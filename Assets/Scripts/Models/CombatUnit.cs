@@ -185,100 +185,6 @@ namespace HammerAndSickle.Models
         Tiny
     }
 
-    ///// <summary>
-    ///// Represents a military unit with identification, base stats, and optional transport mounting.
-    ///// </summary>
-    //public class CombatUnit
-    //{
-    //    #region Constants
-
-    //    /// <summary>
-    //    /// The maximum possible hit points a unit can have, used as the baseline for calculating
-    //    /// strength multipliers.
-    //    /// </summary>
-    //    public const int MaxPossibleHitPoints = 40;
-
-    //    #endregion
-
-    //    // Identification and metadata
-    //    public string UnitName { get; set; }
-    //    public UnitType UnitType { get; private set; }
-    //    public UnitClassification Classification { get; private set; }
-    //    public UnitRole Role { get; private set; }
-    //    public Side Side { get; private set; }
-    //    public Nationality Nationality { get; private set; }
-    //    public bool IsTransportable { get; private set; }
-
-    //    // Action counts per turn
-    //    public int MoveActions { get; private set; }
-    //    public int CombatActions { get; private set; }
-    //    public int SpecialActions { get; private set; }
-
-    //    // Combat profiles
-    //    public WeaponSystemProfile DeployedProfile { get; private set; }
-    //    public WeaponSystemProfile MountedProfile { get; private set; }
-
-    //    // Informational profile
-    //    public UnitProfile UnitProfile { get; private set; }
-
-    //    // Is this unit currently mounted on a transport?
-    //    public bool IsMounted { get; private set; }
-
-    //    // Experience
-    //    public int ExperiencePoints { get; private set; }
-    //    public ExperienceLevel ExperienceLevel { get; private set; }
-
-    //    // Combat readiness state gauge
-    //    public EfficiencyLevel EfficiencyLevel { get; private set; }
-
-    //    // Signals intelligence rating
-    //    public UnitCapability SIGINT_Rating { get; private set; }
-
-    //    // Nuclear, Biological, and Chemical (NBC) rating
-    //    public UnitCapability NBC_Rating { get; private set; }
-
-    //    // Special movement abilities
-    //    public StrategicMobility StrategicMobility { get; private set; }
-
-    //    // Night fighting capability (typically ground and aviation units)
-    //    public UnitCapability NightFighting { get; private set; }
-
-    //    // All weather capability (aircraft only)
-    //    public UnitCapability AllWeather { get; private set; }
-
-    //    // Visibility profile
-    //    public VisibilityProfile VisibilityProfile { get; private set; }
-
-    //    // Hit points
-    //    public const int MaxHitPoints = 40;
-    //    private int hitPoints;
-    //    public int HitPoints => hitPoints;
-
-    //    // Days of supply.
-    //    public const float MaxDaysSupplyDepot = 100f;
-    //    public const float MaxDaysSupplyUnit = 7f;
-    //    public float CurrentDaysSupply = 5f;
-
-    //    // Movement points
-    //    public int MaxMovementPoints { get; private set; }
-    //    public int CurrentMovementPoints { get; private set; }
-
-    //    // Zone of control in hexes
-    //    public int ZOC { get; private set; }
-
-    //    // x,y location on map
-    //    public Vector2 Position { get; private set; }
-
-    //    // TODO: Unit Commander
-    //    // TODO: Airbase structure
-    //    // TODO: Facility structure
-
-
-
-    //    // Constructor and methods will be added in subsequent iterations.
-    //}
-
-
     /// <summary>
     /// Represents a military unit with identification, base stats, and optional transport mounting.
     /// Implements an event-driven design pattern for state changes.
@@ -286,6 +192,12 @@ namespace HammerAndSickle.Models
     [Serializable]
     public class CombatUnit : ICloneable, ISerializable
     {
+        #region TODOs
+        // TODO: Unit Commander
+        // TODO: Airbase structure
+        // TODO: Facility structure
+        #endregion
+
         #region Constants
 
         private const string CLASS_NAME = nameof(CombatUnit);
