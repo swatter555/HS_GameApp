@@ -1,5 +1,7 @@
-﻿using System.Collections;
+﻿using System;
+using System.Collections;
 using System.Collections.Generic;
+using UnityEngine;
 
 namespace HammerAndSickle.Models
 {
@@ -136,62 +138,383 @@ namespace HammerAndSickle.Models
     }
 
     /// <summary>
-    ///  The WeaponSystemProfile is used to give a CombatUnit it's combat values. CombatUnits will
-    ///  have a DeployedProfile and a MountedProfile.Typically, an infanty or artillery based unit
-    ///  will have a mounted and a deployed profile. The deployed profile will be used for as base 
-    ///  unit that cannot change. However, the mounted profile can be upgraded from null to a 
-    ///  to something on it's upgrade list.When a unit is mounted, combat values are derived entirely
-    ///  from the mounted profile.
+    /// The WeaponSystemProfile defines the combat capabilities of a unit.
+    /// It provides values for offensive and defensive capabilities against different target types,
+    /// as well as movement and range parameters. Units can have different profiles when deployed
+    /// or mounted on transports.
     /// </summary>
+    [Serializable]
     public class WeaponSystemProfile
     {
-        public string Name { get; private set; }
-        public Nationality Nationality { get; private set; }
-        public WeaponSystems WeaponSystem { get; private set; }
-        public List<UpgradeType> UpgradeTypes { get; private set; }
-
-        // Values for land combat.
-        public int LandHardAttack { get; set; }
-        public int LandSoftAttack { get; set; }
-        public int LandAirAttack { get; set; }
-        public int LandHardDefense { get; set; }
-        public int LandSoftDefense { get; set; }
-        public int LandAirDefense { get; set; }
-
-        // Values for air combat.
-        public int AirAttack { get; set; }
-        public int AirDefense { get; set; }
-        public int AirAvionics { get; set; }
-        public int AirGroundAttack { get; set; }
-        public int AirGroundDefense { get; set; }
-        public int AirStrategicAttack { get; set; }
-
-        // Values for range.
-        public float PrimaryRange { get; set; }
-        public float IndirectRange { get; set; }
-        public float DetectionRange { get; set; }
-        public float SupportRange { get; set; }
-
-        // Movement points
-        public float MovementModifier { get; set; }
-
-        // ZOC in hexes
-        public int ZOCModifier { get; set; }
+        #region Constants
 
         /// <summary>
-        /// Creates a new instance of the WeaponSystemProfile class.
+        /// The maximum allowed value for any combat statistic
         /// </summary>
-        /// <param name="name"></param>
-        /// <param name="nationality"></param>
-        /// <param name="weaponSystem"></param>
-        /// <param name="upgradeType"></param>
+        public const int MAX_COMBAT_VALUE = 10;
+
+        /// <summary>
+        /// The minimum allowed value for any combat statistic
+        /// </summary>
+        public const int MIN_COMBAT_VALUE = 0;
+
+        /// <summary>
+        /// The maximum allowed range for any weapon system in hexes
+        /// </summary>
+        public const float MAX_RANGE = 25.0f;
+
+        /// <summary>
+        /// The minimum allowed range for any weapon system in hexes
+        /// </summary>
+        public const float MIN_RANGE = 0.0f;
+
+        #endregion
+
+        #region Properties
+
+        /// <summary>
+        /// The display name of this weapon system profile
+        /// </summary>
+        public string Name { get; private set; }
+
+        /// <summary>
+        /// The nationality of this weapon system
+        /// </summary>
+        public Nationality Nationality { get; private set; }
+
+        /// <summary>
+        /// The specific weapon system this profile represents
+        /// </summary>
+        public WeaponSystems WeaponSystem { get; private set; }
+
+        /// <summary>
+        /// List of possible upgrade types compatible with this weapon system
+        /// </summary>
+        public List<UpgradeType> UpgradeTypes { get; private set; }
+
+        /// <summary>
+        /// Attack value against armored/hard targets like tanks or fortifications
+        /// </summary>
+        private int landHardAttack;
+        public int LandHardAttack
+        {
+            get => landHardAttack;
+            set => landHardAttack = ValidateCombatValue(value);
+        }
+
+        /// <summary>
+        /// Attack value against unarmored/soft targets like infantry
+        /// </summary>
+        private int landSoftAttack;
+        public int LandSoftAttack
+        {
+            get => landSoftAttack;
+            set => landSoftAttack = ValidateCombatValue(value);
+        }
+
+        /// <summary>
+        /// Attack value against air units from ground units
+        /// </summary>
+        private int landAirAttack;
+        public int LandAirAttack
+        {
+            get => landAirAttack;
+            set => landAirAttack = ValidateCombatValue(value);
+        }
+
+        /// <summary>
+        /// Defense value against attacks targeting armored/hard units
+        /// </summary>
+        private int landHardDefense;
+        public int LandHardDefense
+        {
+            get => landHardDefense;
+            set => landHardDefense = ValidateCombatValue(value);
+        }
+
+        /// <summary>
+        /// Defense value against attacks targeting unarmored/soft units
+        /// </summary>
+        private int landSoftDefense;
+        public int LandSoftDefense
+        {
+            get => landSoftDefense;
+            set => landSoftDefense = ValidateCombatValue(value);
+        }
+
+        /// <summary>
+        /// Defense value against attacks from air units
+        /// </summary>
+        private int landAirDefense;
+        public int LandAirDefense
+        {
+            get => landAirDefense;
+            set => landAirDefense = ValidateCombatValue(value);
+        }
+
+        /// <summary>
+        /// Air unit's attack value against other air units
+        /// </summary>
+        private int airAttack;
+        public int AirAttack
+        {
+            get => airAttack;
+            set => airAttack = ValidateCombatValue(value);
+        }
+
+        /// <summary>
+        /// Air unit's defense value against attacks from other air units
+        /// </summary>
+        private int airDefense;
+        public int AirDefense
+        {
+            get => airDefense;
+            set => airDefense = ValidateCombatValue(value);
+        }
+
+        /// <summary>
+        /// Represents the sophistication of an air unit's sensors and electronics
+        /// </summary>
+        private int airAvionics;
+        public int AirAvionics
+        {
+            get => airAvionics;
+            set => airAvionics = ValidateCombatValue(value);
+        }
+
+        /// <summary>
+        /// Air unit's attack value against ground targets
+        /// </summary>
+        private int airGroundAttack;
+        public int AirGroundAttack
+        {
+            get => airGroundAttack;
+            set => airGroundAttack = ValidateCombatValue(value);
+        }
+
+        /// <summary>
+        /// Air unit's defense value against ground-based anti-air systems
+        /// </summary>
+        private int airGroundDefense;
+        public int AirGroundDefense
+        {
+            get => airGroundDefense;
+            set => airGroundDefense = ValidateCombatValue(value);
+        }
+
+        /// <summary>
+        /// Air unit's capability for strategic bombing missions
+        /// </summary>
+        private int airStrategicAttack;
+        public int AirStrategicAttack
+        {
+            get => airStrategicAttack;
+            set => airStrategicAttack = ValidateCombatValue(value);
+        }
+
+        /// <summary>
+        /// The standard attack range of the weapon system in hexes
+        /// </summary>
+        private float primaryRange;
+        public float PrimaryRange
+        {
+            get => primaryRange;
+            set => primaryRange = ValidateRange(value);
+        }
+
+        /// <summary>
+        /// The indirect fire range (for artillery, rockets, etc.) in hexes
+        /// </summary>
+        private float indirectRange;
+        public float IndirectRange
+        {
+            get => indirectRange;
+            set => indirectRange = ValidateRange(value);
+        }
+
+        /// <summary>
+        /// How far the unit can detect enemies in hexes
+        /// </summary>
+        private float detectionRange;
+        public float DetectionRange
+        {
+            get => detectionRange;
+            set => detectionRange = ValidateRange(value);
+        }
+
+        /// <summary>
+        /// How far the unit can provide support to friendly units in hexes
+        /// </summary>
+        private float supportRange;
+        public float SupportRange
+        {
+            get => supportRange;
+            set => supportRange = ValidateRange(value);
+        }
+
+        /// <summary>
+        /// Modifier affecting the unit's movement points
+        /// </summary>
+        public float MovementModifier { get; set; }
+
+        /// <summary>
+        /// Modifier affecting the unit's zone of control in hexes
+        /// </summary>
+        public int ZOCModifier { get; set; }
+
+        #endregion
+
+        #region Constructor
+
+        /// <summary>
+        /// Creates a new instance of the WeaponSystemProfile class with default values.
+        /// </summary>
+        /// <param name="name">The display name of this weapon system profile</param>
+        /// <param name="nationality">The nationality this weapon system belongs to</param>
+        /// <param name="weaponSystem">The specific weapon system this profile represents</param>
         public WeaponSystemProfile(string name, Nationality nationality, WeaponSystems weaponSystem)
         {
+            if (string.IsNullOrEmpty(name))
+            {
+                throw new ArgumentException("Name cannot be null or empty", nameof(name));
+            }
+
             Name = name;
             Nationality = nationality;
             WeaponSystem = weaponSystem;
+            UpgradeTypes = new List<UpgradeType>();
+
+            // Initialize with default values
+            LandHardAttack = 0;
+            LandSoftAttack = 0;
+            LandAirAttack = 0;
+            LandHardDefense = 0;
+            LandSoftDefense = 0;
+            LandAirDefense = 0;
+            AirAttack = 0;
+            AirDefense = 0;
+            AirAvionics = 0;
+            AirGroundAttack = 0;
+            AirGroundDefense = 0;
+            AirStrategicAttack = 0;
+            PrimaryRange = 1.0f;
+            IndirectRange = 0.0f;
+            DetectionRange = 1.0f;
+            SupportRange = 0.0f;
+            MovementModifier = 1.0f;
+            ZOCModifier = 0;
         }
 
-        // TODO: Method to add upgrade types.
+        #endregion
+
+        #region Public Methods
+
+        /// <summary>
+        /// Adds an upgrade type to this weapon system profile if it doesn't already exist.
+        /// </summary>
+        /// <param name="upgradeType">The upgrade type to add</param>
+        /// <returns>True if the upgrade type was added, false if it already existed</returns>
+        public bool AddUpgradeType(UpgradeType upgradeType)
+        {
+            if (upgradeType == UpgradeType.None)
+            {
+                return false;
+            }
+
+            if (!UpgradeTypes.Contains(upgradeType))
+            {
+                UpgradeTypes.Add(upgradeType);
+                return true;
+            }
+
+            return false;
+        }
+
+        /// <summary>
+        /// Removes an upgrade type from this weapon system profile if it exists.
+        /// </summary>
+        /// <param name="upgradeType">The upgrade type to remove</param>
+        /// <returns>True if the upgrade type was removed, false if it didn't exist</returns>
+        public bool RemoveUpgradeType(UpgradeType upgradeType)
+        {
+            return UpgradeTypes.Remove(upgradeType);
+        }
+
+        /// <summary>
+        /// Checks if this weapon system profile supports a specific upgrade type.
+        /// </summary>
+        /// <param name="upgradeType">The upgrade type to check</param>
+        /// <returns>True if the upgrade type is supported, false otherwise</returns>
+        public bool HasUpgradeType(UpgradeType upgradeType)
+        {
+            return UpgradeTypes.Contains(upgradeType);
+        }
+
+        /// <summary>
+        /// Creates a deep copy of this weapon system profile.
+        /// </summary>
+        /// <returns>A new WeaponSystemProfile instance with the same values</returns>
+        public WeaponSystemProfile Clone()
+        {
+            var clone = new WeaponSystemProfile(Name, Nationality, WeaponSystem);
+
+            // Copy all combat values
+            clone.LandHardAttack = LandHardAttack;
+            clone.LandSoftAttack = LandSoftAttack;
+            clone.LandAirAttack = LandAirAttack;
+            clone.LandHardDefense = LandHardDefense;
+            clone.LandSoftDefense = LandSoftDefense;
+            clone.LandAirDefense = LandAirDefense;
+            clone.AirAttack = AirAttack;
+            clone.AirDefense = AirDefense;
+            clone.AirAvionics = AirAvionics;
+            clone.AirGroundAttack = AirGroundAttack;
+            clone.AirGroundDefense = AirGroundDefense;
+            clone.AirStrategicAttack = AirStrategicAttack;
+
+            // Copy all range values
+            clone.PrimaryRange = PrimaryRange;
+            clone.IndirectRange = IndirectRange;
+            clone.DetectionRange = DetectionRange;
+            clone.SupportRange = SupportRange;
+
+            // Copy modifiers
+            clone.MovementModifier = MovementModifier;
+            clone.ZOCModifier = ZOCModifier;
+
+            // Copy upgrade types
+            foreach (var upgradeType in UpgradeTypes)
+            {
+                clone.AddUpgradeType(upgradeType);
+            }
+
+            return clone;
+        }
+
+        #endregion
+
+        #region Private Methods
+
+        /// <summary>
+        /// Validates a combat value to ensure it remains within the allowed range.
+        /// </summary>
+        /// <param name="value">The combat value to validate</param>
+        /// <returns>The validated combat value, clamped if necessary</returns>
+        private int ValidateCombatValue(int value)
+        {
+            return Mathf.Clamp(value, MIN_COMBAT_VALUE, MAX_COMBAT_VALUE);
+        }
+
+        /// <summary>
+        /// Validates a range value to ensure it remains within the allowed range.
+        /// </summary>
+        /// <param name="value">The range value to validate</param>
+        /// <returns>The validated range value, clamped if necessary</returns>
+        private float ValidateRange(float value)
+        {
+            return Mathf.Clamp(value, MIN_RANGE, MAX_RANGE);
+        }
+
+        #endregion
     }
 }
