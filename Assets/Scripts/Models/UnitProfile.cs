@@ -1,5 +1,4 @@
 ﻿using System;
-using System.Collections;
 using System.Collections.Generic;
 
 namespace HammerAndSickle.Models
@@ -38,6 +37,25 @@ namespace HammerAndSickle.Models
             Nationality = nationality;
             maxValues = new Dictionary<WeaponSystems, int>();
             CurrentProfile = new Dictionary<WeaponSystems, int>();
+        }
+
+        /// <summary>
+        /// Creates a new instance of UnitProfile as a copy of an existing profile.
+        /// </summary>
+        /// <param name="source">The UnitProfile to copy from</param>
+        private UnitProfile(UnitProfile source)
+        {
+            if (source == null)
+            {
+                throw new ArgumentNullException(nameof(source));
+            }
+
+            Name = source.Name;
+            Nationality = source.Nationality;
+
+            // Deep copy the dictionaries
+            maxValues = new Dictionary<WeaponSystems, int>(source.maxValues);
+            CurrentProfile = new Dictionary<WeaponSystems, int>(source.CurrentProfile);
         }
 
         #endregion
@@ -87,6 +105,52 @@ namespace HammerAndSickle.Models
                 int currentValue = (int)Math.Round(maxValues[weaponSystem] * multiplier);
                 CurrentProfile[weaponSystem] = currentValue;
             }
+        }
+
+        /// <summary>
+        /// Creates a deep copy of this UnitProfile.
+        /// </summary>
+        /// <returns>A new UnitProfile with identical values</returns>
+        public UnitProfile Clone()
+        {
+            return new UnitProfile(this);
+        }
+
+        /// <summary>
+        /// Creates a deep copy of this UnitProfile with a new name.
+        /// </summary>
+        /// <param name="newName">The name for the cloned profile</param>
+        /// <returns>A new UnitProfile with identical values but a different name</returns>
+        public UnitProfile Clone(string newName)
+        {
+            if (string.IsNullOrEmpty(newName))
+            {
+                throw new ArgumentException("New name cannot be null or empty", nameof(newName));
+            }
+
+            var clone = new UnitProfile(this);
+            clone.Name = newName;
+            return clone;
+        }
+
+        /// <summary>
+        /// Creates a copy of this UnitProfile with a different nationality.
+        /// Useful for creating variants of units for different factions.
+        /// </summary>
+        /// <param name="newName">The name for the cloned profile</param>
+        /// <param name="newNationality">The nationality for the cloned profile</param>
+        /// <returns>A new UnitProfile with the specified name and nationality</returns>
+        public UnitProfile Clone(string newName, Nationality newNationality)
+        {
+            if (string.IsNullOrEmpty(newName))
+            {
+                throw new ArgumentException("New name cannot be null or empty", nameof(newName));
+            }
+
+            var clone = new UnitProfile(this);
+            clone.Name = newName;
+            clone.Nationality = newNationality;
+            return clone;
         }
 
         #endregion
