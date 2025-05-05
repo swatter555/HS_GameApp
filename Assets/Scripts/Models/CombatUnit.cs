@@ -55,6 +55,7 @@ namespace HammerAndSickle.Models
         RCN,    // Recon Aircraft
         FWT,    // Fixed-wing transport
         FAC,    // Facility
+        DEPOT,  // Supply Depot
         AIRB,   // Airbase
     }
 
