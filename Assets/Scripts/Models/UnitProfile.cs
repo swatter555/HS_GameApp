@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Runtime.Serialization;
+using HammerAndSickle.Services;
 
 namespace HammerAndSickle.Models
 {
@@ -9,8 +11,13 @@ namespace HammerAndSickle.Models
     /// mechanism is meant only for informational purposes, displayed in the GUI to the user.
     /// This allows for the tracking of losses during a scenario and/or campaign.
     /// </summary>
-    public class UnitProfile
+    [Serializable]
+    public class UnitProfile : ISerializable, ICloneable
     {
+        #region Constants
+        private const string CLASS_NAME = nameof(UnitProfile);
+        #endregion
+
         #region Properties
 
         public string Name { get; private set; }
@@ -56,6 +63,49 @@ namespace HammerAndSickle.Models
             // Deep copy the dictionaries
             maxValues = new Dictionary<WeaponSystems, int>(source.maxValues);
             CurrentProfile = new Dictionary<WeaponSystems, int>(source.CurrentProfile);
+        }
+
+        /// <summary>
+        /// Deserialization constructor.
+        /// </summary>
+        protected UnitProfile(SerializationInfo info, StreamingContext context)
+        {
+            try
+            {
+                // Retrieve basic properties
+                Name = info.GetString(nameof(Name));
+                Nationality = (Nationality)info.GetValue(nameof(Nationality), typeof(Nationality));
+
+                // Retrieve dictionaries
+                // First get the count of elements in each dictionary
+                int maxValuesCount = info.GetInt32("MaxValuesCount");
+                int currentProfileCount = info.GetInt32("CurrentProfileCount");
+
+                // Initialize dictionaries
+                maxValues = new Dictionary<WeaponSystems, int>();
+                CurrentProfile = new Dictionary<WeaponSystems, int>();
+
+                // Deserialize maxValues
+                for (int i = 0; i < maxValuesCount; i++)
+                {
+                    WeaponSystems weapon = (WeaponSystems)info.GetValue($"MaxValuesKey_{i}", typeof(WeaponSystems));
+                    int value = info.GetInt32($"MaxValuesValue_{i}");
+                    maxValues[weapon] = value;
+                }
+
+                // Deserialize CurrentProfile
+                for (int i = 0; i < currentProfileCount; i++)
+                {
+                    WeaponSystems weapon = (WeaponSystems)info.GetValue($"CurrentProfileKey_{i}", typeof(WeaponSystems));
+                    int value = info.GetInt32($"CurrentProfileValue_{i}");
+                    CurrentProfile[weapon] = value;
+                }
+            }
+            catch (Exception e)
+            {
+                AppService.Instance.HandleException(CLASS_NAME, "DeserializationConstructor", e);
+                throw;
+            }
         }
 
         #endregion
@@ -151,6 +201,64 @@ namespace HammerAndSickle.Models
             clone.Name = newName;
             clone.Nationality = newNationality;
             return clone;
+        }
+
+        #endregion
+
+        #region ISerializable Implementation
+
+        /// <summary>
+        /// Serializes this UnitProfile instance.
+        /// </summary>
+        public void GetObjectData(SerializationInfo info, StreamingContext context)
+        {
+            try
+            {
+                // Store basic properties
+                info.AddValue(nameof(Name), Name);
+                info.AddValue(nameof(Nationality), Nationality);
+
+                // Store dictionaries
+                // First store the count of elements in each dictionary
+                info.AddValue("MaxValuesCount", maxValues.Count);
+                info.AddValue("CurrentProfileCount", CurrentProfile.Count);
+
+                // Serialize maxValues
+                int i = 0;
+                foreach (var kvp in maxValues)
+                {
+                    info.AddValue($"MaxValuesKey_{i}", kvp.Key);
+                    info.AddValue($"MaxValuesValue_{i}", kvp.Value);
+                    i++;
+                }
+
+                // Serialize CurrentProfile
+                i = 0;
+                foreach (var kvp in CurrentProfile)
+                {
+                    info.AddValue($"CurrentProfileKey_{i}", kvp.Key);
+                    info.AddValue($"CurrentProfileValue_{i}", kvp.Value);
+                    i++;
+                }
+            }
+            catch (Exception e)
+            {
+                AppService.Instance.HandleException(CLASS_NAME, "GetObjectData", e);
+                throw;
+            }
+        }
+
+        #endregion
+
+        #region ICloneable Implementation
+
+        /// <summary>
+        /// Creates a deep copy of this UnitProfile.
+        /// </summary>
+        /// <returns>A new UnitProfile with identical values</returns>
+        object ICloneable.Clone()
+        {
+            return new UnitProfile(this);
         }
 
         #endregion

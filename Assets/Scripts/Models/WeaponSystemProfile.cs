@@ -1,6 +1,8 @@
-﻿using System;
+﻿using HammerAndSickle.Services;
+using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Runtime.Serialization;
 using UnityEngine;
 
 namespace HammerAndSickle.Models
@@ -144,9 +146,11 @@ namespace HammerAndSickle.Models
     /// or mounted on transports.
     /// </summary>
     [Serializable]
-    public class WeaponSystemProfile
+    public class WeaponSystemProfile : ISerializable, ICloneable
     {
         #region Constants
+
+        private const string CLASS_NAME = nameof(WeaponSystemProfile);
 
         /// <summary>
         /// The maximum allowed value for any combat statistic
@@ -405,6 +409,59 @@ namespace HammerAndSickle.Models
             ZOCModifier = 0;
         }
 
+        /// <summary>
+        /// Deserialization constructor.
+        /// </summary>
+        protected WeaponSystemProfile(SerializationInfo info, StreamingContext context)
+        {
+            try
+            {
+                // Basic properties
+                Name = info.GetString(nameof(Name));
+                Nationality = (Nationality)info.GetValue(nameof(Nationality), typeof(Nationality));
+                WeaponSystem = (WeaponSystems)info.GetValue(nameof(WeaponSystem), typeof(WeaponSystems));
+
+                // Combat values
+                landHardAttack = info.GetInt32(nameof(landHardAttack));
+                landSoftAttack = info.GetInt32(nameof(landSoftAttack));
+                landAirAttack = info.GetInt32(nameof(landAirAttack));
+                landHardDefense = info.GetInt32(nameof(landHardDefense));
+                landSoftDefense = info.GetInt32(nameof(landSoftDefense));
+                landAirDefense = info.GetInt32(nameof(landAirDefense));
+                airAttack = info.GetInt32(nameof(airAttack));
+                airDefense = info.GetInt32(nameof(airDefense));
+                airAvionics = info.GetInt32(nameof(airAvionics));
+                airGroundAttack = info.GetInt32(nameof(airGroundAttack));
+                airGroundDefense = info.GetInt32(nameof(airGroundDefense));
+                airStrategicAttack = info.GetInt32(nameof(airStrategicAttack));
+
+                // Range values
+                primaryRange = info.GetSingle(nameof(primaryRange));
+                indirectRange = info.GetSingle(nameof(indirectRange));
+                detectionRange = info.GetSingle(nameof(detectionRange));
+                supportRange = info.GetSingle(nameof(supportRange));
+
+                // Modifiers
+                MovementModifier = info.GetSingle(nameof(MovementModifier));
+                ZOCModifier = info.GetInt32(nameof(ZOCModifier));
+
+                // Deserialize UpgradeTypes
+                int upgradeTypesCount = info.GetInt32("UpgradeTypesCount");
+                UpgradeTypes = new List<UpgradeType>(upgradeTypesCount);
+
+                for (int i = 0; i < upgradeTypesCount; i++)
+                {
+                    UpgradeType upgradeType = (UpgradeType)info.GetValue($"UpgradeType_{i}", typeof(UpgradeType));
+                    UpgradeTypes.Add(upgradeType);
+                }
+            }
+            catch (Exception e)
+            {
+                AppService.Instance.HandleException(CLASS_NAME, "DeserializationConstructor", e);
+                throw;
+            }
+        }
+
         #endregion
 
         #region Public Methods
@@ -513,6 +570,74 @@ namespace HammerAndSickle.Models
         private float ValidateRange(float value)
         {
             return Mathf.Clamp(value, MIN_RANGE, MAX_RANGE);
+        }
+
+        #endregion
+
+        #region ISerializable Implementation
+
+        /// <summary>
+        /// Serializes this WeaponSystemProfile instance.
+        /// </summary>
+        public void GetObjectData(SerializationInfo info, StreamingContext context)
+        {
+            try
+            {
+                // Basic properties
+                info.AddValue(nameof(Name), Name);
+                info.AddValue(nameof(Nationality), Nationality);
+                info.AddValue(nameof(WeaponSystem), WeaponSystem);
+
+                // Combat values
+                info.AddValue(nameof(landHardAttack), landHardAttack);
+                info.AddValue(nameof(landSoftAttack), landSoftAttack);
+                info.AddValue(nameof(landAirAttack), landAirAttack);
+                info.AddValue(nameof(landHardDefense), landHardDefense);
+                info.AddValue(nameof(landSoftDefense), landSoftDefense);
+                info.AddValue(nameof(landAirDefense), landAirDefense);
+                info.AddValue(nameof(airAttack), airAttack);
+                info.AddValue(nameof(airDefense), airDefense);
+                info.AddValue(nameof(airAvionics), airAvionics);
+                info.AddValue(nameof(airGroundAttack), airGroundAttack);
+                info.AddValue(nameof(airGroundDefense), airGroundDefense);
+                info.AddValue(nameof(airStrategicAttack), airStrategicAttack);
+
+                // Range values
+                info.AddValue(nameof(primaryRange), primaryRange);
+                info.AddValue(nameof(indirectRange), indirectRange);
+                info.AddValue(nameof(detectionRange), detectionRange);
+                info.AddValue(nameof(supportRange), supportRange);
+
+                // Modifiers
+                info.AddValue(nameof(MovementModifier), MovementModifier);
+                info.AddValue(nameof(ZOCModifier), ZOCModifier);
+
+                // Serialize UpgradeTypes
+                info.AddValue("UpgradeTypesCount", UpgradeTypes.Count);
+
+                for (int i = 0; i < UpgradeTypes.Count; i++)
+                {
+                    info.AddValue($"UpgradeType_{i}", UpgradeTypes[i]);
+                }
+            }
+            catch (Exception e)
+            {
+                AppService.Instance.HandleException(CLASS_NAME, "GetObjectData", e);
+                throw;
+            }
+        }
+
+        #endregion
+
+        #region ICloneable Implementation
+
+        /// <summary>
+        /// Creates a deep copy of this weapon system profile.
+        /// </summary>
+        /// <returns>A new WeaponSystemProfile instance with the same values</returns>
+        object ICloneable.Clone()
+        {
+            return Clone();
         }
 
         #endregion
