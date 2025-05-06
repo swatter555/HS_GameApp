@@ -78,4 +78,4 @@ crashlytics-build.properties
 # Always include Scripts directory
 !.gitignore
 !/Assets/Scripts/
-!/Assets/Scripts/**/*
+!/Assets/Scripts/Models/*
