@@ -67,7 +67,7 @@ namespace HammerAndSickle.Models
     /// It handles stockpile management, supply projection, generation, and special abilities.
     /// </summary>
     [Serializable]
-    public class SupplyDepot : ISerializable
+    public class SupplyDepot : LandBase, ISerializable
     {
         #region Constants
         private const string CLASS_NAME = nameof(SupplyDepot);
@@ -292,7 +292,7 @@ namespace HammerAndSickle.Models
         /// <summary>
         /// Creates a new supply depot with default values.
         /// </summary>
-        public SupplyDepot()
+        public SupplyDepot() : base()
         {
             depotID = Guid.NewGuid().ToString();
             depotName = "Supply Depot";
@@ -309,11 +309,12 @@ namespace HammerAndSickle.Models
         /// Creates a new supply depot with the specified parameters.
         /// </summary>
         /// <param name="name">The name of the depot</param>
-        /// <param name="position">The position on the map</param>
         /// <param name="side">Which side the depot belongs to</param>
         /// <param name="depotSize">Size of the depot</param>
         /// <param name="isMainDepot">Whether this is a main depot</param>
-        public SupplyDepot(string name, Side side, DepotSize depotSize, bool isMainDepot = false)
+        /// <param name="initialDamage">Initial damage level (0-100)</param>
+        public SupplyDepot(string name, Side side, DepotSize depotSize, bool isMainDepot = false, int initialDamage = 0)
+            : base(initialDamage)
         {
             try
             {
@@ -339,15 +340,13 @@ namespace HammerAndSickle.Models
         /// <summary>
         /// Deserialization constructor.
         /// </summary>
-        protected SupplyDepot(SerializationInfo info, StreamingContext context)
+        protected SupplyDepot(SerializationInfo info, StreamingContext context) : base(info, context)
         {
             try
             {
                 // Basic depot information
                 depotID = info.GetString(nameof(depotID));
                 depotName = info.GetString(nameof(depotName));
-                float posX = info.GetSingle("PositionX");
-                float posY = info.GetSingle("PositionY");
                 side = (Side)info.GetValue(nameof(side), typeof(Side));
 
                 // Depot attributes
@@ -387,7 +386,10 @@ namespace HammerAndSickle.Models
         /// <returns></returns>
         private float GetCurrentGenerationRate()
         {
-            return GenerationRateValues[generationRate];
+            float baseRate = GenerationRateValues[generationRate];
+            float efficiencyMultiplier = GetEfficiencyMultiplier();
+
+            return baseRate * efficiencyMultiplier;
         }
 
         /// <summary>
@@ -446,6 +448,12 @@ namespace HammerAndSickle.Models
         {
             try
             {
+                // If depot is completely out of operation, no supplies are generated
+                if (!IsOperational())
+                {
+                    return 0f;
+                }
+
                 float generatedAmount = GetCurrentGenerationRate();
 
                 // Don't exceed maximum capacity
@@ -514,10 +522,17 @@ namespace HammerAndSickle.Models
                     return 0f;
                 }
 
-                // Calculate efficiency based on distance and enemy ZOCs
+                // Check if the depot is operational at all
+                if (!IsOperational())
+                {
+                    return 0f;
+                }
+
+                // Calculate efficiency based on distance, enemy ZOCs, and operational capacity
                 float distanceEfficiency = 1f - (distanceInHexes / (float)ProjectionRadius * 0.5f);
                 float zocEfficiency = 1f - (enemyZOCsCrossed / (float)(PenetrationStrength + 1) * 0.3f);
-                float efficiency = distanceEfficiency * zocEfficiency;
+                float operationalEfficiency = GetEfficiencyMultiplier();
+                float efficiency = distanceEfficiency * zocEfficiency * operationalEfficiency;
 
                 // Calculate amount to deliver
                 float maxDeliverable = Math.Min(requestedAmount, MaxUnitStockpileAmount);
@@ -717,13 +732,22 @@ namespace HammerAndSickle.Models
         {
             try
             {
+                // First check if the depot is operational and has air supply capability
+                if (!IsOperational() || !HasAirSupply)
+                {
+                    return 0f;
+                }
+
                 if (distanceInHexes > AirSupplyMaxRange)
                 {
                     return 0f;
                 }
 
-                // Air supply efficiency decreases with distance
-                float efficiencyFactor = 1f - (distanceInHexes / (float)AirSupplyMaxRange * 0.7f);
+                // Air supply efficiency decreases with distance and is affected by operational capacity
+                float distanceEfficiency = 1f - (distanceInHexes / (float)AirSupplyMaxRange * 0.7f);
+                float operationalEfficiency = GetEfficiencyMultiplier();
+                float efficiencyFactor = distanceEfficiency * operationalEfficiency;
+
                 float maxDeliverable = Math.Min(amountRequested, MaxUnitStockpileAmount);
                 float actualAmount = maxDeliverable * efficiencyFactor;
 
@@ -752,13 +776,22 @@ namespace HammerAndSickle.Models
         {
             try
             {
+                // First check if the depot is operational and has naval supply capability
+                if (!IsOperational() || !HasNavalSupply)
+                {
+                    return 0f;
+                }
+
                 if (distanceInHexes > NavalSupplyMaxRange)
                 {
                     return 0f;
                 }
 
-                // Naval supply is more efficient than air but still affected by distance
-                float efficiencyFactor = 1f - (distanceInHexes / (float)NavalSupplyMaxRange * 0.4f);
+                // Naval supply is more efficient than air but still affected by distance and operational capacity
+                float distanceEfficiency = 1f - (distanceInHexes / (float)NavalSupplyMaxRange * 0.4f);
+                float operationalEfficiency = GetEfficiencyMultiplier();
+                float efficiencyFactor = distanceEfficiency * operationalEfficiency;
+
                 float maxDeliverable = Math.Min(amountRequested, stockpileInDays * 0.5f); // Can deliver 50% of on-hand supplies
                 float actualAmount = maxDeliverable * efficiencyFactor;
 
@@ -847,10 +880,13 @@ namespace HammerAndSickle.Models
         /// <summary>
         /// Serializes this SupplyDepot instance.
         /// </summary>
-        public void GetObjectData(SerializationInfo info, StreamingContext context)
+        public override void GetObjectData(SerializationInfo info, StreamingContext context)
         {
             try
             {
+                // Call base class serialization first
+                base.GetObjectData(info, context);
+
                 // Basic depot information
                 info.AddValue(nameof(depotID), depotID);
                 info.AddValue(nameof(depotName), depotName);

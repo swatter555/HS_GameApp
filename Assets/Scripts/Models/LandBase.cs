@@ -1,14 +1,14 @@
-using System.Collections.Generic;
+
 using System;
-using UnityEngine;
-using UnityEngine.Rendering;
+using System.Runtime.Serialization;
+using HammerAndSickle.Services;
 
 namespace HammerAndSickle.Models
 {
     /// <summary>
-    /// Reflects the ability of the airbase to operate.
+    /// Represents the operational capacity of a land-based facility based on damage level.
     /// </summary>
-    public enum AirbaseOperationsCapacity
+    public enum OperationalCapacity
     {
         Full,
         SlightlyDegraded,
@@ -18,155 +18,243 @@ namespace HammerAndSickle.Models
     }
 
     /// <summary>
-    /// This class holds specialized information regarding airbases, supply depots, and facilities.
+    /// Base class for all land-based facilities including airbases and supply depots.
+    /// Provides common functionality for damage tracking, repairs, and operational status.
     /// </summary>
-    public class LandBase
+    [Serializable]
+    public class LandBase : ISerializable
     {
-        #region Airbase Information
-        public const int MaxBaseAirUnits = 4;
+        #region Constants
+        private const string CLASS_NAME = nameof(LandBase);
 
-        // Field to hold the list of attached air units.
-        private List<CombatUnit> airUnitsAttached = new List<CombatUnit>();
+        /// <summary>
+        /// The maximum possible damage value (100%)
+        /// </summary>
+        public const int MAX_DAMAGE = 100;
 
-        // Field to hold the damage level of the airbase.
+        /// <summary>
+        /// The minimum possible damage value (0%)
+        /// </summary>
+        public const int MIN_DAMAGE = 0;
+        #endregion
+
+        #region Fields
+        /// <summary>
+        /// Current damage level of the facility (0-100)
+        /// </summary>
         private int damage = 0;
 
-        // Field to hold the operational capacity of the airbase.
-        private AirbaseOperationsCapacity airbaseCapacity = AirbaseOperationsCapacity.Full;
-
         /// <summary>
-        /// Property to get the list of BaseUnit objects. There is no setter for this property.
+        /// Current operational capacity based on damage
         /// </summary>
-        public IReadOnlyList<CombatUnit> AirUnitsAttached => airUnitsAttached;
+        private OperationalCapacity operationalCapacity = OperationalCapacity.Full;
+        #endregion
 
+        #region Properties
         /// <summary>
-        /// Property to get the damage level of the airbase. There is no setter for this property.
+        /// Gets the current damage level of the facility.
         /// </summary>
         public int Damage => damage;
 
         /// <summary>
-        /// Property to get the operational capacity of the airbase. There is no setter for this property.
+        /// Gets the current operational capacity of the facility.
         /// </summary>
-        public AirbaseOperationsCapacity AirbaseCapacity => airbaseCapacity;
+        public OperationalCapacity OperationalCapacity => operationalCapacity;
+        #endregion
 
+        #region Constructors
         /// <summary>
-        /// Adds a BaseUnit to the list.
+        /// Creates a new instance of the LandBase class with default values.
         /// </summary>
-        /// <param name="unit">The BaseUnit to add.</param>
-        public void AddAirUnit(CombatUnit unit)
+        public LandBase()
         {
-            // Check for null.
-            if (unit == null)
-            {
-                
-            }
-
-            // Make sure we don't add more than 4.
-            if (airUnitsAttached.Count > MaxBaseAirUnits)
-            {
-                
-            }
-
-            // Make sure its an aircraft BaseUnitValueType unit.
-            if (unit.UnitType != UnitType.AirUnit)
-            {
-                
-            }
-            else airUnitsAttached.Add(unit);
+            // Default constructor initializes with no damage and full operational capacity
+            damage = MIN_DAMAGE;
+            operationalCapacity = OperationalCapacity.Full;
         }
 
         /// <summary>
-        /// Removes a BaseUnit from the list.
+        /// Creates a new instance of the LandBase class with specified initial damage.
         /// </summary>
-        /// <param name="unit">The BaseUnit to remove.</param>
-        /// <returns>True if the unit was successfully removed, otherwise false.</returns>
-        public bool RemoveAirUnit(CombatUnit unit)
+        /// <param name="initialDamage">The initial damage level (0-100)</param>
+        public LandBase(int initialDamage)
         {
-            if (unit == null)
+            try
             {
-                
+                // Initialize with specified damage
+                AddDamage(initialDamage);
             }
-
-            return airUnitsAttached.Remove(unit);
-        }
-
-        /// <summary>
-        /// Adds damage to the airbase. This method is currently empty and will be implemented later.
-        /// </summary>
-        public void AddDamage(int incomingDamage)
-        {
-            // Clamp the incoming damage to be between 1 and 100.
-            incomingDamage = Math.Max(1, Math.Min(100, incomingDamage));
-
-            // Add the incoming damage to the current damage.
-            damage += incomingDamage;
-
-            // Clamp the total damage to be between 1 and 100.
-            damage = Math.Max(1, Math.Min(100, damage));
-
-            // Update the airbase's operational capacity based on the new damage level.
-            if (damage >= 81 && damage <= 100)
+            catch (Exception e)
             {
-                airbaseCapacity = AirbaseOperationsCapacity.OutOfOperation;
-            }
-            else if (damage >= 61 && damage <= 80)
-            {
-                airbaseCapacity = AirbaseOperationsCapacity.HeavilyDegraded;
-            }
-            else if (damage >= 41 && damage <= 60)
-            {
-                airbaseCapacity = AirbaseOperationsCapacity.ModeratelyDegraded;
-            }
-            else if (damage >= 21 && damage <= 40)
-            {
-                airbaseCapacity = AirbaseOperationsCapacity.SlightlyDegraded;
-            }
-            else
-            {
-                airbaseCapacity = AirbaseOperationsCapacity.Full;
+                AppService.Instance.HandleException(CLASS_NAME, "Constructor", e);
+                throw;
             }
         }
 
         /// <summary>
-        /// Removes damage from the airbase. This method is currently empty and will be implemented later.
+        /// Deserialization constructor.
         /// </summary>
-        public void RemoveDamage(int repairAmount)
+        protected LandBase(SerializationInfo info, StreamingContext context)
         {
-            // Clamp the repair amount to be between 1 and 100.
-            repairAmount = Math.Max(1, Math.Min(100, repairAmount));
-
-            // Remove the repair amount from the current damage.
-            damage -= repairAmount;
-
-            // Clamp the total damage to be between 1 and 100.
-            damage = Math.Max(1, Math.Min(100, damage));
-
-            // Update the airbase's operational capacity based on the new damage level.
-            if (damage >= 81 && damage <= 100)
+            try
             {
-                airbaseCapacity = AirbaseOperationsCapacity.OutOfOperation;
+                // Retrieve base fields
+                damage = info.GetInt32(nameof(damage));
+                operationalCapacity = (OperationalCapacity)info.GetValue(nameof(operationalCapacity), typeof(OperationalCapacity));
             }
-            else if (damage >= 61 && damage <= 80)
+            catch (Exception e)
             {
-                airbaseCapacity = AirbaseOperationsCapacity.HeavilyDegraded;
-            }
-            else if (damage >= 41 && damage <= 60)
-            {
-                airbaseCapacity = AirbaseOperationsCapacity.ModeratelyDegraded;
-            }
-            else if (damage >= 21 && damage <= 40)
-            {
-                airbaseCapacity = AirbaseOperationsCapacity.SlightlyDegraded;
-            }
-            else
-            {
-                airbaseCapacity = AirbaseOperationsCapacity.Full;
+                AppService.Instance.HandleException(CLASS_NAME, "DeserializationConstructor", e);
+                throw;
             }
         }
         #endregion
 
-        #region Supply Depot Information
+        #region Public Methods
+        /// <summary>
+        /// Adds damage to the facility and updates its operational capacity.
+        /// </summary>
+        /// <param name="incomingDamage">The amount of damage to add (1-100)</param>
+        public virtual void AddDamage(int incomingDamage)
+        {
+            try
+            {
+                // Clamp the incoming damage to be between 1 and 100
+                incomingDamage = Math.Max(1, Math.Min(MAX_DAMAGE, incomingDamage));
 
+                // Add the incoming damage to the current damage
+                damage += incomingDamage;
+
+                // Clamp the total damage to be between 0 and 100
+                damage = Math.Max(MIN_DAMAGE, Math.Min(MAX_DAMAGE, damage));
+
+                // Update operational capacity based on the new damage level
+                UpdateOperationalCapacity();
+            }
+            catch (Exception e)
+            {
+                AppService.Instance.HandleException(CLASS_NAME, "AddDamage", e);
+                throw;
+            }
+        }
+
+        /// <summary>
+        /// Repairs the facility by removing damage and updating its operational capacity.
+        /// </summary>
+        /// <param name="repairAmount">The amount of damage to repair (1-100)</param>
+        public virtual void RepairDamage(int repairAmount)
+        {
+            try
+            {
+                // Clamp the repair amount to be between 1 and 100
+                repairAmount = Math.Max(1, Math.Min(MAX_DAMAGE, repairAmount));
+
+                // Remove the repair amount from the current damage
+                damage -= repairAmount;
+
+                // Clamp the total damage to be between 0 and 100
+                damage = Math.Max(MIN_DAMAGE, Math.Min(MAX_DAMAGE, damage));
+
+                // Update operational capacity based on the new damage level
+                UpdateOperationalCapacity();
+            }
+            catch (Exception e)
+            {
+                AppService.Instance.HandleException(CLASS_NAME, "RepairDamage", e);
+                throw;
+            }
+        }
+
+        /// <summary>
+        /// Gets the efficiency multiplier based on current operational capacity.
+        /// This can be used to scale operations based on damage.
+        /// </summary>
+        /// <returns>An efficiency multiplier between 0.0 and 1.0</returns>
+        public virtual float GetEfficiencyMultiplier()
+        {
+            switch (operationalCapacity)
+            {
+                case OperationalCapacity.Full:
+                    return 1.0f;
+                case OperationalCapacity.SlightlyDegraded:
+                    return 0.75f;
+                case OperationalCapacity.ModeratelyDegraded:
+                    return 0.5f;
+                case OperationalCapacity.HeavilyDegraded:
+                    return 0.25f;
+                case OperationalCapacity.OutOfOperation:
+                    return 0.0f;
+                default:
+                    return 0.0f;
+            }
+        }
+
+        /// <summary>
+        /// Checks if the facility is operational at any level.
+        /// </summary>
+        /// <returns>True if the facility is at least partly operational, false otherwise</returns>
+        public bool IsOperational()
+        {
+            return operationalCapacity != OperationalCapacity.OutOfOperation;
+        }
+
+        /// <summary>
+        /// Checks if the facility is at full operational capacity.
+        /// </summary>
+        /// <returns>True if the facility is at full capacity, false otherwise</returns>
+        public bool IsFullyOperational()
+        {
+            return operationalCapacity == OperationalCapacity.Full;
+        }
+        #endregion
+
+        #region Protected Methods
+        /// <summary>
+        /// Updates the operational capacity based on the current damage level.
+        /// </summary>
+        protected virtual void UpdateOperationalCapacity()
+        {
+            if (damage >= 81 && damage <= 100)
+            {
+                operationalCapacity = OperationalCapacity.OutOfOperation;
+            }
+            else if (damage >= 61 && damage <= 80)
+            {
+                operationalCapacity = OperationalCapacity.HeavilyDegraded;
+            }
+            else if (damage >= 41 && damage <= 60)
+            {
+                operationalCapacity = OperationalCapacity.ModeratelyDegraded;
+            }
+            else if (damage >= 21 && damage <= 40)
+            {
+                operationalCapacity = OperationalCapacity.SlightlyDegraded;
+            }
+            else
+            {
+                operationalCapacity = OperationalCapacity.Full;
+            }
+        }
+        #endregion
+
+        #region ISerializable Implementation
+        /// <summary>
+        /// Serializes this instance.
+        /// </summary>
+        public virtual void GetObjectData(SerializationInfo info, StreamingContext context)
+        {
+            try
+            {
+                // Store base fields
+                info.AddValue(nameof(damage), damage);
+                info.AddValue(nameof(operationalCapacity), operationalCapacity);
+            }
+            catch (Exception e)
+            {
+                AppService.Instance.HandleException(CLASS_NAME, "GetObjectData", e);
+                throw;
+            }
+        }
         #endregion
     }
 }
