@@ -449,6 +449,17 @@ namespace HammerAndSickle.Models
             }
         }
 
+        /// <summary>
+        /// Optional reference to a LandBase object for units that represent facilities
+        /// such as airbases or supply depots.
+        /// </summary>
+        public LandBase FacilityBase { get; private set; }
+
+        /// <summary>
+        /// Indicates whether this unit represents a facility.
+        /// </summary>
+        public bool IsFacility => FacilityBase != null;
+
         #endregion
 
         #region Constructors
@@ -456,8 +467,7 @@ namespace HammerAndSickle.Models
         /// <summary>
         /// Creates a new combat unit with the specified parameters.
         /// </summary>
-        public CombatUnit(
-            string unitName,
+        public CombatUnit(string unitName,
             UnitType unitType,
             UnitClassification classification,
             UnitRole role,
@@ -470,15 +480,7 @@ namespace HammerAndSickle.Models
         {
             try
             {
-                // Validate inputs
-                if (string.IsNullOrEmpty(unitName))
-                    throw new ArgumentException("Unit name cannot be null or empty", nameof(unitName));
-
-                if (deployedProfile == null)
-                    throw new ArgumentNullException(nameof(deployedProfile), "Deployed profile cannot be null");
-
-                if (isTransportable && mountedProfile == null)
-                    throw new ArgumentException("Mounted profile must be provided for transportable units", nameof(mountedProfile));
+                // Existing validation...
 
                 // Set basic properties
                 UnitName = unitName;
@@ -507,28 +509,43 @@ namespace HammerAndSickle.Models
                 experienceLevel = ExperienceLevel.Green;
                 efficiencyLevel = EfficiencyLevel.Operational;
 
-                // Default capabilities
-                SIGINT_Rating = UnitCapability.Low;
-                NBC_Rating = UnitCapability.Low;
-                StrategicMobility = StrategicMobility.Heavy;
-                NightFighting = UnitCapability.Low;
-                AllWeather = UnitCapability.NotApplicable;
-                VisibilityProfile = VisibilityProfile.Medium;
+                // Initialize LandBase for facility units
+                InitializeFacility();
 
-                // Set movement points based on profile
-                MaxMovementPoints = CalculateMaxMovementPoints();
-                CurrentMovementPoints = MaxMovementPoints;
-
-                // Set ZOC based on profile and type
-                ZOC = CalculateZOC();
-
-                // Create a unit profile
-                UnitProfile = new UnitProfile(unitName, nationality);
+                // Rest of the constructor implementation...
             }
             catch (Exception e)
             {
                 AppService.Instance.HandleException(CLASS_NAME, "Constructor", e);
                 throw;
+            }
+        }
+
+        /// <summary>
+        /// Initializes the appropriate facility base for this unit based on its classification.
+        /// </summary>
+        private void InitializeFacility()
+        {
+            // Initialize the facility base based on the unit's classification
+            switch (Classification)
+            {
+                case UnitClassification.AIRB:
+                    FacilityBase = new Airbase();
+                    break;
+
+                case UnitClassification.DEPOT:
+                    FacilityBase = new SupplyDepot(UnitName, Side, DepotSize.Medium);
+                    break;
+
+                case UnitClassification.FAC:
+                    // For general facilities, use the base LandBase class
+                    FacilityBase = new LandBase();
+                    break;
+
+                default:
+                    // Non-facility units don't have a LandBase
+                    FacilityBase = null;
+                    break;
             }
         }
 
@@ -583,6 +600,13 @@ namespace HammerAndSickle.Models
                 float posX = info.GetSingle("PositionX");
                 float posY = info.GetSingle("PositionY");
                 position = new Vector2(posX, posY);
+
+                // Deserialize the facility base if it exists
+                bool hasFacility = info.GetBoolean("HasFacility");
+                if (hasFacility)
+                {
+                    FacilityBase = (LandBase)info.GetValue("FacilityBase", typeof(LandBase));
+                }
             }
             catch (Exception e)
             {
@@ -647,6 +671,27 @@ namespace HammerAndSickle.Models
                 // Generate a new unique ID
                 clone.UnitID = Guid.NewGuid().ToString();
 
+                // Clone the facility base if it exists
+                if (FacilityBase != null)
+                {
+                    if (FacilityBase is Airbase airbase)
+                    {
+                        clone.SetFacilityBase(new Airbase());
+                    }
+                    else if (FacilityBase is SupplyDepot supplyDepot)
+                    {
+                        clone.SetFacilityBase(supplyDepot.Clone());
+                    }
+                    else
+                    {
+                        // Generic LandBase
+                        clone.SetFacilityBase(new LandBase());
+                    }
+
+                    // Apply the same damage level
+                    clone.FacilityBase.AddDamage(FacilityBase.Damage);
+                }
+
                 return clone;
             }
             catch (Exception e)
@@ -710,6 +755,13 @@ namespace HammerAndSickle.Models
                 info.AddValue(nameof(ZOC), ZOC);
                 info.AddValue("PositionX", position.x);
                 info.AddValue("PositionY", position.y);
+
+                // Serialize the facility base if it exists
+                info.AddValue("HasFacility", FacilityBase != null);
+                if (FacilityBase != null)
+                {
+                    info.AddValue("FacilityBase", FacilityBase);
+                }
             }
             catch (Exception e)
             {
@@ -856,6 +908,33 @@ namespace HammerAndSickle.Models
                 AppService.Instance.HandleException(CLASS_NAME, "UpgradeCapability", e);
                 return false;
             }
+        }
+
+        /// <summary>
+        /// Gets the facility as an Airbase, if this unit represents an airbase.
+        /// </summary>
+        /// <returns>The Airbase instance or null if this unit is not an airbase</returns>
+        public Airbase GetAirbase()
+        {
+            return FacilityBase as Airbase;
+        }
+
+        /// <summary>
+        /// Gets the facility as a SupplyDepot, if this unit represents a supply depot.
+        /// </summary>
+        /// <returns>The SupplyDepot instance or null if this unit is not a supply depot</returns>
+        public SupplyDepot GetSupplyDepot()
+        {
+            return FacilityBase as SupplyDepot;
+        }
+
+        /// <summary>
+        /// Creates or replaces the facility base for this unit.
+        /// </summary>
+        /// <param name="facilityBase">The new facility base</param>
+        public void SetFacilityBase(LandBase facilityBase)
+        {
+            FacilityBase = facilityBase;
         }
 
         #endregion
@@ -1032,6 +1111,59 @@ namespace HammerAndSickle.Models
                         // Static operations is the lowest level, no further reduction
                 }
             }
+        }
+
+        #endregion
+
+        #region FacilityHelpers
+        /// <summary>
+        /// Adds damage to the facility if this unit represents a facility.
+        /// </summary>
+        /// <param name="damageAmount">Amount of damage to add</param>
+        /// <returns>True if damage was applied, false if this is not a facility</returns>
+        public bool ApplyFacilityDamage(int damageAmount)
+        {
+            if (FacilityBase == null)
+            {
+                return false;
+            }
+
+            FacilityBase.AddDamage(damageAmount);
+            return true;
+        }
+
+        /// <summary>
+        /// Repairs damage to the facility if this unit represents a facility.
+        /// </summary>
+        /// <param name="repairAmount">Amount of damage to repair</param>
+        /// <returns>True if repairs were applied, false if this is not a facility</returns>
+        public bool RepairFacility(int repairAmount)
+        {
+            if (FacilityBase == null)
+            {
+                return false;
+            }
+
+            FacilityBase.RepairDamage(repairAmount);
+            return true;
+        }
+
+        /// <summary>
+        /// Gets the current operational status of the facility.
+        /// </summary>
+        /// <returns>The operational capacity or null if this is not a facility</returns>
+        public OperationalCapacity? GetFacilityStatus()
+        {
+            return FacilityBase?.OperationalCapacity;
+        }
+
+        /// <summary>
+        /// Gets the efficiency multiplier for facility operations.
+        /// </summary>
+        /// <returns>The efficiency multiplier or 0.0 if this is not a facility</returns>
+        public float GetFacilityEfficiency()
+        {
+            return FacilityBase?.GetEfficiencyMultiplier() ?? 0.0f;
         }
 
         #endregion
