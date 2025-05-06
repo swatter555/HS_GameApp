@@ -195,8 +195,6 @@ namespace HammerAndSickle.Models
     {
         #region TODOs
         // TODO: Unit Commander
-        // TODO: Airbase structure
-        // TODO: Facility structure
         #endregion
 
         #region Constants
