@@ -5,38 +5,26 @@ using HammerAndSickle.Services;
 namespace HammerAndSickle.Models
 {
     /// <summary>
-    /// Possible ranks for Soviet Officers.
+    /// Represents the military rank grade of a commander.
     /// </summary>
-    public enum OfficerRanks
+    public enum CommandGrade
     {
-        Colonel,
-        MajorGeneral,
-        LieutenantGeneral,
-        ColonelGeneral
+        JuniorGrade,    // Lieutenant Colonel equivalent
+        SeniorGrade,    // Colonel equivalent
+        TopGrade        // Major General equivalent
     }
 
     /// <summary>
     /// The command ability of an officer.
     /// </summary>
-    public enum Command
+    public enum CommandAbilites
     {
         Poor = -2,
         BelowAverage = -1,
         Average = 0,
         Good = 1,
         Superior = 2,
-    }
-
-    /// <summary>
-    /// The aggressiveness of an officer.
-    /// </summary>
-    public enum Initiative
-    {
-        Poor = -2,
-        BelowAverage = -1,
-        Average = 0,
-        Good = 1,
-        Superior = 2,
+        Genius = 3
     }
 
     /// <summary>
@@ -75,17 +63,22 @@ namespace HammerAndSickle.Models
         /// <summary>
         /// The officer's military rank.
         /// </summary>
-        public OfficerRanks OfficerRank { get; set; }
+        public CommandGrade CommandGrade { get; set; }
+
+        /// <summary>
+        /// The officer's real world rank equilivalent.
+        /// </summary>
+        public string FormattedRank { get { return GetFormattedRank(); } }
 
         /// <summary>
         /// The officer's command ability, affecting unit performance.
         /// </summary>
-        public Command OfficerCommand { get; private set; }
+        public CommandAbilites CombatCommand { get; private set; }
 
         /// <summary>
         /// The officer's initiative, affecting action priority and response.
         /// </summary>
-        public Initiative OfficerInitiative { get; private set; }
+        public CommandAbilites CombatInitiative { get; private set; }
 
         /// <summary>
         /// Indicates whether this officer is assigned to a unit.
@@ -105,9 +98,9 @@ namespace HammerAndSickle.Models
             {
                 Side = side;
                 Nationality = nationality;
-                OfficerRank = OfficerRanks.Colonel;
-                OfficerCommand = Command.Average;
-                OfficerInitiative = Initiative.Average;
+                CommandGrade = CommandGrade.JuniorGrade;
+                CombatCommand = CommandAbilites.BelowAverage;
+                CombatInitiative = CommandAbilites.BelowAverage;
                 IsAssigned = false;
                 Name = string.Empty;
             }
@@ -126,16 +119,16 @@ namespace HammerAndSickle.Models
         /// <param name="nationality">The nationality of this officer</param>
         /// <param name="command">The officer's command ability</param>
         /// <param name="initiative">The officer's initiative</param>
-        public UnitCommander(string name, Side side, Nationality nationality, Command command, Initiative initiative)
+        public UnitCommander(string name, Side side, Nationality nationality, CommandAbilites command, CommandAbilites initiative)
         {
             try
             {
                 Name = name;
                 Side = side;
                 Nationality = nationality;
-                OfficerRank = OfficerRanks.Colonel;
-                OfficerCommand = command;
-                OfficerInitiative = initiative;
+                CommandGrade = CommandGrade.JuniorGrade;
+                CombatCommand = command;
+                CombatInitiative = initiative;
                 IsAssigned = false;
             }
             catch (Exception e)
@@ -155,9 +148,9 @@ namespace HammerAndSickle.Models
                 Name = info.GetString(nameof(Name));
                 Side = (Side)info.GetValue(nameof(Side), typeof(Side));
                 Nationality = (Nationality)info.GetValue(nameof(Nationality), typeof(Nationality));
-                OfficerRank = (OfficerRanks)info.GetValue(nameof(OfficerRank), typeof(OfficerRanks));
-                OfficerCommand = (Command)info.GetValue(nameof(OfficerCommand), typeof(Command));
-                OfficerInitiative = (Initiative)info.GetValue(nameof(OfficerInitiative), typeof(Initiative));
+                CommandGrade = (CommandGrade)info.GetValue(nameof(CommandGrade), typeof(CommandGrade));
+                CombatCommand = (CommandAbilites)info.GetValue(nameof(CombatCommand), typeof(CommandAbilites));
+                CombatInitiative = (CommandAbilites)info.GetValue(nameof(CombatInitiative), typeof(CommandAbilites));
                 IsAssigned = info.GetBoolean(nameof(IsAssigned));
             }
             catch (Exception e)
@@ -173,11 +166,11 @@ namespace HammerAndSickle.Models
         /// Sets the officer's command ability.
         /// </summary>
         /// <param name="command">The new command ability value</param>
-        public void SetOfficerCommandAbility(Command command)
+        public void SetOfficerCommandAbility(CommandAbilites command)
         {
             try
             {
-                OfficerCommand = command;
+                CombatCommand = command;
             }
             catch (Exception e)
             {
@@ -190,11 +183,11 @@ namespace HammerAndSickle.Models
         /// Sets the officer's initiative level.
         /// </summary>
         /// <param name="initiative">The new initiative value</param>
-        public void SetOfficerInitiative(Initiative initiative)
+        public void SetOfficerInitiative(CommandAbilites initiative)
         {
             try
             {
-                OfficerInitiative = initiative;
+                CombatInitiative = initiative;
             }
             catch (Exception e)
             {
@@ -207,55 +200,17 @@ namespace HammerAndSickle.Models
         /// Randomly generates an officer with appropriate name, rank, and abilities.
         /// Uses the NameGenService to create culturally appropriate names.
         /// </summary>
-        public void RandomlyGenerateMe()
+        public void RandomlyGenerateMe(Nationality nationality)
         {
             try
             {
+                // TODO: Make this method assign command and initiave on a bell curve and make each
+                // command and initiative within one of each other.
+
                 // Generate a random name based on nationality
-                Name = NameGenService.Instance.GenerateMaleName(Nationality);
+                Name = NameGenService.Instance.GenerateMaleName(nationality);
 
-                // Determine overall ability based on a bell curve distribution
-                double randomValue = rand.NextDouble();
-                if (randomValue < 0.02)
-                {
-                    AssignSkillLevel(Command.Superior, Initiative.Superior);
-                }
-                else if (randomValue < 0.15)
-                {
-                    AssignSkillLevel(Command.Good, Initiative.Good);
-                }
-                else if (randomValue < 0.85)
-                {
-                    AssignSkillLevel(Command.Average, Initiative.Average);
-                }
-                else if (randomValue < 0.98)
-                {
-                    AssignSkillLevel(Command.BelowAverage, Initiative.BelowAverage);
-                }
-                else
-                {
-                    OfficerCommand = Command.Poor;
-                    OfficerInitiative = Initiative.Poor;
-                }
-
-                // Randomly assign a rank (weighted towards lower ranks)
-                randomValue = rand.NextDouble();
-                if (randomValue < 0.70)
-                {
-                    OfficerRank = OfficerRanks.Colonel;
-                }
-                else if (randomValue < 0.90)
-                {
-                    OfficerRank = OfficerRanks.MajorGeneral;
-                }
-                else if (randomValue < 0.98)
-                {
-                    OfficerRank = OfficerRanks.LieutenantGeneral;
-                }
-                else
-                {
-                    OfficerRank = OfficerRanks.ColonelGeneral;
-                }
+                
             }
             catch (Exception e)
             {
@@ -274,39 +229,42 @@ namespace HammerAndSickle.Models
             {
                 return Nationality switch
                 {
-                    Nationality.USSR => OfficerRank switch
+                    Nationality.USSR => CommandGrade switch
                     {
-                        OfficerRanks.Colonel => "Colonel",
-                        OfficerRanks.MajorGeneral => "Major General",
-                        OfficerRanks.LieutenantGeneral => "Lieutenant General",
-                        OfficerRanks.ColonelGeneral => "Colonel General",
+                        CommandGrade.JuniorGrade => "Lieutenant Colonel",
+                        CommandGrade.SeniorGrade => "Colonel",
+                        CommandGrade.TopGrade => "Major General",
                         _ => "Officer",
                     },// Return Soviet-styled ranks
-                    Nationality.USA or Nationality.UK => OfficerRank switch
+                    Nationality.USA or Nationality.UK or Nationality.IQ or Nationality.IR or Nationality.SAUD  => CommandGrade switch
                     {
-                        OfficerRanks.Colonel => "Colonel",
-                        OfficerRanks.MajorGeneral => "Major General",
-                        OfficerRanks.LieutenantGeneral => "Lieutenant General",
-                        OfficerRanks.ColonelGeneral => "General",
+                        CommandGrade.JuniorGrade => "Lieutenant Colonel",
+                        CommandGrade.SeniorGrade => "Colonel",
+                        CommandGrade.TopGrade => "Brigadier General",
                         _ => "Officer",
                     },// Return US/UK-styled ranks
-                    Nationality.FRG => OfficerRank switch
+                    Nationality.FRG => CommandGrade switch
                     {
-                        OfficerRanks.Colonel => "Oberst",
-                        OfficerRanks.MajorGeneral => "Generalmajor",
-                        OfficerRanks.LieutenantGeneral => "Generalleutnant",
-                        OfficerRanks.ColonelGeneral => "General",
+                        CommandGrade.JuniorGrade => "Oberst",
+                        CommandGrade.SeniorGrade => "Generalmajor",
+                        CommandGrade.TopGrade => "Generalleutnant",
                         _ => "Offizier",
                     },// Return German-styled ranks
-                    Nationality.FRA => OfficerRank switch
+                    Nationality.FRA => CommandGrade switch
                     {
-                        OfficerRanks.Colonel => "Colonel",
-                        OfficerRanks.MajorGeneral => "Général de Brigade",
-                        OfficerRanks.LieutenantGeneral => "Général de Division",
-                        OfficerRanks.ColonelGeneral => "Général d'Armée",
+                        CommandGrade.JuniorGrade => "Colonel",
+                        CommandGrade.SeniorGrade => "Général de Brigade",
+                        CommandGrade.TopGrade => "Général de Division",
                         _ => "Officier",
                     },// Return French-styled ranks
-                    _ => OfficerRank.ToString(),// Default formatting
+                    Nationality.MJ => CommandGrade switch
+                    {
+                        CommandGrade.JuniorGrade => " Amir al-Fawj",
+                        CommandGrade.SeniorGrade => "Amir al-Mintaqa",
+                        CommandGrade.TopGrade => "Amir al-Jihad",
+                        _ => "Commander",
+                    },// Return French-styled ranks
+                    _ => CommandGrade.ToString(),// Default formatting
                 };
             }
             catch (Exception e)
@@ -324,15 +282,17 @@ namespace HammerAndSickle.Models
         {
             try
             {
-                int totalRating = (int)OfficerCommand + (int)OfficerInitiative;
+                // TODO: Make sure we are catching all cases.
 
-                if (totalRating >= 3)
+                int totalRating = (int)CombatCommand + (int)CombatInitiative;
+
+                if (totalRating >= 5)
                     return "Outstanding";
-                else if (totalRating >= 1)
+                else if (totalRating >= 4)
                     return "Above Average";
-                else if (totalRating >= -1)
+                else if (totalRating >= 3)
                     return "Average";
-                else if (totalRating >= -3)
+                else if (totalRating >= 2)
                     return "Below Average";
                 else
                     return "Poor";
@@ -341,27 +301,6 @@ namespace HammerAndSickle.Models
             {
                 AppService.Instance.HandleException(CLASS_NAME, "GetPerformanceRating", e);
                 return "Undetermined";
-            }
-        }
-        #endregion
-
-        #region Private Methods
-        /// <summary>
-        /// Assigns skill levels to the officer with some randomness.
-        /// </summary>
-        /// <param name="command">The base command level to assign</param>
-        /// <param name="initiative">The base initiative level to assign</param>
-        private void AssignSkillLevel(Command command, Initiative initiative)
-        {
-            try
-            {
-                OfficerCommand = (rand.NextDouble() < 0.5 && command != Command.Poor) ? (Command)((int)command - 1) : command;
-                OfficerInitiative = (rand.NextDouble() < 0.5 && initiative != Initiative.Poor) ? (Initiative)((int)initiative - 1) : initiative;
-            }
-            catch (Exception e)
-            {
-                AppService.Instance.HandleException(CLASS_NAME, "AssignSkillLevel", e);
-                throw;
             }
         }
         #endregion
@@ -378,9 +317,9 @@ namespace HammerAndSickle.Models
                 info.AddValue(nameof(Name), Name);
                 info.AddValue(nameof(Side), Side);
                 info.AddValue(nameof(Nationality), Nationality);
-                info.AddValue(nameof(OfficerRank), OfficerRank);
-                info.AddValue(nameof(OfficerCommand), OfficerCommand);
-                info.AddValue(nameof(OfficerInitiative), OfficerInitiative);
+                info.AddValue(nameof(CommandGrade), CommandGrade);
+                info.AddValue(nameof(CombatCommand), CombatCommand);
+                info.AddValue(nameof(CombatInitiative), CombatInitiative);
                 info.AddValue(nameof(IsAssigned), IsAssigned);
             }
             catch (Exception e)
@@ -405,12 +344,12 @@ namespace HammerAndSickle.Models
                     Name,
                     Side,
                     Nationality,
-                    OfficerCommand,
-                    OfficerInitiative
+                    CombatCommand,
+                    CombatInitiative
                 );
 
                 // Copy additional properties
-                clone.OfficerRank = this.OfficerRank;
+                clone.CommandGrade = this.CommandGrade;
                 clone.IsAssigned = this.IsAssigned;
 
                 return clone;
