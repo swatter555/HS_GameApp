@@ -527,26 +527,13 @@ namespace HammerAndSickle.Models
         private void InitializeFacility()
         {
             // Initialize the facility base based on the unit's classification
-            switch (Classification)
+            FacilityBase = Classification switch
             {
-                case UnitClassification.AIRB:
-                    FacilityBase = new Airbase();
-                    break;
-
-                case UnitClassification.DEPOT:
-                    FacilityBase = new SupplyDepot(UnitName, Side, DepotSize.Medium);
-                    break;
-
-                case UnitClassification.FAC:
-                    // For general facilities, use the base LandBase class
-                    FacilityBase = new LandBase();
-                    break;
-
-                default:
-                    // Non-facility units don't have a LandBase
-                    FacilityBase = null;
-                    break;
-            }
+                UnitClassification.AIRB => new Airbase(),
+                UnitClassification.DEPOT => new SupplyDepot(UnitName, Side, DepotSize.Medium),
+                UnitClassification.FAC => new LandBase(),// For general facilities, use the base LandBase class
+                _ => null,// Non-facility units don't have a LandBase
+            };
         }
 
         /// <summary>
@@ -946,75 +933,23 @@ namespace HammerAndSickle.Models
         /// </summary>
         private int CalculateMaxMovementPoints()
         {
-            int baseMovement;
-
-            // Base movement by unit classification
-            switch (Classification)
+            var baseMovement = Classification switch
             {
                 // Mechanized units
-                case UnitClassification.TANK:
-                case UnitClassification.MECH:
-                case UnitClassification.SPA:
-                case UnitClassification.SPSAM:
-                case UnitClassification.SPAAA:
-                case UnitClassification.SPECM:
-                case UnitClassification.MAB:
-                case UnitClassification.MAM:
-                case UnitClassification.MMAR:
-                    baseMovement = MechanizedMovt;
-                    break;
-
+                UnitClassification.TANK or UnitClassification.MECH or UnitClassification.SPA or UnitClassification.SPSAM or UnitClassification.SPAAA or UnitClassification.SPECM or UnitClassification.MAB or UnitClassification.MAM or UnitClassification.MMAR => MechanizedMovt,
                 // Motorized units
-                case UnitClassification.MOT:
-                case UnitClassification.AT:
-                case UnitClassification.ROC:
-                case UnitClassification.ENG:
-                case UnitClassification.RECON:
-                case UnitClassification.ART:
-                case UnitClassification.SAM:
-                case UnitClassification.AAA:
-                case UnitClassification.BM:
-                    baseMovement = MotorizedMovt;
-                    break;
-
+                UnitClassification.MOT or UnitClassification.AT or UnitClassification.ROC or UnitClassification.ENG or UnitClassification.RECON or UnitClassification.ART or UnitClassification.SAM or UnitClassification.AAA or UnitClassification.BM => MotorizedMovt,
                 // Non-mechanized units
-                case UnitClassification.INF:
-                case UnitClassification.AB:
-                case UnitClassification.AM:
-                case UnitClassification.MAR:
-                case UnitClassification.SPECF:
-                
-                    baseMovement = NonMechanizedMovt;
-                    break;
-
+                UnitClassification.INF or UnitClassification.AB or UnitClassification.AM or UnitClassification.MAR or UnitClassification.SPECF => NonMechanizedMovt,
                 // Air units
-                case UnitClassification.ASF:
-                case UnitClassification.MRF:
-                case UnitClassification.ATT:
-                case UnitClassification.BMB:
-                case UnitClassification.RCN:
-                case UnitClassification.FWT:
-                    baseMovement = AirMovt;
-                    break;
-
+                UnitClassification.ASF or UnitClassification.MRF or UnitClassification.ATT or UnitClassification.BMB or UnitClassification.RCN or UnitClassification.FWT => AirMovt,
                 // Aviation units (helicopters)
-                case UnitClassification.AHEL:
-                case UnitClassification.THEL:
-                case UnitClassification.SPECH:
-                    baseMovement = AviationMovt;
-                    break;
-
+                UnitClassification.AHEL or UnitClassification.THEL or UnitClassification.SPECH => AviationMovt,
                 // Facilities and airbases
-                case UnitClassification.FAC:
-                case UnitClassification.AIRB:
-                    baseMovement = 0;
-                    break;
-
+                UnitClassification.FAC or UnitClassification.AIRB => 0,
                 // Naval units - temporarily setting to 0
-                default:
-                    baseMovement = 0;
-                    break;
-            }
+                _ => 0,
+            };
 
             // Apply profile modifier
             float modifier = IsMounted ?
@@ -1029,28 +964,14 @@ namespace HammerAndSickle.Models
         /// </summary>
         private int CalculateZOC()
         {
-            int baseZOC;
-
-            // Base ZOC by unit type
-            switch (UnitType)
+            var baseZOC = UnitType switch
             {
-                case UnitType.LandUnitDF:
-                    baseZOC = 1;
-                    break;
-                case UnitType.LandUnitIF:
-                case UnitType.NavalUnitIF:
-                    baseZOC = 1;
-                    break;
-                case UnitType.AirUnit:
-                    baseZOC = 0;
-                    break;
-                case UnitType.NavalUnitDF:
-                    baseZOC = 1;
-                    break;
-                default:
-                    baseZOC = 0;
-                    break;
-            }
+                UnitType.LandUnitDF => 1,
+                UnitType.LandUnitIF or UnitType.NavalUnitIF => 1,
+                UnitType.AirUnit => 0,
+                UnitType.NavalUnitDF => 1,
+                _ => 0,
+            };
 
             // Apply profile modifier
             int modifier = IsMounted ?
