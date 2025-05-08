@@ -275,7 +275,7 @@ namespace HammerAndSickle.Models
         // Action counts per turn
         public int MoveActions { get; private set; }
         public int CombatActions { get; private set; }
-        public int SpecialActions { get; private set; }
+        public int DeploymentActions { get; private set; }
 
         // Combat profiles
         public WeaponSystemProfile DeployedProfile { get; private set; }
@@ -498,7 +498,7 @@ namespace HammerAndSickle.Models
                 // Set default action counts
                 MoveActions = 1;
                 CombatActions = 1;
-                SpecialActions = 0;
+                DeploymentActions = 0;
 
                 // Initialize state
                 hitPoints = MaxHitPoints;
@@ -561,7 +561,7 @@ namespace HammerAndSickle.Models
                 // Retrieve action counts
                 MoveActions = info.GetInt32(nameof(MoveActions));
                 CombatActions = info.GetInt32(nameof(CombatActions));
-                SpecialActions = info.GetInt32(nameof(SpecialActions));
+                DeploymentActions = info.GetInt32(nameof(DeploymentActions));
 
                 // Retrieve state
                 hitPoints = info.GetInt32(nameof(HitPoints));
@@ -717,7 +717,7 @@ namespace HammerAndSickle.Models
                 // Store action counts
                 info.AddValue(nameof(MoveActions), MoveActions);
                 info.AddValue(nameof(CombatActions), CombatActions);
-                info.AddValue(nameof(SpecialActions), SpecialActions);
+                info.AddValue(nameof(DeploymentActions), DeploymentActions);
 
                 // Store state
                 info.AddValue(nameof(HitPoints), hitPoints);
