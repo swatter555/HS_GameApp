@@ -40,10 +40,6 @@ namespace HammerAndSickle.Models
         private static readonly Random random = new();
         #endregion
 
-        #region Private Fields
-        private static readonly System.Random rand = random;
-        #endregion
-
         #region Properties
         /// <summary>
         /// The officer's full name.
@@ -102,7 +98,26 @@ namespace HammerAndSickle.Models
                 CombatCommand = CommandAbilites.BelowAverage;
                 CombatInitiative = CommandAbilites.BelowAverage;
                 IsAssigned = false;
-                Name = string.Empty;
+
+                // Initialize with a placeholder name instead of empty string
+                Name = $"Officer-{Guid.NewGuid().ToString().Substring(0, 8)}";
+
+                // Optionally, automatically generate a name if NameGenService is available
+                if (NameGenService.Instance != null)
+                {
+                    try
+                    {
+                        string generatedName = NameGenService.Instance.GenerateMaleName(nationality);
+                        if (!string.IsNullOrEmpty(generatedName))
+                        {
+                            Name = generatedName;
+                        }
+                    }
+                    catch
+                    {
+                        // Silently fail and keep the placeholder name
+                    }
+                }
             }
             catch (Exception e)
             {
@@ -204,13 +219,65 @@ namespace HammerAndSickle.Models
         {
             try
             {
-                // TODO: Make this method assign command and initiave on a bell curve and make each
-                // command and initiative within one of each other.
+                // Check if NameGenService is available
+                if (NameGenService.Instance == null)
+                {
+                    throw new InvalidOperationException("NameGenService is not available");
+                }
+
+                // Update the officer's nationality
+                this.Nationality = nationality;
 
                 // Generate a random name based on nationality
                 Name = NameGenService.Instance.GenerateMaleName(nationality);
 
-                
+                // Ensure name is valid
+                if (string.IsNullOrEmpty(Name))
+                {
+                    Name = $"Officer-{Guid.NewGuid().ToString().Substring(0, 8)}";
+                }
+
+                // Generate command ability and initiative on a bell curve
+                // Using a bell curve approximation with 3d6-10 to get values between -4 and 8
+                int commandValue = (random.Next(1, 7) + random.Next(1, 7) + random.Next(1, 7)) - 10;
+                int initiativeValue = (random.Next(1, 7) + random.Next(1, 7) + random.Next(1, 7)) - 10;
+
+                // Limit to the enum range of -2 to 3
+                commandValue = Math.Clamp(commandValue, -2, 3);
+                initiativeValue = Math.Clamp(initiativeValue, -2, 3);
+
+                // Ensure values are within one of each other
+                if (Math.Abs(commandValue - initiativeValue) > 1)
+                {
+                    // If too far apart, bring them closer
+                    if (commandValue > initiativeValue)
+                    {
+                        initiativeValue = commandValue - 1;
+                    }
+                    else
+                    {
+                        initiativeValue = commandValue + 1;
+                    }
+                }
+
+                // Set the properties using the calculated values
+                CombatCommand = (CommandAbilites)commandValue;
+                CombatInitiative = (CommandAbilites)initiativeValue;
+
+                // Assign an appropriate grade based on abilities
+                int totalRating = (int)CombatCommand + (int)CombatInitiative;
+                if (totalRating >= 4)
+                {
+                    CommandGrade = CommandGrade.TopGrade;
+                }
+                else if (totalRating >= 0)
+                {
+                    CommandGrade = CommandGrade.SeniorGrade;
+                }
+                else
+                {
+                    CommandGrade = CommandGrade.JuniorGrade;
+                }
             }
             catch (Exception e)
             {
@@ -282,25 +349,50 @@ namespace HammerAndSickle.Models
         {
             try
             {
-                // TODO: Make sure we are catching all cases.
-
                 int totalRating = (int)CombatCommand + (int)CombatInitiative;
 
+                // Use non-overlapping ranges for clear categorization
                 if (totalRating >= 5)
                     return "Outstanding";
-                else if (totalRating >= 4)
+                else if (totalRating >= 3 && totalRating < 5)
                     return "Above Average";
-                else if (totalRating >= 3)
+                else if (totalRating >= 1 && totalRating < 3)
                     return "Average";
-                else if (totalRating >= 2)
+                else if (totalRating >= -1 && totalRating < 1)
                     return "Below Average";
-                else
+                else if (totalRating >= -4 && totalRating < -1)
                     return "Poor";
+                else
+                    return "Incompetent"; // For extremely low ratings (though they shouldn't happen with current limits)
             }
             catch (Exception e)
             {
                 AppService.Instance.HandleException(CLASS_NAME, "GetPerformanceRating", e);
                 return "Undetermined";
+            }
+        }
+
+        /// <summary>
+        /// Validates and sets an officer's name
+        /// </summary>
+        /// <param name="name">The name to set</param>
+        /// <returns>True if the name was set successfully, false otherwise</returns>
+        public bool SetOfficerName(string name)
+        {
+            try
+            {
+                if (string.IsNullOrWhiteSpace(name))
+                {
+                    return false;
+                }
+
+                Name = name;
+                return true;
+            }
+            catch (Exception e)
+            {
+                AppService.Instance.HandleException(CLASS_NAME, "SetOfficerName", e);
+                return false;
             }
         }
         #endregion
