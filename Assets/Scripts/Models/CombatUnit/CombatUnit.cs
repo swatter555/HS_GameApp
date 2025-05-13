@@ -12,16 +12,13 @@ namespace HammerAndSickle.Models
     [Serializable]
     public class CombatUnit : ICloneable, ISerializable
     {
-        //====== Constants ======
         #region Constants
-        //========================
 
         private const string CLASS_NAME = nameof(CombatUnit);
+
         #endregion // Constants
 
-        //====== Properties ======
         #region Properties
-        //========================
 
         // Identification and metadata
         public string UnitName { get; set; }
@@ -59,11 +56,11 @@ namespace HammerAndSickle.Models
         public int MaxMovementPoints { get; private set; }
         public int CurrentMovementPoints { get; private set; }
         public Vector2 MapPos { get; private set; }
+
         #endregion // Properties
 
-        //====== Constructors ======
+
         #region Constructors
-        //==========================
 
         public CombatUnit()
         {
@@ -85,9 +82,8 @@ namespace HammerAndSickle.Models
         }
         #endregion // Constructors
 
-        //====== ICloneable Implementation ======
+
         #region ICloneable Implementation
-        //=======================================
 
         public object Clone()
         {
@@ -101,15 +97,12 @@ namespace HammerAndSickle.Models
                 throw;
             }
         }
+
         #endregion // ICloneable Implementation
 
-        //====== ISerializable Implementation ======
+  
         #region ISerializable Implementation
-        //==========================================
 
-        /// <summary>
-        /// Serializes this combat unit.
-        /// </summary>
         public void GetObjectData(SerializationInfo info, StreamingContext context)
         {
             try
@@ -122,19 +115,18 @@ namespace HammerAndSickle.Models
                 throw;
             }
         }
+
         #endregion // ISerializable Implementation
     }
 
-    //====== Public Methods ======
+
     #region Public Methods
-    //============================
 
 
     #endregion // Public Methods
 
-    //====== Private Methods ======
+
     #region Private Methods
-    //=============================
 
 
     #endregion // Private Methods

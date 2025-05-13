@@ -6,19 +6,13 @@ namespace HammerAndSickle.Models
 {
     public class CommanderSkillTree
     {
-        #region Constants
-        // Experience & Promotion Costs
-        public const int XP_PER_BATTLE = 25; // Example XP gain
-        public const int XP_COST_FOR_SENIOR_PROMOTION = 200;
-        public const int XP_COST_FOR_TOP_PROMOTION = 500;
-        #endregion
+        #region Properties
 
-        #region Fields and Properties
         public int ExperiencePoints { get; private set; }
         public CommandGrade CurrentGrade { get; private set; }
 
-        public bool CanAffordSeniorPromotion => ExperiencePoints >= XP_COST_FOR_SENIOR_PROMOTION && CurrentGrade == CommandGrade.JuniorGrade;
-        public bool CanAffordTopPromotion => ExperiencePoints >= XP_COST_FOR_TOP_PROMOTION && CurrentGrade == CommandGrade.SeniorGrade;
+        public bool CanAffordSeniorPromotion => ExperiencePoints >= CUConstants.XP_COST_FOR_SENIOR_PROMOTION && CurrentGrade == CommandGrade.JuniorGrade;
+        public bool CanAffordTopPromotion => ExperiencePoints >= CUConstants.XP_COST_FOR_TOP_PROMOTION && CurrentGrade == CommandGrade.SeniorGrade;
 
         // Dictionaries to store the unlocked status of each skill for this commander
         public Dictionary<LeadershipPath, bool> UnlockedCommandSkills { get; private set; }
@@ -31,7 +25,8 @@ namespace HammerAndSickle.Models
         public event Action<CommandGrade> OnGradeChanged;
         public event Action<int, int> OnExperienceChanged; // (changeAmount, newTotalExperience)
         public event Action<CommandGrade> OnPromotionAvailable; // (targetPromotionGrade)
-        #endregion
+
+        #endregion // Properties
 
         public CommanderSkillTree(int initialExperience = 0)
         {
@@ -99,7 +94,7 @@ namespace HammerAndSickle.Models
         {
             if (CurrentGrade == CommandGrade.JuniorGrade && CanAffordSeniorPromotion)
             {
-                SpendExperience(XP_COST_FOR_SENIOR_PROMOTION);
+                SpendExperience(CUConstants.XP_COST_FOR_SENIOR_PROMOTION);
                 CurrentGrade = CommandGrade.SeniorGrade;
                 OnGradeChanged?.Invoke(CurrentGrade);
                 CheckPromotionAvailability(); // Check if Top Grade is now affordable
@@ -107,7 +102,7 @@ namespace HammerAndSickle.Models
             }
             else if (CurrentGrade == CommandGrade.SeniorGrade && CanAffordTopPromotion)
             {
-                SpendExperience(XP_COST_FOR_TOP_PROMOTION);
+                SpendExperience(CUConstants.XP_COST_FOR_TOP_PROMOTION);
                 CurrentGrade = CommandGrade.TopGrade;
                 OnGradeChanged?.Invoke(CurrentGrade);
                 return true;
@@ -257,24 +252,6 @@ namespace HammerAndSickle.Models
             return totalBonus;
         }
 
-        public int GetTotalInitiativeBonus()
-        {
-            int totalBonus = 0;
-            ProcessUnlockedSkills(skillDef => {
-                if (skillDef.PrimaryBonusType == SkillBonusType.Initiative) totalBonus += (int)skillDef.PrimaryBonusValue;
-            });
-            return totalBonus;
-        }
-
-        public int GetTotalMaskirovkaDetectionBonus()
-        {
-            int totalBonus = 0;
-            ProcessUnlockedSkills(skillDef => {
-                if (skillDef.PrimaryBonusType == SkillBonusType.Detection) totalBonus += (int)skillDef.PrimaryBonusValue;
-            });
-            return totalBonus;
-        }
-
         public float GetTotalSupplyConsumptionMultiplier() // e.g., 0.67 for 33% reduction
         {
             float finalMultiplier = 1.0f;
@@ -324,7 +301,7 @@ namespace HammerAndSickle.Models
         {
             bool hasSkill = false;
             ProcessUnlockedSkills(skillDef => {
-                if (skillDef.PrimaryBonusType == SkillBonusType.BreakthroughCapability) hasSkill = true;
+                if (skillDef.PrimaryBonusType == SkillBonusType.Breakthrough) hasSkill = true;
             }, stopEarlyIf: () => hasSkill);
             return hasSkill;
         }
