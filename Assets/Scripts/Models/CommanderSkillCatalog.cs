@@ -7,22 +7,25 @@ namespace HammerAndSickle.Models
     public enum BonusType
     {
         None,
-        ExperienceMultiplier, // Value is a float multiplier (e.g., 0.25 for +25%)
-        CommandRating,        // Value is an int (e.g., 1 for +1)
+        UnitXP, // Value is a float multiplier (e.g., 0.25 for +25%)
+        Command,        // Value is an int (e.g., 1 for +1)
         Initiative,           // Value is an int (e.g., 1 for +1)
-        MaskirovkaDetection,  // Value is an int (e.g., 1 for +1 detection)
-        SupplyConsumptionMultiplier, // Value is a float total multiplier (e.g., 0.67 for 33% reduction)
-        PrestigeCostMultiplier,      // Value is a float total multiplier (e.g., 0.67 for 33% reduction)
+        Detection,  // Value is an int (e.g., 1 for +1 detection)
+        SupplyConsumption, // Value is a float total multiplier (e.g., 0.67 for 33% reduction)
+        PrestigeCost,      // Value is a float total multiplier (e.g., 0.67 for 33% reduction)
         EmergencyResupply,    // Boolean, value not directly used, presence of skill implies capability
-        HardDefense,
-        SoftDefense,
+        Entrenchment,        // Boolean, skip defensive and go straight to entrenched.
         HardAttack,
+        HardDefense,
+        SoftAttack,
+        SoftDefense,
+
         DetectionRange,
         NightFighting,
-        Entrenchment,
+        
         IndirectRange,
         AirDefense,
-        SupplyPenetration,      // Supply can pierce +1 enemy ZOC
+        SupplyPenetration,      // Boolean, supply can pierce 1 enemy ZOC
         CombatActionBonus,      // Bonus combat action
         MovementActionBonus,    // Bonus move action
         DeploymentActionBonus,  // Bonus deployment action
@@ -73,15 +76,14 @@ namespace HammerAndSickle.Models
         private const int MASKIROVKA_DETECTION_BONUS_VAL = 1;
         private const float SUPPLY_ECONOMY_REDUCTION_VAL = 0.33f; // Reduction, so final multiplier is 1 - value
         private const float PRESTIGE_COST_REDUCTION_VAL = 0.33f;  // Reduction
-        private const int GENERIC_STAT_BONUS_VAL = 1; // For CommandRating, Initiative, NightFighting etc.
+        private const int GENERIC_STAT_BONUS_VAL = 1; // For Command, Initiative, NVGCapability etc.
         private const int DEFENSE_ATTACK_BONUS_VAL = 5;
         private const int DETECTION_RANGE_BONUS_VAL = 1;
         private const int ENTRENCHMENT_BONUS_VAL = 1;
         private const int INDIRECT_RANGE_BONUS_VAL = 1;
         private const int AIR_DEFENSE_BONUS_VAL = 5;
 
-
-        private static readonly Dictionary<Enum, SkillDefinition> AllSkills = new Dictionary<Enum, SkillDefinition>();
+        private static readonly Dictionary<Enum, SkillDefinition> AllSkills = new();
 
         static CommanderSkillCatalog()
         {
@@ -98,13 +100,13 @@ namespace HammerAndSickle.Models
                 CommanderSkillTree.CommandSkillPath.ShockFormation, "Shock Formation", TIER1_XP_COST,
                 $"Increases experience gain by {EXPERIENCE_BONUS_VAL * 100}%. Mutually exclusive with Maskirovka Master.",
                 mutuallyExclusive: new List<Enum> { CommanderSkillTree.CommandSkillPath.MaskirovkaMaster },
-                primaryBonusType: BonusType.ExperienceMultiplier, primaryBonusValue: EXPERIENCE_BONUS_VAL
+                primaryBonusType: BonusType.UnitXP, primaryBonusValue: EXPERIENCE_BONUS_VAL
             ));
             AddSkill(new SkillDefinition(
                 CommanderSkillTree.CommandSkillPath.MaskirovkaMaster, "Maskirovka Master", TIER1_XP_COST,
                 $"Increases Detection Range by +{MASKIROVKA_DETECTION_BONUS_VAL}. Mutually exclusive with Shock Formation.",
                 mutuallyExclusive: new List<Enum> { CommanderSkillTree.CommandSkillPath.ShockFormation },
-                primaryBonusType: BonusType.MaskirovkaDetection, primaryBonusValue: MASKIROVKA_DETECTION_BONUS_VAL
+                primaryBonusType: BonusType.Detection, primaryBonusValue: MASKIROVKA_DETECTION_BONUS_VAL
             ));
 
             // Tier 2
@@ -112,7 +114,7 @@ namespace HammerAndSickle.Models
                 CommanderSkillTree.CommandSkillPath.IronDiscipline, "Iron Discipline", TIER2_XP_COST,
                 "Increases Command Rating by +1.",
                 prerequisites: new List<Enum> { CommanderSkillTree.CommandSkillPath.ShockFormation },
-                primaryBonusType: BonusType.CommandRating, primaryBonusValue: GENERIC_STAT_BONUS_VAL
+                primaryBonusType: BonusType.Command, primaryBonusValue: GENERIC_STAT_BONUS_VAL
             ));
             AddSkill(new SkillDefinition(
                 CommanderSkillTree.CommandSkillPath.TacticalGenius, "Tactical Genius", TIER2_XP_COST,
@@ -126,7 +128,7 @@ namespace HammerAndSickle.Models
                 CommanderSkillTree.CommandSkillPath.PoliticalOfficer, "Political Officer", TIER3_XP_COST,
                 "Increases Command Rating by +1.", CommanderSkillTree.CommandGrade.SeniorGrade,
                 prerequisites: new List<Enum> { CommanderSkillTree.CommandSkillPath.IronDiscipline },
-                primaryBonusType: BonusType.CommandRating, primaryBonusValue: GENERIC_STAT_BONUS_VAL
+                primaryBonusType: BonusType.Command, primaryBonusValue: GENERIC_STAT_BONUS_VAL
             ));
             AddSkill(new SkillDefinition(
                 CommanderSkillTree.CommandSkillPath.OperationalArt, "Operational Art", TIER3_XP_COST,
@@ -140,7 +142,7 @@ namespace HammerAndSickle.Models
                 CommanderSkillTree.CommandSkillPath.HeroOfSovietUnion, "Hero Of Soviet Union", TIER4_XP_COST,
                 "Increases Command Rating by +1.", CommanderSkillTree.CommandGrade.TopGrade,
                 prerequisites: new List<Enum> { CommanderSkillTree.CommandSkillPath.PoliticalOfficer },
-                primaryBonusType: BonusType.CommandRating, primaryBonusValue: GENERIC_STAT_BONUS_VAL
+                primaryBonusType: BonusType.Command, primaryBonusValue: GENERIC_STAT_BONUS_VAL
             ));
             AddSkill(new SkillDefinition(
                 CommanderSkillTree.CommandSkillPath.DeepBattleTheorist, "Deep Battle Theorist", TIER4_XP_COST,
@@ -155,12 +157,12 @@ namespace HammerAndSickle.Models
             AddSkill(new SkillDefinition(
                 CommanderSkillTree.RearAreaSkillPath.SupplyEconomy, "Supply Economy", TIER1_XP_COST,
                 $"Reduces supply consumption by {SUPPLY_ECONOMY_REDUCTION_VAL * 100}%.",
-                primaryBonusType: BonusType.SupplyConsumptionMultiplier, primaryBonusValue: 1.0f - SUPPLY_ECONOMY_REDUCTION_VAL
+                primaryBonusType: BonusType.SupplyConsumption, primaryBonusValue: 1.0f - SUPPLY_ECONOMY_REDUCTION_VAL
             ));
             AddSkill(new SkillDefinition(
                 CommanderSkillTree.RearAreaSkillPath.FieldWorkshop, "Field Workshop", TIER1_XP_COST,
                 $"Reduces repair costs by {PRESTIGE_COST_REDUCTION_VAL * 100}%.",
-                primaryBonusType: BonusType.PrestigeCostMultiplier, primaryBonusValue: 1.0f - PRESTIGE_COST_REDUCTION_VAL
+                primaryBonusType: BonusType.PrestigeCost, primaryBonusValue: 1.0f - PRESTIGE_COST_REDUCTION_VAL
             ));
             AddSkill(new SkillDefinition(
                 CommanderSkillTree.RearAreaSkillPath.PartyConnections, "Party Connections", TIER2_XP_COST,
@@ -307,5 +309,17 @@ namespace HammerAndSickle.Models
             }
             return "Unknown skill.";
         }
+
+
+
+
+
+
+
+
+
+
+
+
     }
 }

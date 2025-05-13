@@ -42,18 +42,6 @@ namespace HammerAndSickle.Models
     }
 
     /// <summary>
-    /// Defines how effectively supplies can penetrate through enemy territory.
-    /// </summary>
-    public enum SupplyPenetration
-    {
-        None,           // Cannot penetrate enemy ZOCs
-        Limited,        // Can penetrate 1 continuous enemy ZOC
-        Moderate,       // Can penetrate 2 continuous enemy ZOCs
-        Advanced,       // Can penetrate 3 continuous enemy ZOCs
-        Special         // Can penetrate 4 continuous enemy ZOCs
-    }
-
-    /// <summary>
     /// Defines the category of a depot.
     /// </summary>
     public enum DepotCategory
@@ -101,16 +89,6 @@ namespace HammerAndSickle.Models
             { SupplyProjection.Theater, 12 }
         };
 
-        // Supply penetration values (number of enemy ZOCs that can be penetrated)
-        private static readonly Dictionary<SupplyPenetration, int> PenetrationValues = new Dictionary<SupplyPenetration, int>
-        {
-            { SupplyPenetration.None, 0 },
-            { SupplyPenetration.Limited, 1 },
-            { SupplyPenetration.Moderate, 2 },
-            { SupplyPenetration.Advanced, 3 },
-            { SupplyPenetration.Special, 4 }
-        };
-
         // Amount any unit can stockpile
         private const int MaxUnitStockpileAmount = 7;
 
@@ -131,7 +109,7 @@ namespace HammerAndSickle.Models
         private float stockpileInDays = 20f;
         private SupplyGenerationRate generationRate = SupplyGenerationRate.Minimal;
         private SupplyProjection supplyProjection = SupplyProjection.Local;
-        private SupplyPenetration supplyPenetration = SupplyPenetration.None;
+        private bool supplyPenetration = false;
         private DepotCategory depotCategory = DepotCategory.Secondary;
 
         // Special abilities
@@ -220,16 +198,11 @@ namespace HammerAndSickle.Models
         /// <summary>
         /// Gets or sets how effectively supplies from this depot can penetrate enemy territory.
         /// </summary>
-        public SupplyPenetration SupplyPenetration
+        public bool SupplyPenetration
         {
             get => supplyPenetration;
             set => supplyPenetration = value;
         }
-
-        /// <summary>
-        /// Gets the number of continuous enemy ZOCs that supplies can penetrate.
-        /// </summary>
-        public int PenetrationStrength => PenetrationValues[supplyPenetration];
 
         /// <summary>
         /// Gets or sets the category of this depot.
@@ -301,7 +274,7 @@ namespace HammerAndSickle.Models
             stockpileInDays = GetMaxStockpile() / 2; // Start half full
             generationRate = SupplyGenerationRate.Minimal;
             supplyProjection = SupplyProjection.Local;
-            supplyPenetration = SupplyPenetration.None;
+            supplyPenetration = SupplyPenetration = false;
             depotCategory = DepotCategory.Secondary;
         }
 
@@ -328,7 +301,7 @@ namespace HammerAndSickle.Models
                 this.stockpileInDays = GetMaxStockpile() / 2; // Start half full
                 this.generationRate = SupplyGenerationRate.Standard;
                 this.supplyProjection = SupplyProjection.Extended;
-                this.supplyPenetration = SupplyPenetration.Limited;
+                this.supplyPenetration = SupplyPenetration;
             }
             catch (Exception e)
             {
@@ -354,7 +327,7 @@ namespace HammerAndSickle.Models
                 stockpileInDays = info.GetSingle(nameof(stockpileInDays));
                 generationRate = (SupplyGenerationRate)info.GetValue(nameof(generationRate), typeof(SupplyGenerationRate));
                 supplyProjection = (SupplyProjection)info.GetValue(nameof(supplyProjection), typeof(SupplyProjection));
-                supplyPenetration = (SupplyPenetration)info.GetValue(nameof(supplyPenetration), typeof(SupplyPenetration));
+                supplyPenetration = (bool)info.GetValue(nameof(supplyPenetration), typeof(bool));
                 depotCategory = (DepotCategory)info.GetValue(nameof(depotCategory), typeof(DepotCategory));
 
                 // Special abilities
@@ -479,6 +452,10 @@ namespace HammerAndSickle.Models
         {
             try
             {
+                // Check if the depot has SupplyPentration.
+                int zocPenetration = 0;
+                if (SupplyPenetration) zocPenetration = 1;
+
                 // Check if unit is within projection radius
                 if (distanceInHexes > ProjectionRadius)
                 {
@@ -486,7 +463,7 @@ namespace HammerAndSickle.Models
                 }
 
                 // Check if supply penetration is sufficient
-                if (enemyZOCsCrossed > PenetrationStrength)
+                if (enemyZOCsCrossed > zocPenetration)
                 {
                     return false;
                 }
@@ -530,7 +507,7 @@ namespace HammerAndSickle.Models
 
                 // Calculate efficiency based on distance, enemy ZOCs, and operational capacity
                 float distanceEfficiency = 1f - (distanceInHexes / (float)ProjectionRadius * 0.5f);
-                float zocEfficiency = 1f - (enemyZOCsCrossed / (float)(PenetrationStrength + 1) * 0.3f);
+                float zocEfficiency = 1 - (enemyZOCsCrossed * 0.65f);
                 float operationalEfficiency = GetEfficiencyMultiplier();
                 float efficiency = distanceEfficiency * zocEfficiency * operationalEfficiency;
 
@@ -649,29 +626,21 @@ namespace HammerAndSickle.Models
         }
 
         /// <summary>
-        /// Upgrades the depot's supply penetration to the next level.
+        /// Upgrades the depot's supply penetration.
         /// </summary>
         /// <returns>True if upgrade was successful, false if already at maximum</returns>
         public bool UpgradeSupplyPenetration()
         {
             try
             {
-                switch (supplyPenetration)
+                if (!SupplyPenetration)
                 {
-                    case SupplyPenetration.None:
-                        SupplyPenetration = SupplyPenetration.Limited;
-                        return true;
-                    case SupplyPenetration.Limited:
-                        SupplyPenetration = SupplyPenetration.Moderate;
-                        return true;
-                    case SupplyPenetration.Moderate:
-                        SupplyPenetration = SupplyPenetration.Advanced;
-                        return true;
-                    case SupplyPenetration.Advanced:
-                        SupplyPenetration = SupplyPenetration.Special;
-                        return true;
-                    default:
-                        return false; // Already at maximum
+                    SupplyPenetration = true;
+                    return true;
+                }
+                else
+                {
+                    return false;
                 }
             }
             catch (Exception e)

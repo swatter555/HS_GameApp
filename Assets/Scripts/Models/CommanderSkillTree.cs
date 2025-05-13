@@ -255,7 +255,7 @@ namespace HammerAndSickle.Models
         {
             float totalMultiplier = 1.0f;
             ProcessUnlockedSkills((skillDef) => {
-                if (skillDef.PrimaryBonusType == BonusType.ExperienceMultiplier)
+                if (skillDef.PrimaryBonusType == BonusType.UnitXP)
                 {
                     totalMultiplier += skillDef.PrimaryBonusValue; // Assumes value is additive (0.25)
                 }
@@ -267,7 +267,7 @@ namespace HammerAndSickle.Models
         {
             int totalBonus = 0;
             ProcessUnlockedSkills(skillDef => {
-                if (skillDef.PrimaryBonusType == BonusType.CommandRating) totalBonus += (int)skillDef.PrimaryBonusValue;
+                if (skillDef.PrimaryBonusType == BonusType.Command) totalBonus += (int)skillDef.PrimaryBonusValue;
             });
             return totalBonus;
         }
@@ -285,7 +285,7 @@ namespace HammerAndSickle.Models
         {
             int totalBonus = 0;
             ProcessUnlockedSkills(skillDef => {
-                if (skillDef.PrimaryBonusType == BonusType.MaskirovkaDetection) totalBonus += (int)skillDef.PrimaryBonusValue;
+                if (skillDef.PrimaryBonusType == BonusType.Detection) totalBonus += (int)skillDef.PrimaryBonusValue;
             });
             return totalBonus;
         }
@@ -294,7 +294,7 @@ namespace HammerAndSickle.Models
         {
             float finalMultiplier = 1.0f;
             ProcessUnlockedSkills(skillDef => {
-                if (skillDef.PrimaryBonusType == BonusType.SupplyConsumptionMultiplier)
+                if (skillDef.PrimaryBonusType == BonusType.SupplyConsumption)
                 {
                     // If multiple skills provide this, they should stack multiplicatively
                     finalMultiplier *= skillDef.PrimaryBonusValue;
@@ -307,7 +307,7 @@ namespace HammerAndSickle.Models
         {
             float finalMultiplier = 1.0f;
             ProcessUnlockedSkills(skillDef => {
-                if (skillDef.PrimaryBonusType == BonusType.PrestigeCostMultiplier)
+                if (skillDef.PrimaryBonusType == BonusType.PrestigeCost)
                 {
                     finalMultiplier *= skillDef.PrimaryBonusValue;
                 }
