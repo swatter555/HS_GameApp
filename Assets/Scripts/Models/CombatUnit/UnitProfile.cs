@@ -15,8 +15,10 @@ namespace HammerAndSickle.Models
     public class UnitProfile : ISerializable, ICloneable
     {
         #region Constants
+
         private const string CLASS_NAME = nameof(UnitProfile);
-        #endregion
+
+        #endregion // Constants
 
         #region Properties
 
@@ -29,7 +31,7 @@ namespace HammerAndSickle.Models
         // The current profile, reflecting the paper strength of the unit
         public Dictionary<WeaponSystems, int> CurrentProfile { get; private set; }
 
-        #endregion
+        #endregion // Properties
 
         #region Constructor
 
@@ -108,7 +110,7 @@ namespace HammerAndSickle.Models
             }
         }
 
-        #endregion
+        #endregion // Constructor
 
         #region Public Methods
 
@@ -139,13 +141,13 @@ namespace HammerAndSickle.Models
             {
                 currentHitPoints = 0;
             }
-            else if (currentHitPoints > CombatUnitConstants.MaxPossibleHitPoints)
+            else if (currentHitPoints > CUConstants.MaxPossibleHitPoints)
             {
-                currentHitPoints = CombatUnitConstants.MaxPossibleHitPoints;
+                currentHitPoints = CUConstants.MaxPossibleHitPoints;
             }
 
             // Calculate the current multiplier based on hit points
-            float multiplier = (float)currentHitPoints / CombatUnitConstants.MaxPossibleHitPoints;
+            float multiplier = (float)currentHitPoints / CUConstants.MaxPossibleHitPoints;
 
             // Clear and regenerate the current profile
             CurrentProfile.Clear();
@@ -207,7 +209,8 @@ namespace HammerAndSickle.Models
             return clone;
         }
 
-        #endregion
+        #endregion // Public Methods
+
 
         #region ISerializable Implementation
 
@@ -252,7 +255,8 @@ namespace HammerAndSickle.Models
             }
         }
 
-        #endregion
+        #endregion // ISerializable Implementation
+
 
         #region ICloneable Implementation
 
@@ -265,6 +269,6 @@ namespace HammerAndSickle.Models
             return new UnitProfile(this);
         }
 
-        #endregion
+        #endregion // ICloneable Implementation
     }
 }

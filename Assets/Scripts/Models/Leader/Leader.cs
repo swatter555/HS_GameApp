@@ -14,17 +14,14 @@ namespace HammerAndSickle.Models
     [Serializable]
     public class Leader : ISerializable, ICloneable
     {
-        //====== Constants ======
         #region Constants
-        //=======================
 
         private const string CLASS_NAME = nameof(Leader);
-        private static readonly Random random = new();
+
         #endregion // Constants
 
-        //====== Properties ======
+
         #region Properties
-        //========================
 
         public string Name { get; private set; }
         public Side Side { get; private set; }
@@ -33,11 +30,11 @@ namespace HammerAndSickle.Models
         public string FormattedRank { get { return GetFormattedRank(); } }
         public CommandAbility CombatCommand { get; private set; }
         public bool IsAssigned { get; private set; }
+
         #endregion // Properties
 
-        //====== Constructors ======
+
         #region Constructors
-        //==========================
 
         public Leader(Side side, Nationality nationality)
         {
@@ -112,11 +109,11 @@ namespace HammerAndSickle.Models
                 throw;
             }
         }
+
         #endregion // Constructors
 
-        //====== Public Methods ======
+ 
         #region Public Methods
-        //============================
         
         public void SetOfficerCommandAbility(CommandAbility command)
         {
@@ -135,6 +132,9 @@ namespace HammerAndSickle.Models
         {
             try
             {
+                // Create a new random number generator.
+                Random random = new();
+
                 // Check if NameGenService is available
                 if (NameGenService.Instance == null)
                 {
@@ -238,11 +238,11 @@ namespace HammerAndSickle.Models
                 return false;
             }
         }
+
         #endregion // Public Methods
 
-        //====== ISerializable Implementation ======
+
         #region ISerializable Implementation
-        //==========================================
 
         public void GetObjectData(SerializationInfo info, StreamingContext context)
         {
@@ -262,12 +262,12 @@ namespace HammerAndSickle.Models
                 throw;
             }
         }
+
         #endregion // ISerializable Implementation
 
-        //====== ICloneable Implementation ======
+
         #region ICloneable Implementation
-        //========================================
- 
+
         public object Clone()
         {
             try
@@ -288,6 +288,7 @@ namespace HammerAndSickle.Models
                 throw;
             }
         }
+
         #endregion // ICloneable Implementation
     }
 }
