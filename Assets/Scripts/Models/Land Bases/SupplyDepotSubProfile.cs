@@ -55,10 +55,10 @@ namespace HammerAndSickle.Models
     /// It handles stockpile management, supply projection, generation, and special abilities.
     /// </summary>
     [Serializable]
-    public class SupplyDepot : LandBase, ISerializable
+    public class SupplyDepotSubProfile : LandBaseProfile, ISerializable
     {
         #region Constants
-        private const string CLASS_NAME = nameof(SupplyDepot);
+        private const string CLASS_NAME = nameof(SupplyDepotSubProfile);
 
         // Maximum stockpile capacities by depot size
         private static readonly Dictionary<DepotSize, float> MaxStockpileBySize = new Dictionary<DepotSize, float>
@@ -265,7 +265,7 @@ namespace HammerAndSickle.Models
         /// <summary>
         /// Creates a new supply depot with default values.
         /// </summary>
-        public SupplyDepot() : base()
+        public SupplyDepotSubProfile() : base()
         {
             depotID = Guid.NewGuid().ToString();
             depotName = "Supply Depot";
@@ -286,7 +286,7 @@ namespace HammerAndSickle.Models
         /// <param name="depotSize">Size of the depot</param>
         /// <param name="isMainDepot">Whether this is a main depot</param>
         /// <param name="initialDamage">Initial damage level (0-100)</param>
-        public SupplyDepot(string name, Side side, DepotSize depotSize, bool isMainDepot = false, int initialDamage = 0)
+        public SupplyDepotSubProfile(string name, Side side, DepotSize depotSize, bool isMainDepot = false, int initialDamage = 0)
             : base(initialDamage)
         {
             try
@@ -313,7 +313,7 @@ namespace HammerAndSickle.Models
         /// <summary>
         /// Deserialization constructor.
         /// </summary>
-        protected SupplyDepot(SerializationInfo info, StreamingContext context) : base(info, context)
+        protected SupplyDepotSubProfile(SerializationInfo info, StreamingContext context) : base(info, context)
         {
             try
             {
@@ -811,12 +811,12 @@ namespace HammerAndSickle.Models
         /// <summary>
         /// Creates a clone of this depot.
         /// </summary>
-        /// <returns>A new SupplyDepot with the same properties</returns>
-        public SupplyDepot Clone()
+        /// <returns>A new SupplyDepotSubProfile with the same properties</returns>
+        public SupplyDepotSubProfile Clone()
         {
             try
             {
-                var clone = new SupplyDepot();
+                var clone = new SupplyDepotSubProfile();
 
                 // Copy basic information (except ID which is generated new)
                 clone.depotName = this.depotName;
@@ -847,7 +847,7 @@ namespace HammerAndSickle.Models
 
         #region ISerializable Implementation
         /// <summary>
-        /// Serializes this SupplyDepot instance.
+        /// Serializes this SupplyDepotSubProfile instance.
         /// </summary>
         public override void GetObjectData(SerializationInfo info, StreamingContext context)
         {

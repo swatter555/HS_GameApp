@@ -1,20 +1,19 @@
 using System;
 using System.Collections.Generic;
 using System.Runtime.Serialization;
-using UnityEngine;
 using HammerAndSickle.Services;
 
 namespace HammerAndSickle.Models
 {
     /// <summary>
     /// Represents an airbase facility that can host and support air units.
-    /// Inherits base damage and operational capacity functionality from LandBase.
+    /// Inherits base damage and operational capacity functionality from LandBaseProfile.
     /// </summary>
     [Serializable]
-    public class Airbase : LandBase, ISerializable
+    public class AirbaseSubProfile : LandBaseProfile, ISerializable
     {
         #region Constants
-        private const string CLASS_NAME = nameof(Airbase);
+        private const string CLASS_NAME = nameof(AirbaseSubProfile);
 
         /// <summary>
         /// The maximum number of air units that can be attached to this airbase.
@@ -38,18 +37,18 @@ namespace HammerAndSickle.Models
 
         #region Constructors
         /// <summary>
-        /// Creates a new instance of the Airbase class with default values.
+        /// Creates a new instance of the AirbaseSubProfile class with default values.
         /// </summary>
-        public Airbase() : base()
+        public AirbaseSubProfile() : base()
         {
             // Default constructor uses base class initialization
         }
 
         /// <summary>
-        /// Creates a new instance of the Airbase class with specified initial damage.
+        /// Creates a new instance of the AirbaseSubProfile class with specified initial damage.
         /// </summary>
         /// <param name="initialDamage">The initial damage level (0-100)</param>
-        public Airbase(int initialDamage) : base(initialDamage)
+        public AirbaseSubProfile(int initialDamage) : base(initialDamage)
         {
             // Uses base class initialization with initial damage
         }
@@ -57,7 +56,7 @@ namespace HammerAndSickle.Models
         /// <summary>
         /// Deserialization constructor.
         /// </summary>
-        protected Airbase(SerializationInfo info, StreamingContext context) : base(info, context)
+        protected AirbaseSubProfile(SerializationInfo info, StreamingContext context) : base(info, context)
         {
             try
             {

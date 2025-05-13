@@ -13,21 +13,6 @@ namespace HammerAndSickle.Models
         public const int XP_COST_FOR_TOP_PROMOTION = 500;
         #endregion
 
-        #region Enums
-        // These enums define the types of skills a commander can have.
-        // The actual data for these skills is now in CommanderSkillCatalog.
-        public enum CommandGrade { JuniorGrade, SeniorGrade, TopGrade }
-        public enum CommandSkillPath { None, ShockFormation, IronDiscipline, MaskirovkaMaster, TacticalGenius, PoliticalOfficer, OperationalArt, HeroOfSovietUnion, DeepBattleTheorist }
-        public enum RearAreaSkillPath { None, SupplyEconomy, FieldWorkshop, PartyConnections, StrategicAirlift, ArmoredSupplyColumn }
-        public enum BattleDoctrineSkillPath
-        {
-            None, ArmoredWarfare, HullDownExpert, ShockTankCorps, NightFightingSpecialist,
-            DefenseInDepth, HedgehogDefense, FortificationEngineer, TrenchWarfareExpert,
-            QueenOfBattle, ForwardObservationPost, IntegratedAirDefenseSystem, PrecisionTargetting
-        }
-        public enum CombatOperationsSkillPath { None, OffensiveDoctrine, ManeuverDoctrine, PursuitDoctrine, SpecialistCorps, ReconnaissanceInForce, CombinedArmsWarfare }
-        #endregion
-
         #region Fields and Properties
         public int ExperiencePoints { get; private set; }
         public CommandGrade CurrentGrade { get; private set; }
@@ -36,7 +21,7 @@ namespace HammerAndSickle.Models
         public bool CanAffordTopPromotion => ExperiencePoints >= XP_COST_FOR_TOP_PROMOTION && CurrentGrade == CommandGrade.SeniorGrade;
 
         // Dictionaries to store the unlocked status of each skill for this commander
-        public Dictionary<CommandSkillPath, bool> UnlockedCommandSkills { get; private set; }
+        public Dictionary<LeadershipPath, bool> UnlockedCommandSkills { get; private set; }
         public Dictionary<RearAreaSkillPath, bool> UnlockedRearAreaSkills { get; private set; }
         public Dictionary<BattleDoctrineSkillPath, bool> UnlockedBattleDoctrineSkills { get; private set; }
         public Dictionary<CombatOperationsSkillPath, bool> UnlockedCombatOperationsSkills { get; private set; }
@@ -57,8 +42,8 @@ namespace HammerAndSickle.Models
 
         private void InitializeSkillDictionaries()
         {
-            UnlockedCommandSkills = Enum.GetValues(typeof(CommandSkillPath)).Cast<CommandSkillPath>()
-                                     .Where(s => s != CommandSkillPath.None)
+            UnlockedCommandSkills = Enum.GetValues(typeof(LeadershipPath)).Cast<LeadershipPath>()
+                                     .Where(s => s != LeadershipPath.None)
                                      .ToDictionary(s => s, s => false);
             UnlockedRearAreaSkills = Enum.GetValues(typeof(RearAreaSkillPath)).Cast<RearAreaSkillPath>()
                                      .Where(s => s != RearAreaSkillPath.None)
@@ -76,9 +61,9 @@ namespace HammerAndSickle.Models
             if (experienceAmount <= 0) return;
 
             float currentExperienceBonus = 1.0f;
-            if (IsSkillUnlocked(CommandSkillPath.ShockFormation))
+            if (IsSkillUnlocked(LeadershipPath.ShockFormation))
             {
-                if (CommanderSkillCatalog.TryGetSkillDefinition(CommandSkillPath.ShockFormation, out var skillDef))
+                if (CommanderSkillCatalog.TryGetSkillDefinition(LeadershipPath.ShockFormation, out var skillDef))
                 {
                     currentExperienceBonus += skillDef.PrimaryBonusValue; // Assumes bonus value is the additive part (0.25)
                 }
@@ -192,7 +177,7 @@ namespace HammerAndSickle.Models
         {
             return skillEnum switch
             {
-                CommandSkillPath csp => UnlockedCommandSkills.TryGetValue(csp, out bool unlocked) && unlocked,
+                LeadershipPath csp => UnlockedCommandSkills.TryGetValue(csp, out bool unlocked) && unlocked,
                 RearAreaSkillPath rasp => UnlockedRearAreaSkills.TryGetValue(rasp, out bool unlocked) && unlocked,
                 BattleDoctrineSkillPath bdsp => UnlockedBattleDoctrineSkills.TryGetValue(bdsp, out bool unlocked) && unlocked,
                 CombatOperationsSkillPath cosp => UnlockedCombatOperationsSkills.TryGetValue(cosp, out bool unlocked) && unlocked,
@@ -204,7 +189,7 @@ namespace HammerAndSickle.Models
         {
             switch (skillEnum)
             {
-                case CommandSkillPath csp: UnlockedCommandSkills[csp] = isUnlocked; break;
+                case LeadershipPath csp: UnlockedCommandSkills[csp] = isUnlocked; break;
                 case RearAreaSkillPath rasp: UnlockedRearAreaSkills[rasp] = isUnlocked; break;
                 case BattleDoctrineSkillPath bdsp: UnlockedBattleDoctrineSkills[bdsp] = isUnlocked; break;
                 case CombatOperationsSkillPath cosp: UnlockedCombatOperationsSkills[cosp] = isUnlocked; break;
@@ -255,7 +240,7 @@ namespace HammerAndSickle.Models
         {
             float totalMultiplier = 1.0f;
             ProcessUnlockedSkills((skillDef) => {
-                if (skillDef.PrimaryBonusType == BonusType.UnitXP)
+                if (skillDef.PrimaryBonusType == SkillBonusType.UnitXP)
                 {
                     totalMultiplier += skillDef.PrimaryBonusValue; // Assumes value is additive (0.25)
                 }
@@ -267,7 +252,7 @@ namespace HammerAndSickle.Models
         {
             int totalBonus = 0;
             ProcessUnlockedSkills(skillDef => {
-                if (skillDef.PrimaryBonusType == BonusType.Command) totalBonus += (int)skillDef.PrimaryBonusValue;
+                if (skillDef.PrimaryBonusType == SkillBonusType.Command) totalBonus += (int)skillDef.PrimaryBonusValue;
             });
             return totalBonus;
         }
@@ -276,7 +261,7 @@ namespace HammerAndSickle.Models
         {
             int totalBonus = 0;
             ProcessUnlockedSkills(skillDef => {
-                if (skillDef.PrimaryBonusType == BonusType.Initiative) totalBonus += (int)skillDef.PrimaryBonusValue;
+                if (skillDef.PrimaryBonusType == SkillBonusType.Initiative) totalBonus += (int)skillDef.PrimaryBonusValue;
             });
             return totalBonus;
         }
@@ -285,7 +270,7 @@ namespace HammerAndSickle.Models
         {
             int totalBonus = 0;
             ProcessUnlockedSkills(skillDef => {
-                if (skillDef.PrimaryBonusType == BonusType.Detection) totalBonus += (int)skillDef.PrimaryBonusValue;
+                if (skillDef.PrimaryBonusType == SkillBonusType.Detection) totalBonus += (int)skillDef.PrimaryBonusValue;
             });
             return totalBonus;
         }
@@ -294,7 +279,7 @@ namespace HammerAndSickle.Models
         {
             float finalMultiplier = 1.0f;
             ProcessUnlockedSkills(skillDef => {
-                if (skillDef.PrimaryBonusType == BonusType.SupplyConsumption)
+                if (skillDef.PrimaryBonusType == SkillBonusType.SupplyConsumption)
                 {
                     // If multiple skills provide this, they should stack multiplicatively
                     finalMultiplier *= skillDef.PrimaryBonusValue;
@@ -307,7 +292,7 @@ namespace HammerAndSickle.Models
         {
             float finalMultiplier = 1.0f;
             ProcessUnlockedSkills(skillDef => {
-                if (skillDef.PrimaryBonusType == BonusType.PrestigeCost)
+                if (skillDef.PrimaryBonusType == SkillBonusType.PrestigeCost)
                 {
                     finalMultiplier *= skillDef.PrimaryBonusValue;
                 }
@@ -319,7 +304,7 @@ namespace HammerAndSickle.Models
         {
             bool hasSkill = false;
             ProcessUnlockedSkills(skillDef => {
-                if (skillDef.PrimaryBonusType == BonusType.EmergencyResupply) hasSkill = true;
+                if (skillDef.PrimaryBonusType == SkillBonusType.EmergencyResupply) hasSkill = true;
             }, stopEarlyIf: () => hasSkill);
             return hasSkill;
         }
@@ -329,7 +314,7 @@ namespace HammerAndSickle.Models
         {
             int totalBonus = 0;
             ProcessUnlockedSkills(skillDef => {
-                if (skillDef.PrimaryBonusType == BonusType.HardDefense) totalBonus += (int)skillDef.PrimaryBonusValue;
+                if (skillDef.PrimaryBonusType == SkillBonusType.HardDefense) totalBonus += (int)skillDef.PrimaryBonusValue;
             });
             return totalBonus;
         }
@@ -339,7 +324,7 @@ namespace HammerAndSickle.Models
         {
             bool hasSkill = false;
             ProcessUnlockedSkills(skillDef => {
-                if (skillDef.PrimaryBonusType == BonusType.BreakthroughCapability) hasSkill = true;
+                if (skillDef.PrimaryBonusType == SkillBonusType.BreakthroughCapability) hasSkill = true;
             }, stopEarlyIf: () => hasSkill);
             return hasSkill;
         }
