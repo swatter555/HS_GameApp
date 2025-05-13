@@ -100,7 +100,7 @@ namespace HammerAndSickle.Models
                 IsAssigned = false;
 
                 // Initialize with a placeholder name instead of empty string
-                Name = $"Officer-{Guid.NewGuid().ToString().Substring(0, 8)}";
+                Name = $"Officer-{Guid.NewGuid().ToString()[..8]}";
 
                 // Optionally, automatically generate a name if NameGenService is available
                 if (NameGenService.Instance != null)
@@ -234,7 +234,7 @@ namespace HammerAndSickle.Models
                 // Ensure name is valid
                 if (string.IsNullOrEmpty(Name))
                 {
-                    Name = $"Officer-{Guid.NewGuid().ToString().Substring(0, 8)}";
+                    Name = $"Officer-{Guid.NewGuid().ToString()[..8]}";
                 }
 
                 // Generate command ability and initiative on a bell curve
@@ -432,17 +432,12 @@ namespace HammerAndSickle.Models
             try
             {
                 // Create a new commander with the same attributes
-                UnitCommander clone = new(
-                    Name,
-                    Side,
-                    Nationality,
-                    CombatCommand,
-                    CombatInitiative
-                );
-
-                // Copy additional properties
-                clone.CommandGrade = this.CommandGrade;
-                clone.IsAssigned = this.IsAssigned;
+                UnitCommander clone = new(Name, Side, Nationality, CombatCommand, CombatInitiative)
+                {
+                    // Copy additional properties
+                    CommandGrade = this.CommandGrade,
+                    IsAssigned = this.IsAssigned
+                };
 
                 return clone;
             }

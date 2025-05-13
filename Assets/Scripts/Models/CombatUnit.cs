@@ -54,7 +54,7 @@ namespace HammerAndSickle.Models
         BMB,    // Bomber
         RCN,    // Recon Aircraft
         FWT,    // Fixed-wing transport
-        FAC,    // Facility
+        BASE,   // Land base of some type (e.g., HQ, depot, airbase, etc.)
         DEPOT,  // Supply Depot
         AIRB,   // Airbase
     }
@@ -127,17 +127,6 @@ namespace HammerAndSickle.Models
     }
 
     /// <summary>
-    /// The unit's special movement capabilities.
-    /// </summary>
-    public enum UnitCapability
-    {
-        NotApplicable,
-        Low,
-        Moderate,
-        High
-    }
-
-    /// <summary>
     /// The experience level of a unit.
     /// </summary>
     public enum ExperienceLevel
@@ -178,12 +167,52 @@ namespace HammerAndSickle.Models
     /// <summary>
     /// How stealthy a unit is.
     /// </summary>
-    public enum VisibilityProfile
+    public enum UnitSilhouette
     {
         Large,
         Medium,
         Small,
         Tiny
+    }
+
+    /// <summary>
+    /// Night Vision Gear rating.
+    /// </summary>
+    public enum NVG_Rating
+    {
+        None,
+        Gen1,
+        Gen2
+    }
+
+    /// <summary>
+    /// Nuclear, Biological, and Chemical (NBC) protection rating.
+    /// </summary>
+    public enum  NBC_Rating
+    {
+        None,
+        Gen1,
+        Gen2
+    }
+
+    /// <summary>
+    /// Aircraft's ability to fly in various conditions.
+    /// </summary>
+    public enum AllWeatherRating
+    {
+        Day,
+        Night,
+        AllWeather
+    }
+
+    /// <summary>
+    /// Signals Intelligence (SIGINT) rating.
+    /// </summary>
+    public enum  SIGINT_Rating
+    {
+        UnitLevel,
+        HQLevel,
+        SpecializedLevel
     }
 
     /// <summary>
@@ -207,6 +236,11 @@ namespace HammerAndSickle.Models
         /// </summary>
         public const int MaxPossibleHitPoints = 40;
 
+        public const float MaxDaysSupplyDepot = 100f;
+        public const float MaxDaysSupplyUnit = 7f;
+
+        public const int ZOCRange = 1; // Zone of Control range for all units
+
         // Movement constants for different unit types
         private const int MechanizedMovt = 12;
         private const int MotorizedMovt = 10;
@@ -216,51 +250,26 @@ namespace HammerAndSickle.Models
 
         #endregion
 
-        #region Events and Delegates
+        //====== Fields ======
+        #region Fields
+        //====================
 
-        /// <summary>
-        /// Triggered when the unit's hit points change.
-        /// </summary>
-        public event Action<int, int> OnHitPointsChanged; // oldValue, newValue
-
-        /// <summary>
-        /// Triggered when the unit's position changes.
-        /// </summary>
-        public event Action<Vector2, Vector2> OnPositionChanged; // oldPosition, newPosition
-
-        /// <summary>
-        /// Triggered when the unit's movement points change.
-        /// </summary>
-        public event Action<int, int> OnMovementPointsChanged; // oldValue, newValue
-
-        /// <summary>
-        /// Triggered when the unit's experience level changes.
-        /// </summary>
-        public event Action<ExperienceLevel, ExperienceLevel> OnExperienceChanged; // oldLevel, newLevel
-
-        /// <summary>
-        /// Triggered when the unit's combat state changes.
-        /// </summary>
-        public event Action<CombatState, CombatState> OnCombatStateChanged; // oldState, newState
-
-        /// <summary>
-        /// Triggered when the unit's days of supply change.
-        /// </summary>
-        public event Action<float, float> OnSupplyChanged; // oldValue, newValue
-
-        /// <summary>
-        /// Triggered when the unit's efficiency level changes.
-        /// </summary>
-        public event Action<EfficiencyLevel, EfficiencyLevel> OnEfficiencyChanged; // oldLevel, newLevel
-
-        /// <summary>
-        /// Triggered when the unit's mounted state changes.
-        /// </summary>
-        public event Action<bool> OnMountedStateChanged; // isMounted
-
+        // Managing unit states.
+        private int experiencePoints;
+        private ExperienceLevel experienceLevel;
+        private EfficiencyLevel efficiencyLevel;
+        private bool isMounted;
+        private CombatState combatState;
+        private int currentHitPoints;
+        private float currentDaysSupply;
+        private int maxMovementPoints;
+        private int currentMovementPoints;
+        private Vector2 mapPos;
         #endregion
 
+        //====== Properties ======
         #region Properties
+        //========================
 
         // Identification and metadata
         public string UnitName { get; set; }
@@ -272,7 +281,7 @@ namespace HammerAndSickle.Models
         public Nationality Nationality { get; private set; }
         public bool IsTransportable { get; private set; }
 
-        // Action counts per turn
+        // Action counts per turn TODO: Make actions a struct or class with a max and current count.
         public int MoveActions { get; private set; }
         public int CombatActions { get; private set; }
         public int DeploymentActions { get; private set; }
@@ -284,254 +293,45 @@ namespace HammerAndSickle.Models
         // Informational profile
         public UnitProfile UnitProfile { get; private set; }
 
-        // Experience
-        private int experiencePoints;
-        public int ExperiencePoints
-        {
-            get => experiencePoints;
-            private set
-            {
-                if (experiencePoints != value)
-                {
-                    experiencePoints = value;
-                    UpdateExperienceLevel();
-                }
-            }
-        }
+        // Properties related to unit's that are a base.
+        public bool IsLandBase { get; private set; }
+        public LandBase LandBase { get; private set; }
+        public bool IsAirbase => LandBase is Airbase;
+        public bool IsSupplyDepot => LandBase is SupplyDepot;
+        public bool IsFacility => LandBase is not Airbase && LandBase is not SupplyDepot;
 
-        private ExperienceLevel experienceLevel;
-        public ExperienceLevel ExperienceLevel
-        {
-            get => experienceLevel;
-            private set
-            {
-                if (experienceLevel != value)
-                {
-                    var oldLevel = experienceLevel;
-                    experienceLevel = value;
-                    OnExperienceChanged?.Invoke(oldLevel, experienceLevel);
-                }
-            }
-        }
-
-        // Combat readiness state gauge
-        private EfficiencyLevel efficiencyLevel;
-        public EfficiencyLevel EfficiencyLevel
-        {
-            get => efficiencyLevel;
-            private set
-            {
-                if (efficiencyLevel != value)
-                {
-                    var oldLevel = efficiencyLevel;
-                    efficiencyLevel = value;
-                    OnEfficiencyChanged?.Invoke(oldLevel, efficiencyLevel);
-                }
-            }
-        }
-
-        // Capability ratings
-        public UnitCapability SIGINT_Rating { get; private set; }
-        public UnitCapability NBC_Rating { get; private set; }
-        public StrategicMobility StrategicMobility { get; private set; }
-        public UnitCapability NightFighting { get; private set; }
-        public UnitCapability AllWeather { get; private set; }
-        public VisibilityProfile VisibilityProfile { get; private set; }
-
-        // Is this unit currently mounted on a transport?
-        private bool isMounted;
-        public bool IsMounted
-        {
-            get => isMounted;
-            private set
-            {
-                if (isMounted != value)
-                {
-                    isMounted = value;
-                    OnMountedStateChanged?.Invoke(isMounted);
-                }
-            }
-        }
-
-        // Combat state
-        private CombatState combatState;
-        public CombatState CombatState
-        {
-            get => combatState;
-            private set
-            {
-                if (combatState != value)
-                {
-                    var oldState = combatState;
-                    combatState = value;
-                    OnCombatStateChanged?.Invoke(oldState, combatState);
-                }
-            }
-        }
-
-        // Hit points
-        public const int MaxHitPoints = 40;
-        private int hitPoints;
-        public int HitPoints
-        {
-            get => hitPoints;
-            private set
-            {
-                if (hitPoints != value)
-                {
-                    int oldValue = hitPoints;
-                    hitPoints = Math.Clamp(value, 0, MaxHitPoints);
-                    OnHitPointsChanged?.Invoke(oldValue, hitPoints);
-
-                    // Update unit profile representation
-                    UnitProfile?.UpdateCurrentProfile(hitPoints);
-                }
-            }
-        }
-
-        // Supply
-        public const float MaxDaysSupplyDepot = 100f;
-        public const float MaxDaysSupplyUnit = 7f;
-        private float currentDaysSupply = 5f;
-        public float CurrentDaysSupply
-        {
-            get => currentDaysSupply;
-            set
-            {
-                if (Math.Abs(currentDaysSupply - value) > 0.01f)
-                {
-                    float oldValue = currentDaysSupply;
-                    currentDaysSupply = Math.Clamp(value, 0f, MaxDaysSupplyUnit);
-                    OnSupplyChanged?.Invoke(oldValue, currentDaysSupply);
-
-                    // Check if supply dropped to zero, which affects efficiency
-                    if (oldValue > 0 && currentDaysSupply <= 0)
-                    {
-                        SupplyEfficiencyCheck();
-                    }
-                }
-            }
-        }
-
-        // Movement
-        public int MaxMovementPoints { get; private set; }
-        private int currentMovementPoints;
-        public int CurrentMovementPoints
-        {
-            get => currentMovementPoints;
-            private set
-            {
-                if (currentMovementPoints != value)
-                {
-                    int oldValue = currentMovementPoints;
-                    currentMovementPoints = Math.Clamp(value, 0, MaxMovementPoints);
-                    OnMovementPointsChanged?.Invoke(oldValue, currentMovementPoints);
-                }
-            }
-        }
-
-        // Zone of control in hexes
-        public int ZOC { get; private set; }
-
-        // Position on map
-        private Vector2 position;
-        public Vector2 Position
-        {
-            get => position;
-            private set
-            {
-                if (position != value)
-                {
-                    Vector2 oldPosition = position;
-                    position = value;
-                    OnPositionChanged?.Invoke(oldPosition, position);
-                }
-            }
-        }
-
-        /// <summary>
-        /// Optional reference to a LandBase object for units that represent facilities
-        /// such as airbases or supply depots.
-        /// </summary>
-        public LandBase FacilityBase { get; private set; }
-
-        /// <summary>
-        /// Indicates whether this unit represents a facility.
-        /// </summary>
-        public bool IsFacility => FacilityBase != null;
+        // State management properties.
+        public int ExperiencePoints => experiencePoints;
+        public ExperienceLevel ExperienceLevel => experienceLevel;
+        public EfficiencyLevel EfficiencyLevel => efficiencyLevel;
+        public bool IsMounted => isMounted;
+        public CombatState CombatState => combatState;
+        public int CurrentHitPoints => currentHitPoints;
+        public float CurrentDaysSupply => currentDaysSupply;
+        public int MaxMovementPoints => maxMovementPoints;
+        public int CurrentMovementPoints => currentMovementPoints;
+        public Vector2 MapPos => mapPos;
 
         #endregion
 
+
+        //====== Constructors ======
         #region Constructors
+        //==========================
 
-        /// <summary>
-        /// Creates a new combat unit with the specified parameters.
-        /// </summary>
-        public CombatUnit(string unitName,
-            UnitType unitType,
-            UnitClassification classification,
-            UnitRole role,
-            Side side,
-            Nationality nationality,
-            bool isTransportable,
-            WeaponSystemProfile deployedProfile,
-            WeaponSystemProfile mountedProfile = null,
-            Vector2 initialPosition = default)
+        public CombatUnit()
         {
-            try
-            {
-                // Existing validation...
 
-                // Set basic properties
-                UnitName = unitName;
-                UnitID = Guid.NewGuid().ToString();
-                UnitType = unitType;
-                Classification = classification;
-                Role = role;
-                Side = side;
-                Nationality = nationality;
-                IsTransportable = isTransportable;
-                DeployedProfile = deployedProfile;
-                MountedProfile = mountedProfile;
-                Position = initialPosition;
-
-                // Set default action counts
-                MoveActions = 1;
-                CombatActions = 1;
-                DeploymentActions = 0;
-
-                // Initialize state
-                hitPoints = MaxHitPoints;
-                currentDaysSupply = 5f;
-                isMounted = false;
-                combatState = CombatState.Deployed;
-                experiencePoints = 0;
-                experienceLevel = ExperienceLevel.Green;
-                efficiencyLevel = EfficiencyLevel.Operational;
-
-                // Initialize LandBase for facility units
-                InitializeFacility();
-
-                // Rest of the constructor implementation...
-            }
-            catch (Exception e)
-            {
-                AppService.Instance.HandleException(CLASS_NAME, "Constructor", e);
-                throw;
-            }
         }
 
-        /// <summary>
-        /// Initializes the appropriate facility base for this unit based on its classification.
-        /// </summary>
         private void InitializeFacility()
         {
             // Initialize the facility base based on the unit's classification
-            FacilityBase = Classification switch
+            LandBase = Classification switch
             {
                 UnitClassification.AIRB => new Airbase(),
                 UnitClassification.DEPOT => new SupplyDepot(UnitName, Side, DepotSize.Medium),
-                UnitClassification.FAC => new LandBase(),// For general facilities, use the base LandBase class
+                UnitClassification.BASE => new LandBase(),// For general facilities, use the base LandBase class
                 _ => null,// Non-facility units don't have a LandBase
             };
         }
@@ -543,57 +343,7 @@ namespace HammerAndSickle.Models
         {
             try
             {
-                // Retrieve basic properties
-                UnitName = info.GetString(nameof(UnitName));
-                UnitID = info.GetString(nameof(UnitID));
-                UnitType = (UnitType)info.GetValue(nameof(UnitType), typeof(UnitType));
-                Classification = (UnitClassification)info.GetValue(nameof(Classification), typeof(UnitClassification));
-                Role = (UnitRole)info.GetValue(nameof(Role), typeof(UnitRole));
-                Side = (Side)info.GetValue(nameof(Side), typeof(Side));
-                Nationality = (Nationality)info.GetValue(nameof(Nationality), typeof(Nationality));
-                IsTransportable = info.GetBoolean(nameof(IsTransportable));
-
-                // Retrieve profiles
-                DeployedProfile = (WeaponSystemProfile)info.GetValue(nameof(DeployedProfile), typeof(WeaponSystemProfile));
-                MountedProfile = (WeaponSystemProfile)info.GetValue(nameof(MountedProfile), typeof(WeaponSystemProfile));
-                UnitProfile = (UnitProfile)info.GetValue(nameof(UnitProfile), typeof(UnitProfile));
-
-                // Retrieve action counts
-                MoveActions = info.GetInt32(nameof(MoveActions));
-                CombatActions = info.GetInt32(nameof(CombatActions));
-                DeploymentActions = info.GetInt32(nameof(DeploymentActions));
-
-                // Retrieve state
-                hitPoints = info.GetInt32(nameof(HitPoints));
-                currentDaysSupply = info.GetSingle(nameof(CurrentDaysSupply));
-                isMounted = info.GetBoolean(nameof(IsMounted));
-                combatState = (CombatState)info.GetValue(nameof(CombatState), typeof(CombatState));
-                experiencePoints = info.GetInt32(nameof(ExperiencePoints));
-                experienceLevel = (ExperienceLevel)info.GetValue(nameof(ExperienceLevel), typeof(ExperienceLevel));
-                efficiencyLevel = (EfficiencyLevel)info.GetValue(nameof(EfficiencyLevel), typeof(EfficiencyLevel));
-
-                // Retrieve capabilities
-                SIGINT_Rating = (UnitCapability)info.GetValue(nameof(SIGINT_Rating), typeof(UnitCapability));
-                NBC_Rating = (UnitCapability)info.GetValue(nameof(NBC_Rating), typeof(UnitCapability));
-                StrategicMobility = (StrategicMobility)info.GetValue(nameof(StrategicMobility), typeof(StrategicMobility));
-                NightFighting = (UnitCapability)info.GetValue(nameof(NightFighting), typeof(UnitCapability));
-                AllWeather = (UnitCapability)info.GetValue(nameof(AllWeather), typeof(UnitCapability));
-                VisibilityProfile = (VisibilityProfile)info.GetValue(nameof(VisibilityProfile), typeof(VisibilityProfile));
-
-                // Retrieve movement and position
-                MaxMovementPoints = info.GetInt32(nameof(MaxMovementPoints));
-                currentMovementPoints = info.GetInt32(nameof(CurrentMovementPoints));
-                ZOC = info.GetInt32(nameof(ZOC));
-                float posX = info.GetSingle("PositionX");
-                float posY = info.GetSingle("PositionY");
-                position = new Vector2(posX, posY);
-
-                // Deserialize the facility base if it exists
-                bool hasFacility = info.GetBoolean("HasFacility");
-                if (hasFacility)
-                {
-                    FacilityBase = (LandBase)info.GetValue("FacilityBase", typeof(LandBase));
-                }
+                // Implement deserialization logic here
             }
             catch (Exception e)
             {
@@ -601,85 +351,17 @@ namespace HammerAndSickle.Models
                 throw;
             }
         }
-
         #endregion
 
+        //====== ICloneable Implementation ======
         #region ICloneable Implementation
+        //=======================================
 
-        /// <summary>
-        /// Creates a deep copy of this combat unit.
-        /// </summary>
         public object Clone()
         {
             try
             {
-                // Create a new unit with the same basic parameters
-                var clone = new CombatUnit(
-                    UnitName,
-                    UnitType,
-                    Classification,
-                    Role,
-                    Side,
-                    Nationality,
-                    IsTransportable,
-                    DeployedProfile.Clone(),
-                    MountedProfile?.Clone(),
-                    Position
-                );
-
-                // Copy state values
-                clone.hitPoints = hitPoints;
-                clone.currentDaysSupply = currentDaysSupply;
-                clone.isMounted = isMounted;
-                clone.combatState = combatState;
-                clone.experiencePoints = experiencePoints;
-                clone.experienceLevel = experienceLevel;
-                clone.efficiencyLevel = efficiencyLevel;
-
-                // Copy capabilities
-                clone.SIGINT_Rating = SIGINT_Rating;
-                clone.NBC_Rating = NBC_Rating;
-                clone.StrategicMobility = StrategicMobility;
-                clone.NightFighting = NightFighting;
-                clone.AllWeather = AllWeather;
-                clone.VisibilityProfile = VisibilityProfile;
-
-                // Copy movement and position
-                clone.MaxMovementPoints = MaxMovementPoints;
-                clone.currentMovementPoints = currentMovementPoints;
-                clone.ZOC = ZOC;
-
-                // Copy unit profile if it exists
-                if (UnitProfile != null)
-                {
-                    clone.UnitProfile = UnitProfile.Clone();
-                }
-
-                // Generate a new unique ID
-                clone.UnitID = Guid.NewGuid().ToString();
-
-                // Clone the facility base if it exists
-                if (FacilityBase != null)
-                {
-                    if (FacilityBase is Airbase airbase)
-                    {
-                        clone.SetFacilityBase(new Airbase());
-                    }
-                    else if (FacilityBase is SupplyDepot supplyDepot)
-                    {
-                        clone.SetFacilityBase(supplyDepot.Clone());
-                    }
-                    else
-                    {
-                        // Generic LandBase
-                        clone.SetFacilityBase(new LandBase());
-                    }
-
-                    // Apply the same damage level
-                    clone.FacilityBase.AddDamage(FacilityBase.Damage);
-                }
-
-                return clone;
+                return null; // Implement deep copy logic here
             }
             catch (Exception e)
             {
@@ -687,10 +369,11 @@ namespace HammerAndSickle.Models
                 throw;
             }
         }
-
         #endregion
 
+        //====== ISerializable Implementation ======
         #region ISerializable Implementation
+        //==========================================
 
         /// <summary>
         /// Serializes this combat unit.
@@ -699,56 +382,7 @@ namespace HammerAndSickle.Models
         {
             try
             {
-                // Store basic properties
-                info.AddValue(nameof(UnitName), UnitName);
-                info.AddValue(nameof(UnitID), UnitID);
-                info.AddValue(nameof(UnitType), UnitType);
-                info.AddValue(nameof(Classification), Classification);
-                info.AddValue(nameof(Role), Role);
-                info.AddValue(nameof(Side), Side);
-                info.AddValue(nameof(Nationality), Nationality);
-                info.AddValue(nameof(IsTransportable), IsTransportable);
-
-                // Store profiles
-                info.AddValue(nameof(DeployedProfile), DeployedProfile);
-                info.AddValue(nameof(MountedProfile), MountedProfile);
-                info.AddValue(nameof(UnitProfile), UnitProfile);
-
-                // Store action counts
-                info.AddValue(nameof(MoveActions), MoveActions);
-                info.AddValue(nameof(CombatActions), CombatActions);
-                info.AddValue(nameof(DeploymentActions), DeploymentActions);
-
-                // Store state
-                info.AddValue(nameof(HitPoints), hitPoints);
-                info.AddValue(nameof(CurrentDaysSupply), currentDaysSupply);
-                info.AddValue(nameof(IsMounted), isMounted);
-                info.AddValue(nameof(CombatState), combatState);
-                info.AddValue(nameof(ExperiencePoints), experiencePoints);
-                info.AddValue(nameof(ExperienceLevel), experienceLevel);
-                info.AddValue(nameof(EfficiencyLevel), efficiencyLevel);
-
-                // Store capabilities
-                info.AddValue(nameof(SIGINT_Rating), SIGINT_Rating);
-                info.AddValue(nameof(NBC_Rating), NBC_Rating);
-                info.AddValue(nameof(StrategicMobility), StrategicMobility);
-                info.AddValue(nameof(NightFighting), NightFighting);
-                info.AddValue(nameof(AllWeather), AllWeather);
-                info.AddValue(nameof(VisibilityProfile), VisibilityProfile);
-
-                // Store movement and position
-                info.AddValue(nameof(MaxMovementPoints), MaxMovementPoints);
-                info.AddValue(nameof(CurrentMovementPoints), currentMovementPoints);
-                info.AddValue(nameof(ZOC), ZOC);
-                info.AddValue("PositionX", position.x);
-                info.AddValue("PositionY", position.y);
-
-                // Serialize the facility base if it exists
-                info.AddValue("HasFacility", FacilityBase != null);
-                if (FacilityBase != null)
-                {
-                    info.AddValue("FacilityBase", FacilityBase);
-                }
+                // Implement serialization logic here
             }
             catch (Exception e)
             {
@@ -756,337 +390,20 @@ namespace HammerAndSickle.Models
                 throw;
             }
         }
-
-        #endregion
-
-        #region Public Methods
-
-        /// <summary>
-        /// Takes the specified amount of damage, reducing hit points.
-        /// </summary>
-        public void TakeDamage(int amount)
-        {
-            if (amount <= 0) return;
-            HitPoints = Math.Max(0, HitPoints - amount);
-        }
-
-        /// <summary>
-        /// Repairs the unit, restoring hit points while deducting experience proportionally.
-        /// When a unit is repaired, it loses experience as veteran crews are diluted with replacements.
-        /// </summary>
-        /// <param name="amount">The amount of hit points to repair</param>
-        public void Repair(int amount)
-        {
-            if (amount <= 0) return;
-
-            int oldHitPoints = hitPoints;
-            HitPoints = Math.Min(MaxHitPoints, hitPoints + amount);
-            int actualRepairAmount = HitPoints - oldHitPoints;
-
-            // Only deduct experience if repairs actually occurred
-            if (actualRepairAmount > 0 && experiencePoints > 0)
-            {
-                // Calculate experience loss - proportional to repair amount and current experience
-                float repairRatio = (float)actualRepairAmount / MaxHitPoints;
-                int expDeduction = (int)Math.Ceiling(experiencePoints * repairRatio);
-
-                // Ensure we don't deduct more than current experience points
-                expDeduction = Math.Min(expDeduction, experiencePoints);
-
-                // Apply the deduction
-                ExperiencePoints = Math.Max(0, experiencePoints - expDeduction);
-            }
-        }
-
-        /// <summary>
-        /// Moves the unit to a new position and decreases movement points.
-        /// </summary>
-        public bool MoveTo(Vector2 newPosition, int movementCost)
-        {
-            if (movementCost > CurrentMovementPoints)
-                return false;
-
-            Position = newPosition;
-            CurrentMovementPoints -= movementCost;
-            return true;
-        }
-
-        /// <summary>
-        /// Adds the specified amount of experience points to the unit.
-        /// </summary>
-        public void AddExperience(int amount)
-        {
-            if (amount <= 0) return;
-            ExperiencePoints += amount;
-        }
-
-        /// <summary>
-        /// Toggles the unit's mounted state if possible.
-        /// </summary>
-        public bool ToggleMountedState()
-        {
-            if (!IsTransportable || MountedProfile == null)
-                return false;
-
-            IsMounted = !IsMounted;
-            return true;
-        }
-
-        /// <summary>
-        /// Updates the unit's combat state.
-        /// </summary>
-        public bool SetCombatState(CombatState newState)
-        {
-            if (IsMounted && newState != CombatState.Mobile)
-                return false;
-
-            CombatState = newState;
-            return true;
-        }
-
-        /// <summary>
-        /// Resupplies the unit to the specified level.
-        /// </summary>
-        public void Resupply(float daysOfSupply)
-        {
-            if (daysOfSupply <= 0) return;
-            CurrentDaysSupply = Math.Min(MaxDaysSupplyUnit, CurrentDaysSupply + daysOfSupply);
-        }
-
-        /// <summary>
-        /// Resets movement points to maximum at the start of a turn.
-        /// </summary>
-        public void ResetMovementPoints()
-        {
-            CurrentMovementPoints = MaxMovementPoints;
-        }
-
-        /// <summary>
-        /// Consumes supplies based on an action or time passing.
-        /// </summary>
-        public void ConsumeSupplies(float amount)
-        {
-            if (amount <= 0) return;
-            CurrentDaysSupply = Math.Max(0, CurrentDaysSupply - amount);
-        }
-
-        /// <summary>
-        /// Upgrades a specific capability or attribute of this unit.
-        /// Allows for runtime modification of unit capabilities such as SIGINT rating,
-        /// NBC protection, night fighting capability, and other key attributes.
-        /// This facilitates unit progression throughout a campaign.
-        /// </summary>
-        /// <param name="capabilityName">The name of the capability property to modify</param>
-        /// <param name="newValue">The new value to set for the capability</param>
-        /// <returns>True if the upgrade was successful, false otherwise</returns>
-        public bool UpgradeCapability(string capabilityName, object newValue)
-        {
-            try
-            {
-                var propertyInfo = GetType().GetProperty(capabilityName);
-                if (propertyInfo == null || !propertyInfo.CanWrite)
-                    return false;
-
-                propertyInfo.SetValue(this, newValue);
-                return true;
-            }
-            catch (Exception e)
-            {
-                AppService.Instance.HandleException(CLASS_NAME, "UpgradeCapability", e);
-                return false;
-            }
-        }
-
-        /// <summary>
-        /// Gets the facility as an Airbase, if this unit represents an airbase.
-        /// </summary>
-        /// <returns>The Airbase instance or null if this unit is not an airbase</returns>
-        public Airbase GetAirbase()
-        {
-            return FacilityBase as Airbase;
-        }
-
-        /// <summary>
-        /// Gets the facility as a SupplyDepot, if this unit represents a supply depot.
-        /// </summary>
-        /// <returns>The SupplyDepot instance or null if this unit is not a supply depot</returns>
-        public SupplyDepot GetSupplyDepot()
-        {
-            return FacilityBase as SupplyDepot;
-        }
-
-        /// <summary>
-        /// Creates or replaces the facility base for this unit.
-        /// </summary>
-        /// <param name="facilityBase">The new facility base</param>
-        public void SetFacilityBase(LandBase facilityBase)
-        {
-            FacilityBase = facilityBase;
-        }
-
-        #endregion
-
-        #region Private Methods
-
-        /// <summary>
-        /// Calculates the maximum movement points based on unit classification.
-        /// </summary>
-        private int CalculateMaxMovementPoints()
-        {
-            var baseMovement = Classification switch
-            {
-                // Mechanized units
-                UnitClassification.TANK or UnitClassification.MECH or UnitClassification.SPA or UnitClassification.SPSAM or UnitClassification.SPAAA or UnitClassification.SPECM or UnitClassification.MAB or UnitClassification.MAM or UnitClassification.MMAR => MechanizedMovt,
-                // Motorized units
-                UnitClassification.MOT or UnitClassification.AT or UnitClassification.ROC or UnitClassification.ENG or UnitClassification.RECON or UnitClassification.ART or UnitClassification.SAM or UnitClassification.AAA or UnitClassification.BM => MotorizedMovt,
-                // Non-mechanized units
-                UnitClassification.INF or UnitClassification.AB or UnitClassification.AM or UnitClassification.MAR or UnitClassification.SPECF => NonMechanizedMovt,
-                // Air units
-                UnitClassification.ASF or UnitClassification.MRF or UnitClassification.ATT or UnitClassification.BMB or UnitClassification.RCN or UnitClassification.FWT => AirMovt,
-                // Aviation units (helicopters)
-                UnitClassification.AHEL or UnitClassification.THEL or UnitClassification.SPECH => AviationMovt,
-                // Facilities and airbases
-                UnitClassification.FAC or UnitClassification.AIRB => 0,
-                // Naval units - temporarily setting to 0
-                _ => 0,
-            };
-
-            // Apply profile modifier
-            float modifier = IsMounted ?
-                MountedProfile?.MovementModifier ?? 1.0f :
-                DeployedProfile?.MovementModifier ?? 1.0f;
-
-            return (int)Math.Round(baseMovement * modifier);
-        }
-
-        /// <summary>
-        /// Calculates the zone of control based on unit type and profiles.
-        /// </summary>
-        private int CalculateZOC()
-        {
-            var baseZOC = UnitType switch
-            {
-                UnitType.LandUnitDF => 1,
-                UnitType.LandUnitIF or UnitType.NavalUnitIF => 1,
-                UnitType.AirUnit => 0,
-                UnitType.NavalUnitDF => 1,
-                _ => 0,
-            };
-
-            // Apply profile modifier
-            int modifier = IsMounted ?
-                MountedProfile?.ZOCModifier ?? 0 :
-                DeployedProfile?.ZOCModifier ?? 0;
-
-            return baseZOC + modifier;
-        }
-
-        /// <summary>
-        /// Updates the experience level based on current experience points.
-        /// </summary>
-        private void UpdateExperienceLevel()
-        {
-            ExperienceLevel newLevel;
-
-            if (experiencePoints >= (int)ExperiencePointLevels.Elite)
-                newLevel = ExperienceLevel.Elite;
-            else if (experiencePoints >= (int)ExperiencePointLevels.Veteran)
-                newLevel = ExperienceLevel.Veteran;
-            else if (experiencePoints >= (int)ExperiencePointLevels.Experienced)
-                newLevel = ExperienceLevel.Experienced;
-            else if (experiencePoints >= (int)ExperiencePointLevels.Trained)
-                newLevel = ExperienceLevel.Trained;
-            else if (experiencePoints >= (int)ExperiencePointLevels.Green)
-                newLevel = ExperienceLevel.Green;
-            else
-                newLevel = ExperienceLevel.Raw;
-
-            ExperienceLevel = newLevel;
-        }
-
-        /// <summary>
-        /// Checks if supply has dropped to zero and reduces efficiency level accordingly.
-        /// This is a focused check specifically for when a unit runs out of supplies
-        /// rather than a general efficiency update.
-        /// </summary>
-        private void SupplyEfficiencyCheck()
-        {
-            // Only reduce efficiency when supply hits zero
-            if (currentDaysSupply <= 0)
-            {
-                // Drop the efficiency level by one if possible
-                switch (efficiencyLevel)
-                {
-                    case EfficiencyLevel.PeakOperational:
-                        EfficiencyLevel = EfficiencyLevel.FullyOperational;
-                        break;
-                    case EfficiencyLevel.FullyOperational:
-                        EfficiencyLevel = EfficiencyLevel.Operational;
-                        break;
-                    case EfficiencyLevel.Operational:
-                        EfficiencyLevel = EfficiencyLevel.DegradedOperations;
-                        break;
-                    case EfficiencyLevel.DegradedOperations:
-                        EfficiencyLevel = EfficiencyLevel.StaticOperations;
-                        break;
-                        // Static operations is the lowest level, no further reduction
-                }
-            }
-        }
-
-        #endregion
-
-        #region FacilityHelpers
-        /// <summary>
-        /// Adds damage to the facility if this unit represents a facility.
-        /// </summary>
-        /// <param name="damageAmount">Amount of damage to add</param>
-        /// <returns>True if damage was applied, false if this is not a facility</returns>
-        public bool ApplyFacilityDamage(int damageAmount)
-        {
-            if (FacilityBase == null)
-            {
-                return false;
-            }
-
-            FacilityBase.AddDamage(damageAmount);
-            return true;
-        }
-
-        /// <summary>
-        /// Repairs damage to the facility if this unit represents a facility.
-        /// </summary>
-        /// <param name="repairAmount">Amount of damage to repair</param>
-        /// <returns>True if repairs were applied, false if this is not a facility</returns>
-        public bool RepairFacility(int repairAmount)
-        {
-            if (FacilityBase == null)
-            {
-                return false;
-            }
-
-            FacilityBase.RepairDamage(repairAmount);
-            return true;
-        }
-
-        /// <summary>
-        /// Gets the current operational status of the facility.
-        /// </summary>
-        /// <returns>The operational capacity or null if this is not a facility</returns>
-        public OperationalCapacity? GetFacilityStatus()
-        {
-            return FacilityBase?.OperationalCapacity;
-        }
-
-        /// <summary>
-        /// Gets the efficiency multiplier for facility operations.
-        /// </summary>
-        /// <returns>The efficiency multiplier or 0.0 if this is not a facility</returns>
-        public float GetFacilityEfficiency()
-        {
-            return FacilityBase?.GetEfficiencyMultiplier() ?? 0.0f;
-        }
-
         #endregion
     }
+
+    //====== Public Methods ======
+    #region Public Methods
+    //============================
+
+
+    #endregion
+
+    //====== Private Methods ======
+    #region Private Methods
+    //=============================
+
+
+    #endregion
 }

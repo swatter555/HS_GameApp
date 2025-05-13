@@ -111,9 +111,53 @@ namespace HammerAndSickle.Models
         ATT_JAGUAR,
 
         // Types of infantry
-        REG_INF,
-        ENG_INF,
-        SF_INF
+        SV_REG_INF,
+        SV_AB_INF,
+        SV_AM_INF,
+        SV_MAR_INF,
+        SV_SPEC_INF,
+        SV_ENG_INF,
+
+        US_REG_INF,
+        US_AB_INF,
+        US_AM_INF,
+        US_MAR_INF,
+        US_SPEC_INF,
+        US_ENG_INF,
+
+        FRG_REG_INF,
+        FRG_AB_INF,
+        FRG_AM_INF,
+        FRG_MAR_INF,
+        FRG_SPEC_INF,
+        FRG_ENG_INF,
+
+        UK_REG_INF,
+        UK_AB_INF,
+        UK_AM_INF,
+        UK_MAR_INF,
+        UK_SPEC_INF,
+        UK_ENG_INF,
+
+        FRA_REG_INF,
+        FRA_AB_INF,
+        FRA_AM_INF,
+        FRA_MAR_INF,
+        FRA_SPEC_INF,
+        FRA_ENG_INF,
+
+        ARAB_REG_INF,
+        ARAB_AB_INF,
+        ARAB_AM_INF,
+        ARAB_MAR_INF,
+        ARAB_SPEC_INF,
+        ARAB_ENG_INF,
+
+        AIRBASE,
+        SUPPLY_DEPOT,
+
+        EAST_SIGINT,
+        WEST_SIGINT
     }
 
     /// <summary>
@@ -366,6 +410,14 @@ namespace HammerAndSickle.Models
         /// </summary>
         public int ZOCModifier { get; set; }
 
+        // Capability ratings
+        public SIGINT_Rating SIGINT_Rating { get; private set; }
+        public NBC_Rating NBC_Rating { get; private set; }
+        public StrategicMobility StrategicMobility { get; private set; }
+        public NVG_Rating NVGCapability { get; private set; }
+        public AllWeatherRating AllWeatherCapability { get; private set; }
+        public UnitSilhouette Silhouette { get; private set; }
+
         #endregion
 
         #region Constructor
@@ -513,31 +565,32 @@ namespace HammerAndSickle.Models
         /// <returns>A new WeaponSystemProfile instance with the same values</returns>
         public WeaponSystemProfile Clone()
         {
-            var clone = new WeaponSystemProfile(Name, Nationality, WeaponSystem);
+            var clone = new WeaponSystemProfile(Name, Nationality, WeaponSystem)
+            {
+                // Copy all combat values
+                LandHardAttack = LandHardAttack,
+                LandSoftAttack = LandSoftAttack,
+                LandAirAttack = LandAirAttack,
+                LandHardDefense = LandHardDefense,
+                LandSoftDefense = LandSoftDefense,
+                LandAirDefense = LandAirDefense,
+                AirAttack = AirAttack,
+                AirDefense = AirDefense,
+                AirAvionics = AirAvionics,
+                AirGroundAttack = AirGroundAttack,
+                AirGroundDefense = AirGroundDefense,
+                AirStrategicAttack = AirStrategicAttack,
 
-            // Copy all combat values
-            clone.LandHardAttack = LandHardAttack;
-            clone.LandSoftAttack = LandSoftAttack;
-            clone.LandAirAttack = LandAirAttack;
-            clone.LandHardDefense = LandHardDefense;
-            clone.LandSoftDefense = LandSoftDefense;
-            clone.LandAirDefense = LandAirDefense;
-            clone.AirAttack = AirAttack;
-            clone.AirDefense = AirDefense;
-            clone.AirAvionics = AirAvionics;
-            clone.AirGroundAttack = AirGroundAttack;
-            clone.AirGroundDefense = AirGroundDefense;
-            clone.AirStrategicAttack = AirStrategicAttack;
+                // Copy all range values
+                PrimaryRange = PrimaryRange,
+                IndirectRange = IndirectRange,
+                DetectionRange = DetectionRange,
+                SupportRange = SupportRange,
 
-            // Copy all range values
-            clone.PrimaryRange = PrimaryRange;
-            clone.IndirectRange = IndirectRange;
-            clone.DetectionRange = DetectionRange;
-            clone.SupportRange = SupportRange;
-
-            // Copy modifiers
-            clone.MovementModifier = MovementModifier;
-            clone.ZOCModifier = ZOCModifier;
+                // Copy modifiers
+                MovementModifier = MovementModifier,
+                ZOCModifier = ZOCModifier
+            };
 
             // Copy upgrade types
             foreach (var upgradeType in UpgradeTypes)

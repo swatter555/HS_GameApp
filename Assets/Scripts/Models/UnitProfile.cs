@@ -178,8 +178,10 @@ namespace HammerAndSickle.Models
                 throw new ArgumentException("New name cannot be null or empty", nameof(newName));
             }
 
-            var clone = new UnitProfile(this);
-            clone.Name = newName;
+            var clone = new UnitProfile(this)
+            {
+                Name = newName
+            };
             return clone;
         }
 
@@ -197,9 +199,11 @@ namespace HammerAndSickle.Models
                 throw new ArgumentException("New name cannot be null or empty", nameof(newName));
             }
 
-            var clone = new UnitProfile(this);
-            clone.Name = newName;
-            clone.Nationality = newNationality;
+            var clone = new UnitProfile(this)
+            {
+                Name = newName,
+                Nationality = newNationality
+            };
             return clone;
         }
 
