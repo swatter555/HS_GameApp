@@ -22,10 +22,10 @@ namespace HammerAndSickle.Models
     /// Provides common functionality for damage tracking, repairs, and operational status.
     /// </summary>
     [Serializable]
-    public class LandBase : ISerializable
+    public class LandBaseProfile : ISerializable
     {
         #region Constants
-        private const string CLASS_NAME = nameof(LandBase);
+        private const string CLASS_NAME = nameof(LandBaseProfile);
 
         /// <summary>
         /// The maximum possible damage value (100%)
@@ -64,9 +64,9 @@ namespace HammerAndSickle.Models
 
         #region Constructors
         /// <summary>
-        /// Creates a new instance of the LandBase class with default values.
+        /// Creates a new instance of the LandBaseProfile class with default values.
         /// </summary>
-        public LandBase()
+        public LandBaseProfile()
         {
             // Default constructor initializes with no damage and full operational capacity
             damage = MIN_DAMAGE;
@@ -74,10 +74,10 @@ namespace HammerAndSickle.Models
         }
 
         /// <summary>
-        /// Creates a new instance of the LandBase class with specified initial damage.
+        /// Creates a new instance of the LandBaseProfile class with specified initial damage.
         /// </summary>
         /// <param name="initialDamage">The initial damage level (0-100)</param>
-        public LandBase(int initialDamage)
+        public LandBaseProfile(int initialDamage)
         {
             try
             {
@@ -94,7 +94,7 @@ namespace HammerAndSickle.Models
         /// <summary>
         /// Deserialization constructor.
         /// </summary>
-        protected LandBase(SerializationInfo info, StreamingContext context)
+        protected LandBaseProfile(SerializationInfo info, StreamingContext context)
         {
             try
             {
