@@ -46,6 +46,8 @@ namespace HammerAndSickle.Models
         public int DeploymentActions { get; private set; }
         public int MaxOpportunityActions { get; private set; }
         public int OpportunityActions { get; private set; }
+        public int MaxIntelGatheringActions { get; private set; }
+        public int IntelGatheringActions { get; private set; }
 
         // State data
         public float SuppressionPoints { get; private set; }

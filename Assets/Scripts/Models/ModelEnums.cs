@@ -344,7 +344,7 @@ namespace HammerAndSickle.Models
         // Air Defense Commander
         AirAttack,            // Bonus to AirAttack
         AirDefense,           // Bonus to AirDefense
-        OppotunityAction,     // Boolean, gets extra oppurtunity action.
+        OpportunityAction,    // Boolean, gets extra opportunity action.
 
         // Artillery Commander
         ShootAndScoot,        // Boolean, may move after ranged attack.
@@ -357,9 +357,14 @@ namespace HammerAndSickle.Models
         AirMobileElite,       // Boolean, significantly reduces vulnerability to enemy fire when mounted.
 
         // Airborne Commander
-        ImpromtuPlanning,      // Boolean, boarding aircraft doesn't cost an action.
+        ImpromptuPlanning,     // Boolean, boarding aircraft doesn't cost an action.
         AirborneAssault,       // Boolean, 1/2 suppression cost for a jump.
         AirborneElite,         // Boolean, still have combat action after jump.
+
+        // Intelligence Commander
+        ImprovedGathering,    // +1 Intel gathering actions
+        UndergroundBunker,    // Much smaller unit silouette.
+        RealtimeTargetting,   // Boolean, each airstrike has a chance of doing bonus damage.
 
         // Combined Arms Spec
         SpottingRange,        // +1 spotting range
@@ -370,8 +375,27 @@ namespace HammerAndSickle.Models
         RiverCrossing,        // Boolean, river crossing move bonus.
         RiverAssault,         // Boolean, amphibious assault combat bonus.
         BridgeBuilding,       // Boolean, may build bridges over rivers in one turn.
+        FieldFortification,   // Boolean, may build a persistent static fortification.
 
-        // Politically Connected Spec
+        // Irregular Warfare Spec
+        TerrainMastery,         // Boolean, rough, forest, mountain hex entrance costs are less.
+        InfiltrationMovement,   // Boolean, can move through enemy ZOC more easily
+        ConcealedPositions,     // Boolean, units have reduced silhouette.
+        AmbushTactics,          // Boolean, first attack from concealment gets +50% combat bonus
+
+        // SIGINT Spec
+        SignalDecryption,      // Boolean, reveals more detailed unit information when spotted
+        DetectionRange,        // +8 spotting range
+        DeepReconnaissance,    // Boolean, has a chance to spot enemy units anywhere on the map.
+        ElectronicWarfare,     // Boolean, randomly makes an enemy unit immobile when gathering intel.
+        PatternRecognition,    // Boolean, shows likely enemy movement paths for some spotted units.
+
+        // Terrain Mastery Spec
+        UrbanCombat,          // Boolean, urban combat bonus.
+        MountainCombat,       // Boolean, mountain combat bonus.
+        NightOperations,      // Boolean, night combat bonus.
+
+        // Politically Connected Bonus branch
         EmergencyResupply,    // Boolean, one free emergency resupply/replacement action per scenario.
         SupplyConsumption,    // Value is a float total multiplier (e.g., 0.67 for 33% reduction)
         NVG,                  // Upgrade unit to latest gen NVG
