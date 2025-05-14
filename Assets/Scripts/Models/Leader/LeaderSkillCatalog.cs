@@ -34,11 +34,11 @@ namespace HammerAndSickle.Models
         }
     }
 
-    public static class CommanderSkillCatalog
+    public static class LeaderSkillCatalog
     {
         private static readonly Dictionary<Enum, SkillDefinition> AllSkills = new();
 
-        static CommanderSkillCatalog()
+        static LeaderSkillCatalog()
         {
             InitializeCommandSkills();
             InitializeRearAreaSkills();
@@ -174,12 +174,12 @@ namespace HammerAndSickle.Models
                 prerequisites: new List<Enum> { BattleDoctrineSkillPath.HedgehogDefense },
                 primaryBonusType: SkillBonusType.HardDefense, primaryBonusValue: CUConstants.DEFENSE_ATTACK_BONUS_VAL
             ));
-            AddSkill(new SkillDefinition(
-                BattleDoctrineSkillPath.TrenchWarfareExpert, "Trench Warfare Expert", CUConstants.TIER3_XP_COST,
-                $"Increases Entrenchment by +{CUConstants.ENTRENCHMENT_BONUS_VAL}.",
-                prerequisites: new List<Enum> { BattleDoctrineSkillPath.FortificationEngineer },
-                primaryBonusType: SkillBonusType.Entrenchment, primaryBonusValue: CUConstants.ENTRENCHMENT_BONUS_VAL
-            ));
+            //AddSkill(new SkillDefinition(
+            //    BattleDoctrineSkillPath.TrenchWarfareExpert, "Trench Warfare Expert", CUConstants.TIER3_XP_COST,
+            //    $"Increases Entrenchment by +{CUConstants.ENTRENCHMENT_BONUS_VAL}.",
+            //    prerequisites: new List<Enum> { BattleDoctrineSkillPath.FortificationEngineer },
+            //    primaryBonusType: SkillBonusType.Entrenchment, primaryBonusValue: CUConstants.ENTRENCHMENT_BONUS_VAL
+            //));
 
             // Artillery/Support Branch
             AddSkill(new SkillDefinition(BattleDoctrineSkillPath.QueenOfBattle, "Queen Of Battle", CUConstants.TIER1_XP_COST, "Specializes in artillery operations."));

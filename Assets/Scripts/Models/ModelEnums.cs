@@ -242,6 +242,16 @@ namespace HammerAndSickle.Models
         Genius = 3
     }
 
+    /// <summary>
+    /// The reputation of a commander, used for promotion.
+    /// </summary>
+    public enum ReputationRank
+    {
+        Unknown = 0,
+        Notable = 100,
+        Famous  = 500
+    }
+
     //================================
     //====== Leader Skill Paths ======
     //================================
@@ -317,25 +327,58 @@ namespace HammerAndSickle.Models
     public enum SkillBonusType
     {
         None,
+
+        // Rear Area
         UnitXP,               // Value is a float multiplier (e.g., 0.25 for +25%)
-        Command,              // Value is an int (e.g., 1 for +1)
         SupplyConsumption,    // Value is a float total multiplier (e.g., 0.67 for 33% reduction)
         PrestigeCost,         // Value is a float total multiplier (e.g., 0.67 for 33% reduction)
         EmergencyResupply,    // Boolean, value not directly used, presence of skill implies capability
-        Entrenchment,         // Boolean, skip defensive and go straight to entrenched.
+        NVG,                  // Upgrade unit to latest gen NVG
+
+        // Leadership
+        Command,              // Value is an int (e.g., 1 for +1)
+        
+        // Tank Commander
         HardAttack,           // Bonus to HardAttack
         HardDefense,          // Bonus to HardDefense
+        Breakthrough,         // Boolean, enemy retreat gives bonus move action.
+
+        // Infanrty Commander
         SoftAttack,           // Bonus to SoftAttack
         SoftDefense,          // Bonus to SoftDefense
-        AirDefense,           // Bonus to AirDefense
-        SpottingRange,        // Spotting range +1
-        IndirectRange,        // Indirect fire range +1
-        NVG,                  // Upgrade unit to latest gen NVG
-        SupplyPenetration,    // Boolean, supply can pierce 1 enemy ZOC
-        CombatAction,         // +1 combat action
-        MovementAction,       // +1 move action
         DeploymentAction,     // +1 deployment action
-        Breakthrough,         // Boolean, enemy retreat gives bonus move action.
+
+        // Air Defense Commander
+        AirAttack,            // Bonus to AirAttack
+        AirDefense,           // Bonus to AirDefense
+        OppotunityAction,     // Boolean, gets extra oppurtunity action.
+
+        // Artillery Commander
+        ShootAndScoot,        // Boolean, may move after ranged attack.
+        AdvancedTargetting,   // Boolean, Indirect attack two different units in one turn, uses 4 supply.
+        IndirectRange,        // Indirect fire range +1
+
+        // Air Mobile Commander
+        AirMobile,            // Boolean, may move after air landing.
+        AirMobileAssault,     // Boolean, still have combat action after landing.
+        AirMobileElite,       // Boolean, significantly reduces vulnerability to enemy fire when mounted.
+
+        // Airborne Commander
+        ImpromtuPlanning,      // Boolean, boarding aircraft doesn't cost an action.
+        AirborneAssault,       // Boolean, 1/2 suppression cost for a jump.
+        AirborneElite,         // Boolean, still have combat action after jump.
+
+        // Combined Arms Spec
+        SpottingRange,        // Spotting range +1
+        RiverAssault,         // Boolean, amphibious assault combat bonus.
+        CombatAction,         // +1 combat action
+
+        // Exploitation Spec
+        RiverCrossing,        // Boolean, river crossing move bonus.
+        SupplyPenetration,    // Boolean, supply can pierce 2 enemy ZOC
+        MovementAction,       // +1 move action
+        
+
     }
 
     //================================

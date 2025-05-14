@@ -58,7 +58,7 @@ namespace HammerAndSickle.Models
             float currentExperienceBonus = 1.0f;
             if (IsSkillUnlocked(LeadershipPath.ShockFormation))
             {
-                if (CommanderSkillCatalog.TryGetSkillDefinition(LeadershipPath.ShockFormation, out var skillDef))
+                if (LeaderSkillCatalog.TryGetSkillDefinition(LeadershipPath.ShockFormation, out var skillDef))
                 {
                     currentExperienceBonus += skillDef.PrimaryBonusValue; // Assumes bonus value is the additive part (0.25)
                 }
@@ -115,7 +115,7 @@ namespace HammerAndSickle.Models
             if (Convert.ToInt32(skillEnum) == 0) return false; // 'None' enum
             if (IsSkillUnlocked(skillEnum)) return false;
 
-            if (!CommanderSkillCatalog.TryGetSkillDefinition(skillEnum, out SkillDefinition skillDef))
+            if (!LeaderSkillCatalog.TryGetSkillDefinition(skillEnum, out SkillDefinition skillDef))
             {
                 // Skill not found in catalog, should not happen if enums and catalog are synced
                 return false;
@@ -127,7 +127,7 @@ namespace HammerAndSickle.Models
 
             SpendExperience(skillDef.XPCost);
             SetSkillUnlockedStatus(skillEnum, true);
-            OnSkillUnlocked?.Invoke(skillDef.Name, CommanderSkillCatalog.GetFullSkillDescription(skillEnum));
+            OnSkillUnlocked?.Invoke(skillDef.Name, LeaderSkillCatalog.GetFullSkillDescription(skillEnum));
             return true;
         }
 
@@ -203,7 +203,7 @@ namespace HammerAndSickle.Models
                 {
                     if (skillsDict[skillKey]) // If skill is unlocked
                     {
-                        if (CommanderSkillCatalog.TryGetSkillDefinition(skillKey, out var skillDef))
+                        if (LeaderSkillCatalog.TryGetSkillDefinition(skillKey, out var skillDef))
                         {
                             refundedXP += skillDef.XPCost;
                         }
@@ -229,7 +229,7 @@ namespace HammerAndSickle.Models
         }
 
         // --- Bonus Calculation Methods ---
-        // These methods now iterate unlocked skills and sum bonuses based on definitions in CommanderSkillCatalog
+        // These methods now iterate unlocked skills and sum bonuses based on definitions in LeaderSkillCatalog
 
         public float GetTotalExperienceBonusMultiplier() // Returns total multiplier, e.g., 1.25 for +25%
         {
@@ -321,7 +321,7 @@ namespace HammerAndSickle.Models
             {
                 if (stopEarlyIf != null && stopEarlyIf()) return;
 
-                if (CommanderSkillCatalog.TryGetSkillDefinition(skillEnum, out SkillDefinition skillDef))
+                if (LeaderSkillCatalog.TryGetSkillDefinition(skillEnum, out SkillDefinition skillDef))
                 {
                     action(skillDef);
                 }

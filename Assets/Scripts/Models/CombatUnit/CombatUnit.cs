@@ -44,8 +44,11 @@ namespace HammerAndSickle.Models
         public int CombatActions { get; private set; }
         public int MaxDeploymentActions { get; private set; }
         public int DeploymentActions { get; private set; }
+        public int MaxOpportunityActions { get; private set; }
+        public int OpportunityActions { get; private set; }
 
         // State data
+        public float SuppressionPoints { get; private set; }
         public int ExperiencePoints { get; private set; }
         public ExperienceLevel _ExperienceLevel { get; private set; }
         public EfficiencyLevel EfficiencyLevel { get; private set; }
