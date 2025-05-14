@@ -235,7 +235,7 @@ namespace HammerAndSickle.Models
         {
             float totalMultiplier = 1.0f;
             ProcessUnlockedSkills((skillDef) => {
-                if (skillDef.PrimaryBonusType == SkillBonusType.UnitXP)
+                if (skillDef.PrimaryBonusType == SkillBonusType.ReplacementXP)
                 {
                     totalMultiplier += skillDef.PrimaryBonusValue; // Assumes value is additive (0.25)
                 }

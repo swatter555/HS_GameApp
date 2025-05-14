@@ -328,13 +328,6 @@ namespace HammerAndSickle.Models
     {
         None,
 
-        // Rear Area
-        UnitXP,               // Value is a float multiplier (e.g., 0.25 for +25%)
-        SupplyConsumption,    // Value is a float total multiplier (e.g., 0.67 for 33% reduction)
-        PrestigeCost,         // Value is a float total multiplier (e.g., 0.67 for 33% reduction)
-        EmergencyResupply,    // Boolean, value not directly used, presence of skill implies capability
-        NVG,                  // Upgrade unit to latest gen NVG
-
         // Leadership
         Command,              // Value is an int (e.g., 1 for +1)
         
@@ -369,16 +362,21 @@ namespace HammerAndSickle.Models
         AirborneElite,         // Boolean, still have combat action after jump.
 
         // Combined Arms Spec
-        SpottingRange,        // Spotting range +1
-        RiverAssault,         // Boolean, amphibious assault combat bonus.
+        SpottingRange,        // +1 spotting range
+        MovementAction,       // +1 move action
         CombatAction,         // +1 combat action
 
-        // Exploitation Spec
+        // Engineering Spec
         RiverCrossing,        // Boolean, river crossing move bonus.
-        SupplyPenetration,    // Boolean, supply can pierce 2 enemy ZOC
-        MovementAction,       // +1 move action
-        
+        RiverAssault,         // Boolean, amphibious assault combat bonus.
+        BridgeBuilding,       // Boolean, may build bridges over rivers in one turn.
 
+        // Politically Connected Spec
+        EmergencyResupply,    // Boolean, one free emergency resupply/replacement action per scenario.
+        SupplyConsumption,    // Value is a float total multiplier (e.g., 0.67 for 33% reduction)
+        NVG,                  // Upgrade unit to latest gen NVG
+        ReplacementXP,        // Replacements recieved are more experienced.
+        PrestigeCost,         // Value is a float total multiplier (e.g., 0.67 for 33% reduction)
     }
 
     //================================

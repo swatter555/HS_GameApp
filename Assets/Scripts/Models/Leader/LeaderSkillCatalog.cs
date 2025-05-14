@@ -53,7 +53,7 @@ namespace HammerAndSickle.Models
                 LeadershipPath.ShockFormation, "Shock Formation", CUConstants.TIER1_XP_COST,
                 $"Increases experience gain by {CUConstants.EXPERIENCE_BONUS_VAL * 100}%. Mutually exclusive with Maskirovka Master.",
                 mutuallyExclusive: new List<Enum> { LeadershipPath.MaskirovkaMaster },
-                primaryBonusType: SkillBonusType.UnitXP, primaryBonusValue: CUConstants.EXPERIENCE_BONUS_VAL
+                primaryBonusType: SkillBonusType.ReplacementXP, primaryBonusValue: CUConstants.EXPERIENCE_BONUS_VAL
             ));
             //AddSkill(new SkillDefinition(
             //    LeadershipPath.MaskirovkaMaster, "Maskirovka Master", TIER1_XP_COST,
@@ -129,12 +129,12 @@ namespace HammerAndSickle.Models
                 prerequisites: new List<Enum> { RearAreaSkillPath.PartyConnections },
                 primaryBonusType: SkillBonusType.EmergencyResupply
             ));
-            AddSkill(new SkillDefinition(
-                RearAreaSkillPath.ArmoredSupplyColumn, "Armored Supply Column", CUConstants.TIER4_XP_COST,
-                "Depots can penetrate one enemy zone of control.",
-                prerequisites: new List<Enum> { RearAreaSkillPath.StrategicAirlift },
-                primaryBonusType: SkillBonusType.SupplyPenetration
-            ));
+            //AddSkill(new SkillDefinition(
+            //    RearAreaSkillPath.ArmoredSupplyColumn, "Armored Supply Column", CUConstants.TIER4_XP_COST,
+            //    "Depots can penetrate one enemy zone of control.",
+            //    prerequisites: new List<Enum> { RearAreaSkillPath.StrategicAirlift },
+            //    primaryBonusType: SkillBonusType.SupplyPenetration
+            //));
         }
 
         private static void InitializeBattleDoctrineSkills()
