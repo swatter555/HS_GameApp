@@ -23,13 +23,17 @@ namespace HammerAndSickle.Models
 
         #region Properties
 
-        public string Name { get; private set; }
-        public Side Side { get; private set; }
-        public Nationality Nationality { get; private set; }
-        public CommandGrade CommandGrade { get; private set; }
-        public string FormattedRank { get { return GetFormattedRank(); } }
-        public CommandAbility CombatCommand { get; private set; }
-        public bool IsAssigned { get; private set; }
+        public string ID { get; private set; }                               // Unique identifier for the officer
+        public string Name { get; private set; }                             // Use random name generator
+        public Side Side { get; private set; }                               // Player or AI
+        public Nationality Nationality { get; private set; }                 // Nation of origin
+        public CommandGrade CommandGrade { get; private set; }               // Rank of the officer
+        public ReputationRank ReputationRank { get; private set; }           // Reputation rank for promotion
+        public int ReputationPoints { get; private set; }                    // Points for the upgrade reputation
+        public string FormattedRank { get { return GetFormattedRank(); } }   // Real-world rank of the officer
+        public CommandAbility CombatCommand { get; private set; }            // Direct combat modifier
+        public bool IsAssigned { get; private set; }                         // Is the officer assigned to a unit?
+        public string UnitID { get; private set; }                           // ID of the unit assigned to the officer
 
         #endregion // Properties
 
@@ -40,31 +44,8 @@ namespace HammerAndSickle.Models
         {
             try
             {
-                Side = side;
-                Nationality = nationality;
-                CommandGrade = CommandGrade.JuniorGrade;
-                CombatCommand = CommandAbility.BelowAverage;
-                IsAssigned = false;
-
-                // Initialize with a placeholder name instead of empty string
-                Name = $"Officer-{Guid.NewGuid().ToString()[..8]}";
-
-                // Optionally, automatically generate a name if NameGenService is available
-                if (NameGenService.Instance != null)
-                {
-                    try
-                    {
-                        string generatedName = NameGenService.Instance.GenerateMaleName(nationality);
-                        if (!string.IsNullOrEmpty(generatedName))
-                        {
-                            Name = generatedName;
-                        }
-                    }
-                    catch
-                    {
-                        // Silently fail and keep the placeholder name
-                    }
-                }
+                
+                // TODO: Implement
             }
             catch (Exception e)
             {
@@ -77,12 +58,7 @@ namespace HammerAndSickle.Models
         {
             try
             {
-                Name = name;
-                Side = side;
-                Nationality = nationality;
-                CommandGrade = CommandGrade.JuniorGrade;
-                CombatCommand = command;
-                IsAssigned = false;
+                // TODO Implement
             }
             catch (Exception e)
             {
@@ -96,12 +72,7 @@ namespace HammerAndSickle.Models
         {
             try
             {
-                Name = info.GetString(nameof(Name));
-                Side = (Side)info.GetValue(nameof(Side), typeof(Side));
-                Nationality = (Nationality)info.GetValue(nameof(Nationality), typeof(Nationality));
-                CommandGrade = (CommandGrade)info.GetValue(nameof(CommandGrade), typeof(CommandGrade));
-                CombatCommand = (CommandAbility)info.GetValue(nameof(CombatCommand), typeof(CommandAbility));
-                IsAssigned = info.GetBoolean(nameof(IsAssigned));
+                // TODO: Implement deserialization logic here
             }
             catch (Exception e)
             {
@@ -248,13 +219,7 @@ namespace HammerAndSickle.Models
         {
             try
             {
-                // Store basic properties
-                info.AddValue(nameof(Name), Name);
-                info.AddValue(nameof(Side), Side);
-                info.AddValue(nameof(Nationality), Nationality);
-                info.AddValue(nameof(CommandGrade), CommandGrade);
-                info.AddValue(nameof(CombatCommand), CombatCommand);
-                info.AddValue(nameof(IsAssigned), IsAssigned);
+                // TODO: Implement serialization logic here
             }
             catch (Exception e)
             {
@@ -272,15 +237,9 @@ namespace HammerAndSickle.Models
         {
             try
             {
-                // Create a new commander with the same attributes
-                Leader clone = new(Name, Side, Nationality, CombatCommand)
-                {
-                    // Copy additional properties
-                    CommandGrade = this.CommandGrade,
-                    IsAssigned = this.IsAssigned
-                };
+               
 
-                return clone;
+                return null; // Implement deep copy logic here
             }
             catch (Exception e)
             {
