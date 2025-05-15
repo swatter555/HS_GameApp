@@ -4,7 +4,7 @@ using System.Linq;
 
 namespace HammerAndSickle.Models
 {
-    public class CommanderSkillTree
+    public class LeaderSkillTree
     {
         #region Properties
 
@@ -28,7 +28,7 @@ namespace HammerAndSickle.Models
 
         #endregion // Properties
 
-        public CommanderSkillTree(int initialExperience = 0)
+        public LeaderSkillTree(int initialExperience = 0)
         {
             ExperiencePoints = initialExperience;
             CurrentGrade = CommandGrade.JuniorGrade;
