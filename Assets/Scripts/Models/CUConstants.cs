@@ -31,16 +31,46 @@ namespace HammerAndSickle.Models
         public const int TIER3_XP_COST = 100;
         public const int TIER4_XP_COST = 150;
 
-        // Bonus values used in skill definitions.
-        public const float EXPERIENCE_BONUS_VAL = 0.25f;
-        public const int MASKIROVKA_DETECTION_BONUS_VAL = 1;
-        public const float SUPPLY_ECONOMY_REDUCTION_VAL = 0.33f;
-        public const float PRESTIGE_COST_REDUCTION_VAL = 0.33f;
-        public const int GENERIC_STAT_BONUS_VAL = 1; 
-        public const int DEFENSE_ATTACK_BONUS_VAL = 5;
-        public const int DETECTION_RANGE_BONUS_VAL = 1;
-        public const int ENTRENCHMENT_BONUS_VAL = 1;
-        public const int INDIRECT_RANGE_BONUS_VAL = 1;
+        // Command and Operation bonuses (typically +1 for actions)
+        public const int COMMAND_BONUS_VAL = 1;
+        public const int DEPLOYMENT_ACTION_BONUS_VAL = 1;
+        public const int MOVEMENT_ACTION_BONUS_VAL = 1;
+        public const int COMBAT_ACTION_BONUS_VAL = 1;
+        public const int OPPORTUNITY_ACTION_BONUS_VAL = 1;
+
+        // Combat rating bonuses.
+        public const int HARD_ATTACK_BONUS_VAL = 5;
+        public const int HARD_DEFENSE_BONUS_VAL = 5;
+        public const int SOFT_ATTACK_BONUS_VAL = 5;
+        public const int SOFT_DEFENSE_BONUS_VAL = 5;
+        public const int AIR_ATTACK_BONUS_VAL = 5;
         public const int AIR_DEFENSE_BONUS_VAL = 5;
+
+        // Spotting and range bonuses.
+        public const int SMALL_SPOTTING_RANGE_BONUS_VAL = 1;
+        public const int LARGE_SPOTTING_RANGE_BONUS_VAL = 5;
+        public const int INDIRECT_RANGE_BONUS_VAL = 1;
+
+        // Special terrain combat bonuses
+        public const int URBAN_COMBAT_BONUS_VAL = 3;
+        public const int ROUGH_TERRAIN_BONUS_VAL = 3;
+        public const int NIGHT_COMBAT_BONUS_VAL = 3;
+
+        // Percentage-based multipliers - some already defined
+        public const float EXPERIENCE_BONUS_VAL = 0.25f;         // Replacement experience at 75% current.
+        public const float SUPPLY_ECONOMY_REDUCTION_VAL = 0.33f; // 33% supply cost reduction
+        public const float PRESTIGE_COST_REDUCTION_VAL = 0.33f;  // 33% prestige cost reduction
+
+        // Engineering specific
+        public const float RIVER_CROSSING_BONUS_VAL = 0.5f; // 50% movement cost reduction
+        public const float RIVER_ASSAULT_BONUS_VAL = 0.25f; // 25% combat penalty reduction
+
+        // Special forces bonuses
+        public const float TERRAIN_MASTERY_BONUS_VAL = 0.33f; // 33% movement cost reduction
+        public const float INFILTRATION_BONUS_VAL = 0.5f;     // 50% ZOC penalty reduction
+        public const float AMBUSH_BONUS_MULTIPLIER = 1.5f;    // 50% combat bonus
+
+        // Air and naval operation bonuses
+        public const float AIR_MOBILE_SPEED_BONUS = 0.25f;    // 25% faster helicopter operations
     }
 }
