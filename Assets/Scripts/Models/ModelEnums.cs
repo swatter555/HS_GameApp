@@ -1,3 +1,6 @@
+using System.Xml.Linq;
+using UnityEngine;
+
 namespace HammerAndSickle.Models
 {
     //=======================
@@ -256,68 +259,151 @@ namespace HammerAndSickle.Models
     //====== Leader Skill Paths ======
     //================================
 
+  
     /// <summary>
-    /// Represents leadership skill path.
+    /// Leadership path tied to officer promotions, providing increasing command ability.
     /// </summary>
-    public enum LeadershipPath 
+    public enum LeadershipPath
     {
-        None, 
-        ShockFormation, 
-        IronDiscipline, 
-        MaskirovkaMaster, 
-        TacticalGenius, 
-        PoliticalOfficer, 
-        OperationalArt, 
-        HeroOfSovietUnion, 
-        DeepBattleTheorist 
+        None,
+        JuniorOfficerTraining_CommandTier1,         // Junior Officer Training (+1 command)
+        PromotionToSeniorGrade_SeniorPromotion,     // Promotion to Senior Grade (costs XP)
+        SeniorOfficerTraining_CommandTier2,         // Senior Officer Training (+1 additional command)
+        PromotionToTopGrade_TopPromotion,           // Promotion to Top Grade (costs XP)
+        GeneralStaffTraining_CommandTier3           // General Staff Training (+1 additional command)
     }
 
     /// <summary>
-    /// Represents the rear area skill path.
+    /// Armored warfare skills.
     /// </summary>
-    public enum RearAreaSkillPath 
-    { 
-        None, 
-        SupplyEconomy, 
-        FieldWorkshop, 
-        PartyConnections, 
-        StrategicAirlift, 
-        ArmoredSupplyColumn 
-    }
-
-    /// <summary>
-    /// Represents battlefield skill path.
-    /// </summary>
-    public enum BattleDoctrineSkillPath
+    public enum ArmoredWarfarePath
     {
-        None, 
-        ArmoredWarfare, 
-        HullDownExpert, 
-        ShockTankCorps, 
-        NightFightingSpecialist,
-        DefenseInDepth, 
-        HedgehogDefense, 
-        FortificationEngineer, 
-        TrenchWarfareExpert,
-        QueenOfBattle, 
-        ForwardObservationPost, 
-        IntegratedAirDefenseSystem, 
-        PrecisionTargetting
+        None,
+        ShockTankCorps_HardAttack,             // Shock Tank Corps
+        HullDownExpert_HardDefense,            // Hull Down Expert
+        PursuitDoctrine_Breakthrough,          // Pursuit Doctrine
+        NightFightingSpecialist_NVG            // Night Fighting Specialist
     }
 
     /// <summary>
-    /// Represents the combat operations skill path.
+    /// Infantry and soft-target focused skills.
     /// </summary>
-    public enum CombatOperationsSkillPath 
-    { 
-        None, 
-        OffensiveDoctrine, 
-        ManeuverDoctrine, 
-        PursuitDoctrine, 
-        SpecialistCorps, 
-        ReconnaissanceInForce, 
-        CombinedArmsWarfare 
+    public enum InfantryDoctrinePath
+    {
+        None,
+        InfantryAssaultTactics_SoftAttack,      // Infantry Assault Tactics
+        DefensiveDoctrine_SoftDefense,          // Defensive Doctrine
+        UrbanCombatSpecialist_UrbanCombat,      // Urban Combat Specialist
+        RoughTerrainOperations_RoughTerrain     // Rough Terrain Operations
     }
+
+    /// <summary>
+    /// Artillery and indirect fire skills.
+    /// </summary>
+    public enum ArtilleryDoctrinePath
+    {
+        None,
+        PrecisionTargeting_IndirectRange,        // Precision Targeting
+        MobileArtilleryDoctrine_ShootAndScoot,   // Mobile Artillery Doctrine
+        FireMissionSpecialist_AdvancedTargetting // Fire Mission Specialist
+    }
+
+    /// <summary>
+    /// Air defense and anti-air skills.
+    /// </summary>
+    public enum AirDefenseDoctrinePath
+    {
+        None,
+        OffensiveAirDefense_AirAttack,            // Offensive Air Defense
+        IntegratedAirDefenseSystem_AirDefense,    // Integrated Air Defense System
+        ReadyResponseProtocol_OpportunityAction   // Ready Response Protocol
+    }
+
+    /// <summary>
+    /// VDV Airborne skills.
+    /// </summary>
+    public enum AirborneDoctrinePath
+    {
+        None,
+        RapidDeploymentPlanning_ImpromptuPlanning,    // Rapid Deployment Planning
+        CombatDropDoctrine_AirborneAssault,           // Combat Drop Doctrine
+        EliteParatrooperCorps_AirborneElite           // Elite Paratrooper Corps
+    }
+
+    /// <summary>
+    /// Air Mobile and helicopter operation skills.
+    /// </summary>
+    public enum AirMobileDoctrinePath
+    {
+        None,
+        RapidRedeployment_AirMobile,                  // Rapid Redeployment
+        HeliborneStrikeForce_AirMobileAssault,        // Heliborne Strike Force
+        EliteAirMobileOperations_AirMobileElite       // Elite Air Mobile Operations
+    }
+
+    /// <summary>
+    /// Intelligence and reconnaissance skills.
+    /// </summary>
+    public enum IntelligencePath
+    {
+        None,
+        EnhancedIntelligenceCollection_ImprovedGathering,    // Enhanced Intelligence Collection
+        ConcealedOperationsBase_UndergroundBunker,           // Concealed Operations Base
+        PriorityTargetDesignation_RealtimeTargetting,        // Priority Target Designation
+        ForwardObservationPost_SpottingRange,                // Forward Observation Post
+        DeepReconnaissanceOperations_DeepReconnaissance      // Deep Reconnaissance Operations
+    }
+
+    /// <summary>
+    /// SIGINT (Signals Intelligence) skills.
+    /// </summary>
+    public enum SignalIntelligencePath
+    {
+        None,
+        CommunicationsDecryption_SignalDecryption,           // Communications Decryption
+        ElectronicSurveillanceNetwork_DetectionRange,        // Electronic Surveillance Network
+        RadioElectronicCombat_ElectronicWarfare,             // Radio Electronic Combat
+        EnemyBehaviorAnalysis_PatternRecognition             // Enemy Behavior Analysis
+    }
+
+    /// <summary>
+    /// Engineering skills.
+    /// </summary>
+    public enum EngineeringPath
+    {
+        None,
+        RiverCrossingOperations_RiverCrossing,               // River Crossing Operations
+        AmphibiousAssaultTactics_RiverAssault,               // Amphibious Assault Tactics
+        CombatEngineeringCorps_BridgeBuilding,               // Combat Engineering Corps
+        FieldFortificationExpert_FieldFortification          // Field Fortification Expert
+    }
+
+    /// <summary>
+    /// Special forces and irregular warfare skills.
+    /// </summary>
+    public enum SpecialForcesDoctrinePath
+    {
+        None,
+        SpecialTerrainMastery_TerrainMastery,                // Special Terrain Mastery
+        InfiltrationTactics_InfiltrationMovement,            // Infiltration Tactics
+        SuperiorCamouflage_ConcealedPositions,               // Superior Camouflage
+        AmbushTactics_AmbushTactics,                         // Ambush Tactics
+        NightCombatOperations_NightCombat                    // Night Combat Operations
+    }
+
+    /// <summary>
+    /// Special bonus path, only tier requirements apply.
+    /// </summary>
+    public enum PoliticallyConnected
+    {
+        None,
+        EmergencyAirDrop_EmergencyResupply,                  // Emergency Air Drop
+        DirectLineToHQ_SupplyConsumption,                    // Direct Line To HQ
+        ForeignTechnology_NVG,                               // Foreign Technology
+        BetterReplacements_ReplacementXP,                    // Better Replacements
+        ConnectionsAtTheTop_PrestigeCost                     // Connections At The Top
+    }
+
 
     //===============================
     //====== Skill Bonus Types ======
