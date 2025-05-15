@@ -391,9 +391,9 @@ namespace HammerAndSickle.Models
         PatternRecognition,    // Boolean, shows likely enemy movement paths for some spotted units.
 
         // Terrain Mastery Spec
-        UrbanCombat,          // Boolean, urban combat bonus.
-        MountainCombat,       // Boolean, mountain combat bonus.
-        NightOperations,      // Boolean, night combat bonus.
+        UrbanCombat,          // Boolean, urban terrain combat bonus.
+        RoughTerrain,         // Boolean, rough terrain combat bonus.
+        NightCombat,          // Boolean, night combat bonus.
 
         // Politically Connected Bonus branch
         EmergencyResupply,    // Boolean, one free emergency resupply/replacement action per scenario.
