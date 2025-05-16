@@ -1,55 +1,9 @@
 using System;
-using System.Collections.Generic;
 using System.Runtime.Serialization;
-using UnityEngine;
 using HammerAndSickle.Services;
 
 namespace HammerAndSickle.Models
 {
-    /// <summary>
-    /// Defines the size of a supply depot and its maximum storage capacity.
-    /// </summary>
-    public enum DepotSize
-    {
-        Small,   // 30 days of supply
-        Medium,  // 50 days of supply
-        Large,   // 80 days of supply
-        Huge     // 110 days of supply
-    }
-
-    /// <summary>
-    /// Defines the supply generation rate of a depot.
-    /// </summary>
-    public enum SupplyGenerationRate
-    {
-        Minimal,        // 0.5 days of supply per turn
-        Basic,          // 1.0 days of supply per turn
-        Standard,       // 1.5 days of supply per turn
-        Enhanced,       // 2.5 days of supply per turn
-        Industrial      // 4.0 days of supply per turn
-    }
-
-    /// <summary>
-    /// Defines how far a depot can project supplies effectively.
-    /// </summary>
-    public enum SupplyProjection
-    {
-        Local,          // 2 hex radius
-        Extended,       // 4 hex radius
-        Regional,       // 6 hex radius
-        Strategic,      // 9 hex radius
-        Theater         // 12 hex radius
-    }
-
-    /// <summary>
-    /// Defines the category of a depot.
-    /// </summary>
-    public enum DepotCategory
-    {
-        Main,       // Primary depot with special abilities
-        Secondary   // Standard field depot
-    }
-
     /// <summary>
     /// This class represents a supply depot that provides supplies to combat units.
     /// It handles stockpile management, supply projection, generation, and special abilities.
@@ -58,250 +12,64 @@ namespace HammerAndSickle.Models
     public class SupplyDepotSubProfile : LandBaseProfile, ISerializable
     {
         #region Constants
+
         private const string CLASS_NAME = nameof(SupplyDepotSubProfile);
 
-        // Maximum stockpile capacities by depot size
-        private static readonly Dictionary<DepotSize, float> MaxStockpileBySize = new Dictionary<DepotSize, float>
-        {
-            { DepotSize.Small, 30f },
-            { DepotSize.Medium, 50f },
-            { DepotSize.Large, 80f },
-            { DepotSize.Huge, 110f }
-        };
+        #endregion // Constants
 
-        // Supply generation rates by level
-        private static readonly Dictionary<SupplyGenerationRate, float> GenerationRateValues = new Dictionary<SupplyGenerationRate, float>
-        {
-            { SupplyGenerationRate.Minimal, 1.0f },
-            { SupplyGenerationRate.Basic, 2.0f },
-            { SupplyGenerationRate.Standard, 3.0f },
-            { SupplyGenerationRate.Enhanced, 4.0f },
-            { SupplyGenerationRate.Industrial, 5.0f }
-        };
-
-        // Supply projection ranges in hexes
-        private static readonly Dictionary<SupplyProjection, int> ProjectionRangeValues = new Dictionary<SupplyProjection, int>
-        {
-            { SupplyProjection.Local, 2 },
-            { SupplyProjection.Extended, 4 },
-            { SupplyProjection.Regional, 6 },
-            { SupplyProjection.Strategic, 9 },
-            { SupplyProjection.Theater, 12 }
-        };
-
-        // Amount any unit can stockpile
-        private const int MaxUnitStockpileAmount = 7;
-
-        // Constants for special abilities
-        private const int AirSupplyMaxRange = 16;
-        private const int NavalSupplyMaxRange = 12;
-        private const int IntelligenceNetworkRadius = 5;
-        #endregion
-
-        #region Fields
-        // Basic depot information
-        private string depotID;
-        private string depotName;
-        private Side side;
-
-        // Depot attributes
-        private DepotSize depotSize = DepotSize.Small;
-        private float stockpileInDays = 20f;
-        private SupplyGenerationRate generationRate = SupplyGenerationRate.Minimal;
-        private SupplyProjection supplyProjection = SupplyProjection.Local;
-        private bool supplyPenetration = false;
-        private DepotCategory depotCategory = DepotCategory.Secondary;
-
-        // Special abilities
-        private bool hasAirSupply = false;
-        private bool hasNavalSupply = false;
-        private bool hasIntelligenceCapability = false;
-        #endregion
-
+      
         #region Properties
-        /// <summary>
-        /// Gets the unique identifier for this depot.
-        /// </summary>
-        public string DepotID => depotID;
 
-        /// <summary>
-        /// Gets or sets the name of this depot.
-        /// </summary>
-        public string DepotName
-        {
-            get => depotName;
-            set => depotName = value;
-        }
+        public string DepotID { get; private set; }                      // Unique identifier for the depot
+        public string DepotName { get; private set; }                    // Name of the depot
+        public Side Side { get; private set; }                           // Side the depot belongs to
+        public DepotSize DepotSize { get; private set; }                 // Size of the depot
+        public float StockpileInDays { get; private set; }               // Current stockpile in days of supply
+        public SupplyGenerationRate GenerationRate { get; private set; } // Generation rate of the depot
+        public SupplyProjection SupplyProjection { get; private set; }   // Supply projection level
+        public bool SupplyPenetration { get; private set; }              // Whether the depot has supply penetration capability
+        public DepotCategory DepotCategory { get; private set; }         // Category of the depot (Main or Secondary)
 
-        /// <summary>
-        /// Gets or sets which side this depot belongs to.
-        /// </summary>
-        public Side Side
-        {
-            get => side;
-            set => side = value;
-        }
+        // Properties with rules.
+        public bool IsMainDepot => DepotCategory == DepotCategory.Main;
+        public bool HasAirSupply { get => HasAirSupply && IsMainDepot; set => HasAirSupply = IsMainDepot && value; }
+        public bool HasNavalSupply { get => HasNavalSupply && IsMainDepot; set => HasNavalSupply = IsMainDepot && value; }
+        public int ProjectionRadius => CUConstants.ProjectionRangeValues[SupplyProjection];
 
-        /// <summary>
-        /// Gets or sets the depot size, which determines maximum stockpile capacity.
-        /// </summary>
-        public DepotSize DepotSize
-        {
-            get => depotSize;
-            set
-            {
-                depotSize = value;
+        #endregion // Properties
 
-                // Ensure current stockpile doesn't exceed the new maximum
-                stockpileInDays = Math.Min(stockpileInDays, GetMaxStockpile());
-            }
-        }
-
-        /// <summary>
-        /// Gets or sets the current stockpile in days. 
-        /// Value is clamped to maximum capacity based on depot size.
-        /// </summary>
-        public float StockpileInDays
-        {
-            get => stockpileInDays;
-            set => stockpileInDays = Math.Clamp(value, 0, GetMaxStockpile());
-        }
-
-        /// <summary>
-        /// Gets the maximum possible stockpile based on current depot size.
-        /// </summary>
-        public float MaxStockpile => GetMaxStockpile();
-
-        /// <summary>
-        /// Gets or sets the rate at which this depot generates supplies each turn.
-        /// </summary>
-        public SupplyGenerationRate GenerationRate
-        {
-            get => generationRate;
-            set => generationRate = value;
-        }
-
-        /// <summary>
-        /// Gets or sets how far this depot can project supplies effectively.
-        /// </summary>
-        public SupplyProjection SupplyProjection
-        {
-            get => supplyProjection;
-            set => supplyProjection = value;
-        }
-
-        /// <summary>
-        /// Gets the actual projection radius in hexes based on the current level.
-        /// </summary>
-        public int ProjectionRadius => ProjectionRangeValues[supplyProjection];
-
-        /// <summary>
-        /// Gets or sets how effectively supplies from this depot can penetrate enemy territory.
-        /// </summary>
-        public bool SupplyPenetration
-        {
-            get => supplyPenetration;
-            set => supplyPenetration = value;
-        }
-
-        /// <summary>
-        /// Gets or sets the category of this depot.
-        /// </summary>
-        public DepotCategory DepotCategory
-        {
-            get => depotCategory;
-            set
-            {
-                // If downgrading from Main to Secondary, clear special abilities
-                if (depotCategory == DepotCategory.Main && value == DepotCategory.Secondary)
-                {
-                    hasAirSupply = false;
-                    hasNavalSupply = false;
-                    hasIntelligenceCapability = false;
-                }
-                depotCategory = value;
-            }
-        }
-
-        /// <summary>
-        /// Gets whether this depot is a Main Depot.
-        /// </summary>
-        public bool IsMainDepot => depotCategory == DepotCategory.Main;
-
-        /// <summary>
-        /// Gets or sets whether this depot has air supply capability.
-        /// </summary>
-        public bool HasAirSupply
-        {
-            get => hasAirSupply && IsMainDepot;
-            set => hasAirSupply = IsMainDepot && value;
-        }
-
-        /// <summary>
-        /// Gets or sets whether this depot has naval supply capability.
-        /// </summary>
-        public bool HasNavalSupply
-        {
-            get => hasNavalSupply && IsMainDepot;
-            set => hasNavalSupply = IsMainDepot && value;
-        }
-
-        /// <summary>
-        /// Gets or sets whether this depot has intelligence capability.
-        /// </summary>
-        public bool HasIntelligenceCapability
-        {
-            get => hasIntelligenceCapability && IsMainDepot;
-            set => hasIntelligenceCapability = IsMainDepot && value;
-        }
-
-        /// <summary>
-        /// Gets the intelligence detection radius in hexes.
-        /// </summary>
-        public int IntelligenceRadius => HasIntelligenceCapability ? IntelligenceNetworkRadius : 0;
-        #endregion
 
         #region Constructors
-        /// <summary>
-        /// Creates a new supply depot with default values.
-        /// </summary>
+
         public SupplyDepotSubProfile() : base()
         {
-            depotID = Guid.NewGuid().ToString();
-            depotName = "Supply Depot";
-            side = Side.Player;
-            depotSize = DepotSize.Small;
-            stockpileInDays = GetMaxStockpile() / 2; // Start half full
-            generationRate = SupplyGenerationRate.Minimal;
-            supplyProjection = SupplyProjection.Local;
-            supplyPenetration = SupplyPenetration = false;
-            depotCategory = DepotCategory.Secondary;
+            DepotID = Guid.NewGuid().ToString();
+            DepotName = "Supply Depot";
+            Side = Side.Player;
+            DepotSize = DepotSize.Small;
+            StockpileInDays = GetMaxStockpile() / 2; // Start half full
+            GenerationRate = SupplyGenerationRate.Minimal;
+            SupplyProjection = SupplyProjection.Local;
+            SupplyPenetration = SupplyPenetration = false;
+            DepotCategory = DepotCategory.Secondary;
         }
 
-        /// <summary>
-        /// Creates a new supply depot with the specified parameters.
-        /// </summary>
-        /// <param name="name">The name of the depot</param>
-        /// <param name="side">Which side the depot belongs to</param>
-        /// <param name="depotSize">Size of the depot</param>
-        /// <param name="isMainDepot">Whether this is a main depot</param>
-        /// <param name="initialDamage">Initial damage level (0-100)</param>
         public SupplyDepotSubProfile(string name, Side side, DepotSize depotSize, bool isMainDepot = false, int initialDamage = 0)
             : base(initialDamage)
         {
             try
             {
-                this.depotID = Guid.NewGuid().ToString();
-                this.depotName = string.IsNullOrEmpty(name) ? "Supply Depot" : name;
-                this.side = side;
-                this.depotSize = depotSize;
-                this.depotCategory = isMainDepot ? DepotCategory.Main : DepotCategory.Secondary;
+                this.DepotID = Guid.NewGuid().ToString();
+                this.DepotName = string.IsNullOrEmpty(name) ? "Supply Depot" : name;
+                this.Side = side;
+                this.DepotSize = depotSize;
+                this.DepotCategory = isMainDepot ? DepotCategory.Main : DepotCategory.Secondary;
 
                 // Initialize with default values
-                this.stockpileInDays = GetMaxStockpile() / 2; // Start half full
-                this.generationRate = SupplyGenerationRate.Standard;
-                this.supplyProjection = SupplyProjection.Extended;
-                this.supplyPenetration = SupplyPenetration;
+                this.StockpileInDays = GetMaxStockpile() / 2; // Start half full
+                this.GenerationRate = SupplyGenerationRate.Standard;
+                this.SupplyProjection = SupplyProjection.Extended;
+                this.SupplyPenetration = SupplyPenetration;
             }
             catch (Exception e)
             {
@@ -318,22 +86,21 @@ namespace HammerAndSickle.Models
             try
             {
                 // Basic depot information
-                depotID = info.GetString(nameof(depotID));
-                depotName = info.GetString(nameof(depotName));
-                side = (Side)info.GetValue(nameof(side), typeof(Side));
+                DepotID = info.GetString(nameof(DepotID));
+                DepotName = info.GetString(nameof(DepotName));
+                Side = (Side)info.GetValue(nameof(Side), typeof(Side));
 
                 // Depot attributes
-                depotSize = (DepotSize)info.GetValue(nameof(depotSize), typeof(DepotSize));
-                stockpileInDays = info.GetSingle(nameof(stockpileInDays));
-                generationRate = (SupplyGenerationRate)info.GetValue(nameof(generationRate), typeof(SupplyGenerationRate));
-                supplyProjection = (SupplyProjection)info.GetValue(nameof(supplyProjection), typeof(SupplyProjection));
-                supplyPenetration = (bool)info.GetValue(nameof(supplyPenetration), typeof(bool));
-                depotCategory = (DepotCategory)info.GetValue(nameof(depotCategory), typeof(DepotCategory));
+                DepotSize = (DepotSize)info.GetValue(nameof(DepotSize), typeof(DepotSize));
+                StockpileInDays = info.GetSingle(nameof(StockpileInDays));
+                GenerationRate = (SupplyGenerationRate)info.GetValue(nameof(GenerationRate), typeof(SupplyGenerationRate));
+                SupplyProjection = (SupplyProjection)info.GetValue(nameof(SupplyProjection), typeof(SupplyProjection));
+                SupplyPenetration = (bool)info.GetValue(nameof(SupplyPenetration), typeof(bool));
+                DepotCategory = (DepotCategory)info.GetValue(nameof(DepotCategory), typeof(DepotCategory));
 
                 // Special abilities
-                hasAirSupply = info.GetBoolean(nameof(hasAirSupply));
-                hasNavalSupply = info.GetBoolean(nameof(hasNavalSupply));
-                hasIntelligenceCapability = info.GetBoolean(nameof(hasIntelligenceCapability));
+                HasAirSupply = info.GetBoolean(nameof(HasAirSupply));
+                HasNavalSupply = info.GetBoolean(nameof(HasNavalSupply));
             }
             catch (Exception e)
             {
@@ -341,34 +108,24 @@ namespace HammerAndSickle.Models
                 throw;
             }
         }
-        #endregion
+
+        #endregion // Constructors
 
         #region Supply Management Methods
-        /// <summary>
-        /// Gets the maximum stockpile capacity based on current depot size.
-        /// </summary>
-        /// <returns>Maximum stockpile in days</returns>
+
         private float GetMaxStockpile()
         {
-            return MaxStockpileBySize[depotSize];
+            return CUConstants.MaxStockpileBySize[DepotSize];
         }
 
-        /// <summary>
-        /// Gets the current supply generation rate in days of supply per turn.
-        /// </summary>
-        /// <returns></returns>
         private float GetCurrentGenerationRate()
         {
-            float baseRate = GenerationRateValues[generationRate];
+            float baseRate = CUConstants.GenerationRateValues[GenerationRate];
             float efficiencyMultiplier = GetEfficiencyMultiplier();
 
             return baseRate * efficiencyMultiplier;
         }
 
-        /// <summary>
-        /// Adds supplies to the depot.
-        /// </summary>
-        /// <param name="amount">Amount of days of supply to add</param>
         public void AddSupplies(float amount)
         {
             try
@@ -387,11 +144,6 @@ namespace HammerAndSickle.Models
             }
         }
 
-        /// <summary>
-        /// Removes supplies from the depot.
-        /// </summary>
-        /// <param name="amount">Amount of days of supply to remove</param>
-        /// <returns>Actual amount removed (may be less if stockpile is insufficient)</returns>
         public float RemoveSupplies(float amount)
         {
             try
@@ -401,7 +153,7 @@ namespace HammerAndSickle.Models
                     throw new ArgumentException("Supply amount must be positive", nameof(amount));
                 }
 
-                float actualAmount = Math.Min(amount, stockpileInDays);
+                float actualAmount = Math.Min(amount, StockpileInDays);
                 StockpileInDays -= actualAmount;
 
                 return actualAmount;
@@ -413,10 +165,6 @@ namespace HammerAndSickle.Models
             }
         }
 
-        /// <summary>
-        /// Processes supply generation for a turn.
-        /// </summary>
-        /// <returns>Amount of supplies generated</returns>
         public float GenerateSupplies()
         {
             try
@@ -430,7 +178,7 @@ namespace HammerAndSickle.Models
                 float generatedAmount = GetCurrentGenerationRate();
 
                 // Don't exceed maximum capacity
-                float amountToAdd = Math.Min(generatedAmount, MaxStockpile - StockpileInDays);
+                float amountToAdd = Math.Min(generatedAmount, CUConstants.MaxDaysSupplyDepot - StockpileInDays);
                 StockpileInDays += amountToAdd;
 
                 return amountToAdd;
@@ -442,12 +190,6 @@ namespace HammerAndSickle.Models
             }
         }
 
-        /// <summary>
-        /// Determines if a unit at the specified distance can be supplied by this depot.
-        /// </summary>
-        /// <param name="distanceInHexes">Distance to unit in hexes</param>
-        /// <param name="enemyZOCsCrossed">Number of enemy ZOCs that must be crossed</param>
-        /// <returns>True if the unit can be supplied, false otherwise</returns>
         public bool CanSupplyUnitAt(int distanceInHexes, int enemyZOCsCrossed)
         {
             try
@@ -477,13 +219,6 @@ namespace HammerAndSickle.Models
             }
         }
 
-        /// <summary>
-        /// Supplies a unit with the requested amount of supplies.
-        /// </summary>
-        /// <param name="requestedAmount">Amount of supplies requested</param>
-        /// <param name="distanceInHexes">Distance to unit in hexes</param>
-        /// <param name="enemyZOCsCrossed">Number of enemy ZOCs that must be crossed</param>
-        /// <returns>Actual amount supplied</returns>
         public float SupplyUnit(float requestedAmount, int distanceInHexes, int enemyZOCsCrossed)
         {
             try
@@ -512,7 +247,7 @@ namespace HammerAndSickle.Models
                 float efficiency = distanceEfficiency * zocEfficiency * operationalEfficiency;
 
                 // Calculate amount to deliver
-                float maxDeliverable = Math.Min(requestedAmount, MaxUnitStockpileAmount);
+                float maxDeliverable = Math.Min(requestedAmount, CUConstants.MaxDaysSupplyUnit);
                 float amountToDeliver = maxDeliverable * efficiency;
 
                 // Remove supplies from stockpile (accounting for losses due to efficiency)
@@ -526,18 +261,17 @@ namespace HammerAndSickle.Models
                 return 0f;
             }
         }
-        #endregion
+
+        #endregion // Supply Management Methods
+
 
         #region Upgrade Methods
-        /// <summary>
-        /// Upgrades the depot size to the next level.
-        /// </summary>
-        /// <returns>True if upgrade was successful, false if already at maximum</returns>
+        
         public bool UpgradeDepotSize()
         {
             try
             {
-                switch (depotSize)
+                switch (DepotSize)
                 {
                     case DepotSize.Small:
                         DepotSize = DepotSize.Medium;
@@ -559,15 +293,11 @@ namespace HammerAndSickle.Models
             }
         }
 
-        /// <summary>
-        /// Upgrades the depot's generation rate to the next level.
-        /// </summary>
-        /// <returns>True if upgrade was successful, false if already at maximum</returns>
         public bool UpgradeGenerationRate()
         {
             try
             {
-                switch (generationRate)
+                switch (GenerationRate)
                 {
                     case SupplyGenerationRate.Minimal:
                         GenerationRate = SupplyGenerationRate.Basic;
@@ -592,15 +322,11 @@ namespace HammerAndSickle.Models
             }
         }
 
-        /// <summary>
-        /// Upgrades the depot's supply projection to the next level.
-        /// </summary>
-        /// <returns>True if upgrade was successful, false if already at maximum</returns>
         public bool UpgradeSupplyProjection()
         {
             try
             {
-                switch (supplyProjection)
+                switch (SupplyProjection)
                 {
                     case SupplyProjection.Local:
                         SupplyProjection = SupplyProjection.Extended;
@@ -625,10 +351,6 @@ namespace HammerAndSickle.Models
             }
         }
 
-        /// <summary>
-        /// Upgrades the depot's supply penetration.
-        /// </summary>
-        /// <returns>True if upgrade was successful, false if already at maximum</returns>
         public bool UpgradeSupplyPenetration()
         {
             try
@@ -649,54 +371,30 @@ namespace HammerAndSickle.Models
                 return false;
             }
         }
-        #endregion
+
+        #endregion // Upgrade Methods
+
 
         #region Special Ability Methods
-        /// <summary>
-        /// Enables the Air Supply special ability if this is a Main Depot.
-        /// </summary>
-        /// <returns>True if successful, false otherwise</returns>
+        
         public bool EnableAirSupply()
         {
             if (!IsMainDepot)
                 return false;
 
-            hasAirSupply = true;
+            HasAirSupply = true;
             return true;
         }
 
-        /// <summary>
-        /// Enables the Naval Supply special ability if this is a Main Depot.
-        /// </summary>
-        /// <returns>True if successful, false otherwise</returns>
         public bool EnableNavalSupply()
         {
             if (!IsMainDepot)
                 return false;
 
-            hasNavalSupply = true;
+            HasNavalSupply = true;
             return true;
         }
 
-        /// <summary>
-        /// Enables the Intelligence Capability special ability if this is a Main Depot.
-        /// </summary>
-        /// <returns>True if successful, false otherwise</returns>
-        public bool EnableIntelligenceCapability()
-        {
-            if (!IsMainDepot)
-                return false;
-
-            hasIntelligenceCapability = true;
-            return true;
-        }
-
-        /// <summary>
-        /// Performs an air supply operation to deliver supplies to an isolated unit.
-        /// </summary>
-        /// <param name="distanceInHexes">Distance to the unit</param>
-        /// <param name="amountRequested">Amount of supplies requested</param>
-        /// <returns>Amount of supplies actually delivered</returns>
         public float PerformAirSupply(int distanceInHexes, float amountRequested)
         {
             try
@@ -707,17 +405,17 @@ namespace HammerAndSickle.Models
                     return 0f;
                 }
 
-                if (distanceInHexes > AirSupplyMaxRange)
+                if (distanceInHexes > CUConstants.AirSupplyMaxRange)
                 {
                     return 0f;
                 }
 
                 // Air supply efficiency decreases with distance and is affected by operational capacity
-                float distanceEfficiency = 1f - (distanceInHexes / (float)AirSupplyMaxRange * 0.7f);
+                float distanceEfficiency = 1f - (distanceInHexes / (float)CUConstants.AirSupplyMaxRange * 0.7f);
                 float operationalEfficiency = GetEfficiencyMultiplier();
                 float efficiencyFactor = distanceEfficiency * operationalEfficiency;
 
-                float maxDeliverable = Math.Min(amountRequested, MaxUnitStockpileAmount);
+                float maxDeliverable = Math.Min(amountRequested, CUConstants.MaxDaysSupplyUnit);
                 float actualAmount = maxDeliverable * efficiencyFactor;
 
                 // Remove the supplies from stockpile
@@ -732,15 +430,6 @@ namespace HammerAndSickle.Models
             }
         }
 
-        /// <summary>
-        /// Performs a naval supply operation to deliver supplies to a coastal unit.
-        /// </summary>
-        /// <param name="distance/// <summary>
-        /// Performs a naval supply operation to deliver supplies to a coastal unit.
-        /// </summary>
-        /// <param name="distanceInHexes">Distance along coast to the unit</param>
-        /// <param name="amountRequested">Amount of supplies requested</param>
-        /// <returns>Amount of supplies actually delivered</returns>
         public float PerformNavalSupply(int distanceInHexes, float amountRequested)
         {
             try
@@ -751,17 +440,17 @@ namespace HammerAndSickle.Models
                     return 0f;
                 }
 
-                if (distanceInHexes > NavalSupplyMaxRange)
+                if (distanceInHexes > CUConstants.NavalSupplyMaxRange)
                 {
                     return 0f;
                 }
 
                 // Naval supply is more efficient than air but still affected by distance and operational capacity
-                float distanceEfficiency = 1f - (distanceInHexes / (float)NavalSupplyMaxRange * 0.4f);
+                float distanceEfficiency = 1f - (distanceInHexes / (float)CUConstants.NavalSupplyMaxRange * 0.4f);
                 float operationalEfficiency = GetEfficiencyMultiplier();
                 float efficiencyFactor = distanceEfficiency * operationalEfficiency;
 
-                float maxDeliverable = Math.Min(amountRequested, stockpileInDays * 0.5f); // Can deliver 50% of on-hand supplies
+                float maxDeliverable = Math.Min(amountRequested, StockpileInDays * 0.5f); // Can deliver 50% of on-hand supplies
                 float actualAmount = maxDeliverable * efficiencyFactor;
 
                 // Remove the supplies from stockpile
@@ -776,25 +465,11 @@ namespace HammerAndSickle.Models
             }
         }
 
-        /// <summary>
-        /// Gets the intelligence detection radius in hexes.
-        /// </summary>
-        /// <returns>Current detection radius based on intelligence capability</returns>
-        public int GetIntelligenceRadius()
-        {
-            if (!HasIntelligenceCapability)
-            {
-                return 0;
-            }
+        #endregion // Special Ability Methods
 
-            return IntelligenceNetworkRadius;
-        }
-        #endregion
 
         #region Game Cycle Methods
-        /// <summary>
-        /// Updates the depot state for a new turn.
-        /// </summary>
+        
         public void OnNewTurn()
         {
             try
@@ -808,10 +483,6 @@ namespace HammerAndSickle.Models
             }
         }
 
-        /// <summary>
-        /// Creates a clone of this depot.
-        /// </summary>
-        /// <returns>A new SupplyDepotSubProfile with the same properties</returns>
         public SupplyDepotSubProfile Clone()
         {
             try
@@ -819,21 +490,20 @@ namespace HammerAndSickle.Models
                 var clone = new SupplyDepotSubProfile();
 
                 // Copy basic information (except ID which is generated new)
-                clone.depotName = this.depotName;
-                clone.side = this.side;
+                clone.DepotName = this.DepotName;
+                clone.Side = this.Side;
 
                 // Copy depot attributes
-                clone.depotSize = this.depotSize;
-                clone.stockpileInDays = this.stockpileInDays;
-                clone.generationRate = this.generationRate;
-                clone.supplyProjection = this.supplyProjection;
-                clone.supplyPenetration = this.supplyPenetration;
-                clone.depotCategory = this.depotCategory;
+                clone.DepotSize = this.DepotSize;
+                clone.StockpileInDays = this.StockpileInDays;
+                clone.GenerationRate = this.GenerationRate;
+                clone.SupplyProjection = this.SupplyProjection;
+                clone.SupplyPenetration = this.SupplyPenetration;
+                clone.DepotCategory = this.DepotCategory;
 
                 // Copy special abilities
-                clone.hasAirSupply = this.hasAirSupply;
-                clone.hasNavalSupply = this.hasNavalSupply;
-                clone.hasIntelligenceCapability = this.hasIntelligenceCapability;
+                clone.HasAirSupply = this.HasAirSupply;
+                clone.HasNavalSupply = this.HasNavalSupply;
 
                 return clone;
             }
@@ -843,12 +513,12 @@ namespace HammerAndSickle.Models
                 throw;
             }
         }
-        #endregion
+
+        #endregion // Game Cycle Methods
+
 
         #region ISerializable Implementation
-        /// <summary>
-        /// Serializes this SupplyDepotSubProfile instance.
-        /// </summary>
+       
         public override void GetObjectData(SerializationInfo info, StreamingContext context)
         {
             try
@@ -857,22 +527,21 @@ namespace HammerAndSickle.Models
                 base.GetObjectData(info, context);
 
                 // Basic depot information
-                info.AddValue(nameof(depotID), depotID);
-                info.AddValue(nameof(depotName), depotName);
-                info.AddValue(nameof(side), side);
+                info.AddValue(nameof(DepotID), DepotID);
+                info.AddValue(nameof(DepotName), DepotName);
+                info.AddValue(nameof(Side), Side);
 
                 // Depot attributes
-                info.AddValue(nameof(depotSize), depotSize);
-                info.AddValue(nameof(stockpileInDays), stockpileInDays);
-                info.AddValue(nameof(generationRate), generationRate);
-                info.AddValue(nameof(supplyProjection), supplyProjection);
-                info.AddValue(nameof(supplyPenetration), supplyPenetration);
-                info.AddValue(nameof(depotCategory), depotCategory);
+                info.AddValue(nameof(DepotSize), DepotSize);
+                info.AddValue(nameof(StockpileInDays), StockpileInDays);
+                info.AddValue(nameof(GenerationRate), GenerationRate);
+                info.AddValue(nameof(SupplyProjection), SupplyProjection);
+                info.AddValue(nameof(SupplyPenetration), SupplyPenetration);
+                info.AddValue(nameof(DepotCategory), DepotCategory);
 
                 // Special abilities
-                info.AddValue(nameof(hasAirSupply), hasAirSupply);
-                info.AddValue(nameof(hasNavalSupply), hasNavalSupply);
-                info.AddValue(nameof(hasIntelligenceCapability), hasIntelligenceCapability);
+                info.AddValue(nameof(HasAirSupply), HasAirSupply);
+                info.AddValue(nameof(HasNavalSupply), HasNavalSupply);
             }
             catch (Exception e)
             {
@@ -880,6 +549,7 @@ namespace HammerAndSickle.Models
                 throw;
             }
         }
-        #endregion
+
+        #endregion // ISerializable Implementation
     }
 }

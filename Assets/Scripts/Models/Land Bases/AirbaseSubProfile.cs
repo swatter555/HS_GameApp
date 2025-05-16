@@ -15,47 +15,38 @@ namespace HammerAndSickle.Models
         #region Constants
         private const string CLASS_NAME = nameof(AirbaseSubProfile);
 
-        /// <summary>
-        /// The maximum number of air units that can be attached to this airbase.
-        /// </summary>
         public const int MaxBaseAirUnits = 4;
-        #endregion
+
+        #endregion // Constants
+
 
         #region Fields
-        /// <summary>
-        /// List of air units attached to this airbase.
-        /// </summary>
+
         private List<CombatUnit> airUnitsAttached = new List<CombatUnit>();
-        #endregion
+
+        #endregion // Fields
+
 
         #region Properties
-        /// <summary>
-        /// Gets the read-only list of air units attached to this airbase.
-        /// </summary>
+
         public IReadOnlyList<CombatUnit> AirUnitsAttached => airUnitsAttached;
-        #endregion
+
+        #endregion // Properties
+
 
         #region Constructors
-        /// <summary>
-        /// Creates a new instance of the AirbaseSubProfile class with default values.
-        /// </summary>
+
         public AirbaseSubProfile() : base()
         {
             // Default constructor uses base class initialization
         }
 
-        /// <summary>
-        /// Creates a new instance of the AirbaseSubProfile class with specified initial damage.
-        /// </summary>
-        /// <param name="initialDamage">The initial damage level (0-100)</param>
+
         public AirbaseSubProfile(int initialDamage) : base(initialDamage)
         {
             // Uses base class initialization with initial damage
         }
 
-        /// <summary>
-        /// Deserialization constructor.
-        /// </summary>
         protected AirbaseSubProfile(SerializationInfo info, StreamingContext context) : base(info, context)
         {
             try
@@ -83,15 +74,11 @@ namespace HammerAndSickle.Models
                 throw;
             }
         }
-        #endregion
+        #endregion // Constructors
+
 
         #region Air Unit Management
-        /// <summary>
-        /// Adds an air unit to the airbase.
-        /// </summary>
-        /// <param name="unit">The air unit to add</param>
-        /// <exception cref="ArgumentNullException">Thrown when unit is null</exception>
-        /// <exception cref="InvalidOperationException">Thrown when airbase is full or unit is not an air unit</exception>
+       
         public void AddAirUnit(CombatUnit unit)
         {
             try
@@ -124,12 +111,6 @@ namespace HammerAndSickle.Models
             }
         }
 
-        /// <summary>
-        /// Removes an air unit from the airbase.
-        /// </summary>
-        /// <param name="unit">The air unit to remove</param>
-        /// <returns>True if the unit was successfully removed, otherwise false</returns>
-        /// <exception cref="ArgumentNullException">Thrown when unit is null</exception>
         public bool RemoveAirUnit(CombatUnit unit)
         {
             try
@@ -148,31 +129,21 @@ namespace HammerAndSickle.Models
             }
         }
 
-        /// <summary>
-        /// Gets the number of air units currently attached to this airbase.
-        /// </summary>
-        /// <returns>The number of attached air units</returns>
         public int GetAttachedUnitCount()
         {
             return airUnitsAttached.Count;
         }
 
-        /// <summary>
-        /// Checks if the airbase has room for additional air units.
-        /// </summary>
-        /// <returns>True if the airbase can accept more air units, otherwise false</returns>
         public bool HasCapacityForMoreUnits()
         {
             return airUnitsAttached.Count < MaxBaseAirUnits;
         }
-        #endregion
+
+        #endregion // Air Unit Management
+
 
         #region Operational Methods
-        /// <summary>
-        /// Gets an operational efficiency multiplier based on current damage level.
-        /// This affects how effectively the airbase can support air operations.
-        /// </summary>
-        /// <returns>An efficiency multiplier between 0.0 and 1.0</returns>
+
         public override float GetEfficiencyMultiplier()
         {
             // Air operations can be more sensitive to damage than other facilities
@@ -193,10 +164,6 @@ namespace HammerAndSickle.Models
             }
         }
 
-        /// <summary>
-        /// Determines if the airbase can launch air operations based on its current status.
-        /// </summary>
-        /// <returns>True if air operations are possible, otherwise false</returns>
         public bool CanLaunchAirOperations()
         {
             // Air operations require at least moderately degraded status
@@ -204,22 +171,16 @@ namespace HammerAndSickle.Models
                    OperationalCapacity != OperationalCapacity.OutOfOperation;
         }
 
-        /// <summary>
-        /// Determines if the airbase can receive and land aircraft based on its current status.
-        /// Landing operations can generally continue at worse damage levels than takeoff operations.
-        /// </summary>
-        /// <returns>True if landing operations are possible, otherwise false</returns>
         public bool CanReceiveAircraft()
         {
             // Even heavily damaged airbases can receive aircraft in an emergency
             return OperationalCapacity != OperationalCapacity.OutOfOperation;
         }
-        #endregion
+
+        #endregion // Operational Methods
 
         #region ISerializable Implementation
-        /// <summary>
-        /// Serializes this instance.
-        /// </summary>
+
         public override void GetObjectData(SerializationInfo info, StreamingContext context)
         {
             try
@@ -243,6 +204,7 @@ namespace HammerAndSickle.Models
                 throw;
             }
         }
-        #endregion
+
+        #endregion // ISerializable Implementation
     }
 }
