@@ -684,4 +684,48 @@ namespace HammerAndSickle.Models
         HeavilyDegraded,
         OutOfOperation
     }
+
+    /// <summary>
+    /// Defines the size of a supply depot and its maximum storage capacity.
+    /// </summary>
+    public enum DepotSize
+    {
+        Small,   // 30 days of supply
+        Medium,  // 50 days of supply
+        Large,   // 80 days of supply
+        Huge     // 110 days of supply
+    }
+
+    /// <summary>
+    /// Defines the supply generation rate of a depot.
+    /// </summary>
+    public enum SupplyGenerationRate
+    {
+        Minimal,        // 0.5 days of supply per turn
+        Basic,          // 1.0 days of supply per turn
+        Standard,       // 1.5 days of supply per turn
+        Enhanced,       // 2.5 days of supply per turn
+        Industrial      // 4.0 days of supply per turn
+    }
+
+    /// <summary>
+    /// Defines how far a depot can project supplies effectively.
+    /// </summary>
+    public enum SupplyProjection
+    {
+        Local,          // 2 hex radius
+        Extended,       // 4 hex radius
+        Regional,       // 6 hex radius
+        Strategic,      // 9 hex radius
+        Theater         // 12 hex radius
+    }
+
+    /// <summary>
+    /// Defines the category of a depot.
+    /// </summary>
+    public enum DepotCategory
+    {
+        Main,       // Primary depot with special abilities
+        Secondary   // Standard field depot
+    }
 }

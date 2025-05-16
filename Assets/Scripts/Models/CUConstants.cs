@@ -1,10 +1,15 @@
+using System.Collections.Generic;
+
 namespace HammerAndSickle.Models
 {
     public class CUConstants
     {
+        //========================
+        //====== CombatUnit ======
+        //========================
+
+        // CombatUnit constants.
         public const int MaxPossibleHitPoints = 40;
-        public const float MaxDaysSupplyDepot = 100f;  // Max supply a depot can carry
-        public const float MaxDaysSupplyUnit = 7f;     // Max supply a unit can carry
         public const int ZOCRange = 1;                 // Zone of Control Range
 
         // Movement constants for different unit types, in movement points.
@@ -24,6 +29,10 @@ namespace HammerAndSickle.Models
         public const int XP_PER_BATTLE = 25;
         public const int XP_COST_FOR_SENIOR_PROMOTION = 200;
         public const int XP_COST_FOR_TOP_PROMOTION = 500;
+
+        //================================
+        //====== Leader Skills/Tree ======
+        //================================
 
         // Tiered skill XP costs.
         public const int TIER1_XP_COST = 50;
@@ -72,5 +81,47 @@ namespace HammerAndSickle.Models
 
         // Air and naval operation bonuses
         public const float AIR_MOBILE_SPEED_BONUS = 0.25f;    // 25% faster helicopter operations
+
+
+        //=======================
+        //====== LandBases ======
+        //=======================
+
+        // Maximum stockpile capacities by depot size
+        public static readonly Dictionary<DepotSize, float> MaxStockpileBySize = new Dictionary<DepotSize, float>
+        {
+            { DepotSize.Small, 30f },
+            { DepotSize.Medium, 50f },
+            { DepotSize.Large, 80f },
+            { DepotSize.Huge, 110f }
+        };
+
+        // Supply generation rates by level
+        public static readonly Dictionary<SupplyGenerationRate, float> GenerationRateValues = new Dictionary<SupplyGenerationRate, float>
+        {
+            { SupplyGenerationRate.Minimal, 1.0f },
+            { SupplyGenerationRate.Basic, 2.0f },
+            { SupplyGenerationRate.Standard, 3.0f },
+            { SupplyGenerationRate.Enhanced, 4.0f },
+            { SupplyGenerationRate.Industrial, 5.0f }
+        };
+
+        // Supply projection ranges in hexes
+        public static readonly Dictionary<SupplyProjection, int> ProjectionRangeValues = new Dictionary<SupplyProjection, int>
+        {
+            { SupplyProjection.Local, 2 },
+            { SupplyProjection.Extended, 4 },
+            { SupplyProjection.Regional, 6 },
+            { SupplyProjection.Strategic, 9 },
+            { SupplyProjection.Theater, 12 }
+        };
+
+        // Amount any unit can stockpile
+        public const float MaxDaysSupplyDepot = 100f;  // Max supply a depot can carry
+        public const float MaxDaysSupplyUnit = 7f;     // Max supply a unit can carry
+
+        // Constants for special abilities
+        public const int AirSupplyMaxRange = 16;
+        public const int NavalSupplyMaxRange = 12;
     }
 }
