@@ -208,7 +208,7 @@ namespace HammerAndSickle.Models
     }
 
     /// <summary>
-    /// Signals Intelligence (SIGINT) rating.
+    /// Signals IntelligenceDoctrine (SIGINT) rating.
     /// </summary>
     public enum SIGINT_Rating
     {
@@ -261,9 +261,9 @@ namespace HammerAndSickle.Models
 
   
     /// <summary>
-    /// Leadership path tied to officer promotions, providing increasing command ability.
+    /// LeadershipFoundation path tied to officer promotions, providing increasing command ability.
     /// </summary>
-    public enum LeadershipPath
+    public enum LeadershipFoundation
     {
         None,
         JuniorOfficerTraining_CommandTier1,         // Junior Officer Training (+1 command)
@@ -274,9 +274,22 @@ namespace HammerAndSickle.Models
     }
 
     /// <summary>
+    /// Special bonus path, only tier requirements apply.
+    /// </summary>
+    public enum PoliticallyConnectedFoundation
+    {
+        None,
+        EmergencyAirDrop_EmergencyResupply,                  // Emergency Air Drop
+        DirectLineToHQ_SupplyConsumption,                    // Direct Line To HQ
+        ForeignTechnology_NVG,                               // Foreign Technology
+        BetterReplacements_ReplacementXP,                    // Better Replacements
+        ConnectionsAtTheTop_PrestigeCost                     // Connections At The Top
+    }
+
+    /// <summary>
     /// Armored warfare skills.
     /// </summary>
-    public enum ArmoredWarfarePath
+    public enum ArmoredDoctrine
     {
         None,
         ShockTankCorps_HardAttack,             // Shock Tank Corps
@@ -288,7 +301,7 @@ namespace HammerAndSickle.Models
     /// <summary>
     /// Infantry and soft-target focused skills.
     /// </summary>
-    public enum InfantryDoctrinePath
+    public enum InfantryDoctrine
     {
         None,
         InfantryAssaultTactics_SoftAttack,      // Infantry Assault Tactics
@@ -300,7 +313,7 @@ namespace HammerAndSickle.Models
     /// <summary>
     /// Artillery and indirect fire skills.
     /// </summary>
-    public enum ArtilleryDoctrinePath
+    public enum ArtilleryDoctrine
     {
         None,
         PrecisionTargeting_IndirectRange,        // Precision Targeting
@@ -311,7 +324,7 @@ namespace HammerAndSickle.Models
     /// <summary>
     /// Air defense and anti-air skills.
     /// </summary>
-    public enum AirDefenseDoctrinePath
+    public enum AirDefenseDoctrine
     {
         None,
         OffensiveAirDefense_AirAttack,            // Offensive Air Defense
@@ -322,7 +335,7 @@ namespace HammerAndSickle.Models
     /// <summary>
     /// VDV Airborne skills.
     /// </summary>
-    public enum AirborneDoctrinePath
+    public enum AirborneDoctrine
     {
         None,
         RapidDeploymentPlanning_ImpromptuPlanning,    // Rapid Deployment Planning
@@ -333,7 +346,7 @@ namespace HammerAndSickle.Models
     /// <summary>
     /// Air Mobile and helicopter operation skills.
     /// </summary>
-    public enum AirMobileDoctrinePath
+    public enum AirMobileDoctrine
     {
         None,
         RapidRedeployment_AirMobile,                  // Rapid Redeployment
@@ -342,46 +355,52 @@ namespace HammerAndSickle.Models
     }
 
     /// <summary>
-    /// Intelligence and reconnaissance skills.
+    /// IntelligenceDoctrine and reconnaissance skills.
     /// </summary>
-    public enum IntelligencePath
+    public enum IntelligenceDoctrine
     {
         None,
-        EnhancedIntelligenceCollection_ImprovedGathering,    // Enhanced Intelligence Collection
+        EnhancedIntelligenceCollection_ImprovedGathering,    // Enhanced IntelligenceDoctrine Collection
         ConcealedOperationsBase_UndergroundBunker,           // Concealed Operations Base
-        PriorityTargetDesignation_RealtimeTargetting,        // Priority Target Designation
-        ForwardObservationPost_SpottingRange,                // Forward Observation Post
-        DeepReconnaissanceOperations_DeepReconnaissance      // Deep Reconnaissance Operations
+        SatelliteIntelligence_SpaceAssets,                   // Priority Target Designation
     }
 
     /// <summary>
-    /// SIGINT (Signals Intelligence) skills.
+    /// CombinedArmsSpecialization skills.
     /// </summary>
-    public enum SignalIntelligencePath
+    public enum CombinedArmsSpecialization
+    {
+
+    }
+
+    /// <summary>
+    /// SIGINT (Signals IntelligenceDoctrine) skills.
+    /// </summary>
+    public enum SignalIntelligenceSpecialization
     {
         None,
         CommunicationsDecryption_SignalDecryption,           // Communications Decryption
-        ElectronicSurveillanceNetwork_DetectionRange,        // Electronic Surveillance Network
+        ElectronicSurveillanceNetwork_SpottingRange,         // Electronic Surveillance Network
         RadioElectronicCombat_ElectronicWarfare,             // Radio Electronic Combat
         EnemyBehaviorAnalysis_PatternRecognition             // Enemy Behavior Analysis
     }
 
     /// <summary>
-    /// Engineering skills.
+    /// EngineeringSpecialization skills.
     /// </summary>
-    public enum EngineeringPath
+    public enum EngineeringSpecialization
     {
         None,
         RiverCrossingOperations_RiverCrossing,               // River Crossing Operations
         AmphibiousAssaultTactics_RiverAssault,               // Amphibious Assault Tactics
-        CombatEngineeringCorps_BridgeBuilding,               // Combat Engineering Corps
+        CombatEngineeringCorps_BridgeBuilding,               // Combat EngineeringSpecialization Corps
         FieldFortificationExpert_FieldFortification          // Field Fortification Expert
     }
 
     /// <summary>
     /// Special forces and irregular warfare skills.
     /// </summary>
-    public enum SpecialForcesDoctrinePath
+    public enum SpecialForcesSpecialization
     {
         None,
         SpecialTerrainMastery_TerrainMastery,                // Special Terrain Mastery
@@ -390,20 +409,6 @@ namespace HammerAndSickle.Models
         AmbushTactics_AmbushTactics,                         // Ambush Tactics
         NightCombatOperations_NightCombat                    // Night Combat Operations
     }
-
-    /// <summary>
-    /// Special bonus path, only tier requirements apply.
-    /// </summary>
-    public enum PoliticallyConnected
-    {
-        None,
-        EmergencyAirDrop_EmergencyResupply,                  // Emergency Air Drop
-        DirectLineToHQ_SupplyConsumption,                    // Direct Line To HQ
-        ForeignTechnology_NVG,                               // Foreign Technology
-        BetterReplacements_ReplacementXP,                    // Better Replacements
-        ConnectionsAtTheTop_PrestigeCost                     // Connections At The Top
-    }
-
 
     //===============================
     //====== Skill Bonus Types ======
@@ -414,65 +419,74 @@ namespace HammerAndSickle.Models
     {
         None,
 
-        // Leadership
-        Command,              // Value is an int (e.g., 1 for +1)
-        
-        // Tank Commander
+        // LeadershipFoundation
+        CommandTier1,         //  +1 to Command
+        SeniorPromotion,      // Boolean, promotion to SeniorGrade.
+        CommandTier2,         // +1 additional command
+        TopPromotion,         // Boolean, promotion to TopGrade
+        CommandTier3,         // +1 additional command
+
+        // PoliticallyConnectedFoundation
+        EmergencyResupply,    // Boolean, one free emergency resupply/replacement action per scenario.
+        SupplyConsumption,    // Value is a float total multiplier (e.g., 0.67 for 33% reduction)
+        NVG,                  // Upgrade unit to latest gen NVG
+        ReplacementXP,        // Replacements recieved are more experienced.
+        PrestigeCost,         // Value is a float total multiplier (e.g., 0.67 for 33% reduction)
+
+        // ArmoredDoctine
         HardAttack,           // Bonus to HardAttack
         HardDefense,          // Bonus to HardDefense
         Breakthrough,         // Boolean, enemy retreat gives bonus move action.
 
-        // Infanrty Commander
+        // InfanrtyDoctrine
         SoftAttack,           // Bonus to SoftAttack
         SoftDefense,          // Bonus to SoftDefense
         DeploymentAction,     // +1 deployment action
 
-        // Air Defense Commander
+        // AirDefenseDoctrine
         AirAttack,            // Bonus to AirAttack
         AirDefense,           // Bonus to AirDefense
         OpportunityAction,    // Boolean, gets extra opportunity action.
 
-        // Artillery Commander
+        // ArtilleryDoctrine
         ShootAndScoot,        // Boolean, may move after ranged attack.
         AdvancedTargetting,   // Boolean, Indirect attack two different units in one turn, uses 4 supply.
         IndirectRange,        // Indirect fire range +1
 
-        // Air Mobile Commander
+        // AirMobileDoctrine
         AirMobile,            // Boolean, may move after air landing.
         AirMobileAssault,     // Boolean, still have combat action after landing.
         AirMobileElite,       // Boolean, significantly reduces vulnerability to enemy fire when mounted.
 
-        // Airborne Commander
+        // AirborneDoctrine
         ImpromptuPlanning,     // Boolean, boarding aircraft doesn't cost an action.
         AirborneAssault,       // Boolean, 1/2 suppression cost for a jump.
         AirborneElite,         // Boolean, still have combat action after jump.
 
-        // Intelligence Commander
+        // IntelligenceDoctrine
         ImprovedGathering,    // +1 Intel gathering actions
         UndergroundBunker,    // Much smaller unit silouette.
-        RealtimeTargetting,   // Boolean, each airstrike has a chance of doing bonus damage.
+        SpaceAssets,          // Boolean, has a chance to spot enemy units anywhere on the map.
 
-        // Combined Arms Spec
+        // CombinedArmsSpecialization
         SpottingRange,        // +1 spotting range
         MovementAction,       // +1 move action
         CombatAction,         // +1 combat action
 
-        // Engineering Spec
+        // EngineeringSpecialization
         RiverCrossing,        // Boolean, river crossing move bonus.
         RiverAssault,         // Boolean, amphibious assault combat bonus.
         BridgeBuilding,       // Boolean, may build bridges over rivers in one turn.
         FieldFortification,   // Boolean, may build a persistent static fortification.
 
-        // Irregular Warfare Spec
+        // SpecialForcesSpecialization
         TerrainMastery,         // Boolean, rough, forest, mountain hex entrance costs are less.
         InfiltrationMovement,   // Boolean, can move through enemy ZOC more easily
         ConcealedPositions,     // Boolean, units have reduced silhouette.
         AmbushTactics,          // Boolean, first attack from concealment gets +50% combat bonus
 
-        // SIGINT Spec
+        // SIGINTSpecialization
         SignalDecryption,      // Boolean, reveals more detailed unit information when spotted
-        DetectionRange,        // +8 spotting range
-        DeepReconnaissance,    // Boolean, has a chance to spot enemy units anywhere on the map.
         ElectronicWarfare,     // Boolean, randomly makes an enemy unit immobile when gathering intel.
         PatternRecognition,    // Boolean, shows likely enemy movement paths for some spotted units.
 
@@ -481,12 +495,41 @@ namespace HammerAndSickle.Models
         RoughTerrain,         // Boolean, rough terrain combat bonus.
         NightCombat,          // Boolean, night combat bonus.
 
-        // Politically Connected Bonus branch
-        EmergencyResupply,    // Boolean, one free emergency resupply/replacement action per scenario.
-        SupplyConsumption,    // Value is a float total multiplier (e.g., 0.67 for 33% reduction)
-        NVG,                  // Upgrade unit to latest gen NVG
-        ReplacementXP,        // Replacements recieved are more experienced.
-        PrestigeCost,         // Value is a float total multiplier (e.g., 0.67 for 33% reduction)
+        
+    }
+
+    /// <summary>
+    /// Enum representing the major skill branches
+    /// </summary>
+    public enum SkillBranch
+    {
+        None,
+        LeadershipFoundation,
+        PoliticallyConnectedFoundation,
+        ArmoredDoctrine,
+        InfantryDoctrine,
+        ArtilleryDoctrine,
+        AirDefenseDoctrine,
+        AirborneDoctrine,
+        AirMobileDoctrine,
+        IntelligenceDoctrine,
+        CombinedArmsSpecialization,
+        SignalIntelligenceSpecialization,
+        EngineeringSpecialization,
+        SpecialForcesSpecialization
+    }
+
+    /// <summary>
+    /// Skill tiers representing progression and requirements
+    /// </summary>
+    public enum SkillTier
+    {
+        None = 0,
+        Tier1 = 1,
+        Tier2 = 2,
+        Tier3 = 3,
+        Tier4 = 4,
+        Tier5 = 5
     }
 
     //================================

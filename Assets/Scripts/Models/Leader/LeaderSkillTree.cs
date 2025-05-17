@@ -1,331 +1,835 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using UnityEngine;
 
 namespace HammerAndSickle.Models
 {
-    //public class LeaderSkillTree
-    //{
-    //    #region Properties
+    /// <summary>
+    /// LeaderSkillTree manages a leader's skills, experience points, and command grade progression.
+    /// 
+    /// This class provides the following functionality:
+    /// - Storage and management of which skills a leader has unlocked
+    /// - Tracking of branch specializations and exclusivity
+    /// - Management of experience points and command grade promotions
+    /// - Calculation of all skill-based bonuses for combat and other systems
+    /// - Validation of skill prerequisites and requirements
+    /// - Support for resetting skills (respec functionality)
+    /// - Event notifications for UI and other systems
+    /// 
+    /// Key methods:
+    /// - AddExperience: Adds XP to the leader's pool
+    /// - CanUnlockSkill: Checks if prerequisites for a skill are met
+    /// - UnlockSkill: Attempts to unlock a skill, applying costs and effects
+    /// - IsSkillUnlocked: Checks if a specific skill is unlocked
+    /// - GetBonusValue: Retrieves total bonus for a specific bonus type
+    /// - HasCapability: Checks if the leader has a specific boolean capability
+    /// - ResetAllSkills/ResetBranch: Refunds experience from skills
+    /// 
+    /// Usage Example:
+    /// ```
+    /// var skillTree = new LeaderSkillTree();
+    /// skillTree.AddExperience(150);  // Award XP after battle
+    /// 
+    /// // Check and unlock a skill
+    /// if (skillTree.CanUnlockSkill(LeadershipFoundation.JuniorOfficerTraining_CommandTier1))
+    /// {
+    ///     skillTree.UnlockSkill(LeadershipFoundation.JuniorOfficerTraining_CommandTier1);
+    /// }
+    /// 
+    /// // Use bonuses in combat calculations
+    /// int commandBonus = (int)skillTree.GetBonusValue(SkillBonusType.CommandTier1);
+    /// bool hasBreakthrough = skillTree.HasCapability(SkillBonusType.Breakthrough);
+    /// ```
+    /// </summary>
+    public class LeaderSkillTree
+    {
+        #region Fields
 
-    //    public int ExperiencePoints { get; private set; }
-    //    public CommandGrade CurrentGrade { get; private set; }
+        // Dictionary to store all unlocked skills regardless of branch
+        private readonly Dictionary<Enum, bool> unlockedSkills = new Dictionary<Enum, bool>();
 
-    //    public bool CanAffordSeniorPromotion => ExperiencePoints >= CUConstants.XP_COST_FOR_SENIOR_PROMOTION && CurrentGrade == CommandGrade.JuniorGrade;
-    //    public bool CanAffordTopPromotion => ExperiencePoints >= CUConstants.XP_COST_FOR_TOP_PROMOTION && CurrentGrade == CommandGrade.SeniorGrade;
+        // Set to track which branches the leader has started
+        private readonly HashSet<SkillBranch> startedBranches = new HashSet<SkillBranch>();
 
-    //    // Dictionaries to store the unlocked status of each skill for this commander
-    //    public Dictionary<LeadershipPath, bool> UnlockedCommandSkills { get; private set; }
-    //    public Dictionary<RearAreaSkillPath, bool> UnlockedRearAreaSkills { get; private set; }
-    //    public Dictionary<BattleDoctrineSkillPath, bool> UnlockedBattleDoctrineSkills { get; private set; }
-    //    public Dictionary<CombatOperationsSkillPath, bool> UnlockedCombatOperationsSkills { get; private set; }
+        // Cache for frequently accessed bonus values
+        private readonly Dictionary<SkillBonusType, float> bonusCache = new Dictionary<SkillBonusType, float>();
 
-    //    // Events
-    //    public event Action<string, string> OnSkillUnlocked; // (skillName, fullSkillDescription)
-    //    public event Action<CommandGrade> OnGradeChanged;
-    //    public event Action<int, int> OnExperienceChanged; // (changeAmount, newTotalExperience)
-    //    public event Action<CommandGrade> OnPromotionAvailable; // (targetPromotionGrade)
+        // Cache for boolean capabilities
+        private readonly Dictionary<SkillBonusType, bool> capabilityCache = new Dictionary<SkillBonusType, bool>();
 
-    //    #endregion // Properties
+        // Flag to track if caches need to be cleared
+        private bool isDirty = true;
 
-    //    public LeaderSkillTree(int initialExperience = 0)
-    //    {
-    //        ExperiencePoints = initialExperience;
-    //        CurrentGrade = CommandGrade.JuniorGrade;
-    //        InitializeSkillDictionaries();
-    //    }
+        #endregion
 
-    //    private void InitializeSkillDictionaries()
-    //    {
-    //        UnlockedCommandSkills = Enum.GetValues(typeof(LeadershipPath)).Cast<LeadershipPath>()
-    //                                 .Where(s => s != LeadershipPath.None)
-    //                                 .ToDictionary(s => s, s => false);
-    //        UnlockedRearAreaSkills = Enum.GetValues(typeof(RearAreaSkillPath)).Cast<RearAreaSkillPath>()
-    //                                 .Where(s => s != RearAreaSkillPath.None)
-    //                                 .ToDictionary(s => s, s => false);
-    //        UnlockedBattleDoctrineSkills = Enum.GetValues(typeof(BattleDoctrineSkillPath)).Cast<BattleDoctrineSkillPath>()
-    //                                 .Where(s => s != BattleDoctrineSkillPath.None)
-    //                                 .ToDictionary(s => s, s => false);
-    //        UnlockedCombatOperationsSkills = Enum.GetValues(typeof(CombatOperationsSkillPath)).Cast<CombatOperationsSkillPath>()
-    //                                 .Where(s => s != CombatOperationsSkillPath.None)
-    //                                 .ToDictionary(s => s, s => false);
-    //    }
+        #region Properties
 
-    //    public void AddExperience(int experienceAmount)
-    //    {
-    //        if (experienceAmount <= 0) return;
+        // Experience and Command Grade
+        public int ExperiencePoints { get; private set; }
+        public CommandGrade CurrentGrade { get; private set; }
 
-    //        float currentExperienceBonus = 1.0f;
-    //        if (IsSkillUnlocked(LeadershipPath.ShockFormation))
-    //        {
-    //            if (LeaderSkillCatalog.TryGetSkillDefinition(LeadershipPath.ShockFormation, out var skillDef))
-    //            {
-    //                currentExperienceBonus += skillDef.PrimaryBonusValue; // Assumes bonus value is the additive part (0.25)
-    //            }
-    //        }
+        // Promotion convenience properties
+        public bool CanAffordSeniorPromotion =>
+            ExperiencePoints >= CUConstants.XP_COST_FOR_SENIOR_PROMOTION &&
+            CurrentGrade == CommandGrade.JuniorGrade;
 
-    //        int finalExperienceToAdd = (int)(experienceAmount * currentExperienceBonus);
-    //        ExperiencePoints += finalExperienceToAdd;
-    //        OnExperienceChanged?.Invoke(finalExperienceToAdd, ExperiencePoints);
-    //        CheckPromotionAvailability();
-    //    }
+        public bool CanAffordTopPromotion =>
+            ExperiencePoints >= CUConstants.XP_COST_FOR_TOP_PROMOTION &&
+            CurrentGrade == CommandGrade.SeniorGrade;
 
-    //    private void SpendExperience(int experienceAmount)
-    //    {
-    //        if (experienceAmount <= 0 || ExperiencePoints < experienceAmount) return; // Ensure enough XP
-    //        ExperiencePoints -= experienceAmount;
-    //        OnExperienceChanged?.Invoke(-experienceAmount, ExperiencePoints);
-    //        CheckPromotionAvailability();
-    //    }
+        // Branch-related properties
+        public IReadOnlyCollection<SkillBranch> ActiveBranches => startedBranches;
 
-    //    private void CheckPromotionAvailability()
-    //    {
-    //        if (CanAffordSeniorPromotion)
-    //        {
-    //            OnPromotionAvailable?.Invoke(CommandGrade.SeniorGrade);
-    //        }
-    //        else if (CanAffordTopPromotion)
-    //        {
-    //            OnPromotionAvailable?.Invoke(CommandGrade.TopGrade);
-    //        }
-    //    }
+        // Skill-count properties
+        public int TotalSkillsUnlocked => unlockedSkills.Count(kv => kv.Value);
 
-    //    public bool PromoteToNextGrade()
-    //    {
-    //        if (CurrentGrade == CommandGrade.JuniorGrade && CanAffordSeniorPromotion)
-    //        {
-    //            SpendExperience(CUConstants.XP_COST_FOR_SENIOR_PROMOTION);
-    //            CurrentGrade = CommandGrade.SeniorGrade;
-    //            OnGradeChanged?.Invoke(CurrentGrade);
-    //            CheckPromotionAvailability(); // Check if Top Grade is now affordable
-    //            return true;
-    //        }
-    //        else if (CurrentGrade == CommandGrade.SeniorGrade && CanAffordTopPromotion)
-    //        {
-    //            SpendExperience(CUConstants.XP_COST_FOR_TOP_PROMOTION);
-    //            CurrentGrade = CommandGrade.TopGrade;
-    //            OnGradeChanged?.Invoke(CurrentGrade);
-    //            return true;
-    //        }
-    //        return false;
-    //    }
+        #endregion
 
-    //    public bool UnlockSkill(Enum skillEnum)
-    //    {
-    //        if (Convert.ToInt32(skillEnum) == 0) return false; // 'None' enum
-    //        if (IsSkillUnlocked(skillEnum)) return false;
+        #region Events
 
-    //        if (!LeaderSkillCatalog.TryGetSkillDefinition(skillEnum, out SkillDefinition skillDef))
-    //        {
-    //            // Skill not found in catalog, should not happen if enums and catalog are synced
-    //            return false;
-    //        }
+        // Notification events for UI and other systems
+        public event Action<Enum, string, string> OnSkillUnlocked; // (skillEnum, skillName, fullSkillDescription)
+        public event Action<CommandGrade> OnGradeChanged;
+        public event Action<int, int> OnExperienceChanged; // (changeAmount, newTotalExperience)
+        public event Action<CommandGrade> OnPromotionAvailable; // (targetPromotionGrade)
+        public event Action<SkillBranch, SkillTier> OnBranchTierUnlocked; // (branch, tier)
+        public event Action<SkillBonusType> OnCapabilityUnlocked; // (bonusType)
 
-    //        if (!CanUnlockSkill(skillEnum, skillDef)) return false;
+        #endregion
 
-    //        if (ExperiencePoints < skillDef.XPCost) return false;
+        #region Constructors
 
-    //        SpendExperience(skillDef.XPCost);
-    //        SetSkillUnlockedStatus(skillEnum, true);
-    //        OnSkillUnlocked?.Invoke(skillDef.Name, LeaderSkillCatalog.GetFullSkillDescription(skillEnum));
-    //        return true;
-    //    }
+        /// <summary>
+        /// Creates a new LeaderSkillTree with optional initial experience
+        /// </summary>
+        /// <param name="initialExperience">Starting experience points (default: 0)</param>
+        public LeaderSkillTree(int initialExperience = 0)
+        {
+            ExperiencePoints = initialExperience;
+            CurrentGrade = CommandGrade.JuniorGrade;
+            InitializeSkillDictionaries();
+        }
 
-    //    private bool CanUnlockSkill(Enum skillEnum, SkillDefinition skillDef)
-    //    {
-    //        // 1. Check Grade Requirement
-    //        if (CurrentGrade < skillDef.RequiredGrade) return false;
+        /// <summary>
+        /// Initialize the skill dictionaries with all possible skills set to not unlocked
+        /// </summary>
+        private void InitializeSkillDictionaries()
+        {
+            // LeadershipFoundation
+            foreach (LeadershipFoundation skill in Enum.GetValues(typeof(LeadershipFoundation)))
+            {
+                if (skill != LeadershipFoundation.None)
+                    unlockedSkills[skill] = false;
+            }
 
-    //        // 2. Check Prerequisites
-    //        foreach (Enum prereqEnum in skillDef.Prerequisites)
-    //        {
-    //            if (!IsSkillUnlocked(prereqEnum)) return false;
-    //        }
+            // ArmoredDoctrine
+            foreach (ArmoredDoctrine skill in Enum.GetValues(typeof(ArmoredDoctrine)))
+            {
+                if (skill != ArmoredDoctrine.None)
+                    unlockedSkills[skill] = false;
+            }
 
-    //        // 3. Check Mutually Exclusive Skills
-    //        foreach (Enum exclusiveEnum in skillDef.MutuallyExclusive)
-    //        {
-    //            if (IsSkillUnlocked(exclusiveEnum)) return false;
-    //        }
+            // Infantry
+            foreach (InfantryDoctrine skill in Enum.GetValues(typeof(InfantryDoctrine)))
+            {
+                if (skill != InfantryDoctrine.None)
+                    unlockedSkills[skill] = false;
+            }
 
-    //        // 4. Special Cases from original logic (if any not covered by SkillDefinition structure)
-    //        // Example: QueenOfBattle OR logic, ReconnaissanceInForce OR logic
-    //        if (skillEnum is BattleDoctrineSkillPath bdSkill && bdSkill == BattleDoctrineSkillPath.QueenOfBattle)
-    //        {
-    //            bool nightFighting = IsSkillUnlocked(BattleDoctrineSkillPath.NightFightingSpecialist);
-    //            bool trenchWarfare = IsSkillUnlocked(BattleDoctrineSkillPath.TrenchWarfareExpert);
-    //            if (!nightFighting && !trenchWarfare) return false; // Needs at least one
-    //        }
-    //        if (skillEnum is CombatOperationsSkillPath coSkill && coSkill == CombatOperationsSkillPath.ReconnaissanceInForce)
-    //        {
-    //            bool hasTier1CO = IsSkillUnlocked(CombatOperationsSkillPath.OffensiveDoctrine) ||
-    //                              IsSkillUnlocked(CombatOperationsSkillPath.ManeuverDoctrine) ||
-    //                              IsSkillUnlocked(CombatOperationsSkillPath.PursuitDoctrine) ||
-    //                              IsSkillUnlocked(CombatOperationsSkillPath.SpecialistCorps);
-    //            if (!hasTier1CO) return false;
-    //        }
+            // Artillery
+            foreach (ArtilleryDoctrine skill in Enum.GetValues(typeof(ArtilleryDoctrine)))
+            {
+                if (skill != ArtilleryDoctrine.None)
+                    unlockedSkills[skill] = false;
+            }
 
-    //        return true;
-    //    }
+            // Air Defense
+            foreach (AirDefenseDoctrine skill in Enum.GetValues(typeof(AirDefenseDoctrine)))
+            {
+                if (skill != AirDefenseDoctrine.None)
+                    unlockedSkills[skill] = false;
+            }
 
-    //    public bool IsSkillUnlocked(Enum skillEnum)
-    //    {
-    //        return skillEnum switch
-    //        {
-    //            LeadershipPath csp => UnlockedCommandSkills.TryGetValue(csp, out bool unlocked) && unlocked,
-    //            RearAreaSkillPath rasp => UnlockedRearAreaSkills.TryGetValue(rasp, out bool unlocked) && unlocked,
-    //            BattleDoctrineSkillPath bdsp => UnlockedBattleDoctrineSkills.TryGetValue(bdsp, out bool unlocked) && unlocked,
-    //            CombatOperationsSkillPath cosp => UnlockedCombatOperationsSkills.TryGetValue(cosp, out bool unlocked) && unlocked,
-    //            _ => false
-    //        };
-    //    }
+            // Airborne
+            foreach (AirborneDoctrine skill in Enum.GetValues(typeof(AirborneDoctrine)))
+            {
+                if (skill != AirborneDoctrine.None)
+                    unlockedSkills[skill] = false;
+            }
 
-    //    private void SetSkillUnlockedStatus(Enum skillEnum, bool isUnlocked)
-    //    {
-    //        switch (skillEnum)
-    //        {
-    //            case LeadershipPath csp: UnlockedCommandSkills[csp] = isUnlocked; break;
-    //            case RearAreaSkillPath rasp: UnlockedRearAreaSkills[rasp] = isUnlocked; break;
-    //            case BattleDoctrineSkillPath bdsp: UnlockedBattleDoctrineSkills[bdsp] = isUnlocked; break;
-    //            case CombatOperationsSkillPath cosp: UnlockedCombatOperationsSkills[cosp] = isUnlocked; break;
-    //        }
-    //    }
+            // Air Mobile
+            foreach (AirMobileDoctrine skill in Enum.GetValues(typeof(AirMobileDoctrine)))
+            {
+                if (skill != AirMobileDoctrine.None)
+                    unlockedSkills[skill] = false;
+            }
 
-    //    public bool ResetAllSkills()
-    //    {
-    //        int refundedXP = 0;
-    //        bool skillsWereReset = false;
+            // IntelligenceDoctrine
+            foreach (IntelligenceDoctrine skill in Enum.GetValues(typeof(IntelligenceDoctrine)))
+            {
+                if (skill != IntelligenceDoctrine.None)
+                    unlockedSkills[skill] = false;
+            }
 
-    //        void ResetCategory<TEnum>(Dictionary<TEnum, bool> skillsDict) where TEnum : Enum
-    //        {
-    //            var keys = skillsDict.Keys.ToList(); // Avoid modification during iteration
-    //            foreach (TEnum skillKey in keys)
-    //            {
-    //                if (skillsDict[skillKey]) // If skill is unlocked
-    //                {
-    //                    if (LeaderSkillCatalog.TryGetSkillDefinition(skillKey, out var skillDef))
-    //                    {
-    //                        refundedXP += skillDef.XPCost;
-    //                    }
-    //                    skillsDict[skillKey] = false;
-    //                    skillsWereReset = true;
-    //                }
-    //            }
-    //        }
+            // Signal IntelligenceDoctrine
+            foreach (SignalIntelligenceSpecialization skill in Enum.GetValues(typeof(SignalIntelligenceSpecialization)))
+            {
+                if (skill != SignalIntelligenceSpecialization.None)
+                    unlockedSkills[skill] = false;
+            }
 
-    //        ResetCategory(UnlockedCommandSkills);
-    //        ResetCategory(UnlockedRearAreaSkills);
-    //        ResetCategory(UnlockedBattleDoctrineSkills);
-    //        ResetCategory(UnlockedCombatOperationsSkills);
+            // EngineeringSpecialization
+            foreach (EngineeringSpecialization skill in Enum.GetValues(typeof(EngineeringSpecialization)))
+            {
+                if (skill != EngineeringSpecialization.None)
+                    unlockedSkills[skill] = false;
+            }
 
-    //        if (skillsWereReset)
-    //        {
-    //            ExperiencePoints += refundedXP; // Directly add XP back
-    //            OnExperienceChanged?.Invoke(refundedXP, ExperiencePoints);
-    //            CheckPromotionAvailability();
-    //        }
-    //        // Note: Does not reset CommandGrade. Promotions are persistent.
-    //        return skillsWereReset;
-    //    }
+            // Special Forces
+            foreach (SpecialForcesSpecialization skill in Enum.GetValues(typeof(SpecialForcesSpecialization)))
+            {
+                if (skill != SpecialForcesSpecialization.None)
+                    unlockedSkills[skill] = false;
+            }
 
-    //    // --- Bonus Calculation Methods ---
-    //    // These methods now iterate unlocked skills and sum bonuses based on definitions in LeaderSkillCatalog
+            // Politically Connected
+            foreach (PoliticallyConnectedFoundation skill in Enum.GetValues(typeof(PoliticallyConnectedFoundation)))
+            {
+                if (skill != PoliticallyConnectedFoundation.None)
+                    unlockedSkills[skill] = false;
+            }
+        }
 
-    //    public float GetTotalExperienceBonusMultiplier() // Returns total multiplier, e.g., 1.25 for +25%
-    //    {
-    //        float totalMultiplier = 1.0f;
-    //        ProcessUnlockedSkills((skillDef) => {
-    //            if (skillDef.PrimaryBonusType == SkillBonusType.ReplacementXP)
-    //            {
-    //                totalMultiplier += skillDef.PrimaryBonusValue; // Assumes value is additive (0.25)
-    //            }
-    //        });
-    //        return totalMultiplier;
-    //    }
+        #endregion
 
-    //    public int GetTotalCommandRatingBonus()
-    //    {
-    //        int totalBonus = 0;
-    //        ProcessUnlockedSkills(skillDef => {
-    //            if (skillDef.PrimaryBonusType == SkillBonusType.Command) totalBonus += (int)skillDef.PrimaryBonusValue;
-    //        });
-    //        return totalBonus;
-    //    }
+        #region Experience Management
 
-    //    public float GetTotalSupplyConsumptionMultiplier() // e.g., 0.67 for 33% reduction
-    //    {
-    //        float finalMultiplier = 1.0f;
-    //        ProcessUnlockedSkills(skillDef => {
-    //            if (skillDef.PrimaryBonusType == SkillBonusType.SupplyConsumption)
-    //            {
-    //                // If multiple skills provide this, they should stack multiplicatively
-    //                finalMultiplier *= skillDef.PrimaryBonusValue;
-    //            }
-    //        });
-    //        return Math.Max(0.1f, finalMultiplier); // Ensure it doesn't go below a certain threshold
-    //    }
+        /// <summary>
+        /// Adds experience points to the leader's pool, applying any experience gain bonuses
+        /// </summary>
+        /// <param name="experienceAmount">Base experience to add</param>
+        public void AddExperience(int experienceAmount)
+        {
+            if (experienceAmount <= 0) return;
 
-    //    public float GetTotalPrestigeCostMultiplier() // e.g., 0.67 for 33% reduction
-    //    {
-    //        float finalMultiplier = 1.0f;
-    //        ProcessUnlockedSkills(skillDef => {
-    //            if (skillDef.PrimaryBonusType == SkillBonusType.PrestigeCost)
-    //            {
-    //                finalMultiplier *= skillDef.PrimaryBonusValue;
-    //            }
-    //        });
-    //        return Math.Max(0.1f, finalMultiplier);
-    //    }
+            // Apply experience gain bonuses
+            float experienceMultiplier = 1.0f;
+            if (HasCapability(SkillBonusType.ReplacementXP))
+            {
+                experienceMultiplier += GetBonusValue(SkillBonusType.ReplacementXP);
+            }
 
-    //    public bool HasEmergencyResupply()
-    //    {
-    //        bool hasSkill = false;
-    //        ProcessUnlockedSkills(skillDef => {
-    //            if (skillDef.PrimaryBonusType == SkillBonusType.EmergencyResupply) hasSkill = true;
-    //        }, stopEarlyIf: () => hasSkill);
-    //        return hasSkill;
-    //    }
+            int finalExperienceToAdd = (int)(experienceAmount * experienceMultiplier);
+            ExperiencePoints += finalExperienceToAdd;
 
-    //    // Add other GetTotal...Bonus methods similarly for HardDefense, SoftDefense, etc.
-    //    public int GetTotalHardDefenseBonus()
-    //    {
-    //        int totalBonus = 0;
-    //        ProcessUnlockedSkills(skillDef => {
-    //            if (skillDef.PrimaryBonusType == SkillBonusType.HardDefense) totalBonus += (int)skillDef.PrimaryBonusValue;
-    //        });
-    //        return totalBonus;
-    //    }
-    //    // ... and so on for all other specific bonuses.
+            OnExperienceChanged?.Invoke(finalExperienceToAdd, ExperiencePoints);
+            CheckPromotionAvailability();
+        }
 
-    //    public bool HasBreakthroughCapability()
-    //    {
-    //        bool hasSkill = false;
-    //        ProcessUnlockedSkills(skillDef => {
-    //            if (skillDef.PrimaryBonusType == SkillBonusType.Breakthrough) hasSkill = true;
-    //        }, stopEarlyIf: () => hasSkill);
-    //        return hasSkill;
-    //    }
+        /// <summary>
+        /// Spends experience points from the leader's pool
+        /// </summary>
+        /// <param name="experienceAmount">Amount to spend</param>
+        /// <returns>True if the experience was successfully spent</returns>
+        private bool SpendExperience(int experienceAmount)
+        {
+            if (experienceAmount <= 0 || ExperiencePoints < experienceAmount) return false;
 
-    //    /// <summary>
-    //    /// Helper to iterate over all unlocked skills of all types and apply an action.
-    //    /// </summary>
-    //    private void ProcessUnlockedSkills(Action<SkillDefinition> action, Func<bool> stopEarlyIf = null)
-    //    {
-    //        IEnumerable<Enum> allSkillEnums =
-    //            UnlockedCommandSkills.Where(kvp => kvp.Value).Select(kvp => (Enum)kvp.Key)
-    //            .Concat(UnlockedRearAreaSkills.Where(kvp => kvp.Value).Select(kvp => (Enum)kvp.Key))
-    //            .Concat(UnlockedBattleDoctrineSkills.Where(kvp => kvp.Value).Select(kvp => (Enum)kvp.Key))
-    //            .Concat(UnlockedCombatOperationsSkills.Where(kvp => kvp.Value).Select(kvp => (Enum)kvp.Key));
+            ExperiencePoints -= experienceAmount;
+            OnExperienceChanged?.Invoke(-experienceAmount, ExperiencePoints);
+            CheckPromotionAvailability();
+            return true;
+        }
 
-    //        foreach (Enum skillEnum in allSkillEnums)
-    //        {
-    //            if (stopEarlyIf != null && stopEarlyIf()) return;
+        /// <summary>
+        /// Checks if a promotion is available and fires the appropriate event
+        /// </summary>
+        private void CheckPromotionAvailability()
+        {
+            if (CanAffordSeniorPromotion)
+            {
+                OnPromotionAvailable?.Invoke(CommandGrade.SeniorGrade);
+            }
+            else if (CanAffordTopPromotion)
+            {
+                OnPromotionAvailable?.Invoke(CommandGrade.TopGrade);
+            }
+        }
 
-    //            if (LeaderSkillCatalog.TryGetSkillDefinition(skillEnum, out SkillDefinition skillDef))
-    //            {
-    //                action(skillDef);
-    //            }
-    //        }
-    //    }
-    //}
+        #endregion
+
+        #region Skill Management
+
+        /// <summary>
+        /// Checks if a skill can be unlocked, considering prerequisites, branch exclusivity,
+        /// command grade requirements, and available experience points
+        /// </summary>
+        /// <param name="skillEnum">The skill to check</param>
+        /// <returns>True if the skill can be unlocked, false otherwise</returns>
+        public bool CanUnlockSkill(Enum skillEnum)
+        {
+            if (Convert.ToInt32(skillEnum) == 0) return false; // 'None' enum value
+            if (IsSkillUnlocked(skillEnum)) return false; // Already unlocked
+
+            // Get the skill definition from the catalog
+            if (!LeaderSkillCatalog.TryGetSkillDefinition(skillEnum, out SkillDefinition skillDef))
+            {
+                return false; // Skill not found in catalog
+            }
+
+            // Check XP cost
+            if (ExperiencePoints < skillDef.XPCost) return false;
+
+            // Check command grade requirement
+            if (CurrentGrade < skillDef.RequiredGrade) return false;
+
+            // Check branch exclusivity
+            if (!IsBranchAvailable(skillDef.Branch)) return false;
+
+            // Check prerequisites
+            foreach (Enum prereqEnum in skillDef.Prerequisites)
+            {
+                if (!IsSkillUnlocked(prereqEnum)) return false;
+            }
+
+            // Check mutually exclusive skills
+            foreach (Enum exclusiveEnum in skillDef.MutuallyExclusive)
+            {
+                if (IsSkillUnlocked(exclusiveEnum)) return false;
+            }
+
+            // Skill is available to unlock
+            return true;
+        }
+
+        /// <summary>
+        /// Attempts to unlock a skill, spending experience and applying effects
+        /// </summary>
+        /// <param name="skillEnum">The skill to unlock</param>
+        /// <returns>True if the skill was successfully unlocked</returns>
+        public bool UnlockSkill(Enum skillEnum)
+        {
+            if (!CanUnlockSkill(skillEnum)) return false;
+
+            if (!LeaderSkillCatalog.TryGetSkillDefinition(skillEnum, out SkillDefinition skillDef))
+            {
+                return false; // Should never happen if CanUnlockSkill returned true
+            }
+
+            // Spend the experience
+            if (!SpendExperience(skillDef.XPCost)) return false;
+
+            // Track the branch if this is the first skill in it
+            startedBranches.Add(skillDef.Branch);
+
+            // Mark the skill as unlocked
+            unlockedSkills[skillEnum] = true;
+
+            // Handle promotion skills
+            if (skillDef.GetPrimaryEffect()?.BonusType == SkillBonusType.SeniorPromotion)
+            {
+                CurrentGrade = CommandGrade.SeniorGrade;
+                OnGradeChanged?.Invoke(CurrentGrade);
+            }
+            else if (skillDef.GetPrimaryEffect()?.BonusType == SkillBonusType.TopPromotion)
+            {
+                CurrentGrade = CommandGrade.TopGrade;
+                OnGradeChanged?.Invoke(CurrentGrade);
+            }
+
+            // Mark caches as dirty
+            isDirty = true;
+
+            // Fire events
+            OnSkillUnlocked?.Invoke(skillEnum, skillDef.Name, skillDef.GetFullDescription());
+            OnBranchTierUnlocked?.Invoke(skillDef.Branch, skillDef.Tier);
+
+            // Fire capability events for each effect that is boolean
+            foreach (var effect in skillDef.Effects)
+            {
+                if (effect.IsBoolean)
+                {
+                    OnCapabilityUnlocked?.Invoke(effect.BonusType);
+                }
+            }
+
+            return true;
+        }
+
+        /// <summary>
+        /// Checks if a specific skill is unlocked
+        /// </summary>
+        /// <param name="skillEnum">The skill to check</param>
+        /// <returns>True if the skill is unlocked</returns>
+        public bool IsSkillUnlocked(Enum skillEnum)
+        {
+            if (Convert.ToInt32(skillEnum) == 0) return false; // 'None' enum
+            return unlockedSkills.TryGetValue(skillEnum, out bool isUnlocked) && isUnlocked;
+        }
+
+        /// <summary>
+        /// Checks if the leader has started a specific branch
+        /// </summary>
+        /// <param name="branch">The branch to check</param>
+        /// <returns>True if the leader has at least one skill in this branch</returns>
+        public bool HasStartedBranch(SkillBranch branch)
+        {
+            return startedBranches.Contains(branch);
+        }
+
+        /// <summary>
+        /// Checks if a branch is available to start, considering exclusivity rules
+        /// </summary>
+        /// <param name="branch">The branch to check</param>
+        /// <returns>True if the branch can be started</returns>
+        public bool IsBranchAvailable(SkillBranch branch)
+        {
+            // LeadershipFoundation and PoliticallyConnectedFoundation can always be combined with other branches
+            if (branch == SkillBranch.LeadershipFoundation || branch == SkillBranch.PoliticallyConnectedFoundation)
+            {
+                return true;
+            }
+
+            // If we've already started this branch, it's available
+            if (HasStartedBranch(branch))
+            {
+                return true;
+            }
+
+            // Check exclusivity with other branches
+            foreach (SkillBranch startedBranch in startedBranches)
+            {
+                // Skip LeadershipFoundation and PoliticallyConnectedFoundation as they're not exclusive
+                if (startedBranch == SkillBranch.LeadershipFoundation || startedBranch == SkillBranch.PoliticallyConnectedFoundation)
+                {
+                    continue;
+                }
+
+                // If we've started any other branch (not LeadershipFoundation/PoliticallyConnectedFoundation), 
+                // we can't start a new one
+                return false;
+            }
+
+            // No exclusive branches started, so this branch is available
+            return true;
+        }
+
+        #endregion
+
+        #region Bonus Calculations
+
+        /// <summary>
+        /// Gets the total bonus value for a specific bonus type from all unlocked skills
+        /// </summary>
+        /// <param name="bonusType">The type of bonus to calculate</param>
+        /// <param name="onlyBoolean">If true, only consider boolean effects</param>
+        /// <returns>The total bonus value (additive for most, multiplicative for some types)</returns>
+        public float GetBonusValue(SkillBonusType bonusType, bool onlyBoolean = false)
+        {
+            // Try to return from cache if not dirty
+            if (!isDirty && bonusCache.TryGetValue(bonusType, out float cachedValue))
+            {
+                return cachedValue;
+            }
+
+            float totalBonus = 0f;
+            bool isMultiplicative = IsMultiplicativeBonus(bonusType);
+
+            if (isMultiplicative)
+            {
+                totalBonus = 1.0f; // Start at 1.0 for multiplicative bonuses
+            }
+
+            // Process all unlocked skills
+            ProcessUnlockedSkills(skillDef =>
+            {
+                foreach (var effect in skillDef.Effects)
+                {
+                    if (effect.BonusType == bonusType)
+                    {
+                        if (onlyBoolean && !effect.IsBoolean) continue;
+
+                        if (isMultiplicative)
+                        {
+                            totalBonus *= effect.BonusValue;
+                        }
+                        else
+                        {
+                            totalBonus += effect.BonusValue;
+                        }
+                    }
+                }
+            });
+
+            // Cache the result
+            bonusCache[bonusType] = totalBonus;
+
+            return totalBonus;
+        }
+
+        /// <summary>
+        /// Checks if the leader has a specific boolean capability
+        /// </summary>
+        /// <param name="bonusType">The capability to check for</param>
+        /// <returns>True if the leader has this capability</returns>
+        public bool HasCapability(SkillBonusType bonusType)
+        {
+            // Try to return from cache if not dirty
+            if (!isDirty && capabilityCache.TryGetValue(bonusType, out bool cachedValue))
+            {
+                return cachedValue;
+            }
+
+            bool hasCapability = false;
+
+            // Process unlocked skills until we find one that grants this capability
+            ProcessUnlockedSkills(skillDef =>
+            {
+                foreach (var effect in skillDef.Effects)
+                {
+                    if (effect.BonusType == bonusType && effect.IsBoolean && effect.BonusValue > 0)
+                    {
+                        hasCapability = true;
+                        break;
+                    }
+                }
+            },
+            stopEarlyIf: () => hasCapability);
+
+            // Cache the result
+            capabilityCache[bonusType] = hasCapability;
+
+            return hasCapability;
+        }
+
+        /// <summary>
+        /// Helper method to determine if a bonus type should be calculated multiplicatively
+        /// </summary>
+        private bool IsMultiplicativeBonus(SkillBonusType bonusType)
+        {
+            // These bonus types stack multiplicatively
+            return bonusType == SkillBonusType.SupplyConsumption ||
+                   bonusType == SkillBonusType.PrestigeCost;
+        }
+
+        /// <summary>
+        /// Clears all bonus caches, forcing recalculation on next access
+        /// </summary>
+        private void ClearBonusCaches()
+        {
+            bonusCache.Clear();
+            capabilityCache.Clear();
+            isDirty = false;
+        }
+
+        #endregion
+
+        #region Skill Reset (Respec)
+
+        /// <summary>
+        /// Resets all skills, refunding experience points
+        /// </summary>
+        /// <returns>True if any skills were reset</returns>
+        public bool ResetAllSkills()
+        {
+            int refundedXP = 0;
+            bool skillsWereReset = false;
+
+            // Get all unlocked skills
+            var unlockedSkillKeys = unlockedSkills.Where(kvp => kvp.Value).Select(kvp => kvp.Key).ToList();
+
+            foreach (Enum skillEnum in unlockedSkillKeys)
+            {
+                if (LeaderSkillCatalog.TryGetSkillDefinition(skillEnum, out SkillDefinition skillDef))
+                {
+                    // Skip promotion skills - once promoted, always promoted
+                    if (skillDef.GetPrimaryEffect()?.BonusType == SkillBonusType.SeniorPromotion ||
+                        skillDef.GetPrimaryEffect()?.BonusType == SkillBonusType.TopPromotion)
+                    {
+                        continue;
+                    }
+
+                    refundedXP += skillDef.XPCost;
+                    unlockedSkills[skillEnum] = false;
+                    skillsWereReset = true;
+                }
+            }
+
+            if (skillsWereReset)
+            {
+                // Reset branch tracking (except LeadershipFoundation which is tied to promotions)
+                startedBranches.RemoveWhere(b =>
+                    b != SkillBranch.LeadershipFoundation);
+
+                // Add refunded XP
+                ExperiencePoints += refundedXP;
+                OnExperienceChanged?.Invoke(refundedXP, ExperiencePoints);
+
+                // Clear caches
+                isDirty = true;
+                ClearBonusCaches();
+            }
+
+            return skillsWereReset;
+        }
+
+        /// <summary>
+        /// Resets all skills in a specific branch, refunding experience points
+        /// </summary>
+        /// <param name="branch">The branch to reset</param>
+        /// <returns>True if any skills were reset</returns>
+        public bool ResetBranch(SkillBranch branch)
+        {
+            // Cannot reset LeadershipFoundation branch (contains promotions)
+            if (branch == SkillBranch.LeadershipFoundation) return false;
+
+            int refundedXP = 0;
+            bool skillsWereReset = false;
+
+            // Get all unlocked skills in this branch
+            var branchSkills = unlockedSkills.Where(kvp => kvp.Value).Select(kvp => kvp.Key)
+                .Where(key =>
+                {
+                    if (LeaderSkillCatalog.TryGetSkillDefinition(key, out SkillDefinition def))
+                    {
+                        return def.Branch == branch;
+                    }
+                    return false;
+                })
+                .ToList();
+
+            foreach (Enum skillEnum in branchSkills)
+            {
+                if (LeaderSkillCatalog.TryGetSkillDefinition(skillEnum, out SkillDefinition skillDef))
+                {
+                    refundedXP += skillDef.XPCost;
+                    unlockedSkills[skillEnum] = false;
+                    skillsWereReset = true;
+                }
+            }
+
+            if (skillsWereReset)
+            {
+                // Remove branch from tracking
+                startedBranches.Remove(branch);
+
+                // Add refunded XP
+                ExperiencePoints += refundedXP;
+                OnExperienceChanged?.Invoke(refundedXP, ExperiencePoints);
+
+                // Clear caches
+                isDirty = true;
+                ClearBonusCaches();
+            }
+
+            return skillsWereReset;
+        }
+
+        /// <summary>
+        /// Resets all skills except those in the LeadershipFoundation branch
+        /// </summary>
+        /// <returns>True if any skills were reset</returns>
+        public bool ResetAllSkillsExceptLeadership()
+        {
+            int refundedXP = 0;
+            bool skillsWereReset = false;
+
+            // Get all unlocked skills not in LeadershipFoundation branch
+            var nonLeadershipSkills = unlockedSkills.Where(kvp => kvp.Value).Select(kvp => kvp.Key)
+                .Where(key =>
+                {
+                    if (LeaderSkillCatalog.TryGetSkillDefinition(key, out SkillDefinition def))
+                    {
+                        return def.Branch != SkillBranch.LeadershipFoundation;
+                    }
+                    return false;
+                })
+                .ToList();
+
+            foreach (Enum skillEnum in nonLeadershipSkills)
+            {
+                if (LeaderSkillCatalog.TryGetSkillDefinition(skillEnum, out SkillDefinition skillDef))
+                {
+                    refundedXP += skillDef.XPCost;
+                    unlockedSkills[skillEnum] = false;
+                    skillsWereReset = true;
+                }
+            }
+
+            if (skillsWereReset)
+            {
+                // Reset branch tracking (except LeadershipFoundation)
+                startedBranches.RemoveWhere(b =>
+                    b != SkillBranch.LeadershipFoundation);
+
+                // Add refunded XP
+                ExperiencePoints += refundedXP;
+                OnExperienceChanged?.Invoke(refundedXP, ExperiencePoints);
+
+                // Clear caches
+                isDirty = true;
+                ClearBonusCaches();
+            }
+
+            return skillsWereReset;
+        }
+
+        #endregion
+
+        #region Helper Methods
+
+        /// <summary>
+        /// Helper to iterate over all unlocked skills and apply an action
+        /// </summary>
+        /// <param name="action">Action to apply to each unlocked skill definition</param>
+        /// <param name="stopEarlyIf">Optional function to check if iteration should stop early</param>
+        private void ProcessUnlockedSkills(Action<SkillDefinition> action, Func<bool> stopEarlyIf = null)
+        {
+            // Get all unlocked skills
+            var unlockedSkillKeys = unlockedSkills.Where(kvp => kvp.Value).Select(kvp => kvp.Key);
+
+            foreach (Enum skillEnum in unlockedSkillKeys)
+            {
+                // Stop early if requested
+                if (stopEarlyIf != null && stopEarlyIf()) return;
+
+                if (LeaderSkillCatalog.TryGetSkillDefinition(skillEnum, out SkillDefinition skillDef))
+                {
+                    action(skillDef);
+                }
+            }
+        }
+
+        #endregion
+
+        #region Serialization Support
+
+        /// <summary>
+        /// Saves the current state to a serializable data object
+        /// </summary>
+        /// <returns>Serializable skill tree data</returns>
+        public LeaderSkillTreeData ToSerializableData()
+        {
+            var data = new LeaderSkillTreeData
+            {
+                ExperiencePoints = this.ExperiencePoints,
+                CurrentGrade = this.CurrentGrade,
+                StartedBranches = this.startedBranches.Select(b => (int)b).ToList(),
+                UnlockedSkills = new List<SkillReference>()
+            };
+
+            foreach (var kvp in unlockedSkills.Where(kvp => kvp.Value))
+            {
+                // Only save skills that are actually unlocked
+                var skillRef = new SkillReference
+                {
+                    EnumType = kvp.Key.GetType().Name,
+                    EnumValue = Convert.ToInt32(kvp.Key)
+                };
+
+                data.UnlockedSkills.Add(skillRef);
+            }
+
+            return data;
+        }
+
+        /// <summary>
+        /// Loads state from serialized data
+        /// </summary>
+        /// <param name="data">The serialized skill tree data</param>
+        public void FromSerializableData(LeaderSkillTreeData data)
+        {
+            if (data == null) return;
+
+            // Reset current state
+            unlockedSkills.Clear();
+            startedBranches.Clear();
+            InitializeSkillDictionaries();
+
+            // Load basic properties
+            ExperiencePoints = data.ExperiencePoints;
+            CurrentGrade = data.CurrentGrade;
+
+            // Load branches
+            foreach (int branchId in data.StartedBranches)
+            {
+                startedBranches.Add((SkillBranch)branchId);
+            }
+
+            // Load skills
+            foreach (var skillRef in data.UnlockedSkills)
+            {
+                Enum skillEnum = DeserializeSkillEnum(skillRef);
+                if (skillEnum != null)
+                {
+                    unlockedSkills[skillEnum] = true;
+                }
+            }
+
+            // Clear caches
+            isDirty = true;
+            ClearBonusCaches();
+        }
+
+        /// <summary>
+        /// Deserializes a skill enum from a skill reference
+        /// </summary>
+        private Enum DeserializeSkillEnum(SkillReference skillRef)
+        {
+            try
+            {
+                // Convert enum type name to Type
+                Type enumType = null;
+                switch (skillRef.EnumType)
+                {
+                    case nameof(LeadershipFoundation): enumType = typeof(LeadershipFoundation); break;
+                    case nameof(ArmoredDoctrine): enumType = typeof(ArmoredDoctrine); break;
+                    case nameof(InfantryDoctrine): enumType = typeof(InfantryDoctrine); break;
+                    case nameof(ArtilleryDoctrine): enumType = typeof(ArtilleryDoctrine); break;
+                    case nameof(AirDefenseDoctrine): enumType = typeof(AirDefenseDoctrine); break;
+                    case nameof(AirborneDoctrine): enumType = typeof(AirborneDoctrine); break;
+                    case nameof(AirMobileDoctrine): enumType = typeof(AirMobileDoctrine); break;
+                    case nameof(IntelligenceDoctrine): enumType = typeof(IntelligenceDoctrine); break;
+                    case nameof(SignalIntelligenceSpecialization): enumType = typeof(SignalIntelligenceSpecialization); break;
+                    case nameof(EngineeringSpecialization): enumType = typeof(EngineeringSpecialization); break;
+                    case nameof(SpecialForcesSpecialization): enumType = typeof(SpecialForcesSpecialization); break;
+                    case nameof(PoliticallyConnectedFoundation): enumType = typeof(PoliticallyConnectedFoundation); break;
+                    default: return null;
+                }
+
+                // Convert int value to enum
+                return (Enum)Enum.ToObject(enumType, skillRef.EnumValue);
+            }
+            catch
+            {
+                // If any error occurs, return null
+                return null;
+            }
+        }
+
+        #endregion
+    }
+
+    /// <summary>
+    /// Serializable data structure for saving/loading leader skill trees
+    /// </summary>
+    [Serializable]
+    public class LeaderSkillTreeData
+    {
+        public int ExperiencePoints;
+        public CommandGrade CurrentGrade;
+        public List<int> StartedBranches;
+        public List<SkillReference> UnlockedSkills;
+    }
+
+    /// <summary>
+    /// Serializable reference to a skill enum
+    /// </summary>
+    [Serializable]
+    public class SkillReference
+    {
+        public string EnumType;  // Name of the enum type
+        public int EnumValue;    // Integer value of the enum
+    }
 }

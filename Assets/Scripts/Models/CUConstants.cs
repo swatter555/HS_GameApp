@@ -39,6 +39,7 @@ namespace HammerAndSickle.Models
         public const int TIER2_XP_COST = 75;
         public const int TIER3_XP_COST = 100;
         public const int TIER4_XP_COST = 150;
+        public const int TIER5_XP_COST = 225;
 
         // Command and Operation bonuses (typically +1 for actions)
         public const int COMMAND_BONUS_VAL = 1;
@@ -57,7 +58,8 @@ namespace HammerAndSickle.Models
 
         // Spotting and range bonuses.
         public const int SMALL_SPOTTING_RANGE_BONUS_VAL = 1;
-        public const int LARGE_SPOTTING_RANGE_BONUS_VAL = 5;
+        public const int MEDIUM_SPOTTING_RANGE_BONUS_VAL = 2;
+        public const int LARGE_SPOTTING_RANGE_BONUS_VAL = 3;
         public const int INDIRECT_RANGE_BONUS_VAL = 1;
 
         // Special terrain combat bonuses
@@ -70,7 +72,7 @@ namespace HammerAndSickle.Models
         public const float SUPPLY_ECONOMY_REDUCTION_VAL = 0.33f; // 33% supply cost reduction
         public const float PRESTIGE_COST_REDUCTION_VAL = 0.33f;  // 33% prestige cost reduction
 
-        // Engineering specific
+        // EngineeringSpecialization specific
         public const float RIVER_CROSSING_BONUS_VAL = 0.5f; // 50% movement cost reduction
         public const float RIVER_ASSAULT_BONUS_VAL = 0.25f; // 25% combat penalty reduction
 
