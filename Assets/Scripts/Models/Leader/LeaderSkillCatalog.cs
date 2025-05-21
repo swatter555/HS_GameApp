@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Xml.Serialization;
 using UnityEngine;
 
 namespace HammerAndSickle.Models
@@ -46,7 +47,6 @@ namespace HammerAndSickle.Models
             BonusType == SkillBonusType.RiverAssault ||
             BonusType == SkillBonusType.BridgeBuilding ||
             BonusType == SkillBonusType.FieldFortification ||
-            BonusType == SkillBonusType.TerrainMastery ||
             BonusType == SkillBonusType.InfiltrationMovement ||
             BonusType == SkillBonusType.ConcealedPositions ||
             BonusType == SkillBonusType.AmbushTactics ||
@@ -54,11 +54,10 @@ namespace HammerAndSickle.Models
             BonusType == SkillBonusType.SpaceAssets ||
             BonusType == SkillBonusType.ElectronicWarfare ||
             BonusType == SkillBonusType.PatternRecognition ||
-            BonusType == SkillBonusType.UrbanCombat ||
-            BonusType == SkillBonusType.RoughTerrain ||
+            BonusType == SkillBonusType.RoughTerrainMovt ||
             BonusType == SkillBonusType.NightCombat ||
             BonusType == SkillBonusType.EmergencyResupply ||
-            BonusType == SkillBonusType.NVG ||
+            BonusType == SkillBonusType.TerrainMastery ||
             BonusType == SkillBonusType.SeniorPromotion ||
             BonusType == SkillBonusType.TopPromotion;
 
@@ -91,8 +90,6 @@ namespace HammerAndSickle.Models
             }
         }
     }
-
-    
 
     /// <summary>
     /// Defines a leader skill with all its attributes, requirements, and effects
@@ -278,24 +275,25 @@ namespace HammerAndSickle.Models
         /// </summary>
         static LeaderSkillCatalog()
         {
-            InitializeLeadershipSkills();
-            InitializeArmoredWarfareSkills();
-            InitializeInfantryDoctrineSkills();
-            InitializeArtilleryDoctrineSkills();
-            InitializeAirDefenseDoctrineSkills();
-            InitializeAirborneDoctrineSkills();
-            InitializeAirMobileDoctrineSkills();
-            InitializeIntelligenceDoctrine();
-            InitializeSignalIntelligenceSpecialization();
-            InitializeEngineeringSkills();
-            InitializeSpecialForcesDoctrineSkills();
-            InitializePoliticallyConnectedSkills();
+            InitLeadership();
+            InitPoliticallyConnected();
+            InitArmoredWarfareDoctrine();
+            InitInfantryDoctrine();
+            InitArtilleryDoctrine();
+            InitAirDefenseDoctrine();
+            InitAirborneDoctrine();
+            InitAirMobileDoctrine();
+            InitIntelligenceDoctrine();
+            InitSignalIntelligenceSpecialization();
+            InitEngineeringSkills();
+            InitSpecialForcesDoctrine();
+            InitCombinedArmsSpecialization();
         }
 
         /// <summary>
         /// Initialize leadership skills - command progression and promotions
         /// </summary>
-        private static void InitializeLeadershipSkills()
+        private static void InitLeadership()
         {
             // Tier 1: Junior Officer Training
             AddSkill(new SkillDefinition(
@@ -345,7 +343,7 @@ namespace HammerAndSickle.Models
                 SkillTier.Tier4,
                 "Promotion to Top Grade grants the highest level of command authority and strategic influence.",
                 SkillBonusType.TopPromotion, // Boolean capability
-                CommandGrade.SeniorGrade,
+                CommandGrade.TopGrade,
                 new List<Enum> { LeadershipFoundation.SeniorOfficerTraining_CommandTier2 }
             ));
 
@@ -367,7 +365,7 @@ namespace HammerAndSickle.Models
         /// <summary>
         /// Initialize armored warfare skills - tank/mechanized combat specialization
         /// </summary>
-        private static void InitializeArmoredWarfareSkills()
+        private static void InitArmoredWarfareDoctrine()
         {
             // Tier 1: Shock Tank Corps - Hard Attack bonus
             AddSkill(new SkillDefinition(
@@ -378,7 +376,8 @@ namespace HammerAndSickle.Models
                 SkillTier.Tier1,
                 "Specialization in armored assault tactics increases hard target attack effectiveness.",
                 SkillBonusType.HardAttack,
-                CUConstants.HARD_ATTACK_BONUS_VAL
+                CUConstants.HARD_ATTACK_BONUS_VAL,
+                CommandGrade.JuniorGrade
             ));
 
             // Tier 2: Hull Down Expert - Hard Defense bonus
@@ -391,7 +390,7 @@ namespace HammerAndSickle.Models
                 "Training in defensive positioning techniques increases armor protection and survivability.",
                 SkillBonusType.HardDefense,
                 CUConstants.HARD_DEFENSE_BONUS_VAL,
-                CommandGrade.JuniorGrade,
+                CommandGrade.SeniorGrade,
                 new List<Enum> { ArmoredDoctrine.ShockTankCorps_HardAttack }
             ));
 
@@ -407,25 +406,12 @@ namespace HammerAndSickle.Models
                 CommandGrade.SeniorGrade,
                 new List<Enum> { ArmoredDoctrine.HullDownExpert_HardDefense }
             ));
-
-            // Tier 4: Night Fighting Specialist - Night vision capability
-            AddSkill(new SkillDefinition(
-                ArmoredDoctrine.NightFightingSpecialist_NVG,
-                "Night Fighting Specialist",
-                CUConstants.TIER4_XP_COST,
-                SkillBranch.ArmoredDoctrine,
-                SkillTier.Tier4,
-                "Elite training in night operations with advanced equipment allows effective combat in darkness.",
-                SkillBonusType.NVG, // Boolean capability
-                CommandGrade.TopGrade,
-                new List<Enum> { ArmoredDoctrine.PursuitDoctrine_Breakthrough }
-            ));
         }
 
         /// <summary>
         /// Initialize infantry doctrine skills - soft-target and tactical infantry operations
         /// </summary>
-        private static void InitializeInfantryDoctrineSkills()
+        private static void InitInfantryDoctrine()
         {
             // Tier 1: Infantry Assault Tactics - Soft Attack bonus
             AddSkill(new SkillDefinition(
@@ -436,7 +422,8 @@ namespace HammerAndSickle.Models
                 SkillTier.Tier1,
                 "Specialized infantry assault training increases effectiveness against soft targets.",
                 SkillBonusType.SoftAttack,
-                CUConstants.SOFT_ATTACK_BONUS_VAL
+                CUConstants.SOFT_ATTACK_BONUS_VAL,
+                CommandGrade.JuniorGrade
             ));
 
             // Tier 2: Defensive Doctrine - Soft Defense bonus
@@ -449,41 +436,28 @@ namespace HammerAndSickle.Models
                 "Training in defensive tactics and entrenchment improves infantry survivability.",
                 SkillBonusType.SoftDefense,
                 CUConstants.SOFT_DEFENSE_BONUS_VAL,
-                CommandGrade.JuniorGrade,
+                CommandGrade.SeniorGrade,
                 new List<Enum> { InfantryDoctrine.InfantryAssaultTactics_SoftAttack }
             ));
 
-            // Tier 3: Urban Combat Specialist - Urban combat bonus
+            // Tier 3: Rough Terrain Operations - Rough terrain bonus
             AddSkill(new SkillDefinition(
-                InfantryDoctrine.UrbanCombatSpecialist_UrbanCombat,
-                "Urban Combat Specialist",
+                InfantryDoctrine.TerrainAdvantage_RoughTerrainMovt,
+                "Rough Terrain Operations",
                 CUConstants.TIER3_XP_COST,
                 SkillBranch.InfantryDoctrine,
                 SkillTier.Tier3,
-                "Advanced training in built-up area operations significantly improves combat effectiveness in urban terrain.",
-                SkillBonusType.UrbanCombat, // Boolean capability
+                "Advanced navigation training for rough terrain.",
+                SkillBonusType.RoughTerrainMovt, // Boolean capability
                 CommandGrade.SeniorGrade,
                 new List<Enum> { InfantryDoctrine.DefensiveDoctrine_SoftDefense }
-            ));
-
-            // Tier 4: Rough Terrain Operations - Rough terrain bonus
-            AddSkill(new SkillDefinition(
-                InfantryDoctrine.RoughTerrainOperations_RoughTerrain,
-                "Rough Terrain Operations",
-                CUConstants.TIER4_XP_COST,
-                SkillBranch.InfantryDoctrine,
-                SkillTier.Tier4,
-                "Elite training in difficult terrain operations enhances combat effectiveness in mountains, forests, and swamps.",
-                SkillBonusType.RoughTerrain, // Boolean capability
-                CommandGrade.TopGrade,
-                new List<Enum> { InfantryDoctrine.UrbanCombatSpecialist_UrbanCombat }
             ));
         }
 
         /// <summary>
         /// Initialize artillery doctrine skills - indirect fire and precision targeting
         /// </summary>
-        private static void InitializeArtilleryDoctrineSkills()
+        private static void InitArtilleryDoctrine()
         {
             // Tier 1: Precision Targeting - Range bonus
             AddSkill(new SkillDefinition(
@@ -494,7 +468,8 @@ namespace HammerAndSickle.Models
                 SkillTier.Tier1,
                 "Improved artillery targeting techniques extend effective range of indirect fire weapons.",
                 SkillBonusType.IndirectRange,
-                CUConstants.INDIRECT_RANGE_BONUS_VAL
+                CUConstants.INDIRECT_RANGE_BONUS_VAL,
+                CommandGrade.JuniorGrade
             ));
 
             // Tier 2: Mobile Artillery Doctrine - Shoot and scoot capability
@@ -506,7 +481,7 @@ namespace HammerAndSickle.Models
                 SkillTier.Tier2,
                 "Training in rapid redeployment allows artillery to fire and then move in the same turn.",
                 SkillBonusType.ShootAndScoot, // Boolean capability
-                CommandGrade.JuniorGrade,
+                CommandGrade.SeniorGrade,
                 new List<Enum> { ArtilleryDoctrine.PrecisionTargeting_IndirectRange }
             ));
 
@@ -527,7 +502,7 @@ namespace HammerAndSickle.Models
         /// <summary>
         /// Initialize air defense doctrine skills - anti-air and opportunity fire
         /// </summary>
-        private static void InitializeAirDefenseDoctrineSkills()
+        private static void InitAirDefenseDoctrine()
         {
             // Tier 1: Offensive Air Defense - Air Attack bonus
             AddSkill(new SkillDefinition(
@@ -538,7 +513,8 @@ namespace HammerAndSickle.Models
                 SkillTier.Tier1,
                 "Aggressive anti-aircraft tactics increase effectiveness against air targets.",
                 SkillBonusType.AirAttack,
-                CUConstants.AIR_ATTACK_BONUS_VAL
+                CUConstants.AIR_ATTACK_BONUS_VAL,
+                CommandGrade.JuniorGrade
             ));
 
             // Tier 2: Integrated Air Defense System - Air Defense bonus
@@ -551,7 +527,7 @@ namespace HammerAndSickle.Models
                 "Coordinated air defense network improves survivability against air attacks.",
                 SkillBonusType.AirDefense,
                 CUConstants.AIR_DEFENSE_BONUS_VAL,
-                CommandGrade.JuniorGrade,
+                CommandGrade.SeniorGrade,
                 new List<Enum> { AirDefenseDoctrine.OffensiveAirDefense_AirAttack }
             ));
 
@@ -572,7 +548,7 @@ namespace HammerAndSickle.Models
         /// <summary>
         /// Initialize airborne doctrine skills - paratrooper operations
         /// </summary>
-        private static void InitializeAirborneDoctrineSkills()
+        private static void InitAirborneDoctrine()
         {
             // Tier 1: Rapid Deployment Planning - Impromptu Planning capability
             AddSkill(new SkillDefinition(
@@ -582,7 +558,8 @@ namespace HammerAndSickle.Models
                 SkillBranch.AirborneDoctrine,
                 SkillTier.Tier1,
                 "Streamlined planning procedures allow boarding aircraft without spending an action.",
-                SkillBonusType.ImpromptuPlanning // Boolean capability
+                SkillBonusType.ImpromptuPlanning,  // Boolean capability
+                CommandGrade.JuniorGrade
             ));
 
             // Tier 2: Combat Drop Doctrine - Airborne Assault capability
@@ -594,7 +571,7 @@ namespace HammerAndSickle.Models
                 SkillTier.Tier2,
                 "Advanced combat drop training reduces suppression impact for paratroopers after landing.",
                 SkillBonusType.AirborneAssault, // Boolean capability
-                CommandGrade.JuniorGrade,
+                CommandGrade.SeniorGrade,
                 new List<Enum> { AirborneDoctrine.RapidDeploymentPlanning_ImpromptuPlanning }
             ));
 
@@ -615,7 +592,7 @@ namespace HammerAndSickle.Models
         /// <summary>
         /// Initialize air mobile doctrine skills - helicopter operations
         /// </summary>
-        private static void InitializeAirMobileDoctrineSkills()
+        private static void InitAirMobileDoctrine()
         {
             // Tier 1: Rapid Redeployment - Air Mobile capability
             AddSkill(new SkillDefinition(
@@ -625,7 +602,8 @@ namespace HammerAndSickle.Models
                 SkillBranch.AirMobileDoctrine,
                 SkillTier.Tier1,
                 "Improved helicopter operations allow units to move after air landing.",
-                SkillBonusType.AirMobile // Boolean capability
+                SkillBonusType.AirMobile, // Boolean capability
+                CommandGrade.JuniorGrade
             ));
 
             // Tier 2: Heliborne Strike Force - Air Mobile Assault capability
@@ -637,7 +615,7 @@ namespace HammerAndSickle.Models
                 SkillTier.Tier2,
                 "Combat-focused air mobile operations allow units to still have a combat action after landing.",
                 SkillBonusType.AirMobileAssault, // Boolean capability
-                CommandGrade.JuniorGrade,
+                CommandGrade.SeniorGrade,
                 new List<Enum> { AirMobileDoctrine.RapidRedeployment_AirMobile }
             ));
 
@@ -658,7 +636,7 @@ namespace HammerAndSickle.Models
         /// <summary>
         /// Initialize intelligence skills - reconnaissance and target acquisition
         /// </summary>
-        private static void InitializeIntelligenceDoctrine()
+        private static void InitIntelligenceDoctrine()
         {
             // Tier 1: Enhanced IntelligenceDoctrine Collection - Intel actions bonus
             AddSkill(new SkillDefinition(
@@ -669,7 +647,8 @@ namespace HammerAndSickle.Models
                 SkillTier.Tier1,
                 "Improved intelligence gathering techniques provide additional intel actions each turn.",
                 SkillBonusType.ImprovedGathering,
-                CUConstants.DEPLOYMENT_ACTION_BONUS_VAL
+                CUConstants.DEPLOYMENT_ACTION_BONUS_VAL,
+                CommandGrade.JuniorGrade
             ));
 
             // Tier 2: Concealed Operations Base - Underground Bunker capability
@@ -694,15 +673,73 @@ namespace HammerAndSickle.Models
                 SkillTier.Tier3,
                 "Satellite intelligence provides a chance to spot enemy units anywhere on the map.",
                 SkillBonusType.SpaceAssets, // Boolean capability
-                CommandGrade.TopGrade,
+                CommandGrade.SeniorGrade,
                 new List<Enum> { IntelligenceDoctrine.ConcealedOperationsBase_UndergroundBunker }
+            ));
+        }
+
+        /// <summary>
+        /// Initialize combined arms specialization skills.
+        /// </summary>
+        private static void InitCombinedArmsSpecialization()
+        {
+            // Tier 4: AvaitionAssets - Increased spotting range.
+            AddSkill(new SkillDefinition(
+                CombinedArmsSpecialization.AviationAssets_SpottingRange,
+                "Aviation Recon Assets",
+                CUConstants.TIER4_XP_COST,
+                SkillBranch.CombinedArmsSpecialization,
+                SkillTier.Tier4,
+                "Higher headquarters has allocated recon helicopters for this unit.",
+                SkillBonusType.SpottingRange,
+                CUConstants.SMALL_SPOTTING_RANGE_BONUS_VAL,
+                CommandGrade.TopGrade
+            ));
+
+            // Tier 4: Expert Staff - Increased move actions.
+            AddSkill(new SkillDefinition(
+                CombinedArmsSpecialization.ExpertStaff_MovementAction,
+                "Expert Staff Planning",
+                CUConstants.TIER4_XP_COST,
+                SkillBranch.CombinedArmsSpecialization,
+                SkillTier.Tier4,
+                "The Soviet Union has excellent staff officers, this unit has the best of the best.",
+                SkillBonusType.MovementAction,
+                CommandGrade.TopGrade,
+                new List<Enum> { CombinedArmsSpecialization.AviationAssets_SpottingRange }
+            ));
+
+            // Tier 4: Tactical Genius - Increased combat actions.
+            AddSkill(new SkillDefinition(
+                CombinedArmsSpecialization.TacticalGenius_CombatAction,
+                "Tactical Genuis",
+                CUConstants.TIER4_XP_COST,
+                SkillBranch.CombinedArmsSpecialization,
+                SkillTier.Tier4,
+                "This commander has excellent insticts and always drives to the sound of guns.",
+                SkillBonusType.CombatAction,
+                CommandGrade.TopGrade,
+                new List<Enum> { CombinedArmsSpecialization.ExpertStaff_MovementAction }
+            ));
+
+            // Tier 5: Night Combat Operations - Bonus fighting at night.
+            AddSkill(new SkillDefinition(
+                CombinedArmsSpecialization.NightCombatOperations_NightCombat,
+                "Night Combat Operations",
+                CUConstants.TIER5_XP_COST,
+                SkillBranch.CombinedArmsSpecialization,
+                SkillTier.Tier5,
+                "Experience is an excellect teacher and crucial in modern night operations.",
+                SkillBonusType.NightCombat, // Boolean capability
+                CommandGrade.TopGrade,
+                new List<Enum> { CombinedArmsSpecialization.ExpertStaff_MovementAction }
             ));
         }
 
         /// <summary>
         /// Initialize signal intelligence skills - electronic warfare and analysis
         /// </summary>
-        private static void InitializeSignalIntelligenceSpecialization()
+        private static void InitSignalIntelligenceSpecialization()
         {
             // Tier 4: Communications Decryption - Signal Decryption capability
             AddSkill(new SkillDefinition(
@@ -716,7 +753,8 @@ namespace HammerAndSickle.Models
                 CommandGrade.TopGrade // Boolean capability
             ));
 
-            // Tier 4: Electronic Surveillance Network - Detection Range bonus
+            // Tier 4: Electroni
+            // c Surveillance Network - Detection Range bonus
             AddSkill(new SkillDefinition(
                 SignalIntelligenceSpecialization.ElectronicSurveillanceNetwork_SpottingRange,
                 "Electronic Surveillance Network",
@@ -743,13 +781,13 @@ namespace HammerAndSickle.Models
                 new List<Enum> { SignalIntelligenceSpecialization.ElectronicSurveillanceNetwork_SpottingRange }
             ));
 
-            // Tier 4: Enemy Behavior Analysis - Pattern Recognition capability
+            // Tier 5: Enemy Behavior Analysis - Pattern Recognition capability
             AddSkill(new SkillDefinition(
                 SignalIntelligenceSpecialization.EnemyBehaviorAnalysis_PatternRecognition,
                 "Enemy Behavior Analysis",
-                CUConstants.TIER4_XP_COST,
+                CUConstants.TIER5_XP_COST,
                 SkillBranch.SignalIntelligenceSpecialization,
-                SkillTier.Tier4,
+                SkillTier.Tier5,
                 "Advanced analysis of enemy movement patterns reveals likely movement paths for spotted units.",
                 SkillBonusType.PatternRecognition, // Boolean capability
                 CommandGrade.TopGrade,
@@ -760,52 +798,54 @@ namespace HammerAndSickle.Models
         /// <summary>
         /// Initialize engineering skills - terrain manipulation and river crossing
         /// </summary>
-        private static void InitializeEngineeringSkills()
+        private static void InitEngineeringSkills()
         {
-            // Tier 1: River Crossing Operations - River Crossing capability
+            // Tier 4: River Crossing Operations - River Crossing capability
             AddSkill(new SkillDefinition(
                 EngineeringSpecialization.RiverCrossingOperations_RiverCrossing,
                 "River Crossing Operations",
-                CUConstants.TIER1_XP_COST,
-                SkillBranch.EngineeringSpecialization,
-                SkillTier.Tier1,
-                "Engineering expertise significantly reduces movement costs when crossing rivers.",
-                SkillBonusType.RiverCrossing // Boolean capability
-            ));
-
-            // Tier 2: Amphibious Assault Tactics - River Assault capability
-            AddSkill(new SkillDefinition(
-                EngineeringSpecialization.AmphibiousAssaultTactics_RiverAssault,
-                "Amphibious Assault Tactics",
-                CUConstants.TIER2_XP_COST,
-                SkillBranch.EngineeringSpecialization,
-                SkillTier.Tier2,
-                "Specialized assault river crossing techniques reduce combat penalties when attacking across rivers.",
-                SkillBonusType.RiverAssault, // Boolean capability
-                CommandGrade.JuniorGrade,
-                new List<Enum> { EngineeringSpecialization.RiverCrossingOperations_RiverCrossing }
-            ));
-
-            // Tier 3: Combat EngineeringSpecialization Corps - Bridge Building capability
-            AddSkill(new SkillDefinition(
-                EngineeringSpecialization.CombatEngineeringCorps_BridgeBuilding,
-                "Combat Engineering Corps",
-                CUConstants.TIER3_XP_COST,
-                SkillBranch.EngineeringSpecialization,
-                SkillTier.Tier3,
-                "Advanced military engineering allows construction of tactical bridges over rivers in a single turn.",
-                SkillBonusType.BridgeBuilding, // Boolean capability
-                CommandGrade.SeniorGrade,
-                new List<Enum> { EngineeringSpecialization.AmphibiousAssaultTactics_RiverAssault }
-            ));
-
-            // Tier 4: Field Fortification Expert - Field Fortification capability
-            AddSkill(new SkillDefinition(
-                EngineeringSpecialization.FieldFortificationExpert_FieldFortification,
-                "Field Fortification Expert",
                 CUConstants.TIER4_XP_COST,
                 SkillBranch.EngineeringSpecialization,
                 SkillTier.Tier4,
+                "Engineering expertise significantly reduces movement costs when crossing rivers.",
+                SkillBonusType.RiverCrossing, // Boolean capability
+                CommandGrade.TopGrade
+
+            ));
+
+            // Tier 4: Amphibious Assault Tactics - River Assault capability
+            AddSkill(new SkillDefinition(
+                EngineeringSpecialization.AmphibiousAssaultTactics_RiverAssault,
+                "Amphibious Assault Tactics",
+                CUConstants.TIER4_XP_COST,
+                SkillBranch.EngineeringSpecialization,
+                SkillTier.Tier4,
+                "Specialized assault river crossing techniques reduce combat penalties when attacking across rivers.",
+                SkillBonusType.RiverAssault, // Boolean capability
+                CommandGrade.TopGrade,
+                new List<Enum> { EngineeringSpecialization.RiverCrossingOperations_RiverCrossing }
+            ));
+
+            // Tier 4: Combat EngineeringSpecialization Corps - Bridge Building capability
+            AddSkill(new SkillDefinition(
+                EngineeringSpecialization.CombatEngineeringCorps_BridgeBuilding,
+                "Combat Engineering Corps",
+                CUConstants.TIER4_XP_COST,
+                SkillBranch.EngineeringSpecialization,
+                SkillTier.Tier4,
+                "Advanced military engineering allows construction of tactical bridges over rivers in a single turn.",
+                SkillBonusType.BridgeBuilding, // Boolean capability
+                CommandGrade.TopGrade,
+                new List<Enum> { EngineeringSpecialization.AmphibiousAssaultTactics_RiverAssault }
+            ));
+
+            // Tier 5: Field Fortification Expert - Field Fortification capability
+            AddSkill(new SkillDefinition(
+                EngineeringSpecialization.FieldFortificationExpert_FieldFortification,
+                "Field Fortification Expert",
+                CUConstants.TIER5_XP_COST,
+                SkillBranch.EngineeringSpecialization,
+                SkillTier.Tier5,
                 "Expert engineering skills allow construction of permanent defensive fortifications.",
                 SkillBonusType.FieldFortification, // Boolean capability
                 CommandGrade.TopGrade,
@@ -816,87 +856,76 @@ namespace HammerAndSickle.Models
         /// <summary>
         /// Initialize special forces doctrine skills - unconventional warfare
         /// </summary>
-        private static void InitializeSpecialForcesDoctrineSkills()
+        private static void InitSpecialForcesDoctrine()
         {
-            // Tier 1: Special Terrain Mastery - Terrain Mastery capability
+            // Tier 4: Special Terrain Mastery - Terrain Mastery capability
             AddSkill(new SkillDefinition(
-                SpecialForcesSpecialization.SpecialTerrainMastery_TerrainMastery,
-                "Special Terrain Mastery",
-                CUConstants.TIER1_XP_COST,
-                SkillBranch.SpecialForcesSpecialization,
-                SkillTier.Tier1,
-                "Advanced training in difficult terrain reduces movement costs in rough terrain, forests, and mountains.",
-                SkillBonusType.TerrainMastery // Boolean capability
-            ));
-
-            // Tier 2: Infiltration Tactics - Infiltration Movement capability
-            AddSkill(new SkillDefinition(
-                SpecialForcesSpecialization.InfiltrationTactics_InfiltrationMovement,
-                "Infiltration Tactics",
-                CUConstants.TIER2_XP_COST,
-                SkillBranch.SpecialForcesSpecialization,
-                SkillTier.Tier2,
-                "Specialized movement techniques allow easier passage through enemy zones of control.",
-                SkillBonusType.InfiltrationMovement, // Boolean capability
-                CommandGrade.JuniorGrade,
-                new List<Enum> { SpecialForcesSpecialization.SpecialTerrainMastery_TerrainMastery }
-            ));
-
-            // Tier 3: Superior Camouflage - Concealed Positions capability
-            AddSkill(new SkillDefinition(
-                SpecialForcesSpecialization.SuperiorCamouflage_ConcealedPositions,
-                "Superior Camouflage",
-                CUConstants.TIER3_XP_COST,
-                SkillBranch.SpecialForcesSpecialization,
-                SkillTier.Tier3,
-                "Advanced concealment techniques reduce unit visibility on the battlefield.",
-                SkillBonusType.ConcealedPositions, // Boolean capability
-                CommandGrade.SeniorGrade,
-                new List<Enum> { SpecialForcesSpecialization.InfiltrationTactics_InfiltrationMovement }
-            ));
-
-            // Tier 4: Ambush Tactics - Ambush Tactics capability
-            AddSkill(new SkillDefinition(
-                SpecialForcesSpecialization.AmbushTactics_AmbushTactics,
-                "Ambush Tactics",
+                SpecialForcesSpecialization.TerrainExpert_TerrainMastery,
+                "Terrain Expert",
                 CUConstants.TIER4_XP_COST,
                 SkillBranch.SpecialForcesSpecialization,
                 SkillTier.Tier4,
+                "Advanced training in difficult terrain reduces movement costs in rough terrain, forests, and mountains.",
+                SkillBonusType.TerrainMastery, // Boolean capability
+                CommandGrade.TopGrade
+            ));
+
+            // Tier 4: Infiltration Tactics - Infiltration Movement capability
+            AddSkill(new SkillDefinition(
+                SpecialForcesSpecialization.InfiltrationTactics_InfiltrationMovement,
+                "Infiltration Tactics",
+                CUConstants.TIER4_XP_COST,
+                SkillBranch.SpecialForcesSpecialization,
+                SkillTier.Tier4,
+                "Specialized movement techniques allow easier passage through enemy zones of control.",
+                SkillBonusType.InfiltrationMovement, // Boolean capability
+                CommandGrade.TopGrade,
+                new List<Enum> { SpecialForcesSpecialization.TerrainExpert_TerrainMastery }
+            ));
+
+            // Tier 4: Superior Camouflage - Concealed Positions capability
+            AddSkill(new SkillDefinition(
+                SpecialForcesSpecialization.SuperiorCamouflage_ConcealedPositions,
+                "Superior Camouflage",
+                CUConstants.TIER4_XP_COST,
+                SkillBranch.SpecialForcesSpecialization,
+                SkillTier.Tier4,
+                "Advanced concealment techniques reduce unit visibility on the battlefield.",
+                SkillBonusType.ConcealedPositions, // Boolean capability
+                CommandGrade.TopGrade,
+                new List<Enum> { SpecialForcesSpecialization.InfiltrationTactics_InfiltrationMovement }
+            ));
+
+            // Tier 5: Ambush Tactics - Ambush Tactics capability
+            AddSkill(new SkillDefinition(
+                SpecialForcesSpecialization.AmbushTactics_AmbushTactics,
+                "Ambush Tactics",
+                CUConstants.TIER5_XP_COST,
+                SkillBranch.SpecialForcesSpecialization,
+                SkillTier.Tier5,
                 "Specialized ambush training grants a significant combat bonus for the first attack from concealment.",
                 SkillBonusType.AmbushTactics, // Boolean capability
                 CommandGrade.TopGrade,
                 new List<Enum> { SpecialForcesSpecialization.SuperiorCamouflage_ConcealedPositions }
-            ));
-
-            // Tier 5: Night Combat Operations - Night Combat capability
-            AddSkill(new SkillDefinition(
-                SpecialForcesSpecialization.NightCombatOperations_NightCombat,
-                "Night Combat Operations",
-                CUConstants.TIER4_XP_COST,
-                SkillBranch.SpecialForcesSpecialization,
-                SkillTier.Tier5,
-                "Elite training in night operations provides combat bonuses during nighttime turns.",
-                SkillBonusType.NightCombat, // Boolean capability
-                CommandGrade.TopGrade,
-                new List<Enum> { SpecialForcesSpecialization.AmbushTactics_AmbushTactics }
-            ));
+            )); 
         }
 
         /// <summary>
         /// Initialize politically connected skills - special political bonuses
         /// This branch can be combined with other specializations
         /// </summary>
-        private static void InitializePoliticallyConnectedSkills()
+        private static void InitPoliticallyConnected()
         {
-            // Tier 1: Emergency Air Drop - Emergency Resupply capability
+            // Tier 2: Emergency Air Drop - Emergency Resupply capability
             AddSkill(new SkillDefinition(
                 PoliticallyConnectedFoundation.EmergencyAirDrop_EmergencyResupply,
                 "Emergency Air Drop",
-                CUConstants.TIER1_XP_COST,
+                CUConstants.TIER2_XP_COST,
                 SkillBranch.PoliticallyConnectedFoundation,
-                SkillTier.Tier1,
+                SkillTier.Tier2,
                 "Political connections provide access to emergency air resupply operations once per scenario.",
-                SkillBonusType.EmergencyResupply // Boolean capability
+                SkillBonusType.EmergencyResupply, // Boolean capability
+                CommandGrade.JuniorGrade
             ));
 
             // Tier 2: Direct Line To HQ - Supply Consumption reduction
@@ -926,13 +955,13 @@ namespace HammerAndSickle.Models
                 new List<Enum> { PoliticallyConnectedFoundation.DirectLineToHQ_SupplyConsumption }
             ));
 
-            // Tier 4: Better Replacements - Replacement XP bonus
+            // Tier 3: Better Replacements - Replacement XP bonus
             AddSkill(new SkillDefinition(
                 PoliticallyConnectedFoundation.BetterReplacements_ReplacementXP,
                 "Better Replacements",
-                CUConstants.TIER4_XP_COST,
+                CUConstants.TIER3_XP_COST,
                 SkillBranch.PoliticallyConnectedFoundation,
-                SkillTier.Tier4,
+                SkillTier.Tier3,
                 $"Political influence ensures better trained replacements, increasing experience gain by {CUConstants.EXPERIENCE_BONUS_VAL * 100}%.",
                 SkillBonusType.ReplacementXP,
                 CUConstants.EXPERIENCE_BONUS_VAL,
@@ -940,13 +969,13 @@ namespace HammerAndSickle.Models
                 new List<Enum> { PoliticallyConnectedFoundation.ForeignTechnology_NVG }
             ));
 
-            // Tier 5: Connections At The Top - Prestige cost reduction
+            // Tier 4: Connections At The Top - Prestige cost reduction
             AddSkill(new SkillDefinition(
                 PoliticallyConnectedFoundation.ConnectionsAtTheTop_PrestigeCost,
                 "Connections At The Top",
-                CUConstants.TIER5_XP_COST,
+                CUConstants.TIER4_XP_COST,
                 SkillBranch.PoliticallyConnectedFoundation,
-                SkillTier.Tier5,
+                SkillTier.Tier4,
                 $"High-level political connections reduce equipment costs by {(1.0f - CUConstants.PRESTIGE_COST_REDUCTION_VAL) * 100}%.",
                 SkillBonusType.PrestigeCost,
                 CUConstants.PRESTIGE_COST_REDUCTION_VAL,
