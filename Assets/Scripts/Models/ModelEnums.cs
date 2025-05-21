@@ -295,7 +295,6 @@ namespace HammerAndSickle.Models
         ShockTankCorps_HardAttack,             // Shock Tank Corps
         HullDownExpert_HardDefense,            // Hull Down Expert
         PursuitDoctrine_Breakthrough,          // Pursuit Doctrine
-        NightFightingSpecialist_NVG            // Night Fighting Specialist
     }
 
     /// <summary>
@@ -306,8 +305,7 @@ namespace HammerAndSickle.Models
         None,
         InfantryAssaultTactics_SoftAttack,      // Infantry Assault Tactics
         DefensiveDoctrine_SoftDefense,          // Defensive Doctrine
-        UrbanCombatSpecialist_UrbanCombat,      // Urban Combat Specialist
-        RoughTerrainOperations_RoughTerrain     // Rough Terrain Operations
+        TerrainAdvantage_RoughTerrainMovt       // Move more easily in rough terrain.
     }
 
     /// <summary>
@@ -370,7 +368,10 @@ namespace HammerAndSickle.Models
     /// </summary>
     public enum CombinedArmsSpecialization
     {
-
+        AviationAssets_SpottingRange,       // +1 spotting range
+        ExpertStaff_MovementAction,         // +1 move action
+        TacticalGenius_CombatAction,        // +1 combat action
+        NightCombatOperations_NightCombat   // Night combat bonus
     }
 
     /// <summary>
@@ -403,11 +404,10 @@ namespace HammerAndSickle.Models
     public enum SpecialForcesSpecialization
     {
         None,
-        SpecialTerrainMastery_TerrainMastery,                // Special Terrain Mastery
+        TerrainExpert_TerrainMastery,                        // Terrain Expert
         InfiltrationTactics_InfiltrationMovement,            // Infiltration Tactics
         SuperiorCamouflage_ConcealedPositions,               // Superior Camouflage
         AmbushTactics_AmbushTactics,                         // Ambush Tactics
-        NightCombatOperations_NightCombat                    // Night Combat Operations
     }
 
     //===============================
@@ -441,12 +441,12 @@ namespace HammerAndSickle.Models
         // InfanrtyDoctrine
         SoftAttack,           // Bonus to SoftAttack
         SoftDefense,          // Bonus to SoftDefense
-        DeploymentAction,     // +1 deployment action
+        RoughTerrainMovt,     // Boolean, rough terrain movement bonus (Rough, Forest, Marsh).
 
         // AirDefenseDoctrine
         AirAttack,            // Bonus to AirAttack
         AirDefense,           // Bonus to AirDefense
-        OpportunityAction,    // Boolean, gets extra opportunity action.
+        OpportunityAction,    // Boolean, gets extra opportunity action(attack).
 
         // ArtilleryDoctrine
         ShootAndScoot,        // Boolean, may move after ranged attack.
@@ -470,6 +470,7 @@ namespace HammerAndSickle.Models
 
         // CombinedArmsSpecialization
         SpottingRange,        // +1 spotting range
+        NightCombat,          // Boolean, night combat bonus.
         MovementAction,       // +1 move action
         CombatAction,         // +1 combat action
 
@@ -480,7 +481,7 @@ namespace HammerAndSickle.Models
         FieldFortification,   // Boolean, may build a persistent static fortification.
 
         // SpecialForcesSpecialization
-        TerrainMastery,         // Boolean, rough, forest, mountain hex entrance costs are less.
+        TerrainMastery,         // Boolean, combat bonuses in Rough, Forest, Mountain, Urban.
         InfiltrationMovement,   // Boolean, can move through enemy ZOC more easily
         ConcealedPositions,     // Boolean, units have reduced silhouette.
         AmbushTactics,          // Boolean, first attack from concealment gets +50% combat bonus
@@ -489,13 +490,6 @@ namespace HammerAndSickle.Models
         SignalDecryption,      // Boolean, reveals more detailed unit information when spotted
         ElectronicWarfare,     // Boolean, randomly makes an enemy unit immobile when gathering intel.
         PatternRecognition,    // Boolean, shows likely enemy movement paths for some spotted units.
-
-        // Terrain Mastery Spec
-        UrbanCombat,          // Boolean, urban terrain combat bonus.
-        RoughTerrain,         // Boolean, rough terrain combat bonus.
-        NightCombat,          // Boolean, night combat bonus.
-
-        
     }
 
     /// <summary>
