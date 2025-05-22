@@ -338,8 +338,7 @@ namespace HammerAndSickle.Models
                 OnGradeChanged?.Invoke(CurrentGrade);
             }
 
-            // Mark caches as dirty
-            isDirty = true;
+            ClearBonusCaches();
 
             // Fire events
             OnSkillUnlocked?.Invoke(skillEnum, skillDef.Name, skillDef.GetFullDescription());
@@ -427,44 +426,28 @@ namespace HammerAndSickle.Models
         /// <returns>The total bonus value (additive for most, multiplicative for some types)</returns>
         public float GetBonusValue(SkillBonusType bonusType, bool onlyBoolean = false)
         {
-            // Try to return from cache if not dirty
             if (!isDirty && bonusCache.TryGetValue(bonusType, out float cachedValue))
             {
                 return cachedValue;
             }
 
-            float totalBonus = 0f;
-            bool isMultiplicative = IsMultiplicativeBonus(bonusType);
+            float totalBonus = IsMultiplicativeBonus(bonusType) ? 1.0f : 0f;
 
-            if (isMultiplicative)
-            {
-                totalBonus = 1.0f; // Start at 1.0 for multiplicative bonuses
-            }
-
-            // Process all unlocked skills
             ProcessUnlockedSkills(skillDef =>
             {
                 foreach (var effect in skillDef.Effects)
                 {
-                    if (effect.BonusType == bonusType)
-                    {
-                        if (onlyBoolean && !effect.IsBoolean) continue;
+                    if (effect.BonusType != bonusType) continue;
+                    if (onlyBoolean && !effect.IsBoolean) continue;
 
-                        if (isMultiplicative)
-                        {
-                            totalBonus *= effect.BonusValue;
-                        }
-                        else
-                        {
-                            totalBonus += effect.BonusValue;
-                        }
-                    }
+                    totalBonus = IsMultiplicativeBonus(bonusType)
+                        ? totalBonus * effect.BonusValue
+                        : totalBonus + effect.BonusValue;
                 }
             });
 
-            // Cache the result
             bonusCache[bonusType] = totalBonus;
-
+            isDirty = false;
             return totalBonus;
         }
 
@@ -475,7 +458,6 @@ namespace HammerAndSickle.Models
         /// <returns>True if the leader has this capability</returns>
         public bool HasCapability(SkillBonusType bonusType)
         {
-            // Try to return from cache if not dirty
             if (!isDirty && capabilityCache.TryGetValue(bonusType, out bool cachedValue))
             {
                 return cachedValue;
@@ -483,7 +465,6 @@ namespace HammerAndSickle.Models
 
             bool hasCapability = false;
 
-            // Process unlocked skills until we find one that grants this capability
             ProcessUnlockedSkills(skillDef =>
             {
                 foreach (var effect in skillDef.Effects)
@@ -497,9 +478,8 @@ namespace HammerAndSickle.Models
             },
             stopEarlyIf: () => hasCapability);
 
-            // Cache the result
             capabilityCache[bonusType] = hasCapability;
-
+            isDirty = false;
             return hasCapability;
         }
 
@@ -520,7 +500,7 @@ namespace HammerAndSickle.Models
         {
             bonusCache.Clear();
             capabilityCache.Clear();
-            isDirty = false;
+            isDirty = true;
         }
 
         #endregion
@@ -567,7 +547,6 @@ namespace HammerAndSickle.Models
                 OnExperienceChanged?.Invoke(refundedXP, ExperiencePoints);
 
                 // Clear caches
-                isDirty = true;
                 ClearBonusCaches();
             }
 
@@ -619,7 +598,6 @@ namespace HammerAndSickle.Models
                 OnExperienceChanged?.Invoke(refundedXP, ExperiencePoints);
 
                 // Clear caches
-                isDirty = true;
                 ClearBonusCaches();
             }
 
@@ -668,7 +646,6 @@ namespace HammerAndSickle.Models
                 OnExperienceChanged?.Invoke(refundedXP, ExperiencePoints);
 
                 // Clear caches
-                isDirty = true;
                 ClearBonusCaches();
             }
 
@@ -768,7 +745,6 @@ namespace HammerAndSickle.Models
             }
 
             // Clear caches
-            isDirty = true;
             ClearBonusCaches();
         }
 
