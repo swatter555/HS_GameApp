@@ -58,6 +58,8 @@ namespace HammerAndSickle.Models
             BonusType == SkillBonusType.NightCombat ||
             BonusType == SkillBonusType.EmergencyResupply ||
             BonusType == SkillBonusType.TerrainMastery ||
+            BonusType == SkillBonusType.NVG ||
+            BonusType == SkillBonusType.AdvancedTargetting ||
             BonusType == SkillBonusType.SeniorPromotion ||
             BonusType == SkillBonusType.TopPromotion;
 
@@ -343,7 +345,7 @@ namespace HammerAndSickle.Models
                 SkillTier.Tier4,
                 "Promotion to Top Grade grants the highest level of command authority and strategic influence.",
                 SkillBonusType.TopPromotion, // Boolean capability
-                CommandGrade.TopGrade,
+                CommandGrade.SeniorGrade,
                 new List<Enum> { LeadershipFoundation.SeniorOfficerTraining_CommandTier2 }
             ));
 
@@ -705,6 +707,7 @@ namespace HammerAndSickle.Models
                 SkillTier.Tier4,
                 "The Soviet Union has excellent staff officers, this unit has the best of the best.",
                 SkillBonusType.MovementAction,
+                CUConstants.MOVEMENT_ACTION_BONUS_VAL,
                 CommandGrade.TopGrade,
                 new List<Enum> { CombinedArmsSpecialization.AviationAssets_SpottingRange }
             ));
@@ -718,6 +721,7 @@ namespace HammerAndSickle.Models
                 SkillTier.Tier4,
                 "This commander has excellent insticts and always drives to the sound of guns.",
                 SkillBonusType.CombatAction,
+                CUConstants.COMBAT_ACTION_BONUS_VAL,
                 CommandGrade.TopGrade,
                 new List<Enum> { CombinedArmsSpecialization.ExpertStaff_MovementAction }
             ));
@@ -732,7 +736,7 @@ namespace HammerAndSickle.Models
                 "Experience is an excellect teacher and crucial in modern night operations.",
                 SkillBonusType.NightCombat, // Boolean capability
                 CommandGrade.TopGrade,
-                new List<Enum> { CombinedArmsSpecialization.ExpertStaff_MovementAction }
+                new List<Enum> { CombinedArmsSpecialization.TacticalGenius_CombatAction }
             ));
         }
 
