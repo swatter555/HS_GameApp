@@ -286,6 +286,7 @@ namespace HammerAndSickle.Models
             InitAirborneDoctrine();
             InitAirMobileDoctrine();
             InitIntelligenceDoctrine();
+            InitCombinedArmsSpecialization();
             InitSignalIntelligenceSpecialization();
             InitEngineeringSkills();
             InitSpecialForcesDoctrine();
@@ -353,7 +354,7 @@ namespace HammerAndSickle.Models
             AddSkill(new SkillDefinition(
                 LeadershipFoundation.GeneralStaffTraining_CommandTier3,
                 "General Staff Training",
-                CUConstants.TIER4_XP_COST,
+                CUConstants.TIER5_XP_COST,
                 SkillBranch.LeadershipFoundation,
                 SkillTier.Tier5,
                 "Elite command training for top officers maximizes leadership effectiveness and strategic capability.",
@@ -757,8 +758,7 @@ namespace HammerAndSickle.Models
                 CommandGrade.TopGrade // Boolean capability
             ));
 
-            // Tier 4: Electroni
-            // c Surveillance Network - Detection Range bonus
+            // Tier 4: Electronic Surveillance Network - Detection Range bonus
             AddSkill(new SkillDefinition(
                 SignalIntelligenceSpecialization.ElectronicSurveillanceNetwork_SpottingRange,
                 "Electronic Surveillance Network",

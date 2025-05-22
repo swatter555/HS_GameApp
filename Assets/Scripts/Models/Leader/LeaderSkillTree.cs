@@ -116,87 +116,94 @@ namespace HammerAndSickle.Models
         /// </summary>
         private void InitializeSkillDictionaries()
         {
-            // LeadershipFoundation
+            // Leadership foundation branch.
             foreach (LeadershipFoundation skill in Enum.GetValues(typeof(LeadershipFoundation)))
             {
                 if (skill != LeadershipFoundation.None)
                     unlockedSkills[skill] = false;
             }
 
-            // ArmoredDoctrine
+            // PoliticallyConnected foundation branch.
+            foreach (PoliticallyConnectedFoundation skill in Enum.GetValues(typeof(PoliticallyConnectedFoundation)))
+            {
+                if (skill != PoliticallyConnectedFoundation.None)
+                    unlockedSkills[skill] = false;
+            }
+
+            // Armored doctrine branch.
             foreach (ArmoredDoctrine skill in Enum.GetValues(typeof(ArmoredDoctrine)))
             {
                 if (skill != ArmoredDoctrine.None)
                     unlockedSkills[skill] = false;
             }
 
-            // Infantry
+            // Infantry doctrine branch.
             foreach (InfantryDoctrine skill in Enum.GetValues(typeof(InfantryDoctrine)))
             {
                 if (skill != InfantryDoctrine.None)
                     unlockedSkills[skill] = false;
             }
 
-            // Artillery
+            // Artillery doctrine branch.
             foreach (ArtilleryDoctrine skill in Enum.GetValues(typeof(ArtilleryDoctrine)))
             {
                 if (skill != ArtilleryDoctrine.None)
                     unlockedSkills[skill] = false;
             }
 
-            // Air Defense
+            // Air Defense doctrine branch.
             foreach (AirDefenseDoctrine skill in Enum.GetValues(typeof(AirDefenseDoctrine)))
             {
                 if (skill != AirDefenseDoctrine.None)
                     unlockedSkills[skill] = false;
             }
 
-            // Airborne
+            // Airborne doctrine branch.
             foreach (AirborneDoctrine skill in Enum.GetValues(typeof(AirborneDoctrine)))
             {
                 if (skill != AirborneDoctrine.None)
                     unlockedSkills[skill] = false;
             }
 
-            // Air Mobile
+            // Air Mobile doctrine branch.
             foreach (AirMobileDoctrine skill in Enum.GetValues(typeof(AirMobileDoctrine)))
             {
                 if (skill != AirMobileDoctrine.None)
                     unlockedSkills[skill] = false;
             }
 
-            // IntelligenceDoctrine
+            // Intelligence doctrine branch.
             foreach (IntelligenceDoctrine skill in Enum.GetValues(typeof(IntelligenceDoctrine)))
             {
                 if (skill != IntelligenceDoctrine.None)
                     unlockedSkills[skill] = false;
             }
 
-            // Signal IntelligenceDoctrine
+            // Combined Arms specialization branch.
+            foreach (CombinedArmsSpecialization skill in Enum.GetValues(typeof(CombinedArmsSpecialization)))
+            {
+                if (skill != CombinedArmsSpecialization.None)
+                    unlockedSkills[skill] = false;
+            }
+
+            // SignalIntelligence specialization branch.
             foreach (SignalIntelligenceSpecialization skill in Enum.GetValues(typeof(SignalIntelligenceSpecialization)))
             {
                 if (skill != SignalIntelligenceSpecialization.None)
                     unlockedSkills[skill] = false;
             }
 
-            // EngineeringSpecialization
+            // Engineering specialization branch.
             foreach (EngineeringSpecialization skill in Enum.GetValues(typeof(EngineeringSpecialization)))
             {
                 if (skill != EngineeringSpecialization.None)
                     unlockedSkills[skill] = false;
             }
 
-            // Special Forces
+            // Special Forces specialization branch.
             foreach (SpecialForcesSpecialization skill in Enum.GetValues(typeof(SpecialForcesSpecialization)))
             {
                 if (skill != SpecialForcesSpecialization.None)
-                    unlockedSkills[skill] = false;
-            }
-
-            // Politically Connected
-            foreach (PoliticallyConnectedFoundation skill in Enum.GetValues(typeof(PoliticallyConnectedFoundation)))
-            {
-                if (skill != PoliticallyConnectedFoundation.None)
                     unlockedSkills[skill] = false;
             }
         }
@@ -390,28 +397,15 @@ namespace HammerAndSickle.Models
                 return true;
             }
 
-            // If we've already started this branch, it's available
-            if (HasStartedBranch(branch))
-            {
-                return true;
-            }
+            bool isDoctrine = branch.IsDoctrine();      // helper ext method
+            bool isSpec = branch.IsSpecialization();
 
-            // Check exclusivity with other branches
-            foreach (SkillBranch startedBranch in startedBranches)
-            {
-                // Skip LeadershipFoundation and PoliticallyConnectedFoundation as they're not exclusive
-                if (startedBranch == SkillBranch.LeadershipFoundation || startedBranch == SkillBranch.PoliticallyConnectedFoundation)
-                {
-                    continue;
-                }
+            if (isDoctrine)
+                return !startedBranches.Any(b => b.IsDoctrine());
+            if (isSpec)
+                return !startedBranches.Any(b => b.IsSpecialization());
 
-                // If we've started any other branch (not LeadershipFoundation/PoliticallyConnectedFoundation), 
-                // we can't start a new one
-                return false;
-            }
-
-            // No exclusive branches started, so this branch is available
-            return true;
+            return false; // unknown branch type
         }
 
         #endregion
@@ -767,6 +761,7 @@ namespace HammerAndSickle.Models
                     case nameof(AirborneDoctrine): enumType = typeof(AirborneDoctrine); break;
                     case nameof(AirMobileDoctrine): enumType = typeof(AirMobileDoctrine); break;
                     case nameof(IntelligenceDoctrine): enumType = typeof(IntelligenceDoctrine); break;
+                    case nameof(CombinedArmsSpecialization): enumType = typeof(CombinedArmsSpecialization); break;
                     case nameof(SignalIntelligenceSpecialization): enumType = typeof(SignalIntelligenceSpecialization); break;
                     case nameof(EngineeringSpecialization): enumType = typeof(EngineeringSpecialization); break;
                     case nameof(SpecialForcesSpecialization): enumType = typeof(SpecialForcesSpecialization); break;
@@ -807,5 +802,45 @@ namespace HammerAndSickle.Models
     {
         public string EnumType;  // Name of the enum type
         public int EnumValue;    // Integer value of the enum
+    }
+
+    /// <summary>
+    /// Extension helpers that classify <see cref="SkillBranch"/> values.
+    /// Keep these in sync with the enum definition.
+    /// </summary>
+    public static class SkillBranchExtensions
+    {
+        /// <summary>
+        /// Returns <c>true</c> when the branch is a Doctrine (mutually exclusive group).
+        /// </summary>
+        public static bool IsDoctrine(this SkillBranch branch)
+        {
+            return branch switch
+            {
+                SkillBranch.ArmoredDoctrine 
+                or SkillBranch.InfantryDoctrine 
+                or SkillBranch.ArtilleryDoctrine 
+                or SkillBranch.AirDefenseDoctrine 
+                or SkillBranch.AirborneDoctrine 
+                or SkillBranch.AirMobileDoctrine 
+                or SkillBranch.IntelligenceDoctrine => true,
+                _ => false,
+            };
+        }
+
+        /// <summary>
+        /// Returns <c>true</c> when the branch is a Specialization (mutually exclusive group).
+        /// </summary>
+        public static bool IsSpecialization(this SkillBranch branch)
+        {
+            return branch switch
+            {
+                SkillBranch.SignalIntelligenceSpecialization 
+                or SkillBranch.CombinedArmsSpecialization 
+                or SkillBranch.EngineeringSpecialization 
+                or SkillBranch.SpecialForcesSpecialization => true,
+                _ => false,
+            };
+        }
     }
 }

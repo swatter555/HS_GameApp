@@ -368,6 +368,7 @@ namespace HammerAndSickle.Models
     /// </summary>
     public enum CombinedArmsSpecialization
     {
+        None,
         AviationAssets_SpottingRange,       // +1 spotting range
         ExpertStaff_MovementAction,         // +1 move action
         TacticalGenius_CombatAction,        // +1 combat action
