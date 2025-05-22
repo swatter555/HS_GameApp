@@ -8,38 +8,79 @@ namespace HammerAndSickle.Models
     /// <summary>
     /// LeaderSkillTree manages a leader's skills, experience points, and command grade progression.
     /// 
-    /// This class provides the following functionality:
+    /// SKILL SYSTEM DESIGN:
+    /// The skill system is built around strategic specialization with universal gating mechanisms:
+    /// 
+    /// BRANCH TYPES:
+    /// • Foundation Branches: Universal branches available to all leaders
+    ///   - LeadershipFoundation: Required for progression, contains promotions that gate access to higher tiers
+    ///   - PoliticallyConnectedFoundation: Optional utility branch with logistical bonuses
+    /// 
+    /// • Doctrine Branches: Combat specializations (MUTUALLY EXCLUSIVE - choose only 1)
+    ///   - ArmoredDoctrine, InfantryDoctrine, ArtilleryDoctrine, AirDefenseDoctrine
+    ///   - AirborneDoctrine, AirMobileDoctrine, IntelligenceDoctrine
+    /// 
+    /// • Specialization Branches: Advanced capabilities (MUTUALLY EXCLUSIVE - choose only 1)
+    ///   - CombinedArmsSpecialization, SignalIntelligenceSpecialization
+    ///   - EngineeringSpecialization, SpecialForcesSpecialization
+    /// 
+    /// PROGRESSION GATING:
+    /// Leadership acts as the universal progression gate through command grade promotions:
+    /// • JuniorGrade (starting): Access to Tier1 skills in any branch
+    /// • SeniorGrade (200 XP): Unlocks Tier2-3 skills across all branches
+    /// • TopGrade (500 XP): Unlocks Tier4-5 specialization skills
+    /// 
+    /// This design forces meaningful XP investment decisions - roughly 50% of a leader's XP 
+    /// must go to Leadership promotions to access higher-tier abilities, preventing early 
+    /// specialization abuse while ensuring every leader has strong command capabilities.
+    /// 
+    /// STRATEGIC CHOICE ARCHITECTURE:
+    /// • Every leader progresses: Leadership + Optional PoliticallyConnected
+    /// • Each leader chooses: 1 Doctrine + 1 Specialization
+    /// • Result: Distinct leader archetypes (Tank Commander, Artillery Specialist, etc.)
+    /// • No "master of everything" builds possible due to exclusivity rules
+    /// 
+    /// CORE FUNCTIONALITY:
     /// - Storage and management of which skills a leader has unlocked
-    /// - Tracking of branch specializations and exclusivity
-    /// - Management of experience points and command grade promotions
+    /// - Enforcement of branch exclusivity rules (1 doctrine, 1 specialization max)
+    /// - Command grade promotion management and tier unlocking
     /// - Calculation of all skill-based bonuses for combat and other systems
-    /// - Validation of skill prerequisites and requirements
+    /// - Validation of skill prerequisites and command grade requirements
     /// - Support for resetting skills (respec functionality)
     /// - Event notifications for UI and other systems
     /// 
-    /// Key methods:
+    /// KEY METHODS:
     /// - AddExperience: Adds XP to the leader's pool
-    /// - CanUnlockSkill: Checks if prerequisites for a skill are met
-    /// - UnlockSkill: Attempts to unlock a skill, applying costs and effects
+    /// - CanUnlockSkill: Validates prerequisites, grade requirements, and branch exclusivity
+    /// - UnlockSkill: Unlocks skills, handles promotions, and applies effects
     /// - IsSkillUnlocked: Checks if a specific skill is unlocked
     /// - GetBonusValue: Retrieves total bonus for a specific bonus type
     /// - HasCapability: Checks if the leader has a specific boolean capability
-    /// - ResetAllSkills/ResetBranch: Refunds experience from skills
+    /// - ResetAllSkills/ResetBranch: Refunds experience from skills (respects promotions)
     /// 
-    /// Usage Example:
-    /// ```
+    /// USAGE EXAMPLE - Typical Leader Progression:
+    /// ```csharp
     /// var skillTree = new LeaderSkillTree();
-    /// skillTree.AddExperience(150);  // Award XP after battle
+    /// skillTree.AddExperience(200);  // Award XP after battles
     /// 
-    /// // Check and unlock a skill
-    /// if (skillTree.CanUnlockSkill(LeadershipFoundation.JuniorOfficerTraining_CommandTier1))
-    /// {
-    ///     skillTree.UnlockSkill(LeadershipFoundation.JuniorOfficerTraining_CommandTier1);
-    /// }
+    /// // Start with Leadership foundation
+    /// skillTree.UnlockSkill(LeadershipFoundation.JuniorOfficerTraining_CommandTier1);
+    /// 
+    /// // Choose a doctrine specialization  
+    /// skillTree.UnlockSkill(ArmoredDoctrine.ShockTankCorps_HardAttack);
+    /// 
+    /// // Promote to access higher tiers (costs 200 XP but unlocks Tier2-3 globally)
+    /// skillTree.UnlockSkill(LeadershipFoundation.PromotionToSeniorGrade_SeniorPromotion);
+    /// 
+    /// // Now can access Tier2 armored skills
+    /// skillTree.UnlockSkill(ArmoredDoctrine.HullDownExpert_HardDefense);
     /// 
     /// // Use bonuses in combat calculations
     /// int commandBonus = (int)skillTree.GetBonusValue(SkillBonusType.CommandTier1);
     /// bool hasBreakthrough = skillTree.HasCapability(SkillBonusType.Breakthrough);
+    /// 
+    /// // Check branch availability (will return false for other doctrines)
+    /// bool canStartInfantry = skillTree.IsBranchAvailable(SkillBranch.InfantryDoctrine);
     /// ```
     /// </summary>
     public class LeaderSkillTree
