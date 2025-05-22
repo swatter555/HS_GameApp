@@ -288,8 +288,8 @@ namespace HammerAndSickle.Models
             InitIntelligenceDoctrine();
             InitCombinedArmsSpecialization();
             InitSignalIntelligenceSpecialization();
-            InitEngineeringSkills();
-            InitSpecialForcesDoctrine();
+            InitEngineeringSpecialization();
+            InitSpecialForcesSpecialization();
         }
 
         /// <summary>
@@ -801,7 +801,7 @@ namespace HammerAndSickle.Models
         /// <summary>
         /// Initialize engineering skills - terrain manipulation and river crossing
         /// </summary>
-        private static void InitEngineeringSkills()
+        private static void InitEngineeringSpecialization()
         {
             // Tier 4: River Crossing Operations - River Crossing capability
             AddSkill(new SkillDefinition(
@@ -859,7 +859,7 @@ namespace HammerAndSickle.Models
         /// <summary>
         /// Initialize special forces doctrine skills - unconventional warfare
         /// </summary>
-        private static void InitSpecialForcesDoctrine()
+        private static void InitSpecialForcesSpecialization()
         {
             // Tier 4: Special Terrain Mastery - Terrain Mastery capability
             AddSkill(new SkillDefinition(
