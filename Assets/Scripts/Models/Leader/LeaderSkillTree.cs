@@ -266,6 +266,7 @@ namespace HammerAndSickle.Models
 
         #endregion
 
+
         #region Skill Management
 
         /// <summary>
@@ -391,21 +392,31 @@ namespace HammerAndSickle.Models
         /// <returns>True if the branch can be started</returns>
         public bool IsBranchAvailable(SkillBranch branch)
         {
-            // LeadershipFoundation and PoliticallyConnectedFoundation can always be combined with other branches
-            if (branch == SkillBranch.LeadershipFoundation || branch == SkillBranch.PoliticallyConnectedFoundation)
+            // ---- Defensive guard ----------------------------------------------------
+            if (branch == SkillBranch.None)
             {
-                return true;
+                Debug.LogError("LeaderSkillTree.IsBranchAvailable: SkillBranch.None is invalid input.");
+                return false;
             }
 
-            bool isDoctrine = branch.IsDoctrine();      // helper ext method
-            bool isSpec = branch.IsSpecialization();
+            // ---- Foundation branches stack with everything -------------------------
+            if (branch == SkillBranch.LeadershipFoundation ||
+                branch == SkillBranch.PoliticallyConnectedFoundation)
+                return true;
 
+            bool isDoctrine = branch.IsDoctrine();
+            bool isSpecialization = branch.IsSpecialization();
+
+            // ---- Doctrine / specialization exclusivity -----------------------------
             if (isDoctrine)
                 return !startedBranches.Any(b => b.IsDoctrine());
-            if (isSpec)
+
+            if (isSpecialization)
                 return !startedBranches.Any(b => b.IsSpecialization());
 
-            return false; // unknown branch type
+            // ---- Unknown branch category -------------------------------------------
+            Debug.LogError($"LeaderSkillTree.IsBranchAvailable: Unhandled branch type: {branch}");
+            return false;
         }
 
         #endregion

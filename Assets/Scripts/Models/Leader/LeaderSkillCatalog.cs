@@ -290,7 +290,6 @@ namespace HammerAndSickle.Models
             InitSignalIntelligenceSpecialization();
             InitEngineeringSkills();
             InitSpecialForcesDoctrine();
-            InitCombinedArmsSpecialization();
         }
 
         /// <summary>
