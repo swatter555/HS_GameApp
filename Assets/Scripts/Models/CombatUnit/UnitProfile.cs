@@ -141,13 +141,13 @@ namespace HammerAndSickle.Models
             {
                 currentHitPoints = 0;
             }
-            else if (currentHitPoints > CUConstants.MaxPossibleHitPoints)
+            else if (currentHitPoints > CUConstants.MAX_HP)
             {
-                currentHitPoints = CUConstants.MaxPossibleHitPoints;
+                currentHitPoints = CUConstants.MAX_HP;
             }
 
             // Calculate the current multiplier based on hit points
-            float multiplier = (float)currentHitPoints / CUConstants.MaxPossibleHitPoints;
+            float multiplier = (float)currentHitPoints / CUConstants.MAX_HP;
 
             // Clear and regenerate the current profile
             CurrentProfile.Clear();

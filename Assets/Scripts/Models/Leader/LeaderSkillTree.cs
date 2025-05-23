@@ -321,7 +321,7 @@ namespace HammerAndSickle.Models
             }
 
             // Check XP cost
-            if (ReputationPoints < skillDef.XPCost) return false;
+            if (ReputationPoints < skillDef.REPCost) return false;
 
             // Check command grade requirement
             if (CurrentGrade < skillDef.RequiredGrade) return false;
@@ -360,7 +360,7 @@ namespace HammerAndSickle.Models
             }
 
             // Spend the experience
-            if (!SpendReputation(skillDef.XPCost)) return false;
+            if (!SpendReputation(skillDef.REPCost)) return false;
 
             // Track the branch if this is the first skill in it
             startedBranches.Add(skillDef.Branch);
@@ -569,7 +569,7 @@ namespace HammerAndSickle.Models
                         continue;
                     }
 
-                    refundedXP += skillDef.XPCost;
+                    refundedXP += skillDef.REPCost;
                     unlockedSkills[skillEnum] = false;
                     skillsWereReset = true;
                 }
@@ -621,7 +621,7 @@ namespace HammerAndSickle.Models
             {
                 if (LeaderSkillCatalog.TryGetSkillDefinition(skillEnum, out SkillDefinition skillDef))
                 {
-                    refundedREP += skillDef.XPCost;
+                    refundedREP += skillDef.REPCost;
                     unlockedSkills[skillEnum] = false;
                     skillsWereReset = true;
                 }
@@ -668,7 +668,7 @@ namespace HammerAndSickle.Models
             {
                 if (LeaderSkillCatalog.TryGetSkillDefinition(skillEnum, out SkillDefinition skillDef))
                 {
-                    refundedXP += skillDef.XPCost;
+                    refundedXP += skillDef.REPCost;
                     unlockedSkills[skillEnum] = false;
                     skillsWereReset = true;
                 }
