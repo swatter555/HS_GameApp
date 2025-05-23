@@ -6,7 +6,7 @@ using UnityEngine;
 namespace HammerAndSickle.Models
 {
     /// <summary>
-    /// LeaderSkillTree manages a leader's skills, experience points, and command grade progression.
+    /// LeaderSkillTree manages a leader's skills, reputation points, and command grade progression.
     /// 
     /// SKILL SYSTEM DESIGN:
     /// The skill system is built around strategic specialization with universal gating mechanisms:
@@ -27,10 +27,10 @@ namespace HammerAndSickle.Models
     /// PROGRESSION GATING:
     /// Leadership acts as the universal progression gate through command grade promotions:
     /// • JuniorGrade (starting): Access to Tier1 skills in any branch
-    /// • SeniorGrade (200 XP): Unlocks Tier2-3 skills across all branches
-    /// • TopGrade (500 XP): Unlocks Tier4-5 specialization skills
+    /// • SeniorGrade: Unlocks Tier2-3 skills across all branches
+    /// • TopGrade: Unlocks Tier4-5 specialization skills
     /// 
-    /// This design forces meaningful XP investment decisions - roughly 50% of a leader's XP 
+    /// This design forces meaningful REP investment decisions - a fair amount of a leader's REP 
     /// must go to Leadership promotions to access higher-tier abilities, preventing early 
     /// specialization abuse while ensuring every leader has strong command capabilities.
     /// 
@@ -50,18 +50,18 @@ namespace HammerAndSickle.Models
     /// - Event notifications for UI and other systems
     /// 
     /// KEY METHODS:
-    /// - AddExperience: Adds XP to the leader's pool
+    /// - AddReputation: Adds REP to the leader's pool
     /// - CanUnlockSkill: Validates prerequisites, grade requirements, and branch exclusivity
     /// - UnlockSkill: Unlocks skills, handles promotions, and applies effects
     /// - IsSkillUnlocked: Checks if a specific skill is unlocked
     /// - GetBonusValue: Retrieves total bonus for a specific bonus type
     /// - HasCapability: Checks if the leader has a specific boolean capability
-    /// - ResetAllSkills/ResetBranch: Refunds experience from skills (respects promotions)
+    /// - ResetAllSkills/ResetBranch: Refunds reputation from skills (respects promotions)
     /// 
     /// USAGE EXAMPLE - Typical Leader Progression:
     /// ```csharp
     /// var skillTree = new LeaderSkillTree();
-    /// skillTree.AddExperience(200);  // Award XP after battles
+    /// skillTree.AddReputation(200);  // Award REP after battles
     /// 
     /// // Start with Leadership foundation
     /// skillTree.UnlockSkill(LeadershipFoundation.JuniorOfficerTraining_CommandTier1);
@@ -106,17 +106,17 @@ namespace HammerAndSickle.Models
 
         #region Properties
 
-        // Experience and Command Grade
-        public int ExperiencePoints { get; private set; }
+        // Reputation and Command Grade
+        public int ReputationPoints { get; private set; }
         public CommandGrade CurrentGrade { get; private set; }
 
         // Promotion convenience properties
         public bool CanAffordSeniorPromotion =>
-            ExperiencePoints >= CUConstants.REP_COST_FOR_SENIOR_PROMOTION &&
+            ReputationPoints >= CUConstants.REP_COST_FOR_SENIOR_PROMOTION &&
             CurrentGrade == CommandGrade.JuniorGrade;
 
         public bool CanAffordTopPromotion =>
-            ExperiencePoints >= CUConstants.REP_COST_FOR_TOP_PROMOTION &&
+            ReputationPoints >= CUConstants.REP_COST_FOR_TOP_PROMOTION &&
             CurrentGrade == CommandGrade.SeniorGrade;
 
         // Branch-related properties
@@ -132,7 +132,7 @@ namespace HammerAndSickle.Models
         // Notification events for UI and other systems
         public event Action<Enum, string, string> OnSkillUnlocked; // (skillEnum, skillName, fullSkillDescription)
         public event Action<CommandGrade> OnGradeChanged;
-        public event Action<int, int> OnExperienceChanged; // (changeAmount, newTotalExperience)
+        public event Action<int, int> OnReputationChanged; // (changeAmount, newTotalReputation)
         public event Action<CommandGrade> OnPromotionAvailable; // (targetPromotionGrade)
         public event Action<SkillBranch, SkillTier> OnBranchTierUnlocked; // (branch, tier)
         public event Action<SkillBonusType> OnCapabilityUnlocked; // (bonusType)
@@ -144,10 +144,10 @@ namespace HammerAndSickle.Models
         /// <summary>
         /// Creates a new LeaderSkillTree with optional initial experience
         /// </summary>
-        /// <param name="initialExperience">Starting experience points (default: 0)</param>
-        public LeaderSkillTree(int initialExperience = 0)
+        /// <param name="initialReputation">Starting experience points (default: 0)</param>
+        public LeaderSkillTree(int initialReputation = 0)
         {
-            ExperiencePoints = initialExperience;
+            ReputationPoints = initialReputation;
             CurrentGrade = CommandGrade.JuniorGrade;
             InitializeSkillDictionaries();
         }
@@ -251,41 +251,34 @@ namespace HammerAndSickle.Models
 
         #endregion
 
-        #region Experience Management
+
+        #region Reputation Management
 
         /// <summary>
-        /// Adds experience points to the leader's pool, applying any experience gain bonuses
+        /// Adds reputation points to the leader's pool.
         /// </summary>
-        /// <param name="experienceAmount">Base experience to add</param>
-        public void AddExperience(int experienceAmount)
+        /// <param name="reputationAmount">Base experience to add</param>
+        public void AddReputation(int reputationAmount)
         {
-            if (experienceAmount <= 0) return;
+            if (reputationAmount <= 0) return;
 
-            // Apply experience gain bonuses
-            float experienceMultiplier = 1.0f;
-            if (HasCapability(SkillBonusType.ReplacementXP))
-            {
-                experienceMultiplier += GetBonusValue(SkillBonusType.ReplacementXP);
-            }
+            ReputationPoints += reputationAmount;
 
-            int finalExperienceToAdd = (int)(experienceAmount * experienceMultiplier);
-            ExperiencePoints += finalExperienceToAdd;
-
-            OnExperienceChanged?.Invoke(finalExperienceToAdd, ExperiencePoints);
+            OnReputationChanged?.Invoke(reputationAmount, ReputationPoints);
             CheckPromotionAvailability();
         }
 
         /// <summary>
         /// Spends experience points from the leader's pool
         /// </summary>
-        /// <param name="experienceAmount">Amount to spend</param>
+        /// <param name="reputationAmount">Amount to spend</param>
         /// <returns>True if the experience was successfully spent</returns>
-        private bool SpendExperience(int experienceAmount)
+        private bool SpendReputation(int reputationAmount)
         {
-            if (experienceAmount <= 0 || ExperiencePoints < experienceAmount) return false;
+            if (reputationAmount <= 0 || ReputationPoints < reputationAmount) return false;
 
-            ExperiencePoints -= experienceAmount;
-            OnExperienceChanged?.Invoke(-experienceAmount, ExperiencePoints);
+            ReputationPoints -= reputationAmount;
+            OnReputationChanged?.Invoke(-reputationAmount, ReputationPoints);
             CheckPromotionAvailability();
             return true;
         }
@@ -328,7 +321,7 @@ namespace HammerAndSickle.Models
             }
 
             // Check XP cost
-            if (ExperiencePoints < skillDef.XPCost) return false;
+            if (ReputationPoints < skillDef.XPCost) return false;
 
             // Check command grade requirement
             if (CurrentGrade < skillDef.RequiredGrade) return false;
@@ -367,7 +360,7 @@ namespace HammerAndSickle.Models
             }
 
             // Spend the experience
-            if (!SpendExperience(skillDef.XPCost)) return false;
+            if (!SpendReputation(skillDef.XPCost)) return false;
 
             // Track the branch if this is the first skill in it
             startedBranches.Add(skillDef.Branch);
@@ -589,8 +582,8 @@ namespace HammerAndSickle.Models
                     b != SkillBranch.LeadershipFoundation);
 
                 // Add refunded XP
-                ExperiencePoints += refundedXP;
-                OnExperienceChanged?.Invoke(refundedXP, ExperiencePoints);
+                ReputationPoints += refundedXP;
+                OnReputationChanged?.Invoke(refundedXP, ReputationPoints);
 
                 // Clear caches
                 ClearBonusCaches();
@@ -600,7 +593,7 @@ namespace HammerAndSickle.Models
         }
 
         /// <summary>
-        /// Resets all skills in a specific branch, refunding experience points
+        /// Resets all skills in a specific branch, refunding reputation points
         /// </summary>
         /// <param name="branch">The branch to reset</param>
         /// <returns>True if any skills were reset</returns>
@@ -609,7 +602,7 @@ namespace HammerAndSickle.Models
             // Cannot reset LeadershipFoundation branch (contains promotions)
             if (branch == SkillBranch.LeadershipFoundation) return false;
 
-            int refundedXP = 0;
+            int refundedREP = 0;
             bool skillsWereReset = false;
 
             // Get all unlocked skills in this branch
@@ -628,7 +621,7 @@ namespace HammerAndSickle.Models
             {
                 if (LeaderSkillCatalog.TryGetSkillDefinition(skillEnum, out SkillDefinition skillDef))
                 {
-                    refundedXP += skillDef.XPCost;
+                    refundedREP += skillDef.XPCost;
                     unlockedSkills[skillEnum] = false;
                     skillsWereReset = true;
                 }
@@ -640,8 +633,8 @@ namespace HammerAndSickle.Models
                 startedBranches.Remove(branch);
 
                 // Add refunded XP
-                ExperiencePoints += refundedXP;
-                OnExperienceChanged?.Invoke(refundedXP, ExperiencePoints);
+                ReputationPoints += refundedREP;
+                OnReputationChanged?.Invoke(refundedREP, ReputationPoints);
 
                 // Clear caches
                 ClearBonusCaches();
@@ -688,8 +681,8 @@ namespace HammerAndSickle.Models
                     b != SkillBranch.LeadershipFoundation);
 
                 // Add refunded XP
-                ExperiencePoints += refundedXP;
-                OnExperienceChanged?.Invoke(refundedXP, ExperiencePoints);
+                ReputationPoints += refundedXP;
+                OnReputationChanged?.Invoke(refundedXP, ReputationPoints);
 
                 // Clear caches
                 ClearBonusCaches();
@@ -736,7 +729,7 @@ namespace HammerAndSickle.Models
         {
             var data = new LeaderSkillTreeData
             {
-                ExperiencePoints = this.ExperiencePoints,
+                ReputationPoints = this.ReputationPoints,
                 CurrentGrade = this.CurrentGrade,
                 StartedBranches = this.startedBranches.Select(b => (int)b).ToList(),
                 UnlockedSkills = new List<SkillReference>()
@@ -771,7 +764,7 @@ namespace HammerAndSickle.Models
             InitializeSkillDictionaries();
 
             // Load basic properties
-            ExperiencePoints = data.ExperiencePoints;
+            ReputationPoints = data.ReputationPoints;
             CurrentGrade = data.CurrentGrade;
 
             // Load branches
@@ -840,7 +833,7 @@ namespace HammerAndSickle.Models
     [Serializable]
     public class LeaderSkillTreeData
     {
-        public int ExperiencePoints;
+        public int ReputationPoints;
         public CommandGrade CurrentGrade;
         public List<int> StartedBranches;
         public List<SkillReference> UnlockedSkills;
