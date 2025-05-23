@@ -28,8 +28,7 @@ namespace HammerAndSickle.Models
         public Side Side { get; private set; }                               // Player or AI
         public Nationality Nationality { get; private set; }                 // Nation of origin
         public CommandGrade CommandGrade { get; private set; }               // Rank of the officer
-        public ReputationRank ReputationRank { get; private set; }           // Reputation rank for promotion
-        public int ReputationPoints { get; private set; }                    // Points for the upgrade reputation
+        public int ReputationPoints { get; private set; }                    // Points for the promotions and upgrades
         public string FormattedRank { get { return GetFormattedRank(); } }   // Real-world rank of the officer
         public CommandAbility CombatCommand { get; private set; }            // Direct combat modifier
         public bool IsAssigned { get; private set; }                         // Is the officer assigned to a unit?

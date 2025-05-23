@@ -301,7 +301,7 @@ namespace HammerAndSickle.Models
             AddSkill(new SkillDefinition(
                 LeadershipFoundation.JuniorOfficerTraining_CommandTier1,
                 "Junior Officer Training",
-                CUConstants.TIER1_XP_COST,
+                CUConstants.TIER1_REP_COST,
                 SkillBranch.LeadershipFoundation,
                 SkillTier.Tier1,
                 "Basic command training for junior officers enhances leadership capabilities.",
@@ -313,7 +313,7 @@ namespace HammerAndSickle.Models
             AddSkill(new SkillDefinition(
                 LeadershipFoundation.PromotionToSeniorGrade_SeniorPromotion,
                 "Promotion to Senior Grade",
-                CUConstants.XP_COST_FOR_SENIOR_PROMOTION, // Special cost
+                CUConstants.REP_COST_FOR_SENIOR_PROMOTION, // Special cost
                 SkillBranch.LeadershipFoundation,
                 SkillTier.Tier2,
                 "Promotion to Senior Grade increases command authority and unlocks advanced skills.",
@@ -326,7 +326,7 @@ namespace HammerAndSickle.Models
             AddSkill(new SkillDefinition(
                 LeadershipFoundation.SeniorOfficerTraining_CommandTier2,
                 "Senior Officer Training",
-                CUConstants.TIER3_XP_COST,
+                CUConstants.TIER3_REP_COST,
                 SkillBranch.LeadershipFoundation,
                 SkillTier.Tier3,
                 "Advanced command training for senior officers substantially improves leadership abilities.",
@@ -340,7 +340,7 @@ namespace HammerAndSickle.Models
             AddSkill(new SkillDefinition(
                 LeadershipFoundation.PromotionToTopGrade_TopPromotion,
                 "Promotion to Top Grade",
-                CUConstants.XP_COST_FOR_TOP_PROMOTION, // Special cost
+                CUConstants.REP_COST_FOR_TOP_PROMOTION, // Special cost
                 SkillBranch.LeadershipFoundation,
                 SkillTier.Tier4,
                 "Promotion to Top Grade grants the highest level of command authority and strategic influence.",
@@ -353,7 +353,7 @@ namespace HammerAndSickle.Models
             AddSkill(new SkillDefinition(
                 LeadershipFoundation.GeneralStaffTraining_CommandTier3,
                 "General Staff Training",
-                CUConstants.TIER5_XP_COST,
+                CUConstants.TIER5_REP_COST,
                 SkillBranch.LeadershipFoundation,
                 SkillTier.Tier5,
                 "Elite command training for top officers maximizes leadership effectiveness and strategic capability.",
@@ -373,7 +373,7 @@ namespace HammerAndSickle.Models
             AddSkill(new SkillDefinition(
                 ArmoredDoctrine.ShockTankCorps_HardAttack,
                 "Shock Tank Corps",
-                CUConstants.TIER1_XP_COST,
+                CUConstants.TIER1_REP_COST,
                 SkillBranch.ArmoredDoctrine,
                 SkillTier.Tier1,
                 "Specialization in armored assault tactics increases hard target attack effectiveness.",
@@ -386,7 +386,7 @@ namespace HammerAndSickle.Models
             AddSkill(new SkillDefinition(
                 ArmoredDoctrine.HullDownExpert_HardDefense,
                 "Hull Down Expert",
-                CUConstants.TIER2_XP_COST,
+                CUConstants.TIER2_REP_COST,
                 SkillBranch.ArmoredDoctrine,
                 SkillTier.Tier2,
                 "Training in defensive positioning techniques increases armor protection and survivability.",
@@ -400,7 +400,7 @@ namespace HammerAndSickle.Models
             AddSkill(new SkillDefinition(
                 ArmoredDoctrine.PursuitDoctrine_Breakthrough,
                 "Pursuit Doctrine",
-                CUConstants.TIER3_XP_COST,
+                CUConstants.TIER3_REP_COST,
                 SkillBranch.ArmoredDoctrine,
                 SkillTier.Tier3,
                 "Specialization in rapid exploitation of breakthroughs allows bonus movement after enemy retreats.",
@@ -419,7 +419,7 @@ namespace HammerAndSickle.Models
             AddSkill(new SkillDefinition(
                 InfantryDoctrine.InfantryAssaultTactics_SoftAttack,
                 "Infantry Assault Tactics",
-                CUConstants.TIER1_XP_COST,
+                CUConstants.TIER1_REP_COST,
                 SkillBranch.InfantryDoctrine,
                 SkillTier.Tier1,
                 "Specialized infantry assault training increases effectiveness against soft targets.",
@@ -432,7 +432,7 @@ namespace HammerAndSickle.Models
             AddSkill(new SkillDefinition(
                 InfantryDoctrine.DefensiveDoctrine_SoftDefense,
                 "Defensive Doctrine",
-                CUConstants.TIER2_XP_COST,
+                CUConstants.TIER2_REP_COST,
                 SkillBranch.InfantryDoctrine,
                 SkillTier.Tier2,
                 "Training in defensive tactics and entrenchment improves infantry survivability.",
@@ -446,7 +446,7 @@ namespace HammerAndSickle.Models
             AddSkill(new SkillDefinition(
                 InfantryDoctrine.TerrainAdvantage_RoughTerrainMovt,
                 "Rough Terrain Operations",
-                CUConstants.TIER3_XP_COST,
+                CUConstants.TIER3_REP_COST,
                 SkillBranch.InfantryDoctrine,
                 SkillTier.Tier3,
                 "Advanced navigation training for rough terrain.",
@@ -465,7 +465,7 @@ namespace HammerAndSickle.Models
             AddSkill(new SkillDefinition(
                 ArtilleryDoctrine.PrecisionTargeting_IndirectRange,
                 "Precision Targeting",
-                CUConstants.TIER1_XP_COST,
+                CUConstants.TIER1_REP_COST,
                 SkillBranch.ArtilleryDoctrine,
                 SkillTier.Tier1,
                 "Improved artillery targeting techniques extend effective range of indirect fire weapons.",
@@ -478,7 +478,7 @@ namespace HammerAndSickle.Models
             AddSkill(new SkillDefinition(
                 ArtilleryDoctrine.MobileArtilleryDoctrine_ShootAndScoot,
                 "Mobile Artillery Doctrine",
-                CUConstants.TIER2_XP_COST,
+                CUConstants.TIER2_REP_COST,
                 SkillBranch.ArtilleryDoctrine,
                 SkillTier.Tier2,
                 "Training in rapid redeployment allows artillery to fire and then move in the same turn.",
@@ -491,7 +491,7 @@ namespace HammerAndSickle.Models
             AddSkill(new SkillDefinition(
                 ArtilleryDoctrine.FireMissionSpecialist_AdvancedTargetting,
                 "Fire Mission Specialist",
-                CUConstants.TIER3_XP_COST,
+                CUConstants.TIER3_REP_COST,
                 SkillBranch.ArtilleryDoctrine,
                 SkillTier.Tier3,
                 "Expert artillery coordination allows targeting multiple enemy units in one turn at increased supply cost.",
@@ -510,7 +510,7 @@ namespace HammerAndSickle.Models
             AddSkill(new SkillDefinition(
                 AirDefenseDoctrine.OffensiveAirDefense_AirAttack,
                 "Offensive Air Defense",
-                CUConstants.TIER1_XP_COST,
+                CUConstants.TIER1_REP_COST,
                 SkillBranch.AirDefenseDoctrine,
                 SkillTier.Tier1,
                 "Aggressive anti-aircraft tactics increase effectiveness against air targets.",
@@ -523,7 +523,7 @@ namespace HammerAndSickle.Models
             AddSkill(new SkillDefinition(
                 AirDefenseDoctrine.IntegratedAirDefenseSystem_AirDefense,
                 "Integrated Air Defense System",
-                CUConstants.TIER2_XP_COST,
+                CUConstants.TIER2_REP_COST,
                 SkillBranch.AirDefenseDoctrine,
                 SkillTier.Tier2,
                 "Coordinated air defense network improves survivability against air attacks.",
@@ -537,7 +537,7 @@ namespace HammerAndSickle.Models
             AddSkill(new SkillDefinition(
                 AirDefenseDoctrine.ReadyResponseProtocol_OpportunityAction,
                 "Ready Response Protocol",
-                CUConstants.TIER3_XP_COST,
+                CUConstants.TIER3_REP_COST,
                 SkillBranch.AirDefenseDoctrine,
                 SkillTier.Tier3,
                 "Improved reaction time allows additional opportunity fire actions against enemy movement.",
@@ -556,7 +556,7 @@ namespace HammerAndSickle.Models
             AddSkill(new SkillDefinition(
                 AirborneDoctrine.RapidDeploymentPlanning_ImpromptuPlanning,
                 "Rapid Deployment Planning",
-                CUConstants.TIER1_XP_COST,
+                CUConstants.TIER1_REP_COST,
                 SkillBranch.AirborneDoctrine,
                 SkillTier.Tier1,
                 "Streamlined planning procedures allow boarding aircraft without spending an action.",
@@ -568,7 +568,7 @@ namespace HammerAndSickle.Models
             AddSkill(new SkillDefinition(
                 AirborneDoctrine.CombatDropDoctrine_AirborneAssault,
                 "Combat Drop Doctrine",
-                CUConstants.TIER2_XP_COST,
+                CUConstants.TIER2_REP_COST,
                 SkillBranch.AirborneDoctrine,
                 SkillTier.Tier2,
                 "Advanced combat drop training reduces suppression impact for paratroopers after landing.",
@@ -581,7 +581,7 @@ namespace HammerAndSickle.Models
             AddSkill(new SkillDefinition(
                 AirborneDoctrine.EliteParatrooperCorps_AirborneElite,
                 "Elite Paratrooper Corps",
-                CUConstants.TIER3_XP_COST,
+                CUConstants.TIER3_REP_COST,
                 SkillBranch.AirborneDoctrine,
                 SkillTier.Tier3,
                 "Elite airborne units can still conduct combat operations immediately after a jump.",
@@ -600,7 +600,7 @@ namespace HammerAndSickle.Models
             AddSkill(new SkillDefinition(
                 AirMobileDoctrine.RapidRedeployment_AirMobile,
                 "Rapid Redeployment",
-                CUConstants.TIER1_XP_COST,
+                CUConstants.TIER1_REP_COST,
                 SkillBranch.AirMobileDoctrine,
                 SkillTier.Tier1,
                 "Improved helicopter operations allow units to move after air landing.",
@@ -612,7 +612,7 @@ namespace HammerAndSickle.Models
             AddSkill(new SkillDefinition(
                 AirMobileDoctrine.HeliborneStrikeForce_AirMobileAssault,
                 "Heliborne Strike Force",
-                CUConstants.TIER2_XP_COST,
+                CUConstants.TIER2_REP_COST,
                 SkillBranch.AirMobileDoctrine,
                 SkillTier.Tier2,
                 "Combat-focused air mobile operations allow units to still have a combat action after landing.",
@@ -625,7 +625,7 @@ namespace HammerAndSickle.Models
             AddSkill(new SkillDefinition(
                 AirMobileDoctrine.EliteAirMobileOperations_AirMobileElite,
                 "Elite Air Mobile Operations",
-                CUConstants.TIER3_XP_COST,
+                CUConstants.TIER3_REP_COST,
                 SkillBranch.AirMobileDoctrine,
                 SkillTier.Tier3,
                 "Elite training significantly reduces vulnerability to enemy fire when mounted in helicopters.",
@@ -644,7 +644,7 @@ namespace HammerAndSickle.Models
             AddSkill(new SkillDefinition(
                 IntelligenceDoctrine.EnhancedIntelligenceCollection_ImprovedGathering,
                 "Enhanced Intelligence Collection",
-                CUConstants.TIER1_XP_COST,
+                CUConstants.TIER1_REP_COST,
                 SkillBranch.IntelligenceDoctrine,
                 SkillTier.Tier1,
                 "Improved intelligence gathering techniques provide additional intel actions each turn.",
@@ -657,7 +657,7 @@ namespace HammerAndSickle.Models
             AddSkill(new SkillDefinition(
                 IntelligenceDoctrine.ConcealedOperationsBase_UndergroundBunker,
                 "Concealed Operations Base",
-                CUConstants.TIER2_XP_COST,
+                CUConstants.TIER2_REP_COST,
                 SkillBranch.IntelligenceDoctrine,
                 SkillTier.Tier2,
                 "Specialized camouflage and concealment techniques significantly reduce unit visibility on the battlefield.",
@@ -670,7 +670,7 @@ namespace HammerAndSickle.Models
             AddSkill(new SkillDefinition(
                 IntelligenceDoctrine.SatelliteIntelligence_SpaceAssets,
                 "Satellite Reconnaissance",
-                CUConstants.TIER3_XP_COST,
+                CUConstants.TIER3_REP_COST,
                 SkillBranch.IntelligenceDoctrine,
                 SkillTier.Tier3,
                 "Satellite intelligence provides a chance to spot enemy units anywhere on the map.",
@@ -689,7 +689,7 @@ namespace HammerAndSickle.Models
             AddSkill(new SkillDefinition(
                 CombinedArmsSpecialization.AviationAssets_SpottingRange,
                 "Aviation Recon Assets",
-                CUConstants.TIER4_XP_COST,
+                CUConstants.TIER4_REP_COST,
                 SkillBranch.CombinedArmsSpecialization,
                 SkillTier.Tier4,
                 "Higher headquarters has allocated recon helicopters for this unit.",
@@ -702,7 +702,7 @@ namespace HammerAndSickle.Models
             AddSkill(new SkillDefinition(
                 CombinedArmsSpecialization.ExpertStaff_MovementAction,
                 "Expert Staff Planning",
-                CUConstants.TIER4_XP_COST,
+                CUConstants.TIER4_REP_COST,
                 SkillBranch.CombinedArmsSpecialization,
                 SkillTier.Tier4,
                 "The Soviet Union has excellent staff officers, this unit has the best of the best.",
@@ -716,7 +716,7 @@ namespace HammerAndSickle.Models
             AddSkill(new SkillDefinition(
                 CombinedArmsSpecialization.TacticalGenius_CombatAction,
                 "Tactical Genuis",
-                CUConstants.TIER4_XP_COST,
+                CUConstants.TIER4_REP_COST,
                 SkillBranch.CombinedArmsSpecialization,
                 SkillTier.Tier4,
                 "This commander has excellent insticts and always drives to the sound of guns.",
@@ -730,7 +730,7 @@ namespace HammerAndSickle.Models
             AddSkill(new SkillDefinition(
                 CombinedArmsSpecialization.NightCombatOperations_NightCombat,
                 "Night Combat Operations",
-                CUConstants.TIER5_XP_COST,
+                CUConstants.TIER5_REP_COST,
                 SkillBranch.CombinedArmsSpecialization,
                 SkillTier.Tier5,
                 "Experience is an excellect teacher and crucial in modern night operations.",
@@ -749,7 +749,7 @@ namespace HammerAndSickle.Models
             AddSkill(new SkillDefinition(
                 SignalIntelligenceSpecialization.CommunicationsDecryption_SignalDecryption,
                 "Communications Decryption",
-                CUConstants.TIER4_XP_COST,
+                CUConstants.TIER4_REP_COST,
                 SkillBranch.SignalIntelligenceSpecialization,
                 SkillTier.Tier4,
                 "Signals intelligence capability reveals more detailed information about spotted enemy units.",
@@ -761,7 +761,7 @@ namespace HammerAndSickle.Models
             AddSkill(new SkillDefinition(
                 SignalIntelligenceSpecialization.ElectronicSurveillanceNetwork_SpottingRange,
                 "Electronic Surveillance Network",
-                CUConstants.TIER4_XP_COST,
+                CUConstants.TIER4_REP_COST,
                 SkillBranch.SignalIntelligenceSpecialization,
                 SkillTier.Tier4,
                 "Deployable electronic surveillance systems dramatically increase detection range.",
@@ -775,7 +775,7 @@ namespace HammerAndSickle.Models
             AddSkill(new SkillDefinition(
                 SignalIntelligenceSpecialization.RadioElectronicCombat_ElectronicWarfare,
                 "Radio Electronic Combat",
-                CUConstants.TIER4_XP_COST,
+                CUConstants.TIER4_REP_COST,
                 SkillBranch.SignalIntelligenceSpecialization,
                 SkillTier.Tier4,
                 "Advanced jamming techniques provide a chance to immobilize enemy units when gathering intelligence.",
@@ -788,7 +788,7 @@ namespace HammerAndSickle.Models
             AddSkill(new SkillDefinition(
                 SignalIntelligenceSpecialization.EnemyBehaviorAnalysis_PatternRecognition,
                 "Enemy Behavior Analysis",
-                CUConstants.TIER5_XP_COST,
+                CUConstants.TIER5_REP_COST,
                 SkillBranch.SignalIntelligenceSpecialization,
                 SkillTier.Tier5,
                 "Advanced analysis of enemy movement patterns reveals likely movement paths for spotted units.",
@@ -807,7 +807,7 @@ namespace HammerAndSickle.Models
             AddSkill(new SkillDefinition(
                 EngineeringSpecialization.RiverCrossingOperations_RiverCrossing,
                 "River Crossing Operations",
-                CUConstants.TIER4_XP_COST,
+                CUConstants.TIER4_REP_COST,
                 SkillBranch.EngineeringSpecialization,
                 SkillTier.Tier4,
                 "Engineering expertise significantly reduces movement costs when crossing rivers.",
@@ -820,7 +820,7 @@ namespace HammerAndSickle.Models
             AddSkill(new SkillDefinition(
                 EngineeringSpecialization.AmphibiousAssaultTactics_RiverAssault,
                 "Amphibious Assault Tactics",
-                CUConstants.TIER4_XP_COST,
+                CUConstants.TIER4_REP_COST,
                 SkillBranch.EngineeringSpecialization,
                 SkillTier.Tier4,
                 "Specialized assault river crossing techniques reduce combat penalties when attacking across rivers.",
@@ -833,7 +833,7 @@ namespace HammerAndSickle.Models
             AddSkill(new SkillDefinition(
                 EngineeringSpecialization.CombatEngineeringCorps_BridgeBuilding,
                 "Combat Engineering Corps",
-                CUConstants.TIER4_XP_COST,
+                CUConstants.TIER4_REP_COST,
                 SkillBranch.EngineeringSpecialization,
                 SkillTier.Tier4,
                 "Advanced military engineering allows construction of tactical bridges over rivers in a single turn.",
@@ -846,7 +846,7 @@ namespace HammerAndSickle.Models
             AddSkill(new SkillDefinition(
                 EngineeringSpecialization.FieldFortificationExpert_FieldFortification,
                 "Field Fortification Expert",
-                CUConstants.TIER5_XP_COST,
+                CUConstants.TIER5_REP_COST,
                 SkillBranch.EngineeringSpecialization,
                 SkillTier.Tier5,
                 "Expert engineering skills allow construction of permanent defensive fortifications.",
@@ -865,7 +865,7 @@ namespace HammerAndSickle.Models
             AddSkill(new SkillDefinition(
                 SpecialForcesSpecialization.TerrainExpert_TerrainMastery,
                 "Terrain Expert",
-                CUConstants.TIER4_XP_COST,
+                CUConstants.TIER4_REP_COST,
                 SkillBranch.SpecialForcesSpecialization,
                 SkillTier.Tier4,
                 "Advanced training in difficult terrain reduces movement costs in rough terrain, forests, and mountains.",
@@ -877,7 +877,7 @@ namespace HammerAndSickle.Models
             AddSkill(new SkillDefinition(
                 SpecialForcesSpecialization.InfiltrationTactics_InfiltrationMovement,
                 "Infiltration Tactics",
-                CUConstants.TIER4_XP_COST,
+                CUConstants.TIER4_REP_COST,
                 SkillBranch.SpecialForcesSpecialization,
                 SkillTier.Tier4,
                 "Specialized movement techniques allow easier passage through enemy zones of control.",
@@ -890,7 +890,7 @@ namespace HammerAndSickle.Models
             AddSkill(new SkillDefinition(
                 SpecialForcesSpecialization.SuperiorCamouflage_ConcealedPositions,
                 "Superior Camouflage",
-                CUConstants.TIER4_XP_COST,
+                CUConstants.TIER4_REP_COST,
                 SkillBranch.SpecialForcesSpecialization,
                 SkillTier.Tier4,
                 "Advanced concealment techniques reduce unit visibility on the battlefield.",
@@ -903,7 +903,7 @@ namespace HammerAndSickle.Models
             AddSkill(new SkillDefinition(
                 SpecialForcesSpecialization.AmbushTactics_AmbushTactics,
                 "Ambush Tactics",
-                CUConstants.TIER5_XP_COST,
+                CUConstants.TIER5_REP_COST,
                 SkillBranch.SpecialForcesSpecialization,
                 SkillTier.Tier5,
                 "Specialized ambush training grants a significant combat bonus for the first attack from concealment.",
@@ -923,7 +923,7 @@ namespace HammerAndSickle.Models
             AddSkill(new SkillDefinition(
                 PoliticallyConnectedFoundation.EmergencyAirDrop_EmergencyResupply,
                 "Emergency Air Drop",
-                CUConstants.TIER2_XP_COST,
+                CUConstants.TIER2_REP_COST,
                 SkillBranch.PoliticallyConnectedFoundation,
                 SkillTier.Tier2,
                 "Political connections provide access to emergency air resupply operations once per scenario.",
@@ -935,7 +935,7 @@ namespace HammerAndSickle.Models
             AddSkill(new SkillDefinition(
                 PoliticallyConnectedFoundation.DirectLineToHQ_SupplyConsumption,
                 "Direct Line To HQ",
-                CUConstants.TIER2_XP_COST,
+                CUConstants.TIER2_REP_COST,
                 SkillBranch.PoliticallyConnectedFoundation,
                 SkillTier.Tier2,
                 $"Priority supply allocation reduces consumption by {(1.0f - CUConstants.SUPPLY_ECONOMY_REDUCTION_VAL) * 100}%.",
@@ -949,7 +949,7 @@ namespace HammerAndSickle.Models
             AddSkill(new SkillDefinition(
                 PoliticallyConnectedFoundation.ForeignTechnology_NVG,
                 "Foreign Technology",
-                CUConstants.TIER3_XP_COST,
+                CUConstants.TIER3_REP_COST,
                 SkillBranch.PoliticallyConnectedFoundation,
                 SkillTier.Tier3,
                 "Access to cutting-edge foreign night vision equipment enhances operations in darkness.",
@@ -962,7 +962,7 @@ namespace HammerAndSickle.Models
             AddSkill(new SkillDefinition(
                 PoliticallyConnectedFoundation.BetterReplacements_ReplacementXP,
                 "Better Replacements",
-                CUConstants.TIER3_XP_COST,
+                CUConstants.TIER3_REP_COST,
                 SkillBranch.PoliticallyConnectedFoundation,
                 SkillTier.Tier3,
                 $"Political influence ensures better trained replacements, increasing experience gain by {CUConstants.EXPERIENCE_BONUS_VAL * 100}%.",
@@ -976,7 +976,7 @@ namespace HammerAndSickle.Models
             AddSkill(new SkillDefinition(
                 PoliticallyConnectedFoundation.ConnectionsAtTheTop_PrestigeCost,
                 "Connections At The Top",
-                CUConstants.TIER4_XP_COST,
+                CUConstants.TIER4_REP_COST,
                 SkillBranch.PoliticallyConnectedFoundation,
                 SkillTier.Tier4,
                 $"High-level political connections reduce equipment costs by {(1.0f - CUConstants.PRESTIGE_COST_REDUCTION_VAL) * 100}%.",

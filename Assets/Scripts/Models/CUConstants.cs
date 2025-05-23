@@ -25,21 +25,21 @@ namespace HammerAndSickle.Models
         public const float MAX_RANGE = 25.0f;
         public const float MIN_RANGE = 0.0f;
 
-        // Unit experience constants.
-        public const int XP_PER_BATTLE = 25;
-        public const int XP_COST_FOR_SENIOR_PROMOTION = 200;
-        public const int XP_COST_FOR_TOP_PROMOTION = 500;
-
         //================================
         //====== Leader Skills/Tree ======
         //================================
 
+        // Reputation constants.
+        public const int REP_PER_BATTLE = 25;
+        public const int REP_COST_FOR_SENIOR_PROMOTION = 200;
+        public const int REP_COST_FOR_TOP_PROMOTION = 500;
+
         // Tiered skill XP costs.
-        public const int TIER1_XP_COST = 50;
-        public const int TIER2_XP_COST = 75;
-        public const int TIER3_XP_COST = 100;
-        public const int TIER4_XP_COST = 150;
-        public const int TIER5_XP_COST = 225;
+        public const int TIER1_REP_COST = 50;
+        public const int TIER2_REP_COST = 75;
+        public const int TIER3_REP_COST = 100;
+        public const int TIER4_REP_COST = 150;
+        public const int TIER5_REP_COST = 225;
 
         // Command and Operation bonuses (typically +1 for actions)
         public const int COMMAND_BONUS_VAL = 1;

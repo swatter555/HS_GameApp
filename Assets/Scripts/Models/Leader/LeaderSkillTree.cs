@@ -112,11 +112,11 @@ namespace HammerAndSickle.Models
 
         // Promotion convenience properties
         public bool CanAffordSeniorPromotion =>
-            ExperiencePoints >= CUConstants.XP_COST_FOR_SENIOR_PROMOTION &&
+            ExperiencePoints >= CUConstants.REP_COST_FOR_SENIOR_PROMOTION &&
             CurrentGrade == CommandGrade.JuniorGrade;
 
         public bool CanAffordTopPromotion =>
-            ExperiencePoints >= CUConstants.XP_COST_FOR_TOP_PROMOTION &&
+            ExperiencePoints >= CUConstants.REP_COST_FOR_TOP_PROMOTION &&
             CurrentGrade == CommandGrade.SeniorGrade;
 
         // Branch-related properties

@@ -245,16 +245,6 @@ namespace HammerAndSickle.Models
         Genius = 3
     }
 
-    /// <summary>
-    /// The reputation of a commander, used for promotion.
-    /// </summary>
-    public enum ReputationRank
-    {
-        Unknown = 0,
-        Notable = 100,
-        Famous  = 500
-    }
-
     //================================
     //====== Leader Skill Paths ======
     //================================
