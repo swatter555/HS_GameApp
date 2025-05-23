@@ -31,15 +31,15 @@ namespace HammerAndSickle.Models
 
         // Reputation constants.
         public const int REP_PER_BATTLE = 25;
-        public const int REP_COST_FOR_SENIOR_PROMOTION = 200;
-        public const int REP_COST_FOR_TOP_PROMOTION = 500;
+        public const int REP_COST_FOR_SENIOR_PROMOTION = 100;
+        public const int REP_COST_FOR_TOP_PROMOTION = 250;
 
         // Tiered skill XP costs.
-        public const int TIER1_REP_COST = 50;
-        public const int TIER2_REP_COST = 75;
-        public const int TIER3_REP_COST = 100;
-        public const int TIER4_REP_COST = 150;
-        public const int TIER5_REP_COST = 225;
+        public const int TIER1_REP_COST = 60;
+        public const int TIER2_REP_COST = 80;
+        public const int TIER3_REP_COST = 120;
+        public const int TIER4_REP_COST = 180;
+        public const int TIER5_REP_COST = 260;
 
         // Command and Operation bonuses (typically +1 for actions)
         public const int COMMAND_BONUS_VAL = 1;
@@ -63,14 +63,14 @@ namespace HammerAndSickle.Models
         public const int INDIRECT_RANGE_BONUS_VAL = 1;
 
         // Silouette bonuses.
-        public const int SMALL_SILOUETTE_REDUCTION_VAL = 1;
-        public const int MEDIUM_SILOUETTE_REDUCTION_VAL = 2;
+        public const int SMALL_SILHOUETTE_REDUCTION_VAL = 1;
+        public const int MEDIUM_SILHOUETTE_REDUCTION_VAL = 2;
 
         // Infantry doctrine multiplier.
         public const float RTO_MOVE_MULT = 0.8f;           // 20% movement cost reduction for RTOs.
 
         // Politically connected bonuses and multipliers.
-        public const int REPLACEMENT_XP_LEVEL_BONUS = 1;    // Replacements get +1 XP level.
+        public const int REPLACEMENT_XP_LEVEL_VAL = 1;    // Replacements get +1 XP level.
         public const float SUPPLY_ECONOMY_MULT      = 0.8f; // Supply consumption gets 20% cost reduction.
         public const float PRESTIGE_COST_MULT       = 0.7f; // Unit upgrades get 30% price reduction.
 
@@ -85,6 +85,37 @@ namespace HammerAndSickle.Models
 
         // Combined arms bonus.
         public const float NIGHT_COMBAT_MULT   = 1.25f;// x% combat bonus at night
+
+        //================================
+        //====== Leader Reputation ======
+        //================================
+
+        /// <summary>
+        /// Types of actions that can award reputation to leaders
+        /// </summary>
+        public enum ReputationAction
+        {
+            Move,
+            MountDismount,
+            IntelGather,
+            Combat,
+            AirborneJump,
+            ForcedRetreat,
+            UnitDestroyed
+        }
+
+        // Base REP gain per action type
+        public const int REP_PER_MOVE_ACTION = 1;              // Routine movement
+        public const int REP_PER_MOUNT_DISMOUNT = 1;           // Mounting/dismounting transport
+        public const int REP_PER_INTEL_GATHER = 2;             // Intelligence gathering (requires positioning)
+        public const int REP_PER_COMBAT_ACTION = 3;            // Attacking (risk involved)
+        public const int REP_PER_AIRBORNE_JUMP = 3;            // Paratrooper insertion (high risk)
+        public const int REP_PER_FORCED_RETREAT = 5;           // Causing enemy to retreat (tactical success)
+        public const int REP_PER_UNIT_DESTROYED = 8;           // Destroying enemy unit (major victory)
+
+        // Bonus REP multipliers
+        public const float REP_EXPERIENCE_MULTIPLIER = 1.5f;   // Veteran/Elite units gain more REP
+        public const float REP_ELITE_DIFFICULTY_BONUS = 2.0f;  // Bonus for destroying elite enemy units
 
 
         //=======================

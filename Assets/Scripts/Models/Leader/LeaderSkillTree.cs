@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 using UnityEngine;
 
 namespace HammerAndSickle.Models
@@ -139,6 +140,7 @@ namespace HammerAndSickle.Models
 
         #endregion
 
+
         #region Constructors
 
         /// <summary>
@@ -154,99 +156,53 @@ namespace HammerAndSickle.Models
 
         /// <summary>
         /// Initialize the skill dictionaries with all possible skills set to not unlocked
+        /// Uses reflection to automatically discover all skill enum types
         /// </summary>
         private void InitializeSkillDictionaries()
         {
-            // Leadership foundation branch.
-            foreach (LeadershipFoundation skill in Enum.GetValues(typeof(LeadershipFoundation)))
+            var skillEnumTypes = GetAllSkillEnumTypes();
+
+            foreach (var enumType in skillEnumTypes)
             {
-                if (skill != LeadershipFoundation.None)
+                foreach (Enum skill in Enum.GetValues(enumType))
+                {
+                    // Skip "None" values (assume None = 0 for all skill enums)
+                    if (Convert.ToInt32(skill) == 0) continue;
+
                     unlockedSkills[skill] = false;
+                }
+            }
+        }
+
+        /// <summary>
+        /// Uses reflection to find all enum types that represent skill branches
+        /// </summary>
+        private static List<Type> GetAllSkillEnumTypes()
+        {
+            var skillEnumTypes = new List<Type>();
+
+            // Get all enum types from the Models namespace that end with expected suffixes
+            var modelTypes = typeof(LeadershipFoundation).Assembly.GetTypes()
+                .Where(t => t.IsEnum && t.Namespace == "HammerAndSickle.Models");
+
+            foreach (var type in modelTypes)
+            {
+                // Check if this enum represents a skill branch by checking naming conventions
+                if (IsSkillEnumType(type))
+                {
+                    skillEnumTypes.Add(type);
+                }
             }
 
-            // PoliticallyConnected foundation branch.
-            foreach (PoliticallyConnectedFoundation skill in Enum.GetValues(typeof(PoliticallyConnectedFoundation)))
-            {
-                if (skill != PoliticallyConnectedFoundation.None)
-                    unlockedSkills[skill] = false;
-            }
+            return skillEnumTypes;
+        }
 
-            // Armored doctrine branch.
-            foreach (ArmoredDoctrine skill in Enum.GetValues(typeof(ArmoredDoctrine)))
-            {
-                if (skill != ArmoredDoctrine.None)
-                    unlockedSkills[skill] = false;
-            }
-
-            // Infantry doctrine branch.
-            foreach (InfantryDoctrine skill in Enum.GetValues(typeof(InfantryDoctrine)))
-            {
-                if (skill != InfantryDoctrine.None)
-                    unlockedSkills[skill] = false;
-            }
-
-            // Artillery doctrine branch.
-            foreach (ArtilleryDoctrine skill in Enum.GetValues(typeof(ArtilleryDoctrine)))
-            {
-                if (skill != ArtilleryDoctrine.None)
-                    unlockedSkills[skill] = false;
-            }
-
-            // Air Defense doctrine branch.
-            foreach (AirDefenseDoctrine skill in Enum.GetValues(typeof(AirDefenseDoctrine)))
-            {
-                if (skill != AirDefenseDoctrine.None)
-                    unlockedSkills[skill] = false;
-            }
-
-            // Airborne doctrine branch.
-            foreach (AirborneDoctrine skill in Enum.GetValues(typeof(AirborneDoctrine)))
-            {
-                if (skill != AirborneDoctrine.None)
-                    unlockedSkills[skill] = false;
-            }
-
-            // Air Mobile doctrine branch.
-            foreach (AirMobileDoctrine skill in Enum.GetValues(typeof(AirMobileDoctrine)))
-            {
-                if (skill != AirMobileDoctrine.None)
-                    unlockedSkills[skill] = false;
-            }
-
-            // Intelligence doctrine branch.
-            foreach (IntelligenceDoctrine skill in Enum.GetValues(typeof(IntelligenceDoctrine)))
-            {
-                if (skill != IntelligenceDoctrine.None)
-                    unlockedSkills[skill] = false;
-            }
-
-            // Combined Arms specialization branch.
-            foreach (CombinedArmsSpecialization skill in Enum.GetValues(typeof(CombinedArmsSpecialization)))
-            {
-                if (skill != CombinedArmsSpecialization.None)
-                    unlockedSkills[skill] = false;
-            }
-
-            // SignalIntelligence specialization branch.
-            foreach (SignalIntelligenceSpecialization skill in Enum.GetValues(typeof(SignalIntelligenceSpecialization)))
-            {
-                if (skill != SignalIntelligenceSpecialization.None)
-                    unlockedSkills[skill] = false;
-            }
-
-            // Engineering specialization branch.
-            foreach (EngineeringSpecialization skill in Enum.GetValues(typeof(EngineeringSpecialization)))
-            {
-                if (skill != EngineeringSpecialization.None)
-                    unlockedSkills[skill] = false;
-            }
-
-            // Special Forces specialization branch.
-            foreach (SpecialForcesSpecialization skill in Enum.GetValues(typeof(SpecialForcesSpecialization)))
-            {
-                if (skill != SpecialForcesSpecialization.None)
-                    unlockedSkills[skill] = false;
-            }
+        /// <summary>
+        /// Determines if an enum type represents a skill branch based on naming conventions
+        /// </summary>
+        private static bool IsSkillEnumType(Type enumType)
+        {
+            return enumType.GetCustomAttribute<SkillBranchEnumAttribute>() != null;
         }
 
         #endregion
@@ -455,6 +411,7 @@ namespace HammerAndSickle.Models
 
         #endregion
 
+
         #region Bonus Calculations
 
         /// <summary>
@@ -543,6 +500,7 @@ namespace HammerAndSickle.Models
         }
 
         #endregion
+
 
         #region Skill Reset (Respec)
 
@@ -693,6 +651,7 @@ namespace HammerAndSickle.Models
 
         #endregion
 
+
         #region Helper Methods
 
         /// <summary>
@@ -718,6 +677,7 @@ namespace HammerAndSickle.Models
         }
 
         #endregion
+
 
         #region Serialization Support
 

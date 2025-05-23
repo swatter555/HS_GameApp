@@ -655,7 +655,7 @@ namespace HammerAndSickle.Models
                 SkillTier.Tier2,
                 "Specialized camouflage and concealment techniques significantly reduce unit visibility on the battlefield.",
                 SkillBonusType.UndergroundBunker,
-                CUConstants.MEDIUM_SILOUETTE_REDUCTION_VAL,
+                CUConstants.MEDIUM_SILHOUETTE_REDUCTION_VAL,
                 CommandGrade.SeniorGrade,
                 new List<Enum> { IntelligenceDoctrine.EnhancedIntelligenceCollection_ImprovedGathering }
             ));
@@ -892,7 +892,7 @@ namespace HammerAndSickle.Models
                 SkillTier.Tier4,
                 "Advanced concealment techniques reduce unit siloette.",
                 SkillBonusType.ConcealedPositions,
-                CUConstants.SMALL_SILOUETTE_REDUCTION_VAL,
+                CUConstants.SMALL_SILHOUETTE_REDUCTION_VAL,
                 CommandGrade.TopGrade,
                 new List<Enum> { SpecialForcesSpecialization.InfiltrationTactics_InfiltrationMovement }
             ));
@@ -963,9 +963,9 @@ namespace HammerAndSickle.Models
                 CUConstants.TIER3_REP_COST,
                 SkillBranch.PoliticallyConnectedFoundation,
                 SkillTier.Tier3,
-                $"Political influence ensures better trained replacements, increasing experience gain by {CUConstants.REPLACEMENT_XP_LEVEL_BONUS * 100}%.",
+                $"Political influence ensures better trained replacements, increasing experience gain by {CUConstants.REPLACEMENT_XP_LEVEL_VAL * 100}%.",
                 SkillBonusType.ReplacementXP,
-                CUConstants.REPLACEMENT_XP_LEVEL_BONUS,
+                CUConstants.REPLACEMENT_XP_LEVEL_VAL,
                 CommandGrade.SeniorGrade,
                 new List<Enum> { PoliticallyConnectedFoundation.ForeignTechnology_NVG }
             ));
