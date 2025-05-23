@@ -171,10 +171,10 @@ namespace HammerAndSickle.Models
     /// </summary>
     public enum UnitSilhouette
     {
-        Large,
-        Medium,
+        Tiny,
         Small,
-        Tiny
+        Medium,
+        Large
     }
 
     /// <summary>
@@ -295,7 +295,7 @@ namespace HammerAndSickle.Models
         None,
         InfantryAssaultTactics_SoftAttack,      // Infantry Assault Tactics
         DefensiveDoctrine_SoftDefense,          // Defensive Doctrine
-        TerrainAdvantage_RoughTerrainMovt       // Move more easily in rough terrain.
+        RoughTerrainOperations_RTO              // Move more easily in rough terrain.
     }
 
     /// <summary>
@@ -411,33 +411,33 @@ namespace HammerAndSickle.Models
         None,
 
         // LeadershipFoundation
-        CommandTier1,         //  +1 to Command
+        CommandTier1,         // +x to Command
         SeniorPromotion,      // Boolean, promotion to SeniorGrade.
-        CommandTier2,         // +1 additional command
+        CommandTier2,         // +x additional command
         TopPromotion,         // Boolean, promotion to TopGrade
-        CommandTier3,         // +1 additional command
+        CommandTier3,         // +x additional command
 
         // PoliticallyConnectedFoundation
-        EmergencyResupply,    // Boolean, one free emergency resupply/replacement action per scenario.
-        SupplyConsumption,    // Value is a float total multiplier (e.g., 0.67 for 33% reduction)
-        NVG,                  // Upgrade unit to latest gen NVG
-        ReplacementXP,        // Replacements recieved are more experienced.
-        PrestigeCost,         // Value is a float total multiplier (e.g., 0.67 for 33% reduction)
+        EmergencyResupply,    // Boolean, one free emergency resupply per scenario.
+        SupplyConsumption,    // Supplies are consumed at reduced rate.
+        NVG,                  // Boolean, upgrade unit to latest gen NVG.
+        ReplacementXP,        // Unit gets better replacements (x bonus levels).
+        PrestigeCost,         // Unit is cheaper to upgrade (x% discount).
 
         // ArmoredDoctine
         HardAttack,           // Bonus to HardAttack
         HardDefense,          // Bonus to HardDefense
-        Breakthrough,         // Boolean, enemy retreat gives bonus move action.
+        Breakthrough,         // Boolean, enemy retreat gives refreshes movement points to max and +1 move actions.
 
         // InfanrtyDoctrine
         SoftAttack,           // Bonus to SoftAttack
         SoftDefense,          // Bonus to SoftDefense
-        RoughTerrainMovt,     // Boolean, rough terrain movement bonus (Rough, Forest, Marsh).
+        RTO,                  // Bonus, Rough Terrain Operations (Forest, Marsh, Rough) 
 
         // AirDefenseDoctrine
         AirAttack,            // Bonus to AirAttack
         AirDefense,           // Bonus to AirDefense
-        OpportunityAction,    // Boolean, gets extra opportunity action(attack).
+        OpportunityAction,    // Bonus to opportunity actions.
 
         // ArtilleryDoctrine
         ShootAndScoot,        // Boolean, may move after ranged attack.
@@ -445,14 +445,14 @@ namespace HammerAndSickle.Models
         IndirectRange,        // Indirect fire range +1
 
         // AirMobileDoctrine
-        AirMobile,            // Boolean, may move after air landing.
-        AirMobileAssault,     // Boolean, still have combat action after landing.
+        AirMobile,            // Boolean, unit has 1 move action after landing.
+        AirMobileAssault,     // Boolean, unit has 1 combat action after landing.
         AirMobileElite,       // Boolean, significantly reduces vulnerability to enemy fire when mounted.
 
         // AirborneDoctrine
         ImpromptuPlanning,     // Boolean, boarding aircraft doesn't cost an action.
-        AirborneAssault,       // Boolean, 1/2 suppression cost for a jump.
-        AirborneElite,         // Boolean, still have combat action after jump.
+        AirborneAssault,       // Boolean, only lose 1 level of efficiency after jump.
+        AirborneElite,         // Boolean, unit will retain one combat action after jump.
 
         // IntelligenceDoctrine
         ImprovedGathering,    // +1 Intel gathering actions
@@ -461,20 +461,20 @@ namespace HammerAndSickle.Models
 
         // CombinedArmsSpecialization
         SpottingRange,        // +1 spotting range
-        NightCombat,          // Boolean, night combat bonus.
+        NightCombat,          // Bonus to night combat operations.
         MovementAction,       // +1 move action
         CombatAction,         // +1 combat action
 
         // EngineeringSpecialization
-        RiverCrossing,        // Boolean, river crossing move bonus.
-        RiverAssault,         // Boolean, amphibious assault combat bonus.
+        RiverCrossing,        // River crossing move bonus.
+        RiverAssault,         // Amphibious assault combat bonus.
         BridgeBuilding,       // Boolean, may build bridges over rivers in one turn.
         FieldFortification,   // Boolean, may build a persistent static fortification.
 
         // SpecialForcesSpecialization
-        TerrainMastery,         // Boolean, combat bonuses in Rough, Forest, Mountain, Urban.
-        InfiltrationMovement,   // Boolean, can move through enemy ZOC more easily
-        ConcealedPositions,     // Boolean, units have reduced silhouette.
+        TerrainMastery,         // Move more easily through all non-clear terrain.
+        InfiltrationMovement,   // Move more easily through enemy ZOCs.
+        ConcealedPositions,     // Smaller silhouette.
         AmbushTactics,          // Boolean, first attack from concealment gets +50% combat bonus
 
         // SIGINTSpecialization

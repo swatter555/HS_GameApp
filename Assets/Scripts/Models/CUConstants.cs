@@ -9,15 +9,15 @@ namespace HammerAndSickle.Models
         //========================
 
         // CombatUnit constants.
-        public const int MaxPossibleHitPoints = 40;
-        public const int ZOCRange = 1;                 // Zone of Control Range
+        public const int MAX_HP = 40;
+        public const int ZOC_RANGE = 1;                 // Zone of Control Range
 
         // Movement constants for different unit types, in movement points.
-        public const int MechanizedMovt = 12;
-        public const int MotorizedMovt = 10;
-        public const int NonMechanizedMovt = 8;
-        public const int AirMovt = 100;
-        public const int AviationMovt = 24;
+        public const int MECH_MOV = 12;
+        public const int MOT_MOV = 10;
+        public const int FOOT_MOV = 8;
+        public const int FIXEDWING_MOV = 100;
+        public const int HELO_MOV = 24;
 
         // WeaponSystem constants.
         public const int MAX_COMBAT_VALUE = 10;
@@ -62,27 +62,29 @@ namespace HammerAndSickle.Models
         public const int LARGE_SPOTTING_RANGE_BONUS_VAL = 3;
         public const int INDIRECT_RANGE_BONUS_VAL = 1;
 
-        // Special terrain combat bonuses
-        public const int URBAN_COMBAT_BONUS_VAL = 3;
-        public const int ROUGH_TERRAIN_BONUS_VAL = 3;
-        public const int NIGHT_COMBAT_BONUS_VAL = 3;
+        // Silouette bonuses.
+        public const int SMALL_SILOUETTE_REDUCTION_VAL = 1;
+        public const int MEDIUM_SILOUETTE_REDUCTION_VAL = 2;
 
-        // Percentage-based multipliers - some already defined
-        public const float EXPERIENCE_BONUS_VAL = 0.25f;         // Replacement experience at 75% current.
-        public const float SUPPLY_ECONOMY_REDUCTION_VAL = 0.33f; // 33% supply cost reduction
-        public const float PRESTIGE_COST_REDUCTION_VAL = 0.33f;  // 33% prestige cost reduction
+        // Infantry doctrine multiplier.
+        public const float RTO_MOVE_MULT = 0.8f;           // 20% movement cost reduction for RTOs.
+
+        // Politically connected bonuses and multipliers.
+        public const int REPLACEMENT_XP_LEVEL_BONUS = 1;    // Replacements get +1 XP level.
+        public const float SUPPLY_ECONOMY_MULT      = 0.8f; // Supply consumption gets 20% cost reduction.
+        public const float PRESTIGE_COST_MULT       = 0.7f; // Unit upgrades get 30% price reduction.
 
         // EngineeringSpecialization specific
-        public const float RIVER_CROSSING_BONUS_VAL = 0.5f; // 50% movement cost reduction
-        public const float RIVER_ASSAULT_BONUS_VAL = 0.25f; // 25% combat penalty reduction
+        public const float RIVER_CROSSING_MOVE_MULT = 0.5f; // x% movement cost reduction
+        public const float RIVER_ASSAULT_MULT       = 1.4f; // x% combat bonus when attacking across a river.
 
         // Special forces bonuses
-        public const float TERRAIN_MASTERY_BONUS_VAL = 0.33f; // 33% movement cost reduction
-        public const float INFILTRATION_BONUS_VAL = 0.5f;     // 50% ZOC penalty reduction
-        public const float AMBUSH_BONUS_MULTIPLIER = 1.5f;    // 50% combat bonus
+        public const float TMASTERY_MOVE_MULT  = 0.8f; // x% movement cost reduction in non-clear terrain.
+        public const float INFILTRATION_MULT   = 0.5f; // x% ZOC penalty reduction
+        public const float AMBUSH_BONUS_MULT   = 1.5f; // x% combat bonus
 
-        // Air and naval operation bonuses
-        public const float AIR_MOBILE_SPEED_BONUS = 0.25f;    // 25% faster helicopter operations
+        // Combined arms bonus.
+        public const float NIGHT_COMBAT_MULT   = 1.25f;// x% combat bonus at night
 
 
         //=======================

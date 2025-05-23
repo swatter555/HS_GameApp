@@ -34,7 +34,6 @@ namespace HammerAndSickle.Models
         /// </summary>
         public bool IsBoolean =>
             BonusType == SkillBonusType.Breakthrough ||
-            BonusType == SkillBonusType.OpportunityAction ||
             BonusType == SkillBonusType.ShootAndScoot ||
             BonusType == SkillBonusType.AirMobile ||
             BonusType == SkillBonusType.AirMobileAssault ||
@@ -42,22 +41,14 @@ namespace HammerAndSickle.Models
             BonusType == SkillBonusType.ImpromptuPlanning ||
             BonusType == SkillBonusType.AirborneAssault ||
             BonusType == SkillBonusType.AirborneElite ||
-            BonusType == SkillBonusType.UndergroundBunker ||
-            BonusType == SkillBonusType.RiverCrossing ||
-            BonusType == SkillBonusType.RiverAssault ||
             BonusType == SkillBonusType.BridgeBuilding ||
             BonusType == SkillBonusType.FieldFortification ||
-            BonusType == SkillBonusType.InfiltrationMovement ||
-            BonusType == SkillBonusType.ConcealedPositions ||
             BonusType == SkillBonusType.AmbushTactics ||
             BonusType == SkillBonusType.SignalDecryption ||
             BonusType == SkillBonusType.SpaceAssets ||
             BonusType == SkillBonusType.ElectronicWarfare ||
             BonusType == SkillBonusType.PatternRecognition ||
-            BonusType == SkillBonusType.RoughTerrainMovt ||
-            BonusType == SkillBonusType.NightCombat ||
             BonusType == SkillBonusType.EmergencyResupply ||
-            BonusType == SkillBonusType.TerrainMastery ||
             BonusType == SkillBonusType.NVG ||
             BonusType == SkillBonusType.AdvancedTargetting ||
             BonusType == SkillBonusType.SeniorPromotion ||
@@ -101,7 +92,7 @@ namespace HammerAndSickle.Models
         // Core identification
         public Enum SkillEnumValue { get; }
         public string Name { get; }
-        public int XPCost { get; }
+        public int REPCost { get; }
         public string Description { get; }
 
         // Classification
@@ -125,7 +116,7 @@ namespace HammerAndSickle.Models
         public SkillDefinition(
             Enum skillEnumValue,
             string name,
-            int xpCost,
+            int repCost,
             SkillBranch branch,
             SkillTier tier,
             string description,
@@ -137,7 +128,7 @@ namespace HammerAndSickle.Models
         {
             SkillEnumValue = skillEnumValue;
             Name = name;
-            XPCost = xpCost;
+            REPCost = repCost;
             Branch = branch;
             Tier = tier;
             Description = description;
@@ -154,7 +145,7 @@ namespace HammerAndSickle.Models
         public SkillDefinition(
             Enum skillEnumValue,
             string name,
-            int xpCost,
+            int repCost,
             SkillBranch branch,
             SkillTier tier,
             string description,
@@ -167,7 +158,7 @@ namespace HammerAndSickle.Models
             : this(
                 skillEnumValue,
                 name,
-                xpCost,
+                repCost,
                 branch,
                 tier,
                 description,
@@ -185,7 +176,7 @@ namespace HammerAndSickle.Models
         public SkillDefinition(
             Enum skillEnumValue,
             string name,
-            int xpCost,
+            int repCost,
             SkillBranch branch,
             SkillTier tier,
             string description,
@@ -197,7 +188,7 @@ namespace HammerAndSickle.Models
             : this(
                 skillEnumValue,
                 name,
-                xpCost,
+                repCost,
                 branch,
                 tier,
                 description,
@@ -444,13 +435,14 @@ namespace HammerAndSickle.Models
 
             // Tier 3: Rough Terrain Operations - Rough terrain bonus
             AddSkill(new SkillDefinition(
-                InfantryDoctrine.TerrainAdvantage_RoughTerrainMovt,
+                InfantryDoctrine.RoughTerrainOperations_RTO,
                 "Rough Terrain Operations",
                 CUConstants.TIER3_REP_COST,
                 SkillBranch.InfantryDoctrine,
                 SkillTier.Tier3,
                 "Advanced navigation training for rough terrain.",
-                SkillBonusType.RoughTerrainMovt, // Boolean capability
+                SkillBonusType.RTO,
+                CUConstants.RTO_MOVE_MULT,
                 CommandGrade.SeniorGrade,
                 new List<Enum> { InfantryDoctrine.DefensiveDoctrine_SoftDefense }
             ));
@@ -540,8 +532,9 @@ namespace HammerAndSickle.Models
                 CUConstants.TIER3_REP_COST,
                 SkillBranch.AirDefenseDoctrine,
                 SkillTier.Tier3,
-                "Improved reaction time allows additional opportunity fire actions against enemy movement.",
-                SkillBonusType.OpportunityAction, // Boolean capability
+                "Improved fire control systems allows additional opportunity fire actions against enemy movement.",
+                SkillBonusType.OpportunityAction,
+                CUConstants.OPPORTUNITY_ACTION_BONUS_VAL,
                 CommandGrade.SeniorGrade,
                 new List<Enum> { AirDefenseDoctrine.IntegratedAirDefenseSystem_AirDefense }
             ));
@@ -661,7 +654,8 @@ namespace HammerAndSickle.Models
                 SkillBranch.IntelligenceDoctrine,
                 SkillTier.Tier2,
                 "Specialized camouflage and concealment techniques significantly reduce unit visibility on the battlefield.",
-                SkillBonusType.UndergroundBunker, // Boolean capability
+                SkillBonusType.UndergroundBunker,
+                CUConstants.MEDIUM_SILOUETTE_REDUCTION_VAL,
                 CommandGrade.SeniorGrade,
                 new List<Enum> { IntelligenceDoctrine.EnhancedIntelligenceCollection_ImprovedGathering }
             ));
@@ -734,7 +728,8 @@ namespace HammerAndSickle.Models
                 SkillBranch.CombinedArmsSpecialization,
                 SkillTier.Tier5,
                 "Experience is an excellect teacher and crucial in modern night operations.",
-                SkillBonusType.NightCombat, // Boolean capability
+                SkillBonusType.NightCombat,
+                CUConstants.NIGHT_COMBAT_MULT,
                 CommandGrade.TopGrade,
                 new List<Enum> { CombinedArmsSpecialization.TacticalGenius_CombatAction }
             ));
@@ -811,9 +806,9 @@ namespace HammerAndSickle.Models
                 SkillBranch.EngineeringSpecialization,
                 SkillTier.Tier4,
                 "Engineering expertise significantly reduces movement costs when crossing rivers.",
-                SkillBonusType.RiverCrossing, // Boolean capability
+                SkillBonusType.RiverCrossing,
+                CUConstants.RIVER_CROSSING_MOVE_MULT,
                 CommandGrade.TopGrade
-
             ));
 
             // Tier 4: Amphibious Assault Tactics - River Assault capability
@@ -824,7 +819,8 @@ namespace HammerAndSickle.Models
                 SkillBranch.EngineeringSpecialization,
                 SkillTier.Tier4,
                 "Specialized assault river crossing techniques reduce combat penalties when attacking across rivers.",
-                SkillBonusType.RiverAssault, // Boolean capability
+                SkillBonusType.RiverAssault,
+                CUConstants.RIVER_ASSAULT_MULT,
                 CommandGrade.TopGrade,
                 new List<Enum> { EngineeringSpecialization.RiverCrossingOperations_RiverCrossing }
             ));
@@ -869,7 +865,8 @@ namespace HammerAndSickle.Models
                 SkillBranch.SpecialForcesSpecialization,
                 SkillTier.Tier4,
                 "Advanced training in difficult terrain reduces movement costs in rough terrain, forests, and mountains.",
-                SkillBonusType.TerrainMastery, // Boolean capability
+                SkillBonusType.TerrainMastery,
+                CUConstants.TMASTERY_MOVE_MULT,
                 CommandGrade.TopGrade
             ));
 
@@ -893,8 +890,9 @@ namespace HammerAndSickle.Models
                 CUConstants.TIER4_REP_COST,
                 SkillBranch.SpecialForcesSpecialization,
                 SkillTier.Tier4,
-                "Advanced concealment techniques reduce unit visibility on the battlefield.",
-                SkillBonusType.ConcealedPositions, // Boolean capability
+                "Advanced concealment techniques reduce unit siloette.",
+                SkillBonusType.ConcealedPositions,
+                CUConstants.SMALL_SILOUETTE_REDUCTION_VAL,
                 CommandGrade.TopGrade,
                 new List<Enum> { SpecialForcesSpecialization.InfiltrationTactics_InfiltrationMovement }
             ));
@@ -938,9 +936,9 @@ namespace HammerAndSickle.Models
                 CUConstants.TIER2_REP_COST,
                 SkillBranch.PoliticallyConnectedFoundation,
                 SkillTier.Tier2,
-                $"Priority supply allocation reduces consumption by {(1.0f - CUConstants.SUPPLY_ECONOMY_REDUCTION_VAL) * 100}%.",
+                $"Priority supply allocation reduces consumption by {(1.0f - CUConstants.SUPPLY_ECONOMY_MULT) * 100}%.",
                 SkillBonusType.SupplyConsumption,
-                CUConstants.SUPPLY_ECONOMY_REDUCTION_VAL,
+                CUConstants.SUPPLY_ECONOMY_MULT,
                 CommandGrade.JuniorGrade,
                 new List<Enum> { PoliticallyConnectedFoundation.EmergencyAirDrop_EmergencyResupply }
             ));
@@ -965,9 +963,9 @@ namespace HammerAndSickle.Models
                 CUConstants.TIER3_REP_COST,
                 SkillBranch.PoliticallyConnectedFoundation,
                 SkillTier.Tier3,
-                $"Political influence ensures better trained replacements, increasing experience gain by {CUConstants.EXPERIENCE_BONUS_VAL * 100}%.",
+                $"Political influence ensures better trained replacements, increasing experience gain by {CUConstants.REPLACEMENT_XP_LEVEL_BONUS * 100}%.",
                 SkillBonusType.ReplacementXP,
-                CUConstants.EXPERIENCE_BONUS_VAL,
+                CUConstants.REPLACEMENT_XP_LEVEL_BONUS,
                 CommandGrade.SeniorGrade,
                 new List<Enum> { PoliticallyConnectedFoundation.ForeignTechnology_NVG }
             ));
@@ -979,9 +977,9 @@ namespace HammerAndSickle.Models
                 CUConstants.TIER4_REP_COST,
                 SkillBranch.PoliticallyConnectedFoundation,
                 SkillTier.Tier4,
-                $"High-level political connections reduce equipment costs by {(1.0f - CUConstants.PRESTIGE_COST_REDUCTION_VAL) * 100}%.",
+                $"High-level political connections reduce equipment costs by {(1.0f - CUConstants.PRESTIGE_COST_MULT) * 100}%.",
                 SkillBonusType.PrestigeCost,
-                CUConstants.PRESTIGE_COST_REDUCTION_VAL,
+                CUConstants.PRESTIGE_COST_MULT,
                 CommandGrade.TopGrade,
                 new List<Enum> { PoliticallyConnectedFoundation.BetterReplacements_ReplacementXP }
             ));
