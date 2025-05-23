@@ -1,6 +1,7 @@
+using HammerAndSickle.Services;
 using System;
 using System.Runtime.Serialization;
-using HammerAndSickle.Services;
+using UnityEngine;
 
 namespace HammerAndSickle.Models
 {
@@ -103,7 +104,7 @@ namespace HammerAndSickle.Models
             try
             {
                 // Create a new random number generator.
-                Random random = new();
+                System.Random random = new();
 
                 // Check if NameGenService is available
                 if (NameGenService.Instance == null)
@@ -138,6 +139,42 @@ namespace HammerAndSickle.Models
                 throw;
             }
         }
+
+        /// <summary>
+        /// Awards reputation to the leader based on action performed
+        /// </summary>
+        /// <param name="actionType">Type of action performed</param>
+        /// <param name="contextMultiplier">Additional multiplier based on context</param>
+        //public void AwardReputation(ReputationAction actionType, float contextMultiplier = 1.0f)
+        //{
+        //    int baseREP = actionType switch
+        //    {
+        //        ReputationAction.Move => CUConstants.REP_PER_MOVE_ACTION,
+        //        ReputationAction.MountDismount => CUConstants.REP_PER_MOUNT_DISMOUNT,
+        //        ReputationAction.IntelGather => CUConstants.REP_PER_INTEL_GATHER,
+        //        ReputationAction.Combat => CUConstants.REP_PER_COMBAT_ACTION,
+        //        ReputationAction.AirborneJump => CUConstants.REP_PER_AIRBORNE_JUMP,
+        //        ReputationAction.ForcedRetreat => CUConstants.REP_PER_FORCED_RETREAT,
+        //        ReputationAction.UnitDestroyed => CUConstants.REP_PER_UNIT_DESTROYED,
+        //        _ => 0
+        //    };
+
+        //    // Apply experience multiplier for veteran units
+        //    if (_ExperienceLevel >= ExperienceLevel.Veteran)
+        //    {
+        //        contextMultiplier *= CUConstants.REP_EXPERIENCE_MULTIPLIER;
+        //    }
+
+        //    int finalREP = Mathf.RoundToInt(baseREP * contextMultiplier);
+
+        //    if (finalREP > 0 && SkillTree != null)
+        //    {
+        //        SkillTree.AddReputation(finalREP);
+
+        //        // Fire event for UI feedback
+        //        OnReputationAwarded?.Invoke(actionType, finalREP);
+        //    }
+        //}
 
         public string GetFormattedRank()
         {

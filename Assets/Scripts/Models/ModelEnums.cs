@@ -1,3 +1,4 @@
+using System;
 using System.Xml.Linq;
 using UnityEngine;
 
@@ -249,10 +250,24 @@ namespace HammerAndSickle.Models
     //====== Leader Skill Paths ======
     //================================
 
-  
+    /// <summary>
+    /// Marks an enum as representing a skill branch for automatic registration
+    /// </summary>
+    [AttributeUsage(AttributeTargets.Enum)]
+    public class SkillBranchEnumAttribute : Attribute
+    {
+        public SkillBranch Branch { get; }
+
+        public SkillBranchEnumAttribute(SkillBranch branch)
+        {
+            Branch = branch;
+        }
+    }
+
     /// <summary>
     /// LeadershipFoundation path tied to officer promotions, providing increasing command ability.
     /// </summary>
+    [SkillBranchEnum(SkillBranch.LeadershipFoundation)]
     public enum LeadershipFoundation
     {
         None,
@@ -266,6 +281,7 @@ namespace HammerAndSickle.Models
     /// <summary>
     /// Special bonus path, only tier requirements apply.
     /// </summary>
+    [SkillBranchEnum(SkillBranch.PoliticallyConnectedFoundation)]
     public enum PoliticallyConnectedFoundation
     {
         None,
@@ -279,6 +295,7 @@ namespace HammerAndSickle.Models
     /// <summary>
     /// Armored warfare skills.
     /// </summary>
+    [SkillBranchEnum(SkillBranch.ArmoredDoctrine)]
     public enum ArmoredDoctrine
     {
         None,
@@ -290,6 +307,7 @@ namespace HammerAndSickle.Models
     /// <summary>
     /// Infantry and soft-target focused skills.
     /// </summary>
+    [SkillBranchEnum(SkillBranch.InfantryDoctrine)]
     public enum InfantryDoctrine
     {
         None,
@@ -301,6 +319,7 @@ namespace HammerAndSickle.Models
     /// <summary>
     /// Artillery and indirect fire skills.
     /// </summary>
+    [SkillBranchEnum(SkillBranch.ArtilleryDoctrine)]
     public enum ArtilleryDoctrine
     {
         None,
@@ -312,6 +331,7 @@ namespace HammerAndSickle.Models
     /// <summary>
     /// Air defense and anti-air skills.
     /// </summary>
+    [SkillBranchEnum(SkillBranch.AirDefenseDoctrine)]
     public enum AirDefenseDoctrine
     {
         None,
@@ -323,6 +343,7 @@ namespace HammerAndSickle.Models
     /// <summary>
     /// VDV Airborne skills.
     /// </summary>
+    [SkillBranchEnum(SkillBranch.AirborneDoctrine)]
     public enum AirborneDoctrine
     {
         None,
@@ -334,6 +355,7 @@ namespace HammerAndSickle.Models
     /// <summary>
     /// Air Mobile and helicopter operation skills.
     /// </summary>
+    [SkillBranchEnum(SkillBranch.AirMobileDoctrine)]
     public enum AirMobileDoctrine
     {
         None,
@@ -345,6 +367,7 @@ namespace HammerAndSickle.Models
     /// <summary>
     /// IntelligenceDoctrine and reconnaissance skills.
     /// </summary>
+    [SkillBranchEnum(SkillBranch.IntelligenceDoctrine)]
     public enum IntelligenceDoctrine
     {
         None,
@@ -356,6 +379,7 @@ namespace HammerAndSickle.Models
     /// <summary>
     /// CombinedArmsSpecialization skills.
     /// </summary>
+    [SkillBranchEnum(SkillBranch.CombinedArmsSpecialization)]
     public enum CombinedArmsSpecialization
     {
         None,
@@ -368,6 +392,7 @@ namespace HammerAndSickle.Models
     /// <summary>
     /// SIGINT (Signals IntelligenceDoctrine) skills.
     /// </summary>
+    [SkillBranchEnum(SkillBranch.SignalIntelligenceSpecialization)]
     public enum SignalIntelligenceSpecialization
     {
         None,
@@ -380,6 +405,7 @@ namespace HammerAndSickle.Models
     /// <summary>
     /// EngineeringSpecialization skills.
     /// </summary>
+    [SkillBranchEnum(SkillBranch.EngineeringSpecialization)]
     public enum EngineeringSpecialization
     {
         None,
@@ -392,6 +418,7 @@ namespace HammerAndSickle.Models
     /// <summary>
     /// Special forces and irregular warfare skills.
     /// </summary>
+    [SkillBranchEnum(SkillBranch.SpecialForcesSpecialization)]
     public enum SpecialForcesSpecialization
     {
         None,
