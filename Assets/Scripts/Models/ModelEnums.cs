@@ -553,10 +553,10 @@ namespace HammerAndSickle.Models
         [BranchType(BranchType.Specialization)]
         SignalIntelligenceSpecialization = 21,
 
-        [BranchType(BranchType.Doctrine)]
+        [BranchType(BranchType.Specialization)]
         EngineeringSpecialization = 22,
 
-        [BranchType(BranchType.Doctrine)]
+        [BranchType(BranchType.Specialization)]
         SpecialForcesSpecialization = 23
     }
 
