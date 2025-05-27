@@ -878,7 +878,8 @@ namespace HammerAndSickle.Models
                 SkillBranch.SpecialForcesSpecialization,
                 SkillTier.Tier4,
                 "Specialized movement techniques allow easier passage through enemy zones of control.",
-                SkillBonusType.InfiltrationMovement, // Boolean capability
+                SkillBonusType.InfiltrationMovement,
+                CUConstants.INFILTRATION_MULT,
                 CommandGrade.TopGrade,
                 new List<Enum> { SpecialForcesSpecialization.TerrainExpert_TerrainMastery }
             ));
