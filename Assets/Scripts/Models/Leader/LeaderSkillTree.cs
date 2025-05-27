@@ -315,6 +315,26 @@ namespace HammerAndSickle.Models
                 return false; // Should never happen if CanUnlockSkill returned true
             }
 
+            // Handle promotion before spending reputation.
+            var primaryEffect = skillDef.GetPrimaryEffect();
+            bool isPromotion = primaryEffect?.BonusType == SkillBonusType.SeniorPromotion ||
+                              primaryEffect?.BonusType == SkillBonusType.TopPromotion;
+            if (isPromotion)
+            {
+                // Update grade first so reputation events fire with correct context
+                if (primaryEffect.BonusType == SkillBonusType.SeniorPromotion)
+                {
+                    CurrentGrade = CommandGrade.SeniorGrade;
+                }
+                else if (primaryEffect.BonusType == SkillBonusType.TopPromotion)
+                {
+                    CurrentGrade = CommandGrade.TopGrade;
+                }
+
+                // Fire grade change event first
+                OnGradeChanged?.Invoke(CurrentGrade);
+            }
+
             // Spend the experience
             if (!SpendReputation(skillDef.REPCost)) return false;
 
@@ -323,18 +343,6 @@ namespace HammerAndSickle.Models
 
             // Mark the skill as unlocked
             unlockedSkills[skillEnum] = true;
-
-            // Handle promotion skills
-            if (skillDef.GetPrimaryEffect()?.BonusType == SkillBonusType.SeniorPromotion)
-            {
-                CurrentGrade = CommandGrade.SeniorGrade;
-                OnGradeChanged?.Invoke(CurrentGrade);
-            }
-            else if (skillDef.GetPrimaryEffect()?.BonusType == SkillBonusType.TopPromotion)
-            {
-                CurrentGrade = CommandGrade.TopGrade;
-                OnGradeChanged?.Invoke(CurrentGrade);
-            }
 
             ClearBonusCaches();
 
