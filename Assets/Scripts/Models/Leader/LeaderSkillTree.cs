@@ -390,30 +390,31 @@ namespace HammerAndSickle.Models
         /// <returns>True if the branch can be started</returns>
         public bool IsBranchAvailable(SkillBranch branch)
         {
-            // ---- Defensive guard ----------------------------------------------------
+            // Defensive guard
             if (branch == SkillBranch.None)
             {
                 Debug.LogError("LeaderSkillTree.IsBranchAvailable: SkillBranch.None is invalid input.");
                 return false;
             }
 
-            // ---- Foundation branches stack with everything -------------------------
-            if (branch == SkillBranch.LeadershipFoundation ||
-                branch == SkillBranch.PoliticallyConnectedFoundation)
+            // Foundation branches can always be started (they stack with everything)
+            if (branch.IsFoundation())
                 return true;
 
-            bool isDoctrine = branch.IsDoctrine();
-            bool isSpecialization = branch.IsSpecialization();
-
-            // ---- Doctrine / specialization exclusivity -----------------------------
-            if (isDoctrine)
+            // For doctrine branches, check if any other doctrine has been started
+            if (branch.IsDoctrine())
+            {
                 return !startedBranches.Any(b => b.IsDoctrine());
+            }
 
-            if (isSpecialization)
+            // For specialization branches, check if any other specialization has been started
+            if (branch.IsSpecialization())
+            {
                 return !startedBranches.Any(b => b.IsSpecialization());
+            }
 
-            // ---- Unknown branch category -------------------------------------------
-            Debug.LogError($"LeaderSkillTree.IsBranchAvailable: Unhandled branch type: {branch}");
+            // This should never happen if all branches are properly attributed
+            Debug.LogError($"LeaderSkillTree.IsBranchAvailable: Unknown branch type for {branch}");
             return false;
         }
 
@@ -699,7 +700,7 @@ namespace HammerAndSickle.Models
             {
                 ReputationPoints = this.ReputationPoints,
                 CurrentGrade = this.CurrentGrade,
-                StartedBranches = this.startedBranches.Select(b => (int)b).ToList(),
+                StartedBranches = this.startedBranches.Select(b => b.ToString()).ToList(),
                 UnlockedSkills = new List<SkillReference>()
             };
 
@@ -735,10 +736,18 @@ namespace HammerAndSickle.Models
             ReputationPoints = data.ReputationPoints;
             CurrentGrade = data.CurrentGrade;
 
-            // Load branches
-            foreach (int branchId in data.StartedBranches)
+            // Load branches with validation
+            foreach (string branchName in data.StartedBranches)
             {
-                startedBranches.Add((SkillBranch)branchId);
+                if (Enum.TryParse<SkillBranch>(branchName, out var branch) &&
+                    branch != SkillBranch.None)
+                {
+                    startedBranches.Add(branch);
+                }
+                else
+                {
+                    Debug.LogWarning($"LeaderSkillTree: Unknown or invalid branch '{branchName}' in save data, skipping.");
+                }
             }
 
             // Load skills
@@ -803,7 +812,7 @@ namespace HammerAndSickle.Models
     {
         public int ReputationPoints;
         public CommandGrade CurrentGrade;
-        public List<int> StartedBranches;
+        public List<string> StartedBranches;
         public List<SkillReference> UnlockedSkills;
     }
 
@@ -815,45 +824,5 @@ namespace HammerAndSickle.Models
     {
         public string EnumType;  // Name of the enum type
         public int EnumValue;    // Integer value of the enum
-    }
-
-    /// <summary>
-    /// Extension helpers that classify <see cref="SkillBranch"/> values.
-    /// Keep these in sync with the enum definition.
-    /// </summary>
-    public static class SkillBranchExtensions
-    {
-        /// <summary>
-        /// Returns <c>true</c> when the branch is a Doctrine (mutually exclusive group).
-        /// </summary>
-        public static bool IsDoctrine(this SkillBranch branch)
-        {
-            return branch switch
-            {
-                SkillBranch.ArmoredDoctrine 
-                or SkillBranch.InfantryDoctrine 
-                or SkillBranch.ArtilleryDoctrine 
-                or SkillBranch.AirDefenseDoctrine 
-                or SkillBranch.AirborneDoctrine 
-                or SkillBranch.AirMobileDoctrine 
-                or SkillBranch.IntelligenceDoctrine => true,
-                _ => false,
-            };
-        }
-
-        /// <summary>
-        /// Returns <c>true</c> when the branch is a Specialization (mutually exclusive group).
-        /// </summary>
-        public static bool IsSpecialization(this SkillBranch branch)
-        {
-            return branch switch
-            {
-                SkillBranch.SignalIntelligenceSpecialization 
-                or SkillBranch.CombinedArmsSpecialization 
-                or SkillBranch.EngineeringSpecialization 
-                or SkillBranch.SpecialForcesSpecialization => true,
-                _ => false,
-            };
-        }
     }
 }

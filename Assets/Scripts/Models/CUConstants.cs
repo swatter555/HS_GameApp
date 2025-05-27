@@ -29,8 +29,21 @@ namespace HammerAndSickle.Models
         //====== Leader Skills/Tree ======
         //================================
 
+        // Leader ID generation
+        public const string LEADER_ID_PREFIX = "LDR";
+        public const int LEADER_ID_LENGTH = 8; // LDR + 5 random chars
+
+        // Leader validation bounds
+        public const int MIN_REPUTATION = 0;
+        public const int MAX_REPUTATION = 9999;
+        public const int MAX_LEADER_NAME_LENGTH = 50;
+        public const int MIN_LEADER_NAME_LENGTH = 2;
+
+        // Command ability validation (matches enum range)
+        public const int MIN_COMMAND_ABILITY = -2; // CommandAbility.Poor
+        public const int MAX_COMMAND_ABILITY = 3;  // CommandAbility.Genius
+
         // Reputation constants.
-        public const int REP_PER_BATTLE = 25;
         public const int REP_COST_FOR_SENIOR_PROMOTION = 100;
         public const int REP_COST_FOR_TOP_PROMOTION = 250;
 
@@ -40,6 +53,10 @@ namespace HammerAndSickle.Models
         public const int TIER3_REP_COST = 120;
         public const int TIER4_REP_COST = 180;
         public const int TIER5_REP_COST = 260;
+
+        // Skill cost validation bounds
+        public const int MIN_SKILL_REP_COST = 50;
+        public const int MAX_SKILL_REP_COST = 500;
 
         // Command and Operation bonuses (typically +1 for actions)
         public const int COMMAND_BONUS_VAL = 1;
@@ -56,6 +73,12 @@ namespace HammerAndSickle.Models
         public const int AIR_ATTACK_BONUS_VAL = 5;
         public const int AIR_DEFENSE_BONUS_VAL = 5;
 
+        // Bonus value validation bounds
+        public const int MIN_COMBAT_BONUS = 1;
+        public const int MAX_COMBAT_BONUS = 10;
+        public const int MIN_ACTION_BONUS = 1;
+        public const int MAX_ACTION_BONUS = 3;
+
         // Spotting and range bonuses.
         public const int SMALL_SPOTTING_RANGE_BONUS_VAL = 1;
         public const int MEDIUM_SPOTTING_RANGE_BONUS_VAL = 2;
@@ -65,6 +88,43 @@ namespace HammerAndSickle.Models
         // Silouette bonuses.
         public const int SMALL_SILHOUETTE_REDUCTION_VAL = 1;
         public const int MEDIUM_SILHOUETTE_REDUCTION_VAL = 2;
+        public const int MAX_SILHOUETTE_REDUCTION_VAL = 3;
+
+        // General multiplier bounds (for any positive effect)
+        public const float MIN_MULTIPLIER = 0.01f;    // 1% of original value (extreme reduction)
+        public const float MAX_MULTIPLIER = 10.0f;    // 10x original value (extreme boost)
+
+        // Common decrease modifiers (what you multiply by to get the reduction)
+        public const float TINY_DECREASE_MULT = 0.99f;     // 1% decrease (keep 99%)
+        public const float SMALL_DECREASE_MULT = 0.90f;    // 10% decrease (keep 90%) 
+        public const float MEDIUM_DECREASE_MULT = 0.80f;   // 20% decrease (keep 80%)
+        public const float LARGE_DECREASE_MULT = 0.50f;    // 50% decrease (keep 50%)
+        public const float HUGE_DECREASE_MULT = 0.01f;     // 99% decrease (keep 1%)
+
+        // Common increase modifiers (what you multiply by to get the boost)
+        public const float TINY_INCREASE_MULT = 1.01f;     // 1% increase (101% of original)
+        public const float SMALL_INCREASE_MULT = 1.10f;    // 10% increase (110% of original)
+        public const float MEDIUM_INCREASE_MULT = 1.25f;   // 25% increase (125% of original)
+        public const float LARGE_INCREASE_MULT = 1.50f;    // 50% increase (150% of original)
+        public const float HUGE_INCREASE_MULT = 2.00f;     // 100% increase (200% of original)
+
+        // Validation: ensure multipliers stay within sane bounds
+        public static bool IsValidMultiplier(float multiplier)
+        {
+            return multiplier >= MIN_MULTIPLIER && multiplier <= MAX_MULTIPLIER;
+        }
+
+        // Helper: convert percentage to multiplier
+        public static float PercentToMultiplier(float percent)
+        {
+            return 1.0f + (percent / 100.0f);
+        }
+
+        // Helper: convert multiplier to percentage change
+        public static float MultiplierToPercent(float multiplier)
+        {
+            return (multiplier - 1.0f) * 100.0f;
+        }
 
         // Infantry doctrine multiplier.
         public const float RTO_MOVE_MULT = 0.8f;           // 20% movement cost reduction for RTOs.
@@ -113,9 +173,29 @@ namespace HammerAndSickle.Models
         public const int REP_PER_FORCED_RETREAT = 5;           // Causing enemy to retreat (tactical success)
         public const int REP_PER_UNIT_DESTROYED = 8;           // Destroying enemy unit (major victory)
 
+        // REP action validation bounds
+        public const int MIN_REP_PER_ACTION = 1;
+        public const int MAX_REP_PER_ACTION = 15;
+
         // Bonus REP multipliers
         public const float REP_EXPERIENCE_MULTIPLIER = 1.5f;   // Veteran/Elite units gain more REP
         public const float REP_ELITE_DIFFICULTY_BONUS = 2.0f;  // Bonus for destroying elite enemy units
+
+        // REP multiplier bounds
+        public const float MIN_REP_MULTIPLIER = 1.0f;
+        public const float MAX_REP_MULTIPLIER = 3.0f;
+
+
+        //================================
+        //====== Random Generation ======
+        //================================
+
+        // For Leader.RandomlyGenerateMe() dice roll
+        public const int COMMAND_DICE_COUNT = 3;         // Roll 3d6
+        public const int COMMAND_DICE_SIDES = 6;         // 6-sided dice
+        public const int COMMAND_DICE_MODIFIER = -10;    // Subtract 10 from total
+        public const int COMMAND_CLAMP_MIN = -2;         // Minimum CommandAbility value
+        public const int COMMAND_CLAMP_MAX = 3;          // Maximum CommandAbility value
 
 
         //=======================

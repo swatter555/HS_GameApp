@@ -228,9 +228,9 @@ namespace HammerAndSickle.Models
     /// </summary>
     public enum CommandGrade
     {
-        JuniorGrade,    // Lieutenant Colonel equivalent
-        SeniorGrade,    // Colonel equivalent
-        TopGrade        // Major General equivalent
+        JuniorGrade = 1,    // Lieutenant Colonel equivalent
+        SeniorGrade = 2,    // Colonel equivalent
+        TopGrade    = 3     // Major General equivalent
     }
 
     /// <summary>
@@ -515,20 +515,49 @@ namespace HammerAndSickle.Models
     /// </summary>
     public enum SkillBranch
     {
-        None,
-        LeadershipFoundation,
-        PoliticallyConnectedFoundation,
-        ArmoredDoctrine,
-        InfantryDoctrine,
-        ArtilleryDoctrine,
-        AirDefenseDoctrine,
-        AirborneDoctrine,
-        AirMobileDoctrine,
-        IntelligenceDoctrine,
-        CombinedArmsSpecialization,
-        SignalIntelligenceSpecialization,
-        EngineeringSpecialization,
-        SpecialForcesSpecialization
+        None = 0,
+
+        // Foundation branches starts at 1.
+        [BranchType(BranchType.Foundation)]
+        LeadershipFoundation = 1,
+
+        [BranchType(BranchType.Foundation)]
+        PoliticallyConnectedFoundation = 2,
+
+        // Doctrine branches starts at 10.
+        [BranchType(BranchType.Doctrine)]
+        ArmoredDoctrine = 10,
+
+        [BranchType(BranchType.Doctrine)]
+        InfantryDoctrine = 11,
+
+        [BranchType(BranchType.Doctrine)]
+        ArtilleryDoctrine = 12,
+
+        [BranchType(BranchType.Doctrine)]
+        AirDefenseDoctrine = 13,
+
+        [BranchType(BranchType.Doctrine)]
+        AirborneDoctrine = 14,
+
+        [BranchType(BranchType.Doctrine)]
+        AirMobileDoctrine = 15,
+
+        [BranchType(BranchType.Doctrine)]
+        IntelligenceDoctrine = 16,
+
+        //Specialization branches start at 20.
+        [BranchType(BranchType.Specialization)]
+        CombinedArmsSpecialization = 20,
+
+        [BranchType(BranchType.Specialization)]
+        SignalIntelligenceSpecialization = 21,
+
+        [BranchType(BranchType.Doctrine)]
+        EngineeringSpecialization = 22,
+
+        [BranchType(BranchType.Doctrine)]
+        SpecialForcesSpecialization = 23
     }
 
     /// <summary>
@@ -542,6 +571,24 @@ namespace HammerAndSickle.Models
         Tier3 = 3,
         Tier4 = 4,
         Tier5 = 5
+    }
+
+    /// <summary>
+    /// The types of branches that a skill can belong to.
+    /// </summary>
+    public enum BranchType
+    {
+        Foundation = 1,
+        Doctrine = 2,
+        Specialization = 3
+    }
+
+    // Used to maintain branch type information for skill branches
+    [AttributeUsage(AttributeTargets.Field)]
+    public class BranchTypeAttribute : Attribute
+    {
+        public BranchType Type { get; }
+        public BranchTypeAttribute(BranchType type) => Type = type;
     }
 
     //================================
