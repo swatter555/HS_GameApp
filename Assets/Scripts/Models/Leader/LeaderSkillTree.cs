@@ -1,4 +1,4 @@
-using System;
+ï»¿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
@@ -13,33 +13,33 @@ namespace HammerAndSickle.Models
     /// The skill system is built around strategic specialization with universal gating mechanisms:
     /// 
     /// BRANCH TYPES:
-    /// • Foundation Branches: Universal branches available to all leaders
+    /// â€¢ Foundation Branches: Universal branches available to all leaders
     ///   - LeadershipFoundation: Required for progression, contains promotions that gate access to higher tiers
     ///   - PoliticallyConnectedFoundation: Optional utility branch with logistical bonuses
     /// 
-    /// • Doctrine Branches: Combat specializations (MUTUALLY EXCLUSIVE - choose only 1)
+    /// â€¢ Doctrine Branches: Combat specializations (MUTUALLY EXCLUSIVE - choose only 1)
     ///   - ArmoredDoctrine, InfantryDoctrine, ArtilleryDoctrine, AirDefenseDoctrine
     ///   - AirborneDoctrine, AirMobileDoctrine, IntelligenceDoctrine
     /// 
-    /// • Specialization Branches: Advanced capabilities (MUTUALLY EXCLUSIVE - choose only 1)
+    /// â€¢ Specialization Branches: Advanced capabilities (MUTUALLY EXCLUSIVE - choose only 1)
     ///   - CombinedArmsSpecialization, SignalIntelligenceSpecialization
     ///   - EngineeringSpecialization, SpecialForcesSpecialization
     /// 
     /// PROGRESSION GATING:
     /// Leadership acts as the universal progression gate through command grade promotions:
-    /// • JuniorGrade (starting): Access to Tier1 skills in any branch
-    /// • SeniorGrade: Unlocks Tier2-3 skills across all branches
-    /// • TopGrade: Unlocks Tier4-5 specialization skills
+    /// â€¢ JuniorGrade (starting): Access to Tier1 skills in any branch
+    /// â€¢ SeniorGrade: Unlocks Tier2-3 skills across all branches
+    /// â€¢ TopGrade: Unlocks Tier4-5 specialization skills
     /// 
     /// This design forces meaningful REP investment decisions - a fair amount of a leader's REP 
     /// must go to Leadership promotions to access higher-tier abilities, preventing early 
     /// specialization abuse while ensuring every leader has strong command capabilities.
     /// 
     /// STRATEGIC CHOICE ARCHITECTURE:
-    /// • Every leader progresses: Leadership + Optional PoliticallyConnected
-    /// • Each leader chooses: 1 Doctrine + 1 Specialization
-    /// • Result: Distinct leader archetypes (Tank Commander, Artillery Specialist, etc.)
-    /// • No "master of everything" builds possible due to exclusivity rules
+    /// â€¢ Every leader progresses: Leadership + Optional PoliticallyConnected
+    /// â€¢ Each leader chooses: 1 Doctrine + 1 Specialization
+    /// â€¢ Result: Distinct leader archetypes (Tank Commander, Artillery Specialist, etc.)
+    /// â€¢ No "master of everything" builds possible due to exclusivity rules
     /// 
     /// CORE FUNCTIONALITY:
     /// - Storage and management of which skills a leader has unlocked
@@ -416,6 +416,47 @@ namespace HammerAndSickle.Models
             // This should never happen if all branches are properly attributed
             Debug.LogError($"LeaderSkillTree.IsBranchAvailable: Unknown branch type for {branch}");
             return false;
+        }
+
+        #endregion
+
+
+        #region Validate Tree System
+
+        /// <summary>
+        /// Validates the skill tree system configuration. 
+        /// Call this during initialization or in editor to verify everything is set up correctly.
+        /// </summary>
+        [System.Diagnostics.Conditional("UNITY_EDITOR")]
+        [System.Diagnostics.Conditional("DEBUG")]
+        public static void ValidateSkillTreeSystem()
+        {
+            try
+            {
+                Debug.Log("=== Skill Tree System Validation ===");
+
+                // Validate branch classification
+                SkillBranchExtensions.ValidateBranchClassification();
+
+                // Test branch type queries
+                var foundationCount = SkillBranchExtensions.GetFoundationBranches().Count();
+                var doctrineCount = SkillBranchExtensions.GetDoctrineBranches().Count();
+                var specializationCount = SkillBranchExtensions.GetSpecializationBranches().Count();
+
+                Debug.Log($"Branch counts - Foundation: {foundationCount}, Doctrine: {doctrineCount}, Specialization: {specializationCount}");
+
+                // Test some specific branches
+                Debug.Log($"Test classifications:");
+                Debug.Log($"  LeadershipFoundation.IsFoundation(): {SkillBranch.LeadershipFoundation.IsFoundation()}");
+                Debug.Log($"  ArmoredDoctrine.IsDoctrine(): {SkillBranch.ArmoredDoctrine.IsDoctrine()}");
+                Debug.Log($"  EngineeringSpecialization.IsSpecialization(): {SkillBranch.EngineeringSpecialization.IsSpecialization()}");
+
+                Debug.Log("âœ“ Skill Tree System validation completed successfully!");
+            }
+            catch (Exception ex)
+            {
+                Debug.LogError($"Skill Tree System validation failed: {ex.Message}");
+            }
         }
 
         #endregion
