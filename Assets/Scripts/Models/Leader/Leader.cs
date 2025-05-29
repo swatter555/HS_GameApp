@@ -77,7 +77,7 @@ namespace HammerAndSickle.Models
             }
             catch (Exception e)
             {
-                AppService.Instance.HandleException(CLASS_NAME, "Constructor", e);
+                AppService.Instance?.HandleException(CLASS_NAME, "Constructor", e);
                 throw;
             }
         }
@@ -116,7 +116,7 @@ namespace HammerAndSickle.Models
             }
             catch (Exception e)
             {
-                AppService.Instance.HandleException(CLASS_NAME, "Constructor", e);
+                AppService.Instance?.HandleException(CLASS_NAME, "Constructor", e);
                 throw;
             }
         }
@@ -160,7 +160,7 @@ namespace HammerAndSickle.Models
             }
             catch (Exception e)
             {
-                AppService.Instance.HandleException(CLASS_NAME, "DeserializationConstructor", e);
+                AppService.Instance?.HandleException(CLASS_NAME, "DeserializationConstructor", e);
                 throw;
             }
         }
@@ -246,7 +246,7 @@ namespace HammerAndSickle.Models
             }
             catch (Exception e)
             {
-                AppService.Instance.HandleException(CLASS_NAME, "SetOfficerCommandAbility", e);
+                AppService.Instance?.HandleException(CLASS_NAME, "SetOfficerCommandAbility", e);
                 throw;
             }
         }
@@ -294,7 +294,7 @@ namespace HammerAndSickle.Models
             }
             catch (Exception e)
             {
-                AppService.Instance.HandleException(CLASS_NAME, "RandomlyGenerateMe", e);
+                AppService.Instance?.HandleException(CLASS_NAME, "RandomlyGenerateMe", e);
                 throw;
             }
         }
@@ -320,7 +320,7 @@ namespace HammerAndSickle.Models
             }
             catch (Exception e)
             {
-                AppService.Instance.HandleException(CLASS_NAME, "SetOfficerName", e);
+                AppService.Instance?.HandleException(CLASS_NAME, "SetOfficerName", e);
                 return false;
             }
         }
@@ -375,7 +375,7 @@ namespace HammerAndSickle.Models
             }
             catch (Exception e)
             {
-                AppService.Instance.HandleException(CLASS_NAME, "GetFormattedRank", e);
+                AppService.Instance?.HandleException(CLASS_NAME, "GetFormattedRank", e);
                 return "Officer";
             }
         }
@@ -401,7 +401,7 @@ namespace HammerAndSickle.Models
             }
             catch (Exception e)
             {
-                AppService.Instance.HandleException(CLASS_NAME, "AwardReputation", e);
+                AppService.Instance?.HandleException(CLASS_NAME, "AwardReputation", e);
                 throw;
             }
         }
@@ -439,7 +439,7 @@ namespace HammerAndSickle.Models
             }
             catch (Exception e)
             {
-                AppService.Instance.HandleException(CLASS_NAME, "AwardReputationForAction", e);
+                AppService.Instance?.HandleException(CLASS_NAME, "AwardReputationForAction", e);
                 throw;
             }
         }
@@ -461,7 +461,7 @@ namespace HammerAndSickle.Models
             }
             catch (Exception e)
             {
-                AppService.Instance.HandleException(CLASS_NAME, "CanUnlockSkill", e);
+                AppService.Instance?.HandleException(CLASS_NAME, "CanUnlockSkill", e);
                 return false;
             }
         }
@@ -479,7 +479,7 @@ namespace HammerAndSickle.Models
             }
             catch (Exception e)
             {
-                AppService.Instance.HandleException(CLASS_NAME, "UnlockSkill", e);
+                AppService.Instance?.HandleException(CLASS_NAME, "UnlockSkill", e);
                 return false;
             }
         }
@@ -497,7 +497,7 @@ namespace HammerAndSickle.Models
             }
             catch (Exception e)
             {
-                AppService.Instance.HandleException(CLASS_NAME, "IsSkillUnlocked", e);
+                AppService.Instance?.HandleException(CLASS_NAME, "IsSkillUnlocked", e);
                 return false;
             }
         }
@@ -515,7 +515,7 @@ namespace HammerAndSickle.Models
             }
             catch (Exception e)
             {
-                AppService.Instance.HandleException(CLASS_NAME, "HasCapability", e);
+                AppService.Instance?.HandleException(CLASS_NAME, "HasCapability", e);
                 return false;
             }
         }
@@ -533,7 +533,7 @@ namespace HammerAndSickle.Models
             }
             catch (Exception e)
             {
-                AppService.Instance.HandleException(CLASS_NAME, "GetBonusValue", e);
+                AppService.Instance?.HandleException(CLASS_NAME, "GetBonusValue", e);
                 return 0f;
             }
         }
@@ -551,7 +551,7 @@ namespace HammerAndSickle.Models
             }
             catch (Exception e)
             {
-                AppService.Instance.HandleException(CLASS_NAME, "IsBranchAvailable", e);
+                AppService.Instance?.HandleException(CLASS_NAME, "IsBranchAvailable", e);
                 return false;
             }
         }
@@ -568,7 +568,7 @@ namespace HammerAndSickle.Models
             }
             catch (Exception e)
             {
-                AppService.Instance.HandleException(CLASS_NAME, "ResetSkills", e);
+                AppService.Instance?.HandleException(CLASS_NAME, "ResetSkills", e);
                 return false;
             }
         }
@@ -596,7 +596,7 @@ namespace HammerAndSickle.Models
             }
             catch (Exception e)
             {
-                AppService.Instance.HandleException(CLASS_NAME, "AssignToUnit", e);
+                AppService.Instance?.HandleException(CLASS_NAME, "AssignToUnit", e);
                 throw;
             }
         }
@@ -614,7 +614,7 @@ namespace HammerAndSickle.Models
             }
             catch (Exception e)
             {
-                AppService.Instance.HandleException(CLASS_NAME, "UnassignFromUnit", e);
+                AppService.Instance?.HandleException(CLASS_NAME, "UnassignFromUnit", e);
                 throw;
             }
         }
@@ -649,7 +649,7 @@ namespace HammerAndSickle.Models
             }
             catch (Exception e)
             {
-                AppService.Instance.HandleException(CLASS_NAME, "GetObjectData", e);
+                AppService.Instance?.HandleException(CLASS_NAME, "GetObjectData", e);
                 throw;
             }
         }
@@ -690,7 +690,7 @@ namespace HammerAndSickle.Models
             }
             catch (Exception e)
             {
-                AppService.Instance.HandleException(CLASS_NAME, "Clone", e);
+                AppService.Instance?.HandleException(CLASS_NAME, "Clone", e);
                 throw;
             }
         }
