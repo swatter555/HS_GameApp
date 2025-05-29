@@ -709,11 +709,11 @@ namespace HammerAndSickle.Models
             // Tier 4: Tactical Genius - Increased combat actions.
             AddSkill(new SkillDefinition(
                 CombinedArmsSpecialization.TacticalGenius_CombatAction,
-                "Tactical Genuis",
+                "Tactical Genius",
                 CUConstants.TIER4_REP_COST,
                 SkillBranch.CombinedArmsSpecialization,
                 SkillTier.Tier4,
-                "This commander has excellent insticts and always drives to the sound of guns.",
+                "This commander has excellent combat insticts, always drives to the sound of guns.",
                 SkillBonusType.CombatAction,
                 CUConstants.COMBAT_ACTION_BONUS_VAL,
                 CommandGrade.TopGrade,
