@@ -32,7 +32,10 @@ namespace HammerAndSickle.Models
         public bool IsLandBase { get; private set; }
 
         // Profiles contain unit stats and capabilities.
-        public CombatUnitProfiles CombatUnitProfiles { get; private set; }
+        public WeaponSystemProfile DeployedProfile { get; private set; }
+        public WeaponSystemProfile MountedProfile { get; private set; }
+        public UnitProfile UnitProfile { get; private set; }
+        public LandBaseProfile LandBaseProfile { get; private set; }
 
         // The unit's leader.
         public Leader CommandingOfficer { get; private set; }

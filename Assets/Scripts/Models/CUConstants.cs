@@ -195,7 +195,7 @@ namespace HammerAndSickle.Models
         public const int COMMAND_DICE_SIDES = 6;         // 6-sided dice
         public const int COMMAND_DICE_MODIFIER = -10;    // Subtract 10 from total
         public const int COMMAND_CLAMP_MIN = -2;         // Minimum CommandAbility value
-        public const int COMMAND_CLAMP_MAX = 3;          // Maximum CommandAbility value
+        public const int COMMAND_CLAMP_MAX = 0;          // Maximum CommandAbility value
 
 
         //=======================
