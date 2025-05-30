@@ -249,67 +249,16 @@ namespace HammerAndSickle.Models
         /// </summary>
         private void InitializeMovementPoints()
         {
-            int maxMovement;
-
-            switch (Classification)
+            var maxMovement = Classification switch
             {
-                case UnitClassification.TANK:
-                case UnitClassification.MECH:
-                case UnitClassification.RECON:
-                case UnitClassification.SPA:
-                case UnitClassification.SPAAA:
-                case UnitClassification.SPSAM:
-                    maxMovement = CUConstants.MECH_MOV;
-                    break;
-
-                case UnitClassification.MOT:
-                case UnitClassification.MAB:
-                case UnitClassification.MMAR:
-                case UnitClassification.AM:
-                case UnitClassification.MAM:
-                case UnitClassification.SPECM:
-                case UnitClassification.ROC:
-                    maxMovement = CUConstants.MOT_MOV;
-                    break;
-
-                case UnitClassification.INF:
-                case UnitClassification.AB:
-                case UnitClassification.MAR:
-                case UnitClassification.AT:
-                case UnitClassification.SPECF:
-                case UnitClassification.ART:
-                case UnitClassification.SAM:
-                case UnitClassification.AAA:
-                case UnitClassification.ENG:
-                    maxMovement = CUConstants.FOOT_MOV;
-                    break;
-
-                case UnitClassification.ASF:
-                case UnitClassification.MRF:
-                case UnitClassification.ATT:
-                case UnitClassification.BMB:
-                case UnitClassification.RCN:
-                case UnitClassification.FWT:
-                    maxMovement = CUConstants.FIXEDWING_MOV;
-                    break;
-
-                case UnitClassification.AHEL:
-                case UnitClassification.THEL:
-                case UnitClassification.SPECH:
-                    maxMovement = CUConstants.HELO_MOV;
-                    break;
-
-                case UnitClassification.BASE:
-                case UnitClassification.DEPOT:
-                case UnitClassification.AIRB:
-                    maxMovement = 0; // Bases don't move
-                    break;
-
-                default:
-                    maxMovement = CUConstants.FOOT_MOV; // Default to foot movement
-                    break;
-            }
-
+                UnitClassification.TANK or UnitClassification.MECH or UnitClassification.RECON or UnitClassification.SPA or UnitClassification.SPAAA or UnitClassification.SPSAM => CUConstants.MECH_MOV,
+                UnitClassification.MOT or UnitClassification.MAB or UnitClassification.MMAR or UnitClassification.AM or UnitClassification.MAM or UnitClassification.SPECM or UnitClassification.ROC => CUConstants.MOT_MOV,
+                UnitClassification.INF or UnitClassification.AB or UnitClassification.MAR or UnitClassification.AT or UnitClassification.SPECF or UnitClassification.ART or UnitClassification.SAM or UnitClassification.AAA or UnitClassification.ENG => CUConstants.FOOT_MOV,
+                UnitClassification.ASF or UnitClassification.MRF or UnitClassification.ATT or UnitClassification.BMB or UnitClassification.RCN or UnitClassification.FWT => CUConstants.FIXEDWING_MOV,
+                UnitClassification.AHEL or UnitClassification.THEL or UnitClassification.SPECH => CUConstants.HELO_MOV,
+                UnitClassification.BASE or UnitClassification.DEPOT or UnitClassification.AIRB => 0,// Bases don't move
+                _ => CUConstants.FOOT_MOV,// Default to foot movement
+            };
             MovementPoints = new StatsMaxCurrent(maxMovement);
         }
 
@@ -401,23 +350,16 @@ namespace HammerAndSickle.Models
         /// <returns>Points needed for next level, or 0 if at max level</returns>
         public int GetPointsToNextLevel()
         {
-            switch (_ExperienceLevel)
+            return _ExperienceLevel switch
             {
-                case ExperienceLevel.Raw:
-                    return (int)ExperiencePointLevels.Green - ExperiencePoints;
-                case ExperienceLevel.Green:
-                    return (int)ExperiencePointLevels.Trained - ExperiencePoints;
-                case ExperienceLevel.Trained:
-                    return (int)ExperiencePointLevels.Experienced - ExperiencePoints;
-                case ExperienceLevel.Experienced:
-                    return (int)ExperiencePointLevels.Veteran - ExperiencePoints;
-                case ExperienceLevel.Veteran:
-                    return (int)ExperiencePointLevels.Elite - ExperiencePoints;
-                case ExperienceLevel.Elite:
-                    return 0; // Already at max level
-                default:
-                    return 0;
-            }
+                ExperienceLevel.Raw => (int)ExperiencePointLevels.Green - ExperiencePoints,
+                ExperienceLevel.Green => (int)ExperiencePointLevels.Trained - ExperiencePoints,
+                ExperienceLevel.Trained => (int)ExperiencePointLevels.Experienced - ExperiencePoints,
+                ExperienceLevel.Experienced => (int)ExperiencePointLevels.Veteran - ExperiencePoints,
+                ExperienceLevel.Veteran => (int)ExperiencePointLevels.Elite - ExperiencePoints,
+                ExperienceLevel.Elite => 0,// Already at max level
+                _ => 0,
+            };
         }
 
         /// <summary>
@@ -464,23 +406,16 @@ namespace HammerAndSickle.Models
         /// <returns>Minimum points required for that level</returns>
         private int GetMinPointsForLevel(ExperienceLevel level)
         {
-            switch (level)
+            return level switch
             {
-                case ExperienceLevel.Raw:
-                    return (int)ExperiencePointLevels.Raw;
-                case ExperienceLevel.Green:
-                    return (int)ExperiencePointLevels.Green;
-                case ExperienceLevel.Trained:
-                    return (int)ExperiencePointLevels.Trained;
-                case ExperienceLevel.Experienced:
-                    return (int)ExperiencePointLevels.Experienced;
-                case ExperienceLevel.Veteran:
-                    return (int)ExperiencePointLevels.Veteran;
-                case ExperienceLevel.Elite:
-                    return (int)ExperiencePointLevels.Elite;
-                default:
-                    return 0;
-            }
+                ExperienceLevel.Raw => (int)ExperiencePointLevels.Raw,
+                ExperienceLevel.Green => (int)ExperiencePointLevels.Green,
+                ExperienceLevel.Trained => (int)ExperiencePointLevels.Trained,
+                ExperienceLevel.Experienced => (int)ExperiencePointLevels.Experienced,
+                ExperienceLevel.Veteran => (int)ExperiencePointLevels.Veteran,
+                ExperienceLevel.Elite => (int)ExperiencePointLevels.Elite,
+                _ => 0,
+            };
         }
 
         /// <summary>
@@ -491,23 +426,16 @@ namespace HammerAndSickle.Models
         /// <returns>Next experience level</returns>
         private ExperienceLevel GetNextLevel(ExperienceLevel currentLevel)
         {
-            switch (currentLevel)
+            return currentLevel switch
             {
-                case ExperienceLevel.Raw:
-                    return ExperienceLevel.Green;
-                case ExperienceLevel.Green:
-                    return ExperienceLevel.Trained;
-                case ExperienceLevel.Trained:
-                    return ExperienceLevel.Experienced;
-                case ExperienceLevel.Experienced:
-                    return ExperienceLevel.Veteran;
-                case ExperienceLevel.Veteran:
-                    return ExperienceLevel.Elite;
-                case ExperienceLevel.Elite:
-                    return ExperienceLevel.Elite; // Already at max
-                default:
-                    return ExperienceLevel.Green;
-            }
+                ExperienceLevel.Raw => ExperienceLevel.Green,
+                ExperienceLevel.Green => ExperienceLevel.Trained,
+                ExperienceLevel.Trained => ExperienceLevel.Experienced,
+                ExperienceLevel.Experienced => ExperienceLevel.Veteran,
+                ExperienceLevel.Veteran => ExperienceLevel.Elite,
+                ExperienceLevel.Elite => ExperienceLevel.Elite,// Already at max
+                _ => ExperienceLevel.Green,
+            };
         }
 
         /// <summary>
@@ -549,23 +477,16 @@ namespace HammerAndSickle.Models
         /// <returns>Multiplier for combat effectiveness (1.0 = normal)</returns>
         public float GetExperienceMultiplier()
         {
-            switch (_ExperienceLevel)
+            return _ExperienceLevel switch
             {
-                case ExperienceLevel.Raw:
-                    return CUConstants.RAW_XP_MODIFIER;  // -20% effectiveness
-                case ExperienceLevel.Green:
-                    return CUConstants.GREEN_XP_MODIFIER;  // -10% effectiveness
-                case ExperienceLevel.Trained:
-                    return CUConstants.TRAINED_XP_MODIFIER;  // Normal effectiveness
-                case ExperienceLevel.Experienced:
-                    return CUConstants.EXPERIENCED_XP_MODIFIER;  // +10% effectiveness
-                case ExperienceLevel.Veteran:
-                    return CUConstants.VETERAN_XP_MODIFIER;  // +20% effectiveness
-                case ExperienceLevel.Elite:
-                    return CUConstants.ELITE_XP_MODIFIER;  // +30% effectiveness
-                default:
-                    return 1.0f;
-            }
+                ExperienceLevel.Raw => CUConstants.RAW_XP_MODIFIER,// -20% effectiveness
+                ExperienceLevel.Green => CUConstants.GREEN_XP_MODIFIER,// -10% effectiveness
+                ExperienceLevel.Trained => CUConstants.TRAINED_XP_MODIFIER,// Normal effectiveness
+                ExperienceLevel.Experienced => CUConstants.EXPERIENCED_XP_MODIFIER,// +10% effectiveness
+                ExperienceLevel.Veteran => CUConstants.VETERAN_XP_MODIFIER,// +20% effectiveness
+                ExperienceLevel.Elite => CUConstants.ELITE_XP_MODIFIER,// +30% effectiveness
+                _ => 1.0f,
+            };
         }
 
         #endregion
