@@ -17,7 +17,15 @@ namespace HammerAndSickle.Models
 
         #endregion // Constants
 
-      
+
+        #region Fields
+
+        private bool hasAirSupply = false;          // Whether the depot can provide air supply
+        private bool hasNavalSupply = false;        // Whether the depot can provide naval supply
+
+        #endregion // Fields
+
+
         #region Properties
 
         public string DepotID { get; private set; }                      // Unique identifier for the depot
@@ -29,11 +37,11 @@ namespace HammerAndSickle.Models
         public SupplyProjection SupplyProjection { get; private set; }   // Supply projection level
         public bool SupplyPenetration { get; private set; }              // Whether the depot has supply penetration capability
         public DepotCategory DepotCategory { get; private set; }         // Category of the depot (Main or Secondary)
+        public bool IsMainDepot => DepotCategory == DepotCategory.Main;
 
         // Properties with rules.
-        public bool IsMainDepot => DepotCategory == DepotCategory.Main;
-        public bool HasAirSupply { get => HasAirSupply && IsMainDepot; set => HasAirSupply = IsMainDepot && value; }
-        public bool HasNavalSupply { get => HasNavalSupply && IsMainDepot; set => HasNavalSupply = IsMainDepot && value; }
+        public bool HasAirSupply { get => hasAirSupply && IsMainDepot; set => hasAirSupply = IsMainDepot && value; }
+        public bool HasNavalSupply { get => hasNavalSupply && IsMainDepot; set => hasNavalSupply = IsMainDepot && value; }
         public int ProjectionRadius => CUConstants.ProjectionRangeValues[SupplyProjection];
 
         #endregion // Properties
@@ -95,12 +103,12 @@ namespace HammerAndSickle.Models
                 StockpileInDays = info.GetSingle(nameof(StockpileInDays));
                 GenerationRate = (SupplyGenerationRate)info.GetValue(nameof(GenerationRate), typeof(SupplyGenerationRate));
                 SupplyProjection = (SupplyProjection)info.GetValue(nameof(SupplyProjection), typeof(SupplyProjection));
-                SupplyPenetration = (bool)info.GetValue(nameof(SupplyPenetration), typeof(bool));
+                SupplyPenetration = info.GetBoolean(nameof(SupplyPenetration));
                 DepotCategory = (DepotCategory)info.GetValue(nameof(DepotCategory), typeof(DepotCategory));
 
-                // Special abilities
-                HasAirSupply = info.GetBoolean(nameof(HasAirSupply));
-                HasNavalSupply = info.GetBoolean(nameof(HasNavalSupply));
+                // Special abilities - FIXED: Use backing fields
+                hasAirSupply = info.GetBoolean("HasAirSupply");
+                hasNavalSupply = info.GetBoolean("HasNavalSupply");
             }
             catch (Exception e)
             {
@@ -518,7 +526,7 @@ namespace HammerAndSickle.Models
 
 
         #region ISerializable Implementation
-       
+
         public override void GetObjectData(SerializationInfo info, StreamingContext context)
         {
             try
@@ -539,9 +547,9 @@ namespace HammerAndSickle.Models
                 info.AddValue(nameof(SupplyPenetration), SupplyPenetration);
                 info.AddValue(nameof(DepotCategory), DepotCategory);
 
-                // Special abilities
-                info.AddValue(nameof(HasAirSupply), HasAirSupply);
-                info.AddValue(nameof(HasNavalSupply), HasNavalSupply);
+                // Special abilities - FIXED: Use backing fields
+                info.AddValue("HasAirSupply", hasAirSupply);
+                info.AddValue("HasNavalSupply", hasNavalSupply);
             }
             catch (Exception e)
             {

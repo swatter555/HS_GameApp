@@ -25,6 +25,15 @@ namespace HammerAndSickle.Models
         public const float MAX_RANGE = 25.0f;
         public const float MIN_RANGE = 0.0f;
 
+        // Experience level modifiers.
+        public const float RAW_XP_MODIFIER = 0.8f;         // -20% effectiveness
+        public const float GREEN_XP_MODIFIER = 0.9f;       // -10% effectiveness
+        public const float TRAINED_XP_MODIFIER = 1.0f;     // Normal effectiveness
+        public const float EXPERIENCED_XP_MODIFIER = 1.1f; // +10% effectiveness
+        public const float VETERAN_XP_MODIFIER = 1.2f;     // +20% effectiveness
+        public const float ELITE_XP_MODIFIER = 1.3f;       // +30% effectiveness
+
+
         //================================
         //====== Leader Skills/Tree ======
         //================================

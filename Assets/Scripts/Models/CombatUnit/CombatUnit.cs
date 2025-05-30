@@ -4,10 +4,11 @@ using UnityEngine;
 using HammerAndSickle.Services;
 
 namespace HammerAndSickle.Models
-{ 
+{
     /// <summary>
     /// Represents a military unit with identification, base stats, and optional transport mounting.
     /// Implements an event-driven design pattern for state changes.
+    /// Uses StatsMaxCurrent for paired max/current value management.
     /// </summary>
     [Serializable]
     public class CombatUnit : ICloneable, ISerializable
@@ -16,7 +17,8 @@ namespace HammerAndSickle.Models
 
         private const string CLASS_NAME = nameof(CombatUnit);
 
-        #endregion // Constants
+        #endregion
+
 
         #region Properties
 
@@ -40,31 +42,25 @@ namespace HammerAndSickle.Models
         // The unit's leader.
         public Leader CommandingOfficer { get; private set; }
 
-        // Action counts
-        public int MaxMoveActions { get; private set; }
-        public int MoveActions { get; private set; }
-        public int MaxCombatActions { get; private set; }
-        public int CombatActions { get; private set; }
-        public int MaxDeploymentActions { get; private set; }
-        public int DeploymentActions { get; private set; }
-        public int MaxOpportunityActions { get; private set; }
-        public int OpportunityActions { get; private set; }
-        public int MaxIntelGatheringActions { get; private set; }
-        public int IntelGatheringActions { get; private set; }
+        // Action counts using StatsMaxCurrent
+        public StatsMaxCurrent MoveActions { get; private set; }
+        public StatsMaxCurrent CombatActions { get; private set; }
+        public StatsMaxCurrent DeploymentActions { get; private set; }
+        public StatsMaxCurrent OpportunityActions { get; private set; }
+        public StatsMaxCurrent IntelGatheringActions { get; private set; }
 
-        // State data
+        // State data using StatsMaxCurrent where appropriate
         public int ExperiencePoints { get; private set; }
         public ExperienceLevel _ExperienceLevel { get; private set; }
         public EfficiencyLevel EfficiencyLevel { get; private set; }
         public bool IsMounted { get; private set; }
         public CombatState CombatState { get; private set; }
-        public int CurrentHitPoints { get; private set; }
-        public float CurrentDaysSupply { get; private set; }
-        public int MaxMovementPoints { get; private set; }
-        public int CurrentMovementPoints { get; private set; }
+        public StatsMaxCurrent HitPoints { get; private set; }
+        public StatsMaxCurrent DaysSupply { get; private set; }
+        public StatsMaxCurrent MovementPoints { get; private set; }
         public Vector2 MapPos { get; private set; }
 
-        #endregion // Properties
+        #endregion
 
 
         #region Constructors
@@ -72,6 +68,103 @@ namespace HammerAndSickle.Models
         public CombatUnit()
         {
 
+        }
+
+        /// <summary>
+        /// Creates a new CombatUnit with the specified core properties.
+        /// </summary>
+        /// <param name="unitName">Display name of the unit</param>
+        /// <param name="unitID">Unique identifier for the unit</param>
+        /// <param name="unitType">Type of unit (land, air, naval)</param>
+        /// <param name="classification">Unit classification (tank, infantry, etc.)</param>
+        /// <param name="role">Primary role of the unit</param>
+        /// <param name="side">Which side controls this unit</param>
+        /// <param name="nationality">National affiliation</param>
+        /// <param name="deployedProfile">Combat profile when deployed</param>
+        /// <param name="mountedProfile">Combat profile when mounted (can be null)</param>
+        /// <param name="unitProfile">Organizational profile for tracking losses</param>
+        /// <param name="isTransportable">Whether this unit can be transported</param>
+        /// <param name="isLandBase">Whether this unit is a land-based facility</param>
+        /// <param name="landBaseProfile">Land base profile if applicable (can be null)</param>
+        public CombatUnit(
+            string unitName,
+            string unitID,
+            UnitType unitType,
+            UnitClassification classification,
+            UnitRole role,
+            Side side,
+            Nationality nationality,
+            WeaponSystemProfile deployedProfile,
+            WeaponSystemProfile mountedProfile,
+            UnitProfile unitProfile,
+            bool isTransportable,
+            bool isLandBase = false,
+            LandBaseProfile landBaseProfile = null)
+        {
+            try
+            {
+                // Validate required parameters
+                if (string.IsNullOrEmpty(unitName))
+                    throw new ArgumentException("Unit name cannot be null or empty", nameof(unitName));
+
+                if (string.IsNullOrEmpty(unitID))
+                    throw new ArgumentException("Unit ID cannot be null or empty", nameof(unitID));
+
+                if (deployedProfile == null)
+                    throw new ArgumentNullException(nameof(deployedProfile), "Deployed profile is required");
+
+                if (unitProfile == null)
+                    throw new ArgumentNullException(nameof(unitProfile), "Unit profile is required");
+
+                // Validate land base requirements
+                if (isLandBase && landBaseProfile == null)
+                    throw new ArgumentException("Land base profile is required when isLandBase is true", nameof(landBaseProfile));
+
+                // Set identification and metadata
+                UnitName = unitName;
+                UnitID = unitID;
+                UnitType = unitType;
+                Classification = classification;
+                Role = role;
+                Side = side;
+                Nationality = nationality;
+                IsTransportable = isTransportable;
+                IsLandBase = isLandBase;
+
+                // Set profiles
+                DeployedProfile = deployedProfile;
+                MountedProfile = mountedProfile;
+                UnitProfile = unitProfile;
+                LandBaseProfile = landBaseProfile;
+
+                // Initialize leader (will be null until assigned)
+                CommandingOfficer = null;
+
+                // Initialize action counts based on unit type and classification
+                InitializeActionCounts();
+
+                // Initialize state with default values
+                ExperiencePoints = 0;
+                _ExperienceLevel = ExperienceLevel.Raw;
+                EfficiencyLevel = EfficiencyLevel.FullyOperational;
+                IsMounted = false;
+                CombatState = CombatState.Deployed;
+
+                // Initialize StatsMaxCurrent properties
+                HitPoints = new StatsMaxCurrent(CUConstants.MAX_HP);
+                DaysSupply = new StatsMaxCurrent(CUConstants.MaxDaysSupplyUnit);
+
+                // Initialize movement based on unit classification
+                InitializeMovementPoints();
+
+                // Initialize position to origin (will be set when placed on map)
+                MapPos = Vector2.zero;
+            }
+            catch (Exception e)
+            {
+                AppService.Instance.HandleException(CLASS_NAME, "Constructor", e);
+                throw;
+            }
         }
 
         // Deserialization constructor.
@@ -87,8 +180,421 @@ namespace HammerAndSickle.Models
                 throw;
             }
         }
-        #endregion // Constructors
 
+        #endregion
+
+
+        #region Initialization Methods
+
+        /// <summary>
+        /// Initializes action counts based on unit type and classification.
+        /// Most units get standard action counts, with variations for special cases.
+        /// </summary>
+        private void InitializeActionCounts()
+        {
+            // Standard action counts for most units
+            int moveActions = 2;
+            int combatActions = 1;
+            int deploymentActions = 1;
+            int opportunityActions = 1;
+            int intelActions = 1;
+
+            // Adjust based on unit classification
+            switch (Classification)
+            {
+                case UnitClassification.RECON:
+                    moveActions = 3; // Recon units are more mobile
+                    intelActions = 2; // Better at intelligence gathering
+                    break;
+
+                case UnitClassification.ART:
+                case UnitClassification.SPA:
+                case UnitClassification.ROC:
+                    moveActions = 1; // Artillery is less mobile
+                    break;
+
+                case UnitClassification.SAM:
+                case UnitClassification.SPSAM:
+                case UnitClassification.AAA:
+                case UnitClassification.SPAAA:
+                    opportunityActions = 2; // Air defense gets more opportunity actions
+                    break;
+
+                case UnitClassification.SPECF:
+                case UnitClassification.SPECM:
+                case UnitClassification.SPECH:
+                    intelActions = 2; // Special forces are better at intel
+                    break;
+
+                case UnitClassification.BASE:
+                case UnitClassification.DEPOT:
+                case UnitClassification.AIRB:
+                    moveActions = 0; // Bases don't move
+                    combatActions = 0; // Bases don't attack
+                    deploymentActions = 0; // Bases don't deploy
+                    opportunityActions = 0; // Bases don't have opportunity actions
+                    break;
+            }
+
+            // Create StatsMaxCurrent instances
+            MoveActions = new StatsMaxCurrent(moveActions);
+            CombatActions = new StatsMaxCurrent(combatActions);
+            DeploymentActions = new StatsMaxCurrent(deploymentActions);
+            OpportunityActions = new StatsMaxCurrent(opportunityActions);
+            IntelGatheringActions = new StatsMaxCurrent(intelActions);
+        }
+
+        /// <summary>
+        /// Initializes movement points based on unit classification.
+        /// </summary>
+        private void InitializeMovementPoints()
+        {
+            int maxMovement;
+
+            switch (Classification)
+            {
+                case UnitClassification.TANK:
+                case UnitClassification.MECH:
+                case UnitClassification.RECON:
+                case UnitClassification.SPA:
+                case UnitClassification.SPAAA:
+                case UnitClassification.SPSAM:
+                    maxMovement = CUConstants.MECH_MOV;
+                    break;
+
+                case UnitClassification.MOT:
+                case UnitClassification.MAB:
+                case UnitClassification.MMAR:
+                case UnitClassification.AM:
+                case UnitClassification.MAM:
+                case UnitClassification.SPECM:
+                case UnitClassification.ROC:
+                    maxMovement = CUConstants.MOT_MOV;
+                    break;
+
+                case UnitClassification.INF:
+                case UnitClassification.AB:
+                case UnitClassification.MAR:
+                case UnitClassification.AT:
+                case UnitClassification.SPECF:
+                case UnitClassification.ART:
+                case UnitClassification.SAM:
+                case UnitClassification.AAA:
+                case UnitClassification.ENG:
+                    maxMovement = CUConstants.FOOT_MOV;
+                    break;
+
+                case UnitClassification.ASF:
+                case UnitClassification.MRF:
+                case UnitClassification.ATT:
+                case UnitClassification.BMB:
+                case UnitClassification.RCN:
+                case UnitClassification.FWT:
+                    maxMovement = CUConstants.FIXEDWING_MOV;
+                    break;
+
+                case UnitClassification.AHEL:
+                case UnitClassification.THEL:
+                case UnitClassification.SPECH:
+                    maxMovement = CUConstants.HELO_MOV;
+                    break;
+
+                case UnitClassification.BASE:
+                case UnitClassification.DEPOT:
+                case UnitClassification.AIRB:
+                    maxMovement = 0; // Bases don't move
+                    break;
+
+                default:
+                    maxMovement = CUConstants.FOOT_MOV; // Default to foot movement
+                    break;
+            }
+
+            MovementPoints = new StatsMaxCurrent(maxMovement);
+        }
+
+        #endregion
+
+
+        #region Experience System Methods
+
+        /// <summary>
+        /// Adds experience points to the unit and checks for level advancement.
+        /// Returns true if the unit leveled up.
+        /// </summary>
+        /// <param name="points">Experience points to add</param>
+        /// <returns>True if the unit advanced to a new experience level</returns>
+        public bool AddExperience(int points)
+        {
+            try
+            {
+                if (points <= 0)
+                    return false;
+
+                var previousLevel = _ExperienceLevel;
+                ExperiencePoints += points;
+
+                // Check if we've advanced to a new level
+                var newLevel = CalculateExperienceLevel(ExperiencePoints);
+                if (newLevel != previousLevel)
+                {
+                    _ExperienceLevel = newLevel;
+                    OnExperienceLevelChanged(previousLevel, newLevel);
+                    return true;
+                }
+
+                return false;
+            }
+            catch (Exception e)
+            {
+                AppService.Instance.HandleException(CLASS_NAME, "AddExperience", e);
+                return false;
+            }
+        }
+
+        /// <summary>
+        /// Sets the unit's experience points directly and updates the level accordingly.
+        /// Used for loading saved games or manual experience setting.
+        /// </summary>
+        /// <param name="points">Total experience points</param>
+        public void SetExperience(int points)
+        {
+            try
+            {
+                if (points < 0)
+                    points = 0;
+
+                ExperiencePoints = points;
+                _ExperienceLevel = CalculateExperienceLevel(points);
+            }
+            catch (Exception e)
+            {
+                AppService.Instance.HandleException(CLASS_NAME, "SetExperience", e);
+            }
+        }
+
+        /// <summary>
+        /// Calculates the experience level based on total experience points.
+        /// </summary>
+        /// <param name="totalPoints">Total experience points</param>
+        /// <returns>The appropriate experience level</returns>
+        private ExperienceLevel CalculateExperienceLevel(int totalPoints)
+        {
+            if (totalPoints >= (int)ExperiencePointLevels.Elite)
+                return ExperienceLevel.Elite;
+            else if (totalPoints >= (int)ExperiencePointLevels.Veteran)
+                return ExperienceLevel.Veteran;
+            else if (totalPoints >= (int)ExperiencePointLevels.Experienced)
+                return ExperienceLevel.Experienced;
+            else if (totalPoints >= (int)ExperiencePointLevels.Trained)
+                return ExperienceLevel.Trained;
+            else if (totalPoints >= (int)ExperiencePointLevels.Green)
+                return ExperienceLevel.Green;
+            else
+                return ExperienceLevel.Raw;
+        }
+
+        /// <summary>
+        /// Gets the experience points required for the next level.
+        /// Returns 0 if already at maximum level (Elite).
+        /// </summary>
+        /// <returns>Points needed for next level, or 0 if at max level</returns>
+        public int GetPointsToNextLevel()
+        {
+            switch (_ExperienceLevel)
+            {
+                case ExperienceLevel.Raw:
+                    return (int)ExperiencePointLevels.Green - ExperiencePoints;
+                case ExperienceLevel.Green:
+                    return (int)ExperiencePointLevels.Trained - ExperiencePoints;
+                case ExperienceLevel.Trained:
+                    return (int)ExperiencePointLevels.Experienced - ExperiencePoints;
+                case ExperienceLevel.Experienced:
+                    return (int)ExperiencePointLevels.Veteran - ExperiencePoints;
+                case ExperienceLevel.Veteran:
+                    return (int)ExperiencePointLevels.Elite - ExperiencePoints;
+                case ExperienceLevel.Elite:
+                    return 0; // Already at max level
+                default:
+                    return 0;
+            }
+        }
+
+        /// <summary>
+        /// Gets the experience level as a human-readable string with progress information.
+        /// </summary>
+        /// <returns>Formatted string showing level and progress</returns>
+        public string GetExperienceDisplayString()
+        {
+            var pointsToNext = GetPointsToNextLevel();
+            if (pointsToNext > 0)
+            {
+                return $"{_ExperienceLevel} ({ExperiencePoints} XP, {pointsToNext} to next)";
+            }
+            else
+            {
+                return $"{_ExperienceLevel} (Max Level - {ExperiencePoints} XP)";
+            }
+        }
+
+        /// <summary>
+        /// Gets the experience progress as a percentage towards the next level (0.0 to 1.0).
+        /// Returns 1.0 if at maximum level.
+        /// </summary>
+        /// <returns>Progress percentage towards next level</returns>
+        public float GetExperienceProgress()
+        {
+            if (_ExperienceLevel == ExperienceLevel.Elite)
+                return 1.0f;
+
+            int currentLevelMin = GetMinPointsForLevel(_ExperienceLevel);
+            int nextLevelMin = GetMinPointsForLevel(GetNextLevel(_ExperienceLevel));
+
+            if (nextLevelMin == currentLevelMin)
+                return 1.0f;
+
+            float progress = (float)(ExperiencePoints - currentLevelMin) / (nextLevelMin - currentLevelMin);
+            return Mathf.Clamp01(progress);
+        }
+
+        /// <summary>
+        /// Gets the minimum experience points required for a specific level.
+        /// </summary>
+        /// <param name="level">The experience level</param>
+        /// <returns>Minimum points required for that level</returns>
+        private int GetMinPointsForLevel(ExperienceLevel level)
+        {
+            switch (level)
+            {
+                case ExperienceLevel.Raw:
+                    return (int)ExperiencePointLevels.Raw;
+                case ExperienceLevel.Green:
+                    return (int)ExperiencePointLevels.Green;
+                case ExperienceLevel.Trained:
+                    return (int)ExperiencePointLevels.Trained;
+                case ExperienceLevel.Experienced:
+                    return (int)ExperiencePointLevels.Experienced;
+                case ExperienceLevel.Veteran:
+                    return (int)ExperiencePointLevels.Veteran;
+                case ExperienceLevel.Elite:
+                    return (int)ExperiencePointLevels.Elite;
+                default:
+                    return 0;
+            }
+        }
+
+        /// <summary>
+        /// Gets the next experience level after the specified level.
+        /// Returns Elite if already at Elite.
+        /// </summary>
+        /// <param name="currentLevel">Current experience level</param>
+        /// <returns>Next experience level</returns>
+        private ExperienceLevel GetNextLevel(ExperienceLevel currentLevel)
+        {
+            switch (currentLevel)
+            {
+                case ExperienceLevel.Raw:
+                    return ExperienceLevel.Green;
+                case ExperienceLevel.Green:
+                    return ExperienceLevel.Trained;
+                case ExperienceLevel.Trained:
+                    return ExperienceLevel.Experienced;
+                case ExperienceLevel.Experienced:
+                    return ExperienceLevel.Veteran;
+                case ExperienceLevel.Veteran:
+                    return ExperienceLevel.Elite;
+                case ExperienceLevel.Elite:
+                    return ExperienceLevel.Elite; // Already at max
+                default:
+                    return ExperienceLevel.Green;
+            }
+        }
+
+        /// <summary>
+        /// Checks if the unit is considered experienced (Veteran or Elite).
+        /// Used for various game mechanics that benefit experienced units.
+        /// </summary>
+        /// <returns>True if unit is Veteran or Elite</returns>
+        public bool IsExperienced()
+        {
+            return _ExperienceLevel == ExperienceLevel.Veteran || _ExperienceLevel == ExperienceLevel.Elite;
+        }
+
+        /// <summary>
+        /// Checks if the unit is considered elite level.
+        /// </summary>
+        /// <returns>True if unit is Elite</returns>
+        public bool IsElite()
+        {
+            return _ExperienceLevel == ExperienceLevel.Elite;
+        }
+
+        /// <summary>
+        /// Called when the unit's experience level changes.
+        /// Can be overridden or used to trigger events/notifications.
+        /// </summary>
+        /// <param name="previousLevel">The previous experience level</param>
+        /// <param name="newLevel">The new experience level</param>
+        protected virtual void OnExperienceLevelChanged(ExperienceLevel previousLevel, ExperienceLevel newLevel)
+        {
+            // Could trigger events, sound effects, UI notifications, etc.
+            // For now, just log the advancement
+            Debug.Log($"{UnitName} advanced from {previousLevel} to {newLevel}!");
+        }
+
+        /// <summary>
+        /// Gets the combat effectiveness multiplier based on experience level.
+        /// Used to modify combat values based on unit experience.
+        /// </summary>
+        /// <returns>Multiplier for combat effectiveness (1.0 = normal)</returns>
+        public float GetExperienceMultiplier()
+        {
+            switch (_ExperienceLevel)
+            {
+                case ExperienceLevel.Raw:
+                    return CUConstants.RAW_XP_MODIFIER;  // -20% effectiveness
+                case ExperienceLevel.Green:
+                    return CUConstants.GREEN_XP_MODIFIER;  // -10% effectiveness
+                case ExperienceLevel.Trained:
+                    return CUConstants.TRAINED_XP_MODIFIER;  // Normal effectiveness
+                case ExperienceLevel.Experienced:
+                    return CUConstants.EXPERIENCED_XP_MODIFIER;  // +10% effectiveness
+                case ExperienceLevel.Veteran:
+                    return CUConstants.VETERAN_XP_MODIFIER;  // +20% effectiveness
+                case ExperienceLevel.Elite:
+                    return CUConstants.ELITE_XP_MODIFIER;  // +30% effectiveness
+                default:
+                    return 1.0f;
+            }
+        }
+
+        #endregion
+
+        #region Public Methods
+
+        /// <summary>
+        /// Refreshes all action counts to their maximum values.
+        /// Called at the start of each turn.
+        /// </summary>
+        public void RefreshAllActions()
+        {
+            MoveActions.ResetToMax();
+            CombatActions.ResetToMax();
+            DeploymentActions.ResetToMax();
+            OpportunityActions.ResetToMax();
+            IntelGatheringActions.ResetToMax();
+        }
+
+        /// <summary>
+        /// Refreshes movement points to maximum.
+        /// Called at the start of each turn.
+        /// </summary>
+        public void RefreshMovementPoints()
+        {
+            MovementPoints.ResetToMax();
+        }
+
+        #endregion
 
         #region ICloneable Implementation
 
@@ -105,9 +611,8 @@ namespace HammerAndSickle.Models
             }
         }
 
-        #endregion // ICloneable Implementation
+        #endregion
 
-  
         #region ISerializable Implementation
 
         public void GetObjectData(SerializationInfo info, StreamingContext context)
@@ -123,18 +628,6 @@ namespace HammerAndSickle.Models
             }
         }
 
-        #endregion // ISerializable Implementation
+        #endregion
     }
-
-
-    #region Public Methods
-
-
-    #endregion // Public Methods
-
-
-    #region Private Methods
-
-
-    #endregion // Private Methods
 }
