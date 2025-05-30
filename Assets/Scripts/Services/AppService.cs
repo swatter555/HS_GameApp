@@ -624,11 +624,11 @@ namespace HammerAndSickle.Services
             }
             finally
             {
-#if UNITY_EDITOR
+                #if UNITY_EDITOR
                 UnityEditor.EditorApplication.isPlaying = false;
-#else
+                #else
                 Application.Quit();
-#endif
+                #endif
             }
         }
 
@@ -692,9 +692,7 @@ namespace HammerAndSickle.Services
         /// </summary>
         public void SaveGameState()
         {
-            // TODO: Implement game state saving logic here.
-            // This will likely integrate with the JSON serialization system outlined
-            // in the architecture document.
+            // Placeholder for game-specific save logic.
         }
 
         /// <summary>
