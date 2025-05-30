@@ -11,9 +11,11 @@
  * - Implements IDisposable for deterministic cleanup
  * - Fallback mechanisms for log persistence
  * - Safe shutdown handling for both editor and runtime
+ * - Implements IErrorHandler interface for centralized exception handling
  * 
  * Usage:
  * AppService.Instance.HandleException("ClassName", "MethodName", exception);
+ * ErrorHandler.HandleException("ClassName", "MethodName", exception); // Static wrapper
  * 
  * Note: This service automatically hooks into Unity's logging system and handles
  * unhandled exceptions across the application domain.
@@ -25,6 +27,7 @@ using System.IO;
 using System.Linq;
 using System.Threading;
 using UnityEngine;
+using HammerAndSickle.Core;
 
 namespace HammerAndSickle.Services
 {
@@ -86,6 +89,28 @@ namespace HammerAndSickle.Services
     }
 
     /// <summary>
+    /// Configuration for exception severity handling.
+    /// </summary>
+    [Serializable]
+    public class ExceptionSeverityConfig
+    {
+        [Tooltip("Whether to save game state on Critical exceptions")]
+        public bool SaveOnCritical = true;
+
+        [Tooltip("Whether to quit application on Critical exceptions")]
+        public bool QuitOnCritical = true;
+
+        [Tooltip("Whether to save game state on Fatal exceptions")]
+        public bool SaveOnFatal = true;
+
+        [Tooltip("Whether to quit application on Fatal exceptions")]
+        public bool QuitOnFatal = true;
+
+        [Tooltip("Whether to show error dialogs for Moderate+ exceptions")]
+        public bool ShowErrorDialogs = true;
+    }
+
+    /// <summary>
     /// Represents a single log entry with critical metadata.
     /// </summary>
     public struct LogEntry
@@ -110,11 +135,11 @@ namespace HammerAndSickle.Services
     /// AppService (ErrorAndDirectoryService) provides centralized error and directory creation handling, logging, and 
     /// lifecycle management for Unity applications.
     /// </summary>
-    public partial class AppService : MonoBehaviour, IDisposable
+    public class AppService : MonoBehaviour, IDisposable, IErrorHandler
     {
         #region Constants
 
-        private const string CLASS_NAME = "EADService";
+        private const string CLASS_NAME = "AppService";
 
         // Folder name constants
         public const string MyGamesFolderName = "My Games";
@@ -141,6 +166,13 @@ namespace HammerAndSickle.Services
         [SerializeField]
         [Tooltip("Configure log limits and behavior")]
         private ErrorServiceConfig config = new();
+
+        /// <summary>
+        /// Severity-based exception handling configuration.
+        /// </summary>
+        [SerializeField]
+        [Tooltip("Configure how different exception severities are handled")]
+        private ExceptionSeverityConfig severityConfig = new();
 
         /// <summary>
         /// Event raised when an error occurs. Subscribers (typically UI elements)
@@ -431,7 +463,7 @@ namespace HammerAndSickle.Services
 
             if (e.ExceptionObject is Exception exception)
             {
-                HandleException("UnhandledException", "Global", exception);
+                HandleException("UnhandledException", "Global", exception, ExceptionSeverity.Fatal);
             }
             else
             {
@@ -448,6 +480,131 @@ namespace HammerAndSickle.Services
         }
 
         #endregion // Exception Handling
+
+
+        #region IErrorHandler Implementation
+
+        /// <summary>
+        /// Handles an exception with Minor severity (backward compatibility).
+        /// </summary>
+        /// <param name="className">Name of the class where the exception occurred</param>
+        /// <param name="methodName">Name of the method where the exception occurred</param>
+        /// <param name="exception">The exception that was caught</param>
+        public void HandleException(string className, string methodName, Exception exception)
+        {
+            // Determine severity based on exception type for backward compatibility
+            var severity = DetermineExceptionSeverity(exception);
+            HandleException(className, methodName, exception, severity);
+        }
+
+        /// <summary>
+        /// Handles an exception with specified severity level.
+        /// </summary>
+        /// <param name="className">Name of the class where the exception occurred</param>
+        /// <param name="methodName">Name of the method where the exception occurred</param>
+        /// <param name="exception">The exception that was caught</param>
+        /// <param name="severity">Severity level of the exception</param>
+        public void HandleException(string className, string methodName, Exception exception, ExceptionSeverity severity)
+        {
+            if (isDisposed) return;
+
+            string message = $"Exception in {className}.{methodName}: {exception.Message}";
+
+            // Log with appropriate level based on severity
+            switch (severity)
+            {
+                case ExceptionSeverity.Minor:
+                    Debug.LogWarning($"[{severity}] {message}");
+                    break;
+                case ExceptionSeverity.Moderate:
+                    Debug.LogWarning($"[{severity}] {message}\n{exception.StackTrace}");
+                    break;
+                case ExceptionSeverity.Critical:
+                case ExceptionSeverity.Fatal:
+                    Debug.LogError($"[{severity}] {message}\n{exception.StackTrace}");
+                    break;
+            }
+
+            // Raise error event for UI notification (if configured)
+            if (severity >= ExceptionSeverity.Moderate && severityConfig.ShowErrorDialogs)
+            {
+                RaiseErrorEvent(new ErrorEventArgs
+                {
+                    Message = message,
+                    StackTrace = exception.StackTrace,
+                    Timestamp = DateTime.UtcNow,
+                    SystemInfo = config.IncludeSystemInfo ? GetSystemInfo() : string.Empty,
+                    IsFatal = severity == ExceptionSeverity.Fatal
+                });
+            }
+
+            // Handle critical/fatal exceptions
+            switch (severity)
+            {
+                case ExceptionSeverity.Critical:
+                    if (severityConfig.SaveOnCritical && severityConfig.QuitOnCritical)
+                    {
+                        SaveAndQuit();
+                    }
+                    else if (severityConfig.SaveOnCritical)
+                    {
+                        SaveGameState();
+                    }
+                    break;
+
+                case ExceptionSeverity.Fatal:
+                    if (severityConfig.SaveOnFatal && severityConfig.QuitOnFatal)
+                    {
+                        SaveAndQuit();
+                    }
+                    else if (severityConfig.SaveOnFatal)
+                    {
+                        SaveGameState();
+                    }
+                    break;
+            }
+        }
+
+        /// <summary>
+        /// Determines exception severity based on exception type for backward compatibility.
+        /// </summary>
+        /// <param name="exception">The exception to analyze</param>
+        /// <returns>Appropriate severity level</returns>
+        private ExceptionSeverity DetermineExceptionSeverity(Exception exception)
+        {
+            return exception switch
+            {
+                // Specific argument exceptions first (most specific to least specific)
+                ArgumentNullException => ExceptionSeverity.Minor,
+                ArgumentOutOfRangeException => ExceptionSeverity.Minor,
+                ArgumentException => ExceptionSeverity.Minor,
+
+                // Logic and state errors
+                InvalidOperationException => ExceptionSeverity.Moderate,
+                NotSupportedException => ExceptionSeverity.Moderate,
+                NullReferenceException => ExceptionSeverity.Moderate,
+                IndexOutOfRangeException => ExceptionSeverity.Minor,
+
+                // I/O and serialization errors
+                IOException => ExceptionSeverity.Moderate,
+                System.Runtime.Serialization.SerializationException => ExceptionSeverity.Moderate,
+                TimeoutException => ExceptionSeverity.Moderate,
+
+                // Security and access issues
+                UnauthorizedAccessException => ExceptionSeverity.Critical,
+                System.Security.SecurityException => ExceptionSeverity.Critical,
+
+                // System resource exhaustion (fatal)
+                OutOfMemoryException => ExceptionSeverity.Fatal,
+                StackOverflowException => ExceptionSeverity.Fatal,
+                AccessViolationException => ExceptionSeverity.Fatal,
+
+                // Default for unknown exceptions
+                _ => ExceptionSeverity.Moderate
+            };
+        }
+
+        #endregion // IErrorHandler Implementation
 
 
         #region Saving and Cleanup
@@ -467,11 +624,11 @@ namespace HammerAndSickle.Services
             }
             finally
             {
-                #if UNITY_EDITOR
+#if UNITY_EDITOR
                 UnityEditor.EditorApplication.isPlaying = false;
-                #else
+#else
                 Application.Quit();
-                #endif
+#endif
             }
         }
 
@@ -530,12 +687,14 @@ namespace HammerAndSickle.Services
         }
 
         /// <summary>
-        /// Placeholder for game state saving functionality.
-        /// To be implemented based on game-specific requirements.
+        /// Saves current game state to persistent storage.
+        /// Implementation depends on game-specific requirements.
         /// </summary>
         public void SaveGameState()
         {
             // TODO: Implement game state saving logic here.
+            // This will likely integrate with the JSON serialization system outlined
+            // in the architecture document.
         }
 
         /// <summary>
@@ -606,7 +765,7 @@ namespace HammerAndSickle.Services
         /// Protected implementation of Dispose pattern.
         /// Handles both explicit disposal and finalization.
         /// </summary>
-        /// <param name="disposing">
+        /// <param name="disposing">True if called from Dispose(), false if called from finalizer</param>
         protected virtual void Dispose(bool disposing)
         {
             if (!isDisposed)

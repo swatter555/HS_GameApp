@@ -40,7 +40,7 @@ namespace HammerAndSickle.Models
         public Nationality Nationality { get; private set; }
 
         // Max values used to generate the current profile
-        private Dictionary<WeaponSystems, int> maxValues;
+        private readonly Dictionary<WeaponSystems, int> maxValues;
 
         // The current profile, reflecting the paper strength of the unit
         public Dictionary<WeaponSystems, int> CurrentProfile { get; private set; }
@@ -69,7 +69,7 @@ namespace HammerAndSickle.Models
             }
             catch (Exception e)
             {
-                AppService.Instance?.HandleException(CLASS_NAME, "Constructor", e);
+                AppService.Instance.HandleException(CLASS_NAME, "Constructor", e);
                 throw;
             }
         }
@@ -94,7 +94,7 @@ namespace HammerAndSickle.Models
             }
             catch (Exception e)
             {
-                AppService.Instance?.HandleException(CLASS_NAME, "CopyConstructor", e);
+                AppService.Instance.HandleException(CLASS_NAME, "CopyConstructor", e);
                 throw;
             }
         }
@@ -115,7 +115,7 @@ namespace HammerAndSickle.Models
             }
             catch (Exception e)
             {
-                AppService.Instance?.HandleException(CLASS_NAME, "CopyWithNameConstructor", e);
+                AppService.Instance.HandleException(CLASS_NAME, "CopyWithNameConstructor", e);
                 throw;
             }
         }
@@ -134,7 +134,7 @@ namespace HammerAndSickle.Models
             }
             catch (Exception e)
             {
-                AppService.Instance?.HandleException(CLASS_NAME, "CopyWithNameAndNationalityConstructor", e);
+                AppService.Instance.HandleException(CLASS_NAME, "CopyWithNameAndNationalityConstructor", e);
                 throw;
             }
         }
@@ -176,7 +176,7 @@ namespace HammerAndSickle.Models
             }
             catch (Exception e)
             {
-                AppService.Instance?.HandleException(CLASS_NAME, "DeserializationConstructor", e);
+                AppService.Instance.HandleException(CLASS_NAME, "DeserializationConstructor", e);
                 throw;
             }
         }
@@ -205,7 +205,7 @@ namespace HammerAndSickle.Models
             }
             catch (Exception e)
             {
-                AppService.Instance?.HandleException(CLASS_NAME, "SetWeaponSystemValue", e);
+                AppService.Instance.HandleException(CLASS_NAME, "SetWeaponSystemValue", e);
                 throw;
             }
         }
@@ -223,7 +223,7 @@ namespace HammerAndSickle.Models
             }
             catch (Exception e)
             {
-                AppService.Instance?.HandleException(CLASS_NAME, "GetWeaponSystemMaxValue", e);
+                AppService.Instance.HandleException(CLASS_NAME, "GetWeaponSystemMaxValue", e);
                 return 0;
             }
         }
@@ -241,7 +241,7 @@ namespace HammerAndSickle.Models
             }
             catch (Exception e)
             {
-                AppService.Instance?.HandleException(CLASS_NAME, "GetWeaponSystemCurrentValue", e);
+                AppService.Instance.HandleException(CLASS_NAME, "GetWeaponSystemCurrentValue", e);
                 return 0;
             }
         }
@@ -261,7 +261,7 @@ namespace HammerAndSickle.Models
             }
             catch (Exception e)
             {
-                AppService.Instance?.HandleException(CLASS_NAME, "RemoveWeaponSystem", e);
+                AppService.Instance.HandleException(CLASS_NAME, "RemoveWeaponSystem", e);
                 return false;
             }
         }
@@ -322,7 +322,7 @@ namespace HammerAndSickle.Models
             }
             catch (Exception e)
             {
-                AppService.Instance?.HandleException(CLASS_NAME, "UpdateCurrentProfile", e);
+                AppService.Instance.HandleException(CLASS_NAME, "UpdateCurrentProfile", e);
                 throw;
             }
         }
@@ -353,7 +353,7 @@ namespace HammerAndSickle.Models
             }
             catch (Exception e)
             {
-                AppService.Instance?.HandleException(CLASS_NAME, "GetCombatEffectiveness", e);
+                AppService.Instance.HandleException(CLASS_NAME, "GetCombatEffectiveness", e);
                 return 0f;
             }
         }
@@ -370,7 +370,7 @@ namespace HammerAndSickle.Models
             }
             catch (Exception e)
             {
-                AppService.Instance?.HandleException(CLASS_NAME, "Clear", e);
+                AppService.Instance.HandleException(CLASS_NAME, "Clear", e);
             }
         }
 
@@ -386,7 +386,7 @@ namespace HammerAndSickle.Models
             }
             catch (Exception e)
             {
-                AppService.Instance?.HandleException(CLASS_NAME, "Clone", e);
+                AppService.Instance.HandleException(CLASS_NAME, "Clone", e);
                 throw;
             }
         }
@@ -404,7 +404,7 @@ namespace HammerAndSickle.Models
             }
             catch (Exception e)
             {
-                AppService.Instance?.HandleException(CLASS_NAME, "CloneWithName", e);
+                AppService.Instance.HandleException(CLASS_NAME, "CloneWithName", e);
                 throw;
             }
         }
@@ -424,7 +424,7 @@ namespace HammerAndSickle.Models
             }
             catch (Exception e)
             {
-                AppService.Instance?.HandleException(CLASS_NAME, "CloneWithNameAndNationality", e);
+                AppService.Instance.HandleException(CLASS_NAME, "CloneWithNameAndNationality", e);
                 throw;
             }
         }
@@ -476,7 +476,7 @@ namespace HammerAndSickle.Models
             }
             catch (Exception e)
             {
-                AppService.Instance?.HandleException(CLASS_NAME, "UpdateCurrentProfileForWeapon", e);
+                AppService.Instance.HandleException(CLASS_NAME, "UpdateCurrentProfileForWeapon", e);
             }
         }
 
@@ -521,7 +521,7 @@ namespace HammerAndSickle.Models
             }
             catch (Exception e)
             {
-                AppService.Instance?.HandleException(CLASS_NAME, "GetObjectData", e);
+                AppService.Instance.HandleException(CLASS_NAME, "GetObjectData", e);
                 throw;
             }
         }
