@@ -1,10 +1,6 @@
-using HammerAndSickle.Core;
 using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
-using System.Runtime.Serialization;
-using System.Security;
 using UnityEngine;
 
 namespace HammerAndSickle.Core
@@ -66,27 +62,28 @@ namespace HammerAndSickle.Core
     /// </summary>
     public static class ErrorHandler
     {
-        private static IErrorHandler _instance;
+        private static IErrorHandler _overrideHandler;
 
         /// <summary>
         /// Gets the current error handler instance.
-        /// Defaults to AppService if available, otherwise uses fallback handler.
+        /// Uses override handler if set (for testing), otherwise defaults to AppService.
+        /// Falls back to FallbackErrorHandler if AppService is not available.
         /// </summary>
         public static IErrorHandler Instance
         {
             get
             {
-                if (_instance != null)
-                    return _instance;
+                // Use override handler if explicitly set (for testing)
+                if (_overrideHandler != null)
+                    return _overrideHandler;
 
                 // Try to use AppService if available
                 if (Services.AppService.Instance != null)
                     return Services.AppService.Instance;
 
-                // Fallback for testing or when AppService isn't available
+                // Fallback for when AppService isn't available (testing, early initialization)
                 return new FallbackErrorHandler();
             }
-            private set => _instance = value;
         }
 
         /// <summary>
@@ -95,7 +92,7 @@ namespace HammerAndSickle.Core
         /// <param name="handler">The error handler to use, or null to reset to AppService</param>
         public static void SetHandler(IErrorHandler handler)
         {
-            Instance = handler;
+            _overrideHandler = handler;
         }
 
         /// <summary>
@@ -103,7 +100,7 @@ namespace HammerAndSickle.Core
         /// </summary>
         public static void ResetToDefault()
         {
-            _instance = null; // Will fall back to AppService
+            _overrideHandler = null;
         }
 
         /// <summary>
@@ -114,7 +111,7 @@ namespace HammerAndSickle.Core
         /// <param name="exception">The exception that was caught</param>
         public static void HandleException(string className, string methodName, Exception exception)
         {
-            Instance?.HandleException(className, methodName, exception, ExceptionSeverity.Minor);
+            Instance?.HandleException(className, methodName, exception);
         }
 
         /// <summary>
@@ -131,7 +128,7 @@ namespace HammerAndSickle.Core
     }
 
     /// <summary>
-    /// Fallback error handler used when AppService is not available (typically during testing).
+    /// Fallback error handler used when AppService is not available (typically during testing or early initialization).
     /// </summary>
     public class FallbackErrorHandler : IErrorHandler
     {
@@ -234,167 +231,5 @@ namespace HammerAndSickle.Core
         {
             // Silent
         }
-    }
-}
-
-// Extension to the existing AppService class
-namespace HammerAndSickle.Services
-{
-    public partial class AppService : IErrorHandler
-    {
-        #region Configuration Extensions
-
-        /// <summary>
-        /// Configuration for exception severity handling.
-        /// </summary>
-        [Serializable]
-        public class ExceptionSeverityConfig
-        {
-            [Tooltip("Whether to save game state on Critical exceptions")]
-            public bool SaveOnCritical = true;
-
-            [Tooltip("Whether to quit application on Critical exceptions")]
-            public bool QuitOnCritical = true;
-
-            [Tooltip("Whether to save game state on Fatal exceptions")]
-            public bool SaveOnFatal = true;
-
-            [Tooltip("Whether to quit application on Fatal exceptions")]
-            public bool QuitOnFatal = true;
-
-            [Tooltip("Whether to show error dialogs for Moderate+ exceptions")]
-            public bool ShowErrorDialogs = true;
-        }
-
-        /// <summary>
-        /// Severity-based exception handling configuration.
-        /// </summary>
-        [SerializeField]
-        [Tooltip("Configure how different exception severities are handled")]
-        private ExceptionSeverityConfig severityConfig = new();
-
-        #endregion
-
-        #region IErrorHandler Implementation
-
-        /// <summary>
-        /// Handles an exception with Minor severity (backward compatibility).
-        /// </summary>
-        /// <param name="className">Name of the class where the exception occurred</param>
-        /// <param name="methodName">Name of the method where the exception occurred</param>
-        /// <param name="exception">The exception that was caught</param>
-        public void HandleException(string className, string methodName, Exception exception)
-        {
-            // Determine severity based on exception type for backward compatibility
-            var severity = DetermineExceptionSeverity(exception);
-            HandleException(className, methodName, exception, severity);
-        }
-
-        /// <summary>
-        /// Handles an exception with specified severity level.
-        /// </summary>
-        /// <param name="className">Name of the class where the exception occurred</param>
-        /// <param name="methodName">Name of the method where the exception occurred</param>
-        /// <param name="exception">The exception that was caught</param>
-        /// <param name="severity">Severity level of the exception</param>
-        public void HandleException(string className, string methodName, Exception exception, Core.ExceptionSeverity severity)
-        {
-            if (isDisposed) return;
-
-            string message = $"Exception in {className}.{methodName}: {exception.Message}";
-
-            // Log with appropriate level based on severity
-            switch (severity)
-            {
-                case Core.ExceptionSeverity.Minor:
-                    Debug.LogWarning($"[{severity}] {message}");
-                    break;
-                case Core.ExceptionSeverity.Moderate:
-                    Debug.LogWarning($"[{severity}] {message}\n{exception.StackTrace}");
-                    break;
-                case Core.ExceptionSeverity.Critical:
-                case Core.ExceptionSeverity.Fatal:
-                    Debug.LogError($"[{severity}] {message}\n{exception.StackTrace}");
-                    break;
-            }
-
-            // Raise error event for UI notification (if configured)
-            if (severity >= Core.ExceptionSeverity.Moderate && severityConfig.ShowErrorDialogs)
-            {
-                RaiseErrorEvent(new ErrorEventArgs
-                {
-                    Message = message,
-                    StackTrace = exception.StackTrace,
-                    Timestamp = DateTime.UtcNow,
-                    SystemInfo = config.IncludeSystemInfo ? GetSystemInfo() : string.Empty,
-                    IsFatal = severity == Core.ExceptionSeverity.Fatal
-                });
-            }
-
-            // Handle critical/fatal exceptions
-            switch (severity)
-            {
-                case Core.ExceptionSeverity.Critical:
-                    if (severityConfig.SaveOnCritical && severityConfig.QuitOnCritical)
-                    {
-                        SaveAndQuit();
-                    }
-                    else if (severityConfig.SaveOnCritical)
-                    {
-                        SaveGameState();
-                    }
-                    break;
-
-                case Core.ExceptionSeverity.Fatal:
-                    if (severityConfig.SaveOnFatal && severityConfig.QuitOnFatal)
-                    {
-                        SaveAndQuit();
-                    }
-                    else if (severityConfig.SaveOnFatal)
-                    {
-                        SaveGameState();
-                    }
-                    break;
-            }
-        }
-
-        private Core.ExceptionSeverity DetermineExceptionSeverity(Exception exception)
-        {
-            return exception switch
-            {
-                // Specific argument exceptions first (most specific to least specific)
-                ArgumentNullException => Core.ExceptionSeverity.Minor,
-                ArgumentOutOfRangeException => Core.ExceptionSeverity.Minor,
-                ArgumentException => Core.ExceptionSeverity.Minor,
-
-                // Logic and state errors
-                InvalidOperationException => Core.ExceptionSeverity.Moderate,
-                NotSupportedException => Core.ExceptionSeverity.Moderate,
-                NullReferenceException => Core.ExceptionSeverity.Moderate,
-                IndexOutOfRangeException => Core.ExceptionSeverity.Minor,
-
-                // I/O and serialization errors
-                IOException => Core.ExceptionSeverity.Moderate,
-                FileNotFoundException => Core.ExceptionSeverity.Moderate,
-                DirectoryNotFoundException => Core.ExceptionSeverity.Moderate,
-                SerializationException => Core.ExceptionSeverity.Moderate,
-                TimeoutException => Core.ExceptionSeverity.Moderate,
-
-                // Security and access issues
-                UnauthorizedAccessException => Core.ExceptionSeverity.Critical,
-                SecurityException => Core.ExceptionSeverity.Critical,
-
-                // System resource exhaustion (fatal)
-                OutOfMemoryException => Core.ExceptionSeverity.Fatal,
-                InsufficientMemoryException => Core.ExceptionSeverity.Fatal,
-                StackOverflowException => Core.ExceptionSeverity.Fatal,
-                AccessViolationException => Core.ExceptionSeverity.Fatal,
-
-                // Default for unknown exceptions
-                _ => Core.ExceptionSeverity.Moderate
-            };
-        }
-
-        #endregion
     }
 }
