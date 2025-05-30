@@ -50,7 +50,7 @@ namespace HammerAndSickle.Models
         }
 
         /// <summary>
-        /// Deserialization constructor - SAFER VERSION
+        /// Deserialization constructor - FIXED VERSION
         /// </summary>
         protected AirbaseSubProfile(SerializationInfo info, StreamingContext context) : base(info, context)
         {
@@ -59,29 +59,20 @@ namespace HammerAndSickle.Models
                 // Deserialize airbase-specific fields
                 int airUnitCount = info.GetInt32("AirUnitCount");
 
-                // Clear the current list
+                // Clear the current lists
                 airUnitsAttached.Clear();
+                attachedUnitIDs.Clear();
 
-                // Instead of deserializing full CombatUnit objects (circular reference risk),
-                // store only the Unit IDs and reconstruct references later
+                // Store Unit IDs for later resolution by game state manager
                 for (int i = 0; i < airUnitCount; i++)
                 {
-                    // OPTION 1: Store only Unit IDs (recommended)
                     string unitID = info.GetString($"AirUnitID_{i}");
-                    // Store IDs for later resolution by game state manager
-                    // airUnitsAttached will be populated by external system
-
-                    // OPTION 2: Full object serialization (risky)
-                    // CombatUnit unit = (CombatUnit)info.GetValue($"AirUnit_{i}", typeof(CombatUnit));
-                    // if (unit != null)
-                    // {
-                    //     airUnitsAttached.Add(unit);
-                    // }
+                    attachedUnitIDs.Add(unitID);  // FIXED: Actually store the IDs
                 }
             }
             catch (Exception e)
             {
-                AppService.Instance.HandleException(CLASS_NAME, "DeserializationConstructor", e);
+                AppService.Instance?.HandleException(CLASS_NAME, "DeserializationConstructor", e);
                 throw;
             }
         }
@@ -113,12 +104,18 @@ namespace HammerAndSickle.Models
                     throw new InvalidOperationException($"Only air units can be attached to an airbase. Unit type: {unit.UnitType}");
                 }
 
+                // Check for duplicates
+                if (airUnitsAttached.Contains(unit))
+                {
+                    throw new InvalidOperationException($"Unit {unit.UnitName} is already attached to this airbase");
+                }
+
                 // Add the unit to the airbase
                 airUnitsAttached.Add(unit);
             }
             catch (Exception e)
             {
-                AppService.Instance.HandleException(CLASS_NAME, "AddAirUnit", e);
+                AppService.Instance?.HandleException(CLASS_NAME, "AddAirUnit", e);
                 throw;
             }
         }
@@ -136,8 +133,50 @@ namespace HammerAndSickle.Models
             }
             catch (Exception e)
             {
-                AppService.Instance.HandleException(CLASS_NAME, "RemoveAirUnit", e);
-                throw;
+                AppService.Instance?.HandleException(CLASS_NAME, "RemoveAirUnit", e);
+                return false;
+            }
+        }
+
+        public bool RemoveAirUnitByID(string unitID)
+        {
+            try
+            {
+                if (string.IsNullOrEmpty(unitID))
+                {
+                    throw new ArgumentException("Unit ID cannot be null or empty", nameof(unitID));
+                }
+
+                var unit = airUnitsAttached.FirstOrDefault(u => u.UnitID == unitID);
+                if (unit != null)
+                {
+                    return airUnitsAttached.Remove(unit);
+                }
+
+                return false;
+            }
+            catch (Exception e)
+            {
+                AppService.Instance?.HandleException(CLASS_NAME, "RemoveAirUnitByID", e);
+                return false;
+            }
+        }
+
+        public CombatUnit GetAirUnitByID(string unitID)
+        {
+            try
+            {
+                if (string.IsNullOrEmpty(unitID))
+                {
+                    return null;
+                }
+
+                return airUnitsAttached.FirstOrDefault(u => u.UnitID == unitID);
+            }
+            catch (Exception e)
+            {
+                AppService.Instance?.HandleException(CLASS_NAME, "GetAirUnitByID", e);
+                return null;
             }
         }
 
@@ -151,6 +190,33 @@ namespace HammerAndSickle.Models
             return airUnitsAttached.Count < MaxBaseAirUnits;
         }
 
+        public int GetRemainingCapacity()
+        {
+            return MaxBaseAirUnits - airUnitsAttached.Count;
+        }
+
+        public bool HasAirUnit(CombatUnit unit)
+        {
+            return unit != null && airUnitsAttached.Contains(unit);
+        }
+
+        public bool HasAirUnitByID(string unitID)
+        {
+            return !string.IsNullOrEmpty(unitID) && airUnitsAttached.Any(u => u.UnitID == unitID);
+        }
+
+        public void ClearAllAirUnits()
+        {
+            try
+            {
+                airUnitsAttached.Clear();
+            }
+            catch (Exception e)
+            {
+                AppService.Instance?.HandleException(CLASS_NAME, "ClearAllAirUnits", e);
+            }
+        }
+
         #endregion // Air Unit Management
 
 
@@ -159,21 +225,15 @@ namespace HammerAndSickle.Models
         public override float GetEfficiencyMultiplier()
         {
             // Air operations can be more sensitive to damage than other facilities
-            switch (OperationalCapacity)
+            return OperationalCapacity switch
             {
-                case OperationalCapacity.Full:
-                    return 1.0f;
-                case OperationalCapacity.SlightlyDegraded:
-                    return 0.7f;  // Slightly worse than base class
-                case OperationalCapacity.ModeratelyDegraded:
-                    return 0.4f;  // Slightly worse than base class
-                case OperationalCapacity.HeavilyDegraded:
-                    return 0.2f;  // Slightly worse than base class
-                case OperationalCapacity.OutOfOperation:
-                    return 0.0f;
-                default:
-                    return 0.0f;
-            }
+                OperationalCapacity.Full => CUConstants.AIRBASE_CAPACITY_LVL5,
+                OperationalCapacity.SlightlyDegraded => CUConstants.AIRBASE_CAPACITY_LVL4,// Slightly worse than base class
+                OperationalCapacity.ModeratelyDegraded => CUConstants.AIRBASE_CAPACITY_LVL3,// Slightly worse than base class
+                OperationalCapacity.HeavilyDegraded => CUConstants.AIRBASE_CAPACITY_LVL2,// Slightly worse than base class
+                OperationalCapacity.OutOfOperation => CUConstants.AIRBASE_CAPACITY_LVL1,
+                _ => 0.0f,
+            };
         }
 
         public bool CanLaunchAirOperations()
@@ -189,10 +249,23 @@ namespace HammerAndSickle.Models
             return OperationalCapacity != OperationalCapacity.OutOfOperation;
         }
 
+        public bool CanRefuelAndRearm()
+        {
+            // Refuel and rearm requires better operational status
+            return OperationalCapacity == OperationalCapacity.Full ||
+                   OperationalCapacity == OperationalCapacity.SlightlyDegraded;
+        }
+
+        public bool CanRepairAircraft()
+        {
+            // Aircraft repairs require full operational capacity
+            return OperationalCapacity == OperationalCapacity.Full;
+        }
+
         #endregion // Operational Methods
 
 
-        #region ISerializable Implementation
+        #region Serialization Support Methods
 
         /// <summary>
         /// Gets the list of attached unit IDs for external reference resolution.
@@ -201,6 +274,15 @@ namespace HammerAndSickle.Models
         public IReadOnlyList<string> GetAttachedUnitIDs()
         {
             return airUnitsAttached.Select(u => u.UnitID).ToList();
+        }
+
+        /// <summary>
+        /// Gets the list of unresolved unit IDs from deserialization.
+        /// Used to check if unit references need to be resolved.
+        /// </summary>
+        public IReadOnlyList<string> GetUnresolvedUnitIDs()
+        {
+            return attachedUnitIDs.AsReadOnly();
         }
 
         /// <summary>
@@ -222,6 +304,18 @@ namespace HammerAndSickle.Models
                         {
                             airUnitsAttached.Add(unit);
                         }
+                        else
+                        {
+                            // Log warning about incorrect unit type but don't throw
+                            AppService.Instance?.HandleException(CLASS_NAME, "ResolveUnitReferences",
+                                new InvalidOperationException($"Unit {unitID} is not an air unit (Type: {unit.UnitType})"));
+                        }
+                    }
+                    else
+                    {
+                        // Log warning about missing unit but don't throw
+                        AppService.Instance?.HandleException(CLASS_NAME, "ResolveUnitReferences",
+                            new KeyNotFoundException($"Unit {unitID} not found in lookup dictionary"));
                     }
                 }
 
@@ -229,9 +323,23 @@ namespace HammerAndSickle.Models
             }
             catch (Exception e)
             {
-                AppService.Instance.HandleException(CLASS_NAME, "ResolveUnitReferences", e);
+                AppService.Instance?.HandleException(CLASS_NAME, "ResolveUnitReferences", e);
             }
         }
+
+        /// <summary>
+        /// Checks if there are unresolved unit references that need to be resolved.
+        /// </summary>
+        /// <returns>True if ResolveUnitReferences() needs to be called</returns>
+        public bool HasUnresolvedReferences()
+        {
+            return attachedUnitIDs.Count > 0;
+        }
+
+        #endregion // Serialization Support Methods
+
+
+        #region ISerializable Implementation
 
         /// <summary>
         /// Populates a <see cref="SerializationInfo"/> object with the data needed to serialize the current object.
@@ -253,21 +361,15 @@ namespace HammerAndSickle.Models
                 // Store the number of air units
                 info.AddValue("AirUnitCount", airUnitsAttached.Count);
 
-                // OPTION 1: Store only Unit IDs (recommended to avoid circular references)
+                // Store only Unit IDs to avoid circular references
                 for (int i = 0; i < airUnitsAttached.Count; i++)
                 {
                     info.AddValue($"AirUnitID_{i}", airUnitsAttached[i].UnitID);
                 }
-
-                // OPTION 2: Store full objects (may cause circular reference issues)
-                // for (int i = 0; i < airUnitsAttached.Count; i++)
-                // {
-                //     info.AddValue($"AirUnit_{i}", airUnitsAttached[i]);
-                // }
             }
             catch (Exception e)
             {
-                AppService.Instance.HandleException(CLASS_NAME, "GetObjectData", e);
+                AppService.Instance?.HandleException(CLASS_NAME, "GetObjectData", e);
                 throw;
             }
         }
