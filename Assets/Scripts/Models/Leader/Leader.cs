@@ -446,6 +446,7 @@ namespace HammerAndSickle.Models
 
         #endregion // Reputation Management
 
+
         #region Skill Tree Interface
 
         /// <summary>
@@ -575,6 +576,7 @@ namespace HammerAndSickle.Models
 
         #endregion // Skill Tree Interface
 
+
         #region Unit Assignment
 
         /// <summary>
@@ -621,6 +623,7 @@ namespace HammerAndSickle.Models
 
         #endregion // Unit Assignment
 
+
         #region ISerializable Implementation
 
         /// <summary>
@@ -655,6 +658,7 @@ namespace HammerAndSickle.Models
         }
 
         #endregion // ISerializable Implementation
+
 
         #region ICloneable Implementation
 
