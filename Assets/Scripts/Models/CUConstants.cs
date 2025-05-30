@@ -247,5 +247,11 @@ namespace HammerAndSickle.Models
         // Constants for special abilities
         public const int AirSupplyMaxRange = 16;
         public const int NavalSupplyMaxRange = 12;
+
+        public const float AIRBASE_CAPACITY_LVL5 = 1f;    // Full operations capacity of an airbase
+        public const float AIRBASE_CAPACITY_LVL4 = 0.75f; // 75% operations capacity
+        public const float AIRBASE_CAPACITY_LVL3 = 0.5f;  // 50% operations capacity
+        public const float AIRBASE_CAPACITY_LVL2 = 0.25f; // 25% operations capacity
+        public const float AIRBASE_CAPACITY_LVL1 = 0f;    // 0% operations capacity
     }
 }
