@@ -110,7 +110,7 @@ namespace HammerAndSickle.Services
     /// AppService (ErrorAndDirectoryService) provides centralized error and directory creation handling, logging, and 
     /// lifecycle management for Unity applications.
     /// </summary>
-    public class AppService : MonoBehaviour, IDisposable
+    public partial class AppService : MonoBehaviour, IDisposable
     {
         #region Constants
 
@@ -123,7 +123,8 @@ namespace HammerAndSickle.Services
         public const string ScenarioStorageFolderName = "Scenarios";
         public const string AtlasStoragePath = "Assets/Graphics/Atlases";
 
-        #endregion
+        #endregion // Constants
+
 
         #region Configuration and Events
 
@@ -147,7 +148,8 @@ namespace HammerAndSickle.Services
         /// </summary>
         public event EventHandler<ErrorEventArgs> OnErrorOccurred;
 
-        #endregion
+        #endregion // Configuration and Events
+
 
         #region Properties
 
@@ -157,7 +159,8 @@ namespace HammerAndSickle.Services
         public string DebugDataFolderPath { get; private set; }
         public string ScenarioStorageFolderPath { get; private set; }
 
-        #endregion
+        #endregion // Properties
+
 
         #region Private Fields
 
@@ -173,7 +176,8 @@ namespace HammerAndSickle.Services
         private bool isDisposed;
         private CancellationTokenSource shutdownToken;
 
-        #endregion
+        #endregion // Private Fields
+
 
         #region Unity Lifecycle
 
@@ -239,7 +243,8 @@ namespace HammerAndSickle.Services
             }
         }
 
-        #endregion
+        #endregion // Unity Lifecycle
+
 
         #region Initialization and Cleanup
 
@@ -342,7 +347,8 @@ namespace HammerAndSickle.Services
             }
         }
 
-        #endregion
+        #endregion // Initialization and Cleanup
+
 
         #region Log Management
 
@@ -441,33 +447,8 @@ namespace HammerAndSickle.Services
             }
         }
 
-        /// <summary>
-        /// Primary method for handling exceptions in the application.
-        /// Logs the error, raises events, and initiates shutdown if fatal.
-        /// </summary>
-        /// <param name="className">Name of the class where the exception occurred</param>
-        /// <param name="methodName">Name of the method where the exception occurred</param>
-        /// <param name="e">The exception that was caught</param>
-        public void HandleException(string className, string methodName, Exception e)
-        {
-            if (isDisposed) return;
+        #endregion // Exception Handling
 
-            string message = $"Exception in {className}.{methodName}: {e.Message}";
-            Debug.LogError($"[Fatal] {message}\n{e.StackTrace}");
-
-            RaiseErrorEvent(new ErrorEventArgs
-            {
-                Message = message,
-                StackTrace = e.StackTrace,
-                Timestamp = DateTime.UtcNow,
-                SystemInfo = config.IncludeSystemInfo ? GetSystemInfo() : string.Empty,
-                IsFatal = true
-            });
-
-            SaveAndQuit();
-        }
-
-        #endregion
 
         #region Saving and Cleanup
 
@@ -605,7 +586,8 @@ namespace HammerAndSickle.Services
             }
         }
 
-        #endregion
+        #endregion // Saving and Cleanup
+
 
         #region IDisposable Implementation
 
@@ -666,7 +648,8 @@ namespace HammerAndSickle.Services
             }
         }
 
-        #endregion
+        #endregion // IDisposable Implementation
+
 
         #region Event Handling
 
@@ -695,6 +678,6 @@ namespace HammerAndSickle.Services
             }
         }
 
-        #endregion
+        #endregion // Event Handling
     }
 }
