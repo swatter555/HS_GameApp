@@ -20,16 +20,17 @@ namespace HammerAndSickle.Models
 
         #endregion // Constants
 
-
+        
         #region Properties
 
         public int Damage { get; private set; }                               // Damage level (0-100)
         public OperationalCapacity OperationalCapacity { get; private set; }  // Operational capacity level
 
-        #endregion
+        #endregion // Properties
+
 
         #region Constructors
-        
+
         public LandBaseProfile()
         {
             // Default constructor initializes with no damage and full operational capacity

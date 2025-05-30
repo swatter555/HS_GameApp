@@ -1,7 +1,8 @@
+using HammerAndSickle.Services;
 using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Runtime.Serialization;
-using HammerAndSickle.Services;
 
 namespace HammerAndSickle.Models
 {
@@ -23,6 +24,7 @@ namespace HammerAndSickle.Models
         #region Fields
 
         private List<CombatUnit> airUnitsAttached = new List<CombatUnit>();
+        private List<string> attachedUnitIDs = new List<string>();           // Store IDs during deserialization
 
         #endregion // Fields
 
@@ -47,25 +49,34 @@ namespace HammerAndSickle.Models
             // Uses base class initialization with initial damage
         }
 
+        /// <summary>
+        /// Deserialization constructor - SAFER VERSION
+        /// </summary>
         protected AirbaseSubProfile(SerializationInfo info, StreamingContext context) : base(info, context)
         {
             try
             {
                 // Deserialize airbase-specific fields
-                // First determine how many air units are attached
                 int airUnitCount = info.GetInt32("AirUnitCount");
 
                 // Clear the current list
                 airUnitsAttached.Clear();
 
-                // Deserialize each air unit
+                // Instead of deserializing full CombatUnit objects (circular reference risk),
+                // store only the Unit IDs and reconstruct references later
                 for (int i = 0; i < airUnitCount; i++)
                 {
-                    CombatUnit unit = (CombatUnit)info.GetValue($"AirUnit_{i}", typeof(CombatUnit));
-                    if (unit != null)
-                    {
-                        airUnitsAttached.Add(unit);
-                    }
+                    // OPTION 1: Store only Unit IDs (recommended)
+                    string unitID = info.GetString($"AirUnitID_{i}");
+                    // Store IDs for later resolution by game state manager
+                    // airUnitsAttached will be populated by external system
+
+                    // OPTION 2: Full object serialization (risky)
+                    // CombatUnit unit = (CombatUnit)info.GetValue($"AirUnit_{i}", typeof(CombatUnit));
+                    // if (unit != null)
+                    // {
+                    //     airUnitsAttached.Add(unit);
+                    // }
                 }
             }
             catch (Exception e)
@@ -74,11 +85,12 @@ namespace HammerAndSickle.Models
                 throw;
             }
         }
+
         #endregion // Constructors
 
 
         #region Air Unit Management
-       
+
         public void AddAirUnit(CombatUnit unit)
         {
             try
@@ -179,8 +191,58 @@ namespace HammerAndSickle.Models
 
         #endregion // Operational Methods
 
+
         #region ISerializable Implementation
 
+        /// <summary>
+        /// Gets the list of attached unit IDs for external reference resolution.
+        /// Used by game state manager to reconnect units after deserialization.
+        /// </summary>
+        public IReadOnlyList<string> GetAttachedUnitIDs()
+        {
+            return airUnitsAttached.Select(u => u.UnitID).ToList();
+        }
+
+        /// <summary>
+        /// Resolves unit references after deserialization.
+        /// Called by game state manager with reconstructed unit objects.
+        /// </summary>
+        /// <param name="unitLookup">Dictionary mapping unit IDs to CombatUnit instances</param>
+        public void ResolveUnitReferences(Dictionary<string, CombatUnit> unitLookup)
+        {
+            try
+            {
+                airUnitsAttached.Clear();
+
+                foreach (string unitID in attachedUnitIDs)
+                {
+                    if (unitLookup.TryGetValue(unitID, out CombatUnit unit))
+                    {
+                        if (unit.UnitType == UnitType.AirUnit)
+                        {
+                            airUnitsAttached.Add(unit);
+                        }
+                    }
+                }
+
+                attachedUnitIDs.Clear(); // Clean up temporary storage
+            }
+            catch (Exception e)
+            {
+                AppService.Instance.HandleException(CLASS_NAME, "ResolveUnitReferences", e);
+            }
+        }
+
+        /// <summary>
+        /// Populates a <see cref="SerializationInfo"/> object with the data needed to serialize the current object.
+        /// </summary>
+        /// <remarks>This method serializes the current object by adding relevant data to the <paramref
+        /// name="info"/> parameter. It includes the count of attached air units and their unique identifiers.  The
+        /// serialization process avoids circular references by storing only the unit IDs.</remarks>
+        /// <param name="info">The <see cref="SerializationInfo"/> object to populate with serialization data. Cannot be <see
+        /// langword="null"/>.</param>
+        /// <param name="context">The <see cref="StreamingContext"/> structure that contains the source and destination of the serialized
+        /// stream.</param>
         public override void GetObjectData(SerializationInfo info, StreamingContext context)
         {
             try
@@ -188,15 +250,20 @@ namespace HammerAndSickle.Models
                 // Call base class serialization first
                 base.GetObjectData(info, context);
 
-                // Serialize airbase-specific fields
                 // Store the number of air units
                 info.AddValue("AirUnitCount", airUnitsAttached.Count);
 
-                // Store each air unit
+                // OPTION 1: Store only Unit IDs (recommended to avoid circular references)
                 for (int i = 0; i < airUnitsAttached.Count; i++)
                 {
-                    info.AddValue($"AirUnit_{i}", airUnitsAttached[i]);
+                    info.AddValue($"AirUnitID_{i}", airUnitsAttached[i].UnitID);
                 }
+
+                // OPTION 2: Store full objects (may cause circular reference issues)
+                // for (int i = 0; i < airUnitsAttached.Count; i++)
+                // {
+                //     info.AddValue($"AirUnit_{i}", airUnitsAttached[i]);
+                // }
             }
             catch (Exception e)
             {
