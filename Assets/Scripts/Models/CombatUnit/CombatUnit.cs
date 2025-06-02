@@ -48,7 +48,7 @@ namespace HammerAndSickle.Models
         public WeaponSystemProfile DeployedProfile { get; private set; }
         public WeaponSystemProfile MountedProfile { get; private set; }
         public UnitProfile UnitProfile { get; private set; }
-        public LandBaseProfile LandBaseProfile { get; private set; }
+        public LandBaseFacility LandBaseFacility { get; private set; }
 
         // The unit's leader.
         public Leader CommandingOfficer { get; private set; }
@@ -85,7 +85,6 @@ namespace HammerAndSickle.Models
         /// Creates a new CombatUnit with the specified core properties.
         /// </summary>
         /// <param name="unitName">Display name of the unit</param>
-        /// <param name="unitID">Unique identifier for the unit</param>
         /// <param name="unitType">Type of unit (land, air, naval)</param>
         /// <param name="classification">Unit classification (tank, infantry, etc.)</param>
         /// <param name="role">Primary role of the unit</param>
@@ -99,7 +98,6 @@ namespace HammerAndSickle.Models
         /// <param name="landBaseProfile">Land base profile if applicable (can be null)</param>
         public CombatUnit(
             string unitName,
-            string unitID,
             UnitType unitType,
             UnitClassification classification,
             UnitRole role,
@@ -110,16 +108,13 @@ namespace HammerAndSickle.Models
             UnitProfile unitProfile,
             bool isTransportable,
             bool isLandBase = false,
-            LandBaseProfile landBaseProfile = null)
+            LandBaseFacility landBaseProfile = null)
         {
             try
             {
                 // Validate required parameters
                 if (string.IsNullOrEmpty(unitName))
                     throw new ArgumentException("Unit name cannot be null or empty", nameof(unitName));
-
-                if (string.IsNullOrEmpty(unitID))
-                    throw new ArgumentException("Unit ID cannot be null or empty", nameof(unitID));
 
                 if (deployedProfile == null)
                     throw new ArgumentNullException(nameof(deployedProfile), "Deployed profile is required");
@@ -133,7 +128,7 @@ namespace HammerAndSickle.Models
 
                 // Set identification and metadata
                 UnitName = unitName;
-                UnitID = unitID;
+                UnitID = Guid.NewGuid().ToString();
                 UnitType = unitType;
                 Classification = classification;
                 Role = role;
@@ -146,7 +141,7 @@ namespace HammerAndSickle.Models
                 DeployedProfile = deployedProfile;
                 MountedProfile = mountedProfile;
                 UnitProfile = unitProfile;
-                LandBaseProfile = landBaseProfile;
+                LandBaseFacility = landBaseProfile;
 
                 // Initialize leader (will be null until assigned)
                 CommandingOfficer = null;
@@ -258,7 +253,7 @@ namespace HammerAndSickle.Models
                 DeployedProfile = null;
                 MountedProfile = null;
                 UnitProfile = null;
-                LandBaseProfile = null;
+                LandBaseFacility = null;
                 CommandingOfficer = null;
             }
             catch (Exception e)
@@ -646,11 +641,10 @@ namespace HammerAndSickle.Models
                 info.AddValue(nameof(IsLandBase), IsLandBase);
 
                 // Serialize profile references as IDs/names (not the objects themselves)
-                info.AddValue("DeployedProfileID", DeployedProfile?.Name ?? "");
-                info.AddValue("MountedProfileID", MountedProfile?.Name ?? "");
-                info.AddValue("UnitProfileID", UnitProfile?.Name ?? "");
-                //TODO: Uncomment when LandBaseProfile is implemented
-                //info.AddValue("LandBaseProfileID", LandBaseProfile?.Name ?? "");
+                info.AddValue("DeployedProfileID", DeployedProfile?.WeaponSystemID ?? "");
+                info.AddValue("MountedProfileID", MountedProfile?.WeaponSystemID ?? "");
+                info.AddValue("UnitProfileID", UnitProfile?.UnitProfileID ?? "");
+                info.AddValue("LandBaseFacilityID", LandBaseFacility?.BaseID ?? "");
                 info.AddValue("LeaderID", CommandingOfficer?.LeaderID ?? "");
 
                 // Serialize owned StatsMaxCurrent objects as Max/Current pairs

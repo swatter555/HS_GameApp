@@ -39,6 +39,7 @@ namespace HammerAndSickle.Models
         #region Properties
 
         public string Name { get; private set; }
+        public string WeaponSystemID { get; private set; }
         public Nationality Nationality { get; private set; }
         public WeaponSystems WeaponSystem { get; private set; }
         public List<UpgradeType> UpgradeTypes { get; private set; }
@@ -131,6 +132,7 @@ namespace HammerAndSickle.Models
                 Name = name;
                 Nationality = nationality;
                 WeaponSystem = weaponSystem;
+                WeaponSystemID = WeaponSystem.ToString();
                 UpgradeTypes = new List<UpgradeType>();
 
                 // Create CombatRating objects with validation
@@ -160,7 +162,7 @@ namespace HammerAndSickle.Models
             }
             catch (Exception e)
             {
-                AppService.Instance?.HandleException(CLASS_NAME, "Constructor", e);
+                AppService.Instance.HandleException(CLASS_NAME, "Constructor", e);
                 throw;
             }
         }
@@ -188,6 +190,17 @@ namespace HammerAndSickle.Models
                 Name = info.GetString(nameof(Name));
                 Nationality = (Nationality)info.GetValue(nameof(Nationality), typeof(Nationality));
                 WeaponSystem = (WeaponSystems)info.GetValue(nameof(WeaponSystem), typeof(WeaponSystems));
+
+                // Handle WeaponSystemID with fallback for backward compatibility
+                try
+                {
+                    WeaponSystemID = info.GetString(nameof(WeaponSystemID));
+                }
+                catch (SerializationException)
+                {
+                    // Backward compatibility: if WeaponSystemID not found, generate from WeaponSystem
+                    WeaponSystemID = WeaponSystem.ToString();
+                }
 
                 // Deserialize CombatRating objects
                 LandHard = (CombatRating)info.GetValue(nameof(LandHard), typeof(CombatRating));
@@ -225,7 +238,7 @@ namespace HammerAndSickle.Models
             }
             catch (Exception e)
             {
-                AppService.Instance?.HandleException(CLASS_NAME, "DeserializationConstructor", e);
+                AppService.Instance.HandleException(CLASS_NAME, "DeserializationConstructor", e);
                 throw;
             }
         }
@@ -255,7 +268,7 @@ namespace HammerAndSickle.Models
             }
             catch (Exception e)
             {
-                AppService.Instance?.HandleException(CLASS_NAME, "SetLandHardAttack", e);
+                AppService.Instance.HandleException(CLASS_NAME, "SetLandHardAttack", e);
                 throw;
             }
         }
@@ -271,7 +284,7 @@ namespace HammerAndSickle.Models
             }
             catch (Exception e)
             {
-                AppService.Instance?.HandleException(CLASS_NAME, "SetLandHardDefense", e);
+                AppService.Instance.HandleException(CLASS_NAME, "SetLandHardDefense", e);
                 throw;
             }
         }
@@ -297,7 +310,7 @@ namespace HammerAndSickle.Models
             }
             catch (Exception e)
             {
-                AppService.Instance?.HandleException(CLASS_NAME, "SetLandSoftAttack", e);
+                AppService.Instance.HandleException(CLASS_NAME, "SetLandSoftAttack", e);
                 throw;
             }
         }
@@ -313,7 +326,7 @@ namespace HammerAndSickle.Models
             }
             catch (Exception e)
             {
-                AppService.Instance?.HandleException(CLASS_NAME, "SetLandSoftDefense", e);
+                AppService.Instance.HandleException(CLASS_NAME, "SetLandSoftDefense", e);
                 throw;
             }
         }
@@ -339,7 +352,7 @@ namespace HammerAndSickle.Models
             }
             catch (Exception e)
             {
-                AppService.Instance?.HandleException(CLASS_NAME, "SetAirAttack", e);
+                AppService.Instance.HandleException(CLASS_NAME, "SetAirAttack", e);
                 throw;
             }
         }
@@ -355,7 +368,7 @@ namespace HammerAndSickle.Models
             }
             catch (Exception e)
             {
-                AppService.Instance?.HandleException(CLASS_NAME, "SetAirDefense", e);
+                AppService.Instance.HandleException(CLASS_NAME, "SetAirDefense", e);
                 throw;
             }
         }
@@ -388,7 +401,7 @@ namespace HammerAndSickle.Models
             }
             catch (Exception e)
             {
-                AppService.Instance?.HandleException(CLASS_NAME, "AddUpgradeType", e);
+                AppService.Instance.HandleException(CLASS_NAME, "AddUpgradeType", e);
                 return false;
             }
         }
@@ -406,7 +419,7 @@ namespace HammerAndSickle.Models
             }
             catch (Exception e)
             {
-                AppService.Instance?.HandleException(CLASS_NAME, "RemoveUpgradeType", e);
+                AppService.Instance.HandleException(CLASS_NAME, "RemoveUpgradeType", e);
                 return false;
             }
         }
@@ -424,7 +437,7 @@ namespace HammerAndSickle.Models
             }
             catch (Exception e)
             {
-                AppService.Instance?.HandleException(CLASS_NAME, "HasUpgradeType", e);
+                AppService.Instance.HandleException(CLASS_NAME, "HasUpgradeType", e);
                 return false;
             }
         }
@@ -449,7 +462,7 @@ namespace HammerAndSickle.Models
             }
             catch (Exception e)
             {
-                AppService.Instance?.HandleException(CLASS_NAME, "ClearUpgradeTypes", e);
+                AppService.Instance.HandleException(CLASS_NAME, "ClearUpgradeTypes", e);
             }
         }
 
@@ -469,7 +482,7 @@ namespace HammerAndSickle.Models
             }
             catch (Exception e)
             {
-                AppService.Instance?.HandleException(CLASS_NAME, "SetPrimaryRange", e);
+                AppService.Instance.HandleException(CLASS_NAME, "SetPrimaryRange", e);
                 throw;
             }
         }
@@ -486,7 +499,7 @@ namespace HammerAndSickle.Models
             }
             catch (Exception e)
             {
-                AppService.Instance?.HandleException(CLASS_NAME, "SetIndirectRange", e);
+                AppService.Instance.HandleException(CLASS_NAME, "SetIndirectRange", e);
                 throw;
             }
         }
@@ -503,7 +516,7 @@ namespace HammerAndSickle.Models
             }
             catch (Exception e)
             {
-                AppService.Instance?.HandleException(CLASS_NAME, "SetSpottingRange", e);
+                AppService.Instance.HandleException(CLASS_NAME, "SetSpottingRange", e);
                 throw;
             }
         }
@@ -520,7 +533,7 @@ namespace HammerAndSickle.Models
             }
             catch (Exception e)
             {
-                AppService.Instance?.HandleException(CLASS_NAME, "SetMovementModifier", e);
+                AppService.Instance.HandleException(CLASS_NAME, "SetMovementModifier", e);
                 throw;
             }
         }
@@ -563,7 +576,7 @@ namespace HammerAndSickle.Models
             }
             catch (Exception e)
             {
-                AppService.Instance?.HandleException(CLASS_NAME, "Clone", e);
+                AppService.Instance.HandleException(CLASS_NAME, "Clone", e);
                 throw;
             }
         }
@@ -587,7 +600,7 @@ namespace HammerAndSickle.Models
             }
             catch (Exception e)
             {
-                AppService.Instance?.HandleException(CLASS_NAME, "Clone", e);
+                AppService.Instance.HandleException(CLASS_NAME, "Clone", e);
                 throw;
             }
         }
@@ -658,6 +671,7 @@ namespace HammerAndSickle.Models
                 info.AddValue(nameof(Name), Name);
                 info.AddValue(nameof(Nationality), Nationality);
                 info.AddValue(nameof(WeaponSystem), WeaponSystem);
+                info.AddValue(nameof(WeaponSystemID), WeaponSystemID);
 
                 // CombatRating objects
                 info.AddValue(nameof(LandHard), LandHard);
@@ -693,7 +707,7 @@ namespace HammerAndSickle.Models
             }
             catch (Exception e)
             {
-                AppService.Instance?.HandleException(CLASS_NAME, "GetObjectData", e);
+                AppService.Instance.HandleException(CLASS_NAME, "GetObjectData", e);
                 throw;
             }
         }

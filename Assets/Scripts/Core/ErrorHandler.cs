@@ -14,16 +14,16 @@ namespace HammerAndSickle.Core
         /// <summary>
         /// Handles an exception that occurred in application code.
         /// </summary>
-        /// <param name="className">Name of the class where the exception occurred</param>
-        /// <param name="methodName">Name of the method where the exception occurred</param>
+        /// <param name="className">UnitProfileID of the class where the exception occurred</param>
+        /// <param name="methodName">UnitProfileID of the method where the exception occurred</param>
         /// <param name="exception">The exception that was caught</param>
         void HandleException(string className, string methodName, Exception exception);
 
         /// <summary>
         /// Handles an exception with specified severity level.
         /// </summary>
-        /// <param name="className">Name of the class where the exception occurred</param>
-        /// <param name="methodName">Name of the method where the exception occurred</param>
+        /// <param name="className">UnitProfileID of the class where the exception occurred</param>
+        /// <param name="methodName">UnitProfileID of the method where the exception occurred</param>
         /// <param name="exception">The exception that was caught</param>
         /// <param name="severity">Severity level of the exception</param>
         void HandleException(string className, string methodName, Exception exception, ExceptionSeverity severity);
@@ -106,8 +106,8 @@ namespace HammerAndSickle.Core
         /// <summary>
         /// Handles an exception using the current error handler with Minor severity.
         /// </summary>
-        /// <param name="className">Name of the class where the exception occurred</param>
-        /// <param name="methodName">Name of the method where the exception occurred</param>
+        /// <param name="className">UnitProfileID of the class where the exception occurred</param>
+        /// <param name="methodName">UnitProfileID of the method where the exception occurred</param>
         /// <param name="exception">The exception that was caught</param>
         public static void HandleException(string className, string methodName, Exception exception)
         {
@@ -117,8 +117,8 @@ namespace HammerAndSickle.Core
         /// <summary>
         /// Handles an exception using the current error handler with specified severity.
         /// </summary>
-        /// <param name="className">Name of the class where the exception occurred</param>
-        /// <param name="methodName">Name of the method where the exception occurred</param>
+        /// <param name="className">UnitProfileID of the class where the exception occurred</param>
+        /// <param name="methodName">UnitProfileID of the method where the exception occurred</param>
         /// <param name="exception">The exception that was caught</param>
         /// <param name="severity">Severity level of the exception</param>
         public static void HandleException(string className, string methodName, Exception exception, ExceptionSeverity severity)
