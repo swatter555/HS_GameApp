@@ -5,8 +5,10 @@ using HammerAndSickle.Services;
 namespace HammerAndSickle.Models
 {
     /// <summary>
-    /// This class represents a supply depot that provides supplies to combat units.
-    /// It handles stockpile management, supply projection, generation, and special abilities.
+    /// Represents a supply depot that provides supplies to combat units.
+    /// Inherits base facility functionality from LandBaseProfile including damage tracking and operational status.
+    /// Handles stockpile management, supply projection, generation, special abilities, and upgrade systems.
+    /// Supports both main and secondary depot categories with different capability restrictions.
     /// </summary>
     [Serializable]
     public class SupplyDepotSubProfile : LandBaseProfile, ISerializable
@@ -28,9 +30,6 @@ namespace HammerAndSickle.Models
 
         #region Properties
 
-        public string DepotID { get; private set; }                      // Unique identifier for the depot
-        public string DepotName { get; private set; }                    // Name of the depot
-        public Side Side { get; private set; }                           // Side the depot belongs to
         public DepotSize DepotSize { get; private set; }                 // Size of the depot
         public float StockpileInDays { get; private set; }               // Current stockpile in days of supply
         public SupplyGenerationRate GenerationRate { get; private set; } // Generation rate of the depot
@@ -53,9 +52,8 @@ namespace HammerAndSickle.Models
         {
             try
             {
-                DepotID = Guid.NewGuid().ToString();
-                DepotName = "Supply Depot";
-                Side = Side.Player;
+                // Use base class default, then set depot-specific name and initialize depot properties
+                SetBaseName("Supply Depot");
                 DepotSize = DepotSize.Small;
                 StockpileInDays = GetMaxStockpile() / 2; // Start half full
                 GenerationRate = SupplyGenerationRate.Minimal;
@@ -71,13 +69,10 @@ namespace HammerAndSickle.Models
         }
 
         public SupplyDepotSubProfile(string name, Side side, DepotSize depotSize, bool isMainDepot = false, int initialDamage = 0)
-            : base(initialDamage)
+            : base(name ?? "Supply Depot", side, initialDamage)
         {
             try
             {
-                DepotID = Guid.NewGuid().ToString();
-                DepotName = string.IsNullOrEmpty(name) ? "Supply Depot" : name;
-                Side = side;
                 DepotSize = depotSize;
                 DepotCategory = isMainDepot ? DepotCategory.Main : DepotCategory.Secondary;
 
@@ -85,7 +80,7 @@ namespace HammerAndSickle.Models
                 StockpileInDays = GetMaxStockpile() / 2; // Start half full
                 GenerationRate = SupplyGenerationRate.Standard;
                 SupplyProjection = SupplyProjection.Extended;
-                SupplyPenetration = false; // FIXED: Don't assign to itself
+                SupplyPenetration = false;
             }
             catch (Exception e)
             {
@@ -101,11 +96,6 @@ namespace HammerAndSickle.Models
         {
             try
             {
-                // Basic depot information
-                DepotID = info.GetString(nameof(DepotID));
-                DepotName = info.GetString(nameof(DepotName));
-                Side = (Side)info.GetValue(nameof(Side), typeof(Side));
-
                 // Depot attributes
                 DepotSize = (DepotSize)info.GetValue(nameof(DepotSize), typeof(DepotSize));
                 StockpileInDays = info.GetSingle(nameof(StockpileInDays));
@@ -332,7 +322,6 @@ namespace HammerAndSickle.Models
         {
             try
             {
-                DepotSize originalSize = DepotSize;
                 switch (DepotSize)
                 {
                     case DepotSize.Small:
@@ -603,17 +592,23 @@ namespace HammerAndSickle.Models
             }
         }
 
-        public SupplyDepotSubProfile Clone()
+        #endregion // Game Cycle Methods
+
+
+        #region Cloning
+
+        public override LandBaseProfile Clone()
         {
             try
             {
                 var clone = new SupplyDepotSubProfile();
 
-                // Copy basic information (except LeaderID which is generated new)
-                clone.DepotName = this.DepotName;
-                clone.Side = this.Side;
+                // Copy base class properties (BaseID will be new)
+                clone.SetBaseName(this.BaseName);
+                clone.SetSide(this.Side);
+                clone.SetDamage(this.Damage);
 
-                // Copy depot attributes
+                // Copy depot-specific attributes
                 clone.DepotSize = this.DepotSize;
                 clone.StockpileInDays = this.StockpileInDays;
                 clone.GenerationRate = this.GenerationRate;
@@ -634,22 +629,29 @@ namespace HammerAndSickle.Models
             }
         }
 
-        #endregion // Game Cycle Methods
+        public SupplyDepotSubProfile CloneTyped()
+        {
+            return (SupplyDepotSubProfile)Clone();
+        }
+
+        #endregion // Cloning
 
 
         #region ISerializable Implementation
 
+        /// <summary>
+        /// Populates a <see cref="SerializationInfo"/> object with the data needed to serialize the current object.
+        /// </summary>
+        /// <remarks>This method serializes the current object by adding relevant depot-specific data to the <paramref
+        /// name="info"/> parameter. Base class properties are handled by the base implementation.</remarks>
+        /// <param name="info">The <see cref="SerializationInfo"/> object to populate with serialization data. Cannot be <see langword="null"/>.</param>
+        /// <param name="context">The <see cref="StreamingContext"/> structure that contains the source and destination of the serialized stream.</param>
         public override void GetObjectData(SerializationInfo info, StreamingContext context)
         {
             try
             {
                 // Call base class serialization first
                 base.GetObjectData(info, context);
-
-                // Basic depot information
-                info.AddValue(nameof(DepotID), DepotID);
-                info.AddValue(nameof(DepotName), DepotName);
-                info.AddValue(nameof(Side), Side);
 
                 // Depot attributes
                 info.AddValue(nameof(DepotSize), DepotSize);

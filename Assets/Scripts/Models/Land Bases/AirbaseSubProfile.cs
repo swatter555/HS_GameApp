@@ -9,6 +9,8 @@ namespace HammerAndSickle.Models
     /// <summary>
     /// Represents an airbase facility that can host and support air units.
     /// Inherits base damage and operational capacity functionality from LandBaseProfile.
+    /// Manages air unit attachment, capacity tracking, and operational capabilities based on damage levels.
+    /// Supports serialization with reference resolution pattern for attached air units.
     /// </summary>
     [Serializable]
     public class AirbaseSubProfile : LandBaseProfile, ISerializable
@@ -23,8 +25,8 @@ namespace HammerAndSickle.Models
 
         #region Fields
 
-        private List<CombatUnit> airUnitsAttached = new ();
-        private List<string> attachedUnitIDs = new ();           // Store IDs during deserialization
+        private List<CombatUnit> airUnitsAttached = new();
+        private List<string> attachedUnitIDs = new();           // Store IDs during deserialization
 
         #endregion // Fields
 
@@ -40,17 +42,52 @@ namespace HammerAndSickle.Models
 
         public AirbaseSubProfile() : base()
         {
-            // Default constructor uses base class initialization
+            try
+            {
+                // Use base class default constructor, then set airbase-specific name
+                SetBaseName("Airbase");
+            }
+            catch (Exception e)
+            {
+                AppService.Instance.HandleException(CLASS_NAME, "DefaultConstructor", e);
+                throw;
+            }
         }
-
 
         public AirbaseSubProfile(int initialDamage) : base(initialDamage)
         {
-            // Uses base class initialization with initial damage
+            try
+            {
+                // Use base class constructor with damage, then set airbase-specific name
+                SetBaseName("Airbase");
+            }
+            catch (Exception e)
+            {
+                AppService.Instance.HandleException(CLASS_NAME, "DamageConstructor", e);
+                throw;
+            }
+        }
+
+        public AirbaseSubProfile(string name, Side side, int initialDamage = 0) : base(name, side, initialDamage)
+        {
+            try
+            {
+                // Use full base constructor - name and side already set
+                // Just ensure we have a reasonable default name if none provided
+                if (string.IsNullOrEmpty(name))
+                {
+                    SetBaseName("Airbase");
+                }
+            }
+            catch (Exception e)
+            {
+                AppService.Instance.HandleException(CLASS_NAME, "FullConstructor", e);
+                throw;
+            }
         }
 
         /// <summary>
-        /// Deserialization constructor - FIXED VERSION
+        /// Deserialization constructor
         /// </summary>
         protected AirbaseSubProfile(SerializationInfo info, StreamingContext context) : base(info, context)
         {
@@ -67,7 +104,7 @@ namespace HammerAndSickle.Models
                 for (int i = 0; i < airUnitCount; i++)
                 {
                     string unitID = info.GetString($"AirUnitID_{i}");
-                    attachedUnitIDs.Add(unitID);  // FIXED: Actually store the IDs
+                    attachedUnitIDs.Add(unitID);
                 }
             }
             catch (Exception e)
@@ -262,7 +299,64 @@ namespace HammerAndSickle.Models
             return OperationalCapacity == OperationalCapacity.Full;
         }
 
+        public bool CanAcceptNewAircraft()
+        {
+            return CanReceiveAircraft() && HasCapacityForMoreUnits();
+        }
+
+        public List<CombatUnit> GetOperationalAirUnits()
+        {
+            try
+            {
+                return airUnitsAttached.Where(unit => unit != null && unit.EfficiencyLevel != EfficiencyLevel.StaticOperations).ToList();
+            }
+            catch (Exception e)
+            {
+                AppService.Instance.HandleException(CLASS_NAME, "GetOperationalAirUnits", e);
+                return new List<CombatUnit>();
+            }
+        }
+
+        public int GetOperationalAirUnitCount()
+        {
+            return GetOperationalAirUnits().Count;
+        }
+
         #endregion // Operational Methods
+
+
+        #region Cloning
+
+        public override LandBaseProfile Clone()
+        {
+            try
+            {
+                var clone = new AirbaseSubProfile();
+
+                // Copy base class properties (BaseID will be new)
+                clone.SetBaseName(this.BaseName);
+                clone.SetSide(this.Side);
+                clone.SetDamage(this.Damage);
+
+                // Note: Air units are NOT cloned - the clone starts with no attached units
+                // This is intentional as air units should be managed separately
+                // If you need to clone with units, use a different method
+
+                return clone;
+            }
+            catch (Exception e)
+            {
+                AppService.Instance.HandleException(CLASS_NAME, "Clone", e);
+                throw;
+            }
+        }
+
+        public AirbaseSubProfile CloneTyped()
+        {
+            return (AirbaseSubProfile)Clone();
+        }
+
+        #endregion // Cloning
 
 
         #region Serialization Support Methods
