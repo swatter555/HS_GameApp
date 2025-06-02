@@ -58,8 +58,8 @@ namespace HammerAndSickle.Tests
             Assert.AreEqual(0, testLeader.ReputationPoints);
             Assert.IsFalse(testLeader.IsAssigned);
             Assert.IsNull(testLeader.UnitID);
-            Assert.IsNotNull(testLeader.ID);
-            Assert.IsTrue(testLeader.ID.StartsWith(CUConstants.LEADER_ID_PREFIX));
+            Assert.IsNotNull(testLeader.LeaderID);
+            Assert.IsTrue(testLeader.LeaderID.StartsWith(CUConstants.LEADER_ID_PREFIX));
         }
 
         [Test]
@@ -488,7 +488,7 @@ namespace HammerAndSickle.Tests
             }
 
             // Assert - All properties preserved
-            Assert.AreEqual(testLeader.ID, deserializedLeader.ID);
+            Assert.AreEqual(testLeader.LeaderID, deserializedLeader.LeaderID);
             Assert.AreEqual(testLeader.Name, deserializedLeader.Name);
             Assert.AreEqual(testLeader.Side, deserializedLeader.Side);
             Assert.AreEqual(testLeader.Nationality, deserializedLeader.Nationality);
@@ -533,7 +533,7 @@ namespace HammerAndSickle.Tests
 
             // Assert - Different objects (independent)
             Assert.AreNotSame(testLeader, clonedLeader);
-            Assert.AreNotEqual(testLeader.ID, clonedLeader.ID); // Should have different IDs
+            Assert.AreNotEqual(testLeader.LeaderID, clonedLeader.LeaderID); // Should have different IDs
 
             // Assert - Independent skill trees
             clonedLeader.AwardReputation(100);
@@ -553,9 +553,9 @@ namespace HammerAndSickle.Tests
             var leader3 = new Leader(TEST_SIDE, TEST_NATIONALITY);
 
             // Assert - Different IDs
-            Assert.AreNotEqual(leader1.ID, leader2.ID);
-            Assert.AreNotEqual(leader2.ID, leader3.ID);
-            Assert.AreNotEqual(leader1.ID, leader3.ID);
+            Assert.AreNotEqual(leader1.LeaderID, leader2.LeaderID);
+            Assert.AreNotEqual(leader2.LeaderID, leader3.LeaderID);
+            Assert.AreNotEqual(leader1.LeaderID, leader3.LeaderID);
 
             // Assert - Names might be different (depending on NameGenService implementation)
             // Note: This test might fail if NameGenService has limited names for testing
@@ -580,11 +580,11 @@ namespace HammerAndSickle.Tests
             testLeader = new Leader(TEST_LEADER_NAME, TEST_SIDE, TEST_NATIONALITY, TEST_COMMAND);
 
             // Assert
-            Assert.IsTrue(testLeader.ID.StartsWith(CUConstants.LEADER_ID_PREFIX));
-            Assert.AreEqual(CUConstants.LEADER_ID_LENGTH, testLeader.ID.Length);
+            Assert.IsTrue(testLeader.LeaderID.StartsWith(CUConstants.LEADER_ID_PREFIX));
+            Assert.AreEqual(CUConstants.LEADER_ID_LENGTH, testLeader.LeaderID.Length);
 
-            // Check that the ID contains only valid characters (letters and numbers)
-            string idSuffix = testLeader.ID.Substring(CUConstants.LEADER_ID_PREFIX.Length);
+            // Check that the LeaderID contains only valid characters (letters and numbers)
+            string idSuffix = testLeader.LeaderID.Substring(CUConstants.LEADER_ID_PREFIX.Length);
             Assert.IsTrue(System.Text.RegularExpressions.Regex.IsMatch(idSuffix, "^[A-F0-9]+$"));
         }
 

@@ -36,7 +36,7 @@ namespace HammerAndSickle.Models
 
         #region Properties
 
-        public string ID { get; private set; }                               // Unique identifier for the officer
+        public string LeaderID { get; private set; }                               // Unique identifier for the officer
         public string Name { get; private set; }                             // Use random name generator
         public Side Side { get; private set; }                               // Player or AI
         public Nationality Nationality { get; private set; }                 // Nation of origin
@@ -45,7 +45,7 @@ namespace HammerAndSickle.Models
         public string FormattedRank { get { return GetFormattedRank(); } }   // Real-world rank of the officer
         public CommandAbility CombatCommand { get; private set; }            // Direct combat modifier
         public bool IsAssigned { get; private set; }                         // Is the officer assigned to a unit?
-        public string UnitID { get; private set; }                           // ID of the unit assigned to the officer
+        public string UnitID { get; private set; }                           // LeaderID of the unit assigned to the officer
 
         #endregion // Properties
 
@@ -131,7 +131,7 @@ namespace HammerAndSickle.Models
             try
             {
                 // Load basic properties
-                ID = info.GetString(nameof(ID));
+                LeaderID = info.GetString(nameof(LeaderID));
                 Name = info.GetString(nameof(Name));
                 Side = (Side)info.GetValue(nameof(Side), typeof(Side));
                 Nationality = (Nationality)info.GetValue(nameof(Nationality), typeof(Nationality));
@@ -174,7 +174,7 @@ namespace HammerAndSickle.Models
         /// </summary>
         private void InitializeCommonProperties(Side side, Nationality nationality)
         {
-            ID = GenerateUniqueID();
+            LeaderID = GenerateUniqueID();
             Side = side;
             Nationality = nationality;
             CommandGrade = CommandGrade.JuniorGrade;
@@ -216,7 +216,7 @@ namespace HammerAndSickle.Models
         }
 
         /// <summary>
-        /// Generate a unique ID for the leader
+        /// Generate a unique LeaderID for the leader
         /// </summary>
         private string GenerateUniqueID()
         {
@@ -582,7 +582,7 @@ namespace HammerAndSickle.Models
         /// <summary>
         /// Assign this leader to a unit
         /// </summary>
-        /// <param name="unitID">ID of the unit to assign to</param>
+        /// <param name="unitID">LeaderID of the unit to assign to</param>
         public void AssignToUnit(string unitID)
         {
             try
@@ -636,7 +636,7 @@ namespace HammerAndSickle.Models
             try
             {
                 // Save basic properties
-                info.AddValue(nameof(ID), ID);
+                info.AddValue(nameof(LeaderID), LeaderID);
                 info.AddValue(nameof(Name), Name);
                 info.AddValue(nameof(Side), Side);
                 info.AddValue(nameof(Nationality), Nationality);

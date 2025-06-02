@@ -38,7 +38,7 @@ namespace HammerAndSickle.Models
         //====== Leader Skills/Tree ======
         //================================
 
-        // Leader ID generation
+        // Leader LeaderID generation
         public const string LEADER_ID_PREFIX = "LDR";
         public const int LEADER_ID_LENGTH = 8; // LDR + 5 random chars
 

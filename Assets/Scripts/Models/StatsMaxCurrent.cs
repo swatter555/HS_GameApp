@@ -53,6 +53,38 @@ namespace HammerAndSickle.Models
             }
         }
 
+        /// <summary>
+        /// Creates a new StatsMaxCurrent with specified maximum and current values.
+        /// Used for deserialization when restoring saved state.
+        /// </summary>
+        /// <param name="maxValue">The maximum value for this statistic</param>
+        /// <param name="currentValue">The current value for this statistic</param>
+        public StatsMaxCurrent(float maxValue, float currentValue)
+        {
+            try
+            {
+                if (maxValue < MIN_VALID_VALUE || maxValue > MAX_VALID_VALUE)
+                {
+                    throw new ArgumentOutOfRangeException(nameof(maxValue),
+                        $"Max value must be between {MIN_VALID_VALUE} and {MAX_VALID_VALUE}");
+                }
+
+                if (currentValue < MIN_VALID_VALUE || currentValue > MAX_VALID_VALUE)
+                {
+                    throw new ArgumentOutOfRangeException(nameof(currentValue),
+                        $"Current value must be between {MIN_VALID_VALUE} and {MAX_VALID_VALUE}");
+                }
+
+                Max = maxValue;
+                Current = currentValue;
+            }
+            catch (Exception e)
+            {
+                AppService.Instance?.HandleException(CLASS_NAME, "Constructor", e);
+                throw;
+            }
+        }
+
         #endregion
 
         #region Public Methods
