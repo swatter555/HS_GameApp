@@ -487,8 +487,8 @@ namespace HammerAndSickle.Services
         /// <summary>
         /// Handles an exception with Minor severity (backward compatibility).
         /// </summary>
-        /// <param name="className">Name of the class where the exception occurred</param>
-        /// <param name="methodName">Name of the method where the exception occurred</param>
+        /// <param name="className">UnitProfileID of the class where the exception occurred</param>
+        /// <param name="methodName">UnitProfileID of the method where the exception occurred</param>
         /// <param name="exception">The exception that was caught</param>
         public void HandleException(string className, string methodName, Exception exception)
         {
@@ -500,8 +500,8 @@ namespace HammerAndSickle.Services
         /// <summary>
         /// Handles an exception with specified severity level.
         /// </summary>
-        /// <param name="className">Name of the class where the exception occurred</param>
-        /// <param name="methodName">Name of the method where the exception occurred</param>
+        /// <param name="className">UnitProfileID of the class where the exception occurred</param>
+        /// <param name="methodName">UnitProfileID of the method where the exception occurred</param>
         /// <param name="exception">The exception that was caught</param>
         /// <param name="severity">Severity level of the exception</param>
         public void HandleException(string className, string methodName, Exception exception, ExceptionSeverity severity)

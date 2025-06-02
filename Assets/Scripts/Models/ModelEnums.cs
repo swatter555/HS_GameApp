@@ -59,7 +59,7 @@ namespace HammerAndSickle.Models
         FWT,    // Fixed-wing transport
         BASE,   // Land base of some type (e.g., HQ, depot, airbase, etc.)
         DEPOT,  // Supply Depot
-        AIRB,   // AirbaseSubProfile
+        AIRB,   // AirbaseFacility
     }
 
     /// <summary>
