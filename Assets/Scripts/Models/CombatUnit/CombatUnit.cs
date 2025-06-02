@@ -1,7 +1,8 @@
+using HammerAndSickle.Services;
 using System;
+using System.Collections.Generic;
 using System.Runtime.Serialization;
 using UnityEngine;
-using HammerAndSickle.Services;
 
 namespace HammerAndSickle.Models
 {
@@ -347,6 +348,33 @@ namespace HammerAndSickle.Models
         #endregion
 
 
+        #region Public Methods
+
+        /// <summary>
+        /// Refreshes all action counts to their maximum values.
+        /// Called at the start of each turn.
+        /// </summary>
+        public void RefreshAllActions()
+        {
+            MoveActions.ResetToMax();
+            CombatActions.ResetToMax();
+            DeploymentActions.ResetToMax();
+            OpportunityActions.ResetToMax();
+            IntelActions.ResetToMax();
+        }
+
+        /// <summary>
+        /// Refreshes movement points to maximum.
+        /// Called at the start of each turn.
+        /// </summary>
+        public void RefreshMovementPoints()
+        {
+            MovementPoints.ResetToMax();
+        }
+
+        #endregion // Public Methods
+
+
         #region Experience System Methods
 
         /// <summary>
@@ -571,33 +599,929 @@ namespace HammerAndSickle.Models
             };
         }
 
-        #endregion
+        #endregion // Experience System Methods
 
-        #region Public Methods
+
+        #region Leader Assignment System
 
         /// <summary>
-        /// Refreshes all action counts to their maximum values.
-        /// Called at the start of each turn.
+        /// Assigns a leader to command this unit.
+        /// Validates that the leader can command this unit type and handles state management.
         /// </summary>
-        public void RefreshAllActions()
+        /// <param name="leader">The leader to assign to this unit</param>
+        public void AssignLeader(Leader leader)
         {
-            MoveActions.ResetToMax();
-            CombatActions.ResetToMax();
-            DeploymentActions.ResetToMax();
-            OpportunityActions.ResetToMax();
-            IntelActions.ResetToMax();
+            try
+            {
+                // TODO: This method will need to interact with the game state manager
+                // to handle leader assignment validation and state updates
+                throw new NotImplementedException("CombatUnit leader assignment not yet implemented");
+            }
+            catch (Exception e)
+            {
+                AppService.Instance.HandleException(CLASS_NAME, "AssignLeader", e);
+                throw;
+            }
         }
 
         /// <summary>
-        /// Refreshes movement points to maximum.
-        /// Called at the start of each turn.
+        /// Removes the commanding officer from this unit.
+        /// Handles state management and cleanup.
         /// </summary>
-        public void RefreshMovementPoints()
+        public void RemoveLeader()
         {
-            MovementPoints.ResetToMax();
+            try
+            {
+                // TODO: This method will need to interact with the game state manager
+                // to handle leader removal validation and state updates
+                throw new NotImplementedException("CombatUnit leader removal not yet implemented");
+            }
+            catch (Exception e)
+            {
+                AppService.Instance.HandleException(CLASS_NAME, "RemoveLeader", e);
+                throw;
+            }
         }
 
-        #endregion // Public Methods
+        /// <summary>
+        /// Gets all bonuses provided by the commanding officer's skills.
+        /// Returns an empty dictionary if no leader is assigned.
+        /// </summary>
+        /// <returns>Dictionary mapping skill bonus types to their values</returns>
+        public Dictionary<SkillBonusType, float> GetLeaderBonuses()
+        {
+            var bonuses = new Dictionary<SkillBonusType, float>();
+
+            try
+            {
+                // Return empty dictionary if no leader assigned
+                if (CommandingOfficer == null)
+                {
+                    return bonuses;
+                }
+
+                // Iterate through all skill bonus types and get non-zero values
+                foreach (SkillBonusType bonusType in (SkillBonusType[])Enum.GetValues(typeof(SkillBonusType)))
+                {
+                    if (bonusType == SkillBonusType.None) continue;
+
+                    float bonusValue = CommandingOfficer.GetBonusValue(bonusType);
+                    if (bonusValue != 0f)
+                    {
+                        bonuses[bonusType] = bonusValue;
+                    }
+                }
+
+                return bonuses;
+            }
+            catch (Exception e)
+            {
+                AppService.Instance.HandleException(CLASS_NAME, "GetLeaderBonuses", e);
+                return bonuses; // Return empty dictionary on error
+            }
+        }
+
+        /// <summary>
+        /// Checks if the unit has a specific leader capability/bonus.
+        /// </summary>
+        /// <param name="bonusType">The bonus type to check for</param>
+        /// <returns>True if the leader provides this capability</returns>
+        public bool HasLeaderCapability(SkillBonusType bonusType)
+        {
+            try
+            {
+                if (CommandingOfficer == null)
+                {
+                    return false;
+                }
+
+                return CommandingOfficer.HasCapability(bonusType);
+            }
+            catch (Exception e)
+            {
+                AppService.Instance.HandleException(CLASS_NAME, "HasLeaderCapability", e);
+                return false;
+            }
+        }
+
+        /// <summary>
+        /// Gets a specific leader bonus value.
+        /// Returns 0 if no leader assigned or bonus not present.
+        /// </summary>
+        /// <param name="bonusType">The type of bonus to retrieve</param>
+        /// <returns>The bonus value, or 0 if not present</returns>
+        public float GetLeaderBonus(SkillBonusType bonusType)
+        {
+            try
+            {
+                if (CommandingOfficer == null || bonusType == SkillBonusType.None)
+                {
+                    return 0f;
+                }
+
+                return CommandingOfficer.GetBonusValue(bonusType);
+            }
+            catch (Exception e)
+            {
+                AppService.Instance.HandleException(CLASS_NAME, "GetLeaderBonus", e);
+                return 0f;
+            }
+        }
+
+        /// <summary>
+        /// Checks if a leader is currently assigned to this unit.
+        /// </summary>
+        /// <returns>True if a leader is assigned</returns>
+        public bool HasLeader()
+        {
+            return CommandingOfficer != null;
+        }
+
+        /// <summary>
+        /// Gets the leader's name for display purposes.
+        /// Returns empty string if no leader assigned.
+        /// </summary>
+        /// <returns>Leader name or empty string</returns>
+        public string GetLeaderName()
+        {
+            try
+            {
+                return CommandingOfficer?.Name ?? "";
+            }
+            catch (Exception e)
+            {
+                AppService.Instance.HandleException(CLASS_NAME, "GetLeaderName", e);
+                return "";
+            }
+        }
+
+        /// <summary>
+        /// Gets the leader's command grade for display and bonus calculations.
+        /// Returns JuniorGrade if no leader assigned.
+        /// </summary>
+        /// <returns>Leader's command grade</returns>
+        public CommandGrade GetLeaderGrade()
+        {
+            try
+            {
+                return CommandingOfficer?.CommandGrade ?? CommandGrade.JuniorGrade;
+            }
+            catch (Exception e)
+            {
+                AppService.Instance.HandleException(CLASS_NAME, "GetLeaderGrade", e);
+                return CommandGrade.JuniorGrade;
+            }
+        }
+
+        /// <summary>
+        /// Gets the leader's reputation points for display purposes.
+        /// Returns 0 if no leader assigned.
+        /// </summary>
+        /// <returns>Leader's reputation points</returns>
+        public int GetLeaderReputation()
+        {
+            try
+            {
+                return CommandingOfficer?.ReputationPoints ?? 0;
+            }
+            catch (Exception e)
+            {
+                AppService.Instance.HandleException(CLASS_NAME, "GetLeaderReputation", e);
+                return 0;
+            }
+        }
+
+        /// <summary>
+        /// Gets the leader's formatted rank based on nationality.
+        /// Returns empty string if no leader assigned.
+        /// </summary>
+        /// <returns>Formatted rank string</returns>
+        public string GetLeaderRank()
+        {
+            try
+            {
+                return CommandingOfficer?.FormattedRank ?? "";
+            }
+            catch (Exception e)
+            {
+                AppService.Instance.HandleException(CLASS_NAME, "GetLeaderRank", e);
+                return "";
+            }
+        }
+
+        /// <summary>
+        /// Gets the leader's combat command ability modifier.
+        /// Returns Average if no leader assigned.
+        /// </summary>
+        /// <returns>Leader's combat command ability</returns>
+        public CommandAbility GetLeaderCommandAbility()
+        {
+            try
+            {
+                return CommandingOfficer?.CombatCommand ?? CommandAbility.Average;
+            }
+            catch (Exception e)
+            {
+                AppService.Instance.HandleException(CLASS_NAME, "GetLeaderCommandAbility", e);
+                return CommandAbility.Average;
+            }
+        }
+
+        /// <summary>
+        /// Checks if the leader has unlocked a specific skill.
+        /// Returns false if no leader assigned.
+        /// </summary>
+        /// <param name="skillEnum">The skill to check</param>
+        /// <returns>True if the skill is unlocked</returns>
+        public bool HasLeaderSkill(Enum skillEnum)
+        {
+            try
+            {
+                if (CommandingOfficer == null)
+                {
+                    return false;
+                }
+
+                return CommandingOfficer.IsSkillUnlocked(skillEnum);
+            }
+            catch (Exception e)
+            {
+                AppService.Instance.HandleException(CLASS_NAME, "HasLeaderSkill", e);
+                return false;
+            }
+        }
+
+        /// <summary>
+        /// Awards reputation to the leader for unit actions.
+        /// Does nothing if no leader assigned.
+        /// </summary>
+        /// <param name="actionType">Type of action performed</param>
+        /// <param name="contextMultiplier">Context-based multiplier (default 1.0)</param>
+        public void AwardLeaderReputation(CUConstants.ReputationAction actionType, float contextMultiplier = 1.0f)
+        {
+            try
+            {
+                if (CommandingOfficer == null)
+                {
+                    return;
+                }
+
+                CommandingOfficer.AwardReputationForAction(actionType, contextMultiplier);
+            }
+            catch (Exception e)
+            {
+                AppService.Instance.HandleException(CLASS_NAME, "AwardLeaderReputation", e);
+            }
+        }
+
+        /// <summary>
+        /// Awards reputation points directly to the leader.
+        /// Does nothing if no leader assigned.
+        /// </summary>
+        /// <param name="amount">Amount of reputation to award</param>
+        public void AwardLeaderReputation(int amount)
+        {
+            try
+            {
+                if (CommandingOfficer == null || amount <= 0)
+                {
+                    return;
+                }
+
+                CommandingOfficer.AwardReputation(amount);
+            }
+            catch (Exception e)
+            {
+                AppService.Instance.HandleException(CLASS_NAME, "AwardLeaderReputation", e);
+            }
+        }
+
+        #endregion // Leader Assignment System
+
+
+        #region Action Consumption System
+
+        /// <summary>
+        /// Consumes one move action if available.
+        /// </summary>
+        /// <returns>True if a move action was consumed, false if none available</returns>
+        public bool ConsumeMoveAction()
+        {
+            try
+            {
+                if (MoveActions.Current >= 1f)
+                {
+                    MoveActions.SetCurrent(MoveActions.Current - 1f);
+                    return true;
+                }
+                return false;
+            }
+            catch (Exception e)
+            {
+                AppService.Instance.HandleException(CLASS_NAME, "ConsumeMoveAction", e);
+                return false;
+            }
+        }
+
+        /// <summary>
+        /// Consumes one combat action if available.
+        /// </summary>
+        /// <returns>True if a combat action was consumed, false if none available</returns>
+        public bool ConsumeCombatAction()
+        {
+            try
+            {
+                if (CombatActions.Current >= 1f)
+                {
+                    CombatActions.SetCurrent(CombatActions.Current - 1f);
+                    return true;
+                }
+                return false;
+            }
+            catch (Exception e)
+            {
+                AppService.Instance.HandleException(CLASS_NAME, "ConsumeCombatAction", e);
+                return false;
+            }
+        }
+
+        /// <summary>
+        /// Consumes movement points if available.
+        /// </summary>
+        /// <param name="points">Number of movement points to consume</param>
+        /// <returns>True if movement points were consumed, false if insufficient</returns>
+        public bool ConsumeMovementPoints(float points)
+        {
+            try
+            {
+                if (points <= 0f)
+                {
+                    throw new ArgumentException("Movement points must be positive", nameof(points));
+                }
+
+                if (MovementPoints.Current >= points)
+                {
+                    MovementPoints.SetCurrent(MovementPoints.Current - points);
+                    return true;
+                }
+                return false;
+            }
+            catch (Exception e)
+            {
+                AppService.Instance.HandleException(CLASS_NAME, "ConsumeMovementPoints", e);
+                return false;
+            }
+        }
+
+        /// <summary>
+        /// Consumes one deployment action if available.
+        /// </summary>
+        /// <returns>True if a deployment action was consumed, false if none available</returns>
+        public bool ConsumeDeploymentAction()
+        {
+            try
+            {
+                if (DeploymentActions.Current >= 1f)
+                {
+                    DeploymentActions.SetCurrent(DeploymentActions.Current - 1f);
+                    return true;
+                }
+                return false;
+            }
+            catch (Exception e)
+            {
+                AppService.Instance.HandleException(CLASS_NAME, "ConsumeDeploymentAction", e);
+                return false;
+            }
+        }
+
+        /// <summary>
+        /// Consumes one opportunity action if available.
+        /// </summary>
+        /// <returns>True if an opportunity action was consumed, false if none available</returns>
+        public bool ConsumeOpportunityAction()
+        {
+            try
+            {
+                if (OpportunityActions.Current >= 1f)
+                {
+                    OpportunityActions.SetCurrent(OpportunityActions.Current - 1f);
+                    return true;
+                }
+                return false;
+            }
+            catch (Exception e)
+            {
+                AppService.Instance.HandleException(CLASS_NAME, "ConsumeOpportunityAction", e);
+                return false;
+            }
+        }
+
+        /// <summary>
+        /// Consumes one intelligence action if available.
+        /// </summary>
+        /// <returns>True if an intelligence action was consumed, false if none available</returns>
+        public bool ConsumeIntelAction()
+        {
+            try
+            {
+                if (IntelActions.Current >= 1f)
+                {
+                    IntelActions.SetCurrent(IntelActions.Current - 1f);
+                    return true;
+                }
+                return false;
+            }
+            catch (Exception e)
+            {
+                AppService.Instance.HandleException(CLASS_NAME, "ConsumeIntelAction", e);
+                return false;
+            }
+        }
+
+        /// <summary>
+        /// Checks if the unit can consume a move action.
+        /// </summary>
+        /// <returns>True if at least one move action is available</returns>
+        public bool CanConsumeMoveAction()
+        {
+            return MoveActions.Current >= 1f;
+        }
+
+        /// <summary>
+        /// Checks if the unit can consume a combat action.
+        /// </summary>
+        /// <returns>True if at least one combat action is available</returns>
+        public bool CanConsumeCombatAction()
+        {
+            return CombatActions.Current >= 1f;
+        }
+
+        /// <summary>
+        /// Checks if the unit can consume the specified movement points.
+        /// </summary>
+        /// <param name="points">Number of movement points needed</param>
+        /// <returns>True if sufficient movement points are available</returns>
+        public bool CanConsumeMovementPoints(float points)
+        {
+            if (points <= 0f) return false;
+            return MovementPoints.Current >= points;
+        }
+
+        /// <summary>
+        /// Checks if the unit can consume a deployment action.
+        /// </summary>
+        /// <returns>True if at least one deployment action is available</returns>
+        public bool CanConsumeDeploymentAction()
+        {
+            return DeploymentActions.Current >= 1f;
+        }
+
+        /// <summary>
+        /// Checks if the unit can consume an opportunity action.
+        /// </summary>
+        /// <returns>True if at least one opportunity action is available</returns>
+        public bool CanConsumeOpportunityAction()
+        {
+            return OpportunityActions.Current >= 1f;
+        }
+
+        /// <summary>
+        /// Checks if the unit can consume an intelligence action.
+        /// </summary>
+        /// <returns>True if at least one intelligence action is available</returns>
+        public bool CanConsumeIntelAction()
+        {
+            return IntelActions.Current >= 1f;
+        }
+
+        /// <summary>
+        /// Gets the number of available actions of each type.
+        /// </summary>
+        /// <returns>Dictionary mapping action types to available counts</returns>
+        public Dictionary<string, float> GetAvailableActions()
+        {
+            return new Dictionary<string, float>
+            {
+                ["Move"] = MoveActions.Current,
+                ["Combat"] = CombatActions.Current,
+                ["Deployment"] = DeploymentActions.Current,
+                ["Opportunity"] = OpportunityActions.Current,
+                ["Intelligence"] = IntelActions.Current,
+                ["MovementPoints"] = MovementPoints.Current
+            };
+        }
+
+        #endregion // Action Consumption System
+
+
+        #region Position and Movement Management
+
+        /// <summary>
+        /// Sets the unit's position on the map.
+        /// </summary>
+        /// <param name="newPos">The new position coordinates</param>
+        public void SetPosition(Vector2 newPos)
+        {
+            try
+            {
+                // Use reflection to set MapPos since it has a private setter
+                var unitType = typeof(CombatUnit);
+                var mapPosProperty = unitType.GetProperty("MapPos");
+                mapPosProperty?.SetValue(this, newPos);
+            }
+            catch (Exception e)
+            {
+                AppService.Instance.HandleException(CLASS_NAME, "SetPosition", e);
+                throw;
+            }
+        }
+
+        /// <summary>
+        /// Checks if the unit can move to the specified position.
+        /// This is a basic validation - full movement rules will be implemented later.
+        /// </summary>
+        /// <param name="targetPos">The target position to validate</param>
+        /// <returns>True if movement appears valid</returns>
+        public bool CanMoveTo(Vector2 targetPos)
+        {
+            try
+            {
+                // Basic validations - will be expanded when terrain system is implemented
+
+                // Check if unit has movement capability
+                if (MovementPoints.Max <= 0)
+                {
+                    return false; // Immobile units (bases, etc.)
+                }
+
+                // Check if unit has movement points available
+                if (MovementPoints.Current <= 0)
+                {
+                    return false; // No movement points left
+                }
+
+                // Check if target is different from current position
+                if (Vector2.Distance(MapPos, targetPos) < 0.01f)
+                {
+                    return false; // Already at target position
+                }
+
+                // TODO: Add terrain validation, enemy ZOC checks, pathfinding, etc.
+                // when those systems are implemented
+
+                return true; // Basic validation passed
+            }
+            catch (Exception e)
+            {
+                AppService.Instance.HandleException(CLASS_NAME, "CanMoveTo", e);
+                return false;
+            }
+        }
+
+        /// <summary>
+        /// Gets the distance between this unit and a target position in Unity units.
+        /// </summary>
+        /// <param name="targetPos">The target position</param>
+        /// <returns>Distance in Unity units</returns>
+        public float GetDistanceTo(Vector2 targetPos)
+        {
+            try
+            {
+                return Vector2.Distance(MapPos, targetPos);
+            }
+            catch (Exception e)
+            {
+                AppService.Instance.HandleException(CLASS_NAME, "GetDistanceTo", e);
+                return float.MaxValue;
+            }
+        }
+
+        /// <summary>
+        /// Gets the distance between this unit and another unit.
+        /// </summary>
+        /// <param name="otherUnit">The other unit</param>
+        /// <returns>Distance in Unity units</returns>
+        public float GetDistanceTo(CombatUnit otherUnit)
+        {
+            try
+            {
+                if (otherUnit == null)
+                {
+                    throw new ArgumentNullException(nameof(otherUnit));
+                }
+
+                return GetDistanceTo(otherUnit.MapPos);
+            }
+            catch (Exception e)
+            {
+                AppService.Instance.HandleException(CLASS_NAME, "GetDistanceTo", e);
+                return float.MaxValue;
+            }
+        }
+
+        /// <summary>
+        /// Checks if the unit is at the specified position (within tolerance).
+        /// </summary>
+        /// <param name="position">Position to check</param>
+        /// <param name="tolerance">Distance tolerance (default 0.01f)</param>
+        /// <returns>True if unit is at the position</returns>
+        public bool IsAtPosition(Vector2 position, float tolerance = 0.01f)
+        {
+            try
+            {
+                return Vector2.Distance(MapPos, position) <= tolerance;
+            }
+            catch (Exception e)
+            {
+                AppService.Instance.HandleException(CLASS_NAME, "IsAtPosition", e);
+                return false;
+            }
+        }
+
+        /// <summary>
+        /// Gets the unit's current map position.
+        /// </summary>
+        /// <returns>Current position on the map</returns>
+        public Vector2 GetPosition()
+        {
+            return MapPos;
+        }
+
+        #endregion // Position and Movement Management
+
+
+        #region Damage and Supply Systems
+
+        /// <summary>
+        /// Applies damage to the unit, reducing hit points and updating combat effectiveness.
+        /// </summary>
+        /// <param name="damage">Amount of damage to apply</param>
+        public void TakeDamage(float damage)
+        {
+            try
+            {
+                if (damage < 0f)
+                {
+                    throw new ArgumentException("Damage cannot be negative", nameof(damage));
+                }
+
+                if (damage == 0f)
+                {
+                    return; // No damage to apply
+                }
+
+                // Apply damage to hit points
+                float newHitPoints = Mathf.Max(0f, HitPoints.Current - damage);
+                HitPoints.SetCurrent(newHitPoints);
+
+                // Update unit profile to reflect current strength
+                if (UnitProfile != null)
+                {
+                    UnitProfile.UpdateCurrentProfile((int)HitPoints.Current);
+                }
+
+                // Update efficiency level based on damage
+                UpdateEfficiencyFromDamage();
+            }
+            catch (Exception e)
+            {
+                AppService.Instance.HandleException(CLASS_NAME, "TakeDamage", e);
+                throw;
+            }
+        }
+
+        /// <summary>
+        /// Repairs damage to the unit, restoring hit points.
+        /// </summary>
+        /// <param name="repairAmount">Amount of damage to repair</param>
+        public void Repair(float repairAmount)
+        {
+            try
+            {
+                if (repairAmount < 0f)
+                {
+                    throw new ArgumentException("Repair amount cannot be negative", nameof(repairAmount));
+                }
+
+                if (repairAmount == 0f)
+                {
+                    return; // No repair to apply
+                }
+
+                // Apply repair to hit points (clamped to maximum)
+                float newHitPoints = Mathf.Min(HitPoints.Max, HitPoints.Current + repairAmount);
+                HitPoints.SetCurrent(newHitPoints);
+
+                // Update unit profile to reflect current strength
+                if (UnitProfile != null)
+                {
+                    UnitProfile.UpdateCurrentProfile((int)HitPoints.Current);
+                }
+
+                // Update efficiency level based on new damage state
+                UpdateEfficiencyFromDamage();
+            }
+            catch (Exception e)
+            {
+                AppService.Instance.HandleException(CLASS_NAME, "Repair", e);
+                throw;
+            }
+        }
+
+        /// <summary>
+        /// Consumes supplies for unit operations.
+        /// </summary>
+        /// <param name="amount">Amount of supplies to consume</param>
+        /// <returns>True if supplies were consumed, false if insufficient</returns>
+        public bool ConsumeSupplies(float amount)
+        {
+            try
+            {
+                if (amount < 0f)
+                {
+                    throw new ArgumentException("Supply amount cannot be negative", nameof(amount));
+                }
+
+                if (amount == 0f)
+                {
+                    return true; // No supplies to consume
+                }
+
+                if (DaysSupply.Current >= amount)
+                {
+                    DaysSupply.SetCurrent(DaysSupply.Current - amount);
+                    return true;
+                }
+
+                return false; // Insufficient supplies
+            }
+            catch (Exception e)
+            {
+                AppService.Instance.HandleException(CLASS_NAME, "ConsumeSupplies", e);
+                return false;
+            }
+        }
+
+        /// <summary>
+        /// Receives supplies from external source (depot, transport, etc.).
+        /// </summary>
+        /// <param name="amount">Amount of supplies offered</param>
+        /// <returns>Actual amount of supplies received (may be less than offered due to capacity)</returns>
+        public float ReceiveSupplies(float amount)
+        {
+            try
+            {
+                if (amount < 0f)
+                {
+                    throw new ArgumentException("Supply amount cannot be negative", nameof(amount));
+                }
+
+                if (amount == 0f)
+                {
+                    return 0f; // No supplies offered
+                }
+
+                // Calculate how much we can actually receive
+                float availableCapacity = DaysSupply.Max - DaysSupply.Current;
+                float actualAmount = Mathf.Min(amount, availableCapacity);
+
+                // Add supplies
+                DaysSupply.SetCurrent(DaysSupply.Current + actualAmount);
+
+                return actualAmount;
+            }
+            catch (Exception e)
+            {
+                AppService.Instance.HandleException(CLASS_NAME, "ReceiveSupplies", e);
+                return 0f;
+            }
+        }
+
+        /// <summary>
+        /// Checks if the unit is destroyed (no hit points remaining).
+        /// </summary>
+        /// <returns>True if the unit is destroyed</returns>
+        public bool IsDestroyed()
+        {
+            return HitPoints.Current <= 0f;
+        }
+
+        /// <summary>
+        /// Checks if the unit can operate effectively (has minimum supplies and hit points).
+        /// </summary>
+        /// <returns>True if the unit can perform operations</returns>
+        public bool CanOperate()
+        {
+            try
+            {
+                // Must have hit points to operate
+                if (IsDestroyed())
+                {
+                    return false;
+                }
+
+                // Must have some supplies for most operations
+                // Allow emergency operations with very low supplies
+                if (DaysSupply.Current < 0.1f)
+                {
+                    return false;
+                }
+
+                return true;
+            }
+            catch (Exception e)
+            {
+                AppService.Instance.HandleException(CLASS_NAME, "CanOperate", e);
+                return false;
+            }
+        }
+
+        /// <summary>
+        /// Gets the combat effectiveness as a percentage based on current hit points.
+        /// </summary>
+        /// <returns>Combat effectiveness from 0.0 to 1.0</returns>
+        public float GetCombatEffectiveness()
+        {
+            try
+            {
+                if (HitPoints.Max <= 0f)
+                {
+                    return 0f;
+                }
+
+                return HitPoints.Current / HitPoints.Max;
+            }
+            catch (Exception e)
+            {
+                AppService.Instance.HandleException(CLASS_NAME, "GetCombatEffectiveness", e);
+                return 0f;
+            }
+        }
+
+        /// <summary>
+        /// Gets the supply status as a percentage of maximum capacity.
+        /// </summary>
+        /// <returns>Supply status from 0.0 to 1.0</returns>
+        public float GetSupplyStatus()
+        {
+            try
+            {
+                if (DaysSupply.Max <= 0f)
+                {
+                    return 0f;
+                }
+
+                return DaysSupply.Current / DaysSupply.Max;
+            }
+            catch (Exception e)
+            {
+                AppService.Instance.HandleException(CLASS_NAME, "GetSupplyStatus", e);
+                return 0f;
+            }
+        }
+
+        /// <summary>
+        /// Checks if the unit has adequate supplies for operations.
+        /// </summary>
+        /// <param name="threshold">Supply threshold percentage (default 0.25 = 25%)</param>
+        /// <returns>True if supplies are above threshold</returns>
+        public bool HasAdequateSupplies(float threshold = 0.25f)
+        {
+            return GetSupplyStatus() >= threshold;
+        }
+
+        /// <summary>
+        /// Updates efficiency level based on current damage state.
+        /// </summary>
+        private void UpdateEfficiencyFromDamage()
+        {
+            try
+            {
+                float effectiveness = GetCombatEffectiveness();
+
+                // Use reflection to set EfficiencyLevel since it has private setter
+                var unitType = typeof(CombatUnit);
+                var efficiencyProperty = unitType.GetProperty("EfficiencyLevel");
+
+                EfficiencyLevel newEfficiency = effectiveness switch
+                {
+                    >= 0.9f => EfficiencyLevel.FullyOperational,
+                    >= 0.7f => EfficiencyLevel.Operational,
+                    >= 0.4f => EfficiencyLevel.DegradedOperations,
+                    > 0f => EfficiencyLevel.StaticOperations,
+                    _ => EfficiencyLevel.StaticOperations
+                };
+
+                efficiencyProperty?.SetValue(this, newEfficiency);
+            }
+            catch (Exception e)
+            {
+                AppService.Instance.HandleException(CLASS_NAME, "UpdateEfficiencyFromDamage", e);
+            }
+        }
+
+        #endregion // Damage and Supply Systems
 
 
         #region ICloneable Implementation
@@ -606,7 +1530,67 @@ namespace HammerAndSickle.Models
         {
             try
             {
-                return null; // Implement deep copy logic here
+                // Create new unit using constructor with same core properties
+                // This ensures proper initialization and generates a new UnitID
+                var clone = new CombatUnit(
+                    this.UnitName,
+                    this.UnitType,
+                    this.Classification,
+                    this.Role,
+                    this.Side,
+                    this.Nationality,
+                    this.DeployedProfile,      // Shared reference
+                    this.MountedProfile,       // Shared reference  
+                    this.UnitProfile,          // Shared reference
+                    this.IsTransportable,
+                    this.IsLandBase,
+                    this.LandBaseFacility      // Shared reference
+                );
+
+                // Deep copy all StatsMaxCurrent objects by reconstructing them
+                // This overwrites the default values set by the constructor
+                clone.HitPoints = new StatsMaxCurrent(this.HitPoints.Max, this.HitPoints.Current);
+                clone.DaysSupply = new StatsMaxCurrent(this.DaysSupply.Max, this.DaysSupply.Current);
+                clone.MovementPoints = new StatsMaxCurrent(this.MovementPoints.Max, this.MovementPoints.Current);
+                clone.MoveActions = new StatsMaxCurrent(this.MoveActions.Max, this.MoveActions.Current);
+                clone.CombatActions = new StatsMaxCurrent(this.CombatActions.Max, this.CombatActions.Current);
+                clone.DeploymentActions = new StatsMaxCurrent(this.DeploymentActions.Max, this.DeploymentActions.Current);
+                clone.OpportunityActions = new StatsMaxCurrent(this.OpportunityActions.Max, this.OpportunityActions.Current);
+                clone.IntelActions = new StatsMaxCurrent(this.IntelActions.Max, this.IntelActions.Current);
+
+                // Copy per-unit state data
+                clone.SetExperience(this.ExperiencePoints); // This also sets ExperienceLevel correctly
+
+                // Copy properties with private setters using reflection
+                var cloneType = typeof(CombatUnit);
+
+                // Copy CommandingOfficer (shared reference)
+                cloneType.GetProperty("CommandingOfficer")
+                    ?.SetValue(clone, this.CommandingOfficer);
+
+                // Copy state properties
+                cloneType.GetProperty("EfficiencyLevel")
+                    ?.SetValue(clone, this.EfficiencyLevel);
+                cloneType.GetProperty("IsMounted")
+                    ?.SetValue(clone, this.IsMounted);
+                cloneType.GetProperty("CombatState")
+                    ?.SetValue(clone, this.CombatState);
+                cloneType.GetProperty("MapPos")
+                    ?.SetValue(clone, this.MapPos);
+
+                // Copy unresolved reference fields (should be empty in normal cloning scenarios)
+                cloneType.GetField("unresolvedDeployedProfileID", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance)
+                    ?.SetValue(clone, this.unresolvedDeployedProfileID);
+                cloneType.GetField("unresolvedMountedProfileID", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance)
+                    ?.SetValue(clone, this.unresolvedMountedProfileID);
+                cloneType.GetField("unresolvedUnitProfileID", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance)
+                    ?.SetValue(clone, this.unresolvedUnitProfileID);
+                cloneType.GetField("unresolvedLandBaseProfileID", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance)
+                    ?.SetValue(clone, this.unresolvedLandBaseProfileID);
+                cloneType.GetField("unresolvedLeaderID", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance)
+                    ?.SetValue(clone, this.unresolvedLeaderID);
+
+                return clone;
             }
             catch (Exception e)
             {
@@ -681,5 +1665,202 @@ namespace HammerAndSickle.Models
         }
 
         #endregion // ISerializable Implementation
+
+
+        #region Serialization Support Methods
+
+        /// <summary>
+        /// Gets the list of unresolved unit IDs from deserialization.
+        /// Used to check if unit references need to be resolved.
+        /// </summary>
+        public IReadOnlyList<string> GetUnresolvedUnitIDs()
+        {
+            var unresolvedIDs = new List<string>();
+
+            // Currently CombatUnit doesn't store references to other CombatUnits
+            // This method exists for interface consistency and future expansion
+
+            return unresolvedIDs.AsReadOnly();
+        }
+
+        /// <summary>
+        /// Resolves unit references after deserialization.
+        /// Called by game state manager with reconstructed unit objects.
+        /// </summary>
+        /// <param name="unitLookup">Dictionary mapping unit IDs to CombatUnit instances</param>
+        public void ResolveUnitReferences(Dictionary<string, CombatUnit> unitLookup)
+        {
+            try
+            {
+                // Currently CombatUnit doesn't store references to other CombatUnits
+                // This method exists for interface consistency and future expansion
+                throw new NotImplementedException("CombatUnit unit reference resolution not yet implemented");
+            }
+            catch (Exception e)
+            {
+                AppService.Instance.HandleException(CLASS_NAME, "ResolveUnitReferences", e);
+                throw;
+            }
+        }
+
+        /// <summary>
+        /// Resolves profile references after deserialization.
+        /// Called by game state manager with reconstructed profile objects.
+        /// </summary>
+        /// <param name="weaponProfileLookup">Dictionary mapping weapon system IDs to WeaponSystemProfile instances</param>
+        /// <param name="unitProfileLookup">Dictionary mapping unit profile IDs to UnitProfile instances</param>
+        /// <param name="landBaseLookup">Dictionary mapping land base IDs to LandBaseFacility instances</param>
+        public void ResolveProfileReferences(
+            Dictionary<string, WeaponSystemProfile> weaponProfileLookup,
+            Dictionary<string, UnitProfile> unitProfileLookup,
+            Dictionary<string, LandBaseFacility> landBaseLookup)
+        {
+            try
+            {
+                // Resolve WeaponSystemProfile references
+                if (!string.IsNullOrEmpty(unresolvedDeployedProfileID))
+                {
+                    if (weaponProfileLookup.TryGetValue(unresolvedDeployedProfileID, out WeaponSystemProfile deployedProfile))
+                    {
+                        DeployedProfile = deployedProfile;
+                        unresolvedDeployedProfileID = "";
+                    }
+                    else
+                    {
+                        AppService.Instance.HandleException(CLASS_NAME, "ResolveProfileReferences",
+                            new KeyNotFoundException($"Deployed profile {unresolvedDeployedProfileID} not found in lookup dictionary"));
+                    }
+                }
+
+                if (!string.IsNullOrEmpty(unresolvedMountedProfileID))
+                {
+                    if (weaponProfileLookup.TryGetValue(unresolvedMountedProfileID, out WeaponSystemProfile mountedProfile))
+                    {
+                        MountedProfile = mountedProfile;
+                        unresolvedMountedProfileID = "";
+                    }
+                    else
+                    {
+                        AppService.Instance.HandleException(CLASS_NAME, "ResolveProfileReferences",
+                            new KeyNotFoundException($"Mounted profile {unresolvedMountedProfileID} not found in lookup dictionary"));
+                    }
+                }
+
+                // Resolve UnitProfile reference
+                if (!string.IsNullOrEmpty(unresolvedUnitProfileID))
+                {
+                    if (unitProfileLookup.TryGetValue(unresolvedUnitProfileID, out UnitProfile unitProfile))
+                    {
+                        UnitProfile = unitProfile;
+                        unresolvedUnitProfileID = "";
+                    }
+                    else
+                    {
+                        AppService.Instance.HandleException(CLASS_NAME, "ResolveProfileReferences",
+                            new KeyNotFoundException($"Unit profile {unresolvedUnitProfileID} not found in lookup dictionary"));
+                    }
+                }
+
+                // Resolve LandBaseFacility reference
+                if (!string.IsNullOrEmpty(unresolvedLandBaseProfileID))
+                {
+                    if (landBaseLookup.TryGetValue(unresolvedLandBaseProfileID, out LandBaseFacility landBase))
+                    {
+                        LandBaseFacility = landBase;
+                        unresolvedLandBaseProfileID = "";
+                    }
+                    else
+                    {
+                        AppService.Instance.HandleException(CLASS_NAME, "ResolveProfileReferences",
+                            new KeyNotFoundException($"Land base profile {unresolvedLandBaseProfileID} not found in lookup dictionary"));
+                    }
+                }
+
+                throw new NotImplementedException("CombatUnit profile reference resolution not yet implemented");
+            }
+            catch (Exception e)
+            {
+                AppService.Instance.HandleException(CLASS_NAME, "ResolveProfileReferences", e);
+                throw;
+            }
+        }
+
+        /// <summary>
+        /// Resolves leader references after deserialization.
+        /// Called by game state manager with reconstructed leader objects.
+        /// </summary>
+        /// <param name="leaderLookup">Dictionary mapping leader IDs to Leader instances</param>
+        public void ResolveLeaderReferences(Dictionary<string, Leader> leaderLookup)
+        {
+            try
+            {
+                if (!string.IsNullOrEmpty(unresolvedLeaderID))
+                {
+                    if (leaderLookup.TryGetValue(unresolvedLeaderID, out Leader leader))
+                    {
+                        CommandingOfficer = leader;
+                        unresolvedLeaderID = "";
+                    }
+                    else
+                    {
+                        AppService.Instance.HandleException(CLASS_NAME, "ResolveLeaderReferences",
+                            new KeyNotFoundException($"Leader {unresolvedLeaderID} not found in lookup dictionary"));
+                    }
+                }
+
+                throw new NotImplementedException("CombatUnit leader reference resolution not yet implemented");
+            }
+            catch (Exception e)
+            {
+                AppService.Instance.HandleException(CLASS_NAME, "ResolveLeaderReferences", e);
+                throw;
+            }
+        }
+
+        /// <summary>
+        /// Checks if there are unresolved references that need to be resolved.
+        /// </summary>
+        /// <returns>True if any resolution methods need to be called</returns>
+        public bool HasUnresolvedReferences()
+        {
+            return !string.IsNullOrEmpty(unresolvedDeployedProfileID) ||
+                   !string.IsNullOrEmpty(unresolvedMountedProfileID) ||
+                   !string.IsNullOrEmpty(unresolvedUnitProfileID) ||
+                   !string.IsNullOrEmpty(unresolvedLandBaseProfileID) ||
+                   !string.IsNullOrEmpty(unresolvedLeaderID);
+        }
+
+        /// <summary>
+        /// Gets the list of profile IDs that need resolution for external reference tracking.
+        /// Used by game state manager to track dependencies.
+        /// </summary>
+        public Dictionary<string, string> GetUnresolvedProfileIDs()
+        {
+            var unresolvedProfiles = new Dictionary<string, string>();
+
+            if (!string.IsNullOrEmpty(unresolvedDeployedProfileID))
+                unresolvedProfiles["DeployedProfile"] = unresolvedDeployedProfileID;
+
+            if (!string.IsNullOrEmpty(unresolvedMountedProfileID))
+                unresolvedProfiles["MountedProfile"] = unresolvedMountedProfileID;
+
+            if (!string.IsNullOrEmpty(unresolvedUnitProfileID))
+                unresolvedProfiles["UnitProfile"] = unresolvedUnitProfileID;
+
+            if (!string.IsNullOrEmpty(unresolvedLandBaseProfileID))
+                unresolvedProfiles["LandBaseFacility"] = unresolvedLandBaseProfileID;
+
+            return unresolvedProfiles;
+        }
+
+        /// <summary>
+        /// Gets the unresolved leader ID for external reference tracking.
+        /// </summary>
+        public string GetUnresolvedLeaderID()
+        {
+            return unresolvedLeaderID;
+        }
+
+        #endregion // Serialization Support Methods
     }
 }
