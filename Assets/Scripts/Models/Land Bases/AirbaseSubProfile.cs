@@ -23,8 +23,8 @@ namespace HammerAndSickle.Models
 
         #region Fields
 
-        private List<CombatUnit> airUnitsAttached = new List<CombatUnit>();
-        private List<string> attachedUnitIDs = new List<string>();           // Store IDs during deserialization
+        private List<CombatUnit> airUnitsAttached = new ();
+        private List<string> attachedUnitIDs = new ();           // Store IDs during deserialization
 
         #endregion // Fields
 
@@ -72,7 +72,7 @@ namespace HammerAndSickle.Models
             }
             catch (Exception e)
             {
-                AppService.Instance?.HandleException(CLASS_NAME, "DeserializationConstructor", e);
+                AppService.Instance.HandleException(CLASS_NAME, "DeserializationConstructor", e);
                 throw;
             }
         }
@@ -115,7 +115,7 @@ namespace HammerAndSickle.Models
             }
             catch (Exception e)
             {
-                AppService.Instance?.HandleException(CLASS_NAME, "AddAirUnit", e);
+                AppService.Instance.HandleException(CLASS_NAME, "AddAirUnit", e);
                 throw;
             }
         }
@@ -133,7 +133,7 @@ namespace HammerAndSickle.Models
             }
             catch (Exception e)
             {
-                AppService.Instance?.HandleException(CLASS_NAME, "RemoveAirUnit", e);
+                AppService.Instance.HandleException(CLASS_NAME, "RemoveAirUnit", e);
                 return false;
             }
         }
@@ -157,7 +157,7 @@ namespace HammerAndSickle.Models
             }
             catch (Exception e)
             {
-                AppService.Instance?.HandleException(CLASS_NAME, "RemoveAirUnitByID", e);
+                AppService.Instance.HandleException(CLASS_NAME, "RemoveAirUnitByID", e);
                 return false;
             }
         }
@@ -175,7 +175,7 @@ namespace HammerAndSickle.Models
             }
             catch (Exception e)
             {
-                AppService.Instance?.HandleException(CLASS_NAME, "GetAirUnitByID", e);
+                AppService.Instance.HandleException(CLASS_NAME, "GetAirUnitByID", e);
                 return null;
             }
         }
@@ -213,7 +213,7 @@ namespace HammerAndSickle.Models
             }
             catch (Exception e)
             {
-                AppService.Instance?.HandleException(CLASS_NAME, "ClearAllAirUnits", e);
+                AppService.Instance.HandleException(CLASS_NAME, "ClearAllAirUnits", e);
             }
         }
 
@@ -307,14 +307,14 @@ namespace HammerAndSickle.Models
                         else
                         {
                             // Log warning about incorrect unit type but don't throw
-                            AppService.Instance?.HandleException(CLASS_NAME, "ResolveUnitReferences",
+                            AppService.Instance.HandleException(CLASS_NAME, "ResolveUnitReferences",
                                 new InvalidOperationException($"Unit {unitID} is not an air unit (Type: {unit.UnitType})"));
                         }
                     }
                     else
                     {
                         // Log warning about missing unit but don't throw
-                        AppService.Instance?.HandleException(CLASS_NAME, "ResolveUnitReferences",
+                        AppService.Instance.HandleException(CLASS_NAME, "ResolveUnitReferences",
                             new KeyNotFoundException($"Unit {unitID} not found in lookup dictionary"));
                     }
                 }
@@ -323,7 +323,7 @@ namespace HammerAndSickle.Models
             }
             catch (Exception e)
             {
-                AppService.Instance?.HandleException(CLASS_NAME, "ResolveUnitReferences", e);
+                AppService.Instance.HandleException(CLASS_NAME, "ResolveUnitReferences", e);
             }
         }
 
@@ -369,7 +369,7 @@ namespace HammerAndSickle.Models
             }
             catch (Exception e)
             {
-                AppService.Instance?.HandleException(CLASS_NAME, "GetObjectData", e);
+                AppService.Instance.HandleException(CLASS_NAME, "GetObjectData", e);
                 throw;
             }
         }

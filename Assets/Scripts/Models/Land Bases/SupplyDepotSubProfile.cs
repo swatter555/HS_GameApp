@@ -65,7 +65,7 @@ namespace HammerAndSickle.Models
             }
             catch (Exception e)
             {
-                AppService.Instance?.HandleException(CLASS_NAME, "DefaultConstructor", e);
+                AppService.Instance.HandleException(CLASS_NAME, "DefaultConstructor", e);
                 throw;
             }
         }
@@ -89,7 +89,7 @@ namespace HammerAndSickle.Models
             }
             catch (Exception e)
             {
-                AppService.Instance?.HandleException(CLASS_NAME, "Constructor", e);
+                AppService.Instance.HandleException(CLASS_NAME, "Constructor", e);
                 throw;
             }
         }
@@ -120,7 +120,7 @@ namespace HammerAndSickle.Models
             }
             catch (Exception e)
             {
-                AppService.Instance?.HandleException(CLASS_NAME, "DeserializationConstructor", e);
+                AppService.Instance.HandleException(CLASS_NAME, "DeserializationConstructor", e);
                 throw;
             }
         }
@@ -159,7 +159,7 @@ namespace HammerAndSickle.Models
             }
             catch (Exception e)
             {
-                AppService.Instance?.HandleException(CLASS_NAME, "AddSupplies", e);
+                AppService.Instance.HandleException(CLASS_NAME, "AddSupplies", e);
                 throw;
             }
         }
@@ -180,7 +180,7 @@ namespace HammerAndSickle.Models
             }
             catch (Exception e)
             {
-                AppService.Instance?.HandleException(CLASS_NAME, "RemoveSupplies", e);
+                AppService.Instance.HandleException(CLASS_NAME, "RemoveSupplies", e);
                 return 0f;
             }
         }
@@ -206,7 +206,7 @@ namespace HammerAndSickle.Models
             }
             catch (Exception e)
             {
-                AppService.Instance?.HandleException(CLASS_NAME, "GenerateSupplies", e);
+                AppService.Instance.HandleException(CLASS_NAME, "GenerateSupplies", e);
                 return 0f;
             }
         }
@@ -238,7 +238,7 @@ namespace HammerAndSickle.Models
             }
             catch (Exception e)
             {
-                AppService.Instance?.HandleException(CLASS_NAME, "CanSupplyUnitAt", e);
+                AppService.Instance.HandleException(CLASS_NAME, "CanSupplyUnitAt", e);
                 return false;
             }
         }
@@ -289,7 +289,7 @@ namespace HammerAndSickle.Models
             }
             catch (Exception e)
             {
-                AppService.Instance?.HandleException(CLASS_NAME, "SupplyUnit", e);
+                AppService.Instance.HandleException(CLASS_NAME, "SupplyUnit", e);
                 return 0f;
             }
         }
@@ -303,7 +303,7 @@ namespace HammerAndSickle.Models
             }
             catch (Exception e)
             {
-                AppService.Instance?.HandleException(CLASS_NAME, "GetStockpilePercentage", e);
+                AppService.Instance.HandleException(CLASS_NAME, "GetStockpilePercentage", e);
                 return 0f;
             }
         }
@@ -350,7 +350,7 @@ namespace HammerAndSickle.Models
             }
             catch (Exception e)
             {
-                AppService.Instance?.HandleException(CLASS_NAME, "UpgradeDepotSize", e);
+                AppService.Instance.HandleException(CLASS_NAME, "UpgradeDepotSize", e);
                 return false;
             }
         }
@@ -379,7 +379,7 @@ namespace HammerAndSickle.Models
             }
             catch (Exception e)
             {
-                AppService.Instance?.HandleException(CLASS_NAME, "UpgradeGenerationRate", e);
+                AppService.Instance.HandleException(CLASS_NAME, "UpgradeGenerationRate", e);
                 return false;
             }
         }
@@ -408,7 +408,7 @@ namespace HammerAndSickle.Models
             }
             catch (Exception e)
             {
-                AppService.Instance?.HandleException(CLASS_NAME, "UpgradeSupplyProjection", e);
+                AppService.Instance.HandleException(CLASS_NAME, "UpgradeSupplyProjection", e);
                 return false;
             }
         }
@@ -426,7 +426,7 @@ namespace HammerAndSickle.Models
             }
             catch (Exception e)
             {
-                AppService.Instance?.HandleException(CLASS_NAME, "UpgradeSupplyPenetration", e);
+                AppService.Instance.HandleException(CLASS_NAME, "UpgradeSupplyPenetration", e);
                 return false;
             }
         }
@@ -468,7 +468,7 @@ namespace HammerAndSickle.Models
             }
             catch (Exception e)
             {
-                AppService.Instance?.HandleException(CLASS_NAME, "EnableAirSupply", e);
+                AppService.Instance.HandleException(CLASS_NAME, "EnableAirSupply", e);
                 return false;
             }
         }
@@ -485,7 +485,7 @@ namespace HammerAndSickle.Models
             }
             catch (Exception e)
             {
-                AppService.Instance?.HandleException(CLASS_NAME, "EnableNavalSupply", e);
+                AppService.Instance.HandleException(CLASS_NAME, "EnableNavalSupply", e);
                 return false;
             }
         }
@@ -532,7 +532,7 @@ namespace HammerAndSickle.Models
             }
             catch (Exception e)
             {
-                AppService.Instance?.HandleException(CLASS_NAME, "PerformAirSupply", e);
+                AppService.Instance.HandleException(CLASS_NAME, "PerformAirSupply", e);
                 return 0f;
             }
         }
@@ -580,7 +580,7 @@ namespace HammerAndSickle.Models
             }
             catch (Exception e)
             {
-                AppService.Instance?.HandleException(CLASS_NAME, "PerformNavalSupply", e);
+                AppService.Instance.HandleException(CLASS_NAME, "PerformNavalSupply", e);
                 return 0f;
             }
         }
@@ -599,7 +599,7 @@ namespace HammerAndSickle.Models
             }
             catch (Exception e)
             {
-                AppService.Instance?.HandleException(CLASS_NAME, "OnNewTurn", e);
+                AppService.Instance.HandleException(CLASS_NAME, "OnNewTurn", e);
             }
         }
 
@@ -609,7 +609,7 @@ namespace HammerAndSickle.Models
             {
                 var clone = new SupplyDepotSubProfile();
 
-                // Copy basic information (except ID which is generated new)
+                // Copy basic information (except LeaderID which is generated new)
                 clone.DepotName = this.DepotName;
                 clone.Side = this.Side;
 
@@ -629,7 +629,7 @@ namespace HammerAndSickle.Models
             }
             catch (Exception e)
             {
-                AppService.Instance?.HandleException(CLASS_NAME, "Clone", e);
+                AppService.Instance.HandleException(CLASS_NAME, "Clone", e);
                 throw;
             }
         }
@@ -665,7 +665,7 @@ namespace HammerAndSickle.Models
             }
             catch (Exception e)
             {
-                AppService.Instance?.HandleException(CLASS_NAME, "GetObjectData", e);
+                AppService.Instance.HandleException(CLASS_NAME, "GetObjectData", e);
                 throw;
             }
         }

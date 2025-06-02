@@ -19,6 +19,17 @@ namespace HammerAndSickle.Models
 
         #endregion
 
+        #region Fields
+
+        // Temporary fields for deserialization reference resolution
+        private string unresolvedDeployedProfileID = "";
+        private string unresolvedMountedProfileID = "";
+        private string unresolvedUnitProfileID = "";
+        private string unresolvedLandBaseProfileID = "";
+        private string unresolvedLeaderID = "";
+
+        #endregion // Fields
+
 
         #region Properties
 
@@ -47,11 +58,11 @@ namespace HammerAndSickle.Models
         public StatsMaxCurrent CombatActions { get; private set; }
         public StatsMaxCurrent DeploymentActions { get; private set; }
         public StatsMaxCurrent OpportunityActions { get; private set; }
-        public StatsMaxCurrent IntelGatheringActions { get; private set; }
+        public StatsMaxCurrent IntelActions { get; private set; }
 
         // State data using StatsMaxCurrent where appropriate
         public int ExperiencePoints { get; private set; }
-        public ExperienceLevel _ExperienceLevel { get; private set; }
+        public ExperienceLevel ExperienceLevel { get; private set; }
         public EfficiencyLevel EfficiencyLevel { get; private set; }
         public bool IsMounted { get; private set; }
         public CombatState CombatState { get; private set; }
@@ -145,7 +156,7 @@ namespace HammerAndSickle.Models
 
                 // Initialize state with default values
                 ExperiencePoints = 0;
-                _ExperienceLevel = ExperienceLevel.Raw;
+                ExperienceLevel = ExperienceLevel.Raw;
                 EfficiencyLevel = EfficiencyLevel.FullyOperational;
                 IsMounted = false;
                 CombatState = CombatState.Deployed;
@@ -167,16 +178,92 @@ namespace HammerAndSickle.Models
             }
         }
 
-        // Deserialization constructor.
+        /// <summary>
+        /// Deserialization constructor for loading CombatUnit from saved data.
+        /// </summary>
+        /// <param name="info">Serialization info containing saved data</param>
+        /// <param name="context">Streaming context for deserialization</param>
         protected CombatUnit(SerializationInfo info, StreamingContext context)
         {
             try
             {
-                // Implement deserialization logic here
+                // Load basic properties
+                UnitName = info.GetString(nameof(UnitName));
+                UnitID = info.GetString(nameof(UnitID));
+                UnitType = (UnitType)info.GetValue(nameof(UnitType), typeof(UnitType));
+                Classification = (UnitClassification)info.GetValue(nameof(Classification), typeof(UnitClassification));
+                Role = (UnitRole)info.GetValue(nameof(Role), typeof(UnitRole));
+                Side = (Side)info.GetValue(nameof(Side), typeof(Side));
+                Nationality = (Nationality)info.GetValue(nameof(Nationality), typeof(Nationality));
+                IsTransportable = info.GetBoolean(nameof(IsTransportable));
+                IsLandBase = info.GetBoolean(nameof(IsLandBase));
+
+                // Store profile IDs for later resolution (don't resolve objects yet)
+                unresolvedDeployedProfileID = info.GetString("DeployedProfileID");
+                unresolvedMountedProfileID = info.GetString("MountedProfileID");
+                unresolvedUnitProfileID = info.GetString("UnitProfileID");
+                unresolvedLandBaseProfileID = info.GetString("LandBaseProfileID");
+                unresolvedLeaderID = info.GetString("LeaderID");
+
+                // Deserialize owned StatsMaxCurrent objects
+                HitPoints = new StatsMaxCurrent(
+                    info.GetSingle("HitPoints_Max"),
+                    info.GetSingle("HitPoints_Current")
+                );
+
+                DaysSupply = new StatsMaxCurrent(
+                    info.GetSingle("DaysSupply_Max"),
+                    info.GetSingle("DaysSupply_Current")
+                );
+
+                MovementPoints = new StatsMaxCurrent(
+                    info.GetSingle("MovementPoints_Max"),
+                    info.GetSingle("MovementPoints_Current")
+                );
+
+                MoveActions = new StatsMaxCurrent(
+                    info.GetSingle("MoveActions_Max"),
+                    info.GetSingle("MoveActions_Current")
+                );
+
+                CombatActions = new StatsMaxCurrent(
+                    info.GetSingle("CombatActions_Max"),
+                    info.GetSingle("CombatActions_Current")
+                );
+
+                DeploymentActions = new StatsMaxCurrent(
+                    info.GetSingle("DeploymentActions_Max"),
+                    info.GetSingle("DeploymentActions_Current")
+                );
+
+                OpportunityActions = new StatsMaxCurrent(
+                    info.GetSingle("OpportunityActions_Max"),
+                    info.GetSingle("OpportunityActions_Current")
+                );
+
+                IntelActions = new StatsMaxCurrent(
+                    info.GetSingle("IntelActions_Max"),
+                    info.GetSingle("IntelActions_Current")
+                );
+
+                // Load simple properties
+                ExperiencePoints = info.GetInt32(nameof(ExperiencePoints));
+                ExperienceLevel = (ExperienceLevel)info.GetValue(nameof(ExperienceLevel), typeof(ExperienceLevel));
+                EfficiencyLevel = (EfficiencyLevel)info.GetValue(nameof(EfficiencyLevel), typeof(EfficiencyLevel));
+                IsMounted = info.GetBoolean(nameof(IsMounted));
+                CombatState = (CombatState)info.GetValue(nameof(CombatState), typeof(CombatState));
+                MapPos = (Vector2)info.GetValue(nameof(MapPos), typeof(Vector2));
+
+                // Leave all object references null - they will be resolved later
+                DeployedProfile = null;
+                MountedProfile = null;
+                UnitProfile = null;
+                LandBaseProfile = null;
+                CommandingOfficer = null;
             }
             catch (Exception e)
             {
-                AppService.Instance.HandleException(CLASS_NAME, "DeserializationConstructor", e);
+                AppService.Instance.HandleException(CLASS_NAME, nameof(CombatUnit), e);
                 throw;
             }
         }
@@ -241,7 +328,7 @@ namespace HammerAndSickle.Models
             CombatActions = new StatsMaxCurrent(combatActions);
             DeploymentActions = new StatsMaxCurrent(deploymentActions);
             OpportunityActions = new StatsMaxCurrent(opportunityActions);
-            IntelGatheringActions = new StatsMaxCurrent(intelActions);
+            IntelActions = new StatsMaxCurrent(intelActions);
         }
 
         /// <summary>
@@ -280,14 +367,14 @@ namespace HammerAndSickle.Models
                 if (points <= 0)
                     return false;
 
-                var previousLevel = _ExperienceLevel;
+                var previousLevel = ExperienceLevel;
                 ExperiencePoints += points;
 
                 // Check if we've advanced to a new level
                 var newLevel = CalculateExperienceLevel(ExperiencePoints);
                 if (newLevel != previousLevel)
                 {
-                    _ExperienceLevel = newLevel;
+                    ExperienceLevel = newLevel;
                     OnExperienceLevelChanged(previousLevel, newLevel);
                     return true;
                 }
@@ -314,7 +401,7 @@ namespace HammerAndSickle.Models
                     points = 0;
 
                 ExperiencePoints = points;
-                _ExperienceLevel = CalculateExperienceLevel(points);
+                ExperienceLevel = CalculateExperienceLevel(points);
             }
             catch (Exception e)
             {
@@ -350,7 +437,7 @@ namespace HammerAndSickle.Models
         /// <returns>Points needed for next level, or 0 if at max level</returns>
         public int GetPointsToNextLevel()
         {
-            return _ExperienceLevel switch
+            return ExperienceLevel switch
             {
                 ExperienceLevel.Raw => (int)ExperiencePointLevels.Green - ExperiencePoints,
                 ExperienceLevel.Green => (int)ExperiencePointLevels.Trained - ExperiencePoints,
@@ -371,11 +458,11 @@ namespace HammerAndSickle.Models
             var pointsToNext = GetPointsToNextLevel();
             if (pointsToNext > 0)
             {
-                return $"{_ExperienceLevel} ({ExperiencePoints} XP, {pointsToNext} to next)";
+                return $"{ExperienceLevel} ({ExperiencePoints} XP, {pointsToNext} to next)";
             }
             else
             {
-                return $"{_ExperienceLevel} (Max Level - {ExperiencePoints} XP)";
+                return $"{ExperienceLevel} (Max Level - {ExperiencePoints} XP)";
             }
         }
 
@@ -386,11 +473,11 @@ namespace HammerAndSickle.Models
         /// <returns>Progress percentage towards next level</returns>
         public float GetExperienceProgress()
         {
-            if (_ExperienceLevel == ExperienceLevel.Elite)
+            if (ExperienceLevel == ExperienceLevel.Elite)
                 return 1.0f;
 
-            int currentLevelMin = GetMinPointsForLevel(_ExperienceLevel);
-            int nextLevelMin = GetMinPointsForLevel(GetNextLevel(_ExperienceLevel));
+            int currentLevelMin = GetMinPointsForLevel(ExperienceLevel);
+            int nextLevelMin = GetMinPointsForLevel(GetNextLevel(ExperienceLevel));
 
             if (nextLevelMin == currentLevelMin)
                 return 1.0f;
@@ -445,7 +532,7 @@ namespace HammerAndSickle.Models
         /// <returns>True if unit is Veteran or Elite</returns>
         public bool IsExperienced()
         {
-            return _ExperienceLevel == ExperienceLevel.Veteran || _ExperienceLevel == ExperienceLevel.Elite;
+            return ExperienceLevel == ExperienceLevel.Veteran || ExperienceLevel == ExperienceLevel.Elite;
         }
 
         /// <summary>
@@ -454,7 +541,7 @@ namespace HammerAndSickle.Models
         /// <returns>True if unit is Elite</returns>
         public bool IsElite()
         {
-            return _ExperienceLevel == ExperienceLevel.Elite;
+            return ExperienceLevel == ExperienceLevel.Elite;
         }
 
         /// <summary>
@@ -477,7 +564,7 @@ namespace HammerAndSickle.Models
         /// <returns>Multiplier for combat effectiveness (1.0 = normal)</returns>
         public float GetExperienceMultiplier()
         {
-            return _ExperienceLevel switch
+            return ExperienceLevel switch
             {
                 ExperienceLevel.Raw => CUConstants.RAW_XP_MODIFIER,// -20% effectiveness
                 ExperienceLevel.Green => CUConstants.GREEN_XP_MODIFIER,// -10% effectiveness
@@ -503,7 +590,7 @@ namespace HammerAndSickle.Models
             CombatActions.ResetToMax();
             DeploymentActions.ResetToMax();
             OpportunityActions.ResetToMax();
-            IntelGatheringActions.ResetToMax();
+            IntelActions.ResetToMax();
         }
 
         /// <summary>
@@ -515,7 +602,8 @@ namespace HammerAndSickle.Models
             MovementPoints.ResetToMax();
         }
 
-        #endregion
+        #endregion // Public Methods
+
 
         #region ICloneable Implementation
 
@@ -532,23 +620,72 @@ namespace HammerAndSickle.Models
             }
         }
 
-        #endregion
+        #endregion // ICloneable Implementation
+
 
         #region ISerializable Implementation
 
+        /// <summary>
+        /// Serializes CombatUnit data for saving to file.
+        /// </summary>
+        /// <param name="info">Serialization info to store data</param>
+        /// <param name="context">Streaming context for serialization</param>
         public void GetObjectData(SerializationInfo info, StreamingContext context)
         {
             try
             {
-                // Implement serialization logic here
+                // Serialize basic properties
+                info.AddValue(nameof(UnitName), UnitName);
+                info.AddValue(nameof(UnitID), UnitID);
+                info.AddValue(nameof(UnitType), UnitType);
+                info.AddValue(nameof(Classification), Classification);
+                info.AddValue(nameof(Role), Role);
+                info.AddValue(nameof(Side), Side);
+                info.AddValue(nameof(Nationality), Nationality);
+                info.AddValue(nameof(IsTransportable), IsTransportable);
+                info.AddValue(nameof(IsLandBase), IsLandBase);
+
+                // Serialize profile references as IDs/names (not the objects themselves)
+                info.AddValue("DeployedProfileID", DeployedProfile?.Name ?? "");
+                info.AddValue("MountedProfileID", MountedProfile?.Name ?? "");
+                info.AddValue("UnitProfileID", UnitProfile?.Name ?? "");
+                //TODO: Uncomment when LandBaseProfile is implemented
+                //info.AddValue("LandBaseProfileID", LandBaseProfile?.Name ?? "");
+                info.AddValue("LeaderID", CommandingOfficer?.LeaderID ?? "");
+
+                // Serialize owned StatsMaxCurrent objects as Max/Current pairs
+                info.AddValue("HitPoints_Max", HitPoints.Max);
+                info.AddValue("HitPoints_Current", HitPoints.Current);
+                info.AddValue("DaysSupply_Max", DaysSupply.Max);
+                info.AddValue("DaysSupply_Current", DaysSupply.Current);
+                info.AddValue("MovementPoints_Max", MovementPoints.Max);
+                info.AddValue("MovementPoints_Current", MovementPoints.Current);
+                info.AddValue("MoveActions_Max", MoveActions.Max);
+                info.AddValue("MoveActions_Current", MoveActions.Current);
+                info.AddValue("CombatActions_Max", CombatActions.Max);
+                info.AddValue("CombatActions_Current", CombatActions.Current);
+                info.AddValue("DeploymentActions_Max", DeploymentActions.Max);
+                info.AddValue("DeploymentActions_Current", DeploymentActions.Current);
+                info.AddValue("OpportunityActions_Max", OpportunityActions.Max);
+                info.AddValue("OpportunityActions_Current", OpportunityActions.Current);
+                info.AddValue("IntelActions_Max", IntelActions.Max);
+                info.AddValue("IntelActions_Current", IntelActions.Current);
+
+                // Serialize simple properties
+                info.AddValue(nameof(ExperiencePoints), ExperiencePoints);
+                info.AddValue(nameof(ExperienceLevel), ExperienceLevel);
+                info.AddValue(nameof(EfficiencyLevel), EfficiencyLevel);
+                info.AddValue(nameof(IsMounted), IsMounted);
+                info.AddValue(nameof(CombatState), CombatState);
+                info.AddValue(nameof(MapPos), MapPos);
             }
             catch (Exception e)
             {
-                AppService.Instance.HandleException(CLASS_NAME, "GetObjectData", e);
+                AppService.Instance.HandleException(CLASS_NAME, nameof(GetObjectData), e);
                 throw;
             }
         }
 
-        #endregion
+        #endregion // ISerializable Implementation
     }
 }
