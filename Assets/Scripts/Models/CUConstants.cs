@@ -13,26 +13,36 @@ namespace HammerAndSickle.Models
         public const int ZOC_RANGE = 1;                 // Zone of Control Range
 
         // Movement constants for different unit types, in movement points.
-        public const int MECH_MOV = 12;
-        public const int MOT_MOV = 10;
-        public const int FOOT_MOV = 8;
+        public const int MECH_MOV      = 12;
+        public const int MOT_MOV       = 10;
+        public const int FOOT_MOV      = 8;
         public const int FIXEDWING_MOV = 100;
-        public const int HELO_MOV = 24;
+        public const int HELO_MOV      = 24;
 
         // WeaponSystem constants.
         public const int MAX_COMBAT_VALUE = 10;
         public const int MIN_COMBAT_VALUE = 0;
-        public const float MAX_RANGE = 25.0f;
-        public const float MIN_RANGE = 0.0f;
+        public const float MAX_RANGE      = 25.0f;
+        public const float MIN_RANGE      = 0.0f;
 
         // Experience level modifiers.
-        public const float RAW_XP_MODIFIER = 0.8f;         // -20% effectiveness
-        public const float GREEN_XP_MODIFIER = 0.9f;       // -10% effectiveness
-        public const float TRAINED_XP_MODIFIER = 1.0f;     // Normal effectiveness
+        public const float RAW_XP_MODIFIER         = 0.8f; // -20% effectiveness
+        public const float GREEN_XP_MODIFIER       = 0.9f; // -10% effectiveness
+        public const float TRAINED_XP_MODIFIER     = 1.0f; // Normal effectiveness
         public const float EXPERIENCED_XP_MODIFIER = 1.1f; // +10% effectiveness
-        public const float VETERAN_XP_MODIFIER = 1.2f;     // +20% effectiveness
-        public const float ELITE_XP_MODIFIER = 1.3f;       // +30% effectiveness
+        public const float VETERAN_XP_MODIFIER     = 1.2f; // +20% effectiveness
+        public const float ELITE_XP_MODIFIER       = 1.3f; // +30% effectiveness
 
+        public const float MOBILE_MOVEMENT_BONUS = 1.0f;           // Movement bonus for Mobile units without MountedProfile
+        public const float DEPLOYMENT_ACTION_MOVEMENT_COST = 0.5f; // Deployment actions cost 50% of max movement
+        public const float COMBAT_ACTION_MOVEMENT_COST = 0.25f;    // Combat actions cost 25% of max movement
+        public const float INTEL_ACTION_MOVEMENT_COST = 0.15f;     // Intel actions cost 15% of max movement
+
+        public const float COMBAT_MOD_MOBILE        = 0.9f; // Mobile units get 10% combat malus
+        public const float COMBAT_MOD_Deployed      = 1.0f; // Deployed units have no combat modifier
+        public const float COMBAT_MOD_HASTY_DEFENSE = 1.1f; // Hasty defense gives +10% combat bonus
+        public const float COMBAT_MOD_ENTRENCHED    = 1.2f; // Entrenched units get +20% combat bonus
+        public const float COMBAT_MOD_FORTIFIED     = 1.3f; // Fortified units get +30% combat bonus
 
         //================================
         //====== Leader Skills/Tree ======
@@ -212,7 +222,7 @@ namespace HammerAndSickle.Models
         //=======================
 
         // Maximum stockpile capacities by depot size
-        public static readonly Dictionary<DepotSize, float> MaxStockpileBySize = new Dictionary<DepotSize, float>
+        public static readonly Dictionary<DepotSize, float> MaxStockpileBySize = new()
         {
             { DepotSize.Small, 30f },
             { DepotSize.Medium, 50f },
@@ -221,7 +231,7 @@ namespace HammerAndSickle.Models
         };
 
         // Supply generation rates by level
-        public static readonly Dictionary<SupplyGenerationRate, float> GenerationRateValues = new Dictionary<SupplyGenerationRate, float>
+        public static readonly Dictionary<SupplyGenerationRate, float> GenerationRateValues = new()
         {
             { SupplyGenerationRate.Minimal, 1.0f },
             { SupplyGenerationRate.Basic, 2.0f },
@@ -231,7 +241,7 @@ namespace HammerAndSickle.Models
         };
 
         // Supply projection ranges in hexes
-        public static readonly Dictionary<SupplyProjection, int> ProjectionRangeValues = new Dictionary<SupplyProjection, int>
+        public static readonly Dictionary<SupplyProjection, int> ProjectionRangeValues = new()
         {
             { SupplyProjection.Local, 2 },
             { SupplyProjection.Extended, 4 },

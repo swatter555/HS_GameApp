@@ -1,4 +1,4 @@
-using HammerAndSickle.Services;
+﻿using HammerAndSickle.Services;
 using System;
 using System.Collections.Generic;
 using System.Runtime.Serialization;
@@ -7,9 +7,125 @@ using UnityEngine;
 namespace HammerAndSickle.Models
 {
     /// <summary>
-    /// Represents a military unit with identification, base stats, and optional transport mounting.
-    /// Implements an event-driven design pattern for state changes.
-    /// Uses StatsMaxCurrent for paired max/current value management.
+    /// Represents a military unit with comprehensive state management, combat capabilities, and serialization support.
+    /// Implements event-driven design patterns and uses StatsMaxCurrent for paired max/current value management.
+    /// Supports complex object relationships with proper reference resolution for saved game compatibility.
+    /// 
+    /// CORE SYSTEMS:
+    /// - Unit identification, classification, and metadata
+    /// - Action economy with deployment, combat, movement, opportunity, and intelligence actions
+    /// - Experience progression system with combat effectiveness modifiers
+    /// - Leader assignment with skill-based bonuses and reputation tracking
+    /// - Combat state transitions (Mobile ↔ Deployed ↔ HastyDefense ↔ Entrenched ↔ Fortified)
+    /// - Damage, repair, and supply management with efficiency calculations
+    /// - Position tracking and basic movement validation
+    /// - Profile switching between deployed and mounted configurations
+    /// 
+    /// KEY METHODS BY CATEGORY:
+    /// 
+    /// **Construction & Initialization:**
+    /// - CombatUnit() - Creates unit with full parameter validation
+    /// - InitializeActionCounts() - Sets action counts based on unit classification
+    /// - InitializeMovementPoints() - Sets movement based on unit type
+    /// 
+    /// **Turn Management:**
+    /// - RefreshAllActions() - Resets all action counts to maximum at turn start
+    /// - RefreshMovementPoints() - Resets movement points to maximum
+    /// 
+    /// **Experience System:**
+    /// - AddExperience(points) - Adds XP and checks for level advancement
+    /// - SetExperience(points) - Sets total XP directly (for loading saves)
+    /// - GetExperienceMultiplier() - Returns combat effectiveness modifier
+    /// - IsExperienced() / IsElite() - Checks for veteran/elite status
+    /// - GetExperienceDisplayString() - Returns formatted progress string
+    /// 
+    /// **Leader Management:**
+    /// - AssignLeader(leader) / RemoveLeader() - Leader assignment (TODO: implementation)
+    /// - GetLeaderBonuses() - Returns all active leader skill bonuses
+    /// - HasLeaderCapability(bonusType) - Checks for specific leader abilities
+    /// - AwardLeaderReputation() - Awards reputation for unit actions
+    /// - GetLeaderName/Rank/Grade() - Leader display information
+    /// 
+    /// **Action Economy:**
+    /// - ConsumeMoveAction/CombatAction/DeploymentAction() - Spends actions
+    /// - ConsumeMovementPoints(points) - Spends movement points
+    /// - CanConsume[ActionType]() - Validates action availability
+    /// - GetAvailableActions() - Returns current action counts
+    /// 
+    /// **Combat State Management:**
+    /// - SetCombatState(newState) - Changes combat posture with validation
+    /// - CanChangeToState(targetState) - Validates state transitions
+    /// - BeginEntrenchment() - Convenience method for defensive positioning
+    /// - GetValidStateTransitions() - Lists all possible state changes
+    /// - GetEffectiveWeaponProfile() - Returns active weapon profile
+    /// - GetCombatStateDefensiveBonus() - Returns defensive modifier
+    /// 
+    /// **Damage & Supply:**
+    /// - TakeDamage(damage) / Repair(repairAmount) - HP management
+    /// - ConsumeSupplies(amount) / ReceiveSupplies(amount) - Supply operations
+    /// - GetCombatEffectiveness() - Returns HP-based effectiveness (0.0-1.0)
+    /// - CanOperate() - Checks minimum operational requirements
+    /// - IsDestroyed() - Checks if unit has any HP remaining
+    /// 
+    /// **Position & Movement:**
+    /// - SetPosition(newPos) / GetPosition() - Map position management
+    /// - GetDistanceTo(position/unit) - Distance calculations
+    /// - CanMoveTo(targetPos) - Basic movement validation
+    /// - IsAtPosition(position, tolerance) - Position verification
+    /// 
+    /// **Serialization & Cloning:**
+    /// - Clone() - Creates deep copy with new UnitID
+    /// - GetObjectData() - Serializes for save games
+    /// - ResolveProfileReferences() - Reconnects shared objects after loading
+    /// - ResolveLeaderReferences() - Reconnects leader after loading
+    /// - HasUnresolvedReferences() - Checks if resolution needed
+    /// 
+    /// SAVE/LOAD GAME STATE COMPLEXITY:
+    /// 
+    /// CombatUnit uses a sophisticated two-phase loading pattern due to complex object relationships:
+    /// 
+    /// **PHASE 1 - SERIALIZATION (Saving):**
+    /// 1. Basic properties are serialized directly (name, ID, stats, etc.)
+    /// 2. StatsMaxCurrent objects are serialized as Max/Current pairs
+    /// 3. Object references are stored as IDs only to prevent circular dependencies:
+    ///    - WeaponSystemProfile references → WeaponSystemID strings
+    ///    - UnitProfile references → UnitProfileID strings  
+    ///    - Leader references → LeaderID strings
+    ///    - LandBaseFacility references → BaseID strings
+    /// 
+    /// **PHASE 2 - DESERIALIZATION (Loading):**
+    /// 1. Basic properties and stats are loaded immediately
+    /// 2. Object reference IDs are stored in temporary fields (unresolvedXXXID)
+    /// 3. Actual object references remain null until resolution
+    /// 
+    /// **PHASE 3 - REFERENCE RESOLUTION:**
+    /// Game state manager must call resolution methods with lookup dictionaries:
+    /// 1. ResolveProfileReferences(weaponProfiles, unitProfiles, landBases)
+    /// 2. ResolveLeaderReferences(leaders)
+    /// 3. HasUnresolvedReferences() returns false when complete
+    /// 
+    /// **EXAMPLE LOADING SEQUENCE:**
+    /// ```csharp
+    /// // After deserializing all objects
+    /// foreach (var unit in allUnits)
+    /// {
+    ///     if (unit.HasUnresolvedReferences())
+    ///     {
+    ///         unit.ResolveProfileReferences(weaponProfileLookup, unitProfileLookup, landBaseLookup);
+    ///         unit.ResolveLeaderReferences(leaderLookup);
+    ///     }
+    /// }
+    /// ```
+    /// 
+    /// This pattern ensures proper object sharing (multiple units can reference the same profiles)
+    /// while preventing save file corruption from circular references.
+    /// 
+    /// DESIGN PATTERNS:
+    /// - Uses StatsMaxCurrent for all max/current paired values
+    /// - Implements comprehensive validation with exception handling
+    /// - Event system integration points marked with TODO comments
+    /// - Reflection used for private property setters during state changes
+    /// - Shared object references for profiles (templates) vs owned objects for stats
     /// </summary>
     [Serializable]
     public class CombatUnit : ICloneable, ISerializable
@@ -924,19 +1040,26 @@ namespace HammerAndSickle.Models
         }
 
         /// <summary>
-        /// Consumes one combat action if available.
+        /// Consumes one combat action and associated movement points if available.
         /// </summary>
-        /// <returns>True if a combat action was consumed, false if none available</returns>
+        /// <returns>True if a combat action was consumed, false if insufficient resources</returns>
         public bool ConsumeCombatAction()
         {
             try
             {
-                if (CombatActions.Current >= 1f)
+                if (!CanConsumeCombatAction())
                 {
-                    CombatActions.SetCurrent(CombatActions.Current - 1f);
-                    return true;
+                    return false;
                 }
-                return false;
+
+                // Consume the combat action
+                CombatActions.SetCurrent(CombatActions.Current - 1f);
+
+                // Consume movement points
+                float movementCost = GetCombatActionMovementCost();
+                ConsumeMovementPoints(movementCost);
+
+                return true;
             }
             catch (Exception e)
             {
@@ -1018,19 +1141,30 @@ namespace HammerAndSickle.Models
         }
 
         /// <summary>
-        /// Consumes one intelligence action if available.
+        /// Consumes one intelligence action and associated movement points if available.
+        /// Bases don't consume movement points for intel gathering.
         /// </summary>
-        /// <returns>True if an intelligence action was consumed, false if none available</returns>
+        /// <returns>True if an intelligence action was consumed, false if insufficient resources</returns>
         public bool ConsumeIntelAction()
         {
             try
             {
-                if (IntelActions.Current >= 1f)
+                if (!CanConsumeIntelAction())
                 {
-                    IntelActions.SetCurrent(IntelActions.Current - 1f);
-                    return true;
+                    return false;
                 }
-                return false;
+
+                // Consume the intel action
+                IntelActions.SetCurrent(IntelActions.Current - 1f);
+
+                // Bases don't consume movement points for intel gathering
+                if (!IsLandBase)
+                {
+                    float movementCost = GetIntelActionMovementCost();
+                    ConsumeMovementPoints(movementCost);
+                }
+
+                return true;
             }
             catch (Exception e)
             {
@@ -1049,12 +1183,25 @@ namespace HammerAndSickle.Models
         }
 
         /// <summary>
-        /// Checks if the unit can consume a combat action.
+        /// Checks if the unit can consume a combat action and has sufficient movement points.
         /// </summary>
-        /// <returns>True if at least one combat action is available</returns>
+        /// <returns>True if at least one combat action and sufficient movement are available</returns>
         public bool CanConsumeCombatAction()
         {
-            return CombatActions.Current >= 1f;
+            // Check if we have a combat action available
+            if (CombatActions.Current < 1f)
+            {
+                return false;
+            }
+
+            // Check if we have sufficient movement points
+            float requiredMovement = GetCombatActionMovementCost();
+            if (MovementPoints.Current < requiredMovement)
+            {
+                return false;
+            }
+
+            return true;
         }
 
         /// <summary>
@@ -1087,16 +1234,36 @@ namespace HammerAndSickle.Models
         }
 
         /// <summary>
-        /// Checks if the unit can consume an intelligence action.
+        /// Checks if the unit can consume an intelligence action and has sufficient movement points.
+        /// Bases don't require movement points for intel actions.
         /// </summary>
-        /// <returns>True if at least one intelligence action is available</returns>
+        /// <returns>True if at least one intelligence action and sufficient movement are available</returns>
         public bool CanConsumeIntelAction()
         {
-            return IntelActions.Current >= 1f;
+            // Check if we have an intel action available
+            if (IntelActions.Current < 1f)
+            {
+                return false;
+            }
+
+            // Bases don't need movement points for intel gathering
+            if (IsLandBase)
+            {
+                return true;
+            }
+
+            // Check if we have sufficient movement points
+            float requiredMovement = GetIntelActionMovementCost();
+            if (MovementPoints.Current < requiredMovement)
+            {
+                return false;
+            }
+
+            return true;
         }
 
         /// <summary>
-        /// Gets the number of available actions of each type.
+        /// Gets the number of available actions of each type with movement point validation.
         /// </summary>
         /// <returns>Dictionary mapping action types to available counts</returns>
         public Dictionary<string, float> GetAvailableActions()
@@ -1104,10 +1271,10 @@ namespace HammerAndSickle.Models
             return new Dictionary<string, float>
             {
                 ["Move"] = MoveActions.Current,
-                ["Combat"] = CombatActions.Current,
-                ["Deployment"] = DeploymentActions.Current,
-                ["Opportunity"] = OpportunityActions.Current,
-                ["Intelligence"] = IntelActions.Current,
+                ["Combat"] = CanConsumeCombatAction() ? CombatActions.Current : 0f,
+                ["Deployment"] = CanConsumeDeploymentAction() ? DeploymentActions.Current : 0f,
+                ["Opportunity"] = OpportunityActions.Current, // Player can't control these
+                ["Intelligence"] = CanConsumeIntelAction() ? IntelActions.Current : 0f,
                 ["MovementPoints"] = MovementPoints.Current
             };
         }
@@ -1524,6 +1691,394 @@ namespace HammerAndSickle.Models
         #endregion // Damage and Supply Systems
 
 
+        #region Combat State Management
+
+        /// <summary>
+        /// Changes the unit's combat state if transition is valid and resources are available.
+        /// Handles profile switching and movement point costs automatically.
+        /// </summary>
+        /// <param name="newState">The target combat state</param>
+        /// <returns>True if state change was successful</returns>
+        public bool SetCombatState(CombatState newState)
+        {
+            try
+            {
+                // Check if state change is allowed
+                if (!CanChangeToState(newState))
+                {
+                    return false;
+                }
+
+                // Check if we have sufficient deployment actions
+                if (!CanConsumeDeploymentAction())
+                {
+                    return false;
+                }
+
+                // Check if we have sufficient movement points
+                if (!HasSufficientMovementForDeployment())
+                {
+                    return false;
+                }
+
+                // Store previous state for event notifications
+                var previousState = CombatState;
+
+                // Consume deployment action
+                ConsumeDeploymentAction();
+
+                // Consume movement points
+                float movementCost = GetDeploymentActionMovementCost();
+                ConsumeMovementPoints(movementCost);
+
+                // Update combat state using reflection (private setter)
+                var unitType = typeof(CombatUnit);
+                var combatStateProperty = unitType.GetProperty("CombatState");
+                combatStateProperty?.SetValue(this, newState);
+
+                // Apply profile changes for new state
+                ApplyProfileForState(newState);
+
+                // TODO: Trigger state change event
+                // OnCombatStateChanged(previousState, newState);
+
+                return true;
+            }
+            catch (Exception e)
+            {
+                AppService.Instance.HandleException(CLASS_NAME, "SetCombatState", e);
+                return false;
+            }
+        }
+
+        /// <summary>
+        /// Checks if the unit can transition to the specified combat state.
+        /// Validates unit type restrictions, adjacency rules, and resource requirements.
+        /// </summary>
+        /// <param name="targetState">The desired combat state</param>
+        /// <returns>True if transition is allowed</returns>
+        public bool CanChangeToState(CombatState targetState)
+        {
+            try
+            {
+                // Same state - no change needed
+                if (CombatState == targetState)
+                {
+                    return false;
+                }
+
+                // Check if this unit type can change states at all
+                if (!CanUnitTypeChangeStates())
+                {
+                    return false;
+                }
+
+                // Check if transition is adjacent
+                if (!IsAdjacentStateTransition(CombatState, targetState))
+                {
+                    return false;
+                }
+
+                // Check resource requirements
+                if (!CanConsumeDeploymentAction())
+                {
+                    return false;
+                }
+
+                if (!HasSufficientMovementForDeployment())
+                {
+                    return false;
+                }
+
+                return true;
+            }
+            catch (Exception e)
+            {
+                AppService.Instance.HandleException(CLASS_NAME, "CanChangeToState", e);
+                return false;
+            }
+        }
+
+        /// <summary>
+        /// Begins entrenchment process by transitioning to HastyDefense.
+        /// Convenience method for defensive positioning.
+        /// </summary>
+        /// <returns>True if entrenchment began successfully</returns>
+        public bool BeginEntrenchment()
+        {
+            try
+            {
+                if (CombatState != CombatState.Deployed)
+                {
+                    return false; // Can only start entrenchment from Deployed
+                }
+
+                return SetCombatState(CombatState.HastyDefense);
+            }
+            catch (Exception e)
+            {
+                AppService.Instance.HandleException(CLASS_NAME, "BeginEntrenchment", e);
+                return false;
+            }
+        }
+
+        /// <summary>
+        /// Checks if the unit can begin entrenchment (transition to defensive states).
+        /// </summary>
+        /// <returns>True if entrenchment is possible</returns>
+        public bool CanEntrench()
+        {
+            try
+            {
+                return CanChangeToState(CombatState.HastyDefense);
+            }
+            catch (Exception e)
+            {
+                AppService.Instance.HandleException(CLASS_NAME, "CanEntrench", e);
+                return false;
+            }
+        }
+
+        /// <summary>
+        /// Gets all valid combat states this unit can transition to from current state.
+        /// </summary>
+        /// <returns>List of valid target states</returns>
+        public List<CombatState> GetValidStateTransitions()
+        {
+            var validStates = new List<CombatState>();
+
+            try
+            {
+                if (!CanUnitTypeChangeStates())
+                {
+                    return validStates; // Return empty list
+                }
+
+                // Check each possible state
+                foreach (CombatState state in (CombatState[])Enum.GetValues(typeof(CombatState)))
+                {
+                    if (CanChangeToState(state))
+                    {
+                        validStates.Add(state);
+                    }
+                }
+
+                return validStates;
+            }
+            catch (Exception e)
+            {
+                AppService.Instance.HandleException(CLASS_NAME, "GetValidStateTransitions", e);
+                return validStates;
+            }
+        }
+
+        #endregion // Combat State Management
+
+
+        #region Private Combat State Helpers
+
+        /// <summary>
+        /// Checks if this unit classification can change combat states.
+        /// Fixed-wing aircraft and bases cannot change states.
+        /// </summary>
+        /// <returns>True if unit can change states</returns>
+        private bool CanUnitTypeChangeStates()
+        {
+            // Fixed-wing aircraft cannot change states
+            if (Classification == UnitClassification.ASF ||
+                Classification == UnitClassification.MRF ||
+                Classification == UnitClassification.ATT ||
+                Classification == UnitClassification.BMB ||
+                Classification == UnitClassification.RCN ||
+                Classification == UnitClassification.FWT)
+            {
+                return false;
+            }
+
+            // Bases cannot change states
+            if (Classification == UnitClassification.BASE ||
+                Classification == UnitClassification.DEPOT ||
+                Classification == UnitClassification.AIRB)
+            {
+                return false;
+            }
+
+            // All other units (including helicopters) can change states
+            return true;
+        }
+
+        /// <summary>
+        /// Checks if the transition between two states is adjacent (one step).
+        /// </summary>
+        /// <param name="currentState">Current combat state</param>
+        /// <param name="targetState">Target combat state</param>
+        /// <returns>True if transition is adjacent</returns>
+        private bool IsAdjacentStateTransition(CombatState currentState, CombatState targetState)
+        {
+            // Define the state order: Mobile ← Deployed → HastyDefense → Entrenched → Fortified
+            var stateOrder = new Dictionary<CombatState, int>
+            {
+                { CombatState.Mobile, 0 },
+                { CombatState.Deployed, 1 },
+                { CombatState.HastyDefense, 2 },
+                { CombatState.Entrenched, 3 },
+                { CombatState.Fortified, 4 }
+            };
+
+            if (!stateOrder.ContainsKey(currentState) || !stateOrder.ContainsKey(targetState))
+            {
+                return false;
+            }
+
+            int currentIndex = stateOrder[currentState];
+            int targetIndex = stateOrder[targetState];
+
+            // Adjacent means difference of exactly 1
+            return Math.Abs(currentIndex - targetIndex) == 1;
+        }
+
+        /// <summary>
+        /// Checks if unit has sufficient movement points for a deployment action.
+        /// Deployment actions cost 50% of max movement points.
+        /// </summary>
+        /// <returns>True if sufficient movement points available</returns>
+        private bool HasSufficientMovementForDeployment()
+        {
+            float requiredMovement = GetDeploymentActionMovementCost();
+            return MovementPoints.Current >= requiredMovement;
+        }
+
+        /// <summary>
+        /// Calculates the movement point cost for a deployment action.
+        /// </summary>
+        /// <returns>Movement points required (50% of max)</returns>
+        private float GetDeploymentActionMovementCost()
+        {
+            return MovementPoints.Max * CUConstants.DEPLOYMENT_ACTION_MOVEMENT_COST;
+        }
+
+        /// <summary>
+        /// Applies the appropriate weapon profile and movement bonuses for the given combat state.
+        /// Mobile state uses MountedProfile (if available) or adds movement bonus.
+        /// All other states use DeployedProfile.
+        /// </summary>
+        /// <param name="state">The combat state to apply</param>
+        private void ApplyProfileForState(CombatState state)
+        {
+            try
+            {
+                if (state == CombatState.Mobile)
+                {
+                    // Mobile state: use MountedProfile if available
+                    if (MountedProfile != null)
+                    {
+                        // Unit will use MountedProfile - no additional changes needed
+                        // The profile is already assigned and will be used by combat calculations
+
+                        // TODO: Trigger profile switch event
+                        // OnProfileSwitched(DeployedProfile, MountedProfile);
+                    }
+                    else
+                    {
+                        // No MountedProfile available - add movement bonus to current movement
+                        float movementBonus = CUConstants.MOBILE_MOVEMENT_BONUS;
+                        float newMaxMovement = MovementPoints.Max + movementBonus;
+
+                        // Update max movement while preserving current percentage
+                        float currentPercentage = MovementPoints.GetPercentage();
+                        MovementPoints.SetMax(newMaxMovement);
+                        MovementPoints.SetCurrent(newMaxMovement * currentPercentage);
+
+                        // TODO: Trigger movement bonus applied event
+                        // OnMovementBonusApplied(movementBonus);
+                    }
+                }
+                else
+                {
+                    // All other states use DeployedProfile
+                    // If we were previously Mobile with movement bonus, remove it
+                    if (MountedProfile == null && CombatState == CombatState.Mobile)
+                    {
+                        // Remove movement bonus - revert to base movement
+                        InitializeMovementPoints(); // Reset to classification default
+
+                        // TODO: Trigger movement bonus removed event
+                        // OnMovementBonusRemoved();
+                    }
+
+                    // TODO: Trigger profile switch event if switching from mounted
+                    // if (MountedProfile != null && CombatState == CombatState.Mobile)
+                    //     OnProfileSwitched(MountedProfile, DeployedProfile);
+                }
+            }
+            catch (Exception e)
+            {
+                AppService.Instance.HandleException(CLASS_NAME, "ApplyProfileForState", e);
+            }
+        }
+
+        /// <summary>
+        /// Gets the effective weapon profile based on current combat state.
+        /// Used by combat calculation systems.
+        /// </summary>
+        /// <returns>The active weapon profile</returns>
+        public WeaponSystemProfile GetEffectiveWeaponProfile()
+        {
+            try
+            {
+                if (CombatState == CombatState.Mobile && MountedProfile != null)
+                {
+                    return MountedProfile;
+                }
+
+                return DeployedProfile;
+            }
+            catch (Exception e)
+            {
+                AppService.Instance.HandleException(CLASS_NAME, "GetEffectiveWeaponProfile", e);
+                return DeployedProfile; // Fallback to deployed profile
+            }
+        }
+
+        /// <summary>
+        /// Gets the defensive bonus multiplier based on current combat state.
+        /// Used by combat calculation systems.
+        /// </summary>
+        /// <returns>Defensive modifier (1.0 = no bonus)</returns>
+        public float GetCombatStateDefensiveBonus()
+        {
+            return CombatState switch
+            {
+                CombatState.Mobile => CUConstants.COMBAT_MOD_MOBILE,
+                CombatState.Deployed => CUConstants.COMBAT_MOD_Deployed,
+                CombatState.HastyDefense => CUConstants.COMBAT_MOD_HASTY_DEFENSE,
+                CombatState.Entrenched => CUConstants.COMBAT_MOD_ENTRENCHED,
+                CombatState.Fortified => CUConstants.COMBAT_MOD_FORTIFIED,
+                _ => CUConstants.COMBAT_MOD_Deployed
+            };
+        }
+
+        /// <summary>
+        /// Calculates the movement point cost for a combat action.
+        /// </summary>
+        /// <returns>Movement points required (25% of max)</returns>
+        private float GetCombatActionMovementCost()
+        {
+            return MovementPoints.Max * CUConstants.COMBAT_ACTION_MOVEMENT_COST;
+        }
+
+        /// <summary>
+        /// Calculates the movement point cost for an intelligence action.
+        /// </summary>
+        /// <returns>Movement points required (15% of max)</returns>
+        private float GetIntelActionMovementCost()
+        {
+            return MovementPoints.Max * CUConstants.INTEL_ACTION_MOVEMENT_COST;
+        }
+
+        #endregion // Private Combat State Helpers
+
+
         #region ICloneable Implementation
 
         public object Clone()
@@ -1544,7 +2099,7 @@ namespace HammerAndSickle.Models
                     this.UnitProfile,          // Shared reference
                     this.IsTransportable,
                     this.IsLandBase,
-                    this.LandBaseFacility      // Shared reference
+                    this.LandBaseFacility
                 );
 
                 // Deep copy all StatsMaxCurrent objects by reconstructing them
