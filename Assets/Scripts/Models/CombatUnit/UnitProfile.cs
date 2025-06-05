@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Runtime.Serialization;
+using System.Text;
 using HammerAndSickle.Services;
 
 namespace HammerAndSickle.Models
@@ -36,8 +37,8 @@ namespace HammerAndSickle.Models
 
         #region Fields
 
-        private float lastKnownMultiplier = 1.0f;
-        private readonly Dictionary<WeaponSystems, int> maxValues;
+        private readonly Dictionary<WeaponSystems, int> weaponSystems; // Maximum values for each weapon system in this profile.
+        private float currentHitPoints = CUConstants.MAX_HP;           // Tracks current hit points for scaling.
 
         #endregion // Fields
 
@@ -50,6 +51,7 @@ namespace HammerAndSickle.Models
         public Dictionary<WeaponSystems, int> CurrentProfile { get; private set; }
 
         #endregion // Properties
+
 
         #region Constructors
 
@@ -68,8 +70,7 @@ namespace HammerAndSickle.Models
 
                 UnitProfileID = profileID;
                 Nationality = nationality;
-                lastKnownMultiplier = 1.0f;
-                maxValues = new Dictionary<WeaponSystems, int>();
+                weaponSystems = new Dictionary<WeaponSystems, int>();
                 CurrentProfile = new Dictionary<WeaponSystems, int>();
             }
             catch (Exception e)
@@ -92,10 +93,9 @@ namespace HammerAndSickle.Models
 
                 UnitProfileID = source.UnitProfileID;
                 Nationality = source.Nationality;
-                lastKnownMultiplier = source.lastKnownMultiplier;
 
                 // Deep copy the dictionaries
-                maxValues = new Dictionary<WeaponSystems, int>(source.maxValues);
+                weaponSystems = new Dictionary<WeaponSystems, int>(source.weaponSystems);
                 CurrentProfile = new Dictionary<WeaponSystems, int>(source.CurrentProfile);
             }
             catch (Exception e)
@@ -152,44 +152,7 @@ namespace HammerAndSickle.Models
         {
             try
             {
-                // Retrieve basic properties
-                UnitProfileID = info.GetString(nameof(UnitProfileID));
-                Nationality = (Nationality)info.GetValue(nameof(Nationality), typeof(Nationality));
-
-                // Retrieve lastKnownMultiplier with backward compatibility
-                try
-                {
-                    lastKnownMultiplier = info.GetSingle(nameof(lastKnownMultiplier));
-                }
-                catch (SerializationException)
-                {
-                    // Backward compatibility: if multiplier not found, default to 1.0
-                    lastKnownMultiplier = 1.0f;
-                }
-
-                // Retrieve dictionaries
-                int maxValuesCount = info.GetInt32("MaxValuesCount");
-                int currentProfileCount = info.GetInt32("CurrentProfileCount");
-
-                // Initialize dictionaries
-                maxValues = new Dictionary<WeaponSystems, int>();
-                CurrentProfile = new Dictionary<WeaponSystems, int>();
-
-                // Deserialize maxValues
-                for (int i = 0; i < maxValuesCount; i++)
-                {
-                    WeaponSystems weapon = (WeaponSystems)info.GetValue($"MaxValuesKey_{i}", typeof(WeaponSystems));
-                    int value = info.GetInt32($"MaxValuesValue_{i}");
-                    maxValues[weapon] = value;
-                }
-
-                // Deserialize CurrentProfile
-                for (int i = 0; i < currentProfileCount; i++)
-                {
-                    WeaponSystems weapon = (WeaponSystems)info.GetValue($"CurrentProfileKey_{i}", typeof(WeaponSystems));
-                    int value = info.GetInt32($"CurrentProfileValue_{i}");
-                    CurrentProfile[weapon] = value;
-                }
+               // TODO: Implement
             }
             catch (Exception e)
             {
@@ -200,7 +163,28 @@ namespace HammerAndSickle.Models
 
         #endregion // Constructors
 
+
         #region Public Methods
+
+        /// <summary>
+        /// Updates the current hit points, provided from parent unit.
+        /// </summary>
+        /// <param name="currentHP"></param>
+        public void UpdateCurrentHP(float currentHP)
+        {
+            try
+            {
+                if (currentHP < 0 || currentHP > CUConstants.MAX_HP)
+                    throw new ArgumentOutOfRangeException(nameof(currentHP), "Current HP must be between 0 and MAX_HP");
+
+                currentHitPoints = currentHP;
+            }
+            catch (Exception e)
+            {
+                AppService.Instance.HandleException(CLASS_NAME, "UpdateCurrentHP", e);
+                throw;
+            }
+        }
 
         /// <summary>
         /// Sets the maximum value for a specific weapon system in this unit profile.
@@ -215,10 +199,7 @@ namespace HammerAndSickle.Models
                 if (maxValue < 0)
                     throw new ArgumentException("Max value cannot be negative", nameof(maxValue));
 
-                maxValues[weaponSystem] = maxValue;
-
-                // Update current profile to reflect the change
-                UpdateCurrentProfileForWeapon(weaponSystem);
+                weaponSystems[weaponSystem] = maxValue;
             }
             catch (Exception e)
             {
@@ -236,29 +217,11 @@ namespace HammerAndSickle.Models
         {
             try
             {
-                return maxValues.TryGetValue(weaponSystem, out int value) ? value : 0;
+                return weaponSystems.TryGetValue(weaponSystem, out int value) ? value : 0;
             }
             catch (Exception e)
             {
                 AppService.Instance.HandleException(CLASS_NAME, "GetWeaponSystemMaxValue", e);
-                return 0;
-            }
-        }
-
-        /// <summary>
-        /// Gets the current value for a specific weapon system.
-        /// </summary>
-        /// <param name="weaponSystem">The weapon system to query</param>
-        /// <returns>The current value, or 0 if not found</returns>
-        public int GetWeaponSystemCurrentValue(WeaponSystems weaponSystem)
-        {
-            try
-            {
-                return CurrentProfile.TryGetValue(weaponSystem, out int value) ? value : 0;
-            }
-            catch (Exception e)
-            {
-                AppService.Instance.HandleException(CLASS_NAME, "GetWeaponSystemCurrentValue", e);
                 return 0;
             }
         }
@@ -272,7 +235,7 @@ namespace HammerAndSickle.Models
         {
             try
             {
-                bool removedMax = maxValues.Remove(weaponSystem);
+                bool removedMax = weaponSystems.Remove(weaponSystem);
                 bool removedCurrent = CurrentProfile.Remove(weaponSystem);
                 return removedMax || removedCurrent;
             }
@@ -290,7 +253,7 @@ namespace HammerAndSickle.Models
         /// <returns>True if the weapon system is present</returns>
         public bool HasWeaponSystem(WeaponSystems weaponSystem)
         {
-            return maxValues.ContainsKey(weaponSystem);
+            return weaponSystems.ContainsKey(weaponSystem);
         }
 
         /// <summary>
@@ -299,7 +262,7 @@ namespace HammerAndSickle.Models
         /// <returns>Collection of weapon systems</returns>
         public IEnumerable<WeaponSystems> GetWeaponSystems()
         {
-            return maxValues.Keys;
+            return weaponSystems.Keys;
         }
 
         /// <summary>
@@ -308,71 +271,7 @@ namespace HammerAndSickle.Models
         /// <returns>Count of weapon systems</returns>
         public int GetWeaponSystemCount()
         {
-            return maxValues.Count;
-        }
-
-        /// <summary>
-        /// Updates the current profile based on the current hit points of the unit.
-        /// This should be called whenever the unit's hit points change.
-        /// </summary>
-        /// <param name="currentHitPoints">The current hit points of the unit</param>
-        public void UpdateCurrentProfile(int currentHitPoints)
-        {
-            try
-            {
-                if (currentHitPoints < 0)
-                    currentHitPoints = 0;
-                else if (currentHitPoints > CUConstants.MAX_HP)
-                    currentHitPoints = CUConstants.MAX_HP;
-
-                // Calculate and store the current multiplier
-                lastKnownMultiplier = (float)currentHitPoints / CUConstants.MAX_HP;
-
-                // Clear and regenerate the current profile
-                CurrentProfile.Clear();
-
-                foreach (var kvp in maxValues)
-                {
-                    int currentValue = (int)Math.Round(kvp.Value * lastKnownMultiplier);
-                    CurrentProfile[kvp.Key] = currentValue;
-                }
-            }
-            catch (Exception e)
-            {
-                AppService.Instance.HandleException(CLASS_NAME, "UpdateCurrentProfile", e);
-                throw;
-            }
-        }
-
-        /// <summary>
-        /// Gets the overall combat effectiveness as a percentage (0.0 to 1.0).
-        /// Based on the ratio of current to maximum weapon system values.
-        /// </summary>
-        /// <returns>Combat effectiveness percentage</returns>
-        public float GetCombatEffectiveness()
-        {
-            try
-            {
-                if (maxValues.Count == 0)
-                    return 0f;
-
-                int totalMax = 0;
-                int totalCurrent = 0;
-
-                foreach (var kvp in maxValues)
-                {
-                    totalMax += kvp.Value;
-                    if (CurrentProfile.TryGetValue(kvp.Key, out int currentValue))
-                        totalCurrent += currentValue;
-                }
-
-                return totalMax > 0 ? (float)totalCurrent / totalMax : 0f;
-            }
-            catch (Exception e)
-            {
-                AppService.Instance.HandleException(CLASS_NAME, "GetCombatEffectiveness", e);
-                return 0f;
-            }
+            return weaponSystems.Count;
         }
 
         /// <summary>
@@ -382,9 +281,8 @@ namespace HammerAndSickle.Models
         {
             try
             {
-                maxValues.Clear();
+                weaponSystems.Clear();
                 CurrentProfile.Clear();
-                lastKnownMultiplier = 1.0f; // Reset multiplier to default
             }
             catch (Exception e)
             {
@@ -392,156 +290,131 @@ namespace HammerAndSickle.Models
             }
         }
 
-        /// <summary>
-        /// Creates a deep copy of this UnitProfile.
-        /// </summary>
-        /// <returns>A new UnitProfile with identical values</returns>
-        public UnitProfile Clone()
-        {
-            try
-            {
-                return new UnitProfile(this);
-            }
-            catch (Exception e)
-            {
-                AppService.Instance.HandleException(CLASS_NAME, "Clone", e);
-                throw;
-            }
-        }
-
-        /// <summary>
-        /// Creates a deep copy of this UnitProfile with a new profileID.
-        /// </summary>
-        /// <param name="newName">The profileID for the cloned profile</param>
-        /// <returns>A new UnitProfile with identical values but a different profileID</returns>
-        public UnitProfile Clone(string newName)
-        {
-            try
-            {
-                return new UnitProfile(this, newName);
-            }
-            catch (Exception e)
-            {
-                AppService.Instance.HandleException(CLASS_NAME, "CloneWithName", e);
-                throw;
-            }
-        }
-
-        /// <summary>
-        /// Creates a copy of this UnitProfile with a different nationality.
-        /// Useful for creating variants of units for different factions.
-        /// </summary>
-        /// <param name="newName">The profileID for the cloned profile</param>
-        /// <param name="newNationality">The nationality for the cloned profile</param>
-        /// <returns>A new UnitProfile with the specified profileID and nationality</returns>
-        public UnitProfile Clone(string newName, Nationality newNationality)
-        {
-            try
-            {
-                return new UnitProfile(this, newName, newNationality);
-            }
-            catch (Exception e)
-            {
-                AppService.Instance.HandleException(CLASS_NAME, "CloneWithNameAndNationality", e);
-                throw;
-            }
-        }
-
-        /// <summary>
-        /// Returns a string representation of the unit profile.
-        /// </summary>
-        /// <returns>Formatted string showing profile details</returns>
-        public override string ToString()
-        {
-            return $"{UnitProfileID} ({Nationality}) - {GetWeaponSystemCount()} weapon systems, {GetCombatEffectiveness():P0} effective";
-        }
-
         #endregion // Public Methods
 
-        #region Private Methods
+
+        #region Status Reports
 
         /// <summary>
-        /// Updates the current profile for a specific weapon system based on the stored multiplier.
-        /// This is called when a weapon system max value is changed.
+        /// Generates a detailed intel report for the player unit, this is passed onto GUI. The player gets full
+        /// information on their own units.
         /// </summary>
-        /// <param name="weaponSystem">The weapon system to update</param>
-        private void UpdateCurrentProfileForWeapon(WeaponSystems weaponSystem)
+        /// <returns></returns>
+        public string GetPlayerUnitIntelReport(string unitName, CombatState combatState, ExperienceLevel xpLevel, EfficiencyLevel effLevel)
         {
+            /* 
+             *     Format for the report is as follows
+             *     
+             *     Example:
+             *     
+             *     Soviet 76th Guards Tank Regiment
+             *     2100 Men, 130 Tanks, 80 IFVs, 10 APCs, 10 Recon, 
+             *     45 Artillery, 12 AAA, 8 SAMs, 
+             *     3 Attack Helicopters, 10 Transport Helicopters
+             *     STATE: Deployed  EXP: Veteran EFF: PeakOperational
+             */
+
             try
             {
-                if (!maxValues.TryGetValue(weaponSystem, out int maxValue))
-                    return;
+                // This is the base multiplier for each weapon system.
+                float currentMultiplier = currentHitPoints / CUConstants.MAX_HP;
 
-                // Use the last known multiplier instead of calculating from other weapons
-                int newCurrentValue = (int)Math.Round(maxValue * lastKnownMultiplier);
-                CurrentProfile[weaponSystem] = newCurrentValue;
+                StringBuilder sb = new StringBuilder();
+
+                foreach (var item in weaponSystems)
+                {
+
+                }
+
+                return sb.ToString();
             }
             catch (Exception e)
             {
-                AppService.Instance.HandleException(CLASS_NAME, "UpdateCurrentProfileForWeapon", e);
+                AppService.Instance.HandleException(CLASS_NAME, "GetPlayerUnitIntelReport", e);
+                throw;
             }
         }
 
-        #endregion // Private Methods
+        /// <summary>
+        /// Lists each weapon system in the unit profile with its current strength, scaled by hit points.
+        /// </summary>
+        /// <returns></returns>
+        public List<string> GetDetailedPlayerUnitIntelReport()
+        {
+            try
+            {
+                // This is the base multiplier for each weapon system.
+                float currentMultiplier = currentHitPoints / CUConstants.MAX_HP;
+
+                // Create a containter to store line.
+                List<string> reportLines = new List<string>();
+
+                foreach (var item in weaponSystems)
+                {
+
+                }
+
+                return reportLines;
+            }
+            catch (Exception e)
+            {
+                AppService.Instance.HandleException(CLASS_NAME, "GetDetailedPlayerUnitIntelReport", e);
+                throw;
+            }
+        }
+
+        /// <summary>
+        /// Get intelligence information of an AI unit based on the it's SpottedLevel.
+        /// </summary>
+        /// <returns></returns>
+        public string GetAIUnitIntelReport(SpottedLevel spottedLevel, 
+            string unitName, 
+            CombatState combatState, 
+            ExperienceLevel xpLevel, 
+            EfficiencyLevel effLevel)
+        {
+            try
+            {
+                // This is the base multiplier for each weapon system.
+                float currentMultiplier = currentHitPoints / CUConstants.MAX_HP;
+
+                StringBuilder sb = new StringBuilder();
+                
+                foreach (var item in weaponSystems)
+                {
+
+                }
+
+                return sb.ToString();
+            }
+            catch (Exception e)
+            {
+                AppService.Instance.HandleException(CLASS_NAME, "GetAIUnitIntelReport", e);
+                throw;
+            }
+        }
+
+        #endregion
+
 
         #region ISerializable Implementation
 
-        /// <summary>
-        /// Serializes this UnitProfile instance.
-        /// </summary>
-        /// <param name="info">The SerializationInfo object to populate</param>
-        /// <param name="context">The StreamingContext structure</param>
         public void GetObjectData(SerializationInfo info, StreamingContext context)
         {
-            try
-            {
-                // Store basic properties
-                info.AddValue(nameof(UnitProfileID), UnitProfileID);
-                info.AddValue(nameof(Nationality), Nationality);
-                info.AddValue(nameof(lastKnownMultiplier), lastKnownMultiplier);
-
-                // Store dictionaries count
-                info.AddValue("MaxValuesCount", maxValues.Count);
-                info.AddValue("CurrentProfileCount", CurrentProfile.Count);
-
-                // Serialize maxValues
-                int i = 0;
-                foreach (var kvp in maxValues)
-                {
-                    info.AddValue($"MaxValuesKey_{i}", kvp.Key);
-                    info.AddValue($"MaxValuesValue_{i}", kvp.Value);
-                    i++;
-                }
-
-                // Serialize CurrentProfile
-                i = 0;
-                foreach (var kvp in CurrentProfile)
-                {
-                    info.AddValue($"CurrentProfileKey_{i}", kvp.Key);
-                    info.AddValue($"CurrentProfileValue_{i}", kvp.Value);
-                    i++;
-                }
-            }
-            catch (Exception e)
-            {
-                AppService.Instance.HandleException(CLASS_NAME, "GetObjectData", e);
-                throw;
-            }
+            // TODO: Implement
         }
 
         #endregion // ISerializable Implementation
 
+
         #region ICloneable Implementation
 
-        /// <summary>
-        /// Creates a deep copy of this UnitProfile.
-        /// </summary>
-        /// <returns>A new UnitProfile with identical values</returns>
-        object ICloneable.Clone()
+        public object Clone()
         {
-            return Clone();
+            // TODO: Implement
+            return null;
         }
 
-        #endregion // ICloneable Implementation
+        #endregion // ICloneable Implementation        
     }
 }

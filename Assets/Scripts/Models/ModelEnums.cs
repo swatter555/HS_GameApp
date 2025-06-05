@@ -57,9 +57,9 @@ namespace HammerAndSickle.Models
         BMB,    // Bomber
         RCN,    // Recon Aircraft
         FWT,    // Fixed-wing transport
-        BASE,   // Land base of some type (e.g., HQ, depot, airbase, etc.)
-        DEPOT,  // Supply Depot
-        AIRB,   // AirbaseFacility
+        BASE,   // LandBase facility, generic
+        DEPOT,  // Supply Depot, specific type of LandBase
+        AIRB,   // Airbase Specific type of Landbase
     }
 
     /// <summary>
@@ -216,6 +216,19 @@ namespace HammerAndSickle.Models
         UnitLevel,
         HQLevel,
         SpecializedLevel
+    }
+
+    /// <summary>
+    /// The intelligence info on enemy units as they are spotted on the map.
+    /// </summary>
+    public enum SpottedLevel
+    {
+        Level0, // Not spotted
+        Level1, // Unit name, type visible
+        Level2, // Unit name, type, and approximate UnitProfile numbers
+        Level3, // Unit name, type, and fairly accurate UnitProfile numbers
+        Level4, // Unit name, type, and exact UnitProfile numbers
+        Level5  // Where it moved last turn.
     }
 
 
@@ -619,13 +632,10 @@ namespace HammerAndSickle.Models
         IFV_BMD3,
         RCN_BRDM2,
         RCN_BRDM2AT,
-        TRUCK_RED,
         SPA_2S1,
         SPA_2S3,
         SPA_2S5,
         SPA_2S19,
-        ART_D20,
-        ART_D30,
         ROC_BM21,
         ROC_BM27,
         ROC_BM30,
@@ -642,6 +652,7 @@ namespace HammerAndSickle.Models
         HEL_MI24D,
         HEL_MI24V,
         HEL_MI28,
+        HELTRAN_MI8,
         AWACS_A50,
         TRAN_AN8,
         ASF_MIG21,
@@ -659,8 +670,14 @@ namespace HammerAndSickle.Models
         BMB_TU22,
         BMB_TU22M3,
         RCN_MIG25R,
+        REG_INF_SV, // Regular Infantry
+        AB_INF_SV,  // Airborne Infantry
+        AM_INF_SV,  // Air Mobile Infantry
+        MAR_INF_SV, // Marine Infantry
+        SPEC_INF_SV,// Special Forces Infantry
+        ENG_INF_SV, // Engineer Infantry
 
-        // US
+        // USA
         TANK_M1,
         IFV_M2,
         IFV_M3,
@@ -672,6 +689,7 @@ namespace HammerAndSickle.Models
         SPSAM_CHAP,
         SAM_HAWK,
         HEL_AH64,
+        HELTRAN_UH1,
         ASF_F15,
         ASF_F4,
         MRF_F16,
@@ -679,73 +697,65 @@ namespace HammerAndSickle.Models
         BMB_F111,
         BMB_F117,
         RCN_SR71,
+        REG_INF_US,
+        AB_INF_US,
+        AM_INF_US,
+        MAR_INF_US,
+        SPEC_INF_US,
+        ENG_INF_US,
 
-        // West Germany
+        // West Germany (FRG)
         TANK_LEOPARD1,
         TANK_LEOPARD2,
         IFV_MARDER,
         SPAAA_GEPARD,
         HEL_BO105,
         MRF_TornadoIDS,
+        REG_INF_FRG,
+        AB_INF_FRG,
+        AM_INF_FRG,
+        MAR_INF_FRG,
+        SPEC_INF_FRG,
+        ENG_INF_FRG,
 
         // UK
         TANK_CHALLENGER1,
         IFV_WARRIOR,
+        REG_INF_UK,
+        AB_INF_UK,
+        AM_INF_UK,
+        MAR_INF_UK,
+        SPEC_INF_UK,
+        ENG_INF_UK,
 
         // France
         TANK_AMX30,
         SPAAA_ROLAND,
         ASF_MIRAGE2000,
         ATT_JAGUAR,
+        REG_INF_FRA,
+        AB_INF_FRA,
+        AM_INF_FRA,
+        MAR_INF_FRA,
+        SPEC_INF_FRA,
+        ENG_INF_FRA,
 
-        // Types of infantry
-        SV_REG_INF,
-        SV_AB_INF,
-        SV_AM_INF,
-        SV_MAR_INF,
-        SV_SPEC_INF,
-        SV_ENG_INF,
+        // Arab armies
+        REG_INF_ARAB,
+        AB_INF_ARAB,
+        AM_INF_ARAB,
+        MAR_INF_ARAB,
+        SPEC_INF_ARAB,
+        ENG_INF_ARAB,
 
-        US_REG_INF,
-        US_AB_INF,
-        US_AM_INF,
-        US_MAR_INF,
-        US_SPEC_INF,
-        US_ENG_INF,
+        // Generic types
+        AAA_GENERIC,
+        ART_LIGHT_GENERIC,
+        ART_HEAVY_GENERIC,
 
-        FRG_REG_INF,
-        FRG_AB_INF,
-        FRG_AM_INF,
-        FRG_MAR_INF,
-        FRG_SPEC_INF,
-        FRG_ENG_INF,
-
-        UK_REG_INF,
-        UK_AB_INF,
-        UK_AM_INF,
-        UK_MAR_INF,
-        UK_SPEC_INF,
-        UK_ENG_INF,
-
-        FRA_REG_INF,
-        FRA_AB_INF,
-        FRA_AM_INF,
-        FRA_MAR_INF,
-        FRA_SPEC_INF,
-        FRA_ENG_INF,
-
-        ARAB_REG_INF,
-        ARAB_AB_INF,
-        ARAB_AM_INF,
-        ARAB_MAR_INF,
-        ARAB_SPEC_INF,
-        ARAB_ENG_INF,
-
-        AIRBASE,
-        SUPPLY_DEPOT,
-
-        EAST_SIGINT,
-        WEST_SIGINT
+        LANDBASE_GENERIC,
+        AIRBASE_GENERIC,
+        SUPPLYDEPOT_GENERIC,
     }
 
     /// <summary>
