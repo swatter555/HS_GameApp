@@ -128,7 +128,7 @@ namespace HammerAndSickle.Models
     /// - Shared object references for profiles (templates) vs owned objects for stats
     /// </summary>
     [Serializable]
-    public class CombatUnit : ICloneable, ISerializable
+    public class CombatUnit : ICloneable, ISerializable, IResolvableReferences
     {
         #region Constants
 
@@ -314,7 +314,7 @@ namespace HammerAndSickle.Models
                 unresolvedDeployedProfileID = info.GetString("DeployedProfileID");
                 unresolvedMountedProfileID = info.GetString("MountedProfileID");
                 unresolvedUnitProfileID = info.GetString("UnitProfileID");
-                unresolvedLandBaseProfileID = info.GetString("LandBaseProfileID");
+                unresolvedLandBaseProfileID = info.GetString("LandBaseFacilityID");
                 unresolvedLeaderID = info.GetString("LeaderID");
 
                 // Deserialize owned StatsMaxCurrent objects
@@ -2220,159 +2220,6 @@ namespace HammerAndSickle.Models
             }
         }
 
-        #endregion // ISerializable Implementation
-
-
-        #region Serialization Support Methods
-
-        /// <summary>
-        /// Gets the list of unresolved unit IDs from deserialization.
-        /// Used to check if unit references need to be resolved.
-        /// </summary>
-        public IReadOnlyList<string> GetUnresolvedUnitIDs()
-        {
-            var unresolvedIDs = new List<string>();
-
-            // Currently CombatUnit doesn't store references to other CombatUnits
-            // This method exists for interface consistency and future expansion
-
-            return unresolvedIDs.AsReadOnly();
-        }
-
-        /// <summary>
-        /// Resolves unit references after deserialization.
-        /// Called by game state manager with reconstructed unit objects.
-        /// </summary>
-        /// <param name="unitLookup">Dictionary mapping unit IDs to CombatUnit instances</param>
-        public void ResolveUnitReferences(Dictionary<string, CombatUnit> unitLookup)
-        {
-            try
-            {
-                // Currently CombatUnit doesn't store references to other CombatUnits
-                // This method exists for interface consistency and future expansion
-                throw new NotImplementedException("CombatUnit unit reference resolution not yet implemented");
-            }
-            catch (Exception e)
-            {
-                AppService.Instance.HandleException(CLASS_NAME, "ResolveUnitReferences", e);
-                throw;
-            }
-        }
-
-        /// <summary>
-        /// Resolves profile references after deserialization.
-        /// Called by game state manager with reconstructed profile objects.
-        /// </summary>
-        /// <param name="weaponProfileLookup">Dictionary mapping weapon system IDs to WeaponSystemProfile instances</param>
-        /// <param name="unitProfileLookup">Dictionary mapping unit profile IDs to UnitProfile instances</param>
-        /// <param name="landBaseLookup">Dictionary mapping land base IDs to LandBaseFacility instances</param>
-        public void ResolveProfileReferences(
-            Dictionary<string, WeaponSystemProfile> weaponProfileLookup,
-            Dictionary<string, UnitProfile> unitProfileLookup,
-            Dictionary<string, LandBaseFacility> landBaseLookup)
-        {
-            try
-            {
-                // Resolve WeaponSystemProfile references
-                if (!string.IsNullOrEmpty(unresolvedDeployedProfileID))
-                {
-                    if (weaponProfileLookup.TryGetValue(unresolvedDeployedProfileID, out WeaponSystemProfile deployedProfile))
-                    {
-                        DeployedProfile = deployedProfile;
-                        unresolvedDeployedProfileID = "";
-                    }
-                    else
-                    {
-                        AppService.Instance.HandleException(CLASS_NAME, "ResolveProfileReferences",
-                            new KeyNotFoundException($"Deployed profile {unresolvedDeployedProfileID} not found in lookup dictionary"));
-                    }
-                }
-
-                if (!string.IsNullOrEmpty(unresolvedMountedProfileID))
-                {
-                    if (weaponProfileLookup.TryGetValue(unresolvedMountedProfileID, out WeaponSystemProfile mountedProfile))
-                    {
-                        MountedProfile = mountedProfile;
-                        unresolvedMountedProfileID = "";
-                    }
-                    else
-                    {
-                        AppService.Instance.HandleException(CLASS_NAME, "ResolveProfileReferences",
-                            new KeyNotFoundException($"Mounted profile {unresolvedMountedProfileID} not found in lookup dictionary"));
-                    }
-                }
-
-                // Resolve UnitProfile reference
-                if (!string.IsNullOrEmpty(unresolvedUnitProfileID))
-                {
-                    if (unitProfileLookup.TryGetValue(unresolvedUnitProfileID, out UnitProfile unitProfile))
-                    {
-                        UnitProfile = unitProfile;
-                        unresolvedUnitProfileID = "";
-                    }
-                    else
-                    {
-                        AppService.Instance.HandleException(CLASS_NAME, "ResolveProfileReferences",
-                            new KeyNotFoundException($"Unit profile {unresolvedUnitProfileID} not found in lookup dictionary"));
-                    }
-                }
-
-                // Resolve LandBaseFacility reference
-                if (!string.IsNullOrEmpty(unresolvedLandBaseProfileID))
-                {
-                    if (landBaseLookup.TryGetValue(unresolvedLandBaseProfileID, out LandBaseFacility landBase))
-                    {
-                        LandBaseFacility = landBase;
-                        unresolvedLandBaseProfileID = "";
-                    }
-                    else
-                    {
-                        AppService.Instance.HandleException(CLASS_NAME, "ResolveProfileReferences",
-                            new KeyNotFoundException($"Land base profile {unresolvedLandBaseProfileID} not found in lookup dictionary"));
-                    }
-                }
-
-                throw new NotImplementedException("CombatUnit profile reference resolution not yet implemented");
-            }
-            catch (Exception e)
-            {
-                AppService.Instance.HandleException(CLASS_NAME, "ResolveProfileReferences", e);
-                throw;
-            }
-        }
-
-        /// <summary>
-        /// Resolves leader references after deserialization.
-        /// Called by game state manager with reconstructed leader objects.
-        /// </summary>
-        /// <param name="leaderLookup">Dictionary mapping leader IDs to Leader instances</param>
-        public void ResolveLeaderReferences(Dictionary<string, Leader> leaderLookup)
-        {
-            try
-            {
-                if (!string.IsNullOrEmpty(unresolvedLeaderID))
-                {
-                    if (leaderLookup.TryGetValue(unresolvedLeaderID, out Leader leader))
-                    {
-                        CommandingOfficer = leader;
-                        unresolvedLeaderID = "";
-                    }
-                    else
-                    {
-                        AppService.Instance.HandleException(CLASS_NAME, "ResolveLeaderReferences",
-                            new KeyNotFoundException($"Leader {unresolvedLeaderID} not found in lookup dictionary"));
-                    }
-                }
-
-                throw new NotImplementedException("CombatUnit leader reference resolution not yet implemented");
-            }
-            catch (Exception e)
-            {
-                AppService.Instance.HandleException(CLASS_NAME, "ResolveLeaderReferences", e);
-                throw;
-            }
-        }
-
         /// <summary>
         /// Checks if there are unresolved references that need to be resolved.
         /// </summary>
@@ -2386,37 +2233,148 @@ namespace HammerAndSickle.Models
                    !string.IsNullOrEmpty(unresolvedLeaderID);
         }
 
+        #endregion // ISerializable Implementation
+
+
+        #region IResolvableReferences
+
         /// <summary>
-        /// Gets the list of profile IDs that need resolution for external reference tracking.
-        /// Used by game state manager to track dependencies.
+        /// Gets the list of unresolved reference IDs that need to be resolved.
         /// </summary>
-        public Dictionary<string, string> GetUnresolvedProfileIDs()
+        /// <returns>Collection of object IDs that this object references</returns>
+        public IReadOnlyList<string> GetUnresolvedReferenceIDs()
         {
-            var unresolvedProfiles = new Dictionary<string, string>();
+            var unresolvedIDs = new List<string>();
 
             if (!string.IsNullOrEmpty(unresolvedDeployedProfileID))
-                unresolvedProfiles["DeployedProfile"] = unresolvedDeployedProfileID;
+                unresolvedIDs.Add($"DeployedProfile:{unresolvedDeployedProfileID}");
 
             if (!string.IsNullOrEmpty(unresolvedMountedProfileID))
-                unresolvedProfiles["MountedProfile"] = unresolvedMountedProfileID;
+                unresolvedIDs.Add($"MountedProfile:{unresolvedMountedProfileID}");
 
             if (!string.IsNullOrEmpty(unresolvedUnitProfileID))
-                unresolvedProfiles["UnitProfile"] = unresolvedUnitProfileID;
+                unresolvedIDs.Add($"UnitProfile:{unresolvedUnitProfileID}");
 
             if (!string.IsNullOrEmpty(unresolvedLandBaseProfileID))
-                unresolvedProfiles["LandBaseFacility"] = unresolvedLandBaseProfileID;
+                unresolvedIDs.Add($"LandBase:{unresolvedLandBaseProfileID}");
 
-            return unresolvedProfiles;
+            if (!string.IsNullOrEmpty(unresolvedLeaderID))
+                unresolvedIDs.Add($"Leader:{unresolvedLeaderID}");
+
+            return unresolvedIDs.AsReadOnly();
         }
 
         /// <summary>
-        /// Gets the unresolved leader ID for external reference tracking.
+        /// Resolves object references using the provided data manager.
+        /// Called after all objects have been deserialized.
         /// </summary>
-        public string GetUnresolvedLeaderID()
+        /// <param name="manager">Game data manager containing all loaded objects</param>
+        public void ResolveReferences(GameDataManager manager)
         {
-            return unresolvedLeaderID;
+            try
+            {
+                // Resolve WeaponSystemProfile references
+                if (!string.IsNullOrEmpty(unresolvedDeployedProfileID))
+                {
+                    if (Enum.TryParse<WeaponSystems>(unresolvedDeployedProfileID, out WeaponSystems deployedWeapon))
+                    {
+                        var deployedProfile = manager.GetWeaponProfile(deployedWeapon, Nationality);
+                        if (deployedProfile != null)
+                        {
+                            DeployedProfile = deployedProfile;
+                            unresolvedDeployedProfileID = "";
+                        }
+                        else
+                        {
+                            AppService.Instance.HandleException(CLASS_NAME, "ResolveReferences",
+                                new KeyNotFoundException($"Deployed profile {deployedWeapon}_{Nationality} not found"));
+                        }
+                    }
+                    else
+                    {
+                        AppService.Instance.HandleException(CLASS_NAME, "ResolveReferences",
+                            new ArgumentException($"Invalid weapon system ID: {unresolvedDeployedProfileID}"));
+                    }
+                }
+
+                if (!string.IsNullOrEmpty(unresolvedMountedProfileID))
+                {
+                    if (Enum.TryParse<WeaponSystems>(unresolvedMountedProfileID, out WeaponSystems mountedWeapon))
+                    {
+                        var mountedProfile = manager.GetWeaponProfile(mountedWeapon, Nationality);
+                        if (mountedProfile != null)
+                        {
+                            MountedProfile = mountedProfile;
+                            unresolvedMountedProfileID = "";
+                        }
+                        else
+                        {
+                            AppService.Instance.HandleException(CLASS_NAME, "ResolveReferences",
+                                new KeyNotFoundException($"Mounted profile {mountedWeapon}_{Nationality} not found"));
+                        }
+                    }
+                    else
+                    {
+                        AppService.Instance.HandleException(CLASS_NAME, "ResolveReferences",
+                            new ArgumentException($"Invalid weapon system ID: {unresolvedMountedProfileID}"));
+                    }
+                }
+
+                // Resolve UnitProfile reference
+                if (!string.IsNullOrEmpty(unresolvedUnitProfileID))
+                {
+                    var unitProfile = manager.GetUnitProfile(unresolvedUnitProfileID, Nationality);
+                    if (unitProfile != null)
+                    {
+                        UnitProfile = unitProfile;
+                        unresolvedUnitProfileID = "";
+                    }
+                    else
+                    {
+                        AppService.Instance.HandleException(CLASS_NAME, "ResolveReferences",
+                            new KeyNotFoundException($"Unit profile {unresolvedUnitProfileID}_{Nationality} not found"));
+                    }
+                }
+
+                // Resolve LandBaseFacility reference
+                if (!string.IsNullOrEmpty(unresolvedLandBaseProfileID))
+                {
+                    var landBase = manager.GetLandBase(unresolvedLandBaseProfileID);
+                    if (landBase != null)
+                    {
+                        LandBaseFacility = landBase;
+                        unresolvedLandBaseProfileID = "";
+                    }
+                    else
+                    {
+                        AppService.Instance.HandleException(CLASS_NAME, "ResolveReferences",
+                            new KeyNotFoundException($"Land base {unresolvedLandBaseProfileID} not found"));
+                    }
+                }
+
+                // Resolve Leader reference
+                if (!string.IsNullOrEmpty(unresolvedLeaderID))
+                {
+                    var leader = manager.GetLeader(unresolvedLeaderID);
+                    if (leader != null)
+                    {
+                        CommandingOfficer = leader;
+                        unresolvedLeaderID = "";
+                    }
+                    else
+                    {
+                        AppService.Instance.HandleException(CLASS_NAME, "ResolveReferences",
+                            new KeyNotFoundException($"Leader {unresolvedLeaderID} not found"));
+                    }
+                }
+            }
+            catch (Exception e)
+            {
+                AppService.Instance.HandleException(CLASS_NAME, "ResolveReferences", e);
+                throw;
+            }
         }
 
-        #endregion // Serialization Support Methods
+        #endregion // IResolvableReferences
     }
 }
