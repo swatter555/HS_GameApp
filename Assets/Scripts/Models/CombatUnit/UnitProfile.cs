@@ -93,6 +93,7 @@ namespace HammerAndSickle.Models
 
                 UnitProfileID = source.UnitProfileID;
                 Nationality = source.Nationality;
+                currentHitPoints = source.currentHitPoints;
 
                 // Deep copy the dictionaries
                 weaponSystems = new Dictionary<WeaponSystems, int>(source.weaponSystems);
@@ -152,7 +153,24 @@ namespace HammerAndSickle.Models
         {
             try
             {
-               // TODO: Implement
+                // Basic properties
+                UnitProfileID = info.GetString(nameof(UnitProfileID));
+                Nationality = (Nationality)info.GetValue(nameof(Nationality), typeof(Nationality));
+                currentHitPoints = info.GetSingle(nameof(currentHitPoints));
+
+                // Deserialize weapon systems dictionary
+                int weaponSystemCount = info.GetInt32("WeaponSystemCount");
+                weaponSystems = new Dictionary<WeaponSystems, int>();
+
+                for (int i = 0; i < weaponSystemCount; i++)
+                {
+                    WeaponSystems weaponSystem = (WeaponSystems)info.GetValue($"WeaponSystem_{i}", typeof(WeaponSystems));
+                    int maxValue = info.GetInt32($"WeaponSystemValue_{i}");
+                    weaponSystems[weaponSystem] = maxValue;
+                }
+
+                // Initialize CurrentProfile (will be populated when intel reports are generated)
+                CurrentProfile = new Dictionary<WeaponSystems, int>();
             }
             catch (Exception e)
             {
@@ -401,7 +419,29 @@ namespace HammerAndSickle.Models
 
         public void GetObjectData(SerializationInfo info, StreamingContext context)
         {
-            // TODO: Implement
+            try
+            {
+                // Basic properties
+                info.AddValue(nameof(UnitProfileID), UnitProfileID);
+                info.AddValue(nameof(Nationality), Nationality);
+                info.AddValue(nameof(currentHitPoints), currentHitPoints);
+
+                // Serialize weapon systems dictionary
+                info.AddValue("WeaponSystemCount", weaponSystems.Count);
+
+                int index = 0;
+                foreach (var kvp in weaponSystems)
+                {
+                    info.AddValue($"WeaponSystem_{index}", kvp.Key);
+                    info.AddValue($"WeaponSystemValue_{index}", kvp.Value);
+                    index++;
+                }
+            }
+            catch (Exception e)
+            {
+                AppService.Instance.HandleException(CLASS_NAME, nameof(GetObjectData), e);
+                throw;
+            }
         }
 
         #endregion // ISerializable Implementation
@@ -411,8 +451,52 @@ namespace HammerAndSickle.Models
 
         public object Clone()
         {
-            // TODO: Implement
-            return null;
+            try
+            {
+                return new UnitProfile(this);
+            }
+            catch (Exception e)
+            {
+                AppService.Instance.HandleException(CLASS_NAME, nameof(Clone), e);
+                throw;
+            }
+        }
+
+        /// <summary>
+        /// Creates a deep copy of this UnitProfile with a new profile ID.
+        /// </summary>
+        /// <param name="newProfileID">The new profile ID for the cloned profile</param>
+        /// <returns>A new UnitProfile with identical weapon systems but different ID</returns>
+        public UnitProfile Clone(string newProfileID)
+        {
+            try
+            {
+                return new UnitProfile(this, newProfileID);
+            }
+            catch (Exception e)
+            {
+                AppService.Instance.HandleException(CLASS_NAME, "Clone", e);
+                throw;
+            }
+        }
+
+        /// <summary>
+        /// Creates a deep copy of this UnitProfile with a new profile ID and nationality.
+        /// </summary>
+        /// <param name="newProfileID">The new profile ID for the cloned profile</param>
+        /// <param name="newNationality">The new nationality for the cloned profile</param>
+        /// <returns>A new UnitProfile with identical weapon systems but different ID and nationality</returns>
+        public UnitProfile Clone(string newProfileID, Nationality newNationality)
+        {
+            try
+            {
+                return new UnitProfile(this, newProfileID, newNationality);
+            }
+            catch (Exception e)
+            {
+                AppService.Instance.HandleException(CLASS_NAME, "Clone", e);
+                throw;
+            }
         }
 
         #endregion // ICloneable Implementation        

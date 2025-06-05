@@ -669,7 +669,7 @@ namespace HammerAndSickle.Models
         BMB_TU16,
         BMB_TU22,
         BMB_TU22M3,
-        RCN_MIG25R,
+        RCNA_MIG25R,
         REG_INF_SV, // Regular Infantry
         AB_INF_SV,  // Airborne Infantry
         AM_INF_SV,  // Air Mobile Infantry
@@ -696,7 +696,7 @@ namespace HammerAndSickle.Models
         ATT_A10,
         BMB_F111,
         BMB_F117,
-        RCN_SR71,
+        RCNA_SR71,
         REG_INF_US,
         AB_INF_US,
         AM_INF_US,
