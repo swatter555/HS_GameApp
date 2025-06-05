@@ -71,6 +71,7 @@ namespace HammerAndSickle.Models
 
         #endregion // Properties
 
+
         #region Constructors
 
         /// <summary>
@@ -245,6 +246,7 @@ namespace HammerAndSickle.Models
 
         #endregion // Constructors
 
+
         #region Combat Value Accessors
 
         /// <summary>
@@ -375,6 +377,7 @@ namespace HammerAndSickle.Models
 
         #endregion // Combat Value Accessors
 
+
         #region Upgrade Management
 
         /// <summary>
@@ -468,6 +471,7 @@ namespace HammerAndSickle.Models
 
         #endregion // Upgrade Management
 
+
         #region Range and Movement Methods
 
         /// <summary>
@@ -540,6 +544,7 @@ namespace HammerAndSickle.Models
 
         #endregion // Range and Movement Methods
 
+
         #region Public Methods
 
         /// <summary>
@@ -594,8 +599,16 @@ namespace HammerAndSickle.Models
                     throw new ArgumentException("New name cannot be null or empty", nameof(newName));
 
                 var clone = Clone();
-                // Use reflection to set the name since it's private set
-                typeof(WeaponSystemProfile).GetProperty(nameof(Name)).SetValue(clone, newName);
+
+                // Use reflection to set both name and generate new ID
+                var nameProperty = typeof(WeaponSystemProfile).GetProperty(nameof(Name));
+                var idProperty = typeof(WeaponSystemProfile).GetProperty(nameof(WeaponSystemID));
+
+                nameProperty?.SetValue(clone, newName);
+                // Generate unique ID by appending GUID suffix to weapon system name
+                string newId = $"{WeaponSystem}_{Guid.NewGuid().ToString("N")[..8]}";
+                idProperty?.SetValue(clone, newId);
+
                 return clone;
             }
             catch (Exception e)
@@ -632,6 +645,7 @@ namespace HammerAndSickle.Models
 
         #endregion // Public Methods
 
+
         #region Private Methods
 
         /// <summary>
@@ -655,6 +669,7 @@ namespace HammerAndSickle.Models
         }
 
         #endregion // Private Methods
+
 
         #region ISerializable Implementation
 
@@ -713,6 +728,7 @@ namespace HammerAndSickle.Models
         }
 
         #endregion // ISerializable Implementation
+
 
         #region ICloneable Implementation
 

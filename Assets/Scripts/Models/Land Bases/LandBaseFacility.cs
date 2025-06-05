@@ -115,6 +115,7 @@ namespace HammerAndSickle.Models
 
         #endregion // Constructors
 
+
         #region Public Methods
 
         public virtual void AddDamage(int incomingDamage)
@@ -127,14 +128,9 @@ namespace HammerAndSickle.Models
                     throw new ArgumentException("Incoming damage cannot be negative", nameof(incomingDamage));
                 }
 
-                // Clamp the incoming damage to be between 0 and 100
-                incomingDamage = Math.Max(0, Math.Min(MAX_DAMAGE, incomingDamage));
-
-                // Add the incoming damage to the current damage
-                Damage += incomingDamage;
-
-                // Clamp the total damage to be between 0 and 100
-                Damage = Math.Max(MIN_DAMAGE, Math.Min(MAX_DAMAGE, Damage));
+                // Add the incoming damage to the current damage, then clamp the result
+                int newDamage = Damage + incomingDamage;
+                Damage = Math.Max(MIN_DAMAGE, Math.Min(MAX_DAMAGE, newDamage));
 
                 // Update operational capacity based on the new damage level
                 UpdateOperationalCapacity();
@@ -274,6 +270,7 @@ namespace HammerAndSickle.Models
         }
 
         #endregion // Public Methods
+
 
         #region Protected Methods
 

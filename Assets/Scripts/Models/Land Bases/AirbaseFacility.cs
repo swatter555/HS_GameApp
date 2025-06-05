@@ -129,6 +129,12 @@ namespace HammerAndSickle.Models
                     throw new ArgumentNullException(nameof(unit), "Air unit cannot be null");
                 }
 
+                // Check if unit is already assigned to another base
+                if (unit.LandBaseFacility != null && unit.LandBaseFacility != this)
+                {
+                    throw new InvalidOperationException($"Unit {unit.UnitName} is already assigned to base {unit.LandBaseFacility.BaseName}");
+                }
+
                 // Make sure we don't add more than the maximum allowed
                 if (airUnitsAttached.Count >= MaxBaseAirUnits)
                 {
@@ -149,6 +155,10 @@ namespace HammerAndSickle.Models
 
                 // Add the unit to the airbase
                 airUnitsAttached.Add(unit);
+
+                // Update the unit's facility reference (assuming this property exists or will be added)
+                // This would require adding LandBaseFacility property to CombatUnit
+                // unit.SetLandBaseFacility(this);
             }
             catch (Exception e)
             {
