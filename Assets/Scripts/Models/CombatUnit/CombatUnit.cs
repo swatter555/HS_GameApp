@@ -2100,18 +2100,19 @@ namespace HammerAndSickle.Models
                     this.IsTransportable,
                     this.IsLandBase,
                     this.LandBaseFacility
-                );
-
-                // Deep copy all StatsMaxCurrent objects by reconstructing them
-                // This overwrites the default values set by the constructor
-                clone.HitPoints = new StatsMaxCurrent(this.HitPoints.Max, this.HitPoints.Current);
-                clone.DaysSupply = new StatsMaxCurrent(this.DaysSupply.Max, this.DaysSupply.Current);
-                clone.MovementPoints = new StatsMaxCurrent(this.MovementPoints.Max, this.MovementPoints.Current);
-                clone.MoveActions = new StatsMaxCurrent(this.MoveActions.Max, this.MoveActions.Current);
-                clone.CombatActions = new StatsMaxCurrent(this.CombatActions.Max, this.CombatActions.Current);
-                clone.DeploymentActions = new StatsMaxCurrent(this.DeploymentActions.Max, this.DeploymentActions.Current);
-                clone.OpportunityActions = new StatsMaxCurrent(this.OpportunityActions.Max, this.OpportunityActions.Current);
-                clone.IntelActions = new StatsMaxCurrent(this.IntelActions.Max, this.IntelActions.Current);
+                )
+                {
+                    // Deep copy all StatsMaxCurrent objects by reconstructing them
+                    // This overwrites the default values set by the constructor
+                    HitPoints = new StatsMaxCurrent(this.HitPoints.Max, this.HitPoints.Current),
+                    DaysSupply = new StatsMaxCurrent(this.DaysSupply.Max, this.DaysSupply.Current),
+                    MovementPoints = new StatsMaxCurrent(this.MovementPoints.Max, this.MovementPoints.Current),
+                    MoveActions = new StatsMaxCurrent(this.MoveActions.Max, this.MoveActions.Current),
+                    CombatActions = new StatsMaxCurrent(this.CombatActions.Max, this.CombatActions.Current),
+                    DeploymentActions = new StatsMaxCurrent(this.DeploymentActions.Max, this.DeploymentActions.Current),
+                    OpportunityActions = new StatsMaxCurrent(this.OpportunityActions.Max, this.OpportunityActions.Current),
+                    IntelActions = new StatsMaxCurrent(this.IntelActions.Max, this.IntelActions.Current)
+                };
 
                 // Copy per-unit state data
                 clone.SetExperience(this.ExperiencePoints); // This also sets ExperienceLevel correctly
