@@ -188,6 +188,12 @@ namespace HammerAndSickle.Models
         public StatsMaxCurrent MovementPoints { get; private set; }
         public Vector2 MapPos { get; internal set; }
 
+        // TODO: Implement into serialization and cloning.
+        public SpottedLevel SpottedLevel { get; private set; }
+
+        // TODO: Implement
+        public List<Vector2> MovementHistoryLastTurn { get; private set; } = new List<Vector2>(); 
+
         #endregion
 
 
@@ -1442,7 +1448,7 @@ namespace HammerAndSickle.Models
                 // Update unit profile to reflect current strength
                 if (UnitProfile != null)
                 {
-                    UnitProfile.UpdateCurrentProfile((int)HitPoints.Current);
+                    UnitProfile.UpdateCurrentHP(HitPoints.Current);
                 }
 
                 // Update efficiency level based on damage
@@ -1480,7 +1486,7 @@ namespace HammerAndSickle.Models
                 // Update unit profile to reflect current strength
                 if (UnitProfile != null)
                 {
-                    UnitProfile.UpdateCurrentProfile((int)HitPoints.Current);
+                    UnitProfile.UpdateCurrentHP(HitPoints.Current);
                 }
 
                 // Update efficiency level based on new damage state
@@ -2063,6 +2069,17 @@ namespace HammerAndSickle.Models
         }
 
         #endregion // Private Combat State Helpers
+
+
+        #region Status Reports and Spotted Level
+
+        // TODO: Set spotted level
+        // TODO: Degrade spotted level one level each turn.
+
+        // TODO: Player unit intel report (full information)
+        // TODO: AI unit intel report based on spotted level
+
+        #endregion // Status Reports
 
 
         #region ICloneable Implementation
