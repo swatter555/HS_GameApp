@@ -34,13 +34,17 @@ namespace HammerAndSickle.Models
 
         #endregion // Constants
 
+        #region Fields
+
+        private float lastKnownMultiplier = 1.0f;
+        private readonly Dictionary<WeaponSystems, int> maxValues;
+
+        #endregion // Fields
+
         #region Properties
 
         public string UnitProfileID { get; private set; }
         public Nationality Nationality { get; private set; }
-
-        // Max values used to generate the current profile
-        private readonly Dictionary<WeaponSystems, int> maxValues;
 
         // The current profile, reflecting the paper strength of the unit
         public Dictionary<WeaponSystems, int> CurrentProfile { get; private set; }
@@ -52,8 +56,8 @@ namespace HammerAndSickle.Models
         /// <summary>
         /// Creates a new instance of the UnitProfile class with validation.
         /// </summary>
-        /// <param profileID="profileID">The profileID of the unit profile</param>
-        /// <param profileID="nationality">The nationality of the unit</param>
+        /// <param name="profileID">The profileID of the unit profile</param>
+        /// <param name="nationality">The nationality of the unit</param>
         public UnitProfile(string profileID, Nationality nationality)
         {
             try
@@ -64,6 +68,7 @@ namespace HammerAndSickle.Models
 
                 UnitProfileID = profileID;
                 Nationality = nationality;
+                lastKnownMultiplier = 1.0f;
                 maxValues = new Dictionary<WeaponSystems, int>();
                 CurrentProfile = new Dictionary<WeaponSystems, int>();
             }
@@ -77,7 +82,7 @@ namespace HammerAndSickle.Models
         /// <summary>
         /// Creates a new instance of UnitProfile as a copy of an existing profile.
         /// </summary>
-        /// <param profileID="source">The UnitProfile to copy from</param>
+        /// <param name="source">The UnitProfile to copy from</param>
         private UnitProfile(UnitProfile source)
         {
             try
@@ -87,6 +92,7 @@ namespace HammerAndSickle.Models
 
                 UnitProfileID = source.UnitProfileID;
                 Nationality = source.Nationality;
+                lastKnownMultiplier = source.lastKnownMultiplier;
 
                 // Deep copy the dictionaries
                 maxValues = new Dictionary<WeaponSystems, int>(source.maxValues);
@@ -102,8 +108,8 @@ namespace HammerAndSickle.Models
         /// <summary>
         /// Creates a new instance of UnitProfile as a copy with a new profileID.
         /// </summary>
-        /// <param profileID="source">The UnitProfile to copy from</param>
-        /// <param profileID="newName">The new profileID for the profile</param>
+        /// <param name="source">The UnitProfile to copy from</param>
+        /// <param name="newName">The new profileID for the profile</param>
         private UnitProfile(UnitProfile source, string newName) : this(source)
         {
             try
@@ -123,9 +129,9 @@ namespace HammerAndSickle.Models
         /// <summary>
         /// Creates a new instance of UnitProfile as a copy with a new profileID and nationality.
         /// </summary>
-        /// <param profileID="source">The UnitProfile to copy from</param>
-        /// <param profileID="newName">The new profileID for the profile</param>
-        /// <param profileID="newNationality">The new nationality for the profile</param>
+        /// <param name="source">The UnitProfile to copy from</param>
+        /// <param name="newName">The new profileID for the profile</param>
+        /// <param name="newNationality">The new nationality for the profile</param>
         private UnitProfile(UnitProfile source, string newName, Nationality newNationality) : this(source, newName)
         {
             try
@@ -149,6 +155,17 @@ namespace HammerAndSickle.Models
                 // Retrieve basic properties
                 UnitProfileID = info.GetString(nameof(UnitProfileID));
                 Nationality = (Nationality)info.GetValue(nameof(Nationality), typeof(Nationality));
+
+                // Retrieve lastKnownMultiplier with backward compatibility
+                try
+                {
+                    lastKnownMultiplier = info.GetSingle(nameof(lastKnownMultiplier));
+                }
+                catch (SerializationException)
+                {
+                    // Backward compatibility: if multiplier not found, default to 1.0
+                    lastKnownMultiplier = 1.0f;
+                }
 
                 // Retrieve dictionaries
                 int maxValuesCount = info.GetInt32("MaxValuesCount");
@@ -189,8 +206,8 @@ namespace HammerAndSickle.Models
         /// Sets the maximum value for a specific weapon system in this unit profile.
         /// Creates a new entry if the weapon system doesn't exist in this profile.
         /// </summary>
-        /// <param profileID="weaponSystem">The weapon system to configure</param>
-        /// <param profileID="maxValue">The maximum number of this weapon system in the unit</param>
+        /// <param name="weaponSystem">The weapon system to configure</param>
+        /// <param name="maxValue">The maximum number of this weapon system in the unit</param>
         public void SetWeaponSystemValue(WeaponSystems weaponSystem, int maxValue)
         {
             try
@@ -213,7 +230,7 @@ namespace HammerAndSickle.Models
         /// <summary>
         /// Gets the maximum value for a specific weapon system.
         /// </summary>
-        /// <param profileID="weaponSystem">The weapon system to query</param>
+        /// <param name="weaponSystem">The weapon system to query</param>
         /// <returns>The maximum value, or 0 if not found</returns>
         public int GetWeaponSystemMaxValue(WeaponSystems weaponSystem)
         {
@@ -231,7 +248,7 @@ namespace HammerAndSickle.Models
         /// <summary>
         /// Gets the current value for a specific weapon system.
         /// </summary>
-        /// <param profileID="weaponSystem">The weapon system to query</param>
+        /// <param name="weaponSystem">The weapon system to query</param>
         /// <returns>The current value, or 0 if not found</returns>
         public int GetWeaponSystemCurrentValue(WeaponSystems weaponSystem)
         {
@@ -249,7 +266,7 @@ namespace HammerAndSickle.Models
         /// <summary>
         /// Removes a weapon system from this profile entirely.
         /// </summary>
-        /// <param profileID="weaponSystem">The weapon system to remove</param>
+        /// <param name="weaponSystem">The weapon system to remove</param>
         /// <returns>True if the weapon system was removed, false if it wasn't found</returns>
         public bool RemoveWeaponSystem(WeaponSystems weaponSystem)
         {
@@ -269,7 +286,7 @@ namespace HammerAndSickle.Models
         /// <summary>
         /// Checks if this profile contains a specific weapon system.
         /// </summary>
-        /// <param profileID="weaponSystem">The weapon system to check for</param>
+        /// <param name="weaponSystem">The weapon system to check for</param>
         /// <returns>True if the weapon system is present</returns>
         public bool HasWeaponSystem(WeaponSystems weaponSystem)
         {
@@ -298,7 +315,7 @@ namespace HammerAndSickle.Models
         /// Updates the current profile based on the current hit points of the unit.
         /// This should be called whenever the unit's hit points change.
         /// </summary>
-        /// <param profileID="currentHitPoints">The current hit points of the unit</param>
+        /// <param name="currentHitPoints">The current hit points of the unit</param>
         public void UpdateCurrentProfile(int currentHitPoints)
         {
             try
@@ -308,15 +325,15 @@ namespace HammerAndSickle.Models
                 else if (currentHitPoints > CUConstants.MAX_HP)
                     currentHitPoints = CUConstants.MAX_HP;
 
-                // Calculate the current multiplier based on hit points
-                float multiplier = (float)currentHitPoints / CUConstants.MAX_HP;
+                // Calculate and store the current multiplier
+                lastKnownMultiplier = (float)currentHitPoints / CUConstants.MAX_HP;
 
                 // Clear and regenerate the current profile
                 CurrentProfile.Clear();
 
                 foreach (var kvp in maxValues)
                 {
-                    int currentValue = (int)Math.Round(kvp.Value * multiplier);
+                    int currentValue = (int)Math.Round(kvp.Value * lastKnownMultiplier);
                     CurrentProfile[kvp.Key] = currentValue;
                 }
             }
@@ -367,6 +384,7 @@ namespace HammerAndSickle.Models
             {
                 maxValues.Clear();
                 CurrentProfile.Clear();
+                lastKnownMultiplier = 1.0f; // Reset multiplier to default
             }
             catch (Exception e)
             {
@@ -394,7 +412,7 @@ namespace HammerAndSickle.Models
         /// <summary>
         /// Creates a deep copy of this UnitProfile with a new profileID.
         /// </summary>
-        /// <param profileID="newName">The profileID for the cloned profile</param>
+        /// <param name="newName">The profileID for the cloned profile</param>
         /// <returns>A new UnitProfile with identical values but a different profileID</returns>
         public UnitProfile Clone(string newName)
         {
@@ -413,8 +431,8 @@ namespace HammerAndSickle.Models
         /// Creates a copy of this UnitProfile with a different nationality.
         /// Useful for creating variants of units for different factions.
         /// </summary>
-        /// <param profileID="newName">The profileID for the cloned profile</param>
-        /// <param profileID="newNationality">The nationality for the cloned profile</param>
+        /// <param name="newName">The profileID for the cloned profile</param>
+        /// <param name="newNationality">The nationality for the cloned profile</param>
         /// <returns>A new UnitProfile with the specified profileID and nationality</returns>
         public UnitProfile Clone(string newName, Nationality newNationality)
         {
@@ -443,10 +461,10 @@ namespace HammerAndSickle.Models
         #region Private Methods
 
         /// <summary>
-        /// Updates the current profile for a specific weapon system based on the last known multiplier.
+        /// Updates the current profile for a specific weapon system based on the stored multiplier.
         /// This is called when a weapon system max value is changed.
         /// </summary>
-        /// <param profileID="weaponSystem">The weapon system to update</param>
+        /// <param name="weaponSystem">The weapon system to update</param>
         private void UpdateCurrentProfileForWeapon(WeaponSystems weaponSystem)
         {
             try
@@ -454,24 +472,8 @@ namespace HammerAndSickle.Models
                 if (!maxValues.TryGetValue(weaponSystem, out int maxValue))
                     return;
 
-                // Calculate multiplier from existing data if possible
-                float multiplier = 1.0f;
-                if (maxValues.Count > 1)
-                {
-                    // Find another weapon system to calculate current multiplier
-                    foreach (var kvp in maxValues)
-                    {
-                        if (kvp.Key != weaponSystem && kvp.Value > 0 &&
-                            CurrentProfile.TryGetValue(kvp.Key, out int currentValue))
-                        {
-                            multiplier = (float)currentValue / kvp.Value;
-                            break;
-                        }
-                    }
-                }
-
-                // Update the current value for this weapon system
-                int newCurrentValue = (int)Math.Round(maxValue * multiplier);
+                // Use the last known multiplier instead of calculating from other weapons
+                int newCurrentValue = (int)Math.Round(maxValue * lastKnownMultiplier);
                 CurrentProfile[weaponSystem] = newCurrentValue;
             }
             catch (Exception e)
@@ -487,8 +489,8 @@ namespace HammerAndSickle.Models
         /// <summary>
         /// Serializes this UnitProfile instance.
         /// </summary>
-        /// <param profileID="info">The SerializationInfo object to populate</param>
-        /// <param profileID="context">The StreamingContext structure</param>
+        /// <param name="info">The SerializationInfo object to populate</param>
+        /// <param name="context">The StreamingContext structure</param>
         public void GetObjectData(SerializationInfo info, StreamingContext context)
         {
             try
@@ -496,6 +498,7 @@ namespace HammerAndSickle.Models
                 // Store basic properties
                 info.AddValue(nameof(UnitProfileID), UnitProfileID);
                 info.AddValue(nameof(Nationality), Nationality);
+                info.AddValue(nameof(lastKnownMultiplier), lastKnownMultiplier);
 
                 // Store dictionaries count
                 info.AddValue("MaxValuesCount", maxValues.Count);

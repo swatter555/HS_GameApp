@@ -39,8 +39,38 @@ namespace HammerAndSickle.Models
         public bool IsMainDepot => DepotCategory == DepotCategory.Main;
 
         // Properties with rules.
-        public bool HasAirSupply { get => hasAirSupply && IsMainDepot; set => hasAirSupply = IsMainDepot && value; }
-        public bool HasNavalSupply { get => hasNavalSupply && IsMainDepot; set => hasNavalSupply = IsMainDepot && value; }
+        public bool HasAirSupply
+        {
+            get => hasAirSupply && IsMainDepot;
+            set
+            {
+                if (IsMainDepot)
+                {
+                    hasAirSupply = value;
+                }
+                else if (value)
+                {
+                    throw new InvalidOperationException("Only main depots can have air supply capability");
+                }
+            }
+        }
+
+        public bool HasNavalSupply
+        {
+            get => hasNavalSupply && IsMainDepot;
+            set
+            {
+                if (IsMainDepot)
+                {
+                    hasNavalSupply = value;
+                }
+                else if (value)
+                {
+                    throw new InvalidOperationException("Only main depots can have naval supply capability");
+                }
+            }
+        }
+
         public int ProjectionRadius => CUConstants.ProjectionRangeValues[SupplyProjection];
 
         #endregion // Properties
@@ -116,6 +146,7 @@ namespace HammerAndSickle.Models
         }
 
         #endregion // Constructors
+
 
         #region Supply Management Methods
 
@@ -344,6 +375,29 @@ namespace HammerAndSickle.Models
             }
         }
 
+        public bool UpgradeToMainDepot()
+        {
+            try
+            {
+                if (DepotCategory == DepotCategory.Main)
+                {
+                    return false; // Already main depot
+                }
+
+                DepotCategory = DepotCategory.Main;
+
+                // Re-evaluate special ability backing fields now that we're a main depot
+                // The properties will now work correctly since IsMainDepot returns true
+
+                return true;
+            }
+            catch (Exception e)
+            {
+                AppService.Instance.HandleException(CLASS_NAME, "UpgradeToMainDepot", e);
+                return false;
+            }
+        }
+
         public bool UpgradeGenerationRate()
         {
             try
@@ -452,6 +506,12 @@ namespace HammerAndSickle.Models
                 if (!IsMainDepot)
                     return false;
 
+                // Require minimum stockpile for air supply operations
+                if (StockpileInDays < 10f)
+                {
+                    throw new InvalidOperationException("Air supply requires at least 10 days of stockpile");
+                }
+
                 HasAirSupply = true;
                 return true;
             }
@@ -468,6 +528,12 @@ namespace HammerAndSickle.Models
             {
                 if (!IsMainDepot)
                     return false;
+
+                // Require minimum stockpile for naval supply operations
+                if (StockpileInDays < 15f)
+                {
+                    throw new InvalidOperationException("Naval supply requires at least 15 days of stockpile");
+                }
 
                 HasNavalSupply = true;
                 return true;

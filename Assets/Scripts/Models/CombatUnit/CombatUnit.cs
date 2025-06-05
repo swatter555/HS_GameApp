@@ -168,7 +168,7 @@ namespace HammerAndSickle.Models
         public LandBaseFacility LandBaseFacility { get; private set; }
 
         // The unit's leader.
-        public Leader CommandingOfficer { get; private set; }
+        public Leader CommandingOfficer { get; internal set; }
 
         // Action counts using StatsMaxCurrent
         public StatsMaxCurrent MoveActions { get; private set; }
@@ -180,13 +180,13 @@ namespace HammerAndSickle.Models
         // State data using StatsMaxCurrent where appropriate
         public int ExperiencePoints { get; private set; }
         public ExperienceLevel ExperienceLevel { get; private set; }
-        public EfficiencyLevel EfficiencyLevel { get; private set; }
-        public bool IsMounted { get; private set; }
-        public CombatState CombatState { get; private set; }
+        public EfficiencyLevel EfficiencyLevel { get; internal set; }
+        public bool IsMounted { get; internal set; }
+        public CombatState CombatState { get; internal set; }
         public StatsMaxCurrent HitPoints { get; private set; }
         public StatsMaxCurrent DaysSupply { get; private set; }
         public StatsMaxCurrent MovementPoints { get; private set; }
-        public Vector2 MapPos { get; private set; }
+        public Vector2 MapPos { get; internal set; }
 
         #endregion
 
@@ -1292,10 +1292,7 @@ namespace HammerAndSickle.Models
         {
             try
             {
-                // Use reflection to set MapPos since it has a private setter
-                var unitType = typeof(CombatUnit);
-                var mapPosProperty = unitType.GetProperty("MapPos");
-                mapPosProperty?.SetValue(this, newPos);
+                MapPos = newPos; // Direct assignment instead of reflection
             }
             catch (Exception e)
             {
@@ -1667,10 +1664,6 @@ namespace HammerAndSickle.Models
             {
                 float effectiveness = GetCombatEffectiveness();
 
-                // Use reflection to set EfficiencyLevel since it has private setter
-                var unitType = typeof(CombatUnit);
-                var efficiencyProperty = unitType.GetProperty("EfficiencyLevel");
-
                 EfficiencyLevel newEfficiency = effectiveness switch
                 {
                     >= 0.9f => EfficiencyLevel.FullyOperational,
@@ -1680,7 +1673,7 @@ namespace HammerAndSickle.Models
                     _ => EfficiencyLevel.StaticOperations
                 };
 
-                efficiencyProperty?.SetValue(this, newEfficiency);
+                EfficiencyLevel = newEfficiency; // Direct assignment instead of reflection
             }
             catch (Exception e)
             {
@@ -1724,23 +1717,16 @@ namespace HammerAndSickle.Models
                 // Store previous state for event notifications
                 var previousState = CombatState;
 
-                // Consume deployment action
+                // Consume resources...
                 ConsumeDeploymentAction();
-
-                // Consume movement points
                 float movementCost = GetDeploymentActionMovementCost();
                 ConsumeMovementPoints(movementCost);
 
-                // Update combat state using reflection (private setter)
-                var unitType = typeof(CombatUnit);
-                var combatStateProperty = unitType.GetProperty("CombatState");
-                combatStateProperty?.SetValue(this, newState);
+                // Update combat state directly
+                CombatState = newState;
 
                 // Apply profile changes for new state
                 ApplyProfileForState(newState);
-
-                // TODO: Trigger state change event
-                // OnCombatStateChanged(previousState, newState);
 
                 return true;
             }
@@ -2099,7 +2085,8 @@ namespace HammerAndSickle.Models
                     this.UnitProfile,          // Shared reference
                     this.IsTransportable,
                     this.IsLandBase,
-                    this.LandBaseFacility
+                    // Deep clone LandBaseFacility if this unit is not a land base itself
+                    this.IsLandBase ? this.LandBaseFacility : this.LandBaseFacility?.Clone()
                 )
                 {
                     // Deep copy all StatsMaxCurrent objects by reconstructing them
@@ -2145,6 +2132,14 @@ namespace HammerAndSickle.Models
                     ?.SetValue(clone, this.unresolvedLandBaseProfileID);
                 cloneType.GetField("unresolvedLeaderID", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance)
                     ?.SetValue(clone, this.unresolvedLeaderID);
+
+                // Important: Don't copy the LandBaseFacility reference for non-land-base units
+                // The clone should start unattached to any base
+                if (!clone.IsLandBase)
+                {
+                    clone.CommandingOfficer = null; // Will need to be reassigned
+                                                    // Note: LandBaseFacility reference handled in constructor above
+                }
 
                 return clone;
             }
