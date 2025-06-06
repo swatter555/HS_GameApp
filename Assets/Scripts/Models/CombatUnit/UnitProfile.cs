@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Runtime.Serialization;
 using System.Text;
 using HammerAndSickle.Services;
+using System.Linq;
 
 namespace HammerAndSickle.Models
 {
@@ -320,31 +321,102 @@ namespace HammerAndSickle.Models
         /// <returns></returns>
         public string GetPlayerUnitIntelReport(string unitName, CombatState combatState, ExperienceLevel xpLevel, EfficiencyLevel effLevel)
         {
-            /* 
-             *     Format for the report is as follows
-             *     
-             *     Example:
-             *     
-             *     Soviet 76th Guards Tank Regiment
-             *     2100 Men, 130 Tanks, 80 IFVs, 10 APCs, 10 Recon, 
-             *     45 Artillery, 12 AAA, 8 SAMs, 
-             *     3 Attack Helicopters, 10 Transport Helicopters
-             *     STATE: Deployed  EXP: Veteran EFF: PeakOperational
-             */
-
             try
             {
-                // This is the base multiplier for each weapon system.
+                // Calculate multiplier for current strength
                 float currentMultiplier = currentHitPoints / CUConstants.MAX_HP;
 
-                StringBuilder sb = new StringBuilder();
-
+                // Calculate current values for each weapon system
+                var currentValues = new Dictionary<WeaponSystems, int>();
                 foreach (var item in weaponSystems)
                 {
-
+                    int currentValue = (int)Math.Round(item.Value * currentMultiplier);
+                    if (currentValue > 0)
+                    {
+                        currentValues[item.Key] = currentValue;
+                    }
                 }
 
-                return sb.ToString();
+                // Initialize buckets
+                var buckets = new Dictionary<string, int>
+                {
+                    ["Men"] = 0,
+                    ["Tanks"] = 0,
+                    ["IFVs"] = 0,
+                    ["APCs"] = 0,
+                    ["Recon"] = 0,
+                    ["Artillery"] = 0,
+                    ["Rocket Artillery"] = 0,
+                    ["Surface To Surface Missiles"] = 0,
+                    ["SAMs"] = 0,
+                    ["Anti-aircraft Artillery"] = 0,
+                    ["MANPADs"] = 0,
+                    ["ATGMs"] = 0,
+                    ["Attack Helicopters"] = 0,
+                    ["Transport Helicopters"] = 0,
+                    ["Fighters"] = 0,
+                    ["Multirole"] = 0,
+                    ["Attack"] = 0,
+                    ["Bombers"] = 0,
+                    ["Transports"] = 0,
+                    ["AWACS"] = 0,
+                    ["Recon Aircraft"] = 0
+                };
+
+                // Categorize weapon systems into buckets
+                foreach (var item in currentValues)
+                {
+                    string prefix = GetWeaponSystemPrefix(item.Key);
+                    string bucketName = MapPrefixToBucket(prefix);
+
+                    if (bucketName != null)
+                    {
+                        buckets[bucketName] += item.Value;
+                    }
+                }
+
+                // Determine if this is an air unit
+                bool isAirUnit = buckets["Fighters"] > 0 || buckets["Multirole"] > 0 ||
+                                buckets["Attack"] > 0 || buckets["Bombers"] > 0 ||
+                                buckets["Transports"] > 0 || buckets["AWACS"] > 0 ||
+                                buckets["Recon Aircraft"] > 0;
+
+                // Build the report
+                var lines = new List<string>();
+
+                // First line: Nationality + Unit Name
+                string nationalityString = Utils.NationalityUtils.GetDisplayName(Nationality);
+                lines.Add($"{nationalityString} {unitName}");
+
+                // Determine bucket order based on unit type
+                var bucketOrder = isAirUnit ?
+                    new[] { "Men", "Fighters", "Multirole", "Attack", "Bombers", "Transports", "AWACS", "Recon Aircraft",
+                   "Tanks", "IFVs", "APCs", "Recon", "Artillery", "Rocket Artillery", "Surface To Surface Missiles",
+                   "SAMs", "Anti-aircraft Artillery", "MANPADs", "ATGMs", "Attack Helicopters", "Transport Helicopters" } :
+                    new[] { "Men", "Tanks", "IFVs", "APCs", "Recon", "Artillery", "Rocket Artillery", "Surface To Surface Missiles",
+                   "SAMs", "Anti-aircraft Artillery", "MANPADs", "ATGMs", "Attack Helicopters", "Transport Helicopters" };
+
+                // Collect non-zero weapon items
+                var weaponItems = new List<string>();
+                foreach (string bucketName in bucketOrder)
+                {
+                    if (buckets[bucketName] > 0)
+                    {
+                        weaponItems.Add($"{buckets[bucketName]} {bucketName}");
+                    }
+                }
+
+                // Format weapon items into lines (about 5 per line)
+                for (int i = 0; i < weaponItems.Count; i += 5)
+                {
+                    var lineItems = weaponItems.Skip(i).Take(5);
+                    lines.Add(string.Join(", ", lineItems));
+                }
+
+                // Status line
+                lines.Add($"STATE: {combatState}  EXP: {xpLevel}  EFF: {effLevel}");
+
+                return string.Join(Environment.NewLine, lines);
             }
             catch (Exception e)
             {
@@ -410,6 +482,59 @@ namespace HammerAndSickle.Models
                 AppService.Instance.HandleException(CLASS_NAME, "GetAIUnitIntelReport", e);
                 throw;
             }
+        }
+
+        /// <summary>
+        /// Extracts the prefix from the name of a weapon system.
+        /// </summary>
+        /// <param name="weaponSystem">The weapon system whose name prefix is to be extracted.</param>
+        /// <returns>A string containing the prefix of the weapon system's name. If the name does not contain an underscore, the
+        /// entire name of the weapon system is returned.</returns>
+        private string GetWeaponSystemPrefix(WeaponSystems weaponSystem)
+        {
+            string weaponName = weaponSystem.ToString();
+            int underscoreIndex = weaponName.IndexOf('_');
+            return underscoreIndex >= 0 ? weaponName.Substring(0, underscoreIndex) : weaponName;
+        }
+
+        /// <summary>
+        /// Maps a given prefix to its corresponding bucket category.
+        /// </summary>
+        /// <remarks>The method uses a predefined mapping of prefixes to bucket categories. For example:
+        /// <list type="bullet"> <item><description>Prefixes such as "REG", "AB", and "AM" map to the "Men"
+        /// category.</description></item> <item><description>"TANK" maps to "Tanks".</description></item>
+        /// <item><description>Prefixes like "SAM" and "SPSAM" map to "SAMs".</description></item> </list> If the prefix
+        /// does not match any of the predefined mappings, the method returns <see langword="null"/>.</remarks>
+        /// <param name="prefix">The prefix representing a specific category. This value determines the bucket to which it is mapped.</param>
+        /// <returns>A string representing the bucket category corresponding to the provided prefix.  Returns <see
+        /// langword="null"/> if the prefix does not match any known category.</returns>
+        private string MapPrefixToBucket(string prefix)
+        {
+            return prefix switch
+            {
+                "REG" or "AB" or "AM" or "MAR" or "SPEC" or "ENG" => "Men",
+                "TANK" => "Tanks",
+                "IFV" => "IFVs",
+                "APC" => "APCs",
+                "RCN" => "Recon",
+                "ART" or "SPA" => "Artillery",
+                "ROC" => "Rocket Artillery",
+                "SSM" => "Surface To Surface Missiles",
+                "SAM" or "SPSAM" => "SAMs",
+                "AAA" or "SPAAA" => "Anti-aircraft Artillery",
+                "MANPAD" => "MANPADs",
+                "ATGM" => "ATGMs",
+                "HEL" => "Attack Helicopters",
+                "HELTRAN" => "Transport Helicopters",
+                "ASF" => "Fighters",
+                "MRF" => "Multirole",
+                "ATT" => "Attack",
+                "BMB" => "Bombers",
+                "TRAN" => "Transports",
+                "AWACS" => "AWACS",
+                "RCNA" => "Recon Aircraft",
+                _ => null
+            };
         }
 
         #endregion
