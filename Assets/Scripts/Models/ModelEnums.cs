@@ -752,6 +752,8 @@ namespace HammerAndSickle.Models
         AAA_GENERIC,
         ART_LIGHT_GENERIC,
         ART_HEAVY_GENERIC,
+        MANPAD_GENERIC,
+        ATGM_GENERIC,
 
         LANDBASE_GENERIC,
         AIRBASE_GENERIC,
