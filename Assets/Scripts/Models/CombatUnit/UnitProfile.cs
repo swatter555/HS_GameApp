@@ -47,6 +47,7 @@ namespace HammerAndSickle.Models
 
         public string UnitProfileID { get; private set; }
         public Nationality Nationality { get; private set; }
+        public IntelReport LastIntelReport { get; private set; } = null; // Last generated intel report for this profile.
 
         // The current profile, reflecting the paper strength of the unit
         public Dictionary<WeaponSystems, int> CurrentProfile { get; private set; }
@@ -312,56 +313,89 @@ namespace HammerAndSickle.Models
         #endregion // Public Methods
 
 
-        #region Status Reports
+        #region IntelReports
 
         /// <summary>
-        /// Generates a detailed intel report for the player unit, this is passed onto GUI. The player gets full
-        /// information on their own units.
+        /// Generates an IntelReport object containing bucketed weapon system data and unit metadata.
+        /// This provides structured data for the GUI to display unit intelligence information.
+        /// Applies fog of war effects based on spotted level for AI units.
         /// </summary>
-        /// <returns></returns>
-        public string GetPlayerUnitIntelReport(string unitName, CombatState combatState, ExperienceLevel xpLevel, EfficiencyLevel effLevel)
+        /// <param name="unitName">Display name of the unit</param>
+        /// <param name="combatState">Current combat state of the unit</param>
+        /// <param name="xpLevel">Experience level of the unit</param>
+        /// <param name="effLevel">Efficiency level of the unit</param>
+        /// <param name="spottedLevel">Intelligence level for AI units (default Level0 for player units)</param>
+        /// <returns>IntelReport object with categorized weapon data and unit information</returns>
+        public IntelReport GenerateIntelReport(string unitName, CombatState combatState, ExperienceLevel xpLevel, EfficiencyLevel effLevel, SpottedLevel spottedLevel = SpottedLevel.Level0)
         {
             try
             {
+                // Create the intel report object
+                var intelReport = new IntelReport();
+
+                // Set unit metadata
+                intelReport.UnitNationality = Nationality;
+                intelReport.UnitName = unitName;
+                intelReport.UnitState = combatState;
+                intelReport.UnitExperienceLevel = xpLevel;
+                intelReport.UnitEfficiencyLevel = effLevel;
+
+                // Handle special spotted levels
+                if (spottedLevel == SpottedLevel.Level1)
+                {
+                    // Level1: Only unit name is visible, skip all calculations
+                    return intelReport;
+                }
+
                 // Calculate multiplier for current strength
                 float currentMultiplier = currentHitPoints / CUConstants.MAX_HP;
 
-                // Calculate current values for each weapon system
+                // Calculate current values for each weapon system and populate detailed data
                 var currentValues = new Dictionary<WeaponSystems, int>();
                 foreach (var item in weaponSystems)
                 {
-                    int currentValue = (int)Math.Round(item.Value * currentMultiplier);
+                    float scaledValue = item.Value * currentMultiplier;
+                    int currentValue = (int)Math.Round(scaledValue);
+
                     if (currentValue > 0)
                     {
                         currentValues[item.Key] = currentValue;
                     }
+
+                    // Always add to detailed data (even if 0) for complete information
+                    intelReport.DetailedWeaponSystemsData[item.Key] = scaledValue;
                 }
 
-                // Initialize buckets
-                var buckets = new Dictionary<string, int>
+                // Determine fog of war parameters
+                bool isPositiveDirection = true;
+                float errorRangeMin = 1f;
+                float errorRangeMax = 1f;
+
+                if (spottedLevel == SpottedLevel.Level2)
                 {
-                    ["Men"] = 0,
-                    ["Tanks"] = 0,
-                    ["IFVs"] = 0,
-                    ["APCs"] = 0,
-                    ["Recon"] = 0,
-                    ["Artillery"] = 0,
-                    ["Rocket Artillery"] = 0,
-                    ["Surface To Surface Missiles"] = 0,
-                    ["SAMs"] = 0,
-                    ["Anti-aircraft Artillery"] = 0,
-                    ["MANPADs"] = 0,
-                    ["ATGMs"] = 0,
-                    ["Attack Helicopters"] = 0,
-                    ["Transport Helicopters"] = 0,
-                    ["Fighters"] = 0,
-                    ["Multirole"] = 0,
-                    ["Attack"] = 0,
-                    ["Bombers"] = 0,
-                    ["Transports"] = 0,
-                    ["AWACS"] = 0,
-                    ["Recon Aircraft"] = 0
-                };
+                    isPositiveDirection = UnityEngine.Random.Range(0f, 1f) >= 0.5f;
+                    errorRangeMin = 1f;
+                    errorRangeMax = 30f;
+                }
+                else if (spottedLevel == SpottedLevel.Level3)
+                {
+                    isPositiveDirection = UnityEngine.Random.Range(0f, 1f) >= 0.5f;
+                    errorRangeMin = 1f;
+                    errorRangeMax = 10f;
+                }
+
+                // Apply fog of war to detailed data
+                if (spottedLevel == SpottedLevel.Level2 || spottedLevel == SpottedLevel.Level3)
+                {
+                    var foggedDetailedData = new Dictionary<WeaponSystems, float>();
+                    foreach (var kvp in intelReport.DetailedWeaponSystemsData)
+                    {
+                        float errorPercent = UnityEngine.Random.Range(errorRangeMin, errorRangeMax);
+                        float multiplier = isPositiveDirection ? (1f + errorPercent / 100f) : (1f - errorPercent / 100f);
+                        foggedDetailedData[kvp.Key] = kvp.Value * multiplier;
+                    }
+                    intelReport.DetailedWeaponSystemsData = foggedDetailedData;
+                }
 
                 // Categorize weapon systems into buckets
                 foreach (var item in currentValues)
@@ -371,115 +405,93 @@ namespace HammerAndSickle.Models
 
                     if (bucketName != null)
                     {
-                        buckets[bucketName] += item.Value;
+                        // Calculate fog of war multiplier for this bucket (each bucket gets its own error percentage)
+                        float bucketMultiplier = 1f;
+                        if (spottedLevel == SpottedLevel.Level2 || spottedLevel == SpottedLevel.Level3)
+                        {
+                            float errorPercent = UnityEngine.Random.Range(errorRangeMin, errorRangeMax);
+                            bucketMultiplier = isPositiveDirection ? (1f + errorPercent / 100f) : (1f - errorPercent / 100f);
+                        }
+
+                        int foggedValue = (int)Math.Round(item.Value * bucketMultiplier);
+
+                        // Map bucket names to IntelReport properties
+                        switch (bucketName)
+                        {
+                            case "Men":
+                                intelReport.Men += foggedValue;
+                                break;
+                            case "Tanks":
+                                intelReport.Tanks += foggedValue;
+                                break;
+                            case "IFVs":
+                                intelReport.IFVs += foggedValue;
+                                break;
+                            case "APCs":
+                                intelReport.APCs += foggedValue;
+                                break;
+                            case "Recon":
+                                intelReport.RCNs += foggedValue;
+                                break;
+                            case "Artillery":
+                                intelReport.ARTs += foggedValue;
+                                break;
+                            case "Rocket Artillery":
+                                intelReport.ROCs += foggedValue;
+                                break;
+                            case "Surface To Surface Missiles":
+                                intelReport.SSMs += foggedValue;
+                                break;
+                            case "SAMs":
+                                intelReport.SAMs += foggedValue;
+                                break;
+                            case "Anti-aircraft Artillery":
+                                intelReport.AAAs += foggedValue;
+                                break;
+                            case "MANPADs":
+                                intelReport.MANPADs += foggedValue;
+                                break;
+                            case "ATGMs":
+                                intelReport.ATGMs += foggedValue;
+                                break;
+                            case "Attack Helicopters":
+                                intelReport.HEL += foggedValue;
+                                break;
+                            case "Transport Helicopters":
+                                intelReport.HELTRAN += foggedValue;
+                                break;
+                            case "Fighters":
+                                intelReport.ASFs += foggedValue;
+                                break;
+                            case "Multirole":
+                                intelReport.MRFs += foggedValue;
+                                break;
+                            case "Attack":
+                                intelReport.ATTs += foggedValue;
+                                break;
+                            case "Bombers":
+                                intelReport.BMBs += foggedValue;
+                                break;
+                            case "Transports":
+                                intelReport.TRANs += foggedValue;
+                                break;
+                            case "AWACS":
+                                intelReport.AWACS += foggedValue;
+                                break;
+                            case "Recon Aircraft":
+                                intelReport.RCNAs += foggedValue;
+                                break;
+                        }
                     }
                 }
 
-                // Determine if this is an air unit
-                bool isAirUnit = buckets["Fighters"] > 0 || buckets["Multirole"] > 0 ||
-                                buckets["Attack"] > 0 || buckets["Bombers"] > 0 ||
-                                buckets["Transports"] > 0 || buckets["AWACS"] > 0 ||
-                                buckets["Recon Aircraft"] > 0;
+                LastIntelReport = intelReport; // Store for later use
 
-                // Build the report
-                var lines = new List<string>();
-
-                // First line: Nationality + Unit Name
-                string nationalityString = Utils.NationalityUtils.GetDisplayName(Nationality);
-                lines.Add($"{nationalityString} {unitName}");
-
-                // Determine bucket order based on unit type
-                var bucketOrder = isAirUnit ?
-                    new[] { "Men", "Fighters", "Multirole", "Attack", "Bombers", "Transports", "AWACS", "Recon Aircraft",
-                   "Tanks", "IFVs", "APCs", "Recon", "Artillery", "Rocket Artillery", "Surface To Surface Missiles",
-                   "SAMs", "Anti-aircraft Artillery", "MANPADs", "ATGMs", "Attack Helicopters", "Transport Helicopters" } :
-                    new[] { "Men", "Tanks", "IFVs", "APCs", "Recon", "Artillery", "Rocket Artillery", "Surface To Surface Missiles",
-                   "SAMs", "Anti-aircraft Artillery", "MANPADs", "ATGMs", "Attack Helicopters", "Transport Helicopters" };
-
-                // Collect non-zero weapon items
-                var weaponItems = new List<string>();
-                foreach (string bucketName in bucketOrder)
-                {
-                    if (buckets[bucketName] > 0)
-                    {
-                        weaponItems.Add($"{buckets[bucketName]} {bucketName}");
-                    }
-                }
-
-                // Format weapon items into lines (about 5 per line)
-                for (int i = 0; i < weaponItems.Count; i += 5)
-                {
-                    var lineItems = weaponItems.Skip(i).Take(5);
-                    lines.Add(string.Join(", ", lineItems));
-                }
-
-                // Status line
-                lines.Add($"STATE: {combatState}  EXP: {xpLevel}  EFF: {effLevel}");
-
-                return string.Join(Environment.NewLine, lines);
+                return intelReport;
             }
             catch (Exception e)
             {
-                AppService.Instance.HandleException(CLASS_NAME, "GetPlayerUnitIntelReport", e);
-                throw;
-            }
-        }
-
-        /// <summary>
-        /// Lists each weapon system in the unit profile with its current strength, scaled by hit points.
-        /// </summary>
-        /// <returns></returns>
-        public List<string> GetDetailedPlayerUnitIntelReport()
-        {
-            try
-            {
-                // This is the base multiplier for each weapon system.
-                float currentMultiplier = currentHitPoints / CUConstants.MAX_HP;
-
-                // Create a containter to store line.
-                List<string> reportLines = new List<string>();
-
-                foreach (var item in weaponSystems)
-                {
-
-                }
-
-                return reportLines;
-            }
-            catch (Exception e)
-            {
-                AppService.Instance.HandleException(CLASS_NAME, "GetDetailedPlayerUnitIntelReport", e);
-                throw;
-            }
-        }
-
-        /// <summary>
-        /// Get intelligence information of an AI unit based on the it's SpottedLevel.
-        /// </summary>
-        /// <returns></returns>
-        public string GetAIUnitIntelReport(SpottedLevel spottedLevel, 
-            string unitName, 
-            CombatState combatState, 
-            ExperienceLevel xpLevel, 
-            EfficiencyLevel effLevel)
-        {
-            try
-            {
-                // This is the base multiplier for each weapon system.
-                float currentMultiplier = currentHitPoints / CUConstants.MAX_HP;
-
-                StringBuilder sb = new StringBuilder();
-                
-                foreach (var item in weaponSystems)
-                {
-
-                }
-
-                return sb.ToString();
-            }
-            catch (Exception e)
-            {
-                AppService.Instance.HandleException(CLASS_NAME, "GetAIUnitIntelReport", e);
+                AppService.Instance.HandleException(CLASS_NAME, "GenerateIntelReport", e);
                 throw;
             }
         }
@@ -537,7 +549,7 @@ namespace HammerAndSickle.Models
             };
         }
 
-        #endregion
+        #endregion // IntelReports
 
 
         #region ISerializable Implementation
