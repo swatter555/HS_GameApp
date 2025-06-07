@@ -2076,9 +2076,6 @@ namespace HammerAndSickle.Models
         // TODO: Set spotted level
         // TODO: Degrade spotted level one level each turn.
 
-        // TODO: Player unit intel report (full information)
-        // TODO: AI unit intel report based on spotted level
-
         #endregion // Status Reports
 
 
