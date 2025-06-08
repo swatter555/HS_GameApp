@@ -49,6 +49,7 @@ namespace HammerAndSickle.Models
 
         #endregion // Properties
 
+
         #region Events
 
         // Events for UI and system notifications
@@ -59,6 +60,7 @@ namespace HammerAndSickle.Models
         public event Action OnUnitUnassigned;                                // ()
 
         #endregion // Events
+
 
         #region Constructors
 
@@ -167,6 +169,7 @@ namespace HammerAndSickle.Models
 
         #endregion // Constructors
 
+
         #region Initialization Helpers
 
         /// <summary>
@@ -226,6 +229,7 @@ namespace HammerAndSickle.Models
         }
 
         #endregion // Initialization Helpers
+
 
         #region Public Methods
 
@@ -381,6 +385,7 @@ namespace HammerAndSickle.Models
         }
 
         #endregion // Public Methods
+
 
         #region Reputation Management
 

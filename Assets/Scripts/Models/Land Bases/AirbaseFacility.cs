@@ -285,33 +285,19 @@ namespace HammerAndSickle.Models
 
         public bool CanLaunchAirOperations()
         {
-            // Air operations require at least moderately degraded status
-            return OperationalCapacity != OperationalCapacity.HeavilyDegraded &&
-                   OperationalCapacity != OperationalCapacity.OutOfOperation;
-        }
-
-        public bool CanReceiveAircraft()
-        {
-            // Even heavily damaged airbases can receive aircraft in an emergency
+            // No air operations if the base is out of operation.
             return OperationalCapacity != OperationalCapacity.OutOfOperation;
-        }
-
-        public bool CanRefuelAndRearm()
-        {
-            // Refuel and rearm requires better operational status
-            return OperationalCapacity == OperationalCapacity.Full ||
-                   OperationalCapacity == OperationalCapacity.SlightlyDegraded;
         }
 
         public bool CanRepairAircraft()
         {
             // Aircraft repairs require full operational capacity
-            return OperationalCapacity == OperationalCapacity.Full;
+            return OperationalCapacity != OperationalCapacity.OutOfOperation;
         }
 
         public bool CanAcceptNewAircraft()
         {
-            return CanReceiveAircraft() && HasCapacityForMoreUnits();
+            return HasCapacityForMoreUnits();
         }
 
         public List<CombatUnit> GetOperationalAirUnits()
