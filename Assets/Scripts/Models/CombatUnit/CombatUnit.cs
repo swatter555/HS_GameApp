@@ -2042,11 +2042,11 @@ namespace HammerAndSickle.Models
             return CombatState switch
             {
                 CombatState.Mobile => CUConstants.COMBAT_MOD_MOBILE,
-                CombatState.Deployed => CUConstants.COMBAT_MOD_Deployed,
+                CombatState.Deployed => CUConstants.COMBAT_MOD_DEPLOYED,
                 CombatState.HastyDefense => CUConstants.COMBAT_MOD_HASTY_DEFENSE,
                 CombatState.Entrenched => CUConstants.COMBAT_MOD_ENTRENCHED,
                 CombatState.Fortified => CUConstants.COMBAT_MOD_FORTIFIED,
-                _ => CUConstants.COMBAT_MOD_Deployed
+                _ => CUConstants.COMBAT_MOD_DEPLOYED
             };
         }
 
@@ -2074,7 +2074,6 @@ namespace HammerAndSickle.Models
         #region Status Reports and Spotted Level
 
         // TODO: Set spotted level
-        // TODO: Degrade spotted level one level each turn.
 
         #endregion // Status Reports
 
