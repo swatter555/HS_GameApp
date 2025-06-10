@@ -1,3 +1,4 @@
+using PlasticGui.WorkspaceWindow.Locks;
 using System.Collections.Generic;
 
 namespace HammerAndSickle.Models
@@ -233,26 +234,28 @@ namespace HammerAndSickle.Models
         // Supply generation rates by level
         public static readonly Dictionary<SupplyGenerationRate, float> GenerationRateValues = new()
         {
-            { SupplyGenerationRate.Minimal, 1.0f },
-            { SupplyGenerationRate.Basic, 2.0f },
-            { SupplyGenerationRate.Standard, 3.0f },
-            { SupplyGenerationRate.Enhanced, 4.0f },
-            { SupplyGenerationRate.Industrial, 5.0f }
+            { SupplyGenerationRate.Minimal, 10.0f },
+            { SupplyGenerationRate.Basic, 20.0f },
+            { SupplyGenerationRate.Standard, 40.0f },
+            { SupplyGenerationRate.Enhanced, 80.0f }
         };
 
         // Supply projection ranges in hexes
         public static readonly Dictionary<SupplyProjection, int> ProjectionRangeValues = new()
         {
-            { SupplyProjection.Local, 2 },
-            { SupplyProjection.Extended, 4 },
-            { SupplyProjection.Regional, 6 },
-            { SupplyProjection.Strategic, 9 },
-            { SupplyProjection.Theater, 12 }
+            { SupplyProjection.Local, 4 },
+            { SupplyProjection.Extended, 8 },
+            { SupplyProjection.Regional, 12 },
+            { SupplyProjection.Strategic, 16 }
         };
 
         // Amount any unit can stockpile
         public const float MaxDaysSupplyDepot = 100f;  // Max supply a depot can carry
         public const float MaxDaysSupplyUnit = 7f;     // Max supply a unit can carry
+
+        // Supply efficiency multipliers
+        public const float DISTANCE_EFF_MULT = 0.4f;
+        public const float ZOC_EFF_MULT      = 0.3f;
 
         // Constants for special abilities
         public const int AirSupplyMaxRange = 16;

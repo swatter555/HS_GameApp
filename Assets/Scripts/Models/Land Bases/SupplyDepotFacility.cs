@@ -84,10 +84,7 @@ namespace HammerAndSickle.Models
             {
                 // Use base class default, then set depot-specific name and initialize depot properties
                 SetBaseName("Supply Depot");
-                DepotSize = DepotSize.Small;
-                StockpileInDays = GetMaxStockpile() / 2; // Start half full
-                GenerationRate = SupplyGenerationRate.Minimal;
-                SupplyProjection = SupplyProjection.Local;
+                SetDepotSize(DepotSize.Small); // Default to small depot
                 SupplyPenetration = false;
                 DepotCategory = DepotCategory.Secondary;
             }
@@ -103,14 +100,17 @@ namespace HammerAndSickle.Models
         {
             try
             {
-                DepotSize = depotSize;
+                // Set depot category based on whether it's a main depot
                 DepotCategory = isMainDepot ? DepotCategory.Main : DepotCategory.Secondary;
-
-                // Initialize with default values
-                StockpileInDays = GetMaxStockpile() / 2; // Start half full
-                GenerationRate = SupplyGenerationRate.Standard;
-                SupplyProjection = SupplyProjection.Extended;
+                SetDepotSize(depotSize);
                 SupplyPenetration = false;
+
+                // Main depots have special characteristics.
+                if (isMainDepot)
+                {
+                    EnableAirSupply(); // Main depots can have air supply by default
+                    EnableNavalSupply(); // Main depots can have naval supply by default
+                }
             }
             catch (Exception e)
             {
@@ -150,11 +150,19 @@ namespace HammerAndSickle.Models
 
         #region Supply Management Methods
 
+        /// <summary>
+        /// Get the max amount of supplies the depot can hold based on its size.
+        /// </summary>
+        /// <returns>Days of supply</returns>
         private float GetMaxStockpile()
         {
             return CUConstants.MaxStockpileBySize[DepotSize];
         }
 
+        /// <summary>
+        /// The inherent generation rate that the depot can produce based on its generation rate setting.
+        /// </summary>
+        /// <returns></returns>
         private float GetCurrentGenerationRate()
         {
             float baseRate = CUConstants.GenerationRateValues[GenerationRate];
@@ -163,6 +171,10 @@ namespace HammerAndSickle.Models
             return baseRate * efficiencyMultiplier;
         }
 
+        /// <summary>
+        /// Add supplies directly to depot.
+        /// </summary>
+        /// <param name="amount"></param>
         public void AddSupplies(float amount)
         {
             try
@@ -185,6 +197,11 @@ namespace HammerAndSickle.Models
             }
         }
 
+        /// <summary>
+        /// Remove supplies from the depot.
+        /// </summary>
+        /// <param name="amount"></param>
+        /// <returns></returns>
         public float RemoveSupplies(float amount)
         {
             try
@@ -206,6 +223,10 @@ namespace HammerAndSickle.Models
             }
         }
 
+        /// <summary>
+        /// Add supplies to the depot based on its generation rate.
+        /// </summary>
+        /// <returns></returns>
         public float GenerateSupplies()
         {
             try
@@ -232,6 +253,18 @@ namespace HammerAndSickle.Models
             }
         }
 
+        /// <summary>
+        /// Determines whether a supply depot can provide supply to a unit at a specified distance and after crossing a
+        /// given number of enemy zones of control (ZOCs).
+        /// </summary>
+        /// <remarks>The method checks whether the depot is operational, whether the unit is within the
+        /// depot's projection radius,  and whether the number of enemy ZOCs crossed is within the depot's supply
+        /// penetration capability.</remarks>
+        /// <param name="distanceInHexes">The distance to the unit in hexes. Must be less than or equal to the depot's projection radius.</param>
+        /// <param name="enemyZOCsCrossed">The number of enemy zones of control (ZOCs) crossed to reach the unit. Must not exceed the depot's supply
+        /// penetration capability.</param>
+        /// <returns><see langword="true"/> if the depot can supply the unit at the specified distance and ZOC conditions;
+        /// otherwise, <see langword="false"/>.</returns>
         public bool CanSupplyUnitAt(int distanceInHexes, int enemyZOCsCrossed)
         {
             try
@@ -248,11 +281,14 @@ namespace HammerAndSickle.Models
                     return false;
                 }
 
-                // Check if supply penetration is sufficient
-                int zocPenetration = SupplyPenetration ? 1 : 0;
-                if (enemyZOCsCrossed > zocPenetration)
+                // Check if enemy ZOCs crossed
+                if (enemyZOCsCrossed > 0)
                 {
-                    return false;
+                    // If supply penetration is not enabled, we cannot cross enemy ZOCs
+                    if (!SupplyPenetration) return false;
+
+                    // If supply penetration is enabled, we can cross enemy ZOCs but must check the limit
+                    if (enemyZOCsCrossed > CUConstants.ZOC_RANGE) return false;
                 }
 
                 return true;
@@ -264,15 +300,26 @@ namespace HammerAndSickle.Models
             }
         }
 
-        public float SupplyUnit(float requestedAmount, int distanceInHexes, int enemyZOCsCrossed)
+        /// <summary>
+        /// Supplies a unit with resources based on the distance, enemy zones of control (ZOCs) crossed,  and
+        /// operational efficiency.
+        /// </summary>
+        /// <remarks>The amount of supplies delivered is calculated based on several factors: <list
+        /// type="bullet"> <item> <description>Distance to the unit, which reduces efficiency
+        /// proportionally.</description> </item> <item> <description>Enemy ZOCs crossed, which further reduces
+        /// efficiency.</description> </item> <item> <description>Operational efficiency, determined by internal
+        /// multipliers.</description> </item> </list> The method ensures that the efficiency does not drop below a
+        /// minimum threshold. Supplies are deducted  from the stockpile after delivery. If the stockpile is
+        /// insufficient or the unit cannot be supplied,  no supplies are delivered.</remarks>
+        /// <param name="distanceInHexes">The distance to the unit in hexes. A greater distance reduces the efficiency of the supply delivery.</param>
+        /// <param name="enemyZOCsCrossed">The number of enemy zones of control (ZOCs) crossed to reach the unit. Each ZOC crossed reduces  the
+        /// efficiency of the supply delivery.</param>
+        /// <returns>The amount of supplies delivered to the unit, expressed in days of supply. Returns <see langword="0"/>  if
+        /// the unit cannot be supplied due to insufficient stockpile or operational constraints.</returns>
+        public float SupplyUnit(int distanceInHexes, int enemyZOCsCrossed)
         {
             try
             {
-                if (requestedAmount <= 0)
-                {
-                    return 0f;
-                }
-
                 // Check if we can supply the unit
                 if (!CanSupplyUnitAt(distanceInHexes, enemyZOCsCrossed))
                 {
@@ -280,14 +327,14 @@ namespace HammerAndSickle.Models
                 }
 
                 // Check if we have supplies to give
-                if (StockpileInDays <= 0)
+                if (StockpileInDays <= CUConstants.MaxDaysSupplyUnit)
                 {
                     return 0f;
                 }
 
                 // Calculate efficiency based on distance, enemy ZOCs, and operational capacity
-                float distanceEfficiency = 1f - (distanceInHexes / (float)ProjectionRadius * 0.5f);
-                float zocEfficiency = 1f - (enemyZOCsCrossed * 0.65f);
+                float distanceEfficiency = 1f - (distanceInHexes / (float)ProjectionRadius * CUConstants.DISTANCE_EFF_MULT);
+                float zocEfficiency = 1f - (enemyZOCsCrossed * CUConstants.ZOC_EFF_MULT);
                 float operationalEfficiency = GetEfficiencyMultiplier();
                 float totalEfficiency = distanceEfficiency * zocEfficiency * operationalEfficiency;
 
@@ -295,18 +342,13 @@ namespace HammerAndSickle.Models
                 totalEfficiency = Math.Max(totalEfficiency, 0.1f);
 
                 // Calculate amount to deliver
-                float maxDeliverable = Math.Min(requestedAmount, CUConstants.MaxDaysSupplyUnit);
-                float amountToDeliver = maxDeliverable * totalEfficiency;
-
-                // Calculate actual supply cost (accounting for losses due to efficiency)
-                float supplyCost = amountToDeliver / totalEfficiency;
-                float actualSupplyCost = Math.Min(supplyCost, StockpileInDays);
+                float amountToDeliver = CUConstants.MaxDaysSupplyUnit * totalEfficiency;
 
                 // Remove supplies from stockpile
-                StockpileInDays -= actualSupplyCost;
+                StockpileInDays -= CUConstants.MaxDaysSupplyUnit;
 
                 // Return the actual amount delivered (proportional to what we could afford)
-                return amountToDeliver * (actualSupplyCost / supplyCost);
+                return amountToDeliver;
             }
             catch (Exception e)
             {
@@ -315,6 +357,13 @@ namespace HammerAndSickle.Models
             }
         }
 
+        /// <summary>
+        /// Calculates the percentage of the stockpile used relative to its maximum capacity.
+        /// </summary>
+        /// <remarks>If the maximum stockpile capacity is zero or an exception occurs, the method returns
+        /// 0.</remarks>
+        /// <returns>A <see cref="float"/> representing the stockpile usage as a percentage of the maximum capacity. Returns 0 if
+        /// the maximum capacity is zero or an error occurs.</returns>
         public float GetStockpilePercentage()
         {
             try
@@ -349,20 +398,29 @@ namespace HammerAndSickle.Models
 
         #region Upgrade Methods
 
+        /// <summary>
+        /// Upgrades the depot size to the next available tier.
+        /// </summary>
+        /// <remarks>The depot size progresses through the following tiers: Small, Medium, Large, and
+        /// Huge.  If the depot is already at the maximum size (Huge), the method returns <see
+        /// langword="false"/>.</remarks>
+        /// <returns><see langword="true"/> if the depot size was successfully upgraded to the next tier;  otherwise, <see
+        /// langword="false"/> if the depot is already at the maximum size or an error occurs.</returns>
         public bool UpgradeDepotSize()
         {
             try
             {
+                // Change parameters based on size.
                 switch (DepotSize)
                 {
                     case DepotSize.Small:
-                        DepotSize = DepotSize.Medium;
+                        SetDepotSize(DepotSize.Medium);
                         return true;
                     case DepotSize.Medium:
-                        DepotSize = DepotSize.Large;
+                        SetDepotSize(DepotSize.Large);
                         return true;
                     case DepotSize.Large:
-                        DepotSize = DepotSize.Huge;
+                        SetDepotSize(DepotSize.Huge);
                         return true;
                     default:
                         return false; // Already at maximum
@@ -375,123 +433,58 @@ namespace HammerAndSickle.Models
             }
         }
 
-        public bool UpgradeToMainDepot()
+        /// <summary>
+        /// The leader determines if supply penetration is enabled or not.
+        /// </summary>
+        /// <param name="enabled"></param>
+        public void SetLeaderSupplyPenetration(bool enabled)
         {
-            try
-            {
-                if (DepotCategory == DepotCategory.Main)
-                {
-                    return false; // Already main depot
-                }
-
-                DepotCategory = DepotCategory.Main;
-
-                // Re-evaluate special ability backing fields now that we're a main depot
-                // The properties will now work correctly since IsMainDepot returns true
-
-                return true;
-            }
-            catch (Exception e)
-            {
-                AppService.Instance.HandleException(CLASS_NAME, "UpgradeToMainDepot", e);
-                return false;
-            }
+            if (enabled) SupplyPenetration = true;
+            else SupplyPenetration = false;
         }
 
-        public bool UpgradeGenerationRate()
+        /// <summary>
+        /// Set the size of the depot and sets to max stockpile.
+        /// </summary>
+        /// <param name="depotSize"></param>
+        private void SetDepotSize (DepotSize depotSize)
         {
             try
             {
-                switch (GenerationRate)
+                switch (depotSize)
                 {
-                    case SupplyGenerationRate.Minimal:
+                    case DepotSize.Small:
+                        DepotSize = DepotSize.Small;
+                        StockpileInDays = GetMaxStockpile();
+                        GenerationRate = SupplyGenerationRate.Minimal;
+                        SupplyProjection = SupplyProjection.Local;
+                        break;
+                    case DepotSize.Medium:
+                        DepotSize = DepotSize.Medium;
+                        StockpileInDays = GetMaxStockpile();
                         GenerationRate = SupplyGenerationRate.Basic;
-                        return true;
-                    case SupplyGenerationRate.Basic:
-                        GenerationRate = SupplyGenerationRate.Standard;
-                        return true;
-                    case SupplyGenerationRate.Standard:
-                        GenerationRate = SupplyGenerationRate.Enhanced;
-                        return true;
-                    case SupplyGenerationRate.Enhanced:
-                        GenerationRate = SupplyGenerationRate.Industrial;
-                        return true;
-                    default:
-                        return false; // Already at maximum
-                }
-            }
-            catch (Exception e)
-            {
-                AppService.Instance.HandleException(CLASS_NAME, "UpgradeGenerationRate", e);
-                return false;
-            }
-        }
-
-        public bool UpgradeSupplyProjection()
-        {
-            try
-            {
-                switch (SupplyProjection)
-                {
-                    case SupplyProjection.Local:
                         SupplyProjection = SupplyProjection.Extended;
-                        return true;
-                    case SupplyProjection.Extended:
+                        break;
+                    case DepotSize.Large:
+                        DepotSize = DepotSize.Large;
+                        StockpileInDays = GetMaxStockpile();
+                        GenerationRate = SupplyGenerationRate.Standard;
                         SupplyProjection = SupplyProjection.Regional;
-                        return true;
-                    case SupplyProjection.Regional:
+                        break;
+                    case DepotSize.Huge:
+                        DepotSize = DepotSize.Huge;
+                        StockpileInDays = GetMaxStockpile();
+                        GenerationRate = SupplyGenerationRate.Enhanced;
                         SupplyProjection = SupplyProjection.Strategic;
-                        return true;
-                    case SupplyProjection.Strategic:
-                        SupplyProjection = SupplyProjection.Theater;
-                        return true;
+                        break;
                     default:
-                        return false; // Already at maximum
+                        throw new ArgumentOutOfRangeException(nameof(depotSize), "Invalid depot size specified");
                 }
             }
             catch (Exception e)
             {
-                AppService.Instance.HandleException(CLASS_NAME, "UpgradeSupplyProjection", e);
-                return false;
+                AppService.Instance.HandleException(CLASS_NAME, "SetDepotSize", e);
             }
-        }
-
-        public bool UpgradeSupplyPenetration()
-        {
-            try
-            {
-                if (!SupplyPenetration)
-                {
-                    SupplyPenetration = true;
-                    return true;
-                }
-                return false;
-            }
-            catch (Exception e)
-            {
-                AppService.Instance.HandleException(CLASS_NAME, "UpgradeSupplyPenetration", e);
-                return false;
-            }
-        }
-
-        public bool CanUpgradeDepotSize()
-        {
-            return DepotSize != DepotSize.Huge;
-        }
-
-        public bool CanUpgradeGenerationRate()
-        {
-            return GenerationRate != SupplyGenerationRate.Industrial;
-        }
-
-        public bool CanUpgradeSupplyProjection()
-        {
-            return SupplyProjection != SupplyProjection.Theater;
-        }
-
-        public bool CanUpgradeSupplyPenetration()
-        {
-            return !SupplyPenetration;
         }
 
         #endregion // Upgrade Methods
@@ -499,20 +492,21 @@ namespace HammerAndSickle.Models
 
         #region Special Ability Methods
 
+        /// <summary>
+        /// Enables the air supply for the current depot.
+        /// </summary>
+        /// <remarks>This method sets the <see cref="HasAirSupply"/> property to <see langword="true"/> if
+        /// the depot is the main depot. If the depot is not the main depot, the method returns <see langword="false"/>
+        /// without enabling the air supply.</remarks>
+        /// <returns><see langword="true"/> if the air supply was successfully enabled; otherwise, <see langword="false"/>.</returns>
         public bool EnableAirSupply()
         {
             try
             {
-                if (!IsMainDepot)
-                    return false;
-
-                // Require minimum stockpile for air supply operations
-                if (StockpileInDays < 10f)
-                {
-                    throw new InvalidOperationException("Air supply requires at least 10 days of stockpile");
-                }
+                if (!IsMainDepot) return false;
 
                 HasAirSupply = true;
+
                 return true;
             }
             catch (Exception e)
@@ -522,20 +516,18 @@ namespace HammerAndSickle.Models
             }
         }
 
+        /// <summary>
+        /// Enables the naval supply for the current depot.
+        /// </summary>
+        /// <returns></returns>
         public bool EnableNavalSupply()
         {
             try
             {
-                if (!IsMainDepot)
-                    return false;
-
-                // Require minimum stockpile for naval supply operations
-                if (StockpileInDays < 15f)
-                {
-                    throw new InvalidOperationException("Naval supply requires at least 15 days of stockpile");
-                }
+                if (!IsMainDepot) return false;
 
                 HasNavalSupply = true;
+
                 return true;
             }
             catch (Exception e)
@@ -545,7 +537,12 @@ namespace HammerAndSickle.Models
             }
         }
 
-        public float PerformAirSupply(int distanceInHexes, float amountRequested)
+        /// <summary>
+        /// Performs air supply to a unit at a specified distance in hexes.
+        /// </summary>
+        /// <param name="distanceInHexes"></param>
+        /// <returns></returns>
+        public float PerformAirSupply(int distanceInHexes)
         {
             try
             {
@@ -560,30 +557,23 @@ namespace HammerAndSickle.Models
                     return 0f;
                 }
 
-                if (amountRequested <= 0 || StockpileInDays <= 0)
+                if (StockpileInDays <= CUConstants.MaxDaysSupplyUnit)
                 {
                     return 0f;
                 }
 
                 // Air supply efficiency decreases with distance and is affected by operational capacity
-                float distanceEfficiency = 1f - (distanceInHexes / (float)CUConstants.AirSupplyMaxRange * 0.7f);
+                float distanceEfficiency = 1f - (distanceInHexes / (float)CUConstants.AirSupplyMaxRange * CUConstants.DISTANCE_EFF_MULT);
                 float operationalEfficiency = GetEfficiencyMultiplier();
                 float totalEfficiency = distanceEfficiency * operationalEfficiency;
 
                 // Ensure minimum efficiency
                 totalEfficiency = Math.Max(totalEfficiency, 0.1f);
 
-                float maxDeliverable = Math.Min(amountRequested, CUConstants.MaxDaysSupplyUnit);
-                float actualAmount = maxDeliverable * totalEfficiency;
-
-                // Calculate supply cost (account for supplies lost in transit)
-                float supplyCost = actualAmount / totalEfficiency;
-                float actualSupplyCost = Math.Min(supplyCost, StockpileInDays);
-
                 // Remove the supplies from stockpile
-                StockpileInDays -= actualSupplyCost;
+                StockpileInDays -= CUConstants.MaxDaysSupplyUnit;
 
-                return actualAmount * (actualSupplyCost / supplyCost);
+                return CUConstants.MaxDaysSupplyUnit * totalEfficiency;
             }
             catch (Exception e)
             {
@@ -592,7 +582,18 @@ namespace HammerAndSickle.Models
             }
         }
 
-        public float PerformNavalSupply(int distanceInHexes, float amountRequested)
+        /// <summary>
+        /// Performs a naval supply operation, delivering supplies to a unit based on the distance and operational
+        /// efficiency.
+        /// </summary>
+        /// <remarks>Naval supply operations are influenced by the distance to the target and the
+        /// operational efficiency of the depot.  Supplies are deducted from the stockpile upon successful delivery. The
+        /// method ensures a minimum efficiency threshold  for supply delivery.</remarks>
+        /// <param name="distanceInHexes">The distance to the target unit in hexes. Must be within the maximum naval supply range.</param>
+        /// <returns>The effective amount of supplies delivered, adjusted for distance and operational efficiency.  Returns 0 if
+        /// the depot is not operational, lacks naval supply capability, the distance exceeds the maximum range,  or the
+        /// stockpile is insufficient.</returns>
+        public float PerformNavalSupply(int distanceInHexes)
         {
             try
             {
@@ -607,31 +608,23 @@ namespace HammerAndSickle.Models
                     return 0f;
                 }
 
-                if (amountRequested <= 0 || StockpileInDays <= 0)
+                if (StockpileInDays <= CUConstants.MaxDaysSupplyUnit)
                 {
                     return 0f;
                 }
 
                 // Naval supply is more efficient than air but still affected by distance and operational capacity
-                float distanceEfficiency = 1f - (distanceInHexes / (float)CUConstants.NavalSupplyMaxRange * 0.4f);
+                float distanceEfficiency = 1f - (distanceInHexes / (float)CUConstants.NavalSupplyMaxRange * CUConstants.DISTANCE_EFF_MULT);
                 float operationalEfficiency = GetEfficiencyMultiplier();
                 float totalEfficiency = distanceEfficiency * operationalEfficiency;
 
                 // Ensure minimum efficiency
                 totalEfficiency = Math.Max(totalEfficiency, 0.1f);
 
-                // Can deliver up to 50% of on-hand supplies
-                float maxDeliverable = Math.Min(amountRequested, StockpileInDays * 0.5f);
-                float actualAmount = maxDeliverable * totalEfficiency;
-
-                // Calculate supply cost
-                float supplyCost = actualAmount / totalEfficiency;
-                float actualSupplyCost = Math.Min(supplyCost, StockpileInDays);
-
                 // Remove the supplies from stockpile
-                StockpileInDays -= actualSupplyCost;
+                StockpileInDays -= CUConstants.MaxDaysSupplyUnit;
 
-                return actualAmount * (actualSupplyCost / supplyCost);
+                return CUConstants.MaxDaysSupplyUnit * totalEfficiency;
             }
             catch (Exception e)
             {
