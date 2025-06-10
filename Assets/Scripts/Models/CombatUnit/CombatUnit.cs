@@ -63,8 +63,8 @@ namespace HammerAndSickle.Models
     /// **Damage & Supply:**
     /// - TakeDamage(damage) / Repair(repairAmount) - HP management
     /// - ConsumeSupplies(amount) / ReceiveSupplies(amount) - Supply operations
-    /// - GetCombatEffectiveness() - Returns HP-based effectiveness (0.0-1.0)
-    /// - CanOperate() - Checks minimum operational requirements
+    /// - GetStrengthModifier() - Returns HP-based effectiveness (0.0-1.0)
+    /// - CanMove() - Checks minimum operational requirements
     /// - IsDestroyed() - Checks if unit has any HP remaining
     /// 
     /// **Position & Movement:**
@@ -201,7 +201,45 @@ namespace HammerAndSickle.Models
 
         public CombatUnit()
         {
+            // Set identification and metadata
+            UnitName = "default";
+            UnitID = Guid.NewGuid().ToString();
+            UnitType = UnitType.LandUnitDF;
+            Classification = UnitClassification.INF;
+            Role = UnitRole.GroundCombat;
+            Side = Side.Player;
+            Nationality = Nationality.USSR;
+            IsTransportable = true;
+            IsLandBase = false;
 
+            // Set profiles
+            DeployedProfile = null;
+            MountedProfile = null;
+            UnitProfile = null;
+            LandBaseFacility = null;
+
+            // Initialize leader (will be null until assigned)
+            CommandingOfficer = null;
+
+            // Initialize action counts based on unit type and classification
+            InitializeActionCounts();
+
+            // Initialize state with default values
+            ExperiencePoints = 0;
+            ExperienceLevel = ExperienceLevel.Raw;
+            EfficiencyLevel = EfficiencyLevel.FullyOperational;
+            IsMounted = false;
+            CombatState = CombatState.Deployed;
+
+            // Initialize StatsMaxCurrent properties
+            HitPoints = new StatsMaxCurrent(CUConstants.MAX_HP);
+            DaysSupply = new StatsMaxCurrent(CUConstants.MaxDaysSupplyUnit);
+
+            // Initialize movement based on unit classification
+            InitializeMovementPoints();
+
+            // Initialize position to origin (will be set when placed on map)
+            MapPos = Vector2.zero;
         }
 
         /// <summary>
@@ -494,7 +532,161 @@ namespace HammerAndSickle.Models
             MovementPoints.ResetToMax();
         }
 
+        /// <summary>
+        /// Calculates and returns the current combat strength profile for the weapon system,  adjusted based on its
+        /// mounted state and applicable modifiers.
+        /// </summary>
+        /// <remarks>This method determines the active combat profile by checking whether the weapon
+        /// system  is mounted or deployed, clones the corresponding profile, and applies a final combat  rating
+        /// modifier to its attributes. If the weapon system is in an invalid state (e.g.,  missing a required profile),
+        /// the method returns <see langword="null"/>.</remarks>
+        /// <returns>A <see cref="WeaponSystemProfile"/> object representing the adjusted combat strength  of the weapon system.
+        /// Returns <see langword="null"/> if the weapon system is in an  invalid state or if an error occurs during
+        /// processing.</returns>
+        public WeaponSystemProfile GetCurrentCombatStrength()
+        {
+            // Sanity checks.
+            if (IsMounted && MountedProfile == null) return null;
+            if (!IsMounted && DeployedProfile == null) return null;
+
+            try
+            {
+                // Get the active profile based on mounted state.
+                WeaponSystemProfile activeProfile = IsMounted ? MountedProfile.Clone() : DeployedProfile.Clone();
+
+                // Compute all modifiers that can effect a combat rating.
+                float finalModifier = GetFinalCombatRatingModifier();
+
+                // Apply the final modifier to the active profile's stats.
+                activeProfile.LandHard.SetAttack(Mathf.CeilToInt(activeProfile.LandHard.Attack * finalModifier));
+                activeProfile.LandHard.SetDefense(Mathf.CeilToInt(activeProfile.LandHard.Defense * finalModifier));
+
+                activeProfile.LandSoft.SetAttack(Mathf.CeilToInt(activeProfile.LandSoft.Attack * finalModifier));
+                activeProfile.LandSoft.SetDefense(Mathf.CeilToInt(activeProfile.LandSoft.Defense * finalModifier));
+
+                activeProfile.LandAir.SetAttack(Mathf.CeilToInt(activeProfile.LandAir.Attack * finalModifier));
+                activeProfile.LandAir.SetDefense(Mathf.CeilToInt(activeProfile.LandAir.Defense * finalModifier));
+
+                activeProfile.Air.SetAttack(Mathf.CeilToInt(activeProfile.Air.Attack * finalModifier));
+                activeProfile.Air.SetDefense(Mathf.CeilToInt(activeProfile.Air.Defense * finalModifier));
+
+                activeProfile.AirGround.SetAttack(Mathf.CeilToInt(activeProfile.AirGround.Attack * finalModifier));
+                activeProfile.AirGround.SetDefense(Mathf.CeilToInt(activeProfile.AirGround.Defense * finalModifier));
+
+                return activeProfile;
+
+            }
+            catch (Exception e)
+            {
+                AppService.Instance.HandleException(CLASS_NAME, "GetCurrentCombatStrength", e);
+                return null; // Return null if an error occurs
+            }
+        }
+
         #endregion // Public Methods
+
+
+        #region Private Methods
+
+        /// <summary>
+        /// Calculates the final combat rating modifier by combining various contributing factors.
+        /// </summary>
+        /// <remarks>This method aggregates multiple modifiers, including strength, combat state,
+        /// efficiency, and experience, to compute the final combat rating modifier. If an error occurs during
+        /// calculation, the method returns a default neutral modifier of 1.0.</remarks>
+        /// <returns>A <see cref="float"/> representing the final combat rating modifier. The value is the product of all
+        /// contributing modifiers, or 1.0 if an error occurs.</returns>
+        private float GetFinalCombatRatingModifier()
+        {
+            try
+            {
+                // Calculate the final combat rating modifier based on all factors.
+                float strengthModifier = GetStrengthModifier();
+                float combatStateModifier = GetCombatStateModifier();
+                float efficiencyModifier = GetEffeciencyModifier();
+                float experienceModifier = GetExperienceMultiplier();
+
+                // Combine all modifiers
+                return strengthModifier * combatStateModifier * efficiencyModifier * experienceModifier;
+            }
+            catch (Exception e)
+            {
+                AppService.Instance.HandleException(CLASS_NAME, "GetFinalCombatRatingModifier", e);
+                return 1.0f; // Default to neutral modifier on error
+            }   
+        }
+
+        /// <summary>
+        /// Gets the combat effectiveness as a percentage based on current hit points.
+        /// </summary>
+        /// <returns>Combat effectiveness from 0.0 to 1.0</returns>
+        private float GetStrengthModifier()
+        {
+            try
+            {
+                // Compute the combat strength multiplier based on hit points.
+                if (HitPoints.Current >= (1 + (HitPoints.Max * CUConstants.FULL_STRENGTH_FLOOR)))
+                {
+                    return CUConstants.STRENGTH_MOD_FULL;
+                }
+                else if (HitPoints.Current >= (1 + (HitPoints.Max * CUConstants.DEPLETED_STRENGTH_FLOOR)))
+                {
+                    return CUConstants.STRENGTH_MOD_DEPLETED;
+                }
+                else
+                {
+                    return CUConstants.STRENGTH_MOD_LOW;
+                }
+            }
+            catch (Exception e)
+            {
+                AppService.Instance.HandleException(CLASS_NAME, "GetCombatEffectiveness", e);
+                return CUConstants.STRENGTH_MOD_LOW;
+            }
+        }
+
+        /// <summary>
+        /// Calculates the combat state modifier based on the current combat state.
+        /// </summary>
+        /// <returns>A <see cref="float"/> representing the combat state multiplier. The value corresponds to the current combat
+        /// state, with predefined modifiers for specific states. Returns <c>1.0f</c> if the combat state is not
+        /// recognized.</returns>
+        private float GetCombatStateModifier()
+        {
+            // Returns the combat state multiplier based on current combat state.
+            return CombatState switch
+            {
+                CombatState.Mobile => CUConstants.COMBAT_MOD_MOBILE,
+                CombatState.Deployed => CUConstants.COMBAT_MOD_DEPLOYED,
+                CombatState.HastyDefense => CUConstants.COMBAT_MOD_HASTY_DEFENSE,
+                CombatState.Entrenched => CUConstants.COMBAT_MOD_ENTRENCHED,
+                CombatState.Fortified => CUConstants.COMBAT_MOD_FORTIFIED,
+                _ => 1.0f, // Default multiplier for other states
+            };
+        }
+
+        /// <summary>
+        /// Calculates the efficiency modifier based on the current efficiency level.
+        /// </summary>
+        /// <remarks>The returned modifier is determined by the current <c>EfficiencyLevel</c> and maps to
+        /// specific  constants defined in <c>CUConstants</c>. If the efficiency level is unrecognized, a default 
+        /// static modifier is returned.</remarks>
+        /// <returns>A <see cref="float"/> representing the efficiency modifier. The value corresponds to the current 
+        /// operational state, with predefined constants for each efficiency level.</returns>
+        private float GetEffeciencyModifier()
+        {
+            // Returns the efficiency modifier based on current efficiency level.
+            return EfficiencyLevel switch
+            {
+                EfficiencyLevel.PeakOperational => CUConstants.EFFICIENCY_MOD_PEAK,
+                EfficiencyLevel.FullyOperational => CUConstants.EFFICIENCY_MOD_FULL,
+                EfficiencyLevel.Operational => CUConstants.EFFICIENCY_MOD_OPERATIONAL,
+                EfficiencyLevel.DegradedOperations => CUConstants.EFFICIENCY_MOD_DEGRADED,
+                _ => CUConstants.EFFICIENCY_MOD_STATIC, // Default multiplier for other states
+            };
+        }
+
+        #endregion // Private Methods
 
 
         #region Experience System Methods
@@ -711,12 +903,12 @@ namespace HammerAndSickle.Models
         {
             return ExperienceLevel switch
             {
-                ExperienceLevel.Raw => CUConstants.RAW_XP_MODIFIER,// -20% effectiveness
-                ExperienceLevel.Green => CUConstants.GREEN_XP_MODIFIER,// -10% effectiveness
-                ExperienceLevel.Trained => CUConstants.TRAINED_XP_MODIFIER,// Normal effectiveness
+                ExperienceLevel.Raw => CUConstants.RAW_XP_MODIFIER,                // -20% effectiveness
+                ExperienceLevel.Green => CUConstants.GREEN_XP_MODIFIER,            // -10% effectiveness
+                ExperienceLevel.Trained => CUConstants.TRAINED_XP_MODIFIER,        // Normal effectiveness
                 ExperienceLevel.Experienced => CUConstants.EXPERIENCED_XP_MODIFIER,// +10% effectiveness
-                ExperienceLevel.Veteran => CUConstants.VETERAN_XP_MODIFIER,// +20% effectiveness
-                ExperienceLevel.Elite => CUConstants.ELITE_XP_MODIFIER,// +30% effectiveness
+                ExperienceLevel.Veteran => CUConstants.VETERAN_XP_MODIFIER,        // +20% effectiveness
+                ExperienceLevel.Elite => CUConstants.ELITE_XP_MODIFIER,            // +30% effectiveness
                 _ => 1.0f,
             };
         }
@@ -1450,9 +1642,6 @@ namespace HammerAndSickle.Models
                 {
                     UnitProfile.UpdateCurrentHP(HitPoints.Current);
                 }
-
-                // Update efficiency level based on damage
-                UpdateEfficiencyFromDamage();
             }
             catch (Exception e)
             {
@@ -1488,9 +1677,6 @@ namespace HammerAndSickle.Models
                 {
                     UnitProfile.UpdateCurrentHP(HitPoints.Current);
                 }
-
-                // Update efficiency level based on new damage state
-                UpdateEfficiencyFromDamage();
             }
             catch (Exception e)
             {
@@ -1578,10 +1764,10 @@ namespace HammerAndSickle.Models
         }
 
         /// <summary>
-        /// Checks if the unit can operate effectively (has minimum supplies and hit points).
+        /// Checks if the unit can move based on various factors.
         /// </summary>
-        /// <returns>True if the unit can perform operations</returns>
-        public bool CanOperate()
+        /// <returns></returns>
+        public bool CanMove()
         {
             try
             {
@@ -1591,9 +1777,14 @@ namespace HammerAndSickle.Models
                     return false;
                 }
 
-                // Must have some supplies for most operations
-                // Allow emergency operations with very low supplies
-                if (DaysSupply.Current < 0.1f)
+                // Must have some supplies for most operations.
+                if (DaysSupply.Current < 1f)
+                {
+                    return false;
+                }
+
+                // Low efficiency level units cannot move.
+                if (EfficiencyLevel == EfficiencyLevel.StaticOperations)
                 {
                     return false;
                 }
@@ -1604,28 +1795,6 @@ namespace HammerAndSickle.Models
             {
                 AppService.Instance.HandleException(CLASS_NAME, "CanOperate", e);
                 return false;
-            }
-        }
-
-        /// <summary>
-        /// Gets the combat effectiveness as a percentage based on current hit points.
-        /// </summary>
-        /// <returns>Combat effectiveness from 0.0 to 1.0</returns>
-        public float GetCombatEffectiveness()
-        {
-            try
-            {
-                if (HitPoints.Max <= 0f)
-                {
-                    return 0f;
-                }
-
-                return HitPoints.Current / HitPoints.Max;
-            }
-            catch (Exception e)
-            {
-                AppService.Instance.HandleException(CLASS_NAME, "GetCombatEffectiveness", e);
-                return 0f;
             }
         }
 
@@ -1648,42 +1817,6 @@ namespace HammerAndSickle.Models
             {
                 AppService.Instance.HandleException(CLASS_NAME, "GetSupplyStatus", e);
                 return 0f;
-            }
-        }
-
-        /// <summary>
-        /// Checks if the unit has adequate supplies for operations.
-        /// </summary>
-        /// <param name="threshold">Supply threshold percentage (default 0.25 = 25%)</param>
-        /// <returns>True if supplies are above threshold</returns>
-        public bool HasAdequateSupplies(float threshold = 0.25f)
-        {
-            return GetSupplyStatus() >= threshold;
-        }
-
-        /// <summary>
-        /// Updates efficiency level based on current damage state.
-        /// </summary>
-        private void UpdateEfficiencyFromDamage()
-        {
-            try
-            {
-                float effectiveness = GetCombatEffectiveness();
-
-                EfficiencyLevel newEfficiency = effectiveness switch
-                {
-                    >= 0.9f => EfficiencyLevel.FullyOperational,
-                    >= 0.7f => EfficiencyLevel.Operational,
-                    >= 0.4f => EfficiencyLevel.DegradedOperations,
-                    > 0f => EfficiencyLevel.StaticOperations,
-                    _ => EfficiencyLevel.StaticOperations
-                };
-
-                EfficiencyLevel = newEfficiency; // Direct assignment instead of reflection
-            }
-            catch (Exception e)
-            {
-                AppService.Instance.HandleException(CLASS_NAME, "UpdateEfficiencyFromDamage", e);
             }
         }
 
