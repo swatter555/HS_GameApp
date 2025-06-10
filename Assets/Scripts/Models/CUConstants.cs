@@ -45,6 +45,20 @@ namespace HammerAndSickle.Models
         public const float COMBAT_MOD_ENTRENCHED    = 1.2f; // Entrenched units get +20% combat bonus
         public const float COMBAT_MOD_FORTIFIED     = 1.3f; // Fortified units get +30% combat bonus
 
+        public const float STRENGTH_MOD_FULL     = 1.15f; // Full strength units get +15% combat bonus
+        public const float STRENGTH_MOD_DEPLETED = 0.75f; // Depleted strength units get -25% combat malus
+        public const float STRENGTH_MOD_LOW      = 0.4f;  // Low strength units get -60% combat malus
+
+        public const float EFFICIENCY_MOD_STATIC      = 0.5f; // Static units get 50% combat malus
+        public const float EFFICIENCY_MOD_DEGRADED    = 0.7f; // Degraded units get 30% combat malus
+        public const float EFFICIENCY_MOD_OPERATIONAL = 0.8f; // Operational units get 20% combat malus
+        public const float EFFICIENCY_MOD_FULL        = 0.9f; // Full efficiency units get 10% combat malus
+        public const float EFFICIENCY_MOD_PEAK        = 1.0f; // Peak efficiency units have no combat modifier
+
+        public const float FULL_STRENGTH_FLOOR      = 0.8f; // Minimum strength for full effectiveness
+        public const float DEPLETED_STRENGTH_FLOOR  = 0.5f; // Minimum strength for depleted effectiveness
+
+        
         //================================
         //====== Leader Skills/Tree ======
         //================================
