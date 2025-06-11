@@ -3,130 +3,126 @@ using System;
 using System.Collections.Generic;
 using System.Runtime.Serialization;
 using UnityEngine;
+using UnityEngine.tvOS;
 
 namespace HammerAndSickle.Models
 {
-    /// <summary>
-    /// Represents a military unit with comprehensive state management, combat capabilities, and serialization support.
-    /// Implements event-driven design patterns and uses StatsMaxCurrent for paired max/current value management.
-    /// Supports complex object relationships with proper reference resolution for saved game compatibility.
-    /// 
-    /// CORE SYSTEMS:
-    /// - Unit identification, classification, and metadata
-    /// - Action economy with deployment, combat, movement, opportunity, and intelligence actions
-    /// - Experience progression system with combat effectiveness modifiers
-    /// - Leader assignment with skill-based bonuses and reputation tracking
-    /// - Combat state transitions (Mobile ↔ Deployed ↔ HastyDefense ↔ Entrenched ↔ Fortified)
-    /// - Damage, repair, and supply management with efficiency calculations
-    /// - Position tracking and basic movement validation
-    /// - Profile switching between deployed and mounted configurations
-    /// 
-    /// KEY METHODS BY CATEGORY:
-    /// 
-    /// **Construction & Initialization:**
-    /// - CombatUnit() - Creates unit with full parameter validation
-    /// - InitializeActionCounts() - Sets action counts based on unit classification
-    /// - InitializeMovementPoints() - Sets movement based on unit type
-    /// 
-    /// **Turn Management:**
-    /// - RefreshAllActions() - Resets all action counts to maximum at turn start
-    /// - RefreshMovementPoints() - Resets movement points to maximum
-    /// 
-    /// **Experience System:**
-    /// - AddExperience(points) - Adds XP and checks for level advancement
-    /// - SetExperience(points) - Sets total XP directly (for loading saves)
-    /// - GetExperienceMultiplier() - Returns combat effectiveness modifier
-    /// - IsExperienced() / IsElite() - Checks for veteran/elite status
-    /// - GetExperienceDisplayString() - Returns formatted progress string
-    /// 
-    /// **Leader Management:**
-    /// - AssignLeader(leader) / RemoveLeader() - Leader assignment (TODO: implementation)
-    /// - GetLeaderBonuses() - Returns all active leader skill bonuses
-    /// - HasLeaderCapability(bonusType) - Checks for specific leader abilities
-    /// - AwardLeaderReputation() - Awards reputation for unit actions
-    /// - GetLeaderName/Rank/Grade() - Leader display information
-    /// 
-    /// **Action Economy:**
-    /// - ConsumeMoveAction/CombatAction/DeploymentAction() - Spends actions
-    /// - ConsumeMovementPoints(points) - Spends movement points
-    /// - CanConsume[ActionType]() - Validates action availability
-    /// - GetAvailableActions() - Returns current action counts
-    /// 
-    /// **Combat State Management:**
-    /// - SetCombatState(newState) - Changes combat posture with validation
-    /// - CanChangeToState(targetState) - Validates state transitions
-    /// - BeginEntrenchment() - Convenience method for defensive positioning
-    /// - GetValidStateTransitions() - Lists all possible state changes
-    /// - GetEffectiveWeaponProfile() - Returns active weapon profile
-    /// - GetCombatStateDefensiveBonus() - Returns defensive modifier
-    /// 
-    /// **Damage & Supply:**
-    /// - TakeDamage(damage) / Repair(repairAmount) - HP management
-    /// - ConsumeSupplies(amount) / ReceiveSupplies(amount) - Supply operations
-    /// - GetStrengthModifier() - Returns HP-based effectiveness (0.0-1.0)
-    /// - CanMove() - Checks minimum operational requirements
-    /// - IsDestroyed() - Checks if unit has any HP remaining
-    /// 
-    /// **Position & Movement:**
-    /// - SetPosition(newPos) / GetPosition() - Map position management
-    /// - GetDistanceTo(position/unit) - Distance calculations
-    /// - CanMoveTo(targetPos) - Basic movement validation
-    /// - IsAtPosition(position, tolerance) - Position verification
-    /// 
-    /// **Serialization & Cloning:**
-    /// - Clone() - Creates deep copy with new UnitID
-    /// - GetObjectData() - Serializes for save games
-    /// - ResolveProfileReferences() - Reconnects shared objects after loading
-    /// - ResolveLeaderReferences() - Reconnects leader after loading
-    /// - HasUnresolvedReferences() - Checks if resolution needed
-    /// 
-    /// SAVE/LOAD GAME STATE COMPLEXITY:
-    /// 
-    /// CombatUnit uses a sophisticated two-phase loading pattern due to complex object relationships:
-    /// 
-    /// **PHASE 1 - SERIALIZATION (Saving):**
-    /// 1. Basic properties are serialized directly (name, ID, stats, etc.)
-    /// 2. StatsMaxCurrent objects are serialized as Max/Current pairs
-    /// 3. Object references are stored as IDs only to prevent circular dependencies:
-    ///    - WeaponSystemProfile references → WeaponSystemID strings
-    ///    - UnitProfile references → UnitProfileID strings  
-    ///    - Leader references → LeaderID strings
-    ///    - LandBaseFacility references → BaseID strings
-    /// 
-    /// **PHASE 2 - DESERIALIZATION (Loading):**
-    /// 1. Basic properties and stats are loaded immediately
-    /// 2. Object reference IDs are stored in temporary fields (unresolvedXXXID)
-    /// 3. Actual object references remain null until resolution
-    /// 
-    /// **PHASE 3 - REFERENCE RESOLUTION:**
-    /// Game state manager must call resolution methods with lookup dictionaries:
-    /// 1. ResolveProfileReferences(weaponProfiles, unitProfiles, landBases)
-    /// 2. ResolveLeaderReferences(leaders)
-    /// 3. HasUnresolvedReferences() returns false when complete
-    /// 
-    /// **EXAMPLE LOADING SEQUENCE:**
-    /// ```csharp
-    /// // After deserializing all objects
-    /// foreach (var unit in allUnits)
-    /// {
-    ///     if (unit.HasUnresolvedReferences())
-    ///     {
-    ///         unit.ResolveProfileReferences(weaponProfileLookup, unitProfileLookup, landBaseLookup);
-    ///         unit.ResolveLeaderReferences(leaderLookup);
-    ///     }
-    /// }
-    /// ```
-    /// 
-    /// This pattern ensures proper object sharing (multiple units can reference the same profiles)
-    /// while preventing save file corruption from circular references.
-    /// 
-    /// DESIGN PATTERNS:
-    /// - Uses StatsMaxCurrent for all max/current paired values
-    /// - Implements comprehensive validation with exception handling
-    /// - Event system integration points marked with TODO comments
-    /// - Reflection used for private property setters during state changes
-    /// - Shared object references for profiles (templates) vs owned objects for stats
-    /// </summary>
+    /*─────────────────────────────────────────────────────────────────────────────
+  CombatUnit  —  universal runtime model for every maneuver element
+───────────────────────────────────────────────────────────────────────────────
+  Scope & Role
+  ────────────
+    • Represents tanks, infantry, aircraft, depots, bases, etc.
+    • Holds *mutable* per-unit state (HP, XP, supply, position, actions).
+    • References shared, immutable templates (WeaponSystemProfile, UnitProfile,
+      LandBaseFacility).
+
+  Major Responsibilities
+  ──────────────────────
+    • Identification & metadata (UnitID, side, nationality, type, class).
+    • Action-economy tracking: Move / Combat / Deployment / Opportunity / Intel.
+    • Experience & leadership (XP progression, Leader bonuses).
+    • Combat-posture state machine:
+        Mobile ↔ Deployed ↔ HastyDefense ↔ Entrenched ↔ Fortified.
+    • Damage, repair, and supply management.
+    • Position & movement on a hex map.
+    • Persistence: ISerializable two-phase load; ICloneable deep copy.
+
+  Design Highlights
+  ─────────────────
+    • All max/current pairs use StatsMaxCurrent for clamping & % queries.
+    • Errors funnel through AppService.Instance.HandleException.
+    • Reflection used only for deep-clone private setters.
+    • No Unity objects serialized—pure data only.
+    • Numeric constants centralized in CUConstants.
+    • Heavy object—always create via factory/GameDataManager so profile refs
+      are shared and properly resolved.
+
+  ─────────────────────────────────────────────────────────────────────────────
+  PUBLIC-METHOD CHEAT SHEET
+  ─────────────────────────────────────────────────────────────────────────────
+  Turn & Detection
+    RefreshAllActions()           Reset all action pools to max at turn start.
+    RefreshMovementPoints()       Restore movement points to maximum.
+    SetSpottedLevel(level)        Update Fog-of-War spotting state.
+
+  Combat Strength
+    GetCurrentCombatStrength()    Effective power with state & XP modifiers.
+
+  Experience
+    AddExperience(points)         Add XP; returns true if level-up.
+    SetExperience(points)         Directly set XP (load/save).
+    GetPointsToNextLevel()        XP needed for next tier.
+    GetExperienceDisplayString()  Nicely formatted XP/level string.
+    GetExperienceProgress()       0–1 progress to next level.
+    IsExperienced()               True if Veteran or Elite.
+    IsElite()                     True if Elite tier.
+    GetExperienceMultiplier()     Combat multiplier from XP tier.
+
+  Leadership
+    AssignLeader(leader)          Attach commander, apply bonuses.
+    RemoveLeader()                Detach commander.
+    GetLeaderBonuses()            Dictionary of all bonus values.
+    HasLeaderCapability(type)     Commander grants capability?
+    GetLeaderBonus(type)          Numeric value of a bonus.
+    HasLeader()                   Commander assigned?
+    GetLeaderName()               Commander’s name.
+    GetLeaderGrade()              Grade (Junior, Senior…).
+    GetLeaderReputation()         Reputation points.
+    GetLeaderRank()               Formatted rank string.
+    GetLeaderCommandAbility()     Combat-command rating.
+    HasLeaderSkill(skill)         Commander has specific skill?
+    AwardLeaderReputation(action[, ctx])  Reputation via contextual action.
+    AwardLeaderReputation(amount) Direct reputation award.
+
+  Action Economy
+    ConsumeMoveAction()           Spend one Move action.
+    ConsumeCombatAction()         Spend Combat action + MP cost.
+    ConsumeMovementPoints(pts)    Deduct MP if available.
+    ConsumeDeploymentAction()     Spend Deployment action.
+    ConsumeOpportunityAction()    Spend Opportunity action.
+    ConsumeIntelAction()          Spend Intel action + MP cost.
+    CanConsumeMoveAction()        Enough Move actions?
+    CanConsumeCombatAction()      Enough Combat actions + MP?
+    CanConsumeMovementPoints(pts) Enough MP?
+    CanConsumeDeploymentAction()  Deployment action available?
+    CanConsumeOpportunityAction() Opportunity action available?
+    CanConsumeIntelAction()       Intel action available?
+
+  Position & Movement
+    SetPosition(pos)              Set hex-map coordinates directly.
+    GetPosition()                 Current coordinates.
+    GetDistanceTo(target)         Hex distance to point overloads (pos/unit).
+    GetDistanceTo(otherUnit)
+    CanMoveTo(target)             Validate MP & terrain legality.
+    IsAtPosition(pos[, tol])      Position equality within tolerance.
+
+  Damage & Supply
+    TakeDamage(dmg)               Apply HP loss.
+    Repair(amt)                   Restore HP up to max.
+    ConsumeSupplies(amt)          Spend supply days; returns true if ok.
+    ReceiveSupplies(amt)          Add supplies; returns actual stored.
+    IsDestroyed()                 True when HP ≤ 0.
+    CanMove()                     HP/supply/efficiency allow movement?
+    GetSupplyStatus()             Supply level 0–1.
+
+  Combat-State Management
+    SetCombatState(state)         Legal state switch; consumes resources.
+    CanChangeToState(state)       Validate prospective state change.
+    BeginEntrenchment()           Convenience → Entrenched.
+    CanEntrench()                 Prerequisites for entrenchment.
+    GetValidStateTransitions()    List legal next states.
+
+  Persistence & Cloning
+    Clone()                       Deep-copy (new UnitID, shared templates).
+    GetObjectData(info, ctx)      Custom binary serialization.
+    HasUnresolvedReferences()     Profiles/leaders still need resolving?
+    GetUnresolvedReferenceIDs()   Return unresolved reference ID list.
+    ResolveReferences(mgr)        Reconnect profile/leader objects.
+
+  ─────────────────────────────────────────────────────────────────────────────
+  Keep this comment up to date when adding/removing public APIs!
+─────────────────────────────────────────────────────────────────────────────*/
     [Serializable]
     public class CombatUnit : ICloneable, ISerializable, IResolvableReferences
     {
@@ -144,6 +140,7 @@ namespace HammerAndSickle.Models
         private string unresolvedUnitProfileID = "";
         private string unresolvedLandBaseProfileID = "";
         private string unresolvedLeaderID = "";
+        private string unresolvedActiveProfileID = "";
 
         #endregion // Fields
 
@@ -164,6 +161,7 @@ namespace HammerAndSickle.Models
         // Profiles contain unit stats and capabilities.
         public WeaponSystemProfile DeployedProfile { get; private set; }
         public WeaponSystemProfile MountedProfile { get; private set; }
+        public WeaponSystemProfile ActiveProfile { get; private set; }
         public UnitProfile UnitProfile { get; private set; }
         public LandBaseFacility LandBaseFacility { get; private set; }
 
@@ -187,8 +185,6 @@ namespace HammerAndSickle.Models
         public StatsMaxCurrent DaysSupply { get; private set; }
         public StatsMaxCurrent MovementPoints { get; private set; }
         public Vector2 MapPos { get; internal set; }
-
-        // TODO: Implement into serialization and cloning.
         public SpottedLevel SpottedLevel { get; private set; }
 
         // TODO: Implement
@@ -217,6 +213,7 @@ namespace HammerAndSickle.Models
             MountedProfile = null;
             UnitProfile = null;
             LandBaseFacility = null;
+            ActiveProfile = null;
 
             // Initialize leader (will be null until assigned)
             CommandingOfficer = null;
@@ -230,6 +227,7 @@ namespace HammerAndSickle.Models
             EfficiencyLevel = EfficiencyLevel.FullyOperational;
             IsMounted = false;
             CombatState = CombatState.Deployed;
+            SpottedLevel = SpottedLevel.Level1;
 
             // Initialize StatsMaxCurrent properties
             HitPoints = new StatsMaxCurrent(CUConstants.MAX_HP);
@@ -301,6 +299,7 @@ namespace HammerAndSickle.Models
                 // Set profiles
                 DeployedProfile = deployedProfile;
                 MountedProfile = mountedProfile;
+                ActiveProfile = deployedProfile; // Default to deployed profile
                 UnitProfile = unitProfile;
                 LandBaseFacility = landBaseProfile;
 
@@ -316,6 +315,7 @@ namespace HammerAndSickle.Models
                 EfficiencyLevel = EfficiencyLevel.FullyOperational;
                 IsMounted = false;
                 CombatState = CombatState.Deployed;
+                SpottedLevel = SpottedLevel.Level1;
 
                 // Initialize StatsMaxCurrent properties
                 HitPoints = new StatsMaxCurrent(CUConstants.MAX_HP);
@@ -353,6 +353,7 @@ namespace HammerAndSickle.Models
                 Nationality = (Nationality)info.GetValue(nameof(Nationality), typeof(Nationality));
                 IsTransportable = info.GetBoolean(nameof(IsTransportable));
                 IsLandBase = info.GetBoolean(nameof(IsLandBase));
+                SpottedLevel = (SpottedLevel)info.GetValue(nameof(SpottedLevel), typeof(SpottedLevel));
 
                 // Store profile IDs for later resolution (don't resolve objects yet)
                 unresolvedDeployedProfileID = info.GetString("DeployedProfileID");
@@ -360,6 +361,7 @@ namespace HammerAndSickle.Models
                 unresolvedUnitProfileID = info.GetString("UnitProfileID");
                 unresolvedLandBaseProfileID = info.GetString("LandBaseFacilityID");
                 unresolvedLeaderID = info.GetString("LeaderID");
+                unresolvedActiveProfileID = info.GetString("ActiveProfileID");
 
                 // Deserialize owned StatsMaxCurrent objects
                 HitPoints = new StatsMaxCurrent(
@@ -542,47 +544,40 @@ namespace HammerAndSickle.Models
         }
 
         /// <summary>
-        /// Calculates and returns the current combat strength profile for the weapon system,  adjusted based on its
-        /// mounted state and applicable modifiers.
+        /// Get the adjusted combat strength based on current mounted state and all applicable modifiers.
         /// </summary>
-        /// <remarks>This method determines the active combat profile by checking whether the weapon
-        /// system  is mounted or deployed, clones the corresponding profile, and applies a final combat  rating
-        /// modifier to its attributes. If the weapon system is in an invalid state (e.g.,  missing a required profile),
-        /// the method returns <see langword="null"/>.</remarks>
-        /// <returns>A <see cref="WeaponSystemProfile"/> object representing the adjusted combat strength  of the weapon system.
-        /// Returns <see langword="null"/> if the weapon system is in an  invalid state or if an error occurs during
-        /// processing.</returns>
+        /// <returns>Modified values for current profile</returns>
         public WeaponSystemProfile GetCurrentCombatStrength()
         {
-            // Sanity checks.
-            if (IsMounted && MountedProfile == null) return null;
-            if (!IsMounted && DeployedProfile == null) return null;
-
             try
             {
-                // Get the active profile based on mounted state.
-                WeaponSystemProfile activeProfile = IsMounted ? MountedProfile.Clone() : DeployedProfile.Clone();
+                // Sanity check.
+                if (ActiveProfile == null)
+                    throw new InvalidOperationException("Active profile is not set.");
+
+                // Clone the active profile.
+                WeaponSystemProfile combatProfile = ActiveProfile.Clone();         
 
                 // Compute all modifiers that can effect a combat rating.
                 float finalModifier = GetFinalCombatRatingModifier();
 
                 // Apply the final modifier to the active profile's stats.
-                activeProfile.LandHard.SetAttack(Mathf.CeilToInt(activeProfile.LandHard.Attack * finalModifier));
-                activeProfile.LandHard.SetDefense(Mathf.CeilToInt(activeProfile.LandHard.Defense * finalModifier));
+                combatProfile.LandHard.SetAttack(Mathf.CeilToInt(combatProfile.LandHard.Attack * finalModifier));
+                combatProfile.LandHard.SetDefense(Mathf.CeilToInt(combatProfile.LandHard.Defense * finalModifier));
 
-                activeProfile.LandSoft.SetAttack(Mathf.CeilToInt(activeProfile.LandSoft.Attack * finalModifier));
-                activeProfile.LandSoft.SetDefense(Mathf.CeilToInt(activeProfile.LandSoft.Defense * finalModifier));
+                combatProfile.LandSoft.SetAttack(Mathf.CeilToInt(combatProfile.LandSoft.Attack * finalModifier));
+                combatProfile.LandSoft.SetDefense(Mathf.CeilToInt(combatProfile.LandSoft.Defense * finalModifier));
 
-                activeProfile.LandAir.SetAttack(Mathf.CeilToInt(activeProfile.LandAir.Attack * finalModifier));
-                activeProfile.LandAir.SetDefense(Mathf.CeilToInt(activeProfile.LandAir.Defense * finalModifier));
+                combatProfile.LandAir.SetAttack(Mathf.CeilToInt(combatProfile.LandAir.Attack * finalModifier));
+                combatProfile.LandAir.SetDefense(Mathf.CeilToInt(combatProfile.LandAir.Defense * finalModifier));
 
-                activeProfile.Air.SetAttack(Mathf.CeilToInt(activeProfile.Air.Attack * finalModifier));
-                activeProfile.Air.SetDefense(Mathf.CeilToInt(activeProfile.Air.Defense * finalModifier));
+                combatProfile.Air.SetAttack(Mathf.CeilToInt(combatProfile.Air.Attack * finalModifier));
+                combatProfile.Air.SetDefense(Mathf.CeilToInt(combatProfile.Air.Defense * finalModifier));
 
-                activeProfile.AirGround.SetAttack(Mathf.CeilToInt(activeProfile.AirGround.Attack * finalModifier));
-                activeProfile.AirGround.SetDefense(Mathf.CeilToInt(activeProfile.AirGround.Defense * finalModifier));
+                combatProfile.AirGround.SetAttack(Mathf.CeilToInt(combatProfile.AirGround.Attack * finalModifier));
+                combatProfile.AirGround.SetDefense(Mathf.CeilToInt(combatProfile.AirGround.Defense * finalModifier));
 
-                return activeProfile;
+                return combatProfile;
 
             }
             catch (Exception e)
@@ -612,7 +607,7 @@ namespace HammerAndSickle.Models
                 // Calculate the final combat rating modifier based on all factors.
                 float strengthModifier = GetStrengthModifier();
                 float combatStateModifier = GetCombatStateModifier();
-                float efficiencyModifier = GetEffeciencyModifier();
+                float efficiencyModifier = GetEfficiencyModifier();
                 float experienceModifier = GetExperienceMultiplier();
 
                 // Combine all modifiers
@@ -634,11 +629,11 @@ namespace HammerAndSickle.Models
             try
             {
                 // Compute the combat strength multiplier based on hit points.
-                if (HitPoints.Current >= (1 + (HitPoints.Max * CUConstants.FULL_STRENGTH_FLOOR)))
+                if (HitPoints.Current >= (HitPoints.Max * CUConstants.FULL_STRENGTH_FLOOR))
                 {
                     return CUConstants.STRENGTH_MOD_FULL;
                 }
-                else if (HitPoints.Current >= (1 + (HitPoints.Max * CUConstants.DEPLETED_STRENGTH_FLOOR)))
+                else if (HitPoints.Current >= (HitPoints.Max * CUConstants.DEPLETED_STRENGTH_FLOOR))
                 {
                     return CUConstants.STRENGTH_MOD_DEPLETED;
                 }
@@ -649,7 +644,7 @@ namespace HammerAndSickle.Models
             }
             catch (Exception e)
             {
-                AppService.Instance.HandleException(CLASS_NAME, "GetCombatEffectiveness", e);
+                AppService.Instance.HandleException(CLASS_NAME, "GetStrengthModifier", e);
                 return CUConstants.STRENGTH_MOD_LOW;
             }
         }
@@ -682,7 +677,7 @@ namespace HammerAndSickle.Models
         /// static modifier is returned.</remarks>
         /// <returns>A <see cref="float"/> representing the efficiency modifier. The value corresponds to the current 
         /// operational state, with predefined constants for each efficiency level.</returns>
-        private float GetEffeciencyModifier()
+        private float GetEfficiencyModifier()
         {
             // Returns the efficiency modifier based on current efficiency level.
             return EfficiencyLevel switch
@@ -1850,23 +1845,10 @@ namespace HammerAndSickle.Models
                     return false;
                 }
 
-                // Check if we have sufficient deployment actions
-                if (!CanConsumeDeploymentAction())
-                {
-                    return false;
-                }
-
-                // Check if we have sufficient movement points
-                if (!HasSufficientMovementForDeployment())
-                {
-                    return false;
-                }
-
-                // Store previous state for event notifications
-                var previousState = CombatState;
-
-                // Consume resources...
+                // Use DeploymentAction.
                 ConsumeDeploymentAction();
+
+                // Consume movement points for deployment action.
                 float movementCost = GetDeploymentActionMovementCost();
                 ConsumeMovementPoints(movementCost);
 
@@ -1874,7 +1856,7 @@ namespace HammerAndSickle.Models
                 CombatState = newState;
 
                 // Apply profile changes for new state
-                ApplyProfileForState(newState);
+                UpdateStateAndProfiles(newState);
 
                 return true;
             }
@@ -2091,26 +2073,41 @@ namespace HammerAndSickle.Models
             return MovementPoints.Max * CUConstants.DEPLOYMENT_ACTION_MOVEMENT_COST;
         }
 
+       
         /// <summary>
-        /// Applies the appropriate weapon profile and movement bonuses for the given combat state.
-        /// Mobile state uses MountedProfile (if available) or adds movement bonus.
-        /// All other states use DeployedProfile.
+        /// Updates the combat state and adjusts the active profile and movement points accordingly.
         /// </summary>
-        /// <param name="state">The combat state to apply</param>
-        private void ApplyProfileForState(CombatState state)
+        /// <remarks>This method updates the unit's state and associated profiles based on the provided
+        /// combat state.  If the state is <see cref="CombatState.Mobile"/>, the method applies movement bonuses and
+        /// sets the active profile  to the mounted profile if available; otherwise, it uses the deployed profile. For
+        /// other states, the unit is unmounted,  movement bonuses are removed, and the deployed profile is set as
+        /// active. <para> Preconditions: <list type="bullet"> <item><description>If the unit is mounted, <see
+        /// cref="MountedProfile"/> must not be <see langword="null"/>.</description></item> <item><description><see
+        /// cref="DeployedProfile"/> must not be <see langword="null"/>.</description></item> </list> </para> <para>
+        /// Postconditions: <list type="bullet"> <item><description>The active profile is updated to match the specified
+        /// state.</description></item> <item><description>Movement points are adjusted based on the state and any
+        /// applicable bonuses.</description></item> <item><description>The mounted state is toggled as
+        /// necessary.</description></item> </list> </para></remarks>
+        /// <param name="state">The desired combat state to transition to. Must be a valid <see cref="CombatState"/> value.</param>
+        private void UpdateStateAndProfiles(CombatState state)
         {
             try
             {
+                // Sanity check.
+                if ((IsMounted && MountedProfile == null) || DeployedProfile == null)
+                    throw new InvalidOperationException("Cannot update state with null profiles.");
+
+                // Start with CombatState.Mobile.
                 if (state == CombatState.Mobile)
                 {
-                    // Mobile state: use MountedProfile if available
+                    // Check for a mounted profile.
                     if (MountedProfile != null)
                     {
-                        // Unit will use MountedProfile - no additional changes needed
-                        // The profile is already assigned and will be used by combat calculations
+                        // If we are not already mounted, mount now.
+                        if (!IsMounted) IsMounted = true; // Set mounted state
 
-                        // TODO: Trigger profile switch event
-                        // OnProfileSwitched(DeployedProfile, MountedProfile);
+                        // Set active profile to the mounted one.
+                        ActiveProfile = MountedProfile; // Switch to mounted profile
                     }
                     else
                     {
@@ -2123,73 +2120,27 @@ namespace HammerAndSickle.Models
                         MovementPoints.SetMax(newMaxMovement);
                         MovementPoints.SetCurrent(newMaxMovement * currentPercentage);
 
-                        // TODO: Trigger movement bonus applied event
-                        // OnMovementBonusApplied(movementBonus);
+                        // Set active profile to deployed profile.
+                        ActiveProfile = DeployedProfile;
                     }
                 }
+                // Handle other states with deployed profile and unmounted.
                 else
                 {
-                    // All other states use DeployedProfile
-                    // If we were previously Mobile with movement bonus, remove it
-                    if (MountedProfile == null && CombatState == CombatState.Mobile)
-                    {
-                        // Remove movement bonus - revert to base movement
-                        InitializeMovementPoints(); // Reset to classification default
+                    // Unmount unit.
+                    if (IsMounted) IsMounted = false;
 
-                        // TODO: Trigger movement bonus removed event
-                        // OnMovementBonusRemoved();
-                    }
+                    // Remove movement bonus -revert to base movement
+                    InitializeMovementPoints();
 
-                    // TODO: Trigger profile switch event if switching from mounted
-                    // if (MountedProfile != null && CombatState == CombatState.Mobile)
-                    //     OnProfileSwitched(MountedProfile, DeployedProfile);
+                    // Set the deployed profile as active.
+                    ActiveProfile = DeployedProfile;
                 }
             }
             catch (Exception e)
             {
                 AppService.Instance.HandleException(CLASS_NAME, "ApplyProfileForState", e);
             }
-        }
-
-        /// <summary>
-        /// Gets the effective weapon profile based on current combat state.
-        /// Used by combat calculation systems.
-        /// </summary>
-        /// <returns>The active weapon profile</returns>
-        public WeaponSystemProfile GetEffectiveWeaponProfile()
-        {
-            try
-            {
-                if (CombatState == CombatState.Mobile && MountedProfile != null)
-                {
-                    return MountedProfile;
-                }
-
-                return DeployedProfile;
-            }
-            catch (Exception e)
-            {
-                AppService.Instance.HandleException(CLASS_NAME, "GetEffectiveWeaponProfile", e);
-                return DeployedProfile; // Fallback to deployed profile
-            }
-        }
-
-        /// <summary>
-        /// Gets the defensive bonus multiplier based on current combat state.
-        /// Used by combat calculation systems.
-        /// </summary>
-        /// <returns>Defensive modifier (1.0 = no bonus)</returns>
-        public float GetCombatStateDefensiveBonus()
-        {
-            return CombatState switch
-            {
-                CombatState.Mobile => CUConstants.COMBAT_MOD_MOBILE,
-                CombatState.Deployed => CUConstants.COMBAT_MOD_DEPLOYED,
-                CombatState.HastyDefense => CUConstants.COMBAT_MOD_HASTY_DEFENSE,
-                CombatState.Entrenched => CUConstants.COMBAT_MOD_ENTRENCHED,
-                CombatState.Fortified => CUConstants.COMBAT_MOD_FORTIFIED,
-                _ => CUConstants.COMBAT_MOD_DEPLOYED
-            };
         }
 
         /// <summary>
@@ -2268,6 +2219,10 @@ namespace HammerAndSickle.Models
                     ?.SetValue(clone, this.CombatState);
                 cloneType.GetProperty("MapPos")
                     ?.SetValue(clone, this.MapPos);
+                cloneType.GetProperty("ActiveProfile")
+                    ?.SetValue(clone, this.ActiveProfile);
+                cloneType.GetProperty("SpottedLevel")
+                    ?.SetValue(clone, this.SpottedLevel);
 
                 // Copy unresolved reference fields (should be empty in normal cloning scenarios)
                 cloneType.GetField("unresolvedDeployedProfileID", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance)
@@ -2280,6 +2235,8 @@ namespace HammerAndSickle.Models
                     ?.SetValue(clone, this.unresolvedLandBaseProfileID);
                 cloneType.GetField("unresolvedLeaderID", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance)
                     ?.SetValue(clone, this.unresolvedLeaderID);
+                cloneType.GetField("unresolvedActiveProfileID", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance)
+                    ?.SetValue(clone, this.unresolvedActiveProfileID);
 
                 // Important: Don't copy the LandBaseFacility reference for non-land-base units
                 // The clone should start unattached to any base
@@ -2329,6 +2286,8 @@ namespace HammerAndSickle.Models
                 info.AddValue("UnitProfileID", UnitProfile?.UnitProfileID ?? "");
                 info.AddValue("LandBaseFacilityID", LandBaseFacility?.BaseID ?? "");
                 info.AddValue("LeaderID", CommandingOfficer?.LeaderID ?? "");
+                info.AddValue("ActiveProfileID", ActiveProfile?.WeaponSystemID ?? "");
+                info.AddValue(nameof(SpottedLevel), SpottedLevel);
 
                 // Serialize owned StatsMaxCurrent objects as Max/Current pairs
                 info.AddValue("HitPoints_Max", HitPoints.Max);
@@ -2370,10 +2329,11 @@ namespace HammerAndSickle.Models
         public bool HasUnresolvedReferences()
         {
             return !string.IsNullOrEmpty(unresolvedDeployedProfileID) ||
-                   !string.IsNullOrEmpty(unresolvedMountedProfileID) ||
-                   !string.IsNullOrEmpty(unresolvedUnitProfileID) ||
-                   !string.IsNullOrEmpty(unresolvedLandBaseProfileID) ||
-                   !string.IsNullOrEmpty(unresolvedLeaderID);
+                !string.IsNullOrEmpty(unresolvedMountedProfileID) ||
+                !string.IsNullOrEmpty(unresolvedUnitProfileID) ||
+                !string.IsNullOrEmpty(unresolvedLandBaseProfileID) ||
+                !string.IsNullOrEmpty(unresolvedLeaderID) ||
+                !string.IsNullOrEmpty(unresolvedActiveProfileID);
         }
 
         #endregion // ISerializable Implementation
@@ -2403,6 +2363,9 @@ namespace HammerAndSickle.Models
 
             if (!string.IsNullOrEmpty(unresolvedLeaderID))
                 unresolvedIDs.Add($"Leader:{unresolvedLeaderID}");
+
+            if (!string.IsNullOrEmpty(unresolvedActiveProfileID))
+                unresolvedIDs.Add($"ActiveProfile:{unresolvedActiveProfileID}");
 
             return unresolvedIDs.AsReadOnly();
         }
@@ -2509,6 +2472,38 @@ namespace HammerAndSickle.Models
                         AppService.Instance.HandleException(CLASS_NAME, "ResolveReferences",
                             new KeyNotFoundException($"Leader {unresolvedLeaderID} not found"));
                     }
+                }
+
+                // Resolve ActiveProfile reference
+                if (!string.IsNullOrEmpty(unresolvedActiveProfileID))
+                {
+                    if (Enum.TryParse<WeaponSystems>(unresolvedActiveProfileID, out WeaponSystems activeWeapon))
+                    {
+                        var activeProfile = manager.GetWeaponProfile(activeWeapon, Nationality);
+                        if (activeProfile != null)
+                        {
+                            ActiveProfile = activeProfile;
+                            unresolvedActiveProfileID = "";
+                        }
+                        else
+                        {
+                            AppService.Instance.HandleException(CLASS_NAME, "ResolveReferences",
+                                new KeyNotFoundException($"Active profile {activeWeapon}_{Nationality} not found"));
+                        }
+                    }
+                    else
+                    {
+                        AppService.Instance.HandleException(CLASS_NAME, "ResolveReferences",
+                            new ArgumentException($"Invalid weapon system ID: {unresolvedActiveProfileID}"));
+                    }
+                }
+
+                // Set ActiveProfile correctly after all profiles are resolved
+                if (string.IsNullOrEmpty(unresolvedDeployedProfileID) &&
+                    string.IsNullOrEmpty(unresolvedMountedProfileID) &&
+                    string.IsNullOrEmpty(unresolvedActiveProfileID))
+                {
+                    UpdateStateAndProfiles(CombatState);
                 }
             }
             catch (Exception e)
