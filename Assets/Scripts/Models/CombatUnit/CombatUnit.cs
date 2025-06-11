@@ -120,6 +120,37 @@ namespace HammerAndSickle.Models
     GetUnresolvedReferenceIDs()   Return unresolved reference ID list.
     ResolveReferences(mgr)        Reconnect profile/leader objects.
 
+    IMPORTANT: Combat State vs Mounted State Clarification
+───────────────────────────────────────────────────────────────────────────────
+  
+  Combat States and Mounting are related but distinct concepts:
+  
+  Combat States (CombatState enum):
+  ════════════════════════════════
+  • Deployed (default): Unit in battle formation, ready for combat
+  • Mobile: Unit in movement columns for easier travel
+  • HastyDefense/Entrenched/Fortified: Progressive defensive postures
+  
+  Mounted State (IsMounted boolean):
+  ═════════════════════════════════
+  • Only relevant for units WITH a MountedProfile (vehicles/transports)
+  • True when unit is physically riding in vehicles/transports
+  • False when unit is dismounted and fighting on foot
+  
+  Profile Switching Logic:
+  ═══════════════════════
+  When transitioning TO Mobile state:
+    → Units WITH MountedProfile: Set IsMounted=true, ActiveProfile=MountedProfile
+    → Units WITHOUT MountedProfile: Keep IsMounted=false, ActiveProfile=DeployedProfile
+      but apply movement bonus (they form march columns, don't mount vehicles)
+  
+  When transitioning FROM Mobile to ANY other state:
+    → All units: Set IsMounted=false, ActiveProfile=DeployedProfile, remove movement bonuses
+  
+  This design allows both mechanized units (mount vehicles) and foot units (march
+  formations) to benefit from Mobile state through the same unified state system.
+─────────────────────────────────────────────────────────────────────────────
+
   ─────────────────────────────────────────────────────────────────────────────
   Keep this comment up to date when adding/removing public APIs!
 ─────────────────────────────────────────────────────────────────────────────*/
@@ -438,47 +469,56 @@ namespace HammerAndSickle.Models
         private void InitializeActionCounts()
         {
             // Standard action counts for most units
-            int moveActions = 2;
-            int combatActions = 1;
-            int deploymentActions = 1;
-            int opportunityActions = 1;
-            int intelActions = 1;
+            int moveActions = CUConstants.DEFAULT_MOVE_ACTIONS;
+            int combatActions = CUConstants.DEFAULT_COMBAT_ACTIONS;
+            int deploymentActions = CUConstants.DEFAULT_DEPLOYMENT_ACTIONS;
+            int opportunityActions = CUConstants.DEFAULT_OPPORTUNITY_ACTIONS;
+            int intelActions = CUConstants.DEFAULT_INTEL_ACTIONS;
 
-            // Adjust based on unit classification
-            switch (Classification)
+            // Recon units are more mobile.
+            if (Classification == UnitClassification.RECON)
+                moveActions += 1;
+
+            // Air defence units get more opportunity actions.
+            if (Classification == UnitClassification.SAM ||
+                Classification == UnitClassification.SPSAM ||
+                Classification == UnitClassification.AAA ||
+                Classification == UnitClassification.SPAAA)
+                opportunityActions += 1;
+
+            // Special forces units get more intel actions.
+            if (Classification == UnitClassification.SPECF ||
+                Classification == UnitClassification.SPECM ||
+                Classification == UnitClassification.SPECH)
+                intelActions += 1;
+
+            
+            // Bases have no actions by default.
+            if (Classification == UnitClassification.BASE ||
+                Classification == UnitClassification.DEPOT ||
+                Classification == UnitClassification.AIRB)
             {
-                case UnitClassification.RECON:
-                    moveActions = 3; // Recon units are more mobile
-                    intelActions = 2; // Better at intelligence gathering
-                    break;
+                moveActions = 0;
+                combatActions = 0;
+                deploymentActions = 0;
+                opportunityActions = 0;
+                intelActions = 0;
+            }
 
-                case UnitClassification.ART:
-                case UnitClassification.SPA:
-                case UnitClassification.ROC:
-                    moveActions = 1; // Artillery is less mobile
-                    break;
+            // Come back and add one intel action to BASE.
+            if (Classification == UnitClassification.BASE)
+                intelActions += 1;
 
-                case UnitClassification.SAM:
-                case UnitClassification.SPSAM:
-                case UnitClassification.AAA:
-                case UnitClassification.SPAAA:
-                    opportunityActions = 2; // Air defense gets more opportunity actions
-                    break;
-
-                case UnitClassification.SPECF:
-                case UnitClassification.SPECM:
-                case UnitClassification.SPECH:
-                    intelActions = 2; // Special forces are better at intel
-                    break;
-
-                case UnitClassification.BASE:
-                case UnitClassification.DEPOT:
-                case UnitClassification.AIRB:
-                    moveActions = 0; // Bases don't move
-                    combatActions = 0; // Bases don't attack
-                    deploymentActions = 0; // Bases don't deploy
-                    opportunityActions = 0; // Bases don't have opportunity actions
-                    break;
+            // Fixed wing aircraft only have move and opportunity actions.
+            if (Classification == UnitClassification.ASF ||
+                Classification == UnitClassification.MRF ||
+                Classification == UnitClassification.ATT ||
+                Classification == UnitClassification.BMB ||
+                Classification == UnitClassification.RECONA)
+            {
+                combatActions = 0;
+                deploymentActions = 0;
+                intelActions = 0;
             }
 
             // Create StatsMaxCurrent instances
@@ -499,8 +539,8 @@ namespace HammerAndSickle.Models
                 UnitClassification.TANK or UnitClassification.MECH or UnitClassification.RECON or UnitClassification.SPA or UnitClassification.SPAAA or UnitClassification.SPSAM => CUConstants.MECH_MOV,
                 UnitClassification.MOT or UnitClassification.MAB or UnitClassification.MMAR or UnitClassification.AM or UnitClassification.MAM or UnitClassification.SPECM or UnitClassification.ROC => CUConstants.MOT_MOV,
                 UnitClassification.INF or UnitClassification.AB or UnitClassification.MAR or UnitClassification.AT or UnitClassification.SPECF or UnitClassification.ART or UnitClassification.SAM or UnitClassification.AAA or UnitClassification.ENG => CUConstants.FOOT_MOV,
-                UnitClassification.ASF or UnitClassification.MRF or UnitClassification.ATT or UnitClassification.BMB or UnitClassification.RCN or UnitClassification.FWT => CUConstants.FIXEDWING_MOV,
-                UnitClassification.AHEL or UnitClassification.THEL or UnitClassification.SPECH => CUConstants.HELO_MOV,
+                UnitClassification.ASF or UnitClassification.MRF or UnitClassification.ATT or UnitClassification.BMB or UnitClassification.RECONA => CUConstants.FIXEDWING_MOV,
+                UnitClassification.HELO or UnitClassification.HELO or UnitClassification.SPECH => CUConstants.HELO_MOV,
                 UnitClassification.BASE or UnitClassification.DEPOT or UnitClassification.AIRB => 0,// Bases don't move
                 _ => CUConstants.FOOT_MOV,// Default to foot movement
             };
@@ -1249,18 +1289,17 @@ namespace HammerAndSickle.Models
         {
             try
             {
-                if (!CanConsumeCombatAction())
-                {
+                // Check combat action availability
+                if (CombatActions.Current < 1f)
                     return false;
-                }
 
-                // Consume the combat action
-                CombatActions.SetCurrent(CombatActions.Current - 1f);
-
-                // Consume movement points
+                // Calculate and consume movement points first
                 float movementCost = GetCombatActionMovementCost();
-                ConsumeMovementPoints(movementCost);
+                if (!ConsumeMovementPoints(movementCost))
+                    return false;
 
+                // Only consume combat action if movement was successful
+                CombatActions.SetCurrent(CombatActions.Current - 1f);
                 return true;
             }
             catch (Exception e)
@@ -1351,21 +1390,21 @@ namespace HammerAndSickle.Models
         {
             try
             {
-                if (!CanConsumeIntelAction())
-                {
+                // Check intel action availability
+                if (IntelActions.Current < 1f)
                     return false;
-                }
-
-                // Consume the intel action
-                IntelActions.SetCurrent(IntelActions.Current - 1f);
 
                 // Bases don't consume movement points for intel gathering
                 if (!IsLandBase)
                 {
+                    // Calculate and consume movement points first
                     float movementCost = GetIntelActionMovementCost();
-                    ConsumeMovementPoints(movementCost);
+                    if (!ConsumeMovementPoints(movementCost))
+                        return false;
                 }
 
+                // Only consume intel action if movement was successful (or not needed for bases)
+                IntelActions.SetCurrent(IntelActions.Current - 1f);
                 return true;
             }
             catch (Exception e)
@@ -2005,8 +2044,7 @@ namespace HammerAndSickle.Models
                 Classification == UnitClassification.MRF ||
                 Classification == UnitClassification.ATT ||
                 Classification == UnitClassification.BMB ||
-                Classification == UnitClassification.RCN ||
-                Classification == UnitClassification.FWT)
+                Classification == UnitClassification.RECONA)
             {
                 return false;
             }
@@ -2379,6 +2417,8 @@ namespace HammerAndSickle.Models
         {
             try
             {
+                bool activeProfileWasResolved = false;
+
                 // Resolve WeaponSystemProfile references
                 if (!string.IsNullOrEmpty(unresolvedDeployedProfileID))
                 {
@@ -2484,6 +2524,7 @@ namespace HammerAndSickle.Models
                         {
                             ActiveProfile = activeProfile;
                             unresolvedActiveProfileID = "";
+                            activeProfileWasResolved = true; // Track successful resolution
                         }
                         else
                         {
@@ -2498,10 +2539,12 @@ namespace HammerAndSickle.Models
                     }
                 }
 
-                // Set ActiveProfile correctly after all profiles are resolved
-                if (string.IsNullOrEmpty(unresolvedDeployedProfileID) &&
-                    string.IsNullOrEmpty(unresolvedMountedProfileID) &&
-                    string.IsNullOrEmpty(unresolvedActiveProfileID))
+                // Only recompute ActiveProfile if it wasn't explicitly resolved from save data
+                // This preserves the exact saved state while handling cases where ActiveProfile wasn't saved
+                // or when we have the core profiles needed to recompute it
+                if (!activeProfileWasResolved &&
+                    string.IsNullOrEmpty(unresolvedDeployedProfileID) &&
+                    string.IsNullOrEmpty(unresolvedMountedProfileID))
                 {
                     UpdateStateAndProfiles(CombatState);
                 }
