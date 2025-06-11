@@ -533,6 +533,15 @@ namespace HammerAndSickle.Models
         }
 
         /// <summary>
+        /// Sets the spotted level for the current instance.
+        /// </summary>
+        /// <param name="spottedLevel">The new spotted level to assign.</param>
+        public void SetSpottedLevel(SpottedLevel spottedLevel)
+        {
+            SpottedLevel = spottedLevel;
+        }
+
+        /// <summary>
         /// Calculates and returns the current combat strength profile for the weapon system,  adjusted based on its
         /// mounted state and applicable modifiers.
         /// </summary>
@@ -2202,13 +2211,6 @@ namespace HammerAndSickle.Models
         }
 
         #endregion // Private Combat State Helpers
-
-
-        #region Status Reports and Spotted Level
-
-        // TODO: Set spotted level
-
-        #endregion // Status Reports
 
 
         #region ICloneable Implementation
