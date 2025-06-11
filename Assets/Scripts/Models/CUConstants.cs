@@ -58,7 +58,12 @@ namespace HammerAndSickle.Models
         public const float FULL_STRENGTH_FLOOR      = 0.8f; // Minimum strength for full effectiveness
         public const float DEPLETED_STRENGTH_FLOOR  = 0.5f; // Minimum strength for depleted effectiveness
 
-        
+        public const int DEFAULT_MOVE_ACTIONS = 1;
+        public const int DEFAULT_COMBAT_ACTIONS = 1;
+        public const int DEFAULT_INTEL_ACTIONS = 1;
+        public const int DEFAULT_DEPLOYMENT_ACTIONS = 1;
+        public const int DEFAULT_OPPORTUNITY_ACTIONS = 1;
+
         //================================
         //====== Leader Skills/Tree ======
         //================================

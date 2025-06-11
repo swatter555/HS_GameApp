@@ -49,14 +49,12 @@ namespace HammerAndSickle.Models
         AAA,    // Anti-Aircraft Artillery
         SPAAA,  // Self-Propelled Anti-Aircraft Artillery
         ENG,    // Engineer
-        AHEL,   // Transport Helicopter
-        THEL,   // Attack helicopter
+        HELO,   // Attack helicopter
         ASF,    // Air Superiority Fighter
         MRF,    // Multi-role Fighter
         ATT,    // Attack aircraft
         BMB,    // Bomber
-        RCN,    // Recon Aircraft
-        FWT,    // Fixed-wing transport
+        RECONA, // Recon Aircraft
         BASE,   // LandBase facility, generic
         DEPOT,  // Supply Depot, specific type of LandBase
         AIRB,   // Airbase Specific type of Landbase
