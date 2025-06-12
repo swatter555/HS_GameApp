@@ -1,6 +1,8 @@
-﻿using HammerAndSickle.Services;
+﻿using HammerAndSickle.Core;
+using HammerAndSickle.Services;
 using System;
 using System.Collections.Generic;
+using System.IO;
 using System.Runtime.Serialization;
 using UnityEngine;
 using UnityEngine.tvOS;
@@ -197,6 +199,7 @@ namespace HammerAndSickle.Models
         public LandBaseFacility LandBaseFacility { get; private set; }
 
         // The unit's leader.
+        public bool IsLeaderAssigned = false;
         public Leader CommandingOfficer { get; internal set; }
 
         // Action counts using StatsMaxCurrent
@@ -226,6 +229,9 @@ namespace HammerAndSickle.Models
 
         #region Constructors
 
+        /// <summary>
+        /// Default constructor
+        /// </summary>
         public CombatUnit()
         {
             // Set identification and metadata
@@ -238,6 +244,7 @@ namespace HammerAndSickle.Models
             Nationality = Nationality.USSR;
             IsTransportable = true;
             IsLandBase = false;
+            IsLeaderAssigned = false;
 
             // Set profiles
             DeployedProfile = null;
@@ -326,6 +333,7 @@ namespace HammerAndSickle.Models
                 Nationality = nationality;
                 IsTransportable = isTransportable;
                 IsLandBase = isLandBase;
+                IsLeaderAssigned = false; // Default to no leader assigned
 
                 // Set profiles
                 DeployedProfile = deployedProfile;
@@ -384,8 +392,9 @@ namespace HammerAndSickle.Models
                 Nationality = (Nationality)info.GetValue(nameof(Nationality), typeof(Nationality));
                 IsTransportable = info.GetBoolean(nameof(IsTransportable));
                 IsLandBase = info.GetBoolean(nameof(IsLandBase));
+                IsLeaderAssigned = info.GetBoolean(nameof(IsLeaderAssigned));
                 SpottedLevel = (SpottedLevel)info.GetValue(nameof(SpottedLevel), typeof(SpottedLevel));
-
+                
                 // Store profile IDs for later resolution (don't resolve objects yet)
                 unresolvedDeployedProfileID = info.GetString("DeployedProfileID");
                 unresolvedMountedProfileID = info.GetString("MountedProfileID");
@@ -393,7 +402,7 @@ namespace HammerAndSickle.Models
                 unresolvedLandBaseProfileID = info.GetString("LandBaseFacilityID");
                 unresolvedLeaderID = info.GetString("LeaderID");
                 unresolvedActiveProfileID = info.GetString("ActiveProfileID");
-
+                
                 // Deserialize owned StatsMaxCurrent objects
                 HitPoints = new StatsMaxCurrent(
                     info.GetSingle("HitPoints_Max"),
@@ -496,7 +505,7 @@ namespace HammerAndSickle.Models
                     break;
 
                 case UnitClassification.RECON:
-                    moveActions = moveActions + 1;
+                    moveActions += 1;
                     break;
                 
                 case UnitClassification.AM:
@@ -754,6 +763,31 @@ namespace HammerAndSickle.Models
             };
         }
 
+        /// <summary>
+        /// Gets the display name of a unit by its ID, with fallback handling.
+        /// </summary>
+        /// <param name="unitId">The unit ID to look up</param>
+        /// <returns>The unit's display name or a fallback string</returns>
+        private string GetUnitDisplayName(string unitId)
+        {
+            if (string.IsNullOrEmpty(unitId))
+            {
+                return "Unknown Unit";
+            }
+
+            try
+            {
+                var unit = GameDataManager.Instance.GetCombatUnit(unitId);
+                return unit?.UnitName ?? $"Unit {unitId}";
+            }
+            catch (Exception e)
+            {
+                // Log the query failure but return fallback name
+                AppService.Instance.HandleException(CLASS_NAME, "GetUnitDisplayName", e, ExceptionSeverity.Minor);
+                return $"Unit {unitId}";
+            }
+        }
+
         #endregion // Private Methods
 
 
@@ -972,9 +1006,7 @@ namespace HammerAndSickle.Models
         /// <param name="newLevel">The new experience level</param>
         protected virtual void OnExperienceLevelChanged(ExperienceLevel previousLevel, ExperienceLevel newLevel)
         {
-            // Could trigger events, sound effects, UI notifications, etc.
-            // For now, just log the advancement
-            Debug.Log($"{UnitName} advanced from {previousLevel} to {newLevel}!");
+            AppService.Instance.CaptureUiMessage($"{UnitName} has advanced from {previousLevel} to {newLevel}!");
         }
 
         /// <summary>
@@ -1003,40 +1035,235 @@ namespace HammerAndSickle.Models
 
         /// <summary>
         /// Assigns a leader to command this unit.
-        /// Validates that the leader can command this unit type and handles state management.
+        /// Handles unassigning any current leader and updating all necessary state.
+        /// Validates that the leader is available and manages bidirectional assignment.
         /// </summary>
         /// <param name="leader">The leader to assign to this unit</param>
-        public void AssignLeader(Leader leader)
+        /// <returns>True if assignment was successful, false otherwise</returns>
+        public bool AssignLeader(Leader leader)
         {
             try
             {
-                // TODO: This method will need to interact with the game state manager
-                // to handle leader assignment validation and state updates
-                throw new NotImplementedException("CombatUnit leader assignment not yet implemented");
+                // 1. Parameter validation
+                if (leader == null)
+                {
+                    AppService.Instance.CaptureUiMessage("Cannot assign commander: No leader specified.");
+                    return false;
+                }
+
+                // 2. Prevent redundant assignment - check if same leader already assigned
+                if (CommandingOfficer != null && CommandingOfficer.LeaderID == leader.LeaderID)
+                {
+                    AppService.Instance.CaptureUiMessage($"{leader.FormattedRank} {leader.Name} is already commanding {UnitName}.");
+                    return false;
+                }
+
+                // 3. Check if the incoming leader is already assigned to another unit
+                if (leader.IsAssigned)
+                {
+                    string assignedUnitName = GetUnitDisplayName(leader.UnitID);
+                    AppService.Instance.CaptureUiMessage($"Cannot assign {leader.Name}: Already commanding {assignedUnitName}.");
+                    return false;
+                }
+
+                // 4. Store current leader for potential rollback
+                Leader previousLeader = CommandingOfficer;
+                bool hadPreviousLeader = IsLeaderAssigned;
+
+                try
+                {
+                    // 5. Unassign current leader if one exists
+                    if (CommandingOfficer != null)
+                    {
+                        string currentLeaderName = CommandingOfficer.Name;
+                        CommandingOfficer.UnassignFromUnit();
+
+                        // Enhanced UI message with unit context
+                        AppService.Instance.CaptureUiMessage($"{currentLeaderName} has been relieved of command of {UnitName} and is now available in the leader pool.");
+
+                        CommandingOfficer = null;
+                    }
+
+                    // 6. Assign the new leader using Leader class method
+                    // This handles setting IsAssigned = true and UnitID properly
+                    leader.AssignToUnit(UnitID);
+
+                    // 7. Set our reference to the new leader
+                    CommandingOfficer = leader;
+
+                    // 8. Update our assignment flag
+                    IsLeaderAssigned = true;
+
+                    // 9. Capture UI message about successful assignment
+                    AppService.Instance.CaptureUiMessage($"{leader.FormattedRank} {leader.Name} has been assigned to command {UnitName}.");
+
+                    // 10. Validate consistency
+                    if (!ValidateLeaderAssignmentConsistency())
+                    {
+                        throw new InvalidOperationException("Leader assignment consistency validation failed");
+                    }
+
+                    return true;
+                }
+                catch (Exception innerException)
+                {
+                    // Rollback changes if anything went wrong
+                    try
+                    {
+                        // Restore previous leader if we had one
+                        if (hadPreviousLeader && previousLeader != null)
+                        {
+                            previousLeader.AssignToUnit(UnitID);
+                            CommandingOfficer = previousLeader;
+                            IsLeaderAssigned = true;
+
+                            AppService.Instance.CaptureUiMessage($"Assignment failed - {previousLeader.Name} remains in command of {UnitName}.");
+                        }
+                        else
+                        {
+                            // No previous leader, ensure clean state
+                            CommandingOfficer = null;
+                            IsLeaderAssigned = false;
+                        }
+
+                        // Ensure the new leader is unassigned after failed attempt
+                        if (leader.IsAssigned && leader.UnitID == UnitID)
+                        {
+                            leader.UnassignFromUnit();
+                        }
+                    }
+                    catch (Exception rollbackException)
+                    {
+                        // Log rollback failure but don't throw - we're already in error handling
+                        AppService.Instance.HandleException(CLASS_NAME, "AssignLeader",
+                            new InvalidOperationException("Failed to rollback leader assignment", rollbackException),
+                            ExceptionSeverity.Critical);
+                    }
+
+                    // Log the original error and notify user
+                    AppService.Instance.HandleException(CLASS_NAME, "AssignLeader", innerException);
+                    AppService.Instance.CaptureUiMessage($"Failed to assign {leader.Name} to {UnitName}.");
+                    return false;
+                }
             }
             catch (Exception e)
             {
+                // Handle any unexpected errors
                 AppService.Instance.HandleException(CLASS_NAME, "AssignLeader", e);
-                throw;
+                AppService.Instance.CaptureUiMessage("Leader assignment failed due to an unexpected error.");
+                return false;
             }
         }
 
         /// <summary>
         /// Removes the commanding officer from this unit.
-        /// Handles state management and cleanup.
+        /// Handles proper state management and cleanup for both unit and leader.
         /// </summary>
-        public void RemoveLeader()
+        /// <returns>True if removal was successful, false if no leader was assigned or removal failed</returns>
+        public bool RemoveLeader()
         {
             try
             {
-                // TODO: This method will need to interact with the game state manager
-                // to handle leader removal validation and state updates
-                throw new NotImplementedException("CombatUnit leader removal not yet implemented");
+                // 1. Check if there's actually a leader to remove
+                if (CommandingOfficer == null || !IsLeaderAssigned)
+                {
+                    AppService.Instance.CaptureUiMessage($"{UnitName} does not have a commanding officer to remove.");
+                    return false;
+                }
+
+                // 1a. Additional safety check - verify leader thinks it's assigned to this unit
+                if (CommandingOfficer.UnitID != UnitID)
+                {
+                    AppService.Instance.HandleException(CLASS_NAME, "RemoveLeader",
+                        new InvalidOperationException($"{CommandingOfficer.Name} thinks it's assigned to {CommandingOfficer.UnitID} but unit thinks it's {UnitID}"),
+                        ExceptionSeverity.Minor);
+
+                    // Fix the inconsistency and continue
+                    FixLeaderAssignmentConsistency();
+
+                    // Re-check after consistency fix
+                    if (CommandingOfficer == null || !IsLeaderAssigned)
+                    {
+                        AppService.Instance.CaptureUiMessage($"{UnitName} does not have a commanding officer to remove after consistency fix.");
+                        return false;
+                    }
+                }
+
+                // 2. Store current leader info for UI messaging and potential rollback
+                Leader currentLeader = CommandingOfficer;
+                string leaderName = currentLeader.Name;
+                string leaderRank = currentLeader.FormattedRank; // Capture rank before unassignment
+
+                try
+                {
+                    // 3. Unassign the leader using Leader class method
+                    // This handles setting IsAssigned = false and UnitID = null properly
+                    currentLeader.UnassignFromUnit();
+
+                    // 4. Clear our reference to the leader
+                    CommandingOfficer = null;
+
+                    // 5. Update our assignment flag
+                    IsLeaderAssigned = false;
+
+                    // 6. Capture UI message about successful removal - using captured rank
+                    AppService.Instance.CaptureUiMessage($"{leaderRank} {leaderName} has been relieved of command of {UnitName} and is now available for reassignment.");
+
+                    // 7. Validate consistency
+                    if (!ValidateLeaderAssignmentConsistency())
+                    {
+                        throw new InvalidOperationException("Leader removal consistency validation failed");
+                    }
+
+                    return true;
+                }
+                catch (Exception innerException)
+                {
+                    // Rollback changes if anything went wrong
+                    try
+                    {
+                        // Restore the leader assignment
+                        currentLeader.AssignToUnit(UnitID);
+                        CommandingOfficer = currentLeader;
+                        IsLeaderAssigned = true;
+
+                        // Consistent messaging - using captured name and rank
+                        AppService.Instance.CaptureUiMessage($"Removal failed - {leaderRank} {leaderName} remains in command of {UnitName}.");
+                    }
+                    catch (Exception rollbackException)
+                    {
+                        // Log rollback failure but don't throw - we're already in error handling
+                        AppService.Instance.HandleException(CLASS_NAME, "RemoveLeader",
+                            new InvalidOperationException("Failed to rollback leader removal", rollbackException),
+                            ExceptionSeverity.Critical);
+
+                        // Force consistency fix since rollback failed
+                        FixLeaderAssignmentConsistency();
+                    }
+
+                    // Log the original error and notify user - consistent with rollback message
+                    AppService.Instance.HandleException(CLASS_NAME, "RemoveLeader", innerException);
+                    AppService.Instance.CaptureUiMessage($"Failed to remove {leaderRank} {leaderName} from command of {UnitName}.");
+                    return false;
+                }
             }
             catch (Exception e)
             {
+                // Handle any unexpected errors
                 AppService.Instance.HandleException(CLASS_NAME, "RemoveLeader", e);
-                throw;
+                AppService.Instance.CaptureUiMessage("Leader removal failed due to an unexpected error.");
+
+                // Attempt to fix any consistency issues that might have occurred
+                try
+                {
+                    FixLeaderAssignmentConsistency();
+                }
+                catch (Exception consistencyException)
+                {
+                    AppService.Instance.HandleException(CLASS_NAME, "RemoveLeader", consistencyException, ExceptionSeverity.Minor);
+                }
+
+                return false;
             }
         }
 
@@ -1290,6 +1517,31 @@ namespace HammerAndSickle.Models
             catch (Exception e)
             {
                 AppService.Instance.HandleException(CLASS_NAME, "AwardLeaderReputation", e);
+            }
+        }
+
+        /// <summary>
+        /// Validates that IsLeaderAssigned flag is consistent with CommandingOfficer state.
+        /// </summary>
+        /// <returns>True if consistent, false if there's a mismatch</returns>
+        private bool ValidateLeaderAssignmentConsistency()
+        {
+            bool hasLeader = CommandingOfficer != null;
+            return IsLeaderAssigned == hasLeader;
+        }
+
+        /// <summary>
+        /// Fixes any inconsistency between IsLeaderAssigned flag and CommandingOfficer state.
+        /// </summary>
+        private void FixLeaderAssignmentConsistency()
+        {
+            bool hasLeader = CommandingOfficer != null;
+            if (IsLeaderAssigned != hasLeader)
+            {
+                AppService.Instance.HandleException(CLASS_NAME, "FixLeaderAssignmentConsistency",
+                    new InvalidOperationException($"Leader assignment inconsistency fixed for unit {UnitID}"),
+                    ExceptionSeverity.Minor);
+                IsLeaderAssigned = hasLeader;
             }
         }
 
@@ -2306,6 +2558,7 @@ namespace HammerAndSickle.Models
                 // Copy CommandingOfficer (shared reference)
                 cloneType.GetProperty("CommandingOfficer")
                     ?.SetValue(clone, this.CommandingOfficer);
+                clone.IsLeaderAssigned = this.IsLeaderAssigned;
 
                 // Copy state properties
                 cloneType.GetProperty("EfficiencyLevel")
@@ -2376,6 +2629,8 @@ namespace HammerAndSickle.Models
                 info.AddValue(nameof(Nationality), Nationality);
                 info.AddValue(nameof(IsTransportable), IsTransportable);
                 info.AddValue(nameof(IsLandBase), IsLandBase);
+                info.AddValue(nameof(IsLeaderAssigned), IsLeaderAssigned);
+                info.AddValue(nameof(SpottedLevel), SpottedLevel);
 
                 // Serialize profile references as IDs/names (not the objects themselves)
                 info.AddValue("DeployedProfileID", DeployedProfile?.WeaponSystemID ?? "");
@@ -2384,7 +2639,6 @@ namespace HammerAndSickle.Models
                 info.AddValue("LandBaseFacilityID", LandBaseFacility?.BaseID ?? "");
                 info.AddValue("LeaderID", CommandingOfficer?.LeaderID ?? "");
                 info.AddValue("ActiveProfileID", ActiveProfile?.WeaponSystemID ?? "");
-                info.AddValue(nameof(SpottedLevel), SpottedLevel);
 
                 // Serialize owned StatsMaxCurrent objects as Max/Current pairs
                 info.AddValue("HitPoints_Max", HitPoints.Max);
@@ -2565,12 +2819,35 @@ namespace HammerAndSickle.Models
                     {
                         CommandingOfficer = leader;
                         unresolvedLeaderID = "";
+
+                        // ADD THIS CONSISTENCY CHECK:
+                        // Ensure IsLeaderAssigned is consistent with resolved leader
+                        if (!IsLeaderAssigned)
+                        {
+                            AppService.Instance.HandleException(CLASS_NAME, "ResolveReferences",
+                                new InvalidDataException($"Unit {UnitID} has leader but IsLeaderAssigned is false"),
+                                ExceptionSeverity.Minor);
+                            IsLeaderAssigned = true; // Fix the inconsistency
+                        }
                     }
                     else
                     {
                         AppService.Instance.HandleException(CLASS_NAME, "ResolveReferences",
                             new KeyNotFoundException($"Leader {unresolvedLeaderID} not found"));
+
+                        // ADD THIS CLEANUP:
+                        // If leader couldn't be resolved, ensure flag is cleared
+                        IsLeaderAssigned = false;
                     }
+                }
+                else if (IsLeaderAssigned)
+                {
+                    // ADD THIS CONSISTENCY CHECK:
+                    // Flag says we have a leader but no leader ID was saved
+                    AppService.Instance.HandleException(CLASS_NAME, "ResolveReferences",
+                        new InvalidDataException($"Unit {UnitID} has IsLeaderAssigned=true but no leader ID"),
+                        ExceptionSeverity.Minor);
+                    IsLeaderAssigned = false; // Fix the inconsistency
                 }
 
                 // Resolve ActiveProfile reference
