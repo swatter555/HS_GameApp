@@ -764,27 +764,42 @@ namespace HammerAndSickle.Models
         /// Returns true if the unit leveled up.
         /// </summary>
         /// <param name="points">Experience points to add</param>
-        /// <returns>True if the unit advanced to a new experience level</returns>
+        /// <returns>Returns true if successful</returns>
         public bool AddExperience(int points)
         {
             try
             {
+                // Units cannot gain negative experience.
                 if (points <= 0)
-                    return false;
+                    throw new ArgumentOutOfRangeException(nameof(points), "Experience points must be positive.");
 
-                var previousLevel = ExperienceLevel;
+                // Validate points do not exceed maximum gain per action.
+                if (points > CUConstants.MAX_EXP_GAIN_PER_ACTION)
+                    throw new ArgumentOutOfRangeException(nameof(points), $"Experience points cannot exceed {CUConstants.MAX_EXP_GAIN_PER_ACTION} per action.");
+
+                // Add experience points to total.
                 ExperiencePoints += points;
 
-                // Check if we've advanced to a new level
+                // Cap at Elite level.
+                if (ExperiencePoints > (int)ExperiencePointLevels.Elite)
+                {
+                    ExperiencePoints = (int)ExperiencePointLevels.Elite; 
+                }
+
+                // Store the previous level for comparison.
+                var previousLevel = ExperienceLevel;
+
+                // Get the new experience level based on updated points.
                 var newLevel = CalculateExperienceLevel(ExperiencePoints);
+
+                // If the level has changed, update and notify.
                 if (newLevel != previousLevel)
                 {
                     ExperienceLevel = newLevel;
                     OnExperienceLevelChanged(previousLevel, newLevel);
-                    return true;
                 }
 
-                return false;
+                return true;
             }
             catch (Exception e)
             {
@@ -1902,26 +1917,32 @@ namespace HammerAndSickle.Models
         {
             try
             {
-                // Check if state change is allowed
+                // Check if state change is allowed. If not allowed, UI message already sent to player.
                 if (!CanChangeToState(newState))
+                    return false;
+
+                // Cost in movement points.
+                float movementCost = GetDeploymentActionMovementCost();
+
+                // Make double sure the points are there.
+                if(ConsumeMovementPoints(movementCost))
                 {
+                    // Use DeploymentAction.
+                    ConsumeDeploymentAction();
+
+                    // Update combat state directly
+                    CombatState = newState;
+
+                    // Apply profile changes for new state
+                    UpdateStateAndProfiles(newState);
+
+                    return true;
+                }
+                else
+                {
+                    AppService.Instance.CaptureUiMessage($"Insufficient movement points to change to {newState} state.");
                     return false;
                 }
-
-                // Use DeploymentAction.
-                ConsumeDeploymentAction();
-
-                // Consume movement points for deployment action.
-                float movementCost = GetDeploymentActionMovementCost();
-                ConsumeMovementPoints(movementCost);
-
-                // Update combat state directly
-                CombatState = newState;
-
-                // Apply profile changes for new state
-                UpdateStateAndProfiles(newState);
-
-                return true;
             }
             catch (Exception e)
             {
@@ -1940,32 +1961,46 @@ namespace HammerAndSickle.Models
         {
             try
             {
+                // Capture the UI message if needed.
+                string errorMessage = $"Cannot change from {CombatState} to {targetState}: ";
+
                 // Same state - no change needed
                 if (CombatState == targetState)
                 {
+                    errorMessage += "Already in target state.";
+                    AppService.Instance.CaptureUiMessage(errorMessage);
                     return false;
                 }
-
-                // Check if this unit type can change states at all
+                    
+                // Air units and bases cannot change states.
                 if (!CanUnitTypeChangeStates())
                 {
+                    errorMessage += "Unit type cannot change combat states.";
+                    AppService.Instance.CaptureUiMessage(errorMessage);
                     return false;
                 }
 
                 // Check if transition is adjacent
                 if (!IsAdjacentStateTransition(CombatState, targetState))
                 {
+                    errorMessage += $"Transition from {CombatState} to {targetState} is not adjacent.";
+                    AppService.Instance.CaptureUiMessage(errorMessage);
                     return false;
                 }
 
-                // Check resource requirements
+                // Make sure you have a deployment action to spend.
                 if (!CanConsumeDeploymentAction())
                 {
+                    errorMessage += "No deployment actions available for state change.";
+                    AppService.Instance.CaptureUiMessage(errorMessage);
                     return false;
                 }
 
+                // You need sufficient movement points for deployment actions.
                 if (!HasSufficientMovementForDeployment())
                 {
+                    errorMessage += "Insufficient movement points for deployment action.";
+                    AppService.Instance.CaptureUiMessage(errorMessage);
                     return false;
                 }
 
