@@ -135,7 +135,7 @@ namespace HammerAndSickle.Services
     /// AppService (ErrorAndDirectoryService) provides centralized error and directory creation handling, logging, and 
     /// lifecycle management for Unity applications.
     /// </summary>
-    public class AppService : MonoBehaviour, IDisposable, IErrorHandler
+    public partial class AppService : MonoBehaviour, IDisposable, IErrorHandler
     {
         #region Constants
 
@@ -448,6 +448,7 @@ namespace HammerAndSickle.Services
         }
 
         #endregion
+
 
         #region Exception Handling
 

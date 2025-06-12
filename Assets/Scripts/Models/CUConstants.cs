@@ -10,8 +10,9 @@ namespace HammerAndSickle.Models
         //========================
 
         // CombatUnit constants.
-        public const int MAX_HP = 40;
-        public const int ZOC_RANGE = 1;                 // Zone of Control Range
+        public const int MAX_HP = 40;                       // Maximum hit points for a CombatUnit
+        public const int ZOC_RANGE = 1;                     // Zone of Control Range
+        public const float MAX_EXP_GAIN_PER_ACTION = 10.0f; // Max XP gain per action
 
         // Movement constants for different unit types, in movement points.
         public const int MECH_MOV      = 12;
