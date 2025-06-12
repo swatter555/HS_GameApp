@@ -475,50 +475,74 @@ namespace HammerAndSickle.Models
             int opportunityActions = CUConstants.DEFAULT_OPPORTUNITY_ACTIONS;
             int intelActions = CUConstants.DEFAULT_INTEL_ACTIONS;
 
-            // Recon units are more mobile.
-            if (Classification == UnitClassification.RECON)
-                moveActions += 1;
 
-            // Air defence units get more opportunity actions.
-            if (Classification == UnitClassification.SAM ||
-                Classification == UnitClassification.SPSAM ||
-                Classification == UnitClassification.AAA ||
-                Classification == UnitClassification.SPAAA)
-                opportunityActions += 1;
-
-            // Special forces units get more intel actions.
-            if (Classification == UnitClassification.SPECF ||
-                Classification == UnitClassification.SPECM ||
-                Classification == UnitClassification.SPECH)
-                intelActions += 1;
-
-            
-            // Bases have no actions by default.
-            if (Classification == UnitClassification.BASE ||
-                Classification == UnitClassification.DEPOT ||
-                Classification == UnitClassification.AIRB)
+            switch (Classification)
             {
-                moveActions = 0;
-                combatActions = 0;
-                deploymentActions = 0;
-                opportunityActions = 0;
-                intelActions = 0;
-            }
+                case UnitClassification.TANK:
+                case UnitClassification.MECH:
+                case UnitClassification.MOT:
+                case UnitClassification.AB:
+                case UnitClassification.MAB:
+                case UnitClassification.MAR:
+                case UnitClassification.MMAR:
+                case UnitClassification.AT:
+                case UnitClassification.INF:
+                case UnitClassification.ART:
+                case UnitClassification.SPA:
+                case UnitClassification.ROC:
+                case UnitClassification.BM:
+                case UnitClassification.ENG:
+                case UnitClassification.HELO:
+                    break;
 
-            // Come back and add one intel action to BASE.
-            if (Classification == UnitClassification.BASE)
-                intelActions += 1;
+                case UnitClassification.RECON:
+                    moveActions = moveActions + 1;
+                    break;
+                
+                case UnitClassification.AM:
+                case UnitClassification.MAM:
+                    deploymentActions += 1;
+                    break;
+                
+                case UnitClassification.SPECF:
+                case UnitClassification.SPECM:
+                case UnitClassification.SPECH:
+                    intelActions += 1;
+                    break;
+                
+                case UnitClassification.SAM:
+                case UnitClassification.SPSAM:
+                case UnitClassification.AAA:
+                case UnitClassification.SPAAA:
+                    opportunityActions += 1;
+                    break;
 
-            // Fixed wing aircraft only have move and opportunity actions.
-            if (Classification == UnitClassification.ASF ||
-                Classification == UnitClassification.MRF ||
-                Classification == UnitClassification.ATT ||
-                Classification == UnitClassification.BMB ||
-                Classification == UnitClassification.RECONA)
-            {
-                combatActions = 0;
-                deploymentActions = 0;
-                intelActions = 0;
+                case UnitClassification.ASF:
+                case UnitClassification.MRF:
+                case UnitClassification.ATT:
+                case UnitClassification.BMB:
+                case UnitClassification.RECONA:
+                    moveActions += 2;
+                    combatActions = 0;
+                    deploymentActions = 0;
+                    intelActions = 0;
+                    break;
+
+                case UnitClassification.BASE:
+                    intelActions += 1;
+                    break;
+
+                case UnitClassification.DEPOT:
+                case UnitClassification.AIRB:
+                    moveActions = 0;
+                    combatActions = 0;
+                    deploymentActions = 0;
+                    opportunityActions = 0;
+                    intelActions = 0;
+                    break;
+
+                default:
+                    break;
             }
 
             // Create StatsMaxCurrent instances

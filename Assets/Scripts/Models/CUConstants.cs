@@ -21,9 +21,9 @@ namespace HammerAndSickle.Models
         public const int HELO_MOV      = 24;
 
         // WeaponSystem constants.
-        public const int MAX_COMBAT_VALUE = 10;
-        public const int MIN_COMBAT_VALUE = 0;
-        public const float MAX_RANGE      = 25.0f;
+        public const int MAX_COMBAT_VALUE = 25;
+        public const int MIN_COMBAT_VALUE = 1;
+        public const float MAX_RANGE      = 100.0f;
         public const float MIN_RANGE      = 0.0f;
 
         // Experience level modifiers.
@@ -34,7 +34,7 @@ namespace HammerAndSickle.Models
         public const float VETERAN_XP_MODIFIER     = 1.2f; // +20% effectiveness
         public const float ELITE_XP_MODIFIER       = 1.3f; // +30% effectiveness
 
-        public const float MOBILE_MOVEMENT_BONUS = 1.0f;           // Movement bonus for Mobile units without MountedProfile
+        public const float MOBILE_MOVEMENT_BONUS = 4.0f;           // Movement point bonus for Mobile units without MountedProfile
         public const float DEPLOYMENT_ACTION_MOVEMENT_COST = 0.5f; // Deployment actions cost 50% of max movement
         public const float COMBAT_ACTION_MOVEMENT_COST = 0.25f;    // Combat actions cost 25% of max movement
         public const float INTEL_ACTION_MOVEMENT_COST = 0.15f;     // Intel actions cost 15% of max movement
