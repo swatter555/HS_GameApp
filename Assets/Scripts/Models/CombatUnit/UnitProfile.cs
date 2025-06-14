@@ -77,7 +77,7 @@ namespace HammerAndSickle.Models
             }
             catch (Exception e)
             {
-                AppService.Instance.HandleException(CLASS_NAME, "Constructor", e);
+                AppService.HandleException(CLASS_NAME, "Constructor", e);
                 throw;
             }
         }
@@ -103,7 +103,7 @@ namespace HammerAndSickle.Models
             }
             catch (Exception e)
             {
-                AppService.Instance.HandleException(CLASS_NAME, "CopyConstructor", e);
+                AppService.HandleException(CLASS_NAME, "CopyConstructor", e);
                 throw;
             }
         }
@@ -124,7 +124,7 @@ namespace HammerAndSickle.Models
             }
             catch (Exception e)
             {
-                AppService.Instance.HandleException(CLASS_NAME, "CopyWithNameConstructor", e);
+                AppService.HandleException(CLASS_NAME, "CopyWithNameConstructor", e);
                 throw;
             }
         }
@@ -143,7 +143,7 @@ namespace HammerAndSickle.Models
             }
             catch (Exception e)
             {
-                AppService.Instance.HandleException(CLASS_NAME, "CopyWithNameAndNationalityConstructor", e);
+                AppService.HandleException(CLASS_NAME, "CopyWithNameAndNationalityConstructor", e);
                 throw;
             }
         }
@@ -176,7 +176,7 @@ namespace HammerAndSickle.Models
             }
             catch (Exception e)
             {
-                AppService.Instance.HandleException(CLASS_NAME, "DeserializationConstructor", e);
+                AppService.HandleException(CLASS_NAME, "DeserializationConstructor", e);
                 throw;
             }
         }
@@ -201,7 +201,7 @@ namespace HammerAndSickle.Models
             }
             catch (Exception e)
             {
-                AppService.Instance.HandleException(CLASS_NAME, "UpdateCurrentHP", e);
+                AppService.HandleException(CLASS_NAME, "UpdateCurrentHP", e);
                 throw;
             }
         }
@@ -223,7 +223,7 @@ namespace HammerAndSickle.Models
             }
             catch (Exception e)
             {
-                AppService.Instance.HandleException(CLASS_NAME, "SetWeaponSystemValue", e);
+                AppService.HandleException(CLASS_NAME, "SetWeaponSystemValue", e);
                 throw;
             }
         }
@@ -241,7 +241,7 @@ namespace HammerAndSickle.Models
             }
             catch (Exception e)
             {
-                AppService.Instance.HandleException(CLASS_NAME, "GetWeaponSystemMaxValue", e);
+                AppService.HandleException(CLASS_NAME, "GetWeaponSystemMaxValue", e);
                 return 0;
             }
         }
@@ -261,7 +261,7 @@ namespace HammerAndSickle.Models
             }
             catch (Exception e)
             {
-                AppService.Instance.HandleException(CLASS_NAME, "RemoveWeaponSystem", e);
+                AppService.HandleException(CLASS_NAME, "RemoveWeaponSystem", e);
                 return false;
             }
         }
@@ -306,7 +306,7 @@ namespace HammerAndSickle.Models
             }
             catch (Exception e)
             {
-                AppService.Instance.HandleException(CLASS_NAME, "Clear", e);
+                AppService.HandleException(CLASS_NAME, "Clear", e);
             }
         }
 
@@ -491,7 +491,7 @@ namespace HammerAndSickle.Models
             }
             catch (Exception e)
             {
-                AppService.Instance.HandleException(CLASS_NAME, "GenerateIntelReport", e);
+                AppService.HandleException(CLASS_NAME, "GenerateIntelReport", e);
                 throw;
             }
         }
@@ -576,7 +576,7 @@ namespace HammerAndSickle.Models
             }
             catch (Exception e)
             {
-                AppService.Instance.HandleException(CLASS_NAME, nameof(GetObjectData), e);
+                AppService.HandleException(CLASS_NAME, nameof(GetObjectData), e);
                 throw;
             }
         }
@@ -594,7 +594,7 @@ namespace HammerAndSickle.Models
             }
             catch (Exception e)
             {
-                AppService.Instance.HandleException(CLASS_NAME, nameof(Clone), e);
+                AppService.HandleException(CLASS_NAME, nameof(Clone), e);
                 throw;
             }
         }
@@ -612,7 +612,7 @@ namespace HammerAndSickle.Models
             }
             catch (Exception e)
             {
-                AppService.Instance.HandleException(CLASS_NAME, "Clone", e);
+                AppService.HandleException(CLASS_NAME, "Clone", e);
                 throw;
             }
         }
@@ -631,7 +631,7 @@ namespace HammerAndSickle.Models
             }
             catch (Exception e)
             {
-                AppService.Instance.HandleException(CLASS_NAME, "Clone", e);
+                AppService.HandleException(CLASS_NAME, "Clone", e);
                 throw;
             }
         }

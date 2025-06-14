@@ -49,7 +49,7 @@ namespace HammerAndSickle.Models
             }
             catch (Exception e)
             {
-                AppService.Instance.HandleException(CLASS_NAME, "DefaultConstructor", e);
+                AppService.HandleException(CLASS_NAME, "DefaultConstructor", e);
                 throw;
             }
         }
@@ -63,7 +63,7 @@ namespace HammerAndSickle.Models
             }
             catch (Exception e)
             {
-                AppService.Instance.HandleException(CLASS_NAME, "DamageConstructor", e);
+                AppService.HandleException(CLASS_NAME, "DamageConstructor", e);
                 throw;
             }
         }
@@ -81,7 +81,7 @@ namespace HammerAndSickle.Models
             }
             catch (Exception e)
             {
-                AppService.Instance.HandleException(CLASS_NAME, "FullConstructor", e);
+                AppService.HandleException(CLASS_NAME, "FullConstructor", e);
                 throw;
             }
         }
@@ -109,7 +109,7 @@ namespace HammerAndSickle.Models
             }
             catch (Exception e)
             {
-                AppService.Instance.HandleException(CLASS_NAME, "DeserializationConstructor", e);
+                AppService.HandleException(CLASS_NAME, "DeserializationConstructor", e);
                 throw;
             }
         }
@@ -162,7 +162,7 @@ namespace HammerAndSickle.Models
             }
             catch (Exception e)
             {
-                AppService.Instance.HandleException(CLASS_NAME, "AddAirUnit", e);
+                AppService.HandleException(CLASS_NAME, "AddAirUnit", e);
                 throw;
             }
         }
@@ -180,7 +180,7 @@ namespace HammerAndSickle.Models
             }
             catch (Exception e)
             {
-                AppService.Instance.HandleException(CLASS_NAME, "RemoveAirUnit", e);
+                AppService.HandleException(CLASS_NAME, "RemoveAirUnit", e);
                 return false;
             }
         }
@@ -204,7 +204,7 @@ namespace HammerAndSickle.Models
             }
             catch (Exception e)
             {
-                AppService.Instance.HandleException(CLASS_NAME, "RemoveAirUnitByID", e);
+                AppService.HandleException(CLASS_NAME, "RemoveAirUnitByID", e);
                 return false;
             }
         }
@@ -222,7 +222,7 @@ namespace HammerAndSickle.Models
             }
             catch (Exception e)
             {
-                AppService.Instance.HandleException(CLASS_NAME, "GetAirUnitByID", e);
+                AppService.HandleException(CLASS_NAME, "GetAirUnitByID", e);
                 return null;
             }
         }
@@ -260,7 +260,7 @@ namespace HammerAndSickle.Models
             }
             catch (Exception e)
             {
-                AppService.Instance.HandleException(CLASS_NAME, "ClearAllAirUnits", e);
+                AppService.HandleException(CLASS_NAME, "ClearAllAirUnits", e);
             }
         }
 
@@ -308,7 +308,7 @@ namespace HammerAndSickle.Models
             }
             catch (Exception e)
             {
-                AppService.Instance.HandleException(CLASS_NAME, "GetOperationalAirUnits", e);
+                AppService.HandleException(CLASS_NAME, "GetOperationalAirUnits", e);
                 return new List<CombatUnit>();
             }
         }
@@ -342,7 +342,7 @@ namespace HammerAndSickle.Models
             }
             catch (Exception e)
             {
-                AppService.Instance.HandleException(CLASS_NAME, "Clone", e);
+                AppService.HandleException(CLASS_NAME, "Clone", e);
                 throw;
             }
         }
@@ -397,14 +397,14 @@ namespace HammerAndSickle.Models
                         else
                         {
                             // Log warning about incorrect unit type but don't throw
-                            AppService.Instance.HandleException(CLASS_NAME, "ResolveUnitReferences",
+                            AppService.HandleException(CLASS_NAME, "ResolveUnitReferences",
                                 new InvalidOperationException($"Unit {unitID} is not an air unit (Type: {unit.UnitType})"));
                         }
                     }
                     else
                     {
                         // Log warning about missing unit but don't throw
-                        AppService.Instance.HandleException(CLASS_NAME, "ResolveUnitReferences",
+                        AppService.HandleException(CLASS_NAME, "ResolveUnitReferences",
                             new KeyNotFoundException($"Unit {unitID} not found in lookup dictionary"));
                     }
                 }
@@ -413,7 +413,7 @@ namespace HammerAndSickle.Models
             }
             catch (Exception e)
             {
-                AppService.Instance.HandleException(CLASS_NAME, "ResolveUnitReferences", e);
+                AppService.HandleException(CLASS_NAME, "ResolveUnitReferences", e);
             }
         }
 
@@ -459,7 +459,7 @@ namespace HammerAndSickle.Models
             }
             catch (Exception e)
             {
-                AppService.Instance.HandleException(CLASS_NAME, "GetObjectData", e);
+                AppService.HandleException(CLASS_NAME, "GetObjectData", e);
                 throw;
             }
         }

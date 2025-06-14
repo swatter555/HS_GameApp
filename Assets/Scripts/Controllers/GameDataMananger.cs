@@ -5,7 +5,6 @@ using System.Linq;
 using System.Runtime.Serialization;
 using System.Runtime.Serialization.Formatters.Binary;
 using System.Threading;
-using HammerAndSickle.Core;
 using HammerAndSickle.Services;
 
 namespace HammerAndSickle.Models
@@ -281,7 +280,7 @@ namespace HammerAndSickle.Models
         {
             if (unit == null)
             {
-                ErrorHandler.HandleException(CLASS_NAME, nameof(RegisterCombatUnit),
+                AppService.HandleException(CLASS_NAME, nameof(RegisterCombatUnit),
                     new ArgumentNullException(nameof(unit)));
                 return false;
             }
@@ -292,7 +291,7 @@ namespace HammerAndSickle.Models
 
                 if (_combatUnits.ContainsKey(unit.UnitID))
                 {
-                    ErrorHandler.HandleException(CLASS_NAME, nameof(RegisterCombatUnit),
+                    AppService.HandleException(CLASS_NAME, nameof(RegisterCombatUnit),
                         new InvalidOperationException($"Combat unit with ID {unit.UnitID} already registered"));
                     return false;
                 }
@@ -310,7 +309,7 @@ namespace HammerAndSickle.Models
             }
             catch (Exception e)
             {
-                ErrorHandler.HandleException(CLASS_NAME, nameof(RegisterCombatUnit), e);
+                AppService.HandleException(CLASS_NAME, nameof(RegisterCombatUnit), e);
                 return false;
             }
             finally
@@ -328,7 +327,7 @@ namespace HammerAndSickle.Models
         {
             if (leader == null)
             {
-                ErrorHandler.HandleException(CLASS_NAME, nameof(RegisterLeader),
+                AppService.HandleException(CLASS_NAME, nameof(RegisterLeader),
                     new ArgumentNullException(nameof(leader)));
                 return false;
             }
@@ -339,7 +338,7 @@ namespace HammerAndSickle.Models
 
                 if (_leaders.ContainsKey(leader.LeaderID))
                 {
-                    ErrorHandler.HandleException(CLASS_NAME, nameof(RegisterLeader),
+                    AppService.HandleException(CLASS_NAME, nameof(RegisterLeader),
                         new InvalidOperationException($"Leader with ID {leader.LeaderID} already registered"));
                     return false;
                 }
@@ -357,7 +356,7 @@ namespace HammerAndSickle.Models
             }
             catch (Exception e)
             {
-                ErrorHandler.HandleException(CLASS_NAME, nameof(RegisterLeader), e);
+                AppService.HandleException(CLASS_NAME, nameof(RegisterLeader), e);
                 return false;
             }
             finally
@@ -375,7 +374,7 @@ namespace HammerAndSickle.Models
         {
             if (profile == null)
             {
-                ErrorHandler.HandleException(CLASS_NAME, nameof(RegisterWeaponProfile),
+                AppService.HandleException(CLASS_NAME, nameof(RegisterWeaponProfile),
                     new ArgumentNullException(nameof(profile)));
                 return false;
             }
@@ -400,7 +399,7 @@ namespace HammerAndSickle.Models
             }
             catch (Exception e)
             {
-                ErrorHandler.HandleException(CLASS_NAME, nameof(RegisterWeaponProfile), e);
+                AppService.HandleException(CLASS_NAME, nameof(RegisterWeaponProfile), e);
                 return false;
             }
             finally
@@ -418,7 +417,7 @@ namespace HammerAndSickle.Models
         {
             if (profile == null)
             {
-                ErrorHandler.HandleException(CLASS_NAME, nameof(RegisterUnitProfile),
+                AppService.HandleException(CLASS_NAME, nameof(RegisterUnitProfile),
                     new ArgumentNullException(nameof(profile)));
                 return false;
             }
@@ -443,7 +442,7 @@ namespace HammerAndSickle.Models
             }
             catch (Exception e)
             {
-                ErrorHandler.HandleException(CLASS_NAME, nameof(RegisterUnitProfile), e);
+                AppService.HandleException(CLASS_NAME, nameof(RegisterUnitProfile), e);
                 return false;
             }
             finally
@@ -462,14 +461,14 @@ namespace HammerAndSickle.Models
         {
             if (profile == null)
             {
-                ErrorHandler.HandleException(CLASS_NAME, nameof(RegisterLandBase),
+                AppService.HandleException(CLASS_NAME, nameof(RegisterLandBase),
                     new ArgumentNullException(nameof(profile)));
                 return false;
             }
 
             if (string.IsNullOrEmpty(baseId))
             {
-                ErrorHandler.HandleException(CLASS_NAME, nameof(RegisterLandBase),
+                AppService.HandleException(CLASS_NAME, nameof(RegisterLandBase),
                     new ArgumentException("Base ID cannot be null or empty", nameof(baseId)));
                 return false;
             }
@@ -480,7 +479,7 @@ namespace HammerAndSickle.Models
 
                 if (_landBases.ContainsKey(baseId))
                 {
-                    ErrorHandler.HandleException(CLASS_NAME, nameof(RegisterLandBase),
+                    AppService.HandleException(CLASS_NAME, nameof(RegisterLandBase),
                         new InvalidOperationException($"Land base with ID {baseId} already registered"));
                     return false;
                 }
@@ -498,7 +497,7 @@ namespace HammerAndSickle.Models
             }
             catch (Exception e)
             {
-                ErrorHandler.HandleException(CLASS_NAME, nameof(RegisterLandBase), e);
+                AppService.HandleException(CLASS_NAME, nameof(RegisterLandBase), e);
                 return false;
             }
             finally
@@ -528,7 +527,7 @@ namespace HammerAndSickle.Models
             }
             catch (Exception e)
             {
-                ErrorHandler.HandleException(CLASS_NAME, nameof(GetCombatUnit), e);
+                AppService.HandleException(CLASS_NAME, nameof(GetCombatUnit), e);
                 return null;
             }
             finally
@@ -553,7 +552,7 @@ namespace HammerAndSickle.Models
             }
             catch (Exception e)
             {
-                ErrorHandler.HandleException(CLASS_NAME, nameof(GetLeader), e);
+                AppService.HandleException(CLASS_NAME, nameof(GetLeader), e);
                 return null;
             }
             finally
@@ -578,7 +577,7 @@ namespace HammerAndSickle.Models
             }
             catch (Exception e)
             {
-                ErrorHandler.HandleException(CLASS_NAME, nameof(GetWeaponProfile), e);
+                AppService.HandleException(CLASS_NAME, nameof(GetWeaponProfile), e);
                 return null;
             }
             finally
@@ -605,7 +604,7 @@ namespace HammerAndSickle.Models
             }
             catch (Exception e)
             {
-                ErrorHandler.HandleException(CLASS_NAME, nameof(GetUnitProfile), e);
+                AppService.HandleException(CLASS_NAME, nameof(GetUnitProfile), e);
                 return null;
             }
             finally
@@ -630,7 +629,7 @@ namespace HammerAndSickle.Models
             }
             catch (Exception e)
             {
-                ErrorHandler.HandleException(CLASS_NAME, nameof(GetLandBase), e);
+                AppService.HandleException(CLASS_NAME, nameof(GetLandBase), e);
                 return null;
             }
             finally
@@ -652,7 +651,7 @@ namespace HammerAndSickle.Models
             }
             catch (Exception e)
             {
-                ErrorHandler.HandleException(CLASS_NAME, nameof(GetAllCombatUnits), e);
+                AppService.HandleException(CLASS_NAME, nameof(GetAllCombatUnits), e);
                 return new List<CombatUnit>();
             }
             finally
@@ -674,7 +673,7 @@ namespace HammerAndSickle.Models
             }
             catch (Exception e)
             {
-                ErrorHandler.HandleException(CLASS_NAME, nameof(GetAllLeaders), e);
+                AppService.HandleException(CLASS_NAME, nameof(GetAllLeaders), e);
                 return new List<Leader>();
             }
             finally
@@ -726,7 +725,7 @@ namespace HammerAndSickle.Models
                     }
                     catch (Exception e)
                     {
-                        ErrorHandler.HandleException(CLASS_NAME, nameof(ResolveAllReferences), e);
+                        AppService.HandleException(CLASS_NAME, nameof(ResolveAllReferences), e);
                         remainingUnresolved.Add(unresolvedObject); // Keep for retry
                     }
                 }
@@ -738,7 +737,7 @@ namespace HammerAndSickle.Models
             }
             catch (Exception e)
             {
-                ErrorHandler.HandleException(CLASS_NAME, nameof(ResolveAllReferences), e);
+                AppService.HandleException(CLASS_NAME, nameof(ResolveAllReferences), e);
                 return 0;
             }
             finally
@@ -795,7 +794,7 @@ namespace HammerAndSickle.Models
             }
             catch (Exception e)
             {
-                ErrorHandler.HandleException(CLASS_NAME, nameof(ValidateDataIntegrity), e);
+                AppService.HandleException(CLASS_NAME, nameof(ValidateDataIntegrity), e);
                 errors.Add($"Validation failed with exception: {e.Message}");
             }
             finally
@@ -821,7 +820,7 @@ namespace HammerAndSickle.Models
         {
             if (string.IsNullOrEmpty(filePath))
             {
-                ErrorHandler.HandleException(CLASS_NAME, nameof(SaveGameState),
+                AppService.HandleException(CLASS_NAME, nameof(SaveGameState),
                     new ArgumentException("File path cannot be null or empty"));
                 return false;
             }
@@ -877,7 +876,7 @@ namespace HammerAndSickle.Models
             }
             catch (Exception e)
             {
-                ErrorHandler.HandleException(CLASS_NAME, nameof(SaveGameState), e);
+                AppService.HandleException(CLASS_NAME, nameof(SaveGameState), e);
                 return false;
             }
             finally
@@ -896,7 +895,7 @@ namespace HammerAndSickle.Models
         {
             if (string.IsNullOrEmpty(filePath))
             {
-                ErrorHandler.HandleException(CLASS_NAME, nameof(LoadGameState),
+                AppService.HandleException(CLASS_NAME, nameof(LoadGameState),
                     new ArgumentException("File path cannot be null or empty"));
                 return false;
             }
@@ -911,7 +910,7 @@ namespace HammerAndSickle.Models
 
                 if (!File.Exists(filePath))
                 {
-                    ErrorHandler.HandleException(CLASS_NAME, nameof(LoadGameState),
+                    AppService.HandleException(CLASS_NAME, nameof(LoadGameState),
                         new FileNotFoundException($"Save file not found: {filePath}"));
                     return false;
                 }
@@ -930,7 +929,7 @@ namespace HammerAndSickle.Models
                     // Validate version compatibility
                     if (header.Version > CURRENT_SAVE_VERSION)
                     {
-                        ErrorHandler.HandleException(CLASS_NAME, nameof(LoadGameState),
+                        AppService.HandleException(CLASS_NAME, nameof(LoadGameState),
                             new NotSupportedException($"Save file version {header.Version} is newer than supported version {CURRENT_SAVE_VERSION}"));
                         return false;
                     }
@@ -983,7 +982,7 @@ namespace HammerAndSickle.Models
                         _unitProfiles.Count != header.UnitProfileCount ||
                         _landBases.Count != header.LandBaseCount)
                     {
-                        ErrorHandler.HandleException(CLASS_NAME, nameof(LoadGameState),
+                        AppService.HandleException(CLASS_NAME, nameof(LoadGameState),
                             new InvalidDataException("Loaded object counts do not match header metadata"));
                     }
                 }
@@ -995,7 +994,7 @@ namespace HammerAndSickle.Models
             }
             catch (Exception e)
             {
-                ErrorHandler.HandleException(CLASS_NAME, nameof(LoadGameState), e);
+                AppService.HandleException(CLASS_NAME, nameof(LoadGameState), e);
 
                 // Clear partially loaded data on failure
                 _dataLock.EnterWriteLock();
@@ -1028,20 +1027,20 @@ namespace HammerAndSickle.Models
         {
             if (string.IsNullOrEmpty(scenarioName))
             {
-                ErrorHandler.HandleException(CLASS_NAME, nameof(SaveScenario),
+                AppService.HandleException(CLASS_NAME, nameof(SaveScenario),
                     new ArgumentException("Scenario name cannot be null or empty"));
                 return false;
             }
 
             try
             {
-                string scenarioPath = Path.Combine(AppService.Instance.ScenarioStorageFolderPath,
+                string scenarioPath = Path.Combine(AppService.ScenarioStorageFolderPath,
                     scenarioName + SAVE_FILE_EXTENSION);
                 return SaveGameState(scenarioPath);
             }
             catch (Exception e)
             {
-                ErrorHandler.HandleException(CLASS_NAME, nameof(SaveScenario), e);
+                AppService.HandleException(CLASS_NAME, nameof(SaveScenario), e);
                 return false;
             }
         }
@@ -1055,14 +1054,14 @@ namespace HammerAndSickle.Models
         {
             if (string.IsNullOrEmpty(scenarioName))
             {
-                ErrorHandler.HandleException(CLASS_NAME, nameof(LoadScenario),
+                AppService.HandleException(CLASS_NAME, nameof(LoadScenario),
                     new ArgumentException("Scenario name cannot be null or empty"));
                 return false;
             }
 
             try
             {
-                string scenarioPath = Path.Combine(AppService.Instance.ScenarioStorageFolderPath,
+                string scenarioPath = Path.Combine(AppService.ScenarioStorageFolderPath,
                     scenarioName + SAVE_FILE_EXTENSION);
 
                 bool loadResult = LoadGameState(scenarioPath);
@@ -1078,7 +1077,7 @@ namespace HammerAndSickle.Models
                     {
                         foreach (var error in validationErrors)
                         {
-                            ErrorHandler.HandleException(CLASS_NAME, nameof(LoadScenario),
+                            AppService.HandleException(CLASS_NAME, nameof(LoadScenario),
                                 new InvalidDataException($"Data integrity issue: {error}"), ExceptionSeverity.Minor);
                         }
                     }
@@ -1088,7 +1087,7 @@ namespace HammerAndSickle.Models
             }
             catch (Exception e)
             {
-                ErrorHandler.HandleException(CLASS_NAME, nameof(LoadScenario), e);
+                AppService.HandleException(CLASS_NAME, nameof(LoadScenario), e);
                 return false;
             }
         }
@@ -1113,7 +1112,7 @@ namespace HammerAndSickle.Models
             }
             catch (Exception e)
             {
-                ErrorHandler.HandleException(CLASS_NAME, nameof(MarkDirty), e);
+                AppService.HandleException(CLASS_NAME, nameof(MarkDirty), e);
             }
             finally
             {
@@ -1133,7 +1132,7 @@ namespace HammerAndSickle.Models
             }
             catch (Exception e)
             {
-                ErrorHandler.HandleException(CLASS_NAME, nameof(ClearAll), e);
+                AppService.HandleException(CLASS_NAME, nameof(ClearAll), e);
             }
             finally
             {
@@ -1173,7 +1172,7 @@ namespace HammerAndSickle.Models
             }
             catch (Exception e)
             {
-                ErrorHandler.HandleException(CLASS_NAME, nameof(CalculateChecksum), e);
+                AppService.HandleException(CLASS_NAME, nameof(CalculateChecksum), e);
                 return "ERROR";
             }
         }
@@ -1218,7 +1217,7 @@ namespace HammerAndSickle.Models
                     }
                     catch (Exception e)
                     {
-                        ErrorHandler.HandleException(CLASS_NAME, nameof(Dispose), e);
+                        AppService.HandleException(CLASS_NAME, nameof(Dispose), e);
                     }
                 }
 

@@ -43,7 +43,7 @@ namespace HammerAndSickle.Models
             }
             catch (Exception e)
             {
-                AppService.Instance?.HandleException(CLASS_NAME, "Constructor", e);
+                AppService.HandleException(CLASS_NAME, "Constructor", e);
                 throw;
             }
         }
@@ -75,7 +75,7 @@ namespace HammerAndSickle.Models
             }
             catch (Exception e)
             {
-                AppService.Instance?.HandleException(CLASS_NAME, "DeserializationConstructor", e);
+                AppService.HandleException(CLASS_NAME, "DeserializationConstructor", e);
                 throw;
             }
         }
@@ -97,7 +97,7 @@ namespace HammerAndSickle.Models
             }
             catch (Exception e)
             {
-                AppService.Instance?.HandleException(CLASS_NAME, "SetAttack", e);
+                AppService.HandleException(CLASS_NAME, "SetAttack", e);
                 throw;
             }
         }
@@ -114,7 +114,7 @@ namespace HammerAndSickle.Models
             }
             catch (Exception e)
             {
-                AppService.Instance?.HandleException(CLASS_NAME, "SetDefense", e);
+                AppService.HandleException(CLASS_NAME, "SetDefense", e);
                 throw;
             }
         }
@@ -133,7 +133,7 @@ namespace HammerAndSickle.Models
             }
             catch (Exception e)
             {
-                AppService.Instance?.HandleException(CLASS_NAME, "SetValues", e);
+                AppService.HandleException(CLASS_NAME, "SetValues", e);
                 throw;
             }
         }
@@ -169,7 +169,7 @@ namespace HammerAndSickle.Models
             }
             catch (Exception e)
             {
-                AppService.Instance?.HandleException(CLASS_NAME, "Clone", e);
+                AppService.HandleException(CLASS_NAME, "Clone", e);
                 throw;
             }
         }
@@ -240,7 +240,7 @@ namespace HammerAndSickle.Models
             }
             catch (Exception e)
             {
-                AppService.Instance?.HandleException(CLASS_NAME, "GetObjectData", e);
+                AppService.HandleException(CLASS_NAME, "GetObjectData", e);
                 throw;
             }
         }

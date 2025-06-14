@@ -11,8 +11,11 @@ namespace HammerAndSickle.Services
     public class NameGenService : IDisposable
     {
         #region Constants
+
         private const string CLASS_NAME = nameof(NameGenService);
-        #endregion
+
+        #endregion // Constants
+
 
         #region Singleton
 
@@ -28,7 +31,9 @@ namespace HammerAndSickle.Services
                 return instance;
             }
         }
-        #endregion
+
+        #endregion // Singleton
+
 
         #region Properties
 
@@ -204,7 +209,9 @@ namespace HammerAndSickle.Services
             "Al-Ruwaili", "Al-Harthy", "Al-Zaidi", "Al-Harthi", "Al-Dosari",
             "Al-Hassan", "Al-Bishi", "Al-Qurayshi", "Al-Farsi", "Al-Ammar"
         };
-        #endregion
+
+        #endregion // Private Fields
+
 
         #region Constructor
 
@@ -219,11 +226,13 @@ namespace HammerAndSickle.Services
             }
             catch (Exception e)
             {
-                AppService.Instance.HandleException(CLASS_NAME, "Constructor", e);
+                AppService.HandleException(CLASS_NAME, "Constructor", e);
                 throw;
             }
         }
-        #endregion
+
+        #endregion // Constructor
+
 
         #region Initialization
 
@@ -246,12 +255,14 @@ namespace HammerAndSickle.Services
             }
             catch (Exception e)
             {
-                AppService.Instance.HandleException(CLASS_NAME, "Initialize", e);
+                AppService.HandleException(CLASS_NAME, "Initialize", e);
                 IsInitialized = false;
                 throw;
             }
         }
-        #endregion
+
+        #endregion // Initialization
+
 
         #region Public Methods
 
@@ -280,7 +291,7 @@ namespace HammerAndSickle.Services
             }
             catch (Exception e)
             {
-                AppService.Instance.HandleException(CLASS_NAME, "GenerateMaleName", e);
+                AppService.HandleException(CLASS_NAME, "GenerateMaleName", e);
                 throw;
             }
         }
@@ -309,7 +320,7 @@ namespace HammerAndSickle.Services
             }
             catch (Exception e)
             {
-                AppService.Instance.HandleException(CLASS_NAME, "GenerateMaleFirstName", e);
+                AppService.HandleException(CLASS_NAME, "GenerateMaleFirstName", e);
                 throw;
             }
         }
@@ -338,11 +349,13 @@ namespace HammerAndSickle.Services
             }
             catch (Exception e)
             {
-                AppService.Instance.HandleException(CLASS_NAME, "GenerateLastName", e);
+                AppService.HandleException(CLASS_NAME, "GenerateLastName", e);
                 throw;
             }
         }
-        #endregion
+
+        #endregion // Public Methods
+
 
         #region Private Methods
 
@@ -385,7 +398,9 @@ namespace HammerAndSickle.Services
                 _ => russianLastNames,// Default to Russian names
             };
         }
-        #endregion
+
+        #endregion // Private Methods
+
 
         #region IDisposable Implementation
 
@@ -432,6 +447,7 @@ namespace HammerAndSickle.Services
         {
             Dispose(false);
         }
-        #endregion
+
+        #endregion // IDisposable Implementation
     }
 }
