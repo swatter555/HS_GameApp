@@ -1,24 +1,21 @@
-/****************************************************************************************
+﻿/****************************************************************************************
  * File: AppService.cs
  * 
- * Purpose: Provides centralized error handling, logging, and lifecycle management for Unity applications.
- * This service handles both synchronous and editor-time operations safely, ensuring proper cleanup
- * and resource management throughout the application lifecycle.
+ * Purpose: Provides centralized error handling, logging, UI messaging, and application 
+ * services as a static class. Eliminates singleton pattern and interface complexity.
  * 
  * Key Features:
  * - Thread-safe logging with ReaderWriterLockSlim
- * - Proper Unity lifecycle integration
- * - Implements IDisposable for deterministic cleanup
+ * - Automatic initialization via RuntimeInitializeOnLoadMethod
+ * - Simple test override capabilities
  * - Fallback mechanisms for log persistence
  * - Safe shutdown handling for both editor and runtime
- * - Implements IErrorHandler interface for centralized exception handling
  * 
  * Usage:
- * AppService.Instance.HandleException("ClassName", "MethodName", exception);
- * ErrorHandler.HandleException("ClassName", "MethodName", exception); // Static wrapper
+ * AppService.HandleException("ClassName", "MethodName", exception);
+ * AppService.CaptureUiMessage("Message for UI");
  * 
- * Note: This service automatically hooks into Unity's logging system and handles
- * unhandled exceptions across the application domain.
+ * Note: This service automatically initializes and hooks into Unity's logging system.
  ****************************************************************************************/
 
 using System;
@@ -27,64 +24,58 @@ using System.IO;
 using System.Linq;
 using System.Threading;
 using UnityEngine;
-using HammerAndSickle.Core;
 
 namespace HammerAndSickle.Services
 {
     /// <summary>
     /// Event arguments for error notifications.
-    /// Used to propagate error information to the UI and other interested systems.
     /// </summary>
     public class ErrorEventArgs : EventArgs
     {
-        /// <summary>
-        /// Short user-facing message or summary.
-        /// </summary>
         public string Message { get; set; }
-
-        /// <summary>
-        /// Detailed stack trace or additional info.
-        /// </summary>
         public string StackTrace { get; set; }
-
-        /// <summary>
-        /// When the error occurred (UTC time).
-        /// </summary>
         public DateTime Timestamp { get; set; }
-
-        /// <summary>
-        /// System info snapshot at the time of error, if applicable.
-        /// </summary>
         public string SystemInfo { get; set; }
-
-        /// <summary>
-        /// True if the error is considered fatal for the application.
-        /// </summary>
         public bool IsFatal { get; set; }
     }
 
     /// <summary>
-    /// Configuration settings for the AppService that can be serialized and modified in Unity Inspector.
+    /// Defines the severity levels for exceptions to determine appropriate response.
+    /// </summary>
+    public enum ExceptionSeverity
+    {
+        /// <summary>
+        /// Low-impact exceptions that don't affect core functionality (validation errors, etc.)
+        /// </summary>
+        Minor,
+
+        /// <summary>
+        /// Moderate exceptions that may impact specific features but don't require shutdown
+        /// </summary>
+        Moderate,
+
+        /// <summary>
+        /// Critical exceptions that require immediate attention and may trigger save/quit
+        /// </summary>
+        Critical,
+
+        /// <summary>
+        /// Fatal exceptions that require immediate shutdown
+        /// </summary>
+        Fatal
+    }
+
+    /// <summary>
+    /// Configuration settings for the AppService.
     /// </summary>
     [Serializable]
-    public class ErrorServiceConfig
+    public class AppServiceConfig
     {
-        // Whether to automatically save logs when the application quits
         public bool SaveLogsOnQuit = true;
-
-        // Maximum number of debug logs to store
         public int MaxDebugLogs = 50;
-
-        // Maximum number of warning logs to store
         public int MaxWarningLogs = 20;
-
-        // Maximum number of error logs to store
         public int MaxErrorLogs = 20;
-
-        // Prefix for log file names (e.g., "UnityLogs_Error.txt")
         public string LogFilePrefix = "UnityLogs";
-
-        // Whether to include system information with each log entry
         public bool IncludeSystemInfo = true;
     }
 
@@ -94,19 +85,10 @@ namespace HammerAndSickle.Services
     [Serializable]
     public class ExceptionSeverityConfig
     {
-        [Tooltip("Whether to save game state on Critical exceptions")]
         public bool SaveOnCritical = true;
-
-        [Tooltip("Whether to quit application on Critical exceptions")]
         public bool QuitOnCritical = true;
-
-        [Tooltip("Whether to save game state on Fatal exceptions")]
         public bool SaveOnFatal = true;
-
-        [Tooltip("Whether to quit application on Fatal exceptions")]
         public bool QuitOnFatal = true;
-
-        [Tooltip("Whether to show error dialogs for Moderate+ exceptions")]
         public bool ShowErrorDialogs = true;
     }
 
@@ -115,27 +97,66 @@ namespace HammerAndSickle.Services
     /// </summary>
     public struct LogEntry
     {
-        // When the log entry was created
         public DateTime Timestamp;
-
-        // The actual log message
         public string Message;
-
-        // Stack trace, if relevant
         public string StackTrace;
-
-        // Corresponds to Unity's built-in LogType (e.g., Log, Warning, Error, etc.)
         public LogType UnityLogType;
-
-        // System info captured if needed
         public string SystemInfo;
     }
 
     /// <summary>
-    /// AppService (ErrorAndDirectoryService) provides centralized error and directory creation handling, logging, and 
-    /// lifecycle management for Unity applications.
+    /// Simple test handler for capturing exceptions and UI messages during unit tests.
     /// </summary>
-    public partial class AppService : MonoBehaviour, IDisposable, IErrorHandler
+    public class TestHandler
+    {
+        private readonly List<(string ClassName, string MethodName, Exception Exception, ExceptionSeverity Severity)> _exceptions = new();
+        private readonly List<string> _uiMessages = new();
+
+        public IReadOnlyList<(string ClassName, string MethodName, Exception Exception, ExceptionSeverity Severity)> Exceptions => _exceptions.AsReadOnly();
+        public IReadOnlyList<string> UiMessages => _uiMessages.AsReadOnly();
+
+        public int ExceptionCount => _exceptions.Count;
+        public int UiMessageCount => _uiMessages.Count;
+        public string LatestUiMessage => _uiMessages.LastOrDefault();
+
+        public void HandleException(string className, string methodName, Exception exception, ExceptionSeverity severity = ExceptionSeverity.Minor)
+        {
+            _exceptions.Add((className, methodName, exception, severity));
+        }
+
+        public void CaptureUiMessage(string message)
+        {
+            if (!string.IsNullOrWhiteSpace(message))
+                _uiMessages.Add(message);
+        }
+
+        public bool HasExceptionOfType<T>() where T : Exception
+        {
+            return _exceptions.Any(e => e.Exception is T);
+        }
+
+        public bool HasExceptionOfSeverity(ExceptionSeverity severity)
+        {
+            return _exceptions.Any(e => e.Severity == severity);
+        }
+
+        public T GetMostRecentExceptionOfType<T>() where T : Exception
+        {
+            return _exceptions.Where(e => e.Exception is T).LastOrDefault().Exception as T;
+        }
+
+        public void Clear()
+        {
+            _exceptions.Clear();
+            _uiMessages.Clear();
+        }
+    }
+
+    /// <summary>
+    /// Static AppService providing centralized error handling, logging, UI messaging,
+    /// and application lifecycle management for Unity applications.
+    /// </summary>
+    public static class AppService
     {
         #region Constants
 
@@ -148,37 +169,28 @@ namespace HammerAndSickle.Services
         public const string ScenarioStorageFolderName = "Scenarios";
         public const string AtlasStoragePath = "Assets/Graphics/Atlases";
 
+        // UI Message constants
+        private const int MaxUiMessages = 100;
+
         #endregion // Constants
 
 
         #region Configuration and Events
 
         /// <summary>
-        /// Singleton instance of the AppService.
-        /// Initialized in Awake and destroyed with the application.
+        /// Configuration settings for the service.
         /// </summary>
-        public static AppService Instance { get; private set; }
-
-        /// <summary>
-        /// Configuration settings for the error service.
-        /// Modifiable through Unity Inspector.
-        /// </summary>
-        [SerializeField]
-        [Tooltip("Configure log limits and behavior")]
-        private ErrorServiceConfig config = new();
+        public static AppServiceConfig Config { get; private set; } = new();
 
         /// <summary>
         /// Severity-based exception handling configuration.
         /// </summary>
-        [SerializeField]
-        [Tooltip("Configure how different exception severities are handled")]
-        private ExceptionSeverityConfig severityConfig = new();
+        public static ExceptionSeverityConfig SeverityConfig { get; private set; } = new();
 
         /// <summary>
-        /// Event raised when an error occurs. Subscribers (typically UI elements)
-        /// can handle this to display error messages to the user.
+        /// Event raised when an error occurs.
         /// </summary>
-        public event EventHandler<ErrorEventArgs> OnErrorOccurred;
+        public static event EventHandler<ErrorEventArgs> OnErrorOccurred;
 
         #endregion // Configuration and Events
 
@@ -186,10 +198,32 @@ namespace HammerAndSickle.Services
         #region Properties
 
         // Path Properties
-        public string MyGamesPath { get; private set; }
-        public string MainAppFolderPath { get; private set; }
-        public string DebugDataFolderPath { get; private set; }
-        public string ScenarioStorageFolderPath { get; private set; }
+        public static string MyGamesPath { get; private set; }
+        public static string MainAppFolderPath { get; private set; }
+        public static string DebugDataFolderPath { get; private set; }
+        public static string ScenarioStorageFolderPath { get; private set; }
+
+        // State Properties
+        public static bool IsInitialized { get; private set; }
+
+        /// <summary>
+        /// Most recent UI message captured. Returns null if no message exists.
+        /// </summary>
+        public static string LatestUiMessage
+        {
+            get
+            {
+                if (_testHandler != null)
+                    return _testHandler.LatestUiMessage;
+
+                _uiMsgLock.EnterReadLock();
+                try
+                {
+                    return _uiMessages.Count > 0 ? _uiMessages.Last() : null;
+                }
+                finally { _uiMsgLock.ExitReadLock(); }
+            }
+        }
 
         #endregion // Properties
 
@@ -197,112 +231,97 @@ namespace HammerAndSickle.Services
         #region Private Fields
 
         // Thread synchronization for log access
-        private readonly ReaderWriterLockSlim _logLock = new(LockRecursionPolicy.SupportsRecursion);
+        private static readonly ReaderWriterLockSlim _logLock = new(LockRecursionPolicy.SupportsRecursion);
+        private static readonly ReaderWriterLockSlim _uiMsgLock = new(LockRecursionPolicy.SupportsRecursion);
 
         // Circular buffers for different log types
-        private readonly Queue<LogEntry> debugLogs = new();
-        private readonly Queue<LogEntry> warningLogs = new();
-        private readonly Queue<LogEntry> errorLogs = new();
+        private static readonly Queue<LogEntry> _debugLogs = new();
+        private static readonly Queue<LogEntry> _warningLogs = new();
+        private static readonly Queue<LogEntry> _errorLogs = new();
+
+        // UI message buffer
+        private static readonly Queue<string> _uiMessages = new(MaxUiMessages);
 
         // Lifecycle management
-        private bool isDisposed;
-        private CancellationTokenSource shutdownToken;
+        private static bool _isDisposed = false;
+
+        // Test handler - simple replacement for interface system
+        private static TestHandler _testHandler;
 
         #endregion // Private Fields
 
 
-        #region Unity Lifecycle
+        #region Initialization and Lifecycle
 
         /// <summary>
-        /// Initializes the singleton instance and core service components.
-        /// Called when the GameObject is instantiated.
+        /// Automatically initializes AppService when Unity starts up.
         /// </summary>
-        private void Awake()
+        [RuntimeInitializeOnLoadMethod(RuntimeInitializeLoadType.BeforeSceneLoad)]
+        private static void AutoInitialize()
         {
-            if (Instance == null)
+            Initialize();
+        }
+
+        /// <summary>
+        /// Initializes the AppService with optional custom configuration.
+        /// </summary>
+        public static void Initialize(AppServiceConfig config = null, ExceptionSeverityConfig severityConfig = null)
+        {
+            if (IsInitialized) return;
+
+            try
             {
-                Instance = this;
-                DontDestroyOnLoad(gameObject);
-                shutdownToken = new CancellationTokenSource();
-                InitializeService();
+                Config = config ?? new AppServiceConfig();
+                SeverityConfig = severityConfig ?? new ExceptionSeverityConfig();
+
+                SetupFolderPaths();
+                ValidateConfiguration();
+                CreateLogDirectories();
+                RegisterEventHandlers();
+
+                // Seed the random number generator
+                int seed = System.DateTime.Now.Millisecond;
+                UnityEngine.Random.InitState(seed);
+
+                IsInitialized = true;
+                Debug.Log($"{CLASS_NAME}: Service initialized successfully.");
             }
-            else
+            catch (Exception ex)
             {
-                // Properly dispose of this instance before destroying
-                Dispose(true);
-                GC.SuppressFinalize(this);  // Prevent finalizer from running
-                Destroy(gameObject);
-            }
-        }
-
-        /// <summary>
-        /// Registers event handlers when the component becomes active.
-        /// Called after Awake and when the GameObject is enabled.
-        /// </summary>
-        private void OnEnable()
-        {
-            RegisterEventHandlers();
-        }
-
-        /// <summary>
-        /// Performs cleanup when the component is disabled.
-        /// Ensures logs are flushed and handlers are unregistered.
-        /// </summary>
-        private void OnDisable()
-        {
-            UnregisterEventHandlers();
-            FlushLogsSync();
-        }
-
-        /// <summary>
-        /// Performs final cleanup when the GameObject is destroyed.
-        /// Ensures all resources are properly disposed.
-        /// </summary>
-        private void OnDestroy()
-        {
-            Dispose(true);
-        }
-
-        /// <summary>
-        /// Handles application shutdown.
-        /// Ensures logs are saved if configured to do so.
-        /// </summary>
-        private void OnApplicationQuit()
-        {
-            if (config.SaveLogsOnQuit)
-            {
-                FlushLogsSync();
+                Debug.LogError($"{CLASS_NAME}.Initialize: Failed to initialize: {ex.Message}");
+                throw;
             }
         }
 
-        #endregion // Unity Lifecycle
-
-
-        #region Initialization and Cleanup
-
         /// <summary>
-        /// Performs one-time initialization of the service.
-        /// Sets up configuration and creates necessary directories.
+        /// Shuts down the AppService and releases all resources.
         /// </summary>
-        private void InitializeService()
+        public static void Shutdown()
         {
-            // Setup folder paths.
-            SetupFolderPaths();
+            if (_isDisposed) return;
 
-            ValidateConfiguration();
-            CreateLogDirectories();
+            try
+            {
+                UnregisterEventHandlers();
 
-            // Seed the random number generator.
-            int seed = System.DateTime.Now.Millisecond;
-            UnityEngine.Random.InitState(seed);
+                if (Config.SaveLogsOnQuit)
+                {
+                    FlushLogsSync();
+                }
 
-            Debug.Log($"{GetType().Name}: Service initialized successfully.");
+                ClearAllData();
+                _isDisposed = true;
+                IsInitialized = false;
+
+                Debug.Log($"{CLASS_NAME}: Service shutdown completed.");
+            }
+            catch (Exception ex)
+            {
+                Debug.LogError($"{CLASS_NAME}.Shutdown: Error during shutdown: {ex.Message}");
+            }
         }
 
-        /// <summary>
-        /// Sets up the necessary folder paths for the application.
-        /// </summary>
-        private void SetupFolderPaths()
+        private static void SetupFolderPaths()
         {
             try
             {
@@ -326,174 +345,59 @@ namespace HammerAndSickle.Services
             }
         }
 
-        /// <summary>
-        /// Registers global exception and log handlers.
-        /// Should be called only once during initialization.
-        /// </summary>
-        private void RegisterEventHandlers()
+        private static void RegisterEventHandlers()
         {
             AppDomain.CurrentDomain.UnhandledException += HandleUnhandledException;
             Application.logMessageReceived += CaptureUnityLogs;
+            Application.quitting += OnApplicationQuitting;
         }
 
-        /// <summary>
-        /// Safely unregisters all event handlers.
-        /// Called during cleanup to prevent memory leaks.
-        /// </summary>
-        private void UnregisterEventHandlers()
+        private static void UnregisterEventHandlers()
         {
-            if (isDisposed) return;
+            if (_isDisposed) return;
 
             AppDomain.CurrentDomain.UnhandledException -= HandleUnhandledException;
             Application.logMessageReceived -= CaptureUnityLogs;
+            Application.quitting -= OnApplicationQuitting;
         }
 
-        /// <summary>
-        /// Validates and adjusts configuration settings to ensure valid values.
-        /// Prevents invalid states that could cause issues during operation.
-        /// </summary>
-        private void ValidateConfiguration()
+        private static void OnApplicationQuitting()
         {
-            config.MaxDebugLogs = Mathf.Max(1, config.MaxDebugLogs);
-            config.MaxWarningLogs = Mathf.Max(1, config.MaxWarningLogs);
-            config.MaxErrorLogs = Mathf.Max(1, config.MaxErrorLogs);
+            Shutdown();
         }
 
-        /// <summary>
-        /// Creates necessary directories for log storage.
-        /// Ensures write permissions and handles potential IO errors.
-        /// </summary>
-        private void CreateLogDirectories()
+        private static void ValidateConfiguration()
+        {
+            Config.MaxDebugLogs = Mathf.Max(1, Config.MaxDebugLogs);
+            Config.MaxWarningLogs = Mathf.Max(1, Config.MaxWarningLogs);
+            Config.MaxErrorLogs = Mathf.Max(1, Config.MaxErrorLogs);
+        }
+
+        private static void CreateLogDirectories()
         {
             try
             {
-                string logPath = DebugDataFolderPath;
-                if (!Directory.Exists(logPath))
+                if (!Directory.Exists(DebugDataFolderPath))
                 {
-                    Directory.CreateDirectory(logPath);
+                    Directory.CreateDirectory(DebugDataFolderPath);
                 }
             }
             catch (Exception ex)
             {
-                Debug.LogError($"ErrorService.CreateLogDirectories: Error creating log directories: {ex.Message}");
+                Debug.LogError($"{CLASS_NAME}.CreateLogDirectories: Error creating log directories: {ex.Message}");
             }
         }
 
-        #endregion // Initialization and Cleanup
+        #endregion // Initialization and Lifecycle
 
 
-        #region Log Management
-
-        /// <summary>
-        /// Captures Unity log messages and stores them in appropriate queues.
-        /// Implements circular buffer behavior to limit memory usage.
-        /// </summary>
-        /// <param name="message">The log message content</param>
-        /// <param name="stackTrace">Stack trace if available</param>
-        /// <param name="type">Type of log message (Log, Warning, Error, Exception)</param>
-        private void CaptureUnityLogs(string message, string stackTrace, LogType type)
-        {
-            if (isDisposed) return;
-
-            var entry = new LogEntry
-            {
-                Timestamp = DateTime.UtcNow,
-                Message = message,
-                StackTrace = stackTrace,
-                UnityLogType = type,
-                SystemInfo = config.IncludeSystemInfo ? GetSystemInfo() : string.Empty
-            };
-
-            try
-            {
-                _logLock.EnterWriteLock();
-
-                switch (type)
-                {
-                    case LogType.Log:
-                        EnqueueLimited(debugLogs, entry, config.MaxDebugLogs);
-                        break;
-                    case LogType.Warning:
-                        EnqueueLimited(warningLogs, entry, config.MaxWarningLogs);
-                        break;
-                    case LogType.Error:
-                    case LogType.Exception:
-                        EnqueueLimited(errorLogs, entry, config.MaxErrorLogs);
-                        break;
-                }
-            }
-            finally
-            {
-                if (_logLock.IsWriteLockHeld)
-                {
-                    _logLock.ExitWriteLock();
-                }
-            }
-        }
-
-        /// <summary>
-        /// Implements circular buffer behavior for log queues.
-        /// Ensures queues never exceed their configured maximum size.
-        /// </summary>
-        /// <param name="queue">Target log queue</param>
-        /// <param name="entry">New log entry</param>
-        /// <param name="maxCount">Maximum allowed entries</param>
-        private void EnqueueLimited(Queue<LogEntry> queue, LogEntry entry, int maxCount)
-        {
-            while (queue.Count >= maxCount)
-            {
-                queue.Dequeue();
-            }
-            queue.Enqueue(entry);
-        }
-
-        #endregion
-
-
-        #region Exception Handling
-
-        /// <summary>
-        /// Handles unhandled exceptions at the AppDomain level.
-        /// These are always treated as fatal errors.
-        /// </summary>
-        /// <param name="sender">Source of the exception</param>
-        /// <param name="e">Exception event args</param>
-        private void HandleUnhandledException(object sender, UnhandledExceptionEventArgs e)
-        {
-            if (isDisposed) return;
-
-            if (e.ExceptionObject is Exception exception)
-            {
-                HandleException("UnhandledException", "Global", exception, ExceptionSeverity.Fatal);
-            }
-            else
-            {
-                string message = $"Non-Exception unhandled error: {e.ExceptionObject}";
-                Debug.LogError(message);
-                RaiseErrorEvent(new ErrorEventArgs
-                {
-                    Message = message,
-                    Timestamp = DateTime.UtcNow,
-                    SystemInfo = config.IncludeSystemInfo ? GetSystemInfo() : string.Empty,
-                    IsFatal = true
-                });
-            }
-        }
-
-        #endregion // Exception Handling
-
-
-        #region IErrorHandler Implementation
+        #region Error Handling
 
         /// <summary>
         /// Handles an exception with Minor severity (backward compatibility).
         /// </summary>
-        /// <param name="className">UnitProfileID of the class where the exception occurred</param>
-        /// <param name="methodName">UnitProfileID of the method where the exception occurred</param>
-        /// <param name="exception">The exception that was caught</param>
-        public void HandleException(string className, string methodName, Exception exception)
+        public static void HandleException(string className, string methodName, Exception exception)
         {
-            // Determine severity based on exception type for backward compatibility
             var severity = DetermineExceptionSeverity(exception);
             HandleException(className, methodName, exception, severity);
         }
@@ -501,13 +405,16 @@ namespace HammerAndSickle.Services
         /// <summary>
         /// Handles an exception with specified severity level.
         /// </summary>
-        /// <param name="className">UnitProfileID of the class where the exception occurred</param>
-        /// <param name="methodName">UnitProfileID of the method where the exception occurred</param>
-        /// <param name="exception">The exception that was caught</param>
-        /// <param name="severity">Severity level of the exception</param>
-        public void HandleException(string className, string methodName, Exception exception, ExceptionSeverity severity)
+        public static void HandleException(string className, string methodName, Exception exception, ExceptionSeverity severity)
         {
-            if (isDisposed) return;
+            if (_isDisposed) return;
+
+            // Use test handler if set
+            if (_testHandler != null)
+            {
+                _testHandler.HandleException(className, methodName, exception, severity);
+                return;
+            }
 
             string message = $"Exception in {className}.{methodName}: {exception.Message}";
 
@@ -527,14 +434,14 @@ namespace HammerAndSickle.Services
             }
 
             // Raise error event for UI notification (if configured)
-            if (severity >= ExceptionSeverity.Moderate && severityConfig.ShowErrorDialogs)
+            if (severity >= ExceptionSeverity.Moderate && SeverityConfig.ShowErrorDialogs)
             {
                 RaiseErrorEvent(new ErrorEventArgs
                 {
                     Message = message,
                     StackTrace = exception.StackTrace,
                     Timestamp = DateTime.UtcNow,
-                    SystemInfo = config.IncludeSystemInfo ? GetSystemInfo() : string.Empty,
+                    SystemInfo = Config.IncludeSystemInfo ? GetSystemInfo() : string.Empty,
                     IsFatal = severity == ExceptionSeverity.Fatal
                 });
             }
@@ -543,22 +450,22 @@ namespace HammerAndSickle.Services
             switch (severity)
             {
                 case ExceptionSeverity.Critical:
-                    if (severityConfig.SaveOnCritical && severityConfig.QuitOnCritical)
+                    if (SeverityConfig.SaveOnCritical && SeverityConfig.QuitOnCritical)
                     {
                         SaveAndQuit();
                     }
-                    else if (severityConfig.SaveOnCritical)
+                    else if (SeverityConfig.SaveOnCritical)
                     {
                         SaveGameState();
                     }
                     break;
 
                 case ExceptionSeverity.Fatal:
-                    if (severityConfig.SaveOnFatal && severityConfig.QuitOnFatal)
+                    if (SeverityConfig.SaveOnFatal && SeverityConfig.QuitOnFatal)
                     {
                         SaveAndQuit();
                     }
-                    else if (severityConfig.SaveOnFatal)
+                    else if (SeverityConfig.SaveOnFatal)
                     {
                         SaveGameState();
                     }
@@ -566,57 +473,160 @@ namespace HammerAndSickle.Services
             }
         }
 
-        /// <summary>
-        /// Determines exception severity based on exception type for backward compatibility.
-        /// </summary>
-        /// <param name="exception">The exception to analyze</param>
-        /// <returns>Appropriate severity level</returns>
-        private ExceptionSeverity DetermineExceptionSeverity(Exception exception)
+        private static void HandleUnhandledException(object sender, UnhandledExceptionEventArgs e)
+        {
+            if (_isDisposed) return;
+
+            if (e.ExceptionObject is Exception exception)
+            {
+                HandleException("UnhandledException", "Global", exception, ExceptionSeverity.Fatal);
+            }
+            else
+            {
+                string message = $"Non-Exception unhandled error: {e.ExceptionObject}";
+                Debug.LogError(message);
+                RaiseErrorEvent(new ErrorEventArgs
+                {
+                    Message = message,
+                    Timestamp = DateTime.UtcNow,
+                    SystemInfo = Config.IncludeSystemInfo ? GetSystemInfo() : string.Empty,
+                    IsFatal = true
+                });
+            }
+        }
+
+        private static ExceptionSeverity DetermineExceptionSeverity(Exception exception)
         {
             return exception switch
             {
-                // Specific argument exceptions first (most specific to least specific)
                 ArgumentNullException => ExceptionSeverity.Minor,
                 ArgumentOutOfRangeException => ExceptionSeverity.Minor,
                 ArgumentException => ExceptionSeverity.Minor,
-
-                // Logic and state errors
                 InvalidOperationException => ExceptionSeverity.Moderate,
                 NotSupportedException => ExceptionSeverity.Moderate,
                 NullReferenceException => ExceptionSeverity.Moderate,
                 IndexOutOfRangeException => ExceptionSeverity.Minor,
-
-                // I/O and serialization errors
                 IOException => ExceptionSeverity.Moderate,
                 System.Runtime.Serialization.SerializationException => ExceptionSeverity.Moderate,
                 TimeoutException => ExceptionSeverity.Moderate,
-
-                // Security and access issues
                 UnauthorizedAccessException => ExceptionSeverity.Critical,
                 System.Security.SecurityException => ExceptionSeverity.Critical,
-
-                // System resource exhaustion (fatal)
                 OutOfMemoryException => ExceptionSeverity.Fatal,
                 StackOverflowException => ExceptionSeverity.Fatal,
                 AccessViolationException => ExceptionSeverity.Fatal,
-
-                // Default for unknown exceptions
                 _ => ExceptionSeverity.Moderate
             };
         }
 
-        #endregion // IErrorHandler Implementation
+        #endregion // Error Handling
+
+
+        #region UI Message Handling
+
+        /// <summary>
+        /// Captures a message intended for the in-game UI.
+        /// </summary>
+        public static void CaptureUiMessage(string message)
+        {
+            if (string.IsNullOrWhiteSpace(message)) return;
+
+            // Use test handler if set
+            if (_testHandler != null)
+            {
+                _testHandler.CaptureUiMessage(message);
+                return;
+            }
+
+            _uiMsgLock.EnterWriteLock();
+            try
+            {
+                // Respect size cap – drop oldest when full
+                if (_uiMessages.Count == MaxUiMessages)
+                    _uiMessages.Dequeue();
+
+                _uiMessages.Enqueue(message);
+            }
+            finally { _uiMsgLock.ExitWriteLock(); }
+        }
+
+        /// <summary>
+        /// Returns a snapshot of all buffered UI messages (oldest → newest).
+        /// </summary>
+        public static IReadOnlyList<string> GetUiMessageLog()
+        {
+            // Use test handler if set
+            if (_testHandler != null)
+            {
+                return _testHandler.UiMessages;
+            }
+
+            _uiMsgLock.EnterReadLock();
+            try { return _uiMessages.ToArray(); }
+            finally { _uiMsgLock.ExitReadLock(); }
+        }
+
+        #endregion // UI Message Handling
+
+
+        #region Log Management
+
+        private static void CaptureUnityLogs(string message, string stackTrace, LogType type)
+        {
+            if (_isDisposed) return;
+
+            var entry = new LogEntry
+            {
+                Timestamp = DateTime.UtcNow,
+                Message = message,
+                StackTrace = stackTrace,
+                UnityLogType = type,
+                SystemInfo = Config.IncludeSystemInfo ? GetSystemInfo() : string.Empty
+            };
+
+            try
+            {
+                _logLock.EnterWriteLock();
+
+                switch (type)
+                {
+                    case LogType.Log:
+                        EnqueueLimited(_debugLogs, entry, Config.MaxDebugLogs);
+                        break;
+                    case LogType.Warning:
+                        EnqueueLimited(_warningLogs, entry, Config.MaxWarningLogs);
+                        break;
+                    case LogType.Error:
+                    case LogType.Exception:
+                        EnqueueLimited(_errorLogs, entry, Config.MaxErrorLogs);
+                        break;
+                }
+            }
+            finally
+            {
+                if (_logLock.IsWriteLockHeld)
+                {
+                    _logLock.ExitWriteLock();
+                }
+            }
+        }
+
+        private static void EnqueueLimited(Queue<LogEntry> queue, LogEntry entry, int maxCount)
+        {
+            while (queue.Count >= maxCount)
+            {
+                queue.Dequeue();
+            }
+            queue.Enqueue(entry);
+        }
+
+        #endregion // Log Management
 
 
         #region Saving and Cleanup
 
-        /// <summary>
-        /// Saves game state and logs, then quits the application.
-        /// Handles both editor and runtime environments appropriately.
-        /// </summary>
-        private void SaveAndQuit()
+        private static void SaveAndQuit()
         {
-            if (isDisposed) return;
+            if (_isDisposed) return;
 
             try
             {
@@ -633,33 +643,29 @@ namespace HammerAndSickle.Services
             }
         }
 
-        /// <summary>
-        /// Synchronously writes all logs to disk.
-        /// Used during shutdown to ensure no logs are lost.
-        /// </summary>
-        private void FlushLogsSync()
+        private static void FlushLogsSync()
         {
-            if (isDisposed) return;
+            if (_isDisposed) return;
 
             try
             {
                 _logLock.EnterReadLock();
 
                 WriteLogsImmediate(
-                    Path.Combine(DebugDataFolderPath, $"{config.LogFilePrefix}_Debug.txt"),
-                    debugLogs);
+                    Path.Combine(DebugDataFolderPath, $"{Config.LogFilePrefix}_Debug.txt"),
+                    _debugLogs);
 
                 WriteLogsImmediate(
-                    Path.Combine(DebugDataFolderPath, $"{config.LogFilePrefix}_Warning.txt"),
-                    warningLogs);
+                    Path.Combine(DebugDataFolderPath, $"{Config.LogFilePrefix}_Warning.txt"),
+                    _warningLogs);
 
                 WriteLogsImmediate(
-                    Path.Combine(DebugDataFolderPath, $"{config.LogFilePrefix}_Error.txt"),
-                    errorLogs);
+                    Path.Combine(DebugDataFolderPath, $"{Config.LogFilePrefix}_Error.txt"),
+                    _errorLogs);
             }
             catch (Exception ex)
             {
-                Debug.LogError($"ErrorService.FlushLogsSync: Failed to save logs: {ex.Message}");
+                Debug.LogError($"{CLASS_NAME}.FlushLogsSync: Failed to save logs: {ex.Message}");
                 FallbackSaveErrorDataToPlayerPrefs();
             }
             finally
@@ -671,13 +677,7 @@ namespace HammerAndSickle.Services
             }
         }
 
-        /// <summary>
-        /// Performs immediate synchronous write of logs to file.
-        /// No async operations to ensure reliability during shutdown.
-        /// </summary>
-        /// <param name="filePath">Target file path for logs</param>
-        /// <param name="logs">Collection of logs to write</param>
-        private void WriteLogsImmediate(string filePath, IEnumerable<LogEntry> logs)
+        private static void WriteLogsImmediate(string filePath, IEnumerable<LogEntry> logs)
         {
             using var writer = new StreamWriter(filePath, false);
             foreach (var entry in logs)
@@ -687,35 +687,14 @@ namespace HammerAndSickle.Services
             }
         }
 
-        /// <summary>
-        /// Saves current game state to persistent storage.
-        /// Implementation depends on game-specific requirements.
-        /// </summary>
-        public void SaveGameState()
+        public static void SaveGameState()
         {
-            // Placeholder for game-specific save logic.
+            // TODO: Placeholder for game-specific save logic
         }
 
-        /// <summary>
-        /// Retrieves formatted system information for logging.
-        /// Helps with debugging by providing context about the runtime environment.
-        /// </summary>
-        /// <returns>Formatted string containing system information</returns>
-        private string GetSystemInfo()
+        private static void FallbackSaveErrorDataToPlayerPrefs()
         {
-            return $"OS: {UnityEngine.SystemInfo.operatingSystem}, " +
-                   $"GPU: {UnityEngine.SystemInfo.graphicsDeviceName}, " +
-                   $"RAM: {UnityEngine.SystemInfo.systemMemorySize}MB, " +
-                   $"Unity Version: {Application.unityVersion}";
-        }
-
-        /// <summary>
-        /// Fallback mechanism to save critical error logs when file I/O fails.
-        /// Uses PlayerPrefs as a last resort storage option.
-        /// </summary>
-        private void FallbackSaveErrorDataToPlayerPrefs()
-        {
-            if (isDisposed) return;
+            if (_isDisposed) return;
 
             const int maxErrorCount = 10;
             const string errorKey = "CriticalLogs";
@@ -724,7 +703,7 @@ namespace HammerAndSickle.Services
             {
                 _logLock.EnterReadLock();
 
-                var recentErrors = errorLogs
+                var recentErrors = _errorLogs
                     .Reverse()
                     .Take(maxErrorCount)
                     .Reverse()
@@ -744,98 +723,107 @@ namespace HammerAndSickle.Services
             }
         }
 
-        #endregion // Saving and Cleanup
-
-
-        #region IDisposable Implementation
-
-        /// <summary>
-        /// Public implementation of Dispose pattern.
-        /// Ensures proper cleanup of managed resources.
-        /// Always use in conjunction with 'using' statements when possible.
-        /// </summary>
-        public void Dispose()
+        private static void ClearAllData()
         {
-            Dispose(true);
-            GC.SuppressFinalize(this);
-        }
-
-        /// <summary>
-        /// Protected implementation of Dispose pattern.
-        /// Handles both explicit disposal and finalization.
-        /// </summary>
-        /// <param name="disposing">True if called from Dispose(), false if called from finalizer</param>
-        protected virtual void Dispose(bool disposing)
-        {
-            if (!isDisposed)
+            try
             {
-                if (disposing)
+                _logLock.EnterWriteLock();
+                _debugLogs.Clear();
+                _warningLogs.Clear();
+                _errorLogs.Clear();
+            }
+            finally
+            {
+                if (_logLock.IsWriteLockHeld)
                 {
-                    // Free managed resources
-                    try
-                    {
-                        // Cancel any pending operations
-                        shutdownToken?.Cancel();
-                        shutdownToken?.Dispose();
-
-                        // Dispose the thread synchronization lock
-                        if (_logLock != null)
-                        {
-                            // Ensure no locks are held before disposing
-                            while (_logLock.IsReadLockHeld || _logLock.IsWriteLockHeld || _logLock.IsUpgradeableReadLockHeld)
-                            {
-                                Thread.Sleep(1);
-                            }
-                            _logLock.Dispose();
-                        }
-
-                        // Clear log queues
-                        debugLogs?.Clear();
-                        warningLogs?.Clear();
-                        errorLogs?.Clear();
-                    }
-                    catch (Exception ex)
-                    {
-                        // Log but don't throw from Dispose
-                        Debug.LogError($"ErrorService.Dispose: Error during cleanup: {ex.Message}");
-                    }
+                    _logLock.ExitWriteLock();
                 }
+            }
 
-                // Set disposed flag
-                isDisposed = true;
+            try
+            {
+                _uiMsgLock.EnterWriteLock();
+                _uiMessages.Clear();
+            }
+            finally
+            {
+                if (_uiMsgLock.IsWriteLockHeld)
+                {
+                    _uiMsgLock.ExitWriteLock();
+                }
             }
         }
 
-        #endregion // IDisposable Implementation
+        #endregion // Saving and Cleanup
 
 
-        #region Event Handling
+        #region Utility Methods
 
-        /// <summary>
-        /// Safely raises the OnErrorOccurred event if the service hasn't been disposed.
-        /// Implements thread-safe event invocation pattern.
-        /// </summary>
-        /// <param name="e">Error event arguments to pass to subscribers</param>
-        private void RaiseErrorEvent(ErrorEventArgs e)
+        private static string GetSystemInfo()
         {
-            if (isDisposed) return;
+            return $"OS: {UnityEngine.SystemInfo.operatingSystem}, " +
+                   $"GPU: {UnityEngine.SystemInfo.graphicsDeviceName}, " +
+                   $"RAM: {UnityEngine.SystemInfo.systemMemorySize}MB, " +
+                   $"Unity Version: {Application.unityVersion}";
+        }
 
-            // Cache event to prevent race conditions
+        private static void RaiseErrorEvent(ErrorEventArgs e)
+        {
+            if (_isDisposed) return;
+
             var handler = OnErrorOccurred;
             if (handler != null)
             {
                 try
                 {
-                    handler(this, e);
+                    handler(null, e);
                 }
                 catch (Exception ex)
                 {
-                    // Log but don't throw - event handler exceptions shouldn't crash the service
-                    Debug.LogError($"ErrorService.RaiseErrorEvent: Event handler threw exception: {ex.Message}");
+                    Debug.LogError($"{CLASS_NAME}.RaiseErrorEvent: Event handler threw exception: {ex.Message}");
                 }
             }
         }
 
-        #endregion // Event Handling
+        #endregion // Utility Methods
+
+
+        #region Test Support
+
+        /// <summary>
+        /// Sets a test handler for unit testing. Set to null to restore default behavior.
+        /// </summary>
+        public static void SetTestHandler(TestHandler testHandler)
+        {
+            _testHandler = testHandler;
+        }
+
+        /// <summary>
+        /// Resets test handler to default behavior.
+        /// </summary>
+        public static void ResetTestHandler()
+        {
+            _testHandler = null;
+        }
+
+        /// <summary>
+        /// Gets the current test handler (for test verification).
+        /// </summary>
+        public static TestHandler GetTestHandler()
+        {
+            return _testHandler;
+        }
+
+        /// <summary>
+        /// Forces reinitialization (useful for testing scenarios).
+        /// </summary>
+        public static void ForceReinitialize(AppServiceConfig config = null, ExceptionSeverityConfig severityConfig = null)
+        {
+            Shutdown();
+            _isDisposed = false;
+            Initialize(config, severityConfig);
+        }
+
+        #endregion // Test Support
     }
 }

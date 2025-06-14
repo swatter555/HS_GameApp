@@ -1,11 +1,9 @@
-﻿using HammerAndSickle.Core;
-using HammerAndSickle.Services;
+﻿using HammerAndSickle.Services;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Runtime.Serialization;
 using UnityEngine;
-using UnityEngine.tvOS;
 
 namespace HammerAndSickle.Models
 {
@@ -368,7 +366,7 @@ namespace HammerAndSickle.Models
             }
             catch (Exception e)
             {
-                AppService.Instance.HandleException(CLASS_NAME, "Constructor", e);
+                AppService.HandleException(CLASS_NAME, "Constructor", e);
                 throw;
             }
         }
@@ -461,7 +459,7 @@ namespace HammerAndSickle.Models
             }
             catch (Exception e)
             {
-                AppService.Instance.HandleException(CLASS_NAME, nameof(CombatUnit), e);
+                AppService.HandleException(CLASS_NAME, nameof(CombatUnit), e);
                 throw;
             }
         }
@@ -687,7 +685,7 @@ namespace HammerAndSickle.Models
             }
             catch (Exception e)
             {
-                AppService.Instance.HandleException(CLASS_NAME, "GetCurrentCombatStrength", e);
+                AppService.HandleException(CLASS_NAME, "GetCurrentCombatStrength", e);
                 return null; // Return null if an error occurs
             }
         }
@@ -720,7 +718,7 @@ namespace HammerAndSickle.Models
             }
             catch (Exception e)
             {
-                AppService.Instance.HandleException(CLASS_NAME, "GetFinalCombatRatingModifier", e);
+                AppService.HandleException(CLASS_NAME, "GetFinalCombatRatingModifier", e);
                 return 1.0f; // Default to neutral modifier on error
             }   
         }
@@ -749,7 +747,7 @@ namespace HammerAndSickle.Models
             }
             catch (Exception e)
             {
-                AppService.Instance.HandleException(CLASS_NAME, "GetStrengthModifier", e);
+                AppService.HandleException(CLASS_NAME, "GetStrengthModifier", e);
                 return CUConstants.STRENGTH_MOD_LOW;
             }
         }
@@ -815,7 +813,7 @@ namespace HammerAndSickle.Models
             catch (Exception e)
             {
                 // Log the query failure but return fallback name
-                AppService.Instance.HandleException(CLASS_NAME, "GetUnitDisplayName", e, ExceptionSeverity.Minor);
+                AppService.HandleException(CLASS_NAME, "GetUnitDisplayName", e, ExceptionSeverity.Minor);
                 return $"Unit {unitId}";
             }
         }
@@ -868,7 +866,7 @@ namespace HammerAndSickle.Models
             }
             catch (Exception e)
             {
-                AppService.Instance.HandleException(CLASS_NAME, "AddExperience", e);
+                AppService.HandleException(CLASS_NAME, "AddExperience", e);
                 return false;
             }
         }
@@ -891,7 +889,7 @@ namespace HammerAndSickle.Models
             }
             catch (Exception e)
             {
-                AppService.Instance.HandleException(CLASS_NAME, "SetExperience", e);
+                AppService.HandleException(CLASS_NAME, "SetExperience", e);
             }
         }
 
@@ -1038,7 +1036,7 @@ namespace HammerAndSickle.Models
         /// <param name="newLevel">The new experience level</param>
         protected virtual void OnExperienceLevelChanged(ExperienceLevel previousLevel, ExperienceLevel newLevel)
         {
-            AppService.Instance.CaptureUiMessage($"{UnitName} has advanced from {previousLevel} to {newLevel}!");
+            AppService.CaptureUiMessage($"{UnitName} has advanced from {previousLevel} to {newLevel}!");
         }
 
         /// <summary>
@@ -1079,14 +1077,14 @@ namespace HammerAndSickle.Models
                 // 1. Parameter validation
                 if (leader == null)
                 {
-                    AppService.Instance.CaptureUiMessage("Cannot assign commander: No leader specified.");
+                    AppService.CaptureUiMessage("Cannot assign commander: No leader specified.");
                     return false;
                 }
 
                 // 2. Prevent redundant assignment - check if same leader already assigned
                 if (CommandingOfficer != null && CommandingOfficer.LeaderID == leader.LeaderID)
                 {
-                    AppService.Instance.CaptureUiMessage($"{leader.FormattedRank} {leader.Name} is already commanding {UnitName}.");
+                    AppService.CaptureUiMessage($"{leader.FormattedRank} {leader.Name} is already commanding {UnitName}.");
                     return false;
                 }
 
@@ -1094,7 +1092,7 @@ namespace HammerAndSickle.Models
                 if (leader.IsAssigned)
                 {
                     string assignedUnitName = GetUnitDisplayName(leader.UnitID);
-                    AppService.Instance.CaptureUiMessage($"Cannot assign {leader.Name}: Already commanding {assignedUnitName}.");
+                    AppService.CaptureUiMessage($"Cannot assign {leader.Name}: Already commanding {assignedUnitName}.");
                     return false;
                 }
 
@@ -1111,7 +1109,7 @@ namespace HammerAndSickle.Models
                         CommandingOfficer.UnassignFromUnit();
 
                         // Enhanced UI message with unit context
-                        AppService.Instance.CaptureUiMessage($"{currentLeaderName} has been relieved of command of {UnitName} and is now available in the leader pool.");
+                        AppService.CaptureUiMessage($"{currentLeaderName} has been relieved of command of {UnitName} and is now available in the leader pool.");
 
                         CommandingOfficer = null;
                     }
@@ -1127,7 +1125,7 @@ namespace HammerAndSickle.Models
                     IsLeaderAssigned = true;
 
                     // 9. Capture UI message about successful assignment
-                    AppService.Instance.CaptureUiMessage($"{leader.FormattedRank} {leader.Name} has been assigned to command {UnitName}.");
+                    AppService.CaptureUiMessage($"{leader.FormattedRank} {leader.Name} has been assigned to command {UnitName}.");
 
                     // 10. Validate consistency
                     if (!ValidateLeaderAssignmentConsistency())
@@ -1149,7 +1147,7 @@ namespace HammerAndSickle.Models
                             CommandingOfficer = previousLeader;
                             IsLeaderAssigned = true;
 
-                            AppService.Instance.CaptureUiMessage($"Assignment failed - {previousLeader.Name} remains in command of {UnitName}.");
+                            AppService.CaptureUiMessage($"Assignment failed - {previousLeader.Name} remains in command of {UnitName}.");
                         }
                         else
                         {
@@ -1167,22 +1165,22 @@ namespace HammerAndSickle.Models
                     catch (Exception rollbackException)
                     {
                         // Log rollback failure but don't throw - we're already in error handling
-                        AppService.Instance.HandleException(CLASS_NAME, "AssignLeader",
+                        AppService.HandleException(CLASS_NAME, "AssignLeader",
                             new InvalidOperationException("Failed to rollback leader assignment", rollbackException),
                             ExceptionSeverity.Critical);
                     }
 
                     // Log the original error and notify user
-                    AppService.Instance.HandleException(CLASS_NAME, "AssignLeader", innerException);
-                    AppService.Instance.CaptureUiMessage($"Failed to assign {leader.Name} to {UnitName}.");
+                    AppService.HandleException(CLASS_NAME, "AssignLeader", innerException);
+                    AppService.CaptureUiMessage($"Failed to assign {leader.Name} to {UnitName}.");
                     return false;
                 }
             }
             catch (Exception e)
             {
                 // Handle any unexpected errors
-                AppService.Instance.HandleException(CLASS_NAME, "AssignLeader", e);
-                AppService.Instance.CaptureUiMessage("Leader assignment failed due to an unexpected error.");
+                AppService.HandleException(CLASS_NAME, "AssignLeader", e);
+                AppService.CaptureUiMessage("Leader assignment failed due to an unexpected error.");
                 return false;
             }
         }
@@ -1199,14 +1197,14 @@ namespace HammerAndSickle.Models
                 // 1. Check if there's actually a leader to remove
                 if (CommandingOfficer == null || !IsLeaderAssigned)
                 {
-                    AppService.Instance.CaptureUiMessage($"{UnitName} does not have a commanding officer to remove.");
+                    AppService.CaptureUiMessage($"{UnitName} does not have a commanding officer to remove.");
                     return false;
                 }
 
                 // 1a. Additional safety check - verify leader thinks it's assigned to this unit
                 if (CommandingOfficer.UnitID != UnitID)
                 {
-                    AppService.Instance.HandleException(CLASS_NAME, "RemoveLeader",
+                    AppService.HandleException(CLASS_NAME, "RemoveLeader",
                         new InvalidOperationException($"{CommandingOfficer.Name} thinks it's assigned to {CommandingOfficer.UnitID} but unit thinks it's {UnitID}"),
                         ExceptionSeverity.Minor);
 
@@ -1216,7 +1214,7 @@ namespace HammerAndSickle.Models
                     // Re-check after consistency fix
                     if (CommandingOfficer == null || !IsLeaderAssigned)
                     {
-                        AppService.Instance.CaptureUiMessage($"{UnitName} does not have a commanding officer to remove after consistency fix.");
+                        AppService.CaptureUiMessage($"{UnitName} does not have a commanding officer to remove after consistency fix.");
                         return false;
                     }
                 }
@@ -1239,7 +1237,7 @@ namespace HammerAndSickle.Models
                     IsLeaderAssigned = false;
 
                     // 6. Capture UI message about successful removal - using captured rank
-                    AppService.Instance.CaptureUiMessage($"{leaderRank} {leaderName} has been relieved of command of {UnitName} and is now available for reassignment.");
+                    AppService.CaptureUiMessage($"{leaderRank} {leaderName} has been relieved of command of {UnitName} and is now available for reassignment.");
 
                     // 7. Validate consistency
                     if (!ValidateLeaderAssignmentConsistency())
@@ -1260,12 +1258,12 @@ namespace HammerAndSickle.Models
                         IsLeaderAssigned = true;
 
                         // Consistent messaging - using captured name and rank
-                        AppService.Instance.CaptureUiMessage($"Removal failed - {leaderRank} {leaderName} remains in command of {UnitName}.");
+                        AppService.CaptureUiMessage($"Removal failed - {leaderRank} {leaderName} remains in command of {UnitName}.");
                     }
                     catch (Exception rollbackException)
                     {
                         // Log rollback failure but don't throw - we're already in error handling
-                        AppService.Instance.HandleException(CLASS_NAME, "RemoveLeader",
+                        AppService.HandleException(CLASS_NAME, "RemoveLeader",
                             new InvalidOperationException("Failed to rollback leader removal", rollbackException),
                             ExceptionSeverity.Critical);
 
@@ -1274,16 +1272,16 @@ namespace HammerAndSickle.Models
                     }
 
                     // Log the original error and notify user - consistent with rollback message
-                    AppService.Instance.HandleException(CLASS_NAME, "RemoveLeader", innerException);
-                    AppService.Instance.CaptureUiMessage($"Failed to remove {leaderRank} {leaderName} from command of {UnitName}.");
+                    AppService.HandleException(CLASS_NAME, "RemoveLeader", innerException);
+                    AppService.CaptureUiMessage($"Failed to remove {leaderRank} {leaderName} from command of {UnitName}.");
                     return false;
                 }
             }
             catch (Exception e)
             {
                 // Handle any unexpected errors
-                AppService.Instance.HandleException(CLASS_NAME, "RemoveLeader", e);
-                AppService.Instance.CaptureUiMessage("Leader removal failed due to an unexpected error.");
+                AppService.HandleException(CLASS_NAME, "RemoveLeader", e);
+                AppService.CaptureUiMessage("Leader removal failed due to an unexpected error.");
 
                 // Attempt to fix any consistency issues that might have occurred
                 try
@@ -1292,7 +1290,7 @@ namespace HammerAndSickle.Models
                 }
                 catch (Exception consistencyException)
                 {
-                    AppService.Instance.HandleException(CLASS_NAME, "RemoveLeader", consistencyException, ExceptionSeverity.Minor);
+                    AppService.HandleException(CLASS_NAME, "RemoveLeader", consistencyException, ExceptionSeverity.Minor);
                 }
 
                 return false;
@@ -1332,7 +1330,7 @@ namespace HammerAndSickle.Models
             }
             catch (Exception e)
             {
-                AppService.Instance.HandleException(CLASS_NAME, "GetLeaderBonuses", e);
+                AppService.HandleException(CLASS_NAME, "GetLeaderBonuses", e);
                 return bonuses; // Return empty dictionary on error
             }
         }
@@ -1429,7 +1427,7 @@ namespace HammerAndSickle.Models
             }
             catch (Exception e)
             {
-                AppService.Instance.HandleException(CLASS_NAME, "AwardLeaderReputation", e);
+                AppService.HandleException(CLASS_NAME, "AwardLeaderReputation", e);
             }
         }
 
@@ -1451,7 +1449,7 @@ namespace HammerAndSickle.Models
             }
             catch (Exception e)
             {
-                AppService.Instance.HandleException(CLASS_NAME, "AwardLeaderReputation", e);
+                AppService.HandleException(CLASS_NAME, "AwardLeaderReputation", e);
             }
         }
 
@@ -1474,7 +1472,7 @@ namespace HammerAndSickle.Models
             bool hasLeader = CommandingOfficer != null;
             if (IsLeaderAssigned != hasLeader)
             {
-                AppService.Instance.HandleException(CLASS_NAME, "FixLeaderAssignmentConsistency",
+                AppService.HandleException(CLASS_NAME, "FixLeaderAssignmentConsistency",
                     new InvalidOperationException($"Leader assignment inconsistency fixed for unit {UnitID}"),
                     ExceptionSeverity.Minor);
                 IsLeaderAssigned = hasLeader;
@@ -1503,7 +1501,7 @@ namespace HammerAndSickle.Models
             }
             catch (Exception e)
             {
-                AppService.Instance.HandleException(CLASS_NAME, "ConsumeMoveAction", e);
+                AppService.HandleException(CLASS_NAME, "ConsumeMoveAction", e);
                 return false;
             }
         }
@@ -1531,7 +1529,7 @@ namespace HammerAndSickle.Models
             }
             catch (Exception e)
             {
-                AppService.Instance.HandleException(CLASS_NAME, "ConsumeCombatAction", e);
+                AppService.HandleException(CLASS_NAME, "ConsumeCombatAction", e);
                 return false;
             }
         }
@@ -1559,7 +1557,7 @@ namespace HammerAndSickle.Models
             }
             catch (Exception e)
             {
-                AppService.Instance.HandleException(CLASS_NAME, "ConsumeMovementPoints", e);
+                AppService.HandleException(CLASS_NAME, "ConsumeMovementPoints", e);
                 return false;
             }
         }
@@ -1581,7 +1579,7 @@ namespace HammerAndSickle.Models
             }
             catch (Exception e)
             {
-                AppService.Instance.HandleException(CLASS_NAME, "ConsumeDeploymentAction", e);
+                AppService.HandleException(CLASS_NAME, "ConsumeDeploymentAction", e);
                 return false;
             }
         }
@@ -1603,7 +1601,7 @@ namespace HammerAndSickle.Models
             }
             catch (Exception e)
             {
-                AppService.Instance.HandleException(CLASS_NAME, "ConsumeOpportunityAction", e);
+                AppService.HandleException(CLASS_NAME, "ConsumeOpportunityAction", e);
                 return false;
             }
         }
@@ -1636,7 +1634,7 @@ namespace HammerAndSickle.Models
             }
             catch (Exception e)
             {
-                AppService.Instance.HandleException(CLASS_NAME, "ConsumeIntelAction", e);
+                AppService.HandleException(CLASS_NAME, "ConsumeIntelAction", e);
                 return false;
             }
         }
@@ -1783,7 +1781,7 @@ namespace HammerAndSickle.Models
             }
             catch (Exception e)
             {
-                AppService.Instance.HandleException(CLASS_NAME, "SetPosition", e);
+                AppService.HandleException(CLASS_NAME, "SetPosition", e);
                 throw;
             }
         }
@@ -1874,7 +1872,7 @@ namespace HammerAndSickle.Models
             }
             catch (Exception e)
             {
-                AppService.Instance.HandleException(CLASS_NAME, "TakeDamage", e);
+                AppService.HandleException(CLASS_NAME, "TakeDamage", e);
                 throw;
             }
         }
@@ -1909,7 +1907,7 @@ namespace HammerAndSickle.Models
             }
             catch (Exception e)
             {
-                AppService.Instance.HandleException(CLASS_NAME, "Repair", e);
+                AppService.HandleException(CLASS_NAME, "Repair", e);
                 throw;
             }
         }
@@ -1943,7 +1941,7 @@ namespace HammerAndSickle.Models
             }
             catch (Exception e)
             {
-                AppService.Instance.HandleException(CLASS_NAME, "ConsumeSupplies", e);
+                AppService.HandleException(CLASS_NAME, "ConsumeSupplies", e);
                 return false;
             }
         }
@@ -1978,7 +1976,7 @@ namespace HammerAndSickle.Models
             }
             catch (Exception e)
             {
-                AppService.Instance.HandleException(CLASS_NAME, "ReceiveSupplies", e);
+                AppService.HandleException(CLASS_NAME, "ReceiveSupplies", e);
                 return 0f;
             }
         }
@@ -2022,7 +2020,7 @@ namespace HammerAndSickle.Models
             }
             catch (Exception e)
             {
-                AppService.Instance.HandleException(CLASS_NAME, "CanOperate", e);
+                AppService.HandleException(CLASS_NAME, "CanOperate", e);
                 return false;
             }
         }
@@ -2044,7 +2042,7 @@ namespace HammerAndSickle.Models
             }
             catch (Exception e)
             {
-                AppService.Instance.HandleException(CLASS_NAME, "GetSupplyStatus", e);
+                AppService.HandleException(CLASS_NAME, "GetSupplyStatus", e);
                 return 0f;
             }
         }
@@ -2053,6 +2051,15 @@ namespace HammerAndSickle.Models
 
 
         #region Combat State Management
+
+        /// <summary>
+        /// Direct change of combat state for debugging purposes.
+        /// </summary>
+        /// <param name="newState"></param>
+        public void DebugSetCombatState(CombatState newState)
+        {
+            CombatState = newState;
+        }
 
         /// <summary>
         /// Changes the unit's combat state if transition is valid and resources are available.
@@ -2087,13 +2094,13 @@ namespace HammerAndSickle.Models
                 }
                 else
                 {
-                    AppService.Instance.CaptureUiMessage($"Insufficient movement points to change to {newState} state.");
+                    AppService.CaptureUiMessage($"Insufficient movement points to change to {newState} state.");
                     return false;
                 }
             }
             catch (Exception e)
             {
-                AppService.Instance.HandleException(CLASS_NAME, "SetCombatState", e);
+                AppService.HandleException(CLASS_NAME, "SetCombatState", e);
                 return false;
             }
         }
@@ -2115,7 +2122,7 @@ namespace HammerAndSickle.Models
                 if (CombatState == targetState)
                 {
                     errorMessage += "Already in target state.";
-                    AppService.Instance.CaptureUiMessage(errorMessage);
+                    AppService.CaptureUiMessage(errorMessage);
                     return false;
                 }
                     
@@ -2123,7 +2130,7 @@ namespace HammerAndSickle.Models
                 if (!CanUnitTypeChangeStates())
                 {
                     errorMessage += "Unit type cannot change combat states.";
-                    AppService.Instance.CaptureUiMessage(errorMessage);
+                    AppService.CaptureUiMessage(errorMessage);
                     return false;
                 }
 
@@ -2131,7 +2138,7 @@ namespace HammerAndSickle.Models
                 if (!IsAdjacentStateTransition(CombatState, targetState))
                 {
                     errorMessage += $"Transition from {CombatState} to {targetState} is not adjacent.";
-                    AppService.Instance.CaptureUiMessage(errorMessage);
+                    AppService.CaptureUiMessage(errorMessage);
                     return false;
                 }
 
@@ -2139,7 +2146,7 @@ namespace HammerAndSickle.Models
                 if (!CanConsumeDeploymentAction())
                 {
                     errorMessage += "No deployment actions available for state change.";
-                    AppService.Instance.CaptureUiMessage(errorMessage);
+                    AppService.CaptureUiMessage(errorMessage);
                     return false;
                 }
 
@@ -2147,7 +2154,7 @@ namespace HammerAndSickle.Models
                 if (!HasSufficientMovementForDeployment())
                 {
                     errorMessage += "Insufficient movement points for deployment action.";
-                    AppService.Instance.CaptureUiMessage(errorMessage);
+                    AppService.CaptureUiMessage(errorMessage);
                     return false;
                 }
 
@@ -2155,7 +2162,7 @@ namespace HammerAndSickle.Models
             }
             catch (Exception e)
             {
-                AppService.Instance.HandleException(CLASS_NAME, "CanChangeToState", e);
+                AppService.HandleException(CLASS_NAME, "CanChangeToState", e);
                 return false;
             }
         }
@@ -2178,7 +2185,7 @@ namespace HammerAndSickle.Models
             }
             catch (Exception e)
             {
-                AppService.Instance.HandleException(CLASS_NAME, "BeginEntrenchment", e);
+                AppService.HandleException(CLASS_NAME, "BeginEntrenchment", e);
                 return false;
             }
         }
@@ -2195,7 +2202,7 @@ namespace HammerAndSickle.Models
             }
             catch (Exception e)
             {
-                AppService.Instance.HandleException(CLASS_NAME, "CanEntrench", e);
+                AppService.HandleException(CLASS_NAME, "CanEntrench", e);
                 return false;
             }
         }
@@ -2228,7 +2235,7 @@ namespace HammerAndSickle.Models
             }
             catch (Exception e)
             {
-                AppService.Instance.HandleException(CLASS_NAME, "GetValidStateTransitions", e);
+                AppService.HandleException(CLASS_NAME, "GetValidStateTransitions", e);
                 return validStates;
             }
         }
@@ -2382,7 +2389,7 @@ namespace HammerAndSickle.Models
             }
             catch (Exception e)
             {
-                AppService.Instance.HandleException(CLASS_NAME, "UpdateStateAndProfiles", e);
+                AppService.HandleException(CLASS_NAME, "UpdateStateAndProfiles", e);
             }
         }
 
@@ -2496,7 +2503,7 @@ namespace HammerAndSickle.Models
             }
             catch (Exception e)
             {
-                AppService.Instance.HandleException(CLASS_NAME, "Clone", e);
+                AppService.HandleException(CLASS_NAME, "Clone", e);
                 throw;
             }
         }
@@ -2564,7 +2571,7 @@ namespace HammerAndSickle.Models
             }
             catch (Exception e)
             {
-                AppService.Instance.HandleException(CLASS_NAME, nameof(GetObjectData), e);
+                AppService.HandleException(CLASS_NAME, nameof(GetObjectData), e);
                 throw;
             }
         }
@@ -2641,13 +2648,13 @@ namespace HammerAndSickle.Models
                         }
                         else
                         {
-                            AppService.Instance.HandleException(CLASS_NAME, "ResolveReferences",
+                            AppService.HandleException(CLASS_NAME, "ResolveReferences",
                                 new KeyNotFoundException($"Deployed profile {deployedWeapon}_{Nationality} not found"));
                         }
                     }
                     else
                     {
-                        AppService.Instance.HandleException(CLASS_NAME, "ResolveReferences",
+                        AppService.HandleException(CLASS_NAME, "ResolveReferences",
                             new ArgumentException($"Invalid weapon system ID: {unresolvedDeployedProfileID}"));
                     }
                 }
@@ -2664,13 +2671,13 @@ namespace HammerAndSickle.Models
                         }
                         else
                         {
-                            AppService.Instance.HandleException(CLASS_NAME, "ResolveReferences",
+                            AppService.HandleException(CLASS_NAME, "ResolveReferences",
                                 new KeyNotFoundException($"Mounted profile {mountedWeapon}_{Nationality} not found"));
                         }
                     }
                     else
                     {
-                        AppService.Instance.HandleException(CLASS_NAME, "ResolveReferences",
+                        AppService.HandleException(CLASS_NAME, "ResolveReferences",
                             new ArgumentException($"Invalid weapon system ID: {unresolvedMountedProfileID}"));
                     }
                 }
@@ -2686,7 +2693,7 @@ namespace HammerAndSickle.Models
                     }
                     else
                     {
-                        AppService.Instance.HandleException(CLASS_NAME, "ResolveReferences",
+                        AppService.HandleException(CLASS_NAME, "ResolveReferences",
                             new KeyNotFoundException($"Unit profile {unresolvedUnitProfileID}_{Nationality} not found"));
                     }
                 }
@@ -2702,7 +2709,7 @@ namespace HammerAndSickle.Models
                     }
                     else
                     {
-                        AppService.Instance.HandleException(CLASS_NAME, "ResolveReferences",
+                        AppService.HandleException(CLASS_NAME, "ResolveReferences",
                             new KeyNotFoundException($"Land base {unresolvedLandBaseProfileID} not found"));
                     }
                 }
@@ -2720,7 +2727,7 @@ namespace HammerAndSickle.Models
                         // Ensure IsLeaderAssigned is consistent with resolved leader
                         if (!IsLeaderAssigned)
                         {
-                            AppService.Instance.HandleException(CLASS_NAME, "ResolveReferences",
+                            AppService.HandleException(CLASS_NAME, "ResolveReferences",
                                 new InvalidDataException($"Unit {UnitID} has leader but IsLeaderAssigned is false"),
                                 ExceptionSeverity.Minor);
                             IsLeaderAssigned = true; // Fix the inconsistency
@@ -2728,7 +2735,7 @@ namespace HammerAndSickle.Models
                     }
                     else
                     {
-                        AppService.Instance.HandleException(CLASS_NAME, "ResolveReferences",
+                        AppService.HandleException(CLASS_NAME, "ResolveReferences",
                             new KeyNotFoundException($"Leader {unresolvedLeaderID} not found"));
 
                         // ADD THIS CLEANUP:
@@ -2740,7 +2747,7 @@ namespace HammerAndSickle.Models
                 {
                     // ADD THIS CONSISTENCY CHECK:
                     // Flag says we have a leader but no leader ID was saved
-                    AppService.Instance.HandleException(CLASS_NAME, "ResolveReferences",
+                    AppService.HandleException(CLASS_NAME, "ResolveReferences",
                         new InvalidDataException($"Unit {UnitID} has IsLeaderAssigned=true but no leader ID"),
                         ExceptionSeverity.Minor);
                     IsLeaderAssigned = false; // Fix the inconsistency
@@ -2760,13 +2767,13 @@ namespace HammerAndSickle.Models
                         }
                         else
                         {
-                            AppService.Instance.HandleException(CLASS_NAME, "ResolveReferences",
+                            AppService.HandleException(CLASS_NAME, "ResolveReferences",
                                 new KeyNotFoundException($"Active profile {activeWeapon}_{Nationality} not found"));
                         }
                     }
                     else
                     {
-                        AppService.Instance.HandleException(CLASS_NAME, "ResolveReferences",
+                        AppService.HandleException(CLASS_NAME, "ResolveReferences",
                             new ArgumentException($"Invalid weapon system ID: {unresolvedActiveProfileID}"));
                     }
                 }
@@ -2783,7 +2790,7 @@ namespace HammerAndSickle.Models
             }
             catch (Exception e)
             {
-                AppService.Instance.HandleException(CLASS_NAME, "ResolveReferences", e);
+                AppService.HandleException(CLASS_NAME, "ResolveReferences", e);
                 throw;
             }
         }

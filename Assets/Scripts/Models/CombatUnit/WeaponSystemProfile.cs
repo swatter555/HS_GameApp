@@ -163,7 +163,7 @@ namespace HammerAndSickle.Models
             }
             catch (Exception e)
             {
-                AppService.Instance.HandleException(CLASS_NAME, "Constructor", e);
+                AppService.HandleException(CLASS_NAME, "Constructor", e);
                 throw;
             }
         }
@@ -239,7 +239,7 @@ namespace HammerAndSickle.Models
             }
             catch (Exception e)
             {
-                AppService.Instance.HandleException(CLASS_NAME, "DeserializationConstructor", e);
+                AppService.HandleException(CLASS_NAME, "DeserializationConstructor", e);
                 throw;
             }
         }
@@ -270,7 +270,7 @@ namespace HammerAndSickle.Models
             }
             catch (Exception e)
             {
-                AppService.Instance.HandleException(CLASS_NAME, "SetLandHardAttack", e);
+                AppService.HandleException(CLASS_NAME, "SetLandHardAttack", e);
                 throw;
             }
         }
@@ -286,7 +286,7 @@ namespace HammerAndSickle.Models
             }
             catch (Exception e)
             {
-                AppService.Instance.HandleException(CLASS_NAME, "SetLandHardDefense", e);
+                AppService.HandleException(CLASS_NAME, "SetLandHardDefense", e);
                 throw;
             }
         }
@@ -312,7 +312,7 @@ namespace HammerAndSickle.Models
             }
             catch (Exception e)
             {
-                AppService.Instance.HandleException(CLASS_NAME, "SetLandSoftAttack", e);
+                AppService.HandleException(CLASS_NAME, "SetLandSoftAttack", e);
                 throw;
             }
         }
@@ -328,7 +328,7 @@ namespace HammerAndSickle.Models
             }
             catch (Exception e)
             {
-                AppService.Instance.HandleException(CLASS_NAME, "SetLandSoftDefense", e);
+                AppService.HandleException(CLASS_NAME, "SetLandSoftDefense", e);
                 throw;
             }
         }
@@ -354,7 +354,7 @@ namespace HammerAndSickle.Models
             }
             catch (Exception e)
             {
-                AppService.Instance.HandleException(CLASS_NAME, "SetAirAttack", e);
+                AppService.HandleException(CLASS_NAME, "SetAirAttack", e);
                 throw;
             }
         }
@@ -370,7 +370,7 @@ namespace HammerAndSickle.Models
             }
             catch (Exception e)
             {
-                AppService.Instance.HandleException(CLASS_NAME, "SetAirDefense", e);
+                AppService.HandleException(CLASS_NAME, "SetAirDefense", e);
                 throw;
             }
         }
@@ -404,7 +404,7 @@ namespace HammerAndSickle.Models
             }
             catch (Exception e)
             {
-                AppService.Instance.HandleException(CLASS_NAME, "AddUpgradeType", e);
+                AppService.HandleException(CLASS_NAME, "AddUpgradeType", e);
                 return false;
             }
         }
@@ -422,7 +422,7 @@ namespace HammerAndSickle.Models
             }
             catch (Exception e)
             {
-                AppService.Instance.HandleException(CLASS_NAME, "RemoveUpgradeType", e);
+                AppService.HandleException(CLASS_NAME, "RemoveUpgradeType", e);
                 return false;
             }
         }
@@ -440,7 +440,7 @@ namespace HammerAndSickle.Models
             }
             catch (Exception e)
             {
-                AppService.Instance.HandleException(CLASS_NAME, "HasUpgradeType", e);
+                AppService.HandleException(CLASS_NAME, "HasUpgradeType", e);
                 return false;
             }
         }
@@ -465,7 +465,7 @@ namespace HammerAndSickle.Models
             }
             catch (Exception e)
             {
-                AppService.Instance.HandleException(CLASS_NAME, "ClearUpgradeTypes", e);
+                AppService.HandleException(CLASS_NAME, "ClearUpgradeTypes", e);
             }
         }
 
@@ -486,7 +486,7 @@ namespace HammerAndSickle.Models
             }
             catch (Exception e)
             {
-                AppService.Instance.HandleException(CLASS_NAME, "SetPrimaryRange", e);
+                AppService.HandleException(CLASS_NAME, "SetPrimaryRange", e);
                 throw;
             }
         }
@@ -503,7 +503,7 @@ namespace HammerAndSickle.Models
             }
             catch (Exception e)
             {
-                AppService.Instance.HandleException(CLASS_NAME, "SetIndirectRange", e);
+                AppService.HandleException(CLASS_NAME, "SetIndirectRange", e);
                 throw;
             }
         }
@@ -520,7 +520,7 @@ namespace HammerAndSickle.Models
             }
             catch (Exception e)
             {
-                AppService.Instance.HandleException(CLASS_NAME, "SetSpottingRange", e);
+                AppService.HandleException(CLASS_NAME, "SetSpottingRange", e);
                 throw;
             }
         }
@@ -537,7 +537,7 @@ namespace HammerAndSickle.Models
             }
             catch (Exception e)
             {
-                AppService.Instance.HandleException(CLASS_NAME, "SetMovementModifier", e);
+                AppService.HandleException(CLASS_NAME, "SetMovementModifier", e);
                 throw;
             }
         }
@@ -581,7 +581,7 @@ namespace HammerAndSickle.Models
             }
             catch (Exception e)
             {
-                AppService.Instance.HandleException(CLASS_NAME, "Clone", e);
+                AppService.HandleException(CLASS_NAME, "Clone", e);
                 throw;
             }
         }
@@ -613,7 +613,7 @@ namespace HammerAndSickle.Models
             }
             catch (Exception e)
             {
-                AppService.Instance.HandleException(CLASS_NAME, "Clone", e);
+                AppService.HandleException(CLASS_NAME, "Clone", e);
                 throw;
             }
         }
@@ -722,7 +722,7 @@ namespace HammerAndSickle.Models
             }
             catch (Exception e)
             {
-                AppService.Instance.HandleException(CLASS_NAME, "GetObjectData", e);
+                AppService.HandleException(CLASS_NAME, "GetObjectData", e);
                 throw;
             }
         }

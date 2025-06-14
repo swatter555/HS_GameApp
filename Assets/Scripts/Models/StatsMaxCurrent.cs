@@ -48,7 +48,7 @@ namespace HammerAndSickle.Models
             }
             catch (Exception e)
             {
-                AppService.Instance?.HandleException(CLASS_NAME, "Constructor", e);
+                AppService.HandleException(CLASS_NAME, "Constructor", e);
                 throw;
             }
         }
@@ -80,7 +80,7 @@ namespace HammerAndSickle.Models
             }
             catch (Exception e)
             {
-                AppService.Instance?.HandleException(CLASS_NAME, "Constructor", e);
+                AppService.HandleException(CLASS_NAME, "Constructor", e);
                 throw;
             }
         }
@@ -107,7 +107,7 @@ namespace HammerAndSickle.Models
             }
             catch (Exception e)
             {
-                AppService.Instance?.HandleException(CLASS_NAME, "SetCurrent", e);
+                AppService.HandleException(CLASS_NAME, "SetCurrent", e);
                 throw;
             }
         }
@@ -172,7 +172,7 @@ namespace HammerAndSickle.Models
             }
             catch (Exception e)
             {
-                AppService.Instance?.HandleException(CLASS_NAME, "SetMax", e);
+                AppService.HandleException(CLASS_NAME, "SetMax", e);
                 throw;
             }
         }
