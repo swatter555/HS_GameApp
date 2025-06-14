@@ -9,9 +9,9 @@ using UnityEngine.tvOS;
 
 namespace HammerAndSickle.Models
 {
-    /*─────────────────────────────────────────────────────────────────────────────
+  /*─────────────────────────────────────────────────────────────────────────────
   CombatUnit  —  universal runtime model for every maneuver element
-───────────────────────────────────────────────────────────────────────────────
+  ───────────────────────────────────────────────────────────────────────────────
   Scope & Role
   ────────────
     • Represents tanks, infantry, aircraft, depots, bases, etc.
@@ -569,12 +569,44 @@ namespace HammerAndSickle.Models
         {
             var maxMovement = Classification switch
             {
-                UnitClassification.TANK or UnitClassification.MECH or UnitClassification.RECON or UnitClassification.SPA or UnitClassification.SPAAA or UnitClassification.SPSAM => CUConstants.MECH_MOV,
-                UnitClassification.MOT or UnitClassification.MAB or UnitClassification.MMAR or UnitClassification.AM or UnitClassification.MAM or UnitClassification.SPECM or UnitClassification.ROC => CUConstants.MOT_MOV,
-                UnitClassification.INF or UnitClassification.AB or UnitClassification.MAR or UnitClassification.AT or UnitClassification.SPECF or UnitClassification.ART or UnitClassification.SAM or UnitClassification.AAA or UnitClassification.ENG => CUConstants.FOOT_MOV,
-                UnitClassification.ASF or UnitClassification.MRF or UnitClassification.ATT or UnitClassification.BMB or UnitClassification.RECONA => CUConstants.FIXEDWING_MOV,
-                UnitClassification.HELO or UnitClassification.HELO or UnitClassification.SPECH => CUConstants.HELO_MOV,
-                UnitClassification.BASE or UnitClassification.DEPOT or UnitClassification.AIRB => 0,// Bases don't move
+                UnitClassification.TANK or 
+                UnitClassification.MECH or 
+                UnitClassification.RECON or
+                UnitClassification.MAB or
+                UnitClassification.MAM or
+                UnitClassification.MMAR or
+                UnitClassification.SPECM or
+                UnitClassification.SPA or 
+                UnitClassification.SPAAA or 
+                UnitClassification.SPSAM => CUConstants.MECH_MOV,
+
+                UnitClassification.AT or
+                UnitClassification.MOT or
+                UnitClassification.ROC => CUConstants.MOT_MOV,
+
+                UnitClassification.INF or 
+                UnitClassification.AB or
+                UnitClassification.AM or
+                UnitClassification.MAR or
+                UnitClassification.ART or
+                UnitClassification.SAM or
+                UnitClassification.AAA or
+                UnitClassification.SPECF or 
+                UnitClassification.ENG => CUConstants.FOOT_MOV,
+
+                UnitClassification.ASF or 
+                UnitClassification.MRF or 
+                UnitClassification.ATT or 
+                UnitClassification.BMB or 
+                UnitClassification.RECONA => CUConstants.FIXEDWING_MOV,
+
+                UnitClassification.HELO or 
+                UnitClassification.SPECH => CUConstants.HELO_MOV,
+
+                UnitClassification.BASE or 
+                UnitClassification.DEPOT or 
+                UnitClassification.AIRB => 0,// Bases don't move
+
                 _ => CUConstants.FOOT_MOV,// Default to foot movement
             };
             MovementPoints = new StatsMaxCurrent(maxMovement);
@@ -794,8 +826,7 @@ namespace HammerAndSickle.Models
         #region Experience System Methods
 
         /// <summary>
-        /// Adds experience points to the unit and checks for level advancement.
-        /// Returns true if the unit leveled up.
+        /// Adds experience points to the unit and returns true if successful.
         /// </summary>
         /// <param name="points">Experience points to add</param>
         /// <returns>Returns true if successful</returns>
@@ -854,8 +885,9 @@ namespace HammerAndSickle.Models
                 if (points < 0)
                     points = 0;
 
-                ExperiencePoints = points;
+                ExperiencePoints = Math.Min(points, (int)ExperiencePointLevels.Elite);
                 ExperienceLevel = CalculateExperienceLevel(points);
+                
             }
             catch (Exception e)
             {
@@ -1310,23 +1342,8 @@ namespace HammerAndSickle.Models
         /// </summary>
         /// <param name="bonusType">The bonus type to check for</param>
         /// <returns>True if the leader provides this capability</returns>
-        public bool HasLeaderCapability(SkillBonusType bonusType)
-        {
-            try
-            {
-                if (CommandingOfficer == null)
-                {
-                    return false;
-                }
-
-                return CommandingOfficer.HasCapability(bonusType);
-            }
-            catch (Exception e)
-            {
-                AppService.Instance.HandleException(CLASS_NAME, "HasLeaderCapability", e);
-                return false;
-            }
-        }
+        public bool HasLeaderCapability(SkillBonusType bonusType) =>
+            CommandingOfficer != null && CommandingOfficer.HasCapability(bonusType);
 
         /// <summary>
         /// Gets a specific leader bonus value.
@@ -1334,23 +1351,10 @@ namespace HammerAndSickle.Models
         /// </summary>
         /// <param name="bonusType">The type of bonus to retrieve</param>
         /// <returns>The bonus value, or 0 if not present</returns>
-        public float GetLeaderBonus(SkillBonusType bonusType)
-        {
-            try
-            {
-                if (CommandingOfficer == null || bonusType == SkillBonusType.None)
-                {
-                    return 0f;
-                }
-
-                return CommandingOfficer.GetBonusValue(bonusType);
-            }
-            catch (Exception e)
-            {
-                AppService.Instance.HandleException(CLASS_NAME, "GetLeaderBonus", e);
-                return 0f;
-            }
-        }
+        public float GetLeaderBonus(SkillBonusType bonusType) =>
+            CommandingOfficer != null && bonusType != SkillBonusType.None
+            ? CommandingOfficer.GetBonusValue(bonusType)
+            : 0f;
 
         /// <summary>
         /// Checks if a leader is currently assigned to this unit.
@@ -1366,90 +1370,36 @@ namespace HammerAndSickle.Models
         /// Returns empty string if no leader assigned.
         /// </summary>
         /// <returns>Leader name or empty string</returns>
-        public string GetLeaderName()
-        {
-            try
-            {
-                return CommandingOfficer?.Name ?? "";
-            }
-            catch (Exception e)
-            {
-                AppService.Instance.HandleException(CLASS_NAME, "GetLeaderName", e);
-                return "";
-            }
-        }
+        public string GetLeaderName() => CommandingOfficer?.Name ?? string.Empty;
 
         /// <summary>
         /// Gets the leader's command grade for display and bonus calculations.
         /// Returns JuniorGrade if no leader assigned.
         /// </summary>
         /// <returns>Leader's command grade</returns>
-        public CommandGrade GetLeaderGrade()
-        {
-            try
-            {
-                return CommandingOfficer?.CommandGrade ?? CommandGrade.JuniorGrade;
-            }
-            catch (Exception e)
-            {
-                AppService.Instance.HandleException(CLASS_NAME, "GetLeaderGrade", e);
-                return CommandGrade.JuniorGrade;
-            }
-        }
+        public CommandGrade GetLeaderGrade() => CommandingOfficer?.CommandGrade ?? CommandGrade.JuniorGrade;
 
         /// <summary>
         /// Gets the leader's reputation points for display purposes.
         /// Returns 0 if no leader assigned.
         /// </summary>
         /// <returns>Leader's reputation points</returns>
-        public int GetLeaderReputation()
-        {
-            try
-            {
-                return CommandingOfficer?.ReputationPoints ?? 0;
-            }
-            catch (Exception e)
-            {
-                AppService.Instance.HandleException(CLASS_NAME, "GetLeaderReputation", e);
-                return 0;
-            }
-        }
+        public int GetLeaderReputation() => CommandingOfficer?.ReputationPoints ?? 0;
 
         /// <summary>
         /// Gets the leader's formatted rank based on nationality.
         /// Returns empty string if no leader assigned.
         /// </summary>
         /// <returns>Formatted rank string</returns>
-        public string GetLeaderRank()
-        {
-            try
-            {
-                return CommandingOfficer?.FormattedRank ?? "";
-            }
-            catch (Exception e)
-            {
-                AppService.Instance.HandleException(CLASS_NAME, "GetLeaderRank", e);
-                return "";
-            }
-        }
+        public string GetLeaderRank() => CommandingOfficer?.FormattedRank ?? "";
 
         /// <summary>
         /// Gets the leader's combat command ability modifier.
         /// Returns Average if no leader assigned.
         /// </summary>
         /// <returns>Leader's combat command ability</returns>
-        public CommandAbility GetLeaderCommandAbility()
-        {
-            try
-            {
-                return CommandingOfficer?.CombatCommand ?? CommandAbility.Average;
-            }
-            catch (Exception e)
-            {
-                AppService.Instance.HandleException(CLASS_NAME, "GetLeaderCommandAbility", e);
-                return CommandAbility.Average;
-            }
-        }
+        public CommandAbility GetLeaderCommandAbility() =>
+            CommandingOfficer?.CombatCommand ?? CommandAbility.Average;
 
         /// <summary>
         /// Checks if the leader has unlocked a specific skill.
@@ -1457,23 +1407,8 @@ namespace HammerAndSickle.Models
         /// </summary>
         /// <param name="skillEnum">The skill to check</param>
         /// <returns>True if the skill is unlocked</returns>
-        public bool HasLeaderSkill(Enum skillEnum)
-        {
-            try
-            {
-                if (CommandingOfficer == null)
-                {
-                    return false;
-                }
-
-                return CommandingOfficer.IsSkillUnlocked(skillEnum);
-            }
-            catch (Exception e)
-            {
-                AppService.Instance.HandleException(CLASS_NAME, "HasLeaderSkill", e);
-                return false;
-            }
-        }
+        public bool HasLeaderSkill(Enum skill) =>
+            CommandingOfficer != null && CommandingOfficer.IsSkillUnlocked(skill);
 
         /// <summary>
         /// Awards reputation to the leader for unit actions.
@@ -1526,8 +1461,9 @@ namespace HammerAndSickle.Models
         /// <returns>True if consistent, false if there's a mismatch</returns>
         private bool ValidateLeaderAssignmentConsistency()
         {
-            bool hasLeader = CommandingOfficer != null;
-            return IsLeaderAssigned == hasLeader;
+            return (CommandingOfficer == null && !IsLeaderAssigned) ||
+                   (CommandingOfficer != null && IsLeaderAssigned &&
+                    CommandingOfficer.IsAssigned && CommandingOfficer.UnitID == UnitID);
         }
 
         /// <summary>
@@ -1795,18 +1731,37 @@ namespace HammerAndSickle.Models
         }
 
         /// <summary>
-        /// Gets the number of available actions of each type with movement point validation.
+        /// Returns a dictionary mapping each action type to the number of **truly** available tokens
+        /// after validating both action counters and movement‑point prerequisites.
         /// </summary>
-        /// <returns>Dictionary mapping action types to available counts</returns>
         public Dictionary<string, float> GetAvailableActions()
         {
+            // Move – must have a token and at least 1 movement point remaining.
+            float moveAvailable = (CanConsumeMoveAction() && MovementPoints.Current > 0f)
+                ? MoveActions.Current : 0f;
+
+            // Combat – existing validation already checks movement cost.
+            float combatAvailable = CanConsumeCombatAction() ? CombatActions.Current : 0f;
+
+            // Deployment – needs token **and** 50 % of max movement (unless immobile base).
+            float deployMpCost = MovementPoints.Max * CUConstants.DEPLOYMENT_ACTION_MOVEMENT_COST;
+            bool canDeploy = MovementPoints.Max == 0f || MovementPoints.Current >= deployMpCost;
+            float deploymentAvailable = (CanConsumeDeploymentAction() && canDeploy)
+                ? DeploymentActions.Current : 0f;
+
+            // Opportunity – purely reactive, no validation.
+            float opportunityAvailable = OpportunityActions.Current;
+
+            // Intel – existing validation already handles base / movement logic.
+            float intelAvailable = CanConsumeIntelAction() ? IntelActions.Current : 0f;
+
             return new Dictionary<string, float>
             {
-                ["Move"] = MoveActions.Current,
-                ["Combat"] = CanConsumeCombatAction() ? CombatActions.Current : 0f,
-                ["Deployment"] = CanConsumeDeploymentAction() ? DeploymentActions.Current : 0f,
-                ["Opportunity"] = OpportunityActions.Current, // Player can't control these
-                ["Intelligence"] = CanConsumeIntelAction() ? IntelActions.Current : 0f,
+                ["Move"] = moveAvailable,
+                ["Combat"] = combatAvailable,
+                ["Deployment"] = deploymentAvailable,
+                ["Opportunity"] = opportunityAvailable,
+                ["Intelligence"] = intelAvailable,
                 ["MovementPoints"] = MovementPoints.Current
             };
         }
@@ -1841,38 +1796,7 @@ namespace HammerAndSickle.Models
         /// <returns>True if movement appears valid</returns>
         public bool CanMoveTo(Vector2 targetPos)
         {
-            try
-            {
-                // Basic validations - will be expanded when terrain system is implemented
-
-                // Check if unit has movement capability
-                if (MovementPoints.Max <= 0)
-                {
-                    return false; // Immobile units (bases, etc.)
-                }
-
-                // Check if unit has movement points available
-                if (MovementPoints.Current <= 0)
-                {
-                    return false; // No movement points left
-                }
-
-                // Check if target is different from current position
-                if (Vector2.Distance(MapPos, targetPos) < 0.01f)
-                {
-                    return false; // Already at target position
-                }
-
-                // TODO: Add terrain validation, enemy ZOC checks, pathfinding, etc.
-                // when those systems are implemented
-
-                return true; // Basic validation passed
-            }
-            catch (Exception e)
-            {
-                AppService.Instance.HandleException(CLASS_NAME, "CanMoveTo", e);
-                return false;
-            }
+            throw new NotImplementedException(); // Placeholder for future movement validation logic
         }
 
         /// <summary>
@@ -1882,15 +1806,7 @@ namespace HammerAndSickle.Models
         /// <returns>Distance in Unity units</returns>
         public float GetDistanceTo(Vector2 targetPos)
         {
-            try
-            {
-                return Vector2.Distance(MapPos, targetPos);
-            }
-            catch (Exception e)
-            {
-                AppService.Instance.HandleException(CLASS_NAME, "GetDistanceTo", e);
-                return float.MaxValue;
-            }
+            throw new NotImplementedException(); // Placeholder for future distance calculation logic
         }
 
         /// <summary>
@@ -1900,20 +1816,7 @@ namespace HammerAndSickle.Models
         /// <returns>Distance in Unity units</returns>
         public float GetDistanceTo(CombatUnit otherUnit)
         {
-            try
-            {
-                if (otherUnit == null)
-                {
-                    throw new ArgumentNullException(nameof(otherUnit));
-                }
-
-                return GetDistanceTo(otherUnit.MapPos);
-            }
-            catch (Exception e)
-            {
-                AppService.Instance.HandleException(CLASS_NAME, "GetDistanceTo", e);
-                return float.MaxValue;
-            }
+            throw new NotImplementedException(); // Placeholder for future distance calculation logic
         }
 
         /// <summary>
@@ -1924,15 +1827,7 @@ namespace HammerAndSickle.Models
         /// <returns>True if unit is at the position</returns>
         public bool IsAtPosition(Vector2 position, float tolerance = 0.01f)
         {
-            try
-            {
-                return Vector2.Distance(MapPos, position) <= tolerance;
-            }
-            catch (Exception e)
-            {
-                AppService.Instance.HandleException(CLASS_NAME, "IsAtPosition", e);
-                return false;
-            }
+            throw new NotImplementedException(); // Placeholder for future position checking logic
         }
 
         /// <summary>
@@ -2421,7 +2316,6 @@ namespace HammerAndSickle.Models
         {
             return MovementPoints.Max * CUConstants.DEPLOYMENT_ACTION_MOVEMENT_COST;
         }
-
        
         /// <summary>
         /// Updates the combat state and adjusts the active profile and movement points accordingly.
@@ -2488,25 +2382,27 @@ namespace HammerAndSickle.Models
             }
             catch (Exception e)
             {
-                AppService.Instance.HandleException(CLASS_NAME, "ApplyProfileForState", e);
+                AppService.Instance.HandleException(CLASS_NAME, "UpdateStateAndProfiles", e);
             }
         }
 
         /// <summary>
-        /// Calculates the movement point cost for a combat action.
+        /// Calculates the movement‑point cost for a combat action.
+        /// Immobile units (Max == 0) pay nothing.
         /// </summary>
-        /// <returns>Movement points required (25% of max)</returns>
         private float GetCombatActionMovementCost()
         {
+            if (MovementPoints.Max <= 0f) return 0f;
             return MovementPoints.Max * CUConstants.COMBAT_ACTION_MOVEMENT_COST;
         }
 
         /// <summary>
-        /// Calculates the movement point cost for an intelligence action.
+        /// Calculates the movement‑point cost for an intelligence action.
+        /// Immobile units (Max == 0) pay nothing.
         /// </summary>
-        /// <returns>Movement points required (15% of max)</returns>
         private float GetIntelActionMovementCost()
         {
+            if (MovementPoints.Max <= 0f) return 0f;
             return MovementPoints.Max * CUConstants.INTEL_ACTION_MOVEMENT_COST;
         }
 
