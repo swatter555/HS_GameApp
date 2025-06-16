@@ -119,7 +119,12 @@ namespace HammerAndSickle.Models
 
         #region Air Unit Management
 
-        public void AddAirUnit(CombatUnit unit)
+        /// <summary>
+        /// Add an air unit to the airbase.
+        /// </summary>
+        /// <param name="unit"></param>
+        /// <returns></returns>
+        public bool AddAirUnit(CombatUnit unit)
         {
             try
             {
@@ -132,13 +137,15 @@ namespace HammerAndSickle.Models
                 // Check if unit is already assigned to another base
                 if (unit.LandBaseFacility != null && unit.LandBaseFacility != this)
                 {
-                    throw new InvalidOperationException($"Unit {unit.UnitName} is already assigned to base {unit.LandBaseFacility.BaseName}");
+                    AppService.CaptureUiMessage($"Unit {unit.UnitName} is already assigned to another base: {unit.LandBaseFacility.BaseName}");
+                    return false; // Cannot add unit already assigned to another base
                 }
 
                 // Make sure we don't add more than the maximum allowed
                 if (airUnitsAttached.Count >= MaxBaseAirUnits)
                 {
-                    throw new InvalidOperationException($"Airbase is at maximum capacity ({MaxBaseAirUnits} units)");
+                    AppService.CaptureUiMessage($"{unit.LandBaseFacility.BaseName} is already full.");
+                    return false; // Cannot add unit if capacity is full
                 }
 
                 // Make sure it's an aircraft unit
@@ -150,15 +157,14 @@ namespace HammerAndSickle.Models
                 // Check for duplicates
                 if (airUnitsAttached.Contains(unit))
                 {
-                    throw new InvalidOperationException($"Unit {unit.UnitName} is already attached to this airbase");
+                    AppService.CaptureUiMessage($"Unit {unit.UnitName} is already attached to this airbase");
+                    return false; // Unit is already attached
                 }
 
                 // Add the unit to the airbase
                 airUnitsAttached.Add(unit);
 
-                // Update the unit's facility reference (assuming this property exists or will be added)
-                // This would require adding LandBaseFacility property to CombatUnit
-                // unit.SetLandBaseFacility(this);
+                return true;
             }
             catch (Exception e)
             {
@@ -167,6 +173,11 @@ namespace HammerAndSickle.Models
             }
         }
 
+        /// <summary>
+        /// Remove an air unit from the airbase.
+        /// </summary>
+        /// <param name="unit"></param>
+        /// <returns></returns>
         public bool RemoveAirUnit(CombatUnit unit)
         {
             try
@@ -176,7 +187,12 @@ namespace HammerAndSickle.Models
                     throw new ArgumentNullException(nameof(unit), "Air unit cannot be null");
                 }
 
-                return airUnitsAttached.Remove(unit);
+                if (airUnitsAttached.Remove(unit))
+                {
+                    AppService.CaptureUiMessage($"Unit {unit.UnitName} has been removed from {BaseName}.");
+                    return true; // Successfully removed
+                }
+                else return false; // Unit was not found in the list
             }
             catch (Exception e)
             {
@@ -185,6 +201,14 @@ namespace HammerAndSickle.Models
             }
         }
 
+        /// <summary>
+        /// Removes an air unit with the specified ID from the collection of attached air units.
+        /// </summary>
+        /// <remarks>If the specified air unit is not found in the collection, the method returns <see
+        /// langword="false"/>. Any exceptions that occur during the operation are logged and handled internally, and
+        /// the method will return <see langword="false"/> in such cases.</remarks>
+        /// <param name="unitID">The unique identifier of the air unit to remove. Cannot be null or empty.</param>
+        /// <returns><see langword="true"/> if the air unit was successfully removed; otherwise, <see langword="false"/>.</returns>
         public bool RemoveAirUnitByID(string unitID)
         {
             try
@@ -197,7 +221,11 @@ namespace HammerAndSickle.Models
                 var unit = airUnitsAttached.FirstOrDefault(u => u.UnitID == unitID);
                 if (unit != null)
                 {
-                    return airUnitsAttached.Remove(unit);
+                   if (airUnitsAttached.Remove(unit))
+                   {
+                        AppService.CaptureUiMessage($"Unit {unit.UnitName} has been removed from {BaseName}.");
+                        return true; // Successfully removed
+                   }
                 }
 
                 return false;
@@ -209,6 +237,15 @@ namespace HammerAndSickle.Models
             }
         }
 
+        /// <summary>
+        /// Retrieves an air unit with the specified identifier.
+        /// </summary>
+        /// <remarks>This method searches the collection of attached air units for a unit with a matching
+        /// identifier. If an exception occurs during execution, it is handled internally, and the method returns <see
+        /// langword="null"/>.</remarks>
+        /// <param name="unitID">The unique identifier of the air unit to retrieve. Cannot be null or empty.</param>
+        /// <returns>The <see cref="CombatUnit"/> that matches the specified identifier, or <see langword="null"/>  if no
+        /// matching unit is found or if <paramref name="unitID"/> is null or empty.</returns>
         public CombatUnit GetAirUnitByID(string unitID)
         {
             try
@@ -227,31 +264,63 @@ namespace HammerAndSickle.Models
             }
         }
 
+        /// <summary>
+        /// Gets the number of air units currently attached.
+        /// </summary>
+        /// <returns>The total count of attached air units.</returns>
         public int GetAttachedUnitCount()
         {
             return airUnitsAttached.Count;
         }
 
+        /// <summary>
+        /// Determines whether the base has capacity to accommodate additional air units.
+        /// </summary>
+        /// <returns><see langword="true"/> if the number of attached air units is less than the maximum allowed;  otherwise,
+        /// <see langword="false"/>.</returns>
         public bool HasCapacityForMoreUnits()
         {
             return airUnitsAttached.Count < MaxBaseAirUnits;
         }
 
+        /// <summary>
+        /// Calculates the remaining capacity for attaching additional air units.
+        /// </summary>
+        /// <remarks>The returned value will be non-negative. If the number of currently attached air
+        /// units equals  or exceeds the maximum allowed, the method will return 0.</remarks>
+        /// <returns>The number of additional air units that can be attached. This value is the difference between  the maximum
+        /// allowed air units and the number of currently attached air units.</returns>
         public int GetRemainingCapacity()
         {
             return MaxBaseAirUnits - airUnitsAttached.Count;
         }
 
+        /// <summary>
+        /// Determines whether the specified combat unit is an air unit attached to this instance.
+        /// </summary>
+        /// <param name="unit">The combat unit to check. Must not be <see langword="null"/>.</param>
+        /// <returns><see langword="true"/> if the specified combat unit is an air unit attached to this instance; otherwise,
+        /// <see langword="false"/>.</returns>
         public bool HasAirUnit(CombatUnit unit)
         {
             return unit != null && airUnitsAttached.Contains(unit);
         }
 
+        /// <summary>
+        /// Check if the airbase has an air unit with the specified ID.
+        /// </summary>
+        /// <param name="unitID"></param>
+        /// <returns></returns>
         public bool HasAirUnitByID(string unitID)
         {
             return !string.IsNullOrEmpty(unitID) && airUnitsAttached.Any(u => u.UnitID == unitID);
         }
 
+        /// <summary>
+        /// Removes all air units from the collection.
+        /// </summary>
+        /// <remarks>This method clears the internal collection of air units.  If an exception occurs
+        /// during the operation, it is handled and logged.</remarks>
         public void ClearAllAirUnits()
         {
             try
@@ -269,6 +338,10 @@ namespace HammerAndSickle.Models
 
         #region Operational Methods
 
+        /// <summary>
+        /// Get the airbase's efficiency multiplier based on its operational capacity.
+        /// </summary>
+        /// <returns></returns>
         public override float GetEfficiencyMultiplier()
         {
             // Air operations can be more sensitive to damage than other facilities
@@ -283,23 +356,41 @@ namespace HammerAndSickle.Models
             };
         }
 
+        /// <summary>
+        /// Check is airbase can launch air operations.
+        /// </summary>
+        /// <returns></returns>
         public bool CanLaunchAirOperations()
         {
             // No air operations if the base is out of operation.
             return OperationalCapacity != OperationalCapacity.OutOfOperation;
         }
 
+        /// <summary>
+        /// Determines whether the aircraft can be repaired based on the current operational capacity.
+        /// </summary>
+        /// <returns><see langword="true"/> if the operational capacity is sufficient to allow aircraft repairs;  otherwise, <see
+        /// langword="false"/>.</returns>
         public bool CanRepairAircraft()
         {
             // Aircraft repairs require full operational capacity
             return OperationalCapacity != OperationalCapacity.OutOfOperation;
         }
 
+        /// <summary>
+        /// Determines whether the system can accept a new aircraft.
+        /// </summary>
+        /// <returns><see langword="true"/> if the system has capacity for additional aircraft; otherwise, <see
+        /// langword="false"/>.</returns>
         public bool CanAcceptNewAircraft()
         {
             return HasCapacityForMoreUnits();
         }
 
+        /// <summary>
+        /// Get the list of air units that are currently operational.
+        /// </summary>
+        /// <returns></returns>
         public List<CombatUnit> GetOperationalAirUnits()
         {
             try
@@ -313,6 +404,10 @@ namespace HammerAndSickle.Models
             }
         }
 
+        /// <summary>
+        /// Gets the total number of operational air units.
+        /// </summary>
+        /// <returns>The number of air units that are currently operational.</returns>
         public int GetOperationalAirUnitCount()
         {
             return GetOperationalAirUnits().Count;

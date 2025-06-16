@@ -174,8 +174,8 @@ namespace HammerAndSickle.Models
         /// <summary>
         /// Add supplies directly to depot.
         /// </summary>
-        /// <param name="amount"></param>
-        public void AddSupplies(float amount)
+        /// <param name="amount">Success</param>
+        public bool AddSupplies(float amount)
         {
             try
             {
@@ -184,16 +184,28 @@ namespace HammerAndSickle.Models
                     throw new ArgumentException("Supply amount must be positive", nameof(amount));
                 }
 
+                if (StockpileInDays == GetMaxStockpile())
+                {
+                    // Notify the UI that the stockpile is full
+                    AppService.CaptureUiMessage($"{BaseName} stockpile is already full. Cannot add more supplies.");
+                    return false;
+                }
+
                 float maxCapacity = GetMaxStockpile();
                 float newAmount = StockpileInDays + amount;
 
                 // Clamp to maximum capacity
                 StockpileInDays = Math.Min(newAmount, maxCapacity);
+
+                // Notify the UI about the supply addition
+                AppService.CaptureUiMessage($"{BaseName} has added {amount} days of supply. Current stockpile: {StockpileInDays} days.");
+
+                return true;
             }
             catch (Exception e)
             {
                 AppService.HandleException(CLASS_NAME, "AddSupplies", e);
-                throw;
+                return false;
             }
         }
 
@@ -202,7 +214,7 @@ namespace HammerAndSickle.Models
         /// </summary>
         /// <param name="amount"></param>
         /// <returns></returns>
-        public float RemoveSupplies(float amount)
+        public void RemoveSupplies(float amount)
         {
             try
             {
@@ -214,27 +226,28 @@ namespace HammerAndSickle.Models
                 float actualAmount = Math.Min(amount, StockpileInDays);
                 StockpileInDays -= actualAmount;
 
-                return actualAmount;
+                // Notify the UI about the supply removal
+                AppService.CaptureUiMessage($"{BaseName} has removed {actualAmount} days of supply. Current stockpile: {StockpileInDays} days.");
             }
             catch (Exception e)
             {
                 AppService.HandleException(CLASS_NAME, "RemoveSupplies", e);
-                return 0f;
             }
         }
 
         /// <summary>
-        /// Add supplies to the depot based on its generation rate.
+        /// Generate supply is called once per turn to generate supplies based on the depot's generation rate.
         /// </summary>
-        /// <returns></returns>
-        public float GenerateSupplies()
+        /// <returns>Success</returns>
+        public bool GenerateSupplies()
         {
             try
             {
                 // If depot is completely out of operation, no supplies are generated
                 if (!IsOperational())
                 {
-                    return 0f;
+                    AppService.CaptureUiMessage($"{BaseName} is not operational and cannot generate supplies.");
+                    return false;
                 }
 
                 float generatedAmount = GetCurrentGenerationRate();
@@ -244,12 +257,15 @@ namespace HammerAndSickle.Models
                 float amountToAdd = Math.Min(generatedAmount, maxCapacity - StockpileInDays);
                 StockpileInDays += amountToAdd;
 
-                return amountToAdd;
+                // Notify the UI about the supply generation
+                AppService.CaptureUiMessage($"{BaseName} has generated {amountToAdd} days of supply. Current stockpile: {StockpileInDays} days.");
+
+                return true;
             }
             catch (Exception e)
             {
                 AppService.HandleException(CLASS_NAME, "GenerateSupplies", e);
-                return 0f;
+                return false;
             }
         }
 
@@ -634,24 +650,6 @@ namespace HammerAndSickle.Models
         }
 
         #endregion // Special Ability Methods
-
-
-        #region Game Cycle Methods
-
-        public void OnNewTurn()
-        {
-            try
-            {
-                // Generate new supplies
-                GenerateSupplies();
-            }
-            catch (Exception e)
-            {
-                AppService.HandleException(CLASS_NAME, "OnNewTurn", e);
-            }
-        }
-
-        #endregion // Game Cycle Methods
 
 
         #region Cloning

@@ -118,6 +118,10 @@ namespace HammerAndSickle.Models
 
         #region Public Methods
 
+        /// <summary>
+        /// Add damage to a base.
+        /// </summary>
+        /// <param name="incomingDamage"></param>
         public virtual void AddDamage(int incomingDamage)
         {
             try
@@ -134,6 +138,10 @@ namespace HammerAndSickle.Models
 
                 // Update operational capacity based on the new damage level
                 UpdateOperationalCapacity();
+
+                // Notify the UI about the damage event
+                AppService.CaptureUiMessage($"{BaseName} has suffered {incomingDamage} damage. Current damage level: {Damage}.");
+                AppService.CaptureUiMessage($"{BaseName} current operational capacity is: {OperationalCapacity}");
             }
             catch (Exception e)
             {
@@ -142,6 +150,14 @@ namespace HammerAndSickle.Models
             }
         }
 
+        /// <summary>
+        /// Repairs the damage to the object by reducing the current damage level.
+        /// </summary>
+        /// <remarks>The method adjusts the current damage level by subtracting the specified repair
+        /// amount, ensuring  that the resulting damage level remains within the valid range. After the damage is
+        /// updated, the  operational capacity of the object is recalculated to reflect the new damage level.</remarks>
+        /// <param name="repairAmount">The amount of damage to repair. Must be a non-negative value. The actual repair amount is clamped  to ensure
+        /// it does not exceed the maximum allowable damage.</param>
         public virtual void RepairDamage(int repairAmount)
         {
             try
@@ -163,6 +179,10 @@ namespace HammerAndSickle.Models
 
                 // Update operational capacity based on the new damage level
                 UpdateOperationalCapacity();
+
+                // Notify the UI about the repair event
+                AppService.CaptureUiMessage($"{BaseName} has been repaired by {repairAmount}. Current damage level: {Damage}.");
+                AppService.CaptureUiMessage($"{BaseName} current operational capacity is: {OperationalCapacity}");
             }
             catch (Exception e)
             {
@@ -171,6 +191,10 @@ namespace HammerAndSickle.Models
             }
         }
 
+        /// <summary>
+        /// Set damage to a given level (0-100).
+        /// </summary>
+        /// <param name="newDamageLevel"></param>
         public virtual void SetDamage(int newDamageLevel)
         {
             try
@@ -192,6 +216,18 @@ namespace HammerAndSickle.Models
             }
         }
 
+        /// <summary>
+        /// Calculates the efficiency multiplier based on the current operational capacity.
+        /// </summary>
+        /// <returns>A <see cref="float"/> value representing the efficiency multiplier: <list type="bullet">
+        /// <item><description>1.0 if the operational capacity is <see
+        /// cref="OperationalCapacity.Full"/>.</description></item> <item><description>0.75 if the operational capacity
+        /// is <see cref="OperationalCapacity.SlightlyDegraded"/>.</description></item> <item><description>0.5 if the
+        /// operational capacity is <see cref="OperationalCapacity.ModeratelyDegraded"/>.</description></item>
+        /// <item><description>0.25 if the operational capacity is <see
+        /// cref="OperationalCapacity.HeavilyDegraded"/>.</description></item> <item><description>0.0 if the operational
+        /// capacity is <see cref="OperationalCapacity.OutOfOperation"/> or an unrecognized value.</description></item>
+        /// </list></returns>
         public virtual float GetEfficiencyMultiplier()
         {
             return OperationalCapacity switch
@@ -205,11 +241,19 @@ namespace HammerAndSickle.Models
             };
         }
 
+        /// <summary>
+        /// Returns whether the facility is operational based on its current operational capacity.
+        /// </summary>
+        /// <returns></returns>
         public bool IsOperational()
         {
             return OperationalCapacity != OperationalCapacity.OutOfOperation;
         }
 
+        /// <summary>
+        /// Determines whether the system is fully operational.
+        /// </summary>
+        /// <returns><see langword="true"/> if the system's operational capacity is at full; otherwise, <see langword="false"/>.</returns>
         public bool IsFullyOperational()
         {
             return OperationalCapacity == OperationalCapacity.Full;

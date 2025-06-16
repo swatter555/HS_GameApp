@@ -384,6 +384,28 @@ namespace HammerAndSickle.Models
             }
         }
 
+        /// <summary>
+        /// Set the command grade of the officer.
+        /// </summary>
+        /// <param name="grade"></param>
+        public void SetCommandGrade(CommandGrade grade)
+        {
+            try
+            {
+                if (!Enum.IsDefined(typeof(CommandGrade), grade))
+                {
+                    throw new ArgumentException($"Invalid command grade: {grade}");
+                }
+                CommandGrade = grade;
+                OnGradeChanged?.Invoke(grade);
+            }
+            catch (Exception e)
+            {
+                AppService.HandleException(CLASS_NAME, "SetCommandGrade", e);
+                throw;
+            }
+        }
+
         #endregion // Public Methods
 
 
