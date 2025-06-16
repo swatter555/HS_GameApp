@@ -786,6 +786,20 @@ namespace HammerAndSickle.Models
     //============================
 
     /// <summary>
+    /// Represents the type of a base facility in a military or logistical context.
+    /// </summary>
+    /// <remarks>This enumeration defines the various types of facilities that can exist within a base,  such
+    /// as land bases, airbases, and supply depots. It is used to categorize and identify  the purpose or function of a
+    /// facility.</remarks>
+    public enum BaseFacilityType : byte
+    {
+        None = 0,
+        LandBase = 1,
+        Airbase = 2,
+        SupplyDepot = 3
+    }
+
+    /// <summary>
     /// Represents the operational capacity of a land-based facility based on damage level.
     /// </summary>
     public enum OperationalCapacity
