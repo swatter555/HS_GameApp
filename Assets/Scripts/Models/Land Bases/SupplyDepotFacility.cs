@@ -184,7 +184,7 @@ namespace HammerAndSickle.Models
                     throw new ArgumentException("Supply amount must be positive", nameof(amount));
                 }
 
-                if (StockpileInDays == GetMaxStockpile())
+                if (StockpileInDays >= GetMaxStockpile())
                 {
                     // Notify the UI that the stockpile is full
                     AppService.CaptureUiMessage($"{BaseName} stockpile is already full. Cannot add more supplies.");

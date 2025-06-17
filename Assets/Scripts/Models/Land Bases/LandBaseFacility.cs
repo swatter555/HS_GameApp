@@ -15,8 +15,7 @@ namespace HammerAndSickle.Models
         #region Constants
 
         private const string CLASS_NAME = nameof(LandBaseFacility);
-        public const int MAX_DAMAGE = 100;
-        public const int MIN_DAMAGE = 0;
+  
 
         #endregion // Constants
 
@@ -42,7 +41,7 @@ namespace HammerAndSickle.Models
                 BaseID = Guid.NewGuid().ToString();
                 BaseName = "Land Base";
                 Side = Side.Player;
-                Damage = MIN_DAMAGE;
+                Damage = CUConstants.MIN_DAMAGE;
                 OperationalCapacity = OperationalCapacity.Full;
             }
             catch (Exception e)
@@ -77,7 +76,7 @@ namespace HammerAndSickle.Models
                 BaseID = Guid.NewGuid().ToString();
                 BaseName = string.IsNullOrEmpty(name) ? "Land Base" : name;
                 Side = side;
-                Damage = MIN_DAMAGE;
+                Damage = CUConstants.MIN_DAMAGE;
                 OperationalCapacity = OperationalCapacity.Full;
 
                 if (initialDamage > 0)
@@ -134,7 +133,7 @@ namespace HammerAndSickle.Models
 
                 // Add the incoming damage to the current damage, then clamp the result
                 int newDamage = Damage + incomingDamage;
-                Damage = Math.Max(MIN_DAMAGE, Math.Min(MAX_DAMAGE, newDamage));
+                Damage = Math.Max(CUConstants.MIN_DAMAGE, Math.Min(CUConstants.MAX_DAMAGE, newDamage));
 
                 // Update operational capacity based on the new damage level
                 UpdateOperationalCapacity();
@@ -169,13 +168,13 @@ namespace HammerAndSickle.Models
                 }
 
                 // Clamp the repair amount to be between 0 and 100
-                repairAmount = Math.Max(0, Math.Min(MAX_DAMAGE, repairAmount));
+                repairAmount = Math.Max(0, Math.Min(CUConstants.MAX_DAMAGE, repairAmount));
 
                 // Remove the repair amount from the current damage
                 Damage -= repairAmount;
 
                 // Clamp the total damage to be between 0 and 100
-                Damage = Math.Max(MIN_DAMAGE, Math.Min(MAX_DAMAGE, Damage));
+                Damage = Math.Max(CUConstants.MIN_DAMAGE, Math.Min(CUConstants.MAX_DAMAGE, Damage));
 
                 // Update operational capacity based on the new damage level
                 UpdateOperationalCapacity();
@@ -200,10 +199,10 @@ namespace HammerAndSickle.Models
             try
             {
                 // Validate damage level
-                if (newDamageLevel < MIN_DAMAGE || newDamageLevel > MAX_DAMAGE)
+                if (newDamageLevel < CUConstants.MIN_DAMAGE || newDamageLevel > CUConstants.MAX_DAMAGE)
                 {
                     throw new ArgumentOutOfRangeException(nameof(newDamageLevel),
-                        $"Damage level must be between {MIN_DAMAGE} and {MAX_DAMAGE}");
+                        $"Damage level must be between {CUConstants.MIN_DAMAGE} and {CUConstants.MAX_DAMAGE}");
                 }
 
                 Damage = newDamageLevel;
@@ -232,11 +231,11 @@ namespace HammerAndSickle.Models
         {
             return OperationalCapacity switch
             {
-                OperationalCapacity.Full => 1.0f,
-                OperationalCapacity.SlightlyDegraded => 0.75f,
-                OperationalCapacity.ModeratelyDegraded => 0.5f,
-                OperationalCapacity.HeavilyDegraded => 0.25f,
-                OperationalCapacity.OutOfOperation => 0.0f,
+                OperationalCapacity.Full => CUConstants.BASE_CAPACITY_LVL5,
+                OperationalCapacity.SlightlyDegraded => CUConstants.BASE_CAPACITY_LVL4,
+                OperationalCapacity.ModeratelyDegraded => CUConstants.BASE_CAPACITY_LVL3,
+                OperationalCapacity.HeavilyDegraded => CUConstants.BASE_CAPACITY_LVL2,
+                OperationalCapacity.OutOfOperation => CUConstants.BASE_CAPACITY_LVL1,
                 _ => 0.0f,
             };
         }

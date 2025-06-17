@@ -11,7 +11,7 @@ namespace HammerAndSickle.Models
     [Serializable]
     public sealed class BaseFacilitySubsystem
     {
-        public BaseFacilityType FacilityType { get; private set; } = BaseFacilityType.None;
+        public FacilityType FacilityType { get; private set; } = FacilityType.HQ;
 
         // runtime reference – non‑null once attached
         private LandBaseFacility _facility;
@@ -30,9 +30,9 @@ namespace HammerAndSickle.Models
             _facility = facility;
             FacilityType = facility switch
             {
-                AirbaseFacility => BaseFacilityType.Airbase,
-                SupplyDepotFacility => BaseFacilityType.SupplyDepot,
-                _ => BaseFacilityType.LandBase,
+                AirbaseFacility => FacilityType.Airbase,
+                SupplyDepotFacility => FacilityType.SupplyDepot,
+                _ => FacilityType.HQ,
             };
         }
 
