@@ -55,9 +55,9 @@ namespace HammerAndSickle.Models
         ATT,    // Attack aircraft
         BMB,    // Bomber
         RECONA, // Recon Aircraft
-        BASE,   // LandBase facility, generic
-        DEPOT,  // Supply Depot, specific type of LandBase
-        AIRB,   // Airbase Specific type of Landbase
+        HQ,     // HQ facility
+        DEPOT,  // Supply Depot
+        AIRB,   // Airbase
     }
 
     /// <summary>
@@ -782,7 +782,7 @@ namespace HammerAndSickle.Models
     }
 
     //============================
-    //====== LandBase Enums ======
+    //====== Facility Enums ======
     //============================
 
     /// <summary>
@@ -791,12 +791,11 @@ namespace HammerAndSickle.Models
     /// <remarks>This enumeration defines the various types of facilities that can exist within a base,  such
     /// as land bases, airbases, and supply depots. It is used to categorize and identify  the purpose or function of a
     /// facility.</remarks>
-    public enum BaseFacilityType : byte
+    public enum FacilityType
     {
-        None = 0,
-        LandBase = 1,
-        Airbase = 2,
-        SupplyDepot = 3
+        HQ,
+        Airbase,
+        SupplyDepot
     }
 
     /// <summary>

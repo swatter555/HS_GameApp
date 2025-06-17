@@ -134,17 +134,10 @@ namespace HammerAndSickle.Models
                     throw new ArgumentNullException(nameof(unit), "Air unit cannot be null");
                 }
 
-                // Check if unit is already assigned to another base
-                if (unit.LandBaseFacility != null && unit.LandBaseFacility != this)
-                {
-                    AppService.CaptureUiMessage($"Unit {unit.UnitName} is already assigned to another base: {unit.LandBaseFacility.BaseName}");
-                    return false; // Cannot add unit already assigned to another base
-                }
-
                 // Make sure we don't add more than the maximum allowed
                 if (airUnitsAttached.Count >= MaxBaseAirUnits)
                 {
-                    AppService.CaptureUiMessage($"{unit.LandBaseFacility.BaseName} is already full.");
+                    AppService.CaptureUiMessage($"{this.BaseName} is already full.");
                     return false; // Cannot add unit if capacity is full
                 }
 
@@ -337,24 +330,6 @@ namespace HammerAndSickle.Models
 
 
         #region Operational Methods
-
-        /// <summary>
-        /// Get the airbase's efficiency multiplier based on its operational capacity.
-        /// </summary>
-        /// <returns></returns>
-        public override float GetEfficiencyMultiplier()
-        {
-            // Air operations can be more sensitive to damage than other facilities
-            return OperationalCapacity switch
-            {
-                OperationalCapacity.Full => CUConstants.AIRBASE_CAPACITY_LVL5,
-                OperationalCapacity.SlightlyDegraded => CUConstants.AIRBASE_CAPACITY_LVL4,// Slightly worse than base class
-                OperationalCapacity.ModeratelyDegraded => CUConstants.AIRBASE_CAPACITY_LVL3,// Slightly worse than base class
-                OperationalCapacity.HeavilyDegraded => CUConstants.AIRBASE_CAPACITY_LVL2,// Slightly worse than base class
-                OperationalCapacity.OutOfOperation => CUConstants.AIRBASE_CAPACITY_LVL1,
-                _ => 0.0f,
-            };
-        }
 
         /// <summary>
         /// Check is airbase can launch air operations.

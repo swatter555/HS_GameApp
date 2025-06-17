@@ -535,7 +535,7 @@ namespace HammerAndSickle.Models
                     intelActions = 0;
                     break;
 
-                case UnitClassification.BASE:
+                case UnitClassification.HQ:
                     intelActions += 1;
                     break;
 
@@ -601,7 +601,7 @@ namespace HammerAndSickle.Models
                 UnitClassification.HELO or 
                 UnitClassification.SPECH => CUConstants.HELO_MOV,
 
-                UnitClassification.BASE or 
+                UnitClassification.HQ or 
                 UnitClassification.DEPOT or 
                 UnitClassification.AIRB => 0,// Bases don't move
 
@@ -689,6 +689,8 @@ namespace HammerAndSickle.Models
                 return null; // Return null if an error occurs
             }
         }
+
+
 
         #endregion // Public Methods
 
@@ -2263,7 +2265,7 @@ namespace HammerAndSickle.Models
             }
 
             // Bases cannot change states
-            if (Classification == UnitClassification.BASE ||
+            if (Classification == UnitClassification.HQ ||
                 Classification == UnitClassification.DEPOT ||
                 Classification == UnitClassification.AIRB)
             {
@@ -2796,5 +2798,116 @@ namespace HammerAndSickle.Models
         }
 
         #endregion // IResolvableReferences
-    }
+
+
+        #region Debugging
+
+        /// <summary>
+        /// Configures the unit as an airbase with default settings for debugging purposes.
+        /// </summary>
+        /// <remarks>This method initializes the unit with predefined values, including its
+        /// identification,  metadata, profiles, and state. It sets the unit's type, classification, role, and other 
+        /// properties to represent an airbase. This method is intended for debugging scenarios and  should not be used
+        /// in production code.</remarks>
+        public void DebugSetupAirbase()
+        {
+            // Set identification and metadata
+            UnitName = "Airbase";
+            UnitID = Guid.NewGuid().ToString();
+            UnitType = UnitType.LandUnitDF;
+            Classification = UnitClassification.AIRB;
+            Role = UnitRole.GroundCombat;
+            Side = Side.Player;
+            Nationality = Nationality.USSR;
+            IsTransportable = false;
+            IsLandBase = true;
+            IsLeaderAssigned = false;
+
+            // Set profiles
+            DeployedProfile = null;
+            MountedProfile = null;
+            UnitProfile = null;
+            LandBaseFacility = new AirbaseFacility();
+            ActiveProfile = null;
+
+            // Initialize leader (will be null until assigned)
+            CommandingOfficer = null;
+
+            // Initialize action counts based on unit type and classification
+            InitializeActionCounts();
+
+            // Initialize state with default values
+            ExperiencePoints = 0;
+            ExperienceLevel = ExperienceLevel.Raw;
+            EfficiencyLevel = EfficiencyLevel.FullyOperational;
+            IsMounted = false;
+            CombatState = CombatState.Deployed;
+            SpottedLevel = SpottedLevel.Level1;
+
+            // Initialize StatsMaxCurrent properties
+            HitPoints = new StatsMaxCurrent(CUConstants.MAX_HP);
+            DaysSupply = new StatsMaxCurrent(CUConstants.MaxDaysSupplyUnit);
+
+            // Initialize movement based on unit classification
+            InitializeMovementPoints();
+
+            // Initialize position to origin (will be set when placed on map)
+            MapPos = Vector2.zero;
+        }
+
+        /// <summary>
+        /// Configures the unit as a supply depot with default settings for debugging purposes.
+        /// </summary>
+        /// <remarks>This method initializes the unit with predefined attributes, profiles, and state
+        /// values  specific to a supply depot. It sets up metadata, classification, and operational parameters, 
+        /// including supply capacity, combat state, and movement points. The unit is not assigned a  commanding officer
+        /// or a specific position on the map until further configuration.</remarks>
+        public void DebugSetupSupplyDepot()
+        {
+            // Set identification and metadata
+            UnitName = "Supply Depot";
+            UnitID = Guid.NewGuid().ToString();
+            UnitType = UnitType.LandUnitDF;
+            Classification = UnitClassification.DEPOT;
+            Role = UnitRole.GroundCombat;
+            Side = Side.Player;
+            Nationality = Nationality.USSR;
+            IsTransportable = false;
+            IsLandBase = true;
+            IsLeaderAssigned = false;
+
+            // Set profiles
+            DeployedProfile = null;
+            MountedProfile = null;
+            UnitProfile = null;
+            LandBaseFacility = new SupplyDepotFacility("SupplyDepot",Side.Player, DepotSize.Huge, true);
+            ActiveProfile = null;
+
+            // Initialize leader (will be null until assigned)
+            CommandingOfficer = null;
+
+            // Initialize action counts based on unit type and classification
+            InitializeActionCounts();
+
+            // Initialize state with default values
+            ExperiencePoints = 0;
+            ExperienceLevel = ExperienceLevel.Raw;
+            EfficiencyLevel = EfficiencyLevel.FullyOperational;
+            IsMounted = false;
+            CombatState = CombatState.Deployed;
+            SpottedLevel = SpottedLevel.Level1;
+
+            // Initialize StatsMaxCurrent properties
+            HitPoints = new StatsMaxCurrent(CUConstants.MAX_HP);
+            DaysSupply = new StatsMaxCurrent(CUConstants.MaxDaysSupplyUnit);
+
+            // Initialize movement based on unit classification
+            InitializeMovementPoints();
+
+            // Initialize position to origin (will be set when placed on map)
+            MapPos = Vector2.zero;
+        }
+
+            #endregion
+        }
 }
