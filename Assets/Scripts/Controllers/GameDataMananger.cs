@@ -161,7 +161,6 @@ namespace HammerAndSickle.Models
         private readonly Dictionary<string, Leader> _leaders = new();
         private readonly Dictionary<string, WeaponSystemProfile> _weaponProfiles = new();
         private readonly Dictionary<string, UnitProfile> _unitProfiles = new();
-        private readonly Dictionary<string, LandBaseFacility> _landBases = new();
 
         // State tracking
         private readonly HashSet<string> _dirtyObjects = new ();
@@ -186,7 +185,7 @@ namespace HammerAndSickle.Models
                 try
                 {
                     return _combatUnits.Count + _leaders.Count + _weaponProfiles.Count +
-                           _unitProfiles.Count + _landBases.Count;
+                           _unitProfiles.Count;
                 }
                 finally
                 {
@@ -243,8 +242,9 @@ namespace HammerAndSickle.Models
                 _dataLock.EnterReadLock();
                 try
                 {
+                    // TODO: Fix this
                     return (_combatUnits.Count, _leaders.Count, _weaponProfiles.Count,
-                            _unitProfiles.Count, _landBases.Count);
+                            _unitProfiles.Count, 0);
                 }
                 finally
                 {
@@ -451,61 +451,6 @@ namespace HammerAndSickle.Models
             }
         }
 
-        /// <summary>
-        /// Registers a land base profile with the data manager.
-        /// </summary>
-        /// <param name="profile">The land base profile to register</param>
-        /// <param name="baseId">Unique identifier for this base instance</param>
-        /// <returns>True if registration was successful</returns>
-        public bool RegisterLandBase(LandBaseFacility profile, string baseId)
-        {
-            if (profile == null)
-            {
-                AppService.HandleException(CLASS_NAME, nameof(RegisterLandBase),
-                    new ArgumentNullException(nameof(profile)));
-                return false;
-            }
-
-            if (string.IsNullOrEmpty(baseId))
-            {
-                AppService.HandleException(CLASS_NAME, nameof(RegisterLandBase),
-                    new ArgumentException("Base ID cannot be null or empty", nameof(baseId)));
-                return false;
-            }
-
-            try
-            {
-                _dataLock.EnterWriteLock();
-
-                if (_landBases.ContainsKey(baseId))
-                {
-                    AppService.HandleException(CLASS_NAME, nameof(RegisterLandBase),
-                        new InvalidOperationException($"Land base with ID {baseId} already registered"));
-                    return false;
-                }
-
-                _landBases[baseId] = profile;
-                MarkDirty(baseId);
-
-                // Track for reference resolution if needed
-                if (profile is IResolvableReferences resolvable && resolvable.HasUnresolvedReferences())
-                {
-                    _unresolvedObjects.Add(resolvable);
-                }
-
-                return true;
-            }
-            catch (Exception e)
-            {
-                AppService.HandleException(CLASS_NAME, nameof(RegisterLandBase), e);
-                return false;
-            }
-            finally
-            {
-                _dataLock.ExitWriteLock();
-            }
-        }
-
         #endregion // Registration Methods
 
 
@@ -605,31 +550,6 @@ namespace HammerAndSickle.Models
             catch (Exception e)
             {
                 AppService.HandleException(CLASS_NAME, nameof(GetUnitProfile), e);
-                return null;
-            }
-            finally
-            {
-                _dataLock.ExitReadLock();
-            }
-        }
-
-        /// <summary>
-        /// Gets a land base profile by its unique identifier.
-        /// </summary>
-        /// <param name="baseId">The base ID to lookup</param>
-        /// <returns>The land base profile if found, null otherwise</returns>
-        public LandBaseFacility GetLandBase(string baseId)
-        {
-            if (string.IsNullOrEmpty(baseId)) return null;
-
-            try
-            {
-                _dataLock.EnterReadLock();
-                return _landBases.TryGetValue(baseId, out LandBaseFacility profile) ? profile : null;
-            }
-            catch (Exception e)
-            {
-                AppService.HandleException(CLASS_NAME, nameof(GetLandBase), e);
                 return null;
             }
             finally
@@ -849,7 +769,6 @@ namespace HammerAndSickle.Models
                     LeaderCount = _leaders.Count,
                     WeaponProfileCount = _weaponProfiles.Count,
                     UnitProfileCount = _unitProfiles.Count,
-                    LandBaseCount = _landBases.Count,
                     // Calculate simple checksum (can be enhanced)
                     Checksum = CalculateChecksum()
                 };
@@ -866,7 +785,6 @@ namespace HammerAndSickle.Models
                     formatter.Serialize(stream, _leaders);
                     formatter.Serialize(stream, _weaponProfiles);
                     formatter.Serialize(stream, _unitProfiles);
-                    formatter.Serialize(stream, _landBases);
                 }
 
                 // Clear dirty flags after successful save
@@ -939,7 +857,6 @@ namespace HammerAndSickle.Models
                     var leaders = (Dictionary<string, Leader>)formatter.Deserialize(stream);
                     var weaponProfiles = (Dictionary<string, WeaponSystemProfile>)formatter.Deserialize(stream);
                     var unitProfiles = (Dictionary<string, UnitProfile>)formatter.Deserialize(stream);
-                    var landBases = (Dictionary<string, LandBaseFacility>)formatter.Deserialize(stream);
 
                     // Transfer to internal collections and track resolvable objects
                     foreach (var kvp in combatUnits)
@@ -966,21 +883,11 @@ namespace HammerAndSickle.Models
                     foreach (var kvp in unitProfiles)
                         _unitProfiles[kvp.Key] = kvp.Value;
 
-                    foreach (var kvp in landBases)
-                    {
-                        _landBases[kvp.Key] = kvp.Value;
-                        if (kvp.Value is IResolvableReferences resolvable && resolvable.HasUnresolvedReferences())
-                        {
-                            _unresolvedObjects.Add(resolvable);
-                        }
-                    }
-
                     // Validate loaded data counts match header
                     if (_combatUnits.Count != header.CombatUnitCount ||
                         _leaders.Count != header.LeaderCount ||
                         _weaponProfiles.Count != header.WeaponProfileCount ||
-                        _unitProfiles.Count != header.UnitProfileCount ||
-                        _landBases.Count != header.LandBaseCount)
+                        _unitProfiles.Count != header.UnitProfileCount)
                     {
                         AppService.HandleException(CLASS_NAME, nameof(LoadGameState),
                             new InvalidDataException("Loaded object counts do not match header metadata"));
@@ -1149,7 +1056,6 @@ namespace HammerAndSickle.Models
             _leaders.Clear();
             _weaponProfiles.Clear();
             _unitProfiles.Clear();
-            _landBases.Clear();
             _dirtyObjects.Clear();
             _unresolvedObjects.Clear();
         }
@@ -1163,10 +1069,11 @@ namespace HammerAndSickle.Models
         {
             try
             {
+                //TODO: Fix this
                 // Simple checksum based on object counts and a few key values
                 int checksum = _combatUnits.Count * 17 + _leaders.Count * 23 +
                               _weaponProfiles.Count * 31 + _unitProfiles.Count * 37 +
-                              _landBases.Count * 41;
+                              0;
 
                 return checksum.ToString("X8");
             }
