@@ -48,7 +48,7 @@ namespace HammerAndSickle.Models
         public int LeaderCount { get; set; }
         public int WeaponProfileCount { get; set; }
         public int UnitProfileCount { get; set; }
-        public int LandBaseCount { get; set; }
+        public int FacilityCount { get; set; }
         public string Checksum { get; set; }
 
         public GameDataHeader()
@@ -67,7 +67,17 @@ namespace HammerAndSickle.Models
             LeaderCount = info.GetInt32(nameof(LeaderCount));
             WeaponProfileCount = info.GetInt32(nameof(WeaponProfileCount));
             UnitProfileCount = info.GetInt32(nameof(UnitProfileCount));
-            LandBaseCount = info.GetInt32(nameof(LandBaseCount));
+
+            // Handle backward compatibility
+            try
+            {
+                FacilityCount = info.GetInt32(nameof(FacilityCount));
+            }
+            catch (SerializationException)
+            {
+                FacilityCount = 0; // Default for older save files
+            }
+
             Checksum = info.GetString(nameof(Checksum));
         }
 
@@ -80,7 +90,7 @@ namespace HammerAndSickle.Models
             info.AddValue(nameof(LeaderCount), LeaderCount);
             info.AddValue(nameof(WeaponProfileCount), WeaponProfileCount);
             info.AddValue(nameof(UnitProfileCount), UnitProfileCount);
-            info.AddValue(nameof(LandBaseCount), LandBaseCount);
+            info.AddValue(nameof(FacilityCount), FacilityCount);
             info.AddValue(nameof(Checksum), Checksum);
         }
     }
@@ -235,16 +245,16 @@ namespace HammerAndSickle.Models
         /// <summary>
         /// Gets the count of each object type for diagnostic purposes.
         /// </summary>
-        public (int CombatUnits, int Leaders, int WeaponProfiles, int UnitProfiles, int LandBases) ObjectCounts
+        public (int CombatUnits, int Leaders, int WeaponProfiles, int UnitProfiles, int Facilities) ObjectCounts
         {
             get
             {
                 _dataLock.EnterReadLock();
                 try
                 {
-                    // TODO: Fix this
+                    int facilityCount = _combatUnits.Values.Count(unit => unit.IsBase);
                     return (_combatUnits.Count, _leaders.Count, _weaponProfiles.Count,
-                            _unitProfiles.Count, 0);
+                            _unitProfiles.Count, facilityCount);
                 }
                 finally
                 {
@@ -303,6 +313,14 @@ namespace HammerAndSickle.Models
                 if (unit is IResolvableReferences resolvable && resolvable.HasUnresolvedReferences())
                 {
                     _unresolvedObjects.Add(resolvable);
+                }
+
+                // Also track FacilityManager if it has unresolved references
+                if (unit.FacilityManager != null &&
+                    unit.FacilityManager is IResolvableReferences facilityResolvable &&
+                    facilityResolvable.HasUnresolvedReferences())
+                {
+                    _unresolvedObjects.Add(facilityResolvable);
                 }
 
                 return true;
@@ -668,6 +686,7 @@ namespace HammerAndSickle.Models
 
         /// <summary>
         /// Validates data integrity by checking for missing references and other issues.
+        /// Enhanced to validate facility relationships and nested references.
         /// </summary>
         /// <returns>List of validation errors found</returns>
         public List<string> ValidateDataIntegrity()
@@ -682,6 +701,16 @@ namespace HammerAndSickle.Models
                 if (_unresolvedObjects.Count > 0)
                 {
                     errors.Add($"{_unresolvedObjects.Count} objects have unresolved references");
+
+                    // Log details about unresolved references
+                    foreach (var obj in _unresolvedObjects)
+                    {
+                        var unresolvedIds = obj.GetUnresolvedReferenceIDs();
+                        if (unresolvedIds.Count > 0)
+                        {
+                            errors.Add($"Object has unresolved references: {string.Join(", ", unresolvedIds)}");
+                        }
+                    }
                 }
 
                 // Check for orphaned leader assignments
@@ -692,6 +721,15 @@ namespace HammerAndSickle.Models
                         if (!_combatUnits.ContainsKey(leader.UnitID))
                         {
                             errors.Add($"Leader {leader.Name} assigned to non-existent unit {leader.UnitID}");
+                        }
+                        else
+                        {
+                            // Verify bidirectional relationship
+                            var unit = _combatUnits[leader.UnitID];
+                            if (unit.CommandingOfficer == null || unit.CommandingOfficer.LeaderID != leader.LeaderID)
+                            {
+                                errors.Add($"Leader {leader.Name} thinks it's assigned to {leader.UnitID} but unit doesn't reference it");
+                            }
                         }
                     }
                 }
@@ -706,10 +744,66 @@ namespace HammerAndSickle.Models
                         {
                             errors.Add($"Unit {unit.UnitName} has commanding officer not in leader registry");
                         }
+                        else
+                        {
+                            // Verify bidirectional relationship
+                            var leader = unit.CommandingOfficer;
+                            if (!leader.IsAssigned || leader.UnitID != unit.UnitID)
+                            {
+                                errors.Add($"Unit {unit.UnitName} references leader {leader.Name} but leader doesn't think it's assigned to this unit");
+                            }
+                        }
+                    }
+
+                    // Validate facility relationships for base units
+                    if (unit.IsBase && unit.FacilityManager != null)
+                    {
+                        // Check facility manager consistency
+                        if (unit.FacilityManager.FacilityType == FacilityType.Airbase)
+                        {
+                            foreach (var attachedUnit in unit.FacilityManager.AirUnitsAttached)
+                            {
+                                if (!_combatUnits.ContainsKey(attachedUnit.UnitID))
+                                {
+                                    errors.Add($"Airbase {unit.UnitName} has attached unit {attachedUnit.UnitID} not in registry");
+                                }
+                                else if (attachedUnit.UnitType != UnitType.AirUnit)
+                                {
+                                    errors.Add($"Airbase {unit.UnitName} has non-air unit {attachedUnit.UnitName} attached");
+                                }
+                            }
+                        }
+                    }
+
+                    // Check for inconsistent leader assignment flags
+                    if (unit.IsLeaderAssigned && unit.CommandingOfficer == null)
+                    {
+                        errors.Add($"Unit {unit.UnitName} has IsLeaderAssigned=true but no CommandingOfficer");
+                    }
+                    else if (!unit.IsLeaderAssigned && unit.CommandingOfficer != null)
+                    {
+                        errors.Add($"Unit {unit.UnitName} has CommandingOfficer but IsLeaderAssigned=false");
                     }
                 }
 
-                // Add more validation checks as needed...
+                // Validate profile references
+                foreach (var unit in _combatUnits.Values)
+                {
+                    if (unit.DeployedProfile == null)
+                    {
+                        errors.Add($"Unit {unit.UnitName} has null DeployedProfile");
+                    }
+
+                    if (unit.ActiveProfile == null)
+                    {
+                        errors.Add($"Unit {unit.UnitName} has null ActiveProfile");
+                    }
+
+                    if (unit.UnitProfile == null)
+                    {
+                        errors.Add($"Unit {unit.UnitName} has null UnitProfile");
+                    }
+                }
 
             }
             catch (Exception e)
@@ -763,13 +857,14 @@ namespace HammerAndSickle.Models
                 }
 
                 // Create header with metadata
+                int facilityCount = _combatUnits.Values.Count(unit => unit.IsBase);
                 var header = new GameDataHeader
                 {
                     CombatUnitCount = _combatUnits.Count,
                     LeaderCount = _leaders.Count,
                     WeaponProfileCount = _weaponProfiles.Count,
                     UnitProfileCount = _unitProfiles.Count,
-                    // Calculate simple checksum (can be enhanced)
+                    FacilityCount = facilityCount,
                     Checksum = CalculateChecksum()
                 };
 
@@ -866,6 +961,14 @@ namespace HammerAndSickle.Models
                         {
                             _unresolvedObjects.Add(resolvable);
                         }
+
+                        // Also track FacilityManager if it has unresolved references
+                        if (kvp.Value.FacilityManager != null &&
+                            kvp.Value.FacilityManager is IResolvableReferences facilityResolvable &&
+                            facilityResolvable.HasUnresolvedReferences())
+                        {
+                            _unresolvedObjects.Add(facilityResolvable);
+                        }
                     }
 
                     foreach (var kvp in leaders)
@@ -884,10 +987,12 @@ namespace HammerAndSickle.Models
                         _unitProfiles[kvp.Key] = kvp.Value;
 
                     // Validate loaded data counts match header
+                    int loadedFacilityCount = _combatUnits.Values.Count(unit => unit.IsBase);
                     if (_combatUnits.Count != header.CombatUnitCount ||
                         _leaders.Count != header.LeaderCount ||
                         _weaponProfiles.Count != header.WeaponProfileCount ||
-                        _unitProfiles.Count != header.UnitProfileCount)
+                        _unitProfiles.Count != header.UnitProfileCount ||
+                        (header.FacilityCount > 0 && loadedFacilityCount != header.FacilityCount))
                     {
                         AppService.HandleException(CLASS_NAME, nameof(LoadGameState),
                             new InvalidDataException("Loaded object counts do not match header metadata"));
@@ -1069,13 +1174,29 @@ namespace HammerAndSickle.Models
         {
             try
             {
-                //TODO: Fix this
-                // Simple checksum based on object counts and a few key values
                 int checksum = _combatUnits.Count * 17 + _leaders.Count * 23 +
-                              _weaponProfiles.Count * 31 + _unitProfiles.Count * 37 +
-                              0;
+                              _weaponProfiles.Count * 31 + _unitProfiles.Count * 37;
 
-                return checksum.ToString("X8");
+                // Add facility count
+                int facilityCount = _combatUnits.Values.Count(unit => unit.IsBase);
+                checksum += facilityCount * 41;
+
+                // Add some key data points for additional validation
+                foreach (var unit in _combatUnits.Values)
+                {
+                    checksum += unit.UnitName.GetHashCode() / 1000; // Prevent overflow
+                    if (unit.CommandingOfficer != null)
+                    {
+                        checksum += unit.CommandingOfficer.LeaderID.GetHashCode() / 1000;
+                    }
+                }
+
+                foreach (var leader in _leaders.Values)
+                {
+                    checksum += leader.Name.GetHashCode() / 1000;
+                }
+
+                return Math.Abs(checksum).ToString("X8");
             }
             catch (Exception e)
             {

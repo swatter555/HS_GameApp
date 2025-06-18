@@ -7,7 +7,7 @@ using System.Runtime.Serialization;
 namespace HammerAndSickle.Models
 {
     [Serializable]
-    public class FacilityManager : ISerializable
+    public class FacilityManager : ISerializable, IResolvableReferences
     {
         #region Constants
 
@@ -151,6 +151,33 @@ namespace HammerAndSickle.Models
         }
 
         #endregion // Constructors
+
+
+        #region Helpers
+
+        /// <summary>
+        /// Set the parent CombatUnit.
+        /// </summary>
+        /// <param name="parent"></param>
+        internal void SetParent(CombatUnit parent)
+        {
+            try
+            {
+                if (parent == null)
+                {
+                    throw new ArgumentNullException(nameof(parent), "Parent combat unit cannot be null");
+                }
+
+                _parent = parent;
+            }
+            catch (Exception e)
+            {
+                AppService.HandleException(CLASS_NAME, "SetParent", e);
+                throw;
+            }
+        }
+
+        #endregion // Helpers
 
 
         #region Base Damage and Operational Capacity Management
@@ -1159,7 +1186,7 @@ namespace HammerAndSickle.Models
         /// </summary>
         /// <param name="info">Serialization info containing saved data</param>
         /// <param name="context">Streaming context for deserialization</param>
-        protected FacilityManager(SerializationInfo info, StreamingContext context)
+        internal FacilityManager(SerializationInfo info, StreamingContext context)
         {
             try
             {
@@ -1167,27 +1194,27 @@ namespace HammerAndSickle.Models
                 _airUnitsAttached = new List<CombatUnit>();
                 _attachedUnitIDs = new List<string>();
 
-                // Parent will be set when this facility is attached to a CombatUnit
+                // Parent will be set by CombatUnit when ResolveReferences is called
                 _parent = null;
 
-                // Load common properties
-                BaseDamage = info.GetInt32(nameof(BaseDamage));
-                OperationalCapacity = (OperationalCapacity)info.GetValue(nameof(OperationalCapacity), typeof(OperationalCapacity));
-                FacilityType = (FacilityType)info.GetValue(nameof(FacilityType), typeof(FacilityType));
+                // Load common properties with FM_ prefix to match serialization
+                BaseDamage = info.GetInt32("FM_" + nameof(BaseDamage));
+                OperationalCapacity = (OperationalCapacity)info.GetValue("FM_" + nameof(OperationalCapacity), typeof(OperationalCapacity));
+                FacilityType = (FacilityType)info.GetValue("FM_" + nameof(FacilityType), typeof(FacilityType));
 
-                // Load supply depot properties
-                DepotSize = (DepotSize)info.GetValue(nameof(DepotSize), typeof(DepotSize));
-                StockpileInDays = info.GetSingle(nameof(StockpileInDays));
-                GenerationRate = (SupplyGenerationRate)info.GetValue(nameof(GenerationRate), typeof(SupplyGenerationRate));
-                SupplyProjection = (SupplyProjection)info.GetValue(nameof(SupplyProjection), typeof(SupplyProjection));
-                SupplyPenetration = info.GetBoolean(nameof(SupplyPenetration));
-                DepotCategory = (DepotCategory)info.GetValue(nameof(DepotCategory), typeof(DepotCategory));
+                // Load supply depot properties with FM_ prefix
+                DepotSize = (DepotSize)info.GetValue("FM_" + nameof(DepotSize), typeof(DepotSize));
+                StockpileInDays = info.GetSingle("FM_" + nameof(StockpileInDays));
+                GenerationRate = (SupplyGenerationRate)info.GetValue("FM_" + nameof(GenerationRate), typeof(SupplyGenerationRate));
+                SupplyProjection = (SupplyProjection)info.GetValue("FM_" + nameof(SupplyProjection), typeof(SupplyProjection));
+                SupplyPenetration = info.GetBoolean("FM_" + nameof(SupplyPenetration));
+                DepotCategory = (DepotCategory)info.GetValue("FM_" + nameof(DepotCategory), typeof(DepotCategory));
 
                 // Load air unit attachments for later resolution
-                int airUnitCount = info.GetInt32("AirUnitCount");
+                int airUnitCount = info.GetInt32("FM_AirUnitCount");
                 for (int i = 0; i < airUnitCount; i++)
                 {
-                    string unitID = info.GetString($"AirUnitID_{i}");
+                    string unitID = info.GetString($"FM_AirUnitID_{i}");
                     if (!string.IsNullOrEmpty(unitID))
                     {
                         _attachedUnitIDs.Add(unitID);
@@ -1218,27 +1245,27 @@ namespace HammerAndSickle.Models
         {
             try
             {
-                // Serialize common properties
-                info.AddValue(nameof(BaseDamage), BaseDamage);
-                info.AddValue(nameof(OperationalCapacity), OperationalCapacity);
-                info.AddValue(nameof(FacilityType), FacilityType);
+                // Serialize common properties with FM_ prefix to avoid naming conflicts
+                info.AddValue("FM_" + nameof(BaseDamage), BaseDamage);
+                info.AddValue("FM_" + nameof(OperationalCapacity), OperationalCapacity);
+                info.AddValue("FM_" + nameof(FacilityType), FacilityType);
 
-                // Serialize supply depot properties
-                info.AddValue(nameof(DepotSize), DepotSize);
-                info.AddValue(nameof(StockpileInDays), StockpileInDays);
-                info.AddValue(nameof(GenerationRate), GenerationRate);
-                info.AddValue(nameof(SupplyProjection), SupplyProjection);
-                info.AddValue(nameof(SupplyPenetration), SupplyPenetration);
-                info.AddValue(nameof(DepotCategory), DepotCategory);
+                // Serialize supply depot properties with FM_ prefix
+                info.AddValue("FM_" + nameof(DepotSize), DepotSize);
+                info.AddValue("FM_" + nameof(StockpileInDays), StockpileInDays);
+                info.AddValue("FM_" + nameof(GenerationRate), GenerationRate);
+                info.AddValue("FM_" + nameof(SupplyProjection), SupplyProjection);
+                info.AddValue("FM_" + nameof(SupplyPenetration), SupplyPenetration);
+                info.AddValue("FM_" + nameof(DepotCategory), DepotCategory);
 
-                // Serialize air unit attachments as Unit IDs to avoid circular references
-                info.AddValue("AirUnitCount", _airUnitsAttached.Count);
+                // Serialize air unit attachments as Unit IDs with FM_ prefix to avoid circular references
+                info.AddValue("FM_AirUnitCount", _airUnitsAttached.Count);
                 for (int i = 0; i < _airUnitsAttached.Count; i++)
                 {
-                    info.AddValue($"AirUnitID_{i}", _airUnitsAttached[i].UnitID);
+                    info.AddValue($"FM_AirUnitID_{i}", _airUnitsAttached[i].UnitID);
                 }
 
-                // Note: Parent CombatUnit is NOT serialized - it will be set when facility is attached
+                // Note: Parent CombatUnit is NOT serialized - it will be set by CombatUnit during ResolveReferences
             }
             catch (Exception e)
             {
@@ -1250,33 +1277,34 @@ namespace HammerAndSickle.Models
         #endregion // ISerializable Implementation
 
 
-        #region Reference Resolution Support
+        #region IResolvableReferences Implementation
 
         /// <summary>
         /// Checks if there are unresolved unit references that need to be resolved.
         /// </summary>
-        /// <returns>True if ResolveUnitReferences() needs to be called</returns>
+        /// <returns>True if ResolveReferences() needs to be called</returns>
         public bool HasUnresolvedReferences()
         {
             return _attachedUnitIDs.Count > 0;
         }
 
         /// <summary>
-        /// Gets the list of unresolved unit IDs from deserialization.
-        /// Used to check which air units need to be reconnected.
+        /// Gets the list of unresolved reference IDs that need to be resolved.
+        /// Implements IResolvableReferences interface.
         /// </summary>
-        /// <returns>Read-only list of unit IDs that need resolution</returns>
-        public IReadOnlyList<string> GetUnresolvedUnitIDs()
+        /// <returns>Collection of object IDs that this object references</returns>
+        public IReadOnlyList<string> GetUnresolvedReferenceIDs()
         {
-            return _attachedUnitIDs.AsReadOnly();
+            return _attachedUnitIDs.Select(unitID => $"FM_AirUnit:{unitID}").ToList().AsReadOnly();
         }
 
         /// <summary>
-        /// Resolves unit references after deserialization.
-        /// Called by game state manager with reconstructed unit objects.
+        /// Resolves object references using the provided data manager.
+        /// Called after all objects have been deserialized.
+        /// Implements IResolvableReferences interface.
         /// </summary>
-        /// <param name="unitLookup">Dictionary mapping unit IDs to CombatUnit instances</param>
-        public void ResolveUnitReferences(Dictionary<string, CombatUnit> unitLookup)
+        /// <param name="manager">Game data manager containing all loaded objects</param>
+        public void ResolveReferences(GameDataManager manager)
         {
             try
             {
@@ -1284,7 +1312,8 @@ namespace HammerAndSickle.Models
 
                 foreach (string unitID in _attachedUnitIDs)
                 {
-                    if (unitLookup.TryGetValue(unitID, out CombatUnit unit))
+                    var unit = manager.GetCombatUnit(unitID);
+                    if (unit != null)
                     {
                         if (unit.UnitType == UnitType.AirUnit)
                         {
@@ -1293,7 +1322,7 @@ namespace HammerAndSickle.Models
                         else
                         {
                             // Log warning about incorrect unit type but don't throw
-                            AppService.HandleException(CLASS_NAME, "ResolveUnitReferences",
+                            AppService.HandleException(CLASS_NAME, "ResolveReferences",
                                 new InvalidOperationException($"Unit {unitID} is not an air unit (Type: {unit.UnitType})"),
                                 ExceptionSeverity.Minor);
                         }
@@ -1301,8 +1330,8 @@ namespace HammerAndSickle.Models
                     else
                     {
                         // Log warning about missing unit but don't throw
-                        AppService.HandleException(CLASS_NAME, "ResolveUnitReferences",
-                            new KeyNotFoundException($"Unit {unitID} not found in lookup dictionary"),
+                        AppService.HandleException(CLASS_NAME, "ResolveReferences",
+                            new KeyNotFoundException($"Unit {unitID} not found in game data manager"),
                             ExceptionSeverity.Minor);
                     }
                 }
@@ -1311,31 +1340,11 @@ namespace HammerAndSickle.Models
             }
             catch (Exception e)
             {
-                AppService.HandleException(CLASS_NAME, "ResolveUnitReferences", e);
+                AppService.HandleException(CLASS_NAME, "ResolveReferences", e);
             }
         }
 
-        /// <summary>
-        /// Sets the parent CombatUnit reference after deserialization or cloning.
-        /// This method should only be called by CombatUnit when attaching this facility.
-        /// </summary>
-        /// <param name="parent">The parent CombatUnit that owns this facility</param>
-        internal void SetParent(CombatUnit parent)
-        {
-            _parent = parent ?? throw new ArgumentNullException(nameof(parent));
-        }
-
-        /// <summary>
-        /// Gets the list of attached unit IDs for external reference resolution.
-        /// Used by game state manager to understand facility dependencies.
-        /// </summary>
-        /// <returns>Read-only list of currently attached air unit IDs</returns>
-        public IReadOnlyList<string> GetAttachedUnitIDs()
-        {
-            return _airUnitsAttached.Select(u => u.UnitID).ToList().AsReadOnly();
-        }
-
-        #endregion // Reference Resolution Support
+        #endregion // IResolvableReferences Implementation
 
 
         #region Cloning Support
