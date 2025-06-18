@@ -153,33 +153,6 @@ namespace HammerAndSickle.Models
         #endregion // Constructors
 
 
-        #region Helpers
-
-        /// <summary>
-        /// Set the parent CombatUnit.
-        /// </summary>
-        /// <param name="parent"></param>
-        internal void SetParent(CombatUnit parent)
-        {
-            try
-            {
-                if (parent == null)
-                {
-                    throw new ArgumentNullException(nameof(parent), "Parent combat unit cannot be null");
-                }
-
-                _parent = parent;
-            }
-            catch (Exception e)
-            {
-                AppService.HandleException(CLASS_NAME, "SetParent", e);
-                throw;
-            }
-        }
-
-        #endregion // Helpers
-
-
         #region Base Damage and Operational Capacity Management
 
         /// <summary>
@@ -375,6 +348,12 @@ namespace HammerAndSickle.Models
         {
             try
             {
+                // Validate parent consistency first
+                if (!ValidateParentConsistency())
+                {
+                    throw new InvalidOperationException("Invalid parent relationship detected");
+                }
+
                 // Make sure it's the proper base type.
                 if (FacilityType != FacilityType.Airbase)
                 {
@@ -1179,6 +1158,53 @@ namespace HammerAndSickle.Models
         #endregion // Supply Management Methods
 
 
+        #region Helpers
+
+        /// <summary>
+        /// Set the parent CombatUnit.
+        /// </summary>
+        /// <param name="parent"></param>
+        internal void SetParent(CombatUnit parent)
+        {
+            try
+            {
+                if (parent == null)
+                {
+                    throw new ArgumentNullException(nameof(parent), "Parent combat unit cannot be null");
+                }
+
+                _parent = parent;
+            }
+            catch (Exception e)
+            {
+                AppService.HandleException(CLASS_NAME, "SetParent", e);
+                throw;
+            }
+        }
+
+        /// <summary>
+        /// Validates that the parent relationship is consistent.
+        /// </summary>
+        /// <returns>True if parent relationship is valid</returns>
+        private bool ValidateParentConsistency()
+        {
+            if (_parent == null) return false;
+
+            // Check if parent's FacilityManager points back to this instance
+            if (_parent.FacilityManager != this)
+            {
+                AppService.HandleException(CLASS_NAME, "ValidateParentConsistency",
+                    new InvalidOperationException($"Parent unit {_parent.UnitID} does not reference this FacilityManager"),
+                    ExceptionSeverity.Minor);
+                return false;
+            }
+
+            return true;
+        }
+
+        #endregion // Helpers
+
+
         #region Serialization Constructor
 
         /// <summary>
@@ -1350,11 +1376,10 @@ namespace HammerAndSickle.Models
         #region Cloning Support
 
         /// <summary>
-        /// Creates a deep copy of this FacilityManager.
-        /// The clone will have the same properties but no parent or attached units.
-        /// Parent must be set separately when attaching to a CombatUnit.
+        /// Creates a clean template copy of this FacilityManager with no attachments.
+        /// This method is specifically for cloning unit templates during scenario creation.
         /// </summary>
-        /// <returns>A new FacilityManager with copied properties</returns>
+        /// <returns>A new FacilityManager with copied properties but no parent or attachments</returns>
         public FacilityManager Clone()
         {
             try
@@ -1374,15 +1399,16 @@ namespace HammerAndSickle.Models
                 clone.SupplyPenetration = this.SupplyPenetration;
                 clone.DepotCategory = this.DepotCategory;
 
-                // Note: Parent and air unit attachments are NOT cloned
-                // Parent will be set when facility is attached to a new CombatUnit
-                // Air units should be managed separately and reattached if needed
+                // NOTE: Parent and air unit attachments are NEVER cloned for templates
+                // Templates should be clean and ready for fresh assignments
+                // _parent will be set when facility is attached to a new CombatUnit
+                // _airUnitsAttached remains empty - no air units should be attached to templates
 
                 return clone;
             }
             catch (Exception e)
             {
-                AppService.HandleException(CLASS_NAME, "Clone", e);
+                AppService.HandleException(CLASS_NAME, "CloneAsTemplate", e);
                 throw;
             }
         }

@@ -150,9 +150,7 @@ namespace HammerAndSickle.Models
         private string unresolvedDeployedProfileID = "";
         private string unresolvedMountedProfileID = "";
         private string unresolvedUnitProfileID = "";
-        private string unresolvedLandBaseProfileID = "";
         private string unresolvedLeaderID = "";
-        private string unresolvedActiveProfileID = "";
         private bool unresolvedFacilityManagerData = false;
 
         #endregion // Fields
@@ -174,7 +172,7 @@ namespace HammerAndSickle.Models
         // Profiles contain unit stats and capabilities.
         public WeaponSystemProfile DeployedProfile { get; private set; }
         public WeaponSystemProfile MountedProfile { get; private set; }
-        public WeaponSystemProfile ActiveProfile { get; private set; }
+        //public WeaponSystemProfile ActiveProfile { get; private set; }
         public UnitProfile UnitProfile { get; private set; }
         public FacilityManager FacilityManager { get; internal set; }
 
@@ -190,8 +188,8 @@ namespace HammerAndSickle.Models
         public StatsMaxCurrent IntelActions { get; private set; }
 
         // State data using StatsMaxCurrent where appropriate
-        public int ExperiencePoints { get; private set; }
-        public ExperienceLevel ExperienceLevel { get; private set; }
+        public int ExperiencePoints { get; internal set; }
+        public ExperienceLevel ExperienceLevel { get; internal set; }
         public EfficiencyLevel EfficiencyLevel { get; internal set; }
         public bool IsMounted { get; internal set; }
         public CombatState CombatState { get; internal set; }
@@ -200,9 +198,6 @@ namespace HammerAndSickle.Models
         public StatsMaxCurrent MovementPoints { get; private set; }
         public Vector2 MapPos { get; internal set; }
         public SpottedLevel SpottedLevel { get; private set; }
-
-        // TODO: Implement
-        public List<Vector2> MovementHistoryLastTurn { get; private set; } = new List<Vector2>();
 
         #endregion
 
@@ -264,7 +259,7 @@ namespace HammerAndSickle.Models
                 // Set profiles
                 DeployedProfile = deployedProfile;
                 MountedProfile = mountedProfile;
-                ActiveProfile = deployedProfile; // Default to deployed profile
+                //ActiveProfile = deployedProfile; // Default to deployed profile
                 UnitProfile = unitProfile;
 
                 // If this is a base unit, initialize the proper facility.
@@ -347,9 +342,7 @@ namespace HammerAndSickle.Models
                 unresolvedDeployedProfileID = info.GetString("DeployedProfileID");
                 unresolvedMountedProfileID = info.GetString("MountedProfileID");
                 unresolvedUnitProfileID = info.GetString("UnitProfileID");
-                unresolvedLandBaseProfileID = info.GetString("LandBaseFacilityID");
                 unresolvedLeaderID = info.GetString("LeaderID");
-                unresolvedActiveProfileID = info.GetString("ActiveProfileID");
 
                 // Deserialize owned StatsMaxCurrent objects
                 HitPoints = new StatsMaxCurrent(
@@ -609,6 +602,17 @@ namespace HammerAndSickle.Models
         }
 
         /// <summary>
+        /// Retrieves the active weapon system profile based on the current mounted state.
+        /// </summary>
+        /// <returns>The active <see cref="WeaponSystemProfile"/>. Returns the <see cref="MountedProfile"/> if the system is
+        /// mounted; otherwise, returns the <see cref="DeployedProfile"/>.</returns>
+        public WeaponSystemProfile GetActiveWeaponSystemProfile()
+        {
+            // Return the active profile based on mounted state
+            return IsMounted ? MountedProfile : DeployedProfile;
+        }
+
+        /// <summary>
         /// Get the adjusted combat strength based on current mounted state and all applicable modifiers.
         /// </summary>
         /// <returns>Modified values for current profile</returns>
@@ -616,12 +620,8 @@ namespace HammerAndSickle.Models
         {
             try
             {
-                // Sanity check.
-                if (ActiveProfile == null)
-                    throw new InvalidOperationException("Active profile is not set.");
-
                 // Clone the active profile.
-                WeaponSystemProfile combatProfile = ActiveProfile.Clone();
+                WeaponSystemProfile combatProfile = GetActiveWeaponSystemProfile().Clone();
 
                 // Compute all modifiers that can effect a combat rating.
                 float finalModifier = GetFinalCombatRatingModifier();
@@ -2329,21 +2329,21 @@ namespace HammerAndSickle.Models
         {
             try
             {
-                // Sanity check.
-                if ((IsMounted && MountedProfile == null) || DeployedProfile == null)
-                    throw new InvalidOperationException("Cannot update state with null profiles.");
+                // Validate BEFORE making any changes
+                if (DeployedProfile == null)
+                    throw new InvalidOperationException("Cannot update state: DeployedProfile is null");
+
+                if (state == CombatState.Mobile && IsMounted && MountedProfile == null)
+                    throw new InvalidOperationException("Cannot update state: Unit is mounted but MountedProfile is null");
 
                 // Start with CombatState.Mobile.
                 if (state == CombatState.Mobile)
                 {
-                    // Check for a mounted profile.
+                    // Check for a mounted profile first
                     if (MountedProfile != null)
                     {
-                        // If we are not already mounted, mount now.
-                        if (!IsMounted) IsMounted = true; // Set mounted state
-
-                        // Set active profile to the mounted one.
-                        ActiveProfile = MountedProfile; // Switch to mounted profile
+                        // Unit can physically mount - set mounted state
+                        if (!IsMounted) IsMounted = true;
                     }
                     else
                     {
@@ -2356,21 +2356,18 @@ namespace HammerAndSickle.Models
                         MovementPoints.SetMax(newMaxMovement);
                         MovementPoints.SetCurrent(newMaxMovement * currentPercentage);
 
-                        // Set active profile to deployed profile.
-                        ActiveProfile = DeployedProfile;
+                        // Unit is not mounted but gets movement bonus
+                        IsMounted = false;
                     }
                 }
                 // Handle other states with deployed profile and unmounted.
                 else
                 {
-                    // Unmount unit.
+                    // CombatState might have changed downwards, therefore dismount if mounted.
                     if (IsMounted) IsMounted = false;
 
                     // Remove movement bonus -revert to base movement
                     InitializeMovementPoints();
-
-                    // Set the deployed profile as active.
-                    ActiveProfile = DeployedProfile;
                 }
             }
             catch (Exception e)
@@ -2425,7 +2422,6 @@ namespace HammerAndSickle.Models
                 );
 
                 // Deep copy all StatsMaxCurrent objects by reconstructing them
-                // This overwrites the default values set by the constructor
                 clone.HitPoints = new StatsMaxCurrent(this.HitPoints.Max, this.HitPoints.Current);
                 clone.DaysSupply = new StatsMaxCurrent(this.DaysSupply.Max, this.DaysSupply.Current);
                 clone.MovementPoints = new StatsMaxCurrent(this.MovementPoints.Max, this.MovementPoints.Current);
@@ -2436,31 +2432,18 @@ namespace HammerAndSickle.Models
                 clone.IntelActions = new StatsMaxCurrent(this.IntelActions.Max, this.IntelActions.Current);
 
                 // Copy per-unit state data
-                clone.SetExperience(this.ExperiencePoints); // This also sets ExperienceLevel correctly
+                clone.SetExperience(this.ExperiencePoints);
+                clone.EfficiencyLevel = this.EfficiencyLevel;
+                clone.IsMounted = this.IsMounted;
+                clone.CombatState = this.CombatState;
+                clone.MapPos = this.MapPos;
+                clone.SpottedLevel = this.SpottedLevel;
 
-                // Copy properties with private setters using reflection
-                var cloneType = typeof(CombatUnit);
+                // NOTE: CommandingOfficer and IsLeaderAssigned are NOT copied
+                // Templates should never have leaders assigned
+                // Leaders must be assigned manually after cloning
 
-                // Copy CommandingOfficer (shared reference)
-                cloneType.GetProperty("CommandingOfficer")
-                    ?.SetValue(clone, this.CommandingOfficer);
-                clone.IsLeaderAssigned = this.IsLeaderAssigned;
-
-                // Copy state properties
-                cloneType.GetProperty("EfficiencyLevel")
-                    ?.SetValue(clone, this.EfficiencyLevel);
-                cloneType.GetProperty("IsMounted")
-                    ?.SetValue(clone, this.IsMounted);
-                cloneType.GetProperty("CombatState")
-                    ?.SetValue(clone, this.CombatState);
-                cloneType.GetProperty("MapPos")
-                    ?.SetValue(clone, this.MapPos);
-                cloneType.GetProperty("ActiveProfile")
-                    ?.SetValue(clone, this.ActiveProfile);
-                cloneType.GetProperty("SpottedLevel")
-                    ?.SetValue(clone, this.SpottedLevel);
-
-                // Clone FacilityManager properly
+                // Clone FacilityManager for base units
                 if (this.FacilityManager != null)
                 {
                     var clonedFacilityManager = this.FacilityManager.Clone();
@@ -2478,6 +2461,7 @@ namespace HammerAndSickle.Models
                                 break;
                             case UnitClassification.AIRB:
                                 clonedFacilityManager.SetupAirbase(clone);
+                                // Air unit attachments are never cloned - templates should be empty
                                 break;
                             default:
                                 clonedFacilityManager.SetParent(clone);
@@ -2489,9 +2473,11 @@ namespace HammerAndSickle.Models
                         clonedFacilityManager.SetParent(clone);
                     }
 
-                    // Set the cloned facility manager
                     clone.FacilityManager = clonedFacilityManager;
                 }
+
+                // Copy properties with private setters using reflection
+                var cloneType = typeof(CombatUnit);
 
                 // Copy unresolved reference fields (should be empty in normal cloning scenarios)
                 cloneType.GetField("unresolvedDeployedProfileID", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance)
@@ -2500,19 +2486,6 @@ namespace HammerAndSickle.Models
                     ?.SetValue(clone, this.unresolvedMountedProfileID);
                 cloneType.GetField("unresolvedUnitProfileID", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance)
                     ?.SetValue(clone, this.unresolvedUnitProfileID);
-                cloneType.GetField("unresolvedLandBaseProfileID", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance)
-                    ?.SetValue(clone, this.unresolvedLandBaseProfileID);
-                cloneType.GetField("unresolvedLeaderID", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance)
-                    ?.SetValue(clone, this.unresolvedLeaderID);
-                cloneType.GetField("unresolvedActiveProfileID", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance)
-                    ?.SetValue(clone, this.unresolvedActiveProfileID);
-
-                // Important: Don't copy the LandBaseFacility reference for non-land-base units
-                // The clone should start unattached to any base
-                if (!clone.IsBase)
-                {
-                    clone.CommandingOfficer = null; // Will need to be reassigned
-                }
 
                 return clone;
             }
@@ -2555,7 +2528,6 @@ namespace HammerAndSickle.Models
                 info.AddValue("MountedProfileID", MountedProfile?.WeaponSystemID ?? "");
                 info.AddValue("UnitProfileID", UnitProfile?.UnitProfileID ?? "");
                 info.AddValue("LeaderID", CommandingOfficer?.LeaderID ?? "");
-                info.AddValue("ActiveProfileID", ActiveProfile?.WeaponSystemID ?? "");
 
                 // Serialize owned StatsMaxCurrent objects as Max/Current pairs
                 info.AddValue("HitPoints_Max", HitPoints.Max);
@@ -2609,9 +2581,7 @@ namespace HammerAndSickle.Models
             bool hasUnresolved = !string.IsNullOrEmpty(unresolvedDeployedProfileID) ||
                 !string.IsNullOrEmpty(unresolvedMountedProfileID) ||
                 !string.IsNullOrEmpty(unresolvedUnitProfileID) ||
-                !string.IsNullOrEmpty(unresolvedLandBaseProfileID) ||
                 !string.IsNullOrEmpty(unresolvedLeaderID) ||
-                !string.IsNullOrEmpty(unresolvedActiveProfileID) ||
                 unresolvedFacilityManagerData;
 
             // Also check if FacilityManager has unresolved references
@@ -2645,14 +2615,8 @@ namespace HammerAndSickle.Models
             if (!string.IsNullOrEmpty(unresolvedUnitProfileID))
                 unresolvedIDs.Add($"UnitProfile:{unresolvedUnitProfileID}");
 
-            if (!string.IsNullOrEmpty(unresolvedLandBaseProfileID))
-                unresolvedIDs.Add($"LandBase:{unresolvedLandBaseProfileID}");
-
             if (!string.IsNullOrEmpty(unresolvedLeaderID))
                 unresolvedIDs.Add($"Leader:{unresolvedLeaderID}");
-
-            if (!string.IsNullOrEmpty(unresolvedActiveProfileID))
-                unresolvedIDs.Add($"ActiveProfile:{unresolvedActiveProfileID}");
 
             if (unresolvedFacilityManagerData)
                 unresolvedIDs.Add("FacilityManager:SelfReferencedData");
@@ -2676,8 +2640,6 @@ namespace HammerAndSickle.Models
         {
             try
             {
-                bool activeProfileWasResolved = false;
-
                 // Resolve WeaponSystemProfile references
                 if (!string.IsNullOrEmpty(unresolvedDeployedProfileID))
                 {
@@ -2778,41 +2740,6 @@ namespace HammerAndSickle.Models
                         new InvalidDataException($"Unit {UnitID} has IsLeaderAssigned=true but no leader ID"),
                         ExceptionSeverity.Minor);
                     IsLeaderAssigned = false; // Fix the inconsistency
-                }
-
-                // Resolve ActiveProfile reference
-                if (!string.IsNullOrEmpty(unresolvedActiveProfileID))
-                {
-                    if (Enum.TryParse<WeaponSystems>(unresolvedActiveProfileID, out WeaponSystems activeWeapon))
-                    {
-                        var activeProfile = manager.GetWeaponProfile(activeWeapon, Nationality);
-                        if (activeProfile != null)
-                        {
-                            ActiveProfile = activeProfile;
-                            unresolvedActiveProfileID = "";
-                            activeProfileWasResolved = true; // Track successful resolution
-                        }
-                        else
-                        {
-                            AppService.HandleException(CLASS_NAME, "ResolveReferences",
-                                new KeyNotFoundException($"Active profile {activeWeapon}_{Nationality} not found"));
-                        }
-                    }
-                    else
-                    {
-                        AppService.HandleException(CLASS_NAME, "ResolveReferences",
-                            new ArgumentException($"Invalid weapon system ID: {unresolvedActiveProfileID}"));
-                    }
-                }
-
-                // Only recompute ActiveProfile if it wasn't explicitly resolved from save data
-                // This preserves the exact saved state while handling cases where ActiveProfile wasn't saved
-                // or when we have the core profiles needed to recompute it
-                if (!activeProfileWasResolved &&
-                    string.IsNullOrEmpty(unresolvedDeployedProfileID) &&
-                    string.IsNullOrEmpty(unresolvedMountedProfileID))
-                {
-                    UpdateStateAndProfiles(CombatState);
                 }
 
                 // Re-establish FacilityManager parent relationship after both objects are loaded
