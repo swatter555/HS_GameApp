@@ -238,9 +238,9 @@ namespace HammerAndSickle.Models
         public const int COMMAND_CLAMP_MAX = 0;          // Maximum CommandAbility value
 
 
-        //=======================
-        //====== LandBases ======
-        //=======================
+        //===================
+        //====== Bases ======
+        //===================
 
         // Maximum stockpile capacities by depot size
         public static readonly Dictionary<DepotSize, float> MaxStockpileBySize = new()
@@ -291,5 +291,8 @@ namespace HammerAndSickle.Models
         // Base damage constants
         public const int MAX_DAMAGE = 100;
         public const int MIN_DAMAGE = 0;
+
+        // Airbase constants
+        public const int MAX_AIR_UNITS = 4;        // Max air units that can be attached to an airbase.
     }
 }

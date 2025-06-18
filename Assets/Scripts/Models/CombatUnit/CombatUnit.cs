@@ -187,14 +187,14 @@ namespace HammerAndSickle.Models
         public Side Side { get; private set; }
         public Nationality Nationality { get; private set; }
         public bool IsTransportable { get; private set; }
-        public bool IsLandBase { get; private set; }
+        public bool IsBase { get; private set; }
 
         // Profiles contain unit stats and capabilities.
         public WeaponSystemProfile DeployedProfile { get; private set; }
         public WeaponSystemProfile MountedProfile { get; private set; }
         public WeaponSystemProfile ActiveProfile { get; private set; }
         public UnitProfile UnitProfile { get; private set; }
-        public LandBaseFacility LandBaseFacility { get; private set; }
+        public FacilityManager FacilityManager { get; private set; }
 
         // The unit's leader.
         public bool IsLeaderAssigned = false;
@@ -228,55 +228,6 @@ namespace HammerAndSickle.Models
         #region Constructors
 
         /// <summary>
-        /// Default constructor
-        /// </summary>
-        public CombatUnit()
-        {
-            // Set identification and metadata
-            UnitName = "default";
-            UnitID = Guid.NewGuid().ToString();
-            UnitType = UnitType.LandUnitDF;
-            Classification = UnitClassification.INF;
-            Role = UnitRole.GroundCombat;
-            Side = Side.Player;
-            Nationality = Nationality.USSR;
-            IsTransportable = true;
-            IsLandBase = false;
-            IsLeaderAssigned = false;
-
-            // Set profiles
-            DeployedProfile = null;
-            MountedProfile = null;
-            UnitProfile = null;
-            LandBaseFacility = null;
-            ActiveProfile = null;
-
-            // Initialize leader (will be null until assigned)
-            CommandingOfficer = null;
-
-            // Initialize action counts based on unit type and classification
-            InitializeActionCounts();
-
-            // Initialize state with default values
-            ExperiencePoints = 0;
-            ExperienceLevel = ExperienceLevel.Raw;
-            EfficiencyLevel = EfficiencyLevel.FullyOperational;
-            IsMounted = false;
-            CombatState = CombatState.Deployed;
-            SpottedLevel = SpottedLevel.Level1;
-
-            // Initialize StatsMaxCurrent properties
-            HitPoints = new StatsMaxCurrent(CUConstants.MAX_HP);
-            DaysSupply = new StatsMaxCurrent(CUConstants.MaxDaysSupplyUnit);
-
-            // Initialize movement based on unit classification
-            InitializeMovementPoints();
-
-            // Initialize position to origin (will be set when placed on map)
-            MapPos = Vector2.zero;
-        }
-
-        /// <summary>
         /// Creates a new CombatUnit with the specified core properties.
         /// </summary>
         /// <param name="unitName">Display name of the unit</param>
@@ -289,8 +240,7 @@ namespace HammerAndSickle.Models
         /// <param name="mountedProfile">Combat profile when mounted (can be null)</param>
         /// <param name="unitProfile">Organizational profile for tracking losses</param>
         /// <param name="isTransportable">Whether this unit can be transported</param>
-        /// <param name="isLandBase">Whether this unit is a land-based facility</param>
-        /// <param name="landBaseProfile">Land base profile if applicable (can be null)</param>
+        /// <param name="isBase">Whether this unit is a land-based facility</param>
         public CombatUnit(
             string unitName,
             UnitType unitType,
@@ -302,8 +252,9 @@ namespace HammerAndSickle.Models
             WeaponSystemProfile mountedProfile,
             UnitProfile unitProfile,
             bool isTransportable,
-            bool isLandBase = false,
-            LandBaseFacility landBaseProfile = null)
+            bool isBase = false,
+            DepotCategory category = DepotCategory.Secondary,
+            DepotSize size = DepotSize.Small)
         {
             try
             {
@@ -317,10 +268,6 @@ namespace HammerAndSickle.Models
                 if (unitProfile == null)
                     throw new ArgumentNullException(nameof(unitProfile), "Unit profile is required");
 
-                // Validate land base requirements
-                if (isLandBase && landBaseProfile == null)
-                    throw new ArgumentException("Land base profile is required when isLandBase is true", nameof(landBaseProfile));
-
                 // Set identification and metadata
                 UnitName = unitName;
                 UnitID = Guid.NewGuid().ToString();
@@ -330,7 +277,6 @@ namespace HammerAndSickle.Models
                 Side = side;
                 Nationality = nationality;
                 IsTransportable = isTransportable;
-                IsLandBase = isLandBase;
                 IsLeaderAssigned = false; // Default to no leader assigned
 
                 // Set profiles
@@ -338,7 +284,31 @@ namespace HammerAndSickle.Models
                 MountedProfile = mountedProfile;
                 ActiveProfile = deployedProfile; // Default to deployed profile
                 UnitProfile = unitProfile;
-                LandBaseFacility = landBaseProfile;
+
+
+
+                // Preliminary base setup, even if this isn't a base unit
+                IsBase = isBase;
+                FacilityManager = new FacilityManager();
+
+                // If this is a base unit, initialize default facilities.
+                if (IsBase)
+                {
+                    switch (classification)
+                    {
+                        case UnitClassification.HQ:
+                            FacilityManager.SetupHQ(this);
+                            break;
+                        case UnitClassification.DEPOT:
+                            FacilityManager.SetupSupplyDepot(this, category, size);
+                            break;
+                        case UnitClassification.AIRB:
+                            FacilityManager.SetupAirbase(this);
+                            break;
+                        default:
+                            break;
+                    }
+                }
 
                 // Initialize leader (will be null until assigned)
                 CommandingOfficer = null;
@@ -389,7 +359,7 @@ namespace HammerAndSickle.Models
                 Side = (Side)info.GetValue(nameof(Side), typeof(Side));
                 Nationality = (Nationality)info.GetValue(nameof(Nationality), typeof(Nationality));
                 IsTransportable = info.GetBoolean(nameof(IsTransportable));
-                IsLandBase = info.GetBoolean(nameof(IsLandBase));
+                IsBase = info.GetBoolean(nameof(IsBase));
                 IsLeaderAssigned = info.GetBoolean(nameof(IsLeaderAssigned));
                 SpottedLevel = (SpottedLevel)info.GetValue(nameof(SpottedLevel), typeof(SpottedLevel));
                 
@@ -454,7 +424,6 @@ namespace HammerAndSickle.Models
                 DeployedProfile = null;
                 MountedProfile = null;
                 UnitProfile = null;
-                LandBaseFacility = null;
                 CommandingOfficer = null;
             }
             catch (Exception e)
@@ -1622,7 +1591,7 @@ namespace HammerAndSickle.Models
                     return false;
 
                 // Bases don't consume movement points for intel gathering
-                if (!IsLandBase)
+                if (!IsBase)
                 {
                     // Calculate and consume movement points first
                     float movementCost = GetIntelActionMovementCost();
@@ -1715,7 +1684,7 @@ namespace HammerAndSickle.Models
             }
 
             // Bases don't need movement points for intel gathering
-            if (IsLandBase)
+            if (IsBase)
             {
                 return true;
             }
@@ -2437,9 +2406,9 @@ namespace HammerAndSickle.Models
                     this.MountedProfile,       // Shared reference  
                     this.UnitProfile,          // Shared reference
                     this.IsTransportable,
-                    this.IsLandBase,
+                    this.IsBase
                     // Deep clone LandBaseFacility if this unit is not a land base itself
-                    this.IsLandBase ? this.LandBaseFacility : this.LandBaseFacility?.Clone()
+                    //this.IsBase ? this.FacilityManager : this.FacilityManager?.Clone()
                 )
                 {
                     // Deep copy all StatsMaxCurrent objects by reconstructing them
@@ -2495,7 +2464,7 @@ namespace HammerAndSickle.Models
 
                 // Important: Don't copy the LandBaseFacility reference for non-land-base units
                 // The clone should start unattached to any base
-                if (!clone.IsLandBase)
+                if (!clone.IsBase)
                 {
                     clone.CommandingOfficer = null; // Will need to be reassigned
                                                     // Note: LandBaseFacility reference handled in constructor above
@@ -2533,7 +2502,7 @@ namespace HammerAndSickle.Models
                 info.AddValue(nameof(Side), Side);
                 info.AddValue(nameof(Nationality), Nationality);
                 info.AddValue(nameof(IsTransportable), IsTransportable);
-                info.AddValue(nameof(IsLandBase), IsLandBase);
+                info.AddValue(nameof(IsBase), IsBase);
                 info.AddValue(nameof(IsLeaderAssigned), IsLeaderAssigned);
                 info.AddValue(nameof(SpottedLevel), SpottedLevel);
 
@@ -2541,7 +2510,6 @@ namespace HammerAndSickle.Models
                 info.AddValue("DeployedProfileID", DeployedProfile?.WeaponSystemID ?? "");
                 info.AddValue("MountedProfileID", MountedProfile?.WeaponSystemID ?? "");
                 info.AddValue("UnitProfileID", UnitProfile?.UnitProfileID ?? "");
-                info.AddValue("LandBaseFacilityID", LandBaseFacility?.BaseID ?? "");
                 info.AddValue("LeaderID", CommandingOfficer?.LeaderID ?? "");
                 info.AddValue("ActiveProfileID", ActiveProfile?.WeaponSystemID ?? "");
 
@@ -2700,22 +2668,6 @@ namespace HammerAndSickle.Models
                     }
                 }
 
-                // Resolve LandBaseFacility reference
-                if (!string.IsNullOrEmpty(unresolvedLandBaseProfileID))
-                {
-                    var landBase = manager.GetLandBase(unresolvedLandBaseProfileID);
-                    if (landBase != null)
-                    {
-                        LandBaseFacility = landBase;
-                        unresolvedLandBaseProfileID = "";
-                    }
-                    else
-                    {
-                        AppService.HandleException(CLASS_NAME, "ResolveReferences",
-                            new KeyNotFoundException($"Land base {unresolvedLandBaseProfileID} not found"));
-                    }
-                }
-
                 // Resolve Leader reference
                 if (!string.IsNullOrEmpty(unresolvedLeaderID))
                 {
@@ -2798,116 +2750,5 @@ namespace HammerAndSickle.Models
         }
 
         #endregion // IResolvableReferences
-
-
-        #region Debugging
-
-        /// <summary>
-        /// Configures the unit as an airbase with default settings for debugging purposes.
-        /// </summary>
-        /// <remarks>This method initializes the unit with predefined values, including its
-        /// identification,  metadata, profiles, and state. It sets the unit's type, classification, role, and other 
-        /// properties to represent an airbase. This method is intended for debugging scenarios and  should not be used
-        /// in production code.</remarks>
-        public void DebugSetupAirbase()
-        {
-            // Set identification and metadata
-            UnitName = "Airbase";
-            UnitID = Guid.NewGuid().ToString();
-            UnitType = UnitType.LandUnitDF;
-            Classification = UnitClassification.AIRB;
-            Role = UnitRole.GroundCombat;
-            Side = Side.Player;
-            Nationality = Nationality.USSR;
-            IsTransportable = false;
-            IsLandBase = true;
-            IsLeaderAssigned = false;
-
-            // Set profiles
-            DeployedProfile = null;
-            MountedProfile = null;
-            UnitProfile = null;
-            LandBaseFacility = new AirbaseFacility();
-            ActiveProfile = null;
-
-            // Initialize leader (will be null until assigned)
-            CommandingOfficer = null;
-
-            // Initialize action counts based on unit type and classification
-            InitializeActionCounts();
-
-            // Initialize state with default values
-            ExperiencePoints = 0;
-            ExperienceLevel = ExperienceLevel.Raw;
-            EfficiencyLevel = EfficiencyLevel.FullyOperational;
-            IsMounted = false;
-            CombatState = CombatState.Deployed;
-            SpottedLevel = SpottedLevel.Level1;
-
-            // Initialize StatsMaxCurrent properties
-            HitPoints = new StatsMaxCurrent(CUConstants.MAX_HP);
-            DaysSupply = new StatsMaxCurrent(CUConstants.MaxDaysSupplyUnit);
-
-            // Initialize movement based on unit classification
-            InitializeMovementPoints();
-
-            // Initialize position to origin (will be set when placed on map)
-            MapPos = Vector2.zero;
-        }
-
-        /// <summary>
-        /// Configures the unit as a supply depot with default settings for debugging purposes.
-        /// </summary>
-        /// <remarks>This method initializes the unit with predefined attributes, profiles, and state
-        /// values  specific to a supply depot. It sets up metadata, classification, and operational parameters, 
-        /// including supply capacity, combat state, and movement points. The unit is not assigned a  commanding officer
-        /// or a specific position on the map until further configuration.</remarks>
-        public void DebugSetupSupplyDepot()
-        {
-            // Set identification and metadata
-            UnitName = "Supply Depot";
-            UnitID = Guid.NewGuid().ToString();
-            UnitType = UnitType.LandUnitDF;
-            Classification = UnitClassification.DEPOT;
-            Role = UnitRole.GroundCombat;
-            Side = Side.Player;
-            Nationality = Nationality.USSR;
-            IsTransportable = false;
-            IsLandBase = true;
-            IsLeaderAssigned = false;
-
-            // Set profiles
-            DeployedProfile = null;
-            MountedProfile = null;
-            UnitProfile = null;
-            LandBaseFacility = new SupplyDepotFacility("SupplyDepot",Side.Player, DepotSize.Huge, true);
-            ActiveProfile = null;
-
-            // Initialize leader (will be null until assigned)
-            CommandingOfficer = null;
-
-            // Initialize action counts based on unit type and classification
-            InitializeActionCounts();
-
-            // Initialize state with default values
-            ExperiencePoints = 0;
-            ExperienceLevel = ExperienceLevel.Raw;
-            EfficiencyLevel = EfficiencyLevel.FullyOperational;
-            IsMounted = false;
-            CombatState = CombatState.Deployed;
-            SpottedLevel = SpottedLevel.Level1;
-
-            // Initialize StatsMaxCurrent properties
-            HitPoints = new StatsMaxCurrent(CUConstants.MAX_HP);
-            DaysSupply = new StatsMaxCurrent(CUConstants.MaxDaysSupplyUnit);
-
-            // Initialize movement based on unit classification
-            InitializeMovementPoints();
-
-            // Initialize position to origin (will be set when placed on map)
-            MapPos = Vector2.zero;
-        }
-
-            #endregion
-        }
+    }
 }
