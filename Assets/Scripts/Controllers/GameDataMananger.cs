@@ -697,6 +697,63 @@ namespace HammerAndSickle.Models
             {
                 _dataLock.EnterReadLock();
 
+                // Validate facility manager parent relationships
+                foreach (var unit in _combatUnits.Values)
+                {
+                    if (unit.IsBase && unit.FacilityManager != null)
+                    {
+                        // Validate that base units have proper facility types
+                        switch (unit.Classification)
+                        {
+                            case UnitClassification.HQ:
+                                if (unit.FacilityManager.FacilityType != FacilityType.HQ)
+                                    errors.Add($"HQ unit {unit.UnitName} has incorrect facility type: {unit.FacilityManager.FacilityType}");
+                                break;
+                            case UnitClassification.DEPOT:
+                                if (unit.FacilityManager.FacilityType != FacilityType.SupplyDepot)
+                                    errors.Add($"Depot unit {unit.UnitName} has incorrect facility type: {unit.FacilityManager.FacilityType}");
+                                break;
+                            case UnitClassification.AIRB:
+                                if (unit.FacilityManager.FacilityType != FacilityType.Airbase)
+                                    errors.Add($"Airbase unit {unit.UnitName} has incorrect facility type: {unit.FacilityManager.FacilityType}");
+                                break;
+                        }
+
+                        // Validate airbase attachments more thoroughly
+                        if (unit.FacilityManager.FacilityType == FacilityType.Airbase)
+                        {
+                            foreach (var attachedUnit in unit.FacilityManager.AirUnitsAttached)
+                            {
+                                if (!_combatUnits.ContainsKey(attachedUnit.UnitID))
+                                {
+                                    errors.Add($"Airbase {unit.UnitName} has attached unit {attachedUnit.UnitID} not in registry");
+                                }
+                                else
+                                {
+                                    var registeredUnit = _combatUnits[attachedUnit.UnitID];
+                                    if (registeredUnit != attachedUnit)
+                                    {
+                                        errors.Add($"Airbase {unit.UnitName} attached unit reference mismatch for {attachedUnit.UnitID}");
+                                    }
+                                    if (attachedUnit.UnitType != UnitType.AirUnit)
+                                    {
+                                        errors.Add($"Airbase {unit.UnitName} has non-air unit {attachedUnit.UnitName} attached");
+                                    }
+                                }
+                            }
+                        }
+                    }
+                    else if (unit.IsBase && unit.FacilityManager == null)
+                    {
+                        errors.Add($"Base unit {unit.UnitName} is marked as base but has null FacilityManager");
+                    }
+                    else if (!unit.IsBase && unit.FacilityManager != null &&
+                             unit.FacilityManager.FacilityType != FacilityType.HQ) // HQ can be on non-base units
+                    {
+                        errors.Add($"Non-base unit {unit.UnitName} has FacilityManager with type {unit.FacilityManager.FacilityType}");
+                    }
+                }
+
                 // Check for unresolved references
                 if (_unresolvedObjects.Count > 0)
                 {
@@ -792,11 +849,6 @@ namespace HammerAndSickle.Models
                     if (unit.DeployedProfile == null)
                     {
                         errors.Add($"Unit {unit.UnitName} has null DeployedProfile");
-                    }
-
-                    if (unit.ActiveProfile == null)
-                    {
-                        errors.Add($"Unit {unit.UnitName} has null ActiveProfile");
                     }
 
                     if (unit.UnitProfile == null)
@@ -906,6 +958,8 @@ namespace HammerAndSickle.Models
         /// <returns>True if load was successful</returns>
         public bool LoadGameState(string filePath)
         {
+            // TODO: Consider implementing partial recovery when object counts don't match the header, rather than just logging the issue.
+
             if (string.IsNullOrEmpty(filePath))
             {
                 AppService.HandleException(CLASS_NAME, nameof(LoadGameState),
@@ -1128,7 +1182,11 @@ namespace HammerAndSickle.Models
             }
             finally
             {
-                _dataLock.ExitWriteLock();
+                // Ensure we always exit the lock, even if an exception occurs
+                if (_dataLock.IsWriteLockHeld)
+                {
+                    _dataLock.ExitWriteLock();
+                }
             }
         }
 
