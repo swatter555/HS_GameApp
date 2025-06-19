@@ -1,32 +1,277 @@
 ﻿using HammerAndSickle.Services;
 using System;
 using System.Collections.Generic;
-using System.Linq;
 using System.Runtime.Serialization;
 using UnityEngine;
 
 namespace HammerAndSickle.Models
 {
-    /// <summary>
-    /// The WeaponSystemProfile defines the combat capabilities of a unit.
-    /// It provides values for offensive and defensive capabilities against different target types,
-    /// as well as movement and range parameters. Units can have different profiles when deployed
-    /// or mounted on transports.
-    /// 
-    /// Methods:
-    /// - Constructor: Creates a new weapon system profile with specified parameters
-    /// - Combat Rating Accessors: Get/set methods for individual combat values
-    /// - Upgrade Management: Add/remove/check upgrade types
-    /// - Validation: Ensures all values are within valid ranges
-    /// - Clone: Creates deep copy of the profile
-    /// - Serialization: Complete ISerializable implementation
-    /// 
-    /// Key Features:
-    /// - Uses CombatRating objects for paired attack/defense values
-    /// - Validates all combat and range values against constants
-    /// - Supports multiple upgrade types per profile
-    /// - Comprehensive error handling and logging
-    /// </summary>
+ /*───────────────────────────────────────────────────────────────────────────────
+ WeaponSystemProfile  —  combat capability definition and tactical effectiveness
+ ────────────────────────────────────────────────────────────────────────────────
+ Overview
+ ════════
+ **WeaponSystemProfile** defines the combat capabilities and tactical effectiveness
+ of military units in Hammer & Sickle. Unlike UnitProfile which tracks organizational
+ composition, WeaponSystemProfile provides the actual combat values used for battle
+ resolution, range calculations, and tactical interactions.
+
+ Each profile represents a specific weapons configuration that units can employ,
+ with separate mounted and deployed variants possible for mechanized forces. The
+ system supports complex multi-domain warfare through specialized combat ratings
+ for different target types and engagement scenarios.
+
+ Major Responsibilities
+ ══════════════════════
+ • Multi-domain combat rating management
+     - Land-based combat: Hard/soft target engagement and defense
+     - Air operations: Air-to-air combat and ground-based air defense
+     - Air-ground operations: Close air support and strategic bombing
+ • Range and detection systems
+     - Primary weapon range for direct engagement
+     - Indirect fire range for artillery and missile systems
+     - Spotting range for reconnaissance and target acquisition
+ • Tactical capability modeling
+     - All-weather operational ratings for adverse conditions
+     - Night vision, NBC protection, and SIGINT capabilities
+     - Strategic mobility classifications and unit silhouette
+ • Equipment upgrade tracking
+     - Multiple simultaneous upgrade types per profile
+     - Upgrade validation and compatibility management
+ • Profile template system
+     - Deep cloning with name/ID override capabilities
+     - Shared profile references for consistent unit definitions
+     - Comprehensive validation and bounds checking
+
+ Design Highlights
+ ═════════════════
+ • **Combat Domain Separation**: Distinct attack/defense pairs for different
+   warfare domains prevent unrealistic cross-domain effectiveness.
+ • **CombatRating Integration**: Paired attack/defense values ensure balanced
+   combat mechanics with proper offensive/defensive distinctions.
+ • **Comprehensive Validation**: All values clamped to realistic bounds (1-25
+   combat, 0-100 range) with automatic correction and error handling.
+ • **Flexible Capability System**: Enum-based special capabilities allow for
+   complex tactical interactions without hard-coded special cases.
+ • **Template Architecture**: Cloning system supports both exact duplication
+   and parameterized variants for different unit configurations.
+
+ Public-Method Reference
+ ═══════════════════════
+   ── Combat Value Management ────────────────────────────────────────────────────
+   GetLandHardAttack()                    Returns hard target attack value.
+   GetLandHardDefense()                   Returns hard target defense value.
+   SetLandHardAttack(value)               Sets hard attack with validation.
+   SetLandHardDefense(value)              Sets hard defense with validation.
+   GetLandSoftAttack()                    Returns soft target attack value.
+   GetLandSoftDefense()                   Returns soft target defense value.
+   SetLandSoftAttack(value)               Sets soft attack with validation.
+   SetLandSoftDefense(value)              Sets soft defense with validation.
+   GetAirAttack()                         Returns air-to-air attack value.
+   GetAirDefense()                        Returns air-to-air defense value.
+   SetAirAttack(value)                    Sets air attack with validation.
+   SetAirDefense(value)                   Sets air defense with validation.
+
+   ── Range and Movement Control ─────────────────────────────────────────────────
+   SetPrimaryRange(range)                 Sets primary weapon range (0-100).
+   SetIndirectRange(range)                Sets indirect fire range (0-100).
+   SetSpottingRange(range)                Sets visual detection range (0-100).
+   SetMovementModifier(modifier)          Sets movement speed modifier (0.1-10).
+
+   ── Upgrade System Management ──────────────────────────────────────────────────
+   AddUpgradeType(upgradeType)            Adds upgrade if not present.
+   RemoveUpgradeType(upgradeType)         Removes specific upgrade type.
+   HasUpgradeType(upgradeType)            Checks for upgrade presence.
+   GetUpgradeTypes()                      Returns read-only upgrade list.
+   ClearUpgradeTypes()                    Removes all upgrades.
+
+   ── Profile Analysis ───────────────────────────────────────────────────────────
+   GetTotalCombatValue()                  Sums all combat values for comparison.
+   ToString()                             Returns formatted profile summary.
+
+   ── Cloning and Templates ──────────────────────────────────────────────────────
+   Clone()                                Creates identical copy.
+   Clone(newName)                         Creates copy with new name and ID.
+
+   ── Persistence ────────────────────────────────────────────────────────────────
+   GetObjectData(info, context)          ISerializable save implementation.
+
+ Combat Domain Architecture
+ ══════════════════════════
+ WeaponSystemProfile models five distinct combat domains with specialized ratings:
+
+   **Land Hard Combat** (Armored Warfare)
+   • **Attack**: Anti-tank effectiveness vs heavily armored targets
+   • **Defense**: Armor protection vs kinetic energy penetrators
+   • **Usage**: Tank vs tank, ATGM vs armor, heavy weapons engagement
+   • **Examples**: T-80B main gun (22 attack), Challenger-1 armor (20 defense)
+
+   **Land Soft Combat** (Anti-Personnel Operations)
+   • **Attack**: Effectiveness vs unarmored personnel and light vehicles
+   • **Defense**: Protection vs small arms, artillery fragments, blast
+   • **Usage**: Infantry combat, suppression, area denial weapons
+   • **Examples**: BMP-2 autocannon (15 attack), entrenchment (12 defense)
+
+   **Land Air Combat** (Ground-Based Air Defense)
+   • **Attack**: Surface-to-air missile and AAA effectiveness
+   • **Defense**: Protection vs air-to-ground attacks and bombing
+   • **Usage**: SAM engagement, AAA coverage, point defense systems
+   • **Examples**: S-300 system (25 attack), hardened bunker (18 defense)
+
+   **Air Combat** (Air-to-Air Operations)
+   • **Attack**: Air superiority fighter effectiveness vs aircraft
+   • **Defense**: Aircraft survivability vs enemy fighters and missiles
+   • **Usage**: Fighter vs fighter, interceptor operations, air superiority
+   • **Examples**: F-15 Eagle (24 attack), MiG-29 agility (19 defense)
+
+   **Air-Ground Combat** (Close Air Support)
+   • **Attack**: Aircraft effectiveness vs ground targets
+   • **Defense**: Aircraft survivability vs ground-based threats
+   • **Usage**: CAS missions, interdiction, precision strikes
+   • **Examples**: A-10 GAU-8 (23 attack), Su-25 armor (16 defense)
+
+ Specialized Combat Values
+ ═════════════════════════
+   **Air Avionics** (0-25 range)
+   • Electronic warfare capability and sensor effectiveness
+   • Affects radar detection, jamming resistance, target acquisition
+   • Modern fighters: 15-25, older aircraft: 5-12, bombers: 8-18
+
+   **Air Strategic Attack** (0-25 range)  
+   • Strategic bombing capability vs infrastructure and industry
+   • Represents payload, accuracy, and penetration capability
+   • Strategic bombers: 18-25, tactical fighters: 8-15, helicopters: 0-5
+
+ Range and Detection Systems
+ ═══════════════════════════
+   **Primary Range** (0-100 hexes)
+   • Direct fire weapon engagement range
+   • Tank main guns: 3-5 hexes, small arms: 1-2 hexes, naval guns: 8-12 hexes
+   • Used for direct combat resolution and line-of-sight attacks
+
+   **Indirect Range** (0-100 hexes)
+   • Artillery, mortar, and missile system range
+   • Field artillery: 8-15 hexes, MLRS: 20-40 hexes, ballistic missiles: 80-100 hexes
+   • Allows beyond-visual-range engagement with spotting requirements
+
+   **Spotting Range** (0-100 hexes)
+   • Visual and sensor detection range for enemy units
+   • Infantry: 2-3 hexes, reconnaissance: 4-6 hexes, AWACS: 20-30 hexes
+   • Determines automatic enemy detection without action expenditure
+
+   **Movement Modifier** (0.1-10.0 multiplier)
+   • Speed adjustment relative to base movement points
+   • Fast units: 1.2-1.5x, standard: 1.0x, slow/damaged: 0.5-0.8x
+   • Applied to base movement for final movement point calculation
+
+ Tactical Capability Enumerations
+ ════════════════════════════════
+   **All-Weather Rating**
+   • Day: Fair weather operations only, limited night capability
+   • Night: Basic night operations, weather restrictions apply  
+   • All-Weather: Full capability in adverse conditions and darkness
+
+   **SIGINT Rating** (Signals Intelligence)
+   • Unit Level: Basic communications and local electronic warfare
+   • HQ Level: Enhanced signals intelligence and coordination capability
+   • Specialized Level: Advanced electronic warfare and signal analysis
+
+   **NBC Rating** (Nuclear, Biological, Chemical Protection)
+   • None: No protection vs NBC weapons, full vulnerability
+   • Gen1: Basic protection suits and detection equipment
+   • Gen2: Advanced NBC systems with filtered air and decontamination
+
+   **Strategic Mobility**
+   • Heavy: Road/rail transport only, no air mobility
+   • AirDrop: Paratrooper capability, light equipment only
+   • AirMobile: Helicopter transport capability, medium equipment
+   • AirLift: Strategic airlift capability, heavy equipment possible
+   • Amphibious: Naval transport and beach assault capability
+
+   **NVG Rating** (Night Vision Capability)
+   • None: Daylight operations only, night penalties apply
+   • Gen1: Basic starlight scopes, limited night capability
+   • Gen2: Advanced thermal and starlight systems, full night ops
+
+   **Unit Silhouette** (Detection Profile)
+   • Tiny: Individual soldiers, small teams, minimal detection signature
+   • Small: Light vehicles, small aircraft, reduced visibility
+   • Medium: Standard vehicles and aircraft, normal detection
+   • Large: Heavy vehicles, large aircraft, increased visibility
+
+ Upgrade System Architecture
+ ═══════════════════════════
+ WeaponSystemProfile supports multiple simultaneous upgrades from 15 categories:
+
+   **Vehicle Upgrades**
+   • AFV: Armored Fighting Vehicle improvements (armor, firepower)
+   • IFV: Infantry Fighting Vehicle enhancements (sensors, weapons)
+   • APC: Armored Personnel Carrier modifications (protection, mobility)
+   • RECON: Reconnaissance vehicle upgrades (sensors, stealth, speed)
+
+   **Artillery Upgrades**  
+   • SPART: Self-Propelled Artillery improvements (range, accuracy, mobility)
+   • ART: Towed Artillery enhancements (firepower, counter-battery)
+   • ROC: Rocket Artillery upgrades (range, payload, reload speed)
+   • SSM: Surface-to-Surface Missile improvements (range, accuracy, warhead)
+
+   **Air Defense Upgrades**
+   • SAM: Surface-to-Air Missile enhancements (range, guidance, mobility)
+   • SPSAM: Self-Propelled SAM improvements (radar, missiles, survivability)
+   • AAA: Anti-Aircraft Artillery upgrades (rate of fire, tracking, range)
+   • SPAAA: Self-Propelled AAA enhancements (mobility, firepower, sensors)
+
+   **Aviation Upgrades**
+   • Fighter: Air superiority improvements (avionics, missiles, maneuverability)
+   • Attack: Ground attack enhancements (weapons, armor, targeting systems)
+   • Bomber: Strategic bombing upgrades (payload, range, survivability)
+
+ Combat Value Validation
+ ═══════════════════════
+ **Bounds Checking**
+ All combat values automatically clamped to valid ranges:
+ ```
+ Combat Values: 1-25 (MIN_COMBAT_VALUE to MAX_COMBAT_VALUE)
+ Range Values: 0-100 (MIN_RANGE to MAX_RANGE)  
+ Movement Modifier: 0.1-10.0 (prevents invalid speed calculations)
+ ```
+
+ **Validation Flow**
+ • Constructor validation: All parameters checked during profile creation
+ • Setter validation: Individual value changes validated and clamped
+ • CombatRating delegation: Attack/defense pairs validated by CombatRating class
+ • Error handling: Invalid values logged and corrected, exceptions for critical errors
+
+ **Design Rationale**
+ • Prevents impossible combat values that would break game balance
+ • Ensures mathematical stability in combat resolution algorithms
+ • Maintains data integrity across save/load and template operations
+ • Provides predictable behavior for AI and player expectations
+
+ Template and Cloning System
+ ═══════════════════════════
+ **Profile Sharing Architecture**
+ WeaponSystemProfile instances are shared references between units of the same type:
+ • Base profiles: Master definitions for each weapon system type
+ • Unit references: Multiple CombatUnits point to same profile instance
+ • Memory efficiency: Thousands of units share dozens of profile templates
+ • Consistency: All T-80B tanks use identical combat characteristics
+
+ **Cloning Scenarios**
+ • `Clone()`: Template duplication for profile libraries and testing
+ • `Clone(newName)`: Custom variants with unique IDs for special units
+ • Profile modification: Create variants without affecting base templates
+ • Scenario-specific profiles: Modified versions for campaign or mission needs
+
+ **ID Generation Strategy**
+ • Base profiles: WeaponSystemID matches WeaponSystems enum name
+ • Cloned profiles: Append GUID suffix for uniqueness (T80B_a1b2c3d4)
+ • Backward compatibility: Fallback ID generation for legacy save files
+ • Reference resolution: Profiles resolved by ID during deserialization
+
+ ───────────────────────────────────────────────────────────────────────────────
+ KEEP THIS COMMENT BLOCK IN SYNC WITH COMBAT SYSTEM AND PROFILE CHANGES!
+ ───────────────────────────────────────────────────────────────────────────── */
     [Serializable]
     public class WeaponSystemProfile : ISerializable, ICloneable
     {

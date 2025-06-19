@@ -1,24 +1,149 @@
-using HammerAndSickle.Services;
+﻿using HammerAndSickle.Services;
 using System;
 using System.Runtime.Serialization;
 using UnityEngine;
 
 namespace HammerAndSickle.Models
 {
-    /// <summary>
-    /// Represents a military officer who commands a unit.
-    /// Manages all aspects of a leader including reputation, skills, command abilities,
-    /// and unit assignment. Provides the primary interface for all leader functionality
-    /// while internally managing the skill tree system.
-    /// 
-    /// Key responsibilities:
-    /// - Generate commanders with appropriate names and abilities based on nationality
-    /// - Manage reputation points and command grade progression
-    /// - Provide skill tree interface without exposing implementation details
-    /// - Handle unit assignment tracking
-    /// - Support serialization for save/load functionality
-    /// - Award reputation based on combat actions and achievements
-    /// </summary>
+    /*───────────────────────────────────────────────────────────────────────────────
+ Leader  —  military officer model for unit command and skill progression
+ ────────────────────────────────────────────────────────────────────────────────
+ Overview
+ ════════
+ A **Leader** instance represents a military officer who can command units in
+ Hammer & Sickle. Leaders provide combat bonuses, skill-based capabilities, and
+ progression through reputation earned in combat. Each leader manages their own
+ skill tree, unit assignment status, and nationality-specific rank progression.
+
+ Major Responsibilities
+ ══════════════════════
+ • Officer generation & identification
+     - Random name generation based on nationality
+     - Unique LeaderID assignment and command ability generation
+ • Reputation & progression system
+     - Reputation point accumulation through combat actions
+     - Command grade advancement (Junior → Senior → Top)
+     - Skill tree progression and unlocking
+ • Unit assignment management
+     - Bidirectional unit-leader relationship tracking
+     - Assignment validation and state consistency
+ • Skill tree interface
+     - Encapsulated skill system without exposing implementation
+     - Branch availability, skill unlocking, and bonus calculation
+ • Nationality-specific features
+     - Localized rank formatting per nation
+     - Cultural name generation integration
+ • Persistence & cloning
+     - Full serialization support for save/load
+     - Deep cloning for leader templates
+
+ Design Highlights
+ ═════════════════
+ • **Event-Driven Architecture**: UI notifications for reputation changes,
+   promotions, skill unlocks, and assignment status updates.
+ • **Encapsulated Skill System**: Internal LeaderSkillTree management with
+   clean public interface - no skill tree implementation details exposed.
+ • **Nationality Integration**: Rank formatting and name generation respects
+   cultural conventions (USSR, NATO, FRG, FRA, MJ variants).
+ • **Robust Validation**: All inputs validated with proper error handling
+   and fallback behaviors for edge cases.
+ • **Action-Based Reputation**: Contextual reputation awards based on specific
+   combat actions with difficulty multipliers.
+
+ Public-Method Reference
+ ═══════════════════════
+   ── Basic Officer Management ────────────────────────────────────────────────
+   SetOfficerCommandAbility(command)     Sets combat command ability directly.
+   RandomlyGenerateMe(nationality)       Regenerates name and abilities randomly.
+   SetOfficerName(name)                  Updates name with length validation.
+   GetFormattedRank()                    Returns nationality-specific rank string.
+   SetCommandGrade(grade)                Manually sets command grade level.
+
+   ── Reputation & Progression ────────────────────────────────────────────────
+   AwardReputation(amount)               Adds reputation points directly.
+   AwardReputationForAction(action, mult) Awards reputation for specific actions.
+
+   ── Skill Tree Interface ────────────────────────────────────────────────────
+   CanUnlockSkill(skillEnum)             Checks if skill prerequisites are met.
+   UnlockSkill(skillEnum)                Attempts to unlock skill with validation.
+   IsSkillUnlocked(skillEnum)            Returns true if skill is already unlocked.
+   HasCapability(bonusType)              Checks for specific bonus availability.
+   GetBonusValue(bonusType)              Returns cumulative bonus value for type.
+   IsBranchAvailable(branch)             Checks if skill branch can be started.
+   ResetSkills()                         Resets all skills except leadership.
+
+   ── Unit Assignment Management ──────────────────────────────────────────────
+   AssignToUnit(unitID)                  Assigns leader to specified unit.
+   UnassignFromUnit()                    Removes leader from current assignment.
+
+   ── Persistence & Cloning ───────────────────────────────────────────────────
+   GetObjectData(info, context)         ISerializable save implementation.
+   Clone()                               Creates deep copy with new LeaderID.
+
+ Event System
+ ════════════
+ Leaders broadcast state changes through events for UI integration:
+
+   • **OnReputationChanged(change, newTotal)**: Fired when reputation awarded
+   • **OnGradeChanged(newGrade)**: Fired when command grade advances  
+   • **OnSkillUnlocked(skillEnum, skillName)**: Fired when new skill acquired
+   • **OnUnitAssigned(unitID)**: Fired when assigned to unit
+   • **OnUnitUnassigned()**: Fired when removed from unit
+
+ Reputation Action System
+ ════════════════════════
+ Leaders earn reputation through specific combat actions with context modifiers:
+
+   • **Move Actions**: Base reputation per movement (low value)
+   • **Mount/Dismount**: Tactical positioning reputation
+   • **Intelligence Gathering**: Reconnaissance and spotting rewards  
+   • **Combat Actions**: Primary reputation source from engagement
+   • **Airborne Operations**: High-risk jump operation bonuses
+   • **Tactical Success**: Forcing enemy retreats and unit destruction
+
+ Context multipliers (0.5x - 2.0x) adjust reputation based on:
+   - Enemy unit experience level and strength
+   - Tactical difficulty and environmental factors
+   - Mission objectives and strategic importance
+
+ Command Ability Generation
+ ═══════════════════════════
+ New leaders receive randomized command abilities using configurable dice:
+   - **Base Roll**: Multiple dice (default 3d6) for ability determination
+   - **Modifier**: Constant bonus applied to raw roll
+   - **Clamping**: Results bounded to valid CommandAbility enum range
+   - **Distribution**: Produces realistic bell curve of officer competence
+
+ Nationality-Specific Ranks
+ ═══════════════════════════
+ Rank formatting adapts to cultural military traditions:
+
+   • **USSR**: Lieutenant Colonel → Colonel → Major General
+   • **NATO (USA/UK/IQ/IR/SAUD)**: Lieutenant Colonel → Colonel → Brigadier General  
+   • **FRG**: Oberst → Generalmajor → Generalleutnant
+   • **FRA**: Colonel → Général de Brigade → Général de Division
+   • **MJ**: Amir al-Fawj → Amir al-Mintaqa → Amir al-Jihad
+
+ Skill Tree Integration
+ ══════════════════════
+ Leaders internally manage LeaderSkillTree instances but expose only essential
+ interface methods. The skill system supports:
+   - **Branch Prerequisites**: Leadership skills unlock advanced branches
+   - **Reputation Costs**: Skills require accumulated reputation to unlock
+   - **Cumulative Bonuses**: Multiple skills stack for enhanced capabilities
+   - **Respec Functionality**: Reset all skills except core leadership
+
+ Assignment Consistency
+ ══════════════════════
+ Unit assignment maintains bidirectional integrity:
+   - Leader tracks UnitID and IsAssigned status
+   - Events notify systems of assignment changes
+   - Validation prevents invalid assignment states
+   - Cleanup ensures proper state on unassignment
+
+ ───────────────────────────────────────────────────────────────────────────────
+ KEEP THIS COMMENT BLOCK IN SYNC WITH PUBLIC API CHANGES!
+ ───────────────────────────────────────────────────────────────────────────── */
     [Serializable]
     public class Leader : ISerializable, ICloneable
     {
@@ -363,8 +488,8 @@ namespace HammerAndSickle.Models
                     Nationality.FRA => CommandGrade switch
                     {
                         CommandGrade.JuniorGrade => "Colonel",
-                        CommandGrade.SeniorGrade => "G�n�ral de Brigade",
-                        CommandGrade.TopGrade => "G�n�ral de Division",
+                        CommandGrade.SeniorGrade => "Général de Brigade",
+                        CommandGrade.TopGrade => "Général de Division",
                         _ => "Officier",
                     },
                     Nationality.MJ => CommandGrade switch
