@@ -5,136 +5,134 @@ using System.IO;
 using System.Runtime.Serialization;
 using UnityEngine;
 
+/*───────────────────────────────────────────────────────────────────────────────
+ CombatUnit  —  universal runtime model for every maneuver element or base
+ ────────────────────────────────────────────────────────────────────────────────
+ Overview
+ ════════
+ A **CombatUnit** instance represents a single controllable entity on the
+ Hammer & Sickle hex map: anything from a tank battalion to an airbase or depot.
+ It stores *mutable* per-unit state, while pointing to shared, **immutable**
+ template objects (WeaponSystemProfile, UnitProfile, Leader, FacilityManager).
+
+ Major Responsibilities
+ ══════════════════════
+ • Identification & metadata
+     - UnitID, name, side, nationality, type, classification, role
+ • Unified action-economy management
+     - Single SpendAction() interface for all action types with variable costs
+     - Move / Combat / Deployment / Opportunity / Intel tokens + MP pool
+ • Combat-posture state machine
+     - Mobile ←→ Deployed ←→ HastyDefense ←→ Entrenched ←→ Fortified
+ • Mounted-vs-Dismounted profile switching
+ • Experience & leadership systems
+     - XP progression, tiered multipliers, leader skills & reputation
+ • Damage, repair, supply & efficiency tracking
+ • Position & movement on a pointy-top, odd-r hex grid (future pathfinder hook)
+ • Persistence with two-phase loading and reference resolution
+ • Cloning for unit templates
+
+ Design Highlights
+ ═════════════════
+ • **Unified Action Interface**: SpendAction() handles all action types with 
+   flexible movement cost parameter for future pathfinding integration.
+ • **Interface-Focused Architecture**: Public methods organized into logical
+   groups (Generic, Experience, Leader, Action, CombatState, Position).
+ • All max/current pairs use **StatsMaxCurrent** for clamping & % queries.
+ • Unity-free data model – no MonoBehaviours serialized.
+ • All exceptions funnel through *AppService.HandleException*; important user
+   feedback goes through *AppService.CaptureUiMessage*.
+
+ Public-Method Reference
+ ═══════════════════════
+   ── Generic Interface ────────────────────────────────────────────────────────
+   RefreshAllActions()                Reset all action pools to max (turn start).
+   RefreshMovementPoints()            Restore MP to max (turn start).
+   SetSpottedLevel(level)             Update visibility level for opposing sides.
+   GetActiveWeaponSystemProfile()     Returns mounted or deployed profile.
+   GetCurrentCombatStrength()         Applies all modifiers to active profile.
+   TakeDamage(amount)                 Reduces hit points and updates unit profile.
+   Repair(amount)                     Restores hit points up to maximum.
+   ConsumeSupplies(amount)            Deducts supply days, returns success.
+   ReceiveSupplies(amount)            Adds supplies up to capacity, returns actual.
+   IsDestroyed()                      Checks if hit points <= 0.
+   CanMove()                          Validates movement based on damage/supply.
+   GetSupplyStatus()                  Returns supply percentage (0.0-1.0).
+
+   ── Experience System ────────────────────────────────────────────────────────
+   AddExperience(points)              Adds XP and handles level-up notifications.
+   SetExperience(points)              Direct setter for load/dev tools.
+   GetPointsToNextLevel()             XP needed to advance (0 if Elite).
+   GetExperienceProgress()            Progress bar value (0.0-1.0) to next level.
+
+   ── Leader Assignment ───────────────────────────────────────────────────────
+   AssignLeader(leader)               Assigns commander with full validation.
+   RemoveLeader()                     Removes commander with proper cleanup.
+   GetLeaderBonuses()                 Dictionary of all active skill bonuses.
+   HasLeaderCapability(type)          Checks for specific bonus availability.
+   GetLeaderBonus(type)               Returns specific bonus value or 0.
+   HasLeader()                        Returns true if commander assigned.
+   GetLeaderName()                    Leader name or empty string.
+   GetLeaderGrade()                   Command grade or JuniorGrade default.
+   GetLeaderReputation()              Reputation points or 0.
+   GetLeaderRank()                    Formatted rank string or empty.
+   GetLeaderCommandAbility()          Combat command ability or Average.
+   HasLeaderSkill(skill)              Checks if specific skill unlocked.
+   AwardLeaderReputation(action)      Awards reputation for unit actions.
+   AwardLeaderReputation(points)      Direct reputation point award.
+
+   ── Action Economy ──────────────────────────────────────────────────────────
+   SpendAction(type, movementCost)    Unified action consumption with MP cost.
+   GetAvailableActions()              Dictionary of truly available actions.
+
+   ── Combat State Management ─────────────────────────────────────────────────
+   SetCombatState(state)              Changes state with validation & costs.
+   CanChangeToState(state)            Validates transition rules & resources.
+   BeginEntrenchment()                Convenience method: Deployed → HastyDefense.
+   CanEntrench()                      Checks if entrenchment is possible.
+   GetValidStateTransitions()         List of legal target states.
+
+   ── Positioning & Movement ──────────────────────────────────────────────────
+   SetPosition(pos)                   Places unit at map coordinates.
+   GetPosition()                      Returns current map position.
+   CanMoveTo(pos)                     Future: validates movement legality.
+   GetDistanceTo(pos|unit)            Future: pathfinder distance calculation.
+   IsAtPosition(pos, tolerance)       Future: position checking with tolerance.
+
+   ── Development Support ─────────────────────────────────────────────────────
+   DebugSetCombatState(state)         Direct state change (no validation/cost).
+
+ Action System Design
+ ════════════════════
+ The unified SpendAction() method handles all action types with intelligent
+ movement point deduction:
+
+   • **Move Actions**: Variable cost (default 0) - ready for pathfinding
+   • **Combat Actions**: Fixed cost (25% max MP) + action token
+   • **Deployment Actions**: Fixed cost (50% max MP) + action token  
+   • **Opportunity Actions**: No movement cost, token only
+   • **Intelligence Actions**: Fixed cost (10% max MP) + token (bases exempt)
+
+ Combat vs Mounted State
+ ═══════════════════════
+ CombatState controls tactical posture; *IsMounted* controls transport usage.
+ Transition rules:
+
+   • To **Mobile**: Uses MountedProfile if available, else adds movement bonus
+   • From **Mobile**: Always uses DeployedProfile, removes any movement bonus
+
+ Persistence Architecture
+ ════════════════════════
+ • ISerializable with two-phase loading pattern
+ • Reference resolution for shared objects (profiles, leaders)
+ • FacilityManager integration with proper parent relationships
+ • Comprehensive consistency validation and error recovery
+
+ ───────────────────────────────────────────────────────────────────────────────
+ KEEP THIS COMMENT BLOCK IN SYNC WITH PUBLIC API CHANGES!
+ ───────────────────────────────────────────────────────────────────────────── */
 namespace HammerAndSickle.Models
 {
-    /*───────────────────────────────────────────────────────────────────────────────
-     CombatUnit  —  universal runtime model for every maneuver element or base
-     ────────────────────────────────────────────────────────────────────────────────
-     Overview
-     ════════
-     A **CombatUnit** instance represents a single controllable entity on the
-     Hammer & Sickle hex map: anything from a tank battalion to an airbase or depot.
-     It stores *mutable* per-unit state, while pointing to shared, **immutable**
-     template objects (WeaponSystemProfile, UnitProfile, Leader, FacilityManager).
-
-     Major Responsibilities
-     ══════════════════════
-     • Identification & metadata
-         - UnitID, name, side, nationality, type, classification, role
-     • Action-economy accounting
-         - Move / Combat / Deployment / Opportunity / Intel tokens + MP pool
-     • Combat-posture state machine
-         - Mobile ←→ Deployed ←→ HastyDefense ←→ Entrenched ←→ Fortified
-     • Mounted-vs-Dismounted profile switching (see section “Combat vs Mounted”)
-     • Experience & leadership
-         - XP progression, tiered multipliers, leader skills & reputation
-     • Damage, repair, supply & efficiency tracking
-     • Position & movement on a pointy-top, odd-r hex grid (future pathfinder hook)
-     • Persistence
-         - Binary ISerializable, two-phase load, reference-resolution pattern
-     • Cloning
-         - Deep copy of per-unit state; shared refs stay shared
-     • Facility management for bases (HQ / DEPOT / AIRB) via FacilityManager
-
-     Design Highlights
-     ═════════════════
-     • All max/current pairs use **StatsMaxCurrent** for clamping & % queries.
-     • Action methods enforce MP prerequisites before debiting tokens.
-     • Constants live in **CUConstants** to avoid magic numbers.
-     • Unity-free data model – no MonoBehaviours serialized.
-     • All exceptions funnel through *AppService.HandleException*; important user
-       feedback goes through *AppService.CaptureUiMessage*.
-     • Heavy object – always spawn via a factory / GameDataManager so template
-       references are shared & cached.
-
-     Public-Method Cheat-Sheet
-     ═════════════════════════
-       ── Turn Utilities ───────────────────────────────────────────────────────────
-       RefreshAllActions()            Reset every action pool to max.
-       RefreshMovementPoints()        Restore MP to max.
-       GetAvailableActions()          Returns a validated dictionary of token counts.
-
-       ── Fog-of-War ───────────────────────────────────────────────────────────────
-       SetSpottedLevel(level)         Update visibility level for opposing sides.
-
-       ── Combat Strength & Modifiers ──────────────────────────────────────────────
-       GetCurrentCombatStrength()     Returns a cloned WeaponSystemProfile with all
-                                      strength/effectiveness modifiers applied.
-
-       ── Experience System ────────────────────────────────────────────────────────
-       AddExperience(pts)             Adds XP and handles level-up UI.
-       SetExperience(pts)             Direct setter (load/cheat/dev tools).
-       GetPointsToNextLevel()         XP needed to level-up (0 if Elite).
-       GetExperienceDisplayString()   “Veteran (1320 XP, 280 to next)”
-       GetExperienceProgress()        Normalised 0-1 progress bar value.
-       IsExperienced(), IsElite(), GetExperienceMultiplier()
-
-       ── Leader System ────────────────────────────────────────────────────────────
-       AssignLeader(leader), RemoveLeader()
-       GetLeaderBonuses()             Dictionary<SkillBonusType,float>
-       HasLeaderCapability(type), GetLeaderBonus(type)
-       HasLeader(), GetLeaderName(), GetLeaderRank(), GetLeaderGrade()
-       AwardLeaderReputation(action[, ctx]) / AwardLeaderReputation(points)
-
-       ── Action Economy ───────────────────────────────────────────────────────────
-       ConsumeMoveAction()            –│
-       ConsumeCombatAction()          –│  All consume* methods perform validation
-       ConsumeDeploymentAction()      –│  and MP deduction internally.
-       ConsumeOpportunityAction()     –│
-       ConsumeIntelAction()           –│
-       ConsumeMovementPoints(pts)     Raw MP drain (used by the above).
-       CanConsumeMoveAction(), CanConsumeCombatAction(), … (mirrors of the above)
-
-       ── Positioning & Movement ───────────────────────────────────────────────────
-       SetPosition(vec2)              Directly place unit (map setup/editor).
-       GetPosition()
-       GetDistanceTo(vec2|unit)       (To-do placeholder for path-finder distance.)
-       IsAtPosition(vec2, tol)
-
-       ── Damage, Supply, Readiness ────────────────────────────────────────────────
-       TakeDamage(pts), Repair(pts)
-       ConsumeSupplies(days), ReceiveSupplies(days) → bool/float
-       IsDestroyed(), CanMove(), GetSupplyStatus()
-
-       ── Combat-State Management ──────────────────────────────────────────────────
-       SetCombatState(state)          Full validation + resource costs.
-       CanChangeToState(state), GetValidStateTransitions()
-       BeginEntrenchment(), CanEntrench()
-       DebugSetCombatState(state)     *Developer-only override (no cost).*
-
-       ── Persistence & Cloning ───────────────────────────────────────────────────
-       Clone()                        Deep copy with new UnitID.
-       GetObjectData(info, ctx)       ISerializable save routine.
-       ResolveReferences(mgr)         Reconnects shared templates/leaders.
-       HasUnresolvedReferences(), GetUnresolvedReferenceIDs()
-
-     Combat vs Mounted State
-     ═══════════════════════
-     CombatState controls tactical posture; *IsMounted* controls whether the unit
-     is physically riding transports.  Transition rules:
-
-       • To **Mobile**
-           – If *MountedProfile* exists ⇒ IsMounted = true, ActiveProfile = Mounted
-           – Otherwise ⇒ IsMounted = false, ActiveProfile = Deployed, MP bonus added
-       • From **Mobile** to any other state
-           – IsMounted = false, ActiveProfile = Deployed, MP bonus removed
-
-     This gives both mechanised (mount) and foot (march column) units a single,
-     unified pathway for movement posture.
-
-     Implementation Caveats
-     ══════════════════════
-     • Fixed-wing aircraft & static bases cannot change combat states.
-     • Deployment / Combat / Intel actions each subtract a percentage of *Max MP*
-       before the action token itself is consumed (see CUConstants).
-     • FacilityManager serialises itself with an “FM_” prefix to avoid name
-       collisions in SerializationInfo.
-     • Leader assignment handles full rollback on failure and maintains
-       bi-directional consistency between unit and leader objects.
-
-     ───────────────────────────────────────────────────────────────────────────────
-     KEEP THIS COMMENT BLOCK IN SYNC WITH PUBLIC API CHANGES!
-     ───────────────────────────────────────────────────────────────────────────── */
     [Serializable]
     public class CombatUnit : ICloneable, ISerializable, IResolvableReferences
     {
@@ -422,153 +420,7 @@ namespace HammerAndSickle.Models
         #endregion
 
 
-        #region Initialization Methods
-
-        /// <summary>
-        /// Initializes action counts based on unit type and classification.
-        /// Most units get standard action counts, with variations for special cases.
-        /// </summary>
-        private void InitializeActionCounts()
-        {
-            // Standard action counts for most units
-            int moveActions = CUConstants.DEFAULT_MOVE_ACTIONS;
-            int combatActions = CUConstants.DEFAULT_COMBAT_ACTIONS;
-            int deploymentActions = CUConstants.DEFAULT_DEPLOYMENT_ACTIONS;
-            int opportunityActions = CUConstants.DEFAULT_OPPORTUNITY_ACTIONS;
-            int intelActions = CUConstants.DEFAULT_INTEL_ACTIONS;
-
-
-            switch (Classification)
-            {
-                case UnitClassification.TANK:
-                case UnitClassification.MECH:
-                case UnitClassification.MOT:
-                case UnitClassification.AB:
-                case UnitClassification.MAB:
-                case UnitClassification.MAR:
-                case UnitClassification.MMAR:
-                case UnitClassification.AT:
-                case UnitClassification.INF:
-                case UnitClassification.ART:
-                case UnitClassification.SPA:
-                case UnitClassification.ROC:
-                case UnitClassification.BM:
-                case UnitClassification.ENG:
-                case UnitClassification.HELO:
-                    break;
-
-                case UnitClassification.RECON:
-                    moveActions += 1;
-                    break;
-
-                case UnitClassification.AM:
-                case UnitClassification.MAM:
-                    deploymentActions += 1;
-                    break;
-
-                case UnitClassification.SPECF:
-                case UnitClassification.SPECM:
-                case UnitClassification.SPECH:
-                    intelActions += 1;
-                    break;
-
-                case UnitClassification.SAM:
-                case UnitClassification.SPSAM:
-                case UnitClassification.AAA:
-                case UnitClassification.SPAAA:
-                    opportunityActions += 1;
-                    break;
-
-                case UnitClassification.ASF:
-                case UnitClassification.MRF:
-                case UnitClassification.ATT:
-                case UnitClassification.BMB:
-                case UnitClassification.RECONA:
-                    moveActions += 2;
-                    combatActions = 0;
-                    deploymentActions = 0;
-                    intelActions = 0;
-                    break;
-
-                case UnitClassification.HQ:
-                    intelActions += 1;
-                    break;
-
-                case UnitClassification.DEPOT:
-                case UnitClassification.AIRB:
-                    moveActions = 0;
-                    combatActions = 0;
-                    deploymentActions = 0;
-                    opportunityActions = 0;
-                    intelActions = 0;
-                    break;
-
-                default:
-                    break;
-            }
-
-            // Create StatsMaxCurrent instances
-            MoveActions = new StatsMaxCurrent(moveActions);
-            CombatActions = new StatsMaxCurrent(combatActions);
-            DeploymentActions = new StatsMaxCurrent(deploymentActions);
-            OpportunityActions = new StatsMaxCurrent(opportunityActions);
-            IntelActions = new StatsMaxCurrent(intelActions);
-        }
-
-        /// <summary>
-        /// Initializes movement points based on unit classification.
-        /// </summary>
-        private void InitializeMovementPoints()
-        {
-            var maxMovement = Classification switch
-            {
-                UnitClassification.TANK or
-                UnitClassification.MECH or
-                UnitClassification.RECON or
-                UnitClassification.MAB or
-                UnitClassification.MAM or
-                UnitClassification.MMAR or
-                UnitClassification.SPECM or
-                UnitClassification.SPA or
-                UnitClassification.SPAAA or
-                UnitClassification.SPSAM => CUConstants.MECH_MOV,
-
-                UnitClassification.AT or
-                UnitClassification.MOT or
-                UnitClassification.ROC => CUConstants.MOT_MOV,
-
-                UnitClassification.INF or
-                UnitClassification.AB or
-                UnitClassification.AM or
-                UnitClassification.MAR or
-                UnitClassification.ART or
-                UnitClassification.SAM or
-                UnitClassification.AAA or
-                UnitClassification.SPECF or
-                UnitClassification.ENG => CUConstants.FOOT_MOV,
-
-                UnitClassification.ASF or
-                UnitClassification.MRF or
-                UnitClassification.ATT or
-                UnitClassification.BMB or
-                UnitClassification.RECONA => CUConstants.FIXEDWING_MOV,
-
-                UnitClassification.HELO or
-                UnitClassification.SPECH => CUConstants.HELO_MOV,
-
-                UnitClassification.HQ or
-                UnitClassification.DEPOT or
-                UnitClassification.AIRB => 0,// Bases don't move
-
-                _ => CUConstants.FOOT_MOV,// Default to foot movement
-            };
-            MovementPoints = new StatsMaxCurrent(maxMovement);
-        }
-
-        #endregion
-
-
-        #region Public Methods
+        #region Generic Interface Methods
 
         /// <summary>
         /// Refreshes all action counts to their maximum values.
@@ -652,181 +504,215 @@ namespace HammerAndSickle.Models
             }
         }
 
-        #endregion // Public Methods
-
-
-        #region Private Methods
-
         /// <summary>
-        /// Calculates the final combat rating modifier by combining various contributing factors.
+        /// Applies damage to the unit, reducing hit points and updating combat effectiveness.
         /// </summary>
-        /// <remarks>This method aggregates multiple modifiers, including strength, combat state,
-        /// efficiency, and experience, to compute the final combat rating modifier. If an error occurs during
-        /// calculation, the method returns a default neutral modifier of 1.0.</remarks>
-        /// <returns>A <see cref="float"/> representing the final combat rating modifier. The value is the product of all
-        /// contributing modifiers, or 1.0 if an error occurs.</returns>
-        private float GetFinalCombatRatingModifier()
+        /// <param name="damage">Amount of damage to apply</param>
+        public void TakeDamage(float damage)
         {
             try
             {
-                // Calculate the final combat rating modifier based on all factors.
-                float strengthModifier = GetStrengthModifier();
-                float combatStateModifier = GetCombatStateModifier();
-                float efficiencyModifier = GetEfficiencyModifier();
-                float experienceModifier = GetExperienceMultiplier();
-
-                // Combine all modifiers
-                return strengthModifier * combatStateModifier * efficiencyModifier * experienceModifier;
-            }
-            catch (Exception e)
-            {
-                AppService.HandleException(CLASS_NAME, "GetFinalCombatRatingModifier", e);
-                return 1.0f; // Default to neutral modifier on error
-            }
-        }
-
-        /// <summary>
-        /// Gets the combat effectiveness as a percentage based on current hit points.
-        /// </summary>
-        /// <returns>Combat effectiveness from 0.0 to 1.0</returns>
-        private float GetStrengthModifier()
-        {
-            try
-            {
-                // Compute the combat strength multiplier based on hit points.
-                if (HitPoints.Current >= (HitPoints.Max * CUConstants.FULL_STRENGTH_FLOOR))
+                if (damage < 0f)
                 {
-                    return CUConstants.STRENGTH_MOD_FULL;
+                    throw new ArgumentException("Damage cannot be negative", nameof(damage));
                 }
-                else if (HitPoints.Current >= (HitPoints.Max * CUConstants.DEPLETED_STRENGTH_FLOOR))
+
+                if (damage == 0f)
                 {
-                    return CUConstants.STRENGTH_MOD_DEPLETED;
+                    return; // No damage to apply
                 }
-                else
+
+                // Apply damage to hit points
+                float newHitPoints = Mathf.Max(0f, HitPoints.Current - damage);
+                HitPoints.SetCurrent(newHitPoints);
+
+                // Update unit profile to reflect current strength
+                if (UnitProfile != null)
                 {
-                    return CUConstants.STRENGTH_MOD_LOW;
+                    UnitProfile.UpdateCurrentHP(HitPoints.Current);
                 }
             }
             catch (Exception e)
             {
-                AppService.HandleException(CLASS_NAME, "GetStrengthModifier", e);
-                return CUConstants.STRENGTH_MOD_LOW;
+                AppService.HandleException(CLASS_NAME, "TakeDamage", e);
+                throw;
             }
         }
 
         /// <summary>
-        /// Calculates the combat state modifier based on the current combat state.
+        /// Repairs damage to the unit, restoring hit points.
         /// </summary>
-        /// <returns>A <see cref="float"/> representing the combat state multiplier. The value corresponds to the current combat
-        /// state, with predefined modifiers for specific states. Returns <c>1.0f</c> if the combat state is not
-        /// recognized.</returns>
-        private float GetCombatStateModifier()
-        {
-            // Returns the combat state multiplier based on current combat state.
-            return CombatState switch
-            {
-                CombatState.Mobile => CUConstants.COMBAT_MOD_MOBILE,
-                CombatState.Deployed => CUConstants.COMBAT_MOD_DEPLOYED,
-                CombatState.HastyDefense => CUConstants.COMBAT_MOD_HASTY_DEFENSE,
-                CombatState.Entrenched => CUConstants.COMBAT_MOD_ENTRENCHED,
-                CombatState.Fortified => CUConstants.COMBAT_MOD_FORTIFIED,
-                _ => 1.0f, // Default multiplier for other states
-            };
-        }
-
-        /// <summary>
-        /// Calculates the efficiency modifier based on the current efficiency level.
-        /// </summary>
-        /// <remarks>The returned modifier is determined by the current <c>EfficiencyLevel</c> and maps to
-        /// specific  constants defined in <c>CUConstants</c>. If the efficiency level is unrecognized, a default 
-        /// static modifier is returned.</remarks>
-        /// <returns>A <see cref="float"/> representing the efficiency modifier. The value corresponds to the current 
-        /// operational state, with predefined constants for each efficiency level.</returns>
-        private float GetEfficiencyModifier()
-        {
-            // Returns the efficiency modifier based on current efficiency level.
-            return EfficiencyLevel switch
-            {
-                EfficiencyLevel.PeakOperational => CUConstants.EFFICIENCY_MOD_PEAK,
-                EfficiencyLevel.FullyOperational => CUConstants.EFFICIENCY_MOD_FULL,
-                EfficiencyLevel.Operational => CUConstants.EFFICIENCY_MOD_OPERATIONAL,
-                EfficiencyLevel.DegradedOperations => CUConstants.EFFICIENCY_MOD_DEGRADED,
-                _ => CUConstants.EFFICIENCY_MOD_STATIC, // Default multiplier for other states
-            };
-        }
-
-        /// <summary>
-        /// Gets the display name of a unit by its ID, with fallback handling.
-        /// </summary>
-        /// <param name="unitId">The unit ID to look up</param>
-        /// <returns>The unit's display name or a fallback string</returns>
-        private string GetUnitDisplayName(string unitId)
-        {
-            if (string.IsNullOrEmpty(unitId))
-            {
-                return "Unknown Unit";
-            }
-
-            try
-            {
-                var unit = GameDataManager.Instance.GetCombatUnit(unitId);
-                return unit?.UnitName ?? $"Unit {unitId}";
-            }
-            catch (Exception e)
-            {
-                // Log the query failure but return fallback name
-                AppService.HandleException(CLASS_NAME, "GetUnitDisplayName", e, ExceptionSeverity.Minor);
-                return $"Unit {unitId}";
-            }
-        }
-
-        /// <summary>
-        /// Used to re-establish the parent relationship of the FacilityManager.
-        /// </summary>
-        private void ReestablishFacilityManagerParent()
+        /// <param name="repairAmount">Amount of damage to repair</param>
+        public void Repair(float repairAmount)
         {
             try
             {
-                if (FacilityManager == null) return;
-
-                if (!IsBase)
+                if (repairAmount < 0f)
                 {
-                    // For non-base units, just set the parent directly
-                    FacilityManager.SetParent(this);
-                    return;
+                    throw new ArgumentException("Repair amount cannot be negative", nameof(repairAmount));
                 }
 
-                // For base units, re-establish the parent relationship based on the unit classification
-                switch (Classification)
+                if (repairAmount == 0f)
                 {
-                    case UnitClassification.HQ:
-                        FacilityManager.SetupHQ(this);
-                        break;
-                    case UnitClassification.DEPOT:
-                        // We need to preserve the original depot settings
-                        var category = FacilityManager.DepotCategory;
-                        var size = FacilityManager.DepotSize;
-                        FacilityManager.SetupSupplyDepot(this, category, size);
-                        break;
-                    case UnitClassification.AIRB:
-                        FacilityManager.SetupAirbase(this);
-                        break;
-                    default:
-                        // For other classifications, just set the parent
-                        FacilityManager.SetParent(this);
-                        break;
+                    return; // No repair to apply
+                }
+
+                // Apply repair to hit points (clamped to maximum)
+                float newHitPoints = Mathf.Min(HitPoints.Max, HitPoints.Current + repairAmount);
+                HitPoints.SetCurrent(newHitPoints);
+
+                // Update unit profile to reflect current strength
+                if (UnitProfile != null)
+                {
+                    UnitProfile.UpdateCurrentHP(HitPoints.Current);
                 }
             }
             catch (Exception e)
             {
-                AppService.HandleException(CLASS_NAME, "ReestablishFacilityManagerParent", e);
+                AppService.HandleException(CLASS_NAME, "Repair", e);
+                throw;
             }
         }
 
-        #endregion // Private Methods
+        /// <summary>
+        /// Consumes supplies for unit operations.
+        /// </summary>
+        /// <param name="amount">Amount of supplies to consume</param>
+        /// <returns>True if supplies were consumed, false if insufficient</returns>
+        public bool ConsumeSupplies(float amount)
+        {
+            try
+            {
+                if (amount < 0f)
+                {
+                    throw new ArgumentException("Supply amount cannot be negative", nameof(amount));
+                }
+
+                if (amount == 0f)
+                {
+                    return true; // No supplies to consume
+                }
+
+                if (DaysSupply.Current >= amount)
+                {
+                    DaysSupply.SetCurrent(DaysSupply.Current - amount);
+                    return true;
+                }
+
+                return false; // Insufficient supplies
+            }
+            catch (Exception e)
+            {
+                AppService.HandleException(CLASS_NAME, "ConsumeSupplies", e);
+                return false;
+            }
+        }
+
+        /// <summary>
+        /// Receives supplies from external source (depot, transport, etc.).
+        /// </summary>
+        /// <param name="amount">Amount of supplies offered</param>
+        /// <returns>Actual amount of supplies received (may be less than offered due to capacity)</returns>
+        public float ReceiveSupplies(float amount)
+        {
+            try
+            {
+                if (amount < 0f)
+                {
+                    throw new ArgumentException("Supply amount cannot be negative", nameof(amount));
+                }
+
+                if (amount == 0f)
+                {
+                    return 0f; // No supplies offered
+                }
+
+                // Calculate how much we can actually receive
+                float availableCapacity = DaysSupply.Max - DaysSupply.Current;
+                float actualAmount = Mathf.Min(amount, availableCapacity);
+
+                // Add supplies
+                DaysSupply.SetCurrent(DaysSupply.Current + actualAmount);
+
+                return actualAmount;
+            }
+            catch (Exception e)
+            {
+                AppService.HandleException(CLASS_NAME, "ReceiveSupplies", e);
+                return 0f;
+            }
+        }
+
+        /// <summary>
+        /// Checks if the unit is destroyed (no hit points remaining).
+        /// </summary>
+        /// <returns>True if the unit is destroyed</returns>
+        public bool IsDestroyed()
+        {
+            return HitPoints.Current <= 0f;
+        }
+
+        /// <summary>
+        /// Checks if the unit can move based on various factors.
+        /// </summary>
+        /// <returns></returns>
+        public bool CanMove()
+        {
+            try
+            {
+                // Must have hit points to operate
+                if (IsDestroyed())
+                {
+                    return false;
+                }
+
+                // Must have some supplies for most operations.
+                if (DaysSupply.Current < 1f)
+                {
+                    return false;
+                }
+
+                // Low efficiency level units cannot move.
+                if (EfficiencyLevel == EfficiencyLevel.StaticOperations)
+                {
+                    return false;
+                }
+
+                return true;
+            }
+            catch (Exception e)
+            {
+                AppService.HandleException(CLASS_NAME, "CanOperate", e);
+                return false;
+            }
+        }
+
+        /// <summary>
+        /// Gets the supply status as a percentage of maximum capacity.
+        /// </summary>
+        /// <returns>Supply status from 0.0 to 1.0</returns>
+        public float GetSupplyStatus()
+        {
+            try
+            {
+                if (DaysSupply.Max <= 0f)
+                {
+                    return 0f;
+                }
+
+                return DaysSupply.Current / DaysSupply.Max;
+            }
+            catch (Exception e)
+            {
+                AppService.HandleException(CLASS_NAME, "GetSupplyStatus", e);
+                return 0f;
+            }
+        }
+
+        #endregion // Generic Interface Methods
 
 
-        #region Experience System Methods
+        #region Experience System Interface Methods
 
         /// <summary>
         /// Adds experience points to the unit and returns true if successful.
@@ -899,27 +785,6 @@ namespace HammerAndSickle.Models
         }
 
         /// <summary>
-        /// Calculates the experience level based on total experience points.
-        /// </summary>
-        /// <param name="totalPoints">Total experience points</param>
-        /// <returns>The appropriate experience level</returns>
-        private ExperienceLevel CalculateExperienceLevel(int totalPoints)
-        {
-            if (totalPoints >= (int)ExperiencePointLevels.Elite)
-                return ExperienceLevel.Elite;
-            else if (totalPoints >= (int)ExperiencePointLevels.Veteran)
-                return ExperienceLevel.Veteran;
-            else if (totalPoints >= (int)ExperiencePointLevels.Experienced)
-                return ExperienceLevel.Experienced;
-            else if (totalPoints >= (int)ExperiencePointLevels.Trained)
-                return ExperienceLevel.Trained;
-            else if (totalPoints >= (int)ExperiencePointLevels.Green)
-                return ExperienceLevel.Green;
-            else
-                return ExperienceLevel.Raw;
-        }
-
-        /// <summary>
         /// Gets the experience points required for the next level.
         /// Returns 0 if already at maximum level (Elite).
         /// </summary>
@@ -936,23 +801,6 @@ namespace HammerAndSickle.Models
                 ExperienceLevel.Elite => 0,// Already at max level
                 _ => 0,
             };
-        }
-
-        /// <summary>
-        /// Gets the experience level as a human-readable string with progress information.
-        /// </summary>
-        /// <returns>Formatted string showing level and progress</returns>
-        public string GetExperienceDisplayString()
-        {
-            var pointsToNext = GetPointsToNextLevel();
-            if (pointsToNext > 0)
-            {
-                return $"{ExperienceLevel} ({ExperiencePoints} XP, {pointsToNext} to next)";
-            }
-            else
-            {
-                return $"{ExperienceLevel} (Max Level - {ExperiencePoints} XP)";
-            }
         }
 
         /// <summary>
@@ -975,79 +823,11 @@ namespace HammerAndSickle.Models
             return Mathf.Clamp01(progress);
         }
 
-        /// <summary>
-        /// Gets the minimum experience points required for a specific level.
-        /// </summary>
-        /// <param name="level">The experience level</param>
-        /// <returns>Minimum points required for that level</returns>
-        private int GetMinPointsForLevel(ExperienceLevel level)
-        {
-            return level switch
-            {
-                ExperienceLevel.Raw => (int)ExperiencePointLevels.Raw,
-                ExperienceLevel.Green => (int)ExperiencePointLevels.Green,
-                ExperienceLevel.Trained => (int)ExperiencePointLevels.Trained,
-                ExperienceLevel.Experienced => (int)ExperiencePointLevels.Experienced,
-                ExperienceLevel.Veteran => (int)ExperiencePointLevels.Veteran,
-                ExperienceLevel.Elite => (int)ExperiencePointLevels.Elite,
-                _ => 0,
-            };
-        }
 
-        /// <summary>
-        /// Gets the next experience level after the specified level.
-        /// Returns Elite if already at Elite.
-        /// </summary>
-        /// <param name="currentLevel">Current experience level</param>
-        /// <returns>Next experience level</returns>
-        private ExperienceLevel GetNextLevel(ExperienceLevel currentLevel)
-        {
-            return currentLevel switch
-            {
-                ExperienceLevel.Raw => ExperienceLevel.Green,
-                ExperienceLevel.Green => ExperienceLevel.Trained,
-                ExperienceLevel.Trained => ExperienceLevel.Experienced,
-                ExperienceLevel.Experienced => ExperienceLevel.Veteran,
-                ExperienceLevel.Veteran => ExperienceLevel.Elite,
-                ExperienceLevel.Elite => ExperienceLevel.Elite,// Already at max
-                _ => ExperienceLevel.Green,
-            };
-        }
-
-        /// <summary>
-        /// Called when the unit's experience level changes.
-        /// Can be overridden or used to trigger events/notifications.
-        /// </summary>
-        /// <param name="previousLevel">The previous experience level</param>
-        /// <param name="newLevel">The new experience level</param>
-        protected virtual void OnExperienceLevelChanged(ExperienceLevel previousLevel, ExperienceLevel newLevel)
-        {
-            AppService.CaptureUiMessage($"{UnitName} has advanced from {previousLevel} to {newLevel}!");
-        }
-
-        /// <summary>
-        /// Gets the combat effectiveness multiplier based on experience level.
-        /// Used to modify combat values based on unit experience.
-        /// </summary>
-        /// <returns>Multiplier for combat effectiveness (1.0 = normal)</returns>
-        public float GetExperienceMultiplier()
-        {
-            return ExperienceLevel switch
-            {
-                ExperienceLevel.Raw => CUConstants.RAW_XP_MODIFIER,                // -20% effectiveness
-                ExperienceLevel.Green => CUConstants.GREEN_XP_MODIFIER,            // -10% effectiveness
-                ExperienceLevel.Trained => CUConstants.TRAINED_XP_MODIFIER,        // Normal effectiveness
-                ExperienceLevel.Experienced => CUConstants.EXPERIENCED_XP_MODIFIER,// +10% effectiveness
-                ExperienceLevel.Veteran => CUConstants.VETERAN_XP_MODIFIER,        // +20% effectiveness
-                ExperienceLevel.Elite => CUConstants.ELITE_XP_MODIFIER,            // +30% effectiveness
-                _ => 1.0f,
-            };
-        }
-
-        #endregion // Experience System Methods
+        #endregion // Experience System Interface Methods
 
 
-        #region Leader Assignment System
+        #region Leader System Interface Methods
 
         /// <summary>
         /// Assigns a leader to command this unit.
@@ -1439,279 +1219,132 @@ namespace HammerAndSickle.Models
             }
         }
 
-        /// <summary>
-        /// Validates that IsLeaderAssigned flag is consistent with CommandingOfficer state.
-        /// </summary>
-        /// <returns>True if consistent, false if there's a mismatch</returns>
-        private bool ValidateLeaderAssignmentConsistency()
-        {
-            return (CommandingOfficer == null && !IsLeaderAssigned) ||
-                   (CommandingOfficer != null && IsLeaderAssigned &&
-                    CommandingOfficer.IsAssigned && CommandingOfficer.UnitID == UnitID);
-        }
+        #endregion // Leader System Interface Methods
+
+
+        #region Action System Interface Methods
 
         /// <summary>
-        /// Fixes any inconsistency between IsLeaderAssigned flag and CommandingOfficer state.
+        /// Spend an action of the specified type, consuming movement points if necessary.
         /// </summary>
-        private void FixLeaderAssignmentConsistency()
-        {
-            bool hasLeader = CommandingOfficer != null;
-            if (IsLeaderAssigned != hasLeader)
-            {
-                AppService.HandleException(CLASS_NAME, "FixLeaderAssignmentConsistency",
-                    new InvalidOperationException($"Leader assignment inconsistency fixed for unit {UnitID}"),
-                    ExceptionSeverity.Minor);
-                IsLeaderAssigned = hasLeader;
-            }
-        }
-
-        #endregion // Leader Assignment System
-
-
-        #region Action Consumption System
-
-        /// <summary>
-        /// Consumes one move action if available.
-        /// </summary>
-        /// <returns>True if a move action was consumed, false if none available</returns>
-        public bool ConsumeMoveAction()
+        /// <param name="type"></param>
+        /// <param name="movtCost"></param>
+        /// <returns></returns>
+        public bool SpendAction(ActionTypes type, float movtCost = 0)
         {
             try
             {
-                if (MoveActions.Current >= 1f)
+                switch (type)
                 {
-                    MoveActions.SetCurrent(MoveActions.Current - 1f);
-                    return true;
+                    case ActionTypes.MoveAction:
+
+                        // Check if we have at least one move action available
+                        if (MoveActions.Current < 1)
+                        {
+                            AppService.CaptureUiMessage($"{UnitName} has no move actions available.");
+                            return false;
+                        }
+
+                        // Check if we have sufficient movement points and consume them.
+                        if (!ConsumeMovementPoints(movtCost))
+                        {
+                            AppService.CaptureUiMessage($"{UnitName} does not have enough movement points to perform a move action.");
+                            return false;
+                        }
+
+                        // Deduct one move action.
+                        MoveActions.SetCurrent(MoveActions.Current - 1f);
+                        return true;
+
+                    case ActionTypes.CombatAction:
+                        // Check if we have at least one combat action available
+                        if (CombatActions.Current < 1)
+                        {
+                            AppService.CaptureUiMessage($"{UnitName} has no combat actions available.");
+                            return false;
+                        }
+
+                        // Calculate and consume movement points first
+                        float movementCost = GetCombatActionMovementCost();
+                        if (!ConsumeMovementPoints(movementCost))
+                        {
+                            AppService.CaptureUiMessage($"{UnitName} does not have enough movement points to perform a combat action.");
+                            return false;
+                        }
+
+                        // Deduct one combat action.
+                        CombatActions.SetCurrent(CombatActions.Current - 1f);
+                        return true;
+
+                    case ActionTypes.DeployAction:
+
+                        // Check if we have at least one deployment action available
+                        if (DeploymentActions.Current < 1)
+                        {
+                            AppService.CaptureUiMessage($"{UnitName} has no deployment actions available.");
+                            return false;
+                        }
+
+                        // Check if we have sufficient movement points for deployment
+                        float deployMovementCost = GetDeploymentActionMovementCost();
+                        if (!ConsumeMovementPoints(deployMovementCost))
+                        {
+                            AppService.CaptureUiMessage($"{UnitName} does not have enough movement points to perform a deployment action.");
+                            return false;
+                        }
+
+                        // Deduct one deployment action.
+                        DeploymentActions.SetCurrent(DeploymentActions.Current - 1f);
+                        return true;
+
+                    case ActionTypes.OpportunityAction:
+
+                        // Check if we have at least one opportunity action available
+                        if (OpportunityActions.Current < 1)
+                        {
+                            AppService.CaptureUiMessage($"{UnitName} has no opportunity actions available.");
+                            return false;
+                        }
+
+                        // Consume one intel action
+                        OpportunityActions.SetCurrent(OpportunityActions.Current - 1f);
+                        return true;
+
+                    case ActionTypes.IntelAction:
+                        // Check if we have at least one intel action available
+                        if (IntelActions.Current < 1)
+                        {
+                            AppService.CaptureUiMessage($"{UnitName} has no intelligence actions available.");
+                            return false;
+                        }
+
+                        // If it's not a base, gathering intel cost movement points.
+                        if (!IsBase)
+                        {
+                            // Get intel action movement cost.
+                            float intelMovementCost = GetIntelActionMovementCost();
+                            if (!ConsumeMovementPoints(intelMovementCost))
+                            {
+                                AppService.CaptureUiMessage($"{UnitName} does not have enough movement points to perform an intelligence action.");
+                                return false;
+                            }
+                        }
+
+                        // Consume one intel action
+                        IntelActions.SetCurrent(IntelActions.Current - 1f);
+                        return true;
                 }
+
+                // Let user know the action was not successful
+                AppService.CaptureUiMessage($"{UnitName} could not perform the action: {type}.");
+
                 return false;
             }
             catch (Exception e)
             {
-                AppService.HandleException(CLASS_NAME, "ConsumeMoveAction", e);
+                AppService.HandleException(CLASS_NAME, "SpendAction", e);
                 return false;
             }
-        }
-
-        /// <summary>
-        /// Consumes one combat action and associated movement points if available.
-        /// </summary>
-        /// <returns>True if a combat action was consumed, false if insufficient resources</returns>
-        public bool ConsumeCombatAction()
-        {
-            try
-            {
-                // Check combat action availability
-                if (CombatActions.Current < 1f)
-                    return false;
-
-                // Calculate and consume movement points first
-                float movementCost = GetCombatActionMovementCost();
-                if (!ConsumeMovementPoints(movementCost))
-                    return false;
-
-                // Only consume combat action if movement was successful
-                CombatActions.SetCurrent(CombatActions.Current - 1f);
-                return true;
-            }
-            catch (Exception e)
-            {
-                AppService.HandleException(CLASS_NAME, "ConsumeCombatAction", e);
-                return false;
-            }
-        }
-
-        /// <summary>
-        /// Consumes movement points if available.
-        /// </summary>
-        /// <param name="points">Number of movement points to consume</param>
-        /// <returns>True if movement points were consumed, false if insufficient</returns>
-        public bool ConsumeMovementPoints(float points)
-        {
-            try
-            {
-                if (points <= 0f)
-                {
-                    throw new ArgumentException("Movement points must be positive", nameof(points));
-                }
-
-                if (MovementPoints.Current >= points)
-                {
-                    MovementPoints.SetCurrent(MovementPoints.Current - points);
-                    return true;
-                }
-                return false;
-            }
-            catch (Exception e)
-            {
-                AppService.HandleException(CLASS_NAME, "ConsumeMovementPoints", e);
-                return false;
-            }
-        }
-
-        /// <summary>
-        /// Consumes one deployment action if available.
-        /// </summary>
-        /// <returns>True if a deployment action was consumed, false if none available</returns>
-        public bool ConsumeDeploymentAction()
-        {
-            try
-            {
-                if (DeploymentActions.Current >= 1f)
-                {
-                    DeploymentActions.SetCurrent(DeploymentActions.Current - 1f);
-                    return true;
-                }
-                return false;
-            }
-            catch (Exception e)
-            {
-                AppService.HandleException(CLASS_NAME, "ConsumeDeploymentAction", e);
-                return false;
-            }
-        }
-
-        /// <summary>
-        /// Consumes one opportunity action if available.
-        /// </summary>
-        /// <returns>True if an opportunity action was consumed, false if none available</returns>
-        public bool ConsumeOpportunityAction()
-        {
-            try
-            {
-                if (OpportunityActions.Current >= 1f)
-                {
-                    OpportunityActions.SetCurrent(OpportunityActions.Current - 1f);
-                    return true;
-                }
-                return false;
-            }
-            catch (Exception e)
-            {
-                AppService.HandleException(CLASS_NAME, "ConsumeOpportunityAction", e);
-                return false;
-            }
-        }
-
-        /// <summary>
-        /// Consumes one intelligence action and associated movement points if available.
-        /// Bases don't consume movement points for intel gathering.
-        /// </summary>
-        /// <returns>True if an intelligence action was consumed, false if insufficient resources</returns>
-        public bool ConsumeIntelAction()
-        {
-            try
-            {
-                // Check intel action availability
-                if (IntelActions.Current < 1f)
-                    return false;
-
-                // Bases don't consume movement points for intel gathering
-                if (!IsBase)
-                {
-                    // Calculate and consume movement points first
-                    float movementCost = GetIntelActionMovementCost();
-                    if (!ConsumeMovementPoints(movementCost))
-                        return false;
-                }
-
-                // Only consume intel action if movement was successful (or not needed for bases)
-                IntelActions.SetCurrent(IntelActions.Current - 1f);
-                return true;
-            }
-            catch (Exception e)
-            {
-                AppService.HandleException(CLASS_NAME, "ConsumeIntelAction", e);
-                return false;
-            }
-        }
-
-        /// <summary>
-        /// Checks if the unit can consume a move action.
-        /// </summary>
-        /// <returns>True if at least one move action is available</returns>
-        public bool CanConsumeMoveAction()
-        {
-            return MoveActions.Current >= 1f;
-        }
-
-        /// <summary>
-        /// Checks if the unit can consume a combat action and has sufficient movement points.
-        /// </summary>
-        /// <returns>True if at least one combat action and sufficient movement are available</returns>
-        public bool CanConsumeCombatAction()
-        {
-            // Check if we have a combat action available
-            if (CombatActions.Current < 1f)
-            {
-                return false;
-            }
-
-            // Check if we have sufficient movement points
-            float requiredMovement = GetCombatActionMovementCost();
-            if (MovementPoints.Current < requiredMovement)
-            {
-                return false;
-            }
-
-            return true;
-        }
-
-        /// <summary>
-        /// Checks if the unit can consume the specified movement points.
-        /// </summary>
-        /// <param name="points">Number of movement points needed</param>
-        /// <returns>True if sufficient movement points are available</returns>
-        public bool CanConsumeMovementPoints(float points)
-        {
-            if (points <= 0f) return false;
-            return MovementPoints.Current >= points;
-        }
-
-        /// <summary>
-        /// Checks if the unit can consume a deployment action.
-        /// </summary>
-        /// <returns>True if at least one deployment action is available</returns>
-        public bool CanConsumeDeploymentAction()
-        {
-            return DeploymentActions.Current >= 1f;
-        }
-
-        /// <summary>
-        /// Checks if the unit can consume an opportunity action.
-        /// </summary>
-        /// <returns>True if at least one opportunity action is available</returns>
-        public bool CanConsumeOpportunityAction()
-        {
-            return OpportunityActions.Current >= 1f;
-        }
-
-        /// <summary>
-        /// Checks if the unit can consume an intelligence action and has sufficient movement points.
-        /// Bases don't require movement points for intel actions.
-        /// </summary>
-        /// <returns>True if at least one intelligence action and sufficient movement are available</returns>
-        public bool CanConsumeIntelAction()
-        {
-            // Check if we have an intel action available
-            if (IntelActions.Current < 1f)
-            {
-                return false;
-            }
-
-            // Bases don't need movement points for intel gathering
-            if (IsBase)
-            {
-                return true;
-            }
-
-            // Check if we have sufficient movement points
-            float requiredMovement = GetIntelActionMovementCost();
-            if (MovementPoints.Current < requiredMovement)
-            {
-                return false;
-            }
-
-            return true;
         }
 
         /// <summary>
@@ -1750,302 +1383,10 @@ namespace HammerAndSickle.Models
             };
         }
 
-        #endregion // Action Consumption System
+        #endregion // Action System Interface Methods
 
 
-        #region Position and Movement Management
-
-        /// <summary>
-        /// Sets the unit's position on the map.
-        /// </summary>
-        /// <param name="newPos">The new position coordinates</param>
-        public void SetPosition(Vector2 newPos)
-        {
-            try
-            {
-                MapPos = newPos; // Direct assignment instead of reflection
-            }
-            catch (Exception e)
-            {
-                AppService.HandleException(CLASS_NAME, "SetPosition", e);
-                throw;
-            }
-        }
-
-        /// <summary>
-        /// Checks if the unit can move to the specified position.
-        /// This is a basic validation - full movement rules will be implemented later.
-        /// </summary>
-        /// <param name="targetPos">The target position to validate</param>
-        /// <returns>True if movement appears valid</returns>
-        public bool CanMoveTo(Vector2 targetPos)
-        {
-            throw new NotImplementedException(); // Placeholder for future movement validation logic
-        }
-
-        /// <summary>
-        /// Gets the distance between this unit and a target position in Unity units.
-        /// </summary>
-        /// <param name="targetPos">The target position</param>
-        /// <returns>Distance in Unity units</returns>
-        public float GetDistanceTo(Vector2 targetPos)
-        {
-            throw new NotImplementedException(); // Placeholder for future distance calculation logic
-        }
-
-        /// <summary>
-        /// Gets the distance between this unit and another unit.
-        /// </summary>
-        /// <param name="otherUnit">The other unit</param>
-        /// <returns>Distance in Unity units</returns>
-        public float GetDistanceTo(CombatUnit otherUnit)
-        {
-            throw new NotImplementedException(); // Placeholder for future distance calculation logic
-        }
-
-        /// <summary>
-        /// Checks if the unit is at the specified position (within tolerance).
-        /// </summary>
-        /// <param name="position">Position to check</param>
-        /// <param name="tolerance">Distance tolerance (default 0.01f)</param>
-        /// <returns>True if unit is at the position</returns>
-        public bool IsAtPosition(Vector2 position, float tolerance = 0.01f)
-        {
-            throw new NotImplementedException(); // Placeholder for future position checking logic
-        }
-
-        /// <summary>
-        /// Gets the unit's current map position.
-        /// </summary>
-        /// <returns>Current position on the map</returns>
-        public Vector2 GetPosition()
-        {
-            return MapPos;
-        }
-
-        #endregion // Position and Movement Management
-
-
-        #region Damage and Supply Systems
-
-        /// <summary>
-        /// Applies damage to the unit, reducing hit points and updating combat effectiveness.
-        /// </summary>
-        /// <param name="damage">Amount of damage to apply</param>
-        public void TakeDamage(float damage)
-        {
-            try
-            {
-                if (damage < 0f)
-                {
-                    throw new ArgumentException("Damage cannot be negative", nameof(damage));
-                }
-
-                if (damage == 0f)
-                {
-                    return; // No damage to apply
-                }
-
-                // Apply damage to hit points
-                float newHitPoints = Mathf.Max(0f, HitPoints.Current - damage);
-                HitPoints.SetCurrent(newHitPoints);
-
-                // Update unit profile to reflect current strength
-                if (UnitProfile != null)
-                {
-                    UnitProfile.UpdateCurrentHP(HitPoints.Current);
-                }
-            }
-            catch (Exception e)
-            {
-                AppService.HandleException(CLASS_NAME, "TakeDamage", e);
-                throw;
-            }
-        }
-
-        /// <summary>
-        /// Repairs damage to the unit, restoring hit points.
-        /// </summary>
-        /// <param name="repairAmount">Amount of damage to repair</param>
-        public void Repair(float repairAmount)
-        {
-            try
-            {
-                if (repairAmount < 0f)
-                {
-                    throw new ArgumentException("Repair amount cannot be negative", nameof(repairAmount));
-                }
-
-                if (repairAmount == 0f)
-                {
-                    return; // No repair to apply
-                }
-
-                // Apply repair to hit points (clamped to maximum)
-                float newHitPoints = Mathf.Min(HitPoints.Max, HitPoints.Current + repairAmount);
-                HitPoints.SetCurrent(newHitPoints);
-
-                // Update unit profile to reflect current strength
-                if (UnitProfile != null)
-                {
-                    UnitProfile.UpdateCurrentHP(HitPoints.Current);
-                }
-            }
-            catch (Exception e)
-            {
-                AppService.HandleException(CLASS_NAME, "Repair", e);
-                throw;
-            }
-        }
-
-        /// <summary>
-        /// Consumes supplies for unit operations.
-        /// </summary>
-        /// <param name="amount">Amount of supplies to consume</param>
-        /// <returns>True if supplies were consumed, false if insufficient</returns>
-        public bool ConsumeSupplies(float amount)
-        {
-            try
-            {
-                if (amount < 0f)
-                {
-                    throw new ArgumentException("Supply amount cannot be negative", nameof(amount));
-                }
-
-                if (amount == 0f)
-                {
-                    return true; // No supplies to consume
-                }
-
-                if (DaysSupply.Current >= amount)
-                {
-                    DaysSupply.SetCurrent(DaysSupply.Current - amount);
-                    return true;
-                }
-
-                return false; // Insufficient supplies
-            }
-            catch (Exception e)
-            {
-                AppService.HandleException(CLASS_NAME, "ConsumeSupplies", e);
-                return false;
-            }
-        }
-
-        /// <summary>
-        /// Receives supplies from external source (depot, transport, etc.).
-        /// </summary>
-        /// <param name="amount">Amount of supplies offered</param>
-        /// <returns>Actual amount of supplies received (may be less than offered due to capacity)</returns>
-        public float ReceiveSupplies(float amount)
-        {
-            try
-            {
-                if (amount < 0f)
-                {
-                    throw new ArgumentException("Supply amount cannot be negative", nameof(amount));
-                }
-
-                if (amount == 0f)
-                {
-                    return 0f; // No supplies offered
-                }
-
-                // Calculate how much we can actually receive
-                float availableCapacity = DaysSupply.Max - DaysSupply.Current;
-                float actualAmount = Mathf.Min(amount, availableCapacity);
-
-                // Add supplies
-                DaysSupply.SetCurrent(DaysSupply.Current + actualAmount);
-
-                return actualAmount;
-            }
-            catch (Exception e)
-            {
-                AppService.HandleException(CLASS_NAME, "ReceiveSupplies", e);
-                return 0f;
-            }
-        }
-
-        /// <summary>
-        /// Checks if the unit is destroyed (no hit points remaining).
-        /// </summary>
-        /// <returns>True if the unit is destroyed</returns>
-        public bool IsDestroyed()
-        {
-            return HitPoints.Current <= 0f;
-        }
-
-        /// <summary>
-        /// Checks if the unit can move based on various factors.
-        /// </summary>
-        /// <returns></returns>
-        public bool CanMove()
-        {
-            try
-            {
-                // Must have hit points to operate
-                if (IsDestroyed())
-                {
-                    return false;
-                }
-
-                // Must have some supplies for most operations.
-                if (DaysSupply.Current < 1f)
-                {
-                    return false;
-                }
-
-                // Low efficiency level units cannot move.
-                if (EfficiencyLevel == EfficiencyLevel.StaticOperations)
-                {
-                    return false;
-                }
-
-                return true;
-            }
-            catch (Exception e)
-            {
-                AppService.HandleException(CLASS_NAME, "CanOperate", e);
-                return false;
-            }
-        }
-
-        /// <summary>
-        /// Gets the supply status as a percentage of maximum capacity.
-        /// </summary>
-        /// <returns>Supply status from 0.0 to 1.0</returns>
-        public float GetSupplyStatus()
-        {
-            try
-            {
-                if (DaysSupply.Max <= 0f)
-                {
-                    return 0f;
-                }
-
-                return DaysSupply.Current / DaysSupply.Max;
-            }
-            catch (Exception e)
-            {
-                AppService.HandleException(CLASS_NAME, "GetSupplyStatus", e);
-                return 0f;
-            }
-        }
-
-        #endregion // Damage and Supply Systems
-
-
-        #region Combat State Management
-
-        /// <summary>
-        /// Direct change of combat state for debugging purposes.
-        /// </summary>
-        /// <param name="newState"></param>
-        public void DebugSetCombatState(CombatState newState)
-        {
-            CombatState = newState;
-        }
+        #region CombatState Interface Methods
 
         /// <summary>
         /// Changes the unit's combat state if transition is valid and resources are available.
@@ -2061,15 +1402,9 @@ namespace HammerAndSickle.Models
                 if (!CanChangeToState(newState))
                     return false;
 
-                // Cost in movement points.
-                float movementCost = GetDeploymentActionMovementCost();
-
-                // Make double sure the points are there.
-                if (ConsumeMovementPoints(movementCost))
+                // Spend the deployment action and movement points if possible.
+                if (SpendAction(ActionTypes.DeployAction))
                 {
-                    // Use DeploymentAction.
-                    ConsumeDeploymentAction();
-
                     // Update combat state directly
                     CombatState = newState;
 
@@ -2226,10 +1561,670 @@ namespace HammerAndSickle.Models
             }
         }
 
-        #endregion // Combat State Management
+        #endregion // CombatState Interface Methods
 
 
-        #region Private Combat State Helpers
+        #region Position and Movement Interface Methods
+
+        /// <summary>
+        /// Sets the unit's position on the map.
+        /// </summary>
+        /// <param name="newPos">The new position coordinates</param>
+        public void SetPosition(Vector2 newPos)
+        {
+            try
+            {
+                MapPos = newPos; // Direct assignment instead of reflection
+            }
+            catch (Exception e)
+            {
+                AppService.HandleException(CLASS_NAME, "SetPosition", e);
+                throw;
+            }
+        }
+
+        /// <summary>
+        /// Checks if the unit can move to the specified position.
+        /// This is a basic validation - full movement rules will be implemented later.
+        /// </summary>
+        /// <param name="targetPos">The target position to validate</param>
+        /// <returns>True if movement appears valid</returns>
+        public bool CanMoveTo(Vector2 targetPos)
+        {
+            // TODO: Implement full movement validation logic
+            throw new NotImplementedException(); // Placeholder for future movement validation logic
+        }
+
+        /// <summary>
+        /// Gets the distance between this unit and a target position in Unity units.
+        /// </summary>
+        /// <param name="targetPos">The target position</param>
+        /// <returns>Distance in Unity units</returns>
+        public float GetDistanceTo(Vector2 targetPos)
+        {
+            // TODO: Implement distance calculation logic
+            throw new NotImplementedException(); // Placeholder for future distance calculation logic
+        }
+
+        /// <summary>
+        /// Gets the distance between this unit and another unit.
+        /// </summary>
+        /// <param name="otherUnit">The other unit</param>
+        /// <returns>Distance in Unity units</returns>
+        public float GetDistanceTo(CombatUnit otherUnit)
+        {
+            // TODO: Implement distance calculation logic
+            throw new NotImplementedException(); // Placeholder for future distance calculation logic
+        }
+
+        /// <summary>
+        /// Checks if the unit is at the specified position (within tolerance).
+        /// </summary>
+        /// <param name="position">Position to check</param>
+        /// <param name="tolerance">Distance tolerance (default 0.01f)</param>
+        /// <returns>True if unit is at the position</returns>
+        public bool IsAtPosition(Vector2 position, float tolerance = 0.01f)
+        {
+            // TODO: Implement position checking logic
+            throw new NotImplementedException(); // Placeholder for future position checking logic
+        }
+
+        /// <summary>
+        /// Gets the unit's current map position.
+        /// </summary>
+        /// <returns>Current position on the map</returns>
+        public Vector2 GetPosition()
+        {
+            return MapPos;
+        }
+
+        #endregion // Position and Movement Interface Methods
+
+
+        #region Debugging Methods
+
+        /// <summary>
+        /// Direct change of combat state for debugging purposes.
+        /// </summary>
+        /// <param name="newState"></param>
+        public void DebugSetCombatState(CombatState newState)
+        {
+            CombatState = newState;
+        }
+
+        #endregion // Debugging Methods
+
+
+        #region Generic Interface Helper Methods
+
+        /// <summary>
+        /// Initializes action counts based on unit type and classification.
+        /// Most units get standard action counts, with variations for special cases.
+        /// </summary>
+        private void InitializeActionCounts()
+        {
+            // Standard action counts for most units
+            int moveActions = CUConstants.DEFAULT_MOVE_ACTIONS;
+            int combatActions = CUConstants.DEFAULT_COMBAT_ACTIONS;
+            int deploymentActions = CUConstants.DEFAULT_DEPLOYMENT_ACTIONS;
+            int opportunityActions = CUConstants.DEFAULT_OPPORTUNITY_ACTIONS;
+            int intelActions = CUConstants.DEFAULT_INTEL_ACTIONS;
+
+
+            switch (Classification)
+            {
+                case UnitClassification.TANK:
+                case UnitClassification.MECH:
+                case UnitClassification.MOT:
+                case UnitClassification.AB:
+                case UnitClassification.MAB:
+                case UnitClassification.MAR:
+                case UnitClassification.MMAR:
+                case UnitClassification.AT:
+                case UnitClassification.INF:
+                case UnitClassification.ART:
+                case UnitClassification.SPA:
+                case UnitClassification.ROC:
+                case UnitClassification.BM:
+                case UnitClassification.ENG:
+                case UnitClassification.HELO:
+                    break;
+
+                case UnitClassification.RECON:
+                    moveActions += 1;
+                    break;
+
+                case UnitClassification.AM:
+                case UnitClassification.MAM:
+                    deploymentActions += 1;
+                    break;
+
+                case UnitClassification.SPECF:
+                case UnitClassification.SPECM:
+                case UnitClassification.SPECH:
+                    intelActions += 1;
+                    break;
+
+                case UnitClassification.SAM:
+                case UnitClassification.SPSAM:
+                case UnitClassification.AAA:
+                case UnitClassification.SPAAA:
+                    opportunityActions += 1;
+                    break;
+
+                case UnitClassification.ASF:
+                case UnitClassification.MRF:
+                case UnitClassification.ATT:
+                case UnitClassification.BMB:
+                case UnitClassification.RECONA:
+                    moveActions += 2;
+                    combatActions = 0;
+                    deploymentActions = 0;
+                    intelActions = 0;
+                    break;
+
+                case UnitClassification.HQ:
+                    intelActions += 1;
+                    break;
+
+                case UnitClassification.DEPOT:
+                case UnitClassification.AIRB:
+                    moveActions = 0;
+                    combatActions = 0;
+                    deploymentActions = 0;
+                    opportunityActions = 0;
+                    intelActions = 0;
+                    break;
+
+                default:
+                    break;
+            }
+
+            // Create StatsMaxCurrent instances
+            MoveActions = new StatsMaxCurrent(moveActions);
+            CombatActions = new StatsMaxCurrent(combatActions);
+            DeploymentActions = new StatsMaxCurrent(deploymentActions);
+            OpportunityActions = new StatsMaxCurrent(opportunityActions);
+            IntelActions = new StatsMaxCurrent(intelActions);
+        }
+
+        /// <summary>
+        /// Initializes movement points based on unit classification.
+        /// </summary>
+        private void InitializeMovementPoints()
+        {
+            var maxMovement = Classification switch
+            {
+                UnitClassification.TANK or
+                UnitClassification.MECH or
+                UnitClassification.RECON or
+                UnitClassification.MAB or
+                UnitClassification.MAM or
+                UnitClassification.MMAR or
+                UnitClassification.SPECM or
+                UnitClassification.SPA or
+                UnitClassification.SPAAA or
+                UnitClassification.SPSAM => CUConstants.MECH_MOV,
+
+                UnitClassification.AT or
+                UnitClassification.MOT or
+                UnitClassification.ROC => CUConstants.MOT_MOV,
+
+                UnitClassification.INF or
+                UnitClassification.AB or
+                UnitClassification.AM or
+                UnitClassification.MAR or
+                UnitClassification.ART or
+                UnitClassification.SAM or
+                UnitClassification.AAA or
+                UnitClassification.SPECF or
+                UnitClassification.ENG => CUConstants.FOOT_MOV,
+
+                UnitClassification.ASF or
+                UnitClassification.MRF or
+                UnitClassification.ATT or
+                UnitClassification.BMB or
+                UnitClassification.RECONA => CUConstants.FIXEDWING_MOV,
+
+                UnitClassification.HELO or
+                UnitClassification.SPECH => CUConstants.HELO_MOV,
+
+                UnitClassification.HQ or
+                UnitClassification.DEPOT or
+                UnitClassification.AIRB => 0,// Bases don't move
+
+                _ => CUConstants.FOOT_MOV,// Default to foot movement
+            };
+            MovementPoints = new StatsMaxCurrent(maxMovement);
+        }
+
+        /// <summary>
+        /// Calculates the final combat rating modifier by combining various contributing factors.
+        /// </summary>
+        /// <remarks>This method aggregates multiple modifiers, including strength, combat state,
+        /// efficiency, and experience, to compute the final combat rating modifier. If an error occurs during
+        /// calculation, the method returns a default neutral modifier of 1.0.</remarks>
+        /// <returns>A <see cref="float"/> representing the final combat rating modifier. The value is the product of all
+        /// contributing modifiers, or 1.0 if an error occurs.</returns>
+        private float GetFinalCombatRatingModifier()
+        {
+            try
+            {
+                // Calculate the final combat rating modifier based on all factors.
+                float strengthModifier = GetStrengthModifier();
+                float combatStateModifier = GetCombatStateModifier();
+                float efficiencyModifier = GetEfficiencyModifier();
+                float experienceModifier = GetExperienceMultiplier();
+
+                // Combine all modifiers
+                return strengthModifier * combatStateModifier * efficiencyModifier * experienceModifier;
+            }
+            catch (Exception e)
+            {
+                AppService.HandleException(CLASS_NAME, "GetFinalCombatRatingModifier", e);
+                return 1.0f; // Default to neutral modifier on error
+            }
+        }
+
+        /// <summary>
+        /// Gets the combat effectiveness as a percentage based on current hit points.
+        /// </summary>
+        /// <returns>Combat effectiveness from 0.0 to 1.0</returns>
+        private float GetStrengthModifier()
+        {
+            try
+            {
+                // Compute the combat strength multiplier based on hit points.
+                if (HitPoints.Current >= (HitPoints.Max * CUConstants.FULL_STRENGTH_FLOOR))
+                {
+                    return CUConstants.STRENGTH_MOD_FULL;
+                }
+                else if (HitPoints.Current >= (HitPoints.Max * CUConstants.DEPLETED_STRENGTH_FLOOR))
+                {
+                    return CUConstants.STRENGTH_MOD_DEPLETED;
+                }
+                else
+                {
+                    return CUConstants.STRENGTH_MOD_LOW;
+                }
+            }
+            catch (Exception e)
+            {
+                AppService.HandleException(CLASS_NAME, "GetStrengthModifier", e);
+                return CUConstants.STRENGTH_MOD_LOW;
+            }
+        }
+
+        /// <summary>
+        /// Calculates the combat state modifier based on the current combat state.
+        /// </summary>
+        /// <returns>A <see cref="float"/> representing the combat state multiplier. The value corresponds to the current combat
+        /// state, with predefined modifiers for specific states. Returns <c>1.0f</c> if the combat state is not
+        /// recognized.</returns>
+        private float GetCombatStateModifier()
+        {
+            // Returns the combat state multiplier based on current combat state.
+            return CombatState switch
+            {
+                CombatState.Mobile => CUConstants.COMBAT_MOD_MOBILE,
+                CombatState.Deployed => CUConstants.COMBAT_MOD_DEPLOYED,
+                CombatState.HastyDefense => CUConstants.COMBAT_MOD_HASTY_DEFENSE,
+                CombatState.Entrenched => CUConstants.COMBAT_MOD_ENTRENCHED,
+                CombatState.Fortified => CUConstants.COMBAT_MOD_FORTIFIED,
+                _ => 1.0f, // Default multiplier for other states
+            };
+        }
+
+        /// <summary>
+        /// Calculates the efficiency modifier based on the current efficiency level.
+        /// </summary>
+        /// <remarks>The returned modifier is determined by the current <c>EfficiencyLevel</c> and maps to
+        /// specific  constants defined in <c>CUConstants</c>. If the efficiency level is unrecognized, a default 
+        /// static modifier is returned.</remarks>
+        /// <returns>A <see cref="float"/> representing the efficiency modifier. The value corresponds to the current 
+        /// operational state, with predefined constants for each efficiency level.</returns>
+        private float GetEfficiencyModifier()
+        {
+            // Returns the efficiency modifier based on current efficiency level.
+            return EfficiencyLevel switch
+            {
+                EfficiencyLevel.PeakOperational => CUConstants.EFFICIENCY_MOD_PEAK,
+                EfficiencyLevel.FullyOperational => CUConstants.EFFICIENCY_MOD_FULL,
+                EfficiencyLevel.Operational => CUConstants.EFFICIENCY_MOD_OPERATIONAL,
+                EfficiencyLevel.DegradedOperations => CUConstants.EFFICIENCY_MOD_DEGRADED,
+                _ => CUConstants.EFFICIENCY_MOD_STATIC, // Default multiplier for other states
+            };
+        }
+
+        /// <summary>
+        /// Used to re-establish the parent relationship of the FacilityManager.
+        /// </summary>
+        private void ReestablishFacilityManagerParent()
+        {
+            try
+            {
+                if (FacilityManager == null) return;
+
+                if (!IsBase)
+                {
+                    // For non-base units, just set the parent directly
+                    FacilityManager.SetParent(this);
+                    return;
+                }
+
+                // For base units, re-establish the parent relationship based on the unit classification
+                switch (Classification)
+                {
+                    case UnitClassification.HQ:
+                        FacilityManager.SetupHQ(this);
+                        break;
+                    case UnitClassification.DEPOT:
+                        // We need to preserve the original depot settings
+                        var category = FacilityManager.DepotCategory;
+                        var size = FacilityManager.DepotSize;
+                        FacilityManager.SetupSupplyDepot(this, category, size);
+                        break;
+                    case UnitClassification.AIRB:
+                        FacilityManager.SetupAirbase(this);
+                        break;
+                    default:
+                        // For other classifications, just set the parent
+                        FacilityManager.SetParent(this);
+                        break;
+                }
+            }
+            catch (Exception e)
+            {
+                AppService.HandleException(CLASS_NAME, "ReestablishFacilityManagerParent", e);
+            }
+        }
+
+        #endregion // Generic Interface Helper Methods
+
+
+        #region Experience System Helper Methods
+
+        /// <summary>
+        /// Calculates the experience level based on total experience points.
+        /// </summary>
+        /// <param name="totalPoints">Total experience points</param>
+        /// <returns>The appropriate experience level</returns>
+        private ExperienceLevel CalculateExperienceLevel(int totalPoints)
+        {
+            if (totalPoints >= (int)ExperiencePointLevels.Elite)
+                return ExperienceLevel.Elite;
+            else if (totalPoints >= (int)ExperiencePointLevels.Veteran)
+                return ExperienceLevel.Veteran;
+            else if (totalPoints >= (int)ExperiencePointLevels.Experienced)
+                return ExperienceLevel.Experienced;
+            else if (totalPoints >= (int)ExperiencePointLevels.Trained)
+                return ExperienceLevel.Trained;
+            else if (totalPoints >= (int)ExperiencePointLevels.Green)
+                return ExperienceLevel.Green;
+            else
+                return ExperienceLevel.Raw;
+        }
+
+        /// <summary>
+        /// Gets the minimum experience points required for a specific level.
+        /// </summary>
+        /// <param name="level">The experience level</param>
+        /// <returns>Minimum points required for that level</returns>
+        private int GetMinPointsForLevel(ExperienceLevel level)
+        {
+            return level switch
+            {
+                ExperienceLevel.Raw => (int)ExperiencePointLevels.Raw,
+                ExperienceLevel.Green => (int)ExperiencePointLevels.Green,
+                ExperienceLevel.Trained => (int)ExperiencePointLevels.Trained,
+                ExperienceLevel.Experienced => (int)ExperiencePointLevels.Experienced,
+                ExperienceLevel.Veteran => (int)ExperiencePointLevels.Veteran,
+                ExperienceLevel.Elite => (int)ExperiencePointLevels.Elite,
+                _ => 0,
+            };
+        }
+
+        /// <summary>
+        /// Gets the next experience level after the specified level.
+        /// Returns Elite if already at Elite.
+        /// </summary>
+        /// <param name="currentLevel">Current experience level</param>
+        /// <returns>Next experience level</returns>
+        private ExperienceLevel GetNextLevel(ExperienceLevel currentLevel)
+        {
+            return currentLevel switch
+            {
+                ExperienceLevel.Raw => ExperienceLevel.Green,
+                ExperienceLevel.Green => ExperienceLevel.Trained,
+                ExperienceLevel.Trained => ExperienceLevel.Experienced,
+                ExperienceLevel.Experienced => ExperienceLevel.Veteran,
+                ExperienceLevel.Veteran => ExperienceLevel.Elite,
+                ExperienceLevel.Elite => ExperienceLevel.Elite,// Already at max
+                _ => ExperienceLevel.Green,
+            };
+        }
+
+        /// <summary>
+        /// Called when the unit's experience level changes.
+        /// Can be overridden or used to trigger events/notifications.
+        /// </summary>
+        /// <param name="previousLevel">The previous experience level</param>
+        /// <param name="newLevel">The new experience level</param>
+        protected virtual void OnExperienceLevelChanged(ExperienceLevel previousLevel, ExperienceLevel newLevel)
+        {
+            AppService.CaptureUiMessage($"{UnitName} has advanced from {previousLevel} to {newLevel}!");
+        }
+
+        /// <summary>
+        /// Gets the combat effectiveness multiplier based on experience level.
+        /// Used to modify combat values based on unit experience.
+        /// </summary>
+        /// <returns>Multiplier for combat effectiveness (1.0 = normal)</returns>
+        private float GetExperienceMultiplier()
+        {
+            return ExperienceLevel switch
+            {
+                ExperienceLevel.Raw => CUConstants.RAW_XP_MODIFIER,                // -20% effectiveness
+                ExperienceLevel.Green => CUConstants.GREEN_XP_MODIFIER,            // -10% effectiveness
+                ExperienceLevel.Trained => CUConstants.TRAINED_XP_MODIFIER,        // Normal effectiveness
+                ExperienceLevel.Experienced => CUConstants.EXPERIENCED_XP_MODIFIER,// +10% effectiveness
+                ExperienceLevel.Veteran => CUConstants.VETERAN_XP_MODIFIER,        // +20% effectiveness
+                ExperienceLevel.Elite => CUConstants.ELITE_XP_MODIFIER,            // +30% effectiveness
+                _ => 1.0f,
+            };
+        }
+
+        #endregion // Experience System Helper Methods
+
+
+        #region Leader System Helper Methods
+
+        /// <summary>
+        /// Validates that IsLeaderAssigned flag is consistent with CommandingOfficer state.
+        /// </summary>
+        /// <returns>True if consistent, false if there's a mismatch</returns>
+        private bool ValidateLeaderAssignmentConsistency()
+        {
+            return (CommandingOfficer == null && !IsLeaderAssigned) ||
+                   (CommandingOfficer != null && IsLeaderAssigned &&
+                    CommandingOfficer.IsAssigned && CommandingOfficer.UnitID == UnitID);
+        }
+
+        /// <summary>
+        /// Fixes any inconsistency between IsLeaderAssigned flag and CommandingOfficer state.
+        /// </summary>
+        private void FixLeaderAssignmentConsistency()
+        {
+            bool hasLeader = CommandingOfficer != null;
+            if (IsLeaderAssigned != hasLeader)
+            {
+                AppService.HandleException(CLASS_NAME, "FixLeaderAssignmentConsistency",
+                    new InvalidOperationException($"Leader assignment inconsistency fixed for unit {UnitID}"),
+                    ExceptionSeverity.Minor);
+                IsLeaderAssigned = hasLeader;
+            }
+        }
+
+        /// <summary>
+        /// Gets the display name of a unit by its ID, with fallback handling.
+        /// </summary>
+        /// <param name="unitId">The unit ID to look up</param>
+        /// <returns>The unit's display name or a fallback string</returns>
+        private string GetUnitDisplayName(string unitId)
+        {
+            if (string.IsNullOrEmpty(unitId))
+            {
+                return "Unknown Unit";
+            }
+
+            try
+            {
+                var unit = GameDataManager.Instance.GetCombatUnit(unitId);
+                return unit?.UnitName ?? $"Unit {unitId}";
+            }
+            catch (Exception e)
+            {
+                // Log the query failure but return fallback name
+                AppService.HandleException(CLASS_NAME, "GetUnitDisplayName", e, ExceptionSeverity.Minor);
+                return $"Unit {unitId}";
+            }
+        }
+
+        #endregion
+
+
+        #region Action System Helper Methods
+
+        /// <summary>
+        /// Consumes movement points if available.
+        /// </summary>
+        /// <param name="points">Number of movement points to consume</param>
+        /// <returns>True if movement points were consumed, false if insufficient</returns>
+        private bool ConsumeMovementPoints(float points)
+        {
+            try
+            {
+                if (points <= 0f)
+                {
+                    return false; // No points to consume
+                }
+
+                if (MovementPoints.Current >= points)
+                {
+                    MovementPoints.SetCurrent(MovementPoints.Current - points);
+                    return true;
+                }
+                return false;
+            }
+            catch (Exception e)
+            {
+                AppService.HandleException(CLASS_NAME, "ConsumeMovementPoints", e);
+                return false;
+            }
+        }
+
+        /// <summary>
+        /// Calculates the movement point cost for a deployment action.
+        /// </summary>
+        /// <returns>Movement points required (50% of max)</returns>
+        private float GetDeploymentActionMovementCost()
+        {
+            return MovementPoints.Max * CUConstants.DEPLOYMENT_ACTION_MOVEMENT_COST;
+        }
+
+        /// <summary>
+        /// Calculates the movement‑point cost for a combat action.
+        /// Immobile units (Max == 0) pay nothing.
+        /// </summary>
+        private float GetCombatActionMovementCost()
+        {
+            if (MovementPoints.Max <= 0f) return 0f;
+            return MovementPoints.Max * CUConstants.COMBAT_ACTION_MOVEMENT_COST;
+        }
+
+        /// <summary>
+        /// Calculates the movement‑point cost for an intelligence action.
+        /// Immobile units (Max == 0) pay nothing.
+        /// </summary>
+        private float GetIntelActionMovementCost()
+        {
+            if (MovementPoints.Max <= 0f) return 0f;
+            return MovementPoints.Max * CUConstants.INTEL_ACTION_MOVEMENT_COST;
+        }
+
+        /// <summary>
+        /// Checks if the unit can consume a move action.
+        /// </summary>
+        /// <returns>True if at least one move action is available</returns>
+        private bool CanConsumeMoveAction()
+        {
+            return MoveActions.Current >= 1f;
+        }
+
+        /// <summary>
+        /// Checks if the unit can consume a combat action and has sufficient movement points.
+        /// </summary>
+        /// <returns>True if at least one combat action and sufficient movement are available</returns>
+        private bool CanConsumeCombatAction()
+        {
+            // Check if we have a combat action available
+            if (CombatActions.Current < 1f)
+            {
+                return false;
+            }
+
+            // Check if we have sufficient movement points
+            float requiredMovement = GetCombatActionMovementCost();
+            if (MovementPoints.Current < requiredMovement)
+            {
+                return false;
+            }
+
+            return true;
+        }
+
+        /// <summary>
+        /// Checks if the unit can consume a deployment action.
+        /// </summary>
+        /// <returns>True if at least one deployment action is available</returns>
+        private bool CanConsumeDeploymentAction()
+        {
+            return DeploymentActions.Current >= 1f;
+        }
+
+        /// <summary>
+        /// Checks if the unit can consume an intelligence action and has sufficient movement points.
+        /// Bases don't require movement points for intel actions.
+        /// </summary>
+        /// <returns>True if at least one intelligence action and sufficient movement are available</returns>
+        private bool CanConsumeIntelAction()
+        {
+            // Check if we have an intel action available
+            if (IntelActions.Current < 1f)
+            {
+                return false;
+            }
+
+            // Bases don't need movement points for intel gathering
+            if (IsBase)
+            {
+                return true;
+            }
+
+            // Check if we have sufficient movement points
+            float requiredMovement = GetIntelActionMovementCost();
+            if (MovementPoints.Current < requiredMovement)
+            {
+                return false;
+            }
+
+            return true;
+        }
+
+        #endregion // Action System Helper Methods
+
+
+        #region CombatState Interface Helper Methods
 
         /// <summary>
         /// Checks if this unit classification can change combat states.
@@ -2302,15 +2297,6 @@ namespace HammerAndSickle.Models
         }
 
         /// <summary>
-        /// Calculates the movement point cost for a deployment action.
-        /// </summary>
-        /// <returns>Movement points required (50% of max)</returns>
-        private float GetDeploymentActionMovementCost()
-        {
-            return MovementPoints.Max * CUConstants.DEPLOYMENT_ACTION_MOVEMENT_COST;
-        }
-
-        /// <summary>
         /// Updates the combat state and adjusts the active profile and movement points accordingly.
         /// </summary>
         /// <remarks>This method updates the unit's state and associated profiles based on the provided
@@ -2376,27 +2362,7 @@ namespace HammerAndSickle.Models
             }
         }
 
-        /// <summary>
-        /// Calculates the movement‑point cost for a combat action.
-        /// Immobile units (Max == 0) pay nothing.
-        /// </summary>
-        private float GetCombatActionMovementCost()
-        {
-            if (MovementPoints.Max <= 0f) return 0f;
-            return MovementPoints.Max * CUConstants.COMBAT_ACTION_MOVEMENT_COST;
-        }
-
-        /// <summary>
-        /// Calculates the movement‑point cost for an intelligence action.
-        /// Immobile units (Max == 0) pay nothing.
-        /// </summary>
-        private float GetIntelActionMovementCost()
-        {
-            if (MovementPoints.Max <= 0f) return 0f;
-            return MovementPoints.Max * CUConstants.INTEL_ACTION_MOVEMENT_COST;
-        }
-
-        #endregion // Private Combat State Helpers
+        #endregion // CombatState Interface Helper Methods
 
 
         #region ICloneable Implementation

@@ -1,13 +1,10 @@
-using PlasticGui.WorkspaceWindow.Locks;
 using System.Collections.Generic;
 
 namespace HammerAndSickle.Models
 {
     public class CUConstants
     {
-        //========================
-        //====== CombatUnit ======
-        //========================
+        #region CombatUnit Constants
 
         // CombatUnit constants.
         public const int MAX_HP = 40;                       // Maximum hit points for a CombatUnit
@@ -15,49 +12,49 @@ namespace HammerAndSickle.Models
         public const int MAX_EXP_GAIN_PER_ACTION = 10; // Max XP gain per action
 
         // Movement constants for different unit types, in movement points.
-        public const int MECH_MOV      = 12;
-        public const int MOT_MOV       = 10;
-        public const int FOOT_MOV      = 8;
+        public const int MECH_MOV = 12;
+        public const int MOT_MOV = 10;
+        public const int FOOT_MOV = 8;
         public const int FIXEDWING_MOV = 100;
-        public const int HELO_MOV      = 24;
+        public const int HELO_MOV = 24;
 
         // WeaponSystem constants.
         public const int MAX_COMBAT_VALUE = 25;
         public const int MIN_COMBAT_VALUE = 1;
-        public const float MAX_RANGE      = 100.0f;
-        public const float MIN_RANGE      = 0.0f;
+        public const float MAX_RANGE = 100.0f;
+        public const float MIN_RANGE = 0.0f;
 
         // Experience level modifiers.
-        public const float RAW_XP_MODIFIER         = 0.8f; // -20% effectiveness
-        public const float GREEN_XP_MODIFIER       = 0.9f; // -10% effectiveness
-        public const float TRAINED_XP_MODIFIER     = 1.0f; // Normal effectiveness
+        public const float RAW_XP_MODIFIER = 0.8f; // -20% effectiveness
+        public const float GREEN_XP_MODIFIER = 0.9f; // -10% effectiveness
+        public const float TRAINED_XP_MODIFIER = 1.0f; // Normal effectiveness
         public const float EXPERIENCED_XP_MODIFIER = 1.1f; // +10% effectiveness
-        public const float VETERAN_XP_MODIFIER     = 1.2f; // +20% effectiveness
-        public const float ELITE_XP_MODIFIER       = 1.3f; // +30% effectiveness
+        public const float VETERAN_XP_MODIFIER = 1.2f; // +20% effectiveness
+        public const float ELITE_XP_MODIFIER = 1.3f; // +30% effectiveness
 
         public const float MOBILE_MOVEMENT_BONUS = 4.0f;           // Movement point bonus for Mobile units without MountedProfile
         public const float DEPLOYMENT_ACTION_MOVEMENT_COST = 0.5f; // Deployment actions cost 50% of max movement
         public const float COMBAT_ACTION_MOVEMENT_COST = 0.25f;    // Combat actions cost 25% of max movement
         public const float INTEL_ACTION_MOVEMENT_COST = 0.15f;     // Intel actions cost 15% of max movement
 
-        public const float COMBAT_MOD_MOBILE        = 0.9f; // Mobile units get 10% combat malus
-        public const float COMBAT_MOD_DEPLOYED      = 1.0f; // Deployed units have no combat modifier
+        public const float COMBAT_MOD_MOBILE = 0.9f; // Mobile units get 10% combat malus
+        public const float COMBAT_MOD_DEPLOYED = 1.0f; // Deployed units have no combat modifier
         public const float COMBAT_MOD_HASTY_DEFENSE = 1.1f; // Hasty defense gives +10% combat bonus
-        public const float COMBAT_MOD_ENTRENCHED    = 1.2f; // Entrenched units get +20% combat bonus
-        public const float COMBAT_MOD_FORTIFIED     = 1.3f; // Fortified units get +30% combat bonus
+        public const float COMBAT_MOD_ENTRENCHED = 1.2f; // Entrenched units get +20% combat bonus
+        public const float COMBAT_MOD_FORTIFIED = 1.3f; // Fortified units get +30% combat bonus
 
-        public const float STRENGTH_MOD_FULL     = 1.15f; // Full strength units get +15% combat bonus
+        public const float STRENGTH_MOD_FULL = 1.15f; // Full strength units get +15% combat bonus
         public const float STRENGTH_MOD_DEPLETED = 0.75f; // Depleted strength units get -25% combat malus
-        public const float STRENGTH_MOD_LOW      = 0.4f;  // Low strength units get -60% combat malus
+        public const float STRENGTH_MOD_LOW = 0.4f;  // Low strength units get -60% combat malus
 
-        public const float EFFICIENCY_MOD_STATIC      = 0.5f; // Static units get 50% combat malus
-        public const float EFFICIENCY_MOD_DEGRADED    = 0.7f; // Degraded units get 30% combat malus
+        public const float EFFICIENCY_MOD_STATIC = 0.5f; // Static units get 50% combat malus
+        public const float EFFICIENCY_MOD_DEGRADED = 0.7f; // Degraded units get 30% combat malus
         public const float EFFICIENCY_MOD_OPERATIONAL = 0.8f; // Operational units get 20% combat malus
-        public const float EFFICIENCY_MOD_FULL        = 0.9f; // Full efficiency units get 10% combat malus
-        public const float EFFICIENCY_MOD_PEAK        = 1.0f; // Peak efficiency units have no combat modifier
+        public const float EFFICIENCY_MOD_FULL = 0.9f; // Full efficiency units get 10% combat malus
+        public const float EFFICIENCY_MOD_PEAK = 1.0f; // Peak efficiency units have no combat modifier
 
-        public const float FULL_STRENGTH_FLOOR      = 0.8f; // Minimum strength for full effectiveness
-        public const float DEPLETED_STRENGTH_FLOOR  = 0.5f; // Minimum strength for depleted effectiveness
+        public const float FULL_STRENGTH_FLOOR = 0.8f; // Minimum strength for full effectiveness
+        public const float DEPLETED_STRENGTH_FLOOR = 0.5f; // Minimum strength for depleted effectiveness
 
         public const int DEFAULT_MOVE_ACTIONS = 1;
         public const int DEFAULT_COMBAT_ACTIONS = 1;
@@ -65,9 +62,10 @@ namespace HammerAndSickle.Models
         public const int DEFAULT_DEPLOYMENT_ACTIONS = 1;
         public const int DEFAULT_OPPORTUNITY_ACTIONS = 1;
 
-        //================================
-        //====== Leader Skills/Tree ======
-        //================================
+        #endregion // CombatUnit Constants
+
+
+        #region Leader Constants
 
         // Leader LeaderID generation
         public const string LEADER_ID_PREFIX = "LDR";
@@ -171,24 +169,20 @@ namespace HammerAndSickle.Models
 
         // Politically connected bonuses and multipliers.
         public const int REPLACEMENT_XP_LEVEL_VAL = 1;    // Replacements get +1 XP level.
-        public const float SUPPLY_ECONOMY_MULT      = 0.8f; // Supply consumption gets 20% cost reduction.
-        public const float PRESTIGE_COST_MULT       = 0.7f; // Unit upgrades get 30% price reduction.
+        public const float SUPPLY_ECONOMY_MULT = 0.8f; // Supply consumption gets 20% cost reduction.
+        public const float PRESTIGE_COST_MULT = 0.7f; // Unit upgrades get 30% price reduction.
 
         // EngineeringSpecialization specific
         public const float RIVER_CROSSING_MOVE_MULT = 0.5f; // x% movement cost reduction
-        public const float RIVER_ASSAULT_MULT       = 1.4f; // x% combat bonus when attacking across a river.
+        public const float RIVER_ASSAULT_MULT = 1.4f; // x% combat bonus when attacking across a river.
 
         // Special forces bonuses
-        public const float TMASTERY_MOVE_MULT  = 0.8f; // x% movement cost reduction in non-clear terrain.
-        public const float INFILTRATION_MULT   = 0.5f; // x% ZOC penalty reduction
-        public const float AMBUSH_BONUS_MULT   = 1.5f; // x% combat bonus
+        public const float TMASTERY_MOVE_MULT = 0.8f; // x% movement cost reduction in non-clear terrain.
+        public const float INFILTRATION_MULT = 0.5f; // x% ZOC penalty reduction
+        public const float AMBUSH_BONUS_MULT = 1.5f; // x% combat bonus
 
         // Combined arms bonus.
-        public const float NIGHT_COMBAT_MULT   = 1.25f;// x% combat bonus at night
-
-        //================================
-        //====== Leader Reputation ======
-        //================================
+        public const float NIGHT_COMBAT_MULT = 1.25f;// x% combat bonus at night
 
         /// <summary>
         /// Types of actions that can award reputation to leaders
@@ -225,11 +219,6 @@ namespace HammerAndSickle.Models
         public const float MIN_REP_MULTIPLIER = 1.0f;
         public const float MAX_REP_MULTIPLIER = 3.0f;
 
-
-        //================================
-        //====== Random Generation ======
-        //================================
-
         // For Leader.RandomlyGenerateMe() dice roll
         public const int COMMAND_DICE_COUNT = 3;         // Roll 3d6
         public const int COMMAND_DICE_SIDES = 6;         // 6-sided dice
@@ -237,10 +226,10 @@ namespace HammerAndSickle.Models
         public const int COMMAND_CLAMP_MIN = -2;         // Minimum CommandAbility value
         public const int COMMAND_CLAMP_MAX = 0;          // Maximum CommandAbility value
 
+        #endregion // Leader Constants
 
-        //===================
-        //====== Bases ======
-        //===================
+
+        #region Facility Constants
 
         // Maximum stockpile capacities by depot size
         public static readonly Dictionary<DepotSize, float> MaxStockpileBySize = new()
@@ -275,7 +264,7 @@ namespace HammerAndSickle.Models
 
         // Supply efficiency multipliers
         public const float DISTANCE_EFF_MULT = 0.4f;
-        public const float ZOC_EFF_MULT      = 0.3f;
+        public const float ZOC_EFF_MULT = 0.3f;
 
         // Constants for special abilities
         public const int AirSupplyMaxRange = 16;
@@ -294,5 +283,7 @@ namespace HammerAndSickle.Models
 
         // Airbase constants
         public const int MAX_AIR_UNITS = 4;        // Max air units that can be attached to an airbase.
+
+        #endregion // Facility Constants
     }
 }
