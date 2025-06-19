@@ -5,7 +5,7 @@ using UnityEngine;
 
 namespace HammerAndSickle.Models
 {
-    /*───────────────────────────────────────────────────────────────────────────────
+ /*───────────────────────────────────────────────────────────────────────────────
  Leader  —  military officer model for unit command and skill progression
  ────────────────────────────────────────────────────────────────────────────────
  Overview
