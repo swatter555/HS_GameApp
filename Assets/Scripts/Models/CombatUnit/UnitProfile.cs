@@ -1,32 +1,208 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Runtime.Serialization;
-using System.Text;
 using HammerAndSickle.Services;
-using System.Linq;
 
 namespace HammerAndSickle.Models
 {
-    /// <summary>
-    /// UnitProfile is a mechanism to define a unit in terms of men, tanks, artillery, etc.,
-    /// while the combat values in the WeaponSystemProfile are used to resolve combat. This
-    /// mechanism is meant only for informational purposes, displayed in the GUI to the user.
-    /// This allows for the tracking of losses during a scenario and/or campaign.
-    /// 
-    /// Methods:
-    /// - Constructor: Creates new unit profiles with validation
-    /// - SetWeaponSystemValue: Configures maximum values for weapon systems
-    /// - UpdateCurrentProfile: Recalculates current strength based on hit points
-    /// - Clone: Creates deep copies with optional profileID/nationality changes
-    /// - Serialization: Complete ISerializable implementation for save/load
-    /// 
-    /// Key Features:
-    /// - Tracks both maximum and current weapon system counts
-    /// - Automatically scales current values based on unit hit points
-    /// - Supports deep cloning with parameter overrides
-    /// - Comprehensive validation and error handling
-    /// - Efficient dictionary-based storage for weapon systems
-    /// </summary>
+ /*───────────────────────────────────────────────────────────────────────────────
+ UnitProfile  —  organizational composition tracking and intelligence reporting
+ ────────────────────────────────────────────────────────────────────────────────
+ Overview
+ ════════
+ **UnitProfile** defines military units in terms of their organizational composition:
+ men, tanks, artillery pieces, aircraft, and other equipment. Unlike WeaponSystemProfile
+ which handles combat calculations, UnitProfile provides informational data for GUI
+ display and tracks attrition throughout scenarios and campaigns.
+
+ The system automatically scales current strength based on unit hit points, providing
+ realistic loss tracking as units take damage. It generates detailed intelligence
+ reports with fog-of-war effects, categorizing equipment into logical display buckets
+ for intuitive player understanding.
+
+ Major Responsibilities
+ ══════════════════════
+ • Organizational composition tracking
+     - Maximum equipment counts per weapon system type
+     - Current strength calculation based on hit point ratio
+     - Real-time attrition tracking through damage events
+ • Intelligence report generation
+     - Structured data for GUI intelligence displays
+     - Fog-of-war implementation with 5 spotted levels
+     - Equipment categorization into logical buckets
+ • Equipment management
+     - Weapon system addition, removal, and modification
+     - Validation and bounds checking for all values
+     - Comprehensive query methods for unit composition
+ • Template system support
+     - Deep cloning with parameter overrides (ID, nationality)
+     - Shared profile references for consistent unit definitions
+     - Serialization for save/load and template storage
+
+ Design Highlights
+ ═════════════════
+ • **Separation of Concerns**: Pure informational model separate from combat
+   mechanics, allowing independent GUI and combat system evolution.
+ • **Automatic Scaling**: Current equipment counts automatically calculated
+   from hit point ratios, maintaining realistic attrition representation.
+ • **Intelligence Categorization**: 20+ weapon system types organized into
+   intuitive display categories (Men, Tanks, Artillery, Aircraft, etc.).
+ • **Fog-of-War Integration**: Sophisticated error modeling with spotted-level
+   dependent accuracy for realistic intelligence gathering.
+ • **Flexible Cloning**: Multiple clone variants support template instantiation
+   with different IDs and nationalities while preserving composition.
+
+ Public-Method Reference
+ ═══════════════════════
+   ── Equipment Management ───────────────────────────────────────────────────────
+   SetWeaponSystemValue(system, maxValue)     Sets maximum count for equipment type.
+   GetWeaponSystemMaxValue(system)            Returns maximum count for equipment.
+   RemoveWeaponSystem(system)                 Removes equipment type entirely.
+   HasWeaponSystem(system)                    Checks if equipment type present.
+   GetWeaponSystems()                         Returns all equipment types in profile.
+   GetWeaponSystemCount()                     Returns total equipment type count.
+   Clear()                                    Removes all equipment from profile.
+
+   ── Strength Tracking ──────────────────────────────────────────────────────────
+   UpdateCurrentHP(currentHP)                 Updates current hit points for scaling.
+
+   ── Intelligence Reporting ─────────────────────────────────────────────────────
+   GenerateIntelReport(name, state, xp, eff, spotted) Creates intelligence report with
+                                              fog-of-war effects and categorization.
+
+   ── Cloning & Templates ────────────────────────────────────────────────────────
+   Clone()                                    Creates identical copy with same ID.
+   Clone(newProfileID)                        Creates copy with new profile ID.
+   Clone(newProfileID, newNationality)        Creates copy with new ID and nationality.
+
+   ── Persistence ────────────────────────────────────────────────────────────────
+   GetObjectData(info, context)              ISerializable save implementation.
+
+ Equipment Categorization System
+ ═══════════════════════════════
+ UnitProfile organizes 50+ weapon systems into logical display categories:
+
+   **Personnel Categories**
+   • **Men**: All infantry types (REG_INF, AB_INF, AM_INF, MAR_INF, SPEC_INF, ENG_INF)
+     - Regular, airborne, air mobile, marine, special forces, engineer infantry
+     - Scaled based on hit points to show personnel casualties
+
+   **Armored Vehicle Categories**
+   • **Tanks**: All main battle tanks (TANK_T55A, TANK_T80B, TANK_M1, etc.)
+   • **IFVs**: Infantry fighting vehicles (IFV_BMP1, IFV_BMP2, IFV_M2, etc.)
+   • **APCs**: Armored personnel carriers (APC_MTLB, APC_M113, etc.)
+   • **Recon**: Reconnaissance vehicles (RCN_BRDM2, etc.)
+
+   **Artillery Categories**
+   • **Artillery**: Towed and self-propelled artillery (ART_LIGHT, SPA_2S1, SPA_M109)
+   • **Rocket Artillery**: Multiple rocket launchers (ROC_BM21, ROC_MLRS, etc.)
+   • **Surface-to-Surface Missiles**: Ballistic missiles (SSM_SCUD, etc.)
+
+   **Air Defense Categories**
+   • **SAMs**: Surface-to-air missile systems (SAM_S300, SPSAM_9K31, etc.)
+   • **Anti-aircraft Artillery**: AAA systems (AAA_GENERIC, SPAAA_ZSU23, etc.)
+   • **MANPADs**: Portable air defense systems (MANPAD_GENERIC)
+   • **ATGMs**: Anti-tank guided missiles (ATGM_GENERIC)
+
+   **Aviation Categories**
+   • **Attack Helicopters**: Combat helicopters (HEL_MI24V, HEL_AH64, etc.)
+   • **Transport Helicopters**: Utility helicopters (HELTRAN_MI8, HELTRAN_UH1)
+   • **Fighters**: Air superiority fighters (ASF_MIG29, ASF_F15, etc.)
+   • **Multirole**: Multi-role fighters (MRF_F16, MRF_TornadoIDS, etc.)
+   • **Attack Aircraft**: Ground attack aircraft (ATT_A10, ATT_SU25, etc.)
+   • **Bombers**: Strategic and tactical bombers (BMB_F111, BMB_TU22M3, etc.)
+   • **Transports**: Transport aircraft (TRAN_AN8, etc.)
+   • **AWACS**: Airborne early warning aircraft (AWACS_A50)
+   • **Recon Aircraft**: Reconnaissance aircraft (RCNA_MIG25R, RCNA_SR71)
+
+ Intelligence System Architecture
+ ═══════════════════════════════
+ **Spotted Level Effects** (Fog-of-War Implementation)
+ • **Level 0**: Full information (player units, perfect intelligence)
+ • **Level 1**: Unit name only (minimal contact, no composition data)
+ • **Level 2**: Unit data with ±30% random error (poor intelligence)
+ • **Level 3**: Unit data with ±10% random error (good intelligence)
+ • **Level 4**: Perfect accuracy (excellent intelligence)
+ • **Level 5**: Perfect accuracy + movement history (elite intelligence)
+
+ **Error Application System**
+ Each equipment category receives independent random error within bounds:
+ ```
+ Error Percentage = Random(1% to MaxError%)
+ Direction = Random(Positive or Negative)
+ Fogged Value = Original × (1 ± ErrorPercentage)
+ ```
+
+ **IntelReport Structure**
+ Generated reports contain:
+ - **Unit Metadata**: Name, nationality, combat state, experience, efficiency
+ - **Categorized Equipment**: Bucketed counts for GUI display
+ - **Detailed Data**: Raw weapon system breakdown for advanced analysis
+ - **Fog-of-War State**: Accuracy level and error characteristics applied
+
+ Strength Scaling Mechanics
+ ═══════════════════════════
+ **Automatic Attrition Calculation**
+ Current equipment counts scale proportionally with unit hit points:
+ ```
+ Current Multiplier = Current HP / Maximum HP (40)
+ Current Equipment = Maximum Equipment × Current Multiplier
+ ```
+
+ **Realistic Loss Representation**
+ - 100% HP: Full equipment complement displayed
+ - 75% HP: 25% equipment losses shown across all categories  
+ - 50% HP: 50% equipment losses (moderate attrition)
+ - 25% HP: 75% equipment losses (heavy attrition)
+ - Near 0% HP: Minimal equipment remaining (unit nearly destroyed)
+
+ **Equipment Distribution**
+ All weapon systems scale uniformly, representing:
+ - Personnel casualties from combat and attrition
+ - Vehicle losses from enemy action and mechanical failure
+ - Aircraft losses from combat and operational accidents
+ - Equipment abandonment during retreats and repositioning
+
+ Template and Cloning System
+ ═══════════════════════════
+ **Profile Template Architecture**
+ UnitProfile supports sophisticated template instantiation:
+ - **Base Templates**: Master profiles with full equipment definitions
+ - **Nationality Variants**: Same composition, different national equipment
+ - **Named Instances**: Unique profile IDs for specific unit instances
+ - **Campaign Persistence**: Profiles maintain state across scenarios
+
+ **Clone Method Variants**
+ • `Clone()`: Exact copy with identical ID (template duplication)
+ • `Clone(newProfileID)`: New ID, same nationality (unit instantiation)  
+ • `Clone(newProfileID, newNationality)`: Full parameterization (cross-national templates)
+
+ **Use Cases**
+ - **Scenario Creation**: Clone base templates for specific unit instances
+ - **Campaign Progression**: Maintain unit-specific profiles across missions
+ - **Nationality Conversion**: Adapt profiles for different armies
+ - **Template Libraries**: Build reusable organizational templates
+
+ Weapon System Integration
+ ═════════════════════════
+ **WeaponSystems Enum Mapping**
+ UnitProfile uses the comprehensive WeaponSystems enumeration covering:
+ - Soviet systems: T-80B tanks, BMP-2 IFVs, Mi-24 helicopters, MiG-29 fighters
+ - NATO systems: M1 tanks, M2 Bradleys, AH-64 helicopters, F-15 fighters  
+ - Generic systems: Universal equipment for flexibility
+ - Facility types: Airbases, supply depots, headquarters
+
+ **Prefix-Based Categorization**
+ Equipment organization uses standardized naming prefixes:
+ - TANK_ → Tanks category
+ - IFV_ → Infantry Fighting Vehicles
+ - HEL_ → Attack Helicopters
+ - ASF_ → Air Superiority Fighters
+ - REG_INF_ → Personnel (Men) category
+
+ ───────────────────────────────────────────────────────────────────────────────
+ KEEP THIS COMMENT BLOCK IN SYNC WITH EQUIPMENT AND INTELLIGENCE CHANGES!
+ ───────────────────────────────────────────────────────────────────────────── */
     [Serializable]
     public class UnitProfile : ISerializable, ICloneable
     {

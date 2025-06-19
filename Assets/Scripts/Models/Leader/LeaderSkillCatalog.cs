@@ -1,4 +1,4 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Xml.Serialization;
@@ -209,7 +209,7 @@ namespace HammerAndSickle.Models
             string result = $"{Description}\n\nEffects:";
             foreach (var effect in Effects)
             {
-                result += $"\n� {effect.EffectDescription}";
+                result += $"\n• {effect.EffectDescription}";
             }
 
             if (RequiredGrade > CommandGrade.JuniorGrade)
@@ -223,7 +223,7 @@ namespace HammerAndSickle.Models
                 foreach (var prereq in Prerequisites)
                 {
                     string prereqName = LeaderSkillCatalog.GetSkillName(prereq);
-                    result += $"\n� {prereqName}";
+                    result += $"\n• {prereqName}";
                 }
             }
 
@@ -239,19 +239,205 @@ namespace HammerAndSickle.Models
         }
     }
 
-    /// <summary>
-    /// LeaderSkillCatalog is a static repository of all skill definitions in the game.
-    /// 
-    /// This class provides the following functionality:
-    /// - Central storage of all skill definitions
-    /// - Methods to retrieve skills by enum value
-    /// - Initialization of all skill tree branches
-    /// - Utility methods for skill descriptions and properties
-    /// 
-    /// The catalog is organized into distinct skill branches, each with its own initialization method.
-    /// Skills are tiered from 1-4 with increasing XP costs and prerequisites.
-    /// Each skill provides one or more effects or bonuses to unit capabilities.
-    /// </summary>
+ /*───────────────────────────────────────────────────────────────────────────────
+ LeaderSkillCatalog  —  comprehensive skill definition repository and effect system
+ ────────────────────────────────────────────────────────────────────────────────
+ Overview
+ ════════
+ **LeaderSkillCatalog** serves as the central static repository for all leader skills
+ in Hammer & Sickle. It defines the complete skill tree system including effects,
+ prerequisites, costs, and progression paths. The catalog organizes skills into
+ distinct branches with tiered progression from basic abilities to elite specializations.
+
+ The system supports three complementary classes:
+ • **SkillEffect**: Individual bonus effects with type, value, and description
+ • **SkillDefinition**: Complete skill specification with requirements and effects  
+ • **LeaderSkillCatalog**: Static storage and retrieval for all skill definitions
+
+ Major Responsibilities
+ ══════════════════════
+ • Skill definition storage & retrieval
+     - Central registry of all 50+ skills across 13 branches
+     - Enum-based skill identification and lookup system
+ • Effect system management
+     - Numeric bonuses (attack/defense values, action counts)
+     - Multiplier effects (cost reductions, movement bonuses)
+     - Boolean capabilities (special abilities and unlocks)
+ • Prerequisite & progression validation
+     - Branch unlock requirements and skill dependencies
+     - Command grade restrictions and tier-based progression
+     - Mutual exclusivity rules for conflicting specializations
+ • Branch organization & categorization
+     - Foundation branches (core leadership and political connections)
+     - Doctrine branches (combat specializations by unit type)
+     - Specialization branches (advanced elite capabilities)
+
+ Design Highlights
+ ═════════════════
+ • **Static Repository Pattern**: Thread-safe immutable catalog initialized once
+   at startup with comprehensive skill definitions.
+ • **Flexible Effect System**: Supports numeric bonuses, percentage modifiers,
+   and boolean capabilities through unified SkillEffect architecture.
+ • **Hierarchical Progression**: Foundation → Doctrine → Specialization path
+   with increasing reputation costs and command grade requirements.
+ • **Comprehensive Validation**: Built-in prerequisite checking, cost validation,
+   and mutual exclusivity enforcement.
+ • **Cultural Integration**: Branch naming and descriptions reflect Soviet
+   military doctrine and organizational structure.
+
+ Public-Method Reference
+ ═══════════════════════
+   ── Skill Retrieval ─────────────────────────────────────────────────────────
+   TryGetSkillDefinition(skillEnum, out def)  Gets complete skill data by enum.
+   GetSkillName(skillEnum)                    Returns skill name or "Unknown Skill".
+   GetFullSkillDescription(skillEnum)         Complete description with effects.
+
+   ── Branch Organization ─────────────────────────────────────────────────────
+   GetSkillsInBranch(branch)                  All skills in branch, ordered by tier.
+   GetSkillsInBranchByTier(branch, tier)      Skills matching branch and tier.
+
+ Skill Branch Architecture
+ ═════════════════════════
+ The catalog organizes 50+ skills across 13 specialized branches:
+
+   **Foundation Branches** (Core Progression)
+   ┌─────────────────────────────────────────────────────────────────────────┐
+   │ Leadership Foundation (5 tiers)                                        │
+   │ • Junior Officer Training (+1 command ability)                         │
+   │ • Promotion to Senior Grade (unlocks advanced branches)                │
+   │ • Senior Officer Training (+1 additional command)                      │
+   │ • Promotion to Top Grade (unlocks elite specializations)               │
+   │ • General Staff Training (+1 final command bonus)                      │
+   │                                                                         │
+   │ Politically Connected Foundation (5 skills)                            │
+   │ • Emergency Air Drop (one-time emergency resupply)                     │
+   │ • Direct Line To HQ (20% supply consumption reduction)                 │
+   │ • Foreign Technology (night vision equipment access)                   │
+   │ • Better Replacements (+1 experience level for new units)              │
+   │ • Connections At The Top (30% equipment cost reduction)                │
+   └─────────────────────────────────────────────────────────────────────────┘
+
+   **Doctrine Branches** (Combat Specializations)
+   ┌─────────────────────────────────────────────────────────────────────────┐
+   │ Armored Doctrine (Tank/Mechanized Warfare)                             │
+   │ • Shock Tank Corps (+5 hard attack rating)                             │
+   │ • Hull Down Expert (+5 hard defense rating)                            │
+   │ • Pursuit Doctrine (breakthrough movement after enemy retreat)         │
+   │                                                                         │
+   │ Infantry Doctrine (Soft-Target Operations)                             │
+   │ • Infantry Assault Tactics (+5 soft attack rating)                     │
+   │ • Defensive Doctrine (+5 soft defense rating)                          │
+   │ • Rough Terrain Operations (20% movement cost reduction)               │
+   │                                                                         │
+   │ Artillery Doctrine (Indirect Fire Support)                             │
+   │ • Precision Targeting (+1 indirect fire range)                         │
+   │ • Mobile Artillery Doctrine (shoot and scoot capability)               │
+   │ • Fire Mission Specialist (multi-target engagement)                    │
+   │                                                                         │
+   │ Air Defense Doctrine (Anti-Aircraft Operations)                        │
+   │ • Offensive Air Defense (+5 air attack rating)                         │
+   │ • Integrated Air Defense System (+5 air defense rating)                │
+   │ • Ready Response Protocol (+1 opportunity action)                      │
+   │                                                                         │
+   │ Airborne Doctrine (Paratrooper Operations)                             │
+   │ • Rapid Deployment Planning (free aircraft boarding)                   │
+   │ • Combat Drop Doctrine (reduced jump suppression)                      │
+   │ • Elite Paratrooper Corps (combat capability after jump)               │
+   │                                                                         │
+   │ Air Mobile Doctrine (Helicopter Operations)                            │
+   │ • Rapid Redeployment (movement after helicopter landing)               │
+   │ • Heliborne Strike Force (combat action after landing)                 │
+   │ • Elite Air Mobile Operations (enhanced protection while mounted)      │
+   │                                                                         │
+   │ Intelligence Doctrine (Reconnaissance & Surveillance)                  │
+   │ • Enhanced Intelligence Collection (+1 intel action)                   │
+   │ • Concealed Operations Base (medium silhouette reduction)              │
+   │ • Satellite Intelligence (global reconnaissance capability)            │
+   └─────────────────────────────────────────────────────────────────────────┘
+
+   **Specialization Branches** (Elite Capabilities)
+   ┌─────────────────────────────────────────────────────────────────────────┐
+   │ Combined Arms Specialization (Advanced Command)                        │
+   │ • Aviation Assets (+1 spotting range)                                  │
+   │ • Expert Staff Planning (+1 movement action)                           │
+   │ • Tactical Genius (+1 combat action)                                   │
+   │ • Night Combat Operations (25% night combat bonus)                     │
+   │                                                                         │
+   │ Signal Intelligence Specialization (Electronic Warfare)                │
+   │ • Communications Decryption (enhanced unit identification)             │
+   │ • Electronic Surveillance Network (+3 spotting range)                  │
+   │ • Radio Electronic Combat (enemy immobilization chance)                │
+   │ • Enemy Behavior Analysis (movement prediction capability)             │
+   │                                                                         │
+   │ Engineering Specialization (Terrain Manipulation)                      │
+   │ • River Crossing Operations (50% river crossing cost reduction)        │
+   │ • Amphibious Assault Tactics (40% river assault bonus)                 │
+   │ • Combat Engineering Corps (tactical bridge construction)              │
+   │ • Field Fortification Expert (permanent fortification building)       │
+   │                                                                         │
+   │ Special Forces Specialization (Unconventional Warfare)                 │
+   │ • Terrain Expert (20% rough terrain movement bonus)                    │
+   │ • Infiltration Tactics (50% enemy ZOC penalty reduction)               │
+   │ • Superior Camouflage (small silhouette reduction)                     │
+   │ • Ambush Tactics (50% first attack bonus from concealment)             │
+   └─────────────────────────────────────────────────────────────────────────┘
+
+ Effect Type System
+ ══════════════════
+ Skills provide bonuses through three distinct effect categories:
+
+   **Numeric Bonuses** (Direct value additions)
+   • Combat ratings: +5 to attack/defense values
+   • Action counts: +1 additional action per turn type
+   • Range extensions: +1 to spotting or indirect fire range
+   • Silhouette reductions: -1 to -3 visibility levels
+
+   **Multiplier Effects** (Percentage modifications)  
+   • Cost reductions: 0.7x prestige costs, 0.8x supply consumption
+   • Movement bonuses: 0.8x terrain penalties, 0.5x river crossing costs
+   • Combat modifiers: 1.25x night operations, 1.4x river assault
+
+   **Boolean Capabilities** (Special abilities)
+   • Tactical abilities: Breakthrough movement, shoot-and-scoot artillery
+   • Enhanced operations: Multi-target engagement, emergency resupply
+   • Advanced capabilities: Satellite reconnaissance, electronic warfare
+   • Construction abilities: Bridge building, field fortifications
+
+ Progression Requirements
+ ════════════════════════
+ Skill advancement follows strict hierarchical requirements:
+
+   **Reputation Costs** (Increasing by tier)
+   • Tier 1: 60 reputation points (basic doctrine skills)
+   • Tier 2: 80 reputation points (intermediate capabilities)  
+   • Tier 3: 120 reputation points (advanced specializations)
+   • Tier 4: 180 reputation points (elite abilities)
+   • Tier 5: 260 reputation points (ultimate mastery)
+   • Special: 100 rep (Senior Grade), 250 rep (Top Grade)
+
+   **Command Grade Gates**
+   • Junior Grade: Access to foundation and basic doctrine skills
+   • Senior Grade: Required for advanced doctrine and specialization entry
+   • Top Grade: Required for elite specializations and ultimate abilities
+
+   **Branch Prerequisites**
+   • Foundation skills: Linear progression within Leadership branch
+   • Doctrine skills: Must complete previous tier before advancement
+   • Specializations: Require Senior/Top Grade plus doctrine prerequisites
+   • Political skills: Independent progression with tier requirements only
+
+ Validation & Constraints
+ ════════════════════════
+ The catalog enforces comprehensive validation rules:
+   • Prerequisite checking: All dependencies must be satisfied
+   • Command grade validation: Rank requirements strictly enforced
+   • Cost bounds: Reputation costs within 50-500 point range
+   • Effect validation: Bonus values within defined combat/action limits
+   • Mutual exclusivity: Conflicting specializations prevented
+
+ ───────────────────────────────────────────────────────────────────────────────
+ KEEP THIS COMMENT BLOCK IN SYNC WITH SKILL ADDITIONS AND CHANGES!
+ ───────────────────────────────────────────────────────────────────────────── */
     public static class LeaderSkillCatalog
     {
         #region Fields

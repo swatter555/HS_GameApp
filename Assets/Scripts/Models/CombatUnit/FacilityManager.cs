@@ -1,4 +1,4 @@
-using HammerAndSickle.Services;
+﻿using HammerAndSickle.Services;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -6,6 +6,202 @@ using System.Runtime.Serialization;
 
 namespace HammerAndSickle.Models
 {
+ /*───────────────────────────────────────────────────────────────────────────────
+ FacilityManager  —  comprehensive base facility operations and resource management
+ ────────────────────────────────────────────────────────────────────────────────
+ Overview
+ ════════
+ **FacilityManager** handles all aspects of base facility operations in Hammer & Sickle,
+ managing three distinct facility types: Headquarters (HQ), Airbases, and Supply Depots.
+ Each facility type provides specialized capabilities essential for military operations,
+ from command coordination to air operations to logistics support.
+
+ The manager integrates with the parent CombatUnit system while maintaining specialized
+ functionality for base operations, damage assessment, and resource distribution.
+ It supports complex supply chain mechanics with distance-based efficiency calculations
+ and operational capacity modifiers.
+
+ Major Responsibilities
+ ══════════════════════
+ • Multi-type facility management
+     - HQ: Command and control operations
+     - Airbase: Air unit attachment and operations support
+     - Supply Depot: Resource generation, storage, and distribution
+ • Damage and operational capacity assessment
+     - 5-tier damage system (0-100% with operational thresholds)
+     - Efficiency multipliers affecting all facility operations
+     - Repair and maintenance tracking
+ • Air unit attachment system
+     - Up to 4 air units per airbase with type validation
+     - Operational readiness assessment and capacity management
+     - Launch capability and maintenance support
+ • Advanced supply distribution
+     - Multi-modal supply (ground, air, naval) with range limitations
+     - Distance and ZOC-based efficiency calculations
+     - Stockpile management with size-based capacity scaling
+ • Reference resolution and persistence
+     - Two-phase loading with air unit attachment restoration
+     - Cloning support for facility templates
+     - Parent relationship validation and consistency checking
+
+ Design Highlights
+ ═════════════════
+ • **Unified Facility Interface**: Single class manages three distinct facility types
+   with type-specific validation and specialized method routing.
+ • **Dynamic Efficiency System**: Operational capacity affects all facility functions
+   through configurable multipliers (100% → 75% → 50% → 25% → 0%).
+ • **Advanced Supply Mechanics**: Multi-factor efficiency calculations including
+   distance decay, enemy ZOC penalties, and operational status modifiers.
+ • **Resource Scaling**: Depot size determines capacity, generation rates, and
+   projection ranges with automatic progression (Small → Medium → Large → Huge).
+ • **Parent Integration**: Bidirectional relationship with CombatUnit ensuring
+   consistency and proper lifecycle management.
+
+ Public-Method Reference
+ ═══════════════════════
+   ── Facility Setup & Configuration ─────────────────────────────────────────────
+   SetupHQ(parent)                        Configures facility as headquarters.
+   SetupAirbase(parent)                   Configures facility as airbase.
+   SetupSupplyDepot(parent, category, size) Configures facility as supply depot.
+   SetParent(parent)                      Sets parent CombatUnit relationship.
+
+   ── Damage & Operational Status ────────────────────────────────────────────────
+   AddDamage(amount)                      Applies incoming damage with UI feedback.
+   RepairDamage(amount)                   Repairs damage and updates capacity.
+   SetDamage(level)                       Directly sets damage level (0-100).
+   GetEfficiencyMultiplier()              Returns operational efficiency (0.0-1.0).
+   IsOperational()                        Checks if facility can function.
+
+   ── Airbase Operations ─────────────────────────────────────────────────────────
+   AddAirUnit(unit)                       Attaches air unit with validation.
+   RemoveAirUnit(unit)                    Detaches air unit by reference.
+   RemoveAirUnitByID(unitID)              Detaches air unit by ID string.
+   GetAirUnitByID(unitID)                 Retrieves attached air unit.
+   HasAirUnit(unit)                       Checks if unit is attached.
+   HasAirUnitByID(unitID)                 Checks attachment by ID.
+   GetAttachedUnitCount()                 Returns total attached units.
+   GetAirUnitCapacity()                   Returns remaining attachment slots.
+   ClearAllAirUnits()                     Removes all attached air units.
+   CanLaunchAirOperations()               Validates launch capability.
+   CanRepairAircraft()                    Validates maintenance capability.
+   CanAcceptNewAircraft()                 Checks capacity availability.
+   GetOperationalAirUnits()               Returns functional air units list.
+   GetOperationalAirUnitCount()           Returns functional air units count.
+
+   ── Supply Depot Operations ────────────────────────────────────────────────────
+   AddSupplies(amount)                    Adds supplies to stockpile.
+   RemoveSupplies(amount)                 Removes supplies from stockpile.
+   GenerateSupplies()                     Produces supplies per turn.
+   CanSupplyUnitAt(distance, zocs)        Validates supply delivery capability.
+   SupplyUnit(distance, zocs)             Delivers supplies with efficiency.
+   PerformAirSupply(distance)             Executes air supply operation.
+   PerformNavalSupply(distance)           Executes naval supply operation.
+   GetStockpilePercentage()               Returns stockpile fill ratio.
+   IsStockpileEmpty()                     Checks if supplies depleted.
+   GetRemainingSupplyCapacity()           Returns available storage space.
+   UpgradeDepotSize()                     Advances to next size tier.
+   SetLeaderSupplyPenetration(enabled)    Enables ZOC penetration capability.
+
+   ── Persistence & Cloning ──────────────────────────────────────────────────────
+   GetObjectData(info, context)          ISerializable save implementation.
+   ResolveReferences(manager)             Restores air unit attachments.
+   HasUnresolvedReferences()              Checks for pending reference resolution.
+   Clone()                                Creates clean template copy.
+   CloneAsAirbase(source, parent)         Static airbase clone factory.
+   CloneAsSupplyDepot(source, parent, cat, size) Static depot clone factory.
+   CloneAsHQ(source, parent)              Static HQ clone factory.
+
+ Facility Type Specializations
+ ═════════════════════════════
+ **Headquarters (HQ)**
+ • Command and control coordination center
+ • Basic facility with damage tracking and operational status
+ • Supports intelligence gathering and command bonuses
+ • No specialized resource management or unit attachments
+
+ **Airbase Facilities**
+ • Air unit attachment and operations support (up to 4 units)
+ • Launch capability dependent on operational status
+ • Aircraft maintenance and repair services
+ • Type validation ensuring only air units attach
+ • Operational readiness assessment for attached squadrons
+
+ **Supply Depot Facilities**
+ • Multi-tier size system with scaling capabilities:
+   - Small: 30 days capacity, local projection (4 hex)
+   - Medium: 50 days capacity, extended projection (8 hex)
+   - Large: 80 days capacity, regional projection (12 hex)
+   - Huge: 110 days capacity, strategic projection (16 hex)
+ • Generation rate scaling: Minimal → Basic → Standard → Enhanced
+ • Main depot designation enables special supply modes:
+   - Air supply: 16 hex range, no ZOC restrictions
+   - Naval supply: 12 hex range, enhanced efficiency
+ • ZOC penetration capability for contested supply lines
+
+ Supply Distribution Mechanics
+ ═════════════════════════════
+ **Efficiency Calculation System**
+ Supply delivery effectiveness uses multi-factor efficiency:
+
+ ```
+ Total Efficiency = Distance Efficiency × ZOC Efficiency × Operational Efficiency
+ 
+ Distance Efficiency = 1.0 - (distance / max_range × 0.4)
+ ZOC Efficiency = 1.0 - (zocs_crossed × 0.3)
+ Operational Efficiency = Based on damage level (1.0 → 0.75 → 0.5 → 0.25 → 0.0)
+ ```
+
+ **Supply Mode Comparison**
+ • **Ground Supply**: Full projection range, ZOC restrictions apply
+ • **Air Supply**: 16 hex range, ignores ZOCs, main depot only
+ • **Naval Supply**: 12 hex range, enhanced efficiency, main depot only
+
+ **Distribution Rules**
+ • Minimum efficiency threshold: 10% (0.1) regardless of penalties
+ • Standard delivery amount: 7 days of unit supply
+ • Stockpile reserved: 7 days minimum retained at depot
+ • ZOC penetration: Requires leader skill or main depot capability
+
+ Operational Capacity System
+ ═══════════════════════════
+ Damage-based operational effectiveness with clear thresholds:
+
+ **Capacity Levels**
+ • **Full** (0-20 damage): 100% efficiency, all operations available
+ • **Slightly Degraded** (21-40 damage): 75% efficiency, reduced performance
+ • **Moderately Degraded** (41-60 damage): 50% efficiency, limited operations
+ • **Heavily Degraded** (61-80 damage): 25% efficiency, minimal capability
+ • **Out of Operation** (81-100 damage): 0% efficiency, no operations possible
+
+ **Impact on Operations**
+ • Supply generation rates affected by efficiency multiplier
+ • Air operations unavailable when out of operation
+ • All supply distribution efficiency reduced proportionally
+ • Repair and upgrade capabilities limited by operational status
+
+ Reference Resolution Pattern
+ ════════════════════════════
+ FacilityManager implements sophisticated reference resolution for air unit attachments:
+
+ • **Serialization**: Stores air unit IDs with "FM_" prefix to avoid conflicts
+ • **Deserialization**: Loads IDs into temporary storage (_attachedUnitIDs)
+ • **Resolution**: GameDataManager reconnects air unit object references
+ • **Validation**: Type checking ensures only air units are attached
+ • **Error Handling**: Missing units logged as warnings, not fatal errors
+ • **Cleanup**: Temporary storage cleared after successful resolution
+
+ Parent Relationship Management
+ ══════════════════════════════
+ Bidirectional consistency maintained between FacilityManager and CombatUnit:
+ • Parent CombatUnit references this FacilityManager instance
+ • FacilityManager maintains private reference to parent CombatUnit
+ • Validation methods ensure relationship integrity
+ • Setup methods automatically establish parent relationships
+ • Cloning preserves relationships for new unit templates
+
+ ───────────────────────────────────────────────────────────────────────────────
+ KEEP THIS COMMENT BLOCK IN SYNC WITH FACILITY SYSTEM CHANGES!
+ ───────────────────────────────────────────────────────────────────────────── */
     [Serializable]
     public class FacilityManager : ISerializable, IResolvableReferences
     {
