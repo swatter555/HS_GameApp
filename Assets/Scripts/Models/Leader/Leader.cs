@@ -45,7 +45,7 @@ namespace HammerAndSickle.Models
         public string FormattedRank { get { return GetFormattedRank(); } }   // Real-world rank of the officer
         public CommandAbility CombatCommand { get; private set; }            // Direct combat modifier
         public bool IsAssigned { get; private set; }                         // Is the officer assigned to a unit?
-        public string UnitID { get; private set; }                           // LeaderID of the unit assigned to the officer
+        public string UnitID { get; private set; }                           // UnitID of the unit assigned to the officer
 
         #endregion // Properties
 

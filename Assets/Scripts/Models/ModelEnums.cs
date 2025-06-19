@@ -1,12 +1,8 @@
 using System;
-using System.Xml.Linq;
-using UnityEngine;
 
 namespace HammerAndSickle.Models
 {
-    //=======================
-    //====== CombatUnit======
-    //=======================
+    #region CombatUnit Enums
 
     /// <summary>
     /// Defines the principal domains of unit operation: ground, air, or naval.
@@ -229,10 +225,22 @@ namespace HammerAndSickle.Models
         Level5  // Above plus where it moved last turn.
     }
 
+    /// <summary>
+    /// The types of actions a CombatUnit can perform.
+    /// </summary>
+    public enum ActionTypes
+    {
+        MoveAction,
+        CombatAction,
+        DeployAction,
+        OpportunityAction,
+        IntelAction
+    }
 
-    //=====================
-    //====== Leaders ======
-    //=====================
+    #endregion // CombatUnit Enums
+
+
+    #region LeaderEnums
 
     /// <summary>
     /// Represents the military rank grade of a commander.
@@ -241,7 +249,7 @@ namespace HammerAndSickle.Models
     {
         JuniorGrade = 1,    // Lieutenant Colonel equivalent
         SeniorGrade = 2,    // Colonel equivalent
-        TopGrade    = 3     // Major General equivalent
+        TopGrade = 3     // Major General equivalent
     }
 
     /// <summary>
@@ -256,10 +264,6 @@ namespace HammerAndSickle.Models
         Superior = 2,
         Genius = 3
     }
-
-    //================================
-    //====== Leader Skill Paths ======
-    //================================
 
     /// <summary>
     /// Marks an enum as representing a skill branch for automatic registration
@@ -439,10 +443,6 @@ namespace HammerAndSickle.Models
         AmbushTactics_AmbushTactics,                         // Ambush Tactics
     }
 
-    //===============================
-    //====== Skill Bonus Types ======
-    //===============================
-
     // Enum to define the type of bonus a skill provides
     public enum SkillBonusType
     {
@@ -602,9 +602,10 @@ namespace HammerAndSickle.Models
         public BranchTypeAttribute(BranchType type) => Type = type;
     }
 
-    //================================
-    //====== WeaponSystem Enums ======
-    //================================
+    #endregion // LeaderEnums
+
+
+    #region WeaponSystem Enums
 
     /// <summary>
     /// Weapon systems in the game.
@@ -781,9 +782,10 @@ namespace HammerAndSickle.Models
         Bomber
     }
 
-    //============================
-    //====== Facility Enums ======
-    //============================
+    #endregion // WeaponSystem Enums
+
+
+    #region Facility Enums
 
     /// <summary>
     /// Represents the type of a base facility in a military or logistical context.
@@ -853,4 +855,6 @@ namespace HammerAndSickle.Models
         Main,       // Primary depot with special abilities
         Secondary   // Standard field depot
     }
+
+    #endregion // Facility Enums
 }
