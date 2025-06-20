@@ -959,7 +959,7 @@ namespace HammerAndSickle.Services
 
         public static void SaveGameState()
         {
-            // TODO: Placeholder for game-specific save logic
+            // TODO: AppService placeholder for game-specific save logic.
         }
 
         private static void FallbackSaveErrorDataToPlayerPrefs()

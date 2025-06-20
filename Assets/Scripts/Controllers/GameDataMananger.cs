@@ -246,7 +246,7 @@ namespace HammerAndSickle.Models
 
         private const string CLASS_NAME = nameof(GameDataManager);
         private const int CURRENT_SAVE_VERSION = 1;
-        private const string SAVE_FILE_EXTENSION = ".dat";
+        private const string SAVE_FILE_EXTENSION = ".sce";
         private const string BACKUP_FILE_EXTENSION = ".bak";
 
         #endregion // Constants
@@ -389,7 +389,7 @@ namespace HammerAndSickle.Models
         /// <summary>
         /// Private constructor for singleton pattern.
         /// </summary>
-        private GameDataManager()
+        public GameDataManager()
         {
             // Initialize empty state
         }
