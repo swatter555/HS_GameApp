@@ -177,6 +177,56 @@ namespace HammerAndSickle.Models
             }
         }
 
+        /// <summary>
+        /// Increase current value by the specified amount or 1.
+        /// </summary>
+        /// <param name="amount"></param>
+        public void IncrementCurrent(float amount = 1)
+        {
+            try
+            {
+                if (amount < 0)
+                {
+                    throw new ArgumentOutOfRangeException(nameof(amount), "Increment amount must be non-negative");
+                }
+                Current += amount;
+                if (Current > Max)
+                {
+                    Current = Max; // Clamp to max
+                }
+            }
+            catch (Exception e)
+            {
+                AppService.HandleException(CLASS_NAME, "IncrementCurrent", e);
+                throw;
+            }
+        }
+
+        /// <summary>
+        /// Decrease current value by the specified amount or 1.
+        /// </summary>
+        /// <param name="amount"></param>
+        public void DecrementCurrent(float amount = 1)
+        {
+            try
+            {
+                if (amount < 0)
+                {
+                    throw new ArgumentOutOfRangeException(nameof(amount), "Decrement amount must be non-negative");
+                }
+                Current -= amount;
+                if (Current < 0)
+                {
+                    Current = 0; // Clamp to zero
+                }
+            }
+            catch (Exception e)
+            {
+                AppService.HandleException(CLASS_NAME, "DecrementCurrent", e);
+                throw;
+            }
+        }
+
         #endregion
     }
 }

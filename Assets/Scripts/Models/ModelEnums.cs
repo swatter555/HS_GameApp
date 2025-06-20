@@ -142,11 +142,11 @@ namespace HammerAndSickle.Models
     public enum ExperiencePointLevels
     {
         Raw = 0,
-        Green = 5,
-        Trained = 12,
-        Experienced = 22,
-        Veteran = 33,
-        Elite = 40
+        Green = 50,
+        Trained = 120,
+        Experienced = 220,
+        Veteran = 330,
+        Elite = 400
     }
 
     /// <summary>

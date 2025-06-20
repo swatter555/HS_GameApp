@@ -170,7 +170,6 @@ namespace HammerAndSickle.Models
         // Profiles contain unit stats and capabilities.
         public WeaponSystemProfile DeployedProfile { get; private set; }
         public WeaponSystemProfile MountedProfile { get; private set; }
-        //public WeaponSystemProfile ActiveProfile { get; private set; }
         public UnitProfile UnitProfile { get; private set; }
         public FacilityManager FacilityManager { get; internal set; }
 
@@ -257,7 +256,6 @@ namespace HammerAndSickle.Models
                 // Set profiles
                 DeployedProfile = deployedProfile;
                 MountedProfile = mountedProfile;
-                //ActiveProfile = deployedProfile; // Default to deployed profile
                 UnitProfile = unitProfile;
 
                 // If this is a base unit, initialize the proper facility.
@@ -725,7 +723,7 @@ namespace HammerAndSickle.Models
             {
                 // Units cannot gain negative experience.
                 if (points <= 0)
-                    throw new ArgumentOutOfRangeException(nameof(points), "Experience points must be positive.");
+                    return false;
 
                 // Validate points do not exceed maximum gain per action.
                 if (points > CUConstants.MAX_EXP_GAIN_PER_ACTION)
@@ -1253,7 +1251,7 @@ namespace HammerAndSickle.Models
                         }
 
                         // Deduct one move action.
-                        MoveActions.SetCurrent(MoveActions.Current - 1f);
+                        MoveActions.DecrementCurrent();
                         return true;
 
                     case ActionTypes.CombatAction:
@@ -1273,7 +1271,7 @@ namespace HammerAndSickle.Models
                         }
 
                         // Deduct one combat action.
-                        CombatActions.SetCurrent(CombatActions.Current - 1f);
+                        CombatActions.DecrementCurrent();
                         return true;
 
                     case ActionTypes.DeployAction:
@@ -1294,7 +1292,7 @@ namespace HammerAndSickle.Models
                         }
 
                         // Deduct one deployment action.
-                        DeploymentActions.SetCurrent(DeploymentActions.Current - 1f);
+                        DeploymentActions.DecrementCurrent();
                         return true;
 
                     case ActionTypes.OpportunityAction:
@@ -1307,7 +1305,7 @@ namespace HammerAndSickle.Models
                         }
 
                         // Consume one intel action
-                        OpportunityActions.SetCurrent(OpportunityActions.Current - 1f);
+                        OpportunityActions.DecrementCurrent();
                         return true;
 
                     case ActionTypes.IntelAction:
@@ -1331,7 +1329,7 @@ namespace HammerAndSickle.Models
                         }
 
                         // Consume one intel action
-                        IntelActions.SetCurrent(IntelActions.Current - 1f);
+                        IntelActions.DecrementCurrent();
                         return true;
                 }
 
