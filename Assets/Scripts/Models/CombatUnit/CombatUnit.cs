@@ -58,6 +58,9 @@ using UnityEngine;
    IsDestroyed()                      Checks if hit points <= 0.
    CanMove()                          Validates movement based on damage/supply.
    GetSupplyStatus()                  Returns supply percentage (0.0-1.0).
+   SetEfficiencyLevel(level)          Sets the efficiency level for the unit.
+   DecreaseEfficiencyLevelBy1()       Lowers efficiency level by 1 (if possible).
+   IncreaseEfficiencyLevelBy1()       Raises efficiency level by 1 (if possible).
 
    ── Experience System ────────────────────────────────────────────────────────
    AddExperience(points)              Adds XP and handles level-up notifications.
@@ -94,10 +97,8 @@ using UnityEngine;
 
    ── Positioning & Movement ──────────────────────────────────────────────────
    SetPosition(pos)                   Places unit at map coordinates.
-   GetPosition()                      Returns current map position.
    CanMoveTo(pos)                     Future: validates movement legality.
    GetDistanceTo(pos|unit)            Future: pathfinder distance calculation.
-   IsAtPosition(pos, tolerance)       Future: position checking with tolerance.
 
    ── Development Support ─────────────────────────────────────────────────────
    DebugSetCombatState(state)         Direct state change (no validation/cost).
@@ -193,7 +194,7 @@ namespace HammerAndSickle.Models
         public StatsMaxCurrent HitPoints { get; private set; }
         public StatsMaxCurrent DaysSupply { get; private set; }
         public StatsMaxCurrent MovementPoints { get; private set; }
-        public Vector2 MapPos { get; internal set; }
+        public Coordinate2D MapPos { get; internal set; }
         public SpottedLevel SpottedLevel { get; private set; }
 
         #endregion
@@ -303,7 +304,7 @@ namespace HammerAndSickle.Models
                 InitializeMovementPoints();
 
                 // Initialize position to origin (will be set when placed on map)
-                MapPos = Vector2.zero;
+                MapPos = Coordinate2D.Zero;
             }
             catch (Exception e)
             {
@@ -387,7 +388,7 @@ namespace HammerAndSickle.Models
                 EfficiencyLevel = (EfficiencyLevel)info.GetValue(nameof(EfficiencyLevel), typeof(EfficiencyLevel));
                 IsMounted = info.GetBoolean(nameof(IsMounted));
                 CombatState = (CombatState)info.GetValue(nameof(CombatState), typeof(CombatState));
-                MapPos = (Vector2)info.GetValue(nameof(MapPos), typeof(Vector2));
+                MapPos = (Coordinate2D)info.GetValue(nameof(MapPos), typeof(Coordinate2D));
 
                 // Load FacilityManager data
                 unresolvedFacilityManagerData = info.GetBoolean("HasFacilityManager");
@@ -704,6 +705,63 @@ namespace HammerAndSickle.Models
             {
                 AppService.HandleException(CLASS_NAME, "GetSupplyStatus", e);
                 return 0f;
+            }
+        }
+
+        /// <summary>
+        /// Sets the efficiency level for the application.
+        /// </summary>
+        /// <remarks>This method updates the application's efficiency level to the specified value. 
+        /// Ensure that the provided <paramref name="level"/> is a valid enumeration value to avoid
+        /// exceptions.</remarks>
+        /// <param name="level">The desired efficiency level to set. Must be a valid value of the <see cref="EfficiencyLevel"/> enumeration.</param>
+        public void SetEfficiencyLevel(EfficiencyLevel level)
+        {
+            try
+            {
+                // Validate the new level
+                if (!Enum.IsDefined(typeof(EfficiencyLevel), level))
+                {
+                    throw new ArgumentOutOfRangeException(nameof(level), "Invalid efficiency level");
+                }
+                // Set the new efficiency level
+                EfficiencyLevel = level;
+            }
+            catch (Exception e)
+            {
+                AppService.HandleException(CLASS_NAME, "SetEfficiencyLevel", e);
+            }
+        }
+
+        /// <summary>
+        /// Decreases the efficiency level by 1, if possible.
+        /// </summary>
+        public void DecreaseEfficiencyLevelBy1()
+        {
+            try
+            {
+                if (EfficiencyLevel > EfficiencyLevel.StaticOperations)
+                    EfficiencyLevel--;
+            }
+            catch (Exception e)
+            {
+                AppService.HandleException(CLASS_NAME, "DecreaseEfficiencyLevel", e);
+            }
+        }
+
+        /// <summary>
+        /// Increases the efficiency level by 1, if possible.
+        /// </summary>
+        public void IncreaseEfficiencyLevelBy1()
+        {
+            try
+            {
+                if (EfficiencyLevel < EfficiencyLevel.PeakOperational)
+                    EfficiencyLevel++;
+            }
+            catch (Exception e)
+            {
+                AppService.HandleException(CLASS_NAME, "IncreaseEfficiencyLevel", e);
             }
         }
 
@@ -1568,7 +1626,7 @@ namespace HammerAndSickle.Models
         /// Sets the unit's position on the map.
         /// </summary>
         /// <param name="newPos">The new position coordinates</param>
-        public void SetPosition(Vector2 newPos)
+        public void SetPosition(Coordinate2D newPos)
         {
             try
             {
@@ -1587,10 +1645,17 @@ namespace HammerAndSickle.Models
         /// </summary>
         /// <param name="targetPos">The target position to validate</param>
         /// <returns>True if movement appears valid</returns>
-        public bool CanMoveTo(Vector2 targetPos)
+        public bool CanMoveTo(Coordinate2D targetPos)
         {
-            // TODO: Implement full movement validation logic
-            throw new NotImplementedException(); // Placeholder for future movement validation logic
+            try
+            {
+                throw new NotImplementedException("Movement validation logic not implemented yet.");
+            }
+            catch (Exception e)
+            {
+                AppService.HandleException(CLASS_NAME, "CanMoveTo", e);
+                return false;
+            }
         }
 
         /// <summary>
@@ -1598,10 +1663,17 @@ namespace HammerAndSickle.Models
         /// </summary>
         /// <param name="targetPos">The target position</param>
         /// <returns>Distance in Unity units</returns>
-        public float GetDistanceTo(Vector2 targetPos)
+        public float GetDistanceTo(Coordinate2D targetPos)
         {
-            // TODO: Implement distance calculation logic
-            throw new NotImplementedException(); // Placeholder for future distance calculation logic
+            try
+            {
+                throw new NotImplementedException("Distance calculation logic not implemented yet.");
+            }
+            catch (Exception e)
+            {
+                AppService.HandleException(CLASS_NAME, "GetDistanceTo", e);
+                return 0f;
+            }
         }
 
         /// <summary>
@@ -1611,29 +1683,15 @@ namespace HammerAndSickle.Models
         /// <returns>Distance in Unity units</returns>
         public float GetDistanceTo(CombatUnit otherUnit)
         {
-            // TODO: Implement distance calculation logic
-            throw new NotImplementedException(); // Placeholder for future distance calculation logic
-        }
-
-        /// <summary>
-        /// Checks if the unit is at the specified position (within tolerance).
-        /// </summary>
-        /// <param name="position">Position to check</param>
-        /// <param name="tolerance">Distance tolerance (default 0.01f)</param>
-        /// <returns>True if unit is at the position</returns>
-        public bool IsAtPosition(Vector2 position, float tolerance = 0.01f)
-        {
-            // TODO: Implement position checking logic
-            throw new NotImplementedException(); // Placeholder for future position checking logic
-        }
-
-        /// <summary>
-        /// Gets the unit's current map position.
-        /// </summary>
-        /// <returns>Current position on the map</returns>
-        public Vector2 GetPosition()
-        {
-            return MapPos;
+            try
+            {
+                throw new NotImplementedException("Distance calculation logic not implemented yet.");
+            }
+            catch (Exception e)
+            {
+                AppService.HandleException(CLASS_NAME, "GetDistanceTo", e);
+                return 0f;
+            }
         }
 
         #endregion // Position and Movement Interface Methods
@@ -1649,6 +1707,16 @@ namespace HammerAndSickle.Models
         {
             CombatState = newState;
         }
+
+        /// <summary>
+        /// Sets the mounted state of the object for debugging purposes.
+        /// </summary>
+        /// <param name="isMounted">A value indicating whether the object should be marked as mounted.  <see langword="true"/> to mark the
+        /// object as mounted; otherwise, <see langword="false"/>.</param>
+        public void DebugSetMounted(bool isMounted)
+        {
+            IsMounted = isMounted;
+        }   
 
         #endregion // Debugging Methods
 
