@@ -590,7 +590,7 @@ namespace HammerAndSickle.Models
             catch (Exception e)
             {
                 AppService.HandleException(CLASS_NAME, "AddAirUnit", e);
-                throw;
+                return false;
             }
         }
 

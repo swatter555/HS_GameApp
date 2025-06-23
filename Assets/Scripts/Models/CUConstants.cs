@@ -56,11 +56,17 @@ namespace HammerAndSickle.Models
         public const float FULL_STRENGTH_FLOOR = 0.8f; // Minimum strength for full effectiveness
         public const float DEPLETED_STRENGTH_FLOOR = 0.5f; // Minimum strength for depleted effectiveness
 
+        // Combat action defaults
         public const int DEFAULT_MOVE_ACTIONS = 1;
         public const int DEFAULT_COMBAT_ACTIONS = 1;
         public const int DEFAULT_INTEL_ACTIONS = 1;
         public const int DEFAULT_DEPLOYMENT_ACTIONS = 1;
         public const int DEFAULT_OPPORTUNITY_ACTIONS = 1;
+
+        // Unit supply constants.
+        public const float LOW_SUPPLY_THRESHOLD = 1f;                   // Threshold for low supply warning
+        public const float CRITICAL_SUPPLY_THRESHOLD = 0.5f;            // Threshold for critical supply warning
+        public const float COMBAT_STATE_SUPPLY_TRANSITION_COST = 0.25f; // Supply cost for state transitions.
 
         #endregion // CombatUnit Constants
 
@@ -259,8 +265,8 @@ namespace HammerAndSickle.Models
         };
 
         // Amount any unit can stockpile
-        public const float MaxDaysSupplyDepot = 100f;  // Max supply a depot can carry
-        public const float MaxDaysSupplyUnit = 7f;     // Max supply a unit can carry
+        public const float MaxDaysSupplyDepot = 100f;       // Max supply a depot can carry
+        public const float MaxDaysSupplyUnit = 7f;          // Max supply a unit can carry
 
         // Supply efficiency multipliers
         public const float DISTANCE_EFF_MULT = 0.4f;
