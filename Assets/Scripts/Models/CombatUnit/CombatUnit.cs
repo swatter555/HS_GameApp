@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Linq;
 using System.Runtime.Serialization;
 using UnityEngine;
 
@@ -90,6 +91,8 @@ using UnityEngine;
 
    ── Combat State Management ─────────────────────────────────────────────────
    SetCombatState(state)              Changes state with validation & costs.
+   UpOneState()                       Moves up to next state (if possible).
+   DownOneState()                     Moves down to previous state (if possible).
    CanChangeToState(state)            Validates transition rules & resources.
    BeginEntrenchment()                Convenience method: Deployed → HastyDefense.
    CanEntrench()                      Checks if entrenchment is possible.
@@ -471,6 +474,10 @@ namespace HammerAndSickle.Models
         {
             try
             {
+                // Ensure we have a valid active weapon system profile.
+                if (GetActiveWeaponSystemProfile() == null)
+                    throw new InvalidOperationException("Active weapon system profile is null");
+
                 // Clone the active profile.
                 WeaponSystemProfile combatProfile = GetActiveWeaponSystemProfile().Clone();
 
@@ -785,8 +792,10 @@ namespace HammerAndSickle.Models
 
                 // Validate points do not exceed maximum gain per action.
                 if (points > CUConstants.MAX_EXP_GAIN_PER_ACTION)
-                    throw new ArgumentOutOfRangeException(nameof(points), $"Experience points cannot exceed {CUConstants.MAX_EXP_GAIN_PER_ACTION} per action.");
-
+                {
+                    points = CUConstants.MAX_EXP_GAIN_PER_ACTION;
+                }
+                    
                 // Add experience points to total.
                 ExperiencePoints += points;
 
@@ -1445,6 +1454,104 @@ namespace HammerAndSickle.Models
         #region CombatState Interface Methods
 
         /// <summary>
+        /// Moves the unit up one combat state (toward more mobile/less defensive posture).
+        /// Progression: Fortified → Entrenched → HastyDefense → Deployed → Mobile
+        /// </summary>
+        /// <returns>True if state change was successful, false if already at maximum mobility or transition invalid</returns>
+        public bool UpOneState()
+        {
+            try
+            {
+                // Define the state order for navigation
+                var stateOrder = new Dictionary<CombatState, int>
+                {
+                    { CombatState.Mobile, 0 },
+                    { CombatState.Deployed, 1 },
+                    { CombatState.HastyDefense, 2 },
+                    { CombatState.Entrenched, 3 },
+                    { CombatState.Fortified, 4 }
+                };
+
+                // Check if current state is valid
+                if (!stateOrder.ContainsKey(CombatState))
+                {
+                    AppService.CaptureUiMessage($"Cannot move up from unknown combat state: {CombatState}");
+                    return false;
+                }
+
+                int currentIndex = stateOrder[CombatState];
+
+                // Check if already at maximum mobility (Mobile state)
+                if (currentIndex == 0)
+                {
+                    AppService.CaptureUiMessage($"{UnitName} is already in Mobile state - cannot move to higher mobility.");
+                    return false;
+                }
+
+                // Calculate target state (one step toward Mobile)
+                int targetIndex = currentIndex - 1;
+                var targetState = stateOrder.First(kvp => kvp.Value == targetIndex).Key;
+
+                // Use existing validation and state change logic
+                return SetCombatState(targetState);
+            }
+            catch (Exception e)
+            {
+                AppService.HandleException(CLASS_NAME, "UpOneState", e);
+                return false;
+            }
+        }
+
+        /// <summary>
+        /// Moves the unit down one combat state (toward more defensive/less mobile posture).
+        /// Progression: Mobile → Deployed → HastyDefense → Entrenched → Fortified
+        /// </summary>
+        /// <returns>True if state change was successful, false if already at maximum defensive posture or transition invalid</returns>
+        public bool DownOneState()
+        {
+            try
+            {
+                // Define the state order for navigation
+                var stateOrder = new Dictionary<CombatState, int>
+                {
+                    { CombatState.Mobile, 0 },
+                    { CombatState.Deployed, 1 },
+                    { CombatState.HastyDefense, 2 },
+                    { CombatState.Entrenched, 3 },
+                    { CombatState.Fortified, 4 }
+                };
+
+                // Check if current state is valid
+                if (!stateOrder.ContainsKey(CombatState))
+                {
+                    AppService.CaptureUiMessage($"Cannot move down from unknown combat state: {CombatState}");
+                    return false;
+                }
+
+                int currentIndex = stateOrder[CombatState];
+
+                // Check if already at maximum defensive posture (Fortified state)
+                if (currentIndex == 4)
+                {
+                    AppService.CaptureUiMessage($"{UnitName} is already in Fortified state - cannot move to higher defensive posture.");
+                    return false;
+                }
+
+                // Calculate target state (one step toward Fortified)
+                int targetIndex = currentIndex + 1;
+                var targetState = stateOrder.First(kvp => kvp.Value == targetIndex).Key;
+
+                // Use existing validation and state change logic
+                return SetCombatState(targetState);
+            }
+            catch (Exception e)
+            {
+                AppService.HandleException(CLASS_NAME, "DownOneState", e);
+                return false;
+            }
+        }
+
+        /// <summary>
         /// Changes the unit's combat state if transition is valid and resources are available.
         /// Handles profile switching and movement point costs automatically.
         /// </summary>
@@ -1458,14 +1565,17 @@ namespace HammerAndSickle.Models
                 if (!CanChangeToState(newState))
                     return false;
 
-                // Spend the deployment action and movement points if possible.
-                if (SpendAction(ActionTypes.DeployAction))
+                // Store previous state before changing it
+                CombatState previousState = CombatState;
+
+                // Spend the deployment action and movement points if possible, consuming supplies if possible.
+                if (SpendAction(ActionTypes.DeployAction) && ConsumeSupplies(CUConstants.COMBAT_STATE_SUPPLY_TRANSITION_COST))
                 {
                     // Update combat state directly
                     CombatState = newState;
 
-                    // Apply profile changes for new state
-                    UpdateStateAndProfiles(newState);
+                    // Pass previous state to profile update method
+                    UpdateStateAndProfiles(newState, previousState);
 
                     return true;
                 }
@@ -1503,6 +1613,10 @@ namespace HammerAndSickle.Models
                     return false;
                 }
 
+                // Check if the unit is destroyed
+                if (IsDestroyed())
+                    return false;
+
                 // Air units and bases cannot change states.
                 if (!CanUnitTypeChangeStates())
                 {
@@ -1533,6 +1647,32 @@ namespace HammerAndSickle.Models
                     errorMessage += "Insufficient movement points for deployment action.";
                     AppService.CaptureUiMessage(errorMessage);
                     return false;
+                }
+
+                // Check if the unit has critical supply levels
+                if (DaysSupply.Current <= CUConstants.CRITICAL_SUPPLY_THRESHOLD)
+                {
+                    errorMessage += "Cannot change state with critical supply levels.";
+                    AppService.CaptureUiMessage(errorMessage);
+                    return false;
+                }
+
+                // Only limited CombatState transitions are allowed based on efficiency level.
+                if (EfficiencyLevel == EfficiencyLevel.StaticOperations)
+                {
+                    if (CombatState == CombatState.Fortified || CombatState == CombatState.Entrenched || CombatState == CombatState.HastyDefense)
+                    {
+                        errorMessage += "Cannot change from defensive states in Static Operations.";
+                        AppService.CaptureUiMessage(errorMessage);
+                        return false; // Cannot change from defensive states in static operations
+                    }
+
+                    if (targetState == CombatState.Mobile)
+                    {
+                        errorMessage += "Cannot change to Mobile state in Static Operations.";
+                        AppService.CaptureUiMessage(errorMessage);
+                        return false; // Cannot change to Mobile state in static operations
+                    }
                 }
 
                 return true;
@@ -2363,21 +2503,14 @@ namespace HammerAndSickle.Models
         }
 
         /// <summary>
-        /// Updates the combat state and adjusts the active profile and movement points accordingly.
+        /// Updates the unit's mounted state and movement points based on combat state transitions.
         /// </summary>
-        /// <remarks>This method updates the unit's state and associated profiles based on the provided
-        /// combat state.  If the state is <see cref="CombatState.Mobile"/>, the method applies movement bonuses and
-        /// sets the active profile  to the mounted profile if available; otherwise, it uses the deployed profile. For
-        /// other states, the unit is unmounted,  movement bonuses are removed, and the deployed profile is set as
-        /// active. <para> Preconditions: <list type="bullet"> <item><description>If the unit is mounted, <see
-        /// cref="MountedProfile"/> must not be <see langword="null"/>.</description></item> <item><description><see
-        /// cref="DeployedProfile"/> must not be <see langword="null"/>.</description></item> </list> </para> <para>
-        /// Postconditions: <list type="bullet"> <item><description>The active profile is updated to match the specified
-        /// state.</description></item> <item><description>Movement points are adjusted based on the state and any
-        /// applicable bonuses.</description></item> <item><description>The mounted state is toggled as
-        /// necessary.</description></item> </list> </para></remarks>
-        /// <param name="state">The desired combat state to transition to. Must be a valid <see cref="CombatState"/> value.</param>
-        private void UpdateStateAndProfiles(CombatState state)
+        /// <remarks>
+        /// This method handles profile switching and movement point adjustments during combat state changes.
+        /// Movement points are only modified when transitioning TO or FROM Mobile state to add/remove movement bonuses.
+        /// For transitions between non-Mobile states, movement points are left unchanged to preserve the 
+        /// movement point consumption from SpendAction.
+        private void UpdateStateAndProfiles(CombatState newState, CombatState previousState)
         {
             try
             {
@@ -2385,11 +2518,11 @@ namespace HammerAndSickle.Models
                 if (DeployedProfile == null)
                     throw new InvalidOperationException("Cannot update state: DeployedProfile is null");
 
-                if (state == CombatState.Mobile && IsMounted && MountedProfile == null)
+                if (newState == CombatState.Mobile && IsMounted && MountedProfile == null)
                     throw new InvalidOperationException("Cannot update state: Unit is mounted but MountedProfile is null");
 
-                // Start with CombatState.Mobile.
-                if (state == CombatState.Mobile)
+                // Handle transition TO Mobile state
+                if (newState == CombatState.Mobile)
                 {
                     // Check for a mounted profile first
                     if (MountedProfile != null)
@@ -2403,23 +2536,39 @@ namespace HammerAndSickle.Models
                         float movementBonus = CUConstants.MOBILE_MOVEMENT_BONUS;
                         float newMaxMovement = MovementPoints.Max + movementBonus;
 
-                        // Update max movement while preserving current percentage
-                        float currentPercentage = MovementPoints.GetPercentage();
+                        // Update max movement while preserving current movement points
+                        float currentMovement = MovementPoints.Current;
                         MovementPoints.SetMax(newMaxMovement);
-                        MovementPoints.SetCurrent(newMaxMovement * currentPercentage);
+                        MovementPoints.SetCurrent(currentMovement + movementBonus);
 
                         // Unit is not mounted but gets movement bonus
                         IsMounted = false;
                     }
                 }
-                // Handle other states with deployed profile and unmounted.
-                else
+                // Handle transition FROM Mobile state
+                else if (previousState == CombatState.Mobile)
                 {
-                    // CombatState might have changed downwards, therefore dismount if mounted.
-                    if (IsMounted) IsMounted = false;
+                    // If coming FROM Mobile state, we need to remove any movement bonuses
 
-                    // Remove movement bonus -revert to base movement
-                    InitializeMovementPoints();
+                    // If unit was mounted, just dismount
+                    if (IsMounted)
+                    {
+                        IsMounted = false;
+                    }
+                    // If unit had movement bonus (wasn't mounted but was Mobile), remove the bonus
+                    else if (MountedProfile == null)
+                    {
+                        // Remove the movement bonus while preserving consumed movement points
+                        float movementBonus = CUConstants.MOBILE_MOVEMENT_BONUS;
+                        float newMaxMovement = MovementPoints.Max - movementBonus;
+                        float currentMovement = MovementPoints.Current - movementBonus;
+
+                        // Ensure current movement doesn't go below 0
+                        currentMovement = Mathf.Max(0f, currentMovement);
+
+                        MovementPoints.SetMax(newMaxMovement);
+                        MovementPoints.SetCurrent(currentMovement);
+                    }
                 }
             }
             catch (Exception e)
