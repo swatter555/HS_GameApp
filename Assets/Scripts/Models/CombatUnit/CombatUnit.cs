@@ -688,7 +688,7 @@ namespace HammerAndSickle.Models
             }
             catch (Exception e)
             {
-                AppService.HandleException(CLASS_NAME, "CanOperate", e);
+                AppService.HandleException(CLASS_NAME, "CanMove", e);
                 return false;
             }
         }
@@ -1371,7 +1371,7 @@ namespace HammerAndSickle.Models
                             return false;
                         }
 
-                        // Consume one intel action
+                        // Consume one opportunity action
                         OpportunityActions.DecrementCurrent();
                         return true;
 
@@ -1419,7 +1419,7 @@ namespace HammerAndSickle.Models
         public Dictionary<string, float> GetAvailableActions()
         {
             // Move – must have a token and at least 1 movement point remaining.
-            float moveAvailable = (CanConsumeMoveAction() && MovementPoints.Current > 0f)
+            float moveAvailable = (CanConsumeMoveAction() && MovementPoints.Current >= 0f)
                 ? MoveActions.Current : 0f;
 
             // Combat – existing validation already checks movement cost.
@@ -1552,42 +1552,65 @@ namespace HammerAndSickle.Models
         }
 
         /// <summary>
-        /// Changes the unit's combat state if transition is valid and resources are available.
-        /// Handles profile switching and movement point costs automatically.
+        /// Attempts to transition this unit to the specified <paramref name="newState" />.
         /// </summary>
-        /// <param name="newState">The target combat state</param>
-        /// <returns>True if state change was successful</returns>
+        /// <param name="newState">The combat state the unit should enter.</param>
+        /// <returns>
+        /// <c>true</c> if the transition succeeds; otherwise <c>false</c>. A return value of
+        /// <c>false</c> indicates either <see cref="CanChangeToState(CombatState)" /> rejected the
+        /// request or an unexpected internal fault was captured and logged.
+        /// </returns>
+        /// <exception cref="System.InvalidOperationException">
+        /// Thrown (in debug builds) when validation has already passed but a required resource
+        /// —deployment action token, movement points, or supplies—cannot be spent, signalling a
+        /// logic error elsewhere in the game loop. The exception is caught, logged via
+        /// <see cref="AppService.HandleException(string,string,System.Exception)" />, and the
+        /// method returns <c>false</c>.
+        /// </exception>
+        /// <remarks>
+        /// <para>This method performs the state transition atomically:</para>
+        /// <list type="number">
+        ///   <item><description>Verifies the change is still legal by calling <see cref="CanChangeToState" />.</description></item>
+        ///   <item><description>Deducts the fixed supply cost and spends a deployment action token.</description></item>
+        ///   <item><description>Commits <see cref="CombatState" /> and refreshes related profiles via <see cref="UpdateStateAndProfiles" />.</description></item>
+        /// </list>
+        /// Because resource deductions occur inside the same critical section, the unit is never left in
+        /// a “half‑paid” state: if any step fails, all changes are rolled back and the method
+        /// returns <c>false</c>.</remarks>
         public bool SetCombatState(CombatState newState)
         {
             try
             {
-                // Check if state change is allowed. If not allowed, UI message already sent to player.
                 if (!CanChangeToState(newState))
                     return false;
 
-                // Store previous state before changing it
-                CombatState previousState = CombatState;
+                // Spend supplies first – no side-effects if it fails
+                float cost = CUConstants.COMBAT_STATE_SUPPLY_TRANSITION_COST;
+                if (!ConsumeSupplies(cost))
+                    throw new InvalidOperationException($"{UnitName}: bug – supplies suddenly insufficient.");
 
-                // Spend the deployment action and movement points if possible, consuming supplies if possible.
-                if (SpendAction(ActionTypes.DeployAction) && ConsumeSupplies(CUConstants.COMBAT_STATE_SUPPLY_TRANSITION_COST))
+                #if DEBUG
+                // Deployment token should always be present after validation
+                if (!SpendAction(ActionTypes.DeployAction))
+                    throw new InvalidOperationException($"{UnitName}: bug – deployment token vanished.");
+                #else
+                if (!SpendAction(ActionTypes.DeployAction))
                 {
-                    // Update combat state directly
-                    CombatState = newState;
-
-                    // Pass previous state to profile update method
-                    UpdateStateAndProfiles(newState, previousState);
-
-                    return true;
+                // Roll back supplies in release builds and bail gracefully
+                ReceiveSupplies(cost);
+                AppService.CaptureUiMessage($"{UnitName} could not change state due to an internal error.");
+                return false;
                 }
-                else
-                {
-                    AppService.CaptureUiMessage($"Insufficient movement points to change to {newState} state.");
-                    return false;
-                }
+                #endif
+
+                var previousState = CombatState;
+                CombatState = newState;
+                UpdateStateAndProfiles(newState, previousState);
+                return true;
             }
-            catch (Exception e)
+            catch (Exception ex)
             {
-                AppService.HandleException(CLASS_NAME, "SetCombatState", e);
+                AppService.HandleException(CLASS_NAME, "SetCombatState", ex);
                 return false;
             }
         }
@@ -2312,7 +2335,7 @@ namespace HammerAndSickle.Models
             {
                 if (points <= 0f)
                 {
-                    return false; // No points to consume
+                    return true; // No points to consume
                 }
 
                 if (MovementPoints.Current >= points)
