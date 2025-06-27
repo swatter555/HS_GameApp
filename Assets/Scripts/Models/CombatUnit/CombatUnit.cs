@@ -2727,10 +2727,9 @@ namespace HammerAndSickle.Models
                 info.AddValue(nameof(IsLeaderAssigned), IsLeaderAssigned);
                 info.AddValue(nameof(SpottedLevel), SpottedLevel);
 
-                // TODO: fix this after change
                 // Serialize profile references as IDs/names (not the objects themselves)
-                //info.AddValue("DeployedProfileID", DeployedProfile?.WeaponSystemID ?? "");
-                //info.AddValue("MountedProfileID", MountedProfile?.WeaponSystemID ?? "");
+                info.AddValue("DeployedProfileID", DeployedProfile?.WeaponSystemID.ToString() ?? "");
+                info.AddValue("MountedProfileID", MountedProfile?.WeaponSystemID.ToString() ?? "");
                 info.AddValue("UnitProfileID", UnitProfile?.UnitProfileID ?? "");
                 info.AddValue("LeaderID", CommandingOfficer?.LeaderID ?? "");
 

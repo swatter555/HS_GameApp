@@ -757,6 +757,11 @@ namespace HammerAndSickle.Models
         SUPPLYDEPOT_GENERIC,
     }
 
+    public enum WeaponProfileTypes
+    {
+
+    }
+
     /// <summary>
     /// The type of upgrade a unit can receive.
     /// </summary>
