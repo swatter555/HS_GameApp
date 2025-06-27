@@ -5,145 +5,106 @@ using UnityEngine;
 
 namespace HammerAndSickle.Models
 {
- /*───────────────────────────────────────────────────────────────────────────────
- Leader  —  military officer model for unit command and skill progression
- ────────────────────────────────────────────────────────────────────────────────
- Overview
- ════════
- A **Leader** instance represents a military officer who can command units in
- Hammer & Sickle. Leaders provide combat bonuses, skill-based capabilities, and
- progression through reputation earned in combat. Each leader manages their own
- skill tree, unit assignment status, and nationality-specific rank progression.
+    /*───────────────────────────────────────────────────────────────────────────────
+   Leader  —  military officer model for unit command, skills, and progression
+   ────────────────────────────────────────────────────────────────────────────────
+   Overview
+   ════════
+   A Leader represents a single military officer that can be assigned to a
+   CombatUnit in Hammer & Sickle.  Leaders provide tactical command bonuses
+   (CommandAbility), unlockable skill‑based capabilities through their private
+   LeaderSkillTree, and progress in rank via reputation earned on the
+   battlefield.  All state is Unity‑free, fully serialisable, and designed for
+   bidirectional integrity with the unit that the leader commands.
 
- Major Responsibilities
- ══════════════════════
- • Officer generation & identification
-     - Random name generation based on nationality
-     - Unique LeaderID assignment and command ability generation
- • Reputation & progression system
-     - Reputation point accumulation through combat actions
-     - Command grade advancement (Junior → Senior → Top)
-     - Skill tree progression and unlocking
- • Unit assignment management
-     - Bidirectional unit-leader relationship tracking
-     - Assignment validation and state consistency
- • Skill tree interface
-     - Encapsulated skill system without exposing implementation
-     - Branch availability, skill unlocking, and bonus calculation
- • Nationality-specific features
-     - Localized rank formatting per nation
-     - Cultural name generation integration
- • Persistence & cloning
-     - Full serialization support for save/load
-     - Deep cloning for leader templates
+   Major Responsibilities
+   ══════════════════════
+   • Officer generation & identification
+   – Unique LeaderID creation and culturally‑appropriate name generation
+   – Randomised initial CommandAbility
+   • Reputation & grade progression
+   – Reputation accrual from explicit calls (AwardReputation,
+   AwardReputationForAction)
+   – Automatic promotion Junior → Senior → Top via the skill tree
+   • Skill tree interface (encapsulated)
+   – Branch availability queries and unlocks
+   – Bonus & capability aggregation for combat systems
+   • Unit assignment management
+   – Safe assignment / unassignment with event broadcast
+   – IsAssigned & UnitID source of truth
+   • Persistence & cloning
+   – Implements ISerializable and ICloneable for save/load and templating
 
- Design Highlights
- ═════════════════
- • **Event-Driven Architecture**: UI notifications for reputation changes,
-   promotions, skill unlocks, and assignment status updates.
- • **Encapsulated Skill System**: Internal LeaderSkillTree management with
-   clean public interface - no skill tree implementation details exposed.
- • **Nationality Integration**: Rank formatting and name generation respects
-   cultural conventions (USSR, NATO, FRG, FRA, MJ variants).
- • **Robust Validation**: All inputs validated with proper error handling
-   and fallback behaviors for edge cases.
- • **Action-Based Reputation**: Contextual reputation awards based on specific
-   combat actions with difficulty multipliers.
+   Design Highlights
+   ═════════════════
+   • Event‑Driven – All state changes surface through C# events for immediate UI
+   update.
+   • Encapsulation – Public surface never exposes LeaderSkillTree; interaction
+   occurs through thin wrappers keeping implementation details internal.
+   • Culture‑Aware Ranks – GetFormattedRank() maps CommandGrade to real
+   world ranks for each nationality.
+   • Action‑Based Reputation – Modular constants in CUConstants define base
+   reputation values; contextual multipliers are clamped for balance.
+   • Robust Validation – All inputs checked with informative exceptions routed
+   through AppService.HandleException.
 
- Public-Method Reference
- ═══════════════════════
-   ── Basic Officer Management ────────────────────────────────────────────────
-   SetOfficerCommandAbility(command)     Sets combat command ability directly.
-   RandomlyGenerateMe(nationality)       Regenerates name and abilities randomly.
-   SetOfficerName(name)                  Updates name with length validation.
-   GetFormattedRank()                    Returns nationality-specific rank string.
-   SetCommandGrade(grade)                Manually sets command grade level.
+   Key Public Surface (abridged)
+   ═════════════════════════════
+   Construction
+   Leader(Side side, Nationality nat)                       // random name & ability
+   Leader(string name, Side side, Nationality nat,          // explicit name/ability
+   CommandAbility ability)
 
-   ── Reputation & Progression ────────────────────────────────────────────────
-   AwardReputation(amount)               Adds reputation points directly.
-   AwardReputationForAction(action, mult) Awards reputation for specific actions.
+   Officer Management
+   bool   SetOfficerName(string name)                       // validated rename
+   void   SetOfficerCommandAbility(CommandAbility cmd)
+   void   SetCommandGrade(CommandGrade grade)               // manual promotion
+   string GetFormattedRank()                                // nationality rank
 
-   ── Skill Tree Interface ────────────────────────────────────────────────────
-   CanUnlockSkill(skillEnum)             Checks if skill prerequisites are met.
-   UnlockSkill(skillEnum)                Attempts to unlock skill with validation.
-   IsSkillUnlocked(skillEnum)            Returns true if skill is already unlocked.
-   HasCapability(bonusType)              Checks for specific bonus availability.
-   GetBonusValue(bonusType)              Returns cumulative bonus value for type.
-   IsBranchAvailable(branch)             Checks if skill branch can be started.
-   ResetSkills()                         Resets all skills except leadership.
+   Reputation & Progression
+   void AwardReputation(int amount)
+   void AwardReputationForAction(CUConstants.ReputationAction action,
+   float contextMult = 1f)
 
-   ── Unit Assignment Management ──────────────────────────────────────────────
-   AssignToUnit(unitID)                  Assigns leader to specified unit.
-   UnassignFromUnit()                    Removes leader from current assignment.
+   Skill Tree Gateway
+   bool CanUnlockSkill(Enum skill)
+   bool UnlockSkill(Enum skill)
+   bool IsSkillUnlocked(Enum skill)
+   bool IsBranchAvailable(SkillBranch branch)
+   bool ResetSkills()                                        // respec (keeps leadership)
+   bool HasCapability(SkillBonusType bonus)
+   float GetBonusValue(SkillBonusType bonus)
 
-   ── Persistence & Cloning ───────────────────────────────────────────────────
-   GetObjectData(info, context)         ISerializable save implementation.
-   Clone()                               Creates deep copy with new LeaderID.
+   Unit Assignment
+   void AssignToUnit(string unitID)
+   void UnassignFromUnit()
 
- Event System
- ════════════
- Leaders broadcast state changes through events for UI integration:
+   Persistence Utilities
+   void   GetObjectData(SerializationInfo info,             // ISerializable
+   StreamingContext ctx)
+   object Clone()                                            // ICloneable deep copy
 
-   • **OnReputationChanged(change, newTotal)**: Fired when reputation awarded
-   • **OnGradeChanged(newGrade)**: Fired when command grade advances  
-   • **OnSkillUnlocked(skillEnum, skillName)**: Fired when new skill acquired
-   • **OnUnitAssigned(unitID)**: Fired when assigned to unit
-   • **OnUnitUnassigned()**: Fired when removed from unit
+   Event Summary
+   ═════════════
+   OnReputationChanged(int delta, int newTotal)
+   OnGradeChanged(CommandGrade newGrade)
+   OnSkillUnlocked(Enum skillEnum, string skillName)
+   OnUnitAssigned(string unitID)
+   OnUnitUnassigned()
 
- Reputation Action System
- ════════════════════════
- Leaders earn reputation through specific combat actions with context modifiers:
+   Implementation Notes
+   ════════════════════
+   • Private helper GenerateRandomNameBasedOnNationality() uses NameGenService;
+   on failure a GUID‑fallback ensures a non‑empty name.
+   • Skill‑tree events are internally wired to corresponding leader events in
+   WireSkillTreeEvents() for transparent propagation.
+   • LeaderID values follow the format ${CUConstants.LEADER_ID_PREFIX}XXXXX to
+   guarantee uniqueness across save files.
+   • Comparison, hashing, and threading semantics rely on Unity’s main thread; the
+   class is not thread‑safe by design.
 
-   • **Move Actions**: Base reputation per movement (low value)
-   • **Mount/Dismount**: Tactical positioning reputation
-   • **Intelligence Gathering**: Reconnaissance and spotting rewards  
-   • **Combat Actions**: Primary reputation source from engagement
-   • **Airborne Operations**: High-risk jump operation bonuses
-   • **Tactical Success**: Forcing enemy retreats and unit destruction
-
- Context multipliers (0.5x - 2.0x) adjust reputation based on:
-   - Enemy unit experience level and strength
-   - Tactical difficulty and environmental factors
-   - Mission objectives and strategic importance
-
- Command Ability Generation
- ═══════════════════════════
- New leaders receive randomized command abilities using configurable dice:
-   - **Base Roll**: Multiple dice (default 3d6) for ability determination
-   - **Modifier**: Constant bonus applied to raw roll
-   - **Clamping**: Results bounded to valid CommandAbility enum range
-   - **Distribution**: Produces realistic bell curve of officer competence
-
- Nationality-Specific Ranks
- ═══════════════════════════
- Rank formatting adapts to cultural military traditions:
-
-   • **USSR**: Lieutenant Colonel → Colonel → Major General
-   • **NATO (USA/UK/IQ/IR/SAUD)**: Lieutenant Colonel → Colonel → Brigadier General  
-   • **FRG**: Oberst → Generalmajor → Generalleutnant
-   • **FRA**: Colonel → Général de Brigade → Général de Division
-   • **MJ**: Amir al-Fawj → Amir al-Mintaqa → Amir al-Jihad
-
- Skill Tree Integration
- ══════════════════════
- Leaders internally manage LeaderSkillTree instances but expose only essential
- interface methods. The skill system supports:
-   - **Branch Prerequisites**: Leadership skills unlock advanced branches
-   - **Reputation Costs**: Skills require accumulated reputation to unlock
-   - **Cumulative Bonuses**: Multiple skills stack for enhanced capabilities
-   - **Respec Functionality**: Reset all skills except core leadership
-
- Assignment Consistency
- ══════════════════════
- Unit assignment maintains bidirectional integrity:
-   - Leader tracks UnitID and IsAssigned status
-   - Events notify systems of assignment changes
-   - Validation prevents invalid assignment states
-   - Cleanup ensures proper state on unassignment
-
- ───────────────────────────────────────────────────────────────────────────────
- KEEP THIS COMMENT BLOCK IN SYNC WITH PUBLIC API CHANGES!
- ───────────────────────────────────────────────────────────────────────────── */
+   KEEP THIS BLOCK COMMENT IN SYNC WITH PUBLIC API CHANGES!
+   ───────────────────────────────────────────────────────────────────────────────*/
     [Serializable]
     public class Leader : ISerializable, ICloneable
     {
@@ -190,7 +151,7 @@ namespace HammerAndSickle.Models
         #region Constructors
 
         /// <summary>
-        /// Creates a new leader with random generation based on nationality
+        /// Creates a new leader with random name based on nationality, setup with default parameters.
         /// </summary>
         /// <param name="side">Player or AI side</param>
         /// <param name="nationality">Nation of origin for name generation and rank formatting</param>
@@ -199,7 +160,7 @@ namespace HammerAndSickle.Models
             try
             {
                 InitializeCommonProperties(side, nationality);
-                RandomlyGenerateMe(nationality);
+                GenerateRandomNameBasedOnNationality();
                 InitializeSkillTree();
             }
             catch (Exception e)
@@ -306,6 +267,7 @@ namespace HammerAndSickle.Models
             Side = side;
             Nationality = nationality;
             CommandGrade = CommandGrade.JuniorGrade;
+            CombatCommand = CommandAbility.Average;
             ReputationPoints = 0;
             IsAssigned = false;
             UnitID = null;
@@ -376,54 +338,6 @@ namespace HammerAndSickle.Models
             catch (Exception e)
             {
                 AppService.HandleException(CLASS_NAME, "SetOfficerCommandAbility", e);
-                throw;
-            }
-        }
-
-        /// <summary>
-        /// Randomly generate leader properties based on nationality
-        /// </summary>
-        /// <param name="nationality">Nation to base generation on</param>
-        public void RandomlyGenerateMe(Nationality nationality)
-        {
-            try
-            {
-                var random = new System.Random();
-
-                // Check if NameGenService is available
-                if (NameGenService.Instance == null)
-                {
-                    throw new InvalidOperationException("NameGenService is not available");
-                }
-
-                // Update the officer's nationality
-                this.Nationality = nationality;
-
-                // Generate a random name based on nationality
-                Name = NameGenService.Instance.GenerateMaleName(nationality);
-
-                // Ensure name is valid
-                if (string.IsNullOrEmpty(Name))
-                {
-                    Name = $"Officer-{Guid.NewGuid().ToString()[..8]}";
-                }
-
-                // Generate command ability using constants from CUConstants
-                int commandValue = 0;
-                for (int i = 0; i < CUConstants.COMMAND_DICE_COUNT; i++)
-                {
-                    commandValue += random.Next(1, CUConstants.COMMAND_DICE_SIDES + 1);
-                }
-                commandValue += CUConstants.COMMAND_DICE_MODIFIER;
-
-                // Clamp to valid range
-                commandValue = Math.Clamp(commandValue, CUConstants.COMMAND_CLAMP_MIN, CUConstants.COMMAND_CLAMP_MAX);
-
-                CombatCommand = (CommandAbility)commandValue;
-            }
-            catch (Exception e)
-            {
-                AppService.HandleException(CLASS_NAME, "RandomlyGenerateMe", e);
                 throw;
             }
         }
@@ -532,6 +446,44 @@ namespace HammerAndSickle.Models
         }
 
         #endregion // Public Methods
+
+
+        #region Helpers
+
+        /// <summary>
+        /// Generates a random name for the officer based on the specified nationality.
+        /// </summary>
+        /// <remarks>If the generated name is null or empty, a fallback name in the format "Officer-XXXX"
+        /// (where XXXX is a random GUID segment) will be used.</remarks>
+        /// <param name="nationality">The nationality to use when generating the name. This determines the cultural context for the generated
+        /// name.</param>
+        private void GenerateRandomNameBasedOnNationality()
+        {
+            try
+            {
+                var random = new System.Random();
+                if (NameGenService.Instance == null)
+                {
+                    throw new InvalidOperationException("NameGenService is not available");
+                }
+
+                // Generate a random name based on nationality
+                Name = NameGenService.Instance.GenerateMaleName(Nationality);
+
+                // Ensure name is valid
+                if (string.IsNullOrEmpty(Name))
+                {
+                    Name = $"Officer-{Guid.NewGuid().ToString()[..8]}";
+                }
+            }
+            catch (Exception e)
+            {
+                AppService.HandleException(CLASS_NAME, "RandomlyGenerateMe", e);
+                throw;
+            }
+        }
+
+        #endregion // Helpers
 
 
         #region Reputation Management

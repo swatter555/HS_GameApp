@@ -257,12 +257,10 @@ namespace HammerAndSickle.Models
     /// </summary>
     public enum CommandAbility
     {
-        Poor = -2,
-        BelowAverage = -1,
-        Average = 0,
-        Good = 1,
-        Superior = 2,
-        Genius = 3
+        Average   = 0,
+        Good      = 1,
+        Superior  = 2,
+        Genius    = 3
     }
 
     /// <summary>
