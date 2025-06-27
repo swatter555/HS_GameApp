@@ -83,10 +83,6 @@ namespace HammerAndSickle.Models
         public const int MAX_LEADER_NAME_LENGTH = 50;
         public const int MIN_LEADER_NAME_LENGTH = 2;
 
-        // Command ability validation (matches enum range)
-        public const int MIN_COMMAND_ABILITY = -2; // CommandAbility.Poor
-        public const int MAX_COMMAND_ABILITY = 3;  // CommandAbility.Genius
-
         // Reputation constants.
         public const int REP_COST_FOR_SENIOR_PROMOTION = 100;
         public const int REP_COST_FOR_TOP_PROMOTION = 250;
@@ -224,13 +220,6 @@ namespace HammerAndSickle.Models
         // REP multiplier bounds
         public const float MIN_REP_MULTIPLIER = 1.0f;
         public const float MAX_REP_MULTIPLIER = 3.0f;
-
-        // For Leader.RandomlyGenerateMe() dice roll
-        public const int COMMAND_DICE_COUNT = 3;         // Roll 3d6
-        public const int COMMAND_DICE_SIDES = 6;         // 6-sided dice
-        public const int COMMAND_DICE_MODIFIER = -10;    // Subtract 10 from total
-        public const int COMMAND_CLAMP_MIN = -2;         // Minimum CommandAbility value
-        public const int COMMAND_CLAMP_MAX = 0;          // Maximum CommandAbility value
 
         #endregion // Leader Constants
 

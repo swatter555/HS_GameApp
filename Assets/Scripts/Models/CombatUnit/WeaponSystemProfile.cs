@@ -301,9 +301,8 @@ namespace HammerAndSickle.Models
         #region Properties
 
         public string Name { get; private set; }
-        public string WeaponSystemID { get; private set; }
+        public WeaponSystems WeaponSystemID { get; private set; }
         public Nationality Nationality { get; private set; }
-        public WeaponSystems WeaponSystem { get; private set; }
         public List<UpgradeType> UpgradeTypes { get; private set; }
 
         // Combat ratings using CombatRating objects for paired values
@@ -394,8 +393,7 @@ namespace HammerAndSickle.Models
                 // Set basic properties
                 Name = name;
                 Nationality = nationality;
-                WeaponSystem = weaponSystem;
-                WeaponSystemID = WeaponSystem.ToString();
+                WeaponSystemID = weaponSystem;
                 UpgradeTypes = new List<UpgradeType>();
 
                 // Create CombatRating objects with validation
@@ -452,18 +450,7 @@ namespace HammerAndSickle.Models
                 // Basic properties
                 Name = info.GetString(nameof(Name));
                 Nationality = (Nationality)info.GetValue(nameof(Nationality), typeof(Nationality));
-                WeaponSystem = (WeaponSystems)info.GetValue(nameof(WeaponSystem), typeof(WeaponSystems));
-
-                // Handle WeaponSystemID with fallback for backward compatibility
-                try
-                {
-                    WeaponSystemID = info.GetString(nameof(WeaponSystemID));
-                }
-                catch (SerializationException)
-                {
-                    // Backward compatibility: if WeaponSystemID not found, generate from WeaponSystem
-                    WeaponSystemID = WeaponSystem.ToString();
-                }
+                WeaponSystemID = (WeaponSystems)info.GetValue(nameof(WeaponSystemID), typeof(WeaponSystems));
 
                 // Deserialize CombatRating objects
                 LandHard = (CombatRating)info.GetValue(nameof(LandHard), typeof(CombatRating));
@@ -724,7 +711,7 @@ namespace HammerAndSickle.Models
                 var clone = new WeaponSystemProfile(
                     Name,
                     Nationality,
-                    WeaponSystem,
+                    WeaponSystemID,
                     LandHard.Attack, LandHard.Defense,
                     LandSoft.Attack, LandSoft.Defense,
                     LandAir.Attack, LandAir.Defense,
@@ -771,10 +758,7 @@ namespace HammerAndSickle.Models
                 var idProperty = typeof(WeaponSystemProfile).GetProperty(nameof(WeaponSystemID));
 
                 nameProperty?.SetValue(clone, newName);
-                // Generate unique ID by appending GUID suffix to weapon system name
-                string newId = $"{WeaponSystem}_{Guid.NewGuid().ToString("N")[..8]}";
-                idProperty?.SetValue(clone, newId);
-
+                
                 return clone;
             }
             catch (Exception e)
@@ -851,7 +835,6 @@ namespace HammerAndSickle.Models
                 // Basic properties
                 info.AddValue(nameof(Name), Name);
                 info.AddValue(nameof(Nationality), Nationality);
-                info.AddValue(nameof(WeaponSystem), WeaponSystem);
                 info.AddValue(nameof(WeaponSystemID), WeaponSystemID);
 
                 // CombatRating objects
