@@ -519,7 +519,7 @@ namespace HammerAndSickle.Models
             {
                 _dataLock.EnterWriteLock();
 
-                string profileId = $"{profile.WeaponSystem}_{profile.Nationality}";
+                string profileId = $"{profile.WeaponSystemID}_{profile.Nationality}";
                 if (_weaponProfiles.ContainsKey(profileId))
                 {
                     // Allow overwriting weapon profiles as they're shared templates
