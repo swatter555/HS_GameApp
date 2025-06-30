@@ -755,11 +755,42 @@ namespace HammerAndSickle.Models
         LANDBASE_GENERIC,
         AIRBASE_GENERIC,
         SUPPLYDEPOT_GENERIC,
+
+        DEFAULT
     }
 
-    public enum WeaponProfileTypes
+    /// <summary>
+    /// Type of UnitProfiles
+    /// </summary>
+    public enum UnitProfileTypes
     {
+        SV_MRR, // Motor Rifle Regiment
+        SV_TR,  // Tank Regiment
+        SV_ART, // Artillery Regiment
+        SV_ROC, // Rocket Artillery Regiment
+        SV_AAR, // Air Assault Regiment
+        SV_VDV, // Airborne Regiment
+        SV_NAV, // Naval Infantry Regiment
+        SV_ENG, // Engineer Regiment
+        SV_RCR, // Reconnaissance Regiment
+        SV_ADR, // Air Defense Regiment
+        SV_HEL, // Helicopter Regiment
+        SV_GRU, // Spetsnaz Regiment
+        SV_FR,  // Fighter Regiment
+        SV_MR,  // Multirole Regiment
+        SV_AR,  // Attack Regiment
+        SV_BR,  // Bomber Regiment
+        SV_RR,  // Reconnaissance Regiment (Air)
+    }
 
+    /// <summary>
+    /// Used to track whether a WeaponSystem is the main deployed or main mounted item.
+    /// </summary>
+    public enum ProfileItem
+    {
+        Default,
+        Deployed,
+        Mounted
     }
 
     /// <summary>

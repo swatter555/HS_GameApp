@@ -2730,7 +2730,12 @@ namespace HammerAndSickle.Models
                 // Serialize profile references as IDs/names (not the objects themselves)
                 info.AddValue("DeployedProfileID", DeployedProfile?.WeaponSystemID.ToString() ?? "");
                 info.AddValue("MountedProfileID", MountedProfile?.WeaponSystemID.ToString() ?? "");
-                info.AddValue("UnitProfileID", UnitProfile?.UnitProfileID ?? "");
+                
+                
+                // TODO: Fix me
+                //info.AddValue("UnitProfileID", UnitProfile?.UnitProfileID ?? "");
+                
+                
                 info.AddValue("LeaderID", CommandingOfficer?.LeaderID ?? "");
 
                 // Serialize owned StatsMaxCurrent objects as Max/Current pairs
