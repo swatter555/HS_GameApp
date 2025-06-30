@@ -6,6 +6,12 @@ using HammerAndSickle.Services;
 
 namespace HammerAndSickle.Models
 {
+
+   /// <summary>
+   /// Represents an entry in a weapon system, associating a specific weapon system with its corresponding profile item.
+   /// </summary>
+   /// <remarks>This class is used to define the relationship between a weapon system and its associated
+   /// profile item. It provides properties to access and modify the weapon system and profile item values.</remarks>
    public class WeaponSystemEntry
     {
         public WeaponSystems WeaponSystem { get; set; } = WeaponSystems.DEFAULT;
@@ -18,6 +24,8 @@ namespace HammerAndSickle.Models
         }
     }
  
+
+
     [Serializable]
     public class UnitProfile : ISerializable, ICloneable
     {
@@ -93,6 +101,15 @@ namespace HammerAndSickle.Models
         }
 
 
+        /// <summary>
+        /// Adds a weapon system entry with specified maximum quantity to this unit profile.
+        /// Each entry represents a specific weapon system in a particular role (Default/Deployed/Mounted).
+        /// </summary>
+        /// <param name="entry">The weapon system entry specifying both weapon type and role</param>
+        /// <param name="maxQuantity">Maximum quantity of this weapon system (must be non-negative)</param>
+        /// <exception cref="ArgumentNullException">Thrown when entry is null</exception>
+        /// <exception cref="ArgumentOutOfRangeException">Thrown when maxQuantity is negative</exception>
+        /// <exception cref="InvalidOperationException">Thrown when this exact weapon system and role combination already exists</exception>
         public void AddWeaponSystem(WeaponSystemEntry entry, int maxQuantity)
         {
             try
@@ -103,68 +120,100 @@ namespace HammerAndSickle.Models
                 if (maxQuantity < 0)
                     throw new ArgumentOutOfRangeException(nameof(maxQuantity), "Max quantity cannot be negative");
 
-                weaponSystemEntries.Add(entry, maxQuantity);
+                // Check if this exact entry already exists
+                if (weaponSystemEntries.ContainsKey(entry))
+                    throw new InvalidOperationException($"WeaponSystemEntry for {entry.WeaponSystem} with ProfileItem {entry.ProfileItem} already exists");
+
+                weaponSystemEntries[entry] = maxQuantity;
             }
             catch (Exception e)
             {
-                AppService.HandleException(CLASS_NAME, "SetWeaponSystemValue", e);
+                AppService.HandleException(CLASS_NAME, nameof(AddWeaponSystem), e);
                 throw;
             }
         }
 
-        public void UpdateDeployedEntry(WeaponSystemEntry newEntry)
+        /// <summary>
+        /// Updates the deployed weapon system entry to use a different weapon system while preserving the original quantity.
+        /// This method supports unit upgrades where deployed equipment can be replaced with improved versions.
+        /// The unit must have an existing deployed entry for this operation to succeed.
+        /// </summary>
+        /// <param name="newWeaponSystem">The new weapon system to use for the deployed configuration</param>
+        /// <returns>True if a deployed entry was found and successfully updated; false if no deployed entry exists</returns>
+        /// <remarks>
+        /// This method performs a safe remove-and-replace operation to maintain dictionary key integrity.
+        /// The original quantity is preserved during the upgrade process.
+        /// </remarks>
+        public bool UpdateDeployedEntry(WeaponSystems newWeaponSystem)
         {
             try
             {
-                // ProfileItem types must match.
-                if (newEntry.ProfileItem != ProfileItem.Deployed)
-                    throw new ArgumentException("The provided entry is not a deployed entry.", nameof(newEntry));
-
-                // Retrieve the existing deployed entry.
-                WeaponSystemEntry oldEntry = weaponSystemEntries.FirstOrDefault(kvp => kvp.Key.ProfileItem == ProfileItem.Deployed).Key;
-                if (oldEntry == null)
+                // Find the existing deployed entry
+                var deployedEntry = weaponSystemEntries.Keys.FirstOrDefault(entry => entry.ProfileItem == ProfileItem.Deployed);
+                if (deployedEntry == null)
                 {
-                    throw new InvalidOperationException("No deployed entry found to update.");
+                    return false; // No deployed entry to update
                 }
 
-                // Update the old entry.
-                oldEntry.WeaponSystem = newEntry.WeaponSystem;
+                // Get the quantity from the old entry
+                int quantity = weaponSystemEntries[deployedEntry];
 
+                // Remove the old entry
+                weaponSystemEntries.Remove(deployedEntry);
+
+                // Add the new entry with the same quantity
+                var newEntry = new WeaponSystemEntry(newWeaponSystem, ProfileItem.Deployed);
+                weaponSystemEntries[newEntry] = quantity;
+
+                return true;
             }
             catch (Exception e)
             {
-                AppService.HandleException(CLASS_NAME, "UpdateDeployedEntry", e);
+                AppService.HandleException(CLASS_NAME, nameof(UpdateDeployedEntry), e);
                 throw;
             }
         }
 
-
-        public void UpdateMountedEntry(WeaponSystemEntry newEntry)
+        /// <summary>
+        /// Updates the mounted weapon system entry to use a different weapon system while preserving the original quantity.
+        /// This method supports unit upgrades where mounted equipment can be replaced with improved versions.
+        /// The unit must have an existing mounted entry for this operation to succeed.
+        /// </summary>
+        /// <param name="newWeaponSystem">The new weapon system to use for the mounted configuration</param>
+        /// <returns>True if a mounted entry was found and successfully updated; false if no mounted entry exists</returns>
+        /// <remarks>
+        /// This method performs a safe remove-and-replace operation to maintain dictionary key integrity.
+        /// The original quantity is preserved during the upgrade process.
+        /// </remarks>
+        public bool UpdateMountedEntry(WeaponSystems newWeaponSystem)
         {
             try
             {
-                // ProfileItem types must match.
-                if (newEntry.ProfileItem != ProfileItem.Mounted)
-                    throw new ArgumentException("The provided entry is not a mounted entry.", nameof(newEntry));
-
-                // Retrieve the existing mounted entry.
-                WeaponSystemEntry oldEntry = weaponSystemEntries.FirstOrDefault(kvp => kvp.Key.ProfileItem == ProfileItem.Mounted).Key;
-                if (oldEntry == null)
+                // Find the existing mounted entry
+                var mountedEntry = weaponSystemEntries.Keys.FirstOrDefault(entry => entry.ProfileItem == ProfileItem.Mounted);
+                if (mountedEntry == null)
                 {
-                    throw new InvalidOperationException("No mounted entry found to update.");
+                    return false; // No mounted entry to update
                 }
 
-                // Update the old entry.
-                oldEntry.WeaponSystem = newEntry.WeaponSystem;
+                // Get the quantity from the old entry
+                int quantity = weaponSystemEntries[mountedEntry];
+
+                // Remove the old entry
+                weaponSystemEntries.Remove(mountedEntry);
+
+                // Add the new entry with the same quantity
+                var newEntry = new WeaponSystemEntry(newWeaponSystem, ProfileItem.Mounted);
+                weaponSystemEntries[newEntry] = quantity;
+
+                return true;
             }
             catch (Exception e)
             {
-                AppService.HandleException(CLASS_NAME, "UpdateMountedEntry", e);
+                AppService.HandleException(CLASS_NAME, nameof(UpdateMountedEntry), e);
                 throw;
             }
         }
-
-
 
         #endregion // Public Methods
 
@@ -175,6 +224,7 @@ namespace HammerAndSickle.Models
         /// Generates an IntelReport object containing bucketed weapon system data and unit metadata.
         /// This provides structured data for the GUI to display unit intelligence information.
         /// Applies fog of war effects based on spotted level for AI units.
+        /// Reports all weapon systems in the profile regardless of their ProfileItem designation.
         /// </summary>
         /// <param name="unitName">Display name of the unit</param>
         /// <param name="combatState">Current combat state of the unit</param>
@@ -208,18 +258,33 @@ namespace HammerAndSickle.Models
 
                 // Calculate current values for each weapon system and populate detailed data
                 var currentValues = new Dictionary<WeaponSystems, int>();
-                foreach (var item in weaponSystems)
+                foreach (var weaponSystemEntry in weaponSystemEntries)
                 {
-                    float scaledValue = item.Value * currentMultiplier;
+                    WeaponSystems weaponSystem = weaponSystemEntry.Key.WeaponSystem;
+                    int maxQuantity = weaponSystemEntry.Value;
+
+                    float scaledValue = maxQuantity * currentMultiplier;
                     int currentValue = (int)Math.Round(scaledValue);
 
-                    if (currentValue > 0)
+                    // Add to current values (accumulate if multiple entries for same weapon system)
+                    if (currentValues.ContainsKey(weaponSystem))
                     {
-                        currentValues[item.Key] = currentValue;
+                        currentValues[weaponSystem] += currentValue;
+                    }
+                    else if (currentValue > 0)
+                    {
+                        currentValues[weaponSystem] = currentValue;
                     }
 
-                    // Always add to detailed data (even if 0) for complete information
-                    intelReport.DetailedWeaponSystemsData[item.Key] = scaledValue;
+                    // Add to detailed data (accumulate if multiple entries for same weapon system)
+                    if (intelReport.DetailedWeaponSystemsData.ContainsKey(weaponSystem))
+                    {
+                        intelReport.DetailedWeaponSystemsData[weaponSystem] += scaledValue;
+                    }
+                    else
+                    {
+                        intelReport.DetailedWeaponSystemsData[weaponSystem] = scaledValue;
+                    }
                 }
 
                 // Determine fog of war parameters
@@ -347,7 +412,7 @@ namespace HammerAndSickle.Models
             }
             catch (Exception e)
             {
-                AppService.HandleException(CLASS_NAME, "GenerateIntelReport", e);
+                AppService.HandleException(CLASS_NAME, nameof(GenerateIntelReport), e);
                 throw;
             }
         }
