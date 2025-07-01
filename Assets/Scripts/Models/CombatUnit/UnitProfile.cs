@@ -85,97 +85,159 @@ namespace HammerAndSickle.Models
     }
 
 
-/*───────────────────────────────────────────────────────────────────────────────
-UnitProfile  —  organizational composition tracking and intelligence reporting
-────────────────────────────────────────────────────────────────────────────────
-Overview
-════════
-**UnitProfile** defines military unit organizational composition: men, tanks, 
-artillery, aircraft, and equipment. Provides informational data for GUI display 
-and tracks attrition throughout campaigns. Automatically scales current strength 
-based on unit hit points and generates intelligence reports with fog-of-war effects.
+    /*───────────────────────────────────────────────────────────────────────────────
+    UnitProfile  —  organizational composition tracking and intelligence reporting
+    ────────────────────────────────────────────────────────────────────────────────
 
-Major Responsibilities
-══════════════════════
-• WeaponSystemEntry management with ProfileItem designation (Default/Deployed/Mounted)
-• Intelligence report generation with 5-level fog-of-war and equipment categorization
-• Real-time strength calculation based on hit point ratios with float precision
-• Template system support with deep cloning and binary serialization
+    Overview
+    ════════
+    **UnitProfile** defines military unit organizational composition tracking men, 
+    tanks, artillery, aircraft, and equipment through WeaponSystemEntry objects. 
+    Provides informational data for GUI display, tracks real-time attrition based 
+    on unit hit points, and generates sophisticated intelligence reports with 
+    fog-of-war effects and equipment categorization.
 
-Design Highlights
-═════════════════
-• **WeaponSystemEntry Architecture**: Combines WeaponSystems enum with ProfileItem 
-  to support unit upgrade system where deployed/mounted equipment can be upgraded 
-  independently while preserving organizational structure.
-• **Automatic Scaling**: Current equipment counts calculated from hit point ratios 
-  for realistic attrition representation.
-• **Intelligence Categorization**: 50+ weapon systems organized into intuitive 
-  display categories (Men, Tanks, Artillery, etc.) with independent fog-of-war per bucket.
-• **Float Precision**: Accumulates equipment counts as floats, rounds only at final 
-  step to prevent cumulative rounding errors in large formations.
+    Major Responsibilities
+    ══════════════════════
+    • WeaponSystemEntry management with ProfileItem designation (Default/Deployed/Mounted)
+    • Intelligence report generation with 5-level fog-of-war and 20+ equipment categories
+    • Real-time strength scaling based on hit point ratios with float precision mathematics
+    • Equipment upgrade support through safe weapon system replacement methods
+    • Template system with comprehensive cloning capabilities and binary serialization
 
-Public-Method Reference
-═══════════════════════
-  ── Equipment Management ───────────────────────────────────────────────────────
-  AddWeaponSystem(entry, maxQuantity)       Adds weapon system entry with quantity.
-  UpdateDeployedEntry(newWeaponSystem)       Updates deployed weapon system (upgrade).
-  UpdateMountedEntry(newWeaponSystem)        Updates mounted weapon system (upgrade).
+    Design Highlights
+    ═════════════════
+    • **WeaponSystemEntry Architecture**: Combines WeaponSystems enum with ProfileItem 
+      to support upgrade system where deployed/mounted equipment can be independently 
+      upgraded while preserving organizational structure and dictionary integrity.
+    • **Automatic Scaling**: Current equipment counts calculated from hit point ratios 
+      for realistic attrition representation without cumulative rounding errors.
+    • **Intelligence Categorization**: 50+ weapon systems organized into intuitive 
+      display categories (Men, Tanks, Artillery, SAMs, Aircraft, etc.) with independent 
+      fog-of-war error application per bucket.
+    • **Float Precision Processing**: Equipment counts accumulated as floats through 
+      entire pipeline, rounded only at final step to prevent mathematical degradation.
+    • **Upgrade System Integration**: UpdateDeployedEntry() and UpdateMountedEntry() 
+      enable safe weapon system replacement while preserving quantities.
 
-  ── Intelligence & Scaling ─────────────────────────────────────────────────────
-  UpdateCurrentHP(currentHP)                Updates hit points for scaling calculations.
-  GenerateIntelReport(name, state, xp, eff, spotted) Creates intelligence report 
-                                             with fog-of-war and categorization.
+    Public-Method Reference
+    ═══════════════════════
+      ── Equipment Management ───────────────────────────────────────────────────────
+      AddWeaponSystem(entry, maxQuantity)       Adds weapon system entry with quantity
+      UpdateDeployedEntry(newWeaponSystem)       Updates deployed weapon system (upgrade)
+      UpdateMountedEntry(newWeaponSystem)        Updates mounted weapon system (upgrade)
 
-  ── Cloning & Persistence ──────────────────────────────────────────────────────
-  Clone()                                   Creates identical copy.
-  Clone(newProfileID)                       Creates copy with new profile ID.
-  Clone(newProfileID, newNationality)       Creates copy with new ID and nationality.
+      ── Intelligence & Scaling ─────────────────────────────────────────────────────
+      UpdateCurrentHP(currentHP)                Updates hit points for scaling calculations
+      GenerateIntelReport(name, state, xp, eff, spotted) Creates intelligence report 
+                                                 with fog-of-war and categorization
 
-WeaponSystemEntry Architecture
-══════════════════════════════
-**Entry Structure**: Each entry combines WeaponSystems enum with ProfileItem designation:
-• **Default**: Organizational equipment that doesn't change between combat states
-• **Deployed**: Primary combat equipment when unit is deployed for battle  
-• **Mounted**: Transport or alternative equipment configuration for Mobile state
+      ── Cloning & Persistence ──────────────────────────────────────────────────────
+      Clone()                                   Creates identical copy with same ID
+      Clone(newProfileID)                       Creates copy with new profile ID
+      Clone(newProfileID, newNationality)       Creates copy with new ID and nationality
 
-**Upgrade Support**: UpdateDeployedEntry() and UpdateMountedEntry() enable safe weapon 
-system replacement while preserving quantities and dictionary integrity.
+    WeaponSystemEntry Architecture
+    ══════════════════════════════
+    **Entry Structure**: Each WeaponSystemEntry combines WeaponSystems enum with 
+    ProfileItem designation supporting complex unit configurations:
 
-Intelligence System
-═══════════════════
-**Spotted Level Effects**:
-• Level 0: Full information (player units)
-• Level 1: Unit name only  
-• Level 2: Unit data with ±30% random error per bucket/weapon
-• Level 3: Unit data with ±10% random error per bucket/weapon
-• Level 4: Perfect accuracy
-• Level 5: Perfect accuracy + movement history
+    • **Default**: Organizational equipment that remains constant across combat states
+    • **Deployed**: Primary combat equipment when unit is deployed for battle  
+    • **Mounted**: Transport or alternative equipment configuration for Mobile state
 
-**Equipment Categorization**: 20+ categories including Men (all infantry types), 
-Tanks, IFVs, APCs, Artillery, SAMs, Aircraft, etc. Each bucket receives independent 
-fog-of-war treatment. Buckets with final values < 1 are omitted from reports.
+    **Upgrade Support**: Safe weapon system replacement preserves quantities while 
+    maintaining dictionary key integrity. UpdateDeployedEntry() and UpdateMountedEntry() 
+    perform atomic remove-and-replace operations for seamless equipment transitions.
 
-**Processing Pipeline**:
-1. Accumulate weapon systems with float precision
-2. Apply independent fog-of-war per weapon system (detailed data)
-3. Categorize into buckets with float precision  
-4. Apply independent fog-of-war per bucket and round to integers
-5. Omit buckets with values < 1
+    **Dictionary Management**: WeaponSystemEntry objects serve as composite keys 
+    enabling units to have multiple configurations of the same weapon system type 
+    (e.g., T-80B for deployed operations + BTR-80 for mounted transport).
 
-Strength Scaling & Templates
-════════════════════════════
-**Automatic Attrition**: Equipment counts scale proportionally with hit points:
-`Current Equipment = Maximum Equipment × (Current HP / 40)`
+    Intelligence System Architecture
+    ════════════════════════════════
+    **Spotted Level Effects** (Fog-of-War Implementation):
+    • **Level 0**: Full information (player units, perfect intelligence)
+    • **Level 1**: Unit name only (minimal contact, no composition data)
+    • **Level 2**: Unit data with ±30% random error per weapon system and bucket
+    • **Level 3**: Unit data with ±10% random error per weapon system and bucket  
+    • **Level 4**: Perfect accuracy (excellent intelligence)
+    • **Level 5**: Perfect accuracy + movement history (elite intelligence)
 
-**Template System**: Supports base templates, unit instances, nationality variants, 
-and campaign persistence through comprehensive cloning with parameter overrides.
+    **Equipment Categorization System**: 20+ display categories including:
+    - **Personnel**: Men (all infantry types combined)
+    - **Armored Vehicles**: Tanks, IFVs, APCs, Recon vehicles
+    - **Artillery Systems**: Artillery, Rocket Artillery, SSMs
+    - **Air Defense**: SAMs, AAA, MANPADs, ATGMs
+    - **Aviation**: Attack/Transport Helicopters, Fighters, Multirole, Attack Aircraft, 
+      Bombers, Transports, AWACS, Reconnaissance Aircraft
 
-**Serialization**: Binary serialization with ISerializable. WeaponSystemEntry objects 
-decomposed into WeaponSystems + ProfileItem + quantity for reconstruction integrity.
+    **Processing Pipeline with Float Precision**:
+    1. **Weapon System Accumulation**: Combine multiple entries of same weapon type 
+       with float precision to prevent rounding errors
+    2. **Strength Scaling**: Apply hit point ratio with float mathematics
+    3. **Fog-of-War Application**: Independent random error per weapon system
+    4. **Category Bucketing**: Group weapons into display categories with float precision  
+    5. **Bucket Fog-of-War**: Independent random error per bucket category
+    6. **Final Rounding**: Convert to integers only at final step
+    7. **Omission Logic**: Buckets with final values < 1 excluded from report
 
-───────────────────────────────────────────────────────────────────────────────
-KEEP THIS COMMENT BLOCK IN SYNC WITH WEAPONSYSTEMENTRY AND UPGRADE CHANGES!
-───────────────────────────────────────────────────────────────────────────── */
+    **Error Modeling**: Each weapon system and bucket receives independent random 
+    error within spotted level bounds. Direction (positive/negative) and magnitude 
+    randomly determined per item for realistic intelligence uncertainty.
+
+    Strength Scaling & Attrition
+    ═════════════════════════════
+    **Automatic Attrition Calculation**: Equipment counts scale proportionally 
+    with unit hit points using precise mathematical formula:
+    `Current Equipment = Maximum Equipment × (Current HP / MAX_HP)`
+
+    **Realistic Loss Representation**:
+    - **100% HP**: Full equipment complement displayed
+    - **75% HP**: 25% equipment losses shown across all categories  
+    - **50% HP**: 50% equipment losses (moderate attrition)
+    - **25% HP**: 75% equipment losses (heavy attrition)
+    - **Near 0% HP**: Minimal equipment remaining (unit nearly destroyed)
+
+    **Proportional Scaling**: All weapon systems scale uniformly representing 
+    personnel casualties, vehicle losses, equipment abandonment, and operational 
+    degradation throughout campaign progression.
+
+    Template System & Persistence
+    ══════════════════════════════
+    **Profile Template Architecture**: Supports comprehensive template instantiation:
+    - **Base Templates**: Master profiles with full equipment definitions
+    - **Unit Instances**: Specific profile variants with unique identifiers
+    - **Nationality Variants**: Same composition with different national equipment
+    - **Campaign Persistence**: Maintains unit-specific state across scenarios
+
+    **Clone Method Variants**:
+    - **Clone()**: Exact duplication with identical ID (template copying)
+    - **Clone(newProfileID)**: New identifier, same nationality (unit instantiation)  
+    - **Clone(newProfileID, newNationality)**: Full parameterization (cross-national)
+
+    **Binary Serialization**: ISerializable implementation with WeaponSystemEntry 
+    decomposition into WeaponSystems + ProfileItem + quantity for reconstruction 
+    integrity. Preserves all organizational data and current state across save/load.
+
+    Upgrade System Integration
+    ══════════════════════════
+    **Safe Equipment Replacement**: UpdateDeployedEntry() and UpdateMountedEntry() 
+    perform atomic operations maintaining dictionary integrity:
+
+    1. **Locate Existing Entry**: Find current deployed/mounted WeaponSystemEntry
+    2. **Preserve Quantity**: Extract quantity value from existing entry
+    3. **Remove Old Entry**: Clean removal from dictionary  
+    4. **Create New Entry**: Generate WeaponSystemEntry with new weapon system
+    5. **Restore Quantity**: Apply preserved quantity to new entry
+    6. **Validation**: Ensure operation success and data consistency
+
+    **Use Cases**: Technology upgrades (T-72A → T-80B), doctrine changes (BMP-1 → BMP-2), 
+    campaign progression rewards, and scenario-specific equipment modifications.
+
+    ───────────────────────────────────────────────────────────────────────────────
+    KEEP THIS COMMENT BLOCK SYNCHRONIZED WITH WEAPONSYSTEMENTRY AND UPGRADE SYSTEM!
+    ───────────────────────────────────────────────────────────────────────────────*/
     [Serializable]
     public class UnitProfile : ISerializable, ICloneable
     {
@@ -268,6 +330,12 @@ KEEP THIS COMMENT BLOCK IN SYNC WITH WEAPONSYSTEMENTRY AND UPGRADE CHANGES!
                 if (maxQuantity < 0)
                     throw new ArgumentOutOfRangeException(nameof(maxQuantity), "Max quantity cannot be negative");
 
+                if (entry.WeaponSystem == WeaponSystems.DEFAULT)
+                    throw new ArgumentException("Cannot add DEFAULT weapon system");
+
+                if (!Enum.IsDefined(typeof(ProfileItem), entry.ProfileItem))
+                    throw new ArgumentException("Invalid ProfileItem value");
+
                 // Check if this exact entry already exists
                 if (weaponSystemEntries.ContainsKey(entry))
                     throw new InvalidOperationException($"WeaponSystemEntry for {entry.WeaponSystem} with ProfileItem {entry.ProfileItem} already exists");
@@ -318,7 +386,7 @@ KEEP THIS COMMENT BLOCK IN SYNC WITH WEAPONSYSTEMENTRY AND UPGRADE CHANGES!
             catch (Exception e)
             {
                 AppService.HandleException(CLASS_NAME, nameof(UpdateDeployedEntry), e);
-                throw;
+                return false; // Indicate failure if an exception occurs
             }
         }
 
@@ -359,7 +427,7 @@ KEEP THIS COMMENT BLOCK IN SYNC WITH WEAPONSYSTEMENTRY AND UPGRADE CHANGES!
             catch (Exception e)
             {
                 AppService.HandleException(CLASS_NAME, nameof(UpdateMountedEntry), e);
-                throw;
+                return false; // Indicate failure if an exception occurs
             }
         }
 
@@ -410,10 +478,10 @@ KEEP THIS COMMENT BLOCK IN SYNC WITH WEAPONSYSTEMENTRY AND UPGRADE CHANGES!
                 // Step 1: Accumulate weapon systems by type with float precision
                 var weaponSystemAccumulators = new Dictionary<WeaponSystems, float>();
 
-                foreach (var weaponSystemEntry in weaponSystemEntries)
+                foreach (var kvp in weaponSystemEntries)
                 {
-                    WeaponSystems weaponSystem = weaponSystemEntry.Key.WeaponSystem;
-                    int maxQuantity = weaponSystemEntry.Value;
+                    WeaponSystems weaponSystem = kvp.Key.WeaponSystem;
+                    int maxQuantity = kvp.Value; // Safe - captured from iteration
                     float scaledValue = maxQuantity * currentMultiplier;
 
                     // Accumulate multiple entries for same weapon system (float precision)
