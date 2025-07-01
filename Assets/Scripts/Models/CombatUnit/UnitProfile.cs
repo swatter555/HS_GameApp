@@ -22,242 +22,300 @@ namespace HammerAndSickle.Models
             WeaponSystem = weaponSystem;
             ProfileItem = profileItem;
         }
+
+        #region Overrides
+
+        /// <summary>
+        /// Determines whether the specified object is equal to the current WeaponSystemEntry.
+        /// Two entries are considered equal if they have the same WeaponSystem and ProfileItem.
+        /// </summary>
+        /// <param name="obj">The object to compare with the current entry</param>
+        /// <returns>true if the specified object is equal to the current entry; otherwise, false</returns>
+        public override bool Equals(object obj)
+        {
+            return obj is WeaponSystemEntry other &&
+                   WeaponSystem == other.WeaponSystem &&
+                   ProfileItem == other.ProfileItem;
+        }
+
+        /// <summary>
+        /// Returns a hash code for the current WeaponSystemEntry.
+        /// The hash code is based on the combination of WeaponSystem and ProfileItem values.
+        /// </summary>
+        /// <returns>A hash code for the current entry</returns>
+        public override int GetHashCode()
+        {
+            return HashCode.Combine(WeaponSystem, ProfileItem);
+        }
+
+        /// <summary>
+        /// Determines whether two WeaponSystemEntry instances are equal.
+        /// </summary>
+        /// <param name="left">The first entry to compare</param>
+        /// <param name="right">The second entry to compare</param>
+        /// <returns>true if the entries are equal; otherwise, false</returns>
+        public static bool operator ==(WeaponSystemEntry left, WeaponSystemEntry right)
+        {
+            return Equals(left, right);
+        }
+
+        /// <summary>
+        /// Determines whether two WeaponSystemEntry instances are not equal.
+        /// </summary>
+        /// <param name="left">The first entry to compare</param>
+        /// <param name="right">The second entry to compare</param>
+        /// <returns>true if the entries are not equal; otherwise, false</returns>
+        public static bool operator !=(WeaponSystemEntry left, WeaponSystemEntry right)
+        {
+            return !Equals(left, right);
+        }
+
+        /// <summary>
+        /// Returns a string representation of the WeaponSystemEntry.
+        /// </summary>
+        /// <returns>A string in the format "WeaponSystem (ProfileItem)"</returns>
+        public override string ToString()
+        {
+            return $"{WeaponSystem} ({ProfileItem})";
+        }
+
+        #endregion // Overrides
     }
 
 
-/*───────────────────────────────────────────────────────────────────────────────
-UnitProfile  —  organizational composition tracking and intelligence reporting
-────────────────────────────────────────────────────────────────────────────────
-Overview
-════════
-**UnitProfile** defines military units in terms of their organizational composition:
-men, tanks, artillery pieces, aircraft, and other equipment. Unlike WeaponSystemProfile
-which handles combat calculations, UnitProfile provides informational data for GUI
-display and tracks attrition throughout scenarios and campaigns.
+    /*───────────────────────────────────────────────────────────────────────────────
+    UnitProfile  —  organizational composition tracking and intelligence reporting
+    ────────────────────────────────────────────────────────────────────────────────
+    Overview
+    ════════
+    **UnitProfile** defines military units in terms of their organizational composition:
+    men, tanks, artillery pieces, aircraft, and other equipment. Unlike WeaponSystemProfile
+    which handles combat calculations, UnitProfile provides informational data for GUI
+    display and tracks attrition throughout scenarios and campaigns.
 
-The system automatically scales current strength based on unit hit points, providing
-realistic loss tracking as units take damage. It generates detailed intelligence
-reports with fog-of-war effects, categorizing equipment into logical display buckets
-for intuitive player understanding.
+    The system automatically scales current strength based on unit hit points, providing
+    realistic loss tracking as units take damage. It generates detailed intelligence
+    reports with fog-of-war effects, categorizing equipment into logical display buckets
+    for intuitive player understanding.
 
-Major Responsibilities
-══════════════════════
-• WeaponSystemEntry management
-    - Weapon system entries with ProfileItem designation (Default/Deployed/Mounted)
-    - Support for unit upgrade system where deployed/mounted configurations can be changed
-    - Maximum equipment counts with real-time attrition scaling
-• Intelligence report generation
-    - Structured data for GUI intelligence displays
-    - Fog-of-war implementation with 5 spotted levels
-    - Equipment categorization into logical buckets (Men, Tanks, Artillery, etc.)
-• Equipment composition tracking
-    - All weapon systems reported regardless of ProfileItem type
-    - Automatic quantity accumulation for duplicate weapon systems
-    - Real-time strength calculation based on hit point ratios
-• Template system support
-    - Deep cloning with parameter overrides (ProfileID, nationality)
-    - Shared profile references for consistent unit definitions
-    - Binary serialization for save/load and template storage
+    Major Responsibilities
+    ══════════════════════
+    • WeaponSystemEntry management
+        - Weapon system entries with ProfileItem designation (Default/Deployed/Mounted)
+        - Support for unit upgrade system where deployed/mounted configurations can be changed
+        - Maximum equipment counts with real-time attrition scaling
+    • Intelligence report generation
+        - Structured data for GUI intelligence displays
+        - Fog-of-war implementation with 5 spotted levels
+        - Equipment categorization into logical buckets (Men, Tanks, Artillery, etc.)
+    • Equipment composition tracking
+        - All weapon systems reported regardless of ProfileItem type
+        - Automatic quantity accumulation for duplicate weapon systems
+        - Real-time strength calculation based on hit point ratios
+    • Template system support
+        - Deep cloning with parameter overrides (ProfileID, nationality)
+        - Shared profile references for consistent unit definitions
+        - Binary serialization for save/load and template storage
 
-Design Highlights
-═════════════════
-• **WeaponSystemEntry Architecture**: Combines WeaponSystems enum with ProfileItem 
-  designation to support the unit upgrade system where deployed/mounted equipment 
-  can be independently upgraded while preserving organizational structure.
-• **Separation of Concerns**: Pure informational model separate from combat
-  mechanics, allowing independent GUI and combat system evolution.
-• **Upgrade Support**: UpdateDeployedEntry() and UpdateMountedEntry() methods enable
-  safe weapon system replacement while preserving quantities and dictionary integrity.
-• **Automatic Scaling**: Current equipment counts automatically calculated
-  from hit point ratios, maintaining realistic attrition representation.
-• **Intelligence Categorization**: 20+ weapon system types organized into
-  intuitive display categories with comprehensive fog-of-war modeling.
-• **Flexible Cloning**: Multiple clone variants support template instantiation
-  with different ProfileIDs and nationalities while preserving composition.
+    Design Highlights
+    ═════════════════
+    • **WeaponSystemEntry Architecture**: Combines WeaponSystems enum with ProfileItem 
+      designation to support the unit upgrade system where deployed/mounted equipment 
+      can be independently upgraded while preserving organizational structure.
+    • **Separation of Concerns**: Pure informational model separate from combat
+      mechanics, allowing independent GUI and combat system evolution.
+    • **Upgrade Support**: UpdateDeployedEntry() and UpdateMountedEntry() methods enable
+      safe weapon system replacement while preserving quantities and dictionary integrity.
+    • **Automatic Scaling**: Current equipment counts automatically calculated
+      from hit point ratios, maintaining realistic attrition representation.
+    • **Intelligence Categorization**: 20+ weapon system types organized into
+      intuitive display categories with comprehensive fog-of-war modeling.
+    • **Flexible Cloning**: Multiple clone variants support template instantiation
+      with different ProfileIDs and nationalities while preserving composition.
 
-Public-Method Reference
-═══════════════════════
-  ── Equipment Management ───────────────────────────────────────────────────────
-  AddWeaponSystem(entry, maxQuantity)       Adds weapon system entry with quantity.
-  UpdateDeployedEntry(newWeaponSystem)       Updates deployed weapon system (upgrade support).
-  UpdateMountedEntry(newWeaponSystem)        Updates mounted weapon system (upgrade support).
+    Public-Method Reference
+    ═══════════════════════
+      ── Equipment Management ───────────────────────────────────────────────────────
+      AddWeaponSystem(entry, maxQuantity)       Adds weapon system entry with quantity.
+      UpdateDeployedEntry(newWeaponSystem)       Updates deployed weapon system (upgrade support).
+      UpdateMountedEntry(newWeaponSystem)        Updates mounted weapon system (upgrade support).
 
-  ── Strength Tracking ──────────────────────────────────────────────────────────
-  UpdateCurrentHP(currentHP)                Updates current hit points for scaling.
+      ── Strength Tracking ──────────────────────────────────────────────────────────
+      UpdateCurrentHP(currentHP)                Updates current hit points for scaling.
 
-  ── Intelligence Reporting ─────────────────────────────────────────────────────
-  GenerateIntelReport(name, state, xp, eff, spotted) Creates intelligence report with
-                                             fog-of-war effects and categorization.
+      ── Intelligence Reporting ─────────────────────────────────────────────────────
+      GenerateIntelReport(name, state, xp, eff, spotted) Creates intelligence report with
+                                                 fog-of-war effects and categorization.
 
-  ── Cloning & Templates ────────────────────────────────────────────────────────
-  Clone()                                   Creates identical copy with same ProfileID.
-  Clone(newProfileID)                       Creates copy with new profile ID.
-  Clone(newProfileID, newNationality)       Creates copy with new ID and nationality.
+      ── Cloning & Templates ────────────────────────────────────────────────────────
+      Clone()                                   Creates identical copy with same ProfileID.
+      Clone(newProfileID)                       Creates copy with new profile ID.
+      Clone(newProfileID, newNationality)       Creates copy with new ID and nationality.
 
-  ── Persistence ────────────────────────────────────────────────────────────────
-  GetObjectData(info, context)             ISerializable save implementation.
+      ── Persistence ────────────────────────────────────────────────────────────────
+      GetObjectData(info, context)             ISerializable save implementation.
 
-WeaponSystemEntry Architecture
-══════════════════════════════
-**WeaponSystemEntry Structure**
-Each entry combines a WeaponSystems enum with a ProfileItem designation:
-• **WeaponSystem**: The specific equipment type (TANK_T80B, REG_INF_SV, etc.)
-• **ProfileItem**: Role designation (Default/Deployed/Mounted)
+    WeaponSystemEntry Architecture
+    ══════════════════════════════
+    **WeaponSystemEntry Structure**
+    Each entry combines a WeaponSystems enum with a ProfileItem designation:
+    • **WeaponSystem**: The specific equipment type (TANK_T80B, REG_INF_SV, etc.)
+    • **ProfileItem**: Role designation (Default/Deployed/Mounted)
 
-**ProfileItem Categories**
-• **Default**: Organizational equipment that doesn't change between combat states
-  - Infantry, support weapons, logistics equipment
-  - Always included in intelligence reports regardless of unit state
-• **Deployed**: Primary combat equipment when unit is deployed for battle
-  - Main battle tanks, deployed weapon systems, heavy equipment
-  - Used when unit is in Deployed, HastyDefense, Entrenched, or Fortified states
-• **Mounted**: Transport or alternative equipment configuration
-  - Transport vehicles, lighter weapons, mobile configurations
-  - Used when unit is in Mobile state (riding in transport)
+    **ProfileItem Categories**
+    • **Default**: Organizational equipment that doesn't change between combat states
+      - Infantry, support weapons, logistics equipment
+      - Always included in intelligence reports regardless of unit state
+    • **Deployed**: Primary combat equipment when unit is deployed for battle
+      - Main battle tanks, deployed weapon systems, heavy equipment
+      - Used when unit is in Deployed, HastyDefense, Entrenched, or Fortified states
+    • **Mounted**: Transport or alternative equipment configuration
+      - Transport vehicles, lighter weapons, mobile configurations
+      - Used when unit is in Mobile state (riding in transport)
 
-**Upgrade System Integration**
-UpdateDeployedEntry() and UpdateMountedEntry() support the unit upgrade system:
-- Replace weapon systems while preserving quantities
-- Enable progression from older to newer equipment (T-55A → T-80B)
-- Maintain separate upgrade paths for deployed vs mounted configurations
-- Safe dictionary operations prevent key corruption during upgrades
+    **Upgrade System Integration**
+    UpdateDeployedEntry() and UpdateMountedEntry() support the unit upgrade system:
+    - Replace weapon systems while preserving quantities
+    - Enable progression from older to newer equipment (T-55A → T-80B)
+    - Maintain separate upgrade paths for deployed vs mounted configurations
+    - Safe dictionary operations prevent key corruption during upgrades
 
-Equipment Categorization System
-═══════════════════════════════
-UnitProfile organizes 50+ weapon systems into logical display categories:
+    Equipment Categorization System
+    ═══════════════════════════════
+    UnitProfile organizes 50+ weapon systems into logical display categories:
 
-  **Personnel Categories**
-  • **Men**: All infantry types (REG_INF, AB_INF, AM_INF, MAR_INF, SPEC_INF, ENG_INF)
-    - Regular, airborne, air mobile, marine, special forces, engineer infantry
-    - Scaled based on hit points to show personnel casualties
+      **Personnel Categories**
+      • **Men**: All infantry types (REG_INF, AB_INF, AM_INF, MAR_INF, SPEC_INF, ENG_INF)
+        - Regular, airborne, air mobile, marine, special forces, engineer infantry
+        - Scaled based on hit points to show personnel casualties
 
-  **Armored Vehicle Categories**
-  • **Tanks**: All main battle tanks (TANK_T55A, TANK_T80B, TANK_M1, etc.)
-  • **IFVs**: Infantry fighting vehicles (IFV_BMP1, IFV_BMP2, IFV_M2, etc.)
-  • **APCs**: Armored personnel carriers (APC_MTLB, APC_M113, etc.)
-  • **Recon**: Reconnaissance vehicles (RCN_BRDM2, etc.)
+      **Armored Vehicle Categories**
+      • **Tanks**: All main battle tanks (TANK_T55A, TANK_T80B, TANK_M1, etc.)
+      • **IFVs**: Infantry fighting vehicles (IFV_BMP1, IFV_BMP2, IFV_M2, etc.)
+      • **APCs**: Armored personnel carriers (APC_MTLB, APC_M113, etc.)
+      • **Recon**: Reconnaissance vehicles (RCN_BRDM2, etc.)
 
-  **Artillery Categories**
-  • **Artillery**: Towed and self-propelled artillery (ART_LIGHT, SPA_2S1, SPA_M109)
-  • **Rocket Artillery**: Multiple rocket launchers (ROC_BM21, ROC_MLRS, etc.)
-  • **Surface-to-Surface Missiles**: Ballistic missiles (SSM_SCUD, etc.)
+      **Artillery Categories**
+      • **Artillery**: Towed and self-propelled artillery (ART_LIGHT, SPA_2S1, SPA_M109)
+      • **Rocket Artillery**: Multiple rocket launchers (ROC_BM21, ROC_MLRS, etc.)
+      • **Surface-to-Surface Missiles**: Ballistic missiles (SSM_SCUD, etc.)
 
-  **Air Defense Categories**
-  • **SAMs**: Surface-to-air missile systems (SAM_S300, SPSAM_9K31, etc.)
-  • **Anti-aircraft Artillery**: AAA systems (AAA_GENERIC, SPAAA_ZSU23, etc.)
-  • **MANPADs**: Portable air defense systems (MANPAD_GENERIC)
-  • **ATGMs**: Anti-tank guided missiles (ATGM_GENERIC)
+      **Air Defense Categories**
+      • **SAMs**: Surface-to-air missile systems (SAM_S300, SPSAM_9K31, etc.)
+      • **Anti-aircraft Artillery**: AAA systems (AAA_GENERIC, SPAAA_ZSU23, etc.)
+      • **MANPADs**: Portable air defense systems (MANPAD_GENERIC)
+      • **ATGMs**: Anti-tank guided missiles (ATGM_GENERIC)
 
-  **Aviation Categories**
-  • **Attack Helicopters**: Combat helicopters (HEL_MI24V, HEL_AH64, etc.)
-  • **Transport Helicopters**: Utility helicopters (HELTRAN_MI8, HELTRAN_UH1)
-  • **Fighters**: Air superiority fighters (ASF_MIG29, ASF_F15, etc.)
-  • **Multirole**: Multi-role fighters (MRF_F16, MRF_TornadoIDS, etc.)
-  • **Attack Aircraft**: Ground attack aircraft (ATT_A10, ATT_SU25, etc.)
-  • **Bombers**: Strategic and tactical bombers (BMB_F111, BMB_TU22M3, etc.)
-  • **Transports**: Transport aircraft (TRAN_AN8, etc.)
-  • **AWACS**: Airborne early warning aircraft (AWACS_A50)
-  • **Recon Aircraft**: Reconnaissance aircraft (RCNA_MIG25R, RCNA_SR71)
+      **Aviation Categories**
+      • **Attack Helicopters**: Combat helicopters (HEL_MI24V, HEL_AH64, etc.)
+      • **Transport Helicopters**: Utility helicopters (HELTRAN_MI8, HELTRAN_UH1)
+      • **Fighters**: Air superiority fighters (ASF_MIG29, ASF_F15, etc.)
+      • **Multirole**: Multi-role fighters (MRF_F16, MRF_TornadoIDS, etc.)
+      • **Attack Aircraft**: Ground attack aircraft (ATT_A10, ATT_SU25, etc.)
+      • **Bombers**: Strategic and tactical bombers (BMB_F111, BMB_TU22M3, etc.)
+      • **Transports**: Transport aircraft (TRAN_AN8, etc.)
+      • **AWACS**: Airborne early warning aircraft (AWACS_A50)
+      • **Recon Aircraft**: Reconnaissance aircraft (RCNA_MIG25R, RCNA_SR71)
 
-Intelligence System Architecture
-═══════════════════════════════
-**Spotted Level Effects** (Fog-of-War Implementation)
-• **Level 0**: Full information (player units, perfect intelligence)
-• **Level 1**: Unit name only (minimal contact, no composition data)
-• **Level 2**: Unit data with ±30% random error (poor intelligence)
-• **Level 3**: Unit data with ±10% random error (good intelligence)
-• **Level 4**: Perfect accuracy (excellent intelligence)
-• **Level 5**: Perfect accuracy + movement history (elite intelligence)
+    Intelligence System Architecture
+    ═══════════════════════════════
+    **Spotted Level Effects** (Fog-of-War Implementation)
+    • **Level 0**: Full information (player units, perfect intelligence)
+    • **Level 1**: Unit name only (minimal contact, no composition data)
+    • **Level 2**: Unit data with ±30% random error (poor intelligence)
+    • **Level 3**: Unit data with ±10% random error (good intelligence)
+    • **Level 4**: Perfect accuracy (excellent intelligence)
+    • **Level 5**: Perfect accuracy + movement history (elite intelligence)
 
-**Equipment Reporting Strategy**
-UnitProfile reports ALL weapon systems regardless of ProfileItem designation:
-• Default, Deployed, and Mounted entries are all included
-• Duplicate weapon systems (same enum, different ProfileItem) have quantities accumulated
-• Intelligence consumers determine what information is tactically relevant
-• Complete organizational picture provided without tactical filtering
+    **Equipment Reporting Strategy**
+    UnitProfile reports ALL weapon systems regardless of ProfileItem designation:
+    • Default, Deployed, and Mounted entries are all included
+    • Duplicate weapon systems (same enum, different ProfileItem) have quantities accumulated
+    • Intelligence consumers determine what information is tactically relevant
+    • Complete organizational picture provided without tactical filtering
 
-**Error Application System**
-Each equipment category receives independent random error within bounds:
-```
-Error Percentage = Random(1% to MaxError%)
-Direction = Random(Positive or Negative)
-Fogged Value = Original × (1 ± ErrorPercentage)
-```
+    **Error Application System**
+    Each equipment category receives independent random error within bounds:
+    ```
+    Error Percentage = Random(1% to MaxError%)
+    Direction = Random(Positive or Negative)
+    Fogged Value = Original × (1 ± ErrorPercentage)
+    ```
 
-**IntelReport Structure**
-Generated reports contain:
-- **Unit Metadata**: Name, nationality, combat state, experience, efficiency
-- **Categorized Equipment**: Bucketed counts for GUI display
-- **Detailed Data**: Raw weapon system breakdown for advanced analysis
-- **Fog-of-War State**: Accuracy level and error characteristics applied
+    **IntelReport Structure**
+    Generated reports contain:
+    - **Unit Metadata**: Name, nationality, combat state, experience, efficiency
+    - **Categorized Equipment**: Bucketed counts for GUI display
+    - **Detailed Data**: Raw weapon system breakdown for advanced analysis
+    - **Fog-of-War State**: Accuracy level and error characteristics applied
 
-Strength Scaling Mechanics
-═══════════════════════════
-**Automatic Attrition Calculation**
-Current equipment counts scale proportionally with unit hit points:
-```
-Current Multiplier = Current HP / Maximum HP (40)
-Current Equipment = Maximum Equipment × Current Multiplier
-```
+    Strength Scaling Mechanics
+    ═══════════════════════════
+    **Automatic Attrition Calculation**
+    Current equipment counts scale proportionally with unit hit points:
+    ```
+    Current Multiplier = Current HP / Maximum HP (40)
+    Current Equipment = Maximum Equipment × Current Multiplier
+    ```
 
-**Realistic Loss Representation**
-- 100% HP: Full equipment complement displayed
-- 75% HP: 25% equipment losses shown across all categories  
-- 50% HP: 50% equipment losses (moderate attrition)
-- 25% HP: 75% equipment losses (heavy attrition)
-- Near 0% HP: Minimal equipment remaining (unit nearly destroyed)
+    **Realistic Loss Representation**
+    - 100% HP: Full equipment complement displayed
+    - 75% HP: 25% equipment losses shown across all categories  
+    - 50% HP: 50% equipment losses (moderate attrition)
+    - 25% HP: 75% equipment losses (heavy attrition)
+    - Near 0% HP: Minimal equipment remaining (unit nearly destroyed)
 
-**Equipment Distribution**
-All weapon systems scale uniformly, representing:
-- Personnel casualties from combat and attrition
-- Vehicle losses from enemy action and mechanical failure
-- Aircraft losses from combat and operational accidents
-- Equipment abandonment during retreats and repositioning
+    **Equipment Distribution**
+    All weapon systems scale uniformly, representing:
+    - Personnel casualties from combat and attrition
+    - Vehicle losses from enemy action and mechanical failure
+    - Aircraft losses from combat and operational accidents
+    - Equipment abandonment during retreats and repositioning
 
-Template and Cloning System
-═══════════════════════════
-**Profile Template Architecture**
-UnitProfile supports sophisticated template instantiation:
-- **Base Templates**: Master profiles with full equipment definitions
-- **Unit Instances**: Unique ProfileID variants for specific unit instances
-- **Nationality Variants**: Same composition adapted for different armies
-- **Campaign Persistence**: Profiles maintain state across scenarios
+    Template and Cloning System
+    ═══════════════════════════
+    **Profile Template Architecture**
+    UnitProfile supports sophisticated template instantiation:
+    - **Base Templates**: Master profiles with full equipment definitions
+    - **Unit Instances**: Unique ProfileID variants for specific unit instances
+    - **Nationality Variants**: Same composition adapted for different armies
+    - **Campaign Persistence**: Profiles maintain state across scenarios
 
-**Clone Method Variants**
-• `Clone()`: Exact copy with identical ProfileID (template duplication)
-• `Clone(newProfileID)`: New ProfileID, same nationality (unit instantiation)  
-• `Clone(newProfileID, newNationality)`: Full parameterization (cross-national templates)
+    **Clone Method Variants**
+    • `Clone()`: Exact copy with identical ProfileID (template duplication)
+    • `Clone(newProfileID)`: New ProfileID, same nationality (unit instantiation)  
+    • `Clone(newProfileID, newNationality)`: Full parameterization (cross-national templates)
 
-**Use Cases**
-- **Scenario Creation**: Clone base templates for specific unit instances
-- **Campaign Progression**: Maintain unit-specific profiles across missions
-- **Nationality Conversion**: Adapt profiles for different armies
-- **Template Libraries**: Build reusable organizational templates
+    **Use Cases**
+    - **Scenario Creation**: Clone base templates for specific unit instances
+    - **Campaign Progression**: Maintain unit-specific profiles across missions
+    - **Nationality Conversion**: Adapt profiles for different armies
+    - **Template Libraries**: Build reusable organizational templates
 
-Serialization Architecture
-══════════════════════════
-**Binary Serialization Pattern**
-UnitProfile implements ISerializable for comprehensive save/load functionality:
-- **Basic Properties**: ProfileID (enum), nationality (enum), current hit points
-- **WeaponSystemEntry Storage**: Decomposes entries into WeaponSystems + ProfileItem + quantity
-- **Indexed Serialization**: Each entry stored with unique index for reconstruction
-- **Key Reconstruction**: WeaponSystemEntry objects rebuilt during deserialization
+    Serialization Architecture
+    ══════════════════════════
+    **Binary Serialization Pattern**
+    UnitProfile implements ISerializable for comprehensive save/load functionality:
+    - **Basic Properties**: ProfileID (enum), nationality (enum), current hit points
+    - **WeaponSystemEntry Storage**: Decomposes entries into WeaponSystems + ProfileItem + quantity
+    - **Indexed Serialization**: Each entry stored with unique index for reconstruction
+    - **Key Reconstruction**: WeaponSystemEntry objects rebuilt during deserialization
 
-**Data Integrity**
-- Enum values serialized directly for type safety
-- Dictionary key integrity maintained through proper entry reconstruction
-- All essential state preserved across save/load cycles
-- Exception handling through AppService integration
+    **Data Integrity**
+    - Enum values serialized directly for type safety
+    - Dictionary key integrity maintained through proper entry reconstruction
+    - All essential state preserved across save/load cycles
+    - Exception handling through AppService integration
 
-**Template System Integration**
-Serialized profiles serve as:
-- Immutable shared templates referenced by multiple units
-- Persistent campaign data maintaining unit state across scenarios
-- Template libraries for scenario creation and unit instantiation
+    **Template System Integration**
+    Serialized profiles serve as:
+    - Immutable shared templates referenced by multiple units
+    - Persistent campaign data maintaining unit state across scenarios
+    - Template libraries for scenario creation and unit instantiation
 
-───────────────────────────────────────────────────────────────────────────────
-KEEP THIS COMMENT BLOCK IN SYNC WITH WEAPONSYSTEMENTRY AND UPGRADE CHANGES!
-───────────────────────────────────────────────────────────────────────────── */
+    ───────────────────────────────────────────────────────────────────────────────
+    KEEP THIS COMMENT BLOCK IN SYNC WITH WEAPONSYSTEMENTRY AND UPGRADE CHANGES!
+    ───────────────────────────────────────────────────────────────────────────── */
     [Serializable]
     public class UnitProfile : ISerializable, ICloneable
     {
@@ -281,6 +339,8 @@ KEEP THIS COMMENT BLOCK IN SYNC WITH WEAPONSYSTEMENTRY AND UPGRADE CHANGES!
         public IntelReport LastIntelReport { get; private set; } = null;  // Last generated intel report for this profile.
 
         #endregion // Properties
+
+        
 
 
         #region Constructors
