@@ -340,18 +340,15 @@ namespace HammerAndSickle.Models
 
         #endregion // Properties
 
-        
-
 
         #region Constructors
 
         /// <summary>
-        /// Constructor for creating a new UnitProfile
+        /// Initializes a new instance of the <see cref="UnitProfile"/> class with the specified profile ID and
+        /// nationality.
         /// </summary>
-        /// <param name="profileID">UntiProfileTypes</param>
-        /// <param name="nationality">Nationality</param>
-        /// <param name="deployed">Depolyed WeaponSystemProfile</param>
-        /// <param name="mounted">Mounted WeaponSystemProfile</param>
+        /// <param name="profileID">The unique identifier for the unit profile, representing its type.</param>
+        /// <param name="nationality">The nationality associated with the unit profile.</param>
         public UnitProfile(UnitProfileTypes profileID, Nationality nationality)
         {
             try
@@ -547,158 +544,172 @@ namespace HammerAndSickle.Models
                 // Calculate multiplier for current strength
                 float currentMultiplier = currentHitPoints / CUConstants.MAX_HP;
 
-                // Calculate current values for each weapon system and populate detailed data
-                var currentValues = new Dictionary<WeaponSystems, int>();
+                // Step 1: Accumulate weapon systems with float precision
+                var weaponSystemAccumulators = new Dictionary<WeaponSystems, float>();
+
                 foreach (var weaponSystemEntry in weaponSystemEntries)
                 {
                     WeaponSystems weaponSystem = weaponSystemEntry.Key.WeaponSystem;
                     int maxQuantity = weaponSystemEntry.Value;
-
                     float scaledValue = maxQuantity * currentMultiplier;
-                    int currentValue = (int)Math.Round(scaledValue);
 
-                    // Add to current values (accumulate if multiple entries for same weapon system)
-                    if (currentValues.ContainsKey(weaponSystem))
+                    // Accumulate multiple entries for same weapon system (float precision)
+                    if (weaponSystemAccumulators.ContainsKey(weaponSystem))
                     {
-                        currentValues[weaponSystem] += currentValue;
+                        weaponSystemAccumulators[weaponSystem] += scaledValue;
                     }
-                    else if (currentValue > 0)
+                    else if (scaledValue > 0f)
                     {
-                        currentValues[weaponSystem] = currentValue;
-                    }
-
-                    // Add to detailed data (accumulate if multiple entries for same weapon system)
-                    if (intelReport.DetailedWeaponSystemsData.ContainsKey(weaponSystem))
-                    {
-                        intelReport.DetailedWeaponSystemsData[weaponSystem] += scaledValue;
-                    }
-                    else
-                    {
-                        intelReport.DetailedWeaponSystemsData[weaponSystem] = scaledValue;
+                        weaponSystemAccumulators[weaponSystem] = scaledValue;
                     }
                 }
 
-                // Determine fog of war parameters
-                bool isPositiveDirection = true;
-                float errorRangeMin = 1f;
-                float errorRangeMax = 1f;
-
-                if (spottedLevel == SpottedLevel.Level2)
+                // Step 2: Populate detailed data (before fog of war)
+                foreach (var kvp in weaponSystemAccumulators)
                 {
-                    isPositiveDirection = UnityEngine.Random.Range(0f, 1f) >= 0.5f;
-                    errorRangeMin = 1f;
-                    errorRangeMax = 30f;
-                }
-                else if (spottedLevel == SpottedLevel.Level3)
-                {
-                    isPositiveDirection = UnityEngine.Random.Range(0f, 1f) >= 0.5f;
-                    errorRangeMin = 1f;
-                    errorRangeMax = 10f;
+                    intelReport.DetailedWeaponSystemsData[kvp.Key] = kvp.Value;
                 }
 
-                // Apply fog of war to detailed data
+                // Step 3: Apply fog of war to detailed data (independent per weapon system)
                 if (spottedLevel == SpottedLevel.Level2 || spottedLevel == SpottedLevel.Level3)
                 {
+                    // Determine error range based on spotted level
+                    float errorRangeMin = 1f;
+                    float errorRangeMax = spottedLevel == SpottedLevel.Level2 ? 30f : 10f;
+
                     var foggedDetailedData = new Dictionary<WeaponSystems, float>();
                     foreach (var kvp in intelReport.DetailedWeaponSystemsData)
                     {
+                        // Each weapon system gets completely independent fog of war
+                        bool isPositiveDirection = UnityEngine.Random.Range(0f, 1f) >= 0.5f;
                         float errorPercent = UnityEngine.Random.Range(errorRangeMin, errorRangeMax);
                         float multiplier = isPositiveDirection ? (1f + errorPercent / 100f) : (1f - errorPercent / 100f);
-                        foggedDetailedData[kvp.Key] = kvp.Value * multiplier;
+
+                        float foggedValue = kvp.Value * multiplier;
+                        if (foggedValue > 0f)
+                        {
+                            foggedDetailedData[kvp.Key] = foggedValue;
+                        }
                     }
                     intelReport.DetailedWeaponSystemsData = foggedDetailedData;
                 }
 
-                // Categorize weapon systems into buckets
-                foreach (var item in currentValues)
+                // Step 4: Categorize weapons into buckets with float precision
+                var bucketAccumulators = new Dictionary<string, float>();
+
+                foreach (var kvp in weaponSystemAccumulators)
                 {
-                    string prefix = GetWeaponSystemPrefix(item.Key);
+                    WeaponSystems weaponSystem = kvp.Key;
+                    float weaponCount = kvp.Value;
+
+                    string prefix = GetWeaponSystemPrefix(weaponSystem);
                     string bucketName = MapPrefixToBucket(prefix);
 
-                    if (bucketName != null)
+                    if (bucketName != null && weaponCount > 0f)
                     {
-                        // Calculate fog of war multiplier for this bucket (each bucket gets its own error percentage)
-                        float bucketMultiplier = 1f;
-                        if (spottedLevel == SpottedLevel.Level2 || spottedLevel == SpottedLevel.Level3)
+                        // Accumulate in bucket with float precision
+                        if (bucketAccumulators.ContainsKey(bucketName))
                         {
-                            float errorPercent = UnityEngine.Random.Range(errorRangeMin, errorRangeMax);
-                            bucketMultiplier = isPositiveDirection ? (1f + errorPercent / 100f) : (1f - errorPercent / 100f);
+                            bucketAccumulators[bucketName] += weaponCount;
                         }
-
-                        int foggedValue = (int)Math.Round(item.Value * bucketMultiplier);
-
-                        // Map bucket names to IntelReport properties
-                        switch (bucketName)
+                        else
                         {
-                            case "Men":
-                                intelReport.Men += foggedValue;
-                                break;
-                            case "Tanks":
-                                intelReport.Tanks += foggedValue;
-                                break;
-                            case "IFVs":
-                                intelReport.IFVs += foggedValue;
-                                break;
-                            case "APCs":
-                                intelReport.APCs += foggedValue;
-                                break;
-                            case "Recon":
-                                intelReport.RCNs += foggedValue;
-                                break;
-                            case "Artillery":
-                                intelReport.ARTs += foggedValue;
-                                break;
-                            case "Rocket Artillery":
-                                intelReport.ROCs += foggedValue;
-                                break;
-                            case "Surface To Surface Missiles":
-                                intelReport.SSMs += foggedValue;
-                                break;
-                            case "SAMs":
-                                intelReport.SAMs += foggedValue;
-                                break;
-                            case "Anti-aircraft Artillery":
-                                intelReport.AAAs += foggedValue;
-                                break;
-                            case "MANPADs":
-                                intelReport.MANPADs += foggedValue;
-                                break;
-                            case "ATGMs":
-                                intelReport.ATGMs += foggedValue;
-                                break;
-                            case "Attack Helicopters":
-                                intelReport.HEL += foggedValue;
-                                break;
-                            case "Transport Helicopters":
-                                intelReport.HELTRAN += foggedValue;
-                                break;
-                            case "Fighters":
-                                intelReport.ASFs += foggedValue;
-                                break;
-                            case "Multirole":
-                                intelReport.MRFs += foggedValue;
-                                break;
-                            case "Attack":
-                                intelReport.ATTs += foggedValue;
-                                break;
-                            case "Bombers":
-                                intelReport.BMBs += foggedValue;
-                                break;
-                            case "Transports":
-                                intelReport.TRANs += foggedValue;
-                                break;
-                            case "AWACS":
-                                intelReport.AWACS += foggedValue;
-                                break;
-                            case "Recon Aircraft":
-                                intelReport.RCNAs += foggedValue;
-                                break;
+                            bucketAccumulators[bucketName] = weaponCount;
                         }
                     }
                 }
 
-                LastIntelReport = intelReport; // Store for later use
+                // Step 5: Apply fog of war to buckets and round to final integer values (independent per bucket)
+                foreach (var bucketKvp in bucketAccumulators)
+                {
+                    string bucketName = bucketKvp.Key;
+                    float accumulatedValue = bucketKvp.Value;
 
+                    // Calculate fog of war multiplier for this bucket (completely independent per bucket)
+                    float bucketMultiplier = 1f;
+                    if (spottedLevel == SpottedLevel.Level2 || spottedLevel == SpottedLevel.Level3)
+                    {
+                        // Each bucket gets its own independent fog-of-war direction and magnitude
+                        bool isPositiveDirection = UnityEngine.Random.Range(0f, 1f) >= 0.5f;
+                        float errorRangeMin = 1f;
+                        float errorRangeMax = spottedLevel == SpottedLevel.Level2 ? 30f : 10f;
+                        float errorPercent = UnityEngine.Random.Range(errorRangeMin, errorRangeMax);
+                        bucketMultiplier = isPositiveDirection ? (1f + errorPercent / 100f) : (1f - errorPercent / 100f);
+                    }
+
+                    // Apply fog of war and round ONLY at the final step
+                    int finalValue = (int)Math.Round(accumulatedValue * bucketMultiplier);
+
+                    // Assign to appropriate IntelReport property
+                    switch (bucketName)
+                    {
+                        case "Men":
+                            intelReport.Men = finalValue;
+                            break;
+                        case "Tanks":
+                            intelReport.Tanks = finalValue;
+                            break;
+                        case "IFVs":
+                            intelReport.IFVs = finalValue;
+                            break;
+                        case "APCs":
+                            intelReport.APCs = finalValue;
+                            break;
+                        case "Recon":
+                            intelReport.RCNs = finalValue;
+                            break;
+                        case "Artillery":
+                            intelReport.ARTs = finalValue;
+                            break;
+                        case "Rocket Artillery":
+                            intelReport.ROCs = finalValue;
+                            break;
+                        case "Surface To Surface Missiles":
+                            intelReport.SSMs = finalValue;
+                            break;
+                        case "SAMs":
+                            intelReport.SAMs = finalValue;
+                            break;
+                        case "Anti-aircraft Artillery":
+                            intelReport.AAAs = finalValue;
+                            break;
+                        case "MANPADs":
+                            intelReport.MANPADs = finalValue;
+                            break;
+                        case "ATGMs":
+                            intelReport.ATGMs = finalValue;
+                            break;
+                        case "Attack Helicopters":
+                            intelReport.HEL = finalValue;
+                            break;
+                        case "Transport Helicopters":
+                            intelReport.HELTRAN = finalValue;
+                            break;
+                        case "Fighters":
+                            intelReport.ASFs = finalValue;
+                            break;
+                        case "Multirole":
+                            intelReport.MRFs = finalValue;
+                            break;
+                        case "Attack":
+                            intelReport.ATTs = finalValue;
+                            break;
+                        case "Bombers":
+                            intelReport.BMBs = finalValue;
+                            break;
+                        case "Transports":
+                            intelReport.TRANs = finalValue;
+                            break;
+                        case "AWACS":
+                            intelReport.AWACS = finalValue;
+                            break;
+                        case "Recon Aircraft":
+                            intelReport.RCNAs = finalValue;
+                            break;
+                    }
+                }
+
+                LastIntelReport = intelReport; // Store for later use
                 return intelReport;
             }
             catch (Exception e)
