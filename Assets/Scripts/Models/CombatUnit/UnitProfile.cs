@@ -350,34 +350,62 @@ namespace HammerAndSickle.Models
         }
 
         /// <summary>
-        /// Updates the deployed weapon system entry to use a different weapon system while preserving the original quantity.
-        /// This method supports unit upgrades where deployed equipment can be replaced with improved versions.
-        /// The unit must have an existing deployed entry for this operation to succeed.
+        /// Replaces the existing <see cref="ProfileItem.Deployed"/> weapon system, or
+        /// creates one if it doesn’t exist.  When adding a new entry you must supply
+        /// <paramref name="quantityIfNew"/> (≥ 1).
         /// </summary>
-        /// <param name="newWeaponSystem">The new weapon system to use for the deployed configuration</param>
-        /// <returns>True if a deployed entry was found and successfully updated; false if no deployed entry exists</returns>
-        /// <remarks>
-        /// This method performs a safe remove-and-replace operation to maintain dictionary key integrity.
-        /// The original quantity is preserved during the upgrade process.
-        /// </remarks>
-        public bool UpdateDeployedEntry(WeaponSystems newWeaponSystem)
+        /// <param name="newWeaponSystem">
+        /// The weapon system that will represent the deployed configuration.
+        /// </param>
+        /// <param name="quantityIfNew">
+        /// Quantity to assign when there is currently no deployed entry.
+        /// Ignored when an entry already exists.
+        /// </param>
+        /// <returns>
+        /// <c>true</c> if the entry was updated or created; <c>false</c> only when
+        /// the profile lacked a deployed entry and <paramref name="quantityIfNew"/>
+        /// was not a positive number.
+        /// </returns>
+        /// <exception cref="ArgumentOutOfRangeException">
+        /// Thrown if <paramref name="quantityIfNew"/> is negative.
+        /// </exception>
+        public bool UpdateDeployedEntry(WeaponSystems newWeaponSystem, int quantityIfNew = 0)
         {
             try
             {
-                // Find the existing deployed entry
-                var deployedEntry = weaponSystemEntries.Keys.FirstOrDefault(entry => entry.ProfileItem == ProfileItem.Deployed);
-                if (deployedEntry == null)
+                if (quantityIfNew < 0)
+                    throw new ArgumentOutOfRangeException(nameof(quantityIfNew),
+                                                          "Quantity cannot be negative");
+
+                // Locate any existing deployed entry (there should be at most one).
+                var deployedEntries = weaponSystemEntries.Keys
+                                                         .Where(e => e.ProfileItem == ProfileItem.Deployed)
+                                                         .ToList();
+
+                // Defensive check: flag duplicates in debug builds.
+                System.Diagnostics.Debug.Assert(
+                    deployedEntries.Count <= 1,
+                    $"{CLASS_NAME}.{nameof(UpdateDeployedEntry)} detected multiple deployed entries.");
+
+                int quantity;
+
+                if (deployedEntries.Count == 1)
                 {
-                    return false; // No deployed entry to update
+                    // Preserve current quantity, then remove the old key.
+                    var oldEntry = deployedEntries[0];
+                    quantity = weaponSystemEntries[oldEntry];
+                    weaponSystemEntries.Remove(oldEntry);
+                }
+                else
+                {
+                    // No deployed entry yet—only proceed if the caller gave us a quantity.
+                    if (quantityIfNew <= 0)
+                        return false;
+
+                    quantity = quantityIfNew;
                 }
 
-                // Get the quantity from the old entry
-                int quantity = weaponSystemEntries[deployedEntry];
-
-                // Remove the old entry
-                weaponSystemEntries.Remove(deployedEntry);
-
-                // Add the new entry with the same quantity
+                // Add the new entry (value-equality prevents accidental duplicates).
                 var newEntry = new WeaponSystemEntry(newWeaponSystem, ProfileItem.Deployed);
                 weaponSystemEntries[newEntry] = quantity;
 
@@ -386,39 +414,57 @@ namespace HammerAndSickle.Models
             catch (Exception e)
             {
                 AppService.HandleException(CLASS_NAME, nameof(UpdateDeployedEntry), e);
-                return false; // Indicate failure if an exception occurs
+                return false;   // Uniform failure signal.
             }
         }
 
         /// <summary>
-        /// Updates the mounted weapon system entry to use a different weapon system while preserving the original quantity.
-        /// This method supports unit upgrades where mounted equipment can be replaced with improved versions.
-        /// The unit must have an existing mounted entry for this operation to succeed.
+        /// Replaces the current <see cref="ProfileItem.Mounted"/> weapon system, or adds one
+        /// if none exists.  When no mounted entry is present you must provide a positive
+        /// <paramref name="quantityIfNew"/> so the method knows how many weapons to add.
         /// </summary>
-        /// <param name="newWeaponSystem">The new weapon system to use for the mounted configuration</param>
-        /// <returns>True if a mounted entry was found and successfully updated; false if no mounted entry exists</returns>
-        /// <remarks>
-        /// This method performs a safe remove-and-replace operation to maintain dictionary key integrity.
-        /// The original quantity is preserved during the upgrade process.
-        /// </remarks>
-        public bool UpdateMountedEntry(WeaponSystems newWeaponSystem)
+        /// <param name="newWeaponSystem">The weapon system that will become the mounted entry.</param>
+        /// <param name="quantityIfNew">
+        /// Quantity to use when the unit has no mounted entry yet.  
+        /// Ignored when an entry already exists (its current quantity is preserved).
+        /// </param>
+        /// <returns>
+        /// <c>true</c> if the mounted entry was created or updated; <c>false</c> only when
+        /// there was no mounted entry <em>and</em> <paramref name="quantityIfNew"/> was
+        /// zero or negative.
+        /// </returns>
+        /// <exception cref="ArgumentOutOfRangeException">
+        /// Thrown when <paramref name="quantityIfNew"/> is negative.
+        /// </exception>
+        public bool UpdateMountedEntry(WeaponSystems newWeaponSystem, int quantityIfNew = 0)
         {
             try
             {
-                // Find the existing mounted entry
-                var mountedEntry = weaponSystemEntries.Keys.FirstOrDefault(entry => entry.ProfileItem == ProfileItem.Mounted);
-                if (mountedEntry == null)
+                if (quantityIfNew < 0)
+                    throw new ArgumentOutOfRangeException(nameof(quantityIfNew),
+                                                          "Quantity cannot be negative");
+
+                // Locate any existing mounted entry (should be at most one by design).
+                var mountedEntry = weaponSystemEntries.Keys
+                                                      .FirstOrDefault(e => e.ProfileItem == ProfileItem.Mounted);
+
+                int quantity;
+                if (mountedEntry != null)
                 {
-                    return false; // No mounted entry to update
+                    // Preserve current quantity then remove the old key to keep hash integrity.
+                    quantity = weaponSystemEntries[mountedEntry];
+                    weaponSystemEntries.Remove(mountedEntry);
+                }
+                else
+                {
+                    // No mounted entry yet – only proceed if caller supplied a positive quantity.
+                    if (quantityIfNew <= 0)
+                        return false;
+
+                    quantity = quantityIfNew;
                 }
 
-                // Get the quantity from the old entry
-                int quantity = weaponSystemEntries[mountedEntry];
-
-                // Remove the old entry
-                weaponSystemEntries.Remove(mountedEntry);
-
-                // Add the new entry with the same quantity
+                // Add/replace with the new entry (value-equality prevents accidental duplicates).
                 var newEntry = new WeaponSystemEntry(newWeaponSystem, ProfileItem.Mounted);
                 weaponSystemEntries[newEntry] = quantity;
 
@@ -427,7 +473,7 @@ namespace HammerAndSickle.Models
             catch (Exception e)
             {
                 AppService.HandleException(CLASS_NAME, nameof(UpdateMountedEntry), e);
-                return false; // Indicate failure if an exception occurs
+                return false;   // Exception means the update failed.
             }
         }
 
