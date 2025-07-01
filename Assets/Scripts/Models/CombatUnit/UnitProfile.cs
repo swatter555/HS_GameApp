@@ -439,7 +439,7 @@ namespace HammerAndSickle.Models
         /// <summary>
         /// Generates an IntelReport object containing bucketed weapon system data and unit metadata.
         /// This provides structured data for the GUI to display unit intelligence information.
-        /// Applies fog of war effects based on spotted level for AI units.
+        /// Applies fog of war effects to final buckets only based on spotted level for AI units.
         /// Reports all weapon systems in the profile regardless of their ProfileItem designation.
         /// Buckets with values less than 1 are omitted from the final report.
         /// </summary>
@@ -475,7 +475,7 @@ namespace HammerAndSickle.Models
                 if (safeHitPoints <= 0) safeHitPoints = 1;
                 float currentMultiplier = safeHitPoints / CUConstants.MAX_HP;
 
-                // Step 1: Accumulate weapon systems by type with float precision
+                // Step 1: Accumulate weapon systems by type with float precision (NO fog-of-war here)
                 var weaponSystemAccumulators = new Dictionary<WeaponSystems, float>();
 
                 foreach (var kvp in weaponSystemEntries)
@@ -495,7 +495,7 @@ namespace HammerAndSickle.Models
                     }
                 }
 
-                // Step 2: Categorize weapons into buckets with float precision
+                // Step 2: Categorize weapons into buckets with float precision (NO fog-of-war here)
                 var bucketAccumulators = new Dictionary<string, float>();
 
                 foreach (var kvp in weaponSystemAccumulators)
@@ -520,13 +520,13 @@ namespace HammerAndSickle.Models
                     }
                 }
 
-                // Step 3: Apply fog of war to buckets, round to final integer values, and omit buckets < 1
+                // Step 3: Apply fog of war to buckets ONLY, round to final integer values, and omit buckets < 1
                 foreach (var bucketKvp in bucketAccumulators)
                 {
                     string bucketName = bucketKvp.Key;
                     float accumulatedValue = bucketKvp.Value;
 
-                    // Calculate fog of war multiplier for this bucket
+                    // Calculate fog of war multiplier for this bucket (ONLY fog-of-war application)
                     float bucketMultiplier = 1f;
                     if (spottedLevel == SpottedLevel.Level2 || spottedLevel == SpottedLevel.Level3)
                     {
