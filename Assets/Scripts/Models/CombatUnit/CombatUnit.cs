@@ -174,8 +174,8 @@ namespace HammerAndSickle.Models
         // Profiles contain unit stats and capabilities.
         public WeaponSystemProfile DeployedProfile { get; private set; }
         public WeaponSystemProfile MountedProfile { get; private set; }
-        public IntelProfile IntelProfile { get; private set; }
         public FacilityManager FacilityManager { get; internal set; }
+        public IntelProfileTypes IntelProfileType { get; internal set; }
 
         // The unit's leader.
         public bool IsLeaderAssigned = false;
@@ -228,7 +228,6 @@ namespace HammerAndSickle.Models
             Nationality nationality,
             WeaponSystemProfile deployedProfile,
             WeaponSystemProfile mountedProfile,
-            IntelProfile intelProfile,
             bool isTransportable,
             bool isBase = false,
             DepotCategory category = DepotCategory.Secondary,
@@ -242,9 +241,6 @@ namespace HammerAndSickle.Models
 
                 if (deployedProfile == null)
                     throw new ArgumentNullException(nameof(deployedProfile), "Deployed profile is required");
-
-                if (intelProfile == null)
-                    throw new ArgumentNullException(nameof(intelProfile), "Unit profile is required");
 
                 // Set identification and metadata
                 UnitName = unitName;
@@ -260,7 +256,6 @@ namespace HammerAndSickle.Models
                 // Set profiles
                 DeployedProfile = deployedProfile;
                 MountedProfile = mountedProfile;
-                IntelProfile = intelProfile;
 
                 // If this is a base unit, initialize the proper facility.
                 IsBase = isBase;
@@ -409,7 +404,6 @@ namespace HammerAndSickle.Models
                 // Leave all object references null - they will be resolved later
                 DeployedProfile = null;
                 MountedProfile = null;
-                IntelProfile = null;
                 CommandingOfficer = null;
             }
             catch (Exception e)
@@ -2608,7 +2602,6 @@ namespace HammerAndSickle.Models
                     this.Nationality,
                     this.DeployedProfile,      // Shared reference
                     this.MountedProfile,       // Shared reference  
-                    this.IntelProfile,          // Shared reference
                     this.IsTransportable,
                     this.IsBase
                 );
@@ -2881,22 +2874,6 @@ namespace HammerAndSickle.Models
                     {
                         AppService.HandleException(CLASS_NAME, "ResolveReferences",
                             new ArgumentException($"Invalid weapon system ID: {unresolvedMountedProfileID}"));
-                    }
-                }
-
-                // Resolve IntelProfile reference
-                if (!string.IsNullOrEmpty(unresolvedUnitProfileID))
-                {
-                    var unitProfile = manager.GetUnitProfile(unresolvedUnitProfileID, Nationality);
-                    if (unitProfile != null)
-                    {
-                        IntelProfile = unitProfile;
-                        unresolvedUnitProfileID = "";
-                    }
-                    else
-                    {
-                        AppService.HandleException(CLASS_NAME, "ResolveReferences",
-                            new KeyNotFoundException($"Unit profile {unresolvedUnitProfileID}_{Nationality} not found"));
                     }
                 }
 

@@ -47,7 +47,6 @@ namespace HammerAndSickle.Models
         public int CombatUnitCount { get; set; }
         public int LeaderCount { get; set; }
         public int WeaponProfileCount { get; set; }
-        public int UnitProfileCount { get; set; }
         public int FacilityCount { get; set; }
         public string Checksum { get; set; }
 
@@ -66,7 +65,6 @@ namespace HammerAndSickle.Models
             CombatUnitCount = info.GetInt32(nameof(CombatUnitCount));
             LeaderCount = info.GetInt32(nameof(LeaderCount));
             WeaponProfileCount = info.GetInt32(nameof(WeaponProfileCount));
-            UnitProfileCount = info.GetInt32(nameof(UnitProfileCount));
 
             // Handle backward compatibility
             try
@@ -89,7 +87,6 @@ namespace HammerAndSickle.Models
             info.AddValue(nameof(CombatUnitCount), CombatUnitCount);
             info.AddValue(nameof(LeaderCount), LeaderCount);
             info.AddValue(nameof(WeaponProfileCount), WeaponProfileCount);
-            info.AddValue(nameof(UnitProfileCount), UnitProfileCount);
             info.AddValue(nameof(FacilityCount), FacilityCount);
             info.AddValue(nameof(Checksum), Checksum);
         }
@@ -288,7 +285,6 @@ namespace HammerAndSickle.Models
         private readonly Dictionary<string, CombatUnit> _combatUnits = new();
         private readonly Dictionary<string, Leader> _leaders = new();
         private readonly Dictionary<string, WeaponSystemProfile> _weaponProfiles = new();
-        private readonly Dictionary<string, IntelProfile> _unitProfiles = new();
 
         // State tracking
         private readonly HashSet<string> _dirtyObjects = new ();
@@ -312,8 +308,7 @@ namespace HammerAndSickle.Models
                 _dataLock.EnterReadLock();
                 try
                 {
-                    return _combatUnits.Count + _leaders.Count + _weaponProfiles.Count +
-                           _unitProfiles.Count;
+                    return _combatUnits.Count + _leaders.Count + _weaponProfiles.Count;
                 }
                 finally
                 {
@@ -363,7 +358,7 @@ namespace HammerAndSickle.Models
         /// <summary>
         /// Gets the count of each object type for diagnostic purposes.
         /// </summary>
-        public (int CombatUnits, int Leaders, int WeaponProfiles, int UnitProfiles, int Facilities) ObjectCounts
+        public (int CombatUnits, int Leaders, int WeaponProfiles, int Facilities) ObjectCounts
         {
             get
             {
@@ -371,8 +366,7 @@ namespace HammerAndSickle.Models
                 try
                 {
                     int facilityCount = _combatUnits.Values.Count(unit => unit.IsBase);
-                    return (_combatUnits.Count, _leaders.Count, _weaponProfiles.Count,
-                            _unitProfiles.Count, facilityCount);
+                    return (CombatUnits: _combatUnits.Count, Leaders: _leaders.Count, WeaponProfiles: _weaponProfiles.Count, Facilities: facilityCount);
                 }
                 finally
                 {
@@ -544,49 +538,6 @@ namespace HammerAndSickle.Models
             }
         }
 
-        /// <summary>
-        /// Registers a unit profile with the data manager.
-        /// </summary>
-        /// <param name="profile">The unit profile to register</param>
-        /// <returns>True if registration was successful</returns>
-        public bool RegisterUnitProfile(IntelProfile profile)
-        {
-            if (profile == null)
-            {
-                AppService.HandleException(CLASS_NAME, nameof(RegisterUnitProfile),
-                    new ArgumentNullException(nameof(profile)));
-                return false;
-            }
-
-            try
-            {
-                _dataLock.EnterWriteLock();
-
-                string profileId = $"{profile.IntelProfileID}_{profile.Nationality}";
-                if (_unitProfiles.ContainsKey(profileId))
-                {
-                    // Allow overwriting unit profiles as they're shared templates
-                    _unitProfiles[profileId] = profile;
-                }
-                else
-                {
-                    _unitProfiles[profileId] = profile;
-                }
-
-                MarkDirty(profileId);
-                return true;
-            }
-            catch (Exception e)
-            {
-                AppService.HandleException(CLASS_NAME, nameof(RegisterUnitProfile), e);
-                return false;
-            }
-            finally
-            {
-                _dataLock.ExitWriteLock();
-            }
-        }
-
         #endregion // Registration Methods
 
 
@@ -659,33 +610,6 @@ namespace HammerAndSickle.Models
             catch (Exception e)
             {
                 AppService.HandleException(CLASS_NAME, nameof(GetWeaponProfile), e);
-                return null;
-            }
-            finally
-            {
-                _dataLock.ExitReadLock();
-            }
-        }
-
-        /// <summary>
-        /// Gets a unit profile by name and nationality.
-        /// </summary>
-        /// <param name="profileName">The profile name</param>
-        /// <param name="nationality">The nationality</param>
-        /// <returns>The unit profile if found, null otherwise</returns>
-        public IntelProfile GetUnitProfile(string profileName, Nationality nationality)
-        {
-            if (string.IsNullOrEmpty(profileName)) return null;
-
-            try
-            {
-                _dataLock.EnterReadLock();
-                string profileId = $"{profileName}_{nationality}";
-                return _unitProfiles.TryGetValue(profileId, out IntelProfile profile) ? profile : null;
-            }
-            catch (Exception e)
-            {
-                AppService.HandleException(CLASS_NAME, nameof(GetUnitProfile), e);
                 return null;
             }
             finally
@@ -968,11 +892,6 @@ namespace HammerAndSickle.Models
                     {
                         errors.Add($"Unit {unit.UnitName} has null DeployedProfile");
                     }
-
-                    if (unit.IntelProfile == null)
-                    {
-                        errors.Add($"Unit {unit.UnitName} has null UnitProfile");
-                    }
                 }
 
             }
@@ -1033,7 +952,6 @@ namespace HammerAndSickle.Models
                     CombatUnitCount = _combatUnits.Count,
                     LeaderCount = _leaders.Count,
                     WeaponProfileCount = _weaponProfiles.Count,
-                    UnitProfileCount = _unitProfiles.Count,
                     FacilityCount = facilityCount,
                     Checksum = CalculateChecksum()
                 };
@@ -1049,7 +967,6 @@ namespace HammerAndSickle.Models
                     formatter.Serialize(stream, _combatUnits);
                     formatter.Serialize(stream, _leaders);
                     formatter.Serialize(stream, _weaponProfiles);
-                    formatter.Serialize(stream, _unitProfiles);
                 }
 
                 // Clear dirty flags after successful save
@@ -1123,7 +1040,6 @@ namespace HammerAndSickle.Models
                     var combatUnits = (Dictionary<string, CombatUnit>)formatter.Deserialize(stream);
                     var leaders = (Dictionary<string, Leader>)formatter.Deserialize(stream);
                     var weaponProfiles = (Dictionary<string, WeaponSystemProfile>)formatter.Deserialize(stream);
-                    var unitProfiles = (Dictionary<string, IntelProfile>)formatter.Deserialize(stream);
 
                     // Transfer to internal collections and track resolvable objects
                     foreach (var kvp in combatUnits)
@@ -1155,15 +1071,11 @@ namespace HammerAndSickle.Models
                     foreach (var kvp in weaponProfiles)
                         _weaponProfiles[kvp.Key] = kvp.Value;
 
-                    foreach (var kvp in unitProfiles)
-                        _unitProfiles[kvp.Key] = kvp.Value;
-
                     // Validate loaded data counts match header
                     int loadedFacilityCount = _combatUnits.Values.Count(unit => unit.IsBase);
                     if (_combatUnits.Count != header.CombatUnitCount ||
                         _leaders.Count != header.LeaderCount ||
                         _weaponProfiles.Count != header.WeaponProfileCount ||
-                        _unitProfiles.Count != header.UnitProfileCount ||
                         (header.FacilityCount > 0 && loadedFacilityCount != header.FacilityCount))
                     {
                         AppService.HandleException(CLASS_NAME, nameof(LoadGameState),
@@ -1336,7 +1248,6 @@ namespace HammerAndSickle.Models
             _combatUnits.Clear();
             _leaders.Clear();
             _weaponProfiles.Clear();
-            _unitProfiles.Clear();
             _dirtyObjects.Clear();
             _unresolvedObjects.Clear();
         }
@@ -1351,7 +1262,7 @@ namespace HammerAndSickle.Models
             try
             {
                 int checksum = _combatUnits.Count * 17 + _leaders.Count * 23 +
-                              _weaponProfiles.Count * 31 + _unitProfiles.Count * 37;
+                              _weaponProfiles.Count * 31;
 
                 // Add facility count
                 int facilityCount = _combatUnits.Values.Count(unit => unit.IsBase);

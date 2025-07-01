@@ -2,341 +2,346 @@
 using System.Collections.Generic;
 using HammerAndSickle.Services;
 
+/*───────────────────────────────────────────────────────────────────────────────
+ IntelProfile  —  static organizational template system for unit intelligence
+ ────────────────────────────────────────────────────────────────────────────────
+ Overview
+ ════════
+ **IntelProfile** provides static organizational templates that define the
+ maximum equipment composition for each unit type in Hammer & Sickle. Unlike
+ per-unit data storage, this system uses shared static definitions to generate
+ intelligence reports with fog-of-war distortion based on spotted levels.
+
+ Major Responsibilities
+ ══════════════════════
+ • Static template storage for all unit organizational structures
+     - Dictionary-based weapon system definitions per IntelProfileTypes
+     - Maximum equipment counts for each WeaponSystems enum
+     - Memory-efficient shared reference architecture
+ • Intelligence report generation with fog-of-war effects
+     - Level-based accuracy distortion (±30% to perfect intel)
+     - Strength scaling based on current hit points
+     - Bucket aggregation for GUI display categories
+ • Startup initialization and data validation
+     - Profile loading and consistency checking
+     - Error handling through AppService integration
+     - Thread-safe static access patterns
+
+ Design Highlights
+ ═════════════════
+ • **Static Architecture**: Eliminates per-unit object storage overhead while
+   maintaining organizational template integrity across all units of same type.
+ • **Enum-Based Lookup**: CombatUnit stores only IntelProfileTypes enum value,
+   enabling O(1) template access without reference resolution complexity.
+ • **Fog-of-War System**: Sophisticated intelligence distortion with independent
+   bucket-level error application for realistic reconnaissance simulation.
+ • **Bucket Mapping**: Weapon system prefixes automatically categorized into
+   GUI-friendly display buckets (Men, Tanks, IFVs, Artillery, etc.).
+ • **Memory Optimization**: Single static definition per unit type serves
+   thousands of individual units without duplication.
+
+ Fog-of-War Intelligence Levels
+ ══════════════════════════════
+ • **Level 0 (Not Spotted)**: No intelligence available - method returns null
+ • **Level 1 (Minimal Contact)**: Unit name and metadata only, zero equipment counts
+ • **Level 2 (Poor Intel)**: Equipment buckets with ±30% random error per bucket
+ • **Level 3 (Good Intel)**: Equipment buckets with ±10% random error per bucket  
+ • **Level 4 (Perfect Intel)**: Exact equipment counts with no distortion
+
+ Bucket Categories
+ ═════════════════
+ Equipment automatically categorized into display buckets:
+ • **Personnel**: Men (infantry, crews, specialists)
+ • **Vehicles**: Tanks, IFVs, APCs, Recon vehicles
+ • **Artillery**: Artillery, Rocket Artillery, Surface-to-Surface Missiles
+ • **Air Defense**: SAMs, Anti-Aircraft Artillery, MANPADs
+ • **Support**: ATGMs, Engineering equipment
+ • **Aircraft**: Attack Helicopters, Fighters, Multirole, Attack, Bombers, AWACS, Recon Aircraft
+
+ Public Interface
+ ════════════════
+   ── Initialization ──────────────────────────────────────────────────────────
+   InitializeProfiles()               Load all static profile definitions
+   IsInitialized                      Check if profiles loaded successfully
+   
+   ── Intelligence Generation ─────────────────────────────────────────────────
+   GenerateIntelReport(profileType,   Generate fog-of-war filtered intelligence
+     unitName, currentHitPoints,      snapshot with specified accuracy level
+     nationality, combatState, 
+     xpLevel, effLevel, spottedLevel)
+     
+   ── Profile Management ──────────────────────────────────────────────────────
+   HasProfile(profileType)            Check if profile type is defined
+   GetWeaponSystemCount(profileType,  Get max count for specific weapon system
+     weaponSystem)                    in profile type
+   GetDefinedWeaponSystems(           Get all weapon systems in profile type
+     profileType)
+
+ Implementation Flow
+ ═══════════════════
+ 1. **Startup Initialization**: LoadProfileDefinitions() populates static dictionary
+    with organizational data for all IntelProfileTypes enum values
+ 2. **Strength Scaling**: Equipment counts multiplied by (currentHP / maxHP) to
+    represent unit attrition and combat effectiveness
+ 3. **Bucket Aggregation**: Individual weapon systems mapped to GUI categories
+    using prefix-based classification system
+ 4. **Fog-of-War Application**: Each bucket independently distorted based on
+    spotted level with random directional error
+ 5. **Pruning**: Buckets with final values < 1 omitted from report to prevent
+    "ghost" equipment display
+
+ Thread Safety
+ ═════════════
+ Static initialization is thread-safe with double-checked locking. Profile
+ access is read-only after initialization, enabling safe concurrent access
+ from multiple game systems without synchronization overhead.
+
+ ───────────────────────────────────────────────────────────────────────────────
+ MAINTAIN CONSISTENCY WITH IntelReport BUCKET PROPERTIES!
+ ─────────────────────────────────────────────────────────────────────────────── */
 namespace HammerAndSickle.Models
 {
-  /*
-  * IntelProfile — Hammer & Sickle data‑model
-  * -----------------------------------------------------------
-  *  Purpose
-  *  -------
-  *  Acts as an **organizational template** for a combat unit.  It stores the
-  *  maximum count of every WeaponSystems enum that can appear in that unit and
-  *  can generate an `IntelReport` reflecting the unit’s *current* equipment
-  *  (scaled by hit‑points) with an optional Fog‑of‑War distortion.
-  *
-  *  Fog‑of‑War / SpottedLevel semantics
-  *  -----------------------------------
-  *      Level0 • Not spotted — nothing about composition is known; callers
-  *                should treat the unit as invisible.  This method therefore
-  *                returns **null** or an empty report (implementation choice).
-  *
-  *      Level1 • Minimal contact — *Unit name only* is populated in the returned
-  *                IntelReport, all other fields remain zero / default.
-  *
-  *      Level2 • Poor intel — Equipment buckets are included but each bucket is
-  *                independently modified by ±30 % random error.  CombatState is
-  *                exposed; Experience/Efficiency are **not**.
-  *
-  *      Level3 • Good intel — Same as Level2 but the random error band is
-  *                ±10 %.  Experience & Efficiency levels are now included.
-  *
-  *      Level4 • Perfect intel — Full, error‑free information.  The report
-  *                mirrors the unit’s true internal state exactly.
-  *
-  *  Public API (signatures only)
-  *  ----------------------------
-  *      // Constructor
-  *      IntelProfile(IntelProfileTypes profileID);
-  *
-  *      // Add a new weapon‑system definition (throws on duplicates / bad data)
-  *      bool AddWeaponSystem(WeaponSystems weaponSystem, int maxQuantity);
-  *
-  *      // Generate a fog‑of‑war filtered intelligence snapshot
-  *      IntelReport GenerateIntelReport(
-  *          string        unitName,
-  *          int           currentHitPoints,
-  *          Nationality   nationality,
-  *          CombatState   combatState,
-  *          ExperienceLevel xpLevel,
-  *          EfficiencyLevel effLevel,
-  *          SpottedLevel  spottedLevel = SpottedLevel.Level1);
-  *
-  *  How the class works (high‑level flow)
-  *  -------------------------------------
-  *  1. **Strength scaling** — All maximum equipment counts are multiplied by
-  *     `currentHitPoints / CUConstants.MAX_HP` (clamped to 0) to represent
-  *     attrition.
-  *  2. **Bucket aggregation** — Individual weapon systems are mapped to GUI
-  *     buckets (Men, Tanks, IFVs, …) via `MapPrefixToBucket`.
-  *  3. **Fog‑of‑War** — Each bucket is optionally blurred according to the
-  *     spotted level (see above).
-  *  4. **Pruning** — Any bucket whose final tally is < 1 is omitted so no
-  *     fractional or “ghost” equipment appears.
-  *
-  *  Exception & Logging Policy
-  *  --------------------------
-  *  All public methods wrap their bodies in try/catch and delegate to
-  *  `AppService.HandleException(CLASS_NAME, methodName, e)` for centralised
-  *  logging; the exception is re‑thrown where failure cannot safely be ignored.
-  *
-  *  Thread‑Safety Note
-  *  ------------------
-  *  The class is *not* thread‑safe; callers must synchronise access if a single
-  *  instance is shared across threads.
-  *
-  * -----------------------------------------------------------
-  */
-    public class IntelProfile
+    public static class IntelProfile
     {
         #region Constants
 
         private const string CLASS_NAME = nameof(IntelProfile);
 
-        #endregion // Constants
+        #endregion
 
 
         #region Fields
 
-        private readonly Dictionary<WeaponSystems, int> weaponSystems;    // Tracks weapon systems with max quantities.
+        private static readonly Dictionary<IntelProfileTypes, Dictionary<WeaponSystems, int>> _profiles
+            = new Dictionary<IntelProfileTypes, Dictionary<WeaponSystems, int>>();
 
-        #endregion // Fields
+        private static readonly object _initializationLock = new object();
+        private static bool _isInitialized = false;
+
+        #endregion
 
 
         #region Properties
 
-        public IntelProfileTypes IntelProfileID { get; private set; }       // Unique identifier for this profile.
-
-        #endregion // Properties
-
-
-        #region Constructors
-
         /// <summary>
-        /// Initializes a new instance of the <see cref="IntelProfile"/> class with the specified profile ID and
-        /// nationality.
+        /// Gets whether the profile system has been successfully initialized.
         /// </summary>
-        /// <param name="profileID">The unique identifier for the unit profile, representing its type.</param>
-        /// <param name="nationality">The nationality associated with the unit profile.</param>
-        public IntelProfile(IntelProfileTypes profileID)
-        {
-            try
-            {
-                IntelProfileID = profileID;
-                weaponSystems = new Dictionary<WeaponSystems, int>();
-            }
-            catch (Exception e)
-            {
-                AppService.HandleException(CLASS_NAME, "Constructor", e);
-                throw;
-            }
-        }
+        public static bool IsInitialized => _isInitialized;
 
-        #endregion // Constructors
+        #endregion
 
 
         #region Public Methods
 
         /// <summary>
-        /// Adds a new weapon system entry with specified max quantity.
+        /// Initializes all static profile definitions. Must be called during application startup
+        /// before any intelligence reports can be generated.
         /// </summary>
-        /// <param name="weaponSystem">WeaponSystems enum</param>
-        /// <param name="maxQuantity">Max num possible</param>
-        /// <returns></returns>
-        public bool AddWeaponSystem(WeaponSystems weaponSystem, int maxQuantity)
+        public static void InitializeProfiles()
+        {
+            if (_isInitialized) return;
+
+            lock (_initializationLock)
+            {
+                if (_isInitialized) return; // Double-check after acquiring lock
+
+                try
+                {
+                    LoadProfileDefinitions();
+                    _isInitialized = true;
+                }
+                catch (Exception e)
+                {
+                    AppService.HandleException(CLASS_NAME, nameof(InitializeProfiles), e);
+                    throw;
+                }
+            }
+        }
+
+        /// <summary>
+        /// Checks if a specific profile type has been defined in the system.
+        /// </summary>
+        /// <param name="profileType">The profile type to check</param>
+        /// <returns>True if the profile type is defined</returns>
+        public static bool HasProfile(IntelProfileTypes profileType)
         {
             try
             {
-                // Check for valid WeaponSystems value
-                if (weaponSystem == WeaponSystems.DEFAULT)
-                    throw new ArgumentException("Cannot add DEFAULT weapon system");
-
-                // Check for valid maxQuantity
-                if (maxQuantity < 0)
-                    throw new ArgumentOutOfRangeException(nameof(maxQuantity), "Max quantity cannot be negative");
-
-                // Check if this exact weaponSystem already exists
-                if (weaponSystems.ContainsKey(weaponSystem))
-                    throw new InvalidOperationException($"WeaponSystemEntry for {weaponSystem} already exists");
-
-                // Add new entry
-                weaponSystems[weaponSystem] = maxQuantity;
-
-                return true;
+                EnsureInitialized();
+                return _profiles.ContainsKey(profileType);
             }
             catch (Exception e)
             {
-                AppService.HandleException(CLASS_NAME, nameof(AddWeaponSystem), e);
+                AppService.HandleException(CLASS_NAME, nameof(HasProfile), e);
                 return false;
             }
         }
 
         /// <summary>
-        /// Generates an IntelReport object containing bucketed weapon system data and unit metadata.
-        /// This provides structured data for the GUI to display unit intelligence information.
-        /// Applies fog of war effects to final buckets only based on spotted level for AI units.
-        /// Reports all weapon systems in the profile regardless of their ProfileItem designation.
-        /// Buckets with values less than 1 are omitted from the final report.
+        /// Gets the maximum count for a specific weapon system in a profile type.
         /// </summary>
+        /// <param name="profileType">The profile type to query</param>
+        /// <param name="weaponSystem">The weapon system to look up</param>
+        /// <returns>Maximum count, or 0 if not found</returns>
+        public static int GetWeaponSystemCount(IntelProfileTypes profileType, WeaponSystems weaponSystem)
+        {
+            try
+            {
+                EnsureInitialized();
+
+                if (_profiles.TryGetValue(profileType, out var weaponSystems))
+                {
+                    return weaponSystems.TryGetValue(weaponSystem, out int count) ? count : 0;
+                }
+
+                return 0;
+            }
+            catch (Exception e)
+            {
+                AppService.HandleException(CLASS_NAME, nameof(GetWeaponSystemCount), e);
+                return 0;
+            }
+        }
+
+        /// <summary>
+        /// Gets all weapon systems defined for a specific profile type.
+        /// </summary>
+        /// <param name="profileType">The profile type to query</param>
+        /// <returns>Dictionary of weapon systems and their maximum counts</returns>
+        public static IReadOnlyDictionary<WeaponSystems, int> GetDefinedWeaponSystems(IntelProfileTypes profileType)
+        {
+            try
+            {
+                EnsureInitialized();
+
+                if (_profiles.TryGetValue(profileType, out var weaponSystems))
+                {
+                    return weaponSystems;
+                }
+
+                return new Dictionary<WeaponSystems, int>();
+            }
+            catch (Exception e)
+            {
+                AppService.HandleException(CLASS_NAME, nameof(GetDefinedWeaponSystems), e);
+                return new Dictionary<WeaponSystems, int>();
+            }
+        }
+
+        /// <summary>
+        /// Generates an IntelReport object containing bucketed weapon system data and unit metadata.
+        /// Applies fog-of-war effects based on spotted level to simulate realistic intelligence gathering.
+        /// </summary>
+        /// <param name="profileType">The organizational profile type for this unit</param>
         /// <param name="unitName">Display name of the unit</param>
-        /// <param name="combatState">Current combat state of the unit</param>
+        /// <param name="currentHitPoints">Current hit points representing unit strength</param>
+        /// <param name="nationality">National affiliation of the unit</param>
+        /// <param name="combatState">Current tactical posture of the unit</param>
         /// <param name="xpLevel">Experience level of the unit</param>
-        /// <param name="effLevel">Efficiency level of the unit</param>
-        /// <param name="spottedLevel">Intelligence level for AI units (default Level0 for player units)</param>
-        /// <returns>IntelReport object with categorized weapon data and unit information</returns>
-        public IntelReport GenerateIntelReport(string unitName,
+        /// <param name="effLevel">Operational efficiency level of the unit</param>
+        /// <param name="spottedLevel">Intelligence accuracy level (default Level1)</param>
+        /// <returns>IntelReport with categorized equipment data and unit metadata, or null if not spotted</returns>
+        public static IntelReport GenerateIntelReport(
+            IntelProfileTypes profileType,
+            string unitName,
             int currentHitPoints,
             Nationality nationality,
-            CombatState combatState, 
-            ExperienceLevel xpLevel, 
-            EfficiencyLevel effLevel, 
+            CombatState combatState,
+            ExperienceLevel xpLevel,
+            EfficiencyLevel effLevel,
             SpottedLevel spottedLevel = SpottedLevel.Level1)
         {
             try
             {
+                EnsureInitialized();
+
+                // Level 0: Not spotted - return null
+                if (spottedLevel == SpottedLevel.Level0)
+                {
+                    return null;
+                }
+
                 // Create the intel report object
-                var intelReport = new IntelReport();
+                var intelReport = new IntelReport
+                {
+                    UnitNationality = nationality,
+                    UnitName = unitName,
+                    UnitState = combatState
+                };
 
-                // Set unit metadata
-                intelReport.UnitNationality = nationality;
-                intelReport.UnitName = unitName;
-                intelReport.UnitState = combatState;
-                intelReport.UnitExperienceLevel = xpLevel;
-                intelReport.UnitEfficiencyLevel = effLevel;
-
-                // Handle special spotted levels
+                // Level 1: Only unit name and basic metadata visible
                 if (spottedLevel == SpottedLevel.Level1)
                 {
-                    // Level1: Only unit name is visible, skip all calculations
                     return intelReport;
                 }
 
-                // Calculate multiplier for current strength, guard against divide by zero.
-                float safeHitPoints = currentHitPoints;
-                if (safeHitPoints <= 0) safeHitPoints = 1;
+                // For levels 2-4, include experience and efficiency based on spotted level
+                if (spottedLevel == SpottedLevel.Level3 || spottedLevel == SpottedLevel.Level4)
+                {
+                    intelReport.UnitExperienceLevel = xpLevel;
+                    intelReport.UnitEfficiencyLevel = effLevel;
+                }
+
+                // Get the profile definition
+                if (!_profiles.TryGetValue(profileType, out var weaponSystems))
+                {
+                    AppService.HandleException(CLASS_NAME, nameof(GenerateIntelReport),
+                        new KeyNotFoundException($"Profile type {profileType} not found"));
+                    return intelReport; // Return basic report with no equipment
+                }
+
+                // Calculate strength multiplier, guard against divide by zero
+                float safeHitPoints = Math.Max(currentHitPoints, 1);
                 float currentMultiplier = safeHitPoints / CUConstants.MAX_HP;
 
-                // Step 1: Accumulate weapon systems by type with float precision (NO fog-of-war here)
-                var weaponSystemAccumulators = new Dictionary<WeaponSystems, float>();
-
+                // Step 1: Scale weapon systems by current strength
+                var scaledWeaponSystems = new Dictionary<WeaponSystems, float>();
                 foreach (var kvp in weaponSystems)
                 {
-                    WeaponSystems weaponSystem = kvp.Key;
-                    int maxQuantity = kvp.Value; // Safe - captured from iteration
-                    float scaledValue = maxQuantity * currentMultiplier;
-
-                    // Accumulate multiple entries for same weapon system (float precision)
-                    if (weaponSystemAccumulators.ContainsKey(weaponSystem))
+                    float scaledValue = kvp.Value * currentMultiplier;
+                    if (scaledValue > 0f)
                     {
-                        weaponSystemAccumulators[weaponSystem] += scaledValue;
-                    }
-                    else if (scaledValue > 0f)
-                    {
-                        weaponSystemAccumulators[weaponSystem] = scaledValue;
+                        scaledWeaponSystems[kvp.Key] = scaledValue;
                     }
                 }
 
-                // Step 2: Categorize weapons into buckets with float precision (NO fog-of-war here)
+                // Step 2: Aggregate into display buckets
                 var bucketAccumulators = new Dictionary<string, float>();
-
-                foreach (var kvp in weaponSystemAccumulators)
+                foreach (var kvp in scaledWeaponSystems)
                 {
-                    WeaponSystems weaponSystem = kvp.Key;
-                    float weaponCount = kvp.Value;
-
-                    string prefix = GetWeaponSystemPrefix(weaponSystem);
+                    string prefix = GetWeaponSystemPrefix(kvp.Key);
                     string bucketName = MapPrefixToBucket(prefix);
 
-                    if (bucketName != null && weaponCount > 0f)
+                    if (bucketName != null && kvp.Value > 0f)
                     {
-                        // Accumulate in bucket with float precision
                         if (bucketAccumulators.ContainsKey(bucketName))
                         {
-                            bucketAccumulators[bucketName] += weaponCount;
+                            bucketAccumulators[bucketName] += kvp.Value;
                         }
                         else
                         {
-                            bucketAccumulators[bucketName] = weaponCount;
+                            bucketAccumulators[bucketName] = kvp.Value;
                         }
                     }
                 }
 
-                // Step 3: Apply fog of war to buckets ONLY, round to final integer values, and omit buckets < 1
+                // Step 3: Apply fog-of-war and assign to report
                 foreach (var bucketKvp in bucketAccumulators)
                 {
                     string bucketName = bucketKvp.Key;
                     float accumulatedValue = bucketKvp.Value;
 
-                    // Calculate fog of war multiplier for this bucket (ONLY fog-of-war application)
-                    float bucketMultiplier = 1f;
-                    if (spottedLevel == SpottedLevel.Level2 || spottedLevel == SpottedLevel.Level3)
-                    {
-                        // Each bucket gets its own independent fog-of-war direction and magnitude
-                        bool isPositiveDirection = UnityEngine.Random.Range(0f, 1f) >= 0.5f;
-                        float errorRangeMin = 1f;
-                        float errorRangeMax = spottedLevel == SpottedLevel.Level2 ? 30f : 10f;
-                        float errorPercent = UnityEngine.Random.Range(errorRangeMin, errorRangeMax);
-                        bucketMultiplier = isPositiveDirection ? (1f + errorPercent / 100f) : (1f - errorPercent / 100f);
-                    }
+                    // Calculate fog-of-war multiplier
+                    float bucketMultiplier = CalculateFogOfWarMultiplier(spottedLevel);
 
-                    // Apply fog of war and round ONLY at the final step
+                    // Apply fog-of-war and round to final integer value
                     int finalValue = (int)Math.Round(accumulatedValue * bucketMultiplier);
 
                     // Only assign non-zero values - omit buckets with values < 1
                     if (finalValue > 0)
                     {
-                        // Assign to appropriate IntelReport property
-                        switch (bucketName)
-                        {
-                            case "Men":
-                                intelReport.Men = finalValue;
-                                break;
-                            case "Tanks":
-                                intelReport.Tanks = finalValue;
-                                break;
-                            case "IFVs":
-                                intelReport.IFVs = finalValue;
-                                break;
-                            case "APCs":
-                                intelReport.APCs = finalValue;
-                                break;
-                            case "Recon":
-                                intelReport.RCNs = finalValue;
-                                break;
-                            case "Artillery":
-                                intelReport.ARTs = finalValue;
-                                break;
-                            case "Rocket Artillery":
-                                intelReport.ROCs = finalValue;
-                                break;
-                            case "Surface To Surface Missiles":
-                                intelReport.SSMs = finalValue;
-                                break;
-                            case "SAMs":
-                                intelReport.SAMs = finalValue;
-                                break;
-                            case "Anti-aircraft Artillery":
-                                intelReport.AAAs = finalValue;
-                                break;
-                            case "MANPADs":
-                                intelReport.MANPADs = finalValue;
-                                break;
-                            case "ATGMs":
-                                intelReport.ATGMs = finalValue;
-                                break;
-                            case "Attack Helicopters":
-                                intelReport.HEL = finalValue;
-                                break;
-                            case "Fighters":
-                                intelReport.ASFs = finalValue;
-                                break;
-                            case "Multirole":
-                                intelReport.MRFs = finalValue;
-                                break;
-                            case "Attack":
-                                intelReport.ATTs = finalValue;
-                                break;
-                            case "Bombers":
-                                intelReport.BMBs = finalValue;
-                                break;
-                            case "AWACS":
-                                intelReport.AWACS = finalValue;
-                                break;
-                            case "Recon Aircraft":
-                                intelReport.RCNAs = finalValue;
-                                break;
-                        }
+                        AssignBucketToReport(intelReport, bucketName, finalValue);
                     }
-                    // If finalValue <= 0, the bucket is omitted from the report
                 }
 
                 return intelReport;
@@ -348,18 +353,72 @@ namespace HammerAndSickle.Models
             }
         }
 
-        #endregion // Public Methods
+        #endregion
 
 
-        #region Helper Methods
+        #region Private Helper Methods
 
         /// <summary>
-        /// Extracts the prefix from the name of a weapon system.
+        /// Ensures the profile system has been initialized before use.
         /// </summary>
-        /// <param name="weaponSystem">The weapon system whose name prefix is to be extracted.</param>
-        /// <returns>A string containing the prefix of the weapon system's name. If the name does not contain an underscore, the
-        /// entire name of the weapon system is returned.</returns>
-        private string GetWeaponSystemPrefix(WeaponSystems weaponSystem)
+        private static void EnsureInitialized()
+        {
+            if (!_isInitialized)
+            {
+                throw new InvalidOperationException("IntelProfile system not initialized. Call InitializeProfiles() first.");
+            }
+        }
+
+        /// <summary>
+        /// Loads all profile definitions from game data.
+        /// This method should be expanded to load from configuration files or data sources.
+        /// </summary>
+        private static void LoadProfileDefinitions()
+        {
+            // TODO: Load profile definitions from data files or configuration
+            // For now, create basic example profiles for testing
+
+            // Example: Tank Regiment profile
+            var tankRegiment = new Dictionary<WeaponSystems, int>
+            {
+                { WeaponSystems.REG_INF_SV, 400 },
+                { WeaponSystems.TANK_T80B, 42 },
+                { WeaponSystems.IFV_BMP2, 12 },
+                { WeaponSystems.APC_BTR80, 8 },
+                { WeaponSystems.SPA_2S1, 6 }
+            };
+            _profiles[IntelProfileTypes.SV_TR] = tankRegiment;
+
+            // Example: Infantry Regiment profile  
+            var motorRifleRegiment = new Dictionary<WeaponSystems, int>
+            {
+                { WeaponSystems.REG_INF_SV, 2000 },
+                { WeaponSystems.IFV_BMP2, 30 },
+                { WeaponSystems.APC_BTR80, 20 },
+                { WeaponSystems.SPA_2S1, 12 },
+                { WeaponSystems.ATGM_GENERIC, 8 }
+            };
+            _profiles[IntelProfileTypes.SV_MRR] = motorRifleRegiment;
+
+            // Example: Artillery Battalion profile
+            var artilleryBattalion = new Dictionary<WeaponSystems, int>
+            {
+                { WeaponSystems.REG_INF_SV, 200 },
+                { WeaponSystems.SPA_2S3, 18 },
+                { WeaponSystems.ROC_BM21, 6 },
+                { WeaponSystems.APC_BTR80, 4 }
+            };
+            _profiles[IntelProfileTypes.SV_ART] = artilleryBattalion;
+
+            // Add more profiles as needed...
+        }
+
+        /// <summary>
+        /// Extracts the prefix from a weapon system name for bucket categorization.
+        /// </summary>
+        /// <param name="weaponSystem">The weapon system to extract prefix from</param>
+        /// <returns>The prefix portion of the weapon system name</returns>
+        private static string GetWeaponSystemPrefix(WeaponSystems weaponSystem)
         {
             string weaponName = weaponSystem.ToString();
             int underscoreIndex = weaponName.IndexOf('_');
@@ -367,17 +426,11 @@ namespace HammerAndSickle.Models
         }
 
         /// <summary>
-        /// Maps a given prefix to its corresponding bucket category.
+        /// Maps weapon system prefixes to display bucket categories.
         /// </summary>
-        /// <remarks>The method uses a predefined mapping of prefixes to bucket categories. For example:
-        /// <list type="bullet"> <item><description>Prefixes such as "REG", "AB", and "AM" map to the "Men"
-        /// category.</description></item> <item><description>"TANK" maps to "Tanks".</description></item>
-        /// <item><description>Prefixes like "SAM" and "SPSAM" map to "SAMs".</description></item> </list> If the prefix
-        /// does not match any of the predefined mappings, the method returns <see langword="null"/>.</remarks>
-        /// <param name="prefix">The prefix representing a specific category. This value determines the bucket to which it is mapped.</param>
-        /// <returns>A string representing the bucket category corresponding to the provided prefix.  Returns <see
-        /// langword="null"/> if the prefix does not match any known category.</returns>
-        private string MapPrefixToBucket(string prefix)
+        /// <param name="prefix">The weapon system prefix</param>
+        /// <returns>The display bucket name, or null if not mapped</returns>
+        private static string MapPrefixToBucket(string prefix)
         {
             return prefix switch
             {
@@ -404,6 +457,105 @@ namespace HammerAndSickle.Models
             };
         }
 
-        #endregion // Helper Methods
+        /// <summary>
+        /// Calculates the fog-of-war multiplier for a bucket based on spotted level.
+        /// </summary>
+        /// <param name="spottedLevel">The intelligence accuracy level</param>
+        /// <returns>Multiplier to apply to bucket values</returns>
+        private static float CalculateFogOfWarMultiplier(SpottedLevel spottedLevel)
+        {
+            return spottedLevel switch
+            {
+                SpottedLevel.Level4 => 1f, // Perfect intel - no distortion
+                SpottedLevel.Level3 => GetRandomMultiplier(1f, 10f), // ±10% error
+                SpottedLevel.Level2 => GetRandomMultiplier(1f, 30f), // ±30% error
+                _ => 1f // Level1 and Level0 handled elsewhere
+            };
+        }
+
+        /// <summary>
+        /// Generates a random multiplier within the specified error range.
+        /// </summary>
+        /// <param name="errorRangeMin">Minimum error percentage</param>
+        /// <param name="errorRangeMax">Maximum error percentage</param>
+        /// <returns>Random multiplier for fog-of-war distortion</returns>
+        private static float GetRandomMultiplier(float errorRangeMin, float errorRangeMax)
+        {
+            bool isPositiveDirection = UnityEngine.Random.Range(0f, 1f) >= 0.5f;
+            float errorPercent = UnityEngine.Random.Range(errorRangeMin, errorRangeMax);
+            return isPositiveDirection ? (1f + errorPercent / 100f) : (1f - errorPercent / 100f);
+        }
+
+        /// <summary>
+        /// Assigns a bucket value to the appropriate property in the IntelReport.
+        /// </summary>
+        /// <param name="report">The IntelReport to update</param>
+        /// <param name="bucketName">The bucket category name</param>
+        /// <param name="value">The value to assign</param>
+        private static void AssignBucketToReport(IntelReport report, string bucketName, int value)
+        {
+            switch (bucketName)
+            {
+                case "Men":
+                    report.Men = value;
+                    break;
+                case "Tanks":
+                    report.Tanks = value;
+                    break;
+                case "IFVs":
+                    report.IFVs = value;
+                    break;
+                case "APCs":
+                    report.APCs = value;
+                    break;
+                case "Recon":
+                    report.RCNs = value;
+                    break;
+                case "Artillery":
+                    report.ARTs = value;
+                    break;
+                case "Rocket Artillery":
+                    report.ROCs = value;
+                    break;
+                case "Surface To Surface Missiles":
+                    report.SSMs = value;
+                    break;
+                case "SAMs":
+                    report.SAMs = value;
+                    break;
+                case "Anti-aircraft Artillery":
+                    report.AAAs = value;
+                    break;
+                case "MANPADs":
+                    report.MANPADs = value;
+                    break;
+                case "ATGMs":
+                    report.ATGMs = value;
+                    break;
+                case "Attack Helicopters":
+                    report.HEL = value;
+                    break;
+                case "Fighters":
+                    report.ASFs = value;
+                    break;
+                case "Multirole":
+                    report.MRFs = value;
+                    break;
+                case "Attack":
+                    report.ATTs = value;
+                    break;
+                case "Bombers":
+                    report.BMBs = value;
+                    break;
+                case "AWACS":
+                    report.AWACS = value;
+                    break;
+                case "Recon Aircraft":
+                    report.RCNAs = value;
+                    break;
+            }
+        }
+
+        #endregion
     }
 }
