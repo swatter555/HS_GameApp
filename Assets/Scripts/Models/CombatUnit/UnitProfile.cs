@@ -258,7 +258,6 @@ namespace HammerAndSickle.Models
 
         public Nationality Nationality { get; private set; }              // Nationality for a profile.
         public UnitProfileTypes UnitProfileID { get; private set; }       // Unique identifier for this profile.
-        public IntelReport LastIntelReport { get; private set; } = null;  // Last generated intel report for this profile.
 
         #endregion // Properties
 
@@ -495,7 +494,7 @@ namespace HammerAndSickle.Models
         /// <param name="effLevel">Efficiency level of the unit</param>
         /// <param name="spottedLevel">Intelligence level for AI units (default Level0 for player units)</param>
         /// <returns>IntelReport object with categorized weapon data and unit information</returns>
-        public IntelReport GenerateIntelReport(string unitName, CombatState combatState, ExperienceLevel xpLevel, EfficiencyLevel effLevel, SpottedLevel spottedLevel = SpottedLevel.Level0)
+        public IntelReport GenerateIntelReport(string unitName, CombatState combatState, ExperienceLevel xpLevel, EfficiencyLevel effLevel, SpottedLevel spottedLevel = SpottedLevel.Level1)
         {
             try
             {
@@ -661,7 +660,6 @@ namespace HammerAndSickle.Models
                     // If finalValue <= 0, the bucket is omitted from the report
                 }
 
-                LastIntelReport = intelReport; // Store for later use
                 return intelReport;
             }
             catch (Exception e)
