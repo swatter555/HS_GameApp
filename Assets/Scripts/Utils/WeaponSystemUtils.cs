@@ -95,7 +95,6 @@ namespace HammerAndSickle.Utils
             { WeaponSystems.SPSAM_CHAP, "M-48 Chaparral" },
             { WeaponSystems.SAM_HAWK, "MIM-23 Hawk" },
             { WeaponSystems.HEL_AH64, "AH-64 Apache" },
-            { WeaponSystems.HELTRAN_UH1, "UH-1 Huey" },
             { WeaponSystems.ASF_F15, "F-15 Eagle" },
             { WeaponSystems.ASF_F4, "F-4 Phantom II" },
             { WeaponSystems.MRF_F16, "F-16 Fighting Falcon" },

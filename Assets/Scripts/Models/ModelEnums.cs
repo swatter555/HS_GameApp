@@ -683,7 +683,6 @@ namespace HammerAndSickle.Models
         SPSAM_CHAP,
         SAM_HAWK,
         HEL_AH64,
-        HELTRAN_UH1,
         ASF_F15,
         ASF_F4,
         MRF_F16,
