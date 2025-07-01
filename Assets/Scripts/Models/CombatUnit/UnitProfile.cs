@@ -403,7 +403,7 @@ KEEP THIS COMMENT BLOCK IN SYNC WITH WEAPONSYSTEMENTRY AND UPGRADE CHANGES!
                 // Calculate multiplier for current strength
                 float currentMultiplier = currentHitPoints / CUConstants.MAX_HP;
 
-                // Step 1: Accumulate weapon systems with float precision
+                // Step 1: Accumulate weapon systems by type with float precision
                 var weaponSystemAccumulators = new Dictionary<WeaponSystems, float>();
 
                 foreach (var weaponSystemEntry in weaponSystemEntries)
@@ -423,37 +423,7 @@ KEEP THIS COMMENT BLOCK IN SYNC WITH WEAPONSYSTEMENTRY AND UPGRADE CHANGES!
                     }
                 }
 
-                // Step 2: Populate detailed data (before fog of war)
-                foreach (var kvp in weaponSystemAccumulators)
-                {
-                    intelReport.DetailedWeaponSystemsData[kvp.Key] = kvp.Value;
-                }
-
-                // Step 3: Apply fog of war to detailed data (independent per weapon system)
-                if (spottedLevel == SpottedLevel.Level2 || spottedLevel == SpottedLevel.Level3)
-                {
-                    // Determine error range based on spotted level
-                    float errorRangeMin = 1f;
-                    float errorRangeMax = spottedLevel == SpottedLevel.Level2 ? 30f : 10f;
-
-                    var foggedDetailedData = new Dictionary<WeaponSystems, float>();
-                    foreach (var kvp in intelReport.DetailedWeaponSystemsData)
-                    {
-                        // Each weapon system gets completely independent fog of war
-                        bool isPositiveDirection = UnityEngine.Random.Range(0f, 1f) >= 0.5f;
-                        float errorPercent = UnityEngine.Random.Range(errorRangeMin, errorRangeMax);
-                        float multiplier = isPositiveDirection ? (1f + errorPercent / 100f) : (1f - errorPercent / 100f);
-
-                        float foggedValue = kvp.Value * multiplier;
-                        if (foggedValue > 0f)
-                        {
-                            foggedDetailedData[kvp.Key] = foggedValue;
-                        }
-                    }
-                    intelReport.DetailedWeaponSystemsData = foggedDetailedData;
-                }
-
-                // Step 4: Categorize weapons into buckets with float precision
+                // Step 2: Categorize weapons into buckets with float precision
                 var bucketAccumulators = new Dictionary<string, float>();
 
                 foreach (var kvp in weaponSystemAccumulators)
@@ -478,13 +448,13 @@ KEEP THIS COMMENT BLOCK IN SYNC WITH WEAPONSYSTEMENTRY AND UPGRADE CHANGES!
                     }
                 }
 
-                // Step 5: Apply fog of war to buckets, round to final integer values, and omit buckets < 1
+                // Step 3: Apply fog of war to buckets, round to final integer values, and omit buckets < 1
                 foreach (var bucketKvp in bucketAccumulators)
                 {
                     string bucketName = bucketKvp.Key;
                     float accumulatedValue = bucketKvp.Value;
 
-                    // Calculate fog of war multiplier for this bucket (completely independent per bucket)
+                    // Calculate fog of war multiplier for this bucket
                     float bucketMultiplier = 1f;
                     if (spottedLevel == SpottedLevel.Level2 || spottedLevel == SpottedLevel.Level3)
                     {

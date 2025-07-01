@@ -36,9 +36,6 @@ namespace HammerAndSickle.Models
         public ExperienceLevel UnitExperienceLevel = ExperienceLevel.Raw;
         public EfficiencyLevel UnitEfficiencyLevel = EfficiencyLevel.StaticOperations;
 
-        // Gives specific data for all WeaponSystems in the UnitProfile.
-        public Dictionary<WeaponSystems, float> DetailedWeaponSystemsData = new Dictionary<WeaponSystems, float>();
-
         #endregion // Properties
     }
 }
