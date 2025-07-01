@@ -233,7 +233,7 @@ namespace HammerAndSickle.Models
    2. **Combat Units Dictionary**: All CombatUnit objects with IDs as keys
    3. **Leaders Dictionary**: All Leader objects with IDs as keys  
    4. **Weapon Profiles Dictionary**: All WeaponSystemProfile templates
-   5. **Unit Profiles Dictionary**: All UnitProfile templates
+   5. **Unit Profiles Dictionary**: All IntelProfile templates
 
  Backup creation and validation ensure data safety during save operations.
 
@@ -288,7 +288,7 @@ namespace HammerAndSickle.Models
         private readonly Dictionary<string, CombatUnit> _combatUnits = new();
         private readonly Dictionary<string, Leader> _leaders = new();
         private readonly Dictionary<string, WeaponSystemProfile> _weaponProfiles = new();
-        private readonly Dictionary<string, UnitProfile> _unitProfiles = new();
+        private readonly Dictionary<string, IntelProfile> _unitProfiles = new();
 
         // State tracking
         private readonly HashSet<string> _dirtyObjects = new ();
@@ -549,7 +549,7 @@ namespace HammerAndSickle.Models
         /// </summary>
         /// <param name="profile">The unit profile to register</param>
         /// <returns>True if registration was successful</returns>
-        public bool RegisterUnitProfile(UnitProfile profile)
+        public bool RegisterUnitProfile(IntelProfile profile)
         {
             if (profile == null)
             {
@@ -562,7 +562,7 @@ namespace HammerAndSickle.Models
             {
                 _dataLock.EnterWriteLock();
 
-                string profileId = $"{profile.UnitProfileID}_{profile.Nationality}";
+                string profileId = $"{profile.IntelProfileID}_{profile.Nationality}";
                 if (_unitProfiles.ContainsKey(profileId))
                 {
                     // Allow overwriting unit profiles as they're shared templates
@@ -673,7 +673,7 @@ namespace HammerAndSickle.Models
         /// <param name="profileName">The profile name</param>
         /// <param name="nationality">The nationality</param>
         /// <returns>The unit profile if found, null otherwise</returns>
-        public UnitProfile GetUnitProfile(string profileName, Nationality nationality)
+        public IntelProfile GetUnitProfile(string profileName, Nationality nationality)
         {
             if (string.IsNullOrEmpty(profileName)) return null;
 
@@ -681,7 +681,7 @@ namespace HammerAndSickle.Models
             {
                 _dataLock.EnterReadLock();
                 string profileId = $"{profileName}_{nationality}";
-                return _unitProfiles.TryGetValue(profileId, out UnitProfile profile) ? profile : null;
+                return _unitProfiles.TryGetValue(profileId, out IntelProfile profile) ? profile : null;
             }
             catch (Exception e)
             {
@@ -969,7 +969,7 @@ namespace HammerAndSickle.Models
                         errors.Add($"Unit {unit.UnitName} has null DeployedProfile");
                     }
 
-                    if (unit.UnitProfile == null)
+                    if (unit.IntelProfile == null)
                     {
                         errors.Add($"Unit {unit.UnitName} has null UnitProfile");
                     }
@@ -1123,7 +1123,7 @@ namespace HammerAndSickle.Models
                     var combatUnits = (Dictionary<string, CombatUnit>)formatter.Deserialize(stream);
                     var leaders = (Dictionary<string, Leader>)formatter.Deserialize(stream);
                     var weaponProfiles = (Dictionary<string, WeaponSystemProfile>)formatter.Deserialize(stream);
-                    var unitProfiles = (Dictionary<string, UnitProfile>)formatter.Deserialize(stream);
+                    var unitProfiles = (Dictionary<string, IntelProfile>)formatter.Deserialize(stream);
 
                     // Transfer to internal collections and track resolvable objects
                     foreach (var kvp in combatUnits)

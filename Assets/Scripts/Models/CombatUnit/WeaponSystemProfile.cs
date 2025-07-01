@@ -12,7 +12,7 @@ namespace HammerAndSickle.Models
     Overview
     ════════
     **WeaponSystemProfile** defines the combat capabilities and tactical effectiveness
-    of military units in Hammer & Sickle. Unlike UnitProfile which tracks organizational
+    of military units in Hammer & Sickle. Unlike IntelProfile which tracks organizational
     composition, WeaponSystemProfile provides the actual combat values used for battle
     resolution, range calculations, and tactical interactions.
 

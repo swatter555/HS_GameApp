@@ -14,7 +14,7 @@ using UnityEngine;
  A **CombatUnit** instance represents a single controllable entity on the
  Hammer & Sickle hex map: anything from a tank battalion to an airbase or depot.
  It stores *mutable* per-unit state, while pointing to shared, **immutable**
- template objects (WeaponSystemProfile, UnitProfile, Leader, FacilityManager).
+ template objects (WeaponSystemProfile, IntelProfile, Leader, FacilityManager).
 
  Major Responsibilities
  ══════════════════════
@@ -174,7 +174,7 @@ namespace HammerAndSickle.Models
         // Profiles contain unit stats and capabilities.
         public WeaponSystemProfile DeployedProfile { get; private set; }
         public WeaponSystemProfile MountedProfile { get; private set; }
-        public UnitProfile UnitProfile { get; private set; }
+        public IntelProfile IntelProfile { get; private set; }
         public FacilityManager FacilityManager { get; internal set; }
 
         // The unit's leader.
@@ -216,7 +216,7 @@ namespace HammerAndSickle.Models
         /// <param name="nationality">National affiliation</param>
         /// <param name="deployedProfile">Combat profile when deployed</param>
         /// <param name="mountedProfile">Combat profile when mounted (can be null)</param>
-        /// <param name="unitProfile">Organizational profile for tracking losses</param>
+        /// <param name="intelProfile">Profile for intel reports</param>
         /// <param name="isTransportable">Whether this unit can be transported</param>
         /// <param name="isBase">Whether this unit is a land-based facility</param>
         public CombatUnit(
@@ -228,7 +228,7 @@ namespace HammerAndSickle.Models
             Nationality nationality,
             WeaponSystemProfile deployedProfile,
             WeaponSystemProfile mountedProfile,
-            UnitProfile unitProfile,
+            IntelProfile intelProfile,
             bool isTransportable,
             bool isBase = false,
             DepotCategory category = DepotCategory.Secondary,
@@ -243,8 +243,8 @@ namespace HammerAndSickle.Models
                 if (deployedProfile == null)
                     throw new ArgumentNullException(nameof(deployedProfile), "Deployed profile is required");
 
-                if (unitProfile == null)
-                    throw new ArgumentNullException(nameof(unitProfile), "Unit profile is required");
+                if (intelProfile == null)
+                    throw new ArgumentNullException(nameof(intelProfile), "Unit profile is required");
 
                 // Set identification and metadata
                 UnitName = unitName;
@@ -260,7 +260,7 @@ namespace HammerAndSickle.Models
                 // Set profiles
                 DeployedProfile = deployedProfile;
                 MountedProfile = mountedProfile;
-                UnitProfile = unitProfile;
+                IntelProfile = intelProfile;
 
                 // If this is a base unit, initialize the proper facility.
                 IsBase = isBase;
@@ -409,7 +409,7 @@ namespace HammerAndSickle.Models
                 // Leave all object references null - they will be resolved later
                 DeployedProfile = null;
                 MountedProfile = null;
-                UnitProfile = null;
+                IntelProfile = null;
                 CommandingOfficer = null;
             }
             catch (Exception e)
@@ -529,14 +529,8 @@ namespace HammerAndSickle.Models
                 }
 
                 // Apply damage to hit points
-                float newHitPoints = Mathf.Max(0f, HitPoints.Current - damage);
+                float newHitPoints = Mathf.Max(CUConstants.MIN_HP, HitPoints.Current - damage);
                 HitPoints.SetCurrent(newHitPoints);
-
-                // Update unit profile to reflect current strength
-                if (UnitProfile != null)
-                {
-                    UnitProfile.UpdateCurrentHP(HitPoints.Current);
-                }
             }
             catch (Exception e)
             {
@@ -566,12 +560,6 @@ namespace HammerAndSickle.Models
                 // Apply repair to hit points (clamped to maximum)
                 float newHitPoints = Mathf.Min(HitPoints.Max, HitPoints.Current + repairAmount);
                 HitPoints.SetCurrent(newHitPoints);
-
-                // Update unit profile to reflect current strength
-                if (UnitProfile != null)
-                {
-                    UnitProfile.UpdateCurrentHP(HitPoints.Current);
-                }
             }
             catch (Exception e)
             {
@@ -2620,7 +2608,7 @@ namespace HammerAndSickle.Models
                     this.Nationality,
                     this.DeployedProfile,      // Shared reference
                     this.MountedProfile,       // Shared reference  
-                    this.UnitProfile,          // Shared reference
+                    this.IntelProfile,          // Shared reference
                     this.IsTransportable,
                     this.IsBase
                 );
@@ -2733,7 +2721,7 @@ namespace HammerAndSickle.Models
                 
                 
                 // TODO: Fix me
-                //info.AddValue("UnitProfileID", UnitProfile?.UnitProfileID ?? "");
+                //info.AddValue("IntelProfileID", IntelProfile?.IntelProfileID ?? "");
                 
                 
                 info.AddValue("LeaderID", CommandingOfficer?.LeaderID ?? "");
@@ -2896,13 +2884,13 @@ namespace HammerAndSickle.Models
                     }
                 }
 
-                // Resolve UnitProfile reference
+                // Resolve IntelProfile reference
                 if (!string.IsNullOrEmpty(unresolvedUnitProfileID))
                 {
                     var unitProfile = manager.GetUnitProfile(unresolvedUnitProfileID, Nationality);
                     if (unitProfile != null)
                     {
-                        UnitProfile = unitProfile;
+                        IntelProfile = unitProfile;
                         unresolvedUnitProfileID = "";
                     }
                     else
