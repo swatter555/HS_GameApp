@@ -56,7 +56,9 @@ namespace HammerAndSickle.Models
         /// <returns>true if the entries are equal; otherwise, false</returns>
         public static bool operator ==(WeaponSystemEntry left, WeaponSystemEntry right)
         {
-            return Equals(left, right);
+            if (ReferenceEquals(left, right)) return true;
+            if (left is null || right is null) return false;
+            return left.Equals(right);
         }
 
         /// <summary>
@@ -400,8 +402,10 @@ KEEP THIS COMMENT BLOCK IN SYNC WITH WEAPONSYSTEMENTRY AND UPGRADE CHANGES!
                     return intelReport;
                 }
 
-                // Calculate multiplier for current strength
-                float currentMultiplier = currentHitPoints / CUConstants.MAX_HP;
+                // Calculate multiplier for current strength, guard against divide by zero.
+                float safeHitPoints = currentHitPoints;
+                if (safeHitPoints <= 0) safeHitPoints = 1;
+                float currentMultiplier = safeHitPoints / CUConstants.MAX_HP;
 
                 // Step 1: Accumulate weapon systems by type with float precision
                 var weaponSystemAccumulators = new Dictionary<WeaponSystems, float>();
