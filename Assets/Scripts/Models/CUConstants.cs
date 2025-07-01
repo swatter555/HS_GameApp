@@ -8,6 +8,7 @@ namespace HammerAndSickle.Models
 
         // CombatUnit constants.
         public const int MAX_HP = 40;                       // Maximum hit points for a CombatUnit
+        public const int MIN_HP = 1;                        // Minimum hit points for a CombatUnit
         public const int ZOC_RANGE = 1;                     // Zone of Control Range
         public const int MAX_EXP_GAIN_PER_ACTION = 10;      // Max XP gain per action
 

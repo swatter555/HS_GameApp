@@ -863,7 +863,7 @@ namespace HammerAndSickle.Models
     [Serializable]
     public class SkillReference
     {
-        public string EnumType;  // UnitProfileID of the enum type
+        public string EnumType;  // IntelProfileID of the enum type
         public int EnumValue;    // Integer value of the enum
     }
 }

@@ -20,12 +20,10 @@ namespace HammerAndSickle.Models
         public int MANPADs { get; set; } = 0;
         public int ATGMs { get; set; } = 0;
         public int HEL { get; set; } = 0;
-        public int HELTRAN { get; set; } = 0;
         public int ASFs { get; set; } = 0;
         public int MRFs { get; set; } = 0;
         public int ATTs { get; set; } = 0;
         public int BMBs { get; set; } = 0;
-        public int TRANs { get; set; } = 0;
         public int AWACS { get; set; } = 0;
         public int RCNAs { get; set; } = 0;
 
