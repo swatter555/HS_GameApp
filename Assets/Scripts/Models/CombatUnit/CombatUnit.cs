@@ -11,130 +11,186 @@ using UnityEngine;
  ────────────────────────────────────────────────────────────────────────────────
  Overview
  ════════
- A **CombatUnit** instance represents a single controllable entity on the
- Hammer & Sickle hex map: anything from a tank battalion to an airbase or depot.
- It stores *mutable* per-unit state, while pointing to shared, **immutable**
- template objects (WeaponSystemProfile, IntelProfile, Leader, FacilityManager).
+ **CombatUnit** represents any controllable entity on the Hammer & Sickle hex map:
+ tank battalions, airbases, supply depots, etc. Stores mutable per-unit state while
+ referencing shared templates (WeaponSystemProfile, static IntelProfile, Leader).
 
  Major Responsibilities
  ══════════════════════
- • Identification & metadata
-     - UnitID, name, side, nationality, type, classification, role
- • Unified action-economy management
-     - Single SpendAction() interface for all action types with variable costs
-     - Move / Combat / Deployment / Opportunity / Intel tokens + MP pool
- • Combat-posture state machine
-     - Mobile ←→ Deployed ←→ HastyDefense ←→ Entrenched ←→ Fortified
- • Mounted-vs-Dismounted profile switching
- • Experience & leadership systems
-     - XP progression, tiered multipliers, leader skills & reputation
+ • Identification & metadata (UnitID, name, side, nationality, classification)
+ • Unified action economy (Move/Combat/Deployment/Opportunity/Intel tokens + MP)
+ • Combat state machine (Mobile ↔ Deployed ↔ HastyDefense ↔ Entrenched ↔ Fortified)
+ • Experience progression & leader assignment with skill bonuses
  • Damage, repair, supply & efficiency tracking
- • Position & movement on a pointy-top, odd-r hex grid (future pathfinder hook)
- • Persistence with two-phase loading and reference resolution
- • Cloning for unit templates
+ • Static intelligence report generation with fog-of-war effects
+ • Position tracking & movement validation (future pathfinder integration)
+ • Serialization with reference resolution for shared objects
 
  Design Highlights
  ═════════════════
- • **Unified Action Interface**: SpendAction() handles all action types with 
-   flexible movement cost parameter for future pathfinding integration.
- • **Interface-Focused Architecture**: Public methods organized into logical
-   groups (Generic, Experience, Leader, Action, CombatState, Position).
- • All max/current pairs use **StatsMaxCurrent** for clamping & % queries.
- • Unity-free data model – no MonoBehaviours serialized.
- • All exceptions funnel through *AppService.HandleException*; important user
-   feedback goes through *AppService.CaptureUiMessage*.
+ • **Unified Action Interface**: SpendAction() handles all action types with flexible MP costs
+ • **Static Intel System**: Uses IntelProfileTypes enum for memory-efficient intelligence reports
+ • **StatsMaxCurrent**: All max/current pairs use validated clamping & percentage queries
+ • **Unity-Free**: No MonoBehaviours - safe for serialization and unit testing
+ • **Centralized Error Handling**: All exceptions route through AppService
 
- Public-Method Reference
- ═══════════════════════
-   ── Generic Interface ────────────────────────────────────────────────────────
-   RefreshAllActions()                Reset all action pools to max (turn start).
-   RefreshMovementPoints()            Restore MP to max (turn start).
-   SetSpottedLevel(level)             Update visibility level for opposing sides.
-   GetActiveWeaponSystemProfile()     Returns mounted or deployed profile.
-   GetCurrentCombatStrength()         Applies all modifiers to active profile.
-   TakeDamage(amount)                 Reduces hit points and updates unit profile.
-   Repair(amount)                     Restores hit points up to maximum.
-   ConsumeSupplies(amount)            Deducts supply days, returns success.
-   ReceiveSupplies(amount)            Adds supplies up to capacity, returns actual.
-   IsDestroyed()                      Checks if hit points <= 0.
-   CanMove()                          Validates movement based on damage/supply.
-   GetSupplyStatus()                  Returns supply percentage (0.0-1.0).
-   SetEfficiencyLevel(level)          Sets the efficiency level for the unit.
-   DecreaseEfficiencyLevelBy1()       Lowers efficiency level by 1 (if possible).
-   IncreaseEfficiencyLevelBy1()       Raises efficiency level by 1 (if possible).
+ Action Economy
+ ══════════════
+ • **Move Actions**: Variable cost (pathfinder ready) + movement points
+ • **Combat Actions**: Fixed cost (25% max MP) + action token
+ • **Deployment Actions**: Fixed cost (50% max MP) + action token  
+ • **Opportunity Actions**: Reactive only, no movement cost
+ • **Intelligence Actions**: Fixed cost (15% max MP) + token (bases exempt)
 
-   ── Experience System ────────────────────────────────────────────────────────
-   AddExperience(points)              Adds XP and handles level-up notifications.
-   SetExperience(points)              Direct setter for load/dev tools.
-   GetPointsToNextLevel()             XP needed to advance (0 if Elite).
-   GetExperienceProgress()            Progress bar value (0.0-1.0) to next level.
+Public Properties
+═══════════════
+    string UnitName { get; set; }
+    string UnitID { get; private set; }
+    UnitType UnitType { get; private set; }
+    UnitClassification Classification { get; private set; }
+    UnitRole Role { get; private set; }
+    Side Side { get; private set; }
+    Nationality Nationality { get; private set; }
+    bool IsTransportable { get; private set; }
+    bool IsBase { get; private set; }
 
-   ── Leader Assignment ───────────────────────────────────────────────────────
-   AssignLeader(leader)               Assigns commander with full validation.
-   RemoveLeader()                     Removes commander with proper cleanup.
-   GetLeaderBonuses()                 Dictionary of all active skill bonuses.
-   HasLeaderCapability(type)          Checks for specific bonus availability.
-   GetLeaderBonus(type)               Returns specific bonus value or 0.
-   HasLeader()                        Returns true if commander assigned.
-   GetLeaderName()                    Leader name or empty string.
-   GetLeaderGrade()                   Command grade or JuniorGrade default.
-   GetLeaderReputation()              Reputation points or 0.
-   GetLeaderRank()                    Formatted rank string or empty.
-   GetLeaderCommandAbility()          Combat command ability or Average.
-   HasLeaderSkill(skill)              Checks if specific skill unlocked.
-   AwardLeaderReputation(action)      Awards reputation for unit actions.
-   AwardLeaderReputation(points)      Direct reputation point award.
+    // Profiles and management
+    WeaponSystemProfile DeployedProfile { get; private set; }
+    WeaponSystemProfile MountedProfile { get; private set; }
+    FacilityManager FacilityManager { get; internal set; }
+    IntelProfileTypes IntelProfileType { get; internal set; }
+
+    // Leader assignment
+    bool IsLeaderAssigned // public field
+    Leader CommandingOfficer { get; internal set; }
+
+    // Action counts (StatsMaxCurrent)
+    StatsMaxCurrent MoveActions { get; private set; }
+    StatsMaxCurrent CombatActions { get; private set; }
+    StatsMaxCurrent DeploymentActions { get; private set; }
+    StatsMaxCurrent OpportunityActions { get; private set; }
+    StatsMaxCurrent IntelActions { get; private set; }
+
+    // State data
+    int ExperiencePoints { get; internal set; }
+    ExperienceLevel ExperienceLevel { get; internal set; }
+    EfficiencyLevel EfficiencyLevel { get; internal set; }
+    bool IsMounted { get; internal set; }
+    CombatState CombatState { get; internal set; }
+    StatsMaxCurrent HitPoints { get; private set; }
+    StatsMaxCurrent DaysSupply { get; private set; }
+    StatsMaxCurrent MovementPoints { get; private set; }
+    Coordinate2D MapPos { get; internal set; }
+    SpottedLevel SpottedLevel { get; private set; }
+
+ Public Interface
+ ════════════════
+   ── Core Operations ─────────────────────────────────────────────────────────
+   RefreshAllActions()                    Reset action pools (turn start)
+   RefreshMovementPoints()                Restore MP to maximum
+   GetActiveWeaponSystemProfile()         Returns mounted or deployed profile
+   GetCurrentCombatStrength()             Applies all modifiers to profile
+   GenerateIntelReport(spottedLevel)      Creates fog-of-war intelligence report
+   TakeDamage(amount), Repair(amount)     HP management
+   ConsumeSupplies(amount), ReceiveSupplies(amount)  Supply management
+   IsDestroyed(), CanMove(), GetSupplyStatus()       Status queries
+   Set/Get EfficiencyLevel methods        Operational status control
+
+   ── Experience System ───────────────────────────────────────────────────────
+   AddExperience(points)                  Add XP with level-up handling
+   SetExperience(points)                  Direct setter for loading/tools
+   GetPointsToNextLevel()                 XP needed for advancement
+   GetExperienceProgress()                Progress percentage (0.0-1.0)
+
+   ── Leader Management ───────────────────────────────────────────────────────
+   AssignLeader(leader), RemoveLeader()   Bidirectional assignment management
+   GetLeaderBonuses()                     Dictionary of active skill bonuses
+   HasLeaderCapability(type)              Check for specific bonus
+   GetLeaderBonus(type)                   Get specific bonus value
+   HasLeader(), GetLeaderName(), GetLeaderGrade(), GetLeaderRank()  Status queries
+   GetLeaderCommandAbility()              Combat command rating
+   HasLeaderSkill(skill)                  Check unlocked skills
+   AwardLeaderReputation(action/points)   Grant reputation for actions
 
    ── Action Economy ──────────────────────────────────────────────────────────
-   SpendAction(type, movementCost)    Unified action consumption with MP cost.
-   GetAvailableActions()              Dictionary of truly available actions.
+   SpendAction(type, movementCost)        Unified action consumption
+   GetAvailableActions()                  Dictionary of available actions with validation
 
    ── Combat State Management ─────────────────────────────────────────────────
-   SetCombatState(state)              Changes state with validation & costs.
-   UpOneState()                       Moves up to next state (if possible).
-   DownOneState()                     Moves down to previous state (if possible).
-   CanChangeToState(state)            Validates transition rules & resources.
-   BeginEntrenchment()                Convenience method: Deployed → HastyDefense.
-   CanEntrench()                      Checks if entrenchment is possible.
-   GetValidStateTransitions()         List of legal target states.
+   SetCombatState(state)                  Validated state transition with costs
+   UpOneState(), DownOneState()           Adjacent state navigation
+   CanChangeToState(state)                Validates transition rules & resources
+   BeginEntrenchment(), CanEntrench()     Defensive positioning shortcuts
+   GetValidStateTransitions()             List of legal target states
 
    ── Positioning & Movement ──────────────────────────────────────────────────
-   SetPosition(pos)                   Places unit at map coordinates.
-   CanMoveTo(pos)                     Future: validates movement legality.
-   GetDistanceTo(pos|unit)            Future: pathfinder distance calculation.
+   SetPosition(pos)                       Update map coordinates
+   CanMoveTo(pos), GetDistanceTo(pos/unit)  Future pathfinder integration
 
    ── Development Support ─────────────────────────────────────────────────────
-   DebugSetCombatState(state)         Direct state change (no validation/cost).
+   DebugSetCombatState(state)             Direct state change (no validation)
+   DebugSetMounted(isMounted)             Direct mount state change
 
- Action System Design
- ════════════════════
- The unified SpendAction() method handles all action types with intelligent
- movement point deduction:
+   ── Serialization & Cloning ─────────────────────────────────────────────────
+   Clone()                                Deep copy with new UnitID
+   GetObjectData(), CombatUnit(SerializationInfo)  ISerializable implementation
+   HasUnresolvedReferences(), GetUnresolvedReferenceIDs(), ResolveReferences()  Reference resolution
 
-   • **Move Actions**: Variable cost (default 0) - ready for pathfinding
-   • **Combat Actions**: Fixed cost (25% max MP) + action token
-   • **Deployment Actions**: Fixed cost (50% max MP) + action token  
-   • **Opportunity Actions**: No movement cost, token only
-   • **Intelligence Actions**: Fixed cost (10% max MP) + token (bases exempt)
+ Private Methods
+ ═══════════════
+   ── Initialization ──────────────────────────────────────────────────────────
+   InitializeActionCounts()               Set action pools by unit classification
+   InitializeMovementPoints()             Set MP by unit type
 
- Combat vs Mounted State
- ═══════════════════════
- CombatState controls tactical posture; *IsMounted* controls transport usage.
- Transition rules:
+   ── Combat Calculations ─────────────────────────────────────────────────────
+   GetFinalCombatRatingModifier()         Combine all combat modifiers
+   GetStrengthModifier()                  HP-based effectiveness
+   GetCombatStateModifier()               Tactical posture bonus/penalty
+   GetEfficiencyModifier()                Operational status modifier
+   GetExperienceMultiplier()              XP-based effectiveness
 
-   • To **Mobile**: Uses MountedProfile if available, else adds movement bonus
-   • From **Mobile**: Always uses DeployedProfile, removes any movement bonus
+   ── Experience System ───────────────────────────────────────────────────────
+   CalculateExperienceLevel(points)       Convert XP to level
+   GetMinPointsForLevel(level)            XP threshold for level
+   GetNextLevel(level)                    Next experience level
+   OnExperienceLevelChanged(old, new)     Level-up notification
 
- Persistence Architecture
- ════════════════════════
- • ISerializable with two-phase loading pattern
- • Reference resolution for shared objects (profiles, leaders)
- • FacilityManager integration with proper parent relationships
- • Comprehensive consistency validation and error recovery
+   ── Leader System ───────────────────────────────────────────────────────────
+   ValidateLeaderAssignmentConsistency()  Check flag/reference consistency
+   FixLeaderAssignmentConsistency()       Repair inconsistent state
+   GetUnitDisplayName(unitId)             Lookup unit name with fallback
+
+   ── Action System ───────────────────────────────────────────────────────────
+   ConsumeMovementPoints(points)          MP consumption with validation
+   Get[Action]MovementCost()              Calculate MP costs for actions
+   CanConsume[Action]()                   Validate action availability
+
+   ── Combat State System ─────────────────────────────────────────────────────
+   CanUnitTypeChangeStates()              Check if unit can change states
+   IsAdjacentStateTransition(from, to)    Validate state adjacency
+   HasSufficientMovementForDeployment()   Check deployment MP requirements
+   UpdateStateAndProfiles(new, old)      Handle mounting/dismounting logic
+
+   ── Facility Support ────────────────────────────────────────────────────────
+   ReestablishFacilityManagerParent()     Restore parent relationships after load
+
+ State Management
+ ════════════════
+ • **CombatState**: Tactical posture affecting combat bonuses/penalties
+ • **IsMounted**: Transport usage (separate from combat state)
+ • **Mobile Transition**: Uses MountedProfile if available, else movement bonus
+ • **Defensive States**: Progressive entrenchment with increasing bonuses
+
+ Persistence
+ ═══════════
+ • **Two-Phase Loading**: Objects deserialized, then references resolved
+ • **Enum Storage**: IntelProfileType stored as enum value (no reference resolution)
+ • **Shared References**: WeaponSystemProfile and Leader resolved via GameDataManager
+ • **FacilityManager**: Integrated serialization with parent relationship restoration
 
  ───────────────────────────────────────────────────────────────────────────────
  KEEP THIS COMMENT BLOCK IN SYNC WITH PUBLIC API CHANGES!
- ───────────────────────────────────────────────────────────────────────────── */
+ ─────────────────────────────────────────────────────────────────────────────── */
 namespace HammerAndSickle.Models
 {
     [Serializable]
@@ -151,7 +207,6 @@ namespace HammerAndSickle.Models
         // Temporary fields for deserialization reference resolution
         private string unresolvedDeployedProfileID = "";
         private string unresolvedMountedProfileID = "";
-        private string unresolvedUnitProfileID = "";
         private string unresolvedLeaderID = "";
         private bool unresolvedFacilityManagerData = false;
 
@@ -216,7 +271,7 @@ namespace HammerAndSickle.Models
         /// <param name="nationality">National affiliation</param>
         /// <param name="deployedProfile">Combat profile when deployed</param>
         /// <param name="mountedProfile">Combat profile when mounted (can be null)</param>
-        /// <param name="intelProfile">Profile for intel reports</param>
+        /// <param name="intelProfileType">Intel profile type for intelligence reports</param>
         /// <param name="isTransportable">Whether this unit can be transported</param>
         /// <param name="isBase">Whether this unit is a land-based facility</param>
         public CombatUnit(
@@ -228,6 +283,7 @@ namespace HammerAndSickle.Models
             Nationality nationality,
             WeaponSystemProfile deployedProfile,
             WeaponSystemProfile mountedProfile,
+            IntelProfileTypes intelProfileType,
             bool isTransportable,
             bool isBase = false,
             DepotCategory category = DepotCategory.Secondary,
@@ -241,6 +297,10 @@ namespace HammerAndSickle.Models
 
                 if (deployedProfile == null)
                     throw new ArgumentNullException(nameof(deployedProfile), "Deployed profile is required");
+
+                // Validate intel profile type
+                if (!Enum.IsDefined(typeof(IntelProfileTypes), intelProfileType))
+                    throw new ArgumentException("Invalid intel profile type", nameof(intelProfileType));
 
                 // Set identification and metadata
                 UnitName = unitName;
@@ -256,6 +316,7 @@ namespace HammerAndSickle.Models
                 // Set profiles
                 DeployedProfile = deployedProfile;
                 MountedProfile = mountedProfile;
+                IntelProfileType = intelProfileType;
 
                 // If this is a base unit, initialize the proper facility.
                 IsBase = isBase;
@@ -333,10 +394,12 @@ namespace HammerAndSickle.Models
                 IsLeaderAssigned = info.GetBoolean(nameof(IsLeaderAssigned));
                 SpottedLevel = (SpottedLevel)info.GetValue(nameof(SpottedLevel), typeof(SpottedLevel));
 
+                // Load IntelProfileType directly as enum value
+                IntelProfileType = (IntelProfileTypes)info.GetValue(nameof(IntelProfileType), typeof(IntelProfileTypes));
+
                 // Store profile IDs for later resolution (don't resolve objects yet)
                 unresolvedDeployedProfileID = info.GetString("DeployedProfileID");
                 unresolvedMountedProfileID = info.GetString("MountedProfileID");
-                unresolvedUnitProfileID = info.GetString("UnitProfileID");
                 unresolvedLeaderID = info.GetString("LeaderID");
 
                 // Deserialize owned StatsMaxCurrent objects
@@ -417,6 +480,33 @@ namespace HammerAndSickle.Models
 
 
         #region Generic Interface Methods
+
+        /// <summary>
+        /// Generates an intelligence report for this unit based on the specified spotted level.
+        /// Uses the static IntelProfile system to create fog-of-war filtered intelligence data.
+        /// </summary>
+        /// <param name="spottedLevel">Intelligence accuracy level (default Level1)</param>
+        /// <returns>IntelReport with unit intelligence data, or null if not spotted</returns>
+        public IntelReport GenerateIntelReport(SpottedLevel spottedLevel = SpottedLevel.Level1)
+        {
+            try
+            {
+                return IntelProfile.GenerateIntelReport(
+                    IntelProfileType,
+                    UnitName,
+                    (int)HitPoints.Current,
+                    Nationality,
+                    CombatState,
+                    ExperienceLevel,
+                    EfficiencyLevel,
+                    spottedLevel);
+            }
+            catch (Exception e)
+            {
+                AppService.HandleException(CLASS_NAME, "GenerateIntelReport", e);
+                return null;
+            }
+        }
 
         /// <summary>
         /// Refreshes all action counts to their maximum values.
@@ -2602,6 +2692,7 @@ namespace HammerAndSickle.Models
                     this.Nationality,
                     this.DeployedProfile,      // Shared reference
                     this.MountedProfile,       // Shared reference  
+                    this.IntelProfileType,     // Static enum value - no reference resolution needed
                     this.IsTransportable,
                     this.IsBase
                 );
@@ -2661,16 +2752,13 @@ namespace HammerAndSickle.Models
                     clone.FacilityManager = clonedFacilityManager;
                 }
 
-                // Copy properties with private setters using reflection
+                // Copy unresolved reference fields using reflection (should be empty in normal cloning scenarios)
                 var cloneType = typeof(CombatUnit);
-
-                // Copy unresolved reference fields (should be empty in normal cloning scenarios)
                 cloneType.GetField("unresolvedDeployedProfileID", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance)
                     ?.SetValue(clone, this.unresolvedDeployedProfileID);
                 cloneType.GetField("unresolvedMountedProfileID", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance)
                     ?.SetValue(clone, this.unresolvedMountedProfileID);
-                cloneType.GetField("unresolvedUnitProfileID", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance)
-                    ?.SetValue(clone, this.unresolvedUnitProfileID);
+                // Note: No need to copy unresolvedUnitProfileID anymore since IntelProfileType is a direct enum value
 
                 return clone;
             }
@@ -2708,15 +2796,12 @@ namespace HammerAndSickle.Models
                 info.AddValue(nameof(IsLeaderAssigned), IsLeaderAssigned);
                 info.AddValue(nameof(SpottedLevel), SpottedLevel);
 
+                // Serialize IntelProfileType directly as enum value
+                info.AddValue(nameof(IntelProfileType), IntelProfileType);
+
                 // Serialize profile references as IDs/names (not the objects themselves)
                 info.AddValue("DeployedProfileID", DeployedProfile?.WeaponSystemID.ToString() ?? "");
                 info.AddValue("MountedProfileID", MountedProfile?.WeaponSystemID.ToString() ?? "");
-                
-                
-                // TODO: Fix me
-                //info.AddValue("IntelProfileID", IntelProfile?.IntelProfileID ?? "");
-                
-                
                 info.AddValue("LeaderID", CommandingOfficer?.LeaderID ?? "");
 
                 // Serialize owned StatsMaxCurrent objects as Max/Current pairs
@@ -2770,7 +2855,6 @@ namespace HammerAndSickle.Models
         {
             bool hasUnresolved = !string.IsNullOrEmpty(unresolvedDeployedProfileID) ||
                 !string.IsNullOrEmpty(unresolvedMountedProfileID) ||
-                !string.IsNullOrEmpty(unresolvedUnitProfileID) ||
                 !string.IsNullOrEmpty(unresolvedLeaderID) ||
                 unresolvedFacilityManagerData;
 
@@ -2801,9 +2885,6 @@ namespace HammerAndSickle.Models
 
             if (!string.IsNullOrEmpty(unresolvedMountedProfileID))
                 unresolvedIDs.Add($"MountedProfile:{unresolvedMountedProfileID}");
-
-            if (!string.IsNullOrEmpty(unresolvedUnitProfileID))
-                unresolvedIDs.Add($"UnitProfile:{unresolvedUnitProfileID}");
 
             if (!string.IsNullOrEmpty(unresolvedLeaderID))
                 unresolvedIDs.Add($"Leader:{unresolvedLeaderID}");
@@ -2877,6 +2958,8 @@ namespace HammerAndSickle.Models
                     }
                 }
 
+                // No IntelProfile resolution needed - it's now a static lookup by enum
+
                 // Resolve Leader reference
                 if (!string.IsNullOrEmpty(unresolvedLeaderID))
                 {
@@ -2886,7 +2969,6 @@ namespace HammerAndSickle.Models
                         CommandingOfficer = leader;
                         unresolvedLeaderID = "";
 
-                        // ADD THIS CONSISTENCY CHECK:
                         // Ensure IsLeaderAssigned is consistent with resolved leader
                         if (!IsLeaderAssigned)
                         {
@@ -2901,14 +2983,12 @@ namespace HammerAndSickle.Models
                         AppService.HandleException(CLASS_NAME, "ResolveReferences",
                             new KeyNotFoundException($"Leader {unresolvedLeaderID} not found"));
 
-                        // ADD THIS CLEANUP:
                         // If leader couldn't be resolved, ensure flag is cleared
                         IsLeaderAssigned = false;
                     }
                 }
                 else if (IsLeaderAssigned)
                 {
-                    // ADD THIS CONSISTENCY CHECK:
                     // Flag says we have a leader but no leader ID was saved
                     AppService.HandleException(CLASS_NAME, "ResolveReferences",
                         new InvalidDataException($"Unit {UnitID} has IsLeaderAssigned=true but no leader ID"),
