@@ -1,7 +1,68 @@
-using System.Collections.Generic;
-
+﻿
 namespace HammerAndSickle.Models
 {
+ /*
+ * ---------------------------------------------------------------------------
+ *  IntelReport — Hammer & Sickle
+ * ---------------------------------------------------------------------------
+ *  IMMUTABLE SNAPSHOT OF UNIT INTELLIGENCE
+ *  ---------------------------------------
+ *  • This class is a **pure data-transfer object (DTO)** produced exclusively
+ *    by `IntelProfile.GenerateIntelReport(...)`.
+ *  • Once instantiated it should be treated as read-only; UI layers and AI
+ *    consumers must never mutate its fields.
+ *  • A new instance should be created each time fresh intel is required.
+ *
+ *  SPOTTED‑LEVEL SEMANTICS & FIELD POPULATION
+ *  -----------------------------------------
+ *  The accuracy and completeness of an *IntelReport* depend on the caller’s
+ *  `SpottedLevel` argument.  The generator ensures the following contract:
+ *
+ *  • **Level 0 (Not spotted)**
+ *      – No `IntelReport` is generated; calling code should handle null.
+ *  • **Level 1 (Name only)**
+ *      – Metadata (UnitName, UnitNationality, UnitState, Exp/Eff levels) is
+ *        populated.
+ *      – Every equipment bucket remains **0**.
+ *  • **Level 2 (Poor intel ±30 %)**
+ *      – All buckets contain values distorted by up to ±30 % error.
+ *  • **Level 3 (Good intel ±10 %)**
+ *      – Buckets distorted by up to ±10 % error.
+ *  • **Level 4 (Perfect intel)**
+ *      – Buckets reflect exact counts; no fog‑of‑war error applied.
+ *
+ *  BUCKET RULES
+ *  ------------
+ *  • Counts are *integers*.  After fog‑of‑war is applied, any bucket whose
+ *    value falls below **1** is **omitted** (remains 0).
+ *  • Buckets map to weapon‑system prefixes in `IntelProfile`:
+ *      Men, Tanks, IFVs, APCs, Recon, Artillery, Rocket Artillery,
+ *      Surface‑to‑Surface Missiles, SAMs, AAA, MANPADs, ATGMs,
+ *      Attack Helicopters, Fighters, Multirole, Attack Aircraft, Bombers,
+ *      AWACS, Recon Aircraft.
+ *
+ *  THREAD‑SAFETY & SERIALIZATION
+ *  -----------------------------
+ *  • The class contains only primitive types and enums — serialization is
+ *    trivial and thread‑safe.
+ *  • If binary persistence is required, mark the class `[Serializable]` or
+ *    implement a custom serializer; no locking is necessary.
+ *
+ *  PUBLIC PROPERTIES (all auto‑properties unless noted)
+ *  ---------------------------------------------------
+ *  int Men, Tanks, IFVs, APCs, RCNs, ARTs, ROCs, SSMs, SAMs, AAAs,
+ *      MANPADs, ATGMs, HEL, ASFs, MRFs, ATTs, BMBs, AWACS, RCNAs;
+ *
+ *  Nationality   UnitNationality  – nation owning the unit.
+ *  string        UnitName         – display name (unique per combat‑unit).
+ *  CombatState   UnitState        – Deployed / Mounted / etc.
+ *  ExperienceLevel UnitExperienceLevel – Raw, Green … Elite.
+ *  EfficiencyLevel UnitEfficiencyLevel – StaticOps … Mobile.
+ *
+ *  Any new bucket or metadata field **must** be added in both `IntelReport`
+ *  and in the mapping switch inside `IntelProfile.GenerateIntelReport`.
+ * ---------------------------------------------------------------------------
+ */
     public class IntelReport
     {
         #region Properties
