@@ -222,7 +222,6 @@ namespace HammerAndSickle.Models
         Level2, // Above plus CombatState and an error rate of about 30%
         Level3, // Above plus EXP and EFF levels, and a 10% error rate.
         Level4, // Above plus no error rate.
-        Level5  // Above plus where it moved last turn.
     }
 
     /// <summary>
