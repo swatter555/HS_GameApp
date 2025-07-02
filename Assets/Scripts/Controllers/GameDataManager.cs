@@ -92,151 +92,7 @@ namespace HammerAndSickle.Models
         }
     }
 
- /*───────────────────────────────────────────────────────────────────────────────
- GameDataManager  —  centralized repository for all game object lifecycle
- ────────────────────────────────────────────────────────────────────────────────
- Overview
- ════════
- The **GameDataManager** serves as the unified registry and persistence layer for
- all Hammer & Sickle game objects. This singleton manages the complete lifecycle
- of CombatUnits, Leaders, WeaponSystemProfiles, and UnitProfiles, implementing
- sophisticated two-phase loading with automatic reference resolution.
-
- Major Responsibilities
- ══════════════════════
- • Centralized object registry with efficient ID-based lookups
-     - Thread-safe registration and retrieval for all game object types
-     - Duplicate prevention and collision detection during registration
- • Two-phase serialization with automatic reference resolution
-     - Phase 1: Deserialize all objects and store unresolved reference IDs
-     - Phase 2: Reconnect object relationships using stored IDs and lookup tables
- • Comprehensive save/load operations with data validation
-     - Binary serialization with versioned headers and metadata
-     - Automatic backup creation and graceful recovery from load failures
- • Thread-safe operations with ReaderWriterLockSlim
-     - Multiple concurrent readers, exclusive writers for data integrity
-     - Recursive lock support for complex nested operations
- • Data integrity validation and error recovery
-     - Bidirectional relationship verification (leader ↔ unit assignments)
-     - Facility management consistency checks (airbase attachments, etc.)
-     - Orphaned reference detection and reporting
- • Change tracking and dirty state management
-     - Efficient save optimization by tracking modified objects only
-     - Integration with file system paths via AppService
-
- Design Highlights
- ═════════════════
- • **Singleton Architecture**: Thread-safe lazy initialization with double-checked
-   locking pattern ensures single instance across application lifecycle.
- • **IResolvableReferences Pattern**: Objects implementing this interface are
-   automatically tracked during deserialization and resolved in Phase 2.
- • **Composite Key System**: WeaponSystemProfiles and UnitProfiles use compound
-   keys (Type_Nationality) to support multiple variants per entity type.
- • **Facility Relationship Validation**: Enhanced integrity checking for complex
-   base-to-unit relationships, especially airbase attachments and HQ assignments.
- • **Graceful Degradation**: Load operations attempt partial recovery when
-   possible, with comprehensive error logging via AppService.HandleException.
- • **Versioned Persistence**: GameDataHeader enables backward compatibility
-   checks and migration paths for future save format changes.
-
- Public-Method Reference
- ═══════════════════════
-   ── Registration Interface ──────────────────────────────────────────────────
-   RegisterCombatUnit(unit)           Registers unit with automatic facility tracking.
-   RegisterLeader(leader)             Registers leader with reference resolution support.
-   RegisterWeaponProfile(profile)     Registers weapon template (allows overwriting).
-   RegisterUnitProfile(profile)       Registers unit template (allows overwriting).
-
-   ── Retrieval Interface ─────────────────────────────────────────────────────
-   GetCombatUnit(unitId)              Retrieves unit by ID or null if not found.
-   GetLeader(leaderId)                Retrieves leader by ID or null if not found.
-   GetWeaponProfile(system, nation)   Retrieves weapon profile by compound key.
-   GetUnitProfile(name, nation)       Retrieves unit profile by compound key.
-   GetAllCombatUnits()                Returns read-only collection of all units.
-   GetAllLeaders()                    Returns read-only collection of all leaders.
-
-   ── Reference Resolution ────────────────────────────────────────────────────
-   ResolveAllReferences()             Resolves pending object references (Phase 2).
-   ValidateDataIntegrity()            Comprehensive validation with error reporting.
-
-   ── Serialization Operations ────────────────────────────────────────────────
-   SaveGameState(filePath)            Saves complete state with backup creation.
-   LoadGameState(filePath)            Loads complete state with reference resolution.
-   SaveScenario(scenarioName)         Convenience save to scenario storage folder.
-   LoadScenario(scenarioName)         Convenience load with auto-validation.
-
-   ── Lifecycle Management ────────────────────────────────────────────────────
-   MarkDirty(objectId)                Marks object as needing save (change tracking).
-   ClearAll()                         Resets manager to empty state (thread-safe).
-   Dispose()                          Releases resources and optionally auto-saves.
-
-   ── Diagnostic Properties ───────────────────────────────────────────────────
-   TotalObjectCount                   Total registered objects across all types.
-   UnresolvedReferenceCount           Objects still awaiting reference resolution.
-   HasUnsavedChanges                  Whether any objects are marked dirty.
-   ObjectCounts                       Tuple with counts by type (includes facilities).
-
- Two-Phase Loading Architecture
- ══════════════════════════════
- The GameDataManager implements the sophisticated reference resolution pattern
- used throughout Hammer & Sickle for handling complex object relationships:
-
-   **Phase 1 - Deserialization**: All objects are created from the save file.
-   Objects with references store IDs in temporary collections rather than
-   direct object references. Objects implementing IResolvableReferences are
-   automatically tracked in _unresolvedObjects list.
-
-   **Phase 2 - Reference Resolution**: ResolveAllReferences() iterates through
-   tracked objects, calling ResolveReferences(this) to reconnect relationships
-   using the manager's lookup methods. Objects are removed from the unresolved
-   list only after successful resolution.
-
- Thread Safety Model
- ═══════════════════
- ReaderWriterLockSlim enables high-performance concurrent access:
-
-   • **Read Operations**: Multiple threads can simultaneously query data
-     (GetCombatUnit, GetLeader, property getters, validation checks)
-   • **Write Operations**: Exclusive access for registration, loading, clearing
-     (RegisterCombatUnit, LoadGameState, ClearAll, reference resolution)
-   • **Recursive Support**: LockRecursionPolicy.SupportsRecursion handles
-     nested operations during complex deserialization scenarios
-
- Compound Key Strategy
- ═════════════════════
- Profiles use composite identifiers to support nationality-specific variants:
-
-   • **Weapon Profiles**: "{WeaponSystem}_{Nationality}" (e.g., "T80B_Soviet")
-   • **Unit Profiles**: "{ProfileName}_{Nationality}" (e.g., "Guards_Soviet")
-
- This enables shared templates while maintaining regional differences in
- equipment specifications, organizational structures, and combat capabilities.
-
- Data Integrity Validation
- ═════════════════════════
- ValidateDataIntegrity() performs comprehensive consistency checks:
-
-   • **Bidirectional Relationships**: Leader assignment cross-references
-   • **Facility Consistency**: Base classification vs FacilityManager type
-   • **Airbase Attachments**: Unit type validation for attached aircraft
-   • **Reference Completeness**: Detection of orphaned or missing references
-   • **Profile Validation**: Null checks for required template objects
-
- Save File Format
- ════════════════
- Binary serialization with structured layout:
-
-   1. **GameDataHeader**: Metadata with version, timestamps, object counts, checksum
-   2. **Combat Units Dictionary**: All CombatUnit objects with IDs as keys
-   3. **Leaders Dictionary**: All Leader objects with IDs as keys  
-   4. **Weapon Profiles Dictionary**: All WeaponSystemProfile templates
-   5. **Unit Profiles Dictionary**: All IntelProfile templates
-
- Backup creation and validation ensure data safety during save operations.
-
- ───────────────────────────────────────────────────────────────────────────────
- KEEP THIS COMMENT BLOCK IN SYNC WITH PUBLIC API CHANGES!
- ───────────────────────────────────────────────────────────────────────────── */
+    
     public class GameDataManager : IDisposable
     {
         #region Constants
@@ -252,7 +108,7 @@ namespace HammerAndSickle.Models
         #region Singleton
 
         private static GameDataManager _instance;
-        private static readonly object _instanceLock = new ();
+        private static readonly object _instanceLock = new();
 
         /// <summary>
         /// Gets the singleton instance of the GameDataManager.
@@ -279,7 +135,7 @@ namespace HammerAndSickle.Models
         #region Fields
 
         // Thread synchronization
-        private readonly ReaderWriterLockSlim _dataLock = new (LockRecursionPolicy.SupportsRecursion);
+        private readonly ReaderWriterLockSlim _dataLock = new(LockRecursionPolicy.SupportsRecursion);
 
         // Object registries
         private readonly Dictionary<string, CombatUnit> _combatUnits = new();
@@ -287,7 +143,7 @@ namespace HammerAndSickle.Models
         private readonly Dictionary<string, WeaponSystemProfile> _weaponProfiles = new();
 
         // State tracking
-        private readonly HashSet<string> _dirtyObjects = new ();
+        private readonly HashSet<string> _dirtyObjects = new();
         private readonly List<IResolvableReferences> _unresolvedObjects = new();
 
         // Lifecycle management

@@ -6,195 +6,11 @@ using System.Linq;
 using System.Runtime.Serialization;
 using UnityEngine;
 
-/*───────────────────────────────────────────────────────────────────────────────
- CombatUnit  —  universal runtime model for every maneuver element or base
- ────────────────────────────────────────────────────────────────────────────────
- Overview
- ════════
- **CombatUnit** represents any controllable entity on the Hammer & Sickle hex map:
- tank battalions, airbases, supply depots, etc. Stores mutable per-unit state while
- referencing shared templates (WeaponSystemProfile, static IntelProfile, Leader).
 
- Major Responsibilities
- ══════════════════════
- • Identification & metadata (UnitID, name, side, nationality, classification)
- • Unified action economy (Move/Combat/Deployment/Opportunity/Intel tokens + MP)
- • Combat state machine (Mobile ↔ Deployed ↔ HastyDefense ↔ Entrenched ↔ Fortified)
- • Experience progression & leader assignment with skill bonuses
- • Damage, repair, supply & efficiency tracking
- • Static intelligence report generation with fog-of-war effects
- • Position tracking & movement validation (future pathfinder integration)
- • Serialization with reference resolution for shared objects
-
- Design Highlights
- ═════════════════
- • **Unified Action Interface**: SpendAction() handles all action types with flexible MP costs
- • **Static Intel System**: Uses IntelProfileTypes enum for memory-efficient intelligence reports
- • **StatsMaxCurrent**: All max/current pairs use validated clamping & percentage queries
- • **Unity-Free**: No MonoBehaviours - safe for serialization and unit testing
- • **Centralized Error Handling**: All exceptions route through AppService
-
- Action Economy
- ══════════════
- • **Move Actions**: Variable cost (pathfinder ready) + movement points
- • **Combat Actions**: Fixed cost (25% max MP) + action token
- • **Deployment Actions**: Fixed cost (50% max MP) + action token  
- • **Opportunity Actions**: Reactive only, no movement cost
- • **Intelligence Actions**: Fixed cost (15% max MP) + token (bases exempt)
-
-Public Properties
-═══════════════
-    string UnitName { get; set; }
-    string UnitID { get; private set; }
-    UnitType UnitType { get; private set; }
-    UnitClassification Classification { get; private set; }
-    UnitRole Role { get; private set; }
-    Side Side { get; private set; }
-    Nationality Nationality { get; private set; }
-    bool IsTransportable { get; private set; }
-    bool IsBase { get; private set; }
-
-    // Profiles and management
-    WeaponSystemProfile DeployedProfile { get; private set; }
-    WeaponSystemProfile MountedProfile { get; private set; }
-    FacilityManager FacilityManager { get; internal set; }
-    IntelProfileTypes IntelProfileType { get; internal set; }
-
-    // Leader assignment
-    bool IsLeaderAssigned // public field
-    Leader CommandingOfficer { get; internal set; }
-
-    // Action counts (StatsMaxCurrent)
-    StatsMaxCurrent MoveActions { get; private set; }
-    StatsMaxCurrent CombatActions { get; private set; }
-    StatsMaxCurrent DeploymentActions { get; private set; }
-    StatsMaxCurrent OpportunityActions { get; private set; }
-    StatsMaxCurrent IntelActions { get; private set; }
-
-    // State data
-    int ExperiencePoints { get; internal set; }
-    ExperienceLevel ExperienceLevel { get; internal set; }
-    EfficiencyLevel EfficiencyLevel { get; internal set; }
-    bool IsMounted { get; internal set; }
-    CombatState CombatState { get; internal set; }
-    StatsMaxCurrent HitPoints { get; private set; }
-    StatsMaxCurrent DaysSupply { get; private set; }
-    StatsMaxCurrent MovementPoints { get; private set; }
-    Coordinate2D MapPos { get; internal set; }
-    SpottedLevel SpottedLevel { get; private set; }
-
- Public Interface
- ════════════════
-   ── Core Operations ─────────────────────────────────────────────────────────
-   RefreshAllActions()                    Reset action pools (turn start)
-   RefreshMovementPoints()                Restore MP to maximum
-   GetActiveWeaponSystemProfile()         Returns mounted or deployed profile
-   GetCurrentCombatStrength()             Applies all modifiers to profile
-   GenerateIntelReport(spottedLevel)      Creates fog-of-war intelligence report
-   TakeDamage(amount), Repair(amount)     HP management
-   ConsumeSupplies(amount), ReceiveSupplies(amount)  Supply management
-   IsDestroyed(), CanMove(), GetSupplyStatus()       Status queries
-   Set/Get EfficiencyLevel methods        Operational status control
-
-   ── Experience System ───────────────────────────────────────────────────────
-   AddExperience(points)                  Add XP with level-up handling
-   SetExperience(points)                  Direct setter for loading/tools
-   GetPointsToNextLevel()                 XP needed for advancement
-   GetExperienceProgress()                Progress percentage (0.0-1.0)
-
-   ── Leader Management ───────────────────────────────────────────────────────
-   AssignLeader(leader), RemoveLeader()   Bidirectional assignment management
-   GetLeaderBonuses()                     Dictionary of active skill bonuses
-   HasLeaderCapability(type)              Check for specific bonus
-   GetLeaderBonus(type)                   Get specific bonus value
-   HasLeader(), GetLeaderName(), GetLeaderGrade(), GetLeaderRank()  Status queries
-   GetLeaderCommandAbility()              Combat command rating
-   HasLeaderSkill(skill)                  Check unlocked skills
-   AwardLeaderReputation(action/points)   Grant reputation for actions
-
-   ── Action Economy ──────────────────────────────────────────────────────────
-   SpendAction(type, movementCost)        Unified action consumption
-   GetAvailableActions()                  Dictionary of available actions with validation
-
-   ── Combat State Management ─────────────────────────────────────────────────
-   SetCombatState(state)                  Validated state transition with costs
-   UpOneState(), DownOneState()           Adjacent state navigation
-   CanChangeToState(state)                Validates transition rules & resources
-   BeginEntrenchment(), CanEntrench()     Defensive positioning shortcuts
-   GetValidStateTransitions()             List of legal target states
-
-   ── Positioning & Movement ──────────────────────────────────────────────────
-   SetPosition(pos)                       Update map coordinates
-   CanMoveTo(pos), GetDistanceTo(pos/unit)  Future pathfinder integration
-
-   ── Development Support ─────────────────────────────────────────────────────
-   DebugSetCombatState(state)             Direct state change (no validation)
-   DebugSetMounted(isMounted)             Direct mount state change
-
-   ── Serialization & Cloning ─────────────────────────────────────────────────
-   Clone()                                Deep copy with new UnitID
-   GetObjectData(), CombatUnit(SerializationInfo)  ISerializable implementation
-   HasUnresolvedReferences(), GetUnresolvedReferenceIDs(), ResolveReferences()  Reference resolution
-
- Private Methods
- ═══════════════
-   ── Initialization ──────────────────────────────────────────────────────────
-   InitializeActionCounts()               Set action pools by unit classification
-   InitializeMovementPoints()             Set MP by unit type
-
-   ── Combat Calculations ─────────────────────────────────────────────────────
-   GetFinalCombatRatingModifier()         Combine all combat modifiers
-   GetStrengthModifier()                  HP-based effectiveness
-   GetCombatStateModifier()               Tactical posture bonus/penalty
-   GetEfficiencyModifier()                Operational status modifier
-   GetExperienceMultiplier()              XP-based effectiveness
-
-   ── Experience System ───────────────────────────────────────────────────────
-   CalculateExperienceLevel(points)       Convert XP to level
-   GetMinPointsForLevel(level)            XP threshold for level
-   GetNextLevel(level)                    Next experience level
-   OnExperienceLevelChanged(old, new)     Level-up notification
-
-   ── Leader System ───────────────────────────────────────────────────────────
-   ValidateLeaderAssignmentConsistency()  Check flag/reference consistency
-   FixLeaderAssignmentConsistency()       Repair inconsistent state
-   GetUnitDisplayName(unitId)             Lookup unit name with fallback
-
-   ── Action System ───────────────────────────────────────────────────────────
-   ConsumeMovementPoints(points)          MP consumption with validation
-   Get[Action]MovementCost()              Calculate MP costs for actions
-   CanConsume[Action]()                   Validate action availability
-
-   ── Combat State System ─────────────────────────────────────────────────────
-   CanUnitTypeChangeStates()              Check if unit can change states
-   IsAdjacentStateTransition(from, to)    Validate state adjacency
-   HasSufficientMovementForDeployment()   Check deployment MP requirements
-   UpdateStateAndProfiles(new, old)      Handle mounting/dismounting logic
-
-   ── Facility Support ────────────────────────────────────────────────────────
-   ReestablishFacilityManagerParent()     Restore parent relationships after load
-
- State Management
- ════════════════
- • **CombatState**: Tactical posture affecting combat bonuses/penalties
- • **IsMounted**: Transport usage (separate from combat state)
- • **Mobile Transition**: Uses MountedProfile if available, else movement bonus
- • **Defensive States**: Progressive entrenchment with increasing bonuses
-
- Persistence
- ═══════════
- • **Two-Phase Loading**: Objects deserialized, then references resolved
- • **Enum Storage**: IntelProfileType stored as enum value (no reference resolution)
- • **Shared References**: WeaponSystemProfile and Leader resolved via GameDataManager
- • **FacilityManager**: Integrated serialization with parent relationship restoration
-
- ───────────────────────────────────────────────────────────────────────────────
- KEEP THIS COMMENT BLOCK IN SYNC WITH PUBLIC API CHANGES!
- ─────────────────────────────────────────────────────────────────────────────── */
 namespace HammerAndSickle.Models
 {
     [Serializable]
-    public class CombatUnit : ICloneable, ISerializable, IResolvableReferences
+    public partial class CombatUnit : ICloneable, ISerializable, IResolvableReferences
     {
         #region Constants
 
@@ -202,13 +18,11 @@ namespace HammerAndSickle.Models
 
         #endregion
 
+
         #region Fields
 
         // Temporary fields for deserialization reference resolution
-        private string unresolvedDeployedProfileID = "";
-        private string unresolvedMountedProfileID = "";
         private string unresolvedLeaderID = "";
-        private bool unresolvedFacilityManagerData = false;
 
         #endregion // Fields
 
@@ -226,10 +40,9 @@ namespace HammerAndSickle.Models
         public bool IsTransportable { get; private set; }
         public bool IsBase { get; private set; }
 
-        // Profiles contain unit stats and capabilities.
-        public WeaponSystemProfile DeployedProfile { get; private set; }
-        public WeaponSystemProfile MountedProfile { get; private set; }
-        public FacilityManager FacilityManager { get; internal set; }
+        // Profile IDs
+        public WeaponSystems DeployedProfileID { get; private set; }
+        public WeaponSystems MountedProfileID { get; private set; }
         public IntelProfileTypes IntelProfileType { get; internal set; }
 
         // The unit's leader.
@@ -269,20 +82,19 @@ namespace HammerAndSickle.Models
         /// <param name="role">Primary role of the unit</param>
         /// <param name="side">Which side controls this unit</param>
         /// <param name="nationality">National affiliation</param>
-        /// <param name="deployedProfile">Combat profile when deployed</param>
-        /// <param name="mountedProfile">Combat profile when mounted (can be null)</param>
+        /// <param name="deployedProfileID">Deployed weapon system profile ID</param>
+        /// <param name="mountedProfileID">Mounted weapon system profile ID (can be DEFAULT for none)</param>
         /// <param name="intelProfileType">Intel profile type for intelligence reports</param>
         /// <param name="isTransportable">Whether this unit can be transported</param>
         /// <param name="isBase">Whether this unit is a land-based facility</param>
-        public CombatUnit(
-            string unitName,
+        public CombatUnit(string unitName,
             UnitType unitType,
             UnitClassification classification,
             UnitRole role,
             Side side,
             Nationality nationality,
-            WeaponSystemProfile deployedProfile,
-            WeaponSystemProfile mountedProfile,
+            WeaponSystems deployedProfileID,
+            WeaponSystems mountedProfileID,
             IntelProfileTypes intelProfileType,
             bool isTransportable,
             bool isBase = false,
@@ -295,8 +107,20 @@ namespace HammerAndSickle.Models
                 if (string.IsNullOrEmpty(unitName))
                     throw new ArgumentException("Unit name cannot be null or empty", nameof(unitName));
 
-                if (deployedProfile == null)
-                    throw new ArgumentNullException(nameof(deployedProfile), "Deployed profile is required");
+                // Deployed profile ID must point to a valid profile.
+                if (deployedProfileID == WeaponSystems.DEFAULT)
+                    throw new ArgumentException("Deployed profile ID cannot be DEFAULT", nameof(deployedProfileID));
+
+                // Check that deployed profile exists in database.
+                if (WeaponSystemsDatabase.GetWeaponSystemProfile(deployedProfileID) == null)
+                    throw new ArgumentException($"Deployed profile ID {deployedProfileID} not found in database", nameof(deployedProfileID));
+
+                // When not DEFAULT, mounted profile ID must point to a valid profile.
+                if (mountedProfileID != WeaponSystems.DEFAULT)
+                {
+                    if (WeaponSystemsDatabase.GetWeaponSystemProfile(mountedProfileID) == null)
+                        throw new ArgumentException($"Mounted profile ID {mountedProfileID} not found in database", nameof(mountedProfileID));
+                }
 
                 // Validate intel profile type
                 if (!Enum.IsDefined(typeof(IntelProfileTypes), intelProfileType))
@@ -313,32 +137,16 @@ namespace HammerAndSickle.Models
                 IsTransportable = isTransportable;
                 IsLeaderAssigned = false; // Default to no leader assigned
 
-                // Set profiles
-                DeployedProfile = deployedProfile;
-                MountedProfile = mountedProfile;
+                // Set profile IDs
+                DeployedProfileID = deployedProfileID;
+                MountedProfileID = mountedProfileID;
                 IntelProfileType = intelProfileType;
 
-                // If this is a base unit, initialize the proper facility.
+                // Set base status and initialize facility if needed
                 IsBase = isBase;
                 if (IsBase)
                 {
-                    // Create a facility.
-                    FacilityManager = new FacilityManager();
-
-                    switch (classification)
-                    {
-                        case UnitClassification.HQ:
-                            FacilityManager.SetupHQ(this);
-                            break;
-                        case UnitClassification.DEPOT:
-                            FacilityManager.SetupSupplyDepot(this, category, size);
-                            break;
-                        case UnitClassification.AIRB:
-                            FacilityManager.SetupAirbase(this);
-                            break;
-                        default:
-                            break;
-                    }
+                    InitializeFacility(category, size);
                 }
 
                 // Initialize leader (will be null until assigned)
@@ -372,114 +180,67 @@ namespace HammerAndSickle.Models
             }
         }
 
-        /// <summary>
-        /// Deserialization constructor for loading CombatUnit from saved data.
-        /// </summary>
-        /// <param name="info">Serialization info containing saved data</param>
-        /// <param name="context">Streaming context for deserialization</param>
-        protected CombatUnit(SerializationInfo info, StreamingContext context)
-        {
-            try
-            {
-                // Load basic properties
-                UnitName = info.GetString(nameof(UnitName));
-                UnitID = info.GetString(nameof(UnitID));
-                UnitType = (UnitType)info.GetValue(nameof(UnitType), typeof(UnitType));
-                Classification = (UnitClassification)info.GetValue(nameof(Classification), typeof(UnitClassification));
-                Role = (UnitRole)info.GetValue(nameof(Role), typeof(UnitRole));
-                Side = (Side)info.GetValue(nameof(Side), typeof(Side));
-                Nationality = (Nationality)info.GetValue(nameof(Nationality), typeof(Nationality));
-                IsTransportable = info.GetBoolean(nameof(IsTransportable));
-                IsBase = info.GetBoolean(nameof(IsBase));
-                IsLeaderAssigned = info.GetBoolean(nameof(IsLeaderAssigned));
-                SpottedLevel = (SpottedLevel)info.GetValue(nameof(SpottedLevel), typeof(SpottedLevel));
-
-                // Load IntelProfileType directly as enum value
-                IntelProfileType = (IntelProfileTypes)info.GetValue(nameof(IntelProfileType), typeof(IntelProfileTypes));
-
-                // Store profile IDs for later resolution (don't resolve objects yet)
-                unresolvedDeployedProfileID = info.GetString("DeployedProfileID");
-                unresolvedMountedProfileID = info.GetString("MountedProfileID");
-                unresolvedLeaderID = info.GetString("LeaderID");
-
-                // Deserialize owned StatsMaxCurrent objects
-                HitPoints = new StatsMaxCurrent(
-                    info.GetSingle("HitPoints_Max"),
-                    info.GetSingle("HitPoints_Current")
-                );
-
-                DaysSupply = new StatsMaxCurrent(
-                    info.GetSingle("DaysSupply_Max"),
-                    info.GetSingle("DaysSupply_Current")
-                );
-
-                MovementPoints = new StatsMaxCurrent(
-                    info.GetSingle("MovementPoints_Max"),
-                    info.GetSingle("MovementPoints_Current")
-                );
-
-                MoveActions = new StatsMaxCurrent(
-                    info.GetSingle("MoveActions_Max"),
-                    info.GetSingle("MoveActions_Current")
-                );
-
-                CombatActions = new StatsMaxCurrent(
-                    info.GetSingle("CombatActions_Max"),
-                    info.GetSingle("CombatActions_Current")
-                );
-
-                DeploymentActions = new StatsMaxCurrent(
-                    info.GetSingle("DeploymentActions_Max"),
-                    info.GetSingle("DeploymentActions_Current")
-                );
-
-                OpportunityActions = new StatsMaxCurrent(
-                    info.GetSingle("OpportunityActions_Max"),
-                    info.GetSingle("OpportunityActions_Current")
-                );
-
-                IntelActions = new StatsMaxCurrent(
-                    info.GetSingle("IntelActions_Max"),
-                    info.GetSingle("IntelActions_Current")
-                );
-
-                // Load simple properties
-                ExperiencePoints = info.GetInt32(nameof(ExperiencePoints));
-                ExperienceLevel = (ExperienceLevel)info.GetValue(nameof(ExperienceLevel), typeof(ExperienceLevel));
-                EfficiencyLevel = (EfficiencyLevel)info.GetValue(nameof(EfficiencyLevel), typeof(EfficiencyLevel));
-                IsMounted = info.GetBoolean(nameof(IsMounted));
-                CombatState = (CombatState)info.GetValue(nameof(CombatState), typeof(CombatState));
-                MapPos = (Coordinate2D)info.GetValue(nameof(MapPos), typeof(Coordinate2D));
-
-                // Load FacilityManager data
-                unresolvedFacilityManagerData = info.GetBoolean("HasFacilityManager");
-                if (unresolvedFacilityManagerData)
-                {
-                    // Reconstruct FacilityManager from the same serialization info
-                    // FacilityManager uses FM_ prefixed names so no conflicts
-                    FacilityManager = new FacilityManager(info, context);
-                }
-                else
-                {
-                    FacilityManager = new FacilityManager();
-                }
-
-                // Leave all object references null - they will be resolved later
-                DeployedProfile = null;
-                MountedProfile = null;
-                CommandingOfficer = null;
-            }
-            catch (Exception e)
-            {
-                AppService.HandleException(CLASS_NAME, nameof(CombatUnit), e);
-                throw;
-            }
-        }
-
         #endregion
 
 
         #region Generic Interface Methods
+
+        /// <summary>
+        /// Retrieves the weapon system profile currently deployed on the system.
+        /// </summary>
+        /// <returns>The <see cref="WeaponSystemProfile"/> associated with the deployed profile ID, or <see langword="null"/> if
+        /// the mounted profile ID is set to the default value.</returns>
+        public WeaponSystemProfile GetDeployedProfile()
+        {
+            try
+            {
+                // Validate deployed profile ID
+                if (DeployedProfileID == WeaponSystems.DEFAULT)
+                    throw new InvalidOperationException("Deployed profile ID cannot be DEFAULT");
+
+                // Lookup profile in database
+                var profile = WeaponSystemsDatabase.GetWeaponSystemProfile(DeployedProfileID);
+                if (profile == null)
+                    throw new InvalidOperationException($"Deployed profile {DeployedProfileID} not found in database");
+
+                return profile;
+            }
+            catch (Exception e)
+            {
+                AppService.HandleException(CLASS_NAME, "GetDeployedProfile", e);
+                return null;
+            }
+        }
+
+        /// <summary>
+        /// Retrieves the weapon system profile currently mounted on the system.
+        /// </summary>
+        /// <remarks>If the mounted profile ID is set to the default value, this method returns <see
+        /// langword="null"/>. If the profile cannot be found in the weapon systems database, an <see
+        /// cref="InvalidOperationException"/> is thrown.</remarks>
+        /// <returns>The <see cref="WeaponSystemProfile"/> associated with the mounted profile ID, or <see langword="null"/> if
+        /// the mounted profile ID is set to the default value.</returns>
+        public WeaponSystemProfile GetMountedProfile()
+        {
+            try
+            {
+                // If mounted profile ID is DEFAULT, there is no mounted profile
+                if (MountedProfileID == WeaponSystems.DEFAULT)
+                    throw new InvalidOperationException("Mounted profile ID is DEFAULT, no mounted profile");
+
+                // Lookup profile in database
+                var profile = WeaponSystemsDatabase.GetWeaponSystemProfile(MountedProfileID);
+                if (profile == null)
+                    throw new InvalidOperationException($"Mounted profile {MountedProfileID} not found in database");
+
+                return profile;
+            }
+            catch (Exception e)
+            {
+                AppService.HandleException(CLASS_NAME, "GetMountedProfile", e);
+                return null;
+            }
+        }
 
         /// <summary>
         /// Generates an intelligence report for this unit based on the specified spotted level.
@@ -547,50 +308,59 @@ namespace HammerAndSickle.Models
         public WeaponSystemProfile GetActiveWeaponSystemProfile()
         {
             // Return the active profile based on mounted state
-            return IsMounted ? MountedProfile : DeployedProfile;
+            return IsMounted ? GetMountedProfile(): GetDeployedProfile();
         }
 
         /// <summary>
         /// Get the adjusted combat strength based on current mounted state and all applicable modifiers.
         /// </summary>
-        /// <returns>Modified values for current profile</returns>
+        /// <returns>Temporary WeaponSystemProfile with modified combat values for immediate calculation</returns>
         public WeaponSystemProfile GetCurrentCombatStrength()
         {
             try
             {
-                // Ensure we have a valid active weapon system profile.
-                if (GetActiveWeaponSystemProfile() == null)
+                // Ensure we have a valid active weapon system profile
+                var activeProfile = GetActiveWeaponSystemProfile();
+                if (activeProfile == null)
                     throw new InvalidOperationException("Active weapon system profile is null");
 
-                // Clone the active profile.
-                WeaponSystemProfile combatProfile = GetActiveWeaponSystemProfile().Clone();
+                // Create a new temporary profile for combat calculations
+                var tempProfile = new WeaponSystemProfile(
+                    activeProfile.Name + "_Combat",
+                    activeProfile.Nationality,
+                    WeaponSystems.COMBAT);
 
-                // Compute all modifiers that can effect a combat rating.
+                // Compute all modifiers that can affect a combat rating
                 float finalModifier = GetFinalCombatRatingModifier();
 
-                // Apply the final modifier to the active profile's stats.
-                combatProfile.LandHard.SetAttack(Mathf.CeilToInt(combatProfile.LandHard.Attack * finalModifier));
-                combatProfile.LandHard.SetDefense(Mathf.CeilToInt(combatProfile.LandHard.Defense * finalModifier));
+                // Copy and apply modifiers to combat ratings
+                tempProfile.LandHard.SetAttack(Mathf.CeilToInt(activeProfile.LandHard.Attack * finalModifier));
+                tempProfile.LandHard.SetDefense(Mathf.CeilToInt(activeProfile.LandHard.Defense * finalModifier));
 
-                combatProfile.LandSoft.SetAttack(Mathf.CeilToInt(combatProfile.LandSoft.Attack * finalModifier));
-                combatProfile.LandSoft.SetDefense(Mathf.CeilToInt(combatProfile.LandSoft.Defense * finalModifier));
+                tempProfile.LandSoft.SetAttack(Mathf.CeilToInt(activeProfile.LandSoft.Attack * finalModifier));
+                tempProfile.LandSoft.SetDefense(Mathf.CeilToInt(activeProfile.LandSoft.Defense * finalModifier));
 
-                combatProfile.LandAir.SetAttack(Mathf.CeilToInt(combatProfile.LandAir.Attack * finalModifier));
-                combatProfile.LandAir.SetDefense(Mathf.CeilToInt(combatProfile.LandAir.Defense * finalModifier));
+                tempProfile.LandAir.SetAttack(Mathf.CeilToInt(activeProfile.LandAir.Attack * finalModifier));
+                tempProfile.LandAir.SetDefense(Mathf.CeilToInt(activeProfile.LandAir.Defense * finalModifier));
 
-                combatProfile.Air.SetAttack(Mathf.CeilToInt(combatProfile.Air.Attack * finalModifier));
-                combatProfile.Air.SetDefense(Mathf.CeilToInt(combatProfile.Air.Defense * finalModifier));
+                tempProfile.Air.SetAttack(Mathf.CeilToInt(activeProfile.Air.Attack * finalModifier));
+                tempProfile.Air.SetDefense(Mathf.CeilToInt(activeProfile.Air.Defense * finalModifier));
 
-                combatProfile.AirGround.SetAttack(Mathf.CeilToInt(combatProfile.AirGround.Attack * finalModifier));
-                combatProfile.AirGround.SetDefense(Mathf.CeilToInt(combatProfile.AirGround.Defense * finalModifier));
+                tempProfile.AirGround.SetAttack(Mathf.CeilToInt(activeProfile.AirGround.Attack * finalModifier));
+                tempProfile.AirGround.SetDefense(Mathf.CeilToInt(activeProfile.AirGround.Defense * finalModifier));
 
-                return combatProfile;
+                // Copy other relevant properties that might be needed for combat calculations
+                tempProfile.SetPrimaryRange(activeProfile.PrimaryRange);
+                tempProfile.SetIndirectRange(activeProfile.IndirectRange);
+                tempProfile.SetSpottingRange(activeProfile.SpottingRange);
+                tempProfile.SetMovementModifier(activeProfile.MovementModifier);
 
+                return tempProfile;
             }
             catch (Exception e)
             {
                 AppService.HandleException(CLASS_NAME, "GetCurrentCombatStrength", e);
-                return null; // Return null if an error occurs
+                return null;
             }
         }
 
@@ -727,7 +497,7 @@ namespace HammerAndSickle.Models
         /// <returns>True if the unit is destroyed</returns>
         public bool IsDestroyed()
         {
-            return HitPoints.Current <= 0f;
+            return HitPoints.Current <= 1f;
         }
 
         /// <summary>
@@ -2197,49 +1967,6 @@ namespace HammerAndSickle.Models
             };
         }
 
-        /// <summary>
-        /// Used to re-establish the parent relationship of the FacilityManager.
-        /// </summary>
-        private void ReestablishFacilityManagerParent()
-        {
-            try
-            {
-                if (FacilityManager == null) return;
-
-                if (!IsBase)
-                {
-                    // For non-base units, just set the parent directly
-                    FacilityManager.SetParent(this);
-                    return;
-                }
-
-                // For base units, re-establish the parent relationship based on the unit classification
-                switch (Classification)
-                {
-                    case UnitClassification.HQ:
-                        FacilityManager.SetupHQ(this);
-                        break;
-                    case UnitClassification.DEPOT:
-                        // We need to preserve the original depot settings
-                        var category = FacilityManager.DepotCategory;
-                        var size = FacilityManager.DepotSize;
-                        FacilityManager.SetupSupplyDepot(this, category, size);
-                        break;
-                    case UnitClassification.AIRB:
-                        FacilityManager.SetupAirbase(this);
-                        break;
-                    default:
-                        // For other classifications, just set the parent
-                        FacilityManager.SetParent(this);
-                        break;
-                }
-            }
-            catch (Exception e)
-            {
-                AppService.HandleException(CLASS_NAME, "ReestablishFacilityManagerParent", e);
-            }
-        }
-
         #endregion // Generic Interface Helper Methods
 
 
@@ -2610,17 +2337,17 @@ namespace HammerAndSickle.Models
             try
             {
                 // Validate BEFORE making any changes
-                if (DeployedProfile == null)
+                if (GetDeployedProfile() == null)
                     throw new InvalidOperationException("Cannot update state: DeployedProfile is null");
 
-                if (newState == CombatState.Mobile && IsMounted && MountedProfile == null)
+                if (newState == CombatState.Mobile && IsMounted && GetMountedProfile() == null)
                     throw new InvalidOperationException("Cannot update state: Unit is mounted but MountedProfile is null");
 
                 // Handle transition TO Mobile state
                 if (newState == CombatState.Mobile)
                 {
                     // Check for a mounted profile first
-                    if (MountedProfile != null)
+                    if (GetMountedProfile() != null)
                     {
                         // Unit can physically mount - set mounted state
                         if (!IsMounted) IsMounted = true;
@@ -2651,7 +2378,7 @@ namespace HammerAndSickle.Models
                         IsMounted = false;
                     }
                     // If unit had movement bonus (wasn't mounted but was Mobile), remove the bonus
-                    else if (MountedProfile == null)
+                    else if (GetMountedProfile() == null)
                     {
                         // Remove the movement bonus while preserving consumed movement points
                         float movementBonus = CUConstants.MOBILE_MOVEMENT_BONUS;
@@ -2690,11 +2417,13 @@ namespace HammerAndSickle.Models
                     this.Role,
                     this.Side,
                     this.Nationality,
-                    this.DeployedProfile,      // Shared reference
-                    this.MountedProfile,       // Shared reference  
-                    this.IntelProfileType,     // Static enum value - no reference resolution needed
+                    this.DeployedProfileID,      // Direct enum value copy
+                    this.MountedProfileID,       // Direct enum value copy
+                    this.IntelProfileType,       // Static enum value - no reference resolution needed
                     this.IsTransportable,
-                    this.IsBase
+                    this.IsBase,
+                    this.DepotCategory,          // Copy depot category for base units
+                    this.DepotSize               // Copy depot size for base units
                 );
 
                 // Deep copy all StatsMaxCurrent objects by reconstructing them
@@ -2719,46 +2448,11 @@ namespace HammerAndSickle.Models
                 // Templates should never have leaders assigned
                 // Leaders must be assigned manually after cloning
 
-                // Clone FacilityManager for base units
-                if (this.FacilityManager != null)
+                // Clone facility data for base units
+                if (this.IsBase)
                 {
-                    var clonedFacilityManager = this.FacilityManager.Clone();
-
-                    // Re-establish the parent relationship for the cloned facility
-                    if (this.IsBase)
-                    {
-                        switch (this.Classification)
-                        {
-                            case UnitClassification.HQ:
-                                clonedFacilityManager.SetupHQ(clone);
-                                break;
-                            case UnitClassification.DEPOT:
-                                clonedFacilityManager.SetupSupplyDepot(clone, this.FacilityManager.DepotCategory, this.FacilityManager.DepotSize);
-                                break;
-                            case UnitClassification.AIRB:
-                                clonedFacilityManager.SetupAirbase(clone);
-                                // Air unit attachments are never cloned - templates should be empty
-                                break;
-                            default:
-                                clonedFacilityManager.SetParent(clone);
-                                break;
-                        }
-                    }
-                    else
-                    {
-                        clonedFacilityManager.SetParent(clone);
-                    }
-
-                    clone.FacilityManager = clonedFacilityManager;
+                    CloneFacilityData(clone);
                 }
-
-                // Copy unresolved reference fields using reflection (should be empty in normal cloning scenarios)
-                var cloneType = typeof(CombatUnit);
-                cloneType.GetField("unresolvedDeployedProfileID", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance)
-                    ?.SetValue(clone, this.unresolvedDeployedProfileID);
-                cloneType.GetField("unresolvedMountedProfileID", System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance)
-                    ?.SetValue(clone, this.unresolvedMountedProfileID);
-                // Note: No need to copy unresolvedUnitProfileID anymore since IntelProfileType is a direct enum value
 
                 return clone;
             }
@@ -2773,6 +2467,103 @@ namespace HammerAndSickle.Models
 
 
         #region ISerializable Implementation
+
+        /// <summary>
+        /// Deserialization constructor for loading CombatUnit from saved data.
+        /// </summary>
+        /// <param name="info">Serialization info containing saved data</param>
+        /// <param name="context">Streaming context for deserialization</param>
+        protected CombatUnit(SerializationInfo info, StreamingContext context)
+        {
+            try
+            {
+                // Load basic properties
+                UnitName = info.GetString(nameof(UnitName));
+                UnitID = info.GetString(nameof(UnitID));
+                UnitType = (UnitType)info.GetValue(nameof(UnitType), typeof(UnitType));
+                Classification = (UnitClassification)info.GetValue(nameof(Classification), typeof(UnitClassification));
+                Role = (UnitRole)info.GetValue(nameof(Role), typeof(UnitRole));
+                Side = (Side)info.GetValue(nameof(Side), typeof(Side));
+                Nationality = (Nationality)info.GetValue(nameof(Nationality), typeof(Nationality));
+                IsTransportable = info.GetBoolean(nameof(IsTransportable));
+                IsBase = info.GetBoolean(nameof(IsBase));
+                IsLeaderAssigned = info.GetBoolean(nameof(IsLeaderAssigned));
+                SpottedLevel = (SpottedLevel)info.GetValue(nameof(SpottedLevel), typeof(SpottedLevel));
+
+                // Load IntelProfileType directly as enum value
+                IntelProfileType = (IntelProfileTypes)info.GetValue(nameof(IntelProfileType), typeof(IntelProfileTypes));
+
+                // Load profile IDs directly as enum values (no reference resolution needed)
+                DeployedProfileID = (WeaponSystems)info.GetValue(nameof(DeployedProfileID), typeof(WeaponSystems));
+                MountedProfileID = (WeaponSystems)info.GetValue(nameof(MountedProfileID), typeof(WeaponSystems));
+
+                // Store leader ID for later resolution
+                unresolvedLeaderID = info.GetString("LeaderID");
+
+                // Deserialize owned StatsMaxCurrent objects
+                HitPoints = new StatsMaxCurrent(
+                    info.GetSingle("HitPoints_Max"),
+                    info.GetSingle("HitPoints_Current")
+                );
+
+                DaysSupply = new StatsMaxCurrent(
+                    info.GetSingle("DaysSupply_Max"),
+                    info.GetSingle("DaysSupply_Current")
+                );
+
+                MovementPoints = new StatsMaxCurrent(
+                    info.GetSingle("MovementPoints_Max"),
+                    info.GetSingle("MovementPoints_Current")
+                );
+
+                MoveActions = new StatsMaxCurrent(
+                    info.GetSingle("MoveActions_Max"),
+                    info.GetSingle("MoveActions_Current")
+                );
+
+                CombatActions = new StatsMaxCurrent(
+                    info.GetSingle("CombatActions_Max"),
+                    info.GetSingle("CombatActions_Current")
+                );
+
+                DeploymentActions = new StatsMaxCurrent(
+                    info.GetSingle("DeploymentActions_Max"),
+                    info.GetSingle("DeploymentActions_Current")
+                );
+
+                OpportunityActions = new StatsMaxCurrent(
+                    info.GetSingle("OpportunityActions_Max"),
+                    info.GetSingle("OpportunityActions_Current")
+                );
+
+                IntelActions = new StatsMaxCurrent(
+                    info.GetSingle("IntelActions_Max"),
+                    info.GetSingle("IntelActions_Current")
+                );
+
+                // Load simple properties
+                ExperiencePoints = info.GetInt32(nameof(ExperiencePoints));
+                ExperienceLevel = (ExperienceLevel)info.GetValue(nameof(ExperienceLevel), typeof(ExperienceLevel));
+                EfficiencyLevel = (EfficiencyLevel)info.GetValue(nameof(EfficiencyLevel), typeof(EfficiencyLevel));
+                IsMounted = info.GetBoolean(nameof(IsMounted));
+                CombatState = (CombatState)info.GetValue(nameof(CombatState), typeof(CombatState));
+                MapPos = (Coordinate2D)info.GetValue(nameof(MapPos), typeof(Coordinate2D));
+
+                // Deserialize facility data if this is a base unit
+                if (IsBase)
+                {
+                    DeserializeFacilityData(info, context);
+                }
+
+                // Leave only leader reference null - profiles are now direct lookups
+                CommandingOfficer = null;
+            }
+            catch (Exception e)
+            {
+                AppService.HandleException(CLASS_NAME, nameof(CombatUnit), e);
+                throw;
+            }
+        }
 
         /// <summary>
         /// Serializes CombatUnit data for saving to file.
@@ -2799,9 +2590,11 @@ namespace HammerAndSickle.Models
                 // Serialize IntelProfileType directly as enum value
                 info.AddValue(nameof(IntelProfileType), IntelProfileType);
 
-                // Serialize profile references as IDs/names (not the objects themselves)
-                info.AddValue("DeployedProfileID", DeployedProfile?.WeaponSystemID.ToString() ?? "");
-                info.AddValue("MountedProfileID", MountedProfile?.WeaponSystemID.ToString() ?? "");
+                // Serialize profile IDs directly as enum values (no reference resolution needed)
+                info.AddValue(nameof(DeployedProfileID), DeployedProfileID);
+                info.AddValue(nameof(MountedProfileID), MountedProfileID);
+
+                // Serialize leader reference as ID (still needs resolution)
                 info.AddValue("LeaderID", CommandingOfficer?.LeaderID ?? "");
 
                 // Serialize owned StatsMaxCurrent objects as Max/Current pairs
@@ -2830,14 +2623,10 @@ namespace HammerAndSickle.Models
                 info.AddValue(nameof(CombatState), CombatState);
                 info.AddValue(nameof(MapPos), MapPos);
 
-                // Serialize FacilityManager
-                bool hasFacilityManager = FacilityManager != null;
-                info.AddValue("HasFacilityManager", hasFacilityManager);
-
-                if (hasFacilityManager)
+                // Serialize facility data if this is a base unit
+                if (IsBase)
                 {
-                    // Let FacilityManager serialize itself with FM_ prefix to avoid naming conflicts
-                    FacilityManager.GetObjectData(info, context);
+                    SerializeFacilityData(info, context);
                 }
             }
             catch (Exception e)
@@ -2853,13 +2642,10 @@ namespace HammerAndSickle.Models
         /// <returns>True if any resolution methods need to be called</returns>
         public bool HasUnresolvedReferences()
         {
-            bool hasUnresolved = !string.IsNullOrEmpty(unresolvedDeployedProfileID) ||
-                !string.IsNullOrEmpty(unresolvedMountedProfileID) ||
-                !string.IsNullOrEmpty(unresolvedLeaderID) ||
-                unresolvedFacilityManagerData;
+            bool hasUnresolved = !string.IsNullOrEmpty(unresolvedLeaderID);
 
-            // Also check if FacilityManager has unresolved references
-            if (FacilityManager != null && FacilityManager.HasUnresolvedReferences())
+            // Check if facility has unresolved references
+            if (IsBase && HasUnresolvedFacilityReferences())
             {
                 hasUnresolved = true;
             }
@@ -2880,22 +2666,13 @@ namespace HammerAndSickle.Models
         {
             var unresolvedIDs = new List<string>();
 
-            if (!string.IsNullOrEmpty(unresolvedDeployedProfileID))
-                unresolvedIDs.Add($"DeployedProfile:{unresolvedDeployedProfileID}");
-
-            if (!string.IsNullOrEmpty(unresolvedMountedProfileID))
-                unresolvedIDs.Add($"MountedProfile:{unresolvedMountedProfileID}");
-
             if (!string.IsNullOrEmpty(unresolvedLeaderID))
                 unresolvedIDs.Add($"Leader:{unresolvedLeaderID}");
 
-            if (unresolvedFacilityManagerData)
-                unresolvedIDs.Add("FacilityManager:SelfReferencedData");
-
-            // Include FacilityManager's unresolved references
-            if (FacilityManager != null && FacilityManager.HasUnresolvedReferences())
+            // Include facility's unresolved references
+            if (IsBase)
             {
-                var facilityRefs = FacilityManager.GetUnresolvedReferenceIDs();
+                var facilityRefs = GetUnresolvedFacilityReferenceIDs();
                 unresolvedIDs.AddRange(facilityRefs);
             }
 
@@ -2911,54 +2688,7 @@ namespace HammerAndSickle.Models
         {
             try
             {
-                // Resolve WeaponSystemProfile references
-                if (!string.IsNullOrEmpty(unresolvedDeployedProfileID))
-                {
-                    if (Enum.TryParse<WeaponSystems>(unresolvedDeployedProfileID, out WeaponSystems deployedWeapon))
-                    {
-                        var deployedProfile = manager.GetWeaponProfile(deployedWeapon, Nationality);
-                        if (deployedProfile != null)
-                        {
-                            DeployedProfile = deployedProfile;
-                            unresolvedDeployedProfileID = "";
-                        }
-                        else
-                        {
-                            AppService.HandleException(CLASS_NAME, "ResolveReferences",
-                                new KeyNotFoundException($"Deployed profile {deployedWeapon}_{Nationality} not found"));
-                        }
-                    }
-                    else
-                    {
-                        AppService.HandleException(CLASS_NAME, "ResolveReferences",
-                            new ArgumentException($"Invalid weapon system ID: {unresolvedDeployedProfileID}"));
-                    }
-                }
-
-                if (!string.IsNullOrEmpty(unresolvedMountedProfileID))
-                {
-                    if (Enum.TryParse<WeaponSystems>(unresolvedMountedProfileID, out WeaponSystems mountedWeapon))
-                    {
-                        var mountedProfile = manager.GetWeaponProfile(mountedWeapon, Nationality);
-                        if (mountedProfile != null)
-                        {
-                            MountedProfile = mountedProfile;
-                            unresolvedMountedProfileID = "";
-                        }
-                        else
-                        {
-                            AppService.HandleException(CLASS_NAME, "ResolveReferences",
-                                new KeyNotFoundException($"Mounted profile {mountedWeapon}_{Nationality} not found"));
-                        }
-                    }
-                    else
-                    {
-                        AppService.HandleException(CLASS_NAME, "ResolveReferences",
-                            new ArgumentException($"Invalid weapon system ID: {unresolvedMountedProfileID}"));
-                    }
-                }
-
-                // No IntelProfile resolution needed - it's now a static lookup by enum
+                // No WeaponSystemProfile resolution needed - they're direct database lookups now
 
                 // Resolve Leader reference
                 if (!string.IsNullOrEmpty(unresolvedLeaderID))
@@ -2996,17 +2726,10 @@ namespace HammerAndSickle.Models
                     IsLeaderAssigned = false; // Fix the inconsistency
                 }
 
-                // Re-establish FacilityManager parent relationship after both objects are loaded
-                if (unresolvedFacilityManagerData && FacilityManager != null)
+                // Resolve facility references if this is a base unit
+                if (IsBase)
                 {
-                    ReestablishFacilityManagerParent();
-                    unresolvedFacilityManagerData = false;
-                }
-
-                // Resolve FacilityManager's references
-                if (FacilityManager != null && FacilityManager.HasUnresolvedReferences())
-                {
-                    FacilityManager.ResolveReferences(manager);
+                    ResolveFacilityReferences(manager);
                 }
             }
             catch (Exception e)

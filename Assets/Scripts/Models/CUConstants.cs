@@ -69,6 +69,11 @@ namespace HammerAndSickle.Models
         public const float CRITICAL_SUPPLY_THRESHOLD = 0.5f;            // Threshold for critical supply warning
         public const float COMBAT_STATE_SUPPLY_TRANSITION_COST = 0.25f; // Supply cost for state transitions.
 
+        // Intel error margins
+        public const float MIN_INTEL_ERROR      = 4f;   // Minimum intel error margin
+        public const float MODERATE_INTEL_ERROR = 8f;   // Maximum intel error margin
+        public const float MAX_INTEL_ERROR      = 12f;  // Maximum intel error margin
+
         #endregion // CombatUnit Constants
 
 
