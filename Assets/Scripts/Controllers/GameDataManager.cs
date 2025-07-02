@@ -46,8 +46,6 @@ namespace HammerAndSickle.Models
         public string GameVersion { get; set; }
         public int CombatUnitCount { get; set; }
         public int LeaderCount { get; set; }
-        public int WeaponProfileCount { get; set; }
-        public int FacilityCount { get; set; }
         public string Checksum { get; set; }
 
         public GameDataHeader()
@@ -64,18 +62,6 @@ namespace HammerAndSickle.Models
             GameVersion = info.GetString(nameof(GameVersion));
             CombatUnitCount = info.GetInt32(nameof(CombatUnitCount));
             LeaderCount = info.GetInt32(nameof(LeaderCount));
-            WeaponProfileCount = info.GetInt32(nameof(WeaponProfileCount));
-
-            // Handle backward compatibility
-            try
-            {
-                FacilityCount = info.GetInt32(nameof(FacilityCount));
-            }
-            catch (SerializationException)
-            {
-                FacilityCount = 0; // Default for older save files
-            }
-
             Checksum = info.GetString(nameof(Checksum));
         }
 
@@ -86,13 +72,29 @@ namespace HammerAndSickle.Models
             info.AddValue(nameof(GameVersion), GameVersion);
             info.AddValue(nameof(CombatUnitCount), CombatUnitCount);
             info.AddValue(nameof(LeaderCount), LeaderCount);
-            info.AddValue(nameof(WeaponProfileCount), WeaponProfileCount);
-            info.AddValue(nameof(FacilityCount), FacilityCount);
             info.AddValue(nameof(Checksum), Checksum);
         }
     }
 
-    
+    /// <summary>
+    /// Centralized data management system for Hammer & Sickle game objects.
+    /// Handles registration, retrieval, serialization, and reference resolution for all persistent game data.
+    /// Uses singleton pattern with thread-safe operations for global access across the game systems.
+    /// 
+    /// Key Responsibilities:
+    /// - Object registration and lookup for CombatUnit and Leader instances
+    /// - Binary serialization with backup file management and version control
+    /// - Two-phase reference resolution for complex object relationships
+    /// - Cross-object relationship validation (leader assignments, etc.)
+    /// - Scenario loading/saving with proper path management
+    /// - Dirty state tracking for efficient save operations
+    /// 
+    /// Architecture Notes:
+    /// - WeaponSystemProfile objects are NOT managed here - they use static WeaponSystemsDatabase
+    /// - Facility functionality is integrated into CombatUnit, no separate tracking needed
+    /// - Each object validates its own internal consistency via ValidateInternalConsistency()
+    /// - GameDataManager focuses on inter-object relationship validation
+    /// </summary>
     public class GameDataManager : IDisposable
     {
         #region Constants
@@ -102,7 +104,7 @@ namespace HammerAndSickle.Models
         private const string SAVE_FILE_EXTENSION = ".sce";
         private const string BACKUP_FILE_EXTENSION = ".bak";
 
-        #endregion // Constants
+        #endregion
 
 
         #region Singleton
@@ -129,7 +131,7 @@ namespace HammerAndSickle.Models
             }
         }
 
-        #endregion // Singleton
+        #endregion
 
 
         #region Fields
@@ -137,25 +139,24 @@ namespace HammerAndSickle.Models
         // Thread synchronization
         private readonly ReaderWriterLockSlim _dataLock = new(LockRecursionPolicy.SupportsRecursion);
 
-        // Object registries
+        // Object registries - only persistent objects that need cross-object reference resolution
         private readonly Dictionary<string, CombatUnit> _combatUnits = new();
         private readonly Dictionary<string, Leader> _leaders = new();
-        private readonly Dictionary<string, WeaponSystemProfile> _weaponProfiles = new();
+
+        // Reference resolution tracking
+        private readonly List<IResolvableReferences> _unresolvedObjects = new();
 
         // State tracking
         private readonly HashSet<string> _dirtyObjects = new();
-        private readonly List<IResolvableReferences> _unresolvedObjects = new();
-
-        // Lifecycle management
         private bool _isDisposed = false;
 
-        #endregion // Fields
+        #endregion
 
 
         #region Properties
 
         /// <summary>
-        /// Gets the total number of registered objects across all types.
+        /// Gets the total number of registered objects.
         /// </summary>
         public int TotalObjectCount
         {
@@ -164,7 +165,7 @@ namespace HammerAndSickle.Models
                 _dataLock.EnterReadLock();
                 try
                 {
-                    return _combatUnits.Count + _leaders.Count + _weaponProfiles.Count;
+                    return _combatUnits.Count + _leaders.Count;
                 }
                 finally
                 {
@@ -193,7 +194,7 @@ namespace HammerAndSickle.Models
         }
 
         /// <summary>
-        /// Gets whether there are unsaved changes to any registered objects.
+        /// Gets whether there are unsaved changes.
         /// </summary>
         public bool HasUnsavedChanges
         {
@@ -212,9 +213,9 @@ namespace HammerAndSickle.Models
         }
 
         /// <summary>
-        /// Gets the count of each object type for diagnostic purposes.
+        /// Gets detailed object counts for diagnostics.
         /// </summary>
-        public (int CombatUnits, int Leaders, int WeaponProfiles, int Facilities) ObjectCounts
+        public (int CombatUnits, int Leaders, int Facilities) ObjectCounts
         {
             get
             {
@@ -222,7 +223,7 @@ namespace HammerAndSickle.Models
                 try
                 {
                     int facilityCount = _combatUnits.Values.Count(unit => unit.IsBase);
-                    return (CombatUnits: _combatUnits.Count, Leaders: _leaders.Count, WeaponProfiles: _weaponProfiles.Count, Facilities: facilityCount);
+                    return (CombatUnits: _combatUnits.Count, Leaders: _leaders.Count, Facilities: facilityCount);
                 }
                 finally
                 {
@@ -231,7 +232,7 @@ namespace HammerAndSickle.Models
             }
         }
 
-        #endregion // Properties
+        #endregion
 
 
         #region Constructor
@@ -239,12 +240,12 @@ namespace HammerAndSickle.Models
         /// <summary>
         /// Private constructor for singleton pattern.
         /// </summary>
-        public GameDataManager()
+        private GameDataManager()
         {
             // Initialize empty state
         }
 
-        #endregion // Constructor
+        #endregion
 
 
         #region Registration Methods
@@ -275,20 +276,12 @@ namespace HammerAndSickle.Models
                 }
 
                 _combatUnits[unit.UnitID] = unit;
-                MarkDirty(unit.UnitID);
+                MarkDirtyInternal(unit.UnitID);
 
                 // Track for reference resolution if needed
                 if (unit is IResolvableReferences resolvable && resolvable.HasUnresolvedReferences())
                 {
                     _unresolvedObjects.Add(resolvable);
-                }
-
-                // Also track FacilityManager if it has unresolved references
-                if (unit.FacilityManager != null &&
-                    unit.FacilityManager is IResolvableReferences facilityResolvable &&
-                    facilityResolvable.HasUnresolvedReferences())
-                {
-                    _unresolvedObjects.Add(facilityResolvable);
                 }
 
                 return true;
@@ -330,7 +323,7 @@ namespace HammerAndSickle.Models
                 }
 
                 _leaders[leader.LeaderID] = leader;
-                MarkDirty(leader.LeaderID);
+                MarkDirtyInternal(leader.LeaderID);
 
                 // Track for reference resolution if needed
                 if (leader is IResolvableReferences resolvable && resolvable.HasUnresolvedReferences())
@@ -351,17 +344,20 @@ namespace HammerAndSickle.Models
             }
         }
 
+        #endregion
+
+
+        #region Unregistration Methods
+
         /// <summary>
-        /// Registers a weapon system profile with the data manager.
+        /// Unregisters a combat unit from the data manager.
         /// </summary>
-        /// <param name="profile">The weapon system profile to register</param>
-        /// <returns>True if registration was successful</returns>
-        public bool RegisterWeaponProfile(WeaponSystemProfile profile)
+        /// <param name="unitId">The unit ID to unregister</param>
+        /// <returns>True if unregistration was successful</returns>
+        public bool UnregisterCombatUnit(string unitId)
         {
-            if (profile == null)
+            if (string.IsNullOrEmpty(unitId))
             {
-                AppService.HandleException(CLASS_NAME, nameof(RegisterWeaponProfile),
-                    new ArgumentNullException(nameof(profile)));
                 return false;
             }
 
@@ -369,23 +365,21 @@ namespace HammerAndSickle.Models
             {
                 _dataLock.EnterWriteLock();
 
-                string profileId = $"{profile.WeaponSystemID}_{profile.Nationality}";
-                if (_weaponProfiles.ContainsKey(profileId))
+                if (_combatUnits.Remove(unitId))
                 {
-                    // Allow overwriting weapon profiles as they're shared templates
-                    _weaponProfiles[profileId] = profile;
-                }
-                else
-                {
-                    _weaponProfiles[profileId] = profile;
+                    _dirtyObjects.Remove(unitId);
+
+                    // Remove from unresolved objects list if present
+                    _unresolvedObjects.RemoveAll(obj => obj is CombatUnit unit && unit.UnitID == unitId);
+
+                    return true;
                 }
 
-                MarkDirty(profileId);
-                return true;
+                return false;
             }
             catch (Exception e)
             {
-                AppService.HandleException(CLASS_NAME, nameof(RegisterWeaponProfile), e);
+                AppService.HandleException(CLASS_NAME, nameof(UnregisterCombatUnit), e);
                 return false;
             }
             finally
@@ -394,7 +388,46 @@ namespace HammerAndSickle.Models
             }
         }
 
-        #endregion // Registration Methods
+        /// <summary>
+        /// Unregisters a leader from the data manager.
+        /// </summary>
+        /// <param name="leaderId">The leader ID to unregister</param>
+        /// <returns>True if unregistration was successful</returns>
+        public bool UnregisterLeader(string leaderId)
+        {
+            if (string.IsNullOrEmpty(leaderId))
+            {
+                return false;
+            }
+
+            try
+            {
+                _dataLock.EnterWriteLock();
+
+                if (_leaders.Remove(leaderId))
+                {
+                    _dirtyObjects.Remove(leaderId);
+
+                    // Remove from unresolved objects list if present
+                    _unresolvedObjects.RemoveAll(obj => obj is Leader leader && leader.LeaderID == leaderId);
+
+                    return true;
+                }
+
+                return false;
+            }
+            catch (Exception e)
+            {
+                AppService.HandleException(CLASS_NAME, nameof(UnregisterLeader), e);
+                return false;
+            }
+            finally
+            {
+                _dataLock.ExitWriteLock();
+            }
+        }
+
+        #endregion
 
 
         #region Retrieval Methods
@@ -450,31 +483,6 @@ namespace HammerAndSickle.Models
         }
 
         /// <summary>
-        /// Gets a weapon system profile by weapon system and nationality.
-        /// </summary>
-        /// <param name="weaponSystem">The weapon system type</param>
-        /// <param name="nationality">The nationality</param>
-        /// <returns>The weapon profile if found, null otherwise</returns>
-        public WeaponSystemProfile GetWeaponProfile(WeaponSystems weaponSystem, Nationality nationality)
-        {
-            try
-            {
-                _dataLock.EnterReadLock();
-                string profileId = $"{weaponSystem}_{nationality}";
-                return _weaponProfiles.TryGetValue(profileId, out WeaponSystemProfile profile) ? profile : null;
-            }
-            catch (Exception e)
-            {
-                AppService.HandleException(CLASS_NAME, nameof(GetWeaponProfile), e);
-                return null;
-            }
-            finally
-            {
-                _dataLock.ExitReadLock();
-            }
-        }
-
-        /// <summary>
         /// Gets all registered combat units.
         /// </summary>
         /// <returns>Read-only collection of all combat units</returns>
@@ -518,14 +526,182 @@ namespace HammerAndSickle.Models
             }
         }
 
-        #endregion // Retrieval Methods
+        #endregion
+
+
+        #region Query Methods
+
+        /// <summary>
+        /// Gets all combat units of a specific classification.
+        /// </summary>
+        /// <param name="classification">The unit classification to filter by</param>
+        /// <returns>Read-only collection of matching units</returns>
+        public IReadOnlyCollection<CombatUnit> GetCombatUnitsByClassification(UnitClassification classification)
+        {
+            try
+            {
+                _dataLock.EnterReadLock();
+                return _combatUnits.Values.Where(unit => unit.Classification == classification).ToList();
+            }
+            catch (Exception e)
+            {
+                AppService.HandleException(CLASS_NAME, nameof(GetCombatUnitsByClassification), e);
+                return new List<CombatUnit>();
+            }
+            finally
+            {
+                _dataLock.ExitReadLock();
+            }
+        }
+
+        /// <summary>
+        /// Gets all combat units controlled by a specific side.
+        /// </summary>
+        /// <param name="side">The side to filter by</param>
+        /// <returns>Read-only collection of matching units</returns>
+        public IReadOnlyCollection<CombatUnit> GetCombatUnitsBySide(Side side)
+        {
+            try
+            {
+                _dataLock.EnterReadLock();
+                return _combatUnits.Values.Where(unit => unit.Side == side).ToList();
+            }
+            catch (Exception e)
+            {
+                AppService.HandleException(CLASS_NAME, nameof(GetCombatUnitsBySide), e);
+                return new List<CombatUnit>();
+            }
+            finally
+            {
+                _dataLock.ExitReadLock();
+            }
+        }
+
+        /// <summary>
+        /// Gets all base units (facilities).
+        /// </summary>
+        /// <returns>Read-only collection of base units</returns>
+        public IReadOnlyCollection<CombatUnit> GetAllFacilities()
+        {
+            try
+            {
+                _dataLock.EnterReadLock();
+                return _combatUnits.Values.Where(unit => unit.IsBase).ToList();
+            }
+            catch (Exception e)
+            {
+                AppService.HandleException(CLASS_NAME, nameof(GetAllFacilities), e);
+                return new List<CombatUnit>();
+            }
+            finally
+            {
+                _dataLock.ExitReadLock();
+            }
+        }
+
+        /// <summary>
+        /// Gets all leaders that are currently unassigned.
+        /// </summary>
+        /// <returns>Read-only collection of unassigned leaders</returns>
+        public IReadOnlyCollection<Leader> GetUnassignedLeaders()
+        {
+            try
+            {
+                _dataLock.EnterReadLock();
+                return _leaders.Values.Where(leader => !leader.IsAssigned).ToList();
+            }
+            catch (Exception e)
+            {
+                AppService.HandleException(CLASS_NAME, nameof(GetUnassignedLeaders), e);
+                return new List<Leader>();
+            }
+            finally
+            {
+                _dataLock.ExitReadLock();
+            }
+        }
+
+        /// <summary>
+        /// Gets all leaders of a specific command grade.
+        /// </summary>
+        /// <param name="grade">The command grade to filter by</param>
+        /// <returns>Read-only collection of matching leaders</returns>
+        public IReadOnlyCollection<Leader> GetLeadersByGrade(CommandGrade grade)
+        {
+            try
+            {
+                _dataLock.EnterReadLock();
+                return _leaders.Values.Where(leader => leader.CommandGrade == grade).ToList();
+            }
+            catch (Exception e)
+            {
+                AppService.HandleException(CLASS_NAME, nameof(GetLeadersByGrade), e);
+                return new List<Leader>();
+            }
+            finally
+            {
+                _dataLock.ExitReadLock();
+            }
+        }
+
+        /// <summary>
+        /// Checks if a combat unit with the specified ID exists.
+        /// </summary>
+        /// <param name="unitId">The unit ID to check</param>
+        /// <returns>True if the unit exists</returns>
+        public bool HasCombatUnit(string unitId)
+        {
+            if (string.IsNullOrEmpty(unitId)) return false;
+
+            try
+            {
+                _dataLock.EnterReadLock();
+                return _combatUnits.ContainsKey(unitId);
+            }
+            catch (Exception e)
+            {
+                AppService.HandleException(CLASS_NAME, nameof(HasCombatUnit), e);
+                return false;
+            }
+            finally
+            {
+                _dataLock.ExitReadLock();
+            }
+        }
+
+        /// <summary>
+        /// Checks if a leader with the specified ID exists.
+        /// </summary>
+        /// <param name="leaderId">The leader ID to check</param>
+        /// <returns>True if the leader exists</returns>
+        public bool HasLeader(string leaderId)
+        {
+            if (string.IsNullOrEmpty(leaderId)) return false;
+
+            try
+            {
+                _dataLock.EnterReadLock();
+                return _leaders.ContainsKey(leaderId);
+            }
+            catch (Exception e)
+            {
+                AppService.HandleException(CLASS_NAME, nameof(HasLeader), e);
+                return false;
+            }
+            finally
+            {
+                _dataLock.ExitReadLock();
+            }
+        }
+
+        #endregion
 
 
         #region Reference Resolution
 
         /// <summary>
         /// Resolves all pending object references after deserialization.
-        /// This method implements the second phase of the two-phase loading pattern.
+        /// Implements the second phase of the two-phase loading pattern.
         /// </summary>
         /// <returns>Number of objects that had references resolved</returns>
         public int ResolveAllReferences()
@@ -583,8 +759,8 @@ namespace HammerAndSickle.Models
         }
 
         /// <summary>
-        /// Validates data integrity by checking for missing references and other issues.
-        /// Enhanced to validate facility relationships and nested references.
+        /// Validates data integrity by checking cross-object relationships and calling each object's internal validation.
+        /// Each object validates its own internal consistency via ValidateInternalConsistency().
         /// </summary>
         /// <returns>List of validation errors found</returns>
         public List<string> ValidateDataIntegrity()
@@ -595,69 +771,11 @@ namespace HammerAndSickle.Models
             {
                 _dataLock.EnterReadLock();
 
-                // Validate facility manager parent relationships
-                foreach (var unit in _combatUnits.Values)
-                {
-                    if (unit.IsBase && unit.FacilityManager != null)
-                    {
-                        // Validate that base units have proper facility types
-                        switch (unit.Classification)
-                        {
-                            case UnitClassification.HQ:
-                                if (unit.FacilityManager.FacilityType != FacilityType.HQ)
-                                    errors.Add($"HQ unit {unit.UnitName} has incorrect facility type: {unit.FacilityManager.FacilityType}");
-                                break;
-                            case UnitClassification.DEPOT:
-                                if (unit.FacilityManager.FacilityType != FacilityType.SupplyDepot)
-                                    errors.Add($"Depot unit {unit.UnitName} has incorrect facility type: {unit.FacilityManager.FacilityType}");
-                                break;
-                            case UnitClassification.AIRB:
-                                if (unit.FacilityManager.FacilityType != FacilityType.Airbase)
-                                    errors.Add($"Airbase unit {unit.UnitName} has incorrect facility type: {unit.FacilityManager.FacilityType}");
-                                break;
-                        }
-
-                        // Validate airbase attachments more thoroughly
-                        if (unit.FacilityManager.FacilityType == FacilityType.Airbase)
-                        {
-                            foreach (var attachedUnit in unit.FacilityManager.AirUnitsAttached)
-                            {
-                                if (!_combatUnits.ContainsKey(attachedUnit.UnitID))
-                                {
-                                    errors.Add($"Airbase {unit.UnitName} has attached unit {attachedUnit.UnitID} not in registry");
-                                }
-                                else
-                                {
-                                    var registeredUnit = _combatUnits[attachedUnit.UnitID];
-                                    if (registeredUnit != attachedUnit)
-                                    {
-                                        errors.Add($"Airbase {unit.UnitName} attached unit reference mismatch for {attachedUnit.UnitID}");
-                                    }
-                                    if (attachedUnit.UnitType != UnitType.AirUnit)
-                                    {
-                                        errors.Add($"Airbase {unit.UnitName} has non-air unit {attachedUnit.UnitName} attached");
-                                    }
-                                }
-                            }
-                        }
-                    }
-                    else if (unit.IsBase && unit.FacilityManager == null)
-                    {
-                        errors.Add($"Base unit {unit.UnitName} is marked as base but has null FacilityManager");
-                    }
-                    else if (!unit.IsBase && unit.FacilityManager != null &&
-                             unit.FacilityManager.FacilityType != FacilityType.HQ) // HQ can be on non-base units
-                    {
-                        errors.Add($"Non-base unit {unit.UnitName} has FacilityManager with type {unit.FacilityManager.FacilityType}");
-                    }
-                }
-
                 // Check for unresolved references
                 if (_unresolvedObjects.Count > 0)
                 {
                     errors.Add($"{_unresolvedObjects.Count} objects have unresolved references");
 
-                    // Log details about unresolved references
                     foreach (var obj in _unresolvedObjects)
                     {
                         var unresolvedIds = obj.GetUnresolvedReferenceIDs();
@@ -668,7 +786,14 @@ namespace HammerAndSickle.Models
                     }
                 }
 
-                // Check for orphaned leader assignments
+                // Validate each CombatUnit's internal consistency
+                foreach (var unit in _combatUnits.Values)
+                {
+                    var unitErrors = unit.ValidateInternalConsistency();
+                    errors.AddRange(unitErrors);
+                }
+
+                // Validate cross-object leader assignment relationships
                 foreach (var leader in _leaders.Values)
                 {
                     if (leader.IsAssigned && !string.IsNullOrEmpty(leader.UnitID))
@@ -689,64 +814,48 @@ namespace HammerAndSickle.Models
                     }
                 }
 
-                // Check for missing commanding officers
+                // Validate unit leader references point to actual leaders
                 foreach (var unit in _combatUnits.Values)
                 {
                     if (unit.CommandingOfficer != null)
                     {
-                        bool leaderExists = _leaders.Values.Any(l => l.LeaderID == unit.CommandingOfficer.LeaderID);
+                        bool leaderExists = _leaders.ContainsKey(unit.CommandingOfficer.LeaderID);
                         if (!leaderExists)
                         {
-                            errors.Add($"Unit {unit.UnitName} has commanding officer not in leader registry");
+                            errors.Add($"Unit {unit.UnitName} has commanding officer {unit.CommandingOfficer.LeaderID} not in leader registry");
                         }
                         else
                         {
                             // Verify bidirectional relationship
-                            var leader = unit.CommandingOfficer;
+                            var leader = _leaders[unit.CommandingOfficer.LeaderID];
                             if (!leader.IsAssigned || leader.UnitID != unit.UnitID)
                             {
                                 errors.Add($"Unit {unit.UnitName} references leader {leader.Name} but leader doesn't think it's assigned to this unit");
                             }
                         }
                     }
+                }
 
-                    // Validate facility relationships for base units
-                    if (unit.IsBase && unit.FacilityManager != null)
+                // Validate cross-object airbase attachment relationships
+                foreach (var unit in _combatUnits.Values)
+                {
+                    if (unit.IsBase && unit.FacilityType == FacilityType.Airbase)
                     {
-                        // Check facility manager consistency
-                        if (unit.FacilityManager.FacilityType == FacilityType.Airbase)
+                        foreach (var attachedUnit in unit.AirUnitsAttached)
                         {
-                            foreach (var attachedUnit in unit.FacilityManager.AirUnitsAttached)
+                            if (!_combatUnits.ContainsKey(attachedUnit.UnitID))
                             {
-                                if (!_combatUnits.ContainsKey(attachedUnit.UnitID))
+                                errors.Add($"Airbase {unit.UnitName} has attached unit {attachedUnit.UnitID} not in registry");
+                            }
+                            else
+                            {
+                                var registeredUnit = _combatUnits[attachedUnit.UnitID];
+                                if (registeredUnit != attachedUnit)
                                 {
-                                    errors.Add($"Airbase {unit.UnitName} has attached unit {attachedUnit.UnitID} not in registry");
-                                }
-                                else if (attachedUnit.UnitType != UnitType.AirUnit)
-                                {
-                                    errors.Add($"Airbase {unit.UnitName} has non-air unit {attachedUnit.UnitName} attached");
+                                    errors.Add($"Airbase {unit.UnitName} attached unit reference mismatch for {attachedUnit.UnitID}");
                                 }
                             }
                         }
-                    }
-
-                    // Check for inconsistent leader assignment flags
-                    if (unit.IsLeaderAssigned && unit.CommandingOfficer == null)
-                    {
-                        errors.Add($"Unit {unit.UnitName} has IsLeaderAssigned=true but no CommandingOfficer");
-                    }
-                    else if (!unit.IsLeaderAssigned && unit.CommandingOfficer != null)
-                    {
-                        errors.Add($"Unit {unit.UnitName} has CommandingOfficer but IsLeaderAssigned=false");
-                    }
-                }
-
-                // Validate profile references
-                foreach (var unit in _combatUnits.Values)
-                {
-                    if (unit.DeployedProfile == null)
-                    {
-                        errors.Add($"Unit {unit.UnitName} has null DeployedProfile");
                     }
                 }
 
@@ -764,7 +873,7 @@ namespace HammerAndSickle.Models
             return errors;
         }
 
-        #endregion // Reference Resolution
+        #endregion
 
 
         #region Serialization Operations
@@ -788,7 +897,7 @@ namespace HammerAndSickle.Models
             {
                 _dataLock.EnterReadLock();
 
-                // Ensure the file has the correct extension
+                // Ensure correct extension
                 if (!filePath.EndsWith(SAVE_FILE_EXTENSION))
                 {
                     filePath += SAVE_FILE_EXTENSION;
@@ -802,13 +911,10 @@ namespace HammerAndSickle.Models
                 }
 
                 // Create header with metadata
-                int facilityCount = _combatUnits.Values.Count(unit => unit.IsBase);
                 var header = new GameDataHeader
                 {
                     CombatUnitCount = _combatUnits.Count,
                     LeaderCount = _leaders.Count,
-                    WeaponProfileCount = _weaponProfiles.Count,
-                    FacilityCount = facilityCount,
                     Checksum = CalculateChecksum()
                 };
 
@@ -816,17 +922,15 @@ namespace HammerAndSickle.Models
                 var formatter = new BinaryFormatter();
                 using (var stream = new FileStream(filePath, FileMode.Create, FileAccess.Write))
                 {
-                    // Write header first
                     formatter.Serialize(stream, header);
-
-                    // Write object collections
                     formatter.Serialize(stream, _combatUnits);
                     formatter.Serialize(stream, _leaders);
-                    formatter.Serialize(stream, _weaponProfiles);
                 }
 
                 // Clear dirty flags after successful save
                 _dirtyObjects.Clear();
+
+                AppService.CaptureUiMessage($"Game state saved successfully. {_combatUnits.Count} units, {_leaders.Count} leaders.");
 
                 return true;
             }
@@ -849,8 +953,6 @@ namespace HammerAndSickle.Models
         /// <returns>True if load was successful</returns>
         public bool LoadGameState(string filePath)
         {
-            // TODO: Consider implementing partial recovery when object counts don't match the header, rather than just logging the issue.
-
             if (string.IsNullOrEmpty(filePath))
             {
                 AppService.HandleException(CLASS_NAME, nameof(LoadGameState),
@@ -860,7 +962,6 @@ namespace HammerAndSickle.Models
 
             try
             {
-                // Ensure the file has the correct extension
                 if (!filePath.EndsWith(SAVE_FILE_EXTENSION))
                 {
                     filePath += SAVE_FILE_EXTENSION;
@@ -895,7 +996,6 @@ namespace HammerAndSickle.Models
                     // Load object collections
                     var combatUnits = (Dictionary<string, CombatUnit>)formatter.Deserialize(stream);
                     var leaders = (Dictionary<string, Leader>)formatter.Deserialize(stream);
-                    var weaponProfiles = (Dictionary<string, WeaponSystemProfile>)formatter.Deserialize(stream);
 
                     // Transfer to internal collections and track resolvable objects
                     foreach (var kvp in combatUnits)
@@ -904,14 +1004,6 @@ namespace HammerAndSickle.Models
                         if (kvp.Value is IResolvableReferences resolvable && resolvable.HasUnresolvedReferences())
                         {
                             _unresolvedObjects.Add(resolvable);
-                        }
-
-                        // Also track FacilityManager if it has unresolved references
-                        if (kvp.Value.FacilityManager != null &&
-                            kvp.Value.FacilityManager is IResolvableReferences facilityResolvable &&
-                            facilityResolvable.HasUnresolvedReferences())
-                        {
-                            _unresolvedObjects.Add(facilityResolvable);
                         }
                     }
 
@@ -924,23 +1016,18 @@ namespace HammerAndSickle.Models
                         }
                     }
 
-                    foreach (var kvp in weaponProfiles)
-                        _weaponProfiles[kvp.Key] = kvp.Value;
-
                     // Validate loaded data counts match header
-                    int loadedFacilityCount = _combatUnits.Values.Count(unit => unit.IsBase);
-                    if (_combatUnits.Count != header.CombatUnitCount ||
-                        _leaders.Count != header.LeaderCount ||
-                        _weaponProfiles.Count != header.WeaponProfileCount ||
-                        (header.FacilityCount > 0 && loadedFacilityCount != header.FacilityCount))
+                    if (_combatUnits.Count != header.CombatUnitCount || _leaders.Count != header.LeaderCount)
                     {
                         AppService.HandleException(CLASS_NAME, nameof(LoadGameState),
                             new InvalidDataException("Loaded object counts do not match header metadata"));
                     }
                 }
 
-                // Clear dirty flags - loaded data is considered clean
+                // Clear dirty flags - loaded data is clean
                 _dirtyObjects.Clear();
+
+                AppService.CaptureUiMessage($"Game state loaded successfully. {_combatUnits.Count} units, {_leaders.Count} leaders.");
 
                 return true;
             }
@@ -949,14 +1036,13 @@ namespace HammerAndSickle.Models
                 AppService.HandleException(CLASS_NAME, nameof(LoadGameState), e);
 
                 // Clear partially loaded data on failure
-                _dataLock.EnterWriteLock();
                 try
                 {
                     ClearAllInternal();
                 }
-                finally
+                catch (Exception clearEx)
                 {
-                    _dataLock.ExitWriteLock();
+                    AppService.HandleException(CLASS_NAME, nameof(LoadGameState), clearEx, ExceptionSeverity.Minor);
                 }
 
                 return false;
@@ -999,6 +1085,7 @@ namespace HammerAndSickle.Models
 
         /// <summary>
         /// Loads a scenario with the given name from the scenario storage folder.
+        /// Automatically resolves references and validates data integrity after loading.
         /// </summary>
         /// <param name="scenarioName">Name of the scenario</param>
         /// <returns>True if load was successful</returns>
@@ -1022,16 +1109,28 @@ namespace HammerAndSickle.Models
                 {
                     // Resolve references after loading
                     int resolvedCount = ResolveAllReferences();
+                    AppService.CaptureUiMessage($"Resolved {resolvedCount} object references.");
 
                     // Validate integrity
                     var validationErrors = ValidateDataIntegrity();
                     if (validationErrors.Count > 0)
                     {
-                        foreach (var error in validationErrors)
+                        AppService.CaptureUiMessage($"Found {validationErrors.Count} data integrity issues during scenario load.");
+
+                        foreach (var error in validationErrors.Take(5)) // Log first 5 errors
                         {
                             AppService.HandleException(CLASS_NAME, nameof(LoadScenario),
                                 new InvalidDataException($"Data integrity issue: {error}"), ExceptionSeverity.Minor);
                         }
+
+                        if (validationErrors.Count > 5)
+                        {
+                            AppService.CaptureUiMessage($"... and {validationErrors.Count - 5} additional integrity issues (see logs).");
+                        }
+                    }
+                    else
+                    {
+                        AppService.CaptureUiMessage("Scenario loaded with no integrity issues.");
                     }
                 }
 
@@ -1044,7 +1143,7 @@ namespace HammerAndSickle.Models
             }
         }
 
-        #endregion // Serialization Operations
+        #endregion
 
 
         #region Lifecycle Management
@@ -1060,7 +1159,7 @@ namespace HammerAndSickle.Models
             try
             {
                 _dataLock.EnterWriteLock();
-                _dirtyObjects.Add(objectId);
+                MarkDirtyInternal(objectId);
             }
             catch (Exception e)
             {
@@ -1068,7 +1167,6 @@ namespace HammerAndSickle.Models
             }
             finally
             {
-                // Ensure we always exit the lock, even if an exception occurs
                 if (_dataLock.IsWriteLockHeld)
                 {
                     _dataLock.ExitWriteLock();
@@ -1085,6 +1183,7 @@ namespace HammerAndSickle.Models
             {
                 _dataLock.EnterWriteLock();
                 ClearAllInternal();
+                AppService.CaptureUiMessage("All game data cleared.");
             }
             catch (Exception e)
             {
@@ -1096,6 +1195,11 @@ namespace HammerAndSickle.Models
             }
         }
 
+        #endregion
+
+
+        #region Private Helper Methods
+
         /// <summary>
         /// Internal method to clear all data. Assumes write lock is already held.
         /// </summary>
@@ -1103,22 +1207,28 @@ namespace HammerAndSickle.Models
         {
             _combatUnits.Clear();
             _leaders.Clear();
-            _weaponProfiles.Clear();
             _dirtyObjects.Clear();
             _unresolvedObjects.Clear();
         }
 
         /// <summary>
+        /// Internal method to mark object dirty. Assumes write lock is already held.
+        /// </summary>
+        /// <param name="objectId">The ID of the object that changed</param>
+        private void MarkDirtyInternal(string objectId)
+        {
+            _dirtyObjects.Add(objectId);
+        }
+
+        /// <summary>
         /// Calculates a simple checksum for data validation.
-        /// Can be enhanced with more sophisticated algorithms as needed.
         /// </summary>
         /// <returns>Checksum string</returns>
         private string CalculateChecksum()
         {
             try
             {
-                int checksum = _combatUnits.Count * 17 + _leaders.Count * 23 +
-                              _weaponProfiles.Count * 31;
+                int checksum = _combatUnits.Count * 17 + _leaders.Count * 23;
 
                 // Add facility count
                 int facilityCount = _combatUnits.Values.Count(unit => unit.IsBase);
@@ -1148,7 +1258,7 @@ namespace HammerAndSickle.Models
             }
         }
 
-        #endregion // Lifecycle Management
+        #endregion
 
 
         #region IDisposable Implementation
@@ -1177,7 +1287,7 @@ namespace HammerAndSickle.Models
                         // Save any unsaved changes before disposing
                         if (HasUnsavedChanges)
                         {
-                            // Could implement auto-save here if desired
+                            AppService.CaptureUiMessage("GameDataManager disposing with unsaved changes - consider implementing auto-save.");
                         }
 
                         // Dispose the lock
@@ -1196,6 +1306,6 @@ namespace HammerAndSickle.Models
             }
         }
 
-        #endregion // IDisposable Implementation
+        #endregion
     }
 }

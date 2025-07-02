@@ -2451,7 +2451,23 @@ namespace HammerAndSickle.Models
                 // Clone facility data for base units
                 if (this.IsBase)
                 {
-                    CloneFacilityData(clone);
+                    // Copy common facility properties
+                    clone.BaseDamage = this.BaseDamage;
+                    clone.OperationalCapacity = this.OperationalCapacity;
+                    clone.FacilityType = this.FacilityType;
+
+                    // Copy supply depot properties
+                    clone.DepotSize = this.DepotSize;
+                    clone.StockpileInDays = this.StockpileInDays;
+                    clone.GenerationRate = this.GenerationRate;
+                    clone.SupplyProjection = this.SupplyProjection;
+                    clone.SupplyPenetration = this.SupplyPenetration;
+                    clone.DepotCategory = this.DepotCategory;
+
+                    // NOTE: Air unit attachments are NEVER cloned for templates
+                    // Templates should be clean and ready for fresh assignments
+                    // _airUnitsAttached remains empty in the clone
+                    clone.AirUnitsAttached = clone._airUnitsAttached.AsReadOnly();
                 }
 
                 return clone;
@@ -2552,10 +2568,39 @@ namespace HammerAndSickle.Models
                 // Deserialize facility data if this is a base unit
                 if (IsBase)
                 {
-                    DeserializeFacilityData(info, context);
+                    // Initialize facility collections first
+                    _airUnitsAttached.Clear();
+                    _attachedUnitIDs.Clear();
+
+                    // Load common facility properties
+                    BaseDamage = info.GetInt32(nameof(BaseDamage));
+                    OperationalCapacity = (OperationalCapacity)info.GetValue(nameof(OperationalCapacity), typeof(OperationalCapacity));
+                    FacilityType = (FacilityType)info.GetValue(nameof(FacilityType), typeof(FacilityType));
+
+                    // Load supply depot properties
+                    DepotSize = (DepotSize)info.GetValue(nameof(DepotSize), typeof(DepotSize));
+                    StockpileInDays = info.GetSingle(nameof(StockpileInDays));
+                    GenerationRate = (SupplyGenerationRate)info.GetValue(nameof(GenerationRate), typeof(SupplyGenerationRate));
+                    SupplyProjection = (SupplyProjection)info.GetValue(nameof(SupplyProjection), typeof(SupplyProjection));
+                    SupplyPenetration = info.GetBoolean(nameof(SupplyPenetration));
+                    DepotCategory = (DepotCategory)info.GetValue(nameof(DepotCategory), typeof(DepotCategory));
+
+                    // Load air unit attachments for later resolution
+                    int airUnitCount = info.GetInt32("AirUnitCount");
+                    for (int i = 0; i < airUnitCount; i++)
+                    {
+                        string unitID = info.GetString($"AirUnitID_{i}");
+                        if (!string.IsNullOrEmpty(unitID))
+                        {
+                            _attachedUnitIDs.Add(unitID);
+                        }
+                    }
+
+                    // Initialize readonly property
+                    AirUnitsAttached = _airUnitsAttached.AsReadOnly();
                 }
 
-                // Leave only leader reference null - profiles are now direct lookups
+                // Initialize leader reference as null - will be resolved later
                 CommandingOfficer = null;
             }
             catch (Exception e)
@@ -2626,7 +2671,25 @@ namespace HammerAndSickle.Models
                 // Serialize facility data if this is a base unit
                 if (IsBase)
                 {
-                    SerializeFacilityData(info, context);
+                    // Serialize common facility properties
+                    info.AddValue(nameof(BaseDamage), BaseDamage);
+                    info.AddValue(nameof(OperationalCapacity), OperationalCapacity);
+                    info.AddValue(nameof(FacilityType), FacilityType);
+
+                    // Serialize supply depot properties
+                    info.AddValue(nameof(DepotSize), DepotSize);
+                    info.AddValue(nameof(StockpileInDays), StockpileInDays);
+                    info.AddValue(nameof(GenerationRate), GenerationRate);
+                    info.AddValue(nameof(SupplyProjection), SupplyProjection);
+                    info.AddValue(nameof(SupplyPenetration), SupplyPenetration);
+                    info.AddValue(nameof(DepotCategory), DepotCategory);
+
+                    // Serialize air unit attachments as Unit IDs to avoid circular references
+                    info.AddValue("AirUnitCount", _airUnitsAttached.Count);
+                    for (int i = 0; i < _airUnitsAttached.Count; i++)
+                    {
+                        info.AddValue($"AirUnitID_{i}", _airUnitsAttached[i].UnitID);
+                    }
                 }
             }
             catch (Exception e)
@@ -2645,7 +2708,7 @@ namespace HammerAndSickle.Models
             bool hasUnresolved = !string.IsNullOrEmpty(unresolvedLeaderID);
 
             // Check if facility has unresolved references
-            if (IsBase && HasUnresolvedFacilityReferences())
+            if (IsBase && _attachedUnitIDs.Count > 0)
             {
                 hasUnresolved = true;
             }
@@ -2672,8 +2735,7 @@ namespace HammerAndSickle.Models
             // Include facility's unresolved references
             if (IsBase)
             {
-                var facilityRefs = GetUnresolvedFacilityReferenceIDs();
-                unresolvedIDs.AddRange(facilityRefs);
+                unresolvedIDs.AddRange(_attachedUnitIDs.Select(unitID => $"AirUnit:{unitID}"));
             }
 
             return unresolvedIDs.AsReadOnly();
@@ -2688,8 +2750,6 @@ namespace HammerAndSickle.Models
         {
             try
             {
-                // No WeaponSystemProfile resolution needed - they're direct database lookups now
-
                 // Resolve Leader reference
                 if (!string.IsNullOrEmpty(unresolvedLeaderID))
                 {
@@ -2727,9 +2787,35 @@ namespace HammerAndSickle.Models
                 }
 
                 // Resolve facility references if this is a base unit
-                if (IsBase)
+                if (IsBase && FacilityType == FacilityType.Airbase)
                 {
-                    ResolveFacilityReferences(manager);
+                    _airUnitsAttached.Clear();
+
+                    foreach (string unitID in _attachedUnitIDs)
+                    {
+                        var unit = manager.GetCombatUnit(unitID);
+                        if (unit != null)
+                        {
+                            if (unit.UnitType == UnitType.AirUnit)
+                            {
+                                _airUnitsAttached.Add(unit);
+                            }
+                            else
+                            {
+                                AppService.HandleException(CLASS_NAME, "ResolveReferences",
+                                    new InvalidOperationException($"Unit {unitID} is not an air unit (Type: {unit.UnitType})"),
+                                    ExceptionSeverity.Minor);
+                            }
+                        }
+                        else
+                        {
+                            AppService.HandleException(CLASS_NAME, "ResolveReferences",
+                                new KeyNotFoundException($"Air unit {unitID} not found in game data manager"),
+                                ExceptionSeverity.Minor);
+                        }
+                    }
+
+                    _attachedUnitIDs.Clear(); // Clean up temporary storage
                 }
             }
             catch (Exception e)
@@ -2740,5 +2826,115 @@ namespace HammerAndSickle.Models
         }
 
         #endregion // IResolvableReferences
+
+
+        #region Validation Methods
+
+        /// <summary>
+        /// Validates internal consistency of the unit, including facility relationships.
+        /// </summary>
+        /// <returns>List of validation errors found</returns>
+        public List<string> ValidateInternalConsistency()
+        {
+            var errors = new List<string>();
+
+            try
+            {
+                // Validate leader assignment consistency
+                if (IsLeaderAssigned && CommandingOfficer == null)
+                {
+                    errors.Add($"Unit {UnitName} has IsLeaderAssigned=true but no CommandingOfficer");
+                }
+                else if (!IsLeaderAssigned && CommandingOfficer != null)
+                {
+                    errors.Add($"Unit {UnitName} has CommandingOfficer but IsLeaderAssigned=false");
+                }
+
+                // Validate facility consistency for base units
+                if (IsBase)
+                {
+                    // Validate facility type matches classification
+                    switch (Classification)
+                    {
+                        case UnitClassification.HQ:
+                            if (FacilityType != FacilityType.HQ)
+                                errors.Add($"HQ unit {UnitName} has incorrect facility type: {FacilityType}");
+                            break;
+                        case UnitClassification.DEPOT:
+                            if (FacilityType != FacilityType.SupplyDepot)
+                                errors.Add($"Depot unit {UnitName} has incorrect facility type: {FacilityType}");
+                            break;
+                        case UnitClassification.AIRB:
+                            if (FacilityType != FacilityType.Airbase)
+                                errors.Add($"Airbase unit {UnitName} has incorrect facility type: {FacilityType}");
+                            break;
+                    }
+
+                    // Validate airbase attachments
+                    if (FacilityType == FacilityType.Airbase)
+                    {
+                        foreach (var attachedUnit in AirUnitsAttached)
+                        {
+                            if (attachedUnit.UnitType != UnitType.AirUnit)
+                            {
+                                errors.Add($"Airbase {UnitName} has non-air unit {attachedUnit.UnitName} attached");
+                            }
+                        }
+
+                        if (AirUnitsAttached.Count > CUConstants.MAX_AIR_UNITS)
+                        {
+                            errors.Add($"Airbase {UnitName} has {AirUnitsAttached.Count} attached units, exceeding maximum of {CUConstants.MAX_AIR_UNITS}");
+                        }
+                    }
+                }
+                else if (!IsBase && FacilityType != FacilityType.HQ) // HQ can be on non-base units
+                {
+                    errors.Add($"Non-base unit {UnitName} has FacilityType set to {FacilityType}");
+                }
+
+                // Validate profile references
+                if (GetDeployedProfile() == null)
+                {
+                    errors.Add($"Unit {UnitName} has invalid DeployedProfileID: {DeployedProfileID}");
+                }
+
+                if (IsMounted && MountedProfileID != WeaponSystems.DEFAULT && GetMountedProfile() == null)
+                {
+                    errors.Add($"Unit {UnitName} is mounted but has invalid MountedProfileID: {MountedProfileID}");
+                }
+
+                // Validate state consistency
+                if (HitPoints.Current > HitPoints.Max)
+                {
+                    errors.Add($"Unit {UnitName} has current HP ({HitPoints.Current}) greater than max HP ({HitPoints.Max})");
+                }
+
+                if (MovementPoints.Current > MovementPoints.Max)
+                {
+                    errors.Add($"Unit {UnitName} has current movement points ({MovementPoints.Current}) greater than max ({MovementPoints.Max})");
+                }
+
+                // Validate action counts
+                if (MoveActions.Current > MoveActions.Max)
+                {
+                    errors.Add($"Unit {UnitName} has current move actions ({MoveActions.Current}) greater than max ({MoveActions.Max})");
+                }
+
+                if (CombatActions.Current > CombatActions.Max)
+                {
+                    errors.Add($"Unit {UnitName} has current combat actions ({CombatActions.Current}) greater than max ({CombatActions.Max})");
+                }
+
+            }
+            catch (Exception e)
+            {
+                AppService.HandleException(CLASS_NAME, "ValidateInternalConsistency", e);
+                errors.Add($"Validation failed with exception: {e.Message}");
+            }
+
+            return errors;
+        }
+
+        #endregion // Validation Methods
     }
 }
