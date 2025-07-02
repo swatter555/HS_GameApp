@@ -1,13 +1,65 @@
-using System;
+﻿using System;
 using System.Collections.Generic;
 using UnityEngine;
 
 namespace HammerAndSickle.Services
 {
-    /// <summary>
-    /// Service responsible for generating culturally appropriate names for unit commanders and other game entities.
-    /// Provides methods to generate first names, last names, or full names for various ethnicities and nationalities.
-    /// </summary>
+    /*────────────────────────────────────────────────────────────────────────────
+      NameGenService ─ culturally‑aware commander name generator 
+    ──────────────────────────────────────────────────────────────────────────────
+
+     Summary
+     ═══════
+     • Centralised singleton that supplies historically plausible male first & last
+       names for unit commanders and other narrative entities based on Nationality
+       enum values.
+     • Ships with curated name tables for USSR, USA, UK, FRG, FRA, IR/IQ/SAUD (Arabic
+       bloc), and a fallback set. Additional cultures can be added by extending the
+       switch expressions.
+     • Implements deterministic pseudorandom selection via System.Random for stable
+       replay when supplied with an externally seeded Random instance (future R&D).
+
+     Public properties
+     ═════════════════
+       bool   IsInitialized  { get; private set; }
+       bool   IsDisposed     { get; private set; }
+       List<string> ArabicLastNames              // exposed for UI previews/tests
+       static NameGenService Instance            // lazy‑init singleton
+
+     Constructors
+     ════════════
+       private NameGenService()                          // singleton; calls Initialize()
+
+     Public API
+     ══════════
+       string GenerateMaleName(Nationality nat)          // "First Last"
+       string GenerateMaleFirstName(Nationality nat)     // first only
+       string GenerateLastName(Nationality nat)          // last only
+
+     Internal helpers
+     ═══════════════
+       void         Initialize()                         // RNG + state set‑up
+       List<string> GetMaleFirstNameList(Nationality)    // table selector
+       List<string> GetLastNameList(Nationality)         // table selector
+
+     IDisposable pattern
+     ═════════════════
+       void Dispose()
+       void Dispose(bool disposing)
+       ~NameGenService()
+         • Suppresses finalisation when Dispose() called explicitly.
+
+     Developer notes
+     ═══════════════
+     • Random instance is intentionally non‑seedable from outside to keep API slim;
+       hook up a seedable overload only for deterministic campaign replays.
+     • enableDebugLogging flag is compiled but disabled by default; toggle via
+       conditional symbol DEBUG to avoid log spam in release builds.
+     • All public methods forward exceptions to AppService.HandleException to comply
+       with project‑wide error handling policy.
+     • Maintain one‑name‑per‑line style in name tables to minimise diff noise when
+       lists are extended.
+    ────────────────────────────────────────────────────────────────────────────*/
     public class NameGenService : IDisposable
     {
         #region Constants
@@ -146,27 +198,27 @@ namespace HammerAndSickle.Services
         // German last names
         private readonly List<string> germanLastNames = new()
         {
-            "M�ller", "Schmidt", "Schneider", "Fischer", "Weber",
+            "Müller", "Schmidt", "Schneider", "Fischer", "Weber",
             "Meyer", "Wagner", "Becker", "Schulz", "Hoffmann",
-            "Sch�fer", "Koch", "Bauer", "Richter", "Klein",
-            "Wolf", "Schr�der", "Neumann", "Schwarz", "Zimmermann",
-            "Braun", "Kr�ger", "Hofmann", "Hartmann", "Lange",
+            "Schäfer", "Koch", "Bauer", "Richter", "Klein",
+            "Wolf", "Schröder", "Neumann", "Schwarz", "Zimmermann",
+            "Braun", "Krüger", "Hofmann", "Hartmann", "Lange",
             "Schmitt", "Werner", "Schmitz", "Krause", "Meier",
-            "Lehmann", "Schmid", "Schulze", "Maier", "K�hler",
-            "Herrmann", "K�nig", "Walter", "Mayer", "Huber",
+            "Lehmann", "Schmid", "Schulze", "Maier", "Köhler",
+            "Herrmann", "König", "Walter", "Mayer", "Huber",
             "Kaiser", "Fuchs", "Peters", "Lang", "Scholz",
-            "M�ller", "Wei�", "Jung", "Hahn", "Schubert"
+            "Möller", "Weiß", "Jung", "Hahn", "Schubert"
         };
 
         // French male first names
         private readonly List<string> frenchMaleFirstNames = new()
         {
-            "Jean", "Pierre", "Michel", "Andr�", "Philippe",
-            "Louis", "Nicolas", "Fran�ois", "Henri", "Bernard",
+            "Jean", "Pierre", "Michel", "André", "Philippe",
+            "Louis", "Nicolas", "François", "Henri", "Bernard",
             "Jacques", "Paul", "Marcel", "Robert", "Claude",
             "Daniel", "Christian", "Thomas", "Joseph", "Alain",
             "Antoine", "Maurice", "Christophe", "Vincent", "Guillaume",
-            "Alexandre", "Julien", "S�bastien", "Patrick", "David"
+            "Alexandre", "Julien", "Sébastien", "Patrick", "David"
         };
 
         // French last names

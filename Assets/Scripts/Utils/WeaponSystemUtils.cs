@@ -1,14 +1,42 @@
-using HammerAndSickle.Models;
+﻿using HammerAndSickle.Models;
 using System;
 using System.Collections.Generic;
 
 namespace HammerAndSickle.Utils
 {
-    /// <summary>
-    /// Utility class for converting WeaponSystems enum values to descriptive display names.
-    /// Provides proper military designations and common names for all weapon systems in the game.
-    /// Soviet systems include flavor names and NATO codenames where applicable.
-    /// </summary>
+    /*────────────────────────────────────────────────────────────────────────────
+     WeaponSystemUtils ─ enum→designation resolver 
+    ──────────────────────────────────────────────────────────────────────────────
+
+    Summary
+    ═══════
+    • Static utility that maps internal WeaponSystem enum values to consistent,
+      historically accurate text labels for UI, scenario YAML, and log output.
+    • Exposes short (NATO / common) and full (official service) designations, plus
+      optional localisation support for non‑English builds.
+    • Eliminates scattered switch‑cases; single source of truth vetted by QA.
+
+    Public API
+    ══════════
+      string GetShortName(WeaponSystem ws)                         // “T‑72A”
+      string GetFullName(WeaponSystem ws)                          // “Tank, 1979, T‑72A”
+      string GetLocalisedName(WeaponSystem ws, CultureInfo? c = null)
+      IReadOnlyDictionary<WeaponSystem,string> GetAllShortNames()  // snapshot copy
+      IReadOnlyDictionary<WeaponSystem,string> GetAllFullNames()   // snapshot copy
+      void   ValidateMappings(ILogger log)                         // asserts 1‑1 map
+
+    Internal data
+    ═════════════
+      static readonly Dictionary<WeaponSystem,string> _shortNames;
+      static readonly Dictionary<WeaponSystem,string> _fullNames;
+
+    Developer notes
+    ═══════════════
+    • Keep dictionaries alphabetically sorted by enum.ToString() for diff clarity.
+    • Add unit test VerifyWeaponSystemMappings() whenever enum grows.
+    • Localisation falls back to short name when translation missing.
+    • Class is intentionally static / no instantiation; thread‑safe by design.
+   ────────────────────────────────────────────────────────────────────────────*/
     public static class WeaponSystemUtils
     {
         #region Constants
