@@ -467,8 +467,8 @@ namespace HammerAndSickle.Models
             return spottedLevel switch
             {
                 SpottedLevel.Level4 => 1f, // Perfect intel - no distortion
-                SpottedLevel.Level3 => GetRandomMultiplier(1f, 10f), // ±10% error
-                SpottedLevel.Level2 => GetRandomMultiplier(1f, 30f), // ±30% error
+                SpottedLevel.Level3 => GetRandomMultiplier(CUConstants.MIN_INTEL_ERROR, CUConstants.MODERATE_INTEL_ERROR),
+                SpottedLevel.Level2 => GetRandomMultiplier(CUConstants.MIN_INTEL_ERROR, CUConstants.MAX_INTEL_ERROR), 
                 _ => 1f // Level1 and Level0 handled elsewhere
             };
         }

@@ -752,8 +752,37 @@ namespace HammerAndSickle.Models
         AIRBASE_GENERIC,
         SUPPLYDEPOT_GENERIC,
 
-        DEFAULT
+        DEFAULT,
+        COMBAT
     }
+
+    /// <summary>
+    /// The type of upgrade a unit can receive.
+    /// </summary>
+    public enum UpgradeType
+    {
+        None,
+        AFV,
+        IFV,
+        APC,
+        RECON,
+        SPART,
+        ART,
+        ROC,
+        SSM,
+        SAM,
+        SPSAM,
+        AAA,
+        SPAAA,
+        Fighter,
+        Attack,
+        Bomber
+    }
+
+    #endregion // WeaponSystem Enums
+
+
+    #region Intel Enums
 
     /// <summary>
     /// Type of UnitProfiles
@@ -783,30 +812,7 @@ namespace HammerAndSickle.Models
         SV_DEPOT, // Supply Depot
     }
 
-    /// <summary>
-    /// The type of upgrade a unit can receive.
-    /// </summary>
-    public enum UpgradeType
-    {
-        None,
-        AFV,
-        IFV,
-        APC,
-        RECON,
-        SPART,
-        ART,
-        ROC,
-        SSM,
-        SAM,
-        SPSAM,
-        AAA,
-        SPAAA,
-        Fighter,
-        Attack,
-        Bomber
-    }
-
-    #endregion // WeaponSystem Enums
+    #endregion
 
 
     #region Facility Enums
