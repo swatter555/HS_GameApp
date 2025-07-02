@@ -7,83 +7,142 @@ using UnityEngine;
 namespace HammerAndSickle.Models
 {
     /// <summary>
-    /// LeaderSkillTree manages a leader's skills, reputation points, and command grade progression.
-    /// 
-    /// SKILL SYSTEM DESIGN:
-    /// The skill system is built around strategic specialization with universal gating mechanisms:
-    /// 
-    /// BRANCH TYPES:
-    /// • Foundation Branches: Universal branches available to all leaders
-    ///   - LeadershipFoundation: Required for progression, contains promotions that gate access to higher tiers
-    ///   - PoliticallyConnectedFoundation: Optional utility branch with logistical bonuses
-    /// 
-    /// • Doctrine Branches: Combat specializations (MUTUALLY EXCLUSIVE - choose only 1)
-    ///   - ArmoredDoctrine, InfantryDoctrine, ArtilleryDoctrine, AirDefenseDoctrine
-    ///   - AirborneDoctrine, AirMobileDoctrine, IntelligenceDoctrine
-    /// 
-    /// • Specialization Branches: Advanced capabilities (MUTUALLY EXCLUSIVE - choose only 1)
-    ///   - CombinedArmsSpecialization, SignalIntelligenceSpecialization
-    ///   - EngineeringSpecialization, SpecialForcesSpecialization
-    /// 
-    /// PROGRESSION GATING:
-    /// Leadership acts as the universal progression gate through command grade promotions:
-    /// • JuniorGrade (starting): Access to Tier1 skills in any branch
-    /// • SeniorGrade: Unlocks Tier2-3 skills across all branches
-    /// • TopGrade: Unlocks Tier4-5 specialization skills
-    /// 
-    /// This design forces meaningful REP investment decisions - a fair amount of a leader's REP 
-    /// must go to Leadership promotions to access higher-tier abilities, preventing early 
-    /// specialization abuse while ensuring every leader has strong command capabilities.
-    /// 
-    /// STRATEGIC CHOICE ARCHITECTURE:
-    /// • Every leader progresses: Leadership + Optional PoliticallyConnected
-    /// • Each leader chooses: 1 Doctrine + 1 Specialization
-    /// • Result: Distinct leader archetypes (Tank Commander, Artillery Specialist, etc.)
-    /// • No "master of everything" builds possible due to exclusivity rules
-    /// 
-    /// CORE FUNCTIONALITY:
-    /// - Storage and management of which skills a leader has unlocked
-    /// - Enforcement of branch exclusivity rules (1 doctrine, 1 specialization max)
-    /// - Command grade promotion management and tier unlocking
-    /// - Calculation of all skill-based bonuses for combat and other systems
-    /// - Validation of skill prerequisites and command grade requirements
-    /// - Support for resetting skills (respec functionality)
-    /// - Event notifications for UI and other systems
-    /// 
-    /// KEY METHODS:
-    /// - AddReputation: Adds REP to the leader's pool
-    /// - CanUnlockSkill: Validates prerequisites, grade requirements, and branch exclusivity
-    /// - UnlockSkill: Unlocks skills, handles promotions, and applies effects
-    /// - IsSkillUnlocked: Checks if a specific skill is unlocked
-    /// - GetBonusValue: Retrieves total bonus for a specific bonus type
-    /// - HasCapability: Checks if the leader has a specific boolean capability
-    /// - ResetAllSkills/ResetBranch: Refunds reputation from skills (respects promotions)
-    /// 
-    /// USAGE EXAMPLE - Typical Leader Progression:
-    /// ```csharp
-    /// var skillTree = new LeaderSkillTree();
-    /// skillTree.AddReputation(200);  // Award REP after battles
-    /// 
-    /// // Start with Leadership foundation
-    /// skillTree.UnlockSkill(LeadershipFoundation.JuniorOfficerTraining_CommandTier1);
-    /// 
-    /// // Choose a doctrine specialization  
-    /// skillTree.UnlockSkill(ArmoredDoctrine.ShockTankCorps_HardAttack);
-    /// 
-    /// // Promote to access higher tiers (costs 200 XP but unlocks Tier2-3 globally)
-    /// skillTree.UnlockSkill(LeadershipFoundation.PromotionToSeniorGrade_SeniorPromotion);
-    /// 
-    /// // Now can access Tier2 armored skills
-    /// skillTree.UnlockSkill(ArmoredDoctrine.HullDownExpert_HardDefense);
-    /// 
-    /// // Use bonuses in combat calculations
-    /// int commandBonus = (int)skillTree.GetBonusValue(SkillBonusType.CommandTier1);
-    /// bool hasBreakthrough = skillTree.HasCapability(SkillBonusType.Breakthrough);
-    /// 
-    /// // Check branch availability (will return false for other doctrines)
-    /// bool canStartInfantry = skillTree.IsBranchAvailable(SkillBranch.InfantryDoctrine);
-    /// ```
+    /// Serializable data structure for saving/loading leader skill trees
     /// </summary>
+    [Serializable]
+    public class LeaderSkillTreeData
+    {
+        public int ReputationPoints;
+        public CommandGrade CurrentGrade;
+        public List<string> StartedBranches;
+        public List<SkillReference> UnlockedSkills;
+    }
+
+    /// <summary>
+    /// Serializable reference to a skill enum
+    /// </summary>
+    [Serializable]
+    public class SkillReference
+    {
+        public string EnumType;  // IntelProfileID of the enum type
+        public int EnumValue;    // Integer value of the enum
+    }
+
+ /*───────────────────────────────────────────────────────────────────────────────
+  LeaderSkillTree ─ per-leader skill, reputation & promotion state-machine
+────────────────────────────────────────────────────────────────────────────────
+ Summary
+ ═══════
+ • Owns the complete **skill progression** for one leader: reputation points,
+   unlocked skills, active branches, promotion to Senior/Top grade, and all
+   derived combat/logistics bonuses.  
+ • Enforces the **strategic-choice architecture** defined in the design doc:  
+     – 2 *Foundation* branches (Leadership & Politically Connected)  
+     – 1 *Doctrine* branch *(choose one)*  
+     – 1 *Specialisation* branch *(choose one)*  
+   with five tiers gated by command grade and REP cost.  
+ • Publishes rich **event hooks** so the UI and game logic can react to skill
+   unlocks, grade changes, new capabilities, and refund/respec operations.  
+ • Caches additive vs. multiplicative bonus totals for fast look-ups during
+   combat simulation while providing deterministic serialisation for save-games.
+
+ Public properties
+ ═════════════════
+   int                        ReputationPoints          { get; private set; }
+   CommandGrade               CurrentGrade              { get; private set; }
+   bool                       CanAffordSeniorPromotion  { get; }   // convenience
+   bool                       CanAffordTopPromotion     { get; }
+   IReadOnlyCollection<SkillBranch> ActiveBranches      { get; }   // already started
+   int                        TotalSkillsUnlocked       { get; }
+
+ Public events
+ ═════════════
+   event Action<Enum,string,string>        OnSkillUnlocked        // enum, name, description
+   event Action<CommandGrade>              OnGradeChanged
+   event Action<int,int>                   OnReputationChanged    // delta, new total
+   event Action<CommandGrade>              OnPromotionAvailable   // Senior / Top hint
+   event Action<SkillBranch,SkillTier>     OnBranchTierUnlocked   // first skill of tier
+   event Action<SkillBonusType>            OnCapabilityUnlocked   // boolean capability
+
+ Constructors
+ ═════════════
+   public LeaderSkillTree(int initialReputation = 0)
+
+ Public API (signature  ⇢  brief purpose)
+ ═══════════════════════════════════════
+ ― Reputation & promotion ―
+   public void  AddReputation(int rep)                                   // grant REP and fire events
+   public bool  ResetAllSkills()                                         // full respec (keeps promos)
+   public bool  ResetBranch(SkillBranch branch)                          // doctrine/spec. only
+   public bool  ResetAllSkillsExceptLeadership()                         // QoL respec helper
+
+ ― Skill queries / unlock flow ―
+   public bool  CanUnlockSkill(Enum skill)                               // validate cost, prereqs, branch
+   public bool  UnlockSkill(Enum skill)                                  // spend REP, unlock, fire events
+   public bool  IsSkillUnlocked(Enum skill)
+   public bool  HasStartedBranch(SkillBranch branch)
+   public bool  IsBranchAvailable(SkillBranch branch)                    // checks exclusivity rules
+
+ ― Bonus extraction ―
+   public float GetBonusValue(SkillBonusType type,
+                              bool onlyBoolean = false)                  // additive vs. multiplicative
+   public bool  HasCapability(SkillBonusType type)                       // boolean flag convenience
+
+ ― Debug / validation / serialisation ―
+   [Conditional("DEBUG")]
+   public static void ValidateSkillTreeSystem()                          // editor sanity-check
+   public LeaderSkillTreeData ToSerializableData()                       // → DTO for saves
+   public void FromSerializableData(LeaderSkillTreeData data)            // ← load from DTO
+
+ Private helpers
+ ═══════════════
+   // construction & reflection
+   void            InitializeSkillDictionaries()              // seed unlockedSkills map
+   static List<Type> GetAllSkillEnumTypes()
+   static bool      IsSkillEnumType(Type enumType)
+
+   // REP & promotion
+   bool  SpendReputation(int amount)                          // guarded debit
+   void  CheckPromotionAvailability()                         // raise OnPromotionAvailable
+
+   // skill iteration & caches
+   void  ProcessUnlockedSkills(Action<SkillDefinition> act,
+                               Func<bool> stopEarlyIf = null) // higher-order helper
+   bool  IsMultiplicativeBonus(SkillBonusType type)           // determines stack logic
+   void  ClearBonusCaches()                                   // mark dirty
+
+   // deserialisation helpers
+   Enum  DeserializeSkillEnum(SkillReference ref)
+   void  ProcessUnlockedSkills(...)                           // see above
+
+ Developer notes
+ ═══════════════
+ • **Branch gating** – *IsBranchAvailable()* applies the “one Doctrine + one
+   Specialisation” rule; remember to decorate new *SkillBranch* enum members
+   with the appropriate `[SkillBranchEnum]` attribute so the reflection scan
+   and exclusivity logic recognise them.  
+ • **Cache coherence** – Any state-mutating path *must* call *ClearBonusCaches()*
+   so computed bonuses stay accurate; this is already wired in *UnlockSkill* and
+   all respec routines.  
+ • **Multiplicative stacks** – Only *SupplyConsumption* and *PrestigeCost* stack
+   multiplicatively by default; update *IsMultiplicativeBonus()* when you add
+   new percentage-type modifiers.  
+ • **Threading** – The class itself is not thread-safe; dispatch all API calls
+   from Unity’s main thread, especially when they raise UI events.  
+ • **Save-game compatibility** – When introducing new branches or skills ensure
+   *DeserializeSkillEnum()* recognises the enum name or older saves will drop
+   the unknown entry silently.
+
+ Example usage
+ ═════════════
+ ```csharp
+ var tree = new LeaderSkillTree();
+ tree.AddReputation(200);
+ tree.UnlockSkill(LeadershipFoundation.JuniorOfficerTraining_CommandTier1);
+ tree.UnlockSkill(ArmoredDoctrine.ShockTankCorps_HardAttack);  // first doctrine
+ float atkBonus = tree.GetBonusValue(SkillBonusType.HardAttack);   // +5
+ bool  hasBreakthrough = tree.HasCapability(SkillBonusType.Breakthrough); // false
+───────────────────────────────────────────────────────────────────────────────*/
     public class LeaderSkillTree
     {
         #region Fields
@@ -104,6 +163,7 @@ namespace HammerAndSickle.Models
         private bool isDirty = true;
 
         #endregion
+
 
         #region Properties
 
@@ -127,6 +187,7 @@ namespace HammerAndSickle.Models
         public int TotalSkillsUnlocked => unlockedSkills.Count(kv => kv.Value);
 
         #endregion
+
 
         #region Events
 
@@ -845,25 +906,5 @@ namespace HammerAndSickle.Models
         #endregion
     }
 
-    /// <summary>
-    /// Serializable data structure for saving/loading leader skill trees
-    /// </summary>
-    [Serializable]
-    public class LeaderSkillTreeData
-    {
-        public int ReputationPoints;
-        public CommandGrade CurrentGrade;
-        public List<string> StartedBranches;
-        public List<SkillReference> UnlockedSkills;
-    }
-
-    /// <summary>
-    /// Serializable reference to a skill enum
-    /// </summary>
-    [Serializable]
-    public class SkillReference
-    {
-        public string EnumType;  // IntelProfileID of the enum type
-        public int EnumValue;    // Integer value of the enum
-    }
+    
 }

@@ -6,9 +6,42 @@ using UnityEngine;
 
 namespace HammerAndSickle.Models
 {
-    /// <summary>
-    /// Defines a leader skill effect, including the type and value of the bonus.
-    /// </summary>
+/*───────────────────────────────────────────────────────────────────────────────
+  SkillEffect ─ atomic description of a single leader-skill bonus              :contentReference[oaicite:0]{index=0}
+────────────────────────────────────────────────────────────────────────────────
+ Summary
+ ═══════
+ • Represents **one** concrete benefit conferred by a leader skill (e.g. +5 Hard Attack,
+   0.8× Supply Consumption, *Breakthrough* capability).  
+ • Abstracts the three supported bonus categories:
+     1. **Numeric**   – direct additions to ratings or action counts  
+     2. **Multiplier** – percentage modifiers to costs, movement, etc.  
+     3. **Boolean**   – on/off capabilities that unlock special actions  
+ • Generates a human-readable effect description on the fly.
+
+ Public properties
+ ═════════════════
+   SkillBonusType BonusType        { get; }   // what is modified/unlocked
+   float          BonusValue       { get; }   // numeric value, multiplier, or 1 / 0 flag
+   string         EffectDescription{ get; }   // auto or custom text
+   bool           IsBoolean        { get; }   // helper → true when capability flag
+
+ Constructors
+ ═════════════
+   public  SkillEffect(SkillBonusType bonusType,
+                       float          bonusValue,
+                       string         effectDescription = null)
+
+ Private helpers
+ ═══════════════
+   string GetDefaultDescription()             // infers text from type/value
+
+ Developer notes
+ ═══════════════
+ • Call *IsBoolean* to decide whether *BonusValue* is treated as a flag.  
+ • When adding new **SkillBonusType** enum members update *IsBoolean* logic.  
+ • Keep descriptions short; UI concatenates multiple effects automatically.
+───────────────────────────────────────────────────────────────────────────────*/
     public class SkillEffect
     {
         /// <summary>
@@ -84,9 +117,63 @@ namespace HammerAndSickle.Models
         }
     }
 
-    /// <summary>
-    /// Defines a leader skill with all its attributes, requirements, and effects
-    /// </summary>
+ /*───────────────────────────────────────────────────────────────────────────────
+  SkillDefinition ─ full specification of a leader skill                       :contentReference[oaicite:1]{index=1}
+────────────────────────────────────────────────────────────────────────────────
+ Summary
+ ═══════
+ • Encapsulates everything the engine needs to know about one skill: identity,
+   costs, branch/tier placement, prerequisites, mutually-exclusive siblings,
+   required command grade, visual icon, and the list of **SkillEffect** objects.  
+ • Provides convenience ctors for the common patterns “single numeric effect”
+   and “single boolean capability”.
+
+ Public properties
+ ═════════════════
+   Enum             SkillEnumValue   { get; }
+   string           Name            { get; }
+   int              REPCost         { get; }
+   string           Description     { get; }
+   SkillBranch      Branch          { get; }
+   SkillTier        Tier            { get; }
+   CommandGrade     RequiredGrade   { get; }
+   List<Enum>       Prerequisites   { get; }
+   List<Enum>       MutuallyExclusive{ get; }
+   List<SkillEffect>Effects         { get; }
+   string           IconPath        { get; }
+
+ Constructors
+ ═════════════
+   public SkillDefinition(Enum skillEnumValue, string name, int repCost,
+                          SkillBranch branch, SkillTier tier, string description,
+                          CommandGrade requiredGrade = JuniorGrade,
+                          List<Enum> prerequisites = null,
+                          List<Enum> mutuallyExclusive = null,
+                          List<SkillEffect> effects = null,
+                          string iconPath = null)
+
+   // convenience overload – one numeric/multiplier effect
+   public SkillDefinition(Enum skillEnumValue, string name, int repCost,
+                          SkillBranch branch, SkillTier tier, string description,
+                          SkillBonusType bonusType, float bonusValue, ...)
+
+   // convenience overload – single boolean capability
+   public SkillDefinition(Enum skillEnumValue, string name, int repCost,
+                          SkillBranch branch, SkillTier tier, string description,
+                          SkillBonusType booleanCapability, ...)
+
+ Public methods
+ ══════════════
+   string      GetFullDescription()     // rich text incl. effects & requirements
+   SkillEffect GetPrimaryEffect()       // first (main) effect
+
+ Developer notes
+ ═══════════════
+ • Always supply an **Enum** value from the relevant branch enum; the catalog
+   uses that as the primary key.  
+ • The description should omit effect text; *GetFullDescription()* builds the
+   final UI string including dynamically-localised bonuses.
+───────────────────────────────────────────────────────────────────────────────*/
     public class SkillDefinition
     {
         // Core identification
@@ -239,205 +326,121 @@ namespace HammerAndSickle.Models
         }
     }
 
- /*───────────────────────────────────────────────────────────────────────────────
- LeaderSkillCatalog  —  comprehensive skill definition repository and effect system
- ────────────────────────────────────────────────────────────────────────────────
- Overview
- ════════
- **LeaderSkillCatalog** serves as the central static repository for all leader skills
- in Hammer & Sickle. It defines the complete skill tree system including effects,
- prerequisites, costs, and progression paths. The catalog organizes skills into
- distinct branches with tiered progression from basic abilities to elite specializations.
+   /*───────────────────────────────────────────────────────────────────────────────
+     LeaderSkillCatalog ─ master repository & progression logic for leader skills
+   ────────────────────────────────────────────────────────────────────────────────
+    Overview
+    ════════
+    Static, thread-safe container that builds **every** leader-skill definition at
+    game start-up and exposes fast look-ups for UI, AI planners, and validation
+    code. Skills are grouped into 13 branches with tiered progression (1→5) and
+    increasing reputation costs / command-grade requirements.
 
- The system supports three complementary classes:
- • **SkillEffect**: Individual bonus effects with type, value, and description
- • **SkillDefinition**: Complete skill specification with requirements and effects  
- • **LeaderSkillCatalog**: Static storage and retrieval for all skill definitions
+    Field layout
+    ════════════
+      Dictionary<Enum, SkillDefinition> AllSkills   // immutable after static ctor
 
- Major Responsibilities
- ══════════════════════
- • Skill definition storage & retrieval
-     - Central registry of all 50+ skills across 13 branches
-     - Enum-based skill identification and lookup system
- • Effect system management
-     - Numeric bonuses (attack/defense values, action counts)
-     - Multiplier effects (cost reductions, movement bonuses)
-     - Boolean capabilities (special abilities and unlocks)
- • Prerequisite & progression validation
-     - Branch unlock requirements and skill dependencies
-     - Command grade restrictions and tier-based progression
-     - Mutual exclusivity rules for conflicting specializations
- • Branch organization & categorization
-     - Foundation branches (core leadership and political connections)
-     - Doctrine branches (combat specializations by unit type)
-     - Specialization branches (advanced elite capabilities)
+    Public API
+    ══════════
+      bool  TryGetSkillDefinition(Enum id, out def)
+      string GetSkillName(Enum id)
+      string GetFullSkillDescription(Enum id)
+      List<SkillDefinition> GetSkillsInBranch(SkillBranch branch)
+      List<SkillDefinition> GetSkillsInBranchByTier(SkillBranch branch, SkillTier tier)
 
- Design Highlights
- ═════════════════
- • **Static Repository Pattern**: Thread-safe immutable catalog initialized once
-   at startup with comprehensive skill definitions.
- • **Flexible Effect System**: Supports numeric bonuses, percentage modifiers,
-   and boolean capabilities through unified SkillEffect architecture.
- • **Hierarchical Progression**: Foundation → Doctrine → Specialization path
-   with increasing reputation costs and command grade requirements.
- • **Comprehensive Validation**: Built-in prerequisite checking, cost validation,
-   and mutual exclusivity enforcement.
- • **Cultural Integration**: Branch naming and descriptions reflect Soviet
-   military doctrine and organizational structure.
+    Progression rules (enforced in caller logic)
+    ════════════════════════════════════════════
+    • Satisfy every prerequisite in *SkillDefinition.Prerequisites*.  
+    • Leader must hold ≥ RequiredGrade.  
+    • Leader must possess enough reputation points to pay *REPCost*.  
+    • Mutually-exclusive skills (e.g. divergent specialisations) cannot coexist.
 
- Public-Method Reference
- ═══════════════════════
-   ── Skill Retrieval ─────────────────────────────────────────────────────────
-   TryGetSkillDefinition(skillEnum, out def)  Gets complete skill data by enum.
-   GetSkillName(skillEnum)                    Returns skill name or "Unknown Skill".
-   GetFullSkillDescription(skillEnum)         Complete description with effects.
+   ───────────────────────────────────────────────────────────────────────────────
+    COMPLETE SKILL LIST
+   ───────────────────────────────────────────────────────────────────────────────
+    Key:  [Enum]  Name  (Branch/Tier | REP | Effect → value [type])
 
-   ── Branch Organization ─────────────────────────────────────────────────────
-   GetSkillsInBranch(branch)                  All skills in branch, ordered by tier.
-   GetSkillsInBranchByTier(branch, tier)      Skills matching branch and tier.
+    ‣ Leadership Foundation
+      • [JuniorOfficerTraining_CommandTier1]  Junior Officer Training  (Lead/T1 | 60) → CommandTier1 +X
+      • [PromotionToSeniorGrade_SeniorPromotion]  Promotion to Senior Grade  (Lead/T2 | 100) → SeniorPromotion ✓
+      • [SeniorOfficerTraining_CommandTier2]  Senior Officer Training  (Lead/T3 | 120) → CommandTier2 +X
+      • [PromotionToTopGrade_TopPromotion]  Promotion to Top Grade  (Lead/T4 | 250) → TopPromotion ✓
+      • [GeneralStaffTraining_CommandTier3]  General Staff Training  (Lead/T5 | 260) → CommandTier3 +X
 
- Skill Branch Architecture
- ═════════════════════════
- The catalog organizes 50+ skills across 13 specialized branches:
+    ‣ Politically Connected Foundation
+      • [EmergencyAirDrop_EmergencyResupply]  Emergency Air Drop  (Pol/T2 | 80) → EmergencyResupply ✓
+      • [DirectLineToHQ_SupplyConsumption]  Direct Line To HQ  (Pol/T2 | 80) → SupplyConsumption ×0.8
+      • [ForeignTechnology_NVG]  Foreign Technology  (Pol/T3 | 120) → NVG ✓
+      • [BetterReplacements_ReplacementXP]  Better Replacements  (Pol/T3 | 120) → ReplacementXP +25 %
+      • [ConnectionsAtTheTop_PrestigeCost]  Connections At The Top  (Pol/T4 | 180) → PrestigeCost ×0.7
 
-   **Foundation Branches** (Core Progression)
-   ┌─────────────────────────────────────────────────────────────────────────┐
-   │ Leadership Foundation (5 tiers)                                        │
-   │ • Junior Officer Training (+1 command ability)                         │
-   │ • Promotion to Senior Grade (unlocks advanced branches)                │
-   │ • Senior Officer Training (+1 additional command)                      │
-   │ • Promotion to Top Grade (unlocks elite specializations)               │
-   │ • General Staff Training (+1 final command bonus)                      │
-   │                                                                         │
-   │ Politically Connected Foundation (5 skills)                            │
-   │ • Emergency Air Drop (one-time emergency resupply)                     │
-   │ • Direct Line To HQ (20% supply consumption reduction)                 │
-   │ • Foreign Technology (night vision equipment access)                   │
-   │ • Better Replacements (+1 experience level for new units)              │
-   │ • Connections At The Top (30% equipment cost reduction)                │
-   └─────────────────────────────────────────────────────────────────────────┘
+    ‣ Armored Doctrine
+      • [ShockTankCorps_HardAttack]  Shock Tank Corps  (Arm/T1 | 60) → HardAttack +5
+      • [HullDownExpert_HardDefense]  Hull Down Expert  (Arm/T2 | 80) → HardDefense +5
+      • [PursuitDoctrine_Breakthrough]  Pursuit Doctrine  (Arm/T3 | 120) → Breakthrough ✓
 
-   **Doctrine Branches** (Combat Specializations)
-   ┌─────────────────────────────────────────────────────────────────────────┐
-   │ Armored Doctrine (Tank/Mechanized Warfare)                             │
-   │ • Shock Tank Corps (+5 hard attack rating)                             │
-   │ • Hull Down Expert (+5 hard defense rating)                            │
-   │ • Pursuit Doctrine (breakthrough movement after enemy retreat)         │
-   │                                                                         │
-   │ Infantry Doctrine (Soft-Target Operations)                             │
-   │ • Infantry Assault Tactics (+5 soft attack rating)                     │
-   │ • Defensive Doctrine (+5 soft defense rating)                          │
-   │ • Rough Terrain Operations (20% movement cost reduction)               │
-   │                                                                         │
-   │ Artillery Doctrine (Indirect Fire Support)                             │
-   │ • Precision Targeting (+1 indirect fire range)                         │
-   │ • Mobile Artillery Doctrine (shoot and scoot capability)               │
-   │ • Fire Mission Specialist (multi-target engagement)                    │
-   │                                                                         │
-   │ Air Defense Doctrine (Anti-Aircraft Operations)                        │
-   │ • Offensive Air Defense (+5 air attack rating)                         │
-   │ • Integrated Air Defense System (+5 air defense rating)                │
-   │ • Ready Response Protocol (+1 opportunity action)                      │
-   │                                                                         │
-   │ Airborne Doctrine (Paratrooper Operations)                             │
-   │ • Rapid Deployment Planning (free aircraft boarding)                   │
-   │ • Combat Drop Doctrine (reduced jump suppression)                      │
-   │ • Elite Paratrooper Corps (combat capability after jump)               │
-   │                                                                         │
-   │ Air Mobile Doctrine (Helicopter Operations)                            │
-   │ • Rapid Redeployment (movement after helicopter landing)               │
-   │ • Heliborne Strike Force (combat action after landing)                 │
-   │ • Elite Air Mobile Operations (enhanced protection while mounted)      │
-   │                                                                         │
-   │ Intelligence Doctrine (Reconnaissance & Surveillance)                  │
-   │ • Enhanced Intelligence Collection (+1 intel action)                   │
-   │ • Concealed Operations Base (medium silhouette reduction)              │
-   │ • Satellite Intelligence (global reconnaissance capability)            │
-   └─────────────────────────────────────────────────────────────────────────┘
+    ‣ Infantry Doctrine
+      • [InfantryAssaultTactics_SoftAttack]  Infantry Assault Tactics  (Inf/T1 | 60) → SoftAttack +5
+      • [DefensiveDoctrine_SoftDefense]  Defensive Doctrine  (Inf/T2 | 80) → SoftDefense +5
+      • [RoughTerrainOperations_RTO]  Rough Terrain Operations  (Inf/T3 | 120) → RoughTerrainMove ×0.8
 
-   **Specialization Branches** (Elite Capabilities)
-   ┌─────────────────────────────────────────────────────────────────────────┐
-   │ Combined Arms Specialization (Advanced Command)                        │
-   │ • Aviation Assets (+1 spotting range)                                  │
-   │ • Expert Staff Planning (+1 movement action)                           │
-   │ • Tactical Genius (+1 combat action)                                   │
-   │ • Night Combat Operations (25% night combat bonus)                     │
-   │                                                                         │
-   │ Signal Intelligence Specialization (Electronic Warfare)                │
-   │ • Communications Decryption (enhanced unit identification)             │
-   │ • Electronic Surveillance Network (+3 spotting range)                  │
-   │ • Radio Electronic Combat (enemy immobilization chance)                │
-   │ • Enemy Behavior Analysis (movement prediction capability)             │
-   │                                                                         │
-   │ Engineering Specialization (Terrain Manipulation)                      │
-   │ • River Crossing Operations (50% river crossing cost reduction)        │
-   │ • Amphibious Assault Tactics (40% river assault bonus)                 │
-   │ • Combat Engineering Corps (tactical bridge construction)              │
-   │ • Field Fortification Expert (permanent fortification building)       │
-   │                                                                         │
-   │ Special Forces Specialization (Unconventional Warfare)                 │
-   │ • Terrain Expert (20% rough terrain movement bonus)                    │
-   │ • Infiltration Tactics (50% enemy ZOC penalty reduction)               │
-   │ • Superior Camouflage (small silhouette reduction)                     │
-   │ • Ambush Tactics (50% first attack bonus from concealment)             │
-   └─────────────────────────────────────────────────────────────────────────┘
+    ‣ Artillery Doctrine
+      • [PrecisionTargeting_IndirectRange]  Precision Targeting  (Art/T1 | 60) → IndirectRange +1 hex
+      • [MobileArtilleryDoctrine_ShootAndScoot]  Mobile Artillery Doctrine  (Art/T2 | 80) → ShootAndScoot ✓
+      • [FireMissionSpecialist_AdvancedTargetting]  Fire Mission Specialist  (Art/T3 | 120) → AdvancedTargeting ✓
 
- Effect Type System
- ══════════════════
- Skills provide bonuses through three distinct effect categories:
+    ‣ Air Defense Doctrine
+      • [OffensiveAirDefense_AirAttack]  Offensive Air Defense  (AD/T1 | 60) → AirAttack +5
+      • [IntegratedAirDefenseSystem_AirDefense]  Integrated Air Defense System  (AD/T2 | 80) → AirDefense +5
+      • [ReadyResponseProtocol_OpportunityAction]  Ready Response Protocol  (AD/T3 | 120) → OpportunityAction +1
 
-   **Numeric Bonuses** (Direct value additions)
-   • Combat ratings: +5 to attack/defense values
-   • Action counts: +1 additional action per turn type
-   • Range extensions: +1 to spotting or indirect fire range
-   • Silhouette reductions: -1 to -3 visibility levels
+    ‣ Airborne Doctrine
+      • [RapidDeploymentPlanning_ImpromptuPlanning]  Rapid Deployment Planning  (ABN/T1 | 60) → ImpromptuPlanning ✓
+      • [CombatDropDoctrine_AirborneAssault]  Combat Drop Doctrine  (ABN/T2 | 80) → AirborneAssault ✓
+      • [EliteParatrooperCorps_AirborneElite]  Elite Paratrooper Corps  (ABN/T3 | 120) → AirborneElite ✓
 
-   **Multiplier Effects** (Percentage modifications)  
-   • Cost reductions: 0.7x prestige costs, 0.8x supply consumption
-   • Movement bonuses: 0.8x terrain penalties, 0.5x river crossing costs
-   • Combat modifiers: 1.25x night operations, 1.4x river assault
+    ‣ Air Mobile Doctrine
+      • [RapidRedeployment_AirMobile]  Rapid Redeployment  (AM/T1 | 60) → AirMobile ✓
+      • [HeliborneStrikeForce_AirMobileAssault]  Heliborne Strike Force  (AM/T2 | 80) → AirMobileAssault ✓
+      • [EliteAirMobileOperations_AirMobileElite]  Elite Air Mobile Operations  (AM/T3 | 120) → AirMobileElite ✓
 
-   **Boolean Capabilities** (Special abilities)
-   • Tactical abilities: Breakthrough movement, shoot-and-scoot artillery
-   • Enhanced operations: Multi-target engagement, emergency resupply
-   • Advanced capabilities: Satellite reconnaissance, electronic warfare
-   • Construction abilities: Bridge building, field fortifications
+    ‣ Intelligence Doctrine
+      • [EnhancedIntelligenceCollection_ImprovedGathering]  Enhanced Intelligence Collection  (Intel/T1 | 60) → IntelActions +1
+      • [ConcealedOperationsBase_UndergroundBunker]  Concealed Operations Base  (Intel/T2 | 80) → Silhouette –1
+      • [SatelliteIntelligence_SpaceAssets]  Satellite Reconnaissance  (Intel/T3 | 120) → SpaceAssets ✓
 
- Progression Requirements
- ════════════════════════
- Skill advancement follows strict hierarchical requirements:
+    ‣ Combined Arms Specialization
+      • [AviationAssets_SpottingRange]  Aviation Recon Assets  (CA/T4 | 180) → SpottingRange +1
+      • [ExpertStaff_MovementAction]  Expert Staff Planning  (CA/T4 | 180) → MovementAction +1
+      • [TacticalGenius_CombatAction]  Tactical Genius  (CA/T4 | 180) → CombatAction +1
+      • [NightCombatOperations_NightCombat]  Night Combat Operations  (CA/T5 | 260) → NightCombat ×1.25
 
-   **Reputation Costs** (Increasing by tier)
-   • Tier 1: 60 reputation points (basic doctrine skills)
-   • Tier 2: 80 reputation points (intermediate capabilities)  
-   • Tier 3: 120 reputation points (advanced specializations)
-   • Tier 4: 180 reputation points (elite abilities)
-   • Tier 5: 260 reputation points (ultimate mastery)
-   • Special: 100 rep (Senior Grade), 250 rep (Top Grade)
+    ‣ Signal Intelligence Specialization
+      • [CommunicationsDecryption_SignalDecryption]  Communications Decryption  (SIG/T4 | 180) → SignalDecryption ✓
+      • [ElectronicSurveillanceNetwork_SpottingRange]  Electronic Surveillance Network  (SIG/T4 | 180) → SpottingRange +3
+      • [RadioElectronicCombat_ElectronicWarfare]  Radio Electronic Combat  (SIG/T4 | 180) → ElectronicWarfare ✓
+      • [EnemyBehaviorAnalysis_PatternRecognition]  Enemy Behavior Analysis  (SIG/T5 | 260) → PatternRecognition ✓
 
-   **Command Grade Gates**
-   • Junior Grade: Access to foundation and basic doctrine skills
-   • Senior Grade: Required for advanced doctrine and specialization entry
-   • Top Grade: Required for elite specializations and ultimate abilities
+    ‣ Engineering Specialization
+      • [RiverCrossingOperations_RiverCrossing]  River Crossing Operations  (Eng/T4 | 180) → RiverCrossMove ×0.5
+      • [AmphibiousAssaultTactics_RiverAssault]  Amphibious Assault Tactics  (Eng/T4 | 180) → RiverAssault ×1.4
+      • [CombatEngineeringCorps_BridgeBuilding]  Combat Engineering Corps  (Eng/T4 | 180) → BridgeBuilding ✓
+      • [FieldFortificationExpert_FieldFortification]  Field Fortification Expert  (Eng/T5 | 260) → FieldFortification ✓
 
-   **Branch Prerequisites**
-   • Foundation skills: Linear progression within Leadership branch
-   • Doctrine skills: Must complete previous tier before advancement
-   • Specializations: Require Senior/Top Grade plus doctrine prerequisites
-   • Political skills: Independent progression with tier requirements only
+    ‣ Special Forces Specialization
+      • [TerrainExpert_TerrainMastery]  Terrain Expert  (SF/T4 | 180) → TerrainMove ×0.8
+      • [InfiltrationTactics_InfiltrationMovement]  Infiltration Tactics  (SF/T4 | 180) → ZOCPenalty ×0.5
+      • [SuperiorCamouflage_ConcealedPositions]  Superior Camouflage  (SF/T4 | 180) → Silhouette –1
+      • [AmbushTactics_AmbushTactics]  Ambush Tactics  (SF/T5 | 260) → AmbushTactics ✓
 
- Validation & Constraints
- ════════════════════════
- The catalog enforces comprehensive validation rules:
-   • Prerequisite checking: All dependencies must be satisfied
-   • Command grade validation: Rank requirements strictly enforced
-   • Cost bounds: Reputation costs within 50-500 point range
-   • Effect validation: Bonus values within defined combat/action limits
-   • Mutual exclusivity: Conflicting specializations prevented
-
- ───────────────────────────────────────────────────────────────────────────────
- KEEP THIS COMMENT BLOCK IN SYNC WITH SKILL ADDITIONS AND CHANGES!
- ───────────────────────────────────────────────────────────────────────────── */
+   ───────────────────────────────────────────────────────────────────────────────
+    Developer notes
+    ═══════════════
+    • When adding a new enumeration and call to *AddSkill()* be sure to update this
+      comment block, **Init…()** builder, and unit-tests that reflect branch sizes.  
+    • The catalogue is immutable after construction; any runtime modifications must
+      clone the definition rather than mutating the stored instance.
+   ───────────────────────────────────────────────────────────────────────────────*/
     public static class LeaderSkillCatalog
     {
         #region Fields
@@ -446,6 +449,7 @@ namespace HammerAndSickle.Models
         private static readonly Dictionary<Enum, SkillDefinition> AllSkills = new Dictionary<Enum, SkillDefinition>();
 
         #endregion
+
 
         #region Initialization
 
@@ -1173,6 +1177,7 @@ namespace HammerAndSickle.Models
         }
 
         #endregion
+
 
         #region Helper Methods
 

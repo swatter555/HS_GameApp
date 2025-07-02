@@ -5,106 +5,106 @@ using UnityEngine;
 
 namespace HammerAndSickle.Models
 {
-    /*───────────────────────────────────────────────────────────────────────────────
-   Leader  —  military officer model for unit command, skills, and progression
-   ────────────────────────────────────────────────────────────────────────────────
-   Overview
-   ════════
-   A Leader represents a single military officer that can be assigned to a
-   CombatUnit in Hammer & Sickle.  Leaders provide tactical command bonuses
-   (CommandAbility), unlockable skill‑based capabilities through their private
-   LeaderSkillTree, and progress in rank via reputation earned on the
-   battlefield.  All state is Unity‑free, fully serialisable, and designed for
-   bidirectional integrity with the unit that the leader commands.
+/*───────────────────────────────────────────────────────────────────────────────
+  Leader ─ officer model with reputation, skills, and unit-assignment logic
+────────────────────────────────────────────────────────────────────────────────
+ Summary
+ ═══════
+ • Represents a single battlefield officer who can be assigned to a **CombatUnit**,
+   earn reputation, unlock skills, and confer command bonuses.  
+ • Encapsulates personal identity (name, nationality, rank), dynamic state
+   (reputation, skills, assignment), and full event hooks for UI updates.  
+ • Implements **ISerializable** and **ICloneable** so leaders can be saved,
+   loaded, and duplicated for scenario editors or undo stacks. :contentReference[oaicite:0]{index=0}
 
-   Major Responsibilities
-   ══════════════════════
-   • Officer generation & identification
-   – Unique LeaderID creation and culturally‑appropriate name generation
-   – Randomised initial CommandAbility
-   • Reputation & grade progression
-   – Reputation accrual from explicit calls (AwardReputation,
-   AwardReputationForAction)
-   – Automatic promotion Junior → Senior → Top via the skill tree
-   • Skill tree interface (encapsulated)
-   – Branch availability queries and unlocks
-   – Bonus & capability aggregation for combat systems
-   • Unit assignment management
-   – Safe assignment / unassignment with event broadcast
-   – IsAssigned & UnitID source of truth
-   • Persistence & cloning
-   – Implements ISerializable and ICloneable for save/load and templating
+ Public properties
+ ═════════════════
+   string          LeaderID        { get; private set; }
+   string          Name            { get; private set; }
+   Side            Side            { get; private set; }
+   Nationality     Nationality     { get; private set; }
+   CommandGrade    CommandGrade    { get; private set; }
+   int             ReputationPoints{ get; private set; }
+   string          FormattedRank   { get; }                  // computed getter
+   CommandAbility  CombatCommand   { get; private set; }
+   bool            IsAssigned      { get; private set; }
+   string          UnitID          { get; private set; }
 
-   Design Highlights
-   ═════════════════
-   • Event‑Driven – All state changes surface through C# events for immediate UI
-   update.
-   • Encapsulation – Public surface never exposes LeaderSkillTree; interaction
-   occurs through thin wrappers keeping implementation details internal.
-   • Culture‑Aware Ranks – GetFormattedRank() maps CommandGrade to real
-   world ranks for each nationality.
-   • Action‑Based Reputation – Modular constants in CUConstants define base
-   reputation values; contextual multipliers are clamped for balance.
-   • Robust Validation – All inputs checked with informative exceptions routed
-   through AppService.HandleException.
+ Public events
+ ═════════════
+   event Action<int,int>          OnReputationChanged;   // (delta, newTotal)
+   event Action<CommandGrade>     OnGradeChanged;        // (newGrade)
+   event Action<Enum,string>      OnSkillUnlocked;       // (skillEnum, skillName)
+   event Action<string>           OnUnitAssigned;        // (unitID)
+   event Action                  OnUnitUnassigned;       // ()
 
-   Key Public Surface (abridged)
-   ═════════════════════════════
-   Construction
-   Leader(Side side, Nationality nat)                       // random name & ability
-   Leader(string name, Side side, Nationality nat,          // explicit name/ability
-   CommandAbility ability)
+ Constructors
+ ═════════════
+   public    Leader(Side side, Nationality nationality)
+   public    Leader(string name, Side side,
+                    Nationality nationality,
+                    CommandAbility command)
+   protected Leader(SerializationInfo info,
+                    StreamingContext context)            // deserialisation
 
-   Officer Management
-   bool   SetOfficerName(string name)                       // validated rename
-   void   SetOfficerCommandAbility(CommandAbility cmd)
-   void   SetCommandGrade(CommandGrade grade)               // manual promotion
-   string GetFormattedRank()                                // nationality rank
+ Public API (method signatures ⇢ brief purpose)
+ ═════════════════════════════════════════════
+ ― Identity & rank ―
+   public void   SetOfficerCommandAbility(CommandAbility command)          // manual override
+   public bool   SetOfficerName(string name)                               // validation + set
+   public string GetFormattedRank()                                        // localised rank text
+   public void   SetCommandGrade(CommandGrade grade)                       // fire grade event
 
-   Reputation & Progression
-   void AwardReputation(int amount)
-   void AwardReputationForAction(CUConstants.ReputationAction action,
-   float contextMult = 1f)
+ ― Reputation ―
+   public void   AwardReputation(int amount)                               // flat REP gain
+   public void   AwardReputationForAction(CUConstants.ReputationAction act,
+                                          float contextMultiplier = 1f)    // action-based REP
 
-   Skill Tree Gateway
-   bool CanUnlockSkill(Enum skill)
-   bool UnlockSkill(Enum skill)
-   bool IsSkillUnlocked(Enum skill)
-   bool IsBranchAvailable(SkillBranch branch)
-   bool ResetSkills()                                        // respec (keeps leadership)
-   bool HasCapability(SkillBonusType bonus)
-   float GetBonusValue(SkillBonusType bonus)
+ ― Skill-tree facade ―
+   public bool   CanUnlockSkill(Enum skillEnum)
+   public bool   UnlockSkill(Enum skillEnum)
+   public bool   IsSkillUnlocked(Enum skillEnum)
+   public bool   HasCapability(SkillBonusType bonusType)
+   public float  GetBonusValue(SkillBonusType bonusType)
+   public bool   IsBranchAvailable(SkillBranch branch)
+   public bool   ResetSkills()                                             // respec
 
-   Unit Assignment
-   void AssignToUnit(string unitID)
-   void UnassignFromUnit()
+ ― Unit assignment ―
+   public void   AssignToUnit(string unitID)
+   public void   UnassignFromUnit()
 
-   Persistence Utilities
-   void   GetObjectData(SerializationInfo info,             // ISerializable
-   StreamingContext ctx)
-   object Clone()                                            // ICloneable deep copy
+ ― Interfaces ―
+   public void   GetObjectData(SerializationInfo info,
+                               StreamingContext context)                   // ISerializable
+   public object Clone()                                                   // ICloneable
 
-   Event Summary
-   ═════════════
-   OnReputationChanged(int delta, int newTotal)
-   OnGradeChanged(CommandGrade newGrade)
-   OnSkillUnlocked(Enum skillEnum, string skillName)
-   OnUnitAssigned(string unitID)
-   OnUnitUnassigned()
+ Private helpers
+ ═══════════════
+   void   InitializeCommonProperties(Side side, Nationality nat)           // default state
+   void   InitializeSkillTree()                                            // create + wire
+   void   WireSkillTreeEvents()                                            // forward events
+   string GenerateUniqueID()                                               // LEAD-xxxxx
+   void   GenerateRandomNameBasedOnNationality()                           // NameGenService
+   // reputation math is in AwardReputationForAction()
+   // validation helpers (Enum.IsDefined, Math.Clamp) inline in callers
 
-   Implementation Notes
-   ════════════════════
-   • Private helper GenerateRandomNameBasedOnNationality() uses NameGenService;
-   on failure a GUID‑fallback ensures a non‑empty name.
-   • Skill‑tree events are internally wired to corresponding leader events in
-   WireSkillTreeEvents() for transparent propagation.
-   • LeaderID values follow the format ${CUConstants.LEADER_ID_PREFIX}XXXXX to
-   guarantee uniqueness across save files.
-   • Comparison, hashing, and threading semantics rely on Unity’s main thread; the
-   class is not thread‑safe by design.
-
-   KEEP THIS BLOCK COMMENT IN SYNC WITH PUBLIC API CHANGES!
-   ───────────────────────────────────────────────────────────────────────────────*/
+ Developer notes
+ ═══════════════
+ • **Event-driven updates** – All state changes raise events consumed by the UI
+   layer; never modify *CommandGrade*, *ReputationPoints*, or assignment flags
+   directly outside the provided methods.  
+ • **Skill-tree ownership** – The contained *LeaderSkillTree* is the single
+   source of truth for capabilities and grade promotions; keep its serialisation
+   data in sync when adding new skills.  
+ • **Exception funnel** – Every public & helper method wraps logic in try/catch
+   and reports via `AppService.HandleException(CLASS_NAME, MethodName, e)` per
+   project logging standard.  
+ • **Thread safety** – No internal locks; UI threads should marshal back to the
+   main thread before mutating leader state.  
+ • **Clone semantics** – *Clone()* performs a deep copy of the skill tree and
+   assignment state but generates a new *LeaderID* to avoid duplicates in
+   persistence layers.
+───────────────────────────────────────────────────────────────────────────────*/
     [Serializable]
     public class Leader : ISerializable, ICloneable
     {

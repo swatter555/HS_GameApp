@@ -1,15 +1,111 @@
-using HammerAndSickle.Services;
+﻿using HammerAndSickle.Services;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Runtime.Serialization;
 
 namespace HammerAndSickle.Models
 {
-    /// <summary>
-    /// Facility management functionality for CombatUnit base units.
-    /// Handles HQ, Airbase, and Supply Depot operations integrated directly into CombatUnit.
-    /// </summary>
+ /*───────────────────────────────────────────────────────────────────────────────
+  CombatUnit.Facility ─ base-facility subsystem (HQ, Airbase, Supply Depot)
+────────────────────────────────────────────────────────────────────────────────
+ Summary
+ ═══════
+ • Adds facility-specific state & behaviour to **CombatUnit** when *IsBase* is
+   true: damage/repair, operational capacity, attached air-unit logistics, and
+   supply-depot stockpile & projection math.  Handles three facility types
+   (HQ, Airbase, SupplyDepot) selected from the unit’s *Classification*. :contentReference[oaicite:0]{index=0}
+
+ Public properties
+ ═════════════════
+   int                      BaseDamage              { get; private set; }
+   OperationalCapacity      OperationalCapacity     { get; private set; }
+   FacilityType             FacilityType            { get; private set; }
+
+   // Supply-depot only
+   DepotSize                DepotSize               { get; private set; }
+   float                    StockpileInDays         { get; private set; }
+   SupplyGenerationRate     GenerationRate          { get; private set; }
+   SupplyProjection         SupplyProjection        { get; private set; }
+   bool                     SupplyPenetration       { get; private set; }
+   DepotCategory            DepotCategory           { get; private set; }
+   int                      ProjectionRadius        => IsBase ? … : 0;
+   bool                     IsMainDepot             => IsBase && DepotCategory == Main;
+
+   // Airbase only
+   IReadOnlyList<CombatUnit> AirUnitsAttached       { get; private set; }
+
+ Constructors
+ ═════════════
+   ⟡ (none in this partial; constructed via main *CombatUnit* ctor)
+
+ Public API (method signatures ⇢ brief purpose)
+ ═════════════════════════════════════════════
+ ― Facility damage / capacity ―
+   public void   AddFacilityDamage(int dmg)               // apply bomb/strike damage
+   public void   RepairFacilityDamage(int amt)            // restore damage
+   public void   SetFacilityDamage(int lvl)               // direct set (load/debug)
+   public float  GetFacilityEfficiencyMultiplier()        // 0-1 scalar vs. capacity
+   public bool   IsFacilityOperational()                  // capacity ≠ OutOfOperation
+
+ ― Airbase management ―
+   public bool          AddAirUnit(CombatUnit unit)       // attach aircraft
+   public bool          RemoveAirUnit(CombatUnit unit)    // detach by ref
+   public bool          RemoveAirUnitByID(string id)      // detach by ID
+   public CombatUnit    GetAirUnitByID(string id)
+   public int           GetAttachedAirUnitCount()
+   public int           GetAirUnitCapacity()
+   public bool          HasAirUnit(CombatUnit unit)
+   public bool          HasAirUnitByID(string id)
+   public void          ClearAllAirUnits()
+   public bool          CanLaunchAirOperations()
+   public bool          CanRepairAircraft()
+   public bool          CanAcceptNewAircraft()
+   public List<CombatUnit> GetOperationalAirUnits()
+   public int           GetOperationalAirUnitCount()
+
+ ― Supply-depot management ―
+   public bool   AddSupplies(float days)                  // manual stock add
+   public void   RemoveSupplies(float days)               // manual stock remove
+   public bool   GenerateSupplies()                       // auto gen (per turn)
+   public bool   CanSupplyUnitAt(int dist, int zoc)       // projection gate check
+   public float  SupplyUnit(int dist, int zoc)            // over-land supply push
+   public float  PerformAirSupply(int dist)               // main-depot airlift
+   public float  PerformNavalSupply(int dist)             // main-depot sealift
+   public float  GetStockpilePercentage()                 // fill ratio 0-1
+   public bool   IsStockpileEmpty()
+   public float  GetRemainingSupplyCapacity()
+   public bool   UpgradeDepotSize()                       // bump S→M→L→H
+   public void   SetSupplyPenetration(bool enabled)       // toggle ZOC bypass
+
+ Private helpers
+ ═══════════════
+   // construction
+   void   InitializeFacility(DepotCategory cat = Secondary, DepotSize size = Small)
+   void   SetupHQ()
+   void   SetupAirbase()
+   void   SetupSupplyDepot(DepotCategory cat, DepotSize size)
+
+   // damage & capacity
+   void   UpdateOperationalCapacity()
+
+   // depot maths
+   float  GetMaxStockpile()
+   float  GetCurrentGenerationRate()
+   void   SetDepotSize(DepotSize size)
+
+ Developer notes
+ ═══════════════
+ • **OperationalCapacity drive-wheel** – All efficiency checks funnel through
+   *GetFacilityEfficiencyMultiplier()*; any new capacity tier must update both
+   that switch and the constants table.
+ • **AirUnit attachment persistence** – Air units are stored by hard reference
+   at runtime and by *UnitID* during serialization (*_attachedUnitIDs* list).
+   Ensure *ResolveReferences()* in the root class re-hydrates this list after
+   load.
+ • **Supply projection model** – Distance & ZOC efficiency multipliers are
+   tuned in *CUConstants.DISTANCE_EFF_MULT* and *.ZOC_EFF_MULT*.  Balance
+   designers can tweak without touching code.
+───────────────────────────────────────────────────────────────────────────────*/
     public partial class CombatUnit
     {
         #region Facility Fields

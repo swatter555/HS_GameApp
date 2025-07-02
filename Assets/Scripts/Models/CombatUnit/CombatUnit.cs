@@ -6,7 +6,204 @@ using System.Linq;
 using System.Runtime.Serialization;
 using UnityEngine;
 
+/*───────────────────────────────────────────────────────────────────────────────
+  CombatUnit ─ universal model for every battlefield piece in Hammer & Sickle
+────────────────────────────────────────────────────────────────────────────────
+ Summary
+ ═══════
+ • Encapsulates all mutable state and behaviour for *one* ground, air, or base
+   unit: hit-points, supply, experience, leader assignment, combat state,
+   movement/action economy, reference-resolution, cloning, and binary
+   serialization.
+ • Works hand-in-glove with shared *profile* singletons
+   (WeaponSystemProfile, IntelProfile, etc.) to keep per-unit memory footprint
+   low.
+ • Implements **ICloneable**, **ISerializable**, and **IResolvableReferences**
+   to support template cloning, save-games, and late reference fixes.
 
+ Public properties
+ ═════════════════
+   string            UnitName               { get; set; }
+   string            UnitID                 { get; private set; }
+   UnitType          UnitType               { get; private set; }
+   UnitClassification Classification        { get; private set; }
+   UnitRole          Role                   { get; private set; }
+   Side              Side                   { get; private set; }
+   Nationality       Nationality            { get; private set; }
+   bool              IsTransportable        { get; private set; }
+   bool              IsBase                 { get; private set; }
+   WeaponSystems     DeployedProfileID      { get; private set; }
+   WeaponSystems     MountedProfileID       { get; private set; }
+   IntelProfileTypes IntelProfileType       { get; internal set; }
+   bool              IsLeaderAssigned                           // field
+   Leader            CommandingOfficer       { get; internal set; }
+   StatsMaxCurrent   MoveActions             { get; private set; }
+   StatsMaxCurrent   CombatActions           { get; private set; }
+   StatsMaxCurrent   DeploymentActions       { get; private set; }
+   StatsMaxCurrent   OpportunityActions      { get; private set; }
+   StatsMaxCurrent   IntelActions            { get; private set; }
+   int               ExperiencePoints        { get; internal set; }
+   ExperienceLevel   ExperienceLevel         { get; internal set; }
+   EfficiencyLevel   EfficiencyLevel         { get; internal set; }
+   bool              IsMounted               { get; internal set; }
+   CombatState       CombatState             { get; internal set; }
+   StatsMaxCurrent   HitPoints               { get; private set; }
+   StatsMaxCurrent   DaysSupply              { get; private set; }
+   StatsMaxCurrent   MovementPoints          { get; private set; }
+   Coordinate2D      MapPos                  { get; internal set; }
+   SpottedLevel      SpottedLevel            { get; private set; }
+
+ Constructors
+ ═════════════
+   public CombatUnit(string unitName,
+                     UnitType unitType,
+                     UnitClassification classification,
+                     UnitRole role,
+                     Side side,
+                     Nationality nationality,
+                     WeaponSystems deployedProfileID,
+                     WeaponSystems mountedProfileID,
+                     IntelProfileTypes intelProfileType,
+                     bool isTransportable,
+                     bool isBase = false,
+                     DepotCategory category = DepotCategory.Secondary,
+                     DepotSize size = DepotSize.Small)
+
+   // Binary-deserialization
+   protected CombatUnit(SerializationInfo info, StreamingContext context)
+
+ Public API (method signatures ⇢ brief purpose)
+ ═════════════════════════════════════════════
+ ― Generic unit info / state ―
+   public WeaponSystemProfile GetDeployedProfile()                 // returns shared deployed profile
+   public WeaponSystemProfile GetMountedProfile()                  // returns shared mounted profile (or null)
+   public WeaponSystemProfile GetActiveWeaponSystemProfile()       // deployed vs. mounted logic
+   public WeaponSystemProfile GetCurrentCombatStrength()           // cloned profile with all modifiers applied
+   public IntelReport          GenerateIntelReport(SpottedLevel=…) // fog-of-war filtered intel
+   public void                 RefreshAllActions()                 // reset action tokens
+   public void                 RefreshMovementPoints()             // reset MP
+   public void                 SetSpottedLevel(SpottedLevel lvl)
+
+ ― Damage / supply ―
+   public void  TakeDamage(float dmg)
+   public void  Repair(float hp)
+   public bool  ConsumeSupplies(float amount)                      // returns false when empty
+   public float ReceiveSupplies(float amount)                      // returns accepted qty
+   public bool  IsDestroyed()
+   public bool  CanMove()                                          // quick “mobility gate”
+   public float GetSupplyStatus()                                  // 0-1 scalar
+
+ ― Efficiency ―
+   public void SetEfficiencyLevel(EfficiencyLevel lvl)
+   public void DecreaseEfficiencyLevelBy1()
+   public void IncreaseEfficiencyLevelBy1()
+
+ ― Experience ―
+   public bool  AddExperience(int pts)                             // handles level-up
+   public void  SetExperience(int pts)                             // direct set (load game)
+   public int   GetPointsToNextLevel()
+   public float GetExperienceProgress()                            // 0-1 scalar
+
+ ― Leader subsystem ―
+   public bool                                AssignLeader(Leader leader)
+   public bool                                RemoveLeader()
+   public Dictionary<SkillBonusType,float>    GetLeaderBonuses()
+   public bool                                HasLeaderCapability(SkillBonusType type)
+   public float                               GetLeaderBonus(SkillBonusType type)
+   public bool                                HasLeader()
+   public string                              GetLeaderName()
+   public CommandGrade                        GetLeaderGrade()
+   public int                                 GetLeaderReputation()
+   public string                              GetLeaderRank()
+   public CommandAbility                      GetLeaderCommandAbility()
+   public bool                                HasLeaderSkill(Enum skill)
+   public void                                AwardLeaderReputation(CUConstants.ReputationAction act,
+                                                                    float ctx=1f)
+   public void                                AwardLeaderReputation(int amount)
+
+ ― Action-economy ―
+   public bool                             SpendAction(ActionTypes type, float movtCost = 0)
+   public Dictionary<string,float>         GetAvailableActions()
+
+ ― Combat-state machine ―
+   public bool UpOneState()                                    // Fortified→…→Mobile
+   public bool DownOneState()                                  // reverse
+   public bool SetCombatState(CombatState newState)
+   public bool CanChangeToState(CombatState target)
+   public bool BeginEntrenchment()
+   public bool CanEntrench()
+   public List<CombatState> GetValidStateTransitions()
+
+ ― Position / movement ―
+   public void  SetPosition(Coordinate2D pos)
+   public bool  CanMoveTo(Coordinate2D target)                 // *TODO* not implemented
+   public float GetDistanceTo(Coordinate2D target)
+   public float GetDistanceTo(CombatUnit other)
+
+ ― Debug helpers ―
+   public void DebugSetCombatState(CombatState st)
+   public void DebugSetMounted(bool mounted)
+
+ ― Interfaces ―
+   public object        Clone()                                // ICloneable
+   public void          GetObjectData(SerializationInfo, StreamingContext) // ISerializable
+   public bool          HasUnresolvedReferences()              // IResolvableReferences
+   public IReadOnlyList<string> GetUnresolvedReferenceIDs()
+   public void          ResolveReferences(GameDataManager mgr)
+   public List<string>  ValidateInternalConsistency()
+
+ Private / internal helpers
+ ══════════════════════════
+   void   InitializeActionCounts()                       // derive token caps from classification
+   void   InitializeMovementPoints()                     // derive MP from classification
+   float  GetFinalCombatRatingModifier()                 // strength×state×efficiency×XP
+   float  GetStrengthModifier()
+   float  GetCombatStateModifier()
+   float  GetEfficiencyModifier()
+   ExperienceLevel   CalculateExperienceLevel(int points)
+   int    GetMinPointsForLevel(ExperienceLevel lvl)
+   ExperienceLevel   GetNextLevel(ExperienceLevel lvl)
+   void   OnExperienceLevelChanged(ExperienceLevel prev, ExperienceLevel next) // UI message
+   float  GetExperienceMultiplier()
+   bool   ValidateLeaderAssignmentConsistency()
+   void   FixLeaderAssignmentConsistency()
+   string GetUnitDisplayName(string id)
+   bool   ConsumeMovementPoints(float pts)
+   float  GetDeploymentActionMovementCost()
+   float  GetCombatActionMovementCost()
+   float  GetIntelActionMovementCost()
+   bool   CanConsumeMoveAction()
+   bool   CanConsumeCombatAction()
+   bool   CanConsumeDeploymentAction()
+   bool   CanConsumeIntelAction()
+   bool   CanUnitTypeChangeStates()
+   bool   IsAdjacentStateTransition(CombatState cur, CombatState tgt)
+   bool   HasSufficientMovementForDeployment()
+   void   UpdateStateAndProfiles(CombatState newSt, CombatState prevSt)
+
+   // …plus a handful of facility-specific helpers in the base-unit region.
+
+ Developer notes
+ ═══════════════
+ • **Action-Economy Core** – Five separate StatsMaxCurrent pools model move, combat,
+   deployment, opportunity, and intel actions.  Each high-level API method *must*
+   decrement these pools consistently; use *SpendAction* for centralised validation.
+ • **Profiles vs. Instance Data** – Deployed/Mounted *WeaponSystemProfile*s are
+   immutable templates; only the enum ID is stored. Avoid serialising the heavy
+   profile object.
+ • **Serialization contract** – When adding fields, remember to:  
+     1.  Extend *GetObjectData* and deserialization ctor.  
+     2.  Include the field in *Clone*.  
+     3.  Update *ValidateInternalConsistency*.
+ • **Reference-resolution pattern** – Leader IDs and air-unit attachments are fixed
+   in *ResolveReferences* after *GameDataManager* owns all objects.  Never dereference
+   these pointers inside the deserialization constructor.
+ • **Error handling** – EVERY public-facing method is wrapped in try-catch and
+   funnels to `AppService.HandleException(CLASS_NAME, Method, e)` per project
+   standard.
+ • **UnitType restrictions** – Fixed-wing aircraft and pure base classes cannot
+   transition combat states; helper *CanUnitTypeChangeStates()* codifies this rule.
+───────────────────────────────────────────────────────────────────────────────*/
 namespace HammerAndSickle.Models
 {
     [Serializable]

@@ -3,102 +3,65 @@ using System.Collections.Generic;
 using HammerAndSickle.Services;
 
 /*───────────────────────────────────────────────────────────────────────────────
- IntelProfile  —  static organizational template system for unit intelligence
- ────────────────────────────────────────────────────────────────────────────────
- Overview
- ════════
- **IntelProfile** provides static organizational templates that define the
- maximum equipment composition for each unit type in Hammer & Sickle. Unlike
- per-unit data storage, this system uses shared static definitions to generate
- intelligence reports with fog-of-war distortion based on spotted levels.
+  IntelProfile ─ static template repository for unit organizational intelligence
+────────────────────────────────────────────────────────────────────────────────
+ Summary
+ ═══════
+ • Holds an immutable lookup table that defines the *maximum* equipment
+   composition for every unit type (one entry per **IntelProfileTypes** value).  
+ • Generates fog-of-war filtered **IntelReport** snapshots, scaling counts by
+   current strength and applying ±error based on *SpottedLevel*.  
+ • Eliminates per-unit memory overhead—each **CombatUnit** stores only an enum
+   reference to its template. :contentReference[oaicite:0]{index=0}
 
- Major Responsibilities
- ══════════════════════
- • Static template storage for all unit organizational structures
-     - Dictionary-based weapon system definitions per IntelProfileTypes
-     - Maximum equipment counts for each WeaponSystems enum
-     - Memory-efficient shared reference architecture
- • Intelligence report generation with fog-of-war effects
-     - Level-based accuracy distortion (±30% to perfect intel)
-     - Strength scaling based on current hit points
-     - Bucket aggregation for GUI display categories
- • Startup initialization and data validation
-     - Profile loading and consistency checking
-     - Error handling through AppService integration
-     - Thread-safe static access patterns
-
- Design Highlights
+ Public properties
  ═════════════════
- • **Static Architecture**: Eliminates per-unit object storage overhead while
-   maintaining organizational template integrity across all units of same type.
- • **Enum-Based Lookup**: CombatUnit stores only IntelProfileTypes enum value,
-   enabling O(1) template access without reference resolution complexity.
- • **Fog-of-War System**: Sophisticated intelligence distortion with independent
-   bucket-level error application for realistic reconnaissance simulation.
- • **Bucket Mapping**: Weapon system prefixes automatically categorized into
-   GUI-friendly display buckets (Men, Tanks, IFVs, Artillery, etc.).
- • **Memory Optimization**: Single static definition per unit type serves
-   thousands of individual units without duplication.
+   bool IsInitialized { get; }                       // true after successful static init
 
- Fog-of-War Intelligence Levels
- ══════════════════════════════
- • **Level 0 (Not Spotted)**: No intelligence available - method returns null
- • **Level 1 (Minimal Contact)**: Unit name and metadata only, zero equipment counts
- • **Level 2 (Poor Intel)**: Equipment buckets with ±30% random error per bucket
- • **Level 3 (Good Intel)**: Equipment buckets with ±10% random error per bucket  
- • **Level 4 (Perfect Intel)**: Exact equipment counts with no distortion
-
- Bucket Categories
- ═════════════════
- Equipment automatically categorized into display buckets:
- • **Personnel**: Men (infantry, crews, specialists)
- • **Vehicles**: Tanks, IFVs, APCs, Recon vehicles
- • **Artillery**: Artillery, Rocket Artillery, Surface-to-Surface Missiles
- • **Air Defense**: SAMs, Anti-Aircraft Artillery, MANPADs
- • **Support**: ATGMs, Engineering equipment
- • **Aircraft**: Attack Helicopters, Fighters, Multirole, Attack, Bombers, AWACS, Recon Aircraft
-
- Public Interface
- ════════════════
-   ── Initialization ──────────────────────────────────────────────────────────
-   InitializeProfiles()               Load all static profile definitions
-   IsInitialized                      Check if profiles loaded successfully
-   
-   ── Intelligence Generation ─────────────────────────────────────────────────
-   GenerateIntelReport(profileType,   Generate fog-of-war filtered intelligence
-     unitName, currentHitPoints,      snapshot with specified accuracy level
-     nationality, combatState, 
-     xpLevel, effLevel, spottedLevel)
-     
-   ── Profile Management ──────────────────────────────────────────────────────
-   HasProfile(profileType)            Check if profile type is defined
-   GetWeaponSystemCount(profileType,  Get max count for specific weapon system
-     weaponSystem)                    in profile type
-   GetDefinedWeaponSystems(           Get all weapon systems in profile type
-     profileType)
-
- Implementation Flow
- ═══════════════════
- 1. **Startup Initialization**: LoadProfileDefinitions() populates static dictionary
-    with organizational data for all IntelProfileTypes enum values
- 2. **Strength Scaling**: Equipment counts multiplied by (currentHP / maxHP) to
-    represent unit attrition and combat effectiveness
- 3. **Bucket Aggregation**: Individual weapon systems mapped to GUI categories
-    using prefix-based classification system
- 4. **Fog-of-War Application**: Each bucket independently distorted based on
-    spotted level with random directional error
- 5. **Pruning**: Buckets with final values < 1 omitted from report to prevent
-    "ghost" equipment display
-
- Thread Safety
+ Constructors
  ═════════════
- Static initialization is thread-safe with double-checked locking. Profile
- access is read-only after initialization, enabling safe concurrent access
- from multiple game systems without synchronization overhead.
+   // none – static class
 
- ───────────────────────────────────────────────────────────────────────────────
- MAINTAIN CONSISTENCY WITH IntelReport BUCKET PROPERTIES!
- ─────────────────────────────────────────────────────────────────────────────── */
+ Public API (method signatures ⇢ purpose)
+ ═══════════════════════════════════════
+   public static void  InitializeProfiles()                                 // one-time load of all templates
+   public static bool  HasProfile(IntelProfileTypes profileType)            // quick existence check
+   public static int   GetWeaponSystemCount(IntelProfileTypes type,
+                                            WeaponSystems ws)               // max count for a given WS
+   public static IReadOnlyDictionary<WeaponSystems,int>
+                       GetDefinedWeaponSystems(IntelProfileTypes type)      // full WS→count map
+   public static IntelReport GenerateIntelReport(IntelProfileTypes type,
+                                                 string unitName,
+                                                 int currentHP,
+                                                 Nationality nat,
+                                                 CombatState state,
+                                                 ExperienceLevel xp,
+                                                 EfficiencyLevel eff,
+                                                 SpottedLevel spot = SpottedLevel.Level1)
+                                                                            // fog-of-war report builder
+
+ Private helpers
+ ═══════════════
+   static void   EnsureInitialized()                         // guard against premature use
+   static void   LoadProfileDefinitions()                    // populate _profiles (TODO: data-file driven)
+   static string GetWeaponSystemPrefix(WeaponSystems ws)     // extract “TANK”, “IFV”, etc.
+   static string MapPrefixToBucket(string prefix)            // prefix→GUI bucket
+   static float  CalculateFogOfWarMultiplier(SpottedLevel s) // ±error based on intel level
+   static float  GetRandomMultiplier(float min, float max)   // randomised ±% helper
+   static void   AssignBucketToReport(IntelReport rpt,
+                                      string bucket,
+                                      int value)             // write into report fields
+
+ Developer notes
+ ═══════════════
+ • **Thread-Safety** – Double-checked locking around *InitializeProfiles()* ensures
+   safe concurrent startup. Once initialised, data are read-only and lock-free.  
+ • **Fog-of-War Maths** – Error percentages come from *CUConstants*; tweak those
+   constants to rebalance intel accuracy without touching this class.  
+ • **Bucket Consistency** – *MapPrefixToBucket()* **must** remain in sync with the
+   bucket properties in **IntelReport**. Add a new case whenever you introduce a
+   new weapon-system prefix or display bucket.  
+───────────────────────────────────────────────────────────────────────────────*/
 namespace HammerAndSickle.Models
 {
     public static class IntelProfile

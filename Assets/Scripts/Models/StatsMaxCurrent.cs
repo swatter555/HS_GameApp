@@ -1,13 +1,70 @@
-using System;
+﻿using System;
 using HammerAndSickle.Services;
 
 namespace HammerAndSickle.Models
 {
-    /// <summary>
-    /// Represents a game statistic that has both a maximum and current value.
-    /// Provides validation and helper methods for managing these paired values.
-    /// Used for stats like hit points, movement points, action counts, and supply levels.
-    /// </summary>
+    /*────────────────────────────────────────────────────────────────────────────
+     Coordinate2D ─ serialisable replacement for Unity Vector2 
+    ──────────────────────────────────────────────────────────────────────────────
+
+    Summary
+    ═══════
+    • Drop‑in struct that mirrors UnityEngine.Vector2 but is fully [Serializable],
+      enabling binary save‑game persistence without custom surrogates.
+    • Provides implicit conversions to/from Vector2 so existing APIs continue to
+      accept Coordinate2D transparently.
+
+    Key features
+    ═════════════
+      • Complete arithmetic & vector‑math operator set (+, −, ×, ÷, dot, lerp).
+      • Common direction constants (Zero, One, Up, Down, Left, Right).
+      • Floating‑point tolerant equality (EPSILON = 1e‑5f).
+      • No‑GC magnitude / sqrMagnitude helpers; normalisation utilities.
+
+    Public API (selection)
+    ══════════════════════
+      // fields
+      float x, y;
+
+      // static constants
+      static Coordinate2D Zero/One/Up/Down/Left/Right;
+
+      // properties
+      float magnitude { get; }
+      float sqrMagnitude { get; }
+      Coordinate2D normalized { get; }
+
+      // constructors
+      Coordinate2D(float x, float y);
+      Coordinate2D(float uniform);
+
+      // implicit conversions
+      static implicit operator Coordinate2D(Vector2 v);
+      static implicit operator Vector2(Coordinate2D c);
+
+      // arithmetic operators
+      +, −, *, / (scalar & component‑wise)
+
+      // vector helpers
+      static float Distance/SqrDistance(Coordinate2D a, Coordinate2D b);
+      static float Dot(Coordinate2D a, Coordinate2D b);
+      static Coordinate2D Lerp/LerpUnclamped(a, b, t);
+      static Coordinate2D Min/Max/Clamp(...);
+
+      // instance methods
+      void Normalize();
+      void Set(float x, float y);
+      void Scale(float s) / Scale(Coordinate2D s);
+
+    Developer notes
+    ═══════════════
+    • Maintain API parity with Vector2 to minimise learning curve; any additions to
+      Vector2 should be evaluated for inclusion here.
+    • EPSILON governs equality/normalisation tolerance—review when precision bugs
+      are reported.
+    • Keep struct immutable from the outside—write access is via public fields by
+      design to match Vector2 semantics.
+   ────────────────────────────────────────────────────────────────────────────*/
     [Serializable]
     public class StatsMaxCurrent
     {

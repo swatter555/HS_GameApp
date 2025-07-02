@@ -1,78 +1,68 @@
 ﻿using System;
 using UnityEngine;
 
-/*───────────────────────────────────────────────────────────────────────────────
- Coordinate2D — serializable replacement for Unity Vector2
- ────────────────────────────────────────────────────────────────────────────────
- Overview
- ════════
- **Coordinate2D** provides a fully serializable 2D coordinate structure that works
- interchangeably with Unity's Vector2. Created to solve binary serialization issues
- where UnityEngine.Vector2 lacks the [Serializable] attribute, causing failures
- with BinaryFormatter during save/load operations.
+/*────────────────────────────────────────────────────────────────────────────
+  Coordinate2D ─ serialisable replacement for Unity Vector2 
+──────────────────────────────────────────────────────────────────────────────
 
- Major Responsibilities
+ Summary
+ ═══════
+ • Drop‑in struct that mirrors UnityEngine.Vector2 but is fully [Serializable],
+   enabling binary save‑game persistence without custom surrogates.
+ • Provides implicit conversions to/from Vector2 so existing APIs continue to
+   accept Coordinate2D transparently.
+
+ Key features
+ ═════════════
+   • Complete arithmetic & vector‑math operator set (+, −, ×, ÷, dot, lerp).
+   • Common direction constants (Zero, One, Up, Down, Left, Right).
+   • Floating‑point tolerant equality (EPSILON = 1e‑5f).
+   • No‑GC magnitude / sqrMagnitude helpers; normalisation utilities.
+
+ Public API (selection)
  ══════════════════════
- • Binary serialization compatibility for save/load systems
- • Seamless interoperability with Unity Vector2 through implicit conversions
- • Complete mathematical operations (add, subtract, multiply, divide, etc.)
- • Vector mathematics (magnitude, distance, normalization, dot/cross products)
- • Equality comparisons with floating-point tolerance
- • Common vector constants (Zero, One, Up, Down, Left, Right)
+   // fields
+   float x, y;
 
- Design Highlights
- ═════════════════
- • **Serializable by Design**: Marked with [Serializable] for BinaryFormatter
- • **Drop-in Replacement**: Implicit conversions allow transparent usage with Vector2
- • **Mathematical Completeness**: Full operator overloading and vector math support
- • **Performance Focused**: Struct design with efficient operations
- • **Unity Integration**: Seamless conversion to/from Vector2 for Unity API calls
- • **Consistent API**: Mirrors Vector2 method names and behavior patterns
+   // static constants
+   static Coordinate2D Zero/One/Up/Down/Left/Right;
 
- Usage Examples
- ══════════════
-   // Direct construction
-   var coord = new Coordinate2D(5.0f, 7.0f);
-   
-   // Implicit conversion from Vector2
-   Coordinate2D pos = new Vector2(10, 20);
-   
-   // Implicit conversion to Vector2
-   Vector2 unityPos = coord;
-   
-   // Mathematical operations
-   var result = coord1 + coord2;
-   var scaled = coord * 2.5f;
-   
-   // Vector mathematics
-   float distance = Coordinate2D.Distance(coord1, coord2);
-   var normalized = coord.normalized;
+   // properties
+   float magnitude { get; }
+   float sqrMagnitude { get; }
+   Coordinate2D normalized { get; }
 
- Public Interface
- ════════════════
-   ── Properties ──────────────────────────────────────────────────────────────
-   float x, y                     Component values
-   float magnitude                Vector length
-   float sqrMagnitude            Squared vector length (faster)
-   Coordinate2D normalized       Unit vector in same direction
-   
-   ── Static Constants ───────────────────────────────────────────────────────
-   Zero, One, Up, Down, Left, Right   Common vector directions
-   
-   ── Mathematical Operations ────────────────────────────────────────────────
-   +, -, *, /                    Standard arithmetic operators
-   ==, !=                        Equality with floating-point tolerance
-   
-   ── Vector Mathematics ─────────────────────────────────────────────────────
-   Distance(a, b)                Distance between two coordinates
-   Dot(a, b)                     Dot product
-   Lerp(a, b, t)                 Linear interpolation
-   Normalize()                   In-place normalization
+   // constructors
+   Coordinate2D(float x, float y);
+   Coordinate2D(float uniform);
 
- ───────────────────────────────────────────────────────────────────────────────
- MAINTAIN COMPATIBILITY WITH Unity Vector2 API PATTERNS!
- ───────────────────────────────────────────────────────────────────────────── */
+   // implicit conversions
+   static implicit operator Coordinate2D(Vector2 v);
+   static implicit operator Vector2(Coordinate2D c);
 
+   // arithmetic operators
+   +, −, *, / (scalar & component‑wise)
+
+   // vector helpers
+   static float Distance/SqrDistance(Coordinate2D a, Coordinate2D b);
+   static float Dot(Coordinate2D a, Coordinate2D b);
+   static Coordinate2D Lerp/LerpUnclamped(a, b, t);
+   static Coordinate2D Min/Max/Clamp(...);
+
+   // instance methods
+   void Normalize();
+   void Set(float x, float y);
+   void Scale(float s) / Scale(Coordinate2D s);
+
+ Developer notes
+ ═══════════════
+ • Maintain API parity with Vector2 to minimise learning curve; any additions to
+   Vector2 should be evaluated for inclusion here.
+ • EPSILON governs equality/normalisation tolerance—review when precision bugs
+   are reported.
+ • Keep struct immutable from the outside—write access is via public fields by
+   design to match Vector2 semantics.
+────────────────────────────────────────────────────────────────────────────*/
 namespace HammerAndSickle.Models
 {
     /// <summary>

@@ -9,10 +9,31 @@ using HammerAndSickle.Services;
 
 namespace HammerAndSickle.Models
 {
-    /// <summary>
-    /// Interface for objects that need reference resolution after deserialization.
-    /// Implements the two-phase loading pattern used throughout the Hammer and Sickle codebase.
-    /// </summary>
+    /*────────────────────────────────────────────────────────────────────────────
+     IResolvableReferences ─ two‑phase loading contract 
+    ──────────────────────────────────────────────────────────────────────────────
+
+    Summary
+    ═══════
+    • Defines a lightweight contract for objects that cannot fully materialise on
+      their initial deserialisation pass and must resolve cross‑object links in a
+      second phase.
+    • Enables GameDataManager.ResolveAllReferences() to iterate generically over
+      heterogeneous objects while maintaining strict type safety.
+
+    Required members
+    ════════════════
+      IReadOnlyList<string> GetUnresolvedReferenceIDs()  ─ IDs still pending
+      void                 ResolveReferences(GameDataManager mgr)
+      bool                 HasUnresolvedReferences()
+
+    Developer notes
+    ═══════════════
+    • Implementations should populate unresolved IDs during ISerializable ctor and
+      clear them once resolution succeeds to minimise GC pressure.
+    • Always return an empty list instead of null to avoid allocations in hot
+      loops.
+   ────────────────────────────────────────────────────────────────────────────*/
     public interface IResolvableReferences
     {
         /// <summary>
@@ -35,9 +56,42 @@ namespace HammerAndSickle.Models
         bool HasUnresolvedReferences();
     }
 
-    /// <summary>
-    /// Metadata header for save files containing version and validation information.
-    /// </summary>
+
+    /*────────────────────────────────────────────────────────────────────────────
+     GameDataHeader ─ save file metadata shim 
+    ─────────────────────────────────── ──────────────────────────────────────────
+
+    Summary
+    ═══════
+    • Lightweight, serialisable header placed at the start of every .sce save file
+      to enable version negotiation and quick integrity checks without loading the
+      full object graph.
+
+    Data fields
+    ═══════════
+      int        Version             ─ incremental format revision
+      DateTime   SaveTime            ─ UTC timestamp of save creation
+      string     GameVersion         ─ client build string (Unity Application.version)
+      int        CombatUnitCount     ─ unit objects in payload
+      int        LeaderCount         ─ leader objects in payload
+      string     Checksum            ─ SHA‑256 over compressed payload bytes
+
+    Constructors
+    ════════════
+      GameDataHeader()                               // default → now, version = 1
+      private GameDataHeader(SerializationInfo, StreamingContext)
+
+    Interface implementation
+    ════════════════════════
+      void GetObjectData(SerializationInfo, StreamingContext)
+
+    Developer notes
+    ═══════════════
+    • Bump Version when header fields change; maintain backwards readers in
+      GameDataManager.
+    • Checksum is calculated by GameDataManager.SaveGameState; setter only used
+      during deserialisation.
+   ────────────────────────────────────────────────────────────────────────────*/
     [Serializable]
     public class GameDataHeader : ISerializable
     {
@@ -76,25 +130,79 @@ namespace HammerAndSickle.Models
         }
     }
 
-    /// <summary>
-    /// Centralized data management system for Hammer & Sickle game objects.
-    /// Handles registration, retrieval, serialization, and reference resolution for all persistent game data.
-    /// Uses singleton pattern with thread-safe operations for global access across the game systems.
-    /// 
-    /// Key Responsibilities:
-    /// - Object registration and lookup for CombatUnit and Leader instances
-    /// - Binary serialization with backup file management and version control
-    /// - Two-phase reference resolution for complex object relationships
-    /// - Cross-object relationship validation (leader assignments, etc.)
-    /// - Scenario loading/saving with proper path management
-    /// - Dirty state tracking for efficient save operations
-    /// 
-    /// Architecture Notes:
-    /// - WeaponSystemProfile objects are NOT managed here - they use static WeaponSystemsDatabase
-    /// - Facility functionality is integrated into CombatUnit, no separate tracking needed
-    /// - Each object validates its own internal consistency via ValidateInternalConsistency()
-    /// - GameDataManager focuses on inter-object relationship validation
-    /// </summary>
+
+    /*────────────────────────────────────────────────────────────────────────────
+     GameDataManager ─ global registry & persistence manager 
+    ──────────────────────────────────────────────────────────────────────────────
+
+    Summary
+    ═══════
+    • Provides a thread‑safe, singleton service that registers, tracks, serialises,
+      and validates all persistent game objects (CombatUnit, Leader, etc.) across
+      Hammer & Sickle.
+    • Implements the two‑phase loading pattern (deserialize → ResolveAllReferences)
+      to support shared template catalogs and cross‑object links.
+    • Exposes diagnostics (dirty/unsaved state, unresolved reference count) for UI
+      and automated tests.
+
+    Public properties
+    ═════════════════
+      int       TotalObjectCount         { get; }
+      int       UnresolvedReferenceCount { get; }
+      bool      HasUnsavedChanges        { get; }
+      (int CombatUnits, int Leaders, int Facilities)
+                ObjectCounts             { get; }
+      static    GameDataManager Instance { get; }
+
+    Constructors
+    ════════════
+      private GameDataManager()                               // hidden ctor (singleton)
+
+    Public methods
+    ══════════════
+      bool   RegisterCombatUnit(CombatUnit unit)              // add & track combat unit
+      bool   RegisterLeader(Leader leader)                    // add & track leader
+      bool   UnregisterCombatUnit(string unitId)              // remove combat unit
+      bool   UnregisterLeader(string leaderId)                // remove leader
+      CombatUnit GetCombatUnit(string unitId)                 // fetch combat unit or null
+      Leader GetLeader(string leaderId)                       // fetch leader or null
+      IReadOnlyCollection<CombatUnit> GetAllCombatUnits()     // enumerate combat units
+      IReadOnlyCollection<Leader> GetAllLeaders()             // enumerate leaders
+      IReadOnlyCollection<CombatUnit> GetCombatUnitsByClassification(UnitClassification c)
+      IReadOnlyCollection<CombatUnit> GetCombatUnitsBySide(Side side)
+      IReadOnlyCollection<CombatUnit> GetAllFacilities()
+      IReadOnlyCollection<Leader> GetUnassignedLeaders()
+      IReadOnlyCollection<Leader> GetLeadersByGrade(CommandGrade grade)
+      bool   HasCombatUnit(string unitId)
+      bool   HasLeader(string leaderId)
+      int    ResolveAllReferences()                           // second‑phase linking
+      List<string> ValidateDataIntegrity()                    // cross‑object checks
+      bool   SaveGameState(string filePath)                   // serialize to .sce (+.bak)
+      bool   LoadGameState(string filePath)                   // load & re‑hydrate
+      bool   SaveScenario(string scenarioName)                // save to scenario folder
+      bool   LoadScenario(string scenarioName)                // load scenario & validate
+      void   MarkDirty(string objectId)                       // flag object as changed
+      void   ClearAll()                                       // wipe all collections
+      void   Dispose()                                        // dispose resources
+
+    Private helpers
+    ═══════════════
+      void   ClearAllInternal()
+      void   MarkDirtyInternal(string objectId)
+      string CalculateChecksum()
+      void   Dispose(bool disposing)
+
+    Developer notes
+    ═══════════════
+    • Any change to the persisted object graph must update CalculateChecksum() and
+      CURRENT_SAVE_VERSION.
+    • All public methods wrap try/catch and forward to AppService.HandleException
+      for uniform error handling as mandated by coding guidelines.
+    • Immutable template objects (WeaponSystemProfile, UnitProfile, etc.) are
+      intentionally excluded; they are resolved during startup via master catalogs.
+    • Keep an extra blank line between #region blocks and append region names after
+      each #endregion as per project style preferences.
+   ────────────────────────────────────────────────────────────────────────────*/
     public class GameDataManager : IDisposable
     {
         #region Constants

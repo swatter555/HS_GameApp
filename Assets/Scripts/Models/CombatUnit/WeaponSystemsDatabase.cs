@@ -1,35 +1,59 @@
-using HammerAndSickle.Services;
+﻿using HammerAndSickle.Services;
 using System;
 using System.Collections.Generic;
 
 namespace HammerAndSickle.Models
 {
-    /// <summary>
-    /// Static database containing all WeaponSystemProfile definitions for the game.
-    /// Provides centralized management and lookup of weapon system combat capabilities.
-    /// 
-    /// This class serves as the master repository for all weapon system profiles used
-    /// throughout Hammer & Sickle. Each WeaponSystems enum value maps to a specific
-    /// WeaponSystemProfile containing combat ratings, ranges, and tactical capabilities.
-    /// 
-    /// The database follows a shared template architecture where multiple CombatUnits
-    /// reference the same WeaponSystemProfile instances, ensuring consistency and
-    /// memory efficiency across large armies.
-    /// 
-    /// Key Features:
-    /// - Static initialization with all game weapon systems
-    /// - Fast Dictionary-based lookup by WeaponSystems enum
-    /// - Centralized management of combat balance and capabilities
-    /// - Memory-efficient shared profile references
-    /// - Comprehensive error handling through AppService integration
-    /// 
-    /// Usage:
-    /// var profile = WeaponSystemsDatabase.GetWeaponSystemProfile(WeaponSystems.TANK_T80B);
-    /// if (profile != null) { /* use profile for combat calculations */ }
-    /// 
-    /// Initialization:
-    /// WeaponSystemsDatabase.Initialize(); // Called during game startup
-    /// </summary>
+/*───────────────────────────────────────────────────────────────────────────────
+  WeaponSystemsDatabase ─ master catalogue of every WeaponSystemProfile
+────────────────────────────────────────────────────────────────────────────────
+ Summary
+ ═══════
+ • Static, in-memory dictionary that maps each **WeaponSystems** enum value to an
+   immutable **WeaponSystemProfile**.  
+ • Guarantees one-time initialisation during game start-up, then provides
+   lock-free, read-only access to profile data for all combat calculations.  
+ • Central location for combat-balance tuning: modify a profile here and every
+   **CombatUnit** that references the same enum reflects the change instantly. :contentReference[oaicite:0]{index=0}
+
+ Public properties
+ ═════════════════
+   bool IsInitialized   { get; }                // true after successful Initialise()
+   int  ProfileCount    { get; }                // total profiles currently stored
+
+ Constructors
+ ═════════════
+   // none – static class
+
+ Public API (method signatures ⇢ brief purpose)
+ ═════════════════════════════════════════════
+   public static void Initialize()                                     // build full DB; call once at start-up
+   public static WeaponSystemProfile
+                       GetWeaponSystemProfile(WeaponSystems id)        // fast lookup; returns null if absent
+   public static bool  HasWeaponSystemProfile(WeaponSystems id)        // existence check without retrieval
+
+ Private helpers
+ ═══════════════
+   static void CreateAllWeaponSystemProfiles()         // instantiates every profile; calls individual builders
+   static void CreateT80BProfile()                     // example builder: crafts “T-80B Main Battle Tank”
+
+ Developer notes
+ ═══════════════
+ • **Template pattern** – Every CombatUnit stores only an enum; the heavy
+   profile object lives here exactly once, reducing per-unit RAM and ensuring
+   global consistency.  
+ • **Initialisation contract** – Always call *WeaponSystemsDatabase.Initialize()*
+   during game boot before any unit creation; otherwise look-ups return *null*.  
+ • **Error handling** – All public and private methods wrap operations in
+   try/catch and delegate to `AppService.HandleException`.  Failed initialisation
+   re-throws to abort loading early.  
+ • **Extensibility** – Add new weapon systems by writing a `CreateXXXProfile()`
+   helper and calling it from *CreateAllWeaponSystemProfiles()*; keep enum,
+   profile builder, and upgrade definitions in sync.  
+ • **Thread-safety** – After the one-time build (which uses a local dictionary
+   before assignment), the underlying `_weaponSystemProfiles` is never mutated,
+   enabling lock-free concurrent reads by AI threads or parallel combat sims.
+───────────────────────────────────────────────────────────────────────────────*/
     public static class WeaponSystemsDatabase
     {
         #region Constants

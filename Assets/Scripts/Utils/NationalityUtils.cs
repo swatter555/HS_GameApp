@@ -1,12 +1,39 @@
-using HammerAndSickle.Models;
+﻿using HammerAndSickle.Models;
 using System.Collections.Generic;
 
 namespace HammerAndSickle.Utils
 {
-    /// <summary>
-    /// Utility class for converting nationality enums to descriptive strings.
-    /// Provides localized and readable nationality names for display purposes.
-    /// </summary>
+    /*────────────────────────────────────────────────────────────────────────────
+     NationalityUtils ─ enum→display‑name helper 
+    ──────────────────────────────────────────────────────────────────────────────
+
+    Summary
+    ═══════
+    • Static utility that maps Nationality enum values to short, localised display
+      names for UI labels, tooltips, and save‑file human readability.
+    • Eliminates scattered switch statements and string literals; single source of
+      truth for human‑friendly country names.
+    • Dictionary‑backed lookup ensures O(1) access and easy extension as new
+      Nationality values are introduced.
+
+    Private fields
+    ══════════════
+      Dictionary<Nationality, string> _displayNames  ─ enum→string lookup (static, RO)
+
+    Public methods
+    ══════════════
+      string                     GetDisplayName(Nationality)      // primary lookup
+      bool                       HasDisplayName(Nationality)      // existence check
+      IReadOnlyDictionary<Nationality,string> GetAllDisplayNames()// expose full map
+
+    Developer notes
+    ═══════════════
+    • When adding a new Nationality enum value, update _displayNames and run the
+      editor‑only NameTableValidation unit test (see UnitTestingGuidelines §4.2).
+    • Keep display names concise (≤ 12 chars) to avoid UI overflow on HUD panels.
+    • The dictionary is intentionally read‑only after static initialisation; any
+      mutation must go through a dedicated migration script and version bump.
+   ────────────────────────────────────────────────────────────────────────────*/
     public static class NationalityUtils
     {
         #region Constants

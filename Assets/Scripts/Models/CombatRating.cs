@@ -1,14 +1,60 @@
-using System;
+﻿using System;
 using System.Runtime.Serialization;
 using HammerAndSickle.Services;
 
 namespace HammerAndSickle.Models
 {
-    /// <summary>
-    /// Represents a combat rating with attack and defense values.
-    /// Provides validation and helper methods for managing paired combat statistics.
-    /// Used for different combat types like hard/soft attack, air combat, etc.
-    /// </summary>
+    /*────────────────────────────────────────────────────────────────────────────
+     CombatRating ─ paired attack/defense value object 
+    ──────────────────────────────────────────────────────────────────────────────
+
+    Summary
+    ═══════
+    • Lightweight value object encapsulating an attack/defense pair used across
+      unit, weapon, and doctrine models.
+    • Provides clamped validation against CUConstants.MIN/MAX_COMBAT_VALUE and a
+      helper API (total, ratio, clone) to centralise arithmetic.
+
+    Public properties
+    ═════════════════
+      int Attack  { get; private set; }
+      int Defense { get; private set; }
+
+    Constructors
+    ════════════
+      CombatRating(int attack, int defense)    // clamp & assign
+      CombatRating(int value)                  // attack = defense = value
+      CombatRating()                           // default 0/0
+      private CombatRating(SerializationInfo, StreamingContext)
+
+    Public methods
+    ══════════════
+      void        SetAttack(int value)
+      void        SetDefense(int value)
+      void        SetValues(int attack, int defense)
+      int         GetTotalCombatValue()
+      float       GetAttackDefenseRatio()
+      CombatRating Clone()
+      string      ToString()
+      bool        Equals(object obj)
+      int         GetHashCode()
+
+    Private helpers
+    ═══════════════
+      int ValidateCombatValue(int value)
+
+    ISerializable implementation
+    ════════════════════════════
+      void GetObjectData(SerializationInfo, StreamingContext)
+
+    Developer notes
+    ═══════════════
+    • Try/catch wrappers route exceptions through AppService.HandleException for
+      consistent logging before re‑throwing.
+    • Maintain immutability semantics for consumers—only expose mutation via
+      validated setters to avoid invalid state.
+    • ValidateCombatValue uses Math.Clamp to enforce bounds without allocations.
+   ────────────────────────────────────────────────────────────────────────────*/
     [Serializable]
     public class CombatRating : ISerializable
     {
