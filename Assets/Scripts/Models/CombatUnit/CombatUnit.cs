@@ -1,211 +1,379 @@
 ﻿using HammerAndSickle.Services;
 using System;
 using System.Collections.Generic;
-using System.IO;
 using System.Linq;
 using System.Runtime.Serialization;
 using UnityEngine;
 
-/*───────────────────────────────────────────────────────────────────────────────
-  CombatUnit ─ universal model for every battlefield piece in Hammer & Sickle
-────────────────────────────────────────────────────────────────────────────────
- Summary
- ═══════
- • Encapsulates all mutable state and behaviour for *one* ground, air, or base
-   unit: hit-points, supply, experience, leader assignment, combat state,
-   movement/action economy, reference-resolution, cloning, and binary
-   serialization.
- • Works hand-in-glove with shared *profile* singletons
-   (WeaponSystemProfile, IntelProfile, etc.) to keep per-unit memory footprint
-   low.
- • Implements **ICloneable**, **ISerializable**, and **IResolvableReferences**
-   to support template cloning, save-games, and late reference fixes.
-
- Public properties
- ═════════════════
-   string            UnitName               { get; set; }
-   string            UnitID                 { get; private set; }
-   UnitType          UnitType               { get; private set; }
-   UnitClassification Classification        { get; private set; }
-   UnitRole          Role                   { get; private set; }
-   Side              Side                   { get; private set; }
-   Nationality       Nationality            { get; private set; }
-   bool              IsTransportable        { get; private set; }
-   bool              IsBase                 { get; private set; }
-   WeaponSystems     DeployedProfileID      { get; private set; }
-   WeaponSystems     MountedProfileID       { get; private set; }
-   IntelProfileTypes IntelProfileType       { get; internal set; }
-   bool              IsLeaderAssigned                           // field
-   Leader            CommandingOfficer       { get; internal set; }
-   StatsMaxCurrent   MoveActions             { get; private set; }
-   StatsMaxCurrent   CombatActions           { get; private set; }
-   StatsMaxCurrent   DeploymentActions       { get; private set; }
-   StatsMaxCurrent   OpportunityActions      { get; private set; }
-   StatsMaxCurrent   IntelActions            { get; private set; }
-   int               ExperiencePoints        { get; internal set; }
-   ExperienceLevel   ExperienceLevel         { get; internal set; }
-   EfficiencyLevel   EfficiencyLevel         { get; internal set; }
-   bool              IsMounted               { get; internal set; }
-   CombatState       CombatState             { get; internal set; }
-   StatsMaxCurrent   HitPoints               { get; private set; }
-   StatsMaxCurrent   DaysSupply              { get; private set; }
-   StatsMaxCurrent   MovementPoints          { get; private set; }
-   Coordinate2D      MapPos                  { get; internal set; }
-   SpottedLevel      SpottedLevel            { get; private set; }
-
- Constructors
- ═════════════
-   public CombatUnit(string unitName,
-                     UnitType unitType,
-                     UnitClassification classification,
-                     UnitRole role,
-                     Side side,
-                     Nationality nationality,
-                     WeaponSystems deployedProfileID,
-                     WeaponSystems mountedProfileID,
-                     IntelProfileTypes intelProfileType,
-                     bool isTransportable,
-                     bool isBase = false,
-                     DepotCategory category = DepotCategory.Secondary,
-                     DepotSize size = DepotSize.Small)
-
-   // Binary-deserialization
-   protected CombatUnit(SerializationInfo info, StreamingContext context)
-
- Public API (method signatures ⇢ brief purpose)
- ═════════════════════════════════════════════
- ― Generic unit info / state ―
-   public WeaponSystemProfile GetDeployedProfile()                 // returns shared deployed profile
-   public WeaponSystemProfile GetMountedProfile()                  // returns shared mounted profile (or null)
-   public WeaponSystemProfile GetActiveWeaponSystemProfile()       // deployed vs. mounted logic
-   public WeaponSystemProfile GetCurrentCombatStrength()           // cloned profile with all modifiers applied
-   public IntelReport          GenerateIntelReport(SpottedLevel=…) // fog-of-war filtered intel
-   public void                 RefreshAllActions()                 // reset action tokens
-   public void                 RefreshMovementPoints()             // reset MP
-   public void                 SetSpottedLevel(SpottedLevel lvl)
-
- ― Damage / supply ―
-   public void  TakeDamage(float dmg)
-   public void  Repair(float hp)
-   public bool  ConsumeSupplies(float amount)                      // returns false when empty
-   public float ReceiveSupplies(float amount)                      // returns accepted qty
-   public bool  IsDestroyed()
-   public bool  CanMove()                                          // quick “mobility gate”
-   public float GetSupplyStatus()                                  // 0-1 scalar
-
- ― Efficiency ―
-   public void SetEfficiencyLevel(EfficiencyLevel lvl)
-   public void DecreaseEfficiencyLevelBy1()
-   public void IncreaseEfficiencyLevelBy1()
-
- ― Experience ―
-   public bool  AddExperience(int pts)                             // handles level-up
-   public void  SetExperience(int pts)                             // direct set (load game)
-   public int   GetPointsToNextLevel()
-   public float GetExperienceProgress()                            // 0-1 scalar
-
- ― Leader subsystem ―
-   public bool                                AssignLeader(Leader leader)
-   public bool                                RemoveLeader()
-   public Dictionary<SkillBonusType,float>    GetLeaderBonuses()
-   public bool                                HasLeaderCapability(SkillBonusType type)
-   public float                               GetLeaderBonus(SkillBonusType type)
-   public bool                                HasLeader()
-   public string                              GetLeaderName()
-   public CommandGrade                        GetLeaderGrade()
-   public int                                 GetLeaderReputation()
-   public string                              GetLeaderRank()
-   public CommandAbility                      GetLeaderCommandAbility()
-   public bool                                HasLeaderSkill(Enum skill)
-   public void                                AwardLeaderReputation(CUConstants.ReputationAction act,
-                                                                    float ctx=1f)
-   public void                                AwardLeaderReputation(int amount)
-
- ― Action-economy ―
-   public bool                             SpendAction(ActionTypes type, float movtCost = 0)
-   public Dictionary<string,float>         GetAvailableActions()
-
- ― Combat-state machine ―
-   public bool UpOneState()                                    // Fortified→…→Mobile
-   public bool DownOneState()                                  // reverse
-   public bool SetCombatState(CombatState newState)
-   public bool CanChangeToState(CombatState target)
-   public bool BeginEntrenchment()
-   public bool CanEntrench()
-   public List<CombatState> GetValidStateTransitions()
-
- ― Position / movement ―
-   public void  SetPosition(Coordinate2D pos)
-   public bool  CanMoveTo(Coordinate2D target)                 // *TODO* not implemented
-   public float GetDistanceTo(Coordinate2D target)
-   public float GetDistanceTo(CombatUnit other)
-
- ― Debug helpers ―
-   public void DebugSetCombatState(CombatState st)
-   public void DebugSetMounted(bool mounted)
-
- ― Interfaces ―
-   public object        Clone()                                // ICloneable
-   public void          GetObjectData(SerializationInfo, StreamingContext) // ISerializable
-   public bool          HasUnresolvedReferences()              // IResolvableReferences
-   public IReadOnlyList<string> GetUnresolvedReferenceIDs()
-   public void          ResolveReferences(GameDataManager mgr)
-   public List<string>  ValidateInternalConsistency()
-
- Private / internal helpers
- ══════════════════════════
-   void   InitializeActionCounts()                       // derive token caps from classification
-   void   InitializeMovementPoints()                     // derive MP from classification
-   float  GetFinalCombatRatingModifier()                 // strength×state×efficiency×XP
-   float  GetStrengthModifier()
-   float  GetCombatStateModifier()
-   float  GetEfficiencyModifier()
-   ExperienceLevel   CalculateExperienceLevel(int points)
-   int    GetMinPointsForLevel(ExperienceLevel lvl)
-   ExperienceLevel   GetNextLevel(ExperienceLevel lvl)
-   void   OnExperienceLevelChanged(ExperienceLevel prev, ExperienceLevel next) // UI message
-   float  GetExperienceMultiplier()
-   bool   ValidateLeaderAssignmentConsistency()
-   void   FixLeaderAssignmentConsistency()
-   string GetUnitDisplayName(string id)
-   bool   ConsumeMovementPoints(float pts)
-   float  GetDeploymentActionMovementCost()
-   float  GetCombatActionMovementCost()
-   float  GetIntelActionMovementCost()
-   bool   CanConsumeMoveAction()
-   bool   CanConsumeCombatAction()
-   bool   CanConsumeDeploymentAction()
-   bool   CanConsumeIntelAction()
-   bool   CanUnitTypeChangeStates()
-   bool   IsAdjacentStateTransition(CombatState cur, CombatState tgt)
-   bool   HasSufficientMovementForDeployment()
-   void   UpdateStateAndProfiles(CombatState newSt, CombatState prevSt)
-
-   // …plus a handful of facility-specific helpers in the base-unit region.
-
- Developer notes
- ═══════════════
- • **Action-Economy Core** – Five separate StatsMaxCurrent pools model move, combat,
-   deployment, opportunity, and intel actions.  Each high-level API method *must*
-   decrement these pools consistently; use *SpendAction* for centralised validation.
- • **Profiles vs. Instance Data** – Deployed/Mounted *WeaponSystemProfile*s are
-   immutable templates; only the enum ID is stored. Avoid serialising the heavy
-   profile object.
- • **Serialization contract** – When adding fields, remember to:  
-     1.  Extend *GetObjectData* and deserialization ctor.  
-     2.  Include the field in *Clone*.  
-     3.  Update *ValidateInternalConsistency*.
- • **Reference-resolution pattern** – Leader IDs and air-unit attachments are fixed
-   in *ResolveReferences* after *GameDataManager* owns all objects.  Never dereference
-   these pointers inside the deserialization constructor.
- • **Error handling** – EVERY public-facing method is wrapped in try-catch and
-   funnels to `AppService.HandleException(CLASS_NAME, Method, e)` per project
-   standard.
- • **UnitType restrictions** – Fixed-wing aircraft and pure base classes cannot
-   transition combat states; helper *CanUnitTypeChangeStates()* codifies this rule.
-───────────────────────────────────────────────────────────────────────────────*/
 namespace HammerAndSickle.Models
 {
+/*────────────────────────────────────────────────────────────────────────────
+
+CombatUnit ─ universal model for every battlefield piece in Hammer & Sickle
+
+──────────────────────────────────────────────────────────────────────────────
+
+Summary
+
+═══════
+
+• Encapsulates all mutable state and behaviour for *one* ground, air, or base
+
+unit: hit-points, supply, experience, leader assignment, combat state,
+
+movement/action economy, reference-resolution, cloning, and binary
+
+serialization.
+
+• Works hand-in-glove with shared *profile* singletons
+
+(WeaponSystemProfile, IntelProfile, etc.) to keep per-unit memory footprint
+
+low.
+
+• Implements **ICloneable**, **ISerializable**, and **IResolvableReferences**
+
+to support template cloning, save-games, and late reference fixes.
+
+Public properties
+
+═════════════════
+
+string UnitName { get; set; }
+
+string UnitID { get; private set; }
+
+UnitType UnitType { get; private set; }
+
+UnitClassification Classification { get; private set; }
+
+UnitRole Role { get; private set; }
+
+Side Side { get; private set; }
+
+Nationality Nationality { get; private set; }
+
+bool IsTransportable { get; private set; }
+
+bool IsBase { get; private set; }
+
+WeaponSystems DeployedProfileID { get; private set; }
+
+WeaponSystems MountedProfileID { get; private set; }
+
+IntelProfileTypes IntelProfileType { get; internal set; }
+
+string LeaderID { get; internal set; } // ID-based leader reference
+
+bool IsLeaderAssigned // computed property → !string.IsNullOrEmpty(LeaderID)
+
+Leader UnitLeader { get; } // computed property → GameDataManager lookup via LeaderID
+
+StatsMaxCurrent MoveActions { get; private set; }
+
+StatsMaxCurrent CombatActions { get; private set; }
+
+StatsMaxCurrent DeploymentActions { get; private set; }
+
+StatsMaxCurrent OpportunityActions { get; private set; }
+
+StatsMaxCurrent IntelActions { get; private set; }
+
+int ExperiencePoints { get; internal set; }
+
+ExperienceLevel ExperienceLevel { get; internal set; }
+
+EfficiencyLevel EfficiencyLevel { get; internal set; }
+
+bool IsMounted { get; internal set; }
+
+CombatState CombatState { get; internal set; }
+
+StatsMaxCurrent HitPoints { get; private set; }
+
+StatsMaxCurrent DaysSupply { get; private set; }
+
+StatsMaxCurrent MovementPoints { get; private set; }
+
+Coordinate2D MapPos { get; internal set; }
+
+SpottedLevel SpottedLevel { get; private set; }
+
+Constructors
+
+═════════════
+
+public CombatUnit(string unitName,
+
+UnitType unitType,
+
+UnitClassification classification,
+
+UnitRole role,
+
+Side side,
+
+Nationality nationality,
+
+WeaponSystems deployedProfileID,
+
+WeaponSystems mountedProfileID,
+
+IntelProfileTypes intelProfileType,
+
+bool isTransportable,
+
+bool isBase = false,
+
+DepotCategory category = DepotCategory.Secondary,
+
+DepotSize size = DepotSize.Small)
+
+// Binary-deserialization
+
+protected CombatUnit(SerializationInfo info, StreamingContext context)
+
+Public API (method signatures ⇢ brief purpose)
+
+═════════════════════════════════════════════
+
+― Generic unit info / state ―
+
+public WeaponSystemProfile GetDeployedProfile() // returns shared deployed profile
+
+public WeaponSystemProfile GetMountedProfile() // returns shared mounted profile (or null)
+
+public WeaponSystemProfile GetActiveWeaponSystemProfile() // deployed vs. mounted logic
+
+public WeaponSystemProfile GetCurrentCombatStrength() // cloned profile with all modifiers applied
+
+public IntelReport GenerateIntelReport(SpottedLevel=...) // fog-of-war filtered intel
+
+public void RefreshAllActions() // reset action tokens
+
+public void RefreshMovementPoints() // reset MP
+
+public void SetSpottedLevel(SpottedLevel lvl)
+
+― Damage / supply ―
+
+public void TakeDamage(float dmg)
+
+public void Repair(float hp)
+
+public bool ConsumeSupplies(float amount) // returns false when empty
+
+public float ReceiveSupplies(float amount) // returns accepted qty
+
+public bool IsDestroyed()
+
+public bool CanMove() // quick "mobility gate"
+
+public float GetSupplyStatus() // 0-1 scalar
+
+― Efficiency ―
+
+public void SetEfficiencyLevel(EfficiencyLevel lvl)
+
+public void DecreaseEfficiencyLevelBy1()
+
+public void IncreaseEfficiencyLevelBy1()
+
+― Experience ―
+
+public bool AddExperience(int pts) // handles level-up
+
+public void SetExperience(int pts) // direct set (load game)
+
+public int GetPointsToNextLevel()
+
+public float GetExperienceProgress() // 0-1 scalar
+
+― Leader subsystem ―
+
+public bool AssignLeader(string leaderID) // ID-based leader assignment
+
+public bool RemoveLeader()
+
+public Dictionary<SkillBonusType,float> GetLeaderBonuses()
+
+public bool HasLeaderCapability(SkillBonusType type)
+
+public float GetLeaderBonus(SkillBonusType type)
+
+public string GetLeaderName()
+
+public CommandGrade GetLeaderGrade()
+
+public int GetLeaderReputation()
+
+public string GetLeaderRank()
+
+public CommandAbility GetLeaderCommandAbility()
+
+public bool HasLeaderSkill(Enum skill)
+
+public void AwardLeaderReputation(CUConstants.ReputationAction act,
+
+float ctx=1f)
+
+public void AwardLeaderReputation(int amount)
+
+― Action-economy ―
+
+public bool SpendAction(ActionTypes type, float movtCost = 0)
+
+public Dictionary<string,float> GetAvailableActions()
+
+― Combat-state machine ―
+
+public bool UpOneState() // Fortified→...→Mobile
+
+public bool DownOneState() // reverse
+
+public bool SetCombatState(CombatState newState)
+
+public bool CanChangeToState(CombatState target)
+
+public bool BeginEntrenchment()
+
+public bool CanEntrench()
+
+public List<CombatState> GetValidStateTransitions()
+
+― Position / movement ―
+
+public void SetPosition(Coordinate2D pos)
+
+public bool CanMoveTo(Coordinate2D target) // *TODO* not implemented
+
+public float GetDistanceTo(Coordinate2D target)
+
+public float GetDistanceTo(CombatUnit other)
+
+― Debug helpers ―
+
+public void DebugSetCombatState(CombatState st)
+
+public void DebugSetMounted(bool mounted)
+
+― Interfaces ―
+
+public object Clone() // ICloneable
+
+public void GetObjectData(SerializationInfo, StreamingContext) // ISerializable
+
+public bool HasUnresolvedReferences() // IResolvableReferences
+
+public IReadOnlyList<string> GetUnresolvedReferenceIDs()
+
+public void ResolveReferences(GameDataManager mgr)
+
+public List<string> ValidateInternalConsistency()
+
+Private / internal helpers
+
+══════════════════════════
+
+void InitializeActionCounts() // derive token caps from classification
+
+void InitializeMovementPoints() // derive MP from classification
+
+float GetFinalCombatRatingModifier() // strength×state×efficiency×XP
+
+float GetStrengthModifier()
+
+float GetCombatStateModifier()
+
+float GetEfficiencyModifier()
+
+ExperienceLevel CalculateExperienceLevel(int points)
+
+int GetMinPointsForLevel(ExperienceLevel lvl)
+
+ExperienceLevel GetNextLevel(ExperienceLevel lvl)
+
+void OnExperienceLevelChanged(ExperienceLevel prev, ExperienceLevel next) // UI message
+
+float GetExperienceMultiplier()
+
+string GetUnitDisplayName(string id)
+
+bool ConsumeMovementPoints(float pts)
+
+float GetDeploymentActionMovementCost()
+
+float GetCombatActionMovementCost()
+
+float GetIntelActionMovementCost()
+
+bool CanConsumeMoveAction()
+
+bool CanConsumeCombatAction()
+
+bool CanConsumeDeploymentAction()
+
+bool CanConsumeIntelAction()
+
+bool CanUnitTypeChangeStates()
+
+bool IsAdjacentStateTransition(CombatState cur, CombatState tgt)
+
+bool HasSufficientMovementForDeployment()
+
+void UpdateStateAndProfiles(CombatState newSt, CombatState prevSt)
+
+// ...plus a handful of facility-specific helpers in the base-unit region.
+
+Developer notes
+
+═══════════════
+
+• **Action-Economy Core** -- Five separate StatsMaxCurrent pools model move, combat,
+
+deployment, opportunity, and intel actions. Each high-level API method *must*
+
+decrement these pools consistently; use *SpendAction* for centralised validation.
+
+• **Profiles vs. Instance Data** -- Deployed/Mounted *WeaponSystemProfile*s are
+
+immutable templates; only the enum ID is stored. Avoid serialising the heavy
+
+profile object.
+
+• **Leader Reference Architecture** -- Leaders are referenced by *LeaderID* string and
+
+resolved via *GameDataManager.GetLeader()* lookup. The *UnitLeader* computed property
+
+handles the lookup automatically with proper exception handling. This eliminates
+
+circular reference issues during serialization while maintaining clean API access.
+
+• **Serialization contract** -- When adding fields, remember to:
+
+1. Extend *GetObjectData* and deserialization ctor.
+
+2. Include the field in *Clone*.
+
+3. Update *ValidateInternalConsistency*.
+
+• **Reference-resolution pattern** -- Air-unit attachments for airbases are fixed
+
+in *ResolveReferences* after *GameDataManager* owns all objects. Leader references
+
+no longer require resolution as they use on-demand lookup.
+
+• **Error handling** -- EVERY public-facing method is wrapped in try-catch and
+
+funnels to `AppService.HandleException(CLASS_NAME, Method, e)` per project
+
+standard.
+
+• **UnitType restrictions** -- Fixed-wing aircraft and pure base classes cannot
+
+transition combat states; helper *CanUnitTypeChangeStates()* codifies this rule.
+
+────────────────────────────────────────────────────────────────────────────*/
     [Serializable]
     public partial class CombatUnit : ICloneable, ISerializable, IResolvableReferences
     {
@@ -242,10 +410,6 @@ namespace HammerAndSickle.Models
         public WeaponSystems MountedProfileID { get; private set; }
         public IntelProfileTypes IntelProfileType { get; internal set; }
 
-        // The unit's leader.
-        public bool IsLeaderAssigned = false;
-        public Leader CommandingOfficer { get; internal set; }
-
         // Action counts using StatsMaxCurrent
         public StatsMaxCurrent MoveActions { get; private set; }
         public StatsMaxCurrent CombatActions { get; private set; }
@@ -264,6 +428,28 @@ namespace HammerAndSickle.Models
         public StatsMaxCurrent MovementPoints { get; private set; }
         public Coordinate2D MapPos { get; internal set; }
         public SpottedLevel SpottedLevel { get; private set; }
+
+        // The ID of unit's Leader, if assigned.
+        public string LeaderID { get; internal set; }
+        public bool IsLeaderAssigned => !string.IsNullOrEmpty(LeaderID);
+        public Leader UnitLeader
+        {
+            get
+            {
+                try
+                {
+                    if (!IsLeaderAssigned)
+                        throw new InvalidOperationException("No leader assigned to this unit.");
+
+                    return GameDataManager.Instance.GetLeader(LeaderID);
+                }
+                catch (Exception e)
+                {
+                    AppService.HandleException(CLASS_NAME, "UnitLeader.get", e, ExceptionSeverity.Minor);
+                    return null;
+                }
+            }
+        }
 
         #endregion
 
@@ -332,7 +518,6 @@ namespace HammerAndSickle.Models
                 Side = side;
                 Nationality = nationality;
                 IsTransportable = isTransportable;
-                IsLeaderAssigned = false; // Default to no leader assigned
 
                 // Set profile IDs
                 DeployedProfileID = deployedProfileID;
@@ -346,9 +531,6 @@ namespace HammerAndSickle.Models
                     InitializeFacility(category, size);
                 }
 
-                // Initialize leader (will be null until assigned)
-                CommandingOfficer = null;
-
                 // Initialize action counts based on unit type and classification
                 InitializeActionCounts();
 
@@ -359,6 +541,7 @@ namespace HammerAndSickle.Models
                 IsMounted = false;
                 CombatState = CombatState.Deployed;
                 SpottedLevel = SpottedLevel.Level1;
+                LeaderID = null;
 
                 // Initialize StatsMaxCurrent properties
                 HitPoints = new StatsMaxCurrent(CUConstants.MAX_HP);
@@ -934,117 +1117,47 @@ namespace HammerAndSickle.Models
         #region Leader System Interface Methods
 
         /// <summary>
-        /// Assigns a leader to command this unit.
-        /// Handles unassigning any current leader and updating all necessary state.
-        /// Validates that the leader is available and manages bidirectional assignment.
+        /// Assigns a leader to this unit by their ID, removing any existing leader.
         /// </summary>
-        /// <param name="leader">The leader to assign to this unit</param>
-        /// <returns>True if assignment was successful, false otherwise</returns>
-        public bool AssignLeader(Leader leader)
+        /// <param name="leaderID">ID of the new leader</param>
+        /// <returns>success/failure</returns>
+        public bool AssignLeader(string leaderID)
         {
             try
             {
-                // 1. Parameter validation
-                if (leader == null)
+                // Validate the incoming LeaderID.
+                Leader newLeader = GameDataManager.Instance.GetLeader(leaderID);
+                if (newLeader == null)
+                    throw new ArgumentException($"Leader with ID {leaderID} does not exist in the game data.", nameof(leaderID));
+
+                // Check if the new leader is already assigned to another unit.
+                if (newLeader.IsAssigned)
+                    throw new InvalidOperationException($"Leader {newLeader.Name} is already assigned to another unit.");
+
+                // If there is already a leader assigned, we must remove them first.
+                if (IsLeaderAssigned)
                 {
-                    AppService.CaptureUiMessage("Cannot assign commander: No leader specified.");
-                    return false;
+                    // Make sure current leader is valid before proceeding.
+                    if (UnitLeader == null)
+                        throw new InvalidOperationException("Current leader is null, cannot unassign.");
+
+                    // Capture UI message about the leader being unassigned.
+                    AppService.CaptureUiMessage($"{UnitLeader.FormattedRank} {UnitLeader.Name} has been unassigned from {UnitName}.");
+
+                    // Reach in and let the Leader know it isn't assigned to this unit anymore.
+                    UnitLeader.UnassignFromUnit();
                 }
 
-                // 2. Prevent redundant assignment - check if same leader already assigned
-                if (CommandingOfficer != null && CommandingOfficer.LeaderID == leader.LeaderID)
-                {
-                    AppService.CaptureUiMessage($"{leader.FormattedRank} {leader.Name} is already commanding {UnitName}.");
-                    return false;
-                }
+                // Assign the new leader ID.
+                LeaderID = leaderID;
 
-                // 3. Check if the incoming leader is already assigned to another unit
-                if (leader.IsAssigned)
-                {
-                    string assignedUnitName = GetUnitDisplayName(leader.UnitID);
-                    AppService.CaptureUiMessage($"Cannot assign {leader.Name}: Already commanding {assignedUnitName}.");
-                    return false;
-                }
+                // Now reach into new leader and assign him from there.
+                newLeader.AssignToUnit(UnitID);
 
-                // 4. Store current leader for potential rollback
-                Leader previousLeader = CommandingOfficer;
-                bool hadPreviousLeader = IsLeaderAssigned;
+                // Capture UI message about the new leader being assigned.
+                AppService.CaptureUiMessage($"{newLeader.FormattedRank} {newLeader.Name} has been assigned to command {UnitName}.");
 
-                try
-                {
-                    // 5. Unassign current leader if one exists
-                    if (CommandingOfficer != null)
-                    {
-                        string currentLeaderName = CommandingOfficer.Name;
-                        CommandingOfficer.UnassignFromUnit();
-
-                        // Enhanced UI message with unit context
-                        AppService.CaptureUiMessage($"{currentLeaderName} has been relieved of command of {UnitName} and is now available in the leader pool.");
-
-                        CommandingOfficer = null;
-                    }
-
-                    // 6. Assign the new leader using Leader class method
-                    // This handles setting IsAssigned = true and UnitID properly
-                    leader.AssignToUnit(UnitID);
-
-                    // 7. Set our reference to the new leader
-                    CommandingOfficer = leader;
-
-                    // 8. Update our assignment flag
-                    IsLeaderAssigned = true;
-
-                    // 9. Capture UI message about successful assignment
-                    AppService.CaptureUiMessage($"{leader.FormattedRank} {leader.Name} has been assigned to command {UnitName}.");
-
-                    // 10. Validate consistency
-                    if (!ValidateLeaderAssignmentConsistency())
-                    {
-                        throw new InvalidOperationException("Leader assignment consistency validation failed");
-                    }
-
-                    return true;
-                }
-                catch (Exception innerException)
-                {
-                    // Rollback changes if anything went wrong
-                    try
-                    {
-                        // Restore previous leader if we had one
-                        if (hadPreviousLeader && previousLeader != null)
-                        {
-                            previousLeader.AssignToUnit(UnitID);
-                            CommandingOfficer = previousLeader;
-                            IsLeaderAssigned = true;
-
-                            AppService.CaptureUiMessage($"Assignment failed - {previousLeader.Name} remains in command of {UnitName}.");
-                        }
-                        else
-                        {
-                            // No previous leader, ensure clean state
-                            CommandingOfficer = null;
-                            IsLeaderAssigned = false;
-                        }
-
-                        // Ensure the new leader is unassigned after failed attempt
-                        if (leader.IsAssigned && leader.UnitID == UnitID)
-                        {
-                            leader.UnassignFromUnit();
-                        }
-                    }
-                    catch (Exception rollbackException)
-                    {
-                        // Log rollback failure but don't throw - we're already in error handling
-                        AppService.HandleException(CLASS_NAME, "AssignLeader",
-                            new InvalidOperationException("Failed to rollback leader assignment", rollbackException),
-                            ExceptionSeverity.Critical);
-                    }
-
-                    // Log the original error and notify user
-                    AppService.HandleException(CLASS_NAME, "AssignLeader", innerException);
-                    AppService.CaptureUiMessage($"Failed to assign {leader.Name} to {UnitName}.");
-                    return false;
-                }
+                return true;
             }
             catch (Exception e)
             {
@@ -1056,113 +1169,36 @@ namespace HammerAndSickle.Models
         }
 
         /// <summary>
-        /// Removes the commanding officer from this unit.
-        /// Handles proper state management and cleanup for both unit and leader.
+        /// Removes the current leader from this unit, if one is assigned.
         /// </summary>
-        /// <returns>True if removal was successful, false if no leader was assigned or removal failed</returns>
+        /// <returns>Success/Failure</returns>
         public bool RemoveLeader()
         {
             try
             {
-                // 1. Check if there's actually a leader to remove
-                if (CommandingOfficer == null || !IsLeaderAssigned)
+                // Check if there is actually a leader to remove.
+                if (!IsLeaderAssigned)
                 {
                     AppService.CaptureUiMessage($"{UnitName} does not have a commanding officer to remove.");
                     return false;
                 }
 
-                // 1a. Additional safety check - verify leader thinks it's assigned to this unit
-                if (CommandingOfficer.UnitID != UnitID)
-                {
-                    AppService.HandleException(CLASS_NAME, "RemoveLeader",
-                        new InvalidOperationException($"{CommandingOfficer.Name} thinks it's assigned to {CommandingOfficer.UnitID} but unit thinks it's {UnitID}"),
-                        ExceptionSeverity.Minor);
+                // Capture UI message about the leader being removed.
+                AppService.CaptureUiMessage($"{UnitLeader.FormattedRank} {UnitLeader.Name} has been relieved of command of {UnitName} and is now available for reassignment.");
 
-                    // Fix the inconsistency and continue
-                    FixLeaderAssignmentConsistency();
+                // Reach in and let the Leader know it isn't assigned to this unit anymore.
+                UnitLeader.UnassignFromUnit();
 
-                    // Re-check after consistency fix
-                    if (CommandingOfficer == null || !IsLeaderAssigned)
-                    {
-                        AppService.CaptureUiMessage($"{UnitName} does not have a commanding officer to remove after consistency fix.");
-                        return false;
-                    }
-                }
+                // Clear our reference to the leader.
+                LeaderID = null;
 
-                // 2. Store current leader info for UI messaging and potential rollback
-                Leader currentLeader = CommandingOfficer;
-                string leaderName = currentLeader.Name;
-                string leaderRank = currentLeader.FormattedRank; // Capture rank before unassignment
-
-                try
-                {
-                    // 3. Unassign the leader using Leader class method
-                    // This handles setting IsAssigned = false and UnitID = null properly
-                    currentLeader.UnassignFromUnit();
-
-                    // 4. Clear our reference to the leader
-                    CommandingOfficer = null;
-
-                    // 5. Update our assignment flag
-                    IsLeaderAssigned = false;
-
-                    // 6. Capture UI message about successful removal - using captured rank
-                    AppService.CaptureUiMessage($"{leaderRank} {leaderName} has been relieved of command of {UnitName} and is now available for reassignment.");
-
-                    // 7. Validate consistency
-                    if (!ValidateLeaderAssignmentConsistency())
-                    {
-                        throw new InvalidOperationException("Leader removal consistency validation failed");
-                    }
-
-                    return true;
-                }
-                catch (Exception innerException)
-                {
-                    // Rollback changes if anything went wrong
-                    try
-                    {
-                        // Restore the leader assignment
-                        currentLeader.AssignToUnit(UnitID);
-                        CommandingOfficer = currentLeader;
-                        IsLeaderAssigned = true;
-
-                        // Consistent messaging - using captured name and rank
-                        AppService.CaptureUiMessage($"Removal failed - {leaderRank} {leaderName} remains in command of {UnitName}.");
-                    }
-                    catch (Exception rollbackException)
-                    {
-                        // Log rollback failure but don't throw - we're already in error handling
-                        AppService.HandleException(CLASS_NAME, "RemoveLeader",
-                            new InvalidOperationException("Failed to rollback leader removal", rollbackException),
-                            ExceptionSeverity.Critical);
-
-                        // Force consistency fix since rollback failed
-                        FixLeaderAssignmentConsistency();
-                    }
-
-                    // Log the original error and notify user - consistent with rollback message
-                    AppService.HandleException(CLASS_NAME, "RemoveLeader", innerException);
-                    AppService.CaptureUiMessage($"Failed to remove {leaderRank} {leaderName} from command of {UnitName}.");
-                    return false;
-                }
+                return true;
             }
             catch (Exception e)
             {
                 // Handle any unexpected errors
                 AppService.HandleException(CLASS_NAME, "RemoveLeader", e);
                 AppService.CaptureUiMessage("Leader removal failed due to an unexpected error.");
-
-                // Attempt to fix any consistency issues that might have occurred
-                try
-                {
-                    FixLeaderAssignmentConsistency();
-                }
-                catch (Exception consistencyException)
-                {
-                    AppService.HandleException(CLASS_NAME, "RemoveLeader", consistencyException, ExceptionSeverity.Minor);
-                }
-
                 return false;
             }
         }
@@ -1178,18 +1214,16 @@ namespace HammerAndSickle.Models
 
             try
             {
-                // Return empty dictionary if no leader assigned
-                if (CommandingOfficer == null)
-                {
+                // Check if there is a leader assigned
+                if (!IsLeaderAssigned)
                     return bonuses;
-                }
 
                 // Iterate through all skill bonus types and get non-zero values
                 foreach (SkillBonusType bonusType in (SkillBonusType[])Enum.GetValues(typeof(SkillBonusType)))
                 {
                     if (bonusType == SkillBonusType.None) continue;
 
-                    float bonusValue = CommandingOfficer.GetBonusValue(bonusType);
+                    float bonusValue = UnitLeader.GetBonusValue(bonusType);
                     if (bonusValue != 0f)
                     {
                         bonuses[bonusType] = bonusValue;
@@ -1211,7 +1245,7 @@ namespace HammerAndSickle.Models
         /// <param name="bonusType">The bonus type to check for</param>
         /// <returns>True if the leader provides this capability</returns>
         public bool HasLeaderCapability(SkillBonusType bonusType) =>
-            CommandingOfficer != null && CommandingOfficer.HasCapability(bonusType);
+            UnitLeader != null && UnitLeader.HasCapability(bonusType);
 
         /// <summary>
         /// Gets a specific leader bonus value.
@@ -1220,46 +1254,37 @@ namespace HammerAndSickle.Models
         /// <param name="bonusType">The type of bonus to retrieve</param>
         /// <returns>The bonus value, or 0 if not present</returns>
         public float GetLeaderBonus(SkillBonusType bonusType) =>
-            CommandingOfficer != null && bonusType != SkillBonusType.None
-            ? CommandingOfficer.GetBonusValue(bonusType)
+            UnitLeader != null && bonusType != SkillBonusType.None
+            ? UnitLeader.GetBonusValue(bonusType)
             : 0f;
-
-        /// <summary>
-        /// Checks if a leader is currently assigned to this unit.
-        /// </summary>
-        /// <returns>True if a leader is assigned</returns>
-        public bool HasLeader()
-        {
-            return CommandingOfficer != null;
-        }
 
         /// <summary>
         /// Gets the leader's name for display purposes.
         /// Returns empty string if no leader assigned.
         /// </summary>
         /// <returns>Leader name or empty string</returns>
-        public string GetLeaderName() => CommandingOfficer?.Name ?? string.Empty;
+        public string GetLeaderName() => UnitLeader?.Name ?? string.Empty;
 
         /// <summary>
         /// Gets the leader's command grade for display and bonus calculations.
         /// Returns JuniorGrade if no leader assigned.
         /// </summary>
         /// <returns>Leader's command grade</returns>
-        public CommandGrade GetLeaderGrade() => CommandingOfficer?.CommandGrade ?? CommandGrade.JuniorGrade;
+        public CommandGrade GetLeaderGrade() => UnitLeader?.CommandGrade ?? CommandGrade.JuniorGrade;
 
         /// <summary>
         /// Gets the leader's reputation points for display purposes.
         /// Returns 0 if no leader assigned.
         /// </summary>
         /// <returns>Leader's reputation points</returns>
-        public int GetLeaderReputation() => CommandingOfficer?.ReputationPoints ?? 0;
+        public int GetLeaderReputation() => UnitLeader?.ReputationPoints ?? 0;
 
         /// <summary>
         /// Gets the leader's formatted rank based on nationality.
         /// Returns empty string if no leader assigned.
         /// </summary>
         /// <returns>Formatted rank string</returns>
-        public string GetLeaderRank() => CommandingOfficer?.FormattedRank ?? "";
+        public string GetLeaderRank() => UnitLeader?.FormattedRank ?? "";
 
         /// <summary>
         /// Gets the leader's combat command ability modifier.
@@ -1267,7 +1292,7 @@ namespace HammerAndSickle.Models
         /// </summary>
         /// <returns>Leader's combat command ability</returns>
         public CommandAbility GetLeaderCommandAbility() =>
-            CommandingOfficer?.CombatCommand ?? CommandAbility.Average;
+            UnitLeader?.CombatCommand ?? CommandAbility.Average;
 
         /// <summary>
         /// Checks if the leader has unlocked a specific skill.
@@ -1276,7 +1301,7 @@ namespace HammerAndSickle.Models
         /// <param name="skillEnum">The skill to check</param>
         /// <returns>True if the skill is unlocked</returns>
         public bool HasLeaderSkill(Enum skill) =>
-            CommandingOfficer != null && CommandingOfficer.IsSkillUnlocked(skill);
+            UnitLeader != null && UnitLeader.IsSkillUnlocked(skill);
 
         /// <summary>
         /// Awards reputation to the leader for unit actions.
@@ -1288,12 +1313,12 @@ namespace HammerAndSickle.Models
         {
             try
             {
-                if (CommandingOfficer == null)
+                if (UnitLeader == null)
                 {
                     return;
                 }
 
-                CommandingOfficer.AwardReputationForAction(actionType, contextMultiplier);
+                UnitLeader.AwardReputationForAction(actionType, contextMultiplier);
             }
             catch (Exception e)
             {
@@ -1310,12 +1335,12 @@ namespace HammerAndSickle.Models
         {
             try
             {
-                if (CommandingOfficer == null || amount <= 0)
+                if (UnitLeader == null || amount <= 0)
                 {
                     return;
                 }
 
-                CommandingOfficer.AwardReputation(amount);
+                UnitLeader.AwardReputation(amount);
             }
             catch (Exception e)
             {
@@ -2262,62 +2287,6 @@ namespace HammerAndSickle.Models
         #endregion // Experience System Helper Methods
 
 
-        #region Leader System Helper Methods
-
-        /// <summary>
-        /// Validates that IsLeaderAssigned flag is consistent with CommandingOfficer state.
-        /// </summary>
-        /// <returns>True if consistent, false if there's a mismatch</returns>
-        private bool ValidateLeaderAssignmentConsistency()
-        {
-            return (CommandingOfficer == null && !IsLeaderAssigned) ||
-                   (CommandingOfficer != null && IsLeaderAssigned &&
-                    CommandingOfficer.IsAssigned && CommandingOfficer.UnitID == UnitID);
-        }
-
-        /// <summary>
-        /// Fixes any inconsistency between IsLeaderAssigned flag and CommandingOfficer state.
-        /// </summary>
-        private void FixLeaderAssignmentConsistency()
-        {
-            bool hasLeader = CommandingOfficer != null;
-            if (IsLeaderAssigned != hasLeader)
-            {
-                AppService.HandleException(CLASS_NAME, "FixLeaderAssignmentConsistency",
-                    new InvalidOperationException($"Leader assignment inconsistency fixed for unit {UnitID}"),
-                    ExceptionSeverity.Minor);
-                IsLeaderAssigned = hasLeader;
-            }
-        }
-
-        /// <summary>
-        /// Gets the display name of a unit by its ID, with fallback handling.
-        /// </summary>
-        /// <param name="unitId">The unit ID to look up</param>
-        /// <returns>The unit's display name or a fallback string</returns>
-        private string GetUnitDisplayName(string unitId)
-        {
-            if (string.IsNullOrEmpty(unitId))
-            {
-                return "Unknown Unit";
-            }
-
-            try
-            {
-                var unit = GameDataManager.Instance.GetCombatUnit(unitId);
-                return unit?.UnitName ?? $"Unit {unitId}";
-            }
-            catch (Exception e)
-            {
-                // Log the query failure but return fallback name
-                AppService.HandleException(CLASS_NAME, "GetUnitDisplayName", e, ExceptionSeverity.Minor);
-                return $"Unit {unitId}";
-            }
-        }
-
-        #endregion
-
-
         #region Action System Helper Methods
 
         /// <summary>
@@ -2641,9 +2610,9 @@ namespace HammerAndSickle.Models
                 clone.MapPos = this.MapPos;
                 clone.SpottedLevel = this.SpottedLevel;
 
-                // NOTE: CommandingOfficer and IsLeaderAssigned are NOT copied
-                // Templates should never have leaders assigned
+                // NOTE: LeaderID is NOT copied - templates should never have leaders assigned
                 // Leaders must be assigned manually after cloning
+                clone.LeaderID = null;
 
                 // Clone facility data for base units
                 if (this.IsBase)
@@ -2700,7 +2669,6 @@ namespace HammerAndSickle.Models
                 Nationality = (Nationality)info.GetValue(nameof(Nationality), typeof(Nationality));
                 IsTransportable = info.GetBoolean(nameof(IsTransportable));
                 IsBase = info.GetBoolean(nameof(IsBase));
-                IsLeaderAssigned = info.GetBoolean(nameof(IsLeaderAssigned));
                 SpottedLevel = (SpottedLevel)info.GetValue(nameof(SpottedLevel), typeof(SpottedLevel));
 
                 // Load IntelProfileType directly as enum value
@@ -2710,8 +2678,10 @@ namespace HammerAndSickle.Models
                 DeployedProfileID = (WeaponSystems)info.GetValue(nameof(DeployedProfileID), typeof(WeaponSystems));
                 MountedProfileID = (WeaponSystems)info.GetValue(nameof(MountedProfileID), typeof(WeaponSystems));
 
-                // Store leader ID for later resolution
-                unresolvedLeaderID = info.GetString("LeaderID");
+                // Load leader ID directly - no temporary storage needed
+                LeaderID = info.GetString("LeaderID");
+                if (string.IsNullOrEmpty(LeaderID))
+                    LeaderID = null;
 
                 // Deserialize owned StatsMaxCurrent objects
                 HitPoints = new StatsMaxCurrent(
@@ -2796,9 +2766,6 @@ namespace HammerAndSickle.Models
                     // Initialize readonly property
                     AirUnitsAttached = _airUnitsAttached.AsReadOnly();
                 }
-
-                // Initialize leader reference as null - will be resolved later
-                CommandingOfficer = null;
             }
             catch (Exception e)
             {
@@ -2826,7 +2793,6 @@ namespace HammerAndSickle.Models
                 info.AddValue(nameof(Nationality), Nationality);
                 info.AddValue(nameof(IsTransportable), IsTransportable);
                 info.AddValue(nameof(IsBase), IsBase);
-                info.AddValue(nameof(IsLeaderAssigned), IsLeaderAssigned);
                 info.AddValue(nameof(SpottedLevel), SpottedLevel);
 
                 // Serialize IntelProfileType directly as enum value
@@ -2836,8 +2802,8 @@ namespace HammerAndSickle.Models
                 info.AddValue(nameof(DeployedProfileID), DeployedProfileID);
                 info.AddValue(nameof(MountedProfileID), MountedProfileID);
 
-                // Serialize leader reference as ID (still needs resolution)
-                info.AddValue("LeaderID", CommandingOfficer?.LeaderID ?? "");
+                // Serialize leader reference as ID (simple string)
+                info.AddValue("LeaderID", LeaderID ?? "");
 
                 // Serialize owned StatsMaxCurrent objects as Max/Current pairs
                 info.AddValue("HitPoints_Max", HitPoints.Max);
@@ -2947,41 +2913,7 @@ namespace HammerAndSickle.Models
         {
             try
             {
-                // Resolve Leader reference
-                if (!string.IsNullOrEmpty(unresolvedLeaderID))
-                {
-                    var leader = manager.GetLeader(unresolvedLeaderID);
-                    if (leader != null)
-                    {
-                        CommandingOfficer = leader;
-                        unresolvedLeaderID = "";
-
-                        // Ensure IsLeaderAssigned is consistent with resolved leader
-                        if (!IsLeaderAssigned)
-                        {
-                            AppService.HandleException(CLASS_NAME, "ResolveReferences",
-                                new InvalidDataException($"Unit {UnitID} has leader but IsLeaderAssigned is false"),
-                                ExceptionSeverity.Minor);
-                            IsLeaderAssigned = true; // Fix the inconsistency
-                        }
-                    }
-                    else
-                    {
-                        AppService.HandleException(CLASS_NAME, "ResolveReferences",
-                            new KeyNotFoundException($"Leader {unresolvedLeaderID} not found"));
-
-                        // If leader couldn't be resolved, ensure flag is cleared
-                        IsLeaderAssigned = false;
-                    }
-                }
-                else if (IsLeaderAssigned)
-                {
-                    // Flag says we have a leader but no leader ID was saved
-                    AppService.HandleException(CLASS_NAME, "ResolveReferences",
-                        new InvalidDataException($"Unit {UnitID} has IsLeaderAssigned=true but no leader ID"),
-                        ExceptionSeverity.Minor);
-                    IsLeaderAssigned = false; // Fix the inconsistency
-                }
+                // Leader resolution is no longer needed - handled via GameDataManager lookup
 
                 // Resolve facility references if this is a base unit
                 if (IsBase && FacilityType == FacilityType.Airbase)
@@ -3038,11 +2970,11 @@ namespace HammerAndSickle.Models
             try
             {
                 // Validate leader assignment consistency
-                if (IsLeaderAssigned && CommandingOfficer == null)
+                if (IsLeaderAssigned && UnitLeader == null)
                 {
                     errors.Add($"Unit {UnitName} has IsLeaderAssigned=true but no CommandingOfficer");
                 }
-                else if (!IsLeaderAssigned && CommandingOfficer != null)
+                else if (!IsLeaderAssigned && UnitLeader != null)
                 {
                     errors.Add($"Unit {UnitName} has CommandingOfficer but IsLeaderAssigned=false");
                 }
