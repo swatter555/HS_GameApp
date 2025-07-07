@@ -100,6 +100,18 @@ namespace HammerAndSickle.Models
     }
 
     /// <summary>
+    /// The types of actions a CombatUnit can perform.
+    /// </summary>
+    public enum ActionTypes
+    {
+        MoveAction,         // Move the unit to a new location
+        CombatAction,       // Engage in combat with another unit
+        DeployAction,       // Deploy the unit into a specific formation or position
+        OpportunityAction,  // Perform an action based on an opportunity (e.g., ambush)
+        IntelAction         // Gather intelligence or perform reconnaissance
+    }
+
+    /// <summary>
     /// States representing whether a unit is riding in transport or deployed in various defensive postures.
     /// </summary>
     public enum CombatState
@@ -222,18 +234,6 @@ namespace HammerAndSickle.Models
         Level2, // Above plus CombatState and an error rate of about 30%
         Level3, // Above plus EXP and EFF levels, and a 10% error rate.
         Level4, // Above plus no error rate.
-    }
-
-    /// <summary>
-    /// The types of actions a CombatUnit can perform.
-    /// </summary>
-    public enum ActionTypes
-    {
-        MoveAction,
-        CombatAction,
-        DeployAction,
-        OpportunityAction,
-        IntelAction
     }
 
     #endregion // CombatUnit Enums

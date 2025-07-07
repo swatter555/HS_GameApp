@@ -1,4 +1,4 @@
-using System.Collections.Generic;
+﻿using System.Collections.Generic;
 
 namespace HammerAndSickle.Models
 {
@@ -13,11 +13,11 @@ namespace HammerAndSickle.Models
         public const int MAX_EXP_GAIN_PER_ACTION = 10;      // Max XP gain per action
 
         // Movement constants for different unit types, in movement points.
-        public const int MECH_MOV = 12;
-        public const int MOT_MOV = 10;
-        public const int FOOT_MOV = 8;
+        public const int MECH_MOV      = 12;
+        public const int MOT_MOV       = 10;
+        public const int FOOT_MOV      = 8;
         public const int FIXEDWING_MOV = 100;
-        public const int HELO_MOV = 24;
+        public const int HELO_MOV      = 24;
 
         // WeaponSystem constants.
         public const int MAX_COMBAT_VALUE = 25;
@@ -68,6 +68,13 @@ namespace HammerAndSickle.Models
         public const float LOW_SUPPLY_THRESHOLD = 1f;                   // Threshold for low supply warning
         public const float CRITICAL_SUPPLY_THRESHOLD = 0.5f;            // Threshold for critical supply warning
         public const float COMBAT_STATE_SUPPLY_TRANSITION_COST = 0.25f; // Supply cost for state transitions.
+        public const float COMBAT_ACTION_SUPPLY_COST = 1f;              // Supply cost for combat actions.
+        public const float COMBAT_ACTION_SUPPLY_THRESHOLD = 2f;         // Threshold for combat action supply cost.
+        public const float MOVE_ACTION_SUPPLY_THRESHOLD = 1.5f;         // Threshold for move action supply cost.
+        public const float MOVE_ACTION_SUPPLY_COST = 0.2f;              // Supply cost for move actions.
+        public const float INTEL_ACTION_SUPPLY_COST = 0.25f;            // Supply cost for intel actions.
+        public const float OPPORTUNITY_ACTION_SUPPLY_THRESHOLD = 1.5f;  // Threshold for opportunity action supply cost.
+        public const float OPPORTUNITY_ACTION_SUPPLY_COST = 0.5f;       // Supply cost for opportunity actions.
 
         // Intel error margins
         public const float MIN_INTEL_ERROR      = 4f;   // Minimum intel error margin
