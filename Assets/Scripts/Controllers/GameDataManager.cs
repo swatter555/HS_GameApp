@@ -1317,9 +1317,9 @@ Important aspects
         /// Calculates a checksum value based on the current state of combat units and leaders.
         /// </summary>
         /// <remarks>The checksum is derived from the counts of combat units and leaders, using a
-        /// predefined formula. This method is intended for internal use and may return "ERROR" if an exception is
+        /// predefined formula. This method is intended for internal use and may return "DEFAULT" if an exception is
         /// encountered.</remarks>
-        /// <returns>A hexadecimal string representing the calculated checksum. Returns "ERROR" if an exception occurs during
+        /// <returns>A hexadecimal string representing the calculated checksum. Returns "DEFAULT" if an exception occurs during
         /// calculation.</returns>
         private string CalculateChecksum()
         {

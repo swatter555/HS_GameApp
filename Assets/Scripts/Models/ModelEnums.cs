@@ -752,8 +752,8 @@ namespace HammerAndSickle.Models
         AIRBASE_GENERIC,
         SUPPLYDEPOT_GENERIC,
 
-        DEFAULT,
-        COMBAT
+        COMBAT,
+        DEFAULT
     }
 
     /// <summary>

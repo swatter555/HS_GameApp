@@ -36,7 +36,7 @@ namespace HammerAndSickle.Models
 
         private bool _mobileBonusApplied = false; // Persisted runtime flag, true when MOBILE_MOVEMENT_BONUS active.
         private const string SERIAL_KEY_MOBILE_BONUS = "mobBonus"; // Serialization identifier for _mobileBonusApplied
-
+        
         #endregion // Fields
 
 
@@ -216,58 +216,76 @@ namespace HammerAndSickle.Models
         #region Core
 
         /// <summary>
-        /// Retrieves the weapon system profile currently deployed on the system.
+        /// Retrieves the weapon‑system profile the unit employs in its <em>deployed</em> (dismounted) state.
         /// </summary>
-        /// <returns>The <see cref="WeaponSystemProfile"/> associated with the deployed profile ID, or <see langword="null"/> if
-        /// the mounted profile ID is set to the default value.</returns>
+        /// <remarks>
+        /// <para>
+        /// If <see cref="DeployedProfileID"/> equals <see cref="WeaponSystems.DEFAULT"/>, the unit has no
+        /// organic deployed weapon system and the method returns <c>null</c> without logging an error.
+        /// </para>
+        /// <para>
+        /// When the ID is not <c>DEFAULT</c> but the profile cannot be located in the database, the situation
+        /// indicates stale or corrupt data. The problem is logged via
+        /// <see cref="AppService.HandleException(string,string,System.Exception)"/>, and the method returns
+        /// <c>null</c> so that callers can handle the absence gracefully.
+        /// </para>
+        /// </remarks>
+        /// <returns>The corresponding <see cref="WeaponSystemProfile"/> or <c>null</c> when none is available.</returns>
         public WeaponSystemProfile GetDeployedProfile()
         {
             try
             {
-                // Validate deployed profile ID
+                // "No profile" is a valid state.
                 if (DeployedProfileID == WeaponSystems.DEFAULT)
-                    throw new InvalidOperationException("Deployed profile ID cannot be DEFAULT");
+                    return null;
 
-                // Lookup profile in database
                 var profile = WeaponSystemsDatabase.GetWeaponSystemProfile(DeployedProfileID);
                 if (profile == null)
-                    throw new InvalidOperationException($"Deployed profile {DeployedProfileID} not found in database");
+                    throw new InvalidOperationException($"Deployed profile ID '{DeployedProfileID}' not found in weapon‑systems database.");
 
                 return profile;
             }
-            catch (Exception e)
+            catch (Exception ex)
             {
-                AppService.HandleException(CLASS_NAME, "GetDeployedProfile", e);
+                AppService.HandleException(nameof(CombatUnit), nameof(GetDeployedProfile), ex);
                 return null;
             }
         }
 
         /// <summary>
-        /// Retrieves the weapon system profile currently mounted on the system.
+        /// Retrieves the weapon‑system profile of the transport (mount) currently carrying the unit, if any.
         /// </summary>
-        /// <remarks>If the mounted profile ID is set to the default value, this method returns <see
-        /// langword="null"/>. If the profile cannot be found in the weapon systems database, an <see
-        /// cref="InvalidOperationException"/> is thrown.</remarks>
-        /// <returns>The <see cref="WeaponSystemProfile"/> associated with the mounted profile ID, or <see langword="null"/> if
-        /// the mounted profile ID is set to the default value.</returns>
+        /// <remarks>
+        /// <para>
+        /// A return value of <c>null</c> can mean one of two things:
+        /// </para>
+        /// <list type="bullet">
+        ///   <item>The unit is not mounted &mdash; <see cref="MountedProfileID"/> equals <see cref="WeaponSystems.DEFAULT"/>.</item>
+        ///   <item>The ID points to a profile that no longer exists in the database (logged as an error).</item>
+        /// </list>
+        /// <para>
+        /// By returning <c>null</c> in both cases the method provides a simple “no usable profile” contract, while
+        /// still ensuring data‑integrity problems are captured in the log.
+        /// </para>
+        /// </remarks>
+        /// <returns>The <see cref="WeaponSystemProfile"/> representing the transport, or <c>null</c> when unmounted/invalid.</returns>
         public WeaponSystemProfile GetMountedProfile()
         {
             try
             {
-                // If mounted profile ID is DEFAULT, there is no mounted profile
+                // DEFAULT means the unit is foot‑mobile (no transport profile).
                 if (MountedProfileID == WeaponSystems.DEFAULT)
-                    throw new InvalidOperationException("Mounted profile ID is DEFAULT, no mounted profile");
+                    return null;
 
-                // Lookup profile in database
                 var profile = WeaponSystemsDatabase.GetWeaponSystemProfile(MountedProfileID);
                 if (profile == null)
-                    throw new InvalidOperationException($"Mounted profile {MountedProfileID} not found in database");
+                    throw new InvalidOperationException($"Mounted profile ID '{MountedProfileID}' not found in weapon‑systems database.");
 
                 return profile;
             }
-            catch (Exception e)
+            catch (Exception ex)
             {
-                AppService.HandleException(CLASS_NAME, "GetMountedProfile", e);
+                AppService.HandleException(nameof(CombatUnit), nameof(GetMountedProfile), ex);
                 return null;
             }
         }
@@ -700,24 +718,42 @@ namespace HammerAndSickle.Models
         }
 
         /// <summary>
-        /// Sets the unit's experience points directly and updates the level accordingly.
-        /// Used for loading saved games or manual experience setting.
+        /// Safely sets the unit’s cumulative experience points (XP) and keeps
+        /// <see cref="ExperienceLevel"/> tightly synchronized.
         /// </summary>
-        /// <param name="points">Total experience points</param>
-        public void SetExperience(int points)
+        /// <param name="points">The new total XP to apply.  Values outside
+        /// <c>0 … CUConstants.EXPERIENCE_MAX</c> are automatically clamped.</param>
+        /// <returns>The clamped XP value that was actually stored.</returns>
+        /// <remarks>
+        /// <para>
+        /// Both <see cref="ExperiencePoints"/> and the derived
+        /// <see cref="ExperienceLevel"/> are updated from the same clamped value,
+        /// eliminating drift.  The method never throws for invalid input; any
+        /// unexpected runtime errors are logged and the prior XP value is
+        /// preserved.
+        /// </para>
+        /// </remarks>
+        public int SetExperience(int points)
         {
             try
             {
-                if (points < 0)
-                    points = 0;
+                // 1) Constrain to legal range.
+                int clamped = Math.Clamp(points, 0, (int)ExperiencePointLevels.Elite);
 
-                ExperiencePoints = Math.Min(points, (int)ExperiencePointLevels.Elite);
-                ExperienceLevel = CalculateExperienceLevel(points);
+                // 2) Skip work if nothing changed – avoids redundant UI refresh.
+                if (clamped == ExperiencePoints)
+                    return clamped;
 
+                // 3) Persist XP and recompute level from the same source value.
+                ExperiencePoints = clamped;
+                ExperienceLevel = CalculateExperienceLevel(clamped);
+
+                return clamped;
             }
-            catch (Exception e)
+            catch (Exception ex)
             {
-                AppService.HandleException(CLASS_NAME, "SetExperience", e);
+                AppService.HandleException(nameof(CombatUnit), nameof(SetExperience), ex);
+                return ExperiencePoints; // return state that survived the error
             }
         }
 
@@ -1019,7 +1055,7 @@ namespace HammerAndSickle.Models
                 if (GetDeployActions() >= 1 && MovementPoints.Current >= GetDeployMovementCost())
                 {
                     // Atempt to deploy up one level.
-                    bool result = TryUpOneState();
+                    bool result = TryDeployUpOneState();
 
                     // If we have made it this far, we can consume supplies and actions.
                     if (result)
@@ -1063,7 +1099,7 @@ namespace HammerAndSickle.Models
                 if (GetDeployActions() >= 1 && MovementPoints.Current >= GetDeployMovementCost())
                 {
                     // Atempt to deploy down one level.
-                    bool result = TryDownOneState();
+                    bool result = TryEntrenchDownOneState();
 
                     // If we have made it this far, we can consume supplies and actions.
                     if (result)
@@ -1265,7 +1301,7 @@ namespace HammerAndSickle.Models
             // Intel – existing validation already handles base / movement logic.
             float intelAvailable = IntelActions.Current >= 1 ? IntelActions.Current : 0f;
 
-            // Deployment – only available for bases, needs movement points.
+            // Deployment – not available for bases, needs movement points.
             float deploymentAvailable = 0f;
             if (IsBase)
             {
@@ -1729,70 +1765,82 @@ namespace HammerAndSickle.Models
         }
 
         /// <summary>
-        /// Calculates the movement point cost for a deployment action.
+        /// Calculates the movement-point (MP) cost for this unit to perform a <b>Deploy</b> action.
         /// </summary>
-        /// <returns>Movement points required (50% of max)</returns>
+        /// <remarks>
+        /// <para>
+        /// If <see cref="MovementPoints.Max"/> is <c>0</c> the method returns <c>0</c>.  
+        /// This indicates the unit is <em>immobile</em>, <u>not</u> that the action is free.  
+        /// Callers must still verify that <see cref="MovementPoints.Remaining"/> is at least
+        /// the value returned before enabling the action.
+        /// </para>
+        /// </remarks>
+        /// <returns>The whole-number MP cost for deploying.  Always non-negative.</returns>
         private float GetDeployMovementCost()
         {
             return Mathf.CeilToInt(MovementPoints.Max * CUConstants.DEPLOYMENT_ACTION_MOVEMENT_COST);
         }
 
         /// <summary>
-        /// Calculates the movement‑point cost for a combat action.
-        /// Immobile units (Max == 0) pay nothing.
+        /// Calculates the MP cost required to execute a <b>Combat</b> (attack) action.
         /// </summary>
+        /// <remarks>
+        /// Returns <c>0</c> when the unit’s maximum MPs are zero, signalling that the unit
+        /// cannot pay any MP cost at all.  Client code should still check
+        /// <see cref="MovementPoints.Remaining"/> ≥ returned value before allowing the attack.
+        /// </remarks>
+        /// <returns>The MP cost as an integer.</returns>
         private float GetCombatMovementCost()
         {
             return Mathf.CeilToInt(MovementPoints.Max * CUConstants.COMBAT_ACTION_MOVEMENT_COST);
         }
 
         /// <summary>
-        /// Calculates the movement‑point cost for an intelligence action.
-        /// Immobile units (Max == 0) pay nothing.
+        /// Calculates the MP cost for an <b>Intel</b> (recon/spotting) action.
         /// </summary>
+        /// <remarks>
+        /// A result of <c>0</c> means the unit is immobile (<see cref="MovementPoints.Max"/> == 0);
+        /// the action is <em>not</em> considered gratis.  
+        /// UI or AI callers must independently confirm there are enough MPs remaining.
+        /// </remarks>
+        /// <returns>Integer MP cost for the intel action.</returns>
         private float GetIntelMovementCost()
         {
             return Mathf.CeilToInt(MovementPoints.Max * CUConstants.INTEL_ACTION_MOVEMENT_COST);
         }
 
         /// <summary>
-        /// Moves the unit up one combat state (toward more mobile/less defensive posture).
-        /// Progression: Fortified → Entrenched → HastyDefense → Deployed → Mobile
+        /// Attempts to move the unit <em>one step toward <c>Mobile</c></em> on the posture ladder.
         /// </summary>
-        /// <returns>True if state change was successful, false if already at maximum mobility or transition invalid</returns>
-        private bool TryUpOneState()
+        /// <remarks>
+        /// <para>
+        /// **“Deploy <u>up</u> one state” means *becoming more mobile*.**  Internally that is a <strong>decrement</strong>
+        /// of the underlying enum index:<br/>
+        /// <c>Fortified (4) → Entrenched (3) → HastyDefense (2) → Deployed (1) → Mobile (0)</c>.
+        /// </para>
+        /// <para>
+        /// If the unit is already at the most‑mobile posture (<c>Mobile</c>), no transition occurs and the method returns
+        /// <c>false</c>.  All legality checks (e.g., suppression, casualties, supply) are delegated to
+        /// <see cref="CanChangeToState(CombatState)"/>.
+        /// </para>
+        /// </remarks>
+        /// <returns><c>true</c> if the posture actually changed; otherwise <c>false</c>.</returns>
+        private bool TryDeployUpOneState()
         {
             try
             {
-                // Define the state order for navigation
-                var stateOrder = new Dictionary<CombatState, int>
-                {
-                    { CombatState.Mobile, 0 },
-                    { CombatState.Deployed, 1 },
-                    { CombatState.HastyDefense, 2 },
-                    { CombatState.Entrenched, 3 },
-                    { CombatState.Fortified, 4 }
-                };
-
-                // Check if current state is valid
-                if (!stateOrder.ContainsKey(CombatState))
-                {
-                    AppService.CaptureUiMessage($"Cannot move up from unknown combat state: {CombatState}");
-                    return false;
-                }
-
-                int currentIndex = stateOrder[CombatState];
+                CombatState currentState = CombatState;
 
                 // Check if already at maximum mobility (Mobile state)
-                if (currentIndex == 0)
+                if (currentState == CombatState.Mobile)
                 {
                     AppService.CaptureUiMessage($"{UnitName} is already in Mobile state - cannot move to higher mobility.");
                     return false;
                 }
 
                 // Calculate target state (one step toward Mobile)
-                int targetIndex = currentIndex - 1;
-                var targetState = stateOrder.First(kvp => kvp.Value == targetIndex).Key;
+                int targetIndex = (int)currentState - 1;
+                CombatState targetState = (CombatState)targetIndex;
 
                 // Comprehensive check for valid state transition.
                 if (!CanChangeToState(targetState))
@@ -1817,51 +1865,55 @@ namespace HammerAndSickle.Models
         }
 
         /// <summary>
-        /// Moves the unit down one combat state (toward more defensive/less mobile posture).
-        /// Progression: Mobile → Deployed → HastyDefense → Entrenched → Fortified
+        /// Attempts to move the unit <em>one step toward <c>Fortified</c></em> on the posture ladder.
         /// </summary>
-        /// <returns>True if state change was successful, false if already at maximum defensive posture or transition invalid</returns>
-        private bool TryDownOneState()
+        /// <remarks>
+        /// <para>
+        /// **“Entrench <u>down</u> one state” means *digging in further* (less mobile, more protection).**  This is a
+        /// <strong>increment</strong> of the enum index:<br/>
+        /// <c>Mobile (0) → Deployed (1) → HastyDefense (2) → Entrenched (3) → Fortified (4)</c>.
+        /// </para>
+        /// <para>
+        /// Attempting the action while already at <c>Fortified</c> simply returns <c>false</c>.  All other gating rules
+        /// are handled by <see cref="CanChangeToState(CombatState)"/>.
+        /// </para>
+        /// </remarks>
+        /// <returns><c>true</c> if the posture deepened; otherwise <c>false</c>.</returns>
+        private bool TryEntrenchDownOneState()
         {
             try
             {
-                // Define the state order for navigation
-                var stateOrder = new Dictionary<CombatState, int>
-                {
-                    { CombatState.Mobile, 0 },
-                    { CombatState.Deployed, 1 },
-                    { CombatState.HastyDefense, 2 },
-                    { CombatState.Entrenched, 3 },
-                    { CombatState.Fortified, 4 }
-                };
+                CombatState currentState = CombatState;
 
-                // Check if current state is valid
-                if (!stateOrder.ContainsKey(CombatState))
+                // Check if already at maximum entrenchment (Fortified state)
+                if (currentState == CombatState.Fortified)
                 {
-                    AppService.CaptureUiMessage($"Cannot move down from unknown combat state: {CombatState}");
+                    AppService.CaptureUiMessage($"{UnitName} is already in Fortified state - cannot entrench further.");
                     return false;
                 }
 
-                int currentIndex = stateOrder[CombatState];
+                // Calculate target state (one step toward fortified)
+                int targetIndex = (int)currentState + 1;
+                CombatState targetState = (CombatState)targetIndex;
 
-                // Check if already at maximum defensive posture (Fortified state)
-                if (currentIndex == 4)
-                {
-                    AppService.CaptureUiMessage($"{UnitName} is already in Fortified state - cannot move to higher defensive posture.");
+                // Comprehensive check for valid state transition.
+                if (!CanChangeToState(targetState))
                     return false;
-                }
 
-                // Calculate target state (one step toward Fortified)
-                int targetIndex = currentIndex + 1;
-                var targetState = stateOrder.First(kvp => kvp.Value == targetIndex).Key;
+                // Save previous state for comparison.
+                var previousState = CombatState;
 
-                // Use existing validation and state change logic
-                //return SetCombatState(targetState);
-                return false;
+                // Set the new combat state
+                CombatState = targetState;
+
+                // Update the unit's mobility state based on the new combat state
+                UpdateMobilityState(targetState, previousState);
+
+                return true;
             }
-            catch (Exception e)
+            catch (Exception ex)
             {
-                AppService.HandleException(CLASS_NAME, "DownOneState", e);
+                AppService.HandleException(nameof(CombatUnit), nameof(TryEntrenchDownOneState), ex);
                 return false;
             }
         }
@@ -1896,93 +1948,106 @@ namespace HammerAndSickle.Models
         }
 
         /// <summary>
-        /// Checks if the transition between two states is adjacent (one step).
+        /// Determines whether two <see cref="CombatState"/> values are <em>adjacent rungs</em> on the posture ladder.
         /// </summary>
-        /// <param name="currentState">Current combat state</param>
-        /// <param name="targetState">Target combat state</param>
-        /// <returns>True if transition is adjacent</returns>
+        /// <remarks>
+        /// The method assumes the enum values are contiguous integers in mobility order.  If that ordering ever changes
+        /// (e.g., inserting a new state or switching to bit‑flags), this helper must be updated accordingly.
+        /// </remarks>
         private bool IsAdjacentStateTransition(CombatState currentState, CombatState targetState)
         {
-            // Define the state order: Mobile ← Deployed → HastyDefense → Entrenched → Fortified
-            var stateOrder = new Dictionary<CombatState, int>
-            {
-                { CombatState.Mobile, 0 },
-                { CombatState.Deployed, 1 },
-                { CombatState.HastyDefense, 2 },
-                { CombatState.Entrenched, 3 },
-                { CombatState.Fortified, 4 }
-            };
-
-            if (!stateOrder.ContainsKey(currentState) || !stateOrder.ContainsKey(targetState))
-            {
-                return false;
-            }
-
-            int currentIndex = stateOrder[currentState];
-            int targetIndex = stateOrder[targetState];
+            int currentIndex = (int)currentState;
+            int targetIndex = (int)targetState;
 
             // Adjacent means difference of exactly 1
             return Math.Abs(currentIndex - targetIndex) == 1;
         }
 
         /// <summary>
-        /// Updates the mobility state of the unit based on the specified new and previous combat states.
+        /// Adjusts <see cref="IsMounted"/> and the <em>mobile‑state movement
+        /// bonus</em> when the unit changes combat state.
         /// </summary>
-        /// <remarks>This method handles transitions between mobile and non-mobile states, applying or
-        /// removing movement bonuses as necessary. - If transitioning to the mobile state, the method applies a
-        /// movement bonus unless the unit is mounted. - If transitioning out of the mobile state, the method removes
-        /// the movement bonus and updates the mounted status.  Preconditions: - The deployed profile must not be null.
-        /// - If the unit is mounted, the mounted profile must not be null.  Exceptions thrown by this method are logged
-        /// using the application's exception handling service.</remarks>
-        /// <param name="newState">The new combat state to transition to. Must be a valid <see cref="CombatState"/> value.</param>
-        /// <param name="previousState">The previous combat state before the transition. Must be a valid <see cref="CombatState"/> value.</param>
+        /// <param name="newState">The state the unit is entering.</param>
+        /// <param name="previousState">The state the unit is leaving.</param>
+        /// <remarks>
+        /// <list type="bullet">
+        ///   <item><term>Entering <see cref="CombatState.Mobile"/></term>
+        ///         <description>
+        ///           • If the unit has a mounted‑profile, it becomes <c>IsMounted = true</c> and <strong>does not</strong>
+        ///             receive the foot‑mobile bonus.<br/>
+        ///           • Otherwise it is foot‑mobile (<c>IsMounted = false</c>) and gains
+        ///             <c>+MOBILE_MOVEMENT_BONUS</c> – applied only once per entry.
+        ///         </description></item>
+        ///   <item><term>Leaving <c>Mobile</c></term>
+        ///         <description>
+        ///           • Mounted units simply mark <c>IsMounted = false</c> (no bonus to remove).<br/>
+        ///           • Foot‑mobile units have the bonus removed exactly once.
+        ///         </description></item>
+        /// </list>
+        /// Preconditions:
+        /// • <see cref="GetDeployedProfile"/> must return a non‑null profile.
+        /// • The method never throws for missing mounted profiles – they are
+        ///   treated as “not mounted.”
+        /// </remarks>
         private void UpdateMobilityState(CombatState newState, CombatState previousState)
         {
             try
             {
-                // Validate BEFORE making any changes
+                // ----- Preconditions --------------------------------------------------
                 if (GetDeployedProfile() == null)
-                    throw new InvalidOperationException("Cannot update state: DeployedProfile is null");
-
-                if (newState == CombatState.Mobile && IsMounted && GetMountedProfile() == null)
-                    throw new InvalidOperationException("Cannot update state: Unit is mounted but MountedProfile is null");
+                    throw new InvalidOperationException("Unit lacks a deployed weapon profile – cannot change mobility state.");
 
                 bool enteringMobile = newState == CombatState.Mobile && previousState != CombatState.Mobile;
                 bool leavingMobile = newState != CombatState.Mobile && previousState == CombatState.Mobile;
 
-                // ENTERING Mobile ---------------------------------------------------
+                // Presence of a transport profile determines mount capability.
+                bool hasTransport = GetMountedProfile() != null;
+
+                // ---------------------------------------------------------------------
+                // ENTERING Mobile
+                // ---------------------------------------------------------------------
                 if (enteringMobile)
                 {
-                    if (GetMountedProfile() != null)
+                    if (hasTransport)
                     {
+                        // Ride the transport – no foot bonus.
                         IsMounted = true;
-                        _mobileBonusApplied = false; // mounted units don’t get the bonus
+
+                        if (_mobileBonusApplied)
+                        {
+                            ApplyMovementBonus(-CUConstants.MOBILE_MOVEMENT_BONUS);
+                            _mobileBonusApplied = false;
+                        }
                     }
-                    else if (!_mobileBonusApplied)
+                    else // Foot‑mobile
                     {
-                        ApplyMovementBonus(+CUConstants.MOBILE_MOVEMENT_BONUS);
                         IsMounted = false;
-                        _mobileBonusApplied = true;
+
+                        if (!_mobileBonusApplied)
+                        {
+                            ApplyMovementBonus(+CUConstants.MOBILE_MOVEMENT_BONUS);
+                            _mobileBonusApplied = true;
+                        }
                     }
                 }
-                // LEAVING Mobile ----------------------------------------------------
+                // ---------------------------------------------------------------------
+                // LEAVING Mobile
+                // ---------------------------------------------------------------------
                 else if (leavingMobile)
                 {
-                    if (IsMounted)
-                    {
-                        IsMounted = false;
-                        _mobileBonusApplied = false;
-                    }
-                    else if (_mobileBonusApplied)
+                    // All units end up dismounted outside the Mobile state.
+                    IsMounted = false;
+
+                    if (_mobileBonusApplied)
                     {
                         ApplyMovementBonus(-CUConstants.MOBILE_MOVEMENT_BONUS);
                         _mobileBonusApplied = false;
                     }
                 }
             }
-            catch (Exception e)
+            catch (Exception ex)
             {
-                AppService.HandleException(CLASS_NAME, "UpdateStateAndProfiles", e);
+                AppService.HandleException(nameof(CombatUnit), nameof(UpdateMobilityState), ex);
             }
         }
 
