@@ -7,373 +7,21 @@ using UnityEngine;
 
 namespace HammerAndSickle.Models
 {
-/*────────────────────────────────────────────────────────────────────────────
-
-CombatUnit ─ universal model for every battlefield piece in Hammer & Sickle
-
-──────────────────────────────────────────────────────────────────────────────
-
-Summary
-
-═══════
-
-• Encapsulates all mutable state and behaviour for *one* ground, air, or base
-
-unit: hit-points, supply, experience, leader assignment, combat state,
-
-movement/action economy, reference-resolution, cloning, and binary
-
-serialization.
-
-• Works hand-in-glove with shared *profile* singletons
-
-(WeaponSystemProfile, IntelProfile, etc.) to keep per-unit memory footprint
-
-low.
-
-• Implements **ICloneable**, **ISerializable**, and **IResolvableReferences**
-
-to support template cloning, save-games, and late reference fixes.
-
-Public properties
-
-═════════════════
-
-string UnitName { get; set; }
-
-string UnitID { get; private set; }
-
-UnitType UnitType { get; private set; }
-
-UnitClassification Classification { get; private set; }
-
-UnitRole Role { get; private set; }
-
-Side Side { get; private set; }
-
-Nationality Nationality { get; private set; }
-
-bool IsTransportable { get; private set; }
-
-bool IsBase { get; private set; }
-
-WeaponSystems DeployedProfileID { get; private set; }
-
-WeaponSystems MountedProfileID { get; private set; }
-
-IntelProfileTypes IntelProfileType { get; internal set; }
-
-string LeaderID { get; internal set; } // ID-based leader reference
-
-bool IsLeaderAssigned // computed property → !string.IsNullOrEmpty(LeaderID)
-
-Leader UnitLeader { get; } // computed property → GameDataManager lookup via LeaderID
-
-StatsMaxCurrent MoveActions { get; private set; }
-
-StatsMaxCurrent CombatActions { get; private set; }
-
-StatsMaxCurrent DeploymentActions { get; private set; }
-
-StatsMaxCurrent OpportunityActions { get; private set; }
-
-StatsMaxCurrent IntelActions { get; private set; }
-
-int ExperiencePoints { get; internal set; }
-
-ExperienceLevel ExperienceLevel { get; internal set; }
-
-EfficiencyLevel EfficiencyLevel { get; internal set; }
-
-bool IsMounted { get; internal set; }
-
-CombatState CombatState { get; internal set; }
-
-StatsMaxCurrent HitPoints { get; private set; }
-
-StatsMaxCurrent DaysSupply { get; private set; }
-
-StatsMaxCurrent MovementPoints { get; private set; }
-
-Coordinate2D MapPos { get; internal set; }
-
-SpottedLevel SpottedLevel { get; private set; }
-
-Constructors
-
-═════════════
-
-public CombatUnit(string unitName,
-
-UnitType unitType,
-
-UnitClassification classification,
-
-UnitRole role,
-
-Side side,
-
-Nationality nationality,
-
-WeaponSystems deployedProfileID,
-
-WeaponSystems mountedProfileID,
-
-IntelProfileTypes intelProfileType,
-
-bool isTransportable,
-
-bool isBase = false,
-
-DepotCategory category = DepotCategory.Secondary,
-
-DepotSize size = DepotSize.Small)
-
-// Binary-deserialization
-
-protected CombatUnit(SerializationInfo info, StreamingContext context)
-
-Public API (method signatures ⇢ brief purpose)
-
-═════════════════════════════════════════════
-
-― Generic unit info / state ―
-
-public WeaponSystemProfile GetDeployedProfile() // returns shared deployed profile
-
-public WeaponSystemProfile GetMountedProfile() // returns shared mounted profile (or null)
-
-public WeaponSystemProfile GetActiveWeaponSystemProfile() // deployed vs. mounted logic
-
-public WeaponSystemProfile GetCurrentCombatStrength() // cloned profile with all modifiers applied
-
-public IntelReport GenerateIntelReport(SpottedLevel=...) // fog-of-war filtered intel
-
-public void RefreshAllActions() // reset action tokens
-
-public void RefreshMovementPoints() // reset MP
-
-public void SetSpottedLevel(SpottedLevel lvl)
-
-― Damage / supply ―
-
-public void TakeDamage(float dmg)
-
-public void Repair(float hp)
-
-public bool ConsumeSupplies(float amount) // returns false when empty
-
-public float ReceiveSupplies(float amount) // returns accepted qty
-
-public bool IsDestroyed()
-
-public bool CanMove() // quick "mobility gate"
-
-public float GetSupplyStatus() // 0-1 scalar
-
-― Efficiency ―
-
-public void SetEfficiencyLevel(EfficiencyLevel lvl)
-
-public void DecreaseEfficiencyLevelBy1()
-
-public void IncreaseEfficiencyLevelBy1()
-
-― Experience ―
-
-public bool AddExperience(int pts) // handles level-up
-
-public void SetExperience(int pts) // direct set (load game)
-
-public int GetPointsToNextLevel()
-
-public float GetExperienceProgress() // 0-1 scalar
-
-― Leader subsystem ―
-
-public bool AssignLeader(string leaderID) // ID-based leader assignment
-
-public bool RemoveLeader()
-
-public Dictionary<SkillBonusType,float> GetLeaderBonuses()
-
-public bool HasLeaderCapability(SkillBonusType type)
-
-public float GetLeaderBonus(SkillBonusType type)
-
-public string GetLeaderName()
-
-public CommandGrade GetLeaderGrade()
-
-public int GetLeaderReputation()
-
-public string GetLeaderRank()
-
-public CommandAbility GetLeaderCommandAbility()
-
-public bool HasLeaderSkill(Enum skill)
-
-public void AwardLeaderReputation(CUConstants.ReputationAction act,
-
-float ctx=1f)
-
-public void AwardLeaderReputation(int amount)
-
-― Action-economy ―
-
-public bool SpendAction(ActionTypes type, float movtCost = 0)
-
-public Dictionary<string,float> GetAvailableActions()
-
-― Combat-state machine ―
-
-public bool UpOneState() // Fortified→...→Mobile
-
-public bool DownOneState() // reverse
-
-public bool SetCombatState(CombatState newState)
-
-public bool CanChangeToState(CombatState target)
-
-public bool BeginEntrenchment()
-
-public bool CanEntrench()
-
-public List<CombatState> GetValidStateTransitions()
-
-― Position / movement ―
-
-public void SetPosition(Coordinate2D pos)
-
-public bool CanMoveTo(Coordinate2D target) // *TODO* not implemented
-
-public float GetDistanceTo(Coordinate2D target)
-
-public float GetDistanceTo(CombatUnit other)
-
-― Debug helpers ―
-
-public void DebugSetCombatState(CombatState st)
-
-public void DebugSetMounted(bool mounted)
-
-― Interfaces ―
-
-public object Clone() // ICloneable
-
-public void GetObjectData(SerializationInfo, StreamingContext) // ISerializable
-
-public bool HasUnresolvedReferences() // IResolvableReferences
-
-public IReadOnlyList<string> GetUnresolvedReferenceIDs()
-
-public void ResolveReferences(GameDataManager mgr)
-
-public List<string> ValidateInternalConsistency()
-
-Private / internal helpers
-
-══════════════════════════
-
-void InitializeActionCounts() // derive token caps from classification
-
-void InitializeMovementPoints() // derive MP from classification
-
-float GetFinalCombatRatingModifier() // strength×state×efficiency×XP
-
-float GetStrengthModifier()
-
-float GetCombatStateModifier()
-
-float GetEfficiencyModifier()
-
-ExperienceLevel CalculateExperienceLevel(int points)
-
-int GetMinPointsForLevel(ExperienceLevel lvl)
-
-ExperienceLevel GetNextLevel(ExperienceLevel lvl)
-
-void OnExperienceLevelChanged(ExperienceLevel prev, ExperienceLevel next) // UI message
-
-float GetExperienceMultiplier()
-
-string GetUnitDisplayName(string id)
-
-bool ConsumeMovementPoints(float pts)
-
-float GetDeploymentActionMovementCost()
-
-float GetCombatActionMovementCost()
-
-float GetIntelActionMovementCost()
-
-bool CanConsumeMoveAction()
-
-bool CanConsumeCombatAction()
-
-bool CanConsumeDeploymentAction()
-
-bool CanConsumeIntelAction()
-
-bool CanUnitTypeChangeStates()
-
-bool IsAdjacentStateTransition(CombatState cur, CombatState tgt)
-
-bool HasSufficientMovementForDeployment()
-
-void UpdateStateAndProfiles(CombatState newSt, CombatState prevSt)
-
-// ...plus a handful of facility-specific helpers in the base-unit region.
-
-Developer notes
-
-═══════════════
-
-• **Action-Economy Core** -- Five separate StatsMaxCurrent pools model move, combat,
-
-deployment, opportunity, and intel actions. Each high-level API method *must*
-
-decrement these pools consistently; use *SpendAction* for centralised validation.
-
-• **Profiles vs. Instance Data** -- Deployed/Mounted *WeaponSystemProfile*s are
-
-immutable templates; only the enum ID is stored. Avoid serialising the heavy
-
-profile object.
-
-• **Leader Reference Architecture** -- Leaders are referenced by *LeaderID* string and
-
-resolved via *GameDataManager.GetLeader()* lookup. The *UnitLeader* computed property
-
-handles the lookup automatically with proper exception handling. This eliminates
-
-circular reference issues during serialization while maintaining clean API access.
-
-• **Serialization contract** -- When adding fields, remember to:
-
-1. Extend *GetObjectData* and deserialization ctor.
-
-2. Include the field in *Clone*.
-
-3. Update *ValidateInternalConsistency*.
-
-• **Reference-resolution pattern** -- Air-unit attachments for airbases are fixed
-
-in *ResolveReferences* after *GameDataManager* owns all objects. Leader references
-
-no longer require resolution as they use on-demand lookup.
-
-• **Error handling** -- EVERY public-facing method is wrapped in try-catch and
-
-funnels to `AppService.HandleException(CLASS_NAME, Method, e)` per project
-
-standard.
-
-• **UnitType restrictions** -- Fixed-wing aircraft and pure base classes cannot
-
-transition combat states; helper *CanUnitTypeChangeStates()* codifies this rule.
-
-────────────────────────────────────────────────────────────────────────────*/
+    /// <summary>
+    /// Extension helpers for UnitClassification.
+    /// </summary>
+    public static class UnitClassificationExtensions
+    {
+        /// <summary>
+        /// Returns <c>true</c> if the classification represents a fixed facility (HQ, DEPOT, AIRB).
+        /// </summary>
+        public static bool IsBaseType(this UnitClassification classification) =>
+            classification == UnitClassification.HQ ||
+            classification == UnitClassification.DEPOT ||
+            classification == UnitClassification.AIRB;
+    }
+
+    
     [Serializable]
     public partial class CombatUnit : ICloneable, ISerializable, IResolvableReferences
     {
@@ -386,8 +34,8 @@ transition combat states; helper *CanUnitTypeChangeStates()* codifies this rule.
 
         #region Fields
 
-        // Temporary fields for deserialization reference resolution
-        private string unresolvedLeaderID = "";
+        private bool _mobileBonusApplied = false; // Persisted runtime flag, true when MOBILE_MOVEMENT_BONUS active.
+        private const string SERIAL_KEY_MOBILE_BONUS = "mobBonus"; // Serialization identifier for _mobileBonusApplied
 
         #endregion // Fields
 
@@ -403,7 +51,7 @@ transition combat states; helper *CanUnitTypeChangeStates()* codifies this rule.
         public Side Side { get; private set; }
         public Nationality Nationality { get; private set; }
         public bool IsTransportable { get; private set; }
-        public bool IsBase { get; private set; }
+        public bool IsBase => Classification.IsBaseType();
 
         // Profile IDs
         public WeaponSystems DeployedProfileID { get; private set; }
@@ -480,7 +128,6 @@ transition combat states; helper *CanUnitTypeChangeStates()* codifies this rule.
             WeaponSystems mountedProfileID,
             IntelProfileTypes intelProfileType,
             bool isTransportable,
-            bool isBase = false,
             DepotCategory category = DepotCategory.Secondary,
             DepotSize size = DepotSize.Small)
         {
@@ -510,7 +157,11 @@ transition combat states; helper *CanUnitTypeChangeStates()* codifies this rule.
                     throw new ArgumentException("Invalid intel profile type", nameof(intelProfileType));
 
                 // Set identification and metadata
-                UnitName = unitName;
+
+                // Basic argument validation
+                if (string.IsNullOrWhiteSpace(unitName))
+                    throw new ArgumentException("Unit name cannot be null or whitespace", nameof(unitName));
+                UnitName = unitName.Trim();
                 UnitID = Guid.NewGuid().ToString();
                 UnitType = unitType;
                 Classification = classification;
@@ -524,8 +175,7 @@ transition combat states; helper *CanUnitTypeChangeStates()* codifies this rule.
                 MountedProfileID = mountedProfileID;
                 IntelProfileType = intelProfileType;
 
-                // Set base status and initialize facility if needed
-                IsBase = isBase;
+                // Initialise facility data when appropriate
                 if (IsBase)
                 {
                     InitializeFacility(category, size);
@@ -563,7 +213,7 @@ transition combat states; helper *CanUnitTypeChangeStates()* codifies this rule.
         #endregion
 
 
-        #region Generic Interface Methods
+        #region Core
 
         /// <summary>
         /// Retrieves the weapon system profile currently deployed on the system.
@@ -994,10 +644,10 @@ transition combat states; helper *CanUnitTypeChangeStates()* codifies this rule.
             }
         }
 
-        #endregion // Generic Interface Methods
+        #endregion // Core
 
 
-        #region Experience System Interface Methods
+        #region Experience System
 
         /// <summary>
         /// Adds experience points to the unit and returns true if successful.
@@ -1110,11 +760,10 @@ transition combat states; helper *CanUnitTypeChangeStates()* codifies this rule.
             return Mathf.Clamp01(progress);
         }
 
+        #endregion // Experience System
 
-        #endregion // Experience System Interface Methods
 
-
-        #region Leader System Interface Methods
+        #region Leader System
 
         /// <summary>
         /// Assigns a leader to this unit by their ID, removing any existing leader.
@@ -1348,506 +997,389 @@ transition combat states; helper *CanUnitTypeChangeStates()* codifies this rule.
             }
         }
 
-        #endregion // Leader System Interface Methods
+        #endregion // Leader System
 
 
-        #region Action System Interface Methods
+        #region CombatUnit Actions
 
         /// <summary>
-        /// Spend an action of the specified type, consuming movement points if necessary.
+        /// Attempts to deploy the combat unit to a higher deployment level.
         /// </summary>
-        /// <param name="type"></param>
-        /// <param name="movtCost"></param>
-        /// <returns></returns>
-        public bool SpendAction(ActionTypes type, float movtCost = 0)
+        /// <remarks>This method checks whether the combat unit has sufficient deployment actions,
+        /// movement points, and supplies to perform the operation. If the deployment is successful, the required
+        /// resources are consumed. If the deployment fails, an appropriate message is captured for the user
+        /// interface.</remarks>
+        /// <returns><see langword="true"/> if the deployment to a higher level is successful; otherwise, <see
+        /// langword="false"/>.</returns>
+        public bool DeployUpOneLevel()
         {
             try
             {
-                switch (type)
+                // Check actions and movement points before deploying.
+                if (GetDeployActions() >= 1 && MovementPoints.Current >= GetDeployMovementCost())
                 {
-                    case ActionTypes.MoveAction:
+                    // Atempt to deploy up one level.
+                    bool result = TryUpOneState();
 
-                        // Check if we have at least one move action available
-                        if (MoveActions.Current < 1)
-                        {
-                            AppService.CaptureUiMessage($"{UnitName} has no move actions available.");
-                            return false;
-                        }
-
-                        // Check if we have sufficient movement points and consume them.
-                        if (!ConsumeMovementPoints(movtCost))
-                        {
-                            AppService.CaptureUiMessage($"{UnitName} does not have enough movement points to perform a move action.");
-                            return false;
-                        }
-
-                        // Deduct one move action.
-                        MoveActions.DecrementCurrent();
-                        return true;
-
-                    case ActionTypes.CombatAction:
-                        // Check if we have at least one combat action available
-                        if (CombatActions.Current < 1)
-                        {
-                            AppService.CaptureUiMessage($"{UnitName} has no combat actions available.");
-                            return false;
-                        }
-
-                        // Calculate and consume movement points first
-                        float movementCost = GetCombatActionMovementCost();
-                        if (!ConsumeMovementPoints(movementCost))
-                        {
-                            AppService.CaptureUiMessage($"{UnitName} does not have enough movement points to perform a combat action.");
-                            return false;
-                        }
-
-                        // Deduct one combat action.
-                        CombatActions.DecrementCurrent();
-                        return true;
-
-                    case ActionTypes.DeployAction:
-
-                        // Check if we have at least one deployment action available
-                        if (DeploymentActions.Current < 1)
-                        {
-                            AppService.CaptureUiMessage($"{UnitName} has no deployment actions available.");
-                            return false;
-                        }
-
-                        // Check if we have sufficient movement points for deployment
-                        float deployMovementCost = GetDeploymentActionMovementCost();
-                        if (!ConsumeMovementPoints(deployMovementCost))
-                        {
-                            AppService.CaptureUiMessage($"{UnitName} does not have enough movement points to perform a deployment action.");
-                            return false;
-                        }
-
-                        // Deduct one deployment action.
+                    // If we have made it this far, we can consume supplies and actions.
+                    if (result)
+                    {
+                        ConsumeSupplies(CUConstants.COMBAT_STATE_SUPPLY_TRANSITION_COST);
                         DeploymentActions.DecrementCurrent();
                         return true;
-
-                    case ActionTypes.OpportunityAction:
-
-                        // Check if we have at least one opportunity action available
-                        if (OpportunityActions.Current < 1)
-                        {
-                            AppService.CaptureUiMessage($"{UnitName} has no opportunity actions available.");
-                            return false;
-                        }
-
-                        // Consume one opportunity action
-                        OpportunityActions.DecrementCurrent();
-                        return true;
-
-                    case ActionTypes.IntelAction:
-                        // Check if we have at least one intel action available
-                        if (IntelActions.Current < 1)
-                        {
-                            AppService.CaptureUiMessage($"{UnitName} has no intelligence actions available.");
-                            return false;
-                        }
-
-                        // If it's not a base, gathering intel cost movement points.
-                        if (!IsBase)
-                        {
-                            // Get intel action movement cost.
-                            float intelMovementCost = GetIntelActionMovementCost();
-                            if (!ConsumeMovementPoints(intelMovementCost))
-                            {
-                                AppService.CaptureUiMessage($"{UnitName} does not have enough movement points to perform an intelligence action.");
-                                return false;
-                            }
-                        }
-
-                        // Consume one intel action
-                        IntelActions.DecrementCurrent();
-                        return true;
+                    }
+                    else
+                    {
+                        // Deployment failed, notify the user.
+                        AppService.CaptureUiMessage($"{UnitName} cannot deploy up one level due to insufficient conditions.");
+                        return false; // Deployment failed
+                    }
                 }
-
-                // Let user know the action was not successful
-                AppService.CaptureUiMessage($"{UnitName} could not perform the action: {type}.");
-
+                // Not enough actions or movement points to deploy
+                AppService.CaptureUiMessage($"{UnitName} does not have enough deployment actions or movement points to deploy up one level.");
                 return false;
             }
             catch (Exception e)
             {
-                AppService.HandleException(CLASS_NAME, "SpendAction", e);
+                AppService.HandleException(CLASS_NAME, "DeployUpOneLevel", e);
                 return false;
             }
         }
+
+        /// <summary>
+        /// Attempts to deploy the combat unit to a lower deployment level.
+        /// </summary>
+        /// <remarks>This method checks whether the combat unit has sufficient deployment actions,
+        /// movement points, and supplies to perform the operation. If the deployment is successful, the required
+        /// resources are consumed. If the deployment fails, an appropriate message is captured for the user
+        /// interface.</remarks>
+        /// <returns><see langword="true"/> if the deployment to a lower level is successful; otherwise, <see
+        /// langword="false"/>.</returns>
+        public bool DeployDownOneLevel()
+        {
+            try
+            {
+                // Check actions and movement points before deploying.
+                if (GetDeployActions() >= 1 && MovementPoints.Current >= GetDeployMovementCost())
+                {
+                    // Atempt to deploy down one level.
+                    bool result = TryDownOneState();
+
+                    // If we have made it this far, we can consume supplies and actions.
+                    if (result)
+                    {
+                        ConsumeSupplies(CUConstants.COMBAT_STATE_SUPPLY_TRANSITION_COST);
+                        DeploymentActions.DecrementCurrent();
+                        return true;
+                    }
+                    else
+                    {
+                        // Deployment failed, notify the user.
+                        AppService.CaptureUiMessage($"{UnitName} cannot deploy down one level due to insufficient conditions.");
+                        return false; // Deployment failed
+                    }
+                }
+                // Not enough actions or movement points to deploy
+                AppService.CaptureUiMessage($"{UnitName} does not have enough deployment actions or movement points to deploy down one level.");
+                return false;
+            }
+            catch (Exception e)
+            {
+                AppService.HandleException(CLASS_NAME, "DeployDownOneLevel", e);
+                return false;
+            }
+        }
+
+        /// <summary>
+        /// Consume actions, movement points, and supplies to perform a combat action.
+        /// </summary>
+        /// <returns>Success/Failure</returns>
+        public bool PerformCombatAction()
+        {
+            try
+            {
+                // Make sure the unit has enough combat actions, movement points, and supplies to perform a combat action.
+                if (CombatActions.Current >= 1 && 
+                    MovementPoints.Current >= GetCombatMovementCost() &&
+                    DaysSupply.Current >= CUConstants.COMBAT_ACTION_SUPPLY_THRESHOLD &&
+                    !IsBase)
+                {
+                    // Deduct one combat action
+                    CombatActions.DecrementCurrent();
+
+                    // Consume movement points
+                    ConsumeMovementPoints(GetCombatMovementCost());
+
+                    // Consume supplies for the combat action
+                    ConsumeSupplies(CUConstants.COMBAT_ACTION_SUPPLY_COST);
+
+                    return true; // Combat action performed successfully
+                }
+                else
+                {
+                    AppService.CaptureUiMessage($"{UnitName} does not have enough combat actions, movement points, or supplies to perform a combat action.");
+                    return false; // Not enough resources to perform combat action
+                }
+            }
+            catch (Exception e)
+            {
+                AppService.HandleException(CLASS_NAME, "PerformCombatAction", e);
+                return false;
+            }
+        }
+
+        /// <summary>
+        /// Consume the required actions, movement points, and supplies to perform a move action.
+        /// </summary>
+        /// <param name="movtCost"></param>
+        /// <returns>Success/Failure</returns>
+        public bool PerformMoveAction(int movtCost)
+        {
+            try
+            {
+                // Make sure the unit has enough move actions, movement points, and supplies to perform a move action.
+                if (MoveActions.Current >= 1 &&
+                    MovementPoints.Current >= movtCost &&
+                    DaysSupply.Current >= (movtCost * CUConstants.MOVE_ACTION_SUPPLY_COST) + CUConstants.MOVE_ACTION_SUPPLY_THRESHOLD &&
+                    !IsBase)
+                {
+                    // Decrement move actions
+                    MoveActions.DecrementCurrent();
+
+                    // Consume movement points
+                    ConsumeMovementPoints(movtCost);
+
+                    // Consume supplies for the move action
+                    ConsumeSupplies((movtCost * CUConstants.MOVE_ACTION_SUPPLY_COST) + CUConstants.MOVE_ACTION_SUPPLY_THRESHOLD);
+
+                    return true; // Move action performed successfully
+                }
+                else
+                {
+                    AppService.CaptureUiMessage($"{UnitName} does not have enough move actions, movement points, or supplies to perform a move action.");
+                    return false; // Not enough resources to perform move action
+                }
+            }
+            catch (Exception e)
+            {
+                AppService.HandleException(CLASS_NAME, "PerformMoveAction", e);
+                return false;
+            }
+        }
+       
+       /// <summary>
+       /// Attempts to perform an intel action for the unit, consuming the required resources.
+       /// </summary>
+       /// <remarks>This method checks whether the unit has sufficient intel actions, movement points, and
+       /// supplies to perform an intel action. If the required resources are available, they are consumed accordingly,
+       /// and the action is performed. If the resources are insufficient, the method logs a message and returns <see
+       /// langword="false"/>.</remarks>
+       /// <returns><see langword="true"/> if the intel action is successfully performed; otherwise, <see langword="false"/>.</returns>
+       public bool PerformIntelAction()
+        {
+            try
+            {
+                // Make sure the unit has enough intel actions, movement points, and supplies to perform an intel action.
+                if (IntelActions.Current >= 1 &&
+                    MovementPoints.Current >= GetIntelMovementCost() &&
+                    DaysSupply.Current >= CUConstants.INTEL_ACTION_SUPPLY_COST)
+                {
+                    // Decrement intel actions
+                    IntelActions.DecrementCurrent();
+
+                    // Consume movement points
+                    ConsumeMovementPoints(GetIntelMovementCost());
+
+                    // Consume supplies for the intel action
+                    ConsumeSupplies(CUConstants.INTEL_ACTION_SUPPLY_COST);
+
+                    return true; // Intel action performed successfully
+                }
+                else
+                {
+                    AppService.CaptureUiMessage($"{UnitName} does not have enough intel actions, movement points, or supplies to perform an intel action.");
+                    return false; // Not enough resources to perform intel action
+                }
+            }
+            catch (Exception e)
+            {
+                AppService.HandleException(CLASS_NAME, "PerformIntelAction", e);
+                return false;
+            }
+        }
+
+       /// <summary>
+       /// Attempts to perform an opportunity action for the unit.
+       /// </summary>
+       /// <remarks>An opportunity action can only be performed if the unit has sufficient opportunity
+       /// actions, adequate supply levels, and is not designated as a base. If the action is successfully performed,
+       /// the unit's opportunity actions are decremented, and the required supplies are consumed.</remarks>
+       /// <returns><see langword="true"/> if the opportunity action was successfully performed; otherwise, <see
+       /// langword="false"/>.</returns>
+       public bool PerformOpportunityAction()
+       {
+            try
+            {
+                // Make sure the unit has enough opportunity actions and is not a base.
+                if (OpportunityActions.Current >= 1 &&
+                    DaysSupply.Current >= CUConstants.OPPORTUNITY_ACTION_SUPPLY_COST + CUConstants.OPPORTUNITY_ACTION_SUPPLY_THRESHOLD && 
+                    !IsBase)
+                {
+                    // Decrement opportunity actions
+                    OpportunityActions.DecrementCurrent();
+
+                    // Consume supplies for the opportunity action
+                    ConsumeSupplies(CUConstants.OPPORTUNITY_ACTION_SUPPLY_COST + CUConstants.OPPORTUNITY_ACTION_SUPPLY_THRESHOLD);
+
+                    return true; // Opportunity action performed successfully
+                }
+                else
+                {
+                    AppService.CaptureUiMessage($"{UnitName} does not have enough opportunity actions to perform an opportunity action.");
+                    return false; // Not enough resources to perform opportunity action
+                }
+            }
+            catch (Exception e)
+            {
+                AppService.HandleException(CLASS_NAME, "PerformOpportunityAction", e);
+                return false;
+            }
+       }
 
         /// <summary>
         /// Returns a dictionary mapping each action type to the number of **truly** available tokens
         /// after validating both action counters and movement‑point prerequisites.
         /// </summary>
-        public Dictionary<string, float> GetAvailableActions()
+        public Dictionary<ActionTypes, float> GetAvailableActions()
         {
             // Move – must have a token and at least 1 movement point remaining.
-            float moveAvailable = (CanConsumeMoveAction() && MovementPoints.Current >= 0f)
+            float moveAvailable = (MoveActions.Current >= 1 && MovementPoints.Current > 0f)
                 ? MoveActions.Current : 0f;
 
             // Combat – existing validation already checks movement cost.
-            float combatAvailable = CanConsumeCombatAction() ? CombatActions.Current : 0f;
-
-            // Deployment – needs token **and** 50 % of max movement (unless immobile base).
-            float deployMpCost = MovementPoints.Max * CUConstants.DEPLOYMENT_ACTION_MOVEMENT_COST;
-            bool canDeploy = MovementPoints.Max == 0f || MovementPoints.Current >= deployMpCost;
-            float deploymentAvailable = (CanConsumeDeploymentAction() && canDeploy)
-                ? DeploymentActions.Current : 0f;
+            float combatAvailable = CombatActions.Current >= 1 ? CombatActions.Current : 0f;
 
             // Opportunity – purely reactive, no validation.
             float opportunityAvailable = OpportunityActions.Current;
 
             // Intel – existing validation already handles base / movement logic.
-            float intelAvailable = CanConsumeIntelAction() ? IntelActions.Current : 0f;
+            float intelAvailable = IntelActions.Current >= 1 ? IntelActions.Current : 0f;
 
-            return new Dictionary<string, float>
+            // Deployment – only available for bases, needs movement points.
+            float deploymentAvailable = 0f;
+            if (IsBase)
             {
-                ["Move"] = moveAvailable,
-                ["Combat"] = combatAvailable,
-                ["Deployment"] = deploymentAvailable,
-                ["Opportunity"] = opportunityAvailable,
-                ["Intelligence"] = intelAvailable,
-                ["MovementPoints"] = MovementPoints.Current
+                deploymentAvailable = 0f;
+            }
+            else
+            {
+                if (MovementPoints.Current >= GetDeployMovementCost() && DeploymentActions.Current >= 1)
+                    deploymentAvailable = DeploymentActions.Current;
+            }
+
+            return new Dictionary<ActionTypes, float>
+            {
+                [ActionTypes.MoveAction] = moveAvailable,
+                [ActionTypes.CombatAction] = combatAvailable,
+                [ActionTypes.DeployAction] = deploymentAvailable,
+                [ActionTypes.OpportunityAction] = opportunityAvailable,
+                [ActionTypes.IntelAction] = intelAvailable
             };
         }
 
-        #endregion // Action System Interface Methods
-
-
-        #region CombatState Interface Methods
-
         /// <summary>
-        /// Moves the unit up one combat state (toward more mobile/less defensive posture).
-        /// Progression: Fortified → Entrenched → HastyDefense → Deployed → Mobile
+        /// Determines the number of deployment actions available for the unit.
         /// </summary>
-        /// <returns>True if state change was successful, false if already at maximum mobility or transition invalid</returns>
-        public bool UpOneState()
+        /// <remarks>This method checks whether the unit has sufficient movement points to perform a
+        /// deployment. If the movement points are greater than or equal to the deployment movement cost, the current
+        /// deployment actions are returned; otherwise, the method returns 0.</remarks>
+        /// <returns>The number of deployment actions available. Returns <see langword="0"/> if the unit does not have enough
+        /// movement points to deploy.</returns>
+        public float GetDeployActions()
         {
-            try
-            {
-                // Define the state order for navigation
-                var stateOrder = new Dictionary<CombatState, int>
-                {
-                    { CombatState.Mobile, 0 },
-                    { CombatState.Deployed, 1 },
-                    { CombatState.HastyDefense, 2 },
-                    { CombatState.Entrenched, 3 },
-                    { CombatState.Fortified, 4 }
-                };
+            // If the unit is a base, it cannot deploy.
+            if (!CanUnitTypeChangeStates())
+                return 0;
 
-                // Check if current state is valid
-                if (!stateOrder.ContainsKey(CombatState))
-                {
-                    AppService.CaptureUiMessage($"Cannot move up from unknown combat state: {CombatState}");
-                    return false;
-                }
-
-                int currentIndex = stateOrder[CombatState];
-
-                // Check if already at maximum mobility (Mobile state)
-                if (currentIndex == 0)
-                {
-                    AppService.CaptureUiMessage($"{UnitName} is already in Mobile state - cannot move to higher mobility.");
-                    return false;
-                }
-
-                // Calculate target state (one step toward Mobile)
-                int targetIndex = currentIndex - 1;
-                var targetState = stateOrder.First(kvp => kvp.Value == targetIndex).Key;
-
-                // Use existing validation and state change logic
-                return SetCombatState(targetState);
-            }
-            catch (Exception e)
-            {
-                AppService.HandleException(CLASS_NAME, "UpOneState", e);
-                return false;
-            }
+            // Check if the unit can deploy based on movement points
+            if (MovementPoints.Current >= GetDeployMovementCost())
+                return DeploymentActions.Current;
+            else return 0f;
         }
 
         /// <summary>
-        /// Moves the unit down one combat state (toward more defensive/less mobile posture).
-        /// Progression: Mobile → Deployed → HastyDefense → Entrenched → Fortified
+        /// Determines the number of combat actions available for the unit based on its current movement points.
         /// </summary>
-        /// <returns>True if state change was successful, false if already at maximum defensive posture or transition invalid</returns>
-        public bool DownOneState()
+        /// <returns>The number of combat actions</returns>
+        public float GetCombatActions()
         {
-            try
-            {
-                // Define the state order for navigation
-                var stateOrder = new Dictionary<CombatState, int>
-                {
-                    { CombatState.Mobile, 0 },
-                    { CombatState.Deployed, 1 },
-                    { CombatState.HastyDefense, 2 },
-                    { CombatState.Entrenched, 3 },
-                    { CombatState.Fortified, 4 }
-                };
+            // If the unit is a base, it cannot perform combat actions.
+            if (IsBase)
+                return 0;
 
-                // Check if current state is valid
-                if (!stateOrder.ContainsKey(CombatState))
-                {
-                    AppService.CaptureUiMessage($"Cannot move down from unknown combat state: {CombatState}");
-                    return false;
-                }
-
-                int currentIndex = stateOrder[CombatState];
-
-                // Check if already at maximum defensive posture (Fortified state)
-                if (currentIndex == 4)
-                {
-                    AppService.CaptureUiMessage($"{UnitName} is already in Fortified state - cannot move to higher defensive posture.");
-                    return false;
-                }
-
-                // Calculate target state (one step toward Fortified)
-                int targetIndex = currentIndex + 1;
-                var targetState = stateOrder.First(kvp => kvp.Value == targetIndex).Key;
-
-                // Use existing validation and state change logic
-                return SetCombatState(targetState);
-            }
-            catch (Exception e)
-            {
-                AppService.HandleException(CLASS_NAME, "DownOneState", e);
-                return false;
-            }
+            // Check if the unit can perform combat actions based on movement points
+            if (MovementPoints.Current >= GetCombatMovementCost())
+                return CombatActions.Current;
+            else return 0;
         }
 
         /// <summary>
-        /// Attempts to transition this unit to the specified <paramref name="newState" />.
+        /// Determines the number of move actions available for the unit.
         /// </summary>
-        /// <param name="newState">The combat state the unit should enter.</param>
-        /// <returns>
-        /// <c>true</c> if the transition succeeds; otherwise <c>false</c>. A return value of
-        /// <c>false</c> indicates either <see cref="CanChangeToState(CombatState)" /> rejected the
-        /// request or an unexpected internal fault was captured and logged.
-        /// </returns>
-        /// <exception cref="System.InvalidOperationException">
-        /// Thrown (in debug builds) when validation has already passed but a required resource
-        /// —deployment action token, movement points, or supplies—cannot be spent, signalling a
-        /// logic error elsewhere in the game loop. The exception is caught, logged via
-        /// <see cref="AppService.HandleException(string,string,System.Exception)" />, and the
-        /// method returns <c>false</c>.
-        /// </exception>
-        /// <remarks>
-        /// <para>This method performs the state transition atomically:</para>
-        /// <list type="number">
-        ///   <item><description>Verifies the change is still legal by calling <see cref="CanChangeToState" />.</description></item>
-        ///   <item><description>Deducts the fixed supply cost and spends a deployment action token.</description></item>
-        ///   <item><description>Commits <see cref="CombatState" /> and refreshes related profiles via <see cref="UpdateStateAndProfiles" />.</description></item>
-        /// </list>
-        /// Because resource deductions occur inside the same critical section, the unit is never left in
-        /// a “half‑paid” state: if any step fails, all changes are rolled back and the method
-        /// returns <c>false</c>.</remarks>
-        public bool SetCombatState(CombatState newState)
+        /// <remarks>A unit's ability to perform move actions depends on its current movement points. If
+        /// the unit is a base,  it cannot move under any circumstances.</remarks>
+        /// <returns>The number of move actions the unit can perform. Returns <see langword="0"/> if the unit is a base  or if
+        /// the unit has no remaining movement points.</returns>
+        public float GetMoveActions()
         {
-            try
-            {
-                if (!CanChangeToState(newState))
-                    return false;
+            // If the unit is a base, it cannot move.
+            if (IsBase)
+                return 0;
 
-                // Spend supplies first – no side-effects if it fails
-                float cost = CUConstants.COMBAT_STATE_SUPPLY_TRANSITION_COST;
-                if (!ConsumeSupplies(cost))
-                    throw new InvalidOperationException($"{UnitName}: bug – supplies suddenly insufficient.");
-
-                #if DEBUG
-                // Deployment token should always be present after validation
-                if (!SpendAction(ActionTypes.DeployAction))
-                    throw new InvalidOperationException($"{UnitName}: bug – deployment token vanished.");
-                #else
-                if (!SpendAction(ActionTypes.DeployAction))
-                {
-                // Roll back supplies in release builds and bail gracefully
-                ReceiveSupplies(cost);
-                AppService.CaptureUiMessage($"{UnitName} could not change state due to an internal error.");
-                return false;
-                }
-                #endif
-
-                var previousState = CombatState;
-                CombatState = newState;
-                UpdateStateAndProfiles(newState, previousState);
-                return true;
-            }
-            catch (Exception ex)
-            {
-                AppService.HandleException(CLASS_NAME, "SetCombatState", ex);
-                return false;
-            }
+            // Check if the unit can perform move actions based on movement points
+            if (MovementPoints.Current > 0)
+                return MoveActions.Current;
+            else
+                return 0;
         }
 
         /// <summary>
-        /// Checks if the unit can transition to the specified combat state.
-        /// Validates unit type restrictions, adjacency rules, and resource requirements.
+        /// Retrieves the current number of opportunity actions available for the unit.
         /// </summary>
-        /// <param name="targetState">The desired combat state</param>
-        /// <returns>True if transition is allowed</returns>
-        public bool CanChangeToState(CombatState targetState)
+        /// <remarks>Opportunity actions represent actions that the unit can perform in specific
+        /// situations. If the unit is a base, it cannot perform opportunity actions, and the method returns
+        /// 0.</remarks>
+        /// <returns>The current number of opportunity actions available for the unit. Returns 0 if the unit is a base.</returns>
+        public float GetOpportunityActions()
         {
-            try
-            {
-                // Capture the UI message if needed.
-                string errorMessage = $"Cannot change from {CombatState} to {targetState}: ";
+            // If the unit is a base, it cannot perform opportunity actions.
+            if (IsBase)
+                return 0;
 
-                // Same state - no change needed
-                if (CombatState == targetState)
-                {
-                    errorMessage += "Already in target state.";
-                    AppService.CaptureUiMessage(errorMessage);
-                    return false;
-                }
-
-                // Check if the unit is destroyed
-                if (IsDestroyed())
-                    return false;
-
-                // Air units and bases cannot change states.
-                if (!CanUnitTypeChangeStates())
-                {
-                    errorMessage += "Unit type cannot change combat states.";
-                    AppService.CaptureUiMessage(errorMessage);
-                    return false;
-                }
-
-                // Check if transition is adjacent
-                if (!IsAdjacentStateTransition(CombatState, targetState))
-                {
-                    errorMessage += $"Transition from {CombatState} to {targetState} is not adjacent.";
-                    AppService.CaptureUiMessage(errorMessage);
-                    return false;
-                }
-
-                // Make sure you have a deployment action to spend.
-                if (!CanConsumeDeploymentAction())
-                {
-                    errorMessage += "No deployment actions available for state change.";
-                    AppService.CaptureUiMessage(errorMessage);
-                    return false;
-                }
-
-                // You need sufficient movement points for deployment actions.
-                if (!HasSufficientMovementForDeployment())
-                {
-                    errorMessage += "Insufficient movement points for deployment action.";
-                    AppService.CaptureUiMessage(errorMessage);
-                    return false;
-                }
-
-                // Check if the unit has critical supply levels
-                if (DaysSupply.Current <= CUConstants.CRITICAL_SUPPLY_THRESHOLD)
-                {
-                    errorMessage += "Cannot change state with critical supply levels.";
-                    AppService.CaptureUiMessage(errorMessage);
-                    return false;
-                }
-
-                // Only limited CombatState transitions are allowed based on efficiency level.
-                if (EfficiencyLevel == EfficiencyLevel.StaticOperations)
-                {
-                    if (CombatState == CombatState.Fortified || CombatState == CombatState.Entrenched || CombatState == CombatState.HastyDefense)
-                    {
-                        errorMessage += "Cannot change from defensive states in Static Operations.";
-                        AppService.CaptureUiMessage(errorMessage);
-                        return false; // Cannot change from defensive states in static operations
-                    }
-
-                    if (targetState == CombatState.Mobile)
-                    {
-                        errorMessage += "Cannot change to Mobile state in Static Operations.";
-                        AppService.CaptureUiMessage(errorMessage);
-                        return false; // Cannot change to Mobile state in static operations
-                    }
-                }
-
-                return true;
-            }
-            catch (Exception e)
-            {
-                AppService.HandleException(CLASS_NAME, "CanChangeToState", e);
-                return false;
-            }
+            return OpportunityActions.Current;
         }
 
         /// <summary>
-        /// Begins entrenchment process by transitioning to HastyDefense.
-        /// Convenience method for defensive positioning.
+        /// Retrieves the number of available intelligence actions for the unit.
         /// </summary>
-        /// <returns>True if entrenchment began successfully</returns>
-        public bool BeginEntrenchment()
+        /// <remarks>The number of intelligence actions returned depends on whether the unit has
+        /// sufficient movement points  to perform an intelligence action. If the unit's current movement points are
+        /// less than the required  movement cost, the method returns 0.</remarks>
+        /// <returns>The current number of intelligence actions available if the unit has sufficient movement points; otherwise,
+        /// 0.</returns>
+        public float GetIntelActions()
         {
-            try
-            {
-                if (CombatState != CombatState.Deployed)
-                {
-                    return false; // Can only start entrenchment from Deployed
-                }
-
-                return SetCombatState(CombatState.HastyDefense);
-            }
-            catch (Exception e)
-            {
-                AppService.HandleException(CLASS_NAME, "BeginEntrenchment", e);
-                return false;
-            }
+            // Check if the unit has enough movement points to perform an intel action.
+            if (MovementPoints.Current >= GetIntelMovementCost())
+                return IntelActions.Current;
+            else
+                return 0; // Not enough movement points for intel action
         }
 
-        /// <summary>
-        /// Checks if the unit can begin entrenchment (transition to defensive states).
-        /// </summary>
-        /// <returns>True if entrenchment is possible</returns>
-        public bool CanEntrench()
-        {
-            try
-            {
-                return CanChangeToState(CombatState.HastyDefense);
-            }
-            catch (Exception e)
-            {
-                AppService.HandleException(CLASS_NAME, "CanEntrench", e);
-                return false;
-            }
-        }
-
-        /// <summary>
-        /// Gets all valid combat states this unit can transition to from current state.
-        /// </summary>
-        /// <returns>List of valid target states</returns>
-        public List<CombatState> GetValidStateTransitions()
-        {
-            var validStates = new List<CombatState>();
-
-            try
-            {
-                if (!CanUnitTypeChangeStates())
-                {
-                    return validStates; // Return empty list
-                }
-
-                // Check each possible state
-                foreach (CombatState state in (CombatState[])Enum.GetValues(typeof(CombatState)))
-                {
-                    if (CanChangeToState(state))
-                    {
-                        validStates.Add(state);
-                    }
-                }
-
-                return validStates;
-            }
-            catch (Exception e)
-            {
-                AppService.HandleException(CLASS_NAME, "GetValidStateTransitions", e);
-                return validStates;
-            }
-        }
-
-        #endregion // CombatState Interface Methods
+        #endregion // CombatUnit Actions
 
 
-        #region Position and Movement Interface Methods
+        #region Position and Movement
 
         /// <summary>
         /// Sets the unit's position on the map.
@@ -1921,34 +1453,10 @@ transition combat states; helper *CanUnitTypeChangeStates()* codifies this rule.
             }
         }
 
-        #endregion // Position and Movement Interface Methods
+        #endregion // Position and Movement
 
 
-        #region Debugging Methods
-
-        /// <summary>
-        /// Direct change of combat state for debugging purposes.
-        /// </summary>
-        /// <param name="newState"></param>
-        public void DebugSetCombatState(CombatState newState)
-        {
-            CombatState = newState;
-        }
-
-        /// <summary>
-        /// Sets the mounted state of the object for debugging purposes.
-        /// </summary>
-        /// <param name="isMounted">A value indicating whether the object should be marked as mounted.  <see langword="true"/> to mark the
-        /// object as mounted; otherwise, <see langword="false"/>.</param>
-        public void DebugSetMounted(bool isMounted)
-        {
-            IsMounted = isMounted;
-        }   
-
-        #endregion // Debugging Methods
-
-
-        #region Generic Interface Helper Methods
+        #region Core Helpers
 
         /// <summary>
         /// Initializes action counts based on unit type and classification.
@@ -2011,9 +1519,7 @@ transition combat states; helper *CanUnitTypeChangeStates()* codifies this rule.
                 case UnitClassification.BMB:
                 case UnitClassification.RECONA:
                     moveActions += 2;
-                    combatActions = 0;
                     deploymentActions = 0;
-                    intelActions = 0;
                     break;
 
                 case UnitClassification.HQ:
@@ -2189,10 +1695,390 @@ transition combat states; helper *CanUnitTypeChangeStates()* codifies this rule.
             };
         }
 
-        #endregion // Generic Interface Helper Methods
+        #endregion // Core Helpers
 
 
-        #region Experience System Helper Methods
+        #region CombatUnit Actions Helpers
+
+        /// <summary>
+        /// Consumes movement points if available.
+        /// </summary>
+        /// <param name="points">Number of movement points to consume</param>
+        /// <returns>True if movement points were consumed, false if insufficient</returns>
+        private bool ConsumeMovementPoints(float points)
+        {
+            try
+            {
+                if (points <= 0f)
+                {
+                    return true; // No points to consume
+                }
+
+                if (MovementPoints.Current >= points)
+                {
+                    MovementPoints.SetCurrent(MovementPoints.Current - points);
+                    return true;
+                }
+                return false;
+            }
+            catch (Exception e)
+            {
+                AppService.HandleException(CLASS_NAME, "ConsumeMovementPoints", e);
+                return false;
+            }
+        }
+
+        /// <summary>
+        /// Calculates the movement point cost for a deployment action.
+        /// </summary>
+        /// <returns>Movement points required (50% of max)</returns>
+        private float GetDeployMovementCost()
+        {
+            return Mathf.CeilToInt(MovementPoints.Max * CUConstants.DEPLOYMENT_ACTION_MOVEMENT_COST);
+        }
+
+        /// <summary>
+        /// Calculates the movement‑point cost for a combat action.
+        /// Immobile units (Max == 0) pay nothing.
+        /// </summary>
+        private float GetCombatMovementCost()
+        {
+            return Mathf.CeilToInt(MovementPoints.Max * CUConstants.COMBAT_ACTION_MOVEMENT_COST);
+        }
+
+        /// <summary>
+        /// Calculates the movement‑point cost for an intelligence action.
+        /// Immobile units (Max == 0) pay nothing.
+        /// </summary>
+        private float GetIntelMovementCost()
+        {
+            return Mathf.CeilToInt(MovementPoints.Max * CUConstants.INTEL_ACTION_MOVEMENT_COST);
+        }
+
+        /// <summary>
+        /// Moves the unit up one combat state (toward more mobile/less defensive posture).
+        /// Progression: Fortified → Entrenched → HastyDefense → Deployed → Mobile
+        /// </summary>
+        /// <returns>True if state change was successful, false if already at maximum mobility or transition invalid</returns>
+        private bool TryUpOneState()
+        {
+            try
+            {
+                // Define the state order for navigation
+                var stateOrder = new Dictionary<CombatState, int>
+                {
+                    { CombatState.Mobile, 0 },
+                    { CombatState.Deployed, 1 },
+                    { CombatState.HastyDefense, 2 },
+                    { CombatState.Entrenched, 3 },
+                    { CombatState.Fortified, 4 }
+                };
+
+                // Check if current state is valid
+                if (!stateOrder.ContainsKey(CombatState))
+                {
+                    AppService.CaptureUiMessage($"Cannot move up from unknown combat state: {CombatState}");
+                    return false;
+                }
+
+                int currentIndex = stateOrder[CombatState];
+
+                // Check if already at maximum mobility (Mobile state)
+                if (currentIndex == 0)
+                {
+                    AppService.CaptureUiMessage($"{UnitName} is already in Mobile state - cannot move to higher mobility.");
+                    return false;
+                }
+
+                // Calculate target state (one step toward Mobile)
+                int targetIndex = currentIndex - 1;
+                var targetState = stateOrder.First(kvp => kvp.Value == targetIndex).Key;
+
+                // Comprehensive check for valid state transition.
+                if (!CanChangeToState(targetState))
+                    return false;
+
+                // Save previous state for comparison.
+                var previousState = CombatState;
+
+                // Set the new combat state
+                CombatState = targetState;
+
+                // Update the unit's mobility state based on the new combat state
+                UpdateMobilityState(targetState, previousState);
+
+                return true;
+            }
+            catch (Exception e)
+            {
+                AppService.HandleException(CLASS_NAME, "UpOneState", e);
+                return false;
+            }
+        }
+
+        /// <summary>
+        /// Moves the unit down one combat state (toward more defensive/less mobile posture).
+        /// Progression: Mobile → Deployed → HastyDefense → Entrenched → Fortified
+        /// </summary>
+        /// <returns>True if state change was successful, false if already at maximum defensive posture or transition invalid</returns>
+        private bool TryDownOneState()
+        {
+            try
+            {
+                // Define the state order for navigation
+                var stateOrder = new Dictionary<CombatState, int>
+                {
+                    { CombatState.Mobile, 0 },
+                    { CombatState.Deployed, 1 },
+                    { CombatState.HastyDefense, 2 },
+                    { CombatState.Entrenched, 3 },
+                    { CombatState.Fortified, 4 }
+                };
+
+                // Check if current state is valid
+                if (!stateOrder.ContainsKey(CombatState))
+                {
+                    AppService.CaptureUiMessage($"Cannot move down from unknown combat state: {CombatState}");
+                    return false;
+                }
+
+                int currentIndex = stateOrder[CombatState];
+
+                // Check if already at maximum defensive posture (Fortified state)
+                if (currentIndex == 4)
+                {
+                    AppService.CaptureUiMessage($"{UnitName} is already in Fortified state - cannot move to higher defensive posture.");
+                    return false;
+                }
+
+                // Calculate target state (one step toward Fortified)
+                int targetIndex = currentIndex + 1;
+                var targetState = stateOrder.First(kvp => kvp.Value == targetIndex).Key;
+
+                // Use existing validation and state change logic
+                //return SetCombatState(targetState);
+                return false;
+            }
+            catch (Exception e)
+            {
+                AppService.HandleException(CLASS_NAME, "DownOneState", e);
+                return false;
+            }
+        }
+
+        /// <summary>
+        /// Checks if this unit classification can change combat states.
+        /// Fixed-wing aircraft and bases cannot change states.
+        /// </summary>
+        /// <returns>True if unit can change states</returns>
+        private bool CanUnitTypeChangeStates()
+        {
+            // Fixed-wing aircraft cannot change states
+            if (Classification == UnitClassification.ASF ||
+                Classification == UnitClassification.MRF ||
+                Classification == UnitClassification.ATT ||
+                Classification == UnitClassification.BMB ||
+                Classification == UnitClassification.RECONA)
+            {
+                return false;
+            }
+
+            // Bases cannot change states
+            if (Classification == UnitClassification.HQ ||
+                Classification == UnitClassification.DEPOT ||
+                Classification == UnitClassification.AIRB)
+            {
+                return false;
+            }
+
+            // All other units (including helicopters) can change states
+            return true;
+        }
+
+        /// <summary>
+        /// Checks if the transition between two states is adjacent (one step).
+        /// </summary>
+        /// <param name="currentState">Current combat state</param>
+        /// <param name="targetState">Target combat state</param>
+        /// <returns>True if transition is adjacent</returns>
+        private bool IsAdjacentStateTransition(CombatState currentState, CombatState targetState)
+        {
+            // Define the state order: Mobile ← Deployed → HastyDefense → Entrenched → Fortified
+            var stateOrder = new Dictionary<CombatState, int>
+            {
+                { CombatState.Mobile, 0 },
+                { CombatState.Deployed, 1 },
+                { CombatState.HastyDefense, 2 },
+                { CombatState.Entrenched, 3 },
+                { CombatState.Fortified, 4 }
+            };
+
+            if (!stateOrder.ContainsKey(currentState) || !stateOrder.ContainsKey(targetState))
+            {
+                return false;
+            }
+
+            int currentIndex = stateOrder[currentState];
+            int targetIndex = stateOrder[targetState];
+
+            // Adjacent means difference of exactly 1
+            return Math.Abs(currentIndex - targetIndex) == 1;
+        }
+
+        /// <summary>
+        /// Updates the mobility state of the unit based on the specified new and previous combat states.
+        /// </summary>
+        /// <remarks>This method handles transitions between mobile and non-mobile states, applying or
+        /// removing movement bonuses as necessary. - If transitioning to the mobile state, the method applies a
+        /// movement bonus unless the unit is mounted. - If transitioning out of the mobile state, the method removes
+        /// the movement bonus and updates the mounted status.  Preconditions: - The deployed profile must not be null.
+        /// - If the unit is mounted, the mounted profile must not be null.  Exceptions thrown by this method are logged
+        /// using the application's exception handling service.</remarks>
+        /// <param name="newState">The new combat state to transition to. Must be a valid <see cref="CombatState"/> value.</param>
+        /// <param name="previousState">The previous combat state before the transition. Must be a valid <see cref="CombatState"/> value.</param>
+        private void UpdateMobilityState(CombatState newState, CombatState previousState)
+        {
+            try
+            {
+                // Validate BEFORE making any changes
+                if (GetDeployedProfile() == null)
+                    throw new InvalidOperationException("Cannot update state: DeployedProfile is null");
+
+                if (newState == CombatState.Mobile && IsMounted && GetMountedProfile() == null)
+                    throw new InvalidOperationException("Cannot update state: Unit is mounted but MountedProfile is null");
+
+                bool enteringMobile = newState == CombatState.Mobile && previousState != CombatState.Mobile;
+                bool leavingMobile = newState != CombatState.Mobile && previousState == CombatState.Mobile;
+
+                // ENTERING Mobile ---------------------------------------------------
+                if (enteringMobile)
+                {
+                    if (GetMountedProfile() != null)
+                    {
+                        IsMounted = true;
+                        _mobileBonusApplied = false; // mounted units don’t get the bonus
+                    }
+                    else if (!_mobileBonusApplied)
+                    {
+                        ApplyMovementBonus(+CUConstants.MOBILE_MOVEMENT_BONUS);
+                        IsMounted = false;
+                        _mobileBonusApplied = true;
+                    }
+                }
+                // LEAVING Mobile ----------------------------------------------------
+                else if (leavingMobile)
+                {
+                    if (IsMounted)
+                    {
+                        IsMounted = false;
+                        _mobileBonusApplied = false;
+                    }
+                    else if (_mobileBonusApplied)
+                    {
+                        ApplyMovementBonus(-CUConstants.MOBILE_MOVEMENT_BONUS);
+                        _mobileBonusApplied = false;
+                    }
+                }
+            }
+            catch (Exception e)
+            {
+                AppService.HandleException(CLASS_NAME, "UpdateStateAndProfiles", e);
+            }
+        }
+
+        /// <summary>
+        /// Adjusts Max and Current movement points by <paramref name="delta"/>, clamping current to
+        /// the [0, newMax] range.
+        /// </summary>
+        private void ApplyMovementBonus(float delta)
+        {
+            float newMax = MovementPoints.Max + delta;
+            float newCurrent = Mathf.Clamp(MovementPoints.Current + delta, 0f, newMax);
+
+            MovementPoints.SetMax(newMax);
+            MovementPoints.SetCurrent(newCurrent);
+        }
+
+        /// <summary>
+        /// Checks if the unit can transition to the specified combat state.
+        /// Validates unit type restrictions, adjacency rules, and resource requirements.
+        /// </summary>
+        /// <param name="targetState">The desired combat state</param>
+        /// <returns>True if transition is allowed</returns>
+        private bool CanChangeToState(CombatState targetState)
+        {
+            try
+            {
+                // Capture the UI message if needed.
+                string errorMessage = $"Cannot change from {CombatState} to {targetState}: ";
+
+                // Same state - no change needed
+                if (CombatState == targetState)
+                {
+                    errorMessage += "Already in target state.";
+                    AppService.CaptureUiMessage(errorMessage);
+                    return false;
+                }
+
+                // Check if the unit is destroyed
+                if (IsDestroyed())
+                    throw new InvalidOperationException($"{UnitName} is destroyed and cannot change states.");
+
+                // Air units and bases cannot change states.
+                if (!CanUnitTypeChangeStates())
+                {
+                    errorMessage += "Unit type cannot change combat states.";
+                    AppService.CaptureUiMessage(errorMessage);
+                    return false;
+                }
+
+                // Check if transition is adjacent
+                if (!IsAdjacentStateTransition(CombatState, targetState))
+                {
+                    errorMessage += $"Transition from {CombatState} to {targetState} is not adjacent.";
+                    AppService.CaptureUiMessage(errorMessage);
+                    return false;
+                }
+
+                // Check if the unit has critical supply levels
+                if (DaysSupply.Current <= CUConstants.CRITICAL_SUPPLY_THRESHOLD)
+                {
+                    errorMessage += "Cannot change state with critical supply levels.";
+                    AppService.CaptureUiMessage(errorMessage);
+                    return false;
+                }
+
+                // Only limited CombatState transitions are allowed based on efficiency level.
+                if (EfficiencyLevel == EfficiencyLevel.StaticOperations)
+                {
+                    if (CombatState == CombatState.Fortified || CombatState == CombatState.Entrenched || CombatState == CombatState.HastyDefense)
+                    {
+                        errorMessage += "Cannot change from defensive states in Static Operations.";
+                        AppService.CaptureUiMessage(errorMessage);
+                        return false; // Cannot change from defensive states in static operations
+                    }
+
+                    if (targetState == CombatState.Mobile)
+                    {
+                        errorMessage += "Cannot change to Mobile state in Static Operations.";
+                        AppService.CaptureUiMessage(errorMessage);
+                        return false; // Cannot change to Mobile state in static operations
+                    }
+                }
+
+                return true;
+            }
+            catch (Exception e)
+            {
+                AppService.HandleException(CLASS_NAME, "CanChangeToState", e);
+                return false;
+            }
+        }
+
+        #endregion // CombatUnit Actions Helper Methods
+
+
+        #region Experience System Helpers
 
         /// <summary>
         /// Calculates the experience level based on total experience points.
@@ -2284,288 +2170,31 @@ transition combat states; helper *CanUnitTypeChangeStates()* codifies this rule.
             };
         }
 
-        #endregion // Experience System Helper Methods
+        #endregion // Experience System Helpers
 
 
-        #region Action System Helper Methods
+        #region Debugging
 
         /// <summary>
-        /// Consumes movement points if available.
+        /// Direct change of combat state for debugging purposes.
         /// </summary>
-        /// <param name="points">Number of movement points to consume</param>
-        /// <returns>True if movement points were consumed, false if insufficient</returns>
-        private bool ConsumeMovementPoints(float points)
+        /// <param name="newState"></param>
+        public void DebugSetCombatState(CombatState newState)
         {
-            try
-            {
-                if (points <= 0f)
-                {
-                    return true; // No points to consume
-                }
-
-                if (MovementPoints.Current >= points)
-                {
-                    MovementPoints.SetCurrent(MovementPoints.Current - points);
-                    return true;
-                }
-                return false;
-            }
-            catch (Exception e)
-            {
-                AppService.HandleException(CLASS_NAME, "ConsumeMovementPoints", e);
-                return false;
-            }
+            CombatState = newState;
         }
 
         /// <summary>
-        /// Calculates the movement point cost for a deployment action.
+        /// Sets the mounted state of the object for debugging purposes.
         /// </summary>
-        /// <returns>Movement points required (50% of max)</returns>
-        private float GetDeploymentActionMovementCost()
+        /// <param name="isMounted">A value indicating whether the object should be marked as mounted.  <see langword="true"/> to mark the
+        /// object as mounted; otherwise, <see langword="false"/>.</param>
+        public void DebugSetMounted(bool isMounted)
         {
-            return MovementPoints.Max * CUConstants.DEPLOYMENT_ACTION_MOVEMENT_COST;
+            IsMounted = isMounted;
         }
 
-        /// <summary>
-        /// Calculates the movement‑point cost for a combat action.
-        /// Immobile units (Max == 0) pay nothing.
-        /// </summary>
-        private float GetCombatActionMovementCost()
-        {
-            if (MovementPoints.Max <= 0f) return 0f;
-            return MovementPoints.Max * CUConstants.COMBAT_ACTION_MOVEMENT_COST;
-        }
-
-        /// <summary>
-        /// Calculates the movement‑point cost for an intelligence action.
-        /// Immobile units (Max == 0) pay nothing.
-        /// </summary>
-        private float GetIntelActionMovementCost()
-        {
-            if (MovementPoints.Max <= 0f) return 0f;
-            return MovementPoints.Max * CUConstants.INTEL_ACTION_MOVEMENT_COST;
-        }
-
-        /// <summary>
-        /// Checks if the unit can consume a move action.
-        /// </summary>
-        /// <returns>True if at least one move action is available</returns>
-        private bool CanConsumeMoveAction()
-        {
-            return MoveActions.Current >= 1f;
-        }
-
-        /// <summary>
-        /// Checks if the unit can consume a combat action and has sufficient movement points.
-        /// </summary>
-        /// <returns>True if at least one combat action and sufficient movement are available</returns>
-        private bool CanConsumeCombatAction()
-        {
-            // Check if we have a combat action available
-            if (CombatActions.Current < 1f)
-            {
-                return false;
-            }
-
-            // Check if we have sufficient movement points
-            float requiredMovement = GetCombatActionMovementCost();
-            if (MovementPoints.Current < requiredMovement)
-            {
-                return false;
-            }
-
-            return true;
-        }
-
-        /// <summary>
-        /// Checks if the unit can consume a deployment action.
-        /// </summary>
-        /// <returns>True if at least one deployment action is available</returns>
-        private bool CanConsumeDeploymentAction()
-        {
-            return DeploymentActions.Current >= 1f;
-        }
-
-        /// <summary>
-        /// Checks if the unit can consume an intelligence action and has sufficient movement points.
-        /// Bases don't require movement points for intel actions.
-        /// </summary>
-        /// <returns>True if at least one intelligence action and sufficient movement are available</returns>
-        private bool CanConsumeIntelAction()
-        {
-            // Check if we have an intel action available
-            if (IntelActions.Current < 1f)
-            {
-                return false;
-            }
-
-            // Bases don't need movement points for intel gathering
-            if (IsBase)
-            {
-                return true;
-            }
-
-            // Check if we have sufficient movement points
-            float requiredMovement = GetIntelActionMovementCost();
-            if (MovementPoints.Current < requiredMovement)
-            {
-                return false;
-            }
-
-            return true;
-        }
-
-        #endregion // Action System Helper Methods
-
-
-        #region CombatState Interface Helper Methods
-
-        /// <summary>
-        /// Checks if this unit classification can change combat states.
-        /// Fixed-wing aircraft and bases cannot change states.
-        /// </summary>
-        /// <returns>True if unit can change states</returns>
-        private bool CanUnitTypeChangeStates()
-        {
-            // Fixed-wing aircraft cannot change states
-            if (Classification == UnitClassification.ASF ||
-                Classification == UnitClassification.MRF ||
-                Classification == UnitClassification.ATT ||
-                Classification == UnitClassification.BMB ||
-                Classification == UnitClassification.RECONA)
-            {
-                return false;
-            }
-
-            // Bases cannot change states
-            if (Classification == UnitClassification.HQ ||
-                Classification == UnitClassification.DEPOT ||
-                Classification == UnitClassification.AIRB)
-            {
-                return false;
-            }
-
-            // All other units (including helicopters) can change states
-            return true;
-        }
-
-        /// <summary>
-        /// Checks if the transition between two states is adjacent (one step).
-        /// </summary>
-        /// <param name="currentState">Current combat state</param>
-        /// <param name="targetState">Target combat state</param>
-        /// <returns>True if transition is adjacent</returns>
-        private bool IsAdjacentStateTransition(CombatState currentState, CombatState targetState)
-        {
-            // Define the state order: Mobile ← Deployed → HastyDefense → Entrenched → Fortified
-            var stateOrder = new Dictionary<CombatState, int>
-            {
-                { CombatState.Mobile, 0 },
-                { CombatState.Deployed, 1 },
-                { CombatState.HastyDefense, 2 },
-                { CombatState.Entrenched, 3 },
-                { CombatState.Fortified, 4 }
-            };
-
-            if (!stateOrder.ContainsKey(currentState) || !stateOrder.ContainsKey(targetState))
-            {
-                return false;
-            }
-
-            int currentIndex = stateOrder[currentState];
-            int targetIndex = stateOrder[targetState];
-
-            // Adjacent means difference of exactly 1
-            return Math.Abs(currentIndex - targetIndex) == 1;
-        }
-
-        /// <summary>
-        /// Checks if unit has sufficient movement points for a deployment action.
-        /// Deployment actions cost 50% of max movement points.
-        /// </summary>
-        /// <returns>True if sufficient movement points available</returns>
-        private bool HasSufficientMovementForDeployment()
-        {
-            float requiredMovement = GetDeploymentActionMovementCost();
-            return MovementPoints.Current >= requiredMovement;
-        }
-
-        /// <summary>
-        /// Updates the unit's mounted state and movement points based on combat state transitions.
-        /// </summary>
-        /// <remarks>
-        /// This method handles profile switching and movement point adjustments during combat state changes.
-        /// Movement points are only modified when transitioning TO or FROM Mobile state to add/remove movement bonuses.
-        /// For transitions between non-Mobile states, movement points are left unchanged to preserve the 
-        /// movement point consumption from SpendAction.
-        private void UpdateStateAndProfiles(CombatState newState, CombatState previousState)
-        {
-            try
-            {
-                // Validate BEFORE making any changes
-                if (GetDeployedProfile() == null)
-                    throw new InvalidOperationException("Cannot update state: DeployedProfile is null");
-
-                if (newState == CombatState.Mobile && IsMounted && GetMountedProfile() == null)
-                    throw new InvalidOperationException("Cannot update state: Unit is mounted but MountedProfile is null");
-
-                // Handle transition TO Mobile state
-                if (newState == CombatState.Mobile)
-                {
-                    // Check for a mounted profile first
-                    if (GetMountedProfile() != null)
-                    {
-                        // Unit can physically mount - set mounted state
-                        if (!IsMounted) IsMounted = true;
-                    }
-                    else
-                    {
-                        // No MountedProfile available - add movement bonus to current movement
-                        float movementBonus = CUConstants.MOBILE_MOVEMENT_BONUS;
-                        float newMaxMovement = MovementPoints.Max + movementBonus;
-
-                        // Update max movement while preserving current movement points
-                        float currentMovement = MovementPoints.Current;
-                        MovementPoints.SetMax(newMaxMovement);
-                        MovementPoints.SetCurrent(currentMovement + movementBonus);
-
-                        // Unit is not mounted but gets movement bonus
-                        IsMounted = false;
-                    }
-                }
-                // Handle transition FROM Mobile state
-                else if (previousState == CombatState.Mobile)
-                {
-                    // If coming FROM Mobile state, we need to remove any movement bonuses
-
-                    // If unit was mounted, just dismount
-                    if (IsMounted)
-                    {
-                        IsMounted = false;
-                    }
-                    // If unit had movement bonus (wasn't mounted but was Mobile), remove the bonus
-                    else if (GetMountedProfile() == null)
-                    {
-                        // Remove the movement bonus while preserving consumed movement points
-                        float movementBonus = CUConstants.MOBILE_MOVEMENT_BONUS;
-                        float newMaxMovement = MovementPoints.Max - movementBonus;
-                        float currentMovement = MovementPoints.Current - movementBonus;
-
-                        // Ensure current movement doesn't go below 0
-                        currentMovement = Mathf.Max(0f, currentMovement);
-
-                        MovementPoints.SetMax(newMaxMovement);
-                        MovementPoints.SetCurrent(currentMovement);
-                    }
-                }
-            }
-            catch (Exception e)
-            {
-                AppService.HandleException(CLASS_NAME, "UpdateStateAndProfiles", e);
-            }
-        }
-
-        #endregion // CombatState Interface Helper Methods
+        #endregion // Debugging
 
 
         #region ICloneable Implementation
@@ -2587,7 +2216,6 @@ transition combat states; helper *CanUnitTypeChangeStates()* codifies this rule.
                     this.MountedProfileID,       // Direct enum value copy
                     this.IntelProfileType,       // Static enum value - no reference resolution needed
                     this.IsTransportable,
-                    this.IsBase,
                     this.DepotCategory,          // Copy depot category for base units
                     this.DepotSize               // Copy depot size for base units
                 );
@@ -2608,6 +2236,7 @@ transition combat states; helper *CanUnitTypeChangeStates()* codifies this rule.
                 clone.IsMounted = this.IsMounted;
                 clone.CombatState = this.CombatState;
                 clone.MapPos = this.MapPos;
+                clone._mobileBonusApplied = this._mobileBonusApplied; // Copy mobile bonus state
                 clone.SpottedLevel = this.SpottedLevel;
 
                 // NOTE: LeaderID is NOT copied - templates should never have leaders assigned
@@ -2668,7 +2297,6 @@ transition combat states; helper *CanUnitTypeChangeStates()* codifies this rule.
                 Side = (Side)info.GetValue(nameof(Side), typeof(Side));
                 Nationality = (Nationality)info.GetValue(nameof(Nationality), typeof(Nationality));
                 IsTransportable = info.GetBoolean(nameof(IsTransportable));
-                IsBase = info.GetBoolean(nameof(IsBase));
                 SpottedLevel = (SpottedLevel)info.GetValue(nameof(SpottedLevel), typeof(SpottedLevel));
 
                 // Load IntelProfileType directly as enum value
@@ -2731,6 +2359,7 @@ transition combat states; helper *CanUnitTypeChangeStates()* codifies this rule.
                 IsMounted = info.GetBoolean(nameof(IsMounted));
                 CombatState = (CombatState)info.GetValue(nameof(CombatState), typeof(CombatState));
                 MapPos = (Coordinate2D)info.GetValue(nameof(MapPos), typeof(Coordinate2D));
+                _mobileBonusApplied = info.GetBoolean(SERIAL_KEY_MOBILE_BONUS);
 
                 // Deserialize facility data if this is a base unit
                 if (IsBase)
@@ -2830,6 +2459,7 @@ transition combat states; helper *CanUnitTypeChangeStates()* codifies this rule.
                 info.AddValue(nameof(IsMounted), IsMounted);
                 info.AddValue(nameof(CombatState), CombatState);
                 info.AddValue(nameof(MapPos), MapPos);
+                info.AddValue(SERIAL_KEY_MOBILE_BONUS, _mobileBonusApplied);
 
                 // Serialize facility data if this is a base unit
                 if (IsBase)
@@ -2868,15 +2498,8 @@ transition combat states; helper *CanUnitTypeChangeStates()* codifies this rule.
         /// <returns>True if any resolution methods need to be called</returns>
         public bool HasUnresolvedReferences()
         {
-            bool hasUnresolved = !string.IsNullOrEmpty(unresolvedLeaderID);
-
-            // Check if facility has unresolved references
-            if (IsBase && _attachedUnitIDs.Count > 0)
-            {
-                hasUnresolved = true;
-            }
-
-            return hasUnresolved;
+            // Only facilities attach other units
+            return IsBase && _attachedUnitIDs.Count > 0;
         }
 
         #endregion // ISerializable Implementation
@@ -2891,9 +2514,6 @@ transition combat states; helper *CanUnitTypeChangeStates()* codifies this rule.
         public IReadOnlyList<string> GetUnresolvedReferenceIDs()
         {
             var unresolvedIDs = new List<string>();
-
-            if (!string.IsNullOrEmpty(unresolvedLeaderID))
-                unresolvedIDs.Add($"Leader:{unresolvedLeaderID}");
 
             // Include facility's unresolved references
             if (IsBase)
