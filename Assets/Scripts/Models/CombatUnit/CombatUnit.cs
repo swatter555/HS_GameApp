@@ -1,9 +1,16 @@
 ﻿using HammerAndSickle.Services;
 using System;
+using System.Buffers.Text;
 using System.Collections.Generic;
 using System.Linq;
 using System.Runtime.Serialization;
 using UnityEngine;
+using UnityEngine.SocialPlatforms;
+using UnityEngine.UIElements;
+using static Codice.CM.Common.CmCallContext;
+using static PlasticGui.PlasticTableColumn;
+using static PlasticGui.WorkspaceWindow.Merge.MergeInProgress;
+using static UnityEditor.Experimental.GraphView.Port;
 
 namespace HammerAndSickle.Models
 {
@@ -22,149 +29,219 @@ namespace HammerAndSickle.Models
     }
 
 
-  /* ──────────────────────────────────────────────────────────────────────────────
-   CombatUnit ─ Universal representation of every game piece
-   ──────────────────────────────────────────────────────────────────────────────
+    /* ──────────────────────────────────────────────────────────────────────
+       CombatUnit – universal representation of every force element
+       ──────────────────────────────────────────────────────────────────────
 
- Summary
- ═══════
- • Core data-model for all maneuver elements: tank regiments, special-forces
-   detachments, aircraft squadrons, HQs, depots, airbases, etc.
- • Implements the Five-Action Framework (Move / Combat / Deployment /
-   Opportunity / Intel) and tracks *StatsMaxCurrent* for each.
- • Owns mutable per-unit state (HP, supply, actions, position, experience,
-   efficiency, combat state, leader link) while referencing immutable shared
-   *Profile* data via IDs.
- • Partial class split:  facility-specific logic lives in *CombatUnit.Facility*.
+       `CombatUnit` is the one‑stop model for **every** tangible piece on the map—armour
+       battalions, SOF teams, fighter squadrons, depots, HQs and air‑bases.  Each
+       instance fuses three data layers: (1) *Identity* (immutable IDs, nationality,
+       role and side), (2) *Templates* (read‑only `WeaponSystemProfile` &
+       `IntelProfile` objects shared across units), and (3) *Runtime state*—hit‑points,
+       days of supply, movement points, five independent action pools, experience,
+       efficiency, deployment state, map position and an optional leader reference.
 
- Public properties
- ═════════════════
-   string            UnitName            { get; set; }
-   string            UnitID              { get; }
-   UnitType          UnitType            { get; }
-   UnitClassification Classification     { get; }
-   UnitRole          Role                { get; }
-   Side              Side                { get; }
-   Nationality       Nationality         { get; }
-   bool              IsTransportable     { get; }
-   bool              IsBase              { get; }
-   WeaponSystems     DeployedProfileID   { get; }
-   WeaponSystems     MountedProfileID    { get; }
-   IntelProfileTypes IntelProfileType    { get; internal set; }
+       The turn loop is driven by the **five action pools** (Move, Combat, Deployment,
+       Opportunity, Intel).  `ResetTurn()` *always* tops every pool back to its design
+       capacity; weather and command friction modify **movement costs**, not token
+       refills, and are handled elsewhere.  Supply acts as a trip‑wire rather than a
+       smooth curve: at ≤1 day the unit is considered *critical* and most actions
+       (other than minimal movement or resupply) are blocked until stocks are
+       replenished.
 
-   // Action pools (StatsMaxCurrent)
-   StatsMaxCurrent MoveActions           { get; }
-   StatsMaxCurrent CombatActions         { get; }
-   StatsMaxCurrent DeploymentActions     { get; }
-   StatsMaxCurrent OpportunityActions    { get; }
-   StatsMaxCurrent IntelActions          { get; }
+       **Deployment** is the centre‑piece of land manoeuvre.  Units climb or descend a
+       five‑step ladder—`Mobile → Deployed → HastyDefense → Entrenched → Fortified`—one
+       rung per Deployment action.  A change costs **½ max MPs** and a small supply
+       fee, validated by `CanChangeToState`.  State changes flip mounting (granting a
+       once‑per‑entry mobile bonus) and apply posture combat multipliers (–10 % Mobile
+       through +30 % Fortified) that feed into `GetFinalCombatRatingModifier`.
+       Transport is strictly *organic*; however a **TODO** flag marks a future third
+       profile ID (`AirMounted`) for airborne/air‑mobile operations.  Aircraft, naval
+       units and base facilities are locked to a single posture.
 
-   // Vital statistics
-   StatsMaxCurrent HitPoints             { get; }
-   StatsMaxCurrent DaysSupply            { get; }
-   StatsMaxCurrent MovementPoints        { get; }
-   Coordinate2D    MapPos               { get; internal set; }
-   ExperienceLevel ExperienceLevel       { get; internal set; }
-   EfficiencyLevel EfficiencyLevel       { get; internal set; }
-   CombatState     CombatState           { get; internal set; }
-   SpottedLevel    SpottedLevel          { get; }
+       The **Opportunity** pool is currently reserved for *indirect‑fire* systems—SAMs
+       and tube / rocket artillery—to trigger defensive shots during the enemy turn.
+       `Intel` actions both run active recon (revealing hexes) and boost an internal
+       *DetectionLevel* for surrounding enemy units.  Experience accrues from combat,
+       movement under threat and successful Intel ops; bases gain XP only through
+       Intel work.  Leader skills apply **solely** to the unit they are stacked with,
+       enabling micro‑level command advantages rather than area buffs.
 
-   // Leadership
-   string           LeaderID             { get; internal set; }
-   bool             IsLeaderAssigned     => !string.IsNullOrEmpty(LeaderID);
-   Leader           UnitLeader           { get; }
+       Depots and air‑bases hold their own stockpiles and throughput; generation is a
+       fixed number that scales with facility size.  `Clone()` is a developer utility
+       for spawning fresh units from templates—*never* used on live state objects.
+       Persistence relies on `ISerializable`; post‑load, `ResolveUnitReferences()`
+       rewires template and leader IDs, and `ValidateInternalConsistency()` guards
+       against corrupt saves.
 
-   // Facility (see partial file)
-   int              BaseDamage           { get; private set; }
-   OperationalCapacity OperationalCapacity { get; private set; }
-   FacilityType     FacilityType         { get; private set; }
-   DepotSize        DepotSize            { get; private set; }
-   float            StockpileInDays      { get; private set; }
-   SupplyGenerationRate GenerationRate   { get; private set; }
-   SupplyProjection SupplyProjection     { get; private set; }
-   bool             SupplyPenetration    { get; private set; }
-   DepotCategory    DepotCategory        { get; private set; }
-   IReadOnlyList<CombatUnit> AirUnitsAttached { get; private set; }
+       --------------------------------------------------------------------
+       PUBLIC API (⇢ brief purpose)
+       --------------------------------------------------------------------
 
- Constructor signatures
- ══════════════════════
-   public  CombatUnit( string unitName,
-                       UnitClassification classification,
-                       UnitRole           role,
-                       Nationality        nationality,
-                       Side               side,
-                       bool               isTransportable,
-                       WeaponSystems      deployedProfile,
-                       WeaponSystems      mountedProfile = WeaponSystems.DEFAULT,
-                       IntelProfileTypes  intelProfile   = IntelProfileTypes.None,
-                       DepotCategory      depotCategory  = DepotCategory.Secondary,
-                       DepotSize          depotSize      = DepotSize.Small );
+       ───────────────────────────────────
+       IDENTIFICATION & METADATA
+       ───────────────────────────────────
+       string             UnitName              { get; set; }
+       string             UnitID                { get; }
+       UnitType           UnitType              { get; }
+       UnitClassification Classification        { get; }
+       UnitRole           Role                  { get; }
+       Side               Side                  { get; }
+       Nationality        Nationality           { get; }
+       bool               IsTransportable       { get; }
+       bool               IsBase                { get; }    // derived helper
 
-   // Deserialization
-   protected CombatUnit(SerializationInfo info, StreamingContext context);
+       ───────────────────────────────────
+       PROFILE REFERENCES
+       ───────────────────────────────────
+       WeaponSystems      DeployedProfileID     { get; }
+       WeaponSystems      MountedProfileID      { get; }
+       IntelProfileTypes  IntelProfileType      { get; internal set; }
 
- Public API (selected)
- ═════════════════════
-   // Turn-cycle
-   public void      ResetTurn();
-   public void      RecoverActions(float percentage);
-   public bool      IsDestroyed();                 // HP ≤ 1 is considered destroyed.
+       ───────────────────────────────────
+       ACTION POOLS (StatsMaxCurrent)
+       ───────────────────────────────────
+       StatsMaxCurrent    MoveActions           { get; }
+       StatsMaxCurrent    CombatActions         { get; }
+       StatsMaxCurrent    DeploymentActions     { get; }
+       StatsMaxCurrent    OpportunityActions    { get; }
+       StatsMaxCurrent    IntelActions          { get; }
 
-   // Movement & position
-   public void      SetPosition(Coordinate2D newPos);
-   public bool      CanMoveTo(Coordinate2D target);
-   public float     GetDistanceTo(Coordinate2D target);
-   public float     GetDistanceTo(CombatUnit other);
+       ───────────────────────────────────
+       STATE & ATTRITION
+       ───────────────────────────────────
+       int                ExperiencePoints      { get; internal set; }
+       ExperienceLevel    ExperienceLevel       { get; internal set; }
+       EfficiencyLevel    EfficiencyLevel       { get; internal set; }
+       bool               IsMounted             { get; internal set; }
+       DeploymentState    DeploymentState       { get; internal set; }
+       StatsMaxCurrent    HitPoints             { get; }
+       StatsMaxCurrent    DaysSupply            { get; }
+       StatsMaxCurrent    MovementPoints        { get; }
+       Coordinate2D       MapPos                { get; internal set; }
+       SpottedLevel       SpottedLevel          { get; }
 
-   // Action execution
-   public bool      PerformMoveAction(Coordinate2D dest);
-   public bool      PerformCombatAction(CombatUnit target);
-   public bool      PerformDeploymentAction(CombatState newState);
-   public bool      PerformOpportunityAction();
-   public bool      PerformIntelAction();
+       ───────────────────────────────────
+       LEADER LINK
+       ───────────────────────────────────
+       string             LeaderID              { get; internal set; }
+       bool               IsLeaderAssigned      { get; }           // computed helper
+       Leader             UnitLeader            { get; }           // lazy lookup
 
-   // Supply & attrition
-   public void      ConsumeSupplies(float days);
-   public void      ApplyDamage(float hp);
-   public bool      ResupplyFromDepot(CombatUnit depot);
+       ───────────────────────────────────
+       Methods
+       ───────────────────────────────────
+       // Turn & state
+         ResetTurn()                        – refill all action pools & MPs
+         RefreshAllActions()                – full token reset (start‑turn)
+         RefreshMovementPoints()            – set MPs = max (start‑turn)
+         IsDestroyed() : bool               – HP ≤ 1 test
 
-   // Cloning & persistence
-   public object    Clone();
-   public void      GetObjectData(SerializationInfo info, StreamingContext ctx);
-   public bool      HasUnresolvedReferences();
-   public IEnumerable<string> GetUnresolvedUnitIDs();
-   public void      ResolveUnitReferences(Dictionary<string,CombatUnit> lookup);
+       // Position & movement
+         SetPosition(pos)                   – teleport (no cost)
+         CanMoveTo(target) : bool           – coarse legality check
+         GetDistanceTo(target) : float      – Euclidean map distance
+         PerformMoveAction(mp) : bool       – spend Move token + MPs + supply
 
-   // Validation & debug
-   public List<string> ValidateInternalConsistency();
+       // Combat & intel
+         PerformCombatAction() : bool       – spend Combat token + MPs + supply
+         PerformIntelAction() : bool        – spend Intel token + MPs + supply
+         PerformOpportunityAction() : bool  – reactive shot, supply only
 
-   // Facility overlay (see partial)
-   public bool      AddAirUnit(CombatUnit unit);
-   public float     SupplyUnit(int dist, int zoc);
-   public float     PerformAirSupply(int dist);
+       // Deployment
+         DeployUpOneLevel() : bool          – posture +1 toward Mobile
+         DeployDownOneLevel() : bool        – posture +1 toward Fortified
+         PerformDeploymentAction(state)     – direct state set (UI wrapper)
 
- Private helpers (excerpt)
- ════════════════════════
-   void InitializeActionCounts();          // sets default action pools
-   void InitializeMovementPoints();        // derives MP from classification
-   int  GetCombatMovementCost();           // MP cost for firing
-   void UpdateExperience(float xpGain);    // adjust XP & level
-   void UpdateEfficiency();                // adjust efficiency state
-   void CheckSupplyWarnings();             // UI message when LOW/CRITICAL
-   void ApplyMobileMovementBonus();        // once per unit
+       // Supply & attrition
+         ConsumeSupplies(days) : bool       – guarded debit
+         ReceiveSupplies(days) : float      – capped credit
+         TakeDamage(hp)                     – apply HP loss (clamped)
+         Repair(hp)                         – restore HP (clamped)
 
- Important developer notes
- ═════════════════════════
- • **C# 9 pattern support** – Unity 2022+ compiles the “`or`” pattern in
-   *InitializeMovementPoints()* without issues, so no back-port needed.  
- • **Depot wastage intentional** – long-range air/sea supply consumes full
-   stockpile allowance to model historical attrition, even if delivery is
-   fractional.  
- • **1 HP = destroyed** – keeps HP > 0 divisions out of later divide-by-zero
-   calculations.  
- • **Static units** (HQ, DEPOT, AIRB) never receive combat actions, rendering
-   *GetCombatMovementCost()* moot for them.  
-────────────────────────────────────────────────────────────────────────────── */
+       // Statistics & strength
+         GetActiveWeaponSystemProfile()     – mounted vs. deployed picker
+         GetCurrentCombatStrength()         – temp profile with all modifiers
+         GetAvailableActions() : Dictionary – tokens after MP gating
+
+       // Experience & efficiency
+         AddExperience(pts)                 – grant XP and auto‑level
+         SetExperience(pts)                 – force XP, resync level
+         IncreaseEfficiencyLevelBy1()       – step up (better)
+         DecreaseEfficiencyLevelBy1()       – step down (worse)
+
+       // Leader subsystem
+         AssignLeader(id) / RemoveLeader()  – attach / detach commander
+         GetLeaderRank() : string           – formatted rank or ""
+         HasLeaderSkill(enum) : bool        – capability check
+         AwardLeaderReputation(…)           – REP via combat or direct value
+
+       // Facilities (HQ/Airbase/Depot)
+         AddAirUnit(unit) : bool            – attach aircraft
+         SupplyUnit(dist,zoc) : float       – land supply push
+         PerformAirSupply(dist) : float     – main‑depot airlift
+         AddFacilityDamage(pts)             – damage → capacity drop
+         RepairFacilityDamage(pts)          – restore capacity
+
+       // Persistence & validation
+         Clone() : object                   – deep copy w/out leader/links
+         GetObjectData(info,ctx)            – ISerializable writer
+         ResolveUnitReferences(dict)        – second‑phase ID fix‑ups
+         ValidateInternalConsistency()      – returns list of error strings
+
+       --------------------------------------------------------------------
+       PRIVATE HELPERS (⇢ brief purpose)
+       --------------------------------------------------------------------
+       // Construction & initialisation
+         InitializeActionCounts()           – default token maxima
+         InitializeMovementPoints()         – derive MPs from classification
+         InitializeFacility(cat,size)       – dispatch to HQ / Depot / Airbase
+         SetupHQ() / SetupAirbase() / SetupSupplyDepot() – facility specialisation
+
+       // Movement / supply maths
+         ConsumeMovementPoints(pts) : bool  – guarded debit
+         GetDeployMovementCost() : float    – ceil(½·MPmax)
+         GetCombatMovementCost() : float    – ceil(¼·MPmax)
+         GetIntelMovementCost() : float     – ceil(⅛·MPmax)
+         ApplyMobileMovementBonus()         – one‑off bonus on entering Mobile
+
+       // Combat modifiers
+         GetStrengthModifier() : float      – HP‑based multiplier
+         GetCombatStateModifier() : float   – posture table lookup
+         GetEfficiencyModifier() : float    – efficiency table lookup
+         GetExperienceMultiplier() : float  – XP‑level table lookup
+         GetFinalCombatRatingModifier()     – product of the above four
+
+       // Deployment transitions
+         TryDeployUpOneState() : bool       – internal Mobile‑wards move
+         TryEntrenchDownOneState() : bool   – internal Fortified‑wards move
+         CanUnitTypeChangeStates() : bool   – blocks aircraft & bases
+         IsAdjacentStateTransition(cur,tgt) – ladder adjacency test
+         UpdateMobilityState(new,old)       – mount toggle + foot bonus flag
+         CanChangeToState(state) : bool     – master legality gate
+
+       // Experience & efficiency maths
+         UpdateExperience(pts)              – add XP & fire level change
+         CalculateExperienceLevel(pts)      – raw pts → enum
+         GetMinPointsForLevel(level)        – table lookup
+         GetNextLevel(level)                – returns following enum
+         UpdateEfficiency()                 – auto degrade / recover per turn
+         CheckSupplyWarnings()              – LOW / CRIT UI messages
+
+       // Facility internals
+         UpdateOperationalCapacity()        – damage → capacity tier
+         GetFacilityEfficiencyMultiplier()  – tier → 0‑1 scalar
+         GetMaxStockpile() : float          – depot capacity days
+         GetCurrentGenerationRate() : float – stockpile/day from size & damage
+         SetDepotSize(size)                 – S→M→L→H size change
+
+       // Utility & misc
+         GetDeployActions() : float         – tokens after MP check
+         GetCombatActions() : float         – tokens after MP check
+         GetMoveActions() : float           – tokens after MP check
+         AwardLeaderReputation(action,ctx)  – wrapper to Leader API
+         GenerateIntelReport(level)         – static helper in IntelProfile
+       ──────────────────────────────────────────────────────────────────────*/
     [Serializable]
     public partial class CombatUnit : ICloneable, ISerializable, IResolvableReferences
     {
@@ -213,7 +290,7 @@ namespace HammerAndSickle.Models
         public ExperienceLevel ExperienceLevel { get; internal set; }
         public EfficiencyLevel EfficiencyLevel { get; internal set; }
         public bool IsMounted { get; internal set; }
-        public CombatState CombatState { get; internal set; }
+        public DeploymentState DeploymentState { get; internal set; }
         public StatsMaxCurrent HitPoints { get; private set; }
         public StatsMaxCurrent DaysSupply { get; private set; }
         public StatsMaxCurrent MovementPoints { get; private set; }
@@ -332,7 +409,7 @@ namespace HammerAndSickle.Models
                 ExperienceLevel = ExperienceLevel.Raw;
                 EfficiencyLevel = EfficiencyLevel.FullyOperational;
                 IsMounted = false;
-                CombatState = CombatState.Deployed;
+                DeploymentState = DeploymentState.Deployed;
                 SpottedLevel = SpottedLevel.Level1;
                 LeaderID = null;
 
@@ -448,7 +525,7 @@ namespace HammerAndSickle.Models
                     UnitName,
                     (int)HitPoints.Current,
                     Nationality,
-                    CombatState,
+                    DeploymentState,
                     ExperienceLevel,
                     EfficiencyLevel,
                     spottedLevel);
@@ -1842,13 +1919,13 @@ namespace HammerAndSickle.Models
         private float GetCombatStateModifier()
         {
             // Returns the combat state multiplier based on current combat state.
-            return CombatState switch
+            return DeploymentState switch
             {
-                CombatState.Mobile => CUConstants.COMBAT_MOD_MOBILE,
-                CombatState.Deployed => CUConstants.COMBAT_MOD_DEPLOYED,
-                CombatState.HastyDefense => CUConstants.COMBAT_MOD_HASTY_DEFENSE,
-                CombatState.Entrenched => CUConstants.COMBAT_MOD_ENTRENCHED,
-                CombatState.Fortified => CUConstants.COMBAT_MOD_FORTIFIED,
+                DeploymentState.Mobile => CUConstants.COMBAT_MOD_MOBILE,
+                DeploymentState.Deployed => CUConstants.COMBAT_MOD_DEPLOYED,
+                DeploymentState.HastyDefense => CUConstants.COMBAT_MOD_HASTY_DEFENSE,
+                DeploymentState.Entrenched => CUConstants.COMBAT_MOD_ENTRENCHED,
+                DeploymentState.Fortified => CUConstants.COMBAT_MOD_FORTIFIED,
                 _ => 1.0f, // Default multiplier for other states
             };
         }
@@ -1964,7 +2041,7 @@ namespace HammerAndSickle.Models
         /// <para>
         /// If the unit is already at the most‑mobile posture (<c>Mobile</c>), no transition occurs and the method returns
         /// <c>false</c>.  All legality checks (e.g., suppression, casualties, supply) are delegated to
-        /// <see cref="CanChangeToState(CombatState)"/>.
+        /// <see cref="CanChangeToState(DeploymentState)"/>.
         /// </para>
         /// </remarks>
         /// <returns><c>true</c> if the posture actually changed; otherwise <c>false</c>.</returns>
@@ -1972,10 +2049,10 @@ namespace HammerAndSickle.Models
         {
             try
             {
-                CombatState currentState = CombatState;
+                DeploymentState currentState = DeploymentState;
 
                 // Check if already at maximum mobility (Mobile state)
-                if (currentState == CombatState.Mobile)
+                if (currentState == DeploymentState.Mobile)
                 {
                     AppService.CaptureUiMessage($"{UnitName} is already in Mobile state - cannot move to higher mobility.");
                     return false;
@@ -1983,17 +2060,17 @@ namespace HammerAndSickle.Models
 
                 // Calculate target state (one step toward Mobile)
                 int targetIndex = (int)currentState - 1;
-                CombatState targetState = (CombatState)targetIndex;
+                DeploymentState targetState = (DeploymentState)targetIndex;
 
                 // Comprehensive check for valid state transition.
                 if (!CanChangeToState(targetState))
                     return false;
 
                 // Save previous state for comparison.
-                var previousState = CombatState;
+                var previousState = DeploymentState;
 
                 // Set the new combat state
-                CombatState = targetState;
+                DeploymentState = targetState;
 
                 // Update the unit's mobility state based on the new combat state
                 UpdateMobilityState(targetState, previousState);
@@ -2018,7 +2095,7 @@ namespace HammerAndSickle.Models
         /// </para>
         /// <para>
         /// Attempting the action while already at <c>Fortified</c> simply returns <c>false</c>.  All other gating rules
-        /// are handled by <see cref="CanChangeToState(CombatState)"/>.
+        /// are handled by <see cref="CanChangeToState(DeploymentState)"/>.
         /// </para>
         /// </remarks>
         /// <returns><c>true</c> if the posture deepened; otherwise <c>false</c>.</returns>
@@ -2026,10 +2103,10 @@ namespace HammerAndSickle.Models
         {
             try
             {
-                CombatState currentState = CombatState;
+                DeploymentState currentState = DeploymentState;
 
                 // Check if already at maximum entrenchment (Fortified state)
-                if (currentState == CombatState.Fortified)
+                if (currentState == DeploymentState.Fortified)
                 {
                     AppService.CaptureUiMessage($"{UnitName} is already in Fortified state - cannot entrench further.");
                     return false;
@@ -2037,17 +2114,17 @@ namespace HammerAndSickle.Models
 
                 // Calculate target state (one step toward fortified)
                 int targetIndex = (int)currentState + 1;
-                CombatState targetState = (CombatState)targetIndex;
+                DeploymentState targetState = (DeploymentState)targetIndex;
 
                 // Comprehensive check for valid state transition.
                 if (!CanChangeToState(targetState))
                     return false;
 
                 // Save previous state for comparison.
-                var previousState = CombatState;
+                var previousState = DeploymentState;
 
                 // Set the new combat state
-                CombatState = targetState;
+                DeploymentState = targetState;
 
                 // Update the unit's mobility state based on the new combat state
                 UpdateMobilityState(targetState, previousState);
@@ -2091,13 +2168,13 @@ namespace HammerAndSickle.Models
         }
 
         /// <summary>
-        /// Determines whether two <see cref="CombatState"/> values are <em>adjacent rungs</em> on the posture ladder.
+        /// Determines whether two <see cref="DeploymentState"/> values are <em>adjacent rungs</em> on the posture ladder.
         /// </summary>
         /// <remarks>
         /// The method assumes the enum values are contiguous integers in mobility order.  If that ordering ever changes
         /// (e.g., inserting a new state or switching to bit‑flags), this helper must be updated accordingly.
         /// </remarks>
-        private bool IsAdjacentStateTransition(CombatState currentState, CombatState targetState)
+        private bool IsAdjacentStateTransition(DeploymentState currentState, DeploymentState targetState)
         {
             int currentIndex = (int)currentState;
             int targetIndex = (int)targetState;
@@ -2114,7 +2191,7 @@ namespace HammerAndSickle.Models
         /// <param name="previousState">The state the unit is leaving.</param>
         /// <remarks>
         /// <list type="bullet">
-        ///   <item><term>Entering <see cref="CombatState.Mobile"/></term>
+        ///   <item><term>Entering <see cref="DeploymentState.Mobile"/></term>
         ///         <description>
         ///           • If the unit has a mounted‑profile, it becomes <c>IsMounted = true</c> and <strong>does not</strong>
         ///             receive the foot‑mobile bonus.<br/>
@@ -2132,7 +2209,7 @@ namespace HammerAndSickle.Models
         /// • The method never throws for missing mounted profiles – they are
         ///   treated as “not mounted.”
         /// </remarks>
-        private void UpdateMobilityState(CombatState newState, CombatState previousState)
+        private void UpdateMobilityState(DeploymentState newState, DeploymentState previousState)
         {
             try
             {
@@ -2140,8 +2217,8 @@ namespace HammerAndSickle.Models
                 if (GetDeployedProfile() == null)
                     throw new InvalidOperationException("Unit lacks a deployed weapon profile – cannot change mobility state.");
 
-                bool enteringMobile = newState == CombatState.Mobile && previousState != CombatState.Mobile;
-                bool leavingMobile = newState != CombatState.Mobile && previousState == CombatState.Mobile;
+                bool enteringMobile = newState == DeploymentState.Mobile && previousState != DeploymentState.Mobile;
+                bool leavingMobile = newState != DeploymentState.Mobile && previousState == DeploymentState.Mobile;
 
                 // Presence of a transport profile determines mount capability.
                 bool hasTransport = GetMountedProfile() != null;
@@ -2213,15 +2290,15 @@ namespace HammerAndSickle.Models
         /// </summary>
         /// <param name="targetState">The desired combat state</param>
         /// <returns>True if transition is allowed</returns>
-        private bool CanChangeToState(CombatState targetState)
+        private bool CanChangeToState(DeploymentState targetState)
         {
             try
             {
                 // Capture the UI message if needed.
-                string errorMessage = $"Cannot change from {CombatState} to {targetState}: ";
+                string errorMessage = $"Cannot change from {DeploymentState} to {targetState}: ";
 
                 // Same state - no change needed
-                if (CombatState == targetState)
+                if (DeploymentState == targetState)
                 {
                     errorMessage += "Already in target state.";
                     AppService.CaptureUiMessage(errorMessage);
@@ -2241,9 +2318,9 @@ namespace HammerAndSickle.Models
                 }
 
                 // Check if transition is adjacent
-                if (!IsAdjacentStateTransition(CombatState, targetState))
+                if (!IsAdjacentStateTransition(DeploymentState, targetState))
                 {
-                    errorMessage += $"Transition from {CombatState} to {targetState} is not adjacent.";
+                    errorMessage += $"Transition from {DeploymentState} to {targetState} is not adjacent.";
                     AppService.CaptureUiMessage(errorMessage);
                     return false;
                 }
@@ -2256,17 +2333,17 @@ namespace HammerAndSickle.Models
                     return false;
                 }
 
-                // Only limited CombatState transitions are allowed based on efficiency level.
+                // Only limited DeploymentState transitions are allowed based on efficiency level.
                 if (EfficiencyLevel == EfficiencyLevel.StaticOperations)
                 {
-                    if (CombatState == CombatState.Fortified || CombatState == CombatState.Entrenched || CombatState == CombatState.HastyDefense)
+                    if (DeploymentState == DeploymentState.Fortified || DeploymentState == DeploymentState.Entrenched || DeploymentState == DeploymentState.HastyDefense)
                     {
                         errorMessage += "Cannot change from defensive states in Static Operations.";
                         AppService.CaptureUiMessage(errorMessage);
                         return false; // Cannot change from defensive states in static operations
                     }
 
-                    if (targetState == CombatState.Mobile)
+                    if (targetState == DeploymentState.Mobile)
                     {
                         errorMessage += "Cannot change to Mobile state in Static Operations.";
                         AppService.CaptureUiMessage(errorMessage);
@@ -2387,9 +2464,9 @@ namespace HammerAndSickle.Models
         /// Direct change of combat state for debugging purposes.
         /// </summary>
         /// <param name="newState"></param>
-        public void DebugSetCombatState(CombatState newState)
+        public void DebugSetCombatState(DeploymentState newState)
         {
-            CombatState = newState;
+            DeploymentState = newState;
         }
 
         /// <summary>
@@ -2442,7 +2519,7 @@ namespace HammerAndSickle.Models
                 clone.SetExperience(this.ExperiencePoints);
                 clone.EfficiencyLevel = this.EfficiencyLevel;
                 clone.IsMounted = this.IsMounted;
-                clone.CombatState = this.CombatState;
+                clone.DeploymentState = this.DeploymentState;
                 clone.MapPos = this.MapPos;
                 clone._mobileBonusApplied = this._mobileBonusApplied; // Copy mobile bonus state
                 clone.SpottedLevel = this.SpottedLevel;
@@ -2565,7 +2642,7 @@ namespace HammerAndSickle.Models
                 ExperienceLevel = (ExperienceLevel)info.GetValue(nameof(ExperienceLevel), typeof(ExperienceLevel));
                 EfficiencyLevel = (EfficiencyLevel)info.GetValue(nameof(EfficiencyLevel), typeof(EfficiencyLevel));
                 IsMounted = info.GetBoolean(nameof(IsMounted));
-                CombatState = (CombatState)info.GetValue(nameof(CombatState), typeof(CombatState));
+                DeploymentState = (DeploymentState)info.GetValue(nameof(DeploymentState), typeof(DeploymentState));
                 MapPos = (Coordinate2D)info.GetValue(nameof(MapPos), typeof(Coordinate2D));
                 _mobileBonusApplied = info.GetBoolean(SERIAL_KEY_MOBILE_BONUS);
 
@@ -2665,7 +2742,7 @@ namespace HammerAndSickle.Models
                 info.AddValue(nameof(ExperienceLevel), ExperienceLevel);
                 info.AddValue(nameof(EfficiencyLevel), EfficiencyLevel);
                 info.AddValue(nameof(IsMounted), IsMounted);
-                info.AddValue(nameof(CombatState), CombatState);
+                info.AddValue(nameof(DeploymentState), DeploymentState);
                 info.AddValue(nameof(MapPos), MapPos);
                 info.AddValue(SERIAL_KEY_MOBILE_BONUS, _mobileBonusApplied);
 

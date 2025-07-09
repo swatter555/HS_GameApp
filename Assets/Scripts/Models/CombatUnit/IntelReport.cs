@@ -46,7 +46,7 @@ namespace HammerAndSickle.Models
 
     Nationality   UnitNationality  – nation owning the unit.
     string        UnitName         – display name (unique per combat‑unit).
-    CombatState   UnitState        – Deployed / Mounted / etc.
+    DeploymentState   UnitState        – Deployed / Mounted / etc.
     ExperienceLevel UnitExperienceLevel – Raw, Green … Elite.
     EfficiencyLevel UnitEfficiencyLevel – StaticOps … Mobile.
 ──────────────────────────────────────────────────────────────────────────────── */
@@ -78,7 +78,7 @@ namespace HammerAndSickle.Models
         // More intel about parent unit.
         public Nationality UnitNationality = Nationality.USSR;
         public string UnitName { get; set; } = "Default";
-        public CombatState UnitState { get; set; } = CombatState.Deployed;
+        public DeploymentState UnitState { get; set; } = DeploymentState.Deployed;
         public ExperienceLevel UnitExperienceLevel = ExperienceLevel.Raw;
         public EfficiencyLevel UnitEfficiencyLevel = EfficiencyLevel.StaticOperations;
 
