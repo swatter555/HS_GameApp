@@ -34,7 +34,7 @@ using HammerAndSickle.Services;
                                                  string unitName,
                                                  int currentHP,
                                                  Nationality nat,
-                                                 CombatState state,
+                                                 DeploymentState state,
                                                  ExperienceLevel xp,
                                                  EfficiencyLevel eff,
                                                  SpottedLevel spot = SpottedLevel.Level1)
@@ -209,7 +209,7 @@ namespace HammerAndSickle.Models
             string unitName,
             int currentHitPoints,
             Nationality nationality,
-            CombatState combatState,
+            DeploymentState combatState,
             ExperienceLevel xpLevel,
             EfficiencyLevel effLevel,
             SpottedLevel spottedLevel = SpottedLevel.Level1)

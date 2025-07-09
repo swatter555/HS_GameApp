@@ -112,9 +112,9 @@ namespace HammerAndSickle.Models
     }
 
     /// <summary>
-    /// States representing whether a unit is riding in transport or deployed in various defensive postures.
+    /// The represents the current deployment state of a CombatUnit.
     /// </summary>
-    public enum CombatState
+    public enum DeploymentState
     {
         Mobile,        // Mounted on transport
         Deployed,      // Standard dismounted posture
@@ -231,7 +231,7 @@ namespace HammerAndSickle.Models
     {
         Level0, // Not spotted
         Level1, // Unit name visible
-        Level2, // Above plus CombatState and an error rate of about 30%
+        Level2, // Above plus DeploymentState and an error rate of about 30%
         Level3, // Above plus EXP and EFF levels, and a 10% error rate.
         Level4, // Above plus no error rate.
     }
