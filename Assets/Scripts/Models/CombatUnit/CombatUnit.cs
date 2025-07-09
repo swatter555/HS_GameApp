@@ -21,7 +21,150 @@ namespace HammerAndSickle.Models
             classification == UnitClassification.AIRB;
     }
 
-    
+
+  /* ──────────────────────────────────────────────────────────────────────────────
+   CombatUnit ─ Universal representation of every game piece
+   ──────────────────────────────────────────────────────────────────────────────
+
+ Summary
+ ═══════
+ • Core data-model for all maneuver elements: tank regiments, special-forces
+   detachments, aircraft squadrons, HQs, depots, airbases, etc.
+ • Implements the Five-Action Framework (Move / Combat / Deployment /
+   Opportunity / Intel) and tracks *StatsMaxCurrent* for each.
+ • Owns mutable per-unit state (HP, supply, actions, position, experience,
+   efficiency, combat state, leader link) while referencing immutable shared
+   *Profile* data via IDs.
+ • Partial class split:  facility-specific logic lives in *CombatUnit.Facility*.
+
+ Public properties
+ ═════════════════
+   string            UnitName            { get; set; }
+   string            UnitID              { get; }
+   UnitType          UnitType            { get; }
+   UnitClassification Classification     { get; }
+   UnitRole          Role                { get; }
+   Side              Side                { get; }
+   Nationality       Nationality         { get; }
+   bool              IsTransportable     { get; }
+   bool              IsBase              { get; }
+   WeaponSystems     DeployedProfileID   { get; }
+   WeaponSystems     MountedProfileID    { get; }
+   IntelProfileTypes IntelProfileType    { get; internal set; }
+
+   // Action pools (StatsMaxCurrent)
+   StatsMaxCurrent MoveActions           { get; }
+   StatsMaxCurrent CombatActions         { get; }
+   StatsMaxCurrent DeploymentActions     { get; }
+   StatsMaxCurrent OpportunityActions    { get; }
+   StatsMaxCurrent IntelActions          { get; }
+
+   // Vital statistics
+   StatsMaxCurrent HitPoints             { get; }
+   StatsMaxCurrent DaysSupply            { get; }
+   StatsMaxCurrent MovementPoints        { get; }
+   Coordinate2D    MapPos               { get; internal set; }
+   ExperienceLevel ExperienceLevel       { get; internal set; }
+   EfficiencyLevel EfficiencyLevel       { get; internal set; }
+   CombatState     CombatState           { get; internal set; }
+   SpottedLevel    SpottedLevel          { get; }
+
+   // Leadership
+   string           LeaderID             { get; internal set; }
+   bool             IsLeaderAssigned     => !string.IsNullOrEmpty(LeaderID);
+   Leader           UnitLeader           { get; }
+
+   // Facility (see partial file)
+   int              BaseDamage           { get; private set; }
+   OperationalCapacity OperationalCapacity { get; private set; }
+   FacilityType     FacilityType         { get; private set; }
+   DepotSize        DepotSize            { get; private set; }
+   float            StockpileInDays      { get; private set; }
+   SupplyGenerationRate GenerationRate   { get; private set; }
+   SupplyProjection SupplyProjection     { get; private set; }
+   bool             SupplyPenetration    { get; private set; }
+   DepotCategory    DepotCategory        { get; private set; }
+   IReadOnlyList<CombatUnit> AirUnitsAttached { get; private set; }
+
+ Constructor signatures
+ ══════════════════════
+   public  CombatUnit( string unitName,
+                       UnitClassification classification,
+                       UnitRole           role,
+                       Nationality        nationality,
+                       Side               side,
+                       bool               isTransportable,
+                       WeaponSystems      deployedProfile,
+                       WeaponSystems      mountedProfile = WeaponSystems.DEFAULT,
+                       IntelProfileTypes  intelProfile   = IntelProfileTypes.None,
+                       DepotCategory      depotCategory  = DepotCategory.Secondary,
+                       DepotSize          depotSize      = DepotSize.Small );
+
+   // Deserialization
+   protected CombatUnit(SerializationInfo info, StreamingContext context);
+
+ Public API (selected)
+ ═════════════════════
+   // Turn-cycle
+   public void      ResetTurn();
+   public void      RecoverActions(float percentage);
+   public bool      IsDestroyed();                 // HP ≤ 1 is considered destroyed.
+
+   // Movement & position
+   public void      SetPosition(Coordinate2D newPos);
+   public bool      CanMoveTo(Coordinate2D target);
+   public float     GetDistanceTo(Coordinate2D target);
+   public float     GetDistanceTo(CombatUnit other);
+
+   // Action execution
+   public bool      PerformMoveAction(Coordinate2D dest);
+   public bool      PerformCombatAction(CombatUnit target);
+   public bool      PerformDeploymentAction(CombatState newState);
+   public bool      PerformOpportunityAction();
+   public bool      PerformIntelAction();
+
+   // Supply & attrition
+   public void      ConsumeSupplies(float days);
+   public void      ApplyDamage(float hp);
+   public bool      ResupplyFromDepot(CombatUnit depot);
+
+   // Cloning & persistence
+   public object    Clone();
+   public void      GetObjectData(SerializationInfo info, StreamingContext ctx);
+   public bool      HasUnresolvedReferences();
+   public IEnumerable<string> GetUnresolvedUnitIDs();
+   public void      ResolveUnitReferences(Dictionary<string,CombatUnit> lookup);
+
+   // Validation & debug
+   public List<string> ValidateInternalConsistency();
+
+   // Facility overlay (see partial)
+   public bool      AddAirUnit(CombatUnit unit);
+   public float     SupplyUnit(int dist, int zoc);
+   public float     PerformAirSupply(int dist);
+
+ Private helpers (excerpt)
+ ════════════════════════
+   void InitializeActionCounts();          // sets default action pools
+   void InitializeMovementPoints();        // derives MP from classification
+   int  GetCombatMovementCost();           // MP cost for firing
+   void UpdateExperience(float xpGain);    // adjust XP & level
+   void UpdateEfficiency();                // adjust efficiency state
+   void CheckSupplyWarnings();             // UI message when LOW/CRITICAL
+   void ApplyMobileMovementBonus();        // once per unit
+
+ Important developer notes
+ ═════════════════════════
+ • **C# 9 pattern support** – Unity 2022+ compiles the “`or`” pattern in
+   *InitializeMovementPoints()* without issues, so no back-port needed.  
+ • **Depot wastage intentional** – long-range air/sea supply consumes full
+   stockpile allowance to model historical attrition, even if delivery is
+   fractional.  
+ • **1 HP = destroyed** – keeps HP > 0 divisions out of later divide-by-zero
+   calculations.  
+ • **Static units** (HQ, DEPOT, AIRB) never receive combat actions, rendering
+   *GetCombatMovementCost()* moot for them.  
+────────────────────────────────────────────────────────────────────────────── */
     [Serializable]
     public partial class CombatUnit : ICloneable, ISerializable, IResolvableReferences
     {
@@ -1186,7 +1329,7 @@ namespace HammerAndSickle.Models
                     ConsumeMovementPoints(movtCost);
 
                     // Consume supplies for the move action
-                    ConsumeSupplies((movtCost * CUConstants.MOVE_ACTION_SUPPLY_COST) + CUConstants.MOVE_ACTION_SUPPLY_THRESHOLD);
+                    ConsumeSupplies(movtCost * CUConstants.MOVE_ACTION_SUPPLY_COST);
 
                     return true; // Move action performed successfully
                 }
@@ -1265,7 +1408,7 @@ namespace HammerAndSickle.Models
                     OpportunityActions.DecrementCurrent();
 
                     // Consume supplies for the opportunity action
-                    ConsumeSupplies(CUConstants.OPPORTUNITY_ACTION_SUPPLY_COST + CUConstants.OPPORTUNITY_ACTION_SUPPLY_THRESHOLD);
+                    ConsumeSupplies(CUConstants.OPPORTUNITY_ACTION_SUPPLY_COST);
 
                     return true; // Opportunity action performed successfully
                 }
