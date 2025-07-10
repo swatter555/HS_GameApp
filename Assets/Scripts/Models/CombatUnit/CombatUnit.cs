@@ -129,6 +129,23 @@ namespace HammerAndSickle.Models
        Leader             UnitLeader            { get; }           // lazy lookup
 
        ───────────────────────────────────
+       Constructor signature
+       ───────────────────────────────────
+
+       public CombatUnit(string unitName,
+            UnitType unitType,
+            UnitClassification classification,
+            UnitRole role,
+            Side side,
+            Nationality nationality,
+            WeaponSystems deployedProfileID,
+            WeaponSystems mountedProfileID,
+            IntelProfileTypes intelProfileType,
+            bool isTransportable,
+            DepotCategory category = DepotCategory.Secondary,
+            DepotSize size = DepotSize.Small)
+
+       ───────────────────────────────────
        Methods
        ───────────────────────────────────
        // Turn & state
@@ -325,19 +342,8 @@ namespace HammerAndSickle.Models
         #region Constructors
 
         /// <summary>
-        /// Creates a new CombatUnit with the specified core properties.
+        /// Constructor
         /// </summary>
-        /// <param name="unitName">Display name of the unit</param>
-        /// <param name="unitType">Type of unit (land, air, naval)</param>
-        /// <param name="classification">Unit classification (tank, infantry, etc.)</param>
-        /// <param name="role">Primary role of the unit</param>
-        /// <param name="side">Which side controls this unit</param>
-        /// <param name="nationality">National affiliation</param>
-        /// <param name="deployedProfileID">Deployed weapon system profile ID</param>
-        /// <param name="mountedProfileID">Mounted weapon system profile ID (can be DEFAULT for none)</param>
-        /// <param name="intelProfileType">Intel profile type for intelligence reports</param>
-        /// <param name="isTransportable">Whether this unit can be transported</param>
-        /// <param name="isBase">Whether this unit is a land-based facility</param>
         public CombatUnit(string unitName,
             UnitType unitType,
             UnitClassification classification,

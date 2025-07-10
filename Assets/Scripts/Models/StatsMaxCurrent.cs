@@ -3,68 +3,73 @@ using HammerAndSickle.Services;
 
 namespace HammerAndSickle.Models
 {
-    /*────────────────────────────────────────────────────────────────────────────
-     Coordinate2D ─ serialisable replacement for Unity Vector2 
-    ──────────────────────────────────────────────────────────────────────────────
+ /*────────────────────────────────────────────────────────────────────────────
 
-    Summary
-    ═══════
-    • Drop‑in struct that mirrors UnityEngine.Vector2 but is fully [Serializable],
-      enabling binary save‑game persistence without custom surrogates.
-    • Provides implicit conversions to/from Vector2 so existing APIs continue to
-      accept Coordinate2D transparently.
+StatsMaxCurrent ─ bounded numeric container with maximum/current value tracking
+──────────────────────────────────────────────────────────────────────────────
 
-    Key features
-    ═════════════
-      • Complete arithmetic & vector‑math operator set (+, −, ×, ÷, dot, lerp).
-      • Common direction constants (Zero, One, Up, Down, Left, Right).
-      • Floating‑point tolerant equality (EPSILON = 1e‑5f).
-      • No‑GC magnitude / sqrMagnitude helpers; normalisation utilities.
+Summary
 
-    Public API (selection)
-    ══════════════════════
-      // fields
-      float x, y;
+═══════
 
-      // static constants
-      static Coordinate2D Zero/One/Up/Down/Left/Right;
+- Encapsulates a numeric statistic with both maximum and current values, providing
+ automatic bounds checking and percentage calculations for game statistics like
+ hit points, action pools, movement points, and supply levels.
 
-      // properties
-      float magnitude { get; }
-      float sqrMagnitude { get; }
-      Coordinate2D normalized { get; }
+- Enforces validation bounds (-1000 to +1000) on all operations and integrates
+ with AppService error handling for consistent exception management.
 
-      // constructors
-      Coordinate2D(float x, float y);
-      Coordinate2D(float uniform);
+- Supports serialization for save game persistence and provides convenience
+ methods for common operations like resetting to maximum, incrementing/
+ decrementing with clamping, and percentage calculations.
 
-      // implicit conversions
-      static implicit operator Coordinate2D(Vector2 v);
-      static implicit operator Vector2(Coordinate2D c);
+Public properties
 
-      // arithmetic operators
-      +, −, *, / (scalar & component‑wise)
+═════════════════
 
-      // vector helpers
-      static float Distance/SqrDistance(Coordinate2D a, Coordinate2D b);
-      static float Dot(Coordinate2D a, Coordinate2D b);
-      static Coordinate2D Lerp/LerpUnclamped(a, b, t);
-      static Coordinate2D Min/Max/Clamp(...);
+float Max { get; private set; }
+float Current { get; private set; }
 
-      // instance methods
-      void Normalize();
-      void Set(float x, float y);
-      void Scale(float s) / Scale(Coordinate2D s);
+Constructors
 
-    Developer notes
-    ═══════════════
-    • Maintain API parity with Vector2 to minimise learning curve; any additions to
-      Vector2 should be evaluated for inclusion here.
-    • EPSILON governs equality/normalisation tolerance—review when precision bugs
-      are reported.
-    • Keep struct immutable from the outside—write access is via public fields by
-      design to match Vector2 semantics.
-   ────────────────────────────────────────────────────────────────────────────*/
+═════════════
+
+public StatsMaxCurrent(float maxValue)
+public StatsMaxCurrent(float maxValue, float currentValue)
+
+Public method signatures
+
+════════════════════════
+
+void SetCurrent(float value) - Sets current value with bounds validation
+void ResetToMax() - Resets current value to maximum
+float GetPercentage() - Returns current/max ratio (0.0 to 1.0)
+bool IsAtMax() - Checks if current equals maximum (within 0.001f tolerance)
+bool IsEmpty() - Checks if current value is zero or negative
+void SetMax(float value) - Sets maximum value, clamps current if needed
+void IncrementCurrent(float amount = 1) - Increases current by amount, clamped to max
+void DecrementCurrent(float amount = 1) - Decreases current by amount, clamped to zero
+
+Important aspects
+
+═════════════════
+
+- **Bounds Enforcement**: All values must be between MIN_VALID_VALUE (-1000f) and 
+ MAX_VALID_VALUE (+1000f) to prevent extreme values that could break game balance.
+
+- **Automatic Clamping**: Current value is automatically constrained between 0 and Max
+ during increment/decrement operations and when Max is changed.
+
+- **Serialization Ready**: [Serializable] attribute enables binary persistence for
+ save game compatibility without requiring ISerializable implementation.
+
+- **Error Integration**: All public methods use try-catch with AppService.HandleException
+ for consistent error reporting and debugging support.
+
+- **Floating Point Tolerance**: IsAtMax() uses 0.001f epsilon for floating point
+ comparison safety rather than direct equality checks.
+
+────────────────────────────────────────────────────────────────────────────*/
     [Serializable]
     public class StatsMaxCurrent
     {
