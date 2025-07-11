@@ -186,18 +186,213 @@ namespace HammerAndSickle.Models
         {
             try
             {
-                // Example profile - T-80B Main Battle Tank
+                //Create Soviet profiles
+                CreateT55AProfile();
+                CreateT64AProfile();
+                CreateT64BProfile();
+                CreateT72AProfile();
+                CreateT72BProfile();
                 CreateT80BProfile();
+                CreateT80UProfile();
+                CreateT80BVProfile();
 
-                // TODO: Add all other weapon system profiles here
-                // CreateT72AProfile();
-                // CreateBMP2Profile();
-                // CreateM1AbamsProfile();
-                // etc...
+
             }
             catch (Exception e)
             {
                 AppService.HandleException(CLASS_NAME, "CreateAllWeaponSystemProfiles", e);
+                throw;
+            }
+        }
+
+        /// <summary>
+        /// T55A Profile
+        /// </summary>
+        private static void CreateT55AProfile()
+        {
+            try
+            {
+                var profile = new WeaponSystemProfile(
+                    name: "T-55A Main Battle Tank",
+                    nationality: Nationality.USSR,
+                    weaponSystemID: WeaponSystems.TANK_T55A,
+                    40,
+                    landHardAttack:  8,
+                    landHardDefense: 7,
+                    landSoftAttack:  9,
+                    landSoftDefense: 8,
+                    landAirAttack:   3,
+                    landAirDefense:  5,
+                    primaryRange:    1f,
+                    indirectRange:   0f,
+                    spottingRange:   2f,
+                    movementModifier: 1f,
+                    allWeatherCapability: AllWeatherRating.AllWeather,
+                    nvgCapability: NVG_Rating.None,
+                    silhouette: UnitSilhouette.Small
+                );
+
+                // Add upgrade types for modernization
+                profile.AddUpgradeType(UpgradeType.AFV);
+
+                _weaponSystemProfiles[WeaponSystems.TANK_T55A] = profile;
+            }
+            catch (Exception e)
+            {
+                AppService.HandleException(CLASS_NAME, "CreateT80BProfile", e);
+                throw;
+            }
+        }
+
+        /// <summary>
+        /// Creates the T-64A tank profile.
+        /// </summary>
+        private static void CreateT64AProfile()
+        {
+            try
+            {
+                var profile = new WeaponSystemProfile(
+                    name: "T-64A Main Battle Tank",
+                    nationality: Nationality.USSR,
+                    weaponSystemID: WeaponSystems.TANK_T64A,
+                    80,
+                    landHardAttack: 10,
+                    landHardDefense: 11,
+                    landSoftAttack: 13,
+                    landSoftDefense: 13,
+                    landAirAttack: 3,
+                    landAirDefense: 6,
+                    primaryRange: 1f,
+                    indirectRange: 0f,
+                    spottingRange: 2f,
+                    movementModifier: 1f,
+                    allWeatherCapability: AllWeatherRating.AllWeather,
+                    nvgCapability: NVG_Rating.Gen1,
+                    silhouette: UnitSilhouette.Small
+                );
+
+                // Add upgrade types for modernization
+                profile.AddUpgradeType(UpgradeType.AFV);
+
+                _weaponSystemProfiles[WeaponSystems.TANK_T64A] = profile;
+            }
+            catch (Exception e)
+            {
+                AppService.HandleException(CLASS_NAME, "CreateT64AProfile", e);
+                throw;
+            }
+        }
+
+        /// <summary>
+        /// Creates the T-64B tank profile.
+        /// </summary>
+        private static void CreateT64BProfile()
+        {
+            try
+            {
+                var profile = new WeaponSystemProfile(
+                    name: "T-64B Main Battle Tank",
+                    nationality: Nationality.USSR,
+                    weaponSystemID: WeaponSystems.TANK_T64B,
+                    115,
+                    landHardAttack: 11,
+                    landHardDefense: 13,
+                    landSoftAttack: 15,
+                    landSoftDefense: 15,
+                    landAirAttack: 3,
+                    landAirDefense: 8,
+                    primaryRange: 1f,
+                    indirectRange: 0f,
+                    spottingRange: 2f,
+                    movementModifier: 1f,
+                    allWeatherCapability: AllWeatherRating.AllWeather,
+                    nvgCapability: NVG_Rating.Gen2,
+                    silhouette: UnitSilhouette.Small
+                );
+
+                profile.AddUpgradeType(UpgradeType.AFV);
+
+                _weaponSystemProfiles[WeaponSystems.TANK_T64B] = profile;
+            }
+            catch (Exception e)
+            {
+                AppService.HandleException(CLASS_NAME, nameof(CreateT64BProfile), e);
+                throw;
+            }
+        }
+
+        /// <summary>
+        /// Creates the T-72A tank profile.
+        /// </summary>
+        private static void CreateT72AProfile()
+        {
+            try
+            {
+                var profile = new WeaponSystemProfile(
+                    name: "T-72A Main Battle Tank",
+                    nationality: Nationality.USSR,
+                    weaponSystemID: WeaponSystems.TANK_T72A,
+                    60,
+                    landHardAttack: 11,
+                    landHardDefense: 10,
+                    landSoftAttack: 11,
+                    landSoftDefense: 10,
+                    landAirAttack: 3,
+                    landAirDefense: 7,
+                    primaryRange: 1f,
+                    indirectRange: 0f,
+                    spottingRange: 2f,
+                    movementModifier: 1f,
+                    allWeatherCapability: AllWeatherRating.AllWeather,
+                    nvgCapability: NVG_Rating.Gen1,
+                    silhouette: UnitSilhouette.Medium
+                );
+
+                profile.AddUpgradeType(UpgradeType.AFV);
+
+                _weaponSystemProfiles[WeaponSystems.TANK_T72A] = profile;
+            }
+            catch (Exception e)
+            {
+                AppService.HandleException(CLASS_NAME, nameof(CreateT72AProfile), e);
+                throw;
+            }
+        }
+
+        /// <summary>
+        /// Creates the T-72B tank profile.
+        /// </summary>
+        private static void CreateT72BProfile()
+        {
+            try
+            {
+                var profile = new WeaponSystemProfile(
+                    name: "T-72B Main Battle Tank",
+                    nationality: Nationality.USSR,
+                    weaponSystemID: WeaponSystems.TANK_T72B,
+                    105,
+                    landHardAttack: 13,
+                    landHardDefense: 12,
+                    landSoftAttack: 12,
+                    landSoftDefense: 12,
+                    landAirAttack: 3,
+                    landAirDefense: 8,
+                    primaryRange: 1f,
+                    indirectRange: 0f,
+                    spottingRange: 2f,
+                    movementModifier: 1f,
+                    allWeatherCapability: AllWeatherRating.AllWeather,
+                    nvgCapability: NVG_Rating.Gen2,
+                    silhouette: UnitSilhouette.Medium
+                );
+
+                profile.AddUpgradeType(UpgradeType.AFV);
+
+                _weaponSystemProfiles[WeaponSystems.TANK_T72B] = profile;
+            }
+            catch (Exception e)
+            {
+                AppService.HandleException(CLASS_NAME, nameof(CreateT72BProfile), e);
                 throw;
             }
         }
@@ -214,19 +409,20 @@ namespace HammerAndSickle.Models
                     name: "T-80B Main Battle Tank",
                     nationality: Nationality.USSR,
                     weaponSystemID: WeaponSystems.TANK_T80B,
-                    landHardAttack: 22,
-                    landHardDefense: 20,
-                    landSoftAttack: 8,
-                    landSoftDefense: 6,
-                    landAirAttack: 0,
-                    landAirDefense: 3,
-                    primaryRange: 3f,
-                    indirectRange: 0f,
-                    spottingRange: 2f,
-                    movementModifier: 1.2f,
-                    allWeatherCapability: AllWeatherRating.Night,
+                    90,
+                    landHardAttack:  14,
+                    landHardDefense: 15,
+                    landSoftAttack:  11,
+                    landSoftDefense: 12,
+                    landAirAttack:   3,
+                    landAirDefense:  9,
+                    primaryRange:    1f,
+                    indirectRange:   0f,
+                    spottingRange:   2f,
+                    movementModifier: 1f,
+                    allWeatherCapability: AllWeatherRating.AllWeather,
                     nvgCapability: NVG_Rating.Gen1,
-                    silhouette: UnitSilhouette.Large
+                    silhouette: UnitSilhouette.Medium
                 );
 
                 // Add upgrade types for modernization
@@ -240,6 +436,85 @@ namespace HammerAndSickle.Models
                 throw;
             }
         }
+
+        /// <summary>
+        /// Creates the T-80U tank profile.
+        /// </summary>
+        private static void CreateT80UProfile()
+        {
+            try
+            {
+                var profile = new WeaponSystemProfile(
+                    name: "T-80U Main Battle Tank",
+                    nationality: Nationality.USSR,
+                    weaponSystemID: WeaponSystems.TANK_T80U,
+                    125,
+                    landHardAttack:  17,
+                    landHardDefense: 17,
+                    landSoftAttack:  11,
+                    landSoftDefense: 13,
+                    landAirAttack:   3,
+                    landAirDefense:  10,
+                    primaryRange:    1f,
+                    indirectRange:   0f,
+                    spottingRange:   2f,
+                    movementModifier: 1f,
+                    allWeatherCapability: AllWeatherRating.AllWeather,
+                    nvgCapability: NVG_Rating.Gen2,
+                    silhouette: UnitSilhouette.Medium
+                );
+
+                // Add upgrade types for modernization
+                profile.AddUpgradeType(UpgradeType.AFV);
+
+                _weaponSystemProfiles[WeaponSystems.TANK_T80U] = profile;
+            }
+            catch (Exception e)
+            {
+                AppService.HandleException(CLASS_NAME, "CreateT80UProfile", e);
+                throw;
+            }
+        }
+
+        /// <summary>
+        /// Creates the T-80BV tank profile.
+        /// </summary>
+        private static void CreateT80BVProfile()
+        {
+            try
+            {
+                var profile = new WeaponSystemProfile(
+                    name: "T-80BV Main Battle Tank",
+                    nationality: Nationality.USSR,
+                    weaponSystemID: WeaponSystems.TANK_T80BV,
+                    150,
+                    landHardAttack: 18,
+                    landHardDefense: 17,
+                    landSoftAttack: 12,
+                    landSoftDefense: 14,
+                    landAirAttack: 3,
+                    landAirDefense: 11,
+                    primaryRange: 1f,
+                    indirectRange: 0f,
+                    spottingRange: 2f,
+                    movementModifier: 1f,
+                    allWeatherCapability: AllWeatherRating.AllWeather,
+                    nvgCapability: NVG_Rating.Gen2,
+                    silhouette: UnitSilhouette.Medium
+                );
+
+                profile.AddUpgradeType(UpgradeType.AFV);
+
+                _weaponSystemProfiles[WeaponSystems.TANK_T80BV] = profile;
+            }
+            catch (Exception e)
+            {
+                AppService.HandleException(CLASS_NAME, nameof(CreateT80BVProfile), e);
+                throw;
+            }
+        }
+
+
 
         #endregion // Private Methods
     }

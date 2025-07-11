@@ -1,141 +1,150 @@
 ﻿using HammerAndSickle.Services;
 using System;
 using System.Collections.Generic;
-using System.Runtime.Serialization;
 using UnityEngine;
 
 namespace HammerAndSickle.Models
 {
-/*───────────────────────────────────────────────────────────────────────────────
-  WeaponSystemProfile ─ immutable “stat card” for any vehicle/aircraft/artillery
-────────────────────────────────────────────────────────────────────────────────
- Summary
- ═══════
- • Bundles every combat-relevant attribute for a single **WeaponSystems** enum
-   (attack/defence pairs, ranges, mobility, sensor & protection ratings, etc.).
-   A profile is created once and referenced by many **CombatUnit** instances to
-   keep per-unit memory low. :contentReference[oaicite:0]{index=0}
- • Performs bounds-checking in the constructor and exposes mutator methods that
-   re-run validation, ensuring data integrity throughout the lifecycle.
+    /*───────────────────────────────────────────────────────────────────────────────
+      WeaponSystemProfile ─ immutable "stat card" for any vehicle/aircraft/artillery
+    ────────────────────────────────────────────────────────────────────────────────
+     Summary
+     ═══════
+     • Bundles every combat-relevant attribute for a single **WeaponSystems** enum
+       (attack/defence pairs, ranges, mobility, sensor & protection ratings, etc.).
+       A profile is created once and referenced by many **CombatUnit** instances to
+       keep per-unit memory low.
+     • Performs bounds-checking in the constructor and exposes mutator methods that
+       re-run validation, ensuring data integrity throughout the lifecycle.
 
- Public properties
- ═════════════════
-   string              Name                 { get; private set; }
-   WeaponSystems       WeaponSystemID       { get; private set; }
-   Nationality         Nationality          { get; private set; }
-   List<UpgradeType>   UpgradeTypes         { get; private set; }
+     Public properties
+     ═════════════════
+       string              Name                 { get; private set; }
+       WeaponSystems       WeaponSystemID       { get; private set; }
+       Nationality         Nationality          { get; private set; }
+       List<UpgradeType>   UpgradeTypes         { get; private set; }
+       int                 PrestigeCost         { get; private set; }
 
-   // Paired combat ratings
-   CombatRating        LandHard             { get; private set; }
-   CombatRating        LandSoft             { get; private set; }
-   CombatRating        LandAir              { get; private set; }
-   CombatRating        Air                  { get; private set; }
-   CombatRating        AirGround            { get; private set; }
+       // Paired combat ratings
+       CombatRating        LandHard             { get; private set; }
+       CombatRating        LandSoft             { get; private set; }
+       CombatRating        LandAir              { get; private set; }
+       CombatRating        Air                  { get; private set; }
+       CombatRating        AirGround            { get; private set; }
 
-   // Single-value ratings
-   int                 AirAvionics          { get; private set; }
-   int                 AirStrategicAttack  { get; private set; }
+       // Single-value ratings
+       int                 AirAvionics          { get; private set; }
+       int                 AirStrategicAttack  { get; private set; }
 
-   // Range & movement
-   float               PrimaryRange         { get; private set; }
-   float               IndirectRange        { get; private set; }
-   float               SpottingRange        { get; private set; }
-   float               MovementModifier     { get; private set; }
+       // Range & movement
+       float               PrimaryRange         { get; private set; }
+       float               IndirectRange        { get; private set; }
+       float               SpottingRange        { get; private set; }
+       float               MovementModifier     { get; private set; }
 
-   // Capability flags
-   AllWeatherRating    AllWeatherCapability { get; private set; }
-   SIGINT_Rating       SIGINT_Rating        { get; private set; }
-   NBC_Rating          NBC_Rating           { get; private set; }
-   StrategicMobility   StrategicMobility    { get; private set; }
-   NVG_Rating          NVGCapability        { get; private set; }
-   UnitSilhouette      Silhouette           { get; private set; }
+       // Capability flags
+       AllWeatherRating    AllWeatherCapability { get; private set; }
+       SIGINT_Rating       SIGINT_Rating        { get; private set; }
+       NBC_Rating          NBC_Rating           { get; private set; }
+       StrategicMobility   StrategicMobility    { get; private set; }
+       NVG_Rating          NVGCapability        { get; private set; }
+       UnitSilhouette      Silhouette           { get; private set; }
 
- Constructors
- ═════════════
-   public WeaponSystemProfile(string name,
-                              Nationality nationality,
-                              WeaponSystems weaponSystemID,
-                              int landHardAttack = 0, int landHardDefense = 0,
-                              int landSoftAttack = 0, int landSoftDefense = 0,
-                              int landAirAttack = 0, int landAirDefense = 0,
-                              int airAttack = 0, int airDefense = 0,
-                              int airAvionics = 0,
-                              int airGroundAttack = 0, int airGroundDefense = 0,
-                              int airStrategicAttack = 0,
-                              float primaryRange = 0f, float indirectRange = 0f,
-                              float spottingRange = 0f, float movementModifier = 1f,
-                              AllWeatherRating allWeatherCapability = AllWeatherRating.Day,
-                              SIGINT_Rating sigintRating = SIGINT_Rating.UnitLevel,
-                              NBC_Rating nbcRating = NBC_Rating.None,
-                              StrategicMobility strategicMobility = StrategicMobility.Heavy,
-                              NVG_Rating nvgCapability = NVG_Rating.None,
-                              UnitSilhouette silhouette = UnitSilhouette.Medium)
+     Constructors
+     ═════════════
+       public WeaponSystemProfile(string name,
+                                  Nationality nationality,
+                                  WeaponSystems weaponSystemID,
+                                  int prestigeCost = 0,
+                                  int landHardAttack = 0, int landHardDefense = 0,
+                                  int landSoftAttack = 0, int landSoftDefense = 0,
+                                  int landAirAttack = 0, int landAirDefense = 0,
+                                  int airAttack = 0, int airDefense = 0,
+                                  int airAvionics = 0,
+                                  int airGroundAttack = 0, int airGroundDefense = 0,
+                                  int airStrategicAttack = 0,
+                                  float primaryRange = 0f, float indirectRange = 0f,
+                                  float spottingRange = 0f, float movementModifier = 1f,
+                                  AllWeatherRating allWeatherCapability = AllWeatherRating.Day,
+                                  SIGINT_Rating sigintRating = SIGINT_Rating.UnitLevel,
+                                  NBC_Rating nbcRating = NBC_Rating.None,
+                                  StrategicMobility strategicMobility = StrategicMobility.Heavy,
+                                  NVG_Rating nvgCapability = NVG_Rating.None,
+                                  UnitSilhouette silhouette = UnitSilhouette.Medium)
 
-   public WeaponSystemProfile(string name,
-                              Nationality nationality,
-                              WeaponSystems weaponSystemID)   // delegates to main ctor
+       public WeaponSystemProfile(string name,
+                                  Nationality nationality,
+                                  WeaponSystems weaponSystemID,
+                                  int prestigeCost = 0)   // delegates to main ctor
 
- Public API (method signatures ⇢ brief purpose)
- ═════════════════════════════════════════════
- ― Combat-rating accessors ―
-   public int  GetLandHardAttack()                          // read A vs hard land
-   public int  GetLandHardDefense()
-   public void SetLandHardAttack(int value)                 // validate & set
-   public void SetLandHardDefense(int value)
+     Public API (method signatures ⇢ brief purpose)
+     ═════════════════════════════════════════════
+     ― Combat-rating accessors ―
+       public int  GetLandHardAttack()                          // read A vs hard land
+       public int  GetLandHardDefense()
+       public void SetLandHardAttack(int value)                 // validate & set
+       public void SetLandHardDefense(int value)
 
-   public int  GetLandSoftAttack()
-   public int  GetLandSoftDefense()
-   public void SetLandSoftAttack(int value)
-   public void SetLandSoftDefense(int value)
+       public int  GetLandSoftAttack()
+       public int  GetLandSoftDefense()
+       public void SetLandSoftAttack(int value)
+       public void SetLandSoftDefense(int value)
 
-   public int  GetLandAirAttack()
-   public int  GetLandAirDefense()
-   public void SetLandAirAttack(int value)
-   public void SetLandAirDefense(int value)
+       public int  GetLandAirAttack()
+       public int  GetLandAirDefense()
+       public void SetLandAirAttack(int value)
+       public void SetLandAirDefense(int value)
 
-   public int  GetAirAttack()
-   public int  GetAirDefense()
-   public void SetAirAttack(int value)
-   public void SetAirDefense(int value)
+       public int  GetAirAttack()
+       public int  GetAirDefense()
+       public void SetAirAttack(int value)
+       public void SetAirDefense(int value)
 
-   public int  GetAirGroundAttack()
-   public int  GetAirGroundDefense()
-   public void SetAirGroundAttack(int value)
-   public void SetAirGroundDefense(int value)
+       public int  GetAirGroundAttack()
+       public int  GetAirGroundDefense()
+       public void SetAirGroundAttack(int value)
+       public void SetAirGroundDefense(int value)
 
- ― Upgrade management ―
-   public bool                     AddUpgradeType(UpgradeType t)     // append if unique & ≠ None
-   public bool                     RemoveUpgradeType(UpgradeType t)
-   public bool                     HasUpgradeType(UpgradeType t)
-   public IReadOnlyList<UpgradeType> GetUpgradeTypes()
-   public void                     ClearUpgradeTypes()
+     ― Upgrade management ―
+       public bool                     AddUpgradeType(UpgradeType t)     // append if unique & ≠ None
+       public bool                     RemoveUpgradeType(UpgradeType t)
+       public bool                     HasUpgradeType(UpgradeType t)
+       public IReadOnlyList<UpgradeType> GetUpgradeTypes()
+       public void                     ClearUpgradeTypes()
 
- ― Range & mobility setters ―
-   public void SetPrimaryRange(float range)
-   public void SetIndirectRange(float range)
-   public void SetSpottingRange(float range)
-   public void SetMovementModifier(float modifier)
+     ― Range & mobility setters ―
+       public void SetPrimaryRange(float range)
+       public void SetIndirectRange(float range)
+       public void SetSpottingRange(float range)
+       public void SetMovementModifier(float modifier)
 
- ― Aggregate metric ―
-   public int  GetTotalCombatValue()                       // rough power score
+     ― Prestige cost management ―
+       public void SetPrestigeCost(int cost)                    // validate & set prestige cost
 
- Private helpers
- ═══════════════
-   private int   ValidateCombatValue(int value)            // clamp to CUConstants
-   private float ValidateRange(float value)                // clamp to CUConstants
+     ― Aggregate metric ―
+       public int  GetTotalCombatValue()                       // rough power score
 
- Developer notes
- ═══════════════
- • **Template pattern** – Multiple units reference one profile by enum, easing
-   balancing & memory pressure (change one object, propagate everywhere).
- • **Controlled mutation** – Core fields are private-set; all changes must go
-   through the provided setter methods which re-validate inputs.
- • **Thread-safety** – *UpgradeTypes* list is not synchronised; wrap calls in a
-   lock when modifying from multi-threaded contexts (e.g., async AI planners).
- • **Error handling** – Each mutator is wrapped in try/catch and reports via
-   `AppService.HandleException`, optionally re-throwing when state could be
-   corrupted.
-───────────────────────────────────────────────────────────────────────────────*/
+     Private helpers
+     ═══════════════
+       private int   ValidateCombatValue(int value)            // clamp to CUConstants
+       private float ValidateRange(float value)                // clamp to CUConstants
+       private int   ValidatePrestigeCost(int cost)            // validate prestige cost
+
+     Developer notes
+     ═══════════════
+     • **Template pattern** – Multiple units reference one profile by enum, easing
+       balancing & memory pressure (change one object, propagate everywhere).
+     • **Controlled mutation** – Core fields are private-set; all changes must go
+       through the provided setter methods which re-validate inputs.
+     • **Thread-safety** – *UpgradeTypes* list is not synchronised; wrap calls in a
+       lock when modifying from multi-threaded contexts (e.g., async AI planners).
+     • **Error handling** – Each mutator is wrapped in try/catch and reports via
+       `AppService.HandleException`, optionally re-throwing when state could be
+       corrupted.
+     • **Prestige economy** – PrestigeCost represents the campaign currency required
+       to purchase this unit type. Cost validation ensures reasonable values within
+       the game's economic balance constraints.
+    ───────────────────────────────────────────────────────────────────────────────*/
     public class WeaponSystemProfile
     {
         #region Constants
@@ -151,6 +160,7 @@ namespace HammerAndSickle.Models
         public WeaponSystems WeaponSystemID { get; private set; }
         public Nationality Nationality { get; private set; }
         public List<UpgradeType> UpgradeTypes { get; private set; }
+        public int PrestigeCost { get; private set; } = 0;      // Prestige cost for purchasing this unit type
 
         // Combat ratings using CombatRating objects for paired values
         public CombatRating LandHard { get; private set; }      // Hard attack/defense vs land targets
@@ -189,6 +199,7 @@ namespace HammerAndSickle.Models
         /// <param name="name">Display name of the weapon system profile</param>
         /// <param name="nationality">National affiliation</param>
         /// <param name="weaponSystemID">Primary weapon system type identifier</param>
+        /// <param name="prestigeCost">Campaign prestige cost to purchase this unit type</param>
         /// <param name="landHardAttack">Hard attack value vs land targets</param>
         /// <param name="landHardDefense">Hard defense value vs land attacks</param>
         /// <param name="landSoftAttack">Soft attack value vs land targets</param>
@@ -215,6 +226,7 @@ namespace HammerAndSickle.Models
             string name,
             Nationality nationality,
             WeaponSystems weaponSystemID,
+            int prestigeCost = 0,
             int landHardAttack = 0, int landHardDefense = 0,
             int landSoftAttack = 0, int landSoftDefense = 0,
             int landAirAttack = 0, int landAirDefense = 0,
@@ -242,6 +254,7 @@ namespace HammerAndSickle.Models
                 Nationality = nationality;
                 WeaponSystemID = weaponSystemID;
                 UpgradeTypes = new List<UpgradeType>();
+                PrestigeCost = ValidatePrestigeCost(prestigeCost);
 
                 // Create CombatRating objects with validation
                 LandHard = new CombatRating(landHardAttack, landHardDefense);
@@ -282,8 +295,9 @@ namespace HammerAndSickle.Models
         /// <param name="name">Display name of the profile</param>
         /// <param name="nationality">National affiliation</param>
         /// <param name="weaponSystemID">Primary weapon system type identifier</param>
-        public WeaponSystemProfile(string name, Nationality nationality, WeaponSystems weaponSystemID)
-            : this(name, nationality, weaponSystemID, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0) { }
+        /// <param name="prestigeCost">Campaign prestige cost to purchase this unit type</param>
+        public WeaponSystemProfile(string name, Nationality nationality, WeaponSystems weaponSystemID, int prestigeCost = 0)
+            : this(name, nationality, weaponSystemID, prestigeCost, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0) { }
 
         #endregion // Constructors
 
@@ -312,7 +326,7 @@ namespace HammerAndSickle.Models
         public int GetAirAttack() => Air.Attack;
         public int GetAirDefense() => Air.Defense;
         public void SetAirAttack(int value) { Air.SetAttack(value); }
-        public void SetAirDefense(int value){ Air.SetDefense(value); }
+        public void SetAirDefense(int value) { Air.SetDefense(value); }
 
         // AirGround properties.
         public int GetAirGroundAttack() => AirGround.Attack;
@@ -490,6 +504,28 @@ namespace HammerAndSickle.Models
         #endregion // Range and Movement Methods
 
 
+        #region Prestige Cost Management
+
+        /// <summary>
+        /// Sets the prestige cost for purchasing this unit type.
+        /// </summary>
+        /// <param name="cost">The new prestige cost (must be >= 0)</param>
+        public void SetPrestigeCost(int cost)
+        {
+            try
+            {
+                PrestigeCost = ValidatePrestigeCost(cost);
+            }
+            catch (Exception e)
+            {
+                AppService.HandleException(CLASS_NAME, "SetPrestigeCost", e);
+                throw;
+            }
+        }
+
+        #endregion // Prestige Cost Management
+
+
         #region Public Methods
 
         /// <summary>
@@ -531,6 +567,22 @@ namespace HammerAndSickle.Models
         private float ValidateRange(float value)
         {
             return Mathf.Clamp(value, CUConstants.MIN_RANGE, CUConstants.MAX_RANGE);
+        }
+
+        /// <summary>
+        /// Validates prestige cost to ensure it's a reasonable value.
+        /// </summary>
+        /// <param name="cost">The prestige cost to validate</param>
+        /// <returns>The validated prestige cost</returns>
+        private int ValidatePrestigeCost(int cost)
+        {
+            if (cost < 0)
+            {
+                throw new ArgumentOutOfRangeException(nameof(cost), "Prestige cost cannot be negative");
+            }
+
+            // Clamp to reasonable maximum to prevent economic balance issues
+            return Mathf.Clamp(cost, 0, 9999);
         }
 
         #endregion // Private Methods
