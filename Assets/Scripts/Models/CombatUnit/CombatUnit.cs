@@ -598,11 +598,13 @@ namespace HammerAndSickle.Models
                 if (activeProfile == null)
                     throw new InvalidOperationException("Active weapon system profile is null");
 
-                // Create a new temporary profile for combat calculations
+                // Modify the constructor call to specify the correct parameters for WeaponSystemProfile
                 var tempProfile = new WeaponSystemProfile(
                     activeProfile.Name + "_Combat",
                     activeProfile.Nationality,
-                    WeaponSystems.COMBAT);
+                    WeaponSystems.COMBAT,
+                    0
+                );
 
                 // Compute all modifiers that can affect a combat rating
                 float finalModifier = GetFinalCombatRatingModifier();
