@@ -2487,6 +2487,16 @@ namespace HammerAndSickle.Models
             IsMounted = isMounted;
         }
 
+        /// <summary>
+        /// Calculates the movement cost for a combat action.
+        /// </summary>
+        /// <returns>The movement cost as a floating-point number, representing the ceiling of the maximum movement points
+        /// multiplied by the combat action movement cost constant.</returns>
+        public float DebugGetCombatMovementCost()
+        {
+            return Mathf.CeilToInt(MovementPoints.Max * CUConstants.COMBAT_ACTION_MOVEMENT_COST);
+        }
+
         #endregion // Debugging
 
 
