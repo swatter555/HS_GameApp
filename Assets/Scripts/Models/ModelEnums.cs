@@ -129,10 +129,10 @@ namespace HammerAndSickle.Models
     public enum StrategicMobility
     {
         Heavy,
-        AirDrop,
-        AirMobile,
         AirLift,
-        Amphibious
+        NavalAssault,
+        AirDrop,
+        AirMobile
     }
 
     /// <summary>
@@ -191,7 +191,8 @@ namespace HammerAndSickle.Models
     {
         None,
         Gen1,
-        Gen2
+        Gen2,
+        Gen3
     }
 
     /// <summary>
@@ -422,7 +423,7 @@ namespace HammerAndSickle.Models
     {
         None,
         RiverCrossingOperations_RiverCrossing,               // River Crossing Operations
-        AmphibiousAssaultTactics_RiverAssault,               // Amphibious Assault Tactics
+        AmphibiousAssaultTactics_RiverAssault,               // NavalAssault Assault Tactics
         CombatEngineeringCorps_BridgeBuilding,               // Combat EngineeringSpecialization Corps
         FieldFortificationExpert_FieldFortification          // Field Fortification Expert
     }
@@ -502,7 +503,7 @@ namespace HammerAndSickle.Models
 
         // EngineeringSpecialization
         RiverCrossing,        // River crossing move bonus.
-        RiverAssault,         // Amphibious assault combat bonus.
+        RiverAssault,         // NavalAssault assault combat bonus.
         BridgeBuilding,       // Boolean, may build bridges over rivers in one turn.
         FieldFortification,   // Boolean, may build a persistent static fortification.
 

@@ -160,7 +160,8 @@ namespace HammerAndSickle.Models
         public WeaponSystems WeaponSystemID { get; private set; }
         public Nationality Nationality { get; private set; }
         public List<UpgradeType> UpgradeTypes { get; private set; }
-        public int PrestigeCost { get; private set; } = 0;      // Prestige cost for purchasing this unit type
+        public int PrestigeCost { get; private set; }           // Prestige cost for purchasing this unit type
+        public bool IsAmphibious { get; private set; }          // Whether this unit can cross rivers easily
 
         // Combat ratings using CombatRating objects for paired values
         public CombatRating LandHard { get; private set; }      // Hard attack/defense vs land targets
@@ -255,6 +256,7 @@ namespace HammerAndSickle.Models
                 WeaponSystemID = weaponSystemID;
                 UpgradeTypes = new List<UpgradeType>();
                 PrestigeCost = ValidatePrestigeCost(prestigeCost);
+                IsAmphibious = false;
 
                 // Create CombatRating objects with validation
                 LandHard = new CombatRating(landHardAttack, landHardDefense);
@@ -297,7 +299,7 @@ namespace HammerAndSickle.Models
         /// <param name="weaponSystemID">Primary weapon system type identifier</param>
         /// <param name="prestigeCost">Campaign prestige cost to purchase this unit type</param>
         public WeaponSystemProfile(string name, Nationality nationality, WeaponSystems weaponSystemID, int prestigeCost = 0)
-            : this(name, nationality, weaponSystemID, prestigeCost, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0) { }
+            : this(name, nationality, weaponSystemID, prestigeCost, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0) { IsAmphibious = false; }
 
         #endregion // Constructors
 
@@ -333,6 +335,9 @@ namespace HammerAndSickle.Models
         public int GetAirGroundDefense() => AirGround.Defense;
         public void SetAirGroundAttack(int value) { AirGround.SetAttack(value); }
         public void SetAirGroundDefense(int value) { AirGround.SetDefense(value); }
+
+        // Single-value combat ratings.
+        public void SetAmphibiousCapability(bool value) { IsAmphibious = value; }
 
         #endregion // Combat Value Accessors
 

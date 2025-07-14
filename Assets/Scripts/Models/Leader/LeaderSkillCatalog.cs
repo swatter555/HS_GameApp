@@ -423,7 +423,7 @@ namespace HammerAndSickle.Models
 
     ‣ Engineering Specialization
       • [RiverCrossingOperations_RiverCrossing]  River Crossing Operations  (Eng/T4 | 180) → RiverCrossMove ×0.5
-      • [AmphibiousAssaultTactics_RiverAssault]  Amphibious Assault Tactics  (Eng/T4 | 180) → RiverAssault ×1.4
+      • [AmphibiousAssaultTactics_RiverAssault]  NavalAssault Assault Tactics  (Eng/T4 | 180) → RiverAssault ×1.4
       • [CombatEngineeringCorps_BridgeBuilding]  Combat Engineering Corps  (Eng/T4 | 180) → BridgeBuilding ✓
       • [FieldFortificationExpert_FieldFortification]  Field Fortification Expert  (Eng/T5 | 260) → FieldFortification ✓
 
@@ -1001,7 +1001,7 @@ namespace HammerAndSickle.Models
                 CommandGrade.TopGrade
             ));
 
-            // Tier 4: Amphibious Assault Tactics - River Assault capability
+            // Tier 4: NavalAssault Assault Tactics - River Assault capability
             AddSkill(new SkillDefinition(
                 EngineeringSpecialization.AmphibiousAssaultTactics_RiverAssault,
                 "Amphibious Assault Tactics",

@@ -195,6 +195,22 @@ namespace HammerAndSickle.Models
                 CreateT80BProfile();
                 CreateT80UProfile();
                 CreateT80BVProfile();
+                CreateRegInfSVProfile();
+                CreateAbInfSVProfile();
+                CreateAmInfSVProfile();
+                CreateMarInfSVProfile();
+                CreateSpecInfSVProfile();
+                CreateEngInfSVProfile();
+                CreateApcMtlbProfile();
+                CreateApcBtr70Profile();
+                CreateApcBtr80Profile();
+                CreateIfvBmp1Profile();
+                CreateIfvBmp2Profile();
+                CreateIfvBmp3Profile();
+                CreateIfvBmd2Profile();
+                CreateIfvBmd3Profile();
+                CreateRcnBrdm2Profile();
+                CreateRcnBrdm2AtProfile();
 
 
             }
@@ -204,6 +220,11 @@ namespace HammerAndSickle.Models
                 throw;
             }
         }
+
+        #endregion // Private Methods
+
+
+        #region Soviet Tanks
 
         /// <summary>
         /// T55A Profile
@@ -228,6 +249,9 @@ namespace HammerAndSickle.Models
                     spottingRange:   2f,
                     movementModifier: 1f,
                     allWeatherCapability: AllWeatherRating.AllWeather,
+                    sigintRating: SIGINT_Rating.UnitLevel,
+                    nbcRating: NBC_Rating.None,
+                    strategicMobility: StrategicMobility.AirLift,
                     nvgCapability: NVG_Rating.None,
                     silhouette: UnitSilhouette.Small
                 );
@@ -267,6 +291,9 @@ namespace HammerAndSickle.Models
                     spottingRange: 2f,
                     movementModifier: 1f,
                     allWeatherCapability: AllWeatherRating.AllWeather,
+                    sigintRating: SIGINT_Rating.UnitLevel,
+                    nbcRating: NBC_Rating.Gen1,
+                    strategicMobility: StrategicMobility.Heavy,
                     nvgCapability: NVG_Rating.Gen1,
                     silhouette: UnitSilhouette.Small
                 );
@@ -294,7 +321,7 @@ namespace HammerAndSickle.Models
                     name: "T-64B Main Battle Tank",
                     nationality: Nationality.USSR,
                     weaponSystemID: WeaponSystems.TANK_T64B,
-                    115,
+                    110,
                     landHardAttack: 11,
                     landHardDefense: 13,
                     landSoftAttack: 15,
@@ -306,6 +333,9 @@ namespace HammerAndSickle.Models
                     spottingRange: 2f,
                     movementModifier: 1f,
                     allWeatherCapability: AllWeatherRating.AllWeather,
+                    sigintRating: SIGINT_Rating.UnitLevel,
+                    nbcRating: NBC_Rating.Gen2,
+                    strategicMobility: StrategicMobility.Heavy,
                     nvgCapability: NVG_Rating.Gen2,
                     silhouette: UnitSilhouette.Small
                 );
@@ -332,7 +362,7 @@ namespace HammerAndSickle.Models
                     name: "T-72A Main Battle Tank",
                     nationality: Nationality.USSR,
                     weaponSystemID: WeaponSystems.TANK_T72A,
-                    60,
+                    65,
                     landHardAttack: 11,
                     landHardDefense: 10,
                     landSoftAttack: 11,
@@ -344,9 +374,14 @@ namespace HammerAndSickle.Models
                     spottingRange: 2f,
                     movementModifier: 1f,
                     allWeatherCapability: AllWeatherRating.AllWeather,
+                    sigintRating: SIGINT_Rating.UnitLevel,
+                    nbcRating: NBC_Rating.Gen1,
+                    strategicMobility: StrategicMobility.Heavy,
                     nvgCapability: NVG_Rating.Gen1,
                     silhouette: UnitSilhouette.Medium
                 );
+
+                profile.SetAmphibiousCapability(true);
 
                 profile.AddUpgradeType(UpgradeType.AFV);
 
@@ -370,7 +405,7 @@ namespace HammerAndSickle.Models
                     name: "T-72B Main Battle Tank",
                     nationality: Nationality.USSR,
                     weaponSystemID: WeaponSystems.TANK_T72B,
-                    105,
+                    100,
                     landHardAttack: 13,
                     landHardDefense: 12,
                     landSoftAttack: 12,
@@ -382,9 +417,14 @@ namespace HammerAndSickle.Models
                     spottingRange: 2f,
                     movementModifier: 1f,
                     allWeatherCapability: AllWeatherRating.AllWeather,
+                    sigintRating: SIGINT_Rating.UnitLevel,
+                    nbcRating: NBC_Rating.Gen2,
+                    strategicMobility: StrategicMobility.Heavy,
                     nvgCapability: NVG_Rating.Gen2,
                     silhouette: UnitSilhouette.Medium
                 );
+
+                profile.SetAmphibiousCapability(true);
 
                 profile.AddUpgradeType(UpgradeType.AFV);
 
@@ -421,6 +461,9 @@ namespace HammerAndSickle.Models
                     spottingRange:   2f,
                     movementModifier: 1f,
                     allWeatherCapability: AllWeatherRating.AllWeather,
+                    sigintRating: SIGINT_Rating.UnitLevel,
+                    nbcRating: NBC_Rating.Gen1,
+                    strategicMobility: StrategicMobility.Heavy,
                     nvgCapability: NVG_Rating.Gen1,
                     silhouette: UnitSilhouette.Medium
                 );
@@ -460,6 +503,9 @@ namespace HammerAndSickle.Models
                     spottingRange:   2f,
                     movementModifier: 1f,
                     allWeatherCapability: AllWeatherRating.AllWeather,
+                    sigintRating: SIGINT_Rating.UnitLevel,
+                    nbcRating: NBC_Rating.Gen2,
+                    strategicMobility: StrategicMobility.Heavy,
                     nvgCapability: NVG_Rating.Gen2,
                     silhouette: UnitSilhouette.Medium
                 );
@@ -499,6 +545,9 @@ namespace HammerAndSickle.Models
                     spottingRange: 2f,
                     movementModifier: 1f,
                     allWeatherCapability: AllWeatherRating.AllWeather,
+                    sigintRating: SIGINT_Rating.UnitLevel,
+                    nbcRating: NBC_Rating.Gen2,
+                    strategicMobility: StrategicMobility.Heavy,
                     nvgCapability: NVG_Rating.Gen2,
                     silhouette: UnitSilhouette.Medium
                 );
@@ -514,8 +563,624 @@ namespace HammerAndSickle.Models
             }
         }
 
+        #endregion // Soviet Tanks
 
 
-        #endregion // Private Methods
+        #region Soviet Infantry
+
+        private static void CreateRegInfSVProfile()
+        {
+            try
+            {
+                var profile = new WeaponSystemProfile(
+                    name: "Infantry",
+                    nationality: Nationality.USSR,
+                    weaponSystemID: WeaponSystems.REG_INF_SV,
+                    15,
+                    landHardAttack: 4,
+                    landHardDefense: 3,
+                    landSoftAttack: 9,
+                    landSoftDefense: 10,
+                    landAirAttack: 2,
+                    landAirDefense: 3,
+                    primaryRange: 1f,
+                    indirectRange: 0f,
+                    spottingRange: 2f,
+                    movementModifier: 1f,
+                    allWeatherCapability: AllWeatherRating.Day,
+                    nvgCapability: NVG_Rating.None,
+                    silhouette: UnitSilhouette.Small,
+                    sigintRating: SIGINT_Rating.UnitLevel,
+                    nbcRating: NBC_Rating.Gen1,
+                    strategicMobility: StrategicMobility.AirLift
+                );
+
+                _weaponSystemProfiles[WeaponSystems.REG_INF_SV] = profile;
+            }
+            catch (Exception e)
+            {
+                AppService.HandleException(CLASS_NAME, nameof(CreateRegInfSVProfile), e);
+                throw;
+            }
+        }
+
+        private static void CreateAbInfSVProfile()
+        {
+            try
+            {
+                var profile = new WeaponSystemProfile(
+                    name: "Airborne",
+                    nationality: Nationality.USSR,
+                    weaponSystemID: WeaponSystems.AB_INF_SV,
+                    18,
+                    landHardAttack: 4,
+                    landHardDefense: 3,
+                    landSoftAttack: 9,
+                    landSoftDefense: 10,
+                    landAirAttack: 2,
+                    landAirDefense: 3,
+                    primaryRange: 1f,
+                    indirectRange: 0f,
+                    spottingRange: 2f,
+                    movementModifier: 1f,
+                    allWeatherCapability: AllWeatherRating.Day,
+                    nvgCapability: NVG_Rating.Gen1,
+                    silhouette: UnitSilhouette.Small,
+                    sigintRating: SIGINT_Rating.UnitLevel,
+                    nbcRating: NBC_Rating.Gen1,
+                    strategicMobility: StrategicMobility.AirDrop
+                );
+
+                _weaponSystemProfiles[WeaponSystems.AB_INF_SV] = profile;
+            }
+            catch (Exception e)
+            {
+                AppService.HandleException(CLASS_NAME, nameof(CreateAbInfSVProfile), e);
+                throw;
+            }
+        }
+
+        private static void CreateAmInfSVProfile()
+        {
+            try
+            {
+                var profile = new WeaponSystemProfile(
+                    name: "Air‑Mobile",
+                    nationality: Nationality.USSR,
+                    weaponSystemID: WeaponSystems.AM_INF_SV,
+                    18,
+                    landHardAttack: 4,
+                    landHardDefense: 3,
+                    landSoftAttack: 9,
+                    landSoftDefense: 10,
+                    landAirAttack: 2,
+                    landAirDefense: 3,
+                    primaryRange: 1f,
+                    indirectRange: 0f,
+                    spottingRange: 2f,
+                    movementModifier: 1f,
+                    allWeatherCapability: AllWeatherRating.Day,
+                    nvgCapability: NVG_Rating.Gen1,
+                    silhouette: UnitSilhouette.Small,
+                    sigintRating: SIGINT_Rating.UnitLevel,
+                    nbcRating: NBC_Rating.Gen1,
+                    strategicMobility: StrategicMobility.AirMobile
+                );
+
+                _weaponSystemProfiles[WeaponSystems.AM_INF_SV] = profile;
+            }
+            catch (Exception e)
+            {
+                AppService.HandleException(CLASS_NAME, nameof(CreateAmInfSVProfile), e);
+                throw;
+            }
+        }
+
+        private static void CreateMarInfSVProfile()
+        {
+            try
+            {
+                var profile = new WeaponSystemProfile(
+                    name: "Naval Infantry",
+                    nationality: Nationality.USSR,
+                    weaponSystemID: WeaponSystems.MAR_INF_SV,
+                    18,
+                    landHardAttack: 4,
+                    landHardDefense: 3,
+                    landSoftAttack: 9,
+                    landSoftDefense: 10,
+                    landAirAttack: 2,
+                    landAirDefense: 3,
+                    primaryRange: 1f,
+                    indirectRange: 0f,
+                    spottingRange: 2f,
+                    movementModifier: 1f,
+                    allWeatherCapability: AllWeatherRating.Day,
+                    nvgCapability: NVG_Rating.None,
+                    silhouette: UnitSilhouette.Small,
+                    sigintRating: SIGINT_Rating.UnitLevel,
+                    nbcRating: NBC_Rating.Gen1,
+                    strategicMobility: StrategicMobility.NavalAssault
+                );
+
+                _weaponSystemProfiles[WeaponSystems.MAR_INF_SV] = profile;
+            }
+            catch (Exception e)
+            {
+                AppService.HandleException(CLASS_NAME, nameof(CreateMarInfSVProfile), e);
+                throw;
+            }
+        }
+
+        private static void CreateSpecInfSVProfile()
+        {
+            try
+            {
+                var profile = new WeaponSystemProfile(
+                    name: "Spetsnaz",
+                    nationality: Nationality.USSR,
+                    weaponSystemID: WeaponSystems.SPEC_INF_SV,
+                    30,
+                    landHardAttack: 8,
+                    landHardDefense: 4,
+                    landSoftAttack: 11,
+                    landSoftDefense:12,
+                    landAirAttack: 3,
+                    landAirDefense: 6,
+                    primaryRange: 1f,
+                    indirectRange: 0f,
+                    spottingRange: 3f,
+                    movementModifier: 1f,
+                    allWeatherCapability: AllWeatherRating.Day,
+                    nvgCapability: NVG_Rating.Gen2,
+                    silhouette: UnitSilhouette.Small,
+                    sigintRating: SIGINT_Rating.SpecializedLevel,
+                    nbcRating: NBC_Rating.Gen1,
+                    strategicMobility: StrategicMobility.AirMobile
+                );
+
+                _weaponSystemProfiles[WeaponSystems.SPEC_INF_SV] = profile;
+            }
+            catch (Exception e)
+            {
+                AppService.HandleException(CLASS_NAME, nameof(CreateSpecInfSVProfile), e);
+                throw;
+            }
+        }
+
+        private static void CreateEngInfSVProfile()
+        {
+            try
+            {
+                var profile = new WeaponSystemProfile(
+                    name: "Combat Engineers",
+                    nationality: Nationality.USSR,
+                    weaponSystemID: WeaponSystems.ENG_INF_SV,
+                    20,
+                    landHardAttack: 4,
+                    landHardDefense: 3,
+                    landSoftAttack: 9,
+                    landSoftDefense: 12,
+                    landAirAttack: 2,
+                    landAirDefense: 3,
+                    primaryRange: 1f,
+                    indirectRange: 0f,
+                    spottingRange: 2f,
+                    movementModifier: 1f,
+                    allWeatherCapability: AllWeatherRating.Day,
+                    nvgCapability: NVG_Rating.None,
+                    silhouette: UnitSilhouette.Small,
+                    sigintRating: SIGINT_Rating.UnitLevel,
+                    nbcRating: NBC_Rating.Gen1,
+                    strategicMobility: StrategicMobility.AirDrop
+                );
+
+                _weaponSystemProfiles[WeaponSystems.ENG_INF_SV] = profile;
+            }
+            catch (Exception e)
+            {
+                AppService.HandleException(CLASS_NAME, nameof(CreateEngInfSVProfile), e);
+                throw;
+            }
+        }
+
+
+        #endregion
+
+
+        #region Soviet APCs
+
+        private static void CreateApcMtlbProfile()
+        {
+            try
+            {
+                var profile = new WeaponSystemProfile(
+                    name: "MT‑LB APC",
+                    nationality: Nationality.USSR,
+                    weaponSystemID: WeaponSystems.APC_MTLB,
+                    20,
+                    landHardAttack: 2,
+                    landHardDefense: 3,
+                    landSoftAttack: 5,
+                    landSoftDefense: 5,
+                    landAirAttack: 1,
+                    landAirDefense: 2,
+                    primaryRange: 1f,
+                    indirectRange: 0f,
+                    spottingRange: 2f,
+                    movementModifier: 1f,
+                    allWeatherCapability: AllWeatherRating.Day,
+                    nvgCapability: NVG_Rating.Gen1,
+                    silhouette: UnitSilhouette.Small,
+                    sigintRating: SIGINT_Rating.UnitLevel,
+                    nbcRating: NBC_Rating.Gen1,
+                    strategicMobility: StrategicMobility.AirDrop
+                );
+
+                profile.SetAmphibiousCapability(true);
+
+                _weaponSystemProfiles[WeaponSystems.APC_MTLB] = profile;
+            }
+            catch (Exception e)
+            {
+                AppService.HandleException(CLASS_NAME, nameof(CreateApcMtlbProfile), e);
+                throw;
+            }
+        }
+
+        private static void CreateApcBtr70Profile()
+        {
+            try
+            {
+                var profile = new WeaponSystemProfile(
+                    name: "BTR‑70 APC",
+                    nationality: Nationality.USSR,
+                    weaponSystemID: WeaponSystems.APC_BTR70,
+                    24,
+                    landHardAttack: 3,
+                    landHardDefense: 4,
+                    landSoftAttack: 6,
+                    landSoftDefense: 6,
+                    landAirAttack: 1,
+                    landAirDefense: 2,
+                    primaryRange: 1f,
+                    indirectRange: 0f,
+                    spottingRange: 2f,
+                    movementModifier: 1,
+                    allWeatherCapability: AllWeatherRating.Day,
+                    nvgCapability: NVG_Rating.Gen1,
+                    silhouette: UnitSilhouette.Small,
+                    sigintRating: SIGINT_Rating.UnitLevel,
+                    nbcRating: NBC_Rating.Gen1,
+                    strategicMobility: StrategicMobility.AirLift
+                );
+
+                profile.SetAmphibiousCapability(true);
+
+                _weaponSystemProfiles[WeaponSystems.APC_BTR70] = profile;
+            }
+            catch (Exception e)
+            {
+                AppService.HandleException(CLASS_NAME, nameof(CreateApcBtr70Profile), e);
+                throw;
+            }
+        }
+
+        private static void CreateApcBtr80Profile()
+        {
+            try
+            {
+                var profile = new WeaponSystemProfile(
+                    name: "BTR‑80 APC",
+                    nationality: Nationality.USSR,
+                    weaponSystemID: WeaponSystems.APC_BTR80,
+                    28,
+                    landHardAttack: 3,
+                    landHardDefense: 4,
+                    landSoftAttack: 7,
+                    landSoftDefense: 7,
+                    landAirAttack: 1,
+                    landAirDefense: 2,
+                    primaryRange: 1f,
+                    indirectRange: 0f,
+                    spottingRange: 2f,
+                    movementModifier: 1f,
+                    allWeatherCapability: AllWeatherRating.Day,
+                    nvgCapability: NVG_Rating.Gen2,
+                    silhouette: UnitSilhouette.Small,
+                    sigintRating: SIGINT_Rating.UnitLevel,
+                    nbcRating: NBC_Rating.Gen1,
+                    strategicMobility: StrategicMobility.AirLift
+                );
+
+                profile.SetAmphibiousCapability(true);
+
+                _weaponSystemProfiles[WeaponSystems.APC_BTR80] = profile;
+            }
+            catch (Exception e)
+            {
+                AppService.HandleException(CLASS_NAME, nameof(CreateApcBtr80Profile), e);
+                throw;
+            }
+        }
+
+        #endregion // Soviet APCs
+
+
+        #region IFV Soviet IFVs
+
+        private static void CreateIfvBmp1Profile()
+        {
+            try
+            {
+                var profile = new WeaponSystemProfile(
+                    name: "BMP‑1 IFV",
+                    nationality: Nationality.USSR,
+                    weaponSystemID: WeaponSystems.IFV_BMP1,
+                    30,
+                    landHardAttack: 8,
+                    landHardDefense: 4,
+                    landSoftAttack: 7,
+                    landSoftDefense: 8,
+                    landAirAttack: 2,
+                    landAirDefense: 3,
+                    primaryRange: 1f,
+                    indirectRange: 0f,
+                    spottingRange: 2f,
+                    movementModifier: 1f,
+                    allWeatherCapability: AllWeatherRating.Day,
+                    nvgCapability: NVG_Rating.Gen1,
+                    silhouette: UnitSilhouette.Small,
+                    sigintRating: SIGINT_Rating.UnitLevel,
+                    nbcRating: NBC_Rating.Gen1,
+                    strategicMobility: StrategicMobility.AirLift
+                );
+
+                profile.SetAmphibiousCapability(true);
+
+                _weaponSystemProfiles[WeaponSystems.IFV_BMP1] = profile;
+            }
+            catch (Exception e)
+            {
+                AppService.HandleException(CLASS_NAME, nameof(CreateIfvBmp1Profile), e);
+                throw;
+            }
+        }
+
+        private static void CreateIfvBmp2Profile()
+        {
+            try
+            {
+                var profile = new WeaponSystemProfile(
+                    name: "BMP‑2 IFV",
+                    nationality: Nationality.USSR,
+                    weaponSystemID: WeaponSystems.IFV_BMP2,
+                    36,
+                    landHardAttack: 10,
+                    landHardDefense: 4,
+                    landSoftAttack: 8,
+                    landSoftDefense: 8,
+                    landAirAttack: 2,
+                    landAirDefense: 3,
+                    primaryRange: 1f,
+                    indirectRange: 0f,
+                    spottingRange: 2f,
+                    movementModifier: 1f,
+                    allWeatherCapability: AllWeatherRating.Day,
+                    nvgCapability: NVG_Rating.Gen2,
+                    silhouette: UnitSilhouette.Small,
+                    sigintRating: SIGINT_Rating.UnitLevel,
+                    nbcRating: NBC_Rating.Gen1,
+                    strategicMobility: StrategicMobility.AirLift
+                );
+
+                profile.SetAmphibiousCapability(true);
+
+                _weaponSystemProfiles[WeaponSystems.IFV_BMP2] = profile;
+            }
+            catch (Exception e)
+            {
+                AppService.HandleException(CLASS_NAME, nameof(CreateIfvBmp2Profile), e);
+                throw;
+            }
+        }
+
+        private static void CreateIfvBmp3Profile()
+        {
+            try
+            {
+                var profile = new WeaponSystemProfile(
+                    name: "BMP‑3 IFV",
+                    nationality: Nationality.USSR,
+                    weaponSystemID: WeaponSystems.IFV_BMP3,
+                    42,
+                    landHardAttack: 11,
+                    landHardDefense: 4,
+                    landSoftAttack: 9,
+                    landSoftDefense: 8,
+                    landAirAttack: 2,
+                    landAirDefense: 3,
+                    primaryRange: 1f,
+                    indirectRange: 0f,
+                    spottingRange: 2f,
+                    movementModifier: 1f,
+                    allWeatherCapability: AllWeatherRating.Day,
+                    nvgCapability: NVG_Rating.Gen2,
+                    silhouette: UnitSilhouette.Small,
+                    sigintRating: SIGINT_Rating.UnitLevel,
+                    nbcRating: NBC_Rating.Gen2,
+                    strategicMobility: StrategicMobility.AirLift
+                );
+
+                profile.SetAmphibiousCapability(true);
+
+                _weaponSystemProfiles[WeaponSystems.IFV_BMP3] = profile;
+            }
+            catch (Exception e)
+            {
+                AppService.HandleException(CLASS_NAME, nameof(CreateIfvBmp3Profile), e);
+                throw;
+            }
+        }
+
+        private static void CreateIfvBmd2Profile()
+        {
+            try
+            {
+                var profile = new WeaponSystemProfile(
+                    name: "BMD‑2 IFV",
+                    nationality: Nationality.USSR,
+                    weaponSystemID: WeaponSystems.IFV_BMD2,
+                    34,
+                    landHardAttack: 5,
+                    landHardDefense: 4,
+                    landSoftAttack: 7,
+                    landSoftDefense: 7,
+                    landAirAttack: 2,
+                    landAirDefense: 3,
+                    primaryRange: 1f,
+                    indirectRange: 0f,
+                    spottingRange: 2f,
+                    movementModifier: 1f,
+                    allWeatherCapability: AllWeatherRating.Day,
+                    nvgCapability: NVG_Rating.Gen1,
+                    silhouette: UnitSilhouette.Small,
+                    sigintRating: SIGINT_Rating.UnitLevel,
+                    nbcRating: NBC_Rating.Gen1,
+                    strategicMobility: StrategicMobility.AirDrop
+                );
+
+                profile.SetAmphibiousCapability(true);
+
+                _weaponSystemProfiles[WeaponSystems.IFV_BMD2] = profile;
+            }
+            catch (Exception e)
+            {
+                AppService.HandleException(CLASS_NAME, nameof(CreateIfvBmd2Profile), e);
+                throw;
+            }
+        }
+
+        private static void CreateIfvBmd3Profile()
+        {
+            try
+            {
+                var profile = new WeaponSystemProfile(
+                    name: "BMD‑3 IFV",
+                    nationality: Nationality.USSR,
+                    weaponSystemID: WeaponSystems.IFV_BMD3,
+                    38,
+                    landHardAttack: 7,
+                    landHardDefense: 5,
+                    landSoftAttack: 9,
+                    landSoftDefense: 7,
+                    landAirAttack: 2,
+                    landAirDefense: 3,
+                    primaryRange: 1f,
+                    indirectRange: 0f,
+                    spottingRange: 2f,
+                    movementModifier: 1.25f,
+                    allWeatherCapability: AllWeatherRating.Day,
+                    nvgCapability: NVG_Rating.Gen2,
+                    silhouette: UnitSilhouette.Small,
+                    sigintRating: SIGINT_Rating.UnitLevel,
+                    nbcRating: NBC_Rating.Gen2,
+                    strategicMobility: StrategicMobility.AirDrop
+                );
+
+                profile.SetAmphibiousCapability(true);
+
+                _weaponSystemProfiles[WeaponSystems.IFV_BMD3] = profile;
+            }
+            catch (Exception e)
+            {
+                AppService.HandleException(CLASS_NAME, nameof(CreateIfvBmd3Profile), e);
+                throw;
+            }
+        }
+
+        #endregion // Soviet IFVs
+
+
+        #region Soviet Recon
+
+        private static void CreateRcnBrdm2Profile()
+        {
+            try
+            {
+                var profile = new WeaponSystemProfile(
+                    name: "BRDM‑2 Recon",
+                    nationality: Nationality.USSR,
+                    weaponSystemID: WeaponSystems.RCN_BRDM2,
+                    22,
+                    landHardAttack: 4,
+                    landHardDefense: 3,
+                    landSoftAttack: 4,
+                    landSoftDefense: 4,
+                    landAirAttack: 1,
+                    landAirDefense: 2,
+                    primaryRange: 1f,
+                    indirectRange: 0f,
+                    spottingRange: 3f,
+                    movementModifier: 1f,
+                    allWeatherCapability: AllWeatherRating.Day,
+                    nvgCapability: NVG_Rating.Gen1,
+                    silhouette: UnitSilhouette.Small,
+                    sigintRating: SIGINT_Rating.UnitLevel,
+                    nbcRating: NBC_Rating.Gen1,
+                    strategicMobility: StrategicMobility.AirDrop
+                );
+
+                profile.SetAmphibiousCapability(true);
+
+                _weaponSystemProfiles[WeaponSystems.RCN_BRDM2] = profile;
+            }
+            catch (Exception e)
+            {
+                AppService.HandleException(CLASS_NAME, nameof(CreateRcnBrdm2Profile), e);
+                throw;
+            }
+        }
+
+        private static void CreateRcnBrdm2AtProfile()
+        {
+            try
+            {
+                var profile = new WeaponSystemProfile(
+                    name: "BRDM‑2 AT‑5",
+                    nationality: Nationality.USSR,
+                    weaponSystemID: WeaponSystems.RCN_BRDM2AT,
+                    28,
+                    landHardAttack: 10,
+                    landHardDefense: 4,
+                    landSoftAttack: 3,
+                    landSoftDefense: 4,
+                    landAirAttack: 1,
+                    landAirDefense: 2,
+                    primaryRange: 1f,
+                    indirectRange: 0f,
+                    spottingRange: 3f,
+                    movementModifier: 1f,
+                    allWeatherCapability: AllWeatherRating.Day,
+                    nvgCapability: NVG_Rating.Gen1,
+                    silhouette: UnitSilhouette.Small,
+                    sigintRating: SIGINT_Rating.UnitLevel,
+                    nbcRating: NBC_Rating.Gen1,
+                    strategicMobility: StrategicMobility.NavalAssault
+                );
+
+                profile.SetAmphibiousCapability(true);
+
+                _weaponSystemProfiles[WeaponSystems.RCN_BRDM2AT] = profile;
+            }
+            catch (Exception e)
+            {
+                AppService.HandleException(CLASS_NAME, nameof(CreateRcnBrdm2AtProfile), e);
+                throw;
+            }
+        }
+
+        #endregion // Soviet IFVs
+
     }
 }
