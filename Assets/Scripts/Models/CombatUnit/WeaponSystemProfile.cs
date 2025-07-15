@@ -5,163 +5,189 @@ using UnityEngine;
 
 namespace HammerAndSickle.Models
 {
-/*───────────────────────────────────────────────────────────────────────────────
-  WeaponSystemProfile ─ immutable "stat card" for any vehicle / aircraft / gun
-───────────────────────────────────────────────────────────────────────────────
- Summary
- ═══════
- • Encapsulates **all** combat‑relevant characteristics for one
-   **WeaponSystems** enum value: paired attack/defence ratings, single‑value air
-   ratings, ranges, mobility modifiers, sensor suites and special capability
-   flags.
- • A **profile** is created once during data‑load and referenced by potentially
-   hundreds of **CombatUnit** instances, massively reducing per‑unit memory
-   footprint.
- • All public mutators validate their input and route failures through
-   `AppService.HandleException` to guarantee the object can never persist in an
-   invalid state.
+    /*───────────────────────────────────────────────────────────────────────────────
+      WeaponSystemProfile ─ immutable "stat card" for any vehicle / aircraft / gun
+    ───────────────────────────────────────────────────────────────────────────────
+     Summary
+     ═══════
+     • Encapsulates **all** combat‑relevant characteristics for one
+       **WeaponSystems** enum value: paired attack/defence ratings, single‑value air
+       ratings, ranges, mobility modifiers, sensor suites and special capability
+       flags.
+     • A **profile** is created once during data‑load and referenced by potentially
+       hundreds of **CombatUnit** instances, massively reducing per‑unit memory
+       footprint.
+     • All public mutators validate their input and route failures through
+       `AppService.HandleException` to guarantee the object can never persist in an
+       invalid state.
 
- Public properties
- ═════════════════
-   string              Name                 { get; private set; }
-   string              ShortName            { get; private set; }   // UI‑friendly label
-   WeaponSystems       WeaponSystemID       { get; private set; }
-   Nationality         Nationality          { get; private set; }
-   List<UpgradeType>   UpgradeTypes         { get; private set; }
-   int                 TurnAvailable        { get; private set; }   // Campaign tech‑date
-   int                 PrestigeCost         { get; private set; }
-   bool                IsAmphibious         { get; private set; }
-   bool                IsDoubleFire         { get; private set; }   // 2× attack/turn flag
+     Public properties
+     ═════════════════
+       string              Name                 { get; private set; }
+       string              ShortName            { get; private set; }   // UI‑friendly label
+       WeaponSystems       WeaponSystemID       { get; private set; }
+       Nationality         Nationality          { get; private set; }
+       List<UpgradeType>   UpgradeTypes         { get; private set; }
+       int                 TurnAvailable        { get; private set; }   // Campaign tech‑date
+       int                 PrestigeCost         { get; private set; }
+       bool                IsAmphibious         { get; private set; }
+       bool                IsDoubleFire         { get; private set; }   // 2× attack/turn flag
 
-   // Paired combat ratings
-   CombatRating        LandHard             { get; private set; }
-   CombatRating        LandSoft             { get; private set; }
-   CombatRating        LandAir              { get; private set; }
-   CombatRating        Air                  { get; private set; }
-   CombatRating        AirGround            { get; private set; }
+       // Paired combat ratings
+       CombatRating        LandHard             { get; private set; }
+       CombatRating        LandSoft             { get; private set; }
+       CombatRating        LandAir              { get; private set; }
+       CombatRating        Air                  { get; private set; }
+       CombatRating        AirGround            { get; private set; }
 
-   // Single‑value aerial ratings
-   int                 AirAvionics          { get; private set; }
-   int                 AirStrategicAttack  { get; private set; }
+       // Single‑value aerial ratings
+       int                 AirAvionics          { get; private set; }
+       int                 AirStrategicAttack  { get; private set; }
 
-   // Ranges & mobility
-   float               PrimaryRange         { get; private set; }
-   float               IndirectRange        { get; private set; }
-   float               SpottingRange        { get; private set; }
-   float               MovementModifier     { get; private set; }
+       // Ranges & mobility
+       float               PrimaryRange         { get; private set; }
+       float               IndirectRange        { get; private set; }
+       float               SpottingRange        { get; private set; }
+       float               MovementModifier     { get; private set; }
 
-   // Capability enums / flags
-   AllWeatherRating    AllWeatherCapability { get; private set; }
-   SIGINT_Rating       SIGINT_Rating        { get; private set; }
-   NBC_Rating          NBC_Rating           { get; private set; }
-   StrategicMobility   StrategicMobility    { get; private set; }
-   NVG_Rating          NVGCapability        { get; private set; }
-   UnitSilhouette      Silhouette           { get; private set; }
+       // Capability enums / flags
+       AllWeatherRating    AllWeatherCapability { get; private set; }
+       SIGINT_Rating       SIGINT_Rating        { get; private set; }
+       NBC_Rating          NBC_Rating           { get; private set; }
+       StrategicMobility   StrategicMobility    { get; private set; }
+       NVG_Rating          NVGCapability        { get; private set; }
+       UnitSilhouette      Silhouette           { get; private set; }
 
- Constructors
- ═════════════
-   public WeaponSystemProfile(string name,
-                              Nationality nationality,
-                              WeaponSystems weaponSystemID,
-                              int prestigeCost = 0,
-                              int landHardAttack = 0,  int landHardDefense = 0,
-                              int landSoftAttack = 0,  int landSoftDefense = 0,
-                              int landAirAttack  = 0,  int landAirDefense  = 0,
-                              int airAttack      = 0,  int airDefense      = 0,
-                              int airAvionics = 0,
-                              int airGroundAttack = 0, int airGroundDefense = 0,
-                              int airStrategicAttack = 0,
-                              float primaryRange = 0f, float indirectRange = 0f,
-                              float spottingRange = 0f, float movementModifier = 1f,
-                              AllWeatherRating allWeatherCapability = AllWeatherRating.Day,
-                              SIGINT_Rating sigintRating = SIGINT_Rating.UnitLevel,
-                              NBC_Rating nbcRating = NBC_Rating.None,
-                              StrategicMobility strategicMobility = StrategicMobility.Heavy,
-                              NVG_Rating nvgCapability = NVG_Rating.None,
-                              UnitSilhouette silhouette = UnitSilhouette.Medium)
+     Constructors
+     ═════════════
+       public WeaponSystemProfile(string name,
+                                  Nationality nationality,
+                                  WeaponSystems weaponSystemID,
+                                  int prestigeCost = 0,
+                                  int landHardAttack = 0,  int landHardDefense = 0,
+                                  int landSoftAttack = 0,  int landSoftDefense = 0,
+                                  int landAirAttack  = 0,  int landAirDefense  = 0,
+                                  int airAttack      = 0,  int airDefense      = 0,
+                                  int airAvionics = 0,
+                                  int airGroundAttack = 0, int airGroundDefense = 0,
+                                  int airStrategicAttack = 0,
+                                  float primaryRange = 0f, float indirectRange = 0f,
+                                  float spottingRange = 0f, float movementModifier = 1f,
+                                  AllWeatherRating allWeatherCapability = AllWeatherRating.Day,
+                                  SIGINT_Rating sigintRating = SIGINT_Rating.UnitLevel,
+                                  NBC_Rating nbcRating = NBC_Rating.None,
+                                  StrategicMobility strategicMobility = StrategicMobility.Heavy,
+                                  NVG_Rating nvgCapability = NVG_Rating.None,
+                                  UnitSilhouette silhouette = UnitSilhouette.Medium)
 
-   public WeaponSystemProfile(string name,
-                              Nationality nationality,
-                              WeaponSystems weaponSystemID,
-                              int prestigeCost = 0)            // delegates to main ctor
+       public WeaponSystemProfile(string name,
+                                  Nationality nationality,
+                                  WeaponSystems weaponSystemID,
+                                  int prestigeCost = 0)            // delegates to main ctor
 
- Public API (method signatures ⇢ purpose)
- ═════════════════════════════════════════════
- ― Combat‑rating accessors ―
-   int  GetLandHardAttack()            // read Vs hard land
-   int  GetLandHardDefense()
-   void SetLandHardAttack(int v)       // validate & set
-   void SetLandHardDefense(int v)
+     Public API (method signatures ⇢ purpose)
+     ═════════════════════════════════════════════
+     ― Combat‑rating accessors ―
+       int  GetLandHardAttack()            // read Vs hard land
+       int  GetLandHardDefense()
+       void SetLandHardAttack(int v)       // validate & set
+       void SetLandHardDefense(int v)
 
-   int  GetLandSoftAttack()
-   int  GetLandSoftDefense()
-   void SetLandSoftAttack(int v)
-   void SetLandSoftDefense(int v)
+       int  GetLandSoftAttack()
+       int  GetLandSoftDefense()
+       void SetLandSoftAttack(int v)
+       void SetLandSoftDefense(int v)
 
-   int  GetLandAirAttack()
-   int  GetLandAirDefense()
-   void SetLandAirAttack(int v)
-   void SetLandAirDefense(int v)
+       int  GetLandAirAttack()
+       int  GetLandAirDefense()
+       void SetLandAirAttack(int v)
+       void SetLandAirDefense(int v)
 
-   int  GetAirAttack()
-   int  GetAirDefense()
-   void SetAirAttack(int v)
-   void SetAirDefense(int v)
+       int  GetAirAttack()
+       int  GetAirDefense()
+       void SetAirAttack(int v)
+       void SetAirDefense(int v)
 
-   int  GetAirGroundAttack()
-   int  GetAirGroundDefense()
-   void SetAirGroundAttack(int v)
-   void SetAirGroundDefense(int v)
+       int  GetAirGroundAttack()
+       int  GetAirGroundDefense()
+       void SetAirGroundAttack(int v)
+       void SetAirGroundDefense(int v)
 
- ― Upgrade management ―
-   bool                      AddUpgradeType(UpgradeType t)      // append if unique & ≠ None
-   bool                      RemoveUpgradeType(UpgradeType t)
-   bool                      HasUpgradeType(UpgradeType t)
-   IReadOnlyList<UpgradeType> GetUpgradeTypes()
-   void                      ClearUpgradeTypes()
+     ― Upgrade management ―
+       bool                      AddUpgradeType(UpgradeType t)      // append if unique & ≠ None
+       bool                      RemoveUpgradeType(UpgradeType t)
+       bool                      HasUpgradeType(UpgradeType t)
+       IReadOnlyList<UpgradeType> GetUpgradeTypes()
+       void                      ClearUpgradeTypes()
 
- ― Range & mobility setters ―
-   void SetPrimaryRange(float r)
-   void SetIndirectRange(float r)
-   void SetSpottingRange(float r)
-   void SetMovementModifier(float m)
+     ― Range & mobility setters ―
+       void SetPrimaryRange(float r)
+       void SetIndirectRange(float r)
+       void SetSpottingRange(float r)
+       void SetMovementModifier(float m)
 
- ― Prestige / capability setters ―
-   void SetPrestigeCost(int cost)
-   void SetAmphibiousCapability(bool val)      // toggle IsAmphibious
-   void SetDoubleFireCapability(bool val)      // toggle IsDoubleFire
-   void SetShortName(string shortName)         // UI label (1‑6 chars recommended)
-   void SetTurnAvailable(int turn)             // campaign availability tweak
+     ― Prestige / capability setters ―
+       void SetPrestigeCost(int cost)
+       void SetAmphibiousCapability(bool val)      // toggle IsAmphibious
+       void SetDoubleFireCapability(bool val)      // toggle IsDoubleFire
+       void SetShortName(string shortName)         // UI label (1‑6 chars recommended)
+       void SetTurnAvailable(int turn)             // campaign availability tweak
 
- ― Aggregate metrics ―
-   int  GetTotalCombatValue()                  // quick “power score” for AI ranking
+     ― Aggregate metrics ―
+       int  GetTotalCombatValue()                  // quick “power score” for AI ranking
 
- Private helpers
- ═══════════════
-   int   ValidateCombatValue(int v)            // clamp to CUConstants
-   float ValidateRange(float v)                // clamp to CUConstants
-   int   ValidatePrestigeCost(int c)           // economy sanity guard
+     Private helpers
+     ═══════════════
+       int   ValidateCombatValue(int v)            // clamp to CUConstants
+       float ValidateRange(float v)                // clamp to CUConstants
+       int   ValidatePrestigeCost(int c)           // economy sanity guard
 
- Developer notes
- ═══════════════
- • **ShortName** is intended for HUD counters and map labels; keep ≤ 8 chars to
-   avoid UI overflow.
- • **TurnAvailable** represents the first campaign turn the weapon system may be
-   purchased; scenario scripts can override for early prototypes or lend‑lease.
- • **IsDoubleFire** marks systems with an innate second attack per combat round
-   (e.g. dual‑launcher SAMs). CombatUnit decides whether the bonus is consumed;
-   the profile merely flags eligibility.
- • **StrategicMobility** enum now includes *UltraLight* and *UltraHeavy* tiers –
-   ensure DB builders assign the correct tier to power the redeployment cost
-   algorithm.
- • UpgradeTypes list is **not** thread‑safe; wrap mutations in a *lock* when
-   accessed from async AI threads.
- • All mutators funnel exceptions through `AppService.HandleException(CLASS_NAME,
-   method, e)` before re‑throwing when state corruption is possible.
- • CUConstants.M* constants define the global min/max bounds for combat values,
-   ranges and movement modifiers – tweak those for balance, not individual
-   validation logic.
-────────────────────────────────────────────────────────────────────────────*/
+     Developer notes
+     ═══════════════
+     • **ShortName** is intended for HUD counters and map labels; keep ≤ 8 chars to
+       avoid UI overflow.
+     • **TurnAvailable** represents the first campaign turn the weapon system may be
+       purchased; scenario scripts can override for early prototypes or lend‑lease.
+     • **IsDoubleFire** marks MLRS systems only.
+     • **StrategicMobility** Determines how units can be transported by other forms of movement.
+     • UpgradeTypes list is **not** thread‑safe; wrap mutations in a *lock* when
+       accessed from async AI threads.
+     • All mutators funnel exceptions through `AppService.HandleException(CLASS_NAME,
+       method, e)` before re‑throwing when state corruption is possible.
+     • CUConstants.M* constants define the global min/max bounds for combat values,
+       ranges and movement modifiers – tweak those for balance, not individual
+       validation logic.
+
+    Notes on Ratings and what they are for:
+
+    // Flags
+    IsAmphibious- Marks whether this unit can cross rivers easily.
+    IsDoubleFire- Marks whether this unit can fire twice per round, only MLRS systems.
+    
+    // Paired combat ratings
+    CombatRating LandHard Attack/Defense- Attacking and defending against armored vehicles in ground combat.
+    CombatRating LandSoft Attack/Defense- Attacking and defending against soft targets like infantry or unarmored vehicles in ground combat.
+    CombatRating LandAir Attack/Defense- Attacking and defending against air units from land-based units,used to attack/defend transiting aircraft.
+    CombatRating Air Attack/Defense- Air-to-air combat ratings, used for dogfights and intercepts.  
+    CombatRating AirGround Attack/Defense- Air-to-ground combat ratings, used for attacking ground targets from the air.
+
+    AirAvionics- Avionics rating for air units, affects targeting and sensor capabilities.
+    AirStrategicAttack- Strategic bombing capability, used for long-range attacks on high-value targets.
+    
+    // Ranges & mobility
+    PrimaryRange- The primary weapon range, used for direct fire engagements, ground combat only, usually 1.
+    IndirectRange- The range of indirect fire weapons, such as artillery and air defense weapons.
+    SpottingRange- The visual spotting range, used for detecting enemy units.
+    MovementModifier- A modifier for movement speed, used to adjust how fast units can move across terrain or in the air.
+    
+    // Capability enums
+    AllWeatherRating- Day equals effective only during daylight, Night equals some effectiveness at night, All-Weather equals no penalties.
+    SIGINT_Rating- Ability to collect intelligence on enemy units.
+    NBC_Rating- Nuclear, Biological, and Chemical protection rating, used to determine how well a unit can operate in contaminated environments.
+    StrategicMobility- Indicates what kind of transport can be used to move this unit type.
+    NVG_Rating- Night Vision Goggles capability, used to determine how well a ground unit can operate at night, or ground attack aircraft at night.
+    UnitSilhouette- Unit silhouette size, used to determine how easily a unit can be spotted by enemy units.
+    ────────────────────────────────────────────────────────────────────────────*/
     public class WeaponSystemProfile
     {
         #region Constants
