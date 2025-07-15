@@ -645,7 +645,6 @@ namespace HammerAndSickle.Models
         SAM_S75,
         SAM_S125,
         SAM_S300,
-        HEL_MI8T,
         HEL_MI8AT,
         HEL_MI24D,
         HEL_MI24V,

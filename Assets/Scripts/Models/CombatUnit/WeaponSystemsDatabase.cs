@@ -1882,8 +1882,567 @@ namespace HammerAndSickle.Models
 
         #region Soviet Air Defense
 
+        /// <summary>
+        /// ZSU-57-2 "Sparka" 57mm twin anti-aircraft gun.
+        /// </summary>
+        private static void CreateSpaaa_Zsu57Profile()
+        {
+            try
+            {
+                var profile = new WeaponSystemProfile(
+                    name: "ZSU-57-2 Sparka Self-Propelled Anti-Aircraft Artillery",
+                    nationality: Nationality.USSR,
+                    weaponSystemID: WeaponSystems.SPAAA_ZSU57,
+                    35,
+                    landHardAttack: 3,
+                    landHardDefense: 3,
+                    landSoftAttack: 10,
+                    landSoftDefense: 5,
+                    landAirAttack: 1,
+                    landAirDefense: 2,
+                    airAttack: 10,
+                    airDefense: 7,
+                    primaryRange: 1f,
+                    indirectRange: 2f,
+                    spottingRange: 2f,
+                    movementModifier: 1f,
+                    allWeatherCapability: AllWeatherRating.Day,
+                    sigintRating: SIGINT_Rating.UnitLevel,
+                    nbcRating: NBC_Rating.None,
+                    strategicMobility: StrategicMobility.AirDrop,
+                    nvgCapability: NVG_Rating.None,
+                    silhouette: UnitSilhouette.Medium
+                );
 
+                // Set upgrade paths for modernization
+                profile.AddUpgradeType(UpgradeType.SPAAA);
+
+                // Set short name for UI display
+                profile.SetShortName("ZSU-57-2");
+
+                // Set turn availability - entered service in 1957
+                profile.SetTurnAvailable(228);
+
+                // Store in master dictionary
+                _weaponSystemProfiles[WeaponSystems.SPAAA_ZSU57] = profile;
+            }
+            catch (Exception e)
+            {
+                AppService.HandleException(CLASS_NAME, nameof(CreateSpaaa_Zsu57Profile), e);
+                throw;
+            }
+        }
+
+        /// <summary>
+        /// ZSU-23-4 "Shilka" 23mm quad anti-aircraft gun with radar.
+        /// </summary>
+        private static void CreateSpaaa_Zsu23Profile()
+        {
+            try
+            {
+                var profile = new WeaponSystemProfile(
+                    name: "ZSU-23-4 Shilka Self-Propelled Anti-Aircraft Artillery",
+                    nationality: Nationality.USSR,
+                    weaponSystemID: WeaponSystems.SPAAA_ZSU23,
+                    45,
+                    landHardAttack: 4,
+                    landHardDefense: 4,
+                    landSoftAttack: 11,
+                    landSoftDefense: 6,
+                    landAirAttack: 2,
+                    landAirDefense: 3,
+                    airAttack: 13,
+                    airDefense: 10,
+                    primaryRange: 1f,
+                    indirectRange: 3f,
+                    spottingRange: 3f,
+                    movementModifier: 1f,
+                    allWeatherCapability: AllWeatherRating.AllWeather,
+                    sigintRating: SIGINT_Rating.UnitLevel,
+                    nbcRating: NBC_Rating.Gen1,
+                    strategicMobility: StrategicMobility.Heavy,
+                    nvgCapability: NVG_Rating.None,
+                    silhouette: UnitSilhouette.Medium
+                );
+
+                // Set upgrade paths for modernization
+                profile.AddUpgradeType(UpgradeType.SPAAA);
+
+                // Set short name for UI display
+                profile.SetShortName("ZSU-23-4");
+
+                // Set turn availability - entered service in 1965
+                profile.SetTurnAvailable(324);
+
+                // Store in master dictionary
+                _weaponSystemProfiles[WeaponSystems.SPAAA_ZSU23] = profile;
+            }
+            catch (Exception e)
+            {
+                AppService.HandleException(CLASS_NAME, nameof(CreateSpaaa_Zsu23Profile), e);
+                throw;
+            }
+        }
+
+        /// <summary>
+        /// 2K22 "Tunguska" combined gun/missile air defense system.
+        /// </summary>
+        private static void CreateSpaaa_2K22Profile()
+        {
+            try
+            {
+                var profile = new WeaponSystemProfile(
+                    name: "2K22 Tunguska Self-Propelled Air Defense System",
+                    nationality: Nationality.USSR,
+                    weaponSystemID: WeaponSystems.SPAAA_2K22,
+                    120,
+                    landHardAttack: 6,
+                    landHardDefense: 6,
+                    landSoftAttack: 10,
+                    landSoftDefense: 8,
+                    landAirAttack: 3,
+                    landAirDefense: 5,
+                    airAttack: 16,
+                    airDefense: 13,
+                    primaryRange: 1f,
+                    indirectRange: 4f,
+                    spottingRange: 4f,
+                    movementModifier: 1f,
+                    allWeatherCapability: AllWeatherRating.AllWeather,
+                    sigintRating: SIGINT_Rating.SpecializedLevel,
+                    nbcRating: NBC_Rating.Gen2,
+                    strategicMobility: StrategicMobility.Heavy,
+                    nvgCapability: NVG_Rating.Gen2,
+                    silhouette: UnitSilhouette.Medium
+                );
+
+                // Set upgrade paths for modernization
+                profile.AddUpgradeType(UpgradeType.SPAAA);
+
+                // Set short name for UI display
+                profile.SetShortName("2K22");
+
+                // Set turn availability - entered service in 1982
+                profile.SetTurnAvailable(528);
+
+                // Store in master dictionary
+                _weaponSystemProfiles[WeaponSystems.SPAAA_2K22] = profile;
+            }
+            catch (Exception e)
+            {
+                AppService.HandleException(CLASS_NAME, nameof(CreateSpaaa_2K22Profile), e);
+                throw;
+            }
+        }
+
+        /// <summary>
+        /// 9K31 "Strela-1" (SA-9) mobile short-range SAM system.
+        /// </summary>
+        private static void CreateSpsam_9K31Profile()
+        {
+            try
+            {
+                var profile = new WeaponSystemProfile(
+                    name: "9K31 Strela-1 Self-Propelled SAM System",
+                    nationality: Nationality.USSR,
+                    weaponSystemID: WeaponSystems.SPSAM_9K31,
+                    40,
+                    landHardAttack: 2,
+                    landHardDefense: 3,
+                    landSoftAttack: 4,
+                    landSoftDefense: 4,
+                    landAirAttack: 1,
+                    landAirDefense: 2,
+                    airAttack: 10,
+                    airDefense: 10,
+                    primaryRange: 1f,
+                    indirectRange: 3f,
+                    spottingRange: 3f,
+                    movementModifier: 1f,
+                    allWeatherCapability: AllWeatherRating.Day,
+                    sigintRating: SIGINT_Rating.UnitLevel,
+                    nbcRating: NBC_Rating.Gen1,
+                    strategicMobility: StrategicMobility.AirDrop,
+                    nvgCapability: NVG_Rating.None,
+                    silhouette: UnitSilhouette.Small
+                );
+
+                // Set upgrade paths for modernization
+                profile.AddUpgradeType(UpgradeType.SPSAM);
+
+                // Set amphibious capability (BRDM-2 chassis)
+                profile.SetAmphibiousCapability(true);
+
+                // Set short name for UI display
+                profile.SetShortName("9K31");
+
+                // Set turn availability - entered service in 1968
+                profile.SetTurnAvailable(360);
+
+                // Store in master dictionary
+                _weaponSystemProfiles[WeaponSystems.SPSAM_9K31] = profile;
+            }
+            catch (Exception e)
+            {
+                AppService.HandleException(CLASS_NAME, nameof(CreateSpsam_9K31Profile), e);
+                throw;
+            }
+        }
+
+        /// <summary>
+        /// S-75 "Dvina" (SA-2) medium-range strategic SAM system.
+        /// </summary>
+        private static void CreateSam_S75Profile()
+        {
+            try
+            {
+                var profile = new WeaponSystemProfile(
+                    name: "S-75 Dvina Strategic SAM System",
+                    nationality: Nationality.USSR,
+                    weaponSystemID: WeaponSystems.SAM_S75,
+                    80,
+                    landHardAttack: 0,
+                    landHardDefense: 2,
+                    landSoftAttack: 0,
+                    landSoftDefense: 3,
+                    landAirAttack: 0,
+                    landAirDefense: 1,
+                    airAttack: 12,
+                    airDefense: 9,
+                    primaryRange: 1f,
+                    indirectRange: 5f,
+                    spottingRange: 5f,
+                    movementModifier: 0f,
+                    allWeatherCapability: AllWeatherRating.AllWeather,
+                    sigintRating: SIGINT_Rating.SpecializedLevel,
+                    nbcRating: NBC_Rating.None,
+                    strategicMobility: StrategicMobility.Heavy,
+                    nvgCapability: NVG_Rating.None,
+                    silhouette: UnitSilhouette.Large
+                );
+
+                // Set upgrade paths for modernization
+                profile.AddUpgradeType(UpgradeType.SAM);
+
+                // Set short name for UI display
+                profile.SetShortName("S-75");
+
+                // Set turn availability - entered service in 1957
+                profile.SetTurnAvailable(228);
+
+                // Store in master dictionary
+                _weaponSystemProfiles[WeaponSystems.SAM_S75] = profile;
+            }
+            catch (Exception e)
+            {
+                AppService.HandleException(CLASS_NAME, nameof(CreateSam_S75Profile), e);
+                throw;
+            }
+        }
+
+        /// <summary>
+        /// S-125 "Neva" (SA-3) low-altitude strategic SAM system.
+        /// </summary>
+        private static void CreateSam_S125Profile()
+        {
+            try
+            {
+                var profile = new WeaponSystemProfile(
+                    name: "S-125 Neva Strategic SAM System",
+                    nationality: Nationality.USSR,
+                    weaponSystemID: WeaponSystems.SAM_S125,
+                    90,
+                    landHardAttack: 0,
+                    landHardDefense: 3,
+                    landSoftAttack: 0,
+                    landSoftDefense: 4,
+                    landAirAttack: 0,
+                    landAirDefense: 2,
+                    airAttack: 14,
+                    airDefense: 11,
+                    primaryRange: 1f,
+                    indirectRange: 6f,
+                    spottingRange: 6f,
+                    movementModifier: 0f,
+                    allWeatherCapability: AllWeatherRating.AllWeather,
+                    sigintRating: SIGINT_Rating.SpecializedLevel,
+                    nbcRating: NBC_Rating.Gen1,
+                    strategicMobility: StrategicMobility.Heavy,
+                    nvgCapability: NVG_Rating.None,
+                    silhouette: UnitSilhouette.Large
+                );
+
+                // Set upgrade paths for modernization
+                profile.AddUpgradeType(UpgradeType.SAM);
+
+                // Set short name for UI display
+                profile.SetShortName("S-125");
+
+                // Set turn availability - entered service in 1961
+                profile.SetTurnAvailable(276);
+
+                // Store in master dictionary
+                _weaponSystemProfiles[WeaponSystems.SAM_S125] = profile;
+            }
+            catch (Exception e)
+            {
+                AppService.HandleException(CLASS_NAME, nameof(CreateSam_S125Profile), e);
+                throw;
+            }
+        }
+
+        /// <summary>
+        /// S-300 "Favorit" (SA-10/20) advanced long-range strategic SAM system.
+        /// </summary>
+        private static void CreateSam_S300Profile()
+        {
+            try
+            {
+                var profile = new WeaponSystemProfile(
+                    name: "S-300 Strategic SAM System",
+                    nationality: Nationality.USSR,
+                    weaponSystemID: WeaponSystems.SAM_S300,
+                    200,
+                    landHardAttack: 0,
+                    landHardDefense: 5,
+                    landSoftAttack: 0,
+                    landSoftDefense: 6,
+                    landAirAttack: 0,
+                    landAirDefense: 4,
+                    airAttack: 20,
+                    airDefense: 15,
+                    primaryRange: 1f,
+                    indirectRange: 8f,
+                    spottingRange: 8f,
+                    movementModifier: 0f,
+                    allWeatherCapability: AllWeatherRating.AllWeather,
+                    sigintRating: SIGINT_Rating.SpecializedLevel,
+                    nbcRating: NBC_Rating.Gen2,
+                    strategicMobility: StrategicMobility.Heavy,
+                    nvgCapability: NVG_Rating.None,
+                    silhouette: UnitSilhouette.Large
+                );
+
+                // Set upgrade paths for modernization
+                profile.AddUpgradeType(UpgradeType.SAM);
+
+                // Set short name for UI display
+                profile.SetShortName("S-300");
+
+                // Set turn availability - entered service in 1978
+                profile.SetTurnAvailable(480);
+
+                // Store in master dictionary
+                _weaponSystemProfiles[WeaponSystems.SAM_S300] = profile;
+            }
+            catch (Exception e)
+            {
+                AppService.HandleException(CLASS_NAME, nameof(CreateSam_S300Profile), e);
+                throw;
+            }
+        }
 
         #endregion // Soviet Air Defense
+
+
+        #region Soviet Helicopters
+
+        /// <summary>
+        /// Mi-8AT "Hip-C" armed transport helicopter with anti-tank missiles.
+        /// </summary>
+        private static void CreateHel_Mi8ATProfile()
+        {
+            try
+            {
+                var profile = new WeaponSystemProfile(
+                    name: "Mi-8AT Hip-C Attack Helicopter",
+                    nationality: Nationality.USSR,
+                    weaponSystemID: WeaponSystems.HEL_MI8AT,
+                    55,
+                    landHardAttack: 8,
+                    landHardDefense: 4,
+                    landSoftAttack: 7,
+                    landSoftDefense: 4,
+                    landAirAttack: 1,
+                    landAirDefense: 2,
+                    primaryRange: 1f,
+                    indirectRange: 0f,
+                    spottingRange: 2f,
+                    movementModifier: 1f,
+                    allWeatherCapability: AllWeatherRating.Day,
+                    sigintRating: SIGINT_Rating.UnitLevel,
+                    nbcRating: NBC_Rating.None,
+                    strategicMobility: StrategicMobility.AirMobile,
+                    nvgCapability: NVG_Rating.None,
+                    silhouette: UnitSilhouette.Medium
+                );
+
+                // Set upgrade paths for modernization
+                profile.AddUpgradeType(UpgradeType.Attack);
+
+                // Set short name for UI display
+                profile.SetShortName("Mi-8AT");
+
+                // Set turn availability - entered service in 1975
+                profile.SetTurnAvailable(444);
+
+                // Store in master dictionary
+                _weaponSystemProfiles[WeaponSystems.HEL_MI8AT] = profile;
+            }
+            catch (Exception e)
+            {
+                AppService.HandleException(CLASS_NAME, nameof(CreateHel_Mi8ATProfile), e);
+                throw;
+            }
+        }
+
+        /// <summary>
+        /// Mi-24D "Hind-D" attack helicopter with rockets and anti-tank missiles.
+        /// </summary>
+        private static void CreateHel_Mi24DProfile()
+        {
+            try
+            {
+                var profile = new WeaponSystemProfile(
+                    name: "Mi-24D Hind-D Attack Helicopter",
+                    nationality: Nationality.USSR,
+                    weaponSystemID: WeaponSystems.HEL_MI24D,
+                    85,
+                    landHardAttack: 10,
+                    landHardDefense: 7,
+                    landSoftAttack: 12,
+                    landSoftDefense: 8,
+                    landAirAttack: 2,
+                    landAirDefense: 4,
+                    primaryRange: 1f,
+                    indirectRange: 0f,
+                    spottingRange: 3f,
+                    movementModifier: 1f,
+                    allWeatherCapability: AllWeatherRating.Day,
+                    sigintRating: SIGINT_Rating.UnitLevel,
+                    nbcRating: NBC_Rating.Gen1,
+                    strategicMobility: StrategicMobility.AirMobile,
+                    nvgCapability: NVG_Rating.None,
+                    silhouette: UnitSilhouette.Medium
+                );
+
+                // Set upgrade paths for modernization
+                profile.AddUpgradeType(UpgradeType.Attack);
+
+                // Set short name for UI display
+                profile.SetShortName("Mi-24D");
+
+                // Set turn availability - entered service in 1973
+                profile.SetTurnAvailable(420);
+
+                // Store in master dictionary
+                _weaponSystemProfiles[WeaponSystems.HEL_MI24D] = profile;
+            }
+            catch (Exception e)
+            {
+                AppService.HandleException(CLASS_NAME, nameof(CreateHel_Mi24DProfile), e);
+                throw;
+            }
+        }
+
+        /// <summary>
+        /// Mi-24V "Hind-E" improved attack helicopter with better sensors and weapons.
+        /// </summary>
+        private static void CreateHel_Mi24VProfile()
+        {
+            try
+            {
+                var profile = new WeaponSystemProfile(
+                    name: "Mi-24V Hind-E Attack Helicopter",
+                    nationality: Nationality.USSR,
+                    weaponSystemID: WeaponSystems.HEL_MI24V,
+                    80,
+                    landHardAttack: 14,
+                    landHardDefense: 7,
+                    landSoftAttack: 13,
+                    landSoftDefense: 8,
+                    landAirAttack: 3,
+                    landAirDefense: 5,
+                    primaryRange: 1f,
+                    indirectRange: 0f,
+                    spottingRange: 3f,
+                    movementModifier: 1f,
+                    allWeatherCapability: AllWeatherRating.Night,
+                    sigintRating: SIGINT_Rating.UnitLevel,
+                    nbcRating: NBC_Rating.Gen1,
+                    strategicMobility: StrategicMobility.AirMobile,
+                    nvgCapability: NVG_Rating.Gen1,
+                    silhouette: UnitSilhouette.Medium
+                );
+
+                // Set upgrade paths for modernization
+                profile.AddUpgradeType(UpgradeType.Attack);
+
+                // Set short name for UI display
+                profile.SetShortName("Mi-24V");
+
+                // Set turn availability - entered service in 1976
+                profile.SetTurnAvailable(456);
+
+                // Store in master dictionary
+                _weaponSystemProfiles[WeaponSystems.HEL_MI24V] = profile;
+            }
+            catch (Exception e)
+            {
+                AppService.HandleException(CLASS_NAME, nameof(CreateHel_Mi24VProfile), e);
+                throw;
+            }
+        }
+
+        /// <summary>
+        /// Mi-28 "Havoc" dedicated attack helicopter with advanced avionics.
+        /// </summary>
+        private static void CreateHel_Mi28Profile()
+        {
+            try
+            {
+                var profile = new WeaponSystemProfile(
+                    name: "Mi-28 Havoc Attack Helicopter",
+                    nationality: Nationality.USSR,
+                    weaponSystemID: WeaponSystems.HEL_MI28,
+                    120,
+                    landHardAttack: 18,
+                    landHardDefense: 8,
+                    landSoftAttack: 15,
+                    landSoftDefense: 9,
+                    landAirAttack: 4,
+                    landAirDefense: 7,
+                    primaryRange: 1f,
+                    indirectRange: 0f,
+                    spottingRange: 3f,
+                    movementModifier: 1f,
+                    allWeatherCapability: AllWeatherRating.AllWeather,
+                    sigintRating: SIGINT_Rating.SpecializedLevel,
+                    nbcRating: NBC_Rating.Gen2,
+                    strategicMobility: StrategicMobility.AirMobile,
+                    nvgCapability: NVG_Rating.Gen2,
+                    silhouette: UnitSilhouette.Medium
+                );
+
+                // Set upgrade paths for modernization
+                profile.AddUpgradeType(UpgradeType.Attack);
+
+                // Set short name for UI display
+                profile.SetShortName("Mi-28");
+
+                // Set turn availability - entered service in 1987
+                profile.SetTurnAvailable(588);
+
+                // Store in master dictionary
+                _weaponSystemProfiles[WeaponSystems.HEL_MI28] = profile;
+            }
+            catch (Exception e)
+            {
+                AppService.HandleException(CLASS_NAME, nameof(CreateHel_Mi28Profile), e);
+                throw;
+            }
+        }
+
+        #endregion
     }
 }
