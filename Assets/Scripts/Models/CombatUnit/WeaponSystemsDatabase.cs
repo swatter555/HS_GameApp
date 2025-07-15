@@ -195,23 +195,28 @@ namespace HammerAndSickle.Models
                 CreateT80BProfile();
                 CreateT80UProfile();
                 CreateT80BVProfile();
+
                 CreateRegInfSVProfile();
                 CreateAbInfSVProfile();
                 CreateAmInfSVProfile();
                 CreateMarInfSVProfile();
                 CreateSpecInfSVProfile();
                 CreateEngInfSVProfile();
+
                 CreateApcMtlbProfile();
                 CreateApcBtr70Profile();
                 CreateApcBtr80Profile();
+
                 CreateIfvBmp1Profile();
                 CreateIfvBmp2Profile();
                 CreateIfvBmp3Profile();
                 CreateIfvBmd1Profile();
                 CreateIfvBmd2Profile();
                 CreateIfvBmd3Profile();
+
                 CreateRcnBrdm2Profile();
                 CreateRcnBrdm2AtProfile();
+
                 CreateSpa2S1Profile();
                 CreateSpa2S3Profile();
                 CreateSpa2S5Profile();
@@ -219,6 +224,49 @@ namespace HammerAndSickle.Models
                 CreateRocBm21Profile();
                 CreateRocBm27Profile();
                 CreateRocBm30Profile();
+
+                CreateSpaaa_Zsu57Profile();
+                CreateSpaaa_Zsu23Profile();
+                CreateSpaaa_2K22Profile();
+                CreateSpsam_9K31Profile();
+
+                CreateSam_S75Profile();
+                CreateSam_S125Profile();
+                CreateSam_S300Profile();
+
+                CreateHel_Mi8ATProfile();
+                CreateHel_Mi24DProfile();
+                CreateHel_Mi24VProfile();
+                CreateHel_Mi28Profile();
+
+                CreateAwacs_A50Profile();
+                CreateAsf_Mig21Profile();
+                CreateAsf_Mig23Profile();
+                CreateAsf_Mig25Profile();
+                CreateAsf_Mig29Profile();
+                CreateAsf_Su27Profile();
+                CreateAsf_Mig31Profile();
+                CreateAsf_Su47Profile();
+
+                CreateMrf_Mig27Profile();
+                CreateAtt_Su25Profile();
+                CreateAtt_Su25BProfile();
+
+                CreateBmb_Su24Profile();
+                CreateBmb_Tu16Profile();
+                CreateBmb_Tu22Profile();
+                CreateBmb_Tu22M3Profile();
+
+                CreateRcna_Mig25RProfile();
+
+                // US profiles
+
+
+
+
+
+
+
 
 
             }
@@ -2604,28 +2652,20 @@ namespace HammerAndSickle.Models
                     name: "MiG-25 Foxbat Air Superiority Fighter",
                     nationality: Nationality.USSR,
                     weaponSystemID: WeaponSystems.ASF_MIG25,
-                    70,
-                    landHardAttack: 1,
-                    landHardDefense: 2,
-                    landSoftAttack: 2,
-                    landSoftDefense: 3,
-                    landAirAttack: 1,
-                    landAirDefense: 4,
-                    airAttack: 18,
-                    airDefense: 12,
-                    airAvionics: 15,
-                    airStrategicAttack: 0,
-                    airGroundAttack: 3,
-                    airGroundDefense: 8,
+                    85,
+                    landAirDefense: 15,
+                    airAttack: 12,
+                    airDefense: 15,
+                    airAvionics: 10,
                     primaryRange: 1f,
                     indirectRange: 0f,
-                    spottingRange: 8f,
-                    movementModifier: 1.5f,
-                    allWeatherCapability: AllWeatherRating.AllWeather,
+                    spottingRange: 4f,
+                    movementModifier: 1.25f,
+                    allWeatherCapability: AllWeatherRating.Night,
                     sigintRating: SIGINT_Rating.SpecializedLevel,
                     nbcRating: NBC_Rating.Gen1,
-                    strategicMobility: StrategicMobility.AirMobile,
-                    nvgCapability: NVG_Rating.Gen1,
+                    strategicMobility: StrategicMobility.Aircraft,
+                    nvgCapability: NVG_Rating.None,
                     silhouette: UnitSilhouette.Medium
                 );
 
@@ -2659,28 +2699,23 @@ namespace HammerAndSickle.Models
                     name: "MiG-29 Fulcrum Air Superiority Fighter",
                     nationality: Nationality.USSR,
                     weaponSystemID: WeaponSystems.ASF_MIG29,
-                    85,
-                    landHardAttack: 4,
-                    landHardDefense: 3,
-                    landSoftAttack: 8,
-                    landSoftDefense: 4,
-                    landAirAttack: 3,
-                    landAirDefense: 6,
-                    airAttack: 20,
-                    airDefense: 15,
-                    airAvionics: 18,
+                    65,
+                    landAirDefense: 9,
+                    airAttack: 15,
+                    airDefense: 13,
+                    airAvionics: 12,
                     airStrategicAttack: 0,
-                    airGroundAttack: 12,
-                    airGroundDefense: 10,
+                    airGroundAttack: 9,
+                    airGroundDefense: 7,
                     primaryRange: 1f,
                     indirectRange: 0f,
-                    spottingRange: 6f,
-                    movementModifier: 1.25f,
+                    spottingRange: 4f,
+                    movementModifier: 1f,
                     allWeatherCapability: AllWeatherRating.AllWeather,
                     sigintRating: SIGINT_Rating.UnitLevel,
                     nbcRating: NBC_Rating.Gen2,
-                    strategicMobility: StrategicMobility.AirMobile,
-                    nvgCapability: NVG_Rating.Gen2,
+                    strategicMobility: StrategicMobility.Aircraft,
+                    nvgCapability: NVG_Rating.None,
                     silhouette: UnitSilhouette.Medium
                 );
 
@@ -2714,33 +2749,22 @@ namespace HammerAndSickle.Models
                     name: "MiG-31 Foxhound Air Superiority Fighter",
                     nationality: Nationality.USSR,
                     weaponSystemID: WeaponSystems.ASF_MIG31,
-                    100,
-                    landHardAttack: 2,
-                    landHardDefense: 4,
-                    landSoftAttack: 4,
-                    landSoftDefense: 5,
-                    landAirAttack: 2,
-                    landAirDefense: 8,
-                    airAttack: 22,
+                    85,
+                    landAirDefense: 14,
+                    airAttack: 16,
                     airDefense: 18,
-                    airAvionics: 22,
-                    airStrategicAttack: 0,
-                    airGroundAttack: 6,
-                    airGroundDefense: 12,
+                    airAvionics: 14,
                     primaryRange: 1f,
                     indirectRange: 0f,
-                    spottingRange: 10f,
-                    movementModifier: 1.5f,
+                    spottingRange: 5f,
+                    movementModifier: 1.25f,
                     allWeatherCapability: AllWeatherRating.AllWeather,
                     sigintRating: SIGINT_Rating.SpecializedLevel,
                     nbcRating: NBC_Rating.Gen2,
-                    strategicMobility: StrategicMobility.AirMobile,
-                    nvgCapability: NVG_Rating.Gen2,
-                    silhouette: UnitSilhouette.Large
+                    strategicMobility: StrategicMobility.Aircraft,
+                    nvgCapability: NVG_Rating.Gen1,
+                    silhouette: UnitSilhouette.Medium
                 );
-
-                // Set double fire capability (multiple long-range missiles)
-                profile.SetDoubleFireCapability(true);
 
                 // Set upgrade paths for modernization
                 profile.AddUpgradeType(UpgradeType.Fighter);
@@ -2748,8 +2772,8 @@ namespace HammerAndSickle.Models
                 // Set short name for UI display
                 profile.SetShortName("MiG-31");
 
-                // Set turn availability - entered service in 1981
-                profile.SetTurnAvailable(516);
+                // Set turn availability
+                profile.SetTurnAvailable(550);
 
                 // Store in master dictionary
                 _weaponSystemProfiles[WeaponSystems.ASF_MIG31] = profile;
@@ -2773,27 +2797,19 @@ namespace HammerAndSickle.Models
                     nationality: Nationality.USSR,
                     weaponSystemID: WeaponSystems.ASF_SU27,
                     95,
-                    landHardAttack: 4,
-                    landHardDefense: 4,
-                    landSoftAttack: 8,
-                    landSoftDefense: 5,
-                    landAirAttack: 3,
-                    landAirDefense: 7,
-                    airAttack: 23,
+                    landAirDefense: 10,
+                    airAttack: 18,
                     airDefense: 16,
-                    airAvionics: 20,
-                    airStrategicAttack: 0,
-                    airGroundAttack: 10,
-                    airGroundDefense: 12,
+                    airAvionics: 14,
                     primaryRange: 1f,
                     indirectRange: 0f,
-                    spottingRange: 7f,
-                    movementModifier: 1.25f,
+                    spottingRange: 5f,
+                    movementModifier: 1,
                     allWeatherCapability: AllWeatherRating.AllWeather,
                     sigintRating: SIGINT_Rating.UnitLevel,
                     nbcRating: NBC_Rating.Gen2,
-                    strategicMobility: StrategicMobility.AirMobile,
-                    nvgCapability: NVG_Rating.Gen2,
+                    strategicMobility: StrategicMobility.Aircraft,
+                    nvgCapability: NVG_Rating.Gen1,
                     silhouette: UnitSilhouette.Medium
                 );
 
@@ -2827,29 +2843,21 @@ namespace HammerAndSickle.Models
                     name: "Su-47 Berkut Experimental Fighter",
                     nationality: Nationality.USSR,
                     weaponSystemID: WeaponSystems.ASF_SU47,
-                    200,
-                    landHardAttack: 5,
-                    landHardDefense: 5,
-                    landSoftAttack: 10,
-                    landSoftDefense: 6,
-                    landAirAttack: 4,
-                    landAirDefense: 8,
-                    airAttack: 25,
-                    airDefense: 20,
-                    airAvionics: 25,
-                    airStrategicAttack: 0,
-                    airGroundAttack: 15,
-                    airGroundDefense: 15,
+                    120,
+                    landAirDefense: 12,
+                    airAttack: 23,
+                    airDefense: 19,
+                    airAvionics: 16,
                     primaryRange: 1f,
                     indirectRange: 0f,
-                    spottingRange: 8f,
-                    movementModifier: 1.5f,
+                    spottingRange: 6f,
+                    movementModifier: 1f,
                     allWeatherCapability: AllWeatherRating.AllWeather,
                     sigintRating: SIGINT_Rating.SpecializedLevel,
                     nbcRating: NBC_Rating.Gen2,
-                    strategicMobility: StrategicMobility.AirMobile,
-                    nvgCapability: NVG_Rating.Gen3,
-                    silhouette: UnitSilhouette.Small
+                    strategicMobility: StrategicMobility.Aircraft,
+                    nvgCapability: NVG_Rating.Gen2,
+                    silhouette: UnitSilhouette.Medium
                 );
 
                 // Set upgrade paths for modernization
@@ -2858,8 +2866,8 @@ namespace HammerAndSickle.Models
                 // Set short name for UI display
                 profile.SetShortName("Su-47");
 
-                // Set turn availability - first flight in 1997 (but prototype development began earlier)
-                profile.SetTurnAvailable(708);
+                // Set turn availability
+                profile.SetTurnAvailable(620);
 
                 // Store in master dictionary
                 _weaponSystemProfiles[WeaponSystems.ASF_SU47] = profile;
@@ -2883,26 +2891,21 @@ namespace HammerAndSickle.Models
                     nationality: Nationality.USSR,
                     weaponSystemID: WeaponSystems.MRF_MIG27,
                     55,
-                    landHardAttack: 6,
-                    landHardDefense: 3,
-                    landSoftAttack: 12,
-                    landSoftDefense: 4,
-                    landAirAttack: 2,
-                    landAirDefense: 4,
+                    landAirDefense: 10,
                     airAttack: 10,
                     airDefense: 8,
                     airAvionics: 10,
-                    airStrategicAttack: 0,
-                    airGroundAttack: 16,
-                    airGroundDefense: 6,
+                    airStrategicAttack: 8,
+                    airGroundAttack: 13,
+                    airGroundDefense: 9,
                     primaryRange: 1f,
                     indirectRange: 0f,
                     spottingRange: 4f,
                     movementModifier: 1f,
-                    allWeatherCapability: AllWeatherRating.Day,
+                    allWeatherCapability: AllWeatherRating.Night,
                     sigintRating: SIGINT_Rating.UnitLevel,
                     nbcRating: NBC_Rating.Gen1,
-                    strategicMobility: StrategicMobility.AirMobile,
+                    strategicMobility: StrategicMobility.Aircraft,
                     nvgCapability: NVG_Rating.Gen1,
                     silhouette: UnitSilhouette.Medium
                 );
@@ -2938,27 +2941,22 @@ namespace HammerAndSickle.Models
                     nationality: Nationality.USSR,
                     weaponSystemID: WeaponSystems.ATT_SU25,
                     60,
-                    landHardAttack: 8,
-                    landHardDefense: 6,
-                    landSoftAttack: 16,
-                    landSoftDefense: 8,
-                    landAirAttack: 2,
-                    landAirDefense: 4,
+                    landAirDefense: 9,
                     airAttack: 6,
-                    airDefense: 10,
-                    airAvionics: 8,
+                    airDefense: 7,
+                    airAvionics: 10,
                     airStrategicAttack: 0,
-                    airGroundAttack: 20,
-                    airGroundDefense: 12,
+                    airGroundAttack: 15,
+                    airGroundDefense: 13,
                     primaryRange: 1f,
                     indirectRange: 0f,
                     spottingRange: 3f,
-                    movementModifier: 0.75f,
-                    allWeatherCapability: AllWeatherRating.Day,
+                    movementModifier: 1f,
+                    allWeatherCapability: AllWeatherRating.Night,
                     sigintRating: SIGINT_Rating.UnitLevel,
                     nbcRating: NBC_Rating.Gen1,
                     strategicMobility: StrategicMobility.AirMobile,
-                    nvgCapability: NVG_Rating.None,
+                    nvgCapability: NVG_Rating.Gen1,
                     silhouette: UnitSilhouette.Medium
                 );
 
@@ -2992,28 +2990,23 @@ namespace HammerAndSickle.Models
                     name: "Su-25B Frogfoot-B Attack Aircraft",
                     nationality: Nationality.USSR,
                     weaponSystemID: WeaponSystems.ATT_SU25B,
-                    75,
-                    landHardAttack: 10,
-                    landHardDefense: 7,
-                    landSoftAttack: 18,
-                    landSoftDefense: 9,
-                    landAirAttack: 3,
-                    landAirDefense: 5,
-                    airAttack: 8,
-                    airDefense: 12,
-                    airAvionics: 12,
+                    80,
+                    landAirDefense: 11,
+                    airAttack: 6,
+                    airDefense: 8,
+                    airAvionics: 14,
                     airStrategicAttack: 0,
-                    airGroundAttack: 22,
-                    airGroundDefense: 14,
+                    airGroundAttack: 18,
+                    airGroundDefense: 16,
                     primaryRange: 1f,
                     indirectRange: 0f,
-                    spottingRange: 4f,
-                    movementModifier: 0.75f,
-                    allWeatherCapability: AllWeatherRating.Night,
+                    spottingRange: 5f,
+                    movementModifier: 1f,
+                    allWeatherCapability: AllWeatherRating.AllWeather,
                     sigintRating: SIGINT_Rating.UnitLevel,
                     nbcRating: NBC_Rating.Gen2,
-                    strategicMobility: StrategicMobility.AirMobile,
-                    nvgCapability: NVG_Rating.Gen1,
+                    strategicMobility: StrategicMobility.Aircraft,
+                    nvgCapability: NVG_Rating.Gen2,
                     silhouette: UnitSilhouette.Medium
                 );
 
@@ -3048,26 +3041,21 @@ namespace HammerAndSickle.Models
                     nationality: Nationality.USSR,
                     weaponSystemID: WeaponSystems.BMB_SU24,
                     80,
-                    landHardAttack: 8,
-                    landHardDefense: 4,
-                    landSoftAttack: 18,
-                    landSoftDefense: 6,
-                    landAirAttack: 2,
-                    landAirDefense: 4,
+                    landAirDefense: 11,
                     airAttack: 6,
                     airDefense: 8,
-                    airAvionics: 15,
-                    airStrategicAttack: 20,
-                    airGroundAttack: 22,
-                    airGroundDefense: 8,
+                    airAvionics: 12,
+                    airStrategicAttack: 18,
+                    airGroundAttack: 14,
+                    airGroundDefense: 10,
                     primaryRange: 1f,
                     indirectRange: 0f,
-                    spottingRange: 5f,
-                    movementModifier: 1.25f,
+                    spottingRange: 4f,
+                    movementModifier: 1f,
                     allWeatherCapability: AllWeatherRating.AllWeather,
                     sigintRating: SIGINT_Rating.UnitLevel,
                     nbcRating: NBC_Rating.Gen1,
-                    strategicMobility: StrategicMobility.AirMobile,
+                    strategicMobility: StrategicMobility.Aircraft,
                     nvgCapability: NVG_Rating.Gen1,
                     silhouette: UnitSilhouette.Medium
                 );
@@ -3103,17 +3091,12 @@ namespace HammerAndSickle.Models
                     nationality: Nationality.USSR,
                     weaponSystemID: WeaponSystems.BMB_TU16,
                     70,
-                    landHardAttack: 6,
-                    landHardDefense: 3,
-                    landSoftAttack: 16,
-                    landSoftDefense: 5,
-                    landAirAttack: 1,
-                    landAirDefense: 3,
-                    airAttack: 4,
+                    landAirDefense: 4,
+                    airAttack: 3,
                     airDefense: 6,
                     airAvionics: 6,
                     airStrategicAttack: 18,
-                    airGroundAttack: 20,
+                    airGroundAttack: 12,
                     airGroundDefense: 6,
                     primaryRange: 1f,
                     indirectRange: 0f,
@@ -3122,7 +3105,7 @@ namespace HammerAndSickle.Models
                     allWeatherCapability: AllWeatherRating.Day,
                     sigintRating: SIGINT_Rating.UnitLevel,
                     nbcRating: NBC_Rating.None,
-                    strategicMobility: StrategicMobility.AirMobile,
+                    strategicMobility: StrategicMobility.Aircraft,
                     nvgCapability: NVG_Rating.None,
                     silhouette: UnitSilhouette.Large
                 );
@@ -3158,26 +3141,21 @@ namespace HammerAndSickle.Models
                     nationality: Nationality.USSR,
                     weaponSystemID: WeaponSystems.BMB_TU22,
                     90,
-                    landHardAttack: 8,
-                    landHardDefense: 4,
-                    landSoftAttack: 18,
-                    landSoftDefense: 6,
-                    landAirAttack: 2,
-                    landAirDefense: 4,
-                    airAttack: 6,
-                    airDefense: 8,
+                    landAirDefense: 12,
+                    airAttack: 3,
+                    airDefense: 10,
                     airAvionics: 10,
-                    airStrategicAttack: 22,
-                    airGroundAttack: 20,
-                    airGroundDefense: 8,
+                    airStrategicAttack: 18,
+                    airGroundAttack: 14,
+                    airGroundDefense: 11,
                     primaryRange: 1f,
                     indirectRange: 0f,
-                    spottingRange: 5f,
-                    movementModifier: 1.5f,
+                    spottingRange: 4f,
+                    movementModifier: 1f,
                     allWeatherCapability: AllWeatherRating.Night,
                     sigintRating: SIGINT_Rating.UnitLevel,
                     nbcRating: NBC_Rating.Gen1,
-                    strategicMobility: StrategicMobility.AirMobile,
+                    strategicMobility: StrategicMobility.Aircraft,
                     nvgCapability: NVG_Rating.None,
                     silhouette: UnitSilhouette.Large
                 );
@@ -3212,23 +3190,18 @@ namespace HammerAndSickle.Models
                     name: "Tu-22M3 Backfire-C Strategic Bomber",
                     nationality: Nationality.USSR,
                     weaponSystemID: WeaponSystems.BMB_TU22M3,
-                    120,
-                    landHardAttack: 10,
-                    landHardDefense: 6,
-                    landSoftAttack: 22,
-                    landSoftDefense: 8,
-                    landAirAttack: 3,
-                    landAirDefense: 6,
-                    airAttack: 8,
-                    airDefense: 12,
+                    130,
+                    landAirDefense: 16,
+                    airAttack: 3,
+                    airDefense: 14,
                     airAvionics: 18,
-                    airStrategicAttack: 25,
-                    airGroundAttack: 24,
-                    airGroundDefense: 12,
+                    airStrategicAttack: 19,
+                    airGroundAttack: 15,
+                    airGroundDefense: 14,
                     primaryRange: 1f,
                     indirectRange: 0f,
-                    spottingRange: 6f,
-                    movementModifier: 1.5f,
+                    spottingRange: 5f,
+                    movementModifier: 1.25f,
                     allWeatherCapability: AllWeatherRating.AllWeather,
                     sigintRating: SIGINT_Rating.SpecializedLevel,
                     nbcRating: NBC_Rating.Gen2,
@@ -3267,29 +3240,21 @@ namespace HammerAndSickle.Models
                     name: "MiG-25R Foxbat-B Reconnaissance Aircraft",
                     nationality: Nationality.USSR,
                     weaponSystemID: WeaponSystems.RCNA_MIG25R,
-                    75,
-                    landHardAttack: 0,
-                    landHardDefense: 2,
-                    landSoftAttack: 0,
-                    landSoftDefense: 3,
-                    landAirAttack: 1,
-                    landAirDefense: 4,
+                    80,
+                    landAirDefense: 20,
                     airAttack: 8,
                     airDefense: 15,
-                    airAvionics: 20,
-                    airStrategicAttack: 0,
-                    airGroundAttack: 0,
-                    airGroundDefense: 12,
+                    airAvionics: 14,
                     primaryRange: 1f,
                     indirectRange: 0f,
-                    spottingRange: 12f,
-                    movementModifier: 1.75f,
+                    spottingRange: 8f,
+                    movementModifier: 1.55f,
                     allWeatherCapability: AllWeatherRating.AllWeather,
                     sigintRating: SIGINT_Rating.SpecializedLevel,
                     nbcRating: NBC_Rating.Gen1,
-                    strategicMobility: StrategicMobility.AirMobile,
-                    nvgCapability: NVG_Rating.Gen2,
-                    silhouette: UnitSilhouette.Small
+                    strategicMobility: StrategicMobility.Aircraft,
+                    nvgCapability: NVG_Rating.None,
+                    silhouette: UnitSilhouette.Medium
                 );
 
                 // Set upgrade paths for modernization
@@ -3298,8 +3263,8 @@ namespace HammerAndSickle.Models
                 // Set short name for UI display
                 profile.SetShortName("MiG-25R");
 
-                // Set turn availability - entered service in 1970
-                profile.SetTurnAvailable(384);
+                // Set turn availability 
+                profile.SetTurnAvailable(440);
 
                 // Store in master dictionary
                 _weaponSystemProfiles[WeaponSystems.RCNA_MIG25R] = profile;
