@@ -625,6 +625,7 @@ namespace HammerAndSickle.Models
         IFV_BMP1,
         IFV_BMP2,
         IFV_BMP3,
+        IFV_BMD1,
         IFV_BMD2,
         IFV_BMD3,
         RCN_BRDM2,

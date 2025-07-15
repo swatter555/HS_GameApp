@@ -207,6 +207,7 @@ namespace HammerAndSickle.Models
                 CreateIfvBmp1Profile();
                 CreateIfvBmp2Profile();
                 CreateIfvBmp3Profile();
+                CreateIfvBmd1Profile();
                 CreateIfvBmd2Profile();
                 CreateIfvBmd3Profile();
                 CreateRcnBrdm2Profile();
@@ -269,6 +270,9 @@ namespace HammerAndSickle.Models
                 // Set short name for UI display
                 profile.SetShortName("T-55A");
 
+                // Set turn availability in months.
+                profile.SetTurnAvailable(300);
+
                 // Store in master dictionary
                 _weaponSystemProfiles[WeaponSystems.TANK_T55A] = profile;
             }
@@ -315,6 +319,9 @@ namespace HammerAndSickle.Models
                 // Set short name for UI display
                 profile.SetShortName("T-64A");
 
+                // Set turn availability in months.
+                profile.SetTurnAvailable(348);
+
                 // Store in master dictionary
                 _weaponSystemProfiles[WeaponSystems.TANK_T64A] = profile;
             }
@@ -360,6 +367,9 @@ namespace HammerAndSickle.Models
 
                 // Set short name for UI display
                 profile.SetShortName("T-64B");
+
+                // Set turn availability in months.
+                profile.SetTurnAvailable(564);
 
                 // Store in master dictionary
                 _weaponSystemProfiles[WeaponSystems.TANK_T64B] = profile;
@@ -410,6 +420,9 @@ namespace HammerAndSickle.Models
                 // Set short name for UI display
                 profile.SetShortName("T-72A");
 
+                // Set turn availability in months.
+                profile.SetTurnAvailable(492);
+
                 // Store in master dictionary
                 _weaponSystemProfiles[WeaponSystems.TANK_T72A] = profile;
             }
@@ -459,6 +472,9 @@ namespace HammerAndSickle.Models
                 // Set short name for UI display
                 profile.SetShortName("T-72B");
 
+                // Set turn availability in months.
+                profile.SetTurnAvailable(552);
+
                 _weaponSystemProfiles[WeaponSystems.TANK_T72B] = profile;
             }
             catch (Exception e)
@@ -504,6 +520,9 @@ namespace HammerAndSickle.Models
 
                 // Set short name for UI display
                 profile.SetShortName("T-80B");
+
+                // Set turn availability in months.
+                profile.SetTurnAvailable(480);
 
                 // Store in master dictionary
                 _weaponSystemProfiles[WeaponSystems.TANK_T80B] = profile;
@@ -551,6 +570,9 @@ namespace HammerAndSickle.Models
                 // Set short name for UI display
                 profile.SetShortName("T-80U");
 
+                // Set turn availability in months.
+                profile.SetTurnAvailable(564);
+
                 // Store in master dictionary
                 _weaponSystemProfiles[WeaponSystems.TANK_T80U] = profile;
             }
@@ -596,6 +618,9 @@ namespace HammerAndSickle.Models
 
                 // Set short name for UI display
                 profile.SetShortName("T-80BV");
+
+                // Set turn availability in months.
+                profile.SetTurnAvailable(615);
 
                 // Store in master dictionary
                 _weaponSystemProfiles[WeaponSystems.TANK_T80BV] = profile;
@@ -645,6 +670,9 @@ namespace HammerAndSickle.Models
                 // Set short name for UI display
                 profile.SetShortName("Infantry");
 
+                // Set turn availability in months.
+                profile.SetTurnAvailable(300);
+
                 // Store in master dictionary
                 _weaponSystemProfiles[WeaponSystems.REG_INF_SV] = profile;
             }
@@ -687,6 +715,9 @@ namespace HammerAndSickle.Models
 
                 // Set short name for UI display
                 profile.SetShortName("Airborne");
+
+                // Set turn availability in months.
+                profile.SetTurnAvailable(300);
 
                 // Store in master dictionary
                 _weaponSystemProfiles[WeaponSystems.AB_INF_SV] = profile;
@@ -731,6 +762,9 @@ namespace HammerAndSickle.Models
                 // Set short name for UI display
                 profile.SetShortName("Air-Mobile");
 
+                // Set turn availability in months.
+                profile.SetTurnAvailable(476);
+
                 // Store in master dictionary
                 _weaponSystemProfiles[WeaponSystems.AM_INF_SV] = profile;
             }
@@ -773,6 +807,9 @@ namespace HammerAndSickle.Models
 
                 // Set short name for UI display
                 profile.SetShortName("Marines");
+
+                // Set turn availability in months.
+                profile.SetTurnAvailable(300);
 
                 // Store in master dictionary
                 _weaponSystemProfiles[WeaponSystems.MAR_INF_SV] = profile;
@@ -817,6 +854,9 @@ namespace HammerAndSickle.Models
                 // Set short name for UI display
                 profile.SetShortName("Spetsnaz");
 
+                // Set turn availability in months.
+                profile.SetTurnAvailable(300);
+
                 // Store in master dictionary
                 _weaponSystemProfiles[WeaponSystems.SPEC_INF_SV] = profile;
             }
@@ -859,6 +899,9 @@ namespace HammerAndSickle.Models
 
                 // Set short name for UI display
                 profile.SetShortName("Engineers");
+
+                // Set turn availability in months.
+                profile.SetTurnAvailable(300);
 
                 // Store in master dictionary
                 _weaponSystemProfiles[WeaponSystems.ENG_INF_SV] = profile;
@@ -912,6 +955,9 @@ namespace HammerAndSickle.Models
                 // Set short name for UI display
                 profile.SetShortName("MT-LB");
 
+                // Set turn availability in months.
+                profile.SetTurnAvailable(384);
+
                 // Store in master dictionary
                 _weaponSystemProfiles[WeaponSystems.APC_MTLB] = profile;
             }
@@ -958,6 +1004,9 @@ namespace HammerAndSickle.Models
                 // Set short name for UI display
                 profile.SetShortName("BTR-70");
 
+                // Set turn availability in months.
+                profile.SetTurnAvailable(408);
+
                 // Store in master dictionary
                 _weaponSystemProfiles[WeaponSystems.APC_BTR70] = profile;
             }
@@ -1003,6 +1052,9 @@ namespace HammerAndSickle.Models
 
                 // Set short name for UI display
                 profile.SetShortName("BTR-80");
+
+                // Set turn availability in months.
+                profile.SetTurnAvailable(576);
 
                 // Store in master dictionary
                 _weaponSystemProfiles[WeaponSystems.APC_BTR80] = profile;
@@ -1055,6 +1107,9 @@ namespace HammerAndSickle.Models
                 // Set short name for UI display
                 profile.SetShortName("BMP-1");
 
+                // Set turn availability in months.
+                profile.SetTurnAvailable(336);
+
                 // Store in master dictionary
                 _weaponSystemProfiles[WeaponSystems.IFV_BMP1] = profile;
             }
@@ -1100,6 +1155,9 @@ namespace HammerAndSickle.Models
 
                 // Set short name for UI display
                 profile.SetShortName("BMP-2");
+
+                // Set turn availability in months.
+                profile.SetTurnAvailable(504);
 
                 // Store in master dictionary
                 _weaponSystemProfiles[WeaponSystems.IFV_BMP2] = profile;
@@ -1147,12 +1205,64 @@ namespace HammerAndSickle.Models
                 // Set short name for UI display
                 profile.SetShortName("BMP-3");
 
+                // Set turn availability in months.
+                profile.SetTurnAvailable(600);
+
                 // Store in master dictionary
                 _weaponSystemProfiles[WeaponSystems.IFV_BMP3] = profile;
             }
             catch (Exception e)
             {
                 AppService.HandleException(CLASS_NAME, nameof(CreateIfvBmp3Profile), e);
+                throw;
+            }
+        }
+
+        private static void CreateIfvBmd1Profile()
+        {
+            try
+            {
+                var profile = new WeaponSystemProfile(
+                    name: "BMD‑1 Airborne Infantry Fighting Vehicle",
+                    nationality: Nationality.USSR,
+                    weaponSystemID: WeaponSystems.IFV_BMD1,
+                    25,
+                    landHardAttack: 5,
+                    landHardDefense: 4,
+                    landSoftAttack: 7,
+                    landSoftDefense: 7,
+                    landAirAttack: 2,
+                    landAirDefense: 3,
+                    primaryRange: 1f,
+                    indirectRange: 0f,
+                    spottingRange: 2f,
+                    movementModifier: 1f,
+                    allWeatherCapability: AllWeatherRating.Day,
+                    nvgCapability: NVG_Rating.Gen1,
+                    silhouette: UnitSilhouette.Small,
+                    sigintRating: SIGINT_Rating.UnitLevel,
+                    nbcRating: NBC_Rating.Gen1,
+                    strategicMobility: StrategicMobility.AirDrop
+                );
+
+                // Set upgrade paths
+                profile.AddUpgradeType(UpgradeType.IFV);
+
+                // Set amphibious capability
+                profile.SetAmphibiousCapability(true);
+
+                // Set short name for UI display
+                profile.SetShortName("BMD-1");
+
+                // Set turn availability in months.
+                profile.SetTurnAvailable(372);
+
+                // Store in master dictionary
+                _weaponSystemProfiles[WeaponSystems.IFV_BMD1] = profile;
+            }
+            catch (Exception e)
+            {
+                AppService.HandleException(CLASS_NAME, nameof(CreateIfvBmd1Profile), e);
                 throw;
             }
         }
@@ -1192,6 +1302,9 @@ namespace HammerAndSickle.Models
 
                 // Set short name for UI display
                 profile.SetShortName("BMD-2");
+
+                // Set turn availability in months.
+                profile.SetTurnAvailable(564);
 
                 // Store in master dictionary
                 _weaponSystemProfiles[WeaponSystems.IFV_BMD2] = profile;
@@ -1238,6 +1351,9 @@ namespace HammerAndSickle.Models
 
                 // Set short name for UI display
                 profile.SetShortName("BMD-3");
+
+                // Set turn availability in months.
+                profile.SetTurnAvailable(600);
 
                 // Store in master dictionary
                 _weaponSystemProfiles[WeaponSystems.IFV_BMD3] = profile;
@@ -1290,6 +1406,9 @@ namespace HammerAndSickle.Models
                 // Set short name for UI display
                 profile.SetShortName("BRDM-2");
 
+                // Set turn availability in months.
+                profile.SetTurnAvailable(288);
+
                 // Store in master dictionary
                 _weaponSystemProfiles[WeaponSystems.RCN_BRDM2] = profile;
             }
@@ -1335,6 +1454,9 @@ namespace HammerAndSickle.Models
 
                 // Set short name for UI display
                 profile.SetShortName("BRDM-2 AT");
+
+                // Set turn availability in months.
+                profile.SetTurnAvailable(432);
 
                 // Store in master dictionary
                 _weaponSystemProfiles[WeaponSystems.RCN_BRDM2AT] = profile;
@@ -1387,6 +1509,9 @@ namespace HammerAndSickle.Models
                 // Set short name for UI display
                 profile.SetShortName("2S1 Gvozdika");
 
+                // Set turn availability in months.
+                profile.SetTurnAvailable(408);
+
                 // Store in master dictionary
                 _weaponSystemProfiles[WeaponSystems.SPA_2S1] = profile;
             }
@@ -1432,6 +1557,9 @@ namespace HammerAndSickle.Models
 
                 // Set short name for UI display
                 profile.SetShortName("2S3 Akatsiya");
+
+                // Set turn availability in months.
+                profile.SetTurnAvailable(420);
 
                 // Store in master dictionary
                 _weaponSystemProfiles[WeaponSystems.SPA_2S3] = profile;
@@ -1479,6 +1607,9 @@ namespace HammerAndSickle.Models
                 // Set short name for UI display
                 profile.SetShortName("2S5 Giatsint-S");
 
+                // Set turn availability in months.
+                profile.SetTurnAvailable(516);
+
                 // Store in master dictionary
                 _weaponSystemProfiles[WeaponSystems.SPA_2S5] = profile;
             }
@@ -1524,6 +1655,9 @@ namespace HammerAndSickle.Models
 
                 // Set short name for UI display
                 profile.SetShortName("2S19 Msta-S");
+
+                // Set turn availability in months.
+                profile.SetTurnAvailable(600);
 
                 // Store in master dictionary
                 _weaponSystemProfiles[WeaponSystems.SPA_2S19] = profile;
@@ -1574,6 +1708,9 @@ namespace HammerAndSickle.Models
                 // Set short name for UI display
                 profile.SetShortName("BM-21 Grad");
 
+                // Set turn availability in months.
+                profile.SetTurnAvailable(300);
+
                 // Store in master dictionary
                 _weaponSystemProfiles[WeaponSystems.ROC_BM21] = profile;
             }
@@ -1622,6 +1759,9 @@ namespace HammerAndSickle.Models
 
                 // Set short name for UI display
                 profile.SetShortName("BM-27 Uragan");
+
+                // Set turn availability in months.
+                profile.SetTurnAvailable(444);
 
                 // Store in master dictionary
                 _weaponSystemProfiles[WeaponSystems.ROC_BM27] = profile;
@@ -1672,6 +1812,9 @@ namespace HammerAndSickle.Models
                 // Set short name for UI display
                 profile.SetShortName("BM-30 Smerch");
 
+                // Set turn availability in months.
+                profile.SetTurnAvailable(588);
+
                 // Store in master dictionary
                 _weaponSystemProfiles[WeaponSystems.ROC_BM30] = profile;
             }
@@ -1721,6 +1864,9 @@ namespace HammerAndSickle.Models
                 // Set short name for UI display
                 profile.SetShortName("9K72 Scud-B");
 
+                // Set turn availability in months.
+                profile.SetTurnAvailable(288);
+
                 // Store in master dictionary
                 _weaponSystemProfiles[WeaponSystems.SSM_SCUD] = profile;
             }
@@ -1733,5 +1879,11 @@ namespace HammerAndSickle.Models
 
         #endregion // Soviet Artillery & Rockets
 
+
+        #region Soviet Air Defense
+
+
+
+        #endregion // Soviet Air Defense
     }
 }
