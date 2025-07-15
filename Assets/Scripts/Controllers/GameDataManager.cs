@@ -5,8 +5,9 @@ using System.Linq;
 using System.Runtime.Serialization;
 using System.Runtime.Serialization.Formatters.Binary;
 using HammerAndSickle.Services;
+using HammerAndSickle.Models;
 
-namespace HammerAndSickle.Models
+namespace HammerAndSickle.Controllers
 {
     /// <summary>
     /// Defines methods for managing and resolving references within a data structure.

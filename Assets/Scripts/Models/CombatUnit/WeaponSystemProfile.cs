@@ -6,26 +6,32 @@ using UnityEngine;
 namespace HammerAndSickle.Models
 {
 /*───────────────────────────────────────────────────────────────────────────────
-  WeaponSystemProfile ─ immutable "stat card" for any vehicle/aircraft/artillery
+  WeaponSystemProfile ─ immutable "stat card" for any vehicle / aircraft / gun
 ───────────────────────────────────────────────────────────────────────────────
  Summary
  ═══════
- • Contains every combat‑relevant attribute for a single **WeaponSystems** enum
-   value: paired attack/defence ratings, ranges, mobility, sensors, protection,
-   and special capabilities.
- • A profile is **created once** at data‑load and referenced by many
-   **CombatUnit** instances, massively reducing per‑unit memory.
- • All values are validated in the constructor and in every mutator to guarantee
-   the profile can never exist in an invalid state.
+ • Encapsulates **all** combat‑relevant characteristics for one
+   **WeaponSystems** enum value: paired attack/defence ratings, single‑value air
+   ratings, ranges, mobility modifiers, sensor suites and special capability
+   flags.
+ • A **profile** is created once during data‑load and referenced by potentially
+   hundreds of **CombatUnit** instances, massively reducing per‑unit memory
+   footprint.
+ • All public mutators validate their input and route failures through
+   `AppService.HandleException` to guarantee the object can never persist in an
+   invalid state.
 
  Public properties
  ═════════════════
    string              Name                 { get; private set; }
+   string              ShortName            { get; private set; }   // UI‑friendly label
    WeaponSystems       WeaponSystemID       { get; private set; }
    Nationality         Nationality          { get; private set; }
    List<UpgradeType>   UpgradeTypes         { get; private set; }
+   int                 TurnAvailable        { get; private set; }   // Campaign tech‑date
    int                 PrestigeCost         { get; private set; }
    bool                IsAmphibious         { get; private set; }
+   bool                IsDoubleFire         { get; private set; }   // 2× attack/turn flag
 
    // Paired combat ratings
    CombatRating        LandHard             { get; private set; }
@@ -34,17 +40,17 @@ namespace HammerAndSickle.Models
    CombatRating        Air                  { get; private set; }
    CombatRating        AirGround            { get; private set; }
 
-   // Single‑value air ratings
+   // Single‑value aerial ratings
    int                 AirAvionics          { get; private set; }
    int                 AirStrategicAttack  { get; private set; }
 
-   // Range & movement
+   // Ranges & mobility
    float               PrimaryRange         { get; private set; }
    float               IndirectRange        { get; private set; }
    float               SpottingRange        { get; private set; }
    float               MovementModifier     { get; private set; }
 
-   // Capability flags / ratings
+   // Capability enums / flags
    AllWeatherRating    AllWeatherCapability { get; private set; }
    SIGINT_Rating       SIGINT_Rating        { get; private set; }
    NBC_Rating          NBC_Rating           { get; private set; }
@@ -58,10 +64,10 @@ namespace HammerAndSickle.Models
                               Nationality nationality,
                               WeaponSystems weaponSystemID,
                               int prestigeCost = 0,
-                              int landHardAttack = 0, int landHardDefense = 0,
-                              int landSoftAttack = 0, int landSoftDefense = 0,
-                              int landAirAttack = 0, int landAirDefense = 0,
-                              int airAttack = 0, int airDefense = 0,
+                              int landHardAttack = 0,  int landHardDefense = 0,
+                              int landSoftAttack = 0,  int landSoftDefense = 0,
+                              int landAirAttack  = 0,  int landAirDefense  = 0,
+                              int airAttack      = 0,  int airDefense      = 0,
                               int airAvionics = 0,
                               int airGroundAttack = 0, int airGroundDefense = 0,
                               int airStrategicAttack = 0,
@@ -77,12 +83,12 @@ namespace HammerAndSickle.Models
    public WeaponSystemProfile(string name,
                               Nationality nationality,
                               WeaponSystems weaponSystemID,
-                              int prestigeCost = 0)   // delegates to main ctor
+                              int prestigeCost = 0)            // delegates to main ctor
 
- Public API (method signatures ⇢ purpose)
+ Public API (method signatures ⇢ purpose)
  ═════════════════════════════════════════════
  ― Combat‑rating accessors ―
-   int  GetLandHardAttack()            // read A vs hard land
+   int  GetLandHardAttack()            // read Vs hard land
    int  GetLandHardDefense()
    void SetLandHardAttack(int v)       // validate & set
    void SetLandHardDefense(int v)
@@ -108,11 +114,11 @@ namespace HammerAndSickle.Models
    void SetAirGroundDefense(int v)
 
  ― Upgrade management ―
-   bool                     AddUpgradeType(UpgradeType t)   // append if unique & ≠ None
-   bool                     RemoveUpgradeType(UpgradeType t)
-   bool                     HasUpgradeType(UpgradeType t)
+   bool                      AddUpgradeType(UpgradeType t)      // append if unique & ≠ None
+   bool                      RemoveUpgradeType(UpgradeType t)
+   bool                      HasUpgradeType(UpgradeType t)
    IReadOnlyList<UpgradeType> GetUpgradeTypes()
-   void                     ClearUpgradeTypes()
+   void                      ClearUpgradeTypes()
 
  ― Range & mobility setters ―
    void SetPrimaryRange(float r)
@@ -122,33 +128,40 @@ namespace HammerAndSickle.Models
 
  ― Prestige / capability setters ―
    void SetPrestigeCost(int cost)
-   void SetAmphibiousCapability(bool val)      // NEW – toggle IsAmphibious
+   void SetAmphibiousCapability(bool val)      // toggle IsAmphibious
+   void SetDoubleFireCapability(bool val)      // toggle IsDoubleFire
+   void SetShortName(string shortName)         // UI label (1‑6 chars recommended)
+   void SetTurnAvailable(int turn)             // campaign availability tweak
 
- ― Aggregate metric ―
-   int  GetTotalCombatValue()                  // "power score" used by AI
+ ― Aggregate metrics ―
+   int  GetTotalCombatValue()                  // quick “power score” for AI ranking
 
  Private helpers
  ═══════════════
    int   ValidateCombatValue(int v)            // clamp to CUConstants
    float ValidateRange(float v)                // clamp to CUConstants
-   int   ValidatePrestigeCost(int c)           // economic sanity
+   int   ValidatePrestigeCost(int c)           // economy sanity guard
 
  Developer notes
  ═══════════════
- • **IsAmphibious** is a simple bool flag indicating innate river / littoral
-   crossing capability. Doctrine or leader bonuses that grant the ability at
-   runtime should modify the owning **CombatUnit**, *not* this template.
- • **StrategicMobility** enum was extended – values now range
-   *UltraLight / Light / Medium / Heavy / UltraHeavy*; ensure DB builders use
-   the correct tier to enable the new strategic redeployment cost model.
- • UpgradeTypes list is **not** thread‑safe; wrap modifications in a *lock*
-   when accessed from async AI threads.
- • All mutators catch & funnel exceptions through
-   `AppService.HandleException(CLASS_NAME, Method, e)` before re‑throwing when
-   state corruption is possible.
- • CUConstants defines global min/max bounds for combat ratings & ranges – keep
-   those tuned to maintain campaign balance.
-──────────────────────────────────────────────────────────────────────────────*/
+ • **ShortName** is intended for HUD counters and map labels; keep ≤ 8 chars to
+   avoid UI overflow.
+ • **TurnAvailable** represents the first campaign turn the weapon system may be
+   purchased; scenario scripts can override for early prototypes or lend‑lease.
+ • **IsDoubleFire** marks systems with an innate second attack per combat round
+   (e.g. dual‑launcher SAMs). CombatUnit decides whether the bonus is consumed;
+   the profile merely flags eligibility.
+ • **StrategicMobility** enum now includes *UltraLight* and *UltraHeavy* tiers –
+   ensure DB builders assign the correct tier to power the redeployment cost
+   algorithm.
+ • UpgradeTypes list is **not** thread‑safe; wrap mutations in a *lock* when
+   accessed from async AI threads.
+ • All mutators funnel exceptions through `AppService.HandleException(CLASS_NAME,
+   method, e)` before re‑throwing when state corruption is possible.
+ • CUConstants.M* constants define the global min/max bounds for combat values,
+   ranges and movement modifiers – tweak those for balance, not individual
+   validation logic.
+────────────────────────────────────────────────────────────────────────────*/
     public class WeaponSystemProfile
     {
         #region Constants
@@ -160,11 +173,13 @@ namespace HammerAndSickle.Models
 
         #region Properties
 
-        public string Name { get; private set; }               // Full descriptive name
-        public string ShortName { get; private set; }          // Abbreviated name for smaller fields
+        public string Name { get; private set; }                // Full descriptive name
+        public string ShortName { get; private set; }           // Abbreviated name for smaller fields
         public WeaponSystems WeaponSystemID { get; private set; }
         public Nationality Nationality { get; private set; }
         public List<UpgradeType> UpgradeTypes { get; private set; }
+        public int TurnAvailable { get; private set; }          // The campaign turn this is available.
+        
         public int PrestigeCost { get; private set; }           // Prestige cost for purchasing this unit type
         public bool IsAmphibious { get; private set; }          // Whether this unit can cross rivers easily
         public bool IsDoubleFire { get; private set; }          // Whether this unit can fire twice per round
@@ -265,6 +280,7 @@ namespace HammerAndSickle.Models
                 PrestigeCost = ValidatePrestigeCost(prestigeCost);
                 IsAmphibious = false;
                 IsDoubleFire = false;
+                TurnAvailable = 1; // Default to turn 1; can be modified later
 
                 // Create CombatRating objects with validation
                 LandHard = new CombatRating(landHardAttack, landHardDefense);
@@ -312,6 +328,7 @@ namespace HammerAndSickle.Models
             ShortName = "Default";
             IsAmphibious = false;
             IsDoubleFire = false;
+            TurnAvailable = 1; // Default to turn 1; can be modified later
         }
 
         #endregion // Constructors
@@ -359,6 +376,14 @@ namespace HammerAndSickle.Models
             if (string.IsNullOrEmpty(shortName))
                 throw new ArgumentException("Short name cannot be null or empty", nameof(shortName));
             ShortName = shortName;
+        }
+
+        // Turn available accessor/mutator
+        public void SetTurnAvailable(int turn)
+        {
+            if (turn < 1)
+                throw new ArgumentOutOfRangeException(nameof(turn), "Turn available must be >= 1");
+            TurnAvailable = turn;
         }
 
         #endregion // Accessors
