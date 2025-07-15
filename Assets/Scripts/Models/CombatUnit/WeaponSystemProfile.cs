@@ -160,12 +160,14 @@ namespace HammerAndSickle.Models
 
         #region Properties
 
-        public string Name { get; private set; }
+        public string Name { get; private set; }               // Full descriptive name
+        public string ShortName { get; private set; }          // Abbreviated name for smaller fields
         public WeaponSystems WeaponSystemID { get; private set; }
         public Nationality Nationality { get; private set; }
         public List<UpgradeType> UpgradeTypes { get; private set; }
         public int PrestigeCost { get; private set; }           // Prestige cost for purchasing this unit type
         public bool IsAmphibious { get; private set; }          // Whether this unit can cross rivers easily
+        public bool IsDoubleFire { get; private set; }          // Whether this unit can fire twice per round
 
         // Combat ratings using CombatRating objects for paired values
         public CombatRating LandHard { get; private set; }      // Hard attack/defense vs land targets
@@ -256,11 +258,13 @@ namespace HammerAndSickle.Models
 
                 // Set basic properties
                 Name = name;
+                ShortName = "Default";
                 Nationality = nationality;
                 WeaponSystemID = weaponSystemID;
                 UpgradeTypes = new List<UpgradeType>();
                 PrestigeCost = ValidatePrestigeCost(prestigeCost);
                 IsAmphibious = false;
+                IsDoubleFire = false;
 
                 // Create CombatRating objects with validation
                 LandHard = new CombatRating(landHardAttack, landHardDefense);
@@ -303,12 +307,17 @@ namespace HammerAndSickle.Models
         /// <param name="weaponSystemID">Primary weapon system type identifier</param>
         /// <param name="prestigeCost">Campaign prestige cost to purchase this unit type</param>
         public WeaponSystemProfile(string name, Nationality nationality, WeaponSystems weaponSystemID, int prestigeCost = 0)
-            : this(name, nationality, weaponSystemID, prestigeCost, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0) { IsAmphibious = false; }
+            : this(name, nationality, weaponSystemID, prestigeCost, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0) 
+        { 
+            ShortName = "Default";
+            IsAmphibious = false;
+            IsDoubleFire = false;
+        }
 
         #endregion // Constructors
 
 
-        #region Combat Value Accessors
+        #region Accessors
 
         // LandHard properties.
         public int GetLandHardAttack() => LandHard.Attack;
@@ -342,8 +351,17 @@ namespace HammerAndSickle.Models
 
         // Single-value combat ratings.
         public void SetAmphibiousCapability(bool value) { IsAmphibious = value; }
+        public void SetDoubleFireCapability(bool value) { IsDoubleFire = value; }
 
-        #endregion // Combat Value Accessors
+        // Short name accessor/mutator
+        public void SetShortName(string shortName)
+        {
+            if (string.IsNullOrEmpty(shortName))
+                throw new ArgumentException("Short name cannot be null or empty", nameof(shortName));
+            ShortName = shortName;
+        }
+
+        #endregion // Accessors
 
 
         #region Upgrade Management
