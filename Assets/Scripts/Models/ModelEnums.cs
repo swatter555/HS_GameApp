@@ -132,7 +132,9 @@ namespace HammerAndSickle.Models
         AirLift,
         NavalAssault,
         AirDrop,
-        AirMobile
+        AirMobile,
+        Aviation,
+        Aircraft
     }
 
     /// <summary>

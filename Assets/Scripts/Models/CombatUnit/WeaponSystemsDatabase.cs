@@ -2272,7 +2272,7 @@ namespace HammerAndSickle.Models
                     allWeatherCapability: AllWeatherRating.Day,
                     sigintRating: SIGINT_Rating.UnitLevel,
                     nbcRating: NBC_Rating.None,
-                    strategicMobility: StrategicMobility.AirMobile,
+                    strategicMobility: StrategicMobility.Aviation,
                     nvgCapability: NVG_Rating.None,
                     silhouette: UnitSilhouette.Medium
                 );
@@ -2321,7 +2321,7 @@ namespace HammerAndSickle.Models
                     allWeatherCapability: AllWeatherRating.Day,
                     sigintRating: SIGINT_Rating.UnitLevel,
                     nbcRating: NBC_Rating.Gen1,
-                    strategicMobility: StrategicMobility.AirMobile,
+                    strategicMobility: StrategicMobility.Aviation,
                     nvgCapability: NVG_Rating.None,
                     silhouette: UnitSilhouette.Medium
                 );
@@ -2370,7 +2370,7 @@ namespace HammerAndSickle.Models
                     allWeatherCapability: AllWeatherRating.Night,
                     sigintRating: SIGINT_Rating.UnitLevel,
                     nbcRating: NBC_Rating.Gen1,
-                    strategicMobility: StrategicMobility.AirMobile,
+                    strategicMobility: StrategicMobility.Aviation,
                     nvgCapability: NVG_Rating.Gen1,
                     silhouette: UnitSilhouette.Medium
                 );
@@ -2419,7 +2419,7 @@ namespace HammerAndSickle.Models
                     allWeatherCapability: AllWeatherRating.AllWeather,
                     sigintRating: SIGINT_Rating.SpecializedLevel,
                     nbcRating: NBC_Rating.Gen2,
-                    strategicMobility: StrategicMobility.AirMobile,
+                    strategicMobility: StrategicMobility.Aviation,
                     nvgCapability: NVG_Rating.Gen2,
                     silhouette: UnitSilhouette.Medium
                 );
@@ -2444,5 +2444,873 @@ namespace HammerAndSickle.Models
         }
 
         #endregion
+
+
+        #region Soviet Aircraft
+
+        /// <summary>
+        /// A-50 "Mainstay" airborne early warning and control aircraft.
+        /// </summary>
+        private static void CreateAwacs_A50Profile()
+        {
+            try
+            {
+                var profile = new WeaponSystemProfile(
+                    name: "A-50 Mainstay AWACS Aircraft",
+                    nationality: Nationality.USSR,
+                    weaponSystemID: WeaponSystems.AWACS_A50,
+                    150,
+                    landAirDefense: 15,
+                    airDefense: 15,
+                    airAvionics: 20,
+                    primaryRange: 1f,
+                    indirectRange: 0f,
+                    spottingRange: 15f,
+                    movementModifier: 1f,
+                    allWeatherCapability: AllWeatherRating.AllWeather,
+                    sigintRating: SIGINT_Rating.SpecializedLevel,
+                    nbcRating: NBC_Rating.Gen2,
+                    strategicMobility: StrategicMobility.Aircraft,
+                    nvgCapability: NVG_Rating.Gen2,
+                    silhouette: UnitSilhouette.Large
+                );
+
+                // Set upgrade paths for modernization
+                profile.AddUpgradeType(UpgradeType.Fighter);
+
+                // Set short name for UI display
+                profile.SetShortName("A-50");
+
+                // Set turn availability - entered service in 1984
+                profile.SetTurnAvailable(552);
+
+                // Store in master dictionary
+                _weaponSystemProfiles[WeaponSystems.AWACS_A50] = profile;
+            }
+            catch (Exception e)
+            {
+                AppService.HandleException(CLASS_NAME, nameof(CreateAwacs_A50Profile), e);
+                throw;
+            }
+        }
+
+        /// <summary>
+        /// MiG-21 "Fishbed" lightweight interceptor fighter.
+        /// </summary>
+        private static void CreateAsf_Mig21Profile()
+        {
+            try
+            {
+                var profile = new WeaponSystemProfile(
+                    name: "MiG-21 Fishbed Air Superiority Fighter",
+                    nationality: Nationality.USSR,
+                    weaponSystemID: WeaponSystems.ASF_MIG21,
+                    35,
+                    landAirDefense: 7,
+                    airAttack: 10,
+                    airDefense: 7,
+                    airAvionics: 7,
+                    airStrategicAttack: 0,
+                    airGroundAttack: 6,
+                    airGroundDefense: 4,
+                    primaryRange: 1f,
+                    indirectRange: 0f,
+                    spottingRange: 2f,
+                    movementModifier: 1f,
+                    allWeatherCapability: AllWeatherRating.Day,
+                    sigintRating: SIGINT_Rating.UnitLevel,
+                    nbcRating: NBC_Rating.None,
+                    strategicMobility: StrategicMobility.Aircraft,
+                    nvgCapability: NVG_Rating.None,
+                    silhouette: UnitSilhouette.Small
+                );
+
+                // Set upgrade paths for modernization
+                profile.AddUpgradeType(UpgradeType.Fighter);
+
+                // Set short name for UI display
+                profile.SetShortName("MiG-21");
+
+                // Set turn availability - entered service in 1959
+                profile.SetTurnAvailable(252);
+
+                // Store in master dictionary
+                _weaponSystemProfiles[WeaponSystems.ASF_MIG21] = profile;
+            }
+            catch (Exception e)
+            {
+                AppService.HandleException(CLASS_NAME, nameof(CreateAsf_Mig21Profile), e);
+                throw;
+            }
+        }
+
+        /// <summary>
+        /// MiG-23 "Flogger" variable-geometry wing fighter.
+        /// </summary>
+        private static void CreateAsf_Mig23Profile()
+        {
+            try
+            {
+                var profile = new WeaponSystemProfile(
+                    name: "MiG-23 Flogger Air Superiority Fighter",
+                    nationality: Nationality.USSR,
+                    weaponSystemID: WeaponSystems.ASF_MIG23,
+                    50,
+                    landAirDefense: 9,
+                    airAttack: 12,
+                    airDefense: 9,
+                    airAvionics: 10,
+                    airGroundAttack: 8,
+                    airGroundDefense: 6,
+                    primaryRange: 1f,
+                    indirectRange: 0f,
+                    spottingRange: 4f,
+                    movementModifier: 1f,
+                    allWeatherCapability: AllWeatherRating.Night,
+                    sigintRating: SIGINT_Rating.UnitLevel,
+                    nbcRating: NBC_Rating.Gen1,
+                    strategicMobility: StrategicMobility.Aircraft,
+                    nvgCapability: NVG_Rating.None,
+                    silhouette: UnitSilhouette.Medium
+                );
+
+                // Set upgrade paths for modernization
+                profile.AddUpgradeType(UpgradeType.Fighter);
+
+                // Set short name for UI display
+                profile.SetShortName("MiG-23");
+
+                // Set turn availability - entered service in 1970
+                profile.SetTurnAvailable(384);
+
+                // Store in master dictionary
+                _weaponSystemProfiles[WeaponSystems.ASF_MIG23] = profile;
+            }
+            catch (Exception e)
+            {
+                AppService.HandleException(CLASS_NAME, nameof(CreateAsf_Mig23Profile), e);
+                throw;
+            }
+        }
+
+        /// <summary>
+        /// MiG-25 "Foxbat" high-speed interceptor.
+        /// </summary>
+        private static void CreateAsf_Mig25Profile()
+        {
+            try
+            {
+                var profile = new WeaponSystemProfile(
+                    name: "MiG-25 Foxbat Air Superiority Fighter",
+                    nationality: Nationality.USSR,
+                    weaponSystemID: WeaponSystems.ASF_MIG25,
+                    70,
+                    landHardAttack: 1,
+                    landHardDefense: 2,
+                    landSoftAttack: 2,
+                    landSoftDefense: 3,
+                    landAirAttack: 1,
+                    landAirDefense: 4,
+                    airAttack: 18,
+                    airDefense: 12,
+                    airAvionics: 15,
+                    airStrategicAttack: 0,
+                    airGroundAttack: 3,
+                    airGroundDefense: 8,
+                    primaryRange: 1f,
+                    indirectRange: 0f,
+                    spottingRange: 8f,
+                    movementModifier: 1.5f,
+                    allWeatherCapability: AllWeatherRating.AllWeather,
+                    sigintRating: SIGINT_Rating.SpecializedLevel,
+                    nbcRating: NBC_Rating.Gen1,
+                    strategicMobility: StrategicMobility.AirMobile,
+                    nvgCapability: NVG_Rating.Gen1,
+                    silhouette: UnitSilhouette.Medium
+                );
+
+                // Set upgrade paths for modernization
+                profile.AddUpgradeType(UpgradeType.Fighter);
+
+                // Set short name for UI display
+                profile.SetShortName("MiG-25");
+
+                // Set turn availability - entered service in 1970
+                profile.SetTurnAvailable(384);
+
+                // Store in master dictionary
+                _weaponSystemProfiles[WeaponSystems.ASF_MIG25] = profile;
+            }
+            catch (Exception e)
+            {
+                AppService.HandleException(CLASS_NAME, nameof(CreateAsf_Mig25Profile), e);
+                throw;
+            }
+        }
+
+        /// <summary>
+        /// MiG-29 "Fulcrum" modern air superiority fighter.
+        /// </summary>
+        private static void CreateAsf_Mig29Profile()
+        {
+            try
+            {
+                var profile = new WeaponSystemProfile(
+                    name: "MiG-29 Fulcrum Air Superiority Fighter",
+                    nationality: Nationality.USSR,
+                    weaponSystemID: WeaponSystems.ASF_MIG29,
+                    85,
+                    landHardAttack: 4,
+                    landHardDefense: 3,
+                    landSoftAttack: 8,
+                    landSoftDefense: 4,
+                    landAirAttack: 3,
+                    landAirDefense: 6,
+                    airAttack: 20,
+                    airDefense: 15,
+                    airAvionics: 18,
+                    airStrategicAttack: 0,
+                    airGroundAttack: 12,
+                    airGroundDefense: 10,
+                    primaryRange: 1f,
+                    indirectRange: 0f,
+                    spottingRange: 6f,
+                    movementModifier: 1.25f,
+                    allWeatherCapability: AllWeatherRating.AllWeather,
+                    sigintRating: SIGINT_Rating.UnitLevel,
+                    nbcRating: NBC_Rating.Gen2,
+                    strategicMobility: StrategicMobility.AirMobile,
+                    nvgCapability: NVG_Rating.Gen2,
+                    silhouette: UnitSilhouette.Medium
+                );
+
+                // Set upgrade paths for modernization
+                profile.AddUpgradeType(UpgradeType.Fighter);
+
+                // Set short name for UI display
+                profile.SetShortName("MiG-29");
+
+                // Set turn availability - entered service in 1983
+                profile.SetTurnAvailable(540);
+
+                // Store in master dictionary
+                _weaponSystemProfiles[WeaponSystems.ASF_MIG29] = profile;
+            }
+            catch (Exception e)
+            {
+                AppService.HandleException(CLASS_NAME, nameof(CreateAsf_Mig29Profile), e);
+                throw;
+            }
+        }
+
+        /// <summary>
+        /// MiG-31 "Foxhound" long-range interceptor.
+        /// </summary>
+        private static void CreateAsf_Mig31Profile()
+        {
+            try
+            {
+                var profile = new WeaponSystemProfile(
+                    name: "MiG-31 Foxhound Air Superiority Fighter",
+                    nationality: Nationality.USSR,
+                    weaponSystemID: WeaponSystems.ASF_MIG31,
+                    100,
+                    landHardAttack: 2,
+                    landHardDefense: 4,
+                    landSoftAttack: 4,
+                    landSoftDefense: 5,
+                    landAirAttack: 2,
+                    landAirDefense: 8,
+                    airAttack: 22,
+                    airDefense: 18,
+                    airAvionics: 22,
+                    airStrategicAttack: 0,
+                    airGroundAttack: 6,
+                    airGroundDefense: 12,
+                    primaryRange: 1f,
+                    indirectRange: 0f,
+                    spottingRange: 10f,
+                    movementModifier: 1.5f,
+                    allWeatherCapability: AllWeatherRating.AllWeather,
+                    sigintRating: SIGINT_Rating.SpecializedLevel,
+                    nbcRating: NBC_Rating.Gen2,
+                    strategicMobility: StrategicMobility.AirMobile,
+                    nvgCapability: NVG_Rating.Gen2,
+                    silhouette: UnitSilhouette.Large
+                );
+
+                // Set double fire capability (multiple long-range missiles)
+                profile.SetDoubleFireCapability(true);
+
+                // Set upgrade paths for modernization
+                profile.AddUpgradeType(UpgradeType.Fighter);
+
+                // Set short name for UI display
+                profile.SetShortName("MiG-31");
+
+                // Set turn availability - entered service in 1981
+                profile.SetTurnAvailable(516);
+
+                // Store in master dictionary
+                _weaponSystemProfiles[WeaponSystems.ASF_MIG31] = profile;
+            }
+            catch (Exception e)
+            {
+                AppService.HandleException(CLASS_NAME, nameof(CreateAsf_Mig31Profile), e);
+                throw;
+            }
+        }
+
+        /// <summary>
+        /// Su-27 "Flanker" advanced air superiority fighter.
+        /// </summary>
+        private static void CreateAsf_Su27Profile()
+        {
+            try
+            {
+                var profile = new WeaponSystemProfile(
+                    name: "Su-27 Flanker Air Superiority Fighter",
+                    nationality: Nationality.USSR,
+                    weaponSystemID: WeaponSystems.ASF_SU27,
+                    95,
+                    landHardAttack: 4,
+                    landHardDefense: 4,
+                    landSoftAttack: 8,
+                    landSoftDefense: 5,
+                    landAirAttack: 3,
+                    landAirDefense: 7,
+                    airAttack: 23,
+                    airDefense: 16,
+                    airAvionics: 20,
+                    airStrategicAttack: 0,
+                    airGroundAttack: 10,
+                    airGroundDefense: 12,
+                    primaryRange: 1f,
+                    indirectRange: 0f,
+                    spottingRange: 7f,
+                    movementModifier: 1.25f,
+                    allWeatherCapability: AllWeatherRating.AllWeather,
+                    sigintRating: SIGINT_Rating.UnitLevel,
+                    nbcRating: NBC_Rating.Gen2,
+                    strategicMobility: StrategicMobility.AirMobile,
+                    nvgCapability: NVG_Rating.Gen2,
+                    silhouette: UnitSilhouette.Medium
+                );
+
+                // Set upgrade paths for modernization
+                profile.AddUpgradeType(UpgradeType.Fighter);
+
+                // Set short name for UI display
+                profile.SetShortName("Su-27");
+
+                // Set turn availability - entered service in 1985
+                profile.SetTurnAvailable(564);
+
+                // Store in master dictionary
+                _weaponSystemProfiles[WeaponSystems.ASF_SU27] = profile;
+            }
+            catch (Exception e)
+            {
+                AppService.HandleException(CLASS_NAME, nameof(CreateAsf_Su27Profile), e);
+                throw;
+            }
+        }
+
+        /// <summary>
+        /// Su-47 "Berkut" experimental forward-swept wing fighter.
+        /// </summary>
+        private static void CreateAsf_Su47Profile()
+        {
+            try
+            {
+                var profile = new WeaponSystemProfile(
+                    name: "Su-47 Berkut Experimental Fighter",
+                    nationality: Nationality.USSR,
+                    weaponSystemID: WeaponSystems.ASF_SU47,
+                    200,
+                    landHardAttack: 5,
+                    landHardDefense: 5,
+                    landSoftAttack: 10,
+                    landSoftDefense: 6,
+                    landAirAttack: 4,
+                    landAirDefense: 8,
+                    airAttack: 25,
+                    airDefense: 20,
+                    airAvionics: 25,
+                    airStrategicAttack: 0,
+                    airGroundAttack: 15,
+                    airGroundDefense: 15,
+                    primaryRange: 1f,
+                    indirectRange: 0f,
+                    spottingRange: 8f,
+                    movementModifier: 1.5f,
+                    allWeatherCapability: AllWeatherRating.AllWeather,
+                    sigintRating: SIGINT_Rating.SpecializedLevel,
+                    nbcRating: NBC_Rating.Gen2,
+                    strategicMobility: StrategicMobility.AirMobile,
+                    nvgCapability: NVG_Rating.Gen3,
+                    silhouette: UnitSilhouette.Small
+                );
+
+                // Set upgrade paths for modernization
+                profile.AddUpgradeType(UpgradeType.Fighter);
+
+                // Set short name for UI display
+                profile.SetShortName("Su-47");
+
+                // Set turn availability - first flight in 1997 (but prototype development began earlier)
+                profile.SetTurnAvailable(708);
+
+                // Store in master dictionary
+                _weaponSystemProfiles[WeaponSystems.ASF_SU47] = profile;
+            }
+            catch (Exception e)
+            {
+                AppService.HandleException(CLASS_NAME, nameof(CreateAsf_Su47Profile), e);
+                throw;
+            }
+        }
+
+        /// <summary>
+        /// MiG-27 "Flogger-D" ground attack variant of MiG-23.
+        /// </summary>
+        private static void CreateMrf_Mig27Profile()
+        {
+            try
+            {
+                var profile = new WeaponSystemProfile(
+                    name: "MiG-27 Flogger-D Multi-Role Fighter",
+                    nationality: Nationality.USSR,
+                    weaponSystemID: WeaponSystems.MRF_MIG27,
+                    55,
+                    landHardAttack: 6,
+                    landHardDefense: 3,
+                    landSoftAttack: 12,
+                    landSoftDefense: 4,
+                    landAirAttack: 2,
+                    landAirDefense: 4,
+                    airAttack: 10,
+                    airDefense: 8,
+                    airAvionics: 10,
+                    airStrategicAttack: 0,
+                    airGroundAttack: 16,
+                    airGroundDefense: 6,
+                    primaryRange: 1f,
+                    indirectRange: 0f,
+                    spottingRange: 4f,
+                    movementModifier: 1f,
+                    allWeatherCapability: AllWeatherRating.Day,
+                    sigintRating: SIGINT_Rating.UnitLevel,
+                    nbcRating: NBC_Rating.Gen1,
+                    strategicMobility: StrategicMobility.AirMobile,
+                    nvgCapability: NVG_Rating.Gen1,
+                    silhouette: UnitSilhouette.Medium
+                );
+
+                // Set upgrade paths for modernization
+                profile.AddUpgradeType(UpgradeType.Attack);
+
+                // Set short name for UI display
+                profile.SetShortName("MiG-27");
+
+                // Set turn availability - entered service in 1975
+                profile.SetTurnAvailable(444);
+
+                // Store in master dictionary
+                _weaponSystemProfiles[WeaponSystems.MRF_MIG27] = profile;
+            }
+            catch (Exception e)
+            {
+                AppService.HandleException(CLASS_NAME, nameof(CreateMrf_Mig27Profile), e);
+                throw;
+            }
+        }
+
+        /// <summary>
+        /// Su-25 "Frogfoot" close air support aircraft.
+        /// </summary>
+        private static void CreateAtt_Su25Profile()
+        {
+            try
+            {
+                var profile = new WeaponSystemProfile(
+                    name: "Su-25 Frogfoot Attack Aircraft",
+                    nationality: Nationality.USSR,
+                    weaponSystemID: WeaponSystems.ATT_SU25,
+                    60,
+                    landHardAttack: 8,
+                    landHardDefense: 6,
+                    landSoftAttack: 16,
+                    landSoftDefense: 8,
+                    landAirAttack: 2,
+                    landAirDefense: 4,
+                    airAttack: 6,
+                    airDefense: 10,
+                    airAvionics: 8,
+                    airStrategicAttack: 0,
+                    airGroundAttack: 20,
+                    airGroundDefense: 12,
+                    primaryRange: 1f,
+                    indirectRange: 0f,
+                    spottingRange: 3f,
+                    movementModifier: 0.75f,
+                    allWeatherCapability: AllWeatherRating.Day,
+                    sigintRating: SIGINT_Rating.UnitLevel,
+                    nbcRating: NBC_Rating.Gen1,
+                    strategicMobility: StrategicMobility.AirMobile,
+                    nvgCapability: NVG_Rating.None,
+                    silhouette: UnitSilhouette.Medium
+                );
+
+                // Set upgrade paths for modernization
+                profile.AddUpgradeType(UpgradeType.Attack);
+
+                // Set short name for UI display
+                profile.SetShortName("Su-25");
+
+                // Set turn availability - entered service in 1981
+                profile.SetTurnAvailable(516);
+
+                // Store in master dictionary
+                _weaponSystemProfiles[WeaponSystems.ATT_SU25] = profile;
+            }
+            catch (Exception e)
+            {
+                AppService.HandleException(CLASS_NAME, nameof(CreateAtt_Su25Profile), e);
+                throw;
+            }
+        }
+
+        /// <summary>
+        /// Su-25B "Frogfoot-B" improved close air support aircraft.
+        /// </summary>
+        private static void CreateAtt_Su25BProfile()
+        {
+            try
+            {
+                var profile = new WeaponSystemProfile(
+                    name: "Su-25B Frogfoot-B Attack Aircraft",
+                    nationality: Nationality.USSR,
+                    weaponSystemID: WeaponSystems.ATT_SU25B,
+                    75,
+                    landHardAttack: 10,
+                    landHardDefense: 7,
+                    landSoftAttack: 18,
+                    landSoftDefense: 9,
+                    landAirAttack: 3,
+                    landAirDefense: 5,
+                    airAttack: 8,
+                    airDefense: 12,
+                    airAvionics: 12,
+                    airStrategicAttack: 0,
+                    airGroundAttack: 22,
+                    airGroundDefense: 14,
+                    primaryRange: 1f,
+                    indirectRange: 0f,
+                    spottingRange: 4f,
+                    movementModifier: 0.75f,
+                    allWeatherCapability: AllWeatherRating.Night,
+                    sigintRating: SIGINT_Rating.UnitLevel,
+                    nbcRating: NBC_Rating.Gen2,
+                    strategicMobility: StrategicMobility.AirMobile,
+                    nvgCapability: NVG_Rating.Gen1,
+                    silhouette: UnitSilhouette.Medium
+                );
+
+                // Set upgrade paths for modernization
+                profile.AddUpgradeType(UpgradeType.Attack);
+
+                // Set short name for UI display
+                profile.SetShortName("Su-25B");
+
+                // Set turn availability - entered service in 1986
+                profile.SetTurnAvailable(576);
+
+                // Store in master dictionary
+                _weaponSystemProfiles[WeaponSystems.ATT_SU25B] = profile;
+            }
+            catch (Exception e)
+            {
+                AppService.HandleException(CLASS_NAME, nameof(CreateAtt_Su25BProfile), e);
+                throw;
+            }
+        }
+
+        /// <summary>
+        /// Su-24 "Fencer" variable-geometry wing bomber.
+        /// </summary>
+        private static void CreateBmb_Su24Profile()
+        {
+            try
+            {
+                var profile = new WeaponSystemProfile(
+                    name: "Su-24 Fencer Bomber",
+                    nationality: Nationality.USSR,
+                    weaponSystemID: WeaponSystems.BMB_SU24,
+                    80,
+                    landHardAttack: 8,
+                    landHardDefense: 4,
+                    landSoftAttack: 18,
+                    landSoftDefense: 6,
+                    landAirAttack: 2,
+                    landAirDefense: 4,
+                    airAttack: 6,
+                    airDefense: 8,
+                    airAvionics: 15,
+                    airStrategicAttack: 20,
+                    airGroundAttack: 22,
+                    airGroundDefense: 8,
+                    primaryRange: 1f,
+                    indirectRange: 0f,
+                    spottingRange: 5f,
+                    movementModifier: 1.25f,
+                    allWeatherCapability: AllWeatherRating.AllWeather,
+                    sigintRating: SIGINT_Rating.UnitLevel,
+                    nbcRating: NBC_Rating.Gen1,
+                    strategicMobility: StrategicMobility.AirMobile,
+                    nvgCapability: NVG_Rating.Gen1,
+                    silhouette: UnitSilhouette.Medium
+                );
+
+                // Set upgrade paths for modernization
+                profile.AddUpgradeType(UpgradeType.Bomber);
+
+                // Set short name for UI display
+                profile.SetShortName("Su-24");
+
+                // Set turn availability - entered service in 1974
+                profile.SetTurnAvailable(432);
+
+                // Store in master dictionary
+                _weaponSystemProfiles[WeaponSystems.BMB_SU24] = profile;
+            }
+            catch (Exception e)
+            {
+                AppService.HandleException(CLASS_NAME, nameof(CreateBmb_Su24Profile), e);
+                throw;
+            }
+        }
+
+        /// <summary>
+        /// Tu-16 "Badger" medium-range bomber.
+        /// </summary>
+        private static void CreateBmb_Tu16Profile()
+        {
+            try
+            {
+                var profile = new WeaponSystemProfile(
+                    name: "Tu-16 Badger Bomber",
+                    nationality: Nationality.USSR,
+                    weaponSystemID: WeaponSystems.BMB_TU16,
+                    70,
+                    landHardAttack: 6,
+                    landHardDefense: 3,
+                    landSoftAttack: 16,
+                    landSoftDefense: 5,
+                    landAirAttack: 1,
+                    landAirDefense: 3,
+                    airAttack: 4,
+                    airDefense: 6,
+                    airAvionics: 6,
+                    airStrategicAttack: 18,
+                    airGroundAttack: 20,
+                    airGroundDefense: 6,
+                    primaryRange: 1f,
+                    indirectRange: 0f,
+                    spottingRange: 4f,
+                    movementModifier: 1f,
+                    allWeatherCapability: AllWeatherRating.Day,
+                    sigintRating: SIGINT_Rating.UnitLevel,
+                    nbcRating: NBC_Rating.None,
+                    strategicMobility: StrategicMobility.AirMobile,
+                    nvgCapability: NVG_Rating.None,
+                    silhouette: UnitSilhouette.Large
+                );
+
+                // Set upgrade paths for modernization
+                profile.AddUpgradeType(UpgradeType.Bomber);
+
+                // Set short name for UI display
+                profile.SetShortName("Tu-16");
+
+                // Set turn availability - entered service in 1954
+                profile.SetTurnAvailable(192);
+
+                // Store in master dictionary
+                _weaponSystemProfiles[WeaponSystems.BMB_TU16] = profile;
+            }
+            catch (Exception e)
+            {
+                AppService.HandleException(CLASS_NAME, nameof(CreateBmb_Tu16Profile), e);
+                throw;
+            }
+        }
+
+        /// <summary>
+        /// Tu-22 "Blinder" supersonic bomber.
+        /// </summary>
+        private static void CreateBmb_Tu22Profile()
+        {
+            try
+            {
+                var profile = new WeaponSystemProfile(
+                    name: "Tu-22 Blinder Bomber",
+                    nationality: Nationality.USSR,
+                    weaponSystemID: WeaponSystems.BMB_TU22,
+                    90,
+                    landHardAttack: 8,
+                    landHardDefense: 4,
+                    landSoftAttack: 18,
+                    landSoftDefense: 6,
+                    landAirAttack: 2,
+                    landAirDefense: 4,
+                    airAttack: 6,
+                    airDefense: 8,
+                    airAvionics: 10,
+                    airStrategicAttack: 22,
+                    airGroundAttack: 20,
+                    airGroundDefense: 8,
+                    primaryRange: 1f,
+                    indirectRange: 0f,
+                    spottingRange: 5f,
+                    movementModifier: 1.5f,
+                    allWeatherCapability: AllWeatherRating.Night,
+                    sigintRating: SIGINT_Rating.UnitLevel,
+                    nbcRating: NBC_Rating.Gen1,
+                    strategicMobility: StrategicMobility.AirMobile,
+                    nvgCapability: NVG_Rating.None,
+                    silhouette: UnitSilhouette.Large
+                );
+
+                // Set upgrade paths for modernization
+                profile.AddUpgradeType(UpgradeType.Bomber);
+
+                // Set short name for UI display
+                profile.SetShortName("Tu-22");
+
+                // Set turn availability - entered service in 1962
+                profile.SetTurnAvailable(288);
+
+                // Store in master dictionary
+                _weaponSystemProfiles[WeaponSystems.BMB_TU22] = profile;
+            }
+            catch (Exception e)
+            {
+                AppService.HandleException(CLASS_NAME, nameof(CreateBmb_Tu22Profile), e);
+                throw;
+            }
+        }
+
+        /// <summary>
+        /// Tu-22M3 "Backfire-C" variable-geometry strategic bomber.
+        /// </summary>
+        private static void CreateBmb_Tu22M3Profile()
+        {
+            try
+            {
+                var profile = new WeaponSystemProfile(
+                    name: "Tu-22M3 Backfire-C Strategic Bomber",
+                    nationality: Nationality.USSR,
+                    weaponSystemID: WeaponSystems.BMB_TU22M3,
+                    120,
+                    landHardAttack: 10,
+                    landHardDefense: 6,
+                    landSoftAttack: 22,
+                    landSoftDefense: 8,
+                    landAirAttack: 3,
+                    landAirDefense: 6,
+                    airAttack: 8,
+                    airDefense: 12,
+                    airAvionics: 18,
+                    airStrategicAttack: 25,
+                    airGroundAttack: 24,
+                    airGroundDefense: 12,
+                    primaryRange: 1f,
+                    indirectRange: 0f,
+                    spottingRange: 6f,
+                    movementModifier: 1.5f,
+                    allWeatherCapability: AllWeatherRating.AllWeather,
+                    sigintRating: SIGINT_Rating.SpecializedLevel,
+                    nbcRating: NBC_Rating.Gen2,
+                    strategicMobility: StrategicMobility.AirMobile,
+                    nvgCapability: NVG_Rating.Gen2,
+                    silhouette: UnitSilhouette.Large
+                );
+
+                // Set upgrade paths for modernization
+                profile.AddUpgradeType(UpgradeType.Bomber);
+
+                // Set short name for UI display
+                profile.SetShortName("Tu-22M3");
+
+                // Set turn availability - entered service in 1983
+                profile.SetTurnAvailable(540);
+
+                // Store in master dictionary
+                _weaponSystemProfiles[WeaponSystems.BMB_TU22M3] = profile;
+            }
+            catch (Exception e)
+            {
+                AppService.HandleException(CLASS_NAME, nameof(CreateBmb_Tu22M3Profile), e);
+                throw;
+            }
+        }
+
+        /// <summary>
+        /// MiG-25R "Foxbat-B" reconnaissance variant.
+        /// </summary>
+        private static void CreateRcna_Mig25RProfile()
+        {
+            try
+            {
+                var profile = new WeaponSystemProfile(
+                    name: "MiG-25R Foxbat-B Reconnaissance Aircraft",
+                    nationality: Nationality.USSR,
+                    weaponSystemID: WeaponSystems.RCNA_MIG25R,
+                    75,
+                    landHardAttack: 0,
+                    landHardDefense: 2,
+                    landSoftAttack: 0,
+                    landSoftDefense: 3,
+                    landAirAttack: 1,
+                    landAirDefense: 4,
+                    airAttack: 8,
+                    airDefense: 15,
+                    airAvionics: 20,
+                    airStrategicAttack: 0,
+                    airGroundAttack: 0,
+                    airGroundDefense: 12,
+                    primaryRange: 1f,
+                    indirectRange: 0f,
+                    spottingRange: 12f,
+                    movementModifier: 1.75f,
+                    allWeatherCapability: AllWeatherRating.AllWeather,
+                    sigintRating: SIGINT_Rating.SpecializedLevel,
+                    nbcRating: NBC_Rating.Gen1,
+                    strategicMobility: StrategicMobility.AirMobile,
+                    nvgCapability: NVG_Rating.Gen2,
+                    silhouette: UnitSilhouette.Small
+                );
+
+                // Set upgrade paths for modernization
+                profile.AddUpgradeType(UpgradeType.Fighter);
+
+                // Set short name for UI display
+                profile.SetShortName("MiG-25R");
+
+                // Set turn availability - entered service in 1970
+                profile.SetTurnAvailable(384);
+
+                // Store in master dictionary
+                _weaponSystemProfiles[WeaponSystems.RCNA_MIG25R] = profile;
+            }
+            catch (Exception e)
+            {
+                AppService.HandleException(CLASS_NAME, nameof(CreateRcna_Mig25RProfile), e);
+                throw;
+            }
+        }
+
+        #endregion // Soviet Aircraft
     }
 }
