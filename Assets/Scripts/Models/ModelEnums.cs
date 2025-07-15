@@ -777,7 +777,8 @@ namespace HammerAndSickle.Models
         SPAAA,
         Fighter,
         Attack,
-        Bomber
+        Bomber,
+        Infantry
     }
 
     #endregion // WeaponSystem Enums

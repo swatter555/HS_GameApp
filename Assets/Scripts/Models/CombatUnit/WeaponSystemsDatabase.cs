@@ -211,6 +211,13 @@ namespace HammerAndSickle.Models
                 CreateIfvBmd3Profile();
                 CreateRcnBrdm2Profile();
                 CreateRcnBrdm2AtProfile();
+                CreateSpa2S1Profile();
+                CreateSpa2S3Profile();
+                CreateSpa2S5Profile();
+                CreateSpa2S19Profile();
+                CreateRocBm21Profile();
+                CreateRocBm27Profile();
+                CreateRocBm30Profile();
 
 
             }
@@ -259,6 +266,10 @@ namespace HammerAndSickle.Models
                 // Add upgrade types for modernization
                 profile.AddUpgradeType(UpgradeType.AFV);
 
+                // Set short name for UI display
+                profile.SetShortName("T-55A");
+
+                // Store in master dictionary
                 _weaponSystemProfiles[WeaponSystems.TANK_T55A] = profile;
             }
             catch (Exception e)
@@ -301,6 +312,10 @@ namespace HammerAndSickle.Models
                 // Add upgrade types for modernization
                 profile.AddUpgradeType(UpgradeType.AFV);
 
+                // Set short name for UI display
+                profile.SetShortName("T-64A");
+
+                // Store in master dictionary
                 _weaponSystemProfiles[WeaponSystems.TANK_T64A] = profile;
             }
             catch (Exception e)
@@ -340,8 +355,13 @@ namespace HammerAndSickle.Models
                     silhouette: UnitSilhouette.Small
                 );
 
+                // Add upgrade types for modernization
                 profile.AddUpgradeType(UpgradeType.AFV);
 
+                // Set short name for UI display
+                profile.SetShortName("T-64B");
+
+                // Store in master dictionary
                 _weaponSystemProfiles[WeaponSystems.TANK_T64B] = profile;
             }
             catch (Exception e)
@@ -381,10 +401,16 @@ namespace HammerAndSickle.Models
                     silhouette: UnitSilhouette.Medium
                 );
 
+                // Set amphibious capability
                 profile.SetAmphibiousCapability(true);
 
+                // Add upgrade types for modernization
                 profile.AddUpgradeType(UpgradeType.AFV);
 
+                // Set short name for UI display
+                profile.SetShortName("T-72A");
+
+                // Store in master dictionary
                 _weaponSystemProfiles[WeaponSystems.TANK_T72A] = profile;
             }
             catch (Exception e)
@@ -424,9 +450,14 @@ namespace HammerAndSickle.Models
                     silhouette: UnitSilhouette.Medium
                 );
 
+                // Set amphibious capability
                 profile.SetAmphibiousCapability(true);
 
+                // Add upgrade types for modernization
                 profile.AddUpgradeType(UpgradeType.AFV);
+
+                // Set short name for UI display
+                profile.SetShortName("T-72B");
 
                 _weaponSystemProfiles[WeaponSystems.TANK_T72B] = profile;
             }
@@ -471,6 +502,10 @@ namespace HammerAndSickle.Models
                 // Add upgrade types for modernization
                 profile.AddUpgradeType(UpgradeType.AFV);
 
+                // Set short name for UI display
+                profile.SetShortName("T-80B");
+
+                // Store in master dictionary
                 _weaponSystemProfiles[WeaponSystems.TANK_T80B] = profile;
             }
             catch (Exception e)
@@ -513,6 +548,10 @@ namespace HammerAndSickle.Models
                 // Add upgrade types for modernization
                 profile.AddUpgradeType(UpgradeType.AFV);
 
+                // Set short name for UI display
+                profile.SetShortName("T-80U");
+
+                // Store in master dictionary
                 _weaponSystemProfiles[WeaponSystems.TANK_T80U] = profile;
             }
             catch (Exception e)
@@ -552,8 +591,13 @@ namespace HammerAndSickle.Models
                     silhouette: UnitSilhouette.Medium
                 );
 
+                // Set upgrade paths for modernization
                 profile.AddUpgradeType(UpgradeType.AFV);
 
+                // Set short name for UI display
+                profile.SetShortName("T-80BV");
+
+                // Store in master dictionary
                 _weaponSystemProfiles[WeaponSystems.TANK_T80BV] = profile;
             }
             catch (Exception e)
@@ -573,7 +617,7 @@ namespace HammerAndSickle.Models
             try
             {
                 var profile = new WeaponSystemProfile(
-                    name: "Infantry",
+                    name: "Soviet Regular Infantry",
                     nationality: Nationality.USSR,
                     weaponSystemID: WeaponSystems.REG_INF_SV,
                     15,
@@ -595,6 +639,13 @@ namespace HammerAndSickle.Models
                     strategicMobility: StrategicMobility.AirLift
                 );
 
+                // Upgrade paths
+                profile.AddUpgradeType(UpgradeType.Infantry);
+
+                // Set short name for UI display
+                profile.SetShortName("Infantry");
+
+                // Store in master dictionary
                 _weaponSystemProfiles[WeaponSystems.REG_INF_SV] = profile;
             }
             catch (Exception e)
@@ -609,7 +660,7 @@ namespace HammerAndSickle.Models
             try
             {
                 var profile = new WeaponSystemProfile(
-                    name: "Airborne",
+                    name: "Soviet Airborne Infantry",
                     nationality: Nationality.USSR,
                     weaponSystemID: WeaponSystems.AB_INF_SV,
                     18,
@@ -631,6 +682,13 @@ namespace HammerAndSickle.Models
                     strategicMobility: StrategicMobility.AirDrop
                 );
 
+                // Upgrade paths
+                profile.AddUpgradeType(UpgradeType.Infantry);
+
+                // Set short name for UI display
+                profile.SetShortName("Airborne");
+
+                // Store in master dictionary
                 _weaponSystemProfiles[WeaponSystems.AB_INF_SV] = profile;
             }
             catch (Exception e)
@@ -645,7 +703,7 @@ namespace HammerAndSickle.Models
             try
             {
                 var profile = new WeaponSystemProfile(
-                    name: "Air‑Mobile",
+                    name: "Soviet Air‑Mobile Infantry",
                     nationality: Nationality.USSR,
                     weaponSystemID: WeaponSystems.AM_INF_SV,
                     18,
@@ -667,6 +725,13 @@ namespace HammerAndSickle.Models
                     strategicMobility: StrategicMobility.AirMobile
                 );
 
+                // Set upgrade paths
+                profile.AddUpgradeType(UpgradeType.Infantry);
+
+                // Set short name for UI display
+                profile.SetShortName("Air-Mobile");
+
+                // Store in master dictionary
                 _weaponSystemProfiles[WeaponSystems.AM_INF_SV] = profile;
             }
             catch (Exception e)
@@ -681,7 +746,7 @@ namespace HammerAndSickle.Models
             try
             {
                 var profile = new WeaponSystemProfile(
-                    name: "Naval Infantry",
+                    name: "Soviet Naval Infantry",
                     nationality: Nationality.USSR,
                     weaponSystemID: WeaponSystems.MAR_INF_SV,
                     18,
@@ -703,6 +768,13 @@ namespace HammerAndSickle.Models
                     strategicMobility: StrategicMobility.NavalAssault
                 );
 
+                // Set upgrade paths
+                profile.AddUpgradeType(UpgradeType.Infantry);
+
+                // Set short name for UI display
+                profile.SetShortName("Marines");
+
+                // Store in master dictionary
                 _weaponSystemProfiles[WeaponSystems.MAR_INF_SV] = profile;
             }
             catch (Exception e)
@@ -717,7 +789,7 @@ namespace HammerAndSickle.Models
             try
             {
                 var profile = new WeaponSystemProfile(
-                    name: "Spetsnaz",
+                    name: "Soviet Spetsnaz Infantry",
                     nationality: Nationality.USSR,
                     weaponSystemID: WeaponSystems.SPEC_INF_SV,
                     30,
@@ -739,6 +811,13 @@ namespace HammerAndSickle.Models
                     strategicMobility: StrategicMobility.AirMobile
                 );
 
+                // Set upgrade paths
+                profile.AddUpgradeType(UpgradeType.Infantry);
+
+                // Set short name for UI display
+                profile.SetShortName("Spetsnaz");
+
+                // Store in master dictionary
                 _weaponSystemProfiles[WeaponSystems.SPEC_INF_SV] = profile;
             }
             catch (Exception e)
@@ -775,6 +854,13 @@ namespace HammerAndSickle.Models
                     strategicMobility: StrategicMobility.AirDrop
                 );
 
+                // Set upgrade paths
+                profile.AddUpgradeType(UpgradeType.Infantry);
+
+                // Set short name for UI display
+                profile.SetShortName("Engineers");
+
+                // Store in master dictionary
                 _weaponSystemProfiles[WeaponSystems.ENG_INF_SV] = profile;
             }
             catch (Exception e)
@@ -795,7 +881,7 @@ namespace HammerAndSickle.Models
             try
             {
                 var profile = new WeaponSystemProfile(
-                    name: "MT‑LB APC",
+                    name: "MT‑LB Armored Personnel Carrier",
                     nationality: Nationality.USSR,
                     weaponSystemID: WeaponSystems.APC_MTLB,
                     20,
@@ -817,8 +903,16 @@ namespace HammerAndSickle.Models
                     strategicMobility: StrategicMobility.AirDrop
                 );
 
+                // Set upgrade paths
+                profile.AddUpgradeType(UpgradeType.APC);
+
+                // Set amphibious capability
                 profile.SetAmphibiousCapability(true);
 
+                // Set short name for UI display
+                profile.SetShortName("MT-LB");
+
+                // Store in master dictionary
                 _weaponSystemProfiles[WeaponSystems.APC_MTLB] = profile;
             }
             catch (Exception e)
@@ -833,7 +927,7 @@ namespace HammerAndSickle.Models
             try
             {
                 var profile = new WeaponSystemProfile(
-                    name: "BTR‑70 APC",
+                    name: "BTR‑70 Armored Personnel Carrier",
                     nationality: Nationality.USSR,
                     weaponSystemID: WeaponSystems.APC_BTR70,
                     24,
@@ -855,8 +949,16 @@ namespace HammerAndSickle.Models
                     strategicMobility: StrategicMobility.AirLift
                 );
 
+                // Set upgrade paths
+                profile.AddUpgradeType(UpgradeType.APC);
+
+                // Set amphibious capability
                 profile.SetAmphibiousCapability(true);
 
+                // Set short name for UI display
+                profile.SetShortName("BTR-70");
+
+                // Store in master dictionary
                 _weaponSystemProfiles[WeaponSystems.APC_BTR70] = profile;
             }
             catch (Exception e)
@@ -871,7 +973,7 @@ namespace HammerAndSickle.Models
             try
             {
                 var profile = new WeaponSystemProfile(
-                    name: "BTR‑80 APC",
+                    name: "BTR‑80 Armored Personnel Carrier",
                     nationality: Nationality.USSR,
                     weaponSystemID: WeaponSystems.APC_BTR80,
                     28,
@@ -893,8 +995,16 @@ namespace HammerAndSickle.Models
                     strategicMobility: StrategicMobility.AirLift
                 );
 
+                // Set upgrade paths
+                profile.AddUpgradeType(UpgradeType.APC);
+
+                // Set amphibious capability
                 profile.SetAmphibiousCapability(true);
 
+                // Set short name for UI display
+                profile.SetShortName("BTR-80");
+
+                // Store in master dictionary
                 _weaponSystemProfiles[WeaponSystems.APC_BTR80] = profile;
             }
             catch (Exception e)
@@ -907,14 +1017,14 @@ namespace HammerAndSickle.Models
         #endregion // Soviet APCs
 
 
-        #region IFV Soviet IFVs
+        #region Soviet IFVs
 
         private static void CreateIfvBmp1Profile()
         {
             try
             {
                 var profile = new WeaponSystemProfile(
-                    name: "BMP‑1 IFV",
+                    name: "BMP‑1 Infantry Fighting Vehicle",
                     nationality: Nationality.USSR,
                     weaponSystemID: WeaponSystems.IFV_BMP1,
                     30,
@@ -936,8 +1046,16 @@ namespace HammerAndSickle.Models
                     strategicMobility: StrategicMobility.AirLift
                 );
 
+                // Set upgrade paths
+                profile.AddUpgradeType(UpgradeType.IFV);
+
+                // Set amphibious capability
                 profile.SetAmphibiousCapability(true);
 
+                // Set short name for UI display
+                profile.SetShortName("BMP-1");
+
+                // Store in master dictionary
                 _weaponSystemProfiles[WeaponSystems.IFV_BMP1] = profile;
             }
             catch (Exception e)
@@ -952,7 +1070,7 @@ namespace HammerAndSickle.Models
             try
             {
                 var profile = new WeaponSystemProfile(
-                    name: "BMP‑2 IFV",
+                    name: "BMP‑2 Infantry Fighting Vehicle",
                     nationality: Nationality.USSR,
                     weaponSystemID: WeaponSystems.IFV_BMP2,
                     36,
@@ -974,8 +1092,16 @@ namespace HammerAndSickle.Models
                     strategicMobility: StrategicMobility.AirLift
                 );
 
+                // Set upgrade paths
+                profile.AddUpgradeType(UpgradeType.IFV);
+
+                // Set amphibious capability
                 profile.SetAmphibiousCapability(true);
 
+                // Set short name for UI display
+                profile.SetShortName("BMP-2");
+
+                // Store in master dictionary
                 _weaponSystemProfiles[WeaponSystems.IFV_BMP2] = profile;
             }
             catch (Exception e)
@@ -990,7 +1116,7 @@ namespace HammerAndSickle.Models
             try
             {
                 var profile = new WeaponSystemProfile(
-                    name: "BMP‑3 IFV",
+                    name: "BMP‑3 Infantry Fighting Vehicle",
                     nationality: Nationality.USSR,
                     weaponSystemID: WeaponSystems.IFV_BMP3,
                     42,
@@ -1012,8 +1138,16 @@ namespace HammerAndSickle.Models
                     strategicMobility: StrategicMobility.AirLift
                 );
 
+                // Set upgrade paths
+                profile.AddUpgradeType(UpgradeType.IFV);
+
+                // Set amphibious capability
                 profile.SetAmphibiousCapability(true);
 
+                // Set short name for UI display
+                profile.SetShortName("BMP-3");
+
+                // Store in master dictionary
                 _weaponSystemProfiles[WeaponSystems.IFV_BMP3] = profile;
             }
             catch (Exception e)
@@ -1028,7 +1162,7 @@ namespace HammerAndSickle.Models
             try
             {
                 var profile = new WeaponSystemProfile(
-                    name: "BMD‑2 IFV",
+                    name: "BMD‑2 Airborne Infantry Fighting Vehicle",
                     nationality: Nationality.USSR,
                     weaponSystemID: WeaponSystems.IFV_BMD2,
                     34,
@@ -1050,8 +1184,16 @@ namespace HammerAndSickle.Models
                     strategicMobility: StrategicMobility.AirDrop
                 );
 
+                // Set upgrade paths
+                profile.AddUpgradeType(UpgradeType.IFV);
+
+                // Set amphibious capability
                 profile.SetAmphibiousCapability(true);
 
+                // Set short name for UI display
+                profile.SetShortName("BMD-2");
+
+                // Store in master dictionary
                 _weaponSystemProfiles[WeaponSystems.IFV_BMD2] = profile;
             }
             catch (Exception e)
@@ -1066,7 +1208,7 @@ namespace HammerAndSickle.Models
             try
             {
                 var profile = new WeaponSystemProfile(
-                    name: "BMD‑3 IFV",
+                    name: "BMD‑3 Airborne Infantry Fighting Vehicle",
                     nationality: Nationality.USSR,
                     weaponSystemID: WeaponSystems.IFV_BMD3,
                     38,
@@ -1088,8 +1230,16 @@ namespace HammerAndSickle.Models
                     strategicMobility: StrategicMobility.AirDrop
                 );
 
+                // Set upgrade paths
+                profile.AddUpgradeType(UpgradeType.IFV);
+
+                // Set amphibious capability
                 profile.SetAmphibiousCapability(true);
 
+                // Set short name for UI display
+                profile.SetShortName("BMD-3");
+
+                // Store in master dictionary
                 _weaponSystemProfiles[WeaponSystems.IFV_BMD3] = profile;
             }
             catch (Exception e)
@@ -1109,7 +1259,7 @@ namespace HammerAndSickle.Models
             try
             {
                 var profile = new WeaponSystemProfile(
-                    name: "BRDM‑2 Recon",
+                    name: "BRDM‑2 Recon Vehicle",
                     nationality: Nationality.USSR,
                     weaponSystemID: WeaponSystems.RCN_BRDM2,
                     22,
@@ -1131,8 +1281,16 @@ namespace HammerAndSickle.Models
                     strategicMobility: StrategicMobility.AirDrop
                 );
 
+                // Set upgrade paths
+                profile.AddUpgradeType(UpgradeType.RECON);
+
+                // Set amphibious capability
                 profile.SetAmphibiousCapability(true);
 
+                // Set short name for UI display
+                profile.SetShortName("BRDM-2");
+
+                // Store in master dictionary
                 _weaponSystemProfiles[WeaponSystems.RCN_BRDM2] = profile;
             }
             catch (Exception e)
@@ -1147,7 +1305,7 @@ namespace HammerAndSickle.Models
             try
             {
                 var profile = new WeaponSystemProfile(
-                    name: "BRDM‑2 AT‑5",
+                    name: "BRDM‑2 AT‑5 Recon Vehicle",
                     nationality: Nationality.USSR,
                     weaponSystemID: WeaponSystems.RCN_BRDM2AT,
                     28,
@@ -1169,8 +1327,16 @@ namespace HammerAndSickle.Models
                     strategicMobility: StrategicMobility.NavalAssault
                 );
 
+                // Set upgrade paths
+                profile.AddUpgradeType(UpgradeType.RECON);
+
+                // Set amphibious capability
                 profile.SetAmphibiousCapability(true);
 
+                // Set short name for UI display
+                profile.SetShortName("BRDM-2 AT");
+
+                // Store in master dictionary
                 _weaponSystemProfiles[WeaponSystems.RCN_BRDM2AT] = profile;
             }
             catch (Exception e)
@@ -1180,7 +1346,392 @@ namespace HammerAndSickle.Models
             }
         }
 
-        #endregion // Soviet IFVs
+        #endregion // Soviet Recon
+
+
+        #region Soviet Artillery & Rockets
+
+        /// <summary>
+        /// 2S1 "Gvozdika" 122 mm self‑propelled howitzer.
+        /// </summary>
+        private static void CreateSpa2S1Profile()
+        {
+            try
+            {
+                var profile = new WeaponSystemProfile(
+                    name: "2S1 Gvozdika Self Propelled Artillery",
+                    nationality: Nationality.USSR,
+                    weaponSystemID: WeaponSystems.SPA_2S1,
+                    40,
+                    landHardAttack: 4,
+                    landHardDefense: 3,
+                    landSoftAttack: 12,
+                    landSoftDefense: 4,
+                    landAirAttack: 1,
+                    landAirDefense: 2,
+                    primaryRange: 1f,
+                    indirectRange: 3f,
+                    spottingRange: 2f,
+                    movementModifier: 1,
+                    allWeatherCapability: AllWeatherRating.Day,
+                    nvgCapability: NVG_Rating.None,
+                    silhouette: UnitSilhouette.Medium,
+                    sigintRating: SIGINT_Rating.UnitLevel,
+                    nbcRating: NBC_Rating.Gen1,
+                    strategicMobility: StrategicMobility.Heavy
+                );
+
+                //Set the upgrade paths for modernization
+                profile.AddUpgradeType(UpgradeType.SPART);
+
+                // Set short name for UI display
+                profile.SetShortName("2S1 Gvozdika");
+
+                // Store in master dictionary
+                _weaponSystemProfiles[WeaponSystems.SPA_2S1] = profile;
+            }
+            catch (Exception e)
+            {
+                AppService.HandleException(CLASS_NAME, nameof(CreateSpa2S1Profile), e);
+                throw;
+            }
+        }
+
+        /// <summary>
+        /// 2S3 "Akatsiya" 152 mm self‑propelled gun‑howitzer.
+        /// </summary>
+        private static void CreateSpa2S3Profile()
+        {
+            try
+            {
+                var profile = new WeaponSystemProfile(
+                    name: "2S3 Akatsiya Self Propelled Artillery",
+                    nationality: Nationality.USSR,
+                    weaponSystemID: WeaponSystems.SPA_2S3,
+                    55,
+                    landHardAttack: 6,
+                    landHardDefense: 3,
+                    landSoftAttack: 14,
+                    landSoftDefense: 4,
+                    landAirAttack: 1,
+                    landAirDefense: 2,
+                    primaryRange: 1f,
+                    indirectRange: 4f,
+                    spottingRange: 2f,
+                    movementModifier: 1f,
+                    allWeatherCapability: AllWeatherRating.Day,
+                    nvgCapability: NVG_Rating.None,
+                    silhouette: UnitSilhouette.Medium,
+                    sigintRating: SIGINT_Rating.UnitLevel,
+                    nbcRating: NBC_Rating.Gen1,
+                    strategicMobility: StrategicMobility.Heavy
+                );
+
+                // Set upgrade paths for modernization
+                profile.AddUpgradeType(UpgradeType.SPART);
+
+                // Set short name for UI display
+                profile.SetShortName("2S3 Akatsiya");
+
+                // Store in master dictionary
+                _weaponSystemProfiles[WeaponSystems.SPA_2S3] = profile;
+            }
+            catch (Exception e)
+            {
+                AppService.HandleException(CLASS_NAME, nameof(CreateSpa2S3Profile), e);
+                throw;
+            }
+        }
+
+        /// <summary>
+        /// 2S5 "Giatsint‑S" 152 mm long‑range gun.
+        /// </summary>
+        private static void CreateSpa2S5Profile()
+        {
+            try
+            {
+                var profile = new WeaponSystemProfile(
+                    name: "2S5 Giatsint‑S Self Propelled Artillery",
+                    nationality: Nationality.USSR,
+                    weaponSystemID: WeaponSystems.SPA_2S5,
+                    70,
+                    landHardAttack: 8,
+                    landHardDefense: 3,
+                    landSoftAttack: 16,
+                    landSoftDefense: 4,
+                    landAirAttack: 1,
+                    landAirDefense: 2,
+                    primaryRange: 1f,
+                    indirectRange: 5f,
+                    spottingRange: 2f,
+                    movementModifier: 1f,
+                    allWeatherCapability: AllWeatherRating.Day,
+                    nvgCapability: NVG_Rating.None,
+                    silhouette: UnitSilhouette.Medium,
+                    sigintRating: SIGINT_Rating.UnitLevel,
+                    nbcRating: NBC_Rating.Gen1,
+                    strategicMobility: StrategicMobility.Heavy
+                );
+
+                // Set upgrade paths for modernization
+                profile.AddUpgradeType(UpgradeType.SPART);
+
+                // Set short name for UI display
+                profile.SetShortName("2S5 Giatsint-S");
+
+                // Store in master dictionary
+                _weaponSystemProfiles[WeaponSystems.SPA_2S5] = profile;
+            }
+            catch (Exception e)
+            {
+                AppService.HandleException(CLASS_NAME, nameof(CreateSpa2S5Profile), e);
+                throw;
+            }
+        }
+
+        /// <summary>
+        /// 2S19 "Msta‑S" 152 mm modern SP howitzer.
+        /// </summary>
+        private static void CreateSpa2S19Profile()
+        {
+            try
+            {
+                var profile = new WeaponSystemProfile(
+                    name: "2S19 Msta‑S Self Propelled Artillery",
+                    nationality: Nationality.USSR,
+                    weaponSystemID: WeaponSystems.SPA_2S19,
+                    80,
+                    landHardAttack: 10,
+                    landHardDefense: 4,
+                    landSoftAttack: 18,
+                    landSoftDefense: 6,
+                    landAirAttack: 1,
+                    landAirDefense: 3,
+                    primaryRange: 1f,
+                    indirectRange: 5f,
+                    spottingRange: 2f,
+                    movementModifier: 1f,
+                    allWeatherCapability: AllWeatherRating.Day,
+                    nvgCapability: NVG_Rating.None,
+                    silhouette: UnitSilhouette.Medium,
+                    sigintRating: SIGINT_Rating.UnitLevel,
+                    nbcRating: NBC_Rating.Gen1,
+                    strategicMobility: StrategicMobility.Heavy
+                );
+
+                // Set upgrade paths for modernization
+                profile.AddUpgradeType(UpgradeType.SPART);
+
+                // Set short name for UI display
+                profile.SetShortName("2S19 Msta-S");
+
+                // Store in master dictionary
+                _weaponSystemProfiles[WeaponSystems.SPA_2S19] = profile;
+            }
+            catch (Exception e)
+            {
+                AppService.HandleException(CLASS_NAME, nameof(CreateSpa2S19Profile), e);
+                throw;
+            }
+        }
+
+        /// <summary>
+        /// BM‑21 "Grad" 122 mm 40‑tube MLRS.
+        /// </summary>
+        private static void CreateRocBm21Profile()
+        {
+            try
+            {
+                var profile = new WeaponSystemProfile(
+                    name: "BM‑21 Grad MLRS",
+                    nationality: Nationality.USSR,
+                    weaponSystemID: WeaponSystems.ROC_BM21,
+                    45,
+                    landHardAttack: 4,
+                    landHardDefense: 2,
+                    landSoftAttack: 10,
+                    landSoftDefense: 3,
+                    landAirAttack: 1,
+                    landAirDefense: 2,
+                    primaryRange: 1f,
+                    indirectRange: 3f,
+                    spottingRange: 2f,
+                    movementModifier: 1f,
+                    allWeatherCapability: AllWeatherRating.Day,
+                    nvgCapability: NVG_Rating.None,
+                    silhouette: UnitSilhouette.Medium,
+                    sigintRating: SIGINT_Rating.UnitLevel,
+                    nbcRating: NBC_Rating.Gen1,
+                    strategicMobility: StrategicMobility.Heavy
+                );
+
+                // Set double fire capability (two salvos per turn)
+                profile.SetDoubleFireCapability(true);
+
+                // Set upgrade paths for modernization
+                profile.AddUpgradeType(UpgradeType.ROC);
+
+                // Set short name for UI display
+                profile.SetShortName("BM-21 Grad");
+
+                // Store in master dictionary
+                _weaponSystemProfiles[WeaponSystems.ROC_BM21] = profile;
+            }
+            catch (Exception e)
+            {
+                AppService.HandleException(CLASS_NAME, nameof(CreateRocBm21Profile), e);
+                throw;
+            }
+        }
+
+        /// <summary>
+        /// BM‑27 "Uragan" 220 mm 16‑tube MLRS.
+        /// </summary>
+        private static void CreateRocBm27Profile()
+        {
+            try
+            {
+                var profile = new WeaponSystemProfile(
+                    name: "BM‑27 Uragan MLRS",
+                    nationality: Nationality.USSR,
+                    weaponSystemID: WeaponSystems.ROC_BM27,
+                    60,
+                    landHardAttack: 8,
+                    landHardDefense: 2,
+                    landSoftAttack: 12,
+                    landSoftDefense: 4,
+                    landAirAttack: 1,
+                    landAirDefense: 2,
+                    primaryRange: 1f,
+                    indirectRange: 4f,
+                    spottingRange: 2f,
+                    movementModifier: 1f,
+                    allWeatherCapability: AllWeatherRating.Day,
+                    nvgCapability: NVG_Rating.None,
+                    silhouette: UnitSilhouette.Medium,
+                    sigintRating: SIGINT_Rating.UnitLevel,
+                    nbcRating: NBC_Rating.Gen1,
+                    strategicMobility: StrategicMobility.Heavy
+                );
+
+                // Set double fire capability (two salvos per turn)
+                profile.SetDoubleFireCapability(true);
+
+                // Set upgrade paths for modernization
+                profile.AddUpgradeType(UpgradeType.ROC);
+
+                // Set short name for UI display
+                profile.SetShortName("BM-27 Uragan");
+
+                // Store in master dictionary
+                _weaponSystemProfiles[WeaponSystems.ROC_BM27] = profile;
+            }
+            catch (Exception e)
+            {
+                AppService.HandleException(CLASS_NAME, nameof(CreateRocBm27Profile), e);
+                throw;
+            }
+        }
+
+        /// <summary>
+        /// BM‑30 "Smerch" 300 mm 12‑tube MLRS.
+        /// </summary>
+        private static void CreateRocBm30Profile()
+        {
+            try
+            {
+                var profile = new WeaponSystemProfile(
+                    name: "BM‑30 Smerch MLRS",
+                    nationality: Nationality.USSR,
+                    weaponSystemID: WeaponSystems.ROC_BM30,
+                    85,
+                    landHardAttack: 9,
+                    landHardDefense: 3,
+                    landSoftAttack: 14,
+                    landSoftDefense: 5,
+                    landAirAttack: 1,
+                    landAirDefense: 3,
+                    primaryRange: 1f,
+                    indirectRange: 5f,
+                    spottingRange: 2f,
+                    movementModifier: 1f,
+                    allWeatherCapability: AllWeatherRating.Day,
+                    nvgCapability: NVG_Rating.None,
+                    silhouette: UnitSilhouette.Medium,
+                    sigintRating: SIGINT_Rating.UnitLevel,
+                    nbcRating: NBC_Rating.Gen1,
+                    strategicMobility: StrategicMobility.Heavy
+                );
+
+                // Set double fire capability (two salvos per turn)
+                profile.SetDoubleFireCapability(true);
+
+                // Set upgrade paths for modernization
+                profile.AddUpgradeType(UpgradeType.ROC);
+
+                // Set short name for UI display
+                profile.SetShortName("BM-30 Smerch");
+
+                // Store in master dictionary
+                _weaponSystemProfiles[WeaponSystems.ROC_BM30] = profile;
+            }
+            catch (Exception e)
+            {
+                AppService.HandleException(CLASS_NAME, nameof(CreateRocBm30Profile), e);
+                throw;
+            }
+        }
+
+        /// <summary>
+        /// 9K72 "Elbrus" (NATO: Scud‑B) tactical ballistic missile system.
+        /// </summary>
+        private static void CreateSsmScudProfile()
+        {
+            try
+            {
+                var profile = new WeaponSystemProfile(
+                    name: "9K72 Scud‑B Tactical Ballistic Missile Launcher",
+                    nationality: Nationality.USSR,
+                    weaponSystemID: WeaponSystems.SSM_SCUD,
+                    200,
+                    landHardAttack: 10,
+                    landHardDefense: 1,
+                    landSoftAttack: 15,
+                    landSoftDefense: 2,
+                    landAirAttack: 0,
+                    landAirDefense: 1,
+                    primaryRange: 1f,
+                    indirectRange: 99f,
+                    spottingRange: 2f,
+                    movementModifier: 1f,
+                    allWeatherCapability: AllWeatherRating.Day,
+                    nvgCapability: NVG_Rating.None,
+                    silhouette: UnitSilhouette.Large,
+                    sigintRating: SIGINT_Rating.UnitLevel,
+                    nbcRating: NBC_Rating.Gen1,
+                    strategicMobility: StrategicMobility.Heavy
+                );
+
+                // Set double fire capability (two salvos per turn)
+                profile.SetDoubleFireCapability(true);
+
+                // Set upgrade paths for modernization
+                profile.AddUpgradeType(UpgradeType.SSM);
+
+                // Set short name for UI display
+                profile.SetShortName("9K72 Scud-B");
+
+                // Store in master dictionary
+                _weaponSystemProfiles[WeaponSystems.SSM_SCUD] = profile;
+            }
+            catch (Exception e)
+            {
+                AppService.HandleException(CLASS_NAME, nameof(CreateSsmScudProfile), e);
+                throw;
+            }
+        }
+
+        #endregion // Soviet Artillery & Rockets
 
     }
 }
