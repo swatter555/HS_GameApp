@@ -32,7 +32,7 @@ namespace HammerAndSickle.Models
         AT,     // Anti-tank
         AM,     // Air Mobile
         MAM,    // Mechanized Air Mobile
-        INF,    // Infantry
+        INF,    // INF
         SPECF,  // Special Forces Foot
         SPECM,  // Special Forces Mechanized
         SPECH,  // Special Forces Helicopter
@@ -45,11 +45,11 @@ namespace HammerAndSickle.Models
         AAA,    // Anti-Aircraft Artillery
         SPAAA,  // Self-Propelled Anti-Aircraft Artillery
         ENG,    // Engineer
-        HELO,   // Attack helicopter
-        ASF,    // Air Superiority Fighter
-        MRF,    // Multi-role Fighter
-        ATT,    // Attack aircraft
-        BMB,    // Bomber
+        HELO,   // ATT helicopter
+        ASF,    // Air Superiority ASF
+        MRF,    // Multi-role ASF
+        ATT,    // ATT aircraft
+        BMB,    // BMB
         RECONA, // Recon Aircraft
         HQ,     // HQ facility
         DEPOT,  // Supply Depot
@@ -116,7 +116,8 @@ namespace HammerAndSickle.Models
     /// </summary>
     public enum DeploymentState
     {
-        Mobile,        // Mounted on transport
+        InTransit,     // Mounted on an air transport
+        Mobile,        // Mounted on a ground transport
         Deployed,      // Standard dismounted posture
         HastyDefense,  // Quick entrenchment, moderate defense boost
         Entrenched,    // Prepared defensive positions, stronger defense
@@ -321,13 +322,13 @@ namespace HammerAndSickle.Models
     }
 
     /// <summary>
-    /// Infantry and soft-target focused skills.
+    /// INF and soft-target focused skills.
     /// </summary>
     [SkillBranchEnum(SkillBranch.InfantryDoctrine)]
     public enum InfantryDoctrine
     {
         None,
-        InfantryAssaultTactics_SoftAttack,      // Infantry Assault Tactics
+        InfantryAssaultTactics_SoftAttack,      // INF Assault Tactics
         DefensiveDoctrine_SoftDefense,          // Defensive Doctrine
         RoughTerrainOperations_RTO              // Move more easily in rough terrain.
     }
@@ -668,12 +669,14 @@ namespace HammerAndSickle.Models
         BMB_TU22,
         BMB_TU22M3,
         RCNA_MIG25R,
-        REG_INF_SV, // Regular Infantry
-        AB_INF_SV,  // Airborne Infantry
-        AM_INF_SV,  // Air Mobile Infantry
-        MAR_INF_SV, // Marine Infantry
-        SPEC_INF_SV,// Special Forces Infantry
-        ENG_INF_SV, // Engineer Infantry
+        REG_INF_SV, // Regular INF
+        AB_INF_SV,  // Airborne INF
+        AM_INF_SV,  // Air Mobile INF
+        MAR_INF_SV, // Marine INF
+        SPEC_INF_SV,// Special Forces INF
+        ENG_INF_SV, // Engineer INF
+        TRANSHELO_MI8, // Transport Helicopter
+        TRANSAIR_AN12, // Transport Aircraft
 
         // USA
         TANK_M1,
@@ -700,6 +703,8 @@ namespace HammerAndSickle.Models
         MAR_INF_US,
         SPEC_INF_US,
         ENG_INF_US,
+
+        // TODO: Add US AWACS
 
         // West Germany (FRG)
         TANK_LEOPARD1,
@@ -766,11 +771,12 @@ namespace HammerAndSickle.Models
     public enum UpgradeType
     {
         None,
+        INF,
         AFV,
         IFV,
         APC,
         RECON,
-        SPART,
+        SPA,
         ART,
         ROC,
         SSM,
@@ -778,10 +784,14 @@ namespace HammerAndSickle.Models
         SPSAM,
         AAA,
         SPAAA,
-        Fighter,
-        Attack,
-        Bomber,
-        Infantry
+        ASF,
+        ATT,
+        BMB,
+        RCN,
+        AWACS,
+        ATTHELO,
+        TRNHELO,
+        TRNAIR
     }
 
     #endregion // WeaponSystem Enums
@@ -801,16 +811,16 @@ namespace HammerAndSickle.Models
         SV_BM,    // Ballistic Missile Regiment
         SV_AAR,   // Air Assault Regiment
         SV_VDV,   // Airborne Regiment
-        SV_NAV,   // Naval Infantry Regiment
+        SV_NAV,   // Naval INF Regiment
         SV_ENG,   // Engineer Regiment
         SV_RCR,   // Reconnaissance Regiment
         SV_ADR,   // Air Defense Regiment
         SV_HEL,   // Helicopter Regiment
         SV_GRU,   // Spetsnaz Regiment
-        SV_FR,    // Fighter Regiment
+        SV_FR,    // ASF Regiment
         SV_MR,    // Multirole Regiment
-        SV_AR,    // Attack Regiment
-        SV_BR,    // Bomber Regiment
+        SV_AR,    // ATT Regiment
+        SV_BR,    // BMB Regiment
         SV_RR,    // Reconnaissance Regiment (Air)
         SV_BASE,  // Base
         SV_AIRB,  // Airbase

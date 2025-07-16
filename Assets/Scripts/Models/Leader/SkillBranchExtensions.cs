@@ -271,7 +271,7 @@ namespace HammerAndSickle.Models
 
             // Validate expected counts based on current design
             const int EXPECTED_FOUNDATION = 2;    // Leadership, Political
-            const int EXPECTED_DOCTRINE = 7;      // Armored, Infantry, Artillery, AirDefense, Airborne, AirMobile, Intelligence
+            const int EXPECTED_DOCTRINE = 7;      // Armored, INF, Artillery, AirDefense, Airborne, AirMobile, Intelligence
             const int EXPECTED_SPECIALIZATION = 4; // CombinedArms, SignalIntel, Engineering, SpecialForces
 
             bool hasErrors = false;

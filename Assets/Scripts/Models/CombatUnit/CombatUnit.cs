@@ -23,236 +23,6 @@ namespace HammerAndSickle.Models
     }
 
 
-    /* ──────────────────────────────────────────────────────────────────────
-       CombatUnit – universal representation of every force element
-       ──────────────────────────────────────────────────────────────────────
-
-       `CombatUnit` is the one‑stop model for **every** tangible piece on the map—armour
-       battalions, SOF teams, fighter squadrons, depots, HQs and air‑bases.  Each
-       instance fuses three data layers: (1) *Identity* (immutable IDs, nationality,
-       role and side), (2) *Templates* (read‑only `WeaponSystemProfile` &
-       `IntelProfile` objects shared across units), and (3) *Runtime state*—hit‑points,
-       days of supply, movement points, five independent action pools, experience,
-       efficiency, deployment state, map position and an optional leader reference.
-
-       The turn loop is driven by the **five action pools** (Move, Combat, Deployment,
-       Opportunity, Intel).  `ResetTurn()` *always* tops every pool back to its design
-       capacity; weather and command friction modify **movement costs**, not token
-       refills, and are handled elsewhere.  Supply acts as a trip‑wire rather than a
-       smooth curve: at ≤1 day the unit is considered *critical* and most actions
-       (other than minimal movement or resupply) are blocked until stocks are
-       replenished.
-
-       **Deployment** is the centre‑piece of land manoeuvre.  Units climb or descend a
-       five‑step ladder—`Mobile → Deployed → HastyDefense → Entrenched → Fortified`—one
-       rung per Deployment action.  A change costs **½ max MPs** and a small supply
-       fee, validated by `CanChangeToState`.  State changes flip mounting (granting a
-       once‑per‑entry mobile bonus) and apply posture combat multipliers (–10 % Mobile
-       through +30 % Fortified) that feed into `GetFinalCombatRatingModifier`.
-       Transport is strictly *organic*; however a **TODO** flag marks a future third
-       profile ID (`AirMounted`) for airborne/air‑mobile operations.  Aircraft, naval
-       units and base facilities are locked to a single posture.
-
-       The **Opportunity** pool is currently reserved for *indirect‑fire* systems—SAMs
-       and tube / rocket artillery—to trigger defensive shots during the enemy turn.
-       `Intel` actions both run active recon (revealing hexes) and boost an internal
-       *DetectionLevel* for surrounding enemy units.  Experience accrues from combat,
-       movement under threat and successful Intel ops; bases gain XP only through
-       Intel work.  Leader skills apply **solely** to the unit they are stacked with,
-       enabling micro‑level command advantages rather than area buffs.
-
-       Depots and air‑bases hold their own stockpiles and throughput; generation is a
-       fixed number that scales with facility size.  `Clone()` is a developer utility
-       for spawning fresh units from templates—*never* used on live state objects.
-       Persistence relies on `ISerializable`; post‑load, `ResolveUnitReferences()`
-       rewires template and leader IDs, and `ValidateInternalConsistency()` guards
-       against corrupt saves.
-
-       --------------------------------------------------------------------
-       PUBLIC API (⇢ brief purpose)
-       --------------------------------------------------------------------
-
-       ───────────────────────────────────
-       IDENTIFICATION & METADATA
-       ───────────────────────────────────
-       string             UnitName              { get; set; }
-       string             UnitID                { get; }
-       UnitType           UnitType              { get; }
-       UnitClassification Classification        { get; }
-       UnitRole           Role                  { get; }
-       Side               Side                  { get; }
-       Nationality        Nationality           { get; }
-       bool               IsTransportable       { get; }
-       bool               IsBase                { get; }    // derived helper
-
-       ───────────────────────────────────
-       PROFILE REFERENCES
-       ───────────────────────────────────
-       WeaponSystems      DeployedProfileID     { get; }
-       WeaponSystems      MountedProfileID      { get; }
-       IntelProfileTypes  IntelProfileType      { get; internal set; }
-
-       ───────────────────────────────────
-       ACTION POOLS (StatsMaxCurrent)
-       ───────────────────────────────────
-       StatsMaxCurrent    MoveActions           { get; }
-       StatsMaxCurrent    CombatActions         { get; }
-       StatsMaxCurrent    DeploymentActions     { get; }
-       StatsMaxCurrent    OpportunityActions    { get; }
-       StatsMaxCurrent    IntelActions          { get; }
-
-       ───────────────────────────────────
-       STATE & ATTRITION
-       ───────────────────────────────────
-       int                ExperiencePoints      { get; internal set; }
-       ExperienceLevel    ExperienceLevel       { get; internal set; }
-       EfficiencyLevel    EfficiencyLevel       { get; internal set; }
-       bool               IsMounted             { get; internal set; }
-       DeploymentState    DeploymentState       { get; internal set; }
-       StatsMaxCurrent    HitPoints             { get; }
-       StatsMaxCurrent    DaysSupply            { get; }
-       StatsMaxCurrent    MovementPoints        { get; }
-       Coordinate2D       MapPos                { get; internal set; }
-       SpottedLevel       SpottedLevel          { get; }
-
-       ───────────────────────────────────
-       LEADER LINK
-       ───────────────────────────────────
-       string             LeaderID              { get; internal set; }
-       bool               IsLeaderAssigned      { get; }           // computed helper
-       Leader             UnitLeader            { get; }           // lazy lookup
-
-       ───────────────────────────────────
-       Constructor signature
-       ───────────────────────────────────
-
-       public CombatUnit(string unitName,
-            UnitType unitType,
-            UnitClassification classification,
-            UnitRole role,
-            Side side,
-            Nationality nationality,
-            WeaponSystems deployedProfileID,
-            WeaponSystems mountedProfileID,
-            IntelProfileTypes intelProfileType,
-            bool isTransportable,
-            DepotCategory category = DepotCategory.Secondary,
-            DepotSize size = DepotSize.Small)
-
-       ───────────────────────────────────
-       Methods
-       ───────────────────────────────────
-       // Turn & state
-         ResetTurn()                        – refill all action pools & MPs
-         RefreshAllActions()                – full token reset (start‑turn)
-         RefreshMovementPoints()            – set MPs = max (start‑turn)
-         IsDestroyed() : bool               – HP ≤ 1 test
-
-       // Position & movement
-         SetPosition(pos)                   – teleport (no cost)
-         CanMoveTo(target) : bool           – coarse legality check
-         GetDistanceTo(target) : float      – Euclidean map distance
-         PerformMoveAction(mp) : bool       – spend Move token + MPs + supply
-
-       // Combat & intel
-         PerformCombatAction() : bool       – spend Combat token + MPs + supply
-         PerformIntelAction() : bool        – spend Intel token + MPs + supply
-         PerformOpportunityAction() : bool  – reactive shot, supply only
-
-       // Deployment
-         DeployUpOneLevel() : bool          – posture +1 toward Mobile
-         DeployDownOneLevel() : bool        – posture +1 toward Fortified
-         PerformDeploymentAction(state)     – direct state set (UI wrapper)
-
-       // Supply & attrition
-         ConsumeSupplies(days) : bool       – guarded debit
-         ReceiveSupplies(days) : float      – capped credit
-         TakeDamage(hp)                     – apply HP loss (clamped)
-         Repair(hp)                         – restore HP (clamped)
-
-       // Statistics & strength
-         GetActiveWeaponSystemProfile()     – mounted vs. deployed picker
-         GetCurrentCombatStrength()         – temp profile with all modifiers
-         GetAvailableActions() : Dictionary – tokens after MP gating
-
-       // Experience & efficiency
-         AddExperience(pts)                 – grant XP and auto‑level
-         SetExperience(pts)                 – force XP, resync level
-         IncreaseEfficiencyLevelBy1()       – step up (better)
-         DecreaseEfficiencyLevelBy1()       – step down (worse)
-
-       // Leader subsystem
-         AssignLeader(id) / RemoveLeader()  – attach / detach commander
-         GetLeaderRank() : string           – formatted rank or ""
-         HasLeaderSkill(enum) : bool        – capability check
-         AwardLeaderReputation(…)           – REP via combat or direct value
-
-       // Facilities (HQ/Airbase/Depot)
-         AddAirUnit(unit) : bool            – attach aircraft
-         SupplyUnit(dist,zoc) : float       – land supply push
-         PerformAirSupply(dist) : float     – main‑depot airlift
-         AddFacilityDamage(pts)             – damage → capacity drop
-         RepairFacilityDamage(pts)          – restore capacity
-
-       // Persistence & validation
-         Clone() : object                   – deep copy w/out leader/links
-         GetObjectData(info,ctx)            – ISerializable writer
-         ResolveUnitReferences(dict)        – second‑phase ID fix‑ups
-         ValidateInternalConsistency()      – returns list of error strings
-
-       --------------------------------------------------------------------
-       PRIVATE HELPERS (⇢ brief purpose)
-       --------------------------------------------------------------------
-       // Construction & initialisation
-         InitializeActionCounts()           – default token maxima
-         InitializeMovementPoints()         – derive MPs from classification
-         InitializeFacility(cat,size)       – dispatch to HQ / Depot / Airbase
-         SetupHQ() / SetupAirbase() / SetupSupplyDepot() – facility specialisation
-
-       // Movement / supply maths
-         ConsumeMovementPoints(pts) : bool  – guarded debit
-         GetDeployMovementCost() : float    – ceil(½·MPmax)
-         GetCombatMovementCost() : float    – ceil(¼·MPmax)
-         GetIntelMovementCost() : float     – ceil(⅛·MPmax)
-         ApplyMobileMovementBonus()         – one‑off bonus on entering Mobile
-
-       // Combat modifiers
-         GetStrengthModifier() : float      – HP‑based multiplier
-         GetCombatStateModifier() : float   – posture table lookup
-         GetEfficiencyModifier() : float    – efficiency table lookup
-         GetExperienceMultiplier() : float  – XP‑level table lookup
-         GetFinalCombatRatingModifier()     – product of the above four
-
-       // Deployment transitions
-         TryDeployUpOneState() : bool       – internal Mobile‑wards move
-         TryEntrenchDownOneState() : bool   – internal Fortified‑wards move
-         CanUnitTypeChangeStates() : bool   – blocks aircraft & bases
-         IsAdjacentStateTransition(cur,tgt) – ladder adjacency test
-         UpdateMobilityState(new,old)       – mount toggle + foot bonus flag
-         CanChangeToState(state) : bool     – master legality gate
-
-       // Experience & efficiency maths
-         UpdateExperience(pts)              – add XP & fire level change
-         CalculateExperienceLevel(pts)      – raw pts → enum
-         GetMinPointsForLevel(level)        – table lookup
-         GetNextLevel(level)                – returns following enum
-         UpdateEfficiency()                 – auto degrade / recover per turn
-         CheckSupplyWarnings()              – LOW / CRIT UI messages
-
-       // Facility internals
-         UpdateOperationalCapacity()        – damage → capacity tier
-         GetFacilityEfficiencyMultiplier()  – tier → 0‑1 scalar
-         GetMaxStockpile() : float          – depot capacity days
-         GetCurrentGenerationRate() : float – stockpile/day from size & damage
-         SetDepotSize(size)                 – S→M→L→H size change
-
-       // Utility & misc
-         GetDeployActions() : float         – tokens after MP check
-         GetCombatActions() : float         – tokens after MP check
-         GetMoveActions() : float           – tokens after MP check
-         AwardLeaderReputation(action,ctx)  – wrapper to Leader API
-         GenerateIntelReport(level)         – static helper in IntelProfile
-       ──────────────────────────────────────────────────────────────────────*/
     [Serializable]
     public partial class CombatUnit : ICloneable, ISerializable, IResolvableReferences
     {
@@ -281,11 +51,12 @@ namespace HammerAndSickle.Models
         public UnitRole Role { get; private set; }
         public Side Side { get; private set; }
         public Nationality Nationality { get; private set; }
-        public bool IsTransportable { get; private set; }
+        public bool IsTransportable{ get; private set; }       // Can use helicopter/airlift transport.
+        public bool IsMountable { get; private set; }          // Can mount onto APCs/IFVs.
         public bool IsBase => Classification.IsBaseType();
 
         // Profile IDs
-        // TODO: Add a transport profile ID for airborne/air-mobile units.
+        public WeaponSystems TransportProfileID { get; private set; }
         public WeaponSystems DeployedProfileID { get; private set; }
         public WeaponSystems MountedProfileID { get; private set; }
         public IntelProfileTypes IntelProfileType { get; internal set; }
@@ -347,8 +118,10 @@ namespace HammerAndSickle.Models
             Nationality nationality,
             WeaponSystems deployedProfileID,
             WeaponSystems mountedProfileID,
+            WeaponSystems transportProfileID,
             IntelProfileTypes intelProfileType,
-            bool isTransportable,
+            bool isMountable = false,
+            bool isTransportable = false,
             DepotCategory category = DepotCategory.Secondary,
             DepotSize size = DepotSize.Small)
         {
@@ -373,6 +146,13 @@ namespace HammerAndSickle.Models
                         throw new ArgumentException($"Mounted profile ID {mountedProfileID} not found in database", nameof(mountedProfileID));
                 }
 
+                // When not DEFAULT, transport profile ID must point to a valid profile.
+                if (transportProfileID != WeaponSystems.DEFAULT)
+                {
+                    if (WeaponSystemsDatabase.GetWeaponSystemProfile(transportProfileID) == null)
+                        throw new ArgumentException($"Transport profile ID {transportProfileID} not found in database", nameof(transportProfileID));
+                }
+
                 // Validate intel profile type
                 if (!Enum.IsDefined(typeof(IntelProfileTypes), intelProfileType))
                     throw new ArgumentException("Invalid intel profile type", nameof(intelProfileType));
@@ -390,8 +170,10 @@ namespace HammerAndSickle.Models
                 Side = side;
                 Nationality = nationality;
                 IsTransportable = isTransportable;
+                IsMountable = isMountable;
 
                 // Set profile IDs
+                TransportProfileID = transportProfileID;
                 DeployedProfileID = deployedProfileID;
                 MountedProfileID = mountedProfileID;
                 IntelProfileType = intelProfileType;
@@ -2512,7 +2294,9 @@ namespace HammerAndSickle.Models
                     this.Nationality,
                     this.DeployedProfileID,      // Direct enum value copy
                     this.MountedProfileID,       // Direct enum value copy
+                    this.TransportProfileID,     // Direct enum value copy
                     this.IntelProfileType,       // Static enum value - no reference resolution needed
+                    this.IsMountable,
                     this.IsTransportable,
                     this.DepotCategory,          // Copy depot category for base units
                     this.DepotSize               // Copy depot size for base units
@@ -2594,7 +2378,7 @@ namespace HammerAndSickle.Models
                 Role = (UnitRole)info.GetValue(nameof(Role), typeof(UnitRole));
                 Side = (Side)info.GetValue(nameof(Side), typeof(Side));
                 Nationality = (Nationality)info.GetValue(nameof(Nationality), typeof(Nationality));
-                IsTransportable = info.GetBoolean(nameof(IsTransportable));
+                IsMountable = info.GetBoolean(nameof(IsMountable));
                 SpottedLevel = (SpottedLevel)info.GetValue(nameof(SpottedLevel), typeof(SpottedLevel));
 
                 // Load IntelProfileType directly as enum value
@@ -2718,7 +2502,7 @@ namespace HammerAndSickle.Models
                 info.AddValue(nameof(Role), Role);
                 info.AddValue(nameof(Side), Side);
                 info.AddValue(nameof(Nationality), Nationality);
-                info.AddValue(nameof(IsTransportable), IsTransportable);
+                info.AddValue(nameof(IsMountable), IsMountable);
                 info.AddValue(nameof(IsBase), IsBase);
                 info.AddValue(nameof(SpottedLevel), SpottedLevel);
 

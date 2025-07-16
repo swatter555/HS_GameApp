@@ -259,6 +259,8 @@ namespace HammerAndSickle.Models
 
                 CreateRcna_Mig25RProfile();
 
+                Create_MI8TProfile();
+
                 // US Tanks
                 CreateTankM1Profile();
 
@@ -289,7 +291,7 @@ namespace HammerAndSickle.Models
                 CreateBmbF117Profile();
                 CreateRcnaSr71Profile();
 
-                // US Infantry
+                // US INF
                 CreateRegInfUsProfile();
                 CreateAbInfUsProfile();
                 CreateAmInfUsProfile();
@@ -741,7 +743,7 @@ namespace HammerAndSickle.Models
                 );
 
                 // Upgrade paths
-                profile.AddUpgradeType(UpgradeType.Infantry);
+                profile.AddUpgradeType(UpgradeType.INF);
 
                 // Set short name for UI display
                 profile.SetShortName("Infantry");
@@ -787,7 +789,7 @@ namespace HammerAndSickle.Models
                 );
 
                 // Upgrade paths
-                profile.AddUpgradeType(UpgradeType.Infantry);
+                profile.AddUpgradeType(UpgradeType.INF);
 
                 // Set short name for UI display
                 profile.SetShortName("Airborne");
@@ -833,7 +835,7 @@ namespace HammerAndSickle.Models
                 );
 
                 // Set upgrade paths
-                profile.AddUpgradeType(UpgradeType.Infantry);
+                profile.AddUpgradeType(UpgradeType.INF);
 
                 // Set short name for UI display
                 profile.SetShortName("Air-Mobile");
@@ -879,7 +881,7 @@ namespace HammerAndSickle.Models
                 );
 
                 // Set upgrade paths
-                profile.AddUpgradeType(UpgradeType.Infantry);
+                profile.AddUpgradeType(UpgradeType.INF);
 
                 // Set short name for UI display
                 profile.SetShortName("Marines");
@@ -925,7 +927,7 @@ namespace HammerAndSickle.Models
                 );
 
                 // Set upgrade paths
-                profile.AddUpgradeType(UpgradeType.Infantry);
+                profile.AddUpgradeType(UpgradeType.INF);
 
                 // Set short name for UI display
                 profile.SetShortName("Spetsnaz");
@@ -971,7 +973,7 @@ namespace HammerAndSickle.Models
                 );
 
                 // Set upgrade paths
-                profile.AddUpgradeType(UpgradeType.Infantry);
+                profile.AddUpgradeType(UpgradeType.INF);
 
                 // Set short name for UI display
                 profile.SetShortName("Engineers");
@@ -1580,7 +1582,7 @@ namespace HammerAndSickle.Models
                 );
 
                 //Set the upgrade paths for modernization
-                profile.AddUpgradeType(UpgradeType.SPART);
+                profile.AddUpgradeType(UpgradeType.SPA);
 
                 // Set short name for UI display
                 profile.SetShortName("2S1 Gvozdika");
@@ -1629,7 +1631,7 @@ namespace HammerAndSickle.Models
                 );
 
                 // Set upgrade paths for modernization
-                profile.AddUpgradeType(UpgradeType.SPART);
+                profile.AddUpgradeType(UpgradeType.SPA);
 
                 // Set short name for UI display
                 profile.SetShortName("2S3 Akatsiya");
@@ -1678,7 +1680,7 @@ namespace HammerAndSickle.Models
                 );
 
                 // Set upgrade paths for modernization
-                profile.AddUpgradeType(UpgradeType.SPART);
+                profile.AddUpgradeType(UpgradeType.SPA);
 
                 // Set short name for UI display
                 profile.SetShortName("2S5 Giatsint-S");
@@ -1727,7 +1729,7 @@ namespace HammerAndSickle.Models
                 );
 
                 // Set upgrade paths for modernization
-                profile.AddUpgradeType(UpgradeType.SPART);
+                profile.AddUpgradeType(UpgradeType.SPA);
 
                 // Set short name for UI display
                 profile.SetShortName("2S19 Msta-S");
@@ -2326,7 +2328,7 @@ namespace HammerAndSickle.Models
                     landSoftAttack: 7,
                     landSoftDefense: 4,
                     landAirAttack: 1,
-                    landAirDefense: 2,
+                    landAirDefense: 7,
                     primaryRange: 1f,
                     indirectRange: 0f,
                     spottingRange: 2f,
@@ -2340,7 +2342,7 @@ namespace HammerAndSickle.Models
                 );
 
                 // Set upgrade paths for modernization
-                profile.AddUpgradeType(UpgradeType.Attack);
+                profile.AddUpgradeType(UpgradeType.ATTHELO);
 
                 // Set short name for UI display
                 profile.SetShortName("Mi-8AT");
@@ -2374,8 +2376,8 @@ namespace HammerAndSickle.Models
                     landHardDefense: 7,
                     landSoftAttack: 12,
                     landSoftDefense: 8,
-                    landAirAttack: 2,
-                    landAirDefense: 4,
+                    landAirAttack: 1,
+                    landAirDefense: 9,
                     primaryRange: 1f,
                     indirectRange: 0f,
                     spottingRange: 3f,
@@ -2389,7 +2391,7 @@ namespace HammerAndSickle.Models
                 );
 
                 // Set upgrade paths for modernization
-                profile.AddUpgradeType(UpgradeType.Attack);
+                profile.AddUpgradeType(UpgradeType.ATTHELO);
 
                 // Set short name for UI display
                 profile.SetShortName("Mi-24D");
@@ -2423,8 +2425,8 @@ namespace HammerAndSickle.Models
                     landHardDefense: 7,
                     landSoftAttack: 13,
                     landSoftDefense: 8,
-                    landAirAttack: 3,
-                    landAirDefense: 5,
+                    landAirAttack: 1,
+                    landAirDefense: 10,
                     primaryRange: 1f,
                     indirectRange: 0f,
                     spottingRange: 3f,
@@ -2438,7 +2440,7 @@ namespace HammerAndSickle.Models
                 );
 
                 // Set upgrade paths for modernization
-                profile.AddUpgradeType(UpgradeType.Attack);
+                profile.AddUpgradeType(UpgradeType.ATTHELO);
 
                 // Set short name for UI display
                 profile.SetShortName("Mi-24V");
@@ -2472,8 +2474,8 @@ namespace HammerAndSickle.Models
                     landHardDefense: 8,
                     landSoftAttack: 15,
                     landSoftDefense: 9,
-                    landAirAttack: 4,
-                    landAirDefense: 7,
+                    landAirAttack: 1,
+                    landAirDefense: 11,
                     primaryRange: 1f,
                     indirectRange: 0f,
                     spottingRange: 3f,
@@ -2487,7 +2489,7 @@ namespace HammerAndSickle.Models
                 );
 
                 // Set upgrade paths for modernization
-                profile.AddUpgradeType(UpgradeType.Attack);
+                profile.AddUpgradeType(UpgradeType.ATTHELO);
 
                 // Set short name for UI display
                 profile.SetShortName("Mi-28");
@@ -2538,7 +2540,7 @@ namespace HammerAndSickle.Models
                 );
 
                 // Set upgrade paths for modernization
-                profile.AddUpgradeType(UpgradeType.Fighter);
+                profile.AddUpgradeType(UpgradeType.AWACS);
 
                 // Set short name for UI display
                 profile.SetShortName("A-50");
@@ -2588,7 +2590,7 @@ namespace HammerAndSickle.Models
                 );
 
                 // Set upgrade paths for modernization
-                profile.AddUpgradeType(UpgradeType.Fighter);
+                profile.AddUpgradeType(UpgradeType.ASF);
 
                 // Set short name for UI display
                 profile.SetShortName("MiG-21");
@@ -2637,7 +2639,7 @@ namespace HammerAndSickle.Models
                 );
 
                 // Set upgrade paths for modernization
-                profile.AddUpgradeType(UpgradeType.Fighter);
+                profile.AddUpgradeType(UpgradeType.ASF);
 
                 // Set short name for UI display
                 profile.SetShortName("MiG-23");
@@ -2684,7 +2686,7 @@ namespace HammerAndSickle.Models
                 );
 
                 // Set upgrade paths for modernization
-                profile.AddUpgradeType(UpgradeType.Fighter);
+                profile.AddUpgradeType(UpgradeType.ASF);
 
                 // Set short name for UI display
                 profile.SetShortName("MiG-25");
@@ -2734,7 +2736,7 @@ namespace HammerAndSickle.Models
                 );
 
                 // Set upgrade paths for modernization
-                profile.AddUpgradeType(UpgradeType.Fighter);
+                profile.AddUpgradeType(UpgradeType.ASF);
 
                 // Set short name for UI display
                 profile.SetShortName("MiG-29");
@@ -2781,7 +2783,7 @@ namespace HammerAndSickle.Models
                 );
 
                 // Set upgrade paths for modernization
-                profile.AddUpgradeType(UpgradeType.Fighter);
+                profile.AddUpgradeType(UpgradeType.ASF);
 
                 // Set short name for UI display
                 profile.SetShortName("MiG-31");
@@ -2828,7 +2830,7 @@ namespace HammerAndSickle.Models
                 );
 
                 // Set upgrade paths for modernization
-                profile.AddUpgradeType(UpgradeType.Fighter);
+                profile.AddUpgradeType(UpgradeType.ASF);
 
                 // Set short name for UI display
                 profile.SetShortName("Su-27");
@@ -2875,7 +2877,7 @@ namespace HammerAndSickle.Models
                 );
 
                 // Set upgrade paths for modernization
-                profile.AddUpgradeType(UpgradeType.Fighter);
+                profile.AddUpgradeType(UpgradeType.ASF);
 
                 // Set short name for UI display
                 profile.SetShortName("Su-47");
@@ -2925,7 +2927,7 @@ namespace HammerAndSickle.Models
                 );
 
                 // Set upgrade paths for modernization
-                profile.AddUpgradeType(UpgradeType.Attack);
+                profile.AddUpgradeType(UpgradeType.ATT);
 
                 // Set short name for UI display
                 profile.SetShortName("MiG-27");
@@ -2975,7 +2977,7 @@ namespace HammerAndSickle.Models
                 );
 
                 // Set upgrade paths for modernization
-                profile.AddUpgradeType(UpgradeType.Attack);
+                profile.AddUpgradeType(UpgradeType.ATT);
 
                 // Set short name for UI display
                 profile.SetShortName("Su-25");
@@ -3025,7 +3027,7 @@ namespace HammerAndSickle.Models
                 );
 
                 // Set upgrade paths for modernization
-                profile.AddUpgradeType(UpgradeType.Attack);
+                profile.AddUpgradeType(UpgradeType.ATT);
 
                 // Set short name for UI display
                 profile.SetShortName("Su-25B");
@@ -3075,7 +3077,7 @@ namespace HammerAndSickle.Models
                 );
 
                 // Set upgrade paths for modernization
-                profile.AddUpgradeType(UpgradeType.Bomber);
+                profile.AddUpgradeType(UpgradeType.BMB);
 
                 // Set short name for UI display
                 profile.SetShortName("Su-24");
@@ -3125,7 +3127,7 @@ namespace HammerAndSickle.Models
                 );
 
                 // Set upgrade paths for modernization
-                profile.AddUpgradeType(UpgradeType.Bomber);
+                profile.AddUpgradeType(UpgradeType.BMB);
 
                 // Set short name for UI display
                 profile.SetShortName("Tu-16");
@@ -3175,7 +3177,7 @@ namespace HammerAndSickle.Models
                 );
 
                 // Set upgrade paths for modernization
-                profile.AddUpgradeType(UpgradeType.Bomber);
+                profile.AddUpgradeType(UpgradeType.BMB);
 
                 // Set short name for UI display
                 profile.SetShortName("Tu-22");
@@ -3225,7 +3227,7 @@ namespace HammerAndSickle.Models
                 );
 
                 // Set upgrade paths for modernization
-                profile.AddUpgradeType(UpgradeType.Bomber);
+                profile.AddUpgradeType(UpgradeType.BMB);
 
                 // Set short name for UI display
                 profile.SetShortName("Tu-22M3");
@@ -3272,7 +3274,7 @@ namespace HammerAndSickle.Models
                 );
 
                 // Set upgrade paths for modernization
-                profile.AddUpgradeType(UpgradeType.Fighter);
+                profile.AddUpgradeType(UpgradeType.RCN);
 
                 // Set short name for UI display
                 profile.SetShortName("MiG-25R");
@@ -3292,6 +3294,107 @@ namespace HammerAndSickle.Models
 
         #endregion // Soviet Aircraft
 
+
+        #region Soviet Transports
+
+        /// <summary>
+        /// The MI-8 "Hip" transport helicopter.
+        /// </summary>
+        private static void Create_MI8TProfile()
+        {
+            try
+            {
+                var profile = new WeaponSystemProfile(
+                    name: "Mi-8 Hip Transport Helicopter",
+                    nationality: Nationality.USSR,
+                    weaponSystemID: WeaponSystems.TRANSHELO_MI8,
+                    70,
+                    landHardAttack: 3,
+                    landHardDefense: 6,
+                    landSoftAttack: 4,
+                    landSoftDefense: 6,
+                    landAirAttack: 1,
+                    landAirDefense: 5,
+                    primaryRange: 1f,
+                    indirectRange: 0f,
+                    spottingRange: 2f,
+                    movementModifier: 2f,
+                    allWeatherCapability: AllWeatherRating.GroundUnit,
+                    sigintRating: SIGINT_Rating.UnitLevel,
+                    nbcRating: NBC_Rating.None,
+                    strategicMobility: StrategicMobility.Aviation,
+                    nvgCapability: NVG_Rating.Gen1,
+                    silhouette: UnitSilhouette.Medium
+
+                );
+
+                // Set upgrade paths for modernization
+                profile.AddUpgradeType(UpgradeType.TRNHELO);
+
+                // Set short name for UI display
+                profile.SetShortName("Mi-8T");
+
+                // Set turn availability
+                profile.SetTurnAvailable(250);
+
+                // Store in master dictionary
+                _weaponSystemProfiles[WeaponSystems.TRANSHELO_MI8] = profile;
+            }
+            catch (Exception e)
+            {
+                AppService.HandleException(CLASS_NAME, nameof(Create_MI8TProfile), e);
+                throw;
+            }
+        }
+
+        /// <summary>
+        /// An-12 medium-range transport.
+        /// </summary>
+        private static void Create_AN12Profile()
+        {
+            try
+            {
+                var profile = new WeaponSystemProfile(
+                    name: "An-12 Antonov Transport Plane",
+                    nationality: Nationality.USSR,
+                    weaponSystemID: WeaponSystems.TRANSAIR_AN12,
+                    90,
+                    landAirDefense: 7,
+                    airAttack: 1,
+                    airDefense: 5,
+                    airAvionics: 6,
+                    primaryRange: 1f,
+                    indirectRange: 0f,
+                    spottingRange: 3f,
+                    movementModifier: 5f,
+                    allWeatherCapability: AllWeatherRating.AllWeather,
+                    sigintRating: SIGINT_Rating.UnitLevel,
+                    nbcRating: NBC_Rating.Gen1,
+                    strategicMobility: StrategicMobility.Aircraft,
+                    nvgCapability: NVG_Rating.None,
+                    silhouette: UnitSilhouette.Large
+                );
+
+                // Set upgrade paths for modernization
+                profile.AddUpgradeType(UpgradeType.TRNAIR);
+
+                // Set short name for UI display
+                profile.SetShortName("An-12 Antonov");
+
+                // Set turn availability
+                profile.SetTurnAvailable(250);
+
+                // Store in master dictionary
+                _weaponSystemProfiles[WeaponSystems.TRANSAIR_AN12] = profile;
+            }
+            catch (Exception e)
+            {
+                AppService.HandleException(CLASS_NAME, nameof(Create_AN12Profile), e);
+                throw;
+            }
+        }
+
+        #endregion
 
         //-----------------------------------------------------------------------------------------
 
@@ -3353,7 +3456,7 @@ namespace HammerAndSickle.Models
         #region US IFVs and APCs
 
         /// <summary>
-        /// M2 Bradley Infantry Fighting Vehicle
+        /// M2 Bradley INF Fighting Vehicle
         /// </summary>
         private static void CreateIfvM2Profile()
         {
@@ -3587,7 +3690,7 @@ namespace HammerAndSickle.Models
                 );
 
                 // Set upgrade paths
-                profile.AddUpgradeType(UpgradeType.SPART);
+                profile.AddUpgradeType(UpgradeType.SPA);
 
                 // Set short name for UI display
                 profile.SetShortName("M109");
@@ -3815,7 +3918,7 @@ namespace HammerAndSickle.Models
         #region US Helicopters
 
         /// <summary>
-        /// AH-64 Apache Attack Helicopter
+        /// AH-64 Apache ATT Helicopter
         /// </summary>
         private static void CreateHelAh64Profile()
         {
@@ -3830,8 +3933,8 @@ namespace HammerAndSickle.Models
                     landHardDefense: 8,
                     landSoftAttack: 16,
                     landSoftDefense: 9,
-                    landAirAttack: 4,
-                    landAirDefense: 7,
+                    landAirAttack: 1,
+                    landAirDefense: 10,
                     primaryRange: 1f,
                     indirectRange: 0f,
                     spottingRange: 3f,
@@ -3845,7 +3948,7 @@ namespace HammerAndSickle.Models
                 );
 
                 // Set upgrade paths
-                profile.AddUpgradeType(UpgradeType.Attack);
+                profile.AddUpgradeType(UpgradeType.ATTHELO);
 
                 // Set short name for UI display
                 profile.SetShortName("AH-64");
@@ -3869,7 +3972,7 @@ namespace HammerAndSickle.Models
         #region US Aircraft
 
         /// <summary>
-        /// F-15 Eagle Air Superiority Fighter
+        /// F-15 Eagle Air Superiority ASF
         /// </summary>
         private static void CreateAsfF15Profile()
         {
@@ -3899,7 +4002,7 @@ namespace HammerAndSickle.Models
                 );
 
                 // Set upgrade paths
-                profile.AddUpgradeType(UpgradeType.Fighter);
+                profile.AddUpgradeType(UpgradeType.ASF);
 
                 // Set short name for UI display
                 profile.SetShortName("F-15 Eagle");
@@ -3918,7 +4021,7 @@ namespace HammerAndSickle.Models
         }
 
         /// <summary>
-        /// F-4 Phantom Multi-Role Fighter
+        /// F-4 Phantom Multi-Role ASF
         /// </summary>
         private static void CreateAsfF4Profile()
         {
@@ -3948,7 +4051,7 @@ namespace HammerAndSickle.Models
                 );
 
                 // Set upgrade paths
-                profile.AddUpgradeType(UpgradeType.Fighter);
+                profile.AddUpgradeType(UpgradeType.ASF);
 
                 // Set short name for UI display
                 profile.SetShortName("F-4 Phantom");
@@ -3967,7 +4070,7 @@ namespace HammerAndSickle.Models
         }
 
         /// <summary>
-        /// F-16 Fighting Falcon Multi-Role Fighter
+        /// F-16 Fighting Falcon Multi-Role ASF
         /// </summary>
         private static void CreateMrfF16Profile()
         {
@@ -3998,7 +4101,7 @@ namespace HammerAndSickle.Models
                 );
 
                 // Set upgrade paths
-                profile.AddUpgradeType(UpgradeType.Attack);
+                profile.AddUpgradeType(UpgradeType.ATT);
 
                 // Set short name for UI display
                 profile.SetShortName("F-16 Falcon");
@@ -4017,7 +4120,7 @@ namespace HammerAndSickle.Models
         }
 
         /// <summary>
-        /// A-10 Thunderbolt II Attack Aircraft
+        /// A-10 Thunderbolt II ATT Aircraft
         /// </summary>
         private static void CreateAttA10Profile()
         {
@@ -4048,7 +4151,7 @@ namespace HammerAndSickle.Models
                 );
 
                 // Set upgrade paths
-                profile.AddUpgradeType(UpgradeType.Attack);
+                profile.AddUpgradeType(UpgradeType.ATT);
 
                 // Set short name for UI display
                 profile.SetShortName("A-10 Thunderbolt II");
@@ -4067,7 +4170,7 @@ namespace HammerAndSickle.Models
         }
 
         /// <summary>
-        /// F-111 Aardvark Strike Fighter
+        /// F-111 Aardvark Strike ASF
         /// </summary>
         private static void CreateBmbF111Profile()
         {
@@ -4098,7 +4201,7 @@ namespace HammerAndSickle.Models
                 );
 
                 // Set upgrade paths
-                profile.AddUpgradeType(UpgradeType.Bomber);
+                profile.AddUpgradeType(UpgradeType.BMB);
 
                 // Set short name for UI display
                 profile.SetShortName("F-111");
@@ -4117,7 +4220,7 @@ namespace HammerAndSickle.Models
         }
 
         /// <summary>
-        /// F-117 Nighthawk Stealth Attack Aircraft
+        /// F-117 Nighthawk Stealth ATT Aircraft
         /// </summary>
         private static void CreateBmbF117Profile()
         {
@@ -4148,7 +4251,7 @@ namespace HammerAndSickle.Models
                 );
 
                 // Set upgrade paths
-                profile.AddUpgradeType(UpgradeType.Bomber);
+                profile.AddUpgradeType(UpgradeType.BMB);
 
                 // Set short name for UI display
                 profile.SetShortName("F-117 Nighthawk");
@@ -4195,7 +4298,7 @@ namespace HammerAndSickle.Models
                 );
 
                 // Set upgrade paths
-                profile.AddUpgradeType(UpgradeType.Fighter);
+                profile.AddUpgradeType(UpgradeType.RCN);
 
                 // Set short name for UI display
                 profile.SetShortName("SR-71 Blackbird");
@@ -4219,7 +4322,7 @@ namespace HammerAndSickle.Models
         #region US Infantry
 
         /// <summary>
-        /// US Regular Infantry
+        /// US Regular INF
         /// </summary>
         private static void CreateRegInfUsProfile()
         {
@@ -4249,7 +4352,7 @@ namespace HammerAndSickle.Models
                 );
 
                 // Upgrade paths
-                profile.AddUpgradeType(UpgradeType.Infantry);
+                profile.AddUpgradeType(UpgradeType.INF);
 
                 // Set short name for UI display
                 profile.SetShortName("Infantry");
@@ -4268,7 +4371,7 @@ namespace HammerAndSickle.Models
         }
 
         /// <summary>
-        /// US Airborne Infantry
+        /// US Airborne INF
         /// </summary>
         private static void CreateAbInfUsProfile()
         {
@@ -4298,7 +4401,7 @@ namespace HammerAndSickle.Models
                 );
 
                 // Upgrade paths
-                profile.AddUpgradeType(UpgradeType.Infantry);
+                profile.AddUpgradeType(UpgradeType.INF);
 
                 // Set short name for UI display
                 profile.SetShortName("Airborne");
@@ -4317,7 +4420,7 @@ namespace HammerAndSickle.Models
         }
 
         /// <summary>
-        /// US Air Mobile Infantry
+        /// US Air Mobile INF
         /// </summary>
         private static void CreateAmInfUsProfile()
         {
@@ -4347,7 +4450,7 @@ namespace HammerAndSickle.Models
                 );
 
                 // Set upgrade paths
-                profile.AddUpgradeType(UpgradeType.Infantry);
+                profile.AddUpgradeType(UpgradeType.INF);
 
                 // Set short name for UI display
                 profile.SetShortName("Air Mobile");
@@ -4366,7 +4469,7 @@ namespace HammerAndSickle.Models
         }
 
         /// <summary>
-        /// US Marine Infantry
+        /// US Marine INF
         /// </summary>
         private static void CreateMarInfUsProfile()
         {
@@ -4396,7 +4499,7 @@ namespace HammerAndSickle.Models
                 );
 
                 // Set upgrade paths
-                profile.AddUpgradeType(UpgradeType.Infantry);
+                profile.AddUpgradeType(UpgradeType.INF);
 
                 // Set short name for UI display
                 profile.SetShortName("Marines");
@@ -4415,7 +4518,7 @@ namespace HammerAndSickle.Models
         }
 
         /// <summary>
-        /// US Special Forces Infantry
+        /// US Special Forces INF
         /// </summary>
         private static void CreateSpecInfUsProfile()
         {
@@ -4445,7 +4548,7 @@ namespace HammerAndSickle.Models
                 );
 
                 // Set upgrade paths
-                profile.AddUpgradeType(UpgradeType.Infantry);
+                profile.AddUpgradeType(UpgradeType.INF);
 
                 // Set short name for UI display
                 profile.SetShortName("Special Forces");
@@ -4464,7 +4567,7 @@ namespace HammerAndSickle.Models
         }
 
         /// <summary>
-        /// US Engineer Infantry
+        /// US Engineer INF
         /// </summary>
         private static void CreateEngInfUsProfile()
         {
@@ -4494,7 +4597,7 @@ namespace HammerAndSickle.Models
                 );
 
                 // Set upgrade paths
-                profile.AddUpgradeType(UpgradeType.Infantry);
+                profile.AddUpgradeType(UpgradeType.INF);
 
                 // Set short name for UI display
                 profile.SetShortName("Engineers");
@@ -4512,7 +4615,7 @@ namespace HammerAndSickle.Models
             }
         }
 
-        #endregion // US Infantry
+        #endregion // US INF
 
 
         //-----------------------------------------------------------------------------------------

@@ -500,7 +500,7 @@ namespace HammerAndSickle.Models
             };
             _profiles[IntelProfileTypes.SV_TR] = tankRegiment;
 
-            // Example: Infantry Regiment profile  
+            // Example: INF Regiment profile  
             var motorRifleRegiment = new Dictionary<WeaponSystems, int>
             {
                 { WeaponSystems.REG_INF_SV, 2000 },
