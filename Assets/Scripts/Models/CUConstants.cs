@@ -179,7 +179,7 @@ namespace HammerAndSickle.Models
             return (multiplier - 1.0f) * 100.0f;
         }
 
-        // Infantry doctrine multiplier.
+        // INF doctrine multiplier.
         public const float RTO_MOVE_MULT = 0.8f;           // 20% movement cost reduction for RTOs.
 
         // Politically connected bonuses and multipliers.

@@ -17,7 +17,7 @@ namespace HammerAndSickle.Models
 
     Public properties
     ═════════════════
-      int Attack  { get; private set; }
+      int ATT  { get; private set; }
       int Defense { get; private set; }
 
     Constructors

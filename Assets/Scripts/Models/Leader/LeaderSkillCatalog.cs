@@ -11,7 +11,7 @@ namespace HammerAndSickle.Models
 ────────────────────────────────────────────────────────────────────────────────
  Summary
  ═══════
- • Represents **one** concrete benefit conferred by a leader skill (e.g. +5 Hard Attack,
+ • Represents **one** concrete benefit conferred by a leader skill (e.g. +5 Hard ATT,
    0.8× Supply Consumption, *Breakthrough* capability).  
  • Abstracts the three supported bonus categories:
      1. **Numeric**   – direct additions to ratings or action counts  
@@ -51,7 +51,7 @@ namespace HammerAndSickle.Models
 
         /// <summary>
         /// The value of the bonus. Interpretation depends on BonusType:
-        /// - For numeric bonuses (like Command, Attack), this is the addition amount
+        /// - For numeric bonuses (like Command, ATT), this is the addition amount
         /// - For multiplier bonuses (like SupplyConsumption), this is the multiplier
         /// - For boolean effects, true = 1.0f, false = 0.0f
         /// </summary>
@@ -379,8 +379,8 @@ namespace HammerAndSickle.Models
       • [HullDownExpert_HardDefense]  Hull Down Expert  (Arm/T2 | 80) → HardDefense +5
       • [PursuitDoctrine_Breakthrough]  Pursuit Doctrine  (Arm/T3 | 120) → Breakthrough ✓
 
-    ‣ Infantry Doctrine
-      • [InfantryAssaultTactics_SoftAttack]  Infantry Assault Tactics  (Inf/T1 | 60) → SoftAttack +5
+    ‣ INF Doctrine
+      • [InfantryAssaultTactics_SoftAttack]  INF Assault Tactics  (Inf/T1 | 60) → SoftAttack +5
       • [DefensiveDoctrine_SoftDefense]  Defensive Doctrine  (Inf/T2 | 80) → SoftDefense +5
       • [RoughTerrainOperations_RTO]  Rough Terrain Operations  (Inf/T3 | 120) → RoughTerrainMove ×0.8
 
@@ -550,7 +550,7 @@ namespace HammerAndSickle.Models
         /// </summary>
         private static void InitArmoredWarfareDoctrine()
         {
-            // Tier 1: Shock Tank Corps - Hard Attack bonus
+            // Tier 1: Shock Tank Corps - Hard ATT bonus
             AddSkill(new SkillDefinition(
                 ArmoredDoctrine.ShockTankCorps_HardAttack,
                 "Shock Tank Corps",
@@ -596,7 +596,7 @@ namespace HammerAndSickle.Models
         /// </summary>
         private static void InitInfantryDoctrine()
         {
-            // Tier 1: Infantry Assault Tactics - Soft Attack bonus
+            // Tier 1: INF Assault Tactics - Soft ATT bonus
             AddSkill(new SkillDefinition(
                 InfantryDoctrine.InfantryAssaultTactics_SoftAttack,
                 "Infantry Assault Tactics",
@@ -688,7 +688,7 @@ namespace HammerAndSickle.Models
         /// </summary>
         private static void InitAirDefenseDoctrine()
         {
-            // Tier 1: Offensive Air Defense - Air Attack bonus
+            // Tier 1: Offensive Air Defense - Air ATT bonus
             AddSkill(new SkillDefinition(
                 AirDefenseDoctrine.OffensiveAirDefense_AirAttack,
                 "Offensive Air Defense",

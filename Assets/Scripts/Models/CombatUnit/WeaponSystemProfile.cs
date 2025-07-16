@@ -165,11 +165,11 @@ namespace HammerAndSickle.Models
     IsDoubleFire- Marks whether this unit can fire twice per round, only MLRS systems.
     
     // Paired combat ratings
-    CombatRating LandHard Attack/Defense- Attacking and defending against armored vehicles in ground combat.
-    CombatRating LandSoft Attack/Defense- Attacking and defending against soft targets like infantry or unarmored vehicles in ground combat.
-    CombatRating LandAir Attack/Defense- Attacking and defending against air units from land-based units,used to attack/defend transiting aircraft.
-    CombatRating Air Attack/Defense- Air-to-air combat ratings, used for dogfights and intercepts.  
-    CombatRating AirGround Attack/Defense- Air-to-ground combat ratings, used for attacking ground targets from the air.
+    CombatRating LandHard ATT/Defense- Attacking and defending against armored vehicles in ground combat.
+    CombatRating LandSoft ATT/Defense- Attacking and defending against soft targets like infantry or unarmored vehicles in ground combat.
+    CombatRating LandAir ATT/Defense- Attacking and defending against air units from land-based units,used to attack/defend transiting aircraft.
+    CombatRating Air ATT/Defense- Air-to-air combat ratings, used for dogfights and intercepts.  
+    CombatRating AirGround ATT/Defense- Air-to-ground combat ratings, used for attacking ground targets from the air.
 
     AirAvionics- Avionics rating for air units, affects targeting and sensor capabilities.
     AirStrategicAttack- Strategic bombing capability, used for long-range attacks on high-value targets.

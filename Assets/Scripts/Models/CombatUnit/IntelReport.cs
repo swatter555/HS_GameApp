@@ -36,7 +36,7 @@ namespace HammerAndSickle.Models
     • Buckets map to weapon‑system prefixes in `IntelProfile`:
        Men, Tanks, IFVs, APCs, Recon, Artillery, Rocket Artillery,
        Surface‑to‑Surface Missiles, SAMs, AAA, MANPADs, ATGMs,
-       Attack Helicopters, Fighters, Multirole, Attack Aircraft, Bombers,
+       ATT Helicopters, Fighters, Multirole, ATT Aircraft, Bombers,
        AWACS, Recon Aircraft.
     
     PUBLIC PROPERTIES (all auto‑properties unless noted)
