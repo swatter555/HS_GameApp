@@ -259,15 +259,43 @@ namespace HammerAndSickle.Models
 
                 CreateRcna_Mig25RProfile();
 
-                // US profiles
+                // US Tanks
+                CreateTankM1Profile();
 
+                // US IFVs and APCs  
+                CreateIfvM2Profile();
+                CreateIfvM3Profile();
+                CreateApcM113Profile();
+                CreateApcLvtp7Profile();
 
+                // US Artillery
+                CreateSpaM109Profile();
+                CreateRocMlrsProfile();
 
+                // US Air Defense
+                CreateSpaaaM163Profile();
+                CreateSpsamChapProfile();
+                CreateSamHawkProfile();
 
+                // US Helicopters
+                CreateHelAh64Profile();
 
+                // US Aircraft
+                CreateAsfF15Profile();
+                CreateAsfF4Profile();
+                CreateMrfF16Profile();
+                CreateAttA10Profile();
+                CreateBmbF111Profile();
+                CreateBmbF117Profile();
+                CreateRcnaSr71Profile();
 
-
-
+                // US Infantry
+                CreateRegInfUsProfile();
+                CreateAbInfUsProfile();
+                CreateAmInfUsProfile();
+                CreateMarInfUsProfile();
+                CreateSpecInfUsProfile();
+                CreateEngInfUsProfile();
 
             }
             catch (Exception e)
@@ -290,7 +318,7 @@ namespace HammerAndSickle.Models
             try
             {
                 var profile = new WeaponSystemProfile(
-                    name: "T-55A Main Battle Tank",
+                    name: "T-55A MBT",
                     nationality: Nationality.USSR,
                     weaponSystemID: WeaponSystems.TANK_T55A,
                     40,
@@ -304,7 +332,7 @@ namespace HammerAndSickle.Models
                     indirectRange:   0f,
                     spottingRange:   2f,
                     movementModifier: 1f,
-                    allWeatherCapability: AllWeatherRating.AllWeather,
+                    allWeatherCapability: AllWeatherRating.GroundUnit,
                     sigintRating: SIGINT_Rating.UnitLevel,
                     nbcRating: NBC_Rating.None,
                     strategicMobility: StrategicMobility.AirLift,
@@ -339,7 +367,7 @@ namespace HammerAndSickle.Models
             try
             {
                 var profile = new WeaponSystemProfile(
-                    name: "T-64A Main Battle Tank",
+                    name: "T-64A MBT",
                     nationality: Nationality.USSR,
                     weaponSystemID: WeaponSystems.TANK_T64A,
                     80,
@@ -353,7 +381,7 @@ namespace HammerAndSickle.Models
                     indirectRange: 0f,
                     spottingRange: 2f,
                     movementModifier: 1f,
-                    allWeatherCapability: AllWeatherRating.AllWeather,
+                    allWeatherCapability: AllWeatherRating.GroundUnit,
                     sigintRating: SIGINT_Rating.UnitLevel,
                     nbcRating: NBC_Rating.Gen1,
                     strategicMobility: StrategicMobility.Heavy,
@@ -388,7 +416,7 @@ namespace HammerAndSickle.Models
             try
             {
                 var profile = new WeaponSystemProfile(
-                    name: "T-64B Main Battle Tank",
+                    name: "T-64B MBT",
                     nationality: Nationality.USSR,
                     weaponSystemID: WeaponSystems.TANK_T64B,
                     110,
@@ -402,7 +430,7 @@ namespace HammerAndSickle.Models
                     indirectRange: 0f,
                     spottingRange: 2f,
                     movementModifier: 1f,
-                    allWeatherCapability: AllWeatherRating.AllWeather,
+                    allWeatherCapability: AllWeatherRating.GroundUnit,
                     sigintRating: SIGINT_Rating.UnitLevel,
                     nbcRating: NBC_Rating.Gen2,
                     strategicMobility: StrategicMobility.Heavy,
@@ -437,7 +465,7 @@ namespace HammerAndSickle.Models
             try
             {
                 var profile = new WeaponSystemProfile(
-                    name: "T-72A Main Battle Tank",
+                    name: "T-72A MBT",
                     nationality: Nationality.USSR,
                     weaponSystemID: WeaponSystems.TANK_T72A,
                     65,
@@ -451,7 +479,7 @@ namespace HammerAndSickle.Models
                     indirectRange: 0f,
                     spottingRange: 2f,
                     movementModifier: 1f,
-                    allWeatherCapability: AllWeatherRating.AllWeather,
+                    allWeatherCapability: AllWeatherRating.GroundUnit,
                     sigintRating: SIGINT_Rating.UnitLevel,
                     nbcRating: NBC_Rating.Gen1,
                     strategicMobility: StrategicMobility.Heavy,
@@ -489,7 +517,7 @@ namespace HammerAndSickle.Models
             try
             {
                 var profile = new WeaponSystemProfile(
-                    name: "T-72B Main Battle Tank",
+                    name: "T-72B MBT",
                     nationality: Nationality.USSR,
                     weaponSystemID: WeaponSystems.TANK_T72B,
                     100,
@@ -503,7 +531,7 @@ namespace HammerAndSickle.Models
                     indirectRange: 0f,
                     spottingRange: 2f,
                     movementModifier: 1f,
-                    allWeatherCapability: AllWeatherRating.AllWeather,
+                    allWeatherCapability: AllWeatherRating.GroundUnit,
                     sigintRating: SIGINT_Rating.UnitLevel,
                     nbcRating: NBC_Rating.Gen2,
                     strategicMobility: StrategicMobility.Heavy,
@@ -541,7 +569,7 @@ namespace HammerAndSickle.Models
             try
             {
                 var profile = new WeaponSystemProfile(
-                    name: "T-80B Main Battle Tank",
+                    name: "T-80B MBT",
                     nationality: Nationality.USSR,
                     weaponSystemID: WeaponSystems.TANK_T80B,
                     90,
@@ -555,7 +583,7 @@ namespace HammerAndSickle.Models
                     indirectRange:   0f,
                     spottingRange:   2f,
                     movementModifier: 1f,
-                    allWeatherCapability: AllWeatherRating.AllWeather,
+                    allWeatherCapability: AllWeatherRating.GroundUnit,
                     sigintRating: SIGINT_Rating.UnitLevel,
                     nbcRating: NBC_Rating.Gen1,
                     strategicMobility: StrategicMobility.Heavy,
@@ -590,7 +618,7 @@ namespace HammerAndSickle.Models
             try
             {
                 var profile = new WeaponSystemProfile(
-                    name: "T-80U Main Battle Tank",
+                    name: "T-80U MBT",
                     nationality: Nationality.USSR,
                     weaponSystemID: WeaponSystems.TANK_T80U,
                     125,
@@ -604,7 +632,7 @@ namespace HammerAndSickle.Models
                     indirectRange:   0f,
                     spottingRange:   2f,
                     movementModifier: 1f,
-                    allWeatherCapability: AllWeatherRating.AllWeather,
+                    allWeatherCapability: AllWeatherRating.GroundUnit,
                     sigintRating: SIGINT_Rating.UnitLevel,
                     nbcRating: NBC_Rating.Gen2,
                     strategicMobility: StrategicMobility.Heavy,
@@ -639,7 +667,7 @@ namespace HammerAndSickle.Models
             try
             {
                 var profile = new WeaponSystemProfile(
-                    name: "T-80BV Main Battle Tank",
+                    name: "T-80BV MBT",
                     nationality: Nationality.USSR,
                     weaponSystemID: WeaponSystems.TANK_T80BV,
                     150,
@@ -653,7 +681,7 @@ namespace HammerAndSickle.Models
                     indirectRange: 0f,
                     spottingRange: 2f,
                     movementModifier: 1f,
-                    allWeatherCapability: AllWeatherRating.AllWeather,
+                    allWeatherCapability: AllWeatherRating.GroundUnit,
                     sigintRating: SIGINT_Rating.UnitLevel,
                     nbcRating: NBC_Rating.Gen2,
                     strategicMobility: StrategicMobility.Heavy,
@@ -704,7 +732,7 @@ namespace HammerAndSickle.Models
                     indirectRange: 0f,
                     spottingRange: 2f,
                     movementModifier: 1f,
-                    allWeatherCapability: AllWeatherRating.Day,
+                    allWeatherCapability: AllWeatherRating.GroundUnit,
                     nvgCapability: NVG_Rating.None,
                     silhouette: UnitSilhouette.Small,
                     sigintRating: SIGINT_Rating.UnitLevel,
@@ -750,7 +778,7 @@ namespace HammerAndSickle.Models
                     indirectRange: 0f,
                     spottingRange: 2f,
                     movementModifier: 1f,
-                    allWeatherCapability: AllWeatherRating.Day,
+                    allWeatherCapability: AllWeatherRating.GroundUnit,
                     nvgCapability: NVG_Rating.Gen1,
                     silhouette: UnitSilhouette.Small,
                     sigintRating: SIGINT_Rating.UnitLevel,
@@ -796,7 +824,7 @@ namespace HammerAndSickle.Models
                     indirectRange: 0f,
                     spottingRange: 2f,
                     movementModifier: 1f,
-                    allWeatherCapability: AllWeatherRating.Day,
+                    allWeatherCapability: AllWeatherRating.GroundUnit,
                     nvgCapability: NVG_Rating.Gen1,
                     silhouette: UnitSilhouette.Small,
                     sigintRating: SIGINT_Rating.UnitLevel,
@@ -842,7 +870,7 @@ namespace HammerAndSickle.Models
                     indirectRange: 0f,
                     spottingRange: 2f,
                     movementModifier: 1f,
-                    allWeatherCapability: AllWeatherRating.Day,
+                    allWeatherCapability: AllWeatherRating.GroundUnit,
                     nvgCapability: NVG_Rating.None,
                     silhouette: UnitSilhouette.Small,
                     sigintRating: SIGINT_Rating.UnitLevel,
@@ -888,7 +916,7 @@ namespace HammerAndSickle.Models
                     indirectRange: 0f,
                     spottingRange: 3f,
                     movementModifier: 1f,
-                    allWeatherCapability: AllWeatherRating.Day,
+                    allWeatherCapability: AllWeatherRating.GroundUnit,
                     nvgCapability: NVG_Rating.Gen2,
                     silhouette: UnitSilhouette.Small,
                     sigintRating: SIGINT_Rating.SpecializedLevel,
@@ -934,7 +962,7 @@ namespace HammerAndSickle.Models
                     indirectRange: 0f,
                     spottingRange: 2f,
                     movementModifier: 1f,
-                    allWeatherCapability: AllWeatherRating.Day,
+                    allWeatherCapability: AllWeatherRating.GroundUnit,
                     nvgCapability: NVG_Rating.None,
                     silhouette: UnitSilhouette.Small,
                     sigintRating: SIGINT_Rating.UnitLevel,
@@ -972,7 +1000,7 @@ namespace HammerAndSickle.Models
             try
             {
                 var profile = new WeaponSystemProfile(
-                    name: "MT‑LB Armored Personnel Carrier",
+                    name: "MT‑LB APC",
                     nationality: Nationality.USSR,
                     weaponSystemID: WeaponSystems.APC_MTLB,
                     20,
@@ -986,7 +1014,7 @@ namespace HammerAndSickle.Models
                     indirectRange: 0f,
                     spottingRange: 2f,
                     movementModifier: 1f,
-                    allWeatherCapability: AllWeatherRating.Day,
+                    allWeatherCapability: AllWeatherRating.GroundUnit,
                     nvgCapability: NVG_Rating.Gen1,
                     silhouette: UnitSilhouette.Small,
                     sigintRating: SIGINT_Rating.UnitLevel,
@@ -1021,7 +1049,7 @@ namespace HammerAndSickle.Models
             try
             {
                 var profile = new WeaponSystemProfile(
-                    name: "BTR‑70 Armored Personnel Carrier",
+                    name: "BTR‑70 APC",
                     nationality: Nationality.USSR,
                     weaponSystemID: WeaponSystems.APC_BTR70,
                     24,
@@ -1035,7 +1063,7 @@ namespace HammerAndSickle.Models
                     indirectRange: 0f,
                     spottingRange: 2f,
                     movementModifier: 1,
-                    allWeatherCapability: AllWeatherRating.Day,
+                    allWeatherCapability: AllWeatherRating.GroundUnit,
                     nvgCapability: NVG_Rating.Gen1,
                     silhouette: UnitSilhouette.Small,
                     sigintRating: SIGINT_Rating.UnitLevel,
@@ -1070,7 +1098,7 @@ namespace HammerAndSickle.Models
             try
             {
                 var profile = new WeaponSystemProfile(
-                    name: "BTR‑80 Armored Personnel Carrier",
+                    name: "BTR‑80 APC",
                     nationality: Nationality.USSR,
                     weaponSystemID: WeaponSystems.APC_BTR80,
                     28,
@@ -1084,7 +1112,7 @@ namespace HammerAndSickle.Models
                     indirectRange: 0f,
                     spottingRange: 2f,
                     movementModifier: 1f,
-                    allWeatherCapability: AllWeatherRating.Day,
+                    allWeatherCapability: AllWeatherRating.GroundUnit,
                     nvgCapability: NVG_Rating.Gen2,
                     silhouette: UnitSilhouette.Small,
                     sigintRating: SIGINT_Rating.UnitLevel,
@@ -1124,7 +1152,7 @@ namespace HammerAndSickle.Models
             try
             {
                 var profile = new WeaponSystemProfile(
-                    name: "BMP‑1 Infantry Fighting Vehicle",
+                    name: "BMP‑1 IFV",
                     nationality: Nationality.USSR,
                     weaponSystemID: WeaponSystems.IFV_BMP1,
                     30,
@@ -1138,7 +1166,7 @@ namespace HammerAndSickle.Models
                     indirectRange: 0f,
                     spottingRange: 2f,
                     movementModifier: 1f,
-                    allWeatherCapability: AllWeatherRating.Day,
+                    allWeatherCapability: AllWeatherRating.GroundUnit,
                     nvgCapability: NVG_Rating.Gen1,
                     silhouette: UnitSilhouette.Small,
                     sigintRating: SIGINT_Rating.UnitLevel,
@@ -1173,7 +1201,7 @@ namespace HammerAndSickle.Models
             try
             {
                 var profile = new WeaponSystemProfile(
-                    name: "BMP‑2 Infantry Fighting Vehicle",
+                    name: "BMP‑2 IFV",
                     nationality: Nationality.USSR,
                     weaponSystemID: WeaponSystems.IFV_BMP2,
                     36,
@@ -1187,7 +1215,7 @@ namespace HammerAndSickle.Models
                     indirectRange: 0f,
                     spottingRange: 2f,
                     movementModifier: 1f,
-                    allWeatherCapability: AllWeatherRating.Day,
+                    allWeatherCapability: AllWeatherRating.GroundUnit,
                     nvgCapability: NVG_Rating.Gen2,
                     silhouette: UnitSilhouette.Small,
                     sigintRating: SIGINT_Rating.UnitLevel,
@@ -1222,7 +1250,7 @@ namespace HammerAndSickle.Models
             try
             {
                 var profile = new WeaponSystemProfile(
-                    name: "BMP‑3 Infantry Fighting Vehicle",
+                    name: "BMP‑3 IFV",
                     nationality: Nationality.USSR,
                     weaponSystemID: WeaponSystems.IFV_BMP3,
                     42,
@@ -1236,7 +1264,7 @@ namespace HammerAndSickle.Models
                     indirectRange: 0f,
                     spottingRange: 2f,
                     movementModifier: 1f,
-                    allWeatherCapability: AllWeatherRating.Day,
+                    allWeatherCapability: AllWeatherRating.GroundUnit,
                     nvgCapability: NVG_Rating.Gen2,
                     silhouette: UnitSilhouette.Small,
                     sigintRating: SIGINT_Rating.UnitLevel,
@@ -1271,7 +1299,7 @@ namespace HammerAndSickle.Models
             try
             {
                 var profile = new WeaponSystemProfile(
-                    name: "BMD‑1 Airborne Infantry Fighting Vehicle",
+                    name: "BMD‑1 IFV",
                     nationality: Nationality.USSR,
                     weaponSystemID: WeaponSystems.IFV_BMD1,
                     25,
@@ -1285,7 +1313,7 @@ namespace HammerAndSickle.Models
                     indirectRange: 0f,
                     spottingRange: 2f,
                     movementModifier: 1f,
-                    allWeatherCapability: AllWeatherRating.Day,
+                    allWeatherCapability: AllWeatherRating.GroundUnit,
                     nvgCapability: NVG_Rating.Gen1,
                     silhouette: UnitSilhouette.Small,
                     sigintRating: SIGINT_Rating.UnitLevel,
@@ -1320,7 +1348,7 @@ namespace HammerAndSickle.Models
             try
             {
                 var profile = new WeaponSystemProfile(
-                    name: "BMD‑2 Airborne Infantry Fighting Vehicle",
+                    name: "BMD‑2 IFV",
                     nationality: Nationality.USSR,
                     weaponSystemID: WeaponSystems.IFV_BMD2,
                     34,
@@ -1334,7 +1362,7 @@ namespace HammerAndSickle.Models
                     indirectRange: 0f,
                     spottingRange: 2f,
                     movementModifier: 1f,
-                    allWeatherCapability: AllWeatherRating.Day,
+                    allWeatherCapability: AllWeatherRating.GroundUnit,
                     nvgCapability: NVG_Rating.Gen1,
                     silhouette: UnitSilhouette.Small,
                     sigintRating: SIGINT_Rating.UnitLevel,
@@ -1369,7 +1397,7 @@ namespace HammerAndSickle.Models
             try
             {
                 var profile = new WeaponSystemProfile(
-                    name: "BMD‑3 Airborne Infantry Fighting Vehicle",
+                    name: "BMD‑3 IFV",
                     nationality: Nationality.USSR,
                     weaponSystemID: WeaponSystems.IFV_BMD3,
                     38,
@@ -1383,7 +1411,7 @@ namespace HammerAndSickle.Models
                     indirectRange: 0f,
                     spottingRange: 2f,
                     movementModifier: 1.25f,
-                    allWeatherCapability: AllWeatherRating.Day,
+                    allWeatherCapability: AllWeatherRating.GroundUnit,
                     nvgCapability: NVG_Rating.Gen2,
                     silhouette: UnitSilhouette.Small,
                     sigintRating: SIGINT_Rating.UnitLevel,
@@ -1437,7 +1465,7 @@ namespace HammerAndSickle.Models
                     indirectRange: 0f,
                     spottingRange: 3f,
                     movementModifier: 1f,
-                    allWeatherCapability: AllWeatherRating.Day,
+                    allWeatherCapability: AllWeatherRating.GroundUnit,
                     nvgCapability: NVG_Rating.Gen1,
                     silhouette: UnitSilhouette.Small,
                     sigintRating: SIGINT_Rating.UnitLevel,
@@ -1486,7 +1514,7 @@ namespace HammerAndSickle.Models
                     indirectRange: 0f,
                     spottingRange: 3f,
                     movementModifier: 1f,
-                    allWeatherCapability: AllWeatherRating.Day,
+                    allWeatherCapability: AllWeatherRating.GroundUnit,
                     nvgCapability: NVG_Rating.Gen1,
                     silhouette: UnitSilhouette.Small,
                     sigintRating: SIGINT_Rating.UnitLevel,
@@ -1529,7 +1557,7 @@ namespace HammerAndSickle.Models
             try
             {
                 var profile = new WeaponSystemProfile(
-                    name: "2S1 Gvozdika Self Propelled Artillery",
+                    name: "2S1 Gvozdika SPA",
                     nationality: Nationality.USSR,
                     weaponSystemID: WeaponSystems.SPA_2S1,
                     40,
@@ -1543,7 +1571,7 @@ namespace HammerAndSickle.Models
                     indirectRange: 3f,
                     spottingRange: 2f,
                     movementModifier: 1,
-                    allWeatherCapability: AllWeatherRating.Day,
+                    allWeatherCapability: AllWeatherRating.GroundUnit,
                     nvgCapability: NVG_Rating.None,
                     silhouette: UnitSilhouette.Medium,
                     sigintRating: SIGINT_Rating.UnitLevel,
@@ -1578,7 +1606,7 @@ namespace HammerAndSickle.Models
             try
             {
                 var profile = new WeaponSystemProfile(
-                    name: "2S3 Akatsiya Self Propelled Artillery",
+                    name: "2S3 Akatsiya SPA",
                     nationality: Nationality.USSR,
                     weaponSystemID: WeaponSystems.SPA_2S3,
                     55,
@@ -1592,7 +1620,7 @@ namespace HammerAndSickle.Models
                     indirectRange: 4f,
                     spottingRange: 2f,
                     movementModifier: 1f,
-                    allWeatherCapability: AllWeatherRating.Day,
+                    allWeatherCapability: AllWeatherRating.GroundUnit,
                     nvgCapability: NVG_Rating.None,
                     silhouette: UnitSilhouette.Medium,
                     sigintRating: SIGINT_Rating.UnitLevel,
@@ -1627,7 +1655,7 @@ namespace HammerAndSickle.Models
             try
             {
                 var profile = new WeaponSystemProfile(
-                    name: "2S5 Giatsint‑S Self Propelled Artillery",
+                    name: "2S5 Giatsint‑S SPA",
                     nationality: Nationality.USSR,
                     weaponSystemID: WeaponSystems.SPA_2S5,
                     70,
@@ -1641,7 +1669,7 @@ namespace HammerAndSickle.Models
                     indirectRange: 5f,
                     spottingRange: 2f,
                     movementModifier: 1f,
-                    allWeatherCapability: AllWeatherRating.Day,
+                    allWeatherCapability: AllWeatherRating.GroundUnit,
                     nvgCapability: NVG_Rating.None,
                     silhouette: UnitSilhouette.Medium,
                     sigintRating: SIGINT_Rating.UnitLevel,
@@ -1676,7 +1704,7 @@ namespace HammerAndSickle.Models
             try
             {
                 var profile = new WeaponSystemProfile(
-                    name: "2S19 Msta‑S Self Propelled Artillery",
+                    name: "2S19 Msta‑S SPA",
                     nationality: Nationality.USSR,
                     weaponSystemID: WeaponSystems.SPA_2S19,
                     80,
@@ -1690,7 +1718,7 @@ namespace HammerAndSickle.Models
                     indirectRange: 5f,
                     spottingRange: 2f,
                     movementModifier: 1f,
-                    allWeatherCapability: AllWeatherRating.Day,
+                    allWeatherCapability: AllWeatherRating.GroundUnit,
                     nvgCapability: NVG_Rating.None,
                     silhouette: UnitSilhouette.Medium,
                     sigintRating: SIGINT_Rating.UnitLevel,
@@ -1739,7 +1767,7 @@ namespace HammerAndSickle.Models
                     indirectRange: 3f,
                     spottingRange: 2f,
                     movementModifier: 1f,
-                    allWeatherCapability: AllWeatherRating.Day,
+                    allWeatherCapability: AllWeatherRating.GroundUnit,
                     nvgCapability: NVG_Rating.None,
                     silhouette: UnitSilhouette.Medium,
                     sigintRating: SIGINT_Rating.UnitLevel,
@@ -1791,7 +1819,7 @@ namespace HammerAndSickle.Models
                     indirectRange: 4f,
                     spottingRange: 2f,
                     movementModifier: 1f,
-                    allWeatherCapability: AllWeatherRating.Day,
+                    allWeatherCapability: AllWeatherRating.GroundUnit,
                     nvgCapability: NVG_Rating.None,
                     silhouette: UnitSilhouette.Medium,
                     sigintRating: SIGINT_Rating.UnitLevel,
@@ -1843,7 +1871,7 @@ namespace HammerAndSickle.Models
                     indirectRange: 5f,
                     spottingRange: 2f,
                     movementModifier: 1f,
-                    allWeatherCapability: AllWeatherRating.Day,
+                    allWeatherCapability: AllWeatherRating.GroundUnit,
                     nvgCapability: NVG_Rating.None,
                     silhouette: UnitSilhouette.Medium,
                     sigintRating: SIGINT_Rating.UnitLevel,
@@ -1895,7 +1923,7 @@ namespace HammerAndSickle.Models
                     indirectRange: 99f,
                     spottingRange: 2f,
                     movementModifier: 1f,
-                    allWeatherCapability: AllWeatherRating.Day,
+                    allWeatherCapability: AllWeatherRating.GroundUnit,
                     nvgCapability: NVG_Rating.None,
                     silhouette: UnitSilhouette.Large,
                     sigintRating: SIGINT_Rating.UnitLevel,
@@ -1938,7 +1966,7 @@ namespace HammerAndSickle.Models
             try
             {
                 var profile = new WeaponSystemProfile(
-                    name: "ZSU-57-2 Sparka Self-Propelled Anti-Aircraft Artillery",
+                    name: "ZSU-57-2 Sparka SPAAA",
                     nationality: Nationality.USSR,
                     weaponSystemID: WeaponSystems.SPAAA_ZSU57,
                     35,
@@ -1946,15 +1974,13 @@ namespace HammerAndSickle.Models
                     landHardDefense: 3,
                     landSoftAttack: 10,
                     landSoftDefense: 5,
-                    landAirAttack: 1,
-                    landAirDefense: 2,
-                    airAttack: 10,
-                    airDefense: 7,
+                    landAirAttack: 9,
+                    landAirDefense: 10,
                     primaryRange: 1f,
                     indirectRange: 2f,
                     spottingRange: 2f,
                     movementModifier: 1f,
-                    allWeatherCapability: AllWeatherRating.Day,
+                    allWeatherCapability: AllWeatherRating.GroundUnit,
                     sigintRating: SIGINT_Rating.UnitLevel,
                     nbcRating: NBC_Rating.None,
                     strategicMobility: StrategicMobility.AirDrop,
@@ -1966,7 +1992,7 @@ namespace HammerAndSickle.Models
                 profile.AddUpgradeType(UpgradeType.SPAAA);
 
                 // Set short name for UI display
-                profile.SetShortName("ZSU-57-2");
+                profile.SetShortName("ZSU-57-2 Sparka");
 
                 // Set turn availability - entered service in 1957
                 profile.SetTurnAvailable(228);
@@ -1989,7 +2015,7 @@ namespace HammerAndSickle.Models
             try
             {
                 var profile = new WeaponSystemProfile(
-                    name: "ZSU-23-4 Shilka Self-Propelled Anti-Aircraft Artillery",
+                    name: "ZSU-23-4 Shilka SPAAA",
                     nationality: Nationality.USSR,
                     weaponSystemID: WeaponSystems.SPAAA_ZSU23,
                     45,
@@ -1997,15 +2023,13 @@ namespace HammerAndSickle.Models
                     landHardDefense: 4,
                     landSoftAttack: 11,
                     landSoftDefense: 6,
-                    landAirAttack: 2,
-                    landAirDefense: 3,
-                    airAttack: 13,
-                    airDefense: 10,
+                    landAirAttack: 10,
+                    landAirDefense: 12,
                     primaryRange: 1f,
                     indirectRange: 3f,
                     spottingRange: 3f,
                     movementModifier: 1f,
-                    allWeatherCapability: AllWeatherRating.AllWeather,
+                    allWeatherCapability: AllWeatherRating.GroundUnit,
                     sigintRating: SIGINT_Rating.UnitLevel,
                     nbcRating: NBC_Rating.Gen1,
                     strategicMobility: StrategicMobility.Heavy,
@@ -2017,7 +2041,7 @@ namespace HammerAndSickle.Models
                 profile.AddUpgradeType(UpgradeType.SPAAA);
 
                 // Set short name for UI display
-                profile.SetShortName("ZSU-23-4");
+                profile.SetShortName("ZSU-23-4 Shilka");
 
                 // Set turn availability - entered service in 1965
                 profile.SetTurnAvailable(324);
@@ -2040,7 +2064,7 @@ namespace HammerAndSickle.Models
             try
             {
                 var profile = new WeaponSystemProfile(
-                    name: "2K22 Tunguska Self-Propelled Air Defense System",
+                    name: "2K22 Tunguska SPAAA",
                     nationality: Nationality.USSR,
                     weaponSystemID: WeaponSystems.SPAAA_2K22,
                     120,
@@ -2048,15 +2072,13 @@ namespace HammerAndSickle.Models
                     landHardDefense: 6,
                     landSoftAttack: 10,
                     landSoftDefense: 8,
-                    landAirAttack: 3,
-                    landAirDefense: 5,
-                    airAttack: 16,
-                    airDefense: 13,
+                    landAirAttack: 12,
+                    landAirDefense: 14,
                     primaryRange: 1f,
                     indirectRange: 4f,
                     spottingRange: 4f,
                     movementModifier: 1f,
-                    allWeatherCapability: AllWeatherRating.AllWeather,
+                    allWeatherCapability: AllWeatherRating.GroundUnit,
                     sigintRating: SIGINT_Rating.SpecializedLevel,
                     nbcRating: NBC_Rating.Gen2,
                     strategicMobility: StrategicMobility.Heavy,
@@ -2068,7 +2090,7 @@ namespace HammerAndSickle.Models
                 profile.AddUpgradeType(UpgradeType.SPAAA);
 
                 // Set short name for UI display
-                profile.SetShortName("2K22");
+                profile.SetShortName("2K22 Tunguska");
 
                 // Set turn availability - entered service in 1982
                 profile.SetTurnAvailable(528);
@@ -2091,7 +2113,7 @@ namespace HammerAndSickle.Models
             try
             {
                 var profile = new WeaponSystemProfile(
-                    name: "9K31 Strela-1 Self-Propelled SAM System",
+                    name: "9K31 Strela-1 SPSAM",
                     nationality: Nationality.USSR,
                     weaponSystemID: WeaponSystems.SPSAM_9K31,
                     40,
@@ -2099,15 +2121,13 @@ namespace HammerAndSickle.Models
                     landHardDefense: 3,
                     landSoftAttack: 4,
                     landSoftDefense: 4,
-                    landAirAttack: 1,
-                    landAirDefense: 2,
-                    airAttack: 10,
-                    airDefense: 10,
+                    landAirAttack: 10,
+                    landAirDefense: 6,
                     primaryRange: 1f,
                     indirectRange: 3f,
                     spottingRange: 3f,
                     movementModifier: 1f,
-                    allWeatherCapability: AllWeatherRating.Day,
+                    allWeatherCapability: AllWeatherRating.GroundUnit,
                     sigintRating: SIGINT_Rating.UnitLevel,
                     nbcRating: NBC_Rating.Gen1,
                     strategicMobility: StrategicMobility.AirDrop,
@@ -2122,7 +2142,7 @@ namespace HammerAndSickle.Models
                 profile.SetAmphibiousCapability(true);
 
                 // Set short name for UI display
-                profile.SetShortName("9K31");
+                profile.SetShortName("9K31 Strela");
 
                 // Set turn availability - entered service in 1968
                 profile.SetTurnAvailable(360);
@@ -2145,7 +2165,7 @@ namespace HammerAndSickle.Models
             try
             {
                 var profile = new WeaponSystemProfile(
-                    name: "S-75 Dvina Strategic SAM System",
+                    name: "S-75 Dvina SAM System",
                     nationality: Nationality.USSR,
                     weaponSystemID: WeaponSystems.SAM_S75,
                     80,
@@ -2153,15 +2173,13 @@ namespace HammerAndSickle.Models
                     landHardDefense: 2,
                     landSoftAttack: 0,
                     landSoftDefense: 3,
-                    landAirAttack: 0,
-                    landAirDefense: 1,
-                    airAttack: 12,
-                    airDefense: 9,
+                    landAirAttack: 11,
+                    landAirDefense: 5,
                     primaryRange: 1f,
                     indirectRange: 5f,
                     spottingRange: 5f,
                     movementModifier: 0f,
-                    allWeatherCapability: AllWeatherRating.AllWeather,
+                    allWeatherCapability: AllWeatherRating.GroundUnit,
                     sigintRating: SIGINT_Rating.SpecializedLevel,
                     nbcRating: NBC_Rating.None,
                     strategicMobility: StrategicMobility.Heavy,
@@ -2173,7 +2191,7 @@ namespace HammerAndSickle.Models
                 profile.AddUpgradeType(UpgradeType.SAM);
 
                 // Set short name for UI display
-                profile.SetShortName("S-75");
+                profile.SetShortName("S-75 Dvina");
 
                 // Set turn availability - entered service in 1957
                 profile.SetTurnAvailable(228);
@@ -2196,7 +2214,7 @@ namespace HammerAndSickle.Models
             try
             {
                 var profile = new WeaponSystemProfile(
-                    name: "S-125 Neva Strategic SAM System",
+                    name: "S-125 Neva SAM System",
                     nationality: Nationality.USSR,
                     weaponSystemID: WeaponSystems.SAM_S125,
                     90,
@@ -2204,15 +2222,13 @@ namespace HammerAndSickle.Models
                     landHardDefense: 3,
                     landSoftAttack: 0,
                     landSoftDefense: 4,
-                    landAirAttack: 0,
-                    landAirDefense: 2,
-                    airAttack: 14,
-                    airDefense: 11,
+                    landAirAttack: 10,
+                    landAirDefense: 5,
                     primaryRange: 1f,
                     indirectRange: 6f,
                     spottingRange: 6f,
                     movementModifier: 0f,
-                    allWeatherCapability: AllWeatherRating.AllWeather,
+                    allWeatherCapability: AllWeatherRating.GroundUnit,
                     sigintRating: SIGINT_Rating.SpecializedLevel,
                     nbcRating: NBC_Rating.Gen1,
                     strategicMobility: StrategicMobility.Heavy,
@@ -2224,7 +2240,7 @@ namespace HammerAndSickle.Models
                 profile.AddUpgradeType(UpgradeType.SAM);
 
                 // Set short name for UI display
-                profile.SetShortName("S-125");
+                profile.SetShortName("S-125 Neva");
 
                 // Set turn availability - entered service in 1961
                 profile.SetTurnAvailable(276);
@@ -2247,7 +2263,7 @@ namespace HammerAndSickle.Models
             try
             {
                 var profile = new WeaponSystemProfile(
-                    name: "S-300 Strategic SAM System",
+                    name: "S-300 SAM System",
                     nationality: Nationality.USSR,
                     weaponSystemID: WeaponSystems.SAM_S300,
                     200,
@@ -2255,15 +2271,13 @@ namespace HammerAndSickle.Models
                     landHardDefense: 5,
                     landSoftAttack: 0,
                     landSoftDefense: 6,
-                    landAirAttack: 0,
-                    landAirDefense: 4,
-                    airAttack: 20,
-                    airDefense: 15,
+                    landAirAttack: 20,
+                    landAirDefense: 10,
                     primaryRange: 1f,
                     indirectRange: 8f,
                     spottingRange: 8f,
                     movementModifier: 0f,
-                    allWeatherCapability: AllWeatherRating.AllWeather,
+                    allWeatherCapability: AllWeatherRating.GroundUnit,
                     sigintRating: SIGINT_Rating.SpecializedLevel,
                     nbcRating: NBC_Rating.Gen2,
                     strategicMobility: StrategicMobility.Heavy,
@@ -2277,8 +2291,8 @@ namespace HammerAndSickle.Models
                 // Set short name for UI display
                 profile.SetShortName("S-300");
 
-                // Set turn availability - entered service in 1978
-                profile.SetTurnAvailable(480);
+                // Set turn availability - entered service in 1984
+                profile.SetTurnAvailable(552);
 
                 // Store in master dictionary
                 _weaponSystemProfiles[WeaponSystems.SAM_S300] = profile;
@@ -2317,11 +2331,11 @@ namespace HammerAndSickle.Models
                     indirectRange: 0f,
                     spottingRange: 2f,
                     movementModifier: 1f,
-                    allWeatherCapability: AllWeatherRating.Day,
+                    allWeatherCapability: AllWeatherRating.GroundUnit,
                     sigintRating: SIGINT_Rating.UnitLevel,
                     nbcRating: NBC_Rating.None,
                     strategicMobility: StrategicMobility.Aviation,
-                    nvgCapability: NVG_Rating.None,
+                    nvgCapability: NVG_Rating.Gen1,
                     silhouette: UnitSilhouette.Medium
                 );
 
@@ -2366,11 +2380,11 @@ namespace HammerAndSickle.Models
                     indirectRange: 0f,
                     spottingRange: 3f,
                     movementModifier: 1f,
-                    allWeatherCapability: AllWeatherRating.Day,
+                    allWeatherCapability: AllWeatherRating.GroundUnit,
                     sigintRating: SIGINT_Rating.UnitLevel,
                     nbcRating: NBC_Rating.Gen1,
                     strategicMobility: StrategicMobility.Aviation,
-                    nvgCapability: NVG_Rating.None,
+                    nvgCapability: NVG_Rating.Gen1,
                     silhouette: UnitSilhouette.Medium
                 );
 
@@ -2415,11 +2429,11 @@ namespace HammerAndSickle.Models
                     indirectRange: 0f,
                     spottingRange: 3f,
                     movementModifier: 1f,
-                    allWeatherCapability: AllWeatherRating.Night,
+                    allWeatherCapability: AllWeatherRating.GroundUnit,
                     sigintRating: SIGINT_Rating.UnitLevel,
                     nbcRating: NBC_Rating.Gen1,
                     strategicMobility: StrategicMobility.Aviation,
-                    nvgCapability: NVG_Rating.Gen1,
+                    nvgCapability: NVG_Rating.Gen2,
                     silhouette: UnitSilhouette.Medium
                 );
 
@@ -2464,7 +2478,7 @@ namespace HammerAndSickle.Models
                     indirectRange: 0f,
                     spottingRange: 3f,
                     movementModifier: 1f,
-                    allWeatherCapability: AllWeatherRating.AllWeather,
+                    allWeatherCapability: AllWeatherRating.GroundUnit,
                     sigintRating: SIGINT_Rating.SpecializedLevel,
                     nbcRating: NBC_Rating.Gen2,
                     strategicMobility: StrategicMobility.Aviation,
@@ -2504,7 +2518,7 @@ namespace HammerAndSickle.Models
             try
             {
                 var profile = new WeaponSystemProfile(
-                    name: "A-50 Mainstay AWACS Aircraft",
+                    name: "A-50 Mainstay AWACS",
                     nationality: Nationality.USSR,
                     weaponSystemID: WeaponSystems.AWACS_A50,
                     150,
@@ -2519,7 +2533,7 @@ namespace HammerAndSickle.Models
                     sigintRating: SIGINT_Rating.SpecializedLevel,
                     nbcRating: NBC_Rating.Gen2,
                     strategicMobility: StrategicMobility.Aircraft,
-                    nvgCapability: NVG_Rating.Gen2,
+                    nvgCapability: NVG_Rating.None,
                     silhouette: UnitSilhouette.Large
                 );
 
@@ -2762,7 +2776,7 @@ namespace HammerAndSickle.Models
                     sigintRating: SIGINT_Rating.SpecializedLevel,
                     nbcRating: NBC_Rating.Gen2,
                     strategicMobility: StrategicMobility.Aircraft,
-                    nvgCapability: NVG_Rating.Gen1,
+                    nvgCapability: NVG_Rating.None,
                     silhouette: UnitSilhouette.Medium
                 );
 
@@ -2809,7 +2823,7 @@ namespace HammerAndSickle.Models
                     sigintRating: SIGINT_Rating.UnitLevel,
                     nbcRating: NBC_Rating.Gen2,
                     strategicMobility: StrategicMobility.Aircraft,
-                    nvgCapability: NVG_Rating.Gen1,
+                    nvgCapability: NVG_Rating.None,
                     silhouette: UnitSilhouette.Medium
                 );
 
@@ -2856,7 +2870,7 @@ namespace HammerAndSickle.Models
                     sigintRating: SIGINT_Rating.SpecializedLevel,
                     nbcRating: NBC_Rating.Gen2,
                     strategicMobility: StrategicMobility.Aircraft,
-                    nvgCapability: NVG_Rating.Gen2,
+                    nvgCapability: NVG_Rating.None,
                     silhouette: UnitSilhouette.Medium
                 );
 
@@ -2906,7 +2920,7 @@ namespace HammerAndSickle.Models
                     sigintRating: SIGINT_Rating.UnitLevel,
                     nbcRating: NBC_Rating.Gen1,
                     strategicMobility: StrategicMobility.Aircraft,
-                    nvgCapability: NVG_Rating.Gen1,
+                    nvgCapability: NVG_Rating.None,
                     silhouette: UnitSilhouette.Medium
                 );
 
@@ -2956,7 +2970,7 @@ namespace HammerAndSickle.Models
                     sigintRating: SIGINT_Rating.UnitLevel,
                     nbcRating: NBC_Rating.Gen1,
                     strategicMobility: StrategicMobility.AirMobile,
-                    nvgCapability: NVG_Rating.Gen1,
+                    nvgCapability: NVG_Rating.None,
                     silhouette: UnitSilhouette.Medium
                 );
 
@@ -3006,7 +3020,7 @@ namespace HammerAndSickle.Models
                     sigintRating: SIGINT_Rating.UnitLevel,
                     nbcRating: NBC_Rating.Gen2,
                     strategicMobility: StrategicMobility.Aircraft,
-                    nvgCapability: NVG_Rating.Gen2,
+                    nvgCapability: NVG_Rating.None,
                     silhouette: UnitSilhouette.Medium
                 );
 
@@ -3056,7 +3070,7 @@ namespace HammerAndSickle.Models
                     sigintRating: SIGINT_Rating.UnitLevel,
                     nbcRating: NBC_Rating.Gen1,
                     strategicMobility: StrategicMobility.Aircraft,
-                    nvgCapability: NVG_Rating.Gen1,
+                    nvgCapability: NVG_Rating.None,
                     silhouette: UnitSilhouette.Medium
                 );
 
@@ -3206,7 +3220,7 @@ namespace HammerAndSickle.Models
                     sigintRating: SIGINT_Rating.SpecializedLevel,
                     nbcRating: NBC_Rating.Gen2,
                     strategicMobility: StrategicMobility.AirMobile,
-                    nvgCapability: NVG_Rating.Gen2,
+                    nvgCapability: NVG_Rating.None,
                     silhouette: UnitSilhouette.Large
                 );
 
@@ -3277,5 +3291,1232 @@ namespace HammerAndSickle.Models
         }
 
         #endregion // Soviet Aircraft
+
+
+        //-----------------------------------------------------------------------------------------
+
+
+        #region US Tanks
+
+        /// <summary>
+        /// M1 Abrams Main Battle Tank
+        /// </summary>
+        private static void CreateTankM1Profile()
+        {
+            try
+            {
+                var profile = new WeaponSystemProfile(
+                    name: "M1 Abrams MBT",
+                    nationality: Nationality.USA,
+                    weaponSystemID: WeaponSystems.TANK_M1,
+                    120,
+                    landHardAttack: 12,
+                    landHardDefense: 16,
+                    landSoftAttack: 11,
+                    landSoftDefense: 14,
+                    landAirAttack: 3,
+                    landAirDefense: 9,
+                    primaryRange: 1f,
+                    indirectRange: 0f,
+                    spottingRange: 2f,
+                    movementModifier: 1f,
+                    allWeatherCapability: AllWeatherRating.GroundUnit,
+                    sigintRating: SIGINT_Rating.UnitLevel,
+                    nbcRating: NBC_Rating.Gen2,
+                    strategicMobility: StrategicMobility.Heavy,
+                    nvgCapability: NVG_Rating.Gen2,
+                    silhouette: UnitSilhouette.Large
+                );
+
+                // Add upgrade types for modernization
+                profile.AddUpgradeType(UpgradeType.AFV);
+
+                // Set short name for UI display
+                profile.SetShortName("M1 Abrams");
+
+                // Set turn availability - entered service in 1980
+                profile.SetTurnAvailable(504);
+
+                // Store in master dictionary
+                _weaponSystemProfiles[WeaponSystems.TANK_M1] = profile;
+            }
+            catch (Exception e)
+            {
+                AppService.HandleException(CLASS_NAME, nameof(CreateTankM1Profile), e);
+                throw;
+            }
+        }
+
+        #endregion // US Tanks
+
+
+        #region US IFVs and APCs
+
+        /// <summary>
+        /// M2 Bradley Infantry Fighting Vehicle
+        /// </summary>
+        private static void CreateIfvM2Profile()
+        {
+            try
+            {
+                var profile = new WeaponSystemProfile(
+                    name: "M2 Bradley IFV",
+                    nationality: Nationality.USA,
+                    weaponSystemID: WeaponSystems.IFV_M2,
+                    85,
+                    landHardAttack: 12,
+                    landHardDefense: 4,
+                    landSoftAttack: 9,
+                    landSoftDefense: 8,
+                    landAirAttack: 2,
+                    landAirDefense: 4,
+                    primaryRange: 1f,
+                    indirectRange: 0f,
+                    spottingRange: 2f,
+                    movementModifier: 1f,
+                    allWeatherCapability: AllWeatherRating.GroundUnit,
+                    sigintRating: SIGINT_Rating.UnitLevel,
+                    nbcRating: NBC_Rating.Gen2,
+                    strategicMobility: StrategicMobility.AirLift,
+                    nvgCapability: NVG_Rating.Gen2,
+                    silhouette: UnitSilhouette.Medium
+                );
+
+                // Set upgrade paths
+                profile.AddUpgradeType(UpgradeType.IFV);
+
+                // Set short name for UI display
+                profile.SetShortName("M2 Bradley");
+
+                // Set turn availability - entered service in 1981
+                profile.SetTurnAvailable(516);
+
+                // Store in master dictionary
+                _weaponSystemProfiles[WeaponSystems.IFV_M2] = profile;
+            }
+            catch (Exception e)
+            {
+                AppService.HandleException(CLASS_NAME, nameof(CreateIfvM2Profile), e);
+                throw;
+            }
+        }
+
+        /// <summary>
+        /// M3 Bradley Cavalry Fighting Vehicle
+        /// </summary>
+        private static void CreateIfvM3Profile()
+        {
+            try
+            {
+                var profile = new WeaponSystemProfile(
+                    name: "M3 Bradley Scout IFV",
+                    nationality: Nationality.USA,
+                    weaponSystemID: WeaponSystems.IFV_M3,
+                    90,
+                    landHardAttack: 12,
+                    landHardDefense: 4,
+                    landSoftAttack: 9,
+                    landSoftDefense: 8,
+                    landAirAttack: 2,
+                    landAirDefense: 4,
+                    primaryRange: 1f,
+                    indirectRange: 0f,
+                    spottingRange: 3f,
+                    movementModifier: 1f,
+                    allWeatherCapability: AllWeatherRating.GroundUnit,
+                    sigintRating: SIGINT_Rating.UnitLevel,
+                    nbcRating: NBC_Rating.Gen2,
+                    strategicMobility: StrategicMobility.AirLift,
+                    nvgCapability: NVG_Rating.Gen3,
+                    silhouette: UnitSilhouette.Medium
+                );
+
+                // Set upgrade paths
+                profile.AddUpgradeType(UpgradeType.RECON);
+
+                // Set short name for UI display
+                profile.SetShortName("M3 Bradley");
+
+                // Set turn availability - entered service in 1981
+                profile.SetTurnAvailable(516);
+
+                // Store in master dictionary
+                _weaponSystemProfiles[WeaponSystems.IFV_M3] = profile;
+            }
+            catch (Exception e)
+            {
+                AppService.HandleException(CLASS_NAME, nameof(CreateIfvM3Profile), e);
+                throw;
+            }
+        }
+
+        /// <summary>
+        /// M113 Armored Personnel Carrier
+        /// </summary>
+        private static void CreateApcM113Profile()
+        {
+            try
+            {
+                var profile = new WeaponSystemProfile(
+                    name: "M113 APC",
+                    nationality: Nationality.USA,
+                    weaponSystemID: WeaponSystems.APC_M113,
+                    25,
+                    landHardAttack: 2,
+                    landHardDefense: 3,
+                    landSoftAttack: 5,
+                    landSoftDefense: 5,
+                    landAirAttack: 1,
+                    landAirDefense: 2,
+                    primaryRange: 1f,
+                    indirectRange: 0f,
+                    spottingRange: 2f,
+                    movementModifier: 1f,
+                    allWeatherCapability: AllWeatherRating.GroundUnit,
+                    sigintRating: SIGINT_Rating.UnitLevel,
+                    nbcRating: NBC_Rating.Gen1,
+                    strategicMobility: StrategicMobility.AirLift,
+                    nvgCapability: NVG_Rating.Gen1,
+                    silhouette: UnitSilhouette.Small
+                );
+
+                // Set upgrade paths
+                profile.AddUpgradeType(UpgradeType.APC);
+
+                // Set short name for UI display
+                profile.SetShortName("M113");
+
+                // Set turn availability - entered service in 1960
+                profile.SetTurnAvailable(264);
+
+                // Store in master dictionary
+                _weaponSystemProfiles[WeaponSystems.APC_M113] = profile;
+            }
+            catch (Exception e)
+            {
+                AppService.HandleException(CLASS_NAME, nameof(CreateApcM113Profile), e);
+                throw;
+            }
+        }
+
+        /// <summary>
+        /// LVTP-7 Amphibious Assault Vehicle
+        /// </summary>
+        private static void CreateApcLvtp7Profile()
+        {
+            try
+            {
+                var profile = new WeaponSystemProfile(
+                    name: "LVTP-7 AAV",
+                    nationality: Nationality.USA,
+                    weaponSystemID: WeaponSystems.APC_LVTP7,
+                    35,
+                    landHardAttack: 3,
+                    landHardDefense: 4,
+                    landSoftAttack: 6,
+                    landSoftDefense: 6,
+                    landAirAttack: 1,
+                    landAirDefense: 2,
+                    primaryRange: 1f,
+                    indirectRange: 0f,
+                    spottingRange: 2f,
+                    movementModifier: 1f,
+                    allWeatherCapability: AllWeatherRating.GroundUnit,
+                    sigintRating: SIGINT_Rating.UnitLevel,
+                    nbcRating: NBC_Rating.Gen1,
+                    strategicMobility: StrategicMobility.NavalAssault,
+                    nvgCapability: NVG_Rating.Gen1,
+                    silhouette: UnitSilhouette.Medium
+                );
+
+                // Set upgrade paths
+                profile.AddUpgradeType(UpgradeType.APC);
+
+                // Set amphibious capability
+                profile.SetAmphibiousCapability(true);
+
+                // Set short name for UI display
+                profile.SetShortName("LVTP-7");
+
+                // Set turn availability - entered service in 1972
+                profile.SetTurnAvailable(408);
+
+                // Store in master dictionary
+                _weaponSystemProfiles[WeaponSystems.APC_LVTP7] = profile;
+            }
+            catch (Exception e)
+            {
+                AppService.HandleException(CLASS_NAME, nameof(CreateApcLvtp7Profile), e);
+                throw;
+            }
+        }
+
+        #endregion // US IFVs and APCs
+
+
+        #region US Artillery
+
+        /// <summary>
+        /// M109 Paladin Self-Propelled Howitzer
+        /// </summary>
+        private static void CreateSpaM109Profile()
+        {
+            try
+            {
+                var profile = new WeaponSystemProfile(
+                    name: "M109 Paladin Self-Propelled Artillery",
+                    nationality: Nationality.USA,
+                    weaponSystemID: WeaponSystems.SPA_M109,
+                    60,
+                    landHardAttack: 10,
+                    landHardDefense: 4,
+                    landSoftAttack: 17,
+                    landSoftDefense: 6,
+                    landAirAttack: 1,
+                    landAirDefense: 3,
+                    primaryRange: 1f,
+                    indirectRange: 5f,
+                    spottingRange: 2f,
+                    movementModifier: 1f,
+                    allWeatherCapability: AllWeatherRating.GroundUnit,
+                    sigintRating: SIGINT_Rating.UnitLevel,
+                    nbcRating: NBC_Rating.Gen2,
+                    strategicMobility: StrategicMobility.Heavy,
+                    nvgCapability: NVG_Rating.Gen2,
+                    silhouette: UnitSilhouette.Large
+                );
+
+                // Set upgrade paths
+                profile.AddUpgradeType(UpgradeType.SPART);
+
+                // Set short name for UI display
+                profile.SetShortName("M109");
+
+                // Set turn availability - entered service in 1963
+                profile.SetTurnAvailable(300);
+
+                // Store in master dictionary
+                _weaponSystemProfiles[WeaponSystems.SPA_M109] = profile;
+            }
+            catch (Exception e)
+            {
+                AppService.HandleException(CLASS_NAME, nameof(CreateSpaM109Profile), e);
+                throw;
+            }
+        }
+
+        /// <summary>
+        /// M270 MLRS Multiple Launch Rocket System
+        /// </summary>
+        private static void CreateRocMlrsProfile()
+        {
+            try
+            {
+                var profile = new WeaponSystemProfile(
+                    name: "M270 MLRS Multiple Launch Rocket System",
+                    nationality: Nationality.USA,
+                    weaponSystemID: WeaponSystems.ROC_MLRS,
+                    95,
+                    landHardAttack: 8,
+                    landHardDefense: 3,
+                    landSoftAttack: 16,
+                    landSoftDefense: 4,
+                    landAirAttack: 1,
+                    landAirDefense: 3,
+                    primaryRange: 1f,
+                    indirectRange: 6f,
+                    spottingRange: 2f,
+                    movementModifier: 1f,
+                    allWeatherCapability: AllWeatherRating.GroundUnit,
+                    sigintRating: SIGINT_Rating.UnitLevel,
+                    nbcRating: NBC_Rating.Gen2,
+                    strategicMobility: StrategicMobility.Heavy,
+                    nvgCapability: NVG_Rating.Gen2,
+                    silhouette: UnitSilhouette.Large
+                );
+
+                // Set double fire capability
+                profile.SetDoubleFireCapability(true);
+
+                // Set upgrade paths
+                profile.AddUpgradeType(UpgradeType.ROC);
+
+                // Set short name for UI display
+                profile.SetShortName("MLRS");
+
+                // Set turn availability - entered service in 1983
+                profile.SetTurnAvailable(540);
+
+                // Store in master dictionary
+                _weaponSystemProfiles[WeaponSystems.ROC_MLRS] = profile;
+            }
+            catch (Exception e)
+            {
+                AppService.HandleException(CLASS_NAME, nameof(CreateRocMlrsProfile), e);
+                throw;
+            }
+        }
+
+        #endregion // US Artillery
+
+
+        #region US Air Defense
+
+        /// <summary>
+        /// M163 Vulcan Air Defense System
+        /// </summary>
+        private static void CreateSpaaaM163Profile()
+        {
+            try
+            {
+                var profile = new WeaponSystemProfile(
+                    name: "M163 Vulcan Self-Propelled Anti-Aircraft Artillery",
+                    nationality: Nationality.USA,
+                    weaponSystemID: WeaponSystems.SPAAA_M163,
+                    40,
+                    landHardAttack: 3,
+                    landHardDefense: 3,
+                    landSoftAttack: 8,
+                    landSoftDefense: 4,
+                    landAirAttack: 8,
+                    landAirDefense: 12,
+                    primaryRange: 1f,
+                    indirectRange: 2f,
+                    spottingRange: 3f,
+                    movementModifier: 1f,
+                    allWeatherCapability: AllWeatherRating.GroundUnit,
+                    sigintRating: SIGINT_Rating.UnitLevel,
+                    nbcRating: NBC_Rating.Gen1,
+                    strategicMobility: StrategicMobility.AirLift,
+                    nvgCapability: NVG_Rating.Gen1,
+                    silhouette: UnitSilhouette.Medium
+                );
+
+                // Set upgrade paths
+                profile.AddUpgradeType(UpgradeType.SPAAA);
+
+                // Set short name for UI display
+                profile.SetShortName("M163");
+
+                // Set turn availability - entered service in 1969
+                profile.SetTurnAvailable(372);
+
+                // Store in master dictionary
+                _weaponSystemProfiles[WeaponSystems.SPAAA_M163] = profile;
+            }
+            catch (Exception e)
+            {
+                AppService.HandleException(CLASS_NAME, nameof(CreateSpaaaM163Profile), e);
+                throw;
+            }
+        }
+
+        /// <summary>
+        /// M48 Chaparral Self-Propelled SAM System
+        /// </summary>
+        private static void CreateSpsamChapProfile()
+        {
+            try
+            {
+                var profile = new WeaponSystemProfile(
+                    name: "M48 Chaparral Self-Propelled SAM System",
+                    nationality: Nationality.USA,
+                    weaponSystemID: WeaponSystems.SPSAM_CHAP,
+                    50,
+                    landHardAttack: 2,
+                    landHardDefense: 3,
+                    landSoftAttack: 3,
+                    landSoftDefense: 4,
+                    landAirAttack: 11,
+                    landAirDefense: 6,
+                    primaryRange: 1f,
+                    indirectRange: 3f,
+                    spottingRange: 3f,
+                    movementModifier: 1f,
+                    allWeatherCapability: AllWeatherRating.GroundUnit,
+                    sigintRating: SIGINT_Rating.UnitLevel,
+                    nbcRating: NBC_Rating.Gen1,
+                    strategicMobility: StrategicMobility.AirLift,
+                    nvgCapability: NVG_Rating.Gen1,
+                    silhouette: UnitSilhouette.Medium
+                );
+
+                // Set upgrade paths
+                profile.AddUpgradeType(UpgradeType.SPSAM);
+
+                // Set short name for UI display
+                profile.SetShortName("Chaparral");
+
+                // Set turn availability - entered service in 1969
+                profile.SetTurnAvailable(372);
+
+                // Store in master dictionary
+                _weaponSystemProfiles[WeaponSystems.SPSAM_CHAP] = profile;
+            }
+            catch (Exception e)
+            {
+                AppService.HandleException(CLASS_NAME, nameof(CreateSpsamChapProfile), e);
+                throw;
+            }
+        }
+
+        /// <summary>
+        /// MIM-23 Hawk Medium-Range SAM System
+        /// </summary>
+        private static void CreateSamHawkProfile()
+        {
+            try
+            {
+                var profile = new WeaponSystemProfile(
+                    name: "MIM-23 Hawk Strategic SAM System",
+                    nationality: Nationality.USA,
+                    weaponSystemID: WeaponSystems.SAM_HAWK,
+                    85,
+                    landHardAttack: 0,
+                    landHardDefense: 3,
+                    landSoftAttack: 0,
+                    landSoftDefense: 4,
+                    landAirAttack: 15,
+                    landAirDefense: 8,
+                    primaryRange: 1f,
+                    indirectRange: 6f,
+                    spottingRange: 6f,
+                    movementModifier: 0f,
+                    allWeatherCapability: AllWeatherRating.GroundUnit,
+                    sigintRating: SIGINT_Rating.SpecializedLevel,
+                    nbcRating: NBC_Rating.Gen1,
+                    strategicMobility: StrategicMobility.Heavy,
+                    nvgCapability: NVG_Rating.None,
+                    silhouette: UnitSilhouette.Large
+                );
+
+                // Set upgrade paths
+                profile.AddUpgradeType(UpgradeType.SAM);
+
+                // Set short name for UI display
+                profile.SetShortName("Hawk");
+
+                // Set turn availability - entered service in 1960
+                profile.SetTurnAvailable(264);
+
+                // Store in master dictionary
+                _weaponSystemProfiles[WeaponSystems.SAM_HAWK] = profile;
+            }
+            catch (Exception e)
+            {
+                AppService.HandleException(CLASS_NAME, nameof(CreateSamHawkProfile), e);
+                throw;
+            }
+        }
+
+        #endregion // US Air Defense
+
+
+        #region US Helicopters
+
+        /// <summary>
+        /// AH-64 Apache Attack Helicopter
+        /// </summary>
+        private static void CreateHelAh64Profile()
+        {
+            try
+            {
+                var profile = new WeaponSystemProfile(
+                    name: "AH-64 Apache Attack Helicopter",
+                    nationality: Nationality.USA,
+                    weaponSystemID: WeaponSystems.HEL_AH64,
+                    130,
+                    landHardAttack: 20,
+                    landHardDefense: 8,
+                    landSoftAttack: 16,
+                    landSoftDefense: 9,
+                    landAirAttack: 4,
+                    landAirDefense: 7,
+                    primaryRange: 1f,
+                    indirectRange: 0f,
+                    spottingRange: 3f,
+                    movementModifier: 1f,
+                    allWeatherCapability: AllWeatherRating.GroundUnit,
+                    sigintRating: SIGINT_Rating.SpecializedLevel,
+                    nbcRating: NBC_Rating.Gen2,
+                    strategicMobility: StrategicMobility.Aviation,
+                    nvgCapability: NVG_Rating.Gen3,
+                    silhouette: UnitSilhouette.Medium
+                );
+
+                // Set upgrade paths
+                profile.AddUpgradeType(UpgradeType.Attack);
+
+                // Set short name for UI display
+                profile.SetShortName("AH-64");
+
+                // Set turn availability - entered service in 1986
+                profile.SetTurnAvailable(576);
+
+                // Store in master dictionary
+                _weaponSystemProfiles[WeaponSystems.HEL_AH64] = profile;
+            }
+            catch (Exception e)
+            {
+                AppService.HandleException(CLASS_NAME, nameof(CreateHelAh64Profile), e);
+                throw;
+            }
+        }
+
+        #endregion // US Helicopters
+
+
+        #region US Aircraft
+
+        /// <summary>
+        /// F-15 Eagle Air Superiority Fighter
+        /// </summary>
+        private static void CreateAsfF15Profile()
+        {
+            try
+            {
+                var profile = new WeaponSystemProfile(
+                    name: "F-15 Eagle Air Superiority Fighter",
+                    nationality: Nationality.USA,
+                    weaponSystemID: WeaponSystems.ASF_F15,
+                    110,
+                    landAirDefense: 12,
+                    airAttack: 21,
+                    airDefense: 17,
+                    airAvionics: 18,
+                    airGroundAttack: 8,
+                    airGroundDefense: 8,
+                    primaryRange: 1f,
+                    indirectRange: 0f,
+                    spottingRange: 5f,
+                    movementModifier: 1f,
+                    allWeatherCapability: AllWeatherRating.AllWeather,
+                    sigintRating: SIGINT_Rating.UnitLevel,
+                    nbcRating: NBC_Rating.Gen2,
+                    strategicMobility: StrategicMobility.Aircraft,
+                    nvgCapability: NVG_Rating.None,
+                    silhouette: UnitSilhouette.Medium
+                );
+
+                // Set upgrade paths
+                profile.AddUpgradeType(UpgradeType.Fighter);
+
+                // Set short name for UI display
+                profile.SetShortName("F-15 Eagle");
+
+                // Set turn availability - entered service in 1976
+                profile.SetTurnAvailable(456);
+
+                // Store in master dictionary
+                _weaponSystemProfiles[WeaponSystems.ASF_F15] = profile;
+            }
+            catch (Exception e)
+            {
+                AppService.HandleException(CLASS_NAME, nameof(CreateAsfF15Profile), e);
+                throw;
+            }
+        }
+
+        /// <summary>
+        /// F-4 Phantom Multi-Role Fighter
+        /// </summary>
+        private static void CreateAsfF4Profile()
+        {
+            try
+            {
+                var profile = new WeaponSystemProfile(
+                    name: "F-4 Phantom Air Superiority Fighter",
+                    nationality: Nationality.USA,
+                    weaponSystemID: WeaponSystems.ASF_F4,
+                    65,
+                    landAirDefense: 9,
+                    airAttack: 12,
+                    airDefense: 10,
+                    airAvionics: 12,
+                    airGroundAttack: 12,
+                    airGroundDefense: 8,
+                    primaryRange: 1f,
+                    indirectRange: 0f,
+                    spottingRange: 4f,
+                    movementModifier: 1f,
+                    allWeatherCapability: AllWeatherRating.Night,
+                    sigintRating: SIGINT_Rating.UnitLevel,
+                    nbcRating: NBC_Rating.Gen1,
+                    strategicMobility: StrategicMobility.Aircraft,
+                    nvgCapability: NVG_Rating.None,
+                    silhouette: UnitSilhouette.Medium
+                );
+
+                // Set upgrade paths
+                profile.AddUpgradeType(UpgradeType.Fighter);
+
+                // Set short name for UI display
+                profile.SetShortName("F-4 Phantom");
+
+                // Set turn availability - entered service in 1960
+                profile.SetTurnAvailable(264);
+
+                // Store in master dictionary
+                _weaponSystemProfiles[WeaponSystems.ASF_F4] = profile;
+            }
+            catch (Exception e)
+            {
+                AppService.HandleException(CLASS_NAME, nameof(CreateAsfF4Profile), e);
+                throw;
+            }
+        }
+
+        /// <summary>
+        /// F-16 Fighting Falcon Multi-Role Fighter
+        /// </summary>
+        private static void CreateMrfF16Profile()
+        {
+            try
+            {
+                var profile = new WeaponSystemProfile(
+                    name: "F-16 Fighting Falcon Multi-Role Fighter",
+                    nationality: Nationality.USA,
+                    weaponSystemID: WeaponSystems.MRF_F16,
+                    75,
+                    landAirDefense: 11,
+                    airAttack: 15,
+                    airDefense: 14,
+                    airAvionics: 16,
+                    airStrategicAttack: 6,
+                    airGroundAttack: 14,
+                    airGroundDefense: 10,
+                    primaryRange: 1f,
+                    indirectRange: 0f,
+                    spottingRange: 4f,
+                    movementModifier: 1f,
+                    allWeatherCapability: AllWeatherRating.AllWeather,
+                    sigintRating: SIGINT_Rating.UnitLevel,
+                    nbcRating: NBC_Rating.Gen2,
+                    strategicMobility: StrategicMobility.Aircraft,
+                    nvgCapability: NVG_Rating.None,
+                    silhouette: UnitSilhouette.Medium
+                );
+
+                // Set upgrade paths
+                profile.AddUpgradeType(UpgradeType.Attack);
+
+                // Set short name for UI display
+                profile.SetShortName("F-16 Falcon");
+
+                // Set turn availability - entered service in 1978
+                profile.SetTurnAvailable(480);
+
+                // Store in master dictionary
+                _weaponSystemProfiles[WeaponSystems.MRF_F16] = profile;
+            }
+            catch (Exception e)
+            {
+                AppService.HandleException(CLASS_NAME, nameof(CreateMrfF16Profile), e);
+                throw;
+            }
+        }
+
+        /// <summary>
+        /// A-10 Thunderbolt II Attack Aircraft
+        /// </summary>
+        private static void CreateAttA10Profile()
+        {
+            try
+            {
+                var profile = new WeaponSystemProfile(
+                    name: "A-10 Thunderbolt II Attack Aircraft",
+                    nationality: Nationality.USA,
+                    weaponSystemID: WeaponSystems.ATT_A10,
+                    70,
+                    landAirDefense: 8,
+                    airAttack: 4,
+                    airDefense: 6,
+                    airAvionics: 16,
+                    airStrategicAttack: 0,
+                    airGroundAttack: 18,
+                    airGroundDefense: 15,
+                    primaryRange: 1f,
+                    indirectRange: 0f,
+                    spottingRange: 3f,
+                    movementModifier: 1f,
+                    allWeatherCapability: AllWeatherRating.AllWeather,
+                    sigintRating: SIGINT_Rating.UnitLevel,
+                    nbcRating: NBC_Rating.Gen1,
+                    strategicMobility: StrategicMobility.Aircraft,
+                    nvgCapability: NVG_Rating.None,
+                    silhouette: UnitSilhouette.Medium
+                );
+
+                // Set upgrade paths
+                profile.AddUpgradeType(UpgradeType.Attack);
+
+                // Set short name for UI display
+                profile.SetShortName("A-10 Thunderbolt II");
+
+                // Set turn availability - entered service in 1977
+                profile.SetTurnAvailable(468);
+
+                // Store in master dictionary
+                _weaponSystemProfiles[WeaponSystems.ATT_A10] = profile;
+            }
+            catch (Exception e)
+            {
+                AppService.HandleException(CLASS_NAME, nameof(CreateAttA10Profile), e);
+                throw;
+            }
+        }
+
+        /// <summary>
+        /// F-111 Aardvark Strike Fighter
+        /// </summary>
+        private static void CreateBmbF111Profile()
+        {
+            try
+            {
+                var profile = new WeaponSystemProfile(
+                    name: "F-111 Aardvark Strike Fighter",
+                    nationality: Nationality.USA,
+                    weaponSystemID: WeaponSystems.BMB_F111,
+                    95,
+                    landAirDefense: 13,
+                    airAttack: 6,
+                    airDefense: 10,
+                    airAvionics: 14,
+                    airStrategicAttack: 16,
+                    airGroundAttack: 15,
+                    airGroundDefense: 12,
+                    primaryRange: 1f,
+                    indirectRange: 0f,
+                    spottingRange: 4f,
+                    movementModifier: 1f,
+                    allWeatherCapability: AllWeatherRating.AllWeather,
+                    sigintRating: SIGINT_Rating.UnitLevel,
+                    nbcRating: NBC_Rating.Gen1,
+                    strategicMobility: StrategicMobility.Aircraft,
+                    nvgCapability: NVG_Rating.None,
+                    silhouette: UnitSilhouette.Medium
+                );
+
+                // Set upgrade paths
+                profile.AddUpgradeType(UpgradeType.Bomber);
+
+                // Set short name for UI display
+                profile.SetShortName("F-111");
+
+                // Set turn availability - entered service in 1967
+                profile.SetTurnAvailable(348);
+
+                // Store in master dictionary
+                _weaponSystemProfiles[WeaponSystems.BMB_F111] = profile;
+            }
+            catch (Exception e)
+            {
+                AppService.HandleException(CLASS_NAME, nameof(CreateBmbF111Profile), e);
+                throw;
+            }
+        }
+
+        /// <summary>
+        /// F-117 Nighthawk Stealth Attack Aircraft
+        /// </summary>
+        private static void CreateBmbF117Profile()
+        {
+            try
+            {
+                var profile = new WeaponSystemProfile(
+                    name: "F-117 Nighthawk Stealth Attack Aircraft",
+                    nationality: Nationality.USA,
+                    weaponSystemID: WeaponSystems.BMB_F117,
+                    180,
+                    landAirDefense: 25,
+                    airAttack: 3,
+                    airDefense: 14,
+                    airAvionics: 18,
+                    airStrategicAttack: 20,
+                    airGroundAttack: 16,
+                    airGroundDefense: 18,
+                    primaryRange: 1f,
+                    indirectRange: 0f,
+                    spottingRange: 3f,
+                    movementModifier: 1f,
+                    allWeatherCapability: AllWeatherRating.AllWeather,
+                    sigintRating: SIGINT_Rating.SpecializedLevel,
+                    nbcRating: NBC_Rating.Gen2,
+                    strategicMobility: StrategicMobility.Aircraft,
+                    nvgCapability: NVG_Rating.None,
+                    silhouette: UnitSilhouette.Tiny
+                );
+
+                // Set upgrade paths
+                profile.AddUpgradeType(UpgradeType.Bomber);
+
+                // Set short name for UI display
+                profile.SetShortName("F-117 Nighthawk");
+
+                // Set turn availability - entered service in 1983
+                profile.SetTurnAvailable(540);
+
+                // Store in master dictionary
+                _weaponSystemProfiles[WeaponSystems.BMB_F117] = profile;
+            }
+            catch (Exception e)
+            {
+                AppService.HandleException(CLASS_NAME, nameof(CreateBmbF117Profile), e);
+                throw;
+            }
+        }
+
+        /// <summary>
+        /// SR-71 Blackbird Strategic Reconnaissance Aircraft
+        /// </summary>
+        private static void CreateRcnaSr71Profile()
+        {
+            try
+            {
+                var profile = new WeaponSystemProfile(
+                    name: "SR-71 Blackbird Strategic Reconnaissance Aircraft",
+                    nationality: Nationality.USA,
+                    weaponSystemID: WeaponSystems.RCNA_SR71,
+                    200,
+                    landAirDefense: 25,
+                    airAttack: 0,
+                    airDefense: 20,
+                    airAvionics: 20,
+                    primaryRange: 1f,
+                    indirectRange: 0f,
+                    spottingRange: 10f,
+                    movementModifier: 1.5f,
+                    allWeatherCapability: AllWeatherRating.AllWeather,
+                    sigintRating: SIGINT_Rating.SpecializedLevel,
+                    nbcRating: NBC_Rating.Gen2,
+                    strategicMobility: StrategicMobility.Aircraft,
+                    nvgCapability: NVG_Rating.None,
+                    silhouette: UnitSilhouette.Medium
+                );
+
+                // Set upgrade paths
+                profile.AddUpgradeType(UpgradeType.Fighter);
+
+                // Set short name for UI display
+                profile.SetShortName("SR-71 Blackbird");
+
+                // Set turn availability - entered service in 1966
+                profile.SetTurnAvailable(336);
+
+                // Store in master dictionary
+                _weaponSystemProfiles[WeaponSystems.RCNA_SR71] = profile;
+            }
+            catch (Exception e)
+            {
+                AppService.HandleException(CLASS_NAME, nameof(CreateRcnaSr71Profile), e);
+                throw;
+            }
+        }
+
+        #endregion // US Aircraft
+
+
+        #region US Infantry
+
+        /// <summary>
+        /// US Regular Infantry
+        /// </summary>
+        private static void CreateRegInfUsProfile()
+        {
+            try
+            {
+                var profile = new WeaponSystemProfile(
+                    name: "US Regular Infantry",
+                    nationality: Nationality.USA,
+                    weaponSystemID: WeaponSystems.REG_INF_US,
+                    18,
+                    landHardAttack: 5,
+                    landHardDefense: 4,
+                    landSoftAttack: 10,
+                    landSoftDefense: 11,
+                    landAirAttack: 3,
+                    landAirDefense: 4,
+                    primaryRange: 1f,
+                    indirectRange: 0f,
+                    spottingRange: 2f,
+                    movementModifier: 1f,
+                    allWeatherCapability: AllWeatherRating.Night,
+                    nvgCapability: NVG_Rating.Gen2,
+                    silhouette: UnitSilhouette.Small,
+                    sigintRating: SIGINT_Rating.UnitLevel,
+                    nbcRating: NBC_Rating.Gen2,
+                    strategicMobility: StrategicMobility.AirLift
+                );
+
+                // Upgrade paths
+                profile.AddUpgradeType(UpgradeType.Infantry);
+
+                // Set short name for UI display
+                profile.SetShortName("Infantry");
+
+                // Set turn availability in months.
+                profile.SetTurnAvailable(300);
+
+                // Store in master dictionary
+                _weaponSystemProfiles[WeaponSystems.REG_INF_US] = profile;
+            }
+            catch (Exception e)
+            {
+                AppService.HandleException(CLASS_NAME, nameof(CreateRegInfUsProfile), e);
+                throw;
+            }
+        }
+
+        /// <summary>
+        /// US Airborne Infantry
+        /// </summary>
+        private static void CreateAbInfUsProfile()
+        {
+            try
+            {
+                var profile = new WeaponSystemProfile(
+                    name: "US Airborne Infantry",
+                    nationality: Nationality.USA,
+                    weaponSystemID: WeaponSystems.AB_INF_US,
+                    22,
+                    landHardAttack: 5,
+                    landHardDefense: 4,
+                    landSoftAttack: 10,
+                    landSoftDefense: 11,
+                    landAirAttack: 3,
+                    landAirDefense: 4,
+                    primaryRange: 1f,
+                    indirectRange: 0f,
+                    spottingRange: 2f,
+                    movementModifier: 1f,
+                    allWeatherCapability: AllWeatherRating.Night,
+                    nvgCapability: NVG_Rating.Gen2,
+                    silhouette: UnitSilhouette.Small,
+                    sigintRating: SIGINT_Rating.UnitLevel,
+                    nbcRating: NBC_Rating.Gen2,
+                    strategicMobility: StrategicMobility.AirDrop
+                );
+
+                // Upgrade paths
+                profile.AddUpgradeType(UpgradeType.Infantry);
+
+                // Set short name for UI display
+                profile.SetShortName("Airborne");
+
+                // Set turn availability in months.
+                profile.SetTurnAvailable(300);
+
+                // Store in master dictionary
+                _weaponSystemProfiles[WeaponSystems.AB_INF_US] = profile;
+            }
+            catch (Exception e)
+            {
+                AppService.HandleException(CLASS_NAME, nameof(CreateAbInfUsProfile), e);
+                throw;
+            }
+        }
+
+        /// <summary>
+        /// US Air Mobile Infantry
+        /// </summary>
+        private static void CreateAmInfUsProfile()
+        {
+            try
+            {
+                var profile = new WeaponSystemProfile(
+                    name: "US Air Mobile Infantry",
+                    nationality: Nationality.USA,
+                    weaponSystemID: WeaponSystems.AM_INF_US,
+                    22,
+                    landHardAttack: 5,
+                    landHardDefense: 4,
+                    landSoftAttack: 10,
+                    landSoftDefense: 11,
+                    landAirAttack: 3,
+                    landAirDefense: 4,
+                    primaryRange: 1f,
+                    indirectRange: 0f,
+                    spottingRange: 2f,
+                    movementModifier: 1f,
+                    allWeatherCapability: AllWeatherRating.Night,
+                    nvgCapability: NVG_Rating.Gen2,
+                    silhouette: UnitSilhouette.Small,
+                    sigintRating: SIGINT_Rating.UnitLevel,
+                    nbcRating: NBC_Rating.Gen2,
+                    strategicMobility: StrategicMobility.AirMobile
+                );
+
+                // Set upgrade paths
+                profile.AddUpgradeType(UpgradeType.Infantry);
+
+                // Set short name for UI display
+                profile.SetShortName("Air Mobile");
+
+                // Set turn availability in months.
+                profile.SetTurnAvailable(440);
+
+                // Store in master dictionary
+                _weaponSystemProfiles[WeaponSystems.AM_INF_US] = profile;
+            }
+            catch (Exception e)
+            {
+                AppService.HandleException(CLASS_NAME, nameof(CreateAmInfUsProfile), e);
+                throw;
+            }
+        }
+
+        /// <summary>
+        /// US Marine Infantry
+        /// </summary>
+        private static void CreateMarInfUsProfile()
+        {
+            try
+            {
+                var profile = new WeaponSystemProfile(
+                    name: "US Marine Infantry",
+                    nationality: Nationality.USA,
+                    weaponSystemID: WeaponSystems.MAR_INF_US,
+                    22,
+                    landHardAttack: 6,
+                    landHardDefense: 4,
+                    landSoftAttack: 11,
+                    landSoftDefense: 12,
+                    landAirAttack: 3,
+                    landAirDefense: 4,
+                    primaryRange: 1f,
+                    indirectRange: 0f,
+                    spottingRange: 2f,
+                    movementModifier: 1f,
+                    allWeatherCapability: AllWeatherRating.Night,
+                    nvgCapability: NVG_Rating.Gen2,
+                    silhouette: UnitSilhouette.Small,
+                    sigintRating: SIGINT_Rating.UnitLevel,
+                    nbcRating: NBC_Rating.Gen2,
+                    strategicMobility: StrategicMobility.NavalAssault
+                );
+
+                // Set upgrade paths
+                profile.AddUpgradeType(UpgradeType.Infantry);
+
+                // Set short name for UI display
+                profile.SetShortName("Marines");
+
+                // Set turn availability in months.
+                profile.SetTurnAvailable(300);
+
+                // Store in master dictionary
+                _weaponSystemProfiles[WeaponSystems.MAR_INF_US] = profile;
+            }
+            catch (Exception e)
+            {
+                AppService.HandleException(CLASS_NAME, nameof(CreateMarInfUsProfile), e);
+                throw;
+            }
+        }
+
+        /// <summary>
+        /// US Special Forces Infantry
+        /// </summary>
+        private static void CreateSpecInfUsProfile()
+        {
+            try
+            {
+                var profile = new WeaponSystemProfile(
+                    name: "US Special Forces Infantry",
+                    nationality: Nationality.USA,
+                    weaponSystemID: WeaponSystems.SPEC_INF_US,
+                    35,
+                    landHardAttack: 9,
+                    landHardDefense: 5,
+                    landSoftAttack: 12,
+                    landSoftDefense: 13,
+                    landAirAttack: 4,
+                    landAirDefense: 7,
+                    primaryRange: 1f,
+                    indirectRange: 0f,
+                    spottingRange: 3f,
+                    movementModifier: 1f,
+                    allWeatherCapability: AllWeatherRating.AllWeather,
+                    nvgCapability: NVG_Rating.Gen3,
+                    silhouette: UnitSilhouette.Small,
+                    sigintRating: SIGINT_Rating.SpecializedLevel,
+                    nbcRating: NBC_Rating.Gen2,
+                    strategicMobility: StrategicMobility.AirMobile
+                );
+
+                // Set upgrade paths
+                profile.AddUpgradeType(UpgradeType.Infantry);
+
+                // Set short name for UI display
+                profile.SetShortName("Special Forces");
+
+                // Set turn availability in months.
+                profile.SetTurnAvailable(300);
+
+                // Store in master dictionary
+                _weaponSystemProfiles[WeaponSystems.SPEC_INF_US] = profile;
+            }
+            catch (Exception e)
+            {
+                AppService.HandleException(CLASS_NAME, nameof(CreateSpecInfUsProfile), e);
+                throw;
+            }
+        }
+
+        /// <summary>
+        /// US Engineer Infantry
+        /// </summary>
+        private static void CreateEngInfUsProfile()
+        {
+            try
+            {
+                var profile = new WeaponSystemProfile(
+                    name: "US Combat Engineers",
+                    nationality: Nationality.USA,
+                    weaponSystemID: WeaponSystems.ENG_INF_US,
+                    24,
+                    landHardAttack: 5,
+                    landHardDefense: 4,
+                    landSoftAttack: 10,
+                    landSoftDefense: 13,
+                    landAirAttack: 3,
+                    landAirDefense: 4,
+                    primaryRange: 1f,
+                    indirectRange: 0f,
+                    spottingRange: 2f,
+                    movementModifier: 1f,
+                    allWeatherCapability: AllWeatherRating.Night,
+                    nvgCapability: NVG_Rating.Gen2,
+                    silhouette: UnitSilhouette.Small,
+                    sigintRating: SIGINT_Rating.UnitLevel,
+                    nbcRating: NBC_Rating.Gen2,
+                    strategicMobility: StrategicMobility.AirDrop
+                );
+
+                // Set upgrade paths
+                profile.AddUpgradeType(UpgradeType.Infantry);
+
+                // Set short name for UI display
+                profile.SetShortName("Engineers");
+
+                // Set turn availability in months.
+                profile.SetTurnAvailable(300);
+
+                // Store in master dictionary
+                _weaponSystemProfiles[WeaponSystems.ENG_INF_US] = profile;
+            }
+            catch (Exception e)
+            {
+                AppService.HandleException(CLASS_NAME, nameof(CreateEngInfUsProfile), e);
+                throw;
+            }
+        }
+
+        #endregion // US Infantry
+
+
+        //-----------------------------------------------------------------------------------------
+
+
     }
 }
