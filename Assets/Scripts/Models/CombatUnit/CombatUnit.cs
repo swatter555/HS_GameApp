@@ -285,6 +285,7 @@ namespace HammerAndSickle.Models
         public bool IsBase => Classification.IsBaseType();
 
         // Profile IDs
+        // TODO: Add a transport profile ID for airborne/air-mobile units.
         public WeaponSystems DeployedProfileID { get; private set; }
         public WeaponSystems MountedProfileID { get; private set; }
         public IntelProfileTypes IntelProfileType { get; internal set; }

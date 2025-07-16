@@ -333,50 +333,6 @@ namespace HammerAndSickle.Models
         }
 
         /// <summary>
-        /// Loads all profile definitions from game data.
-        /// This method should be expanded to load from configuration files or data sources.
-        /// </summary>
-        private static void LoadProfileDefinitions()
-        {
-            // TODO: Load profile definitions from data files or configuration
-            // For now, create basic example profiles for testing
-
-            // Example: Tank Regiment profile
-            var tankRegiment = new Dictionary<WeaponSystems, int>
-            {
-                { WeaponSystems.REG_INF_SV, 400 },
-                { WeaponSystems.TANK_T80B, 42 },
-                { WeaponSystems.IFV_BMP2, 12 },
-                { WeaponSystems.APC_BTR80, 8 },
-                { WeaponSystems.SPA_2S1, 6 }
-            };
-            _profiles[IntelProfileTypes.SV_TR] = tankRegiment;
-
-            // Example: Infantry Regiment profile  
-            var motorRifleRegiment = new Dictionary<WeaponSystems, int>
-            {
-                { WeaponSystems.REG_INF_SV, 2000 },
-                { WeaponSystems.IFV_BMP2, 30 },
-                { WeaponSystems.APC_BTR80, 20 },
-                { WeaponSystems.SPA_2S1, 12 },
-                { WeaponSystems.ATGM_GENERIC, 8 }
-            };
-            _profiles[IntelProfileTypes.SV_MRR] = motorRifleRegiment;
-
-            // Example: Artillery Battalion profile
-            var artilleryBattalion = new Dictionary<WeaponSystems, int>
-            {
-                { WeaponSystems.REG_INF_SV, 200 },
-                { WeaponSystems.SPA_2S3, 18 },
-                { WeaponSystems.ROC_BM21, 6 },
-                { WeaponSystems.APC_BTR80, 4 }
-            };
-            _profiles[IntelProfileTypes.SV_ART] = artilleryBattalion;
-
-            // Add more profiles as needed...
-        }
-
-        /// <summary>
         /// Extracts the prefix from a weapon system name for bucket categorization.
         /// </summary>
         /// <param name="weaponSystem">The weapon system to extract prefix from</param>
@@ -520,5 +476,54 @@ namespace HammerAndSickle.Models
         }
 
         #endregion
+
+
+        #region Profile Database
+
+        /// <summary>
+        /// Loads all profile definitions from game data.
+        /// This method should be expanded to load from configuration files or data sources.
+        /// </summary>
+        private static void LoadProfileDefinitions()
+        {
+            // TODO: Load profile definitions from data files or configuration
+            // For now, create basic example profiles for testing
+
+            // Example: Tank Regiment profile
+            var tankRegiment = new Dictionary<WeaponSystems, int>
+            {
+                { WeaponSystems.REG_INF_SV, 400 },
+                { WeaponSystems.TANK_T80B, 42 },
+                { WeaponSystems.IFV_BMP2, 12 },
+                { WeaponSystems.APC_BTR80, 8 },
+                { WeaponSystems.SPA_2S1, 6 }
+            };
+            _profiles[IntelProfileTypes.SV_TR] = tankRegiment;
+
+            // Example: Infantry Regiment profile  
+            var motorRifleRegiment = new Dictionary<WeaponSystems, int>
+            {
+                { WeaponSystems.REG_INF_SV, 2000 },
+                { WeaponSystems.IFV_BMP2, 30 },
+                { WeaponSystems.APC_BTR80, 20 },
+                { WeaponSystems.SPA_2S1, 12 },
+                { WeaponSystems.ATGM_GENERIC, 8 }
+            };
+            _profiles[IntelProfileTypes.SV_MRR] = motorRifleRegiment;
+
+            // Example: Artillery Battalion profile
+            var artilleryBattalion = new Dictionary<WeaponSystems, int>
+            {
+                { WeaponSystems.REG_INF_SV, 200 },
+                { WeaponSystems.SPA_2S3, 18 },
+                { WeaponSystems.ROC_BM21, 6 },
+                { WeaponSystems.APC_BTR80, 4 }
+            };
+            _profiles[IntelProfileTypes.SV_ART] = artilleryBattalion;
+
+            // Add more profiles as needed...
+        }
+
+        #endregion // Profile Database
     }
 }

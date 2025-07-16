@@ -212,6 +212,7 @@ namespace HammerAndSickle.Models
     /// </summary>
     public enum AllWeatherRating
     {
+        GroundUnit,
         Day,
         Night,
         AllWeather
