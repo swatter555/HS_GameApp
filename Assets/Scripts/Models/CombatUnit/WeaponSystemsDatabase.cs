@@ -301,6 +301,36 @@ namespace HammerAndSickle.Models
                 CreateSpecInfUsProfile();
                 CreateEngInfUsProfile();
 
+                // FRG
+                CreateTankLeopard1Profile();
+                CreateTankLeopard2Profile();
+                CreateIfvMarderProfile();
+                CreateSpaaaGepardProfile();
+                CreateHelBo105Profile();
+                CreateRegInfFRGProfile();
+                CreateAmInfFRGProfile();
+                CreateSpecInfFRGProfile();
+                CreateEngInfFRGProfile();
+                CreateAsfTIDSProfile();
+
+                // UK
+                CreateTankChallenger1Profile();
+                CreateIfvWarriorProfile();
+                CreateRegInfUKProfile();
+                CreateAbInfUKProfile();
+                CreateAmInfUKProfile();
+                CreateSpecInfUKProfile();
+                CreateEngInfUKProfile();
+
+                // FRA
+                CreateTankAMX30Profile();
+                CreateSpaaaRolandProfile();
+                CreateRegInfFRAProfile();
+                CreateAmInfFRAProfile();
+                CreateSpecInfFRAProfile();
+                CreateEngInfFRAProfile();
+                CreateAsfM2000Profile();
+                CreateAttJaguarProfile();
             }
             catch (Exception e)
             {
@@ -4634,5 +4664,1090 @@ namespace HammerAndSickle.Models
         //-----------------------------------------------------------------------------------------
 
 
+        #region West Germany (FRG)
+
+        private static void CreateTankLeopard1Profile()
+        {
+            try
+            {
+                var profile = new WeaponSystemProfile(
+                    name: "Leopard 1 MBT",
+                    nationality: Nationality.FRG,
+                    weaponSystemID: WeaponSystems.TANK_LEOPARD1,
+                    80,
+                    hardAttack: 11,
+                    hardDefense: 10,
+                    softAttack: 11,
+                    softDefense: 10,
+                    groundAirDefense: CUConstants.GROUND_DEFENSE_ARMOR,
+                    primaryRange: 1f,
+                    spottingRange: 2f,
+                    allWeatherCapability: AllWeatherRating.GroundUnit,
+                    sigintRating: SIGINT_Rating.UnitLevel,
+                    nbcRating: NBC_Rating.Gen1,
+                    strategicMobility: StrategicMobility.Heavy,
+                    nvgCapability: NVG_Rating.None,
+                    silhouette: UnitSilhouette.Medium,
+                    movementPoints: CUConstants.MECH_UNIT);
+
+                profile.AddUpgradeType(UpgradeType.AFV);
+                profile.SetShortName("Leo 1");
+                profile.SetTurnAvailable(336); // 1965
+                _weaponSystemProfiles[WeaponSystems.TANK_LEOPARD1] = profile;
+            }
+            catch (Exception e) { AppService.HandleException(CLASS_NAME, nameof(CreateTankLeopard1Profile), e); throw; }
+        }
+
+        private static void CreateTankLeopard2Profile()
+        {
+            try
+            {
+                var profile = new WeaponSystemProfile(
+                    name: "Leopard 2 MBT",
+                    nationality: Nationality.FRG,
+                    weaponSystemID: WeaponSystems.TANK_LEOPARD2,
+                    120,
+                    hardAttack: 14,
+                    hardDefense: 16,
+                    softAttack: 11,
+                    softDefense: 13,
+                    groundAirDefense: CUConstants.GROUND_DEFENSE_ARMOR,
+                    primaryRange: 1f,
+                    spottingRange: 2f,
+                    allWeatherCapability: AllWeatherRating.GroundUnit,
+                    sigintRating: SIGINT_Rating.UnitLevel,
+                    nbcRating: NBC_Rating.Gen2,
+                    strategicMobility: StrategicMobility.Heavy,
+                    nvgCapability: NVG_Rating.Gen2,
+                    silhouette: UnitSilhouette.Medium,
+                    movementPoints: CUConstants.MECH_UNIT);
+
+                profile.AddUpgradeType(UpgradeType.AFV);
+                profile.SetShortName("Leo 2");
+                profile.SetTurnAvailable(540); // 1983
+                _weaponSystemProfiles[WeaponSystems.TANK_LEOPARD2] = profile;
+            }
+            catch (Exception e) { AppService.HandleException(CLASS_NAME, nameof(CreateTankLeopard2Profile), e); throw; }
+        }
+
+        private static void CreateIfvMarderProfile()
+        {
+            try
+            {
+                var profile = new WeaponSystemProfile(
+                    name: "Marder IFV",
+                    nationality: Nationality.FRG,
+                    weaponSystemID: WeaponSystems.IFV_MARDER,
+                    65,
+                    hardAttack: 9,
+                    hardDefense: 4,
+                    softAttack: 8,
+                    softDefense: 8,
+                    groundAirDefense: CUConstants.GROUND_DEFENSE_LIGHTARMOR,
+                    primaryRange: 1f,
+                    spottingRange: 2f,
+                    allWeatherCapability: AllWeatherRating.GroundUnit,
+                    sigintRating: SIGINT_Rating.UnitLevel,
+                    nbcRating: NBC_Rating.Gen1,
+                    strategicMobility: StrategicMobility.AirLift,
+                    nvgCapability: NVG_Rating.Gen1,
+                    silhouette: UnitSilhouette.Small,
+                    movementPoints: CUConstants.MECH_UNIT);
+
+                profile.AddUpgradeType(UpgradeType.IFV);
+                profile.SetShortName("Marder");
+                profile.SetTurnAvailable(396); // 1973
+                _weaponSystemProfiles[WeaponSystems.IFV_MARDER] = profile;
+            }
+            catch (Exception e) { AppService.HandleException(CLASS_NAME, nameof(CreateIfvMarderProfile), e); throw; }
+        }
+
+        private static void CreateSpaaaGepardProfile()
+        {
+            try
+            {
+                var profile = new WeaponSystemProfile(
+                    name: "Flakpanzer Gepard SPAAA",
+                    nationality: Nationality.FRG,
+                    weaponSystemID: WeaponSystems.SPAAA_GEPARD,
+                    55,
+                    hardAttack: 3,
+                    hardDefense: 4,
+                    softAttack: 8,
+                    softDefense: 5,
+                    groundAirAttack: 10,
+                    groundAirDefense: CUConstants.GROUND_DEFENSE_AAA,
+                    primaryRange: 1f,
+                    indirectRange: 3f,
+                    spottingRange: 3f,
+                    allWeatherCapability: AllWeatherRating.GroundUnit,
+                    sigintRating: SIGINT_Rating.UnitLevel,
+                    nbcRating: NBC_Rating.Gen1,
+                    strategicMobility: StrategicMobility.Heavy,
+                    nvgCapability: NVG_Rating.None,
+                    silhouette: UnitSilhouette.Medium,
+                    movementPoints: CUConstants.MECH_UNIT);
+
+                profile.AddUpgradeType(UpgradeType.SPAAA);
+                profile.SetShortName("Gepard");
+                profile.SetTurnAvailable(444); // 1975
+                _weaponSystemProfiles[WeaponSystems.SPAAA_GEPARD] = profile;
+            }
+            catch (Exception e) { AppService.HandleException(CLASS_NAME, nameof(CreateSpaaaGepardProfile), e); throw; }
+        }
+
+        private static void CreateHelBo105Profile()
+        {
+            try
+            {
+                var profile = new WeaponSystemProfile(
+                    name: "Bo 105P PAH‑1 Attack Helicopter",
+                    nationality: Nationality.FRG,
+                    weaponSystemID: WeaponSystems.HEL_BO105,
+                    70,
+                    hardAttack: 12,
+                    hardDefense: 5,
+                    softAttack: 8,
+                    softDefense: 5,
+                    groundAirDefense: CUConstants.GROUND_DEFENSE_HELO,
+                    primaryRange: 1f,
+                    spottingRange: 3f,
+                    allWeatherCapability: AllWeatherRating.Day,
+                    sigintRating: SIGINT_Rating.UnitLevel,
+                    nbcRating: NBC_Rating.None,
+                    strategicMobility: StrategicMobility.Aviation,
+                    nvgCapability: NVG_Rating.None,
+                    silhouette: UnitSilhouette.Small,
+                    movementPoints: CUConstants.HELO_UNIT);
+
+                profile.AddUpgradeType(UpgradeType.ATTHELO);
+                profile.SetShortName("Bo105");
+                profile.SetTurnAvailable(444); // 1975
+                _weaponSystemProfiles[WeaponSystems.HEL_BO105] = profile;
+            }
+            catch (Exception e) { AppService.HandleException(CLASS_NAME, nameof(CreateHelBo105Profile), e); throw; }
+        }
+
+        /// <summary>
+        /// FRG Regular INF
+        /// </summary>
+        private static void CreateRegInfFRGProfile()
+        {
+            try
+            {
+                var profile = new WeaponSystemProfile(
+                    name: "West German Regular Infantry",
+                    nationality: Nationality.FRG,
+                    weaponSystemID: WeaponSystems.REG_INF_FRG,
+                    18,
+                    hardAttack: 5,
+                    hardDefense: 4,
+                    softAttack: 10,
+                    softDefense: 11,
+                    groundAirAttack: 3,
+                    groundAirDefense: 4,
+                    primaryRange: 1f,
+                    indirectRange: 0f,
+                    spottingRange: 2f,
+                    allWeatherCapability: AllWeatherRating.AllWeather,
+                    nvgCapability: NVG_Rating.Gen2,
+                    silhouette: UnitSilhouette.Small,
+                    sigintRating: SIGINT_Rating.UnitLevel,
+                    nbcRating: NBC_Rating.Gen2,
+                    strategicMobility: StrategicMobility.AirLift
+                );
+
+                // Upgrade paths
+                profile.AddUpgradeType(UpgradeType.INF);
+
+                // Set short name for UI display
+                profile.SetShortName("Infantry");
+
+                // Set turn availability in months.
+                profile.SetTurnAvailable(300);
+
+                // Store in master dictionary
+                _weaponSystemProfiles[WeaponSystems.REG_INF_FRG] = profile;
+            }
+            catch (Exception e)
+            {
+                AppService.HandleException(CLASS_NAME, nameof(CreateRegInfFRGProfile), e);
+                throw;
+            }
+        }
+
+        /// <summary>
+        /// FRG Air Mobile INF
+        /// </summary>
+        private static void CreateAmInfFRGProfile()
+        {
+            try
+            {
+                var profile = new WeaponSystemProfile(
+                    name: "West German Air Mobile Infantry",
+                    nationality: Nationality.FRG,
+                    weaponSystemID: WeaponSystems.AM_INF_FRG,
+                    22,
+                    hardAttack: 5,
+                    hardDefense: 4,
+                    softAttack: 10,
+                    softDefense: 11,
+                    groundAirAttack: 3,
+                    groundAirDefense: 4,
+                    primaryRange: 1f,
+                    indirectRange: 0f,
+                    spottingRange: 2f,
+                    allWeatherCapability: AllWeatherRating.Night,
+                    nvgCapability: NVG_Rating.Gen2,
+                    silhouette: UnitSilhouette.Small,
+                    sigintRating: SIGINT_Rating.UnitLevel,
+                    nbcRating: NBC_Rating.Gen2,
+                    strategicMobility: StrategicMobility.AirMobile
+                );
+
+                // Set upgrade paths
+                profile.AddUpgradeType(UpgradeType.INF);
+
+                // Set short name for UI display
+                profile.SetShortName("Air Mobile");
+
+                // Set turn availability in months.
+                profile.SetTurnAvailable(440);
+
+                // Store in master dictionary
+                _weaponSystemProfiles[WeaponSystems.AM_INF_FRG] = profile;
+            }
+            catch (Exception e)
+            {
+                AppService.HandleException(CLASS_NAME, nameof(CreateAmInfFRGProfile), e);
+                throw;
+            }
+        }
+
+        /// <summary>
+        /// FRG Special Forces INF
+        /// </summary>
+        private static void CreateSpecInfFRGProfile()
+        {
+            try
+            {
+                var profile = new WeaponSystemProfile(
+                    name: "West German Special Forces Infantry",
+                    nationality: Nationality.FRG,
+                    weaponSystemID: WeaponSystems.SPEC_INF_FRG,
+                    35,
+                    hardAttack: 9,
+                    hardDefense: 5,
+                    softAttack: 12,
+                    softDefense: 13,
+                    groundAirAttack: 4,
+                    groundAirDefense: 7,
+                    primaryRange: 1f,
+                    indirectRange: 0f,
+                    spottingRange: 3f,
+                    allWeatherCapability: AllWeatherRating.AllWeather,
+                    nvgCapability: NVG_Rating.Gen3,
+                    silhouette: UnitSilhouette.Small,
+                    sigintRating: SIGINT_Rating.SpecializedLevel,
+                    nbcRating: NBC_Rating.Gen2,
+                    strategicMobility: StrategicMobility.AirMobile
+                );
+
+                // Set upgrade paths
+                profile.AddUpgradeType(UpgradeType.INF);
+
+                // Set short name for UI display
+                profile.SetShortName("Special Forces");
+
+                // Set turn availability in months.
+                profile.SetTurnAvailable(300);
+
+                // Store in master dictionary
+                _weaponSystemProfiles[WeaponSystems.SPEC_INF_FRG] = profile;
+            }
+            catch (Exception e)
+            {
+                AppService.HandleException(CLASS_NAME, nameof(CreateSpecInfFRGProfile), e);
+                throw;
+            }
+        }
+
+        /// <summary>
+        /// FRG Engineer INF
+        /// </summary>
+        private static void CreateEngInfFRGProfile()
+        {
+            try
+            {
+                var profile = new WeaponSystemProfile(
+                    name: "West German Combat Engineers",
+                    nationality: Nationality.FRG,
+                    weaponSystemID: WeaponSystems.ENG_INF_FRG,
+                    24,
+                    hardAttack: 5,
+                    hardDefense: 4,
+                    softAttack: 10,
+                    softDefense: 13,
+                    groundAirAttack: 3,
+                    groundAirDefense: 4,
+                    primaryRange: 1f,
+                    indirectRange: 0f,
+                    spottingRange: 2f,
+                    allWeatherCapability: AllWeatherRating.Night,
+                    nvgCapability: NVG_Rating.Gen2,
+                    silhouette: UnitSilhouette.Small,
+                    sigintRating: SIGINT_Rating.UnitLevel,
+                    nbcRating: NBC_Rating.Gen2,
+                    strategicMobility: StrategicMobility.AirDrop
+                );
+
+                // Set upgrade paths
+                profile.AddUpgradeType(UpgradeType.INF);
+
+                // Set short name for UI display
+                profile.SetShortName("Engineers");
+
+                // Set turn availability in months.
+                profile.SetTurnAvailable(300);
+
+                // Store in master dictionary
+                _weaponSystemProfiles[WeaponSystems.ENG_INF_FRG] = profile;
+            }
+            catch (Exception e)
+            {
+                AppService.HandleException(CLASS_NAME, nameof(CreateEngInfFRGProfile), e);
+                throw;
+            }
+        }
+
+        /// <summary>
+        /// Tornado IDS Multi-Role ASF
+        /// </summary>
+        private static void CreateAsfTIDSProfile()
+        {
+            try
+            {
+                var profile = new WeaponSystemProfile(
+                    name: "Tornado IDS Phantom Air Superiority Fighter",
+                    nationality: Nationality.FRG,
+                    weaponSystemID: WeaponSystems.MRF_TornadoIDS,
+                    65,
+                    dogfighting: 9,
+                    maneuverability: 7,
+                    topSpeed: 13,
+                    survivability: 9,
+                    groundAttack: 14,
+                    ordinanceLoad: 14,
+                    stealth: 0,
+                    primaryRange: 1f,
+                    indirectRange: 0f,
+                    spottingRange: 4f,
+                    allWeatherCapability: AllWeatherRating.AllWeather,
+                    sigintRating: SIGINT_Rating.UnitLevel,
+                    nbcRating: NBC_Rating.Gen1,
+                    strategicMobility: StrategicMobility.Aircraft,
+                    nvgCapability: NVG_Rating.None,
+                    silhouette: UnitSilhouette.Medium
+                );
+
+                // Set upgrade paths
+                profile.AddUpgradeType(UpgradeType.ASF);
+
+                // Set short name for UI display
+                profile.SetShortName("Tornado IDS");
+
+                // Set turn availability - entered service in 1960
+                profile.SetTurnAvailable(264);
+
+                // Store in master dictionary
+                _weaponSystemProfiles[WeaponSystems.MRF_TornadoIDS] = profile;
+            }
+            catch (Exception e)
+            {
+                AppService.HandleException(CLASS_NAME, nameof(CreateAsfTIDSProfile), e);
+                throw;
+            }
+        }
+
+        #endregion
+
+
+        //-----------------------------------------------------------------------------------------
+
+
+        #region United Kingdom (UK)
+
+        private static void CreateTankChallenger1Profile()
+        {
+            try
+            {
+                var profile = new WeaponSystemProfile(
+                    name: "Challenger 1 MBT",
+                    nationality: Nationality.UK,
+                    weaponSystemID: WeaponSystems.TANK_CHALLENGER1,
+                    115,
+                    hardAttack: 13,
+                    hardDefense: 16,
+                    softAttack: 11,
+                    softDefense: 13,
+                    groundAirDefense: CUConstants.GROUND_DEFENSE_ARMOR,
+                    primaryRange: 1f,
+                    spottingRange: 2f,
+                    allWeatherCapability: AllWeatherRating.GroundUnit,
+                    sigintRating: SIGINT_Rating.UnitLevel,
+                    nbcRating: NBC_Rating.Gen2,
+                    strategicMobility: StrategicMobility.Heavy,
+                    nvgCapability: NVG_Rating.Gen2,
+                    silhouette: UnitSilhouette.Medium,
+                    movementPoints: CUConstants.MECH_UNIT);
+
+                profile.AddUpgradeType(UpgradeType.AFV);
+                profile.SetShortName("Chall 1");
+                profile.SetTurnAvailable(552); // 1984
+                _weaponSystemProfiles[WeaponSystems.TANK_CHALLENGER1] = profile;
+            }
+            catch (Exception e) { AppService.HandleException(CLASS_NAME, nameof(CreateTankChallenger1Profile), e); throw; }
+        }
+
+        private static void CreateIfvWarriorProfile()
+        {
+            try
+            {
+                var profile = new WeaponSystemProfile(
+                    name: "Warrior IFV",
+                    nationality: Nationality.UK,
+                    weaponSystemID: WeaponSystems.IFV_WARRIOR,
+                    75,
+                    hardAttack: 10,
+                    hardDefense: 4,
+                    softAttack: 9,
+                    softDefense: 8,
+                    groundAirDefense: CUConstants.GROUND_DEFENSE_LIGHTARMOR,
+                    primaryRange: 1f,
+                    spottingRange: 2f,
+                    allWeatherCapability: AllWeatherRating.GroundUnit,
+                    sigintRating: SIGINT_Rating.UnitLevel,
+                    nbcRating: NBC_Rating.Gen2,
+                    strategicMobility: StrategicMobility.AirLift,
+                    nvgCapability: NVG_Rating.Gen2,
+                    silhouette: UnitSilhouette.Small,
+                    movementPoints: CUConstants.MECH_UNIT);
+
+                profile.AddUpgradeType(UpgradeType.IFV);
+                profile.SetShortName("Warrior");
+                profile.SetTurnAvailable(576); // 1986
+                _weaponSystemProfiles[WeaponSystems.IFV_WARRIOR] = profile;
+            }
+            catch (Exception e) { AppService.HandleException(CLASS_NAME, nameof(CreateIfvWarriorProfile), e); throw; }
+        }
+
+        /// <summary>
+        /// UK Regular INF
+        /// </summary>
+        private static void CreateRegInfUKProfile()
+        {
+            try
+            {
+                var profile = new WeaponSystemProfile(
+                    name: "UK Regular Infantry",
+                    nationality: Nationality.UK,
+                    weaponSystemID: WeaponSystems.REG_INF_UK,
+                    18,
+                    hardAttack: 5,
+                    hardDefense: 4,
+                    softAttack: 10,
+                    softDefense: 11,
+                    groundAirAttack: 3,
+                    groundAirDefense: 4,
+                    primaryRange: 1f,
+                    indirectRange: 0f,
+                    spottingRange: 2f,
+                    allWeatherCapability: AllWeatherRating.Night,
+                    nvgCapability: NVG_Rating.Gen2,
+                    silhouette: UnitSilhouette.Small,
+                    sigintRating: SIGINT_Rating.UnitLevel,
+                    nbcRating: NBC_Rating.Gen2,
+                    strategicMobility: StrategicMobility.AirLift
+                );
+
+                // Upgrade paths
+                profile.AddUpgradeType(UpgradeType.INF);
+
+                // Set short name for UI display
+                profile.SetShortName("Infantry");
+
+                // Set turn availability in months.
+                profile.SetTurnAvailable(300);
+
+                // Store in master dictionary
+                _weaponSystemProfiles[WeaponSystems.REG_INF_UK] = profile;
+            }
+            catch (Exception e)
+            {
+                AppService.HandleException(CLASS_NAME, nameof(CreateRegInfUKProfile), e);
+                throw;
+            }
+        }
+
+        /// <summary>
+        /// UK Airborne INF
+        /// </summary>
+        private static void CreateAbInfUKProfile()
+        {
+            try
+            {
+                var profile = new WeaponSystemProfile(
+                    name: "UK Airborne Infantry",
+                    nationality: Nationality.UK,
+                    weaponSystemID: WeaponSystems.AB_INF_UK,
+                    22,
+                    hardAttack: 5,
+                    hardDefense: 4,
+                    softAttack: 10,
+                    softDefense: 11,
+                    groundAirAttack: 3,
+                    groundAirDefense: 4,
+                    primaryRange: 1f,
+                    indirectRange: 0f,
+                    spottingRange: 2f,
+                    allWeatherCapability: AllWeatherRating.Night,
+                    nvgCapability: NVG_Rating.Gen2,
+                    silhouette: UnitSilhouette.Small,
+                    sigintRating: SIGINT_Rating.UnitLevel,
+                    nbcRating: NBC_Rating.Gen2,
+                    strategicMobility: StrategicMobility.AirDrop
+                );
+
+                // Upgrade paths
+                profile.AddUpgradeType(UpgradeType.INF);
+
+                // Set short name for UI display
+                profile.SetShortName("Airborne");
+
+                // Set turn availability in months.
+                profile.SetTurnAvailable(300);
+
+                // Store in master dictionary
+                _weaponSystemProfiles[WeaponSystems.AB_INF_UK] = profile;
+            }
+            catch (Exception e)
+            {
+                AppService.HandleException(CLASS_NAME, nameof(CreateAbInfUKProfile), e);
+                throw;
+            }
+        }
+
+        /// <summary>
+        /// UK Air Mobile INF
+        /// </summary>
+        private static void CreateAmInfUKProfile()
+        {
+            try
+            {
+                var profile = new WeaponSystemProfile(
+                    name: "UK Air Mobile Infantry",
+                    nationality: Nationality.UK,
+                    weaponSystemID: WeaponSystems.AM_INF_UK,
+                    22,
+                    hardAttack: 5,
+                    hardDefense: 4,
+                    softAttack: 10,
+                    softDefense: 11,
+                    groundAirAttack: 3,
+                    groundAirDefense: 4,
+                    primaryRange: 1f,
+                    indirectRange: 0f,
+                    spottingRange: 2f,
+                    allWeatherCapability: AllWeatherRating.Night,
+                    nvgCapability: NVG_Rating.Gen2,
+                    silhouette: UnitSilhouette.Small,
+                    sigintRating: SIGINT_Rating.UnitLevel,
+                    nbcRating: NBC_Rating.Gen2,
+                    strategicMobility: StrategicMobility.AirMobile
+                );
+
+                // Set upgrade paths
+                profile.AddUpgradeType(UpgradeType.INF);
+
+                // Set short name for UI display
+                profile.SetShortName("Air Mobile");
+
+                // Set turn availability in months.
+                profile.SetTurnAvailable(440);
+
+                // Store in master dictionary
+                _weaponSystemProfiles[WeaponSystems.AM_INF_UK] = profile;
+            }
+            catch (Exception e)
+            {
+                AppService.HandleException(CLASS_NAME, nameof(CreateAmInfUKProfile), e);
+                throw;
+            }
+        }
+
+        /// <summary>
+        /// UK Special Forces INF
+        /// </summary>
+        private static void CreateSpecInfUKProfile()
+        {
+            try
+            {
+                var profile = new WeaponSystemProfile(
+                    name: "UK Special Forces Infantry",
+                    nationality: Nationality.UK,
+                    weaponSystemID: WeaponSystems.SPEC_INF_UK,
+                    35,
+                    hardAttack: 9,
+                    hardDefense: 5,
+                    softAttack: 12,
+                    softDefense: 13,
+                    groundAirAttack: 4,
+                    groundAirDefense: 7,
+                    primaryRange: 1f,
+                    indirectRange: 0f,
+                    spottingRange: 3f,
+                    allWeatherCapability: AllWeatherRating.AllWeather,
+                    nvgCapability: NVG_Rating.Gen3,
+                    silhouette: UnitSilhouette.Small,
+                    sigintRating: SIGINT_Rating.SpecializedLevel,
+                    nbcRating: NBC_Rating.Gen2,
+                    strategicMobility: StrategicMobility.AirMobile
+                );
+
+                // Set upgrade paths
+                profile.AddUpgradeType(UpgradeType.INF);
+
+                // Set short name for UI display
+                profile.SetShortName("Special Forces");
+
+                // Set turn availability in months.
+                profile.SetTurnAvailable(300);
+
+                // Store in master dictionary
+                _weaponSystemProfiles[WeaponSystems.SPEC_INF_UK] = profile;
+            }
+            catch (Exception e)
+            {
+                AppService.HandleException(CLASS_NAME, nameof(CreateSpecInfUKProfile), e);
+                throw;
+            }
+        }
+
+        /// <summary>
+        /// UK Engineer INF
+        /// </summary>
+        private static void CreateEngInfUKProfile()
+        {
+            try
+            {
+                var profile = new WeaponSystemProfile(
+                    name: "US Combat Engineers",
+                    nationality: Nationality.UK,
+                    weaponSystemID: WeaponSystems.ENG_INF_UK,
+                    24,
+                    hardAttack: 5,
+                    hardDefense: 4,
+                    softAttack: 10,
+                    softDefense: 13,
+                    groundAirAttack: 3,
+                    groundAirDefense: 4,
+                    primaryRange: 1f,
+                    indirectRange: 0f,
+                    spottingRange: 2f,
+                    allWeatherCapability: AllWeatherRating.Night,
+                    nvgCapability: NVG_Rating.Gen2,
+                    silhouette: UnitSilhouette.Small,
+                    sigintRating: SIGINT_Rating.UnitLevel,
+                    nbcRating: NBC_Rating.Gen2,
+                    strategicMobility: StrategicMobility.AirDrop
+                );
+
+                // Set upgrade paths
+                profile.AddUpgradeType(UpgradeType.INF);
+
+                // Set short name for UI display
+                profile.SetShortName("Engineers");
+
+                // Set turn availability in months.
+                profile.SetTurnAvailable(300);
+
+                // Store in master dictionary
+                _weaponSystemProfiles[WeaponSystems.ENG_INF_UK] = profile;
+            }
+            catch (Exception e)
+            {
+                AppService.HandleException(CLASS_NAME, nameof(CreateEngInfUKProfile), e);
+                throw;
+            }
+        }
+
+        #endregion
+
+
+        //-----------------------------------------------------------------------------------------
+
+
+        #region France
+
+        private static void CreateTankAMX30Profile()
+        {
+            try
+            {
+                var profile = new WeaponSystemProfile(
+                    name: "AMX‑30 MBT",
+                    nationality: Nationality.FRA,
+                    weaponSystemID: WeaponSystems.TANK_AMX30,
+                    75,
+                    hardAttack: 11,
+                    hardDefense: 9,
+                    softAttack: 11,
+                    softDefense: 10,
+                    groundAirDefense: CUConstants.GROUND_DEFENSE_ARMOR,
+                    primaryRange: 1f,
+                    spottingRange: 2f,
+                    allWeatherCapability: AllWeatherRating.GroundUnit,
+                    sigintRating: SIGINT_Rating.UnitLevel,
+                    nbcRating: NBC_Rating.Gen1,
+                    strategicMobility: StrategicMobility.Heavy,
+                    nvgCapability: NVG_Rating.None,
+                    silhouette: UnitSilhouette.Medium,
+                    movementPoints: CUConstants.MECH_UNIT);
+
+                profile.AddUpgradeType(UpgradeType.AFV);
+                profile.SetShortName("AMX‑30");
+                profile.SetTurnAvailable(324); // 1965
+                _weaponSystemProfiles[WeaponSystems.TANK_AMX30] = profile;
+            }
+            catch (Exception e) { AppService.HandleException(CLASS_NAME, nameof(CreateTankAMX30Profile), e); throw; }
+        }
+
+        private static void CreateSpaaaRolandProfile()
+        {
+            try
+            {
+                var profile = new WeaponSystemProfile(
+                    name: "Roland SPAAA/SAM",
+                    nationality: Nationality.FRA,
+                    weaponSystemID: WeaponSystems.SPAAA_ROLAND,
+                    65,
+                    hardAttack: 2,
+                    hardDefense: 3,
+                    softAttack: 4,
+                    softDefense: 4,
+                    groundAirAttack: 12,
+                    groundAirDefense: CUConstants.GROUND_DEFENSE_AAA,
+                    primaryRange: 1f,
+                    indirectRange: 4f,
+                    spottingRange: 4f,
+                    allWeatherCapability: AllWeatherRating.AllWeather,
+                    sigintRating: SIGINT_Rating.SpecializedLevel,
+                    nbcRating: NBC_Rating.Gen1,
+                    strategicMobility: StrategicMobility.Heavy,
+                    nvgCapability: NVG_Rating.None,
+                    silhouette: UnitSilhouette.Medium,
+                    movementPoints: CUConstants.MECH_UNIT);
+
+                profile.AddUpgradeType(UpgradeType.SPSAM);
+                profile.SetShortName("Roland");
+                profile.SetTurnAvailable(456); // 1976
+                _weaponSystemProfiles[WeaponSystems.SPAAA_ROLAND] = profile;
+            }
+            catch (Exception e) { AppService.HandleException(CLASS_NAME, nameof(CreateSpaaaRolandProfile), e); throw; }
+        }
+
+        /// <summary>
+        /// FRA Regular INF
+        /// </summary>
+        private static void CreateRegInfFRAProfile()
+        {
+            try
+            {
+                var profile = new WeaponSystemProfile(
+                    name: "French Regular Infantry",
+                    nationality: Nationality.FRA,
+                    weaponSystemID: WeaponSystems.REG_INF_FRA,
+                    18,
+                    hardAttack: 5,
+                    hardDefense: 4,
+                    softAttack: 10,
+                    softDefense: 11,
+                    groundAirAttack: 3,
+                    groundAirDefense: 4,
+                    primaryRange: 1f,
+                    indirectRange: 0f,
+                    spottingRange: 2f,
+                    allWeatherCapability: AllWeatherRating.AllWeather,
+                    nvgCapability: NVG_Rating.Gen2,
+                    silhouette: UnitSilhouette.Small,
+                    sigintRating: SIGINT_Rating.UnitLevel,
+                    nbcRating: NBC_Rating.Gen2,
+                    strategicMobility: StrategicMobility.AirLift
+                );
+
+                // Upgrade paths
+                profile.AddUpgradeType(UpgradeType.INF);
+
+                // Set short name for UI display
+                profile.SetShortName("Infantry");
+
+                // Set turn availability in months.
+                profile.SetTurnAvailable(300);
+
+                // Store in master dictionary
+                _weaponSystemProfiles[WeaponSystems.REG_INF_FRA] = profile;
+            }
+            catch (Exception e)
+            {
+                AppService.HandleException(CLASS_NAME, nameof(CreateRegInfFRAProfile), e);
+                throw;
+            }
+        }
+
+        /// <summary>
+        /// FRA Air Mobile INF
+        /// </summary>
+        private static void CreateAmInfFRAProfile()
+        {
+            try
+            {
+                var profile = new WeaponSystemProfile(
+                    name: "French Air Mobile Infantry",
+                    nationality: Nationality.FRA,
+                    weaponSystemID: WeaponSystems.AM_INF_FRA,
+                    22,
+                    hardAttack: 5,
+                    hardDefense: 4,
+                    softAttack: 10,
+                    softDefense: 11,
+                    groundAirAttack: 3,
+                    groundAirDefense: 4,
+                    primaryRange: 1f,
+                    indirectRange: 0f,
+                    spottingRange: 2f,
+                    allWeatherCapability: AllWeatherRating.Night,
+                    nvgCapability: NVG_Rating.Gen2,
+                    silhouette: UnitSilhouette.Small,
+                    sigintRating: SIGINT_Rating.UnitLevel,
+                    nbcRating: NBC_Rating.Gen2,
+                    strategicMobility: StrategicMobility.AirMobile
+                );
+
+                // Set upgrade paths
+                profile.AddUpgradeType(UpgradeType.INF);
+
+                // Set short name for UI display
+                profile.SetShortName("Air Mobile");
+
+                // Set turn availability in months.
+                profile.SetTurnAvailable(440);
+
+                // Store in master dictionary
+                _weaponSystemProfiles[WeaponSystems.AM_INF_FRA] = profile;
+            }
+            catch (Exception e)
+            {
+                AppService.HandleException(CLASS_NAME, nameof(CreateAmInfFRAProfile), e);
+                throw;
+            }
+        }
+
+        /// <summary>
+        /// FRA Special Forces INF
+        /// </summary>
+        private static void CreateSpecInfFRAProfile()
+        {
+            try
+            {
+                var profile = new WeaponSystemProfile(
+                    name: "French Special Forces Infantry",
+                    nationality: Nationality.FRA,
+                    weaponSystemID: WeaponSystems.SPEC_INF_FRA,
+                    35,
+                    hardAttack: 9,
+                    hardDefense: 5,
+                    softAttack: 12,
+                    softDefense: 13,
+                    groundAirAttack: 4,
+                    groundAirDefense: 7,
+                    primaryRange: 1f,
+                    indirectRange: 0f,
+                    spottingRange: 3f,
+                    allWeatherCapability: AllWeatherRating.AllWeather,
+                    nvgCapability: NVG_Rating.Gen3,
+                    silhouette: UnitSilhouette.Small,
+                    sigintRating: SIGINT_Rating.SpecializedLevel,
+                    nbcRating: NBC_Rating.Gen2,
+                    strategicMobility: StrategicMobility.AirMobile
+                );
+
+                // Set upgrade paths
+                profile.AddUpgradeType(UpgradeType.INF);
+
+                // Set short name for UI display
+                profile.SetShortName("Special Forces");
+
+                // Set turn availability in months.
+                profile.SetTurnAvailable(300);
+
+                // Store in master dictionary
+                _weaponSystemProfiles[WeaponSystems.SPEC_INF_FRA] = profile;
+            }
+            catch (Exception e)
+            {
+                AppService.HandleException(CLASS_NAME, nameof(CreateSpecInfFRAProfile), e);
+                throw;
+            }
+        }
+
+        /// <summary>
+        /// FRA Engineer INF
+        /// </summary>
+        private static void CreateEngInfFRAProfile()
+        {
+            try
+            {
+                var profile = new WeaponSystemProfile(
+                    name: "French Combat Engineers",
+                    nationality: Nationality.FRA,
+                    weaponSystemID: WeaponSystems.ENG_INF_FRA,
+                    24,
+                    hardAttack: 5,
+                    hardDefense: 4,
+                    softAttack: 10,
+                    softDefense: 13,
+                    groundAirAttack: 3,
+                    groundAirDefense: 4,
+                    primaryRange: 1f,
+                    indirectRange: 0f,
+                    spottingRange: 2f,
+                    allWeatherCapability: AllWeatherRating.Night,
+                    nvgCapability: NVG_Rating.Gen2,
+                    silhouette: UnitSilhouette.Small,
+                    sigintRating: SIGINT_Rating.UnitLevel,
+                    nbcRating: NBC_Rating.Gen2,
+                    strategicMobility: StrategicMobility.AirDrop
+                );
+
+                // Set upgrade paths
+                profile.AddUpgradeType(UpgradeType.INF);
+
+                // Set short name for UI display
+                profile.SetShortName("Engineers");
+
+                // Set turn availability in months.
+                profile.SetTurnAvailable(300);
+
+                // Store in master dictionary
+                _weaponSystemProfiles[WeaponSystems.ENG_INF_FRA] = profile;
+            }
+            catch (Exception e)
+            {
+                AppService.HandleException(CLASS_NAME, nameof(CreateEngInfFRAProfile), e);
+                throw;
+            }
+        }
+
+        /// <summary>
+        /// Mirage 2000 ASF
+        /// </summary>
+        private static void CreateAsfM2000Profile()
+        {
+            try
+            {
+                var profile = new WeaponSystemProfile(
+                    name: "Mirage 2000 Air Superiority Fighter",
+                    nationality: Nationality.FRA,
+                    weaponSystemID: WeaponSystems.ASF_MIRAGE2000,
+                    110,
+                    dogfighting: 19,
+                    maneuverability: 16,
+                    topSpeed: 16,
+                    survivability: 10,
+                    groundAttack: 5,
+                    ordinanceLoad: 7,
+                    stealth: 0,
+                    primaryRange: 1f,
+                    indirectRange: 0f,
+                    spottingRange: 5f,
+                    allWeatherCapability: AllWeatherRating.AllWeather,
+                    sigintRating: SIGINT_Rating.UnitLevel,
+                    nbcRating: NBC_Rating.Gen2,
+                    strategicMobility: StrategicMobility.Aircraft,
+                    nvgCapability: NVG_Rating.None,
+                    silhouette: UnitSilhouette.Medium
+                );
+
+                // Set upgrade paths
+                profile.AddUpgradeType(UpgradeType.ASF);
+
+                // Set short name for UI display
+                profile.SetShortName("Mirage 2000");
+
+                // Set turn availability - entered service in 1976
+                profile.SetTurnAvailable(456);
+
+                // Store in master dictionary
+                _weaponSystemProfiles[WeaponSystems.ASF_F15] = profile;
+            }
+            catch (Exception e)
+            {
+                AppService.HandleException(CLASS_NAME, nameof(CreateAsfM2000Profile), e);
+                throw;
+            }
+        }
+
+        /// <summary>
+        /// SEPECAT Jaguar ATT
+        /// </summary>
+        private static void CreateAttJaguarProfile()
+        {
+            try
+            {
+                var profile = new WeaponSystemProfile(
+                    name: "SEPECAT Jaguar Attack Aircraft",
+                    nationality: Nationality.FRA,
+                    weaponSystemID: WeaponSystems.ATT_JAGUAR,
+                    110,
+                    dogfighting: 19,
+                    maneuverability: 16,
+                    topSpeed: 16,
+                    survivability: 10,
+                    groundAttack: 5,
+                    ordinanceLoad: 7,
+                    stealth: 0,
+                    primaryRange: 1f,
+                    indirectRange: 0f,
+                    spottingRange: 5f,
+                    allWeatherCapability: AllWeatherRating.AllWeather,
+                    sigintRating: SIGINT_Rating.UnitLevel,
+                    nbcRating: NBC_Rating.Gen2,
+                    strategicMobility: StrategicMobility.Aircraft,
+                    nvgCapability: NVG_Rating.None,
+                    silhouette: UnitSilhouette.Medium
+                );
+
+                // Set upgrade paths
+                profile.AddUpgradeType(UpgradeType.ASF);
+
+                // Set short name for UI display
+                profile.SetShortName("SEPECAT Jaguar");
+
+                // Set turn availability - entered service in 1976
+                profile.SetTurnAvailable(456);
+
+                // Store in master dictionary
+                _weaponSystemProfiles[WeaponSystems.ATT_JAGUAR] = profile;
+            }
+            catch (Exception e)
+            {
+                AppService.HandleException(CLASS_NAME, nameof(CreateAttJaguarProfile), e);
+                throw;
+            }
+        }
+
+        #endregion
+
+
+        //-----------------------------------------------------------------------------------------
     }
 }

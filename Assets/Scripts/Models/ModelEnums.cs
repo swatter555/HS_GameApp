@@ -715,9 +715,7 @@ namespace HammerAndSickle.Models
         HEL_BO105,
         MRF_TornadoIDS,
         REG_INF_FRG,
-        AB_INF_FRG,
         AM_INF_FRG,
-        MAR_INF_FRG,
         SPEC_INF_FRG,
         ENG_INF_FRG,
 
@@ -727,9 +725,9 @@ namespace HammerAndSickle.Models
         REG_INF_UK,
         AB_INF_UK,
         AM_INF_UK,
-        MAR_INF_UK,
         SPEC_INF_UK,
         ENG_INF_UK,
+        MRF_TORNADOGR1,
 
         // France
         TANK_AMX30,
@@ -744,6 +742,7 @@ namespace HammerAndSickle.Models
         ENG_INF_FRA,
 
         // Arab armies
+        IREG_INF_ARAB,
         REG_INF_ARAB,
         AB_INF_ARAB,
         AM_INF_ARAB,
