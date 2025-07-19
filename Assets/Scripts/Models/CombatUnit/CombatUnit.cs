@@ -104,6 +104,12 @@ namespace HammerAndSickle.Models
 
         #endregion
 
+        /*
+         * TODO: Reimplement cloning, check serialization.
+         * TODO: Make sure deployment is implementsed correctly.
+         * TODO: Implement movement points correctly.
+         */
+
 
         #region Constructors
 
