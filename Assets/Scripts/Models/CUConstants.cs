@@ -7,74 +7,82 @@ namespace HammerAndSickle.Models
         #region CombatUnit Constants
 
         // CombatUnit constants.
-        public const int MAX_HP = 40;                       // Maximum hit points for a CombatUnit
-        public const int MIN_HP = 1;                        // Minimum hit points for a CombatUnit
-        public const int ZOC_RANGE = 1;                     // Zone of Control Range
-        public const int MAX_EXP_GAIN_PER_ACTION = 10;      // Max XP gain per action
+        public const int MAX_HP                  = 40; // Maximum hit points for a CombatUnit
+        public const int MIN_HP                  = 1;  // Minimum hit points for a CombatUnit
+        public const int ZOC_RANGE               = 1;  // Zone of Control Range
+        public const int MAX_EXP_GAIN_PER_ACTION = 10; // Max XP gain per action
 
         // Movement constants for different unit types, in movement points.
-        public const int MECH_MOV      = 12;
-        public const int MOT_MOV       = 10;
-        public const int FOOT_MOV      = 8;
-        public const int FIXEDWING_MOV = 100;
-        public const int HELO_MOV      = 24;
+        public const int MECH_UNIT      = 10;
+        public const int MOT_UNIT       = 8;
+        public const int FOOT_UNIT      = 4;
+        public const int FIXEDWING_UNIT = 100;
+        public const int HELO_UNIT      = 24;
+        public const int STATIC_UNIT    = 0;
+        public const int NAVAL_UNIT     = 8;
+
+        public const int GROUND_DEFENSE_ARMOR       = 8;  // Base ground defense for tank units
+        public const int GROUND_DEFENSE_LIGHTARMOR  = 5;  // Base ground defense for APCs units
+        public const int GROUND_DEFENSE_INFANTRY    = 6;  // Base ground defense for Infantry units
+        public const int GROUND_DEFENSE_AAA         = 12; // Base ground defense for AAA units
+        public const int GROUND_DEFENSE_HELO        = 10; // Base air defense for helo units
 
         // WeaponSystem constants.
         public const int MAX_COMBAT_VALUE = 25;
         public const int MIN_COMBAT_VALUE = 1;
-        public const float MAX_RANGE = 100.0f;
-        public const float MIN_RANGE = 0.0f;
+        public const float MAX_RANGE      = 100.0f;
+        public const float MIN_RANGE      = 0.0f;
 
         // Experience level modifiers.
-        public const float RAW_XP_MODIFIER = 0.8f; // -20% effectiveness
-        public const float GREEN_XP_MODIFIER = 0.9f; // -10% effectiveness
-        public const float TRAINED_XP_MODIFIER = 1.0f; // Normal effectiveness
+        public const float RAW_XP_MODIFIER         = 0.8f; // -20% effectiveness
+        public const float GREEN_XP_MODIFIER       = 0.9f; // -10% effectiveness
+        public const float TRAINED_XP_MODIFIER     = 1.0f; // Normal effectiveness
         public const float EXPERIENCED_XP_MODIFIER = 1.1f; // +10% effectiveness
-        public const float VETERAN_XP_MODIFIER = 1.2f; // +20% effectiveness
-        public const float ELITE_XP_MODIFIER = 1.3f; // +30% effectiveness
+        public const float VETERAN_XP_MODIFIER     = 1.2f; // +20% effectiveness
+        public const float ELITE_XP_MODIFIER       = 1.3f; // +30% effectiveness
 
-        public const float MOBILE_MOVEMENT_BONUS = 4.0f;           // Movement point bonus for Mobile units without MountedProfile
-        public const float DEPLOYMENT_ACTION_MOVEMENT_COST = 0.5f; // Deployment actions cost 50% of max movement
-        public const float COMBAT_ACTION_MOVEMENT_COST = 0.25f;    // Combat actions cost 25% of max movement
-        public const float INTEL_ACTION_MOVEMENT_COST = 0.15f;     // Intel actions cost 15% of max movement
+        public const float MOBILE_MOVEMENT_BONUS           = 2.0f;  // Movement point bonus for Mobile units without MountedProfile
+        public const float DEPLOYMENT_ACTION_MOVEMENT_COST = 0.5f;  // Deployment actions cost 50% of max movement
+        public const float COMBAT_ACTION_MOVEMENT_COST     = 0.25f; // Combat actions cost 25% of max movement
+        public const float INTEL_ACTION_MOVEMENT_COST      = 0.15f; // Intel actions cost 15% of max movement
 
-        public const float COMBAT_MOD_MOBILE = 0.9f; // Mobile units get 10% combat malus
-        public const float COMBAT_MOD_DEPLOYED = 1.0f; // Deployed units have no combat modifier
-        public const float COMBAT_MOD_HASTY_DEFENSE = 1.1f; // Hasty defense gives +10% combat bonus
-        public const float COMBAT_MOD_ENTRENCHED = 1.2f; // Entrenched units get +20% combat bonus
-        public const float COMBAT_MOD_FORTIFIED = 1.3f; // Fortified units get +30% combat bonus
+        public const float COMBAT_MOD_MOBILE        = 0.9f;  // Mobile units get 10% combat malus
+        public const float COMBAT_MOD_DEPLOYED      = 1.0f;  // Deployed units have no combat modifier
+        public const float COMBAT_MOD_HASTY_DEFENSE = 1.1f;  // Hasty defense gives +10% combat bonus
+        public const float COMBAT_MOD_ENTRENCHED    = 1.2f;  // Entrenched units get +20% combat bonus
+        public const float COMBAT_MOD_FORTIFIED     = 1.3f;  // Fortified units get +30% combat bonus
 
-        public const float STRENGTH_MOD_FULL = 1.15f; // Full strength units get +15% combat bonus
+        public const float STRENGTH_MOD_FULL     = 1.15f; // Full strength units get +15% combat bonus
         public const float STRENGTH_MOD_DEPLETED = 0.75f; // Depleted strength units get -25% combat malus
-        public const float STRENGTH_MOD_LOW = 0.4f;  // Low strength units get -60% combat malus
+        public const float STRENGTH_MOD_LOW      = 0.4f;  // Low strength units get -60% combat malus
 
-        public const float EFFICIENCY_MOD_STATIC = 0.5f; // Static units get 50% combat malus
-        public const float EFFICIENCY_MOD_DEGRADED = 0.7f; // Degraded units get 30% combat malus
+        public const float EFFICIENCY_MOD_STATIC      = 0.5f; // Static units get 50% combat malus
+        public const float EFFICIENCY_MOD_DEGRADED    = 0.7f; // Degraded units get 30% combat malus
         public const float EFFICIENCY_MOD_OPERATIONAL = 0.8f; // Operational units get 20% combat malus
-        public const float EFFICIENCY_MOD_FULL = 0.9f; // Full efficiency units get 10% combat malus
-        public const float EFFICIENCY_MOD_PEAK = 1.0f; // Peak efficiency units have no combat modifier
+        public const float EFFICIENCY_MOD_FULL        = 0.9f; // Full efficiency units get 10% combat malus
+        public const float EFFICIENCY_MOD_PEAK        = 1.0f; // Peak efficiency units have no combat modifier
 
-        public const float FULL_STRENGTH_FLOOR = 0.8f; // Minimum strength for full effectiveness
+        public const float FULL_STRENGTH_FLOOR     = 0.8f; // Minimum strength for full effectiveness
         public const float DEPLETED_STRENGTH_FLOOR = 0.5f; // Minimum strength for depleted effectiveness
 
         // Combat action defaults
-        public const int DEFAULT_MOVE_ACTIONS = 1;
-        public const int DEFAULT_COMBAT_ACTIONS = 1;
-        public const int DEFAULT_INTEL_ACTIONS = 1;
-        public const int DEFAULT_DEPLOYMENT_ACTIONS = 1;
+        public const int DEFAULT_MOVE_ACTIONS        = 1;
+        public const int DEFAULT_COMBAT_ACTIONS      = 1;
+        public const int DEFAULT_INTEL_ACTIONS       = 1;
+        public const int DEFAULT_DEPLOYMENT_ACTIONS  = 1;
         public const int DEFAULT_OPPORTUNITY_ACTIONS = 1;
 
         // Unit supply constants.
-        public const float LOW_SUPPLY_THRESHOLD = 1f;                   // Threshold for low supply warning
-        public const float CRITICAL_SUPPLY_THRESHOLD = 0.5f;            // Threshold for critical supply warning
+        public const float LOW_SUPPLY_THRESHOLD                = 1f;    // Threshold for low supply warning
+        public const float CRITICAL_SUPPLY_THRESHOLD           = 0.5f;  // Threshold for critical supply warning
         public const float COMBAT_STATE_SUPPLY_TRANSITION_COST = 0.25f; // Supply cost for state transitions.
-        public const float COMBAT_ACTION_SUPPLY_COST = 1f;              // Supply cost for combat actions.
-        public const float COMBAT_ACTION_SUPPLY_THRESHOLD = 2f;         // Threshold for combat action supply cost.
-        public const float MOVE_ACTION_SUPPLY_THRESHOLD = 1.5f;         // Threshold for move action supply cost.
-        public const float MOVE_ACTION_SUPPLY_COST = 0.2f;              // Supply cost for move actions.
-        public const float INTEL_ACTION_SUPPLY_COST = 0.25f;            // Supply cost for intel actions.
+        public const float COMBAT_ACTION_SUPPLY_COST           = 1f;    // Supply cost for combat actions.
+        public const float COMBAT_ACTION_SUPPLY_THRESHOLD      = 2f;    // Threshold for combat action supply cost.
+        public const float MOVE_ACTION_SUPPLY_THRESHOLD        = 1.5f;  // Threshold for move action supply cost.
+        public const float MOVE_ACTION_SUPPLY_COST             = 0.2f;  // Supply cost for move actions.
+        public const float INTEL_ACTION_SUPPLY_COST            = 0.25f; // Supply cost for intel actions.
         public const float OPPORTUNITY_ACTION_SUPPLY_THRESHOLD = 1.5f;  // Threshold for opportunity action supply cost.
-        public const float OPPORTUNITY_ACTION_SUPPLY_COST = 0.5f;       // Supply cost for opportunity actions.
+        public const float OPPORTUNITY_ACTION_SUPPLY_COST      = 0.5f;  // Supply cost for opportunity actions.
 
         // Intel error margins
         public const float MIN_INTEL_ERROR      = 4f;   // Minimum intel error margin
@@ -88,17 +96,17 @@ namespace HammerAndSickle.Models
 
         // Leader LeaderID generation
         public const string LEADER_ID_PREFIX = "LDR";
-        public const int LEADER_ID_LENGTH = 8; // LDR + 5 random chars
+        public const int LEADER_ID_LENGTH    = 8; // LDR + 5 random chars
 
         // Leader validation bounds
-        public const int MIN_REPUTATION = 0;
-        public const int MAX_REPUTATION = 9999;
+        public const int MIN_REPUTATION         = 0;
+        public const int MAX_REPUTATION         = 9999;
         public const int MAX_LEADER_NAME_LENGTH = 50;
         public const int MIN_LEADER_NAME_LENGTH = 2;
 
         // Reputation constants.
         public const int REP_COST_FOR_SENIOR_PROMOTION = 100;
-        public const int REP_COST_FOR_TOP_PROMOTION = 250;
+        public const int REP_COST_FOR_TOP_PROMOTION    = 250;
 
         // Tiered skill XP costs.
         public const int TIER1_REP_COST = 60;
@@ -112,19 +120,19 @@ namespace HammerAndSickle.Models
         public const int MAX_SKILL_REP_COST = 500;
 
         // Command and Operation bonuses (typically +1 for actions)
-        public const int COMMAND_BONUS_VAL = 1;
-        public const int DEPLOYMENT_ACTION_BONUS_VAL = 1;
-        public const int MOVEMENT_ACTION_BONUS_VAL = 1;
-        public const int COMBAT_ACTION_BONUS_VAL = 1;
+        public const int COMMAND_BONUS_VAL            = 1;
+        public const int DEPLOYMENT_ACTION_BONUS_VAL  = 1;
+        public const int MOVEMENT_ACTION_BONUS_VAL    = 1;
+        public const int COMBAT_ACTION_BONUS_VAL      = 1;
         public const int OPPORTUNITY_ACTION_BONUS_VAL = 1;
 
         // Combat rating bonuses.
-        public const int HARD_ATTACK_BONUS_VAL = 5;
+        public const int HARD_ATTACK_BONUS_VAL  = 5;
         public const int HARD_DEFENSE_BONUS_VAL = 5;
-        public const int SOFT_ATTACK_BONUS_VAL = 5;
+        public const int SOFT_ATTACK_BONUS_VAL  = 5;
         public const int SOFT_DEFENSE_BONUS_VAL = 5;
-        public const int AIR_ATTACK_BONUS_VAL = 5;
-        public const int AIR_DEFENSE_BONUS_VAL = 5;
+        public const int AIR_ATTACK_BONUS_VAL   = 5;
+        public const int AIR_DEFENSE_BONUS_VAL  = 5;
 
         // Bonus value validation bounds
         public const int MIN_COMBAT_BONUS = 1;
@@ -133,15 +141,15 @@ namespace HammerAndSickle.Models
         public const int MAX_ACTION_BONUS = 3;
 
         // Spotting and range bonuses.
-        public const int SMALL_SPOTTING_RANGE_BONUS_VAL = 1;
+        public const int SMALL_SPOTTING_RANGE_BONUS_VAL  = 1;
         public const int MEDIUM_SPOTTING_RANGE_BONUS_VAL = 2;
-        public const int LARGE_SPOTTING_RANGE_BONUS_VAL = 3;
-        public const int INDIRECT_RANGE_BONUS_VAL = 1;
+        public const int LARGE_SPOTTING_RANGE_BONUS_VAL  = 3;
+        public const int INDIRECT_RANGE_BONUS_VAL        = 1;
 
         // Silouette bonuses.
-        public const int SMALL_SILHOUETTE_REDUCTION_VAL = 1;
+        public const int SMALL_SILHOUETTE_REDUCTION_VAL  = 1;
         public const int MEDIUM_SILHOUETTE_REDUCTION_VAL = 2;
-        public const int MAX_SILHOUETTE_REDUCTION_VAL = 3;
+        public const int MAX_SILHOUETTE_REDUCTION_VAL    = 3;
 
         // General multiplier bounds (for any positive effect)
         public const float MIN_MULTIPLIER = 0.01f;    // 1% of original value (extreme reduction)
