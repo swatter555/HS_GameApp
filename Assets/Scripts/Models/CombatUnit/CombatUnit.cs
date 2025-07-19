@@ -1416,6 +1416,7 @@ namespace HammerAndSickle.Models
         #endregion // CombatUnit Actions
 
 
+
         #region Position and Movement
 
         /// <summary>
