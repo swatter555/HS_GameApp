@@ -33,9 +33,7 @@ namespace HammerAndSickle.Models
         AM,     // Air Mobile
         MAM,    // Mechanized Air Mobile
         INF,    // INF
-        SPECF,  // Special Forces Foot
-        SPECM,  // Special Forces Mechanized
-        SPECH,  // Special Forces Helicopter
+        SPECF,  // Special Forces
         ART,    // Artillery
         SPA,    // Self-Propelled Artillery
         ROC,    // Rocket Artillery
@@ -54,6 +52,8 @@ namespace HammerAndSickle.Models
         HQ,     // HQ facility
         DEPOT,  // Supply Depot
         AIRB,   // Airbase
+        // TODO: Implement naval bases and ports
+        NAVB,   // Naval Base
     }
 
     /// <summary>
@@ -669,14 +669,15 @@ namespace HammerAndSickle.Models
         BMB_TU22,
         BMB_TU22M3,
         RCNA_MIG25R,
-        REG_INF_SV, // Regular INF
-        AB_INF_SV,  // Airborne INF
-        AM_INF_SV,  // Air Mobile INF
-        MAR_INF_SV, // Marine INF
-        SPEC_INF_SV,// Special Forces INF
-        ENG_INF_SV, // Engineer INF
+        REG_INF_SV,    // Regular INF
+        AB_INF_SV,     // Airborne INF
+        AM_INF_SV,     // Air Mobile INF
+        MAR_INF_SV,    // Marine INF
+        SPEC_INF_SV,   // Special Forces INF
+        ENG_INF_SV,    // Engineer INF
         TRANSHELO_MI8, // Transport Helicopter
         TRANSAIR_AN12, // Transport Aircraft
+        TRANSNAVAL,    // Transport Naval
 
         // USA
         TANK_M1,
@@ -761,8 +762,8 @@ namespace HammerAndSickle.Models
         AIRBASE_GENERIC,
         SUPPLYDEPOT_GENERIC,
 
-        COMBAT,
-        DEFAULT
+        COMBAT, // Used for generic combat calculations
+        DEFAULT // Fallback value
     }
 
     /// <summary>
@@ -791,7 +792,8 @@ namespace HammerAndSickle.Models
         AWACS,
         ATTHELO,
         TRNHELO,
-        TRNAIR
+        TRNAIR,
+        TRNNAVAL
     }
 
     #endregion // WeaponSystem Enums

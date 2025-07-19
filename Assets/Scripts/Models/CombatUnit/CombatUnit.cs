@@ -51,7 +51,7 @@ namespace HammerAndSickle.Models
         public UnitRole Role { get; private set; }
         public Side Side { get; private set; }
         public Nationality Nationality { get; private set; }
-        public bool IsTransportable{ get; private set; }       // Can use helicopter/airlift transport.
+        public bool IsTransportable{ get; private set; }       // Can use helicopter/airlift transport/naval.
         public bool IsMountable { get; private set; }          // Can mount onto APCs/IFVs.
         public bool IsBase => Classification.IsBaseType();
 
@@ -116,12 +116,12 @@ namespace HammerAndSickle.Models
             UnitRole role,
             Side side,
             Nationality nationality,
-            WeaponSystems deployedProfileID,
-            WeaponSystems mountedProfileID,
-            WeaponSystems transportProfileID,
             IntelProfileTypes intelProfileType,
+            WeaponSystems deployedProfileID,
             bool isMountable = false,
+            WeaponSystems mountedProfileID = WeaponSystems.DEFAULT,
             bool isTransportable = false,
+            WeaponSystems transportProfileID = WeaponSystems.DEFAULT,
             DepotCategory category = DepotCategory.Secondary,
             DepotSize size = DepotSize.Small)
         {
@@ -219,21 +219,9 @@ namespace HammerAndSickle.Models
         #region Core
 
         /// <summary>
-        /// Retrieves the weapon‑system profile the unit employs in its <em>deployed</em> (dismounted) state.
+        /// Retrieves the weapon‑system profile the unit employs in its deployed state.
         /// </summary>
-        /// <remarks>
-        /// <para>
-        /// If <see cref="DeployedProfileID"/> equals <see cref="WeaponSystems.DEFAULT"/>, the unit has no
-        /// organic deployed weapon system and the method returns <c>null</c> without logging an error.
-        /// </para>
-        /// <para>
-        /// When the ID is not <c>DEFAULT</c> but the profile cannot be located in the database, the situation
-        /// indicates stale or corrupt data. The problem is logged via
-        /// <see cref="AppService.HandleException(string,string,System.Exception)"/>, and the method returns
-        /// <c>null</c> so that callers can handle the absence gracefully.
-        /// </para>
-        /// </remarks>
-        /// <returns>The corresponding <see cref="WeaponSystemProfile"/> or <c>null</c> when none is available.</returns>
+        /// <returns></returns>
         public WeaponSystemProfile GetDeployedProfile()
         {
             try
@@ -256,22 +244,9 @@ namespace HammerAndSickle.Models
         }
 
         /// <summary>
-        /// Retrieves the weapon‑system profile of the transport (mount) currently carrying the unit, if any.
+        /// Retrieves the weapon‑system profile of the mounted transport (APC/IFV) the unit employs when mounted.
         /// </summary>
-        /// <remarks>
-        /// <para>
-        /// A return value of <c>null</c> can mean one of two things:
-        /// </para>
-        /// <list type="bullet">
-        ///   <item>The unit is not mounted &mdash; <see cref="MountedProfileID"/> equals <see cref="WeaponSystems.DEFAULT"/>.</item>
-        ///   <item>The ID points to a profile that no longer exists in the database (logged as an error).</item>
-        /// </list>
-        /// <para>
-        /// By returning <c>null</c> in both cases the method provides a simple “no usable profile” contract, while
-        /// still ensuring data‑integrity problems are captured in the log.
-        /// </para>
-        /// </remarks>
-        /// <returns>The <see cref="WeaponSystemProfile"/> representing the transport, or <c>null</c> when unmounted/invalid.</returns>
+        /// <returns></returns>
         public WeaponSystemProfile GetMountedProfile()
         {
             try
@@ -289,6 +264,31 @@ namespace HammerAndSickle.Models
             catch (Exception ex)
             {
                 AppService.HandleException(nameof(CombatUnit), nameof(GetMountedProfile), ex);
+                return null;
+            }
+        }
+
+        /// <summary>
+        /// Retrieves the weapon‑system profile the unit employs when in transport (airlift/sea).
+        /// </summary>
+        /// <returns></returns>
+        public WeaponSystemProfile GetTransportProfile()
+        {
+            try
+            {
+                // DEFAULT means the unit has no transport profile.
+                if (TransportProfileID == WeaponSystems.DEFAULT)
+                    return null;
+
+                var profile = WeaponSystemsDatabase.GetWeaponSystemProfile(TransportProfileID);
+                if (profile == null)
+                    throw new InvalidOperationException($"Transport profile ID '{TransportProfileID}' not found in weapon‑systems database.");
+                
+                return profile;
+            }
+            catch (Exception ex)
+            {
+                AppService.HandleException(nameof(CombatUnit), nameof(GetTransportProfile), ex);
                 return null;
             }
         }
@@ -385,28 +385,24 @@ namespace HammerAndSickle.Models
 
                 // Compute all modifiers that can affect a combat rating
                 float finalModifier = GetFinalCombatRatingModifier();
+                float finalModifier_Air = GetFinalCombatRatingModifier_Aircraft();
 
-                // Copy and apply modifiers to combat ratings
-                tempProfile.LandHard.SetAttack(Mathf.CeilToInt(activeProfile.LandHard.Attack * finalModifier));
-                tempProfile.LandHard.SetDefense(Mathf.CeilToInt(activeProfile.LandHard.Defense * finalModifier));
+                // Copy and apply modifiers to combat ratings for ground units.
+                tempProfile.SetHardAttack(Mathf.CeilToInt(activeProfile.HardAttack * finalModifier));
+                tempProfile.SetHardDefense(Mathf.CeilToInt(activeProfile.HardDefense * finalModifier));
+                tempProfile.SetSoftAttack(Mathf.CeilToInt(activeProfile.SoftAttack * finalModifier));
+                tempProfile.SetSoftDefense(Mathf.CeilToInt(activeProfile.SoftDefense * finalModifier));
+                tempProfile.SetGroundAirAttack(Mathf.CeilToInt(activeProfile.GroundAirAttack * finalModifier));
+                tempProfile.SetGroundAirDefense(Mathf.CeilToInt(activeProfile.GroundAirDefense * finalModifier));
 
-                tempProfile.LandSoft.SetAttack(Mathf.CeilToInt(activeProfile.LandSoft.Attack * finalModifier));
-                tempProfile.LandSoft.SetDefense(Mathf.CeilToInt(activeProfile.LandSoft.Defense * finalModifier));
-
-                tempProfile.LandAir.SetAttack(Mathf.CeilToInt(activeProfile.LandAir.Attack * finalModifier));
-                tempProfile.LandAir.SetDefense(Mathf.CeilToInt(activeProfile.LandAir.Defense * finalModifier));
-
-                tempProfile.Air.SetAttack(Mathf.CeilToInt(activeProfile.Air.Attack * finalModifier));
-                tempProfile.Air.SetDefense(Mathf.CeilToInt(activeProfile.Air.Defense * finalModifier));
-
-                tempProfile.AirGround.SetAttack(Mathf.CeilToInt(activeProfile.AirGround.Attack * finalModifier));
-                tempProfile.AirGround.SetDefense(Mathf.CeilToInt(activeProfile.AirGround.Defense * finalModifier));
-
-                // Copy other relevant properties that might be needed for combat calculations
-                tempProfile.SetPrimaryRange(activeProfile.PrimaryRange);
-                tempProfile.SetIndirectRange(activeProfile.IndirectRange);
-                tempProfile.SetSpottingRange(activeProfile.SpottingRange);
-                tempProfile.SetMovementModifier(activeProfile.MovementModifier);
+                // Copy and apply modifiers to combat ratings for air units.
+                tempProfile.SetDogfighting(Mathf.CeilToInt(activeProfile.Dogfighting * finalModifier_Air));
+                tempProfile.SetManeuverability(activeProfile.Maneuverability);
+                tempProfile.SetTopSpeed(activeProfile.TopSpeed);
+                tempProfile.SetSurvivability(activeProfile.Survivability);
+                tempProfile.SetGroundAttack(activeProfile.GroundAttack);
+                tempProfile.SetOrdinanceLoad(Mathf.CeilToInt(activeProfile.OrdinanceLoad * finalModifier_Air));
+                tempProfile.SetStealth(activeProfile.Stealth);
 
                 return tempProfile;
             }
@@ -1542,8 +1538,6 @@ namespace HammerAndSickle.Models
                     break;
 
                 case UnitClassification.SPECF:
-                case UnitClassification.SPECM:
-                case UnitClassification.SPECH:
                     intelActions += 1;
                     break;
 
@@ -1569,6 +1563,7 @@ namespace HammerAndSickle.Models
 
                 case UnitClassification.DEPOT:
                 case UnitClassification.AIRB:
+                case UnitClassification.NAVB:
                     moveActions = 0;
                     combatActions = 0;
                     deploymentActions = 0;
@@ -1601,14 +1596,13 @@ namespace HammerAndSickle.Models
                 UnitClassification.MAB or
                 UnitClassification.MAM or
                 UnitClassification.MMAR or
-                UnitClassification.SPECM or
                 UnitClassification.SPA or
                 UnitClassification.SPAAA or
-                UnitClassification.SPSAM => CUConstants.MECH_MOV,
+                UnitClassification.SPSAM => CUConstants.MECH_UNIT,
 
                 UnitClassification.AT or
                 UnitClassification.MOT or
-                UnitClassification.ROC => CUConstants.MOT_MOV,
+                UnitClassification.ROC => CUConstants.MOT_UNIT,
 
                 UnitClassification.INF or
                 UnitClassification.AB or
@@ -1618,22 +1612,22 @@ namespace HammerAndSickle.Models
                 UnitClassification.SAM or
                 UnitClassification.AAA or
                 UnitClassification.SPECF or
-                UnitClassification.ENG => CUConstants.FOOT_MOV,
+                UnitClassification.ENG => CUConstants.FOOT_UNIT,
 
                 UnitClassification.ASF or
                 UnitClassification.MRF or
                 UnitClassification.ATT or
                 UnitClassification.BMB or
-                UnitClassification.RECONA => CUConstants.FIXEDWING_MOV,
+                UnitClassification.RECONA => CUConstants.FIXEDWING_UNIT,
 
-                UnitClassification.HELO or
-                UnitClassification.SPECH => CUConstants.HELO_MOV,
+                UnitClassification.HELO => CUConstants.HELO_UNIT,
 
                 UnitClassification.HQ or
                 UnitClassification.DEPOT or
-                UnitClassification.AIRB => 0,// Bases don't move
+                UnitClassification.AIRB or
+                UnitClassification.NAVB => 0,// Bases don't move
 
-                _ => CUConstants.FOOT_MOV,// Default to foot movement
+                _ => CUConstants.FOOT_UNIT,// Default to foot movement
             };
             MovementPoints = new StatsMaxCurrent(maxMovement);
         }
@@ -1662,6 +1656,28 @@ namespace HammerAndSickle.Models
             catch (Exception e)
             {
                 AppService.HandleException(CLASS_NAME, "GetFinalCombatRatingModifier", e);
+                return 1.0f; // Default to neutral modifier on error
+            }
+        }
+
+        /// <summary>
+        /// Calculates the final combat rating modifier specifically for aircraft units.
+        /// </summary>
+        /// <returns>Multiplier</returns>
+        private float GetFinalCombatRatingModifier_Aircraft()
+        {
+            try
+            {
+                // Calculate the final combat rating modifier based on all factors.
+                float strengthModifier = GetStrengthModifier();
+                float efficiencyModifier = GetEfficiencyModifier();
+                float experienceModifier = GetExperienceMultiplier();
+                // Combine all modifiers
+                return strengthModifier * efficiencyModifier * experienceModifier;
+            }
+            catch (Exception e)
+            {
+                AppService.HandleException(CLASS_NAME, "GetFinalCombatRatingModifier_Aircraft", e);
                 return 1.0f; // Default to neutral modifier on error
             }
         }
@@ -1815,37 +1831,68 @@ namespace HammerAndSickle.Models
         }
 
         /// <summary>
-        /// Attempts to move the unit <em>one step toward <c>Mobile</c></em> on the posture ladder.
+        /// Attempts to move the unit <em>one step toward <c>InTransit</c></em> on the posture ladder.
         /// </summary>
-        /// <remarks>
-        /// <para>
-        /// **“Deploy <u>up</u> one state” means *becoming more mobile*.**  Internally that is a <strong>decrement</strong>
-        /// of the underlying enum index:<br/>
-        /// <c>Fortified (4) → Entrenched (3) → HastyDefense (2) → Deployed (1) → Mobile (0)</c>.
-        /// </para>
-        /// <para>
-        /// If the unit is already at the most‑mobile posture (<c>Mobile</c>), no transition occurs and the method returns
-        /// <c>false</c>.  All legality checks (e.g., suppression, casualties, supply) are delegated to
-        /// <see cref="CanChangeToState(DeploymentState)"/>.
-        /// </para>
-        /// </remarks>
-        /// <returns><c>true</c> if the posture actually changed; otherwise <c>false</c>.</returns>
-        private bool TryDeployUpOneState()
+        /// <param name="onAirfieldPort">Is unit on an airfield or port</param>
+        /// <returns></returns>
+        private bool TryDeployUpOneState(bool onAirbase = false, bool onPort = false)
         {
             try
             {
                 DeploymentState currentState = DeploymentState;
 
-                // Check if already at maximum mobility (Mobile state)
-                if (currentState == DeploymentState.Mobile)
+                // Check if already at maximum mobility (InTransit)
+                if (currentState == DeploymentState.InTransit)
                 {
-                    AppService.CaptureUiMessage($"{UnitName} is already in Mobile state - cannot move to higher mobility.");
+                    AppService.CaptureUiMessage($"{UnitName} is already in InTransit state - cannot move to higher mobility.");
                     return false;
                 }
 
-                // Calculate target state (one step toward Mobile)
+                // Calculate target state (one step toward InTransit)
                 int targetIndex = (int)currentState - 1;
                 DeploymentState targetState = (DeploymentState)targetIndex;
+
+                // Special checks for entering InTransit state
+                if (targetState == DeploymentState.InTransit)
+                {
+                    // Only certain unit types can enter InTransit state
+                    bool allowed =
+                        Classification == UnitClassification.AM ||
+                        Classification == UnitClassification.MAM ||
+                        Classification == UnitClassification.AB ||
+                        Classification == UnitClassification.MAB ||
+                        Classification == UnitClassification.MAR ||
+                        Classification == UnitClassification.MMAR;
+                    if (!allowed)
+                    {
+                        AppService.CaptureUiMessage($"{UnitName} must be an air-mobile, airborne, or a marine unit to enter InTransit state.");
+                        return false;
+                    }
+
+                    // Airborne unit must be on an airbase.
+                    if (Classification == UnitClassification.AB ||
+                        Classification == UnitClassification.MAB)
+                    {
+                        if (!onAirbase)
+                        {
+                            AppService.CaptureUiMessage($"{UnitName} must be on an airbase to enter InTransit state.");
+                            return false;
+                        }
+                    }
+
+                    // Marine units must be on a port.
+                    if (Classification == UnitClassification.MAR ||
+                        Classification == UnitClassification.MMAR)
+                    {
+                        if (!onPort)
+                        {
+                            AppService.CaptureUiMessage($"{UnitName} must be on a port to enter InTransit state.");
+                            return false;
+                        }
+                    }
+
+                    // Note: Air-mobile and mechanized air-mobile units can enter InTransit from valid non-enemy occupied space.
+                }
 
                 // Comprehensive check for valid state transition.
                 if (!CanChangeToState(targetState))
@@ -1870,20 +1917,9 @@ namespace HammerAndSickle.Models
         }
 
         /// <summary>
-        /// Attempts to move the unit <em>one step toward <c>Fortified</c></em> on the posture ladder.
+        /// Attempts to move the unit one step toward Fortified on the posture ladder.
         /// </summary>
-        /// <remarks>
-        /// <para>
-        /// **“Entrench <u>down</u> one state” means *digging in further* (less mobile, more protection).**  This is a
-        /// <strong>increment</strong> of the enum index:<br/>
-        /// <c>Mobile (0) → Deployed (1) → HastyDefense (2) → Entrenched (3) → Fortified (4)</c>.
-        /// </para>
-        /// <para>
-        /// Attempting the action while already at <c>Fortified</c> simply returns <c>false</c>.  All other gating rules
-        /// are handled by <see cref="CanChangeToState(DeploymentState)"/>.
-        /// </para>
-        /// </remarks>
-        /// <returns><c>true</c> if the posture deepened; otherwise <c>false</c>.</returns>
+        /// <returns></returns>
         private bool TryEntrenchDownOneState()
         {
             try
@@ -1968,32 +2004,7 @@ namespace HammerAndSickle.Models
             return Math.Abs(currentIndex - targetIndex) == 1;
         }
 
-        /// <summary>
-        /// Adjusts <see cref="IsMounted"/> and the <em>mobile‑state movement
-        /// bonus</em> when the unit changes combat state.
-        /// </summary>
-        /// <param name="newState">The state the unit is entering.</param>
-        /// <param name="previousState">The state the unit is leaving.</param>
-        /// <remarks>
-        /// <list type="bullet">
-        ///   <item><term>Entering <see cref="DeploymentState.Mobile"/></term>
-        ///         <description>
-        ///           • If the unit has a mounted‑profile, it becomes <c>IsMounted = true</c> and <strong>does not</strong>
-        ///             receive the foot‑mobile bonus.<br/>
-        ///           • Otherwise it is foot‑mobile (<c>IsMounted = false</c>) and gains
-        ///             <c>+MOBILE_MOVEMENT_BONUS</c> – applied only once per entry.
-        ///         </description></item>
-        ///   <item><term>Leaving <c>Mobile</c></term>
-        ///         <description>
-        ///           • Mounted units simply mark <c>IsMounted = false</c> (no bonus to remove).<br/>
-        ///           • Foot‑mobile units have the bonus removed exactly once.
-        ///         </description></item>
-        /// </list>
-        /// Preconditions:
-        /// • <see cref="GetDeployedProfile"/> must return a non‑null profile.
-        /// • The method never throws for missing mounted profiles – they are
-        ///   treated as “not mounted.”
-        /// </remarks>
+        // TODO: Update this
         private void UpdateMobilityState(DeploymentState newState, DeploymentState previousState)
         {
             try
@@ -2281,79 +2292,7 @@ namespace HammerAndSickle.Models
 
         public object Clone()
         {
-            try
-            {
-                // Create new unit using constructor with same core properties
-                // This ensures proper initialization and generates a new UnitID
-                var clone = new CombatUnit(
-                    this.UnitName,
-                    this.UnitType,
-                    this.Classification,
-                    this.Role,
-                    this.Side,
-                    this.Nationality,
-                    this.DeployedProfileID,      // Direct enum value copy
-                    this.MountedProfileID,       // Direct enum value copy
-                    this.TransportProfileID,     // Direct enum value copy
-                    this.IntelProfileType,       // Static enum value - no reference resolution needed
-                    this.IsMountable,
-                    this.IsTransportable,
-                    this.DepotCategory,          // Copy depot category for base units
-                    this.DepotSize               // Copy depot size for base units
-                );
-
-                // Deep copy all StatsMaxCurrent objects by reconstructing them
-                clone.HitPoints = new StatsMaxCurrent(this.HitPoints.Max, this.HitPoints.Current);
-                clone.DaysSupply = new StatsMaxCurrent(this.DaysSupply.Max, this.DaysSupply.Current);
-                clone.MovementPoints = new StatsMaxCurrent(this.MovementPoints.Max, this.MovementPoints.Current);
-                clone.MoveActions = new StatsMaxCurrent(this.MoveActions.Max, this.MoveActions.Current);
-                clone.CombatActions = new StatsMaxCurrent(this.CombatActions.Max, this.CombatActions.Current);
-                clone.DeploymentActions = new StatsMaxCurrent(this.DeploymentActions.Max, this.DeploymentActions.Current);
-                clone.OpportunityActions = new StatsMaxCurrent(this.OpportunityActions.Max, this.OpportunityActions.Current);
-                clone.IntelActions = new StatsMaxCurrent(this.IntelActions.Max, this.IntelActions.Current);
-
-                // Copy per-unit state data
-                clone.SetExperience(this.ExperiencePoints);
-                clone.EfficiencyLevel = this.EfficiencyLevel;
-                clone.IsMounted = this.IsMounted;
-                clone.DeploymentState = this.DeploymentState;
-                clone.MapPos = this.MapPos;
-                clone._mobileBonusApplied = this._mobileBonusApplied; // Copy mobile bonus state
-                clone.SpottedLevel = this.SpottedLevel;
-
-                // NOTE: LeaderID is NOT copied - templates should never have leaders assigned
-                // Leaders must be assigned manually after cloning
-                clone.LeaderID = null;
-
-                // Clone facility data for base units
-                if (this.IsBase)
-                {
-                    // Copy common facility properties
-                    clone.BaseDamage = this.BaseDamage;
-                    clone.OperationalCapacity = this.OperationalCapacity;
-                    clone.FacilityType = this.FacilityType;
-
-                    // Copy supply depot properties
-                    clone.DepotSize = this.DepotSize;
-                    clone.StockpileInDays = this.StockpileInDays;
-                    clone.GenerationRate = this.GenerationRate;
-                    clone.SupplyProjection = this.SupplyProjection;
-                    clone.SupplyPenetration = this.SupplyPenetration;
-                    clone.DepotCategory = this.DepotCategory;
-
-                    // NOTE: Air unit attachments are NEVER cloned for templates
-                    // Templates should be clean and ready for fresh assignments
-                    // _airUnitsAttached remains empty in the clone
-                    clone.AirUnitsAttached = clone._airUnitsAttached.AsReadOnly();
-                }
-
-                return clone;
-            }
-            catch (Exception e)
-            {
-                AppService.HandleException(CLASS_NAME, "Clone", e);
-                throw;
-            }
+            throw new NotImplementedException();
         }
 
         #endregion // ICloneable Implementation
