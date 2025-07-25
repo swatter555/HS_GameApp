@@ -104,12 +104,6 @@ namespace HammerAndSickle.Models
 
         #endregion
 
-        /*
-         * TODO: Reimplement cloning, check serialization.
-         * TODO: Make sure deployment is implementsed correctly.
-         * TODO: Implement movement points correctly.
-         */
-
 
         #region Constructors
 
@@ -146,14 +140,14 @@ namespace HammerAndSickle.Models
                     throw new ArgumentException($"Deployed profile ID {deployedProfileID} not found in database", nameof(deployedProfileID));
 
                 // When not DEFAULT, mounted profile ID must point to a valid profile.
-                if (mountedProfileID != WeaponSystems.DEFAULT)
+                if (isMountable && mountedProfileID != WeaponSystems.DEFAULT)
                 {
                     if (WeaponSystemsDatabase.GetWeaponSystemProfile(mountedProfileID) == null)
                         throw new ArgumentException($"Mounted profile ID {mountedProfileID} not found in database", nameof(mountedProfileID));
                 }
 
                 // When not DEFAULT, transport profile ID must point to a valid profile.
-                if (transportProfileID != WeaponSystems.DEFAULT)
+                if (isTransportable && transportProfileID != WeaponSystems.DEFAULT)
                 {
                     if (WeaponSystemsDatabase.GetWeaponSystemProfile(transportProfileID) == null)
                         throw new ArgumentException($"Transport profile ID {transportProfileID} not found in database", nameof(transportProfileID));
@@ -364,8 +358,13 @@ namespace HammerAndSickle.Models
         /// mounted; otherwise, returns the <see cref="DeployedProfile"/>.</returns>
         public WeaponSystemProfile GetActiveWeaponSystemProfile()
         {
-            // Return the active profile based on mounted state
-            return IsMounted ? GetMountedProfile(): GetDeployedProfile();
+            // Priority: InTransit > Mobile (if mounted) > Deployed
+            return DeploymentState switch
+            {
+                DeploymentState.InTransit => GetTransportProfile() ?? GetDeployedProfile(),
+                DeploymentState.Mobile when IsMounted => GetMountedProfile() ?? GetDeployedProfile(),
+                _ => GetDeployedProfile()
+            };
         }
 
         /// <summary>
@@ -1593,47 +1592,21 @@ namespace HammerAndSickle.Models
         /// </summary>
         private void InitializeMovementPoints()
         {
-            var maxMovement = Classification switch
+            try
             {
-                UnitClassification.TANK or
-                UnitClassification.MECH or
-                UnitClassification.RECON or
-                UnitClassification.MAB or
-                UnitClassification.MAM or
-                UnitClassification.MMAR or
-                UnitClassification.SPA or
-                UnitClassification.SPAAA or
-                UnitClassification.SPSAM => CUConstants.MECH_UNIT,
+                // Start with deployed profile movement points
+                var deployedProfile = GetDeployedProfile();
+                if (deployedProfile == null)
+                    throw new InvalidOperationException("Unit must have a valid deployed profile");
 
-                UnitClassification.AT or
-                UnitClassification.MOT or
-                UnitClassification.ROC => CUConstants.MOT_UNIT,
-
-                UnitClassification.INF or
-                UnitClassification.AB or
-                UnitClassification.AM or
-                UnitClassification.MAR or
-                UnitClassification.ART or
-                UnitClassification.SAM or
-                UnitClassification.AAA or
-                UnitClassification.SPECF or
-                UnitClassification.ENG => CUConstants.FOOT_UNIT,
-
-                UnitClassification.ASF or
-                UnitClassification.MRF or
-                UnitClassification.ATT or
-                UnitClassification.BMB or
-                UnitClassification.RECONA => CUConstants.FIXEDWING_UNIT,
-
-                UnitClassification.HELO => CUConstants.HELO_UNIT,
-
-                UnitClassification.HQ or
-                UnitClassification.DEPOT or
-                UnitClassification.AIRB => 0,// Bases don't move
-
-                _ => CUConstants.FOOT_UNIT,// Default to foot movement
-            };
-            MovementPoints = new StatsMaxCurrent(maxMovement);
+                MovementPoints = new StatsMaxCurrent(deployedProfile.MovementPoints);
+            }
+            catch (Exception e)
+            {
+                AppService.HandleException(CLASS_NAME, "InitializeMovementPoints", e);
+                // Fallback to foot movement if profile access fails
+                MovementPoints = new StatsMaxCurrent(CUConstants.FOOT_UNIT);
+            }
         }
 
         /// <summary>
@@ -1756,6 +1729,39 @@ namespace HammerAndSickle.Models
             };
         }
 
+        /// <summary>
+        /// Updates the movement points for the active weapon system profile.
+        /// </summary>
+        /// <remarks>This method retrieves the active weapon system profile and updates the maximum
+        /// movement points based on the profile's settings. The current movement points are adjusted proportionally to
+        /// maintain the same percentage of the new maximum. If no active profile is available, an <see
+        /// cref="InvalidOperationException"/> is thrown.</remarks>
+        private void UpdateMovementPointsForProfile()
+        {
+            try
+            {
+                var activeProfile = GetActiveWeaponSystemProfile();
+                if (activeProfile == null)
+                    throw new InvalidOperationException("No active weapon system profile available");
+
+                int newMaxMovement = activeProfile.MovementPoints;
+
+                // Calculate current movement as percentage of old max
+                float movementPercentage = MovementPoints.Max > 0
+                    ? MovementPoints.Current / MovementPoints.Max
+                    : 0f;
+
+                // Set new max and scale current proportionally
+                MovementPoints.SetMax(newMaxMovement);
+                float newCurrent = newMaxMovement * movementPercentage;
+                MovementPoints.SetCurrent(newCurrent);
+            }
+            catch (Exception e)
+            {
+                AppService.HandleException(CLASS_NAME, "UpdateMovementPointsForProfile", e);
+            }
+        }
+
         #endregion // Core Helpers
 
 
@@ -1859,23 +1865,22 @@ namespace HammerAndSickle.Models
                 // Special checks for entering InTransit state
                 if (targetState == DeploymentState.InTransit)
                 {
-                    // Only certain unit types can enter InTransit state
-                    bool allowed =
-                        Classification == UnitClassification.AM ||
-                        Classification == UnitClassification.MAM ||
-                        Classification == UnitClassification.AB ||
-                        Classification == UnitClassification.MAB ||
-                        Classification == UnitClassification.MAR ||
-                        Classification == UnitClassification.MMAR;
-                    if (!allowed)
+                    // Must be transportable to enter InTransit
+                    if (!IsTransportable)
                     {
-                        AppService.CaptureUiMessage($"{UnitName} must be an air-mobile, airborne, or a marine unit to enter InTransit state.");
+                        AppService.CaptureUiMessage($"{UnitName} is not transportable and cannot enter InTransit state.");
                         return false;
                     }
 
-                    // Airborne unit must be on an airbase.
-                    if (Classification == UnitClassification.AB ||
-                        Classification == UnitClassification.MAB)
+                    // Must have a valid transport profile
+                    if (GetTransportProfile() == null)
+                    {
+                        AppService.CaptureUiMessage($"{UnitName} has no transport profile and cannot enter InTransit state.");
+                        return false;
+                    }
+
+                    // Airborne units must be on an airbase
+                    if (Classification == UnitClassification.AB || Classification == UnitClassification.MAB)
                     {
                         if (!onAirbase)
                         {
@@ -1884,9 +1889,8 @@ namespace HammerAndSickle.Models
                         }
                     }
 
-                    // Marine units must be on a port.
-                    if (Classification == UnitClassification.MAR ||
-                        Classification == UnitClassification.MMAR)
+                    // Marine units must be on a port
+                    if (Classification == UnitClassification.MAR || Classification == UnitClassification.MMAR)
                     {
                         if (!onPort)
                         {
@@ -1894,15 +1898,13 @@ namespace HammerAndSickle.Models
                             return false;
                         }
                     }
-
-                    // Note: Air-mobile and mechanized air-mobile units can enter InTransit from valid non-enemy occupied space.
                 }
 
-                // Comprehensive check for valid state transition.
+                // Comprehensive check for valid state transition
                 if (!CanChangeToState(targetState))
                     return false;
 
-                // Save previous state for comparison.
+                // Save previous state for comparison
                 var previousState = DeploymentState;
 
                 // Set the new combat state
@@ -1912,6 +1914,8 @@ namespace HammerAndSickle.Models
                 UpdateMobilityState(targetState, previousState);
 
                 return true;
+
+
             }
             catch (Exception e)
             {
@@ -2008,61 +2012,97 @@ namespace HammerAndSickle.Models
             return Math.Abs(currentIndex - targetIndex) == 1;
         }
 
-        // TODO: Update this
+        /// <summary>
+        /// Handles the transition logic for changing the mobility state of the unit.
+        /// </summary>
+        /// <param name="newState"></param>
+        /// <param name="previousState"></param>
         private void UpdateMobilityState(DeploymentState newState, DeploymentState previousState)
         {
             try
             {
-                // ----- Preconditions --------------------------------------------------
                 if (GetDeployedProfile() == null)
                     throw new InvalidOperationException("Unit lacks a deployed weapon profile – cannot change mobility state.");
 
+                bool enteringInTransit = newState == DeploymentState.InTransit;
+                bool leavingInTransit = previousState == DeploymentState.InTransit;
                 bool enteringMobile = newState == DeploymentState.Mobile && previousState != DeploymentState.Mobile;
                 bool leavingMobile = newState != DeploymentState.Mobile && previousState == DeploymentState.Mobile;
 
-                // Presence of a transport profile determines mount capability.
-                bool hasTransport = GetMountedProfile() != null;
-
-                // ---------------------------------------------------------------------
-                // ENTERING Mobile
-                // ---------------------------------------------------------------------
-                if (enteringMobile)
+                // Handle transitions TO InTransit
+                if (enteringInTransit)
                 {
+                    IsMounted = false; // Can't be mounted while in transport
+                    if (_mobileBonusApplied)
+                    {
+                        _mobileBonusApplied = false;
+                    }
+                    // Movement points lost when entering transit
+                    MovementPoints.SetCurrent(0f);
+                    UpdateMovementPointsForProfile(); // Update to transport profile
+                }
+                // Handle transitions FROM InTransit (special exception to ladder rule)
+                else if (leavingInTransit)
+                {
+                    // Major exception: InTransit can go directly to Deployed
+                    if (newState != DeploymentState.Mobile)
+                    {
+                        // Force to Deployed state regardless of target
+                        DeploymentState = DeploymentState.Deployed;
+                        IsMounted = false;
+                    }
+
+                    // Set to 1/2 deployed profile movement points
+                    var deployedProfile = GetDeployedProfile();
+                    int halfDeployedMovement = Mathf.CeilToInt(deployedProfile.MovementPoints * 0.5f);
+                    MovementPoints.SetMax(deployedProfile.MovementPoints);
+                    MovementPoints.SetCurrent(halfDeployedMovement);
+                }
+                // Handle transitions TO Mobile (normal ladder progression)
+                else if (enteringMobile)
+                {
+                    bool hasTransport = GetMountedProfile() != null;
+
                     if (hasTransport)
                     {
-                        // Ride the transport – no foot bonus.
                         IsMounted = true;
-
                         if (_mobileBonusApplied)
                         {
                             ApplyMovementBonus(-CUConstants.MOBILE_MOVEMENT_BONUS);
                             _mobileBonusApplied = false;
                         }
                     }
-                    else // Foot‑mobile
+                    else
                     {
                         IsMounted = false;
-
                         if (!_mobileBonusApplied)
                         {
                             ApplyMovementBonus(+CUConstants.MOBILE_MOVEMENT_BONUS);
                             _mobileBonusApplied = true;
                         }
                     }
+                    UpdateMovementPointsForProfile();
                 }
-                // ---------------------------------------------------------------------
-                // LEAVING Mobile
-                // ---------------------------------------------------------------------
+                // Handle transitions FROM Mobile (normal ladder progression)
                 else if (leavingMobile)
                 {
-                    // All units end up dismounted outside the Mobile state.
                     IsMounted = false;
-
                     if (_mobileBonusApplied)
                     {
                         ApplyMovementBonus(-CUConstants.MOBILE_MOVEMENT_BONUS);
                         _mobileBonusApplied = false;
                     }
+                    UpdateMovementPointsForProfile();
+                }
+                // Handle dis-entrenchment exception (HastyDefense/Entrenched/Fortified -> Deployed)
+                else if ((previousState == DeploymentState.HastyDefense ||
+                          previousState == DeploymentState.Entrenched ||
+                          previousState == DeploymentState.Fortified) &&
+                         newState == DeploymentState.Deployed)
+                {
+                    // This is allowed as an exception to the ladder rule
+                    IsMounted = false;
+                    UpdateMovementPointsForProfile();
                 }
             }
             catch (Exception ex)
@@ -2294,9 +2334,100 @@ namespace HammerAndSickle.Models
 
         #region ICloneable Implementation
 
+        /// <summary>
+        /// Creates a deep copy of this CombatUnit with a new unique ID.
+        /// Used for spawning fresh units from templates - never used on live state objects.
+        /// Leaders are not cloned and must be assigned separately.
+        /// </summary>
+        /// <returns>A new CombatUnit instance with identical properties but unique ID</returns>
         public object Clone()
         {
-            throw new NotImplementedException();
+            try
+            {
+                // Create new unit with same basic parameters
+                var clonedUnit = new CombatUnit(
+                    unitName: UnitName + "_Clone",
+                    unitType: UnitType,
+                    classification: Classification,
+                    role: Role,
+                    side: Side,
+                    nationality: Nationality,
+                    intelProfileType: IntelProfileType,
+                    deployedProfileID: DeployedProfileID,
+                    isMountable: IsMountable,
+                    mountedProfileID: MountedProfileID,
+                    isTransportable: IsTransportable,
+                    transportProfileID: TransportProfileID,
+                    category: IsBase ? DepotCategory : DepotCategory.Secondary,
+                    size: IsBase ? DepotSize : DepotSize.Small
+                );
+
+                // Copy state data
+                clonedUnit.ExperiencePoints = ExperiencePoints;
+                clonedUnit.ExperienceLevel = ExperienceLevel;
+                clonedUnit.EfficiencyLevel = EfficiencyLevel;
+                clonedUnit.IsMounted = IsMounted;
+                clonedUnit.DeploymentState = DeploymentState;
+                clonedUnit.SpottedLevel = SpottedLevel;
+                clonedUnit._mobileBonusApplied = _mobileBonusApplied;
+
+                // Copy StatsMaxCurrent values
+                clonedUnit.HitPoints.SetMax(HitPoints.Max);
+                clonedUnit.HitPoints.SetCurrent(HitPoints.Current);
+
+                clonedUnit.DaysSupply.SetMax(DaysSupply.Max);
+                clonedUnit.DaysSupply.SetCurrent(DaysSupply.Current);
+
+                clonedUnit.MovementPoints.SetMax(MovementPoints.Max);
+                clonedUnit.MovementPoints.SetCurrent(MovementPoints.Current);
+
+                // Copy action counts
+                clonedUnit.MoveActions.SetMax(MoveActions.Max);
+                clonedUnit.MoveActions.SetCurrent(MoveActions.Current);
+
+                clonedUnit.CombatActions.SetMax(CombatActions.Max);
+                clonedUnit.CombatActions.SetCurrent(CombatActions.Current);
+
+                clonedUnit.DeploymentActions.SetMax(DeploymentActions.Max);
+                clonedUnit.DeploymentActions.SetCurrent(DeploymentActions.Current);
+
+                clonedUnit.OpportunityActions.SetMax(OpportunityActions.Max);
+                clonedUnit.OpportunityActions.SetCurrent(OpportunityActions.Current);
+
+                clonedUnit.IntelActions.SetMax(IntelActions.Max);
+                clonedUnit.IntelActions.SetCurrent(IntelActions.Current);
+
+                // Copy position
+                clonedUnit.MapPos = MapPos;
+
+                // Copy facility data if this is a base unit
+                if (IsBase)
+                {
+                    clonedUnit.BaseDamage = BaseDamage;
+                    clonedUnit.OperationalCapacity = OperationalCapacity;
+                    clonedUnit.FacilityType = FacilityType;
+                    clonedUnit.DepotSize = DepotSize;
+                    clonedUnit.StockpileInDays = StockpileInDays;
+                    clonedUnit.GenerationRate = GenerationRate;
+                    clonedUnit.SupplyProjection = SupplyProjection;
+                    clonedUnit.SupplyPenetration = SupplyPenetration;
+                    clonedUnit.DepotCategory = DepotCategory;
+
+                    // Note: Air unit attachments are NOT cloned - they represent specific unit relationships
+                    // that should not be duplicated. The cloned facility starts with no attached units.
+                }
+
+                // Note: LeaderID is intentionally NOT cloned
+                // Leaders must be assigned separately to avoid duplicate assignments
+                clonedUnit.LeaderID = null;
+
+                return clonedUnit;
+            }
+            catch (Exception e)
+            {
+                AppService.HandleException(CLASS_NAME, "Clone", e);
+                throw;
+            }
         }
 
         #endregion // ICloneable Implementation
@@ -2330,6 +2461,7 @@ namespace HammerAndSickle.Models
                 // Load profile IDs directly as enum values (no reference resolution needed)
                 DeployedProfileID = (WeaponSystems)info.GetValue(nameof(DeployedProfileID), typeof(WeaponSystems));
                 MountedProfileID = (WeaponSystems)info.GetValue(nameof(MountedProfileID), typeof(WeaponSystems));
+                TransportProfileID = (WeaponSystems)info.GetValue(nameof(TransportProfileID), typeof(WeaponSystems));
 
                 // Load leader ID directly - no temporary storage needed
                 LeaderID = info.GetString("LeaderID");
@@ -2455,6 +2587,7 @@ namespace HammerAndSickle.Models
                 // Serialize profile IDs directly as enum values (no reference resolution needed)
                 info.AddValue(nameof(DeployedProfileID), DeployedProfileID);
                 info.AddValue(nameof(MountedProfileID), MountedProfileID);
+                info.AddValue(nameof(TransportProfileID), TransportProfileID);
 
                 // Serialize leader reference as ID (simple string)
                 info.AddValue("LeaderID", LeaderID ?? "");
