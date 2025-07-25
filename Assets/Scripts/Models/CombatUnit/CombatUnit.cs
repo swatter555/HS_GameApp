@@ -22,264 +22,353 @@ namespace HammerAndSickle.Models
             classification == UnitClassification.AIRB;
     }
 
-/*────────────────────────────────────────────────────────────────────────────
- CombatUnit ─ universal representation of every force element on the battlefield
- ────────────────────────────────────────────────────────────────────────────────
- 
- Summary
- ═══════
- **CombatUnit** serves as the unified model for every tangible military asset in 
- Hammer & Sickle, from tank battalions and infantry squads to fighter wings, supply 
- depots, headquarters, and airbases. Each instance combines three data layers: 
- (1) **Identity** (immutable IDs, nationality, role, side), (2) **Templates** 
- (read-only WeaponSystemProfile & IntelProfile objects shared across units), and 
- (3) **Runtime state** (hit points, supplies, movement points, five independent 
- action pools, experience, efficiency, deployment state, map position, and optional 
- leader assignment).
+    /*────────────────────────────────────────────────────────────────────────────
+     CombatUnit ─ universal representation of every force element on the battlefield
+     ────────────────────────────────────────────────────────────────────────────────
 
- The core gameplay revolves around the **five-action framework** where Move, Combat, 
- Deployment, Opportunity, and Intel actions each consume specific tokens plus movement 
- points, forcing players into constant tactical trade-offs. Units progress through a 
- sophisticated deployment ladder (InTransit → Mobile → Deployed → HastyDefense → 
- Entrenched → Fortified) with each transition costing deployment actions and movement 
- points while providing defensive bonuses or mobility advantages.
+     Summary
+     ═══════
+     **CombatUnit** serves as the unified model for every tangible military asset in 
+     Hammer & Sickle, from tank battalions and infantry squads to fighter wings, supply 
+     depots, headquarters, and airbases. Each instance combines three data layers: 
+     (1) **Identity** (immutable IDs, nationality, role, side), (2) **Templates** 
+     (read-only WeaponSystemProfile & IntelProfile objects shared across units for 
+     base capabilities), and (3) **Runtime state** (hit points, supplies, movement 
+     points, five independent action pools, experience, efficiency, deployment state, 
+     map position, and optional leader assignment).
 
- **Profile-Based Architecture**: Rather than storing duplicate combat statistics, 
- each unit references shared WeaponSystemProfile templates via enum IDs (DeployedProfileID, 
- MountedProfileID, TransportProfileID), dramatically reducing memory usage while ensuring 
- consistency. Units automatically switch between profiles based on their current 
- deployment state and mounting status.
+     The core gameplay revolves around the **five-action framework** where Move, Combat, 
+     Deployment, Opportunity, and Intel actions each consume specific tokens plus movement 
+     points as a secondary cost, forcing players into constant tactical trade-offs and 
+     preventing action-spamming exploits. Units progress through a sophisticated 
+     deployment ladder (see detailed explanation below) with each transition costing 
+     deployment actions and movement points while providing defensive bonuses or 
+     mobility advantages.
 
- **Experience & Leadership Integration**: Units gain experience through combat and 
- movement under threat, progressing from Raw through Elite levels with corresponding 
- combat effectiveness multipliers. Leaders can be assigned to provide skill-based 
- bonuses, reputation management, and specialized capabilities that enhance unit 
- performance without breaking the action economy.
+     **Hybrid Profile-State Architecture**: Units reference shared WeaponSystemProfile 
+     templates via enum IDs (DeployedProfileID, MountedProfileID, TransportProfileID) 
+     for base capabilities, but maintain their own runtime state through StatsMaxCurrent 
+     objects for hit points, supplies, movement points, and action pools. This 
+     dramatically reduces memory usage for shared data while allowing individual unit 
+     progression and state management.
 
- **Facility Operations**: Base units (HQ, DEPOT, AIRB) extend the core framework 
- with specialized capabilities including supply generation/projection, air unit 
- attachment management, and operational capacity scaling based on battle damage.
+     **Experience & Leadership Integration**: Units gain experience through combat and 
+     movement under threat, progressing from Raw through Elite levels with corresponding 
+     combat effectiveness multipliers. Leaders can be assigned to provide skill-based 
+     bonuses, reputation management, and specialized capabilities that enhance unit 
+     performance without breaking the action economy.
 
- Public Properties
- ═════════════════
- // Identity & Metadata
- public string UnitName { get; set; }
- public string UnitID { get; private set; }
- public UnitType UnitType { get; private set; }
- public UnitClassification Classification { get; private set; }
- public UnitRole Role { get; private set; }
- public Side Side { get; private set; }
- public Nationality Nationality { get; private set; }
- public bool IsTransportable { get; private set; }
- public bool IsMountable { get; private set; }
- public bool IsBase { get; }
+     **Facility Operations**: Base units (HQ, DEPOT, AIRB) extend the core framework 
+     through a partial class system with specialized capabilities including supply 
+     generation/projection, air unit attachment management, and operational capacity 
+     scaling based on battle damage. The facility code is implemented in 
+     CombatUnit.Facility.cs as a partial class extension.
 
- // Profile References
- public WeaponSystems TransportProfileID { get; private set; }
- public WeaponSystems DeployedProfileID { get; private set; }
- public WeaponSystems MountedProfileID { get; private set; }
- public IntelProfileTypes IntelProfileType { get; internal set; }
+     THE DEPLOYMENT LADDER SYSTEM
+     ═══════════════════════════
 
- // Action Economy (StatsMaxCurrent)
- public StatsMaxCurrent MoveActions { get; private set; }
- public StatsMaxCurrent CombatActions { get; private set; }
- public StatsMaxCurrent DeploymentActions { get; private set; }
- public StatsMaxCurrent OpportunityActions { get; private set; }
- public StatsMaxCurrent IntelActions { get; private set; }
+     The deployment ladder represents a unit's tactical posture, balancing mobility 
+     against defensive preparation. Units can only transition between adjacent states 
+     on this ladder, with specific exceptions detailed below:
 
- // Combat State & Resources
- public int ExperiencePoints { get; internal set; }
- public ExperienceLevel ExperienceLevel { get; internal set; }
- public EfficiencyLevel EfficiencyLevel { get; internal set; }
- public bool IsMounted { get; internal set; }
- public DeploymentState DeploymentState { get; internal set; }
- public StatsMaxCurrent HitPoints { get; private set; }
- public StatsMaxCurrent DaysSupply { get; private set; }
- public StatsMaxCurrent MovementPoints { get; private set; }
- public Coordinate2D MapPos { get; internal set; }
- public SpottedLevel SpottedLevel { get; private set; }
+     **Ladder Structure (Mobility → Entrenchment):**
 
- // Leader Integration
- public string LeaderID { get; internal set; }
- public bool IsLeaderAssigned { get; }
- public Leader UnitLeader { get; }
+     InTransit ──→ Mobile ──→ Deployed ──→ HastyDefense ──→ Entrenched ──→ Fortified
+        ↑            ↑           ↑             ↑              ↑            ↑
+      Special      +2 MP      Standard      +10% def       +20% def    +30% def
+     Transport    Mounted     Dismounted    Quick dig      Prepared    Maximum
+      Profile     Profile      Profile        in          positions   fortification
 
- Constructor Signature
- ═════════════════════
- public CombatUnit(string unitName,
-     UnitType unitType,
-     UnitClassification classification,
-     UnitRole role,
-     Side side,
-     Nationality nationality,
-     IntelProfileTypes intelProfileType,
-     WeaponSystems deployedProfileID,
-     bool isMountable = false,
-     WeaponSystems mountedProfileID = WeaponSystems.DEFAULT,
-     bool isTransportable = false,
-     WeaponSystems transportProfileID = WeaponSystems.DEFAULT,
-     DepotCategory category = DepotCategory.Secondary,
-     DepotSize size = DepotSize.Small)
+     **State Descriptions:**
 
- Public Methods
- ══════════════
- // Profile Access
- public WeaponSystemProfile GetDeployedProfile() - retrieves deployed combat profile
- public WeaponSystemProfile GetMountedProfile() - retrieves mounted transport profile  
- public WeaponSystemProfile GetTransportProfile() - retrieves air/sea transport profile
- public WeaponSystemProfile GetActiveWeaponSystemProfile() - current profile based on state
- public WeaponSystemProfile GetCurrentCombatStrength() - temporary profile with all modifiers
+     • **InTransit**: Unit is aboard air or naval transport. Cannot engage in combat 
+       but can move vast distances. Uses TransportProfile for capabilities. During
+       InTranist movement, movement points are used from the TransportProfile. Once
+       the unit attempt to deploy down one level, it must go directly to Deployed.
+       Max movement points are set to the DeployedProfile maximum. Current movement 
+       points are set to 1/2 deployed profile maximum.
 
- // Intelligence & Spotting
- public IntelReport GenerateIntelReport(SpottedLevel spottedLevel = SpottedLevel.Level1) - fog-of-war intelligence data
- public void SetSpottedLevel(SpottedLevel spottedLevel) - update detection level
+     • **Mobile**: Unit is mounted on ground transport (APC/IFV) or has inherent high 
+       mobility. Receives +2 movement point bonus and uses MountedProfile if available. 
+       Suffers -10% combat effectiveness penalty due to reduced tactical positioning.
 
- // Turn Management
- public void RefreshAllActions() - reset all action pools to maximum
- public void RefreshMovementPoints() - reset movement points to maximum
+     • **Deployed**: Standard tactical posture. Unit is dismounted and ready for combat 
+       with no modifiers. Uses DeployedProfile for all capabilities. This is the 
+       baseline state for most tactical operations.
 
- // Combat & Damage
- public void TakeDamage(float damage) - apply battle damage with clamping
- public void Repair(float repairAmount) - restore hit points with limits
- public bool IsDestroyed() - check if unit is eliminated (HP ≤ 1)
+     • **HastyDefense**: Unit has quickly prepared defensive positions. +10% combat 
+       effectiveness bonus. Represents immediate battlefield entrenchment without 
+       extensive preparation.
 
- // Supply Management  
- public bool ConsumeSupplies(float amount) - deduct supplies with validation
- public float ReceiveSupplies(float amount) - add supplies respecting capacity
- public float GetSupplyStatus() - current supply as percentage of maximum
- public bool CanMove() - movement legality based on HP, supplies, efficiency
+     • **Entrenched**: Unit occupies prepared defensive positions with overhead cover 
+       and improved fields of fire. +20% combat effectiveness bonus. Requires time 
+       and engineering effort to achieve.
 
- // Efficiency & Experience
- public void SetEfficiencyLevel(EfficiencyLevel level) - direct efficiency assignment
- public void DecreaseEfficiencyLevelBy1() - step down operational effectiveness  
- public void IncreaseEfficiencyLevelBy1() - step up operational effectiveness
- public bool AddExperience(int points) - award XP with level progression
- public int SetExperience(int points) - direct XP assignment with validation
- public int GetPointsToNextLevel() - XP needed for advancement
- public float GetExperienceProgress() - advancement progress as percentage
+     • **Fortified**: Maximum defensive preparation with hardened positions, pre-sited 
+       weapons, and extensive obstacle networks. +30% combat effectiveness bonus. 
+       Represents the highest level of defensive preparation.
 
- // Leader Assignment
- public bool AssignLeader(string leaderID) - attach commanding officer
- public bool RemoveLeader() - detach commanding officer
- public Dictionary<SkillBonusType, float> GetLeaderBonuses() - all active skill bonuses
- public bool HasLeaderCapability(SkillBonusType bonusType) - specific capability check
- public float GetLeaderBonus(SkillBonusType bonusType) - specific bonus value
- public string GetLeaderName() - leader display name
- public CommandGrade GetLeaderGrade() - leader command level
- public int GetLeaderReputation() - leader reputation points
- public string GetLeaderRank() - formatted rank string
- public CommandAbility GetLeaderCommandAbility() - leader combat modifier
- public bool HasLeaderSkill(Enum skill) - specific skill unlock check
- public void AwardLeaderReputation(CUConstants.ReputationAction actionType, float contextMultiplier = 1.0f) - REP for actions
- public void AwardLeaderReputation(int amount) - direct REP award
+     **Transition Rules and Exceptions:**
 
- // Action Execution
- public bool DeployUpOneLevel() - move toward Mobile on deployment ladder
- public bool DeployDownOneLevel() - move toward Fortified on deployment ladder  
- public bool PerformCombatAction() - execute attack with resource consumption
- public bool PerformMoveAction(int movtCost) - execute movement with cost validation
- public bool PerformIntelAction() - execute reconnaissance with resource consumption
- public bool PerformOpportunityAction() - execute reactive defensive action
- public Dictionary<ActionTypes, float> GetAvailableActions() - validated action counts after MP gating
- public float GetDeployActions() - deployment actions available after MP validation
- public float GetCombatActions() - combat actions available after MP validation
- public float GetMoveActions() - move actions available after MP validation
- public float GetOpportunityActions() - opportunity actions (no MP validation)
- public float GetIntelActions() - intel actions available after MP validation
+     1. **Adjacent Ladder Movement**: Most transitions must be between adjacent states 
+        (e.g., Deployed ↔ HastyDefense, Mobile ↔ Deployed).
 
- // Position & Movement
- public void SetPosition(Coordinate2D newPos) - teleport unit to map position
- public bool CanMoveTo(Coordinate2D targetPos) - movement legality validation
- public float GetDistanceTo(Coordinate2D targetPos) - distance calculation to position
- public float GetDistanceTo(CombatUnit otherUnit) - distance calculation to unit
+     2. **InTransit Landing Exception**: Units leaving InTransit MUST go directly to 
+        Deployed, bypassing Mobile. This represents the disorganization inherent in 
+        air/naval landings. Movement points are set to 50% of DeployedProfile maximum.
 
- // Debugging Support  
- public void DebugSetCombatState(DeploymentState newState) - direct state override
- public void DebugSetMounted(bool isMounted) - direct mounting override
- public float DebugGetCombatMovementCost() - expose internal MP calculation
+     3. **Dis-entrenchment Exception**: Units in defensive states (HastyDefense, 
+        Entrenched, Fortified) may jump directly to Deployed to rapidly abandon 
+        positions when tactical situation changes.
 
- // Validation & Persistence
- public List<string> ValidateInternalConsistency() - comprehensive error checking
- public object Clone() - deep copy for template spawning
- public void GetObjectData(SerializationInfo info, StreamingContext context) - ISerializable writer
- public bool HasUnresolvedReferences() - IResolvableReferences check
- public IReadOnlyList<string> GetUnresolvedReferenceIDs() - reference ID enumeration  
- public void ResolveReferences(GameDataManager manager) - second-phase reference resolution
+     4. **Type Restrictions**: Fixed-wing aircraft and base facilities cannot change 
+        states. Helicopters follow normal ladder rules.
 
- Private Methods
- ═══════════════
- // Initialization
- void InitializeActionCounts() - set action pool maxima based on classification
- void InitializeMovementPoints() - derive MPs from active weapon profile
- void InitializeFacility(DepotCategory category, DepotSize size) - base facility setup
+     **Resource Costs for Transitions:**
+     • 1 Deployment Action (from action pool)
+     • Movement Points (50% of maximum per transition)
+     • Supply Cost (0.25 days supply per transition)
+     • Movement point availability gates action availability
 
- // Combat Calculations
- float GetFinalCombatRatingModifier() - multiplicative modifier for ground units
- float GetFinalCombatRatingModifier_Aircraft() - multiplicative modifier for air units  
- float GetStrengthModifier() - HP-based effectiveness multiplier
- float GetCombatStateModifier() - deployment state combat multiplier
- float GetEfficiencyModifier() - operational efficiency multiplier
- void UpdateMovementPointsForProfile() - sync MPs when profile changes
+     **Profile Switching During Transitions:**
+     When changing states, units automatically switch between weapon profiles:
+     • InTransit: Uses TransportProfile (helicopter/aircraft capabilities)
+     • Mobile + Mounted: Uses MountedProfile (APC/IFV capabilities)
+     • All Other States: Uses DeployedProfile (dismounted capabilities)
 
- // Action System Internals
- bool ConsumeMovementPoints(float points) - MP deduction with validation
- float GetDeployMovementCost() - MP cost for deployment transitions
- float GetCombatMovementCost() - MP cost for combat actions
- float GetIntelMovementCost() - MP cost for reconnaissance actions
+     **Special Entry Requirements:**
+     • **InTransit Entry**: Unit must be transportable, have valid transport profile, 
+       airborne units need airbase access, marine units need port access.
+     • **Mobile Entry**: Unit becomes mounted if MountedProfile available, receives 
+       +2 movement bonus, profile switches to mounted capabilities.
 
- // Deployment State Machine
- bool TryDeployUpOneState(bool onAirbase = false, bool onPort = false) - ladder movement toward Mobile
- bool TryDeployDownOneState() - ladder movement toward Fortified
- bool CanUnitTypeChangeStates() - type-based state transition validation
- bool IsAdjacentStateTransition(DeploymentState currentState, DeploymentState targetState) - ladder adjacency check
- void UpdateMobilityState(DeploymentState newState, DeploymentState previousState) - mounting/profile transitions
- void ApplyMovementBonus(float delta) - mobile movement bonus application
- bool CanChangeToState(DeploymentState targetState) - comprehensive transition validation
+     Public Properties
+     ═════════════════
+     // Identity & Metadata
+     public string UnitName { get; set; }
+     public string UnitID { get; private set; }
+     public UnitType UnitType { get; private set; }
+     public UnitClassification Classification { get; private set; }
+     public UnitRole Role { get; private set; }
+     public Side Side { get; private set; }
+     public Nationality Nationality { get; private set; }
+     public bool IsTransportable { get; private set; }
+     public bool IsMountable { get; private set; }
+     public bool IsBase { get; }
 
- // Experience System Internals  
- ExperienceLevel CalculateExperienceLevel(int totalPoints) - XP to level conversion
- int GetMinPointsForLevel(ExperienceLevel level) - level threshold lookup
- ExperienceLevel GetNextLevel(ExperienceLevel currentLevel) - advancement progression
- void OnExperienceLevelChanged(ExperienceLevel previousLevel, ExperienceLevel newLevel) - level-up notification
- float GetExperienceMultiplier() - XP-based combat effectiveness multiplier
+     // Profile References (Shared Templates)
+     public WeaponSystems TransportProfileID { get; private set; }
+     public WeaponSystems DeployedProfileID { get; private set; }
+     public WeaponSystems MountedProfileID { get; private set; }
+     public IntelProfileTypes IntelProfileType { get; internal set; }
 
- Important Design Notes
- ══════════════════════
- • **Action Economy Architecture**: All meaningful activities consume both action tokens 
-   and movement points, preventing exploitation while maintaining tactical flexibility. 
-   The GetAvailableActions() method provides validated counts after MP gating.
+     // Action Economy (Individual Unit State)
+     public StatsMaxCurrent MoveActions { get; private set; }
+     public StatsMaxCurrent CombatActions { get; private set; }
+     public StatsMaxCurrent DeploymentActions { get; private set; }
+     public StatsMaxCurrent OpportunityActions { get; private set; }
+     public StatsMaxCurrent IntelActions { get; private set; }
 
- • **Profile Template System**: Combat statistics live in shared WeaponSystemProfile 
-   objects accessed via enum IDs, not duplicated per unit. Always use GetActiveWeaponSystemProfile() 
-   for current combat calculations as it handles mounting/deployment transitions automatically.
+     // Combat State & Resources (Individual Unit State)
+     public int ExperiencePoints { get; internal set; }
+     public ExperienceLevel ExperienceLevel { get; internal set; }
+     public EfficiencyLevel EfficiencyLevel { get; internal set; }
+     public bool IsMounted { get; internal set; }
+     public DeploymentState DeploymentState { get; internal set; }
+     public StatsMaxCurrent HitPoints { get; private set; }
+     public StatsMaxCurrent DaysSupply { get; private set; }
+     public StatsMaxCurrent MovementPoints { get; private set; }
+     public Coordinate2D MapPos { get; internal set; }
+     public SpottedLevel SpottedLevel { get; private set; }
 
- • **Deployment State Ladder**: Units must transition through adjacent states on the 
-   mobility ladder, with special exceptions for InTransit→Deployed and defensive dis-entrenchment. 
-   The UpdateMobilityState() method handles complex mounting logic and movement point adjustments.
+     // Leader Integration
+     public string LeaderID { get; internal set; }
+     public bool IsLeaderAssigned { get; }
+     public Leader UnitLeader { get; }
 
- • **Leader Reference Pattern**: Leaders are referenced by string ID and resolved via 
-   GameDataManager.GetLeader() lookup rather than direct object references, eliminating 
-   circular serialization issues while maintaining clean API access through the UnitLeader property.
+     Constructor Signature
+     ═════════════════════
+     public CombatUnit(string unitName,
+         UnitType unitType,
+         UnitClassification classification,
+         UnitRole role,
+         Side side,
+         Nationality nationality,
+         IntelProfileTypes intelProfileType,
+         WeaponSystems deployedProfileID,
+         bool isMountable = false,
+         WeaponSystems mountedProfileID = WeaponSystems.DEFAULT,
+         bool isTransportable = false,
+         WeaponSystems transportProfileID = WeaponSystems.DEFAULT,
+         DepotCategory category = DepotCategory.Secondary,
+         DepotSize size = DepotSize.Small)
 
- • **Facility Extension**: Base units automatically initialize facility-specific state 
-   and capabilities through the partial class system. The IsBase property drives this 
-   behavior based on UnitClassification values.
+     Includes extensive validation: profile existence checking, argument validation,
+     enum value validation, and automatic facility initialization for base units.
 
- • **Serialization Contract**: When adding fields, update GetObjectData(), deserialization 
-   constructor, Clone(), and ValidateInternalConsistency(). Profile IDs serialize directly 
-   as enums while complex object relationships use the IResolvableReferences pattern.
+     Public Methods
+     ══════════════
+     // Profile Access
+     public WeaponSystemProfile GetDeployedProfile() - retrieves deployed combat profile
+     public WeaponSystemProfile GetMountedProfile() - retrieves mounted transport profile  
+     public WeaponSystemProfile GetTransportProfile() - retrieves air/sea transport profile
+     public WeaponSystemProfile GetActiveWeaponSystemProfile() - current profile based on state
+     public WeaponSystemProfile GetCurrentCombatStrength() - temporary profile with all modifiers
 
- • **Experience & Efficiency Integration**: Both systems provide multiplicative combat 
-   modifiers that stack with strength and deployment state bonuses. Use GetCurrentCombatStrength() 
-   for final combat calculations rather than accessing profiles directly.
+     // Intelligence & Spotting
+     public IntelReport GenerateIntelReport(SpottedLevel spottedLevel = SpottedLevel.Level1) - fog-of-war intelligence data
+     public void SetSpottedLevel(SpottedLevel spottedLevel) - update detection level
 
- • **Movement Point Taxation**: All major actions consume MPs in addition to their specific 
-   tokens, creating natural limitations on highly active units while rewarding efficient 
-   tactical planning. The pattern prevents action-spamming exploits.
+     // Turn Management
+     public void RefreshAllActions() - reset all action pools to maximum
+     public void RefreshMovementPoints() - reset movement points to maximum
 
- ────────────────────────────────────────────────────────────────────────────────
- KEEP THIS COMMENT BLOCK IN SYNC WITH CLASS ARCHITECTURE CHANGES!
- ────────────────────────────────────────────────────────────────────────────────*/
+     // Combat & Damage
+     public void TakeDamage(float damage) - apply battle damage with clamping
+     public void Repair(float repairAmount) - restore hit points with limits
+     public bool IsDestroyed() - check if unit is eliminated (HP ≤ 1)
+
+     // Supply Management  
+     public bool ConsumeSupplies(float amount) - deduct supplies with validation
+     public float ReceiveSupplies(float amount) - add supplies respecting capacity
+     public float GetSupplyStatus() - current supply as percentage of maximum
+     public bool CanMove() - movement legality based on HP, supplies, efficiency
+
+     // Efficiency & Experience
+     public void SetEfficiencyLevel(EfficiencyLevel level) - direct efficiency assignment
+     public void DecreaseEfficiencyLevelBy1() - step down operational effectiveness  
+     public void IncreaseEfficiencyLevelBy1() - step up operational effectiveness
+     public bool AddExperience(int points) - award XP with level progression
+     public int SetExperience(int points) - direct XP assignment with validation
+     public int GetPointsToNextLevel() - XP needed for advancement
+     public float GetExperienceProgress() - advancement progress as percentage
+
+     // Leader Assignment
+     public bool AssignLeader(string leaderID) - attach commanding officer
+     public bool RemoveLeader() - detach commanding officer
+     public Dictionary<SkillBonusType, float> GetLeaderBonuses() - all active skill bonuses
+     public bool HasLeaderCapability(SkillBonusType bonusType) - specific capability check
+     public float GetLeaderBonus(SkillBonusType bonusType) - specific bonus value
+     public string GetLeaderName() - leader display name
+     public CommandGrade GetLeaderGrade() - leader command level
+     public int GetLeaderReputation() - leader reputation points
+     public string GetLeaderRank() - formatted rank string
+     public CommandAbility GetLeaderCommandAbility() - leader combat modifier
+     public bool HasLeaderSkill(Enum skill) - specific skill unlock check
+     public void AwardLeaderReputation(CUConstants.ReputationAction actionType, float contextMultiplier = 1.0f) - REP for actions
+     public void AwardLeaderReputation(int amount) - direct REP award
+
+     // Action Execution
+     public bool DeployUpOneLevel() - move toward Mobile on deployment ladder
+     public bool DeployDownOneLevel() - move toward Fortified on deployment ladder  
+     public bool PerformCombatAction() - execute attack with resource consumption
+     public bool PerformMoveAction(int movtCost) - execute movement with cost validation
+     public bool PerformIntelAction() - execute reconnaissance with resource consumption
+     public bool PerformOpportunityAction() - execute reactive defensive action
+     public Dictionary<ActionTypes, float> GetAvailableActions() - validated action counts after MP gating
+     public float GetDeployActions() - deployment actions available after MP validation
+     public float GetCombatActions() - combat actions available after MP validation
+     public float GetMoveActions() - move actions available after MP validation
+     public float GetOpportunityActions() - opportunity actions (no MP validation)
+     public float GetIntelActions() - intel actions available after MP validation
+
+     // Position & Movement
+     public void SetPosition(Coordinate2D newPos) - teleport unit to map position
+     public bool CanMoveTo(Coordinate2D targetPos) - movement legality validation **TODO: Not implemented**
+     public float GetDistanceTo(Coordinate2D targetPos) - distance calculation to position **TODO: Not implemented**
+     public float GetDistanceTo(CombatUnit otherUnit) - distance calculation to unit **TODO: Not implemented**
+
+     // Debugging Support  
+     public void DebugSetCombatState(DeploymentState newState) - direct state override
+     public void DebugSetMounted(bool isMounted) - direct mounting override
+     public float DebugGetCombatMovementCost() - expose internal MP calculation
+
+     // Validation & Persistence
+     public List<string> ValidateInternalConsistency() - comprehensive error checking
+     public object Clone() - deep copy for template spawning
+     public void GetObjectData(SerializationInfo info, StreamingContext context) - ISerializable writer
+     public bool HasUnresolvedReferences() - IResolvableReferences check
+     public IReadOnlyList<string> GetUnresolvedReferenceIDs() - reference ID enumeration  
+     public void ResolveReferences(GameDataManager manager) - second-phase reference resolution
+
+     Private Methods
+     ═══════════════
+     // Initialization
+     void InitializeActionCounts() - set action pool maxima based on classification
+     void InitializeMovementPoints() - derive MPs from active weapon profile
+     void InitializeFacility(DepotCategory category, DepotSize size) - base facility setup
+
+     // Combat Calculations
+     float GetFinalCombatRatingModifier() - multiplicative modifier for ground units
+     float GetFinalCombatRatingModifier_Aircraft() - multiplicative modifier for air units  
+     float GetStrengthModifier() - HP-based effectiveness multiplier
+     float GetCombatStateModifier() - deployment state combat multiplier
+     float GetEfficiencyModifier() - operational efficiency multiplier
+     void UpdateMovementPointsForProfile() - sync MPs when profile changes
+
+     // Action System Internals
+     bool ConsumeMovementPoints(float points) - MP deduction with validation
+     float GetDeployMovementCost() - MP cost for deployment transitions (50% of max MP)
+     float GetCombatMovementCost() - MP cost for combat actions (25% of max MP)
+     float GetIntelMovementCost() - MP cost for reconnaissance actions (15% of max MP)
+
+     // Deployment State Machine
+     bool TryDeployUpOneState(bool onAirbase = false, bool onPort = false) - ladder movement toward Mobile
+     bool TryDeployDownOneState() - ladder movement toward Fortified
+     bool CanUnitTypeChangeStates() - type-based state transition validation
+     bool IsAdjacentStateTransition(DeploymentState currentState, DeploymentState targetState) - ladder adjacency check
+     void UpdateMobilityState(DeploymentState newState, DeploymentState previousState) - mounting/profile transitions
+     void ApplyMovementBonus(float delta) - mobile movement bonus application
+     bool CanChangeToState(DeploymentState targetState) - comprehensive transition validation
+
+     // Experience System Internals  
+     ExperienceLevel CalculateExperienceLevel(int totalPoints) - XP to level conversion
+     int GetMinPointsForLevel(ExperienceLevel level) - level threshold lookup
+     ExperienceLevel GetNextLevel(ExperienceLevel currentLevel) - advancement progression
+     void OnExperienceLevelChanged(ExperienceLevel previousLevel, ExperienceLevel newLevel) - level-up notification
+     float GetExperienceMultiplier() - XP-based combat effectiveness multiplier
+
+     Important Design Notes
+     ══════════════════════
+     • **Movement Point Gating System**: All major actions consume both action tokens 
+       and movement points as a secondary cost (percentages of maximum MP). Actions 
+       become unavailable when insufficient MPs remain, creating natural turn limitations 
+       and preventing action-spamming exploits.
+
+     • **Hybrid Profile-State System**: Base capabilities come from shared WeaponSystemProfile 
+       templates (accessed via enum IDs) while individual progression and current state 
+       are stored in StatsMaxCurrent objects. Always use GetActiveWeaponSystemProfile() 
+       for current calculations as it handles mounting/deployment transitions automatically.
+
+     • **Deployment State Ladder**: Units must transition through adjacent states with 
+       specific exceptions (InTransit→Deployed bypass, defensive dis-entrenchment). 
+       The UpdateMobilityState() method handles complex mounting logic, profile switching, 
+       and movement point adjustments automatically.
+
+     • **Leader Reference Pattern**: Leaders are referenced by string ID and resolved via 
+       GameDataManager.GetLeader() lookup rather than direct object references, eliminating 
+       circular serialization issues while maintaining clean API access through the UnitLeader property.
+
+     • **Partial Class Architecture**: Base units automatically initialize facility-specific 
+       state through the partial class system (CombatUnit.Facility.cs). The IsBase property 
+       drives this behavior based on UnitClassification values.
+
+     • **Serialization Contract**: Profile IDs serialize directly as enums (no reference 
+       resolution needed) while complex object relationships use the IResolvableReferences 
+       pattern. When adding fields, update GetObjectData(), deserialization constructor, 
+       Clone(), and ValidateInternalConsistency().
+
+     • **Experience & Efficiency Integration**: Both systems provide multiplicative combat 
+       modifiers that stack with strength and deployment state bonuses. Use GetCurrentCombatStrength() 
+       for final combat calculations rather than accessing profiles directly.
+
+     • **Action Economy Balance**: The combination of action tokens + movement point costs + 
+       supply consumption creates meaningful resource management decisions. Units must balance 
+       immediate tactical needs against turn-long operational capacity.
+
+     ────────────────────────────────────────────────────────────────────────────────
+     KEEP THIS COMMENT BLOCK IN SYNC WITH CLASS ARCHITECTURE CHANGES!
+     ────────────────────────────────────────────────────────────────────────────────*/
     [Serializable]
     public partial class CombatUnit : ICloneable, ISerializable, IResolvableReferences
     {
