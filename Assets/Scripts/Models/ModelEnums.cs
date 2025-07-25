@@ -689,6 +689,7 @@ namespace HammerAndSickle.Models
         SPSAM_CHAP,
         SAM_HAWK,
         HEL_AH64,
+        AWACS_E3,
         ASF_F15,
         ASF_F4,
         MRF_F16,
@@ -742,9 +743,6 @@ namespace HammerAndSickle.Models
         // Arab armies
         IREG_INF_ARAB,
         REG_INF_ARAB,
-        AB_INF_ARAB,
-        AM_INF_ARAB,
-        MAR_INF_ARAB,
         SPEC_INF_ARAB,
         ENG_INF_ARAB,
 
@@ -782,6 +780,7 @@ namespace HammerAndSickle.Models
         SPSAM,
         AAA,
         SPAAA,
+        ATGM,
         ASF,
         ATT,
         BMB,
@@ -790,7 +789,8 @@ namespace HammerAndSickle.Models
         ATTHELO,
         TRNHELO,
         TRNAIR,
-        TRNNAVAL
+        TRNNAVAL,
+        BASE
     }
 
     #endregion // WeaponSystem Enums

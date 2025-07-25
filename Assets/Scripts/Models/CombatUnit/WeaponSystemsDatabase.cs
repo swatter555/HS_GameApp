@@ -285,6 +285,7 @@ namespace HammerAndSickle.Models
                 CreateHelAh64Profile();
 
                 // US Aircraft
+                CreateAwacs_A50Profile();
                 CreateAsfF15Profile();
                 CreateAsfF4Profile();
                 CreateMrfF16Profile();
@@ -331,6 +332,23 @@ namespace HammerAndSickle.Models
                 CreateEngInfFRAProfile();
                 CreateAsfM2000Profile();
                 CreateAttJaguarProfile();
+
+                CreateRegInfArabProfile();
+                CreateIregInfArabProfile();
+                CreateSpecInfArabProfile();
+                CreateEngInfArabProfile();
+
+                CreateAAA_GenericProfile();
+                CreateLightArt_GenericProfile();
+                CreateHeavytArt_GenericProfile();
+                CreateMANPAD_GenericProfile();
+                CreateATGM_GenericProfile();
+
+                CreateLandbase_GenericProfile();
+                CreateAirbase_GenericProfile();
+                CreateDepot_GenericProfile();
+                CreateIntelBase_GenericProfile();
+
             }
             catch (Exception e)
             {
@@ -4023,6 +4041,56 @@ namespace HammerAndSickle.Models
         #region US Aircraft
 
         /// <summary>
+        /// E-3 Sentry airborne early warning and control aircraft.
+        /// </summary>
+        private static void CreateAwacs_E3Profile()
+        {
+            try
+            {
+                var profile = new WeaponSystemProfile(
+                    name: "E-3 Sentry Airborne Early Warning",
+                    nationality: Nationality.USA,
+                    weaponSystemID: WeaponSystems.AWACS_E3,
+                    150,
+                    dogfighting: 0,
+                    maneuverability: 0,
+                    topSpeed: 7,
+                    survivability: 6,
+                    groundAttack: 0,
+                    ordinanceLoad: 0,
+                    stealth: 0,
+                    primaryRange: 1f,
+                    indirectRange: 0f,
+                    spottingRange: 20f,
+                    allWeatherCapability: AllWeatherRating.AllWeather,
+                    sigintRating: SIGINT_Rating.SpecializedLevel,
+                    nbcRating: NBC_Rating.Gen2,
+                    strategicMobility: StrategicMobility.Aircraft,
+                    nvgCapability: NVG_Rating.None,
+                    silhouette: UnitSilhouette.Large,
+                    movementPoints: CUConstants.FIXEDWING_UNIT
+                );
+
+                // Set upgrade paths for modernization
+                profile.AddUpgradeType(UpgradeType.AWACS);
+
+                // Set short name for UI display
+                profile.SetShortName("E-3 Sentry");
+
+                // Set turn availability
+                profile.SetTurnAvailable(500);
+
+                // Store in master dictionary
+                _weaponSystemProfiles[WeaponSystems.AWACS_E3] = profile;
+            }
+            catch (Exception e)
+            {
+                AppService.HandleException(CLASS_NAME, nameof(CreateAwacs_E3Profile), e);
+                throw;
+            }
+        }
+
+        /// <summary>
         /// F-15 Eagle Air Superiority ASF
         /// </summary>
         private static void CreateAsfF15Profile()
@@ -5741,6 +5809,644 @@ namespace HammerAndSickle.Models
             catch (Exception e)
             {
                 AppService.HandleException(CLASS_NAME, nameof(CreateAttJaguarProfile), e);
+                throw;
+            }
+        }
+
+        #endregion
+
+
+        //-----------------------------------------------------------------------------------------
+
+
+        #region Arab Nations
+
+        private static void CreateRegInfArabProfile()
+        {
+            try
+            {
+                var profile = new WeaponSystemProfile(
+                    name: "Regular Infantry",
+                    nationality: Nationality.MJ,
+                    weaponSystemID: WeaponSystems.REG_INF_ARAB,
+                    15,
+                    hardAttack: 4,
+                    hardDefense: 3,
+                    softAttack: 9,
+                    softDefense: 10,
+                    groundAirDefense: CUConstants.GROUND_DEFENSE_INFANTRY,
+                    primaryRange: 1f,
+                    indirectRange: 0f,
+                    spottingRange: 2f,
+                    allWeatherCapability: AllWeatherRating.GroundUnit,
+                    nvgCapability: NVG_Rating.None,
+                    silhouette: UnitSilhouette.Small,
+                    sigintRating: SIGINT_Rating.UnitLevel,
+                    nbcRating: NBC_Rating.Gen1,
+                    strategicMobility: StrategicMobility.AirLift,
+                    movementPoints: CUConstants.FOOT_UNIT
+                );
+
+                // Upgrade paths
+                profile.AddUpgradeType(UpgradeType.INF);
+
+                // Set short name for UI display
+                profile.SetShortName("Infantry");
+
+                // Set turn availability in months.
+                profile.SetTurnAvailable(300);
+
+                // Store in master dictionary
+                _weaponSystemProfiles[WeaponSystems.REG_INF_ARAB] = profile;
+            }
+            catch (Exception e)
+            {
+                AppService.HandleException(CLASS_NAME, nameof(CreateRegInfArabProfile), e);
+                throw;
+            }
+        }
+
+        private static void CreateIregInfArabProfile()
+        {
+            try
+            {
+                var profile = new WeaponSystemProfile(
+                    name: "Irregular Infantry",
+                    nationality: Nationality.MJ,
+                    weaponSystemID: WeaponSystems.IREG_INF_ARAB,
+                    18,
+                    hardAttack: 4,
+                    hardDefense: 3,
+                    softAttack: 9,
+                    softDefense: 10,
+                    groundAirDefense: CUConstants.GROUND_DEFENSE_INFANTRY,
+                    primaryRange: 1f,
+                    indirectRange: 0f,
+                    spottingRange: 2f,
+                    allWeatherCapability: AllWeatherRating.GroundUnit,
+                    nvgCapability: NVG_Rating.Gen1,
+                    silhouette: UnitSilhouette.Small,
+                    sigintRating: SIGINT_Rating.UnitLevel,
+                    nbcRating: NBC_Rating.Gen1,
+                    strategicMobility: StrategicMobility.AirDrop,
+                    movementPoints: CUConstants.FOOT_UNIT
+                );
+
+                // Upgrade paths
+                profile.AddUpgradeType(UpgradeType.INF);
+
+                // Set short name for UI display
+                profile.SetShortName("Irregulars");
+
+                // Set turn availability in months.
+                profile.SetTurnAvailable(300);
+
+                // Store in master dictionary
+                _weaponSystemProfiles[WeaponSystems.IREG_INF_ARAB] = profile;
+            }
+            catch (Exception e)
+            {
+                AppService.HandleException(CLASS_NAME, nameof(CreateIregInfArabProfile), e);
+                throw;
+            }
+        }
+
+        private static void CreateSpecInfArabProfile()
+        {
+            try
+            {
+                var profile = new WeaponSystemProfile(
+                    name: "Special Forces Infantry",
+                    nationality: Nationality.MJ,
+                    weaponSystemID: WeaponSystems.SPEC_INF_ARAB,
+                    30,
+                    hardAttack: 8,
+                    hardDefense: 4,
+                    softAttack: 11,
+                    softDefense: 12,
+                    groundAirDefense: CUConstants.GROUND_DEFENSE_INFANTRY,
+                    primaryRange: 1f,
+                    indirectRange: 0f,
+                    spottingRange: 3f,
+                    allWeatherCapability: AllWeatherRating.GroundUnit,
+                    nvgCapability: NVG_Rating.Gen2,
+                    silhouette: UnitSilhouette.Small,
+                    sigintRating: SIGINT_Rating.SpecializedLevel,
+                    nbcRating: NBC_Rating.Gen1,
+                    strategicMobility: StrategicMobility.AirMobile,
+                    movementPoints: CUConstants.FOOT_UNIT
+                );
+
+                // Set upgrade paths
+                profile.AddUpgradeType(UpgradeType.INF);
+
+                // Set short name for UI display
+                profile.SetShortName("Special Forces");
+
+                // Set turn availability in months.
+                profile.SetTurnAvailable(300);
+
+                // Store in master dictionary
+                _weaponSystemProfiles[WeaponSystems.SPEC_INF_ARAB] = profile;
+            }
+            catch (Exception e)
+            {
+                AppService.HandleException(CLASS_NAME, nameof(CreateSpecInfArabProfile), e);
+                throw;
+            }
+        }
+
+        private static void CreateEngInfArabProfile()
+        {
+            try
+            {
+                var profile = new WeaponSystemProfile(
+                    name: "Combat Engineers",
+                    nationality: Nationality.MJ,
+                    weaponSystemID: WeaponSystems.ENG_INF_ARAB,
+                    20,
+                    hardAttack: 4,
+                    hardDefense: 3,
+                    softAttack: 9,
+                    softDefense: 12,
+                    groundAirDefense: CUConstants.GROUND_DEFENSE_INFANTRY,
+                    primaryRange: 1f,
+                    indirectRange: 0f,
+                    spottingRange: 2f,
+                    allWeatherCapability: AllWeatherRating.GroundUnit,
+                    nvgCapability: NVG_Rating.None,
+                    silhouette: UnitSilhouette.Small,
+                    sigintRating: SIGINT_Rating.UnitLevel,
+                    nbcRating: NBC_Rating.Gen1,
+                    strategicMobility: StrategicMobility.AirDrop,
+                    movementPoints: CUConstants.FOOT_UNIT
+                );
+
+                // Set upgrade paths
+                profile.AddUpgradeType(UpgradeType.INF);
+
+                // Set short name for UI display
+                profile.SetShortName("Engineers");
+
+                // Set turn availability in months.
+                profile.SetTurnAvailable(300);
+
+                // Store in master dictionary
+                _weaponSystemProfiles[WeaponSystems.ENG_INF_ARAB] = profile;
+            }
+            catch (Exception e)
+            {
+                AppService.HandleException(CLASS_NAME, nameof(CreateEngInfArabProfile), e);
+                throw;
+            }
+        }
+
+        #endregion
+
+
+        //-----------------------------------------------------------------------------------------
+
+
+        #region Generic Weapons
+
+        /// <summary>
+        /// Generic AAA profile
+        /// </summary>
+        private static void CreateAAA_GenericProfile()
+        {
+            try
+            {
+                var profile = new WeaponSystemProfile(
+                    name: "Anti-Aircraft Artillery",
+                    nationality: Nationality.USSR,
+                    weaponSystemID: WeaponSystems.AAA_GENERIC,
+                    15,
+                    hardAttack: 3,
+                    hardDefense: 1,
+                    softAttack: 10,
+                    softDefense: 5,
+                    groundAirAttack: 9,
+                    groundAirDefense: CUConstants.GROUND_DEFENSE_AAA,
+                    primaryRange: 1f,
+                    indirectRange: 2f,
+                    spottingRange: 2f,
+                    allWeatherCapability: AllWeatherRating.GroundUnit,
+                    sigintRating: SIGINT_Rating.UnitLevel,
+                    nbcRating: NBC_Rating.None,
+                    strategicMobility: StrategicMobility.AirDrop,
+                    nvgCapability: NVG_Rating.None,
+                    silhouette: UnitSilhouette.Medium,
+                    movementPoints: CUConstants.FOOT_UNIT
+                );
+
+                // Set upgrade paths for modernization
+                profile.AddUpgradeType(UpgradeType.AAA);
+
+                // Set short name for UI display
+                profile.SetShortName("AAA");
+
+                // Set turn availability - entered service in 1957
+                profile.SetTurnAvailable(228);
+
+                // Store in master dictionary
+                _weaponSystemProfiles[WeaponSystems.AAA_GENERIC] = profile;
+            }
+            catch (Exception e)
+            {
+                AppService.HandleException(CLASS_NAME, nameof(CreateAAA_GenericProfile), e);
+                throw;
+            }
+        }
+
+        /// <summary>
+        /// Generic Man-portable Air Defense profile
+        /// </summary>
+        private static void CreateMANPAD_GenericProfile()
+        {
+            try
+            {
+                var profile = new WeaponSystemProfile(
+                    name: "Man-Portable Air Defense",
+                    nationality: Nationality.USSR,
+                    weaponSystemID: WeaponSystems.MANPAD_GENERIC,
+                    10,
+                    hardAttack: 1,
+                    hardDefense: 1,
+                    softAttack: 1,
+                    softDefense: 3,
+                    groundAirAttack: 9,
+                    groundAirDefense: CUConstants.GROUND_DEFENSE_INFANTRY,
+                    primaryRange: 1f,
+                    indirectRange: 2f,
+                    spottingRange: 2f,
+                    allWeatherCapability: AllWeatherRating.GroundUnit,
+                    sigintRating: SIGINT_Rating.UnitLevel,
+                    nbcRating: NBC_Rating.Gen1,
+                    strategicMobility: StrategicMobility.AirDrop,
+                    nvgCapability: NVG_Rating.None,
+                    silhouette: UnitSilhouette.Small,
+                    movementPoints: CUConstants.FOOT_UNIT
+                );
+
+                // Set upgrade paths for modernization
+                profile.AddUpgradeType(UpgradeType.SAM);
+
+                // Set short name for UI display
+                profile.SetShortName("MANPAD");
+
+                // Set turn availability - entered service in 1968
+                profile.SetTurnAvailable(360);
+
+                // Store in master dictionary
+                _weaponSystemProfiles[WeaponSystems.MANPAD_GENERIC] = profile;
+            }
+            catch (Exception e)
+            {
+                AppService.HandleException(CLASS_NAME, nameof(CreateMANPAD_GenericProfile), e);
+                throw;
+            }
+        }
+
+        /// <summary>
+        /// Create a generic light towed artillery profile.
+        /// </summary>
+        private static void CreateLightArt_GenericProfile()
+        {
+            try
+            {
+                var profile = new WeaponSystemProfile(
+                    name: "Light Towed Artillery",
+                    nationality: Nationality.USSR,
+                    weaponSystemID: WeaponSystems.ART_LIGHT_GENERIC,
+                    20,
+                    hardAttack: 4,
+                    hardDefense: 3,
+                    softAttack: 10,
+                    softDefense: 4,
+                    groundAirDefense: CUConstants.GROUND_DEFENSE_INFANTRY,
+                    primaryRange: 1f,
+                    indirectRange: 3f,
+                    spottingRange: 2f,
+                    allWeatherCapability: AllWeatherRating.GroundUnit,
+                    nvgCapability: NVG_Rating.None,
+                    silhouette: UnitSilhouette.Medium,
+                    sigintRating: SIGINT_Rating.UnitLevel,
+                    nbcRating: NBC_Rating.Gen1,
+                    strategicMobility: StrategicMobility.AirDrop,
+                    movementPoints: CUConstants.FOOT_UNIT
+                );
+
+                //Set the upgrade paths for modernization
+                profile.AddUpgradeType(UpgradeType.ART);
+
+                // Set short name for UI display
+                profile.SetShortName("Light Artillery");
+
+                // Set turn availability in months.
+                profile.SetTurnAvailable(1);
+
+                // Store in master dictionary
+                _weaponSystemProfiles[WeaponSystems.ART_LIGHT_GENERIC] = profile;
+            }
+            catch (Exception e)
+            {
+                AppService.HandleException(CLASS_NAME, nameof(CreateLightArt_GenericProfile), e);
+                throw;
+            }
+        }
+
+        /// <summary>
+        /// Create a generic light towed artillery profile.
+        /// </summary>
+        private static void CreateHeavytArt_GenericProfile()
+        {
+            try
+            {
+                var profile = new WeaponSystemProfile(
+                    name: "Heavy Towed Artillery",
+                    nationality: Nationality.USSR,
+                    weaponSystemID: WeaponSystems.ART_HEAVY_GENERIC,
+                    30,
+                    hardAttack: 6,
+                    hardDefense: 3,
+                    softAttack: 14,
+                    softDefense: 4,
+                    groundAirDefense: CUConstants.GROUND_DEFENSE_INFANTRY,
+                    primaryRange: 1f,
+                    indirectRange: 4f,
+                    spottingRange: 2f,
+                    allWeatherCapability: AllWeatherRating.GroundUnit,
+                    nvgCapability: NVG_Rating.None,
+                    silhouette: UnitSilhouette.Medium,
+                    sigintRating: SIGINT_Rating.UnitLevel,
+                    nbcRating: NBC_Rating.Gen1,
+                    strategicMobility: StrategicMobility.AirDrop,
+                    movementPoints: CUConstants.FOOT_UNIT
+                );
+
+                //Set the upgrade paths for modernization
+                profile.AddUpgradeType(UpgradeType.ART);
+
+                // Set short name for UI display
+                profile.SetShortName("Heavy Artillery");
+
+                // Set turn availability in months.
+                profile.SetTurnAvailable(1);
+
+                // Store in master dictionary
+                _weaponSystemProfiles[WeaponSystems.ART_HEAVY_GENERIC] = profile;
+            }
+            catch (Exception e)
+            {
+                AppService.HandleException(CLASS_NAME, nameof(CreateHeavytArt_GenericProfile), e);
+                throw;
+            }
+        }
+
+        /// <summary>
+        /// Create a generic Anti-Tank Guided Missile (ATGM) profile.
+        /// </summary>
+        private static void CreateATGM_GenericProfile()
+        {
+            try
+            {
+                var profile = new WeaponSystemProfile(
+                    name: "Anti-Tank Guided Missile",
+                    nationality: Nationality.USSR,
+                    weaponSystemID: WeaponSystems.ATGM_GENERIC,
+                    10,
+                    hardAttack: 10,
+                    hardDefense: 1,
+                    softAttack: 1,
+                    softDefense: 4,
+                    groundAirDefense: CUConstants.FOOT_UNIT,
+                    primaryRange: 1f,
+                    indirectRange: 0f,
+                    spottingRange: 2f,
+                    allWeatherCapability: AllWeatherRating.GroundUnit,
+                    nvgCapability: NVG_Rating.Gen1,
+                    silhouette: UnitSilhouette.Small,
+                    sigintRating: SIGINT_Rating.UnitLevel,
+                    nbcRating: NBC_Rating.Gen1,
+                    strategicMobility: StrategicMobility.AirDrop,
+                    movementPoints: CUConstants.FOOT_UNIT
+                );
+
+                // Set upgrade paths
+                profile.AddUpgradeType(UpgradeType.ATGM);
+
+                // Set short name for UI display
+                profile.SetShortName("ATGM");
+
+                // Set turn availability in months.
+                profile.SetTurnAvailable(432);
+
+                // Store in master dictionary
+                _weaponSystemProfiles[WeaponSystems.ATGM_GENERIC] = profile;
+            }
+            catch (Exception e)
+            {
+                AppService.HandleException(CLASS_NAME, nameof(CreateATGM_GenericProfile), e);
+                throw;
+            }
+        }
+
+        #endregion
+
+
+        //-----------------------------------------------------------------------------------------
+
+
+        #region Bases
+
+        /// <summary>
+        /// Create a generic land base profile.
+        /// </summary>
+        private static void CreateLandbase_GenericProfile()
+        {
+            try
+            {
+                var profile = new WeaponSystemProfile(
+                    name: "HQ LandBase",
+                    nationality: Nationality.USSR,
+                    weaponSystemID: WeaponSystems.LANDBASE_GENERIC,
+                    50,
+                    hardAttack: 4,
+                    hardDefense: 3,
+                    softAttack: 7,
+                    softDefense: 8,
+                    groundAirDefense: CUConstants.GROUND_DEFENSE_INFANTRY,
+                    primaryRange: 1f,
+                    indirectRange: 0f,
+                    spottingRange: 4f,
+                    allWeatherCapability: AllWeatherRating.GroundUnit,
+                    nvgCapability: NVG_Rating.None,
+                    silhouette: UnitSilhouette.Small,
+                    sigintRating: SIGINT_Rating.HQLevel,
+                    nbcRating: NBC_Rating.Gen1,
+                    strategicMobility: StrategicMobility.Heavy,
+                    movementPoints: CUConstants.STATIC_UNIT
+                );
+
+                // Upgrade paths
+                profile.AddUpgradeType(UpgradeType.BASE);
+
+                // Set short name for UI display
+                profile.SetShortName("HQ");
+
+                // Set turn availability in months.
+                profile.SetTurnAvailable(1);
+
+                // Store in master dictionary
+                _weaponSystemProfiles[WeaponSystems.LANDBASE_GENERIC] = profile;
+            }
+            catch (Exception e)
+            {
+                AppService.HandleException(CLASS_NAME, nameof(CreateLandbase_GenericProfile), e);
+                throw;
+            }
+        }
+
+        /// <summary>
+        /// Create a generic airbase profile.
+        /// </summary>
+        private static void CreateAirbase_GenericProfile()
+        {
+            try
+            {
+                var profile = new WeaponSystemProfile(
+                    name: "Airbase",
+                    nationality: Nationality.USSR,
+                    weaponSystemID: WeaponSystems.AIRBASE_GENERIC,
+                    50,
+                    hardAttack: 4,
+                    hardDefense: 3,
+                    softAttack: 7,
+                    softDefense: 8,
+                    groundAirDefense: CUConstants.GROUND_DEFENSE_INFANTRY,
+                    primaryRange: 1f,
+                    indirectRange: 0f,
+                    spottingRange: 4f,
+                    allWeatherCapability: AllWeatherRating.GroundUnit,
+                    nvgCapability: NVG_Rating.None,
+                    silhouette: UnitSilhouette.Small,
+                    sigintRating: SIGINT_Rating.UnitLevel,
+                    nbcRating: NBC_Rating.Gen1,
+                    strategicMobility: StrategicMobility.Heavy,
+                    movementPoints: CUConstants.STATIC_UNIT
+                );
+
+                // Upgrade paths
+                profile.AddUpgradeType(UpgradeType.BASE);
+
+                // Set short name for UI display
+                profile.SetShortName("Airbase");
+
+                // Set turn availability in months.
+                profile.SetTurnAvailable(1);
+
+                // Store in master dictionary
+                _weaponSystemProfiles[WeaponSystems.AIRBASE_GENERIC] = profile;
+            }
+            catch (Exception e)
+            {
+                AppService.HandleException(CLASS_NAME, nameof(CreateAirbase_GenericProfile), e);
+                throw;
+            }
+        }
+
+        /// <summary>
+        /// Create a generic supply depot profile.
+        /// </summary>
+        private static void CreateDepot_GenericProfile()
+        {
+            try
+            {
+                var profile = new WeaponSystemProfile(
+                    name: "Suppy Depot",
+                    nationality: Nationality.USSR,
+                    weaponSystemID: WeaponSystems.SUPPLYDEPOT_GENERIC,
+                    150,
+                    hardAttack: 4,
+                    hardDefense: 3,
+                    softAttack: 7,
+                    softDefense: 8,
+                    groundAirDefense: CUConstants.GROUND_DEFENSE_INFANTRY,
+                    primaryRange: 1f,
+                    indirectRange: 0f,
+                    spottingRange: 2f,
+                    allWeatherCapability: AllWeatherRating.GroundUnit,
+                    nvgCapability: NVG_Rating.None,
+                    silhouette: UnitSilhouette.Small,
+                    sigintRating: SIGINT_Rating.UnitLevel,
+                    nbcRating: NBC_Rating.Gen1,
+                    strategicMobility: StrategicMobility.Heavy,
+                    movementPoints: CUConstants.STATIC_UNIT
+                );
+
+                // Upgrade paths
+                profile.AddUpgradeType(UpgradeType.BASE);
+
+                // Set short name for UI display
+                profile.SetShortName("Suppy Depot");
+
+                // Set turn availability in months.
+                profile.SetTurnAvailable(1);
+
+                // Store in master dictionary
+                _weaponSystemProfiles[WeaponSystems.SUPPLYDEPOT_GENERIC] = profile;
+            }
+            catch (Exception e)
+            {
+                AppService.HandleException(CLASS_NAME, nameof(CreateDepot_GenericProfile), e);
+                throw;
+            }
+        }
+
+        /// <summary>
+        /// Create a generic intelligence gathering base profile.
+        /// </summary>
+        private static void CreateIntelBase_GenericProfile()
+        {
+            try
+            {
+                var profile = new WeaponSystemProfile(
+                    name: "Intelligence Gathering Base",
+                    nationality: Nationality.USSR,
+                    weaponSystemID: WeaponSystems.LANDBASE_GENERIC,
+                    150,
+                    hardAttack: 4,
+                    hardDefense: 3,
+                    softAttack: 7,
+                    softDefense: 8,
+                    groundAirDefense: CUConstants.GROUND_DEFENSE_INFANTRY,
+                    primaryRange: 1f,
+                    indirectRange: 0f,
+                    spottingRange: 6f,
+                    allWeatherCapability: AllWeatherRating.GroundUnit,
+                    nvgCapability: NVG_Rating.None,
+                    silhouette: UnitSilhouette.Small,
+                    sigintRating: SIGINT_Rating.SpecializedLevel,
+                    nbcRating: NBC_Rating.Gen1,
+                    strategicMobility: StrategicMobility.Heavy,
+                    movementPoints: CUConstants.STATIC_UNIT
+                );
+
+                // Upgrade paths
+                profile.AddUpgradeType(UpgradeType.BASE);
+
+                // Set short name for UI display
+                profile.SetShortName("Intel Base");
+
+                // Set turn availability in months.
+                profile.SetTurnAvailable(1);
+
+                // Store in master dictionary
+                _weaponSystemProfiles[WeaponSystems.LANDBASE_GENERIC] = profile;
+            }
+            catch (Exception e)
+            {
+                AppService.HandleException(CLASS_NAME, nameof(CreateIntelBase_GenericProfile), e);
                 throw;
             }
         }
