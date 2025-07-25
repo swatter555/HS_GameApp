@@ -64,7 +64,6 @@ namespace HammerAndSickle.Models
         GroundCombatStatic,    // Immobile (facility or airbase typically)
         GroundCombatRecon,
         AirDefenseArea,
-        AirDefensePoint,
         AirSuperiority,
         AirMultirole,
         AirGroundAttack,
@@ -704,8 +703,6 @@ namespace HammerAndSickle.Models
         SPEC_INF_US,
         ENG_INF_US,
 
-        // TODO: Add US AWACS
-
         // West Germany (FRG)
         TANK_LEOPARD1,
         TANK_LEOPARD2,
@@ -824,6 +821,8 @@ namespace HammerAndSickle.Models
         SV_BASE,  // Base
         SV_AIRB,  // Airbase
         SV_DEPOT, // Supply Depot
+
+        // TODO: Add rest of the profiles
     }
 
     #endregion
