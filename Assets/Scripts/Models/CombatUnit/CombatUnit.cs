@@ -229,7 +229,7 @@ namespace HammerAndSickle.Models
 
  // Deployment State Machine
  bool TryDeployUpOneState(bool onAirbase = false, bool onPort = false) - ladder movement toward Mobile
- bool TryEntrenchDownOneState() - ladder movement toward Fortified
+ bool TryDeployDownOneState() - ladder movement toward Fortified
  bool CanUnitTypeChangeStates() - type-based state transition validation
  bool IsAdjacentStateTransition(DeploymentState currentState, DeploymentState targetState) - ladder adjacency check
  void UpdateMobilityState(DeploymentState newState, DeploymentState previousState) - mounting/profile transitions
@@ -1362,7 +1362,7 @@ namespace HammerAndSickle.Models
                 if (GetDeployActions() >= 1 && MovementPoints.Current >= GetDeployMovementCost())
                 {
                     // Atempt to deploy down one level.
-                    bool result = TryEntrenchDownOneState();
+                    bool result = TryDeployDownOneState();
 
                     // If we have made it this far, we can consume supplies and actions.
                     if (result)
@@ -2098,7 +2098,7 @@ namespace HammerAndSickle.Models
         }
 
         /// <summary>
-        /// Attempts to move the unit <em>one step toward <c>InTransit</c></em> on the posture ladder.
+        /// Attempts to move the unit up one step on the posture ladder.
         /// </summary>
         /// <param name="onAirfieldPort">Is unit on an airfield or port</param>
         /// <returns></returns>
@@ -2158,9 +2158,12 @@ namespace HammerAndSickle.Models
                 }
 
                 // Comprehensive check for valid state transition
-                if (!CanChangeToState(targetState))
+                if (!CanChangeToState(targetState, out string errorMsg))
+                {
+                    AppService.CaptureUiMessage($"{UnitName}: {errorMsg}");
                     return false;
-
+                }
+                
                 // Save previous state for comparison
                 var previousState = DeploymentState;
 
@@ -2171,8 +2174,6 @@ namespace HammerAndSickle.Models
                 UpdateMobilityState(targetState, previousState);
 
                 return true;
-
-
             }
             catch (Exception e)
             {
@@ -2182,10 +2183,10 @@ namespace HammerAndSickle.Models
         }
 
         /// <summary>
-        /// Attempts to move the unit one step toward Fortified on the posture ladder.
+        /// Attempts to move the unit one step down on the posture ladder.
         /// </summary>
         /// <returns></returns>
-        private bool TryEntrenchDownOneState()
+        private bool TryDeployDownOneState(bool validDeploymentHex = false)
         {
             try
             {
@@ -2198,13 +2199,23 @@ namespace HammerAndSickle.Models
                     return false;
                 }
 
+                // A unit InTransit cannot move down the ladder without a valid deployment hex.
+                if (currentState == DeploymentState.InTransit && !validDeploymentHex)
+                {
+                    AppService.CaptureUiMessage($"{UnitName} is in InTransit state - cannot move down the ladder without a valid deployment hex.");
+                    return false;
+                }
+
                 // Calculate target state (one step toward fortified)
                 int targetIndex = (int)currentState + 1;
                 DeploymentState targetState = (DeploymentState)targetIndex;
 
-                // Comprehensive check for valid state transition.
-                if (!CanChangeToState(targetState))
+                // Comprehensive check for valid state transition
+                if (!CanChangeToState(targetState, out string errorMsg))
+                {
+                    AppService.CaptureUiMessage($"{UnitName}: {errorMsg}");
                     return false;
+                }
 
                 // Save previous state for comparison.
                 var previousState = DeploymentState;
@@ -2219,7 +2230,7 @@ namespace HammerAndSickle.Models
             }
             catch (Exception ex)
             {
-                AppService.HandleException(nameof(CombatUnit), nameof(TryEntrenchDownOneState), ex);
+                AppService.HandleException(nameof(CombatUnit), nameof(TryDeployDownOneState), ex);
                 return false;
             }
         }
@@ -2301,15 +2312,11 @@ namespace HammerAndSickle.Models
                 // Handle transitions FROM InTransit (special exception to ladder rule)
                 else if (leavingInTransit)
                 {
-                    // Major exception: InTransit can go directly to Deployed
-                    if (newState != DeploymentState.Mobile)
-                    {
-                        // Force to Deployed state regardless of target
-                        DeploymentState = DeploymentState.Deployed;
-                        IsMounted = false;
-                    }
+                    // Exception: InTransit must go directly to Deployed
+                    DeploymentState = DeploymentState.Deployed;
+                    IsMounted = false;
 
-                    // Set to 1/2 deployed profile movement points
+                    // Set to 1/2 deployed profile movement points,regardless of how far it traveled InTransit.
                     var deployedProfile = GetDeployedProfile();
                     int halfDeployedMovement = Mathf.CeilToInt(deployedProfile.MovementPoints * 0.5f);
                     MovementPoints.SetMax(deployedProfile.MovementPoints);
@@ -2318,26 +2325,17 @@ namespace HammerAndSickle.Models
                 // Handle transitions TO Mobile (normal ladder progression)
                 else if (enteringMobile)
                 {
+                    // Set mounted status based on available transport profile
                     bool hasTransport = GetMountedProfile() != null;
+                    IsMounted = hasTransport;
 
-                    if (hasTransport)
+                    // ALL units get mobile bonus when entering Mobile state
+                    if (!_mobileBonusApplied)
                     {
-                        IsMounted = true;
-                        if (_mobileBonusApplied)
-                        {
-                            ApplyMovementBonus(-CUConstants.MOBILE_MOVEMENT_BONUS);
-                            _mobileBonusApplied = false;
-                        }
+                        ApplyMovementBonus(+CUConstants.MOBILE_MOVEMENT_BONUS);
+                        _mobileBonusApplied = true;
                     }
-                    else
-                    {
-                        IsMounted = false;
-                        if (!_mobileBonusApplied)
-                        {
-                            ApplyMovementBonus(+CUConstants.MOBILE_MOVEMENT_BONUS);
-                            _mobileBonusApplied = true;
-                        }
-                    }
+
                     UpdateMovementPointsForProfile();
                 }
                 // Handle transitions FROM Mobile (normal ladder progression)
@@ -2374,7 +2372,24 @@ namespace HammerAndSickle.Models
         /// </summary>
         private void ApplyMovementBonus(float delta)
         {
-            float newMax = MovementPoints.Max + delta;
+            // Prevent stacking by checking current state vs intended operation
+            if (delta > 0 && _mobileBonusApplied)
+            {
+                AppService.HandleException(CLASS_NAME, "ApplyMovementBonus",
+                    new InvalidOperationException("Attempted to apply mobile bonus when already applied"),
+                    ExceptionSeverity.Minor);
+                return;
+            }
+
+            if (delta < 0 && !_mobileBonusApplied)
+            {
+                AppService.HandleException(CLASS_NAME, "ApplyMovementBonus",
+                    new InvalidOperationException("Attempted to remove mobile bonus when not applied"),
+                    ExceptionSeverity.Minor);
+                return;
+            }
+
+            float newMax = Mathf.Max(0f, MovementPoints.Max + delta);
             float newCurrent = Mathf.Clamp(MovementPoints.Current + delta, 0f, newMax);
 
             MovementPoints.SetMax(newMax);
@@ -2387,74 +2402,64 @@ namespace HammerAndSickle.Models
         /// </summary>
         /// <param name="targetState">The desired combat state</param>
         /// <returns>True if transition is allowed</returns>
-        private bool CanChangeToState(DeploymentState targetState)
+        private bool CanChangeToState(DeploymentState targetState, out string errorMessage)
         {
-            try
+            errorMessage = string.Empty;
+
+            // Same state - no change needed
+            if (DeploymentState == targetState)
             {
-                // Capture the UI message if needed.
-                string errorMessage = $"Cannot change from {DeploymentState} to {targetState}: ";
-
-                // Same state - no change needed
-                if (DeploymentState == targetState)
-                {
-                    errorMessage += "Already in target state.";
-                    AppService.CaptureUiMessage(errorMessage);
-                    return false;
-                }
-
-                // Check if the unit is destroyed
-                if (IsDestroyed())
-                    throw new InvalidOperationException($"{UnitName} is destroyed and cannot change states.");
-
-                // Air units and bases cannot change states.
-                if (!CanUnitTypeChangeStates())
-                {
-                    errorMessage += "Unit type cannot change combat states.";
-                    AppService.CaptureUiMessage(errorMessage);
-                    return false;
-                }
-
-                // Check if transition is adjacent
-                if (!IsAdjacentStateTransition(DeploymentState, targetState))
-                {
-                    errorMessage += $"Transition from {DeploymentState} to {targetState} is not adjacent.";
-                    AppService.CaptureUiMessage(errorMessage);
-                    return false;
-                }
-
-                // Check if the unit has critical supply levels
-                if (DaysSupply.Current <= CUConstants.CRITICAL_SUPPLY_THRESHOLD)
-                {
-                    errorMessage += "Cannot change state with critical supply levels.";
-                    AppService.CaptureUiMessage(errorMessage);
-                    return false;
-                }
-
-                // Only limited DeploymentState transitions are allowed based on efficiency level.
-                if (EfficiencyLevel == EfficiencyLevel.StaticOperations)
-                {
-                    if (DeploymentState == DeploymentState.Fortified || DeploymentState == DeploymentState.Entrenched || DeploymentState == DeploymentState.HastyDefense)
-                    {
-                        errorMessage += "Cannot change from defensive states in Static Operations.";
-                        AppService.CaptureUiMessage(errorMessage);
-                        return false; // Cannot change from defensive states in static operations
-                    }
-
-                    if (targetState == DeploymentState.Mobile)
-                    {
-                        errorMessage += "Cannot change to Mobile state in Static Operations.";
-                        AppService.CaptureUiMessage(errorMessage);
-                        return false; // Cannot change to Mobile state in static operations
-                    }
-                }
-
-                return true;
-            }
-            catch (Exception e)
-            {
-                AppService.HandleException(CLASS_NAME, "CanChangeToState", e);
+                errorMessage = $"Already in target state {targetState}";
                 return false;
             }
+
+            // Check if the unit is destroyed
+            if (IsDestroyed())
+            {
+                errorMessage = $"{UnitName} is destroyed and cannot change states";
+                throw new InvalidOperationException(errorMessage);
+            }
+
+            // Air units and bases cannot change states
+            if (!CanUnitTypeChangeStates())
+            {
+                errorMessage = $"{UnitName} cannot change combat states (unit type: {Classification})";
+                return false;
+            }
+
+            // Check if transition is adjacent
+            if (!IsAdjacentStateTransition(DeploymentState, targetState))
+            {
+                errorMessage = $"Transition from {DeploymentState} to {targetState} is not adjacent";
+                return false;
+            }
+
+            // Check if the unit has critical supply levels
+            if (DaysSupply.Current <= CUConstants.CRITICAL_SUPPLY_THRESHOLD)
+            {
+                errorMessage = $"Cannot change state with critical supply levels ({DaysSupply.Current:F1} days remaining)";
+                return false;
+            }
+
+            // Only limited DeploymentState transitions are allowed based on efficiency level
+            if (EfficiencyLevel == EfficiencyLevel.StaticOperations)
+            {
+                if (DeploymentState == DeploymentState.Fortified ||
+                    DeploymentState == DeploymentState.Entrenched ||
+                    DeploymentState == DeploymentState.HastyDefense)
+                {
+                    errorMessage = $"Cannot change from defensive states in Static Operations (current efficiency: {EfficiencyLevel})";
+                    return false;
+                }
+
+                if (targetState == DeploymentState.Mobile)
+                {
+                    errorMessage = $"Cannot change to Mobile state in Static Operations (current efficiency: {EfficiencyLevel})";
+                    return false;
+                }
+            }
+
+            return true;
         }
 
         #endregion // CombatUnit Actions Helper Methods
