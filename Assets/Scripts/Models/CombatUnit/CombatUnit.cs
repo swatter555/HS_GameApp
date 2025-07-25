@@ -1422,7 +1422,6 @@ namespace HammerAndSickle.Models
         #endregion // CombatUnit Actions
 
 
-
         #region Position and Movement
 
         /// <summary>
@@ -1570,7 +1569,6 @@ namespace HammerAndSickle.Models
 
                 case UnitClassification.DEPOT:
                 case UnitClassification.AIRB:
-                case UnitClassification.NAVB:
                     moveActions = 0;
                     combatActions = 0;
                     deploymentActions = 0;
@@ -1631,8 +1629,7 @@ namespace HammerAndSickle.Models
 
                 UnitClassification.HQ or
                 UnitClassification.DEPOT or
-                UnitClassification.AIRB or
-                UnitClassification.NAVB => 0,// Bases don't move
+                UnitClassification.AIRB => 0,// Bases don't move
 
                 _ => CUConstants.FOOT_UNIT,// Default to foot movement
             };
