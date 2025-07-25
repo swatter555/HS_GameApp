@@ -51,9 +51,7 @@ namespace HammerAndSickle.Models
         RECONA, // Recon Aircraft
         HQ,     // HQ facility
         DEPOT,  // Supply Depot
-        AIRB,   // Airbase
-        // TODO: Implement naval bases and ports
-        NAVB,   // Naval Base
+        AIRB    // Airbase
     }
 
     /// <summary>
