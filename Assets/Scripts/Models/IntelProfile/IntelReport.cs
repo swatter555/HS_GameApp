@@ -19,7 +19,7 @@ namespace HammerAndSickle.Models
     • **Level 0 (Not spotted)**
          – No `IntelReport` is generated; calling code should handle null.
     • **Level 1 (Name only)**
-         – Metadata (UnitName, UnitNationality, UnitState, Exp/Eff levels) is
+         – Metadata (UnitName, UnitNationality, DeploymentPosition, Exp/Eff levels) is
            populated.
          – Every equipment bucket remains **0**.
     • **Level 2 (Poor intel ±30 %)**
@@ -46,7 +46,7 @@ namespace HammerAndSickle.Models
 
     Nationality   UnitNationality  – nation owning the unit.
     string        UnitName         – display name (unique per combat‑unit).
-    DeploymentState   UnitState        – Deployed / Mounted / etc.
+    DeploymentStatus   DeploymentPosition        – Deployed / Mounted / etc.
     ExperienceLevel UnitExperienceLevel – Raw, Green … Elite.
     EfficiencyLevel UnitEfficiencyLevel – StaticOps … Mobile.
 ──────────────────────────────────────────────────────────────────────────────── */
@@ -78,7 +78,7 @@ namespace HammerAndSickle.Models
         // More intel about parent unit.
         public Nationality UnitNationality = Nationality.USSR;
         public string UnitName { get; set; } = "Default";
-        public DeploymentState UnitState { get; set; } = DeploymentState.Deployed;
+        public DeploymentPosition DeploymentPosition { get; set; } = DeploymentPosition.Deployed;
         public ExperienceLevel UnitExperienceLevel = ExperienceLevel.Raw;
         public EfficiencyLevel UnitEfficiencyLevel = EfficiencyLevel.StaticOperations;
 
