@@ -139,9 +139,9 @@ namespace HammerAndSickle.Models
                 Role = role;
                 Side = side;
                 Nationality = nationality;
-                IsEmbarkable = isEmbarkable;
-                IsMountable = isMountable;
-                _deploymentPosition = DeploymentPosition.Deployed;
+
+                // Initialize deployment position based on embarkable and mountable states
+                InitializeDeploymentSystem(isEmbarkable, isMountable);
 
                 // Set profile IDs
                 EmbarkedProfileID = embarkProfileID;

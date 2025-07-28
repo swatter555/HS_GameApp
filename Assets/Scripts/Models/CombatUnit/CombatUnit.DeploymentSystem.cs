@@ -86,6 +86,22 @@ Important Implementation Details
 
         #endregion //Properties
 
+        #region Initialization
+
+        /// <summary>
+        /// Intializes the deployment system for the combat unit.
+        /// </summary>
+        /// <param name="embarkable"></param>
+        /// <param name="mountable"></param>
+        private void InitializeDeploymentSystem(bool embarkable, bool mountable)
+        {
+            IsEmbarkable = embarkable;
+            IsMountable = mountable;
+            _deploymentPosition = DeploymentPosition.Deployed;
+        }
+
+        #endregion
+
 
         #region Deployment State Machine
 
@@ -95,13 +111,6 @@ Important Implementation Details
         public bool TryDeployUP(out string errorMsg, bool onAirbase = false, bool onPort = false)
         {
             errorMsg = string.Empty;
-
-            // Checks if up deployment is allowed based on current state.
-            if (DeploymentPosition == DeploymentPosition.Embarked)
-            {
-                errorMsg = $"{UnitName} is embarked and cannot deploy up.";
-                return false;
-            }
 
             // Get the current deployment position.
             DeploymentPosition oldPosition = _deploymentPosition;
@@ -131,19 +140,72 @@ Important Implementation Details
             // Decrement the deployment actions.
             DeploymentActions.DecrementCurrent();
 
-            // Reset the movement points for the CombatUnit.
+            // Consume movement points for the deployment action BEFORE profile change
+            float movementCost = CUConstants.DEPLOYMENT_ACTION_MOVEMENT_COST * MovementPoints.Max;
+            MovementPoints.SetCurrent(MovementPoints.Current - movementCost);
+
+            // Reset the movement points for the CombatUnit, preserves used movt points.
             UpdateMovementPointsForProfile();
 
             // Apply or remove the Mobile movement bonus.
-            if (targetPosition == DeploymentPosition.Mobile) ApplyMobileBonus();
+            if (_deploymentPosition == DeploymentPosition.Mobile) ApplyMobileBonus();
             else RemoveMobileBonus();
             
             return true;
         }
 
-        public bool TryDeployDOWN()
+        /// <summary>
+        /// Attempt to change the deployment state of the combat unit to a lower level (more defensive).
+        /// </summary>
+        /// <param name="errorMsg">Error message if deployment fails</param>
+        /// <param name="isBeachhead">True if Marines are debarking from sea to land</param>
+        /// <returns>True if deployment succeeded, false otherwise</returns>
+        public bool TryDeployDOWN(out string errorMsg, bool isBeachhead = false)
         {
-            return false;
+            errorMsg = string.Empty;
+
+            // Check if we're already at the lowest deployment level
+            if (DeploymentPosition == DeploymentPosition.Fortified)
+            {
+                errorMsg = $"{UnitName} is already at minimum deployment level (Fortified).";
+                return false;
+            }
+
+            // Get the current deployment position
+            DeploymentPosition oldPosition = _deploymentPosition;
+
+            // Determine target position based on special rules
+            DeploymentPosition targetPosition = GetDownwardTargetPosition(oldPosition);
+
+            // Conduct comprehensive checks for state transition
+            if (!CanChangeToState(targetPosition, out errorMsg))
+                return false;
+
+            // Special checks for debarking from Embarked state
+            if (!SpecialDebarkmentChecks(out errorMsg, oldPosition, isBeachhead))
+                return false;
+
+            // Execute the state transition
+            _deploymentPosition = targetPosition;
+
+            // Consume supplies
+            ConsumeSupplies(CUConstants.COMBAT_STATE_SUPPLY_TRANSITION_COST);
+
+            // Decrement the deployment actions
+            DeploymentActions.DecrementCurrent();
+
+            // Consume movement points for the deployment action BEFORE profile change
+            float movementCost = CUConstants.DEPLOYMENT_ACTION_MOVEMENT_COST * MovementPoints.Max;
+            MovementPoints.SetCurrent(MovementPoints.Current - movementCost);
+
+            // Reset the movement points for the CombatUnit, preserves used movement points
+            UpdateMovementPointsForProfile();
+
+            // Apply or remove the Mobile movement bonus
+            if (_deploymentPosition == DeploymentPosition.Mobile) ApplyMobileBonus();
+            else RemoveMobileBonus();
+
+            return true;
         }
 
         /// <summary>
@@ -339,6 +401,13 @@ Important Implementation Details
                 }
             }
 
+            // Check if the target state is valid
+            if (MovementPoints.Current < CUConstants.DEPLOYMENT_ACTION_MOVEMENT_COST * MovementPoints.Max)
+            {
+                errorMessage = $"{UnitName} does not have enough movement points to change states ({MovementPoints.Current:F1} available, {CUConstants.DEPLOYMENT_ACTION_MOVEMENT_COST} required)";
+                return false;
+            }
+
             return true;
         }
 
@@ -368,6 +437,76 @@ Important Implementation Details
             }
 
             // All other units (including helicopters) can change states
+            return true;
+        }
+
+        /// <summary>
+        /// Determines the target deployment position when deploying down.
+        /// Handles the special case where Embarked always goes to Deployed.
+        /// </summary>
+        /// <param name="currentPosition">Current deployment position</param>
+        /// <returns>Target deployment position</returns>
+        private DeploymentPosition GetDownwardTargetPosition(DeploymentPosition currentPosition)
+        {
+            // Special case: Embarked always goes to Deployed (bypasses Mobile)
+            if (currentPosition == DeploymentPosition.Embarked)
+            {
+                return DeploymentPosition.Deployed;
+            }
+
+            // All other positions go down one step linearly
+            return currentPosition - 1;
+        }
+
+        /// <summary>
+        /// Performs special validation checks for debarking from Embarked state.
+        /// </summary>
+        /// <param name="errorMsg">Error message if checks fail</param>
+        /// <param name="currentPosition">Current deployment position</param>
+        /// <param name="isBeachhead">True if Marines are debarking from sea to land</param>
+        /// <returns>True if checks pass, false otherwise</returns>
+        private bool SpecialDebarkmentChecks(out string errorMsg, DeploymentPosition currentPosition, bool isBeachhead)
+        {
+            errorMsg = string.Empty;
+
+            // Only need special checks when debarking from Embarked state
+            if (currentPosition != DeploymentPosition.Embarked)
+                return true;
+
+            // Marine units have special debarking requirements
+            if (Classification == UnitClassification.MAR || Classification == UnitClassification.MMAR)
+            {
+                // Marines can debark on beachheads (from sea to land)
+                // Other hex legality is handled by external classes
+                if (!isBeachhead)
+                {
+                    // This might be a land-based debarkation, which should be valid
+                    // We'll allow it and let other systems validate hex legality
+                }
+            }
+
+            // Airborne units debarking (parachute landing)
+            if (Classification == UnitClassification.AB || Classification == UnitClassification.MAB)
+            {
+                // Airborne units can debark anywhere their transport can legally be
+                // Hex legality validation happens elsewhere
+            }
+
+            // Air Mobile units debarking (helicopter landing)
+            if (Classification == UnitClassification.AM || Classification == UnitClassification.MAM)
+            {
+                // Air Mobile units can debark anywhere helicopters can land
+                // Hex legality validation happens elsewhere
+            }
+
+            // Special Forces have flexible transport options
+            if (Classification == UnitClassification.SPECF)
+            {
+                // Special Forces can debark from any transport type
+                // Hex legality validation happens elsewhere
+            }
+
+            // All checks passed
             return true;
         }
 
