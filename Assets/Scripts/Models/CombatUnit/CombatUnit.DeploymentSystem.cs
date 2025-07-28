@@ -5,66 +5,78 @@ using HammerAndSickle.Services;
 namespace HammerAndSickle.Models
 {
 /*────────────────────────────────────────────────────────────────────────────
- CombatUnit.DeploymentStateMachine — simplified linear deployment state transitions
+ CombatUnit.DeploymentSystem — linear deployment state machine with tactical resource management
  ────────────────────────────────────────────────────────────────────────────────
 
 Summary
 ═══════
-Partial class extension that implements a simplified linear deployment state machine
-for CombatUnit. Units progress through deployment states by incrementing or decrementing
-enum values, with automatic resource consumption, profile switching, and unit-type
-specific validation. Replaces the complex adjacency-based system with streamlined
-linear progression while maintaining tactical depth through resource costs and
-unit capabilities.
+Partial class extension implementing a simplified linear deployment state machine for CombatUnit.
+Units progress through six deployment states via enum arithmetic, consuming deployment actions,
+movement points, and supplies for each transition. The system balances tactical mobility versus
+defensive preparation through resource costs and combat effectiveness modifiers.
 
-The system handles state transitions from lower enum values (defensive positions) to
-higher enum values (mobile/embarked positions), with special logic for dis-entrenchment
-and embarked operations requiring specific facility access.
+Deployment states progress from defensive (lower enum values) to mobile (higher enum values):
+Fortified (0) → Entrenched (1) → HastyDefense (2) → Deployed (3) → Mobile (4) → Embarked (5)
+
+Units deploy UP toward mobility/embarkation and DOWN toward defensive entrenchment. Special
+logic handles dis-entrenchment shortcuts (Fortified/Entrenched → Deployed before embarking)
+and debarkation rules (Embarked → Deployed, bypassing Mobile). Profile switching occurs
+automatically based on deployment state, with Mobile bonus system providing +2 movement points.
 
 Public Properties
 ═════════════════
-public DeploymentPosition DeploymentPosition { get; } // Current position in state machine
-public bool IsEmbarkable { get; private set; } // Can use air/naval transport
-public bool IsMountable { get; private set; } // Can use ground transport (APC/IFV)
+public DeploymentPosition DeploymentPosition { get; }
+public bool IsEmbarkable { get; private set; }
+public bool IsMountable { get; private set; }
 
-Public Method Signatures
-═══════════════════════
-public bool TryDeployUP(out string errorMsg, bool onAirbase = false, bool onPort = false) // Deploy up one state level with validation and resource consumption
-public bool TryDeployDOWN(out string errorMsg) // Deploy down one state level (not yet implemented)
+Constructors
+════════════
+private void InitializeDeploymentSystem(bool embarkable, bool mountable)
 
-Private Method Signatures
-════════════════════════
-private bool SpecialEmbarkmentChecks(out string errorMsg, DeploymentPosition targetPos, bool onAirbase = false, bool onPort = false) // Validates unit-type specific embarked requirements
-private void ApplyMobileBonus() // Adds +2 movement points when entering Mobile state
-private void RemoveMobileBonus() // Clears mobile bonus flag when leaving Mobile state
-private void UpdateMovementPointsForProfile() // Recalculates movement points based on active weapon profile
-private bool CanChangeToState(DeploymentPosition targetState, out string errorMessage) // Validates state transition legality
-private bool CanUnitTypeChangeStates() // Checks if unit classification allows state changes
+Public Methods
+══════════════
+public bool TryDeployUP(out string errorMsg, bool onAirbase = false, bool onPort = false) - Advances deployment state toward mobility/embarkation with facility-based validation for transport boarding
+public bool TryDeployDOWN(out string errorMsg, bool isBeachhead = false) - Retreats deployment state toward defensive entrenchment with special debarkation support for Marines
 
-Important Implementation Details
-═══════════════════════════════
-• **Linear Progression**: States progress via enum arithmetic (_deploymentPosition + 1 for up, -1 for down)
-  eliminating complex adjacency rules while maintaining tactical resource management.
+Private Methods
+═══════════════
+private bool SpecialEmbarkmentChecks(out string errorMsg, DeploymentPosition targetPos, bool onAirbase = false, bool onPort = false) - Validates unit-type specific requirements for embarking on air/naval transport
+private bool SpecialDebarkmentChecks(out string errorMsg, DeploymentPosition currentPosition, bool isBeachhead) - Validates unit-type specific requirements for debarking from transport
+private DeploymentPosition GetDownwardTargetPosition(DeploymentPosition currentPosition) - Calculates target position for downward transitions, handling Embarked→Deployed special case
+private void ApplyMobileBonus() - Adds +2 movement point bonus when entering Mobile state, sets tracking flag for serialization
+private void RemoveMobileBonus() - Clears mobile bonus tracking flag when leaving Mobile state
+private void UpdateMovementPointsForProfile() - Recalculates movement points based on active weapon profile, preserving usage percentage across profile switches
+private bool CanChangeToState(DeploymentPosition targetState, out string errorMessage) - Comprehensive validation including unit type restrictions, resource requirements, and efficiency limitations
+private bool CanUnitTypeChangeStates() - Determines if unit classification permits state changes (excludes fixed-wing aircraft and base facilities)
 
-• **Automatic Profile Switching**: GetActiveWeaponSystemProfile() handles profile transitions automatically
-  based on deployment state, with Embarked using transport profiles, Mobile using mounted profiles,
-  and other states using deployed profiles.
+Important Design Notes
+══════════════════════
+• **Linear State Progression**: Deployment UP/DOWN uses enum arithmetic (+1/-1) with two special cases:
+  dis-entrenchment (Fortified/Entrenched → Deployed before embarking) and debarkation (Embarked → Deployed).
 
-• **Dis-entrenchment Logic**: Units in Fortified or Entrenched positions are forced to Deployed
-  state before embarking, representing abandonment of defensive positions.
+• **Resource Consumption Pattern**: All transitions consume 1 deployment action, 0.25 days supply, and
+  50% of maximum movement points, creating meaningful tactical trade-offs between positioning and action economy.
 
-• **Resource Consumption**: Each transition consumes 1 deployment action, 0.25 days supply,
-  and resets movement points based on the new active profile.
+• **Profile-Based Movement Points**: Movement points recalculate based on GetActiveWeaponSystemProfile()
+  which switches between Embarked (transport), Mobile (mounted), and Deployed profiles automatically.
 
-• **Unit-Type Restrictions**: Airborne units require airbases for embarked transitions,
-  Marines require ports, Special Forces have flexible transport options, and fixed-wing
-  aircraft/bases cannot change states.
+• **Mobile Bonus System**: Units entering Mobile state receive +2 movement points bonus applied after
+  profile calculation. The _mobileBonusApplied flag tracks this state for serialization persistence.
 
-• **Mobile Bonus System**: Units entering Mobile state receive +2 movement points bonus
-  applied after profile-based movement point calculation, with bonus flag tracked for serialization.
+• **Movement Point Gating**: State transitions require sufficient movement points (50% of maximum) to prevent
+  exploitation while maintaining natural turn flow limitations.
 
-• **Movement Point Gating**: All state transitions require sufficient movement points based
-  on percentage costs of maximum movement, preventing exploitation while maintaining turn flow.
+• **Unit-Type Restrictions**: Fixed-wing aircraft (ASF, MRF, ATT, BMB, RECONA) and base facilities
+  (HQ, DEPOT, AIRB) cannot change deployment states. Helicopters follow normal state machine rules.
+
+• **Facility-Based Embarkation**: Airborne units require airbases, Marines require ports, Air Mobile units
+  use helicopter transport (embark anywhere), Special Forces have flexible transport options based on profile.
+
+• **Efficiency Integration**: Static Operations efficiency prevents movement from defensive states and
+  blocks transitions to Mobile, representing severely degraded unit readiness.
+
+• **External Validation Delegation**: Hex legality, terrain restrictions, and map-based validation occur
+  in other systems. DeploymentSystem focuses purely on unit capability and resource management.
 
 ────────────────────────────────────────────────────────────────────────────── */
     public partial class CombatUnit
@@ -85,6 +97,7 @@ Important Implementation Details
         public bool IsMountable { get; private set; }  // Equipped with ground transport (e.g., trucks, APCs).
 
         #endregion //Properties
+
 
         #region Initialization
 
@@ -236,7 +249,7 @@ Important Implementation Details
                 }
 
                 // Airborne and mechanized airborne must be on an airbase to deploy to Embarked position.
-                if (Classification == UnitClassification.AIRB || Classification == UnitClassification.MAB)
+                if (Classification == UnitClassification.AB || Classification == UnitClassification.MAB)
                 {
                     if (!onAirbase)
                     {

@@ -1,10 +1,84 @@
-using HammerAndSickle.Services;
+﻿using HammerAndSickle.Services;
 using System;
 using System.Collections.Generic;
 using HammerAndSickle.Controllers;
 
 namespace HammerAndSickle.Models
 {
+/*────────────────────────────────────────────────────────────────────────────
+ CombatUnit.LeaderSystem — commanding officer interface and skill bonus integration
+ ────────────────────────────────────────────────────────────────────────────────
+
+Summary
+═══════
+Partial class extension providing the interface layer for commanding officer assignment
+and skill-based bonus retrieval in CombatUnit. Leaders are referenced by string ID and
+resolved through GameDataManager lookup, eliminating circular serialization dependencies
+while maintaining clean API access. The system handles bidirectional leader-unit
+relationships, reputation awards, and skill bonus queries for combat calculations.
+
+Leaders provide multiplicative and additive bonuses to unit capabilities through unlocked
+skills, command grades, and reputation-based progression. The interface delegates to the
+deeper Leader model for skill trees, reputation management, and grade promotions while
+exposing only the essential unit-specific functionality.
+
+Public Properties
+═════════════════
+public string LeaderID { get; internal set; }
+public bool IsLeaderAssigned { get; }
+public Leader UnitLeader { get; }
+
+Constructors
+════════════
+(No initialization method - LeaderID defaults to null)
+
+Public Methods
+══════════════
+public bool AssignLeader(string leaderID) - Assigns commanding officer by ID with bidirectional relationship management and validation
+public bool RemoveLeader() - Removes current leader with proper cleanup and UI messaging
+public Dictionary<SkillBonusType, float> GetLeaderBonuses() - Returns all active skill bonuses as type-value pairs for combat calculations
+public bool HasLeaderCapability(SkillBonusType bonusType) - Checks for specific boolean capabilities (breakthrough, emergency resupply, etc.)
+public float GetLeaderBonus(SkillBonusType bonusType) - Retrieves specific bonus value for combat modifier calculations
+public string GetLeaderName() - Display name for UI elements
+public CommandGrade GetLeaderGrade() - Command grade for promotion tracking and bonus eligibility
+public int GetLeaderReputation() - Current reputation points for advancement system
+public string GetLeaderRank() - Nationality-specific formatted rank string for display
+public CommandAbility GetLeaderCommandAbility() - Base command ability modifier for combat effectiveness
+public bool HasLeaderSkill(Enum skill) - Queries specific skill unlock status from leader's skill tree
+public void AwardLeaderReputation(CUConstants.ReputationAction actionType, float contextMultiplier = 1.0f) - Awards action-based reputation with context scaling
+public void AwardLeaderReputation(int amount) - Direct reputation point award for scenario events
+
+Private Methods
+═══════════════
+(None - pure interface layer delegating to Leader model and GameDataManager)
+
+Important Design Notes
+══════════════════════
+• **String-Based References**: Leaders are stored as LeaderID strings and resolved via GameDataManager
+  lookup to prevent circular serialization issues while maintaining object relationships.
+
+• **Bidirectional Relationship Management**: AssignLeader() and RemoveLeader() coordinate both unit-side
+  and leader-side assignment state to maintain referential integrity across the object graph.
+
+• **Null-Safe Interface**: All getter methods provide safe defaults (empty strings, zero values, default
+  enums) when no leader is assigned, preventing null reference exceptions in combat calculations.
+
+• **UI Message Integration**: Leader assignment/removal operations automatically generate user messages
+  through AppService.CaptureUiMessage() for command structure visibility.
+
+• **Exception Delegation**: Error handling defers to AppService.HandleException() with appropriate
+  severity levels, maintaining consistent logging while preserving method return values.
+
+• **Combat Integration**: GetLeaderBonuses() provides the primary interface for combat system bonus
+  application, returning only non-zero values to optimize calculation loops.
+
+• **Reputation Flow**: Reputation awards flow from unit actions through this interface to the leader's
+  skill progression system, enabling experience-based advancement and skill unlocks.
+
+• **GameDataManager Dependency**: All leader access requires functional GameDataManager.Instance,
+  creating initialization order dependency that must be managed during game startup.
+
+────────────────────────────────────────────────────────────────────────────── */
     public partial class CombatUnit
     {
         #region Properties
@@ -31,6 +105,19 @@ namespace HammerAndSickle.Models
         }
 
         #endregion // Properties
+
+
+        #region Initialization
+
+        /// <summary>
+        /// Initializes the leader system for the combat unit.
+        /// </summary>
+        private void InitializeLeaderSystem()
+        {
+            LeaderID = null; // No leader assigned by default
+        }
+
+        #endregion
 
 
         #region Leader System
