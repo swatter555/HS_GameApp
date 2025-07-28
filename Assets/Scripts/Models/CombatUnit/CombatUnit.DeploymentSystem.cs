@@ -121,6 +121,13 @@ Important Design Notes
         {
             errorMsg = string.Empty;
 
+            // Check for an invalid profile.
+            if (MovementPoints.Max <= 0f)
+            {
+                errorMsg = "Unit has invalid movement profile; cannot deploy.";
+                return false;
+            }
+
             // Get the current deployment position.
             DeploymentPosition oldPosition = _deploymentPosition;
 
@@ -171,6 +178,13 @@ Important Design Notes
         public bool TryDeployDOWN(out string errorMsg, bool isBeachhead = false)
         {
             errorMsg = string.Empty;
+
+            // Check for an invalid profile.
+            if (MovementPoints.Max <= 0f)
+            {
+                errorMsg = "Unit has invalid movement profile; cannot deploy.";
+                return false;
+            }
 
             // Check if we're already at the lowest deployment level
             if (DeploymentPosition == DeploymentPosition.Fortified)

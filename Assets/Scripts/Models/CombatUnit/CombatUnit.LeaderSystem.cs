@@ -134,18 +134,28 @@ Important Design Notes
                 // Validate the incoming LeaderID.
                 Leader newLeader = GameDataManager.Instance.GetLeader(leaderID);
                 if (newLeader == null)
-                    throw new ArgumentException($"Leader with ID {leaderID} does not exist in the game data.", nameof(leaderID));
+                {
+                    AppService.HandleException(CLASS_NAME, "AssignLeader", new Exception("Missing leader: " + leaderID));
+                    LeaderID = null;
+                    return false;
+                }
 
                 // Check if the new leader is already assigned to another unit.
                 if (newLeader.IsAssigned)
-                    throw new InvalidOperationException($"Leader {newLeader.Name} is already assigned to another unit.");
+                {
+                    AppService.CaptureUiMessage($"{newLeader.FormattedRank} {newLeader.Name} is already assigned to another unit.");
+                    return false;
+                }
 
                 // If there is already a leader assigned, we must remove them first.
                 if (IsLeaderAssigned)
                 {
                     // Make sure current leader is valid before proceeding.
                     if (UnitLeader == null)
-                        throw new InvalidOperationException("Current leader is null, cannot unassign.");
+                    {                         
+                        AppService.HandleException(CLASS_NAME, "AssignLeader", new Exception("Current leader is null when trying to assign a new leader."));
+                        return false;
+                    }
 
                     // Capture UI message about the leader being unassigned.
                     AppService.CaptureUiMessage($"{UnitLeader.FormattedRank} {UnitLeader.Name} has been unassigned from {UnitName}.");

@@ -45,6 +45,8 @@ WeaponSystems MobileProfileID { get; private set; }
 WeaponSystems DeployedProfileID { get; private set; }
 IntelProfileTypes IntelProfileType { get; internal set; }
 
+EfficiencyLevel EfficiencyLevel { get; internal set; }
+
 StatsMaxCurrent MoveActions { get; private set; }
 StatsMaxCurrent CombatActions { get; private set; }
 StatsMaxCurrent DeploymentActions { get; private set; }
@@ -243,7 +245,6 @@ Developer notes
   all external dependencies (AppService, GameDataManager, WeaponSystemsDatabase)
   provide thread-safe operations for concurrent access during AI processing and
   UI updates. Modification operations should occur on the main thread only.
-
 ────────────────────────────────────────────────────────────────────────────── */
 namespace HammerAndSickle.Models
 {
@@ -296,6 +297,9 @@ namespace HammerAndSickle.Models
 
         // The profile used to generate intelligence reports.
         public IntelProfileTypes IntelProfileType { get; internal set; }
+
+        // How combat effective is a unit is tracked by EfficiencyLevel.
+        public EfficiencyLevel EfficiencyLevel { get; internal set; }
 
         // Action counts using StatsMaxCurrent
         public StatsMaxCurrent MoveActions { get; private set; }
