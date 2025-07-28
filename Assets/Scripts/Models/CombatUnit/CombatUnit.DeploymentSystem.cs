@@ -44,7 +44,6 @@ private bool SpecialEmbarkmentChecks(out string errorMsg, DeploymentPosition tar
 private bool SpecialDebarkmentChecks(out string errorMsg, DeploymentPosition currentPosition, bool isBeachhead) - Validates unit-type specific requirements for debarking from transport
 private DeploymentPosition GetDownwardTargetPosition(DeploymentPosition currentPosition) - Calculates target position for downward transitions, handling Embarked→Deployed special case
 private void ApplyMobileBonus() - Adds +2 movement point bonus when entering Mobile state, sets tracking flag for serialization
-private void RemoveMobileBonus() - Clears mobile bonus tracking flag when leaving Mobile state
 private void UpdateMovementPointsForProfile() - Recalculates movement points based on active weapon profile, preserving usage percentage across profile switches
 private bool CanChangeToState(DeploymentPosition targetState, out string errorMessage) - Comprehensive validation including unit type restrictions, resource requirements, and efficiency limitations
 private bool CanUnitTypeChangeStates() - Determines if unit classification permits state changes (excludes fixed-wing aircraft and base facilities)
@@ -61,7 +60,7 @@ Important Design Notes
   which switches between Embarked (transport), Mobile (mounted), and Deployed profiles automatically.
 
 • **Mobile Bonus System**: Units entering Mobile state receive +2 movement points bonus applied after
-  profile calculation. The _mobileBonusApplied flag tracks this state for serialization persistence.
+  profile calculation.
 
 • **Movement Point Gating**: State transitions require sufficient movement points (50% of maximum) to prevent
   exploitation while maintaining natural turn flow limitations.
@@ -77,15 +76,12 @@ Important Design Notes
 
 • **External Validation Delegation**: Hex legality, terrain restrictions, and map-based validation occur
   in other systems. DeploymentSystem focuses purely on unit capability and resource management.
-
 ────────────────────────────────────────────────────────────────────────────── */
     public partial class CombatUnit
     {
         #region Fields
 
         private DeploymentPosition _deploymentPosition = DeploymentPosition.Deployed;
-        private bool _mobileBonusApplied = false;                  // Persisted runtime flag, true when MOBILE_MOVEMENT_BONUS active.
-        private const string SERIAL_KEY_MOBILE_BONUS = "mobBonus"; // Serialization identifier for _mobileBonusApplied
 
         #endregion
 
@@ -160,9 +156,8 @@ Important Design Notes
             // Reset the movement points for the CombatUnit, preserves used movt points.
             UpdateMovementPointsForProfile();
 
-            // Apply or remove the Mobile movement bonus.
+            // Apply the Mobile movement bonus if applicable.
             if (_deploymentPosition == DeploymentPosition.Mobile) ApplyMobileBonus();
-            else RemoveMobileBonus();
             
             return true;
         }
@@ -214,9 +209,8 @@ Important Design Notes
             // Reset the movement points for the CombatUnit, preserves used movement points
             UpdateMovementPointsForProfile();
 
-            // Apply or remove the Mobile movement bonus
+            // Apply the Mobile movement bonus if applicable.
             if (_deploymentPosition == DeploymentPosition.Mobile) ApplyMobileBonus();
-            else RemoveMobileBonus();
 
             return true;
         }
@@ -307,18 +301,6 @@ Important Design Notes
             // Set new movement points.
             MovementPoints.SetMax(newMax);
             MovementPoints.SetCurrent(newCurrent);
-
-            // Set the mobile bonus flag to true.
-            _mobileBonusApplied = true;
-        }
-
-        /// <summary>
-        /// Removes the mobile bonus from the movement points if it has been applied.
-        /// </summary>
-        private void RemoveMobileBonus()
-        {
-            // Set the mobile bonus flag to false.
-            _mobileBonusApplied = false;
         }
 
         /// <summary>
