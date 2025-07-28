@@ -6,6 +6,245 @@ using System.Runtime.Serialization;
 using UnityEngine;
 using HammerAndSickle.Controllers;
 
+/*────────────────────────────────────────────────────────────────────────────
+ CombatUnit ─ universal military unit representation with modular subsystems
+────────────────────────────────────────────────────────────────────────────────
+
+Summary
+═══════
+• Central game entity representing all military units from tank regiments to supply
+  depots through a unified object model. Units operate on sophisticated action
+  economy mechanics where tactical decisions consume deployment actions, combat
+  actions, movement points, and supplies. The design emphasizes resource trade-offs
+  between positioning, offensive capability, and logistical sustainability.
+
+• CombatUnit serves as the universal hub for diverse military capabilities using
+  classification-based specialization rather than inheritance hierarchies. Ground
+  units, aircraft, helicopters, and base facilities share the same core framework
+  while accessing specialized behaviors through partial class extensions and
+  profile-based stat systems.
+
+• Five interconnected subsystems provide tactical depth: deployment state machines
+  for positioning trade-offs, experience progression for veteran bonuses, facility
+  management for base operations, leader integration for skill-based enhancements,
+  and profile-driven combat calculations for authentic military effectiveness.
+
+Public properties
+═════════════════
+string UnitName { get; set; }
+string UnitID { get; private set; }
+UnitType UnitType { get; private set; }
+UnitClassification Classification { get; private set; }
+UnitRole Role { get; private set; }
+Side Side { get; private set; }
+Nationality Nationality { get; private set; }
+bool IsBase { get; }
+
+WeaponSystems EmbarkedProfileID { get; private set; }
+WeaponSystems MobileProfileID { get; private set; }
+WeaponSystems DeployedProfileID { get; private set; }
+IntelProfileTypes IntelProfileType { get; internal set; }
+
+StatsMaxCurrent MoveActions { get; private set; }
+StatsMaxCurrent CombatActions { get; private set; }
+StatsMaxCurrent DeploymentActions { get; private set; }
+StatsMaxCurrent OpportunityActions { get; private set; }
+StatsMaxCurrent IntelActions { get; private set; }
+
+StatsMaxCurrent HitPoints { get; private set; }
+StatsMaxCurrent DaysSupply { get; private set; }
+StatsMaxCurrent MovementPoints { get; private set; }
+Coordinate2D MapPos { get; internal set; }
+SpottedLevel SpottedLevel { get; private set; }
+
+int ExperiencePoints { get; internal set; }
+ExperienceLevel ExperienceLevel { get; internal set; }
+EfficiencyLevel EfficiencyLevel { get; internal set; }
+
+string LeaderID { get; internal set; }
+bool IsLeaderAssigned { get; }
+Leader UnitLeader { get; }
+
+DeploymentPosition DeploymentPosition { get; }
+bool IsEmbarkable { get; private set; }
+bool IsMountable { get; private set; }
+
+int BaseDamage { get; private set; }
+OperationalCapacity OperationalCapacity { get; private set; }
+FacilityType FacilityType { get; private set; }
+DepotSize DepotSize { get; private set; }
+float StockpileInDays { get; private set; }
+IReadOnlyList<CombatUnit> AirUnitsAttached { get; private set; }
+
+Constructors
+════════════
+public CombatUnit(string unitName, UnitType unitType, UnitClassification classification,
+    UnitRole role, Side side, Nationality nationality, IntelProfileTypes intelProfileType,
+    WeaponSystems deployedProfileID, bool isMountable = false, 
+    WeaponSystems mobileProfileID = WeaponSystems.DEFAULT, bool isEmbarkable = false,
+    WeaponSystems embarkProfileID = WeaponSystems.DEFAULT, 
+    DepotCategory category = DepotCategory.Secondary, DepotSize size = DepotSize.Small)
+
+protected CombatUnit(SerializationInfo info, StreamingContext context)
+
+Public methods
+══════════════
+WeaponSystemProfile GetDeployedProfile()
+WeaponSystemProfile GetMobileProfile()
+WeaponSystemProfile GetEmbarkedProfile()
+WeaponSystemProfile GetActiveWeaponSystemProfile()
+WeaponSystemProfile GetCurrentCombatStrength()
+IntelReport GenerateIntelReport(SpottedLevel spottedLevel = SpottedLevel.Level1)
+
+void RefreshAllActions()
+void RefreshMovementPoints()
+void SetSpottedLevel(SpottedLevel spottedLevel)
+void TakeDamage(float damage)
+void Repair(float repairAmount)
+bool ConsumeSupplies(float amount)
+float ReceiveSupplies(float amount)
+bool IsDestroyed()
+
+bool PerformCombatAction()
+bool PerformMoveAction(int movtCost)
+bool PerformIntelAction()
+bool PerformOpportunityAction()
+Dictionary<ActionTypes, float> GetAvailableActions()
+float GetDeployActions()
+float GetCombatActions()
+float GetMoveActions()
+float GetOpportunityActions()
+float GetIntelActions()
+
+bool CanMove()
+float GetSupplyStatus()
+void SetEfficiencyLevel(EfficiencyLevel level)
+void DecreaseEfficiencyLevelBy1()
+void IncreaseEfficiencyLevelBy1()
+
+void SetPosition(Coordinate2D newPos)
+bool CanMoveTo(Coordinate2D targetPos)
+float GetDistanceTo(Coordinate2D targetPos)
+float GetDistanceTo(CombatUnit otherUnit)
+
+object Clone()
+void GetObjectData(SerializationInfo info, StreamingContext context)
+bool HasUnresolvedReferences()
+IReadOnlyList<string> GetUnresolvedReferenceIDs()
+void ResolveReferences(GameDataManager manager)
+List<string> ValidateInternalConsistency()
+
+Private methods
+═══════════════
+void InitializeActionCounts()
+void InitializeMovementPoints()
+float GetFinalCombatRatingModifier()
+float GetFinalCombatRatingModifier_Aircraft()
+float GetStrengthModifier()
+float GetCombatStateModifier()
+float GetEfficiencyModifier()
+bool ConsumeMovementPoints(float points)
+float GetDeployMovementCost()
+float GetCombatMovementCost()
+float GetIntelMovementCost()
+
+Partial Class Architecture
+═════════════════════════
+CombatUnit is implemented as a partial class distributed across multiple files for
+logical organization and maintainability:
+
+**CombatUnit.DeploymentSystem.cs** - Linear deployment state machine managing six
+tactical positions (Fortified to Embarked) with resource-based transitions. Units
+progress through defensive entrenchment or mobile deployment consuming deployment
+actions, movement points, and supplies. Profile switching occurs automatically
+based on state, with special rules for dis-entrenchment and facility-based
+embarkation requirements.
+
+**CombatUnit.ExperienceSystem.cs** - Progressive unit advancement through six
+experience levels (Raw to Elite) affecting combat effectiveness via multiplicative
+bonuses. Units gain experience through combat actions and battlefield achievements,
+with level synchronization maintaining consistency between experience points and
+derived advancement tiers.
+
+**CombatUnit.Facility.cs** - Base facility operations for HQ, Airbase, and Supply
+Depot units including damage-based operational capacity degradation, air unit
+attachment management, and supply depot logistics with stockpile generation,
+distance-based projection efficiency, and special transport capabilities for main
+depots.
+
+**CombatUnit.LeaderSystem.cs** - Command officer integration providing skill-based
+bonuses through string ID reference resolution. Leaders provide multiplicative and
+additive combat bonuses via unlocked skills while maintaining bidirectional
+assignment relationships and reputation flow for advancement systems.
+
+System Integration Architecture
+═══════════════════════════════
+The CombatUnit ecosystem operates through several key integration patterns:
+
+**Profile-Based Statistics** - Units reference shared WeaponSystemProfile templates
+via enum identifiers rather than storing individual combat values. The system
+automatically switches between Deployed, Mobile, and Embarked profiles based on
+deployment state, ensuring authentic tactical behavior while minimizing memory
+usage and maintaining data consistency across identical unit types.
+
+**Action Economy Framework** - All meaningful unit activities consume specific
+resources through a unified action system. Combat actions cost 25% maximum movement
+points plus supplies, deployment transitions cost 50% movement points plus deployment
+actions, and movement consumes both move actions and variable movement points based
+on terrain. This creates natural tactical trade-offs between positioning, combat
+effectiveness, and resource conservation.
+
+**Modifier Stacking System** - Combat effectiveness emerges from multiplicative
+stacking of strength modifiers (hit point percentage), deployment state bonuses
+(defensive positioning), efficiency levels (operational readiness), experience
+multipliers (veteran bonuses), and leader skill effects. The GetCurrentCombatStrength()
+method applies all modifiers to create temporary profiles for immediate calculations
+without mutating base statistics.
+
+**Reference Resolution Pattern** - Complex object relationships use string ID
+references resolved through GameDataManager lookup to prevent circular serialization
+dependencies. Leaders, attached air units, and profile references maintain clean
+separation between persistent data storage and runtime object graphs, enabling
+robust save/load functionality.
+
+**State Validation Cascade** - Unit capabilities depend on hierarchical validation:
+destroyed units cannot act, critically supplied units have restricted operations,
+Static Operations efficiency prevents movement from defensive states, and base
+facilities follow different action availability rules. This creates emergent
+tactical complexity from simple rule interactions.
+
+**Intelligence and Fog of War** - Units generate intelligence reports based on
+SpottedLevel and IntelProfileType, providing filtered information about enemy
+capabilities. The system balances authentic military uncertainty with gameplay
+clarity through configurable error margins and progressive revelation mechanics.
+
+Developer notes
+═══════════════
+• **Classification-Based Specialization** - Unit behaviors are determined by
+  UnitClassification enum values rather than inheritance hierarchies. This allows
+  runtime behavior switching and simplified serialization while maintaining type
+  safety through validation in the constructor and action methods.
+
+• **StatsMaxCurrent Pattern** - All dynamic unit resources (actions, hit points,
+  supplies, movement points) use the StatsMaxCurrent class for consistent maximum/
+  current value tracking with automatic validation and progress calculation support.
+
+• **Serialization Strategy** - The class implements custom ISerializable with
+  reference resolution support for complex object relationships. Profile references
+  are stored as enum values, leader assignments as string IDs, and attached units
+  as temporary ID collections resolved during deserialization.
+
+• **Exception Handling Integration** - All public methods use AppService.HandleException
+  with appropriate severity levels for consistent error logging and UI messaging.
+  Critical operations include defensive validation to prevent invalid state
+  transitions and resource corruption.
+
+• **Thread Safety Considerations** - While the class itself is not thread-safe,
+  all external dependencies (AppService, GameDataManager, WeaponSystemsDatabase)
+  provide thread-safe operations for concurrent access during AI processing and
+  UI updates. Modification operations should occur on the main thread only.
+
+────────────────────────────────────────────────────────────────────────────── */
 namespace HammerAndSickle.Models
 {
     /// <summary>
