@@ -27,7 +27,6 @@ Public Properties
 ═════════════════
 public int ExperiencePoints { get; internal set; }
 public ExperienceLevel ExperienceLevel { get; internal set; }
-public EfficiencyLevel EfficiencyLevel { get; internal set; }
 
 Constructors
 ════════════
@@ -81,7 +80,6 @@ Important Design Notes
 
         public int ExperiencePoints { get; internal set; }
         public ExperienceLevel ExperienceLevel { get; internal set; }
-        public EfficiencyLevel EfficiencyLevel { get; internal set; }
 
         #endregion // Properties
 
@@ -95,7 +93,6 @@ Important Design Notes
         {
             ExperiencePoints = 0;
             ExperienceLevel = ExperienceLevel.Raw;
-            EfficiencyLevel = EfficiencyLevel.FullyOperational;
         }
 
         #endregion
