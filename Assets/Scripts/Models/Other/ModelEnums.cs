@@ -109,19 +109,6 @@ namespace HammerAndSickle.Models
     }
 
     /// <summary>
-    /// The represents the current deployment state of a CombatUnit.
-    /// </summary>
-    public enum DeploymentState
-    {
-        InTransit,     // Mounted on an air transport
-        Mobile,        // Mounted on a ground transport
-        Deployed,      // Standard dismounted posture
-        HastyDefense,  // Quick entrenchment, moderate defense boost
-        Entrenched,    // Prepared defensive positions, stronger defense
-        Fortified      // Maximum defensive preparations, highest defense
-    }
-
-    /// <summary>
     /// The unit's special movement capabilities.
     /// </summary>
     public enum StrategicMobility
@@ -233,12 +220,27 @@ namespace HammerAndSickle.Models
     {
         Level0, // Not spotted
         Level1, // Unit name visible
-        Level2, // Above plus DeploymentState and an error rate of about 30%
+        Level2, // Above plus DeploymentStatus and an error rate of about 30%
         Level3, // Above plus EXP and EFF levels, and a 10% error rate.
         Level4, // Above plus no error rate.
     }
 
     #endregion // CombatUnit Enums
+
+
+    #region DeploymentStateMachine
+
+    public enum DeploymentPosition
+    {
+        Embarked = CUConstants.Embarked,
+        Mobile = CUConstants.Mobile,
+        Deployed = CUConstants.Deployed,
+        HastyDefense = CUConstants.HastyDefense,
+        Entrenched = CUConstants.Entrenched,
+        Fortified = CUConstants.Fortified
+    }
+
+    #endregion // DeploymentStateMachine
 
 
     #region LeaderEnums

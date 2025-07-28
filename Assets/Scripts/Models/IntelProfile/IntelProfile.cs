@@ -34,7 +34,7 @@ using HammerAndSickle.Services;
                                                  string unitName,
                                                  int currentHP,
                                                  Nationality nat,
-                                                 DeploymentState state,
+                                                 DeploymentStatus state,
                                                  ExperienceLevel xp,
                                                  EfficiencyLevel eff,
                                                  SpottedLevel spot = SpottedLevel.Level1)
@@ -191,25 +191,13 @@ namespace HammerAndSickle.Models
             }
         }
 
-        /// <summary>
-        /// Generates an IntelReport object containing bucketed weapon system data and unit metadata.
-        /// Applies fog-of-war effects based on spotted level to simulate realistic intelligence gathering.
-        /// </summary>
-        /// <param name="profileType">The organizational profile type for this unit</param>
-        /// <param name="unitName">Display name of the unit</param>
-        /// <param name="currentHitPoints">Current hit points representing unit strength</param>
-        /// <param name="nationality">National affiliation of the unit</param>
-        /// <param name="combatState">Current tactical posture of the unit</param>
-        /// <param name="xpLevel">Experience level of the unit</param>
-        /// <param name="effLevel">Operational efficiency level of the unit</param>
-        /// <param name="spottedLevel">Intelligence accuracy level (default Level1)</param>
-        /// <returns>IntelReport with categorized equipment data and unit metadata, or null if not spotted</returns>
+        
         public static IntelReport GenerateIntelReport(
             IntelProfileTypes profileType,
             string unitName,
             int currentHitPoints,
             Nationality nationality,
-            DeploymentState combatState,
+            DeploymentPosition deploymentPosition,
             ExperienceLevel xpLevel,
             EfficiencyLevel effLevel,
             SpottedLevel spottedLevel = SpottedLevel.Level1)
@@ -229,7 +217,7 @@ namespace HammerAndSickle.Models
                 {
                     UnitNationality = nationality,
                     UnitName = unitName,
-                    UnitState = combatState
+                    DeploymentPosition = deploymentPosition
                 };
 
                 // Level 1: Only unit name and basic metadata visible

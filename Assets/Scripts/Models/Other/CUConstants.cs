@@ -92,6 +92,18 @@ namespace HammerAndSickle.Models
         #endregion // CombatUnit Constants
 
 
+        #region Deployment Constants
+
+        public const int Embarked     = 5; // Embarked on air, helicopter, and naval transport
+        public const int Mobile       = 4; // Deployed in columns for movment.
+        public const int Deployed     = 3; // Deployed in combat formation.
+        public const int HastyDefense = 2; // Deployed defensively, intially prepared.
+        public const int Entrenched   = 1; // Deployed defensively, digging in.
+        public const int Fortified    = 0; // Deployed defensively, fortified position.
+
+        #endregion // Deployment Constants
+
+
         #region Leader Constants
 
         // Leader LeaderID generation
