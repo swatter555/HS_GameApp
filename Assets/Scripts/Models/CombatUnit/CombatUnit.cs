@@ -127,7 +127,9 @@ namespace HammerAndSickle.Models
                 if (!Enum.IsDefined(typeof(IntelProfileTypes), intelProfileType))
                     throw new ArgumentException("Invalid intel profile type", nameof(intelProfileType));
 
+                //---------------------------------
                 // Set identification and metadata
+                //---------------------------------
 
                 // Basic argument validation
                 if (string.IsNullOrWhiteSpace(unitName))
@@ -158,13 +160,14 @@ namespace HammerAndSickle.Models
                 // Initialize action counts based on unit type and classification
                 InitializeActionCounts();
 
-                // Initialize state with default values
-                ExperiencePoints = 0;
-                ExperienceLevel = ExperienceLevel.Raw;
-                EfficiencyLevel = EfficiencyLevel.FullyOperational;
-                
+                // Initialize the leader system
+                InitializeLeaderSystem();
+
+                // Set the initial spotted level
                 SpottedLevel = SpottedLevel.Level1;
-                LeaderID = null;
+
+                // Initialize experience system
+                InitializeExperienceSystem();
 
                 // Initialize StatsMaxCurrent properties
                 HitPoints = new StatsMaxCurrent(CUConstants.MAX_HP);

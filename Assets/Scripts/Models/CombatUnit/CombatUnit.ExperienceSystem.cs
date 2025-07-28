@@ -1,9 +1,80 @@
-using System;
+﻿using System;
 using UnityEngine;
 using HammerAndSickle.Services;
 
 namespace HammerAndSickle.Models
 {
+/*────────────────────────────────────────────────────────────────────────────
+ CombatUnit.ExperienceSystem — unit progression and combat effectiveness scaling
+ ────────────────────────────────────────────────────────────────────────────────
+
+Summary
+═══════
+Partial class extension managing unit experience progression from Raw recruits to Elite
+veterans through combat actions and battlefield achievements. Units accumulate experience
+points that advance through six experience levels, each providing multiplicative combat
+effectiveness bonuses ranging from -20% (Raw) to +30% (Elite). The system maintains
+tight synchronization between experience points and derived levels while providing
+progress tracking and advancement notifications.
+
+Experience progression follows traditional wargaming advancement: Raw (0) → Green (50) →
+Trained (120) → Experienced (220) → Veteran (330) → Elite (400). Units gain experience
+through combat, movement under threat, and scenario objectives, with advancement providing
+tangible tactical benefits through GetExperienceMultiplier() integration with combat
+calculations.
+
+Public Properties
+═════════════════
+public int ExperiencePoints { get; internal set; }
+public ExperienceLevel ExperienceLevel { get; internal set; }
+public EfficiencyLevel EfficiencyLevel { get; internal set; }
+
+Constructors
+════════════
+private void InitializeExperienceSystem()
+
+Public Methods
+══════════════
+public bool AddExperience(int points) - Adds experience points with validation, level progression, and advancement notifications
+public int SetExperience(int points) - Direct experience assignment with automatic level synchronization and clamping
+public int GetPointsToNextLevel() - Calculates experience points required for next advancement level
+public float GetExperienceProgress() - Returns advancement progress as percentage (0.0-1.0) for UI progress bars
+
+Private Methods
+═══════════════
+private ExperienceLevel CalculateExperienceLevel(int totalPoints) - Converts experience points to appropriate experience level enum
+private int GetMinPointsForLevel(ExperienceLevel level) - Returns minimum experience points required for specified level
+private ExperienceLevel GetNextLevel(ExperienceLevel currentLevel) - Determines next advancement level in progression sequence
+protected virtual void OnExperienceLevelChanged(ExperienceLevel previousLevel, ExperienceLevel newLevel) - Level advancement notification with UI messaging
+private float GetExperienceMultiplier() - Combat effectiveness multiplier based on current experience level for integration with combat calculations
+
+Important Design Notes
+══════════════════════
+• **Point-Level Synchronization**: SetExperience() and AddExperience() maintain strict consistency
+  between ExperiencePoints and ExperienceLevel by recalculating level from the same clamped value.
+
+• **Progressive Combat Bonuses**: Experience multipliers range from 0.8× (Raw) to 1.3× (Elite),
+  providing meaningful tactical progression that scales with GetFinalCombatRatingModifier() calculations.
+
+• **Clamped Advancement**: Experience points are constrained to 0-400 range with automatic capping
+  at Elite level to prevent overflow while maintaining progression incentives.
+
+• **Gain Limiting**: AddExperience() enforces MAX_EXP_GAIN_PER_ACTION limit to prevent exploitation
+  while allowing natural battlefield advancement through repeated engagements.
+
+• **UI Integration**: OnExperienceLevelChanged() automatically generates advancement messages through
+  AppService.CaptureUiMessage() for player feedback on unit development.
+
+• **Progress Tracking**: GetExperienceProgress() provides normalized advancement percentage for
+  UI progress bars and advancement indicators, returning 1.0 for Elite units.
+
+• **Efficiency Independence**: Experience system operates independently from EfficiencyLevel
+  (operational readiness) to allow veteran units with temporary efficiency penalties.
+
+• **Advancement Thresholds**: Experience level boundaries match ExperiencePointLevels enum values
+  with carefully tuned progression curve balancing advancement rate with tactical impact.
+
+────────────────────────────────────────────────────────────────────────────── */
     public partial class CombatUnit
     {
         #region Properties
@@ -13,6 +84,21 @@ namespace HammerAndSickle.Models
         public EfficiencyLevel EfficiencyLevel { get; internal set; }
 
         #endregion // Properties
+
+
+        #region Initialization
+
+        /// <summary>
+        /// Initializes the experience system for the combat unit.
+        /// </summary>
+        private void InitializeExperienceSystem()
+        {
+            ExperiencePoints = 0;
+            ExperienceLevel = ExperienceLevel.Raw;
+            EfficiencyLevel = EfficiencyLevel.FullyOperational;
+        }
+
+        #endregion
 
 
         #region Experience System
@@ -68,11 +154,11 @@ namespace HammerAndSickle.Models
         }
 
         /// <summary>
-        /// Safely sets the unit�s cumulative experience points (XP) and keeps
+        /// Safely sets the unit’s cumulative experience points (XP) and keeps
         /// <see cref="ExperienceLevel"/> tightly synchronized.
         /// </summary>
         /// <param name="points">The new total XP to apply.  Values outside
-        /// <c>0 � CUConstants.EXPERIENCE_MAX</c> are automatically clamped.</param>
+        /// <c>0 … CUConstants.EXPERIENCE_MAX</c> are automatically clamped.</param>
         /// <returns>The clamped XP value that was actually stored.</returns>
         /// <remarks>
         /// <para>
@@ -90,7 +176,7 @@ namespace HammerAndSickle.Models
                 // 1) Constrain to legal range.
                 int clamped = Math.Clamp(points, 0, (int)ExperiencePointLevels.Elite);
 
-                // 2) Skip work if nothing changed � avoids redundant UI refresh.
+                // 2) Skip work if nothing changed – avoids redundant UI refresh.
                 if (clamped == ExperiencePoints)
                     return clamped;
 
