@@ -58,7 +58,7 @@ namespace HammerAndSickle.Models
 
         public const float EFFICIENCY_MOD_STATIC      = 0.5f; // Static units get 50% combat malus
         public const float EFFICIENCY_MOD_DEGRADED    = 0.7f; // Degraded units get 30% combat malus
-        public const float EFFICIENCY_MOD_OPERATIONAL = 0.8f; // Operational units get 20% combat malus
+        public const float EFFICIENCY_MOD_OPERATIONAL = 0.8f; // NormalOperations units get 20% combat malus
         public const float EFFICIENCY_MOD_FULL        = 0.9f; // Full efficiency units get 10% combat malus
         public const float EFFICIENCY_MOD_PEAK        = 1.0f; // Peak efficiency units have no combat modifier
 
