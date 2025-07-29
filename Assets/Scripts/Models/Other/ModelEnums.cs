@@ -155,9 +155,9 @@ namespace HammerAndSickle.Models
     {
         StaticOperations,
         DegradedOperations,
-        Operational,
-        FullyOperational,
-        PeakOperational
+        NormalOperations,
+        CombatOperations,
+        FullOperations
     }
 
     /// <summary>

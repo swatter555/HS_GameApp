@@ -371,7 +371,7 @@ namespace HammerAndSickle.Models
             }
         }
 
-        #endregion // Base Damage and Operational Capacity Management
+        #endregion // Base Damage and NormalOperations Capacity Management
 
 
         #region Airbase Management

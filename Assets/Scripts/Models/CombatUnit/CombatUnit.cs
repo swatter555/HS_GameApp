@@ -419,6 +419,9 @@ namespace HammerAndSickle.Models
                 // Initialize movement based on unit classification
                 InitializeMovementPoints();
 
+                // Set operational efficiency
+                EfficiencyLevel = EfficiencyLevel.FullOperations;
+
                 // Initialize position to origin (will be set when placed on map)
                 MapPos = Coordinate2D.Zero;
             }
@@ -874,7 +877,7 @@ namespace HammerAndSickle.Models
         {
             try
             {
-                if (EfficiencyLevel < EfficiencyLevel.PeakOperational)
+                if (EfficiencyLevel < EfficiencyLevel.FullOperations)
                     EfficiencyLevel++;
             }
             catch (Exception e)
@@ -1104,9 +1107,9 @@ namespace HammerAndSickle.Models
             // Returns the efficiency modifier based on current efficiency level.
             return EfficiencyLevel switch
             {
-                EfficiencyLevel.PeakOperational => CUConstants.EFFICIENCY_MOD_PEAK,
-                EfficiencyLevel.FullyOperational => CUConstants.EFFICIENCY_MOD_FULL,
-                EfficiencyLevel.Operational => CUConstants.EFFICIENCY_MOD_OPERATIONAL,
+                EfficiencyLevel.FullOperations => CUConstants.EFFICIENCY_MOD_PEAK,
+                EfficiencyLevel.CombatOperations => CUConstants.EFFICIENCY_MOD_FULL,
+                EfficiencyLevel.NormalOperations => CUConstants.EFFICIENCY_MOD_OPERATIONAL,
                 EfficiencyLevel.DegradedOperations => CUConstants.EFFICIENCY_MOD_DEGRADED,
                 _ => CUConstants.EFFICIENCY_MOD_STATIC, // Default multiplier for other states
             };
@@ -1562,7 +1565,7 @@ namespace HammerAndSickle.Models
         /// Direct change of combat state for debugging purposes.
         /// </summary>
         /// <param name="newPosition"></param>
-        public void DebugSetCombatState(DeploymentPosition newPosition)
+        public void Debug_SetDeploymentPosition(DeploymentPosition newPosition)
         {
             _deploymentPosition = newPosition;
         }

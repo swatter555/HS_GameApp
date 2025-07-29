@@ -410,7 +410,7 @@ Important Design Notes
                 }
             }
 
-            // Check if the target state is valid
+            // Check if there are enough movement points for the transition
             if (MovementPoints.Current < CUConstants.DEPLOYMENT_ACTION_MOVEMENT_COST * MovementPoints.Max)
             {
                 errorMessage = $"{UnitName} does not have enough movement points to change states ({MovementPoints.Current:F1} available, {CUConstants.DEPLOYMENT_ACTION_MOVEMENT_COST} required)";
