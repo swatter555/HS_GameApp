@@ -1894,8 +1894,14 @@ namespace HammerAndSickle.Models
                 return true;
 
             // Check for unresolved facility references
-            if (IsBase && _attachedUnitIDs.Count > 0)
-                return true;
+            // During runtime: check if we have attached units that need to be serialized as references
+            // During deserialization: check if we have unresolved unit IDs to resolve
+            if (IsBase && FacilityType == FacilityType.Airbase)
+            {
+                // If we have attached units OR unresolved IDs, we have references
+                if (_airUnitsAttached.Count > 0 || _attachedUnitIDs.Count > 0)
+                    return true;
+            }
 
             return false;
         }
@@ -1915,9 +1921,20 @@ namespace HammerAndSickle.Models
             }
 
             // Include facility's unresolved references
-            if (IsBase && _attachedUnitIDs.Count > 0)
+            if (IsBase && FacilityType == FacilityType.Airbase)
             {
-                unresolvedIDs.AddRange(_attachedUnitIDs.Select(unitID => $"AirUnit:{unitID}"));
+                // During runtime: report attached units as references
+                foreach (var airUnit in _airUnitsAttached)
+                {
+                    if (airUnit != null)
+                        unresolvedIDs.Add($"AirUnit:{airUnit.UnitID}");
+                }
+
+                // During deserialization: report unresolved unit IDs
+                foreach (var unitID in _attachedUnitIDs)
+                {
+                    unresolvedIDs.Add($"AirUnit:{unitID}");
+                }
             }
 
             return unresolvedIDs.AsReadOnly();
@@ -1952,22 +1969,20 @@ namespace HammerAndSickle.Models
                     foreach (string unitID in _attachedUnitIDs)
                     {
                         var unit = manager.GetCombatUnit(unitID);
-                        if (unit != null)
+                        if (unit == null)
                         {
-                            if (unit.UnitType == UnitType.AirUnit)
-                            {
-                                _airUnitsAttached.Add(unit);
-                            }
-                            else
-                            {
-                                AppService.HandleException(CLASS_NAME, "ResolveReferences",
-                                    new InvalidOperationException($"Unit {unitID} is not an air unit (Type: {unit.UnitType})"),
-                                    ExceptionSeverity.Minor);
-                            }
+                            throw new KeyNotFoundException($"Air unit {unitID} not found in game data manager");
+                        }
+
+                        if (unit.UnitType == UnitType.AirUnit)
+                        {
+                            _airUnitsAttached.Add(unit);
                         }
                         else
                         {
-                            throw new KeyNotFoundException($"Air unit {unitID} not found in game data manager");
+                            AppService.HandleException(CLASS_NAME, "ResolveReferences",
+                                new InvalidOperationException($"Unit {unitID} is not an air unit (Type: {unit.UnitType})"),
+                                ExceptionSeverity.Minor);
                         }
                     }
 
@@ -1977,7 +1992,7 @@ namespace HammerAndSickle.Models
             catch (Exception e)
             {
                 AppService.HandleException(CLASS_NAME, "ResolveReferences", e);
-                throw;
+                throw; // Re-throw the exception so the test can catch it
             }
         }
 

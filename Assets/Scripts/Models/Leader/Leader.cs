@@ -5,106 +5,106 @@ using UnityEngine;
 
 namespace HammerAndSickle.Models
 {
-/*───────────────────────────────────────────────────────────────────────────────
-  Leader ─ officer model with reputation, skills, and unit-assignment logic
-────────────────────────────────────────────────────────────────────────────────
- Summary
- ═══════
- • Represents a single battlefield officer who can be assigned to a **CombatUnit**,
-   earn reputation, unlock skills, and confer command bonuses.  
- • Encapsulates personal identity (name, nationality, rank), dynamic state
-   (reputation, skills, assignment), and full event hooks for UI updates.  
- • Implements **ISerializable** and **ICloneable** so leaders can be saved,
-   loaded, and duplicated for scenario editors or undo stacks. :contentReference[oaicite:0]{index=0}
+   /*───────────────────────────────────────────────────────────────────────────────
+      Leader ─ officer model with reputation, skills, and unit-assignment logic
+    ────────────────────────────────────────────────────────────────────────────────
+     Summary
+     ═══════
+     • Represents a single battlefield officer who can be assigned to a **CombatUnit**,
+       earn reputation, unlock skills, and confer command bonuses.  
+     • Encapsulates personal identity (name, nationality, rank), dynamic state
+       (reputation, skills, assignment), and full event hooks for UI updates.  
+     • Implements **ISerializable** and **ICloneable** so leaders can be saved,
+       loaded, and duplicated for scenario editors or undo stacks. :contentReference[oaicite:0]{index=0}
 
- Public properties
- ═════════════════
-   string          LeaderID        { get; private set; }
-   string          Name            { get; private set; }
-   Side            Side            { get; private set; }
-   Nationality     Nationality     { get; private set; }
-   CommandGrade    CommandGrade    { get; private set; }
-   int             ReputationPoints{ get; private set; }
-   string          FormattedRank   { get; }                  // computed getter
-   CommandAbility  CombatCommand   { get; private set; }
-   bool            IsAssigned      { get; private set; }
-   string          UnitID          { get; private set; }
+     Public properties
+     ═════════════════
+       string          LeaderID        { get; private set; }
+       string          Name            { get; private set; }
+       Side            Side            { get; private set; }
+       Nationality     Nationality     { get; private set; }
+       CommandGrade    CommandGrade    { get; private set; }
+       int             ReputationPoints{ get; private set; }
+       string          FormattedRank   { get; }                  // computed getter
+       CommandAbility  CombatCommand   { get; private set; }
+       bool            IsAssigned      { get; private set; }
+       string          UnitID          { get; private set; }
 
- Public events
- ═════════════
-   event Action<int,int>          OnReputationChanged;   // (delta, newTotal)
-   event Action<CommandGrade>     OnGradeChanged;        // (newGrade)
-   event Action<Enum,string>      OnSkillUnlocked;       // (skillEnum, skillName)
-   event Action<string>           OnUnitAssigned;        // (unitID)
-   event Action                  OnUnitUnassigned;       // ()
+     Public events
+     ═════════════
+       event Action<int,int>          OnReputationChanged;   // (delta, newTotal)
+       event Action<CommandGrade>     OnGradeChanged;        // (newGrade)
+       event Action<Enum,string>      OnSkillUnlocked;       // (skillEnum, skillName)
+       event Action<string>           OnUnitAssigned;        // (unitID)
+       event Action                  OnUnitUnassigned;       // ()
 
- Constructors
- ═════════════
-   public    Leader(Side side, Nationality nationality)
-   public    Leader(string name, Side side,
-                    Nationality nationality,
-                    CommandAbility command)
-   protected Leader(SerializationInfo info,
-                    StreamingContext context)            // deserialisation
+     Constructors
+     ═════════════
+       public    Leader(Side side, Nationality nationality)
+       public    Leader(string name, Side side,
+                        Nationality nationality,
+                        CommandAbility command)
+       protected Leader(SerializationInfo info,
+                        StreamingContext context)            // deserialisation
 
- Public API (method signatures ⇢ brief purpose)
- ═════════════════════════════════════════════
- ― Identity & rank ―
-   public void   SetOfficerCommandAbility(CommandAbility command)          // manual override
-   public bool   SetOfficerName(string name)                               // validation + set
-   public string GetFormattedRank()                                        // localised rank text
-   public void   SetCommandGrade(CommandGrade grade)                       // fire grade event
+     Public API (method signatures ⇢ brief purpose)
+     ═════════════════════════════════════════════
+     ― Identity & rank ―
+       public void   SetOfficerCommandAbility(CommandAbility command)          // manual override
+       public bool   SetOfficerName(string name)                               // validation + set
+       public string GetFormattedRank()                                        // localised rank text
+       public void   SetCommandGrade(CommandGrade grade)                       // fire grade event
 
- ― Reputation ―
-   public void   AwardReputation(int amount)                               // flat REP gain
-   public void   AwardReputationForAction(CUConstants.ReputationAction act,
-                                          float contextMultiplier = 1f)    // action-based REP
+     ― Reputation ―
+       public void   AwardReputation(int amount)                               // flat REP gain
+       public void   AwardReputationForAction(CUConstants.ReputationAction act,
+                                              float contextMultiplier = 1f)    // action-based REP
 
- ― Skill-tree facade ―
-   public bool   CanUnlockSkill(Enum skillEnum)
-   public bool   UnlockSkill(Enum skillEnum)
-   public bool   IsSkillUnlocked(Enum skillEnum)
-   public bool   HasCapability(SkillBonusType bonusType)
-   public float  GetBonusValue(SkillBonusType bonusType)
-   public bool   IsBranchAvailable(SkillBranch branch)
-   public bool   ResetSkills()                                             // respec
+     ― Skill-tree facade ―
+       public bool   CanUnlockSkill(Enum skillEnum)
+       public bool   UnlockSkill(Enum skillEnum)
+       public bool   IsSkillUnlocked(Enum skillEnum)
+       public bool   HasCapability(SkillBonusType bonusType)
+       public float  GetBonusValue(SkillBonusType bonusType)
+       public bool   IsBranchAvailable(SkillBranch branch)
+       public bool   ResetSkills()                                             // respec
 
- ― Unit assignment ―
-   public void   AssignToUnit(string unitID)
-   public void   UnassignFromUnit()
+     ― Unit assignment ―
+       public void   AssignToUnit(string unitID)
+       public void   UnassignFromUnit()
 
- ― Interfaces ―
-   public void   GetObjectData(SerializationInfo info,
-                               StreamingContext context)                   // ISerializable
-   public object Clone()                                                   // ICloneable
+     ― Interfaces ―
+       public void   GetObjectData(SerializationInfo info,
+                                   StreamingContext context)                   // ISerializable
+       public object Clone()                                                   // ICloneable
 
- Private helpers
- ═══════════════
-   void   InitializeCommonProperties(Side side, Nationality nat)           // default state
-   void   InitializeSkillTree()                                            // create + wire
-   void   WireSkillTreeEvents()                                            // forward events
-   string GenerateUniqueID()                                               // LEAD-xxxxx
-   void   GenerateRandomNameBasedOnNationality()                           // NameGenService
-   // reputation math is in AwardReputationForAction()
-   // validation helpers (Enum.IsDefined, Math.Clamp) inline in callers
+     Private helpers
+     ═══════════════
+       void   InitializeCommonProperties(Side side, Nationality nat)           // default state
+       void   InitializeSkillTree()                                            // create + wire
+       void   WireSkillTreeEvents()                                            // forward events
+       string GenerateUniqueID()                                               // LEAD-xxxxx
+       void   GenerateRandomNameBasedOnNationality()                           // NameGenService
+       // reputation math is in AwardReputationForAction()
+       // validation helpers (Enum.IsDefined, Math.Clamp) inline in callers
 
- Developer notes
- ═══════════════
- • **Event-driven updates** – All state changes raise events consumed by the UI
-   layer; never modify *CommandGrade*, *ReputationPoints*, or assignment flags
-   directly outside the provided methods.  
- • **Skill-tree ownership** – The contained *LeaderSkillTree* is the single
-   source of truth for capabilities and grade promotions; keep its serialisation
-   data in sync when adding new skills.  
- • **Exception funnel** – Every public & helper method wraps logic in try/catch
-   and reports via `AppService.HandleException(CLASS_NAME, MethodName, e)` per
-   project logging standard.  
- • **Thread safety** – No internal locks; UI threads should marshal back to the
-   main thread before mutating leader state.  
- • **Clone semantics** – *Clone()* performs a deep copy of the skill tree and
-   assignment state but generates a new *LeaderID* to avoid duplicates in
-   persistence layers.
-───────────────────────────────────────────────────────────────────────────────*/
+     Developer notes
+     ═══════════════
+     • **Event-driven updates** – All state changes raise events consumed by the UI
+       layer; never modify *CommandGrade*, *ReputationPoints*, or assignment flags
+       directly outside the provided methods.  
+     • **Skill-tree ownership** – The contained *LeaderSkillTree* is the single
+       source of truth for capabilities and grade promotions; keep its serialisation
+       data in sync when adding new skills.  
+     • **Exception funnel** – Every public & helper method wraps logic in try/catch
+       and reports via `AppService.HandleException(CLASS_NAME, MethodName, e)` per
+       project logging standard.  
+     • **Thread safety** – No internal locks; UI threads should marshal back to the
+       main thread before mutating leader state.  
+     • **Clone semantics** – *Clone()* performs a deep copy of the skill tree and
+       assignment state but generates a new *LeaderID* to avoid duplicates in
+       persistence layers.
+    ───────────────────────────────────────────────────────────────────────────────*/
     [Serializable]
     public class Leader : ISerializable, ICloneable
     {
