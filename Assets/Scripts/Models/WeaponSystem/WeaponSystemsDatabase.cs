@@ -4,56 +4,6 @@ using System.Collections.Generic;
 
 namespace HammerAndSickle.Models
 {
-/*───────────────────────────────────────────────────────────────────────────────
-  WeaponSystemsDatabase ─ master catalogue of every WeaponSystemProfile
-────────────────────────────────────────────────────────────────────────────────
- Summary
- ═══════
- • Static, in-memory dictionary that maps each **WeaponSystems** enum value to an
-   immutable **WeaponSystemProfile**.  
- • Guarantees one-time initialisation during game start-up, then provides
-   lock-free, read-only access to profile data for all combat calculations.  
- • Central location for combat-balance tuning: modify a profile here and every
-   **CombatUnit** that references the same enum reflects the change instantly. :contentReference[oaicite:0]{index=0}
-
- Public properties
- ═════════════════
-   bool IsInitialized   { get; }                // true after successful Initialise()
-   int  ProfileCount    { get; }                // total profiles currently stored
-
- Constructors
- ═════════════
-   // none – static class
-
- Public API (method signatures ⇢ brief purpose)
- ═════════════════════════════════════════════
-   public static void Initialize()                                     // build full DB; call once at start-up
-   public static WeaponSystemProfile
-                       GetWeaponSystemProfile(WeaponSystems id)        // fast lookup; returns null if absent
-   public static bool  HasWeaponSystemProfile(WeaponSystems id)        // existence check without retrieval
-
- Private helpers
- ═══════════════
-   static void CreateAllWeaponSystemProfiles()         // instantiates every profile; calls individual builders
-   static void CreateT80BProfile()                     // example builder: crafts “T-80B Main Battle Tank”
-
- Developer notes
- ═══════════════
- • **Template pattern** – Every CombatUnit stores only an enum; the heavy
-   profile object lives here exactly once, reducing per-unit RAM and ensuring
-   global consistency.  
- • **Initialisation contract** – Always call *WeaponSystemsDatabase.Initialize()*
-   during game boot before any unit creation; otherwise look-ups return *null*.  
- • **Error handling** – All public and private methods wrap operations in
-   try/catch and delegate to `AppService.HandleException`.  Failed initialisation
-   re-throws to abort loading early.  
- • **Extensibility** – Add new weapon systems by writing a `CreateXXXProfile()`
-   helper and calling it from *CreateAllWeaponSystemProfiles()*; keep enum,
-   profile builder, and upgrade definitions in sync.  
- • **Thread-safety** – After the one-time build (which uses a local dictionary
-   before assignment), the underlying `_weaponSystemProfiles` is never mutated,
-   enabling lock-free concurrent reads by AI threads or parallel combat sims.
-───────────────────────────────────────────────────────────────────────────────*/
     public static class WeaponSystemsDatabase
     {
         #region Constants
@@ -62,14 +12,12 @@ namespace HammerAndSickle.Models
 
         #endregion // Constants
 
-
         #region Private Fields
 
         private static Dictionary<WeaponSystems, WeaponSystemProfile> _weaponSystemProfiles;
         private static bool _isInitialized = false;
 
         #endregion // Private Fields
-
 
         #region Public Properties
 
@@ -84,7 +32,6 @@ namespace HammerAndSickle.Models
         public static int ProfileCount => _weaponSystemProfiles?.Count ?? 0;
 
         #endregion // Public Properties
-
 
         #region Public Methods
 
@@ -174,7 +121,6 @@ namespace HammerAndSickle.Models
         }
 
         #endregion // Public Methods
-
 
         #region Private Methods
 
@@ -358,7 +304,6 @@ namespace HammerAndSickle.Models
         }
 
         #endregion // Private Methods
-
 
         #region Soviet Tanks
 
@@ -754,7 +699,6 @@ namespace HammerAndSickle.Models
 
         #endregion // Soviet Tanks
 
-
         #region Soviet Infantry
 
         private static void CreateRegInfSVProfile()
@@ -1030,7 +974,6 @@ namespace HammerAndSickle.Models
 
         #endregion
 
-
         #region Soviet APCs
 
         private static void CreateApcMtlbProfile()
@@ -1178,7 +1121,6 @@ namespace HammerAndSickle.Models
         }
 
         #endregion // Soviet APCs
-
 
         #region Soviet IFVs
 
@@ -1472,7 +1414,6 @@ namespace HammerAndSickle.Models
 
         #endregion // Soviet IFVs
 
-
         #region Soviet Recon
 
         private static void CreateRcnBrdm2Profile()
@@ -1572,7 +1513,6 @@ namespace HammerAndSickle.Models
         }
 
         #endregion // Soviet Recon
-
 
         #region Soviet Artillery & Rockets
 
@@ -1974,7 +1914,6 @@ namespace HammerAndSickle.Models
 
         #endregion // Soviet Artillery & Rockets
 
-
         #region Soviet Air Defense
 
         /// <summary>
@@ -2325,7 +2264,6 @@ namespace HammerAndSickle.Models
 
         #endregion // Soviet Air Defense
 
-
         #region Soviet Helicopters
 
         /// <summary>
@@ -2521,7 +2459,6 @@ namespace HammerAndSickle.Models
         }
 
         #endregion
-
 
         #region Soviet Aircraft
 
@@ -3327,7 +3264,6 @@ namespace HammerAndSickle.Models
 
         #endregion // Soviet Aircraft
 
-
         #region Soviet Transports
 
         /// <summary>
@@ -3531,7 +3467,6 @@ namespace HammerAndSickle.Models
 
         #endregion // US Tanks
 
-
         #region US IFVs and APCs
 
         /// <summary>
@@ -3731,7 +3666,6 @@ namespace HammerAndSickle.Models
 
         #endregion // US IFVs and APCs
 
-
         #region US Artillery
 
         /// <summary>
@@ -3834,7 +3768,6 @@ namespace HammerAndSickle.Models
         }
 
         #endregion // US Artillery
-
 
         #region US Air Defense
 
@@ -3984,7 +3917,6 @@ namespace HammerAndSickle.Models
 
         #endregion // US Air Defense
 
-
         #region US Helicopters
 
         /// <summary>
@@ -4036,7 +3968,6 @@ namespace HammerAndSickle.Models
         }
 
         #endregion // US Helicopters
-
 
         #region US Aircraft
 
@@ -4434,7 +4365,6 @@ namespace HammerAndSickle.Models
         }
 
         #endregion // US Aircraft
-
 
         #region US Infantry
 

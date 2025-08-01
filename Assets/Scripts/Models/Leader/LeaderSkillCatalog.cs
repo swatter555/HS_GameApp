@@ -6,42 +6,6 @@ using UnityEngine;
 
 namespace HammerAndSickle.Models
 {
-/*───────────────────────────────────────────────────────────────────────────────
-  SkillEffect ─ atomic description of a single leader-skill bonus              :contentReference[oaicite:0]{index=0}
-────────────────────────────────────────────────────────────────────────────────
- Summary
- ═══════
- • Represents **one** concrete benefit conferred by a leader skill (e.g. +5 Hard ATT,
-   0.8× Supply Consumption, *Breakthrough* capability).  
- • Abstracts the three supported bonus categories:
-     1. **Numeric**   – direct additions to ratings or action counts  
-     2. **Multiplier** – percentage modifiers to costs, movement, etc.  
-     3. **Boolean**   – on/off capabilities that unlock special actions  
- • Generates a human-readable effect description on the fly.
-
- Public properties
- ═════════════════
-   SkillBonusType BonusType        { get; }   // what is modified/unlocked
-   float          BonusValue       { get; }   // numeric value, multiplier, or 1 / 0 flag
-   string         EffectDescription{ get; }   // auto or custom text
-   bool           IsBoolean        { get; }   // helper → true when capability flag
-
- Constructors
- ═════════════
-   public  SkillEffect(SkillBonusType bonusType,
-                       float          bonusValue,
-                       string         effectDescription = null)
-
- Private helpers
- ═══════════════
-   string GetDefaultDescription()             // infers text from type/value
-
- Developer notes
- ═══════════════
- • Call *IsBoolean* to decide whether *BonusValue* is treated as a flag.  
- • When adding new **SkillBonusType** enum members update *IsBoolean* logic.  
- • Keep descriptions short; UI concatenates multiple effects automatically.
-───────────────────────────────────────────────────────────────────────────────*/
     public class SkillEffect
     {
         /// <summary>

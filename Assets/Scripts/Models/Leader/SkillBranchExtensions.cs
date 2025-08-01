@@ -6,62 +6,6 @@ using UnityEngine;
 
 namespace HammerAndSickle.Models
 {
-    /*────────────────────────────────────────────────────────────────────────────
-     SkillBranchExtensions ─ attribute‑driven enum classifier 
-    ──────────────────────────────────────────────────────────────────────────────
-
-    Summary
-    ═══════
-    • Static helper that classifies SkillBranch enum values into Foundation,
-      Doctrine, and Specialization categories using reflection‑based attribute
-      lookup instead of switch statements for maintainability.
-    • Builds a cached Dictionary<SkillBranch, BranchType> on first access using
-      a double‑checked locking pattern; subsequent queries are O(1).
-    • Provides extension helpers for classification checks, grouped queries, and
-      editor‑only validation utilities.
-
-    Private fields
-    ══════════════
-      Dictionary<SkillBranch, BranchType> _branchTypeCache  ─ enum→type lookup
-      object                               _cacheLock        ─ thread‑sync token
-      bool                                 _cacheInitialized ═ cache flag
-
-    Cache management
-    ════════════════
-      void   InitializeBranchTypeCache()                 ─ build cache (thread‑safe)
-      void   ClearCache() [Conditional("UNITY_EDITOR")] ─ wipe & reset
-
-    Classification extensions
-    ═════════════════════════
-      BranchType  GetBranchType(this SkillBranch)       ─ primary lookup
-      bool        IsFoundation(this SkillBranch)
-      bool        IsDoctrine(this SkillBranch)
-      bool        IsSpecialization(this SkillBranch)
-
-    Query helpers
-    ═════════════
-      IEnumerable<SkillBranch> GetBranchesByType(BranchType)
-      int                      GetBranchCountByType(BranchType)
-      IEnumerable<SkillBranch> GetFoundationBranches()
-      IEnumerable<SkillBranch> GetDoctrineBranches()
-      IEnumerable<SkillBranch> GetSpecializationBranches()
-
-    Validation utilities
-    ═══════════════════
-      void ValidateBranchClassification() [Conditional("UNITY_EDITOR"|"DEBUG")]
-        • Logs summary counts and warns if attribute coverage or expected totals
-          (constants inside the method) are off.
-
-    Developer notes
-    ═══════════════
-    • Expected branch counts must be updated in ValidateBranchClassification when
-      enum values change.
-    • InitializeBranchTypeCache must be idempotent; guard with _cacheInitialized to
-      avoid redundant reflection cost in hot play‑mode loops.
-    • For runtime builds, ClearCache and Validate* are stripped to minimise size.
-    • Missing BranchTypeAttribute falls back to Foundation and logs a warning to
-      maintain stability.
-   ────────────────────────────────────────────────────────────────────────────*/
     public static class SkillBranchExtensions
     {
         #region Private Fields

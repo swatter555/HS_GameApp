@@ -227,7 +227,6 @@ namespace HammerAndSickle.Models
 
     #endregion // CombatUnit Enums
 
-
     #region DeploymentStateMachine
 
     public enum DeploymentPosition
@@ -241,7 +240,6 @@ namespace HammerAndSickle.Models
     }
 
     #endregion // DeploymentStateMachine
-
 
     #region LeaderEnums
 
@@ -605,7 +603,6 @@ namespace HammerAndSickle.Models
 
     #endregion // LeaderEnums
 
-
     #region WeaponSystem Enums
 
     /// <summary>
@@ -794,7 +791,6 @@ namespace HammerAndSickle.Models
 
     #endregion // WeaponSystem Enums
 
-
     #region Intel Enums
 
     /// <summary>
@@ -828,7 +824,6 @@ namespace HammerAndSickle.Models
     }
 
     #endregion
-
 
     #region Facility Enums
 
