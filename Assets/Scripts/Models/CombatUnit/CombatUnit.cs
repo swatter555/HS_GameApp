@@ -1,277 +1,18 @@
 ﻿using HammerAndSickle.Services;
 using System;
 using System.Collections.Generic;
-using System.Linq;
-using System.Runtime.Serialization;
 using UnityEngine;
-using HammerAndSickle.Controllers;
 
-/*────────────────────────────────────────────────────────────────────────────
- CombatUnit ─ universal military unit representation with modular subsystems
-────────────────────────────────────────────────────────────────────────────────
-
-Summary
-═══════
-• Central game entity representing all military units from tank regiments to supply
-  depots through a unified object model. Units operate on sophisticated action
-  economy mechanics where tactical decisions consume deployment actions, combat
-  actions, movement points, and supplies. The design emphasizes resource trade-offs
-  between positioning, offensive capability, and logistical sustainability.
-
-• CombatUnit serves as the universal hub for diverse military capabilities using
-  classification-based specialization rather than inheritance hierarchies. Ground
-  units, aircraft, helicopters, and base facilities share the same core framework
-  while accessing specialized behaviors through partial class extensions and
-  profile-based stat systems.
-
-• Five interconnected subsystems provide tactical depth: deployment state machines
-  for positioning trade-offs, experience progression for veteran bonuses, facility
-  management for base operations, leader integration for skill-based enhancements,
-  and profile-driven combat calculations for authentic military effectiveness.
-
-Public properties
-═════════════════
-string UnitName { get; set; }
-string UnitID { get; private set; }
-UnitType UnitType { get; private set; }
-UnitClassification Classification { get; private set; }
-UnitRole Role { get; private set; }
-Side Side { get; private set; }
-Nationality Nationality { get; private set; }
-bool IsBase { get; }
-
-WeaponSystems EmbarkedProfileID { get; private set; }
-WeaponSystems MobileProfileID { get; private set; }
-WeaponSystems DeployedProfileID { get; private set; }
-IntelProfileTypes IntelProfileType { get; internal set; }
-
-EfficiencyLevel EfficiencyLevel { get; internal set; }
-
-StatsMaxCurrent MoveActions { get; private set; }
-StatsMaxCurrent CombatActions { get; private set; }
-StatsMaxCurrent DeploymentActions { get; private set; }
-StatsMaxCurrent OpportunityActions { get; private set; }
-StatsMaxCurrent IntelActions { get; private set; }
-
-StatsMaxCurrent HitPoints { get; private set; }
-StatsMaxCurrent DaysSupply { get; private set; }
-StatsMaxCurrent MovementPoints { get; private set; }
-Coordinate2D MapPos { get; internal set; }
-SpottedLevel SpottedLevel { get; private set; }
-
-int ExperiencePoints { get; internal set; }
-ExperienceLevel ExperienceLevel { get; internal set; }
-EfficiencyLevel EfficiencyLevel { get; internal set; }
-
-string LeaderID { get; internal set; }
-bool IsLeaderAssigned { get; }
-Leader UnitLeader { get; }
-
-DeploymentPosition DeploymentPosition { get; }
-bool IsEmbarkable { get; private set; }
-bool IsMountable { get; private set; }
-
-int BaseDamage { get; private set; }
-OperationalCapacity OperationalCapacity { get; private set; }
-FacilityType FacilityType { get; private set; }
-DepotSize DepotSize { get; private set; }
-float StockpileInDays { get; private set; }
-IReadOnlyList<CombatUnit> AirUnitsAttached { get; private set; }
-
-Constructors
-════════════
-public CombatUnit(string unitName, UnitType unitType, UnitClassification classification,
-    UnitRole role, Side side, Nationality nationality, IntelProfileTypes intelProfileType,
-    WeaponSystems deployedProfileID, bool isMountable = false, 
-    WeaponSystems mobileProfileID = WeaponSystems.DEFAULT, bool isEmbarkable = false,
-    WeaponSystems embarkProfileID = WeaponSystems.DEFAULT, 
-    DepotCategory category = DepotCategory.Secondary, DepotSize size = DepotSize.Small)
-
-protected CombatUnit(SerializationInfo info, StreamingContext context)
-
-Public methods
-══════════════
-WeaponSystemProfile GetDeployedProfile()
-WeaponSystemProfile GetMobileProfile()
-WeaponSystemProfile GetEmbarkedProfile()
-WeaponSystemProfile GetActiveWeaponSystemProfile()
-WeaponSystemProfile GetCurrentCombatStrength()
-IntelReport GenerateIntelReport(SpottedLevel spottedLevel = SpottedLevel.Level1)
-
-void RefreshAllActions()
-void RefreshMovementPoints()
-void SetSpottedLevel(SpottedLevel spottedLevel)
-void TakeDamage(float damage)
-void Repair(float repairAmount)
-bool ConsumeSupplies(float amount)
-float ReceiveSupplies(float amount)
-bool IsDestroyed()
-
-bool PerformCombatAction()
-bool PerformMoveAction(int movtCost)
-bool PerformIntelAction()
-bool PerformOpportunityAction()
-Dictionary<ActionTypes, float> GetAvailableActions()
-float GetDeployActions()
-float GetCombatActions()
-float GetMoveActions()
-float GetOpportunityActions()
-float GetIntelActions()
-
-bool CanMove()
-float GetSupplyStatus()
-void SetEfficiencyLevel(EfficiencyLevel level)
-void DecreaseEfficiencyLevelBy1()
-void IncreaseEfficiencyLevelBy1()
-
-void SetPosition(Coordinate2D newPos)
-bool CanMoveTo(Coordinate2D targetPos)
-float GetDistanceTo(Coordinate2D targetPos)
-float GetDistanceTo(CombatUnit otherUnit)
-
-object Clone()
-void GetObjectData(SerializationInfo info, StreamingContext context)
-bool HasUnresolvedReferences()
-IReadOnlyList<string> GetUnresolvedReferenceIDs()
-void ResolveReferences(GameDataManager manager)
-List<string> ValidateInternalConsistency()
-
-Private methods
-═══════════════
-void InitializeActionCounts()
-void InitializeMovementPoints()
-float GetFinalCombatRatingModifier()
-float GetFinalCombatRatingModifier_Aircraft()
-float GetStrengthModifier()
-float GetCombatStateModifier()
-float GetEfficiencyModifier()
-bool ConsumeMovementPoints(float points)
-float GetDeployMovementCost()
-float GetCombatMovementCost()
-float GetIntelMovementCost()
-
-Partial Class Architecture
-═════════════════════════
-CombatUnit is implemented as a partial class distributed across multiple files for
-logical organization and maintainability:
-
-**CombatUnit.DeploymentSystem.cs** - Linear deployment state machine managing six
-tactical positions (Fortified to Embarked) with resource-based transitions. Units
-progress through defensive entrenchment or mobile deployment consuming deployment
-actions, movement points, and supplies. Profile switching occurs automatically
-based on state, with special rules for dis-entrenchment and facility-based
-embarkation requirements.
-
-**CombatUnit.ExperienceSystem.cs** - Progressive unit advancement through six
-experience levels (Raw to Elite) affecting combat effectiveness via multiplicative
-bonuses. Units gain experience through combat actions and battlefield achievements,
-with level synchronization maintaining consistency between experience points and
-derived advancement tiers.
-
-**CombatUnit.Facility.cs** - Base facility operations for HQ, Airbase, and Supply
-Depot units including damage-based operational capacity degradation, air unit
-attachment management, and supply depot logistics with stockpile generation,
-distance-based projection efficiency, and special transport capabilities for main
-depots.
-
-**CombatUnit.LeaderSystem.cs** - Command officer integration providing skill-based
-bonuses through string ID reference resolution. Leaders provide multiplicative and
-additive combat bonuses via unlocked skills while maintaining bidirectional
-assignment relationships and reputation flow for advancement systems.
-
-System Integration Architecture
-═══════════════════════════════
-The CombatUnit ecosystem operates through several key integration patterns:
-
-**Profile-Based Statistics** - Units reference shared WeaponSystemProfile templates
-via enum identifiers rather than storing individual combat values. The system
-automatically switches between Deployed, Mobile, and Embarked profiles based on
-deployment state, ensuring authentic tactical behavior while minimizing memory
-usage and maintaining data consistency across identical unit types.
-
-**Action Economy Framework** - All meaningful unit activities consume specific
-resources through a unified action system. Combat actions cost 25% maximum movement
-points plus supplies, deployment transitions cost 50% movement points plus deployment
-actions, and movement consumes both move actions and variable movement points based
-on terrain. This creates natural tactical trade-offs between positioning, combat
-effectiveness, and resource conservation.
-
-**Modifier Stacking System** - Combat effectiveness emerges from multiplicative
-stacking of strength modifiers (hit point percentage), deployment state bonuses
-(defensive positioning), efficiency levels (operational readiness), experience
-multipliers (veteran bonuses), and leader skill effects. The GetCurrentCombatStrength()
-method applies all modifiers to create temporary profiles for immediate calculations
-without mutating base statistics.
-
-**Reference Resolution Pattern** - Complex object relationships use string ID
-references resolved through GameDataManager lookup to prevent circular serialization
-dependencies. Leaders, attached air units, and profile references maintain clean
-separation between persistent data storage and runtime object graphs, enabling
-robust save/load functionality.
-
-**State Validation Cascade** - Unit capabilities depend on hierarchical validation:
-destroyed units cannot act, critically supplied units have restricted operations,
-Static Operations efficiency prevents movement from defensive states, and base
-facilities follow different action availability rules. This creates emergent
-tactical complexity from simple rule interactions.
-
-**Intelligence and Fog of War** - Units generate intelligence reports based on
-SpottedLevel and IntelProfileType, providing filtered information about enemy
-capabilities. The system balances authentic military uncertainty with gameplay
-clarity through configurable error margins and progressive revelation mechanics.
-
-Developer notes
-═══════════════
-• **Classification-Based Specialization** - Unit behaviors are determined by
-  UnitClassification enum values rather than inheritance hierarchies. This allows
-  runtime behavior switching and simplified serialization while maintaining type
-  safety through validation in the constructor and action methods.
-
-• **StatsMaxCurrent Pattern** - All dynamic unit resources (actions, hit points,
-  supplies, movement points) use the StatsMaxCurrent class for consistent maximum/
-  current value tracking with automatic validation and progress calculation support.
-
-• **Serialization Strategy** - The class implements custom ISerializable with
-  reference resolution support for complex object relationships. Profile references
-  are stored as enum values, leader assignments as string IDs, and attached units
-  as temporary ID collections resolved during deserialization.
-
-• **Exception Handling Integration** - All public methods use AppService.HandleException
-  with appropriate severity levels for consistent error logging and UI messaging.
-  Critical operations include defensive validation to prevent invalid state
-  transitions and resource corruption.
-
-• **Thread Safety Considerations** - While the class itself is not thread-safe,
-  all external dependencies (AppService, GameDataManager, WeaponSystemsDatabase)
-  provide thread-safe operations for concurrent access during AI processing and
-  UI updates. Modification operations should occur on the main thread only.
-────────────────────────────────────────────────────────────────────────────── */
 namespace HammerAndSickle.Models
 {
-    /// <summary>
-    /// Extension helpers for UnitClassification.
-    /// </summary>
-    public static class UnitClassificationExtensions
-    {
-        /// <summary>
-        /// Returns <c>true</c> if the classification represents a fixed facility (HQ, DEPOT, AIRB).
-        /// </summary>
-        public static bool IsBaseType(this UnitClassification classification) =>
-            classification == UnitClassification.HQ ||
-            classification == UnitClassification.DEPOT ||
-            classification == UnitClassification.AIRB;
-    }
-
-   
     [Serializable]
-    public partial class CombatUnit : ICloneable, ISerializable, IResolvableReferences
+    public partial class CombatUnit : ICloneable
     {
         #region Constants
 
         private const string CLASS_NAME = nameof(CombatUnit);
 
-        #endregion
-
+        #endregion // Constants
 
         #region Properties
 
@@ -283,23 +24,16 @@ namespace HammerAndSickle.Models
         public UnitRole Role { get; private set; }
         public Side Side { get; private set; }
         public Nationality Nationality { get; private set; }
-        public bool IsBase => Classification.IsBaseType();
+        public bool IsBase => IsBaseType(Classification);
 
-        // Profile IDs
-        // Profile for air, helo, naval transport, if available.
-        public WeaponSystems EmbarkedProfileID { get; private set; }
-
-        // Profile for units that have organic transport (Truck/APC/IFV), if available.
-        public WeaponSystems MobileProfileID { get; private set; }
-
-        // The default, core profile that all units have.
-        public WeaponSystems DeployedProfileID { get; private set; }
-
-        // The profile used to generate intelligence reports.
-        public IntelProfileTypes IntelProfileType { get; internal set; }
+        // Profiles
+        public WeaponSystems EmbarkedProfileID { get; private set; }     // Profile for external transport
+        public WeaponSystems MobileProfileID { get; private set; }       // Profile for organic transport
+        public WeaponSystems DeployedProfileID { get; private set; }     // Profile that all units have.
+        public IntelProfileTypes IntelProfileType { get; internal set; } // Profile for intelligence reports.
 
         // How combat effective is a unit is tracked by EfficiencyLevel.
-        public EfficiencyLevel EfficiencyLevel { get; internal set; }
+        public EfficiencyLevel EfficiencyLevel { get; internal set; }    
 
         // Action counts using StatsMaxCurrent
         public StatsMaxCurrent MoveActions { get; private set; }
@@ -316,7 +50,6 @@ namespace HammerAndSickle.Models
         public SpottedLevel SpottedLevel { get; private set; }
 
         #endregion // Properties
-
 
         #region Constructors
 
@@ -433,7 +166,6 @@ namespace HammerAndSickle.Models
         }
 
         #endregion // Constructors
-
 
         #region Core
 
@@ -1115,8 +847,16 @@ namespace HammerAndSickle.Models
             };
         }
 
-        #endregion // Core
+        /// <summary>
+        /// Determines whether the specified represents a base unit type.
+        /// </summary>
+        public bool IsBaseType(UnitClassification classification) =>
+            classification == UnitClassification.HQ ||
+            classification == UnitClassification.DEPOT ||
+            classification == UnitClassification.AIRB;
 
+
+        #endregion // Core
 
         #region CombatUnit Actions
 
@@ -1481,7 +1221,6 @@ namespace HammerAndSickle.Models
 
         #endregion // CombatUnit Actions
 
-
         #region Position and Movement
 
         /// <summary>
@@ -1558,7 +1297,6 @@ namespace HammerAndSickle.Models
 
         #endregion // Position and Movement
 
-
         #region Debugging
 
         /// <summary>
@@ -1581,7 +1319,6 @@ namespace HammerAndSickle.Models
         }
 
         #endregion // Debugging
-
 
         #region ICloneable Implementation
 
@@ -1674,464 +1411,5 @@ namespace HammerAndSickle.Models
         }
 
         #endregion // ICloneable Implementation
-
-
-        #region ISerializable Implementation
-
-        /// <summary>
-        /// Deserialization constructor for loading CombatUnit from saved data.
-        /// </summary>
-        /// <param name="info">Serialization info containing saved data</param>
-        /// <param name="context">Streaming context for deserialization</param>
-        protected CombatUnit(SerializationInfo info, StreamingContext context)
-        {
-            try
-            {
-                // Core identification and metadata
-                UnitName = info.GetString("UnitName");
-                UnitID = info.GetString("UnitID");
-                UnitType = (UnitType)info.GetValue("UnitType", typeof(UnitType));
-                Classification = (UnitClassification)info.GetValue("Classification", typeof(UnitClassification));
-                Role = (UnitRole)info.GetValue("Role", typeof(UnitRole));
-                Side = (Side)info.GetValue("Side", typeof(Side));
-                Nationality = (Nationality)info.GetValue("Nationality", typeof(Nationality));
-
-                // Profile IDs
-                DeployedProfileID = (WeaponSystems)info.GetValue("DeployedProfileID", typeof(WeaponSystems));
-                MobileProfileID = (WeaponSystems)info.GetValue("MobileProfileID", typeof(WeaponSystems));
-                EmbarkedProfileID = (WeaponSystems)info.GetValue("EmbarkedProfileID", typeof(WeaponSystems));
-                IntelProfileType = (IntelProfileTypes)info.GetValue("IntelProfileType", typeof(IntelProfileTypes));
-
-                // Deployment system data
-                _deploymentPosition = (DeploymentPosition)info.GetValue("DeploymentPosition", typeof(DeploymentPosition));
-                IsEmbarkable = info.GetBoolean("IsEmbarkable");
-                IsMountable = info.GetBoolean("IsMountable");
-
-                // Experience system data
-                ExperiencePoints = info.GetInt32("ExperiencePoints");
-                ExperienceLevel = (ExperienceLevel)info.GetValue("ExperienceLevel", typeof(ExperienceLevel));
-                EfficiencyLevel = (EfficiencyLevel)info.GetValue("EfficiencyLevel", typeof(EfficiencyLevel));
-
-                // Leader system data
-                LeaderID = info.GetString("LeaderID"); // Can be null
-
-                // StatsMaxCurrent properties - deserialize both max and current values
-                HitPoints = new StatsMaxCurrent(info.GetSingle("HitPointsMax"), info.GetSingle("HitPointsCurrent"));
-                DaysSupply = new StatsMaxCurrent(info.GetSingle("DaysSupplyMax"), info.GetSingle("DaysSupplyCurrent"));
-                MovementPoints = new StatsMaxCurrent(info.GetSingle("MovementPointsMax"), info.GetSingle("MovementPointsCurrent"));
-
-                // Action counts
-                MoveActions = new StatsMaxCurrent(info.GetSingle("MoveActionsMax"), info.GetSingle("MoveActionsCurrent"));
-                CombatActions = new StatsMaxCurrent(info.GetSingle("CombatActionsMax"), info.GetSingle("CombatActionsCurrent"));
-                DeploymentActions = new StatsMaxCurrent(info.GetSingle("DeploymentActionsMax"), info.GetSingle("DeploymentActionsCurrent"));
-                OpportunityActions = new StatsMaxCurrent(info.GetSingle("OpportunityActionsMax"), info.GetSingle("OpportunityActionsCurrent"));
-                IntelActions = new StatsMaxCurrent(info.GetSingle("IntelActionsMax"), info.GetSingle("IntelActionsCurrent"));
-
-                // Position and state
-                MapPos = (Coordinate2D)info.GetValue("MapPos", typeof(Coordinate2D));
-                SpottedLevel = (SpottedLevel)info.GetValue("SpottedLevel", typeof(SpottedLevel));
-
-                // Facility data (if applicable)
-                if (Classification.IsBaseType())
-                {
-                    BaseDamage = info.GetInt32("BaseDamage");
-                    OperationalCapacity = (OperationalCapacity)info.GetValue("OperationalCapacity", typeof(OperationalCapacity));
-                    FacilityType = (FacilityType)info.GetValue("FacilityType", typeof(FacilityType));
-
-                    if (FacilityType == FacilityType.SupplyDepot)
-                    {
-                        DepotSize = (DepotSize)info.GetValue("DepotSize", typeof(DepotSize));
-                        DepotCategory = (DepotCategory)info.GetValue("DepotCategory", typeof(DepotCategory));
-                        StockpileInDays = info.GetSingle("StockpileInDays");
-                        GenerationRate = (SupplyGenerationRate)info.GetValue("GenerationRate", typeof(SupplyGenerationRate));
-                        SupplyProjection = (SupplyProjection)info.GetValue("SupplyProjection", typeof(SupplyProjection));
-                        SupplyPenetration = info.GetBoolean("SupplyPenetration");
-                    }
-
-                    if (FacilityType == FacilityType.Airbase)
-                    {
-                        // Initialize collections
-                        _airUnitsAttached = new List<CombatUnit>();
-                        AirUnitsAttached = _airUnitsAttached.AsReadOnly();
-
-                        // Load attached unit IDs for later resolution
-                        _attachedUnitIDs = new List<string>();
-                        int attachedCount = info.GetInt32("AttachedUnitCount");
-                        for (int i = 0; i < attachedCount; i++)
-                        {
-                            string unitId = info.GetString($"AttachedUnitID_{i}");
-                            if (!string.IsNullOrEmpty(unitId))
-                            {
-                                _attachedUnitIDs.Add(unitId);
-                            }
-                        }
-                    }
-                }
-                else
-                {
-                    // Initialize facility collections for non-base units
-                    _airUnitsAttached = new List<CombatUnit>();
-                    AirUnitsAttached = _airUnitsAttached.AsReadOnly();
-                    _attachedUnitIDs = new List<string>();
-                }
-            }
-            catch (Exception e)
-            {
-                AppService.HandleException(CLASS_NAME, "Deserialization Constructor", e);
-                throw;
-            }
-        }
-
-        /// <summary>
-        /// Serializes CombatUnit data for saving to file.
-        /// </summary>
-        /// <param name="info">Serialization info to store data</param>
-        /// <param name="context">Streaming context for serialization</param>
-        public void GetObjectData(SerializationInfo info, StreamingContext context)
-        {
-            try
-            {
-                // Core identification and metadata
-                info.AddValue("UnitName", UnitName);
-                info.AddValue("UnitID", UnitID);
-                info.AddValue("UnitType", UnitType);
-                info.AddValue("Classification", Classification);
-                info.AddValue("Role", Role);
-                info.AddValue("Side", Side);
-                info.AddValue("Nationality", Nationality);
-
-                // Profile IDs
-                info.AddValue("DeployedProfileID", DeployedProfileID);
-                info.AddValue("MobileProfileID", MobileProfileID);
-                info.AddValue("EmbarkedProfileID", EmbarkedProfileID);
-                info.AddValue("IntelProfileType", IntelProfileType);
-
-                // Deployment system data
-                info.AddValue("DeploymentPosition", _deploymentPosition);
-                info.AddValue("IsEmbarkable", IsEmbarkable);
-                info.AddValue("IsMountable", IsMountable);
-
-                // Experience system data
-                info.AddValue("ExperiencePoints", ExperiencePoints);
-                info.AddValue("ExperienceLevel", ExperienceLevel);
-                info.AddValue("EfficiencyLevel", EfficiencyLevel);
-
-                // Leader system data
-                info.AddValue("LeaderID", LeaderID); // Can be null
-
-                // StatsMaxCurrent properties - serialize both max and current values
-                info.AddValue("HitPointsMax", HitPoints.Max);
-                info.AddValue("HitPointsCurrent", HitPoints.Current);
-                info.AddValue("DaysSupplyMax", DaysSupply.Max);
-                info.AddValue("DaysSupplyCurrent", DaysSupply.Current);
-                info.AddValue("MovementPointsMax", MovementPoints.Max);
-                info.AddValue("MovementPointsCurrent", MovementPoints.Current);
-
-                // Action counts
-                info.AddValue("MoveActionsMax", MoveActions.Max);
-                info.AddValue("MoveActionsCurrent", MoveActions.Current);
-                info.AddValue("CombatActionsMax", CombatActions.Max);
-                info.AddValue("CombatActionsCurrent", CombatActions.Current);
-                info.AddValue("DeploymentActionsMax", DeploymentActions.Max);
-                info.AddValue("DeploymentActionsCurrent", DeploymentActions.Current);
-                info.AddValue("OpportunityActionsMax", OpportunityActions.Max);
-                info.AddValue("OpportunityActionsCurrent", OpportunityActions.Current);
-                info.AddValue("IntelActionsMax", IntelActions.Max);
-                info.AddValue("IntelActionsCurrent", IntelActions.Current);
-
-                // Position and state
-                info.AddValue("MapPos", MapPos);
-                info.AddValue("SpottedLevel", SpottedLevel);
-
-                // Facility data (if applicable)
-                if (IsBase)
-                {
-                    info.AddValue("BaseDamage", BaseDamage);
-                    info.AddValue("OperationalCapacity", OperationalCapacity);
-                    info.AddValue("FacilityType", FacilityType);
-
-                    if (FacilityType == FacilityType.SupplyDepot)
-                    {
-                        info.AddValue("DepotSize", DepotSize);
-                        info.AddValue("DepotCategory", DepotCategory);
-                        info.AddValue("StockpileInDays", StockpileInDays);
-                        info.AddValue("GenerationRate", GenerationRate);
-                        info.AddValue("SupplyProjection", SupplyProjection);
-                        info.AddValue("SupplyPenetration", SupplyPenetration);
-                    }
-
-                    if (FacilityType == FacilityType.Airbase)
-                    {
-                        // Serialize attached unit IDs only (not the actual units)
-                        info.AddValue("AttachedUnitCount", _airUnitsAttached.Count);
-                        for (int i = 0; i < _airUnitsAttached.Count; i++)
-                        {
-                            info.AddValue($"AttachedUnitID_{i}", _airUnitsAttached[i].UnitID);
-                        }
-                    }
-                }
-            }
-            catch (Exception e)
-            {
-                AppService.HandleException(CLASS_NAME, "GetObjectData", e);
-                throw;
-            }
-        }
-
-        #endregion // ISerializable Implementation
-
-
-        #region IResolvableReferences
-
-        /// <summary>
-        /// Checks if there are unresolved references that need to be resolved.
-        /// </summary>
-        /// <returns>True if any resolution methods need to be called</returns>
-        public bool HasUnresolvedReferences()
-        {
-            // Check for unresolved leader reference
-            if (!string.IsNullOrEmpty(LeaderID))
-                return true;
-
-            // Check for unresolved facility references
-            // During runtime: check if we have attached units that need to be serialized as references
-            // During deserialization: check if we have unresolved unit IDs to resolve
-            if (IsBase && FacilityType == FacilityType.Airbase)
-            {
-                // If we have attached units OR unresolved IDs, we have references
-                if (_airUnitsAttached.Count > 0 || _attachedUnitIDs.Count > 0)
-                    return true;
-            }
-
-            return false;
-        }
-
-        /// <summary>
-        /// Gets the list of unresolved reference IDs that need to be resolved.
-        /// </summary>
-        /// <returns>Collection of object IDs that this object references</returns>
-        public IReadOnlyList<string> GetUnresolvedReferenceIDs()
-        {
-            var unresolvedIDs = new List<string>();
-
-            // Include leader ID if assigned
-            if (!string.IsNullOrEmpty(LeaderID))
-            {
-                unresolvedIDs.Add($"Leader:{LeaderID}");
-            }
-
-            // Include facility's unresolved references
-            if (IsBase && FacilityType == FacilityType.Airbase)
-            {
-                // During runtime: report attached units as references
-                foreach (var airUnit in _airUnitsAttached)
-                {
-                    if (airUnit != null)
-                        unresolvedIDs.Add($"AirUnit:{airUnit.UnitID}");
-                }
-
-                // During deserialization: report unresolved unit IDs
-                foreach (var unitID in _attachedUnitIDs)
-                {
-                    unresolvedIDs.Add($"AirUnit:{unitID}");
-                }
-            }
-
-            return unresolvedIDs.AsReadOnly();
-        }
-
-        /// <summary>
-        /// Resolves object references using the provided data manager.
-        /// Called after all objects have been deserialized.
-        /// </summary>
-        /// <param name="manager">Game data manager containing all loaded objects</param>
-        public void ResolveReferences(GameDataManager manager)
-        {
-            try
-            {
-                // Resolve leader reference if assigned
-                if (!string.IsNullOrEmpty(LeaderID))
-                {
-                    var leader = manager.GetLeader(LeaderID);
-                    if (leader == null)
-                    {
-                        throw new KeyNotFoundException($"Leader {LeaderID} not found in game data manager");
-                    }
-                    // Leader resolution is handled via GameDataManager lookup - no additional action needed
-                    // The UnitLeader property will resolve it dynamically
-                }
-
-                // Resolve facility references if this is a base unit
-                if (IsBase && FacilityType == FacilityType.Airbase && _attachedUnitIDs.Count > 0)
-                {
-                    _airUnitsAttached.Clear();
-
-                    foreach (string unitID in _attachedUnitIDs)
-                    {
-                        var unit = manager.GetCombatUnit(unitID);
-                        if (unit == null)
-                        {
-                            throw new KeyNotFoundException($"Air unit {unitID} not found in game data manager");
-                        }
-
-                        if (unit.UnitType == UnitType.AirUnit)
-                        {
-                            _airUnitsAttached.Add(unit);
-                        }
-                        else
-                        {
-                            AppService.HandleException(CLASS_NAME, "ResolveReferences",
-                                new InvalidOperationException($"Unit {unitID} is not an air unit (Type: {unit.UnitType})"),
-                                ExceptionSeverity.Minor);
-                        }
-                    }
-
-                    _attachedUnitIDs.Clear(); // Clean up temporary storage
-                }
-            }
-            catch (Exception e)
-            {
-                AppService.HandleException(CLASS_NAME, "ResolveReferences", e);
-                throw; // Re-throw the exception so the test can catch it
-            }
-        }
-
-        #endregion // IResolvableReferences
-
-
-        #region Validation Methods
-
-        /// <summary>
-        /// Validates internal consistency of the unit, including facility relationships.
-        /// </summary>
-        /// <returns>List of validation errors found</returns>
-        public List<string> ValidateInternalConsistency()
-        {
-            var errors = new List<string>();
-
-            try
-            {
-                // Validate basic properties
-                if (string.IsNullOrEmpty(UnitID))
-                    errors.Add("Unit ID cannot be null or empty");
-
-                if (string.IsNullOrEmpty(UnitName))
-                    errors.Add("Unit name cannot be null or empty");
-
-                // Validate profile IDs exist in database
-                if (DeployedProfileID != WeaponSystems.DEFAULT)
-                {
-                    if (WeaponSystemsDatabase.GetWeaponSystemProfile(DeployedProfileID) == null)
-                        errors.Add($"Deployed profile {DeployedProfileID} not found in WeaponSystemsDatabase");
-                }
-                else
-                {
-                    errors.Add("Deployed profile cannot be DEFAULT");
-                }
-
-                if (MobileProfileID != WeaponSystems.DEFAULT)
-                {
-                    if (WeaponSystemsDatabase.GetWeaponSystemProfile(MobileProfileID) == null)
-                        errors.Add($"Mobile profile {MobileProfileID} not found in WeaponSystemsDatabase");
-                }
-
-                if (EmbarkedProfileID != WeaponSystems.DEFAULT)
-                {
-                    if (WeaponSystemsDatabase.GetWeaponSystemProfile(EmbarkedProfileID) == null)
-                        errors.Add($"Embarked profile {EmbarkedProfileID} not found in WeaponSystemsDatabase");
-                }
-
-                // Validate intel profile exists
-                if (!IntelProfile.HasProfile(IntelProfileType))
-                    errors.Add($"Intel profile {IntelProfileType} not found in IntelProfile system");
-
-                // Validate leader exists if assigned
-                if (!string.IsNullOrEmpty(LeaderID))
-                {
-                    if (GameDataManager.Instance?.GetLeader(LeaderID) == null)
-                        errors.Add($"Leader {LeaderID} not found in GameDataManager");
-                }
-
-                // Validate StatsMaxCurrent consistency
-                if (HitPoints.Current > HitPoints.Max)
-                    errors.Add("Hit points current cannot exceed maximum");
-
-                if (DaysSupply.Current > DaysSupply.Max)
-                    errors.Add("Days supply current cannot exceed maximum");
-
-                if (MovementPoints.Current > MovementPoints.Max)
-                    errors.Add("Movement points current cannot exceed maximum");
-
-                // Validate action counts
-                if (MoveActions.Current > MoveActions.Max)
-                    errors.Add("Move actions current cannot exceed maximum");
-
-                if (CombatActions.Current > CombatActions.Max)
-                    errors.Add("Combat actions current cannot exceed maximum");
-
-                if (DeploymentActions.Current > DeploymentActions.Max)
-                    errors.Add("Deployment actions current cannot exceed maximum");
-
-                if (OpportunityActions.Current > OpportunityActions.Max)
-                    errors.Add("Opportunity actions current cannot exceed maximum");
-
-                if (IntelActions.Current > IntelActions.Max)
-                    errors.Add("Intel actions current cannot exceed maximum");
-
-                // Validate facility-specific data
-                if (IsBase)
-                {
-                    if (BaseDamage < CUConstants.MIN_DAMAGE || BaseDamage > CUConstants.MAX_DAMAGE)
-                        errors.Add($"Base damage must be between {CUConstants.MIN_DAMAGE} and {CUConstants.MAX_DAMAGE}");
-
-                    if (FacilityType == FacilityType.Airbase)
-                    {
-                        // Validate attached air units exist and are air units
-                        foreach (var airUnit in _airUnitsAttached)
-                        {
-                            if (airUnit == null)
-                                errors.Add("Attached air unit cannot be null");
-                            else if (airUnit.UnitType != UnitType.AirUnit)
-                                errors.Add($"Attached unit {airUnit.UnitID} is not an air unit (Type: {airUnit.UnitType})");
-                        }
-
-                        if (_airUnitsAttached.Count > CUConstants.MAX_AIR_UNITS)
-                            errors.Add($"Too many air units attached ({_airUnitsAttached.Count} > {CUConstants.MAX_AIR_UNITS})");
-                    }
-
-                    if (FacilityType == FacilityType.SupplyDepot)
-                    {
-                        var maxStockpile = CUConstants.MaxStockpileBySize[DepotSize];
-                        if (StockpileInDays > maxStockpile)
-                            errors.Add($"Stockpile exceeds maximum for depot size ({StockpileInDays} > {maxStockpile})");
-
-                        if (StockpileInDays < 0)
-                            errors.Add("Stockpile cannot be negative");
-                    }
-                }
-
-                // Validate deployment position constraints
-                if (!CanUnitTypeChangeStates() && _deploymentPosition != DeploymentPosition.Deployed)
-                {
-                    errors.Add($"Unit type {Classification} cannot be in deployment position {_deploymentPosition}");
-                }
-
-                // Validate embarkable/mountable consistency
-                if (IsEmbarkable && EmbarkedProfileID == WeaponSystems.DEFAULT)
-                    errors.Add("Embarkable unit must have valid embarked profile");
-
-                if (IsMountable && MobileProfileID == WeaponSystems.DEFAULT)
-                    errors.Add("Mountable unit must have valid mobile profile");
-            }
-            catch (Exception e)
-            {
-                AppService.HandleException(CLASS_NAME, "ValidateInternalConsistency", e);
-                errors.Add($"Validation error: {e.Message}");
-            }
-
-            return errors;
-        }
-
-        #endregion // Validation Methods
     }
 }
