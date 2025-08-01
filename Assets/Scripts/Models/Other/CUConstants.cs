@@ -91,7 +91,6 @@ namespace HammerAndSickle.Models
 
         #endregion // CombatUnit Constants
 
-
         #region Deployment Constants
 
         public const int Embarked     = 5; // Embarked on air, helicopter, and naval transport
@@ -102,7 +101,6 @@ namespace HammerAndSickle.Models
         public const int Fortified    = 0; // Deployed defensively, fortified position.
 
         #endregion // Deployment Constants
-
 
         #region Leader Constants
 
@@ -255,7 +253,6 @@ namespace HammerAndSickle.Models
         public const float MAX_REP_MULTIPLIER = 3.0f;
 
         #endregion // Leader Constants
-
 
         #region Facility Constants
 

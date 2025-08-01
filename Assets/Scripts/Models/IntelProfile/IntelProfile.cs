@@ -2,66 +2,6 @@
 using System.Collections.Generic;
 using HammerAndSickle.Services;
 
-/*───────────────────────────────────────────────────────────────────────────────
-  IntelProfile ─ static template repository for unit organizational intelligence
-────────────────────────────────────────────────────────────────────────────────
- Summary
- ═══════
- • Holds an immutable lookup table that defines the *maximum* equipment
-   composition for every unit type (one entry per **IntelProfileTypes** value).  
- • Generates fog-of-war filtered **IntelReport** snapshots, scaling counts by
-   current strength and applying ±error based on *SpottedLevel*.  
- • Eliminates per-unit memory overhead—each **CombatUnit** stores only an enum
-   reference to its template. :contentReference[oaicite:0]{index=0}
-
- Public properties
- ═════════════════
-   bool IsInitialized { get; }                       // true after successful static init
-
- Constructors
- ═════════════
-   // none – static class
-
- Public API (method signatures ⇢ purpose)
- ═══════════════════════════════════════
-   public static void  InitializeProfiles()                                 // one-time load of all templates
-   public static bool  HasProfile(IntelProfileTypes profileType)            // quick existence check
-   public static int   GetWeaponSystemCount(IntelProfileTypes type,
-                                            WeaponSystems ws)               // max count for a given WS
-   public static IReadOnlyDictionary<WeaponSystems,int>
-                       GetDefinedWeaponSystems(IntelProfileTypes type)      // full WS→count map
-   public static IntelReport GenerateIntelReport(IntelProfileTypes type,
-                                                 string unitName,
-                                                 int currentHP,
-                                                 Nationality nat,
-                                                 DeploymentStatus state,
-                                                 ExperienceLevel xp,
-                                                 EfficiencyLevel eff,
-                                                 SpottedLevel spot = SpottedLevel.Level1)
-                                                                            // fog-of-war report builder
-
- Private helpers
- ═══════════════
-   static void   EnsureInitialized()                         // guard against premature use
-   static void   LoadProfileDefinitions()                    // populate _profiles (TODO: data-file driven)
-   static string GetWeaponSystemPrefix(WeaponSystems ws)     // extract “TANK”, “IFV”, etc.
-   static string MapPrefixToBucket(string prefix)            // prefix→GUI bucket
-   static float  CalculateFogOfWarMultiplier(SpottedLevel s) // ±error based on intel level
-   static float  GetRandomMultiplier(float min, float max)   // randomised ±% helper
-   static void   AssignBucketToReport(IntelReport rpt,
-                                      string bucket,
-                                      int value)             // write into report fields
-
- Developer notes
- ═══════════════
- • **Thread-Safety** – Double-checked locking around *InitializeProfiles()* ensures
-   safe concurrent startup. Once initialised, data are read-only and lock-free.  
- • **Fog-of-War Maths** – Error percentages come from *CUConstants*; tweak those
-   constants to rebalance intel accuracy without touching this class.  
- • **Bucket Consistency** – *MapPrefixToBucket()* **must** remain in sync with the
-   bucket properties in **IntelReport**. Add a new case whenever you introduce a
-   new weapon-system prefix or display bucket.  
-───────────────────────────────────────────────────────────────────────────────*/
 namespace HammerAndSickle.Models
 {
     public static class IntelProfile
