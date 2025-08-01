@@ -336,10 +336,9 @@ namespace HammerAndSickle.Controllers
         #endregion // Query Methods
 
         #region Public Methods
-
         /// <summary>
         /// Completely wipes every mutable runtime collection so a brand‑new snapshot can be applied
-        /// without leaving behind zombie references.  This must be called <b>before</b> any new state
+        /// without leaving behind zombie references.  This must be called <b>before</b> any new state
         /// (campaign, scenario, units, leaders, caches) is loaded.
         /// </summary>
         public void ClearAll()
@@ -348,42 +347,146 @@ namespace HammerAndSickle.Controllers
 
             try
             {
+                AppService.CaptureUiMessage("Beginning complete game state wipe...");
+
                 // ──────────────────────────────────────────────────────────────────────────────
-                // 1) Break cross‑object links (Leader ↔ CombatUnit).
+                // Step 1: Break all cross‑object links to prevent dangling references
                 // ──────────────────────────────────────────────────────────────────────────────
-                foreach (var leader in _leaders.Values)
+
+                // Unassign all leaders from their units
+                foreach (var leader in _leaders.Values.ToList()) // ToList() to avoid modification during enumeration
                 {
-                    // Detach the leader from its unit (if any) so nothing holds stale UnitID refs.
-                    if (leader.IsAssigned)
+                    if (leader != null && leader.IsAssigned)
                     {
-                        leader.UnassignFromUnit();
+                        try
+                        {
+                            leader.UnassignFromUnit();
+                        }
+                        catch (Exception ex)
+                        {
+                            AppService.HandleException(CLASS_NAME, METHOD_NAME,
+                                new InvalidOperationException($"Failed to unassign leader {leader.LeaderID}", ex));
+                        }
+                    }
+                }
+
+                // Clear leader references from all units
+                foreach (var unit in _combatUnits.Values.ToList())
+                {
+                    if (unit != null && !string.IsNullOrEmpty(unit.LeaderID))
+                    {
+                        try
+                        {
+                            // Use reflection to clear the LeaderID since it might be read-only
+                            var leaderIdProperty = unit.GetType().GetProperty("LeaderID",
+                                System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Instance);
+                            if (leaderIdProperty != null && leaderIdProperty.CanWrite)
+                            {
+                                leaderIdProperty.SetValue(unit, null);
+                            }
+                        }
+                        catch (Exception ex)
+                        {
+                            AppService.HandleException(CLASS_NAME, METHOD_NAME,
+                                new InvalidOperationException($"Failed to clear leader reference from unit {unit.UnitID}", ex));
+                        }
+                    }
+                }
+
+                // Clear air unit attachments from facilities
+                foreach (var facility in _combatUnits.Values.Where(u => u?.IsBase == true).ToList())
+                {
+                    if (facility != null)
+                    {
+                        try
+                        {
+                            facility.ClearAllAirUnits();
+                        }
+                        catch (Exception ex)
+                        {
+                            AppService.HandleException(CLASS_NAME, METHOD_NAME,
+                                new InvalidOperationException($"Failed to clear air units from facility {facility.UnitID}", ex));
+                        }
                     }
                 }
 
                 // ──────────────────────────────────────────────────────────────────────────────
-                // 2) Clear the master dictionaries that index all entities.
+                // Step 2: Clear all entity dictionaries
                 // ──────────────────────────────────────────────────────────────────────────────
+
+                int unitsCleared = _combatUnits.Count;
+                int leadersCleared = _leaders.Count;
+
                 _combatUnits.Clear();
                 _leaders.Clear();
 
+                AppService.CaptureUiMessage($"Cleared {unitsCleared} units and {leadersCleared} leaders from registries");
+
                 // ──────────────────────────────────────────────────────────────────────────────
-                // 3) Null‑out high‑level objects so their internal collections become GC‑eligible.
+                // Step 3: Null out high‑level game state objects
                 // ──────────────────────────────────────────────────────────────────────────────
+
                 CurrentCampaignData = null;
                 CurrentScenarioData = null;
 
+                AppService.CaptureUiMessage("Cleared campaign and scenario data");
+
                 // ──────────────────────────────────────────────────────────────────────────────
-                // 4) Purge transient caches (pathfinding, supply, etc.)
-                //    NOTE: the actual cache dictionaries live in the main file; the method stub
-                //    keeps this call compile‑safe even if no caches exist yet.
+                // Step 4: Clear transient caches and computed data
                 // ──────────────────────────────────────────────────────────────────────────────
-                RebuildTransientCaches();
+
+                ClearTransientCaches();
+
+                // ──────────────────────────────────────────────────────────────────────────────
+                // Step 5: Force garbage collection of cleared objects (optional but helpful)
+                // ──────────────────────────────────────────────────────────────────────────────
+
+                // Suggest garbage collection to clean up the large number of objects we just released
+                // This is optional but can help with memory pressure after clearing large game states
+                GC.Collect();
+                GC.WaitForPendingFinalizers();
+
+                AppService.CaptureUiMessage("Game state completely cleared and ready for new data");
             }
             catch (Exception ex)
             {
-                // Centralised error handling – we re‑throw so calling code can still react if needed.
+                // This is a critical operation - if ClearAll fails, the game state could be corrupted
                 AppService.HandleException(CLASS_NAME, METHOD_NAME, ex);
-                throw;
+                throw; // Re‑throw so calling code knows the clear failed
+            }
+        }
+
+        /// <summary>
+        /// Clears all transient (non-persistent) caches and computed data.
+        /// This is called by ClearAll() and can also be called independently to refresh caches.
+        /// </summary>
+        private void ClearTransientCaches()
+        {
+            const string METHOD_NAME = nameof(ClearTransientCaches);
+
+            try
+            {
+                // ──────────────────────────────────────────────────────────────────────────────
+                // Clear any cached lookups, pathfinding data, supply networks, etc.
+                // ──────────────────────────────────────────────────────────────────────────────
+
+                // Note: Add cache clearing logic here as new caches are implemented
+                // Examples of what might go here in the future:
+                // - Pathfinding graphs
+                // - Supply network calculations  
+                // - Unit visibility caches
+                // - Threat assessment matrices
+                // - AI decision trees
+
+                // For now, this is mostly a placeholder but provides the structure
+                // for future cache management
+
+                AppService.CaptureUiMessage("Transient caches cleared");
+            }
+            catch (Exception ex)
+            {
+                AppService.HandleException(CLASS_NAME, METHOD_NAME, ex);
+                // Don't re-throw cache clearing errors - they're not critical to core functionality
             }
         }
 
