@@ -5,108 +5,8 @@ using UnityEngine;
 
 namespace HammerAndSickle.Models
 {
-   /*───────────────────────────────────────────────────────────────────────────────
-      Leader ─ officer model with reputation, skills, and unit-assignment logic
-    ────────────────────────────────────────────────────────────────────────────────
-     Summary
-     ═══════
-     • Represents a single battlefield officer who can be assigned to a **CombatUnit**,
-       earn reputation, unlock skills, and confer command bonuses.  
-     • Encapsulates personal identity (name, nationality, rank), dynamic state
-       (reputation, skills, assignment), and full event hooks for UI updates.  
-     • Implements **ISerializable** and **ICloneable** so leaders can be saved,
-       loaded, and duplicated for scenario editors or undo stacks. :contentReference[oaicite:0]{index=0}
-
-     Public properties
-     ═════════════════
-       string          LeaderID        { get; private set; }
-       string          Name            { get; private set; }
-       Side            Side            { get; private set; }
-       Nationality     Nationality     { get; private set; }
-       CommandGrade    CommandGrade    { get; private set; }
-       int             ReputationPoints{ get; private set; }
-       string          FormattedRank   { get; }                  // computed getter
-       CommandAbility  CombatCommand   { get; private set; }
-       bool            IsAssigned      { get; private set; }
-       string          UnitID          { get; private set; }
-
-     Public events
-     ═════════════
-       event Action<int,int>          OnReputationChanged;   // (delta, newTotal)
-       event Action<CommandGrade>     OnGradeChanged;        // (newGrade)
-       event Action<Enum,string>      OnSkillUnlocked;       // (skillEnum, skillName)
-       event Action<string>           OnUnitAssigned;        // (unitID)
-       event Action                  OnUnitUnassigned;       // ()
-
-     Constructors
-     ═════════════
-       public    Leader(Side side, Nationality nationality)
-       public    Leader(string name, Side side,
-                        Nationality nationality,
-                        CommandAbility command)
-       protected Leader(SerializationInfo info,
-                        StreamingContext context)            // deserialisation
-
-     Public API (method signatures ⇢ brief purpose)
-     ═════════════════════════════════════════════
-     ― Identity & rank ―
-       public void   SetOfficerCommandAbility(CommandAbility command)          // manual override
-       public bool   SetOfficerName(string name)                               // validation + set
-       public string GetFormattedRank()                                        // localised rank text
-       public void   SetCommandGrade(CommandGrade grade)                       // fire grade event
-
-     ― Reputation ―
-       public void   AwardReputation(int amount)                               // flat REP gain
-       public void   AwardReputationForAction(CUConstants.ReputationAction act,
-                                              float contextMultiplier = 1f)    // action-based REP
-
-     ― Skill-tree facade ―
-       public bool   CanUnlockSkill(Enum skillEnum)
-       public bool   UnlockSkill(Enum skillEnum)
-       public bool   IsSkillUnlocked(Enum skillEnum)
-       public bool   HasCapability(SkillBonusType bonusType)
-       public float  GetBonusValue(SkillBonusType bonusType)
-       public bool   IsBranchAvailable(SkillBranch branch)
-       public bool   ResetSkills()                                             // respec
-
-     ― Unit assignment ―
-       public void   AssignToUnit(string unitID)
-       public void   UnassignFromUnit()
-
-     ― Interfaces ―
-       public void   GetObjectData(SerializationInfo info,
-                                   StreamingContext context)                   // ISerializable
-       public object Clone()                                                   // ICloneable
-
-     Private helpers
-     ═══════════════
-       void   InitializeCommonProperties(Side side, Nationality nat)           // default state
-       void   InitializeSkillTree()                                            // create + wire
-       void   WireSkillTreeEvents()                                            // forward events
-       string GenerateUniqueID()                                               // LEAD-xxxxx
-       void   GenerateRandomNameBasedOnNationality()                           // NameGenService
-       // reputation math is in AwardReputationForAction()
-       // validation helpers (Enum.IsDefined, Math.Clamp) inline in callers
-
-     Developer notes
-     ═══════════════
-     • **Event-driven updates** – All state changes raise events consumed by the UI
-       layer; never modify *CommandGrade*, *ReputationPoints*, or assignment flags
-       directly outside the provided methods.  
-     • **Skill-tree ownership** – The contained *LeaderSkillTree* is the single
-       source of truth for capabilities and grade promotions; keep its serialisation
-       data in sync when adding new skills.  
-     • **Exception funnel** – Every public & helper method wraps logic in try/catch
-       and reports via `AppService.HandleException(CLASS_NAME, MethodName, e)` per
-       project logging standard.  
-     • **Thread safety** – No internal locks; UI threads should marshal back to the
-       main thread before mutating leader state.  
-     • **Clone semantics** – *Clone()* performs a deep copy of the skill tree and
-       assignment state but generates a new *LeaderID* to avoid duplicates in
-       persistence layers.
-    ───────────────────────────────────────────────────────────────────────────────*/
     [Serializable]
-    public class Leader : ISerializable, ICloneable
+    public class Leader : ICloneable
     {
         #region Constants
 
@@ -130,8 +30,8 @@ namespace HammerAndSickle.Models
         public int ReputationPoints { get; private set; }                    // Points for promotions and skill upgrades
         public string FormattedRank { get { return GetFormattedRank(); } }   // Real-world rank of the officer
         public CommandAbility CombatCommand { get; private set; }            // Direct combat modifier
-        public bool IsAssigned { get; private set; }                         // Is the officer assigned to a unit?
-        public string UnitID { get; private set; }                           // UnitID of the unit assigned to the officer
+        public bool IsAssigned { get; internal set; }                         // Is the officer assigned to a unit?
+        public string UnitID { get; internal set; }                           // UnitID of the unit assigned to the officer
 
         #endregion // Properties
 
@@ -726,42 +626,6 @@ namespace HammerAndSickle.Models
         }
 
         #endregion // Unit Assignment
-
-
-        #region ISerializable Implementation
-
-        /// <summary>
-        /// Serialize the leader for save data
-        /// </summary>
-        /// <param name="info">Serialization info to populate</param>
-        /// <param name="context">Streaming context</param>
-        public void GetObjectData(SerializationInfo info, StreamingContext context)
-        {
-            try
-            {
-                // Save basic properties
-                info.AddValue(nameof(LeaderID), LeaderID);
-                info.AddValue(nameof(Name), Name);
-                info.AddValue(nameof(Side), Side);
-                info.AddValue(nameof(Nationality), Nationality);
-                info.AddValue(nameof(CommandGrade), CommandGrade);
-                info.AddValue(nameof(ReputationPoints), ReputationPoints);
-                info.AddValue(nameof(CombatCommand), CombatCommand);
-                info.AddValue(nameof(IsAssigned), IsAssigned);
-                info.AddValue(nameof(UnitID), UnitID);
-
-                // Save skill tree data
-                var skillTreeData = skillTree?.ToSerializableData();
-                info.AddValue("SkillTreeData", skillTreeData);
-            }
-            catch (Exception e)
-            {
-                AppService.HandleException(CLASS_NAME, "GetObjectData", e);
-                throw;
-            }
-        }
-
-        #endregion // ISerializable Implementation
 
 
         #region ICloneable Implementation
