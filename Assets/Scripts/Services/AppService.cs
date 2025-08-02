@@ -130,6 +130,14 @@ namespace HammerAndSickle.Services
             _exceptions.Clear();
             _uiMessages.Clear();
         }
+
+        /// <summary>
+        /// Reset/clear all captured test data
+        /// </summary>
+        public void Reset()
+        {
+            Clear();
+        }
     }
 
     /// <summary>
