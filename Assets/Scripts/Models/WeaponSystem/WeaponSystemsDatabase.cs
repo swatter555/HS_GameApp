@@ -305,6 +305,8 @@ namespace HammerAndSickle.Models
 
         #endregion // Private Methods
 
+        //-----------------------------------------------------------------------------------------
+
         #region Soviet Tanks
 
         /// <summary>
