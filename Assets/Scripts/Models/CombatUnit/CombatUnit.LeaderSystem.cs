@@ -24,7 +24,7 @@ namespace HammerAndSickle.Models
                 }
                 catch (Exception e)
                 {
-                    AppService.HandleException(CLASS_NAME, "UnitLeader.get", e, ExceptionSeverity.Minor);
+                    AppService.HandleException(CLASS_NAME, "UnitLeader.get", e);
                     return null;
                 }
             }

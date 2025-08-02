@@ -1,4 +1,5 @@
-﻿using System;
+﻿using HammerAndSickle.Services;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
@@ -7,25 +8,315 @@ using UnityEngine;
 namespace HammerAndSickle.Models
 {
     /// <summary>
-    /// Serializable data structure for saving/loading leader skill trees
+    /// Updated LeaderSkillTreeData with proper enum serialization support
     /// </summary>
     [Serializable]
     public class LeaderSkillTreeData
     {
+        #region Core State
+
         public int ReputationPoints;
         public CommandGrade CurrentGrade;
-        public List<string> StartedBranches;
+
+        #endregion // Core State
+
+        #region Branch Tracking
+
+        public List<SkillBranch> StartedBranches;
+
+        #endregion // Branch Tracking
+
+        #region Skill Storage
+
         public List<SkillReference> UnlockedSkills;
+
+        #endregion // Skill Storage
+
+        #region Constructor
+
+        /// <summary>
+        /// Parameterless constructor for serialization
+        /// </summary>
+        public LeaderSkillTreeData()
+        {
+            ReputationPoints = 0;
+            CurrentGrade = CommandGrade.JuniorGrade;
+            StartedBranches = new List<SkillBranch>();
+            UnlockedSkills = new List<SkillReference>();
+        }
+
+        #endregion // Constructor
+
+        #region Validation
+
+        /// <summary>
+        /// Validates the skill tree data integrity
+        /// </summary>
+        /// <returns>True if data is valid</returns>
+        public bool IsValid()
+        {
+            // Basic validation
+            if (ReputationPoints < 0) return false;
+            if (!Enum.IsDefined(typeof(CommandGrade), CurrentGrade)) return false;
+            if (StartedBranches == null || UnlockedSkills == null) return false;
+
+            // Validate started branches
+            foreach (var branch in StartedBranches)
+            {
+                if (!Enum.IsDefined(typeof(SkillBranch), branch)) return false;
+            }
+
+            // Validate skill references
+            foreach (var skillRef in UnlockedSkills)
+            {
+                if (skillRef == null || !skillRef.IsValid()) return false;
+            }
+
+            return true;
+        }
+
+        #endregion // Validation
     }
 
     /// <summary>
-    /// Serializable reference to a skill enum
+    /// Updated SkillReference with better enum handling
     /// </summary>
     [Serializable]
     public class SkillReference
     {
-        public string EnumType;  // IntelProfileID of the enum type
-        public int EnumValue;    // Integer value of the enum
+        #region Fields
+
+        public string EnumTypeName;  // Full type name for reconstruction
+        public string EnumValueName; // String name of the enum value
+        public int EnumValueInt;     // Integer value for validation
+
+        #endregion // Fields
+
+        #region Constructors
+
+        /// <summary>
+        /// Parameterless constructor for serialization
+        /// </summary>
+        public SkillReference()
+        {
+            EnumTypeName = string.Empty;
+            EnumValueName = string.Empty;
+            EnumValueInt = 0;
+        }
+
+        /// <summary>
+        /// Creates a skill reference from an enum value
+        /// </summary>
+        /// <param name="skillEnum">The skill enum to reference</param>
+        public SkillReference(Enum skillEnum)
+        {
+            if (skillEnum == null)
+            {
+                throw new ArgumentNullException(nameof(skillEnum));
+            }
+
+            EnumTypeName = skillEnum.GetType().FullName;
+            EnumValueName = skillEnum.ToString();
+            EnumValueInt = Convert.ToInt32(skillEnum);
+        }
+
+        #endregion // Constructors
+
+        #region Validation and Conversion
+
+        /// <summary>
+        /// Validates that this skill reference is properly formed
+        /// </summary>
+        /// <returns>True if the reference is valid</returns>
+        public bool IsValid()
+        {
+            return !string.IsNullOrWhiteSpace(EnumTypeName) &&
+                   !string.IsNullOrWhiteSpace(EnumValueName) &&
+                   EnumValueInt >= 0;
+        }
+
+        /// <summary>
+        /// Attempts to convert this reference back to an Enum
+        /// </summary>
+        /// <returns>The enum value, or null if conversion fails</returns>
+        public Enum ToEnum()
+        {
+            try
+            {
+                // Get the enum type
+                var enumType = Type.GetType(EnumTypeName);
+                if (enumType == null || !enumType.IsEnum)
+                {
+                    return null;
+                }
+
+                // Try to parse by name first (most reliable)
+                if (Enum.TryParse(enumType, EnumValueName, out object result))
+                {
+                    return (Enum)result;
+                }
+
+                // Fallback to integer value
+                if (Enum.IsDefined(enumType, EnumValueInt))
+                {
+                    return (Enum)Enum.ToObject(enumType, EnumValueInt);
+                }
+
+                return null;
+            }
+            catch
+            {
+                return null;
+            }
+        }
+
+        #endregion // Validation and Conversion
+    }
+
+    /// <summary>
+    /// Extension methods for LeaderSkillTree snapshot support
+    /// </summary>
+    public static class LeaderSkillTreeSnapshotExtensions
+    {
+        #region Snapshot Conversion
+
+        /// <summary>
+        /// Creates a snapshot of the skill tree for persistence
+        /// This method should be added to the LeaderSkillTree class as an instance method
+        /// </summary>
+        /// <param name="skillTree">The skill tree to snapshot</param>
+        /// <returns>Serializable skill tree data</returns>
+        public static LeaderSkillTreeData ToSnapshot(this LeaderSkillTree skillTree)
+        {
+            if (skillTree == null)
+            {
+                throw new ArgumentNullException(nameof(skillTree));
+            }
+
+            try
+            {
+                var data = new LeaderSkillTreeData
+                {
+                    ReputationPoints = skillTree.ReputationPoints,
+                    CurrentGrade = skillTree.CurrentGrade
+                };
+
+                // Convert started branches to list
+                data.StartedBranches = skillTree.ActiveBranches.ToList();
+
+                // Convert unlocked skills to skill references
+                data.UnlockedSkills = new List<SkillReference>();
+
+                // Use the internal method to get unlocked skills
+                var unlockedSkills = skillTree.GetUnlockedSkills();
+
+                foreach (var skillKvp in unlockedSkills)
+                {
+                    if (skillKvp.Value) // Only save unlocked skills
+                    {
+                        data.UnlockedSkills.Add(new SkillReference(skillKvp.Key));
+                    }
+                }
+
+                return data;
+            }
+            catch (Exception e)
+            {
+                AppService.HandleException(nameof(LeaderSkillTreeSnapshotExtensions), nameof(ToSnapshot), e);
+                throw;
+            }
+        }
+
+        /// <summary>
+        /// Creates a LeaderSkillTree from snapshot data
+        /// This method should be added to the LeaderSkillTree class as a static method
+        /// </summary>
+        /// <param name="data">The snapshot data to restore from</param>
+        /// <returns>Reconstructed skill tree</returns>
+        public static LeaderSkillTree FromSnapshot(LeaderSkillTreeData data)
+        {
+            if (data == null)
+            {
+                throw new ArgumentNullException(nameof(data));
+            }
+
+            if (!data.IsValid())
+            {
+                throw new ArgumentException("Invalid skill tree data provided to FromSnapshot");
+            }
+
+            try
+            {
+                // Create new skill tree with reputation points
+                var skillTree = new LeaderSkillTree(data.ReputationPoints);
+
+                // Restore command grade
+                skillTree.SetCommandGrade(data.CurrentGrade);
+
+                // Restore started branches
+                foreach (var branch in data.StartedBranches)
+                {
+                    skillTree.AddStartedBranch(branch);
+                }
+
+                // Restore unlocked skills
+                foreach (var skillRef in data.UnlockedSkills)
+                {
+                    var skillEnum = skillRef.ToEnum();
+                    if (skillEnum != null)
+                    {
+                        skillTree.ForceUnlockSkill(skillEnum);
+                    }
+                    else
+                    {
+                        // Log warning about unrecognized skill but continue
+                        AppService.CaptureUiMessage($"Warning: Could not restore skill {skillRef.EnumValueName} from save data");
+                    }
+                }
+
+                return skillTree;
+            }
+            catch (Exception e)
+            {
+                AppService.HandleException(nameof(LeaderSkillTreeSnapshotExtensions), nameof(FromSnapshot), e);
+                throw;
+            }
+        }
+
+        #endregion // Snapshot Conversion
+
+        #region Helper Methods
+
+        /// <summary>
+        /// Gets unlocked skills from skill tree using reflection
+        /// This is needed because unlockedSkills is private
+        /// </summary>
+        /// <param name="skillTree">The skill tree to read from</param>
+        /// <returns>Dictionary of skill states</returns>
+        private static Dictionary<Enum, bool> GetUnlockedSkillsFromTree(LeaderSkillTree skillTree)
+        {
+            try
+            {
+                var fieldInfo = typeof(LeaderSkillTree).GetField("unlockedSkills",
+                    System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
+
+                if (fieldInfo != null)
+                {
+                    return (Dictionary<Enum, bool>)fieldInfo.GetValue(skillTree);
+                }
+
+                // Fallback: return empty dictionary and log error
+                AppService.CaptureUiMessage("Warning: Could not access skill tree data via reflection");
+                return new Dictionary<Enum, bool>();
+            }
+            catch (Exception e)
+            {
+                AppService.HandleException(nameof(LeaderSkillTreeSnapshotExtensions), nameof(GetUnlockedSkillsFromTree), e);
+                return new Dictionary<Enum, bool>();
+            }
+        }
+
+        #endregion // Helper Methods
     }
 
     [Serializable]
@@ -138,7 +429,6 @@ namespace HammerAndSickle.Models
 
         #endregion // Constructors
 
-
         #region Reputation Management
 
         /// <summary>
@@ -166,7 +456,6 @@ namespace HammerAndSickle.Models
         }
 
         #endregion // Reputation Management
-
 
         #region Skill Management
 
@@ -315,7 +604,6 @@ namespace HammerAndSickle.Models
 
         #endregion // Skill Management
 
-
         #region Validate Tree System
 
         /// <summary>
@@ -355,7 +643,6 @@ namespace HammerAndSickle.Models
         }
 
         #endregion // Validate Tree System
-
 
         #region Bonus Calculations
 
@@ -445,7 +732,6 @@ namespace HammerAndSickle.Models
         }
 
         #endregion // Bonus Calculations
-
 
         #region Skill Reset (Respec)
 
@@ -593,7 +879,6 @@ namespace HammerAndSickle.Models
 
         #endregion // Skill Reset
 
-
         #region Helper Methods
 
         /// <summary>
@@ -619,5 +904,115 @@ namespace HammerAndSickle.Models
         }
 
         #endregion // Helper Methods
+
+        #region Snapshot Method
+
+        /// <summary>
+        /// Creates a LeaderSkillTree from snapshot data
+        /// </summary>
+        /// <param name="data">The snapshot data to restore from</param>
+        /// <returns>Reconstructed skill tree</returns>
+        public static LeaderSkillTree FromSnapshot(LeaderSkillTreeData data)
+        {
+            if (data == null)
+            {
+                throw new ArgumentNullException(nameof(data));
+            }
+
+            if (!data.IsValid())
+            {
+                throw new ArgumentException("Invalid skill tree data provided to FromSnapshot");
+            }
+
+            try
+            {
+                // Create new skill tree with reputation points
+                var skillTree = new LeaderSkillTree(data.ReputationPoints);
+
+                // Restore command grade
+                skillTree.SetCommandGrade(data.CurrentGrade);
+
+                // Restore started branches
+                foreach (var branch in data.StartedBranches)
+                {
+                    skillTree.AddStartedBranch(branch);
+                }
+
+                // Restore unlocked skills
+                foreach (var skillRef in data.UnlockedSkills)
+                {
+                    var skillEnum = skillRef.ToEnum();
+                    if (skillEnum != null)
+                    {
+                        skillTree.ForceUnlockSkill(skillEnum);
+                    }
+                    else
+                    {
+                        // Log warning about unrecognized skill but continue
+                        AppService.CaptureUiMessage($"Warning: Could not restore skill {skillRef.EnumValueName} from save data");
+                    }
+                }
+
+                return skillTree;
+            }
+            catch (Exception e)
+            {
+                AppService.HandleException("LeaderSkillTree", "FromSnapshot", e);
+                throw;
+            }
+        }
+
+        #endregion // Snapshot Method
+
+        #region Snapshot Support Methods
+
+        /// <summary>
+        /// Sets command grade directly (for snapshot restoration)
+        /// </summary>
+        /// <param name="grade">Command grade to set</param>
+        internal void SetCommandGrade(CommandGrade grade)
+        {
+            if (!Enum.IsDefined(typeof(CommandGrade), grade))
+            {
+                throw new ArgumentException($"Invalid command grade: {grade}");
+            }
+            CurrentGrade = grade;
+        }
+
+        /// <summary>
+        /// Adds a branch to started branches (for snapshot restoration)
+        /// </summary>
+        /// <param name="branch">Branch to add</param>
+        internal void AddStartedBranch(SkillBranch branch)
+        {
+            if (branch != SkillBranch.None)
+            {
+                startedBranches.Add(branch);
+            }
+        }
+
+        /// <summary>
+        /// Forces a skill to be unlocked without validation (for snapshot restoration)
+        /// </summary>
+        /// <param name="skillEnum">Skill to force unlock</param>
+        internal void ForceUnlockSkill(Enum skillEnum)
+        {
+            if (skillEnum != null && Convert.ToInt32(skillEnum) != 0)
+            {
+                unlockedSkills[skillEnum] = true;
+                ClearBonusCaches(); // Ensure caches are rebuilt
+            }
+        }
+
+        /// <summary>
+        /// Gets all unlocked skills for snapshot operations
+        /// </summary>
+        /// <returns>Dictionary of skill unlock states</returns>
+        internal IReadOnlyDictionary<Enum, bool> GetUnlockedSkills()
+        {
+            return unlockedSkills;
+        }
+
+        #endregion // Snapshot Support Methods
     }
 }
