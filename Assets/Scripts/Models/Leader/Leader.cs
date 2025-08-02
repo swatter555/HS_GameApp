@@ -1,12 +1,11 @@
 ﻿using HammerAndSickle.Services;
 using System;
-using System.Runtime.Serialization;
 using UnityEngine;
 
 namespace HammerAndSickle.Models
 {
     [Serializable]
-    public class Leader : ICloneable
+    public class Leader
     {
         #region Constants
 
@@ -34,19 +33,6 @@ namespace HammerAndSickle.Models
         public string UnitID { get; internal set; }                           // UnitID of the unit assigned to the officer
 
         #endregion // Properties
-
-
-        #region Events
-
-        // Events for UI and system notifications
-        public event Action<int, int> OnReputationChanged;                    // (changeAmount, newTotal)
-        public event Action<CommandGrade> OnGradeChanged;                     // (newGrade)
-        public event Action<Enum, string> OnSkillUnlocked;                   // (skillEnum, skillName)
-        public event Action<string> OnUnitAssigned;                          // (unitID)
-        public event Action OnUnitUnassigned;                                // ()
-
-        #endregion // Events
-
 
         #region Constructors
 
@@ -109,52 +95,7 @@ namespace HammerAndSickle.Models
             }
         }
 
-        /// <summary>
-        /// Deserialization constructor for loading from save data
-        /// </summary>
-        /// <param name="info">Serialization info containing saved data</param>
-        /// <param name="context">Streaming context</param>
-        protected Leader(SerializationInfo info, StreamingContext context)
-        {
-            try
-            {
-                // Load basic properties
-                LeaderID = info.GetString(nameof(LeaderID));
-                Name = info.GetString(nameof(Name));
-                Side = (Side)info.GetValue(nameof(Side), typeof(Side));
-                Nationality = (Nationality)info.GetValue(nameof(Nationality), typeof(Nationality));
-                CommandGrade = (CommandGrade)info.GetValue(nameof(CommandGrade), typeof(CommandGrade));
-                ReputationPoints = info.GetInt32(nameof(ReputationPoints));
-                CombatCommand = (CommandAbility)info.GetValue(nameof(CombatCommand), typeof(CommandAbility));
-                IsAssigned = info.GetBoolean(nameof(IsAssigned));
-
-                // Handle optional UnitID (might be null)
-                try
-                {
-                    UnitID = info.GetString(nameof(UnitID));
-                }
-                catch (SerializationException)
-                {
-                    UnitID = null; // Not assigned to any unit
-                }
-
-                // Load skill tree data
-                var skillTreeData = (LeaderSkillTreeData)info.GetValue("SkillTreeData", typeof(LeaderSkillTreeData));
-                skillTree = new LeaderSkillTree();
-                skillTree.FromSerializableData(skillTreeData);
-
-                // Wire up skill tree events to our events
-                WireSkillTreeEvents();
-            }
-            catch (Exception e)
-            {
-                AppService.HandleException(CLASS_NAME, "DeserializationConstructor", e);
-                throw;
-            }
-        }
-
         #endregion // Constructors
-
 
         #region Initialization Helpers
 
@@ -179,30 +120,6 @@ namespace HammerAndSickle.Models
         private void InitializeSkillTree()
         {
             skillTree = new LeaderSkillTree(ReputationPoints);
-            WireSkillTreeEvents();
-        }
-
-        /// <summary>
-        /// Wire skill tree events to our public events
-        /// </summary>
-        private void WireSkillTreeEvents()
-        {
-            skillTree.OnGradeChanged += (grade) =>
-            {
-                CommandGrade = grade;
-                OnGradeChanged?.Invoke(grade);
-            };
-
-            skillTree.OnReputationChanged += (change, newTotal) =>
-            {
-                ReputationPoints = newTotal;
-                OnReputationChanged?.Invoke(change, newTotal);
-            };
-
-            skillTree.OnSkillUnlocked += (skillEnum, skillName, description) =>
-            {
-                OnSkillUnlocked?.Invoke(skillEnum, skillName);
-            };
         }
 
         /// <summary>
@@ -216,7 +133,6 @@ namespace HammerAndSickle.Models
         }
 
         #endregion // Initialization Helpers
-
 
         #region Public Methods
 
@@ -336,7 +252,6 @@ namespace HammerAndSickle.Models
                     throw new ArgumentException($"Invalid command grade: {grade}");
                 }
                 CommandGrade = grade;
-                OnGradeChanged?.Invoke(grade);
             }
             catch (Exception e)
             {
@@ -346,7 +261,6 @@ namespace HammerAndSickle.Models
         }
 
         #endregion // Public Methods
-
 
         #region Helpers
 
@@ -385,7 +299,6 @@ namespace HammerAndSickle.Models
 
         #endregion // Helpers
 
-
         #region Reputation Management
 
         /// <summary>
@@ -400,8 +313,6 @@ namespace HammerAndSickle.Models
 
                 ReputationPoints += amount;
                 skillTree.AddReputation(amount);
-
-                OnReputationChanged?.Invoke(amount, ReputationPoints);
             }
             catch (Exception e)
             {
@@ -449,7 +360,6 @@ namespace HammerAndSickle.Models
         }
 
         #endregion // Reputation Management
-
 
         #region Skill Tree Interface
 
@@ -580,7 +490,6 @@ namespace HammerAndSickle.Models
 
         #endregion // Skill Tree Interface
 
-
         #region Unit Assignment
 
         /// <summary>
@@ -598,7 +507,6 @@ namespace HammerAndSickle.Models
 
                 UnitID = unitID;
                 IsAssigned = true;
-                OnUnitAssigned?.Invoke(unitID);
             }
             catch (Exception e)
             {
@@ -616,7 +524,6 @@ namespace HammerAndSickle.Models
             {
                 UnitID = null;
                 IsAssigned = false;
-                OnUnitUnassigned?.Invoke();
             }
             catch (Exception e)
             {
@@ -626,47 +533,5 @@ namespace HammerAndSickle.Models
         }
 
         #endregion // Unit Assignment
-
-
-        #region ICloneable Implementation
-
-        /// <summary>
-        /// Create a deep copy of this leader
-        /// </summary>
-        /// <returns>Cloned leader instance</returns>
-        public object Clone()
-        {
-            try
-            {
-                // Create new leader with same basic properties
-                var clone = new Leader(Name, Side, Nationality, CombatCommand);
-
-                // Copy additional state
-                clone.ReputationPoints = this.ReputationPoints;
-                clone.CommandGrade = this.CommandGrade;
-
-                // Copy assignment state
-                if (IsAssigned)
-                {
-                    clone.AssignToUnit(UnitID);
-                }
-
-                // Copy skill tree state
-                if (skillTree != null)
-                {
-                    var skillTreeData = skillTree.ToSerializableData();
-                    clone.skillTree.FromSerializableData(skillTreeData);
-                }
-
-                return clone;
-            }
-            catch (Exception e)
-            {
-                AppService.HandleException(CLASS_NAME, "Clone", e);
-                throw;
-            }
-        }
-
-        #endregion // ICloneable Implementation
     }
 }
