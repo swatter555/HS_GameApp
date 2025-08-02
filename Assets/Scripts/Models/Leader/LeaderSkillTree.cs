@@ -48,8 +48,7 @@ namespace HammerAndSickle.Models
         // Flag to track if caches need to be cleared
         private bool isDirty = true;
 
-        #endregion
-
+        #endregion // Fields
 
         #region Properties
 
@@ -61,7 +60,6 @@ namespace HammerAndSickle.Models
         public bool CanAffordSeniorPromotion =>
             ReputationPoints >= CUConstants.REP_COST_FOR_SENIOR_PROMOTION &&
             CurrentGrade == CommandGrade.JuniorGrade;
-
         public bool CanAffordTopPromotion =>
             ReputationPoints >= CUConstants.REP_COST_FOR_TOP_PROMOTION &&
             CurrentGrade == CommandGrade.SeniorGrade;
@@ -72,21 +70,7 @@ namespace HammerAndSickle.Models
         // Skill-count properties
         public int TotalSkillsUnlocked => unlockedSkills.Count(kv => kv.Value);
 
-        #endregion
-
-
-        #region Events
-
-        // Notification events for UI and other systems
-        public event Action<Enum, string, string> OnSkillUnlocked; // (skillEnum, skillName, fullSkillDescription)
-        public event Action<CommandGrade> OnGradeChanged;
-        public event Action<int, int> OnReputationChanged; // (changeAmount, newTotalReputation)
-        public event Action<CommandGrade> OnPromotionAvailable; // (targetPromotionGrade)
-        public event Action<SkillBranch, SkillTier> OnBranchTierUnlocked; // (branch, tier)
-        public event Action<SkillBonusType> OnCapabilityUnlocked; // (bonusType)
-
-        #endregion
-
+        #endregion // Properties
 
         #region Constructors
 
@@ -152,7 +136,7 @@ namespace HammerAndSickle.Models
             return enumType.GetCustomAttribute<SkillBranchEnumAttribute>() != null;
         }
 
-        #endregion
+        #endregion // Constructors
 
 
         #region Reputation Management
@@ -166,9 +150,6 @@ namespace HammerAndSickle.Models
             if (reputationAmount <= 0) return;
 
             ReputationPoints += reputationAmount;
-
-            OnReputationChanged?.Invoke(reputationAmount, ReputationPoints);
-            CheckPromotionAvailability();
         }
 
         /// <summary>
@@ -181,27 +162,10 @@ namespace HammerAndSickle.Models
             if (reputationAmount <= 0 || ReputationPoints < reputationAmount) return false;
 
             ReputationPoints -= reputationAmount;
-            OnReputationChanged?.Invoke(-reputationAmount, ReputationPoints);
-            CheckPromotionAvailability();
             return true;
         }
 
-        /// <summary>
-        /// Checks if a promotion is available and fires the appropriate event
-        /// </summary>
-        private void CheckPromotionAvailability()
-        {
-            if (CanAffordSeniorPromotion)
-            {
-                OnPromotionAvailable?.Invoke(CommandGrade.SeniorGrade);
-            }
-            else if (CanAffordTopPromotion)
-            {
-                OnPromotionAvailable?.Invoke(CommandGrade.TopGrade);
-            }
-        }
-
-        #endregion
+        #endregion // Reputation Management
 
 
         #region Skill Management
@@ -277,9 +241,6 @@ namespace HammerAndSickle.Models
                 {
                     CurrentGrade = CommandGrade.TopGrade;
                 }
-
-                // Fire grade change event first
-                OnGradeChanged?.Invoke(CurrentGrade);
             }
 
             // Spend the experience
@@ -292,19 +253,6 @@ namespace HammerAndSickle.Models
             unlockedSkills[skillEnum] = true;
 
             ClearBonusCaches();
-
-            // Fire events
-            OnSkillUnlocked?.Invoke(skillEnum, skillDef.Name, skillDef.GetFullDescription());
-            OnBranchTierUnlocked?.Invoke(skillDef.Branch, skillDef.Tier);
-
-            // Fire capability events for each effect that is boolean
-            foreach (var effect in skillDef.Effects)
-            {
-                if (effect.IsBoolean)
-                {
-                    OnCapabilityUnlocked?.Invoke(effect.BonusType);
-                }
-            }
 
             return true;
         }
@@ -365,7 +313,7 @@ namespace HammerAndSickle.Models
             return false;
         }
 
-        #endregion
+        #endregion // Skill Management
 
 
         #region Validate Tree System
@@ -406,7 +354,7 @@ namespace HammerAndSickle.Models
             }
         }
 
-        #endregion
+        #endregion // Validate Tree System
 
 
         #region Bonus Calculations
@@ -496,7 +444,7 @@ namespace HammerAndSickle.Models
             isDirty = true;
         }
 
-        #endregion
+        #endregion // Bonus Calculations
 
 
         #region Skill Reset (Respec)
@@ -538,7 +486,6 @@ namespace HammerAndSickle.Models
 
                 // Add refunded XP
                 ReputationPoints += refundedXP;
-                OnReputationChanged?.Invoke(refundedXP, ReputationPoints);
 
                 // Clear caches
                 ClearBonusCaches();
@@ -589,7 +536,6 @@ namespace HammerAndSickle.Models
 
                 // Add refunded XP
                 ReputationPoints += refundedREP;
-                OnReputationChanged?.Invoke(refundedREP, ReputationPoints);
 
                 // Clear caches
                 ClearBonusCaches();
@@ -637,7 +583,6 @@ namespace HammerAndSickle.Models
 
                 // Add refunded XP
                 ReputationPoints += refundedXP;
-                OnReputationChanged?.Invoke(refundedXP, ReputationPoints);
 
                 // Clear caches
                 ClearBonusCaches();
@@ -646,7 +591,7 @@ namespace HammerAndSickle.Models
             return skillsWereReset;
         }
 
-        #endregion
+        #endregion // Skill Reset
 
 
         #region Helper Methods
@@ -673,124 +618,6 @@ namespace HammerAndSickle.Models
             }
         }
 
-        #endregion
-
-
-        #region Serialization Support
-
-        /// <summary>
-        /// Saves the current state to a serializable data object
-        /// </summary>
-        /// <returns>Serializable skill tree data</returns>
-        public LeaderSkillTreeData ToSerializableData()
-        {
-            var data = new LeaderSkillTreeData
-            {
-                ReputationPoints = this.ReputationPoints,
-                CurrentGrade = this.CurrentGrade,
-                StartedBranches = this.startedBranches.Select(b => b.ToString()).ToList(),
-                UnlockedSkills = new List<SkillReference>()
-            };
-
-            foreach (var kvp in unlockedSkills.Where(kvp => kvp.Value))
-            {
-                // Only save skills that are actually unlocked
-                var skillRef = new SkillReference
-                {
-                    EnumType = kvp.Key.GetType().Name,
-                    EnumValue = Convert.ToInt32(kvp.Key)
-                };
-
-                data.UnlockedSkills.Add(skillRef);
-            }
-
-            return data;
-        }
-
-        /// <summary>
-        /// Loads state from serialized data
-        /// </summary>
-        /// <param name="data">The serialized skill tree data</param>
-        public void FromSerializableData(LeaderSkillTreeData data)
-        {
-            if (data == null) return;
-
-            // Reset current state
-            unlockedSkills.Clear();
-            startedBranches.Clear();
-            InitializeSkillDictionaries();
-
-            // Load basic properties
-            ReputationPoints = data.ReputationPoints;
-            CurrentGrade = data.CurrentGrade;
-
-            // Load branches with validation
-            foreach (string branchName in data.StartedBranches)
-            {
-                if (Enum.TryParse<SkillBranch>(branchName, out var branch) &&
-                    branch != SkillBranch.None)
-                {
-                    startedBranches.Add(branch);
-                }
-                else
-                {
-                    Debug.LogWarning($"LeaderSkillTree: Unknown or invalid branch '{branchName}' in save data, skipping.");
-                }
-            }
-
-            // Load skills
-            foreach (var skillRef in data.UnlockedSkills)
-            {
-                Enum skillEnum = DeserializeSkillEnum(skillRef);
-                if (skillEnum != null)
-                {
-                    unlockedSkills[skillEnum] = true;
-                }
-            }
-
-            // Clear caches
-            ClearBonusCaches();
-        }
-
-        /// <summary>
-        /// Deserializes a skill enum from a skill reference
-        /// </summary>
-        private Enum DeserializeSkillEnum(SkillReference skillRef)
-        {
-            try
-            {
-                // Convert enum type name to Type
-                Type enumType = null;
-                switch (skillRef.EnumType)
-                {
-                    case nameof(LeadershipFoundation): enumType = typeof(LeadershipFoundation); break;
-                    case nameof(ArmoredDoctrine): enumType = typeof(ArmoredDoctrine); break;
-                    case nameof(InfantryDoctrine): enumType = typeof(InfantryDoctrine); break;
-                    case nameof(ArtilleryDoctrine): enumType = typeof(ArtilleryDoctrine); break;
-                    case nameof(AirDefenseDoctrine): enumType = typeof(AirDefenseDoctrine); break;
-                    case nameof(AirborneDoctrine): enumType = typeof(AirborneDoctrine); break;
-                    case nameof(AirMobileDoctrine): enumType = typeof(AirMobileDoctrine); break;
-                    case nameof(IntelligenceDoctrine): enumType = typeof(IntelligenceDoctrine); break;
-                    case nameof(CombinedArmsSpecialization): enumType = typeof(CombinedArmsSpecialization); break;
-                    case nameof(SignalIntelligenceSpecialization): enumType = typeof(SignalIntelligenceSpecialization); break;
-                    case nameof(EngineeringSpecialization): enumType = typeof(EngineeringSpecialization); break;
-                    case nameof(SpecialForcesSpecialization): enumType = typeof(SpecialForcesSpecialization); break;
-                    case nameof(PoliticallyConnectedFoundation): enumType = typeof(PoliticallyConnectedFoundation); break;
-                    default: return null;
-                }
-
-                // Convert int value to enum
-                return (Enum)Enum.ToObject(enumType, skillRef.EnumValue);
-            }
-            catch
-            {
-                // If any error occurs, return null
-                return null;
-            }
-        }
-
-        #endregion
+        #endregion // Helper Methods
     }
-
-    
 }
