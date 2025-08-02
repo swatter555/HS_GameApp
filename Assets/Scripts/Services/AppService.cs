@@ -144,9 +144,9 @@ namespace HammerAndSickle.Services
 
         // Folder name constants
         public const string MyGamesFolderName = "My Games";
-        public const string MainAppFolderName = "HS_MapEditor";
-        public const string DebugDataFolderName = "DebugData";
-        public const string ScenarioStorageFolderName = "Scenarios";
+        public const string MainAppFolderName = "Hammer and Sickle";
+        public const string DebugDataFolderName = "Debug";
+        public const string GameDataFolderName = "Game Data";
         public const string AtlasStoragePath = "Assets/Graphics/Atlases";
 
         // UI Message constants
@@ -311,7 +311,7 @@ namespace HammerAndSickle.Services
 
                 MainAppFolderPath = Path.Combine(MyGamesPath, MainAppFolderName);
                 DebugDataFolderPath = Path.Combine(MainAppFolderPath, DebugDataFolderName);
-                ScenarioStorageFolderPath = Path.Combine(MainAppFolderPath, ScenarioStorageFolderName);
+                ScenarioStorageFolderPath = Path.Combine(MainAppFolderPath, GameDataFolderName);
 
                 // Create directories if they don't exist
                 Directory.CreateDirectory(MainAppFolderPath);
