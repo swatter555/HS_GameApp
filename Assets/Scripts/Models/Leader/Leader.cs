@@ -533,5 +533,66 @@ namespace HammerAndSickle.Models
         }
 
         #endregion // Unit Assignment
+
+        #region Snapshot Support Methods
+
+        /// <summary>
+        /// Gets the skill tree for snapshot operations (internal access)
+        /// </summary>
+        /// <returns>The leader's skill tree</returns>
+        internal LeaderSkillTree GetSkillTree()
+        {
+            return skillTree;
+        }
+
+        /// <summary>
+        /// Sets the leader ID (for snapshot restoration only)
+        /// </summary>
+        /// <param name="leaderID">The leader ID to set</param>
+        internal void SetLeaderID(string leaderID)
+        {
+            if (string.IsNullOrWhiteSpace(leaderID))
+            {
+                throw new ArgumentException("Leader ID cannot be null or empty");
+            }
+            LeaderID = leaderID;
+        }
+
+        /// <summary>
+        /// Sets reputation points directly (for snapshot restoration)
+        /// </summary>
+        /// <param name="reputationPoints">Reputation points to set</param>
+        internal void SetReputationPoints(int reputationPoints)
+        {
+            if (reputationPoints < 0)
+            {
+                throw new ArgumentException("Reputation points cannot be negative");
+            }
+            ReputationPoints = reputationPoints;
+        }
+
+        /// <summary>
+        /// Restores skill tree from snapshot data
+        /// </summary>
+        /// <param name="skillTreeData">Skill tree data to restore</param>
+        internal void RestoreSkillTree(LeaderSkillTreeData skillTreeData)
+        {
+            if (skillTreeData == null)
+            {
+                throw new ArgumentNullException(nameof(skillTreeData));
+            }
+
+            try
+            {
+                skillTree = LeaderSkillTree.FromSnapshot(skillTreeData);
+            }
+            catch (Exception e)
+            {
+                AppService.HandleException(CLASS_NAME, "RestoreSkillTree", e);
+                throw;
+            }
+        }
+
+        #endregion // Snapshot Support Methods
     }
 }
