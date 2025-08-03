@@ -4,6 +4,13 @@ using UnityEngine;
 
 namespace HammerAndSickle.Models
 {
+    /// <summary>
+    /// Represents a military leader with attributes such as name, nationality, rank, and command abilities.
+    /// </summary>
+    /// <remarks>A <see cref="Leader"/> can be assigned to a unit, gain reputation points, and unlock skills
+    /// through a skill tree. Leaders are created with either default or specified attributes, and their properties and
+    /// methods allow for managing their state, reputation, and skills. This class is designed to support both
+    /// player-controlled and AI-controlled leaders.</remarks>
     [Serializable]
     public class Leader
     {
@@ -584,7 +591,7 @@ namespace HammerAndSickle.Models
 
             try
             {
-                skillTree = LeaderSkillTree.FromSnapshot(skillTreeData);
+                skillTree = LeaderSkillTreeSnapshotExtensions.FromSnapshot(skillTreeData);
             }
             catch (Exception e)
             {
