@@ -1348,15 +1348,16 @@ namespace HammerAndSickle.Models
                     embarkProfileID: EmbarkedProfileID,
                     category: DepotCategory,
                     size: DepotSize
-                );
+                )
+                {
+                    // Copy deployment system state
+                    _deploymentPosition = _deploymentPosition,
 
-                // Copy deployment system state
-                clonedUnit._deploymentPosition = _deploymentPosition;
-
-                // Copy experience system state
-                clonedUnit.ExperiencePoints = ExperiencePoints;
-                clonedUnit.ExperienceLevel = ExperienceLevel;
-                clonedUnit.EfficiencyLevel = EfficiencyLevel;
+                    // Copy experience system state
+                    ExperiencePoints = ExperiencePoints,
+                    ExperienceLevel = ExperienceLevel,
+                    EfficiencyLevel = EfficiencyLevel
+                };
 
                 // Copy current state values
                 clonedUnit.HitPoints.SetMax(HitPoints.Max);

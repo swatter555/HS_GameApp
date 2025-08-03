@@ -6,8 +6,13 @@ using UnityEngine;
 
 namespace HammerAndSickle.Models
 {
+    /// <summary>
+    /// The class representing a single skill effect within a skill definition.
+    /// </summary>
     public class SkillEffect
     {
+        #region Properties
+
         /// <summary>
         /// The type of bonus this effect provides.
         /// </summary>
@@ -51,6 +56,10 @@ namespace HammerAndSickle.Models
             BonusType == SkillBonusType.SeniorPromotion ||
             BonusType == SkillBonusType.TopPromotion;
 
+        #endregion // Properties
+
+        #region Methods
+
         public SkillEffect(SkillBonusType bonusType, float bonusValue, string effectDescription = null)
         {
             BonusType = bonusType;
@@ -79,10 +88,21 @@ namespace HammerAndSickle.Models
                 return $"+{BonusValue} to {BonusType}.";
             }
         }
+
+        #endregion // Methods
     }
 
+    /// <summary>
+    /// Represents the definition of a skill, including its properties, requirements, and effects.
+    /// </summary>
+    /// <remarks>A skill is defined by its core attributes such as name, description, and cost, as well as its
+    /// classification (branch and tier) and any requirements or restrictions. Skills may have one or more effects,
+    /// which define their impact or functionality. This class also provides methods to retrieve detailed descriptions
+    /// and primary effects of the skill.</remarks>
     public class SkillDefinition
     {
+        #region Properties
+
         // Core identification
         public Enum SkillEnumValue { get; }
         public string Name { get; }
@@ -103,6 +123,10 @@ namespace HammerAndSickle.Models
 
         // Visual/UI
         public string IconPath { get; }
+
+        #endregion // Properties
+
+        #region Public Methods
 
         /// <summary>
         /// Creates a comprehensive skill definition
@@ -159,7 +183,7 @@ namespace HammerAndSickle.Models
                 requiredGrade,
                 prerequisites,
                 mutuallyExclusive,
-                new List<SkillEffect> { new SkillEffect(bonusType, bonusValue) },
+                new List<SkillEffect> { new(bonusType, bonusValue) },
                 iconPath)
         {
         }
@@ -231,17 +255,21 @@ namespace HammerAndSickle.Models
         {
             return Effects.Count > 0 ? Effects[0] : null;
         }
+
+        #endregion // Public Methods
     }
 
+    /// <summary>
+    /// The is the main catalog for all leader skills, providing access to skill definitions.
+    /// </summary>
     public static class LeaderSkillCatalog
     {
         #region Fields
 
         // Main storage for all skill definitions
-        private static readonly Dictionary<Enum, SkillDefinition> AllSkills = new Dictionary<Enum, SkillDefinition>();
+        private static readonly Dictionary<Enum, SkillDefinition> AllSkills = new();
 
         #endregion
-
 
         #region Initialization
 
@@ -730,8 +758,8 @@ namespace HammerAndSickle.Models
                 SkillBranch.SignalIntelligenceSpecialization,
                 SkillTier.Tier4,
                 "Signals intelligence capability reveals more detailed information about spotted enemy units.",
-                SkillBonusType.SignalDecryption, 
-                CommandGrade.TopGrade // Boolean capability
+                SkillBonusType.SignalDecryption, // Boolean capability
+                CommandGrade.TopGrade 
             ));
 
             // Tier 4: Electronic Surveillance Network - Detection Range bonus
@@ -969,7 +997,6 @@ namespace HammerAndSickle.Models
         }
 
         #endregion
-
 
         #region Helper Methods
 

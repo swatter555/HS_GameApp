@@ -198,17 +198,16 @@ namespace HammerAndSickle.Models
                 var data = new LeaderSkillTreeData
                 {
                     ReputationPoints = skillTree.ReputationPoints,
-                    CurrentGrade = skillTree.CurrentGrade
+                    CurrentGrade = skillTree.CurrentGrade,
+                    // Convert started branches to list
+                    StartedBranches = skillTree.ActiveBranches.ToList(),
+
+                    // Convert unlocked skills to skill references
+                    UnlockedSkills = new List<SkillReference>()
                 };
 
-                // Convert started branches to list
-                data.StartedBranches = skillTree.ActiveBranches.ToList();
-
-                // Convert unlocked skills to skill references
-                data.UnlockedSkills = new List<SkillReference>();
-
                 // Use the internal method to get unlocked skills
-                var unlockedSkills = skillTree.GetUnlockedSkills();
+                var unlockedSkills = GetUnlockedSkillsFromTree(skillTree);
 
                 foreach (var skillKvp in unlockedSkills)
                 {
@@ -319,22 +318,29 @@ namespace HammerAndSickle.Models
         #endregion // Helper Methods
     }
 
+    /// <summary>
+    /// Represents a skill tree for a leader, managing skill unlocking, reputation points, and branch progression.
+    /// </summary>
+    /// <remarks>The <see cref="LeaderSkillTree"/> class provides functionality for managing a leader's
+    /// skills, including unlocking skills, tracking branch progression, calculating bonuses, and resetting skills. It
+    /// also handles reputation points, which are used as a currency for unlocking skills and promotions. The class
+    /// enforces prerequisites, branch exclusivity, and command grade requirements when unlocking skills.</remarks>
     [Serializable]
     public class LeaderSkillTree
     {
         #region Fields
 
         // Dictionary to store all unlocked skills regardless of branch
-        private readonly Dictionary<Enum, bool> unlockedSkills = new Dictionary<Enum, bool>();
+        private readonly Dictionary<Enum, bool> unlockedSkills = new();
 
         // Set to track which branches the leader has started
-        private readonly HashSet<SkillBranch> startedBranches = new HashSet<SkillBranch>();
+        private readonly HashSet<SkillBranch> startedBranches = new();
 
         // Cache for frequently accessed bonus values
-        private readonly Dictionary<SkillBonusType, float> bonusCache = new Dictionary<SkillBonusType, float>();
+        private readonly Dictionary<SkillBonusType, float> bonusCache = new();
 
         // Cache for boolean capabilities
-        private readonly Dictionary<SkillBonusType, bool> capabilityCache = new Dictionary<SkillBonusType, bool>();
+        private readonly Dictionary<SkillBonusType, bool> capabilityCache = new();
 
         // Flag to track if caches need to be cleared
         private bool isDirty = true;
@@ -904,65 +910,6 @@ namespace HammerAndSickle.Models
         }
 
         #endregion // Helper Methods
-
-        #region Snapshot Method
-
-        /// <summary>
-        /// Creates a LeaderSkillTree from snapshot data
-        /// </summary>
-        /// <param name="data">The snapshot data to restore from</param>
-        /// <returns>Reconstructed skill tree</returns>
-        public static LeaderSkillTree FromSnapshot(LeaderSkillTreeData data)
-        {
-            if (data == null)
-            {
-                throw new ArgumentNullException(nameof(data));
-            }
-
-            if (!data.IsValid())
-            {
-                throw new ArgumentException("Invalid skill tree data provided to FromSnapshot");
-            }
-
-            try
-            {
-                // Create new skill tree with reputation points
-                var skillTree = new LeaderSkillTree(data.ReputationPoints);
-
-                // Restore command grade
-                skillTree.SetCommandGrade(data.CurrentGrade);
-
-                // Restore started branches
-                foreach (var branch in data.StartedBranches)
-                {
-                    skillTree.AddStartedBranch(branch);
-                }
-
-                // Restore unlocked skills
-                foreach (var skillRef in data.UnlockedSkills)
-                {
-                    var skillEnum = skillRef.ToEnum();
-                    if (skillEnum != null)
-                    {
-                        skillTree.ForceUnlockSkill(skillEnum);
-                    }
-                    else
-                    {
-                        // Log warning about unrecognized skill but continue
-                        AppService.CaptureUiMessage($"Warning: Could not restore skill {skillRef.EnumValueName} from save data");
-                    }
-                }
-
-                return skillTree;
-            }
-            catch (Exception e)
-            {
-                AppService.HandleException("LeaderSkillTree", "FromSnapshot", e);
-                throw;
-            }
-        }
-
-        #endregion // Snapshot Method
 
         #region Snapshot Support Methods
 

@@ -5,6 +5,13 @@ using HammerAndSickle.Controllers;
 
 namespace HammerAndSickle.Models
 {
+    /// <summary>
+    /// Represents a combat unit that can be assigned a leader and manage leader-related operations.
+    /// </summary>
+    /// <remarks>A <see cref="CombatUnit"/> is responsible for managing its assigned leader, including
+    /// assigning, removing, and retrieving leader-related information such as bonuses, skills, and reputation. It
+    /// provides methods to interact with the leader's capabilities and track their contributions to the unit's
+    /// performance.</remarks>
     public partial class CombatUnit
     {
         #region Properties
@@ -32,7 +39,6 @@ namespace HammerAndSickle.Models
 
         #endregion // Properties
 
-
         #region Initialization
 
         /// <summary>
@@ -44,7 +50,6 @@ namespace HammerAndSickle.Models
         }
 
         #endregion
-
 
         #region Leader System
 
