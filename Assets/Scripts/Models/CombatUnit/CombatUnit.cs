@@ -1399,8 +1399,8 @@ namespace HammerAndSickle.Models
                     }
                 }
 
-                // Leaders are not cloned - template units have no leaders
-                // clonedUnit.LeaderID remains null
+                // Leaders are not cloned
+                clonedUnit.LeaderID = LeaderID;
 
                 return clonedUnit;
             }
