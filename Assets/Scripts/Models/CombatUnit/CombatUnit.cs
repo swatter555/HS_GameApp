@@ -51,24 +51,12 @@ namespace HammerAndSickle.Models
         public SpottedLevel SpottedLevel { get; private set; }
 
         // Leader system for the unit
-        public bool IsLeaderAssigned => !string.IsNullOrEmpty(UnitLeader.LeaderID);
-        public Leader UnitLeader
+        public string LeaderID { get; internal set; } = string.Empty;
+        public bool IsLeaderAssigned => !string.IsNullOrEmpty(LeaderID);
+        public Leader GetAssignedLeader()
         {
-            get
-            {
-                try
-                {
-                    if (!IsLeaderAssigned)
-                        throw new InvalidOperationException("No leader assigned to this unit.");
-
-                    return GameDataManager.Instance.GetLeader(UnitLeader.LeaderID);
-                }
-                catch (Exception e)
-                {
-                    AppService.HandleException(CLASS_NAME, "UnitLeader.get", e);
-                    return null;
-                }
-            }
+            if (!IsLeaderAssigned) return null;
+            return GameDataManager.Instance.GetLeader(LeaderID);
         }
 
         #endregion // Properties
@@ -262,6 +250,9 @@ namespace HammerAndSickle.Models
                 return null;
             }
         }
+
+
+        
 
         /// <summary>
         /// Generates an intelligence report for this unit based on the specified spotted level.

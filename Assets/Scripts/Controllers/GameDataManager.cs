@@ -336,6 +336,65 @@ namespace HammerAndSickle.Controllers
         #endregion // Query Methods
 
         #region Public Methods
+
+        /// <summary>
+        /// Assign a leader to a combat unit by their unique identifiers.
+        /// </summary>
+        public bool AssignLeaderToUnit(string leaderID, string unitID)
+        {
+            try
+            {
+                var leader = GetLeader(leaderID);
+                var unit = GetCombatUnit(unitID);
+
+                if (leader == null || unit == null) return false;
+
+                // Check if leader is already assigned elsewhere
+                if (leader.IsAssigned)
+                {
+                    AppService.CaptureUiMessage($"Leader {leader.Name} is already assigned to another unit");
+                    return false;
+                }
+
+                // Handle bidirectional assignment
+                leader.AssignToUnit(unitID);
+                unit.LeaderID = leaderID;
+
+                AppService.CaptureUiMessage($"Leader {leader.Name} assigned to {unit.UnitName}");
+                return true;
+            }
+            catch (Exception e)
+            {
+                AppService.HandleException(CLASS_NAME, nameof(AssignLeaderToUnit), e);
+                return false;
+            }
+        }
+
+        /// <summary>
+        /// Unassigns a leader from their current combat unit by their unique identifier.
+        /// </summary>
+        public bool UnassignLeader(string leaderID)
+        {
+            try
+            {
+                var leader = GetLeader(leaderID);
+                if (leader?.IsAssigned != true) return false;
+
+                var unit = GetCombatUnit(leader.UnitID);
+
+                leader.UnassignFromUnit();
+                if (unit != null) unit.LeaderID = string.Empty;
+
+                AppService.CaptureUiMessage($"Leader {leader.Name} unassigned");
+                return true;
+            }
+            catch (Exception e)
+            {
+                AppService.HandleException(CLASS_NAME, nameof(UnassignLeader), e);
+                return false;
+            }
+        }
+
         /// <summary>
         /// Completely wipes every mutable runtime collection so a brand‑new snapshot can be applied
         /// without leaving behind zombie references.  This must be called <b>before</b> any new state

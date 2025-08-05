@@ -17,7 +17,7 @@ namespace HammerAndSickle.Persistence
         #region Constants
 
         private const string CLASS_NAME = nameof(SnapshotMapper);
-        private const int CURRENT_SAVE_VERSION = 1;
+        private const int CURRENT_SAVE_VERSION = CUConstants.SAVE_VERSION;
 
         #endregion // Constants
 
@@ -94,7 +94,7 @@ namespace HammerAndSickle.Persistence
                             freshUnit.SetSpottedLevel(unit.SpottedLevel);
 
                             // Copy leader assignment (just the ID string, not the object)
-                            //freshUnit.LeaderID = unit.LeaderID;
+                            freshUnit.LeaderID = unit.LeaderID;
 
                             // Copy facility state if applicable
                             if (unit.IsBase)
@@ -102,7 +102,7 @@ namespace HammerAndSickle.Persistence
                                 freshUnit.SetFacilityDamage(unit.BaseDamage);
                                 if (unit.FacilityType == FacilityType.SupplyDepot)
                                 {
-                                    freshUnit.DaysSupply.SetCurrent(CUConstants.MaxDaysSupplyUnit);
+                                    freshUnit.DaysSupply.SetCurrent(CUConstants.MaxDaysSupplyDepot);
                                 }
                                 // Note: Don't copy attached air units - they'll be restored by RebuildTransientCaches
                             }
@@ -299,26 +299,26 @@ namespace HammerAndSickle.Persistence
                         AppService.HandleException(CLASS_NAME, METHOD_NAME,
                             new InvalidOperationException($"Leader {leader.LeaderID} assigned to non-existent unit {leader.UnitID}"));
                     }
-                    else if (assignedUnit.UnitLeader.LeaderID != leader.LeaderID)
+                    else if (assignedUnit.LeaderID != leader.LeaderID)
                     {
                         AppService.HandleException(CLASS_NAME, METHOD_NAME,
-                            new InvalidOperationException($"Leader-Unit assignment mismatch: Leader {leader.LeaderID} thinks it's assigned to {assignedUnit.UnitName}, but unit thinks its leader is {assignedUnit.UnitLeader.LeaderID}"));
+                            new InvalidOperationException($"Leader-Unit assignment mismatch: Leader {leader.LeaderID} thinks it's assigned to {assignedUnit.UnitName}, but unit thinks its leader is {assignedUnit.LeaderID}"));
                     }
                 }
 
                 // Check for units with invalid leader references
-                foreach (var unit in allUnits.Where(u => !string.IsNullOrEmpty(u.UnitLeader.LeaderID)))
+                foreach (var unit in allUnits.Where(u => !string.IsNullOrEmpty(u.LeaderID)))
                 {
-                    var assignedLeader = mgr.GetLeader(unit.UnitLeader.LeaderID);
+                    var assignedLeader = mgr.GetLeader(unit.LeaderID);
                     if (assignedLeader == null)
                     {
                         AppService.HandleException(CLASS_NAME, METHOD_NAME,
-                            new InvalidOperationException($"Unit {unit.UnitLeader.LeaderID} references non-existent leader {unit.UnitLeader.LeaderID}"));
+                            new InvalidOperationException($"Unit {unit.UnitID} references non-existent leader {unit.LeaderID}"));
                     }
-                    else if (!assignedLeader.IsAssigned || assignedLeader.LeaderID != unit.UnitID)
+                    else if (!assignedLeader.IsAssigned || assignedLeader.UnitID != unit.UnitID)
                     {
                         AppService.HandleException(CLASS_NAME, METHOD_NAME,
-                            new InvalidOperationException($"Unit-Leader assignment mismatch: Unit {unit.UnitID} thinks its leader is {unit.UnitLeader.LeaderID}, but leader is not properly assigned back"));
+                            new InvalidOperationException($"Unit-Leader assignment mismatch: Unit {unit.UnitID} thinks its leader is {unit.LeaderID}, but leader is not properly assigned back"));
                     }
                 }
 

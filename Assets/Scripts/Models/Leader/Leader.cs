@@ -524,7 +524,7 @@ namespace HammerAndSickle.Models
         /// Assign this leader to a unit
         /// </summary>
         /// <param name="unitID">LeaderID of the unit to assign to</param>
-        public void AssignToUnit(string unitID)
+        internal void AssignToUnit(string unitID)
         {
             try
             {
@@ -546,7 +546,7 @@ namespace HammerAndSickle.Models
         /// <summary>
         /// Unassign this leader from their current unit
         /// </summary>
-        public void UnassignFromUnit()
+        internal void UnassignFromUnit()
         {
             try
             {
