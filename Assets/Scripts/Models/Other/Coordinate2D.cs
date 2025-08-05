@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Text.Json.Serialization;
 using UnityEngine;
 
 namespace HammerAndSickle.Models
@@ -69,18 +70,21 @@ namespace HammerAndSickle.Models
         /// <summary>
         /// Gets the magnitude (length) of this coordinate vector.
         /// </summary>
+        [JsonIgnore]
         public float magnitude => Mathf.Sqrt(x * x + y * y);
 
         /// <summary>
         /// Gets the squared magnitude of this coordinate vector.
         /// More efficient than magnitude when you only need to compare lengths.
         /// </summary>
+        [JsonIgnore]
         public float sqrMagnitude => x * x + y * y;
 
         /// <summary>
         /// Gets a unit vector in the same direction as this coordinate.
         /// Returns Zero if this vector has zero length.
         /// </summary>
+        [JsonIgnore]
         public Coordinate2D normalized
         {
             get

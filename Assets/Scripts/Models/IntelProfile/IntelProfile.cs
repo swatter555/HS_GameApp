@@ -426,7 +426,7 @@ namespace HammerAndSickle.Models
                 { WeaponSystems.APC_BTR80, 8 },
                 { WeaponSystems.SPA_2S1, 6 }
             };
-            _profiles[IntelProfileTypes.SV_TR] = tankRegiment;
+            _profiles[IntelProfileTypes.SV_TR_T55] = tankRegiment;
 
             // Example: INF Regiment profile  
             var motorRifleRegiment = new Dictionary<WeaponSystems, int>
@@ -437,7 +437,7 @@ namespace HammerAndSickle.Models
                 { WeaponSystems.SPA_2S1, 12 },
                 { WeaponSystems.ATGM_GENERIC, 8 }
             };
-            _profiles[IntelProfileTypes.SV_MRR] = motorRifleRegiment;
+            _profiles[IntelProfileTypes.SV_MRR_BTR70] = motorRifleRegiment;
 
             // Example: Artillery Battalion profile
             var artilleryBattalion = new Dictionary<WeaponSystems, int>
@@ -447,7 +447,7 @@ namespace HammerAndSickle.Models
                 { WeaponSystems.ROC_BM21, 6 },
                 { WeaponSystems.APC_BTR80, 4 }
             };
-            _profiles[IntelProfileTypes.SV_ART] = artilleryBattalion;
+            _profiles[IntelProfileTypes.SV_ART_HVY] = artilleryBattalion;
 
             // Add more profiles as needed...
         }
