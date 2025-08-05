@@ -1,4 +1,5 @@
-﻿using HammerAndSickle.Services;
+﻿using HammerAndSickle.Controllers;
+using HammerAndSickle.Services;
 using System;
 using System.Collections.Generic;
 using UnityEngine;
@@ -48,6 +49,27 @@ namespace HammerAndSickle.Models
         public StatsMaxCurrent MovementPoints { get; private set; }
         public Coordinate2D MapPos { get; internal set; }
         public SpottedLevel SpottedLevel { get; private set; }
+
+        // Leader system for the unit
+        public bool IsLeaderAssigned => !string.IsNullOrEmpty(UnitLeader.LeaderID);
+        public Leader UnitLeader
+        {
+            get
+            {
+                try
+                {
+                    if (!IsLeaderAssigned)
+                        throw new InvalidOperationException("No leader assigned to this unit.");
+
+                    return GameDataManager.Instance.GetLeader(UnitLeader.LeaderID);
+                }
+                catch (Exception e)
+                {
+                    AppService.HandleException(CLASS_NAME, "UnitLeader.get", e);
+                    return null;
+                }
+            }
+        }
 
         #endregion // Properties
 
@@ -135,9 +157,6 @@ namespace HammerAndSickle.Models
 
                 // Initialize action counts based on unit type and classification
                 InitializeActionCounts();
-
-                // Initialize the leader system
-                InitializeLeaderSystem();
 
                 // Set the initial spotted level
                 SpottedLevel = SpottedLevel.Level1;
@@ -1387,7 +1406,6 @@ namespace HammerAndSickle.Models
                 ExperienceLevel = ExperienceLevel.Trained; // Default experience
 
                 // Clear any runtime assignments/state
-                LeaderID = null;
                 SpottedLevel = SpottedLevel.Level1;
                 MapPos = Coordinate2D.Zero;
 

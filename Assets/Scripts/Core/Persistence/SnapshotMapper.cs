@@ -27,29 +27,6 @@ namespace HammerAndSickle.Persistence
         /// Creates a complete snapshot of the current game state for persistence by generating
         /// independent copies of all game entities and their current state.
         /// </summary>
-        /// <remarks>
-        /// <para>
-        /// This method creates truly independent objects for the snapshot rather than storing
-        /// live references, ensuring that subsequent operations like GameDataManager.ClearAll()
-        /// cannot corrupt the snapshot data during save/load operations.
-        /// </para>
-        /// <para>
-        /// For combat units, creates fresh instances using the original constructor parameters
-        /// and manually copies essential runtime state (hit points, supplies, experience, 
-        /// leader assignments, etc.). For leaders, uses the existing snapshot conversion 
-        /// system (LeaderData round-trip) to ensure complete state preservation including
-        /// skill trees and assignments.
-        /// </para>
-        /// <para>
-        /// The resulting snapshot contains completely independent objects that can be safely
-        /// serialized to JSON without concern for external state mutations. Leader-unit
-        /// relationships are preserved via ID strings and restored during load via
-        /// RebuildTransientCaches().
-        /// </para>
-        /// </remarks>
-        /// <param name="mgr">The GameDataManager containing current game state</param>
-        /// <returns>GameStateSnapshot with independent copies of all game entities</returns>
-        /// <exception cref="ArgumentNullException">Thrown when mgr is null</exception>
         public static GameStateSnapshot ToSnapshot(GameDataManager mgr)
         {
             const string METHOD_NAME = nameof(ToSnapshot);
@@ -117,7 +94,7 @@ namespace HammerAndSickle.Persistence
                             freshUnit.SetSpottedLevel(unit.SpottedLevel);
 
                             // Copy leader assignment (just the ID string, not the object)
-                            freshUnit.LeaderID = unit.LeaderID;
+                            //freshUnit.LeaderID = unit.LeaderID;
 
                             // Copy facility state if applicable
                             if (unit.IsBase)
@@ -322,26 +299,26 @@ namespace HammerAndSickle.Persistence
                         AppService.HandleException(CLASS_NAME, METHOD_NAME,
                             new InvalidOperationException($"Leader {leader.LeaderID} assigned to non-existent unit {leader.UnitID}"));
                     }
-                    else if (assignedUnit.LeaderID != leader.LeaderID)
+                    else if (assignedUnit.UnitLeader.LeaderID != leader.LeaderID)
                     {
                         AppService.HandleException(CLASS_NAME, METHOD_NAME,
-                            new InvalidOperationException($"Leader-Unit assignment mismatch: Leader {leader.LeaderID} thinks it's assigned to {leader.UnitID}, but unit thinks its leader is {assignedUnit.LeaderID}"));
+                            new InvalidOperationException($"Leader-Unit assignment mismatch: Leader {leader.LeaderID} thinks it's assigned to {assignedUnit.UnitName}, but unit thinks its leader is {assignedUnit.UnitLeader.LeaderID}"));
                     }
                 }
 
                 // Check for units with invalid leader references
-                foreach (var unit in allUnits.Where(u => !string.IsNullOrEmpty(u.LeaderID)))
+                foreach (var unit in allUnits.Where(u => !string.IsNullOrEmpty(u.UnitLeader.LeaderID)))
                 {
-                    var assignedLeader = mgr.GetLeader(unit.LeaderID);
+                    var assignedLeader = mgr.GetLeader(unit.UnitLeader.LeaderID);
                     if (assignedLeader == null)
                     {
                         AppService.HandleException(CLASS_NAME, METHOD_NAME,
-                            new InvalidOperationException($"Unit {unit.UnitID} references non-existent leader {unit.LeaderID}"));
+                            new InvalidOperationException($"Unit {unit.UnitLeader.LeaderID} references non-existent leader {unit.UnitLeader.LeaderID}"));
                     }
-                    else if (!assignedLeader.IsAssigned || assignedLeader.UnitID != unit.UnitID)
+                    else if (!assignedLeader.IsAssigned || assignedLeader.LeaderID != unit.UnitID)
                     {
                         AppService.HandleException(CLASS_NAME, METHOD_NAME,
-                            new InvalidOperationException($"Unit-Leader assignment mismatch: Unit {unit.UnitID} thinks its leader is {unit.LeaderID}, but leader is not properly assigned back"));
+                            new InvalidOperationException($"Unit-Leader assignment mismatch: Unit {unit.UnitID} thinks its leader is {unit.UnitLeader.LeaderID}, but leader is not properly assigned back"));
                     }
                 }
 
