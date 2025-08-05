@@ -4,6 +4,12 @@ namespace HammerAndSickle.Models
 {
     public class CUConstants
     {
+        #region General Constants
+
+        public const int SAVE_VERSION = 1;
+
+        #endregion
+
         #region CombatUnit Constants
 
         // CombatUnit constants.
