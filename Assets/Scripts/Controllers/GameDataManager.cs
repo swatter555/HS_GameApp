@@ -350,68 +350,7 @@ namespace HammerAndSickle.Controllers
                 AppService.CaptureUiMessage("Beginning complete game state wipe...");
 
                 // ──────────────────────────────────────────────────────────────────────────────
-                // Step 1: Break all cross‑object links to prevent dangling references
-                // ──────────────────────────────────────────────────────────────────────────────
-
-                //// Unassign all leaders from their units
-                //foreach (var leader in _leaders.Values.ToList()) // ToList() to avoid modification during enumeration
-                //{
-                //    if (leader != null && leader.IsAssigned)
-                //    {
-                //        try
-                //        {
-                //            leader.UnassignFromUnit();
-                //        }
-                //        catch (Exception ex)
-                //        {
-                //            AppService.HandleException(CLASS_NAME, METHOD_NAME,
-                //                new InvalidOperationException($"Failed to unassign leader {leader.LeaderID}", ex));
-                //        }
-                //    }
-                //}
-
-                //// Clear leader references from all units
-                //foreach (var unit in _combatUnits.Values.ToList())
-                //{
-                //    if (unit != null && !string.IsNullOrEmpty(unit.LeaderID))
-                //    {
-                //        try
-                //        {
-                //            // Use reflection to clear the LeaderID since it might be read-only
-                //            var leaderIdProperty = unit.GetType().GetProperty("LeaderID",
-                //                System.Reflection.BindingFlags.Public | System.Reflection.BindingFlags.Instance);
-                //            if (leaderIdProperty != null && leaderIdProperty.CanWrite)
-                //            {
-                //                leaderIdProperty.SetValue(unit, null);
-                //            }
-                //        }
-                //        catch (Exception ex)
-                //        {
-                //            AppService.HandleException(CLASS_NAME, METHOD_NAME,
-                //                new InvalidOperationException($"Failed to clear leader reference from unit {unit.UnitID}", ex));
-                //        }
-                //    }
-                //}
-
-                //// Clear air unit attachments from facilities
-                //foreach (var facility in _combatUnits.Values.Where(u => u?.IsBase == true).ToList())
-                //{
-                //    if (facility != null)
-                //    {
-                //        try
-                //        {
-                //            facility.ClearAllAirUnits();
-                //        }
-                //        catch (Exception ex)
-                //        {
-                //            AppService.HandleException(CLASS_NAME, METHOD_NAME,
-                //                new InvalidOperationException($"Failed to clear air units from facility {facility.UnitID}", ex));
-                //        }
-                //    }
-                //}
-
-                // ──────────────────────────────────────────────────────────────────────────────
-                // Step 2: Clear all entity dictionaries
+                // Clear all entity dictionaries
                 // ──────────────────────────────────────────────────────────────────────────────
 
                 int unitsCleared = _combatUnits.Count;
@@ -423,7 +362,7 @@ namespace HammerAndSickle.Controllers
                 AppService.CaptureUiMessage($"Cleared {unitsCleared} units and {leadersCleared} leaders from registries");
 
                 // ──────────────────────────────────────────────────────────────────────────────
-                // Step 3: Null out high‑level game state objects
+                // Null out high‑level game state objects
                 // ──────────────────────────────────────────────────────────────────────────────
 
                 CurrentCampaignData = null;
@@ -432,13 +371,13 @@ namespace HammerAndSickle.Controllers
                 AppService.CaptureUiMessage("Cleared campaign and scenario data");
 
                 // ──────────────────────────────────────────────────────────────────────────────
-                // Step 4: Clear transient caches and computed data
+                // Clear transient caches and computed data
                 // ──────────────────────────────────────────────────────────────────────────────
 
                 ClearTransientCaches();
 
                 // ──────────────────────────────────────────────────────────────────────────────
-                // Step 5: Force garbage collection of cleared objects (optional but helpful)
+                // Force garbage collection of cleared objects (optional but helpful)
                 // ──────────────────────────────────────────────────────────────────────────────
 
                 // Suggest garbage collection to clean up the large number of objects we just released

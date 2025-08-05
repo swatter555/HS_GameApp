@@ -6,7 +6,7 @@ using UnityEngine;
 namespace HammerAndSickle.Models
 {
     [Serializable]
-    public partial class CombatUnit : ICloneable
+    public partial class CombatUnit
     {
         #region Constants
 
@@ -1300,15 +1300,6 @@ namespace HammerAndSickle.Models
         #region Debugging
 
         /// <summary>
-        /// Direct change of combat state for debugging purposes.
-        /// </summary>
-        /// <param name="newPosition"></param>
-        public void Debug_SetDeploymentPosition(DeploymentPosition newPosition)
-        {
-            _deploymentPosition = newPosition;
-        }
-
-        /// <summary>
         /// Calculates the movement cost for a combat action.
         /// </summary>
         /// <returns>The movement cost as a floating-point number, representing the ceiling of the maximum movement points
@@ -1320,20 +1311,117 @@ namespace HammerAndSickle.Models
 
         #endregion // Debugging
 
-        #region ICloneable Implementation
+        #region Template Copying
 
         /// <summary>
-        /// Creates a deep copy of this CombatUnit with a new unique ID.
+        /// Creates a template copy of this CombatUnit with a new unique ID.
         /// Used for spawning fresh units from templates - never used on live state objects.
         /// Leaders are not cloned and must be assigned separately.
         /// </summary>
-        /// <returns>A new CombatUnit instance with identical properties but unique ID</returns>
+        /// <returns>A new CombatUnit instance with identical template properties but unique ID</returns>
         public object Clone()
         {
             try
             {
-                // Create new unit with same basic parameters but fresh state
-                var clonedUnit = new CombatUnit(
+                // Use the new template cloning method
+                return CreateTemplateClone();
+            }
+            catch (Exception e)
+            {
+                AppService.HandleException(CLASS_NAME, "Clone", e);
+                throw;
+            }
+        }
+
+        /// <summary>
+        /// Copies template characteristics from another CombatUnit to this instance.
+        /// Only copies the defining template properties, not runtime state, positions, or assignments.
+        /// Used for spawning new units from templates.Not used for the snapshot system.
+        /// </summary>
+        /// <param name="template">The template unit to copy from</param>
+        /// <exception cref="ArgumentNullException">Thrown when template is null</exception>
+        public void CopyTemplateFrom(CombatUnit template)
+        {
+            if (template == null)
+                throw new ArgumentNullException(nameof(template));
+
+            try
+            {
+                // Copy core template identity (but not UnitID - that stays unique)
+                UnitName = template.UnitName;
+                UnitType = template.UnitType;
+                Classification = template.Classification;
+                Role = template.Role;
+                Side = template.Side;
+                Nationality = template.Nationality;
+
+                // Copy profile IDs (the template characteristics)
+                DeployedProfileID = template.DeployedProfileID;
+                MobileProfileID = template.MobileProfileID;
+                EmbarkedProfileID = template.EmbarkedProfileID;
+                IntelProfileType = template.IntelProfileType;
+
+                // Copy deployment capabilities
+                IsEmbarkable = template.IsEmbarkable;
+                IsMountable = template.IsMountable;
+
+                // Copy facility properties if applicable
+                if (template.IsBase)
+                {
+                    DepotCategory = template.DepotCategory;
+                    DepotSize = template.DepotSize;
+                    FacilityType = template.FacilityType;
+                }
+
+                // Reset action counts to match template's initial values
+                InitializeActionCounts();
+
+                // Reset movement points based on new profile
+                InitializeMovementPoints();
+
+                // Reset state to fresh template defaults
+                HitPoints.ResetToMax();
+                DaysSupply.ResetToMax();
+                MovementPoints.ResetToMax();
+                EfficiencyLevel = EfficiencyLevel.FullOperations;
+                ExperienceLevel = ExperienceLevel.Trained; // Default experience
+
+                // Clear any runtime assignments/state
+                LeaderID = null;
+                SpottedLevel = SpottedLevel.Level1;
+                MapPos = Coordinate2D.Zero;
+
+                // If it's a facility, reset to undamaged state
+                if (IsBase)
+                {
+                    BaseDamage = 0;
+                    OperationalCapacity = OperationalCapacity.Full;
+                    if (FacilityType == FacilityType.SupplyDepot)
+                    {
+                        StockpileInDays = 0f; // Start with empty depot
+                    }
+                    // Clear any attached units (airbases start empty)
+                    ClearAllAirUnits();
+                }
+            }
+            catch (Exception e)
+            {
+                AppService.HandleException(CLASS_NAME, nameof(CopyTemplateFrom), e);
+                throw;
+            }
+        }
+
+        /// <summary>
+        /// Creates a new CombatUnit that's a template copy of this unit.
+        /// Generates a fresh UnitID and resets all runtime state. Not used for the snapshot system.
+        /// </summary>
+        /// <returns>A new CombatUnit with the same template characteristics but fresh state</returns>
+        public CombatUnit CreateTemplateClone()
+        {
+            try
+            {
+                // Create new unit with same template parameters
+                var newUnit = new CombatUnit(
                     unitName: UnitName,
                     unitType: UnitType,
                     classification: Classification,
@@ -1346,71 +1434,21 @@ namespace HammerAndSickle.Models
                     mobileProfileID: MobileProfileID,
                     isEmbarkable: IsEmbarkable,
                     embarkProfileID: EmbarkedProfileID,
-                    category: DepotCategory,
-                    size: DepotSize
-                )
-                {
-                    // Copy deployment system state
-                    _deploymentPosition = _deploymentPosition,
+                    category: IsBase ? DepotCategory : DepotCategory.Secondary,
+                    size: IsBase ? DepotSize : DepotSize.Small
+                );
 
-                    // Copy experience system state
-                    ExperiencePoints = ExperiencePoints,
-                    ExperienceLevel = ExperienceLevel,
-                    EfficiencyLevel = EfficiencyLevel
-                };
-
-                // Copy current state values
-                clonedUnit.HitPoints.SetMax(HitPoints.Max);
-                clonedUnit.HitPoints.SetCurrent(HitPoints.Current);
-                clonedUnit.DaysSupply.SetMax(DaysSupply.Max);
-                clonedUnit.DaysSupply.SetCurrent(DaysSupply.Current);
-                clonedUnit.MovementPoints.SetMax(MovementPoints.Max);
-                clonedUnit.MovementPoints.SetCurrent(MovementPoints.Current);
-
-                // Copy action counts
-                clonedUnit.MoveActions.SetMax(MoveActions.Max);
-                clonedUnit.MoveActions.SetCurrent(MoveActions.Current);
-                clonedUnit.CombatActions.SetMax(CombatActions.Max);
-                clonedUnit.CombatActions.SetCurrent(CombatActions.Current);
-                clonedUnit.DeploymentActions.SetMax(DeploymentActions.Max);
-                clonedUnit.DeploymentActions.SetCurrent(DeploymentActions.Current);
-                clonedUnit.OpportunityActions.SetMax(OpportunityActions.Max);
-                clonedUnit.OpportunityActions.SetCurrent(OpportunityActions.Current);
-                clonedUnit.IntelActions.SetMax(IntelActions.Max);
-                clonedUnit.IntelActions.SetCurrent(IntelActions.Current);
-
-                // Copy position and spotted level
-                clonedUnit.MapPos = MapPos;
-                clonedUnit.SpottedLevel = SpottedLevel;
-
-                // Copy facility state if applicable (but not attached units - they need separate handling)
-                if (IsBase)
-                {
-                    clonedUnit.BaseDamage = BaseDamage;
-                    clonedUnit.OperationalCapacity = OperationalCapacity;
-
-                    if (FacilityType == FacilityType.SupplyDepot)
-                    {
-                        clonedUnit.StockpileInDays = StockpileInDays;
-                        clonedUnit.GenerationRate = GenerationRate;
-                        clonedUnit.SupplyProjection = SupplyProjection;
-                        clonedUnit.SupplyPenetration = SupplyPenetration;
-                        // Note: Air units are not cloned - facilities start empty
-                    }
-                }
-
-                // Leaders are not cloned
-                clonedUnit.LeaderID = LeaderID;
-
-                return clonedUnit;
+                // The constructor handles all the initialization, so we're done
+                // New unit has fresh UnitID, full resources, no assignments
+                return newUnit;
             }
             catch (Exception e)
             {
-                AppService.HandleException(CLASS_NAME, "Clone", e);
+                AppService.HandleException(CLASS_NAME, nameof(CreateTemplateClone), e);
                 throw;
             }
         }
 
-        #endregion // ICloneable Implementation
+        #endregion // Template Copying
     }
 }

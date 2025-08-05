@@ -11,6 +11,6 @@ namespace HammerAndSickle.Persistence
         [DataMember] public ScenarioData Scenario { get; set; }
         [DataMember] public Dictionary<string, CombatUnit> Units { get; set; } = new();
         [DataMember] public Dictionary<string, Leader> Leaders { get; set; } = new();
-        public int SaveVersion { get; set; } = 1;
+        [DataMember] public int SaveVersion { get; set; } = 1;
     }
 }

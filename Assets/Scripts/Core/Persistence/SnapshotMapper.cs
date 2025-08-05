@@ -24,51 +24,31 @@ namespace HammerAndSickle.Persistence
         #region Public API
 
         /// <summary>
-        /// Take a point‑in‑time copy of every mutable runtime object that should land in a save file.
-        /// The copy is shallow (live references) by design – we only call this immediately before
-        /// serialisation, so no further mutations should occur.
+        /// Creates a complete snapshot of the current game state for persistence by generating
+        /// independent copies of all game entities and their current state.
         /// </summary>
+        /// <remarks>
+        /// <para>
+        /// This method creates truly independent objects for the snapshot rather than storing
+        /// live references, ensuring that subsequent operations like GameDataManager.ClearAll()
+        /// cannot corrupt the snapshot data during save/load operations.
+        /// </para>
+        /// <para>
+        /// For combat units, creates fresh instances using the original constructor parameters
+        /// and manually copies essential runtime state (hit points, supplies, experience, 
+        /// leader assignments, etc.). For leaders, uses the existing snapshot conversion 
+        /// system (LeaderData round-trip) to ensure complete state preservation including
+        /// skill trees and assignments.
+        /// </para>
+        /// <para>
+        /// The resulting snapshot contains completely independent objects that can be safely
+        /// serialized to JSON without concern for external state mutations. Leader-unit
+        /// relationships are preserved via ID strings and restored during load via
+        /// RebuildTransientCaches().
+        /// </para>
+        /// </remarks>
         /// <param name="mgr">The GameDataManager containing current game state</param>
-        /// <returns>GameStateSnapshot ready for serialization</returns>
-        /// <exception cref="ArgumentNullException">Thrown when mgr is null</exception>
-        //public static GameStateSnapshot ToSnapshot(GameDataManager mgr)
-        //{
-        //    const string METHOD_NAME = nameof(ToSnapshot);
-
-        //    try
-        //    {
-        //        if (mgr == null)
-        //            throw new ArgumentNullException(nameof(mgr), "GameDataManager cannot be null");
-
-        //        // Create the snapshot with current game state
-        //        var snapshot = new GameStateSnapshot
-        //        {
-        //            // High-level game state (shallow copy - these are value types or immutable)
-        //            Campaign = mgr.CurrentCampaignData,           // May be null for scenario-only saves
-        //            Scenario = mgr.CurrentScenarioData,           // May be null for campaign-only saves
-        //            SaveVersion = CURRENT_SAVE_VERSION,
-
-        //            // Pull fresh enumerations from the manager to avoid internal dictionary layout dependencies
-        //            Units = mgr.GetAllCombatUnits().ToDictionary(u => u.UnitID, u => u, StringComparer.Ordinal),
-        //            Leaders = mgr.GetAllLeaders().ToDictionary(l => l.LeaderID, l => l, StringComparer.Ordinal)
-        //        };
-
-        //        AppService.CaptureUiMessage($"Snapshot created with {snapshot.Units.Count} units and {snapshot.Leaders.Count} leaders");
-        //        return snapshot;
-        //    }
-        //    catch (Exception ex)
-        //    {
-        //        AppService.HandleException(CLASS_NAME, METHOD_NAME, ex);
-        //        throw; // Re-throw since save failures are critical
-        //    }
-        //}
-
-        /// <summary>
-        /// Take a point‑in‑time copy of every mutable runtime object that should land in a save file.
-        /// The copy is deep to ensure snapshot independence from live objects.
-        /// </summary>
-        /// <param name="mgr">The GameDataManager containing current game state</param>
-        /// <returns>GameStateSnapshot ready for serialization</returns>
+        /// <returns>GameStateSnapshot with independent copies of all game entities</returns>
         /// <exception cref="ArgumentNullException">Thrown when mgr is null</exception>
         public static GameStateSnapshot ToSnapshot(GameDataManager mgr)
         {
@@ -82,36 +62,102 @@ namespace HammerAndSickle.Persistence
                 // Create the snapshot with current game state
                 var snapshot = new GameStateSnapshot
                 {
-                    // High-level game state (shallow copy - these are value types or immutable)
-                    Campaign = mgr.CurrentCampaignData,           // May be null for scenario-only saves
-                    Scenario = mgr.CurrentScenarioData,           // May be null for campaign-only saves
+                    Campaign = mgr.CurrentCampaignData,
+                    Scenario = mgr.CurrentScenarioData,
                     SaveVersion = CURRENT_SAVE_VERSION,
-
-                    // Create deep copies of units and leaders using their snapshot extensions
                     Units = new Dictionary<string, CombatUnit>(StringComparer.Ordinal),
                     Leaders = new Dictionary<string, Leader>(StringComparer.Ordinal)
                 };
 
-                // Deep copy all combat units using their Clone() method or snapshot conversion
+                // Create fresh units with same parameters but independent state
                 foreach (var unit in mgr.GetAllCombatUnits())
                 {
                     if (unit != null)
                     {
-                        // Use the unit's Clone method to create a deep copy
-                        var unitCopy = (CombatUnit)unit.Clone();
-                        snapshot.Units[unitCopy.UnitID] = unitCopy;
+                        try
+                        {
+                            // Create fresh unit with same template parameters
+                            var freshUnit = new CombatUnit(
+                                unitName: unit.UnitName,
+                                unitType: unit.UnitType,
+                                classification: unit.Classification,
+                                role: unit.Role,
+                                side: unit.Side,
+                                nationality: unit.Nationality,
+                                intelProfileType: unit.IntelProfileType,
+                                deployedProfileID: unit.DeployedProfileID,
+                                isMountable: unit.IsMountable,
+                                mobileProfileID: unit.MobileProfileID,
+                                isEmbarkable: unit.IsEmbarkable,
+                                embarkProfileID: unit.EmbarkedProfileID,
+                                category: unit.IsBase ? unit.DepotCategory : DepotCategory.Secondary,
+                                size: unit.IsBase ? unit.DepotSize : DepotSize.Small
+                            );
+
+                            // Copy essential current state
+                            freshUnit.HitPoints.SetCurrent(unit.HitPoints.Current);
+                            freshUnit.DaysSupply.SetCurrent(unit.DaysSupply.Current);
+                            freshUnit.MovementPoints.SetCurrent(unit.MovementPoints.Current);
+
+                            // Copy action states
+                            freshUnit.MoveActions.SetCurrent(unit.MoveActions.Current);
+                            freshUnit.CombatActions.SetCurrent(unit.CombatActions.Current);
+                            freshUnit.DeploymentActions.SetCurrent(unit.DeploymentActions.Current);
+                            freshUnit.OpportunityActions.SetCurrent(unit.OpportunityActions.Current);
+                            freshUnit.IntelActions.SetCurrent(unit.IntelActions.Current);
+
+                            // Copy deployment and experience state
+                            freshUnit.SetDeploymentPosition(unit.DeploymentPosition);
+                            freshUnit.ExperienceLevel = unit.ExperienceLevel;
+                            freshUnit.ExperiencePoints = unit.ExperiencePoints;
+                            freshUnit.SetEfficiencyLevel(unit.EfficiencyLevel);
+
+                            // Copy position and spotted state
+                            freshUnit.SetPosition(unit.MapPos);
+                            freshUnit.SetSpottedLevel(unit.SpottedLevel);
+
+                            // Copy leader assignment (just the ID string, not the object)
+                            freshUnit.LeaderID = unit.LeaderID;
+
+                            // Copy facility state if applicable
+                            if (unit.IsBase)
+                            {
+                                freshUnit.SetFacilityDamage(unit.BaseDamage);
+                                if (unit.FacilityType == FacilityType.SupplyDepot)
+                                {
+                                    freshUnit.DaysSupply.SetCurrent(CUConstants.MaxDaysSupplyUnit);
+                                }
+                                // Note: Don't copy attached air units - they'll be restored by RebuildTransientCaches
+                            }
+
+                            snapshot.Units[freshUnit.UnitID] = freshUnit;
+                        }
+                        catch (Exception ex)
+                        {
+                            AppService.HandleException(CLASS_NAME, METHOD_NAME,
+                                new InvalidOperationException($"Failed to create snapshot copy of unit {unit.UnitName}", ex));
+                            // Continue with other units rather than failing completely
+                        }
                     }
                 }
 
-                // Deep copy all leaders using their snapshot conversion
+                // Use existing leader snapshot conversion (this part already works)
                 foreach (var leader in mgr.GetAllLeaders())
                 {
                     if (leader != null)
                     {
-                        // Convert to snapshot data and back to create a deep copy
-                        var leaderData = leader.ToSnapshot();
-                        var leaderCopy = LeaderSnapshotExtensions.FromSnapshot(leaderData);
-                        snapshot.Leaders[leaderCopy.LeaderID] = leaderCopy;
+                        try
+                        {
+                            var leaderData = leader.ToSnapshot();
+                            var leaderCopy = LeaderSnapshotExtensions.FromSnapshot(leaderData);
+                            snapshot.Leaders[leaderCopy.LeaderID] = leaderCopy;
+                        }
+                        catch (Exception ex)
+                        {
+                            AppService.HandleException(CLASS_NAME, METHOD_NAME,
+                                new InvalidOperationException($"Failed to create snapshot copy of leader {leader.Name}", ex));
+                            // Continue with other leaders rather than failing completely
+                        }
                     }
                 }
 
@@ -121,7 +167,7 @@ namespace HammerAndSickle.Persistence
             catch (Exception ex)
             {
                 AppService.HandleException(CLASS_NAME, METHOD_NAME, ex);
-                throw; // Re-throw since save failures are critical
+                throw;
             }
         }
 

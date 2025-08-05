@@ -38,7 +38,6 @@ namespace HammerAndSickle.Models
 
         #endregion
 
-
         #region Deployment State Machine
 
         /// <summary>
@@ -447,5 +446,18 @@ namespace HammerAndSickle.Models
         }
 
         #endregion //Deployment State Machine
+
+        #region Utility Methods
+
+        /// <summary>
+        /// Direct change of combat state for debugging purposes.
+        /// </summary>
+        /// <param name="newPosition"></param>
+        public void SetDeploymentPosition(DeploymentPosition newPosition)
+        {
+            _deploymentPosition = newPosition;
+        }
+
+        #endregion
     }
 }
