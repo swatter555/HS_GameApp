@@ -28,7 +28,7 @@ namespace HammerAndSickle.Models
 
         #region Properties
 
-        public string LeaderID { get; private set; }                               // Unique identifier for the officer
+        public string LeaderID { get; private set; }                         // Unique identifier for the officer
         public string Name { get; private set; }                             // Use random name generator
         public Side Side { get; private set; }                               // Player or AI
         public Nationality Nationality { get; private set; }                 // Nation of origin
@@ -36,8 +36,8 @@ namespace HammerAndSickle.Models
         public int ReputationPoints { get; private set; }                    // Points for promotions and skill upgrades
         public string FormattedRank { get { return GetFormattedRank(); } }   // Real-world rank of the officer
         public CommandAbility CombatCommand { get; private set; }            // Direct combat modifier
-        public bool IsAssigned { get; internal set; }                         // Is the officer assigned to a unit?
-        public string UnitID { get; internal set; }                           // UnitID of the unit assigned to the officer
+        public bool IsAssigned { get; internal set; }                        // Is the officer assigned to a unit?
+        public string UnitID { get; internal set; }                          // UnitID of the unit assigned to the officer
 
         #endregion // Properties
 
@@ -263,6 +263,27 @@ namespace HammerAndSickle.Models
             catch (Exception e)
             {
                 AppService.HandleException(CLASS_NAME, "SetCommandGrade", e);
+                throw;
+            }
+        }
+
+        /// <summary>
+        /// Set the unique identifier for this leader.
+        /// </summary>
+        /// <param name="id"></param>
+        public void SetLeaderID(string id)
+        {
+            try
+            {
+                if (string.IsNullOrWhiteSpace(id))
+                {
+                    throw new ArgumentException("Leader ID cannot be null or empty");
+                }
+                LeaderID = id.Trim();
+            }
+            catch (Exception e)
+            {
+                AppService.HandleException(CLASS_NAME, "SetLeaderID", e);
                 throw;
             }
         }
@@ -547,29 +568,16 @@ namespace HammerAndSickle.Models
         /// Gets the skill tree for snapshot operations (internal access)
         /// </summary>
         /// <returns>The leader's skill tree</returns>
-        internal LeaderSkillTree GetSkillTree()
+        public LeaderSkillTree GetSkillTree()
         {
             return skillTree;
-        }
-
-        /// <summary>
-        /// Sets the leader ID (for snapshot restoration only)
-        /// </summary>
-        /// <param name="leaderID">The leader ID to set</param>
-        internal void SetLeaderID(string leaderID)
-        {
-            if (string.IsNullOrWhiteSpace(leaderID))
-            {
-                throw new ArgumentException("Leader ID cannot be null or empty");
-            }
-            LeaderID = leaderID;
         }
 
         /// <summary>
         /// Sets reputation points directly (for snapshot restoration)
         /// </summary>
         /// <param name="reputationPoints">Reputation points to set</param>
-        internal void SetReputationPoints(int reputationPoints)
+        public void SetReputationPoints(int reputationPoints)
         {
             if (reputationPoints < 0)
             {
@@ -582,7 +590,7 @@ namespace HammerAndSickle.Models
         /// Restores skill tree from snapshot data
         /// </summary>
         /// <param name="skillTreeData">Skill tree data to restore</param>
-        internal void RestoreSkillTree(LeaderSkillTreeData skillTreeData)
+        public void RestoreSkillTree(LeaderSkillTreeData skillTreeData)
         {
             if (skillTreeData == null)
             {
