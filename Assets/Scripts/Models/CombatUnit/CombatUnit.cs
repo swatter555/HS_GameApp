@@ -2,6 +2,7 @@
 using HammerAndSickle.Services;
 using System;
 using System.Collections.Generic;
+using System.Text.Json.Serialization;
 using UnityEngine;
 
 namespace HammerAndSickle.Models
@@ -172,6 +173,81 @@ namespace HammerAndSickle.Models
             }
         }
 
+        /// <summary>
+        /// Parameterless constructor for JSON deserialization.
+        /// Properties will be set after construction by the JSON deserializer.
+        /// </summary>
+        [JsonConstructor]
+        public CombatUnit()
+        {
+            try
+            {
+                // Initialize identification with safe defaults - JSON will overwrite these
+                UnitID = Guid.NewGuid().ToString();
+                UnitName = string.Empty;
+                UnitType = UnitType.LandUnitDF;
+                Classification = UnitClassification.INF;
+                Role = UnitRole.GroundCombat;
+                Side = Side.Player;
+                Nationality = Nationality.USSR;
+                IntelProfileType = IntelProfileTypes.SV_MRR_BTR70;
+
+                // Initialize profile IDs with safe defaults
+                DeployedProfileID = WeaponSystems.DEFAULT;
+                MobileProfileID = WeaponSystems.DEFAULT;
+                EmbarkedProfileID = WeaponSystems.DEFAULT;
+
+                // Initialize deployment capabilities
+                IsEmbarkable = false;
+                IsMountable = false;
+
+                // Initialize efficiency
+                EfficiencyLevel = EfficiencyLevel.FullOperations;
+
+                // Initialize required StatsMaxCurrent objects to prevent null reference exceptions
+                // These will be overwritten by JSON with actual values
+                HitPoints = new StatsMaxCurrent(1f);
+                DaysSupply = new StatsMaxCurrent(1f);
+                MovementPoints = new StatsMaxCurrent(1f);
+                MoveActions = new StatsMaxCurrent(1f);
+                CombatActions = new StatsMaxCurrent(1f);
+                DeploymentActions = new StatsMaxCurrent(1f);
+                OpportunityActions = new StatsMaxCurrent(1f);
+                IntelActions = new StatsMaxCurrent(1f);
+
+                // Initialize position and state
+                MapPos = Coordinate2D.Zero;
+                SpottedLevel = SpottedLevel.Level1;
+                LeaderID = string.Empty;
+
+                // Initialize experience system defaults
+                ExperienceLevel = ExperienceLevel.Trained;
+                ExperiencePoints = 0;
+
+                // Initialize deployment system defaults
+                SetDeploymentPosition(DeploymentPosition.Deployed);
+
+                // Initialize facility defaults (will be overwritten if this is actually a base)
+                BaseDamage = 0;
+                OperationalCapacity = OperationalCapacity.Full;
+                FacilityType = FacilityType.HQ;
+                DepotSize = DepotSize.Small;
+                DepotCategory = DepotCategory.Secondary;
+                StockpileInDays = 0f;
+                GenerationRate = SupplyGenerationRate.Basic;
+                SupplyProjection = SupplyProjection.Local;
+                SupplyPenetration = false;
+
+                // Initialize air units collection for airbases (empty by default)
+                // This will be handled by the partial class if needed
+            }
+            catch (Exception e)
+            {
+                AppService.HandleException(CLASS_NAME, "JsonConstructor", e);
+                throw;
+            }
+        }
+
         #endregion // Constructors
 
         #region Core
@@ -250,9 +326,6 @@ namespace HammerAndSickle.Models
                 return null;
             }
         }
-
-
-        
 
         /// <summary>
         /// Generates an intelligence report for this unit based on the specified spotted level.
@@ -864,6 +937,29 @@ namespace HammerAndSickle.Models
             classification == UnitClassification.HQ ||
             classification == UnitClassification.DEPOT ||
             classification == UnitClassification.AIRB;
+
+        /// <summary>
+        /// Sets the unit ID directly. Used for snapshot restoration to preserve ID consistency.
+        /// </summary>
+        /// <param name="unitId">The unit ID to set</param>
+        /// <exception cref="ArgumentException">Thrown when unitId is null or empty</exception>
+        public void SetUnitID(string unitId)
+        {
+            try
+            {
+                if (string.IsNullOrWhiteSpace(unitId))
+                {
+                    throw new ArgumentException("Unit ID cannot be null or empty", nameof(unitId));
+                }
+
+                UnitID = unitId.Trim();
+            }
+            catch (Exception e)
+            {
+                AppService.HandleException(CLASS_NAME, nameof(SetUnitID), e);
+                throw;
+            }
+        }
 
 
         #endregion // Core

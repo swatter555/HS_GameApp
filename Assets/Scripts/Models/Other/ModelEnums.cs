@@ -798,27 +798,87 @@ namespace HammerAndSickle.Models
     /// </summary>
     public enum IntelProfileTypes
     {
-        SV_MRR,   // Motor Rifle Regiment
-        SV_TR,    // Tank Regiment
-        SV_ART,   // Artillery Regiment
-        SV_ROC,   // Rocket Artillery Regiment
-        SV_BM,    // Ballistic Missile Regiment
-        SV_AAR,   // Air Assault Regiment
-        SV_VDV,   // Airborne Regiment
-        SV_NAV,   // Naval INF Regiment
-        SV_ENG,   // Engineer Regiment
-        SV_RCR,   // Reconnaissance Regiment
-        SV_ADR,   // Air Defense Regiment
-        SV_HEL,   // Helicopter Regiment
-        SV_GRU,   // Spetsnaz Regiment
-        SV_FR,    // ASF Regiment
-        SV_MR,    // Multirole Regiment
-        SV_AR,    // ATT Regiment
-        SV_BR,    // BMB Regiment
-        SV_RR,    // Reconnaissance Regiment (Air)
-        SV_BASE,  // Base
-        SV_AIRB,  // Airbase
-        SV_DEPOT, // Supply Depot
+        SV_MRR_BTR70,   // Motor Rifle Regiment
+        SV_MRR_BTR80,   // Motor Rifle Regiment
+        SV_MRR_BMP1,    // Motor Rifle Regiment (BMP)
+        SV_MRR_BMP2,    // Motor Rifle Regiment (BMP)
+        SV_MRR_BMP3,    // Motor Rifle Regiment (BMP)
+
+        SV_TR_T55,      // Tank Regiment T-55
+        SV_TR_T64A,     // Tank Regiment T-72
+        SV_TR_T64B,     // Tank Regiment T-72
+        SV_TR_T72A,     // Tank Regiment T-72
+        SV_TR_T72B,     // Tank Regiment T-72
+        SV_TR_T80B,     // Tank Regiment T-80
+        SV_TR_T80U,     // Tank Regiment T-80
+        SV_TR_T80BV,    // Tank Regiment T-80
+
+        SV_ART_HVY,    // Artillery Regiment
+        SV_ART_LGT,    // Artillery Regiment
+        SV_SPA_2S1,    // Self-Propelled Artillery Regiment
+        SV_SPA_2S3,    // Self-Propelled Artillery Regiment
+        SV_SPA_2S5,    // Self-Propelled Artillery Regiment
+        SV_SPA_2S19,   // Self-Propelled Artillery Regiment
+
+        SV_ROC_BM21,    // Rocket Artillery Regiment
+        SV_ROC_BM27,    // Rocket Artillery Regiment
+        SV_ROC_BM30,    // Rocket Artillery Regiment
+        SV_BM_SCUDB,    // Ballistic Missile Regiment
+
+        SV_AAR_MTLB,    // Air Assault Regiment
+        SV_AAR_BTR70,    // Air Assault Regiment
+        SV_AAR_BTR80,    // Air Assault Regiment
+
+        SV_VDV_BMD1,    // Airborne Regiment
+        SV_VDV_BMD2,    // Airborne Regiment
+        SV_VDV_BMD3,    // Airborne Regiment
+
+        SV_NAV,         // Naval INF Regiment
+        SV_NAV_MECH,    // Naval Mechanized Regiment
+
+        SV_ENG,         // Engineer Regiment
+
+        SV_RCR,         // Reconnaissance Regiment
+        SV_RCR_AT,      // Anti-Tank Regiment
+
+        SV_ADR_ZSU57,   // Air Defense Regiment
+        SV_ADR_ZSU23,   // Air Defense Regiment
+        SV_ADR_2K22,    // Air Defense Regiment
+
+        SV_SAM_S75,     // Surface-to-Air Missile Regiment
+        SV_SAM_S125,    // Surface-to-Air Missile Regiment
+        SV_SAM_S300,    // Surface-to-Air Missile Regiment
+
+        SV_HEL_MI8AT,    // Helicopter Regiment
+        SV_HEL_MI24D,    // Helicopter Regiment
+        SV_HEL_MI24V,    // Helicopter Regiment
+        SV_HEL_MI28,     // Helicopter Regiment
+
+        SV_GRU,    // Spetsnaz Regiment
+
+        SV_FR_MIG21,     // ASF Regiment
+        SV_FR_MIG23,     // ASF Regiment
+        SV_FR_MIG25,     // ASF Regiment
+        SV_FR_MIG29,     // ASF Regiment
+        SV_FR_MIG31,     // ASF Regiment
+        SV_FR_SU27,      // ASF Regiment
+        SV_FR_SU47,      // ASF Regiment
+        
+        SV_MR_MIG27,     // Multirole Regiment
+
+        SV_AR_SU25,     // ATT Regiment
+        SV_AR_SU25B,    // ATT Regiment
+
+        SV_BR_SU24,     // BMB Regiment
+        SV_BR_TU16,     // BMB Regiment
+        SV_BR_TU22,     // BMB Regiment
+        SV_BR_TU22M3,   // BMB Regiment
+
+        SV_RR_MIG25R,     // Reconnaissance Regiment (Air)
+
+        SV_BASE,   // Base
+        SV_AIRB,   // Airbase
+        SV_DEPOT,  // Supply Depot
 
         // TODO: Add rest of the profiles
     }
