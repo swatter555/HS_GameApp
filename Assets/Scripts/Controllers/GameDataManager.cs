@@ -542,18 +542,33 @@ namespace HammerAndSickle.Controllers
                 // -------------------------------------------------
                 foreach (var facility in _combatUnits.Values.Where(cu => cu.IsBase))
                 {
-                    // The hard references live in a private list; the IDs are what survive serialization.
-                    var idField = typeof(CombatUnit).GetField("_attachedUnitIDs", BindingFlags.NonPublic | BindingFlags.Instance);
-                    var listField = typeof(CombatUnit).GetField("_airUnitsAttached", BindingFlags.NonPublic | BindingFlags.Instance);
-
-                    if (idField?.GetValue(facility) is List<string> idList &&
-                        listField?.GetValue(facility) is IList<CombatUnit> refList)
+                    if (facility.FacilityType == FacilityType.Airbase)
                     {
-                        refList.Clear();
-                        foreach (string id in idList)
+                        // Clear existing attachments
+                        facility.ClearAllAirUnits();
+
+                        // Get the attached unit IDs (this will now be populated from JSON)
+                        var attachedIds = facility.AttachedUnitIDs;
+
+                        if (attachedIds?.Count > 0)
                         {
-                            if (!string.IsNullOrEmpty(id) && _combatUnits.TryGetValue(id, out var airUnit))
-                                refList.Add(airUnit);
+                            int reattachedCount = 0;
+                            foreach (string unitId in attachedIds)
+                            {
+                                if (!string.IsNullOrEmpty(unitId) && _combatUnits.TryGetValue(unitId, out var airUnit))
+                                {
+                                    if (facility.AddAirUnit(airUnit))
+                                    {
+                                        reattachedCount++;
+                                    }
+                                }
+                                else
+                                {
+                                    AppService.CaptureUiMessage($"Warning: Could not find air unit {unitId} for reattachment to {facility.UnitName}");
+                                }
+                            }
+
+                            AppService.CaptureUiMessage($"Reattached {reattachedCount} air units to {facility.UnitName}");
                         }
                     }
                 }

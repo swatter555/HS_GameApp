@@ -4,6 +4,7 @@ using HammerAndSickle.Services;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Reflection;
 
 namespace HammerAndSickle.Persistence
 {
@@ -109,9 +110,37 @@ namespace HammerAndSickle.Persistence
                                 {
                                     freshUnit.DaysSupply.SetCurrent(CUConstants.MaxDaysSupplyDepot);
                                 }
-                                // Note: Don't copy attached air units - they'll be restored by RebuildTransientCaches
+
+                                // Copy attached air unit IDs for airbases
+                                if (unit.FacilityType == FacilityType.Airbase)
+                                {
+                                    var attachedUnits = unit.AirUnitsAttached;
+                                    if (attachedUnits?.Count > 0)
+                                    {
+                                        // Use reflection to populate the _attachedUnitIDs field
+                                        var attachedIdsField = typeof(CombatUnit).GetField("_attachedUnitIDs",
+                                            BindingFlags.NonPublic | BindingFlags.Instance);
+
+                                        if (attachedIdsField != null)
+                                        {
+                                            var freshAttachedIds = (List<string>)attachedIdsField.GetValue(freshUnit);
+                                            freshAttachedIds.Clear();
+
+                                            foreach (var attachedUnit in attachedUnits)
+                                            {
+                                                if (attachedUnit != null && !string.IsNullOrEmpty(attachedUnit.UnitID))
+                                                {
+                                                    freshAttachedIds.Add(attachedUnit.UnitID);
+                                                }
+                                            }
+
+                                            AppService.CaptureUiMessage($"Preserved {freshAttachedIds.Count} air unit attachments for {freshUnit.UnitName}");
+                                        }
+                                    }
+                                }
                             }
 
+                            // Finally, add to snapshot dictionary
                             snapshot.Units[freshUnit.UnitID] = freshUnit;
                         }
                         catch (Exception ex)
@@ -122,81 +151,6 @@ namespace HammerAndSickle.Persistence
                         }
                     }
                 }
-
-
-
-
-                //// Create fresh units with same parameters but independent state
-                //foreach (var unit in mgr.GetAllCombatUnits())
-                //{
-                //    if (unit != null)
-                //    {
-                //        try
-                //        {
-                //            // Create fresh unit with same template parameters
-                //            var freshUnit = new CombatUnit(
-                //                unitName: unit.UnitName,
-                //                unitType: unit.UnitType,
-                //                classification: unit.Classification,
-                //                role: unit.Role,
-                //                side: unit.Side,
-                //                nationality: unit.Nationality,
-                //                intelProfileType: unit.IntelProfileType,
-                //                deployedProfileID: unit.DeployedProfileID,
-                //                isMountable: unit.IsMountable,
-                //                mobileProfileID: unit.MobileProfileID,
-                //                isEmbarkable: unit.IsEmbarkable,
-                //                embarkProfileID: unit.EmbarkedProfileID,
-                //                category: unit.IsBase ? unit.DepotCategory : DepotCategory.Secondary,
-                //                size: unit.IsBase ? unit.DepotSize : DepotSize.Small
-                //            );
-
-                //            // Copy essential current state
-                //            freshUnit.HitPoints.SetCurrent(unit.HitPoints.Current);
-                //            freshUnit.DaysSupply.SetCurrent(unit.DaysSupply.Current);
-                //            freshUnit.MovementPoints.SetCurrent(unit.MovementPoints.Current);
-
-                //            // Copy action states
-                //            freshUnit.MoveActions.SetCurrent(unit.MoveActions.Current);
-                //            freshUnit.CombatActions.SetCurrent(unit.CombatActions.Current);
-                //            freshUnit.DeploymentActions.SetCurrent(unit.DeploymentActions.Current);
-                //            freshUnit.OpportunityActions.SetCurrent(unit.OpportunityActions.Current);
-                //            freshUnit.IntelActions.SetCurrent(unit.IntelActions.Current);
-
-                //            // Copy deployment and experience state
-                //            freshUnit.SetDeploymentPosition(unit.DeploymentPosition);
-                //            freshUnit.ExperienceLevel = unit.ExperienceLevel;
-                //            freshUnit.ExperiencePoints = unit.ExperiencePoints;
-                //            freshUnit.SetEfficiencyLevel(unit.EfficiencyLevel);
-
-                //            // Copy position and spotted state
-                //            freshUnit.SetPosition(unit.MapPos);
-                //            freshUnit.SetSpottedLevel(unit.SpottedLevel);
-
-                //            // Copy leader assignment (just the ID string, not the object)
-                //            freshUnit.LeaderID = unit.LeaderID;
-
-                //            // Copy facility state if applicable
-                //            if (unit.IsBase)
-                //            {
-                //                freshUnit.SetFacilityDamage(unit.BaseDamage);
-                //                if (unit.FacilityType == FacilityType.SupplyDepot)
-                //                {
-                //                    freshUnit.DaysSupply.SetCurrent(CUConstants.MaxDaysSupplyDepot);
-                //                }
-                //                // Note: Don't copy attached air units - they'll be restored by RebuildTransientCaches
-                //            }
-
-                //            snapshot.Units[freshUnit.UnitID] = freshUnit;
-                //        }
-                //        catch (Exception ex)
-                //        {
-                //            AppService.HandleException(CLASS_NAME, METHOD_NAME,
-                //                new InvalidOperationException($"Failed to create snapshot copy of unit {unit.UnitName}", ex));
-                //            // Continue with other units rather than failing completely
-                //        }
-                //    }
-                //}
 
                 // Use existing leader snapshot conversion (this part already works)
                 foreach (var leader in mgr.GetAllLeaders())

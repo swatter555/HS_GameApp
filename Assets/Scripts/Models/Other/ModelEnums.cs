@@ -813,12 +813,12 @@ namespace HammerAndSickle.Models
         SV_TR_T80U,     // Tank Regiment T-80
         SV_TR_T80BV,    // Tank Regiment T-80
 
-        SV_ART_HVY,    // Artillery Regiment
-        SV_ART_LGT,    // Artillery Regiment
-        SV_SPA_2S1,    // Self-Propelled Artillery Regiment
-        SV_SPA_2S3,    // Self-Propelled Artillery Regiment
-        SV_SPA_2S5,    // Self-Propelled Artillery Regiment
-        SV_SPA_2S19,   // Self-Propelled Artillery Regiment
+        SV_AR_HVY,     // Artillery Regiment
+        SV_AR_LGT,     // Artillery Regiment
+        SV_AR_2S1,     // Self-Propelled Artillery Regiment
+        SV_AR_2S3,     // Self-Propelled Artillery Regiment
+        SV_AR_2S5,     // Self-Propelled Artillery Regiment
+        SV_AR_2S19,    // Self-Propelled Artillery Regiment
 
         SV_ROC_BM21,    // Rocket Artillery Regiment
         SV_ROC_BM27,    // Rocket Artillery Regiment
@@ -826,8 +826,8 @@ namespace HammerAndSickle.Models
         SV_BM_SCUDB,    // Ballistic Missile Regiment
 
         SV_AAR_MTLB,    // Air Assault Regiment
-        SV_AAR_BTR70,    // Air Assault Regiment
-        SV_AAR_BTR80,    // Air Assault Regiment
+        SV_AAR_BTR70,   // Air Assault Regiment
+        SV_AAR_BTR80,   // Air Assault Regiment
 
         SV_VDV_BMD1,    // Airborne Regiment
         SV_VDV_BMD2,    // Airborne Regiment

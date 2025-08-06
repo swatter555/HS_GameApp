@@ -471,8 +471,8 @@ namespace HammerAndSickle.Models
                     return; // No damage to apply
                 }
 
-                // Apply damage to hit points
-                float newHitPoints = Mathf.Max(CUConstants.MIN_HP, HitPoints.Current - damage);
+                // Apply damage to hit points - allow going to 0 for destroyed units
+                float newHitPoints = Mathf.Max(0f, HitPoints.Current - damage);  // Changed from CUConstants.MIN_HP to 0f
                 HitPoints.SetCurrent(newHitPoints);
             }
             catch (Exception e)
@@ -586,7 +586,7 @@ namespace HammerAndSickle.Models
         /// <returns>True if the unit is destroyed</returns>
         public bool IsDestroyed()
         {
-            return HitPoints.Current <= 1f;
+            return HitPoints.Current < CUConstants.MIN_HP;
         }
 
         /// <summary>
