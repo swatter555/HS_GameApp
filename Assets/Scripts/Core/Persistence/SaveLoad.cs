@@ -8,6 +8,9 @@ namespace HammerAndSickle.Persistence
 {
     public static class SaveLoad
     {
+        /// <summary>
+        /// JSON serialization options to handle object references and formatting.
+        /// </summary>
         private static readonly JsonSerializerOptions _opts = new()
 
         {
@@ -15,6 +18,9 @@ namespace HammerAndSickle.Persistence
             WriteIndented = true
         };
 
+        /// <summary>
+        /// Saves the current game state to a file asynchronously.
+        /// </summary>
         public static async Task SaveAsync(string path)
         {
             var snap = SnapshotMapper.ToSnapshot(GameDataManager.Instance);
@@ -22,6 +28,9 @@ namespace HammerAndSickle.Persistence
             await JsonSerializer.SerializeAsync(fs, snap, _opts);
         }
 
+        /// <summary>
+        /// Loads the game state from a file asynchronously.
+        /// </summary>
         public static async Task LoadAsync(string path)
         {
             await using var fs = File.OpenRead(path);
