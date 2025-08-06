@@ -29,18 +29,27 @@ namespace HammerAndSickle.Models
 
         #region Properties
 
+        [JsonInclude]
         public string Name { get; private set; }                             // Use random name generator
+        [JsonInclude]
         public Side Side { get; private set; }                               // Player or AI
+        [JsonInclude]
         public Nationality Nationality { get; private set; }                 // Nation of origin
+        [JsonInclude]
         public CommandGrade CommandGrade { get; private set; }               // Rank of the officer
+        [JsonInclude]
         public int ReputationPoints { get; private set; }                    // Points for promotions and skill upgrades
-        public string FormattedRank { get { return GetFormattedRank(); } }   // Real-world rank of the officer
+        [JsonInclude]
         public CommandAbility CombatCommand { get; private set; }            // Direct combat modifier
+        [JsonInclude]
         public bool IsAssigned { get; internal set; }                        // Is the officer assigned to a unit?
         [JsonInclude]
         public string LeaderID { get; private set; }                         // Unique identifier for the officer
         [JsonInclude]
         public string UnitID { get; internal set; }                          // UnitID of the unit assigned to the officer
+
+        // Real-world rank of the officer
+        public string FormattedRank { get { return GetFormattedRank(); } }   
 
         #endregion // Properties
 

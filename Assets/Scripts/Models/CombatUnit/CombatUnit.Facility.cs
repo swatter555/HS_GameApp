@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Text.Json.Serialization;
 
 namespace HammerAndSickle.Models
 {
@@ -10,13 +11,24 @@ namespace HammerAndSickle.Models
         #region Facility Fields
 
         // Units attached to an airbase
-        private readonly List<CombatUnit> _airUnitsAttached = new List<CombatUnit>();
-        private readonly List<string> _attachedUnitIDs = new List<string>(); // For deserialization
+        private List<CombatUnit> _airUnitsAttached = new List<CombatUnit>();
+        private List<string> _attachedUnitIDs = new List<string>(); // For deserialization
 
         #endregion // Facility Fields
 
 
         #region Facility Properties
+
+        /// <summary>
+        /// Gets the list of attached unit IDs for JSON serialization, 
+        /// and preserves airbase attachments across save/load operations.
+        /// </summary>
+        [JsonInclude]
+        public IReadOnlyList<string> AttachedUnitIDs
+        {
+            get => _attachedUnitIDs.AsReadOnly();
+            private set => _attachedUnitIDs = value?.ToList() ?? new List<string>();
+        }
 
         // Common facility properties
         public int BaseDamage { get; private set; }
@@ -37,7 +49,6 @@ namespace HammerAndSickle.Models
         public IReadOnlyList<CombatUnit> AirUnitsAttached { get; private set; }
 
         #endregion // Facility Properties
-
 
         #region Facility Initialization
 
@@ -115,7 +126,6 @@ namespace HammerAndSickle.Models
         }
 
         #endregion // Facility Initialization
-
 
         #region Base Damage and Operational Capacity Management
 
@@ -271,7 +281,6 @@ namespace HammerAndSickle.Models
         }
 
         #endregion // Base Damage and NormalOperations Capacity Management
-
 
         #region Airbase Management
 
@@ -544,7 +553,6 @@ namespace HammerAndSickle.Models
         }
 
         #endregion // Airbase Management
-
 
         #region Supply Depot Management
 
