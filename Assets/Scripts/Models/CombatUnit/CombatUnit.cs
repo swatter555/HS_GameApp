@@ -20,6 +20,7 @@ namespace HammerAndSickle.Models
 
         // Identification and metadata
         public string UnitName { get; set; }
+        [JsonInclude]
         public string UnitID { get; private set; }
         public UnitType UnitType { get; private set; }
         public UnitClassification Classification { get; private set; }
@@ -52,6 +53,7 @@ namespace HammerAndSickle.Models
         public SpottedLevel SpottedLevel { get; private set; }
 
         // Leader system for the unit
+        [JsonInclude]
         public string LeaderID { get; internal set; } = string.Empty;
         public bool IsLeaderAssigned => !string.IsNullOrEmpty(LeaderID);
         public Leader GetAssignedLeader()

@@ -414,8 +414,89 @@ namespace HammerAndSickle.Models
         /// </summary>
         private static void LoadProfileDefinitions()
         {
-            // TODO: Load profile definitions from data files or configuration
-            // For now, create basic example profiles for testing
+            // Motor Rifle Regiment- BTR70 profile
+            var mrrBTR70 = new Dictionary<WeaponSystems, int>
+            {
+                { WeaponSystems.REG_INF_SV, 2523 },
+                { WeaponSystems.TANK_T55A, 40 },
+                { WeaponSystems.APC_BTR70, 129 },
+                { WeaponSystems.IFV_BMP1, 26 },
+                { WeaponSystems.SPAAA_ZSU57, 4},
+                { WeaponSystems.SPSAM_9K31, 4 },
+                { WeaponSystems.SPA_2S1, 18 },
+                { WeaponSystems.RCN_BRDM2, 12 },
+                { WeaponSystems.ATGM_GENERIC, 16 },
+                { WeaponSystems.MANPAD_GENERIC, 30 },
+            };
+            _profiles[IntelProfileTypes.SV_MRR_BTR70] = mrrBTR70;
+
+            // Motor Rifle Regiment- BTR80 profile
+            var mrrBTR80 = new Dictionary<WeaponSystems, int>
+            {
+                { WeaponSystems.REG_INF_SV, 2523 },
+                { WeaponSystems.TANK_T72A, 40 },
+                { WeaponSystems.APC_BTR80, 129 },
+                { WeaponSystems.IFV_BMP2, 26 },
+                { WeaponSystems.SPAAA_ZSU23, 4},
+                { WeaponSystems.SPSAM_9K31, 4 },
+                { WeaponSystems.SPA_2S1, 18 },
+                { WeaponSystems.RCN_BRDM2, 12 },
+                { WeaponSystems.ATGM_GENERIC, 16 },
+                { WeaponSystems.MANPAD_GENERIC, 30 },
+            };
+            _profiles[IntelProfileTypes.SV_MRR_BTR80] = mrrBTR80;
+
+            // Motor Rifle Regiment- BMP1 profile
+            var mrrBMP1 = new Dictionary<WeaponSystems, int>
+            {
+                { WeaponSystems.REG_INF_SV, 2424 },
+                { WeaponSystems.TANK_T55A, 40 },
+                { WeaponSystems.IFV_BMP1, 129 },
+                { WeaponSystems.APC_BTR70, 26 },
+                { WeaponSystems.SPAAA_ZSU57, 4},
+                { WeaponSystems.SPSAM_9K31, 4 },
+                { WeaponSystems.SPA_2S1, 18 },
+                { WeaponSystems.RCN_BRDM2, 12 },
+                { WeaponSystems.ATGM_GENERIC, 16 },
+                { WeaponSystems.MANPAD_GENERIC, 30 },
+            };
+            _profiles[IntelProfileTypes.SV_MRR_BMP1] = mrrBMP1;
+
+            // Motor Rifle Regiment- BMP2 profile
+            var mrrBMP2 = new Dictionary<WeaponSystems, int>
+            {
+                { WeaponSystems.REG_INF_SV, 2424 },
+                { WeaponSystems.TANK_T72A, 40 },
+                { WeaponSystems.IFV_BMP2, 129 },
+                { WeaponSystems.APC_BTR70, 26 },
+                { WeaponSystems.SPAAA_ZSU23, 4},
+                { WeaponSystems.SPSAM_9K31, 4 },
+                { WeaponSystems.SPA_2S3, 18 },
+                { WeaponSystems.RCN_BRDM2, 12 },
+                { WeaponSystems.ATGM_GENERIC, 16 },
+                { WeaponSystems.MANPAD_GENERIC, 30 },
+            };
+            _profiles[IntelProfileTypes.SV_MRR_BMP2] = mrrBMP2;
+
+            // Motor Rifle Regiment- BMP3 profile
+            var mrrBMP3 = new Dictionary<WeaponSystems, int>
+            {
+                { WeaponSystems.REG_INF_SV, 2424 },
+                { WeaponSystems.TANK_T80B, 40 },
+                { WeaponSystems.IFV_BMP3, 129 },
+                { WeaponSystems.APC_BTR80, 26 },
+                { WeaponSystems.SPAAA_ZSU23, 4},
+                { WeaponSystems.SPSAM_9K31, 4 },
+                { WeaponSystems.SPA_2S3, 18 },
+                { WeaponSystems.RCN_BRDM2, 12 },
+                { WeaponSystems.ATGM_GENERIC, 16 },
+                { WeaponSystems.MANPAD_GENERIC, 30 },
+            };
+            _profiles[IntelProfileTypes.SV_MRR_BMP3] = mrrBMP3;
+
+
+
+
 
             // Example: Tank Regiment profile
             var tankRegiment = new Dictionary<WeaponSystems, int>
@@ -427,17 +508,6 @@ namespace HammerAndSickle.Models
                 { WeaponSystems.SPA_2S1, 6 }
             };
             _profiles[IntelProfileTypes.SV_TR_T55] = tankRegiment;
-
-            // Example: INF Regiment profile  
-            var motorRifleRegiment = new Dictionary<WeaponSystems, int>
-            {
-                { WeaponSystems.REG_INF_SV, 2000 },
-                { WeaponSystems.IFV_BMP2, 30 },
-                { WeaponSystems.APC_BTR80, 20 },
-                { WeaponSystems.SPA_2S1, 12 },
-                { WeaponSystems.ATGM_GENERIC, 8 }
-            };
-            _profiles[IntelProfileTypes.SV_MRR_BTR70] = motorRifleRegiment;
 
             // Example: Artillery Battalion profile
             var artilleryBattalion = new Dictionary<WeaponSystems, int>

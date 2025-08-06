@@ -1,5 +1,6 @@
 ﻿using HammerAndSickle.Services;
 using System;
+using System.Text.Json.Serialization;
 using UnityEngine;
 
 namespace HammerAndSickle.Models
@@ -28,7 +29,6 @@ namespace HammerAndSickle.Models
 
         #region Properties
 
-        public string LeaderID { get; private set; }                         // Unique identifier for the officer
         public string Name { get; private set; }                             // Use random name generator
         public Side Side { get; private set; }                               // Player or AI
         public Nationality Nationality { get; private set; }                 // Nation of origin
@@ -37,6 +37,9 @@ namespace HammerAndSickle.Models
         public string FormattedRank { get { return GetFormattedRank(); } }   // Real-world rank of the officer
         public CommandAbility CombatCommand { get; private set; }            // Direct combat modifier
         public bool IsAssigned { get; internal set; }                        // Is the officer assigned to a unit?
+        [JsonInclude]
+        public string LeaderID { get; private set; }                         // Unique identifier for the officer
+        [JsonInclude]
         public string UnitID { get; internal set; }                          // UnitID of the unit assigned to the officer
 
         #endregion // Properties
@@ -98,6 +101,36 @@ namespace HammerAndSickle.Models
             catch (Exception e)
             {
                 AppService.HandleException(CLASS_NAME, "Constructor", e);
+                throw;
+            }
+        }
+
+        /// <summary>
+        /// Parameterless constructor for JSON deserialization.
+        /// Properties will be set after construction by the JSON deserializer.
+        /// </summary>
+        [JsonConstructor]
+        public Leader()
+        {
+            try
+            {
+                // Initialize with safe defaults - JSON will overwrite these
+                LeaderID = GenerateUniqueID();
+                Name = string.Empty;
+                Side = Side.Player;
+                Nationality = Nationality.USSR;
+                CommandGrade = CommandGrade.JuniorGrade;
+                CombatCommand = CommandAbility.Average;
+                ReputationPoints = 0;
+                IsAssigned = false;
+                UnitID = null;
+
+                // Initialize skill tree with default reputation
+                skillTree = new LeaderSkillTree(0);
+            }
+            catch (Exception e)
+            {
+                AppService.HandleException(CLASS_NAME, "JsonConstructor", e);
                 throw;
             }
         }
