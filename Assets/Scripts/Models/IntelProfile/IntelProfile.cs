@@ -723,44 +723,58 @@ namespace HammerAndSickle.Models
             // Soviet air mobile regiment MTLB
             var aar_MTLB = new Dictionary<WeaponSystems, int>
             {
-                { WeaponSystems.REG_INF_SV,       1800 },  // 3× air‑assault battalions + HQ & support
-                { WeaponSystems.APC_MTLB,           93 },  // 31 per battalion (3 rifle coys + HQ)
-                { WeaponSystems.RCN_BRDM2,           6 },  // recon platoon
-                { WeaponSystems.ART_LIGHT_GENERIC,  12 },  // 122 mm artillery battery
-                { WeaponSystems.ATGM_GENERIC,       12 },  // mixed AT‑4/AT‑5 sections
-                { WeaponSystems.MANPAD_GENERIC,     24 },  // SA‑14/16 squads
-                { WeaponSystems.SPAAA_ZSU23,         2 },  // ZSU‑23‑4 Shilka (reduced strength)
-                { WeaponSystems.TRANSHELO_MI8,       48 }, // 2× transport helicopter squadrons
+                { WeaponSystems.AM_INF_SV,       2300 },   // 3× air‑assault battalions + HQ & support
+                { WeaponSystems.APC_MTLB,           68 },  // 31 per battalion (3 rifle coys + HQ)
+                { WeaponSystems.RCN_BRDM2,          13 },  // recon platoon
+                { WeaponSystems.ART_LIGHT_GENERIC,  18 },  // 122 mm artillery battery
+                { WeaponSystems.ATGM_GENERIC,       14 },  // mixed AT‑4/AT‑5 sections
+                { WeaponSystems.MANPAD_GENERIC,     45 },  // SA‑14/16 squads
+                { WeaponSystems.AAA_GENERIC,         2 },  // ZSU‑23‑4 Shilka (reduced strength)
+                { WeaponSystems.TRANSHELO_MI8,     166 },  // 2× transport helicopter squadrons
             };
             _profiles[IntelProfileTypes.SV_AAR_MTLB] = aar_MTLB;
 
-            // Soviet air mobile regiment BTR70
-            var aar_BTR70 = new Dictionary<WeaponSystems, int>
+            // Soviet air mobile regiment BMD1
+            var aar_BMD1 = new Dictionary<WeaponSystems, int>
             {
-                { WeaponSystems.REG_INF_SV,       1800 },  // 3× air‑assault battalions + HQ & support
-                { WeaponSystems.APC_BTR70,          93 },  // 31 per battalion (3 rifle coys + HQ)
-                { WeaponSystems.RCN_BRDM2,           6 },  // recon platoon
-                { WeaponSystems.ART_LIGHT_GENERIC,  12 },  // 122 mm artillery battery
-                { WeaponSystems.ATGM_GENERIC,       12 },  // mixed AT‑4/AT‑5 sections
-                { WeaponSystems.MANPAD_GENERIC,     24 },  // SA‑14/16 squads
-                { WeaponSystems.SPAAA_ZSU23,         2 },  // ZSU‑23‑4 Shilka (reduced strength)
-                { WeaponSystems.TRANSHELO_MI8,      48 },  // 2× transport helicopter squadrons
+                { WeaponSystems.AM_INF_SV,       2300 },   // 3× air‑assault battalions + HQ & support
+                { WeaponSystems.IFV_BMD1,           68 },  // 31 per battalion (3 rifle coys + HQ)
+                { WeaponSystems.RCN_BRDM2,          13 },  // recon platoon
+                { WeaponSystems.ART_LIGHT_GENERIC,  18 },  // 122 mm artillery battery
+                { WeaponSystems.ATGM_GENERIC,       14 },  // mixed AT‑4/AT‑5 sections
+                { WeaponSystems.MANPAD_GENERIC,     45 },  // SA‑14/16 squads
+                { WeaponSystems.AAA_GENERIC,         2 },  // ZSU‑23‑4 Shilka (reduced strength)
+                { WeaponSystems.TRANSHELO_MI8,     166 },  // 2× transport helicopter squadrons
             };
-            _profiles[IntelProfileTypes.SV_AAR_BTR70] = aar_BTR70;
+            _profiles[IntelProfileTypes.SV_AAR_BMD1] = aar_BMD1;
 
             // Soviet air mobile regiment BTR80
-            var aar_BTR80 = new Dictionary<WeaponSystems, int>
+            var aar_BMD2 = new Dictionary<WeaponSystems, int>
             {
-                { WeaponSystems.REG_INF_SV,       1800 },  // 3× air‑assault battalions + HQ & support
-                { WeaponSystems.APC_BTR80,          93 },  // 31 per battalion (3 rifle coys + HQ)
-                { WeaponSystems.RCN_BRDM2,           6 },  // recon platoon
-                { WeaponSystems.ART_LIGHT_GENERIC,  12 },  // 122 mm artillery battery
-                { WeaponSystems.ATGM_GENERIC,       12 },  // mixed AT‑4/AT‑5 sections
-                { WeaponSystems.MANPAD_GENERIC,     24 },  // SA‑14/16 squads
-                { WeaponSystems.SPAAA_ZSU23,         2 },  // ZSU‑23‑4 Shilka (reduced strength)
-                { WeaponSystems.TRANSHELO_MI8,      48 },  // 2× transport helicopter squadrons
+                { WeaponSystems.AM_INF_SV,       2300 },   // 3× air‑assault battalions + HQ & support
+                { WeaponSystems.IFV_BMD2,           68 },  // 31 per battalion (3 rifle coys + HQ)
+                { WeaponSystems.RCN_BRDM2,          13 },  // recon platoon
+                { WeaponSystems.ART_LIGHT_GENERIC,  18 },  // 122 mm artillery battery
+                { WeaponSystems.ATGM_GENERIC,       14 },  // mixed AT‑4/AT‑5 sections
+                { WeaponSystems.MANPAD_GENERIC,     45 },  // SA‑14/16 squads
+                { WeaponSystems.AAA_GENERIC,         2 },  // ZSU‑23‑4 Shilka (reduced strength)
+                { WeaponSystems.TRANSHELO_MI8,     166 },  // 2× transport helicopter squadrons
             };
-            _profiles[IntelProfileTypes.SV_AAR_BTR80] = aar_BTR80;
+            _profiles[IntelProfileTypes.SV_AAR_BMD2] = aar_BMD2;
+
+            // Soviet air mobile regiment BMD3
+            var aar_BMD3 = new Dictionary<WeaponSystems, int>
+            {
+                { WeaponSystems.AM_INF_SV,       2300 },   // 3× air‑assault battalions + HQ & support
+                { WeaponSystems.IFV_BMD3,           68 },  // 31 per battalion (3 rifle coys + HQ)
+                { WeaponSystems.RCN_BRDM2,          13 },  // recon platoon
+                { WeaponSystems.ART_LIGHT_GENERIC,  18 },  // 122 mm artillery battery
+                { WeaponSystems.ATGM_GENERIC,       14 },  // mixed AT‑4/AT‑5 sections
+                { WeaponSystems.MANPAD_GENERIC,     45 },  // SA‑14/16 squads
+                { WeaponSystems.AAA_GENERIC,         2 },  // ZSU‑23‑4 Shilka (reduced strength)
+                { WeaponSystems.TRANSHELO_MI8,     166 },  // 2× transport helicopter squadrons
+            };
+            _profiles[IntelProfileTypes.SV_AAR_BMD3] = aar_BMD3;
 
             #endregion // Soviet air mobile units
 
@@ -771,45 +785,299 @@ namespace HammerAndSickle.Models
             // BMD battalions (31 vehicles each) plus regimental assets.
             var vdv_BMD1 = new Dictionary<WeaponSystems, int>
             {
-                { WeaponSystems.AB_INF_SV,          1800 }, // 3× airborne battalions + regt HQ/support
+                { WeaponSystems.AB_INF_SV,          2250 }, // 3× airborne battalions + regt HQ/support
                 { WeaponSystems.IFV_BMD1,             93 }, // 31 per battalion (3 rifle coys + HQ)
                 { WeaponSystems.RCN_BRDM2,             6 }, // recon platoon (BRDM‑2)
                 { WeaponSystems.ART_LIGHT_GENERIC,    18 }, // 120 mm 2S9 Nona‑S battery
                 { WeaponSystems.ATGM_GENERIC,         12 }, // AT‑4/AT‑5 sections
-                { WeaponSystems.MANPAD_GENERIC,       24 }, // SA‑14/16 squads
-                { WeaponSystems.SPAAA_ZSU23,           2 }, // ZSU‑23‑4 Shilka (regimental AD)
+                { WeaponSystems.MANPAD_GENERIC,       45 }, // SA‑14/16 squads
+                { WeaponSystems.AAA_GENERIC,           6 },
             };
             _profiles[IntelProfileTypes.SV_VDV_BMD1] = vdv_BMD1;
 
             // VDV airborne regiment – BMD‑2 (mid‑1980s baseline)
             var vdv_BMD2 = new Dictionary<WeaponSystems, int>
             {
-                { WeaponSystems.AB_INF_SV,          1800 }, // 3× airborne battalions + regt HQ/support
+                { WeaponSystems.AB_INF_SV,          2250 }, // 3× airborne battalions + regt HQ/support
                 { WeaponSystems.IFV_BMD2,             93 }, // 31 per battalion (3 rifle coys + HQ)
                 { WeaponSystems.RCN_BRDM2,             6 }, // recon platoon (BRDM‑2)
                 { WeaponSystems.ART_LIGHT_GENERIC,    18 }, // 120 mm 2S9 Nona‑S battery
                 { WeaponSystems.ATGM_GENERIC,         12 }, // AT‑4/AT‑5 sections
-                { WeaponSystems.MANPAD_GENERIC,       24 }, // SA‑14/16 squads
-                { WeaponSystems.SPAAA_ZSU23,           2 }, // ZSU‑23‑4 Shilka (regimental AD)
+                { WeaponSystems.MANPAD_GENERIC,       45 }, // SA‑14/16 squads
+                { WeaponSystems.AAA_GENERIC,           6 },
             };
             _profiles[IntelProfileTypes.SV_VDV_BMD2] = vdv_BMD2;
 
             // VDV airborne regiment – BMD‑3 (mid‑1980s baseline)
             var vdv_BMD3 = new Dictionary<WeaponSystems, int>
             {
-                { WeaponSystems.AB_INF_SV,          1800 }, // 3× airborne battalions + regt HQ/support
+                { WeaponSystems.AB_INF_SV,          2250 }, // 3× airborne battalions + regt HQ/support
                 { WeaponSystems.IFV_BMD3,             93 }, // 31 per battalion (3 rifle coys + HQ)
                 { WeaponSystems.RCN_BRDM2,             6 }, // recon platoon (BRDM‑2)
                 { WeaponSystems.ART_LIGHT_GENERIC,    18 }, // 120 mm 2S9 Nona‑S battery
                 { WeaponSystems.ATGM_GENERIC,         12 }, // AT‑4/AT‑5 sections
-                { WeaponSystems.MANPAD_GENERIC,       24 }, // SA‑14/16 squads
-                { WeaponSystems.SPAAA_ZSU23,           2 }, // ZSU‑23‑4 Shilka (regimental AD)
+                { WeaponSystems.MANPAD_GENERIC,       45 }, // SA‑14/16 squads
+                { WeaponSystems.AAA_GENERIC,           6 },
             };
             _profiles[IntelProfileTypes.SV_VDV_BMD3] = vdv_BMD3;
 
+            // VDV artillery regiment
+            var vdv_artreg = new Dictionary<WeaponSystems, int>
+            {
+                { WeaponSystems.AB_INF_SV,          1200 }, // regt HQ/support
+                { WeaponSystems.ART_LIGHT_GENERIC,    36 }, // 120 mm 2S9 Nona‑S battery
+            };
+            _profiles[IntelProfileTypes.SV_VDV_ART] = vdv_artreg;
+
+            // VDV airborne regiment – support (mid‑1980s baseline)
+            var vdv_sup = new Dictionary<WeaponSystems, int>
+            {
+                { WeaponSystems.AB_INF_SV,          1150 },
+                { WeaponSystems.TANK_T55A,            31 },
+                { WeaponSystems.RCN_BRDM2AT,          18 }, 
+                { WeaponSystems.ART_LIGHT_GENERIC,     6 }, 
+                { WeaponSystems.ATGM_GENERIC,         12 }, 
+                { WeaponSystems.MANPAD_GENERIC,       12 }, 
+                { WeaponSystems.AAA_GENERIC,           2 },
+            };
+            _profiles[IntelProfileTypes.SV_VDV_SUP] = vdv_sup;
+
             #endregion // Soviet VDV units
 
+            #region Soviet naval infantry units
+
+            // Naval Assault Brigade- T55 profile
+            var navT55 = new Dictionary<WeaponSystems, int>
+            {
+                { WeaponSystems.REG_INF_SV, 2750 },
+                { WeaponSystems.TANK_T55A, 44 },
+                { WeaponSystems.IFV_BMP1, 44 },
+                { WeaponSystems.APC_BTR70, 145 },
+                { WeaponSystems.SPAAA_ZSU57, 4},
+                { WeaponSystems.SPSAM_9K31, 4 },
+                { WeaponSystems.SPA_2S1, 18 },
+                { WeaponSystems.RCN_BRDM2, 12 },
+                { WeaponSystems.ATGM_GENERIC, 12 },
+                { WeaponSystems.MANPAD_GENERIC, 36 },
+            };
+            _profiles[IntelProfileTypes.SV_NAV_T55] = navT55;
+
+            // Naval Assault Brigade- T72 profile
+            var navT72 = new Dictionary<WeaponSystems, int>
+            {
+                { WeaponSystems.REG_INF_SV, 2750 },
+                { WeaponSystems.TANK_T72A, 44 },
+                { WeaponSystems.IFV_BMP2, 44 },
+                { WeaponSystems.APC_BTR70, 145 },
+                { WeaponSystems.SPAAA_ZSU23, 4},
+                { WeaponSystems.SPSAM_9K31, 4 },
+                { WeaponSystems.SPA_2S1, 18 },
+                { WeaponSystems.RCN_BRDM2, 12 },
+                { WeaponSystems.ATGM_GENERIC, 12 },
+                { WeaponSystems.MANPAD_GENERIC, 36 },
+            };
+            _profiles[IntelProfileTypes.SV_NAV_T72] = navT72;
+
+            // Naval Assault Brigade- T80 profile
+            var navT80 = new Dictionary<WeaponSystems, int>
+            {
+                { WeaponSystems.REG_INF_SV, 2750 },
+                { WeaponSystems.TANK_T80U, 44 },
+                { WeaponSystems.IFV_BMP3, 44 },
+                { WeaponSystems.APC_BTR80, 145 },
+                { WeaponSystems.SPAAA_2K22, 4},
+                { WeaponSystems.SPSAM_9K31, 4 },
+                { WeaponSystems.SPA_2S1, 18 },
+                { WeaponSystems.RCN_BRDM2, 12 },
+                { WeaponSystems.ATGM_GENERIC, 12 },
+                { WeaponSystems.MANPAD_GENERIC, 36 },
+            };
+            _profiles[IntelProfileTypes.SV_NAV_T80] = navT80;
+
+            #endregion // Soviet naval infantry units
+
+            #region Soviet engineer units
+
+            // Soviet engineer battalion
+            var svengineers = new Dictionary<WeaponSystems, int>
+            {
+                { WeaponSystems.ENG_INF_SV, 340 },
+                { WeaponSystems.APC_BTR70, 20 },
+            };
+            _profiles[IntelProfileTypes.SV_ENG] = svengineers;
+
+            #endregion // Soviet engineer units
+
+            #region Soviet recon units
+
+            // Soviet recon regiment
+            var svreconrgt = new Dictionary<WeaponSystems, int>
+            {
+                { WeaponSystems.REG_INF_SV, 1020 },
+                { WeaponSystems.TANK_T55A, 18 },
+                { WeaponSystems.IFV_BMP1, 36 },
+                { WeaponSystems.APC_BTR70, 42 },
+                { WeaponSystems.SPAAA_ZSU57, 4},
+                { WeaponSystems.RCN_BRDM2, 54 },
+                { WeaponSystems.ATGM_GENERIC, 12 },
+                { WeaponSystems.MANPAD_GENERIC, 12 },
+            };
+            _profiles[IntelProfileTypes.SV_RCR] = svreconrgt;
+
+            // Soviet recon regiment AT
+            var svreconrgtAT = new Dictionary<WeaponSystems, int>
+            {
+                { WeaponSystems.REG_INF_SV, 1020 },
+                { WeaponSystems.TANK_T72A, 18 },
+                { WeaponSystems.IFV_BMP2, 36 },
+                { WeaponSystems.APC_BTR80, 42 },
+                { WeaponSystems.SPAAA_ZSU57, 4},
+                { WeaponSystems.RCN_BRDM2AT, 54 },
+                { WeaponSystems.ATGM_GENERIC, 12 },
+                { WeaponSystems.MANPAD_GENERIC, 12 },
+            };
+            _profiles[IntelProfileTypes.SV_RCR_AT] = svreconrgtAT;
+
+            #endregion // Soviet recon units
+
+            #region Soviet air defence units
+
+            // AAA Regiment- AAA profile
+            var svadr_AAA = new Dictionary<WeaponSystems, int>
+            {
+                { WeaponSystems.REG_INF_SV, 600 },
+                { WeaponSystems.AAA_GENERIC, 18 },
+                { WeaponSystems.MANPAD_GENERIC, 12 }
+            };
+            _profiles[IntelProfileTypes.SV_ADR_AAA] = svadr_AAA;
+
+            // AAA Regiment- ZSU-57 profile
+            var svadr_ZSU57 = new Dictionary<WeaponSystems, int>
+            {
+                { WeaponSystems.REG_INF_SV, 600 },
+                { WeaponSystems.SPAAA_ZSU57, 18 },
+                { WeaponSystems.MANPAD_GENERIC, 12 }
+            };
+            _profiles[IntelProfileTypes.SV_ADR_ZSU57] = svadr_ZSU57;
+
+            // AAA Regiment- ZSU-23 profile
+            var svadr_ZSU23 = new Dictionary<WeaponSystems, int>
+            {
+                { WeaponSystems.REG_INF_SV, 600 },
+                { WeaponSystems.SPAAA_ZSU23, 18 },
+                { WeaponSystems.MANPAD_GENERIC, 12 }
+            };
+            _profiles[IntelProfileTypes.SV_ADR_ZSU57] = svadr_ZSU23;
+
+            // AAA Regiment- 2K22 profile
+            var svadr_2K22 = new Dictionary<WeaponSystems, int>
+            {
+                { WeaponSystems.REG_INF_SV, 600 },
+                { WeaponSystems.SPAAA_2K22, 18 },
+                { WeaponSystems.MANPAD_GENERIC, 12 }
+            };
+            _profiles[IntelProfileTypes.SV_ADR_2K22] = svadr_2K22;
+
+            #endregion // Soviet air defence units
+
+            #region Soviet SAM units
+
+            // SAM Regiment- S75 profile
+            var samS75 = new Dictionary<WeaponSystems, int>
+            {
+                { WeaponSystems.REG_INF_SV, 750 },
+                { WeaponSystems.SAM_S75, 18 },
+                { WeaponSystems.MANPAD_GENERIC, 12 }
+            };
+            _profiles[IntelProfileTypes.SV_SAM_S75] = samS75;
+
+            // SAM Regiment- S125 profile
+            var samS125 = new Dictionary<WeaponSystems, int>
+            {
+                { WeaponSystems.REG_INF_SV, 750 },
+                { WeaponSystems.SAM_S125, 18 },
+                { WeaponSystems.MANPAD_GENERIC, 12 }
+            };
+            _profiles[IntelProfileTypes.SV_SAM_S125] = samS125;
+
+            // SAM Regiment- S300 profile
+            var samS300 = new Dictionary<WeaponSystems, int>
+            {
+                { WeaponSystems.REG_INF_SV, 750 },
+                { WeaponSystems.SAM_S300, 18 },
+                { WeaponSystems.MANPAD_GENERIC, 12 }
+            };
+            _profiles[IntelProfileTypes.SV_SAM_S300] = samS300;
+
+            #endregion // Soviet SAM units
+
+            #region Soviet attack helicopter units
+
+            // Attack regiment- Mi-8T profile
+            var helo_MI8T = new Dictionary<WeaponSystems, int>
+            {
+                { WeaponSystems.HEL_MI8AT, 54 }
+            };
+            _profiles[IntelProfileTypes.SV_HEL_MI8AT] = helo_MI8T;
+
+            // Attack regiment- Mi-24D profile
+            var helo_MI24D = new Dictionary<WeaponSystems, int>
+            {
+                { WeaponSystems.HEL_MI24D, 54 }
+            };
+            _profiles[IntelProfileTypes.SV_HEL_MI24D] = helo_MI24D;
+
+            // Attack regiment- Mi-24V profile
+            var helo_MI24V = new Dictionary<WeaponSystems, int>
+            {
+                { WeaponSystems.HEL_MI24V, 54 }
+            };
+            _profiles[IntelProfileTypes.SV_HEL_MI24V] = helo_MI24V;
+
+            // Attack regiment- Mi-28 profile
+            var helo_MI28 = new Dictionary<WeaponSystems, int>
+            {
+                { WeaponSystems.HEL_MI28, 54 }
+            };
+            _profiles[IntelProfileTypes.SV_HEL_MI28] = helo_MI28;
+
+            #endregion
+
+            #region Spetznaz units
+
+            // Soviet Spetznaz
+            var spetz = new Dictionary<WeaponSystems, int>
+            {
+                { WeaponSystems.SPEC_INF_SV, 1200 },
+                { WeaponSystems.ATGM_GENERIC, 12 },
+                { WeaponSystems.MANPAD_GENERIC, 12 },
+            };
+            _profiles[IntelProfileTypes.SV_GRU] = spetz;
+
+            #endregion // Spetznaz units
+
             #region Soviet air units
+
+            // Fighter Regiment- MiG-21 profile
+            var fighterRegiment_Mig21 = new Dictionary<WeaponSystems, int>
+            {
+                { WeaponSystems.ASF_MIG21, 36 }
+            };
+            _profiles[IntelProfileTypes.SV_FR_MIG21] = fighterRegiment_Mig21;
+
+            // Fighter Regiment- MiG-23 profile
+            var fighterRegiment_Mig23 = new Dictionary<WeaponSystems, int>
+            {
+                { WeaponSystems.ASF_MIG23, 36 }
+            };
+            _profiles[IntelProfileTypes.SV_FR_MIG23] = fighterRegiment_Mig23;
+
+            // Fighter Regiment- MiG-25 profile
+            var fighterRegiment_Mig25 = new Dictionary<WeaponSystems, int>
+            {
+                { WeaponSystems.ASF_MIG25, 36 }
+            };
+            _profiles[IntelProfileTypes.SV_FR_MIG25] = fighterRegiment_Mig25;
 
             // Fighter Regiment- MiG-29 profile
             var fighterRegiment_Mig29 = new Dictionary<WeaponSystems, int>
@@ -817,6 +1085,83 @@ namespace HammerAndSickle.Models
                 { WeaponSystems.ASF_MIG29, 36 }
             };
             _profiles[IntelProfileTypes.SV_FR_MIG29] = fighterRegiment_Mig29;
+
+            // Fighter Regiment- Mig-31 profile
+            var fighterRegiment_Mig31 = new Dictionary<WeaponSystems, int>
+            {
+                { WeaponSystems.ASF_MIG31, 36 }
+            };
+            _profiles[IntelProfileTypes.SV_FR_MIG31] = fighterRegiment_Mig31;
+
+            // Fighter Regiment- Su-27 profile
+            var fighterRegiment_Su27 = new Dictionary<WeaponSystems, int>
+            {
+                { WeaponSystems.ASF_SU27, 36 }
+            };
+            _profiles[IntelProfileTypes.SV_FR_SU27] = fighterRegiment_Su27;
+
+            // Fighter Regiment- SU-47 profile
+            var fighterRegiment_Su47 = new Dictionary<WeaponSystems, int>
+            {
+                { WeaponSystems.ASF_SU47, 36 }
+            };
+            _profiles[IntelProfileTypes.SV_FR_SU47] = fighterRegiment_Su47;
+
+            // Fighter Regiment- Mig-27
+            var fighterRegiment_Mig27 = new Dictionary<WeaponSystems, int>
+            {
+                { WeaponSystems.MRF_MIG27, 36 }
+            };
+            _profiles[IntelProfileTypes.SV_MR_MIG27] = fighterRegiment_Mig27;
+
+            // Attack Regiment- Su-25 profile
+            var attackRegiment_Su25 = new Dictionary<WeaponSystems, int>
+            {
+                { WeaponSystems.ATT_SU25, 36 }
+            };
+            _profiles[IntelProfileTypes.SV_AR_SU25] = attackRegiment_Su25;
+
+            // Attack Regiment- Su-25B profile
+            var attackRegiment_Su25B = new Dictionary<WeaponSystems, int>
+            {
+                { WeaponSystems.ATT_SU25B, 36 }
+            };
+            _profiles[IntelProfileTypes.SV_AR_SU25B] = attackRegiment_Su25B;
+
+            // Bomber Regiment- SU-24 profile
+            var bomberRegiment_Su24 = new Dictionary<WeaponSystems, int>
+            {
+                { WeaponSystems.BMB_SU24, 36 }
+            };
+            _profiles[IntelProfileTypes.SV_BR_SU24] = bomberRegiment_Su24;
+
+            // Bomber Regiment- TU-16
+            var bomberRegiment_Tu16 = new Dictionary<WeaponSystems, int>
+            {
+                { WeaponSystems.BMB_TU16, 24 }
+            };
+            _profiles[IntelProfileTypes.SV_BR_TU16] = bomberRegiment_Tu16;
+
+            // Bomber Regiment- TU-22
+            var bomberRegiment_Tu22 = new Dictionary<WeaponSystems, int>
+            {
+                { WeaponSystems.BMB_TU22, 24 }
+            };
+            _profiles[IntelProfileTypes.SV_BR_TU22] = bomberRegiment_Tu22;
+
+            // Bomber Regiment- TU-22M3
+            var bomberRegiment_Tu22M3 = new Dictionary<WeaponSystems, int>
+            {
+                { WeaponSystems.BMB_TU22M3, 24 }
+            };
+            _profiles[IntelProfileTypes.SV_BR_TU22M3] = bomberRegiment_Tu22M3;
+
+            // Air Recon Regiment- MiG-25R profile
+            var airRecon_Mig25R = new Dictionary<WeaponSystems, int>
+            {
+                { WeaponSystems.RCNA_MIG25R, 12 }
+            };
+            _profiles[IntelProfileTypes.SV_RR_MIG25R] = airRecon_Mig25R;
 
             #endregion // Soviet air units
 
@@ -836,7 +1181,18 @@ namespace HammerAndSickle.Models
             };
             _profiles[IntelProfileTypes.SV_AIRB] = sv_airbase;
 
+            // Regular base profile
+            var sv_regularbase = new Dictionary<WeaponSystems, int>
+            {
+                { WeaponSystems.REG_INF_SV, 1500 }
+            };
+            _profiles[IntelProfileTypes.SV_BASE] = sv_regularbase;
+
             #endregion // Soviet bases
+
+            //-------------------------------------------------------------//
+
+
         }
 
         #endregion // Profile Database
