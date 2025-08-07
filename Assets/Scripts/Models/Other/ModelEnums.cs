@@ -677,6 +677,8 @@ namespace HammerAndSickle.Models
 
         // USA
         TANK_M1,
+        TANK_M60A3,
+        TANK_M551,
         IFV_M2,
         IFV_M3,
         APC_M113,
