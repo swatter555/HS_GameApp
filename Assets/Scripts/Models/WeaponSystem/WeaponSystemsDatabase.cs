@@ -211,6 +211,8 @@ namespace HammerAndSickle.Models
 
                 // US Tanks
                 CreateTankM1Profile();
+                CreateTankM60A3Profile();
+                CreateTankM551Profile();
 
                 // US IFVs and APCs  
                 CreateIfvM2Profile();
@@ -3416,7 +3418,6 @@ namespace HammerAndSickle.Models
 
         //-----------------------------------------------------------------------------------------
 
-
         #region US Tanks
 
         /// <summary>
@@ -3467,8 +3468,104 @@ namespace HammerAndSickle.Models
             }
         }
 
-        #endregion // US Tanks
+        /// <summary>
+        /// M-60A3 Patton Main Battle Tank
+        /// </summary>
+        private static void CreateTankM60A3Profile()
+        {
+            try
+            {
+                var profile = new WeaponSystemProfile(
+                    name: "M60-A3 Patton MBT",
+                    nationality: Nationality.USA,
+                    weaponSystemID: WeaponSystems.TANK_M60A3,
+                    120,
+                    hardAttack: 9,
+                    hardDefense: 7,
+                    softAttack: 9,
+                    softDefense: 8,
+                    groundAirAttack: 3,
+                    groundAirDefense: 9,
+                    primaryRange: 1f,
+                    indirectRange: 0f,
+                    spottingRange: 2f,
+                    allWeatherCapability: AllWeatherRating.GroundUnit,
+                    sigintRating: SIGINT_Rating.UnitLevel,
+                    nbcRating: NBC_Rating.Gen1,
+                    strategicMobility: StrategicMobility.Heavy,
+                    nvgCapability: NVG_Rating.Gen1,
+                    silhouette: UnitSilhouette.Medium
+                );
 
+                // Add upgrade types for modernization
+                profile.AddUpgradeType(UpgradeType.AFV);
+
+                // Set short name for UI display
+                profile.SetShortName("M-60A3 Abrams");
+
+                // Set turn availability - entered service in 1980
+                profile.SetTurnAvailable(275);
+
+                // Store in master dictionary
+                _weaponSystemProfiles[WeaponSystems.TANK_M60A3] = profile;
+            }
+            catch (Exception e)
+            {
+                AppService.HandleException(CLASS_NAME, nameof(CreateTankM60A3Profile), e);
+                throw;
+            }
+        }
+
+        /// <summary>
+        /// M551 Sheridan
+        /// </summary>
+        private static void CreateTankM551Profile()
+        {
+            try
+            {
+                var profile = new WeaponSystemProfile(
+                    name: "M551 Sheridan Light Tank",
+                    nationality: Nationality.USA,
+                    weaponSystemID: WeaponSystems.TANK_M551,
+                    20,
+                    hardAttack: 10,
+                    hardDefense: 3,
+                    softAttack: 3,
+                    softDefense: 6,
+                    groundAirAttack: 3,
+                    groundAirDefense: 4,
+                    primaryRange: 1f,
+                    indirectRange: 0f,
+                    spottingRange: 2f,
+                    allWeatherCapability: AllWeatherRating.GroundUnit,
+                    sigintRating: SIGINT_Rating.UnitLevel,
+                    nbcRating: NBC_Rating.None,
+                    strategicMobility: StrategicMobility.AirDrop,
+                    nvgCapability: NVG_Rating.None,
+                    silhouette: UnitSilhouette.Small
+                );
+
+                // Add upgrade types for modernization
+                profile.AddUpgradeType(UpgradeType.AFV);
+
+                // Set short name for UI display
+                profile.SetShortName("M551 Sheridan");
+
+                // Set turn availability - entered service in 1980
+                profile.SetTurnAvailable(250);
+
+                // Store in master dictionary
+                _weaponSystemProfiles[WeaponSystems.TANK_M551] = profile;
+            }
+            catch (Exception e)
+            {
+                AppService.HandleException(CLASS_NAME, nameof(CreateTankM551Profile), e);
+                throw;
+            }
+        }
+
+        #endregion // US Tanks
+        
         #region US IFVs and APCs
 
         /// <summary>
@@ -4660,9 +4757,7 @@ namespace HammerAndSickle.Models
 
         #endregion // US INF
 
-
         //-----------------------------------------------------------------------------------------
-
 
         #region West Germany (FRG)
 
@@ -5071,10 +5166,8 @@ namespace HammerAndSickle.Models
 
         #endregion
 
-
         //-----------------------------------------------------------------------------------------
-
-
+        
         #region United Kingdom (UK)
 
         private static void CreateTankChallenger1Profile()
@@ -5383,9 +5476,7 @@ namespace HammerAndSickle.Models
 
         #endregion
 
-
         //-----------------------------------------------------------------------------------------
-
 
         #region France
 
@@ -5747,9 +5838,7 @@ namespace HammerAndSickle.Models
 
         #endregion
 
-
         //-----------------------------------------------------------------------------------------
-
 
         #region Arab Nations
 
@@ -5935,9 +6024,7 @@ namespace HammerAndSickle.Models
 
         #endregion
 
-
         //-----------------------------------------------------------------------------------------
-
 
         #region Generic Weapons
 
@@ -6185,9 +6272,7 @@ namespace HammerAndSickle.Models
 
         #endregion
 
-
         //-----------------------------------------------------------------------------------------
-
 
         #region Bases
 
@@ -6384,7 +6469,6 @@ namespace HammerAndSickle.Models
         }
 
         #endregion
-
 
         //-----------------------------------------------------------------------------------------
     }
