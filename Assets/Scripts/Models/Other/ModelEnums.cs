@@ -826,21 +826,26 @@ namespace HammerAndSickle.Models
         SV_BM_SCUDB,    // Ballistic Missile Regiment
 
         SV_AAR_MTLB,    // Air Assault Regiment
-        SV_AAR_BTR70,   // Air Assault Regiment
-        SV_AAR_BTR80,   // Air Assault Regiment
+        SV_AAR_BMD1,    // Air Assault Regiment
+        SV_AAR_BMD2,    // Air Assault Regiment
+        SV_AAR_BMD3,    // Air Assault Regiment
 
         SV_VDV_BMD1,    // Airborne Regiment
         SV_VDV_BMD2,    // Airborne Regiment
         SV_VDV_BMD3,    // Airborne Regiment
+        SV_VDV_ART,     // Airborne Artillery Regiment
+        SV_VDV_SUP,     // Airborne Support Regiment
 
-        SV_NAV,         // Naval INF Regiment
-        SV_NAV_MECH,    // Naval Mechanized Regiment
+        SV_NAV_T55,     // Naval INF Regiment
+        SV_NAV_T72,     // Naval INF Regiment
+        SV_NAV_T80,     // Naval INF Regiment
 
         SV_ENG,         // Engineer Regiment
 
         SV_RCR,         // Reconnaissance Regiment
         SV_RCR_AT,      // Anti-Tank Regiment
 
+        SV_ADR_AAA,     // Air Defense Regiment, generic
         SV_ADR_ZSU57,   // Air Defense Regiment
         SV_ADR_ZSU23,   // Air Defense Regiment
         SV_ADR_2K22,    // Air Defense Regiment
