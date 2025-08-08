@@ -688,6 +688,7 @@ namespace HammerAndSickle.Models
         SPAAA_M163,
         SPSAM_CHAP,
         SAM_HAWK,
+        HEL_OH58,
         HEL_AH64,
         AWACS_E3,
         ASF_F15,
