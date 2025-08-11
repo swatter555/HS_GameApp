@@ -93,7 +93,8 @@ namespace HammerAndSickle.Models
         MJ,
         IR,
         IQ,
-        SAUD
+        SAUD,
+        GENERIC
     }
 
     /// <summary>
@@ -645,10 +646,12 @@ namespace HammerAndSickle.Models
         SAM_S75,
         SAM_S125,
         SAM_S300,
+        HEL_MI8T,   // Transport Helicopter
         HEL_MI8AT,
         HEL_MI24D,
         HEL_MI24V,
         HEL_MI28,
+        TRA_AN12,   // Transport Aircraft
         AWACS_A50,
         ASF_MIG21,
         ASF_MIG23,
@@ -665,15 +668,8 @@ namespace HammerAndSickle.Models
         BMB_TU22,
         BMB_TU22M3,
         RCNA_MIG25R,
-        REG_INF_SV,    // Regular INF
-        AB_INF_SV,     // Airborne INF
-        AM_INF_SV,     // Air Mobile INF
-        MAR_INF_SV,    // Marine INF
-        SPEC_INF_SV,   // Special Forces INF
-        ENG_INF_SV,    // Engineer INF
-        TRANSHELO_MI8, // Transport Helicopter
-        TRANSAIR_AN12, // Transport Aircraft
-        TRANSNAVAL,    // Transport Naval
+        
+        TRA_NAVAL,   // Transport Naval
 
         // USA
         TANK_M1,
@@ -698,12 +694,6 @@ namespace HammerAndSickle.Models
         BMB_F111,
         BMB_F117,
         RCNA_SR71,
-        REG_INF_US,
-        AB_INF_US,
-        AM_INF_US,
-        MAR_INF_US,
-        SPEC_INF_US,
-        ENG_INF_US,
 
         // West Germany (FRG)
         TANK_LEOPARD1,
@@ -711,50 +701,42 @@ namespace HammerAndSickle.Models
         IFV_MARDER,
         SPAAA_GEPARD,
         HEL_BO105,
-        MRF_TornadoIDS,
-        REG_INF_FRG,
-        AM_INF_FRG,
-        SPEC_INF_FRG,
-        ENG_INF_FRG,
+        MRF_TORNADO_IDS,
 
         // UK
         TANK_CHALLENGER1,
         IFV_WARRIOR,
-        REG_INF_UK,
-        AB_INF_UK,
-        AM_INF_UK,
-        SPEC_INF_UK,
-        ENG_INF_UK,
-        MRF_TORNADOGR1,
+        APC_FV432,
+        SAM_RAPIER,
+        MRF_TORNADO_GR1,
 
         // France
         TANK_AMX30,
+        IFV_AMX10P,
+        APC_VAB,
+        RCN_ERC90,
+        SPA_AUF1,
         SPAAA_ROLAND,
         ASF_MIRAGE2000,
         ATT_JAGUAR,
-        REG_INF_FRA,
-        AB_INF_FRA,
-        AM_INF_FRA,
-        MAR_INF_FRA,
-        SPEC_INF_FRA,
-        ENG_INF_FRA,
-
-        // Arab armies
-        IREG_INF_ARAB,
-        REG_INF_ARAB,
-        SPEC_INF_ARAB,
-        ENG_INF_ARAB,
 
         // Generic types
-        AAA_GENERIC,
-        ART_LIGHT_GENERIC,
-        ART_HEAVY_GENERIC,
-        MANPAD_GENERIC,
-        ATGM_GENERIC,
+        GENERIC_AAA,
+        GENERIC_ART_LIGHT,
+        GENERIC_ART_HEAVY,
+        GENERIC_MANPAD,
+        GENERIC_ATGM,
+        GENERIC_LANDBASE,
+        GENERIC_AIRBASE,
+        GENERIC_SUPPLYDEPOT,
 
-        LANDBASE_GENERIC,
-        AIRBASE_GENERIC,
-        SUPPLYDEPOT_GENERIC,
+        // Shared profiles for infantry
+        INF_REG,    // Regular INF
+        INF_AB,     // Airborne INF
+        INF_AM,     // Air Mobile INF
+        INF_MAR,    // Marine INF
+        INF_SPEC,   // Special Forces INF
+        INF_ENG,    // Engineer INF
 
         COMBAT, // Used for generic combat calculations
         DEFAULT // Fallback value

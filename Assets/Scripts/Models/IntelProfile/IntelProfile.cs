@@ -419,7 +419,7 @@ namespace HammerAndSickle.Models
             // Motor Rifle Regiment- BTR70 profile
             var mrrBTR70 = new Dictionary<WeaponSystems, int>
             {
-                { WeaponSystems.REG_INF_SV, 2523 },
+                { WeaponSystems.INF_REG, 2523 },
                 { WeaponSystems.TANK_T55A, 40 },
                 { WeaponSystems.APC_BTR70, 129 },
                 { WeaponSystems.IFV_BMP1, 26 },
@@ -427,15 +427,15 @@ namespace HammerAndSickle.Models
                 { WeaponSystems.SPSAM_9K31, 4 },
                 { WeaponSystems.SPA_2S1, 18 },
                 { WeaponSystems.RCN_BRDM2, 12 },
-                { WeaponSystems.ATGM_GENERIC, 16 },
-                { WeaponSystems.MANPAD_GENERIC, 30 },
+                { WeaponSystems.GENERIC_ATGM, 16 },
+                { WeaponSystems.GENERIC_MANPAD, 30 },
             };
             _profiles[IntelProfileTypes.SV_MRR_BTR70] = mrrBTR70;
 
             // Motor Rifle Regiment- BTR80 profile
             var mrrBTR80 = new Dictionary<WeaponSystems, int>
             {
-                { WeaponSystems.REG_INF_SV, 2523 },
+                { WeaponSystems.INF_REG, 2523 },
                 { WeaponSystems.TANK_T72A, 40 },
                 { WeaponSystems.APC_BTR80, 129 },
                 { WeaponSystems.IFV_BMP2, 26 },
@@ -443,8 +443,8 @@ namespace HammerAndSickle.Models
                 { WeaponSystems.SPSAM_9K31, 4 },
                 { WeaponSystems.SPA_2S1, 18 },
                 { WeaponSystems.RCN_BRDM2, 12 },
-                { WeaponSystems.ATGM_GENERIC, 16 },
-                { WeaponSystems.MANPAD_GENERIC, 30 },
+                { WeaponSystems.GENERIC_ATGM, 16 },
+                { WeaponSystems.GENERIC_MANPAD, 30 },
             };
             _profiles[IntelProfileTypes.SV_MRR_BTR80] = mrrBTR80;
 
@@ -455,7 +455,7 @@ namespace HammerAndSickle.Models
             // Motor Rifle Regiment- BMP1 profile
             var mrrBMP1 = new Dictionary<WeaponSystems, int>
             {
-                { WeaponSystems.REG_INF_SV, 2424 },
+                { WeaponSystems.INF_REG, 2424 },
                 { WeaponSystems.TANK_T55A, 40 },
                 { WeaponSystems.IFV_BMP1, 129 },
                 { WeaponSystems.APC_BTR70, 26 },
@@ -463,15 +463,15 @@ namespace HammerAndSickle.Models
                 { WeaponSystems.SPSAM_9K31, 4 },
                 { WeaponSystems.SPA_2S1, 18 },
                 { WeaponSystems.RCN_BRDM2, 12 },
-                { WeaponSystems.ATGM_GENERIC, 16 },
-                { WeaponSystems.MANPAD_GENERIC, 30 },
+                { WeaponSystems.GENERIC_ATGM, 16 },
+                { WeaponSystems.GENERIC_MANPAD, 30 },
             };
             _profiles[IntelProfileTypes.SV_MRR_BMP1] = mrrBMP1;
 
             // Motor Rifle Regiment- BMP2 profile
             var mrrBMP2 = new Dictionary<WeaponSystems, int>
             {
-                { WeaponSystems.REG_INF_SV, 2424 },
+                { WeaponSystems.INF_REG, 2424 },
                 { WeaponSystems.TANK_T72A, 40 },
                 { WeaponSystems.IFV_BMP2, 129 },
                 { WeaponSystems.APC_BTR70, 26 },
@@ -479,15 +479,15 @@ namespace HammerAndSickle.Models
                 { WeaponSystems.SPSAM_9K31, 4 },
                 { WeaponSystems.SPA_2S1, 18 },
                 { WeaponSystems.RCN_BRDM2, 12 },
-                { WeaponSystems.ATGM_GENERIC, 16 },
-                { WeaponSystems.MANPAD_GENERIC, 30 },
+                { WeaponSystems.GENERIC_ATGM, 16 },
+                { WeaponSystems.GENERIC_MANPAD, 30 },
             };
             _profiles[IntelProfileTypes.SV_MRR_BMP2] = mrrBMP2;
 
             // Motor Rifle Regiment- BMP3 profile
             var mrrBMP3 = new Dictionary<WeaponSystems, int>
             {
-                { WeaponSystems.REG_INF_SV, 2424 },
+                { WeaponSystems.INF_REG, 2424 },
                 { WeaponSystems.TANK_T80B, 40 },
                 { WeaponSystems.IFV_BMP3, 129 },
                 { WeaponSystems.APC_BTR80, 26 },
@@ -495,8 +495,8 @@ namespace HammerAndSickle.Models
                 { WeaponSystems.SPSAM_9K31, 4 },
                 { WeaponSystems.SPA_2S1, 18 },
                 { WeaponSystems.RCN_BRDM2, 12 },
-                { WeaponSystems.ATGM_GENERIC, 16 },
-                { WeaponSystems.MANPAD_GENERIC, 30 },
+                { WeaponSystems.GENERIC_ATGM, 16 },
+                { WeaponSystems.GENERIC_MANPAD, 30 },
             };
             _profiles[IntelProfileTypes.SV_MRR_BMP3] = mrrBMP3;
 
@@ -507,7 +507,7 @@ namespace HammerAndSickle.Models
             // Tank Regiment- T55 profile
             var tr_T55 = new Dictionary<WeaponSystems, int>
             {
-                { WeaponSystems.REG_INF_SV, 1143 },
+                { WeaponSystems.INF_REG, 1143 },
                 { WeaponSystems.TANK_T55A, 94 },
                 { WeaponSystems.IFV_BMP1, 45 },
                 { WeaponSystems.APC_BTR70, 21 },
@@ -515,15 +515,15 @@ namespace HammerAndSickle.Models
                 { WeaponSystems.SPSAM_9K31, 4 },
                 { WeaponSystems.SPA_2S1, 18 },
                 { WeaponSystems.RCN_BRDM2, 12 },
-                { WeaponSystems.ATGM_GENERIC, 12 },
-                { WeaponSystems.MANPAD_GENERIC, 12 },
+                { WeaponSystems.GENERIC_ATGM, 12 },
+                { WeaponSystems.GENERIC_MANPAD, 12 },
             };
             _profiles[IntelProfileTypes.SV_TR_T55] = tr_T55;
 
             // Tank Regiment- T64A profile
             var tr_T64A = new Dictionary<WeaponSystems, int>
             {
-                { WeaponSystems.REG_INF_SV, 1143 },
+                { WeaponSystems.INF_REG, 1143 },
                 { WeaponSystems.TANK_T64A, 94 },
                 { WeaponSystems.IFV_BMP2, 45 },
                 { WeaponSystems.APC_BTR70, 21 },
@@ -531,15 +531,15 @@ namespace HammerAndSickle.Models
                 { WeaponSystems.SPSAM_9K31, 4 },
                 { WeaponSystems.SPA_2S1, 18 },
                 { WeaponSystems.RCN_BRDM2, 12 },
-                { WeaponSystems.ATGM_GENERIC, 12 },
-                { WeaponSystems.MANPAD_GENERIC, 12 },
+                { WeaponSystems.GENERIC_ATGM, 12 },
+                { WeaponSystems.GENERIC_MANPAD, 12 },
             };
             _profiles[IntelProfileTypes.SV_TR_T64A] = tr_T64A;
 
             // Tank Regiment- T64B profile
             var tr_T64B = new Dictionary<WeaponSystems, int>
             {
-                { WeaponSystems.REG_INF_SV, 1143 },
+                { WeaponSystems.INF_REG, 1143 },
                 { WeaponSystems.TANK_T64B, 94 },
                 { WeaponSystems.IFV_BMP2, 45 },
                 { WeaponSystems.APC_BTR80, 21 },
@@ -547,15 +547,15 @@ namespace HammerAndSickle.Models
                 { WeaponSystems.SPSAM_9K31, 4 },
                 { WeaponSystems.SPA_2S1, 18 },
                 { WeaponSystems.RCN_BRDM2, 12 },
-                { WeaponSystems.ATGM_GENERIC, 12 },
-                { WeaponSystems.MANPAD_GENERIC, 12 },
+                { WeaponSystems.GENERIC_ATGM, 12 },
+                { WeaponSystems.GENERIC_MANPAD, 12 },
             };
             _profiles[IntelProfileTypes.SV_TR_T64B] = tr_T64B;
 
             // Tank Regiment- T72A profile
             var tr_T72A = new Dictionary<WeaponSystems, int>
             {
-                { WeaponSystems.REG_INF_SV, 1143 },
+                { WeaponSystems.INF_REG, 1143 },
                 { WeaponSystems.TANK_T72A, 94 },
                 { WeaponSystems.IFV_BMP1, 45 },
                 { WeaponSystems.APC_BTR70, 21 },
@@ -563,15 +563,15 @@ namespace HammerAndSickle.Models
                 { WeaponSystems.SPSAM_9K31, 4 },
                 { WeaponSystems.SPA_2S1, 18 },
                 { WeaponSystems.RCN_BRDM2, 12 },
-                { WeaponSystems.ATGM_GENERIC, 12 },
-                { WeaponSystems.MANPAD_GENERIC, 12 },
+                { WeaponSystems.GENERIC_ATGM, 12 },
+                { WeaponSystems.GENERIC_MANPAD, 12 },
             };
             _profiles[IntelProfileTypes.SV_TR_T72A] = tr_T72A;
 
             // Tank Regiment- T72B profile
             var tr_T72B = new Dictionary<WeaponSystems, int>
             {
-                { WeaponSystems.REG_INF_SV, 1143 },
+                { WeaponSystems.INF_REG, 1143 },
                 { WeaponSystems.TANK_T72B, 94 },
                 { WeaponSystems.IFV_BMP2, 45 },
                 { WeaponSystems.APC_BTR80, 21 },
@@ -579,15 +579,15 @@ namespace HammerAndSickle.Models
                 { WeaponSystems.SPSAM_9K31, 4 },
                 { WeaponSystems.SPA_2S1, 18 },
                 { WeaponSystems.RCN_BRDM2, 12 },
-                { WeaponSystems.ATGM_GENERIC, 12 },
-                { WeaponSystems.MANPAD_GENERIC, 12 },
+                { WeaponSystems.GENERIC_ATGM, 12 },
+                { WeaponSystems.GENERIC_MANPAD, 12 },
             };
             _profiles[IntelProfileTypes.SV_TR_T72B] = tr_T72B;
 
             // Tank Regiment- T80B profile
             var tr_T80B = new Dictionary<WeaponSystems, int>
             {
-                { WeaponSystems.REG_INF_SV, 1143 },
+                { WeaponSystems.INF_REG, 1143 },
                 { WeaponSystems.TANK_T80B, 94 },
                 { WeaponSystems.IFV_BMP2, 45 },
                 { WeaponSystems.APC_BTR80, 21 },
@@ -595,15 +595,15 @@ namespace HammerAndSickle.Models
                 { WeaponSystems.SPSAM_9K31, 4 },
                 { WeaponSystems.SPA_2S1, 18 },
                 { WeaponSystems.RCN_BRDM2, 12 },
-                { WeaponSystems.ATGM_GENERIC, 12 },
-                { WeaponSystems.MANPAD_GENERIC, 12 },
+                { WeaponSystems.GENERIC_ATGM, 12 },
+                { WeaponSystems.GENERIC_MANPAD, 12 },
             };
             _profiles[IntelProfileTypes.SV_TR_T80B] = tr_T80B;
 
             // Tank Regiment- T80U profile
             var tr_T80U = new Dictionary<WeaponSystems, int>
             {
-                { WeaponSystems.REG_INF_SV, 1143 },
+                { WeaponSystems.INF_REG, 1143 },
                 { WeaponSystems.TANK_T80U, 94 },
                 { WeaponSystems.IFV_BMP2, 45 },
                 { WeaponSystems.APC_BTR80, 21 },
@@ -611,15 +611,15 @@ namespace HammerAndSickle.Models
                 { WeaponSystems.SPSAM_9K31, 4 },
                 { WeaponSystems.SPA_2S1, 18 },
                 { WeaponSystems.RCN_BRDM2, 12 },
-                { WeaponSystems.ATGM_GENERIC, 12 },
-                { WeaponSystems.MANPAD_GENERIC, 12 },
+                { WeaponSystems.GENERIC_ATGM, 12 },
+                { WeaponSystems.GENERIC_MANPAD, 12 },
             };
             _profiles[IntelProfileTypes.SV_TR_T80U] = tr_T80U;
 
             // Tank Regiment- T80BV profile
             var tr_T80BV = new Dictionary<WeaponSystems, int>
             {
-                { WeaponSystems.REG_INF_SV, 1143 },
+                { WeaponSystems.INF_REG, 1143 },
                 { WeaponSystems.TANK_T80BV, 94 },
                 { WeaponSystems.IFV_BMP3, 45 },
                 { WeaponSystems.APC_BTR80, 21 },
@@ -627,8 +627,8 @@ namespace HammerAndSickle.Models
                 { WeaponSystems.SPSAM_9K31, 4 },
                 { WeaponSystems.SPA_2S1, 18 },
                 { WeaponSystems.RCN_BRDM2, 12 },
-                { WeaponSystems.ATGM_GENERIC, 12 },
-                { WeaponSystems.MANPAD_GENERIC, 12 },
+                { WeaponSystems.GENERIC_ATGM, 12 },
+                { WeaponSystems.GENERIC_MANPAD, 12 },
             };
             _profiles[IntelProfileTypes.SV_TR_T80BV] = tr_T80BV;
 
@@ -639,23 +639,23 @@ namespace HammerAndSickle.Models
             // Soviet heavy towed artillery
             var sv_heavyart = new Dictionary<WeaponSystems, int>
             {
-                { WeaponSystems.REG_INF_SV, 1100 },
-                { WeaponSystems.ART_HEAVY_GENERIC, 72 },
+                { WeaponSystems.INF_REG, 1100 },
+                { WeaponSystems.GENERIC_ART_HEAVY, 72 },
             };
             _profiles[IntelProfileTypes.SV_AR_HVY] = sv_heavyart;
 
             // Soviet light towed artillery
             var sv_lightart = new Dictionary<WeaponSystems, int>
             {
-                { WeaponSystems.REG_INF_SV, 1100 },
-                { WeaponSystems.ART_LIGHT_GENERIC, 72 },
+                { WeaponSystems.INF_REG, 1100 },
+                { WeaponSystems.GENERIC_ART_LIGHT, 72 },
             };
             _profiles[IntelProfileTypes.SV_AR_LGT] = sv_lightart;
 
             // Soviet artillery regiment 2S1
             var sv_2s1 = new Dictionary<WeaponSystems, int>
             {
-                { WeaponSystems.REG_INF_SV, 1062 },
+                { WeaponSystems.INF_REG, 1062 },
                 { WeaponSystems.SPA_2S1, 36 },
             };
             _profiles[IntelProfileTypes.SV_AR_2S1] = sv_2s1;
@@ -663,7 +663,7 @@ namespace HammerAndSickle.Models
             // Soviet artillery regiment 2S3
             var sv_2s3 = new Dictionary<WeaponSystems, int>
             {
-                { WeaponSystems.REG_INF_SV, 1062 },
+                { WeaponSystems.INF_REG, 1062 },
                 { WeaponSystems.SPA_2S3, 36 },
             };
             _profiles[IntelProfileTypes.SV_AR_2S3] = sv_2s3;
@@ -671,7 +671,7 @@ namespace HammerAndSickle.Models
             // Soviet artillery regiment 2S5
             var sv_2s5 = new Dictionary<WeaponSystems, int>
             {
-                { WeaponSystems.REG_INF_SV, 1062 },
+                { WeaponSystems.INF_REG, 1062 },
                 { WeaponSystems.SPA_2S5, 36 },
             };
             _profiles[IntelProfileTypes.SV_AR_2S5] = sv_2s5;
@@ -679,7 +679,7 @@ namespace HammerAndSickle.Models
             // Soviet artillery regiment 2S19
             var sv_2s19 = new Dictionary<WeaponSystems, int>
             {
-                { WeaponSystems.REG_INF_SV, 1062 },
+                { WeaponSystems.INF_REG, 1062 },
                 { WeaponSystems.SPA_2S19, 36 },
             };
             _profiles[IntelProfileTypes.SV_AR_2S19] = sv_2s19;
@@ -687,7 +687,7 @@ namespace HammerAndSickle.Models
             // Soviet rocket artillery regiment BM-21
             var sv_bm21 = new Dictionary<WeaponSystems, int>
             {
-                { WeaponSystems.REG_INF_SV, 1200 },
+                { WeaponSystems.INF_REG, 1200 },
                 { WeaponSystems.ROC_BM21, 54 },
             };
             _profiles[IntelProfileTypes.SV_ROC_BM21] = sv_bm21;
@@ -695,7 +695,7 @@ namespace HammerAndSickle.Models
             // Soviet rocket artillery regiment BM-27
             var sv_bm27 = new Dictionary<WeaponSystems, int>
             {
-                { WeaponSystems.REG_INF_SV, 1200 },
+                { WeaponSystems.INF_REG, 1200 },
                 { WeaponSystems.ROC_BM27, 54 },
             };
             _profiles[IntelProfileTypes.SV_ROC_BM27] = sv_bm27;
@@ -703,7 +703,7 @@ namespace HammerAndSickle.Models
             // Soviet rocket artillery regiment BM-30
             var sv_bm30 = new Dictionary<WeaponSystems, int>
             {
-                { WeaponSystems.REG_INF_SV, 1200 },
+                { WeaponSystems.INF_REG, 1200 },
                 { WeaponSystems.ROC_BM30, 54 },
             };
             _profiles[IntelProfileTypes.SV_ROC_BM30] = sv_bm30;
@@ -711,7 +711,7 @@ namespace HammerAndSickle.Models
             // Soviet ballistic missile regiment SCUD
             var sv_scud = new Dictionary<WeaponSystems, int>
             {
-                { WeaponSystems.REG_INF_SV, 800 },
+                { WeaponSystems.INF_REG, 800 },
                 { WeaponSystems.SSM_SCUD, 18 },
             };
             _profiles[IntelProfileTypes.SV_BM_SCUDB] = sv_scud;
@@ -723,56 +723,56 @@ namespace HammerAndSickle.Models
             // Soviet air mobile regiment MTLB
             var aar_MTLB = new Dictionary<WeaponSystems, int>
             {
-                { WeaponSystems.AM_INF_SV,       2300 },   // 3× air‑assault battalions + HQ & support
+                { WeaponSystems.INF_AM,           2300 },   // 3× air‑assault battalions + HQ & support
                 { WeaponSystems.APC_MTLB,           68 },  // 31 per battalion (3 rifle coys + HQ)
                 { WeaponSystems.RCN_BRDM2,          13 },  // recon platoon
-                { WeaponSystems.ART_LIGHT_GENERIC,  18 },  // 122 mm artillery battery
-                { WeaponSystems.ATGM_GENERIC,       14 },  // mixed AT‑4/AT‑5 sections
-                { WeaponSystems.MANPAD_GENERIC,     45 },  // SA‑14/16 squads
-                { WeaponSystems.AAA_GENERIC,         2 },  // ZSU‑23‑4 Shilka (reduced strength)
-                { WeaponSystems.TRANSHELO_MI8,     166 },  // 2× transport helicopter squadrons
+                { WeaponSystems.GENERIC_ART_LIGHT,  18 },  // 122 mm artillery battery
+                { WeaponSystems.GENERIC_ATGM,       14 },  // mixed AT‑4/AT‑5 sections
+                { WeaponSystems.GENERIC_MANPAD,     45 },  // SA‑14/16 squads
+                { WeaponSystems.GENERIC_AAA,         2 },  // ZSU‑23‑4 Shilka (reduced strength)
+                { WeaponSystems.HEL_MI8T,     166 },  // 2× transport helicopter squadrons
             };
             _profiles[IntelProfileTypes.SV_AAR_MTLB] = aar_MTLB;
 
             // Soviet air mobile regiment BMD1
             var aar_BMD1 = new Dictionary<WeaponSystems, int>
             {
-                { WeaponSystems.AM_INF_SV,       2300 },   // 3× air‑assault battalions + HQ & support
+                { WeaponSystems.INF_AM,           2300 },   // 3× air‑assault battalions + HQ & support
                 { WeaponSystems.IFV_BMD1,           68 },  // 31 per battalion (3 rifle coys + HQ)
                 { WeaponSystems.RCN_BRDM2,          13 },  // recon platoon
-                { WeaponSystems.ART_LIGHT_GENERIC,  18 },  // 122 mm artillery battery
-                { WeaponSystems.ATGM_GENERIC,       14 },  // mixed AT‑4/AT‑5 sections
-                { WeaponSystems.MANPAD_GENERIC,     45 },  // SA‑14/16 squads
-                { WeaponSystems.AAA_GENERIC,         2 },  // ZSU‑23‑4 Shilka (reduced strength)
-                { WeaponSystems.TRANSHELO_MI8,     166 },  // 2× transport helicopter squadrons
+                { WeaponSystems.GENERIC_ART_LIGHT,  18 },  // 122 mm artillery battery
+                { WeaponSystems.GENERIC_ATGM,       14 },  // mixed AT‑4/AT‑5 sections
+                { WeaponSystems.GENERIC_MANPAD,     45 },  // SA‑14/16 squads
+                { WeaponSystems.GENERIC_AAA,         2 },  // ZSU‑23‑4 Shilka (reduced strength)
+                { WeaponSystems.HEL_MI8T,     166 },  // 2× transport helicopter squadrons
             };
             _profiles[IntelProfileTypes.SV_AAR_BMD1] = aar_BMD1;
 
             // Soviet air mobile regiment BTR80
             var aar_BMD2 = new Dictionary<WeaponSystems, int>
             {
-                { WeaponSystems.AM_INF_SV,       2300 },   // 3× air‑assault battalions + HQ & support
+                { WeaponSystems.INF_AM,           2300 },   // 3× air‑assault battalions + HQ & support
                 { WeaponSystems.IFV_BMD2,           68 },  // 31 per battalion (3 rifle coys + HQ)
                 { WeaponSystems.RCN_BRDM2,          13 },  // recon platoon
-                { WeaponSystems.ART_LIGHT_GENERIC,  18 },  // 122 mm artillery battery
-                { WeaponSystems.ATGM_GENERIC,       14 },  // mixed AT‑4/AT‑5 sections
-                { WeaponSystems.MANPAD_GENERIC,     45 },  // SA‑14/16 squads
-                { WeaponSystems.AAA_GENERIC,         2 },  // ZSU‑23‑4 Shilka (reduced strength)
-                { WeaponSystems.TRANSHELO_MI8,     166 },  // 2× transport helicopter squadrons
+                { WeaponSystems.GENERIC_ART_LIGHT,  18 },  // 122 mm artillery battery
+                { WeaponSystems.GENERIC_ATGM,       14 },  // mixed AT‑4/AT‑5 sections
+                { WeaponSystems.GENERIC_MANPAD,     45 },  // SA‑14/16 squads
+                { WeaponSystems.GENERIC_AAA,         2 },  // ZSU‑23‑4 Shilka (reduced strength)
+                { WeaponSystems.HEL_MI8T,     166 },  // 2× transport helicopter squadrons
             };
             _profiles[IntelProfileTypes.SV_AAR_BMD2] = aar_BMD2;
 
             // Soviet air mobile regiment BMD3
             var aar_BMD3 = new Dictionary<WeaponSystems, int>
             {
-                { WeaponSystems.AM_INF_SV,       2300 },   // 3× air‑assault battalions + HQ & support
+                { WeaponSystems.INF_AM,           2300 },   // 3× air‑assault battalions + HQ & support
                 { WeaponSystems.IFV_BMD3,           68 },  // 31 per battalion (3 rifle coys + HQ)
                 { WeaponSystems.RCN_BRDM2,          13 },  // recon platoon
-                { WeaponSystems.ART_LIGHT_GENERIC,  18 },  // 122 mm artillery battery
-                { WeaponSystems.ATGM_GENERIC,       14 },  // mixed AT‑4/AT‑5 sections
-                { WeaponSystems.MANPAD_GENERIC,     45 },  // SA‑14/16 squads
-                { WeaponSystems.AAA_GENERIC,         2 },  // ZSU‑23‑4 Shilka (reduced strength)
-                { WeaponSystems.TRANSHELO_MI8,     166 },  // 2× transport helicopter squadrons
+                { WeaponSystems.GENERIC_ART_LIGHT,  18 },  // 122 mm artillery battery
+                { WeaponSystems.GENERIC_ATGM,       14 },  // mixed AT‑4/AT‑5 sections
+                { WeaponSystems.GENERIC_MANPAD,     45 },  // SA‑14/16 squads
+                { WeaponSystems.GENERIC_AAA,         2 },  // ZSU‑23‑4 Shilka (reduced strength)
+                { WeaponSystems.HEL_MI8T,     166 },  // 2× transport helicopter squadrons
             };
             _profiles[IntelProfileTypes.SV_AAR_BMD3] = aar_BMD3;
 
@@ -785,60 +785,60 @@ namespace HammerAndSickle.Models
             // BMD battalions (31 vehicles each) plus regimental assets.
             var vdv_BMD1 = new Dictionary<WeaponSystems, int>
             {
-                { WeaponSystems.AB_INF_SV,          2250 }, // 3× airborne battalions + regt HQ/support
+                { WeaponSystems.INF_AB,             2250 }, // 3× airborne battalions + regt HQ/support
                 { WeaponSystems.IFV_BMD1,             93 }, // 31 per battalion (3 rifle coys + HQ)
                 { WeaponSystems.RCN_BRDM2,             6 }, // recon platoon (BRDM‑2)
-                { WeaponSystems.ART_LIGHT_GENERIC,    18 }, // 120 mm 2S9 Nona‑S battery
-                { WeaponSystems.ATGM_GENERIC,         12 }, // AT‑4/AT‑5 sections
-                { WeaponSystems.MANPAD_GENERIC,       45 }, // SA‑14/16 squads
-                { WeaponSystems.AAA_GENERIC,           6 },
+                { WeaponSystems.GENERIC_ART_LIGHT,    18 }, // 120 mm 2S9 Nona‑S battery
+                { WeaponSystems.GENERIC_ATGM,         12 }, // AT‑4/AT‑5 sections
+                { WeaponSystems.GENERIC_MANPAD,       45 }, // SA‑14/16 squads
+                { WeaponSystems.GENERIC_AAA,           6 },
             };
             _profiles[IntelProfileTypes.SV_VDV_BMD1] = vdv_BMD1;
 
             // VDV airborne regiment – BMD‑2 (mid‑1980s baseline)
             var vdv_BMD2 = new Dictionary<WeaponSystems, int>
             {
-                { WeaponSystems.AB_INF_SV,          2250 }, // 3× airborne battalions + regt HQ/support
+                { WeaponSystems.INF_AB,             2250 }, // 3× airborne battalions + regt HQ/support
                 { WeaponSystems.IFV_BMD2,             93 }, // 31 per battalion (3 rifle coys + HQ)
                 { WeaponSystems.RCN_BRDM2,             6 }, // recon platoon (BRDM‑2)
-                { WeaponSystems.ART_LIGHT_GENERIC,    18 }, // 120 mm 2S9 Nona‑S battery
-                { WeaponSystems.ATGM_GENERIC,         12 }, // AT‑4/AT‑5 sections
-                { WeaponSystems.MANPAD_GENERIC,       45 }, // SA‑14/16 squads
-                { WeaponSystems.AAA_GENERIC,           6 },
+                { WeaponSystems.GENERIC_ART_LIGHT,    18 }, // 120 mm 2S9 Nona‑S battery
+                { WeaponSystems.GENERIC_ATGM,         12 }, // AT‑4/AT‑5 sections
+                { WeaponSystems.GENERIC_MANPAD,       45 }, // SA‑14/16 squads
+                { WeaponSystems.GENERIC_AAA,           6 },
             };
             _profiles[IntelProfileTypes.SV_VDV_BMD2] = vdv_BMD2;
 
             // VDV airborne regiment – BMD‑3 (mid‑1980s baseline)
             var vdv_BMD3 = new Dictionary<WeaponSystems, int>
             {
-                { WeaponSystems.AB_INF_SV,          2250 }, // 3× airborne battalions + regt HQ/support
+                { WeaponSystems.INF_AB,             2250 }, // 3× airborne battalions + regt HQ/support
                 { WeaponSystems.IFV_BMD3,             93 }, // 31 per battalion (3 rifle coys + HQ)
                 { WeaponSystems.RCN_BRDM2,             6 }, // recon platoon (BRDM‑2)
-                { WeaponSystems.ART_LIGHT_GENERIC,    18 }, // 120 mm 2S9 Nona‑S battery
-                { WeaponSystems.ATGM_GENERIC,         12 }, // AT‑4/AT‑5 sections
-                { WeaponSystems.MANPAD_GENERIC,       45 }, // SA‑14/16 squads
-                { WeaponSystems.AAA_GENERIC,           6 },
+                { WeaponSystems.GENERIC_ART_LIGHT,    18 }, // 120 mm 2S9 Nona‑S battery
+                { WeaponSystems.GENERIC_ATGM,         12 }, // AT‑4/AT‑5 sections
+                { WeaponSystems.GENERIC_MANPAD,       45 }, // SA‑14/16 squads
+                { WeaponSystems.GENERIC_AAA,           6 },
             };
             _profiles[IntelProfileTypes.SV_VDV_BMD3] = vdv_BMD3;
 
             // VDV artillery regiment
             var vdv_artreg = new Dictionary<WeaponSystems, int>
             {
-                { WeaponSystems.AB_INF_SV,          1200 }, // regt HQ/support
-                { WeaponSystems.ART_LIGHT_GENERIC,    36 }, // 120 mm 2S9 Nona‑S battery
+                { WeaponSystems.INF_AB,             1200 }, // regt HQ/support
+                { WeaponSystems.GENERIC_ART_LIGHT,    36 }, // 120 mm 2S9 Nona‑S battery
             };
             _profiles[IntelProfileTypes.SV_VDV_ART] = vdv_artreg;
 
             // VDV airborne regiment – support (mid‑1980s baseline)
             var vdv_sup = new Dictionary<WeaponSystems, int>
             {
-                { WeaponSystems.AB_INF_SV,          1150 },
+                { WeaponSystems.INF_AB,             1150 },
                 { WeaponSystems.TANK_T55A,            31 },
                 { WeaponSystems.RCN_BRDM2AT,          18 }, 
-                { WeaponSystems.ART_LIGHT_GENERIC,     6 }, 
-                { WeaponSystems.ATGM_GENERIC,         12 }, 
-                { WeaponSystems.MANPAD_GENERIC,       12 }, 
-                { WeaponSystems.AAA_GENERIC,           2 },
+                { WeaponSystems.GENERIC_ART_LIGHT,     6 }, 
+                { WeaponSystems.GENERIC_ATGM,         12 }, 
+                { WeaponSystems.GENERIC_MANPAD,       12 }, 
+                { WeaponSystems.GENERIC_AAA,           2 },
             };
             _profiles[IntelProfileTypes.SV_VDV_SUP] = vdv_sup;
 
@@ -849,7 +849,7 @@ namespace HammerAndSickle.Models
             // Naval Assault Brigade- T55 profile
             var navT55 = new Dictionary<WeaponSystems, int>
             {
-                { WeaponSystems.REG_INF_SV, 2750 },
+                { WeaponSystems.INF_REG, 2750 },
                 { WeaponSystems.TANK_T55A, 44 },
                 { WeaponSystems.IFV_BMP1, 44 },
                 { WeaponSystems.APC_BTR70, 145 },
@@ -857,15 +857,15 @@ namespace HammerAndSickle.Models
                 { WeaponSystems.SPSAM_9K31, 4 },
                 { WeaponSystems.SPA_2S1, 18 },
                 { WeaponSystems.RCN_BRDM2, 12 },
-                { WeaponSystems.ATGM_GENERIC, 12 },
-                { WeaponSystems.MANPAD_GENERIC, 36 },
+                { WeaponSystems.GENERIC_ATGM, 12 },
+                { WeaponSystems.GENERIC_MANPAD, 36 },
             };
             _profiles[IntelProfileTypes.SV_NAV_T55] = navT55;
 
             // Naval Assault Brigade- T72 profile
             var navT72 = new Dictionary<WeaponSystems, int>
             {
-                { WeaponSystems.REG_INF_SV, 2750 },
+                { WeaponSystems.INF_REG, 2750 },
                 { WeaponSystems.TANK_T72A, 44 },
                 { WeaponSystems.IFV_BMP2, 44 },
                 { WeaponSystems.APC_BTR70, 145 },
@@ -873,15 +873,15 @@ namespace HammerAndSickle.Models
                 { WeaponSystems.SPSAM_9K31, 4 },
                 { WeaponSystems.SPA_2S1, 18 },
                 { WeaponSystems.RCN_BRDM2, 12 },
-                { WeaponSystems.ATGM_GENERIC, 12 },
-                { WeaponSystems.MANPAD_GENERIC, 36 },
+                { WeaponSystems.GENERIC_ATGM, 12 },
+                { WeaponSystems.GENERIC_MANPAD, 36 },
             };
             _profiles[IntelProfileTypes.SV_NAV_T72] = navT72;
 
             // Naval Assault Brigade- T80 profile
             var navT80 = new Dictionary<WeaponSystems, int>
             {
-                { WeaponSystems.REG_INF_SV, 2750 },
+                { WeaponSystems.INF_REG, 2750 },
                 { WeaponSystems.TANK_T80U, 44 },
                 { WeaponSystems.IFV_BMP3, 44 },
                 { WeaponSystems.APC_BTR80, 145 },
@@ -889,8 +889,8 @@ namespace HammerAndSickle.Models
                 { WeaponSystems.SPSAM_9K31, 4 },
                 { WeaponSystems.SPA_2S1, 18 },
                 { WeaponSystems.RCN_BRDM2, 12 },
-                { WeaponSystems.ATGM_GENERIC, 12 },
-                { WeaponSystems.MANPAD_GENERIC, 36 },
+                { WeaponSystems.GENERIC_ATGM, 12 },
+                { WeaponSystems.GENERIC_MANPAD, 36 },
             };
             _profiles[IntelProfileTypes.SV_NAV_T80] = navT80;
 
@@ -901,7 +901,7 @@ namespace HammerAndSickle.Models
             // Soviet engineer battalion
             var svengineers = new Dictionary<WeaponSystems, int>
             {
-                { WeaponSystems.ENG_INF_SV, 340 },
+                { WeaponSystems.INF_ENG, 340 },
                 { WeaponSystems.APC_BTR70, 20 },
             };
             _profiles[IntelProfileTypes.SV_ENG] = svengineers;
@@ -913,28 +913,28 @@ namespace HammerAndSickle.Models
             // Soviet recon regiment
             var svreconrgt = new Dictionary<WeaponSystems, int>
             {
-                { WeaponSystems.REG_INF_SV, 1020 },
+                { WeaponSystems.INF_REG, 1020 },
                 { WeaponSystems.TANK_T55A, 18 },
                 { WeaponSystems.IFV_BMP1, 36 },
                 { WeaponSystems.APC_BTR70, 42 },
                 { WeaponSystems.SPAAA_ZSU57, 4},
                 { WeaponSystems.RCN_BRDM2, 54 },
-                { WeaponSystems.ATGM_GENERIC, 12 },
-                { WeaponSystems.MANPAD_GENERIC, 12 },
+                { WeaponSystems.GENERIC_ATGM, 12 },
+                { WeaponSystems.GENERIC_MANPAD, 12 },
             };
             _profiles[IntelProfileTypes.SV_RCR] = svreconrgt;
 
             // Soviet recon regiment AT
             var svreconrgtAT = new Dictionary<WeaponSystems, int>
             {
-                { WeaponSystems.REG_INF_SV, 1020 },
+                { WeaponSystems.INF_REG, 1020 },
                 { WeaponSystems.TANK_T72A, 18 },
                 { WeaponSystems.IFV_BMP2, 36 },
                 { WeaponSystems.APC_BTR80, 42 },
                 { WeaponSystems.SPAAA_ZSU57, 4},
                 { WeaponSystems.RCN_BRDM2AT, 54 },
-                { WeaponSystems.ATGM_GENERIC, 12 },
-                { WeaponSystems.MANPAD_GENERIC, 12 },
+                { WeaponSystems.GENERIC_ATGM, 12 },
+                { WeaponSystems.GENERIC_MANPAD, 12 },
             };
             _profiles[IntelProfileTypes.SV_RCR_AT] = svreconrgtAT;
 
@@ -945,36 +945,36 @@ namespace HammerAndSickle.Models
             // AAA Regiment- AAA profile
             var svadr_AAA = new Dictionary<WeaponSystems, int>
             {
-                { WeaponSystems.REG_INF_SV, 600 },
-                { WeaponSystems.AAA_GENERIC, 18 },
-                { WeaponSystems.MANPAD_GENERIC, 12 }
+                { WeaponSystems.INF_REG, 600 },
+                { WeaponSystems.GENERIC_AAA, 18 },
+                { WeaponSystems.GENERIC_MANPAD, 12 }
             };
             _profiles[IntelProfileTypes.SV_ADR_AAA] = svadr_AAA;
 
             // AAA Regiment- ZSU-57 profile
             var svadr_ZSU57 = new Dictionary<WeaponSystems, int>
             {
-                { WeaponSystems.REG_INF_SV, 600 },
+                { WeaponSystems.INF_REG, 600 },
                 { WeaponSystems.SPAAA_ZSU57, 18 },
-                { WeaponSystems.MANPAD_GENERIC, 12 }
+                { WeaponSystems.GENERIC_MANPAD, 12 }
             };
             _profiles[IntelProfileTypes.SV_ADR_ZSU57] = svadr_ZSU57;
 
             // AAA Regiment- ZSU-23 profile
             var svadr_ZSU23 = new Dictionary<WeaponSystems, int>
             {
-                { WeaponSystems.REG_INF_SV, 600 },
+                { WeaponSystems.INF_REG, 600 },
                 { WeaponSystems.SPAAA_ZSU23, 18 },
-                { WeaponSystems.MANPAD_GENERIC, 12 }
+                { WeaponSystems.GENERIC_MANPAD, 12 }
             };
             _profiles[IntelProfileTypes.SV_ADR_ZSU57] = svadr_ZSU23;
 
             // AAA Regiment- 2K22 profile
             var svadr_2K22 = new Dictionary<WeaponSystems, int>
             {
-                { WeaponSystems.REG_INF_SV, 600 },
+                { WeaponSystems.INF_REG, 600 },
                 { WeaponSystems.SPAAA_2K22, 18 },
-                { WeaponSystems.MANPAD_GENERIC, 12 }
+                { WeaponSystems.GENERIC_MANPAD, 12 }
             };
             _profiles[IntelProfileTypes.SV_ADR_2K22] = svadr_2K22;
 
@@ -985,27 +985,27 @@ namespace HammerAndSickle.Models
             // SAM Regiment- S75 profile
             var samS75 = new Dictionary<WeaponSystems, int>
             {
-                { WeaponSystems.REG_INF_SV, 750 },
+                { WeaponSystems.INF_REG, 750 },
                 { WeaponSystems.SAM_S75, 18 },
-                { WeaponSystems.MANPAD_GENERIC, 12 }
+                { WeaponSystems.GENERIC_MANPAD, 12 }
             };
             _profiles[IntelProfileTypes.SV_SAM_S75] = samS75;
 
             // SAM Regiment- S125 profile
             var samS125 = new Dictionary<WeaponSystems, int>
             {
-                { WeaponSystems.REG_INF_SV, 750 },
+                { WeaponSystems.INF_REG, 750 },
                 { WeaponSystems.SAM_S125, 18 },
-                { WeaponSystems.MANPAD_GENERIC, 12 }
+                { WeaponSystems.GENERIC_MANPAD, 12 }
             };
             _profiles[IntelProfileTypes.SV_SAM_S125] = samS125;
 
             // SAM Regiment- S300 profile
             var samS300 = new Dictionary<WeaponSystems, int>
             {
-                { WeaponSystems.REG_INF_SV, 750 },
+                { WeaponSystems.INF_REG, 750 },
                 { WeaponSystems.SAM_S300, 18 },
-                { WeaponSystems.MANPAD_GENERIC, 12 }
+                { WeaponSystems.GENERIC_MANPAD, 12 }
             };
             _profiles[IntelProfileTypes.SV_SAM_S300] = samS300;
 
@@ -1048,9 +1048,9 @@ namespace HammerAndSickle.Models
             // Soviet Spetznaz
             var spetz = new Dictionary<WeaponSystems, int>
             {
-                { WeaponSystems.SPEC_INF_SV, 1200 },
-                { WeaponSystems.ATGM_GENERIC, 12 },
-                { WeaponSystems.MANPAD_GENERIC, 12 },
+                { WeaponSystems.INF_SPEC, 1200 },
+                { WeaponSystems.GENERIC_ATGM, 12 },
+                { WeaponSystems.GENERIC_MANPAD, 12 },
             };
             _profiles[IntelProfileTypes.SV_GRU] = spetz;
 
@@ -1170,21 +1170,21 @@ namespace HammerAndSickle.Models
             // Suppy Depot profile
             var sv_supplydepot = new Dictionary<WeaponSystems, int>
             {
-                { WeaponSystems.REG_INF_SV, 3000 }
+                { WeaponSystems.INF_REG, 3000 }
             };
             _profiles[IntelProfileTypes.SV_DEPOT] = sv_supplydepot;
 
             // Airbase profile
             var sv_airbase = new Dictionary<WeaponSystems, int>
             {
-                { WeaponSystems.REG_INF_SV, 2500 }
+                { WeaponSystems.INF_REG, 2500 }
             };
             _profiles[IntelProfileTypes.SV_AIRB] = sv_airbase;
 
             // Regular base profile
             var sv_regularbase = new Dictionary<WeaponSystems, int>
             {
-                { WeaponSystems.REG_INF_SV, 1500 }
+                { WeaponSystems.INF_REG, 1500 }
             };
             _profiles[IntelProfileTypes.SV_BASE] = sv_regularbase;
 
