@@ -133,170 +133,156 @@ namespace HammerAndSickle.Models
             try
             {
                 //Create Soviet profiles
-                CreateT55AProfile();
-                CreateT64AProfile();
-                CreateT64BProfile();
-                CreateT72AProfile();
-                CreateT72BProfile();
-                CreateT80BProfile();
-                CreateT80UProfile();
-                CreateT80BVProfile();
+                Create_TANK_T55A_Profile();
+                Create_TANK_T64A_Profile();
+                Create_TANK_T64B_Profile();
+                Create_TANK_T72A_Profile();
+                Create_TANK_T72B_Profile();
+                Create_TANK_T80B_Profile();
+                Create_TANK_T80U_Profile();
+                Create_TANK_T80BV_Profile();
 
-                CreateRegInfSVProfile();
-                CreateAbInfSVProfile();
-                CreateAmInfSVProfile();
-                CreateMarInfSVProfile();
-                CreateSpecInfSVProfile();
-                CreateEngInfSVProfile();
+                Create_APC_MTLB_Profile();
+                Create_APC_BTR70_Profile();
+                Create_APC_BTR80_Profile();
 
-                CreateApcMtlbProfile();
-                CreateApcBtr70Profile();
-                CreateApcBtr80Profile();
+                Create_IFV_BMP1_Profile();
+                Create_IFV_BMP2_Profile();
+                Create_IFV_BMP3_Profile();
+                Create_IFV_BMD1_Profile();
+                Create_IFV_BMD2_Profile();
+                Create_IFV_BMD3_Profile();
 
-                CreateIfvBmp1Profile();
-                CreateIfvBmp2Profile();
-                CreateIfvBmp3Profile();
-                CreateIfvBmd1Profile();
-                CreateIfvBmd2Profile();
-                CreateIfvBmd3Profile();
+                Create_RCN_BRDM2_Profile();
+                Create_RCN_BRDM2AT_Profile();
 
-                CreateRcnBrdm2Profile();
-                CreateRcnBrdm2AtProfile();
+                Create_SPA_2S1_Profile();
+                Create_SPA_2S3_Profile();
+                Create_SPA_2S5_Profile();
+                Create_SPA_2S19_Profile();
+                Create_ROC_BM21_Profile();
+                Create_ROC_BM27_Profile();
+                Create_ROC_BM30_Profile();
 
-                CreateSpa2S1Profile();
-                CreateSpa2S3Profile();
-                CreateSpa2S5Profile();
-                CreateSpa2S19Profile();
-                CreateRocBm21Profile();
-                CreateRocBm27Profile();
-                CreateRocBm30Profile();
+                Create_SPAAA_ZSU57_Profile();
+                Create_SPAAA_ZSU23_Profile();
+                Create_SPAAA_2K22_Profile();
 
-                CreateSpaaa_Zsu57Profile();
-                CreateSpaaa_Zsu23Profile();
-                CreateSpaaa_2K22Profile();
-                CreateSpsam_9K31Profile();
+                Create_SPSAM_9K31_Profile();
 
-                CreateSam_S75Profile();
-                CreateSam_S125Profile();
-                CreateSam_S300Profile();
+                Create_SAM_S75_Profile();
+                Create_SAM_S125_Profile();
+                Create_SAM_S300_Profile();
 
-                CreateHel_Mi8ATProfile();
-                CreateHel_Mi24DProfile();
-                CreateHel_Mi24VProfile();
-                CreateHel_Mi28Profile();
+                Create_HEL_MI8T_Profile();
+                Create_HEL_MI8AT_Profile();
+                Create_HEL_MI24D_Profile();
+                Create_HEL_MI24V_Profile();
+                Create_HEL_MI28_Profile();
 
-                CreateAwacs_A50Profile();
-                CreateAsf_Mig21Profile();
-                CreateAsf_Mig23Profile();
-                CreateAsf_Mig25Profile();
-                CreateAsf_Mig29Profile();
-                CreateAsf_Su27Profile();
-                CreateAsf_Mig31Profile();
-                CreateAsf_Su47Profile();
+                Create_TRA_AN12_Profile();
+                Create_AWACS_A50_Profile();
+                Create_ASF_MIG21_Profile();
+                Create_ASF_MIG23_Profile();
+                Create_ASF_MIG25_Profile();
+                Create_ASF_MIG29_Profile();
+                Create_ASF_MIG31_Profile();
+                Create_ASF_SU27_Profile();
+                Create_ASF_SU47_Profile();
 
-                CreateMrf_Mig27Profile();
-                CreateAtt_Su25Profile();
-                CreateAtt_Su25BProfile();
+                Create_MRF_MIG27_Profile();
 
-                CreateBmb_Su24Profile();
-                CreateBmb_Tu16Profile();
-                CreateBmb_Tu22Profile();
-                CreateBmb_Tu22M3Profile();
+                Create_ATT_SU25_Profile();
+                Create_ATT_SU25B_Profile();
 
-                CreateRcna_Mig25RProfile();
+                Create_BMB_SU24_Profile();
+                Create_BMB_TU16_Profile();
+                CreateBMB_TU22_Profile();
+                Create_BMB_TU22M3_Profile();
 
-                Create_MI8TProfile();
-                Create_AN12Profile();
-                Create_TransportFlotillaProfile();
+                Create_RCNA_Mig25R_Profile();
+
+                Create__TRA_TransportFlotilla_Profile();
 
                 // US Tanks
-                CreateTankM1Profile();
-                CreateTankM60A3Profile();
-                CreateTankM551Profile();
+                Create_TANK_M1_Profile();
+                Create_TANK_M60A3_Profile();
+                Create_TANK_M551_Profile();
 
                 // US IFVs and APCs  
-                CreateIfvM2Profile();
-                CreateIfvM3Profile();
-                CreateApcM113Profile();
-                CreateApcLvtp7Profile();
+                Create_IFV_M2_Profile();
+                Create_IFV_M3_Profile();
+                Create_APC_M113_Profile();
+                Create_APC_LVTP7_Profile();
 
                 // US Artillery
-                CreateSpaM109Profile();
-                CreateRocMlrsProfile();
+                Create_SPA_M109_Profile();
+                Create_ROC_MLRS_Profile();
 
                 // US Air Defense
-                CreateSpaaaM163Profile();
-                CreateSpsamChapProfile();
-                CreateSamHawkProfile();
+                Create_SPAAA_M163_Profile();
+                Create_SPSAM_Chap_Profile();
+                Create_SAM_Hawk_Profile();
 
                 // US Helicopters
-                CreateHelAh64Profile();
+                Create_HEL_AH64_Profile();
+                Create_HEL_OH58_Profile();
 
                 // US Aircraft
-                CreateAwacs_A50Profile();
-                CreateAsfF15Profile();
-                CreateAsfF4Profile();
-                CreateMrfF16Profile();
-                CreateAttA10Profile();
-                CreateBmbF111Profile();
-                CreateBmbF117Profile();
-                CreateRcnaSr71Profile();
-
-                // US INF
-                CreateRegInfUsProfile();
-                CreateAbInfUsProfile();
-                CreateAmInfUsProfile();
-                CreateMarInfUsProfile();
-                CreateSpecInfUsProfile();
-                CreateEngInfUsProfile();
+                Create_AWACS_E3_Profile();
+                Create_ASF_F15_Profile();
+                Create_ASF_F4_Profile();
+                Create_MRF_F16_Profile();
+                Create_ATT_A10_Profile();
+                Create_BMB_F111_Profile();
+                Create_BMB_F117_Profile();
+                Create_RCNA_SR71_Profile();
 
                 // FRG
-                CreateTankLeopard1Profile();
-                CreateTankLeopard2Profile();
-                CreateIfvMarderProfile();
-                CreateSpaaaGepardProfile();
-                CreateHelBo105Profile();
-                CreateRegInfFRGProfile();
-                CreateAmInfFRGProfile();
-                CreateSpecInfFRGProfile();
-                CreateEngInfFRGProfile();
-                CreateAsfTIDSProfile();
+                Create_TANK_LEOPARD1_Profile();
+                Create_TANK_LEOPARD2_Profile();
+                Create_IFV_MARDER_Profile();
+                Create_SPAAA_Gepard_Profile();
+                Create_HEL_BO105_Profile();
+                Create_MRF_TORNADO_IDS_Profile();
 
                 // UK
-                CreateTankChallenger1Profile();
-                CreateIfvWarriorProfile();
-                CreateRegInfUKProfile();
-                CreateAbInfUKProfile();
-                CreateAmInfUKProfile();
-                CreateSpecInfUKProfile();
-                CreateEngInfUKProfile();
+                Create_TANK_CHALLENGER1_Profile();
+                Create_IFV_WARRIOR_Profile();
+                Create_APC_FV432_Profile();
+                Create_SAM_Rapier_Profile();
+                Create_MRF_GR1_Profile();
 
                 // FRA
-                CreateTankAMX30Profile();
-                CreateSpaaaRolandProfile();
-                CreateRegInfFRAProfile();
-                CreateAmInfFRAProfile();
-                CreateSpecInfFRAProfile();
-                CreateEngInfFRAProfile();
-                CreateAsfM2000Profile();
-                CreateAttJaguarProfile();
+                Create_TANK_AMX30_Profile();
+                Create_IFV_AMX10P_Profile();
+                Create_APC_VAB_Profile();
+                Create_RCN_ERC90_Profile();
+                Create_SPA_AUF1_Profile();
+                Create_SPAAA_Roland_Profile();
+                Create_ASF_M2000_Profile();
+                Create_ATT_JAGUAR_Profile();
 
-                CreateRegInfArabProfile();
-                CreateIregInfArabProfile();
-                CreateSpecInfArabProfile();
-                CreateEngInfArabProfile();
+                // Generic Profiles
+                Create_GENERIC_AAA_Profile();
+                Create_GENERIC_LightArt_Profile();
+                Create_GENERIC_HeavytArt_Profile();
+                Create_GENERIC_MANPAD_Profile();
+                Create_GENERIC_ATGM_Profile();
 
-                CreateAAA_GenericProfile();
-                CreateLightArt_GenericProfile();
-                CreateHeavytArt_GenericProfile();
-                CreateMANPAD_GenericProfile();
-                CreateATGM_GenericProfile();
+                // Generic land bases
+                Create_BASE_Landbase_Profile();
+                Create_BASE_Airbase_Profile();
+                Create_BASE_Depot_Profile();
+                Create_BASE_Intel_Profile();
 
-                CreateLandbase_GenericProfile();
-                CreateAirbase_GenericProfile();
-                CreateDepot_GenericProfile();
-                CreateIntelBase_GenericProfile();
-
+                // Generic infantry profiles
+                Create_INF_REG_Profile();
+                Create_INF_AB_Profile();
+                Create_INF_AM_Profile();
+                Create_INF_MAR_Profile();
+                Create_INF_SPEC_Profile();
+                Create_INF_ENG_Profile();
             }
             catch (Exception e)
             {
@@ -314,7 +300,7 @@ namespace HammerAndSickle.Models
         /// <summary>
         /// T55A Profile
         /// </summary>
-        private static void CreateT55AProfile()
+        private static void Create_TANK_T55A_Profile()
         {
             try
             {
@@ -362,7 +348,7 @@ namespace HammerAndSickle.Models
         /// <summary>
         /// Creates the T-64A tank profile.
         /// </summary>
-        private static void CreateT64AProfile()
+        private static void Create_TANK_T64A_Profile()
         {
             try
             {
@@ -410,7 +396,7 @@ namespace HammerAndSickle.Models
         /// <summary>
         /// Creates the T-64B tank profile.
         /// </summary>
-        private static void CreateT64BProfile()
+        private static void Create_TANK_T64B_Profile()
         {
             try
             {
@@ -450,7 +436,7 @@ namespace HammerAndSickle.Models
             }
             catch (Exception e)
             {
-                AppService.HandleException(CLASS_NAME, nameof(CreateT64BProfile), e);
+                AppService.HandleException(CLASS_NAME, nameof(Create_TANK_T64B_Profile), e);
                 throw;
             }
         }
@@ -458,7 +444,7 @@ namespace HammerAndSickle.Models
         /// <summary>
         /// Creates the T-72A tank profile.
         /// </summary>
-        private static void CreateT72AProfile()
+        private static void Create_TANK_T72A_Profile()
         {
             try
             {
@@ -501,7 +487,7 @@ namespace HammerAndSickle.Models
             }
             catch (Exception e)
             {
-                AppService.HandleException(CLASS_NAME, nameof(CreateT72AProfile), e);
+                AppService.HandleException(CLASS_NAME, nameof(Create_TANK_T72A_Profile), e);
                 throw;
             }
         }
@@ -509,7 +495,7 @@ namespace HammerAndSickle.Models
         /// <summary>
         /// Creates the T-72B tank profile.
         /// </summary>
-        private static void CreateT72BProfile()
+        private static void Create_TANK_T72B_Profile()
         {
             try
             {
@@ -551,7 +537,7 @@ namespace HammerAndSickle.Models
             }
             catch (Exception e)
             {
-                AppService.HandleException(CLASS_NAME, nameof(CreateT72BProfile), e);
+                AppService.HandleException(CLASS_NAME, nameof(Create_TANK_T72B_Profile), e);
                 throw;
             }
         }
@@ -560,7 +546,7 @@ namespace HammerAndSickle.Models
         /// Creates the T-80B main battle tank profile.
         /// Example of a modern Soviet main battle tank with strong armor and firepower.
         /// </summary>
-        private static void CreateT80BProfile()
+        private static void Create_TANK_T80B_Profile()
         {
             try
             {
@@ -608,7 +594,7 @@ namespace HammerAndSickle.Models
         /// <summary>
         /// Creates the T-80U tank profile.
         /// </summary>
-        private static void CreateT80UProfile()
+        private static void Create_TANK_T80U_Profile()
         {
             try
             {
@@ -656,7 +642,7 @@ namespace HammerAndSickle.Models
         /// <summary>
         /// Creates the T-80BV tank profile.
         /// </summary>
-        private static void CreateT80BVProfile()
+        private static void Create_TANK_T80BV_Profile()
         {
             try
             {
@@ -696,291 +682,16 @@ namespace HammerAndSickle.Models
             }
             catch (Exception e)
             {
-                AppService.HandleException(CLASS_NAME, nameof(CreateT80BVProfile), e);
+                AppService.HandleException(CLASS_NAME, nameof(Create_TANK_T80BV_Profile), e);
                 throw;
             }
         }
 
         #endregion // Soviet Tanks
 
-        #region Soviet Infantry
-
-        private static void CreateRegInfSVProfile()
-        {
-            try
-            {
-                var profile = new WeaponSystemProfile(
-                    name: "Soviet Regular Infantry",
-                    nationality: Nationality.USSR,
-                    weaponSystemID: WeaponSystems.REG_INF_SV,
-                    15,
-                    hardAttack: 4,
-                    hardDefense: 3,
-                    softAttack: 9,
-                    softDefense: 10,
-                    groundAirDefense: CUConstants.GROUND_DEFENSE_INFANTRY,
-                    primaryRange: 1f,
-                    indirectRange: 0f,
-                    spottingRange: 2f,
-                    allWeatherCapability: AllWeatherRating.GroundUnit,
-                    nvgCapability: NVG_Rating.None,
-                    silhouette: UnitSilhouette.Small,
-                    sigintRating: SIGINT_Rating.UnitLevel,
-                    nbcRating: NBC_Rating.Gen1,
-                    strategicMobility: StrategicMobility.AirLift,
-                    movementPoints: CUConstants.FOOT_UNIT
-                );
-
-                // Upgrade paths
-                profile.AddUpgradeType(UpgradeType.INF);
-
-                // Set short name for UI display
-                profile.SetShortName("Infantry");
-
-                // Set turn availability in months.
-                profile.SetTurnAvailable(300);
-
-                // Store in master dictionary
-                _weaponSystemProfiles[WeaponSystems.REG_INF_SV] = profile;
-            }
-            catch (Exception e)
-            {
-                AppService.HandleException(CLASS_NAME, nameof(CreateRegInfSVProfile), e);
-                throw;
-            }
-        }
-
-        private static void CreateAbInfSVProfile()
-        {
-            try
-            {
-                var profile = new WeaponSystemProfile(
-                    name: "Soviet Airborne Infantry",
-                    nationality: Nationality.USSR,
-                    weaponSystemID: WeaponSystems.AB_INF_SV,
-                    18,
-                    hardAttack: 4,
-                    hardDefense: 3,
-                    softAttack: 9,
-                    softDefense: 10,
-                    groundAirDefense: CUConstants.GROUND_DEFENSE_INFANTRY,
-                    primaryRange: 1f,
-                    indirectRange: 0f,
-                    spottingRange: 2f,
-                    allWeatherCapability: AllWeatherRating.GroundUnit,
-                    nvgCapability: NVG_Rating.Gen1,
-                    silhouette: UnitSilhouette.Small,
-                    sigintRating: SIGINT_Rating.UnitLevel,
-                    nbcRating: NBC_Rating.Gen1,
-                    strategicMobility: StrategicMobility.AirDrop,
-                    movementPoints: CUConstants.FOOT_UNIT
-                );
-
-                // Upgrade paths
-                profile.AddUpgradeType(UpgradeType.INF);
-
-                // Set short name for UI display
-                profile.SetShortName("Airborne");
-
-                // Set turn availability in months.
-                profile.SetTurnAvailable(300);
-
-                // Store in master dictionary
-                _weaponSystemProfiles[WeaponSystems.AB_INF_SV] = profile;
-            }
-            catch (Exception e)
-            {
-                AppService.HandleException(CLASS_NAME, nameof(CreateAbInfSVProfile), e);
-                throw;
-            }
-        }
-
-        private static void CreateAmInfSVProfile()
-        {
-            try
-            {
-                var profile = new WeaponSystemProfile(
-                    name: "Soviet Air‑Mobile Infantry",
-                    nationality: Nationality.USSR,
-                    weaponSystemID: WeaponSystems.AM_INF_SV,
-                    18,
-                    hardAttack: 4,
-                    hardDefense: 3,
-                    softAttack: 9,
-                    softDefense: 10,
-                    groundAirDefense: CUConstants.GROUND_DEFENSE_INFANTRY,
-                    primaryRange: 1f,
-                    indirectRange: 0f,
-                    spottingRange: 2f,
-                    allWeatherCapability: AllWeatherRating.GroundUnit,
-                    nvgCapability: NVG_Rating.Gen1,
-                    silhouette: UnitSilhouette.Small,
-                    sigintRating: SIGINT_Rating.UnitLevel,
-                    nbcRating: NBC_Rating.Gen1,
-                    strategicMobility: StrategicMobility.AirMobile,
-                    movementPoints: CUConstants.FOOT_UNIT
-                );
-
-                // Set upgrade paths
-                profile.AddUpgradeType(UpgradeType.INF);
-
-                // Set short name for UI display
-                profile.SetShortName("Air-Mobile");
-
-                // Set turn availability in months.
-                profile.SetTurnAvailable(476);
-
-                // Store in master dictionary
-                _weaponSystemProfiles[WeaponSystems.AM_INF_SV] = profile;
-            }
-            catch (Exception e)
-            {
-                AppService.HandleException(CLASS_NAME, nameof(CreateAmInfSVProfile), e);
-                throw;
-            }
-        }
-
-        private static void CreateMarInfSVProfile()
-        {
-            try
-            {
-                var profile = new WeaponSystemProfile(
-                    name: "Soviet Naval Infantry",
-                    nationality: Nationality.USSR,
-                    weaponSystemID: WeaponSystems.MAR_INF_SV,
-                    18,
-                    hardAttack: 4,
-                    hardDefense: 3,
-                    softAttack: 9,
-                    softDefense: 10,
-                    groundAirDefense: CUConstants.GROUND_DEFENSE_INFANTRY,
-                    primaryRange: 1f,
-                    indirectRange: 0f,
-                    spottingRange: 2f,
-                    allWeatherCapability: AllWeatherRating.GroundUnit,
-                    nvgCapability: NVG_Rating.None,
-                    silhouette: UnitSilhouette.Small,
-                    sigintRating: SIGINT_Rating.UnitLevel,
-                    nbcRating: NBC_Rating.Gen1,
-                    strategicMobility: StrategicMobility.NavalAssault,
-                    movementPoints: CUConstants.FOOT_UNIT
-                );
-
-                // Set upgrade paths
-                profile.AddUpgradeType(UpgradeType.INF);
-
-                // Set short name for UI display
-                profile.SetShortName("Marines");
-
-                // Set turn availability in months.
-                profile.SetTurnAvailable(300);
-
-                // Store in master dictionary
-                _weaponSystemProfiles[WeaponSystems.MAR_INF_SV] = profile;
-            }
-            catch (Exception e)
-            {
-                AppService.HandleException(CLASS_NAME, nameof(CreateMarInfSVProfile), e);
-                throw;
-            }
-        }
-
-        private static void CreateSpecInfSVProfile()
-        {
-            try
-            {
-                var profile = new WeaponSystemProfile(
-                    name: "Soviet Spetsnaz Infantry",
-                    nationality: Nationality.USSR,
-                    weaponSystemID: WeaponSystems.SPEC_INF_SV,
-                    30,
-                    hardAttack: 8,
-                    hardDefense: 4,
-                    softAttack: 11,
-                    softDefense:12,
-                    groundAirDefense: CUConstants.GROUND_DEFENSE_INFANTRY,
-                    primaryRange: 1f,
-                    indirectRange: 0f,
-                    spottingRange: 3f,
-                    allWeatherCapability: AllWeatherRating.GroundUnit,
-                    nvgCapability: NVG_Rating.Gen2,
-                    silhouette: UnitSilhouette.Small,
-                    sigintRating: SIGINT_Rating.SpecializedLevel,
-                    nbcRating: NBC_Rating.Gen1,
-                    strategicMobility: StrategicMobility.AirMobile,
-                    movementPoints: CUConstants.FOOT_UNIT
-                );
-
-                // Set upgrade paths
-                profile.AddUpgradeType(UpgradeType.INF);
-
-                // Set short name for UI display
-                profile.SetShortName("Spetsnaz");
-
-                // Set turn availability in months.
-                profile.SetTurnAvailable(300);
-
-                // Store in master dictionary
-                _weaponSystemProfiles[WeaponSystems.SPEC_INF_SV] = profile;
-            }
-            catch (Exception e)
-            {
-                AppService.HandleException(CLASS_NAME, nameof(CreateSpecInfSVProfile), e);
-                throw;
-            }
-        }
-
-        private static void CreateEngInfSVProfile()
-        {
-            try
-            {
-                var profile = new WeaponSystemProfile(
-                    name: "Combat Engineers",
-                    nationality: Nationality.USSR,
-                    weaponSystemID: WeaponSystems.ENG_INF_SV,
-                    20,
-                    hardAttack: 4,
-                    hardDefense: 3,
-                    softAttack: 9,
-                    softDefense: 12,
-                    groundAirDefense: CUConstants.GROUND_DEFENSE_INFANTRY,
-                    primaryRange: 1f,
-                    indirectRange: 0f,
-                    spottingRange: 2f,
-                    allWeatherCapability: AllWeatherRating.GroundUnit,
-                    nvgCapability: NVG_Rating.None,
-                    silhouette: UnitSilhouette.Small,
-                    sigintRating: SIGINT_Rating.UnitLevel,
-                    nbcRating: NBC_Rating.Gen1,
-                    strategicMobility: StrategicMobility.AirDrop,
-                    movementPoints: CUConstants.FOOT_UNIT
-                );
-
-                // Set upgrade paths
-                profile.AddUpgradeType(UpgradeType.INF);
-
-                // Set short name for UI display
-                profile.SetShortName("Engineers");
-
-                // Set turn availability in months.
-                profile.SetTurnAvailable(300);
-
-                // Store in master dictionary
-                _weaponSystemProfiles[WeaponSystems.ENG_INF_SV] = profile;
-            }
-            catch (Exception e)
-            {
-                AppService.HandleException(CLASS_NAME, nameof(CreateEngInfSVProfile), e);
-                throw;
-            }
-        }
-
-
-        #endregion
-
         #region Soviet APCs
 
-        private static void CreateApcMtlbProfile()
+        private static void Create_APC_MTLB_Profile()
         {
             try
             {
@@ -1023,12 +734,12 @@ namespace HammerAndSickle.Models
             }
             catch (Exception e)
             {
-                AppService.HandleException(CLASS_NAME, nameof(CreateApcMtlbProfile), e);
+                AppService.HandleException(CLASS_NAME, nameof(Create_APC_MTLB_Profile), e);
                 throw;
             }
         }
 
-        private static void CreateApcBtr70Profile()
+        private static void Create_APC_BTR70_Profile()
         {
             try
             {
@@ -1071,12 +782,12 @@ namespace HammerAndSickle.Models
             }
             catch (Exception e)
             {
-                AppService.HandleException(CLASS_NAME, nameof(CreateApcBtr70Profile), e);
+                AppService.HandleException(CLASS_NAME, nameof(Create_APC_BTR70_Profile), e);
                 throw;
             }
         }
 
-        private static void CreateApcBtr80Profile()
+        private static void Create_APC_BTR80_Profile()
         {
             try
             {
@@ -1119,7 +830,7 @@ namespace HammerAndSickle.Models
             }
             catch (Exception e)
             {
-                AppService.HandleException(CLASS_NAME, nameof(CreateApcBtr80Profile), e);
+                AppService.HandleException(CLASS_NAME, nameof(Create_APC_BTR80_Profile), e);
                 throw;
             }
         }
@@ -1128,7 +839,7 @@ namespace HammerAndSickle.Models
 
         #region Soviet IFVs
 
-        private static void CreateIfvBmp1Profile()
+        private static void Create_IFV_BMP1_Profile()
         {
             try
             {
@@ -1171,12 +882,12 @@ namespace HammerAndSickle.Models
             }
             catch (Exception e)
             {
-                AppService.HandleException(CLASS_NAME, nameof(CreateIfvBmp1Profile), e);
+                AppService.HandleException(CLASS_NAME, nameof(Create_IFV_BMP1_Profile), e);
                 throw;
             }
         }
 
-        private static void CreateIfvBmp2Profile()
+        private static void Create_IFV_BMP2_Profile()
         {
             try
             {
@@ -1219,12 +930,12 @@ namespace HammerAndSickle.Models
             }
             catch (Exception e)
             {
-                AppService.HandleException(CLASS_NAME, nameof(CreateIfvBmp2Profile), e);
+                AppService.HandleException(CLASS_NAME, nameof(Create_IFV_BMP2_Profile), e);
                 throw;
             }
         }
 
-        private static void CreateIfvBmp3Profile()
+        private static void Create_IFV_BMP3_Profile()
         {
             try
             {
@@ -1267,12 +978,12 @@ namespace HammerAndSickle.Models
             }
             catch (Exception e)
             {
-                AppService.HandleException(CLASS_NAME, nameof(CreateIfvBmp3Profile), e);
+                AppService.HandleException(CLASS_NAME, nameof(Create_IFV_BMP3_Profile), e);
                 throw;
             }
         }
 
-        private static void CreateIfvBmd1Profile()
+        private static void Create_IFV_BMD1_Profile()
         {
             try
             {
@@ -1315,12 +1026,12 @@ namespace HammerAndSickle.Models
             }
             catch (Exception e)
             {
-                AppService.HandleException(CLASS_NAME, nameof(CreateIfvBmd1Profile), e);
+                AppService.HandleException(CLASS_NAME, nameof(Create_IFV_BMD1_Profile), e);
                 throw;
             }
         }
 
-        private static void CreateIfvBmd2Profile()
+        private static void Create_IFV_BMD2_Profile()
         {
             try
             {
@@ -1363,12 +1074,12 @@ namespace HammerAndSickle.Models
             }
             catch (Exception e)
             {
-                AppService.HandleException(CLASS_NAME, nameof(CreateIfvBmd2Profile), e);
+                AppService.HandleException(CLASS_NAME, nameof(Create_IFV_BMD2_Profile), e);
                 throw;
             }
         }
 
-        private static void CreateIfvBmd3Profile()
+        private static void Create_IFV_BMD3_Profile()
         {
             try
             {
@@ -1411,7 +1122,7 @@ namespace HammerAndSickle.Models
             }
             catch (Exception e)
             {
-                AppService.HandleException(CLASS_NAME, nameof(CreateIfvBmd3Profile), e);
+                AppService.HandleException(CLASS_NAME, nameof(Create_IFV_BMD3_Profile), e);
                 throw;
             }
         }
@@ -1420,7 +1131,7 @@ namespace HammerAndSickle.Models
 
         #region Soviet Recon
 
-        private static void CreateRcnBrdm2Profile()
+        private static void Create_RCN_BRDM2_Profile()
         {
             try
             {
@@ -1463,12 +1174,12 @@ namespace HammerAndSickle.Models
             }
             catch (Exception e)
             {
-                AppService.HandleException(CLASS_NAME, nameof(CreateRcnBrdm2Profile), e);
+                AppService.HandleException(CLASS_NAME, nameof(Create_RCN_BRDM2_Profile), e);
                 throw;
             }
         }
 
-        private static void CreateRcnBrdm2AtProfile()
+        private static void Create_RCN_BRDM2AT_Profile()
         {
             try
             {
@@ -1511,7 +1222,7 @@ namespace HammerAndSickle.Models
             }
             catch (Exception e)
             {
-                AppService.HandleException(CLASS_NAME, nameof(CreateRcnBrdm2AtProfile), e);
+                AppService.HandleException(CLASS_NAME, nameof(Create_RCN_BRDM2AT_Profile), e);
                 throw;
             }
         }
@@ -1523,7 +1234,7 @@ namespace HammerAndSickle.Models
         /// <summary>
         /// 2S1 "Gvozdika" 122 mm self‑propelled howitzer.
         /// </summary>
-        private static void CreateSpa2S1Profile()
+        private static void Create_SPA_2S1_Profile()
         {
             try
             {
@@ -1563,7 +1274,7 @@ namespace HammerAndSickle.Models
             }
             catch (Exception e)
             {
-                AppService.HandleException(CLASS_NAME, nameof(CreateSpa2S1Profile), e);
+                AppService.HandleException(CLASS_NAME, nameof(Create_SPA_2S1_Profile), e);
                 throw;
             }
         }
@@ -1571,7 +1282,7 @@ namespace HammerAndSickle.Models
         /// <summary>
         /// 2S3 "Akatsiya" 152 mm self‑propelled gun‑howitzer.
         /// </summary>
-        private static void CreateSpa2S3Profile()
+        private static void Create_SPA_2S3_Profile()
         {
             try
             {
@@ -1611,7 +1322,7 @@ namespace HammerAndSickle.Models
             }
             catch (Exception e)
             {
-                AppService.HandleException(CLASS_NAME, nameof(CreateSpa2S3Profile), e);
+                AppService.HandleException(CLASS_NAME, nameof(Create_SPA_2S3_Profile), e);
                 throw;
             }
         }
@@ -1619,7 +1330,7 @@ namespace HammerAndSickle.Models
         /// <summary>
         /// 2S5 "Giatsint‑S" 152 mm long‑range gun.
         /// </summary>
-        private static void CreateSpa2S5Profile()
+        private static void Create_SPA_2S5_Profile()
         {
             try
             {
@@ -1659,7 +1370,7 @@ namespace HammerAndSickle.Models
             }
             catch (Exception e)
             {
-                AppService.HandleException(CLASS_NAME, nameof(CreateSpa2S5Profile), e);
+                AppService.HandleException(CLASS_NAME, nameof(Create_SPA_2S5_Profile), e);
                 throw;
             }
         }
@@ -1667,7 +1378,7 @@ namespace HammerAndSickle.Models
         /// <summary>
         /// 2S19 "Msta‑S" 152 mm modern SP howitzer.
         /// </summary>
-        private static void CreateSpa2S19Profile()
+        private static void Create_SPA_2S19_Profile()
         {
             try
             {
@@ -1707,7 +1418,7 @@ namespace HammerAndSickle.Models
             }
             catch (Exception e)
             {
-                AppService.HandleException(CLASS_NAME, nameof(CreateSpa2S19Profile), e);
+                AppService.HandleException(CLASS_NAME, nameof(Create_SPA_2S19_Profile), e);
                 throw;
             }
         }
@@ -1715,7 +1426,7 @@ namespace HammerAndSickle.Models
         /// <summary>
         /// BM‑21 "Grad" 122 mm 40‑tube MLRS.
         /// </summary>
-        private static void CreateRocBm21Profile()
+        private static void Create_ROC_BM21_Profile()
         {
             try
             {
@@ -1758,7 +1469,7 @@ namespace HammerAndSickle.Models
             }
             catch (Exception e)
             {
-                AppService.HandleException(CLASS_NAME, nameof(CreateRocBm21Profile), e);
+                AppService.HandleException(CLASS_NAME, nameof(Create_ROC_BM21_Profile), e);
                 throw;
             }
         }
@@ -1766,7 +1477,7 @@ namespace HammerAndSickle.Models
         /// <summary>
         /// BM‑27 "Uragan" 220 mm 16‑tube MLRS.
         /// </summary>
-        private static void CreateRocBm27Profile()
+        private static void Create_ROC_BM27_Profile()
         {
             try
             {
@@ -1809,7 +1520,7 @@ namespace HammerAndSickle.Models
             }
             catch (Exception e)
             {
-                AppService.HandleException(CLASS_NAME, nameof(CreateRocBm27Profile), e);
+                AppService.HandleException(CLASS_NAME, nameof(Create_ROC_BM27_Profile), e);
                 throw;
             }
         }
@@ -1817,7 +1528,7 @@ namespace HammerAndSickle.Models
         /// <summary>
         /// BM‑30 "Smerch" 300 mm 12‑tube MLRS.
         /// </summary>
-        private static void CreateRocBm30Profile()
+        private static void Create_ROC_BM30_Profile()
         {
             try
             {
@@ -1860,7 +1571,7 @@ namespace HammerAndSickle.Models
             }
             catch (Exception e)
             {
-                AppService.HandleException(CLASS_NAME, nameof(CreateRocBm30Profile), e);
+                AppService.HandleException(CLASS_NAME, nameof(Create_ROC_BM30_Profile), e);
                 throw;
             }
         }
@@ -1923,7 +1634,7 @@ namespace HammerAndSickle.Models
         /// <summary>
         /// ZSU-57-2 "Sparka" 57mm twin anti-aircraft gun.
         /// </summary>
-        private static void CreateSpaaa_Zsu57Profile()
+        private static void Create_SPAAA_ZSU57_Profile()
         {
             try
             {
@@ -1964,7 +1675,7 @@ namespace HammerAndSickle.Models
             }
             catch (Exception e)
             {
-                AppService.HandleException(CLASS_NAME, nameof(CreateSpaaa_Zsu57Profile), e);
+                AppService.HandleException(CLASS_NAME, nameof(Create_SPAAA_ZSU57_Profile), e);
                 throw;
             }
         }
@@ -1972,7 +1683,7 @@ namespace HammerAndSickle.Models
         /// <summary>
         /// ZSU-23-4 "Shilka" 23mm quad anti-aircraft gun with radar.
         /// </summary>
-        private static void CreateSpaaa_Zsu23Profile()
+        private static void Create_SPAAA_ZSU23_Profile()
         {
             try
             {
@@ -2013,7 +1724,7 @@ namespace HammerAndSickle.Models
             }
             catch (Exception e)
             {
-                AppService.HandleException(CLASS_NAME, nameof(CreateSpaaa_Zsu23Profile), e);
+                AppService.HandleException(CLASS_NAME, nameof(Create_SPAAA_ZSU23_Profile), e);
                 throw;
             }
         }
@@ -2021,7 +1732,7 @@ namespace HammerAndSickle.Models
         /// <summary>
         /// 2K22 "Tunguska" combined gun/missile air defense system.
         /// </summary>
-        private static void CreateSpaaa_2K22Profile()
+        private static void Create_SPAAA_2K22_Profile()
         {
             try
             {
@@ -2062,7 +1773,7 @@ namespace HammerAndSickle.Models
             }
             catch (Exception e)
             {
-                AppService.HandleException(CLASS_NAME, nameof(CreateSpaaa_2K22Profile), e);
+                AppService.HandleException(CLASS_NAME, nameof(Create_SPAAA_2K22_Profile), e);
                 throw;
             }
         }
@@ -2070,7 +1781,7 @@ namespace HammerAndSickle.Models
         /// <summary>
         /// 9K31 "Strela-1" (SA-9) mobile short-range SAM system.
         /// </summary>
-        private static void CreateSpsam_9K31Profile()
+        private static void Create_SPSAM_9K31_Profile()
         {
             try
             {
@@ -2114,7 +1825,7 @@ namespace HammerAndSickle.Models
             }
             catch (Exception e)
             {
-                AppService.HandleException(CLASS_NAME, nameof(CreateSpsam_9K31Profile), e);
+                AppService.HandleException(CLASS_NAME, nameof(Create_SPSAM_9K31_Profile), e);
                 throw;
             }
         }
@@ -2122,7 +1833,7 @@ namespace HammerAndSickle.Models
         /// <summary>
         /// S-75 "Dvina" (SA-2) medium-range strategic SAM system.
         /// </summary>
-        private static void CreateSam_S75Profile()
+        private static void Create_SAM_S75_Profile()
         {
             try
             {
@@ -2163,7 +1874,7 @@ namespace HammerAndSickle.Models
             }
             catch (Exception e)
             {
-                AppService.HandleException(CLASS_NAME, nameof(CreateSam_S75Profile), e);
+                AppService.HandleException(CLASS_NAME, nameof(Create_SAM_S75_Profile), e);
                 throw;
             }
         }
@@ -2171,7 +1882,7 @@ namespace HammerAndSickle.Models
         /// <summary>
         /// S-125 "Neva" (SA-3) low-altitude strategic SAM system.
         /// </summary>
-        private static void CreateSam_S125Profile()
+        private static void Create_SAM_S125_Profile()
         {
             try
             {
@@ -2212,7 +1923,7 @@ namespace HammerAndSickle.Models
             }
             catch (Exception e)
             {
-                AppService.HandleException(CLASS_NAME, nameof(CreateSam_S125Profile), e);
+                AppService.HandleException(CLASS_NAME, nameof(Create_SAM_S125_Profile), e);
                 throw;
             }
         }
@@ -2220,7 +1931,7 @@ namespace HammerAndSickle.Models
         /// <summary>
         /// S-300 "Favorit" (SA-10/20) advanced long-range strategic SAM system.
         /// </summary>
-        private static void CreateSam_S300Profile()
+        private static void Create_SAM_S300_Profile()
         {
             try
             {
@@ -2261,7 +1972,7 @@ namespace HammerAndSickle.Models
             }
             catch (Exception e)
             {
-                AppService.HandleException(CLASS_NAME, nameof(CreateSam_S300Profile), e);
+                AppService.HandleException(CLASS_NAME, nameof(Create_SAM_S300_Profile), e);
                 throw;
             }
         }
@@ -2273,7 +1984,7 @@ namespace HammerAndSickle.Models
         /// <summary>
         /// Mi-8AT "Hip-C" armed transport helicopter with anti-tank missiles.
         /// </summary>
-        private static void CreateHel_Mi8ATProfile()
+        private static void Create_HEL_MI8AT_Profile()
         {
             try
             {
@@ -2313,7 +2024,7 @@ namespace HammerAndSickle.Models
             }
             catch (Exception e)
             {
-                AppService.HandleException(CLASS_NAME, nameof(CreateHel_Mi8ATProfile), e);
+                AppService.HandleException(CLASS_NAME, nameof(Create_HEL_MI8AT_Profile), e);
                 throw;
             }
         }
@@ -2321,7 +2032,7 @@ namespace HammerAndSickle.Models
         /// <summary>
         /// Mi-24D "Hind-D" attack helicopter with rockets and anti-tank missiles.
         /// </summary>
-        private static void CreateHel_Mi24DProfile()
+        private static void Create_HEL_MI24D_Profile()
         {
             try
             {
@@ -2361,7 +2072,7 @@ namespace HammerAndSickle.Models
             }
             catch (Exception e)
             {
-                AppService.HandleException(CLASS_NAME, nameof(CreateHel_Mi24DProfile), e);
+                AppService.HandleException(CLASS_NAME, nameof(Create_HEL_MI24D_Profile), e);
                 throw;
             }
         }
@@ -2369,7 +2080,7 @@ namespace HammerAndSickle.Models
         /// <summary>
         /// Mi-24V "Hind-E" improved attack helicopter with better sensors and weapons.
         /// </summary>
-        private static void CreateHel_Mi24VProfile()
+        private static void Create_HEL_MI24V_Profile()
         {
             try
             {
@@ -2409,7 +2120,7 @@ namespace HammerAndSickle.Models
             }
             catch (Exception e)
             {
-                AppService.HandleException(CLASS_NAME, nameof(CreateHel_Mi24VProfile), e);
+                AppService.HandleException(CLASS_NAME, nameof(Create_HEL_MI24V_Profile), e);
                 throw;
             }
         }
@@ -2417,7 +2128,7 @@ namespace HammerAndSickle.Models
         /// <summary>
         /// Mi-28 "Havoc" dedicated attack helicopter with advanced avionics.
         /// </summary>
-        private static void CreateHel_Mi28Profile()
+        private static void Create_HEL_MI28_Profile()
         {
             try
             {
@@ -2457,7 +2168,7 @@ namespace HammerAndSickle.Models
             }
             catch (Exception e)
             {
-                AppService.HandleException(CLASS_NAME, nameof(CreateHel_Mi28Profile), e);
+                AppService.HandleException(CLASS_NAME, nameof(Create_HEL_MI28_Profile), e);
                 throw;
             }
         }
@@ -2469,7 +2180,7 @@ namespace HammerAndSickle.Models
         /// <summary>
         /// A-50 "Mainstay" airborne early warning and control aircraft.
         /// </summary>
-        private static void CreateAwacs_A50Profile()
+        private static void Create_AWACS_A50_Profile()
         {
             try
             {
@@ -2511,7 +2222,7 @@ namespace HammerAndSickle.Models
             }
             catch (Exception e)
             {
-                AppService.HandleException(CLASS_NAME, nameof(CreateAwacs_A50Profile), e);
+                AppService.HandleException(CLASS_NAME, nameof(Create_AWACS_A50_Profile), e);
                 throw;
             }
         }
@@ -2519,7 +2230,7 @@ namespace HammerAndSickle.Models
         /// <summary>
         /// MiG-21 "Fishbed" lightweight interceptor fighter.
         /// </summary>
-        private static void CreateAsf_Mig21Profile()
+        private static void Create_ASF_MIG21_Profile()
         {
             try
             {
@@ -2561,7 +2272,7 @@ namespace HammerAndSickle.Models
             }
             catch (Exception e)
             {
-                AppService.HandleException(CLASS_NAME, nameof(CreateAsf_Mig21Profile), e);
+                AppService.HandleException(CLASS_NAME, nameof(Create_ASF_MIG21_Profile), e);
                 throw;
             }
         }
@@ -2569,7 +2280,7 @@ namespace HammerAndSickle.Models
         /// <summary>
         /// MiG-23 "Flogger" variable-geometry wing fighter.
         /// </summary>
-        private static void CreateAsf_Mig23Profile()
+        private static void Create_ASF_MIG23_Profile()
         {
             try
             {
@@ -2611,7 +2322,7 @@ namespace HammerAndSickle.Models
             }
             catch (Exception e)
             {
-                AppService.HandleException(CLASS_NAME, nameof(CreateAsf_Mig23Profile), e);
+                AppService.HandleException(CLASS_NAME, nameof(Create_ASF_MIG23_Profile), e);
                 throw;
             }
         }
@@ -2619,7 +2330,7 @@ namespace HammerAndSickle.Models
         /// <summary>
         /// MiG-25 "Foxbat" high-speed interceptor.
         /// </summary>
-        private static void CreateAsf_Mig25Profile()
+        private static void Create_ASF_MIG25_Profile()
         {
             try
             {
@@ -2661,7 +2372,7 @@ namespace HammerAndSickle.Models
             }
             catch (Exception e)
             {
-                AppService.HandleException(CLASS_NAME, nameof(CreateAsf_Mig25Profile), e);
+                AppService.HandleException(CLASS_NAME, nameof(Create_ASF_MIG25_Profile), e);
                 throw;
             }
         }
@@ -2669,7 +2380,7 @@ namespace HammerAndSickle.Models
         /// <summary>
         /// MiG-29 "Fulcrum" modern air superiority fighter.
         /// </summary>
-        private static void CreateAsf_Mig29Profile()
+        private static void Create_ASF_MIG29_Profile()
         {
             try
             {
@@ -2711,7 +2422,7 @@ namespace HammerAndSickle.Models
             }
             catch (Exception e)
             {
-                AppService.HandleException(CLASS_NAME, nameof(CreateAsf_Mig29Profile), e);
+                AppService.HandleException(CLASS_NAME, nameof(Create_ASF_MIG29_Profile), e);
                 throw;
             }
         }
@@ -2719,7 +2430,7 @@ namespace HammerAndSickle.Models
         /// <summary>
         /// MiG-31 "Foxhound" long-range interceptor.
         /// </summary>
-        private static void CreateAsf_Mig31Profile()
+        private static void Create_ASF_MIG31_Profile()
         {
             try
             {
@@ -2761,7 +2472,7 @@ namespace HammerAndSickle.Models
             }
             catch (Exception e)
             {
-                AppService.HandleException(CLASS_NAME, nameof(CreateAsf_Mig31Profile), e);
+                AppService.HandleException(CLASS_NAME, nameof(Create_ASF_MIG31_Profile), e);
                 throw;
             }
         }
@@ -2769,7 +2480,7 @@ namespace HammerAndSickle.Models
         /// <summary>
         /// Su-27 "Flanker" advanced air superiority fighter.
         /// </summary>
-        private static void CreateAsf_Su27Profile()
+        private static void Create_ASF_SU27_Profile()
         {
             try
             {
@@ -2811,7 +2522,7 @@ namespace HammerAndSickle.Models
             }
             catch (Exception e)
             {
-                AppService.HandleException(CLASS_NAME, nameof(CreateAsf_Su27Profile), e);
+                AppService.HandleException(CLASS_NAME, nameof(Create_ASF_SU27_Profile), e);
                 throw;
             }
         }
@@ -2819,7 +2530,7 @@ namespace HammerAndSickle.Models
         /// <summary>
         /// Su-47 "Berkut" experimental forward-swept wing fighter.
         /// </summary>
-        private static void CreateAsf_Su47Profile()
+        private static void Create_ASF_SU47_Profile()
         {
             try
             {
@@ -2861,7 +2572,7 @@ namespace HammerAndSickle.Models
             }
             catch (Exception e)
             {
-                AppService.HandleException(CLASS_NAME, nameof(CreateAsf_Su47Profile), e);
+                AppService.HandleException(CLASS_NAME, nameof(Create_ASF_SU47_Profile), e);
                 throw;
             }
         }
@@ -2869,7 +2580,7 @@ namespace HammerAndSickle.Models
         /// <summary>
         /// MiG-27 "Flogger-D" ground attack variant of MiG-23.
         /// </summary>
-        private static void CreateMrf_Mig27Profile()
+        private static void Create_MRF_MIG27_Profile()
         {
             try
             {
@@ -2911,7 +2622,7 @@ namespace HammerAndSickle.Models
             }
             catch (Exception e)
             {
-                AppService.HandleException(CLASS_NAME, nameof(CreateMrf_Mig27Profile), e);
+                AppService.HandleException(CLASS_NAME, nameof(Create_MRF_MIG27_Profile), e);
                 throw;
             }
         }
@@ -2919,7 +2630,7 @@ namespace HammerAndSickle.Models
         /// <summary>
         /// Su-25 "Frogfoot" close air support aircraft.
         /// </summary>
-        private static void CreateAtt_Su25Profile()
+        private static void Create_ATT_SU25_Profile()
         {
             try
             {
@@ -2961,7 +2672,7 @@ namespace HammerAndSickle.Models
             }
             catch (Exception e)
             {
-                AppService.HandleException(CLASS_NAME, nameof(CreateAtt_Su25Profile), e);
+                AppService.HandleException(CLASS_NAME, nameof(Create_ATT_SU25_Profile), e);
                 throw;
             }
         }
@@ -2969,7 +2680,7 @@ namespace HammerAndSickle.Models
         /// <summary>
         /// Su-25B "Frogfoot-B" improved close air support aircraft.
         /// </summary>
-        private static void CreateAtt_Su25BProfile()
+        private static void Create_ATT_SU25B_Profile()
         {
             try
             {
@@ -3011,7 +2722,7 @@ namespace HammerAndSickle.Models
             }
             catch (Exception e)
             {
-                AppService.HandleException(CLASS_NAME, nameof(CreateAtt_Su25BProfile), e);
+                AppService.HandleException(CLASS_NAME, nameof(Create_ATT_SU25B_Profile), e);
                 throw;
             }
         }
@@ -3019,7 +2730,7 @@ namespace HammerAndSickle.Models
         /// <summary>
         /// Su-24 "Fencer" variable-geometry wing bomber.
         /// </summary>
-        private static void CreateBmb_Su24Profile()
+        private static void Create_BMB_SU24_Profile()
         {
             try
             {
@@ -3061,7 +2772,7 @@ namespace HammerAndSickle.Models
             }
             catch (Exception e)
             {
-                AppService.HandleException(CLASS_NAME, nameof(CreateBmb_Su24Profile), e);
+                AppService.HandleException(CLASS_NAME, nameof(Create_BMB_SU24_Profile), e);
                 throw;
             }
         }
@@ -3069,7 +2780,7 @@ namespace HammerAndSickle.Models
         /// <summary>
         /// Tu-16 "Badger" medium-range bomber.
         /// </summary>
-        private static void CreateBmb_Tu16Profile()
+        private static void Create_BMB_TU16_Profile()
         {
             try
             {
@@ -3111,7 +2822,7 @@ namespace HammerAndSickle.Models
             }
             catch (Exception e)
             {
-                AppService.HandleException(CLASS_NAME, nameof(CreateBmb_Tu16Profile), e);
+                AppService.HandleException(CLASS_NAME, nameof(Create_BMB_TU16_Profile), e);
                 throw;
             }
         }
@@ -3119,7 +2830,7 @@ namespace HammerAndSickle.Models
         /// <summary>
         /// Tu-22 "Blinder" supersonic bomber.
         /// </summary>
-        private static void CreateBmb_Tu22Profile()
+        private static void CreateBMB_TU22_Profile()
         {
             try
             {
@@ -3161,7 +2872,7 @@ namespace HammerAndSickle.Models
             }
             catch (Exception e)
             {
-                AppService.HandleException(CLASS_NAME, nameof(CreateBmb_Tu22Profile), e);
+                AppService.HandleException(CLASS_NAME, nameof(CreateBMB_TU22_Profile), e);
                 throw;
             }
         }
@@ -3169,7 +2880,7 @@ namespace HammerAndSickle.Models
         /// <summary>
         /// Tu-22M3 "Backfire-C" variable-geometry strategic bomber.
         /// </summary>
-        private static void CreateBmb_Tu22M3Profile()
+        private static void Create_BMB_TU22M3_Profile()
         {
             try
             {
@@ -3211,7 +2922,7 @@ namespace HammerAndSickle.Models
             }
             catch (Exception e)
             {
-                AppService.HandleException(CLASS_NAME, nameof(CreateBmb_Tu22M3Profile), e);
+                AppService.HandleException(CLASS_NAME, nameof(Create_BMB_TU22M3_Profile), e);
                 throw;
             }
         }
@@ -3219,7 +2930,7 @@ namespace HammerAndSickle.Models
         /// <summary>
         /// MiG-25R "Foxbat-B" reconnaissance variant.
         /// </summary>
-        private static void CreateRcna_Mig25RProfile()
+        private static void Create_RCNA_Mig25R_Profile()
         {
             try
             {
@@ -3261,7 +2972,7 @@ namespace HammerAndSickle.Models
             }
             catch (Exception e)
             {
-                AppService.HandleException(CLASS_NAME, nameof(CreateRcna_Mig25RProfile), e);
+                AppService.HandleException(CLASS_NAME, nameof(Create_RCNA_Mig25R_Profile), e);
                 throw;
             }
         }
@@ -3273,14 +2984,14 @@ namespace HammerAndSickle.Models
         /// <summary>
         /// The MI-8 "Hip" transport helicopter.
         /// </summary>
-        private static void Create_MI8TProfile()
+        private static void Create_HEL_MI8T_Profile()
         {
             try
             {
                 var profile = new WeaponSystemProfile(
                     name: "Mi-8 Hip Transport Helicopter",
                     nationality: Nationality.USSR,
-                    weaponSystemID: WeaponSystems.TRANSHELO_MI8,
+                    weaponSystemID: WeaponSystems.HEL_MI8T,
                     70,
                     hardAttack: 3,
                     hardDefense: 6,
@@ -3311,11 +3022,11 @@ namespace HammerAndSickle.Models
                 profile.SetTurnAvailable(250);
 
                 // Store in master dictionary
-                _weaponSystemProfiles[WeaponSystems.TRANSHELO_MI8] = profile;
+                _weaponSystemProfiles[WeaponSystems.HEL_MI8T] = profile;
             }
             catch (Exception e)
             {
-                AppService.HandleException(CLASS_NAME, nameof(Create_MI8TProfile), e);
+                AppService.HandleException(CLASS_NAME, nameof(Create_HEL_MI8T_Profile), e);
                 throw;
             }
         }
@@ -3323,14 +3034,14 @@ namespace HammerAndSickle.Models
         /// <summary>
         /// An-12 medium-range transport.
         /// </summary>
-        private static void Create_AN12Profile()
+        private static void Create_TRA_AN12_Profile()
         {
             try
             {
                 var profile = new WeaponSystemProfile(
                     name: "An-12 Antonov Transport Plane",
                     nationality: Nationality.USSR,
-                    weaponSystemID: WeaponSystems.TRANSAIR_AN12,
+                    weaponSystemID: WeaponSystems.TRA_AN12,
                     90,
                     dogfighting: 1,
                     maneuverability: 1,
@@ -3361,11 +3072,11 @@ namespace HammerAndSickle.Models
                 profile.SetTurnAvailable(250);
 
                 // Store in master dictionary
-                _weaponSystemProfiles[WeaponSystems.TRANSAIR_AN12] = profile;
+                _weaponSystemProfiles[WeaponSystems.TRA_AN12] = profile;
             }
             catch (Exception e)
             {
-                AppService.HandleException(CLASS_NAME, nameof(Create_AN12Profile), e);
+                AppService.HandleException(CLASS_NAME, nameof(Create_TRA_AN12_Profile), e);
                 throw;
             }
         }
@@ -3373,14 +3084,14 @@ namespace HammerAndSickle.Models
         /// <summary>
         /// Soviet transport flotilla
         /// </summary>
-        private static void Create_TransportFlotillaProfile()
+        private static void Create__TRA_TransportFlotilla_Profile()
         {
             try
             {
                 var profile = new WeaponSystemProfile(
                     name: "Transport Flotilla",
                     nationality: Nationality.USSR,
-                    weaponSystemID: WeaponSystems.TRANSNAVAL,
+                    weaponSystemID: WeaponSystems.TRA_NAVAL,
                     150,
                     groundAirDefense: 10,
                     primaryRange: 1f,
@@ -3405,11 +3116,11 @@ namespace HammerAndSickle.Models
                 profile.SetTurnAvailable(250);
 
                 // Store in master dictionary
-                _weaponSystemProfiles[WeaponSystems.TRANSNAVAL] = profile;
+                _weaponSystemProfiles[WeaponSystems.TRA_NAVAL] = profile;
             }
             catch (Exception e)
             {
-                AppService.HandleException(CLASS_NAME, nameof(Create_TransportFlotillaProfile), e);
+                AppService.HandleException(CLASS_NAME, nameof(Create__TRA_TransportFlotilla_Profile), e);
                 throw;
             }
         }
@@ -3423,7 +3134,7 @@ namespace HammerAndSickle.Models
         /// <summary>
         /// M1 Abrams Main Battle Tank
         /// </summary>
-        private static void CreateTankM1Profile()
+        private static void Create_TANK_M1_Profile()
         {
             try
             {
@@ -3463,7 +3174,7 @@ namespace HammerAndSickle.Models
             }
             catch (Exception e)
             {
-                AppService.HandleException(CLASS_NAME, nameof(CreateTankM1Profile), e);
+                AppService.HandleException(CLASS_NAME, nameof(Create_TANK_M1_Profile), e);
                 throw;
             }
         }
@@ -3471,7 +3182,7 @@ namespace HammerAndSickle.Models
         /// <summary>
         /// M-60A3 Patton Main Battle Tank
         /// </summary>
-        private static void CreateTankM60A3Profile()
+        private static void Create_TANK_M60A3_Profile()
         {
             try
             {
@@ -3511,7 +3222,7 @@ namespace HammerAndSickle.Models
             }
             catch (Exception e)
             {
-                AppService.HandleException(CLASS_NAME, nameof(CreateTankM60A3Profile), e);
+                AppService.HandleException(CLASS_NAME, nameof(Create_TANK_M60A3_Profile), e);
                 throw;
             }
         }
@@ -3519,7 +3230,7 @@ namespace HammerAndSickle.Models
         /// <summary>
         /// M551 Sheridan
         /// </summary>
-        private static void CreateTankM551Profile()
+        private static void Create_TANK_M551_Profile()
         {
             try
             {
@@ -3559,7 +3270,7 @@ namespace HammerAndSickle.Models
             }
             catch (Exception e)
             {
-                AppService.HandleException(CLASS_NAME, nameof(CreateTankM551Profile), e);
+                AppService.HandleException(CLASS_NAME, nameof(Create_TANK_M551_Profile), e);
                 throw;
             }
         }
@@ -3571,7 +3282,7 @@ namespace HammerAndSickle.Models
         /// <summary>
         /// M2 Bradley INF Fighting Vehicle
         /// </summary>
-        private static void CreateIfvM2Profile()
+        private static void Create_IFV_M2_Profile()
         {
             try
             {
@@ -3611,7 +3322,7 @@ namespace HammerAndSickle.Models
             }
             catch (Exception e)
             {
-                AppService.HandleException(CLASS_NAME, nameof(CreateIfvM2Profile), e);
+                AppService.HandleException(CLASS_NAME, nameof(Create_IFV_M2_Profile), e);
                 throw;
             }
         }
@@ -3619,7 +3330,7 @@ namespace HammerAndSickle.Models
         /// <summary>
         /// M3 Bradley Cavalry Fighting Vehicle
         /// </summary>
-        private static void CreateIfvM3Profile()
+        private static void Create_IFV_M3_Profile()
         {
             try
             {
@@ -3659,7 +3370,7 @@ namespace HammerAndSickle.Models
             }
             catch (Exception e)
             {
-                AppService.HandleException(CLASS_NAME, nameof(CreateIfvM3Profile), e);
+                AppService.HandleException(CLASS_NAME, nameof(Create_IFV_M3_Profile), e);
                 throw;
             }
         }
@@ -3667,7 +3378,7 @@ namespace HammerAndSickle.Models
         /// <summary>
         /// M113 Armored Personnel Carrier
         /// </summary>
-        private static void CreateApcM113Profile()
+        private static void Create_APC_M113_Profile()
         {
             try
             {
@@ -3707,7 +3418,7 @@ namespace HammerAndSickle.Models
             }
             catch (Exception e)
             {
-                AppService.HandleException(CLASS_NAME, nameof(CreateApcM113Profile), e);
+                AppService.HandleException(CLASS_NAME, nameof(Create_APC_M113_Profile), e);
                 throw;
             }
         }
@@ -3715,7 +3426,7 @@ namespace HammerAndSickle.Models
         /// <summary>
         /// LVTP-7 Amphibious Assault Vehicle
         /// </summary>
-        private static void CreateApcLvtp7Profile()
+        private static void Create_APC_LVTP7_Profile()
         {
             try
             {
@@ -3758,7 +3469,7 @@ namespace HammerAndSickle.Models
             }
             catch (Exception e)
             {
-                AppService.HandleException(CLASS_NAME, nameof(CreateApcLvtp7Profile), e);
+                AppService.HandleException(CLASS_NAME, nameof(Create_APC_LVTP7_Profile), e);
                 throw;
             }
         }
@@ -3770,7 +3481,7 @@ namespace HammerAndSickle.Models
         /// <summary>
         /// M109 Paladin Self-Propelled Howitzer
         /// </summary>
-        private static void CreateSpaM109Profile()
+        private static void Create_SPA_M109_Profile()
         {
             try
             {
@@ -3810,7 +3521,7 @@ namespace HammerAndSickle.Models
             }
             catch (Exception e)
             {
-                AppService.HandleException(CLASS_NAME, nameof(CreateSpaM109Profile), e);
+                AppService.HandleException(CLASS_NAME, nameof(Create_SPA_M109_Profile), e);
                 throw;
             }
         }
@@ -3818,7 +3529,7 @@ namespace HammerAndSickle.Models
         /// <summary>
         /// M270 MLRS Multiple Launch Rocket System
         /// </summary>
-        private static void CreateRocMlrsProfile()
+        private static void Create_ROC_MLRS_Profile()
         {
             try
             {
@@ -3861,7 +3572,7 @@ namespace HammerAndSickle.Models
             }
             catch (Exception e)
             {
-                AppService.HandleException(CLASS_NAME, nameof(CreateRocMlrsProfile), e);
+                AppService.HandleException(CLASS_NAME, nameof(Create_ROC_MLRS_Profile), e);
                 throw;
             }
         }
@@ -3873,7 +3584,7 @@ namespace HammerAndSickle.Models
         /// <summary>
         /// M163 Vulcan Air Defense System
         /// </summary>
-        private static void CreateSpaaaM163Profile()
+        private static void Create_SPAAA_M163_Profile()
         {
             try
             {
@@ -3913,7 +3624,7 @@ namespace HammerAndSickle.Models
             }
             catch (Exception e)
             {
-                AppService.HandleException(CLASS_NAME, nameof(CreateSpaaaM163Profile), e);
+                AppService.HandleException(CLASS_NAME, nameof(Create_SPAAA_M163_Profile), e);
                 throw;
             }
         }
@@ -3921,7 +3632,7 @@ namespace HammerAndSickle.Models
         /// <summary>
         /// M48 Chaparral Self-Propelled SAM System
         /// </summary>
-        private static void CreateSpsamChapProfile()
+        private static void Create_SPSAM_Chap_Profile()
         {
             try
             {
@@ -3961,7 +3672,7 @@ namespace HammerAndSickle.Models
             }
             catch (Exception e)
             {
-                AppService.HandleException(CLASS_NAME, nameof(CreateSpsamChapProfile), e);
+                AppService.HandleException(CLASS_NAME, nameof(Create_SPSAM_Chap_Profile), e);
                 throw;
             }
         }
@@ -3969,7 +3680,7 @@ namespace HammerAndSickle.Models
         /// <summary>
         /// MIM-23 Hawk Medium-Range SAM System
         /// </summary>
-        private static void CreateSamHawkProfile()
+        private static void Create_SAM_Hawk_Profile()
         {
             try
             {
@@ -4009,7 +3720,7 @@ namespace HammerAndSickle.Models
             }
             catch (Exception e)
             {
-                AppService.HandleException(CLASS_NAME, nameof(CreateSamHawkProfile), e);
+                AppService.HandleException(CLASS_NAME, nameof(Create_SAM_Hawk_Profile), e);
                 throw;
             }
         }
@@ -4021,7 +3732,7 @@ namespace HammerAndSickle.Models
         /// <summary>
         /// AH-64 Apache ATT Helicopter
         /// </summary>
-        private static void CreateHelAh64Profile()
+        private static void Create_HEL_AH64_Profile()
         {
             try
             {
@@ -4040,7 +3751,7 @@ namespace HammerAndSickle.Models
                     indirectRange: 0f,
                     spottingRange: 3f,
                     allWeatherCapability: AllWeatherRating.GroundUnit,
-                    sigintRating: SIGINT_Rating.SpecializedLevel,
+                    sigintRating: SIGINT_Rating.UnitLevel,
                     nbcRating: NBC_Rating.Gen2,
                     strategicMobility: StrategicMobility.Aviation,
                     nvgCapability: NVG_Rating.Gen3,
@@ -4061,7 +3772,55 @@ namespace HammerAndSickle.Models
             }
             catch (Exception e)
             {
-                AppService.HandleException(CLASS_NAME, nameof(CreateHelAh64Profile), e);
+                AppService.HandleException(CLASS_NAME, nameof(Create_HEL_AH64_Profile), e);
+                throw;
+            }
+        }
+
+        /// <summary>
+        /// OH-58 Recon Helicopter
+        /// </summary>
+        private static void Create_HEL_OH58_Profile()
+        {
+            try
+            {
+                var profile = new WeaponSystemProfile(
+                    name: "OH-58 Kiowa Recon Helicopter",
+                    nationality: Nationality.USA,
+                    weaponSystemID: WeaponSystems.HEL_OH58,
+                    40,
+                    hardAttack: 6,
+                    hardDefense: 3,
+                    softAttack: 9,
+                    softDefense: 5,
+                    groundAirAttack: 1,
+                    groundAirDefense: 7,
+                    primaryRange: 1f,
+                    indirectRange: 0f,
+                    spottingRange: 3f,
+                    allWeatherCapability: AllWeatherRating.GroundUnit,
+                    sigintRating: SIGINT_Rating.UnitLevel,
+                    nbcRating: NBC_Rating.Gen2,
+                    strategicMobility: StrategicMobility.Aviation,
+                    nvgCapability: NVG_Rating.Gen3,
+                    silhouette: UnitSilhouette.Small
+                );
+
+                // Set upgrade paths
+                profile.AddUpgradeType(UpgradeType.ATTHELO);
+
+                // Set short name for UI display
+                profile.SetShortName("OH-58");
+
+                // Set turn availability - entered service in 1986
+                profile.SetTurnAvailable(500);
+
+                // Store in master dictionary
+                _weaponSystemProfiles[WeaponSystems.HEL_OH58] = profile;
+            }
+            catch (Exception e)
+            {
+                AppService.HandleException(CLASS_NAME, nameof(Create_HEL_OH58_Profile), e);
                 throw;
             }
         }
@@ -4073,7 +3832,7 @@ namespace HammerAndSickle.Models
         /// <summary>
         /// E-3 Sentry airborne early warning and control aircraft.
         /// </summary>
-        private static void CreateAwacs_E3Profile()
+        private static void Create_AWACS_E3_Profile()
         {
             try
             {
@@ -4115,7 +3874,7 @@ namespace HammerAndSickle.Models
             }
             catch (Exception e)
             {
-                AppService.HandleException(CLASS_NAME, nameof(CreateAwacs_E3Profile), e);
+                AppService.HandleException(CLASS_NAME, nameof(Create_AWACS_E3_Profile), e);
                 throw;
             }
         }
@@ -4123,7 +3882,7 @@ namespace HammerAndSickle.Models
         /// <summary>
         /// F-15 Eagle Air Superiority ASF
         /// </summary>
-        private static void CreateAsfF15Profile()
+        private static void Create_ASF_F15_Profile()
         {
             try
             {
@@ -4164,7 +3923,7 @@ namespace HammerAndSickle.Models
             }
             catch (Exception e)
             {
-                AppService.HandleException(CLASS_NAME, nameof(CreateAsfF15Profile), e);
+                AppService.HandleException(CLASS_NAME, nameof(Create_ASF_F15_Profile), e);
                 throw;
             }
         }
@@ -4172,7 +3931,7 @@ namespace HammerAndSickle.Models
         /// <summary>
         /// F-4 Phantom Multi-Role ASF
         /// </summary>
-        private static void CreateAsfF4Profile()
+        private static void Create_ASF_F4_Profile()
         {
             try
             {
@@ -4213,7 +3972,7 @@ namespace HammerAndSickle.Models
             }
             catch (Exception e)
             {
-                AppService.HandleException(CLASS_NAME, nameof(CreateAsfF4Profile), e);
+                AppService.HandleException(CLASS_NAME, nameof(Create_ASF_F4_Profile), e);
                 throw;
             }
         }
@@ -4221,7 +3980,7 @@ namespace HammerAndSickle.Models
         /// <summary>
         /// F-16 Fighting Falcon Multi-Role ASF
         /// </summary>
-        private static void CreateMrfF16Profile()
+        private static void Create_MRF_F16_Profile()
         {
             try
             {
@@ -4262,7 +4021,7 @@ namespace HammerAndSickle.Models
             }
             catch (Exception e)
             {
-                AppService.HandleException(CLASS_NAME, nameof(CreateMrfF16Profile), e);
+                AppService.HandleException(CLASS_NAME, nameof(Create_MRF_F16_Profile), e);
                 throw;
             }
         }
@@ -4270,7 +4029,7 @@ namespace HammerAndSickle.Models
         /// <summary>
         /// A-10 Thunderbolt II ATT Aircraft
         /// </summary>
-        private static void CreateAttA10Profile()
+        private static void Create_ATT_A10_Profile()
         {
             try
             {
@@ -4311,7 +4070,7 @@ namespace HammerAndSickle.Models
             }
             catch (Exception e)
             {
-                AppService.HandleException(CLASS_NAME, nameof(CreateAttA10Profile), e);
+                AppService.HandleException(CLASS_NAME, nameof(Create_ATT_A10_Profile), e);
                 throw;
             }
         }
@@ -4319,7 +4078,7 @@ namespace HammerAndSickle.Models
         /// <summary>
         /// F-111 Aardvark Strike ASF
         /// </summary>
-        private static void CreateBmbF111Profile()
+        private static void Create_BMB_F111_Profile()
         {
             try
             {
@@ -4360,7 +4119,7 @@ namespace HammerAndSickle.Models
             }
             catch (Exception e)
             {
-                AppService.HandleException(CLASS_NAME, nameof(CreateBmbF111Profile), e);
+                AppService.HandleException(CLASS_NAME, nameof(Create_BMB_F111_Profile), e);
                 throw;
             }
         }
@@ -4368,7 +4127,7 @@ namespace HammerAndSickle.Models
         /// <summary>
         /// F-117 Nighthawk Stealth ATT Aircraft
         /// </summary>
-        private static void CreateBmbF117Profile()
+        private static void Create_BMB_F117_Profile()
         {
             try
             {
@@ -4409,7 +4168,7 @@ namespace HammerAndSickle.Models
             }
             catch (Exception e)
             {
-                AppService.HandleException(CLASS_NAME, nameof(CreateBmbF117Profile), e);
+                AppService.HandleException(CLASS_NAME, nameof(Create_BMB_F117_Profile), e);
                 throw;
             }
         }
@@ -4417,7 +4176,7 @@ namespace HammerAndSickle.Models
         /// <summary>
         /// SR-71 Blackbird Strategic Reconnaissance Aircraft
         /// </summary>
-        private static void CreateRcnaSr71Profile()
+        private static void Create_RCNA_SR71_Profile()
         {
             try
             {
@@ -4458,310 +4217,18 @@ namespace HammerAndSickle.Models
             }
             catch (Exception e)
             {
-                AppService.HandleException(CLASS_NAME, nameof(CreateRcnaSr71Profile), e);
+                AppService.HandleException(CLASS_NAME, nameof(Create_RCNA_SR71_Profile), e);
                 throw;
             }
         }
 
         #endregion // US Aircraft
 
-        #region US Infantry
-
-        /// <summary>
-        /// US Regular INF
-        /// </summary>
-        private static void CreateRegInfUsProfile()
-        {
-            try
-            {
-                var profile = new WeaponSystemProfile(
-                    name: "US Regular Infantry",
-                    nationality: Nationality.USA,
-                    weaponSystemID: WeaponSystems.REG_INF_US,
-                    18,
-                    hardAttack: 5,
-                    hardDefense: 4,
-                    softAttack: 10,
-                    softDefense: 11,
-                    groundAirAttack: 3,
-                    groundAirDefense: 4,
-                    primaryRange: 1f,
-                    indirectRange: 0f,
-                    spottingRange: 2f,
-                    allWeatherCapability: AllWeatherRating.Night,
-                    nvgCapability: NVG_Rating.Gen2,
-                    silhouette: UnitSilhouette.Small,
-                    sigintRating: SIGINT_Rating.UnitLevel,
-                    nbcRating: NBC_Rating.Gen2,
-                    strategicMobility: StrategicMobility.AirLift
-                );
-
-                // Upgrade paths
-                profile.AddUpgradeType(UpgradeType.INF);
-
-                // Set short name for UI display
-                profile.SetShortName("Infantry");
-
-                // Set turn availability in months.
-                profile.SetTurnAvailable(300);
-
-                // Store in master dictionary
-                _weaponSystemProfiles[WeaponSystems.REG_INF_US] = profile;
-            }
-            catch (Exception e)
-            {
-                AppService.HandleException(CLASS_NAME, nameof(CreateRegInfUsProfile), e);
-                throw;
-            }
-        }
-
-        /// <summary>
-        /// US Airborne INF
-        /// </summary>
-        private static void CreateAbInfUsProfile()
-        {
-            try
-            {
-                var profile = new WeaponSystemProfile(
-                    name: "US Airborne Infantry",
-                    nationality: Nationality.USA,
-                    weaponSystemID: WeaponSystems.AB_INF_US,
-                    22,
-                    hardAttack: 5,
-                    hardDefense: 4,
-                    softAttack: 10,
-                    softDefense: 11,
-                    groundAirAttack: 3,
-                    groundAirDefense: 4,
-                    primaryRange: 1f,
-                    indirectRange: 0f,
-                    spottingRange: 2f,
-                    allWeatherCapability: AllWeatherRating.Night,
-                    nvgCapability: NVG_Rating.Gen2,
-                    silhouette: UnitSilhouette.Small,
-                    sigintRating: SIGINT_Rating.UnitLevel,
-                    nbcRating: NBC_Rating.Gen2,
-                    strategicMobility: StrategicMobility.AirDrop
-                );
-
-                // Upgrade paths
-                profile.AddUpgradeType(UpgradeType.INF);
-
-                // Set short name for UI display
-                profile.SetShortName("Airborne");
-
-                // Set turn availability in months.
-                profile.SetTurnAvailable(300);
-
-                // Store in master dictionary
-                _weaponSystemProfiles[WeaponSystems.AB_INF_US] = profile;
-            }
-            catch (Exception e)
-            {
-                AppService.HandleException(CLASS_NAME, nameof(CreateAbInfUsProfile), e);
-                throw;
-            }
-        }
-
-        /// <summary>
-        /// US Air Mobile INF
-        /// </summary>
-        private static void CreateAmInfUsProfile()
-        {
-            try
-            {
-                var profile = new WeaponSystemProfile(
-                    name: "US Air Mobile Infantry",
-                    nationality: Nationality.USA,
-                    weaponSystemID: WeaponSystems.AM_INF_US,
-                    22,
-                    hardAttack: 5,
-                    hardDefense: 4,
-                    softAttack: 10,
-                    softDefense: 11,
-                    groundAirAttack: 3,
-                    groundAirDefense: 4,
-                    primaryRange: 1f,
-                    indirectRange: 0f,
-                    spottingRange: 2f,
-                    allWeatherCapability: AllWeatherRating.Night,
-                    nvgCapability: NVG_Rating.Gen2,
-                    silhouette: UnitSilhouette.Small,
-                    sigintRating: SIGINT_Rating.UnitLevel,
-                    nbcRating: NBC_Rating.Gen2,
-                    strategicMobility: StrategicMobility.AirMobile
-                );
-
-                // Set upgrade paths
-                profile.AddUpgradeType(UpgradeType.INF);
-
-                // Set short name for UI display
-                profile.SetShortName("Air Mobile");
-
-                // Set turn availability in months.
-                profile.SetTurnAvailable(440);
-
-                // Store in master dictionary
-                _weaponSystemProfiles[WeaponSystems.AM_INF_US] = profile;
-            }
-            catch (Exception e)
-            {
-                AppService.HandleException(CLASS_NAME, nameof(CreateAmInfUsProfile), e);
-                throw;
-            }
-        }
-
-        /// <summary>
-        /// US Marine INF
-        /// </summary>
-        private static void CreateMarInfUsProfile()
-        {
-            try
-            {
-                var profile = new WeaponSystemProfile(
-                    name: "US Marine Infantry",
-                    nationality: Nationality.USA,
-                    weaponSystemID: WeaponSystems.MAR_INF_US,
-                    22,
-                    hardAttack: 6,
-                    hardDefense: 4,
-                    softAttack: 11,
-                    softDefense: 12,
-                    groundAirAttack: 3,
-                    groundAirDefense: 4,
-                    primaryRange: 1f,
-                    indirectRange: 0f,
-                    spottingRange: 2f,
-                    allWeatherCapability: AllWeatherRating.Night,
-                    nvgCapability: NVG_Rating.Gen2,
-                    silhouette: UnitSilhouette.Small,
-                    sigintRating: SIGINT_Rating.UnitLevel,
-                    nbcRating: NBC_Rating.Gen2,
-                    strategicMobility: StrategicMobility.NavalAssault
-                );
-
-                // Set upgrade paths
-                profile.AddUpgradeType(UpgradeType.INF);
-
-                // Set short name for UI display
-                profile.SetShortName("Marines");
-
-                // Set turn availability in months.
-                profile.SetTurnAvailable(300);
-
-                // Store in master dictionary
-                _weaponSystemProfiles[WeaponSystems.MAR_INF_US] = profile;
-            }
-            catch (Exception e)
-            {
-                AppService.HandleException(CLASS_NAME, nameof(CreateMarInfUsProfile), e);
-                throw;
-            }
-        }
-
-        /// <summary>
-        /// US Special Forces INF
-        /// </summary>
-        private static void CreateSpecInfUsProfile()
-        {
-            try
-            {
-                var profile = new WeaponSystemProfile(
-                    name: "US Special Forces Infantry",
-                    nationality: Nationality.USA,
-                    weaponSystemID: WeaponSystems.SPEC_INF_US,
-                    35,
-                    hardAttack: 9,
-                    hardDefense: 5,
-                    softAttack: 12,
-                    softDefense: 13,
-                    groundAirAttack: 4,
-                    groundAirDefense: 7,
-                    primaryRange: 1f,
-                    indirectRange: 0f,
-                    spottingRange: 3f,
-                    allWeatherCapability: AllWeatherRating.AllWeather,
-                    nvgCapability: NVG_Rating.Gen3,
-                    silhouette: UnitSilhouette.Small,
-                    sigintRating: SIGINT_Rating.SpecializedLevel,
-                    nbcRating: NBC_Rating.Gen2,
-                    strategicMobility: StrategicMobility.AirMobile
-                );
-
-                // Set upgrade paths
-                profile.AddUpgradeType(UpgradeType.INF);
-
-                // Set short name for UI display
-                profile.SetShortName("Special Forces");
-
-                // Set turn availability in months.
-                profile.SetTurnAvailable(300);
-
-                // Store in master dictionary
-                _weaponSystemProfiles[WeaponSystems.SPEC_INF_US] = profile;
-            }
-            catch (Exception e)
-            {
-                AppService.HandleException(CLASS_NAME, nameof(CreateSpecInfUsProfile), e);
-                throw;
-            }
-        }
-
-        /// <summary>
-        /// US Engineer INF
-        /// </summary>
-        private static void CreateEngInfUsProfile()
-        {
-            try
-            {
-                var profile = new WeaponSystemProfile(
-                    name: "US Combat Engineers",
-                    nationality: Nationality.USA,
-                    weaponSystemID: WeaponSystems.ENG_INF_US,
-                    24,
-                    hardAttack: 5,
-                    hardDefense: 4,
-                    softAttack: 10,
-                    softDefense: 13,
-                    groundAirAttack: 3,
-                    groundAirDefense: 4,
-                    primaryRange: 1f,
-                    indirectRange: 0f,
-                    spottingRange: 2f,
-                    allWeatherCapability: AllWeatherRating.Night,
-                    nvgCapability: NVG_Rating.Gen2,
-                    silhouette: UnitSilhouette.Small,
-                    sigintRating: SIGINT_Rating.UnitLevel,
-                    nbcRating: NBC_Rating.Gen2,
-                    strategicMobility: StrategicMobility.AirDrop
-                );
-
-                // Set upgrade paths
-                profile.AddUpgradeType(UpgradeType.INF);
-
-                // Set short name for UI display
-                profile.SetShortName("Engineers");
-
-                // Set turn availability in months.
-                profile.SetTurnAvailable(300);
-
-                // Store in master dictionary
-                _weaponSystemProfiles[WeaponSystems.ENG_INF_US] = profile;
-            }
-            catch (Exception e)
-            {
-                AppService.HandleException(CLASS_NAME, nameof(CreateEngInfUsProfile), e);
-                throw;
-            }
-        }
-
-        #endregion // US INF
-
         //-----------------------------------------------------------------------------------------
 
         #region West Germany (FRG)
 
-        private static void CreateTankLeopard1Profile()
+        private static void Create_TANK_LEOPARD1_Profile()
         {
             try
             {
@@ -4790,10 +4257,10 @@ namespace HammerAndSickle.Models
                 profile.SetTurnAvailable(336); // 1965
                 _weaponSystemProfiles[WeaponSystems.TANK_LEOPARD1] = profile;
             }
-            catch (Exception e) { AppService.HandleException(CLASS_NAME, nameof(CreateTankLeopard1Profile), e); throw; }
+            catch (Exception e) { AppService.HandleException(CLASS_NAME, nameof(Create_TANK_LEOPARD1_Profile), e); throw; }
         }
 
-        private static void CreateTankLeopard2Profile()
+        private static void Create_TANK_LEOPARD2_Profile()
         {
             try
             {
@@ -4822,10 +4289,10 @@ namespace HammerAndSickle.Models
                 profile.SetTurnAvailable(540); // 1983
                 _weaponSystemProfiles[WeaponSystems.TANK_LEOPARD2] = profile;
             }
-            catch (Exception e) { AppService.HandleException(CLASS_NAME, nameof(CreateTankLeopard2Profile), e); throw; }
+            catch (Exception e) { AppService.HandleException(CLASS_NAME, nameof(Create_TANK_LEOPARD2_Profile), e); throw; }
         }
 
-        private static void CreateIfvMarderProfile()
+        private static void Create_IFV_MARDER_Profile()
         {
             try
             {
@@ -4854,10 +4321,10 @@ namespace HammerAndSickle.Models
                 profile.SetTurnAvailable(396); // 1973
                 _weaponSystemProfiles[WeaponSystems.IFV_MARDER] = profile;
             }
-            catch (Exception e) { AppService.HandleException(CLASS_NAME, nameof(CreateIfvMarderProfile), e); throw; }
+            catch (Exception e) { AppService.HandleException(CLASS_NAME, nameof(Create_IFV_MARDER_Profile), e); throw; }
         }
 
-        private static void CreateSpaaaGepardProfile()
+        private static void Create_SPAAA_Gepard_Profile()
         {
             try
             {
@@ -4888,10 +4355,10 @@ namespace HammerAndSickle.Models
                 profile.SetTurnAvailable(444); // 1975
                 _weaponSystemProfiles[WeaponSystems.SPAAA_GEPARD] = profile;
             }
-            catch (Exception e) { AppService.HandleException(CLASS_NAME, nameof(CreateSpaaaGepardProfile), e); throw; }
+            catch (Exception e) { AppService.HandleException(CLASS_NAME, nameof(Create_SPAAA_Gepard_Profile), e); throw; }
         }
 
-        private static void CreateHelBo105Profile()
+        private static void Create_HEL_BO105_Profile()
         {
             try
             {
@@ -4920,212 +4387,20 @@ namespace HammerAndSickle.Models
                 profile.SetTurnAvailable(444); // 1975
                 _weaponSystemProfiles[WeaponSystems.HEL_BO105] = profile;
             }
-            catch (Exception e) { AppService.HandleException(CLASS_NAME, nameof(CreateHelBo105Profile), e); throw; }
-        }
-
-        /// <summary>
-        /// FRG Regular INF
-        /// </summary>
-        private static void CreateRegInfFRGProfile()
-        {
-            try
-            {
-                var profile = new WeaponSystemProfile(
-                    name: "West German Regular Infantry",
-                    nationality: Nationality.FRG,
-                    weaponSystemID: WeaponSystems.REG_INF_FRG,
-                    18,
-                    hardAttack: 5,
-                    hardDefense: 4,
-                    softAttack: 10,
-                    softDefense: 11,
-                    groundAirAttack: 3,
-                    groundAirDefense: 4,
-                    primaryRange: 1f,
-                    indirectRange: 0f,
-                    spottingRange: 2f,
-                    allWeatherCapability: AllWeatherRating.AllWeather,
-                    nvgCapability: NVG_Rating.Gen2,
-                    silhouette: UnitSilhouette.Small,
-                    sigintRating: SIGINT_Rating.UnitLevel,
-                    nbcRating: NBC_Rating.Gen2,
-                    strategicMobility: StrategicMobility.AirLift
-                );
-
-                // Upgrade paths
-                profile.AddUpgradeType(UpgradeType.INF);
-
-                // Set short name for UI display
-                profile.SetShortName("Infantry");
-
-                // Set turn availability in months.
-                profile.SetTurnAvailable(300);
-
-                // Store in master dictionary
-                _weaponSystemProfiles[WeaponSystems.REG_INF_FRG] = profile;
-            }
-            catch (Exception e)
-            {
-                AppService.HandleException(CLASS_NAME, nameof(CreateRegInfFRGProfile), e);
-                throw;
-            }
-        }
-
-        /// <summary>
-        /// FRG Air Mobile INF
-        /// </summary>
-        private static void CreateAmInfFRGProfile()
-        {
-            try
-            {
-                var profile = new WeaponSystemProfile(
-                    name: "West German Air Mobile Infantry",
-                    nationality: Nationality.FRG,
-                    weaponSystemID: WeaponSystems.AM_INF_FRG,
-                    22,
-                    hardAttack: 5,
-                    hardDefense: 4,
-                    softAttack: 10,
-                    softDefense: 11,
-                    groundAirAttack: 3,
-                    groundAirDefense: 4,
-                    primaryRange: 1f,
-                    indirectRange: 0f,
-                    spottingRange: 2f,
-                    allWeatherCapability: AllWeatherRating.Night,
-                    nvgCapability: NVG_Rating.Gen2,
-                    silhouette: UnitSilhouette.Small,
-                    sigintRating: SIGINT_Rating.UnitLevel,
-                    nbcRating: NBC_Rating.Gen2,
-                    strategicMobility: StrategicMobility.AirMobile
-                );
-
-                // Set upgrade paths
-                profile.AddUpgradeType(UpgradeType.INF);
-
-                // Set short name for UI display
-                profile.SetShortName("Air Mobile");
-
-                // Set turn availability in months.
-                profile.SetTurnAvailable(440);
-
-                // Store in master dictionary
-                _weaponSystemProfiles[WeaponSystems.AM_INF_FRG] = profile;
-            }
-            catch (Exception e)
-            {
-                AppService.HandleException(CLASS_NAME, nameof(CreateAmInfFRGProfile), e);
-                throw;
-            }
-        }
-
-        /// <summary>
-        /// FRG Special Forces INF
-        /// </summary>
-        private static void CreateSpecInfFRGProfile()
-        {
-            try
-            {
-                var profile = new WeaponSystemProfile(
-                    name: "West German Special Forces Infantry",
-                    nationality: Nationality.FRG,
-                    weaponSystemID: WeaponSystems.SPEC_INF_FRG,
-                    35,
-                    hardAttack: 9,
-                    hardDefense: 5,
-                    softAttack: 12,
-                    softDefense: 13,
-                    groundAirAttack: 4,
-                    groundAirDefense: 7,
-                    primaryRange: 1f,
-                    indirectRange: 0f,
-                    spottingRange: 3f,
-                    allWeatherCapability: AllWeatherRating.AllWeather,
-                    nvgCapability: NVG_Rating.Gen3,
-                    silhouette: UnitSilhouette.Small,
-                    sigintRating: SIGINT_Rating.SpecializedLevel,
-                    nbcRating: NBC_Rating.Gen2,
-                    strategicMobility: StrategicMobility.AirMobile
-                );
-
-                // Set upgrade paths
-                profile.AddUpgradeType(UpgradeType.INF);
-
-                // Set short name for UI display
-                profile.SetShortName("Special Forces");
-
-                // Set turn availability in months.
-                profile.SetTurnAvailable(300);
-
-                // Store in master dictionary
-                _weaponSystemProfiles[WeaponSystems.SPEC_INF_FRG] = profile;
-            }
-            catch (Exception e)
-            {
-                AppService.HandleException(CLASS_NAME, nameof(CreateSpecInfFRGProfile), e);
-                throw;
-            }
-        }
-
-        /// <summary>
-        /// FRG Engineer INF
-        /// </summary>
-        private static void CreateEngInfFRGProfile()
-        {
-            try
-            {
-                var profile = new WeaponSystemProfile(
-                    name: "West German Combat Engineers",
-                    nationality: Nationality.FRG,
-                    weaponSystemID: WeaponSystems.ENG_INF_FRG,
-                    24,
-                    hardAttack: 5,
-                    hardDefense: 4,
-                    softAttack: 10,
-                    softDefense: 13,
-                    groundAirAttack: 3,
-                    groundAirDefense: 4,
-                    primaryRange: 1f,
-                    indirectRange: 0f,
-                    spottingRange: 2f,
-                    allWeatherCapability: AllWeatherRating.Night,
-                    nvgCapability: NVG_Rating.Gen2,
-                    silhouette: UnitSilhouette.Small,
-                    sigintRating: SIGINT_Rating.UnitLevel,
-                    nbcRating: NBC_Rating.Gen2,
-                    strategicMobility: StrategicMobility.AirDrop
-                );
-
-                // Set upgrade paths
-                profile.AddUpgradeType(UpgradeType.INF);
-
-                // Set short name for UI display
-                profile.SetShortName("Engineers");
-
-                // Set turn availability in months.
-                profile.SetTurnAvailable(300);
-
-                // Store in master dictionary
-                _weaponSystemProfiles[WeaponSystems.ENG_INF_FRG] = profile;
-            }
-            catch (Exception e)
-            {
-                AppService.HandleException(CLASS_NAME, nameof(CreateEngInfFRGProfile), e);
-                throw;
-            }
+            catch (Exception e) { AppService.HandleException(CLASS_NAME, nameof(Create_HEL_BO105_Profile), e); throw; }
         }
 
         /// <summary>
         /// Tornado IDS Multi-Role ASF
         /// </summary>
-        private static void CreateAsfTIDSProfile()
+        private static void Create_MRF_TORNADO_IDS_Profile()
         {
             try
             {
                 var profile = new WeaponSystemProfile(
-                    name: "Tornado IDS Phantom Air Superiority Fighter",
+                    name: "Tornado IDS Multirole Fighter",
                     nationality: Nationality.FRG,
-                    weaponSystemID: WeaponSystems.MRF_TornadoIDS,
+                    weaponSystemID: WeaponSystems.MRF_TORNADO_IDS,
                     65,
                     dogfighting: 9,
                     maneuverability: 7,
@@ -5155,11 +4430,11 @@ namespace HammerAndSickle.Models
                 profile.SetTurnAvailable(264);
 
                 // Store in master dictionary
-                _weaponSystemProfiles[WeaponSystems.MRF_TornadoIDS] = profile;
+                _weaponSystemProfiles[WeaponSystems.MRF_TORNADO_IDS] = profile;
             }
             catch (Exception e)
             {
-                AppService.HandleException(CLASS_NAME, nameof(CreateAsfTIDSProfile), e);
+                AppService.HandleException(CLASS_NAME, nameof(Create_MRF_TORNADO_IDS_Profile), e);
                 throw;
             }
         }
@@ -5170,7 +4445,7 @@ namespace HammerAndSickle.Models
         
         #region United Kingdom (UK)
 
-        private static void CreateTankChallenger1Profile()
+        private static void Create_TANK_CHALLENGER1_Profile()
         {
             try
             {
@@ -5199,10 +4474,10 @@ namespace HammerAndSickle.Models
                 profile.SetTurnAvailable(552); // 1984
                 _weaponSystemProfiles[WeaponSystems.TANK_CHALLENGER1] = profile;
             }
-            catch (Exception e) { AppService.HandleException(CLASS_NAME, nameof(CreateTankChallenger1Profile), e); throw; }
+            catch (Exception e) { AppService.HandleException(CLASS_NAME, nameof(Create_TANK_CHALLENGER1_Profile), e); throw; }
         }
 
-        private static void CreateIfvWarriorProfile()
+        private static void Create_IFV_WARRIOR_Profile()
         {
             try
             {
@@ -5231,245 +4506,150 @@ namespace HammerAndSickle.Models
                 profile.SetTurnAvailable(576); // 1986
                 _weaponSystemProfiles[WeaponSystems.IFV_WARRIOR] = profile;
             }
-            catch (Exception e) { AppService.HandleException(CLASS_NAME, nameof(CreateIfvWarriorProfile), e); throw; }
+            catch (Exception e) { AppService.HandleException(CLASS_NAME, nameof(Create_IFV_WARRIOR_Profile), e); throw; }
         }
 
         /// <summary>
-        /// UK Regular INF
+        /// FV432 Armored Personnel Carrier
         /// </summary>
-        private static void CreateRegInfUKProfile()
+        private static void Create_APC_FV432_Profile()
         {
             try
             {
                 var profile = new WeaponSystemProfile(
-                    name: "UK Regular Infantry",
+                    name: "FV 432",
                     nationality: Nationality.UK,
-                    weaponSystemID: WeaponSystems.REG_INF_UK,
-                    18,
-                    hardAttack: 5,
-                    hardDefense: 4,
-                    softAttack: 10,
-                    softDefense: 11,
-                    groundAirAttack: 3,
-                    groundAirDefense: 4,
+                    weaponSystemID: WeaponSystems.APC_FV432,
+                    25,
+                    hardAttack: 2,
+                    hardDefense: 3,
+                    softAttack: 5,
+                    softDefense: 5,
+                    groundAirAttack: 1,
+                    groundAirDefense: 2,
                     primaryRange: 1f,
                     indirectRange: 0f,
                     spottingRange: 2f,
-                    allWeatherCapability: AllWeatherRating.Night,
-                    nvgCapability: NVG_Rating.Gen2,
-                    silhouette: UnitSilhouette.Small,
+                    allWeatherCapability: AllWeatherRating.GroundUnit,
                     sigintRating: SIGINT_Rating.UnitLevel,
-                    nbcRating: NBC_Rating.Gen2,
-                    strategicMobility: StrategicMobility.AirLift
-                );
-
-                // Upgrade paths
-                profile.AddUpgradeType(UpgradeType.INF);
-
-                // Set short name for UI display
-                profile.SetShortName("Infantry");
-
-                // Set turn availability in months.
-                profile.SetTurnAvailable(300);
-
-                // Store in master dictionary
-                _weaponSystemProfiles[WeaponSystems.REG_INF_UK] = profile;
-            }
-            catch (Exception e)
-            {
-                AppService.HandleException(CLASS_NAME, nameof(CreateRegInfUKProfile), e);
-                throw;
-            }
-        }
-
-        /// <summary>
-        /// UK Airborne INF
-        /// </summary>
-        private static void CreateAbInfUKProfile()
-        {
-            try
-            {
-                var profile = new WeaponSystemProfile(
-                    name: "UK Airborne Infantry",
-                    nationality: Nationality.UK,
-                    weaponSystemID: WeaponSystems.AB_INF_UK,
-                    22,
-                    hardAttack: 5,
-                    hardDefense: 4,
-                    softAttack: 10,
-                    softDefense: 11,
-                    groundAirAttack: 3,
-                    groundAirDefense: 4,
-                    primaryRange: 1f,
-                    indirectRange: 0f,
-                    spottingRange: 2f,
-                    allWeatherCapability: AllWeatherRating.Night,
-                    nvgCapability: NVG_Rating.Gen2,
-                    silhouette: UnitSilhouette.Small,
-                    sigintRating: SIGINT_Rating.UnitLevel,
-                    nbcRating: NBC_Rating.Gen2,
-                    strategicMobility: StrategicMobility.AirDrop
-                );
-
-                // Upgrade paths
-                profile.AddUpgradeType(UpgradeType.INF);
-
-                // Set short name for UI display
-                profile.SetShortName("Airborne");
-
-                // Set turn availability in months.
-                profile.SetTurnAvailable(300);
-
-                // Store in master dictionary
-                _weaponSystemProfiles[WeaponSystems.AB_INF_UK] = profile;
-            }
-            catch (Exception e)
-            {
-                AppService.HandleException(CLASS_NAME, nameof(CreateAbInfUKProfile), e);
-                throw;
-            }
-        }
-
-        /// <summary>
-        /// UK Air Mobile INF
-        /// </summary>
-        private static void CreateAmInfUKProfile()
-        {
-            try
-            {
-                var profile = new WeaponSystemProfile(
-                    name: "UK Air Mobile Infantry",
-                    nationality: Nationality.UK,
-                    weaponSystemID: WeaponSystems.AM_INF_UK,
-                    22,
-                    hardAttack: 5,
-                    hardDefense: 4,
-                    softAttack: 10,
-                    softDefense: 11,
-                    groundAirAttack: 3,
-                    groundAirDefense: 4,
-                    primaryRange: 1f,
-                    indirectRange: 0f,
-                    spottingRange: 2f,
-                    allWeatherCapability: AllWeatherRating.Night,
-                    nvgCapability: NVG_Rating.Gen2,
-                    silhouette: UnitSilhouette.Small,
-                    sigintRating: SIGINT_Rating.UnitLevel,
-                    nbcRating: NBC_Rating.Gen2,
-                    strategicMobility: StrategicMobility.AirMobile
+                    nbcRating: NBC_Rating.Gen1,
+                    strategicMobility: StrategicMobility.AirLift,
+                    nvgCapability: NVG_Rating.Gen1,
+                    silhouette: UnitSilhouette.Small
                 );
 
                 // Set upgrade paths
-                profile.AddUpgradeType(UpgradeType.INF);
+                profile.AddUpgradeType(UpgradeType.APC);
 
                 // Set short name for UI display
-                profile.SetShortName("Air Mobile");
+                profile.SetShortName("FV 432");
 
-                // Set turn availability in months.
-                profile.SetTurnAvailable(440);
+                // Set turn availability - entered service in 1960
+                profile.SetTurnAvailable(264);
 
                 // Store in master dictionary
-                _weaponSystemProfiles[WeaponSystems.AM_INF_UK] = profile;
+                _weaponSystemProfiles[WeaponSystems.APC_FV432] = profile;
             }
             catch (Exception e)
             {
-                AppService.HandleException(CLASS_NAME, nameof(CreateAmInfUKProfile), e);
+                AppService.HandleException(CLASS_NAME, nameof(Create_APC_FV432_Profile), e);
                 throw;
             }
         }
 
         /// <summary>
-        /// UK Special Forces INF
+        /// Rapier Medium-Range SAM System
         /// </summary>
-        private static void CreateSpecInfUKProfile()
+        private static void Create_SAM_Rapier_Profile()
         {
             try
             {
                 var profile = new WeaponSystemProfile(
-                    name: "UK Special Forces Infantry",
+                    name: "Rapier SAM System",
                     nationality: Nationality.UK,
-                    weaponSystemID: WeaponSystems.SPEC_INF_UK,
-                    35,
-                    hardAttack: 9,
-                    hardDefense: 5,
-                    softAttack: 12,
-                    softDefense: 13,
-                    groundAirAttack: 4,
-                    groundAirDefense: 7,
+                    weaponSystemID: WeaponSystems.SAM_RAPIER,
+                    85,
+                    hardAttack: 0,
+                    hardDefense: 3,
+                    softAttack: 0,
+                    softDefense: 4,
+                    groundAirAttack: 11,
+                    groundAirDefense: 8,
                     primaryRange: 1f,
-                    indirectRange: 0f,
-                    spottingRange: 3f,
-                    allWeatherCapability: AllWeatherRating.AllWeather,
-                    nvgCapability: NVG_Rating.Gen3,
-                    silhouette: UnitSilhouette.Small,
+                    indirectRange: 6f,
+                    spottingRange: 6f,
+                    allWeatherCapability: AllWeatherRating.GroundUnit,
                     sigintRating: SIGINT_Rating.SpecializedLevel,
-                    nbcRating: NBC_Rating.Gen2,
-                    strategicMobility: StrategicMobility.AirMobile
+                    nbcRating: NBC_Rating.Gen1,
+                    strategicMobility: StrategicMobility.Heavy,
+                    nvgCapability: NVG_Rating.None,
+                    silhouette: UnitSilhouette.Large
                 );
 
                 // Set upgrade paths
-                profile.AddUpgradeType(UpgradeType.INF);
+                profile.AddUpgradeType(UpgradeType.SAM);
 
                 // Set short name for UI display
-                profile.SetShortName("Special Forces");
+                profile.SetShortName("Rapier");
 
-                // Set turn availability in months.
+                // Set turn availability - entered service in 1960
                 profile.SetTurnAvailable(300);
 
                 // Store in master dictionary
-                _weaponSystemProfiles[WeaponSystems.SPEC_INF_UK] = profile;
+                _weaponSystemProfiles[WeaponSystems.SAM_RAPIER] = profile;
             }
             catch (Exception e)
             {
-                AppService.HandleException(CLASS_NAME, nameof(CreateSpecInfUKProfile), e);
+                AppService.HandleException(CLASS_NAME, nameof(Create_SAM_Rapier_Profile), e);
                 throw;
             }
         }
 
         /// <summary>
-        /// UK Engineer INF
+        /// Tornado GR1 Multi-Role ASF
         /// </summary>
-        private static void CreateEngInfUKProfile()
+        private static void Create_MRF_GR1_Profile()
         {
             try
             {
                 var profile = new WeaponSystemProfile(
-                    name: "US Combat Engineers",
+                    name: "Tornado GR.1 Multirole Fighter",
                     nationality: Nationality.UK,
-                    weaponSystemID: WeaponSystems.ENG_INF_UK,
-                    24,
-                    hardAttack: 5,
-                    hardDefense: 4,
-                    softAttack: 10,
-                    softDefense: 13,
-                    groundAirAttack: 3,
-                    groundAirDefense: 4,
+                    weaponSystemID: WeaponSystems.MRF_TORNADO_GR1,
+                    65,
+                    dogfighting: 11,
+                    maneuverability: 8,
+                    topSpeed: 13,
+                    survivability: 9,
+                    groundAttack: 10,
+                    ordinanceLoad: 12,
+                    stealth: 0,
                     primaryRange: 1f,
                     indirectRange: 0f,
-                    spottingRange: 2f,
-                    allWeatherCapability: AllWeatherRating.Night,
-                    nvgCapability: NVG_Rating.Gen2,
-                    silhouette: UnitSilhouette.Small,
+                    spottingRange: 4f,
+                    allWeatherCapability: AllWeatherRating.AllWeather,
                     sigintRating: SIGINT_Rating.UnitLevel,
-                    nbcRating: NBC_Rating.Gen2,
-                    strategicMobility: StrategicMobility.AirDrop
+                    nbcRating: NBC_Rating.Gen1,
+                    strategicMobility: StrategicMobility.Aircraft,
+                    nvgCapability: NVG_Rating.None,
+                    silhouette: UnitSilhouette.Medium
                 );
 
                 // Set upgrade paths
-                profile.AddUpgradeType(UpgradeType.INF);
+                profile.AddUpgradeType(UpgradeType.ASF);
 
                 // Set short name for UI display
-                profile.SetShortName("Engineers");
+                profile.SetShortName("Tornado GR.1");
 
-                // Set turn availability in months.
-                profile.SetTurnAvailable(300);
+                // Set turn availability - entered service in 1960
+                profile.SetTurnAvailable(264);
 
                 // Store in master dictionary
-                _weaponSystemProfiles[WeaponSystems.ENG_INF_UK] = profile;
+                _weaponSystemProfiles[WeaponSystems.MRF_TORNADO_GR1] = profile;
             }
             catch (Exception e)
             {
-                AppService.HandleException(CLASS_NAME, nameof(CreateEngInfUKProfile), e);
+                AppService.HandleException(CLASS_NAME, nameof(Create_MRF_GR1_Profile), e);
                 throw;
             }
         }
@@ -5480,7 +4660,7 @@ namespace HammerAndSickle.Models
 
         #region France
 
-        private static void CreateTankAMX30Profile()
+        private static void Create_TANK_AMX30_Profile()
         {
             try
             {
@@ -5509,10 +4689,10 @@ namespace HammerAndSickle.Models
                 profile.SetTurnAvailable(324); // 1965
                 _weaponSystemProfiles[WeaponSystems.TANK_AMX30] = profile;
             }
-            catch (Exception e) { AppService.HandleException(CLASS_NAME, nameof(CreateTankAMX30Profile), e); throw; }
+            catch (Exception e) { AppService.HandleException(CLASS_NAME, nameof(Create_TANK_AMX30_Profile), e); throw; }
         }
 
-        private static void CreateSpaaaRolandProfile()
+        private static void Create_SPAAA_Roland_Profile()
         {
             try
             {
@@ -5543,197 +4723,187 @@ namespace HammerAndSickle.Models
                 profile.SetTurnAvailable(456); // 1976
                 _weaponSystemProfiles[WeaponSystems.SPAAA_ROLAND] = profile;
             }
-            catch (Exception e) { AppService.HandleException(CLASS_NAME, nameof(CreateSpaaaRolandProfile), e); throw; }
+            catch (Exception e) { AppService.HandleException(CLASS_NAME, nameof(Create_SPAAA_Roland_Profile), e); throw; }
         }
 
         /// <summary>
-        /// FRA Regular INF
+        /// AMX-10P IFV
         /// </summary>
-        private static void CreateRegInfFRAProfile()
+        private static void Create_IFV_AMX10P_Profile()
         {
             try
             {
                 var profile = new WeaponSystemProfile(
-                    name: "French Regular Infantry",
+                    name: "AMX-10P",
                     nationality: Nationality.FRA,
-                    weaponSystemID: WeaponSystems.REG_INF_FRA,
-                    18,
-                    hardAttack: 5,
+                    weaponSystemID: WeaponSystems.IFV_AMX10P,
+                    65,
+                    hardAttack: 9,
                     hardDefense: 4,
-                    softAttack: 10,
-                    softDefense: 11,
-                    groundAirAttack: 3,
-                    groundAirDefense: 4,
+                    softAttack: 8,
+                    softDefense: 8,
+                    groundAirDefense: CUConstants.GROUND_DEFENSE_LIGHTARMOR,
                     primaryRange: 1f,
-                    indirectRange: 0f,
                     spottingRange: 2f,
-                    allWeatherCapability: AllWeatherRating.AllWeather,
-                    nvgCapability: NVG_Rating.Gen2,
-                    silhouette: UnitSilhouette.Small,
+                    allWeatherCapability: AllWeatherRating.GroundUnit,
                     sigintRating: SIGINT_Rating.UnitLevel,
-                    nbcRating: NBC_Rating.Gen2,
-                    strategicMobility: StrategicMobility.AirLift
-                );
+                    nbcRating: NBC_Rating.Gen1,
+                    strategicMobility: StrategicMobility.AirLift,
+                    nvgCapability: NVG_Rating.Gen1,
+                    silhouette: UnitSilhouette.Small,
+                    movementPoints: CUConstants.MECH_UNIT);
 
-                // Upgrade paths
-                profile.AddUpgradeType(UpgradeType.INF);
-
-                // Set short name for UI display
-                profile.SetShortName("Infantry");
-
-                // Set turn availability in months.
-                profile.SetTurnAvailable(300);
-
-                // Store in master dictionary
-                _weaponSystemProfiles[WeaponSystems.REG_INF_FRA] = profile;
+                profile.AddUpgradeType(UpgradeType.IFV);
+                profile.SetShortName("AMX-10P");
+                profile.SetTurnAvailable(300); // 1973
+                _weaponSystemProfiles[WeaponSystems.IFV_AMX10P] = profile;
             }
-            catch (Exception e)
-            {
-                AppService.HandleException(CLASS_NAME, nameof(CreateRegInfFRAProfile), e);
-                throw;
-            }
+            catch (Exception e) { AppService.HandleException(CLASS_NAME, nameof(Create_IFV_AMX10P_Profile), e); throw; }
         }
 
         /// <summary>
-        /// FRA Air Mobile INF
+        /// VAB Armored Personnel Carrier
         /// </summary>
-        private static void CreateAmInfFRAProfile()
+        private static void Create_APC_VAB_Profile()
         {
             try
             {
                 var profile = new WeaponSystemProfile(
-                    name: "French Air Mobile Infantry",
+                    name: "VAB APC",
                     nationality: Nationality.FRA,
-                    weaponSystemID: WeaponSystems.AM_INF_FRA,
-                    22,
-                    hardAttack: 5,
-                    hardDefense: 4,
-                    softAttack: 10,
-                    softDefense: 11,
-                    groundAirAttack: 3,
-                    groundAirDefense: 4,
+                    weaponSystemID: WeaponSystems.APC_VAB,
+                    25,
+                    hardAttack: 2,
+                    hardDefense: 3,
+                    softAttack: 5,
+                    softDefense: 5,
+                    groundAirAttack: 1,
+                    groundAirDefense: 2,
                     primaryRange: 1f,
                     indirectRange: 0f,
                     spottingRange: 2f,
-                    allWeatherCapability: AllWeatherRating.Night,
-                    nvgCapability: NVG_Rating.Gen2,
-                    silhouette: UnitSilhouette.Small,
+                    allWeatherCapability: AllWeatherRating.GroundUnit,
                     sigintRating: SIGINT_Rating.UnitLevel,
-                    nbcRating: NBC_Rating.Gen2,
-                    strategicMobility: StrategicMobility.AirMobile
+                    nbcRating: NBC_Rating.Gen1,
+                    strategicMobility: StrategicMobility.AirLift,
+                    nvgCapability: NVG_Rating.Gen1,
+                    silhouette: UnitSilhouette.Small
                 );
 
                 // Set upgrade paths
-                profile.AddUpgradeType(UpgradeType.INF);
+                profile.AddUpgradeType(UpgradeType.APC);
 
                 // Set short name for UI display
-                profile.SetShortName("Air Mobile");
+                profile.SetShortName("VAB");
 
-                // Set turn availability in months.
-                profile.SetTurnAvailable(440);
+                // Set turn availability - entered service in 1960
+                profile.SetTurnAvailable(264);
 
                 // Store in master dictionary
-                _weaponSystemProfiles[WeaponSystems.AM_INF_FRA] = profile;
+                _weaponSystemProfiles[WeaponSystems.APC_VAB] = profile;
             }
             catch (Exception e)
             {
-                AppService.HandleException(CLASS_NAME, nameof(CreateAmInfFRAProfile), e);
+                AppService.HandleException(CLASS_NAME, nameof(Create_APC_VAB_Profile), e);
                 throw;
             }
         }
 
         /// <summary>
-        /// FRA Special Forces INF
+        /// ERC-90 Recon Vehicle
         /// </summary>
-        private static void CreateSpecInfFRAProfile()
+        private static void Create_RCN_ERC90_Profile()
         {
             try
             {
                 var profile = new WeaponSystemProfile(
-                    name: "French Special Forces Infantry",
+                    name: "ERC-90 Recon Vehicle",
                     nationality: Nationality.FRA,
-                    weaponSystemID: WeaponSystems.SPEC_INF_FRA,
-                    35,
-                    hardAttack: 9,
-                    hardDefense: 5,
-                    softAttack: 12,
-                    softDefense: 13,
-                    groundAirAttack: 4,
-                    groundAirDefense: 7,
+                    weaponSystemID: WeaponSystems.RCN_ERC90,
+                    22,
+                    hardAttack: 4,
+                    hardDefense: 3,
+                    softAttack: 6,
+                    softDefense: 6,
+                    groundAirDefense: CUConstants.GROUND_DEFENSE_LIGHTARMOR,
                     primaryRange: 1f,
                     indirectRange: 0f,
                     spottingRange: 3f,
-                    allWeatherCapability: AllWeatherRating.AllWeather,
-                    nvgCapability: NVG_Rating.Gen3,
+                    allWeatherCapability: AllWeatherRating.GroundUnit,
+                    nvgCapability: NVG_Rating.Gen1,
                     silhouette: UnitSilhouette.Small,
-                    sigintRating: SIGINT_Rating.SpecializedLevel,
-                    nbcRating: NBC_Rating.Gen2,
-                    strategicMobility: StrategicMobility.AirMobile
+                    sigintRating: SIGINT_Rating.UnitLevel,
+                    nbcRating: NBC_Rating.Gen1,
+                    strategicMobility: StrategicMobility.AirDrop,
+                    movementPoints: CUConstants.MECH_UNIT
                 );
 
                 // Set upgrade paths
-                profile.AddUpgradeType(UpgradeType.INF);
+                profile.AddUpgradeType(UpgradeType.RECON);
+
+                // Set amphibious capability
+                profile.SetAmphibiousCapability(true);
 
                 // Set short name for UI display
-                profile.SetShortName("Special Forces");
+                profile.SetShortName("ERC-90");
 
                 // Set turn availability in months.
-                profile.SetTurnAvailable(300);
+                profile.SetTurnAvailable(288);
 
                 // Store in master dictionary
-                _weaponSystemProfiles[WeaponSystems.SPEC_INF_FRA] = profile;
+                _weaponSystemProfiles[WeaponSystems.RCN_ERC90] = profile;
             }
             catch (Exception e)
             {
-                AppService.HandleException(CLASS_NAME, nameof(CreateSpecInfFRAProfile), e);
+                AppService.HandleException(CLASS_NAME, nameof(Create_RCN_ERC90_Profile), e);
                 throw;
             }
         }
 
         /// <summary>
-        /// FRA Engineer INF
+        /// AUF-1 Self-Propelled Howitzer
         /// </summary>
-        private static void CreateEngInfFRAProfile()
+        private static void Create_SPA_AUF1_Profile()
         {
             try
             {
                 var profile = new WeaponSystemProfile(
-                    name: "French Combat Engineers",
+                    name: "AMX-30 AuF1 Self-Propelled Artillery",
                     nationality: Nationality.FRA,
-                    weaponSystemID: WeaponSystems.ENG_INF_FRA,
-                    24,
-                    hardAttack: 5,
+                    weaponSystemID: WeaponSystems.SPA_AUF1,
+                    60,
+                    hardAttack: 9,
                     hardDefense: 4,
-                    softAttack: 10,
-                    softDefense: 13,
-                    groundAirAttack: 3,
-                    groundAirDefense: 4,
+                    softAttack: 14,
+                    softDefense: 6,
+                    groundAirAttack: 1,
+                    groundAirDefense: 3,
                     primaryRange: 1f,
-                    indirectRange: 0f,
+                    indirectRange: 5f,
                     spottingRange: 2f,
-                    allWeatherCapability: AllWeatherRating.Night,
-                    nvgCapability: NVG_Rating.Gen2,
-                    silhouette: UnitSilhouette.Small,
+                    allWeatherCapability: AllWeatherRating.GroundUnit,
                     sigintRating: SIGINT_Rating.UnitLevel,
                     nbcRating: NBC_Rating.Gen2,
-                    strategicMobility: StrategicMobility.AirDrop
+                    strategicMobility: StrategicMobility.Heavy,
+                    nvgCapability: NVG_Rating.Gen2,
+                    silhouette: UnitSilhouette.Large
                 );
 
                 // Set upgrade paths
-                profile.AddUpgradeType(UpgradeType.INF);
+                profile.AddUpgradeType(UpgradeType.SPA);
 
                 // Set short name for UI display
-                profile.SetShortName("Engineers");
+                profile.SetShortName("AuF1");
 
-                // Set turn availability in months.
+                // Set turn availability - entered service in 1963
                 profile.SetTurnAvailable(300);
 
                 // Store in master dictionary
-                _weaponSystemProfiles[WeaponSystems.ENG_INF_FRA] = profile;
+                _weaponSystemProfiles[WeaponSystems.SPA_AUF1] = profile;
             }
             catch (Exception e)
             {
-                AppService.HandleException(CLASS_NAME, nameof(CreateEngInfFRAProfile), e);
+                AppService.HandleException(CLASS_NAME, nameof(Create_SPA_AUF1_Profile), e);
                 throw;
             }
         }
@@ -5741,7 +4911,7 @@ namespace HammerAndSickle.Models
         /// <summary>
         /// Mirage 2000 ASF
         /// </summary>
-        private static void CreateAsfM2000Profile()
+        private static void Create_ASF_M2000_Profile()
         {
             try
             {
@@ -5782,7 +4952,7 @@ namespace HammerAndSickle.Models
             }
             catch (Exception e)
             {
-                AppService.HandleException(CLASS_NAME, nameof(CreateAsfM2000Profile), e);
+                AppService.HandleException(CLASS_NAME, nameof(Create_ASF_M2000_Profile), e);
                 throw;
             }
         }
@@ -5790,7 +4960,7 @@ namespace HammerAndSickle.Models
         /// <summary>
         /// SEPECAT Jaguar ATT
         /// </summary>
-        private static void CreateAttJaguarProfile()
+        private static void Create_ATT_JAGUAR_Profile()
         {
             try
             {
@@ -5831,193 +5001,7 @@ namespace HammerAndSickle.Models
             }
             catch (Exception e)
             {
-                AppService.HandleException(CLASS_NAME, nameof(CreateAttJaguarProfile), e);
-                throw;
-            }
-        }
-
-        #endregion
-
-        //-----------------------------------------------------------------------------------------
-
-        #region Arab Nations
-
-        private static void CreateRegInfArabProfile()
-        {
-            try
-            {
-                var profile = new WeaponSystemProfile(
-                    name: "Regular Infantry",
-                    nationality: Nationality.MJ,
-                    weaponSystemID: WeaponSystems.REG_INF_ARAB,
-                    15,
-                    hardAttack: 4,
-                    hardDefense: 3,
-                    softAttack: 9,
-                    softDefense: 10,
-                    groundAirDefense: CUConstants.GROUND_DEFENSE_INFANTRY,
-                    primaryRange: 1f,
-                    indirectRange: 0f,
-                    spottingRange: 2f,
-                    allWeatherCapability: AllWeatherRating.GroundUnit,
-                    nvgCapability: NVG_Rating.None,
-                    silhouette: UnitSilhouette.Small,
-                    sigintRating: SIGINT_Rating.UnitLevel,
-                    nbcRating: NBC_Rating.Gen1,
-                    strategicMobility: StrategicMobility.AirLift,
-                    movementPoints: CUConstants.FOOT_UNIT
-                );
-
-                // Upgrade paths
-                profile.AddUpgradeType(UpgradeType.INF);
-
-                // Set short name for UI display
-                profile.SetShortName("Infantry");
-
-                // Set turn availability in months.
-                profile.SetTurnAvailable(300);
-
-                // Store in master dictionary
-                _weaponSystemProfiles[WeaponSystems.REG_INF_ARAB] = profile;
-            }
-            catch (Exception e)
-            {
-                AppService.HandleException(CLASS_NAME, nameof(CreateRegInfArabProfile), e);
-                throw;
-            }
-        }
-
-        private static void CreateIregInfArabProfile()
-        {
-            try
-            {
-                var profile = new WeaponSystemProfile(
-                    name: "Irregular Infantry",
-                    nationality: Nationality.MJ,
-                    weaponSystemID: WeaponSystems.IREG_INF_ARAB,
-                    18,
-                    hardAttack: 4,
-                    hardDefense: 3,
-                    softAttack: 9,
-                    softDefense: 10,
-                    groundAirDefense: CUConstants.GROUND_DEFENSE_INFANTRY,
-                    primaryRange: 1f,
-                    indirectRange: 0f,
-                    spottingRange: 2f,
-                    allWeatherCapability: AllWeatherRating.GroundUnit,
-                    nvgCapability: NVG_Rating.Gen1,
-                    silhouette: UnitSilhouette.Small,
-                    sigintRating: SIGINT_Rating.UnitLevel,
-                    nbcRating: NBC_Rating.Gen1,
-                    strategicMobility: StrategicMobility.AirDrop,
-                    movementPoints: CUConstants.FOOT_UNIT
-                );
-
-                // Upgrade paths
-                profile.AddUpgradeType(UpgradeType.INF);
-
-                // Set short name for UI display
-                profile.SetShortName("Irregulars");
-
-                // Set turn availability in months.
-                profile.SetTurnAvailable(300);
-
-                // Store in master dictionary
-                _weaponSystemProfiles[WeaponSystems.IREG_INF_ARAB] = profile;
-            }
-            catch (Exception e)
-            {
-                AppService.HandleException(CLASS_NAME, nameof(CreateIregInfArabProfile), e);
-                throw;
-            }
-        }
-
-        private static void CreateSpecInfArabProfile()
-        {
-            try
-            {
-                var profile = new WeaponSystemProfile(
-                    name: "Special Forces Infantry",
-                    nationality: Nationality.MJ,
-                    weaponSystemID: WeaponSystems.SPEC_INF_ARAB,
-                    30,
-                    hardAttack: 8,
-                    hardDefense: 4,
-                    softAttack: 11,
-                    softDefense: 12,
-                    groundAirDefense: CUConstants.GROUND_DEFENSE_INFANTRY,
-                    primaryRange: 1f,
-                    indirectRange: 0f,
-                    spottingRange: 3f,
-                    allWeatherCapability: AllWeatherRating.GroundUnit,
-                    nvgCapability: NVG_Rating.Gen2,
-                    silhouette: UnitSilhouette.Small,
-                    sigintRating: SIGINT_Rating.SpecializedLevel,
-                    nbcRating: NBC_Rating.Gen1,
-                    strategicMobility: StrategicMobility.AirMobile,
-                    movementPoints: CUConstants.FOOT_UNIT
-                );
-
-                // Set upgrade paths
-                profile.AddUpgradeType(UpgradeType.INF);
-
-                // Set short name for UI display
-                profile.SetShortName("Special Forces");
-
-                // Set turn availability in months.
-                profile.SetTurnAvailable(300);
-
-                // Store in master dictionary
-                _weaponSystemProfiles[WeaponSystems.SPEC_INF_ARAB] = profile;
-            }
-            catch (Exception e)
-            {
-                AppService.HandleException(CLASS_NAME, nameof(CreateSpecInfArabProfile), e);
-                throw;
-            }
-        }
-
-        private static void CreateEngInfArabProfile()
-        {
-            try
-            {
-                var profile = new WeaponSystemProfile(
-                    name: "Combat Engineers",
-                    nationality: Nationality.MJ,
-                    weaponSystemID: WeaponSystems.ENG_INF_ARAB,
-                    20,
-                    hardAttack: 4,
-                    hardDefense: 3,
-                    softAttack: 9,
-                    softDefense: 12,
-                    groundAirDefense: CUConstants.GROUND_DEFENSE_INFANTRY,
-                    primaryRange: 1f,
-                    indirectRange: 0f,
-                    spottingRange: 2f,
-                    allWeatherCapability: AllWeatherRating.GroundUnit,
-                    nvgCapability: NVG_Rating.None,
-                    silhouette: UnitSilhouette.Small,
-                    sigintRating: SIGINT_Rating.UnitLevel,
-                    nbcRating: NBC_Rating.Gen1,
-                    strategicMobility: StrategicMobility.AirDrop,
-                    movementPoints: CUConstants.FOOT_UNIT
-                );
-
-                // Set upgrade paths
-                profile.AddUpgradeType(UpgradeType.INF);
-
-                // Set short name for UI display
-                profile.SetShortName("Engineers");
-
-                // Set turn availability in months.
-                profile.SetTurnAvailable(300);
-
-                // Store in master dictionary
-                _weaponSystemProfiles[WeaponSystems.ENG_INF_ARAB] = profile;
-            }
-            catch (Exception e)
-            {
-                AppService.HandleException(CLASS_NAME, nameof(CreateEngInfArabProfile), e);
+                AppService.HandleException(CLASS_NAME, nameof(Create_ATT_JAGUAR_Profile), e);
                 throw;
             }
         }
@@ -6031,14 +5015,14 @@ namespace HammerAndSickle.Models
         /// <summary>
         /// Generic AAA profile
         /// </summary>
-        private static void CreateAAA_GenericProfile()
+        private static void Create_GENERIC_AAA_Profile()
         {
             try
             {
                 var profile = new WeaponSystemProfile(
                     name: "Anti-Aircraft Artillery",
-                    nationality: Nationality.USSR,
-                    weaponSystemID: WeaponSystems.AAA_GENERIC,
+                    nationality: Nationality.GENERIC,
+                    weaponSystemID: WeaponSystems.GENERIC_AAA,
                     15,
                     hardAttack: 3,
                     hardDefense: 1,
@@ -6068,11 +5052,11 @@ namespace HammerAndSickle.Models
                 profile.SetTurnAvailable(228);
 
                 // Store in master dictionary
-                _weaponSystemProfiles[WeaponSystems.AAA_GENERIC] = profile;
+                _weaponSystemProfiles[WeaponSystems.GENERIC_AAA] = profile;
             }
             catch (Exception e)
             {
-                AppService.HandleException(CLASS_NAME, nameof(CreateAAA_GenericProfile), e);
+                AppService.HandleException(CLASS_NAME, nameof(Create_GENERIC_AAA_Profile), e);
                 throw;
             }
         }
@@ -6080,14 +5064,14 @@ namespace HammerAndSickle.Models
         /// <summary>
         /// Generic Man-portable Air Defense profile
         /// </summary>
-        private static void CreateMANPAD_GenericProfile()
+        private static void Create_GENERIC_MANPAD_Profile()
         {
             try
             {
                 var profile = new WeaponSystemProfile(
                     name: "Man-Portable Air Defense",
-                    nationality: Nationality.USSR,
-                    weaponSystemID: WeaponSystems.MANPAD_GENERIC,
+                    nationality: Nationality.GENERIC,
+                    weaponSystemID: WeaponSystems.GENERIC_MANPAD,
                     10,
                     hardAttack: 1,
                     hardDefense: 1,
@@ -6117,11 +5101,11 @@ namespace HammerAndSickle.Models
                 profile.SetTurnAvailable(360);
 
                 // Store in master dictionary
-                _weaponSystemProfiles[WeaponSystems.MANPAD_GENERIC] = profile;
+                _weaponSystemProfiles[WeaponSystems.GENERIC_MANPAD] = profile;
             }
             catch (Exception e)
             {
-                AppService.HandleException(CLASS_NAME, nameof(CreateMANPAD_GenericProfile), e);
+                AppService.HandleException(CLASS_NAME, nameof(Create_GENERIC_MANPAD_Profile), e);
                 throw;
             }
         }
@@ -6129,14 +5113,14 @@ namespace HammerAndSickle.Models
         /// <summary>
         /// Create a generic light towed artillery profile.
         /// </summary>
-        private static void CreateLightArt_GenericProfile()
+        private static void Create_GENERIC_LightArt_Profile()
         {
             try
             {
                 var profile = new WeaponSystemProfile(
                     name: "Light Towed Artillery",
-                    nationality: Nationality.USSR,
-                    weaponSystemID: WeaponSystems.ART_LIGHT_GENERIC,
+                    nationality: Nationality.GENERIC,
+                    weaponSystemID: WeaponSystems.GENERIC_ART_LIGHT,
                     20,
                     hardAttack: 4,
                     hardDefense: 3,
@@ -6165,11 +5149,11 @@ namespace HammerAndSickle.Models
                 profile.SetTurnAvailable(1);
 
                 // Store in master dictionary
-                _weaponSystemProfiles[WeaponSystems.ART_LIGHT_GENERIC] = profile;
+                _weaponSystemProfiles[WeaponSystems.GENERIC_ART_LIGHT] = profile;
             }
             catch (Exception e)
             {
-                AppService.HandleException(CLASS_NAME, nameof(CreateLightArt_GenericProfile), e);
+                AppService.HandleException(CLASS_NAME, nameof(Create_GENERIC_LightArt_Profile), e);
                 throw;
             }
         }
@@ -6177,14 +5161,14 @@ namespace HammerAndSickle.Models
         /// <summary>
         /// Create a generic light towed artillery profile.
         /// </summary>
-        private static void CreateHeavytArt_GenericProfile()
+        private static void Create_GENERIC_HeavytArt_Profile()
         {
             try
             {
                 var profile = new WeaponSystemProfile(
                     name: "Heavy Towed Artillery",
-                    nationality: Nationality.USSR,
-                    weaponSystemID: WeaponSystems.ART_HEAVY_GENERIC,
+                    nationality: Nationality.GENERIC,
+                    weaponSystemID: WeaponSystems.GENERIC_ART_HEAVY,
                     30,
                     hardAttack: 6,
                     hardDefense: 3,
@@ -6213,11 +5197,11 @@ namespace HammerAndSickle.Models
                 profile.SetTurnAvailable(1);
 
                 // Store in master dictionary
-                _weaponSystemProfiles[WeaponSystems.ART_HEAVY_GENERIC] = profile;
+                _weaponSystemProfiles[WeaponSystems.GENERIC_ART_HEAVY] = profile;
             }
             catch (Exception e)
             {
-                AppService.HandleException(CLASS_NAME, nameof(CreateHeavytArt_GenericProfile), e);
+                AppService.HandleException(CLASS_NAME, nameof(Create_GENERIC_HeavytArt_Profile), e);
                 throw;
             }
         }
@@ -6225,14 +5209,14 @@ namespace HammerAndSickle.Models
         /// <summary>
         /// Create a generic Anti-Tank Guided Missile (ATGM) profile.
         /// </summary>
-        private static void CreateATGM_GenericProfile()
+        private static void Create_GENERIC_ATGM_Profile()
         {
             try
             {
                 var profile = new WeaponSystemProfile(
                     name: "Anti-Tank Guided Missile",
-                    nationality: Nationality.USSR,
-                    weaponSystemID: WeaponSystems.ATGM_GENERIC,
+                    nationality: Nationality.GENERIC,
+                    weaponSystemID: WeaponSystems.GENERIC_ATGM,
                     10,
                     hardAttack: 10,
                     hardDefense: 1,
@@ -6261,11 +5245,11 @@ namespace HammerAndSickle.Models
                 profile.SetTurnAvailable(432);
 
                 // Store in master dictionary
-                _weaponSystemProfiles[WeaponSystems.ATGM_GENERIC] = profile;
+                _weaponSystemProfiles[WeaponSystems.GENERIC_ATGM] = profile;
             }
             catch (Exception e)
             {
-                AppService.HandleException(CLASS_NAME, nameof(CreateATGM_GenericProfile), e);
+                AppService.HandleException(CLASS_NAME, nameof(Create_GENERIC_ATGM_Profile), e);
                 throw;
             }
         }
@@ -6279,14 +5263,14 @@ namespace HammerAndSickle.Models
         /// <summary>
         /// Create a generic land base profile.
         /// </summary>
-        private static void CreateLandbase_GenericProfile()
+        private static void Create_BASE_Landbase_Profile()
         {
             try
             {
                 var profile = new WeaponSystemProfile(
                     name: "HQ LandBase",
-                    nationality: Nationality.USSR,
-                    weaponSystemID: WeaponSystems.LANDBASE_GENERIC,
+                    nationality: Nationality.GENERIC,
+                    weaponSystemID: WeaponSystems.GENERIC_LANDBASE,
                     50,
                     hardAttack: 4,
                     hardDefense: 3,
@@ -6315,11 +5299,11 @@ namespace HammerAndSickle.Models
                 profile.SetTurnAvailable(1);
 
                 // Store in master dictionary
-                _weaponSystemProfiles[WeaponSystems.LANDBASE_GENERIC] = profile;
+                _weaponSystemProfiles[WeaponSystems.GENERIC_LANDBASE] = profile;
             }
             catch (Exception e)
             {
-                AppService.HandleException(CLASS_NAME, nameof(CreateLandbase_GenericProfile), e);
+                AppService.HandleException(CLASS_NAME, nameof(Create_BASE_Landbase_Profile), e);
                 throw;
             }
         }
@@ -6327,14 +5311,14 @@ namespace HammerAndSickle.Models
         /// <summary>
         /// Create a generic airbase profile.
         /// </summary>
-        private static void CreateAirbase_GenericProfile()
+        private static void Create_BASE_Airbase_Profile()
         {
             try
             {
                 var profile = new WeaponSystemProfile(
                     name: "Airbase",
-                    nationality: Nationality.USSR,
-                    weaponSystemID: WeaponSystems.AIRBASE_GENERIC,
+                    nationality: Nationality.GENERIC,
+                    weaponSystemID: WeaponSystems.GENERIC_AIRBASE,
                     50,
                     hardAttack: 4,
                     hardDefense: 3,
@@ -6363,11 +5347,11 @@ namespace HammerAndSickle.Models
                 profile.SetTurnAvailable(1);
 
                 // Store in master dictionary
-                _weaponSystemProfiles[WeaponSystems.AIRBASE_GENERIC] = profile;
+                _weaponSystemProfiles[WeaponSystems.GENERIC_AIRBASE] = profile;
             }
             catch (Exception e)
             {
-                AppService.HandleException(CLASS_NAME, nameof(CreateAirbase_GenericProfile), e);
+                AppService.HandleException(CLASS_NAME, nameof(Create_BASE_Airbase_Profile), e);
                 throw;
             }
         }
@@ -6375,14 +5359,14 @@ namespace HammerAndSickle.Models
         /// <summary>
         /// Create a generic supply depot profile.
         /// </summary>
-        private static void CreateDepot_GenericProfile()
+        private static void Create_BASE_Depot_Profile()
         {
             try
             {
                 var profile = new WeaponSystemProfile(
                     name: "Suppy Depot",
-                    nationality: Nationality.USSR,
-                    weaponSystemID: WeaponSystems.SUPPLYDEPOT_GENERIC,
+                    nationality: Nationality.GENERIC,
+                    weaponSystemID: WeaponSystems.GENERIC_SUPPLYDEPOT,
                     150,
                     hardAttack: 4,
                     hardDefense: 3,
@@ -6411,11 +5395,11 @@ namespace HammerAndSickle.Models
                 profile.SetTurnAvailable(1);
 
                 // Store in master dictionary
-                _weaponSystemProfiles[WeaponSystems.SUPPLYDEPOT_GENERIC] = profile;
+                _weaponSystemProfiles[WeaponSystems.GENERIC_SUPPLYDEPOT] = profile;
             }
             catch (Exception e)
             {
-                AppService.HandleException(CLASS_NAME, nameof(CreateDepot_GenericProfile), e);
+                AppService.HandleException(CLASS_NAME, nameof(Create_BASE_Depot_Profile), e);
                 throw;
             }
         }
@@ -6423,14 +5407,14 @@ namespace HammerAndSickle.Models
         /// <summary>
         /// Create a generic intelligence gathering base profile.
         /// </summary>
-        private static void CreateIntelBase_GenericProfile()
+        private static void Create_BASE_Intel_Profile()
         {
             try
             {
                 var profile = new WeaponSystemProfile(
                     name: "Intelligence Gathering Base",
-                    nationality: Nationality.USSR,
-                    weaponSystemID: WeaponSystems.LANDBASE_GENERIC,
+                    nationality: Nationality.GENERIC,
+                    weaponSystemID: WeaponSystems.GENERIC_LANDBASE,
                     150,
                     hardAttack: 4,
                     hardDefense: 3,
@@ -6459,11 +5443,305 @@ namespace HammerAndSickle.Models
                 profile.SetTurnAvailable(1);
 
                 // Store in master dictionary
-                _weaponSystemProfiles[WeaponSystems.LANDBASE_GENERIC] = profile;
+                _weaponSystemProfiles[WeaponSystems.GENERIC_LANDBASE] = profile;
             }
             catch (Exception e)
             {
-                AppService.HandleException(CLASS_NAME, nameof(CreateIntelBase_GenericProfile), e);
+                AppService.HandleException(CLASS_NAME, nameof(Create_BASE_Intel_Profile), e);
+                throw;
+            }
+        }
+
+        #endregion
+
+        //-----------------------------------------------------------------------------------------
+
+        #region Infantry
+
+        /// <summary>
+        /// Regular Infantry
+        /// </summary>
+        private static void Create_INF_REG_Profile()
+        {
+            try
+            {
+                var profile = new WeaponSystemProfile(
+                    name: "Regular Infantry",
+                    nationality: Nationality.GENERIC,
+                    weaponSystemID: WeaponSystems.INF_REG,
+                    15,
+                    hardAttack: 4,
+                    hardDefense: 3,
+                    softAttack: 9,
+                    softDefense: 10,
+                    groundAirDefense: CUConstants.GROUND_DEFENSE_INFANTRY,
+                    primaryRange: 1f,
+                    indirectRange: 0f,
+                    spottingRange: 2f,
+                    allWeatherCapability: AllWeatherRating.GroundUnit,
+                    nvgCapability: NVG_Rating.None,
+                    silhouette: UnitSilhouette.Small,
+                    sigintRating: SIGINT_Rating.UnitLevel,
+                    nbcRating: NBC_Rating.Gen1,
+                    strategicMobility: StrategicMobility.AirLift,
+                    movementPoints: CUConstants.FOOT_UNIT
+                );
+
+                // Upgrade paths
+                profile.AddUpgradeType(UpgradeType.INF);
+
+                // Set short name for UI display
+                profile.SetShortName("Regulars");
+
+                // Set turn availability in months.
+                profile.SetTurnAvailable(1);
+
+                // Store in master dictionary
+                _weaponSystemProfiles[WeaponSystems.INF_REG] = profile;
+            }
+            catch (Exception e)
+            {
+                AppService.HandleException(CLASS_NAME, nameof(Create_INF_REG_Profile), e);
+                throw;
+            }
+        }
+
+        /// <summary>
+        /// Airborne infantry
+        /// </summary>
+        private static void Create_INF_AB_Profile()
+        {
+            try
+            {
+                var profile = new WeaponSystemProfile(
+                    name: "Airborne Infantry",
+                    nationality: Nationality.GENERIC,
+                    weaponSystemID: WeaponSystems.INF_AB,
+                    18,
+                    hardAttack: 4,
+                    hardDefense: 3,
+                    softAttack: 9,
+                    softDefense: 10,
+                    groundAirDefense: CUConstants.GROUND_DEFENSE_INFANTRY,
+                    primaryRange: 1f,
+                    indirectRange: 0f,
+                    spottingRange: 2f,
+                    allWeatherCapability: AllWeatherRating.GroundUnit,
+                    nvgCapability: NVG_Rating.Gen1,
+                    silhouette: UnitSilhouette.Small,
+                    sigintRating: SIGINT_Rating.UnitLevel,
+                    nbcRating: NBC_Rating.Gen1,
+                    strategicMobility: StrategicMobility.AirDrop,
+                    movementPoints: CUConstants.FOOT_UNIT
+                );
+
+                // Upgrade paths
+                profile.AddUpgradeType(UpgradeType.INF);
+
+                // Set short name for UI display
+                profile.SetShortName("Airborne");
+
+                // Set turn availability in months.
+                profile.SetTurnAvailable(50);
+
+                // Store in master dictionary
+                _weaponSystemProfiles[WeaponSystems.INF_AB] = profile;
+            }
+            catch (Exception e)
+            {
+                AppService.HandleException(CLASS_NAME, nameof(Create_INF_AB_Profile), e);
+                throw;
+            }
+        }
+
+        /// <summary>
+        /// Air-Mobile Infantry
+        /// </summary>
+        private static void Create_INF_AM_Profile()
+        {
+            try
+            {
+                var profile = new WeaponSystemProfile(
+                    name: "Air‑Mobile Infantry",
+                    nationality: Nationality.GENERIC,
+                    weaponSystemID: WeaponSystems.INF_AM,
+                    18,
+                    hardAttack: 4,
+                    hardDefense: 3,
+                    softAttack: 9,
+                    softDefense: 10,
+                    groundAirDefense: CUConstants.GROUND_DEFENSE_INFANTRY,
+                    primaryRange: 1f,
+                    indirectRange: 0f,
+                    spottingRange: 2f,
+                    allWeatherCapability: AllWeatherRating.GroundUnit,
+                    nvgCapability: NVG_Rating.Gen1,
+                    silhouette: UnitSilhouette.Small,
+                    sigintRating: SIGINT_Rating.UnitLevel,
+                    nbcRating: NBC_Rating.Gen1,
+                    strategicMobility: StrategicMobility.AirMobile,
+                    movementPoints: CUConstants.FOOT_UNIT
+                );
+
+                // Set upgrade paths
+                profile.AddUpgradeType(UpgradeType.INF);
+
+                // Set short name for UI display
+                profile.SetShortName("Air-Mobile");
+
+                // Set turn availability in months.
+                profile.SetTurnAvailable(376);
+
+                // Store in master dictionary
+                _weaponSystemProfiles[WeaponSystems.INF_AM] = profile;
+            }
+            catch (Exception e)
+            {
+                AppService.HandleException(CLASS_NAME, nameof(Create_INF_AM_Profile), e);
+                throw;
+            }
+        }
+
+        /// <summary>
+        /// Marine infantry
+        /// </summary>
+        private static void Create_INF_MAR_Profile()
+        {
+            try
+            {
+                var profile = new WeaponSystemProfile(
+                    name: "Marine Infantry",
+                    nationality: Nationality.GENERIC,
+                    weaponSystemID: WeaponSystems.INF_MAR,
+                    18,
+                    hardAttack: 4,
+                    hardDefense: 3,
+                    softAttack: 9,
+                    softDefense: 10,
+                    groundAirDefense: CUConstants.GROUND_DEFENSE_INFANTRY,
+                    primaryRange: 1f,
+                    indirectRange: 0f,
+                    spottingRange: 2f,
+                    allWeatherCapability: AllWeatherRating.GroundUnit,
+                    nvgCapability: NVG_Rating.None,
+                    silhouette: UnitSilhouette.Small,
+                    sigintRating: SIGINT_Rating.UnitLevel,
+                    nbcRating: NBC_Rating.Gen1,
+                    strategicMobility: StrategicMobility.NavalAssault,
+                    movementPoints: CUConstants.FOOT_UNIT
+                );
+
+                // Set upgrade paths
+                profile.AddUpgradeType(UpgradeType.INF);
+
+                // Set short name for UI display
+                profile.SetShortName("Marines");
+
+                // Set turn availability in months.
+                profile.SetTurnAvailable(1);
+
+                // Store in master dictionary
+                _weaponSystemProfiles[WeaponSystems.INF_MAR] = profile;
+            }
+            catch (Exception e)
+            {
+                AppService.HandleException(CLASS_NAME, nameof(Create_INF_MAR_Profile), e);
+                throw;
+            }
+        }
+
+        /// <summary>
+        /// Special Forces Infantry
+        /// </summary>
+        private static void Create_INF_SPEC_Profile()
+        {
+            try
+            {
+                var profile = new WeaponSystemProfile(
+                    name: "Special Forces Infantry",
+                    nationality: Nationality.GENERIC,
+                    weaponSystemID: WeaponSystems.INF_SPEC,
+                    30,
+                    hardAttack: 8,
+                    hardDefense: 4,
+                    softAttack: 11,
+                    softDefense: 12,
+                    groundAirDefense: CUConstants.GROUND_DEFENSE_INFANTRY,
+                    primaryRange: 1f,
+                    indirectRange: 0f,
+                    spottingRange: 3f,
+                    allWeatherCapability: AllWeatherRating.GroundUnit,
+                    nvgCapability: NVG_Rating.Gen2,
+                    silhouette: UnitSilhouette.Small,
+                    sigintRating: SIGINT_Rating.SpecializedLevel,
+                    nbcRating: NBC_Rating.Gen1,
+                    strategicMobility: StrategicMobility.AirMobile,
+                    movementPoints: CUConstants.FOOT_UNIT
+                );
+
+                // Set upgrade paths
+                profile.AddUpgradeType(UpgradeType.INF);
+
+                // Set short name for UI display
+                profile.SetShortName("Special Forces");
+
+                // Set turn availability in months.
+                profile.SetTurnAvailable(1);
+
+                // Store in master dictionary
+                _weaponSystemProfiles[WeaponSystems.INF_SPEC] = profile;
+            }
+            catch (Exception e)
+            {
+                AppService.HandleException(CLASS_NAME, nameof(Create_INF_SPEC_Profile), e);
+                throw;
+            }
+        }
+
+        /// <summary>
+        /// Combat Engineers Infantry
+        /// </summary>
+        private static void Create_INF_ENG_Profile()
+        {
+            try
+            {
+                var profile = new WeaponSystemProfile(
+                    name: "Combat Engineers",
+                    nationality: Nationality.GENERIC,
+                    weaponSystemID: WeaponSystems.INF_ENG,
+                    20,
+                    hardAttack: 4,
+                    hardDefense: 3,
+                    softAttack: 9,
+                    softDefense: 12,
+                    groundAirDefense: CUConstants.GROUND_DEFENSE_INFANTRY,
+                    primaryRange: 1f,
+                    indirectRange: 0f,
+                    spottingRange: 2f,
+                    allWeatherCapability: AllWeatherRating.GroundUnit,
+                    nvgCapability: NVG_Rating.None,
+                    silhouette: UnitSilhouette.Small,
+                    sigintRating: SIGINT_Rating.UnitLevel,
+                    nbcRating: NBC_Rating.Gen1,
+                    strategicMobility: StrategicMobility.AirDrop,
+                    movementPoints: CUConstants.FOOT_UNIT
+                );
+
+                // Set upgrade paths
+                profile.AddUpgradeType(UpgradeType.INF);
+
+                // Set short name for UI display
+                profile.SetShortName("Engineers");
+
+                // Set turn availability in months.
+                profile.SetTurnAvailable(300);
+
+                // Store in master dictionary
+                _weaponSystemProfiles[WeaponSystems.INF_ENG] = profile;
+            }
+            catch (Exception e)
+            {
+                AppService.HandleException(CLASS_NAME, nameof(Create_INF_ENG_Profile), e);
                 throw;
             }
         }
