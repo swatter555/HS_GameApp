@@ -260,7 +260,7 @@ namespace HammerAndSickle.Models
                 Create_APC_VAB_Profile();
                 Create_RCN_ERC90_Profile();
                 Create_SPA_AUF1_Profile();
-                Create_SPAAA_Roland_Profile();
+                Create_SPSAM_Roland_Profile();
                 Create_ASF_M2000_Profile();
                 Create_ATT_JAGUAR_Profile();
 
@@ -4727,6 +4727,9 @@ namespace HammerAndSickle.Models
 
         #region France
 
+        /// <summary>
+        /// AMX-30 Main Battle Tank (MBT)
+        /// </summary>
         private static void Create_TANK_AMX30_Profile()
         {
             try
@@ -4759,14 +4762,17 @@ namespace HammerAndSickle.Models
             catch (Exception e) { AppService.HandleException(CLASS_NAME, nameof(Create_TANK_AMX30_Profile), e); throw; }
         }
 
-        private static void Create_SPAAA_Roland_Profile()
+        /// <summary>
+        /// Roland SAM
+        /// </summary>
+        private static void Create_SPSAM_Roland_Profile()
         {
             try
             {
                 var profile = new WeaponSystemProfile(
-                    name: "Roland SPAAA/SAM",
+                    name: "Roland SAM",
                     nationality: Nationality.FRA,
-                    weaponSystemID: WeaponSystems.SPAAA_ROLAND,
+                    weaponSystemID: WeaponSystems.SPSAM_ROLAND,
                     65,
                     hardAttack: 2,
                     hardDefense: 3,
@@ -4788,9 +4794,9 @@ namespace HammerAndSickle.Models
                 profile.AddUpgradeType(UpgradeType.SPSAM);
                 profile.SetShortName("Roland");
                 profile.SetTurnAvailable(456); // 1976
-                _weaponSystemProfiles[WeaponSystems.SPAAA_ROLAND] = profile;
+                _weaponSystemProfiles[WeaponSystems.SPSAM_ROLAND] = profile;
             }
-            catch (Exception e) { AppService.HandleException(CLASS_NAME, nameof(Create_SPAAA_Roland_Profile), e); throw; }
+            catch (Exception e) { AppService.HandleException(CLASS_NAME, nameof(Create_SPSAM_Roland_Profile), e); throw; }
         }
 
         /// <summary>

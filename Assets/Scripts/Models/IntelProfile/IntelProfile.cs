@@ -1301,17 +1301,27 @@ namespace HammerAndSickle.Models
             };
             _profiles[IntelProfileTypes.US_ARMORED_CAV_SQDN] = us_armoredCavSqdn;
 
-            // US Division Artillery Brigade (DIVARTY)
-            var us_divisionArtilleryBde = new Dictionary<WeaponSystems, int>
+            // US Division Artillery Battalion (DIVARTY)
+            var us_divisionArtilleryBde_M109 = new Dictionary<WeaponSystems, int>
             {
-                { WeaponSystems.INF_REG, 1920 },    // Artillery personnel across 4 battalions
-                { WeaponSystems.SPA_M109, 54 },     // 3 × 155mm SP howitzer battalions (18 each)
-                { WeaponSystems.ROC_MLRS, 12 },     // 1 × MLRS battalion
-                { WeaponSystems.APC_M113, 48 },     // Fire direction, supply, maintenance vehicles
-                { WeaponSystems.GENERIC_MANPAD, 24 }, // Stinger teams for air defense
-                { WeaponSystems.IFV_M3, 6 },        // Forward observer vehicles
+                { WeaponSystems.INF_REG, 1050 },      // Artillery personnel across 4 battalions
+                { WeaponSystems.SPA_M109, 54 },       // 3 × 155mm SP howitzer battalions (18 each)
+                { WeaponSystems.APC_M113, 48 },       // Fire direction, supply, maintenance vehicles
+                { WeaponSystems.GENERIC_MANPAD, 12 }, // Stinger teams for air defense
+                { WeaponSystems.IFV_M3, 6 },          // Forward observer vehicles
             };
-            _profiles[IntelProfileTypes.US_DIVISION_ARTILLERY_BDE] = us_divisionArtilleryBde;
+            _profiles[IntelProfileTypes.US_ARTILLERY_BDE_M109] = us_divisionArtilleryBde_M109;
+
+            // US Division Artillery Battalion (DIVARTY) - MLRS focused
+            var us_divisionArtilleryBde_MLRS = new Dictionary<WeaponSystems, int>
+            {
+                { WeaponSystems.INF_REG, 1120 },      // Artillery personnel across 4 battalions
+                { WeaponSystems.ROC_MLRS, 36 },       // 1 × MLRS battalion
+                { WeaponSystems.APC_M113, 48 },       // Fire direction, supply, maintenance vehicles
+                { WeaponSystems.GENERIC_MANPAD, 12 }, // Stinger teams for air defense
+                { WeaponSystems.IFV_M3, 6 },          // Forward observer vehicles
+            };
+            _profiles[IntelProfileTypes.US_ARTILLERY_BDE_MLRS] = us_divisionArtilleryBde_MLRS;
 
             // US Aviation Attack Brigade
             var us_aviationAttackBde = new Dictionary<WeaponSystems, int>
@@ -1335,17 +1345,27 @@ namespace HammerAndSickle.Models
             };
             _profiles[IntelProfileTypes.US_ENGINEER_BDE] = us_engineerBde;
 
-            // US Air Defense Brigade
-            var us_airDefenseBde = new Dictionary<WeaponSystems, int>
+            // US Air Defense Brigade- Hawk SAMs
+            var us_airDefenseBde_Hawk = new Dictionary<WeaponSystems, int>
             {
-                { WeaponSystems.INF_REG, 1800 },    // Air defense personnel
-                { WeaponSystems.SAM_HAWK, 24 },     // Hawk SAM batteries
-                { WeaponSystems.SPSAM_CHAP, 36 },   // Chaparral mobile SAM systems
-                { WeaponSystems.SPAAA_M163, 48 },   // Vulcan air defense guns
-                { WeaponSystems.GENERIC_MANPAD, 72 }, // Stinger teams distributed throughout
-                { WeaponSystems.APC_M113, 24 },     // Command and control vehicles
+                { WeaponSystems.INF_REG, 1800 },      // Air defense personnel
+                { WeaponSystems.SAM_HAWK, 24 },       // Hawk SAM batteries
+                { WeaponSystems.SPAAA_M163, 12 },     // Vulcan air defense guns
+                { WeaponSystems.GENERIC_MANPAD, 12 }, // Stinger teams distributed throughout
+                { WeaponSystems.APC_M113, 24 },       // Command and control vehicles
             };
-            _profiles[IntelProfileTypes.US_AIR_DEFENSE_BDE] = us_airDefenseBde;
+            _profiles[IntelProfileTypes.US_AIR_DEFENSE_BDE_HAWK] = us_airDefenseBde_Hawk;
+
+            // US Air Defense Brigade- Chaparral
+            var us_airDefenseBde_Chap = new Dictionary<WeaponSystems, int>
+            {
+                { WeaponSystems.INF_REG, 1800 },      // Air defense personnel
+                { WeaponSystems.SPSAM_CHAP, 24 },     // Chaparral mobile SAM systems
+                { WeaponSystems.SPAAA_M163, 12 },     // Vulcan air defense guns
+                { WeaponSystems.GENERIC_MANPAD, 12 }, // Stinger teams distributed throughout
+                { WeaponSystems.APC_M113, 24 },       // Command and control vehicles
+            };
+            _profiles[IntelProfileTypes.US_AIR_DEFENSE_BDE_CHAPARRAL] = us_airDefenseBde_Chap;
 
             // US Fighter Wing - F-15 Eagle
             var us_fighterWing_F15 = new Dictionary<WeaponSystems, int>
@@ -1458,18 +1478,28 @@ namespace HammerAndSickle.Models
             _profiles[IntelProfileTypes.FRG_PZGREN_BDE_MARDER] = frg_pzgrenBde;
 
             // FRG Artillery Brigade
-            var frg_artilleryBde = new Dictionary<WeaponSystems, int>
+            var frg_artilleryBde_M109 = new Dictionary<WeaponSystems, int>
             {
                 { WeaponSystems.INF_REG, 1300 },           // Artillery personnel (gunners, fire direction, logistics)
                 { WeaponSystems.SPA_M109, 72 },            // 3× Artillery BN (24× M109 155mm SP howitzers each)
-                { WeaponSystems.ROC_MLRS, 18 },            // 1× Rocket Artillery BN (LARS 110mm MLRS)
                 { WeaponSystems.APC_M113, 48 },            // Fire direction centers, survey, meteorological, ammunition carriers
                 { WeaponSystems.RCN_LUCHS, 8 },            // Artillery reconnaissance and forward observer teams
                 { WeaponSystems.GENERIC_MANPAD, 16 },      // Roland/Stinger air defense (counter-battery protection)
-                { WeaponSystems.SPAAA_GEPARD, 12 },        // Enhanced air defense for high-value artillery assets
-                { WeaponSystems.GENERIC_ATGM, 8 },         // Milan teams for close defense of fire positions
+                { WeaponSystems.SPAAA_GEPARD, 4 },        // Enhanced air defense for high-value artillery assets
             };
-            _profiles[IntelProfileTypes.FRG_ARTILLERY_BDE] = frg_artilleryBde;
+            _profiles[IntelProfileTypes.FRG_ARTILLERY_BDE_M109] = frg_artilleryBde_M109;
+
+            // FRG Artillery Brigade
+            var frg_artilleryBde_MLRS = new Dictionary<WeaponSystems, int>
+            {
+                { WeaponSystems.INF_REG, 1350 },           // Artillery personnel (gunners, fire direction, logistics)
+                { WeaponSystems.ROC_MLRS, 36 },            // 3× MLRS BN
+                { WeaponSystems.APC_M113, 48 },            // Fire direction centers, survey, meteorological, ammunition carriers
+                { WeaponSystems.RCN_LUCHS, 8 },            // Artillery reconnaissance and forward observer teams
+                { WeaponSystems.GENERIC_MANPAD, 16 },      // Roland/Stinger air defense (counter-battery protection)
+                { WeaponSystems.SPAAA_GEPARD, 4 },         // Enhanced air defense for high-value artillery assets
+            };
+            _profiles[IntelProfileTypes.FRG_ARTILLERY_BDE_MLRS] = frg_artilleryBde_MLRS;
 
             // FRG Airborne Brigade
             var frg_luftlandeBde = new Dictionary<WeaponSystems, int>
@@ -1485,6 +1515,68 @@ namespace HammerAndSickle.Models
             };
             _profiles[IntelProfileTypes.FRG_LUFTLANDE_BDE] = frg_luftlandeBde;
 
+            // FRG Mountain Brigade
+            var frg_mountainBde = new Dictionary<WeaponSystems, int>
+            {
+                { WeaponSystems.INF_REG, 2150 },           // Gebirgsjäger personnel (mountain warfare specialists)
+                { WeaponSystems.APC_M113, 72 },            // Limited M113 for command posts and support
+                { WeaponSystems.RCN_LUCHS, 8 },            // Reconnaissance (limited by terrain constraints)
+                { WeaponSystems.GENERIC_ATGM, 42 },        // Milan ATGM teams (defensive emphasis in mountains)
+                { WeaponSystems.GENERIC_MANPAD, 32 },      // Stinger teams (air threat in confined terrain)
+                { WeaponSystems.GENERIC_ART_LIGHT, 36 },   // Pack howitzers and mountain mortars (105mm/120mm)
+                { WeaponSystems.GENERIC_AAA, 12 },         // Light air defense (20mm for valley defense)
+                { WeaponSystems.HEL_BO105, 8 },            // Utility helicopters for mountain resupply
+            };
+            _profiles[IntelProfileTypes.FRG_MOUNTAIN_BDE] = frg_mountainBde;
+
+            // FRG Air Defense Brigade
+            var frg_airDefenseBde_HAWK = new Dictionary<WeaponSystems, int>
+            {
+                { WeaponSystems.INF_REG, 1100 },           // Air defense personnel (radar, missile, gun crews)
+                { WeaponSystems.SAM_HAWK, 24 },            // 1× Hawk SAM battalion (medium-range area defense)
+                { WeaponSystems.SPAAA_GEPARD, 12 },        // 2× Gepard battalions (radar-guided 35mm guns)
+                { WeaponSystems.APC_M113, 32 },            // Command posts, radar vehicles, support systems
+                { WeaponSystems.RCN_LUCHS, 6 },            // Forward air defense reconnaissance
+                { WeaponSystems.GENERIC_MANPAD, 12 },      // Stinger teams for gap coverage and mobility
+            };
+            _profiles[IntelProfileTypes.FRG_AIR_DEFENSE_BDE_HAWK] = frg_airDefenseBde_HAWK;
+
+            // FRG Air Defense Brigade
+            var frg_airDefenseBde_ROLAND = new Dictionary<WeaponSystems, int>
+            {
+                { WeaponSystems.INF_REG, 1100 },           // Air defense personnel (radar, missile, gun crews)
+                { WeaponSystems.SPSAM_ROLAND, 24 },        // 1× Hawk SAM battalion (medium-range area defense)
+                { WeaponSystems.SPAAA_GEPARD, 12 },        // 2× Gepard battalions (radar-guided 35mm guns)
+                { WeaponSystems.APC_M113, 32 },            // Command posts, radar vehicles, support systems
+                { WeaponSystems.RCN_LUCHS, 6 },            // Forward air defense reconnaissance
+                { WeaponSystems.GENERIC_MANPAD, 12 },      // Stinger teams for gap coverage and mobility
+            };
+            _profiles[IntelProfileTypes.FRG_AIR_DEFENSE_BDE_ROLAND] = frg_airDefenseBde_ROLAND;
+
+            // FRG Air Defense Brigade
+            var frg_airDefenseBde_GEPARD = new Dictionary<WeaponSystems, int>
+            {
+                { WeaponSystems.INF_REG, 1100 },           // Air defense personnel (radar, missile, gun crews)
+                { WeaponSystems.SPAAA_GEPARD, 24 },        // 2× Gepard battalions (radar-guided 35mm guns)
+                { WeaponSystems.APC_M113, 32 },            // Command posts, radar vehicles, support systems
+                { WeaponSystems.RCN_LUCHS, 6 },            // Forward air defense reconnaissance
+                { WeaponSystems.GENERIC_MANPAD, 12 },      // Stinger teams for gap coverage and mobility
+            };
+            _profiles[IntelProfileTypes.FRG_AIR_DEFENSE_BDE_GEPARD] = frg_airDefenseBde_GEPARD;
+
+            // FRG Air Defense Brigade
+            var frg_aviation_Bde = new Dictionary<WeaponSystems, int>
+            {
+                { WeaponSystems.HEL_BO105, 72 },
+            };
+            _profiles[IntelProfileTypes.FRG_AVIATION_BDE_BO105] = frg_aviation_Bde;
+
+            // FRG Air Defense Brigade
+            var frg_fighterWing = new Dictionary<WeaponSystems, int>
+            {
+                { WeaponSystems.MRF_TORNADO_IDS, 36 },
+            };
+            _profiles[IntelProfileTypes.FRG_FIGHTER_WING_TORNADO_IDS] = frg_fighterWing;
 
             #endregion
 
