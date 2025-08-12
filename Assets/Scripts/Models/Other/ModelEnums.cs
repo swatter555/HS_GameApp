@@ -717,7 +717,7 @@ namespace HammerAndSickle.Models
         APC_VAB,
         RCN_ERC90,
         SPA_AUF1,
-        SPAAA_ROLAND,
+        SPSAM_ROLAND,
         ASF_MIRAGE2000,
         ATT_JAGUAR,
 
@@ -880,12 +880,14 @@ namespace HammerAndSickle.Models
         US_HEAVY_MECH_BDE_M60A3,   // US Heavy Mechanized Brigade with M60A3 Patton
         US_PARA_BDE_82ND,          // US Airborne Brigade (82nd Airborne)
         US_AIR_ASSAULT_BDE_101ST,  // US Air Assault Brigade (101st Airborne)
-        US_DIVISION_ARTILLERY_BDE, // US Division Artillery Brigade
+        
         US_AVIATION_ATTACK_BDE,    // US Aviation Attack Brigade
         US_ENGINEER_BDE,           // US Engineer Brigade
-        US_AIR_DEFENSE_BDE,        // US Air Defense Brigade
-        US_ARMORED_CAV_SQDN, // US Armored Cavalry Squadron
-
+        US_ARMORED_CAV_SQDN,       // US Armored Cavalry Squadron
+        US_ARTILLERY_BDE_M109,     // US Division Artillery
+        US_ARTILLERY_BDE_MLRS,     // US Division Rocket Artillery
+        US_AIR_DEFENSE_BDE_HAWK,        // US Air Defense Brigade
+        US_AIR_DEFENSE_BDE_CHAPARRAL,   // US Air Defense Brigade
         US_FIGHTER_WING_F15,      // US Fighter Wing with F-15C Eagle
         US_FIGHTER_WING_F4,       // US Fighter Wing with F-4 Phantom II
         US_FIGHTER_WING_F16,      // US Multirole Wing with F-16 Fighting Falcon
@@ -899,9 +901,15 @@ namespace HammerAndSickle.Models
         FRG_PANZER_BDE_LEO2,         // FRG Panzer Brigade with Leopard 2
         FRG_PANZER_BDE_LEO1,         // FRG Panzer Brigade with Leopard 1
         FRG_PZGREN_BDE_MARDER,       // FRG Panzergrenadier Brigade
-        FRG_ARTILLERY_BDE,           // FRG Artillery Brigade
+        FRG_ARTILLERY_BDE_M109,      // FRG Artillery Brigade
+        FRG_ARTILLERY_BDE_MLRS,      // FRG Rocket Artillery Brigade
         FRG_LUFTLANDE_BDE,           // FRG Luftlande Brigade (Airborne)
-
+        FRG_MOUNTAIN_BDE,            // FRG Mountain Infantry Brigade
+        FRG_AIR_DEFENSE_BDE_HAWK,    // FRG Air Defense Brigade
+        FRG_AIR_DEFENSE_BDE_ROLAND,  // FRG Air Defense Brigade
+        FRG_AIR_DEFENSE_BDE_GEPARD,  // FRG Air Defense Brigade
+        FRG_AVIATION_BDE_BO105,      // FRG Aviation Brigade
+        FRG_FIGHTER_WING_TORNADO_IDS, // FRG Fighter Wing Tornado IDS
     }
 
     #endregion
