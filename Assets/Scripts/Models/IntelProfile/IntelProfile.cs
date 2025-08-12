@@ -1406,6 +1406,61 @@ namespace HammerAndSickle.Models
             #endregion
 
             //-------------------------------------------------------------//
+
+            #region FRG Profiles
+
+            // FRG Panzer Brigade - Leopard 2
+            var frg_panzerBde_Leo2 = new Dictionary<WeaponSystems, int>
+            {
+                { WeaponSystems.INF_REG, 2200 },           // Brigade personnel across 4 battalions + support
+                { WeaponSystems.TANK_LEOPARD2, 116 },      // 2× Panzer BN (44 each) + Mixed BN tank companies (28) = 116 tanks
+                { WeaponSystems.IFV_MARDER, 58 },          // 1× PzGren BN (44) + Mixed BN mech company (14) = 58 Marders  
+                { WeaponSystems.APC_M113, 24 },            // Command posts, medical, maintenance, mortar carriers
+                { WeaponSystems.RCN_LUCHS, 12 },           // Brigade reconnaissance platoon (German equivalent)
+                { WeaponSystems.GENERIC_ATGM, 32 },        // Milan ATGM teams (Marder-mounted + dismounted)
+                { WeaponSystems.GENERIC_MANPAD, 24 },      // Roland/Stinger air defense sections
+                { WeaponSystems.SPA_M109, 18 },            // Organic artillery battalion (155mm SP)
+                { WeaponSystems.SPAAA_GEPARD, 8 },         // Gepard air defense guns (brigade level)
+                { WeaponSystems.GENERIC_ART_LIGHT, 12 },   // 120mm mortars distributed across battalions
+            };
+            _profiles[IntelProfileTypes.FRG_PANZER_BDE_LEO2] = frg_panzerBde_Leo2;
+
+            // FRG Panzer Brigade - Leopard 1
+            var frg_panzerBde_Leo1 = new Dictionary<WeaponSystems, int>
+            {
+                { WeaponSystems.INF_REG, 2200 },           // Brigade personnel across 4 battalions + support
+                { WeaponSystems.TANK_LEOPARD1, 116 },      // 2× Panzer BN (44 each) + Mixed BN tank companies (28) = 116 tanks
+                { WeaponSystems.IFV_MARDER, 58 },          // 1× PzGren BN (44) + Mixed BN mech company (14) = 58 Marders  
+                { WeaponSystems.APC_M113, 24 },            // Command posts, medical, maintenance, mortar carriers
+                { WeaponSystems.RCN_LUCHS, 12 },           // Brigade reconnaissance platoon (Luchs 8x8)
+                { WeaponSystems.GENERIC_ATGM, 32 },        // Milan ATGM teams (Marder-mounted + dismounted)
+                { WeaponSystems.GENERIC_MANPAD, 24 },      // Roland/Stinger air defense sections
+                { WeaponSystems.SPA_M109, 18 },            // Organic artillery battalion (155mm SP)
+                { WeaponSystems.SPAAA_GEPARD, 8 },         // Gepard air defense guns (brigade level)
+                { WeaponSystems.GENERIC_ART_LIGHT, 12 },   // 120mm mortars distributed across battalions
+            };
+            _profiles[IntelProfileTypes.FRG_PANZER_BDE_LEO1] = frg_panzerBde_Leo1;
+
+            // FRG Panzergrenadier Brigade - Leopard 1
+            var frg_pzgrenBde_Leo1 = new Dictionary<WeaponSystems, int>
+            {
+                { WeaponSystems.INF_REG, 2800 },           // Brigade personnel across 4 battalions + support
+                { WeaponSystems.TANK_LEOPARD1, 58 },       // 1× Panzer BN (44) + Mixed PzGren BN tank company (14) = 58 tanks
+                { WeaponSystems.IFV_MARDER, 102 },         // 2× PzGren BN (44 each) + Mixed PzGren BN mech companies (14) = 102 Marders
+                { WeaponSystems.APC_M113, 32 },            // Command posts, medical, maintenance, MTW carriers for lighter companies
+                { WeaponSystems.RCN_LUCHS, 12 },           // Brigade reconnaissance platoon (Luchs 8x8)
+                { WeaponSystems.GENERIC_ATGM, 40 },        // Milan ATGM teams (higher count due to infantry emphasis)
+                { WeaponSystems.GENERIC_MANPAD, 28 },      // Roland/Stinger air defense sections (more infantry coverage)
+                { WeaponSystems.SPA_M109, 18 },            // Organic artillery battalion (155mm SP)
+                { WeaponSystems.SPAAA_GEPARD, 8 },         // Gepard air defense guns (brigade level)
+                { WeaponSystems.GENERIC_ART_LIGHT, 18 },   // 120mm mortars (higher count for infantry support)
+            };
+            _profiles[IntelProfileTypes.FRG_PZGREN_BDE_LEO1] = frg_pzgrenBde_Leo1;
+
+
+            #endregion
+
+            //-------------------------------------------------------------//
         }
 
         #endregion // Profile Database

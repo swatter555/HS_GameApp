@@ -242,6 +242,7 @@ namespace HammerAndSickle.Models
                 Create_TANK_LEOPARD1_Profile();
                 Create_TANK_LEOPARD2_Profile();
                 Create_IFV_MARDER_Profile();
+                Create_RCN_LUCHS_Profile();
                 Create_SPAAA_Gepard_Profile();
                 Create_HEL_BO105_Profile();
                 Create_MRF_TORNADO_IDS_Profile();
@@ -4228,6 +4229,9 @@ namespace HammerAndSickle.Models
 
         #region West Germany (FRG)
 
+        /// <summary>
+        /// Leopard 1 Main Battle Tank (MBT)
+        /// </summary>
         private static void Create_TANK_LEOPARD1_Profile()
         {
             try
@@ -4260,6 +4264,9 @@ namespace HammerAndSickle.Models
             catch (Exception e) { AppService.HandleException(CLASS_NAME, nameof(Create_TANK_LEOPARD1_Profile), e); throw; }
         }
 
+        /// <summary>
+        /// Leopard 2 Main Battle Tank (MBT)
+        /// </summary>
         private static void Create_TANK_LEOPARD2_Profile()
         {
             try
@@ -4292,6 +4299,9 @@ namespace HammerAndSickle.Models
             catch (Exception e) { AppService.HandleException(CLASS_NAME, nameof(Create_TANK_LEOPARD2_Profile), e); throw; }
         }
 
+        /// <summary>
+        /// Marder Infantry Fighting Vehicle (IFV)
+        /// </summary>
         private static void Create_IFV_MARDER_Profile()
         {
             try
@@ -4324,6 +4334,60 @@ namespace HammerAndSickle.Models
             catch (Exception e) { AppService.HandleException(CLASS_NAME, nameof(Create_IFV_MARDER_Profile), e); throw; }
         }
 
+        /// <summary>
+        /// Luchs Reconnaissance Vehicle
+        /// </summary>
+        private static void Create_RCN_LUCHS_Profile()
+        {
+            try
+            {
+                var profile = new WeaponSystemProfile(
+                    name: "Luchs Reconnaissance Vehicle",
+                    nationality: Nationality.FRG,
+                    weaponSystemID: WeaponSystems.RCN_LUCHS,
+                    prestigeCost: 28,
+                    hardAttack: 3,
+                    hardDefense: 4,
+                    softAttack: 7,
+                    softDefense: 7,
+                    groundAirDefense: CUConstants.GROUND_DEFENSE_LIGHTARMOR,
+                    primaryRange: 1f,
+                    indirectRange: 0f,
+                    spottingRange: 4f,
+                    allWeatherCapability: AllWeatherRating.Night,
+                    nvgCapability: NVG_Rating.Gen2,
+                    silhouette: UnitSilhouette.Small,
+                    sigintRating: SIGINT_Rating.HQLevel,
+                    nbcRating: NBC_Rating.Gen2,
+                    strategicMobility: StrategicMobility.AirLift,
+                    movementPoints: CUConstants.MECH_UNIT
+                );
+
+                // Set upgrade paths
+                profile.AddUpgradeType(UpgradeType.RECON);
+
+                // Set amphibious capability (Luchs is fully amphibious)
+                profile.SetAmphibiousCapability(true);
+
+                // Set short name for UI display
+                profile.SetShortName("Luchs");
+
+                // Set turn availability - Luchs entered service 1975, fully deployed by 1982
+                profile.SetTurnAvailable(276);
+
+                // Store in master dictionary
+                _weaponSystemProfiles[WeaponSystems.RCN_LUCHS] = profile;
+            }
+            catch (Exception e)
+            {
+                AppService.HandleException(CLASS_NAME, nameof(Create_RCN_LUCHS_Profile), e);
+                throw;
+            }
+        }
+
+        /// <summary>
+        /// Gepard Self-Propelled Anti-Aircraft Artillery (SPAAA)
+        /// </summary>
         private static void Create_SPAAA_Gepard_Profile()
         {
             try
@@ -4358,6 +4422,9 @@ namespace HammerAndSickle.Models
             catch (Exception e) { AppService.HandleException(CLASS_NAME, nameof(Create_SPAAA_Gepard_Profile), e); throw; }
         }
 
+        /// <summary>
+        /// Bo 105P PAH‑1 Attack Helicopter
+        /// </summary>
         private static void Create_HEL_BO105_Profile()
         {
             try

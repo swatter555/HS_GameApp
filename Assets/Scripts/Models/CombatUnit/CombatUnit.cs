@@ -32,8 +32,8 @@ namespace HammerAndSickle.Models
         // Profiles
         public WeaponSystems EmbarkedProfileID { get; private set; }     // Profile for external transport
         public WeaponSystems MobileProfileID { get; private set; }       // Profile for organic transport
-        public WeaponSystems DeployedProfileID { get; private set; }     // Profile that all units have.
-        public IntelProfileTypes IntelProfileType { get; internal set; } // Profile for intelligence reports.
+        public WeaponSystems DeployedProfileID { get; private set; }     // Profile that all units have
+        public IntelProfileTypes IntelProfileType { get; internal set; } // Profile for intelligence reports
 
         // How combat effective is a unit is tracked by EfficiencyLevel.
         public EfficiencyLevel EfficiencyLevel { get; internal set; }    
@@ -51,6 +51,7 @@ namespace HammerAndSickle.Models
         public StatsMaxCurrent MovementPoints { get; private set; }
         public Coordinate2D MapPos { get; internal set; }
         public SpottedLevel SpottedLevel { get; private set; }
+        public float IndividualCombatModifier { get; private set; } // Add more disntinction between units
 
         // Leader system for the unit
         [JsonInclude]
@@ -167,6 +168,9 @@ namespace HammerAndSickle.Models
 
                 // Initialize position to origin (will be set when placed on map)
                 MapPos = Coordinate2D.Zero;
+
+                // Initialize individual combat modifier to default
+                IndividualCombatModifier = CUConstants.ICM_DEFAULT;
             }
             catch (Exception e)
             {
@@ -239,6 +243,9 @@ namespace HammerAndSickle.Models
                 GenerationRate = SupplyGenerationRate.Basic;
                 SupplyProjection = SupplyProjection.Local;
                 SupplyPenetration = false;
+
+                // Initialize individual combat modifier to default
+                IndividualCombatModifier = CUConstants.ICM_DEFAULT;
 
                 // Initialize air units collection for airbases (empty by default)
                 // This will be handled by the partial class if needed
@@ -829,9 +836,10 @@ namespace HammerAndSickle.Models
                 float combatStateModifier = GetCombatStateModifier();
                 float efficiencyModifier = GetEfficiencyModifier();
                 float experienceModifier = GetExperienceMultiplier();
+                float icmModifier = IndividualCombatModifier;
 
                 // Combine all modifiers
-                return strengthModifier * combatStateModifier * efficiencyModifier * experienceModifier;
+                return strengthModifier * combatStateModifier * efficiencyModifier * experienceModifier * icmModifier;
             }
             catch (Exception e)
             {
@@ -852,8 +860,10 @@ namespace HammerAndSickle.Models
                 float strengthModifier = GetStrengthModifier();
                 float efficiencyModifier = GetEfficiencyModifier();
                 float experienceModifier = GetExperienceMultiplier();
+                float icmModifier = IndividualCombatModifier;
+
                 // Combine all modifiers
-                return strengthModifier * efficiencyModifier * experienceModifier;
+                return strengthModifier * efficiencyModifier * experienceModifier * icmModifier;
             }
             catch (Exception e)
             {
@@ -963,6 +973,25 @@ namespace HammerAndSickle.Models
             }
         }
 
+        /// <summary>
+        /// Set the Individual Combat Modifier (ICM) for the unit.
+        /// </summary>
+        public void SetICM(float icm)
+        {
+            try
+            {
+                if (icm < CUConstants.ICM_MIN || icm > CUConstants.ICM_MAX)
+                {
+                    throw new ArgumentOutOfRangeException(nameof(icm), $"ICM must be between {CUConstants.ICM_MIN} and {CUConstants.ICM_MAX}");
+                }
+                IndividualCombatModifier = icm;
+            }
+            catch (Exception e)
+            {
+                AppService.HandleException(CLASS_NAME, nameof(SetICM), e);
+                throw;
+            }
+        }
 
         #endregion // Core
 

@@ -47,8 +47,6 @@ namespace HammerAndSickle.Persistence
                     Leaders = new Dictionary<string, Leader>(StringComparer.Ordinal)
                 };
 
-
-
                 // Create fresh units with same parameters but independent state
                 foreach (var unit in mgr.GetAllCombatUnits())
                 {
@@ -98,6 +96,7 @@ namespace HammerAndSickle.Persistence
                             // Copy position and spotted state
                             freshUnit.SetPosition(unit.MapPos);
                             freshUnit.SetSpottedLevel(unit.SpottedLevel);
+                            freshUnit.SetICM(unit.IndividualCombatModifier);
 
                             // Copy leader assignment (just the ID string, not the object)
                             freshUnit.LeaderID = unit.LeaderID;
