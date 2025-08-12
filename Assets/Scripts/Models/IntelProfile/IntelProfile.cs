@@ -428,6 +428,7 @@ namespace HammerAndSickle.Models
                 { WeaponSystems.SPAAA_ZSU57, 4},
                 { WeaponSystems.SPSAM_9K31, 4 },
                 { WeaponSystems.SPA_2S1, 18 },
+                { WeaponSystems.GENERIC_ART_LIGHT, 24 },
                 { WeaponSystems.RCN_BRDM2, 12 },
                 { WeaponSystems.GENERIC_ATGM, 16 },
                 { WeaponSystems.GENERIC_MANPAD, 30 },
@@ -444,6 +445,7 @@ namespace HammerAndSickle.Models
                 { WeaponSystems.SPAAA_ZSU23, 4},
                 { WeaponSystems.SPSAM_9K31, 4 },
                 { WeaponSystems.SPA_2S1, 18 },
+                { WeaponSystems.GENERIC_ART_LIGHT, 24 },
                 { WeaponSystems.RCN_BRDM2, 12 },
                 { WeaponSystems.GENERIC_ATGM, 16 },
                 { WeaponSystems.GENERIC_MANPAD, 30 },
@@ -464,6 +466,7 @@ namespace HammerAndSickle.Models
                 { WeaponSystems.SPAAA_ZSU57, 4},
                 { WeaponSystems.SPSAM_9K31, 4 },
                 { WeaponSystems.SPA_2S1, 18 },
+                { WeaponSystems.GENERIC_ART_LIGHT, 24 },
                 { WeaponSystems.RCN_BRDM2, 12 },
                 { WeaponSystems.GENERIC_ATGM, 16 },
                 { WeaponSystems.GENERIC_MANPAD, 30 },
@@ -480,6 +483,7 @@ namespace HammerAndSickle.Models
                 { WeaponSystems.SPAAA_ZSU23, 4},
                 { WeaponSystems.SPSAM_9K31, 4 },
                 { WeaponSystems.SPA_2S1, 18 },
+                { WeaponSystems.GENERIC_ART_LIGHT, 24 },
                 { WeaponSystems.RCN_BRDM2, 12 },
                 { WeaponSystems.GENERIC_ATGM, 16 },
                 { WeaponSystems.GENERIC_MANPAD, 30 },
@@ -496,6 +500,7 @@ namespace HammerAndSickle.Models
                 { WeaponSystems.SPAAA_ZSU23, 4},
                 { WeaponSystems.SPSAM_9K31, 4 },
                 { WeaponSystems.SPA_2S1, 18 },
+                { WeaponSystems.GENERIC_ART_LIGHT, 24 },
                 { WeaponSystems.RCN_BRDM2, 12 },
                 { WeaponSystems.GENERIC_ATGM, 16 },
                 { WeaponSystems.GENERIC_MANPAD, 30 },
@@ -516,6 +521,7 @@ namespace HammerAndSickle.Models
                 { WeaponSystems.SPAAA_ZSU57, 4},
                 { WeaponSystems.SPSAM_9K31, 4 },
                 { WeaponSystems.SPA_2S1, 18 },
+                { WeaponSystems.GENERIC_ART_LIGHT, 24 },
                 { WeaponSystems.RCN_BRDM2, 12 },
                 { WeaponSystems.GENERIC_ATGM, 12 },
                 { WeaponSystems.GENERIC_MANPAD, 12 },
@@ -532,6 +538,7 @@ namespace HammerAndSickle.Models
                 { WeaponSystems.SPAAA_ZSU57, 4},
                 { WeaponSystems.SPSAM_9K31, 4 },
                 { WeaponSystems.SPA_2S1, 18 },
+                { WeaponSystems.GENERIC_ART_LIGHT, 24 },
                 { WeaponSystems.RCN_BRDM2, 12 },
                 { WeaponSystems.GENERIC_ATGM, 12 },
                 { WeaponSystems.GENERIC_MANPAD, 12 },
@@ -548,6 +555,7 @@ namespace HammerAndSickle.Models
                 { WeaponSystems.SPAAA_ZSU23, 4},
                 { WeaponSystems.SPSAM_9K31, 4 },
                 { WeaponSystems.SPA_2S1, 18 },
+                { WeaponSystems.GENERIC_ART_LIGHT, 24 },
                 { WeaponSystems.RCN_BRDM2, 12 },
                 { WeaponSystems.GENERIC_ATGM, 12 },
                 { WeaponSystems.GENERIC_MANPAD, 12 },
@@ -564,6 +572,7 @@ namespace HammerAndSickle.Models
                 { WeaponSystems.SPAAA_ZSU57, 4},
                 { WeaponSystems.SPSAM_9K31, 4 },
                 { WeaponSystems.SPA_2S1, 18 },
+                { WeaponSystems.GENERIC_ART_LIGHT, 24 },
                 { WeaponSystems.RCN_BRDM2, 12 },
                 { WeaponSystems.GENERIC_ATGM, 12 },
                 { WeaponSystems.GENERIC_MANPAD, 12 },
@@ -580,6 +589,7 @@ namespace HammerAndSickle.Models
                 { WeaponSystems.SPAAA_2K22, 4},
                 { WeaponSystems.SPSAM_9K31, 4 },
                 { WeaponSystems.SPA_2S1, 18 },
+                { WeaponSystems.GENERIC_ART_LIGHT, 24 },
                 { WeaponSystems.RCN_BRDM2, 12 },
                 { WeaponSystems.GENERIC_ATGM, 12 },
                 { WeaponSystems.GENERIC_MANPAD, 12 },
@@ -596,6 +606,7 @@ namespace HammerAndSickle.Models
                 { WeaponSystems.SPAAA_ZSU23, 4},
                 { WeaponSystems.SPSAM_9K31, 4 },
                 { WeaponSystems.SPA_2S1, 18 },
+                { WeaponSystems.GENERIC_ART_LIGHT, 24 },
                 { WeaponSystems.RCN_BRDM2, 12 },
                 { WeaponSystems.GENERIC_ATGM, 12 },
                 { WeaponSystems.GENERIC_MANPAD, 12 },
@@ -612,6 +623,7 @@ namespace HammerAndSickle.Models
                 { WeaponSystems.SPAAA_2K22, 4},
                 { WeaponSystems.SPSAM_9K31, 4 },
                 { WeaponSystems.SPA_2S1, 18 },
+                { WeaponSystems.GENERIC_ART_LIGHT, 24 },
                 { WeaponSystems.RCN_BRDM2, 12 },
                 { WeaponSystems.GENERIC_ATGM, 12 },
                 { WeaponSystems.GENERIC_MANPAD, 12 },
@@ -628,6 +640,7 @@ namespace HammerAndSickle.Models
                 { WeaponSystems.SPAAA_2K22, 4},
                 { WeaponSystems.SPSAM_9K31, 4 },
                 { WeaponSystems.SPA_2S1, 18 },
+                { WeaponSystems.GENERIC_ART_LIGHT, 24 },
                 { WeaponSystems.RCN_BRDM2, 12 },
                 { WeaponSystems.GENERIC_ATGM, 12 },
                 { WeaponSystems.GENERIC_MANPAD, 12 },
@@ -858,6 +871,7 @@ namespace HammerAndSickle.Models
                 { WeaponSystems.SPAAA_ZSU57, 4},
                 { WeaponSystems.SPSAM_9K31, 4 },
                 { WeaponSystems.SPA_2S1, 18 },
+                { WeaponSystems.GENERIC_ART_LIGHT, 24 },
                 { WeaponSystems.RCN_BRDM2, 12 },
                 { WeaponSystems.GENERIC_ATGM, 12 },
                 { WeaponSystems.GENERIC_MANPAD, 36 },
@@ -874,6 +888,7 @@ namespace HammerAndSickle.Models
                 { WeaponSystems.SPAAA_ZSU23, 4},
                 { WeaponSystems.SPSAM_9K31, 4 },
                 { WeaponSystems.SPA_2S1, 18 },
+                { WeaponSystems.GENERIC_ART_LIGHT, 24 },
                 { WeaponSystems.RCN_BRDM2, 12 },
                 { WeaponSystems.GENERIC_ATGM, 12 },
                 { WeaponSystems.GENERIC_MANPAD, 36 },
@@ -890,6 +905,7 @@ namespace HammerAndSickle.Models
                 { WeaponSystems.SPAAA_2K22, 4},
                 { WeaponSystems.SPSAM_9K31, 4 },
                 { WeaponSystems.SPA_2S1, 18 },
+                { WeaponSystems.GENERIC_ART_LIGHT, 24 },
                 { WeaponSystems.RCN_BRDM2, 12 },
                 { WeaponSystems.GENERIC_ATGM, 12 },
                 { WeaponSystems.GENERIC_MANPAD, 36 },
@@ -1581,6 +1597,92 @@ namespace HammerAndSickle.Models
             #endregion
 
             //-------------------------------------------------------------//
+
+            #region UK Profiles
+
+            // UK Armoured Brigade - Challenger 1 (Heavy Type)
+            var uk_armouredBde_Challenger = new Dictionary<WeaponSystems, int>
+            {
+                { WeaponSystems.INF_REG, 1880 },              // Brigade personnel (580+720+580 for units + support)
+                { WeaponSystems.TANK_CHALLENGER1, 116 },      // 2× Armoured Regiments (58 each) = 116 tanks
+                { WeaponSystems.IFV_WARRIOR, 45 },            // 1× Mechanised Infantry Battalion 
+                { WeaponSystems.APC_FV432, 26 },              // Command, medical, support vehicles across brigade
+                { WeaponSystems.RCN_SCIMITAR, 8 },            // Brigade reconnaissance troop (CVR(T))
+                { WeaponSystems.GENERIC_ATGM, 30 },           // Milan ATGM (Warrior-mounted + dismounted teams)
+                { WeaponSystems.GENERIC_MANPAD, 16 },         // Javelin SAM teams across battalions
+                { WeaponSystems.SPA_M109, 18 },               // Organic Royal Artillery regiment (155mm SP)
+                { WeaponSystems.GENERIC_ART_LIGHT, 18 },      // 81mm mortars distributed across battalions
+                { WeaponSystems.SAM_RAPIER, 6 },              // Rapier air defense missiles (brigade level)
+            };
+            _profiles[IntelProfileTypes.UK_ARMOURED_BDE_CHALLENGER] = uk_armouredBde_Challenger;
+
+            // UK Mechanised Brigade - Warrior IFV (Infantry-heavy: 1 tank + 2 mech infantry)
+            var uk_mechanisedBde_Warrior = new Dictionary<WeaponSystems, int>
+            {
+                { WeaponSystems.INF_REG, 2020 },              // Brigade personnel (580+720+720 for units + support)
+                { WeaponSystems.TANK_CHALLENGER1, 58 },       // 1× Armoured Regiment
+                { WeaponSystems.IFV_WARRIOR, 90 },            // 2× Mechanised Infantry Battalions (45 each)
+                { WeaponSystems.APC_FV432, 18 },              // Command, medical, support vehicles
+                { WeaponSystems.RCN_SCIMITAR, 8 },            // Brigade reconnaissance troop
+                { WeaponSystems.GENERIC_ATGM, 54 },           // Milan ATGM (Warrior-mounted + dismounted)
+                { WeaponSystems.GENERIC_MANPAD, 24 },         // Javelin SAM teams
+                { WeaponSystems.SPA_M109, 18 },               // Organic Royal Artillery regiment
+                { WeaponSystems.GENERIC_ART_LIGHT, 18 },      // 81mm mortars
+                { WeaponSystems.SAM_RAPIER, 6 },              // Brigade air defense
+            };
+            _profiles[IntelProfileTypes.UK_MECHANISED_BDE_WARRIOR] = uk_mechanisedBde_Warrior;
+
+            // UK Infantry Brigade - FV432 APC (Traditional infantry with vehicular mobility)
+            var uk_infantryBde_FV432 = new Dictionary<WeaponSystems, int>
+            {
+                { WeaponSystems.INF_REG, 2040 },              // Brigade personnel for 3× infantry battalions + support
+                { WeaponSystems.APC_FV432, 156 },             // 3× Mechanised Infantry Battalions (52 each)
+                { WeaponSystems.RCN_SCIMITAR, 8 },            // Brigade reconnaissance troop
+                { WeaponSystems.GENERIC_ATGM, 48 },           // Milan ATGM teams (dismounted focus)
+                { WeaponSystems.GENERIC_MANPAD, 24 },         // Javelin SAM teams
+                { WeaponSystems.SPA_M109, 18 },               // Organic Royal Artillery regiment
+                { WeaponSystems.GENERIC_ART_LIGHT, 18 },      // 81mm mortars
+                { WeaponSystems.SAM_RAPIER, 6 },              // Brigade air defense
+            };
+            _profiles[IntelProfileTypes.UK_INFANTRY_BDE_FV432] = uk_infantryBde_FV432;
+
+            // UK Airmobile Brigade - Enhanced AT (1983-1988 experimental formation)
+            var uk_airmobileBde = new Dictionary<WeaponSystems, int>
+            {
+                { WeaponSystems.INF_REG, 1360 },              // 2× Infantry battalions + support (lighter structure)
+                { WeaponSystems.GENERIC_ATGM, 72 },           // Heavy Milan ATGM load (primary AT capability)
+                { WeaponSystems.GENERIC_MANPAD, 24 },         // Javelin SAM teams
+                { WeaponSystems.HEL_LYNX, 72 },               // RAF helicopter lift assets
+                { WeaponSystems.GENERIC_ART_LIGHT, 12 },      // 81mm mortars (air-portable)
+                { WeaponSystems.APC_FV432, 8 },               // Command vehicles only
+            };
+            _profiles[IntelProfileTypes.UK_AIRMOBILE_BDE] = uk_airmobileBde;
+
+            // UK Artillery Brigade - Royal Artillery
+            var uk_artilleryBde = new Dictionary<WeaponSystems, int>
+            {
+                { WeaponSystems.INF_REG, 1350 },              // 3× Artillery regiments + support personnel
+                { WeaponSystems.SPA_M109, 54 },               // 3× Artillery regiments (18 each) - 155mm SP
+                { WeaponSystems.GENERIC_ART_HEAVY, 18 },      // Heavy artillery (203mm or MLRS)
+                { WeaponSystems.APC_FV432, 36 },              // Fire direction, supply, maintenance vehicles
+                { WeaponSystems.RCN_SCIMITAR, 6 },            // Artillery reconnaissance
+                { WeaponSystems.GENERIC_MANPAD, 12 },         // Self-defense air defense
+            };
+            _profiles[IntelProfileTypes.UK_ARTILLERY_BDE] = uk_artilleryBde;
+
+            // UK Air Defense Brigade - Royal Artillery Air Defense
+            var uk_airDefenseBde = new Dictionary<WeaponSystems, int>
+            {
+                { WeaponSystems.INF_REG, 1200 },              // Air defense personnel + support
+                { WeaponSystems.SAM_RAPIER, 36 },             // 3× Rapier squadrons (12 each)
+                { WeaponSystems.GENERIC_MANPAD, 48 },         // Blowpipe/Javelin teams
+                { WeaponSystems.GENERIC_AAA, 24 },            // Light AA guns (40mm Bofors)
+                { WeaponSystems.APC_FV432, 24 },              // Command, radar, support vehicles
+                { WeaponSystems.RCN_SCIMITAR, 4 },            // Air defense reconnaissance
+            };
+            _profiles[IntelProfileTypes.UK_AIR_DEFENSE_BDE] = uk_airDefenseBde;
+
+            #endregion
         }
 
         #endregion // Profile Database

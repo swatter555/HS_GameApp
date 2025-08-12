@@ -708,7 +708,9 @@ namespace HammerAndSickle.Models
         TANK_CHALLENGER1,
         IFV_WARRIOR,
         APC_FV432,
+        RCN_SCIMITAR,
         SAM_RAPIER,
+        HEL_LYNX,
         MRF_TORNADO_GR1,
 
         // France
@@ -910,6 +912,14 @@ namespace HammerAndSickle.Models
         FRG_AIR_DEFENSE_BDE_GEPARD,  // FRG Air Defense Brigade
         FRG_AVIATION_BDE_BO105,      // FRG Aviation Brigade
         FRG_FIGHTER_WING_TORNADO_IDS, // FRG Fighter Wing Tornado IDS
+
+        // UK profiles
+        UK_ARMOURED_BDE_CHALLENGER,   //UK Armored Brigade with Challenger 1
+        UK_MECHANISED_BDE_WARRIOR,    //UK Mechanized Brigade with Warrior IFV
+        UK_INFANTRY_BDE_FV432,        //UK Infantry Brigade with FV432 APC
+        UK_AIRMOBILE_BDE,             //UK Airmobile Brigade
+        UK_ARTILLERY_BDE,             //UK Artillery Brigade
+        UK_AIR_DEFENSE_BDE,           //UK Air Defense Brigade
     }
 
     #endregion
