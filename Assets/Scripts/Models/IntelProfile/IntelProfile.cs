@@ -1441,10 +1441,10 @@ namespace HammerAndSickle.Models
             };
             _profiles[IntelProfileTypes.FRG_PANZER_BDE_LEO1] = frg_panzerBde_Leo1;
 
-            // FRG Panzergrenadier Brigade - Leopard 1
-            var frg_pzgrenBde_Leo1 = new Dictionary<WeaponSystems, int>
+            // FRG Panzergrenadier Brigade
+            var frg_pzgrenBde = new Dictionary<WeaponSystems, int>
             {
-                { WeaponSystems.INF_REG, 2800 },           // Brigade personnel across 4 battalions + support
+                { WeaponSystems.INF_REG, 2600 },           // Brigade personnel across 4 battalions + support
                 { WeaponSystems.TANK_LEOPARD1, 58 },       // 1× Panzer BN (44) + Mixed PzGren BN tank company (14) = 58 tanks
                 { WeaponSystems.IFV_MARDER, 102 },         // 2× PzGren BN (44 each) + Mixed PzGren BN mech companies (14) = 102 Marders
                 { WeaponSystems.APC_M113, 32 },            // Command posts, medical, maintenance, MTW carriers for lighter companies
@@ -1455,7 +1455,35 @@ namespace HammerAndSickle.Models
                 { WeaponSystems.SPAAA_GEPARD, 8 },         // Gepard air defense guns (brigade level)
                 { WeaponSystems.GENERIC_ART_LIGHT, 18 },   // 120mm mortars (higher count for infantry support)
             };
-            _profiles[IntelProfileTypes.FRG_PZGREN_BDE_LEO1] = frg_pzgrenBde_Leo1;
+            _profiles[IntelProfileTypes.FRG_PZGREN_BDE_MARDER] = frg_pzgrenBde;
+
+            // FRG Artillery Brigade
+            var frg_artilleryBde = new Dictionary<WeaponSystems, int>
+            {
+                { WeaponSystems.INF_REG, 1300 },           // Artillery personnel (gunners, fire direction, logistics)
+                { WeaponSystems.SPA_M109, 72 },            // 3× Artillery BN (24× M109 155mm SP howitzers each)
+                { WeaponSystems.ROC_MLRS, 18 },            // 1× Rocket Artillery BN (LARS 110mm MLRS)
+                { WeaponSystems.APC_M113, 48 },            // Fire direction centers, survey, meteorological, ammunition carriers
+                { WeaponSystems.RCN_LUCHS, 8 },            // Artillery reconnaissance and forward observer teams
+                { WeaponSystems.GENERIC_MANPAD, 16 },      // Roland/Stinger air defense (counter-battery protection)
+                { WeaponSystems.SPAAA_GEPARD, 12 },        // Enhanced air defense for high-value artillery assets
+                { WeaponSystems.GENERIC_ATGM, 8 },         // Milan teams for close defense of fire positions
+            };
+            _profiles[IntelProfileTypes.FRG_ARTILLERY_BDE] = frg_artilleryBde;
+
+            // FRG Airborne Brigade
+            var frg_luftlandeBde = new Dictionary<WeaponSystems, int>
+            {
+                { WeaponSystems.INF_AB, 1900 },            // Fallschirmjäger personnel across 3 parachute battalions + support
+                { WeaponSystems.APC_M113, 18 },            // Limited M113 for command posts (helicopter-transportable)
+                { WeaponSystems.RCN_LUCHS, 6 },            // Reduced reconnaissance (air mobility constraints)
+                { WeaponSystems.GENERIC_ATGM, 54 },        // Heavy Milan ATGM emphasis (anti-tank role)
+                { WeaponSystems.GENERIC_MANPAD, 36 },      // Stinger teams for immediate air defense
+                { WeaponSystems.GENERIC_ART_LIGHT, 24 },   // 120mm mortars (air-droppable fire support)
+                { WeaponSystems.GENERIC_AAA, 8 },          // Light air defense guns (20mm)
+                { WeaponSystems.HEL_BO105, 12 },           // Organic utility helicopters for mobility
+            };
+            _profiles[IntelProfileTypes.FRG_LUFTLANDE_BDE] = frg_luftlandeBde;
 
 
             #endregion

@@ -898,7 +898,9 @@ namespace HammerAndSickle.Models
         // Federal Republic of Germany (FRG) profiles
         FRG_PANZER_BDE_LEO2,         // FRG Panzer Brigade with Leopard 2
         FRG_PANZER_BDE_LEO1,         // FRG Panzer Brigade with Leopard 1
-        FRG_PZGREN_BDE_LEO1,         // FRG Panzergrenadier Brigade with Leopard 1
+        FRG_PZGREN_BDE_MARDER,       // FRG Panzergrenadier Brigade
+        FRG_ARTILLERY_BDE,           // FRG Artillery Brigade
+        FRG_LUFTLANDE_BDE,           // FRG Luftlande Brigade (Airborne)
 
     }
 
