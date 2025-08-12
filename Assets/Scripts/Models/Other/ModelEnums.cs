@@ -783,6 +783,7 @@ namespace HammerAndSickle.Models
     /// </summary>
     public enum IntelProfileTypes
     {
+        // Soviet profiles
         SV_MRR_BTR70,   // Motor Rifle Regiment
         SV_MRR_BTR80,   // Motor Rifle Regiment
         SV_MRR_BMP1,    // Motor Rifle Regiment (BMP)
@@ -859,6 +860,7 @@ namespace HammerAndSickle.Models
         SV_AR_SU25,     // ATT Regiment
         SV_AR_SU25B,    // ATT Regiment
 
+        SV_AWACS_A50,   // AWACS Regiment
         SV_BR_SU24,     // BMB Regiment
         SV_BR_TU16,     // BMB Regiment
         SV_BR_TU22,     // BMB Regiment
@@ -870,7 +872,28 @@ namespace HammerAndSickle.Models
         SV_AIRB,   // Airbase
         SV_DEPOT,  // Supply Depot
 
-        // TODO: Add rest of the profiles
+        // US profiles
+        US_ARMORED_BDE_M1,         // US Armored Brigade with M1A1 Abrams
+        US_ARMORED_BDE_M60A3,      // US Armored Brigade with M60A3 Patton
+        US_HEAVY_MECH_BDE_M1,      // US Heavy Mechanized Brigade with M1A1 Abrams
+        US_HEAVY_MECH_BDE_M60A3,   // US Heavy Mechanized Brigade with M60A3 Patton
+        US_PARA_BDE_82ND,          // US Airborne Brigade (82nd Airborne)
+        US_AIR_ASSAULT_BDE_101ST,  // US Air Assault Brigade (101st Airborne)
+        US_DIVISION_ARTILLERY_BDE, // US Division Artillery Brigade
+        US_AVIATION_ATTACK_BDE,    // US Aviation Attack Brigade
+        US_ENGINEER_BDE,           // US Engineer Brigade
+        US_AIR_DEFENSE_BDE,        // US Air Defense Brigade
+        US_ARMORED_CAV_SQDN, // US Armored Cavalry Squadron
+
+        US_FIGHTER_WING_F15,      // US Fighter Wing with F-15C Eagle
+        US_FIGHTER_WING_F4,       // US Fighter Wing with F-4 Phantom II
+        US_FIGHTER_WING_F16,      // US Multirole Wing with F-16 Fighting Falcon
+        US_TACTICAL_WING_A10,     // US Tactical Wing with A-10 Thunderbolt II
+        US_BOMBER_WING_F111,      // US Bomber Wing with F-111 Aardvark
+        US_BOMBER_WING_F117,      // US Bomber Wing with F-117 Nighthawk
+        US_RECON_SQDN_SR71,       // US Reconnaissance Squadron with SR-71 Blackbird
+        US_AWACS_E3,              // US AWACS Squadron with E-3 Sentry
+
     }
 
     #endregion
