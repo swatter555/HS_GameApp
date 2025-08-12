@@ -699,6 +699,7 @@ namespace HammerAndSickle.Models
         TANK_LEOPARD1,
         TANK_LEOPARD2,
         IFV_MARDER,
+        RCN_LUCHS,
         SPAAA_GEPARD,
         HEL_BO105,
         MRF_TORNADO_IDS,
@@ -893,6 +894,11 @@ namespace HammerAndSickle.Models
         US_BOMBER_WING_F117,      // US Bomber Wing with F-117 Nighthawk
         US_RECON_SQDN_SR71,       // US Reconnaissance Squadron with SR-71 Blackbird
         US_AWACS_E3,              // US AWACS Squadron with E-3 Sentry
+
+        // Federal Republic of Germany (FRG) profiles
+        FRG_PANZER_BDE_LEO2,         // FRG Panzer Brigade with Leopard 2
+        FRG_PANZER_BDE_LEO1,         // FRG Panzer Brigade with Leopard 1
+        FRG_PZGREN_BDE_LEO1,         // FRG Panzergrenadier Brigade with Leopard 1
 
     }
 
