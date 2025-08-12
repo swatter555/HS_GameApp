@@ -251,7 +251,9 @@ namespace HammerAndSickle.Models
                 Create_TANK_CHALLENGER1_Profile();
                 Create_IFV_WARRIOR_Profile();
                 Create_APC_FV432_Profile();
+                Create_RCN_Scimitar_Profile();
                 Create_SAM_Rapier_Profile();
+                Create_HEL_LYNX_Profile();
                 Create_MRF_GR1_Profile();
 
                 // FRA
@@ -4353,7 +4355,7 @@ namespace HammerAndSickle.Models
                     groundAirDefense: CUConstants.GROUND_DEFENSE_LIGHTARMOR,
                     primaryRange: 1f,
                     indirectRange: 0f,
-                    spottingRange: 4f,
+                    spottingRange: 3f,
                     allWeatherCapability: AllWeatherRating.Night,
                     nvgCapability: NVG_Rating.Gen2,
                     silhouette: UnitSilhouette.Small,
@@ -4625,6 +4627,54 @@ namespace HammerAndSickle.Models
         }
 
         /// <summary>
+        /// FV432 Armored Personnel Carrier
+        /// </summary>
+        private static void Create_RCN_Scimitar_Profile()
+        {
+            try
+            {
+                var profile = new WeaponSystemProfile(
+                    name: "Scimitar Recon Vehicle",
+                    nationality: Nationality.UK,
+                    weaponSystemID: WeaponSystems.RCN_SCIMITAR,
+                    25,
+                    hardAttack: 2,
+                    hardDefense: 3,
+                    softAttack: 5,
+                    softDefense: 5,
+                    groundAirAttack: 1,
+                    groundAirDefense: 2,
+                    primaryRange: 1f,
+                    indirectRange: 0f,
+                    spottingRange: 3f,
+                    allWeatherCapability: AllWeatherRating.GroundUnit,
+                    sigintRating: SIGINT_Rating.UnitLevel,
+                    nbcRating: NBC_Rating.Gen2,
+                    strategicMobility: StrategicMobility.AirLift,
+                    nvgCapability: NVG_Rating.Gen2,
+                    silhouette: UnitSilhouette.Small
+                );
+
+                // Set upgrade paths
+                profile.AddUpgradeType(UpgradeType.RCN);
+
+                // Set short name for UI display
+                profile.SetShortName("Scimitar");
+
+                // Set turn availability
+                profile.SetTurnAvailable(320);
+
+                // Store in master dictionary
+                _weaponSystemProfiles[WeaponSystems.RCN_SCIMITAR] = profile;
+            }
+            catch (Exception e)
+            {
+                AppService.HandleException(CLASS_NAME, nameof(Create_RCN_Scimitar_Profile), e);
+                throw;
+            }
+        }
+
+        /// <summary>
         /// Rapier Medium-Range SAM System
         /// </summary>
         private static void Create_SAM_Rapier_Profile()
@@ -4668,6 +4718,54 @@ namespace HammerAndSickle.Models
             catch (Exception e)
             {
                 AppService.HandleException(CLASS_NAME, nameof(Create_SAM_Rapier_Profile), e);
+                throw;
+            }
+        }
+
+        /// <summary>
+        /// Lynx Transport Helicopter
+        /// </summary>
+        private static void Create_HEL_LYNX_Profile()
+        {
+            try
+            {
+                var profile = new WeaponSystemProfile(
+                    name: "Westland Lynx",
+                    nationality: Nationality.UK,
+                    weaponSystemID: WeaponSystems.HEL_LYNX,
+                    40,
+                    hardAttack: 1,
+                    hardDefense: 3,
+                    softAttack: 5,
+                    softDefense: 5,
+                    groundAirAttack: 1,
+                    groundAirDefense: 6,
+                    primaryRange: 1f,
+                    indirectRange: 0f,
+                    spottingRange: 3f,
+                    allWeatherCapability: AllWeatherRating.GroundUnit,
+                    sigintRating: SIGINT_Rating.UnitLevel,
+                    nbcRating: NBC_Rating.Gen2,
+                    strategicMobility: StrategicMobility.Aviation,
+                    nvgCapability: NVG_Rating.Gen2,
+                    silhouette: UnitSilhouette.Small
+                );
+
+                // Set upgrade paths
+                profile.AddUpgradeType(UpgradeType.ATTHELO);
+
+                // Set short name for UI display
+                profile.SetShortName("Lynx");
+
+                // Set turn availability - entered service in 1986
+                profile.SetTurnAvailable(400);
+
+                // Store in master dictionary
+                _weaponSystemProfiles[WeaponSystems.HEL_LYNX] = profile;
+            }
+            catch (Exception e)
+            {
+                AppService.HandleException(CLASS_NAME, nameof(Create_HEL_LYNX_Profile), e);
                 throw;
             }
         }
