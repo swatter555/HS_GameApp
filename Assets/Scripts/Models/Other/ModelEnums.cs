@@ -839,6 +839,7 @@ namespace HammerAndSickle.Models
         SV_ADR_ZSU23,   // Air Defense Regiment
         SV_ADR_2K22,    // Air Defense Regiment
 
+        SV_SPSAM_9K31,  // Self-Propelled SAM Regiment
         SV_SAM_S75,     // Surface-to-Air Missile Regiment
         SV_SAM_S125,    // Surface-to-Air Missile Regiment
         SV_SAM_S300,    // Surface-to-Air Missile Regiment
@@ -920,6 +921,16 @@ namespace HammerAndSickle.Models
         UK_AIRMOBILE_BDE,             //UK Airmobile Brigade
         UK_ARTILLERY_BDE,             //UK Artillery Brigade
         UK_AIR_DEFENSE_BDE,           //UK Air Defense Brigade
+
+        // FRA profiles
+        FR_BRIGADE_BLINDEE_AMX30,    // French Armored Division with AMX-30
+        FR_BRIGADE_INF_MECA_AMX10P,  // French Mechanized Infantry Division with AMX-10P
+        FR_BRIGADE_INF_MOTO_VAB,     // French Motorized Infantry Division with VAB
+        FR_BRIGADE_PARACHUTISTE,     // French 11e Division Parachutiste
+        FR_REGIMENT_ARTILLERIE,      // French Artillery Regiment
+        FR_REGIMENT_DEFENSE_AA,      // French Air Defense Regiment
+        FR_FIGHTER_WING_MIRAGE2000,  // French Fighter Wing with Mirage 2000
+        FR_ATTACK_WING_JAGUAR,       // French Attack Wing with Jaguar
     }
 
     #endregion
