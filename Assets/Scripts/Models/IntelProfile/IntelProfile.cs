@@ -656,6 +656,9 @@ namespace HammerAndSickle.Models
             {
                 { WeaponSystems.INF_REG, 1100 },
                 { WeaponSystems.GENERIC_ART_HEAVY, 72 },
+                { WeaponSystems.RCN_BRDM2, 12 },
+                { WeaponSystems.APC_BTR70, 24 },
+                { WeaponSystems.GENERIC_MANPAD, 21 },
             };
             _profiles[IntelProfileTypes.SV_AR_HVY] = sv_heavyart;
 
@@ -664,6 +667,9 @@ namespace HammerAndSickle.Models
             {
                 { WeaponSystems.INF_REG, 1100 },
                 { WeaponSystems.GENERIC_ART_LIGHT, 72 },
+                { WeaponSystems.RCN_BRDM2, 12 },
+                { WeaponSystems.APC_BTR70, 24 },
+                { WeaponSystems.GENERIC_MANPAD, 21 },
             };
             _profiles[IntelProfileTypes.SV_AR_LGT] = sv_lightart;
 
@@ -672,6 +678,9 @@ namespace HammerAndSickle.Models
             {
                 { WeaponSystems.INF_REG, 1062 },
                 { WeaponSystems.SPA_2S1, 36 },
+                { WeaponSystems.RCN_BRDM2, 12 },
+                { WeaponSystems.APC_BTR70, 24 },
+                { WeaponSystems.GENERIC_MANPAD, 21 },
             };
             _profiles[IntelProfileTypes.SV_AR_2S1] = sv_2s1;
 
@@ -680,22 +689,31 @@ namespace HammerAndSickle.Models
             {
                 { WeaponSystems.INF_REG, 1062 },
                 { WeaponSystems.SPA_2S3, 36 },
+                { WeaponSystems.RCN_BRDM2, 12 },
+                { WeaponSystems.APC_BTR70, 24 },
+                { WeaponSystems.GENERIC_MANPAD, 21 },
             };
             _profiles[IntelProfileTypes.SV_AR_2S3] = sv_2s3;
 
             // Soviet artillery regiment 2S5
             var sv_2s5 = new Dictionary<WeaponSystems, int>
             {
-                { WeaponSystems.INF_REG, 1062 },
+                { WeaponSystems.INF_REG, 1262 },
                 { WeaponSystems.SPA_2S5, 36 },
+                { WeaponSystems.RCN_BRDM2, 12 },
+                { WeaponSystems.APC_BTR70, 44 },
+                { WeaponSystems.GENERIC_MANPAD, 21 },
             };
             _profiles[IntelProfileTypes.SV_AR_2S5] = sv_2s5;
 
             // Soviet artillery regiment 2S19
             var sv_2s19 = new Dictionary<WeaponSystems, int>
             {
-                { WeaponSystems.INF_REG, 1062 },
+                { WeaponSystems.INF_REG, 1162 },
                 { WeaponSystems.SPA_2S19, 36 },
+                { WeaponSystems.RCN_BRDM2, 12 },
+                { WeaponSystems.APC_BTR70, 36 },
+                { WeaponSystems.GENERIC_MANPAD, 21 },
             };
             _profiles[IntelProfileTypes.SV_AR_2S19] = sv_2s19;
 
@@ -703,7 +721,10 @@ namespace HammerAndSickle.Models
             var sv_bm21 = new Dictionary<WeaponSystems, int>
             {
                 { WeaponSystems.INF_REG, 1200 },
-                { WeaponSystems.ROC_BM21, 54 },
+                { WeaponSystems.ROC_BM21, 48 },
+                { WeaponSystems.RCN_BRDM2, 12 },
+                { WeaponSystems.APC_BTR70, 24 },
+                { WeaponSystems.GENERIC_MANPAD, 21 },
             };
             _profiles[IntelProfileTypes.SV_ROC_BM21] = sv_bm21;
 
@@ -711,7 +732,10 @@ namespace HammerAndSickle.Models
             var sv_bm27 = new Dictionary<WeaponSystems, int>
             {
                 { WeaponSystems.INF_REG, 1200 },
-                { WeaponSystems.ROC_BM27, 54 },
+                { WeaponSystems.ROC_BM27, 24 },
+                { WeaponSystems.RCN_BRDM2, 12 },
+                { WeaponSystems.APC_BTR70, 24 },
+                { WeaponSystems.GENERIC_MANPAD, 21 },
             };
             _profiles[IntelProfileTypes.SV_ROC_BM27] = sv_bm27;
 
@@ -719,7 +743,10 @@ namespace HammerAndSickle.Models
             var sv_bm30 = new Dictionary<WeaponSystems, int>
             {
                 { WeaponSystems.INF_REG, 1200 },
-                { WeaponSystems.ROC_BM30, 54 },
+                { WeaponSystems.ROC_BM30, 24 },
+                { WeaponSystems.RCN_BRDM2, 12 },
+                { WeaponSystems.APC_BTR70, 24 },
+                { WeaponSystems.GENERIC_MANPAD, 21 },
             };
             _profiles[IntelProfileTypes.SV_ROC_BM30] = sv_bm30;
 
@@ -727,7 +754,10 @@ namespace HammerAndSickle.Models
             var sv_scud = new Dictionary<WeaponSystems, int>
             {
                 { WeaponSystems.INF_REG, 800 },
-                { WeaponSystems.SSM_SCUD, 18 },
+                { WeaponSystems.SSM_SCUD, 12 },
+                { WeaponSystems.RCN_BRDM2, 12 },
+                { WeaponSystems.APC_BTR70, 24 },
+                { WeaponSystems.GENERIC_MANPAD, 21 },
             };
             _profiles[IntelProfileTypes.SV_BM_SCUDB] = sv_scud;
 
@@ -965,7 +995,8 @@ namespace HammerAndSickle.Models
             {
                 { WeaponSystems.INF_REG, 600 },
                 { WeaponSystems.GENERIC_AAA, 18 },
-                { WeaponSystems.GENERIC_MANPAD, 12 }
+                { WeaponSystems.GENERIC_MANPAD, 21 },
+                { WeaponSystems.APC_BTR70, 22 }
             };
             _profiles[IntelProfileTypes.SV_ADR_AAA] = svadr_AAA;
 
@@ -974,7 +1005,8 @@ namespace HammerAndSickle.Models
             {
                 { WeaponSystems.INF_REG, 600 },
                 { WeaponSystems.SPAAA_ZSU57, 18 },
-                { WeaponSystems.GENERIC_MANPAD, 12 }
+                { WeaponSystems.GENERIC_MANPAD, 21 },
+                { WeaponSystems.APC_BTR70, 22 }
             };
             _profiles[IntelProfileTypes.SV_ADR_ZSU57] = svadr_ZSU57;
 
@@ -983,7 +1015,8 @@ namespace HammerAndSickle.Models
             {
                 { WeaponSystems.INF_REG, 600 },
                 { WeaponSystems.SPAAA_ZSU23, 18 },
-                { WeaponSystems.GENERIC_MANPAD, 12 }
+                { WeaponSystems.GENERIC_MANPAD, 21 },
+                { WeaponSystems.APC_BTR70, 22 }
             };
             _profiles[IntelProfileTypes.SV_ADR_ZSU57] = svadr_ZSU23;
 
@@ -992,7 +1025,8 @@ namespace HammerAndSickle.Models
             {
                 { WeaponSystems.INF_REG, 600 },
                 { WeaponSystems.SPAAA_2K22, 18 },
-                { WeaponSystems.GENERIC_MANPAD, 12 }
+                { WeaponSystems.GENERIC_MANPAD, 21 },
+                { WeaponSystems.APC_BTR70, 22 }
             };
             _profiles[IntelProfileTypes.SV_ADR_2K22] = svadr_2K22;
 
@@ -1000,12 +1034,23 @@ namespace HammerAndSickle.Models
 
             #region Soviet SAM units
 
+            // SAM Regiment- 9K31 profile
+            var sam9k31 = new Dictionary<WeaponSystems, int>
+            {
+                { WeaponSystems.INF_REG, 750 },
+                { WeaponSystems.SPSAM_9K31, 18 },
+                { WeaponSystems.GENERIC_MANPAD, 21 },
+                { WeaponSystems.APC_BTR70, 22 }
+            };
+            _profiles[IntelProfileTypes.SV_SPSAM_9K31] = sam9k31;
+
             // SAM Regiment- S75 profile
             var samS75 = new Dictionary<WeaponSystems, int>
             {
                 { WeaponSystems.INF_REG, 750 },
                 { WeaponSystems.SAM_S75, 18 },
-                { WeaponSystems.GENERIC_MANPAD, 12 }
+                { WeaponSystems.GENERIC_MANPAD, 21 },
+                { WeaponSystems.APC_BTR70, 48 }
             };
             _profiles[IntelProfileTypes.SV_SAM_S75] = samS75;
 
@@ -1014,7 +1059,8 @@ namespace HammerAndSickle.Models
             {
                 { WeaponSystems.INF_REG, 750 },
                 { WeaponSystems.SAM_S125, 18 },
-                { WeaponSystems.GENERIC_MANPAD, 12 }
+                { WeaponSystems.GENERIC_MANPAD, 21 },
+                { WeaponSystems.APC_BTR70, 48 }
             };
             _profiles[IntelProfileTypes.SV_SAM_S125] = samS125;
 
@@ -1023,7 +1069,8 @@ namespace HammerAndSickle.Models
             {
                 { WeaponSystems.INF_REG, 750 },
                 { WeaponSystems.SAM_S300, 18 },
-                { WeaponSystems.GENERIC_MANPAD, 12 }
+                { WeaponSystems.GENERIC_MANPAD, 21 },
+                { WeaponSystems.APC_BTR70, 48 }
             };
             _profiles[IntelProfileTypes.SV_SAM_S300] = samS300;
 
@@ -1331,8 +1378,8 @@ namespace HammerAndSickle.Models
             // US Division Artillery Battalion (DIVARTY) - MLRS focused
             var us_divisionArtilleryBde_MLRS = new Dictionary<WeaponSystems, int>
             {
-                { WeaponSystems.INF_REG, 1120 },      // Artillery personnel across 4 battalions
-                { WeaponSystems.ROC_MLRS, 36 },       // 1 × MLRS battalion
+                { WeaponSystems.INF_REG, 1020 },      // Artillery personnel across 4 battalions
+                { WeaponSystems.ROC_MLRS, 18 },       // 1 × MLRS battalion
                 { WeaponSystems.APC_M113, 48 },       // Fire direction, supply, maintenance vehicles
                 { WeaponSystems.GENERIC_MANPAD, 12 }, // Stinger teams for air defense
                 { WeaponSystems.IFV_M3, 6 },          // Forward observer vehicles
@@ -1345,8 +1392,7 @@ namespace HammerAndSickle.Models
                 { WeaponSystems.INF_REG, 1350 },    // Aviation personnel (pilots, crew, maintenance)
                 { WeaponSystems.HEL_AH64, 54 },     // 3 × AH-64 Apache attack battalions (18 each)
                 { WeaponSystems.HEL_OH58, 18 },     // OH-58 Kiowa scout helicopters
-                { WeaponSystems.APC_M113, 12 },     // Ground support and maintenance vehicles
-                { WeaponSystems.GENERIC_MANPAD, 12 }, // Air defense for airfields
+                { WeaponSystems.APC_M113, 48 },     // Ground support and maintenance vehicles
             };
             _profiles[IntelProfileTypes.US_AVIATION_ATTACK_BDE] = us_aviationAttackBde;
 
@@ -1364,20 +1410,20 @@ namespace HammerAndSickle.Models
             // US Air Defense Brigade- Hawk SAMs
             var us_airDefenseBde_Hawk = new Dictionary<WeaponSystems, int>
             {
-                { WeaponSystems.INF_REG, 1800 },      // Air defense personnel
-                { WeaponSystems.SAM_HAWK, 24 },       // Hawk SAM batteries
-                { WeaponSystems.SPAAA_M163, 12 },     // Vulcan air defense guns
-                { WeaponSystems.GENERIC_MANPAD, 12 }, // Stinger teams distributed throughout
-                { WeaponSystems.APC_M113, 24 },       // Command and control vehicles
+                { WeaponSystems.INF_REG, 1100 },       // Air defense personnel
+                { WeaponSystems.SAM_HAWK, 18 },        // Hawk SAM batteries
+                { WeaponSystems.SPAAA_M163, 4 },       // Vulcan air defense guns
+                { WeaponSystems.GENERIC_MANPAD, 12 },  // Stinger teams distributed throughout
+                { WeaponSystems.APC_M113, 24 },        // Command and control vehicles
             };
             _profiles[IntelProfileTypes.US_AIR_DEFENSE_BDE_HAWK] = us_airDefenseBde_Hawk;
 
             // US Air Defense Brigade- Chaparral
             var us_airDefenseBde_Chap = new Dictionary<WeaponSystems, int>
             {
-                { WeaponSystems.INF_REG, 1800 },      // Air defense personnel
-                { WeaponSystems.SPSAM_CHAP, 24 },     // Chaparral mobile SAM systems
-                { WeaponSystems.SPAAA_M163, 12 },     // Vulcan air defense guns
+                { WeaponSystems.INF_REG, 900 },       // Air defense personnel
+                { WeaponSystems.SPSAM_CHAP, 18 },     // Chaparral mobile SAM systems
+                { WeaponSystems.SPAAA_M163, 4 },      // Vulcan air defense guns
                 { WeaponSystems.GENERIC_MANPAD, 12 }, // Stinger teams distributed throughout
                 { WeaponSystems.APC_M113, 24 },       // Command and control vehicles
             };
@@ -1497,7 +1543,7 @@ namespace HammerAndSickle.Models
             var frg_artilleryBde_M109 = new Dictionary<WeaponSystems, int>
             {
                 { WeaponSystems.INF_REG, 1300 },           // Artillery personnel (gunners, fire direction, logistics)
-                { WeaponSystems.SPA_M109, 72 },            // 3× Artillery BN (24× M109 155mm SP howitzers each)
+                { WeaponSystems.SPA_M109, 48 },            // 3× Artillery BN (24× M109 155mm SP howitzers each)
                 { WeaponSystems.APC_M113, 48 },            // Fire direction centers, survey, meteorological, ammunition carriers
                 { WeaponSystems.RCN_LUCHS, 8 },            // Artillery reconnaissance and forward observer teams
                 { WeaponSystems.GENERIC_MANPAD, 16 },      // Roland/Stinger air defense (counter-battery protection)
@@ -1509,7 +1555,7 @@ namespace HammerAndSickle.Models
             var frg_artilleryBde_MLRS = new Dictionary<WeaponSystems, int>
             {
                 { WeaponSystems.INF_REG, 1350 },           // Artillery personnel (gunners, fire direction, logistics)
-                { WeaponSystems.ROC_MLRS, 36 },            // 3× MLRS BN
+                { WeaponSystems.ROC_MLRS, 24 },            // 3× MLRS BN
                 { WeaponSystems.APC_M113, 48 },            // Fire direction centers, survey, meteorological, ammunition carriers
                 { WeaponSystems.RCN_LUCHS, 8 },            // Artillery reconnaissance and forward observer teams
                 { WeaponSystems.GENERIC_MANPAD, 16 },      // Roland/Stinger air defense (counter-battery protection)
@@ -1549,9 +1595,9 @@ namespace HammerAndSickle.Models
             var frg_airDefenseBde_HAWK = new Dictionary<WeaponSystems, int>
             {
                 { WeaponSystems.INF_REG, 1100 },           // Air defense personnel (radar, missile, gun crews)
-                { WeaponSystems.SAM_HAWK, 24 },            // 1× Hawk SAM battalion (medium-range area defense)
-                { WeaponSystems.SPAAA_GEPARD, 12 },        // 2× Gepard battalions (radar-guided 35mm guns)
-                { WeaponSystems.APC_M113, 32 },            // Command posts, radar vehicles, support systems
+                { WeaponSystems.SAM_HAWK, 18 },            // 1× Hawk SAM battalion (medium-range area defense)
+                { WeaponSystems.SPAAA_GEPARD, 3 },        // 2× Gepard battalions (radar-guided 35mm guns)
+                { WeaponSystems.APC_M113, 16 },            // Command posts, radar vehicles, support systems
                 { WeaponSystems.RCN_LUCHS, 6 },            // Forward air defense reconnaissance
                 { WeaponSystems.GENERIC_MANPAD, 12 },      // Stinger teams for gap coverage and mobility
             };
@@ -1560,9 +1606,9 @@ namespace HammerAndSickle.Models
             // FRG Air Defense Brigade
             var frg_airDefenseBde_ROLAND = new Dictionary<WeaponSystems, int>
             {
-                { WeaponSystems.INF_REG, 1100 },           // Air defense personnel (radar, missile, gun crews)
-                { WeaponSystems.SPSAM_ROLAND, 24 },        // 1× Hawk SAM battalion (medium-range area defense)
-                { WeaponSystems.SPAAA_GEPARD, 12 },        // 2× Gepard battalions (radar-guided 35mm guns)
+                { WeaponSystems.INF_REG, 950 },            // Air defense personnel (radar, missile, gun crews)
+                { WeaponSystems.SPSAM_ROLAND, 18 },        // 1× Hawk SAM battalion (medium-range area defense)
+                { WeaponSystems.SPAAA_GEPARD, 3 },         // 2× Gepard battalions (radar-guided 35mm guns)
                 { WeaponSystems.APC_M113, 32 },            // Command posts, radar vehicles, support systems
                 { WeaponSystems.RCN_LUCHS, 6 },            // Forward air defense reconnaissance
                 { WeaponSystems.GENERIC_MANPAD, 12 },      // Stinger teams for gap coverage and mobility
@@ -1572,8 +1618,8 @@ namespace HammerAndSickle.Models
             // FRG Air Defense Brigade
             var frg_airDefenseBde_GEPARD = new Dictionary<WeaponSystems, int>
             {
-                { WeaponSystems.INF_REG, 1100 },           // Air defense personnel (radar, missile, gun crews)
-                { WeaponSystems.SPAAA_GEPARD, 24 },        // 2× Gepard battalions (radar-guided 35mm guns)
+                { WeaponSystems.INF_REG, 850 },            // Air defense personnel (radar, missile, gun crews)
+                { WeaponSystems.SPAAA_GEPARD, 18 },        // 2× Gepard battalions (radar-guided 35mm guns)
                 { WeaponSystems.APC_M113, 32 },            // Command posts, radar vehicles, support systems
                 { WeaponSystems.RCN_LUCHS, 6 },            // Forward air defense reconnaissance
                 { WeaponSystems.GENERIC_MANPAD, 12 },      // Stinger teams for gap coverage and mobility
@@ -1583,7 +1629,7 @@ namespace HammerAndSickle.Models
             // FRG Air Defense Brigade
             var frg_aviation_Bde = new Dictionary<WeaponSystems, int>
             {
-                { WeaponSystems.HEL_BO105, 72 },
+                { WeaponSystems.HEL_BO105, 54 },
             };
             _profiles[IntelProfileTypes.FRG_AVIATION_BDE_BO105] = frg_aviation_Bde;
 
@@ -1663,7 +1709,6 @@ namespace HammerAndSickle.Models
             {
                 { WeaponSystems.INF_REG, 1350 },              // 3× Artillery regiments + support personnel
                 { WeaponSystems.SPA_M109, 54 },               // 3× Artillery regiments (18 each) - 155mm SP
-                { WeaponSystems.GENERIC_ART_HEAVY, 18 },      // Heavy artillery (203mm or MLRS)
                 { WeaponSystems.APC_FV432, 36 },              // Fire direction, supply, maintenance vehicles
                 { WeaponSystems.RCN_SCIMITAR, 6 },            // Artillery reconnaissance
                 { WeaponSystems.GENERIC_MANPAD, 12 },         // Self-defense air defense
@@ -1674,13 +1719,107 @@ namespace HammerAndSickle.Models
             var uk_airDefenseBde = new Dictionary<WeaponSystems, int>
             {
                 { WeaponSystems.INF_REG, 1200 },              // Air defense personnel + support
-                { WeaponSystems.SAM_RAPIER, 36 },             // 3× Rapier squadrons (12 each)
-                { WeaponSystems.GENERIC_MANPAD, 48 },         // Blowpipe/Javelin teams
-                { WeaponSystems.GENERIC_AAA, 24 },            // Light AA guns (40mm Bofors)
+                { WeaponSystems.SAM_RAPIER, 12 },             // 3× Rapier squadrons (12 each)
+                { WeaponSystems.GENERIC_AAA, 8 },             // Light AA guns (40mm Bofors)
                 { WeaponSystems.APC_FV432, 24 },              // Command, radar, support vehicles
                 { WeaponSystems.RCN_SCIMITAR, 4 },            // Air defense reconnaissance
             };
             _profiles[IntelProfileTypes.UK_AIR_DEFENSE_BDE] = uk_airDefenseBde;
+
+            #endregion
+
+            //-------------------------------------------------------------
+
+            #region French
+
+            // French Division Blindée - AMX-30B (Armored Division)
+            var fr_brigadeBlindee_AMX30 = new Dictionary<WeaponSystems, int>
+            {
+                { WeaponSystems.INF_REG, 1750 },              // Personnel (5-6 regiments + support)
+                { WeaponSystems.TANK_AMX30, 80 },             // 2× Armored regiments (40 each)
+                { WeaponSystems.IFV_AMX10P, 36 },             // 1× Mechanized infantry regiments (36 each)
+                { WeaponSystems.APC_VAB, 18 },                // Command, support vehicles
+                { WeaponSystems.RCN_ERC90, 12 },              // Reconnaissance regiment
+                { WeaponSystems.GENERIC_ATGM, 8 },            // Milan ATGM teams
+                { WeaponSystems.GENERIC_MANPAD, 18 },         // Mistral SAM teams
+                { WeaponSystems.SPA_AUF1, 18 },               // Organic artillery regiment
+                { WeaponSystems.GENERIC_ART_LIGHT, 18 },      // 120mm mortars
+            };
+            _profiles[IntelProfileTypes.FR_BRIGADE_BLINDEE_AMX30] = fr_brigadeBlindee_AMX30;
+
+            // French Division d'Infanterie Mécanisée (Mechanized Infantry Division)
+            var fr_brigadeInfMeca_AMX10P = new Dictionary<WeaponSystems, int>
+            {
+                { WeaponSystems.INF_REG, 1950 },              // Division personnel (4 regiments + support)
+                { WeaponSystems.RCN_ERC90, 12},               // Reconnaissance regiment
+                { WeaponSystems.IFV_AMX10P, 72 },             // 3× Mechanized infantry regiments (36 each)
+                { WeaponSystems.TANK_AMX30, 40 },             // 1× Light armor regiment (support)
+                { WeaponSystems.APC_VAB, 12 },                // Command, medical vehicles
+                { WeaponSystems.GENERIC_ATGM, 18 },           // Milan ATGM teams
+                { WeaponSystems.GENERIC_MANPAD, 12 },         // Mistral SAM teams
+                { WeaponSystems.SPA_AUF1, 18 },               // Organic artillery regiment
+                { WeaponSystems.GENERIC_ART_LIGHT, 18 },      // 120mm mortars
+            };
+            _profiles[IntelProfileTypes.FR_BRIGADE_INF_MECA_AMX10P] = fr_brigadeInfMeca_AMX10P;
+
+            // French Division d'Infanterie Motorisée (Motorized Infantry Division)
+            var fr_brigadeInfMoto_VAB = new Dictionary<WeaponSystems, int>
+            {
+                { WeaponSystems.INF_REG, 1900 },              // Division personnel (4 regiments + support)
+                { WeaponSystems.RCN_ERC90, 12 },              // Reconnaissance regiment
+                { WeaponSystems.APC_VAB, 135 },               // 3× Motorized infantry regiments (45 each)
+                { WeaponSystems.TANK_AMX30, 20 },             // Light armor support squadron
+                { WeaponSystems.GENERIC_ATGM, 18 },           // Milan ATGM teams
+                { WeaponSystems.GENERIC_MANPAD, 12 },         // Mistral SAM teams
+                { WeaponSystems.SPA_AUF1, 18 },               // Organic artillery regiment
+                { WeaponSystems.GENERIC_ART_LIGHT, 18 },      // 120mm mortars
+            };
+            _profiles[IntelProfileTypes.FR_BRIGADE_INF_MOTO_VAB] = fr_brigadeInfMoto_VAB;
+
+            // 11e Division Parachutiste (Airborne Division)
+            var fr_brigadePara = new Dictionary<WeaponSystems, int>
+            {
+                { WeaponSystems.INF_AB, 2200 },               // Parachute infantry personnel (largest French division)
+                { WeaponSystems.APC_VAB, 24 },                // Light support vehicles (air-portable)
+                { WeaponSystems.RCN_ERC90, 12 },              // Light armored cavalry regiment (air-droppable)
+                { WeaponSystems.GENERIC_ATGM, 36 },           // Milan ATGM teams
+                { WeaponSystems.GENERIC_MANPAD, 24 },         // Mistral SAM teams
+                { WeaponSystems.GENERIC_ART_LIGHT, 36 },      // 120mm mortars (air-droppable)
+            };
+            _profiles[IntelProfileTypes.FR_BRIGADE_PARACHUTISTE] = fr_brigadePara;
+
+            // French Régiment d'Artillerie (Artillery Regiment)
+            var fr_regimentArtillerie = new Dictionary<WeaponSystems, int>
+            {
+                { WeaponSystems.INF_REG, 700 },               // Artillery personnel
+                { WeaponSystems.SPA_AUF1, 18 },               // AUF1 155mm SP howitzers
+                { WeaponSystems.APC_VAB, 10 },                // Fire direction, supply vehicles
+                { WeaponSystems.GENERIC_MANPAD, 6 },          // Self-defense Mistral teams
+            };
+            _profiles[IntelProfileTypes.FR_REGIMENT_ARTILLERIE] = fr_regimentArtillerie;
+
+            // French Régiment de Défense Antiaérienne (Air Defense Regiment)
+            var fr_regimentDefenseAA = new Dictionary<WeaponSystems, int>
+            {
+                { WeaponSystems.INF_REG, 650 },               // Air defense personnel
+                { WeaponSystems.SPSAM_ROLAND, 18 },           // Roland air defense missiles
+                { WeaponSystems.GENERIC_AAA, 12 },            // Light AA guns (20mm)
+                { WeaponSystems.GENERIC_MANPAD, 36 },         // Mistral SAM teams
+                { WeaponSystems.APC_VAB, 12 },                // Command, radar vehicles
+            };
+            _profiles[IntelProfileTypes.FR_REGIMENT_DEFENSE_AA] = fr_regimentDefenseAA;
+
+            // French Escadron de Chasse (Fighter Squadron) - Mirage 2000
+            var fr_fighterSquadron_Mirage2000 = new Dictionary<WeaponSystems, int>
+            {
+                { WeaponSystems.ASF_MIRAGE2000, 36 },
+            };
+
+            // French Escadron de Chasse (Fighter Squadron) - Jaguar
+            var fr_fighterSquadron_Jaguar = new Dictionary<WeaponSystems, int>
+            {
+                { WeaponSystems.ATT_JAGUAR, 36 },
+            };
 
             #endregion
         }
