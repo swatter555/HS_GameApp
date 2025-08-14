@@ -27,6 +27,7 @@ namespace HammerAndSickle.Models
         public const int MECH_UNIT      = 10;
         public const int MOT_UNIT       = 8;
         public const int FOOT_UNIT      = 4;
+        public const int CAVALRY_UNIT   = 10;
         public const int FIXEDWING_UNIT = 100;
         public const int HELO_UNIT      = 24;
         public const int STATIC_UNIT    = 0;

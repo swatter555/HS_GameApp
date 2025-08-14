@@ -29,6 +29,7 @@ namespace HammerAndSickle.Models
         MAR,    // Marine
         MMAR,   // Mechanized Marine
         RECON,  // Reconnaissance
+        CAV,    // Horse Cavalry
         AT,     // Anti-tank
         AM,     // Air Mobile
         MAM,    // Mechanized Air Mobile
@@ -732,6 +733,11 @@ namespace HammerAndSickle.Models
         GENERIC_LANDBASE,
         GENERIC_AIRBASE,
         GENERIC_SUPPLYDEPOT,
+        GENERIC_RPG7,
+        GENERIC_MORTAR_82MM,
+        GENERIC_MORTAR_120MM,
+        GENERIC_RECOILLESS_RIFLE,
+        GENERIC_CAVALRY,
 
         // Shared profiles for infantry
         INF_REG,    // Regular INF
@@ -931,6 +937,38 @@ namespace HammerAndSickle.Models
         FR_REGIMENT_DEFENSE_AA,      // French Air Defense Regiment
         FR_FIGHTER_WING_MIRAGE2000,  // French Fighter Wing with Mirage 2000
         FR_ATTACK_WING_JAGUAR,       // French Attack Wing with Jaguar
+
+        // Mujahideen profiles
+        MJ_INF_GUERRILLA,        // Mujahideen Guerrilla INF
+        MJ_SPEC_COMMANDO,        // Mujahideen Special Forces Commando INF
+        MJ_CAV_HORSE,            // Mujahideen Horse Cavalry
+        MJ_AA,                   // Mujahideen anti-aircraft unit
+        MJ_ART_LIGHT_MORTAR,     // Mujahideen Light Mortar unit
+        MJ_ART_HEAVY_MORTAR,     // Mujahideen Heavy Mortar unit
+
+        // Regular Arab profiles
+        ARAB_TANK_REG_T55,         // Regular Arab Tank Regiment T-55
+        ARAB_TANK_REG_T72,         // Regular Arab Tank Regiment T-72
+        ARAB_TANK_REG_M60A3,       // Regular Arab Tank Regiment M60A3
+        ARAB_TANK_REG_M1,          // Regular Arab Tank Regiment M1
+        ARAB_MECH_REG_BMP1,        // Regular Arab Mechanized Infantry Regiment BMP-1
+        ARAB_MECH_REG_BTR70,       // Regular Arab Mechanized Infantry Regiment BTR-70
+        ARAB_MECH_REG_M2,          // Regular Arab Mechanized Infantry Regiment M2 Bradley
+        ARAB_MECH_REG_M113,        // Regular Arab Mechanized Infantry Regiment M113
+        ARAB_REG_MOT,              // Regular Arab Motorized Infantry Regiment
+        ARAB_REG_INF,              // Regular Arab Infantry Regiment
+        ARAB_REG_HVY_ART,          // Regular Arab Heavy Artillery Regiment
+        ARAB_REG_LGT_ART,          // Regular Arab Light Artillery Regiment
+        ARAB_SPA_REG_2S1,          // Regular Arab Self-Propelled Artillery Regiment 2S1
+        ARAB_SPA_REG_M109,         // Regular Arab Self-Propelled Artillery Regiment M109
+        ARAB_ROC_REG_BM21,         // Regular Arab Rocket Artillery Regiment BM-21
+        ARAB_ROC_REG_MLRS,         // Regular Arab Rocket Artillery Regiment MLRS
+        ARAB_RCN_REG_BRDM,         // Regular Arab Reconnaissance Regiment BRDM
+        ARAB_RCN_REG_M3,           // Regular Arab Reconnaissance Regiment M3 Cavalry
+        ARAB_SPAAA_REG_ZSU23,      // Regular Arab SPAAA Regiment ZSU-23
+        ARAB_SAM_REG_S75,          // Regular Arab SAM Regiment S-75
+        ARAB_SAM_REG_S125,         // Regular Arab SAM Regiment S-125
+        ARAB_SAM_REG_HAWK,         // Regular Arab SAM Regiment HAWK
     }
 
     #endregion
