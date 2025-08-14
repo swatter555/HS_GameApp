@@ -272,6 +272,11 @@ namespace HammerAndSickle.Models
                 Create_GENERIC_HeavytArt_Profile();
                 Create_GENERIC_MANPAD_Profile();
                 Create_GENERIC_ATGM_Profile();
+                Create_GENERIC_RPG7_Profile();
+                Create_GENERIC_LightMortar_Profile();
+                Create_GENERIC_HeavyMortar_Profile();
+                Create_GENERIC_RECOILLESS_RIFLE_Profile();
+                Create_GENERIC_CAVALRY_Profile();
 
                 // Generic land bases
                 Create_BASE_Landbase_Profile();
@@ -5425,6 +5430,246 @@ namespace HammerAndSickle.Models
             }
         }
 
+        /// <summary>
+        /// Create a generic light mortar profile.
+        /// </summary>
+        private static void Create_GENERIC_LightMortar_Profile()
+        {
+            try
+            {
+                var profile = new WeaponSystemProfile(
+                    name: "82mm Light Mortar",
+                    nationality: Nationality.GENERIC,
+                    weaponSystemID: WeaponSystems.GENERIC_MORTAR_82MM,
+                    20,
+                    hardAttack: 4,
+                    hardDefense: 3,
+                    softAttack: 9,
+                    softDefense: 4,
+                    groundAirDefense: CUConstants.GROUND_DEFENSE_INFANTRY,
+                    primaryRange: 1f,
+                    indirectRange: 2f,
+                    spottingRange: 2f,
+                    allWeatherCapability: AllWeatherRating.GroundUnit,
+                    nvgCapability: NVG_Rating.None,
+                    silhouette: UnitSilhouette.Medium,
+                    sigintRating: SIGINT_Rating.UnitLevel,
+                    nbcRating: NBC_Rating.Gen1,
+                    strategicMobility: StrategicMobility.AirDrop,
+                    movementPoints: CUConstants.FOOT_UNIT
+                );
+
+                //Set the upgrade paths for modernization
+                profile.AddUpgradeType(UpgradeType.ART);
+
+                // Set short name for UI display
+                profile.SetShortName("82mm Mortar");
+
+                // Set turn availability in months.
+                profile.SetTurnAvailable(1);
+
+                // Store in master dictionary
+                _weaponSystemProfiles[WeaponSystems.GENERIC_MORTAR_82MM] = profile;
+            }
+            catch (Exception e)
+            {
+                AppService.HandleException(CLASS_NAME, nameof(Create_GENERIC_LightMortar_Profile), e);
+                throw;
+            }
+        }
+
+        /// <summary>
+        /// Create a generic heavy mortar profile.
+        /// </summary>
+        private static void Create_GENERIC_HeavyMortar_Profile()
+        {
+            try
+            {
+                var profile = new WeaponSystemProfile(
+                    name: "120mm Heavy Mortar",
+                    nationality: Nationality.GENERIC,
+                    weaponSystemID: WeaponSystems.GENERIC_MORTAR_120MM,
+                    20,
+                    hardAttack: 6,
+                    hardDefense: 4,
+                    softAttack: 12,
+                    softDefense: 4,
+                    groundAirDefense: CUConstants.GROUND_DEFENSE_INFANTRY,
+                    primaryRange: 1f,
+                    indirectRange: 3f,
+                    spottingRange: 2f,
+                    allWeatherCapability: AllWeatherRating.GroundUnit,
+                    nvgCapability: NVG_Rating.None,
+                    silhouette: UnitSilhouette.Medium,
+                    sigintRating: SIGINT_Rating.UnitLevel,
+                    nbcRating: NBC_Rating.Gen1,
+                    strategicMobility: StrategicMobility.AirDrop,
+                    movementPoints: CUConstants.FOOT_UNIT
+                );
+
+                //Set the upgrade paths for modernization
+                profile.AddUpgradeType(UpgradeType.ART);
+
+                // Set short name for UI display
+                profile.SetShortName("120mm Mortar");
+
+                // Set turn availability in months.
+                profile.SetTurnAvailable(1);
+
+                // Store in master dictionary
+                _weaponSystemProfiles[WeaponSystems.GENERIC_MORTAR_120MM] = profile;
+            }
+            catch (Exception e)
+            {
+                AppService.HandleException(CLASS_NAME, nameof(Create_GENERIC_HeavyMortar_Profile), e);
+                throw;
+            }
+        }
+
+        /// <summary>
+        /// Create a generic RPG-7 profile.
+        /// </summary>
+        private static void Create_GENERIC_RPG7_Profile()
+        {
+            try
+            {
+                var profile = new WeaponSystemProfile(
+                    name: "RPG-7",
+                    nationality: Nationality.GENERIC,
+                    weaponSystemID: WeaponSystems.GENERIC_RPG7,
+                    10,
+                    hardAttack: 10,
+                    hardDefense: 1,
+                    softAttack: 6,
+                    softDefense: 8,
+                    groundAirDefense: CUConstants.FOOT_UNIT,
+                    primaryRange: 1f,
+                    indirectRange: 0f,
+                    spottingRange: 2f,
+                    allWeatherCapability: AllWeatherRating.GroundUnit,
+                    nvgCapability: NVG_Rating.Gen1,
+                    silhouette: UnitSilhouette.Small,
+                    sigintRating: SIGINT_Rating.UnitLevel,
+                    nbcRating: NBC_Rating.Gen1,
+                    strategicMobility: StrategicMobility.AirDrop,
+                    movementPoints: CUConstants.FOOT_UNIT
+                );
+
+                // Set upgrade paths
+                profile.AddUpgradeType(UpgradeType.ATGM);
+
+                // Set short name for UI display
+                profile.SetShortName("RPG-7");
+
+                // Set turn availability in months.
+                profile.SetTurnAvailable(250);
+
+                // Store in master dictionary
+                _weaponSystemProfiles[WeaponSystems.GENERIC_RPG7] = profile;
+            }
+            catch (Exception e)
+            {
+                AppService.HandleException(CLASS_NAME, nameof(Create_GENERIC_RPG7_Profile), e);
+                throw;
+            }
+        }
+
+        /// <summary>
+        /// Create a generic Recoiless Rifle profile.
+        /// </summary>
+        private static void Create_GENERIC_RECOILLESS_RIFLE_Profile()
+        {
+            try
+            {
+                var profile = new WeaponSystemProfile(
+                    name: "Recoilless Rifle",
+                    nationality: Nationality.GENERIC,
+                    weaponSystemID: WeaponSystems.GENERIC_RECOILLESS_RIFLE,
+                    10,
+                    hardAttack: 7,
+                    hardDefense: 3,
+                    softAttack: 7,
+                    softDefense: 8,
+                    groundAirDefense: CUConstants.FOOT_UNIT,
+                    primaryRange: 1f,
+                    indirectRange: 0f,
+                    spottingRange: 2f,
+                    allWeatherCapability: AllWeatherRating.GroundUnit,
+                    nvgCapability: NVG_Rating.Gen1,
+                    silhouette: UnitSilhouette.Small,
+                    sigintRating: SIGINT_Rating.UnitLevel,
+                    nbcRating: NBC_Rating.Gen1,
+                    strategicMobility: StrategicMobility.AirDrop,
+                    movementPoints: CUConstants.FOOT_UNIT
+                );
+
+                // Set upgrade paths
+                profile.AddUpgradeType(UpgradeType.ATGM);
+
+                // Set short name for UI display
+                profile.SetShortName("Recoilless Rifle");
+
+                // Set turn availability in months.
+                profile.SetTurnAvailable(250);
+
+                // Store in master dictionary
+                _weaponSystemProfiles[WeaponSystems.GENERIC_RECOILLESS_RIFLE] = profile;
+            }
+            catch (Exception e)
+            {
+                AppService.HandleException(CLASS_NAME, nameof(Create_GENERIC_RECOILLESS_RIFLE_Profile), e);
+                throw;
+            }
+        }
+
+        /// <summary>
+        /// Create a generic mounted cavalry profile.
+        /// </summary>
+        private static void Create_GENERIC_CAVALRY_Profile()
+        {
+            try
+            {
+                var profile = new WeaponSystemProfile(
+                    name: "Mounted Cavalry Unit",
+                    nationality: Nationality.GENERIC,
+                    weaponSystemID: WeaponSystems.GENERIC_CAVALRY,
+                    20,
+                    hardAttack: 5,
+                    hardDefense: 5,
+                    softAttack: 7,
+                    softDefense: 9,
+                    groundAirDefense: CUConstants.FOOT_UNIT,
+                    primaryRange: 1f,
+                    indirectRange: 0f,
+                    spottingRange: 2f,
+                    allWeatherCapability: AllWeatherRating.GroundUnit,
+                    nvgCapability: NVG_Rating.Gen1,
+                    silhouette: UnitSilhouette.Small,
+                    sigintRating: SIGINT_Rating.UnitLevel,
+                    nbcRating: NBC_Rating.Gen1,
+                    strategicMobility: StrategicMobility.AirLift,
+                    movementPoints: CUConstants.CAVALRY_UNIT
+                );
+
+                // Set upgrade paths
+                profile.AddUpgradeType(UpgradeType.INF);
+
+                // Set short name for UI display
+                profile.SetShortName("Cavalry");
+
+                // Set turn availability in months.
+                profile.SetTurnAvailable(1);
+
+                // Store in master dictionary
+                _weaponSystemProfiles[WeaponSystems.GENERIC_CAVALRY] = profile;
+            }
+            catch (Exception e)
+            {
+                AppService.HandleException(CLASS_NAME, nameof(Create_GENERIC_CAVALRY_Profile), e);
+                throw;
+            }
+        }
+        
         #endregion
 
         //-----------------------------------------------------------------------------------------
@@ -5920,5 +6165,7 @@ namespace HammerAndSickle.Models
         #endregion
 
         //-----------------------------------------------------------------------------------------
+
+        // TODO: Add CONSTANTS to help balance ratings later.
     }
 }

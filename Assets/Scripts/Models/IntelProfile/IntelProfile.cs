@@ -13,7 +13,6 @@ namespace HammerAndSickle.Models
 
         #endregion
 
-
         #region Fields
 
         private static readonly Dictionary<IntelProfileTypes, Dictionary<WeaponSystems, int>> _profiles
@@ -24,7 +23,6 @@ namespace HammerAndSickle.Models
 
         #endregion
 
-
         #region Properties
 
         /// <summary>
@@ -33,7 +31,6 @@ namespace HammerAndSickle.Models
         public static bool IsInitialized => _isInitialized;
 
         #endregion
-
 
         #region Public Methods
 
@@ -247,7 +244,6 @@ namespace HammerAndSickle.Models
 
         #endregion
 
-
         #region Private Helper Methods
 
         /// <summary>
@@ -406,7 +402,6 @@ namespace HammerAndSickle.Models
 
         #endregion
 
-
         #region Profile Database
 
         /// <summary>
@@ -416,6 +411,7 @@ namespace HammerAndSickle.Models
         private static void LoadProfileDefinitions()
         {
             //-------------------------------------------------------------//
+
             #region Soviet APCs
 
             // Motor Rifle Regiment- BTR70 profile
@@ -1728,7 +1724,7 @@ namespace HammerAndSickle.Models
 
             #endregion
 
-            //-------------------------------------------------------------
+            //-------------------------------------------------------------//
 
             #region French
 
@@ -1822,6 +1818,366 @@ namespace HammerAndSickle.Models
             };
 
             #endregion
+
+            //-------------------------------------------------------------//
+
+            #region Arab Irregulars Profiles
+
+            // Mujahideen Guerrilla Infantry Regiment
+            var mj_infGuerrilla = new Dictionary<WeaponSystems, int>
+            {
+                { WeaponSystems.INF_REG, 1200 },           // Regiment personnel (guerrilla fighters)
+                { WeaponSystems.GENERIC_RPG7, 36 },        // RPG-7 anti-tank teams
+                { WeaponSystems.GENERIC_MORTAR_82MM, 18 }, // 82mm mortar teams
+                { WeaponSystems.GENERIC_RECOILLESS_RIFLE, 12 }, // Recoilless rifle teams
+                { WeaponSystems.GENERIC_MANPAD, 8 },       // SA-7/Stinger teams
+                { WeaponSystems.GENERIC_AAA, 6 },          // DShK/ZU-23 positions
+            };
+            _profiles[IntelProfileTypes.MJ_INF_GUERRILLA] = mj_infGuerrilla;
+
+            // Mujahideen Special Forces/Commando Regiment
+            var mj_specCommando = new Dictionary<WeaponSystems, int>
+            {
+                { WeaponSystems.INF_SPEC, 800 },           // Regiment personnel (elite fighters)
+                { WeaponSystems.GENERIC_RPG7, 48 },        // More RPG-7 teams (better equipped)
+                { WeaponSystems.GENERIC_MORTAR_82MM, 18 }, // More mortar teams
+                { WeaponSystems.GENERIC_MANPAD, 20 },      // Better air defense
+                { WeaponSystems.GENERIC_ATGM, 12 },        // Limited advanced ATGMs (TOW/Dragon)
+            };
+            _profiles[IntelProfileTypes.MJ_SPEC_COMMANDO] = mj_specCommando;
+
+            // Mujahideen Horse Cavalry Regiment
+            var mj_cavHorse = new Dictionary<WeaponSystems, int>
+            {
+                { WeaponSystems.INF_REG, 1075 },               // Regiment personnel (mounted infantry)
+                { WeaponSystems.GENERIC_RPG7, 48 },            // Portable anti-tank weapons
+                { WeaponSystems.GENERIC_MORTAR_82MM, 12 },     // Light mortars (packable)
+                { WeaponSystems.GENERIC_RECOILLESS_RIFLE, 8 }, // Limited heavy weapons
+                { WeaponSystems.GENERIC_MANPAD, 10 },          // Air defense teams
+            };
+            _profiles[IntelProfileTypes.MJ_CAV_HORSE] = mj_cavHorse;
+
+            // Mujahideen Air Defense Regiment
+            var mj_adManpad = new Dictionary<WeaponSystems, int>
+            {
+                { WeaponSystems.INF_REG, 700 }, // Regiment personnel (AD specialists)
+                { WeaponSystems.GENERIC_MANPAD, 24 }, // Primary air defense (SA-7/Stinger)
+                { WeaponSystems.GENERIC_AAA, 24 }, // Heavy machine guns/AAA
+            };
+            _profiles[IntelProfileTypes.MJ_AA] = mj_adManpad;
+
+            // Mujahideen Mortar Regiment
+            var mj_artMortarLight = new Dictionary<WeaponSystems, int>
+            {
+                { WeaponSystems.INF_REG, 700 },                // Regiment personnel (mortar crews)
+                { WeaponSystems.GENERIC_MORTAR_82MM, 54 },     // Primary fire support
+                { WeaponSystems.GENERIC_RECOILLESS_RIFLE, 8 }, // Direct fire support
+                { WeaponSystems.GENERIC_RPG7, 12 },            // Infantry protection
+                { WeaponSystems.GENERIC_MANPAD, 6 },           // Air defense
+            };
+            _profiles[IntelProfileTypes.MJ_ART_LIGHT_MORTAR] = mj_artMortarLight;
+
+            // Mujahideen Heavy Mortar Regiment
+            var mj_artMortarHeavy = new Dictionary<WeaponSystems, int>
+            {
+                { WeaponSystems.INF_REG, 800 },             // Regiment personnel (artillery crews)
+                { WeaponSystems.GENERIC_MORTAR_120MM, 36 }, // Light howitzers/mountain guns
+                { WeaponSystems.GENERIC_MORTAR_82MM, 12 },  // Supplemental mortars
+                { WeaponSystems.GENERIC_RECOILLESS_RIFLE, 12 }, // Direct fire capability
+                { WeaponSystems.GENERIC_RPG7, 18 },         // Infantry defense
+                { WeaponSystems.GENERIC_MANPAD, 8 },        // Limited air defense
+            };
+            _profiles[IntelProfileTypes.MJ_ART_HEAVY_MORTAR] = mj_artMortarHeavy;
+
+            #endregion
+
+            //-------------------------------------------------------------//
+
+            #region Arab Army Tank Regiments
+
+            // Arab Tank Regiment - T-55
+            var arab_tankReg_T55 = new Dictionary<WeaponSystems, int>
+            {
+                { WeaponSystems.INF_REG, 950 }, // Regiment personnel (tank crews + support)
+                { WeaponSystems.TANK_T55A, 95 }, // T-55 main battle tanks (3 battalions)
+                { WeaponSystems.APC_MTLB, 12 }, // Command post, medical vehicles
+                { WeaponSystems.RCN_BRDM2, 8 }, // Reconnaissance vehicles
+                { WeaponSystems.GENERIC_ATGM, 6 }, // AT-3 Sagger teams
+                { WeaponSystems.GENERIC_MANPAD, 8 }, // SA-7 teams for air defense
+                { WeaponSystems.GENERIC_AAA, 4 }, // ZU-23 air defense guns
+            };
+            _profiles[IntelProfileTypes.ARAB_TANK_REG_T55] = arab_tankReg_T55;
+
+            // Arab Tank Regiment - T-72
+            var arab_tankReg_T72 = new Dictionary<WeaponSystems, int>
+            {
+                { WeaponSystems.INF_REG, 950 }, // Regiment personnel (tank crews + support)
+                { WeaponSystems.TANK_T72A, 95 }, // T-72 main battle tanks (3 battalions)
+                { WeaponSystems.APC_BTR70, 12 }, // Command post, medical vehicles
+                { WeaponSystems.RCN_BRDM2, 8 }, // Reconnaissance vehicles
+                { WeaponSystems.GENERIC_ATGM, 8 }, // AT-5 Spandrel teams
+                { WeaponSystems.GENERIC_MANPAD, 10 }, // SA-14 teams for air defense
+                { WeaponSystems.SPAAA_ZSU23, 4 }, // ZSU-23-4 air defense guns
+            };
+            _profiles[IntelProfileTypes.ARAB_TANK_REG_T72] = arab_tankReg_T72;
+
+            // Arab Tank Regiment - M60A3
+            var arab_tankReg_M60A3 = new Dictionary<WeaponSystems, int>
+            {
+                { WeaponSystems.INF_REG, 880 }, // Regiment personnel (tank crews + support)
+                { WeaponSystems.TANK_M60A3, 95 }, // M60A3 main battle tanks (3 battalions)
+                { WeaponSystems.APC_M113, 12 }, // Command post, medical vehicles
+                { WeaponSystems.IFV_M3, 8 }, // Reconnaissance vehicles
+                { WeaponSystems.GENERIC_ATGM, 8 }, // TOW missile teams
+                { WeaponSystems.GENERIC_MANPAD, 6 }, // Stinger teams for air defense
+                { WeaponSystems.GENERIC_AAA, 4 }, // M163 Vulcan air defense guns
+            };
+            _profiles[IntelProfileTypes.ARAB_TANK_REG_M60A3] = arab_tankReg_M60A3;
+
+            // Arab Tank Regiment - M1 Abrams
+            var arab_tankReg_M1 = new Dictionary<WeaponSystems, int>
+            {
+                { WeaponSystems.INF_REG, 920 }, // Regiment personnel (tank crews + support)
+                { WeaponSystems.TANK_M1, 95 }, // M1 Abrams main battle tanks (3 battalions)
+                { WeaponSystems.APC_M113, 35 }, // Command post, medical vehicles
+                { WeaponSystems.IFV_M3, 8 }, // Reconnaissance vehicles
+                { WeaponSystems.GENERIC_ATGM, 10 }, // TOW missile teams
+                { WeaponSystems.GENERIC_MANPAD, 8 }, // Stinger teams for air defense
+                { WeaponSystems.SPAAA_M163, 4 }, // M163 Vulcan air defense guns
+            };
+            _profiles[IntelProfileTypes.ARAB_TANK_REG_M1] = arab_tankReg_M1;
+
+            #endregion // Arab Army Tank Regiments
+
+            #region Arab Army Mechanized Infantry Regiments
+
+            // Arab Mechanized Infantry Regiment - BMP-1
+            var arab_mechReg_BMP1 = new Dictionary<WeaponSystems, int>
+            {
+                { WeaponSystems.INF_REG, 1800 }, // Regiment personnel (infantry + crews)
+                { WeaponSystems.IFV_BMP1, 90 }, // BMP-1 infantry fighting vehicles
+                { WeaponSystems.TANK_T55A, 31 }, // Tank support battalion
+                { WeaponSystems.APC_MTLB, 8 }, // Command, medical vehicles
+                { WeaponSystems.GENERIC_ATGM, 18 }, // AT-3 Sagger teams
+                { WeaponSystems.GENERIC_MANPAD, 12 }, // SA-7 teams
+                { WeaponSystems.GENERIC_ART_LIGHT, 18 }, // 120mm howitzers
+                { WeaponSystems.GENERIC_MORTAR_82MM, 24 }, // 82mm mortars
+
+            };
+            _profiles[IntelProfileTypes.ARAB_MECH_REG_BMP1] = arab_mechReg_BMP1;
+
+            // Arab Mechanized Infantry Regiment - M2 Bradley
+            var arab_mechReg_M2 = new Dictionary<WeaponSystems, int>
+            {
+                { WeaponSystems.INF_REG, 1900 }, // Regiment personnel (infantry + crews)
+                { WeaponSystems.IFV_M2, 90 }, // M2 Bradley infantry fighting vehicles
+                { WeaponSystems.TANK_M60A3, 31 }, // Tank support battalion
+                { WeaponSystems.APC_M113, 8 }, // Command, medical vehicles
+                { WeaponSystems.GENERIC_ATGM, 20 }, // TOW missile teams
+                { WeaponSystems.GENERIC_MANPAD, 10 }, // Stinger teams
+                { WeaponSystems.GENERIC_ART_LIGHT, 18 }, // Howitzers
+                { WeaponSystems.GENERIC_MORTAR_82MM, 24 }, // 82mm mortars
+            };
+            _profiles[IntelProfileTypes.ARAB_MECH_REG_M2] = arab_mechReg_M2;
+
+            // Arab Mechanized Infantry Regiment - BTR-70
+            var arab_mechReg_BTR70 = new Dictionary<WeaponSystems, int>
+            {
+                { WeaponSystems.INF_REG, 1800 }, // Regiment personnel (infantry + crews)
+                { WeaponSystems.APC_BTR70, 90 }, // BTR-70 armoured personnel carriers
+                { WeaponSystems.TANK_T55A, 31 }, // Tank support battalion
+                { WeaponSystems.GENERIC_ATGM, 14 }, // AT-3 Sagger teams
+                { WeaponSystems.GENERIC_MANPAD, 10 }, // SA-7 teams
+                { WeaponSystems.GENERIC_ART_LIGHT, 18 }, // 120mm mortars
+                { WeaponSystems.GENERIC_MORTAR_82MM, 24 }, // 82mm mortars
+            };
+            _profiles[IntelProfileTypes.ARAB_MECH_REG_BTR70] = arab_mechReg_BTR70;
+
+            // Arab Mechanized Infantry Regiment - M113
+            var arab_mechReg_M113 = new Dictionary<WeaponSystems, int>
+            {
+                { WeaponSystems.INF_REG, 1900 }, // Regiment personnel (infantry + crews)
+                { WeaponSystems.APC_M113, 90 }, // M113 armoured personnel carriers
+                { WeaponSystems.TANK_M60A3, 31 }, // Tank support battalion
+                { WeaponSystems.GENERIC_ATGM, 16 }, // TOW missile teams
+                { WeaponSystems.GENERIC_MANPAD, 8 }, // Air defense teams
+                { WeaponSystems.GENERIC_ART_LIGHT, 18 }, // 120mm mortars
+                { WeaponSystems.GENERIC_MORTAR_82MM, 24 }, // 82mm mortars
+            };
+            _profiles[IntelProfileTypes.ARAB_MECH_REG_M113] = arab_mechReg_M113;
+
+            #endregion // Arab Army Mechanized Infantry Regiments
+
+            #region Arab Army Infantry Regiments
+
+            // Arab Motorized Infantry Regiment
+            var arab_regMot = new Dictionary<WeaponSystems, int>
+            {
+                { WeaponSystems.INF_REG, 1600 }, // Regiment personnel (motorized infantry)
+                { WeaponSystems.GENERIC_ATGM, 12 }, // Anti-tank missile teams
+                { WeaponSystems.GENERIC_MANPAD, 8 }, // Portable air defense
+                { WeaponSystems.GENERIC_AAA, 6 }, // Anti-aircraft guns
+                { WeaponSystems.GENERIC_ART_LIGHT, 18 }, // 120mm mortars
+                { WeaponSystems.GENERIC_MORTAR_82MM, 24 }, // 82mm mortars
+            };
+            _profiles[IntelProfileTypes.ARAB_REG_MOT] = arab_regMot;
+
+            // Arab Infantry Regiment
+            var arab_regInf = new Dictionary<WeaponSystems, int>
+            {
+                { WeaponSystems.INF_REG, 1700 }, // Regiment personnel (foot infantry)
+                { WeaponSystems.GENERIC_ATGM, 8 }, // Anti-tank missile teams
+                { WeaponSystems.GENERIC_MANPAD, 6 }, // Portable air defense
+                { WeaponSystems.GENERIC_AAA, 4 }, // Anti-aircraft guns
+                { WeaponSystems.GENERIC_ART_LIGHT, 18 }, // 120mm mortars
+                { WeaponSystems.GENERIC_MORTAR_82MM, 24 }, // 82mm mortars
+            };
+            _profiles[IntelProfileTypes.ARAB_REG_INF] = arab_regInf;
+
+            #endregion // Arab Army Infantry Regiments
+
+            #region Arab Army Artillery Regiments
+
+            // Arab Heavy Artillery Regiment
+            var arab_regHvyArt = new Dictionary<WeaponSystems, int>
+            {
+                { WeaponSystems.INF_REG,750 }, // Artillery personnel
+                { WeaponSystems.GENERIC_ART_HEAVY, 36 }, // 152mm/155mm towed howitzers
+                { WeaponSystems.APC_MTLB, 18 }, // Fire direction, supply vehicles
+                { WeaponSystems.GENERIC_MANPAD, 8 }, // Air defense teams
+                { WeaponSystems.GENERIC_AAA, 4 }, // Anti-aircraft guns
+            };
+            _profiles[IntelProfileTypes.ARAB_REG_HVY_ART] = arab_regHvyArt;
+
+            // Arab Light Artillery Regiment
+            var arab_regLgtArt = new Dictionary<WeaponSystems, int>
+            {
+                { WeaponSystems.INF_REG, 700 }, // Artillery personnel
+                { WeaponSystems.GENERIC_ART_LIGHT, 48 }, // 122mm towed howitzers
+                { WeaponSystems.APC_MTLB, 12 }, // Fire direction, supply vehicles
+                { WeaponSystems.GENERIC_MANPAD, 6 }, // Air defense teams
+                { WeaponSystems.GENERIC_AAA, 4 }, // Anti-aircraft guns
+            };
+            _profiles[IntelProfileTypes.ARAB_REG_LGT_ART] = arab_regLgtArt;
+
+            // Arab Self-Propelled Artillery Regiment - 2S1
+            var arab_spaReg_2S1 = new Dictionary<WeaponSystems, int>
+            {
+                { WeaponSystems.INF_REG, 720 }, // Artillery personnel
+                { WeaponSystems.SPA_2S1, 36 }, // 2S1 122mm self-propelled howitzers
+                { WeaponSystems.APC_BTR70, 12 }, // Fire direction, supply vehicles
+                { WeaponSystems.GENERIC_MANPAD, 8 }, // Air defense teams
+                { WeaponSystems.SPAAA_ZSU23, 4 }, // ZSU-23-4 air defense
+            };
+            _profiles[IntelProfileTypes.ARAB_SPA_REG_2S1] = arab_spaReg_2S1;
+
+            // Arab Self-Propelled Artillery Regiment - M109
+            var arab_spaReg_M109 = new Dictionary<WeaponSystems, int>
+            {
+                { WeaponSystems.INF_REG, 750 }, // Artillery personnel
+                { WeaponSystems.SPA_M109, 36 }, // M109 155mm self-propelled howitzers
+                { WeaponSystems.APC_M113, 12 }, // Fire direction, supply vehicles
+                { WeaponSystems.GENERIC_MANPAD, 6 }, // Air defense teams
+                { WeaponSystems.SPAAA_M163, 4 }, // M163 Vulcan air defense
+            };
+            _profiles[IntelProfileTypes.ARAB_SPA_REG_M109] = arab_spaReg_M109;
+
+            // Arab Rocket Artillery Regiment - BM-21
+            var arab_rocReg_BM21 = new Dictionary<WeaponSystems, int>
+            {
+                { WeaponSystems.INF_REG, 680 }, // Artillery personnel
+                { WeaponSystems.ROC_BM21, 18 }, // BM-21 Grad rocket launchers
+                { WeaponSystems.APC_BTR70, 18 }, // Fire direction, supply vehicles
+                { WeaponSystems.GENERIC_MANPAD, 8 }, // Air defense teams
+                { WeaponSystems.SPAAA_ZSU23, 4 }, // ZSU-23-4 air defense
+            };
+            _profiles[IntelProfileTypes.ARAB_ROC_REG_BM21] = arab_rocReg_BM21;
+
+            // Arab Rocket Artillery Regiment - MLRS
+            var arab_rocReg_MLRS = new Dictionary<WeaponSystems, int>
+            {
+                { WeaponSystems.INF_REG, 720 }, // Artillery personnel
+                { WeaponSystems.ROC_MLRS, 18 }, // MLRS rocket launchers
+                { WeaponSystems.APC_M113, 18 }, // Fire direction, supply vehicles
+                { WeaponSystems.GENERIC_MANPAD, 6 }, // Air defense teams
+                { WeaponSystems.SPAAA_M163, 4 }, // M163 Vulcan air defense
+            };
+            _profiles[IntelProfileTypes.ARAB_ROC_REG_MLRS] = arab_rocReg_MLRS;
+
+            #endregion // Arab Army Artillery Regiments
+
+            #region Arab Army Reconnaissance Regiments
+
+            // Arab Reconnaissance Regiment - BRDM
+            var arab_rcnReg_BRDM = new Dictionary<WeaponSystems, int>
+            {
+                { WeaponSystems.INF_REG, 650 }, // Regiment personnel
+                { WeaponSystems.RCN_BRDM2, 48 }, // BRDM-2 reconnaissance vehicles
+                { WeaponSystems.RCN_BRDM2AT, 12 }, // BRDM-2 AT variant
+                { WeaponSystems.APC_BTR70, 8 }, // Support vehicles
+                { WeaponSystems.GENERIC_MANPAD, 8 }, // Air defense teams
+            };
+            _profiles[IntelProfileTypes.ARAB_RCN_REG_BRDM] = arab_rcnReg_BRDM;
+
+            // Arab Reconnaissance Regiment - M3 Bradley
+            var arab_rcnReg_M3 = new Dictionary<WeaponSystems, int>
+            {
+                { WeaponSystems.INF_REG, 680 }, // Regiment personnel
+                { WeaponSystems.IFV_M3, 48 }, // M3 Bradley cavalry fighting vehicles
+                { WeaponSystems.APC_M113, 8 }, // Support vehicles
+                { WeaponSystems.GENERIC_ATGM, 12 }, // TOW missile teams
+                { WeaponSystems.GENERIC_MANPAD, 6 }, // Air defense teams
+            };
+
+            _profiles[IntelProfileTypes.ARAB_RCN_REG_M3] = arab_rcnReg_M3;
+
+            #endregion // Arab Army Reconnaissance Regiments
+
+            #region Arab Army Air Defense Regiments
+
+            // Arab Self-Propelled Anti-Aircraft Regiment - ZSU-23-4
+            var arab_spaaaReg_ZSU23 = new Dictionary<WeaponSystems, int>
+            {
+                { WeaponSystems.INF_REG, 700 }, // Air defense personnel
+                { WeaponSystems.SPAAA_ZSU23, 36 }, // ZSU-23-4 Shilka
+                { WeaponSystems.APC_BTR70, 12 }, // Command, supply vehicles
+                { WeaponSystems.GENERIC_MANPAD, 24 }, // SA-7/SA-14 teams
+            };
+            _profiles[IntelProfileTypes.ARAB_SPAAA_REG_ZSU23] = arab_spaaaReg_ZSU23;
+
+            // Arab SAM Regiment - S-75 Dvina (SA-2)
+            var arab_samReg_S75 = new Dictionary<WeaponSystems, int>
+            {
+                { WeaponSystems.INF_REG, 750 }, // SAM personnel
+                { WeaponSystems.SAM_S75, 12 }, // S-75 Dvina SAM launchers
+                { WeaponSystems.APC_MTLB, 12 }, // Command, radar vehicles
+                { WeaponSystems.GENERIC_AAA, 12 }, // Supporting AAA guns
+            };
+            _profiles[IntelProfileTypes.ARAB_SAM_REG_S75] = arab_samReg_S75;
+
+            // Arab SAM Regiment - S-125 Neva (SA-3)
+            var arab_samReg_S125 = new Dictionary<WeaponSystems, int>
+            {
+                { WeaponSystems.INF_REG, 800 }, // SAM personnel
+                { WeaponSystems.SAM_S125, 24 }, // S-125 Neva SAM launchers
+                { WeaponSystems.APC_BTR70, 12 }, // Command, radar vehicles
+                { WeaponSystems.SPAAA_ZSU23, 8 }, // Supporting SPAAA
+            };
+            _profiles[IntelProfileTypes.ARAB_SAM_REG_S125] = arab_samReg_S125;
+
+            // Arab SAM Regiment - Hawk
+            var arab_samReg_Hawk = new Dictionary<WeaponSystems, int>
+            {
+                { WeaponSystems.INF_REG, 780 }, // SAM personnel
+                { WeaponSystems.SAM_HAWK, 24 }, // MIM-23 Hawk SAM launchers
+                { WeaponSystems.APC_M113, 12 }, // Command, radar vehicles
+                { WeaponSystems.SPAAA_M163, 8 }, // Supporting M163 Vulcan
+            };
+            _profiles[IntelProfileTypes.ARAB_SAM_REG_HAWK] = arab_samReg_Hawk;
+
+            #endregion // Arab Army Air Defense Regiments
+
+            //-------------------------------------------------------------//
         }
 
         #endregion // Profile Database
