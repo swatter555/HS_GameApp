@@ -57,7 +57,6 @@ namespace HammerAndSickle.Persistence
                             // Create fresh unit with same template parameters
                             var freshUnit = new CombatUnit(
                                 unitName: unit.UnitName,
-                                unitType: unit.UnitType,
                                 classification: unit.Classification,
                                 role: unit.Role,
                                 side: unit.Side,
