@@ -309,9 +309,13 @@ namespace HammerAndSickle.Models
                     return false;
                 }
 
-                if (unit.UnitType != UnitType.AirUnit)
+                if (unit.Classification != UnitClassification.ASF ||
+                    unit.Classification != UnitClassification.MRF ||
+                    unit.Classification != UnitClassification.ATT ||
+                    unit.Classification != UnitClassification.BMB ||
+                    unit.Classification != UnitClassification.RECONA)
                 {
-                    throw new InvalidOperationException($"Only air units can be attached to an airbase. Unit type: {unit.UnitType}");
+                    throw new InvalidOperationException($"Only air units can be attached to an airbase.");
                 }
 
                 if (_airUnitsAttached.Contains(unit))

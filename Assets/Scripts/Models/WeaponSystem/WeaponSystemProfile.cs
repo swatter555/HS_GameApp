@@ -19,6 +19,7 @@ namespace HammerAndSickle.Models
         public string ShortName { get; private set; }              = "Default";
         public WeaponSystems WeaponSystemID { get; private set; }  = WeaponSystems.DEFAULT;
         public Nationality Nationality { get; private set; }       = Nationality.USSR;
+        public WeaponSystemType WeaponSystemType { get; private set; } = WeaponSystemType.Soft;
         public List<UpgradeType> UpgradeTypes { get; private set; } = new List<UpgradeType>();
         public int TurnAvailable { get; private set; } = 0;      // The campaign turn this is available.
 
@@ -68,6 +69,7 @@ namespace HammerAndSickle.Models
             Nationality nationality,
             WeaponSystems weaponSystemID,
             int prestigeCost = 0,
+            WeaponSystemType weaponSystemType = WeaponSystemType.Soft,
             int hardAttack = 0, int hardDefense = 0,
             int softAttack = 0, int softDefense = 0,
             int groundAirAttack = 0, int groundAirDefense = 0,
@@ -95,6 +97,7 @@ namespace HammerAndSickle.Models
                 Name = name;
                 Nationality = nationality;
                 WeaponSystemID = weaponSystemID;
+                WeaponSystemType = weaponSystemType;
                 PrestigeCost = ValidatePrestigeCost(prestigeCost);
                 IsAmphibious = false;
                 IsDoubleFire = false;

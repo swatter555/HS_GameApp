@@ -5,18 +5,6 @@ namespace HammerAndSickle.Models
     #region CombatUnit Enums
 
     /// <summary>
-    /// Defines the principal domains of unit operation: ground, air, or naval.
-    /// </summary>
-    public enum UnitType
-    {
-        LandUnitDF, // Land unit with direct fire capability
-        LandUnitIF, // Land unit with indirect fire capability
-        AirUnit,    // Air unit
-        NavalUnitDF, // Naval unit with direct fire capability
-        NavalUnitIF, // Naval unit with indirect fire capability
-    }
-
-    /// <summary>
     /// Descriptive categories that capture a unit's broader organizational or functional role.
     /// </summary>
     public enum UnitClassification
@@ -608,6 +596,16 @@ namespace HammerAndSickle.Models
     #region WeaponSystem Enums
 
     /// <summary>
+    /// Represents the general category of weapon system.
+    /// </summary>
+    public enum WeaponSystemType
+    {
+        Hard,
+        Soft,
+        Air
+    }
+
+    /// <summary>
     /// Weapon systems in the game.
     /// </summary>
     public enum WeaponSystems
@@ -647,12 +645,12 @@ namespace HammerAndSickle.Models
         SAM_S75,
         SAM_S125,
         SAM_S300,
-        HEL_MI8T,   // Transport Helicopter
+        HEL_MI8T,
         HEL_MI8AT,
         HEL_MI24D,
         HEL_MI24V,
         HEL_MI28,
-        TRA_AN12,   // Transport Aircraft
+        TRA_AN12,
         AWACS_A50,
         ASF_MIG21,
         ASF_MIG23,
@@ -669,8 +667,7 @@ namespace HammerAndSickle.Models
         BMB_TU22,
         BMB_TU22M3,
         RCNA_MIG25R,
-        
-        TRA_NAVAL,   // Transport Naval
+        TRA_NAVAL,
 
         // USA
         TANK_M1,
@@ -738,6 +735,7 @@ namespace HammerAndSickle.Models
         GENERIC_MORTAR_120MM,
         GENERIC_RECOILLESS_RIFLE,
         GENERIC_CAVALRY,
+        GENERIC_TRUCK,
 
         // Shared profiles for infantry
         INF_REG,    // Regular INF

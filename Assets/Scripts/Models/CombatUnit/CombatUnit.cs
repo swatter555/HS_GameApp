@@ -22,7 +22,6 @@ namespace HammerAndSickle.Models
         public string UnitName { get; set; }
         [JsonInclude]
         public string UnitID { get; private set; }
-        public UnitType UnitType { get; private set; }
         public UnitClassification Classification { get; private set; }
         public UnitRole Role { get; private set; }
         public Side Side { get; private set; }
@@ -71,7 +70,6 @@ namespace HammerAndSickle.Models
         /// Constructor
         /// </summary>
         public CombatUnit(string unitName,
-            UnitType unitType,
             UnitClassification classification,
             UnitRole role,
             Side side,
@@ -126,7 +124,6 @@ namespace HammerAndSickle.Models
                     throw new ArgumentException("Unit name cannot be null or whitespace", nameof(unitName));
                 UnitName = unitName.Trim();
                 UnitID = Guid.NewGuid().ToString();
-                UnitType = unitType;
                 Classification = classification;
                 Role = role;
                 Side = side;
@@ -191,7 +188,6 @@ namespace HammerAndSickle.Models
                 // Initialize identification with safe defaults - JSON will overwrite these
                 UnitID = Guid.NewGuid().ToString();
                 UnitName = string.Empty;
-                UnitType = UnitType.LandUnitDF;
                 Classification = UnitClassification.INF;
                 Role = UnitRole.GroundCombat;
                 Side = Side.Player;
@@ -1486,7 +1482,6 @@ namespace HammerAndSickle.Models
             {
                 // Copy core template identity (but not UnitID - that stays unique)
                 UnitName = template.UnitName;
-                UnitType = template.UnitType;
                 Classification = template.Classification;
                 Role = template.Role;
                 Side = template.Side;
@@ -1559,7 +1554,6 @@ namespace HammerAndSickle.Models
                 // Create new unit with same template parameters
                 var newUnit = new CombatUnit(
                     unitName: UnitName,
-                    unitType: UnitType,
                     classification: Classification,
                     role: Role,
                     side: Side,

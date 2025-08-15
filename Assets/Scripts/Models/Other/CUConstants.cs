@@ -23,28 +23,6 @@ namespace HammerAndSickle.Models
         public const int ZOC_RANGE               = 1;  // Zone of Control Range
         public const int MAX_EXP_GAIN_PER_ACTION = 10; // Max XP gain per action
 
-        // Movement constants for different unit types, in movement points.
-        public const int MECH_UNIT      = 10;
-        public const int MOT_UNIT       = 8;
-        public const int FOOT_UNIT      = 4;
-        public const int CAVALRY_UNIT   = 10;
-        public const int FIXEDWING_UNIT = 100;
-        public const int HELO_UNIT      = 24;
-        public const int STATIC_UNIT    = 0;
-        public const int NAVAL_UNIT     = 8;
-
-        public const int GROUND_DEFENSE_ARMOR       = 8;  // Base ground defense for tank units
-        public const int GROUND_DEFENSE_LIGHTARMOR  = 5;  // Base ground defense for APCs units
-        public const int GROUND_DEFENSE_INFANTRY    = 6;  // Base ground defense for Infantry units
-        public const int GROUND_DEFENSE_AAA         = 12; // Base ground defense for AAA units
-        public const int GROUND_DEFENSE_HELO        = 10; // Base air defense for helo units
-
-        // WeaponSystem constants.
-        public const int MAX_COMBAT_VALUE = 25;
-        public const int MIN_COMBAT_VALUE = 1;
-        public const float MAX_RANGE      = 100.0f;
-        public const float MIN_RANGE      = 0.0f;
-
         // Experience level modifiers.
         public const float RAW_XP_MODIFIER         = 0.8f; // -20% effectiveness
         public const float GREEN_XP_MODIFIER       = 0.9f; // -10% effectiveness
@@ -102,6 +80,127 @@ namespace HammerAndSickle.Models
         public const float MAX_INTEL_ERROR      = 12f;  // Maximum intel error margin
 
         #endregion // CombatUnit Constants
+
+        #region WeaponSystem Constants
+
+        /* Note: Attacker targets defenders hardness/softness type. Defender targets attackers hardness/softness type */
+
+        // WeaponSystem constants.
+        public const int MAX_COMBAT_VALUE = 25;
+        public const int MIN_COMBAT_VALUE = 1;
+        public const float MAX_RANGE = 100.0f;
+        public const float MIN_RANGE = 0.0f;
+
+        // Movement constants for WeaponSystems,in movement points.
+        public const int MECH_UNIT = 10;
+        public const int MOT_UNIT = 8;
+        public const int FOOT_UNIT = 4;
+        public const int CAVALRY_UNIT = 10;
+        public const int FIXEDWING_UNIT = 100;
+        public const int HELO_UNIT = 24;
+        public const int STATIC_UNIT = 0;
+        public const int NAVAL_UNIT = 8;
+
+        // Ground defense against air attack.
+        
+        public const int GROUND_DEFENSE_LIGHTARMOR =  5;  // Base ground defense for APCs units
+        public const int GROUND_DEFENSE_INFANTRY   =  6;  // Base ground defense for Infantry units
+        public const int GROUND_DEFENSE_ARMOR      =  8;  // Base ground defense for tank units
+        public const int GROUND_DEFENSE_SAM        =  8;  // Base ground defense for SAM units
+        public const int GROUND_DEFENSE_HELO       = 10;  // Base air defense for helo units
+        public const int GROUND_DEFENSE_AAA        = 12;  // Base ground defense for AAA units
+        
+
+        // Standard spotting range values
+        public const float BASE_UNIT_SPOTTING_RANGE  = 2;
+        public const float RECON_UNIT_SPOTTING_RANGE = 3;
+        public const float BASE_AAA_SPOTTING_RANGE   = 3;
+        public const float BASE_SAM_SPOTTING_RANGE   = 6;
+        public const float INTEL_UNIT_SPOTTING_RANGE = 6;
+        public const float AIR_UNIT_SPOTTING_RANGE   = 8;
+
+        // Standard primary range values.
+        public const float PRIMARY_RANGE_DEFAULT = 1;
+
+        // Standard indirect range values.
+        public const float INDIRECT_RANGE_DEFAULT = 0;
+        public const float INDIRECT_RANGE_120MM   = 4;
+        public const float INDIRECT_RANGE_155MM   = 5;
+        public const float INDIRECT_RANGE_203MM   = 6;
+        public const float INDIRECT_RANGE_ROC_SR  = 4;
+        public const float INDIRECT_RANGE_ROC_MR  = 6;
+        public const float INDIRECT_RANGE_ROC_LR  = 10;
+
+        // Standard anti-air range values.
+        public const float INDIRECT_RANGE_AAA = 3;
+        public const float INDIRECT_RANGE_SAM = 6;
+
+        // Standard infantry values
+        public const int BASE_INF_HARD_ATTACK  = 5;
+        public const int BASE_INF_HARD_DEFENSE = 7;
+
+        public const int BASE_INF_SOFT_ATTACK  = 7;
+        public const int BASE_INF_SOFT_DEFENSE = 8;
+
+        // Standard APC values
+        public const int BASE_APC_HARD_ATTACK  = 3;
+        public const int BASE_APC_HARD_DEFENSE = 4;
+        public const int BASE_APC_SOFT_ATTACK  = 6;
+        public const int BASE_APC_SOFT_DEFENSE = 7;
+
+        // Standard IFV values
+        public const int BASE_IFV_HARD_ATTACK  = 4;
+        public const int BASE_IFV_HARD_DEFENSE = 4;
+        public const int BASE_IFV_SOFT_ATTACK  = 7;
+        public const int BASE_IFV_SOFT_DEFENSE = 7;
+
+        // Standard tank soft combat values
+        public const int BASE_TANK_SOFT_ATTACK  = 8;
+        public const int BASE_TANK_SOFT_DEFENSE = 6;
+
+        // Gen1 standard tank values
+        public const int GEN1_TANK_HARD_ATTACK  = 7;
+        public const int GEN1_TANK_HARD_DEFENSE = 5;
+
+        // Gen2 standard tank values
+        public const int GEN2_TANK_HARD_ATTACK  = 10;
+        public const int GEN2_TANK_HARD_DEFENSE = 8;
+
+        // Gen3 standard tank values
+        public const int GEN3_TANK_HARD_ATTACK  = 13;
+        public const int GEN3_TANK_HARD_DEFENSE = 11;
+
+        // Gen4 standard tank values
+        public const int GEN4_TANK_HARD_ATTACK  = 16;
+        public const int GEN4_TANK_HARD_DEFENSE = 14;
+
+        // Standard artillery values
+        public const int BASE_ARTY_HARD_ATTACK  = 5;
+        public const int BASE_ARTY_HARD_DEFENSE = 5;
+        public const int BASE_ARTY_SOFT_ATTACK  = 9;
+        public const int BASE_ARTY_SOFT_DEFENSE = 5;
+
+        // AAA standard values
+        public const int BASE_AAA_HARD_ATTACK       = 4;
+        public const int BASE_AAA_HARD_DEFENSE      = 4;
+        public const int BASE_AAA_SOFT_ATTACK       = 9;
+        public const int BASE_AAA_SOFT_DEFENSE      = 6;
+        public const int BASE_AAA_GROUND_AIR_ATTACK = 9;
+
+        // SAM standard values
+        public const int BASE_SAM_HARD_ATTACK       =  1;
+        public const int BASE_SAM_HARD_DEFENSE      =  3;
+        public const int BASE_SAM_SOFT_ATTACK       =  1;
+        public const int BASE_SAM_SOFT_DEFENSE      =  3;
+        public const int BASE_SAM_GROUND_AIR_ATTACK = 10;
+
+        // Standard helo values
+        public const int BASE_HEL_HARD_ATTACK = 7;
+        public const int BASE_HEL_HARD_DEFENSE = 6;
+        public const int BASE_HEL_SOFT_ATTACK = 10;
+        public const int BASE_HEL_SOFT_DEFENSE = 7;
+
+        #endregion
 
         #region Deployment Constants
 
