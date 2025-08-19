@@ -334,7 +334,7 @@ namespace HammerAndSickle.Models
 
         /// <summary>
         /// Generates an intelligence report for this unit based on the specified spotted level.
-        /// Uses the static IntelProfile system to create fog-of-war filtered intelligence data.
+        /// Uses the static IntelProfileDatabase system to create fog-of-war filtered intelligence data.
         /// </summary>
         /// <param name="spottedLevel">Intelligence accuracy level (default Level1)</param>
         /// <returns>IntelReport with unit intelligence data, or null if not spotted</returns>
@@ -342,7 +342,7 @@ namespace HammerAndSickle.Models
         {
             try
             {
-                return IntelProfile.GenerateIntelReport(
+                return IntelProfileDatabase.GenerateIntelReport(
                     IntelProfileType,
                     UnitName,
                     (int)HitPoints.Current,
