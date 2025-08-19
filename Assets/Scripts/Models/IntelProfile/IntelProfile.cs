@@ -1,7 +1,6 @@
 ﻿using HammerAndSickle.Services;
 using System;
 using System.Collections.Generic;
-using static Codice.CM.Common.Purge.PurgeReport;
 
 namespace HammerAndSickle.Models
 {
@@ -291,12 +290,14 @@ namespace HammerAndSickle.Models
                 "MANPAD" => "MANPADs",
                 "ATGM" => "ATGMs",
                 "HEL" => "Attack Helicopters",
-                "ASF" => "Fighters",
-                "MRF" => "Multirole",
+                "TRANHEL" => "Transport Helicopters",
+                "FGT" => "Fighters",
                 "ATT" => "Attack",
                 "BMB" => "Bombers",
                 "AWACS" => "AWACS",
+                "TRANAIR" => "Transport Aircraft",
                 "RCNA" => "Recon Aircraft",
+                "TRANNAV" => "Naval Transport",
                 _ => null
             };
         }
@@ -379,11 +380,11 @@ namespace HammerAndSickle.Models
                 case "Attack Helicopters":
                     report.HEL = value;
                     break;
-                case "Fighters":
-                    report.ASFs = value;
+                case "Transport Helicopters":
+                    report.TRANHEL = value;
                     break;
-                case "Multirole":
-                    report.MRFs = value;
+                case "Fighters":
+                    report.FGTs = value;
                     break;
                 case "Attack":
                     report.ATTs = value;
@@ -394,8 +395,14 @@ namespace HammerAndSickle.Models
                 case "AWACS":
                     report.AWACS = value;
                     break;
+                case "Transport Aircraft":
+                    report.TRANAIR = value;
+                    break;
                 case "Recon Aircraft":
                     report.RCNAs = value;
+                    break;
+                case "Naval Transport":
+                    report.TRANNAV = value;
                     break;
             }
         }
@@ -771,7 +778,7 @@ namespace HammerAndSickle.Models
                 { WeaponSystems.GENERIC_ATGM,       14 },  // mixed AT‑4/AT‑5 sections
                 { WeaponSystems.GENERIC_MANPAD,     45 },  // SA‑14/16 squads
                 { WeaponSystems.GENERIC_AAA,         2 },  // ZSU‑23‑4 Shilka (reduced strength)
-                { WeaponSystems.HEL_MI8T,     166 },  // 2× transport helicopter squadrons
+                { WeaponSystems.TRANHEL_MI8T,     166 },  // 2× transport helicopter squadrons
             };
             _profiles[IntelProfileTypes.SV_AAR_MTLB] = aar_MTLB;
 
@@ -785,7 +792,7 @@ namespace HammerAndSickle.Models
                 { WeaponSystems.GENERIC_ATGM,       14 },  // mixed AT‑4/AT‑5 sections
                 { WeaponSystems.GENERIC_MANPAD,     45 },  // SA‑14/16 squads
                 { WeaponSystems.GENERIC_AAA,         2 },  // ZSU‑23‑4 Shilka (reduced strength)
-                { WeaponSystems.HEL_MI8T,     166 },  // 2× transport helicopter squadrons
+                { WeaponSystems.TRANHEL_MI8T,     166 },  // 2× transport helicopter squadrons
             };
             _profiles[IntelProfileTypes.SV_AAR_BMD1] = aar_BMD1;
 
@@ -799,7 +806,7 @@ namespace HammerAndSickle.Models
                 { WeaponSystems.GENERIC_ATGM,       14 },  // mixed AT‑4/AT‑5 sections
                 { WeaponSystems.GENERIC_MANPAD,     45 },  // SA‑14/16 squads
                 { WeaponSystems.GENERIC_AAA,         2 },  // ZSU‑23‑4 Shilka (reduced strength)
-                { WeaponSystems.HEL_MI8T,     166 },  // 2× transport helicopter squadrons
+                { WeaponSystems.TRANHEL_MI8T,     166 },  // 2× transport helicopter squadrons
             };
             _profiles[IntelProfileTypes.SV_AAR_BMD2] = aar_BMD2;
 
@@ -813,7 +820,7 @@ namespace HammerAndSickle.Models
                 { WeaponSystems.GENERIC_ATGM,       14 },  // mixed AT‑4/AT‑5 sections
                 { WeaponSystems.GENERIC_MANPAD,     45 },  // SA‑14/16 squads
                 { WeaponSystems.GENERIC_AAA,         2 },  // ZSU‑23‑4 Shilka (reduced strength)
-                { WeaponSystems.HEL_MI8T,     166 },  // 2× transport helicopter squadrons
+                { WeaponSystems.TRANHEL_MI8T,     166 },  // 2× transport helicopter squadrons
             };
             _profiles[IntelProfileTypes.SV_AAR_BMD3] = aar_BMD3;
 
@@ -1129,56 +1136,56 @@ namespace HammerAndSickle.Models
             // Fighter Regiment- MiG-21 profile
             var fighterRegiment_Mig21 = new Dictionary<WeaponSystems, int>
             {
-                { WeaponSystems.ASF_MIG21, 36 }
+                { WeaponSystems.FGT_MIG21, 36 }
             };
             _profiles[IntelProfileTypes.SV_FR_MIG21] = fighterRegiment_Mig21;
 
             // Fighter Regiment- MiG-23 profile
             var fighterRegiment_Mig23 = new Dictionary<WeaponSystems, int>
             {
-                { WeaponSystems.ASF_MIG23, 36 }
+                { WeaponSystems.FGT_MIG23, 36 }
             };
             _profiles[IntelProfileTypes.SV_FR_MIG23] = fighterRegiment_Mig23;
 
             // Fighter Regiment- MiG-25 profile
             var fighterRegiment_Mig25 = new Dictionary<WeaponSystems, int>
             {
-                { WeaponSystems.ASF_MIG25, 36 }
+                { WeaponSystems.FGT_MIG25, 36 }
             };
             _profiles[IntelProfileTypes.SV_FR_MIG25] = fighterRegiment_Mig25;
 
             // Fighter Regiment- MiG-29 profile
             var fighterRegiment_Mig29 = new Dictionary<WeaponSystems, int>
             {
-                { WeaponSystems.ASF_MIG29, 36 }
+                { WeaponSystems.FGT_MIG29, 36 }
             };
             _profiles[IntelProfileTypes.SV_FR_MIG29] = fighterRegiment_Mig29;
 
             // Fighter Regiment- Mig-31 profile
             var fighterRegiment_Mig31 = new Dictionary<WeaponSystems, int>
             {
-                { WeaponSystems.ASF_MIG31, 36 }
+                { WeaponSystems.FGT_MIG31, 36 }
             };
             _profiles[IntelProfileTypes.SV_FR_MIG31] = fighterRegiment_Mig31;
 
             // Fighter Regiment- Su-27 profile
             var fighterRegiment_Su27 = new Dictionary<WeaponSystems, int>
             {
-                { WeaponSystems.ASF_SU27, 36 }
+                { WeaponSystems.FGT_SU27, 36 }
             };
             _profiles[IntelProfileTypes.SV_FR_SU27] = fighterRegiment_Su27;
 
             // Fighter Regiment- SU-47 profile
             var fighterRegiment_Su47 = new Dictionary<WeaponSystems, int>
             {
-                { WeaponSystems.ASF_SU47, 36 }
+                { WeaponSystems.FGT_SU47, 36 }
             };
             _profiles[IntelProfileTypes.SV_FR_SU47] = fighterRegiment_Su47;
 
             // Fighter Regiment- Mig-27
             var fighterRegiment_Mig27 = new Dictionary<WeaponSystems, int>
             {
-                { WeaponSystems.MRF_MIG27, 36 }
+                { WeaponSystems.FGT_MIG27, 36 }
             };
             _profiles[IntelProfileTypes.SV_MR_MIG27] = fighterRegiment_Mig27;
 
@@ -1428,21 +1435,21 @@ namespace HammerAndSickle.Models
             // US Fighter Wing - F-15 Eagle
             var us_fighterWing_F15 = new Dictionary<WeaponSystems, int>
             {
-                { WeaponSystems.ASF_F15, 36 }
+                { WeaponSystems.FGT_F15, 36 }
             };
             _profiles[IntelProfileTypes.US_FIGHTER_WING_F15] = us_fighterWing_F15;
 
             // US Fighter Wing - F-4 Phantom II
             var us_fighterWing_F4 = new Dictionary<WeaponSystems, int>
             {
-                { WeaponSystems.ASF_F4, 36 }
+                { WeaponSystems.FGT_F4, 36 }
             };
             _profiles[IntelProfileTypes.US_FIGHTER_WING_F4] = us_fighterWing_F4;
 
             // US Fighter Wing - F-16 Fighting Falcon
             var us_fighterWing_F16 = new Dictionary<WeaponSystems, int>
             {
-                { WeaponSystems.MRF_F16, 36 }
+                { WeaponSystems.FGT_F16, 36 }
             };
             _profiles[IntelProfileTypes.US_FIGHTER_WING_F16] = us_fighterWing_F16;
 
@@ -1632,7 +1639,7 @@ namespace HammerAndSickle.Models
             // FRG Air Defense Brigade
             var frg_fighterWing = new Dictionary<WeaponSystems, int>
             {
-                { WeaponSystems.MRF_TORNADO_IDS, 36 },
+                { WeaponSystems.FGT_TORNADO_IDS, 36 },
             };
             _profiles[IntelProfileTypes.FRG_FIGHTER_WING_TORNADO_IDS] = frg_fighterWing;
 
@@ -1808,7 +1815,7 @@ namespace HammerAndSickle.Models
             // French Escadron de Chasse (Fighter Squadron) - Mirage 2000
             var fr_fighterSquadron_Mirage2000 = new Dictionary<WeaponSystems, int>
             {
-                { WeaponSystems.ASF_MIRAGE2000, 36 },
+                { WeaponSystems.FGT_MIRAGE2000, 36 },
             };
 
             // French Escadron de Chasse (Fighter Squadron) - Jaguar

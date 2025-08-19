@@ -309,8 +309,7 @@ namespace HammerAndSickle.Models
                     return false;
                 }
 
-                if (unit.Classification != UnitClassification.ASF ||
-                    unit.Classification != UnitClassification.MRF ||
+                if (unit.Classification != UnitClassification.FGT ||
                     unit.Classification != UnitClassification.ATT ||
                     unit.Classification != UnitClassification.BMB ||
                     unit.Classification != UnitClassification.RECONA)

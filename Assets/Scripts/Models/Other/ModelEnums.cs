@@ -33,10 +33,9 @@ namespace HammerAndSickle.Models
         SPAAA,  // Self-Propelled Anti-Aircraft Artillery
         ENG,    // Engineer
         HELO,   // ATT helicopter
-        ASF,    // Air Superiority ASF
-        MRF,    // Multi-role ASF
+        FGT,    // Fighter aircraft
         ATT,    // ATT aircraft
-        BMB,    // BMB
+        BMB,    // Bomber aircraft
         RECONA, // Recon Aircraft
         HQ,     // HQ facility
         DEPOT,  // Supply Depot
@@ -130,12 +129,12 @@ namespace HammerAndSickle.Models
     /// </summary>
     public enum ExperiencePointLevels
     {
-        Raw = 0,
-        Green = 50,
-        Trained = 120,
+        Raw         =   0,
+        Green       =  50,
+        Trained     = 120,
         Experienced = 220,
-        Veteran = 330,
-        Elite = 400
+        Veteran     = 330,
+        Elite       = 400
     }
 
     /// <summary>
@@ -645,21 +644,21 @@ namespace HammerAndSickle.Models
         SAM_S75,
         SAM_S125,
         SAM_S300,
-        HEL_MI8T,
+        TRANHEL_MI8T,
         HEL_MI8AT,
         HEL_MI24D,
         HEL_MI24V,
         HEL_MI28,
-        TRA_AN12,
+        TRANAIR_AN12,
         AWACS_A50,
-        ASF_MIG21,
-        ASF_MIG23,
-        ASF_MIG25,
-        ASF_MIG29,
-        ASF_MIG31,
-        ASF_SU27,
-        ASF_SU47,
-        MRF_MIG27,
+        FGT_MIG21,
+        FGT_MIG23,
+        FGT_MIG25,
+        FGT_MIG29,
+        FGT_MIG31,
+        FGT_SU27,
+        FGT_SU47,
+        FGT_MIG27,
         ATT_SU25,
         ATT_SU25B,
         BMB_SU24,
@@ -667,7 +666,7 @@ namespace HammerAndSickle.Models
         BMB_TU22,
         BMB_TU22M3,
         RCNA_MIG25R,
-        TRA_NAVAL,
+        TRANNAV_NAVAL,
 
         // USA
         TANK_M1,
@@ -685,9 +684,9 @@ namespace HammerAndSickle.Models
         HEL_OH58,
         HEL_AH64,
         AWACS_E3,
-        ASF_F15,
-        ASF_F4,
-        MRF_F16,
+        FGT_F15,
+        FGT_F4,
+        FGT_F16,
         ATT_A10,
         BMB_F111,
         BMB_F117,
@@ -700,7 +699,7 @@ namespace HammerAndSickle.Models
         RCN_LUCHS,
         SPAAA_GEPARD,
         HEL_BO105,
-        MRF_TORNADO_IDS,
+        FGT_TORNADO_IDS,
 
         // UK
         TANK_CHALLENGER1,
@@ -709,7 +708,7 @@ namespace HammerAndSickle.Models
         RCN_SCIMITAR,
         SAM_RAPIER,
         HEL_LYNX,
-        MRF_TORNADO_GR1,
+        FGT_TORNADO_GR1,
 
         // France
         TANK_AMX30,
@@ -718,7 +717,7 @@ namespace HammerAndSickle.Models
         RCN_ERC90,
         SPA_AUF1,
         SPSAM_ROLAND,
-        ASF_MIRAGE2000,
+        FGT_MIRAGE2000,
         ATT_JAGUAR,
 
         // Generic types
@@ -769,7 +768,7 @@ namespace HammerAndSickle.Models
         AAA,
         SPAAA,
         ATGM,
-        ASF,
+        FGT,
         ATT,
         BMB,
         RCN,
@@ -855,13 +854,13 @@ namespace HammerAndSickle.Models
 
         SV_GRU,    // Spetsnaz Regiment
 
-        SV_FR_MIG21,     // ASF Regiment
-        SV_FR_MIG23,     // ASF Regiment
-        SV_FR_MIG25,     // ASF Regiment
-        SV_FR_MIG29,     // ASF Regiment
-        SV_FR_MIG31,     // ASF Regiment
-        SV_FR_SU27,      // ASF Regiment
-        SV_FR_SU47,      // ASF Regiment
+        SV_FR_MIG21,     // FGT Regiment
+        SV_FR_MIG23,     // FGT Regiment
+        SV_FR_MIG25,     // FGT Regiment
+        SV_FR_MIG29,     // FGT Regiment
+        SV_FR_MIG31,     // FGT Regiment
+        SV_FR_SU27,      // FGT Regiment
+        SV_FR_SU47,      // FGT Regiment
         
         SV_MR_MIG27,     // Multirole Regiment
 

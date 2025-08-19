@@ -12,7 +12,6 @@ namespace HammerAndSickle.Models
 
         #endregion
 
-
         #region Properties
 
         public DeploymentPosition DeploymentPosition { get => _deploymentPosition; }
@@ -20,7 +19,6 @@ namespace HammerAndSickle.Models
         public bool IsMountable { get; private set; }  // Equipped with ground transport (e.g., trucks, APCs).
 
         #endregion //Properties
-
 
         #region Initialization
 
@@ -196,7 +194,7 @@ namespace HammerAndSickle.Models
                 if (Classification == UnitClassification.SPECF)
                 {
                     // Special forces with aircraft transport must be on an airbase.
-                    if (embarkedProfile.WeaponSystemID == WeaponSystems.TRA_AN12 && !onAirbase)
+                    if (embarkedProfile.WeaponSystemID == WeaponSystems.TRANAIR_AN12 && !onAirbase)
                     {
                         errorMsg = $"{UnitName} must be on an airbase to deploy to Embarked position with AN-12 transport.";
                         return false;
@@ -218,7 +216,7 @@ namespace HammerAndSickle.Models
                 // Airmobile and mechanized airmobile units must have a valid helicopter transport profile to deploy to Embarked position.
                 if (Classification == UnitClassification.AM || Classification == UnitClassification.MAM)
                 {
-                    if (embarkedProfile.WeaponSystemID != WeaponSystems.HEL_MI8T)
+                    if (embarkedProfile.WeaponSystemID != WeaponSystems.TRANHEL_MI8T)
                     {
                         errorMsg = $"{UnitName} must have a valid helicopter transport profile to deploy to Embarked position.";
                         return false;
@@ -354,8 +352,7 @@ namespace HammerAndSickle.Models
         private bool CanUnitTypeChangeStates()
         {
             // Fixed-wing aircraft cannot change states
-            if (Classification == UnitClassification.ASF ||
-                Classification == UnitClassification.MRF ||
+            if (Classification == UnitClassification.FGT ||
                 Classification == UnitClassification.ATT ||
                 Classification == UnitClassification.BMB ||
                 Classification == UnitClassification.RECONA)

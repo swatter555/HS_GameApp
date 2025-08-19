@@ -11,6 +11,7 @@ namespace HammerAndSickle.Models
         private const string CLASS_NAME = nameof(WeaponSystemsDatabase);
         
         // Centralized place to combat rating modifiers
+        private const int MASSIVE_MALUS  = -10;
         private const int XXLARGE_MALUS  = -5;
         private const int XLARGE_MALUS   = -4;
         private const int LARGE_MALUS    = -3;
@@ -22,6 +23,7 @@ namespace HammerAndSickle.Models
         private const int XLARGE_BONUS   =  4;
         private const int XXLARGE_BONUS  =  5;
         private const int XXXLARGE_BONUS =  6;
+        private const int MASSIVE_BONUS  =  10;
 
         #endregion // Constants
 
@@ -330,7 +332,7 @@ namespace HammerAndSickle.Models
                     name: "T-55A MBT",
                     nationality: Nationality.USSR,
                     weaponSystemID: WeaponSystems.TANK_T55A,
-                    40,
+                    CUConstants.PRESTIGE_TIER_1 + XXLARGE_MALUS,
                     weaponSystemType: WeaponSystemType.Hard,
                     hardAttack:  CUConstants.GEN1_TANK_HARD_ATTACK,
                     hardDefense: CUConstants.GEN1_TANK_HARD_DEFENSE,
@@ -379,7 +381,7 @@ namespace HammerAndSickle.Models
                     name: "T-64A MBT",
                     nationality: Nationality.USSR,
                     weaponSystemID: WeaponSystems.TANK_T64A,
-                    80,
+                    CUConstants.PRESTIGE_TIER_2,
                     weaponSystemType: WeaponSystemType.Hard,
                     hardAttack: CUConstants.GEN2_TANK_HARD_ATTACK + SMALL_BONUS,
                     hardDefense: CUConstants.GEN2_TANK_HARD_DEFENSE + MEDIUM_BONUS,
@@ -428,7 +430,7 @@ namespace HammerAndSickle.Models
                     name: "T-64B MBT",
                     nationality: Nationality.USSR,
                     weaponSystemID: WeaponSystems.TANK_T64B,
-                    110,
+                    CUConstants.PRESTIGE_TIER_3,
                     weaponSystemType: WeaponSystemType.Hard,
                     hardAttack: CUConstants.GEN3_TANK_HARD_ATTACK + MEDIUM_BONUS,
                     hardDefense: CUConstants.GEN3_TANK_HARD_DEFENSE + SMALL_BONUS,
@@ -477,7 +479,7 @@ namespace HammerAndSickle.Models
                     name: "T-72A MBT",
                     nationality: Nationality.USSR,
                     weaponSystemID: WeaponSystems.TANK_T72A,
-                    75,
+                    CUConstants.PRESTIGE_TIER_2 + XXLARGE_MALUS,
                     weaponSystemType: WeaponSystemType.Hard,
                     hardAttack: CUConstants.GEN2_TANK_HARD_ATTACK + MEDIUM_BONUS,
                     hardDefense: CUConstants.GEN2_TANK_HARD_DEFENSE + SMALL_BONUS,
@@ -529,7 +531,7 @@ namespace HammerAndSickle.Models
                     name: "T-72B MBT",
                     nationality: Nationality.USSR,
                     weaponSystemID: WeaponSystems.TANK_T72B,
-                    95,
+                    CUConstants.PRESTIGE_TIER_3,
                     weaponSystemType: WeaponSystemType.Hard,
                     hardAttack: CUConstants.GEN3_TANK_HARD_ATTACK,
                     hardDefense: CUConstants.GEN3_TANK_HARD_DEFENSE,
@@ -581,10 +583,10 @@ namespace HammerAndSickle.Models
                     name: "T-80B MBT",
                     nationality: Nationality.USSR,
                     weaponSystemID: WeaponSystems.TANK_T80B,
-                    90,
+                    CUConstants.PRESTIGE_TIER_2 + XXLARGE_BONUS,
                     weaponSystemType: WeaponSystemType.Hard,
                     hardAttack: CUConstants.GEN2_TANK_HARD_ATTACK + SMALL_BONUS,
-                    hardDefense: CUConstants.GEN2_TANK_HARD_DEFENSE + SMALL_BONUS,
+                    hardDefense: CUConstants.GEN2_TANK_HARD_DEFENSE + MEDIUM_BONUS,
                     softAttack: CUConstants.BASE_TANK_SOFT_ATTACK,
                     softDefense: CUConstants.BASE_TANK_SOFT_DEFENSE,
                     groundAirDefense: CUConstants.GROUND_DEFENSE_ARMOR,
@@ -630,7 +632,7 @@ namespace HammerAndSickle.Models
                     name: "T-80U MBT",
                     nationality: Nationality.USSR,
                     weaponSystemID: WeaponSystems.TANK_T80U,
-                    125,
+                    CUConstants.PRESTIGE_TIER_3 + XXLARGE_BONUS,
                     weaponSystemType: WeaponSystemType.Hard,
                     hardAttack: CUConstants.GEN3_TANK_HARD_ATTACK + MEDIUM_BONUS,
                     hardDefense: CUConstants.GEN3_TANK_HARD_DEFENSE + LARGE_BONUS,
@@ -679,7 +681,7 @@ namespace HammerAndSickle.Models
                     name: "T-80BV MBT",
                     nationality: Nationality.USSR,
                     weaponSystemID: WeaponSystems.TANK_T80BV,
-                    150,
+                    CUConstants.PRESTIGE_TIER_4,
                     weaponSystemType: WeaponSystemType.Hard,
                     hardAttack: CUConstants.GEN4_TANK_HARD_ATTACK + SMALL_BONUS,
                     hardDefense: CUConstants.GEN4_TANK_HARD_DEFENSE,
@@ -729,7 +731,7 @@ namespace HammerAndSickle.Models
                     name: "MT‑LB APC",
                     nationality: Nationality.USSR,
                     weaponSystemID: WeaponSystems.APC_MTLB,
-                    20,
+                    CUConstants.PRESTIGE_TIER_0,
                     weaponSystemType: WeaponSystemType.Hard,
                     hardAttack: CUConstants.BASE_APC_HARD_ATTACK,
                     hardDefense: CUConstants.BASE_APC_HARD_DEFENSE,
@@ -778,7 +780,7 @@ namespace HammerAndSickle.Models
                     name: "BTR‑70 APC",
                     nationality: Nationality.USSR,
                     weaponSystemID: WeaponSystems.APC_BTR70,
-                    25,
+                    CUConstants.PRESTIGE_TIER_0 + LARGE_BONUS,
                     weaponSystemType: WeaponSystemType.Hard,
                     hardAttack: CUConstants.BASE_APC_HARD_ATTACK,
                     hardDefense: CUConstants.BASE_APC_HARD_DEFENSE,
@@ -827,8 +829,8 @@ namespace HammerAndSickle.Models
                     name: "BTR‑80 APC",
                     nationality: Nationality.USSR,
                     weaponSystemID: WeaponSystems.APC_BTR80,
-                    30,
-                   weaponSystemType: WeaponSystemType.Hard,
+                    CUConstants.PRESTIGE_TIER_0 + XLARGE_BONUS,
+                    weaponSystemType: WeaponSystemType.Hard,
                     hardAttack: CUConstants.BASE_APC_HARD_ATTACK,
                     hardDefense: CUConstants.BASE_APC_HARD_DEFENSE,
                     softAttack: CUConstants.BASE_APC_SOFT_ATTACK + SMALL_BONUS,
@@ -880,7 +882,7 @@ namespace HammerAndSickle.Models
                     name: "BMP‑1P IFV",
                     nationality: Nationality.USSR,
                     weaponSystemID: WeaponSystems.IFV_BMP1,
-                    30,
+                    CUConstants.PRESTIGE_TIER_0 + MASSIVE_BONUS,
                     weaponSystemType: WeaponSystemType.Hard,
                     hardAttack: CUConstants.BASE_IFV_HARD_ATTACK + XXLARGE_BONUS,
                     hardDefense: CUConstants.BASE_IFV_HARD_DEFENSE,
@@ -929,7 +931,7 @@ namespace HammerAndSickle.Models
                     name: "BMP‑2 IFV",
                     nationality: Nationality.USSR,
                     weaponSystemID: WeaponSystems.IFV_BMP2,
-                    36,
+                    CUConstants.PRESTIGE_TIER_0 + MASSIVE_BONUS + XXLARGE_BONUS,
                     weaponSystemType: WeaponSystemType.Hard,
                     hardAttack: CUConstants.BASE_IFV_HARD_ATTACK + XXXLARGE_BONUS,
                     hardDefense: CUConstants.BASE_IFV_HARD_DEFENSE,
@@ -978,7 +980,7 @@ namespace HammerAndSickle.Models
                     name: "BMP‑3 IFV",
                     nationality: Nationality.USSR,
                     weaponSystemID: WeaponSystems.IFV_BMP3,
-                    42,
+                    CUConstants.PRESTIGE_TIER_1 + XXLARGE_MALUS,
                     weaponSystemType: WeaponSystemType.Hard,
                     hardAttack: CUConstants.BASE_IFV_HARD_ATTACK + XXXLARGE_BONUS,
                     hardDefense: CUConstants.BASE_IFV_HARD_DEFENSE,
@@ -1027,7 +1029,7 @@ namespace HammerAndSickle.Models
                     name: "BMD‑1 IFV",
                     nationality: Nationality.USSR,
                     weaponSystemID: WeaponSystems.IFV_BMD1,
-                    25,
+                    CUConstants.PRESTIGE_TIER_0 + LARGE_BONUS,
                     weaponSystemType: WeaponSystemType.Hard,
                     hardAttack: CUConstants.BASE_IFV_HARD_ATTACK,
                     hardDefense: CUConstants.BASE_IFV_HARD_DEFENSE,
@@ -1076,7 +1078,7 @@ namespace HammerAndSickle.Models
                     name: "BMD‑2 IFV",
                     nationality: Nationality.USSR,
                     weaponSystemID: WeaponSystems.IFV_BMD2,
-                    34,
+                    CUConstants.PRESTIGE_TIER_0 + MASSIVE_BONUS,
                     weaponSystemType: WeaponSystemType.Hard,
                     hardAttack: CUConstants.BASE_IFV_HARD_ATTACK,
                     hardDefense: CUConstants.BASE_IFV_HARD_DEFENSE,
@@ -1125,7 +1127,7 @@ namespace HammerAndSickle.Models
                     name: "BMD‑3 IFV",
                     nationality: Nationality.USSR,
                     weaponSystemID: WeaponSystems.IFV_BMD3,
-                    38,
+                    CUConstants.PRESTIGE_TIER_1 + MASSIVE_MALUS,
                     weaponSystemType: WeaponSystemType.Hard,
                     hardAttack: CUConstants.BASE_IFV_HARD_ATTACK,
                     hardDefense: CUConstants.BASE_IFV_HARD_DEFENSE,
@@ -1178,7 +1180,7 @@ namespace HammerAndSickle.Models
                     name: "BRDM‑2 Recon Vehicle",
                     nationality: Nationality.USSR,
                     weaponSystemID: WeaponSystems.RCN_BRDM2,
-                    22,
+                    CUConstants.PRESTIGE_TIER_0,
                     weaponSystemType: WeaponSystemType.Hard,
                     hardAttack: CUConstants.BASE_APC_HARD_ATTACK,
                     hardDefense: CUConstants.BASE_APC_HARD_DEFENSE,
@@ -1227,7 +1229,7 @@ namespace HammerAndSickle.Models
                     name: "BRDM‑2 AT‑5 Recon Vehicle",
                     nationality: Nationality.USSR,
                     weaponSystemID: WeaponSystems.RCN_BRDM2AT,
-                    28,
+                    CUConstants.PRESTIGE_TIER_1,
                     weaponSystemType: WeaponSystemType.Hard,
                     hardAttack: CUConstants.BASE_APC_HARD_ATTACK + XXLARGE_BONUS,
                     hardDefense: CUConstants.BASE_APC_HARD_DEFENSE,
@@ -1283,7 +1285,7 @@ namespace HammerAndSickle.Models
                     name: "2S1 Gvozdika SPA",
                     nationality: Nationality.USSR,
                     weaponSystemID: WeaponSystems.SPA_2S1,
-                    40,
+                    CUConstants.PRESTIGE_TIER_1,
                     weaponSystemType: WeaponSystemType.Hard,
                     hardAttack: CUConstants.BASE_ARTY_HARD_ATTACK,
                     hardDefense: CUConstants.BASE_ARTY_HARD_DEFENSE + MEDIUM_BONUS,
@@ -1332,7 +1334,7 @@ namespace HammerAndSickle.Models
                     name: "2S3 Akatsiya SPA",
                     nationality: Nationality.USSR,
                     weaponSystemID: WeaponSystems.SPA_2S3,
-                    55,
+                    CUConstants.PRESTIGE_TIER_1 + MASSIVE_BONUS,
                     weaponSystemType: WeaponSystemType.Hard,
                     hardAttack: CUConstants.BASE_ARTY_HARD_ATTACK,
                     hardDefense: CUConstants.BASE_ARTY_HARD_DEFENSE + MEDIUM_BONUS,
@@ -1381,7 +1383,7 @@ namespace HammerAndSickle.Models
                     name: "2S5 Giatsint‑S SPA",
                     nationality: Nationality.USSR,
                     weaponSystemID: WeaponSystems.SPA_2S5,
-                    70,
+                    CUConstants.PRESTIGE_TIER_2,
                     weaponSystemType: WeaponSystemType.Hard,
                     hardAttack: CUConstants.BASE_ARTY_HARD_ATTACK + MEDIUM_BONUS,
                     hardDefense: CUConstants.BASE_ARTY_HARD_DEFENSE + MEDIUM_BONUS,
@@ -1430,8 +1432,8 @@ namespace HammerAndSickle.Models
                     name: "2S19 Msta‑S SPA",
                     nationality: Nationality.USSR,
                     weaponSystemID: WeaponSystems.SPA_2S19,
-                    80,
-                   weaponSystemType: WeaponSystemType.Hard,
+                    CUConstants.PRESTIGE_TIER_3,
+                    weaponSystemType: WeaponSystemType.Hard,
                     hardAttack: CUConstants.BASE_ARTY_HARD_ATTACK + LARGE_BONUS,
                     hardDefense: CUConstants.BASE_ARTY_HARD_DEFENSE + MEDIUM_BONUS,
                     softAttack: CUConstants.BASE_ARTY_SOFT_ATTACK + XLARGE_BONUS,
@@ -1479,7 +1481,7 @@ namespace HammerAndSickle.Models
                     name: "BM‑21 Grad MLRS",
                     nationality: Nationality.USSR,
                     weaponSystemID: WeaponSystems.ROC_BM21,
-                    45,
+                    CUConstants.PRESTIGE_TIER_1,
                     weaponSystemType: WeaponSystemType.Hard,
                     hardAttack: CUConstants.BASE_ARTY_HARD_ATTACK,
                     hardDefense: CUConstants.BASE_ARTY_HARD_DEFENSE + MEDIUM_BONUS,
@@ -1531,7 +1533,7 @@ namespace HammerAndSickle.Models
                     name: "BM‑27 Uragan MLRS",
                     nationality: Nationality.USSR,
                     weaponSystemID: WeaponSystems.ROC_BM27,
-                    70,
+                    CUConstants.PRESTIGE_TIER_2,
                     weaponSystemType: WeaponSystemType.Hard,
                     hardAttack: CUConstants.BASE_ARTY_HARD_ATTACK + LARGE_BONUS,
                     hardDefense: CUConstants.BASE_ARTY_HARD_DEFENSE + MEDIUM_BONUS,
@@ -1583,7 +1585,7 @@ namespace HammerAndSickle.Models
                     name: "BM‑30 Smerch MLRS",
                     nationality: Nationality.USSR,
                     weaponSystemID: WeaponSystems.ROC_BM30,
-                    85,
+                    CUConstants.PRESTIGE_TIER_3,
                      weaponSystemType: WeaponSystemType.Hard,
                     hardAttack: CUConstants.BASE_ARTY_HARD_ATTACK + LARGE_BONUS,
                     hardDefense: CUConstants.BASE_ARTY_HARD_DEFENSE + MEDIUM_BONUS,
@@ -1635,7 +1637,7 @@ namespace HammerAndSickle.Models
                     name: "9K72 Scud‑B Tactical Ballistic Missile Launcher",
                     nationality: Nationality.USSR,
                     weaponSystemID: WeaponSystems.SSM_SCUD,
-                    200,
+                    CUConstants.PRESTIGE_TIER_4,
                      weaponSystemType: WeaponSystemType.Hard,
                     hardAttack: CUConstants.BASE_ARTY_HARD_ATTACK,
                     hardDefense: CUConstants.BASE_ARTY_HARD_DEFENSE + MEDIUM_BONUS,
@@ -1691,7 +1693,7 @@ namespace HammerAndSickle.Models
                     name: "ZSU-57-2 Sparka SPAAA",
                     nationality: Nationality.USSR,
                     weaponSystemID: WeaponSystems.SPAAA_ZSU57,
-                    35,
+                    CUConstants.PRESTIGE_TIER_0,
                     WeaponSystemType.Hard,
                     hardAttack: CUConstants.BASE_AAA_HARD_ATTACK,
                     hardDefense: CUConstants.BASE_AAA_HARD_DEFENSE,
@@ -1741,7 +1743,7 @@ namespace HammerAndSickle.Models
                     name: "ZSU-23-4 Shilka SPAAA",
                     nationality: Nationality.USSR,
                     weaponSystemID: WeaponSystems.SPAAA_ZSU23,
-                    45,
+                    CUConstants.PRESTIGE_TIER_1,
                     WeaponSystemType.Hard,
                     hardAttack: CUConstants.BASE_AAA_HARD_ATTACK,
                     hardDefense: CUConstants.BASE_AAA_HARD_DEFENSE,
@@ -1791,7 +1793,7 @@ namespace HammerAndSickle.Models
                     name: "2K22 Tunguska SPAAA",
                     nationality: Nationality.USSR,
                     weaponSystemID: WeaponSystems.SPAAA_2K22,
-                    120,
+                    CUConstants.PRESTIGE_TIER_2 + MASSIVE_BONUS,
                     WeaponSystemType.Hard,
                     hardAttack: CUConstants.BASE_AAA_HARD_ATTACK,
                     hardDefense: CUConstants.BASE_AAA_HARD_DEFENSE,
@@ -1841,7 +1843,7 @@ namespace HammerAndSickle.Models
                     name: "9K31 Strela-1 SPSAM",
                     nationality: Nationality.USSR,
                     weaponSystemID: WeaponSystems.SPSAM_9K31,
-                    80,
+                    CUConstants.PRESTIGE_TIER_2,
                     WeaponSystemType.Soft,
                     hardAttack: CUConstants.BASE_SAM_HARD_ATTACK,
                     hardDefense: CUConstants.BASE_SAM_HARD_DEFENSE,
@@ -1894,7 +1896,7 @@ namespace HammerAndSickle.Models
                     name: "S-75 Dvina SAM System",
                     nationality: Nationality.USSR,
                     weaponSystemID: WeaponSystems.SAM_S75,
-                    45,
+                    CUConstants.PRESTIGE_TIER_1,
                     WeaponSystemType.Soft,
                     hardAttack: CUConstants.BASE_SAM_HARD_ATTACK,
                     hardDefense: CUConstants.BASE_SAM_HARD_DEFENSE,
@@ -1944,7 +1946,7 @@ namespace HammerAndSickle.Models
                     name: "S-125 Neva SAM System",
                     nationality: Nationality.USSR,
                     weaponSystemID: WeaponSystems.SAM_S125,
-                    90,
+                    CUConstants.PRESTIGE_TIER_2,
                     WeaponSystemType.Soft,
                     hardAttack: CUConstants.BASE_SAM_HARD_ATTACK,
                     hardDefense: CUConstants.BASE_SAM_HARD_DEFENSE,
@@ -1994,7 +1996,7 @@ namespace HammerAndSickle.Models
                     name: "S-300 SAM System",
                     nationality: Nationality.USSR,
                     weaponSystemID: WeaponSystems.SAM_S300,
-                    200,
+                    CUConstants.PRESTIGE_TIER_4,
                     WeaponSystemType.Soft,
                     hardAttack: CUConstants.BASE_SAM_HARD_ATTACK,
                     hardDefense: CUConstants.BASE_SAM_HARD_DEFENSE,
@@ -2003,7 +2005,7 @@ namespace HammerAndSickle.Models
                     groundAirAttack: CUConstants.BASE_SAM_GROUND_AIR_ATTACK + XXLARGE_BONUS,
                     groundAirDefense: CUConstants.GROUND_DEFENSE_SAM,
                     primaryRange: CUConstants.PRIMARY_RANGE_DEFAULT,
-                    indirectRange: CUConstants.INDIRECT_RANGE_SAM + XLARGE_MALUS,
+                    indirectRange: CUConstants.INDIRECT_RANGE_SAM + XLARGE_BONUS,
                     spottingRange: CUConstants.BASE_SAM_SPOTTING_RANGE + XLARGE_BONUS,
                     allWeatherCapability: AllWeatherRating.GroundUnit,
                     sigintRating: SIGINT_Rating.SpecializedLevel,
@@ -2038,6 +2040,56 @@ namespace HammerAndSickle.Models
         #region Soviet Helicopters
 
         /// <summary>
+        /// The MI-8 "Hip" transport helicopter.
+        /// </summary>
+        private static void Create_HEL_MI8T_Profile()
+        {
+            try
+            {
+                var profile = new WeaponSystemProfile(
+                    name: "Mi-8 Hip Transport Helicopter",
+                    nationality: Nationality.USSR,
+                    weaponSystemID: WeaponSystems.TRANHEL_MI8T,
+                    CUConstants.PRESTIGE_TIER_1,
+                    weaponSystemType: WeaponSystemType.Hard,
+                    hardAttack: CUConstants.BASE_HEL_HARD_ATTACK + MEDIUM_MALUS,
+                    hardDefense: CUConstants.BASE_HEL_HARD_DEFENSE + MEDIUM_MALUS,
+                    softAttack: CUConstants.BASE_HEL_SOFT_ATTACK + MEDIUM_MALUS,
+                    softDefense: CUConstants.BASE_HEL_SOFT_DEFENSE + MEDIUM_MALUS,
+                    groundAirDefense: CUConstants.GROUND_DEFENSE_HELO,
+                    primaryRange: CUConstants.PRIMARY_RANGE_DEFAULT,
+                    indirectRange: CUConstants.INDIRECT_RANGE_DEFAULT,
+                    spottingRange: CUConstants.RECON_UNIT_SPOTTING_RANGE,
+                    allWeatherCapability: AllWeatherRating.GroundUnit,
+                    sigintRating: SIGINT_Rating.UnitLevel,
+                    nbcRating: NBC_Rating.None,
+                    strategicMobility: StrategicMobility.Aviation,
+                    nvgCapability: NVG_Rating.Gen1,
+                    silhouette: UnitSilhouette.Medium,
+                    movementPoints: CUConstants.HELO_UNIT
+
+                );
+
+                // Set upgrade paths for modernization
+                profile.AddUpgradeType(UpgradeType.TRNHELO);
+
+                // Set short name for UI display
+                profile.SetShortName("Mi-8T");
+
+                // Set turn availability
+                profile.SetTurnAvailable(250);
+
+                // Store in master dictionary
+                _weaponSystemProfiles[WeaponSystems.TRANHEL_MI8T] = profile;
+            }
+            catch (Exception e)
+            {
+                AppService.HandleException(CLASS_NAME, nameof(Create_HEL_MI8T_Profile), e);
+                throw;
+            }
+        }
+
+        /// <summary>
         /// Mi-8AT "Hip-C" armed transport helicopter with anti-tank missiles.
         /// </summary>
         private static void Create_HEL_MI8AT_Profile()
@@ -2048,8 +2100,8 @@ namespace HammerAndSickle.Models
                     name: "Mi-8AT Hip-C Attack Helicopter",
                     nationality: Nationality.USSR,
                     weaponSystemID: WeaponSystems.HEL_MI8AT,
-                    55,
-                    weaponSystemType: WeaponSystemType.Soft,
+                    CUConstants.PRESTIGE_TIER_1,
+                    weaponSystemType: WeaponSystemType.Hard,
                     hardAttack: CUConstants.BASE_HEL_HARD_ATTACK,
                     hardDefense: CUConstants.BASE_HEL_HARD_DEFENSE,
                     softAttack: CUConstants.BASE_HEL_SOFT_ATTACK,
@@ -2097,7 +2149,7 @@ namespace HammerAndSickle.Models
                     name: "Mi-24D Hind-D Attack Helicopter",
                     nationality: Nationality.USSR,
                     weaponSystemID: WeaponSystems.HEL_MI24D,
-                    85,
+                    CUConstants.PRESTIGE_TIER_2,
                     weaponSystemType: WeaponSystemType.Hard,
                     hardAttack: CUConstants.BASE_HEL_HARD_ATTACK + SMALL_BONUS,
                     hardDefense: CUConstants.BASE_HEL_HARD_DEFENSE + MEDIUM_BONUS,
@@ -2146,7 +2198,7 @@ namespace HammerAndSickle.Models
                     name: "Mi-24V Hind-E Attack Helicopter",
                     nationality: Nationality.USSR,
                     weaponSystemID: WeaponSystems.HEL_MI24V,
-                    80,
+                    CUConstants.PRESTIGE_TIER_3,
                     weaponSystemType: WeaponSystemType.Hard,
                     hardAttack: CUConstants.BASE_HEL_HARD_ATTACK + XLARGE_BONUS,
                     hardDefense: CUConstants.BASE_HEL_HARD_DEFENSE + MEDIUM_BONUS,
@@ -2195,7 +2247,7 @@ namespace HammerAndSickle.Models
                     name: "Mi-28 Havoc Attack Helicopter",
                     nationality: Nationality.USSR,
                     weaponSystemID: WeaponSystems.HEL_MI28,
-                    120,
+                    CUConstants.PRESTIGE_TIER_4,
                     weaponSystemType: WeaponSystemType.Hard,
                     hardAttack: CUConstants.BASE_HEL_HARD_ATTACK + XXXLARGE_BONUS,
                     hardDefense: CUConstants.BASE_HEL_HARD_DEFENSE + SMALL_BONUS,
@@ -2238,6 +2290,57 @@ namespace HammerAndSickle.Models
         #region Soviet Aircraft
 
         /// <summary>
+        /// An-12 medium-range transport.
+        /// </summary>
+        private static void Create_TRA_AN12_Profile()
+        {
+            try
+            {
+                var profile = new WeaponSystemProfile(
+                    name: "An-12 Antonov Transport Plane",
+                    nationality: Nationality.USSR,
+                    weaponSystemID: WeaponSystems.TRANAIR_AN12,
+                    CUConstants.PRESTIGE_TIER_2,
+                    weaponSystemType: WeaponSystemType.Air,
+                    dogfighting: CUConstants.AC_BOMBER_DOGFIGHT,
+                    maneuverability: CUConstants.AC_BOMBER_MANEUVER,
+                    topSpeed: CUConstants.AC_BOMBER_TOPSPEED + LARGE_MALUS,
+                    survivability: CUConstants.AC_BOMBER_SURVIVE,
+                    groundAttack: CUConstants.GROUND_ATTACK_NA,
+                    ordinanceLoad: CUConstants.LARGE_AC_LOAD,
+                    stealth: 0,
+                    primaryRange: CUConstants.PRIMARY_RANGE_DEFAULT,
+                    indirectRange: CUConstants.INDIRECT_RANGE_DEFAULT,
+                    spottingRange: CUConstants.AC_SPOTTING_BASIC,
+                    allWeatherCapability: AllWeatherRating.AllWeather,
+                    sigintRating: SIGINT_Rating.UnitLevel,
+                    nbcRating: NBC_Rating.Gen1,
+                    strategicMobility: StrategicMobility.Aircraft,
+                    nvgCapability: NVG_Rating.None,
+                    silhouette: UnitSilhouette.Large,
+                    movementPoints: CUConstants.FIXEDWING_UNIT
+                );
+
+                // Set upgrade paths for modernization
+                profile.AddUpgradeType(UpgradeType.TRNAIR);
+
+                // Set short name for UI display
+                profile.SetShortName("An-12 Antonov");
+
+                // Set turn availability
+                profile.SetTurnAvailable(250);
+
+                // Store in master dictionary
+                _weaponSystemProfiles[WeaponSystems.TRANAIR_AN12] = profile;
+            }
+            catch (Exception e)
+            {
+                AppService.HandleException(CLASS_NAME, nameof(Create_TRA_AN12_Profile), e);
+                throw;
+            }
+        }
+
+        /// <summary>
         /// A-50 "Mainstay" airborne early warning and control aircraft.
         /// </summary>
         private static void Create_AWACS_A50_Profile()
@@ -2248,17 +2351,18 @@ namespace HammerAndSickle.Models
                     name: "A-50 Mainstay AWACS",
                     nationality: Nationality.USSR,
                     weaponSystemID: WeaponSystems.AWACS_A50,
-                    150,
-                    dogfighting: 0,
-                    maneuverability: 0,
-                    topSpeed: 7,
-                    survivability: 6,
-                    groundAttack: 0,
-                    ordinanceLoad: 0,
+                    CUConstants.PRESTIGE_TIER_5,
+                    weaponSystemType: WeaponSystemType.Air,
+                    dogfighting: CUConstants.AC_BOMBER_DOGFIGHT,
+                    maneuverability: CUConstants.AC_BOMBER_MANEUVER,
+                    topSpeed: CUConstants.AC_BOMBER_TOPSPEED,
+                    survivability: CUConstants.AC_BOMBER_SURVIVE,
+                    groundAttack: CUConstants.GROUND_ATTACK_NA,
+                    ordinanceLoad: CUConstants.LARGE_AC_LOAD,
                     stealth: 0,
-                    primaryRange: 1f,
-                    indirectRange: 0f,
-                    spottingRange: 15f,
+                    primaryRange: CUConstants.PRIMARY_RANGE_DEFAULT,
+                    indirectRange: CUConstants.INDIRECT_RANGE_DEFAULT,
+                    spottingRange: CUConstants.AC_SPOTTING_BASIC,
                     allWeatherCapability: AllWeatherRating.AllWeather,
                     sigintRating: SIGINT_Rating.SpecializedLevel,
                     nbcRating: NBC_Rating.Gen2,
@@ -2297,18 +2401,19 @@ namespace HammerAndSickle.Models
                 var profile = new WeaponSystemProfile(
                     name: "MiG-21 Fishbed Air Superiority Fighter",
                     nationality: Nationality.USSR,
-                    weaponSystemID: WeaponSystems.ASF_MIG21,
-                    35,
-                    dogfighting: 10,
-                    maneuverability: 12,
-                    topSpeed: 14,
-                    survivability: 6,
-                    groundAttack: 0,
-                    ordinanceLoad: 0,
+                    weaponSystemID: WeaponSystems.FGT_MIG21,
+                    CUConstants.PRESTIGE_TIER_1,
+                    weaponSystemType: WeaponSystemType.Air,
+                    dogfighting: CUConstants.EARLY_FGT_DOGFIGHT,
+                    maneuverability: CUConstants.EARLY_FGT_MANEUVER,
+                    topSpeed: CUConstants.EARLY_FGT_TOPSPEED,
+                    survivability: CUConstants.EARLY_FGT_SURVIVE,
+                    groundAttack: CUConstants.GROUND_ATTACK_NA,
+                    ordinanceLoad: CUConstants.SMALL_AC_LOAD,
                     stealth: 0,
-                    primaryRange: 1f,
-                    indirectRange: 0f,
-                    spottingRange: 2f,
+                    primaryRange: CUConstants.PRIMARY_RANGE_DEFAULT,
+                    indirectRange: CUConstants.INDIRECT_RANGE_DEFAULT,
+                    spottingRange: CUConstants.AC_SPOTTING_BASIC,
                     allWeatherCapability: AllWeatherRating.Day,
                     sigintRating: SIGINT_Rating.UnitLevel,
                     nbcRating: NBC_Rating.None,
@@ -2319,7 +2424,7 @@ namespace HammerAndSickle.Models
                 );
 
                 // Set upgrade paths for modernization
-                profile.AddUpgradeType(UpgradeType.ASF);
+                profile.AddUpgradeType(UpgradeType.FGT);
 
                 // Set short name for UI display
                 profile.SetShortName("MiG-21");
@@ -2328,7 +2433,7 @@ namespace HammerAndSickle.Models
                 profile.SetTurnAvailable(252);
 
                 // Store in master dictionary
-                _weaponSystemProfiles[WeaponSystems.ASF_MIG21] = profile;
+                _weaponSystemProfiles[WeaponSystems.FGT_MIG21] = profile;
             }
             catch (Exception e)
             {
@@ -2347,18 +2452,19 @@ namespace HammerAndSickle.Models
                 var profile = new WeaponSystemProfile(
                     name: "MiG-23 Flogger Air Superiority Fighter",
                     nationality: Nationality.USSR,
-                    weaponSystemID: WeaponSystems.ASF_MIG23,
-                    50,
-                    dogfighting: 13,
-                    maneuverability: 10,
-                    topSpeed: 15,
-                    survivability: 6,
-                    groundAttack: 6,
-                    ordinanceLoad: 6,
+                    weaponSystemID: WeaponSystems.FGT_MIG23,
+                    CUConstants.PRESTIGE_TIER_1 + XXLARGE_BONUS,
+                    weaponSystemType: WeaponSystemType.Air,
+                    dogfighting: CUConstants.EARLY_FGT_DOGFIGHT + LARGE_BONUS,
+                    maneuverability: CUConstants.EARLY_FGT_MANEUVER,
+                    topSpeed: CUConstants.EARLY_FGT_TOPSPEED + SMALL_BONUS,
+                    survivability: CUConstants.EARLY_FGT_SURVIVE + MEDIUM_BONUS,
+                    groundAttack: CUConstants.GROUND_ATTACK_TIER_0,
+                    ordinanceLoad: CUConstants.SMALL_AC_LOAD,
                     stealth: 0,
-                    primaryRange: 1f,
-                    indirectRange: 0f,
-                    spottingRange: 4f,
+                    primaryRange: CUConstants.PRIMARY_RANGE_DEFAULT,
+                    indirectRange: CUConstants.INDIRECT_RANGE_DEFAULT,
+                    spottingRange: CUConstants.AC_SPOTTING_ENHANCED,
                     allWeatherCapability: AllWeatherRating.Night,
                     sigintRating: SIGINT_Rating.UnitLevel,
                     nbcRating: NBC_Rating.Gen1,
@@ -2369,7 +2475,7 @@ namespace HammerAndSickle.Models
                 );
 
                 // Set upgrade paths for modernization
-                profile.AddUpgradeType(UpgradeType.ASF);
+                profile.AddUpgradeType(UpgradeType.FGT);
 
                 // Set short name for UI display
                 profile.SetShortName("MiG-23");
@@ -2378,7 +2484,7 @@ namespace HammerAndSickle.Models
                 profile.SetTurnAvailable(384);
 
                 // Store in master dictionary
-                _weaponSystemProfiles[WeaponSystems.ASF_MIG23] = profile;
+                _weaponSystemProfiles[WeaponSystems.FGT_MIG23] = profile;
             }
             catch (Exception e)
             {
@@ -2397,18 +2503,19 @@ namespace HammerAndSickle.Models
                 var profile = new WeaponSystemProfile(
                     name: "MiG-25 Foxbat Air Superiority Fighter",
                     nationality: Nationality.USSR,
-                    weaponSystemID: WeaponSystems.ASF_MIG25,
-                    85,
-                    dogfighting: 11,
-                    maneuverability: 4,
-                    topSpeed: 19,
-                    survivability: 7,
-                    groundAttack: 3,
-                    ordinanceLoad: 4,
+                    weaponSystemID: WeaponSystems.FGT_MIG25,
+                    CUConstants.PRESTIGE_TIER_2,
+                    weaponSystemType: WeaponSystemType.Air,
+                    dogfighting: CUConstants.EARLY_FGT_DOGFIGHT,
+                    maneuverability: CUConstants.EARLY_FGT_MANEUVER,
+                    topSpeed: CUConstants.AC_HIGHSPEED_RUSSIAN,
+                    survivability: CUConstants.EARLY_FGT_SURVIVE,
+                    groundAttack: CUConstants.GROUND_ATTACK_TIER_0,
+                    ordinanceLoad: CUConstants.SMALL_AC_LOAD,
                     stealth: 0,
-                    primaryRange: 1f,
-                    indirectRange: 0f,
-                    spottingRange: 4f,
+                    primaryRange: CUConstants.PRIMARY_RANGE_DEFAULT,
+                    indirectRange: CUConstants.INDIRECT_RANGE_DEFAULT,
+                    spottingRange: CUConstants.AC_SPOTTING_ENHANCED,
                     allWeatherCapability: AllWeatherRating.Night,
                     sigintRating: SIGINT_Rating.SpecializedLevel,
                     nbcRating: NBC_Rating.Gen1,
@@ -2419,7 +2526,7 @@ namespace HammerAndSickle.Models
                 );
 
                 // Set upgrade paths for modernization
-                profile.AddUpgradeType(UpgradeType.ASF);
+                profile.AddUpgradeType(UpgradeType.FGT);
 
                 // Set short name for UI display
                 profile.SetShortName("MiG-25");
@@ -2428,7 +2535,7 @@ namespace HammerAndSickle.Models
                 profile.SetTurnAvailable(384);
 
                 // Store in master dictionary
-                _weaponSystemProfiles[WeaponSystems.ASF_MIG25] = profile;
+                _weaponSystemProfiles[WeaponSystems.FGT_MIG25] = profile;
             }
             catch (Exception e)
             {
@@ -2447,18 +2554,19 @@ namespace HammerAndSickle.Models
                 var profile = new WeaponSystemProfile(
                     name: "MiG-29 Fulcrum Air Superiority Fighter",
                     nationality: Nationality.USSR,
-                    weaponSystemID: WeaponSystems.ASF_MIG29,
-                    65,
-                    dogfighting: 15,
-                    maneuverability: 18,
-                    topSpeed: 15,
-                    survivability: 8,
-                    groundAttack: 7,
-                    ordinanceLoad: 7,
+                    weaponSystemID: WeaponSystems.FGT_MIG29,
+                    CUConstants.PRESTIGE_TIER_2,
+                    weaponSystemType: WeaponSystemType.Air,
+                    dogfighting: CUConstants.MID_FGT_DOGFIGHT + LARGE_BONUS,
+                    maneuverability: CUConstants.MID_FGT_MANEUVER + XXLARGE_BONUS,
+                    topSpeed: CUConstants.MID_FGT_TOPSPEED + SMALL_BONUS,
+                    survivability: CUConstants.MID_FGT_SURVIVE,
+                    groundAttack: CUConstants.GROUND_ATTACK_TIER_1,
+                    ordinanceLoad: CUConstants.SMALL_AC_LOAD,
                     stealth: 0,
-                    primaryRange: 1f,
-                    indirectRange: 0f,
-                    spottingRange: 4f,
+                    primaryRange: CUConstants.PRIMARY_RANGE_DEFAULT,
+                    indirectRange: CUConstants.INDIRECT_RANGE_DEFAULT,
+                    spottingRange: CUConstants.AC_SPOTTING_ENHANCED,
                     allWeatherCapability: AllWeatherRating.AllWeather,
                     sigintRating: SIGINT_Rating.UnitLevel,
                     nbcRating: NBC_Rating.Gen2,
@@ -2469,7 +2577,7 @@ namespace HammerAndSickle.Models
                 );
 
                 // Set upgrade paths for modernization
-                profile.AddUpgradeType(UpgradeType.ASF);
+                profile.AddUpgradeType(UpgradeType.FGT);
 
                 // Set short name for UI display
                 profile.SetShortName("MiG-29");
@@ -2478,7 +2586,7 @@ namespace HammerAndSickle.Models
                 profile.SetTurnAvailable(540);
 
                 // Store in master dictionary
-                _weaponSystemProfiles[WeaponSystems.ASF_MIG29] = profile;
+                _weaponSystemProfiles[WeaponSystems.FGT_MIG29] = profile;
             }
             catch (Exception e)
             {
@@ -2497,18 +2605,19 @@ namespace HammerAndSickle.Models
                 var profile = new WeaponSystemProfile(
                     name: "MiG-31 Foxhound Air Superiority Fighter",
                     nationality: Nationality.USSR,
-                    weaponSystemID: WeaponSystems.ASF_MIG31,
-                    85,
-                    dogfighting: 14,
-                    maneuverability: 10,
-                    topSpeed: 19,
-                    survivability: 9,
-                    groundAttack: 6,
-                    ordinanceLoad: 7,
+                    weaponSystemID: WeaponSystems.FGT_MIG31,
+                    CUConstants.PRESTIGE_TIER_2 + XXLARGE_BONUS,
+                    weaponSystemType: WeaponSystemType.Air,
+                    dogfighting: CUConstants.MID_FGT_DOGFIGHT + LARGE_BONUS,
+                    maneuverability: CUConstants.MID_FGT_MANEUVER,
+                    topSpeed: CUConstants.AC_HIGHSPEED_RUSSIAN,
+                    survivability: CUConstants.MID_FGT_SURVIVE,
+                    groundAttack: CUConstants.GROUND_ATTACK_TIER_1 + LARGE_MALUS,
+                    ordinanceLoad: CUConstants.SMALL_AC_LOAD,
                     stealth: 0,
-                    primaryRange: 1f,
-                    indirectRange: 0f,
-                    spottingRange: 5f,
+                    primaryRange: CUConstants.PRIMARY_RANGE_DEFAULT,
+                    indirectRange: CUConstants.INDIRECT_RANGE_DEFAULT,
+                    spottingRange: CUConstants.AC_SPOTTING_ADVANCED,
                     allWeatherCapability: AllWeatherRating.AllWeather,
                     sigintRating: SIGINT_Rating.SpecializedLevel,
                     nbcRating: NBC_Rating.Gen2,
@@ -2519,7 +2628,7 @@ namespace HammerAndSickle.Models
                 );
 
                 // Set upgrade paths for modernization
-                profile.AddUpgradeType(UpgradeType.ASF);
+                profile.AddUpgradeType(UpgradeType.FGT);
 
                 // Set short name for UI display
                 profile.SetShortName("MiG-31");
@@ -2528,7 +2637,7 @@ namespace HammerAndSickle.Models
                 profile.SetTurnAvailable(550);
 
                 // Store in master dictionary
-                _weaponSystemProfiles[WeaponSystems.ASF_MIG31] = profile;
+                _weaponSystemProfiles[WeaponSystems.FGT_MIG31] = profile;
             }
             catch (Exception e)
             {
@@ -2547,18 +2656,19 @@ namespace HammerAndSickle.Models
                 var profile = new WeaponSystemProfile(
                     name: "Su-27 Flanker Air Superiority Fighter",
                     nationality: Nationality.USSR,
-                    weaponSystemID: WeaponSystems.ASF_SU27,
-                    95,
-                    dogfighting: 18,
-                    maneuverability: 17,
-                    topSpeed: 16,
-                    survivability: 9,
-                    groundAttack: 6,
-                    ordinanceLoad: 7,
+                    weaponSystemID: WeaponSystems.FGT_SU27,
+                    CUConstants.PRESTIGE_TIER_3,
+                    weaponSystemType: WeaponSystemType.Air,
+                    dogfighting: CUConstants.MID_FGT_DOGFIGHT + XXLARGE_BONUS,
+                    maneuverability: CUConstants.MID_FGT_MANEUVER + MEDIUM_BONUS,
+                    topSpeed: CUConstants.MID_FGT_TOPSPEED + MEDIUM_BONUS,
+                    survivability: CUConstants.MID_FGT_SURVIVE + MEDIUM_BONUS,
+                    groundAttack: CUConstants.GROUND_ATTACK_TIER_1,
+                    ordinanceLoad: CUConstants.SMALL_AC_LOAD,
                     stealth: 0,
-                    primaryRange: 1f,
-                    indirectRange: 0f,
-                    spottingRange: 5f,
+                    primaryRange: CUConstants.PRIMARY_RANGE_DEFAULT,
+                    indirectRange: CUConstants.INDIRECT_RANGE_DEFAULT,
+                    spottingRange: CUConstants.AC_SPOTTING_ADVANCED,
                     allWeatherCapability: AllWeatherRating.AllWeather,
                     sigintRating: SIGINT_Rating.UnitLevel,
                     nbcRating: NBC_Rating.Gen2,
@@ -2569,7 +2679,7 @@ namespace HammerAndSickle.Models
                 );
 
                 // Set upgrade paths for modernization
-                profile.AddUpgradeType(UpgradeType.ASF);
+                profile.AddUpgradeType(UpgradeType.FGT);
 
                 // Set short name for UI display
                 profile.SetShortName("Su-27");
@@ -2578,7 +2688,7 @@ namespace HammerAndSickle.Models
                 profile.SetTurnAvailable(564);
 
                 // Store in master dictionary
-                _weaponSystemProfiles[WeaponSystems.ASF_SU27] = profile;
+                _weaponSystemProfiles[WeaponSystems.FGT_SU27] = profile;
             }
             catch (Exception e)
             {
@@ -2597,18 +2707,19 @@ namespace HammerAndSickle.Models
                 var profile = new WeaponSystemProfile(
                     name: "Su-47 Berkut Experimental Fighter",
                     nationality: Nationality.USSR,
-                    weaponSystemID: WeaponSystems.ASF_SU47,
-                    120,
-                    dogfighting: 19,
-                    maneuverability: 19,
-                    topSpeed: 15,
-                    survivability: 7,
-                    groundAttack: 7,
-                    ordinanceLoad: 6,
+                    weaponSystemID: WeaponSystems.FGT_SU47,
+                    CUConstants.PRESTIGE_TIER_3 + XXXLARGE_BONUS + XXXLARGE_BONUS + XXXLARGE_BONUS,
+                    weaponSystemType: WeaponSystemType.Air,
+                    dogfighting: CUConstants.LATE_FGT_DOGFIGHT + XXXLARGE_BONUS,
+                    maneuverability: CUConstants.LATE_FGT_MANEUVER + XXLARGE_BONUS,
+                    topSpeed: CUConstants.LATE_FGT_TOPSPEED,
+                    survivability: CUConstants.LATE_FGT_SURVIVE,
+                    groundAttack: CUConstants.GROUND_ATTACK_TIER_2,
+                    ordinanceLoad: CUConstants.SMALL_AC_LOAD,
                     stealth: 0,
-                    primaryRange: 1f,
-                    indirectRange: 0f,
-                    spottingRange: 6f,
+                    primaryRange: CUConstants.PRIMARY_RANGE_DEFAULT,
+                    indirectRange: CUConstants.INDIRECT_RANGE_DEFAULT,
+                    spottingRange: CUConstants.AC_SPOTTING_ENHANCED,
                     allWeatherCapability: AllWeatherRating.AllWeather,
                     sigintRating: SIGINT_Rating.SpecializedLevel,
                     nbcRating: NBC_Rating.Gen2,
@@ -2619,7 +2730,7 @@ namespace HammerAndSickle.Models
                 );
 
                 // Set upgrade paths for modernization
-                profile.AddUpgradeType(UpgradeType.ASF);
+                profile.AddUpgradeType(UpgradeType.FGT);
 
                 // Set short name for UI display
                 profile.SetShortName("Su-47");
@@ -2628,7 +2739,7 @@ namespace HammerAndSickle.Models
                 profile.SetTurnAvailable(620);
 
                 // Store in master dictionary
-                _weaponSystemProfiles[WeaponSystems.ASF_SU47] = profile;
+                _weaponSystemProfiles[WeaponSystems.FGT_SU47] = profile;
             }
             catch (Exception e)
             {
@@ -2647,18 +2758,19 @@ namespace HammerAndSickle.Models
                 var profile = new WeaponSystemProfile(
                     name: "MiG-27 Flogger-D Multi-Role Fighter",
                     nationality: Nationality.USSR,
-                    weaponSystemID: WeaponSystems.MRF_MIG27,
-                    55,
-                    dogfighting: 6,
-                    maneuverability: 8,
-                    topSpeed: 14,
-                    survivability: 7,
-                    groundAttack: 13,
-                    ordinanceLoad: 9,
+                    weaponSystemID: WeaponSystems.FGT_MIG27,
+                    CUConstants.PRESTIGE_TIER_1 + XXLARGE_BONUS,
+                    weaponSystemType: WeaponSystemType.Air,
+                    dogfighting: CUConstants.AC_ATTACK_DOGFIGHT + LARGE_BONUS,
+                    maneuverability: CUConstants.AC_ATTACK_MANEUVER + MEDIUM_BONUS,
+                    topSpeed: CUConstants.AC_ATTACK_TOPSPEED + MEDIUM_BONUS,
+                    survivability: CUConstants.AC_ATTACK_SURVIVE + SMALL_BONUS,
+                    groundAttack: CUConstants.GROUND_ATTACK_TIER_0 + XLARGE_BONUS,
+                    ordinanceLoad: CUConstants.MEDIUM_AC_LOAD,
                     stealth: 0,
-                    primaryRange: 1f,
-                    indirectRange: 0f,
-                    spottingRange: 4f,
+                    primaryRange: CUConstants.PRIMARY_RANGE_DEFAULT,
+                    indirectRange: CUConstants.INDIRECT_RANGE_DEFAULT,
+                    spottingRange: CUConstants.AC_SPOTTING_BASIC,
                     allWeatherCapability: AllWeatherRating.Night,
                     sigintRating: SIGINT_Rating.UnitLevel,
                     nbcRating: NBC_Rating.Gen1,
@@ -2678,7 +2790,7 @@ namespace HammerAndSickle.Models
                 profile.SetTurnAvailable(444);
 
                 // Store in master dictionary
-                _weaponSystemProfiles[WeaponSystems.MRF_MIG27] = profile;
+                _weaponSystemProfiles[WeaponSystems.FGT_MIG27] = profile;
             }
             catch (Exception e)
             {
@@ -2698,21 +2810,22 @@ namespace HammerAndSickle.Models
                     name: "Su-25 Frogfoot Attack Aircraft",
                     nationality: Nationality.USSR,
                     weaponSystemID: WeaponSystems.ATT_SU25,
-                    60,
-                    dogfighting: 4,
-                    maneuverability: 8,
-                    topSpeed: 7,
-                    survivability: 15,
-                    groundAttack: 14,
-                    ordinanceLoad: 12,
+                    CUConstants.PRESTIGE_TIER_2 + XXLARGE_MALUS,
+                    weaponSystemType: WeaponSystemType.Air,
+                    dogfighting: CUConstants.AC_ATTACK_DOGFIGHT + MEDIUM_MALUS,
+                    maneuverability: CUConstants.AC_ATTACK_MANEUVER,
+                    topSpeed: CUConstants.AC_ATTACK_TOPSPEED,
+                    survivability: CUConstants.AC_ATTACK_SURVIVE + MEDIUM_BONUS,
+                    groundAttack: CUConstants.GROUND_ATTACK_TIER_1 + LARGE_BONUS,
+                    ordinanceLoad: CUConstants.SMALL_AC_LOAD + LARGE_BONUS,
                     stealth: 0,
-                    primaryRange: 1f,
-                    indirectRange: 0f,
-                    spottingRange: 3f,
+                    primaryRange: CUConstants.PRIMARY_RANGE_DEFAULT,
+                    indirectRange: CUConstants.INDIRECT_RANGE_DEFAULT,
+                    spottingRange: CUConstants.AC_SPOTTING_BASIC,
                     allWeatherCapability: AllWeatherRating.Night,
                     sigintRating: SIGINT_Rating.UnitLevel,
                     nbcRating: NBC_Rating.Gen1,
-                    strategicMobility: StrategicMobility.AirMobile,
+                    strategicMobility: StrategicMobility.Aircraft,
                     nvgCapability: NVG_Rating.None,
                     silhouette: UnitSilhouette.Medium,
                     movementPoints: CUConstants.FIXEDWING_UNIT
@@ -2748,17 +2861,18 @@ namespace HammerAndSickle.Models
                     name: "Su-25B Frogfoot-B Attack Aircraft",
                     nationality: Nationality.USSR,
                     weaponSystemID: WeaponSystems.ATT_SU25B,
-                    80,
-                    dogfighting: 4,
-                    maneuverability: 8,
-                    topSpeed: 7,
-                    survivability: 16,
-                    groundAttack: 17,
-                    ordinanceLoad: 13,
+                    CUConstants.PRESTIGE_TIER_2 + XXLARGE_BONUS,
+                    weaponSystemType: WeaponSystemType.Air,
+                    dogfighting: CUConstants.AC_ATTACK_DOGFIGHT,
+                    maneuverability: CUConstants.AC_ATTACK_MANEUVER,
+                    topSpeed: CUConstants.AC_ATTACK_TOPSPEED,
+                    survivability: CUConstants.AC_ATTACK_SURVIVE + XXLARGE_BONUS,
+                    groundAttack: CUConstants.GROUND_ATTACK_TIER_2 + LARGE_BONUS,
+                    ordinanceLoad: CUConstants.SMALL_AC_LOAD + XLARGE_BONUS,
                     stealth: 0,
-                    primaryRange: 1f,
-                    indirectRange: 0f,
-                    spottingRange: 5f,
+                    primaryRange: CUConstants.PRIMARY_RANGE_DEFAULT,
+                    indirectRange: CUConstants.INDIRECT_RANGE_DEFAULT,
+                    spottingRange: CUConstants.AC_SPOTTING_BASIC,
                     allWeatherCapability: AllWeatherRating.AllWeather,
                     sigintRating: SIGINT_Rating.UnitLevel,
                     nbcRating: NBC_Rating.Gen2,
@@ -2798,17 +2912,17 @@ namespace HammerAndSickle.Models
                     name: "Su-24 Fencer Bomber",
                     nationality: Nationality.USSR,
                     weaponSystemID: WeaponSystems.BMB_SU24,
-                    80,
-                    dogfighting: 5,
-                    maneuverability: 6,
-                    topSpeed: 12,
-                    survivability: 8,
-                    groundAttack: 15,
-                    ordinanceLoad: 14,
+                    CUConstants.PRESTIGE_TIER_3 + XXLARGE_MALUS,
+                    dogfighting: CUConstants.AC_BOMBER_DOGFIGHT + XXLARGE_BONUS,
+                    maneuverability: CUConstants.AC_BOMBER_MANEUVER + LARGE_BONUS,
+                    topSpeed: CUConstants.AC_BOMBER_TOPSPEED + XLARGE_BONUS,
+                    survivability: CUConstants.AC_BOMBER_SURVIVE,
+                    groundAttack: CUConstants.GROUND_ATTACK_TIER_1 + LARGE_BONUS,
+                    ordinanceLoad: CUConstants.LARGE_AC_LOAD,
                     stealth: 0,
-                    primaryRange: 1f,
-                    indirectRange: 0f,
-                    spottingRange: 4f,
+                    primaryRange: CUConstants.PRIMARY_RANGE_DEFAULT,
+                    indirectRange: CUConstants.INDIRECT_RANGE_DEFAULT,
+                    spottingRange: CUConstants.AC_SPOTTING_BASIC,
                     allWeatherCapability: AllWeatherRating.AllWeather,
                     sigintRating: SIGINT_Rating.UnitLevel,
                     nbcRating: NBC_Rating.Gen1,
@@ -2848,17 +2962,17 @@ namespace HammerAndSickle.Models
                     name: "Tu-16 Badger Bomber",
                     nationality: Nationality.USSR,
                     weaponSystemID: WeaponSystems.BMB_TU16,
-                    70,
-                    dogfighting: 1,
-                    maneuverability: 1,
-                    topSpeed: 8,
-                    survivability: 6,
-                    groundAttack: 14,
-                    ordinanceLoad: 15,
+                    CUConstants.PRESTIGE_TIER_3 + XXLARGE_BONUS,
+                    dogfighting: CUConstants.AC_BOMBER_DOGFIGHT,
+                    maneuverability: CUConstants.AC_BOMBER_MANEUVER,
+                    topSpeed: CUConstants.AC_BOMBER_TOPSPEED,
+                    survivability: CUConstants.AC_BOMBER_SURVIVE + MEDIUM_BONUS,
+                    groundAttack: CUConstants.GROUND_ATTACK_TIER_1,
+                    ordinanceLoad: CUConstants.XLARGE_AC_LOAD,
                     stealth: 0,
-                    primaryRange: 1f,
-                    indirectRange: 0f,
-                    spottingRange: 4f,
+                    primaryRange: CUConstants.PRIMARY_RANGE_DEFAULT,
+                    indirectRange: CUConstants.INDIRECT_RANGE_DEFAULT,
+                    spottingRange: CUConstants.AC_SPOTTING_BASIC,
                     allWeatherCapability: AllWeatherRating.Day,
                     sigintRating: SIGINT_Rating.UnitLevel,
                     nbcRating: NBC_Rating.None,
@@ -2898,17 +3012,17 @@ namespace HammerAndSickle.Models
                     name: "Tu-22 Blinder Bomber",
                     nationality: Nationality.USSR,
                     weaponSystemID: WeaponSystems.BMB_TU22,
-                    90,
-                    dogfighting: 2,
-                    maneuverability: 2,
-                    topSpeed: 12,
-                    survivability: 6,
-                    groundAttack: 15,
-                    ordinanceLoad: 16,
+                    CUConstants.PRESTIGE_TIER_4,
+                    dogfighting: CUConstants.AC_BOMBER_DOGFIGHT,
+                    maneuverability: CUConstants.AC_BOMBER_MANEUVER,
+                    topSpeed: CUConstants.AC_BOMBER_TOPSPEED + XLARGE_BONUS,
+                    survivability: CUConstants.AC_BOMBER_SURVIVE,
+                    groundAttack: CUConstants.GROUND_ATTACK_TIER_1 + XLARGE_BONUS,
+                    ordinanceLoad: CUConstants.LARGE_AC_LOAD + SMALL_MALUS,
                     stealth: 0,
-                    primaryRange: 1f,
-                    indirectRange: 0f,
-                    spottingRange: 4f,
+                    primaryRange: CUConstants.PRIMARY_RANGE_DEFAULT,
+                    indirectRange: CUConstants.INDIRECT_RANGE_DEFAULT,
+                    spottingRange: CUConstants.AC_SPOTTING_BASIC,
                     allWeatherCapability: AllWeatherRating.Night,
                     sigintRating: SIGINT_Rating.UnitLevel,
                     nbcRating: NBC_Rating.Gen1,
@@ -2948,17 +3062,17 @@ namespace HammerAndSickle.Models
                     name: "Tu-22M3 Backfire-C Strategic Bomber",
                     nationality: Nationality.USSR,
                     weaponSystemID: WeaponSystems.BMB_TU22M3,
-                    130,
-                    dogfighting: 4,
-                    maneuverability: 4,
-                    topSpeed: 15,
-                    survivability: 7,
-                    groundAttack: 17,
-                    ordinanceLoad: 17,
+                    CUConstants.PRESTIGE_TIER_5,
+                    dogfighting: CUConstants.AC_BOMBER_DOGFIGHT,
+                    maneuverability: CUConstants.AC_BOMBER_MANEUVER,
+                    topSpeed: CUConstants.AC_HIGHSPEED_RUSSIAN + SMALL_MALUS,
+                    survivability: CUConstants.AC_BOMBER_SURVIVE,
+                    groundAttack: CUConstants.GROUND_ATTACK_TIER_2 + LARGE_BONUS,
+                    ordinanceLoad: CUConstants.LARGE_AC_LOAD + LARGE_BONUS,
                     stealth: 0,
-                    primaryRange: 1f,
-                    indirectRange: 0f,
-                    spottingRange: 5f,
+                    primaryRange: CUConstants.PRIMARY_RANGE_DEFAULT,
+                    indirectRange: CUConstants.INDIRECT_RANGE_DEFAULT,
+                    spottingRange: CUConstants.AC_SPOTTING_BASIC,
                     allWeatherCapability: AllWeatherRating.AllWeather,
                     sigintRating: SIGINT_Rating.SpecializedLevel,
                     nbcRating: NBC_Rating.Gen2,
@@ -2998,17 +3112,18 @@ namespace HammerAndSickle.Models
                     name: "MiG-25R Foxbat-B Reconnaissance Aircraft",
                     nationality: Nationality.USSR,
                     weaponSystemID: WeaponSystems.RCNA_MIG25R,
-                    80,
-                    dogfighting: 3,
-                    maneuverability: 4,
-                    topSpeed: 20,
-                    survivability: 8,
-                    groundAttack: 4,
-                    ordinanceLoad: 6,
+                    CUConstants.PRESTIGE_TIER_2,
+                    weaponSystemType: WeaponSystemType.Air,
+                    dogfighting: CUConstants.EARLY_FGT_DOGFIGHT,
+                    maneuverability: CUConstants.EARLY_FGT_MANEUVER,
+                    topSpeed: CUConstants.AC_HIGHSPEED_RUSSIAN + MEDIUM_BONUS,
+                    survivability: CUConstants.EARLY_FGT_SURVIVE,
+                    groundAttack: CUConstants.GROUND_ATTACK_TIER_0,
+                    ordinanceLoad: CUConstants.SMALL_AC_LOAD,
                     stealth: 0,
-                    primaryRange: 1f,
-                    indirectRange: 0f,
-                    spottingRange: 8f,
+                    primaryRange: CUConstants.PRIMARY_RANGE_DEFAULT,
+                    indirectRange: CUConstants.INDIRECT_RANGE_DEFAULT,
+                    spottingRange: CUConstants.AC_SPOTTING_BASIC,
                     allWeatherCapability: AllWeatherRating.AllWeather,
                     sigintRating: SIGINT_Rating.SpecializedLevel,
                     nbcRating: NBC_Rating.Gen1,
@@ -3042,106 +3157,6 @@ namespace HammerAndSickle.Models
         #region Soviet Transports
 
         /// <summary>
-        /// The MI-8 "Hip" transport helicopter.
-        /// </summary>
-        private static void Create_HEL_MI8T_Profile()
-        {
-            try
-            {
-                var profile = new WeaponSystemProfile(
-                    name: "Mi-8 Hip Transport Helicopter",
-                    nationality: Nationality.USSR,
-                    weaponSystemID: WeaponSystems.HEL_MI8T,
-                    70,
-                    hardAttack: 3,
-                    hardDefense: 6,
-                    softAttack: 4,
-                    softDefense: 6,
-                    groundAirAttack: 1,
-                    groundAirDefense: 5,
-                    primaryRange: 1f,
-                    indirectRange: 0f,
-                    spottingRange: 2f,
-                    allWeatherCapability: AllWeatherRating.GroundUnit,
-                    sigintRating: SIGINT_Rating.UnitLevel,
-                    nbcRating: NBC_Rating.None,
-                    strategicMobility: StrategicMobility.Aviation,
-                    nvgCapability: NVG_Rating.Gen1,
-                    silhouette: UnitSilhouette.Medium,
-                    movementPoints: CUConstants.HELO_UNIT
-
-                );
-
-                // Set upgrade paths for modernization
-                profile.AddUpgradeType(UpgradeType.TRNHELO);
-
-                // Set short name for UI display
-                profile.SetShortName("Mi-8T");
-
-                // Set turn availability
-                profile.SetTurnAvailable(250);
-
-                // Store in master dictionary
-                _weaponSystemProfiles[WeaponSystems.HEL_MI8T] = profile;
-            }
-            catch (Exception e)
-            {
-                AppService.HandleException(CLASS_NAME, nameof(Create_HEL_MI8T_Profile), e);
-                throw;
-            }
-        }
-
-        /// <summary>
-        /// An-12 medium-range transport.
-        /// </summary>
-        private static void Create_TRA_AN12_Profile()
-        {
-            try
-            {
-                var profile = new WeaponSystemProfile(
-                    name: "An-12 Antonov Transport Plane",
-                    nationality: Nationality.USSR,
-                    weaponSystemID: WeaponSystems.TRA_AN12,
-                    90,
-                    dogfighting: 1,
-                    maneuverability: 1,
-                    topSpeed: 6,
-                    survivability: 6,
-                    groundAttack: 1,
-                    ordinanceLoad: 1,
-                    stealth: 0,
-                    primaryRange: 1f,
-                    indirectRange: 0f,
-                    spottingRange: 3f,
-                    allWeatherCapability: AllWeatherRating.AllWeather,
-                    sigintRating: SIGINT_Rating.UnitLevel,
-                    nbcRating: NBC_Rating.Gen1,
-                    strategicMobility: StrategicMobility.Aircraft,
-                    nvgCapability: NVG_Rating.None,
-                    silhouette: UnitSilhouette.Large,
-                    movementPoints: CUConstants.FIXEDWING_UNIT
-                );
-
-                // Set upgrade paths for modernization
-                profile.AddUpgradeType(UpgradeType.TRNAIR);
-
-                // Set short name for UI display
-                profile.SetShortName("An-12 Antonov");
-
-                // Set turn availability
-                profile.SetTurnAvailable(250);
-
-                // Store in master dictionary
-                _weaponSystemProfiles[WeaponSystems.TRA_AN12] = profile;
-            }
-            catch (Exception e)
-            {
-                AppService.HandleException(CLASS_NAME, nameof(Create_TRA_AN12_Profile), e);
-                throw;
-            }
-        }
-
-        /// <summary>
         /// Soviet transport flotilla
         /// </summary>
         private static void Create__TRA_TransportFlotilla_Profile()
@@ -3151,12 +3166,12 @@ namespace HammerAndSickle.Models
                 var profile = new WeaponSystemProfile(
                     name: "Transport Flotilla",
                     nationality: Nationality.USSR,
-                    weaponSystemID: WeaponSystems.TRA_NAVAL,
-                    150,
-                    groundAirDefense: 10,
-                    primaryRange: 1f,
-                    indirectRange: 0f,
-                    spottingRange: 3f,
+                    weaponSystemID: WeaponSystems.TRANNAV_NAVAL,
+                    CUConstants.PRESTIGE_TIER_5,
+                    groundAirDefense: 12,
+                    primaryRange: CUConstants.PRIMARY_RANGE_DEFAULT,
+                    indirectRange: CUConstants.INDIRECT_RANGE_DEFAULT,
+                    spottingRange: 4f,
                     allWeatherCapability: AllWeatherRating.AllWeather,
                     sigintRating: SIGINT_Rating.UnitLevel,
                     nbcRating: NBC_Rating.Gen1,
@@ -3176,7 +3191,7 @@ namespace HammerAndSickle.Models
                 profile.SetTurnAvailable(250);
 
                 // Store in master dictionary
-                _weaponSystemProfiles[WeaponSystems.TRA_NAVAL] = profile;
+                _weaponSystemProfiles[WeaponSystems.TRANNAV_NAVAL] = profile;
             }
             catch (Exception e)
             {
@@ -3202,16 +3217,16 @@ namespace HammerAndSickle.Models
                     name: "M1 Abrams MBT",
                     nationality: Nationality.USA,
                     weaponSystemID: WeaponSystems.TANK_M1,
-                    120,
-                    hardAttack: 12,
-                    hardDefense: 16,
-                    softAttack: 11,
-                    softDefense: 14,
-                    groundAirAttack: 3,
-                    groundAirDefense: 9,
-                    primaryRange: 1f,
-                    indirectRange: 0f,
-                    spottingRange: 2f,
+                    CUConstants.PRESTIGE_TIER_FREE,
+                    weaponSystemType: WeaponSystemType.Hard,
+                    hardAttack: CUConstants.GEN2_TANK_HARD_ATTACK,
+                    hardDefense: CUConstants.GEN2_TANK_HARD_DEFENSE + XXLARGE_BONUS,
+                    softAttack: CUConstants.BASE_TANK_SOFT_ATTACK,
+                    softDefense: CUConstants.BASE_TANK_SOFT_DEFENSE + MEDIUM_BONUS,
+                    groundAirDefense: CUConstants.GROUND_DEFENSE_ARMOR,
+                    primaryRange: CUConstants.PRIMARY_RANGE_DEFAULT,
+                    indirectRange: CUConstants.INDIRECT_RANGE_DEFAULT,
+                    spottingRange: CUConstants.BASE_UNIT_SPOTTING_RANGE,
                     allWeatherCapability: AllWeatherRating.GroundUnit,
                     sigintRating: SIGINT_Rating.UnitLevel,
                     nbcRating: NBC_Rating.Gen2,
@@ -3250,16 +3265,16 @@ namespace HammerAndSickle.Models
                     name: "M60-A3 Patton MBT",
                     nationality: Nationality.USA,
                     weaponSystemID: WeaponSystems.TANK_M60A3,
-                    120,
-                    hardAttack: 9,
-                    hardDefense: 7,
-                    softAttack: 9,
-                    softDefense: 8,
-                    groundAirAttack: 3,
-                    groundAirDefense: 9,
-                    primaryRange: 1f,
-                    indirectRange: 0f,
-                    spottingRange: 2f,
+                    CUConstants.PRESTIGE_TIER_FREE,
+                    weaponSystemType: WeaponSystemType.Hard,
+                    hardAttack: CUConstants.GEN1_TANK_HARD_ATTACK + SMALL_BONUS,
+                    hardDefense: CUConstants.GEN1_TANK_HARD_DEFENSE,
+                    softAttack: CUConstants.BASE_TANK_SOFT_ATTACK,
+                    softDefense: CUConstants.BASE_TANK_SOFT_DEFENSE,
+                    groundAirDefense: CUConstants.GROUND_DEFENSE_ARMOR,
+                    primaryRange: CUConstants.PRIMARY_RANGE_DEFAULT,
+                    indirectRange: CUConstants.INDIRECT_RANGE_DEFAULT,
+                    spottingRange: CUConstants.BASE_UNIT_SPOTTING_RANGE,
                     allWeatherCapability: AllWeatherRating.GroundUnit,
                     sigintRating: SIGINT_Rating.UnitLevel,
                     nbcRating: NBC_Rating.Gen1,
@@ -3298,16 +3313,16 @@ namespace HammerAndSickle.Models
                     name: "M551 Sheridan Light Tank",
                     nationality: Nationality.USA,
                     weaponSystemID: WeaponSystems.TANK_M551,
-                    20,
-                    hardAttack: 10,
-                    hardDefense: 3,
-                    softAttack: 3,
-                    softDefense: 6,
-                    groundAirAttack: 3,
-                    groundAirDefense: 4,
-                    primaryRange: 1f,
-                    indirectRange: 0f,
-                    spottingRange: 2f,
+                    CUConstants.PRESTIGE_TIER_FREE,
+                    weaponSystemType: WeaponSystemType.Hard,
+                    hardAttack: CUConstants.GEN1_TANK_HARD_ATTACK + LARGE_BONUS,
+                    hardDefense: CUConstants.GEN1_TANK_HARD_DEFENSE + MEDIUM_MALUS,
+                    softAttack: CUConstants.BASE_TANK_SOFT_ATTACK + LARGE_MALUS,
+                    softDefense: CUConstants.BASE_TANK_SOFT_DEFENSE,
+                    groundAirDefense: CUConstants.GROUND_DEFENSE_ARMOR,
+                    primaryRange: CUConstants.PRIMARY_RANGE_DEFAULT,
+                    indirectRange: CUConstants.INDIRECT_RANGE_DEFAULT,
+                    spottingRange: CUConstants.BASE_UNIT_SPOTTING_RANGE,
                     allWeatherCapability: AllWeatherRating.GroundUnit,
                     sigintRating: SIGINT_Rating.UnitLevel,
                     nbcRating: NBC_Rating.None,
@@ -3350,16 +3365,16 @@ namespace HammerAndSickle.Models
                     name: "M2 Bradley IFV",
                     nationality: Nationality.USA,
                     weaponSystemID: WeaponSystems.IFV_M2,
-                    85,
-                    hardAttack: 12,
-                    hardDefense: 4,
-                    softAttack: 9,
-                    softDefense: 8,
-                    groundAirAttack: 2,
-                    groundAirDefense: 4,
-                    primaryRange: 1f,
-                    indirectRange: 0f,
-                    spottingRange: 2f,
+                    CUConstants.PRESTIGE_TIER_FREE,
+                    weaponSystemType: WeaponSystemType.Hard,
+                    hardAttack: CUConstants.BASE_IFV_HARD_ATTACK + XXXLARGE_BONUS,
+                    hardDefense: CUConstants.BASE_IFV_HARD_DEFENSE,
+                    softAttack: CUConstants.BASE_IFV_SOFT_ATTACK + SMALL_BONUS,
+                    softDefense: CUConstants.BASE_IFV_SOFT_DEFENSE,
+                    groundAirDefense: CUConstants.GROUND_DEFENSE_LIGHTARMOR,
+                    primaryRange: CUConstants.PRIMARY_RANGE_DEFAULT,
+                    indirectRange: CUConstants.INDIRECT_RANGE_DEFAULT,
+                    spottingRange: CUConstants.BASE_UNIT_SPOTTING_RANGE,
                     allWeatherCapability: AllWeatherRating.GroundUnit,
                     sigintRating: SIGINT_Rating.UnitLevel,
                     nbcRating: NBC_Rating.Gen2,
@@ -3398,16 +3413,16 @@ namespace HammerAndSickle.Models
                     name: "M3 Bradley Scout IFV",
                     nationality: Nationality.USA,
                     weaponSystemID: WeaponSystems.IFV_M3,
-                    90,
-                    hardAttack: 12,
-                    hardDefense: 4,
-                    softAttack: 9,
-                    softDefense: 8,
-                    groundAirAttack: 2,
-                    groundAirDefense: 4,
-                    primaryRange: 1f,
-                    indirectRange: 0f,
-                    spottingRange: 3f,
+                    CUConstants.PRESTIGE_TIER_FREE,
+                    weaponSystemType: WeaponSystemType.Hard,
+                    hardAttack: CUConstants.BASE_IFV_HARD_ATTACK + XXXLARGE_BONUS,
+                    hardDefense: CUConstants.BASE_IFV_HARD_DEFENSE,
+                    softAttack: CUConstants.BASE_IFV_SOFT_ATTACK + MEDIUM_BONUS,
+                    softDefense: CUConstants.BASE_IFV_SOFT_DEFENSE,
+                    groundAirDefense: CUConstants.GROUND_DEFENSE_LIGHTARMOR,
+                    primaryRange: CUConstants.PRIMARY_RANGE_DEFAULT,
+                    indirectRange: CUConstants.INDIRECT_RANGE_DEFAULT,
+                    spottingRange: CUConstants.RECON_UNIT_SPOTTING_RANGE,
                     allWeatherCapability: AllWeatherRating.GroundUnit,
                     sigintRating: SIGINT_Rating.UnitLevel,
                     nbcRating: NBC_Rating.Gen2,
@@ -3446,16 +3461,16 @@ namespace HammerAndSickle.Models
                     name: "M113 APC",
                     nationality: Nationality.USA,
                     weaponSystemID: WeaponSystems.APC_M113,
-                    25,
-                    hardAttack: 2,
-                    hardDefense: 3,
-                    softAttack: 5,
-                    softDefense: 5,
-                    groundAirAttack: 1,
-                    groundAirDefense: 2,
-                    primaryRange: 1f,
-                    indirectRange: 0f,
-                    spottingRange: 2f,
+                    CUConstants.PRESTIGE_TIER_FREE,
+                    weaponSystemType: WeaponSystemType.Hard,
+                    hardAttack: CUConstants.BASE_APC_HARD_ATTACK,
+                    hardDefense: CUConstants.BASE_APC_HARD_DEFENSE,
+                    softAttack: CUConstants.BASE_APC_SOFT_ATTACK,
+                    softDefense: CUConstants.BASE_APC_SOFT_DEFENSE,
+                    groundAirDefense: CUConstants.GROUND_DEFENSE_LIGHTARMOR,
+                    primaryRange: CUConstants.PRIMARY_RANGE_DEFAULT,
+                    indirectRange: CUConstants.INDIRECT_RANGE_DEFAULT,
+                    spottingRange: CUConstants.BASE_UNIT_SPOTTING_RANGE,
                     allWeatherCapability: AllWeatherRating.GroundUnit,
                     sigintRating: SIGINT_Rating.UnitLevel,
                     nbcRating: NBC_Rating.Gen1,
@@ -3494,16 +3509,16 @@ namespace HammerAndSickle.Models
                     name: "LVTP-7 AAV",
                     nationality: Nationality.USA,
                     weaponSystemID: WeaponSystems.APC_LVTP7,
-                    35,
-                    hardAttack: 3,
-                    hardDefense: 4,
-                    softAttack: 6,
-                    softDefense: 6,
-                    groundAirAttack: 1,
-                    groundAirDefense: 2,
-                    primaryRange: 1f,
-                    indirectRange: 0f,
-                    spottingRange: 2f,
+                    CUConstants.PRESTIGE_TIER_FREE,
+                    weaponSystemType: WeaponSystemType.Hard,
+                    hardAttack: CUConstants.BASE_APC_HARD_ATTACK,
+                    hardDefense: CUConstants.BASE_APC_HARD_DEFENSE,
+                    softAttack: CUConstants.BASE_APC_SOFT_ATTACK,
+                    softDefense: CUConstants.BASE_APC_SOFT_DEFENSE,
+                    groundAirDefense: CUConstants.GROUND_DEFENSE_LIGHTARMOR,
+                    primaryRange: CUConstants.PRIMARY_RANGE_DEFAULT,
+                    indirectRange: CUConstants.INDIRECT_RANGE_DEFAULT,
+                    spottingRange: CUConstants.BASE_UNIT_SPOTTING_RANGE,
                     allWeatherCapability: AllWeatherRating.GroundUnit,
                     sigintRating: SIGINT_Rating.UnitLevel,
                     nbcRating: NBC_Rating.Gen1,
@@ -3549,16 +3564,16 @@ namespace HammerAndSickle.Models
                     name: "M109 Paladin Self-Propelled Artillery",
                     nationality: Nationality.USA,
                     weaponSystemID: WeaponSystems.SPA_M109,
-                    60,
-                    hardAttack: 10,
-                    hardDefense: 4,
-                    softAttack: 17,
-                    softDefense: 6,
-                    groundAirAttack: 1,
-                    groundAirDefense: 3,
-                    primaryRange: 1f,
-                    indirectRange: 5f,
-                    spottingRange: 2f,
+                    CUConstants.PRESTIGE_TIER_FREE,
+                    weaponSystemType: WeaponSystemType.Hard,
+                    hardAttack: CUConstants.BASE_ARTY_HARD_ATTACK + LARGE_BONUS,
+                    hardDefense: CUConstants.BASE_ARTY_HARD_DEFENSE + MEDIUM_BONUS,
+                    softAttack: CUConstants.BASE_ARTY_SOFT_ATTACK + XLARGE_BONUS,
+                    softDefense: CUConstants.BASE_ARTY_SOFT_DEFENSE + MEDIUM_BONUS,
+                    groundAirDefense: CUConstants.GROUND_DEFENSE_LIGHTARMOR,
+                    primaryRange: CUConstants.PRIMARY_RANGE_DEFAULT,
+                    indirectRange: CUConstants.INDIRECT_RANGE_155MM,
+                    spottingRange: CUConstants.BASE_UNIT_SPOTTING_RANGE,
                     allWeatherCapability: AllWeatherRating.GroundUnit,
                     sigintRating: SIGINT_Rating.UnitLevel,
                     nbcRating: NBC_Rating.Gen2,
@@ -3597,16 +3612,16 @@ namespace HammerAndSickle.Models
                     name: "M270 MLRS Multiple Launch Rocket System",
                     nationality: Nationality.USA,
                     weaponSystemID: WeaponSystems.ROC_MLRS,
-                    95,
-                    hardAttack: 8,
-                    hardDefense: 3,
-                    softAttack: 16,
-                    softDefense: 4,
-                    groundAirAttack: 1,
-                    groundAirDefense: 3,
-                    primaryRange: 1f,
-                    indirectRange: 6f,
-                    spottingRange: 2f,
+                    CUConstants.PRESTIGE_TIER_FREE,
+                    weaponSystemType: WeaponSystemType.Hard,
+                    hardAttack: CUConstants.BASE_ARTY_HARD_ATTACK + LARGE_BONUS,
+                    hardDefense: CUConstants.BASE_ARTY_HARD_DEFENSE + MEDIUM_BONUS,
+                    softAttack: CUConstants.BASE_ARTY_SOFT_ATTACK + LARGE_BONUS,
+                    softDefense: CUConstants.BASE_ARTY_SOFT_DEFENSE + MEDIUM_BONUS,
+                    groundAirDefense: CUConstants.GROUND_DEFENSE_LIGHTARMOR,
+                    primaryRange: CUConstants.PRIMARY_RANGE_DEFAULT,
+                    indirectRange: CUConstants.INDIRECT_RANGE_ROC_MR,
+                    spottingRange: CUConstants.BASE_UNIT_SPOTTING_RANGE,
                     allWeatherCapability: AllWeatherRating.GroundUnit,
                     sigintRating: SIGINT_Rating.UnitLevel,
                     nbcRating: NBC_Rating.Gen2,
@@ -3652,16 +3667,17 @@ namespace HammerAndSickle.Models
                     name: "M163 Vulcan Self-Propelled Anti-Aircraft Artillery",
                     nationality: Nationality.USA,
                     weaponSystemID: WeaponSystems.SPAAA_M163,
-                    40,
-                    hardAttack: 3,
-                    hardDefense: 3,
-                    softAttack: 8,
-                    softDefense: 4,
-                    groundAirAttack: 8,
-                    groundAirDefense: 12,
-                    primaryRange: 1f,
-                    indirectRange: 2f,
-                    spottingRange: 3f,
+                    CUConstants.PRESTIGE_TIER_FREE,
+                    WeaponSystemType.Hard,
+                    hardAttack: CUConstants.BASE_AAA_HARD_ATTACK,
+                    hardDefense: CUConstants.BASE_AAA_HARD_DEFENSE,
+                    softAttack: CUConstants.BASE_AAA_SOFT_ATTACK,
+                    softDefense: CUConstants.BASE_AAA_SOFT_DEFENSE,
+                    groundAirAttack: CUConstants.BASE_AAA_GROUND_AIR_ATTACK + SMALL_BONUS,
+                    groundAirDefense: CUConstants.GROUND_DEFENSE_AAA,
+                    primaryRange: CUConstants.PRIMARY_RANGE_DEFAULT,
+                    indirectRange: CUConstants.INDIRECT_RANGE_AAA,
+                    spottingRange: CUConstants.BASE_AAA_SPOTTING_RANGE,
                     allWeatherCapability: AllWeatherRating.GroundUnit,
                     sigintRating: SIGINT_Rating.UnitLevel,
                     nbcRating: NBC_Rating.Gen1,
@@ -3700,16 +3716,17 @@ namespace HammerAndSickle.Models
                     name: "M48 Chaparral Self-Propelled SAM System",
                     nationality: Nationality.USA,
                     weaponSystemID: WeaponSystems.SPSAM_CHAP,
-                    50,
-                    hardAttack: 2,
-                    hardDefense: 3,
-                    softAttack: 3,
-                    softDefense: 4,
-                    groundAirAttack: 11,
-                    groundAirDefense: 6,
-                    primaryRange: 1f,
-                    indirectRange: 3f,
-                    spottingRange: 3f,
+                    CUConstants.PRESTIGE_TIER_FREE,
+                    WeaponSystemType.Soft,
+                    hardAttack: CUConstants.BASE_SAM_HARD_ATTACK,
+                    hardDefense: CUConstants.BASE_SAM_HARD_DEFENSE,
+                    softAttack: CUConstants.BASE_SAM_SOFT_ATTACK,
+                    softDefense: CUConstants.BASE_SAM_SOFT_DEFENSE,
+                    groundAirAttack: CUConstants.BASE_SAM_GROUND_AIR_ATTACK,
+                    groundAirDefense: CUConstants.GROUND_DEFENSE_SAM,
+                    primaryRange: CUConstants.PRIMARY_RANGE_DEFAULT,
+                    indirectRange: CUConstants.INDIRECT_RANGE_SAM,
+                    spottingRange: CUConstants.BASE_SAM_SPOTTING_RANGE,
                     allWeatherCapability: AllWeatherRating.GroundUnit,
                     sigintRating: SIGINT_Rating.UnitLevel,
                     nbcRating: NBC_Rating.Gen1,
@@ -3748,16 +3765,17 @@ namespace HammerAndSickle.Models
                     name: "MIM-23 Hawk Strategic SAM System",
                     nationality: Nationality.USA,
                     weaponSystemID: WeaponSystems.SAM_HAWK,
-                    85,
-                    hardAttack: 0,
-                    hardDefense: 3,
-                    softAttack: 0,
-                    softDefense: 4,
-                    groundAirAttack: 15,
-                    groundAirDefense: 8,
-                    primaryRange: 1f,
-                    indirectRange: 6f,
-                    spottingRange: 6f,
+                    CUConstants.PRESTIGE_TIER_FREE,
+                    WeaponSystemType.Soft,
+                    hardAttack: CUConstants.BASE_SAM_HARD_ATTACK,
+                    hardDefense: CUConstants.BASE_SAM_HARD_DEFENSE,
+                    softAttack: CUConstants.BASE_SAM_SOFT_ATTACK,
+                    softDefense: CUConstants.BASE_SAM_SOFT_DEFENSE,
+                    groundAirAttack: CUConstants.BASE_SAM_GROUND_AIR_ATTACK + LARGE_BONUS,
+                    groundAirDefense: CUConstants.GROUND_DEFENSE_SAM,
+                    primaryRange: CUConstants.PRIMARY_RANGE_DEFAULT,
+                    indirectRange: CUConstants.INDIRECT_RANGE_SAM + LARGE_BONUS,
+                    spottingRange: CUConstants.BASE_SAM_SPOTTING_RANGE + LARGE_BONUS,
                     allWeatherCapability: AllWeatherRating.GroundUnit,
                     sigintRating: SIGINT_Rating.SpecializedLevel,
                     nbcRating: NBC_Rating.Gen1,
@@ -3800,16 +3818,16 @@ namespace HammerAndSickle.Models
                     name: "AH-64 Apache Attack Helicopter",
                     nationality: Nationality.USA,
                     weaponSystemID: WeaponSystems.HEL_AH64,
-                    130,
-                    hardAttack: 20,
-                    hardDefense: 8,
-                    softAttack: 16,
-                    softDefense: 9,
-                    groundAirAttack: 1,
-                    groundAirDefense: 10,
-                    primaryRange: 1f,
-                    indirectRange: 0f,
-                    spottingRange: 3f,
+                    CUConstants.PRESTIGE_TIER_FREE,
+                    weaponSystemType: WeaponSystemType.Hard,
+                    hardAttack: CUConstants.BASE_HEL_HARD_ATTACK + XXXLARGE_BONUS,
+                    hardDefense: CUConstants.BASE_HEL_HARD_DEFENSE + MEDIUM_BONUS,
+                    softAttack: CUConstants.BASE_HEL_SOFT_ATTACK + MEDIUM_BONUS,
+                    softDefense: CUConstants.BASE_HEL_SOFT_DEFENSE + SMALL_BONUS,
+                    groundAirDefense: CUConstants.GROUND_DEFENSE_HELO,
+                    primaryRange: CUConstants.PRIMARY_RANGE_DEFAULT,
+                    indirectRange: CUConstants.INDIRECT_RANGE_DEFAULT,
+                    spottingRange: CUConstants.RECON_UNIT_SPOTTING_RANGE,
                     allWeatherCapability: AllWeatherRating.GroundUnit,
                     sigintRating: SIGINT_Rating.UnitLevel,
                     nbcRating: NBC_Rating.Gen2,
@@ -3848,16 +3866,16 @@ namespace HammerAndSickle.Models
                     name: "OH-58 Kiowa Recon Helicopter",
                     nationality: Nationality.USA,
                     weaponSystemID: WeaponSystems.HEL_OH58,
-                    40,
-                    hardAttack: 6,
-                    hardDefense: 3,
-                    softAttack: 9,
-                    softDefense: 5,
-                    groundAirAttack: 1,
-                    groundAirDefense: 7,
-                    primaryRange: 1f,
-                    indirectRange: 0f,
-                    spottingRange: 3f,
+                    CUConstants.PRESTIGE_TIER_FREE,
+                    weaponSystemType: WeaponSystemType.Hard,
+                    hardAttack: CUConstants.BASE_HEL_HARD_ATTACK + SMALL_MALUS,
+                    hardDefense: CUConstants.BASE_HEL_HARD_DEFENSE,
+                    softAttack: CUConstants.BASE_HEL_SOFT_ATTACK,
+                    softDefense: CUConstants.BASE_HEL_SOFT_DEFENSE,
+                    groundAirDefense: CUConstants.GROUND_DEFENSE_HELO,
+                    primaryRange: CUConstants.PRIMARY_RANGE_DEFAULT,
+                    indirectRange: CUConstants.INDIRECT_RANGE_DEFAULT,
+                    spottingRange: CUConstants.RECON_UNIT_SPOTTING_RANGE,
                     allWeatherCapability: AllWeatherRating.GroundUnit,
                     sigintRating: SIGINT_Rating.UnitLevel,
                     nbcRating: NBC_Rating.Gen2,
@@ -3900,17 +3918,18 @@ namespace HammerAndSickle.Models
                     name: "E-3 Sentry Airborne Early Warning",
                     nationality: Nationality.USA,
                     weaponSystemID: WeaponSystems.AWACS_E3,
-                    150,
-                    dogfighting: 0,
-                    maneuverability: 0,
-                    topSpeed: 7,
-                    survivability: 6,
-                    groundAttack: 0,
-                    ordinanceLoad: 0,
+                    CUConstants.PRESTIGE_TIER_FREE,
+                    weaponSystemType: WeaponSystemType.Air,
+                    dogfighting: CUConstants.AC_BOMBER_DOGFIGHT,
+                    maneuverability: CUConstants.AC_BOMBER_MANEUVER,
+                    topSpeed: CUConstants.AC_BOMBER_TOPSPEED,
+                    survivability: CUConstants.AC_BOMBER_SURVIVE,
+                    groundAttack: CUConstants.GROUND_ATTACK_NA,
+                    ordinanceLoad: CUConstants.LARGE_AC_LOAD,
                     stealth: 0,
-                    primaryRange: 1f,
-                    indirectRange: 0f,
-                    spottingRange: 20f,
+                    primaryRange: CUConstants.PRIMARY_RANGE_DEFAULT,
+                    indirectRange: CUConstants.INDIRECT_RANGE_DEFAULT,
+                    spottingRange: CUConstants.AC_SPOTTING_BASIC,
                     allWeatherCapability: AllWeatherRating.AllWeather,
                     sigintRating: SIGINT_Rating.SpecializedLevel,
                     nbcRating: NBC_Rating.Gen2,
@@ -3940,7 +3959,7 @@ namespace HammerAndSickle.Models
         }
 
         /// <summary>
-        /// F-15 Eagle Air Superiority ASF
+        /// F-15 Eagle Air Superiority FGT
         /// </summary>
         private static void Create_ASF_F15_Profile()
         {
@@ -3949,18 +3968,19 @@ namespace HammerAndSickle.Models
                 var profile = new WeaponSystemProfile(
                     name: "F-15 Eagle Air Superiority Fighter",
                     nationality: Nationality.USA,
-                    weaponSystemID: WeaponSystems.ASF_F15,
-                    110,
-                    dogfighting: 19,
-                    maneuverability: 16,
-                    topSpeed: 16,
-                    survivability: 10,
-                    groundAttack: 5,
-                    ordinanceLoad: 7,
+                    weaponSystemID: WeaponSystems.FGT_F15,
+                    CUConstants.PRESTIGE_TIER_FREE,
+                    weaponSystemType: WeaponSystemType.Air,
+                    dogfighting: CUConstants.MID_FGT_DOGFIGHT + XXXLARGE_BONUS,
+                    maneuverability: CUConstants.MID_FGT_MANEUVER + LARGE_BONUS,
+                    topSpeed: CUConstants.MID_FGT_TOPSPEED + MEDIUM_BONUS,
+                    survivability: CUConstants.MID_FGT_SURVIVE + XLARGE_BONUS,
+                    groundAttack: CUConstants.GROUND_ATTACK_TIER_2,
+                    ordinanceLoad: CUConstants.SMALL_AC_LOAD + LARGE_BONUS,
                     stealth: 0,
-                    primaryRange: 1f,
-                    indirectRange: 0f,
-                    spottingRange: 5f,
+                    primaryRange: CUConstants.PRIMARY_RANGE_DEFAULT,
+                    indirectRange: CUConstants.INDIRECT_RANGE_DEFAULT,
+                    spottingRange: CUConstants.AC_SPOTTING_SUPERIOR,
                     allWeatherCapability: AllWeatherRating.AllWeather,
                     sigintRating: SIGINT_Rating.UnitLevel,
                     nbcRating: NBC_Rating.Gen2,
@@ -3970,7 +3990,7 @@ namespace HammerAndSickle.Models
                 );
 
                 // Set upgrade paths
-                profile.AddUpgradeType(UpgradeType.ASF);
+                profile.AddUpgradeType(UpgradeType.FGT);
 
                 // Set short name for UI display
                 profile.SetShortName("F-15 Eagle");
@@ -3979,7 +3999,7 @@ namespace HammerAndSickle.Models
                 profile.SetTurnAvailable(456);
 
                 // Store in master dictionary
-                _weaponSystemProfiles[WeaponSystems.ASF_F15] = profile;
+                _weaponSystemProfiles[WeaponSystems.FGT_F15] = profile;
             }
             catch (Exception e)
             {
@@ -3989,7 +4009,7 @@ namespace HammerAndSickle.Models
         }
 
         /// <summary>
-        /// F-4 Phantom Multi-Role ASF
+        /// F-4 Phantom Multi-Role FGT
         /// </summary>
         private static void Create_ASF_F4_Profile()
         {
@@ -3998,18 +4018,19 @@ namespace HammerAndSickle.Models
                 var profile = new WeaponSystemProfile(
                     name: "F-4 Phantom Air Superiority Fighter",
                     nationality: Nationality.USA,
-                    weaponSystemID: WeaponSystems.ASF_F4,
-                    65,
-                    dogfighting: 9,
-                    maneuverability: 7,
-                    topSpeed: 15,
-                    survivability: 9,
-                    groundAttack: 10,
-                    ordinanceLoad: 12,
+                    weaponSystemID: WeaponSystems.FGT_F4,
+                    CUConstants.PRESTIGE_TIER_FREE,
+                    weaponSystemType: WeaponSystemType.Air,
+                    dogfighting: CUConstants.EARLY_FGT_DOGFIGHT + MEDIUM_BONUS,
+                    maneuverability: CUConstants.EARLY_FGT_MANEUVER,
+                    topSpeed: CUConstants.EARLY_FGT_TOPSPEED + MEDIUM_BONUS,
+                    survivability: CUConstants.EARLY_FGT_SURVIVE + MEDIUM_BONUS,
+                    groundAttack: CUConstants.GROUND_ATTACK_TIER_0,
+                    ordinanceLoad: CUConstants.SMALL_AC_LOAD,
                     stealth: 0,
-                    primaryRange: 1f,
-                    indirectRange: 0f,
-                    spottingRange: 4f,
+                    primaryRange: CUConstants.PRIMARY_RANGE_DEFAULT,
+                    indirectRange: CUConstants.INDIRECT_RANGE_DEFAULT,
+                    spottingRange: CUConstants.AC_SPOTTING_ENHANCED,
                     allWeatherCapability: AllWeatherRating.Night,
                     sigintRating: SIGINT_Rating.UnitLevel,
                     nbcRating: NBC_Rating.Gen1,
@@ -4019,7 +4040,7 @@ namespace HammerAndSickle.Models
                 );
 
                 // Set upgrade paths
-                profile.AddUpgradeType(UpgradeType.ASF);
+                profile.AddUpgradeType(UpgradeType.FGT);
 
                 // Set short name for UI display
                 profile.SetShortName("F-4 Phantom");
@@ -4028,7 +4049,7 @@ namespace HammerAndSickle.Models
                 profile.SetTurnAvailable(264);
 
                 // Store in master dictionary
-                _weaponSystemProfiles[WeaponSystems.ASF_F4] = profile;
+                _weaponSystemProfiles[WeaponSystems.FGT_F4] = profile;
             }
             catch (Exception e)
             {
@@ -4038,7 +4059,7 @@ namespace HammerAndSickle.Models
         }
 
         /// <summary>
-        /// F-16 Fighting Falcon Multi-Role ASF
+        /// F-16 Fighting Falcon Multi-Role FGT
         /// </summary>
         private static void Create_MRF_F16_Profile()
         {
@@ -4047,18 +4068,19 @@ namespace HammerAndSickle.Models
                 var profile = new WeaponSystemProfile(
                     name: "F-16 Fighting Falcon Multi-Role Fighter",
                     nationality: Nationality.USA,
-                    weaponSystemID: WeaponSystems.MRF_F16,
-                    75,
-                    dogfighting: 15,
-                    maneuverability: 16,
-                    topSpeed: 15,
-                    survivability: 9,
-                    groundAttack: 12,
-                    ordinanceLoad: 10,
+                    weaponSystemID: WeaponSystems.FGT_F16,
+                    CUConstants.PRESTIGE_TIER_FREE,
+                    weaponSystemType: WeaponSystemType.Air,
+                    dogfighting: CUConstants.MID_FGT_DOGFIGHT + XLARGE_BONUS,
+                    maneuverability: CUConstants.MID_FGT_MANEUVER + XLARGE_BONUS,
+                    topSpeed: CUConstants.MID_FGT_TOPSPEED + SMALL_BONUS,
+                    survivability: CUConstants.MID_FGT_SURVIVE + SMALL_BONUS,
+                    groundAttack: CUConstants.GROUND_ATTACK_TIER_2,
+                    ordinanceLoad: CUConstants.SMALL_AC_LOAD + MEDIUM_BONUS,
                     stealth: 0,
-                    primaryRange: 1f,
-                    indirectRange: 0f,
-                    spottingRange: 4f,
+                    primaryRange: CUConstants.PRIMARY_RANGE_DEFAULT,
+                    indirectRange: CUConstants.INDIRECT_RANGE_DEFAULT,
+                    spottingRange: CUConstants.AC_SPOTTING_ADVANCED,
                     allWeatherCapability: AllWeatherRating.AllWeather,
                     sigintRating: SIGINT_Rating.UnitLevel,
                     nbcRating: NBC_Rating.Gen2,
@@ -4068,7 +4090,7 @@ namespace HammerAndSickle.Models
                 );
 
                 // Set upgrade paths
-                profile.AddUpgradeType(UpgradeType.ATT);
+                profile.AddUpgradeType(UpgradeType.FGT);
 
                 // Set short name for UI display
                 profile.SetShortName("F-16 Falcon");
@@ -4077,7 +4099,7 @@ namespace HammerAndSickle.Models
                 profile.SetTurnAvailable(480);
 
                 // Store in master dictionary
-                _weaponSystemProfiles[WeaponSystems.MRF_F16] = profile;
+                _weaponSystemProfiles[WeaponSystems.FGT_F16] = profile;
             }
             catch (Exception e)
             {
@@ -4097,17 +4119,18 @@ namespace HammerAndSickle.Models
                     name: "A-10 Thunderbolt II Attack Aircraft",
                     nationality: Nationality.USA,
                     weaponSystemID: WeaponSystems.ATT_A10,
-                    70,
-                    dogfighting: 3,
-                    maneuverability: 7,
-                    topSpeed: 5,
-                    survivability: 18,
-                    groundAttack: 18,
-                    ordinanceLoad: 14,
+                     CUConstants.PRESTIGE_TIER_FREE,
+                    weaponSystemType: WeaponSystemType.Air,
+                    dogfighting: CUConstants.AC_ATTACK_DOGFIGHT,
+                    maneuverability: CUConstants.AC_ATTACK_MANEUVER,
+                    topSpeed: CUConstants.AC_ATTACK_TOPSPEED,
+                    survivability: CUConstants.AC_ATTACK_SURVIVE + XXLARGE_BONUS,
+                    groundAttack: CUConstants.GROUND_ATTACK_TIER_2 + XXLARGE_BONUS,
+                    ordinanceLoad: CUConstants.SMALL_AC_LOAD + XXLARGE_BONUS,
                     stealth: 0,
-                    primaryRange: 1f,
-                    indirectRange: 0f,
-                    spottingRange: 3f,
+                    primaryRange: CUConstants.PRIMARY_RANGE_DEFAULT,
+                    indirectRange: CUConstants.INDIRECT_RANGE_DEFAULT,
+                    spottingRange: CUConstants.AC_SPOTTING_BASIC,
                     allWeatherCapability: AllWeatherRating.AllWeather,
                     sigintRating: SIGINT_Rating.UnitLevel,
                     nbcRating: NBC_Rating.Gen1,
@@ -4136,7 +4159,7 @@ namespace HammerAndSickle.Models
         }
 
         /// <summary>
-        /// F-111 Aardvark Strike ASF
+        /// F-111 Aardvark Strike FGT
         /// </summary>
         private static void Create_BMB_F111_Profile()
         {
@@ -4146,17 +4169,17 @@ namespace HammerAndSickle.Models
                     name: "F-111 Aardvark Strike Fighter",
                     nationality: Nationality.USA,
                     weaponSystemID: WeaponSystems.BMB_F111,
-                    95,
-                    dogfighting: 6,
-                    maneuverability: 6,
-                    topSpeed: 16,
-                    survivability: 9,
-                    groundAttack: 17,
-                    ordinanceLoad: 18,
+                    CUConstants.PRESTIGE_TIER_FREE,
+                    dogfighting: CUConstants.AC_BOMBER_DOGFIGHT + XXLARGE_BONUS,
+                    maneuverability: CUConstants.AC_BOMBER_MANEUVER + LARGE_BONUS,
+                    topSpeed: CUConstants.AC_BOMBER_TOPSPEED + XLARGE_BONUS,
+                    survivability: CUConstants.AC_BOMBER_SURVIVE,
+                    groundAttack: CUConstants.GROUND_ATTACK_TIER_2 + LARGE_BONUS,
+                    ordinanceLoad: CUConstants.LARGE_AC_LOAD + MEDIUM_BONUS,
                     stealth: 0,
-                    primaryRange: 1f,
-                    indirectRange: 0f,
-                    spottingRange: 4f,
+                    primaryRange: CUConstants.PRIMARY_RANGE_DEFAULT,
+                    indirectRange: CUConstants.INDIRECT_RANGE_DEFAULT,
+                    spottingRange: CUConstants.AC_SPOTTING_ENHANCED,
                     allWeatherCapability: AllWeatherRating.AllWeather,
                     sigintRating: SIGINT_Rating.UnitLevel,
                     nbcRating: NBC_Rating.Gen1,
@@ -4195,17 +4218,17 @@ namespace HammerAndSickle.Models
                     name: "F-117 Nighthawk Stealth Attack Aircraft",
                     nationality: Nationality.USA,
                     weaponSystemID: WeaponSystems.BMB_F117,
-                    180,
-                    dogfighting: 2,
-                    maneuverability: 6,
-                    topSpeed: 7,
-                    survivability: 7,
-                    groundAttack: 17,
-                    ordinanceLoad: 12,
-                    stealth: 20,
-                    primaryRange: 1f,
-                    indirectRange: 0f,
-                    spottingRange: 3f,
+                    CUConstants.PRESTIGE_TIER_FREE,
+                    dogfighting: CUConstants.AC_BOMBER_DOGFIGHT,
+                    maneuverability: CUConstants.AC_BOMBER_MANEUVER,
+                    topSpeed: CUConstants.AC_BOMBER_TOPSPEED,
+                    survivability: CUConstants.AC_BOMBER_SURVIVE,
+                    groundAttack: CUConstants.GROUND_ATTACK_TIER_3 + LARGE_BONUS,
+                    ordinanceLoad: CUConstants.SMALL_AC_LOAD,
+                    stealth: 15,
+                    primaryRange: CUConstants.PRIMARY_RANGE_DEFAULT,
+                    indirectRange: CUConstants.INDIRECT_RANGE_DEFAULT,
+                    spottingRange: CUConstants.AC_SPOTTING_BASIC,
                     allWeatherCapability: AllWeatherRating.AllWeather,
                     sigintRating: SIGINT_Rating.SpecializedLevel,
                     nbcRating: NBC_Rating.Gen2,
@@ -4244,17 +4267,18 @@ namespace HammerAndSickle.Models
                     name: "SR-71 Blackbird Strategic Reconnaissance Aircraft",
                     nationality: Nationality.USA,
                     weaponSystemID: WeaponSystems.RCNA_SR71,
-                    200,
-                    dogfighting: 1,
-                    maneuverability: 5,
-                    topSpeed: 21,
-                    survivability: 10,
-                    groundAttack: 1,
-                    ordinanceLoad: 1,
-                    stealth: 12,
-                    primaryRange: 1f,
-                    indirectRange: 0f,
-                    spottingRange: 10f,
+                    CUConstants.PRESTIGE_TIER_2,
+                    weaponSystemType: WeaponSystemType.Air,
+                    dogfighting: CUConstants.EARLY_FGT_DOGFIGHT,
+                    maneuverability: CUConstants.EARLY_FGT_MANEUVER,
+                    topSpeed: CUConstants.AC_HIGHSPEED_WESTERN,
+                    survivability: CUConstants.EARLY_FGT_SURVIVE,
+                    groundAttack: CUConstants.GROUND_ATTACK_TIER_0,
+                    ordinanceLoad: CUConstants.SMALL_AC_LOAD,
+                    stealth: 0,
+                    primaryRange: CUConstants.PRIMARY_RANGE_DEFAULT,
+                    indirectRange: CUConstants.INDIRECT_RANGE_DEFAULT,
+                    spottingRange: CUConstants.AC_SPOTTING_BASIC,
                     allWeatherCapability: AllWeatherRating.AllWeather,
                     sigintRating: SIGINT_Rating.SpecializedLevel,
                     nbcRating: NBC_Rating.Gen2,
@@ -4299,14 +4323,16 @@ namespace HammerAndSickle.Models
                     name: "Leopard 1 MBT",
                     nationality: Nationality.FRG,
                     weaponSystemID: WeaponSystems.TANK_LEOPARD1,
-                    80,
-                    hardAttack: 11,
-                    hardDefense: 10,
-                    softAttack: 11,
-                    softDefense: 10,
+                    CUConstants.PRESTIGE_TIER_FREE,
+                    weaponSystemType: WeaponSystemType.Hard,
+                    hardAttack: CUConstants.GEN1_TANK_HARD_ATTACK + MEDIUM_BONUS,
+                    hardDefense: CUConstants.GEN1_TANK_HARD_DEFENSE + MEDIUM_BONUS,
+                    softAttack: CUConstants.BASE_TANK_SOFT_ATTACK,
+                    softDefense: CUConstants.BASE_TANK_SOFT_DEFENSE,
                     groundAirDefense: CUConstants.GROUND_DEFENSE_ARMOR,
-                    primaryRange: 1f,
-                    spottingRange: 2f,
+                    primaryRange: CUConstants.PRIMARY_RANGE_DEFAULT,
+                    indirectRange: CUConstants.INDIRECT_RANGE_DEFAULT,
+                    spottingRange: CUConstants.BASE_UNIT_SPOTTING_RANGE,
                     allWeatherCapability: AllWeatherRating.GroundUnit,
                     sigintRating: SIGINT_Rating.UnitLevel,
                     nbcRating: NBC_Rating.Gen1,
@@ -4334,14 +4360,16 @@ namespace HammerAndSickle.Models
                     name: "Leopard 2 MBT",
                     nationality: Nationality.FRG,
                     weaponSystemID: WeaponSystems.TANK_LEOPARD2,
-                    120,
-                    hardAttack: 14,
-                    hardDefense: 16,
-                    softAttack: 11,
-                    softDefense: 13,
+                    CUConstants.PRESTIGE_TIER_FREE,
+                    weaponSystemType: WeaponSystemType.Hard,
+                    hardAttack: CUConstants.GEN2_TANK_HARD_ATTACK + XLARGE_BONUS,
+                    hardDefense: CUConstants.GEN2_TANK_HARD_DEFENSE + XXLARGE_BONUS,
+                    softAttack: CUConstants.BASE_TANK_SOFT_ATTACK,
+                    softDefense: CUConstants.BASE_TANK_SOFT_DEFENSE + MEDIUM_BONUS,
                     groundAirDefense: CUConstants.GROUND_DEFENSE_ARMOR,
-                    primaryRange: 1f,
-                    spottingRange: 2f,
+                    primaryRange: CUConstants.PRIMARY_RANGE_DEFAULT,
+                    indirectRange: CUConstants.INDIRECT_RANGE_DEFAULT,
+                    spottingRange: CUConstants.BASE_UNIT_SPOTTING_RANGE,
                     allWeatherCapability: AllWeatherRating.GroundUnit,
                     sigintRating: SIGINT_Rating.UnitLevel,
                     nbcRating: NBC_Rating.Gen2,
@@ -4369,14 +4397,16 @@ namespace HammerAndSickle.Models
                     name: "Marder IFV",
                     nationality: Nationality.FRG,
                     weaponSystemID: WeaponSystems.IFV_MARDER,
-                    65,
-                    hardAttack: 9,
-                    hardDefense: 4,
-                    softAttack: 8,
-                    softDefense: 8,
+                    CUConstants.PRESTIGE_TIER_FREE,
+                    weaponSystemType: WeaponSystemType.Hard,
+                    hardAttack: CUConstants.BASE_IFV_HARD_ATTACK + LARGE_BONUS,
+                    hardDefense: CUConstants.BASE_IFV_HARD_DEFENSE,
+                    softAttack: CUConstants.BASE_IFV_SOFT_ATTACK,
+                    softDefense: CUConstants.BASE_IFV_SOFT_DEFENSE,
                     groundAirDefense: CUConstants.GROUND_DEFENSE_LIGHTARMOR,
-                    primaryRange: 1f,
-                    spottingRange: 2f,
+                    primaryRange: CUConstants.PRIMARY_RANGE_DEFAULT,
+                    indirectRange: CUConstants.INDIRECT_RANGE_DEFAULT,
+                    spottingRange: CUConstants.BASE_UNIT_SPOTTING_RANGE,
                     allWeatherCapability: AllWeatherRating.GroundUnit,
                     sigintRating: SIGINT_Rating.UnitLevel,
                     nbcRating: NBC_Rating.Gen1,
@@ -4404,15 +4434,16 @@ namespace HammerAndSickle.Models
                     name: "Luchs Reconnaissance Vehicle",
                     nationality: Nationality.FRG,
                     weaponSystemID: WeaponSystems.RCN_LUCHS,
-                    prestigeCost: 28,
-                    hardAttack: 3,
-                    hardDefense: 4,
-                    softAttack: 7,
-                    softDefense: 7,
+                    CUConstants.PRESTIGE_TIER_0 + MASSIVE_BONUS,
+                    weaponSystemType: WeaponSystemType.Hard,
+                    hardAttack: CUConstants.BASE_IFV_HARD_ATTACK,
+                    hardDefense: CUConstants.BASE_IFV_HARD_DEFENSE,
+                    softAttack: CUConstants.BASE_IFV_SOFT_ATTACK,
+                    softDefense: CUConstants.BASE_IFV_SOFT_DEFENSE,
                     groundAirDefense: CUConstants.GROUND_DEFENSE_LIGHTARMOR,
-                    primaryRange: 1f,
-                    indirectRange: 0f,
-                    spottingRange: 3f,
+                    primaryRange: CUConstants.PRIMARY_RANGE_DEFAULT,
+                    indirectRange: CUConstants.INDIRECT_RANGE_DEFAULT,
+                    spottingRange: CUConstants.RECON_UNIT_SPOTTING_RANGE,
                     allWeatherCapability: AllWeatherRating.Night,
                     nvgCapability: NVG_Rating.Gen2,
                     silhouette: UnitSilhouette.Small,
@@ -4455,16 +4486,15 @@ namespace HammerAndSickle.Models
                     name: "Flakpanzer Gepard SPAAA",
                     nationality: Nationality.FRG,
                     weaponSystemID: WeaponSystems.SPAAA_GEPARD,
-                    55,
-                    hardAttack: 3,
-                    hardDefense: 4,
-                    softAttack: 8,
-                    softDefense: 5,
-                    groundAirAttack: 10,
+                    hardAttack: CUConstants.BASE_AAA_HARD_ATTACK,
+                    hardDefense: CUConstants.BASE_AAA_HARD_DEFENSE,
+                    softAttack: CUConstants.BASE_AAA_SOFT_ATTACK,
+                    softDefense: CUConstants.BASE_AAA_SOFT_DEFENSE,
+                    groundAirAttack: CUConstants.BASE_AAA_GROUND_AIR_ATTACK + SMALL_BONUS,
                     groundAirDefense: CUConstants.GROUND_DEFENSE_AAA,
-                    primaryRange: 1f,
-                    indirectRange: 3f,
-                    spottingRange: 3f,
+                    primaryRange: CUConstants.PRIMARY_RANGE_DEFAULT,
+                    indirectRange: CUConstants.INDIRECT_RANGE_AAA,
+                    spottingRange: CUConstants.BASE_AAA_SPOTTING_RANGE,
                     allWeatherCapability: AllWeatherRating.GroundUnit,
                     sigintRating: SIGINT_Rating.UnitLevel,
                     nbcRating: NBC_Rating.Gen1,
@@ -4492,14 +4522,16 @@ namespace HammerAndSickle.Models
                     name: "Bo 105P PAH‑1 Attack Helicopter",
                     nationality: Nationality.FRG,
                     weaponSystemID: WeaponSystems.HEL_BO105,
-                    70,
-                    hardAttack: 12,
-                    hardDefense: 5,
-                    softAttack: 8,
-                    softDefense: 5,
+                    CUConstants.PRESTIGE_TIER_FREE,
+                    weaponSystemType: WeaponSystemType.Hard,
+                    hardAttack: CUConstants.BASE_HEL_HARD_ATTACK,
+                    hardDefense: CUConstants.BASE_HEL_HARD_DEFENSE,
+                    softAttack: CUConstants.BASE_HEL_SOFT_ATTACK,
+                    softDefense: CUConstants.BASE_HEL_SOFT_DEFENSE,
                     groundAirDefense: CUConstants.GROUND_DEFENSE_HELO,
-                    primaryRange: 1f,
-                    spottingRange: 3f,
+                    primaryRange: CUConstants.PRIMARY_RANGE_DEFAULT,
+                    indirectRange: CUConstants.INDIRECT_RANGE_DEFAULT,
+                    spottingRange: CUConstants.RECON_UNIT_SPOTTING_RANGE,
                     allWeatherCapability: AllWeatherRating.Day,
                     sigintRating: SIGINT_Rating.UnitLevel,
                     nbcRating: NBC_Rating.None,
@@ -4517,7 +4549,7 @@ namespace HammerAndSickle.Models
         }
 
         /// <summary>
-        /// Tornado IDS Multi-Role ASF
+        /// Tornado IDS Multi-Role FGT
         /// </summary>
         private static void Create_MRF_TORNADO_IDS_Profile()
         {
@@ -4526,18 +4558,19 @@ namespace HammerAndSickle.Models
                 var profile = new WeaponSystemProfile(
                     name: "Tornado IDS Multirole Fighter",
                     nationality: Nationality.FRG,
-                    weaponSystemID: WeaponSystems.MRF_TORNADO_IDS,
-                    65,
-                    dogfighting: 9,
-                    maneuverability: 7,
-                    topSpeed: 13,
-                    survivability: 9,
-                    groundAttack: 14,
-                    ordinanceLoad: 14,
+                    weaponSystemID: WeaponSystems.FGT_TORNADO_IDS,
+                    CUConstants.PRESTIGE_TIER_FREE,
+                    weaponSystemType: WeaponSystemType.Air,
+                    dogfighting: CUConstants.MID_FGT_DOGFIGHT + MEDIUM_BONUS,
+                    maneuverability: CUConstants.MID_FGT_MANEUVER,
+                    topSpeed: CUConstants.MID_FGT_TOPSPEED,
+                    survivability: CUConstants.MID_FGT_SURVIVE,
+                    groundAttack: CUConstants.GROUND_ATTACK_TIER_2,
+                    ordinanceLoad: CUConstants.SMALL_AC_LOAD + MEDIUM_BONUS,
                     stealth: 0,
-                    primaryRange: 1f,
-                    indirectRange: 0f,
-                    spottingRange: 4f,
+                    primaryRange: CUConstants.PRIMARY_RANGE_DEFAULT,
+                    indirectRange: CUConstants.INDIRECT_RANGE_DEFAULT,
+                    spottingRange: CUConstants.AC_SPOTTING_ENHANCED,
                     allWeatherCapability: AllWeatherRating.AllWeather,
                     sigintRating: SIGINT_Rating.UnitLevel,
                     nbcRating: NBC_Rating.Gen1,
@@ -4547,7 +4580,7 @@ namespace HammerAndSickle.Models
                 );
 
                 // Set upgrade paths
-                profile.AddUpgradeType(UpgradeType.ASF);
+                profile.AddUpgradeType(UpgradeType.FGT);
 
                 // Set short name for UI display
                 profile.SetShortName("Tornado IDS");
@@ -4556,7 +4589,7 @@ namespace HammerAndSickle.Models
                 profile.SetTurnAvailable(264);
 
                 // Store in master dictionary
-                _weaponSystemProfiles[WeaponSystems.MRF_TORNADO_IDS] = profile;
+                _weaponSystemProfiles[WeaponSystems.FGT_TORNADO_IDS] = profile;
             }
             catch (Exception e)
             {
@@ -4579,14 +4612,16 @@ namespace HammerAndSickle.Models
                     name: "Challenger 1 MBT",
                     nationality: Nationality.UK,
                     weaponSystemID: WeaponSystems.TANK_CHALLENGER1,
-                    115,
-                    hardAttack: 13,
-                    hardDefense: 16,
-                    softAttack: 11,
-                    softDefense: 13,
+                    CUConstants.PRESTIGE_TIER_FREE,
+                    weaponSystemType: WeaponSystemType.Hard,
+                    hardAttack: CUConstants.GEN2_TANK_HARD_ATTACK + LARGE_BONUS,
+                    hardDefense: CUConstants.GEN2_TANK_HARD_DEFENSE + XXLARGE_BONUS,
+                    softAttack: CUConstants.BASE_TANK_SOFT_ATTACK,
+                    softDefense: CUConstants.BASE_TANK_SOFT_DEFENSE + MEDIUM_BONUS,
                     groundAirDefense: CUConstants.GROUND_DEFENSE_ARMOR,
-                    primaryRange: 1f,
-                    spottingRange: 2f,
+                    primaryRange: CUConstants.PRIMARY_RANGE_DEFAULT,
+                    indirectRange: CUConstants.INDIRECT_RANGE_DEFAULT,
+                    spottingRange: CUConstants.BASE_UNIT_SPOTTING_RANGE,
                     allWeatherCapability: AllWeatherRating.GroundUnit,
                     sigintRating: SIGINT_Rating.UnitLevel,
                     nbcRating: NBC_Rating.Gen2,
@@ -4596,7 +4631,7 @@ namespace HammerAndSickle.Models
                     movementPoints: CUConstants.MECH_UNIT);
 
                 profile.AddUpgradeType(UpgradeType.AFV);
-                profile.SetShortName("Chall 1");
+                profile.SetShortName("Challenger 1");
                 profile.SetTurnAvailable(552); // 1984
                 _weaponSystemProfiles[WeaponSystems.TANK_CHALLENGER1] = profile;
             }
@@ -4611,14 +4646,16 @@ namespace HammerAndSickle.Models
                     name: "Warrior IFV",
                     nationality: Nationality.UK,
                     weaponSystemID: WeaponSystems.IFV_WARRIOR,
-                    75,
-                    hardAttack: 10,
-                    hardDefense: 4,
-                    softAttack: 9,
-                    softDefense: 8,
+                    CUConstants.PRESTIGE_TIER_FREE,
+                    weaponSystemType: WeaponSystemType.Hard,
+                    hardAttack: CUConstants.BASE_IFV_HARD_ATTACK + MEDIUM_BONUS,
+                    hardDefense: CUConstants.BASE_IFV_HARD_DEFENSE,
+                    softAttack: CUConstants.BASE_IFV_SOFT_ATTACK,
+                    softDefense: CUConstants.BASE_IFV_SOFT_DEFENSE,
                     groundAirDefense: CUConstants.GROUND_DEFENSE_LIGHTARMOR,
-                    primaryRange: 1f,
-                    spottingRange: 2f,
+                    primaryRange: CUConstants.PRIMARY_RANGE_DEFAULT,
+                    indirectRange: CUConstants.INDIRECT_RANGE_DEFAULT,
+                    spottingRange: CUConstants.BASE_UNIT_SPOTTING_RANGE,
                     allWeatherCapability: AllWeatherRating.GroundUnit,
                     sigintRating: SIGINT_Rating.UnitLevel,
                     nbcRating: NBC_Rating.Gen2,
@@ -4646,16 +4683,16 @@ namespace HammerAndSickle.Models
                     name: "FV 432",
                     nationality: Nationality.UK,
                     weaponSystemID: WeaponSystems.APC_FV432,
-                    25,
-                    hardAttack: 2,
-                    hardDefense: 3,
-                    softAttack: 5,
-                    softDefense: 5,
-                    groundAirAttack: 1,
-                    groundAirDefense: 2,
-                    primaryRange: 1f,
-                    indirectRange: 0f,
-                    spottingRange: 2f,
+                    CUConstants.PRESTIGE_TIER_FREE,
+                    weaponSystemType: WeaponSystemType.Hard,
+                    hardAttack: CUConstants.BASE_APC_HARD_ATTACK,
+                    hardDefense: CUConstants.BASE_APC_HARD_DEFENSE,
+                    softAttack: CUConstants.BASE_APC_SOFT_ATTACK,
+                    softDefense: CUConstants.BASE_APC_SOFT_DEFENSE,
+                    groundAirDefense: CUConstants.GROUND_DEFENSE_LIGHTARMOR,
+                    primaryRange: CUConstants.PRIMARY_RANGE_DEFAULT,
+                    indirectRange: CUConstants.INDIRECT_RANGE_DEFAULT,
+                    spottingRange: CUConstants.BASE_UNIT_SPOTTING_RANGE,
                     allWeatherCapability: AllWeatherRating.GroundUnit,
                     sigintRating: SIGINT_Rating.UnitLevel,
                     nbcRating: NBC_Rating.Gen1,
@@ -4694,16 +4731,16 @@ namespace HammerAndSickle.Models
                     name: "Scimitar Recon Vehicle",
                     nationality: Nationality.UK,
                     weaponSystemID: WeaponSystems.RCN_SCIMITAR,
-                    25,
-                    hardAttack: 2,
-                    hardDefense: 3,
-                    softAttack: 5,
-                    softDefense: 5,
-                    groundAirAttack: 1,
-                    groundAirDefense: 2,
-                    primaryRange: 1f,
-                    indirectRange: 0f,
-                    spottingRange: 3f,
+                   CUConstants.PRESTIGE_TIER_FREE,
+                    weaponSystemType: WeaponSystemType.Hard,
+                    hardAttack: CUConstants.BASE_IFV_HARD_ATTACK + XLARGE_BONUS,
+                    hardDefense: CUConstants.BASE_IFV_HARD_DEFENSE,
+                    softAttack: CUConstants.BASE_IFV_SOFT_ATTACK,
+                    softDefense: CUConstants.BASE_IFV_SOFT_DEFENSE,
+                    groundAirDefense: CUConstants.GROUND_DEFENSE_LIGHTARMOR,
+                    primaryRange: CUConstants.PRIMARY_RANGE_DEFAULT,
+                    indirectRange: CUConstants.INDIRECT_RANGE_DEFAULT,
+                    spottingRange: CUConstants.RECON_UNIT_SPOTTING_RANGE,
                     allWeatherCapability: AllWeatherRating.GroundUnit,
                     sigintRating: SIGINT_Rating.UnitLevel,
                     nbcRating: NBC_Rating.Gen2,
@@ -4742,16 +4779,17 @@ namespace HammerAndSickle.Models
                     name: "Rapier SAM System",
                     nationality: Nationality.UK,
                     weaponSystemID: WeaponSystems.SAM_RAPIER,
-                    85,
-                    hardAttack: 0,
-                    hardDefense: 3,
-                    softAttack: 0,
-                    softDefense: 4,
-                    groundAirAttack: 11,
-                    groundAirDefense: 8,
-                    primaryRange: 1f,
-                    indirectRange: 6f,
-                    spottingRange: 6f,
+                    CUConstants.PRESTIGE_TIER_FREE,
+                    WeaponSystemType.Soft,
+                    hardAttack: CUConstants.BASE_SAM_HARD_ATTACK,
+                    hardDefense: CUConstants.BASE_SAM_HARD_DEFENSE,
+                    softAttack: CUConstants.BASE_SAM_SOFT_ATTACK,
+                    softDefense: CUConstants.BASE_SAM_SOFT_DEFENSE,
+                    groundAirAttack: CUConstants.BASE_SAM_GROUND_AIR_ATTACK + SMALL_BONUS,
+                    groundAirDefense: CUConstants.GROUND_DEFENSE_SAM,
+                    primaryRange: CUConstants.PRIMARY_RANGE_DEFAULT,
+                    indirectRange: CUConstants.INDIRECT_RANGE_SAM,
+                    spottingRange: CUConstants.BASE_SAM_SPOTTING_RANGE,
                     allWeatherCapability: AllWeatherRating.GroundUnit,
                     sigintRating: SIGINT_Rating.SpecializedLevel,
                     nbcRating: NBC_Rating.Gen1,
@@ -4790,16 +4828,16 @@ namespace HammerAndSickle.Models
                     name: "Westland Lynx",
                     nationality: Nationality.UK,
                     weaponSystemID: WeaponSystems.HEL_LYNX,
-                    40,
-                    hardAttack: 1,
-                    hardDefense: 3,
-                    softAttack: 5,
-                    softDefense: 5,
-                    groundAirAttack: 1,
-                    groundAirDefense: 6,
-                    primaryRange: 1f,
-                    indirectRange: 0f,
-                    spottingRange: 3f,
+                    CUConstants.PRESTIGE_TIER_FREE,
+                    weaponSystemType: WeaponSystemType.Hard,
+                    hardAttack: CUConstants.BASE_HEL_HARD_ATTACK,
+                    hardDefense: CUConstants.BASE_HEL_HARD_DEFENSE,
+                    softAttack: CUConstants.BASE_HEL_SOFT_ATTACK,
+                    softDefense: CUConstants.BASE_HEL_SOFT_DEFENSE,
+                    groundAirDefense: CUConstants.GROUND_DEFENSE_HELO,
+                    primaryRange: CUConstants.PRIMARY_RANGE_DEFAULT,
+                    indirectRange: CUConstants.INDIRECT_RANGE_DEFAULT,
+                    spottingRange: CUConstants.RECON_UNIT_SPOTTING_RANGE,
                     allWeatherCapability: AllWeatherRating.GroundUnit,
                     sigintRating: SIGINT_Rating.UnitLevel,
                     nbcRating: NBC_Rating.Gen2,
@@ -4828,7 +4866,7 @@ namespace HammerAndSickle.Models
         }
 
         /// <summary>
-        /// Tornado GR1 Multi-Role ASF
+        /// Tornado GR1 Multi-Role FGT
         /// </summary>
         private static void Create_MRF_GR1_Profile()
         {
@@ -4837,18 +4875,19 @@ namespace HammerAndSickle.Models
                 var profile = new WeaponSystemProfile(
                     name: "Tornado GR.1 Multirole Fighter",
                     nationality: Nationality.UK,
-                    weaponSystemID: WeaponSystems.MRF_TORNADO_GR1,
-                    65,
-                    dogfighting: 11,
-                    maneuverability: 8,
-                    topSpeed: 13,
-                    survivability: 9,
-                    groundAttack: 10,
-                    ordinanceLoad: 12,
+                    weaponSystemID: WeaponSystems.FGT_TORNADO_GR1,
+                    CUConstants.PRESTIGE_TIER_FREE,
+                    weaponSystemType: WeaponSystemType.Air,
+                    dogfighting: CUConstants.MID_FGT_DOGFIGHT + LARGE_BONUS,
+                    maneuverability: CUConstants.MID_FGT_MANEUVER,
+                    topSpeed: CUConstants.MID_FGT_TOPSPEED,
+                    survivability: CUConstants.MID_FGT_SURVIVE,
+                    groundAttack: CUConstants.GROUND_ATTACK_TIER_2,
+                    ordinanceLoad: CUConstants.SMALL_AC_LOAD,
                     stealth: 0,
-                    primaryRange: 1f,
-                    indirectRange: 0f,
-                    spottingRange: 4f,
+                    primaryRange: CUConstants.PRIMARY_RANGE_DEFAULT,
+                    indirectRange: CUConstants.INDIRECT_RANGE_DEFAULT,
+                    spottingRange: CUConstants.AC_SPOTTING_ENHANCED,
                     allWeatherCapability: AllWeatherRating.AllWeather,
                     sigintRating: SIGINT_Rating.UnitLevel,
                     nbcRating: NBC_Rating.Gen1,
@@ -4858,7 +4897,7 @@ namespace HammerAndSickle.Models
                 );
 
                 // Set upgrade paths
-                profile.AddUpgradeType(UpgradeType.ASF);
+                profile.AddUpgradeType(UpgradeType.FGT);
 
                 // Set short name for UI display
                 profile.SetShortName("Tornado GR.1");
@@ -4867,7 +4906,7 @@ namespace HammerAndSickle.Models
                 profile.SetTurnAvailable(264);
 
                 // Store in master dictionary
-                _weaponSystemProfiles[WeaponSystems.MRF_TORNADO_GR1] = profile;
+                _weaponSystemProfiles[WeaponSystems.FGT_TORNADO_GR1] = profile;
             }
             catch (Exception e)
             {
@@ -4893,14 +4932,16 @@ namespace HammerAndSickle.Models
                     name: "AMX‑30 MBT",
                     nationality: Nationality.FRA,
                     weaponSystemID: WeaponSystems.TANK_AMX30,
-                    75,
-                    hardAttack: 11,
-                    hardDefense: 9,
-                    softAttack: 11,
-                    softDefense: 10,
+                    CUConstants.PRESTIGE_TIER_FREE,
+                    weaponSystemType: WeaponSystemType.Hard,
+                    hardAttack: CUConstants.GEN1_TANK_HARD_ATTACK + LARGE_BONUS,
+                    hardDefense: CUConstants.GEN1_TANK_HARD_DEFENSE,
+                    softAttack: CUConstants.BASE_TANK_SOFT_ATTACK,
+                    softDefense: CUConstants.BASE_TANK_SOFT_DEFENSE,
                     groundAirDefense: CUConstants.GROUND_DEFENSE_ARMOR,
-                    primaryRange: 1f,
-                    spottingRange: 2f,
+                    primaryRange: CUConstants.PRIMARY_RANGE_DEFAULT,
+                    indirectRange: CUConstants.INDIRECT_RANGE_DEFAULT,
+                    spottingRange: CUConstants.BASE_UNIT_SPOTTING_RANGE,
                     allWeatherCapability: AllWeatherRating.GroundUnit,
                     sigintRating: SIGINT_Rating.UnitLevel,
                     nbcRating: NBC_Rating.Gen1,
@@ -4928,16 +4969,17 @@ namespace HammerAndSickle.Models
                     name: "Roland SAM",
                     nationality: Nationality.FRA,
                     weaponSystemID: WeaponSystems.SPSAM_ROLAND,
-                    65,
-                    hardAttack: 2,
-                    hardDefense: 3,
-                    softAttack: 4,
-                    softDefense: 4,
-                    groundAirAttack: 12,
-                    groundAirDefense: CUConstants.GROUND_DEFENSE_AAA,
-                    primaryRange: 1f,
-                    indirectRange: 4f,
-                    spottingRange: 4f,
+                    CUConstants.PRESTIGE_TIER_FREE,
+                    WeaponSystemType.Soft,
+                    hardAttack: CUConstants.BASE_SAM_HARD_ATTACK,
+                    hardDefense: CUConstants.BASE_SAM_HARD_DEFENSE,
+                    softAttack: CUConstants.BASE_SAM_SOFT_ATTACK,
+                    softDefense: CUConstants.BASE_SAM_SOFT_DEFENSE,
+                    groundAirAttack: CUConstants.BASE_SAM_GROUND_AIR_ATTACK + MEDIUM_BONUS,
+                    groundAirDefense: CUConstants.GROUND_DEFENSE_SAM,
+                    primaryRange: CUConstants.PRIMARY_RANGE_DEFAULT,
+                    indirectRange: CUConstants.INDIRECT_RANGE_SAM,
+                    spottingRange: CUConstants.BASE_SAM_SPOTTING_RANGE,
                     allWeatherCapability: AllWeatherRating.AllWeather,
                     sigintRating: SIGINT_Rating.SpecializedLevel,
                     nbcRating: NBC_Rating.Gen1,
@@ -4965,14 +5007,16 @@ namespace HammerAndSickle.Models
                     name: "AMX-10P",
                     nationality: Nationality.FRA,
                     weaponSystemID: WeaponSystems.IFV_AMX10P,
-                    65,
-                    hardAttack: 9,
-                    hardDefense: 4,
-                    softAttack: 8,
-                    softDefense: 8,
+                    CUConstants.PRESTIGE_TIER_FREE,
+                    weaponSystemType: WeaponSystemType.Hard,
+                    hardAttack: CUConstants.BASE_IFV_HARD_ATTACK + LARGE_BONUS,
+                    hardDefense: CUConstants.BASE_IFV_HARD_DEFENSE,
+                    softAttack: CUConstants.BASE_IFV_SOFT_ATTACK,
+                    softDefense: CUConstants.BASE_IFV_SOFT_DEFENSE + LARGE_BONUS,
                     groundAirDefense: CUConstants.GROUND_DEFENSE_LIGHTARMOR,
-                    primaryRange: 1f,
-                    spottingRange: 2f,
+                    primaryRange: CUConstants.PRIMARY_RANGE_DEFAULT,
+                    indirectRange: CUConstants.INDIRECT_RANGE_DEFAULT,
+                    spottingRange: CUConstants.BASE_UNIT_SPOTTING_RANGE,
                     allWeatherCapability: AllWeatherRating.GroundUnit,
                     sigintRating: SIGINT_Rating.UnitLevel,
                     nbcRating: NBC_Rating.Gen1,
@@ -5000,16 +5044,16 @@ namespace HammerAndSickle.Models
                     name: "VAB APC",
                     nationality: Nationality.FRA,
                     weaponSystemID: WeaponSystems.APC_VAB,
-                    25,
-                    hardAttack: 2,
-                    hardDefense: 3,
-                    softAttack: 5,
-                    softDefense: 5,
-                    groundAirAttack: 1,
-                    groundAirDefense: 2,
-                    primaryRange: 1f,
-                    indirectRange: 0f,
-                    spottingRange: 2f,
+                    CUConstants.PRESTIGE_TIER_FREE,
+                    weaponSystemType: WeaponSystemType.Hard,
+                    hardAttack: CUConstants.BASE_APC_HARD_ATTACK,
+                    hardDefense: CUConstants.BASE_APC_HARD_DEFENSE,
+                    softAttack: CUConstants.BASE_APC_SOFT_ATTACK,
+                    softDefense: CUConstants.BASE_APC_SOFT_DEFENSE,
+                    groundAirDefense: CUConstants.GROUND_DEFENSE_LIGHTARMOR,
+                    primaryRange: CUConstants.PRIMARY_RANGE_DEFAULT,
+                    indirectRange: CUConstants.INDIRECT_RANGE_DEFAULT,
+                    spottingRange: CUConstants.BASE_UNIT_SPOTTING_RANGE,
                     allWeatherCapability: AllWeatherRating.GroundUnit,
                     sigintRating: SIGINT_Rating.UnitLevel,
                     nbcRating: NBC_Rating.Gen1,
@@ -5048,15 +5092,16 @@ namespace HammerAndSickle.Models
                     name: "ERC-90 Recon Vehicle",
                     nationality: Nationality.FRA,
                     weaponSystemID: WeaponSystems.RCN_ERC90,
-                    22,
-                    hardAttack: 4,
-                    hardDefense: 3,
-                    softAttack: 6,
-                    softDefense: 6,
+                    CUConstants.PRESTIGE_TIER_FREE,
+                    weaponSystemType: WeaponSystemType.Hard,
+                    hardAttack: CUConstants.BASE_IFV_HARD_ATTACK,
+                    hardDefense: CUConstants.BASE_IFV_HARD_DEFENSE,
+                    softAttack: CUConstants.BASE_IFV_SOFT_ATTACK,
+                    softDefense: CUConstants.BASE_IFV_SOFT_DEFENSE,
                     groundAirDefense: CUConstants.GROUND_DEFENSE_LIGHTARMOR,
-                    primaryRange: 1f,
-                    indirectRange: 0f,
-                    spottingRange: 3f,
+                    primaryRange: CUConstants.PRIMARY_RANGE_DEFAULT,
+                    indirectRange: CUConstants.INDIRECT_RANGE_DEFAULT,
+                    spottingRange: CUConstants.RECON_UNIT_SPOTTING_RANGE,
                     allWeatherCapability: AllWeatherRating.GroundUnit,
                     nvgCapability: NVG_Rating.Gen1,
                     silhouette: UnitSilhouette.Small,
@@ -5099,16 +5144,16 @@ namespace HammerAndSickle.Models
                     name: "AMX-30 AuF1 Self-Propelled Artillery",
                     nationality: Nationality.FRA,
                     weaponSystemID: WeaponSystems.SPA_AUF1,
-                    60,
-                    hardAttack: 9,
-                    hardDefense: 4,
-                    softAttack: 14,
-                    softDefense: 6,
-                    groundAirAttack: 1,
-                    groundAirDefense: 3,
-                    primaryRange: 1f,
-                    indirectRange: 5f,
-                    spottingRange: 2f,
+                    CUConstants.PRESTIGE_TIER_FREE,
+                    weaponSystemType: WeaponSystemType.Hard,
+                    hardAttack: CUConstants.BASE_ARTY_HARD_ATTACK,
+                    hardDefense: CUConstants.BASE_ARTY_HARD_DEFENSE + MEDIUM_BONUS,
+                    softAttack: CUConstants.BASE_ARTY_SOFT_ATTACK + MEDIUM_BONUS,
+                    softDefense: CUConstants.BASE_ARTY_SOFT_DEFENSE + MEDIUM_BONUS,
+                    groundAirDefense: CUConstants.GROUND_DEFENSE_LIGHTARMOR,
+                    primaryRange: CUConstants.PRIMARY_RANGE_DEFAULT,
+                    indirectRange: CUConstants.INDIRECT_RANGE_155MM,
+                    spottingRange: CUConstants.BASE_UNIT_SPOTTING_RANGE,
                     allWeatherCapability: AllWeatherRating.GroundUnit,
                     sigintRating: SIGINT_Rating.UnitLevel,
                     nbcRating: NBC_Rating.Gen2,
@@ -5137,7 +5182,7 @@ namespace HammerAndSickle.Models
         }
 
         /// <summary>
-        /// Mirage 2000 ASF
+        /// Mirage 2000 FGT
         /// </summary>
         private static void Create_ASF_M2000_Profile()
         {
@@ -5146,18 +5191,19 @@ namespace HammerAndSickle.Models
                 var profile = new WeaponSystemProfile(
                     name: "Mirage 2000 Air Superiority Fighter",
                     nationality: Nationality.FRA,
-                    weaponSystemID: WeaponSystems.ASF_MIRAGE2000,
-                    110,
-                    dogfighting: 19,
-                    maneuverability: 16,
-                    topSpeed: 16,
-                    survivability: 10,
-                    groundAttack: 5,
-                    ordinanceLoad: 7,
+                    weaponSystemID: WeaponSystems.FGT_MIRAGE2000,
+                    CUConstants.PRESTIGE_TIER_FREE,
+                    weaponSystemType: WeaponSystemType.Air,
+                    dogfighting: CUConstants.MID_FGT_DOGFIGHT + XLARGE_BONUS,
+                    maneuverability: CUConstants.MID_FGT_MANEUVER + XLARGE_BONUS,
+                    topSpeed: CUConstants.MID_FGT_TOPSPEED + MEDIUM_BONUS,
+                    survivability: CUConstants.MID_FGT_SURVIVE,
+                    groundAttack: CUConstants.GROUND_ATTACK_TIER_2,
+                    ordinanceLoad: CUConstants.SMALL_AC_LOAD,
                     stealth: 0,
-                    primaryRange: 1f,
-                    indirectRange: 0f,
-                    spottingRange: 5f,
+                    primaryRange: CUConstants.PRIMARY_RANGE_DEFAULT,
+                    indirectRange: CUConstants.INDIRECT_RANGE_DEFAULT,
+                    spottingRange: CUConstants.AC_SPOTTING_ENHANCED,
                     allWeatherCapability: AllWeatherRating.AllWeather,
                     sigintRating: SIGINT_Rating.UnitLevel,
                     nbcRating: NBC_Rating.Gen2,
@@ -5167,7 +5213,7 @@ namespace HammerAndSickle.Models
                 );
 
                 // Set upgrade paths
-                profile.AddUpgradeType(UpgradeType.ASF);
+                profile.AddUpgradeType(UpgradeType.FGT);
 
                 // Set short name for UI display
                 profile.SetShortName("Mirage 2000");
@@ -5176,7 +5222,7 @@ namespace HammerAndSickle.Models
                 profile.SetTurnAvailable(456);
 
                 // Store in master dictionary
-                _weaponSystemProfiles[WeaponSystems.ASF_F15] = profile;
+                _weaponSystemProfiles[WeaponSystems.FGT_F15] = profile;
             }
             catch (Exception e)
             {
@@ -5196,17 +5242,18 @@ namespace HammerAndSickle.Models
                     name: "SEPECAT Jaguar Attack Aircraft",
                     nationality: Nationality.FRA,
                     weaponSystemID: WeaponSystems.ATT_JAGUAR,
-                    110,
-                    dogfighting: 19,
-                    maneuverability: 16,
-                    topSpeed: 16,
-                    survivability: 10,
-                    groundAttack: 5,
-                    ordinanceLoad: 7,
+                    CUConstants.PRESTIGE_TIER_FREE,
+                    weaponSystemType: WeaponSystemType.Air,
+                    dogfighting: CUConstants.EARLY_FGT_DOGFIGHT,
+                    maneuverability: CUConstants.EARLY_FGT_MANEUVER,
+                    topSpeed: CUConstants.EARLY_FGT_TOPSPEED + MEDIUM_MALUS,
+                    survivability: CUConstants.MID_FGT_SURVIVE + MEDIUM_BONUS,
+                    groundAttack: CUConstants.GROUND_ATTACK_TIER_2,
+                    ordinanceLoad: CUConstants.SMALL_AC_LOAD + LARGE_BONUS,
                     stealth: 0,
-                    primaryRange: 1f,
-                    indirectRange: 0f,
-                    spottingRange: 5f,
+                    primaryRange: CUConstants.PRIMARY_RANGE_DEFAULT,
+                    indirectRange: CUConstants.INDIRECT_RANGE_DEFAULT,
+                    spottingRange: CUConstants.AC_SPOTTING_BASIC,
                     allWeatherCapability: AllWeatherRating.AllWeather,
                     sigintRating: SIGINT_Rating.UnitLevel,
                     nbcRating: NBC_Rating.Gen2,
@@ -5216,7 +5263,7 @@ namespace HammerAndSickle.Models
                 );
 
                 // Set upgrade paths
-                profile.AddUpgradeType(UpgradeType.ASF);
+                profile.AddUpgradeType(UpgradeType.FGT);
 
                 // Set short name for UI display
                 profile.SetShortName("SEPECAT Jaguar");
@@ -5251,16 +5298,17 @@ namespace HammerAndSickle.Models
                     name: "Anti-Aircraft Artillery",
                     nationality: Nationality.GENERIC,
                     weaponSystemID: WeaponSystems.GENERIC_AAA,
-                    15,
-                    hardAttack: 3,
-                    hardDefense: 1,
-                    softAttack: 10,
-                    softDefense: 5,
-                    groundAirAttack: 9,
+                    CUConstants.PRESTIGE_TIER_0,
+                    WeaponSystemType.Soft,
+                    hardAttack: CUConstants.BASE_AAA_HARD_ATTACK,
+                    hardDefense: CUConstants.BASE_AAA_HARD_DEFENSE,
+                    softAttack: CUConstants.BASE_AAA_SOFT_ATTACK,
+                    softDefense: CUConstants.BASE_AAA_SOFT_DEFENSE,
+                    groundAirAttack: CUConstants.BASE_AAA_GROUND_AIR_ATTACK,
                     groundAirDefense: CUConstants.GROUND_DEFENSE_AAA,
-                    primaryRange: 1f,
-                    indirectRange: 2f,
-                    spottingRange: 2f,
+                    primaryRange: CUConstants.PRIMARY_RANGE_DEFAULT,
+                    indirectRange: CUConstants.INDIRECT_RANGE_AAA,
+                    spottingRange: CUConstants.BASE_AAA_SPOTTING_RANGE,
                     allWeatherCapability: AllWeatherRating.GroundUnit,
                     sigintRating: SIGINT_Rating.UnitLevel,
                     nbcRating: NBC_Rating.None,
@@ -5300,16 +5348,16 @@ namespace HammerAndSickle.Models
                     name: "Man-Portable Air Defense",
                     nationality: Nationality.GENERIC,
                     weaponSystemID: WeaponSystems.GENERIC_MANPAD,
-                    10,
-                    hardAttack: 1,
-                    hardDefense: 1,
-                    softAttack: 1,
-                    softDefense: 3,
-                    groundAirAttack: 9,
+                    CUConstants.PRESTIGE_TIER_0,
+                    WeaponSystemType.Soft,
+                    hardAttack: CUConstants.BASE_INF_HARD_ATTACK,
+                    hardDefense: CUConstants.BASE_INF_HARD_DEFENSE,
+                    softAttack: CUConstants.BASE_INF_SOFT_ATTACK,
+                    softDefense: CUConstants.BASE_INF_SOFT_DEFENSE,
                     groundAirDefense: CUConstants.GROUND_DEFENSE_INFANTRY,
-                    primaryRange: 1f,
-                    indirectRange: 2f,
-                    spottingRange: 2f,
+                    primaryRange: CUConstants.PRIMARY_RANGE_DEFAULT,
+                    indirectRange: CUConstants.INDIRECT_RANGE_DEFAULT,
+                    spottingRange: CUConstants.BASE_UNIT_SPOTTING_RANGE,
                     allWeatherCapability: AllWeatherRating.GroundUnit,
                     sigintRating: SIGINT_Rating.UnitLevel,
                     nbcRating: NBC_Rating.Gen1,
@@ -5349,22 +5397,23 @@ namespace HammerAndSickle.Models
                     name: "Light Towed Artillery",
                     nationality: Nationality.GENERIC,
                     weaponSystemID: WeaponSystems.GENERIC_ART_LIGHT,
-                    20,
-                    hardAttack: 4,
-                    hardDefense: 3,
-                    softAttack: 10,
-                    softDefense: 4,
+                    CUConstants.PRESTIGE_TIER_0,
+                    weaponSystemType: WeaponSystemType.Soft,
+                    hardAttack: CUConstants.BASE_ARTY_HARD_ATTACK,
+                    hardDefense: CUConstants.BASE_ARTY_HARD_DEFENSE,
+                    softAttack: CUConstants.BASE_ARTY_SOFT_ATTACK,
+                    softDefense: CUConstants.BASE_ARTY_SOFT_DEFENSE,
                     groundAirDefense: CUConstants.GROUND_DEFENSE_INFANTRY,
-                    primaryRange: 1f,
-                    indirectRange: 3f,
-                    spottingRange: 2f,
+                    primaryRange: CUConstants.PRIMARY_RANGE_DEFAULT,
+                    indirectRange: CUConstants.INDIRECT_RANGE_120MM,
+                    spottingRange: CUConstants.BASE_UNIT_SPOTTING_RANGE,
                     allWeatherCapability: AllWeatherRating.GroundUnit,
                     nvgCapability: NVG_Rating.None,
                     silhouette: UnitSilhouette.Medium,
                     sigintRating: SIGINT_Rating.UnitLevel,
                     nbcRating: NBC_Rating.Gen1,
                     strategicMobility: StrategicMobility.AirDrop,
-                    movementPoints: CUConstants.FOOT_UNIT
+                    movementPoints: CUConstants.STATIC_UNIT
                 );
 
                 //Set the upgrade paths for modernization
@@ -5397,22 +5446,23 @@ namespace HammerAndSickle.Models
                     name: "Heavy Towed Artillery",
                     nationality: Nationality.GENERIC,
                     weaponSystemID: WeaponSystems.GENERIC_ART_HEAVY,
-                    30,
-                    hardAttack: 6,
-                    hardDefense: 3,
-                    softAttack: 14,
-                    softDefense: 4,
+                    CUConstants.PRESTIGE_TIER_0 + MASSIVE_BONUS,
+                    weaponSystemType: WeaponSystemType.Soft,
+                    hardAttack: CUConstants.BASE_ARTY_HARD_ATTACK,
+                    hardDefense: CUConstants.BASE_ARTY_HARD_DEFENSE,
+                    softAttack: CUConstants.BASE_ARTY_SOFT_ATTACK + XLARGE_BONUS,
+                    softDefense: CUConstants.BASE_ARTY_SOFT_DEFENSE,
                     groundAirDefense: CUConstants.GROUND_DEFENSE_INFANTRY,
-                    primaryRange: 1f,
-                    indirectRange: 4f,
-                    spottingRange: 2f,
+                    primaryRange: CUConstants.PRIMARY_RANGE_DEFAULT,
+                    indirectRange: CUConstants.INDIRECT_RANGE_155MM,
+                    spottingRange: CUConstants.BASE_UNIT_SPOTTING_RANGE,
                     allWeatherCapability: AllWeatherRating.GroundUnit,
                     nvgCapability: NVG_Rating.None,
                     silhouette: UnitSilhouette.Medium,
                     sigintRating: SIGINT_Rating.UnitLevel,
                     nbcRating: NBC_Rating.Gen1,
                     strategicMobility: StrategicMobility.AirDrop,
-                    movementPoints: CUConstants.FOOT_UNIT
+                    movementPoints: CUConstants.STATIC_UNIT
                 );
 
                 //Set the upgrade paths for modernization
@@ -5445,15 +5495,16 @@ namespace HammerAndSickle.Models
                     name: "Anti-Tank Guided Missile",
                     nationality: Nationality.GENERIC,
                     weaponSystemID: WeaponSystems.GENERIC_ATGM,
-                    10,
-                    hardAttack: 10,
-                    hardDefense: 1,
-                    softAttack: 1,
-                    softDefense: 4,
-                    groundAirDefense: CUConstants.FOOT_UNIT,
-                    primaryRange: 1f,
-                    indirectRange: 0f,
-                    spottingRange: 2f,
+                    CUConstants.PRESTIGE_TIER_0,
+                    WeaponSystemType.Soft,
+                    hardAttack: CUConstants.BASE_INF_HARD_ATTACK + XXLARGE_BONUS,
+                    hardDefense: CUConstants.BASE_INF_HARD_DEFENSE,
+                    softAttack: CUConstants.BASE_INF_SOFT_ATTACK,
+                    softDefense: CUConstants.BASE_INF_SOFT_DEFENSE,
+                    groundAirDefense: CUConstants.GROUND_DEFENSE_INFANTRY,
+                    primaryRange: CUConstants.PRIMARY_RANGE_DEFAULT,
+                    indirectRange: CUConstants.INDIRECT_RANGE_DEFAULT,
+                    spottingRange: CUConstants.BASE_UNIT_SPOTTING_RANGE,
                     allWeatherCapability: AllWeatherRating.GroundUnit,
                     nvgCapability: NVG_Rating.Gen1,
                     silhouette: UnitSilhouette.Small,
@@ -5493,15 +5544,16 @@ namespace HammerAndSickle.Models
                     name: "82mm Light Mortar",
                     nationality: Nationality.GENERIC,
                     weaponSystemID: WeaponSystems.GENERIC_MORTAR_82MM,
-                    20,
-                    hardAttack: 4,
-                    hardDefense: 3,
-                    softAttack: 9,
-                    softDefense: 4,
+                    CUConstants.PRESTIGE_TIER_0 + MASSIVE_MALUS,
+                    weaponSystemType: WeaponSystemType.Soft,
+                    hardAttack: CUConstants.BASE_ARTY_HARD_ATTACK + MEDIUM_MALUS,
+                    hardDefense: CUConstants.BASE_ARTY_HARD_DEFENSE,
+                    softAttack: CUConstants.BASE_ARTY_SOFT_ATTACK + LARGE_MALUS,
+                    softDefense: CUConstants.BASE_ARTY_SOFT_DEFENSE,
                     groundAirDefense: CUConstants.GROUND_DEFENSE_INFANTRY,
-                    primaryRange: 1f,
-                    indirectRange: 2f,
-                    spottingRange: 2f,
+                    primaryRange: CUConstants.PRIMARY_RANGE_DEFAULT,
+                    indirectRange: CUConstants.INDIRECT_RANGE_120MM + MEDIUM_MALUS,
+                    spottingRange: CUConstants.BASE_UNIT_SPOTTING_RANGE,
                     allWeatherCapability: AllWeatherRating.GroundUnit,
                     nvgCapability: NVG_Rating.None,
                     silhouette: UnitSilhouette.Medium,
@@ -5541,15 +5593,16 @@ namespace HammerAndSickle.Models
                     name: "120mm Heavy Mortar",
                     nationality: Nationality.GENERIC,
                     weaponSystemID: WeaponSystems.GENERIC_MORTAR_120MM,
-                    20,
-                    hardAttack: 6,
-                    hardDefense: 4,
-                    softAttack: 12,
-                    softDefense: 4,
+                    CUConstants.PRESTIGE_TIER_0 + LARGE_MALUS,
+                    weaponSystemType: WeaponSystemType.Soft,
+                    hardAttack: CUConstants.BASE_ARTY_HARD_ATTACK + SMALL_MALUS,
+                    hardDefense: CUConstants.BASE_ARTY_HARD_DEFENSE,
+                    softAttack: CUConstants.BASE_ARTY_SOFT_ATTACK + SMALL_MALUS,
+                    softDefense: CUConstants.BASE_ARTY_SOFT_DEFENSE,
                     groundAirDefense: CUConstants.GROUND_DEFENSE_INFANTRY,
-                    primaryRange: 1f,
-                    indirectRange: 3f,
-                    spottingRange: 2f,
+                    primaryRange: CUConstants.PRIMARY_RANGE_DEFAULT,
+                    indirectRange: CUConstants.INDIRECT_RANGE_120MM + SMALL_MALUS,
+                    spottingRange: CUConstants.BASE_UNIT_SPOTTING_RANGE,
                     allWeatherCapability: AllWeatherRating.GroundUnit,
                     nvgCapability: NVG_Rating.None,
                     silhouette: UnitSilhouette.Medium,
@@ -5589,15 +5642,16 @@ namespace HammerAndSickle.Models
                     name: "RPG-7",
                     nationality: Nationality.GENERIC,
                     weaponSystemID: WeaponSystems.GENERIC_RPG7,
-                    10,
-                    hardAttack: 10,
-                    hardDefense: 1,
-                    softAttack: 6,
-                    softDefense: 8,
-                    groundAirDefense: CUConstants.FOOT_UNIT,
-                    primaryRange: 1f,
-                    indirectRange: 0f,
-                    spottingRange: 2f,
+                    CUConstants.PRESTIGE_TIER_0 + MASSIVE_MALUS,
+                    WeaponSystemType.Soft,
+                    hardAttack: CUConstants.BASE_INF_HARD_ATTACK + LARGE_BONUS,
+                    hardDefense: CUConstants.BASE_INF_HARD_DEFENSE + MEDIUM_MALUS,
+                    softAttack: CUConstants.BASE_INF_SOFT_ATTACK + MEDIUM_MALUS,
+                    softDefense: CUConstants.BASE_INF_SOFT_DEFENSE + MEDIUM_MALUS,
+                    groundAirDefense: CUConstants.GROUND_DEFENSE_INFANTRY,
+                    primaryRange: CUConstants.PRIMARY_RANGE_DEFAULT,
+                    indirectRange: CUConstants.INDIRECT_RANGE_DEFAULT,
+                    spottingRange: CUConstants.BASE_UNIT_SPOTTING_RANGE,
                     allWeatherCapability: AllWeatherRating.GroundUnit,
                     nvgCapability: NVG_Rating.Gen1,
                     silhouette: UnitSilhouette.Small,
@@ -5637,15 +5691,16 @@ namespace HammerAndSickle.Models
                     name: "Recoilless Rifle",
                     nationality: Nationality.GENERIC,
                     weaponSystemID: WeaponSystems.GENERIC_RECOILLESS_RIFLE,
-                    10,
-                    hardAttack: 7,
-                    hardDefense: 3,
-                    softAttack: 7,
-                    softDefense: 8,
-                    groundAirDefense: CUConstants.FOOT_UNIT,
-                    primaryRange: 1f,
-                    indirectRange: 0f,
-                    spottingRange: 2f,
+                    CUConstants.PRESTIGE_TIER_0 + MASSIVE_MALUS,
+                    WeaponSystemType.Soft,
+                    hardAttack: CUConstants.BASE_INF_HARD_ATTACK + LARGE_BONUS,
+                    hardDefense: CUConstants.BASE_INF_HARD_DEFENSE + MEDIUM_MALUS,
+                    softAttack: CUConstants.BASE_INF_SOFT_ATTACK + MEDIUM_MALUS,
+                    softDefense: CUConstants.BASE_INF_SOFT_DEFENSE + MEDIUM_MALUS,
+                    groundAirDefense: CUConstants.GROUND_DEFENSE_INFANTRY,
+                    primaryRange: CUConstants.PRIMARY_RANGE_DEFAULT,
+                    indirectRange: CUConstants.INDIRECT_RANGE_DEFAULT,
+                    spottingRange: CUConstants.BASE_UNIT_SPOTTING_RANGE,
                     allWeatherCapability: AllWeatherRating.GroundUnit,
                     nvgCapability: NVG_Rating.Gen1,
                     silhouette: UnitSilhouette.Small,
@@ -5685,15 +5740,16 @@ namespace HammerAndSickle.Models
                     name: "Mounted Cavalry Unit",
                     nationality: Nationality.GENERIC,
                     weaponSystemID: WeaponSystems.GENERIC_CAVALRY,
-                    20,
-                    hardAttack: 5,
-                    hardDefense: 5,
-                    softAttack: 7,
-                    softDefense: 9,
-                    groundAirDefense: CUConstants.FOOT_UNIT,
-                    primaryRange: 1f,
-                    indirectRange: 0f,
-                    spottingRange: 2f,
+                    CUConstants.PRESTIGE_TIER_0,
+                    WeaponSystemType.Soft,
+                    hardAttack: CUConstants.BASE_INF_HARD_ATTACK,
+                    hardDefense: CUConstants.BASE_INF_HARD_DEFENSE,
+                    softAttack: CUConstants.BASE_INF_SOFT_ATTACK,
+                    softDefense: CUConstants.BASE_INF_SOFT_DEFENSE,
+                    groundAirDefense: CUConstants.GROUND_DEFENSE_INFANTRY,
+                    primaryRange: CUConstants.PRIMARY_RANGE_DEFAULT,
+                    indirectRange: CUConstants.INDIRECT_RANGE_DEFAULT,
+                    spottingRange: CUConstants.BASE_UNIT_SPOTTING_RANGE,
                     allWeatherCapability: AllWeatherRating.GroundUnit,
                     nvgCapability: NVG_Rating.Gen1,
                     silhouette: UnitSilhouette.Small,
@@ -5733,13 +5789,13 @@ namespace HammerAndSickle.Models
                     name: "Truck",
                     nationality: Nationality.GENERIC,
                     weaponSystemID: WeaponSystems.GENERIC_TRUCK,
-                    15,
+                    CUConstants.PRESTIGE_TIER_0,
                     weaponSystemType: WeaponSystemType.Soft,
-                    hardAttack: 3,
-                    hardDefense: 3,
-                    softAttack: 3,
-                    softDefense: 5,
-                    groundAirDefense: CUConstants.FOOT_UNIT + MEDIUM_MALUS,
+                    hardAttack: CUConstants.TRUCK_HARD_ATTACK,
+                    hardDefense: CUConstants.TRUCK_HARD_DEFENSE,
+                    softAttack: CUConstants.TRUCK_SOFT_ATTACK,
+                    softDefense: CUConstants.TRUCK_SOFT_DEFENSE,
+                    groundAirDefense: CUConstants.GROUND_DEFENSE_INFANTRY,
                     primaryRange: CUConstants.PRIMARY_RANGE_DEFAULT,
                     indirectRange: CUConstants.INDIRECT_RANGE_DEFAULT,
                     spottingRange: CUConstants.BASE_UNIT_SPOTTING_RANGE,
@@ -5788,15 +5844,16 @@ namespace HammerAndSickle.Models
                     name: "HQ LandBase",
                     nationality: Nationality.GENERIC,
                     weaponSystemID: WeaponSystems.GENERIC_LANDBASE,
-                    50,
-                    hardAttack: 4,
-                    hardDefense: 3,
-                    softAttack: 7,
-                    softDefense: 8,
+                    CUConstants.PRESTIGE_TIER_2,
+                    weaponSystemType: WeaponSystemType.Hard,
+                    hardAttack: CUConstants.BASE_HARD_ATTACK,
+                    hardDefense: CUConstants.BASE_HARD_DEFENSE,
+                    softAttack: CUConstants.BASE_SOFT_ATTACK,
+                    softDefense: CUConstants.BASE_SOFT_DEFENSE,
                     groundAirDefense: CUConstants.GROUND_DEFENSE_INFANTRY,
-                    primaryRange: 1f,
-                    indirectRange: 0f,
-                    spottingRange: 4f,
+                    primaryRange: CUConstants.PRIMARY_RANGE_DEFAULT,
+                    indirectRange: CUConstants.INDIRECT_RANGE_DEFAULT,
+                    spottingRange: CUConstants.FACILITY_SPOTTING_RANGE,
                     allWeatherCapability: AllWeatherRating.GroundUnit,
                     nvgCapability: NVG_Rating.None,
                     silhouette: UnitSilhouette.Small,
@@ -5836,15 +5893,16 @@ namespace HammerAndSickle.Models
                     name: "Airbase",
                     nationality: Nationality.GENERIC,
                     weaponSystemID: WeaponSystems.GENERIC_AIRBASE,
-                    50,
-                    hardAttack: 4,
-                    hardDefense: 3,
-                    softAttack: 7,
-                    softDefense: 8,
+                    CUConstants.PRESTIGE_TIER_4,
+                    weaponSystemType: WeaponSystemType.Hard,
+                    hardAttack: CUConstants.BASE_HARD_ATTACK,
+                    hardDefense: CUConstants.BASE_HARD_DEFENSE,
+                    softAttack: CUConstants.BASE_SOFT_ATTACK,
+                    softDefense: CUConstants.BASE_SOFT_DEFENSE,
                     groundAirDefense: CUConstants.GROUND_DEFENSE_INFANTRY,
-                    primaryRange: 1f,
-                    indirectRange: 0f,
-                    spottingRange: 4f,
+                    primaryRange: CUConstants.PRIMARY_RANGE_DEFAULT,
+                    indirectRange: CUConstants.INDIRECT_RANGE_DEFAULT,
+                    spottingRange: CUConstants.FACILITY_SPOTTING_RANGE,
                     allWeatherCapability: AllWeatherRating.GroundUnit,
                     nvgCapability: NVG_Rating.None,
                     silhouette: UnitSilhouette.Small,
@@ -5884,15 +5942,16 @@ namespace HammerAndSickle.Models
                     name: "Suppy Depot",
                     nationality: Nationality.GENERIC,
                     weaponSystemID: WeaponSystems.GENERIC_SUPPLYDEPOT,
-                    150,
-                    hardAttack: 4,
-                    hardDefense: 3,
-                    softAttack: 7,
-                    softDefense: 8,
+                    CUConstants.PRESTIGE_TIER_3,
+                    weaponSystemType: WeaponSystemType.Hard,
+                    hardAttack: CUConstants.BASE_HARD_ATTACK,
+                    hardDefense: CUConstants.BASE_HARD_DEFENSE,
+                    softAttack: CUConstants.BASE_SOFT_ATTACK,
+                    softDefense: CUConstants.BASE_SOFT_DEFENSE,
                     groundAirDefense: CUConstants.GROUND_DEFENSE_INFANTRY,
-                    primaryRange: 1f,
-                    indirectRange: 0f,
-                    spottingRange: 2f,
+                    primaryRange: CUConstants.PRIMARY_RANGE_DEFAULT,
+                    indirectRange: CUConstants.INDIRECT_RANGE_DEFAULT,
+                    spottingRange: CUConstants.FACILITY_SPOTTING_RANGE,
                     allWeatherCapability: AllWeatherRating.GroundUnit,
                     nvgCapability: NVG_Rating.None,
                     silhouette: UnitSilhouette.Small,
@@ -5932,15 +5991,16 @@ namespace HammerAndSickle.Models
                     name: "Intelligence Gathering Base",
                     nationality: Nationality.GENERIC,
                     weaponSystemID: WeaponSystems.GENERIC_LANDBASE,
-                    150,
-                    hardAttack: 4,
-                    hardDefense: 3,
-                    softAttack: 7,
-                    softDefense: 8,
+                    CUConstants.PRESTIGE_TIER_3,
+                    weaponSystemType: WeaponSystemType.Hard,
+                    hardAttack: CUConstants.BASE_HARD_ATTACK,
+                    hardDefense: CUConstants.BASE_HARD_DEFENSE,
+                    softAttack: CUConstants.BASE_SOFT_ATTACK,
+                    softDefense: CUConstants.BASE_SOFT_DEFENSE,
                     groundAirDefense: CUConstants.GROUND_DEFENSE_INFANTRY,
-                    primaryRange: 1f,
-                    indirectRange: 0f,
-                    spottingRange: 6f,
+                    primaryRange: CUConstants.PRIMARY_RANGE_DEFAULT,
+                    indirectRange: CUConstants.INDIRECT_RANGE_DEFAULT,
+                    spottingRange: CUConstants.INTEL_UNIT_SPOTTING_RANGE,
                     allWeatherCapability: AllWeatherRating.GroundUnit,
                     nvgCapability: NVG_Rating.None,
                     silhouette: UnitSilhouette.Small,
@@ -5986,15 +6046,16 @@ namespace HammerAndSickle.Models
                     name: "Regular Infantry",
                     nationality: Nationality.GENERIC,
                     weaponSystemID: WeaponSystems.INF_REG,
-                    15,
-                    hardAttack: 4,
-                    hardDefense: 3,
-                    softAttack: 9,
-                    softDefense: 10,
+                    CUConstants.PRESTIGE_TIER_0,
+                    weaponSystemType: WeaponSystemType.Soft,
+                    hardAttack: CUConstants.BASE_INF_HARD_ATTACK,
+                    hardDefense: CUConstants.BASE_INF_HARD_DEFENSE,
+                    softAttack: CUConstants.BASE_INF_SOFT_ATTACK,
+                    softDefense: CUConstants.BASE_INF_SOFT_DEFENSE,
                     groundAirDefense: CUConstants.GROUND_DEFENSE_INFANTRY,
-                    primaryRange: 1f,
-                    indirectRange: 0f,
-                    spottingRange: 2f,
+                    primaryRange: CUConstants.PRIMARY_RANGE_DEFAULT,
+                    indirectRange: CUConstants.INDIRECT_RANGE_DEFAULT,
+                    spottingRange: CUConstants.BASE_UNIT_SPOTTING_RANGE,
                     allWeatherCapability: AllWeatherRating.GroundUnit,
                     nvgCapability: NVG_Rating.None,
                     silhouette: UnitSilhouette.Small,
@@ -6034,15 +6095,16 @@ namespace HammerAndSickle.Models
                     name: "Airborne Infantry",
                     nationality: Nationality.GENERIC,
                     weaponSystemID: WeaponSystems.INF_AB,
-                    18,
-                    hardAttack: 4,
-                    hardDefense: 3,
-                    softAttack: 9,
-                    softDefense: 10,
+                    CUConstants.PRESTIGE_TIER_0 + MASSIVE_BONUS,
+                    weaponSystemType: WeaponSystemType.Soft,
+                    hardAttack: CUConstants.BASE_INF_HARD_ATTACK,
+                    hardDefense: CUConstants.BASE_INF_HARD_DEFENSE,
+                    softAttack: CUConstants.BASE_INF_SOFT_ATTACK,
+                    softDefense: CUConstants.BASE_INF_SOFT_DEFENSE,
                     groundAirDefense: CUConstants.GROUND_DEFENSE_INFANTRY,
-                    primaryRange: 1f,
-                    indirectRange: 0f,
-                    spottingRange: 2f,
+                    primaryRange: CUConstants.PRIMARY_RANGE_DEFAULT,
+                    indirectRange: CUConstants.INDIRECT_RANGE_DEFAULT,
+                    spottingRange: CUConstants.BASE_UNIT_SPOTTING_RANGE,
                     allWeatherCapability: AllWeatherRating.GroundUnit,
                     nvgCapability: NVG_Rating.Gen1,
                     silhouette: UnitSilhouette.Small,
@@ -6082,15 +6144,16 @@ namespace HammerAndSickle.Models
                     name: "Air‑Mobile Infantry",
                     nationality: Nationality.GENERIC,
                     weaponSystemID: WeaponSystems.INF_AM,
-                    18,
-                    hardAttack: 4,
-                    hardDefense: 3,
-                    softAttack: 9,
-                    softDefense: 10,
+                    CUConstants.PRESTIGE_TIER_1,
+                    weaponSystemType: WeaponSystemType.Soft,
+                    hardAttack: CUConstants.BASE_INF_HARD_ATTACK,
+                    hardDefense: CUConstants.BASE_INF_HARD_DEFENSE,
+                    softAttack: CUConstants.BASE_INF_SOFT_ATTACK,
+                    softDefense: CUConstants.BASE_INF_SOFT_DEFENSE,
                     groundAirDefense: CUConstants.GROUND_DEFENSE_INFANTRY,
-                    primaryRange: 1f,
-                    indirectRange: 0f,
-                    spottingRange: 2f,
+                    primaryRange: CUConstants.PRIMARY_RANGE_DEFAULT,
+                    indirectRange: CUConstants.INDIRECT_RANGE_DEFAULT,
+                    spottingRange: CUConstants.BASE_UNIT_SPOTTING_RANGE,
                     allWeatherCapability: AllWeatherRating.GroundUnit,
                     nvgCapability: NVG_Rating.Gen1,
                     silhouette: UnitSilhouette.Small,
@@ -6130,15 +6193,16 @@ namespace HammerAndSickle.Models
                     name: "Marine Infantry",
                     nationality: Nationality.GENERIC,
                     weaponSystemID: WeaponSystems.INF_MAR,
-                    18,
-                    hardAttack: 4,
-                    hardDefense: 3,
-                    softAttack: 9,
-                    softDefense: 10,
+                    CUConstants.PRESTIGE_TIER_1,
+                    weaponSystemType: WeaponSystemType.Soft,
+                    hardAttack: CUConstants.BASE_INF_HARD_ATTACK,
+                    hardDefense: CUConstants.BASE_INF_HARD_DEFENSE,
+                    softAttack: CUConstants.BASE_INF_SOFT_ATTACK,
+                    softDefense: CUConstants.BASE_INF_SOFT_DEFENSE,
                     groundAirDefense: CUConstants.GROUND_DEFENSE_INFANTRY,
-                    primaryRange: 1f,
-                    indirectRange: 0f,
-                    spottingRange: 2f,
+                    primaryRange: CUConstants.PRIMARY_RANGE_DEFAULT,
+                    indirectRange: CUConstants.INDIRECT_RANGE_DEFAULT,
+                    spottingRange: CUConstants.BASE_UNIT_SPOTTING_RANGE,
                     allWeatherCapability: AllWeatherRating.GroundUnit,
                     nvgCapability: NVG_Rating.None,
                     silhouette: UnitSilhouette.Small,
@@ -6178,15 +6242,16 @@ namespace HammerAndSickle.Models
                     name: "Special Forces Infantry",
                     nationality: Nationality.GENERIC,
                     weaponSystemID: WeaponSystems.INF_SPEC,
-                    30,
-                    hardAttack: 8,
-                    hardDefense: 4,
-                    softAttack: 11,
-                    softDefense: 12,
+                    CUConstants.PRESTIGE_TIER_0,
+                    weaponSystemType: WeaponSystemType.Soft,
+                    hardAttack: CUConstants.BASE_INF_HARD_ATTACK + MEDIUM_BONUS,
+                    hardDefense: CUConstants.BASE_INF_HARD_DEFENSE,
+                    softAttack: CUConstants.BASE_INF_SOFT_ATTACK + MEDIUM_BONUS,
+                    softDefense: CUConstants.BASE_INF_SOFT_DEFENSE,
                     groundAirDefense: CUConstants.GROUND_DEFENSE_INFANTRY,
-                    primaryRange: 1f,
-                    indirectRange: 0f,
-                    spottingRange: 3f,
+                    primaryRange: CUConstants.PRIMARY_RANGE_DEFAULT,
+                    indirectRange: CUConstants.INDIRECT_RANGE_DEFAULT,
+                    spottingRange: CUConstants.RECON_UNIT_SPOTTING_RANGE,
                     allWeatherCapability: AllWeatherRating.GroundUnit,
                     nvgCapability: NVG_Rating.Gen2,
                     silhouette: UnitSilhouette.Small,
@@ -6226,15 +6291,16 @@ namespace HammerAndSickle.Models
                     name: "Combat Engineers",
                     nationality: Nationality.GENERIC,
                     weaponSystemID: WeaponSystems.INF_ENG,
-                    20,
-                    hardAttack: 4,
-                    hardDefense: 3,
-                    softAttack: 9,
-                    softDefense: 12,
+                    CUConstants.PRESTIGE_TIER_0,
+                    weaponSystemType: WeaponSystemType.Soft,
+                    hardAttack: CUConstants.BASE_INF_HARD_ATTACK,
+                    hardDefense: CUConstants.BASE_INF_HARD_DEFENSE,
+                    softAttack: CUConstants.BASE_INF_SOFT_ATTACK,
+                    softDefense: CUConstants.BASE_INF_SOFT_DEFENSE,
                     groundAirDefense: CUConstants.GROUND_DEFENSE_INFANTRY,
-                    primaryRange: 1f,
-                    indirectRange: 0f,
-                    spottingRange: 2f,
+                    primaryRange: CUConstants.PRIMARY_RANGE_DEFAULT,
+                    indirectRange: CUConstants.INDIRECT_RANGE_DEFAULT,
+                    spottingRange: CUConstants.BASE_UNIT_SPOTTING_RANGE,
                     allWeatherCapability: AllWeatherRating.GroundUnit,
                     nvgCapability: NVG_Rating.None,
                     silhouette: UnitSilhouette.Small,
