@@ -721,20 +721,17 @@ namespace HammerAndSickle.Models
         ATT_JAGUAR,
 
         // Generic types
-        GENERIC_AAA,
-        GENERIC_ART_LIGHT,
-        GENERIC_ART_HEAVY,
-        GENERIC_MANPAD,
-        GENERIC_ATGM,
-        GENERIC_LANDBASE,
-        GENERIC_AIRBASE,
-        GENERIC_SUPPLYDEPOT,
-        GENERIC_RPG7,
-        GENERIC_MORTAR_82MM,
-        GENERIC_MORTAR_120MM,
-        GENERIC_RECOILLESS_RIFLE,
-        GENERIC_CAVALRY,
-        GENERIC_TRUCK,
+        AAA_GENERIC,
+        ART_LIGHT_GENERIC,
+        ART_HEAVY_GENERIC,
+        MANPAD_GENERIC,
+        ATGM_GENERIC,
+        AT_RPG7,
+        MORTAR_81MM,
+        MORTAR_120MM,
+        RR_RECOILLESS_RIFLE,
+        CAVALRY_GENERIC,
+        TRUCK_GENERIC,
 
         // Shared profiles for infantry
         INF_REG,    // Regular INF
@@ -743,6 +740,11 @@ namespace HammerAndSickle.Models
         INF_MAR,    // Marine INF
         INF_SPEC,   // Special Forces INF
         INF_ENG,    // Engineer INF
+
+        // Bases
+        LANDBASE_GENERIC,
+        AIRBASE_GENERIC,
+        SUPPLYDEPOT_GENERIC,
 
         COMBAT, // Used for generic combat calculations
         DEFAULT // Fallback value

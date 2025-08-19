@@ -26,6 +26,9 @@
         public int TRANAIR { get; set; } = 0;
         public int RCNAs { get; set; } = 0;
         public int TRANNAV { get; set; } = 0;
+        public int LightAT { get; set; } = 0;
+        public int Mortars { get; set; } = 0;
+        public int Recoilless { get; set; } = 0;
 
         // More intel about parent unit.
         public Nationality UnitNationality = Nationality.USSR;
