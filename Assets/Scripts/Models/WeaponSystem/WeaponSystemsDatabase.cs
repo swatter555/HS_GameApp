@@ -178,6 +178,7 @@ namespace HammerAndSickle.Models
                 Create_ROC_BM21_Profile();
                 Create_ROC_BM27_Profile();
                 Create_ROC_BM30_Profile();
+                Create_SSM_SCUD_Profile();
 
                 Create_SPAAA_ZSU57_Profile();
                 Create_SPAAA_ZSU23_Profile();
@@ -332,7 +333,7 @@ namespace HammerAndSickle.Models
                     name: "T-55A MBT",
                     nationality: Nationality.USSR,
                     weaponSystemID: WeaponSystems.TANK_T55A,
-                    CUConstants.PRESTIGE_TIER_1 + XXLARGE_MALUS,
+                    prestigeCost: CUConstants.PRESTIGE_TIER_1 + XXLARGE_MALUS,
                     weaponSystemType: WeaponSystemType.Hard,
                     hardAttack:  CUConstants.GEN1_TANK_HARD_ATTACK,
                     hardDefense: CUConstants.GEN1_TANK_HARD_DEFENSE,
@@ -381,7 +382,7 @@ namespace HammerAndSickle.Models
                     name: "T-64A MBT",
                     nationality: Nationality.USSR,
                     weaponSystemID: WeaponSystems.TANK_T64A,
-                    CUConstants.PRESTIGE_TIER_2,
+                    prestigeCost: CUConstants.PRESTIGE_TIER_2,
                     weaponSystemType: WeaponSystemType.Hard,
                     hardAttack: CUConstants.GEN2_TANK_HARD_ATTACK + SMALL_BONUS,
                     hardDefense: CUConstants.GEN2_TANK_HARD_DEFENSE + MEDIUM_BONUS,
@@ -430,7 +431,7 @@ namespace HammerAndSickle.Models
                     name: "T-64B MBT",
                     nationality: Nationality.USSR,
                     weaponSystemID: WeaponSystems.TANK_T64B,
-                    CUConstants.PRESTIGE_TIER_3,
+                    prestigeCost: CUConstants.PRESTIGE_TIER_3,
                     weaponSystemType: WeaponSystemType.Hard,
                     hardAttack: CUConstants.GEN3_TANK_HARD_ATTACK + MEDIUM_BONUS,
                     hardDefense: CUConstants.GEN3_TANK_HARD_DEFENSE + SMALL_BONUS,
@@ -479,7 +480,7 @@ namespace HammerAndSickle.Models
                     name: "T-72A MBT",
                     nationality: Nationality.USSR,
                     weaponSystemID: WeaponSystems.TANK_T72A,
-                    CUConstants.PRESTIGE_TIER_2 + XXLARGE_MALUS,
+                    prestigeCost: CUConstants.PRESTIGE_TIER_2 + XXLARGE_MALUS,
                     weaponSystemType: WeaponSystemType.Hard,
                     hardAttack: CUConstants.GEN2_TANK_HARD_ATTACK + MEDIUM_BONUS,
                     hardDefense: CUConstants.GEN2_TANK_HARD_DEFENSE + SMALL_BONUS,
@@ -531,7 +532,7 @@ namespace HammerAndSickle.Models
                     name: "T-72B MBT",
                     nationality: Nationality.USSR,
                     weaponSystemID: WeaponSystems.TANK_T72B,
-                    CUConstants.PRESTIGE_TIER_3,
+                    prestigeCost: CUConstants.PRESTIGE_TIER_3,
                     weaponSystemType: WeaponSystemType.Hard,
                     hardAttack: CUConstants.GEN3_TANK_HARD_ATTACK,
                     hardDefense: CUConstants.GEN3_TANK_HARD_DEFENSE,
@@ -583,7 +584,7 @@ namespace HammerAndSickle.Models
                     name: "T-80B MBT",
                     nationality: Nationality.USSR,
                     weaponSystemID: WeaponSystems.TANK_T80B,
-                    CUConstants.PRESTIGE_TIER_2 + XXLARGE_BONUS,
+                    prestigeCost: CUConstants.PRESTIGE_TIER_2 + XXLARGE_BONUS,
                     weaponSystemType: WeaponSystemType.Hard,
                     hardAttack: CUConstants.GEN2_TANK_HARD_ATTACK + SMALL_BONUS,
                     hardDefense: CUConstants.GEN2_TANK_HARD_DEFENSE + MEDIUM_BONUS,
@@ -632,7 +633,7 @@ namespace HammerAndSickle.Models
                     name: "T-80U MBT",
                     nationality: Nationality.USSR,
                     weaponSystemID: WeaponSystems.TANK_T80U,
-                    CUConstants.PRESTIGE_TIER_3 + XXLARGE_BONUS,
+                    prestigeCost: CUConstants.PRESTIGE_TIER_3 + XXLARGE_BONUS,
                     weaponSystemType: WeaponSystemType.Hard,
                     hardAttack: CUConstants.GEN3_TANK_HARD_ATTACK + MEDIUM_BONUS,
                     hardDefense: CUConstants.GEN3_TANK_HARD_DEFENSE + LARGE_BONUS,
@@ -681,7 +682,7 @@ namespace HammerAndSickle.Models
                     name: "T-80BV MBT",
                     nationality: Nationality.USSR,
                     weaponSystemID: WeaponSystems.TANK_T80BV,
-                    CUConstants.PRESTIGE_TIER_4,
+                    prestigeCost: CUConstants.PRESTIGE_TIER_4,
                     weaponSystemType: WeaponSystemType.Hard,
                     hardAttack: CUConstants.GEN4_TANK_HARD_ATTACK + SMALL_BONUS,
                     hardDefense: CUConstants.GEN4_TANK_HARD_DEFENSE,
@@ -731,7 +732,7 @@ namespace HammerAndSickle.Models
                     name: "MT‑LB APC",
                     nationality: Nationality.USSR,
                     weaponSystemID: WeaponSystems.APC_MTLB,
-                    CUConstants.PRESTIGE_TIER_0,
+                    prestigeCost: CUConstants.PRESTIGE_TIER_0,
                     weaponSystemType: WeaponSystemType.Hard,
                     hardAttack: CUConstants.BASE_APC_HARD_ATTACK,
                     hardDefense: CUConstants.BASE_APC_HARD_DEFENSE,
@@ -780,7 +781,7 @@ namespace HammerAndSickle.Models
                     name: "BTR‑70 APC",
                     nationality: Nationality.USSR,
                     weaponSystemID: WeaponSystems.APC_BTR70,
-                    CUConstants.PRESTIGE_TIER_0 + LARGE_BONUS,
+                    prestigeCost: CUConstants.PRESTIGE_TIER_0 + LARGE_BONUS,
                     weaponSystemType: WeaponSystemType.Hard,
                     hardAttack: CUConstants.BASE_APC_HARD_ATTACK,
                     hardDefense: CUConstants.BASE_APC_HARD_DEFENSE,
@@ -829,7 +830,7 @@ namespace HammerAndSickle.Models
                     name: "BTR‑80 APC",
                     nationality: Nationality.USSR,
                     weaponSystemID: WeaponSystems.APC_BTR80,
-                    CUConstants.PRESTIGE_TIER_0 + XLARGE_BONUS,
+                    prestigeCost: CUConstants.PRESTIGE_TIER_0 + XLARGE_BONUS,
                     weaponSystemType: WeaponSystemType.Hard,
                     hardAttack: CUConstants.BASE_APC_HARD_ATTACK,
                     hardDefense: CUConstants.BASE_APC_HARD_DEFENSE,
@@ -882,7 +883,7 @@ namespace HammerAndSickle.Models
                     name: "BMP‑1P IFV",
                     nationality: Nationality.USSR,
                     weaponSystemID: WeaponSystems.IFV_BMP1,
-                    CUConstants.PRESTIGE_TIER_0 + MASSIVE_BONUS,
+                    prestigeCost: CUConstants.PRESTIGE_TIER_0 + MASSIVE_BONUS,
                     weaponSystemType: WeaponSystemType.Hard,
                     hardAttack: CUConstants.BASE_IFV_HARD_ATTACK + XXLARGE_BONUS,
                     hardDefense: CUConstants.BASE_IFV_HARD_DEFENSE,
@@ -931,7 +932,7 @@ namespace HammerAndSickle.Models
                     name: "BMP‑2 IFV",
                     nationality: Nationality.USSR,
                     weaponSystemID: WeaponSystems.IFV_BMP2,
-                    CUConstants.PRESTIGE_TIER_0 + MASSIVE_BONUS + XXLARGE_BONUS,
+                    prestigeCost: CUConstants.PRESTIGE_TIER_0 + MASSIVE_BONUS + XXLARGE_BONUS,
                     weaponSystemType: WeaponSystemType.Hard,
                     hardAttack: CUConstants.BASE_IFV_HARD_ATTACK + XXXLARGE_BONUS,
                     hardDefense: CUConstants.BASE_IFV_HARD_DEFENSE,
@@ -980,7 +981,7 @@ namespace HammerAndSickle.Models
                     name: "BMP‑3 IFV",
                     nationality: Nationality.USSR,
                     weaponSystemID: WeaponSystems.IFV_BMP3,
-                    CUConstants.PRESTIGE_TIER_1 + XXLARGE_MALUS,
+                    prestigeCost: CUConstants.PRESTIGE_TIER_1 + XXLARGE_MALUS,
                     weaponSystemType: WeaponSystemType.Hard,
                     hardAttack: CUConstants.BASE_IFV_HARD_ATTACK + XXXLARGE_BONUS,
                     hardDefense: CUConstants.BASE_IFV_HARD_DEFENSE,
@@ -1029,7 +1030,7 @@ namespace HammerAndSickle.Models
                     name: "BMD‑1 IFV",
                     nationality: Nationality.USSR,
                     weaponSystemID: WeaponSystems.IFV_BMD1,
-                    CUConstants.PRESTIGE_TIER_0 + LARGE_BONUS,
+                    prestigeCost: CUConstants.PRESTIGE_TIER_0 + LARGE_BONUS,
                     weaponSystemType: WeaponSystemType.Hard,
                     hardAttack: CUConstants.BASE_IFV_HARD_ATTACK,
                     hardDefense: CUConstants.BASE_IFV_HARD_DEFENSE,
@@ -1078,7 +1079,7 @@ namespace HammerAndSickle.Models
                     name: "BMD‑2 IFV",
                     nationality: Nationality.USSR,
                     weaponSystemID: WeaponSystems.IFV_BMD2,
-                    CUConstants.PRESTIGE_TIER_0 + MASSIVE_BONUS,
+                    prestigeCost: CUConstants.PRESTIGE_TIER_0 + MASSIVE_BONUS,
                     weaponSystemType: WeaponSystemType.Hard,
                     hardAttack: CUConstants.BASE_IFV_HARD_ATTACK,
                     hardDefense: CUConstants.BASE_IFV_HARD_DEFENSE,
@@ -1127,7 +1128,7 @@ namespace HammerAndSickle.Models
                     name: "BMD‑3 IFV",
                     nationality: Nationality.USSR,
                     weaponSystemID: WeaponSystems.IFV_BMD3,
-                    CUConstants.PRESTIGE_TIER_1 + MASSIVE_MALUS,
+                    prestigeCost: CUConstants.PRESTIGE_TIER_1 + MASSIVE_MALUS,
                     weaponSystemType: WeaponSystemType.Hard,
                     hardAttack: CUConstants.BASE_IFV_HARD_ATTACK,
                     hardDefense: CUConstants.BASE_IFV_HARD_DEFENSE,
@@ -1180,7 +1181,7 @@ namespace HammerAndSickle.Models
                     name: "BRDM‑2 Recon Vehicle",
                     nationality: Nationality.USSR,
                     weaponSystemID: WeaponSystems.RCN_BRDM2,
-                    CUConstants.PRESTIGE_TIER_0,
+                    prestigeCost: CUConstants.PRESTIGE_TIER_0,
                     weaponSystemType: WeaponSystemType.Hard,
                     hardAttack: CUConstants.BASE_APC_HARD_ATTACK,
                     hardDefense: CUConstants.BASE_APC_HARD_DEFENSE,
@@ -1229,7 +1230,7 @@ namespace HammerAndSickle.Models
                     name: "BRDM‑2 AT‑5 Recon Vehicle",
                     nationality: Nationality.USSR,
                     weaponSystemID: WeaponSystems.RCN_BRDM2AT,
-                    CUConstants.PRESTIGE_TIER_1,
+                    prestigeCost: CUConstants.PRESTIGE_TIER_1,
                     weaponSystemType: WeaponSystemType.Hard,
                     hardAttack: CUConstants.BASE_APC_HARD_ATTACK + XXLARGE_BONUS,
                     hardDefense: CUConstants.BASE_APC_HARD_DEFENSE,
@@ -1285,7 +1286,7 @@ namespace HammerAndSickle.Models
                     name: "2S1 Gvozdika SPA",
                     nationality: Nationality.USSR,
                     weaponSystemID: WeaponSystems.SPA_2S1,
-                    CUConstants.PRESTIGE_TIER_1,
+                    prestigeCost: CUConstants.PRESTIGE_TIER_1,
                     weaponSystemType: WeaponSystemType.Hard,
                     hardAttack: CUConstants.BASE_ARTY_HARD_ATTACK,
                     hardDefense: CUConstants.BASE_ARTY_HARD_DEFENSE + MEDIUM_BONUS,
@@ -1334,7 +1335,7 @@ namespace HammerAndSickle.Models
                     name: "2S3 Akatsiya SPA",
                     nationality: Nationality.USSR,
                     weaponSystemID: WeaponSystems.SPA_2S3,
-                    CUConstants.PRESTIGE_TIER_1 + MASSIVE_BONUS,
+                    prestigeCost: CUConstants.PRESTIGE_TIER_1 + MASSIVE_BONUS,
                     weaponSystemType: WeaponSystemType.Hard,
                     hardAttack: CUConstants.BASE_ARTY_HARD_ATTACK,
                     hardDefense: CUConstants.BASE_ARTY_HARD_DEFENSE + MEDIUM_BONUS,
@@ -1383,7 +1384,7 @@ namespace HammerAndSickle.Models
                     name: "2S5 Giatsint‑S SPA",
                     nationality: Nationality.USSR,
                     weaponSystemID: WeaponSystems.SPA_2S5,
-                    CUConstants.PRESTIGE_TIER_2,
+                    prestigeCost: CUConstants.PRESTIGE_TIER_2,
                     weaponSystemType: WeaponSystemType.Hard,
                     hardAttack: CUConstants.BASE_ARTY_HARD_ATTACK + MEDIUM_BONUS,
                     hardDefense: CUConstants.BASE_ARTY_HARD_DEFENSE + MEDIUM_BONUS,
@@ -1432,7 +1433,7 @@ namespace HammerAndSickle.Models
                     name: "2S19 Msta‑S SPA",
                     nationality: Nationality.USSR,
                     weaponSystemID: WeaponSystems.SPA_2S19,
-                    CUConstants.PRESTIGE_TIER_3,
+                    prestigeCost: CUConstants.PRESTIGE_TIER_3,
                     weaponSystemType: WeaponSystemType.Hard,
                     hardAttack: CUConstants.BASE_ARTY_HARD_ATTACK + LARGE_BONUS,
                     hardDefense: CUConstants.BASE_ARTY_HARD_DEFENSE + MEDIUM_BONUS,
@@ -1481,7 +1482,7 @@ namespace HammerAndSickle.Models
                     name: "BM‑21 Grad MLRS",
                     nationality: Nationality.USSR,
                     weaponSystemID: WeaponSystems.ROC_BM21,
-                    CUConstants.PRESTIGE_TIER_1,
+                    prestigeCost: CUConstants.PRESTIGE_TIER_1,
                     weaponSystemType: WeaponSystemType.Hard,
                     hardAttack: CUConstants.BASE_ARTY_HARD_ATTACK,
                     hardDefense: CUConstants.BASE_ARTY_HARD_DEFENSE + MEDIUM_BONUS,
@@ -1533,7 +1534,7 @@ namespace HammerAndSickle.Models
                     name: "BM‑27 Uragan MLRS",
                     nationality: Nationality.USSR,
                     weaponSystemID: WeaponSystems.ROC_BM27,
-                    CUConstants.PRESTIGE_TIER_2,
+                    prestigeCost: CUConstants.PRESTIGE_TIER_2,
                     weaponSystemType: WeaponSystemType.Hard,
                     hardAttack: CUConstants.BASE_ARTY_HARD_ATTACK + LARGE_BONUS,
                     hardDefense: CUConstants.BASE_ARTY_HARD_DEFENSE + MEDIUM_BONUS,
@@ -1585,8 +1586,8 @@ namespace HammerAndSickle.Models
                     name: "BM‑30 Smerch MLRS",
                     nationality: Nationality.USSR,
                     weaponSystemID: WeaponSystems.ROC_BM30,
-                    CUConstants.PRESTIGE_TIER_3,
-                     weaponSystemType: WeaponSystemType.Hard,
+                    prestigeCost: CUConstants.PRESTIGE_TIER_3,
+                    weaponSystemType: WeaponSystemType.Hard,
                     hardAttack: CUConstants.BASE_ARTY_HARD_ATTACK + LARGE_BONUS,
                     hardDefense: CUConstants.BASE_ARTY_HARD_DEFENSE + MEDIUM_BONUS,
                     softAttack: CUConstants.BASE_ARTY_SOFT_ATTACK + XLARGE_BONUS,
@@ -1629,7 +1630,7 @@ namespace HammerAndSickle.Models
         /// <summary>
         /// 9K72 "Elbrus" (NATO: Scud‑B) tactical ballistic missile system.
         /// </summary>
-        private static void CreateSsmScudProfile()
+        private static void Create_SSM_SCUD_Profile()
         {
             try
             {
@@ -1637,8 +1638,8 @@ namespace HammerAndSickle.Models
                     name: "9K72 Scud‑B Tactical Ballistic Missile Launcher",
                     nationality: Nationality.USSR,
                     weaponSystemID: WeaponSystems.SSM_SCUD,
-                    CUConstants.PRESTIGE_TIER_4,
-                     weaponSystemType: WeaponSystemType.Hard,
+                    prestigeCost: CUConstants.PRESTIGE_TIER_4,
+                    weaponSystemType: WeaponSystemType.Hard,
                     hardAttack: CUConstants.BASE_ARTY_HARD_ATTACK,
                     hardDefense: CUConstants.BASE_ARTY_HARD_DEFENSE + MEDIUM_BONUS,
                     softAttack: CUConstants.BASE_ARTY_SOFT_ATTACK + XXXLARGE_BONUS,
@@ -1673,7 +1674,7 @@ namespace HammerAndSickle.Models
             }
             catch (Exception e)
             {
-                AppService.HandleException(CLASS_NAME, nameof(CreateSsmScudProfile), e);
+                AppService.HandleException(CLASS_NAME, nameof(Create_SSM_SCUD_Profile), e);
                 throw;
             }
         }
@@ -1693,8 +1694,8 @@ namespace HammerAndSickle.Models
                     name: "ZSU-57-2 Sparka SPAAA",
                     nationality: Nationality.USSR,
                     weaponSystemID: WeaponSystems.SPAAA_ZSU57,
-                    CUConstants.PRESTIGE_TIER_0,
-                    WeaponSystemType.Hard,
+                    prestigeCost: CUConstants.PRESTIGE_TIER_0,
+                    weaponSystemType: WeaponSystemType.Hard,
                     hardAttack: CUConstants.BASE_AAA_HARD_ATTACK,
                     hardDefense: CUConstants.BASE_AAA_HARD_DEFENSE,
                     softAttack: CUConstants.BASE_AAA_SOFT_ATTACK,
@@ -1743,8 +1744,8 @@ namespace HammerAndSickle.Models
                     name: "ZSU-23-4 Shilka SPAAA",
                     nationality: Nationality.USSR,
                     weaponSystemID: WeaponSystems.SPAAA_ZSU23,
-                    CUConstants.PRESTIGE_TIER_1,
-                    WeaponSystemType.Hard,
+                    prestigeCost: CUConstants.PRESTIGE_TIER_1,
+                    weaponSystemType: WeaponSystemType.Hard,
                     hardAttack: CUConstants.BASE_AAA_HARD_ATTACK,
                     hardDefense: CUConstants.BASE_AAA_HARD_DEFENSE,
                     softAttack: CUConstants.BASE_AAA_SOFT_ATTACK,
@@ -1793,8 +1794,8 @@ namespace HammerAndSickle.Models
                     name: "2K22 Tunguska SPAAA",
                     nationality: Nationality.USSR,
                     weaponSystemID: WeaponSystems.SPAAA_2K22,
-                    CUConstants.PRESTIGE_TIER_2 + MASSIVE_BONUS,
-                    WeaponSystemType.Hard,
+                    prestigeCost: CUConstants.PRESTIGE_TIER_2 + MASSIVE_BONUS,
+                    weaponSystemType: WeaponSystemType.Hard,
                     hardAttack: CUConstants.BASE_AAA_HARD_ATTACK,
                     hardDefense: CUConstants.BASE_AAA_HARD_DEFENSE,
                     softAttack: CUConstants.BASE_AAA_SOFT_ATTACK,
@@ -1843,8 +1844,8 @@ namespace HammerAndSickle.Models
                     name: "9K31 Strela-1 SPSAM",
                     nationality: Nationality.USSR,
                     weaponSystemID: WeaponSystems.SPSAM_9K31,
-                    CUConstants.PRESTIGE_TIER_2,
-                    WeaponSystemType.Soft,
+                    prestigeCost: CUConstants.PRESTIGE_TIER_2,
+                    weaponSystemType: WeaponSystemType.Soft,
                     hardAttack: CUConstants.BASE_SAM_HARD_ATTACK,
                     hardDefense: CUConstants.BASE_SAM_HARD_DEFENSE,
                     softAttack: CUConstants.BASE_SAM_SOFT_ATTACK,
@@ -1896,8 +1897,8 @@ namespace HammerAndSickle.Models
                     name: "S-75 Dvina SAM System",
                     nationality: Nationality.USSR,
                     weaponSystemID: WeaponSystems.SAM_S75,
-                    CUConstants.PRESTIGE_TIER_1,
-                    WeaponSystemType.Soft,
+                    prestigeCost: CUConstants.PRESTIGE_TIER_1,
+                    weaponSystemType: WeaponSystemType.Soft,
                     hardAttack: CUConstants.BASE_SAM_HARD_ATTACK,
                     hardDefense: CUConstants.BASE_SAM_HARD_DEFENSE,
                     softAttack: CUConstants.BASE_SAM_SOFT_ATTACK,
@@ -1946,8 +1947,8 @@ namespace HammerAndSickle.Models
                     name: "S-125 Neva SAM System",
                     nationality: Nationality.USSR,
                     weaponSystemID: WeaponSystems.SAM_S125,
-                    CUConstants.PRESTIGE_TIER_2,
-                    WeaponSystemType.Soft,
+                    prestigeCost: CUConstants.PRESTIGE_TIER_2,
+                    weaponSystemType: WeaponSystemType.Soft,
                     hardAttack: CUConstants.BASE_SAM_HARD_ATTACK,
                     hardDefense: CUConstants.BASE_SAM_HARD_DEFENSE,
                     softAttack: CUConstants.BASE_SAM_SOFT_ATTACK,
@@ -1996,8 +1997,8 @@ namespace HammerAndSickle.Models
                     name: "S-300 SAM System",
                     nationality: Nationality.USSR,
                     weaponSystemID: WeaponSystems.SAM_S300,
-                    CUConstants.PRESTIGE_TIER_4,
-                    WeaponSystemType.Soft,
+                    prestigeCost: CUConstants.PRESTIGE_TIER_4,
+                    weaponSystemType: WeaponSystemType.Soft,
                     hardAttack: CUConstants.BASE_SAM_HARD_ATTACK,
                     hardDefense: CUConstants.BASE_SAM_HARD_DEFENSE,
                     softAttack: CUConstants.BASE_SAM_SOFT_ATTACK,
@@ -2050,7 +2051,7 @@ namespace HammerAndSickle.Models
                     name: "Mi-8 Hip Transport Helicopter",
                     nationality: Nationality.USSR,
                     weaponSystemID: WeaponSystems.TRANHEL_MI8T,
-                    CUConstants.PRESTIGE_TIER_1,
+                    prestigeCost: CUConstants.PRESTIGE_TIER_1,
                     weaponSystemType: WeaponSystemType.Hard,
                     hardAttack: CUConstants.BASE_HEL_HARD_ATTACK + MEDIUM_MALUS,
                     hardDefense: CUConstants.BASE_HEL_HARD_DEFENSE + MEDIUM_MALUS,
@@ -2100,7 +2101,7 @@ namespace HammerAndSickle.Models
                     name: "Mi-8AT Hip-C Attack Helicopter",
                     nationality: Nationality.USSR,
                     weaponSystemID: WeaponSystems.HEL_MI8AT,
-                    CUConstants.PRESTIGE_TIER_1,
+                    prestigeCost: CUConstants.PRESTIGE_TIER_1,
                     weaponSystemType: WeaponSystemType.Hard,
                     hardAttack: CUConstants.BASE_HEL_HARD_ATTACK,
                     hardDefense: CUConstants.BASE_HEL_HARD_DEFENSE,
@@ -2149,7 +2150,7 @@ namespace HammerAndSickle.Models
                     name: "Mi-24D Hind-D Attack Helicopter",
                     nationality: Nationality.USSR,
                     weaponSystemID: WeaponSystems.HEL_MI24D,
-                    CUConstants.PRESTIGE_TIER_2,
+                    prestigeCost: CUConstants.PRESTIGE_TIER_2,
                     weaponSystemType: WeaponSystemType.Hard,
                     hardAttack: CUConstants.BASE_HEL_HARD_ATTACK + SMALL_BONUS,
                     hardDefense: CUConstants.BASE_HEL_HARD_DEFENSE + MEDIUM_BONUS,
@@ -2198,7 +2199,7 @@ namespace HammerAndSickle.Models
                     name: "Mi-24V Hind-E Attack Helicopter",
                     nationality: Nationality.USSR,
                     weaponSystemID: WeaponSystems.HEL_MI24V,
-                    CUConstants.PRESTIGE_TIER_3,
+                    prestigeCost: CUConstants.PRESTIGE_TIER_3,
                     weaponSystemType: WeaponSystemType.Hard,
                     hardAttack: CUConstants.BASE_HEL_HARD_ATTACK + XLARGE_BONUS,
                     hardDefense: CUConstants.BASE_HEL_HARD_DEFENSE + MEDIUM_BONUS,
@@ -2247,7 +2248,7 @@ namespace HammerAndSickle.Models
                     name: "Mi-28 Havoc Attack Helicopter",
                     nationality: Nationality.USSR,
                     weaponSystemID: WeaponSystems.HEL_MI28,
-                    CUConstants.PRESTIGE_TIER_4,
+                    prestigeCost: CUConstants.PRESTIGE_TIER_4,
                     weaponSystemType: WeaponSystemType.Hard,
                     hardAttack: CUConstants.BASE_HEL_HARD_ATTACK + XXXLARGE_BONUS,
                     hardDefense: CUConstants.BASE_HEL_HARD_DEFENSE + SMALL_BONUS,
@@ -2300,7 +2301,7 @@ namespace HammerAndSickle.Models
                     name: "An-12 Antonov Transport Plane",
                     nationality: Nationality.USSR,
                     weaponSystemID: WeaponSystems.TRANAIR_AN12,
-                    CUConstants.PRESTIGE_TIER_2,
+                    prestigeCost: CUConstants.PRESTIGE_TIER_2,
                     weaponSystemType: WeaponSystemType.Air,
                     dogfighting: CUConstants.AC_BOMBER_DOGFIGHT,
                     maneuverability: CUConstants.AC_BOMBER_MANEUVER,
@@ -2351,7 +2352,7 @@ namespace HammerAndSickle.Models
                     name: "A-50 Mainstay AWACS",
                     nationality: Nationality.USSR,
                     weaponSystemID: WeaponSystems.AWACS_A50,
-                    CUConstants.PRESTIGE_TIER_5,
+                    prestigeCost: CUConstants.PRESTIGE_TIER_5,
                     weaponSystemType: WeaponSystemType.Air,
                     dogfighting: CUConstants.AC_BOMBER_DOGFIGHT,
                     maneuverability: CUConstants.AC_BOMBER_MANEUVER,
@@ -2402,7 +2403,7 @@ namespace HammerAndSickle.Models
                     name: "MiG-21 Fishbed Air Superiority Fighter",
                     nationality: Nationality.USSR,
                     weaponSystemID: WeaponSystems.FGT_MIG21,
-                    CUConstants.PRESTIGE_TIER_1,
+                    prestigeCost: CUConstants.PRESTIGE_TIER_1,
                     weaponSystemType: WeaponSystemType.Air,
                     dogfighting: CUConstants.EARLY_FGT_DOGFIGHT,
                     maneuverability: CUConstants.EARLY_FGT_MANEUVER,
@@ -2453,7 +2454,7 @@ namespace HammerAndSickle.Models
                     name: "MiG-23 Flogger Air Superiority Fighter",
                     nationality: Nationality.USSR,
                     weaponSystemID: WeaponSystems.FGT_MIG23,
-                    CUConstants.PRESTIGE_TIER_1 + XXLARGE_BONUS,
+                    prestigeCost: CUConstants.PRESTIGE_TIER_1 + XXLARGE_BONUS,
                     weaponSystemType: WeaponSystemType.Air,
                     dogfighting: CUConstants.EARLY_FGT_DOGFIGHT + LARGE_BONUS,
                     maneuverability: CUConstants.EARLY_FGT_MANEUVER,
@@ -2504,7 +2505,7 @@ namespace HammerAndSickle.Models
                     name: "MiG-25 Foxbat Air Superiority Fighter",
                     nationality: Nationality.USSR,
                     weaponSystemID: WeaponSystems.FGT_MIG25,
-                    CUConstants.PRESTIGE_TIER_2,
+                    prestigeCost: CUConstants.PRESTIGE_TIER_2,
                     weaponSystemType: WeaponSystemType.Air,
                     dogfighting: CUConstants.EARLY_FGT_DOGFIGHT,
                     maneuverability: CUConstants.EARLY_FGT_MANEUVER,
@@ -2555,7 +2556,7 @@ namespace HammerAndSickle.Models
                     name: "MiG-29 Fulcrum Air Superiority Fighter",
                     nationality: Nationality.USSR,
                     weaponSystemID: WeaponSystems.FGT_MIG29,
-                    CUConstants.PRESTIGE_TIER_2,
+                    prestigeCost: CUConstants.PRESTIGE_TIER_2,
                     weaponSystemType: WeaponSystemType.Air,
                     dogfighting: CUConstants.MID_FGT_DOGFIGHT + LARGE_BONUS,
                     maneuverability: CUConstants.MID_FGT_MANEUVER + XXLARGE_BONUS,
@@ -2606,7 +2607,7 @@ namespace HammerAndSickle.Models
                     name: "MiG-31 Foxhound Air Superiority Fighter",
                     nationality: Nationality.USSR,
                     weaponSystemID: WeaponSystems.FGT_MIG31,
-                    CUConstants.PRESTIGE_TIER_2 + XXLARGE_BONUS,
+                    prestigeCost: CUConstants.PRESTIGE_TIER_2 + XXLARGE_BONUS,
                     weaponSystemType: WeaponSystemType.Air,
                     dogfighting: CUConstants.MID_FGT_DOGFIGHT + LARGE_BONUS,
                     maneuverability: CUConstants.MID_FGT_MANEUVER,
@@ -2657,7 +2658,7 @@ namespace HammerAndSickle.Models
                     name: "Su-27 Flanker Air Superiority Fighter",
                     nationality: Nationality.USSR,
                     weaponSystemID: WeaponSystems.FGT_SU27,
-                    CUConstants.PRESTIGE_TIER_3,
+                    prestigeCost: CUConstants.PRESTIGE_TIER_3,
                     weaponSystemType: WeaponSystemType.Air,
                     dogfighting: CUConstants.MID_FGT_DOGFIGHT + XXLARGE_BONUS,
                     maneuverability: CUConstants.MID_FGT_MANEUVER + MEDIUM_BONUS,
@@ -2708,7 +2709,7 @@ namespace HammerAndSickle.Models
                     name: "Su-47 Berkut Experimental Fighter",
                     nationality: Nationality.USSR,
                     weaponSystemID: WeaponSystems.FGT_SU47,
-                    CUConstants.PRESTIGE_TIER_3 + XXXLARGE_BONUS + XXXLARGE_BONUS + XXXLARGE_BONUS,
+                    prestigeCost: CUConstants.PRESTIGE_TIER_3 + XXXLARGE_BONUS + XXXLARGE_BONUS + XXXLARGE_BONUS,
                     weaponSystemType: WeaponSystemType.Air,
                     dogfighting: CUConstants.LATE_FGT_DOGFIGHT + XXXLARGE_BONUS,
                     maneuverability: CUConstants.LATE_FGT_MANEUVER + XXLARGE_BONUS,
@@ -2759,7 +2760,7 @@ namespace HammerAndSickle.Models
                     name: "MiG-27 Flogger-D Multi-Role Fighter",
                     nationality: Nationality.USSR,
                     weaponSystemID: WeaponSystems.FGT_MIG27,
-                    CUConstants.PRESTIGE_TIER_1 + XXLARGE_BONUS,
+                    prestigeCost: CUConstants.PRESTIGE_TIER_1 + XXLARGE_BONUS,
                     weaponSystemType: WeaponSystemType.Air,
                     dogfighting: CUConstants.AC_ATTACK_DOGFIGHT + LARGE_BONUS,
                     maneuverability: CUConstants.AC_ATTACK_MANEUVER + MEDIUM_BONUS,
@@ -2810,7 +2811,7 @@ namespace HammerAndSickle.Models
                     name: "Su-25 Frogfoot Attack Aircraft",
                     nationality: Nationality.USSR,
                     weaponSystemID: WeaponSystems.ATT_SU25,
-                    CUConstants.PRESTIGE_TIER_2 + XXLARGE_MALUS,
+                    prestigeCost: CUConstants.PRESTIGE_TIER_2 + XXLARGE_MALUS,
                     weaponSystemType: WeaponSystemType.Air,
                     dogfighting: CUConstants.AC_ATTACK_DOGFIGHT + MEDIUM_MALUS,
                     maneuverability: CUConstants.AC_ATTACK_MANEUVER,
@@ -2861,7 +2862,7 @@ namespace HammerAndSickle.Models
                     name: "Su-25B Frogfoot-B Attack Aircraft",
                     nationality: Nationality.USSR,
                     weaponSystemID: WeaponSystems.ATT_SU25B,
-                    CUConstants.PRESTIGE_TIER_2 + XXLARGE_BONUS,
+                    prestigeCost: CUConstants.PRESTIGE_TIER_2 + XXLARGE_BONUS,
                     weaponSystemType: WeaponSystemType.Air,
                     dogfighting: CUConstants.AC_ATTACK_DOGFIGHT,
                     maneuverability: CUConstants.AC_ATTACK_MANEUVER,
@@ -2912,7 +2913,8 @@ namespace HammerAndSickle.Models
                     name: "Su-24 Fencer Bomber",
                     nationality: Nationality.USSR,
                     weaponSystemID: WeaponSystems.BMB_SU24,
-                    CUConstants.PRESTIGE_TIER_3 + XXLARGE_MALUS,
+                    prestigeCost: CUConstants.PRESTIGE_TIER_3 + XXLARGE_MALUS,
+                    weaponSystemType: WeaponSystemType.Air,
                     dogfighting: CUConstants.AC_BOMBER_DOGFIGHT + XXLARGE_BONUS,
                     maneuverability: CUConstants.AC_BOMBER_MANEUVER + LARGE_BONUS,
                     topSpeed: CUConstants.AC_BOMBER_TOPSPEED + XLARGE_BONUS,
@@ -2962,7 +2964,8 @@ namespace HammerAndSickle.Models
                     name: "Tu-16 Badger Bomber",
                     nationality: Nationality.USSR,
                     weaponSystemID: WeaponSystems.BMB_TU16,
-                    CUConstants.PRESTIGE_TIER_3 + XXLARGE_BONUS,
+                    prestigeCost: CUConstants.PRESTIGE_TIER_3 + XXLARGE_BONUS,
+                    weaponSystemType: WeaponSystemType.Air,
                     dogfighting: CUConstants.AC_BOMBER_DOGFIGHT,
                     maneuverability: CUConstants.AC_BOMBER_MANEUVER,
                     topSpeed: CUConstants.AC_BOMBER_TOPSPEED,
@@ -3012,7 +3015,8 @@ namespace HammerAndSickle.Models
                     name: "Tu-22 Blinder Bomber",
                     nationality: Nationality.USSR,
                     weaponSystemID: WeaponSystems.BMB_TU22,
-                    CUConstants.PRESTIGE_TIER_4,
+                    prestigeCost: CUConstants.PRESTIGE_TIER_4,
+                    weaponSystemType: WeaponSystemType.Air,
                     dogfighting: CUConstants.AC_BOMBER_DOGFIGHT,
                     maneuverability: CUConstants.AC_BOMBER_MANEUVER,
                     topSpeed: CUConstants.AC_BOMBER_TOPSPEED + XLARGE_BONUS,
@@ -3062,7 +3066,8 @@ namespace HammerAndSickle.Models
                     name: "Tu-22M3 Backfire-C Strategic Bomber",
                     nationality: Nationality.USSR,
                     weaponSystemID: WeaponSystems.BMB_TU22M3,
-                    CUConstants.PRESTIGE_TIER_5,
+                    prestigeCost: CUConstants.PRESTIGE_TIER_5,
+                    weaponSystemType: WeaponSystemType.Air,
                     dogfighting: CUConstants.AC_BOMBER_DOGFIGHT,
                     maneuverability: CUConstants.AC_BOMBER_MANEUVER,
                     topSpeed: CUConstants.AC_HIGHSPEED_RUSSIAN + SMALL_MALUS,
@@ -3112,7 +3117,7 @@ namespace HammerAndSickle.Models
                     name: "MiG-25R Foxbat-B Reconnaissance Aircraft",
                     nationality: Nationality.USSR,
                     weaponSystemID: WeaponSystems.RCNA_MIG25R,
-                    CUConstants.PRESTIGE_TIER_2,
+                    prestigeCost: CUConstants.PRESTIGE_TIER_2,
                     weaponSystemType: WeaponSystemType.Air,
                     dogfighting: CUConstants.EARLY_FGT_DOGFIGHT,
                     maneuverability: CUConstants.EARLY_FGT_MANEUVER,
@@ -3167,7 +3172,8 @@ namespace HammerAndSickle.Models
                     name: "Transport Flotilla",
                     nationality: Nationality.USSR,
                     weaponSystemID: WeaponSystems.TRANNAV_NAVAL,
-                    CUConstants.PRESTIGE_TIER_5,
+                    prestigeCost: CUConstants.PRESTIGE_TIER_5,
+                    weaponSystemType: WeaponSystemType.Hard,
                     groundAirDefense: 12,
                     primaryRange: CUConstants.PRIMARY_RANGE_DEFAULT,
                     indirectRange: CUConstants.INDIRECT_RANGE_DEFAULT,
@@ -3217,7 +3223,7 @@ namespace HammerAndSickle.Models
                     name: "M1 Abrams MBT",
                     nationality: Nationality.USA,
                     weaponSystemID: WeaponSystems.TANK_M1,
-                    CUConstants.PRESTIGE_TIER_FREE,
+                    prestigeCost: CUConstants.PRESTIGE_TIER_FREE,
                     weaponSystemType: WeaponSystemType.Hard,
                     hardAttack: CUConstants.GEN2_TANK_HARD_ATTACK,
                     hardDefense: CUConstants.GEN2_TANK_HARD_DEFENSE + XXLARGE_BONUS,
@@ -3232,7 +3238,8 @@ namespace HammerAndSickle.Models
                     nbcRating: NBC_Rating.Gen2,
                     strategicMobility: StrategicMobility.Heavy,
                     nvgCapability: NVG_Rating.Gen2,
-                    silhouette: UnitSilhouette.Large
+                    silhouette: UnitSilhouette.Large,
+                    movementPoints: CUConstants.MECH_UNIT
                 );
 
                 // Add upgrade types for modernization
@@ -3265,7 +3272,7 @@ namespace HammerAndSickle.Models
                     name: "M60-A3 Patton MBT",
                     nationality: Nationality.USA,
                     weaponSystemID: WeaponSystems.TANK_M60A3,
-                    CUConstants.PRESTIGE_TIER_FREE,
+                    prestigeCost: CUConstants.PRESTIGE_TIER_FREE,
                     weaponSystemType: WeaponSystemType.Hard,
                     hardAttack: CUConstants.GEN1_TANK_HARD_ATTACK + SMALL_BONUS,
                     hardDefense: CUConstants.GEN1_TANK_HARD_DEFENSE,
@@ -3280,7 +3287,8 @@ namespace HammerAndSickle.Models
                     nbcRating: NBC_Rating.Gen1,
                     strategicMobility: StrategicMobility.Heavy,
                     nvgCapability: NVG_Rating.Gen1,
-                    silhouette: UnitSilhouette.Medium
+                    silhouette: UnitSilhouette.Medium,
+                    movementPoints: CUConstants.MECH_UNIT
                 );
 
                 // Add upgrade types for modernization
@@ -3313,7 +3321,7 @@ namespace HammerAndSickle.Models
                     name: "M551 Sheridan Light Tank",
                     nationality: Nationality.USA,
                     weaponSystemID: WeaponSystems.TANK_M551,
-                    CUConstants.PRESTIGE_TIER_FREE,
+                    prestigeCost: CUConstants.PRESTIGE_TIER_FREE,
                     weaponSystemType: WeaponSystemType.Hard,
                     hardAttack: CUConstants.GEN1_TANK_HARD_ATTACK + LARGE_BONUS,
                     hardDefense: CUConstants.GEN1_TANK_HARD_DEFENSE + MEDIUM_MALUS,
@@ -3328,7 +3336,8 @@ namespace HammerAndSickle.Models
                     nbcRating: NBC_Rating.None,
                     strategicMobility: StrategicMobility.AirDrop,
                     nvgCapability: NVG_Rating.None,
-                    silhouette: UnitSilhouette.Small
+                    silhouette: UnitSilhouette.Small,
+                    movementPoints: CUConstants.MECH_UNIT
                 );
 
                 // Add upgrade types for modernization
@@ -3365,7 +3374,7 @@ namespace HammerAndSickle.Models
                     name: "M2 Bradley IFV",
                     nationality: Nationality.USA,
                     weaponSystemID: WeaponSystems.IFV_M2,
-                    CUConstants.PRESTIGE_TIER_FREE,
+                    prestigeCost: CUConstants.PRESTIGE_TIER_FREE,
                     weaponSystemType: WeaponSystemType.Hard,
                     hardAttack: CUConstants.BASE_IFV_HARD_ATTACK + XXXLARGE_BONUS,
                     hardDefense: CUConstants.BASE_IFV_HARD_DEFENSE,
@@ -3380,7 +3389,8 @@ namespace HammerAndSickle.Models
                     nbcRating: NBC_Rating.Gen2,
                     strategicMobility: StrategicMobility.AirLift,
                     nvgCapability: NVG_Rating.Gen2,
-                    silhouette: UnitSilhouette.Medium
+                    silhouette: UnitSilhouette.Medium,
+                    movementPoints: CUConstants.MECH_UNIT
                 );
 
                 // Set upgrade paths
@@ -3413,7 +3423,7 @@ namespace HammerAndSickle.Models
                     name: "M3 Bradley Scout IFV",
                     nationality: Nationality.USA,
                     weaponSystemID: WeaponSystems.IFV_M3,
-                    CUConstants.PRESTIGE_TIER_FREE,
+                    prestigeCost: CUConstants.PRESTIGE_TIER_FREE,
                     weaponSystemType: WeaponSystemType.Hard,
                     hardAttack: CUConstants.BASE_IFV_HARD_ATTACK + XXXLARGE_BONUS,
                     hardDefense: CUConstants.BASE_IFV_HARD_DEFENSE,
@@ -3428,7 +3438,8 @@ namespace HammerAndSickle.Models
                     nbcRating: NBC_Rating.Gen2,
                     strategicMobility: StrategicMobility.AirLift,
                     nvgCapability: NVG_Rating.Gen3,
-                    silhouette: UnitSilhouette.Medium
+                    silhouette: UnitSilhouette.Medium,
+                    movementPoints: CUConstants.MECH_UNIT
                 );
 
                 // Set upgrade paths
@@ -3461,7 +3472,7 @@ namespace HammerAndSickle.Models
                     name: "M113 APC",
                     nationality: Nationality.USA,
                     weaponSystemID: WeaponSystems.APC_M113,
-                    CUConstants.PRESTIGE_TIER_FREE,
+                    prestigeCost: CUConstants.PRESTIGE_TIER_FREE,
                     weaponSystemType: WeaponSystemType.Hard,
                     hardAttack: CUConstants.BASE_APC_HARD_ATTACK,
                     hardDefense: CUConstants.BASE_APC_HARD_DEFENSE,
@@ -3476,7 +3487,8 @@ namespace HammerAndSickle.Models
                     nbcRating: NBC_Rating.Gen1,
                     strategicMobility: StrategicMobility.AirLift,
                     nvgCapability: NVG_Rating.Gen1,
-                    silhouette: UnitSilhouette.Small
+                    silhouette: UnitSilhouette.Small,
+                    movementPoints: CUConstants.MECH_UNIT
                 );
 
                 // Set upgrade paths
@@ -3509,7 +3521,7 @@ namespace HammerAndSickle.Models
                     name: "LVTP-7 AAV",
                     nationality: Nationality.USA,
                     weaponSystemID: WeaponSystems.APC_LVTP7,
-                    CUConstants.PRESTIGE_TIER_FREE,
+                    prestigeCost: CUConstants.PRESTIGE_TIER_FREE,
                     weaponSystemType: WeaponSystemType.Hard,
                     hardAttack: CUConstants.BASE_APC_HARD_ATTACK,
                     hardDefense: CUConstants.BASE_APC_HARD_DEFENSE,
@@ -3524,7 +3536,8 @@ namespace HammerAndSickle.Models
                     nbcRating: NBC_Rating.Gen1,
                     strategicMobility: StrategicMobility.NavalAssault,
                     nvgCapability: NVG_Rating.Gen1,
-                    silhouette: UnitSilhouette.Medium
+                    silhouette: UnitSilhouette.Medium,
+                    movementPoints: CUConstants.MECH_UNIT
                 );
 
                 // Set upgrade paths
@@ -3564,7 +3577,7 @@ namespace HammerAndSickle.Models
                     name: "M109 Paladin Self-Propelled Artillery",
                     nationality: Nationality.USA,
                     weaponSystemID: WeaponSystems.SPA_M109,
-                    CUConstants.PRESTIGE_TIER_FREE,
+                    prestigeCost: CUConstants.PRESTIGE_TIER_FREE,
                     weaponSystemType: WeaponSystemType.Hard,
                     hardAttack: CUConstants.BASE_ARTY_HARD_ATTACK + LARGE_BONUS,
                     hardDefense: CUConstants.BASE_ARTY_HARD_DEFENSE + MEDIUM_BONUS,
@@ -3579,7 +3592,8 @@ namespace HammerAndSickle.Models
                     nbcRating: NBC_Rating.Gen2,
                     strategicMobility: StrategicMobility.Heavy,
                     nvgCapability: NVG_Rating.Gen2,
-                    silhouette: UnitSilhouette.Large
+                    silhouette: UnitSilhouette.Large,
+                    movementPoints: CUConstants.MECH_UNIT
                 );
 
                 // Set upgrade paths
@@ -3612,7 +3626,7 @@ namespace HammerAndSickle.Models
                     name: "M270 MLRS Multiple Launch Rocket System",
                     nationality: Nationality.USA,
                     weaponSystemID: WeaponSystems.ROC_MLRS,
-                    CUConstants.PRESTIGE_TIER_FREE,
+                    prestigeCost: CUConstants.PRESTIGE_TIER_FREE,
                     weaponSystemType: WeaponSystemType.Hard,
                     hardAttack: CUConstants.BASE_ARTY_HARD_ATTACK + LARGE_BONUS,
                     hardDefense: CUConstants.BASE_ARTY_HARD_DEFENSE + MEDIUM_BONUS,
@@ -3627,7 +3641,8 @@ namespace HammerAndSickle.Models
                     nbcRating: NBC_Rating.Gen2,
                     strategicMobility: StrategicMobility.Heavy,
                     nvgCapability: NVG_Rating.Gen2,
-                    silhouette: UnitSilhouette.Large
+                    silhouette: UnitSilhouette.Large,
+                    movementPoints: CUConstants.MECH_UNIT
                 );
 
                 // Set double fire capability
@@ -3667,8 +3682,8 @@ namespace HammerAndSickle.Models
                     name: "M163 Vulcan Self-Propelled Anti-Aircraft Artillery",
                     nationality: Nationality.USA,
                     weaponSystemID: WeaponSystems.SPAAA_M163,
-                    CUConstants.PRESTIGE_TIER_FREE,
-                    WeaponSystemType.Hard,
+                    prestigeCost: CUConstants.PRESTIGE_TIER_FREE,
+                    weaponSystemType: WeaponSystemType.Hard,
                     hardAttack: CUConstants.BASE_AAA_HARD_ATTACK,
                     hardDefense: CUConstants.BASE_AAA_HARD_DEFENSE,
                     softAttack: CUConstants.BASE_AAA_SOFT_ATTACK,
@@ -3683,7 +3698,8 @@ namespace HammerAndSickle.Models
                     nbcRating: NBC_Rating.Gen1,
                     strategicMobility: StrategicMobility.AirLift,
                     nvgCapability: NVG_Rating.Gen1,
-                    silhouette: UnitSilhouette.Medium
+                    silhouette: UnitSilhouette.Medium,
+                    movementPoints: CUConstants.MECH_UNIT
                 );
 
                 // Set upgrade paths
@@ -3716,8 +3732,8 @@ namespace HammerAndSickle.Models
                     name: "M48 Chaparral Self-Propelled SAM System",
                     nationality: Nationality.USA,
                     weaponSystemID: WeaponSystems.SPSAM_CHAP,
-                    CUConstants.PRESTIGE_TIER_FREE,
-                    WeaponSystemType.Soft,
+                    prestigeCost: CUConstants.PRESTIGE_TIER_FREE,
+                    weaponSystemType: WeaponSystemType.Soft,
                     hardAttack: CUConstants.BASE_SAM_HARD_ATTACK,
                     hardDefense: CUConstants.BASE_SAM_HARD_DEFENSE,
                     softAttack: CUConstants.BASE_SAM_SOFT_ATTACK,
@@ -3732,7 +3748,8 @@ namespace HammerAndSickle.Models
                     nbcRating: NBC_Rating.Gen1,
                     strategicMobility: StrategicMobility.AirLift,
                     nvgCapability: NVG_Rating.Gen1,
-                    silhouette: UnitSilhouette.Medium
+                    silhouette: UnitSilhouette.Medium,
+                    movementPoints: CUConstants.MECH_UNIT
                 );
 
                 // Set upgrade paths
@@ -3765,8 +3782,8 @@ namespace HammerAndSickle.Models
                     name: "MIM-23 Hawk Strategic SAM System",
                     nationality: Nationality.USA,
                     weaponSystemID: WeaponSystems.SAM_HAWK,
-                    CUConstants.PRESTIGE_TIER_FREE,
-                    WeaponSystemType.Soft,
+                    prestigeCost: CUConstants.PRESTIGE_TIER_FREE,
+                    weaponSystemType: WeaponSystemType.Soft,
                     hardAttack: CUConstants.BASE_SAM_HARD_ATTACK,
                     hardDefense: CUConstants.BASE_SAM_HARD_DEFENSE,
                     softAttack: CUConstants.BASE_SAM_SOFT_ATTACK,
@@ -3781,7 +3798,8 @@ namespace HammerAndSickle.Models
                     nbcRating: NBC_Rating.Gen1,
                     strategicMobility: StrategicMobility.Heavy,
                     nvgCapability: NVG_Rating.None,
-                    silhouette: UnitSilhouette.Large
+                    silhouette: UnitSilhouette.Large,
+                    movementPoints: CUConstants.STATIC_UNIT
                 );
 
                 // Set upgrade paths
@@ -3818,7 +3836,7 @@ namespace HammerAndSickle.Models
                     name: "AH-64 Apache Attack Helicopter",
                     nationality: Nationality.USA,
                     weaponSystemID: WeaponSystems.HEL_AH64,
-                    CUConstants.PRESTIGE_TIER_FREE,
+                    prestigeCost: CUConstants.PRESTIGE_TIER_FREE,
                     weaponSystemType: WeaponSystemType.Hard,
                     hardAttack: CUConstants.BASE_HEL_HARD_ATTACK + XXXLARGE_BONUS,
                     hardDefense: CUConstants.BASE_HEL_HARD_DEFENSE + MEDIUM_BONUS,
@@ -3833,7 +3851,8 @@ namespace HammerAndSickle.Models
                     nbcRating: NBC_Rating.Gen2,
                     strategicMobility: StrategicMobility.Aviation,
                     nvgCapability: NVG_Rating.Gen3,
-                    silhouette: UnitSilhouette.Medium
+                    silhouette: UnitSilhouette.Medium,
+                    movementPoints: CUConstants.HELO_UNIT
                 );
 
                 // Set upgrade paths
@@ -3866,7 +3885,7 @@ namespace HammerAndSickle.Models
                     name: "OH-58 Kiowa Recon Helicopter",
                     nationality: Nationality.USA,
                     weaponSystemID: WeaponSystems.HEL_OH58,
-                    CUConstants.PRESTIGE_TIER_FREE,
+                    prestigeCost: CUConstants.PRESTIGE_TIER_FREE,
                     weaponSystemType: WeaponSystemType.Hard,
                     hardAttack: CUConstants.BASE_HEL_HARD_ATTACK + SMALL_MALUS,
                     hardDefense: CUConstants.BASE_HEL_HARD_DEFENSE,
@@ -3881,7 +3900,8 @@ namespace HammerAndSickle.Models
                     nbcRating: NBC_Rating.Gen2,
                     strategicMobility: StrategicMobility.Aviation,
                     nvgCapability: NVG_Rating.Gen3,
-                    silhouette: UnitSilhouette.Small
+                    silhouette: UnitSilhouette.Small,
+                    movementPoints: CUConstants.HELO_UNIT
                 );
 
                 // Set upgrade paths
@@ -3918,7 +3938,7 @@ namespace HammerAndSickle.Models
                     name: "E-3 Sentry Airborne Early Warning",
                     nationality: Nationality.USA,
                     weaponSystemID: WeaponSystems.AWACS_E3,
-                    CUConstants.PRESTIGE_TIER_FREE,
+                    prestigeCost: CUConstants.PRESTIGE_TIER_FREE,
                     weaponSystemType: WeaponSystemType.Air,
                     dogfighting: CUConstants.AC_BOMBER_DOGFIGHT,
                     maneuverability: CUConstants.AC_BOMBER_MANEUVER,
@@ -3969,7 +3989,7 @@ namespace HammerAndSickle.Models
                     name: "F-15 Eagle Air Superiority Fighter",
                     nationality: Nationality.USA,
                     weaponSystemID: WeaponSystems.FGT_F15,
-                    CUConstants.PRESTIGE_TIER_FREE,
+                    prestigeCost: CUConstants.PRESTIGE_TIER_FREE,
                     weaponSystemType: WeaponSystemType.Air,
                     dogfighting: CUConstants.MID_FGT_DOGFIGHT + XXXLARGE_BONUS,
                     maneuverability: CUConstants.MID_FGT_MANEUVER + LARGE_BONUS,
@@ -3986,7 +4006,8 @@ namespace HammerAndSickle.Models
                     nbcRating: NBC_Rating.Gen2,
                     strategicMobility: StrategicMobility.Aircraft,
                     nvgCapability: NVG_Rating.None,
-                    silhouette: UnitSilhouette.Medium
+                    silhouette: UnitSilhouette.Medium,
+                    movementPoints: CUConstants.FIXEDWING_UNIT
                 );
 
                 // Set upgrade paths
@@ -4019,7 +4040,7 @@ namespace HammerAndSickle.Models
                     name: "F-4 Phantom Air Superiority Fighter",
                     nationality: Nationality.USA,
                     weaponSystemID: WeaponSystems.FGT_F4,
-                    CUConstants.PRESTIGE_TIER_FREE,
+                    prestigeCost: CUConstants.PRESTIGE_TIER_FREE,
                     weaponSystemType: WeaponSystemType.Air,
                     dogfighting: CUConstants.EARLY_FGT_DOGFIGHT + MEDIUM_BONUS,
                     maneuverability: CUConstants.EARLY_FGT_MANEUVER,
@@ -4036,7 +4057,8 @@ namespace HammerAndSickle.Models
                     nbcRating: NBC_Rating.Gen1,
                     strategicMobility: StrategicMobility.Aircraft,
                     nvgCapability: NVG_Rating.None,
-                    silhouette: UnitSilhouette.Medium
+                    silhouette: UnitSilhouette.Medium,
+                    movementPoints: CUConstants.FIXEDWING_UNIT
                 );
 
                 // Set upgrade paths
@@ -4069,7 +4091,7 @@ namespace HammerAndSickle.Models
                     name: "F-16 Fighting Falcon Multi-Role Fighter",
                     nationality: Nationality.USA,
                     weaponSystemID: WeaponSystems.FGT_F16,
-                    CUConstants.PRESTIGE_TIER_FREE,
+                    prestigeCost: CUConstants.PRESTIGE_TIER_FREE,
                     weaponSystemType: WeaponSystemType.Air,
                     dogfighting: CUConstants.MID_FGT_DOGFIGHT + XLARGE_BONUS,
                     maneuverability: CUConstants.MID_FGT_MANEUVER + XLARGE_BONUS,
@@ -4086,7 +4108,8 @@ namespace HammerAndSickle.Models
                     nbcRating: NBC_Rating.Gen2,
                     strategicMobility: StrategicMobility.Aircraft,
                     nvgCapability: NVG_Rating.None,
-                    silhouette: UnitSilhouette.Medium
+                    silhouette: UnitSilhouette.Medium,
+                    movementPoints: CUConstants.FIXEDWING_UNIT
                 );
 
                 // Set upgrade paths
@@ -4119,7 +4142,7 @@ namespace HammerAndSickle.Models
                     name: "A-10 Thunderbolt II Attack Aircraft",
                     nationality: Nationality.USA,
                     weaponSystemID: WeaponSystems.ATT_A10,
-                     CUConstants.PRESTIGE_TIER_FREE,
+                    prestigeCost: CUConstants.PRESTIGE_TIER_FREE,
                     weaponSystemType: WeaponSystemType.Air,
                     dogfighting: CUConstants.AC_ATTACK_DOGFIGHT,
                     maneuverability: CUConstants.AC_ATTACK_MANEUVER,
@@ -4136,7 +4159,8 @@ namespace HammerAndSickle.Models
                     nbcRating: NBC_Rating.Gen1,
                     strategicMobility: StrategicMobility.Aircraft,
                     nvgCapability: NVG_Rating.None,
-                    silhouette: UnitSilhouette.Medium
+                    silhouette: UnitSilhouette.Medium,
+                    movementPoints: CUConstants.FIXEDWING_UNIT
                 );
 
                 // Set upgrade paths
@@ -4169,7 +4193,7 @@ namespace HammerAndSickle.Models
                     name: "F-111 Aardvark Strike Fighter",
                     nationality: Nationality.USA,
                     weaponSystemID: WeaponSystems.BMB_F111,
-                    CUConstants.PRESTIGE_TIER_FREE,
+                    prestigeCost: CUConstants.PRESTIGE_TIER_FREE,
                     dogfighting: CUConstants.AC_BOMBER_DOGFIGHT + XXLARGE_BONUS,
                     maneuverability: CUConstants.AC_BOMBER_MANEUVER + LARGE_BONUS,
                     topSpeed: CUConstants.AC_BOMBER_TOPSPEED + XLARGE_BONUS,
@@ -4185,7 +4209,8 @@ namespace HammerAndSickle.Models
                     nbcRating: NBC_Rating.Gen1,
                     strategicMobility: StrategicMobility.Aircraft,
                     nvgCapability: NVG_Rating.None,
-                    silhouette: UnitSilhouette.Medium
+                    silhouette: UnitSilhouette.Medium,
+                    movementPoints: CUConstants.FIXEDWING_UNIT
                 );
 
                 // Set upgrade paths
@@ -4218,7 +4243,8 @@ namespace HammerAndSickle.Models
                     name: "F-117 Nighthawk Stealth Attack Aircraft",
                     nationality: Nationality.USA,
                     weaponSystemID: WeaponSystems.BMB_F117,
-                    CUConstants.PRESTIGE_TIER_FREE,
+                    prestigeCost: CUConstants.PRESTIGE_TIER_FREE,
+                    weaponSystemType:WeaponSystemType.Air,
                     dogfighting: CUConstants.AC_BOMBER_DOGFIGHT,
                     maneuverability: CUConstants.AC_BOMBER_MANEUVER,
                     topSpeed: CUConstants.AC_BOMBER_TOPSPEED,
@@ -4234,7 +4260,8 @@ namespace HammerAndSickle.Models
                     nbcRating: NBC_Rating.Gen2,
                     strategicMobility: StrategicMobility.Aircraft,
                     nvgCapability: NVG_Rating.None,
-                    silhouette: UnitSilhouette.Tiny
+                    silhouette: UnitSilhouette.Tiny,
+                    movementPoints: CUConstants.FIXEDWING_UNIT
                 );
 
                 // Set upgrade paths
@@ -4267,7 +4294,7 @@ namespace HammerAndSickle.Models
                     name: "SR-71 Blackbird Strategic Reconnaissance Aircraft",
                     nationality: Nationality.USA,
                     weaponSystemID: WeaponSystems.RCNA_SR71,
-                    CUConstants.PRESTIGE_TIER_2,
+                    prestigeCost: CUConstants.PRESTIGE_TIER_2,
                     weaponSystemType: WeaponSystemType.Air,
                     dogfighting: CUConstants.EARLY_FGT_DOGFIGHT,
                     maneuverability: CUConstants.EARLY_FGT_MANEUVER,
@@ -4284,7 +4311,8 @@ namespace HammerAndSickle.Models
                     nbcRating: NBC_Rating.Gen2,
                     strategicMobility: StrategicMobility.Aircraft,
                     nvgCapability: NVG_Rating.None,
-                    silhouette: UnitSilhouette.Medium
+                    silhouette: UnitSilhouette.Medium,
+                    movementPoints: CUConstants.FIXEDWING_UNIT
                 );
 
                 // Set upgrade paths
@@ -4323,7 +4351,7 @@ namespace HammerAndSickle.Models
                     name: "Leopard 1 MBT",
                     nationality: Nationality.FRG,
                     weaponSystemID: WeaponSystems.TANK_LEOPARD1,
-                    CUConstants.PRESTIGE_TIER_FREE,
+                    prestigeCost: CUConstants.PRESTIGE_TIER_FREE,
                     weaponSystemType: WeaponSystemType.Hard,
                     hardAttack: CUConstants.GEN1_TANK_HARD_ATTACK + MEDIUM_BONUS,
                     hardDefense: CUConstants.GEN1_TANK_HARD_DEFENSE + MEDIUM_BONUS,
@@ -4339,7 +4367,8 @@ namespace HammerAndSickle.Models
                     strategicMobility: StrategicMobility.Heavy,
                     nvgCapability: NVG_Rating.None,
                     silhouette: UnitSilhouette.Medium,
-                    movementPoints: CUConstants.MECH_UNIT);
+                    movementPoints: CUConstants.MECH_UNIT
+                    );
 
                 profile.AddUpgradeType(UpgradeType.AFV);
                 profile.SetShortName("Leo 1");
@@ -4360,7 +4389,7 @@ namespace HammerAndSickle.Models
                     name: "Leopard 2 MBT",
                     nationality: Nationality.FRG,
                     weaponSystemID: WeaponSystems.TANK_LEOPARD2,
-                    CUConstants.PRESTIGE_TIER_FREE,
+                    prestigeCost: CUConstants.PRESTIGE_TIER_FREE,
                     weaponSystemType: WeaponSystemType.Hard,
                     hardAttack: CUConstants.GEN2_TANK_HARD_ATTACK + XLARGE_BONUS,
                     hardDefense: CUConstants.GEN2_TANK_HARD_DEFENSE + XXLARGE_BONUS,
@@ -4376,7 +4405,8 @@ namespace HammerAndSickle.Models
                     strategicMobility: StrategicMobility.Heavy,
                     nvgCapability: NVG_Rating.Gen2,
                     silhouette: UnitSilhouette.Medium,
-                    movementPoints: CUConstants.MECH_UNIT);
+                    movementPoints: CUConstants.MECH_UNIT
+                    );
 
                 profile.AddUpgradeType(UpgradeType.AFV);
                 profile.SetShortName("Leo 2");
@@ -4397,7 +4427,7 @@ namespace HammerAndSickle.Models
                     name: "Marder IFV",
                     nationality: Nationality.FRG,
                     weaponSystemID: WeaponSystems.IFV_MARDER,
-                    CUConstants.PRESTIGE_TIER_FREE,
+                    prestigeCost: CUConstants.PRESTIGE_TIER_FREE,
                     weaponSystemType: WeaponSystemType.Hard,
                     hardAttack: CUConstants.BASE_IFV_HARD_ATTACK + LARGE_BONUS,
                     hardDefense: CUConstants.BASE_IFV_HARD_DEFENSE,
@@ -4413,7 +4443,8 @@ namespace HammerAndSickle.Models
                     strategicMobility: StrategicMobility.AirLift,
                     nvgCapability: NVG_Rating.Gen1,
                     silhouette: UnitSilhouette.Small,
-                    movementPoints: CUConstants.MECH_UNIT);
+                    movementPoints: CUConstants.MECH_UNIT
+                    );
 
                 profile.AddUpgradeType(UpgradeType.IFV);
                 profile.SetShortName("Marder");
@@ -4434,7 +4465,7 @@ namespace HammerAndSickle.Models
                     name: "Luchs Reconnaissance Vehicle",
                     nationality: Nationality.FRG,
                     weaponSystemID: WeaponSystems.RCN_LUCHS,
-                    CUConstants.PRESTIGE_TIER_0 + MASSIVE_BONUS,
+                    prestigeCost: CUConstants.PRESTIGE_TIER_0 + MASSIVE_BONUS,
                     weaponSystemType: WeaponSystemType.Hard,
                     hardAttack: CUConstants.BASE_IFV_HARD_ATTACK,
                     hardDefense: CUConstants.BASE_IFV_HARD_DEFENSE,
@@ -4486,6 +4517,8 @@ namespace HammerAndSickle.Models
                     name: "Flakpanzer Gepard SPAAA",
                     nationality: Nationality.FRG,
                     weaponSystemID: WeaponSystems.SPAAA_GEPARD,
+                    prestigeCost: CUConstants.PRESTIGE_TIER_FREE,
+                    weaponSystemType: WeaponSystemType.Hard,
                     hardAttack: CUConstants.BASE_AAA_HARD_ATTACK,
                     hardDefense: CUConstants.BASE_AAA_HARD_DEFENSE,
                     softAttack: CUConstants.BASE_AAA_SOFT_ATTACK,
@@ -4501,7 +4534,8 @@ namespace HammerAndSickle.Models
                     strategicMobility: StrategicMobility.Heavy,
                     nvgCapability: NVG_Rating.None,
                     silhouette: UnitSilhouette.Medium,
-                    movementPoints: CUConstants.MECH_UNIT);
+                    movementPoints: CUConstants.MECH_UNIT
+                    );
 
                 profile.AddUpgradeType(UpgradeType.SPAAA);
                 profile.SetShortName("Gepard");
@@ -4522,7 +4556,7 @@ namespace HammerAndSickle.Models
                     name: "Bo 105P PAH‑1 Attack Helicopter",
                     nationality: Nationality.FRG,
                     weaponSystemID: WeaponSystems.HEL_BO105,
-                    CUConstants.PRESTIGE_TIER_FREE,
+                    prestigeCost: CUConstants.PRESTIGE_TIER_FREE,
                     weaponSystemType: WeaponSystemType.Hard,
                     hardAttack: CUConstants.BASE_HEL_HARD_ATTACK,
                     hardDefense: CUConstants.BASE_HEL_HARD_DEFENSE,
@@ -4538,7 +4572,8 @@ namespace HammerAndSickle.Models
                     strategicMobility: StrategicMobility.Aviation,
                     nvgCapability: NVG_Rating.None,
                     silhouette: UnitSilhouette.Small,
-                    movementPoints: CUConstants.HELO_UNIT);
+                    movementPoints: CUConstants.HELO_UNIT
+                    );
 
                 profile.AddUpgradeType(UpgradeType.ATTHELO);
                 profile.SetShortName("Bo105");
@@ -4559,7 +4594,7 @@ namespace HammerAndSickle.Models
                     name: "Tornado IDS Multirole Fighter",
                     nationality: Nationality.FRG,
                     weaponSystemID: WeaponSystems.FGT_TORNADO_IDS,
-                    CUConstants.PRESTIGE_TIER_FREE,
+                    prestigeCost: CUConstants.PRESTIGE_TIER_FREE,
                     weaponSystemType: WeaponSystemType.Air,
                     dogfighting: CUConstants.MID_FGT_DOGFIGHT + MEDIUM_BONUS,
                     maneuverability: CUConstants.MID_FGT_MANEUVER,
@@ -4576,7 +4611,8 @@ namespace HammerAndSickle.Models
                     nbcRating: NBC_Rating.Gen1,
                     strategicMobility: StrategicMobility.Aircraft,
                     nvgCapability: NVG_Rating.None,
-                    silhouette: UnitSilhouette.Medium
+                    silhouette: UnitSilhouette.Medium,
+                    movementPoints: CUConstants.FIXEDWING_UNIT
                 );
 
                 // Set upgrade paths
@@ -4612,7 +4648,7 @@ namespace HammerAndSickle.Models
                     name: "Challenger 1 MBT",
                     nationality: Nationality.UK,
                     weaponSystemID: WeaponSystems.TANK_CHALLENGER1,
-                    CUConstants.PRESTIGE_TIER_FREE,
+                    prestigeCost: CUConstants.PRESTIGE_TIER_FREE,
                     weaponSystemType: WeaponSystemType.Hard,
                     hardAttack: CUConstants.GEN2_TANK_HARD_ATTACK + LARGE_BONUS,
                     hardDefense: CUConstants.GEN2_TANK_HARD_DEFENSE + XXLARGE_BONUS,
@@ -4628,7 +4664,8 @@ namespace HammerAndSickle.Models
                     strategicMobility: StrategicMobility.Heavy,
                     nvgCapability: NVG_Rating.Gen2,
                     silhouette: UnitSilhouette.Medium,
-                    movementPoints: CUConstants.MECH_UNIT);
+                    movementPoints: CUConstants.MECH_UNIT
+                    );
 
                 profile.AddUpgradeType(UpgradeType.AFV);
                 profile.SetShortName("Challenger 1");
@@ -4646,7 +4683,7 @@ namespace HammerAndSickle.Models
                     name: "Warrior IFV",
                     nationality: Nationality.UK,
                     weaponSystemID: WeaponSystems.IFV_WARRIOR,
-                    CUConstants.PRESTIGE_TIER_FREE,
+                    prestigeCost: CUConstants.PRESTIGE_TIER_FREE,
                     weaponSystemType: WeaponSystemType.Hard,
                     hardAttack: CUConstants.BASE_IFV_HARD_ATTACK + MEDIUM_BONUS,
                     hardDefense: CUConstants.BASE_IFV_HARD_DEFENSE,
@@ -4662,7 +4699,8 @@ namespace HammerAndSickle.Models
                     strategicMobility: StrategicMobility.AirLift,
                     nvgCapability: NVG_Rating.Gen2,
                     silhouette: UnitSilhouette.Small,
-                    movementPoints: CUConstants.MECH_UNIT);
+                    movementPoints: CUConstants.MECH_UNIT
+                    );
 
                 profile.AddUpgradeType(UpgradeType.IFV);
                 profile.SetShortName("Warrior");
@@ -4683,7 +4721,7 @@ namespace HammerAndSickle.Models
                     name: "FV 432",
                     nationality: Nationality.UK,
                     weaponSystemID: WeaponSystems.APC_FV432,
-                    CUConstants.PRESTIGE_TIER_FREE,
+                    prestigeCost: CUConstants.PRESTIGE_TIER_FREE,
                     weaponSystemType: WeaponSystemType.Hard,
                     hardAttack: CUConstants.BASE_APC_HARD_ATTACK,
                     hardDefense: CUConstants.BASE_APC_HARD_DEFENSE,
@@ -4698,7 +4736,8 @@ namespace HammerAndSickle.Models
                     nbcRating: NBC_Rating.Gen1,
                     strategicMobility: StrategicMobility.AirLift,
                     nvgCapability: NVG_Rating.Gen1,
-                    silhouette: UnitSilhouette.Small
+                    silhouette: UnitSilhouette.Small,
+                    movementPoints: CUConstants.MECH_UNIT
                 );
 
                 // Set upgrade paths
@@ -4731,7 +4770,7 @@ namespace HammerAndSickle.Models
                     name: "Scimitar Recon Vehicle",
                     nationality: Nationality.UK,
                     weaponSystemID: WeaponSystems.RCN_SCIMITAR,
-                   CUConstants.PRESTIGE_TIER_FREE,
+                    prestigeCost: CUConstants.PRESTIGE_TIER_FREE,
                     weaponSystemType: WeaponSystemType.Hard,
                     hardAttack: CUConstants.BASE_IFV_HARD_ATTACK + XLARGE_BONUS,
                     hardDefense: CUConstants.BASE_IFV_HARD_DEFENSE,
@@ -4746,7 +4785,8 @@ namespace HammerAndSickle.Models
                     nbcRating: NBC_Rating.Gen2,
                     strategicMobility: StrategicMobility.AirLift,
                     nvgCapability: NVG_Rating.Gen2,
-                    silhouette: UnitSilhouette.Small
+                    silhouette: UnitSilhouette.Small,
+                    movementPoints: CUConstants.MECH_UNIT
                 );
 
                 // Set upgrade paths
@@ -4779,8 +4819,8 @@ namespace HammerAndSickle.Models
                     name: "Rapier SAM System",
                     nationality: Nationality.UK,
                     weaponSystemID: WeaponSystems.SAM_RAPIER,
-                    CUConstants.PRESTIGE_TIER_FREE,
-                    WeaponSystemType.Soft,
+                    prestigeCost: CUConstants.PRESTIGE_TIER_FREE,
+                    weaponSystemType: WeaponSystemType.Soft,
                     hardAttack: CUConstants.BASE_SAM_HARD_ATTACK,
                     hardDefense: CUConstants.BASE_SAM_HARD_DEFENSE,
                     softAttack: CUConstants.BASE_SAM_SOFT_ATTACK,
@@ -4795,7 +4835,8 @@ namespace HammerAndSickle.Models
                     nbcRating: NBC_Rating.Gen1,
                     strategicMobility: StrategicMobility.Heavy,
                     nvgCapability: NVG_Rating.None,
-                    silhouette: UnitSilhouette.Large
+                    silhouette: UnitSilhouette.Large,
+                    movementPoints: CUConstants.STATIC_UNIT
                 );
 
                 // Set upgrade paths
@@ -4828,7 +4869,7 @@ namespace HammerAndSickle.Models
                     name: "Westland Lynx",
                     nationality: Nationality.UK,
                     weaponSystemID: WeaponSystems.HEL_LYNX,
-                    CUConstants.PRESTIGE_TIER_FREE,
+                    prestigeCost: CUConstants.PRESTIGE_TIER_FREE,
                     weaponSystemType: WeaponSystemType.Hard,
                     hardAttack: CUConstants.BASE_HEL_HARD_ATTACK,
                     hardDefense: CUConstants.BASE_HEL_HARD_DEFENSE,
@@ -4843,7 +4884,8 @@ namespace HammerAndSickle.Models
                     nbcRating: NBC_Rating.Gen2,
                     strategicMobility: StrategicMobility.Aviation,
                     nvgCapability: NVG_Rating.Gen2,
-                    silhouette: UnitSilhouette.Small
+                    silhouette: UnitSilhouette.Small,
+                    movementPoints: CUConstants.HELO_UNIT
                 );
 
                 // Set upgrade paths
@@ -4876,7 +4918,7 @@ namespace HammerAndSickle.Models
                     name: "Tornado GR.1 Multirole Fighter",
                     nationality: Nationality.UK,
                     weaponSystemID: WeaponSystems.FGT_TORNADO_GR1,
-                    CUConstants.PRESTIGE_TIER_FREE,
+                    prestigeCost: CUConstants.PRESTIGE_TIER_FREE,
                     weaponSystemType: WeaponSystemType.Air,
                     dogfighting: CUConstants.MID_FGT_DOGFIGHT + LARGE_BONUS,
                     maneuverability: CUConstants.MID_FGT_MANEUVER,
@@ -4893,7 +4935,8 @@ namespace HammerAndSickle.Models
                     nbcRating: NBC_Rating.Gen1,
                     strategicMobility: StrategicMobility.Aircraft,
                     nvgCapability: NVG_Rating.None,
-                    silhouette: UnitSilhouette.Medium
+                    silhouette: UnitSilhouette.Medium,
+                    movementPoints: CUConstants.FIXEDWING_UNIT
                 );
 
                 // Set upgrade paths
@@ -4932,7 +4975,7 @@ namespace HammerAndSickle.Models
                     name: "AMX‑30 MBT",
                     nationality: Nationality.FRA,
                     weaponSystemID: WeaponSystems.TANK_AMX30,
-                    CUConstants.PRESTIGE_TIER_FREE,
+                    prestigeCost: CUConstants.PRESTIGE_TIER_FREE,
                     weaponSystemType: WeaponSystemType.Hard,
                     hardAttack: CUConstants.GEN1_TANK_HARD_ATTACK + LARGE_BONUS,
                     hardDefense: CUConstants.GEN1_TANK_HARD_DEFENSE,
@@ -4948,7 +4991,8 @@ namespace HammerAndSickle.Models
                     strategicMobility: StrategicMobility.Heavy,
                     nvgCapability: NVG_Rating.None,
                     silhouette: UnitSilhouette.Medium,
-                    movementPoints: CUConstants.MECH_UNIT);
+                    movementPoints: CUConstants.MECH_UNIT
+                    );
 
                 profile.AddUpgradeType(UpgradeType.AFV);
                 profile.SetShortName("AMX‑30");
@@ -4969,8 +5013,8 @@ namespace HammerAndSickle.Models
                     name: "Roland SAM",
                     nationality: Nationality.FRA,
                     weaponSystemID: WeaponSystems.SPSAM_ROLAND,
-                    CUConstants.PRESTIGE_TIER_FREE,
-                    WeaponSystemType.Soft,
+                    prestigeCost: CUConstants.PRESTIGE_TIER_FREE,
+                    weaponSystemType: WeaponSystemType.Soft,
                     hardAttack: CUConstants.BASE_SAM_HARD_ATTACK,
                     hardDefense: CUConstants.BASE_SAM_HARD_DEFENSE,
                     softAttack: CUConstants.BASE_SAM_SOFT_ATTACK,
@@ -4986,7 +5030,8 @@ namespace HammerAndSickle.Models
                     strategicMobility: StrategicMobility.Heavy,
                     nvgCapability: NVG_Rating.None,
                     silhouette: UnitSilhouette.Medium,
-                    movementPoints: CUConstants.MECH_UNIT);
+                    movementPoints: CUConstants.MECH_UNIT
+                    );
 
                 profile.AddUpgradeType(UpgradeType.SPSAM);
                 profile.SetShortName("Roland");
@@ -5007,7 +5052,7 @@ namespace HammerAndSickle.Models
                     name: "AMX-10P",
                     nationality: Nationality.FRA,
                     weaponSystemID: WeaponSystems.IFV_AMX10P,
-                    CUConstants.PRESTIGE_TIER_FREE,
+                    prestigeCost: CUConstants.PRESTIGE_TIER_FREE,
                     weaponSystemType: WeaponSystemType.Hard,
                     hardAttack: CUConstants.BASE_IFV_HARD_ATTACK + LARGE_BONUS,
                     hardDefense: CUConstants.BASE_IFV_HARD_DEFENSE,
@@ -5023,7 +5068,8 @@ namespace HammerAndSickle.Models
                     strategicMobility: StrategicMobility.AirLift,
                     nvgCapability: NVG_Rating.Gen1,
                     silhouette: UnitSilhouette.Small,
-                    movementPoints: CUConstants.MECH_UNIT);
+                    movementPoints: CUConstants.MECH_UNIT
+                    );
 
                 profile.AddUpgradeType(UpgradeType.IFV);
                 profile.SetShortName("AMX-10P");
@@ -5044,7 +5090,7 @@ namespace HammerAndSickle.Models
                     name: "VAB APC",
                     nationality: Nationality.FRA,
                     weaponSystemID: WeaponSystems.APC_VAB,
-                    CUConstants.PRESTIGE_TIER_FREE,
+                    prestigeCost: CUConstants.PRESTIGE_TIER_FREE,
                     weaponSystemType: WeaponSystemType.Hard,
                     hardAttack: CUConstants.BASE_APC_HARD_ATTACK,
                     hardDefense: CUConstants.BASE_APC_HARD_DEFENSE,
@@ -5059,7 +5105,8 @@ namespace HammerAndSickle.Models
                     nbcRating: NBC_Rating.Gen1,
                     strategicMobility: StrategicMobility.AirLift,
                     nvgCapability: NVG_Rating.Gen1,
-                    silhouette: UnitSilhouette.Small
+                    silhouette: UnitSilhouette.Small,
+                    movementPoints: CUConstants.MECH_UNIT
                 );
 
                 // Set upgrade paths
@@ -5092,7 +5139,7 @@ namespace HammerAndSickle.Models
                     name: "ERC-90 Recon Vehicle",
                     nationality: Nationality.FRA,
                     weaponSystemID: WeaponSystems.RCN_ERC90,
-                    CUConstants.PRESTIGE_TIER_FREE,
+                    prestigeCost: CUConstants.PRESTIGE_TIER_FREE,
                     weaponSystemType: WeaponSystemType.Hard,
                     hardAttack: CUConstants.BASE_IFV_HARD_ATTACK,
                     hardDefense: CUConstants.BASE_IFV_HARD_DEFENSE,
@@ -5144,7 +5191,7 @@ namespace HammerAndSickle.Models
                     name: "AMX-30 AuF1 Self-Propelled Artillery",
                     nationality: Nationality.FRA,
                     weaponSystemID: WeaponSystems.SPA_AUF1,
-                    CUConstants.PRESTIGE_TIER_FREE,
+                    prestigeCost: CUConstants.PRESTIGE_TIER_FREE,
                     weaponSystemType: WeaponSystemType.Hard,
                     hardAttack: CUConstants.BASE_ARTY_HARD_ATTACK,
                     hardDefense: CUConstants.BASE_ARTY_HARD_DEFENSE + MEDIUM_BONUS,
@@ -5159,7 +5206,8 @@ namespace HammerAndSickle.Models
                     nbcRating: NBC_Rating.Gen2,
                     strategicMobility: StrategicMobility.Heavy,
                     nvgCapability: NVG_Rating.Gen2,
-                    silhouette: UnitSilhouette.Large
+                    silhouette: UnitSilhouette.Large,
+                    movementPoints: CUConstants.MECH_UNIT
                 );
 
                 // Set upgrade paths
@@ -5192,7 +5240,7 @@ namespace HammerAndSickle.Models
                     name: "Mirage 2000 Air Superiority Fighter",
                     nationality: Nationality.FRA,
                     weaponSystemID: WeaponSystems.FGT_MIRAGE2000,
-                    CUConstants.PRESTIGE_TIER_FREE,
+                    prestigeCost: CUConstants.PRESTIGE_TIER_FREE,
                     weaponSystemType: WeaponSystemType.Air,
                     dogfighting: CUConstants.MID_FGT_DOGFIGHT + XLARGE_BONUS,
                     maneuverability: CUConstants.MID_FGT_MANEUVER + XLARGE_BONUS,
@@ -5209,7 +5257,8 @@ namespace HammerAndSickle.Models
                     nbcRating: NBC_Rating.Gen2,
                     strategicMobility: StrategicMobility.Aircraft,
                     nvgCapability: NVG_Rating.None,
-                    silhouette: UnitSilhouette.Medium
+                    silhouette: UnitSilhouette.Medium,
+                    movementPoints: CUConstants.FIXEDWING_UNIT
                 );
 
                 // Set upgrade paths
@@ -5222,7 +5271,7 @@ namespace HammerAndSickle.Models
                 profile.SetTurnAvailable(456);
 
                 // Store in master dictionary
-                _weaponSystemProfiles[WeaponSystems.FGT_F15] = profile;
+                _weaponSystemProfiles[WeaponSystems.FGT_MIRAGE2000] = profile;
             }
             catch (Exception e)
             {
@@ -5242,7 +5291,7 @@ namespace HammerAndSickle.Models
                     name: "SEPECAT Jaguar Attack Aircraft",
                     nationality: Nationality.FRA,
                     weaponSystemID: WeaponSystems.ATT_JAGUAR,
-                    CUConstants.PRESTIGE_TIER_FREE,
+                    prestigeCost: CUConstants.PRESTIGE_TIER_FREE,
                     weaponSystemType: WeaponSystemType.Air,
                     dogfighting: CUConstants.EARLY_FGT_DOGFIGHT,
                     maneuverability: CUConstants.EARLY_FGT_MANEUVER,
@@ -5259,7 +5308,8 @@ namespace HammerAndSickle.Models
                     nbcRating: NBC_Rating.Gen2,
                     strategicMobility: StrategicMobility.Aircraft,
                     nvgCapability: NVG_Rating.None,
-                    silhouette: UnitSilhouette.Medium
+                    silhouette: UnitSilhouette.Medium,
+                    movementPoints: CUConstants.FIXEDWING_UNIT
                 );
 
                 // Set upgrade paths
@@ -5298,8 +5348,8 @@ namespace HammerAndSickle.Models
                     name: "Anti-Aircraft Artillery",
                     nationality: Nationality.GENERIC,
                     weaponSystemID: WeaponSystems.GENERIC_AAA,
-                    CUConstants.PRESTIGE_TIER_0,
-                    WeaponSystemType.Soft,
+                    prestigeCost: CUConstants.PRESTIGE_TIER_0,
+                    weaponSystemType: WeaponSystemType.Soft,
                     hardAttack: CUConstants.BASE_AAA_HARD_ATTACK,
                     hardDefense: CUConstants.BASE_AAA_HARD_DEFENSE,
                     softAttack: CUConstants.BASE_AAA_SOFT_ATTACK,
@@ -5348,8 +5398,8 @@ namespace HammerAndSickle.Models
                     name: "Man-Portable Air Defense",
                     nationality: Nationality.GENERIC,
                     weaponSystemID: WeaponSystems.GENERIC_MANPAD,
-                    CUConstants.PRESTIGE_TIER_0,
-                    WeaponSystemType.Soft,
+                    prestigeCost: CUConstants.PRESTIGE_TIER_0,
+                    weaponSystemType: WeaponSystemType.Soft,
                     hardAttack: CUConstants.BASE_INF_HARD_ATTACK,
                     hardDefense: CUConstants.BASE_INF_HARD_DEFENSE,
                     softAttack: CUConstants.BASE_INF_SOFT_ATTACK,
@@ -5397,7 +5447,7 @@ namespace HammerAndSickle.Models
                     name: "Light Towed Artillery",
                     nationality: Nationality.GENERIC,
                     weaponSystemID: WeaponSystems.GENERIC_ART_LIGHT,
-                    CUConstants.PRESTIGE_TIER_0,
+                    prestigeCost: CUConstants.PRESTIGE_TIER_0,
                     weaponSystemType: WeaponSystemType.Soft,
                     hardAttack: CUConstants.BASE_ARTY_HARD_ATTACK,
                     hardDefense: CUConstants.BASE_ARTY_HARD_DEFENSE,
@@ -5446,7 +5496,7 @@ namespace HammerAndSickle.Models
                     name: "Heavy Towed Artillery",
                     nationality: Nationality.GENERIC,
                     weaponSystemID: WeaponSystems.GENERIC_ART_HEAVY,
-                    CUConstants.PRESTIGE_TIER_0 + MASSIVE_BONUS,
+                    prestigeCost: CUConstants.PRESTIGE_TIER_0 + MASSIVE_BONUS,
                     weaponSystemType: WeaponSystemType.Soft,
                     hardAttack: CUConstants.BASE_ARTY_HARD_ATTACK,
                     hardDefense: CUConstants.BASE_ARTY_HARD_DEFENSE,
@@ -5495,8 +5545,8 @@ namespace HammerAndSickle.Models
                     name: "Anti-Tank Guided Missile",
                     nationality: Nationality.GENERIC,
                     weaponSystemID: WeaponSystems.GENERIC_ATGM,
-                    CUConstants.PRESTIGE_TIER_0,
-                    WeaponSystemType.Soft,
+                    prestigeCost: CUConstants.PRESTIGE_TIER_0,
+                    weaponSystemType: WeaponSystemType.Soft,
                     hardAttack: CUConstants.BASE_INF_HARD_ATTACK + XXLARGE_BONUS,
                     hardDefense: CUConstants.BASE_INF_HARD_DEFENSE,
                     softAttack: CUConstants.BASE_INF_SOFT_ATTACK,
@@ -5544,7 +5594,7 @@ namespace HammerAndSickle.Models
                     name: "82mm Light Mortar",
                     nationality: Nationality.GENERIC,
                     weaponSystemID: WeaponSystems.GENERIC_MORTAR_82MM,
-                    CUConstants.PRESTIGE_TIER_0 + MASSIVE_MALUS,
+                    prestigeCost: CUConstants.PRESTIGE_TIER_0 + MASSIVE_MALUS,
                     weaponSystemType: WeaponSystemType.Soft,
                     hardAttack: CUConstants.BASE_ARTY_HARD_ATTACK + MEDIUM_MALUS,
                     hardDefense: CUConstants.BASE_ARTY_HARD_DEFENSE,
@@ -5593,7 +5643,7 @@ namespace HammerAndSickle.Models
                     name: "120mm Heavy Mortar",
                     nationality: Nationality.GENERIC,
                     weaponSystemID: WeaponSystems.GENERIC_MORTAR_120MM,
-                    CUConstants.PRESTIGE_TIER_0 + LARGE_MALUS,
+                    prestigeCost: CUConstants.PRESTIGE_TIER_0 + LARGE_MALUS,
                     weaponSystemType: WeaponSystemType.Soft,
                     hardAttack: CUConstants.BASE_ARTY_HARD_ATTACK + SMALL_MALUS,
                     hardDefense: CUConstants.BASE_ARTY_HARD_DEFENSE,
@@ -5642,8 +5692,8 @@ namespace HammerAndSickle.Models
                     name: "RPG-7",
                     nationality: Nationality.GENERIC,
                     weaponSystemID: WeaponSystems.GENERIC_RPG7,
-                    CUConstants.PRESTIGE_TIER_0 + MASSIVE_MALUS,
-                    WeaponSystemType.Soft,
+                    prestigeCost: CUConstants.PRESTIGE_TIER_0 + MASSIVE_MALUS,
+                    weaponSystemType: WeaponSystemType.Soft,
                     hardAttack: CUConstants.BASE_INF_HARD_ATTACK + LARGE_BONUS,
                     hardDefense: CUConstants.BASE_INF_HARD_DEFENSE + MEDIUM_MALUS,
                     softAttack: CUConstants.BASE_INF_SOFT_ATTACK + MEDIUM_MALUS,
@@ -5691,8 +5741,8 @@ namespace HammerAndSickle.Models
                     name: "Recoilless Rifle",
                     nationality: Nationality.GENERIC,
                     weaponSystemID: WeaponSystems.GENERIC_RECOILLESS_RIFLE,
-                    CUConstants.PRESTIGE_TIER_0 + MASSIVE_MALUS,
-                    WeaponSystemType.Soft,
+                    prestigeCost: CUConstants.PRESTIGE_TIER_0 + MASSIVE_MALUS,
+                    weaponSystemType: WeaponSystemType.Soft,
                     hardAttack: CUConstants.BASE_INF_HARD_ATTACK + LARGE_BONUS,
                     hardDefense: CUConstants.BASE_INF_HARD_DEFENSE + MEDIUM_MALUS,
                     softAttack: CUConstants.BASE_INF_SOFT_ATTACK + MEDIUM_MALUS,
@@ -5740,8 +5790,8 @@ namespace HammerAndSickle.Models
                     name: "Mounted Cavalry Unit",
                     nationality: Nationality.GENERIC,
                     weaponSystemID: WeaponSystems.GENERIC_CAVALRY,
-                    CUConstants.PRESTIGE_TIER_0,
-                    WeaponSystemType.Soft,
+                    prestigeCost: CUConstants.PRESTIGE_TIER_0,
+                    weaponSystemType: WeaponSystemType.Soft,
                     hardAttack: CUConstants.BASE_INF_HARD_ATTACK,
                     hardDefense: CUConstants.BASE_INF_HARD_DEFENSE,
                     softAttack: CUConstants.BASE_INF_SOFT_ATTACK,
@@ -5789,7 +5839,7 @@ namespace HammerAndSickle.Models
                     name: "Truck",
                     nationality: Nationality.GENERIC,
                     weaponSystemID: WeaponSystems.GENERIC_TRUCK,
-                    CUConstants.PRESTIGE_TIER_0,
+                    prestigeCost: CUConstants.PRESTIGE_TIER_0,
                     weaponSystemType: WeaponSystemType.Soft,
                     hardAttack: CUConstants.TRUCK_HARD_ATTACK,
                     hardDefense: CUConstants.TRUCK_HARD_DEFENSE,
@@ -5844,7 +5894,7 @@ namespace HammerAndSickle.Models
                     name: "HQ LandBase",
                     nationality: Nationality.GENERIC,
                     weaponSystemID: WeaponSystems.GENERIC_LANDBASE,
-                    CUConstants.PRESTIGE_TIER_2,
+                    prestigeCost: CUConstants.PRESTIGE_TIER_2,
                     weaponSystemType: WeaponSystemType.Hard,
                     hardAttack: CUConstants.BASE_HARD_ATTACK,
                     hardDefense: CUConstants.BASE_HARD_DEFENSE,
@@ -5893,7 +5943,7 @@ namespace HammerAndSickle.Models
                     name: "Airbase",
                     nationality: Nationality.GENERIC,
                     weaponSystemID: WeaponSystems.GENERIC_AIRBASE,
-                    CUConstants.PRESTIGE_TIER_4,
+                    prestigeCost: CUConstants.PRESTIGE_TIER_4,
                     weaponSystemType: WeaponSystemType.Hard,
                     hardAttack: CUConstants.BASE_HARD_ATTACK,
                     hardDefense: CUConstants.BASE_HARD_DEFENSE,
@@ -5942,7 +5992,7 @@ namespace HammerAndSickle.Models
                     name: "Suppy Depot",
                     nationality: Nationality.GENERIC,
                     weaponSystemID: WeaponSystems.GENERIC_SUPPLYDEPOT,
-                    CUConstants.PRESTIGE_TIER_3,
+                    prestigeCost: CUConstants.PRESTIGE_TIER_3,
                     weaponSystemType: WeaponSystemType.Hard,
                     hardAttack: CUConstants.BASE_HARD_ATTACK,
                     hardDefense: CUConstants.BASE_HARD_DEFENSE,
@@ -5991,7 +6041,7 @@ namespace HammerAndSickle.Models
                     name: "Intelligence Gathering Base",
                     nationality: Nationality.GENERIC,
                     weaponSystemID: WeaponSystems.GENERIC_LANDBASE,
-                    CUConstants.PRESTIGE_TIER_3,
+                    prestigeCost: CUConstants.PRESTIGE_TIER_3,
                     weaponSystemType: WeaponSystemType.Hard,
                     hardAttack: CUConstants.BASE_HARD_ATTACK,
                     hardDefense: CUConstants.BASE_HARD_DEFENSE,
@@ -6046,7 +6096,7 @@ namespace HammerAndSickle.Models
                     name: "Regular Infantry",
                     nationality: Nationality.GENERIC,
                     weaponSystemID: WeaponSystems.INF_REG,
-                    CUConstants.PRESTIGE_TIER_0,
+                    prestigeCost: CUConstants.PRESTIGE_TIER_0,
                     weaponSystemType: WeaponSystemType.Soft,
                     hardAttack: CUConstants.BASE_INF_HARD_ATTACK,
                     hardDefense: CUConstants.BASE_INF_HARD_DEFENSE,
@@ -6095,7 +6145,7 @@ namespace HammerAndSickle.Models
                     name: "Airborne Infantry",
                     nationality: Nationality.GENERIC,
                     weaponSystemID: WeaponSystems.INF_AB,
-                    CUConstants.PRESTIGE_TIER_0 + MASSIVE_BONUS,
+                    prestigeCost: CUConstants.PRESTIGE_TIER_0 + MASSIVE_BONUS,
                     weaponSystemType: WeaponSystemType.Soft,
                     hardAttack: CUConstants.BASE_INF_HARD_ATTACK,
                     hardDefense: CUConstants.BASE_INF_HARD_DEFENSE,
@@ -6144,7 +6194,7 @@ namespace HammerAndSickle.Models
                     name: "Air‑Mobile Infantry",
                     nationality: Nationality.GENERIC,
                     weaponSystemID: WeaponSystems.INF_AM,
-                    CUConstants.PRESTIGE_TIER_1,
+                    prestigeCost: CUConstants.PRESTIGE_TIER_1,
                     weaponSystemType: WeaponSystemType.Soft,
                     hardAttack: CUConstants.BASE_INF_HARD_ATTACK,
                     hardDefense: CUConstants.BASE_INF_HARD_DEFENSE,
@@ -6193,7 +6243,7 @@ namespace HammerAndSickle.Models
                     name: "Marine Infantry",
                     nationality: Nationality.GENERIC,
                     weaponSystemID: WeaponSystems.INF_MAR,
-                    CUConstants.PRESTIGE_TIER_1,
+                    prestigeCost: CUConstants.PRESTIGE_TIER_1,
                     weaponSystemType: WeaponSystemType.Soft,
                     hardAttack: CUConstants.BASE_INF_HARD_ATTACK,
                     hardDefense: CUConstants.BASE_INF_HARD_DEFENSE,
@@ -6242,7 +6292,7 @@ namespace HammerAndSickle.Models
                     name: "Special Forces Infantry",
                     nationality: Nationality.GENERIC,
                     weaponSystemID: WeaponSystems.INF_SPEC,
-                    CUConstants.PRESTIGE_TIER_0,
+                    prestigeCost: CUConstants.PRESTIGE_TIER_0,
                     weaponSystemType: WeaponSystemType.Soft,
                     hardAttack: CUConstants.BASE_INF_HARD_ATTACK + MEDIUM_BONUS,
                     hardDefense: CUConstants.BASE_INF_HARD_DEFENSE,
@@ -6291,7 +6341,7 @@ namespace HammerAndSickle.Models
                     name: "Combat Engineers",
                     nationality: Nationality.GENERIC,
                     weaponSystemID: WeaponSystems.INF_ENG,
-                    CUConstants.PRESTIGE_TIER_0,
+                    prestigeCost: CUConstants.PRESTIGE_TIER_0,
                     weaponSystemType: WeaponSystemType.Soft,
                     hardAttack: CUConstants.BASE_INF_HARD_ATTACK,
                     hardDefense: CUConstants.BASE_INF_HARD_DEFENSE,
