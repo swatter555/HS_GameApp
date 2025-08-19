@@ -18,12 +18,14 @@
         public int MANPADs { get; set; } = 0;
         public int ATGMs { get; set; } = 0;
         public int HEL { get; set; } = 0;
-        public int ASFs { get; set; } = 0;
-        public int MRFs { get; set; } = 0;
+        public int TRANHEL { get; set; } = 0;
+        public int FGTs { get; set; } = 0;
         public int ATTs { get; set; } = 0;
         public int BMBs { get; set; } = 0;
         public int AWACS { get; set; } = 0;
+        public int TRANAIR { get; set; } = 0;
         public int RCNAs { get; set; } = 0;
+        public int TRANNAV { get; set; } = 0;
 
         // More intel about parent unit.
         public Nationality UnitNationality = Nationality.USSR;

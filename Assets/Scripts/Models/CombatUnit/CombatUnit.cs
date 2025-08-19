@@ -759,8 +759,7 @@ namespace HammerAndSickle.Models
                     opportunityActions += 1;
                     break;
 
-                case UnitClassification.ASF:
-                case UnitClassification.MRF:
+                case UnitClassification.FGT:
                 case UnitClassification.ATT:
                 case UnitClassification.BMB:
                 case UnitClassification.RECONA:

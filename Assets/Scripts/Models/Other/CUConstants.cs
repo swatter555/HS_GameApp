@@ -88,21 +88,20 @@ namespace HammerAndSickle.Models
         // WeaponSystem constants.
         public const int MAX_COMBAT_VALUE = 25;
         public const int MIN_COMBAT_VALUE = 1;
-        public const float MAX_RANGE = 100.0f;
-        public const float MIN_RANGE = 0.0f;
+        public const float MAX_RANGE      = 100.0f;
+        public const float MIN_RANGE      = 0.0f;
 
         // Movement constants for WeaponSystems,in movement points.
-        public const int MECH_UNIT = 10;
-        public const int MOT_UNIT = 8;
-        public const int FOOT_UNIT = 4;
-        public const int CAVALRY_UNIT = 10;
+        public const int STATIC_UNIT    =   0;
+        public const int FOOT_UNIT      =   4;
+        public const int MOT_UNIT       =   8;
+        public const int MECH_UNIT      =  10;
+        public const int CAVALRY_UNIT   =  10;
+        public const int NAVAL_UNIT     =  10;
+        public const int HELO_UNIT      =  24;
         public const int FIXEDWING_UNIT = 100;
-        public const int HELO_UNIT = 24;
-        public const int STATIC_UNIT = 0;
-        public const int NAVAL_UNIT = 8;
-
-        // Ground defense against air attack.
         
+        // Ground defense against air attack.
         public const int GROUND_DEFENSE_LIGHTARMOR =  5;  // Base ground defense for APCs units
         public const int GROUND_DEFENSE_INFANTRY   =  6;  // Base ground defense for Infantry units
         public const int GROUND_DEFENSE_ARMOR      =  8;  // Base ground defense for tank units
@@ -115,9 +114,9 @@ namespace HammerAndSickle.Models
         public const float BASE_UNIT_SPOTTING_RANGE  = 2;
         public const float RECON_UNIT_SPOTTING_RANGE = 3;
         public const float BASE_AAA_SPOTTING_RANGE   = 3;
+        public const float FACILITY_SPOTTING_RANGE   = 4;
         public const float BASE_SAM_SPOTTING_RANGE   = 6;
         public const float INTEL_UNIT_SPOTTING_RANGE = 6;
-        public const float AIR_UNIT_SPOTTING_RANGE   = 8;
 
         // Standard primary range values.
         public const float PRIMARY_RANGE_DEFAULT = 1;
@@ -199,6 +198,80 @@ namespace HammerAndSickle.Models
         public const int BASE_HEL_HARD_DEFENSE = 6;
         public const int BASE_HEL_SOFT_ATTACK = 10;
         public const int BASE_HEL_SOFT_DEFENSE = 7;
+
+        // Standard fixed wing values, early generation
+        public const int EARLY_FGT_DOGFIGHT  =  8;
+        public const int EARLY_FGT_MANEUVER  =  9;
+        public const int EARLY_FGT_TOPSPEED  = 10;
+        public const int EARLY_FGT_SURVIVE   =  6;
+
+        // Standard fixed wing values, mid generation
+        public const int MID_FGT_DOGFIGHT =  10;
+        public const int MID_FGT_MANEUVER =  11;
+        public const int MID_FGT_TOPSPEED =  10;
+        public const int MID_FGT_SURVIVE  =   7;
+
+        // Standard fixed wing values, late generation
+        public const int LATE_FGT_DOGFIGHT =  12;
+        public const int LATE_FGT_MANEUVER =  12;
+        public const int LATE_FGT_TOPSPEED =  10;
+        public const int LATE_FGT_SURVIVE  =   9;
+
+        // Ordinance Loads
+        public const int SMALL_AC_LOAD    =  6;  // Small air-to-ground load
+        public const int MEDIUM_AC_LOAD   =  9;  // Medium air-to-ground load
+        public const int LARGE_AC_LOAD    = 12;  // Large air-to-ground load
+        public const int XLARGE_AC_LOAD   = 16;  // Extra large air-to-ground load
+
+        // Spotting in the AC context express ability for long range engagements
+        public const int AC_SPOTTING_BASIC    = 1;
+        public const int AC_SPOTTING_ENHANCED = 2;
+        public const int AC_SPOTTING_ADVANCED = 3;
+        public const int AC_SPOTTING_SUPERIOR = 4;
+
+        // Air unit prestige costs
+        public const int PRESTIGE_TIER_FREE  =   1;
+        public const int PRESTIGE_TIER_0     =  25;
+        public const int PRESTIGE_TIER_1     =  50;
+        public const int PRESTIGE_TIER_2     =  75;
+        public const int PRESTIGE_TIER_3     = 100;
+        public const int PRESTIGE_TIER_4     = 125;
+        public const int PRESTIGE_TIER_5     = 150;
+
+        // Standard attack aircraft values
+        public const int AC_ATTACK_DOGFIGHT   = 4;
+        public const int AC_ATTACK_MANEUVER   = 4;
+        public const int AC_ATTACK_TOPSPEED   = 7;
+        public const int AC_ATTACK_SURVIVE    = 10;
+
+        // Standard bomber values
+        public const int AC_BOMBER_DOGFIGHT   = 1;
+        public const int AC_BOMBER_MANEUVER   = 3;
+        public const int AC_BOMBER_TOPSPEED   = 10;
+        public const int AC_BOMBER_SURVIVE    = 8;
+
+        // High mach aircraft speeds
+        public const int AC_HIGHSPEED_RUSSIAN =  17;
+        public const int AC_HIGHSPEED_WESTERN =  21;
+
+        // Standard fixed wing values, attack aircraft
+        public const int GROUND_ATTACK_NA      =  0;
+        public const int GROUND_ATTACK_TIER_0  =  6;
+        public const int GROUND_ATTACK_TIER_1  =  9;
+        public const int GROUND_ATTACK_TIER_2  = 12;
+        public const int GROUND_ATTACK_TIER_3  = 15;
+
+        // Standard values for truck transport units
+        public const int TRUCK_HARD_ATTACK  = 3;
+        public const int TRUCK_HARD_DEFENSE = 3;
+        public const int TRUCK_SOFT_ATTACK  = 3;
+        public const int TRUCK_SOFT_DEFENSE = 3;
+
+        // Standard values for facilities
+        public const int BASE_HARD_ATTACK  = 4;
+        public const int BASE_HARD_DEFENSE = 6;
+        public const int BASE_SOFT_ATTACK  = 6;
+        public const int BASE_SOFT_DEFENSE = 7;
 
         #endregion
 
