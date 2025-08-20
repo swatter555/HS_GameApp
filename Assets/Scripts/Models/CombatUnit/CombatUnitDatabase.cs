@@ -214,6 +214,9 @@ namespace HammerAndSickle.Models
         {
             try
             {
+                // Soviet units
+                CreateSovietMotorRifleRegiments();
+                CreateSovietTankRegiments();
 
             }
             catch (Exception e)
@@ -236,6 +239,150 @@ namespace HammerAndSickle.Models
         public static void CreateSovietMotorRifleRegiments()
         {
 
+            #region BTR70 MRR
+
+            var btr70Regiment = new CombatUnit(
+                unitName: "Motor Rifle Regiment (BTR-70)",
+                classification: UnitClassification.MECH,
+                role: UnitRole.GroundCombat,
+                side: Side.Player,
+                nationality: Nationality.USSR,
+                intelProfileType: IntelProfileTypes.SV_MRR_BTR70,
+                deployedProfileID: WeaponSystems.INF_REG,
+                isMountable: true,
+                mobileProfileID: WeaponSystems.APC_BTR70,
+                isEmbarkable: false,
+                embarkProfileID: WeaponSystems.DEFAULT,
+                category: DepotCategory.Secondary,
+                size: DepotSize.Small
+            );
+
+            // Set experience level
+            btr70Regiment.SetExperienceLevel(ExperienceLevel.Trained);
+
+            // Set the ICM
+            btr70Regiment.SetICM(CUConstants.ICM_DEFAULT);
+
+            // Add the template to the database
+            AddTemplate("USSR_MRR_BTR70", btr70Regiment);
+
+            #endregion //BTR70 MRR
+
+            #region BTR80 MRR
+
+            var btr80Regiment = new CombatUnit(
+                unitName: "Motor Rifle Regiment (BTR-80)",
+                classification: UnitClassification.MOT,
+                role: UnitRole.GroundCombat,
+                side: Side.Player,
+                nationality: Nationality.USSR,
+                intelProfileType: IntelProfileTypes.SV_MRR_BTR80,
+                deployedProfileID: WeaponSystems.INF_REG,
+                isMountable: true,
+                mobileProfileID: WeaponSystems.APC_BTR80,
+                isEmbarkable: false,
+                embarkProfileID: WeaponSystems.DEFAULT,
+                category: DepotCategory.Secondary,
+                size: DepotSize.Small
+            );
+
+            // Set experience level
+            btr80Regiment.SetExperienceLevel(ExperienceLevel.Trained);
+
+            // Set the ICM
+            btr80Regiment.SetICM(CUConstants.ICM_DEFAULT);
+
+            // Add the template to the database
+            AddTemplate("USSR_MRR_BTR80", btr80Regiment);
+
+            #endregion //BTR80 MRR
+
+            #region BMP1 MRR
+
+            var bmp1Regiment = new CombatUnit(
+                unitName: "Motor Rifle Regiment (BMP-1)",
+                classification: UnitClassification.MECH,
+                role: UnitRole.GroundCombat,
+                side: Side.Player,
+                nationality: Nationality.USSR,
+                intelProfileType: IntelProfileTypes.SV_MRR_BMP1,
+                deployedProfileID: WeaponSystems.INF_REG,
+                isMountable: true,
+                mobileProfileID: WeaponSystems.IFV_BMP1,
+                isEmbarkable: false,
+                embarkProfileID: WeaponSystems.DEFAULT,
+                category: DepotCategory.Secondary,
+                size: DepotSize.Small
+            );
+
+            // Set experience level
+            bmp1Regiment.SetExperienceLevel(ExperienceLevel.Trained);
+
+            // Set the ICM
+            bmp1Regiment.SetICM(CUConstants.ICM_DEFAULT);
+
+            // Add the template to the database
+            AddTemplate("USSR_MRR_BMP1", bmp1Regiment);
+
+            #endregion //BMP1 MRR
+
+            #region BMP2 MRR
+
+            var bmp2Regiment = new CombatUnit(
+                unitName: "Motor Rifle Regiment (BMP-2)",
+                classification: UnitClassification.MECH,
+                role: UnitRole.GroundCombat,
+                side: Side.Player,
+                nationality: Nationality.USSR,
+                intelProfileType: IntelProfileTypes.SV_MRR_BMP2,
+                deployedProfileID: WeaponSystems.INF_REG,
+                isMountable: true,
+                mobileProfileID: WeaponSystems.IFV_BMP2,
+                isEmbarkable: false,
+                embarkProfileID: WeaponSystems.DEFAULT,
+                category: DepotCategory.Secondary,
+                size: DepotSize.Small
+            );
+
+            // Set experience level
+            bmp2Regiment.SetExperienceLevel(ExperienceLevel.Trained);
+
+            // Set the ICM
+            bmp2Regiment.SetICM(CUConstants.ICM_DEFAULT);
+
+            // Add the template to the database
+            AddTemplate("USSR_MRR_BMP2", bmp2Regiment);
+
+            #endregion //BMP2 MRR
+
+            #region BMP3 MRR
+
+            var bmp3Regiment = new CombatUnit(
+                unitName: "Motor Rifle Regiment (BMP-3)",
+                classification: UnitClassification.MECH,
+                role: UnitRole.GroundCombat,
+                side: Side.Player,
+                nationality: Nationality.USSR,
+                intelProfileType: IntelProfileTypes.SV_MRR_BMP3,
+                deployedProfileID: WeaponSystems.INF_REG,
+                isMountable: true,
+                mobileProfileID: WeaponSystems.IFV_BMP3,
+                isEmbarkable: false,
+                embarkProfileID: WeaponSystems.DEFAULT,
+                category: DepotCategory.Secondary,
+                size: DepotSize.Small
+            );
+
+            // Set experience level
+            bmp3Regiment.SetExperienceLevel(ExperienceLevel.Trained);
+
+            // Set the ICM
+            bmp3Regiment.SetICM(CUConstants.ICM_DEFAULT);
+
+            // Add the template to the database
+            AddTemplate("USSR_MRR_BMP3", bmp3Regiment);
+
+            #endregion //BMP3 MRR
         }
 
         #endregion
@@ -250,7 +397,237 @@ namespace HammerAndSickle.Models
         /// implementation details within the method body.</remarks>
         public static void CreateSovietTankRegiments()
         {
+            #region T55 Tank Regiment
 
+            var t55Regiment = new CombatUnit(
+                unitName: "Tank Regiment (T-55A)",
+                classification: UnitClassification.TANK,
+                role: UnitRole.GroundCombat,
+                side: Side.Player,
+                nationality: Nationality.USSR,
+                intelProfileType: IntelProfileTypes.SV_TR_T55,
+                deployedProfileID: WeaponSystems.TANK_T55A,
+                isMountable: false,
+                mobileProfileID: WeaponSystems.DEFAULT,
+                isEmbarkable: false,
+                embarkProfileID: WeaponSystems.DEFAULT,
+                category: DepotCategory.Secondary,
+                size: DepotSize.Small
+            );
+
+            // Set experience level
+            t55Regiment.SetExperienceLevel(ExperienceLevel.Trained);
+
+            // Set the ICM
+            t55Regiment.SetICM(CUConstants.ICM_DEFAULT);
+
+            // Add the template to the database
+            AddTemplate("USSR_TR_T55", t55Regiment);
+
+            #endregion //T55 Tank Regiment
+
+            #region T64A Tank Regiment
+
+            var t64aRegiment = new CombatUnit(
+                unitName: "Tank Regiment (T-64A)",
+                classification: UnitClassification.TANK,
+                role: UnitRole.GroundCombat,
+                side: Side.Player,
+                nationality: Nationality.USSR,
+                intelProfileType: IntelProfileTypes.SV_TR_T64A,
+                deployedProfileID: WeaponSystems.TANK_T64A,
+                isMountable: false,
+                mobileProfileID: WeaponSystems.DEFAULT,
+                isEmbarkable: false,
+                embarkProfileID: WeaponSystems.DEFAULT,
+                category: DepotCategory.Secondary,
+                size: DepotSize.Small
+            );
+
+            // Set experience level
+            t64aRegiment.SetExperienceLevel(ExperienceLevel.Trained);
+
+            // Set the ICM
+            t64aRegiment.SetICM(CUConstants.ICM_DEFAULT);
+
+            // Add the template to the database
+            AddTemplate("USSR_TR_T64A", t64aRegiment);
+
+            #endregion //T64A Tank Regiment
+
+            #region T64B Tank Regiment
+
+            var t64bRegiment = new CombatUnit(
+                unitName: "Tank Regiment (T-64B)",
+                classification: UnitClassification.TANK,
+                role: UnitRole.GroundCombat,
+                side: Side.Player,
+                nationality: Nationality.USSR,
+                intelProfileType: IntelProfileTypes.SV_TR_T64B,
+                deployedProfileID: WeaponSystems.TANK_T64B,
+                isMountable: false,
+                mobileProfileID: WeaponSystems.DEFAULT,
+                isEmbarkable: false,
+                embarkProfileID: WeaponSystems.DEFAULT,
+                category: DepotCategory.Secondary,
+                size: DepotSize.Small
+            );
+
+            // Set experience level
+            t64bRegiment.SetExperienceLevel(ExperienceLevel.Trained);
+
+            // Set the ICM
+            t64bRegiment.SetICM(CUConstants.ICM_DEFAULT);
+
+            // Add the template to the database
+            AddTemplate("USSR_TR_T64B", t64bRegiment);
+
+            #endregion //T64B Tank Regiment
+
+            #region T72A Tank Regiment
+
+            var t72aRegiment = new CombatUnit(
+                unitName: "Tank Regiment (T-72A)",
+                classification: UnitClassification.TANK,
+                role: UnitRole.GroundCombat,
+                side: Side.Player,
+                nationality: Nationality.USSR,
+                intelProfileType: IntelProfileTypes.SV_TR_T72A,
+                deployedProfileID: WeaponSystems.TANK_T72A,
+                isMountable: false,
+                mobileProfileID: WeaponSystems.DEFAULT,
+                isEmbarkable: false,
+                embarkProfileID: WeaponSystems.DEFAULT,
+                category: DepotCategory.Secondary,
+                size: DepotSize.Small
+            );
+
+            // Set experience level
+            t72aRegiment.SetExperienceLevel(ExperienceLevel.Trained);
+
+            // Set the ICM
+            t72aRegiment.SetICM(CUConstants.ICM_DEFAULT);
+
+            // Add the template to the database
+            AddTemplate("USSR_TR_T72A", t72aRegiment);
+
+            #endregion //T72A Tank Regiment
+
+            #region T72B Tank Regiment
+
+            var t72bRegiment = new CombatUnit(
+                unitName: "Tank Regiment (T-72B)",
+                classification: UnitClassification.TANK,
+                role: UnitRole.GroundCombat,
+                side: Side.Player,
+                nationality: Nationality.USSR,
+                intelProfileType: IntelProfileTypes.SV_TR_T72B,
+                deployedProfileID: WeaponSystems.TANK_T72B,
+                isMountable: false,
+                mobileProfileID: WeaponSystems.DEFAULT,
+                isEmbarkable: false,
+                embarkProfileID: WeaponSystems.DEFAULT,
+                category: DepotCategory.Secondary,
+                size: DepotSize.Small
+            );
+
+            // Set experience level
+            t72bRegiment.SetExperienceLevel(ExperienceLevel.Trained);
+
+            // Set the ICM
+            t72bRegiment.SetICM(CUConstants.ICM_DEFAULT);
+
+            // Add the template to the database
+            AddTemplate("USSR_TR_T72B", t72bRegiment);
+
+            #endregion //T72B Tank Regiment
+
+            #region T80B Tank Regiment
+
+            var t80bRegiment = new CombatUnit(
+                unitName: "Tank Regiment (T-80B)",
+                classification: UnitClassification.TANK,
+                role: UnitRole.GroundCombat,
+                side: Side.Player,
+                nationality: Nationality.USSR,
+                intelProfileType: IntelProfileTypes.SV_TR_T80B,
+                deployedProfileID: WeaponSystems.TANK_T80B,
+                isMountable: false,
+                mobileProfileID: WeaponSystems.DEFAULT,
+                isEmbarkable: false,
+                embarkProfileID: WeaponSystems.DEFAULT,
+                category: DepotCategory.Secondary,
+                size: DepotSize.Small
+            );
+
+            // Set experience level
+            t80bRegiment.SetExperienceLevel(ExperienceLevel.Trained);
+
+            // Set the ICM
+            t80bRegiment.SetICM(CUConstants.ICM_DEFAULT);
+
+            // Add the template to the database
+            AddTemplate("USSR_TR_T80B", t80bRegiment);
+
+            #endregion //T80B Tank Regiment
+
+            #region T80U Tank Regiment
+
+            var t80uRegiment = new CombatUnit(
+                unitName: "Tank Regiment (T-80U)",
+                classification: UnitClassification.TANK,
+                role: UnitRole.GroundCombat,
+                side: Side.Player,
+                nationality: Nationality.USSR,
+                intelProfileType: IntelProfileTypes.SV_TR_T80U,
+                deployedProfileID: WeaponSystems.TANK_T80U,
+                isMountable: false,
+                mobileProfileID: WeaponSystems.DEFAULT,
+                isEmbarkable: false,
+                embarkProfileID: WeaponSystems.DEFAULT,
+                category: DepotCategory.Secondary,
+                size: DepotSize.Small
+            );
+
+            // Set experience level
+            t80uRegiment.SetExperienceLevel(ExperienceLevel.Trained);
+
+            // Set the ICM
+            t80uRegiment.SetICM(CUConstants.ICM_DEFAULT);
+
+            // Add the template to the database
+            AddTemplate("USSR_TR_T80U", t80uRegiment);
+
+            #endregion //T80U Tank Regiment
+
+            #region T80BV Tank Regiment
+
+            var t80bvRegiment = new CombatUnit(
+                unitName: "Tank Regiment (T-80BV)",
+                classification: UnitClassification.TANK,
+                role: UnitRole.GroundCombat,
+                side: Side.Player,
+                nationality: Nationality.USSR,
+                intelProfileType: IntelProfileTypes.SV_TR_T80BV,
+                deployedProfileID: WeaponSystems.TANK_T80BV,
+                isMountable: false,
+                mobileProfileID: WeaponSystems.DEFAULT,
+                isEmbarkable: false,
+                embarkProfileID: WeaponSystems.DEFAULT,
+                category: DepotCategory.Secondary,
+                size: DepotSize.Small
+            );
+
+            // Set experience level
+            t80bvRegiment.SetExperienceLevel(ExperienceLevel.Trained);
+
+            // Set the ICM
+            t80bvRegiment.SetICM(CUConstants.ICM_DEFAULT);
+
+            // Add the template to the database
+            AddTemplate("USSR_TR_T80BV", t80bvRegiment);
+
+            #endregion //T80BV Tank Regiment
         }
 
         #endregion
