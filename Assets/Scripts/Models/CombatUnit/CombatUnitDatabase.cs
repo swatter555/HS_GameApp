@@ -217,6 +217,22 @@ namespace HammerAndSickle.Models
                 // Soviet units
                 CreateSovietMotorRifleRegiments();
                 CreateSovietTankRegiments();
+                CreateSovietArtilleryRegiments();
+                CreateSovietRocketRegiments();
+                CreateSovietAirAssaultRegiments();
+                CreateSovietAirborneRegiments();
+                CreateSovietNavalInfantryRegiments();
+                CreateSovietInfantryForces();
+                CreateSovietReconForces();
+                CreateSovietAirDefenseRegiments();
+                CreateSovietSAMRegiments();
+                CreateSovietHelicopterRegiments();
+                CreateSovietFighterRegiments();
+                CreateSovietAttackAviationRegiments();
+                CreateSovietBomberRegiments();
+                CreateSovietStrategicReconRegiments();
+
+                // Mujahedin units
 
             }
             catch (Exception e)
@@ -628,57 +644,169 @@ namespace HammerAndSickle.Models
 
         #region Soviet Artillery Regiments
 
+        /// <summary>
+        /// Creates and initializes Soviet artillery regiments.
+        /// </summary>
+        public static void CreateSovietArtilleryRegiments()
+        {
+
+        }
+
         #endregion
 
         #region Soviet Rocket Regiments
+
+        /// <summary>
+        /// Creates and initializes Soviet rocket regiments.
+        /// </summary>
+        public static void CreateSovietRocketRegiments()
+        {
+
+        }
 
         #endregion
 
         #region Soviet Air Assault Regiments
 
+        /// <summary>
+        /// Creates and initializes Soviet air assault regiments.
+        /// </summary>
+        public static void CreateSovietAirAssaultRegiments()
+        {
+            
+        }
+
         #endregion
 
         #region Soviet Airborne Regiments
+
+        /// <summary>
+        /// Creates and initializes Soviet airborne regiments.
+        /// </summary>
+        public static void CreateSovietAirborneRegiments()
+        {
+
+        }
 
         #endregion
 
         #region Soviet Naval Infantry Regiments
 
+        /// <summary>
+        /// Creates and initializes Soviet naval infantry regiments.
+        /// </summary>
+        public static void CreateSovietNavalInfantryRegiments()
+        {
+
+        }
+
         #endregion
 
         #region Soviet Infantry Forces
+
+        /// <summary>
+        /// Creates and initializes Soviet infantry forces.
+        /// </summary>
+        public static void CreateSovietInfantryForces()
+        {
+
+        }
 
         #endregion
 
         #region Soviet Recon Forces
 
+        /// <summary>
+        /// Creates and initializes Soviet reconnaissance forces.
+        /// </summary>
+        public static void CreateSovietReconForces()
+        {
+
+        }
+
         #endregion
 
         #region Soviet Air Defense Regiments
+
+        /// <summary>
+        /// Creates and initializes Soviet air defense regiments.
+        /// </summary>
+        public static void CreateSovietAirDefenseRegiments()
+        {
+
+        }
 
         #endregion
 
         #region Soviet SAM Regiments
 
+        /// <summary>
+        /// Creates and initializes Soviet surface-to-air missile (SAM) regiments.
+        /// </summary>
+        public static void CreateSovietSAMRegiments()
+        {
+
+        }
+
         #endregion
 
         #region Soviet Helicopter Regiments
+
+        /// <summary>
+        /// Creates and initializes Soviet helicopter regiments.
+        /// </summary>
+        public static void CreateSovietHelicopterRegiments()
+        {
+            
+        }
 
         #endregion
 
         #region Soviet Fighter Regiments
 
+        /// <summary>
+        /// Creates and initializes Soviet fighter regiments.
+        /// </summary>
+        public static void CreateSovietFighterRegiments()
+        {
+
+        }
+
         #endregion
 
         #region Soviet Attack Aviation Regiments
+
+        /// <summary>
+        /// Creates and initializes Soviet attack aviation regiments.
+        /// </summary>
+        public static void CreateSovietAttackAviationRegiments()
+        {
+
+        }
 
         #endregion
 
         #region Soviet Bomber Regiments
 
+        /// <summary>
+        /// Creates and initializes Soviet bomber regiments.
+        /// </summary>
+        public static void CreateSovietBomberRegiments()
+        {
+
+        }
+
         #endregion
 
         #region Soviet Strategic Recon Regiments
+
+        /// <summary>
+        /// Creates and initializes Soviet strategic reconnaissance regiments.
+        /// </summary>
+        public static void CreateSovietStrategicReconRegiments()
+        {
+
+        }
 
         #endregion
     }
