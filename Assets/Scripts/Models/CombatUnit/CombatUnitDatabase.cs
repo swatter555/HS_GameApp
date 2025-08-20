@@ -1240,7 +1240,63 @@ namespace HammerAndSickle.Models
         /// </summary>
         public static void CreateSovietNavalInfantryRegiments()
         {
+            #region Naval Infantry Regiment (BTR-70)
 
+            var navalInfantryBtr70Regiment = new CombatUnit(
+                unitName: "Naval Infantry Regiment (BTR-70)",
+                classification: UnitClassification.MMAR,
+                role: UnitRole.GroundCombat,
+                side: Side.Player,
+                nationality: Nationality.USSR,
+                intelProfileType: IntelProfileTypes.SV_NAV_BTR70,
+                deployedProfileID: WeaponSystems.INF_MAR,
+                isMountable: true,
+                mobileProfileID: WeaponSystems.APC_BTR70,
+                isEmbarkable: true,
+                embarkProfileID: WeaponSystems.TRANNAV_NAVAL,
+                category: DepotCategory.Secondary,
+                size: DepotSize.Small
+            );
+
+            // Set experience level
+            navalInfantryBtr70Regiment.SetExperienceLevel(ExperienceLevel.Experienced);
+
+            // Set the ICM
+            navalInfantryBtr70Regiment.SetICM(CUConstants.ICM_DEFAULT);
+
+            // Add the template to the database
+            AddTemplate("USSR_NAV_BTR70", navalInfantryBtr70Regiment);
+
+            #endregion //Naval Infantry Regiment (BTR-70)
+
+            #region Naval Infantry Regiment (BTR-80)
+
+            var navalInfantryBtr80Regiment = new CombatUnit(
+                unitName: "Naval Infantry Regiment (BTR-80)",
+                classification: UnitClassification.MMAR,
+                role: UnitRole.GroundCombat,
+                side: Side.Player,
+                nationality: Nationality.USSR,
+                intelProfileType: IntelProfileTypes.SV_NAV_BTR80,
+                deployedProfileID: WeaponSystems.INF_MAR,
+                isMountable: true,
+                mobileProfileID: WeaponSystems.APC_BTR80,
+                isEmbarkable: true,
+                embarkProfileID: WeaponSystems.TRANNAV_NAVAL,
+                category: DepotCategory.Secondary,
+                size: DepotSize.Small
+            );
+
+            // Set experience level
+            navalInfantryBtr80Regiment.SetExperienceLevel(ExperienceLevel.Experienced);
+
+            // Set the ICM
+            navalInfantryBtr80Regiment.SetICM(CUConstants.ICM_DEFAULT);
+
+            // Add the template to the database
+            AddTemplate("USSR_NAV_BTR80", navalInfantryBtr80Regiment);
+
+            #endregion //Naval Infantry Regiment (BTR-80)
         }
 
         #endregion
@@ -1252,7 +1308,63 @@ namespace HammerAndSickle.Models
         /// </summary>
         public static void CreateSovietInfantryForces()
         {
+            #region Engineer Regiment
 
+            var engineerRegiment = new CombatUnit(
+                unitName: "Engineer Regiment",
+                classification: UnitClassification.ENG,
+                role: UnitRole.GroundCombat,
+                side: Side.Player,
+                nationality: Nationality.USSR,
+                intelProfileType: IntelProfileTypes.SV_ENG,
+                deployedProfileID: WeaponSystems.INF_ENG,
+                isMountable: true,
+                mobileProfileID: WeaponSystems.APC_MTLB,
+                isEmbarkable: false,
+                embarkProfileID: WeaponSystems.DEFAULT,
+                category: DepotCategory.Secondary,
+                size: DepotSize.Small
+            );
+
+            // Set experience level
+            engineerRegiment.SetExperienceLevel(ExperienceLevel.Trained);
+
+            // Set the ICM
+            engineerRegiment.SetICM(CUConstants.ICM_DEFAULT);
+
+            // Add the template to the database
+            AddTemplate("USSR_ENG", engineerRegiment);
+
+            #endregion //Engineer Regiment
+
+            #region Spetsnaz Regiment (GRU)
+
+            var spetsnazRegiment = new CombatUnit(
+                unitName: "Spetsnaz Regiment (GRU)",
+                classification: UnitClassification.SPECF,
+                role: UnitRole.GroundCombatRecon,
+                side: Side.Player,
+                nationality: Nationality.USSR,
+                intelProfileType: IntelProfileTypes.SV_GRU,
+                deployedProfileID: WeaponSystems.INF_SPEC,
+                isMountable: true,
+                mobileProfileID: WeaponSystems.TRANHEL_MI8T,
+                isEmbarkable: false,
+                embarkProfileID: WeaponSystems.DEFAULT,
+                category: DepotCategory.Secondary,
+                size: DepotSize.Small
+            );
+
+            // Set experience level
+            spetsnazRegiment.SetExperienceLevel(ExperienceLevel.Veteran);
+
+            // Set the ICM
+            spetsnazRegiment.SetICM(CUConstants.ICM_SMALL_UNIT);
+
+            // Add the template to the database
+            AddTemplate("USSR_GRU", spetsnazRegiment);
+
+            #endregion //Spetsnaz Regiment (GRU)
         }
 
         #endregion
@@ -1264,7 +1376,63 @@ namespace HammerAndSickle.Models
         /// </summary>
         public static void CreateSovietReconForces()
         {
+            #region Reconnaissance Regiment
 
+            var reconRegiment = new CombatUnit(
+                unitName: "Reconnaissance Regiment",
+                classification: UnitClassification.RECON,
+                role: UnitRole.GroundCombatRecon,
+                side: Side.Player,
+                nationality: Nationality.USSR,
+                intelProfileType: IntelProfileTypes.SV_RCR,
+                deployedProfileID: WeaponSystems.RCN_BRDM2,
+                isMountable: false,
+                mobileProfileID: WeaponSystems.DEFAULT,
+                isEmbarkable: false,
+                embarkProfileID: WeaponSystems.DEFAULT,
+                category: DepotCategory.Secondary,
+                size: DepotSize.Small
+            );
+
+            // Set experience level
+            reconRegiment.SetExperienceLevel(ExperienceLevel.Trained);
+
+            // Set the ICM
+            reconRegiment.SetICM(CUConstants.ICM_DEFAULT);
+
+            // Add the template to the database
+            AddTemplate("USSR_RCR", reconRegiment);
+
+            #endregion //Reconnaissance Regiment
+
+            #region Anti-Tank Regiment
+
+            var antiTankRegiment = new CombatUnit(
+                unitName: "Recon Regiment AT",
+                classification: UnitClassification.RECON,
+                role: UnitRole.GroundCombat,
+                side: Side.Player,
+                nationality: Nationality.USSR,
+                intelProfileType: IntelProfileTypes.SV_RCR_AT,
+                deployedProfileID: WeaponSystems.RCN_BRDM2AT,
+                isMountable: false,
+                mobileProfileID: WeaponSystems.DEFAULT,
+                isEmbarkable: false,
+                embarkProfileID: WeaponSystems.DEFAULT,
+                category: DepotCategory.Secondary,
+                size: DepotSize.Small
+            );
+
+            // Set experience level
+            antiTankRegiment.SetExperienceLevel(ExperienceLevel.Trained);
+
+            // Set the ICM
+            antiTankRegiment.SetICM(CUConstants.ICM_DEFAULT);
+
+            // Add the template to the database
+            AddTemplate("USSR_RCR_AT", antiTankRegiment);
+
+            #endregion //Anti-Tank Regiment
         }
 
         #endregion
@@ -1276,7 +1444,121 @@ namespace HammerAndSickle.Models
         /// </summary>
         public static void CreateSovietAirDefenseRegiments()
         {
+            #region Air Defense Regiment (Generic AAA)
 
+            var adrGenericRegiment = new CombatUnit(
+                unitName: "Air Defense Regiment (Generic AAA)",
+                classification: UnitClassification.AAA,
+                role: UnitRole.AirDefenseArea,
+                side: Side.Player,
+                nationality: Nationality.USSR,
+                intelProfileType: IntelProfileTypes.SV_ADR_AAA,
+                deployedProfileID: WeaponSystems.AAA_GENERIC,
+                isMountable: true,
+                mobileProfileID: WeaponSystems.TRUCK_GENERIC,
+                isEmbarkable: false,
+                embarkProfileID: WeaponSystems.DEFAULT,
+                category: DepotCategory.Secondary,
+                size: DepotSize.Small
+            );
+
+            // Set experience level
+            adrGenericRegiment.SetExperienceLevel(ExperienceLevel.Trained);
+
+            // Set the ICM
+            adrGenericRegiment.SetICM(CUConstants.ICM_DEFAULT);
+
+            // Add the template to the database
+            AddTemplate("USSR_ADR_AAA", adrGenericRegiment);
+
+            #endregion //Air Defense Regiment (Generic AAA)
+
+            #region Air Defense Regiment (ZSU-57)
+
+            var adrZsu57Regiment = new CombatUnit(
+                unitName: "Air Defense Regiment (ZSU-57)",
+                classification: UnitClassification.SPAAA,
+                role: UnitRole.AirDefenseArea,
+                side: Side.Player,
+                nationality: Nationality.USSR,
+                intelProfileType: IntelProfileTypes.SV_ADR_ZSU57,
+                deployedProfileID: WeaponSystems.SPAAA_ZSU57,
+                isMountable: false,
+                mobileProfileID: WeaponSystems.DEFAULT,
+                isEmbarkable: false,
+                embarkProfileID: WeaponSystems.DEFAULT,
+                category: DepotCategory.Secondary,
+                size: DepotSize.Small
+            );
+
+            // Set experience level
+            adrZsu57Regiment.SetExperienceLevel(ExperienceLevel.Trained);
+
+            // Set the ICM
+            adrZsu57Regiment.SetICM(CUConstants.ICM_DEFAULT);
+
+            // Add the template to the database
+            AddTemplate("USSR_ADR_ZSU57", adrZsu57Regiment);
+
+            #endregion //Air Defense Regiment (ZSU-57)
+
+            #region Air Defense Regiment (ZSU-23)
+
+            var adrZsu23Regiment = new CombatUnit(
+                unitName: "Air Defense Regiment (ZSU-23)",
+                classification: UnitClassification.SPAAA,
+                role: UnitRole.AirDefenseArea,
+                side: Side.Player,
+                nationality: Nationality.USSR,
+                intelProfileType: IntelProfileTypes.SV_ADR_ZSU23,
+                deployedProfileID: WeaponSystems.SPAAA_ZSU23,
+                isMountable: false,
+                mobileProfileID: WeaponSystems.DEFAULT,
+                isEmbarkable: false,
+                embarkProfileID: WeaponSystems.DEFAULT,
+                category: DepotCategory.Secondary,
+                size: DepotSize.Small
+            );
+
+            // Set experience level
+            adrZsu23Regiment.SetExperienceLevel(ExperienceLevel.Trained);
+
+            // Set the ICM
+            adrZsu23Regiment.SetICM(CUConstants.ICM_DEFAULT);
+
+            // Add the template to the database
+            AddTemplate("USSR_ADR_ZSU23", adrZsu23Regiment);
+
+            #endregion //Air Defense Regiment (ZSU-23)
+
+            #region Air Defense Regiment (2K22 Tunguska)
+
+            var adr2k22Regiment = new CombatUnit(
+                unitName: "Air Defense Regiment (2K22 Tunguska)",
+                classification: UnitClassification.SPAAA,
+                role: UnitRole.AirDefenseArea,
+                side: Side.Player,
+                nationality: Nationality.USSR,
+                intelProfileType: IntelProfileTypes.SV_ADR_2K22,
+                deployedProfileID: WeaponSystems.SPAAA_2K22,
+                isMountable: false,
+                mobileProfileID: WeaponSystems.DEFAULT,
+                isEmbarkable: false,
+                embarkProfileID: WeaponSystems.DEFAULT,
+                category: DepotCategory.Secondary,
+                size: DepotSize.Small
+            );
+
+            // Set experience level
+            adr2k22Regiment.SetExperienceLevel(ExperienceLevel.Trained);
+
+            // Set the ICM
+            adr2k22Regiment.SetICM(CUConstants.ICM_DEFAULT);
+
+            // Add the template to the database
+            AddTemplate("USSR_ADR_2K22", adr2k22Regiment);
+
+            #endregion //Air Defense Regiment (2K22 Tunguska)
         }
 
         #endregion
@@ -1288,7 +1570,121 @@ namespace HammerAndSickle.Models
         /// </summary>
         public static void CreateSovietSAMRegiments()
         {
+            #region Self-Propelled SAM Regiment (9K31 Strela-1)
 
+            var spsam9k31Regiment = new CombatUnit(
+                unitName: "Self-Propelled SAM Regiment (9K31 Strela-1)",
+                classification: UnitClassification.SPSAM,
+                role: UnitRole.AirDefenseArea,
+                side: Side.Player,
+                nationality: Nationality.USSR,
+                intelProfileType: IntelProfileTypes.SV_SPSAM_9K31,
+                deployedProfileID: WeaponSystems.SPSAM_9K31,
+                isMountable: false,
+                mobileProfileID: WeaponSystems.DEFAULT,
+                isEmbarkable: false,
+                embarkProfileID: WeaponSystems.DEFAULT,
+                category: DepotCategory.Secondary,
+                size: DepotSize.Small
+            );
+
+            // Set experience level
+            spsam9k31Regiment.SetExperienceLevel(ExperienceLevel.Trained);
+
+            // Set the ICM
+            spsam9k31Regiment.SetICM(CUConstants.ICM_DEFAULT);
+
+            // Add the template to the database
+            AddTemplate("USSR_SPSAM_9K31", spsam9k31Regiment);
+
+            #endregion //Self-Propelled SAM Regiment (9K31 Strela-1)
+
+            #region SAM Regiment (S-75 Dvina)
+
+            var samS75Regiment = new CombatUnit(
+                unitName: "SAM Regiment (S-75 Dvina)",
+                classification: UnitClassification.SAM,
+                role: UnitRole.AirDefenseArea,
+                side: Side.Player,
+                nationality: Nationality.USSR,
+                intelProfileType: IntelProfileTypes.SV_SAM_S75,
+                deployedProfileID: WeaponSystems.SAM_S75,
+                isMountable: true,
+                mobileProfileID: WeaponSystems.TRUCK_GENERIC,
+                isEmbarkable: false,
+                embarkProfileID: WeaponSystems.DEFAULT,
+                category: DepotCategory.Secondary,
+                size: DepotSize.Small
+            );
+
+            // Set experience level
+            samS75Regiment.SetExperienceLevel(ExperienceLevel.Trained);
+
+            // Set the ICM
+            samS75Regiment.SetICM(CUConstants.ICM_DEFAULT);
+
+            // Add the template to the database
+            AddTemplate("USSR_SAM_S75", samS75Regiment);
+
+            #endregion //SAM Regiment (S-75 Dvina)
+
+            #region SAM Regiment (S-125 Neva)
+
+            var samS125Regiment = new CombatUnit(
+                unitName: "SAM Regiment (S-125 Neva)",
+                classification: UnitClassification.SAM,
+                role: UnitRole.AirDefenseArea,
+                side: Side.Player,
+                nationality: Nationality.USSR,
+                intelProfileType: IntelProfileTypes.SV_SAM_S125,
+                deployedProfileID: WeaponSystems.SAM_S125,
+                isMountable: true,
+                mobileProfileID: WeaponSystems.TRUCK_GENERIC,
+                isEmbarkable: false,
+                embarkProfileID: WeaponSystems.DEFAULT,
+                category: DepotCategory.Secondary,
+                size: DepotSize.Small
+            );
+
+            // Set experience level
+            samS125Regiment.SetExperienceLevel(ExperienceLevel.Trained);
+
+            // Set the ICM
+            samS125Regiment.SetICM(CUConstants.ICM_DEFAULT);
+
+            // Add the template to the database
+            AddTemplate("USSR_SAM_S125", samS125Regiment);
+
+            #endregion //SAM Regiment (S-125 Neva)
+
+            #region SAM Regiment (S-300)
+
+            var samS300Regiment = new CombatUnit(
+                unitName: "SAM Regiment (S-300)",
+                classification: UnitClassification.SAM,
+                role: UnitRole.AirDefenseArea,
+                side: Side.Player,
+                nationality: Nationality.USSR,
+                intelProfileType: IntelProfileTypes.SV_SAM_S300,
+                deployedProfileID: WeaponSystems.SAM_S300,
+                isMountable: true,
+                mobileProfileID: WeaponSystems.TRUCK_GENERIC,
+                isEmbarkable: false,
+                embarkProfileID: WeaponSystems.DEFAULT,
+                category: DepotCategory.Secondary,
+                size: DepotSize.Small
+            );
+
+            // Set experience level
+            samS300Regiment.SetExperienceLevel(ExperienceLevel.Trained);
+
+            // Set the ICM
+            samS300Regiment.SetICM(CUConstants.ICM_DEFAULT);
+
+            // Add the template to the database
+            AddTemplate("USSR_SAM_S300", samS300Regiment);
+
+            #endregion //SAM Regiment (S-300)
         }
 
         #endregion
@@ -1300,7 +1696,121 @@ namespace HammerAndSickle.Models
         /// </summary>
         public static void CreateSovietHelicopterRegiments()
         {
-            
+            #region Attack Helicopter Regiment (Mi-8AT)
+
+            var helMi8atRegiment = new CombatUnit(
+                unitName: "Attack Helicopter Regiment (Mi-8AT)",
+                classification: UnitClassification.HELO,
+                role: UnitRole.AirGroundAttack,
+                side: Side.Player,
+                nationality: Nationality.USSR,
+                intelProfileType: IntelProfileTypes.SV_HEL_MI8AT,
+                deployedProfileID: WeaponSystems.HEL_MI8AT,
+                isMountable: false,
+                mobileProfileID: WeaponSystems.DEFAULT,
+                isEmbarkable: false,
+                embarkProfileID: WeaponSystems.DEFAULT,
+                category: DepotCategory.Secondary,
+                size: DepotSize.Small
+            );
+
+            // Set experience level
+            helMi8atRegiment.SetExperienceLevel(ExperienceLevel.Trained);
+
+            // Set the ICM
+            helMi8atRegiment.SetICM(CUConstants.ICM_DEFAULT);
+
+            // Add the template to the database
+            AddTemplate("USSR_HEL_MI8AT", helMi8atRegiment);
+
+            #endregion //Attack Helicopter Regiment (Mi-8AT)
+
+            #region Attack Helicopter Regiment (Mi-24D)
+
+            var helMi24dRegiment = new CombatUnit(
+                unitName: "Attack Helicopter Regiment (Mi-24D)",
+                classification: UnitClassification.HELO,
+                role: UnitRole.AirGroundAttack,
+                side: Side.Player,
+                nationality: Nationality.USSR,
+                intelProfileType: IntelProfileTypes.SV_HEL_MI24D,
+                deployedProfileID: WeaponSystems.HEL_MI24D,
+                isMountable: false,
+                mobileProfileID: WeaponSystems.DEFAULT,
+                isEmbarkable: false,
+                embarkProfileID: WeaponSystems.DEFAULT,
+                category: DepotCategory.Secondary,
+                size: DepotSize.Small
+            );
+
+            // Set experience level
+            helMi24dRegiment.SetExperienceLevel(ExperienceLevel.Trained);
+
+            // Set the ICM
+            helMi24dRegiment.SetICM(CUConstants.ICM_DEFAULT);
+
+            // Add the template to the database
+            AddTemplate("USSR_HEL_MI24D", helMi24dRegiment);
+
+            #endregion //Attack Helicopter Regiment (Mi-24D)
+
+            #region Attack Helicopter Regiment (Mi-24V)
+
+            var helMi24vRegiment = new CombatUnit(
+                unitName: "Attack Helicopter Regiment (Mi-24V)",
+                classification: UnitClassification.HELO,
+                role: UnitRole.AirGroundAttack,
+                side: Side.Player,
+                nationality: Nationality.USSR,
+                intelProfileType: IntelProfileTypes.SV_HEL_MI24V,
+                deployedProfileID: WeaponSystems.HEL_MI24V,
+                isMountable: false,
+                mobileProfileID: WeaponSystems.DEFAULT,
+                isEmbarkable: false,
+                embarkProfileID: WeaponSystems.DEFAULT,
+                category: DepotCategory.Secondary,
+                size: DepotSize.Small
+            );
+
+            // Set experience level
+            helMi24vRegiment.SetExperienceLevel(ExperienceLevel.Trained);
+
+            // Set the ICM
+            helMi24vRegiment.SetICM(CUConstants.ICM_DEFAULT);
+
+            // Add the template to the database
+            AddTemplate("USSR_HEL_MI24V", helMi24vRegiment);
+
+            #endregion //Attack Helicopter Regiment (Mi-24V)
+
+            #region Attack Helicopter Regiment (Mi-28)
+
+            var helMi28Regiment = new CombatUnit(
+                unitName: "Attack Helicopter Regiment (Mi-28)",
+                classification: UnitClassification.HELO,
+                role: UnitRole.AirGroundAttack,
+                side: Side.Player,
+                nationality: Nationality.USSR,
+                intelProfileType: IntelProfileTypes.SV_HEL_MI28,
+                deployedProfileID: WeaponSystems.HEL_MI28,
+                isMountable: false,
+                mobileProfileID: WeaponSystems.DEFAULT,
+                isEmbarkable: false,
+                embarkProfileID: WeaponSystems.DEFAULT,
+                category: DepotCategory.Secondary,
+                size: DepotSize.Small
+            );
+
+            // Set experience level
+            helMi28Regiment.SetExperienceLevel(ExperienceLevel.Trained);
+
+            // Set the ICM
+            helMi28Regiment.SetICM(CUConstants.ICM_DEFAULT);
+
+            // Add the template to the database
+            AddTemplate("USSR_HEL_MI28", helMi28Regiment);
+
+            #endregion //Attack Helicopter Regiment (Mi-28)
         }
 
         #endregion
@@ -1312,7 +1822,237 @@ namespace HammerAndSickle.Models
         /// </summary>
         public static void CreateSovietFighterRegiments()
         {
+            #region Fighter Regiment (MiG-21)
 
+            var fgtMig21Regiment = new CombatUnit(
+                unitName: "Fighter Regiment (MiG-21)",
+                classification: UnitClassification.FGT,
+                role: UnitRole.AirSuperiority,
+                side: Side.Player,
+                nationality: Nationality.USSR,
+                intelProfileType: IntelProfileTypes.SV_FR_MIG21,
+                deployedProfileID: WeaponSystems.FGT_MIG21,
+                isMountable: false,
+                mobileProfileID: WeaponSystems.DEFAULT,
+                isEmbarkable: false,
+                embarkProfileID: WeaponSystems.DEFAULT,
+                category: DepotCategory.Secondary,
+                size: DepotSize.Small
+            );
+
+            // Set experience level
+            fgtMig21Regiment.SetExperienceLevel(ExperienceLevel.Trained);
+
+            // Set the ICM
+            fgtMig21Regiment.SetICM(CUConstants.ICM_DEFAULT);
+
+            // Add the template to the database
+            AddTemplate("USSR_FGT_MIG21", fgtMig21Regiment);
+
+            #endregion //Fighter Regiment (MiG-21)
+
+            #region Fighter Regiment (MiG-23)
+
+            var fgtMig23Regiment = new CombatUnit(
+                unitName: "Fighter Regiment (MiG-23)",
+                classification: UnitClassification.FGT,
+                role: UnitRole.AirSuperiority,
+                side: Side.Player,
+                nationality: Nationality.USSR,
+                intelProfileType: IntelProfileTypes.SV_FR_MIG23,
+                deployedProfileID: WeaponSystems.FGT_MIG23,
+                isMountable: false,
+                mobileProfileID: WeaponSystems.DEFAULT,
+                isEmbarkable: false,
+                embarkProfileID: WeaponSystems.DEFAULT,
+                category: DepotCategory.Secondary,
+                size: DepotSize.Small
+            );
+
+            // Set experience level
+            fgtMig23Regiment.SetExperienceLevel(ExperienceLevel.Trained);
+
+            // Set the ICM
+            fgtMig23Regiment.SetICM(CUConstants.ICM_DEFAULT);
+
+            // Add the template to the database
+            AddTemplate("USSR_FGT_MIG23", fgtMig23Regiment);
+
+            #endregion //Fighter Regiment (MiG-23)
+
+            #region Fighter Regiment (MiG-25)
+
+            var fgtMig25Regiment = new CombatUnit(
+                unitName: "Fighter Regiment (MiG-25)",
+                classification: UnitClassification.FGT,
+                role: UnitRole.AirSuperiority,
+                side: Side.Player,
+                nationality: Nationality.USSR,
+                intelProfileType: IntelProfileTypes.SV_FR_MIG25,
+                deployedProfileID: WeaponSystems.FGT_MIG25,
+                isMountable: false,
+                mobileProfileID: WeaponSystems.DEFAULT,
+                isEmbarkable: false,
+                embarkProfileID: WeaponSystems.DEFAULT,
+                category: DepotCategory.Secondary,
+                size: DepotSize.Small
+            );
+
+            // Set experience level
+            fgtMig25Regiment.SetExperienceLevel(ExperienceLevel.Trained);
+
+            // Set the ICM
+            fgtMig25Regiment.SetICM(CUConstants.ICM_DEFAULT);
+
+            // Add the template to the database
+            AddTemplate("USSR_FGT_MIG25", fgtMig25Regiment);
+
+            #endregion //Fighter Regiment (MiG-25)
+
+            #region Fighter Regiment (MiG-29)
+
+            var fgtMig29Regiment = new CombatUnit(
+                unitName: "Fighter Regiment (MiG-29)",
+                classification: UnitClassification.FGT,
+                role: UnitRole.AirSuperiority,
+                side: Side.Player,
+                nationality: Nationality.USSR,
+                intelProfileType: IntelProfileTypes.SV_FR_MIG29,
+                deployedProfileID: WeaponSystems.FGT_MIG29,
+                isMountable: false,
+                mobileProfileID: WeaponSystems.DEFAULT,
+                isEmbarkable: false,
+                embarkProfileID: WeaponSystems.DEFAULT,
+                category: DepotCategory.Secondary,
+                size: DepotSize.Small
+            );
+
+            // Set experience level
+            fgtMig29Regiment.SetExperienceLevel(ExperienceLevel.Trained);
+
+            // Set the ICM
+            fgtMig29Regiment.SetICM(CUConstants.ICM_DEFAULT);
+
+            // Add the template to the database
+            AddTemplate("USSR_FGT_MIG29", fgtMig29Regiment);
+
+            #endregion //Fighter Regiment (MiG-29)
+
+            #region Fighter Regiment (MiG-31)
+
+            var fgtMig31Regiment = new CombatUnit(
+                unitName: "Fighter Regiment (MiG-31)",
+                classification: UnitClassification.FGT,
+                role: UnitRole.AirSuperiority,
+                side: Side.Player,
+                nationality: Nationality.USSR,
+                intelProfileType: IntelProfileTypes.SV_FR_MIG31,
+                deployedProfileID: WeaponSystems.FGT_MIG31,
+                isMountable: false,
+                mobileProfileID: WeaponSystems.DEFAULT,
+                isEmbarkable: false,
+                embarkProfileID: WeaponSystems.DEFAULT,
+                category: DepotCategory.Secondary,
+                size: DepotSize.Small
+            );
+
+            // Set experience level
+            fgtMig31Regiment.SetExperienceLevel(ExperienceLevel.Trained);
+
+            // Set the ICM
+            fgtMig31Regiment.SetICM(CUConstants.ICM_DEFAULT);
+
+            // Add the template to the database
+            AddTemplate("USSR_FGT_MIG31", fgtMig31Regiment);
+
+            #endregion //Fighter Regiment (MiG-31)
+
+            #region Fighter Regiment (Su-27)
+
+            var fgtSu27Regiment = new CombatUnit(
+                unitName: "Fighter Regiment (Su-27)",
+                classification: UnitClassification.FGT,
+                role: UnitRole.AirSuperiority,
+                side: Side.Player,
+                nationality: Nationality.USSR,
+                intelProfileType: IntelProfileTypes.SV_FR_SU27,
+                deployedProfileID: WeaponSystems.FGT_SU27,
+                isMountable: false,
+                mobileProfileID: WeaponSystems.DEFAULT,
+                isEmbarkable: false,
+                embarkProfileID: WeaponSystems.DEFAULT,
+                category: DepotCategory.Secondary,
+                size: DepotSize.Small
+            );
+
+            // Set experience level
+            fgtSu27Regiment.SetExperienceLevel(ExperienceLevel.Trained);
+
+            // Set the ICM
+            fgtSu27Regiment.SetICM(CUConstants.ICM_DEFAULT);
+
+            // Add the template to the database
+            AddTemplate("USSR_FGT_SU27", fgtSu27Regiment);
+
+            #endregion //Fighter Regiment (Su-27)
+
+            #region Fighter Regiment (Su-47)
+
+            var fgtSu47Regiment = new CombatUnit(
+                unitName: "Fighter Regiment (Su-47)",
+                classification: UnitClassification.FGT,
+                role: UnitRole.AirSuperiority,
+                side: Side.Player,
+                nationality: Nationality.USSR,
+                intelProfileType: IntelProfileTypes.SV_FR_SU47,
+                deployedProfileID: WeaponSystems.FGT_SU47,
+                isMountable: false,
+                mobileProfileID: WeaponSystems.DEFAULT,
+                isEmbarkable: false,
+                embarkProfileID: WeaponSystems.DEFAULT,
+                category: DepotCategory.Secondary,
+                size: DepotSize.Small
+            );
+
+            // Set experience level
+            fgtSu47Regiment.SetExperienceLevel(ExperienceLevel.Elite);
+
+            // Set the ICM
+            fgtSu47Regiment.SetICM(CUConstants.ICM_LARGE_UNIT);
+
+            // Add the template to the database
+            AddTemplate("USSR_FGT_SU47", fgtSu47Regiment);
+
+            #endregion //Fighter Regiment (Su-47)
+
+            #region Multirole Fighter Regiment (MiG-27)
+
+            var mrfMig27Regiment = new CombatUnit(
+                unitName: "Multirole Fighter Regiment (MiG-27)",
+                classification: UnitClassification.FGT,
+                role: UnitRole.AirMultirole,
+                side: Side.Player,
+                nationality: Nationality.USSR,
+                intelProfileType: IntelProfileTypes.SV_MR_MIG27,
+                deployedProfileID: WeaponSystems.FGT_MIG27,
+                isMountable: false,
+                mobileProfileID: WeaponSystems.DEFAULT,
+                isEmbarkable: false,
+                embarkProfileID: WeaponSystems.DEFAULT,
+                category: DepotCategory.Secondary,
+                size: DepotSize.Small
+            );
+
+            // Set experience level
+            mrfMig27Regiment.SetExperienceLevel(ExperienceLevel.Trained);
+
+            // Set the ICM
+            mrfMig27Regiment.SetICM(CUConstants.ICM_DEFAULT);
+
+            // Add the template to the database
+            AddTemplate("USSR_MRF_MIG27", mrfMig27Regiment);
+
+            #endregion //Multirole Fighter Regiment (MiG-27)
         }
 
         #endregion
@@ -1324,7 +2064,63 @@ namespace HammerAndSickle.Models
         /// </summary>
         public static void CreateSovietAttackAviationRegiments()
         {
+            #region Attack Regiment (Su-25)
 
+            var attSu25Regiment = new CombatUnit(
+                unitName: "Attack Regiment (Su-25)",
+                classification: UnitClassification.ATT,
+                role: UnitRole.AirGroundAttack,
+                side: Side.Player,
+                nationality: Nationality.USSR,
+                intelProfileType: IntelProfileTypes.SV_AR_SU25,
+                deployedProfileID: WeaponSystems.ATT_SU25,
+                isMountable: false,
+                mobileProfileID: WeaponSystems.DEFAULT,
+                isEmbarkable: false,
+                embarkProfileID: WeaponSystems.DEFAULT,
+                category: DepotCategory.Secondary,
+                size: DepotSize.Small
+            );
+
+            // Set experience level
+            attSu25Regiment.SetExperienceLevel(ExperienceLevel.Trained);
+
+            // Set the ICM
+            attSu25Regiment.SetICM(CUConstants.ICM_DEFAULT);
+
+            // Add the template to the database
+            AddTemplate("USSR_ATT_SU25", attSu25Regiment);
+
+            #endregion //Attack Regiment (Su-25)
+
+            #region Attack Regiment (Su-25B)
+
+            var attSu25bRegiment = new CombatUnit(
+                unitName: "Attack Regiment (Su-25B)",
+                classification: UnitClassification.ATT,
+                role: UnitRole.AirGroundAttack,
+                side: Side.Player,
+                nationality: Nationality.USSR,
+                intelProfileType: IntelProfileTypes.SV_AR_SU25B,
+                deployedProfileID: WeaponSystems.ATT_SU25B,
+                isMountable: false,
+                mobileProfileID: WeaponSystems.DEFAULT,
+                isEmbarkable: false,
+                embarkProfileID: WeaponSystems.DEFAULT,
+                category: DepotCategory.Secondary,
+                size: DepotSize.Small
+            );
+
+            // Set experience level
+            attSu25bRegiment.SetExperienceLevel(ExperienceLevel.Trained);
+
+            // Set the ICM
+            attSu25bRegiment.SetICM(CUConstants.ICM_DEFAULT);
+
+            // Add the template to the database
+            AddTemplate("USSR_ATT_SU25B", attSu25bRegiment);
+
+            #endregion //Attack Regiment (Su-25B)
         }
 
         #endregion
@@ -1336,7 +2132,150 @@ namespace HammerAndSickle.Models
         /// </summary>
         public static void CreateSovietBomberRegiments()
         {
+            #region AWACS Regiment (A-50)
 
+            var awacsA50Regiment = new CombatUnit(
+                unitName: "AWACS Regiment (A-50)",
+                classification: UnitClassification.AWACS,
+                role: UnitRole.AirborneEarlyWarning,
+                side: Side.Player,
+                nationality: Nationality.USSR,
+                intelProfileType: IntelProfileTypes.SV_AWACS_A50,
+                deployedProfileID: WeaponSystems.AWACS_A50,
+                isMountable: false,
+                mobileProfileID: WeaponSystems.DEFAULT,
+                isEmbarkable: false,
+                embarkProfileID: WeaponSystems.DEFAULT,
+                category: DepotCategory.Secondary,
+                size: DepotSize.Small
+            );
+
+            // Set experience level
+            awacsA50Regiment.SetExperienceLevel(ExperienceLevel.Trained);
+
+            // Set the ICM
+            awacsA50Regiment.SetICM(CUConstants.ICM_DEFAULT);
+
+            // Add the template to the database
+            AddTemplate("USSR_AWACS_A50", awacsA50Regiment);
+
+            #endregion //AWACS Regiment (A-50)
+
+            #region Bomber Regiment (Su-24)
+
+            var bmbSu24Regiment = new CombatUnit(
+                unitName: "Bomber Regiment (Su-24)",
+                classification: UnitClassification.BMB,
+                role: UnitRole.AirStrategicAttack,
+                side: Side.Player,
+                nationality: Nationality.USSR,
+                intelProfileType: IntelProfileTypes.SV_BR_SU24,
+                deployedProfileID: WeaponSystems.BMB_SU24,
+                isMountable: false,
+                mobileProfileID: WeaponSystems.DEFAULT,
+                isEmbarkable: false,
+                embarkProfileID: WeaponSystems.DEFAULT,
+                category: DepotCategory.Secondary,
+                size: DepotSize.Small
+            );
+
+            // Set experience level
+            bmbSu24Regiment.SetExperienceLevel(ExperienceLevel.Trained);
+
+            // Set the ICM
+            bmbSu24Regiment.SetICM(CUConstants.ICM_DEFAULT);
+
+            // Add the template to the database
+            AddTemplate("USSR_BMB_SU24", bmbSu24Regiment);
+
+            #endregion //Bomber Regiment (Su-24)
+
+            #region Bomber Regiment (Tu-16)
+
+            var bmbTu16Regiment = new CombatUnit(
+                unitName: "Bomber Regiment (Tu-16)",
+                classification: UnitClassification.BMB,
+                role: UnitRole.AirStrategicAttack,
+                side: Side.Player,
+                nationality: Nationality.USSR,
+                intelProfileType: IntelProfileTypes.SV_BR_TU16,
+                deployedProfileID: WeaponSystems.BMB_TU16,
+                isMountable: false,
+                mobileProfileID: WeaponSystems.DEFAULT,
+                isEmbarkable: false,
+                embarkProfileID: WeaponSystems.DEFAULT,
+                category: DepotCategory.Secondary,
+                size: DepotSize.Small
+            );
+
+            // Set experience level
+            bmbTu16Regiment.SetExperienceLevel(ExperienceLevel.Trained);
+
+            // Set the ICM
+            bmbTu16Regiment.SetICM(CUConstants.ICM_DEFAULT);
+
+            // Add the template to the database
+            AddTemplate("USSR_BMB_TU16", bmbTu16Regiment);
+
+            #endregion //Bomber Regiment (Tu-16)
+
+            #region Bomber Regiment (Tu-22)
+
+            var bmbTu22Regiment = new CombatUnit(
+                unitName: "Bomber Regiment (Tu-22)",
+                classification: UnitClassification.BMB,
+                role: UnitRole.AirStrategicAttack,
+                side: Side.Player,
+                nationality: Nationality.USSR,
+                intelProfileType: IntelProfileTypes.SV_BR_TU22,
+                deployedProfileID: WeaponSystems.BMB_TU22,
+                isMountable: false,
+                mobileProfileID: WeaponSystems.DEFAULT,
+                isEmbarkable: false,
+                embarkProfileID: WeaponSystems.DEFAULT,
+                category: DepotCategory.Secondary,
+                size: DepotSize.Small
+            );
+
+            // Set experience level
+            bmbTu22Regiment.SetExperienceLevel(ExperienceLevel.Trained);
+
+            // Set the ICM
+            bmbTu22Regiment.SetICM(CUConstants.ICM_DEFAULT);
+
+            // Add the template to the database
+            AddTemplate("USSR_BMB_TU22", bmbTu22Regiment);
+
+            #endregion //Bomber Regiment (Tu-22)
+
+            #region Bomber Regiment (Tu-22M3)
+
+            var bmbTu22m3Regiment = new CombatUnit(
+                unitName: "Bomber Regiment (Tu-22M3)",
+                classification: UnitClassification.BMB,
+                role: UnitRole.AirStrategicAttack,
+                side: Side.Player,
+                nationality: Nationality.USSR,
+                intelProfileType: IntelProfileTypes.SV_BR_TU22M3,
+                deployedProfileID: WeaponSystems.BMB_TU22M3,
+                isMountable: false,
+                mobileProfileID: WeaponSystems.DEFAULT,
+                isEmbarkable: false,
+                embarkProfileID: WeaponSystems.DEFAULT,
+                category: DepotCategory.Secondary,
+                size: DepotSize.Small
+            );
+
+            // Set experience level
+            bmbTu22m3Regiment.SetExperienceLevel(ExperienceLevel.Trained);
+
+            // Set the ICM
+            bmbTu22m3Regiment.SetICM(CUConstants.ICM_DEFAULT);
+
+            // Add the template to the database
+            AddTemplate("USSR_BMB_TU22M3", bmbTu22m3Regiment);
+
+            #endregion //Bomber Regiment (Tu-22M3)
         }
 
         #endregion
@@ -1348,7 +2287,34 @@ namespace HammerAndSickle.Models
         /// </summary>
         public static void CreateSovietStrategicReconRegiments()
         {
+            #region Strategic Reconnaissance Regiment (MiG-25R)
 
+            var rcnMig25rRegiment = new CombatUnit(
+                unitName: "Strategic Reconnaissance Regiment (MiG-25R)",
+                classification: UnitClassification.RECONA,
+                role: UnitRole.AirRecon,
+                side: Side.Player,
+                nationality: Nationality.USSR,
+                intelProfileType: IntelProfileTypes.SV_RR_MIG25R,
+                deployedProfileID: WeaponSystems.RCNA_MIG25R,
+                isMountable: false,
+                mobileProfileID: WeaponSystems.DEFAULT,
+                isEmbarkable: false,
+                embarkProfileID: WeaponSystems.DEFAULT,
+                category: DepotCategory.Secondary,
+                size: DepotSize.Small
+            );
+
+            // Set experience level
+            rcnMig25rRegiment.SetExperienceLevel(ExperienceLevel.Trained);
+
+            // Set the ICM
+            rcnMig25rRegiment.SetICM(CUConstants.ICM_DEFAULT);
+
+            // Add the template to the database
+            AddTemplate("USSR_RCN_MIG25R", rcnMig25rRegiment);
+
+            #endregion //Strategic Reconnaissance Regiment (MiG-25R)
         }
 
         #endregion

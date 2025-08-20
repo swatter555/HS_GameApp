@@ -35,6 +35,7 @@ namespace HammerAndSickle.Models
         HELO,   // ATT helicopter
         FGT,    // Fighter aircraft
         ATT,    // ATT aircraft
+        AWACS,  // AWACS aircraft
         BMB,    // Bomber aircraft
         RECONA, // Recon Aircraft
         HQ,     // HQ facility
@@ -56,7 +57,8 @@ namespace HammerAndSickle.Models
         AirMultirole,
         AirGroundAttack,
         AirStrategicAttack,
-        AirRecon
+        AirRecon,
+        AirborneEarlyWarning,
     }
 
     /// <summary>
