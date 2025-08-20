@@ -830,9 +830,8 @@ namespace HammerAndSickle.Models
         SV_VDV_ART,     // Airborne Artillery Regiment
         SV_VDV_SUP,     // Airborne Support Regiment
 
-        SV_NAV_T55,     // Naval INF Regiment
-        SV_NAV_T72,     // Naval INF Regiment
-        SV_NAV_T80,     // Naval INF Regiment
+        SV_NAV_BTR70,   // Naval INF Regiment
+        SV_NAV_BTR80,   // Naval INF Regiment
 
         SV_ENG,         // Engineer Regiment
 

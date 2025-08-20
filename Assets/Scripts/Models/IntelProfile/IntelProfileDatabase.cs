@@ -944,8 +944,8 @@ namespace HammerAndSickle.Models
 
             #region Soviet naval infantry units
 
-            // Naval Assault Brigade- T55 profile
-            var navT55 = new Dictionary<WeaponSystems, int>
+            // Naval Assault Brigade- BTR70
+            var navBTR70 = new Dictionary<WeaponSystems, int>
             {
                 { WeaponSystems.INF_REG, 2750 },
                 { WeaponSystems.TANK_T55A, 44 },
@@ -960,15 +960,15 @@ namespace HammerAndSickle.Models
                 { WeaponSystems.ATGM_GENERIC, 12 },
                 { WeaponSystems.MANPAD_GENERIC, 36 },
             };
-            _profiles[IntelProfileTypes.SV_NAV_T55] = navT55;
+            _profiles[IntelProfileTypes.SV_NAV_BTR70] = navBTR70;
 
-            // Naval Assault Brigade- T72 profile
-            var navT72 = new Dictionary<WeaponSystems, int>
+            // Naval Assault Brigade- BTR80 profile
+            var navBTR80 = new Dictionary<WeaponSystems, int>
             {
                 { WeaponSystems.INF_REG, 2750 },
                 { WeaponSystems.TANK_T72A, 44 },
                 { WeaponSystems.IFV_BMP2, 44 },
-                { WeaponSystems.APC_BTR70, 145 },
+                { WeaponSystems.APC_BTR80, 145 },
                 { WeaponSystems.SPAAA_ZSU23, 4},
                 { WeaponSystems.SPSAM_9K31, 4 },
                 { WeaponSystems.SPA_2S1, 18 },
@@ -978,25 +978,7 @@ namespace HammerAndSickle.Models
                 { WeaponSystems.ATGM_GENERIC, 12 },
                 { WeaponSystems.MANPAD_GENERIC, 36 },
             };
-            _profiles[IntelProfileTypes.SV_NAV_T72] = navT72;
-
-            // Naval Assault Brigade- T80 profile
-            var navT80 = new Dictionary<WeaponSystems, int>
-            {
-                { WeaponSystems.INF_REG, 2750 },
-                { WeaponSystems.TANK_T80U, 44 },
-                { WeaponSystems.IFV_BMP3, 44 },
-                { WeaponSystems.APC_BTR80, 145 },
-                { WeaponSystems.SPAAA_2K22, 4},
-                { WeaponSystems.SPSAM_9K31, 4 },
-                { WeaponSystems.SPA_2S1, 18 },
-                { WeaponSystems.MORTAR_81MM, 12 },
-                { WeaponSystems.MORTAR_120MM, 12 },
-                { WeaponSystems.RCN_BRDM2, 12 },
-                { WeaponSystems.ATGM_GENERIC, 12 },
-                { WeaponSystems.MANPAD_GENERIC, 36 },
-            };
-            _profiles[IntelProfileTypes.SV_NAV_T80] = navT80;
+            _profiles[IntelProfileTypes.SV_NAV_BTR80] = navBTR80;
 
             #endregion // Soviet naval infantry units
 
