@@ -233,9 +233,6 @@ namespace HammerAndSickle.Models
         /// <summary>
         /// Creates and initializes Soviet motor rifle regiments.
         /// </summary>
-        /// <remarks>This method is responsible for setting up Soviet motor rifle regiments.  It does not
-        /// return a value and is intended to be used for initializing  or configuring these regiments within the
-        /// application.</remarks>
         public static void CreateSovietMotorRifleRegiments()
         {
 
@@ -392,9 +389,6 @@ namespace HammerAndSickle.Models
         /// <summary>
         /// Creates and initializes Soviet tank regiments.
         /// </summary>
-        /// <remarks>This method is intended to set up the structure and organization of Soviet tank
-        /// regiments. It does not return a value or accept parameters, and its behavior depends on the specific
-        /// implementation details within the method body.</remarks>
         public static void CreateSovietTankRegiments()
         {
             #region T55 Tank Regiment
