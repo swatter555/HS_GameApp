@@ -13,9 +13,11 @@ namespace HammerAndSickle.Models
         #region CombatUnit Constants
 
         // Individual Combat Modifiers for unit types.
-        public const float ICM_MIN          = -0.1f;
-        public const float ICM_MAX          = 10.0f;
-        public const float ICM_DEFAULT      =  1.0f;
+        public const float ICM_MIN          =   0.1f;
+        public const float ICM_MAX          =  10.0f;
+        public const float ICM_DEFAULT      =   1.0f;
+        public const float ICM_LARGE_UNIT   =  1.25f;
+        public const float ICM_SMALL_UNIT   =  0.75f;
 
         // CombatUnit constants.
         public const int MAX_HP                  = 40; // Maximum hit points for a CombatUnit

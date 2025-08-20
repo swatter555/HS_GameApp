@@ -13,7 +13,6 @@ namespace HammerAndSickle.Models
 
         #endregion // Properties
 
-
         #region Initialization
 
         /// <summary>
@@ -26,7 +25,6 @@ namespace HammerAndSickle.Models
         }
 
         #endregion
-
 
         #region Experience System
 
@@ -68,7 +66,6 @@ namespace HammerAndSickle.Models
                 if (newLevel != previousLevel)
                 {
                     ExperienceLevel = newLevel;
-                    OnExperienceLevelChanged(previousLevel, newLevel);
                 }
 
                 return true;
@@ -121,6 +118,31 @@ namespace HammerAndSickle.Models
         }
 
         /// <summary>
+        /// Sets the experience level of the entity.
+        /// </summary>
+        /// <remarks>If the specified level is the same as the current level, the method performs no
+        /// action. This method updates the experience points to the minimum required for the specified level and raises
+        /// an event to notify about the level change.</remarks>
+        /// <param name="level">The new experience level to set. Must be within the valid range of <see cref="ExperienceLevel.Raw"/> to <see
+        /// cref="ExperienceLevel.Elite"/>.</param>
+        /// <exception cref="ArgumentOutOfRangeException">Thrown if <paramref name="level"/> is outside the valid range of experience levels.</exception>
+        public void SetExperienceLevel(ExperienceLevel level)
+        {
+            if (level == ExperienceLevel)
+                return; // No change, nothing to do
+
+            // Validate level is within bounds
+            if (level < ExperienceLevel.Raw || level > ExperienceLevel.Elite)
+            {
+                throw new ArgumentOutOfRangeException(nameof(level), "Invalid experience level");
+            }
+
+            // Update experience points based on the new level
+            ExperiencePoints = GetMinPointsForLevel(level);
+            ExperienceLevel = level;
+        }
+
+        /// <summary>
         /// Gets the experience points required for the next level.
         /// Returns 0 if already at maximum level (Elite).
         /// </summary>
@@ -160,7 +182,6 @@ namespace HammerAndSickle.Models
         }
 
         #endregion // Experience System
-
 
         #region Experience System Helpers
 
@@ -222,17 +243,6 @@ namespace HammerAndSickle.Models
                 ExperienceLevel.Elite => ExperienceLevel.Elite,// Already at max
                 _ => ExperienceLevel.Green,
             };
-        }
-
-        /// <summary>
-        /// Called when the unit's experience level changes.
-        /// Can be overridden or used to trigger events/notifications.
-        /// </summary>
-        /// <param name="previousLevel">The previous experience level</param>
-        /// <param name="newLevel">The new experience level</param>
-        protected virtual void OnExperienceLevelChanged(ExperienceLevel previousLevel, ExperienceLevel newLevel)
-        {
-            AppService.CaptureUiMessage($"{UnitName} has advanced from {previousLevel} to {newLevel}!");
         }
 
         /// <summary>
