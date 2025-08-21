@@ -231,8 +231,10 @@ namespace HammerAndSickle.Models
                 CreateSovietAttackAviationRegiments();
                 CreateSovietBomberRegiments();
                 CreateSovietStrategicReconRegiments();
+                CreateSovietFacilities();
 
                 // Mujahedin units
+                CreateMujahideenForces();
 
             }
             catch (Exception e)
@@ -243,6 +245,8 @@ namespace HammerAndSickle.Models
         }
 
         #endregion //Private Methods
+
+        //-------------------------------------------------------------------------------------------------
 
         #region Soviet Motor Rifle Regiments
 
@@ -2318,5 +2322,345 @@ namespace HammerAndSickle.Models
         }
 
         #endregion
+
+        #region Soviet Facilities
+
+        /// <summary>
+        /// Creates and initializes Soviet facility units.
+        /// </summary>
+        public static void CreateSovietFacilities()
+        {
+            #region Soviet Supply Depot
+
+            var sovSupplyDepot = new CombatUnit(
+                unitName: "Soviet Supply Depot",
+                classification: UnitClassification.DEPOT,
+                role: UnitRole.GroundCombatStatic,
+                side: Side.Player,
+                nationality: Nationality.USSR,
+                intelProfileType: IntelProfileTypes.SV_DEPOT,
+                deployedProfileID: WeaponSystems.SUPPLYDEPOT_GENERIC,
+                isMountable: false,
+                mobileProfileID: WeaponSystems.DEFAULT,
+                isEmbarkable: false,
+                embarkProfileID: WeaponSystems.DEFAULT,
+                category: DepotCategory.Main,
+                size: DepotSize.Large
+            );
+
+            // Set experience level - facilities don't gain experience
+            sovSupplyDepot.SetExperienceLevel(ExperienceLevel.Trained);
+
+            // Set the ICM - standard facility
+            sovSupplyDepot.SetICM(CUConstants.ICM_DEFAULT);
+
+            // Add the template to the database
+            AddTemplate("USSR_DEPOT", sovSupplyDepot);
+
+            #endregion //Soviet Supply Depot
+
+            #region Soviet Airbase
+
+            var sovAirbase = new CombatUnit(
+                unitName: "Soviet Airbase",
+                classification: UnitClassification.AIRB,
+                role: UnitRole.GroundCombatStatic,
+                side: Side.Player,
+                nationality: Nationality.USSR,
+                intelProfileType: IntelProfileTypes.SV_AIRB,
+                deployedProfileID: WeaponSystems.AIRBASE_GENERIC,
+                isMountable: false,
+                mobileProfileID: WeaponSystems.DEFAULT,
+                isEmbarkable: false,
+                embarkProfileID: WeaponSystems.DEFAULT,
+                category: DepotCategory.Main,
+                size: DepotSize.Large
+            );
+
+            // Set experience level - facilities don't gain experience
+            sovAirbase.SetExperienceLevel(ExperienceLevel.Trained);
+
+            // Set the ICM - standard facility
+            sovAirbase.SetICM(CUConstants.ICM_DEFAULT);
+
+            // Add the template to the database
+            AddTemplate("USSR_AIRBASE", sovAirbase);
+
+            #endregion //Soviet Airbase
+
+            #region Soviet HQ
+
+            var sovHQ = new CombatUnit(
+                unitName: "Soviet Headquarters",
+                classification: UnitClassification.HQ,
+                role: UnitRole.GroundCombatStatic,
+                side: Side.Player,
+                nationality: Nationality.USSR,
+                intelProfileType: IntelProfileTypes.SV_BASE,
+                deployedProfileID: WeaponSystems.LANDBASE_GENERIC,
+                isMountable: false,
+                mobileProfileID: WeaponSystems.DEFAULT,
+                isEmbarkable: false,
+                embarkProfileID: WeaponSystems.DEFAULT,
+                category: DepotCategory.Main,
+                size: DepotSize.Medium
+            );
+
+            // Set experience level - facilities don't gain experience
+            sovHQ.SetExperienceLevel(ExperienceLevel.Trained);
+
+            // Set the ICM - command facility
+            sovHQ.SetICM(CUConstants.ICM_DEFAULT);
+
+            // Add the template to the database
+            AddTemplate("USSR_HQ", sovHQ);
+
+            #endregion //Soviet HQ
+
+            #region Soviet Intelligence Base
+
+            var sovIntelBase = new CombatUnit(
+                unitName: "Soviet Intelligence Base",
+                classification: UnitClassification.HQ,
+                role: UnitRole.GroundCombatStatic,
+                side: Side.Player,
+                nationality: Nationality.USSR,
+                intelProfileType: IntelProfileTypes.SV_BASE,
+                deployedProfileID: WeaponSystems.LANDBASE_GENERIC,
+                isMountable: false,
+                mobileProfileID: WeaponSystems.DEFAULT,
+                isEmbarkable: false,
+                embarkProfileID: WeaponSystems.DEFAULT,
+                category: DepotCategory.Main,
+                size: DepotSize.Small
+            );
+
+            // Set experience level - facilities don't gain experience
+            sovIntelBase.SetExperienceLevel(ExperienceLevel.Trained);
+
+            // Set the ICM - specialized intelligence facility
+            sovIntelBase.SetICM(CUConstants.ICM_DEFAULT);
+
+            // Add the template to the database
+            AddTemplate("USSR_INTEL_BASE", sovIntelBase);
+
+            #endregion //Soviet Intelligence Base
+        }
+
+        #endregion
+
+        //-------------------------------------------------------------------------------------------------
+
+        #region Mujahideen Units
+
+        public static void CreateMujahideenForces()
+        {
+            #region Mujahideen Guerrilla Infantry
+
+            var mjGuerrillaInf = new CombatUnit(
+                unitName: "Mujahideen Guerrilla Infantry",
+                classification: UnitClassification.INF,
+                role: UnitRole.GroundCombat,
+                side: Side.AI,
+                nationality: Nationality.MJ,
+                intelProfileType: IntelProfileTypes.MJ_INF_GUERRILLA,
+                deployedProfileID: WeaponSystems.INF_REG,
+                isMountable: false,
+                mobileProfileID: WeaponSystems.DEFAULT,
+                isEmbarkable: false,
+                embarkProfileID: WeaponSystems.DEFAULT,
+                category: DepotCategory.Secondary,
+                size: DepotSize.Small
+            );
+
+            // Set experience level
+            mjGuerrillaInf.SetExperienceLevel(ExperienceLevel.Experienced);
+
+            // Set the ICM - guerrillas are tough fighters on home terrain
+            mjGuerrillaInf.SetICM(CUConstants.ICM_DEFAULT);
+
+            // Add the template to the database
+            AddTemplate("MJ_INF_GUERRILLA", mjGuerrillaInf);
+
+            #endregion //Mujahideen Guerrilla Infantry
+
+            #region Mujahideen Special Forces Commando
+
+            var mjSpecCommando = new CombatUnit(
+                unitName: "Mujahideen Special Forces Commando",
+                classification: UnitClassification.SPECF,
+                role: UnitRole.GroundCombatRecon,
+                side: Side.AI,
+                nationality: Nationality.MJ,
+                intelProfileType: IntelProfileTypes.MJ_SPEC_COMMANDO,
+                deployedProfileID: WeaponSystems.INF_SPEC,
+                isMountable: false,
+                mobileProfileID: WeaponSystems.DEFAULT,
+                isEmbarkable: false,
+                embarkProfileID: WeaponSystems.DEFAULT,
+                category: DepotCategory.Secondary,
+                size: DepotSize.Small
+            );
+
+            // Set experience level - elite fighters
+            mjSpecCommando.SetExperienceLevel(ExperienceLevel.Veteran);
+
+            // Set the ICM - small elite unit
+            mjSpecCommando.SetICM(CUConstants.ICM_SMALL_UNIT);
+
+            // Add the template to the database
+            AddTemplate("MJ_SPEC_COMMANDO", mjSpecCommando);
+
+            #endregion //Mujahideen Special Forces Commando
+
+            #region Mujahideen Horse Cavalry
+
+            var mjHorseCavalry = new CombatUnit(
+                unitName: "Mujahideen Horse Cavalry",
+                classification: UnitClassification.CAV,
+                role: UnitRole.GroundCombatRecon,
+                side: Side.AI,
+                nationality: Nationality.MJ,
+                intelProfileType: IntelProfileTypes.MJ_CAV_HORSE,
+                deployedProfileID: WeaponSystems.CAVALRY_GENERIC,
+                isMountable: false,
+                mobileProfileID: WeaponSystems.DEFAULT,
+                isEmbarkable: false,
+                embarkProfileID: WeaponSystems.DEFAULT,
+                category: DepotCategory.Secondary,
+                size: DepotSize.Small
+            );
+
+            // Set experience level - experienced in mobile warfare
+            mjHorseCavalry.SetExperienceLevel(ExperienceLevel.Experienced);
+
+            // Set the ICM - traditional mobile fighters
+            mjHorseCavalry.SetICM(CUConstants.ICM_DEFAULT);
+
+            // Add the template to the database
+            AddTemplate("MJ_CAV_HORSE", mjHorseCavalry);
+
+            #endregion //Mujahideen Horse Cavalry
+
+            #region Mujahideen Anti-Aircraft Unit
+
+            var mjAntiAircraft = new CombatUnit(
+                unitName: "Mujahideen Anti-Aircraft Unit",
+                classification: UnitClassification.AAA,
+                role: UnitRole.AirDefenseArea,
+                side: Side.AI,
+                nationality: Nationality.MJ,
+                intelProfileType: IntelProfileTypes.MJ_AA,
+                deployedProfileID: WeaponSystems.MANPAD_GENERIC,
+                isMountable: true,
+                mobileProfileID: WeaponSystems.TRUCK_GENERIC,
+                isEmbarkable: false,
+                embarkProfileID: WeaponSystems.DEFAULT,
+                category: DepotCategory.Secondary,
+                size: DepotSize.Small
+            );
+
+            // Set experience level
+            mjAntiAircraft.SetExperienceLevel(ExperienceLevel.Trained);
+
+            // Set the ICM - portable air defense
+            mjAntiAircraft.SetICM(CUConstants.ICM_SMALL_UNIT);
+
+            // Add the template to the database
+            AddTemplate("MJ_AA", mjAntiAircraft);
+
+            #endregion //Mujahideen Anti-Aircraft Unit
+
+            #region Mujahideen Light Mortar Unit
+
+            var mjLightMortar = new CombatUnit(
+                unitName: "Mujahideen Light Mortar Unit",
+                classification: UnitClassification.ART,
+                role: UnitRole.GroundCombatIndirect,
+                side: Side.AI,
+                nationality: Nationality.MJ,
+                intelProfileType: IntelProfileTypes.MJ_ART_LIGHT_MORTAR,
+                deployedProfileID: WeaponSystems.MORTAR_81MM,
+                isMountable: true,
+                mobileProfileID: WeaponSystems.TRUCK_GENERIC,
+                isEmbarkable: false,
+                embarkProfileID: WeaponSystems.DEFAULT,
+                category: DepotCategory.Secondary,
+                size: DepotSize.Small
+            );
+
+            // Set experience level
+            mjLightMortar.SetExperienceLevel(ExperienceLevel.Trained);
+
+            // Set the ICM - light artillery support
+            mjLightMortar.SetICM(CUConstants.ICM_SMALL_UNIT);
+
+            // Add the template to the database
+            AddTemplate("MJ_ART_LIGHT_MORTAR", mjLightMortar);
+
+            #endregion //Mujahideen Light Mortar Unit
+
+            #region Mujahideen Heavy Mortar Unit
+
+            var mjHeavyMortar = new CombatUnit(
+                unitName: "Mujahideen Heavy Mortar Unit",
+                classification: UnitClassification.ART,
+                role: UnitRole.GroundCombatIndirect,
+                side: Side.AI,
+                nationality: Nationality.MJ,
+                intelProfileType: IntelProfileTypes.MJ_ART_HEAVY_MORTAR,
+                deployedProfileID: WeaponSystems.MORTAR_120MM,
+                isMountable: true,
+                mobileProfileID: WeaponSystems.TRUCK_GENERIC,
+                isEmbarkable: false,
+                embarkProfileID: WeaponSystems.DEFAULT,
+                category: DepotCategory.Secondary,
+                size: DepotSize.Small
+            );
+
+            // Set experience level
+            mjHeavyMortar.SetExperienceLevel(ExperienceLevel.Trained);
+
+            // Set the ICM - heavier artillery support
+            mjHeavyMortar.SetICM(CUConstants.ICM_SMALL_UNIT);
+
+            // Add the template to the database
+            AddTemplate("MJ_ART_HEAVY_MORTAR", mjHeavyMortar);
+
+            #endregion //Mujahideen Heavy Mortar Unit
+
+            #region Mujahideen Supply Cache
+
+            var mjSupplyCache = new CombatUnit(
+                unitName: "Mujahideen Supply Cache",
+                classification: UnitClassification.DEPOT,
+                role: UnitRole.GroundCombatStatic,
+                side: Side.AI,
+                nationality: Nationality.MJ,
+                intelProfileType: IntelProfileTypes.SV_DEPOT, // Using generic depot intel profile
+                deployedProfileID: WeaponSystems.SUPPLYDEPOT_GENERIC,
+                isMountable: false,
+                mobileProfileID: WeaponSystems.DEFAULT,
+                isEmbarkable: false,
+                embarkProfileID: WeaponSystems.DEFAULT,
+                category: DepotCategory.Secondary,
+                size: DepotSize.Small
+            );
+
+            // Set experience level - facilities don't gain experience
+            mjSupplyCache.SetExperienceLevel(ExperienceLevel.Trained);
+
+            // Set the ICM - small hidden supply cache
+            mjSupplyCache.SetICM(CUConstants.ICM_SMALL_UNIT);
+
+            // Add the template to the database
+            AddTemplate("MJ_DEPOT", mjSupplyCache);
+
+            #endregion //Mujahideen Supply Cache
+        }
+
+        #endregion
+
+        //-------------------------------------------------------------------------------------------------
     }
 }
