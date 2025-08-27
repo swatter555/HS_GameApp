@@ -6,6 +6,7 @@ namespace HammerAndSickle.Models.Map
 {
     /// <summary>
     /// Stores hex edge information with JSON serialization support.
+    /// Uses the correct HexDirection order: NE, E, SE, SW, W, NW
     /// </summary>
     [Serializable]
     public class FeatureBorders
@@ -15,9 +16,6 @@ namespace HammerAndSickle.Models.Map
         #endregion
 
         #region Properties
-
-        [JsonInclude]
-        public bool Northwest { get; set; }
 
         [JsonInclude]
         public bool Northeast { get; set; }
@@ -35,6 +33,9 @@ namespace HammerAndSickle.Models.Map
         public bool West { get; set; }
 
         [JsonInclude]
+        public bool Northwest { get; set; }
+
+        [JsonInclude]
         public BorderType Type { get; set; }
 
         #endregion
@@ -47,36 +48,37 @@ namespace HammerAndSickle.Models.Map
         [JsonConstructor]
         public FeatureBorders()
         {
-            Northwest = false;
             Northeast = false;
             East = false;
             Southeast = false;
             Southwest = false;
             West = false;
+            Northwest = false;
             Type = BorderType.None;
         }
 
         /// <summary>
         /// Constructor that initializes the borders with specific directions.
+        /// Parameters follow HexDirection order: NE, E, SE, SW, W, NW
         /// </summary>
         /// <param name="type">Border type</param>
-        /// <param name="nw">Northwest border value</param>
         /// <param name="ne">Northeast border value</param>
         /// <param name="e">East border value</param>
         /// <param name="se">Southeast border value</param>
         /// <param name="sw">Southwest border value</param>
         /// <param name="w">West border value</param>
-        public FeatureBorders(BorderType type, bool nw, bool ne, bool e, bool se, bool sw, bool w)
+        /// <param name="nw">Northwest border value</param>
+        public FeatureBorders(BorderType type, bool ne, bool e, bool se, bool sw, bool w, bool nw)
         {
             try
             {
                 Type = type;
-                Northwest = nw;
                 Northeast = ne;
                 East = e;
                 Southeast = se;
                 Southwest = sw;
                 West = w;
+                Northwest = nw;
             }
             catch (Exception ex)
             {
@@ -94,12 +96,12 @@ namespace HammerAndSickle.Models.Map
             try
             {
                 Type = type;
-                Northwest = false;
                 Northeast = false;
                 East = false;
                 Southeast = false;
                 Southwest = false;
                 West = false;
+                Northwest = false;
             }
             catch (Exception ex)
             {
@@ -110,8 +112,9 @@ namespace HammerAndSickle.Models.Map
 
         /// <summary>
         /// Constructor that initializes the borders from a binary string.
+        /// String positions map to HexDirection order: NE, E, SE, SW, W, NW
         /// </summary>
-        /// <param name="input">Binary string representing the hex matrix</param>
+        /// <param name="input">Binary string representing the hex matrix (6 chars)</param>
         /// <param name="type">Border type</param>
         public FeatureBorders(string input, BorderType type = BorderType.None)
         {
@@ -158,12 +161,12 @@ namespace HammerAndSickle.Models.Map
             {
                 return direction switch
                 {
-                    HexDirection.NW => Northwest,
                     HexDirection.NE => Northeast,
                     HexDirection.E => East,
                     HexDirection.SE => Southeast,
                     HexDirection.SW => Southwest,
                     HexDirection.W => West,
+                    HexDirection.NW => Northwest,
                     _ => throw new ArgumentOutOfRangeException(nameof(direction), direction, "Invalid direction")
                 };
             }
@@ -185,12 +188,12 @@ namespace HammerAndSickle.Models.Map
             {
                 switch (direction)
                 {
-                    case HexDirection.NW: Northwest = value; break;
                     case HexDirection.NE: Northeast = value; break;
                     case HexDirection.E: East = value; break;
                     case HexDirection.SE: Southeast = value; break;
                     case HexDirection.SW: Southwest = value; break;
                     case HexDirection.W: West = value; break;
+                    case HexDirection.NW: Northwest = value; break;
                     default: throw new ArgumentOutOfRangeException(nameof(direction), direction, "Invalid direction");
                 }
             }
@@ -203,6 +206,7 @@ namespace HammerAndSickle.Models.Map
 
         /// <summary>
         /// Sets the matrix with a 6-character binary string.
+        /// String positions map to HexDirection enum order: [0]=NE, [1]=E, [2]=SE, [3]=SW, [4]=W, [5]=NW
         /// </summary>
         /// <param name="input">Binary string representing the hex matrix</param>
         public void SetBorderString(string input)
@@ -219,12 +223,13 @@ namespace HammerAndSickle.Models.Map
                     throw new ArgumentException("Input must be a 6-character binary string", nameof(input));
                 }
 
-                Northwest = input[0] == '1';
-                Northeast = input[1] == '1';
-                East = input[2] == '1';
-                Southeast = input[3] == '1';
-                Southwest = input[4] == '1';
-                West = input[5] == '1';
+                // Map string positions to HexDirection enum order
+                Northeast = input[0] == '1';  // HexDirection.NE = 0
+                East = input[1] == '1';       // HexDirection.E = 1
+                Southeast = input[2] == '1';  // HexDirection.SE = 2
+                Southwest = input[3] == '1';  // HexDirection.SW = 3
+                West = input[4] == '1';       // HexDirection.W = 4
+                Northwest = input[5] == '1';  // HexDirection.NW = 5
             }
             catch (Exception ex)
             {
@@ -235,13 +240,14 @@ namespace HammerAndSickle.Models.Map
 
         /// <summary>
         /// Converts the hex borders to a binary string representation.
+        /// String positions follow HexDirection enum order: NE, E, SE, SW, W, NW
         /// </summary>
         /// <returns>Binary string representing the hex border</returns>
         public string GetBorderString()
         {
             try
             {
-                return $"{(Northwest ? "1" : "0")}{(Northeast ? "1" : "0")}{(East ? "1" : "0")}{(Southeast ? "1" : "0")}{(Southwest ? "1" : "0")}{(West ? "1" : "0")}";
+                return $"{(Northeast ? "1" : "0")}{(East ? "1" : "0")}{(Southeast ? "1" : "0")}{(Southwest ? "1" : "0")}{(West ? "1" : "0")}{(Northwest ? "1" : "0")}";
             }
             catch (Exception ex)
             {
@@ -258,7 +264,7 @@ namespace HammerAndSickle.Models.Map
         {
             try
             {
-                return Northwest || Northeast || East || Southeast || Southwest || West;
+                return Northeast || East || Southeast || Southwest || West || Northwest;
             }
             catch (Exception ex)
             {

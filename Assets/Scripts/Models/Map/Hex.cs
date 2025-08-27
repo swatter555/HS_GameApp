@@ -1,14 +1,16 @@
 using HammerAndSickle.Services;
 using System;
 using System.Collections.Generic;
+using System.Text.Json.Serialization;
 using UnityEngine;
 
 namespace HammerAndSickle.Models.Map
 {
     /// <summary>
-    /// Represents a single hex tile in the game map, containing terrain, features, borders,
-    /// labels, and game state information with neighbor relationships.
+    /// Represents a single hex tile in the game map with JSON serialization support.
+    /// Contains terrain, features, borders, labels, and game state information.
     /// </summary>
+    [Serializable]
     public class Hex : IDisposable
     {
         #region Constants
@@ -20,49 +22,117 @@ namespace HammerAndSickle.Models.Map
         /// <summary>
         /// Indicates if the hex is properly initialized.
         /// </summary>
+        [JsonIgnore]
         public bool IsInitialized { get; private set; }
 
         /// <summary>
         /// Indicates if the hex has been disposed.
         /// </summary>
+        [JsonIgnore]
         public bool IsDisposed { get; private set; }
 
-        // Game State Properties
-        public TerrainType Terrain { get; private set; }
-        public Vector2Int Position { get; private set; }
-        public bool IsRail { get; private set; }
-        public bool IsRoad { get; private set; }
-        public bool IsFort { get; private set; }
-        public bool IsAirbase { get; private set; }
-        public bool IsObjective { get; private set; }
-        public bool IsVisible { get; private set; }
-        public string TileLabel { get; set; }
-        public string LargeTileLabel { get; set; }
-        public TextSize LabelSize { get; set; }
-        public FontWeight LabelWeight { get; set; }
-        public TextColor LabelColor { get; set; }
-        public float LabelOutlineThickness { get; set; }
-        public float VictoryValue { get; set; }
-        public float AirbaseDamage { get; set; }
-        public int UrbanDamage { get; set; }
-        public TileControl TileControl { get; set; }
-        public DefaultTileControl DefaultTileControl { get; set; }
-        public FeatureBorders RiverBorders { get; set; }
-        public FeatureBorders BridgeBorders { get; set; }
-        public FeatureBorders PontoonBridgeBorders { get; set; }
-        public FeatureBorders DamagedBridgeBorders { get; set; }
+        // Core Position and Identity
+        [JsonInclude]
+        public Vector2Int Position { get; set; }
+
+        // Terrain Properties
+        [JsonInclude]
+        public TerrainType Terrain { get; set; }
+
+        [JsonInclude]
         public int MovementCost { get; private set; }
+
+        // Infrastructure Features
+        [JsonInclude]
+        public bool IsRail { get; set; }
+
+        [JsonInclude]
+        public bool IsRoad { get; set; }
+
+        [JsonInclude]
+        public bool IsFort { get; set; }
+
+        [JsonInclude]
+        public bool IsAirbase { get; set; }
+
+        // Game State
+        [JsonInclude]
+        public bool IsObjective { get; set; }
+
+        [JsonInclude]
+        public bool IsVisible { get; set; }
+
+        [JsonInclude]
+        public TileControl TileControl { get; set; }
+
+        [JsonInclude]
+        public DefaultTileControl DefaultTileControl { get; set; }
+
+        // Labels and Display
+        [JsonInclude]
+        public string TileLabel { get; set; }
+
+        [JsonInclude]
+        public string LargeTileLabel { get; set; }
+
+        [JsonInclude]
+        public TextSize LabelSize { get; set; }
+
+        [JsonInclude]
+        public FontWeight LabelWeight { get; set; }
+
+        [JsonInclude]
+        public TextColor LabelColor { get; set; }
+
+        [JsonInclude]
+        public float LabelOutlineThickness { get; set; }
+
+        // Victory and Damage
+        [JsonInclude]
+        public float VictoryValue { get; set; }
+
+        [JsonInclude]
+        public float AirbaseDamage { get; set; }
+
+        [JsonInclude]
+        public int UrbanDamage { get; set; }
+
+        // Border Features
+        [JsonInclude]
+        public FeatureBorders RiverBorders { get; set; }
+
+        [JsonInclude]
+        public FeatureBorders BridgeBorders { get; set; }
+
+        [JsonInclude]
+        public FeatureBorders PontoonBridgeBorders { get; set; }
+
+        [JsonInclude]
+        public FeatureBorders DamagedBridgeBorders { get; set; }
 
         #endregion
 
         #region Private Fields
 
+        [JsonIgnore]
         private readonly bool enableDebugLogging;
-        private Dictionary<HexDirection, Hex> Neighbors;
+
+        [JsonIgnore]
+        private Dictionary<HexDirection, Hex> neighbors;
 
         #endregion
 
-        #region Constructor
+        #region Constructors
+
+        /// <summary>
+        /// Parameterless constructor for JSON serialization.
+        /// </summary>
+        [JsonConstructor]
+        public Hex()
+        {
+            enableDebugLogging = false;
+            Initialize();
+        }
 
         /// <summary>
         /// Initializes a new hex instance at the specified position.
@@ -91,49 +161,50 @@ namespace HammerAndSickle.Models.Map
 
         #region Initialization
 
+        /// <summary>
+        /// Initializes the hex with default values.
+        /// </summary>
         private void Initialize()
         {
             try
             {
-                // Initialize all properties with default values
-                Terrain = TerrainType.Clear;
-                IsRail = false;
-                IsRoad = false;
-                IsFort = false;
-                IsAirbase = false;
-                IsObjective = false;
-                IsVisible = false;
-                TileLabel = string.Empty;
-                LargeTileLabel = string.Empty;
-                LabelSize = TextSize.Small;
-                LabelWeight = FontWeight.Medium;
-                LabelColor = TextColor.Blue;
-                LabelOutlineThickness = 0.1f;
-                VictoryValue = 0f;
-                AirbaseDamage = 0f;
-                UrbanDamage = 0;
-                TileControl = TileControl.None;
-                DefaultTileControl = DefaultTileControl.None;
+                // Initialize terrain and movement
+                if (Terrain == default)
+                {
+                    Terrain = TerrainType.Clear;
+                }
+                UpdateMovementCost();
 
-                // Initialize border features
-                RiverBorders = new FeatureBorders(BorderType.River);
-                BridgeBorders = new FeatureBorders(BorderType.Bridge);
-                PontoonBridgeBorders = new FeatureBorders(BorderType.PontoonBridge);
-                DamagedBridgeBorders = new FeatureBorders(BorderType.DestroyedBridge);
+                // Initialize infrastructure features
+                // Keep existing values if they were set during deserialization
 
-                MovementCost = 0;
-                Neighbors = new Dictionary<HexDirection, Hex>();
+                // Initialize labels and display if not already set
+                TileLabel ??= string.Empty;
+                LargeTileLabel ??= string.Empty;
+                if (LabelSize == default) LabelSize = TextSize.Small;
+                if (LabelWeight == default) LabelWeight = FontWeight.Medium;
+                if (LabelColor == default) LabelColor = TextColor.Blue;
+                if (LabelOutlineThickness == default) LabelOutlineThickness = 0.1f;
+
+                // Initialize border features if not already set
+                RiverBorders ??= new FeatureBorders(BorderType.River);
+                BridgeBorders ??= new FeatureBorders(BorderType.Bridge);
+                PontoonBridgeBorders ??= new FeatureBorders(BorderType.PontoonBridge);
+                DamagedBridgeBorders ??= new FeatureBorders(BorderType.DestroyedBridge);
+
+                // Initialize neighbors dictionary
+                neighbors = new Dictionary<HexDirection, Hex>();
 
                 IsInitialized = true;
 
                 if (enableDebugLogging)
                 {
-                    Debug.Log($"{CLASS_NAME}: Hex at position {Position} initialized successfully.");
+                    Debug.Log($"{CLASS_NAME}: Hex at position {Position} initialized successfully");
                 }
             }
-            catch (Exception e)
+            catch (Exception ex)
             {
-                AppService.HandleException(CLASS_NAME, "Initialize", e);
+                AppService.HandleException(CLASS_NAME, nameof(Initialize), ex);
                 IsInitialized = false;
                 throw;
             }
@@ -146,7 +217,7 @@ namespace HammerAndSickle.Models.Map
         /// <summary>
         /// Sets the position of the hex.
         /// </summary>
-        /// <param name="position"></param>
+        /// <param name="position">New position</param>
         public void SetPosition(Vector2Int position)
         {
             ValidateState();
@@ -157,164 +228,12 @@ namespace HammerAndSickle.Models.Map
 
                 if (enableDebugLogging)
                 {
-                    Debug.Log($"{CLASS_NAME}: Position set at {position}");
+                    Debug.Log($"{CLASS_NAME}: Position set to {position}");
                 }
             }
-            catch (Exception e)
+            catch (Exception ex)
             {
-                AppService.HandleException(CLASS_NAME, "SetPosition", e);
-                throw;
-            }
-        }
-
-        /// <summary>
-        /// Sets the fort status of the hex. Mutually exclusive with airbase.
-        /// </summary>
-        /// <param name="value">True to enable fort, false to disable</param>
-        /// <exception cref="InvalidOperationException">Thrown when hex is not initialized or is disposed</exception>
-        public void SetIsFort(bool value)
-        {
-            ValidateState();
-
-            try
-            {
-                IsFort = value;
-                if (IsFort)
-                {
-                    IsAirbase = false;
-                }
-
-                if (enableDebugLogging)
-                {
-                    Debug.Log($"{CLASS_NAME}: Fort status at {Position} set to {value}");
-                }
-            }
-            catch (Exception e)
-            {
-                AppService.HandleException(CLASS_NAME, "SetIsFort", e);
-                throw;
-            }
-        }
-
-        /// <summary>
-        /// Sets the airbase status of the hex. Mutually exclusive with fort.
-        /// </summary>
-        /// <param name="value">True to enable airbase, false to disable</param>
-        /// <exception cref="InvalidOperationException">Thrown when hex is not initialized or is disposed</exception>
-        public void SetIsAirbase(bool value)
-        {
-            ValidateState();
-
-            try
-            {
-                IsAirbase = value;
-                if (IsAirbase)
-                {
-                    IsFort = false;
-                }
-
-                if (enableDebugLogging)
-                {
-                    Debug.Log($"{CLASS_NAME}: Airbase status at {Position} set to {value}");
-                }
-            }
-            catch (Exception e)
-            {
-                AppService.HandleException(CLASS_NAME, "SetIsAirbase", e);
-                throw;
-            }
-        }
-
-        /// <summary>
-        /// Sets the rail status of the hex.
-        /// </summary>
-        /// <param name="value">True to enable rail, false to disable</param>
-        /// <exception cref="InvalidOperationException">Thrown when hex is not initialized or is disposed</exception>
-        public void SetIsRail(bool value)
-        {
-            ValidateState();
-
-            try
-            {
-                IsRail = value;
-
-                if (enableDebugLogging)
-                {
-                    Debug.Log($"{CLASS_NAME}: Rail status at {Position} set to {value}");
-                }
-            }
-            catch (Exception e)
-            {
-                AppService.HandleException(CLASS_NAME, "SetIsRail", e);
-                throw;
-            }
-        }
-
-        /// <summary>
-        /// Sets the road status of the hex.
-        /// </summary>
-        /// <param name="value">True to enable road, false to disable</param>
-        /// <exception cref="InvalidOperationException">Thrown when hex is not initialized or is disposed</exception>
-        public void SetIsRoad(bool value)
-        {
-            ValidateState();
-
-            try
-            {
-                IsRoad = value;
-
-                if (enableDebugLogging)
-                {
-                    Debug.Log($"{CLASS_NAME}: Road status at {Position} set to {value}");
-                }
-            }
-            catch (Exception e)
-            {
-                AppService.HandleException(CLASS_NAME, "SetIsRoad", e);
-                throw;
-            }
-        }
-
-        /// <summary>
-        /// Sets the objective status of the hex.
-        /// </summary>
-        /// <param name="value"></param>
-        public void SetIsObjective(bool value)
-        {
-            ValidateState();
-            try
-            {
-                IsObjective = value;
-                if (enableDebugLogging)
-                {
-                    Debug.Log($"{CLASS_NAME}: Objective status at {Position} set to {value}");
-                }
-            }
-            catch (Exception e)
-            {
-                AppService.HandleException(CLASS_NAME, "SetIsObjective", e);
-                throw;
-            }
-        }
-
-        /// <summary>
-        /// Sets the visibility status of the hex to the red side.
-        /// </summary>
-        /// <param name="value"></param>
-        public void SetIsVisible(bool value)
-        {
-            ValidateState();
-            try
-            {
-                IsVisible = value;
-                if (enableDebugLogging)
-                {
-                    Debug.Log($"{CLASS_NAME}: Visibility status at {Position} set to {value}");
-                }
-            }
-            catch (Exception e)
-            {
-                AppService.HandleException(CLASS_NAME, "SetIsVisible", e);
+                AppService.HandleException(CLASS_NAME, nameof(SetPosition), ex);
                 throw;
             }
         }
@@ -323,7 +242,6 @@ namespace HammerAndSickle.Models.Map
         /// Sets the terrain type and updates the movement cost.
         /// </summary>
         /// <param name="type">The terrain type to set</param>
-        /// <exception cref="InvalidOperationException">Thrown when hex is not initialized or is disposed</exception>
         public void SetTerrain(TerrainType type)
         {
             ValidateState();
@@ -338,18 +256,172 @@ namespace HammerAndSickle.Models.Map
                     Debug.Log($"{CLASS_NAME}: Terrain at {Position} set to {type}");
                 }
             }
-            catch (Exception e)
+            catch (Exception ex)
             {
-                AppService.HandleException(CLASS_NAME, "SetTerrain", e);
+                AppService.HandleException(CLASS_NAME, nameof(SetTerrain), ex);
                 throw;
             }
         }
 
         /// <summary>
-        /// Sets the label text for the hex.
+        /// Sets the fort status of the hex. Mutually exclusive with airbase.
         /// </summary>
-        /// <param name="direction"></param>
-        /// <param name="neighbor"></param>
+        /// <param name="value">True to enable fort, false to disable</param>
+        public void SetIsFort(bool value)
+        {
+            ValidateState();
+
+            try
+            {
+                IsFort = value;
+                if (IsFort && IsAirbase)
+                {
+                    IsAirbase = false;
+                    AppService.CaptureUiMessage("Fort and Airbase are mutually exclusive. Airbase disabled.");
+                }
+
+                if (enableDebugLogging)
+                {
+                    Debug.Log($"{CLASS_NAME}: Fort status at {Position} set to {value}");
+                }
+            }
+            catch (Exception ex)
+            {
+                AppService.HandleException(CLASS_NAME, nameof(SetIsFort), ex);
+                throw;
+            }
+        }
+
+        /// <summary>
+        /// Sets the airbase status of the hex. Mutually exclusive with fort.
+        /// </summary>
+        /// <param name="value">True to enable airbase, false to disable</param>
+        public void SetIsAirbase(bool value)
+        {
+            ValidateState();
+
+            try
+            {
+                IsAirbase = value;
+                if (IsAirbase && IsFort)
+                {
+                    IsFort = false;
+                    AppService.CaptureUiMessage("Fort and Airbase are mutually exclusive. Fort disabled.");
+                }
+
+                if (enableDebugLogging)
+                {
+                    Debug.Log($"{CLASS_NAME}: Airbase status at {Position} set to {value}");
+                }
+            }
+            catch (Exception ex)
+            {
+                AppService.HandleException(CLASS_NAME, nameof(SetIsAirbase), ex);
+                throw;
+            }
+        }
+
+        /// <summary>
+        /// Sets the rail status of the hex.
+        /// </summary>
+        /// <param name="value">True to enable rail, false to disable</param>
+        public void SetIsRail(bool value)
+        {
+            ValidateState();
+
+            try
+            {
+                IsRail = value;
+
+                if (enableDebugLogging)
+                {
+                    Debug.Log($"{CLASS_NAME}: Rail status at {Position} set to {value}");
+                }
+            }
+            catch (Exception ex)
+            {
+                AppService.HandleException(CLASS_NAME, nameof(SetIsRail), ex);
+                throw;
+            }
+        }
+
+        /// <summary>
+        /// Sets the road status of the hex.
+        /// </summary>
+        /// <param name="value">True to enable road, false to disable</param>
+        public void SetIsRoad(bool value)
+        {
+            ValidateState();
+
+            try
+            {
+                IsRoad = value;
+
+                if (enableDebugLogging)
+                {
+                    Debug.Log($"{CLASS_NAME}: Road status at {Position} set to {value}");
+                }
+            }
+            catch (Exception ex)
+            {
+                AppService.HandleException(CLASS_NAME, nameof(SetIsRoad), ex);
+                throw;
+            }
+        }
+
+        /// <summary>
+        /// Sets the objective status of the hex.
+        /// </summary>
+        /// <param name="value">True to make objective, false to remove</param>
+        public void SetIsObjective(bool value)
+        {
+            ValidateState();
+
+            try
+            {
+                IsObjective = value;
+
+                if (enableDebugLogging)
+                {
+                    Debug.Log($"{CLASS_NAME}: Objective status at {Position} set to {value}");
+                }
+            }
+            catch (Exception ex)
+            {
+                AppService.HandleException(CLASS_NAME, nameof(SetIsObjective), ex);
+                throw;
+            }
+        }
+
+        /// <summary>
+        /// Sets the visibility status of the hex.
+        /// </summary>
+        /// <param name="value">True to make visible, false to hide</param>
+        public void SetIsVisible(bool value)
+        {
+            ValidateState();
+
+            try
+            {
+                IsVisible = value;
+
+                if (enableDebugLogging)
+                {
+                    Debug.Log($"{CLASS_NAME}: Visibility status at {Position} set to {value}");
+                }
+            }
+            catch (Exception ex)
+            {
+                AppService.HandleException(CLASS_NAME, nameof(SetIsVisible), ex);
+                throw;
+            }
+        }
+
+        /// <summary>
+        /// Sets a neighboring hex in a specified direction.
+        /// </summary>
+        /// <param name="direction">Direction of the neighbor</param>
+        /// <param name="neighbor">The neighboring hex (null to remove)</param>
         public void SetNeighbor(HexDirection direction, Hex neighbor)
         {
             ValidateState();
@@ -358,11 +430,11 @@ namespace HammerAndSickle.Models.Map
             {
                 if (neighbor == null)
                 {
-                    Neighbors.Remove(direction);
+                    neighbors.Remove(direction);
                 }
                 else
                 {
-                    Neighbors[direction] = neighbor;
+                    neighbors[direction] = neighbor;
                 }
 
                 if (enableDebugLogging)
@@ -370,9 +442,9 @@ namespace HammerAndSickle.Models.Map
                     Debug.Log($"{CLASS_NAME}: Set neighbor at direction {direction} for hex at {Position}");
                 }
             }
-            catch (Exception e)
+            catch (Exception ex)
             {
-                AppService.HandleException(CLASS_NAME, "SetNeighbor", e);
+                AppService.HandleException(CLASS_NAME, nameof(SetNeighbor), ex);
                 throw;
             }
         }
@@ -380,19 +452,74 @@ namespace HammerAndSickle.Models.Map
         /// <summary>
         /// Retrieves a neighboring hex in a specified direction.
         /// </summary>
-        /// <param name="direction">The direction of the neighboring hex to retrieve.</param>
-        /// <returns>The neighboring hex in the specified direction, or null if no neighbor is present.</returns>
+        /// <param name="direction">The direction of the neighboring hex to retrieve</param>
+        /// <returns>The neighboring hex in the specified direction, or null if no neighbor exists</returns>
         public Hex GetNeighbor(HexDirection direction)
         {
-            // Check if the Neighbors dictionary contains the key for the specified direction.
-            if (Neighbors.ContainsKey(direction))
+            try
             {
-                return Neighbors[direction];
+                return neighbors.TryGetValue(direction, out Hex neighbor) ? neighbor : null;
             }
-            else
+            catch (Exception ex)
             {
-                // Return null if the neighbor does not exist in the specified direction.
+                AppService.HandleException(CLASS_NAME, nameof(GetNeighbor), ex);
                 return null;
+            }
+        }
+
+        /// <summary>
+        /// Gets all neighbors of this hex.
+        /// </summary>
+        /// <returns>Dictionary of all neighboring hexes by direction</returns>
+        public IReadOnlyDictionary<HexDirection, Hex> GetAllNeighbors()
+        {
+            try
+            {
+                return neighbors;
+            }
+            catch (Exception ex)
+            {
+                AppService.HandleException(CLASS_NAME, nameof(GetAllNeighbors), ex);
+                return new Dictionary<HexDirection, Hex>();
+            }
+        }
+
+        /// <summary>
+        /// Validates the current state of this hex for consistency.
+        /// </summary>
+        /// <returns>True if hex is valid, false otherwise</returns>
+        public bool ValidateHex()
+        {
+            try
+            {
+                // Check mutually exclusive features
+                if (IsFort && IsAirbase)
+                {
+                    AppService.CaptureUiMessage($"Hex at {Position}: Fort and Airbase cannot both be true");
+                    return false;
+                }
+
+                // Check terrain consistency
+                if (!Enum.IsDefined(typeof(TerrainType), Terrain))
+                {
+                    AppService.CaptureUiMessage($"Hex at {Position}: Invalid terrain type {Terrain}");
+                    return false;
+                }
+
+                // Validate movement cost matches terrain
+                int expectedCost = GetExpectedMovementCost(Terrain);
+                if (MovementCost != expectedCost)
+                {
+                    AppService.CaptureUiMessage($"Hex at {Position}: Movement cost {MovementCost} doesn't match terrain {Terrain} (expected {expectedCost})");
+                    return false;
+                }
+
+                return true;
+            }
+            catch (Exception ex)
+            {
+                AppService.HandleException(CLASS_NAME, nameof(ValidateHex), ex);
+                return false;
             }
         }
 
@@ -405,7 +532,25 @@ namespace HammerAndSickle.Models.Map
         /// </summary>
         private void UpdateMovementCost()
         {
-            MovementCost = Terrain switch
+            try
+            {
+                MovementCost = GetExpectedMovementCost(Terrain);
+            }
+            catch (Exception ex)
+            {
+                AppService.HandleException(CLASS_NAME, nameof(UpdateMovementCost), ex);
+                MovementCost = (int)HexMovementCost.Plains; // Safe default
+            }
+        }
+
+        /// <summary>
+        /// Gets the expected movement cost for a terrain type.
+        /// </summary>
+        /// <param name="terrain">Terrain type</param>
+        /// <returns>Movement cost for the terrain</returns>
+        private static int GetExpectedMovementCost(TerrainType terrain)
+        {
+            return terrain switch
             {
                 TerrainType.Water => (int)HexMovementCost.Water,
                 TerrainType.Clear => (int)HexMovementCost.Plains,
@@ -416,19 +561,18 @@ namespace HammerAndSickle.Models.Map
                 TerrainType.MinorCity => (int)HexMovementCost.MinorCity,
                 TerrainType.MajorCity => (int)HexMovementCost.MajorCity,
                 TerrainType.Impassable => (int)HexMovementCost.Impassable,
-                _ => throw new InvalidOperationException($"Invalid terrain type {Terrain}")
+                _ => (int)HexMovementCost.Plains
             };
         }
 
         /// <summary>
         /// Validates the current state of the hex.
         /// </summary>
-        /// <exception cref="InvalidOperationException">Thrown when hex is not initialized or is disposed</exception>
         private void ValidateState()
         {
             if (!IsInitialized)
             {
-                throw new InvalidOperationException($"{CLASS_NAME} is not initialized.");
+                throw new InvalidOperationException($"{CLASS_NAME} is not initialized");
             }
 
             if (IsDisposed)
@@ -463,7 +607,7 @@ namespace HammerAndSickle.Models.Map
                     try
                     {
                         // Clear neighbors dictionary
-                        Neighbors?.Clear();
+                        neighbors?.Clear();
 
                         // Clear border features
                         RiverBorders = null;
@@ -473,12 +617,12 @@ namespace HammerAndSickle.Models.Map
 
                         if (enableDebugLogging)
                         {
-                            Debug.Log($"{CLASS_NAME}: Hex at position {Position} disposed.");
+                            Debug.Log($"{CLASS_NAME}: Hex at position {Position} disposed");
                         }
                     }
-                    catch (Exception e)
+                    catch (Exception ex)
                     {
-                        AppService.HandleException(CLASS_NAME, "Dispose", e);
+                        AppService.HandleException(CLASS_NAME, nameof(Dispose), ex);
                     }
                 }
 
