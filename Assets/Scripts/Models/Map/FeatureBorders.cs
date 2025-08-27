@@ -1,170 +1,320 @@
+using HammerAndSickle.Services;
 using System;
-using System.Linq;
+using System.Text.Json.Serialization;
 
 namespace HammerAndSickle.Models.Map
 {
     /// <summary>
-    /// Hex border types.
+    /// Stores hex edge information with JSON serialization support.
     /// </summary>
-    public enum BorderType
-    {
-        None,
-        River,
-        Bridge,
-        DestroyedBridge,
-        PontoonBridge
-    }
-
-    /// <summary>
-    /// Stores hex edge information.
-    /// </summary>
+    [Serializable]
     public class FeatureBorders
     {
-        // The border strings have the characters in this order.
-        public bool Northwest { get; set; } = false;
-        public bool Northeast { get; set; } = false;
-        public bool East { get; set; } = false;
-        public bool Southeast { get; set; } = false;
-        public bool Southwest { get; set; } = false;
-        public bool West { get; set; } = false;
-        BorderType Type { get; set; } = BorderType.None;
+        #region Constants
+        private const string CLASS_NAME = nameof(FeatureBorders);
+        #endregion
+
+        #region Properties
+
+        [JsonInclude]
+        public bool Northwest { get; set; }
+
+        [JsonInclude]
+        public bool Northeast { get; set; }
+
+        [JsonInclude]
+        public bool East { get; set; }
+
+        [JsonInclude]
+        public bool Southeast { get; set; }
+
+        [JsonInclude]
+        public bool Southwest { get; set; }
+
+        [JsonInclude]
+        public bool West { get; set; }
+
+        [JsonInclude]
+        public BorderType Type { get; set; }
+
+        #endregion
+
+        #region Constructors
+
+        /// <summary>
+        /// Parameterless constructor for JSON serialization.
+        /// </summary>
+        [JsonConstructor]
+        public FeatureBorders()
+        {
+            Northwest = false;
+            Northeast = false;
+            East = false;
+            Southeast = false;
+            Southwest = false;
+            West = false;
+            Type = BorderType.None;
+        }
 
         /// <summary>
         /// Constructor that initializes the borders with specific directions.
         /// </summary>
-        /// <param name="NW">Northwest border value.</param>
-        /// <param name="NE">Northeast border value.</param>
-        /// <param name="E">East border value.</param>
-        /// <param name="SE">Southeast border value.</param>
-        /// <param name="SW">Southwest border value.</param>
-        /// <param name="W">West border value.</param>
-        public FeatureBorders(BorderType type, bool NW, bool NE, bool E, bool SE, bool SW, bool W)
+        /// <param name="type">Border type</param>
+        /// <param name="nw">Northwest border value</param>
+        /// <param name="ne">Northeast border value</param>
+        /// <param name="e">East border value</param>
+        /// <param name="se">Southeast border value</param>
+        /// <param name="sw">Southwest border value</param>
+        /// <param name="w">West border value</param>
+        public FeatureBorders(BorderType type, bool nw, bool ne, bool e, bool se, bool sw, bool w)
         {
-            Northwest = NW;
-            Northeast = NE;
-            East = E;
-            Southeast = SE;
-            Southwest = SW;
-            West = W;
+            try
+            {
+                Type = type;
+                Northwest = nw;
+                Northeast = ne;
+                East = e;
+                Southeast = se;
+                Southwest = sw;
+                West = w;
+            }
+            catch (Exception ex)
+            {
+                AppService.HandleException(CLASS_NAME, nameof(FeatureBorders), ex);
+                throw;
+            }
         }
 
         /// <summary>
         /// Constructor that initializes the borders with a specific type.
         /// </summary>
-        /// <param name="type"></param>
+        /// <param name="type">Border type</param>
         public FeatureBorders(BorderType type)
         {
-            Type = type;
+            try
+            {
+                Type = type;
+                Northwest = false;
+                Northeast = false;
+                East = false;
+                Southeast = false;
+                Southwest = false;
+                West = false;
+            }
+            catch (Exception ex)
+            {
+                AppService.HandleException(CLASS_NAME, nameof(FeatureBorders), ex);
+                throw;
+            }
         }
 
         /// <summary>
         /// Constructor that initializes the borders from a binary string.
         /// </summary>
-        /// <param name="input">Binary string representing the hex matrix.</param>
-        /// <exception cref="ArgumentException">Thrown when the input is not a valid 6-character binary string.</exception>
-        public FeatureBorders(string input = "000000")
+        /// <param name="input">Binary string representing the hex matrix</param>
+        /// <param name="type">Border type</param>
+        public FeatureBorders(string input, BorderType type = BorderType.None)
         {
-            SetBorderString(input);
+            try
+            {
+                Type = type;
+                SetBorderString(input ?? "000000");
+            }
+            catch (Exception ex)
+            {
+                AppService.HandleException(CLASS_NAME, nameof(FeatureBorders), ex);
+                throw;
+            }
         }
+
+        #endregion
+
+        #region Public Methods
 
         /// <summary>
         /// Reset the borders to default value.
         /// </summary>
         public void Reset()
         {
-            SetBorderString("000000");
+            try
+            {
+                SetBorderString("000000");
+            }
+            catch (Exception ex)
+            {
+                AppService.HandleException(CLASS_NAME, nameof(Reset), ex);
+                throw;
+            }
         }
 
         /// <summary>
         /// Gets the value of a specified side.
         /// </summary>
-        /// <param name="direction">The hex direction.</param>
-        /// <returns>Boolean value of the specified direction.</returns>
-        /// <exception cref="ArgumentOutOfRangeException">Thrown when the direction is invalid.</exception>
+        /// <param name="direction">The hex direction</param>
+        /// <returns>Boolean value of the specified direction</returns>
         public bool GetBorder(HexDirection direction)
         {
-            return direction switch
+            try
             {
-                HexDirection.NW => Northwest,
-                HexDirection.NE => Northeast,
-                HexDirection.E => East,
-                HexDirection.SE => Southeast,
-                HexDirection.SW => Southwest,
-                HexDirection.W => West,
-                _ => throw new ArgumentOutOfRangeException(nameof(direction), direction, "FeatureBorders.GetBorder: Error, invalid direction.")
-            };
+                return direction switch
+                {
+                    HexDirection.NW => Northwest,
+                    HexDirection.NE => Northeast,
+                    HexDirection.E => East,
+                    HexDirection.SE => Southeast,
+                    HexDirection.SW => Southwest,
+                    HexDirection.W => West,
+                    _ => throw new ArgumentOutOfRangeException(nameof(direction), direction, "Invalid direction")
+                };
+            }
+            catch (Exception ex)
+            {
+                AppService.HandleException(CLASS_NAME, nameof(GetBorder), ex);
+                throw;
+            }
         }
 
         /// <summary>
         /// Sets a side to a specific value.
         /// </summary>
-        /// <param name="direction">The hex direction.</param>
-        /// <param name="value">Value to set.</param>
-        /// <exception cref="ArgumentOutOfRangeException">Thrown when the direction is invalid.</exception>
+        /// <param name="direction">The hex direction</param>
+        /// <param name="value">Value to set</param>
         public void SetBorder(HexDirection direction, bool value)
         {
-            switch (direction)
+            try
             {
-                case HexDirection.NW: Northwest = value; break;
-                case HexDirection.NE: Northeast = value; break;
-                case HexDirection.E: East = value; break;
-                case HexDirection.SE: Southeast = value; break;
-                case HexDirection.SW: Southwest = value; break;
-                case HexDirection.W: West = value; break;
-                default: throw new ArgumentOutOfRangeException(nameof(direction), direction, "FeatureBorders.SetBorder: Error, invalid direction.");
+                switch (direction)
+                {
+                    case HexDirection.NW: Northwest = value; break;
+                    case HexDirection.NE: Northeast = value; break;
+                    case HexDirection.E: East = value; break;
+                    case HexDirection.SE: Southeast = value; break;
+                    case HexDirection.SW: Southwest = value; break;
+                    case HexDirection.W: West = value; break;
+                    default: throw new ArgumentOutOfRangeException(nameof(direction), direction, "Invalid direction");
+                }
+            }
+            catch (Exception ex)
+            {
+                AppService.HandleException(CLASS_NAME, nameof(SetBorder), ex);
+                throw;
             }
         }
 
         /// <summary>
         /// Sets the matrix with a 6-character binary string.
         /// </summary>
-        /// <param name="input">Binary string representing the hex matrix.</param>
-        /// <exception cref="ArgumentException">Thrown when the input is not a valid 6-character binary string.</exception>
+        /// <param name="input">Binary string representing the hex matrix</param>
         public void SetBorderString(string input)
         {
-            if (input.Length != 6 || !IsBinaryString(input))
+            try
             {
-                throw new ArgumentException("FeatureBorders.SetMatrixString: Error, input must be a 6-character binary string.");
+                if (string.IsNullOrEmpty(input))
+                {
+                    input = "000000";
+                }
+
+                if (input.Length != 6 || !IsBinaryString(input))
+                {
+                    throw new ArgumentException("Input must be a 6-character binary string", nameof(input));
+                }
+
+                Northwest = input[0] == '1';
+                Northeast = input[1] == '1';
+                East = input[2] == '1';
+                Southeast = input[3] == '1';
+                Southwest = input[4] == '1';
+                West = input[5] == '1';
             }
-
-            Northwest = input[0] == '1';
-            Northeast = input[1] == '1';
-            East = input[2] == '1';
-            Southeast = input[3] == '1';
-            Southwest = input[4] == '1';
-            West = input[5] == '1';
-        }
-
-        /// <summary>
-        /// Validates if a string is a binary string.
-        /// </summary>
-        /// <param name="input">The string to check.</param>
-        /// <returns>True if the string is binary; otherwise, false.</returns>
-        private bool IsBinaryString(string input)
-        {
-            return input.All(c => c == '0' || c == '1');
+            catch (Exception ex)
+            {
+                AppService.HandleException(CLASS_NAME, nameof(SetBorderString), ex);
+                throw;
+            }
         }
 
         /// <summary>
         /// Converts the hex borders to a binary string representation.
         /// </summary>
-        /// <returns>Binary string representing the hex border.</returns>
+        /// <returns>Binary string representing the hex border</returns>
         public string GetBorderString()
         {
-            return $"{(Northwest ? "1" : "0")}{(Northeast ? "1" : "0")}{(East ? "1" : "0")}{(Southeast ? "1" : "0")}{(Southwest ? "1" : "0")}{(West ? "1" : "0")}";
+            try
+            {
+                return $"{(Northwest ? "1" : "0")}{(Northeast ? "1" : "0")}{(East ? "1" : "0")}{(Southeast ? "1" : "0")}{(Southwest ? "1" : "0")}{(West ? "1" : "0")}";
+            }
+            catch (Exception ex)
+            {
+                AppService.HandleException(CLASS_NAME, nameof(GetBorderString), ex);
+                return "000000";
+            }
+        }
+
+        /// <summary>
+        /// Checks if any of the borders are active.
+        /// </summary>
+        /// <returns>True if any border is active, false otherwise</returns>
+        public bool HasAnyBorders()
+        {
+            try
+            {
+                return Northwest || Northeast || East || Southeast || Southwest || West;
+            }
+            catch (Exception ex)
+            {
+                AppService.HandleException(CLASS_NAME, nameof(HasAnyBorders), ex);
+                return false;
+            }
         }
 
         /// <summary>
         /// Checks if any of the borders in the given FeatureBorders object are active.
         /// </summary>
-        /// <param name="borders">The FeatureBorders object representing the state of each border.</param>
-        /// <returns>Returns true if any of the borders are active; otherwise, false.</returns>
+        /// <param name="borders">The FeatureBorders object representing the state of each border</param>
+        /// <returns>True if any of the borders are active, false otherwise</returns>
         public static bool CheckFeatureBorders(FeatureBorders borders)
         {
-            // Check each border in the FeatureBorders object. 
-            // If any border is active (true), return true.
-            return borders.Northwest || borders.Northeast || borders.East ||
-                   borders.Southeast || borders.Southwest || borders.West;
+            try
+            {
+                return borders?.HasAnyBorders() ?? false;
+            }
+            catch (Exception ex)
+            {
+                AppService.HandleException(CLASS_NAME, nameof(CheckFeatureBorders), ex);
+                return false;
+            }
         }
+
+        #endregion
+
+        #region Private Methods
+
+        /// <summary>
+        /// Validates if a string is a binary string.
+        /// </summary>
+        /// <param name="input">The string to check</param>
+        /// <returns>True if the string is binary, false otherwise</returns>
+        private static bool IsBinaryString(string input)
+        {
+            try
+            {
+                if (string.IsNullOrEmpty(input)) return false;
+
+                foreach (char c in input)
+                {
+                    if (c != '0' && c != '1')
+                    {
+                        return false;
+                    }
+                }
+                return true;
+            }
+            catch
+            {
+                return false;
+            }
+        }
+
+        #endregion
     }
 }
