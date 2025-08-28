@@ -54,12 +54,12 @@ namespace HammerAndSickle.Models.Map
     /// </summary>
     public enum HexDirection
     {
+        NW,
         NE,
         E,
         SE,
         SW,
-        W,
-        NW
+        W
     }
 
     /// <summary>

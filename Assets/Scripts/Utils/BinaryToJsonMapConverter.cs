@@ -124,9 +124,11 @@ namespace HammerAndSickle.Editor.Tools
                     return null;
                 }
 
-                // Create output file path
+                // Get file name without extension
                 string fileName = Path.GetFileNameWithoutExtension(binaryFilePath);
-                string jsonFilePath = Path.Combine(OUTPUT_DIRECTORY, $"{fileName}.json");
+                
+                // Save pretty‑printed JSON using .map extension
+                string jsonFilePath = Path.Combine(OUTPUT_DIRECTORY, $"{fileName}.map");
 
                 // Save JSON file
                 bool success = await SaveJsonMapFileAsync(jsonMapData, jsonFilePath);
