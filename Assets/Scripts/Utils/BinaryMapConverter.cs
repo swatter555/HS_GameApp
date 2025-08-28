@@ -1,4 +1,4 @@
-using HammerAndSickle.Models.Map;
+﻿using HammerAndSickle.Models.Map;
 using HammerAndSickle.Models.Map.Legacy;
 using HammerAndSickle.Services;
 using System;
@@ -19,8 +19,14 @@ namespace HammerAndSickle.Utils
     {
         #region Constants
         private const string CLASS_NAME = nameof(BinaryMapConverter);
-        private const string BINARY_MAP_EXTENSION = ".map";
-        private const string JSON_MAP_EXTENSION = ".json";
+        
+        // Legacy input produced by the editor
+        private const string LEGACY_BINARY_EXTENSION = ".hsm";
+
+        // Output file extension for human‑readable JSON maps used by the game
+        private const string OUTPUT_MAP_EXTENSION = ".map";
+
+        // File extensions
         private static readonly JsonSerializerOptions JsonOptions = new()
         {
             WriteIndented = true,
@@ -74,8 +80,12 @@ namespace HammerAndSickle.Utils
 
                 // Determine output path
                 outputDirectory ??= Path.GetDirectoryName(binaryFilePath);
+
+                // Get the binary file name without extension
                 string fileName = Path.GetFileNameWithoutExtension(binaryFilePath);
-                string jsonFilePath = Path.Combine(outputDirectory, $"{fileName}{JSON_MAP_EXTENSION}");
+                
+                // Write JSON content with .map extension
+                string jsonFilePath = Path.Combine(outputDirectory, $"{fileName}{OUTPUT_MAP_EXTENSION}");
 
                 // Save JSON file
                 bool success = await SaveJsonMapFileAsync(jsonMapData, jsonFilePath);
@@ -115,8 +125,8 @@ namespace HammerAndSickle.Utils
 
                 outputDirectory ??= inputDirectory;
 
-                // Find all binary map files
-                var binaryFiles = Directory.GetFiles(inputDirectory, $"*{BINARY_MAP_EXTENSION}", SearchOption.TopDirectoryOnly);
+                // Look for legacy .hsm files
+                var binaryFiles = Directory.GetFiles(inputDirectory, $"*{LEGACY_BINARY_EXTENSION}", SearchOption.TopDirectoryOnly);
 
                 if (binaryFiles.Length == 0)
                 {
