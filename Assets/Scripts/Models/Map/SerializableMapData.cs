@@ -8,25 +8,30 @@ namespace HammerAndSickle.Models.Map
     /// <summary>
     /// Legacy serializable map data structure for binary deserialization.
     /// Used only for converting old binary map files to JSON format.
+    /// MUST match the structure created by the map editor exactly.
     /// </summary>
     [Serializable]
     public class SerializableMapData
     {
         #region Constants
+
         private const string CLASS_NAME = nameof(SerializableMapData);
+
         #endregion
 
         #region Properties
 
         /// <summary>
         /// Map header containing metadata and configuration.
+        /// Uses the actual MapHeader class from the map editor.
         /// </summary>
         public SerializableMapHeader Header { get; set; }
 
         /// <summary>
-        /// Collection of all hex tiles in the map.
+        /// Array of all hex tiles in the map.
+        /// MUST be array, not List, to match binary format.
         /// </summary>
-        public List<SerializableHex> Hexes { get; set; }
+        public SerializableHex[] Hexes { get; set; }
 
         #endregion
 
@@ -38,7 +43,7 @@ namespace HammerAndSickle.Models.Map
         public SerializableMapData()
         {
             Header = new SerializableMapHeader();
-            Hexes = new List<SerializableHex>();
+            Hexes = new SerializableHex[0];
         }
 
         #endregion
@@ -59,7 +64,7 @@ namespace HammerAndSickle.Models.Map
                     return false;
                 }
 
-                if (Hexes == null || Hexes.Count == 0)
+                if (Hexes == null || Hexes.Length == 0)
                 {
                     AppService.CaptureUiMessage("Map has no hex data");
                     return false;
@@ -127,7 +132,7 @@ namespace HammerAndSickle.Models.Map
 
     /// <summary>
     /// Legacy serializable map header for binary deserialization.
-    /// Contains map metadata and configuration information.
+    /// MUST match the MapHeader structure from the map editor exactly.
     /// </summary>
     [Serializable]
     public class SerializableMapHeader
@@ -139,39 +144,44 @@ namespace HammerAndSickle.Models.Map
         #region Properties
 
         /// <summary>
-        /// Map configuration type (Small/Large).
-        /// </summary>
-        public MapConfig MapConfiguration { get; set; }
-
-        /// <summary>
-        /// Map theme (Europe/MiddleEast/China).
-        /// </summary>
-        public MapTheme Theme { get; set; }
-
-        /// <summary>
-        /// Map name or identifier.
+        /// Map name - matches MapHeader.MapName.
         /// </summary>
         public string MapName { get; set; }
 
         /// <summary>
-        /// Map width in hexes.
+        /// Map width - matches MapHeader.Width.
         /// </summary>
-        public int MapWidth { get; set; }
+        public int Width { get; set; }
 
         /// <summary>
-        /// Map height in hexes.
+        /// Map height - matches MapHeader.Height.
         /// </summary>
-        public int MapHeight { get; set; }
+        public int Height { get; set; }
 
         /// <summary>
-        /// Version of the map format.
+        /// Map configuration - matches MapHeader.MapConfiguration.
+        /// </summary>
+        public MapConfig MapConfiguration { get; set; }
+
+        /// <summary>
+        /// Creation date - matches MapHeader.CreationDate.
+        /// </summary>
+        public DateTime CreationDate { get; set; }
+
+        /// <summary>
+        /// Last modified date - matches MapHeader.LastModifiedDate.
+        /// </summary>
+        public DateTime LastModifiedDate { get; set; }
+
+        /// <summary>
+        /// Description - matches MapHeader.Description.
+        /// </summary>
+        public string Description { get; set; }
+
+        /// <summary>
+        /// Version - matches MapHeader.Version.
         /// </summary>
         public int Version { get; set; }
-
-        /// <summary>
-        /// Creation timestamp.
-        /// </summary>
-        public DateTime CreatedDate { get; set; }
 
         #endregion
 
@@ -182,13 +192,14 @@ namespace HammerAndSickle.Models.Map
         /// </summary>
         public SerializableMapHeader()
         {
-            MapConfiguration = MapConfig.None;
-            Theme = MapTheme.None;
             MapName = string.Empty;
-            MapWidth = 0;
-            MapHeight = 0;
+            Width = 0;
+            Height = 0;
+            MapConfiguration = MapConfig.None;
+            CreationDate = DateTime.MinValue;
+            LastModifiedDate = DateTime.MinValue;
+            Description = string.Empty;
             Version = 1;
-            CreatedDate = DateTime.MinValue;
         }
 
         #endregion
@@ -209,21 +220,15 @@ namespace HammerAndSickle.Models.Map
                     return false;
                 }
 
-                if (MapWidth <= 0 || MapHeight <= 0)
+                if (Width <= 0 || Height <= 0)
                 {
-                    AppService.CaptureUiMessage($"Invalid map dimensions: {MapWidth}x{MapHeight}");
+                    AppService.CaptureUiMessage($"Invalid map dimensions: {Width}x{Height}");
                     return false;
                 }
 
                 if (!Enum.IsDefined(typeof(MapConfig), MapConfiguration))
                 {
                     AppService.CaptureUiMessage($"Invalid map configuration: {MapConfiguration}");
-                    return false;
-                }
-
-                if (!Enum.IsDefined(typeof(MapTheme), Theme))
-                {
-                    AppService.CaptureUiMessage($"Invalid map theme: {Theme}");
                     return false;
                 }
 
@@ -241,18 +246,20 @@ namespace HammerAndSickle.Models.Map
 
     /// <summary>
     /// Legacy serializable hex data for binary deserialization.
-    /// Contains all hex properties in a format compatible with old binary files.
+    /// MUST match the SerializableHex structure from the map editor exactly.
     /// </summary>
     [Serializable]
     public class SerializableHex
     {
         #region Constants
+
         private const string CLASS_NAME = nameof(SerializableHex);
+
         #endregion
 
         #region Properties
 
-        // Position
+        // Position - matches map editor exactly
         public int X { get; set; }
         public int Y { get; set; }
 
@@ -284,11 +291,11 @@ namespace HammerAndSickle.Models.Map
         public float AirbaseDamage { get; set; }
         public int UrbanDamage { get; set; }
 
-        // Border Features (stored as binary strings)
-        public string RiverBorderString { get; set; }
-        public string BridgeBorderString { get; set; }
-        public string PontoonBridgeBorderString { get; set; }
-        public string DamagedBridgeBorderString { get; set; }
+        // Border Features - matches map editor property names exactly
+        public string RiverBorders { get; set; }
+        public string BridgeBorders { get; set; }
+        public string PontoonBridgeBorders { get; set; }
+        public string DamagedBridgeBorders { get; set; }
 
         #endregion
 
@@ -319,10 +326,10 @@ namespace HammerAndSickle.Models.Map
             VictoryValue = 0f;
             AirbaseDamage = 0f;
             UrbanDamage = 0;
-            RiverBorderString = "000000";
-            BridgeBorderString = "000000";
-            PontoonBridgeBorderString = "000000";
-            DamagedBridgeBorderString = "000000";
+            RiverBorders = "000000";
+            BridgeBorders = "000000";
+            PontoonBridgeBorders = "000000";
+            DamagedBridgeBorders = "000000";
         }
 
         #endregion
@@ -365,10 +372,10 @@ namespace HammerAndSickle.Models.Map
                 jsonHex.UrbanDamage = UrbanDamage;
 
                 // Convert border strings to FeatureBorders objects
-                jsonHex.RiverBorders = new FeatureBorders(RiverBorderString ?? "000000", BorderType.River);
-                jsonHex.BridgeBorders = new FeatureBorders(BridgeBorderString ?? "000000", BorderType.Bridge);
-                jsonHex.PontoonBridgeBorders = new FeatureBorders(PontoonBridgeBorderString ?? "000000", BorderType.PontoonBridge);
-                jsonHex.DamagedBridgeBorders = new FeatureBorders(DamagedBridgeBorderString ?? "000000", BorderType.DestroyedBridge);
+                jsonHex.RiverBorders = new FeatureBorders(RiverBorders ?? "000000", BorderType.River);
+                jsonHex.BridgeBorders = new FeatureBorders(BridgeBorders ?? "000000", BorderType.Bridge);
+                jsonHex.PontoonBridgeBorders = new FeatureBorders(PontoonBridgeBorders ?? "000000", BorderType.PontoonBridge);
+                jsonHex.DamagedBridgeBorders = new FeatureBorders(DamagedBridgeBorders ?? "000000", BorderType.DestroyedBridge);
 
                 return jsonHex;
             }
@@ -422,10 +429,10 @@ namespace HammerAndSickle.Models.Map
                 targetHex.UrbanDamage = UrbanDamage;
 
                 // Convert and set border features
-                targetHex.RiverBorders = new FeatureBorders(RiverBorderString ?? "000000", BorderType.River);
-                targetHex.BridgeBorders = new FeatureBorders(BridgeBorderString ?? "000000", BorderType.Bridge);
-                targetHex.PontoonBridgeBorders = new FeatureBorders(PontoonBridgeBorderString ?? "000000", BorderType.PontoonBridge);
-                targetHex.DamagedBridgeBorders = new FeatureBorders(DamagedBridgeBorderString ?? "000000", BorderType.DestroyedBridge);
+                targetHex.RiverBorders = new FeatureBorders(RiverBorders ?? "000000", BorderType.River);
+                targetHex.BridgeBorders = new FeatureBorders(BridgeBorders ?? "000000", BorderType.Bridge);
+                targetHex.PontoonBridgeBorders = new FeatureBorders(PontoonBridgeBorders ?? "000000", BorderType.PontoonBridge);
+                targetHex.DamagedBridgeBorders = new FeatureBorders(DamagedBridgeBorders ?? "000000", BorderType.DestroyedBridge);
             }
             catch (Exception ex)
             {
@@ -457,13 +464,13 @@ namespace HammerAndSickle.Models.Map
                 }
 
                 // Validate border strings
-                if (!ValidateBorderString(RiverBorderString, "River"))
+                if (!ValidateBorderString(RiverBorders, "River"))
                     return false;
-                if (!ValidateBorderString(BridgeBorderString, "Bridge"))
+                if (!ValidateBorderString(BridgeBorders, "Bridge"))
                     return false;
-                if (!ValidateBorderString(PontoonBridgeBorderString, "PontoonBridge"))
+                if (!ValidateBorderString(PontoonBridgeBorders, "PontoonBridge"))
                     return false;
-                if (!ValidateBorderString(DamagedBridgeBorderString, "DamagedBridge"))
+                if (!ValidateBorderString(DamagedBridgeBorders, "DamagedBridge"))
                     return false;
 
                 return true;

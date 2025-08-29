@@ -20,6 +20,7 @@ namespace HammerAndSickle.Utils
     public class BinaryToJsonMapConverter : MonoBehaviour
     {
         #region Constants
+
         private const string CLASS_NAME = nameof(BinaryToJsonMapConverter);
         private const string OUTPUT_DIRECTORY = "Assets/Converted Files";
 
@@ -29,21 +30,27 @@ namespace HammerAndSickle.Utils
             PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
             DefaultIgnoreCondition = System.Text.Json.Serialization.JsonIgnoreCondition.WhenWritingNull
         };
+
         #endregion
 
         #region Serialized Fields
+
         [Header("File Conversion")]
         [SerializeField] private UnityEngine.Object binaryFileToConvert;
+
         #endregion
 
         #region Unity Methods
+
         private void Start()
         {
             EnsureOutputDirectoryExists();
         }
+
         #endregion
 
         #region Public Methods
+
         /// <summary>
         /// Converts the assigned .hsm file to JSON format.
         /// </summary>
@@ -55,7 +62,7 @@ namespace HammerAndSickle.Utils
                 return;
             }
 
-#if UNITY_EDITOR
+            #if UNITY_EDITOR
             string assetPath = AssetDatabase.GetAssetPath(binaryFileToConvert);
             if (string.IsNullOrEmpty(assetPath))
             {
@@ -91,13 +98,15 @@ namespace HammerAndSickle.Utils
             {
                 Debug.LogError("✗ Conversion failed");
             }
-#else
+            #else
             Debug.LogError("File conversion only available in Unity Editor");
-#endif
+            #endif
         }
+
         #endregion
 
         #region Private Methods
+
         private async Task<string> ConvertBinaryMapToJsonAsync(string binaryFilePath)
         {
             try
@@ -125,7 +134,7 @@ namespace HammerAndSickle.Utils
 
                 // Get file name without extension
                 string fileName = Path.GetFileNameWithoutExtension(binaryFilePath);
-                
+
                 // Save pretty‑printed JSON using .map extension
                 string jsonFilePath = Path.Combine(OUTPUT_DIRECTORY, $"{fileName}.map");
 
@@ -146,12 +155,12 @@ namespace HammerAndSickle.Utils
             {
                 using var fileStream = new FileStream(filePath, FileMode.Open, FileAccess.Read, FileShare.Read);
 
-#pragma warning disable SYSLIB0011 // BinaryFormatter is obsolete
+                #pragma warning disable SYSLIB0011 // BinaryFormatter is obsolete
                 var formatter = new BinaryFormatter();
                 var mapData = (SerializableMapData)formatter.Deserialize(fileStream);
-#pragma warning restore SYSLIB0011
+                #pragma warning restore SYSLIB0011
 
-                Debug.Log($"Loaded binary data: {mapData?.Hexes?.Count ?? 0} hexes");
+                Debug.Log($"Loaded binary data: {mapData?.Hexes?.Length ?? 0} hexes");
                 return mapData;
             }
             catch (Exception ex)
@@ -170,18 +179,18 @@ namespace HammerAndSickle.Utils
                     return null;
                 }
 
-                // Convert header
+                // Convert header - map SerializableMapHeader properties to JsonMapHeader
                 var jsonHeader = new JsonMapHeader
                 {
                     MapName = binaryMapData.Header.MapName,
                     MapConfiguration = binaryMapData.Header.MapConfiguration,
-                    Theme = binaryMapData.Header.Theme,
-                    MapWidth = binaryMapData.Header.MapWidth,
-                    MapHeight = binaryMapData.Header.MapHeight,
+                    MapWidth = binaryMapData.Header.Width, // Width -> MapWidth
+                    MapHeight = binaryMapData.Header.Height, // Height -> MapHeight
                     Version = binaryMapData.Header.Version,
-                    CreatedDate = binaryMapData.Header.CreatedDate,
+                    CreatedDate = binaryMapData.Header.CreationDate, // CreationDate -> CreatedDate
                     ConvertedDate = DateTime.UtcNow,
-                    OriginalFormat = "Binary"
+                    OriginalFormat = "Binary",
+                    Description = binaryMapData.Header.Description
                 };
 
                 // Convert hex data
@@ -234,9 +243,9 @@ namespace HammerAndSickle.Utils
                 if (!Directory.Exists(OUTPUT_DIRECTORY))
                 {
                     Directory.CreateDirectory(OUTPUT_DIRECTORY);
-#if UNITY_EDITOR
+                    #if UNITY_EDITOR
                     AssetDatabase.Refresh();
-#endif
+                    #endif
                     Debug.Log($"Created output directory: {OUTPUT_DIRECTORY}");
                 }
             }
@@ -245,10 +254,11 @@ namespace HammerAndSickle.Utils
                 AppService.HandleException(CLASS_NAME, nameof(EnsureOutputDirectoryExists), ex);
             }
         }
+
         #endregion
     }
 
-#if UNITY_EDITOR
+    #if UNITY_EDITOR
     /// <summary>
     /// Custom inspector for BinaryToJsonMapConverter to show the Convert File button.
     /// </summary>
@@ -269,7 +279,7 @@ namespace HammerAndSickle.Utils
             }
         }
     }
-#endif
+    #endif
 
     #region Data Classes
     /// <summary>
@@ -296,25 +306,25 @@ namespace HammerAndSickle.Utils
     {
         public string MapName { get; set; }
         public MapConfig MapConfiguration { get; set; }
-        public MapTheme Theme { get; set; }
         public int MapWidth { get; set; }
         public int MapHeight { get; set; }
         public int Version { get; set; }
         public DateTime CreatedDate { get; set; }
         public DateTime ConvertedDate { get; set; }
         public string OriginalFormat { get; set; }
+        public string Description { get; set; }
 
         public JsonMapHeader()
         {
             MapName = string.Empty;
             MapConfiguration = MapConfig.None;
-            Theme = MapTheme.None;
             MapWidth = 0;
             MapHeight = 0;
             Version = 1;
             CreatedDate = DateTime.MinValue;
             ConvertedDate = DateTime.UtcNow;
             OriginalFormat = "JSON";
+            Description = string.Empty;
         }
     }
     #endregion
