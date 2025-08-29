@@ -1,5 +1,4 @@
 ﻿using HammerAndSickle.Models.Map;
-using HammerAndSickle.Models.Map.Legacy;
 using HammerAndSickle.Services;
 using System;
 using System.Collections.Generic;
@@ -13,7 +12,7 @@ using UnityEngine;
 using UnityEditor;
 #endif
 
-namespace HammerAndSickle.Editor.Tools
+namespace HammerAndSickle.Utils
 {
     /// <summary>
     /// Simple tool for converting .hsm files to JSON format.

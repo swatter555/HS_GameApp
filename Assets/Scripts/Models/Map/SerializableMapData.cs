@@ -3,7 +3,7 @@ using System;
 using System.Collections.Generic;
 using UnityEngine;
 
-namespace HammerAndSickle.Models.Map.Legacy
+namespace HammerAndSickle.Models.Map
 {
     /// <summary>
     /// Legacy serializable map data structure for binary deserialization.
