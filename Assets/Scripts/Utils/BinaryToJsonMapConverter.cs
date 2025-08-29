@@ -6,11 +6,9 @@ using System.IO;
 using System.Runtime.Serialization.Formatters.Binary;
 using System.Text.Json;
 using System.Threading.Tasks;
+using System.Diagnostics; // for Stopwatch
 using UnityEngine;
-
-#if UNITY_EDITOR
 using UnityEditor;
-#endif
 
 namespace HammerAndSickle.Utils
 {
@@ -56,47 +54,62 @@ namespace HammerAndSickle.Utils
         /// </summary>
         public async void ConvertFile()
         {
+            
+            UnityEngine.Debug.Log($"[{CLASS_NAME}] ConvertFile() invoked.");
             if (binaryFileToConvert == null)
             {
-                Debug.Log("No file assigned. Please drag a .hsm file to the Binary File To Convert field.");
+                UnityEngine.Debug.Log("No file assigned. Please drag a .hsm file to the Binary File To Convert field.");
                 return;
             }
 
             #if UNITY_EDITOR
             string assetPath = AssetDatabase.GetAssetPath(binaryFileToConvert);
+            UnityEngine.Debug.Log($"[{CLASS_NAME}] Resolved Asset path: '{assetPath}'");
             if (string.IsNullOrEmpty(assetPath))
             {
-                Debug.LogError("Could not get path for assigned file.");
+                UnityEngine.Debug.LogError("Could not get path for assigned file.");
                 return;
             }
 
             if (!assetPath.EndsWith(".hsm", StringComparison.OrdinalIgnoreCase))
             {
-                Debug.LogError($"Selected file is not a .hsm file: {assetPath}");
+                UnityEngine.Debug.LogError($"Selected file is not a .hsm file: {assetPath}");
                 return;
             }
 
-            Debug.Log($"Converting {Path.GetFileName(assetPath)} to JSON...");
+            string fileName = Path.GetFileName(assetPath);
+            UnityEngine.Debug.Log($"[{CLASS_NAME}] Preparing to convert '{fileName}' to JSON...");
 
             string fullPath = Path.GetFullPath(assetPath);
+            UnityEngine.Debug.Log($"[{CLASS_NAME}] Full OS path: '{fullPath}'");
+
+            var totalSw = Stopwatch.StartNew();
             string jsonPath = await ConvertBinaryMapToJsonAsync(fullPath);
+            totalSw.Stop();
+            UnityEngine.Debug.Log($"[{CLASS_NAME}] Total conversion time: {totalSw.ElapsedMilliseconds} ms");
 
             if (!string.IsNullOrEmpty(jsonPath))
             {
-                Debug.Log($"✓ Conversion successful: {Path.GetFileName(jsonPath)}");
+                UnityEngine.Debug.Log($"✓ Conversion successful: {Path.GetFileName(jsonPath)}");
                 AssetDatabase.Refresh();
 
                 // Ping the created file
                 string relativePath = "Assets" + jsonPath.Substring(Application.dataPath.Length);
+                UnityEngine.Debug.Log($"[{CLASS_NAME}] Attempting to ping asset at: '{relativePath}'");
                 var asset = AssetDatabase.LoadAssetAtPath<UnityEngine.Object>(relativePath);
                 if (asset != null)
                 {
                     EditorGUIUtility.PingObject(asset);
+                    UnityEngine.Debug.Log($"[{CLASS_NAME}] Pinged created asset.");
+                }
+                else
+                {
+                    UnityEngine.Debug.LogWarning($"[{CLASS_NAME}] Could not load asset for ping: '{relativePath}'");
                 }
             }
             else
             {
-                Debug.LogError("✗ Conversion failed");
+                UnityEngine.Debug.LogError("✗ Conversion failed");
             }
             #else
             Debug.LogError("File conversion only available in Unity Editor");
@@ -109,37 +122,60 @@ namespace HammerAndSickle.Utils
 
         private async Task<string> ConvertBinaryMapToJsonAsync(string binaryFilePath)
         {
+            UnityEngine.Debug.Log($"[{CLASS_NAME}] ConvertBinaryMapToJsonAsync() start. Source: '{binaryFilePath}'");
             try
             {
                 // Load binary map data
+                var loadSw = Stopwatch.StartNew();
                 var binaryMapData = LoadBinaryMapFile(binaryFilePath);
+                loadSw.Stop();
+                UnityEngine.Debug.Log($"[{CLASS_NAME}] LoadBinaryMapFile() completed in {loadSw.ElapsedMilliseconds} ms");
+
                 if (binaryMapData == null)
                 {
+                    UnityEngine.Debug.LogError($"[{CLASS_NAME}] LoadBinaryMapFile() returned null.");
                     return null;
                 }
 
                 // Validate binary data
-                if (!binaryMapData.ValidateMapData())
+                UnityEngine.Debug.Log($"[{CLASS_NAME}] Validating binary data...");
+                var validateSw = Stopwatch.StartNew();
+                bool valid = binaryMapData.ValidateMapData();
+                validateSw.Stop();
+                UnityEngine.Debug.Log($"[{CLASS_NAME}] ValidateMapData() => {valid} in {validateSw.ElapsedMilliseconds} ms");
+                if (!valid)
                 {
-                    Debug.LogError($"Binary data validation failed: {Path.GetFileName(binaryFilePath)}");
+                    UnityEngine.Debug.LogError($"Binary data validation failed: {Path.GetFileName(binaryFilePath)}");
                     return null;
                 }
 
                 // Convert to JSON format
+                UnityEngine.Debug.Log($"[{CLASS_NAME}] Converting to JSON structure...");
+                var convertSw = Stopwatch.StartNew();
                 var jsonMapData = ConvertToJsonMapData(binaryMapData);
+                convertSw.Stop();
+                UnityEngine.Debug.Log($"[{CLASS_NAME}] ConvertToJsonMapData() completed in {convertSw.ElapsedMilliseconds} ms");
                 if (jsonMapData == null)
                 {
+                    UnityEngine.Debug.LogError($"[{CLASS_NAME}] ConvertToJsonMapData() returned null.");
                     return null;
                 }
 
                 // Get file name without extension
                 string fileName = Path.GetFileNameWithoutExtension(binaryFilePath);
+                UnityEngine.Debug.Log($"[{CLASS_NAME}] Derived output base name: '{fileName}'");
 
-                // Save pretty‑printed JSON using .map extension
+                // Save pretty-printed JSON using .map extension
                 string jsonFilePath = Path.Combine(OUTPUT_DIRECTORY, $"{fileName}.map");
+                UnityEngine.Debug.Log($"[{CLASS_NAME}] Target JSON path: '{jsonFilePath}'");
 
                 // Save JSON file
+                UnityEngine.Debug.Log($"[{CLASS_NAME}] Writing JSON to disk...");
+                var saveSw = Stopwatch.StartNew();
                 bool success = await SaveJsonMapFileAsync(jsonMapData, jsonFilePath);
+                saveSw.Stop();
+                UnityEngine.Debug.Log($"[{CLASS_NAME}] SaveJsonMapFileAsync() => {success} in {saveSw.ElapsedMilliseconds} ms");
+
                 return success ? jsonFilePath : null;
             }
             catch (Exception ex)
@@ -151,6 +187,7 @@ namespace HammerAndSickle.Utils
 
         private SerializableMapData LoadBinaryMapFile(string filePath)
         {
+            UnityEngine.Debug.Log($"[{CLASS_NAME}] LoadBinaryMapFile() reading: '{filePath}'");
             try
             {
                 using var fileStream = new FileStream(filePath, FileMode.Open, FileAccess.Read, FileShare.Read);
@@ -160,7 +197,17 @@ namespace HammerAndSickle.Utils
                 var mapData = (SerializableMapData)formatter.Deserialize(fileStream);
                 #pragma warning restore SYSLIB0011
 
-                Debug.Log($"Loaded binary data: {mapData?.Hexes?.Length ?? 0} hexes");
+                int hexCount = mapData?.Hexes?.Length ?? 0;
+                UnityEngine.Debug.Log($"[{CLASS_NAME}] Loaded binary data. Hex count: {hexCount}");
+                if (mapData?.Header != null)
+                {
+                    UnityEngine.Debug.Log($"[{CLASS_NAME}] Header: Name='{mapData.Header.MapName}', Size={mapData.Header.Width}x{mapData.Header.Height}, Version={mapData.Header.Version}");
+                }
+                else
+                {
+                    UnityEngine.Debug.LogWarning($"[{CLASS_NAME}] Header is null in loaded binary data.");
+                }
+
                 return mapData;
             }
             catch (Exception ex)
@@ -172,31 +219,42 @@ namespace HammerAndSickle.Utils
 
         private JsonMapData ConvertToJsonMapData(SerializableMapData binaryMapData)
         {
+            UnityEngine.Debug.Log($"[{CLASS_NAME}] ConvertToJsonMapData() start.");
             try
             {
                 if (binaryMapData?.Header == null || binaryMapData.Hexes == null)
                 {
+                    UnityEngine.Debug.LogError($"[{CLASS_NAME}] Input data invalid. Header null: {binaryMapData?.Header == null}, Hexes null: {binaryMapData?.Hexes == null}");
                     return null;
                 }
 
                 // Convert header - map SerializableMapHeader properties to JsonMapHeader
+                var h = binaryMapData.Header;
+                UnityEngine.Debug.Log($"[{CLASS_NAME}] Mapping header fields...");
                 var jsonHeader = new JsonMapHeader
                 {
-                    MapName = binaryMapData.Header.MapName,
-                    MapConfiguration = binaryMapData.Header.MapConfiguration,
-                    MapWidth = binaryMapData.Header.Width, // Width -> MapWidth
-                    MapHeight = binaryMapData.Header.Height, // Height -> MapHeight
-                    Version = binaryMapData.Header.Version,
-                    CreatedDate = binaryMapData.Header.CreationDate, // CreationDate -> CreatedDate
+                    MapName = h.MapName,
+                    MapConfiguration = h.MapConfiguration,
+                    MapWidth = h.Width,            // Width -> MapWidth
+                    MapHeight = h.Height,          // Height -> MapHeight
+                    Version = h.Version,
+                    CreatedDate = h.CreationDate,  // CreationDate -> CreatedDate
                     ConvertedDate = DateTime.UtcNow,
                     OriginalFormat = "Binary",
-                    Description = binaryMapData.Header.Description
+                    Description = h.Description
                 };
+                UnityEngine.Debug.Log($"[{CLASS_NAME}] Header mapped. Name='{jsonHeader.MapName}', Size={jsonHeader.MapWidth}x{jsonHeader.MapHeight}, Version={jsonHeader.Version}");
 
                 // Convert hex data
+                UnityEngine.Debug.Log($"[{CLASS_NAME}] Converting hex array to JSON hex list...");
+                var hexSw = Stopwatch.StartNew();
                 var jsonHexes = binaryMapData.ConvertToJsonHexes();
+                hexSw.Stop();
+                int count = jsonHexes?.Count ?? 0;
+                UnityEngine.Debug.Log($"[{CLASS_NAME}] ConvertToJsonHexes() produced {count} hexes in {hexSw.ElapsedMilliseconds} ms");
                 if (jsonHexes == null || jsonHexes.Count == 0)
                 {
+                    UnityEngine.Debug.LogError($"[{CLASS_NAME}] No hexes produced during conversion.");
                     return null;
                 }
 
@@ -206,7 +264,7 @@ namespace HammerAndSickle.Utils
                     Hexes = jsonHexes
                 };
 
-                Debug.Log($"Converted to JSON format: {jsonHexes.Count} hexes");
+                UnityEngine.Debug.Log($"[{CLASS_NAME}] Converted to JSON format: {jsonHexes.Count} hexes");
                 return jsonMapData;
             }
             catch (Exception ex)
@@ -218,15 +276,18 @@ namespace HammerAndSickle.Utils
 
         private async Task<bool> SaveJsonMapFileAsync(JsonMapData jsonMapData, string filePath)
         {
+            UnityEngine.Debug.Log($"[{CLASS_NAME}] SaveJsonMapFileAsync() path: '{filePath}'");
             try
             {
                 EnsureOutputDirectoryExists();
 
                 var jsonString = JsonSerializer.Serialize(jsonMapData, JsonOptions);
+                UnityEngine.Debug.Log($"[{CLASS_NAME}] JSON serialized. Length: {jsonString?.Length ?? 0} chars");
+
                 await File.WriteAllTextAsync(filePath, jsonString);
 
                 var fileInfo = new FileInfo(filePath);
-                Debug.Log($"Saved JSON file: {fileInfo.Length:N0} bytes");
+                UnityEngine.Debug.Log($"Saved JSON file: {fileInfo.Length:N0} bytes at '{fileInfo.FullName}'");
                 return true;
             }
             catch (Exception ex)
@@ -246,7 +307,11 @@ namespace HammerAndSickle.Utils
                     #if UNITY_EDITOR
                     AssetDatabase.Refresh();
                     #endif
-                    Debug.Log($"Created output directory: {OUTPUT_DIRECTORY}");
+                    UnityEngine.Debug.Log($"Created output directory: {OUTPUT_DIRECTORY}");
+                }
+                else
+                {
+                    UnityEngine.Debug.Log($"[{CLASS_NAME}] Output directory exists: {OUTPUT_DIRECTORY}");
                 }
             }
             catch (Exception ex)
