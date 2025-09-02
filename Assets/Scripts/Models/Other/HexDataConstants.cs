@@ -24,6 +24,9 @@ namespace HammerAndSickle.Models.Map
         public const int LargeHexWidth = 32;
         public const int LargeHexHeight = 42;
 
+        // Map data file current save version
+        public const int CurrentMapDataVersion = 1;
+
         // Vector represents no hex is selected.
         public static readonly Vector2Int NoHexSelected = new Vector2Int(-1, -1);
 
