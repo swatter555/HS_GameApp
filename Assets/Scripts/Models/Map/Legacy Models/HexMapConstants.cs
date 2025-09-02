@@ -1,6 +1,6 @@
 using UnityEngine;
 
-namespace HammerAndSickle.Models.Map
+namespace HammerAndSickle.Legacy.Map
 {
     /// <summary>
     /// Constants for the hex map.
@@ -38,28 +38,16 @@ namespace HammerAndSickle.Models.Map
     }
 
     /// <summary>
-    /// Hex border types.
-    /// </summary>
-    public enum BorderType
-    {
-        None,
-        River,
-        Bridge,
-        DestroyedBridge,
-        PontoonBridge
-    }
-
-    /// <summary>
     /// Pointy-Top hex directions.
     /// </summary>
     public enum HexDirection
     {
-        NW,
         NE,
         E,
         SE,
         SW,
-        W
+        W,
+        NW
     }
 
     /// <summary>
@@ -130,20 +118,20 @@ namespace HammerAndSickle.Models.Map
     public enum DefaultTileControl
     {
         None,
-        BE, // Belgium
-        DE, // Denmark
-        FR, // France
-        MJ, // Mujahideen
-        NE, // Netherlands
-        SV, // Soviet Union
-        UK, // United Kingdom
-        US, // United States
-        GE, // Germany
-        CH, // China
-        IR, // Iran
-        IQ, // Iraq
-        SA, // Saudi Arabia
-        KW  // Kuwait
+        BE,
+        DE,
+        FR,
+        MJ,
+        NE,
+        SV,
+        UK,
+        US,
+        GE,
+        CH,
+        IR,
+        IQ,
+        SA,
+        KW
     }
 
     /// <summary>
@@ -166,7 +154,7 @@ namespace HammerAndSickle.Models.Map
         MiddleEast,
         China
     }
-
+   
     /// <summary>
     /// The types of hex outlines.
     /// </summary>
@@ -196,7 +184,7 @@ namespace HammerAndSickle.Models.Map
     /// <summary>
     /// The text size for the map element
     /// </summary>
-    public enum  TextSize
+    public enum TextSize
     {
         Small,
         Medium,
