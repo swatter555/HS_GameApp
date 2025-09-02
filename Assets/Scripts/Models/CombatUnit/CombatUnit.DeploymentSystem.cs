@@ -421,21 +421,21 @@ namespace HammerAndSickle.Models
             if (Classification == UnitClassification.AB || Classification == UnitClassification.MAB)
             {
                 // Airborne units can debark anywhere their transport can legally be
-                // Hex legality validation happens elsewhere
+                // GameHex legality validation happens elsewhere
             }
 
             // Air Mobile units debarking (helicopter landing)
             if (Classification == UnitClassification.AM || Classification == UnitClassification.MAM)
             {
                 // Air Mobile units can debark anywhere helicopters can land
-                // Hex legality validation happens elsewhere
+                // GameHex legality validation happens elsewhere
             }
 
             // Special Forces have flexible transport options
             if (Classification == UnitClassification.SPECF)
             {
                 // Special Forces can debark from any transport type
-                // Hex legality validation happens elsewhere
+                // GameHex legality validation happens elsewhere
             }
 
             // All checks passed
