@@ -1,6 +1,7 @@
 using UnityEngine;
 using System;
 using System.IO;
+using System.Runtime.Serialization;
 using System.Runtime.Serialization.Formatters.Binary;
 using HammerAndSickle.Services;
 using HammerAndSickle.Legacy.Map;
@@ -26,13 +27,14 @@ namespace HammerAndSickle.Tools
         [Header("File Selection")]
         [SerializeField]
         [Tooltip("Drag and drop the .hsm binary file here")]
-        private TextAsset binaryMapFile = null;
+        private UnityEngine.Object binaryMapFile = null;
 
         [Header("Loaded Data Status")]
         [SerializeField] private string loadedMapName = "";
         [SerializeField] private string mapDimensions = "";
         [SerializeField] private int hexCount = 0;
         [SerializeField] private string creationDate = "";
+        [SerializeField] private string fileStatus = "No file selected";
         #endregion
 
         #region Private Fields
@@ -43,55 +45,27 @@ namespace HammerAndSickle.Tools
         /// <summary>
         /// Converts the selected binary file by loading it into temporary storage.
         /// </summary>
-        [ContextMenu("Convert")]
         public void ConvertBinaryFile()
         {
             Debug.Log($"{CLASS_NAME}: Starting conversion process");
 
             try
             {
-                if (binaryMapFile == null)
+                if (!ValidateSelectedFileForConversion())
                 {
-                    Debug.LogError($"{CLASS_NAME}: No binary file assigned to binaryMapFile field");
-                    AppService.CaptureUiMessage("No binary file selected");
                     return;
                 }
 
-                Debug.Log($"{CLASS_NAME}: Binary file found: {binaryMapFile.name}");
-
-                // Get the asset path
-                string assetPath = null;
-#if UNITY_EDITOR
-                assetPath = AssetDatabase.GetAssetPath(binaryMapFile);
-                Debug.Log($"{CLASS_NAME}: Asset path: {assetPath}");
-
-                if (string.IsNullOrEmpty(assetPath))
+                string filePath = GetFilePath();
+                if (string.IsNullOrEmpty(filePath))
                 {
-                    Debug.LogError($"{CLASS_NAME}: Could not get asset path for file");
-                    AppService.CaptureUiMessage("Could not locate file in project");
                     return;
                 }
-
-                // Convert to absolute path
-                string fullPath = Path.GetFullPath(assetPath);
-                Debug.Log($"{CLASS_NAME}: Full file path: {fullPath}");
-
-                if (!File.Exists(fullPath))
-                {
-                    Debug.LogError($"{CLASS_NAME}: File does not exist at path: {fullPath}");
-                    AppService.CaptureUiMessage("File not found");
-                    return;
-                }
-#else
-                Debug.LogError($"{CLASS_NAME}: File conversion only available in editor");
-                AppService.CaptureUiMessage("Conversion only available in editor");
-                return;
-#endif
 
                 Debug.Log($"{CLASS_NAME}: Attempting to load binary map data...");
 
-                // Load binary data using original map editor logic
-                loadedMapData = LoadBinaryMapData(fullPath);
+                // Load binary data using original map editor logic with custom binder
+                loadedMapData = LoadBinaryMapData(filePath);
 
                 if (loadedMapData != null)
                 {
@@ -105,6 +79,7 @@ namespace HammerAndSickle.Tools
                 {
                     Debug.LogError($"{CLASS_NAME}: Failed to load map data - LoadBinaryMapData returned null");
                     AppService.CaptureUiMessage("Failed to load map data");
+                    fileStatus = "Failed to load data";
                 }
             }
             catch (Exception ex)
@@ -113,13 +88,100 @@ namespace HammerAndSickle.Tools
                 Debug.LogError($"{CLASS_NAME}: Stack trace: {ex.StackTrace}");
                 AppService.HandleException(CLASS_NAME, nameof(ConvertBinaryFile), ex);
                 AppService.CaptureUiMessage("Conversion failed: " + ex.Message);
+                fileStatus = $"Error: {ex.Message}";
             }
 
             Debug.Log($"{CLASS_NAME}: Conversion process completed");
         }
+
+        /// <summary>
+        /// Validates if a file is selected (basic check for button state).
+        /// </summary>
+        public bool IsValidFileSelected()
+        {
+            return binaryMapFile != null;
+        }
         #endregion
 
         #region Private Methods
+        private bool ValidateSelectedFileForConversion()
+        {
+            if (binaryMapFile == null)
+            {
+                Debug.LogError($"{CLASS_NAME}: No binary file assigned to binaryMapFile field");
+                AppService.CaptureUiMessage("No binary file selected");
+                fileStatus = "No file selected";
+                return false;
+            }
+
+            string assetPath = null;
+#if UNITY_EDITOR
+            assetPath = AssetDatabase.GetAssetPath(binaryMapFile);
+            if (string.IsNullOrEmpty(assetPath))
+            {
+                Debug.LogError($"{CLASS_NAME}: Could not get asset path for file");
+                AppService.CaptureUiMessage("Could not locate file in project");
+                fileStatus = "Invalid file path";
+                return false;
+            }
+
+            if (!assetPath.EndsWith(HSM_EXTENSION, StringComparison.OrdinalIgnoreCase))
+            {
+                Debug.LogError($"{CLASS_NAME}: File must have {HSM_EXTENSION} extension. Current: {Path.GetExtension(assetPath)}");
+                AppService.CaptureUiMessage($"File must have {HSM_EXTENSION} extension");
+                fileStatus = $"Wrong extension: {Path.GetExtension(assetPath)}";
+                return false;
+            }
+
+            string fileName = Path.GetFileName(assetPath);
+            long fileSize = 0;
+            string fullPath = Path.GetFullPath(assetPath);
+
+            if (File.Exists(fullPath))
+            {
+                fileSize = new FileInfo(fullPath).Length;
+                fileStatus = $"Converting: {fileName} ({fileSize:N0} bytes)";
+            }
+            else
+            {
+                fileStatus = $"File not found: {fileName}";
+                return false;
+            }
+#else
+            Debug.LogError($"{CLASS_NAME}: File conversion only available in editor");
+            AppService.CaptureUiMessage("Conversion only available in editor");
+            fileStatus = "Editor only feature";
+            return false;
+#endif
+
+            return true;
+        }
+
+        private string GetFilePath()
+        {
+#if UNITY_EDITOR
+            if (binaryMapFile == null) return null;
+
+            string assetPath = AssetDatabase.GetAssetPath(binaryMapFile);
+            if (string.IsNullOrEmpty(assetPath)) return null;
+
+            string fullPath = Path.GetFullPath(assetPath);
+            Debug.Log($"{CLASS_NAME}: Full file path: {fullPath}");
+
+            if (!File.Exists(fullPath))
+            {
+                Debug.LogError($"{CLASS_NAME}: File does not exist at path: {fullPath}");
+                AppService.CaptureUiMessage("File not found");
+                fileStatus = "File not found";
+                return null;
+            }
+
+            return fullPath;
+#else
+            return null;
+#endif
+        }
+
         private TemporaryMapData LoadBinaryMapData(string filePath)
         {
             Debug.Log($"{CLASS_NAME}: LoadBinaryMapData called with path: {filePath}");
@@ -133,35 +195,31 @@ namespace HammerAndSickle.Tools
                 {
                     Debug.Log($"{CLASS_NAME}: File stream opened successfully, stream length: {stream.Length} bytes");
 
-                    Debug.Log($"{CLASS_NAME}: Creating BinaryFormatter");
+                    Debug.Log($"{CLASS_NAME}: Creating BinaryFormatter with custom SerializationBinder");
                     BinaryFormatter formatter = new BinaryFormatter();
 
-                    Debug.Log($"{CLASS_NAME}: Attempting deserialization");
+                    // Apply custom binder to handle cross-assembly type resolution
+                    formatter.Binder = new MapDataSerializationBinder();
+
+                    Debug.Log($"{CLASS_NAME}: Attempting deserialization with binder");
                     mapData = (TemporaryMapData)formatter.Deserialize(stream);
 
-                    Debug.Log($"{CLASS_NAME}: Deserialization completed");
+                    Debug.Log($"{CLASS_NAME}: Deserialization completed successfully");
                 }
 
                 Debug.Log($"{CLASS_NAME}: Validating loaded data");
 
-                if (mapData == null)
+                if (mapData?.Header == null)
                 {
-                    Debug.LogError($"{CLASS_NAME}: mapData is null after deserialization");
-                    AppService.CaptureUiMessage($"Deserialized map data is null");
-                    return null;
-                }
-
-                if (mapData.Header == null)
-                {
-                    Debug.LogError($"{CLASS_NAME}: mapData.Header is null");
-                    AppService.CaptureUiMessage($"Map header is null");
+                    Debug.LogError($"{CLASS_NAME}: mapData or Header is null");
+                    AppService.CaptureUiMessage("Map data or header is null");
                     return null;
                 }
 
                 if (mapData.Hexes == null)
                 {
                     Debug.LogError($"{CLASS_NAME}: mapData.Hexes is null");
-                    AppService.CaptureUiMessage($"Map hexes array is null");
+                    AppService.CaptureUiMessage("Map hexes array is null");
                     return null;
                 }
 
@@ -193,9 +251,10 @@ namespace HammerAndSickle.Tools
                 if (loadedMapData?.Header != null)
                 {
                     loadedMapName = loadedMapData.Header.MapName;
-                    mapDimensions = $"{loadedMapData.Header.Width} x {loadedMapData.Header.Height}";
+                    mapDimensions = $"{loadedMapData.Header.MapConfiguration} ({loadedMapData.Header.Width} x {loadedMapData.Header.Height})";
                     hexCount = loadedMapData.Hexes?.Length ?? 0;
                     creationDate = loadedMapData.Header.CreationDate.ToString("yyyy-MM-dd HH:mm");
+                    fileStatus = "Data loaded successfully";
 
                     Debug.Log($"{CLASS_NAME}: Display fields updated successfully");
                     Debug.Log($"{CLASS_NAME}: - Map Name: {loadedMapName}");
@@ -206,6 +265,7 @@ namespace HammerAndSickle.Tools
                 else
                 {
                     Debug.LogWarning($"{CLASS_NAME}: Cannot update display fields - loadedMapData or Header is null");
+                    ClearDisplayFields();
                 }
             }
             catch (Exception ex)
@@ -222,6 +282,39 @@ namespace HammerAndSickle.Tools
             mapDimensions = "";
             hexCount = 0;
             creationDate = "";
+            fileStatus = "No file selected";
+        }
+
+        private void OnValidate()
+        {
+            // Update file status when file selection changes in inspector
+            if (binaryMapFile == null)
+            {
+                ClearDisplayFields();
+            }
+            else
+            {
+#if UNITY_EDITOR
+                string assetPath = AssetDatabase.GetAssetPath(binaryMapFile);
+                if (!string.IsNullOrEmpty(assetPath))
+                {
+                    string fileName = Path.GetFileName(assetPath);
+                    if (File.Exists(Path.GetFullPath(assetPath)))
+                    {
+                        long fileSize = new FileInfo(Path.GetFullPath(assetPath)).Length;
+                        fileStatus = $"Selected: {fileName} ({fileSize:N0} bytes)";
+                    }
+                    else
+                    {
+                        fileStatus = $"File not found: {fileName}";
+                    }
+                }
+                else
+                {
+                    fileStatus = "Invalid file selection";
+                }
+#endif
+            }
         }
         #endregion
 
@@ -242,6 +335,98 @@ namespace HammerAndSickle.Tools
         }
         #endregion
     }
+
+    /// <summary>
+    /// Custom SerializationBinder to handle cross-assembly type resolution for map data deserialization.
+    /// Maps original map editor types to temporary structures in current assembly.
+    /// </summary>
+    public class MapDataSerializationBinder : SerializationBinder
+    {
+        private const string CLASS_NAME = nameof(MapDataSerializationBinder);
+
+        public override Type BindToType(string assemblyName, string typeName)
+        {
+            try
+            {
+                Debug.Log($"{CLASS_NAME}: Binding type: {typeName} from assembly: {assemblyName}");
+
+                // Map original types to our temporary structures
+                Type targetType = typeName switch
+                {
+                    "HammerAndSickle.Core.Services.SerializableMapData" => typeof(TemporaryMapData),
+                    "HammerAndSickle.Core.Map.MapHeader" => typeof(TemporaryMapHeader),
+                    "HammerAndSickle.Core.Services.SerializableHex" => typeof(TemporaryHex),
+
+                    // Enum types should resolve to our Legacy.Map namespace
+                    "HammerAndSickle.Core.Map.MapConfig" => typeof(MapConfig),
+                    "HammerAndSickle.Core.Map.TerrainType" => typeof(TerrainType),
+                    "HammerAndSickle.Core.Map.TextSize" => typeof(TextSize),
+                    "HammerAndSickle.Core.Map.FontWeight" => typeof(FontWeight),
+                    "HammerAndSickle.Core.Map.TextColor" => typeof(TextColor),
+                    "HammerAndSickle.Core.Map.TileControl" => typeof(TileControl),
+                    "HammerAndSickle.Core.Map.DefaultTileControl" => typeof(DefaultTileControl),
+
+                    // Let other types resolve normally
+                    _ => Type.GetType($"{typeName}, {assemblyName}")
+                };
+
+                if (targetType != null)
+                {
+                    Debug.Log($"{CLASS_NAME}: Successfully mapped {typeName} to {targetType.FullName}");
+                }
+                else
+                {
+                    Debug.LogWarning($"{CLASS_NAME}: Could not resolve type: {typeName}");
+                }
+
+                return targetType;
+            }
+            catch (Exception ex)
+            {
+                Debug.LogError($"{CLASS_NAME}: Exception in BindToType for {typeName}: {ex.Message}");
+                AppService.HandleException(CLASS_NAME, nameof(BindToType), ex);
+
+                // Fall back to default resolution
+                return Type.GetType($"{typeName}, {assemblyName}");
+            }
+        }
+    }
+
+#if UNITY_EDITOR
+    /// <summary>
+    /// Custom editor for BinaryToJsonConverter with Convert button.
+    /// </summary>
+    [CustomEditor(typeof(BinaryToJsonConverter))]
+    public class BinaryToJsonConverterEditor : Editor
+    {
+        public override void OnInspectorGUI()
+        {
+            // Draw default inspector
+            DrawDefaultInspector();
+
+            GUILayout.Space(10);
+
+            BinaryToJsonConverter converter = (BinaryToJsonConverter)target;
+
+            // Convert button - enabled if any file is selected (validation happens on click)
+            GUI.enabled = converter.IsValidFileSelected();
+
+            if (GUILayout.Button("Convert", GUILayout.Height(30)))
+            {
+                converter.ConvertBinaryFile();
+            }
+
+            GUI.enabled = true;
+
+            // Status display
+            if (!converter.IsValidFileSelected())
+            {
+                GUILayout.Space(5);
+                EditorGUILayout.HelpBox("Select any file to enable conversion (HSM validation happens on click)", MessageType.Info);
+            }
+        }
+    }
+#endif
 
     #region Temporary Data Structures
     /// <summary>
