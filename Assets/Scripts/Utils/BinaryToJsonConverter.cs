@@ -54,12 +54,14 @@ namespace HammerAndSickle.Tools
         #endregion
 
         #region Public Methods
+
         /// <summary>
-        /// Converts the selected binary file by loading it into temporary storage.
+        /// Converts the selected binary file to JSON format.
+        /// Complete workflow: Load binary → Convert to JSON → Write file.
         /// </summary>
         public void ConvertBinaryFile()
         {
-            Debug.Log($"{CLASS_NAME}: Starting conversion process");
+            Debug.Log($"{CLASS_NAME}: Starting complete conversion process");
 
             try
             {
@@ -74,25 +76,52 @@ namespace HammerAndSickle.Tools
                     return;
                 }
 
-                Debug.Log($"{CLASS_NAME}: Attempting to load binary map data...");
-
-                // Load binary data using original map editor logic with custom binder
+                // Phase 1: Load binary data
+                Debug.Log($"{CLASS_NAME}: Phase 1 - Loading binary map data...");
                 loadedMapData = LoadBinaryMapData(filePath);
 
-                if (loadedMapData != null)
-                {
-                    Debug.Log($"{CLASS_NAME}: Binary data loaded successfully");
-                    UpdateDisplayFields();
-                    Debug.Log($"{CLASS_NAME}: Display fields updated");
-                    AppService.CaptureUiMessage($"Successfully loaded map: {loadedMapData.Header.MapName}");
-                    AppService.CaptureUiMessage($"Ready to convert to: {outputFileName}{MAP_EXTENSION}");
-                    AppService.CaptureUiMessage($"Loaded {loadedMapData.Hexes?.Length ?? 0} hexes");
-                }
-                else
+                if (loadedMapData == null)
                 {
                     Debug.LogError($"{CLASS_NAME}: Failed to load map data - LoadBinaryMapData returned null");
                     AppService.CaptureUiMessage("Failed to load map data");
                     fileStatus = "Failed to load data";
+                    return;
+                }
+
+                Debug.Log($"{CLASS_NAME}: Phase 1 complete - Binary data loaded successfully");
+                UpdateDisplayFields();
+                AppService.CaptureUiMessage($"Loaded map: {loadedMapData.Header.MapName} ({loadedMapData.Hexes?.Length ?? 0} hexes)");
+
+                // Phase 2: Convert to JSON format
+                Debug.Log($"{CLASS_NAME}: Phase 2 - Converting to JSON format...");
+                JsonMapData jsonMapData = ConvertToJsonMapData(loadedMapData);
+
+                if (jsonMapData == null)
+                {
+                    Debug.LogError($"{CLASS_NAME}: Failed to convert to JSON format");
+                    AppService.CaptureUiMessage("Failed to convert map data to JSON format");
+                    fileStatus = "JSON conversion failed";
+                    return;
+                }
+
+                Debug.Log($"{CLASS_NAME}: Phase 2 complete - JSON conversion successful");
+                AppService.CaptureUiMessage("Map data converted to JSON format");
+
+                // Phase 3: Write JSON file
+                Debug.Log($"{CLASS_NAME}: Phase 3 - Writing JSON file...");
+                bool writeSuccess = WriteJsonMapFile(jsonMapData);
+
+                if (writeSuccess)
+                {
+                    Debug.Log($"{CLASS_NAME}: Phase 3 complete - File written successfully");
+                    AppService.CaptureUiMessage($"Conversion complete! File saved as: {outputFileName}{MAP_EXTENSION}");
+                    fileStatus = $"✅ Converted: {outputFileName}{MAP_EXTENSION}";
+                }
+                else
+                {
+                    Debug.LogError($"{CLASS_NAME}: Failed to write JSON file");
+                    AppService.CaptureUiMessage("Failed to write JSON file");
+                    fileStatus = "File write failed";
                 }
             }
             catch (Exception ex)
@@ -104,7 +133,7 @@ namespace HammerAndSickle.Tools
                 fileStatus = $"Error: {ex.Message}";
             }
 
-            Debug.Log($"{CLASS_NAME}: Conversion process completed");
+            Debug.Log($"{CLASS_NAME}: Complete conversion process finished");
         }
 
         /// <summary>
