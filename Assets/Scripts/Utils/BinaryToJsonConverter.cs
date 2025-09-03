@@ -1,10 +1,15 @@
-using UnityEngine;
+﻿using UnityEngine;
 using System;
 using System.IO;
+using System.Linq;
 using System.Runtime.Serialization;
 using System.Runtime.Serialization.Formatters.Binary;
 using HammerAndSickle.Services;
-using HammerAndSickle.Legacy.Map;
+//using HammerAndSickle.Legacy.Map;
+using HammerAndSickle.Models.Map;
+using HammerAndSickle.Utils;
+using System.Text.Json;
+
 
 #if UNITY_EDITOR
 using UnityEditor;
@@ -14,20 +19,28 @@ namespace HammerAndSickle.Tools
 {
     /// <summary>
     /// Unity tool for converting binary .hsm map files to JSON format.
-    /// First iteration: loads binary data into temporary storage for validation.
+    /// Loads binary data and converts to JSON-compliant GameHex structures.
     /// </summary>
     public class BinaryToJsonConverter : MonoBehaviour
     {
         #region Constants
         private const string CLASS_NAME = nameof(BinaryToJsonConverter);
         private const string HSM_EXTENSION = ".hsm";
+        private const string MAP_EXTENSION = ".map";
+        private static readonly char[] INVALID_FILENAME_CHARS = Path.GetInvalidFileNameChars();
+        private static readonly string CONVERTED_FILES_FOLDER = Path.Combine(Application.dataPath, "Converted Files");
         #endregion
 
         #region Inspector Fields
         [Header("File Selection")]
         [SerializeField]
         [Tooltip("Drag and drop the .hsm binary file here")]
-        private UnityEngine.Object binaryMapFile = null;
+        public UnityEngine.Object binaryMapFile = null;
+
+        [Header("Output Configuration")]
+        [SerializeField]
+        [Tooltip("Output filename for the .map file (without extension)")]
+        public string outputFileName = "";
 
         [Header("Loaded Data Status")]
         [SerializeField] private string loadedMapName = "";
@@ -73,6 +86,7 @@ namespace HammerAndSickle.Tools
                     UpdateDisplayFields();
                     Debug.Log($"{CLASS_NAME}: Display fields updated");
                     AppService.CaptureUiMessage($"Successfully loaded map: {loadedMapData.Header.MapName}");
+                    AppService.CaptureUiMessage($"Ready to convert to: {outputFileName}{MAP_EXTENSION}");
                     AppService.CaptureUiMessage($"Loaded {loadedMapData.Hexes?.Length ?? 0} hexes");
                 }
                 else
@@ -95,11 +109,11 @@ namespace HammerAndSickle.Tools
         }
 
         /// <summary>
-        /// Validates if a file is selected (basic check for button state).
+        /// Validates if both file and filename are properly selected and valid.
         /// </summary>
         public bool IsValidFileSelected()
         {
-            return binaryMapFile != null;
+            return binaryMapFile != null && IsValidOutputFileName(outputFileName);
         }
         #endregion
 
@@ -111,6 +125,14 @@ namespace HammerAndSickle.Tools
                 Debug.LogError($"{CLASS_NAME}: No binary file assigned to binaryMapFile field");
                 AppService.CaptureUiMessage("No binary file selected");
                 fileStatus = "No file selected";
+                return false;
+            }
+
+            if (!IsValidOutputFileName(outputFileName))
+            {
+                Debug.LogError($"{CLASS_NAME}: Invalid output filename: '{outputFileName}'");
+                AppService.CaptureUiMessage("Invalid or missing output filename");
+                fileStatus = "Invalid output filename";
                 return false;
             }
 
@@ -140,7 +162,7 @@ namespace HammerAndSickle.Tools
             if (File.Exists(fullPath))
             {
                 fileSize = new FileInfo(fullPath).Length;
-                fileStatus = $"Converting: {fileName} ({fileSize:N0} bytes)";
+                fileStatus = $"Ready: {fileName} → {outputFileName}{MAP_EXTENSION}";
             }
             else
             {
@@ -153,6 +175,249 @@ namespace HammerAndSickle.Tools
             fileStatus = "Editor only feature";
             return false;
 #endif
+
+            return true;
+        }
+
+        private JsonMapData ConvertToJsonMapData(TemporaryMapData tempData)
+        {
+            try
+            {
+                Debug.Log($"{CLASS_NAME}: Converting temporary map data to JSON format");
+
+                if (tempData?.Header == null)
+                {
+                    Debug.LogError($"{CLASS_NAME}: Temporary data or header is null");
+                    return null;
+                }
+
+                if (tempData.Hexes == null)
+                {
+                    Debug.LogError($"{CLASS_NAME}: Temporary hex array is null");
+                    return null;
+                }
+
+                Debug.Log($"{CLASS_NAME}: Converting {tempData.Hexes.Length} hexes");
+
+                // Convert header
+                JsonMapHeader jsonHeader = new JsonMapHeader(
+                    tempData.Header.MapName,
+                    tempData.Header.MapConfiguration,
+                    "placeholder" // Checksum will be calculated after hex conversion
+                );
+
+                // Convert hex array
+                GameHex[] gameHexes = new GameHex[tempData.Hexes.Length];
+                for (int i = 0; i < tempData.Hexes.Length; i++)
+                {
+                    gameHexes[i] = ConvertTemporaryHexToGameHex(tempData.Hexes[i]);
+                    if (gameHexes[i] == null)
+                    {
+                        Debug.LogError($"{CLASS_NAME}: Failed to convert hex at index {i}");
+                        AppService.CaptureUiMessage($"Failed to convert hex at index {i}");
+                        return null;
+                    }
+                }
+
+                Debug.Log($"{CLASS_NAME}: Successfully converted all hexes");
+
+                // Create JSON map data
+                JsonMapData jsonMapData = new JsonMapData(jsonHeader, gameHexes);
+
+                // Calculate and update checksum
+                Debug.Log($"{CLASS_NAME}: Calculating checksum for converted data");
+                bool checksumSuccess = MapChecksumUtility.UpdateChecksum(jsonMapData);
+
+                if (!checksumSuccess)
+                {
+                    Debug.LogError($"{CLASS_NAME}: Failed to calculate checksum");
+                    AppService.CaptureUiMessage("Failed to calculate data checksum");
+                    return null;
+                }
+
+                // Validate final result
+                if (!jsonMapData.IsValid())
+                {
+                    Debug.LogError($"{CLASS_NAME}: Converted JSON map data failed validation");
+                    AppService.CaptureUiMessage("Converted map data failed validation");
+                    return null;
+                }
+
+                Debug.Log($"{CLASS_NAME}: JSON map data conversion completed successfully");
+                return jsonMapData;
+            }
+            catch (Exception ex)
+            {
+                Debug.LogError($"{CLASS_NAME}: Exception in ConvertToJsonMapData: {ex.Message}");
+                AppService.HandleException(CLASS_NAME, nameof(ConvertToJsonMapData), ex);
+                return null;
+            }
+        }
+
+        private GameHex ConvertTemporaryHexToGameHex(TemporaryHex tempHex)
+        {
+            try
+            {
+                if (tempHex == null)
+                {
+                    Debug.LogError($"{CLASS_NAME}: Temporary hex is null");
+                    return null;
+                }
+
+                // Create GameHex with position conversion
+                Vector2Int position = new Vector2Int(tempHex.X, tempHex.Y);
+                GameHex gameHex = new GameHex(position);
+
+                // Copy basic properties
+                gameHex.SetTerrain(tempHex.Terrain);
+                gameHex.SetIsRail(tempHex.IsRail);
+                gameHex.SetIsRoad(tempHex.IsRoad);
+                gameHex.SetIsFort(tempHex.IsFort);
+                gameHex.SetIsAirbase(tempHex.IsAirbase);
+                gameHex.SetIsObjective(tempHex.IsObjective);
+                gameHex.SetIsVisible(tempHex.IsVisible);
+
+                // Copy label and display properties
+                gameHex.TileLabel = tempHex.TileLabel ?? string.Empty;
+                gameHex.LargeTileLabel = tempHex.LargeTileLabel ?? string.Empty;
+                gameHex.LabelSize = tempHex.LabelSize;
+                gameHex.LabelWeight = tempHex.LabelWeight;
+                gameHex.LabelColor = tempHex.LabelColor;
+                gameHex.LabelOutlineThickness = tempHex.LabelOutlineThickness;
+
+                // Copy game state properties
+                gameHex.VictoryValue = tempHex.VictoryValue;
+                gameHex.AirbaseDamage = tempHex.AirbaseDamage;
+                gameHex.UrbanDamage = tempHex.UrbanDamage;
+                gameHex.TileControl = tempHex.TileControl;
+                gameHex.DefaultTileControl = tempHex.DefaultTileControl;
+
+                // Convert border strings to JSONFeatureBorders
+                gameHex.RiverBorders = new JSONFeatureBorders(tempHex.RiverBorders ?? "000000", BorderType.River);
+                gameHex.BridgeBorders = new JSONFeatureBorders(tempHex.BridgeBorders ?? "000000", BorderType.Bridge);
+                gameHex.PontoonBridgeBorders = new JSONFeatureBorders(tempHex.PontoonBridgeBorders ?? "000000", BorderType.PontoonBridge);
+                gameHex.DamagedBridgeBorders = new JSONFeatureBorders(tempHex.DamagedBridgeBorders ?? "000000", BorderType.DestroyedBridge);
+
+                return gameHex;
+            }
+            catch (Exception ex)
+            {
+                Debug.LogError($"{CLASS_NAME}: Exception converting hex at ({tempHex?.X}, {tempHex?.Y}): {ex.Message}");
+                AppService.HandleException(CLASS_NAME, nameof(ConvertTemporaryHexToGameHex), ex);
+                return null;
+            }
+        }
+
+        private bool WriteJsonMapFile(JsonMapData jsonMapData)
+        {
+            try
+            {
+                Debug.Log($"{CLASS_NAME}: Writing JSON map file");
+
+                if (jsonMapData == null)
+                {
+                    Debug.LogError($"{CLASS_NAME}: JsonMapData is null");
+                    return false;
+                }
+
+                // Ensure output directory exists
+                string outputDirectory = CONVERTED_FILES_FOLDER;
+                if (!Directory.Exists(outputDirectory))
+                {
+                    Debug.Log($"{CLASS_NAME}: Creating output directory: {outputDirectory}");
+                    Directory.CreateDirectory(outputDirectory);
+
+#if UNITY_EDITOR
+                    UnityEditor.AssetDatabase.Refresh();
+#endif
+                }
+
+                // Create full output path
+                string outputPath = Path.Combine(outputDirectory, $"{outputFileName}{MAP_EXTENSION}");
+                Debug.Log($"{CLASS_NAME}: Writing to: {outputPath}");
+
+                // Configure JSON serialization options
+                var options = new JsonSerializerOptions
+                {
+                    WriteIndented = true, // Pretty-printed JSON for readability
+                    PropertyNamingPolicy = JsonNamingPolicy.CamelCase,
+                    DefaultIgnoreCondition = System.Text.Json.Serialization.JsonIgnoreCondition.Never
+                };
+
+                // Serialize and write file
+                string jsonString = JsonSerializer.Serialize(jsonMapData, options);
+                File.WriteAllText(outputPath, jsonString);
+
+                Debug.Log($"{CLASS_NAME}: JSON file written successfully");
+                Debug.Log($"{CLASS_NAME}: File size: {new FileInfo(outputPath).Length:N0} bytes");
+
+#if UNITY_EDITOR
+                // Refresh Unity's asset database to show the new file
+                UnityEditor.AssetDatabase.Refresh();
+#endif
+
+                // Validate written file by attempting to read it back
+                Debug.Log($"{CLASS_NAME}: Validating written file");
+                string readBack = File.ReadAllText(outputPath);
+                JsonMapData validationData = JsonSerializer.Deserialize<JsonMapData>(readBack, options);
+
+                if (validationData?.IsValid() == true)
+                {
+                    Debug.Log($"{CLASS_NAME}: File validation successful");
+
+                    // Verify checksum integrity
+                    bool checksumValid = MapChecksumUtility.ValidateChecksum(validationData);
+                    if (checksumValid)
+                    {
+                        Debug.Log($"{CLASS_NAME}: Checksum validation passed");
+                        AppService.CaptureUiMessage($"File written and validated: {outputFileName}{MAP_EXTENSION}");
+                        return true;
+                    }
+                    else
+                    {
+                        Debug.LogWarning($"{CLASS_NAME}: Checksum validation failed but file is readable");
+                        AppService.CaptureUiMessage($"File written but checksum validation failed: {outputFileName}{MAP_EXTENSION}");
+                        return true; // Still consider success since file is readable
+                    }
+                }
+                else
+                {
+                    Debug.LogError($"{CLASS_NAME}: File validation failed - written file is not readable");
+                    AppService.CaptureUiMessage("File was written but failed validation");
+                    return false;
+                }
+            }
+            catch (Exception ex)
+            {
+                Debug.LogError($"{CLASS_NAME}: Exception writing JSON file: {ex.Message}");
+                AppService.HandleException(CLASS_NAME, nameof(WriteJsonMapFile), ex);
+                return false;
+            }
+        }
+
+        private bool IsValidOutputFileName(string filename)
+        {
+            if (string.IsNullOrWhiteSpace(filename))
+            {
+                return false;
+            }
+
+            // Check for invalid filename characters
+            if (filename.Any(c => INVALID_FILENAME_CHARS.Contains(c)))
+            {
+                return false;
+            }
+
+            // Additional checks for problematic filenames
+            if (filename.StartsWith(" ") || filename.EndsWith(" "))
+            {
+                return false;
+            }
+
+            if (filename.StartsWith(".") || filename.EndsWith("."))
+            {
+                return false;
+            }
 
             return true;
         }
@@ -254,7 +519,7 @@ namespace HammerAndSickle.Tools
                     mapDimensions = $"{loadedMapData.Header.MapConfiguration} ({loadedMapData.Header.Width} x {loadedMapData.Header.Height})";
                     hexCount = loadedMapData.Hexes?.Length ?? 0;
                     creationDate = loadedMapData.Header.CreationDate.ToString("yyyy-MM-dd HH:mm");
-                    fileStatus = "Data loaded successfully";
+                    fileStatus = $"Ready: {Path.GetFileNameWithoutExtension(AssetDatabase.GetAssetPath(binaryMapFile))}{HSM_EXTENSION} → {outputFileName}{MAP_EXTENSION}";
 
                     Debug.Log($"{CLASS_NAME}: Display fields updated successfully");
                     Debug.Log($"{CLASS_NAME}: - Map Name: {loadedMapName}");
@@ -287,7 +552,7 @@ namespace HammerAndSickle.Tools
 
         private void OnValidate()
         {
-            // Update file status when file selection changes in inspector
+            // Update file status when file selection or filename changes in inspector
             if (binaryMapFile == null)
             {
                 ClearDisplayFields();
@@ -299,14 +564,24 @@ namespace HammerAndSickle.Tools
                 if (!string.IsNullOrEmpty(assetPath))
                 {
                     string fileName = Path.GetFileName(assetPath);
-                    if (File.Exists(Path.GetFullPath(assetPath)))
+
+                    if (!File.Exists(Path.GetFullPath(assetPath)))
+                    {
+                        fileStatus = $"File not found: {fileName}";
+                    }
+                    else if (string.IsNullOrWhiteSpace(outputFileName))
                     {
                         long fileSize = new FileInfo(Path.GetFullPath(assetPath)).Length;
-                        fileStatus = $"Selected: {fileName} ({fileSize:N0} bytes)";
+                        fileStatus = $"Selected: {fileName} ({fileSize:N0} bytes) - Output filename required";
+                    }
+                    else if (!IsValidOutputFileName(outputFileName))
+                    {
+                        fileStatus = $"Selected: {fileName} - Invalid filename characters";
                     }
                     else
                     {
-                        fileStatus = $"File not found: {fileName}";
+                        long fileSize = new FileInfo(Path.GetFullPath(assetPath)).Length;
+                        fileStatus = $"Ready: {fileName} → {outputFileName}{MAP_EXTENSION}";
                     }
                 }
                 else
@@ -394,7 +669,7 @@ namespace HammerAndSickle.Tools
 
 #if UNITY_EDITOR
     /// <summary>
-    /// Custom editor for BinaryToJsonConverter with Convert button.
+    /// Custom editor for BinaryToJsonConverter with Convert button and enhanced validation feedback.
     /// </summary>
     [CustomEditor(typeof(BinaryToJsonConverter))]
     public class BinaryToJsonConverterEditor : Editor
@@ -408,7 +683,7 @@ namespace HammerAndSickle.Tools
 
             BinaryToJsonConverter converter = (BinaryToJsonConverter)target;
 
-            // Convert button - enabled if any file is selected (validation happens on click)
+            // Convert button - enabled only when both file and filename are valid
             GUI.enabled = converter.IsValidFileSelected();
 
             if (GUILayout.Button("Convert", GUILayout.Height(30)))
@@ -418,12 +693,38 @@ namespace HammerAndSickle.Tools
 
             GUI.enabled = true;
 
-            // Status display
-            if (!converter.IsValidFileSelected())
+            // Status display with progressive help
+            GUILayout.Space(5);
+
+            if (converter.binaryMapFile == null)
             {
-                GUILayout.Space(5);
-                EditorGUILayout.HelpBox("Select any file to enable conversion (HSM validation happens on click)", MessageType.Info);
+                EditorGUILayout.HelpBox("Select a .hsm file to begin conversion", MessageType.Info);
             }
+            else if (string.IsNullOrWhiteSpace(converter.outputFileName))
+            {
+                EditorGUILayout.HelpBox("Enter an output filename to enable conversion", MessageType.Warning);
+            }
+            else if (!IsValidFilename(converter.outputFileName))
+            {
+                EditorGUILayout.HelpBox("Check filename for invalid characters", MessageType.Warning);
+            }
+            else
+            {
+                EditorGUILayout.HelpBox("Ready to convert! Click the Convert button.", MessageType.None);
+            }
+        }
+
+        private bool IsValidFilename(string filename)
+        {
+            if (string.IsNullOrWhiteSpace(filename)) return false;
+
+            char[] invalidChars = Path.GetInvalidFileNameChars();
+            if (filename.Any(c => invalidChars.Contains(c))) return false;
+
+            if (filename.StartsWith(" ") || filename.EndsWith(" ")) return false;
+            if (filename.StartsWith(".") || filename.EndsWith(".")) return false;
+
+            return true;
         }
     }
 #endif
