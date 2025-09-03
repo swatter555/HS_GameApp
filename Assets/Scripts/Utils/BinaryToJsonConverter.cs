@@ -321,10 +321,10 @@ namespace HammerAndSickle.Tools
                 gameHex.DefaultTileControl = tempHex.DefaultTileControl;
 
                 // Convert border strings to JSONFeatureBorders
-                gameHex.RiverBorders = new JSONFeatureBorders(tempHex.RiverBorders ?? "000000", BorderType.River);
-                gameHex.BridgeBorders = new JSONFeatureBorders(tempHex.BridgeBorders ?? "000000", BorderType.Bridge);
-                gameHex.PontoonBridgeBorders = new JSONFeatureBorders(tempHex.PontoonBridgeBorders ?? "000000", BorderType.PontoonBridge);
-                gameHex.DamagedBridgeBorders = new JSONFeatureBorders(tempHex.DamagedBridgeBorders ?? "000000", BorderType.DestroyedBridge);
+                gameHex.RiverBorders = new JSONFeatureBorders(tempHex.RiverBorders, BorderType.River);
+                gameHex.BridgeBorders = new JSONFeatureBorders(tempHex.BridgeBorders, BorderType.Bridge);
+                gameHex.PontoonBridgeBorders = new JSONFeatureBorders(tempHex.PontoonBridgeBorders, BorderType.PontoonBridge);
+                gameHex.DamagedBridgeBorders = new JSONFeatureBorders(tempHex.DamagedBridgeBorders, BorderType.DestroyedBridge);
 
                 return gameHex;
             }

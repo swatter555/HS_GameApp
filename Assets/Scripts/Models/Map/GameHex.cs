@@ -130,6 +130,7 @@ namespace HammerAndSickle.Models.Map
         [JsonConstructor]
         public GameHex()
         {
+            Terrain = TerrainType.Clear;
             enableDebugLogging = false;
             Initialize();
         }
@@ -146,17 +147,6 @@ namespace HammerAndSickle.Models.Map
             Initialize();
         }
 
-        /// <summary>
-        /// Initializes a new hex instance at the specified coordinates.
-        /// </summary>
-        /// <param name="posX">X coordinate</param>
-        /// <param name="posY">Y coordinate</param>
-        /// <param name="enableLogging">Enable debug logging for this hex</param>
-        public GameHex(int posX, int posY, bool enableLogging = false)
-            : this(new Vector2Int(posX, posY), enableLogging)
-        {
-        }
-
         #endregion
 
         #region Initialization
@@ -168,11 +158,6 @@ namespace HammerAndSickle.Models.Map
         {
             try
             {
-                // Initialize terrain and movement
-                if (Terrain == default)
-                {
-                    Terrain = TerrainType.Clear;
-                }
                 UpdateMovementCost();
 
                 // Initialize infrastructure features
