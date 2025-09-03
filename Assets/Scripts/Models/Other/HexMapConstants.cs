@@ -25,7 +25,7 @@ namespace HammerAndSickle.Models.Map
         public const int LargeHexHeight = 42;
 
         // Vector represents no hex is selected.
-        public static readonly Vector2Int NoHexSelected = new Vector2Int(-1, -1);
+        public static readonly Vector2Int NoHexSelected = new(-1, -1);
 
         /// <summary>
         /// Gets vertical spacing for the hex grid.

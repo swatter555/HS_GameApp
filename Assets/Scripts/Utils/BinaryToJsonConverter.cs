@@ -23,21 +23,22 @@ namespace HammerAndSickle.Tools
     public class BinaryToJsonConverter : MonoBehaviour
     {
         #region Constants
+
         private const string CLASS_NAME = nameof(BinaryToJsonConverter);
         private const string HSM_EXTENSION = ".hsm";
         private const string MAP_EXTENSION = ".map";
         private static readonly char[] INVALID_FILENAME_CHARS = Path.GetInvalidFileNameChars();
         private static readonly string CONVERTED_FILES_FOLDER = Path.Combine(Application.dataPath, "Converted Files");
-        #endregion
+
+        #endregion // Constants
 
         #region Inspector Fields
+
         [Header("File Selection")]
-        [SerializeField]
         [Tooltip("Drag and drop the .hsm binary file here")]
         public UnityEngine.Object binaryMapFile = null;
 
         [Header("Output Configuration")]
-        [SerializeField]
         [Tooltip("Output filename for the .map file (without extension)")]
         public string outputFileName = "";
 
@@ -47,11 +48,14 @@ namespace HammerAndSickle.Tools
         [SerializeField] private int hexCount = 0;
         [SerializeField] private string creationDate = "";
         [SerializeField] private string fileStatus = "No file selected";
-        #endregion
+
+        #endregion // Inspector Fields
 
         #region Private Fields
+
         private TemporaryMapData loadedMapData = null;
-        #endregion
+
+        #endregion // Private Fields
 
         #region Public Methods
 
@@ -143,9 +147,14 @@ namespace HammerAndSickle.Tools
         {
             return binaryMapFile != null && IsValidOutputFileName(outputFileName);
         }
-        #endregion
+
+        #endregion // Public Methods
 
         #region Private Methods
+
+        /// <summary>
+        /// Validates the selected binary file and output file name for conversion.
+        /// </summary>
         private bool ValidateSelectedFileForConversion()
         {
             if (binaryMapFile == null)
@@ -165,7 +174,7 @@ namespace HammerAndSickle.Tools
             }
 
             string assetPath = null;
-#if UNITY_EDITOR
+            #if UNITY_EDITOR
             assetPath = AssetDatabase.GetAssetPath(binaryMapFile);
             if (string.IsNullOrEmpty(assetPath))
             {
@@ -197,16 +206,19 @@ namespace HammerAndSickle.Tools
                 fileStatus = $"File not found: {fileName}";
                 return false;
             }
-#else
+            #else
             Debug.LogError($"{CLASS_NAME}: File conversion only available in editor");
             AppService.CaptureUiMessage("Conversion only available in editor");
             fileStatus = "Editor only feature";
             return false;
-#endif
+            #endif
 
             return true;
         }
 
+        /// <summary>
+        /// Converts TemporaryMapData to JsonMapData format.
+        /// </summary>
         private JsonMapData ConvertToJsonMapData(TemporaryMapData tempData)
         {
             try
@@ -227,9 +239,16 @@ namespace HammerAndSickle.Tools
 
                 Debug.Log($"{CLASS_NAME}: Converting {tempData.Hexes.Length} hexes");
 
+                // Handle null or empty map name - use filename as fallback
+                string mapName = string.IsNullOrWhiteSpace(tempData.Header.MapName)
+                    ? GetFallbackMapName()
+                    : tempData.Header.MapName;
+
+                Debug.Log($"{CLASS_NAME}: Using map name: '{mapName}'");
+
                 // Convert header
-                JsonMapHeader jsonHeader = new JsonMapHeader(
-                    tempData.Header.MapName,
+                JsonMapHeader jsonHeader = new(
+                    mapName,
                     tempData.Header.MapConfiguration,
                     "placeholder" // Checksum will be calculated after hex conversion
                 );
@@ -250,7 +269,7 @@ namespace HammerAndSickle.Tools
                 Debug.Log($"{CLASS_NAME}: Successfully converted all hexes");
 
                 // Create JSON map data
-                JsonMapData jsonMapData = new JsonMapData(jsonHeader, gameHexes);
+                JsonMapData jsonMapData = new(jsonHeader, gameHexes);
 
                 // Calculate and update checksum
                 Debug.Log($"{CLASS_NAME}: Calculating checksum for converted data");
@@ -282,6 +301,43 @@ namespace HammerAndSickle.Tools
             }
         }
 
+        /// <summary>
+        /// Generates a fallback map name when the original is null or empty.
+        /// Uses the input filename without extension as the map name.
+        /// </summary>
+        /// <returns>Fallback map name</returns>
+        private string GetFallbackMapName()
+        {
+            try
+            {
+                if (binaryMapFile != null)
+                {
+                    #if UNITY_EDITOR
+                    string assetPath = UnityEditor.AssetDatabase.GetAssetPath(binaryMapFile);
+                    if (!string.IsNullOrEmpty(assetPath))
+                    {
+                        string fileName = Path.GetFileNameWithoutExtension(assetPath);
+                        Debug.Log($"{CLASS_NAME}: Using filename as fallback map name: '{fileName}'");
+                        return fileName;
+                    }
+                    #endif
+                }
+
+                // Final fallback
+                string fallback = "Unnamed Map";
+                Debug.Log($"{CLASS_NAME}: Using final fallback map name: '{fallback}'");
+                return fallback;
+            }
+            catch (Exception ex)
+            {
+                AppService.HandleException(CLASS_NAME, nameof(GetFallbackMapName), ex);
+                return "Unnamed Map";
+            }
+        }
+
+        /// <summary>
+        /// Converts a TemporaryHex to a GameHex.
+        /// </summary>
         private GameHex ConvertTemporaryHexToGameHex(TemporaryHex tempHex)
         {
             try
@@ -293,8 +349,8 @@ namespace HammerAndSickle.Tools
                 }
 
                 // Create GameHex with position conversion
-                Vector2Int position = new Vector2Int(tempHex.X, tempHex.Y);
-                GameHex gameHex = new GameHex(position);
+                Vector2Int position = new(tempHex.X, tempHex.Y);
+                GameHex gameHex = new(position);
 
                 // Copy basic properties
                 gameHex.SetTerrain(tempHex.Terrain);
@@ -336,6 +392,9 @@ namespace HammerAndSickle.Tools
             }
         }
 
+        /// <summary>
+        /// Writes the provided JSON map data to a file in the specified output directory.
+        /// </summary>
         private bool WriteJsonMapFile(JsonMapData jsonMapData)
         {
             try
@@ -355,9 +414,9 @@ namespace HammerAndSickle.Tools
                     Debug.Log($"{CLASS_NAME}: Creating output directory: {outputDirectory}");
                     Directory.CreateDirectory(outputDirectory);
 
-#if UNITY_EDITOR
+                    #if UNITY_EDITOR
                     UnityEditor.AssetDatabase.Refresh();
-#endif
+                    #endif
                 }
 
                 // Create full output path
@@ -379,10 +438,10 @@ namespace HammerAndSickle.Tools
                 Debug.Log($"{CLASS_NAME}: JSON file written successfully");
                 Debug.Log($"{CLASS_NAME}: File size: {new FileInfo(outputPath).Length:N0} bytes");
 
-#if UNITY_EDITOR
+                #if UNITY_EDITOR
                 // Refresh Unity's asset database to show the new file
                 UnityEditor.AssetDatabase.Refresh();
-#endif
+                #endif
 
                 // Validate written file by attempting to read it back
                 Debug.Log($"{CLASS_NAME}: Validating written file");
@@ -423,6 +482,12 @@ namespace HammerAndSickle.Tools
             }
         }
 
+        /// <summary>
+        /// Determines whether the specified filename is valid for use as an output file name.
+        /// </summary>
+        /// <remarks>This method checks for invalid characters based on a predefined set of restricted
+        /// characters. It also ensures that the file name does not begin or end with problematic characters such as
+        /// whitespace or a period, which may cause issues in certain file systems.</remarks>
         private bool IsValidOutputFileName(string filename)
         {
             if (string.IsNullOrWhiteSpace(filename))
@@ -450,9 +515,16 @@ namespace HammerAndSickle.Tools
             return true;
         }
 
+        /// <summary>
+        /// Retrieves the full file path of the binary map file in the Unity Editor.
+        /// </summary>
+        /// <remarks>This method is only functional in the Unity Editor. If the binary map file is not
+        /// set,  or if the file does not exist at the resolved path, the method returns <see langword="null"/>.
+        /// Additionally, if the file is not found, an error message is logged, and the file status is
+        /// updated.</remarks>
         private string GetFilePath()
         {
-#if UNITY_EDITOR
+            #if UNITY_EDITOR
             if (binaryMapFile == null) return null;
 
             string assetPath = AssetDatabase.GetAssetPath(binaryMapFile);
@@ -470,11 +542,14 @@ namespace HammerAndSickle.Tools
             }
 
             return fullPath;
-#else
+            #else
             return null;
-#endif
+            #endif
         }
 
+        /// <summary>
+        /// Loads and deserializes the binary map data from the specified file path.
+        /// </summary>
         private TemporaryMapData LoadBinaryMapData(string filePath)
         {
             Debug.Log($"{CLASS_NAME}: LoadBinaryMapData called with path: {filePath}");
@@ -489,10 +564,11 @@ namespace HammerAndSickle.Tools
                     Debug.Log($"{CLASS_NAME}: File stream opened successfully, stream length: {stream.Length} bytes");
 
                     Debug.Log($"{CLASS_NAME}: Creating BinaryFormatter with custom SerializationBinder");
-                    BinaryFormatter formatter = new BinaryFormatter();
-
-                    // Apply custom binder to handle cross-assembly type resolution
-                    formatter.Binder = new MapDataSerializationBinder();
+                    BinaryFormatter formatter = new()
+                    {
+                        // Apply custom binder to handle cross-assembly type resolution
+                        Binder = new MapDataSerializationBinder()
+                    };
 
                     Debug.Log($"{CLASS_NAME}: Attempting deserialization with binder");
                     mapData = (TemporaryMapData)formatter.Deserialize(stream);
@@ -535,6 +611,9 @@ namespace HammerAndSickle.Tools
             }
         }
 
+        /// <summary>
+        /// Updates the display fields in the inspector to reflect the current state of the loaded map data.
+        /// </summary>
         private void UpdateDisplayFields()
         {
             Debug.Log($"{CLASS_NAME}: Updating inspector display fields");
@@ -568,6 +647,9 @@ namespace HammerAndSickle.Tools
             }
         }
 
+        /// <summary>
+        /// Clears the display fields in the inspector.
+        /// </summary>
         private void ClearDisplayFields()
         {
             Debug.Log($"{CLASS_NAME}: Clearing display fields");
@@ -578,6 +660,13 @@ namespace HammerAndSickle.Tools
             fileStatus = "No file selected";
         }
 
+        /// <summary>
+        /// Validates the current state of the file selection and updates the file status accordingly.
+        /// </summary>
+        /// <remarks>This method is called automatically by Unity when changes are made to the serialized
+        /// fields in the Inspector. It ensures that the file selection and output filename are valid, and updates the
+        /// <c>fileStatus</c> field to reflect the current state. The validation includes checking if the selected file
+        /// exists, verifying the output filename, and providing appropriate status messages.</remarks>
         private void OnValidate()
         {
             // Update file status when file selection or filename changes in inspector
@@ -587,7 +676,7 @@ namespace HammerAndSickle.Tools
             }
             else
             {
-#if UNITY_EDITOR
+                #if UNITY_EDITOR
                 string assetPath = AssetDatabase.GetAssetPath(binaryMapFile);
                 if (!string.IsNullOrEmpty(assetPath))
                 {
@@ -616,12 +705,14 @@ namespace HammerAndSickle.Tools
                 {
                     fileStatus = "Invalid file selection";
                 }
-#endif
+                #endif
             }
         }
-        #endregion
+
+        #endregion // Private Methods
 
         #region Unity Lifecycle
+
         private void Start()
         {
             Debug.Log($"{CLASS_NAME}: BinaryToJsonConverter initialized");
@@ -636,7 +727,8 @@ namespace HammerAndSickle.Tools
                 AppService.HandleException(CLASS_NAME, nameof(Start), ex);
             }
         }
-        #endregion
+
+        #endregion // Unity Lifecycle
     }
 
     /// <summary>
@@ -645,8 +737,20 @@ namespace HammerAndSickle.Tools
     /// </summary>
     public class MapDataSerializationBinder : SerializationBinder
     {
+        // Class name for logging
         private const string CLASS_NAME = nameof(MapDataSerializationBinder);
 
+        /// <summary>
+        /// Resolves a type based on its assembly and type name, with custom mappings for specific types.
+        /// </summary>
+        /// <remarks>This method provides custom mappings for specific types, redirecting them to
+        /// alternative types  as defined in the method. If the type is not explicitly mapped, it attempts to resolve
+        /// the type  using the default resolution mechanism. <para> If an exception occurs during resolution, the
+        /// method logs the error and falls back to the default  resolution mechanism. </para></remarks>
+        /// <param name="assemblyName">The name of the assembly containing the type to resolve.</param>
+        /// <param name="typeName">The fully qualified name of the type to resolve.</param>
+        /// <returns>The resolved <see cref="Type"/> corresponding to the specified <paramref name="typeName"/> and  <paramref
+        /// name="assemblyName"/>. Returns <see langword="null"/> if the type cannot be resolved.</returns>
         public override Type BindToType(string assemblyName, string typeName)
         {
             try
@@ -695,7 +799,8 @@ namespace HammerAndSickle.Tools
         }
     }
 
-#if UNITY_EDITOR
+    #if UNITY_EDITOR
+
     /// <summary>
     /// Custom editor for BinaryToJsonConverter with Convert button and enhanced validation feedback.
     /// </summary>
@@ -755,9 +860,11 @@ namespace HammerAndSickle.Tools
             return true;
         }
     }
-#endif
+
+    #endif
 
     #region Temporary Data Structures
+
     /// <summary>
     /// Temporary map data structure for binary deserialization.
     /// Exact copy of the map editor's SerializableMapData structure.
@@ -823,5 +930,6 @@ namespace HammerAndSickle.Tools
         public string PontoonBridgeBorders;
         public string DamagedBridgeBorders;
     }
-    #endregion
+
+    #endregion // Temporary Data Structures
 }
