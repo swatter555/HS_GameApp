@@ -5,7 +5,6 @@ using System.Linq;
 using System.Runtime.Serialization;
 using System.Runtime.Serialization.Formatters.Binary;
 using HammerAndSickle.Services;
-//using HammerAndSickle.Legacy.Map;
 using HammerAndSickle.Models.Map;
 using HammerAndSickle.Utils;
 using System.Text.Json;
