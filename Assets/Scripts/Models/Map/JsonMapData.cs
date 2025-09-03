@@ -142,7 +142,7 @@ namespace HammerAndSickle.Models.Map
                     return "JsonMapData: Header is null";
                 }
 
-                return $"Map: {Header.MapName}, Size: {Header.MapSize}, Hexes: {GetHexCount()}, Version: {Header.SaveVersion}";
+                return $"Map: {Header.MapName}, Config: {Header.MapConfiguration}, Hexes: {GetHexCount()}, Version: {Header.SaveVersion}";
             }
             catch (Exception ex)
             {

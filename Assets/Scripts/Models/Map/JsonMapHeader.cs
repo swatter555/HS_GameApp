@@ -27,7 +27,7 @@ namespace HammerAndSickle.Models.Map
         /// Map size configuration (Small, Large, None).
         /// </summary>
         [JsonInclude]
-        public MapConfig MapSize { get; set; }
+        public MapConfig MapConfiguration { get; set; }
 
         /// <summary>
         /// Save format version for compatibility tracking.
@@ -56,7 +56,7 @@ namespace HammerAndSickle.Models.Map
         public JsonMapHeader()
         {
             MapName = string.Empty;
-            MapSize = MapConfig.None;
+            MapConfiguration = MapConfig.None;
             SaveVersion = HexMapConstants.CurrentMapDataVersion;
             Checksum = string.Empty;
             CreatedAt = DateTime.UtcNow;
@@ -66,14 +66,14 @@ namespace HammerAndSickle.Models.Map
         /// Creates a new JsonMapHeader with specified values.
         /// </summary>
         /// <param name="mapName">Name of the map</param>
-        /// <param name="mapSize">Size configuration of the map</param>
+        /// <param name="mapConfiguration">Size configuration of the map</param>
         /// <param name="checksum">Data integrity checksum</param>
-        public JsonMapHeader(string mapName, MapConfig mapSize, string checksum)
+        public JsonMapHeader(string mapName, MapConfig mapConfiguration, string checksum)
         {
             try
             {
                 MapName = mapName ?? throw new ArgumentNullException(nameof(mapName));
-                MapSize = mapSize;
+                MapConfiguration = mapConfiguration;
                 SaveVersion = HexMapConstants.CurrentMapDataVersion;
                 Checksum = checksum ?? throw new ArgumentNullException(nameof(checksum));
                 CreatedAt = DateTime.UtcNow;
@@ -101,9 +101,9 @@ namespace HammerAndSickle.Models.Map
                     return false;
                 }
 
-                if (!Enum.IsDefined(typeof(MapConfig), MapSize))
+                if (!Enum.IsDefined(typeof(MapConfig), MapConfiguration))
                 {
-                    AppService.CaptureUiMessage($"JsonMapHeader validation failed: Invalid MapSize value {MapSize}");
+                    AppService.CaptureUiMessage($"JsonMapHeader validation failed: Invalid MapSize value {MapConfiguration}");
                     return false;
                 }
 
@@ -192,7 +192,7 @@ namespace HammerAndSickle.Models.Map
         {
             try
             {
-                return $"'{MapName}' ({MapSize}) v{SaveVersion} created {CreatedAt:yyyy-MM-dd HH:mm} UTC";
+                return $"'{MapName}' ({MapConfiguration}) v{SaveVersion} created {CreatedAt:yyyy-MM-dd HH:mm} UTC";
             }
             catch (Exception ex)
             {
