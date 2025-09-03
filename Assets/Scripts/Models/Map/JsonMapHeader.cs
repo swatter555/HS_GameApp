@@ -57,7 +57,7 @@ namespace HammerAndSickle.Models.Map
         {
             MapName = string.Empty;
             MapSize = MapConfig.None;
-            SaveVersion = HexDataConstants.CurrentMapDataVersion;
+            SaveVersion = HexMapConstants.CurrentMapDataVersion;
             Checksum = string.Empty;
             CreatedAt = DateTime.UtcNow;
         }
@@ -74,7 +74,7 @@ namespace HammerAndSickle.Models.Map
             {
                 MapName = mapName ?? throw new ArgumentNullException(nameof(mapName));
                 MapSize = mapSize;
-                SaveVersion = HexDataConstants.CurrentMapDataVersion;
+                SaveVersion = HexMapConstants.CurrentMapDataVersion;
                 Checksum = checksum ?? throw new ArgumentNullException(nameof(checksum));
                 CreatedAt = DateTime.UtcNow;
             }
@@ -162,7 +162,7 @@ namespace HammerAndSickle.Models.Map
         /// <returns>Current save version</returns>
         public static int GetCurrentSaveVersion()
         {
-            return HexDataConstants.CurrentMapDataVersion;
+            return HexMapConstants.CurrentMapDataVersion;
         }
 
         /// <summary>
@@ -175,7 +175,7 @@ namespace HammerAndSickle.Models.Map
             {
                 // For now, only exact version matches are compatible
                 // Future versions can implement backward compatibility logic
-                return SaveVersion == HexDataConstants.CurrentMapDataVersion;
+                return SaveVersion == HexMapConstants.CurrentMapDataVersion;
             }
             catch (Exception ex)
             {

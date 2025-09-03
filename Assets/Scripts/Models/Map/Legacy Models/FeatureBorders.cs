@@ -1,20 +1,9 @@
 using System;
 using System.Linq;
+using HammerAndSickle.Models.Map;
 
 namespace HammerAndSickle.Legacy.Map
-{
-    /// <summary>
-    /// Hex border types.
-    /// </summary>
-    public enum BorderType
-    {
-        None,
-        River,
-        Bridge,
-        DestroyedBridge,
-        PontoonBridge
-    }
-
+{ 
     /// <summary>
     /// Stores hex edge information.
     /// </summary>

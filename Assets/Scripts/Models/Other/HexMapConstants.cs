@@ -5,12 +5,12 @@ namespace HammerAndSickle.Models.Map
     /// <summary>
     /// Constants for the hex map.
     /// </summary>
-    public class HexDataConstants
+    public class HexMapConstants
     {
-        // GameHex grid orientation.
+        // Hex grid orientation.
         public const bool IsPointyTop = true;
 
-        // GameHex size constant.
+        // Hex size constant.
         public const int HexSize = 256;
 
         // Rendering constants.
@@ -18,14 +18,11 @@ namespace HammerAndSickle.Models.Map
         public const float PixelScaleY = 1;
         public const int SpritePPU = 256;
 
-        // GameHex grid size constants.
+        // Hex grid size constants.
         public const int SmallHexWidth = 32;
         public const int SmallHexHeight = 21;
         public const int LargeHexWidth = 32;
         public const int LargeHexHeight = 42;
-
-        // Map data file current save version
-        public const int CurrentMapDataVersion = 1;
 
         // Vector represents no hex is selected.
         public static readonly Vector2Int NoHexSelected = new Vector2Int(-1, -1);
@@ -38,6 +35,22 @@ namespace HammerAndSickle.Models.Map
         {
             return HexSize * 0.75f;
         }
+
+        // Version of the .map file format.
+        public const int CurrentMapDataVersion = 1;
+    }
+
+    /// <summary>
+    /// Pointy-Top hex directions.
+    /// </summary>
+    public enum HexDirection
+    {
+        NE,
+        E,
+        SE,
+        SW,
+        W,
+        NW
     }
 
     /// <summary>
@@ -50,19 +63,6 @@ namespace HammerAndSickle.Models.Map
         Bridge,
         DestroyedBridge,
         PontoonBridge
-    }
-
-    /// <summary>
-    /// Pointy-Top hex directions.
-    /// </summary>
-    public enum HexDirection
-    {
-        NW,
-        NE,
-        E,
-        SE,
-        SW,
-        W
     }
 
     /// <summary>
@@ -158,7 +158,7 @@ namespace HammerAndSickle.Models.Map
         Large,
         None
     }
-
+    
     /// <summary>
     /// The types of hex outlines.
     /// </summary>
@@ -188,7 +188,7 @@ namespace HammerAndSickle.Models.Map
     /// <summary>
     /// The text size for the map element
     /// </summary>
-    public enum  TextSize
+    public enum TextSize
     {
         Small,
         Medium,

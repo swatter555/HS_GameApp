@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using UnityEngine;
 using HammerAndSickle.Services;
+using HammerAndSickle.Models.Map;
 
 namespace HammerAndSickle.Legacy.Map
 {
