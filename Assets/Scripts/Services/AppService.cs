@@ -86,6 +86,11 @@ namespace HammerAndSickle.Services
         // Cached paths
         private static string _mainAppPath;
         private static string _scenariosPath;
+        private static string _mapPath;
+        private static string _oobPath;
+        private static string _aiiPath;
+        private static string _brfPath;
+        private static string _cmpPath;
         private static string _logsPath;
         private static string _exportsPath;
         private static string _backupsPath;
@@ -116,6 +121,36 @@ namespace HammerAndSickle.Services
         /// </summary>
         public static string ScenariosPath => GetOrCreatePath(ref _scenariosPath,
             Path.Combine(MainAppPath, "scenarios"));
+
+        /// <summary>
+        /// Gets the file system path to the directory where map files are stored.
+        /// </summary>
+        public static string MapPath => GetOrCreatePath(ref _mapPath,
+            Path.Combine(MainAppPath, "maps"));
+
+        /// <summary>
+        /// Gets the file system path to the "Order of Battle" (OOB) directory, creating it if it does not already exist.
+        /// </summary>
+        public static string OobPath => GetOrCreatePath(ref _oobPath,
+            Path.Combine(MainAppPath, "oob"));
+
+        /// <summary>
+        /// Gets the file system path to the "aii" directory within the main application path.
+        /// </summary>
+        public static string AiiPath => GetOrCreatePath(ref _aiiPath,
+            Path.Combine(MainAppPath, "aii"));
+
+        /// <summary>
+        /// Gets the file system path to the "brf" directory within the main application path.
+        /// </summary>
+        public static string BrfPath => GetOrCreatePath(ref _brfPath,
+            Path.Combine(MainAppPath, "brf"));
+
+        /// <summary>
+        /// Gets the path to the "cmp" directory, creating it if it does not already exist.
+        /// </summary>
+        public static string CmpPath => GetOrCreatePath(ref _cmpPath,
+            Path.Combine(MainAppPath, "cmp"));
 
         /// <summary>
         /// Path to log files: Documents/My Games/Hammer and Sickle/logs/

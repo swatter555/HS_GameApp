@@ -337,7 +337,7 @@ namespace HammerAndSickle.Models.Map
 
         #endregion // Public Methods
 
-        #region Validation (Stubs)
+        #region Validation
 
         /// <summary>
         /// Validates the integrity of the hex map data.
@@ -349,16 +349,98 @@ namespace HammerAndSickle.Models.Map
             {
                 ValidateState();
 
-                // TODO: Implement checksum validation
-                // TODO: Implement hex consistency checks
-                // TODO: Implement neighbor relationship validation
+                bool isValid = true;
+                int validationErrors = 0;
 
                 if (enableDebugLogging)
                 {
-                    Debug.Log($"{CLASS_NAME}: ValidateIntegrity - stub implementation");
+                    Debug.Log($"{CLASS_NAME}: Starting integrity validation for {HexCount} hexes");
                 }
 
-                return true;
+                // Validate basic map state
+                if (hexDictionary == null)
+                {
+                    AppService.CaptureUiMessage("Map integrity failed: Hex dictionary is null");
+                    return false;
+                }
+
+                if (MapSize.x <= 0 || MapSize.y <= 0)
+                {
+                    AppService.CaptureUiMessage($"Map integrity failed: Invalid map dimensions {MapSize.x}x{MapSize.y}");
+                    return false;
+                }
+
+                // Validate each hex for internal consistency
+                foreach (var hex in hexDictionary.Values)
+                {
+                    if (hex == null)
+                    {
+                        AppService.CaptureUiMessage("Map integrity failed: Found null hex in dictionary");
+                        validationErrors++;
+                        isValid = false;
+                        continue;
+                    }
+
+                    // Validate hex internal consistency
+                    if (!hex.ValidateHex())
+                    {
+                        AppService.CaptureUiMessage($"Map integrity failed: Hex at {hex.Position} failed validation");
+                        validationErrors++;
+                        isValid = false;
+                    }
+
+                    // Validate hex position matches dictionary key
+                    if (hexDictionary.TryGetValue(hex.Position, out HexTile storedHex))
+                    {
+                        if (!ReferenceEquals(hex, storedHex))
+                        {
+                            AppService.CaptureUiMessage($"Map integrity failed: Position mismatch for hex at {hex.Position}");
+                            validationErrors++;
+                            isValid = false;
+                        }
+                    }
+                    else
+                    {
+                        AppService.CaptureUiMessage($"Map integrity failed: Hex at {hex.Position} not found in dictionary by position");
+                        validationErrors++;
+                        isValid = false;
+                    }
+                }
+
+                // Check for duplicate positions (should not happen with proper dictionary usage)
+                var allPositions = new HashSet<Position2D>();
+                foreach (var hex in hexDictionary.Values)
+                {
+                    if (hex != null && !allPositions.Add(hex.Position))
+                    {
+                        AppService.CaptureUiMessage($"Map integrity failed: Duplicate position found at {hex.Position}");
+                        validationErrors++;
+                        isValid = false;
+                    }
+                }
+
+                if (enableDebugLogging)
+                {
+                    if (isValid)
+                    {
+                        Debug.Log($"{CLASS_NAME}: Integrity validation passed - all {HexCount} hexes valid");
+                    }
+                    else
+                    {
+                        Debug.LogWarning($"{CLASS_NAME}: Integrity validation failed with {validationErrors} errors");
+                    }
+                }
+
+                if (isValid)
+                {
+                    AppService.CaptureUiMessage($"Map integrity validation passed for '{MapName}'");
+                }
+                else
+                {
+                    AppService.CaptureUiMessage($"Map integrity validation failed with {validationErrors} errors");
+                }
+
+                return isValid;
             }
             catch (Exception ex)
             {
@@ -377,15 +459,93 @@ namespace HammerAndSickle.Models.Map
             {
                 ValidateState();
 
-                // TODO: Implement bounds checking for all hexes
-                // TODO: Use Position2D.Clamp() for validation
+                bool isValid = true;
+                int outOfBoundsCount = 0;
 
                 if (enableDebugLogging)
                 {
-                    Debug.Log($"{CLASS_NAME}: ValidateDimensions - stub implementation");
+                    Debug.Log($"{CLASS_NAME}: Validating dimensions for {HexCount} hexes against bounds {MapSize.x}x{MapSize.y}");
                 }
 
-                return true;
+                // Check each hex position against map bounds
+                foreach (var hex in hexDictionary.Values)
+                {
+                    if (hex == null)
+                    {
+                        continue; // Skip null hexes (will be caught by integrity validation)
+                    }
+
+                    // Validate position is within map bounds
+                    if (!IsPositionInBounds(hex.Position))
+                    {
+                        AppService.CaptureUiMessage($"Dimension validation failed: Hex at {hex.Position} is outside map bounds ({MapSize.x}x{MapSize.y})");
+                        outOfBoundsCount++;
+                        isValid = false;
+
+                        if (enableDebugLogging)
+                        {
+                            Debug.LogWarning($"{CLASS_NAME}: Hex at {hex.Position} is out of bounds");
+                        }
+                    }
+
+                    // Validate position components are non-negative
+                    if (hex.Position.x < 0 || hex.Position.y < 0)
+                    {
+                        AppService.CaptureUiMessage($"Dimension validation failed: Hex at {hex.Position} has negative coordinates");
+                        outOfBoundsCount++;
+                        isValid = false;
+                    }
+
+                    // Use Position2D.Clamp to get corrected position and compare
+                    Position2D clampedPosition = Position2D.Clamp(
+                        hex.Position,
+                        Position2D.Zero,
+                        new Position2D(MapSize.x - 1, MapSize.y - 1)
+                    );
+
+                    if (!hex.Position.Equals(clampedPosition))
+                    {
+                        AppService.CaptureUiMessage($"Dimension validation failed: Hex at {hex.Position} would be clamped to {clampedPosition}");
+                        outOfBoundsCount++;
+                        isValid = false;
+                    }
+                }
+
+                // Check for coverage gaps (optional - identifies areas without hexes)
+                int expectedHexCount = MapSize.x * MapSize.y;
+                if (HexCount != expectedHexCount)
+                {
+                    AppService.CaptureUiMessage($"Dimension validation warning: Expected {expectedHexCount} hexes for {MapSize.x}x{MapSize.y} map, found {HexCount}");
+
+                    if (enableDebugLogging)
+                    {
+                        Debug.LogWarning($"{CLASS_NAME}: Hex count mismatch - expected {expectedHexCount}, found {HexCount}");
+                    }
+                    // Note: This is a warning, not an error, as sparse maps may be valid
+                }
+
+                if (enableDebugLogging)
+                {
+                    if (isValid)
+                    {
+                        Debug.Log($"{CLASS_NAME}: Dimension validation passed - all hexes within bounds");
+                    }
+                    else
+                    {
+                        Debug.LogWarning($"{CLASS_NAME}: Dimension validation failed - {outOfBoundsCount} hexes out of bounds");
+                    }
+                }
+
+                if (isValid)
+                {
+                    AppService.CaptureUiMessage($"Dimension validation passed for map '{MapName}'");
+                }
+                else
+                {
+                    AppService.CaptureUiMessage($"Dimension validation failed - {outOfBoundsCount} hexes out of bounds");
+                }
+
+                return isValid;
             }
             catch (Exception ex)
             {
@@ -404,22 +564,175 @@ namespace HammerAndSickle.Models.Map
             {
                 ValidateState();
 
-                // TODO: Implement neighbor relationship validation
-                // TODO: Check for orphaned hexes
-                // TODO: Validate bidirectional relationships
+                bool isValid = true;
+                int connectivityErrors = 0;
+                int orphanedHexes = 0;
+                int brokenRelationships = 0;
 
                 if (enableDebugLogging)
                 {
-                    Debug.Log($"{CLASS_NAME}: ValidateConnectivity - stub implementation");
+                    Debug.Log($"{CLASS_NAME}: Validating neighbor connectivity for {HexCount} hexes");
                 }
 
-                return true;
+                foreach (var hex in hexDictionary.Values)
+                {
+                    if (hex == null)
+                    {
+                        continue; // Skip null hexes
+                    }
+
+                    var neighbors = hex.GetAllNeighbors();
+                    bool hasAnyNeighbor = false;
+
+                    // Check each direction for neighbor relationships
+                    for (int direction = 0; direction < 6; direction++)
+                    {
+                        HexDirection hexDirection = (HexDirection)direction;
+
+                        // Calculate expected neighbor position
+                        Position2D expectedNeighborPos = HexMapUtil.GetNeighborPosition(hex.Position, hexDirection);
+
+                        // Get actual neighbor from hex
+                        HexTile actualNeighbor = hex.GetNeighbor(hexDirection);
+
+                        // Get neighbor that should be in the map at that position
+                        HexTile expectedNeighbor = GetHexAt(expectedNeighborPos);
+
+                        // Case 1: Hex has a neighbor reference, but position is wrong
+                        if (actualNeighbor != null && !actualNeighbor.Position.Equals(expectedNeighborPos))
+                        {
+                            AppService.CaptureUiMessage($"Connectivity error: Hex at {hex.Position} has neighbor in direction {hexDirection} at wrong position {actualNeighbor.Position}, expected {expectedNeighborPos}");
+                            connectivityErrors++;
+                            brokenRelationships++;
+                            isValid = false;
+                        }
+
+                        // Case 2: Expected neighbor exists but hex doesn't reference it
+                        if (expectedNeighbor != null && actualNeighbor == null)
+                        {
+                            AppService.CaptureUiMessage($"Connectivity error: Hex at {hex.Position} missing neighbor reference in direction {hexDirection} to {expectedNeighborPos}");
+                            connectivityErrors++;
+                            brokenRelationships++;
+                            isValid = false;
+                        }
+
+                        // Case 3: Hex references neighbor that doesn't exist in map
+                        if (actualNeighbor != null && expectedNeighbor == null)
+                        {
+                            AppService.CaptureUiMessage($"Connectivity error: Hex at {hex.Position} references non-existent neighbor in direction {hexDirection} at {actualNeighbor.Position}");
+                            connectivityErrors++;
+                            brokenRelationships++;
+                            isValid = false;
+                        }
+
+                        // Case 4: References don't match (hex A points to hex B, but hex B is not at expected position)
+                        if (actualNeighbor != null && expectedNeighbor != null && !ReferenceEquals(actualNeighbor, expectedNeighbor))
+                        {
+                            AppService.CaptureUiMessage($"Connectivity error: Hex at {hex.Position} neighbor reference mismatch in direction {hexDirection}");
+                            connectivityErrors++;
+                            brokenRelationships++;
+                            isValid = false;
+                        }
+
+                        // Track if hex has any valid neighbors
+                        if (actualNeighbor != null && expectedNeighbor != null && ReferenceEquals(actualNeighbor, expectedNeighbor))
+                        {
+                            hasAnyNeighbor = true;
+                        }
+
+                        // Validate bidirectional relationships
+                        if (actualNeighbor != null && expectedNeighbor != null && ReferenceEquals(actualNeighbor, expectedNeighbor))
+                        {
+                            // Check if the neighbor points back to this hex
+                            HexDirection oppositeDirection = GetOppositeDirection(hexDirection);
+                            HexTile backReference = actualNeighbor.GetNeighbor(oppositeDirection);
+
+                            if (!ReferenceEquals(backReference, hex))
+                            {
+                                AppService.CaptureUiMessage($"Connectivity error: Non-bidirectional relationship between {hex.Position} and {actualNeighbor.Position}");
+                                connectivityErrors++;
+                                brokenRelationships++;
+                                isValid = false;
+                            }
+                        }
+                    }
+
+                    // Check for orphaned hexes (no valid neighbors when they should have some)
+                    if (!hasAnyNeighbor)
+                    {
+                        // Check if this hex should have neighbors based on its position
+                        bool shouldHaveNeighbors = false;
+                        for (int direction = 0; direction < 6; direction++)
+                        {
+                            Position2D neighborPos = HexMapUtil.GetNeighborPosition(hex.Position, (HexDirection)direction);
+                            if (IsPositionInBounds(neighborPos) && hexDictionary.ContainsKey(neighborPos))
+                            {
+                                shouldHaveNeighbors = true;
+                                break;
+                            }
+                        }
+
+                        if (shouldHaveNeighbors)
+                        {
+                            AppService.CaptureUiMessage($"Connectivity warning: Hex at {hex.Position} appears orphaned despite having potential neighbors");
+                            orphanedHexes++;
+                            // This is a warning, not necessarily an error for edge hexes
+                        }
+                    }
+                }
+
+                if (enableDebugLogging)
+                {
+                    if (isValid)
+                    {
+                        Debug.Log($"{CLASS_NAME}: Connectivity validation passed - all neighbor relationships valid");
+                    }
+                    else
+                    {
+                        Debug.LogWarning($"{CLASS_NAME}: Connectivity validation failed - {connectivityErrors} total errors, {brokenRelationships} broken relationships, {orphanedHexes} orphaned hexes");
+                    }
+                }
+
+                if (isValid)
+                {
+                    AppService.CaptureUiMessage($"Connectivity validation passed for map '{MapName}'");
+                }
+                else
+                {
+                    AppService.CaptureUiMessage($"Connectivity validation failed - {connectivityErrors} errors found");
+                }
+
+                if (orphanedHexes > 0)
+                {
+                    AppService.CaptureUiMessage($"Connectivity validation found {orphanedHexes} potentially orphaned hexes");
+                }
+
+                return isValid;
             }
             catch (Exception ex)
             {
                 AppService.HandleException(CLASS_NAME, nameof(ValidateConnectivity), ex);
                 return false;
             }
+        }
+
+        /// <summary>
+        /// Gets the opposite direction for bidirectional relationship validation.
+        /// </summary>
+        /// <param name="direction">Original direction</param>
+        /// <returns>Opposite direction</returns>
+        private static HexDirection GetOppositeDirection(HexDirection direction)
+        {
+            return direction switch
+            {
+                HexDirection.NW => HexDirection.SE,
+                HexDirection.NE => HexDirection.SW,
+                HexDirection.E => HexDirection.W,
+                HexDirection.SE => HexDirection.NW,
+                HexDirection.SW => HexDirection.NE,
+                HexDirection.W => HexDirection.E,
+                _ => throw new ArgumentOutOfRangeException(nameof(direction), direction, "Invalid hex direction")
+            };
         }
 
         #endregion // Validation
