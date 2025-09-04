@@ -120,13 +120,13 @@ namespace HammerAndSickle.Services
         /// Path to scenario storage: Documents/My Games/Hammer and Sickle/scenarios/
         /// </summary>
         public static string ScenariosPath => GetOrCreatePath(ref _scenariosPath,
-            Path.Combine(MainAppPath, "scenarios"));
+            Path.Combine(MainAppPath, "scenario"));
 
         /// <summary>
         /// Gets the file system path to the directory where map files are stored.
         /// </summary>
         public static string MapPath => GetOrCreatePath(ref _mapPath,
-            Path.Combine(MainAppPath, "maps"));
+            Path.Combine(MainAppPath, "map"));
 
         /// <summary>
         /// Gets the file system path to the "Order of Battle" (OOB) directory, creating it if it does not already exist.
