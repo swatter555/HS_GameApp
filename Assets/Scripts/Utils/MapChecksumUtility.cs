@@ -19,11 +19,11 @@ namespace HammerAndSickle.Utils
 
         #region Public Methods
         /// <summary>
-        /// Calculates a SHA256 checksum for an array of GameHex objects.
+        /// Calculates a SHA256 checksum for an array of HexTile objects.
         /// </summary>
         /// <param name="hexes">Array of hex data to checksum</param>
         /// <returns>Hexadecimal string representation of the checksum</returns>
-        public static string CalculateChecksum(GameHex[] hexes)
+        public static string CalculateChecksum(HexTile[] hexes)
         {
             try
             {
@@ -171,7 +171,7 @@ namespace HammerAndSickle.Utils
         /// </summary>
         /// <param name="hexes">Array of hex data to checksum</param>
         /// <returns>Hexadecimal string representation of the MD5 checksum</returns>
-        public static string CalculateQuickChecksum(GameHex[] hexes)
+        public static string CalculateQuickChecksum(HexTile[] hexes)
         {
             try
             {

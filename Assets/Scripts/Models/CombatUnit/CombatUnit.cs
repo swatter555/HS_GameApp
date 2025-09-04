@@ -48,7 +48,7 @@ namespace HammerAndSickle.Models
         public StatsMaxCurrent HitPoints { get; private set; }
         public StatsMaxCurrent DaysSupply { get; private set; }
         public StatsMaxCurrent MovementPoints { get; private set; }
-        public Coordinate2D MapPos { get; internal set; }
+        public Position2D MapPos { get; internal set; }
         public SpottedLevel SpottedLevel { get; private set; }
         public float IndividualCombatModifier { get; private set; } // Add more disntinction between units
 
@@ -164,7 +164,7 @@ namespace HammerAndSickle.Models
                 EfficiencyLevel = EfficiencyLevel.FullOperations;
 
                 // Initialize position to origin (will be set when placed on map)
-                MapPos = Coordinate2D.Zero;
+                MapPos = Position2D.Zero;
 
                 // Initialize individual combat modifier to default
                 IndividualCombatModifier = CUConstants.ICM_DEFAULT;
@@ -218,7 +218,7 @@ namespace HammerAndSickle.Models
                 IntelActions = new StatsMaxCurrent(1f);
 
                 // Initialize position and state
-                MapPos = Coordinate2D.Zero;
+                MapPos = Position2D.Zero;
                 SpottedLevel = SpottedLevel.Level1;
                 LeaderID = string.Empty;
 
@@ -1359,7 +1359,7 @@ namespace HammerAndSickle.Models
         /// Sets the unit's position on the map.
         /// </summary>
         /// <param name="newPos">The new position coordinates</param>
-        public void SetPosition(Coordinate2D newPos)
+        public void SetPosition(Position2D newPos)
         {
             try
             {
@@ -1378,7 +1378,7 @@ namespace HammerAndSickle.Models
         /// </summary>
         /// <param name="targetPos">The target position to validate</param>
         /// <returns>True if movement appears valid</returns>
-        public bool CanMoveTo(Coordinate2D targetPos)
+        public bool CanMoveTo(Position2D targetPos)
         {
             try
             {
@@ -1396,7 +1396,7 @@ namespace HammerAndSickle.Models
         /// </summary>
         /// <param name="targetPos">The target position</param>
         /// <returns>Distance in Unity units</returns>
-        public float GetDistanceTo(Coordinate2D targetPos)
+        public float GetDistanceTo(Position2D targetPos)
         {
             try
             {
@@ -1519,7 +1519,7 @@ namespace HammerAndSickle.Models
 
                 // Clear any runtime assignments/state
                 SpottedLevel = SpottedLevel.Level1;
-                MapPos = Coordinate2D.Zero;
+                MapPos = Position2D.Zero;
 
                 // If it's a facility, reset to undamaged state
                 if (IsBase)

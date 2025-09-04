@@ -54,7 +54,7 @@ namespace HammerAndSickle.Models.Map
     }
 
     /// <summary>
-    /// GameHex border types.
+    /// HexTile border types.
     /// </summary>
     public enum BorderType
     {

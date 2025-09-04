@@ -13,10 +13,13 @@ namespace HammerAndSickle.Models.Map
     public class JSONFeatureBorders
     {
         #region Constants
+
         private const string CLASS_NAME = nameof(JSONFeatureBorders);
-        #endregion
+
+        #endregion // Constants
 
         #region Properties
+
         [JsonInclude]
         public bool Northwest { get; set; }
 
@@ -37,9 +40,11 @@ namespace HammerAndSickle.Models.Map
 
         [JsonInclude]
         public BorderType Type { get; set; }
-        #endregion
+
+        #endregion // Properties
 
         #region Constructors
+
         /// <summary>
         /// Parameterless constructor for JSON serialization.
         /// </summary>
@@ -126,9 +131,11 @@ namespace HammerAndSickle.Models.Map
                 throw;
             }
         }
-        #endregion
+
+        #endregion // Constructors
 
         #region Public Methods
+
         /// <summary>
         /// Reset the borders to default value.
         /// </summary>
@@ -284,9 +291,11 @@ namespace HammerAndSickle.Models.Map
                 return false;
             }
         }
-        #endregion
+
+        #endregion // Public Methods
 
         #region Private Methods
+
         /// <summary>
         /// Validates if a string is a binary string.
         /// </summary>
@@ -305,6 +314,7 @@ namespace HammerAndSickle.Models.Map
                 return false;
             }
         }
-        #endregion
+
+        #endregion // Private Methods
     }
 }
