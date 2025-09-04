@@ -11,11 +11,13 @@ namespace HammerAndSickle.Models.Map
     /// Contains terrain, features, borders, labels, and game state information.
     /// </summary>
     [Serializable]
-    public class GameHex : IDisposable
+    public class HexTile : IDisposable
     {
         #region Constants
-        private const string CLASS_NAME = nameof(GameHex);
-        #endregion
+
+        private const string CLASS_NAME = nameof(HexTile);
+
+        #endregion // Constants
 
         #region Properties
 
@@ -33,7 +35,7 @@ namespace HammerAndSickle.Models.Map
 
         // Core Position and Identity
         [JsonInclude]
-        public Vector2Int Position { get; set; }
+        public Position2D Position { get; set; }
 
         // Terrain Properties
         [JsonInclude]
@@ -110,7 +112,7 @@ namespace HammerAndSickle.Models.Map
         [JsonInclude]
         public JSONFeatureBorders DamagedBridgeBorders { get; set; }
 
-        #endregion
+        #endregion // Properties
 
         #region Private Fields
 
@@ -118,9 +120,9 @@ namespace HammerAndSickle.Models.Map
         private readonly bool enableDebugLogging;
 
         [JsonIgnore]
-        private Dictionary<HexDirection, GameHex> neighbors;
+        private Dictionary<HexDirection, HexTile> neighbors;
 
-        #endregion
+        #endregion // Private Fields
 
         #region Constructors
 
@@ -128,7 +130,7 @@ namespace HammerAndSickle.Models.Map
         /// Parameterless constructor for JSON serialization.
         /// </summary>
         [JsonConstructor]
-        public GameHex()
+        public HexTile()
         {
             Terrain = TerrainType.Clear;
             enableDebugLogging = false;
@@ -140,14 +142,14 @@ namespace HammerAndSickle.Models.Map
         /// </summary>
         /// <param name="position">Grid position of the hex</param>
         /// <param name="enableLogging">Enable debug logging for this hex</param>
-        public GameHex(Vector2Int position, bool enableLogging = false)
+        public HexTile(Vector2Int position, bool enableLogging = false)
         {
             Position = position;
             enableDebugLogging = enableLogging;
             Initialize();
         }
 
-        #endregion
+        #endregion // Constructors
 
         #region Initialization
 
@@ -178,7 +180,7 @@ namespace HammerAndSickle.Models.Map
                 DamagedBridgeBorders ??= new JSONFeatureBorders(BorderType.DestroyedBridge);
 
                 // Initialize neighbors dictionary
-                neighbors = new Dictionary<HexDirection, GameHex>();
+                neighbors = new Dictionary<HexDirection, HexTile>();
 
                 IsInitialized = true;
 
@@ -195,7 +197,7 @@ namespace HammerAndSickle.Models.Map
             }
         }
 
-        #endregion
+        #endregion // Initialization
 
         #region Public Methods
 
@@ -221,6 +223,15 @@ namespace HammerAndSickle.Models.Map
                 AppService.HandleException(CLASS_NAME, nameof(SetPosition), ex);
                 throw;
             }
+        }
+
+        /// <summary>
+        /// Sets the position of the object.
+        /// </summary>
+        /// <param name="position">The new position to assign, represented as a <see cref="Position2D"/> object.</param>
+        public void SetPosition(Position2D position)
+        {
+            Position = position;
         }
 
         /// <summary>
@@ -407,7 +418,7 @@ namespace HammerAndSickle.Models.Map
         /// </summary>
         /// <param name="direction">Direction of the neighbor</param>
         /// <param name="neighbor">The neighboring hex (null to remove)</param>
-        public void SetNeighbor(HexDirection direction, GameHex neighbor)
+        public void SetNeighbor(HexDirection direction, HexTile neighbor)
         {
             ValidateState();
 
@@ -439,11 +450,11 @@ namespace HammerAndSickle.Models.Map
         /// </summary>
         /// <param name="direction">The direction of the neighboring hex to retrieve</param>
         /// <returns>The neighboring hex in the specified direction, or null if no neighbor exists</returns>
-        public GameHex GetNeighbor(HexDirection direction)
+        public HexTile GetNeighbor(HexDirection direction)
         {
             try
             {
-                return neighbors.TryGetValue(direction, out GameHex neighbor) ? neighbor : null;
+                return neighbors.TryGetValue(direction, out HexTile neighbor) ? neighbor : null;
             }
             catch (Exception ex)
             {
@@ -456,7 +467,7 @@ namespace HammerAndSickle.Models.Map
         /// Gets all neighbors of this hex.
         /// </summary>
         /// <returns>Dictionary of all neighboring hexes by direction</returns>
-        public IReadOnlyDictionary<HexDirection, GameHex> GetAllNeighbors()
+        public IReadOnlyDictionary<HexDirection, HexTile> GetAllNeighbors()
         {
             try
             {
@@ -465,7 +476,7 @@ namespace HammerAndSickle.Models.Map
             catch (Exception ex)
             {
                 AppService.HandleException(CLASS_NAME, nameof(GetAllNeighbors), ex);
-                return new Dictionary<HexDirection, GameHex>();
+                return new Dictionary<HexDirection, HexTile>();
             }
         }
 
@@ -508,7 +519,7 @@ namespace HammerAndSickle.Models.Map
             }
         }
 
-        #endregion
+        #endregion // Public Methods
 
         #region Private Methods
 
@@ -566,7 +577,7 @@ namespace HammerAndSickle.Models.Map
             }
         }
 
-        #endregion
+        #endregion // Private Methods
 
         #region IDisposable Implementation
 
@@ -615,6 +626,6 @@ namespace HammerAndSickle.Models.Map
             }
         }
 
-        #endregion
+        #endregion // IDisposable Implementation
     }
 }

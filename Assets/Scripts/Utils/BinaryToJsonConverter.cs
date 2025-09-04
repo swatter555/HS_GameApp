@@ -18,7 +18,7 @@ namespace HammerAndSickle.Tools
 {
     /// <summary>
     /// Unity tool for converting binary .hsm map files to JSON format.
-    /// Loads binary data and converts to JSON-compliant GameHex structures.
+    /// Loads binary data and converts to JSON-compliant HexTile structures.
     /// </summary>
     public class BinaryToJsonConverter : MonoBehaviour
     {
@@ -254,7 +254,7 @@ namespace HammerAndSickle.Tools
                 );
 
                 // Convert hex array
-                GameHex[] gameHexes = new GameHex[tempData.Hexes.Length];
+                HexTile[] gameHexes = new HexTile[tempData.Hexes.Length];
                 for (int i = 0; i < tempData.Hexes.Length; i++)
                 {
                     gameHexes[i] = ConvertTemporaryHexToGameHex(tempData.Hexes[i]);
@@ -336,9 +336,9 @@ namespace HammerAndSickle.Tools
         }
 
         /// <summary>
-        /// Converts a TemporaryHex to a GameHex.
+        /// Converts a TemporaryHex to a HexTile.
         /// </summary>
-        private GameHex ConvertTemporaryHexToGameHex(TemporaryHex tempHex)
+        private HexTile ConvertTemporaryHexToGameHex(TemporaryHex tempHex)
         {
             try
             {
@@ -348,9 +348,9 @@ namespace HammerAndSickle.Tools
                     return null;
                 }
 
-                // Create GameHex with position conversion
+                // Create HexTile with position conversion
                 Vector2Int position = new(tempHex.X, tempHex.Y);
-                GameHex gameHex = new(position);
+                HexTile gameHex = new(position);
 
                 // Copy basic properties
                 gameHex.SetTerrain(tempHex.Terrain);

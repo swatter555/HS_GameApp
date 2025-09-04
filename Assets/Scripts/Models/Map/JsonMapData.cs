@@ -26,7 +26,7 @@ namespace HammerAndSickle.Models.Map
         /// Array of all hex tiles in the map.
         /// </summary>
         [JsonInclude]
-        public GameHex[] Hexes { get; set; }
+        public HexTile[] Hexes { get; set; }
         #endregion
 
         #region Constructors
@@ -37,7 +37,7 @@ namespace HammerAndSickle.Models.Map
         public JsonMapData()
         {
             Header = new JsonMapHeader();
-            Hexes = Array.Empty<GameHex>();
+            Hexes = Array.Empty<HexTile>();
         }
 
         /// <summary>
@@ -45,7 +45,7 @@ namespace HammerAndSickle.Models.Map
         /// </summary>
         /// <param name="header">Map header information</param>
         /// <param name="hexes">Array of hex tiles</param>
-        public JsonMapData(JsonMapHeader header, GameHex[] hexes)
+        public JsonMapData(JsonMapHeader header, HexTile[] hexes)
         {
             try
             {
