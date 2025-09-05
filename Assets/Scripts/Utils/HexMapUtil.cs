@@ -74,7 +74,7 @@ namespace HammerAndSickle.Models.Map
         {
             try
             {
-                return new Vector2Int(Mathf.RoundToInt(coords.x), Mathf.RoundToInt(coords.y));
+                return new Vector2Int(Mathf.RoundToInt(coords.X), Mathf.RoundToInt(coords.Y));
             }
             catch (Exception ex)
             {
@@ -93,11 +93,11 @@ namespace HammerAndSickle.Models.Map
         {
             try
             {
-                float x = hexCoords.x * HEX_HORIZONTAL_SPACING;
-                float z = hexCoords.y * HEX_VERTICAL_SPACING;
+                float x = hexCoords.X * HEX_HORIZONTAL_SPACING;
+                float z = hexCoords.Y * HEX_VERTICAL_SPACING;
 
                 // Offset odd rows for hex grid alignment
-                if (Mathf.RoundToInt(hexCoords.y) % 2 == 1)
+                if (Mathf.RoundToInt(hexCoords.Y) % 2 == 1)
                 {
                     x += HEX_HORIZONTAL_SPACING * 0.5f;
                 }
@@ -154,13 +154,13 @@ namespace HammerAndSickle.Models.Map
         {
             try
             {
-                int row = Mathf.RoundToInt(hexPos.y);
+                int row = Mathf.RoundToInt(hexPos.Y);
                 bool isOddRow = (row % 2) == 1;
 
                 Vector2Int[] directions = isOddRow ? OddRowDirections : EvenRowDirections;
                 Vector2Int offset = directions[(int)direction];
 
-                return new Position2D(hexPos.x + offset.x, hexPos.y + offset.y);
+                return new Position2D(hexPos.X + offset.x, hexPos.Y + offset.y);
             }
             catch (Exception ex)
             {
@@ -223,11 +223,11 @@ namespace HammerAndSickle.Models.Map
         /// Converts odd-r offset coordinates to cube coordinates for calculations.
         /// </summary>
         /// <param name="offset">Offset coordinates</param>
-        /// <returns>Cube coordinates (x, y, z)</returns>
+        /// <returns>Cube coordinates (X, Y, z)</returns>
         private static Vector3Int OffsetToCube(Position2D offset)
         {
-            int col = Mathf.RoundToInt(offset.x);
-            int row = Mathf.RoundToInt(offset.y);
+            int col = Mathf.RoundToInt(offset.X);
+            int row = Mathf.RoundToInt(offset.Y);
 
             int x = col - (row - (row & 1)) / 2;
             int z = row;
@@ -458,8 +458,8 @@ namespace HammerAndSickle.Models.Map
         {
             try
             {
-                return position.x >= 0 && position.x < mapSize.x &&
-                       position.y >= 0 && position.y < mapSize.y;
+                return position.X >= 0 && position.X < mapSize.x &&
+                       position.Y >= 0 && position.Y < mapSize.y;
             }
             catch (Exception ex)
             {

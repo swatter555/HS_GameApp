@@ -35,6 +35,7 @@ namespace HammerAndSickle.Models.Map
 
         // Core Position and Identity
         [JsonInclude]
+        [JsonPropertyName("position")]
         public Position2D Position { get; set; }
 
         // Terrain Properties
@@ -127,9 +128,8 @@ namespace HammerAndSickle.Models.Map
         #region Constructors
 
         /// <summary>
-        /// Parameterless constructor for JSON serialization.
+        /// Parameterless constructor.
         /// </summary>
-        [JsonConstructor]
         public HexTile()
         {
             Terrain = TerrainType.Clear;
@@ -146,6 +146,69 @@ namespace HammerAndSickle.Models.Map
         {
             Position = position;
             enableDebugLogging = enableLogging;
+            Initialize();
+        }
+
+        /// <summary>
+        /// Parameterized constructor for JSON deserialization with explicit field mapping.
+        /// </summary>
+        [JsonConstructor]
+        public HexTile(
+           Position2D position,
+           TerrainType terrain,
+           int movementCost,
+           bool isRail,
+           bool isRoad,
+           bool isFort,
+           bool isAirbase,
+           bool isObjective,
+           bool isVisible,
+           TileControl tileControl,
+           DefaultTileControl defaultTileControl,
+           string tileLabel,
+           string largeTileLabel,
+           TextSize labelSize,
+           FontWeight labelWeight,
+           TextColor labelColor,
+           float labelOutlineThickness,
+           float victoryValue,
+           float airbaseDamage,
+           int urbanDamage,
+           JSONFeatureBorders riverBorders,
+           JSONFeatureBorders bridgeBorders,
+           JSONFeatureBorders pontoonBridgeBorders,
+           JSONFeatureBorders damagedBridgeBorders)
+        {
+            // Set all properties directly from parameters
+            Position = position;
+            Terrain = terrain;
+            MovementCost = movementCost;
+            IsRail = isRail;
+            IsRoad = isRoad;
+            IsFort = isFort;
+            IsAirbase = isAirbase;
+            IsObjective = isObjective;
+            IsVisible = isVisible;
+            TileControl = tileControl;
+            DefaultTileControl = defaultTileControl;
+            TileLabel = tileLabel ?? string.Empty;
+            LargeTileLabel = largeTileLabel ?? string.Empty;
+            LabelSize = labelSize;
+            LabelWeight = labelWeight;
+            LabelColor = labelColor;
+            LabelOutlineThickness = labelOutlineThickness;
+            VictoryValue = victoryValue;
+            AirbaseDamage = airbaseDamage;
+            UrbanDamage = urbanDamage;
+            RiverBorders = riverBorders;
+            BridgeBorders = bridgeBorders;
+            PontoonBridgeBorders = pontoonBridgeBorders;
+            DamagedBridgeBorders = damagedBridgeBorders;
+
+            enableDebugLogging = false;
+
+            Debug.Log($"HexTile JsonConstructor Position: {Position.X}, {Position.Y}");
+
             Initialize();
         }
 

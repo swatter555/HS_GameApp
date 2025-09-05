@@ -439,18 +439,18 @@ namespace HammerAndSickle.Models
         None,
 
         // LeadershipFoundation
-        CommandTier1,         // +x to Command
+        CommandTier1,         // +X to Command
         SeniorPromotion,      // Boolean, promotion to SeniorGrade.
-        CommandTier2,         // +x additional command
+        CommandTier2,         // +X additional command
         TopPromotion,         // Boolean, promotion to TopGrade
-        CommandTier3,         // +x additional command
+        CommandTier3,         // +X additional command
 
         // PoliticallyConnectedFoundation
         EmergencyResupply,    // Boolean, one free emergency resupply per scenario.
         SupplyConsumption,    // Supplies are consumed at reduced rate.
         NVG,                  // Boolean, upgrade unit to latest gen NVG.
-        ReplacementXP,        // Unit gets better replacements (x bonus levels).
-        PrestigeCost,         // Unit is cheaper to upgrade (x% discount).
+        ReplacementXP,        // Unit gets better replacements (X bonus levels).
+        PrestigeCost,         // Unit is cheaper to upgrade (X% discount).
 
         // ArmoredDoctine
         HardAttack,           // Bonus to HardAttack

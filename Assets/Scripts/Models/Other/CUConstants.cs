@@ -392,16 +392,16 @@ namespace HammerAndSickle.Models
         public const float PRESTIGE_COST_MULT = 0.7f; // Unit upgrades get 30% price reduction.
 
         // EngineeringSpecialization specific
-        public const float RIVER_CROSSING_MOVE_MULT = 0.5f; // x% movement cost reduction
-        public const float RIVER_ASSAULT_MULT = 1.4f; // x% combat bonus when attacking across a river.
+        public const float RIVER_CROSSING_MOVE_MULT = 0.5f; // X% movement cost reduction
+        public const float RIVER_ASSAULT_MULT = 1.4f; // X% combat bonus when attacking across a river.
 
         // Special forces bonuses
-        public const float TMASTERY_MOVE_MULT = 0.8f; // x% movement cost reduction in non-clear terrain.
-        public const float INFILTRATION_MULT = 0.5f; // x% ZOC penalty reduction
-        public const float AMBUSH_BONUS_MULT = 1.5f; // x% combat bonus
+        public const float TMASTERY_MOVE_MULT = 0.8f; // X% movement cost reduction in non-clear terrain.
+        public const float INFILTRATION_MULT = 0.5f; // X% ZOC penalty reduction
+        public const float AMBUSH_BONUS_MULT = 1.5f; // X% combat bonus
 
         // Combined arms bonus.
-        public const float NIGHT_COMBAT_MULT = 1.25f;// x% combat bonus at night
+        public const float NIGHT_COMBAT_MULT = 1.25f;// X% combat bonus at night
 
         /// <summary>
         /// Types of actions that can award reputation to leaders
