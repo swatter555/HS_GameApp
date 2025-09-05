@@ -9,7 +9,6 @@ using HammerAndSickle.Models.Map;
 using HammerAndSickle.Utils;
 using System.Text.Json;
 
-
 #if UNITY_EDITOR
 using UnityEditor;
 #endif

@@ -22,12 +22,16 @@ namespace HammerAndSickle.Models
         /// <summary>
         /// X component of the coordinate.
         /// </summary>
-        public float x;
+        [JsonInclude]
+        [JsonPropertyName("x")]
+        public float X { get; set; }
 
         /// <summary>
         /// Y component of the coordinate.
         /// </summary>
-        public float y;
+        [JsonInclude]
+        [JsonPropertyName("y")]
+        public float Y { get; set; }
 
         #endregion //Fields
 
@@ -71,14 +75,14 @@ namespace HammerAndSickle.Models
         /// Gets the magnitude (length) of this coordinate vector.
         /// </summary>
         [JsonIgnore]
-        public readonly float Magnitude => Mathf.Sqrt(x * x + y * y);
+        public readonly float Magnitude => Mathf.Sqrt(X * X + Y * Y);
 
         /// <summary>
         /// Gets the squared magnitude of this coordinate vector.
         /// More efficient than magnitude when you only need to compare lengths.
         /// </summary>
         [JsonIgnore]
-        public readonly float SqrMagnitude => x * x + y * y;
+        public readonly float SqrMagnitude => X * X + Y * Y;
 
         /// <summary>
         /// Gets a unit vector in the same direction as this coordinate.
@@ -90,66 +94,66 @@ namespace HammerAndSickle.Models
             get
             {
                 float mag = Magnitude;
-                return mag > EPSILON ? new Position2D(x / mag, y / mag) : Zero;
+                return mag > EPSILON ? new Position2D(X / mag, Y / mag) : Zero;
             }
         }
 
         /// <summary>
-        /// Gets the integer x component, rounded to nearest integer.
+        /// Gets the integer X component, rounded to nearest integer.
         /// </summary>
         [JsonIgnore]
-        public readonly int IntX => Mathf.RoundToInt(x);
+        public readonly int IntX => Mathf.RoundToInt(X);
 
         /// <summary>
-        /// Gets the integer y component, rounded to nearest integer.
+        /// Gets the integer Y component, rounded to nearest integer.
         /// </summary>
         [JsonIgnore]
-        public readonly int IntY => Mathf.RoundToInt(y);
+        public readonly int IntY => Mathf.RoundToInt(Y);
 
         #endregion //Properties
 
         #region Constructors
 
         /// <summary>
-        /// Creates a new Position2D with the specified x and y components.
+        /// Creates a new Position2D with the specified X and Y components.
         /// </summary>
-        /// <param name="x">The x component</param>
-        /// <param name="y">The y component</param>
+        /// <param name="x">The X component</param>
+        /// <param name="y">The Y component</param>
         public Position2D(float x, float y)
         {
-            this.x = x;
-            this.y = y;
+            this.X = x;
+            this.Y = y;
         }
 
         /// <summary>
         /// Creates a new Position2D with both components set to the same value.
         /// </summary>
-        /// <param name="value">Value for both x and y components</param>
+        /// <param name="value">Value for both X and Y components</param>
         public Position2D(float value)
         {
-            this.x = value;
-            this.y = value;
+            this.X = value;
+            this.Y = value;
         }
 
         /// <summary>
         /// Creates a new Position2D from integer components.
         /// </summary>
-        /// <param name="x">The x component</param>
-        /// <param name="y">The y component</param>
+        /// <param name="x">The X component</param>
+        /// <param name="y">The Y component</param>
         public Position2D(int x, int y)
         {
-            this.x = x;
-            this.y = y;
+            this.X = x;
+            this.Y = y;
         }
 
         /// <summary>
         /// Creates a new Position2D with both components set to the same integer value.
         /// </summary>
-        /// <param name="value">Integer value for both x and y components</param>
+        /// <param name="value">Integer value for both X and Y components</param>
         public Position2D(int value)
         {
-            this.x = value;
-            this.y = value;
+            this.X = value;
+            this.Y = value;
         }
 
         #endregion //Constructors
@@ -160,7 +164,7 @@ namespace HammerAndSickle.Models
         /// Implicitly converts a Unity Vector2 to a Position2D.
         /// </summary>
         /// <param name="vector">The Vector2 to convert</param>
-        /// <returns>A new Position2D with the same x and y values</returns>
+        /// <returns>A new Position2D with the same X and Y values</returns>
         public static implicit operator Position2D(Vector2 vector)
         {
             return new Position2D(vector.x, vector.y);
@@ -170,17 +174,17 @@ namespace HammerAndSickle.Models
         /// Implicitly converts a Position2D to a Unity Vector2.
         /// </summary>
         /// <param name="coord">The Position2D to convert</param>
-        /// <returns>A new Vector2 with the same x and y values</returns>
+        /// <returns>A new Vector2 with the same X and Y values</returns>
         public static implicit operator Vector2(Position2D coord)
         {
-            return new Vector2(coord.x, coord.y);
+            return new Vector2(coord.X, coord.Y);
         }
 
         /// <summary>
         /// Implicitly converts a Unity Vector2Int to a Position2D.
         /// </summary>
         /// <param name="vector">The Vector2Int to convert</param>
-        /// <returns>A new Position2D with the same x and y values</returns>
+        /// <returns>A new Position2D with the same X and Y values</returns>
         public static implicit operator Position2D(Vector2Int vector)
         {
             return new Position2D(vector.x, vector.y);
@@ -191,10 +195,10 @@ namespace HammerAndSickle.Models
         /// Components are rounded to nearest integers.
         /// </summary>
         /// <param name="coord">The Position2D to convert</param>
-        /// <returns>A new Vector2Int with rounded x and y values</returns>
+        /// <returns>A new Vector2Int with rounded X and Y values</returns>
         public static explicit operator Vector2Int(Position2D coord)
         {
-            return new Vector2Int(Mathf.RoundToInt(coord.x), Mathf.RoundToInt(coord.y));
+            return new Vector2Int(Mathf.RoundToInt(coord.X), Mathf.RoundToInt(coord.Y));
         }
 
         #endregion //Conversion Operators
@@ -206,7 +210,7 @@ namespace HammerAndSickle.Models
         /// </summary>
         public static Position2D operator +(Position2D a, Position2D b)
         {
-            return new Position2D(a.x + b.x, a.y + b.y);
+            return new Position2D(a.X + b.X, a.Y + b.Y);
         }
 
         /// <summary>
@@ -214,7 +218,7 @@ namespace HammerAndSickle.Models
         /// </summary>
         public static Position2D operator -(Position2D a, Position2D b)
         {
-            return new Position2D(a.x - b.x, a.y - b.y);
+            return new Position2D(a.X - b.X, a.Y - b.Y);
         }
 
         /// <summary>
@@ -222,7 +226,7 @@ namespace HammerAndSickle.Models
         /// </summary>
         public static Position2D operator -(Position2D coord)
         {
-            return new Position2D(-coord.x, -coord.y);
+            return new Position2D(-coord.X, -coord.Y);
         }
 
         /// <summary>
@@ -230,7 +234,7 @@ namespace HammerAndSickle.Models
         /// </summary>
         public static Position2D operator *(Position2D coord, float scalar)
         {
-            return new Position2D(coord.x * scalar, coord.y * scalar);
+            return new Position2D(coord.X * scalar, coord.Y * scalar);
         }
 
         /// <summary>
@@ -238,7 +242,7 @@ namespace HammerAndSickle.Models
         /// </summary>
         public static Position2D operator *(float scalar, Position2D coord)
         {
-            return new Position2D(coord.x * scalar, coord.y * scalar);
+            return new Position2D(coord.X * scalar, coord.Y * scalar);
         }
 
         /// <summary>
@@ -246,7 +250,7 @@ namespace HammerAndSickle.Models
         /// </summary>
         public static Position2D operator *(Position2D coord, int scalar)
         {
-            return new Position2D(coord.x * scalar, coord.y * scalar);
+            return new Position2D(coord.X * scalar, coord.Y * scalar);
         }
 
         /// <summary>
@@ -254,7 +258,7 @@ namespace HammerAndSickle.Models
         /// </summary>
         public static Position2D operator *(int scalar, Position2D coord)
         {
-            return new Position2D(coord.x * scalar, coord.y * scalar);
+            return new Position2D(coord.X * scalar, coord.Y * scalar);
         }
 
         /// <summary>
@@ -262,7 +266,7 @@ namespace HammerAndSickle.Models
         /// </summary>
         public static Position2D operator *(Position2D a, Position2D b)
         {
-            return new Position2D(a.x * b.x, a.y * b.y);
+            return new Position2D(a.X * b.X, a.Y * b.Y);
         }
 
         /// <summary>
@@ -270,7 +274,7 @@ namespace HammerAndSickle.Models
         /// </summary>
         public static Position2D operator /(Position2D coord, float scalar)
         {
-            return new Position2D(coord.x / scalar, coord.y / scalar);
+            return new Position2D(coord.X / scalar, coord.Y / scalar);
         }
 
         /// <summary>
@@ -278,7 +282,7 @@ namespace HammerAndSickle.Models
         /// </summary>
         public static Position2D operator /(Position2D coord, int scalar)
         {
-            return new Position2D(coord.x / scalar, coord.y / scalar);
+            return new Position2D(coord.X / scalar, coord.Y / scalar);
         }
 
         /// <summary>
@@ -286,7 +290,7 @@ namespace HammerAndSickle.Models
         /// </summary>
         public static Position2D operator /(Position2D a, Position2D b)
         {
-            return new Position2D(a.x / b.x, a.y / b.y);
+            return new Position2D(a.X / b.X, a.Y / b.Y);
         }
 
         #endregion //Arithmetic Operators
@@ -298,7 +302,7 @@ namespace HammerAndSickle.Models
         /// </summary>
         public static bool operator ==(Position2D a, Position2D b)
         {
-            return Mathf.Abs(a.x - b.x) < EPSILON && Mathf.Abs(a.y - b.y) < EPSILON;
+            return Mathf.Abs(a.X - b.X) < EPSILON && Mathf.Abs(a.Y - b.Y) < EPSILON;
         }
 
         /// <summary>
@@ -321,8 +325,8 @@ namespace HammerAndSickle.Models
         /// <returns>The distance between the coordinates</returns>
         public static float Distance(Position2D a, Position2D b)
         {
-            float deltaX = a.x - b.x;
-            float deltaY = a.y - b.y;
+            float deltaX = a.X - b.X;
+            float deltaY = a.Y - b.Y;
             return Mathf.Sqrt(deltaX * deltaX + deltaY * deltaY);
         }
 
@@ -335,8 +339,8 @@ namespace HammerAndSickle.Models
         /// <returns>The squared distance between the coordinates</returns>
         public static float SqrDistance(Position2D a, Position2D b)
         {
-            float deltaX = a.x - b.x;
-            float deltaY = a.y - b.y;
+            float deltaX = a.X - b.X;
+            float deltaY = a.Y - b.Y;
             return deltaX * deltaX + deltaY * deltaY;
         }
 
@@ -349,7 +353,7 @@ namespace HammerAndSickle.Models
         /// <returns>The Manhattan distance between the coordinates</returns>
         public static float ManhattanDistance(Position2D a, Position2D b)
         {
-            return Mathf.Abs(a.x - b.x) + Mathf.Abs(a.y - b.y);
+            return Mathf.Abs(a.X - b.X) + Mathf.Abs(a.Y - b.Y);
         }
 
         /// <summary>
@@ -360,7 +364,7 @@ namespace HammerAndSickle.Models
         /// <returns>The dot product</returns>
         public static float Dot(Position2D a, Position2D b)
         {
-            return a.x * b.x + a.y * b.y;
+            return a.X * b.X + a.Y * b.Y;
         }
 
         /// <summary>
@@ -374,8 +378,8 @@ namespace HammerAndSickle.Models
         {
             t = Mathf.Clamp01(t);
             return new Position2D(
-                a.x + (b.x - a.x) * t,
-                a.y + (b.y - a.y) * t
+                a.X + (b.X - a.X) * t,
+                a.Y + (b.Y - a.Y) * t
             );
         }
 
@@ -389,25 +393,25 @@ namespace HammerAndSickle.Models
         public static Position2D LerpUnclamped(Position2D a, Position2D b, float t)
         {
             return new Position2D(
-                a.x + (b.x - a.x) * t,
-                a.y + (b.y - a.y) * t
+                a.X + (b.X - a.X) * t,
+                a.Y + (b.Y - a.Y) * t
             );
         }
 
         /// <summary>
-        /// Returns a coordinate with the minimum x and y components from two coordinates.
+        /// Returns a coordinate with the minimum X and Y components from two coordinates.
         /// </summary>
         public static Position2D Min(Position2D a, Position2D b)
         {
-            return new Position2D(Mathf.Min(a.x, b.x), Mathf.Min(a.y, b.y));
+            return new Position2D(Mathf.Min(a.X, b.X), Mathf.Min(a.Y, b.Y));
         }
 
         /// <summary>
-        /// Returns a coordinate with the maximum x and y components from two coordinates.
+        /// Returns a coordinate with the maximum X and Y components from two coordinates.
         /// </summary>
         public static Position2D Max(Position2D a, Position2D b)
         {
-            return new Position2D(Mathf.Max(a.x, b.x), Mathf.Max(a.y, b.y));
+            return new Position2D(Mathf.Max(a.X, b.X), Mathf.Max(a.Y, b.Y));
         }
 
         /// <summary>
@@ -416,8 +420,8 @@ namespace HammerAndSickle.Models
         public static Position2D Clamp(Position2D value, Position2D min, Position2D max)
         {
             return new Position2D(
-                Mathf.Clamp(value.x, min.x, max.x),
-                Mathf.Clamp(value.y, min.y, max.y)
+                Mathf.Clamp(value.X, min.X, max.X),
+                Mathf.Clamp(value.Y, min.Y, max.Y)
             );
         }
 
@@ -426,7 +430,7 @@ namespace HammerAndSickle.Models
         /// </summary>
         public static Position2D Round(Position2D coord)
         {
-            return new Position2D(Mathf.RoundToInt(coord.x), Mathf.RoundToInt(coord.y));
+            return new Position2D(Mathf.RoundToInt(coord.X), Mathf.RoundToInt(coord.Y));
         }
 
         /// <summary>
@@ -434,7 +438,7 @@ namespace HammerAndSickle.Models
         /// </summary>
         public static Position2D Floor(Position2D coord)
         {
-            return new Position2D(Mathf.FloorToInt(coord.x), Mathf.FloorToInt(coord.y));
+            return new Position2D(Mathf.FloorToInt(coord.X), Mathf.FloorToInt(coord.Y));
         }
 
         /// <summary>
@@ -442,7 +446,7 @@ namespace HammerAndSickle.Models
         /// </summary>
         public static Position2D Ceil(Position2D coord)
         {
-            return new Position2D(Mathf.CeilToInt(coord.x), Mathf.CeilToInt(coord.y));
+            return new Position2D(Mathf.CeilToInt(coord.X), Mathf.CeilToInt(coord.Y));
         }
 
         #endregion //Static Methods
@@ -458,31 +462,31 @@ namespace HammerAndSickle.Models
             float mag = Magnitude;
             if (mag > EPSILON)
             {
-                x /= mag;
-                y /= mag;
+                X /= mag;
+                Y /= mag;
             }
         }
 
         /// <summary>
-        /// Sets the x and y components of this coordinate.
+        /// Sets the X and Y components of this coordinate.
         /// </summary>
-        /// <param name="newX">New x component</param>
-        /// <param name="newY">New y component</param>
+        /// <param name="newX">New X component</param>
+        /// <param name="newY">New Y component</param>
         public void Set(float newX, float newY)
         {
-            x = newX;
-            y = newY;
+            X = newX;
+            Y = newY;
         }
 
         /// <summary>
-        /// Sets the x and y components of this coordinate from integer values.
+        /// Sets the X and Y components of this coordinate from integer values.
         /// </summary>
-        /// <param name="newX">New x component</param>
-        /// <param name="newY">New y component</param>
+        /// <param name="newX">New X component</param>
+        /// <param name="newY">New Y component</param>
         public void Set(int newX, int newY)
         {
-            x = newX;
-            y = newY;
+            X = newX;
+            Y = newY;
         }
 
         /// <summary>
@@ -491,8 +495,8 @@ namespace HammerAndSickle.Models
         /// <param name="scale">Scale factor to apply</param>
         public void Scale(float scale)
         {
-            x *= scale;
-            y *= scale;
+            X *= scale;
+            Y *= scale;
         }
 
         /// <summary>
@@ -501,8 +505,8 @@ namespace HammerAndSickle.Models
         /// <param name="scale">Integer scale factor to apply</param>
         public void Scale(int scale)
         {
-            x *= scale;
-            y *= scale;
+            X *= scale;
+            Y *= scale;
         }
 
         /// <summary>
@@ -511,35 +515,35 @@ namespace HammerAndSickle.Models
         /// <param name="scale">Scale coordinate</param>
         public void Scale(Position2D scale)
         {
-            x *= scale.x;
-            y *= scale.y;
+            X *= scale.X;
+            Y *= scale.Y;
         }
 
         /// <summary>
         /// Converts this coordinate to a Vector2Int by rounding components to nearest integers.
         /// </summary>
-        /// <returns>A Vector2Int with rounded x and y values</returns>
+        /// <returns>A Vector2Int with rounded X and Y values</returns>
         public readonly Vector2Int ToVector2Int()
         {
-            return new Vector2Int(Mathf.RoundToInt(x), Mathf.RoundToInt(y));
+            return new Vector2Int(Mathf.RoundToInt(X), Mathf.RoundToInt(Y));
         }
 
         /// <summary>
         /// Converts this coordinate to a Vector2Int by flooring components.
         /// </summary>
-        /// <returns>A Vector2Int with floored x and y values</returns>
+        /// <returns>A Vector2Int with floored X and Y values</returns>
         public readonly Vector2Int ToVector2IntFloor()
         {
-            return new Vector2Int(Mathf.FloorToInt(x), Mathf.FloorToInt(y));
+            return new Vector2Int(Mathf.FloorToInt(X), Mathf.FloorToInt(Y));
         }
 
         /// <summary>
         /// Converts this coordinate to a Vector2Int by ceiling components.
         /// </summary>
-        /// <returns>A Vector2Int with ceiling x and y values</returns>
+        /// <returns>A Vector2Int with ceiling X and Y values</returns>
         public readonly Vector2Int ToVector2IntCeil()
         {
-            return new Vector2Int(Mathf.CeilToInt(x), Mathf.CeilToInt(y));
+            return new Vector2Int(Mathf.CeilToInt(X), Mathf.CeilToInt(Y));
         }
 
         #endregion //Instance Methods
@@ -572,16 +576,16 @@ namespace HammerAndSickle.Models
         /// <returns>A hash code</returns>
         public readonly override int GetHashCode()
         {
-            return HashCode.Combine(x, y);
+            return HashCode.Combine(X, Y);
         }
 
         /// <summary>
         /// Returns a formatted string representation of this coordinate.
         /// </summary>
-        /// <returns>String in format "(x, y)"</returns>
+        /// <returns>String in format "(X, Y)"</returns>
         public readonly override string ToString()
         {
-            return $"({x:F2}, {y:F2})";
+            return $"({X:F2}, {Y:F2})";
         }
 
         /// <summary>
@@ -591,7 +595,7 @@ namespace HammerAndSickle.Models
         /// <returns>Formatted string representation</returns>
         public readonly string ToString(string format)
         {
-            return $"({x.ToString(format)}, {y.ToString(format)})";
+            return $"({X.ToString(format)}, {Y.ToString(format)})";
         }
 
         #endregion //Object Overrides

@@ -250,8 +250,8 @@ namespace HammerAndSickle.Models.Map
         {
             try
             {
-                return position.x >= 0 && position.x < MapSize.x &&
-                       position.y >= 0 && position.y < MapSize.y;
+                return position.X >= 0 && position.X < MapSize.x &&
+                       position.Y >= 0 && position.Y < MapSize.y;
             }
             catch (Exception ex)
             {
@@ -489,7 +489,7 @@ namespace HammerAndSickle.Models.Map
                     }
 
                     // Validate position components are non-negative
-                    if (hex.Position.x < 0 || hex.Position.y < 0)
+                    if (hex.Position.X < 0 || hex.Position.Y < 0)
                     {
                         AppService.CaptureUiMessage($"Dimension validation failed: Hex at {hex.Position} has negative coordinates");
                         outOfBoundsCount++;
@@ -909,12 +909,12 @@ namespace HammerAndSickle.Models.Map
     {
         public bool Equals(Position2D x, Position2D y)
         {
-            return x.x.Equals(y.x) && x.y.Equals(y.y);
+            return x.X.Equals(y.X) && x.Y.Equals(y.Y);
         }
 
         public int GetHashCode(Position2D obj)
         {
-            return HashCode.Combine(obj.x, obj.y);
+            return HashCode.Combine(obj.X, obj.Y);
         }
     }
 }
