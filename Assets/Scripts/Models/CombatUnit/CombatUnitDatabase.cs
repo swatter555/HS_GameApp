@@ -176,6 +176,23 @@ namespace HammerAndSickle.Models
             }
         }
 
+        /// <summary>
+        /// Gets all template identifiers currently stored in the database
+        /// </summary>
+        /// <returns>List of all template IDs</returns>
+        public static List<string> GetAllTemplateIds()
+        {
+            try
+            {
+                return new List<string>(_unitTemplates.Keys);
+            }
+            catch (Exception e)
+            {
+                AppService.HandleException(nameof(CombatUnitDatabase), nameof(GetAllTemplateIds), e);
+                return new List<string>();
+            }
+        }
+
         #endregion //Public Methods
 
         #region Private Methods

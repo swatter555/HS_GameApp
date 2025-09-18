@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Text.Json.Serialization;
 using UnityEngine;
 using HammerAndSickle.Services;
 
@@ -8,6 +9,7 @@ namespace HammerAndSickle.Models
     {
         #region Fields
 
+        [JsonInclude]
         private DeploymentPosition _deploymentPosition = DeploymentPosition.Deployed;
 
         #endregion
@@ -15,7 +17,9 @@ namespace HammerAndSickle.Models
         #region Properties
 
         public DeploymentPosition DeploymentPosition { get => _deploymentPosition; }
+        [JsonInclude]
         public bool IsEmbarkable { get; private set; } // Equipped with helicopter/airlift transport/naval.
+        [JsonInclude]
         public bool IsMountable { get; private set; }  // Equipped with ground transport (e.g., trucks, APCs).
 
         #endregion //Properties

@@ -22,34 +22,54 @@ namespace HammerAndSickle.Models
         public string UnitName { get; set; }
         [JsonInclude]
         public string UnitID { get; private set; }
+        [JsonInclude]
         public UnitClassification Classification { get; private set; }
+        [JsonInclude]
         public UnitRole Role { get; private set; }
+        [JsonInclude]
         public Side Side { get; private set; }
+        [JsonInclude]
         public Nationality Nationality { get; private set; }
         public bool IsBase => IsBaseType(Classification);
 
         // Profiles
+        [JsonInclude]
         public WeaponSystems EmbarkedProfileID { get; private set; }     // Profile for external transport
+        [JsonInclude]
         public WeaponSystems MobileProfileID { get; private set; }       // Profile for organic transport
+        [JsonInclude]
         public WeaponSystems DeployedProfileID { get; private set; }     // Profile that all units have
+        [JsonInclude]
         public IntelProfileTypes IntelProfileType { get; internal set; } // Profile for intelligence reports
 
         // How combat effective is a unit is tracked by EfficiencyLevel.
+        [JsonInclude]
         public EfficiencyLevel EfficiencyLevel { get; internal set; }    
 
         // Action counts using StatsMaxCurrent
+        [JsonInclude]
         public StatsMaxCurrent MoveActions { get; private set; }
+        [JsonInclude]
         public StatsMaxCurrent CombatActions { get; private set; }
+        [JsonInclude]
         public StatsMaxCurrent DeploymentActions { get; private set; }
+        [JsonInclude]
         public StatsMaxCurrent OpportunityActions { get; private set; }
+        [JsonInclude]
         public StatsMaxCurrent IntelActions { get; private set; }
 
         // State data
+        [JsonInclude]
         public StatsMaxCurrent HitPoints { get; private set; }
+        [JsonInclude]
         public StatsMaxCurrent DaysSupply { get; private set; }
+        [JsonInclude]
         public StatsMaxCurrent MovementPoints { get; private set; }
+        [JsonInclude]
         public Position2D MapPos { get; internal set; }
+        [JsonInclude]
         public SpottedLevel SpottedLevel { get; private set; }
+        [JsonInclude]
         public float IndividualCombatModifier { get; private set; } // Add more disntinction between units
 
         // Leader system for the unit
@@ -178,73 +198,77 @@ namespace HammerAndSickle.Models
 
         /// <summary>
         /// Parameterless constructor for JSON deserialization.
-        /// Properties will be set after construction by the JSON deserializer.
+        /// This constructor initializes all properties to safe, non-null defaults.
+        /// The JSON deserializer will overwrite these values with the actual data from JSON.
+        /// All properties marked with [JsonInclude] will be properly deserialized.
         /// </summary>
         [JsonConstructor]
         public CombatUnit()
         {
             try
             {
-                // Initialize identification with safe defaults - JSON will overwrite these
-                UnitID = Guid.NewGuid().ToString();
-                UnitName = string.Empty;
-                Classification = UnitClassification.INF;
-                Role = UnitRole.GroundCombat;
-                Side = Side.Player;
-                Nationality = Nationality.USSR;
-                IntelProfileType = IntelProfileTypes.SV_MRR_BTR70;
+                // Initialize identification - JSON deserializer will set actual values for [JsonInclude] properties
+                UnitID = Guid.NewGuid().ToString(); // Will be overwritten by JSON
+                UnitName = string.Empty; // Public setter, will be set by JSON
+                Classification = UnitClassification.INF; // Will be overwritten by JSON
+                Role = UnitRole.GroundCombat; // Will be overwritten by JSON
+                Side = Side.Player; // Will be overwritten by JSON
+                Nationality = Nationality.USSR; // Will be overwritten by JSON
+                IntelProfileType = IntelProfileTypes.SV_MRR_BTR70; // Will be overwritten by JSON
 
-                // Initialize profile IDs with safe defaults
-                DeployedProfileID = WeaponSystems.DEFAULT;
-                MobileProfileID = WeaponSystems.DEFAULT;
-                EmbarkedProfileID = WeaponSystems.DEFAULT;
+                // Initialize weapon system profile IDs - JSON will set actual values
+                DeployedProfileID = WeaponSystems.DEFAULT; // Will be overwritten by JSON
+                MobileProfileID = WeaponSystems.DEFAULT; // Will be overwritten by JSON
+                EmbarkedProfileID = WeaponSystems.DEFAULT; // Will be overwritten by JSON
 
-                // Initialize deployment capabilities
-                IsEmbarkable = false;
-                IsMountable = false;
+                // Initialize deployment capabilities - JSON will set actual values
+                IsEmbarkable = false; // Will be overwritten by JSON
+                IsMountable = false; // Will be overwritten by JSON
+                SetDeploymentPosition(DeploymentPosition.Deployed); // Will be overwritten by JSON
 
-                // Initialize efficiency
-                EfficiencyLevel = EfficiencyLevel.FullOperations;
+                // Initialize efficiency - JSON will set actual value
+                EfficiencyLevel = EfficiencyLevel.FullOperations; // Will be overwritten by JSON
 
                 // Initialize required StatsMaxCurrent objects to prevent null reference exceptions
-                // These will be overwritten by JSON with actual values
-                HitPoints = new StatsMaxCurrent(1f);
-                DaysSupply = new StatsMaxCurrent(1f);
-                MovementPoints = new StatsMaxCurrent(1f);
-                MoveActions = new StatsMaxCurrent(1f);
-                CombatActions = new StatsMaxCurrent(1f);
-                DeploymentActions = new StatsMaxCurrent(1f);
-                OpportunityActions = new StatsMaxCurrent(1f);
-                IntelActions = new StatsMaxCurrent(1f);
+                // JSON deserializer will replace these with actual values
+                HitPoints = new StatsMaxCurrent(1f); // Will be overwritten by JSON
+                DaysSupply = new StatsMaxCurrent(1f); // Will be overwritten by JSON
+                MovementPoints = new StatsMaxCurrent(1f); // Will be overwritten by JSON
+                MoveActions = new StatsMaxCurrent(1f); // Will be overwritten by JSON
+                CombatActions = new StatsMaxCurrent(1f); // Will be overwritten by JSON
+                DeploymentActions = new StatsMaxCurrent(1f); // Will be overwritten by JSON
+                OpportunityActions = new StatsMaxCurrent(1f); // Will be overwritten by JSON
+                IntelActions = new StatsMaxCurrent(1f); // Will be overwritten by JSON
 
-                // Initialize position and state
-                MapPos = Position2D.Zero;
-                SpottedLevel = SpottedLevel.Level1;
-                LeaderID = string.Empty;
+                // Initialize position and state - JSON will set actual values
+                MapPos = Position2D.Zero; // Will be overwritten by JSON
+                SpottedLevel = SpottedLevel.Level1; // Will be overwritten by JSON
+                LeaderID = string.Empty; // Will be overwritten by JSON
+                IndividualCombatModifier = CUConstants.ICM_DEFAULT; // Will be overwritten by JSON
 
-                // Initialize experience system defaults
-                ExperienceLevel = ExperienceLevel.Trained;
-                ExperiencePoints = 0;
+                // Initialize experience system - JSON will set actual values
+                ExperienceLevel = ExperienceLevel.Raw; // Will be overwritten by JSON
+                ExperiencePoints = 0; // Will be overwritten by JSON
 
-                // Initialize deployment system defaults
-                SetDeploymentPosition(DeploymentPosition.Deployed);
+                // Initialize facility properties - JSON will set actual values for base units
+                BaseDamage = 0; // Will be overwritten by JSON
+                OperationalCapacity = OperationalCapacity.Full; // Will be overwritten by JSON
+                FacilityType = FacilityType.HQ; // Will be overwritten by JSON
+                DepotSize = DepotSize.Small; // Will be overwritten by JSON
+                DepotCategory = DepotCategory.Secondary; // Will be overwritten by JSON
+                StockpileInDays = 0f; // Will be overwritten by JSON
+                GenerationRate = SupplyGenerationRate.Basic; // Will be overwritten by JSON
+                SupplyProjection = SupplyProjection.Local; // Will be overwritten by JSON
+                SupplyPenetration = false; // Will be overwritten by JSON
 
-                // Initialize facility defaults (will be overwritten if this is actually a base)
-                BaseDamage = 0;
-                OperationalCapacity = OperationalCapacity.Full;
-                FacilityType = FacilityType.HQ;
-                DepotSize = DepotSize.Small;
-                DepotCategory = DepotCategory.Secondary;
-                StockpileInDays = 0f;
-                GenerationRate = SupplyGenerationRate.Basic;
-                SupplyProjection = SupplyProjection.Local;
-                SupplyPenetration = false;
+                // Initialize facility collections
+                _airUnitsAttached = new List<CombatUnit>();
+                _attachedUnitIDs = new List<string>();
+                AirUnitsAttached = _airUnitsAttached.AsReadOnly();
 
-                // Initialize individual combat modifier to default
-                IndividualCombatModifier = CUConstants.ICM_DEFAULT;
-
-                // Initialize air units collection for airbases (empty by default)
-                // This will be handled by the partial class if needed
+                // Note: The JSON deserializer will automatically populate all properties
+                // marked with [JsonInclude] after this constructor completes.
+                // This constructor only ensures no null reference exceptions occur.
             }
             catch (Exception e)
             {
@@ -986,6 +1010,31 @@ namespace HammerAndSickle.Models
                 AppService.HandleException(CLASS_NAME, nameof(SetICM), e);
                 throw;
             }
+        }
+
+        /// <summary>
+        /// Set unit nationality.
+        /// </summary>
+        public void SetNationality(Nationality nationality)
+        {
+            Nationality = nationality;
+        }
+
+        /// <summary>
+        /// Set unit side (Player, AI).
+        /// </summary>
+        /// <param name="side"></param>
+        public void SetSide(Side side)
+        {
+            Side = side;
+        }
+
+        /// <summary>
+        /// Sets the unit role for the AI.
+        /// </summary>
+        public void SetRole(UnitRole role)
+        {
+            Role = role;
         }
 
         #endregion // Core

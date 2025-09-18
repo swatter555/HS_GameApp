@@ -1,5 +1,7 @@
-﻿using System;
-using HammerAndSickle.Services;
+﻿using HammerAndSickle.Services;
+using System;
+using System.Text.Json.Serialization;
+using UnityEngine;
 
 namespace HammerAndSickle.Models
 {
@@ -16,7 +18,10 @@ namespace HammerAndSickle.Models
 
         #region Properties
 
+
+        [JsonInclude] 
         public float Max { get; private set; }
+        [JsonInclude]
         public float Current { get; private set; }
 
         #endregion
@@ -54,6 +59,7 @@ namespace HammerAndSickle.Models
         /// </summary>
         /// <param name="maxValue">The maximum value for this statistic</param>
         /// <param name="currentValue">The current value for this statistic</param>
+        [JsonConstructor]
         public StatsMaxCurrent(float maxValue, float currentValue)
         {
             try
