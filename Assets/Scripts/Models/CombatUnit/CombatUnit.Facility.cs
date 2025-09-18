@@ -1,4 +1,5 @@
-﻿using HammerAndSickle.Services;
+﻿using HammerAndSickle.Controllers;
+using HammerAndSickle.Services;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -16,7 +17,6 @@ namespace HammerAndSickle.Models
 
         #endregion // Facility Fields
 
-
         #region Facility Properties
 
         /// <summary>
@@ -31,16 +31,25 @@ namespace HammerAndSickle.Models
         }
 
         // Common facility properties
+        [JsonInclude]
         public int BaseDamage { get; private set; }
+        [JsonInclude]
         public OperationalCapacity OperationalCapacity { get; private set; }
+        [JsonInclude]
         public FacilityType FacilityType { get; private set; }
 
         // Supply depot specific properties
+        [JsonInclude]
         public DepotSize DepotSize { get; private set; }
+        [JsonInclude]
         public float StockpileInDays { get; private set; }
+        [JsonInclude]
         public SupplyGenerationRate GenerationRate { get; private set; }
+        [JsonInclude]
         public SupplyProjection SupplyProjection { get; private set; }
+        [JsonInclude]
         public bool SupplyPenetration { get; private set; }
+        [JsonInclude]
         public DepotCategory DepotCategory { get; private set; }
         public int ProjectionRadius => IsBase ? CUConstants.ProjectionRangeValues[SupplyProjection] : 0;
         public bool IsMainDepot => IsBase && DepotCategory == DepotCategory.Main;
@@ -309,12 +318,10 @@ namespace HammerAndSickle.Models
                     return false;
                 }
 
-                if (unit.Classification != UnitClassification.FGT ||
-                    unit.Classification != UnitClassification.ATT ||
-                    unit.Classification != UnitClassification.BMB ||
-                    unit.Classification != UnitClassification.RECONA)
+                // Fixed: Check if unit IS an air unit (using AND logic or helper method)
+                if (!IsAirUnitClassification(unit.Classification))
                 {
-                    throw new InvalidOperationException($"Only air units can be attached to an airbase.");
+                    throw new InvalidOperationException($"Only air units can be attached to an airbase. {unit.UnitName} is {unit.Classification}");
                 }
 
                 if (_airUnitsAttached.Contains(unit))
@@ -323,7 +330,17 @@ namespace HammerAndSickle.Models
                     return false;
                 }
 
+                // Check if unit ID already in the ID list (defensive programming)
+                if (_attachedUnitIDs.Contains(unit.UnitID))
+                {
+                    AppService.CaptureUiMessage($"Unit ID {unit.UnitID} is already in the attached units list");
+                    return false;
+                }
+
+                // Add to both runtime collection AND ID list for serialization
                 _airUnitsAttached.Add(unit);
+                _attachedUnitIDs.Add(unit.UnitID);
+
                 AppService.CaptureUiMessage($"{unit.UnitName} has been attached to {UnitName}.");
                 return true;
             }
@@ -353,11 +370,26 @@ namespace HammerAndSickle.Models
                     throw new ArgumentNullException(nameof(unit), "Air unit cannot be null");
                 }
 
-                if (_airUnitsAttached.Remove(unit))
+                // Remove from both collections
+                bool removedFromList = _airUnitsAttached.Remove(unit);
+                bool removedFromIds = _attachedUnitIDs.Remove(unit.UnitID);
+
+                if (removedFromList || removedFromIds)
                 {
+                    // Ensure both collections are synchronized
+                    if (!removedFromList)
+                    {
+                        AppService.CaptureUiMessage($"Warning: Unit {unit.UnitName} was not in attached units list but ID was present");
+                    }
+                    if (!removedFromIds)
+                    {
+                        AppService.CaptureUiMessage($"Warning: Unit ID {unit.UnitID} was not in ID list but unit was attached");
+                    }
+
                     AppService.CaptureUiMessage($"Unit {unit.UnitName} has been removed from {UnitName}.");
                     return true;
                 }
+
                 return false;
             }
             catch (Exception e)
@@ -386,15 +418,35 @@ namespace HammerAndSickle.Models
                     throw new ArgumentException("Unit ID cannot be null or empty", nameof(unitID));
                 }
 
+                // Find the unit in the attached list
                 var unit = _airUnitsAttached.FirstOrDefault(u => u.UnitID == unitID);
+
+                // Remove from both collections
+                bool removedFromIds = _attachedUnitIDs.Remove(unitID);
+                bool removedFromList = false;
+
                 if (unit != null)
                 {
-                    if (_airUnitsAttached.Remove(unit))
-                    {
-                        AppService.CaptureUiMessage($"Unit {unit.UnitName} has been removed from {UnitName}.");
-                        return true;
-                    }
+                    removedFromList = _airUnitsAttached.Remove(unit);
                 }
+
+                if (removedFromList || removedFromIds)
+                {
+                    // Ensure both collections are synchronized
+                    if (!removedFromList)
+                    {
+                        AppService.CaptureUiMessage($"Warning: Unit with ID {unitID} was not in attached units list but ID was present");
+                    }
+                    if (!removedFromIds)
+                    {
+                        AppService.CaptureUiMessage($"Warning: Unit ID {unitID} was not in ID list but unit was attached");
+                    }
+
+                    string unitName = unit?.UnitName ?? unitID;
+                    AppService.CaptureUiMessage($"Unit {unitName} has been removed from {UnitName}.");
+                    return true;
+                }
+
                 return false;
             }
             catch (Exception e)
@@ -471,7 +523,7 @@ namespace HammerAndSickle.Models
         {
             return IsBase && FacilityType == FacilityType.Airbase &&
                    !string.IsNullOrEmpty(unitID) &&
-                   _airUnitsAttached.Any(u => u.UnitID == unitID);
+                   _attachedUnitIDs.Contains(unitID); // Check ID list for efficiency
         }
 
         /// <summary>
@@ -483,8 +535,16 @@ namespace HammerAndSickle.Models
             {
                 if (IsBase && FacilityType == FacilityType.Airbase)
                 {
+                    int count = _airUnitsAttached.Count;
+
+                    // Clear both collections
                     _airUnitsAttached.Clear();
-                    AppService.CaptureUiMessage($"All air units have been removed from {UnitName}.");
+                    _attachedUnitIDs.Clear();
+
+                    if (count > 0)
+                    {
+                        AppService.CaptureUiMessage($"All {count} air units have been removed from {UnitName}.");
+                    }
                 }
             }
             catch (Exception e)
@@ -500,7 +560,8 @@ namespace HammerAndSickle.Models
         public bool CanLaunchAirOperations()
         {
             return IsBase && FacilityType == FacilityType.Airbase &&
-                   OperationalCapacity != OperationalCapacity.OutOfOperation;
+                   OperationalCapacity != OperationalCapacity.OutOfOperation &&
+                   _airUnitsAttached.Count > 0; // Must have aircraft to launch
         }
 
         /// <summary>
@@ -519,7 +580,9 @@ namespace HammerAndSickle.Models
         /// <returns>True if airbase has capacity</returns>
         public bool CanAcceptNewAircraft()
         {
-            return IsBase && FacilityType == FacilityType.Airbase && GetAirUnitCapacity() > 0;
+            return IsBase && FacilityType == FacilityType.Airbase &&
+                   GetAirUnitCapacity() > 0 &&
+                   OperationalCapacity != OperationalCapacity.OutOfOperation;
         }
 
         /// <summary>
@@ -536,6 +599,7 @@ namespace HammerAndSickle.Models
                 }
 
                 return _airUnitsAttached.Where(unit => unit != null &&
+                                                      !unit.IsDestroyed() &&
                                                       unit.EfficiencyLevel != EfficiencyLevel.StaticOperations)
                                       .ToList();
             }
@@ -553,6 +617,62 @@ namespace HammerAndSickle.Models
         public int GetOperationalAirUnitCount()
         {
             return GetOperationalAirUnits().Count;
+        }
+
+        /// <summary>
+        /// Synchronizes the attached unit IDs list with the current air units list.
+        /// Used for data integrity checks and repair operations.
+        /// </summary>
+        public void SynchronizeAirUnitLists()
+        {
+            try
+            {
+                if (!IsBase || FacilityType != FacilityType.Airbase)
+                    return;
+
+                // Rebuild ID list from actual attached units
+                var currentIds = _airUnitsAttached.Select(u => u.UnitID).ToList();
+
+                // Check for discrepancies
+                var idsNotInUnits = _attachedUnitIDs.Except(currentIds).ToList();
+                var unitsNotInIds = currentIds.Except(_attachedUnitIDs).ToList();
+
+                if (idsNotInUnits.Any() || unitsNotInIds.Any())
+                {
+                    AppService.CaptureUiMessage($"Synchronizing air unit lists for {UnitName}");
+
+                    if (idsNotInUnits.Any())
+                    {
+                        AppService.CaptureUiMessage($"Removing {idsNotInUnits.Count} orphaned IDs from attachment list");
+                    }
+
+                    if (unitsNotInIds.Any())
+                    {
+                        AppService.CaptureUiMessage($"Adding {unitsNotInIds.Count} missing IDs to attachment list");
+                    }
+
+                    // Rebuild the ID list to match actual units
+                    _attachedUnitIDs.Clear();
+                    _attachedUnitIDs.AddRange(currentIds);
+                }
+            }
+            catch (Exception e)
+            {
+                AppService.HandleException(CLASS_NAME, "SynchronizeAirUnitLists", e);
+            }
+        }
+
+        /// <summary>
+        /// Helper method to determine if a unit classification represents an air unit.
+        /// </summary>
+        /// <param name="classification">The unit classification to check</param>
+        /// <returns>True if the classification is an air unit type</returns>
+        private bool IsAirUnitClassification(UnitClassification classification)
+        {
+            return classification == UnitClassification.FGT ||
+                   classification == UnitClassification.ATT ||
+                   classification == UnitClassification.BMB ||
+                   classification == UnitClassification.RECONA;
         }
 
         #endregion // Airbase Management

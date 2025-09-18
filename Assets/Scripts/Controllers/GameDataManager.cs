@@ -5,17 +5,23 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using UnityEngine;
 
 namespace HammerAndSickle.Controllers
 { 
-    public class GameDataManager
+    public class GameDataManager : MonoBehaviour
     {
         #region Constants
 
         private const string CLASS_NAME = nameof(GameDataManager);
-        private const string SCENARIO_FILE_EXTENSION = ".sce";
-        private const string CAMPAIGN_FILE_EXTENSION = ".cmp";
-        private const string BACKUP_FILE_EXTENSION = ".bak";
+
+        // File extensions
+        public const string MANIFEST_EXTENSION = ".manifest";
+        public const string MAP_EXTENSION = ".map";
+        public const string OOB_EXTENSION = ".oob";
+        public const string AII_EXTENSION = ".aii";
+        public const string BRF_EXTENSION = ".brf";
+        public const string CMP_EXTENSION = ".cmp";
 
         #endregion // Constants
 
@@ -56,6 +62,37 @@ namespace HammerAndSickle.Controllers
         public ScenarioData CurrentScenarioData { get; set; }
 
         #endregion // Properties
+
+        #region Unity Lifecycle
+
+        /// <summary>
+        /// Initialize the loading service on start.
+        /// </summary>
+        private void Start()
+        {
+            try
+            {
+                // Initialize static databases
+                WeaponSystemsDatabase.Initialize();
+                IntelProfileDatabase.Initialize();
+                CombatUnitDatabase.Initialize();
+                
+            }
+            catch (Exception ex)
+            {
+                AppService.HandleException(CLASS_NAME, nameof(Start), ex);
+            }
+        }
+
+        /// <summary>
+        /// Perform the map loading test on the first update call.
+        /// </summary>
+        private void Update()
+        {
+            
+        }
+
+        #endregion // Unity Lifecycle
 
         #region Registration
 
@@ -627,5 +664,253 @@ namespace HammerAndSickle.Controllers
         }
 
         #endregion // Private Helper Methods
+
+        #region Template and Database Access
+
+        /// <summary>
+        /// Retrieves a combat unit template by its unique identifier.
+        /// </summary>
+        /// <param name="templateId">Template identifier string</param>
+        /// <returns>Unit template or null if not found</returns>
+        public static CombatUnit GetUnitTemplate(string templateId)
+        {
+            try
+            {
+                return CombatUnitDatabase.GetUnitTemplate(templateId);
+            }
+            catch (Exception e)
+            {
+                AppService.HandleException(CLASS_NAME, nameof(GetUnitTemplate), e);
+                return null;
+            }
+        }
+
+        /// <summary>
+        /// Creates a new combat unit instance from template.
+        /// </summary>
+        /// <param name="templateId">Template identifier</param>
+        /// <param name="unitName">Name for the new unit instance</param>
+        /// <returns>New CombatUnit instance or null if template not found</returns>
+        public static CombatUnit CreateUnitFromTemplate(string templateId, string unitName)
+        {
+            try
+            {
+                return CombatUnitDatabase.CreateUnitFromTemplate(templateId, unitName);
+            }
+            catch (Exception e)
+            {
+                AppService.HandleException(CLASS_NAME, nameof(CreateUnitFromTemplate), e);
+                return null;
+            }
+        }
+
+        /// <summary>
+        /// Gets all template identifiers for a specific nationality.
+        /// </summary>
+        /// <param name="nationality">Nationality to filter by</param>
+        /// <returns>List of template IDs matching nationality</returns>
+        public static List<string> GetTemplatesByNationality(Nationality nationality)
+        {
+            try
+            {
+                return CombatUnitDatabase.GetTemplatesByNationality(nationality);
+            }
+            catch (Exception e)
+            {
+                AppService.HandleException(CLASS_NAME, nameof(GetTemplatesByNationality), e);
+                return new List<string>();
+            }
+        }
+
+        /// <summary>
+        /// Gets all template identifiers for a specific unit classification.
+        /// </summary>
+        /// <param name="classification">Unit classification to filter by</param>
+        /// <returns>List of template IDs matching classification</returns>
+        public static List<string> GetTemplatesByClassification(UnitClassification classification)
+        {
+            try
+            {
+                return CombatUnitDatabase.GetTemplatesByClassification(classification);
+            }
+            catch (Exception e)
+            {
+                AppService.HandleException(CLASS_NAME, nameof(GetTemplatesByClassification), e);
+                return new List<string>();
+            }
+        }
+
+        /// <summary>
+        /// Checks if a combat unit template exists.
+        /// </summary>
+        /// <param name="templateId">Template identifier to check</param>
+        /// <returns>True if template exists</returns>
+        public static bool HasUnitTemplate(string templateId)
+        {
+            try
+            {
+                return CombatUnitDatabase.HasUnitTemplate(templateId);
+            }
+            catch (Exception e)
+            {
+                AppService.HandleException(CLASS_NAME, nameof(HasUnitTemplate), e);
+                return false;
+            }
+        }
+
+        /// <summary>
+        /// Gets the total number of unit templates currently stored.
+        /// </summary>
+        /// <returns>Template count</returns>
+        public static int GetTemplateCount()
+        {
+            try
+            {
+                return CombatUnitDatabase.TemplateCount;
+            }
+            catch (Exception e)
+            {
+                AppService.HandleException(CLASS_NAME, nameof(GetTemplateCount), e);
+                return 0;
+            }
+        }
+
+        /// <summary>
+        /// Gets all template identifiers currently stored in the database.
+        /// </summary>
+        /// <returns>List of all template IDs</returns>
+        public static List<string> GetAllTemplateIds()
+        {
+            try
+            {
+                return CombatUnitDatabase.GetAllTemplateIds();
+            }
+            catch (Exception e)
+            {
+                AppService.HandleException(CLASS_NAME, nameof(GetAllTemplateIds), e);
+                return new List<string>();
+            }
+        }
+
+        /// <summary>
+        /// Retrieves a weapon system profile by its enum identifier.
+        /// </summary>
+        /// <param name="weaponSystemID">The weapon system identifier to look up</param>
+        /// <returns>The corresponding WeaponSystemProfile, or null if not found</returns>
+        public static WeaponSystemProfile GetWeaponSystemProfile(WeaponSystems weaponSystemID)
+        {
+            try
+            {
+                return WeaponSystemsDatabase.GetWeaponSystemProfile(weaponSystemID);
+            }
+            catch (Exception e)
+            {
+                AppService.HandleException(CLASS_NAME, nameof(GetWeaponSystemProfile), e);
+                return null;
+            }
+        }
+
+        /// <summary>
+        /// Gets the total number of weapon system profiles in the database.
+        /// </summary>
+        /// <returns>Profile count</returns>
+        public static int GetWeaponSystemProfileCount()
+        {
+            try
+            {
+                return WeaponSystemsDatabase.ProfileCount;
+            }
+            catch (Exception e)
+            {
+                AppService.HandleException(CLASS_NAME, nameof(GetWeaponSystemProfileCount), e);
+                return 0;
+            }
+        }
+
+        /// <summary>
+        /// Checks if a specific intel profile type has been defined in the system.
+        /// </summary>
+        /// <param name="profileType">The profile type to check</param>
+        /// <returns>True if the profile type is defined</returns>
+        public static bool HasIntelProfile(IntelProfileTypes profileType)
+        {
+            try
+            {
+                return IntelProfileDatabase.HasProfile(profileType);
+            }
+            catch (Exception e)
+            {
+                AppService.HandleException(CLASS_NAME, nameof(HasIntelProfile), e);
+                return false;
+            }
+        }
+
+        /// <summary>
+        /// Gets the maximum count for a specific weapon system in an intel profile type.
+        /// </summary>
+        /// <param name="profileType">The profile type to query</param>
+        /// <param name="weaponSystem">The weapon system to look up</param>
+        /// <returns>Maximum count, or 0 if not found</returns>
+        public static int GetIntelWeaponSystemCount(IntelProfileTypes profileType, WeaponSystems weaponSystem)
+        {
+            try
+            {
+                return IntelProfileDatabase.GetWeaponSystemCount(profileType, weaponSystem);
+            }
+            catch (Exception e)
+            {
+                AppService.HandleException(CLASS_NAME, nameof(GetIntelWeaponSystemCount), e);
+                return 0;
+            }
+        }
+
+        /// <summary>
+        /// Generates an intelligence report for a unit based on the specified spotted level.
+        /// </summary>
+        /// <param name="profileType">Intel profile type</param>
+        /// <param name="unitName">Unit name for the report</param>
+        /// <param name="hitPoints">Current hit points</param>
+        /// <param name="nationality">Unit nationality</param>
+        /// <param name="deploymentPosition">Current deployment state</param>
+        /// <param name="experienceLevel">Unit experience level</param>
+        /// <param name="efficiencyLevel">Unit efficiency level</param>
+        /// <param name="spottedLevel">Intelligence accuracy level</param>
+        /// <returns>IntelReport with unit intelligence data, or null if generation fails</returns>
+        public static IntelReport GenerateIntelReport(IntelProfileTypes profileType, string unitName, int hitPoints,
+            Nationality nationality, DeploymentPosition deploymentPosition, ExperienceLevel experienceLevel,
+            EfficiencyLevel efficiencyLevel, SpottedLevel spottedLevel = SpottedLevel.Level1)
+        {
+            try
+            {
+                return IntelProfileDatabase.GenerateIntelReport(profileType, unitName, hitPoints, nationality,
+                    deploymentPosition, experienceLevel, efficiencyLevel, spottedLevel);
+            }
+            catch (Exception e)
+            {
+                AppService.HandleException(CLASS_NAME, nameof(GenerateIntelReport), e);
+                return null;
+            }
+        }
+
+        /// <summary>
+        /// Gets whether all static databases have been successfully initialized.
+        /// </summary>
+        /// <returns>True if all databases are initialized</returns>
+        public static bool AreAllDatabasesInitialized()
+        {
+            try
+            {
+                return CombatUnitDatabase.IsInitialized &&
+                       WeaponSystemsDatabase.IsInitialized &&
+                       IntelProfileDatabase.IsInitialized;
+            }
+            catch (Exception e)
+            {
+                AppService.HandleException(CLASS_NAME, nameof(AreAllDatabasesInitialized), e);
+                return false;
+            }
+        }
+
+        #endregion // Template and Database Access
     }
 }

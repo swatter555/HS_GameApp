@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Text.Json.Serialization;
 using UnityEngine;
 using HammerAndSickle.Services;
 
@@ -8,7 +9,9 @@ namespace HammerAndSickle.Models
     {
         #region Properties
 
+        [JsonInclude]
         public int ExperiencePoints { get; internal set; }
+        [JsonInclude]
         public ExperienceLevel ExperienceLevel { get; internal set; }
 
         #endregion // Properties

@@ -35,7 +35,7 @@ namespace HammerAndSickle.Models
         /// Initializes all static profile definitions. Must be called during application startup
         /// before any intelligence reports can be generated.
         /// </summary>
-        public static void InitializeProfiles()
+        public static void Initialize()
         {
             if (_isInitialized) return;
 
@@ -50,7 +50,7 @@ namespace HammerAndSickle.Models
                 }
                 catch (Exception e)
                 {
-                    AppService.HandleException(CLASS_NAME, nameof(InitializeProfiles), e);
+                    AppService.HandleException(CLASS_NAME, nameof(Initialize), e);
                     throw;
                 }
             }
