@@ -157,9 +157,6 @@ namespace HammerAndSickle.Tests
                 // Clear any existing state
                 GameManager.ClearAll();
 
-                // Initialize databases and systems
-                GameManager.Initialize();
-
                 TestLog.Add("Test environment initialization completed");
             }
             catch (Exception ex)
