@@ -72,11 +72,7 @@ namespace HammerAndSickle.Controllers
         {
             try
             {
-                // Initialize static databases
-                WeaponSystemsDatabase.Initialize();
-                IntelProfileDatabase.Initialize();
-                CombatUnitDatabase.Initialize();
-                
+                Initialize();
             }
             catch (Exception ex)
             {
@@ -93,6 +89,21 @@ namespace HammerAndSickle.Controllers
         }
 
         #endregion // Unity Lifecycle
+
+        #region Initialization
+
+        /// <summary>
+        /// Initializes the GameDataManager and its static databases.
+        /// </summary>
+        public void Initialize()
+        {
+            // Initialize static databases
+            WeaponSystemsDatabase.Initialize();
+            IntelProfileDatabase.Initialize();
+            CombatUnitDatabase.Initialize();
+        }
+
+        #endregion // Initialization
 
         #region Registration
 

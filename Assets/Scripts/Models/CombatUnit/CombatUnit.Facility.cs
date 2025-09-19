@@ -1,5 +1,4 @@
-﻿using HammerAndSickle.Controllers;
-using HammerAndSickle.Services;
+﻿using HammerAndSickle.Services;
 using System;
 using System.Collections.Generic;
 using System.Linq;

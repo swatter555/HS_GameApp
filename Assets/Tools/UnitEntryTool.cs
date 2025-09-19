@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Text.Json;
-using System.Text.Json.Serialization;
 using UnityEngine;
 using HammerAndSickle.Models;
 using HammerAndSickle.Controllers;
@@ -21,12 +20,18 @@ namespace HammerAndSickle.Tools
     {
         public string UnitID { get; set; }
         public string UnitName { get; set; }
-        public string TemplateID { get; set; }
         public float MapPosX { get; set; }
         public float MapPosY { get; set; }
         public Side Side { get; set; }
         public Nationality Nationality { get; set; }
+        public UnitClassification Classification { get; set; }
         public UnitRole Role { get; set; }
+        public IntelProfileTypes IntelProfileType { get; set; }
+        public WeaponSystems DeployedProfileID { get; set; }
+        public WeaponSystems MobileProfileID { get; set; }
+        public WeaponSystems EmbarkedProfileID { get; set; }
+        public bool IsMountable { get; set; }
+        public bool IsEmbarkable { get; set; }
         public ExperienceLevel Experience { get; set; }
         public EfficiencyLevel Efficiency { get; set; }
         public DeploymentPosition Deployment { get; set; }
@@ -34,9 +39,10 @@ namespace HammerAndSickle.Tools
         public float ICM { get; set; }
         public float HitPointsPercent { get; set; }
         public float SupplyPercent { get; set; }
+        public DepotCategory DepotCategory { get; set; }
+        public DepotSize DepotSize { get; set; }
         public List<string> AttachedAirUnitIDs { get; set; } = new List<string>();
     }
-     
 
     /// <summary>
     /// Unity Editor tool for creating and managing combat units for OOB files.
@@ -85,20 +91,27 @@ namespace HammerAndSickle.Tools
         private Vector2 availableAirScrollPos;
         private Vector2 attachedAirScrollPos;
 
+        // Airbase Management
+        [System.NonSerialized]
+        private CombatUnit selectedAirbase = null;
+        private int selectedAirbaseIndex = -1;
+        private Vector2 airbaseScrollPos;
+
         // UI State
         private Vector2 playerUnitsScrollPos;
         private Vector2 aiUnitsScrollPos;
         private bool isInitialized = false;
         private bool showTemplateDropdown = false;
         private Vector2 templateDropdownScrollPos;
+        private Vector2 attachedAirbaseScrollPos;
 
         [Header("UI Settings")]
         [SerializeField] public bool showGUI = false;
 
         // Constants
         private const string SAVE_DIRECTORY = "Assets/Data Files/oob";
-        private const int WINDOW_WIDTH = 1200;
-        private const int WINDOW_HEIGHT = 800;
+        private const int WINDOW_WIDTH = 1000;
+        private const int WINDOW_HEIGHT = 1200;
 
         #endregion
 
@@ -150,7 +163,7 @@ namespace HammerAndSickle.Tools
             GUILayout.Space(10);
 
             // Attachments section (for AIRB units)
-            DrawAttachmentsSection();
+            //DrawAttachmentsSection();
             GUILayout.Space(10);
 
             // Bottom row - Unit Management (most important - the lists)
@@ -378,6 +391,10 @@ namespace HammerAndSickle.Tools
 
         private void DrawUnitConfigurationSection()
         {
+            GUILayout.BeginHorizontal();
+
+            // Left Column - Unit Configuration
+            GUILayout.BeginVertical(GUILayout.Width(WINDOW_WIDTH / 2 - 10));
             GUILayout.Label("Unit Configuration", GUI.skin.box);
 
             GUILayout.BeginHorizontal();
@@ -484,84 +501,132 @@ namespace HammerAndSickle.Tools
             {
                 CreateUnitFromTemplate();
             }
+            GUILayout.EndVertical();
+
+            GUILayout.Space(10);
+
+            // Right Column - Airbase Management
+            GUILayout.BeginVertical(GUILayout.Width(WINDOW_WIDTH / 2 - 10));
+            DrawAirbaseManagementSection();
+            GUILayout.EndVertical();
+
+            GUILayout.EndHorizontal();
         }
 
-        private void DrawAttachmentsSection()
+        private void DrawAirbaseManagementSection()
         {
-            // Only show for AIRB (airbase) units
-            var template = GameDataManager.GetUnitTemplate(selectedTemplateId);
-            if (template == null || template.Classification != UnitClassification.AIRB)
-                return;
+            GUILayout.Label("Airbase Management", GUI.skin.box);
 
-            GUILayout.Label("★ ATTACHMENTS (Airbase Air Units) ★", GUI.skin.box);
+            // Get all airbases from both lists
+            var allAirbases = playerUnits.Concat(aiUnits)
+                .Where(u => u.Classification == UnitClassification.AIRB)
+                .ToList();
 
-            // Load available air units if needed
-            RefreshAirUnitsLists();
-
-            // Side-by-side layout for Available and Attached air units
+            // Airbase selection dropdown
             GUILayout.BeginHorizontal();
+            GUILayout.Label("Select Airbase:", GUILayout.Width(100));
 
-            // Available Air Units (Left side)
-            GUILayout.BeginVertical(GUILayout.Width(WINDOW_WIDTH / 2 - 20));
-            GUILayout.Label("AVAILABLE AIR UNITS", GUI.skin.box);
-            availableAirScrollPos = GUILayout.BeginScrollView(availableAirScrollPos, GUILayout.Height(120));
-
-            for (int i = 0; i < availableAirUnits.Count; i++)
+            string airbaseName = selectedAirbase != null ? selectedAirbase.UnitName : "None Selected";
+            if (GUILayout.Button($"{airbaseName} ▼", GUILayout.Width(250)))
             {
-                var airUnit = availableAirUnits[i];
-                GUILayout.BeginHorizontal();
+                // Simple cycling through airbases
+                if (allAirbases.Count > 0)
+                {
+                    selectedAirbaseIndex = (selectedAirbaseIndex + 1) % allAirbases.Count;
+                    selectedAirbase = allAirbases[selectedAirbaseIndex];
+                }
+            }
+            GUILayout.EndHorizontal();
 
-                GUILayout.Label($"{airUnit.UnitName}", GUILayout.Width(120));
+            if (selectedAirbase == null || allAirbases.Count == 0)
+            {
+                GUILayout.Label("No airbases created yet", GUI.skin.label);
+                return;
+            }
+
+            // Show airbase details
+            GUILayout.Label($"Location: ({selectedAirbase.MapPos.X}, {selectedAirbase.MapPos.Y})", GUI.skin.label);
+            GUILayout.Label($"Side: {selectedAirbase.Side}", GUI.skin.label);
+            GUILayout.Label($"Attached Units: {selectedAirbase.AirUnitsAttached.Count}/4", GUI.skin.label);
+
+            GUILayout.Space(10);
+
+            // Available air units for attachment
+            var availableForAttachment = playerUnits.Concat(aiUnits)
+                .Where(u => IsAirUnit(u) && u.Classification != UnitClassification.HELO)
+                .Where(u => !IsAttachedToAnyAirbase(u))
+                .ToList();
+
+            GUILayout.Label("Available Air Units", GUI.skin.box);
+            airbaseScrollPos = GUILayout.BeginScrollView(airbaseScrollPos, GUILayout.Height(150));
+
+            foreach (var airUnit in availableForAttachment)
+            {
+                GUILayout.BeginHorizontal();
+                GUILayout.Label($"{airUnit.UnitName}", GUILayout.Width(150));
                 GUILayout.Label($"{airUnit.Classification}", GUILayout.Width(50));
 
-                if (GUILayout.Button("→", GUILayout.Width(30)))
+                if (GUILayout.Button("Attach", GUILayout.Width(60)))
                 {
-                    AttachAirUnit(i);
+                    if (selectedAirbase.AirUnitsAttached.Count < 4)
+                    {
+                        selectedAirbase.AddAirUnit(airUnit);
+                        statusMessage = $"Attached {airUnit.UnitName} to {selectedAirbase.UnitName}";
+                    }
+                    else
+                    {
+                        statusMessage = "Airbase is at capacity (4 units)";
+                    }
                 }
-
                 GUILayout.EndHorizontal();
             }
 
-            if (availableAirUnits.Count == 0)
+            if (availableForAttachment.Count == 0)
             {
                 GUILayout.Label("No air units available", GUI.skin.label);
             }
 
             GUILayout.EndScrollView();
-            GUILayout.EndVertical();
 
-            GUILayout.Space(20);
+            GUILayout.Space(10);
 
-            // Attached Air Units (Right side)
-            GUILayout.BeginVertical(GUILayout.Width(WINDOW_WIDTH / 2 - 20));
-            GUILayout.Label($"ATTACHED AIR UNITS ({attachedAirUnits.Count}/4)", GUI.skin.box);
-            attachedAirScrollPos = GUILayout.BeginScrollView(attachedAirScrollPos, GUILayout.Height(120));
+            // Currently attached units
+            GUILayout.Label("Attached Air Units", GUI.skin.box);
+            attachedAirbaseScrollPos = GUILayout.BeginScrollView(attachedAirbaseScrollPos, GUILayout.Height(120));
 
-            for (int i = 0; i < attachedAirUnits.Count; i++)
+            foreach (var attachedUnit in selectedAirbase.AirUnitsAttached.ToList())
             {
-                var airUnit = attachedAirUnits[i];
                 GUILayout.BeginHorizontal();
+                GUILayout.Label($"{attachedUnit.UnitName}", GUILayout.Width(150));
+                GUILayout.Label($"{attachedUnit.Classification}", GUILayout.Width(50));
 
-                if (GUILayout.Button("←", GUILayout.Width(30)))
+                if (GUILayout.Button("Detach", GUILayout.Width(60)))
                 {
-                    DetachAirUnit(i);
+                    selectedAirbase.RemoveAirUnit(attachedUnit);
+                    statusMessage = $"Detached {attachedUnit.UnitName} from {selectedAirbase.UnitName}";
                 }
-
-                GUILayout.Label($"{airUnit.UnitName}", GUILayout.Width(120));
-                GUILayout.Label($"{airUnit.Classification}", GUILayout.Width(50));
-
                 GUILayout.EndHorizontal();
             }
 
-            if (attachedAirUnits.Count == 0)
+            if (selectedAirbase.AirUnitsAttached.Count == 0)
             {
-                GUILayout.Label("No air units attached", GUI.skin.label);
+                GUILayout.Label("No units attached", GUI.skin.label);
             }
 
             GUILayout.EndScrollView();
-            GUILayout.EndVertical();
+        }
 
-            GUILayout.EndHorizontal();
+        private bool IsAttachedToAnyAirbase(CombatUnit airUnit)
+        {
+            var allAirbases = playerUnits.Concat(aiUnits)
+                .Where(u => u.Classification == UnitClassification.AIRB);
+
+            foreach (var airbase in allAirbases)
+            {
+                if (airbase.AirUnitsAttached.Contains(airUnit))
+                    return true;
+            }
+            return false;
         }
 
         private void DrawUnitManagementSection()
@@ -850,42 +915,81 @@ namespace HammerAndSickle.Tools
                     return;
                 }
 
-                // Parse JSON to unit collection
-                // This will need to match the expected OOB file format
                 var options = new JsonSerializerOptions
                 {
-                    ReferenceHandler = ReferenceHandler.Preserve,
-                    WriteIndented = true,
-                    MaxDepth = 64 // Increase depth limit to handle complex object graphs
+                    WriteIndented = true
                 };
 
-                // For now, we'll implement a simple structure
-                var unitDict = JsonSerializer.Deserialize<Dictionary<string, CombatUnit>>(jsonContent, options);
+                var oobDataList = JsonSerializer.Deserialize<List<OobUnitData>>(jsonContent, options);
+
+                if (oobDataList == null || oobDataList.Count == 0)
+                {
+                    statusMessage = "No units found in file";
+                    return;
+                }
 
                 playerUnits.Clear();
                 aiUnits.Clear();
                 attachedAirUnits.Clear();
                 availableAirUnits.Clear();
 
-                // Sort loaded units into appropriate lists based on nationality
-                foreach (var unit in unitDict.Values)
+                // First pass: Create all units from scratch using constructor
+                var unitMap = new Dictionary<string, CombatUnit>();
+
+                foreach (var data in oobDataList)
                 {
-                    Debug.Log($"Processing unit: {unit.UnitName}, Side: {unit.Side}, Nationality: {unit.Nationality}");
+                    // Create unit directly with full constructor
+                    var unit = new CombatUnit(
+                        data.UnitName,
+                        data.Classification,
+                        data.Role,
+                        data.Side,
+                        data.Nationality,
+                        data.IntelProfileType,
+                        data.DeployedProfileID,
+                        data.IsMountable,
+                        data.MobileProfileID,
+                        data.IsEmbarkable,
+                        data.EmbarkedProfileID,
+                        data.DepotCategory,
+                        data.DepotSize
+                    );
+
+                    unit.SetUnitID(data.UnitID);
+                    unit.SetPosition(new Position2D(data.MapPosX, data.MapPosY));
+                    unit.SetExperienceLevel(data.Experience);
+                    unit.SetEfficiencyLevel(data.Efficiency);
+                    unit.SetDeploymentPosition(data.Deployment);
+                    unit.SetSpottedLevel(data.Spotted);
+                    unit.SetICM(data.ICM);
+                    unit.HitPoints.SetCurrent(unit.HitPoints.Max * data.HitPointsPercent);
+                    unit.DaysSupply.SetCurrent(unit.DaysSupply.Max * data.SupplyPercent);
+
+                    unitMap[unit.UnitID] = unit;
 
                     if (unit.Side == Side.Player)
-                    {
                         playerUnits.Add(unit);
-                    }
                     else
-                    {
                         aiUnits.Add(unit);
+                }
+
+                // Second pass: Restore air attachments
+                foreach (var data in oobDataList.Where(d => d.AttachedAirUnitIDs != null && d.AttachedAirUnitIDs.Count > 0))
+                {
+                    if (unitMap.TryGetValue(data.UnitID, out var airbase))
+                    {
+                        foreach (var airUnitId in data.AttachedAirUnitIDs)
+                        {
+                            if (unitMap.TryGetValue(airUnitId, out var airUnit))
+                            {
+                                airbase.AddAirUnit(airUnit);
+                            }
+                        }
                     }
                 }
 
-                // Rebuild air units lists after loading
                 RefreshAirUnitsLists();
 
-                // Set status message.
                 int totalUnits = playerUnits.Count + aiUnits.Count;
                 statusMessage = $"Loaded {totalUnits} units (Player: {playerUnits.Count}, AI: {aiUnits.Count}) from {loadFileName}.oob";
             }
@@ -913,27 +1017,55 @@ namespace HammerAndSickle.Tools
                     return;
                 }
 
-                // Create dictionary structure for OOB file (combine both lists)
-                var unitDict = new Dictionary<string, CombatUnit>();
+                // Convert to flat OOB data structure with ALL unit properties
+                var oobDataList = new List<OobUnitData>();
 
-                foreach (var unit in playerUnits)
+                foreach (var unit in playerUnits.Concat(aiUnits))
                 {
-                    unitDict[unit.UnitID] = unit;
-                }
+                    var data = new OobUnitData
+                    {
+                        UnitID = unit.UnitID,
+                        UnitName = unit.UnitName,
+                        MapPosX = unit.MapPos.X,
+                        MapPosY = unit.MapPos.Y,
+                        Side = unit.Side,
+                        Nationality = unit.Nationality,
+                        Classification = unit.Classification,
+                        Role = unit.Role,
+                        IntelProfileType = unit.IntelProfileType,
+                        DeployedProfileID = unit.DeployedProfileID,
+                        MobileProfileID = unit.MobileProfileID,
+                        EmbarkedProfileID = unit.EmbarkedProfileID,
+                        IsMountable = unit.IsMountable,
+                        IsEmbarkable = unit.IsEmbarkable,
+                        Experience = unit.ExperienceLevel,
+                        Efficiency = unit.EfficiencyLevel,
+                        Deployment = unit.DeploymentPosition,
+                        Spotted = unit.SpottedLevel,
+                        ICM = unit.IndividualCombatModifier,
+                        HitPointsPercent = unit.HitPoints.Current / unit.HitPoints.Max,
+                        SupplyPercent = unit.DaysSupply.Current / unit.DaysSupply.Max,
+                        DepotCategory = unit.DepotCategory,
+                        DepotSize = unit.DepotSize
+                    };
 
-                foreach (var unit in aiUnits)
-                {
-                    unitDict[unit.UnitID] = unit;
+                    // Handle air attachments for airbases
+                    if (unit.Classification == UnitClassification.AIRB && unit.AirUnitsAttached != null)
+                    {
+                        data.AttachedAirUnitIDs = unit.AirUnitsAttached
+                            .Select(au => au.UnitID)
+                            .ToList();
+                    }
+
+                    oobDataList.Add(data);
                 }
 
                 var options = new JsonSerializerOptions
                 {
-                    ReferenceHandler = ReferenceHandler.Preserve,
-                    WriteIndented = true,
-                    MaxDepth = 64 // Increase depth limit to handle complex object graphs
+                    WriteIndented = true
                 };
 
-                string json = JsonSerializer.Serialize(unitDict, options);
+                string json = JsonSerializer.Serialize(oobDataList, options);
                 string filePath = Path.Combine(SAVE_DIRECTORY, $"{saveFileName}.oob");
 
                 File.WriteAllText(filePath, json);
@@ -1029,7 +1161,7 @@ namespace HammerAndSickle.Tools
         #endregion
     }
 
-#if UNITY_EDITOR
+    #if UNITY_EDITOR
     [CustomEditor(typeof(UnitEntryTool))]
     public class UnitEntryToolEditor : Editor
     {
@@ -1049,5 +1181,5 @@ namespace HammerAndSickle.Tools
             }
         }
     }
-#endif
+    #endif
 }
