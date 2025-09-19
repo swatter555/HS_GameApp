@@ -4,18 +4,21 @@ using HammerAndSickle.Services;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Reflection;
 using UnityEngine;
 
 namespace HammerAndSickle.Controllers
-{ 
+{
+    /// <summary>
+    /// Central data management system for Hammer & Sickle, managing combat units, 
+    /// leaders, and game state with Unity-compliant singleton pattern.
+    /// </summary>
     public class GameDataManager : MonoBehaviour
     {
         #region Constants
 
         private const string CLASS_NAME = nameof(GameDataManager);
 
-        // File extensions
+        // File extensions for future use
         public const string MANIFEST_EXTENSION = ".manifest";
         public const string MAP_EXTENSION = ".map";
         public const string OOB_EXTENSION = ".oob";
@@ -28,16 +31,24 @@ namespace HammerAndSickle.Controllers
         #region Singleton
 
         private static GameDataManager _instance;
-        private static readonly object _instanceLock = new();
+
+        /// <summary>
+        /// Singleton instance with Unity-compliant lazy initialization.
+        /// </summary>
         public static GameDataManager Instance
         {
             get
             {
                 if (_instance == null)
                 {
-                    lock (_instanceLock)
+                    // Try to find existing instance in scene (using new Unity API)
+                    _instance = FindAnyObjectByType<GameDataManager>();
+
+                    // Create new instance if none exists
+                    if (_instance == null)
                     {
-                        _instance ??= new GameDataManager();
+                        GameObject go = new GameObject("GameDataManager");
+                        _instance = go.AddComponent<GameDataManager>();
                     }
                 }
                 return _instance;
@@ -50,42 +61,53 @@ namespace HammerAndSickle.Controllers
 
         private readonly Dictionary<string, CombatUnit> _combatUnits = new();
         private readonly Dictionary<string, Leader> _leaders = new();
+        private bool _isInitialized = false;
 
         #endregion // Fields
 
         #region Properties
 
-        /// <summary>The player‑progression data that persists across scenarios.</summary>
+        /// <summary>The player progression data that persists across scenarios.</summary>
         public CampaignData CurrentCampaignData { get; set; }
 
         /// <summary>The currently loaded scenario data (null outside of missions).</summary>
         public ScenarioData CurrentScenarioData { get; set; }
 
+        /// <summary>Indicates whether the manager has been fully initialized.</summary>
+        public bool IsReady => _isInitialized;
+
+        /// <summary>Gets the count of registered combat units.</summary>
+        public int UnitCount => _combatUnits.Count;
+
+        /// <summary>Gets the count of registered leaders.</summary>
+        public int LeaderCount => _leaders.Count;
+
         #endregion // Properties
 
         #region Unity Lifecycle
 
-        /// <summary>
-        /// Initialize the loading service on start.
-        /// </summary>
-        private void Start()
+        private void Awake()
         {
-            try
+            // Enforce singleton pattern
+            if (_instance != null && _instance != this)
             {
-                Initialize();
+                Destroy(gameObject);
+                return;
             }
-            catch (Exception ex)
-            {
-                AppService.HandleException(CLASS_NAME, nameof(Start), ex);
-            }
+
+            _instance = this;
+            DontDestroyOnLoad(gameObject);
+
+            // Initialize core systems early
+            InitializeDatabases();
         }
 
-        /// <summary>
-        /// Perform the map loading test on the first update call.
-        /// </summary>
-        private void Update()
+        private void OnDestroy()
         {
-            
+            if (_instance == this)
+            {
+                _instance = null;
+            }
         }
 
         #endregion // Unity Lifecycle
@@ -93,14 +115,39 @@ namespace HammerAndSickle.Controllers
         #region Initialization
 
         /// <summary>
-        /// Initializes the GameDataManager and its static databases.
+        /// Initializes all static databases required for the game.
         /// </summary>
-        public void Initialize()
+        private void InitializeDatabases()
         {
-            // Initialize static databases
-            WeaponSystemsDatabase.Initialize();
-            IntelProfileDatabase.Initialize();
-            CombatUnitDatabase.Initialize();
+            try
+            {
+                if (_isInitialized)
+                    return;
+
+                // Initialize static databases
+                WeaponSystemsDatabase.Initialize();
+                IntelProfileDatabase.Initialize();
+                CombatUnitDatabase.Initialize();
+
+                _isInitialized = true;
+                AppService.CaptureUiMessage("Game databases initialized successfully");
+            }
+            catch (Exception ex)
+            {
+                AppService.HandleException(CLASS_NAME, nameof(InitializeDatabases), ex);
+                _isInitialized = false;
+            }
+        }
+
+        /// <summary>
+        /// Ensures the GameDataManager singleton exists. Call this at game startup.
+        /// </summary>
+        public static void EnsureExists()
+        {
+            if (_instance == null)
+            {
+                _ = Instance; // Forces creation through the getter
+            }
         }
 
         #endregion // Initialization
@@ -112,17 +159,11 @@ namespace HammerAndSickle.Controllers
         /// </summary>
         public bool RegisterCombatUnit(CombatUnit unit)
         {
-            // Validate input
-            if (unit == null)
-            {
-                AppService.HandleException(CLASS_NAME, nameof(RegisterCombatUnit),
-                    new ArgumentNullException(nameof(unit)));
+            if (!ValidateEntity(unit, nameof(unit)))
                 return false;
-            }
 
             try
             {
-                // Check if the unit ID is valid
                 if (_combatUnits.ContainsKey(unit.UnitID))
                 {
                     AppService.HandleException(CLASS_NAME, nameof(RegisterCombatUnit),
@@ -130,9 +171,7 @@ namespace HammerAndSickle.Controllers
                     return false;
                 }
 
-                // Register the combat unit
                 _combatUnits[unit.UnitID] = unit;
-
                 return true;
             }
             catch (Exception e)
@@ -147,17 +186,11 @@ namespace HammerAndSickle.Controllers
         /// </summary>
         public bool RegisterLeader(Leader leader)
         {
-            // Validate input
-            if (leader == null)
-            {
-                AppService.HandleException(CLASS_NAME, nameof(RegisterLeader),
-                    new ArgumentNullException(nameof(leader)));
+            if (!ValidateEntity(leader, nameof(leader)))
                 return false;
-            }
 
             try
             {
-                // Check if the leader ID is valid
                 if (_leaders.ContainsKey(leader.LeaderID))
                 {
                     AppService.HandleException(CLASS_NAME, nameof(RegisterLeader),
@@ -165,9 +198,7 @@ namespace HammerAndSickle.Controllers
                     return false;
                 }
 
-                // Register the leader
                 _leaders[leader.LeaderID] = leader;
-
                 return true;
             }
             catch (Exception e)
@@ -178,31 +209,25 @@ namespace HammerAndSickle.Controllers
         }
 
         /// <summary>
-        /// Unregisters a combat unit from the system using its unique identifier.
+        /// Unregisters a combat unit from the system.
         /// </summary>
         public bool UnregisterCombatUnit(string unitId)
         {
-            // Validate input
             if (string.IsNullOrEmpty(unitId))
                 return false;
 
-            // Check if the unit exists
-            if (_combatUnits.Remove(unitId)) return true;
-            else return false;
+            return _combatUnits.Remove(unitId);
         }
 
         /// <summary>
-        /// Unregisters a leader from the system using the specified leader ID.
+        /// Unregisters a leader from the system.
         /// </summary>
         public bool UnregisterLeader(string leaderId)
         {
-            // Validate input
             if (string.IsNullOrEmpty(leaderId))
                 return false;
 
-            // Check if the leader exists
-            if (_leaders.Remove(leaderId)) return true;
-            else return false;
+            return _leaders.Remove(leaderId);
         }
 
         #endregion // Registration
@@ -214,19 +239,10 @@ namespace HammerAndSickle.Controllers
         /// </summary>
         public CombatUnit GetCombatUnit(string unitId)
         {
-            // Validate input
-            if (string.IsNullOrEmpty(unitId)) return null;
-
-            try
-            {
-                // Attempt to retrieve the combat unit from the dictionary
-                return _combatUnits.TryGetValue(unitId, out CombatUnit unit) ? unit : null;
-            }
-            catch (Exception e)
-            {
-                AppService.HandleException(CLASS_NAME, nameof(GetCombatUnit), e);
+            if (string.IsNullOrEmpty(unitId))
                 return null;
-            }
+
+            return _combatUnits.TryGetValue(unitId, out CombatUnit unit) ? unit : null;
         }
 
         /// <summary>
@@ -234,19 +250,10 @@ namespace HammerAndSickle.Controllers
         /// </summary>
         public Leader GetLeader(string leaderId)
         {
-            // 
-            if (string.IsNullOrEmpty(leaderId)) return null;
-
-            try
-            {
-                // Attempt to retrieve the leader from the dictionary
-                return _leaders.TryGetValue(leaderId, out Leader leader) ? leader : null;
-            }
-            catch (Exception e)
-            {
-                AppService.HandleException(CLASS_NAME, nameof(GetLeader), e);
+            if (string.IsNullOrEmpty(leaderId))
                 return null;
-            }
+
+            return _leaders.TryGetValue(leaderId, out Leader leader) ? leader : null;
         }
 
         /// <summary>
@@ -254,15 +261,7 @@ namespace HammerAndSickle.Controllers
         /// </summary>
         public IReadOnlyCollection<CombatUnit> GetAllCombatUnits()
         {
-            try
-            {
-                return _combatUnits.Values.ToList();
-            }
-            catch (Exception e)
-            {
-                AppService.HandleException(CLASS_NAME, nameof(GetAllCombatUnits), e);
-                return new List<CombatUnit>();
-            }
+            return _combatUnits.Values.ToList();
         }
 
         /// <summary>
@@ -270,13 +269,47 @@ namespace HammerAndSickle.Controllers
         /// </summary>
         public IReadOnlyCollection<Leader> GetAllLeaders()
         {
+            return _leaders.Values.ToList();
+        }
+
+        #endregion // Retrieval Methods
+
+        #region Query Methods
+
+        /// <summary>
+        /// Gets combat units that match the specified filter.
+        /// </summary>
+        public IReadOnlyCollection<CombatUnit> GetUnits(Predicate<CombatUnit> filter)
+        {
             try
             {
-                return _leaders.Values.ToList();
+                if (filter == null)
+                    return GetAllCombatUnits();
+
+                return _combatUnits.Values.Where(u => filter(u)).ToList();
             }
             catch (Exception e)
             {
-                AppService.HandleException(CLASS_NAME, nameof(GetAllLeaders), e);
+                AppService.HandleException(CLASS_NAME, nameof(GetUnits), e);
+                return new List<CombatUnit>();
+            }
+        }
+
+        /// <summary>
+        /// Gets leaders that match the specified filter.
+        /// </summary>
+        public IReadOnlyCollection<Leader> GetLeaders(Predicate<Leader> filter)
+        {
+            try
+            {
+                if (filter == null)
+                    return GetAllLeaders();
+
+                return _leaders.Values.Where(l => filter(l)).ToList();
+            }
+            catch (Exception e)
+            {
+                AppService.HandleException(CLASS_NAME, nameof(GetLeaders), e);
                 return new List<Leader>();
             }
         }
@@ -286,15 +319,7 @@ namespace HammerAndSickle.Controllers
         /// </summary>
         public IReadOnlyCollection<CombatUnit> GetPlayerUnits()
         {
-            try
-            {
-                return _combatUnits.Values.Where(unit => unit.Side == Side.Player).ToList();
-            }
-            catch (Exception e)
-            {
-                AppService.HandleException(CLASS_NAME, nameof(GetPlayerUnits), e);
-                return new List<CombatUnit>();
-            }
+            return GetUnits(unit => unit.Side == Side.Player);
         }
 
         /// <summary>
@@ -302,88 +327,36 @@ namespace HammerAndSickle.Controllers
         /// </summary>
         public IReadOnlyCollection<CombatUnit> GetAIUnits()
         {
-            try
-            {
-                return _combatUnits.Values.Where(unit => unit.Side != Side.Player).ToList();
-            }
-            catch (Exception e)
-            {
-                AppService.HandleException(CLASS_NAME, nameof(GetAIUnits), e);
-                return new List<CombatUnit>();
-            }
+            return GetUnits(unit => unit.Side != Side.Player);
         }
 
-        #endregion // Retrieval Methods
-
-        #region Query Methods
-
         /// <summary>
-        /// Retrieves a collection of combat units that match the specified classification.
+        /// Retrieves units by classification.
         /// </summary>
         public IReadOnlyCollection<CombatUnit> GetCombatUnitsByClassification(UnitClassification classification)
         {
-            try
-            {
-                return _combatUnits.Values.Where(unit => unit.Classification == classification).ToList();
-            }
-            catch (Exception e)
-            {
-                AppService.HandleException(CLASS_NAME, nameof(GetCombatUnitsByClassification), e);
-                return new List<CombatUnit>();
-            }
+            return GetUnits(unit => unit.Classification == classification);
         }
 
         /// <summary>
-        /// Get all CombatUnits that are bases.
-        /// </summary>
-        public IReadOnlyCollection<CombatUnit> GetAllFacilities()
-        {
-            try
-            {
-                return _combatUnits.Values.Where(unit => unit.IsBase).ToList();
-            }
-            catch (Exception e)
-            {
-                AppService.HandleException(CLASS_NAME, nameof(GetAllFacilities), e);
-                return new List<CombatUnit>();
-            }
-        }
-
-        /// <summary>
-        /// Retrieves a collection of leaders who are not currently assigned.
+        /// Retrieves unassigned leaders.
         /// </summary>
         public IReadOnlyCollection<Leader> GetUnassignedLeaders()
         {
-            try
-            {
-                return _leaders.Values.Where(leader => !leader.IsAssigned).ToList();
-            }
-            catch (Exception e)
-            {
-                AppService.HandleException(CLASS_NAME, nameof(GetUnassignedLeaders), e);
-                return new List<Leader>();
-            }
+            return GetLeaders(leader => !leader.IsAssigned);
         }
 
         /// <summary>
-        /// Retrieves a collection of leaders filtered by the specified command grade.
+        /// Retrieves leaders by command grade.
         /// </summary>
         public IReadOnlyCollection<Leader> GetLeadersByGrade(CommandGrade grade)
         {
-            try
-            {
-                return _leaders.Values.Where(leader => leader.CommandGrade == grade).ToList();
-            }
-            catch (Exception e)
-            {
-                AppService.HandleException(CLASS_NAME, nameof(GetLeadersByGrade), e);
-                return new List<Leader>();
-            }
+            return GetLeaders(leader => leader.CommandGrade == grade);
         }
 
         #endregion // Query Methods
 
-        #region Public Methods
+        #region Leader-Unit Assignment
 
         /// <summary>
         /// Assign a leader to a combat unit by their unique identifiers.
@@ -395,9 +368,9 @@ namespace HammerAndSickle.Controllers
                 var leader = GetLeader(leaderID);
                 var unit = GetCombatUnit(unitID);
 
-                if (leader == null || unit == null) return false;
+                if (leader == null || unit == null)
+                    return false;
 
-                // Check if leader is already assigned elsewhere
                 if (leader.IsAssigned)
                 {
                     AppService.CaptureUiMessage($"Leader {leader.Name} is already assigned to another unit");
@@ -419,19 +392,21 @@ namespace HammerAndSickle.Controllers
         }
 
         /// <summary>
-        /// Unassigns a leader from their current combat unit by their unique identifier.
+        /// Unassigns a leader from their current combat unit.
         /// </summary>
         public bool UnassignLeader(string leaderID)
         {
             try
             {
                 var leader = GetLeader(leaderID);
-                if (leader?.IsAssigned != true) return false;
+                if (leader?.IsAssigned != true)
+                    return false;
 
                 var unit = GetCombatUnit(leader.UnitID);
 
                 leader.UnassignFromUnit();
-                if (unit != null) unit.LeaderID = string.Empty;
+                if (unit != null)
+                    unit.LeaderID = string.Empty;
 
                 AppService.CaptureUiMessage($"Leader {leader.Name} unassigned");
                 return true;
@@ -443,22 +418,18 @@ namespace HammerAndSickle.Controllers
             }
         }
 
+        #endregion // Leader-Unit Assignment
+
+        #region State Management
+
         /// <summary>
-        /// Completely wipes every mutable runtime collection so a brand‑new snapshot can be applied
-        /// without leaving behind zombie references.  This must be called <b>before</b> any new state
-        /// (campaign, scenario, units, leaders, caches) is loaded.
+        /// Completely wipes all game state for loading new data.
         /// </summary>
         public void ClearAll()
         {
-            const string METHOD_NAME = nameof(ClearAll);
-
             try
             {
-                AppService.CaptureUiMessage("Beginning complete game state wipe...");
-
-                // ──────────────────────────────────────────────────────────────────────────────
-                // Clear all entity dictionaries
-                // ──────────────────────────────────────────────────────────────────────────────
+                AppService.CaptureUiMessage("Clearing game state...");
 
                 int unitsCleared = _combatUnits.Count;
                 int leadersCleared = _leaders.Count;
@@ -466,223 +437,127 @@ namespace HammerAndSickle.Controllers
                 _combatUnits.Clear();
                 _leaders.Clear();
 
-                AppService.CaptureUiMessage($"Cleared {unitsCleared} units and {leadersCleared} leaders from registries");
-
-                // ──────────────────────────────────────────────────────────────────────────────
-                // Null out high‑level game state objects
-                // ──────────────────────────────────────────────────────────────────────────────
-
                 CurrentCampaignData = null;
                 CurrentScenarioData = null;
 
-                AppService.CaptureUiMessage("Cleared campaign and scenario data");
+                AppService.CaptureUiMessage($"Cleared {unitsCleared} units and {leadersCleared} leaders");
 
-                // ──────────────────────────────────────────────────────────────────────────────
-                // Clear transient caches and computed data
-                // ──────────────────────────────────────────────────────────────────────────────
-
-                ClearTransientCaches();
-
-                // ──────────────────────────────────────────────────────────────────────────────
-                // Force garbage collection of cleared objects (optional but helpful)
-                // ──────────────────────────────────────────────────────────────────────────────
-
-                // Suggest garbage collection to clean up the large number of objects we just released
-                // This is optional but can help with memory pressure after clearing large game states
-                GC.Collect();
-                GC.WaitForPendingFinalizers();
-
-                AppService.CaptureUiMessage("Game state completely cleared and ready for new data");
+                // Optional: Force garbage collection for large states
+                if (unitsCleared + leadersCleared > 100)
+                {
+                    GC.Collect();
+                    GC.WaitForPendingFinalizers();
+                }
             }
             catch (Exception ex)
             {
-                // This is a critical operation - if ClearAll fails, the game state could be corrupted
-                AppService.HandleException(CLASS_NAME, METHOD_NAME, ex);
-                throw; // Re‑throw so calling code knows the clear failed
+                AppService.HandleException(CLASS_NAME, nameof(ClearAll), ex);
+                throw; // Re-throw as this is critical
             }
         }
 
         /// <summary>
-        /// Clears all transient (non-persistent) caches and computed data.
-        /// This is called by ClearAll() and can also be called independently to refresh caches.
+        /// Rebuilds transient caches after loading from snapshot.
         /// </summary>
-        private void ClearTransientCaches()
-        {
-            const string METHOD_NAME = nameof(ClearTransientCaches);
-
-            try
-            {
-                // ──────────────────────────────────────────────────────────────────────────────
-                // Clear any cached lookups, pathfinding data, supply networks, etc.
-                // ──────────────────────────────────────────────────────────────────────────────
-
-                // Note: Add cache clearing logic here as new caches are implemented
-                // Examples of what might go here in the future:
-                // - Pathfinding graphs
-                // - Supply network calculations  
-                // - Unit visibility caches
-                // - Threat assessment matrices
-                // - AI decision trees
-
-                // For now, this is mostly a placeholder but provides the structure
-                // for future cache management
-
-                AppService.CaptureUiMessage("Transient caches cleared");
-            }
-            catch (Exception ex)
-            {
-                AppService.HandleException(CLASS_NAME, METHOD_NAME, ex);
-                // Don't re-throw cache clearing errors - they're not critical to core functionality
-            }
-        }
-
-        /// <summary>
-        /// Re‑hydrate all transient (non‑persistent) data after loading a <see cref="GameDataSnapshot"/>.
-        /// </summary>
-        /// <remarks>
-        ///   • Re‑establishes the <strong>Leader ↔ Unit</strong> two‑way link so that skills, morale buffs,
-        ///     etc. can resolve their owning commander at runtime.  <br/>
-        ///   • Restores <strong>air‑unit attachments</strong> for airbases – they are stored by <em>UnitID</em>
-        ///     inside <c>_attachedUnitIDs</c> during serialization, but the actual <c>CombatUnit</c>
-        ///     references live in <c>_airUnitsAttached</c>.  <br/>
-        ///   • Serves as a single choke‑point if we add more caches in the future (supply projection,
-        ///     path‑finding, quick‑look lists, etc.).
-        /// </remarks>
         public void RebuildTransientCaches()
         {
             try
             {
-                // -------------------------------------------------
-                // 1  Leader ↔ Unit linkage                    
-                // -------------------------------------------------
+                // Rebuild Leader ↔ Unit linkage
                 foreach (var leader in _leaders.Values)
                 {
                     if (string.IsNullOrEmpty(leader.UnitID))
-                        continue; // Leader currently un‑assigned
+                        continue;
 
                     if (_combatUnits.TryGetValue(leader.UnitID, out var unit))
                     {
-                        // If the snapshot didn’t preserve the runtime assignment flag, redo it so any
-                        // listeners (UI, combat calcs) receive their event callbacks.
                         if (!leader.IsAssigned)
                         {
-                            leader.AssignToUnit(leader.UnitID); // Fires LeaderAssigned event internally
+                            leader.AssignToUnit(leader.UnitID);
                         }
-
-                        // Some versions expose a writable LeaderID on CombatUnit; others keep the link
-                        // private.  Reflection keeps us build‑agnostic while remaining type‑safe for
-                        // release builds where the property exists.
-                        var leaderIdProp = unit.GetType().GetProperty("LeaderID", BindingFlags.Public | BindingFlags.Instance);
-                        if (leaderIdProp != null && leaderIdProp.CanWrite)
-                        {
-                            leaderIdProp.SetValue(unit, leader.LeaderID);
-                        }
+                        unit.LeaderID = leader.LeaderID;
                     }
                     else
                     {
-                        // Dangling reference – clear it to avoid null checks elsewhere.
                         leader.UnassignFromUnit();
                     }
                 }
 
-                // -------------------------------------------------
-                // 2️  Air‑unit attachments for facilities       
-                // -------------------------------------------------
-                foreach (var facility in _combatUnits.Values.Where(cu => cu.IsBase))
+                // Rebuild air unit attachments for airbases
+                foreach (var facility in _combatUnits.Values.Where(u => u.IsBase && u.FacilityType == FacilityType.Airbase))
                 {
-                    if (facility.FacilityType == FacilityType.Airbase)
+                    facility.ClearAllAirUnits();
+
+                    var attachedIds = facility.AttachedUnitIDs;
+                    if (attachedIds?.Count > 0)
                     {
-                        // Clear existing attachments
-                        facility.ClearAllAirUnits();
-
-                        // Get the attached unit IDs (this will now be populated from JSON)
-                        var attachedIds = facility.AttachedUnitIDs;
-
-                        if (attachedIds?.Count > 0)
+                        int reattached = 0;
+                        foreach (string unitId in attachedIds)
                         {
-                            int reattachedCount = 0;
-                            foreach (string unitId in attachedIds)
+                            if (!string.IsNullOrEmpty(unitId) && _combatUnits.TryGetValue(unitId, out var airUnit))
                             {
-                                if (!string.IsNullOrEmpty(unitId) && _combatUnits.TryGetValue(unitId, out var airUnit))
-                                {
-                                    if (facility.AddAirUnit(airUnit))
-                                    {
-                                        reattachedCount++;
-                                    }
-                                }
-                                else
-                                {
-                                    AppService.CaptureUiMessage($"Warning: Could not find air unit {unitId} for reattachment to {facility.UnitName}");
-                                }
+                                if (facility.AddAirUnit(airUnit))
+                                    reattached++;
                             }
-
-                            AppService.CaptureUiMessage($"Reattached {reattachedCount} air units to {facility.UnitName}");
                         }
+
+                        if (reattached > 0)
+                            AppService.CaptureUiMessage($"Reattached {reattached} air units to {facility.UnitName}");
                     }
                 }
 
-                // -------------------------------------------------
-                // 3️  Future caches can be rebuilt here         
-                // -------------------------------------------------
-                // e.g. supply graph, quick lookup dictionaries, etc.
-
-                AppService.CaptureUiMessage("Game data caches rebuilt successfully.");
+                AppService.CaptureUiMessage("Game caches rebuilt successfully");
             }
             catch (Exception e)
             {
                 AppService.HandleException(CLASS_NAME, nameof(RebuildTransientCaches), e);
-                throw; // Re‑throw so calling code can decide how to proceed
+                throw;
             }
         }
 
-        #endregion // Public Methods
+        #endregion // State Management
 
-        #region Private Helper Methods
+        #region Helper Methods
 
         /// <summary>
-        /// Clears all player-related data, including units, leaders, and other associated objects.
+        /// Validates an entity is not null.
         /// </summary>
-        private void ClearPlayerData()
+        private bool ValidateEntity<T>(T entity, string paramName) where T : class
         {
-            var playerUnits = GetPlayerUnits().Select(unit => unit.UnitID).ToList();
-            foreach (var unitId in playerUnits)
+            if (entity == null)
             {
-                UnregisterCombatUnit(unitId);
+                AppService.HandleException(CLASS_NAME, "ValidateEntity",
+                    new ArgumentNullException(paramName));
+                return false;
             }
-
-            var allLeaders = GetAllLeaders().Select(leader => leader.LeaderID).ToList();
-            foreach (var leaderId in allLeaders)
-            {
-                UnregisterLeader(leaderId);
-            }
+            return true;
         }
 
+        #endregion // Helper Methods
+
+        #region Static Database Helpers
+
         /// <summary>
-        /// Calculates a checksum value based on the current state of combat units and leaders.
+        /// Checks if all required databases are initialized.
         /// </summary>
-        private string CalculateChecksum()
+        public static bool AreAllDatabasesInitialized()
         {
             try
             {
-                int checksum = _combatUnits.Count * 17 + _leaders.Count * 23;
-                return Math.Abs(checksum).ToString("X8");
+                return CombatUnitDatabase.IsInitialized &&
+                       WeaponSystemsDatabase.IsInitialized &&
+                       IntelProfileDatabase.IsInitialized;
             }
             catch (Exception e)
             {
-                AppService.HandleException(CLASS_NAME, nameof(CalculateChecksum), e);
-                return "ERROR";
+                AppService.HandleException(CLASS_NAME, nameof(AreAllDatabasesInitialized), e);
+                return false;
             }
         }
-
-        #endregion // Private Helper Methods
-
-        #region Template and Database Access
 
         /// <summary>
         /// Retrieves a combat unit template by its unique identifier.
         /// </summary>
-        /// <param name="templateId">Template identifier string</param>
-        /// <returns>Unit template or null if not found</returns>
         public static CombatUnit GetUnitTemplate(string templateId)
         {
             try
@@ -699,9 +574,6 @@ namespace HammerAndSickle.Controllers
         /// <summary>
         /// Creates a new combat unit instance from template.
         /// </summary>
-        /// <param name="templateId">Template identifier</param>
-        /// <param name="unitName">Name for the new unit instance</param>
-        /// <returns>New CombatUnit instance or null if template not found</returns>
         public static CombatUnit CreateUnitFromTemplate(string templateId, string unitName)
         {
             try
@@ -718,8 +590,6 @@ namespace HammerAndSickle.Controllers
         /// <summary>
         /// Gets all template identifiers for a specific nationality.
         /// </summary>
-        /// <param name="nationality">Nationality to filter by</param>
-        /// <returns>List of template IDs matching nationality</returns>
         public static List<string> GetTemplatesByNationality(Nationality nationality)
         {
             try
@@ -736,8 +606,6 @@ namespace HammerAndSickle.Controllers
         /// <summary>
         /// Gets all template identifiers for a specific unit classification.
         /// </summary>
-        /// <param name="classification">Unit classification to filter by</param>
-        /// <returns>List of template IDs matching classification</returns>
         public static List<string> GetTemplatesByClassification(UnitClassification classification)
         {
             try
@@ -754,8 +622,6 @@ namespace HammerAndSickle.Controllers
         /// <summary>
         /// Checks if a combat unit template exists.
         /// </summary>
-        /// <param name="templateId">Template identifier to check</param>
-        /// <returns>True if template exists</returns>
         public static bool HasUnitTemplate(string templateId)
         {
             try
@@ -772,7 +638,6 @@ namespace HammerAndSickle.Controllers
         /// <summary>
         /// Gets the total number of unit templates currently stored.
         /// </summary>
-        /// <returns>Template count</returns>
         public static int GetTemplateCount()
         {
             try
@@ -789,7 +654,6 @@ namespace HammerAndSickle.Controllers
         /// <summary>
         /// Gets all template identifiers currently stored in the database.
         /// </summary>
-        /// <returns>List of all template IDs</returns>
         public static List<string> GetAllTemplateIds()
         {
             try
@@ -806,8 +670,6 @@ namespace HammerAndSickle.Controllers
         /// <summary>
         /// Retrieves a weapon system profile by its enum identifier.
         /// </summary>
-        /// <param name="weaponSystemID">The weapon system identifier to look up</param>
-        /// <returns>The corresponding WeaponSystemProfile, or null if not found</returns>
         public static WeaponSystemProfile GetWeaponSystemProfile(WeaponSystems weaponSystemID)
         {
             try
@@ -824,7 +686,6 @@ namespace HammerAndSickle.Controllers
         /// <summary>
         /// Gets the total number of weapon system profiles in the database.
         /// </summary>
-        /// <returns>Profile count</returns>
         public static int GetWeaponSystemProfileCount()
         {
             try
@@ -841,8 +702,6 @@ namespace HammerAndSickle.Controllers
         /// <summary>
         /// Checks if a specific intel profile type has been defined in the system.
         /// </summary>
-        /// <param name="profileType">The profile type to check</param>
-        /// <returns>True if the profile type is defined</returns>
         public static bool HasIntelProfile(IntelProfileTypes profileType)
         {
             try
@@ -859,9 +718,6 @@ namespace HammerAndSickle.Controllers
         /// <summary>
         /// Gets the maximum count for a specific weapon system in an intel profile type.
         /// </summary>
-        /// <param name="profileType">The profile type to query</param>
-        /// <param name="weaponSystem">The weapon system to look up</param>
-        /// <returns>Maximum count, or 0 if not found</returns>
         public static int GetIntelWeaponSystemCount(IntelProfileTypes profileType, WeaponSystems weaponSystem)
         {
             try
@@ -878,15 +734,6 @@ namespace HammerAndSickle.Controllers
         /// <summary>
         /// Generates an intelligence report for a unit based on the specified spotted level.
         /// </summary>
-        /// <param name="profileType">Intel profile type</param>
-        /// <param name="unitName">Unit name for the report</param>
-        /// <param name="hitPoints">Current hit points</param>
-        /// <param name="nationality">Unit nationality</param>
-        /// <param name="deploymentPosition">Current deployment state</param>
-        /// <param name="experienceLevel">Unit experience level</param>
-        /// <param name="efficiencyLevel">Unit efficiency level</param>
-        /// <param name="spottedLevel">Intelligence accuracy level</param>
-        /// <returns>IntelReport with unit intelligence data, or null if generation fails</returns>
         public static IntelReport GenerateIntelReport(IntelProfileTypes profileType, string unitName, int hitPoints,
             Nationality nationality, DeploymentPosition deploymentPosition, ExperienceLevel experienceLevel,
             EfficiencyLevel efficiencyLevel, SpottedLevel spottedLevel = SpottedLevel.Level1)
@@ -903,25 +750,6 @@ namespace HammerAndSickle.Controllers
             }
         }
 
-        /// <summary>
-        /// Gets whether all static databases have been successfully initialized.
-        /// </summary>
-        /// <returns>True if all databases are initialized</returns>
-        public static bool AreAllDatabasesInitialized()
-        {
-            try
-            {
-                return CombatUnitDatabase.IsInitialized &&
-                       WeaponSystemsDatabase.IsInitialized &&
-                       IntelProfileDatabase.IsInitialized;
-            }
-            catch (Exception e)
-            {
-                AppService.HandleException(CLASS_NAME, nameof(AreAllDatabasesInitialized), e);
-                return false;
-            }
-        }
-
-        #endregion // Template and Database Access
+        #endregion // Static Database Helpers
     }
 }
