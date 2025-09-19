@@ -14,6 +14,31 @@ using UnityEditor;
 namespace HammerAndSickle.Tools
 {
     /// <summary>
+    /// A flat data representation of a combat unit for serialization to/from OOB files.
+    /// </summary>
+    [Serializable]
+    public class OobUnitData
+    {
+        public string UnitID { get; set; }
+        public string UnitName { get; set; }
+        public string TemplateID { get; set; }
+        public float MapPosX { get; set; }
+        public float MapPosY { get; set; }
+        public Side Side { get; set; }
+        public Nationality Nationality { get; set; }
+        public UnitRole Role { get; set; }
+        public ExperienceLevel Experience { get; set; }
+        public EfficiencyLevel Efficiency { get; set; }
+        public DeploymentPosition Deployment { get; set; }
+        public SpottedLevel Spotted { get; set; }
+        public float ICM { get; set; }
+        public float HitPointsPercent { get; set; }
+        public float SupplyPercent { get; set; }
+        public List<string> AttachedAirUnitIDs { get; set; } = new List<string>();
+    }
+     
+
+    /// <summary>
     /// Unity Editor tool for creating and managing combat units for OOB files.
     /// Only active during play mode to utilize the initialized game systems.
     /// </summary>
