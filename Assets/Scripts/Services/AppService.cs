@@ -393,9 +393,22 @@ namespace HammerAndSickle.Services
         #region Cleanup
 
         /// <summary>
+        /// Shuts down Unity regardless of game state data safety. Performs necessary cleanup.
+        /// Use with caution - may lead to data loss if game state is unsaved.
+        /// </summary>
+        public static void UnityQuit_DataUnsafe()
+        {
+            // Perform cleanup tasks.
+            Shutdown();
+
+            // Quit the application.
+            Application.Quit();
+        }
+
+        /// <summary>
         /// Clears all session data and writes final session log.
         /// </summary>
-        public static void Shutdown()
+        private static void Shutdown()
         {
             try
             {
