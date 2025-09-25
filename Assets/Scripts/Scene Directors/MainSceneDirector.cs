@@ -57,14 +57,6 @@ namespace HammerAndSickle.SceneDirectors
             // Cleanup code
         }
 
-        /// <summary>
-        /// Handles input specific to the main scene.
-        /// </summary>
-        protected override void InputListener()
-        {
-            // Handle input specific to the main scene
-        }
-
         #endregion // Protected Methods
     }
 }

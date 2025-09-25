@@ -9,6 +9,25 @@ using UnityEngine;
 namespace HammerAndSickle.Controllers
 {
     /// <summary>
+    /// General constants used throughout the Hammer & Sickle application.
+    /// </summary>
+    public class GeneralConstants
+    {
+        #region Menu/Dialog IDs
+
+        // Main startup scene menu/dialog IDs
+        public const int DefaultID                   = 0;
+        public const int MainScene_CoreInterface_ID  = 1;
+        public const int MainScene_ContinueDialog_ID = 2;
+        public const int MainScene_CampaignDialog_ID = 3;
+        public const int MainScene_ScenarioDialog_ID = 4;
+        public const int MainScene_OptionsDialog_ID  = 5;
+        public const int MainScene_ExitDialog_ID     = 6;
+
+        #endregion
+    }
+
+    /// <summary>
     /// Central data management system for Hammer & Sickle, managing combat units, 
     /// leaders, and game state with Unity-compliant singleton pattern.
     /// </summary>
