@@ -16,8 +16,11 @@ namespace HammerAndSickle.SceneDirectors
         // Stores registered menus with their IDs
         private Dictionary<int, MenuHandler> menuDictionary = new Dictionary<int, MenuHandler>();
 
+        // Scene core interface menu ID
+        private int _coreInterfaceMenuID = GeneralConstants.DefaultID;
+
         // Currently active menu ID
-        private int _activeMenuID = 0; // Zero is always the default menu.
+        private int _activeMenuID = GeneralConstants.DefaultID;
 
         #endregion //Input State Management
 
@@ -55,11 +58,12 @@ namespace HammerAndSickle.SceneDirectors
         {
             ValidateGameSystems();
             OnSceneInitialize();
-        }
 
-        protected virtual void Update()
-        {
-            InputListener();
+            if (_coreInterfaceMenuID == GeneralConstants.DefaultID)
+            {
+                AppService.HandleException(GetClassName(), nameof(Start),
+                    new Exception("Core interface not set after initialization"));
+            }
         }
 
         protected virtual void OnDestroy()
@@ -72,40 +76,92 @@ namespace HammerAndSickle.SceneDirectors
         #region Public Methods
 
         /// <summary>
-        /// Activates the menu corresponding to the specified menu ID and deactivates the currently active menu.
+        /// Sets the core interface by assigning a menu ID and registering the associated menu handler.
         /// </summary>
-        /// <remarks>If the specified menu is already active, the method returns immediately without
-        /// making any changes. If the currently active menu or the specified menu cannot be found in the menu
-        /// dictionary, an exception is logged.</remarks>
-        /// <param name="menuID">The unique identifier of the menu to activate. Must correspond to a valid menu in the menu dictionary.</param>
+        /// <param name="menuID">The unique identifier for the core interface menu.</param>
+        /// <param name="menuHandler">The <see cref="MenuHandler"/> instance responsible for handling the core interface menu.</param>
+        public void SetCoreInterface(int menuID, MenuHandler menuHandler)
+        {
+            // Set the core interface ID.
+            _coreInterfaceMenuID = menuID;
+
+            // Initialize the interface.
+            menuHandler.Initialize(menuID, true);
+
+            // Register the menu.
+            RegisterMenu(menuHandler);
+
+            // Set as the active menu.
+            _activeMenuID = menuID;
+        }
+
+        /// <summary>
+        /// Activates the menu corresponding to the specified menu ID and manages focus/visibility states.
+        /// Core interface remains visible but loses focus when other menus activate.
+        /// </summary>
+        /// <param name="menuID">The unique identifier of the menu to activate.</param>
         public void SetActiveMenuByID(int menuID)
         {
             try
             {
                 // Check if the requested menu is already active
-                if (_activeMenuID == menuID) return; // Already active
+                if (_activeMenuID == menuID) return;
 
-                // Get the active menu if it exists
-                bool result = menuDictionary.TryGetValue(_activeMenuID, out MenuHandler menu);
-                if (result)
+                // Validate the new menu exists
+                if (!menuDictionary.TryGetValue(menuID, out MenuHandler newMenu))
                 {
-                    // Deactivate the currently active menu
-                    menu.SetInactive();
+                    throw new Exception($"Menu with ID {menuID} not found in the menu dictionary.");
                 }
-                else throw new Exception($"Active menu with ID {_activeMenuID} not found in the menu dictionary.");
 
-                // Activate the new menu if it exists
-                result = menuDictionary.TryGetValue(menuID, out menu);
-                if (result)
+                // Handle the currently active menu
+                if (_activeMenuID != GeneralConstants.DefaultID)
                 {
-                    menu.SetActive();
-                    _activeMenuID = menuID;
+                    if (menuDictionary.TryGetValue(_activeMenuID, out MenuHandler currentMenu))
+                    {
+                        currentMenu.Hide();
+                    }
+                    // If current menu not found, log but continue (non-fatal)
+                    else
+                    {
+                        AppService.HandleException(GetClassName(), nameof(SetActiveMenuByID),
+                            new Exception($"Current active menu with ID {_activeMenuID} not found. Continuing with activation."));
+                    }
                 }
-                else throw new Exception($"Menu with ID {menuID} not found in the menu dictionary.");
+
+                // Remove focus from all menus first (ensures single focus)
+                foreach (var menu in menuDictionary.Values)
+                {
+                    menu.IsInputFocus = false;
+                }
+
+                // Activate the new menu
+                newMenu.Show();
+                _activeMenuID = menuID;
+
+                // If activating core interface, ensure no other menus are visible
+                if (menuID == _coreInterfaceMenuID)
+                {
+                    foreach (var kvp in menuDictionary)
+                    {
+                        if (kvp.Key != _coreInterfaceMenuID && kvp.Value.IsVisible)
+                        {
+                            kvp.Value.Hide();
+                        }
+                    }
+                }
             }
             catch (Exception e)
             {
                 AppService.HandleException(GetClassName(), nameof(SetActiveMenuByID), e);
+
+                // Fallback: try to activate core interface if available
+                if (_coreInterfaceMenuID != GeneralConstants.DefaultID &&
+                    _coreInterfaceMenuID != menuID &&
+                    menuDictionary.ContainsKey(_coreInterfaceMenuID))
+                {
+                    _activeMenuID = _coreInterfaceMenuID;
+                    menuDictionary[_coreInterfaceMenuID].IsInputFocus = true;
+                }
             }
         }
 
@@ -114,7 +170,6 @@ namespace HammerAndSickle.SceneDirectors
         #region Protected Methods
 
         protected abstract void SetupSingleton();
-        protected abstract void InputListener();
 
         protected virtual void ValidateGameSystems()
         {
@@ -143,52 +198,82 @@ namespace HammerAndSickle.SceneDirectors
     {
         #region Fields
 
-        private int _menuID;
+        private int _menuID           = GeneralConstants.DefaultID;
+        private bool _isCoreInterface = false;
+        private bool _isVisible       = false;
+        private bool _isInputFocus    = false;
+        private bool _isInitialized   = false;
 
         #endregion // Fields
 
         #region Properties
 
-        public bool IsActive { get; private set; } = false;
-        public int MenuID => _menuID;
+        public int MenuID { get => _menuID; private set => _menuID = value; }
+
+        public bool IsCoreInterface { get => _isCoreInterface; private set => _isCoreInterface = value; }
+
+        public bool IsVisible { get => _isVisible; protected set => _isVisible = value; }
+
+        public bool IsInputFocus { get => _isInputFocus; set => _isInputFocus = value; }
+
+        public bool IsInitialized { get => _isInitialized; private set => _isInitialized = value; }
 
         #endregion // Properties
 
-        #region Abstract Methods
-
-        public abstract void ActivateMenu();
-        public abstract void DeactivateMenu();
-
-        #endregion // Abstract Methods
-
         #region Public Methods
 
-        /// <summary>
-        /// Sets the menu ID. Must be called before registering with SceneDirector.
-        /// </summary>
-        public void SetMenuID(int menuID)
+        public void Initialize(int menuID, bool isCore)
         {
-            _menuID = menuID;
+            MenuID = menuID;
+            IsCoreInterface = isCore;
+
+            // Set the core interface to be always visible and current input focus.
+            if (IsCoreInterface)
+            {
+                IsVisible = true;
+                IsInputFocus = true;
+            }
+
+            IsInitialized = true;
         }
 
-        /// <summary>
-        /// Set the menu state to active and calls the ActivateMenu method.
-        /// </summary>
-        public void SetActive()
+        public void Show()
         {
-            IsActive = true;
-            ActivateMenu();
+            // Show the menu.
+            ShowMenu();
+
+            // Set visibility and input focus.
+            IsVisible = true;
+            IsInputFocus = true;
         }
 
-        /// <summary>
-        /// Marks the object as inactive and performs any necessary deactivation actions.
-        /// </summary>
-        public void SetInactive()
+        public void Hide()
         {
-            IsActive = false;
-            DeactivateMenu();
+            // Check if this is the core interface first.
+            if (IsCoreInterface)
+            {
+                // Core interface menus cannot be hidden, only lose input focus.
+                IsInputFocus = false;
+                IsVisible = true;
+            }
+            else
+            {
+                // Hide the menu.
+                HideMenu();
+
+                // Clear visibility and input focus.
+                IsVisible = false;
+                IsInputFocus = false;
+            }
         }
 
-        #endregion
+        #endregion // Public Methods
+
+        #region Abstract Methods
+
+        public abstract void ShowMenu();
+        public abstract void HideMenu();
+
+        #endregion // Abstract Methods
     }
 }
