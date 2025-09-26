@@ -2,6 +2,7 @@ using HammerAndSickle.Controllers;
 using HammerAndSickle.Services;
 using System;
 using UnityEngine;
+using UnityEngine.UI;
 
 namespace HammerAndSickle.SceneDirectors
 {
@@ -12,10 +13,6 @@ namespace HammerAndSickle.SceneDirectors
         public static MainSceneDirector Instance { get; private set; }
 
         #endregion // Singleton Instance
-
-
-
-
 
         #region Protected Methods
 
@@ -44,7 +41,9 @@ namespace HammerAndSickle.SceneDirectors
         /// </summary>
         protected override void OnSceneInitialize()
         {
-            // Main scene specific initialization
+            // Provide ID to core interface and register.
+            MainSceneCoreInterface.Instance.Initialize(GeneralConstants.MainScene_CoreInterface_ID, true);
+            RegisterCoreInterface(GeneralConstants.MainScene_CoreInterface_ID, MainSceneCoreInterface.Instance);
         }
 
         /// <summary>
