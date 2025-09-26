@@ -32,21 +32,6 @@ namespace HammerAndSickle.SceneDirectors
 
         #endregion // Abstract Methods
 
-        #region Input Control Methods
-
-        /// <summary>
-        /// Registers a menu with the scene director.
-        /// </summary>
-        public void RegisterMenu(MenuHandler menu)
-        {
-            if (!menuDictionary.ContainsKey(menu.MenuID))
-            {
-                menuDictionary.Add(menu.MenuID, menu);
-            }
-        }
-
-        #endregion // Input Control Methods
-
         #region Unity Lifecycle
 
         protected virtual void Awake()
@@ -73,14 +58,23 @@ namespace HammerAndSickle.SceneDirectors
 
         #endregion // Unity Lifecycle
 
-        #region Public Methods
+        #region Registration Methods
 
         /// <summary>
-        /// Sets the core interface by assigning a menu ID and registering the associated menu handler.
+        /// Registers a menu with the scene director.
         /// </summary>
-        /// <param name="menuID">The unique identifier for the core interface menu.</param>
-        /// <param name="menuHandler">The <see cref="MenuHandler"/> instance responsible for handling the core interface menu.</param>
-        public void SetCoreInterface(int menuID, MenuHandler menuHandler)
+        public void RegisterMenu(MenuHandler menu)
+        {
+            if (!menuDictionary.ContainsKey(menu.MenuID))
+            {
+                menuDictionary.Add(menu.MenuID, menu);
+            }
+        }
+
+        /// <summary>
+        /// Register the core interface menu.
+        /// </summary>
+        public void RegisterCoreInterface(int menuID, MenuHandler menuHandler)
         {
             // Set the core interface ID.
             _coreInterfaceMenuID = menuID;
@@ -94,6 +88,10 @@ namespace HammerAndSickle.SceneDirectors
             // Set as the active menu.
             _activeMenuID = menuID;
         }
+
+        #endregion // Registration
+
+        #region Public Methods
 
         /// <summary>
         /// Activates the menu corresponding to the specified menu ID and manages focus/visibility states.
@@ -194,29 +192,19 @@ namespace HammerAndSickle.SceneDirectors
     /// <summary>
     /// This class serves as a base for handling menu activation and deactivation.
     /// </summary>
-    public abstract class MenuHandler
+    public abstract class MenuHandler : MonoBehaviour
     {
-        #region Fields
-
-        private int _menuID           = GeneralConstants.DefaultID;
-        private bool _isCoreInterface = false;
-        private bool _isVisible       = false;
-        private bool _isInputFocus    = false;
-        private bool _isInitialized   = false;
-
-        #endregion // Fields
-
         #region Properties
 
-        public int MenuID { get => _menuID; private set => _menuID = value; }
+        public int MenuID { get; private set; }
 
-        public bool IsCoreInterface { get => _isCoreInterface; private set => _isCoreInterface = value; }
+        public bool IsCoreInterface { get; private set; }
 
-        public bool IsVisible { get => _isVisible; protected set => _isVisible = value; }
+        public bool IsVisible { get; protected set; }
 
-        public bool IsInputFocus { get => _isInputFocus; set => _isInputFocus = value; }
+        public bool IsInputFocus { get; set; }
 
-        public bool IsInitialized { get => _isInitialized; private set => _isInitialized = value; }
+        public bool IsInitialized { get; private set; }
 
         #endregion // Properties
 
@@ -227,7 +215,7 @@ namespace HammerAndSickle.SceneDirectors
             MenuID = menuID;
             IsCoreInterface = isCore;
 
-            // Set the core interface to be always visible and current input focus.
+            // Default settings for the core interface.
             if (IsCoreInterface)
             {
                 IsVisible = true;
@@ -239,41 +227,45 @@ namespace HammerAndSickle.SceneDirectors
 
         public void Show()
         {
-            // Show the menu.
-            ShowMenu();
-
             // Set visibility and input focus.
             IsVisible = true;
             IsInputFocus = true;
+            ToggleMenu();
         }
 
         public void Hide()
         {
-            // Check if this is the core interface first.
-            if (IsCoreInterface)
-            {
-                // Core interface menus cannot be hidden, only lose input focus.
-                IsInputFocus = false;
-                IsVisible = true;
-            }
-            else
-            {
-                // Hide the menu.
-                HideMenu();
-
-                // Clear visibility and input focus.
-                IsVisible = false;
-                IsInputFocus = false;
-            }
+            IsInputFocus = false;
+            IsVisible = !IsCoreInterface;  // Core stays visible, others don't
+            ToggleMenu();
         }
 
         #endregion // Public Methods
 
         #region Abstract Methods
 
-        public abstract void ShowMenu();
-        public abstract void HideMenu();
+        public abstract void ToggleMenu();
+        public abstract void SetupSingleton();
 
         #endregion // Abstract Methods
+
+        #region Virtual Methods
+
+        public virtual void Awake()
+        {
+            SetupSingleton();
+        }
+
+        public virtual void Start()
+        {
+
+        }
+
+        public virtual void Update()
+        {
+
+        }
+
+        #endregion // Virtual Methods
     }
 }
