@@ -3,7 +3,7 @@ using UnityEngine.EventSystems;
 using UnityEngine.UI;
 using System.Collections;
 
-namespace HammerAndSickle.Core
+namespace HammerAndSickle.Core.UI
 {
     /// <summary>
     /// Provides smooth scale animation for UI buttons on hover.

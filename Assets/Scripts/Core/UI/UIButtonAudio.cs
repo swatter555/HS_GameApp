@@ -3,7 +3,7 @@ using UnityEngine.EventSystems;
 using UnityEngine.UI;
 using HammerAndSickle.Controllers;
 
-namespace HammerAndSickle.UI
+namespace HammerAndSickle.Core.UI
 {
     /// <summary>
     /// Provides audio feedback for UI button interactions with customizable sounds
