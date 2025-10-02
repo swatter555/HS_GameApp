@@ -1,6 +1,6 @@
 using HammerAndSickle.Services;
 using System;
-using UnityEngine;
+using HammerAndSickle.Core.GameData;
 
 namespace HammerAndSickle.Models
 {

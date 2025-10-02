@@ -35,7 +35,7 @@ namespace HammerAndSickle.Core.UI
 
         #region Private Fields
 
-        private List<GameObject> _listItems = new List<GameObject>();
+        private readonly List<GameObject> _listItems = new();
         private int _selectedIndex = -1;
         private GameObject _currentSelectedRow = null;
 
@@ -152,8 +152,7 @@ namespace HammerAndSickle.Core.UI
             }
 
             // Check for VerticalLayoutGroup on content
-            VerticalLayoutGroup layoutGroup = scrollViewContent.GetComponent<VerticalLayoutGroup>();
-            if (layoutGroup == null)
+            if (!scrollViewContent.TryGetComponent<VerticalLayoutGroup>(out _))
             {
                 AppService.CaptureUiMessage("Warning: scrollViewContent missing VerticalLayoutGroup component.");
             }
@@ -176,7 +175,7 @@ namespace HammerAndSickle.Core.UI
         private void CreateListRow(string text, int index)
         {
             // Create row GameObject
-            GameObject rowObj = new GameObject($"Row_{index}");
+            GameObject rowObj = new($"Row_{index}");
             rowObj.transform.SetParent(scrollViewContent, false);
 
             // Add and configure Image component
@@ -192,7 +191,7 @@ namespace HammerAndSickle.Core.UI
             rowRect.sizeDelta = new Vector2(0, 30); // Height of 30, width matches parent
 
             // Create text child
-            GameObject textObj = new GameObject("Text");
+            GameObject textObj = new ("Text");
             textObj.transform.SetParent(rowObj.transform, false);
 
             TMP_Text textComponent = textObj.AddComponent<TextMeshProUGUI>();
@@ -231,8 +230,7 @@ namespace HammerAndSickle.Core.UI
                 // Restore previous selection to even/odd background
                 if (_currentSelectedRow != null && _selectedIndex >= 0)
                 {
-                    Image previousImage = _currentSelectedRow.GetComponent<Image>();
-                    if (previousImage != null)
+                    if (_currentSelectedRow.TryGetComponent<Image>(out Image previousImage))
                     {
                         previousImage.sprite = (_selectedIndex % 2 == 0) ? evenLineImage : oddLineImage;
                     }
@@ -242,8 +240,7 @@ namespace HammerAndSickle.Core.UI
                 _selectedIndex = index;
                 _currentSelectedRow = _listItems[index];
 
-                Image selectedImage = _currentSelectedRow.GetComponent<Image>();
-                if (selectedImage != null)
+                if (_currentSelectedRow.TryGetComponent<Image>(out Image selectedImage))
                 {
                     selectedImage.sprite = selectedLineImage;
                 }

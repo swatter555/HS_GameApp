@@ -1,7 +1,7 @@
 using System;
 using System.Text.Json.Serialization;
-using HammerAndSickle.Legacy.Map;
 using HammerAndSickle.Services;
+using HammerAndSickle.Core.GameData;
 
 namespace HammerAndSickle.Models.Map
 {

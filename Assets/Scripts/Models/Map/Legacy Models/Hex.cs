@@ -2,7 +2,7 @@ using System;
 using System.Collections.Generic;
 using UnityEngine;
 using HammerAndSickle.Services;
-using HammerAndSickle.Models.Map;
+using HammerAndSickle.Core.GameData;
 
 namespace HammerAndSickle.Legacy.Map
 {

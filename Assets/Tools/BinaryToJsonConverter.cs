@@ -8,6 +8,7 @@ using HammerAndSickle.Services;
 using HammerAndSickle.Models.Map;
 using HammerAndSickle.Utils;
 using System.Text.Json;
+using HammerAndSickle.Core.GameData;
 
 #if UNITY_EDITOR
 using UnityEditor;
@@ -27,7 +28,7 @@ namespace HammerAndSickle.Tools
         private const string HSM_EXTENSION = ".hsm";
         private const string MAP_EXTENSION = ".map";
         private static readonly char[] INVALID_FILENAME_CHARS = Path.GetInvalidFileNameChars();
-        private static readonly string CONVERTED_FILES_FOLDER = Path.Combine(Application.dataPath, "Converted Files");
+        private static readonly string CONVERTED_FILES_FOLDER = Path.Combine(Application.dataPath, "Generated Data/map");
 
         #endregion // Constants
 

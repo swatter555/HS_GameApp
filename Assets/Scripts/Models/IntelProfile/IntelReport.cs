@@ -1,4 +1,6 @@
-﻿namespace HammerAndSickle.Models
+﻿using HammerAndSickle.Core.GameData;
+
+namespace HammerAndSickle.Models
 {
     public class IntelReport
     {

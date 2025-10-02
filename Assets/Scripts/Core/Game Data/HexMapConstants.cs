@@ -1,6 +1,6 @@
 using UnityEngine;
 
-namespace HammerAndSickle.Models.Map
+namespace HammerAndSickle.Core.GameData
 {
     /// <summary>
     /// Constants for the hex map.

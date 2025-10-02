@@ -2,6 +2,7 @@
 using System.Text.Json.Serialization;
 using UnityEngine;
 using HammerAndSickle.Services;
+using HammerAndSickle.Core.GameData;
 
 namespace HammerAndSickle.Models
 {

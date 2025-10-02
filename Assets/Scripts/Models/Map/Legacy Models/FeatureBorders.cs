@@ -1,6 +1,6 @@
 using System;
 using System.Linq;
-using HammerAndSickle.Models.Map;
+using HammerAndSickle.Core.GameData;
 
 namespace HammerAndSickle.Legacy.Map
 { 

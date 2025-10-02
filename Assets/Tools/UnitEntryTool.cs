@@ -6,6 +6,7 @@ using System.Text.Json;
 using UnityEngine;
 using HammerAndSickle.Models;
 using HammerAndSickle.Controllers;
+using HammerAndSickle.Core.GameData;
 #if UNITY_EDITOR
 using UnityEditor;
 #endif
@@ -109,7 +110,7 @@ namespace HammerAndSickle.Tools
         [SerializeField] public bool showGUI = false;
 
         // Constants
-        private const string SAVE_DIRECTORY = "Assets/Data Files/oob";
+        private const string SAVE_DIRECTORY = "Assets/Generated Data/oob";
         private const int WINDOW_WIDTH = 1000;
         private const int WINDOW_HEIGHT = 1200;
 

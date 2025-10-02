@@ -86,14 +86,12 @@ namespace HammerAndSickle.Services
         // Cached paths
         private static string _mainAppPath;
         private static string _scenariosPath;
+        private static string _manifestsPath;
         private static string _mapPath;
         private static string _oobPath;
         private static string _aiiPath;
         private static string _brfPath;
-        private static string _cmpPath;
         private static string _logsPath;
-        private static string _exportsPath;
-        private static string _backupsPath;
 
         // Session data
         private static readonly List<ExceptionEntry> _exceptions = new();
@@ -117,58 +115,46 @@ namespace HammerAndSickle.Services
                         MyGamesFolderName, MainAppFolderName));
 
         /// <summary>
-        /// Path to scenario storage: Documents/My Games/Hammer and Sickle/scenarios/
+        /// Path to scenario storage: Documents/My Games/Hammer and Sickle/scenario data/
         /// </summary>
-        public static string ScenariosPath => GetOrCreatePath(ref _scenariosPath,
-            Path.Combine(MainAppPath, "scenario"));
+        public static string ScenarioDataPath => GetOrCreatePath(ref _scenariosPath,
+            Path.Combine(MainAppPath, "scenario data"));
+
+        /// <summary>
+        /// Gets the file system path to the directory where manifests are stored.
+        /// </summary>
+        public static string ManifestsPath => GetOrCreatePath(ref _manifestsPath,
+            Path.Combine(ScenarioDataPath, "manifests"));
 
         /// <summary>
         /// Gets the file system path to the directory where map files are stored.
         /// </summary>
         public static string MapPath => GetOrCreatePath(ref _mapPath,
-            Path.Combine(MainAppPath, "map"));
+            Path.Combine(ScenarioDataPath, "map"));
 
         /// <summary>
         /// Gets the file system path to the "Order of Battle" (OOB) directory, creating it if it does not already exist.
         /// </summary>
         public static string OobPath => GetOrCreatePath(ref _oobPath,
-            Path.Combine(MainAppPath, "oob"));
+            Path.Combine(ScenarioDataPath, "oob"));
 
         /// <summary>
         /// Gets the file system path to the "aii" directory within the main application path.
         /// </summary>
         public static string AiiPath => GetOrCreatePath(ref _aiiPath,
-            Path.Combine(MainAppPath, "aii"));
+            Path.Combine(ScenarioDataPath, "aii"));
 
         /// <summary>
         /// Gets the file system path to the "brf" directory within the main application path.
         /// </summary>
         public static string BrfPath => GetOrCreatePath(ref _brfPath,
-            Path.Combine(MainAppPath, "brf"));
-
-        /// <summary>
-        /// Gets the path to the "cmp" directory, creating it if it does not already exist.
-        /// </summary>
-        public static string CmpPath => GetOrCreatePath(ref _cmpPath,
-            Path.Combine(MainAppPath, "cmp"));
+            Path.Combine(ScenarioDataPath, "brf"));
 
         /// <summary>
         /// Path to log files: Documents/My Games/Hammer and Sickle/logs/
         /// </summary>
         public static string LogsPath => GetOrCreatePath(ref _logsPath,
             Path.Combine(MainAppPath, "logs"));
-
-        /// <summary>
-        /// Path to exported content: Documents/My Games/Hammer and Sickle/exports/
-        /// </summary>
-        public static string ExportsPath => GetOrCreatePath(ref _exportsPath,
-            Path.Combine(MainAppPath, "exports"));
-
-        /// <summary>
-        /// Path to backup files: Documents/My Games/Hammer and Sickle/backups/
-        /// </summary>
-        public static string BackupsPath => GetOrCreatePath(ref _backupsPath,
-            Path.Combine(MainAppPath, "backups"));
 
         /// <summary>
         /// Most recent UI message captured. Returns null if no message exists.
