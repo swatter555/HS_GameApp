@@ -5,6 +5,7 @@ using System.Linq;
 using System.Text.Json.Serialization;
 using HammerAndSickle.Services;
 using UnityEngine;
+using HammerAndSickle.Core.GameData;
 
 namespace HammerAndSickle.Models.Map
 {

@@ -5,6 +5,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
+using HammerAndSickle.Core.GameData;
 
 namespace HammerAndSickle.Controllers
 {
@@ -66,7 +67,7 @@ namespace HammerAndSickle.Controllers
                     // Create new instance if none exists
                     if (_instance == null)
                     {
-                        GameObject go = new GameObject("GameDataManager");
+                        GameObject go = new ("GameDataManager");
                         _instance = go.AddComponent<GameDataManager>();
                     }
                 }

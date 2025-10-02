@@ -1,8 +1,8 @@
 using System;
 using System.Collections.Generic;
-using HammerAndSickle.Models;
 using HammerAndSickle.Services;
 using UnityEngine;
+using HammerAndSickle.Core.GameData;
 
 namespace HammerAndSickle.Models.Map
 {
@@ -25,22 +25,22 @@ namespace HammerAndSickle.Models.Map
         // Direction vectors for pointy-top, odd-r hex system
         private static readonly Vector2Int[] EvenRowDirections = new Vector2Int[]
         {
-            new Vector2Int(-1, -1), // NW
-            new Vector2Int(0, -1),  // NE  
-            new Vector2Int(1, 0),   // E
-            new Vector2Int(0, 1),   // SE
-            new Vector2Int(-1, 1),  // SW
-            new Vector2Int(-1, 0)   // W
+            new (-1, -1), // NW
+            new (0, -1),  // NE  
+            new (1, 0),   // E
+            new (0, 1),   // SE
+            new (-1, 1),  // SW
+            new (-1, 0)   // W
         };
 
         private static readonly Vector2Int[] OddRowDirections = new Vector2Int[]
         {
-            new Vector2Int(0, -1),  // NW
-            new Vector2Int(1, -1),  // NE
-            new Vector2Int(1, 0),   // E
-            new Vector2Int(1, 1),   // SE
-            new Vector2Int(0, 1),   // SW
-            new Vector2Int(-1, 0)   // W
+            new (0, -1),  // NW
+            new (1, -1),  // NE
+            new (1, 0),   // E
+            new (1, 1),   // SE
+            new (0, 1),   // SW
+            new (-1, 0)   // W
         };
 
         #endregion // Constants

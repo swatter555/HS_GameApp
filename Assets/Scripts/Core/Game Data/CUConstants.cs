@@ -1,6 +1,6 @@
 ﻿using System.Collections.Generic;
 
-namespace HammerAndSickle.Models
+namespace HammerAndSickle.Core.GameData
 {
     public class CUConstants
     {

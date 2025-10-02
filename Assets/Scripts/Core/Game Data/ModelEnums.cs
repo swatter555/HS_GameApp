@@ -1,6 +1,6 @@
 using System;
 
-namespace HammerAndSickle.Models
+namespace HammerAndSickle.Core.GameData
 {
     #region CombatUnit Enums
 

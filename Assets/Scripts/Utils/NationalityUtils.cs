@@ -1,4 +1,4 @@
-﻿using HammerAndSickle.Models;
+﻿using HammerAndSickle.Core.GameData;
 using System.Collections.Generic;
 
 namespace HammerAndSickle.Utils

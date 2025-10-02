@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using UnityEngine;
+using HammerAndSickle.Core.GameData;
 
 namespace HammerAndSickle.Services
 {
@@ -262,7 +263,7 @@ namespace HammerAndSickle.Services
         /// </summary>
         /// <param name="nationality">The nationality to generate a name for</param>
         /// <returns>A full name string (first and last name)</returns>
-        public string GenerateMaleName(Models.Nationality nationality)
+        public string GenerateMaleName(Nationality nationality)
         {
             if (!IsInitialized)
             {
@@ -292,7 +293,7 @@ namespace HammerAndSickle.Services
         /// </summary>
         /// <param name="nationality">The nationality to generate a name for</param>
         /// <returns>A first name string</returns>
-        public string GenerateMaleFirstName(Models.Nationality nationality)
+        public string GenerateMaleFirstName(Nationality nationality)
         {
             if (!IsInitialized)
             {
@@ -321,7 +322,7 @@ namespace HammerAndSickle.Services
         /// </summary>
         /// <param name="nationality">The nationality to generate a name for</param>
         /// <returns>A last name string</returns>
-        public string GenerateLastName(Models.Nationality nationality)
+        public string GenerateLastName(Nationality nationality)
         {
             if (!IsInitialized)
             {
@@ -354,17 +355,17 @@ namespace HammerAndSickle.Services
         /// </summary>
         /// <param name="nationality">The nationality to get names for</param>
         /// <returns>A list of first names appropriate for the nationality</returns>
-        private List<string> GetMaleFirstNameList(Models.Nationality nationality)
+        private List<string> GetMaleFirstNameList(Nationality nationality)
         {
             return nationality switch
             {
-                Models.Nationality.USSR => russianMaleFirstNames,
-                Models.Nationality.USA => usMaleFirstNames,
-                Models.Nationality.UK => ukMaleFirstNames,
-                Models.Nationality.FRG => germanMaleFirstNames,
-                Models.Nationality.FRA => frenchMaleFirstNames,
-                Models.Nationality.IR or Models.Nationality.IQ or Models.Nationality.SAUD => arabicMaleFirstNames,
-                Models.Nationality.MJ => russianMaleFirstNames,// Default to Russian for "MJ" (assuming this is mostly Russian)
+                Nationality.USSR => russianMaleFirstNames,
+                Nationality.USA => usMaleFirstNames,
+                Nationality.UK => ukMaleFirstNames,
+                Nationality.FRG => germanMaleFirstNames,
+                Nationality.FRA => frenchMaleFirstNames,
+                Nationality.IR or Nationality.IQ or Nationality.SAUD => arabicMaleFirstNames,
+                Nationality.MJ => russianMaleFirstNames,// Default to Russian for "MJ" (assuming this is mostly Russian)
                 _ => russianMaleFirstNames,// Default to Russian names
             };
         }
@@ -374,17 +375,17 @@ namespace HammerAndSickle.Services
         /// </summary>
         /// <param name="nationality">The nationality to get names for</param>
         /// <returns>A list of last names appropriate for the nationality</returns>
-        private List<string> GetLastNameList(Models.Nationality nationality)
+        private List<string> GetLastNameList(Nationality nationality)
         {
             return nationality switch
             {
-                Models.Nationality.USSR => russianLastNames,
-                Models.Nationality.USA => usLastNames,
-                Models.Nationality.UK => ukLastNames,
-                Models.Nationality.FRG => germanLastNames,
-                Models.Nationality.FRA => frenchLastNames,
-                Models.Nationality.IR or Models.Nationality.IQ or Models.Nationality.SAUD => ArabicLastNames,
-                Models.Nationality.MJ => russianLastNames,// Default to Russian for "MJ" (assuming this is mostly Russian)
+                Nationality.USSR => russianLastNames,
+                Nationality.USA => usLastNames,
+                Nationality.UK => ukLastNames,
+                Nationality.FRG => germanLastNames,
+                Nationality.FRA => frenchLastNames,
+                Nationality.IR or Nationality.IQ or Nationality.SAUD => ArabicLastNames,
+                Nationality.MJ => russianLastNames,// Default to Russian for "MJ" (assuming this is mostly Russian)
                 _ => russianLastNames,// Default to Russian names
             };
         }

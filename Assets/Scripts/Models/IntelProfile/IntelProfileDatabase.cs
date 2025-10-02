@@ -1,6 +1,7 @@
 ﻿using HammerAndSickle.Services;
 using System;
 using System.Collections.Generic;
+using HammerAndSickle.Core.GameData;
 
 namespace HammerAndSickle.Models
 {
