@@ -1,28 +1,29 @@
 using HammerAndSickle.Services;
 using UnityEngine;
 using UnityEngine.UI;
+using HammerAndSickle.Controllers;
 
 namespace HammerAndSickle.SceneDirectors
 {
     /// <summary>
     /// Main scene core interface menu handler.
     /// </summary>
-    public class MainScene_ScenarioDialog : MenuHandler
+    public class MainScene_ScenarioDialogInterface : MenuHandler
     {
         #region Singleton Instance
 
-        public static MainScene_ScenarioDialog Instance { get; private set; }
+        public static MainScene_ScenarioDialogInterface Instance { get; private set; }
 
         #endregion // Singleton Instance
 
         #region Control Fields
 
         // UI Controls
+        [SerializeField] private GameObject dialogObject;
         [SerializeField] private Button _loadButton;
         [SerializeField] private Button _randomButton;
         [SerializeField] private Button _exitButton;
         
-
         #endregion // Control Fields
 
         #region Overrides
@@ -30,6 +31,8 @@ namespace HammerAndSickle.SceneDirectors
         public override void ToggleMenu()
         {
             // Set active state and interactivity based on visibility and input focus.
+            if (IsVisible && IsInputFocus) dialogObject.SetActive(true);
+            else dialogObject.SetActive(false);
 
             // Continue button
             if (_loadButton != null)
@@ -53,13 +56,22 @@ namespace HammerAndSickle.SceneDirectors
             }
         }
 
+        public override void Awake()
+        {
+            base.Awake();
+
+            // Set the dialog ID.
+            Initialize(GeneralConstants.MainScene_ScenarioDialog_ID, false);
+        }
+
         public override void Start()
         {
+            // Make sure buttons are valid.
             if (_loadButton == null ||
                 _randomButton == null ||
                 _exitButton == null)
             {
-                AppService.HandleException(GetType().Name, nameof(Start), new System.Exception("MainSceneCoreInterface control invalid"));
+                AppService.HandleException(GetType().Name, nameof(Start), new System.Exception("MainScene_ScenarioDialogInterface control invalid"));
                 AppService.UnityQuit_DataUnsafe(); // Consider adding a Datasafe quit option
             }
         }
@@ -94,8 +106,8 @@ namespace HammerAndSickle.SceneDirectors
 
         public void OnExitButton()
         {
-            // Start new scenario logic
-            Debug.Log("exit button pressed.");
+            // Return to the main interface.
+            MainSceneDirector.Instance.SetActiveMenuByID(GeneralConstants.MainScene_CoreInterface_ID);
         }
 
         #endregion // Callbacks
