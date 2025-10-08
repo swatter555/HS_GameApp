@@ -165,6 +165,50 @@ namespace HammerAndSickle.Core.GameData
             return Path.Combine(AppService.BrfPath, briefingFilename);
         }
 
+        /// <summary>
+        /// Retrieves the full file path for the GDP (generated data path) map file, for campaign scenarios.
+        /// </summary>
+        public string GetMapFilePath_GDP()
+        {             
+            if (string.IsNullOrWhiteSpace(mapFilename))
+                return string.Empty;
+            
+            return Path.Combine(AppService.GDP_MapPath, mapFilename);
+        }
+
+        /// <summary>
+        /// Retrieves the full file path for the GDP OOB file, for campaign scenarios.
+        /// </summary>
+        public string GetOobFilePath_GDP()
+        {
+            if (string.IsNullOrWhiteSpace(oobFilename))
+                return string.Empty;
+
+            return Path.Combine(AppService.GDP_OobPath, oobFilename);
+        }
+
+        /// <summary>
+        /// Retrieves the full file path for the GDP AII file, for campaign scenarios.
+        /// </summary>
+        public string GetAiiFilePath_GDP()
+        {
+            if (string.IsNullOrWhiteSpace(aiiFilename))
+                return string.Empty;
+
+            return Path.Combine(AppService.GDP_AiiPath, aiiFilename);
+        }
+
+        /// <summary>
+        /// Retrieves the full file path for the GDP briefing file, for campaign scenarios.
+        /// </summary>
+        public string GetBriefingFilePath_GDP()
+        {
+            if (string.IsNullOrWhiteSpace(briefingFilename))
+                return string.Empty;
+
+            return Path.Combine(AppService.GDP_BrfPath, briefingFilename);
+        }
+
         #endregion // Public Methods
     }
 }

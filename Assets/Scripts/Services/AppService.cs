@@ -108,6 +108,11 @@ namespace HammerAndSickle.Services
         #region Properties
 
         /// <summary>
+        /// Gets the path to the application's "Assets" folder.
+        /// </summary>
+        public static string InteralAssetsPath => Application.dataPath;
+
+        /// <summary>
         /// Path to the main application folder: Documents/My Games/Hammer and Sickle/
         /// </summary>
         public static string MainAppPath => GetOrCreatePath(ref _mainAppPath,
@@ -121,32 +126,26 @@ namespace HammerAndSickle.Services
             Path.Combine(MainAppPath, "scenario data"));
 
         /// <summary>
-        /// Gets the file system path to the directory where manifests are stored.
+        /// This is the path to the directory where generated data files are stored.
         /// </summary>
+        public static string GeneratedDataPath => Path.Combine(InteralAssetsPath, "Generated Data");
+
+        // File paths for campaign scenario data.
+        public static string GDP_ManifestsPath => Path.Combine(GeneratedDataPath, "Manifests");
+        public static string GDP_MapPath => Path.Combine(GeneratedDataPath, "Map");
+        public static string GDP_OobPath => Path.Combine(GeneratedDataPath, "Oob");
+        public static string GDP_AiiPath => Path.Combine(GeneratedDataPath, "Aii");
+        public static string GDP_BrfPath => Path.Combine(GeneratedDataPath, "Brf");
+
+        // File paths of stand alone scenerio data in the documents folder.
         public static string ManifestsPath => GetOrCreatePath(ref _manifestsPath,
             Path.Combine(ScenarioDataPath, "manifests"));
-
-        /// <summary>
-        /// Gets the file system path to the directory where map files are stored.
-        /// </summary>
         public static string MapPath => GetOrCreatePath(ref _mapPath,
             Path.Combine(ScenarioDataPath, "map"));
-
-        /// <summary>
-        /// Gets the file system path to the "Order of Battle" (OOB) directory, creating it if it does not already exist.
-        /// </summary>
         public static string OobPath => GetOrCreatePath(ref _oobPath,
             Path.Combine(ScenarioDataPath, "oob"));
-
-        /// <summary>
-        /// Gets the file system path to the "aii" directory within the main application path.
-        /// </summary>
         public static string AiiPath => GetOrCreatePath(ref _aiiPath,
             Path.Combine(ScenarioDataPath, "aii"));
-
-        /// <summary>
-        /// Gets the file system path to the "brf" directory within the main application path.
-        /// </summary>
         public static string BrfPath => GetOrCreatePath(ref _brfPath,
             Path.Combine(ScenarioDataPath, "brf"));
 
