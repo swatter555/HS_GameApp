@@ -2,6 +2,7 @@ using System;
 using System.IO;
 using UnityEngine;
 using HammerAndSickle.Services;
+using UnityEngine.UI;
 
 namespace HammerAndSickle.Core.GameData
 {
@@ -110,14 +111,14 @@ namespace HammerAndSickle.Core.GameData
         }
 
         /// <summary>
-        /// Gets the full file system path to the thumbnail in StreamingAssets.
+        /// Gets the path in the assets/resources folder to the thumbnail image. Must use resource load.
         /// </summary>
         public string GetThumbnailPath()
         {
             if (string.IsNullOrWhiteSpace(thumbnailFilename))
                 return string.Empty;
 
-            return Path.Combine(Application.streamingAssetsPath, "Graphics", "Thumbnails", thumbnailFilename);
+            return "Art/Scenario Thumbs/" + thumbnailFilename;
         }
 
         /// <summary>
