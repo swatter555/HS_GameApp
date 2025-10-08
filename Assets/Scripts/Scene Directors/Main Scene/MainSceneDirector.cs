@@ -6,7 +6,9 @@ namespace HammerAndSickle.SceneDirectors
     public class MainSceneDirector : SceneDirectorBase
     {
         #region Singleton Instance
+
         public static MainSceneDirector Instance { get; private set; }
+
         #endregion // Singleton Instance
 
         #region Protected Methods
@@ -95,6 +97,7 @@ namespace HammerAndSickle.SceneDirectors
                 AppService.HandleException(GetClassName(), "OnSceneCleanup", e);
             }
         }
+
         #endregion // Protected Methods
     }
 }
