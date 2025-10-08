@@ -235,8 +235,13 @@ namespace HammerAndSickle.SceneDirectors
 
         public void Hide()
         {
+            // Always lose input focus.
             IsInputFocus = false;
-            IsVisible = !IsCoreInterface;  // Core stays visible, others don't
+
+            // Core interface remains visible but loses focus.
+            if (IsCoreInterface) IsVisible = true;
+            else IsVisible = false;
+            
             ToggleMenu();
         }
 

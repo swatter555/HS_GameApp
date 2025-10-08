@@ -2,7 +2,6 @@ using System;
 using System.IO;
 using UnityEngine;
 using HammerAndSickle.Services;
-using UnityEngine.UI;
 
 namespace HammerAndSickle.Core.GameData
 {

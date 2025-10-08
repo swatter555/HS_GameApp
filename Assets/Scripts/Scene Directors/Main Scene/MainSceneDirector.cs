@@ -41,6 +41,9 @@ namespace HammerAndSickle.SceneDirectors
             MainSceneCoreInterface.Instance.Initialize(GeneralConstants.MainScene_CoreInterface_ID, true);
             RegisterCoreInterface(GeneralConstants.MainScene_CoreInterface_ID, MainSceneCoreInterface.Instance);
 
+            // Register other interfaces.
+            RegisterMenu(MainScene_ScenarioDialogInterface.Instance);
+
             // Initialize audio manager and start main menu music
             InitializeAudio();
         }

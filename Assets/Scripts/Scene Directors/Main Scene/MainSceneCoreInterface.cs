@@ -1,6 +1,7 @@
 using HammerAndSickle.Services;
 using UnityEngine;
 using UnityEngine.UI;
+using HammerAndSickle.Controllers;
 
 namespace HammerAndSickle.SceneDirectors
 {
@@ -111,8 +112,8 @@ namespace HammerAndSickle.SceneDirectors
 
         public void OnScenarioButton()
         {
-            // Start new scenario logic
-            Debug.Log("Scenario button pressed.");
+            // Switch to scenario dialog.
+            MainSceneDirector.Instance.SetActiveMenuByID(GeneralConstants.MainScene_ScenarioDialog_ID);
         }
 
         public void OnSettingsButton()
