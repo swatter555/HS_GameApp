@@ -1,48 +1,53 @@
+using HammerAndSickle.Services;
+using Newtonsoft.Json;
 using System;
 using System.IO;
-using UnityEngine;
-using HammerAndSickle.Services;
 
 namespace HammerAndSickle.Core.GameData
 {
     /// <summary>
     /// Serializable data structure representing a scenario manifest file.
     /// Lists all files required to load a scenario and provides metadata for UI display.
+    /// Uses Newtonsoft.Json for serialization/deserialization.
     /// </summary>
     [Serializable]
     public class ScenarioManifest
     {
         private const string CLASS_NAME = "ScenarioManifest";
 
-        #region Serialized Fields
+        #region JSON Properties
 
-        [SerializeField] private string scenarioId;
-        [SerializeField] private string displayName;
-        [SerializeField] private string description;
-        [SerializeField] private string thumbnailFilename;
-        [SerializeField] private string mapFilename;
-        [SerializeField] private string oobFilename;
-        [SerializeField] private string aiiFilename;
-        [SerializeField] private string briefingFilename;
-        [SerializeField] private int prestigePool;
-        [SerializeField] private bool isCampaignScenario;
+        [JsonProperty("scenarioId")]
+        public string ScenarioId { get; set; } = string.Empty;
 
-        #endregion // Serialized Fields
+        [JsonProperty("displayName")]
+        public string DisplayName { get; set; } = string.Empty;
 
-        #region Properties
+        [JsonProperty("description")]
+        public string Description { get; set; } = string.Empty;
 
-        public string ScenarioId => scenarioId;
-        public string DisplayName => displayName;
-        public string Description => description;
-        public string ThumbnailFilename => thumbnailFilename;
-        public string MapFilename => mapFilename;
-        public string OobFilename => oobFilename;
-        public string AiiFilename => aiiFilename;
-        public string BriefingFilename => briefingFilename;
-        public int PrestigePool => prestigePool;
-        public bool IsCampaignScenario => isCampaignScenario;
+        [JsonProperty("thumbnailFilename")]
+        public string ThumbnailFilename { get; set; } = string.Empty;
 
-        #endregion // Properties
+        [JsonProperty("mapFilename")]
+        public string MapFilename { get; set; } = string.Empty;
+
+        [JsonProperty("oobFilename")]
+        public string OobFilename { get; set; } = string.Empty;
+
+        [JsonProperty("aiiFilename")]
+        public string AiiFilename { get; set; } = string.Empty;
+
+        [JsonProperty("briefingFilename")]
+        public string BriefingFilename { get; set; } = string.Empty;
+
+        [JsonProperty("prestigePool")]
+        public int PrestigePool { get; set; } = 0;
+
+        [JsonProperty("isCampaignScenario")]
+        public bool IsCampaignScenario { get; set; } = false;
+
+        #endregion // JSON Properties
 
         #region Constructors
 
@@ -51,16 +56,6 @@ namespace HammerAndSickle.Core.GameData
         /// </summary>
         public ScenarioManifest()
         {
-            scenarioId = string.Empty;
-            displayName = string.Empty;
-            description = string.Empty;
-            thumbnailFilename = string.Empty;
-            mapFilename = string.Empty;
-            oobFilename = string.Empty;
-            aiiFilename = string.Empty;
-            briefingFilename = string.Empty;
-            prestigePool = 0;
-            isCampaignScenario = false;
         }
 
         /// <summary>
@@ -70,16 +65,16 @@ namespace HammerAndSickle.Core.GameData
             string thumbnailFilename, string mapFilename, string oobFilename,
             string aiiFilename, string briefingFilename, int prestigePool, bool isCampaignScenario)
         {
-            this.scenarioId = scenarioId;
-            this.displayName = displayName;
-            this.description = description;
-            this.thumbnailFilename = thumbnailFilename;
-            this.mapFilename = mapFilename;
-            this.oobFilename = oobFilename;
-            this.aiiFilename = aiiFilename;
-            this.briefingFilename = briefingFilename;
-            this.prestigePool = prestigePool;
-            this.isCampaignScenario = isCampaignScenario;
+            ScenarioId = scenarioId;
+            DisplayName = displayName;
+            Description = description;
+            ThumbnailFilename = thumbnailFilename;
+            MapFilename = mapFilename;
+            OobFilename = oobFilename;
+            AiiFilename = aiiFilename;
+            BriefingFilename = briefingFilename;
+            PrestigePool = prestigePool;
+            IsCampaignScenario = isCampaignScenario;
         }
 
         #endregion // Constructors
@@ -91,19 +86,19 @@ namespace HammerAndSickle.Core.GameData
         /// </summary>
         public bool IsValid()
         {
-            if (string.IsNullOrWhiteSpace(scenarioId))
+            if (string.IsNullOrWhiteSpace(ScenarioId))
                 return false;
 
-            if (string.IsNullOrWhiteSpace(displayName))
+            if (string.IsNullOrWhiteSpace(DisplayName))
                 return false;
 
-            if (string.IsNullOrWhiteSpace(mapFilename))
+            if (string.IsNullOrWhiteSpace(MapFilename))
                 return false;
 
-            if (string.IsNullOrWhiteSpace(oobFilename))
+            if (string.IsNullOrWhiteSpace(OobFilename))
                 return false;
 
-            if (prestigePool < 0)
+            if (PrestigePool < 0)
                 return false;
 
             return true;
@@ -114,10 +109,10 @@ namespace HammerAndSickle.Core.GameData
         /// </summary>
         public string GetThumbnailPath()
         {
-            if (string.IsNullOrWhiteSpace(thumbnailFilename))
+            if (string.IsNullOrWhiteSpace(ThumbnailFilename))
                 return string.Empty;
 
-            return "Art/Scenario Thumbs/" + thumbnailFilename;
+            return "Art/Scenario Thumbs/" + ThumbnailFilename;
         }
 
         /// <summary>
@@ -125,10 +120,10 @@ namespace HammerAndSickle.Core.GameData
         /// </summary>
         public string GetMapFilePath()
         {
-            if (string.IsNullOrWhiteSpace(mapFilename))
+            if (string.IsNullOrWhiteSpace(MapFilename))
                 return string.Empty;
 
-            return Path.Combine(AppService.MapPath, mapFilename);
+            return Path.Combine(AppService.MapPath, MapFilename);
         }
 
         /// <summary>
@@ -136,10 +131,10 @@ namespace HammerAndSickle.Core.GameData
         /// </summary>
         public string GetOobFilePath()
         {
-            if (string.IsNullOrWhiteSpace(oobFilename))
+            if (string.IsNullOrWhiteSpace(OobFilename))
                 return string.Empty;
 
-            return Path.Combine(AppService.OobPath, oobFilename);
+            return Path.Combine(AppService.OobPath, OobFilename);
         }
 
         /// <summary>
@@ -147,10 +142,10 @@ namespace HammerAndSickle.Core.GameData
         /// </summary>
         public string GetAiiFilePath()
         {
-            if (string.IsNullOrWhiteSpace(aiiFilename))
+            if (string.IsNullOrWhiteSpace(AiiFilename))
                 return string.Empty;
 
-            return Path.Combine(AppService.AiiPath, aiiFilename);
+            return Path.Combine(AppService.AiiPath, AiiFilename);
         }
 
         /// <summary>
@@ -158,21 +153,21 @@ namespace HammerAndSickle.Core.GameData
         /// </summary>
         public string GetBriefingFilePath()
         {
-            if (string.IsNullOrWhiteSpace(briefingFilename))
+            if (string.IsNullOrWhiteSpace(BriefingFilename))
                 return string.Empty;
 
-            return Path.Combine(AppService.BrfPath, briefingFilename);
+            return Path.Combine(AppService.BrfPath, BriefingFilename);
         }
 
         /// <summary>
         /// Retrieves the full file path for the GDP (generated data path) map file, for campaign scenarios.
         /// </summary>
         public string GetMapFilePath_GDP()
-        {             
-            if (string.IsNullOrWhiteSpace(mapFilename))
+        {
+            if (string.IsNullOrWhiteSpace(MapFilename))
                 return string.Empty;
-            
-            return Path.Combine(AppService.GDP_MapPath, mapFilename);
+
+            return Path.Combine(AppService.GDP_MapPath, MapFilename);
         }
 
         /// <summary>
@@ -180,10 +175,10 @@ namespace HammerAndSickle.Core.GameData
         /// </summary>
         public string GetOobFilePath_GDP()
         {
-            if (string.IsNullOrWhiteSpace(oobFilename))
+            if (string.IsNullOrWhiteSpace(OobFilename))
                 return string.Empty;
 
-            return Path.Combine(AppService.GDP_OobPath, oobFilename);
+            return Path.Combine(AppService.GDP_OobPath, OobFilename);
         }
 
         /// <summary>
@@ -191,10 +186,10 @@ namespace HammerAndSickle.Core.GameData
         /// </summary>
         public string GetAiiFilePath_GDP()
         {
-            if (string.IsNullOrWhiteSpace(aiiFilename))
+            if (string.IsNullOrWhiteSpace(AiiFilename))
                 return string.Empty;
 
-            return Path.Combine(AppService.GDP_AiiPath, aiiFilename);
+            return Path.Combine(AppService.GDP_AiiPath, AiiFilename);
         }
 
         /// <summary>
@@ -202,10 +197,10 @@ namespace HammerAndSickle.Core.GameData
         /// </summary>
         public string GetBriefingFilePath_GDP()
         {
-            if (string.IsNullOrWhiteSpace(briefingFilename))
+            if (string.IsNullOrWhiteSpace(BriefingFilename))
                 return string.Empty;
 
-            return Path.Combine(AppService.GDP_BrfPath, briefingFilename);
+            return Path.Combine(AppService.GDP_BrfPath, BriefingFilename);
         }
 
         #endregion // Public Methods

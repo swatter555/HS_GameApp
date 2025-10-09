@@ -1,9 +1,10 @@
 using HammerAndSickle.Core.GameData;
 using HammerAndSickle.Services;
+using HammerAndSickle.Controllers;
 using System;
 using System.Collections.Generic;
 using System.IO;
-using System.Text.Json;
+using Newtonsoft.Json;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -67,7 +68,7 @@ namespace HammerAndSickle.Core.UI
                     return;
                 }
 
-                string[] manifestFiles = Directory.GetFiles(manifestPath, "*.manifest");
+                string[] manifestFiles = Directory.GetFiles(manifestPath, "*" + GameDataManager.MANIFEST_EXTENSION);
 
                 if (manifestFiles.Length == 0)
                 {
@@ -83,7 +84,12 @@ namespace HammerAndSickle.Core.UI
                     try
                     {
                         string json = File.ReadAllText(manifestFile);
-                        ScenarioManifest manifest = JsonSerializer.Deserialize<ScenarioManifest>(json);
+
+                        ScenarioManifest manifest = JsonConvert.DeserializeObject<ScenarioManifest>(json);
+
+                        Debug.Log($"Loaded manifest text: {json}");
+
+                        Debug.Log($"Manifest content: {manifest.DisplayName}");
 
                         if (manifest == null || !manifest.IsValid())
                         {

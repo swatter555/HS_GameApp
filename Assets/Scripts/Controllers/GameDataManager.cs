@@ -1,4 +1,23 @@
-﻿using HammerAndSickle.Models;
+﻿// ============================================================================
+// ⚠️ ⚠️ ⚠️  JSON SERIALIZATION WARNING  ⚠️ ⚠️ ⚠️
+// ============================================================================
+// This project uses NEWTONSOFT.JSON (Json.NET) for ALL JSON serialization!
+//
+// DO NOT USE: System.Text.Json
+// DO USE:     Newtonsoft.Json
+//
+// Why? Unity compatibility, private field serialization, and existing
+// codebase consistency. System.Text.Json does NOT work properly with Unity's
+// [SerializeField] attributes and private field patterns used throughout
+// this project.
+//
+// Correct usage:
+//   using Newtonsoft.Json;
+//   var obj = JsonConvert.DeserializeObject<T>(json);
+//   var json = JsonConvert.SerializeObject(obj);
+// ============================================================================
+
+using HammerAndSickle.Models;
 using HammerAndSickle.Persistence;
 using HammerAndSickle.Services;
 using System;
