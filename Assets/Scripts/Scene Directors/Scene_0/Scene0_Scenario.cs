@@ -1,45 +1,61 @@
-using HammerAndSickle.Core.GameData;
-using HammerAndSickle.Services;
 using HammerAndSickle.Controllers;
+using HammerAndSickle.Core.GameData;
+using HammerAndSickle.Core.UI;
+using HammerAndSickle.Services;
 using System;
 using System.Collections.Generic;
 using System.IO;
-using Newtonsoft.Json;
-using TMPro;
 using UnityEngine;
-using UnityEngine.UI;
+using Newtonsoft.Json;
 
-namespace HammerAndSickle.Core.UI
+namespace HammerAndSickle.SceneDirectors
 {
     /// <summary>
-    /// Dialog controller for loading standalone scenario files from the user's Documents folder.
-    /// Displays scenario list, briefing text, and thumbnail preview.
+    /// Main scene core interface menu handler.
     /// </summary>
-    public class MainScene_ScenarioDialog : GenericDialog
+    public class Scene0_ScenarioDialog : MenuHandler
     {
-        private const string CLASS_NAME = "MainScene_ScenarioDialog";
+        private const string CLASS_NAME = nameof(Scene0_ScenarioDialog);
 
-        #region Serialized Fields
+        #region Singleton Instance
 
-        [Header("Scenario Display")]
-        [SerializeField] private TMP_Text briefingText;
-        [SerializeField] private Sprite placeholderThumbnail;
-        [SerializeField] private Image thumbnailImage;
+        public static Scene0_ScenarioDialog Instance { get; private set; }
 
-        #endregion // Serialized Fields
+        #endregion // Singleton Instance
 
-        #region Private Fields
+        #region Fields
 
+        // Dialog GameObject Root
+        [SerializeField] private GameObject dialogRoot;
+
+        // Contains dialog controls.
+        [SerializeField] private ScenarioDialog _scenarioDialog;
+
+        // Manifest storage
         private List<ScenarioManifest> _loadedManifests = new List<ScenarioManifest>();
 
-        #endregion // Private Fields
+        #endregion // Fields
 
         #region Unity Lifecycle
+
+        public override void Awake()
+        {
+            base.Awake();
+
+            // Set the dialog ID.
+            Initialize(GeneralConstants.MainScene_ScenarioDialog_ID, false);
+        }
 
         private void OnEnable()
         {
             try
             {
+                // Subscribe to selection change event
+                if (_scenarioDialog != null)
+                {
+                    _scenarioDialog.SelectionChanged += ReactSelectionChange;
+                }
+
                 LoadScenarioManifests();
             }
             catch (Exception e)
@@ -48,14 +64,77 @@ namespace HammerAndSickle.Core.UI
             }
         }
 
+        private void OnDisable()
+        {
+            // Unsubscribe to prevent memory leaks
+            if (_scenarioDialog != null)
+            {
+                _scenarioDialog.SelectionChanged -= ReactSelectionChange;
+            }
+        }
+
         #endregion // Unity Lifecycle
 
-        #region Manifest Loading
+        #region Overrides
 
+        public override void ToggleMenu()
+        {
+            // Set active state and interactivity based on visibility and input focus.
+            if (IsVisible && IsInputFocus) dialogRoot.SetActive(true);
+            else dialogRoot.SetActive(false);
+        }
+
+        public override void SetupSingleton()
+        {
+            if (Instance == null)
+            {
+                Instance = this;
+            }
+            else
+            {
+                Destroy(gameObject);
+            }
+        }
+
+        #endregion // Overrides
+
+        #region Callbacks
+
+        public static void OnLoadButton()
+        {
+            // Continue game logic
+            Debug.Log("Load button pressed.");
+        }
+
+        public void OnRandomButton()
+        {
+            // Start new campaign logic
+            Debug.Log("random button pressed.");
+        }
+
+        public void OnExitButton()
+        {
+            // Return to the main interface.
+            Scene0_Director.Instance.SetActiveMenuByID(GeneralConstants.MainScene_CoreInterface_ID);
+        }
+
+        #endregion // Callbacks
+
+        #region Private Methods
+
+        /// <summary>
+        /// Loads scenario manifests from the designated directory and populates the scenario dialog with their display
+        /// names.
+        /// </summary>
+        /// <remarks>This method clears any previously loaded manifests and attempts to load all manifest
+        /// files from the directory specified  by <see cref="AppService.ManifestsPath"/>. If the directory does not
+        /// exist, contains no manifest files, or if all manifest  files are invalid, appropriate error messages are
+        /// displayed, and the operation is aborted.  Valid manifests are added to the internal collection and their
+        /// display names are shown in the scenario dialog.</remarks>
         private void LoadScenarioManifests()
         {
             _loadedManifests.Clear();
-            ClearList();
+            _scenarioDialog.ClearList();
 
             try
             {
@@ -87,10 +166,6 @@ namespace HammerAndSickle.Core.UI
 
                         ScenarioManifest manifest = JsonConvert.DeserializeObject<ScenarioManifest>(json);
 
-                        Debug.Log($"Loaded manifest text: {json}");
-
-                        Debug.Log($"Manifest content: {manifest.DisplayName}");
-
                         if (manifest == null || !manifest.IsValid())
                         {
                             AppService.CaptureUiMessage($"Invalid manifest: {Path.GetFileName(manifestFile)}");
@@ -113,12 +188,12 @@ namespace HammerAndSickle.Core.UI
                     return;
                 }
 
-                PopulateList(displayNames);
+                _scenarioDialog.PopulateList(displayNames);
 
                 // Auto-load first scenario content (visual selection requires user click)
                 if (_loadedManifests.Count > 0)
                 {
-                    OnSelectionChanged(0);
+                    ReactSelectionChange(0);
                 }
             }
             catch (Exception e)
@@ -128,11 +203,11 @@ namespace HammerAndSickle.Core.UI
             }
         }
 
-        #endregion // Manifest Loading
-
-        #region Selection Handling
-
-        protected override void OnSelectionChanged(int newIndex)
+        /// <summary>
+        /// Reacts to a change in the selected scenario index by loading the corresponding thumbnail and briefing text.
+        /// </summary>
+        /// <param name="newIndex"></param>
+        private void ReactSelectionChange(int newIndex)
         {
             try
             {
@@ -146,14 +221,17 @@ namespace HammerAndSickle.Core.UI
             }
             catch (Exception e)
             {
-                AppService.HandleException(CLASS_NAME, nameof(OnSelectionChanged), e);
+                AppService.HandleException(CLASS_NAME, nameof(ReactSelectionChange), e);
             }
         }
 
-        #endregion // Selection Handling
+        #endregion
 
         #region Resource Loading
 
+        /// <summary>
+        /// Loads the thumbnail image for the given scenario manifest.
+        /// </summary>
         private void LoadThumbnail(ScenarioManifest manifest)
         {
             try
@@ -181,9 +259,9 @@ namespace HammerAndSickle.Core.UI
                     return;
                 }
 
-                if (thumbnailImage != null)
+                if (_scenarioDialog.ThumbnailImage != null)
                 {
-                    thumbnailImage.sprite = thumbnail;
+                    _scenarioDialog.ThumbnailImage.sprite = thumbnail;
                 }
             }
             catch (Exception e)
@@ -193,6 +271,9 @@ namespace HammerAndSickle.Core.UI
             }
         }
 
+        /// <summary>
+        /// Loads the briefing text for the given scenario manifest.
+        /// </summary>
         private void LoadBriefing(ScenarioManifest manifest)
         {
             try
@@ -215,9 +296,9 @@ namespace HammerAndSickle.Core.UI
 
                 string briefingContent = File.ReadAllText(briefingPath);
 
-                if (briefingText != null)
+                if (_scenarioDialog.BriefingText != null)
                 {
-                    briefingText.text = briefingContent;
+                    _scenarioDialog.BriefingText.text = briefingContent;
                 }
             }
             catch (Exception e)
@@ -231,27 +312,38 @@ namespace HammerAndSickle.Core.UI
 
         #region Helper Methods
 
+        /// <summary>
+        /// Sets the scenario dialog content based on the selected index.
+        /// </summary>
         private void SetPlaceholderThumbnail()
         {
-            if (thumbnailImage != null && placeholderThumbnail != null)
+            if (_scenarioDialog.ThumbnailImage != null && _scenarioDialog.PlaceholderThumbnail != null)
             {
-                thumbnailImage.sprite = placeholderThumbnail;
+                _scenarioDialog.ThumbnailImage.sprite = _scenarioDialog.PlaceholderThumbnail;
             }
         }
 
+        /// <summary>
+        /// Sets the scenario dialog content based on the selected index.
+        /// </summary>
+        /// <param name="errorMessage"></param>
         private void ShowBriefingError(string errorMessage)
         {
-            if (briefingText != null)
+            if (_scenarioDialog.BriefingText != null)
             {
-                briefingText.text = errorMessage;
+                _scenarioDialog.BriefingText.text = errorMessage;
             }
         }
 
+        /// <summary>
+        /// Shows an error state in the scenario dialog with the provided error message and a placeholder thumbnail.
+        /// </summary>
+        /// <param name="errorMessage"></param>
         private void ShowErrorState(string errorMessage)
         {
-            if (briefingText != null)
+            if (_scenarioDialog.BriefingText != null)
             {
-                briefingText.text = errorMessage;
+                _scenarioDialog.BriefingText.text = errorMessage;
             }
 
             SetPlaceholderThumbnail();
@@ -266,7 +358,7 @@ namespace HammerAndSickle.Core.UI
         /// </summary>
         public ScenarioManifest GetSelectedManifest()
         {
-            int selectedIndex = GetSelectedIndex();
+            int selectedIndex = _scenarioDialog.GetSelectedIndex();
             if (selectedIndex >= 0 && selectedIndex < _loadedManifests.Count)
             {
                 return _loadedManifests[selectedIndex];

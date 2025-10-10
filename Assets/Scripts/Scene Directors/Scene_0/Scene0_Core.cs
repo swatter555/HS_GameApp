@@ -8,11 +8,11 @@ namespace HammerAndSickle.SceneDirectors
     /// <summary>
     /// Main scene core interface menu handler.
     /// </summary>
-    public class MainSceneCoreInterface : MenuHandler
+    public class Scene0_Core : MenuHandler
     {
         #region Singleton Instance
 
-        public static MainSceneCoreInterface Instance { get; private set; }
+        public static Scene0_Core Instance { get; private set; }
 
         #endregion // Singleton Instance
 
@@ -113,7 +113,7 @@ namespace HammerAndSickle.SceneDirectors
         public void OnScenarioButton()
         {
             // Switch to scenario dialog.
-            MainSceneDirector.Instance.SetActiveMenuByID(GeneralConstants.MainScene_ScenarioDialog_ID);
+            Scene0_Director.Instance.SetActiveMenuByID(GeneralConstants.MainScene_ScenarioDialog_ID);
         }
 
         public void OnSettingsButton()
