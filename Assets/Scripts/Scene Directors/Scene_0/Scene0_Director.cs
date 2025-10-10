@@ -3,11 +3,11 @@ using HammerAndSickle.Services;
 
 namespace HammerAndSickle.SceneDirectors
 {
-    public class MainSceneDirector : SceneDirectorBase
+    public class Scene0_Director : SceneDirectorBase
     {
         #region Singleton Instance
 
-        public static MainSceneDirector Instance { get; private set; }
+        public static Scene0_Director Instance { get; private set; }
 
         #endregion // Singleton Instance
 
@@ -15,10 +15,10 @@ namespace HammerAndSickle.SceneDirectors
         /// <summary>
         /// Retrieves the name of the class associated with this instance.
         /// </summary>
-        protected override string GetClassName() => nameof(MainSceneDirector);
+        protected override string GetClassName() => nameof(Scene0_Director);
 
         /// <summary>
-        /// Sets up the singleton instance for the MainSceneDirector.
+        /// Sets up the singleton instance for the Scene0_Director.
         /// </summary>
         protected override void SetupSingleton()
         {
@@ -38,11 +38,11 @@ namespace HammerAndSickle.SceneDirectors
         protected override void OnSceneInitialize()
         {
             // Provide ID to core interface and register.
-            MainSceneCoreInterface.Instance.Initialize(GeneralConstants.MainScene_CoreInterface_ID, true);
-            RegisterCoreInterface(GeneralConstants.MainScene_CoreInterface_ID, MainSceneCoreInterface.Instance);
+            Scene0_Core.Instance.Initialize(GeneralConstants.MainScene_CoreInterface_ID, true);
+            RegisterCoreInterface(GeneralConstants.MainScene_CoreInterface_ID, Scene0_Core.Instance);
 
             // Register other interfaces.
-            RegisterMenu(MainScene_ScenarioDialogInterface.Instance);
+            RegisterMenu(Scene0_ScenarioDialog.Instance);
 
             // Initialize audio manager and start main menu music
             InitializeAudio();

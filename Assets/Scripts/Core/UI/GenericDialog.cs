@@ -27,6 +27,7 @@ namespace HammerAndSickle.Core.UI
         [SerializeField] private Sprite evenLineImage;
         [SerializeField] private Sprite oddLineImage;
         [SerializeField] private Sprite selectedLineImage;
+        [SerializeField] private TMP_Text listTextTemplate;
 
         [Header("Input Behavior")]
         [SerializeField] private bool allowInputEditing = false;
@@ -60,13 +61,13 @@ namespace HammerAndSickle.Core.UI
 
         #endregion // Unity Lifecycle
 
-        #region Protected Methods
+        #region Public Methods
 
         /// <summary>
         /// Populates the scroll view with a list of string entries.
         /// Creates alternating background images with text overlays.
         /// </summary>
-        protected void PopulateList(List<string> entries)
+        public void PopulateList(List<string> entries)
         {
             try
             {
@@ -92,7 +93,7 @@ namespace HammerAndSickle.Core.UI
         /// <summary>
         /// Clears all items from the scroll view list.
         /// </summary>
-        protected void ClearList()
+        public void ClearList()
         {
             try
             {
@@ -122,7 +123,7 @@ namespace HammerAndSickle.Core.UI
         /// <summary>
         /// Gets the currently selected entry text, or empty string if none selected.
         /// </summary>
-        protected string GetSelectedEntry()
+        public string GetSelectedEntry()
         {
             if (_selectedIndex >= 0 && _selectedIndex < _listItems.Count)
             {
@@ -135,12 +136,12 @@ namespace HammerAndSickle.Core.UI
         /// <summary>
         /// Gets the currently selected index, or -1 if none selected.
         /// </summary>
-        protected int GetSelectedIndex()
+        public int GetSelectedIndex()
         {
             return _selectedIndex;
         }
 
-        #endregion // Protected Methods
+        #endregion // Public Methods
 
         #region Private Methods
 
@@ -183,29 +184,22 @@ namespace HammerAndSickle.Core.UI
             bgImage.sprite = (index % 2 == 0) ? evenLineImage : oddLineImage;
             bgImage.type = Image.Type.Sliced;
 
-            // Configure RectTransform for proper sizing
-            RectTransform rowRect = rowObj.GetComponent<RectTransform>();
-            rowRect.anchorMin = new Vector2(0, 1);
-            rowRect.anchorMax = new Vector2(1, 1);
-            rowRect.pivot = new Vector2(0.5f, 1);
-            rowRect.sizeDelta = new Vector2(0, 30); // Height of 30, width matches parent
+            // Add LayoutElement for proper sizing within VerticalLayoutGroup
+            LayoutElement layoutElement = rowObj.AddComponent<LayoutElement>();
+            layoutElement.minHeight = 30;
+            layoutElement.preferredHeight = 30;
+            layoutElement.flexibleWidth = 1;
 
-            // Create text child
-            GameObject textObj = new ("Text");
-            textObj.transform.SetParent(rowObj.transform, false);
-
-            TMP_Text textComponent = textObj.AddComponent<TextMeshProUGUI>();
+            // Instantiate text from template
+            TMP_Text textComponent = Instantiate(listTextTemplate, rowObj.transform);
             textComponent.text = text;
-            textComponent.alignment = TextAlignmentOptions.MidlineLeft;
-            textComponent.margin = new Vector4(10, 0, 10, 0);
 
             // Configure text RectTransform to fill parent
             RectTransform textRect = textComponent.GetComponent<RectTransform>();
             textRect.anchorMin = Vector2.zero;
             textRect.anchorMax = Vector2.one;
-            textRect.sizeDelta = Vector2.zero;
-            textRect.offsetMin = new Vector2(10, 0);
-            textRect.offsetMax = new Vector2(-10, 0);
+            textRect.offsetMin = Vector2.zero;
+            textRect.offsetMax = Vector2.zero;
 
             // Add button component for click handling
             Button button = rowObj.AddComponent<Button>();
@@ -217,7 +211,7 @@ namespace HammerAndSickle.Core.UI
 
             _listItems.Add(rowObj);
         }
-
+        
         private void OnRowClicked(int index)
         {
             try
