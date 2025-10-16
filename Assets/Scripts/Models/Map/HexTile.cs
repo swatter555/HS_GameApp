@@ -1,7 +1,7 @@
 using HammerAndSickle.Services;
+using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
-using System.Text.Json.Serialization;
 using UnityEngine;
 using HammerAndSickle.Core.GameData;
 
@@ -35,83 +35,82 @@ namespace HammerAndSickle.Models.Map
         public bool IsDisposed { get; private set; }
 
         // Core Position and Identity
-        [JsonInclude]
-        [JsonPropertyName("position")]
+        [JsonProperty("position")]
         public Position2D Position { get; set; }
 
         // Terrain Properties
-        [JsonInclude]
+        [JsonProperty("terrain")]
         public TerrainType Terrain { get; set; }
 
-        [JsonInclude]
+        [JsonProperty("movementCost")]
         public int MovementCost { get; private set; }
 
         // Infrastructure Features
-        [JsonInclude]
+        [JsonProperty("isRail")]
         public bool IsRail { get; set; }
 
-        [JsonInclude]
+        [JsonProperty("isRoad")]
         public bool IsRoad { get; set; }
 
-        [JsonInclude]
+        [JsonProperty("isFort")]
         public bool IsFort { get; set; }
 
-        [JsonInclude]
+        [JsonProperty("isAirbase")]
         public bool IsAirbase { get; set; }
 
         // Game State
-        [JsonInclude]
+        [JsonProperty("isObjective")]
         public bool IsObjective { get; set; }
 
-        [JsonInclude]
+        [JsonProperty("isVisible")]
         public bool IsVisible { get; set; }
 
-        [JsonInclude]
+        [JsonProperty("tileControl")]
         public TileControl TileControl { get; set; }
 
-        [JsonInclude]
+        [JsonProperty("defaultTileControl")]
         public DefaultTileControl DefaultTileControl { get; set; }
 
         // Labels and Display
-        [JsonInclude]
+        [JsonProperty("tileLabel")]
         public string TileLabel { get; set; }
 
-        [JsonInclude]
+        [JsonProperty("largeTileLabel")]
         public string LargeTileLabel { get; set; }
 
-        [JsonInclude]
+        [JsonProperty("labelSize")]
         public TextSize LabelSize { get; set; }
 
-        [JsonInclude]
+        [JsonProperty("labelWeight")]
         public FontWeight LabelWeight { get; set; }
 
-        [JsonInclude]
+        [JsonProperty("labelColor")]
         public TextColor LabelColor { get; set; }
 
-        [JsonInclude]
+        [JsonProperty("labelOutlineThickness")]
         public float LabelOutlineThickness { get; set; }
 
         // Victory and Damage
-        [JsonInclude]
+        [JsonProperty("victoryValue")]
         public float VictoryValue { get; set; }
 
-        [JsonInclude]
+        [JsonProperty("airbaseDamage")]
         public float AirbaseDamage { get; set; }
 
-        [JsonInclude]
+        [JsonProperty("urbanDamage")]
         public int UrbanDamage { get; set; }
 
         // Border Features
-        [JsonInclude]
+        [JsonProperty("riverBorders")]
         public JSONFeatureBorders RiverBorders { get; set; }
 
-        [JsonInclude]
+        [JsonProperty("bridgeBorders")]
         public JSONFeatureBorders BridgeBorders { get; set; }
 
-        [JsonInclude]
+        [JsonProperty("pontoonBridgeBorders")]
         public JSONFeatureBorders PontoonBridgeBorders { get; set; }
 
-        [JsonInclude]
+        [JsonProperty("damagedBridgeBorders")]
         public JSONFeatureBorders DamagedBridgeBorders { get; set; }
 
         #endregion // Properties
@@ -208,7 +207,8 @@ namespace HammerAndSickle.Models.Map
 
             enableDebugLogging = false;
 
-            Debug.Log($"HexTile JsonConstructor Position: {Position.X}, {Position.Y}");
+            if (enableDebugLogging)
+                Debug.Log($"HexTile JsonConstructor Position: {Position.X}, {Position.Y}");
 
             Initialize();
         }

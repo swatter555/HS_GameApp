@@ -1,5 +1,5 @@
 using System;
-using System.Text.Json.Serialization;
+using Newtonsoft.Json;
 using HammerAndSickle.Services;
 
 namespace HammerAndSickle.Models.Map
@@ -19,13 +19,13 @@ namespace HammerAndSickle.Models.Map
         /// <summary>
         /// Map header containing metadata and integrity information.
         /// </summary>
-        [JsonInclude]
+        [JsonProperty("header")]
         public JsonMapHeader Header { get; set; }
 
         /// <summary>
         /// Array of all hex tiles in the map.
         /// </summary>
-        [JsonInclude]
+        [JsonProperty("hexes")]
         public HexTile[] Hexes { get; set; }
         #endregion
 
@@ -87,18 +87,14 @@ namespace HammerAndSickle.Models.Map
                     return false;
                 }
 
-                // Validate each hex
+                // Skip individual hex validation during initial load.
+                // Hexes will be properly initialized and validated when added to HexMap.
+                // This validation only checks for null hexes to ensure the array is properly populated.
                 for (int i = 0; i < Hexes.Length; i++)
                 {
                     if (Hexes[i] == null)
                     {
                         AppService.CaptureUiMessage($"JsonMapData validation failed: Hex at index {i} is null");
-                        return false;
-                    }
-
-                    if (!Hexes[i].ValidateHex())
-                    {
-                        AppService.CaptureUiMessage($"JsonMapData validation failed: Hex at index {i} failed validation");
                         return false;
                     }
                 }

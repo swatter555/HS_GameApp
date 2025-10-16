@@ -190,6 +190,8 @@ namespace HammerAndSickle.Core
                 throw new System.NullReferenceException($"{CLASS_NAME}.ValidateReferences: nameplateRenderer is null");
             if (controlFlagRenderer == null)
                 throw new System.NullReferenceException($"{CLASS_NAME}.ValidateReferences: controlFlagRenderer is null");
+            if (objectiveFlagRenderer == null)
+                throw new System.NullReferenceException($"{CLASS_NAME}.ValidateReferences: objectiveFlagRenderer is null");
             if (cityNameText == null)
                 throw new System.NullReferenceException($"{CLASS_NAME}.ValidateReferences: cityNameText is null");
             if (fontAsset == null)

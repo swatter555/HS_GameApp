@@ -22,7 +22,7 @@ namespace HammerAndSickle.Models.Map
 
         private Dictionary<Position2D, HexTile> hexDictionary;
         private readonly Coordinate2DEqualityComparer coordinateComparer;
-        private readonly bool enableDebugLogging;
+        private bool enableDebugLogging = false;
 
         #endregion // Private Fields
 
@@ -56,13 +56,12 @@ namespace HammerAndSickle.Models.Map
         /// <param name="mapName">Display name of the map</param>
         /// <param name="configuration">Map size configuration</param>
         /// <param name="enableLogging">Enable debug logging for this map</param>
-        public HexMap(string mapName, MapConfig configuration, bool enableLogging = false)
+        public HexMap(string mapName, MapConfig configuration)
         {
             try
             {
                 MapName = mapName ?? throw new ArgumentNullException(nameof(mapName));
                 Configuration = configuration;
-                enableDebugLogging = enableLogging;
                 coordinateComparer = new Coordinate2DEqualityComparer();
 
                 Initialize();
@@ -87,7 +86,6 @@ namespace HammerAndSickle.Models.Map
         {
             MapName = string.Empty;
             Configuration = MapConfig.None;
-            enableDebugLogging = false;
             coordinateComparer = new Coordinate2DEqualityComparer();
             Initialize();
         }
@@ -726,67 +724,6 @@ namespace HammerAndSickle.Models.Map
         }
 
         #endregion // Validation
-
-        #region Save/Load (Stubs)
-
-        /// <summary>
-        /// Saves the hex map to the specified file path.
-        /// </summary>
-        /// <param name="filePath">Path to save the map file</param>
-        /// <returns>True if save was successful, false otherwise</returns>
-        public bool SaveToFile(string filePath)
-        {
-            try
-            {
-                ValidateState();
-
-                // TODO: Implement save functionality
-                // TODO: Convert to JsonMapData format
-                // TODO: Use snapshot pattern for serialization
-                // TODO: Calculate and store checksum
-
-                if (enableDebugLogging)
-                {
-                    Debug.Log($"{CLASS_NAME}: SaveToFile - stub implementation for path: {filePath}");
-                }
-
-                AppService.CaptureUiMessage($"Save functionality not yet implemented for map '{MapName}'");
-                return false;
-            }
-            catch (Exception ex)
-            {
-                AppService.HandleException(CLASS_NAME, nameof(SaveToFile), ex);
-                return false;
-            }
-        }
-
-        /// <summary>
-        /// Loads a hex map from the specified file path.
-        /// </summary>
-        /// <param name="filePath">Path to the map file</param>
-        /// <returns>Loaded HexMap instance, or null if loading failed</returns>
-        public static HexMap LoadFromFile(string filePath)
-        {
-            try
-            {
-                // TODO: Implement load functionality
-                // TODO: Read and deserialize JsonMapData
-                // TODO: Convert HexTile[] to MapHex instances
-                // TODO: Validate checksum integrity
-                // TODO: Build neighbor relationships
-
-                Debug.Log($"{CLASS_NAME}: LoadFromFile - stub implementation for path: {filePath}");
-                AppService.CaptureUiMessage("Load functionality not yet implemented");
-                return null;
-            }
-            catch (Exception ex)
-            {
-                AppService.HandleException(CLASS_NAME, nameof(LoadFromFile), ex);
-                return null;
-            }
-        }
-
-        #endregion // Save/Load
 
         #region IEnumerable Implementation
 

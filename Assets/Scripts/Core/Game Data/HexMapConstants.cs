@@ -155,7 +155,17 @@ namespace HammerAndSickle.Core.GameData
         Large,
         None
     }
-    
+
+    /// <summary>
+    /// This enum contains the map themes used in the game.
+    /// </summary>
+    public enum MapTheme
+    {
+        MiddleEast,
+        Europe,
+        China
+    }
+
     /// <summary>
     /// The types of hex outlines.
     /// </summary>
