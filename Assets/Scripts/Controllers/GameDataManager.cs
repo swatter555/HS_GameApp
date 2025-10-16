@@ -45,6 +45,9 @@ namespace HammerAndSickle.Controllers
         public const int MainScene_OptionsDialog_ID  = 5;
         public const int MainScene_ExitDialog_ID     = 6;
 
+        // Khost scenario scene menu/dialog IDs
+        public const int KhostScene_CoreInterface_ID = 7;
+
         #endregion
     }
 
@@ -162,6 +165,11 @@ namespace HammerAndSickle.Controllers
 
         // Currently selected hex coordinates (-1, -1) if none selected.
         public static Position2D SelectedHex { get; set; } = NoHexSelected;
+
+        /// ----------------------
+        /// Scenario related data
+        /// ----------------------
+        public static ScenarioManifest CurrentManifest { get; set; } = null;
 
         #endregion // Properties
 

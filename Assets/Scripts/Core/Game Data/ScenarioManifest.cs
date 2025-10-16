@@ -47,6 +47,9 @@ namespace HammerAndSickle.Core.GameData
         [JsonProperty("isCampaignScenario")]
         public bool IsCampaignScenario { get; set; } = false;
 
+        [JsonProperty("mapTheme")]
+        public MapTheme MapTheme { get; set; } = MapTheme.MiddleEast;
+
         #endregion // JSON Properties
 
         #region Constructors
@@ -63,7 +66,7 @@ namespace HammerAndSickle.Core.GameData
         /// </summary>
         public ScenarioManifest(string scenarioId, string displayName, string description,
             string thumbnailFilename, string mapFilename, string oobFilename,
-            string aiiFilename, string briefingFilename, int prestigePool, bool isCampaignScenario)
+            string aiiFilename, string briefingFilename, int prestigePool, bool isCampaignScenario, MapTheme mapTheme)
         {
             ScenarioId = scenarioId;
             DisplayName = displayName;
@@ -75,6 +78,7 @@ namespace HammerAndSickle.Core.GameData
             BriefingFilename = briefingFilename;
             PrestigePool = prestigePool;
             IsCampaignScenario = isCampaignScenario;
+            MapTheme = mapTheme;
         }
 
         #endregion // Constructors

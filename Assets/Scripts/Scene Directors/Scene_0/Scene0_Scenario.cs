@@ -384,7 +384,28 @@ namespace HammerAndSickle.SceneDirectors
             int selectedIndex = _scenarioDialog.GetSelectedIndex();
             if (selectedIndex >= 0 && selectedIndex < _loadedManifests.Count)
             {
-                return _loadedManifests[selectedIndex];
+                ScenarioManifest selected = _loadedManifests[selectedIndex];
+
+                // Create a new instance to persist across scenes.
+                ScenarioManifest manifestCopy = new ScenarioManifest(
+                    selected.ScenarioId,
+                    selected.DisplayName,
+                    selected.Description,
+                    selected.ThumbnailFilename,
+                    selected.MapFilename,
+                    selected.OobFilename,
+                    selected.AiiFilename,
+                    selected.BriefingFilename,
+                    selected.PrestigePool,
+                    selected.IsCampaignScenario,
+                    selected.MapTheme
+                );
+
+                // Store the new instance in GDM to persist across scenes.
+                GameDataManager.CurrentManifest = manifestCopy;
+
+                // Return the new instance.
+                return manifestCopy;
             }
             return null;
         }

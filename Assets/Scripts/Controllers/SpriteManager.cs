@@ -1,8 +1,8 @@
 using HammerAndSickle.Services;
 using System;
-using System.Resources;
 using UnityEngine;
 using UnityEngine.U2D;
+using HammerAndSickle.Core.GameData;
 
 namespace HammerAndSickle.Controllers
 {
@@ -27,16 +27,6 @@ namespace HammerAndSickle.Controllers
         MajorCity,
         MinorCity,
         Airbase
-    }
-
-    /// <summary>
-    /// This enum contains the map themes used in the game.
-    /// </summary>
-    public enum MapTheme
-    {
-        MiddleEast,
-        Europe,
-        China
     }
 
     public class SpriteManager : MonoBehaviour
@@ -285,11 +275,11 @@ namespace HammerAndSickle.Controllers
                 {
                     return spriteType switch
                     {
-                        ThemedSpriteTypes.Nameplate => _bridgeIconAtlas.GetSprite(ME_Nameplate),
-                        ThemedSpriteTypes.Fort => _bridgeIconAtlas.GetSprite(ME_Fort),
-                        ThemedSpriteTypes.MajorCity => _bridgeIconAtlas.GetSprite(ME_MajorCity),
-                        ThemedSpriteTypes.MinorCity => _bridgeIconAtlas.GetSprite(ME_MinorCity),
-                        ThemedSpriteTypes.Airbase => _bridgeIconAtlas.GetSprite(ME_Airbase),
+                        ThemedSpriteTypes.Nameplate => _mapIconAtlas.GetSprite(ME_Nameplate),
+                        ThemedSpriteTypes.Fort => _mapIconAtlas.GetSprite(ME_Fort),
+                        ThemedSpriteTypes.MajorCity => _mapIconAtlas.GetSprite(ME_MajorCity),
+                        ThemedSpriteTypes.MinorCity => _mapIconAtlas.GetSprite(ME_MinorCity),
+                        ThemedSpriteTypes.Airbase => _mapIconAtlas.GetSprite(ME_Airbase),
                         _ => throw new ArgumentException($"{CLASS_NAME}.GetThemedSprite: Invalid sprite type '{spriteType}' for theme '{theme}'.")
                     };
                 }
@@ -297,11 +287,11 @@ namespace HammerAndSickle.Controllers
                 {
                     return spriteType switch
                     {
-                        ThemedSpriteTypes.Nameplate => _bridgeIconAtlas.GetSprite(EU_Nameplate),
-                        ThemedSpriteTypes.Fort => _bridgeIconAtlas.GetSprite(EU_Fort),
-                        ThemedSpriteTypes.MajorCity => _bridgeIconAtlas.GetSprite(EU_MajorCity),
-                        ThemedSpriteTypes.MinorCity => _bridgeIconAtlas.GetSprite(EU_MinorCity),
-                        ThemedSpriteTypes.Airbase => _bridgeIconAtlas.GetSprite(EU_Airbase),
+                        ThemedSpriteTypes.Nameplate => _mapIconAtlas.GetSprite(EU_Nameplate),
+                        ThemedSpriteTypes.Fort => _mapIconAtlas.GetSprite(EU_Fort),
+                        ThemedSpriteTypes.MajorCity => _mapIconAtlas.GetSprite(EU_MajorCity),
+                        ThemedSpriteTypes.MinorCity => _mapIconAtlas.GetSprite(EU_MinorCity),
+                        ThemedSpriteTypes.Airbase => _mapIconAtlas.GetSprite(EU_Airbase),
                         _ => throw new ArgumentException($"{CLASS_NAME}.GetThemedSprite: Invalid sprite type '{spriteType}' for theme '{theme}'.")
                     };
                 }
@@ -309,11 +299,11 @@ namespace HammerAndSickle.Controllers
                 {
                     return spriteType switch
                     {
-                        ThemedSpriteTypes.Nameplate => _bridgeIconAtlas.GetSprite(CH_Nameplate),
-                        ThemedSpriteTypes.Fort => _bridgeIconAtlas.GetSprite(CH_Fort),
-                        ThemedSpriteTypes.MajorCity => _bridgeIconAtlas.GetSprite(CH_MajorCity),
-                        ThemedSpriteTypes.MinorCity => _bridgeIconAtlas.GetSprite(CH_MinorCity),
-                        ThemedSpriteTypes.Airbase => _bridgeIconAtlas.GetSprite(CH_Airbase),
+                        ThemedSpriteTypes.Nameplate => _mapIconAtlas.GetSprite(CH_Nameplate),
+                        ThemedSpriteTypes.Fort => _mapIconAtlas.GetSprite(CH_Fort),
+                        ThemedSpriteTypes.MajorCity => _mapIconAtlas.GetSprite(CH_MajorCity),
+                        ThemedSpriteTypes.MinorCity => _mapIconAtlas.GetSprite(CH_MinorCity),
+                        ThemedSpriteTypes.Airbase => _mapIconAtlas.GetSprite(CH_Airbase),
                         _ => throw new ArgumentException($"{CLASS_NAME}.GetThemedSprite: Invalid sprite type '{spriteType}' for theme '{theme}'.")
                     };
                 }

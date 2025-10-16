@@ -1,11 +1,9 @@
 using System;
 using System.Collections.Generic;
-using System.Resources;
 using UnityEngine;
 using UnityEngine.Tilemaps;
 using HammerAndSickle.Controllers;
 using HammerAndSickle.Core.GameData;
-using HammerAndSickle.Legacy.Map;
 using HammerAndSickle.Models.Map;
 using HammerAndSickle.Services;
 using HammerAndSickle.Models;
@@ -29,17 +27,17 @@ namespace HammerAndSickle.Core.Map
         /// </summary>
         public static HexMapRenderer Instance { get; private set; }
 
-        #endregion
+        #endregion // Singleton
 
         #region Fields
+
         /// <summary>
         /// Dictionary to store and track city prefab instances by their hex coordinates.
         /// </summary>
         private readonly Dictionary<Vector2Int, Prefab_CityIcon> cityPrefabs = new();
 
         /// <summary>
-        /// Dictionary to store and track bridge prefab instances by their border position key.
-        /// Key format: "minX_minY_maxX_maxY_direction"
+        /// Dictionary to store and track bridge prefab instances by their unique keys.
         /// </summary>
         private readonly Dictionary<string, Prefab_BridgeIcon> bridgePrefabs = new();
 
@@ -48,7 +46,7 @@ namespace HammerAndSickle.Core.Map
         /// </summary>
         private readonly Dictionary<Vector2Int, Prefab_MapIcon> mapIconPrefabs = new();
 
-        #endregion
+        #endregion // Fields
 
         #region Inspector Fields
 
@@ -68,7 +66,7 @@ namespace HammerAndSickle.Core.Map
         [SerializeField]
         private GameObject textLabelLayer;
 
-        #endregion
+        #endregion // Inspector Fields
 
         #region Properties
 
@@ -83,7 +81,7 @@ namespace HammerAndSickle.Core.Map
         /// </summary>
         public GameObject TextLabelLayer => textLabelLayer;
 
-        #endregion
+        #endregion // Properties
 
         #region Unity Lifecycle
 
@@ -112,12 +110,12 @@ namespace HammerAndSickle.Core.Map
         {
             if (!IsInitialized)
             {
-                Debug.LogError($"{GetType().Name}.Start: Service failed to initialize properly.");
+                Debug.LogError($"{CLASS_NAME}.Start: Service failed to initialize properly.");
                 return;
             }
         }
 
-        #endregion
+        #endregion // Unity Lifecycle
 
         #region Initialization
 
@@ -134,7 +132,7 @@ namespace HammerAndSickle.Core.Map
             }
             catch (Exception ex)
             {
-                AppService.HandleException(GetType().Name, "InitializeService", ex);
+                AppService.HandleException(CLASS_NAME, "InitializeService", ex);
                 IsInitialized = false;
             }
         }
@@ -146,22 +144,22 @@ namespace HammerAndSickle.Core.Map
         private void ValidateComponents()
         {
             if (hexOutlineTilemap == null)
-                throw new NullReferenceException($"{GetType().Name}.ValidateComponents: {nameof(hexOutlineTilemap)} TileRenderer is missing.");
+                throw new NullReferenceException($"{CLASS_NAME}.ValidateComponents: {nameof(hexOutlineTilemap)} is missing.");
 
             if (hexSelectionTilemap == null)
-                throw new NullReferenceException($"{GetType().Name}.ValidateComponents: {nameof(hexSelectionTilemap)} TileRenderer is missing.");
+                throw new NullReferenceException($"{CLASS_NAME}.ValidateComponents: {nameof(hexSelectionTilemap)} is missing.");
 
             if (mapIconLayer == null)
-                throw new NullReferenceException($"{GetType().Name}.ValidateComponents: {nameof(mapIconLayer)} TileRenderer is missing.");
+                throw new NullReferenceException($"{CLASS_NAME}.ValidateComponents: {nameof(mapIconLayer)} is missing.");
 
             if (cityIconLayer == null)
-                throw new NullReferenceException($"{GetType().Name}.ValidateComponents: {nameof(cityIconLayer)} GameObject is missing.");
+                throw new NullReferenceException($"{CLASS_NAME}.ValidateComponents: {nameof(cityIconLayer)} is missing.");
 
             if (bridgeIconLayer == null)
-                throw new NullReferenceException($"{GetType().Name}.ValidateComponents: {nameof(bridgeIconLayer)} GameObject is missing.");
+                throw new NullReferenceException($"{CLASS_NAME}.ValidateComponents: {nameof(bridgeIconLayer)} is missing.");
         }
 
-        #endregion
+        #endregion // Initialization
 
         #region Public Methods
 
@@ -170,35 +168,131 @@ namespace HammerAndSickle.Core.Map
         /// </summary>
         public Vector3 GetRenderPosition(Vector2Int gridPos)
         {
-            // Check if the service is initialized.
-            if (IsInitialized)
-            {
-                // Get the world position of the cell center.
-                return hexOutlineTilemap.GetCellCenterWorld(new Vector3Int(gridPos.x, gridPos.y, 0));
-            }
-            else throw new InvalidOperationException($"{GetType().Name}.GetTilemapRenderPosition: Service not initialized.");
+            if (!IsInitialized)
+                throw new InvalidOperationException($"{CLASS_NAME}.GetRenderPosition: Service not initialized.");
+
+            return hexOutlineTilemap.GetCellCenterWorld(new Vector3Int(gridPos.x, gridPos.y, 0));
         }
-
-        #endregion
-
-        #region Private Methods
 
         /// <summary>
-        /// Updates the map layers based on current map data.
+        /// Refreshes the entire map display, redrawing all elements.
         /// </summary>
-        private void UpdateMapLayers()
+        public void RefreshMap()
         {
-            // Clear existing map icons.
-            ClearContainer(mapIconLayer.transform);
-            ClearContainer(bridgeIconLayer.transform);
-            ClearContainer(cityIconLayer.transform);
+            try
+            {
+                // Validate that we have a map to render
+                if (GameDataManager.CurrentHexMap == null)
+                {
+                    AppService.CaptureUiMessage("Cannot refresh map: No hex map loaded.");
+                    return;
+                }
 
-            // Draw the map and bridge icons.
-            DrawMapIcons();
+                // Clear tracking dictionaries
+                cityPrefabs.Clear();
+                bridgePrefabs.Clear();
+                mapIconPrefabs.Clear();
 
-            // Draw the city icons.
-            DrawCityIcons();
+                // Clear existing visual elements
+                ClearContainer(mapIconLayer.transform);
+                ClearContainer(bridgeIconLayer.transform);
+                ClearContainer(cityIconLayer.transform);
+                ClearContainer(textLabelLayer.transform);
+
+                // Draw the hex outlines
+                DrawHexOutlines();
+
+                // Iterate through all hexes and render their features
+                foreach (var hex in GameDataManager.CurrentHexMap)
+                {
+                    if (hex == null) continue;
+
+                    // Draw map icons (airbases, forts)
+                    DrawMapIconsForHex(hex);
+
+                    // Draw city icons
+                    DrawCityIconForHex(hex);
+
+                    // Draw bridges (only for E, SE, SW to avoid duplicates)
+                    DrawBridgesForHex(hex);
+                }
+            }
+            catch (Exception e)
+            {
+                AppService.HandleException(CLASS_NAME, "RefreshMap", e);
+            }
         }
+
+        /// <summary>
+        /// Draws the hex selector outline on the map.
+        /// </summary>
+        public void DrawHexSelector()
+        {
+            try
+            {
+                // Clear existing hex selector
+                hexSelectionTilemap.ClearAllTiles();
+
+                // Check if a hex is selected
+                Position2D selectedHex = GameDataManager.SelectedHex;
+                if (selectedHex != GameDataManager.NoHexSelected)
+                {
+                    // Create and configure the tile
+                    Tile tile = ScriptableObject.CreateInstance<Tile>();
+                    tile.sprite = SpriteManager.Instance.GetSprite(AtlasTypes.HexOutlineIcons, SpriteManager.HexSelectOutline);
+
+                    // Set the tile at the position
+                    hexSelectionTilemap.SetTile(new Vector3Int(selectedHex.IntX, selectedHex.IntY, 0), tile);
+                }
+            }
+            catch (Exception e)
+            {
+                AppService.HandleException(CLASS_NAME, "DrawHexSelector", e);
+            }
+        }
+
+        /// <summary>
+        /// Changes the control flag for a city at the specified position based on current tile control.
+        /// </summary>
+        public void ChangeControlFlag(Position2D position)
+        {
+            try
+            {
+                // Validate map exists
+                if (GameDataManager.CurrentHexMap == null)
+                {
+                    AppService.CaptureUiMessage("Cannot change control flag: No hex map loaded.");
+                    return;
+                }
+
+                // Get the hex at the position
+                HexTile hex = GameDataManager.CurrentHexMap.GetHexAt(position);
+                if (hex == null)
+                {
+                    AppService.CaptureUiMessage($"Cannot change control flag: No hex found at position {position}.");
+                    return;
+                }
+
+                // Check if there's a city prefab at this position
+                Vector2Int pos = new Vector2Int(position.IntX, position.IntY);
+                if (!cityPrefabs.TryGetValue(pos, out Prefab_CityIcon cityPrefab))
+                {
+                    AppService.CaptureUiMessage($"Cannot change control flag: No city found at position {position}.");
+                    return;
+                }
+
+                // Update the control flag based on current tile control
+                cityPrefab.UpdateControlFlag(hex.TileControl, hex.DefaultTileControl);
+            }
+            catch (Exception e)
+            {
+                AppService.HandleException(CLASS_NAME, "ChangeControlFlag", e);
+            }
+        }
+
+        #endregion // Public Methods
+
+        #region Private Methods - Hex Outlines
 
         /// <summary>
         /// Draws hex outlines based on current map configuration and outline color settings.
@@ -207,7 +301,7 @@ namespace HammerAndSickle.Core.Map
         {
             try
             {
-                // Clear existing hex outlines.
+                // Clear existing hex outlines
                 hexOutlineTilemap.ClearAllTiles();
 
                 // Get the appropriate sprite based on outline color
@@ -219,11 +313,12 @@ namespace HammerAndSickle.Core.Map
                 tile.sprite = sprite;
 
                 // Draw tiles for each valid position
-                for (int x = 0; x < GameDataManager.CurrentMapSize.Width; x++)
+                Vector2Int mapSize = GameDataManager.CurrentMapSize.ToVector2Int();
+                for (int x = 0; x < mapSize.x; x++)
                 {
-                    for (int y = 0; y < GameDataManager.CurrentMapSize.Height; y++)
+                    for (int y = 0; y < mapSize.y; y++)
                     {
-                        if (IsValidHexPosition(x, y))
+                        if (IsValidHexPosition(x, y, mapSize))
                         {
                             hexOutlineTilemap.SetTile(new Vector3Int(x, y, 0), tile);
                         }
@@ -237,240 +332,173 @@ namespace HammerAndSickle.Core.Map
         }
 
         /// <summary>
-        /// Draws the hex selector outline on the map.
+        /// Gets the appropriate sprite name based on current outline color setting.
         /// </summary>
-        private void DrawHexSelector()
+        private string GetOutlineSpriteName()
+        {
+            return GameDataManager.CurrentHexOutlineColor switch
+            {
+                HexOutlineColor.Black => SpriteManager.BlackHexOutline,
+                HexOutlineColor.White => SpriteManager.WhiteHexOutline,
+                _ => SpriteManager.GreyHexOutline
+            };
+        }
+
+        /// <summary>
+        /// Checks if the given coordinates represent a valid hex position.
+        /// </summary>
+        private bool IsValidHexPosition(int x, int y, Vector2Int mapSize)
+        {
+            // Don't render the last column if row is odd (prevents rendering out of bounds)
+            if (y % 2 != 0 && x >= mapSize.x - 1)
+                return false;
+
+            return true;
+        }
+
+        #endregion // Private Methods - Hex Outlines
+
+        #region Private Methods - Map Icons
+
+        /// <summary>
+        /// Draws map icons for a specific hex (airbases and forts).
+        /// </summary>
+        private void DrawMapIconsForHex(HexTile hex)
         {
             try
             {
-                // Clear existing hex selector.
-                hexSelectionTilemap.ClearAllTiles();
-
-                // Check if a hex is selected.
-                Position2D selectedHex = GameDataManager.SelectedHex;
-                if (selectedHex != GameDataManager.NoHexSelected)
+                if (hex.IsAirbase)
                 {
-                    // Create and configure the tile
-                    Tile tile = ScriptableObject.CreateInstance<Tile>();
-
-                    // Draw the selection outline.
-                    tile.sprite = SpriteManager.Instance.GetSprite(AtlasTypes.HexOutlineIcons, SpriteManager.HexSelectOutline);
-
-                    // Set the tile at the position.
-                    hexSelectionTilemap.SetTile(new Vector3Int(selectedHex.IntX, selectedHex.IntY, 0), tile);
+                    CreateMapIcon(hex, MapIconType.Airbase, ThemedSpriteTypes.Airbase);
+                }
+                else if (hex.IsFort)
+                {
+                    CreateMapIcon(hex, MapIconType.Fort, ThemedSpriteTypes.Fort);
                 }
             }
             catch (Exception e)
             {
-                AppService.HandleException(CLASS_NAME, "DrawHexSelector", e);
+                AppService.HandleException(CLASS_NAME, "DrawMapIconsForHex", e);
             }
         }
 
         /// <summary>
-        /// Draws hex icons based on current hex map data. Places icons for airbases and forts.
+        /// Creates a map icon prefab at the specified hex position.
         /// </summary>
-        private void DrawMapIcons()
+        private void CreateMapIcon(HexTile hex, MapIconType iconType, ThemedSpriteTypes spriteType)
+        {
+            // Create prefab instance
+            GameObject mapIconObject = Instantiate(SpriteManager.Instance.MapIconPrefab, mapIconLayer.transform);
+            mapIconObject.name = $"{iconType}_{hex.Position.IntX}_{hex.Position.IntY}";
+
+            // Get prefab component
+            Prefab_MapIcon mapIconPrefab = mapIconObject.GetComponent<Prefab_MapIcon>();
+
+            // Configure prefab
+            mapIconPrefab.SetIconType(iconType);
+            mapIconPrefab.SetPosition(new Vector2Int(hex.Position.IntX, hex.Position.IntY));
+            mapIconPrefab.GetSpriteRenderer().sprite = SpriteManager.Instance.GetThemedSprite(GameDataManager.CurrentMapTheme, spriteType);
+
+            // Position the prefab
+            mapIconObject.transform.position = GetRenderPosition(new Vector2Int(hex.Position.IntX, hex.Position.IntY));
+
+            // Store reference
+            mapIconPrefabs[new Vector2Int(hex.Position.IntX, hex.Position.IntY)] = mapIconPrefab;
+        }
+
+        #endregion // Private Methods - Map Icons
+
+        #region Private Methods - City Icons
+
+        /// <summary>
+        /// Draws city icon for a specific hex if it's a city.
+        /// </summary>
+        private void DrawCityIconForHex(HexTile hex)
         {
             try
             {
-                // Iterate through the hex map
-                for (int x = 0; x < GameDataManager.CurrentMapSize.Width; x++)
+                TerrainType terrain = hex.Terrain;
+
+                // Check if this hex should have a city icon
+                if (terrain == TerrainType.MajorCity || terrain == TerrainType.MinorCity)
                 {
-                    for (int y = 0; y < GameDataManager.CurrentMapSize.Height; y++)
-                    {
-                        HexTile hex = GameDataManager.CurrentHexMap.GetHexAt(new Position2D(x, y));
-
-                        // Check if this hex should have an icon.
-                        if (hex.IsAirbase)
-                        {
-                            // Create airbase prefab instance,
-                            GameObject mapIconObject = Instantiate(SpriteManager.Instance.MapIconPrefab, mapIconLayer.transform);
-
-                            // Set the name of the object.
-                            mapIconObject.name = $"Airbase_{x}_{y}";
-                            Prefab_MapIcon mapIconPrefab = mapIconObject.GetComponent<Prefab_MapIcon>();
-
-                            // Set the icon type and position.
-                            mapIconPrefab.SetIconType(MapIconType.Airbase);
-                            mapIconPrefab.SetPosition(new Vector2Int(x, y));
-
-                            // Get the correct sprite from the atlas.
-                            mapIconPrefab.GetSpriteRenderer().sprite = SpriteManager.Instance.GetThemedSprite(GameDataManager.CurrentMapTheme, ThemedSpriteTypes.Airbase);
-
-                            // Position the prefab (adjust these values based on your grid spacing)
-                            mapIconObject.transform.position = GetRenderPosition(new Vector2Int(x, y));
-                        }
-                        else if (hex.IsFort)
-                        {
-                            // Create airbase prefab instance,
-                            GameObject mapIconObject = Instantiate(SpriteManager.Instance.MapIconPrefab, mapIconLayer.transform);
-
-                            // Set the name of the object.
-                            mapIconObject.name = $"Fort_{x}_{y}";
-                            Prefab_MapIcon mapIconPrefab = mapIconObject.GetComponent<Prefab_MapIcon>();
-
-                            // Set the icon type and position.
-                            mapIconPrefab.SetIconType(MapIconType.Fort);
-                            mapIconPrefab.SetPosition(new Vector2Int(x, y));
-
-                            // Get the correct sprite from the atlas.
-                            mapIconPrefab.GetSpriteRenderer().sprite = SpriteManager.Instance.GetThemedSprite(GameDataManager.CurrentMapTheme, ThemedSpriteTypes.Fort);
-
-                            // Position the prefab (adjust these values based on your grid spacing)
-                            mapIconObject.transform.position = GetRenderPosition(new Vector2Int(x, y));
-
-                            // Store the prefab reference.
-                            mapIconPrefabs[new Vector2Int(x, y)] = mapIconPrefab;
-                        }
-
-                        // Draw bridges.
-                        DrawBridges(hex);
-                    }
+                    CreateCityIcon(hex, terrain);
                 }
             }
             catch (Exception e)
             {
-                AppService.HandleException(GetType().Name, "DrawHexSelector", e);
+                AppService.HandleException(CLASS_NAME, "DrawCityIconForHex", e);
             }
         }
 
         /// <summary>
-        /// Draws map icons based on current hex map data. Places icons for cities and airbases.
+        /// Creates a city icon prefab at the specified hex position.
         /// </summary>
-        private void DrawCityIcons()
+        private void CreateCityIcon(HexTile hex, TerrainType terrain)
+        {
+            // Create city prefab instance
+            GameObject cityObj = Instantiate(SpriteManager.Instance.CityPrefab, cityIconLayer.transform);
+            cityObj.name = $"City_{hex.Position.IntX}_{hex.Position.IntY}";
+
+            // Get prefab component
+            Prefab_CityIcon cityPrefab = cityObj.GetComponent<Prefab_CityIcon>();
+
+            // Position the prefab
+            Vector3 position = hexOutlineTilemap.GetCellCenterWorld(new Vector3Int(hex.Position.IntX, hex.Position.IntY, 0));
+            cityObj.transform.position = position;
+
+            // Update the prefab's visual elements
+            cityPrefab.UpdateCityIcon(terrain, GameDataManager.CurrentMapTheme);
+            cityPrefab.UpdateNameplate(GameDataManager.CurrentMapTheme);
+            cityPrefab.UpdateControlFlag(hex.TileControl, hex.DefaultTileControl);
+            cityPrefab.UpdateCityName(hex.TileLabel);
+            cityPrefab.UpdateObjectiveStatus(hex.IsObjective);
+
+            // Store the prefab reference
+            cityPrefabs[new Vector2Int(hex.Position.IntX, hex.Position.IntY)] = cityPrefab;
+        }
+
+        #endregion // Private Methods - City Icons
+
+        #region Private Methods - Bridges
+
+        /// <summary>
+        /// Draws bridge icons for a specific hex.
+        /// Only renders bridges in E, SE, and SW directions to avoid duplicates.
+        /// </summary>
+        private void DrawBridgesForHex(HexTile hex)
         {
             try
             {
-                // Iterate through the hex map
-                for (int x = 0; x < GameDataManager.CurrentHexMap.MapSize.x; x++)
-                {
-                    for (int y = 0; y < GameDataManager.CurrentHexMap.MapSize.y; y++)
-                    {
-                        HexTile hexTile = GameDataManager.CurrentHexMap.GetHexAt(new Position2D(x, y));
-                        TerrainType terrain = hexTile.Terrain;
-
-                        // Check if this hex should have a city icon
-                        if (terrain == TerrainType.MajorCity || terrain == TerrainType.MinorCity)
-                        {
-                            // Create city prefab instance
-                            GameObject cityObj = Instantiate(SpriteManager.Instance.CityPrefab, cityIconLayer.transform);
-                            cityObj.name = $"City_{x}_{y}";
-                            Prefab_CityIcon cityPrefab = cityObj.GetComponent<Prefab_CityIcon>();
-
-                            // Position the prefab (adjust these values based on your grid spacing)
-                            Vector3 position = hexOutlineTilemap.GetCellCenterWorld(new Vector3Int(x, y, 0));
-                            cityObj.transform.position = position;
-
-                            // Update the prefab's visual elements
-                            cityPrefab.UpdateCityIcon(terrain, GameDataManager.CurrentMapTheme);
-                            cityPrefab.UpdateNameplate(GameDataManager.CurrentMapTheme);
-                            cityPrefab.UpdateControlFlag(hexTile.TileControl, hexTile.DefaultTileControl);
-                            cityPrefab.UpdateCityName(hexTile.TileLabel);
-                            cityPrefab.UpdateObjectiveStatus(hexTile.IsObjective);
-
-                            // Store the prefab reference
-                            cityPrefabs[new Vector2Int(x, y)] = cityPrefab;
-                        }
-                    }
-                }
+                // Only render bridges in half the directions to avoid duplicates
+                // Each bridge will be rendered once from one of the two hexes it connects
+                DrawBridgeInDirection(hex, HexDirection.E, hex.BridgeBorders.East, hex.DamagedBridgeBorders.East, hex.PontoonBridgeBorders.East);
+                DrawBridgeInDirection(hex, HexDirection.SE, hex.BridgeBorders.Southeast, hex.DamagedBridgeBorders.Southeast, hex.PontoonBridgeBorders.Southeast);
+                DrawBridgeInDirection(hex, HexDirection.SW, hex.BridgeBorders.Southwest, hex.DamagedBridgeBorders.Southwest, hex.PontoonBridgeBorders.Southwest);
             }
             catch (Exception e)
             {
-                AppService.HandleException(GetType().Name, "DrawCityIcons", e);
+                AppService.HandleException(CLASS_NAME, "DrawBridgesForHex", e);
             }
         }
 
         /// <summary>
-        /// Draws the bridge icons on the map.
+        /// Draws a bridge in the specified direction if one exists.
         /// </summary>
-        /// <param name="x"></param>
-        /// <param name="y"></param>
-        /// <param name="hex"></param>
-        private void DrawBridges(HexTile hex)
+        private void DrawBridgeInDirection(HexTile hex, HexDirection direction, bool hasRegular, bool hasDamaged, bool hasPontoon)
         {
-            try
+            // Check each bridge type and create if needed
+            if (hasRegular)
             {
-                // Draw the bridge icons.
-                if (hex.BridgeBorders.Northwest)
-                {
-                    CreateBridgeObject(hex, BridgeType.Regular, HexDirection.NW);
-                }
-                if (hex.BridgeBorders.Northeast)
-                {
-                    CreateBridgeObject(hex, BridgeType.Regular, HexDirection.NE);
-                }
-                if (hex.BridgeBorders.East)
-                {
-                    CreateBridgeObject(hex, BridgeType.Regular, HexDirection.E);
-                }
-                if (hex.BridgeBorders.Southeast)
-                {
-                    CreateBridgeObject(hex, BridgeType.Regular, HexDirection.SE);
-                }
-                if (hex.BridgeBorders.Southwest)
-                {
-                    CreateBridgeObject(hex, BridgeType.Regular, HexDirection.SW);
-                }
-                if (hex.BridgeBorders.West)
-                {
-                    CreateBridgeObject(hex, BridgeType.Regular, HexDirection.W);
-                }
-
-                // Draw damaged bridges icons.
-                if (hex.DamagedBridgeBorders.Northwest)
-                {
-                    CreateBridgeObject(hex, BridgeType.DamagedRegular, HexDirection.NW);
-                }
-                if (hex.DamagedBridgeBorders.Northeast)
-                {
-                    CreateBridgeObject(hex, BridgeType.DamagedRegular, HexDirection.NE);
-                }
-                if (hex.DamagedBridgeBorders.East)
-                {
-                    CreateBridgeObject(hex, BridgeType.DamagedRegular, HexDirection.E);
-                }
-                if (hex.DamagedBridgeBorders.Southeast)
-                {
-                    CreateBridgeObject(hex, BridgeType.DamagedRegular, HexDirection.SE);
-                }
-                if (hex.DamagedBridgeBorders.Southwest)
-                {
-                    CreateBridgeObject(hex, BridgeType.DamagedRegular, HexDirection.SW);
-                }
-                if (hex.DamagedBridgeBorders.West)
-                {
-                    CreateBridgeObject(hex, BridgeType.DamagedRegular, HexDirection.W);
-                }
-
-                // Draw pontoon bridges icons.
-                if (hex.PontoonBridgeBorders.Northwest)
-                {
-                    CreateBridgeObject(hex, BridgeType.Pontoon, HexDirection.NW);
-                }
-                if (hex.PontoonBridgeBorders.Northeast)
-                {
-                    CreateBridgeObject(hex, BridgeType.Pontoon, HexDirection.NE);
-                }
-                if (hex.PontoonBridgeBorders.East)
-                {
-                    CreateBridgeObject(hex, BridgeType.Pontoon, HexDirection.E);
-                }
-                if (hex.PontoonBridgeBorders.Southeast)
-                {
-                    CreateBridgeObject(hex, BridgeType.Pontoon, HexDirection.SE);
-                }
-                if (hex.PontoonBridgeBorders.Southwest)
-                {
-                    CreateBridgeObject(hex, BridgeType.Pontoon, HexDirection.SW);
-                }
-                if (hex.PontoonBridgeBorders.West)
-                {
-                    CreateBridgeObject(hex, BridgeType.Pontoon, HexDirection.W);
-                }
+                CreateBridgeObject(hex, BridgeType.Regular, direction);
             }
-            catch (System.Exception e)
+            if (hasDamaged)
             {
-                AppService.HandleException("HexMapRenderer", "DrawBridges", e);
+                CreateBridgeObject(hex, BridgeType.DamagedRegular, direction);
+            }
+            if (hasPontoon)
+            {
+                CreateBridgeObject(hex, BridgeType.Pontoon, direction);
             }
         }
 
@@ -479,38 +507,43 @@ namespace HammerAndSickle.Core.Map
         /// </summary>
         private void CreateBridgeObject(HexTile hex, BridgeType bridgeType, HexDirection direction)
         {
-            // Generate the key
-            string borderKey = GenerateBridgeBorderKey(hex, direction, bridgeType);
-            if (string.IsNullOrEmpty(borderKey)) return;
+            // Verify neighbor exists (bridges span between two hexes)
+            HexTile neighborHex = hex.GetNeighbor(direction);
+            if (neighborHex == null) return;
 
-            // Check if the swapped version exists
-            string swappedKey = GetSwappedBridgeKey(borderKey);
-            if (bridgePrefabs.ContainsKey(swappedKey))
-            {
-                return; // Bridge already exists from neighbor's perspective
-            }
+            // Generate unique key for this bridge
+            string bridgeKey = GenerateBridgeKey(hex.Position, direction, bridgeType);
+
+            // Skip if already rendered
+            if (bridgePrefabs.ContainsKey(bridgeKey)) return;
 
             // Create bridge prefab instance
             GameObject bridgeIconObject = Instantiate(SpriteManager.Instance.BridgeIconPrefab, bridgeIconLayer.transform);
+            bridgeIconObject.name = $"{bridgeType}_{direction}_{hex.Position.IntX}_{hex.Position.IntY}";
 
-            // Set the name of the object.
-            bridgeIconObject.name = $"{direction} {bridgeType} {hex.Position.X}_{hex.Position.Y}";
+            // Get prefab component
             Prefab_BridgeIcon bridgeIconPrefab = bridgeIconObject.GetComponent<Prefab_BridgeIcon>();
 
-            // Set the icon type and position.
+            // Configure prefab
             bridgeIconPrefab.Type = bridgeType;
             bridgeIconPrefab.Dir = direction;
             bridgeIconPrefab.Pos = hex.Position.ToVector2Int();
-
-            // Set the appropriate sprite based on bridge type and direction
             bridgeIconPrefab.Renderer.sprite = GetBridgeSprite(bridgeType, direction);
 
             // Position the prefab
             Vector3 position = hexOutlineTilemap.GetCellCenterWorld(new Vector3Int(hex.Position.IntX, hex.Position.IntY, 0));
             bridgeIconObject.transform.position = position;
 
-            // Store the prefab reference with the border key
-            bridgePrefabs[borderKey] = bridgeIconPrefab;
+            // Store the prefab reference
+            bridgePrefabs[bridgeKey] = bridgeIconPrefab;
+        }
+
+        /// <summary>
+        /// Generates a unique key for a bridge.
+        /// </summary>
+        private string GenerateBridgeKey(Position2D pos, HexDirection dir, BridgeType type)
+        {
+            return $"{pos.IntX}_{pos.IntY}_{(int)dir}_{(int)type}";
         }
 
         /// <summary>
@@ -568,79 +601,13 @@ namespace HammerAndSickle.Core.Map
             return SpriteManager.Instance.GetSprite(AtlasTypes.BridgeIcons, spriteName);
         }
 
-        /// <summary>
-        /// Generates a unique border key for bridge placement.
-        /// </summary>
-        private string GenerateBridgeBorderKey(HexTile currentHex, HexDirection direction, BridgeType bridgeType)
-        {
-            // Get neighbor hex
-            HexTile neighborHex = currentHex.GetNeighbor(direction);
+        #endregion // Private Methods - Bridges
 
-            // Check if the neighbor hex is valid
-            if (neighborHex == null) return string.Empty;
-
-            // Get the opposite direction for the neighbor's perspective
-            HexDirection oppositeDirection = HexMapUtil.GetOppositeDirection(direction);
-
-            // Generate first half (current hex)
-            string currentHexKey = string.Format("{0:D3}{1:D3}{2}{3}",
-                currentHex.Position.X,
-                currentHex.Position.Y,
-                (int)direction,
-                (int)bridgeType);
-
-            // Generate second half (neighbor hex)
-            string neighborHexKey = string.Format("{0:D3}{1:D3}{2}{3}",
-                neighborHex.Position.X,
-                neighborHex.Position.Y,
-                (int)oppositeDirection,
-                (int)bridgeType);
-
-            // Return the combined key
-            return currentHexKey + neighborHexKey;
-        }
-
-        /// <summary>
-        /// Gets the swapped version of a bridge key (swaps the two 8-character halves).
-        /// </summary>
-        private string GetSwappedBridgeKey(string originalKey)
-        {
-            if (string.IsNullOrEmpty(originalKey) || originalKey.Length != 16)
-                return string.Empty;
-
-            return originalKey.Substring(8, 8) + originalKey.Substring(0, 8);
-        }
-
-        /// <summary>
-        /// Gets the appropriate sprite name based on current outline color setting.
-        /// </summary>
-        /// <returns>The sprite name to use for hex outlines.</returns>
-        private string GetOutlineSpriteName()
-        {
-            return GameDataManager.CurrentHexOutlineColor switch
-            {
-                HexOutlineColor.Black => SpriteManager.BlackHexOutline,
-                HexOutlineColor.White => SpriteManager.WhiteHexOutline,
-                _ => SpriteManager.GreyHexOutline
-            };
-        }
-
-        /// <summary>
-        /// Checks if the given coordinates represent a valid hex position.
-        /// </summary>
-        private bool IsValidHexPosition(int x, int y)
-        {
-            // Don't render the last column if row is odd (prevents rendering out of bounds)
-            if (y % 2 != 0 && x >= GameDataManager.CurrentMapSize.X - 1)
-                return false;
-
-            return true;
-        }
+        #region Private Methods - Utilities
 
         /// <summary>
         /// Clears all child objects from the specified container.
         /// </summary>
-        /// <param name="container"></param>
         private void ClearContainer(Transform container)
         {
             try
@@ -648,15 +615,15 @@ namespace HammerAndSickle.Core.Map
                 // Loop backwards because destroying objects will shift the indices
                 for (int i = container.childCount - 1; i >= 0; i--)
                 {
-                    GameObject.Destroy(container.GetChild(i).gameObject);
+                    Destroy(container.GetChild(i).gameObject);
                 }
             }
             catch (Exception e)
             {
-                AppService.HandleException("ClassName", "ClearContainer", e);
+                AppService.HandleException(CLASS_NAME, "ClearContainer", e);
             }
         }
 
-        #endregion
+        #endregion // Private Methods - Utilities
     }
 }
