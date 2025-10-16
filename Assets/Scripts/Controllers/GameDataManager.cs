@@ -25,6 +25,7 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 using HammerAndSickle.Core.GameData;
+using HammerAndSickle.Models.Map;
 
 namespace HammerAndSickle.Controllers
 {
@@ -53,10 +54,23 @@ namespace HammerAndSickle.Controllers
     /// </summary>
     public class GameDataManager : MonoBehaviour
     {
+        #region Enumerations
+
+        public enum SceneID
+        {
+            MainMenu = 0,
+            Scenario_Khost = 1,
+            Campaign_Khost = 2
+        }
+
+        #endregion // Enumerations
+
         #region Constants
 
         private const string CLASS_NAME = nameof(GameDataManager);
 
+        
+        
         // File extensions for future use
         public const string MANIFEST_EXTENSION = ".manifest";
         public const string MAP_EXTENSION = ".map";
@@ -64,6 +78,10 @@ namespace HammerAndSickle.Controllers
         public const string AII_EXTENSION = ".aii";
         public const string BRF_EXTENSION = ".brf";
         public const string CMP_EXTENSION = ".cmp";
+
+        // Scenario ID constants
+        public const string SCENARIO_ID_MISSION_KHOST = "Mission_Khost";
+        public const string SCENARIO_ID_CAMPAIGN_KHOST = "Campaign_Khost";
 
         #endregion // Constants
 
@@ -106,20 +124,44 @@ namespace HammerAndSickle.Controllers
 
         #region Properties
 
-        /// <summary>The player progression data that persists across scenarios.</summary>
-        public CampaignData CurrentCampaignData { get; set; }
-
-        /// <summary>The currently loaded scenario data (null outside of missions).</summary>
-        public ScenarioData CurrentScenarioData { get; set; }
-
-        /// <summary>Indicates whether the manager has been fully initialized.</summary>
+        // Indicates whether the manager has been fully initialized.
         public bool IsReady => _isInitialized;
 
-        /// <summary>Gets the count of registered combat units.</summary>
+        /// ----------------------------------------------------
+        /// Database of all registered combat units and leaders
+        /// ----------------------------------------------------
+        // The player progression data that persists across scenarios.
+        public CampaignData CurrentCampaignData { get; set; }
+
+        // The currently loaded scenario data (null outside of missions).
+        public ScenarioData CurrentScenarioData { get; set; }
+
+        // Gets the count of registered combat units.
         public int UnitCount => _combatUnits.Count;
 
-        /// <summary>Gets the count of registered leaders.</summary>
+        // Gets the count of registered leaders.
         public int LeaderCount => _leaders.Count;
+
+        /// --------------------
+        /// Map related data
+        /// --------------------
+        // Currently active hex map instance (null if none).
+        public static HexMap CurrentHexMap { get; set; } = null;
+
+        // Current map size in hex cells (width, height).
+        public static Position2D CurrentMapSize { get; set; } = new(100, 100);
+
+        // Current map theme for terrain and icons.
+        public static MapTheme CurrentMapTheme { get; set; } = MapTheme.MiddleEast;
+
+        // Hex outline color.
+        public static HexOutlineColor CurrentHexOutlineColor { get; set; } = HexOutlineColor.Black;
+
+        // Vector representing no hex is selected
+        public static readonly Position2D NoHexSelected = new(-1, -1);
+
+        // Currently selected hex coordinates (-1, -1) if none selected.
+        public static Position2D SelectedHex { get; set; } = NoHexSelected;
 
         #endregion // Properties
 

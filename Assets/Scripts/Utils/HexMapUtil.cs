@@ -220,6 +220,24 @@ namespace HammerAndSickle.Models.Map
         }
 
         /// <summary>
+        /// Gets the opposite direction for a given hex direction.
+        /// </summary>
+        /// <param name="direction">Original direction</param>
+        /// <returns>Opposite direction</returns>
+        public static HexDirection GetOppositeDirection(HexDirection direction)
+        {
+            try
+            {
+                return (HexDirection)(((int)direction + 3) % 6);
+            }
+            catch (Exception ex)
+            {
+                AppService.HandleException(CLASS_NAME, nameof(GetOppositeDirection), ex);
+                return direction; // Return original direction on error
+            }
+        }
+
+        /// <summary>
         /// Converts odd-r offset coordinates to cube coordinates for calculations.
         /// </summary>
         /// <param name="offset">Offset coordinates</param>

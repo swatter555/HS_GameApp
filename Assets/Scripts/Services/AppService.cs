@@ -119,6 +119,9 @@ namespace HammerAndSickle.Services
             Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.MyDocuments),
                         MyGamesFolderName, MainAppFolderName));
 
+        // Path to sprite atlas resources within the Unity project.
+        public const string SpriteAtlasPath = "Assets/Resources/Art/Sprite Atlases/";
+
         /// <summary>
         /// Path to scenario storage: Documents/My Games/Hammer and Sickle/scenario data/
         /// </summary>
