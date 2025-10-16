@@ -100,10 +100,33 @@ namespace HammerAndSickle.SceneDirectors
 
         #region Callbacks
 
-        public static void OnLoadButton()
+        public void OnLoadButton()
         {
-            // Continue game logic
-            Debug.Log("Load button pressed.");
+            // Validate a scenario is selected and get the manifest.
+            ScenarioManifest manifest = GetSelectedManifest();
+            if (manifest == null)
+            {
+                AppService.CaptureUiMessage("No scenario selected to load.");
+                return;
+            }
+
+            // Get the scene ID based on the selected scenario ID.
+            int? sceneId = manifest.ScenarioId switch
+            {
+                GameDataManager.SCENARIO_ID_MISSION_KHOST => (int)GameDataManager.SceneID.Scenario_Khost,
+                GameDataManager.SCENARIO_ID_CAMPAIGN_KHOST => (int)GameDataManager.SceneID.Campaign_Khost,
+                _ => null
+            };
+
+            // Load the scene if a valid scene ID was found.
+            if (sceneId.HasValue)
+            {
+                SceneManager.Instance.LoadScene(sceneId.Value);
+            }
+            else
+            {
+                AppService.CaptureUiMessage($"Unknown scenario ID: {manifest.ScenarioId}");
+            }
         }
 
         public void OnRandomButton()

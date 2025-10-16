@@ -6,6 +6,7 @@ using System.Text.Json.Serialization;
 using HammerAndSickle.Services;
 using UnityEngine;
 using HammerAndSickle.Core.GameData;
+using HammerAndSickle.Controllers;
 
 namespace HammerAndSickle.Models.Map
 {
@@ -15,48 +16,8 @@ namespace HammerAndSickle.Models.Map
     /// </summary>
     public class HexMap : IEnumerable<HexTile>, IDisposable
     {
-        #region Constants
-
         private const string CLASS_NAME = nameof(HexMap);
-
-        #endregion // Constants
-
-        #region Properties
-
-        /// <summary>
-        /// Display name of the map.
-        /// </summary>
-        public string MapName { get; private set; }
-
-        /// <summary>
-        /// Map dimensions in hex coordinates.
-        /// </summary>
-        public Vector2Int MapSize { get; private set; }
-
-        /// <summary>
-        /// Map configuration determining bounds and layout.
-        /// </summary>
-        public MapConfig Configuration { get; private set; }
-
-        /// <summary>
-        /// Total number of hexes in the map.
-        /// </summary>
-        public int HexCount => hexDictionary?.Count ?? 0;
-
-        /// <summary>
-        /// Indicates if the map has been properly initialized.
-        /// </summary>
-        [JsonIgnore]
-        public bool IsInitialized { get; private set; }
-
-        /// <summary>
-        /// Indicates if the map has been disposed.
-        /// </summary>
-        [JsonIgnore]
-        public bool IsDisposed { get; private set; }
-
-        #endregion // Properties
-
+        
         #region Private Fields
 
         private Dictionary<Position2D, HexTile> hexDictionary;
@@ -64,6 +25,28 @@ namespace HammerAndSickle.Models.Map
         private readonly bool enableDebugLogging;
 
         #endregion // Private Fields
+
+        #region Properties
+
+        // Display name of the map.
+        public string MapName { get; private set; }
+
+        // Map dimensions in hex coordinates.
+        public Vector2Int MapSize { get; private set; }
+
+        // Map configuration determining bounds and layout.
+        public MapConfig Configuration { get; private set; }
+
+        // Total number of hexes in the map.
+        public int HexCount => hexDictionary?.Count ?? 0;
+
+        // Indicates if the map has been properly initialized.
+        [JsonIgnore] public bool IsInitialized { get; private set; }
+
+        /// Indicates if the map has been disposed.
+        [JsonIgnore] public bool IsDisposed { get; private set; }
+
+        #endregion // Properties
 
         #region Constructors
 
@@ -120,7 +103,13 @@ namespace HammerAndSickle.Models.Map
         {
             try
             {
+                // Retrieve map dimensions based on configuration
                 MapSize = GetMapDimensions(Configuration);
+
+                // Tell the GameDataManager the map dimensions
+                GameDataManager.CurrentMapSize = MapSize;
+
+                // Initialize the hex dictionary with coordinate comparer
                 hexDictionary = new Dictionary<Position2D, HexTile>(coordinateComparer);
                 IsInitialized = true;
 
