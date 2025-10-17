@@ -17,6 +17,9 @@ namespace HammerAndSickle.Core.UI
 
         #region Serialized Fields
 
+        [Header("Truncated Dialog Flag")]
+        [SerializeField] private bool isTruncated = false;
+
         [Header("UI References")]
         [SerializeField] private TMP_Text dialogTitle;
         [SerializeField] private ScrollRect scrollView;
@@ -48,8 +51,12 @@ namespace HammerAndSickle.Core.UI
         {
             try
             {
-                ValidateComponents();
-                ConfigureInputField();
+                // Don't validate or configure if truncated dialog
+                if (!isTruncated)
+                {
+                    ValidateComponents();
+                    ConfigureInputField();
+                }
             }
             catch (System.Exception e)
             {
