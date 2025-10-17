@@ -47,6 +47,7 @@ namespace HammerAndSickle.Controllers
 
         // Khost scenario scene menu/dialog IDs
         public const int KhostScene_CoreInterface_ID = 7;
+        public const int KhostScene_OrdersDialog_ID  = 8;
 
         #endregion
     }

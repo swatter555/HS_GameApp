@@ -80,6 +80,7 @@ namespace HammerAndSickle.Controllers
             MenuOpen,
             MenuClose,
             RadioButtonClick,
+            MeduimSnareDrum
         }
 
         /// <summary>
@@ -125,7 +126,8 @@ namespace HammerAndSickle.Controllers
             { SoundEffect.MenuOpen, "SFX_MenuOpen.wav" },
             { SoundEffect.MenuClose, "SFX_MenuClose.wav" },
             { SoundEffect.RadioButtonClick, "SFX_RadioButtonClick.wav" },
-            { SoundEffect.ButtonHover, "SFX_ButtonHover.wav" }
+            { SoundEffect.ButtonHover, "SFX_ButtonHover.wav" },
+            { SoundEffect.MeduimSnareDrum, "SFX_MediumSnareDrum.wav"}
         };
 
         /// <summary>
