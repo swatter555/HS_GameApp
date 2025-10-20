@@ -46,6 +46,16 @@ namespace HammerAndSickle.Core.Map
         /// </summary>
         private readonly Dictionary<Vector2Int, Prefab_MapIcon> mapIconPrefabs = new();
 
+        /// <summary>
+        /// Dictionary to store and track text label prefab instances by their hex coordinates.
+        /// </summary>
+        private readonly Dictionary<Vector2Int, Prefab_MapText> textLabelPrefabs = new();
+
+        /// <summary>
+        /// Controls whether map labels are rendered on the map.
+        /// </summary>
+        private bool isRenderMapLabels = true;
+
         #endregion // Fields
 
         #region Inspector Fields
@@ -80,6 +90,22 @@ namespace HammerAndSickle.Core.Map
         /// Gets the GameObject reference for the text label layer.
         /// </summary>
         public GameObject TextLabelLayer => textLabelLayer;
+
+        /// <summary>
+        /// Gets or sets whether map labels are rendered. Setting this value refreshes the map.
+        /// </summary>
+        public bool IsRenderMapLabels
+        {
+            get => isRenderMapLabels;
+            set
+            {
+                if (isRenderMapLabels != value)
+                {
+                    isRenderMapLabels = value;
+                    RefreshMap();
+                }
+            }
+        }
 
         #endregion // Properties
 
@@ -192,6 +218,7 @@ namespace HammerAndSickle.Core.Map
                 cityPrefabs.Clear();
                 bridgePrefabs.Clear();
                 mapIconPrefabs.Clear();
+                textLabelPrefabs.Clear();
 
                 // Clear existing visual elements
                 ClearContainer(mapIconLayer.transform);
@@ -215,6 +242,12 @@ namespace HammerAndSickle.Core.Map
 
                     // Draw bridges (only for E, SE, SW to avoid duplicates)
                     DrawBridgesForHex(hex);
+
+                    // Draw text labels if enabled
+                    if (isRenderMapLabels)
+                    {
+                        DrawTextLabelsForHex(hex);
+                    }
                 }
             }
             catch (Exception e)
@@ -602,6 +635,77 @@ namespace HammerAndSickle.Core.Map
         }
 
         #endregion // Private Methods - Bridges
+
+        #region Private Methods - Text Labels
+
+        /// <summary>
+        /// Draws text labels for a specific hex if it has large label text.
+        /// Note: Small labels (TileLabel) are handled by CityIconPrefab.
+        /// </summary>
+        private void DrawTextLabelsForHex(HexTile hex)
+        {
+            try
+            {
+                // Only render large tile labels (small labels are for cities)
+                if (string.IsNullOrEmpty(hex.LargeTileLabel))
+                {
+                    return;
+                }
+
+                // Create the text label prefab
+                CreateTextLabel(hex, hex.LargeTileLabel);
+            }
+            catch (Exception e)
+            {
+                AppService.HandleException(CLASS_NAME, "DrawTextLabelsForHex", e);
+            }
+        }
+
+        /// <summary>
+        /// Creates a text label prefab at the specified hex position.
+        /// </summary>
+        private void CreateTextLabel(HexTile hex, string labelText)
+        {
+            // Create text prefab instance
+            GameObject textObject = Instantiate(SpriteManager.Instance.MapTextPrefab, textLabelLayer.transform);
+            textObject.name = $"TextLabel_{hex.Position.IntX}_{hex.Position.IntY}";
+
+            // Get prefab component
+            Prefab_MapText textPrefab = textObject.GetComponent<Prefab_MapText>();
+
+            // Convert enum types from GameData namespace to Core namespace
+            HammerAndSickle.Core.TextSize coreTextSize = hex.LabelSize switch
+            {
+                GameData.TextSize.Small => HammerAndSickle.Core.TextSize.Small,
+                GameData.TextSize.Medium => HammerAndSickle.Core.TextSize.Medium,
+                GameData.TextSize.Large => HammerAndSickle.Core.TextSize.Large,
+                _ => HammerAndSickle.Core.TextSize.Medium
+            };
+
+            HammerAndSickle.Core.FontWeight coreFontWeight = hex.LabelWeight switch
+            {
+                GameData.FontWeight.Light => HammerAndSickle.Core.FontWeight.Light,
+                GameData.FontWeight.Medium => HammerAndSickle.Core.FontWeight.Medium,
+                GameData.FontWeight.Bold => HammerAndSickle.Core.FontWeight.Bold,
+                _ => HammerAndSickle.Core.FontWeight.Medium
+            };
+
+            // Configure the text label
+            textPrefab.SetText(labelText);
+            textPrefab.SetSize(coreTextSize);
+            textPrefab.SetFont(coreFontWeight);
+            textPrefab.SetColor(hex.LabelColor);
+            textPrefab.SetOutlineThickness(hex.LabelOutlineThickness);
+
+            // Position the prefab at the hex center
+            Vector3 position = GetRenderPosition(new Vector2Int(hex.Position.IntX, hex.Position.IntY));
+            textObject.transform.position = position;
+
+            // Store the prefab reference
+            textLabelPrefabs[new Vector2Int(hex.Position.IntX, hex.Position.IntY)] = textPrefab;
+        }
+
+        #endregion // Private Methods - Text Labels
 
         #region Private Methods - Utilities
 
