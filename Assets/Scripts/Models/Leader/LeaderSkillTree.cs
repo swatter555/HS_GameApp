@@ -1,4 +1,4 @@
-﻿using HammerAndSickle.Services;
+using HammerAndSickle.Services;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -61,13 +61,13 @@ namespace HammerAndSickle.Models
             if (!Enum.IsDefined(typeof(CommandGrade), CurrentGrade)) return false;
             if (StartedBranches == null || UnlockedSkills == null) return false;
 
-            // Validate started branches
+            // Initialize started branches
             foreach (var branch in StartedBranches)
             {
                 if (!Enum.IsDefined(typeof(SkillBranch), branch)) return false;
             }
 
-            // Validate skill references
+            // Initialize skill references
             foreach (var skillRef in UnlockedSkills)
             {
                 if (skillRef == null || !skillRef.IsValid()) return false;
@@ -625,7 +625,7 @@ namespace HammerAndSickle.Models
             {
                 Debug.Log("=== Skill Tree System Validation ===");
 
-                // Validate branch classification
+                // Initialize branch classification
                 SkillBranchExtensions.ValidateBranchClassification();
 
                 // Test branch type queries
@@ -649,7 +649,7 @@ namespace HammerAndSickle.Models
             }
         }
 
-        #endregion // Validate Tree System
+        #endregion // Initialize Tree System
 
         #region Bonus Calculations
 

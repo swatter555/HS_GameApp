@@ -102,7 +102,7 @@ namespace HammerAndSickle.SceneDirectors
 
         public void OnLoadButton()
         {
-            // Validate a scenario is selected and get the manifest.
+            // Initialize a scenario is selected and get the manifest.
             ScenarioManifest manifest = GetSelectedManifest();
             if (manifest == null)
             {

@@ -1,4 +1,4 @@
-﻿using HammerAndSickle.Services;
+using HammerAndSickle.Services;
 using System;
 using System.Collections.Generic;
 using UnityEngine;
@@ -90,7 +90,7 @@ namespace HammerAndSickle.Models
         {
             try
             {
-                // Validate required parameters
+                // Initialize required parameters
                 if (string.IsNullOrEmpty(name))
                     throw new ArgumentException("Profile name cannot be null or empty", nameof(name));
 

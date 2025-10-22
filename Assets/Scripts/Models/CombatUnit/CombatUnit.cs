@@ -1,4 +1,4 @@
-﻿using HammerAndSickle.Controllers;
+using HammerAndSickle.Controllers;
 using HammerAndSickle.Services;
 using System;
 using System.Collections.Generic;
@@ -106,7 +106,7 @@ namespace HammerAndSickle.Models
         {
             try
             {
-                // Validate required parameters
+                // Initialize required parameters
                 if (string.IsNullOrEmpty(unitName))
                     throw new ArgumentException("Unit name cannot be null or empty", nameof(unitName));
 
@@ -132,7 +132,7 @@ namespace HammerAndSickle.Models
                         throw new ArgumentException($"Transport profile ID {embarkProfileID} not found in database", nameof(embarkProfileID));
                 }
 
-                // Validate intel profile type
+                // Initialize intel profile type
                 if (!Enum.IsDefined(typeof(IntelProfileTypes), intelProfileType))
                     throw new ArgumentException("Invalid intel profile type", nameof(intelProfileType));
 
@@ -685,7 +685,7 @@ namespace HammerAndSickle.Models
         {
             try
             {
-                // Validate the new level
+                // Initialize the new level
                 if (!Enum.IsDefined(typeof(EfficiencyLevel), level))
                 {
                     throw new ArgumentOutOfRangeException(nameof(level), "Invalid efficiency level");
