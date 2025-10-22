@@ -1,4 +1,4 @@
-﻿using HammerAndSickle.Services;
+using HammerAndSickle.Services;
 using System;
 using System.Text.Json.Serialization;
 using UnityEngine;
@@ -89,7 +89,7 @@ namespace HammerAndSickle.Models
             {
                 InitializeCommonProperties(side, nationality);
 
-                // Validate and set name
+                // Initialize and set name
                 if (string.IsNullOrWhiteSpace(name) ||
                     name.Length < CUConstants.MIN_LEADER_NAME_LENGTH ||
                     name.Length > CUConstants.MAX_LEADER_NAME_LENGTH)
@@ -99,7 +99,7 @@ namespace HammerAndSickle.Models
 
                 Name = name.Trim();
 
-                // Validate command ability
+                // Initialize command ability
                 if (!Enum.IsDefined(typeof(CommandAbility), command))
                 {
                     throw new ArgumentException($"Invalid command ability: {command}");
@@ -413,7 +413,7 @@ namespace HammerAndSickle.Models
                     _ => 0
                 };
 
-                // Validate multiplier bounds
+                // Initialize multiplier bounds
                 contextMultiplier = Math.Clamp(contextMultiplier, CUConstants.MIN_REP_MULTIPLIER, CUConstants.MAX_REP_MULTIPLIER);
 
                 int finalREP = Mathf.RoundToInt(baseREP * contextMultiplier);

@@ -75,20 +75,20 @@ namespace HammerAndSickle.Models
             if (string.IsNullOrWhiteSpace(LeaderID)) return false;
             if (string.IsNullOrWhiteSpace(Name)) return false;
 
-            // Validate enum values
+            // Initialize enum values
             if (!Enum.IsDefined(typeof(Side), Side)) return false;
             if (!Enum.IsDefined(typeof(Nationality), Nationality)) return false;
             if (!Enum.IsDefined(typeof(CommandGrade), CommandGrade)) return false;
             if (!Enum.IsDefined(typeof(CommandAbility), CombatCommand)) return false;
 
-            // Validate assignment consistency
+            // Initialize assignment consistency
             if (IsAssigned && string.IsNullOrWhiteSpace(UnitID)) return false;
             if (!IsAssigned && !string.IsNullOrWhiteSpace(UnitID)) return false;
 
-            // Validate reputation bounds
+            // Initialize reputation bounds
             if (ReputationPoints < 0) return false;
 
-            // Validate skill tree data exists
+            // Initialize skill tree data exists
             if (SkillTreeData == null) return false;
 
             return true;

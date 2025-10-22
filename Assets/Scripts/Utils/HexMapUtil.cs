@@ -348,7 +348,7 @@ namespace HammerAndSickle.Models.Map
             try
             {
                 // TODO: Implement unit placement logic
-                // TODO: Validate hex is empty and accessible
+                // TODO: Initialize hex is empty and accessible
                 // TODO: Update hex occupancy information
                 // TODO: Handle stacking rules and restrictions
 
@@ -399,7 +399,7 @@ namespace HammerAndSickle.Models.Map
             try
             {
                 // TODO: Implement unit movement logic
-                // TODO: Validate movement rules and restrictions
+                // TODO: Initialize movement rules and restrictions
                 // TODO: Update both source and destination hexes
                 // TODO: Handle movement costs and action consumption
 

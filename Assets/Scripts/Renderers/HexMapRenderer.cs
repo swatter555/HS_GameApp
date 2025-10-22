@@ -61,20 +61,14 @@ namespace HammerAndSickle.Core.Map
         #region Inspector Fields
 
         [Header("Rendering Tilemaps")]
-        [SerializeField]
-        private Tilemap hexOutlineTilemap;
-        [SerializeField]
-        private Tilemap hexSelectionTilemap;
+        [SerializeField] private Tilemap hexOutlineTilemap;
+        [SerializeField] private Tilemap hexSelectionTilemap;
 
         [Header("Rendering Layers")]
-        [SerializeField]
-        private GameObject mapIconLayer;
-        [SerializeField]
-        private GameObject bridgeIconLayer;
-        [SerializeField]
-        private GameObject cityIconLayer;
-        [SerializeField]
-        private GameObject textLabelLayer;
+        [SerializeField] private GameObject mapIconLayer;
+        [SerializeField] private GameObject bridgeIconLayer;
+        [SerializeField] private GameObject cityIconLayer;
+        [SerializeField] private GameObject textLabelLayer;
 
         #endregion // Inspector Fields
 
@@ -207,7 +201,7 @@ namespace HammerAndSickle.Core.Map
         {
             try
             {
-                // Validate that we have a map to render
+                // Initialize that we have a map to render
                 if (GameDataManager.CurrentHexMap == null)
                 {
                     AppService.CaptureUiMessage("Cannot refresh map: No hex map loaded.");
@@ -291,7 +285,7 @@ namespace HammerAndSickle.Core.Map
         {
             try
             {
-                // Validate map exists
+                // Initialize map exists
                 if (GameDataManager.CurrentHexMap == null)
                 {
                     AppService.CaptureUiMessage("Cannot change control flag: No hex map loaded.");
@@ -674,20 +668,20 @@ namespace HammerAndSickle.Core.Map
             Prefab_MapText textPrefab = textObject.GetComponent<Prefab_MapText>();
 
             // Convert enum types from GameData namespace to Core namespace
-            HammerAndSickle.Core.TextSize coreTextSize = hex.LabelSize switch
+            TextSize coreTextSize = hex.LabelSize switch
             {
-                GameData.TextSize.Small => HammerAndSickle.Core.TextSize.Small,
-                GameData.TextSize.Medium => HammerAndSickle.Core.TextSize.Medium,
-                GameData.TextSize.Large => HammerAndSickle.Core.TextSize.Large,
-                _ => HammerAndSickle.Core.TextSize.Medium
+                GameData.TextSize.Small => TextSize.Small,
+                GameData.TextSize.Medium => TextSize.Medium,
+                GameData.TextSize.Large => TextSize.Large,
+                _ => TextSize.Medium
             };
 
-            HammerAndSickle.Core.FontWeight coreFontWeight = hex.LabelWeight switch
+            FontWeight coreFontWeight = hex.LabelWeight switch
             {
-                GameData.FontWeight.Light => HammerAndSickle.Core.FontWeight.Light,
-                GameData.FontWeight.Medium => HammerAndSickle.Core.FontWeight.Medium,
-                GameData.FontWeight.Bold => HammerAndSickle.Core.FontWeight.Bold,
-                _ => HammerAndSickle.Core.FontWeight.Medium
+                GameData.FontWeight.Light => FontWeight.Light,
+                GameData.FontWeight.Medium => FontWeight.Medium,
+                GameData.FontWeight.Bold => FontWeight.Bold,
+                _ => FontWeight.Medium
             };
 
             // Configure the text label

@@ -345,7 +345,7 @@ namespace HammerAndSickle.Models.Map
                     Debug.Log($"{CLASS_NAME}: Starting integrity validation for {HexCount} hexes");
                 }
 
-                // Validate basic map state
+                // Initialize basic map state
                 if (hexDictionary == null)
                 {
                     AppService.CaptureUiMessage("Map integrity failed: Hex dictionary is null");
@@ -358,7 +358,7 @@ namespace HammerAndSickle.Models.Map
                     return false;
                 }
 
-                // Validate each hex for internal consistency
+                // Initialize each hex for internal consistency
                 foreach (var hex in hexDictionary.Values)
                 {
                     if (hex == null)
@@ -369,7 +369,7 @@ namespace HammerAndSickle.Models.Map
                         continue;
                     }
 
-                    // Validate hex internal consistency
+                    // Initialize hex internal consistency
                     if (!hex.ValidateHex())
                     {
                         AppService.CaptureUiMessage($"Map integrity failed: Hex at {hex.Position} failed validation");
@@ -377,7 +377,7 @@ namespace HammerAndSickle.Models.Map
                         isValid = false;
                     }
 
-                    // Validate hex position matches dictionary key
+                    // Initialize hex position matches dictionary key
                     if (hexDictionary.TryGetValue(hex.Position, out HexTile storedHex))
                     {
                         if (!ReferenceEquals(hex, storedHex))
@@ -463,7 +463,7 @@ namespace HammerAndSickle.Models.Map
                         continue; // Skip null hexes (will be caught by integrity validation)
                     }
 
-                    // Validate position is within map bounds
+                    // Initialize position is within map bounds
                     if (!IsPositionInBounds(hex.Position))
                     {
                         AppService.CaptureUiMessage($"Dimension validation failed: Hex at {hex.Position} is outside map bounds ({MapSize.x}x{MapSize.y})");
@@ -476,7 +476,7 @@ namespace HammerAndSickle.Models.Map
                         }
                     }
 
-                    // Validate position components are non-negative
+                    // Initialize position components are non-negative
                     if (hex.Position.X < 0 || hex.Position.Y < 0)
                     {
                         AppService.CaptureUiMessage($"Dimension validation failed: Hex at {hex.Position} has negative coordinates");
@@ -628,7 +628,7 @@ namespace HammerAndSickle.Models.Map
                             hasAnyNeighbor = true;
                         }
 
-                        // Validate bidirectional relationships
+                        // Initialize bidirectional relationships
                         if (actualNeighbor != null && expectedNeighbor != null && ReferenceEquals(actualNeighbor, expectedNeighbor))
                         {
                             // Check if the neighbor points back to this hex

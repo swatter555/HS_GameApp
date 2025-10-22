@@ -105,7 +105,7 @@ namespace HammerAndSickle.SceneDirectors
                 // Check if the requested menu is already active
                 if (_activeMenuID == menuID) return;
 
-                // Validate the new menu exists
+                // Initialize the new menu exists
                 if (!menuDictionary.TryGetValue(menuID, out MenuHandler newMenu))
                 {
                     throw new Exception($"Menu with ID {menuID} not found in the menu dictionary.");

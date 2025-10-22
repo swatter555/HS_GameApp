@@ -566,7 +566,7 @@ namespace HammerAndSickle.Models.Map
                     return false;
                 }
 
-                // Validate movement cost matches terrain
+                // Initialize movement cost matches terrain
                 int expectedCost = GetExpectedMovementCost(Terrain);
                 if (MovementCost != expectedCost)
                 {

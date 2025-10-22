@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Text.Json.Serialization;
 using UnityEngine;
 using HammerAndSickle.Services;
@@ -45,7 +45,7 @@ namespace HammerAndSickle.Models
                 if (points <= 0)
                     return false;
 
-                // Validate points do not exceed maximum gain per action.
+                // Initialize points do not exceed maximum gain per action.
                 if (points > CUConstants.MAX_EXP_GAIN_PER_ACTION)
                 {
                     points = CUConstants.MAX_EXP_GAIN_PER_ACTION;
@@ -135,7 +135,7 @@ namespace HammerAndSickle.Models
             if (level == ExperienceLevel)
                 return; // No change, nothing to do
 
-            // Validate level is within bounds
+            // Initialize level is within bounds
             if (level < ExperienceLevel.Raw || level > ExperienceLevel.Elite)
             {
                 throw new ArgumentOutOfRangeException(nameof(level), "Invalid experience level");

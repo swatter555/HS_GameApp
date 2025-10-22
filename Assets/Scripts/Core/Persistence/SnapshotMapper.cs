@@ -1,4 +1,4 @@
-﻿using HammerAndSickle.Controllers;
+using HammerAndSickle.Controllers;
 using HammerAndSickle.Models;
 using HammerAndSickle.Services;
 using System;
@@ -195,7 +195,7 @@ namespace HammerAndSickle.Persistence
 
             try
             {
-                // Validate inputs
+                // Initialize inputs
                 if (snap == null)
                     throw new ArgumentNullException(nameof(snap), "GameStateSnapshot cannot be null");
                 if (mgr == null)
@@ -272,7 +272,7 @@ namespace HammerAndSickle.Persistence
                 AppService.CaptureUiMessage("Rebuilding transient caches and cross-references...");
                 mgr.RebuildTransientCaches();
 
-                // Step 5: Validate the loaded state
+                // Step 5: Initialize the loaded state
                 ValidateLoadedState(mgr);
 
                 AppService.CaptureUiMessage("Game state successfully restored from snapshot");
