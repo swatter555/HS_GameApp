@@ -8,8 +8,6 @@ namespace HammerAndSickle.SceneDirectors
 {
     public class Scene1_Orders : MenuHandler
     {
-        private const string CLASS_NAME = nameof(Scene1_Orders);
-
         #region Singleton
 
         public static Scene1_Orders Instance { get; private set; }

@@ -50,6 +50,11 @@ namespace HammerAndSickle.Services
         [Tooltip("Default orthographic size for reset")]
         private float defaultOrthographicSize = 20f;
 
+        [Header("Debug Settings")]
+        [SerializeField]
+        [Tooltip("Enable debug logging for this service")]
+        private bool debugLog = false;
+
         #endregion // Serialized Fields
 
         #region Properties
@@ -82,7 +87,7 @@ namespace HammerAndSickle.Services
             if (Instance == null)
             {
                 Instance = this;
-                Debug.Log($"{CLASS_NAME}: Instance created on {gameObject.name}");
+                if (debugLog) Debug.Log($"{CLASS_NAME}: Instance created on {gameObject.name}");
 
                 InitializeService();
             }
@@ -160,7 +165,7 @@ namespace HammerAndSickle.Services
                 }
 
                 IsInitialized = true;
-                Debug.Log($"{CLASS_NAME}: Service initialized successfully.");
+                if (debugLog) Debug.Log($"{CLASS_NAME}: Service initialized successfully.");
             }
             catch (Exception e)
             {
@@ -197,7 +202,7 @@ namespace HammerAndSickle.Services
                 // Report initial camera position
                 UpdateCameraPositionInInputService();
 
-                Debug.Log($"{CLASS_NAME}: Subscribed to input events.");
+                if (debugLog) Debug.Log($"{CLASS_NAME}: Subscribed to input events.");
             }
             catch (Exception e)
             {
@@ -222,7 +227,7 @@ namespace HammerAndSickle.Services
                 InputService_BattleMap.Instance.OnMapZoom -= HandleZoom;
                 InputService_BattleMap.Instance.OnResetZoom -= HandleResetZoom;
 
-                Debug.Log($"{CLASS_NAME}: Unsubscribed from input events.");
+                if (debugLog) Debug.Log($"{CLASS_NAME}: Unsubscribed from input events.");
             }
             catch (Exception e)
             {
@@ -310,7 +315,7 @@ namespace HammerAndSickle.Services
                 if (controlledCamera == null) return;
 
                 controlledCamera.orthographicSize = defaultOrthographicSize;
-                Debug.Log($"{CLASS_NAME}: Zoom reset to default ({defaultOrthographicSize}).");
+                if (debugLog) Debug.Log($"{CLASS_NAME}: Zoom reset to default ({defaultOrthographicSize}).");
             }
             catch (Exception e)
             {

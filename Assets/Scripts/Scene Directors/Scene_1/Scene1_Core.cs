@@ -1,3 +1,4 @@
+using System;
 using HammerAndSickle.Services;
 using UnityEngine;
 
@@ -19,12 +20,22 @@ namespace HammerAndSickle.SceneDirectors
 
         public override void ToggleMenu()
         {
-           
+            try
+            {
+                Debug.Log($"{GetType().Name}: Toggling menu. IsVisible={IsVisible}, IsInputFocus={IsInputFocus}");
+
+                // Map scroll, hotkeys, and other input enabled only if visible and has input focus.
+                InputService_BattleMap.Instance.SetInputEnabled(IsInputFocus);
+            }
+            catch (Exception e)
+            {
+                AppService.HandleException(GetType().Name, nameof(ToggleMenu), e);
+            }
         }
 
         public override void Start()
         {
-            
+
         }
 
         public override void SetupSingleton()

@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+#if UNITY_EDITOR
+using UnityEngine;
 using System;
 using System.IO;
 using System.Linq;
@@ -9,10 +10,7 @@ using HammerAndSickle.Models.Map;
 using HammerAndSickle.Utils;
 using System.Text.Json;
 using HammerAndSickle.Core.GameData;
-
-#if UNITY_EDITOR
 using UnityEditor;
-#endif
 
 namespace HammerAndSickle.Tools
 {
@@ -933,3 +931,4 @@ namespace HammerAndSickle.Tools
 
     #endregion // Temporary Data Structures
 }
+#endif
