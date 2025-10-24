@@ -90,7 +90,7 @@ namespace HammerAndSickle.Services
 
             scrollBounds.Min = min;
             scrollBounds.Max = max;
-            Debug.Log($"{CLASS_NAME}: Scroll bounds set to Min:{min} Max:{max}");
+            if (debugLog) Debug.Log($"{CLASS_NAME}: Scroll bounds set to Min:{min} Max:{max}");
         }
 
         /// <summary>
@@ -130,6 +130,11 @@ namespace HammerAndSickle.Services
         #endregion // Singleton
 
         #region Fields
+
+        [Header("Debug Settings")]
+        [SerializeField]
+        [Tooltip("Enable debug logging for this service")]
+        private bool debugLog = false;
 
         [Header("Input Actions")]
         [SerializeField]
@@ -441,7 +446,7 @@ namespace HammerAndSickle.Services
             if (Instance == null)
             {
                 Instance = this;
-                Debug.Log($"{CLASS_NAME}: Instance created on {gameObject.name}");
+                if (debugLog) Debug.Log($"{CLASS_NAME}: Instance created on {gameObject.name}");
 
                 InitializeService();
             }
@@ -538,7 +543,7 @@ namespace HammerAndSickle.Services
                 SubscribeToInputEvents();
 
                 IsInitialized = true;
-                Debug.Log($"{CLASS_NAME}: Service initialized successfully.");
+                if (debugLog) Debug.Log($"{CLASS_NAME}: Service initialized successfully.");
             }
             catch (Exception e)
             {
@@ -559,7 +564,7 @@ namespace HammerAndSickle.Services
 
                 IsStarted = true;
                 nextSubscriberValidationTime = Time.time + SUBSCRIBER_VALIDATION_INTERVAL;
-                Debug.Log($"{CLASS_NAME}: Service started successfully.");
+                if (debugLog) Debug.Log($"{CLASS_NAME}: Service started successfully.");
             }
             catch (Exception e)
             {
@@ -1075,7 +1080,7 @@ namespace HammerAndSickle.Services
                     resetZoomAction?.Enable();
                     leftMouseAction?.Enable();
                     rightMouseAction?.Enable();
-                    Debug.Log($"{CLASS_NAME}: Input enabled.");
+                    if (debugLog) Debug.Log($"{CLASS_NAME}: Input enabled.");
                 }
                 else
                 {
@@ -1086,9 +1091,9 @@ namespace HammerAndSickle.Services
                     leftMouseAction?.Disable();
                     rightMouseAction?.Disable();
 
-                    // Reset states when disabling
-                    ResetInputState();
-                    Debug.Log($"{CLASS_NAME}: Input disabled.");
+                    // Reset input state variables but preserve event subscribers
+                    ResetInputStateVariables();
+                    if (debugLog) Debug.Log($"{CLASS_NAME}: Input disabled.");
                 }
             }
             catch (Exception e)
@@ -1098,10 +1103,10 @@ namespace HammerAndSickle.Services
         }
 
         /// <summary>
-        /// Clears all current input states and resets to default values.
-        /// Useful when changing scenes or resetting the game state.
+        /// Resets input state variables without clearing event subscribers.
+        /// Used when temporarily disabling input (e.g., for dialogs).
         /// </summary>
-        public void ResetInputState()
+        private void ResetInputStateVariables()
         {
             try
             {
@@ -1116,6 +1121,25 @@ namespace HammerAndSickle.Services
 
                 LastLeftClickPosition = Vector2.zero;
                 LastRightClickPosition = Vector2.zero;
+
+                if (debugLog) Debug.Log($"{CLASS_NAME}: Input state variables reset (subscribers preserved).");
+            }
+            catch (Exception e)
+            {
+                AppService.HandleException(CLASS_NAME, "ResetInputStateVariables", e);
+            }
+        }
+
+        /// <summary>
+        /// Clears all current input states and resets to default values.
+        /// Also clears all event subscribers. Only use when fully disposing the service.
+        /// </summary>
+        public void ResetInputState()
+        {
+            try
+            {
+                // Reset variables first
+                ResetInputStateVariables();
 
                 // Clear all event delegates
                 _onMapScroll = null;
@@ -1133,7 +1157,7 @@ namespace HammerAndSickle.Services
 
                 eventSubscribers.Clear();
 
-                Debug.Log($"{CLASS_NAME}: Input state reset.");
+                if (debugLog) Debug.Log($"{CLASS_NAME}: Input state fully reset (including subscribers).");
             }
             catch (Exception e)
             {
@@ -1386,7 +1410,7 @@ namespace HammerAndSickle.Services
                         // Clear all event subscriptions
                         eventSubscribers.Clear();
 
-                        Debug.Log($"{CLASS_NAME}: Service disposed successfully.");
+                        if (debugLog) Debug.Log($"{CLASS_NAME}: Service disposed successfully.");
                     }
                     catch (Exception e)
                     {

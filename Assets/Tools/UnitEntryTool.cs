@@ -1,3 +1,4 @@
+#if UNITY_EDITOR
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -7,9 +8,7 @@ using UnityEngine;
 using HammerAndSickle.Models;
 using HammerAndSickle.Controllers;
 using HammerAndSickle.Core.GameData;
-#if UNITY_EDITOR
 using UnityEditor;
-#endif
 
 namespace HammerAndSickle.Tools
 {
@@ -1184,3 +1183,4 @@ namespace HammerAndSickle.Tools
     }
     #endif
 }
+#endif

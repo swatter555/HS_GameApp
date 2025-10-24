@@ -41,14 +41,13 @@ namespace HammerAndSickle.SceneDirectors
         /// </summary>
         protected override void OnSceneInitialize()
         {
-            // Provide ID to core interface and register.
-            Scene1_Core.Instance.Initialize(GeneralConstants.KhostScene_CoreInterface_ID, true);
+            // Register core interface (Initialize is called by RegisterCoreInterface).
             RegisterCoreInterface(GeneralConstants.KhostScene_CoreInterface_ID, Scene1_Core.Instance);
 
             // Register Orders dialog.
             RegisterMenu(Scene1_Orders.Instance);
 
-            // Start the scene with the OrdersDialog open.
+            // Start the scene with the OrdersDialog open (this will properly hide the core interface).
             SetActiveMenuByID(GeneralConstants.KhostScene_OrdersDialog_ID);
 
             // Initialize audio manager and start main menu music
