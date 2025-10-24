@@ -12,6 +12,12 @@ namespace HammerAndSickle.SceneDirectors
 
         #endregion // Singleton Instance
 
+        #region Private Fields
+
+        private bool _debugInfo = false;
+
+        #endregion // Private Fields
+
         #region Control Fields
 
         #endregion // Control Fields
@@ -22,10 +28,14 @@ namespace HammerAndSickle.SceneDirectors
         {
             try
             {
-                Debug.Log($"{GetType().Name}: Toggling menu. IsVisible={IsVisible}, IsInputFocus={IsInputFocus}");
-
                 // Map scroll, hotkeys, and other input enabled only if visible and has input focus.
                 InputService_BattleMap.Instance.SetInputEnabled(IsInputFocus);
+
+                // Show debug info
+                if (_debugInfo)
+                {
+                    Debug.Log($"{GetType().Name}: Toggling menu. IsVisible={IsVisible}, IsInputFocus={IsInputFocus}");
+                }       
             }
             catch (Exception e)
             {

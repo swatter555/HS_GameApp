@@ -56,6 +56,11 @@ namespace HammerAndSickle.Core.Map
         /// </summary>
         private bool isRenderMapLabels = true;
 
+        /// <summary>
+        /// Enables detailed debug logging throughout the renderer.
+        /// </summary>
+        [SerializeField] private bool _debug = false;
+
         #endregion // Fields
 
         #region Inspector Fields
@@ -133,6 +138,16 @@ namespace HammerAndSickle.Core.Map
                 Debug.LogError($"{CLASS_NAME}.Start: Service failed to initialize properly.");
                 return;
             }
+
+            SubscribeToEvents();
+        }
+
+        /// <summary>
+        /// Unity's OnDestroy method. Handles cleanup and unsubscription.
+        /// </summary>
+        private void OnDestroy()
+        {
+            UnsubscribeFromEvents();
         }
 
         #endregion // Unity Lifecycle
@@ -147,13 +162,19 @@ namespace HammerAndSickle.Core.Map
         {
             try
             {
+                if (_debug) Debug.Log($"[{CLASS_NAME}.InitializeService] Starting initialization...");
+
                 ValidateComponents();
                 IsInitialized = true;
+
+                if (_debug) Debug.Log($"[{CLASS_NAME}.InitializeService] Successfully initialized.");
             }
             catch (Exception ex)
             {
                 AppService.HandleException(CLASS_NAME, "InitializeService", ex);
                 IsInitialized = false;
+
+                if (_debug) Debug.Log($"[{CLASS_NAME}.InitializeService] Initialization failed.");
             }
         }
 
@@ -163,6 +184,8 @@ namespace HammerAndSickle.Core.Map
         /// </summary>
         private void ValidateComponents()
         {
+            if (_debug) Debug.Log($"[{CLASS_NAME}.ValidateComponents] Validating required components...");
+
             if (hexOutlineTilemap == null)
                 throw new NullReferenceException($"{CLASS_NAME}.ValidateComponents: {nameof(hexOutlineTilemap)} is missing.");
 
@@ -177,9 +200,62 @@ namespace HammerAndSickle.Core.Map
 
             if (bridgeIconLayer == null)
                 throw new NullReferenceException($"{CLASS_NAME}.ValidateComponents: {nameof(bridgeIconLayer)} is missing.");
+
+            if (_debug) Debug.Log($"[{CLASS_NAME}.ValidateComponents] All required components validated successfully.");
         }
 
         #endregion // Initialization
+
+        #region Event Management
+
+        /// <summary>
+        /// Subscribes to hex selection events.
+        /// </summary>
+        private void SubscribeToEvents()
+        {
+            if (HexDetectionService.Instance != null)
+            {
+                HexDetectionService.Instance.OnHexSelected += HandleHexSelected;
+
+                if (_debug) Debug.Log($"[{CLASS_NAME}.SubscribeToEvents] Successfully subscribed to HexDetectionService events.");
+            }
+            else
+            {
+                Debug.LogWarning($"{CLASS_NAME}: HexDetectionService instance not found. Hex selection events will not be handled.");
+            }
+        }
+
+        /// <summary>
+        /// Unsubscribes from hex selection events.
+        /// </summary>
+        private void UnsubscribeFromEvents()
+        {
+            if (HexDetectionService.Instance != null)
+            {
+                HexDetectionService.Instance.OnHexSelected -= HandleHexSelected;
+
+                if (_debug) Debug.Log($"[{CLASS_NAME}.UnsubscribeFromEvents] Unsubscribed from HexDetectionService events.");
+            }
+        }
+
+        /// <summary>
+        /// Handles hex selection change events.
+        /// </summary>
+        private void HandleHexSelected(Position2D hexPosition)
+        {
+            try
+            {
+                if (_debug) Debug.Log($"[{CLASS_NAME}.HandleHexSelected] Hex selected at position: ({hexPosition.IntX}, {hexPosition.IntY})");
+
+                DrawHexSelector();
+            }
+            catch (Exception e)
+            {
+                AppService.HandleException(CLASS_NAME, nameof(HandleHexSelected), e);
+            }
+        }
+
+        #endregion // Event Management
 
         #region Public Methods
 
@@ -201,12 +277,17 @@ namespace HammerAndSickle.Core.Map
         {
             try
             {
+                if (_debug) Debug.Log($"[{CLASS_NAME}.RefreshMap] Starting map refresh...");
+
                 // Initialize that we have a map to render
                 if (GameDataManager.CurrentHexMap == null)
                 {
                     AppService.CaptureUiMessage("Cannot refresh map: No hex map loaded.");
+                    if (_debug) Debug.Log($"[{CLASS_NAME}.RefreshMap] Aborted: No hex map loaded.");
                     return;
                 }
+
+                if (_debug) Debug.Log($"[{CLASS_NAME}.RefreshMap] Clearing existing prefab dictionaries and visual elements...");
 
                 // Clear tracking dictionaries
                 cityPrefabs.Clear();
@@ -223,26 +304,47 @@ namespace HammerAndSickle.Core.Map
                 // Draw the hex outlines
                 DrawHexOutlines();
 
+                if (_debug) Debug.Log($"[{CLASS_NAME}.RefreshMap] Iterating through hexes to render features...");
+
+                // Counters for summary
+                int hexCount = 0;
+                int cityCount = 0;
+                int mapIconCount = 0;
+                int bridgeCount = 0;
+                int labelCount = 0;
+
                 // Iterate through all hexes and render their features
                 foreach (var hex in GameDataManager.CurrentHexMap)
                 {
                     if (hex == null) continue;
 
+                    hexCount++;
+
                     // Draw map icons (airbases, forts)
+                    int prevMapIconCount = mapIconPrefabs.Count;
                     DrawMapIconsForHex(hex);
+                    if (mapIconPrefabs.Count > prevMapIconCount) mapIconCount++;
 
                     // Draw city icons
+                    int prevCityCount = cityPrefabs.Count;
                     DrawCityIconForHex(hex);
+                    if (cityPrefabs.Count > prevCityCount) cityCount++;
 
                     // Draw bridges (only for E, SE, SW to avoid duplicates)
+                    int prevBridgeCount = bridgePrefabs.Count;
                     DrawBridgesForHex(hex);
+                    bridgeCount += (bridgePrefabs.Count - prevBridgeCount);
 
                     // Draw text labels if enabled
                     if (isRenderMapLabels)
                     {
+                        int prevLabelCount = textLabelPrefabs.Count;
                         DrawTextLabelsForHex(hex);
+                        if (textLabelPrefabs.Count > prevLabelCount) labelCount++;
                     }
                 }
+
+                if (_debug) Debug.Log($"[{CLASS_NAME}.RefreshMap] Map refresh complete. Processed {hexCount} hexes. Created {cityCount} cities, {mapIconCount} map icons, {bridgeCount} bridges, {labelCount} labels.");
             }
             catch (Exception e)
             {
@@ -264,12 +366,18 @@ namespace HammerAndSickle.Core.Map
                 Position2D selectedHex = GameDataManager.SelectedHex;
                 if (selectedHex != GameDataManager.NoHexSelected)
                 {
+                    if (_debug) Debug.Log($"[{CLASS_NAME}.DrawHexSelector] Drawing selector at ({selectedHex.IntX}, {selectedHex.IntY})");
+
                     // Create and configure the tile
                     Tile tile = ScriptableObject.CreateInstance<Tile>();
                     tile.sprite = SpriteManager.Instance.GetSprite(AtlasTypes.HexOutlineIcons, SpriteManager.HexSelectOutline);
 
                     // Set the tile at the position
                     hexSelectionTilemap.SetTile(new Vector3Int(selectedHex.IntX, selectedHex.IntY, 0), tile);
+                }
+                else
+                {
+                    if (_debug) Debug.Log($"[{CLASS_NAME}.DrawHexSelector] Cleared selector - no hex selected.");
                 }
             }
             catch (Exception e)
@@ -285,10 +393,13 @@ namespace HammerAndSickle.Core.Map
         {
             try
             {
+                if (_debug) Debug.Log($"[{CLASS_NAME}.ChangeControlFlag] Attempting to change control flag at position ({position.IntX}, {position.IntY})");
+
                 // Initialize map exists
                 if (GameDataManager.CurrentHexMap == null)
                 {
                     AppService.CaptureUiMessage("Cannot change control flag: No hex map loaded.");
+                    if (_debug) Debug.Log($"[{CLASS_NAME}.ChangeControlFlag] Failed: No hex map loaded.");
                     return;
                 }
 
@@ -297,6 +408,7 @@ namespace HammerAndSickle.Core.Map
                 if (hex == null)
                 {
                     AppService.CaptureUiMessage($"Cannot change control flag: No hex found at position {position}.");
+                    if (_debug) Debug.Log($"[{CLASS_NAME}.ChangeControlFlag] Failed: No hex found at position.");
                     return;
                 }
 
@@ -305,11 +417,14 @@ namespace HammerAndSickle.Core.Map
                 if (!cityPrefabs.TryGetValue(pos, out Prefab_CityIcon cityPrefab))
                 {
                     AppService.CaptureUiMessage($"Cannot change control flag: No city found at position {position}.");
+                    if (_debug) Debug.Log($"[{CLASS_NAME}.ChangeControlFlag] Failed: No city prefab found at position.");
                     return;
                 }
 
                 // Update the control flag based on current tile control
                 cityPrefab.UpdateControlFlag(hex.TileControl, hex.DefaultTileControl);
+
+                if (_debug) Debug.Log($"[{CLASS_NAME}.ChangeControlFlag] Successfully updated control flag. TileControl: {hex.TileControl}, DefaultTileControl: {hex.DefaultTileControl}");
             }
             catch (Exception e)
             {
@@ -328,6 +443,8 @@ namespace HammerAndSickle.Core.Map
         {
             try
             {
+                if (_debug) Debug.Log($"[{CLASS_NAME}.DrawHexOutlines] Drawing hex outlines...");
+
                 // Clear existing hex outlines
                 hexOutlineTilemap.ClearAllTiles();
 
@@ -335,12 +452,16 @@ namespace HammerAndSickle.Core.Map
                 string spriteName = GetOutlineSpriteName();
                 Sprite sprite = SpriteManager.Instance.GetSprite(AtlasTypes.HexOutlineIcons, spriteName);
 
+                if (_debug) Debug.Log($"[{CLASS_NAME}.DrawHexOutlines] Using outline color: {GameDataManager.CurrentHexOutlineColor}, sprite: {spriteName}");
+
                 // Create and configure the tile
                 Tile tile = ScriptableObject.CreateInstance<Tile>();
                 tile.sprite = sprite;
 
                 // Draw tiles for each valid position
                 Vector2Int mapSize = GameDataManager.CurrentMapSize.ToVector2Int();
+                int tileCount = 0;
+
                 for (int x = 0; x < mapSize.x; x++)
                 {
                     for (int y = 0; y < mapSize.y; y++)
@@ -348,9 +469,12 @@ namespace HammerAndSickle.Core.Map
                         if (IsValidHexPosition(x, y, mapSize))
                         {
                             hexOutlineTilemap.SetTile(new Vector3Int(x, y, 0), tile);
+                            tileCount++;
                         }
                     }
                 }
+
+                if (_debug) Debug.Log($"[{CLASS_NAME}.DrawHexOutlines] Drew {tileCount} hex outline tiles for map size {mapSize.x}x{mapSize.y}");
             }
             catch (Exception e)
             {
@@ -414,6 +538,8 @@ namespace HammerAndSickle.Core.Map
         /// </summary>
         private void CreateMapIcon(HexTile hex, MapIconType iconType, ThemedSpriteTypes spriteType)
         {
+            if (_debug) Debug.Log($"[{CLASS_NAME}.CreateMapIcon] Creating {iconType} icon at ({hex.Position.IntX}, {hex.Position.IntY})");
+
             // Create prefab instance
             GameObject mapIconObject = Instantiate(SpriteManager.Instance.MapIconPrefab, mapIconLayer.transform);
             mapIconObject.name = $"{iconType}_{hex.Position.IntX}_{hex.Position.IntY}";
@@ -463,6 +589,8 @@ namespace HammerAndSickle.Core.Map
         /// </summary>
         private void CreateCityIcon(HexTile hex, TerrainType terrain)
         {
+            if (_debug) Debug.Log($"[{CLASS_NAME}.CreateCityIcon] Creating {terrain} at ({hex.Position.IntX}, {hex.Position.IntY}), Label: '{hex.TileLabel}', IsObjective: {hex.IsObjective}");
+
             // Create city prefab instance
             GameObject cityObj = Instantiate(SpriteManager.Instance.CityPrefab, cityIconLayer.transform);
             cityObj.name = $"City_{hex.Position.IntX}_{hex.Position.IntY}";
@@ -536,13 +664,23 @@ namespace HammerAndSickle.Core.Map
         {
             // Verify neighbor exists (bridges span between two hexes)
             HexTile neighborHex = hex.GetNeighbor(direction);
-            if (neighborHex == null) return;
+            if (neighborHex == null)
+            {
+                if (_debug) Debug.Log($"[{CLASS_NAME}.CreateBridgeObject] Skipping {bridgeType} bridge at ({hex.Position.IntX}, {hex.Position.IntY}) direction {direction}: No neighbor found.");
+                return;
+            }
 
             // Generate unique key for this bridge
             string bridgeKey = GenerateBridgeKey(hex.Position, direction, bridgeType);
 
             // Skip if already rendered
-            if (bridgePrefabs.ContainsKey(bridgeKey)) return;
+            if (bridgePrefabs.ContainsKey(bridgeKey))
+            {
+                if (_debug) Debug.Log($"[{CLASS_NAME}.CreateBridgeObject] Skipping duplicate bridge: {bridgeKey}");
+                return;
+            }
+
+            if (_debug) Debug.Log($"[{CLASS_NAME}.CreateBridgeObject] Creating {bridgeType} bridge at ({hex.Position.IntX}, {hex.Position.IntY}) direction {direction}");
 
             // Create bridge prefab instance
             GameObject bridgeIconObject = Instantiate(SpriteManager.Instance.BridgeIconPrefab, bridgeIconLayer.transform);
@@ -660,6 +798,8 @@ namespace HammerAndSickle.Core.Map
         /// </summary>
         private void CreateTextLabel(HexTile hex, string labelText)
         {
+            if (_debug) Debug.Log($"[{CLASS_NAME}.CreateTextLabel] Creating text label at ({hex.Position.IntX}, {hex.Position.IntY}): '{labelText}', Size: {hex.LabelSize}, Weight: {hex.LabelWeight}");
+
             // Create text prefab instance
             GameObject textObject = Instantiate(SpriteManager.Instance.MapTextPrefab, textLabelLayer.transform);
             textObject.name = $"TextLabel_{hex.Position.IntX}_{hex.Position.IntY}";
@@ -710,6 +850,9 @@ namespace HammerAndSickle.Core.Map
         {
             try
             {
+                int childCount = container.childCount;
+                if (_debug && childCount > 0) Debug.Log($"[{CLASS_NAME}.ClearContainer] Clearing {childCount} child objects from {container.name}");
+
                 // Loop backwards because destroying objects will shift the indices
                 for (int i = container.childCount - 1; i >= 0; i--)
                 {
