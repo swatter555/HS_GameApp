@@ -365,7 +365,7 @@ namespace HammerAndSickle.Models
         /// <returns>The clamped value within valid range</returns>
         private int ValidateCombatValue(int value)
         {
-            return Mathf.Clamp(value, CUConstants.MIN_COMBAT_VALUE, CUConstants.MAX_COMBAT_VALUE);
+            return Mathf.Clamp(value, GameData.MIN_COMBAT_VALUE, GameData.MAX_COMBAT_VALUE);
         }
 
         /// <summary>
@@ -375,7 +375,7 @@ namespace HammerAndSickle.Models
         /// <returns>The clamped value within valid range</returns>
         private float ValidateRange(float value)
         {
-            return Mathf.Clamp(value, CUConstants.MIN_RANGE, CUConstants.MAX_RANGE);
+            return Mathf.Clamp(value, GameData.MIN_RANGE, GameData.MAX_RANGE);
         }
 
         /// <summary>

@@ -19,7 +19,7 @@ namespace HammerAndSickle.Persistence
         #region Constants
 
         private const string CLASS_NAME = nameof(SnapshotMapper);
-        private const int CURRENT_SAVE_VERSION = CUConstants.SAVE_VERSION;
+        private const int CURRENT_SAVE_VERSION = GameData.SAVE_VERSION;
 
         #endregion // Constants
 
@@ -107,7 +107,7 @@ namespace HammerAndSickle.Persistence
                                 freshUnit.SetFacilityDamage(unit.BaseDamage);
                                 if (unit.FacilityType == FacilityType.SupplyDepot)
                                 {
-                                    freshUnit.DaysSupply.SetCurrent(CUConstants.MaxDaysSupplyDepot);
+                                    freshUnit.DaysSupply.SetCurrent(GameData.MaxDaysSupplyDepot);
                                 }
 
                                 // Copy attached air unit IDs for airbases

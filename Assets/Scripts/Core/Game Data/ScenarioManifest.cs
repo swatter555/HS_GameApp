@@ -13,8 +13,6 @@ namespace HammerAndSickle.Core.GameData
     [Serializable]
     public class ScenarioManifest
     {
-        private const string CLASS_NAME = "ScenarioManifest";
-
         #region JSON Properties
 
         [JsonProperty("scenarioId")]
@@ -50,6 +48,9 @@ namespace HammerAndSickle.Core.GameData
         [JsonProperty("mapTheme")]
         public MapTheme MapTheme { get; set; } = MapTheme.MiddleEast;
 
+        [JsonProperty("difficultyLevel")]
+        public DifficultyLevel DifficultyLevel { get; set; } = DifficultyLevel.Colonel;
+
         #endregion // JSON Properties
 
         #region Constructors
@@ -66,7 +67,7 @@ namespace HammerAndSickle.Core.GameData
         /// </summary>
         public ScenarioManifest(string scenarioId, string displayName, string description,
             string thumbnailFilename, string mapFilename, string oobFilename,
-            string aiiFilename, string briefingFilename, int prestigePool, bool isCampaignScenario, MapTheme mapTheme)
+            string aiiFilename, string briefingFilename, int prestigePool, bool isCampaignScenario, MapTheme mapTheme, DifficultyLevel difficultyLevel)
         {
             ScenarioId = scenarioId;
             DisplayName = displayName;
@@ -79,6 +80,7 @@ namespace HammerAndSickle.Core.GameData
             PrestigePool = prestigePool;
             IsCampaignScenario = isCampaignScenario;
             MapTheme = mapTheme;
+            DifficultyLevel = difficultyLevel;
         }
 
         #endregion // Constructors

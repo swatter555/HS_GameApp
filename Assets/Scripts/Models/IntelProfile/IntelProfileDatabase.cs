@@ -1,4 +1,4 @@
-﻿using HammerAndSickle.Services;
+using HammerAndSickle.Services;
 using System;
 using System.Collections.Generic;
 using HammerAndSickle.Core.GameData;
@@ -190,7 +190,7 @@ namespace HammerAndSickle.Models
 
                 // Calculate strength multiplier, guard against divide by zero
                 float safeHitPoints = Math.Max(currentHitPoints, 1);
-                float currentMultiplier = safeHitPoints / CUConstants.MAX_HP;
+                float currentMultiplier = safeHitPoints / GameData.MAX_HP;
 
                 // Step 1: Scale weapon systems by current strength
                 var scaledWeaponSystems = new Dictionary<WeaponSystems, float>();
@@ -325,8 +325,8 @@ namespace HammerAndSickle.Models
             return spottedLevel switch
             {
                 SpottedLevel.Level4 => 1f, // Perfect intel - no distortion
-                SpottedLevel.Level3 => GetRandomMultiplier(CUConstants.MIN_INTEL_ERROR, CUConstants.MODERATE_INTEL_ERROR),
-                SpottedLevel.Level2 => GetRandomMultiplier(CUConstants.MIN_INTEL_ERROR, CUConstants.MAX_INTEL_ERROR), 
+                SpottedLevel.Level3 => GetRandomMultiplier(GameData.MIN_INTEL_ERROR, GameData.MODERATE_INTEL_ERROR),
+                SpottedLevel.Level2 => GetRandomMultiplier(GameData.MIN_INTEL_ERROR, GameData.MAX_INTEL_ERROR), 
                 _ => 1f // Level1 and Level0 handled elsewhere
             };
         }

@@ -1,4 +1,4 @@
-﻿using HammerAndSickle.Services;
+using HammerAndSickle.Services;
 using System;
 using System.Collections.Generic;
 using System.Linq;
@@ -51,7 +51,7 @@ namespace HammerAndSickle.Models
         public bool SupplyPenetration { get; private set; }
         [JsonInclude]
         public DepotCategory DepotCategory { get; private set; }
-        public int ProjectionRadius => IsBase ? CUConstants.ProjectionRangeValues[SupplyProjection] : 0;
+        public int ProjectionRadius => IsBase ? GameData.ProjectionRangeValues[SupplyProjection] : 0;
         public bool IsMainDepot => IsBase && DepotCategory == DepotCategory.Main;
 
         // Airbase specific properties
@@ -157,7 +157,7 @@ namespace HammerAndSickle.Models
                 }
 
                 int newDamage = BaseDamage + incomingDamage;
-                BaseDamage = Math.Max(CUConstants.MIN_DAMAGE, Math.Min(CUConstants.MAX_DAMAGE, newDamage));
+                BaseDamage = Math.Max(GameData.MIN_DAMAGE, Math.Min(GameData.MAX_DAMAGE, newDamage));
 
                 UpdateOperationalCapacity();
 
@@ -189,9 +189,9 @@ namespace HammerAndSickle.Models
                     throw new ArgumentException("Repair amount cannot be negative", nameof(repairAmount));
                 }
 
-                repairAmount = Math.Max(0, Math.Min(CUConstants.MAX_DAMAGE, repairAmount));
+                repairAmount = Math.Max(0, Math.Min(GameData.MAX_DAMAGE, repairAmount));
                 BaseDamage -= repairAmount;
-                BaseDamage = Math.Max(CUConstants.MIN_DAMAGE, Math.Min(CUConstants.MAX_DAMAGE, BaseDamage));
+                BaseDamage = Math.Max(GameData.MIN_DAMAGE, Math.Min(GameData.MAX_DAMAGE, BaseDamage));
 
                 UpdateOperationalCapacity();
 
@@ -218,10 +218,10 @@ namespace HammerAndSickle.Models
                     throw new InvalidOperationException("Cannot set facility damage on non-base units");
                 }
 
-                if (newDamageLevel < CUConstants.MIN_DAMAGE || newDamageLevel > CUConstants.MAX_DAMAGE)
+                if (newDamageLevel < GameData.MIN_DAMAGE || newDamageLevel > GameData.MAX_DAMAGE)
                 {
                     throw new ArgumentOutOfRangeException(nameof(newDamageLevel),
-                        $"Damage level must be between {CUConstants.MIN_DAMAGE} and {CUConstants.MAX_DAMAGE}");
+                        $"Damage level must be between {GameData.MIN_DAMAGE} and {GameData.MAX_DAMAGE}");
                 }
 
                 BaseDamage = newDamageLevel;
@@ -244,11 +244,11 @@ namespace HammerAndSickle.Models
 
             return OperationalCapacity switch
             {
-                OperationalCapacity.Full => CUConstants.BASE_CAPACITY_LVL5,
-                OperationalCapacity.SlightlyDegraded => CUConstants.BASE_CAPACITY_LVL4,
-                OperationalCapacity.ModeratelyDegraded => CUConstants.BASE_CAPACITY_LVL3,
-                OperationalCapacity.HeavilyDegraded => CUConstants.BASE_CAPACITY_LVL2,
-                OperationalCapacity.OutOfOperation => CUConstants.BASE_CAPACITY_LVL1,
+                OperationalCapacity.Full => GameData.BASE_CAPACITY_LVL5,
+                OperationalCapacity.SlightlyDegraded => GameData.BASE_CAPACITY_LVL4,
+                OperationalCapacity.ModeratelyDegraded => GameData.BASE_CAPACITY_LVL3,
+                OperationalCapacity.HeavilyDegraded => GameData.BASE_CAPACITY_LVL2,
+                OperationalCapacity.OutOfOperation => GameData.BASE_CAPACITY_LVL1,
                 _ => 0.0f,
             };
         }
@@ -312,7 +312,7 @@ namespace HammerAndSickle.Models
                     throw new ArgumentNullException(nameof(unit), "Air unit cannot be null");
                 }
 
-                if (_airUnitsAttached.Count >= CUConstants.MAX_AIR_UNITS)
+                if (_airUnitsAttached.Count >= GameData.MAX_AIR_UNITS)
                 {
                     AppService.CaptureUiMessage($"{UnitName} is already at maximum air unit capacity.");
                     return false;
@@ -500,7 +500,7 @@ namespace HammerAndSickle.Models
         public int GetAirUnitCapacity()
         {
             return IsBase && FacilityType == FacilityType.Airbase
-                ? CUConstants.MAX_AIR_UNITS - _airUnitsAttached.Count
+                ? GameData.MAX_AIR_UNITS - _airUnitsAttached.Count
                 : 0;
         }
 
@@ -686,7 +686,7 @@ namespace HammerAndSickle.Models
         private float GetMaxStockpile()
         {
             return IsBase && FacilityType == FacilityType.SupplyDepot
-                ? CUConstants.MaxStockpileBySize[DepotSize]
+                ? GameData.MaxStockpileBySize[DepotSize]
                 : 0f;
         }
 
@@ -698,7 +698,7 @@ namespace HammerAndSickle.Models
         {
             if (!IsBase || FacilityType != FacilityType.SupplyDepot) return 0f;
 
-            float baseRate = CUConstants.GenerationRateValues[GenerationRate];
+            float baseRate = GameData.GenerationRateValues[GenerationRate];
             float efficiencyMultiplier = GetFacilityEfficiencyMultiplier();
             return baseRate * efficiencyMultiplier;
         }
@@ -815,7 +815,7 @@ namespace HammerAndSickle.Models
                 if (enemyZOCsCrossed > 0)
                 {
                     if (!SupplyPenetration) return false;
-                    if (enemyZOCsCrossed > CUConstants.ZOC_RANGE) return false;
+                    if (enemyZOCsCrossed > GameData.ZOC_RANGE) return false;
                 }
 
                 return true;
@@ -841,17 +841,17 @@ namespace HammerAndSickle.Models
 
                 if (!CanSupplyUnitAt(distanceInHexes, enemyZOCsCrossed)) return 0f;
 
-                if (StockpileInDays <= CUConstants.MaxDaysSupplyUnit) return 0f;
+                if (StockpileInDays <= GameData.MaxDaysSupplyUnit) return 0f;
 
                 // Calculate efficiency
-                float distanceEfficiency = 1f - (distanceInHexes / (float)ProjectionRadius * CUConstants.DISTANCE_EFF_MULT);
-                float zocEfficiency = 1f - (enemyZOCsCrossed * CUConstants.ZOC_EFF_MULT);
+                float distanceEfficiency = 1f - (distanceInHexes / (float)ProjectionRadius * GameData.DISTANCE_EFF_MULT);
+                float zocEfficiency = 1f - (enemyZOCsCrossed * GameData.ZOC_EFF_MULT);
                 float operationalEfficiency = GetFacilityEfficiencyMultiplier();
                 float totalEfficiency = distanceEfficiency * zocEfficiency * operationalEfficiency;
                 totalEfficiency = Math.Max(totalEfficiency, 0.1f);
 
-                float amountToDeliver = CUConstants.MaxDaysSupplyUnit * totalEfficiency;
-                StockpileInDays -= CUConstants.MaxDaysSupplyUnit;
+                float amountToDeliver = GameData.MaxDaysSupplyUnit * totalEfficiency;
+                StockpileInDays -= GameData.MaxDaysSupplyUnit;
 
                 return amountToDeliver;
             }
@@ -874,15 +874,15 @@ namespace HammerAndSickle.Models
                 if (!IsFacilityOperational() || !IsMainDepot || FacilityType != FacilityType.SupplyDepot)
                     return 0f;
 
-                if (distanceInHexes > CUConstants.AirSupplyMaxRange) return 0f;
-                if (StockpileInDays <= CUConstants.MaxDaysSupplyUnit) return 0f;
+                if (distanceInHexes > GameData.AirSupplyMaxRange) return 0f;
+                if (StockpileInDays <= GameData.MaxDaysSupplyUnit) return 0f;
 
-                float distanceEfficiency = 1f - (distanceInHexes / (float)CUConstants.AirSupplyMaxRange * CUConstants.DISTANCE_EFF_MULT);
+                float distanceEfficiency = 1f - (distanceInHexes / (float)GameData.AirSupplyMaxRange * GameData.DISTANCE_EFF_MULT);
                 float operationalEfficiency = GetFacilityEfficiencyMultiplier();
                 float totalEfficiency = Math.Max(distanceEfficiency * operationalEfficiency, 0.1f);
 
-                StockpileInDays -= CUConstants.MaxDaysSupplyUnit;
-                return CUConstants.MaxDaysSupplyUnit * totalEfficiency;
+                StockpileInDays -= GameData.MaxDaysSupplyUnit;
+                return GameData.MaxDaysSupplyUnit * totalEfficiency;
             }
             catch (Exception e)
             {
@@ -903,15 +903,15 @@ namespace HammerAndSickle.Models
                 if (!IsFacilityOperational() || !IsMainDepot || FacilityType != FacilityType.SupplyDepot)
                     return 0f;
 
-                if (distanceInHexes > CUConstants.NavalSupplyMaxRange) return 0f;
-                if (StockpileInDays <= CUConstants.MaxDaysSupplyUnit) return 0f;
+                if (distanceInHexes > GameData.NavalSupplyMaxRange) return 0f;
+                if (StockpileInDays <= GameData.MaxDaysSupplyUnit) return 0f;
 
-                float distanceEfficiency = 1f - (distanceInHexes / (float)CUConstants.NavalSupplyMaxRange * CUConstants.DISTANCE_EFF_MULT);
+                float distanceEfficiency = 1f - (distanceInHexes / (float)GameData.NavalSupplyMaxRange * GameData.DISTANCE_EFF_MULT);
                 float operationalEfficiency = GetFacilityEfficiencyMultiplier();
                 float totalEfficiency = Math.Max(distanceEfficiency * operationalEfficiency, 0.1f);
 
-                StockpileInDays -= CUConstants.MaxDaysSupplyUnit;
-                return CUConstants.MaxDaysSupplyUnit * totalEfficiency;
+                StockpileInDays -= GameData.MaxDaysSupplyUnit;
+                return GameData.MaxDaysSupplyUnit * totalEfficiency;
             }
             catch (Exception e)
             {

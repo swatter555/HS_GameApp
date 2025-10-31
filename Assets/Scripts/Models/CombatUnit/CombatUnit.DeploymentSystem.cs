@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Text.Json.Serialization;
 using UnityEngine;
 using HammerAndSickle.Services;
@@ -80,13 +80,13 @@ namespace HammerAndSickle.Models
             else _deploymentPosition = targetPosition;
 
             // Consume supplies.
-            ConsumeSupplies(CUConstants.COMBAT_STATE_SUPPLY_TRANSITION_COST);
+            ConsumeSupplies(GameData.COMBAT_STATE_SUPPLY_TRANSITION_COST);
 
             // Decrement the deployment actions.
             DeploymentActions.DecrementCurrent();
 
             // Consume movement points for the deployment action BEFORE profile change
-            float movementCost = CUConstants.DEPLOYMENT_ACTION_MOVEMENT_COST * MovementPoints.Max;
+            float movementCost = GameData.DEPLOYMENT_ACTION_MOVEMENT_COST * MovementPoints.Max;
             MovementPoints.SetCurrent(MovementPoints.Current - movementCost);
 
             // Reset the movement points for the CombatUnit, preserves used movt points.
@@ -140,13 +140,13 @@ namespace HammerAndSickle.Models
             _deploymentPosition = targetPosition;
 
             // Consume supplies
-            ConsumeSupplies(CUConstants.COMBAT_STATE_SUPPLY_TRANSITION_COST);
+            ConsumeSupplies(GameData.COMBAT_STATE_SUPPLY_TRANSITION_COST);
 
             // Decrement the deployment actions
             DeploymentActions.DecrementCurrent();
 
             // Consume movement points for the deployment action BEFORE profile change
-            float movementCost = CUConstants.DEPLOYMENT_ACTION_MOVEMENT_COST * MovementPoints.Max;
+            float movementCost = GameData.DEPLOYMENT_ACTION_MOVEMENT_COST * MovementPoints.Max;
             MovementPoints.SetCurrent(MovementPoints.Current - movementCost);
 
             // Reset the movement points for the CombatUnit, preserves used movement points
@@ -238,8 +238,8 @@ namespace HammerAndSickle.Models
         private void ApplyMobileBonus()
         {
             // Compute and clamp new movement points.
-            float newMax = Mathf.Max(0f, MovementPoints.Max + CUConstants.MOBILE_MOVEMENT_BONUS);
-            float newCurrent = Mathf.Clamp(MovementPoints.Current + CUConstants.MOBILE_MOVEMENT_BONUS, 0f, newMax);
+            float newMax = Mathf.Max(0f, MovementPoints.Max + GameData.MOBILE_MOVEMENT_BONUS);
+            float newCurrent = Mathf.Clamp(MovementPoints.Current + GameData.MOBILE_MOVEMENT_BONUS, 0f, newMax);
 
             // Set new movement points.
             MovementPoints.SetMax(newMax);
@@ -313,7 +313,7 @@ namespace HammerAndSickle.Models
             }
 
             // Check if the unit has critical supply levels
-            if (DaysSupply.Current <= CUConstants.CRITICAL_SUPPLY_THRESHOLD)
+            if (DaysSupply.Current <= GameData.CRITICAL_SUPPLY_THRESHOLD)
             {
                 errorMessage = $"Cannot change state with critical supply levels ({DaysSupply.Current:F1} days remaining)";
                 return false;
@@ -340,9 +340,9 @@ namespace HammerAndSickle.Models
             }
 
             // Check if there are enough movement points for the transition
-            if (MovementPoints.Current < CUConstants.DEPLOYMENT_ACTION_MOVEMENT_COST * MovementPoints.Max)
+            if (MovementPoints.Current < GameData.DEPLOYMENT_ACTION_MOVEMENT_COST * MovementPoints.Max)
             {
-                errorMessage = $"{UnitName} does not have enough movement points to change states ({MovementPoints.Current:F1} available, {CUConstants.DEPLOYMENT_ACTION_MOVEMENT_COST} required)";
+                errorMessage = $"{UnitName} does not have enough movement points to change states ({MovementPoints.Current:F1} available, {GameData.DEPLOYMENT_ACTION_MOVEMENT_COST} required)";
                 return false;
             }
 

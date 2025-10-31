@@ -175,8 +175,8 @@ namespace HammerAndSickle.Models
                 InitializeExperienceSystem();
 
                 // Initialize StatsMaxCurrent properties
-                HitPoints = new StatsMaxCurrent(CUConstants.MAX_HP);
-                DaysSupply = new StatsMaxCurrent(CUConstants.MaxDaysSupplyUnit);
+                HitPoints = new StatsMaxCurrent(GameData.MAX_HP);
+                DaysSupply = new StatsMaxCurrent(GameData.MaxDaysSupplyUnit);
 
                 // Initialize movement based on unit classification
                 InitializeMovementPoints();
@@ -188,7 +188,7 @@ namespace HammerAndSickle.Models
                 MapPos = Position2D.Zero;
 
                 // Initialize individual combat modifier to default
-                IndividualCombatModifier = CUConstants.ICM_DEFAULT;
+                IndividualCombatModifier = GameData.ICM_DEFAULT;
             }
             catch (Exception e)
             {
@@ -245,7 +245,7 @@ namespace HammerAndSickle.Models
                 MapPos = Position2D.Zero; // Will be overwritten by JSON
                 SpottedLevel = SpottedLevel.Level1; // Will be overwritten by JSON
                 LeaderID = string.Empty; // Will be overwritten by JSON
-                IndividualCombatModifier = CUConstants.ICM_DEFAULT; // Will be overwritten by JSON
+                IndividualCombatModifier = GameData.ICM_DEFAULT; // Will be overwritten by JSON
 
                 // Initialize experience system - JSON will set actual values
                 ExperienceLevel = ExperienceLevel.Raw; // Will be overwritten by JSON
@@ -614,7 +614,7 @@ namespace HammerAndSickle.Models
         /// <returns>True if the unit is destroyed</returns>
         public bool IsDestroyed()
         {
-            return HitPoints.Current < CUConstants.MIN_HP;
+            return HitPoints.Current < GameData.MIN_HP;
         }
 
         /// <summary>
@@ -738,11 +738,11 @@ namespace HammerAndSickle.Models
         private void InitializeActionCounts()
         {
             // Standard action counts for most units
-            int moveActions = CUConstants.DEFAULT_MOVE_ACTIONS;
-            int combatActions = CUConstants.DEFAULT_COMBAT_ACTIONS;
-            int deploymentActions = CUConstants.DEFAULT_DEPLOYMENT_ACTIONS;
-            int opportunityActions = CUConstants.DEFAULT_OPPORTUNITY_ACTIONS;
-            int intelActions = CUConstants.DEFAULT_INTEL_ACTIONS;
+            int moveActions = GameData.DEFAULT_MOVE_ACTIONS;
+            int combatActions = GameData.DEFAULT_COMBAT_ACTIONS;
+            int deploymentActions = GameData.DEFAULT_DEPLOYMENT_ACTIONS;
+            int opportunityActions = GameData.DEFAULT_OPPORTUNITY_ACTIONS;
+            int intelActions = GameData.DEFAULT_INTEL_ACTIONS;
 
 
             switch (Classification)
@@ -835,7 +835,7 @@ namespace HammerAndSickle.Models
             {
                 AppService.HandleException(CLASS_NAME, "InitializeMovementPoints", e);
                 // Fallback to foot movement if profile access fails
-                MovementPoints = new StatsMaxCurrent(CUConstants.FOOT_UNIT);
+                MovementPoints = new StatsMaxCurrent(GameData.FOOT_UNIT);
             }
         }
 
@@ -901,23 +901,23 @@ namespace HammerAndSickle.Models
             try
             {
                 // Compute the combat strength multiplier based on hit points.
-                if (HitPoints.Current >= (HitPoints.Max * CUConstants.FULL_STRENGTH_FLOOR))
+                if (HitPoints.Current >= (HitPoints.Max * GameData.FULL_STRENGTH_FLOOR))
                 {
-                    return CUConstants.STRENGTH_MOD_FULL;
+                    return GameData.STRENGTH_MOD_FULL;
                 }
-                else if (HitPoints.Current >= (HitPoints.Max * CUConstants.DEPLETED_STRENGTH_FLOOR))
+                else if (HitPoints.Current >= (HitPoints.Max * GameData.DEPLETED_STRENGTH_FLOOR))
                 {
-                    return CUConstants.STRENGTH_MOD_DEPLETED;
+                    return GameData.STRENGTH_MOD_DEPLETED;
                 }
                 else
                 {
-                    return CUConstants.STRENGTH_MOD_LOW;
+                    return GameData.STRENGTH_MOD_LOW;
                 }
             }
             catch (Exception e)
             {
                 AppService.HandleException(CLASS_NAME, "GetStrengthModifier", e);
-                return CUConstants.STRENGTH_MOD_LOW;
+                return GameData.STRENGTH_MOD_LOW;
             }
         }
 
@@ -932,11 +932,11 @@ namespace HammerAndSickle.Models
             // Returns the combat state multiplier based on current combat state.
             return DeploymentPosition switch
             {
-                DeploymentPosition.Mobile => CUConstants.COMBAT_MOD_MOBILE,
-                DeploymentPosition.Deployed => CUConstants.COMBAT_MOD_DEPLOYED,
-                DeploymentPosition.HastyDefense => CUConstants.COMBAT_MOD_HASTY_DEFENSE,
-                DeploymentPosition.Entrenched => CUConstants.COMBAT_MOD_ENTRENCHED,
-                DeploymentPosition.Fortified => CUConstants.COMBAT_MOD_FORTIFIED,
+                DeploymentPosition.Mobile => GameData.COMBAT_MOD_MOBILE,
+                DeploymentPosition.Deployed => GameData.COMBAT_MOD_DEPLOYED,
+                DeploymentPosition.HastyDefense => GameData.COMBAT_MOD_HASTY_DEFENSE,
+                DeploymentPosition.Entrenched => GameData.COMBAT_MOD_ENTRENCHED,
+                DeploymentPosition.Fortified => GameData.COMBAT_MOD_FORTIFIED,
                 _ => 1.0f, // Default multiplier for other states
             };
         }
@@ -954,11 +954,11 @@ namespace HammerAndSickle.Models
             // Returns the efficiency modifier based on current efficiency level.
             return EfficiencyLevel switch
             {
-                EfficiencyLevel.FullOperations => CUConstants.EFFICIENCY_MOD_PEAK,
-                EfficiencyLevel.CombatOperations => CUConstants.EFFICIENCY_MOD_FULL,
-                EfficiencyLevel.NormalOperations => CUConstants.EFFICIENCY_MOD_OPERATIONAL,
-                EfficiencyLevel.DegradedOperations => CUConstants.EFFICIENCY_MOD_DEGRADED,
-                _ => CUConstants.EFFICIENCY_MOD_STATIC, // Default multiplier for other states
+                EfficiencyLevel.FullOperations => GameData.EFFICIENCY_MOD_PEAK,
+                EfficiencyLevel.CombatOperations => GameData.EFFICIENCY_MOD_FULL,
+                EfficiencyLevel.NormalOperations => GameData.EFFICIENCY_MOD_OPERATIONAL,
+                EfficiencyLevel.DegradedOperations => GameData.EFFICIENCY_MOD_DEGRADED,
+                _ => GameData.EFFICIENCY_MOD_STATIC, // Default multiplier for other states
             };
         }
 
@@ -1000,9 +1000,9 @@ namespace HammerAndSickle.Models
         {
             try
             {
-                if (icm < CUConstants.ICM_MIN || icm > CUConstants.ICM_MAX)
+                if (icm < GameData.ICM_MIN || icm > GameData.ICM_MAX)
                 {
-                    throw new ArgumentOutOfRangeException(nameof(icm), $"ICM must be between {CUConstants.ICM_MIN} and {CUConstants.ICM_MAX}");
+                    throw new ArgumentOutOfRangeException(nameof(icm), $"ICM must be between {GameData.ICM_MIN} and {GameData.ICM_MAX}");
                 }
                 IndividualCombatModifier = icm;
             }
@@ -1053,7 +1053,7 @@ namespace HammerAndSickle.Models
                 // Make sure the unit has enough combat actions, movement points, and supplies to perform a combat action.
                 if (CombatActions.Current >= 1 && 
                     MovementPoints.Current >= GetCombatMovementCost() &&
-                    DaysSupply.Current >= CUConstants.COMBAT_ACTION_SUPPLY_THRESHOLD &&
+                    DaysSupply.Current >= GameData.COMBAT_ACTION_SUPPLY_THRESHOLD &&
                     !IsBase)
                 {
                     // Deduct one combat action
@@ -1063,7 +1063,7 @@ namespace HammerAndSickle.Models
                     ConsumeMovementPoints(GetCombatMovementCost());
 
                     // Consume supplies for the combat action
-                    ConsumeSupplies(CUConstants.COMBAT_ACTION_SUPPLY_COST);
+                    ConsumeSupplies(GameData.COMBAT_ACTION_SUPPLY_COST);
 
                     return true; // Combat action performed successfully
                 }
@@ -1092,7 +1092,7 @@ namespace HammerAndSickle.Models
                 // Make sure the unit has enough move actions, movement points, and supplies to perform a move action.
                 if (MoveActions.Current >= 1 &&
                     MovementPoints.Current >= movtCost &&
-                    DaysSupply.Current >= (movtCost * CUConstants.MOVE_ACTION_SUPPLY_COST) + CUConstants.MOVE_ACTION_SUPPLY_THRESHOLD &&
+                    DaysSupply.Current >= (movtCost * GameData.MOVE_ACTION_SUPPLY_COST) + GameData.MOVE_ACTION_SUPPLY_THRESHOLD &&
                     !IsBase)
                 {
                     // Decrement move actions
@@ -1102,7 +1102,7 @@ namespace HammerAndSickle.Models
                     ConsumeMovementPoints(movtCost);
 
                     // Consume supplies for the move action
-                    ConsumeSupplies(movtCost * CUConstants.MOVE_ACTION_SUPPLY_COST);
+                    ConsumeSupplies(movtCost * GameData.MOVE_ACTION_SUPPLY_COST);
 
                     return true; // Move action performed successfully
                 }
@@ -1134,7 +1134,7 @@ namespace HammerAndSickle.Models
                 // Make sure the unit has enough intel actions, movement points, and supplies to perform an intel action.
                 if (IntelActions.Current >= 1 &&
                     MovementPoints.Current >= GetIntelMovementCost() &&
-                    DaysSupply.Current >= CUConstants.INTEL_ACTION_SUPPLY_COST)
+                    DaysSupply.Current >= GameData.INTEL_ACTION_SUPPLY_COST)
                 {
                     // Decrement intel actions
                     IntelActions.DecrementCurrent();
@@ -1143,7 +1143,7 @@ namespace HammerAndSickle.Models
                     ConsumeMovementPoints(GetIntelMovementCost());
 
                     // Consume supplies for the intel action
-                    ConsumeSupplies(CUConstants.INTEL_ACTION_SUPPLY_COST);
+                    ConsumeSupplies(GameData.INTEL_ACTION_SUPPLY_COST);
 
                     return true; // Intel action performed successfully
                 }
@@ -1174,14 +1174,14 @@ namespace HammerAndSickle.Models
             {
                 // Make sure the unit has enough opportunity actions and is not a base.
                 if (OpportunityActions.Current >= 1 &&
-                    DaysSupply.Current >= CUConstants.OPPORTUNITY_ACTION_SUPPLY_COST + CUConstants.OPPORTUNITY_ACTION_SUPPLY_THRESHOLD && 
+                    DaysSupply.Current >= GameData.OPPORTUNITY_ACTION_SUPPLY_COST + GameData.OPPORTUNITY_ACTION_SUPPLY_THRESHOLD &&
                     !IsBase)
                 {
                     // Decrement opportunity actions
                     OpportunityActions.DecrementCurrent();
 
                     // Consume supplies for the opportunity action
-                    ConsumeSupplies(CUConstants.OPPORTUNITY_ACTION_SUPPLY_COST);
+                    ConsumeSupplies(GameData.OPPORTUNITY_ACTION_SUPPLY_COST);
 
                     return true; // Opportunity action performed successfully
                 }
@@ -1370,7 +1370,7 @@ namespace HammerAndSickle.Models
         /// <returns>The whole-number MP cost for deploying.  Always non-negative.</returns>
         private float GetDeployMovementCost()
         {
-            return Mathf.CeilToInt(MovementPoints.Max * CUConstants.DEPLOYMENT_ACTION_MOVEMENT_COST);
+            return Mathf.CeilToInt(MovementPoints.Max * GameData.DEPLOYMENT_ACTION_MOVEMENT_COST);
         }
 
         /// <summary>
@@ -1384,7 +1384,7 @@ namespace HammerAndSickle.Models
         /// <returns>The MP cost as an integer.</returns>
         private float GetCombatMovementCost()
         {
-            return Mathf.CeilToInt(MovementPoints.Max * CUConstants.COMBAT_ACTION_MOVEMENT_COST);
+            return Mathf.CeilToInt(MovementPoints.Max * GameData.COMBAT_ACTION_MOVEMENT_COST);
         }
 
         /// <summary>
@@ -1398,7 +1398,7 @@ namespace HammerAndSickle.Models
         /// <returns>Integer MP cost for the intel action.</returns>
         private float GetIntelMovementCost()
         {
-            return Mathf.CeilToInt(MovementPoints.Max * CUConstants.INTEL_ACTION_MOVEMENT_COST);
+            return Mathf.CeilToInt(MovementPoints.Max * GameData.INTEL_ACTION_MOVEMENT_COST);
         }
 
         #endregion // CombatUnit Actions
@@ -1488,7 +1488,7 @@ namespace HammerAndSickle.Models
         /// multiplied by the combat action movement cost constant.</returns>
         public float DebugGetCombatMovementCost()
         {
-            return Mathf.CeilToInt(MovementPoints.Max * CUConstants.COMBAT_ACTION_MOVEMENT_COST);
+            return Mathf.CeilToInt(MovementPoints.Max * GameData.COMBAT_ACTION_MOVEMENT_COST);
         }
 
         #endregion // Debugging

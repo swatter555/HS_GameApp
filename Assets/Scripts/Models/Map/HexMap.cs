@@ -133,8 +133,8 @@ namespace HammerAndSickle.Models.Map
         {
             return config switch
             {
-                MapConfig.Small => new Vector2Int(HexMapConstants.SmallHexWidth, HexMapConstants.SmallHexHeight),
-                MapConfig.Large => new Vector2Int(HexMapConstants.LargeHexWidth, HexMapConstants.LargeHexHeight),
+                MapConfig.Small => new Vector2Int(ProgramData.SmallHexWidth, ProgramData.SmallHexHeight),
+                MapConfig.Large => new Vector2Int(ProgramData.LargeHexWidth, ProgramData.LargeHexHeight),
                 _ => Vector2Int.zero
             };
         }
