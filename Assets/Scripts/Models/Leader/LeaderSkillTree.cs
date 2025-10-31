@@ -356,10 +356,10 @@ namespace HammerAndSickle.Models
 
         // Promotion convenience properties
         public bool CanAffordSeniorPromotion =>
-            ReputationPoints >= CUConstants.REP_COST_FOR_SENIOR_PROMOTION &&
+            ReputationPoints >= GameData.REP_COST_FOR_SENIOR_PROMOTION &&
             CurrentGrade == CommandGrade.JuniorGrade;
         public bool CanAffordTopPromotion =>
-            ReputationPoints >= CUConstants.REP_COST_FOR_TOP_PROMOTION &&
+            ReputationPoints >= GameData.REP_COST_FOR_TOP_PROMOTION &&
             CurrentGrade == CommandGrade.SeniorGrade;
 
         // Branch-related properties

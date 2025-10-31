@@ -36,6 +36,20 @@ namespace HammerAndSickle.SceneDirectors
 
         #endregion // Fields
 
+        #region Events
+
+        /// <summary>
+        /// Fired when the difficulty button is pressed.
+        /// </summary>
+        public event Action DifficultyButtonPressed;
+
+        /// <summary>
+        /// Fired when a new scenario is selected.
+        /// </summary>
+        public event Action ScenarioSelectionChanged;
+
+        #endregion // Events
+
         #region Unity Lifecycle
 
         public override void Awake()
@@ -129,10 +143,19 @@ namespace HammerAndSickle.SceneDirectors
             }
         }
 
-        public void OnRandomButton()
+        public void OnDifficultyButton()
         {
-            // Start new campaign logic
-            Debug.Log("random button pressed.");
+            // Check if a manifest is selected before firing the event
+            int selectedIndex = _scenarioDialog.GetSelectedIndex();
+
+            if (selectedIndex < 0 || selectedIndex >= _loadedManifests.Count)
+            {
+                AppService.CaptureUiMessage("No scenario selected. Please select a scenario first.");
+                return;
+            }
+
+            // Fire the event for difficulty selector to handle
+            DifficultyButtonPressed?.Invoke();
         }
 
         public void OnExitButton()
@@ -241,6 +264,9 @@ namespace HammerAndSickle.SceneDirectors
 
                 LoadThumbnail(selectedManifest);
                 LoadBriefing(selectedManifest);
+
+                // Fire event to notify difficulty selector
+                ScenarioSelectionChanged?.Invoke();
             }
             catch (Exception e)
             {
@@ -382,6 +408,7 @@ namespace HammerAndSickle.SceneDirectors
         public ScenarioManifest GetSelectedManifest()
         {
             int selectedIndex = _scenarioDialog.GetSelectedIndex();
+
             if (selectedIndex >= 0 && selectedIndex < _loadedManifests.Count)
             {
                 ScenarioManifest selected = _loadedManifests[selectedIndex];
@@ -398,7 +425,8 @@ namespace HammerAndSickle.SceneDirectors
                     selected.BriefingFilename,
                     selected.PrestigePool,
                     selected.IsCampaignScenario,
-                    selected.MapTheme
+                    selected.MapTheme,
+                    selected.DifficultyLevel
                 );
 
                 // Store the new instance in GDM to persist across scenes.
@@ -407,7 +435,33 @@ namespace HammerAndSickle.SceneDirectors
                 // Return the new instance.
                 return manifestCopy;
             }
+
             return null;
+        }
+
+        /// <summary>
+        /// Gets the currently selected scenario manifest without creating a copy (read-only access).
+        /// </summary>
+        public ScenarioManifest GetCurrentlySelectedManifest()
+        {
+            int selectedIndex = _scenarioDialog.GetSelectedIndex();
+            if (selectedIndex >= 0 && selectedIndex < _loadedManifests.Count)
+            {
+                return _loadedManifests[selectedIndex];
+            }
+            return null;
+        }
+
+        /// <summary>
+        /// Updates the difficulty level of the currently selected manifest.
+        /// </summary>
+        public void UpdateSelectedManifestDifficulty(DifficultyLevel newDifficulty)
+        {
+            int selectedIndex = _scenarioDialog.GetSelectedIndex();
+            if (selectedIndex >= 0 && selectedIndex < _loadedManifests.Count)
+            {
+                _loadedManifests[selectedIndex].DifficultyLevel = newDifficulty;
+            }
         }
 
         #endregion // Public API

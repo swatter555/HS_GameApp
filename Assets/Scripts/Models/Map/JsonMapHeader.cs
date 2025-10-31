@@ -13,10 +13,13 @@ namespace HammerAndSickle.Models.Map
     public class JsonMapHeader
     {
         #region Constants
+
         private const string CLASS_NAME = nameof(JsonMapHeader);
-        #endregion
+
+        #endregion // Constants
 
         #region Properties
+
         /// <summary>
         /// Display name of the map.
         /// </summary>
@@ -46,9 +49,11 @@ namespace HammerAndSickle.Models.Map
         /// </summary>
         [JsonProperty("createdAt")]
         public DateTime CreatedAt { get; set; }
-        #endregion
+
+        #endregion // Properties
 
         #region Constructors
+
         /// <summary>
         /// Parameterless constructor for JSON serialization.
         /// </summary>
@@ -57,7 +62,7 @@ namespace HammerAndSickle.Models.Map
         {
             MapName = string.Empty;
             MapConfiguration = MapConfig.None;
-            SaveVersion = HexMapConstants.CurrentMapDataVersion;
+            SaveVersion = ProgramData.CurrentMapDataVersion;
             Checksum = string.Empty;
             CreatedAt = DateTime.UtcNow;
         }
@@ -74,7 +79,7 @@ namespace HammerAndSickle.Models.Map
             {
                 MapName = mapName ?? throw new ArgumentNullException(nameof(mapName));
                 MapConfiguration = mapConfiguration;
-                SaveVersion = HexMapConstants.CurrentMapDataVersion;
+                SaveVersion = ProgramData.CurrentMapDataVersion;
                 Checksum = checksum ?? throw new ArgumentNullException(nameof(checksum));
                 CreatedAt = DateTime.UtcNow;
             }
@@ -84,9 +89,11 @@ namespace HammerAndSickle.Models.Map
                 throw;
             }
         }
-        #endregion
+
+        #endregion // Constructors
 
         #region Public Methods
+
         /// <summary>
         /// Validates the header data for consistency and completeness.
         /// </summary>
@@ -162,7 +169,7 @@ namespace HammerAndSickle.Models.Map
         /// <returns>Current save version</returns>
         public static int GetCurrentSaveVersion()
         {
-            return HexMapConstants.CurrentMapDataVersion;
+            return ProgramData.CurrentMapDataVersion;
         }
 
         /// <summary>
@@ -175,7 +182,7 @@ namespace HammerAndSickle.Models.Map
             {
                 // For now, only exact version matches are compatible
                 // Future versions can implement backward compatibility logic
-                return SaveVersion == HexMapConstants.CurrentMapDataVersion;
+                return SaveVersion == ProgramData.CurrentMapDataVersion;
             }
             catch (Exception ex)
             {
@@ -200,6 +207,7 @@ namespace HammerAndSickle.Models.Map
                 return "JsonMapHeader: Error generating summary";
             }
         }
-        #endregion
+
+        #endregion // Public Methods
     }
 }

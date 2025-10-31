@@ -91,10 +91,10 @@ namespace HammerAndSickle.Models
 
                 // Initialize and set name
                 if (string.IsNullOrWhiteSpace(name) ||
-                    name.Length < CUConstants.MIN_LEADER_NAME_LENGTH ||
-                    name.Length > CUConstants.MAX_LEADER_NAME_LENGTH)
+                    name.Length < GameData.MIN_LEADER_NAME_LENGTH ||
+                    name.Length > GameData.MAX_LEADER_NAME_LENGTH)
                 {
-                    throw new ArgumentException($"Leader name must be between {CUConstants.MIN_LEADER_NAME_LENGTH} and {CUConstants.MAX_LEADER_NAME_LENGTH} characters");
+                    throw new ArgumentException($"Leader name must be between {GameData.MIN_LEADER_NAME_LENGTH} and {GameData.MAX_LEADER_NAME_LENGTH} characters");
                 }
 
                 Name = name.Trim();
@@ -177,7 +177,7 @@ namespace HammerAndSickle.Models
         /// </summary>
         private string GenerateUniqueID()
         {
-            string baseID = CUConstants.LEADER_ID_PREFIX;
+            string baseID = GameData.LEADER_ID_PREFIX;
             string randomPart = Guid.NewGuid().ToString("N")[..5].ToUpper();
             return $"{baseID}{randomPart}";
         }
@@ -218,8 +218,8 @@ namespace HammerAndSickle.Models
             try
             {
                 if (string.IsNullOrWhiteSpace(name) ||
-                    name.Length < CUConstants.MIN_LEADER_NAME_LENGTH ||
-                    name.Length > CUConstants.MAX_LEADER_NAME_LENGTH)
+                    name.Length < GameData.MIN_LEADER_NAME_LENGTH ||
+                    name.Length > GameData.MAX_LEADER_NAME_LENGTH)
                 {
                     return false;
                 }
@@ -397,24 +397,24 @@ namespace HammerAndSickle.Models
         /// </summary>
         /// <param name="actionType">Type of action performed</param>
         /// <param name="contextMultiplier">Additional multiplier based on context (e.g., difficulty, unit experience)</param>
-        public void AwardReputationForAction(CUConstants.ReputationAction actionType, float contextMultiplier = 1.0f)
+        public void AwardReputationForAction(GameData.ReputationAction actionType, float contextMultiplier = 1.0f)
         {
             try
             {
                 int baseREP = actionType switch
                 {
-                    CUConstants.ReputationAction.Move => CUConstants.REP_PER_MOVE_ACTION,
-                    CUConstants.ReputationAction.MountDismount => CUConstants.REP_PER_MOUNT_DISMOUNT,
-                    CUConstants.ReputationAction.IntelGather => CUConstants.REP_PER_INTEL_GATHER,
-                    CUConstants.ReputationAction.Combat => CUConstants.REP_PER_COMBAT_ACTION,
-                    CUConstants.ReputationAction.AirborneJump => CUConstants.REP_PER_AIRBORNE_JUMP,
-                    CUConstants.ReputationAction.ForcedRetreat => CUConstants.REP_PER_FORCED_RETREAT,
-                    CUConstants.ReputationAction.UnitDestroyed => CUConstants.REP_PER_UNIT_DESTROYED,
+                    GameData.ReputationAction.Move => GameData.REP_PER_MOVE_ACTION,
+                    GameData.ReputationAction.MountDismount => GameData.REP_PER_MOUNT_DISMOUNT,
+                    GameData.ReputationAction.IntelGather => GameData.REP_PER_INTEL_GATHER,
+                    GameData.ReputationAction.Combat => GameData.REP_PER_COMBAT_ACTION,
+                    GameData.ReputationAction.AirborneJump => GameData.REP_PER_AIRBORNE_JUMP,
+                    GameData.ReputationAction.ForcedRetreat => GameData.REP_PER_FORCED_RETREAT,
+                    GameData.ReputationAction.UnitDestroyed => GameData.REP_PER_UNIT_DESTROYED,
                     _ => 0
                 };
 
                 // Initialize multiplier bounds
-                contextMultiplier = Math.Clamp(contextMultiplier, CUConstants.MIN_REP_MULTIPLIER, CUConstants.MAX_REP_MULTIPLIER);
+                contextMultiplier = Math.Clamp(contextMultiplier, GameData.MIN_REP_MULTIPLIER, GameData.MAX_REP_MULTIPLIER);
 
                 int finalREP = Mathf.RoundToInt(baseREP * contextMultiplier);
 

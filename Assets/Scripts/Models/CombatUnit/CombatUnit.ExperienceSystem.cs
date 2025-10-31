@@ -46,9 +46,9 @@ namespace HammerAndSickle.Models
                     return false;
 
                 // Initialize points do not exceed maximum gain per action.
-                if (points > CUConstants.MAX_EXP_GAIN_PER_ACTION)
+                if (points > GameData.MAX_EXP_GAIN_PER_ACTION)
                 {
-                    points = CUConstants.MAX_EXP_GAIN_PER_ACTION;
+                    points = GameData.MAX_EXP_GAIN_PER_ACTION;
                 }
 
                 // Add experience points to total.
@@ -258,12 +258,12 @@ namespace HammerAndSickle.Models
         {
             return ExperienceLevel switch
             {
-                ExperienceLevel.Raw => CUConstants.RAW_XP_MODIFIER,                // -20% effectiveness
-                ExperienceLevel.Green => CUConstants.GREEN_XP_MODIFIER,            // -10% effectiveness
-                ExperienceLevel.Trained => CUConstants.TRAINED_XP_MODIFIER,        // Normal effectiveness
-                ExperienceLevel.Experienced => CUConstants.EXPERIENCED_XP_MODIFIER,// +10% effectiveness
-                ExperienceLevel.Veteran => CUConstants.VETERAN_XP_MODIFIER,        // +20% effectiveness
-                ExperienceLevel.Elite => CUConstants.ELITE_XP_MODIFIER,            // +30% effectiveness
+                ExperienceLevel.Raw => GameData.RAW_XP_MODIFIER,                // -20% effectiveness
+                ExperienceLevel.Green => GameData.GREEN_XP_MODIFIER,            // -10% effectiveness
+                ExperienceLevel.Trained => GameData.TRAINED_XP_MODIFIER,        // Normal effectiveness
+                ExperienceLevel.Experienced => GameData.EXPERIENCED_XP_MODIFIER,// +10% effectiveness
+                ExperienceLevel.Veteran => GameData.VETERAN_XP_MODIFIER,        // +20% effectiveness
+                ExperienceLevel.Elite => GameData.ELITE_XP_MODIFIER,            // +30% effectiveness
                 _ => 1.0f,
             };
         }
