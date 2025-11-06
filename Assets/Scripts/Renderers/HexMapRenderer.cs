@@ -245,8 +245,37 @@ namespace HammerAndSickle.Core.Map
         {
             try
             {
+                // Log the selected hex position
                 if (_debug) Debug.Log($"[{CLASS_NAME}.HandleHexSelected] Hex selected at position: ({hexPosition.IntX}, {hexPosition.IntY})");
 
+                // Validate map data exists
+                if (GameDataManager.CurrentHexMap != null)
+                {
+                    // Validate hex is selected
+                    if (hexPosition != GameDataManager.NoHexSelected)
+                    {
+                        // Get the selected hex tile
+                        HexTile selectedHex = GameDataManager.CurrentHexMap.GetHexAt(hexPosition);
+                        if (selectedHex != null)
+                        {
+                            if (_debug) Debug.Log($"Hex data selected at position: ({hexPosition.IntX}, {hexPosition.IntY})");
+                            if (_debug) Debug.Log($"Terrain: {selectedHex.Terrain}, IsCity: {(selectedHex.Terrain == TerrainType.MajorCity || selectedHex.Terrain == TerrainType.MinorCity)}, IsAirbase: {selectedHex.IsAirbase}, IsFort: {selectedHex.IsFort}");
+
+                            // Assign the selected hex in game data manager
+                            GameDataManager.SelectedHexData = selectedHex;
+                        }
+                        else
+                        {
+                            if (_debug) Debug.LogWarning($"[{CLASS_NAME}.HandleHexSelected] No valid hex found at selected position.");
+                        }
+                    }
+                    else
+                    {
+                        if (_debug) Debug.Log($"[{CLASS_NAME}.HandleHexSelected] No hex is currently selected.");
+                    }
+                }
+
+                // Draw the map indicator of the selected hex
                 DrawHexSelector();
             }
             catch (Exception e)
