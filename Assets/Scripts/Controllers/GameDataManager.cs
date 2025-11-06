@@ -1,4 +1,4 @@
-﻿// ============================================================================
+// ============================================================================
 // ⚠️ ⚠️ ⚠️  JSON SERIALIZATION WARNING  ⚠️ ⚠️ ⚠️
 // ============================================================================
 // This project uses NEWTONSOFT.JSON (Json.NET) for ALL JSON serialization!
@@ -58,6 +58,8 @@ namespace HammerAndSickle.Controllers
     /// </summary>
     public class GameDataManager : MonoBehaviour
     {
+        private const string CLASS_NAME = nameof(GameDataManager);
+
         #region Enumerations
 
         public enum SceneID
@@ -71,10 +73,6 @@ namespace HammerAndSickle.Controllers
 
         #region Constants
 
-        private const string CLASS_NAME = nameof(GameDataManager);
-
-        
-        
         // File extensions for future use
         public const string MANIFEST_EXTENSION = ".manifest";
         public const string MAP_EXTENSION = ".map";
@@ -166,6 +164,9 @@ namespace HammerAndSickle.Controllers
 
         // Currently selected hex coordinates (-1, -1) if none selected.
         public static Position2D SelectedHex { get; set; } = NoHexSelected;
+
+        // Data of the currently selected hex (null if none).
+        public static HexTile SelectedHexData { get; set; } = null;
 
         /// ----------------------
         /// Scenario related data

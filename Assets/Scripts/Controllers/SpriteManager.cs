@@ -14,7 +14,9 @@ namespace HammerAndSickle.Controllers
         HexOutlineIcons,
         MapIcons,
         ControlIcons,
-        BridgeIcons
+        BridgeIcons,
+        RankIcons,
+        TerrainPortraits
     }
 
     /// <summary>
@@ -106,6 +108,43 @@ namespace HammerAndSickle.Controllers
         // Parameter used with themed sprites.
         public const string VoidSpriteName = "None";
 
+        // Rank icons.
+        public const string Colonel = "Col";
+        public const string ColonelGeneral = "ColGeneral";
+        public const string GeneralOfArmy = "GenArmy";
+        public const string LieutenantGeneral = "LtGeneral";
+        public const string MajorGeneral = "MjGeneral";
+
+        // Terrain portraits.
+        public const string TP_Water = "Ocean";
+
+        // Middle East (ME_)
+        public const string ME_TP_Clear     = "ME_Clear";
+        public const string ME_TP_Forest    = "ME_Forest";
+        public const string ME_TP_Marsh     = "ME_Marsh";
+        public const string ME_TP_Mountains = "ME_Mountains";
+        public const string ME_TP_Rough     = "ME_Rough";
+        public const string ME_TP_City      = "ME_City";
+        public const string ME_TP_Town      = "ME_Town";
+
+        // Europe (EU_)
+        public const string EU_TP_Clear     = "EU_Clear";
+        public const string EU_TP_Forest    = "EU_Forest";
+        public const string EU_TP_Marsh     = "EU_Marsh";
+        public const string EU_TP_Mountains = "EU_Mountains";
+        public const string EU_TP_Rough     = "EU_Rough";
+        public const string EU_TP_City      = "EU_City";
+        public const string EU_TP_Town      = "EU_Town";
+
+        // China (CH_)
+        public const string CH_TP_Clear     = "CH_Clear";
+        public const string CH_TP_Forest    = "CH_Forest";
+        public const string CH_TP_Marsh     = "CH_Marsh";
+        public const string CH_TP_Mountains = "CH_Mountains";
+        public const string CH_TP_Rough     = "CH_Rough";
+        public const string CH_TP_City      = "CH_City";
+        public const string CH_TP_Town      = "CH_Town";
+
         #endregion
 
         #region Singleton
@@ -144,6 +183,8 @@ namespace HammerAndSickle.Controllers
         [SerializeField] private SpriteAtlas _controlIconAtlas;
         [SerializeField] private SpriteAtlas _mapIconAtlas;
         [SerializeField] private SpriteAtlas _bridgeIconAtlas;
+        [SerializeField] private SpriteAtlas _rankAtlas;
+        [SerializeField] private SpriteAtlas _terrainPortraitAtlas;
 
         [Header("Prefabs")]
         [SerializeField] private GameObject _cityPrefab;
@@ -251,6 +292,47 @@ namespace HammerAndSickle.Controllers
                         PontBridgeNE => _bridgeIconAtlas.GetSprite(PontBridgeNE),
                         PontBridgeSW => _bridgeIconAtlas.GetSprite(PontBridgeSW),
                         PontBridgeSE => _bridgeIconAtlas.GetSprite(PontBridgeSE),
+                        _ => throw new ArgumentException($"{CLASS_NAME}.GetSprite: Invalid sprite name '{spriteName}' for atlas type '{atlasType}'.")
+                    };
+                }
+                else if (atlasType == AtlasTypes.RankIcons)
+                {
+                    return spriteName switch
+                    {
+                        Colonel => _rankAtlas.GetSprite(Colonel),
+                        ColonelGeneral => _rankAtlas.GetSprite(ColonelGeneral),
+                        GeneralOfArmy => _rankAtlas.GetSprite(GeneralOfArmy),
+                        LieutenantGeneral => _rankAtlas.GetSprite(LieutenantGeneral),
+                        MajorGeneral => _rankAtlas.GetSprite(MajorGeneral),
+                        _ => throw new ArgumentException($"{CLASS_NAME}.GetSprite: Invalid sprite name '{spriteName}' for atlas type '{atlasType}'.")
+                    };
+                }
+                else if (atlasType == AtlasTypes.TerrainPortraits)
+                {
+                    return spriteName switch
+                    {
+                        TP_Water => _terrainPortraitAtlas.GetSprite(TP_Water),
+                        ME_TP_Clear => _terrainPortraitAtlas.GetSprite(ME_TP_Clear),
+                        ME_TP_Forest => _terrainPortraitAtlas.GetSprite(ME_TP_Forest),
+                        ME_TP_Marsh => _terrainPortraitAtlas.GetSprite(ME_TP_Marsh),
+                        ME_TP_Mountains => _terrainPortraitAtlas.GetSprite(ME_TP_Mountains),
+                        ME_TP_Rough => _terrainPortraitAtlas.GetSprite(ME_TP_Rough),
+                        ME_TP_City => _terrainPortraitAtlas.GetSprite(ME_TP_City),
+                        ME_TP_Town => _terrainPortraitAtlas.GetSprite(ME_TP_Town),
+                        EU_TP_Clear => _terrainPortraitAtlas.GetSprite(EU_TP_Clear),
+                        EU_TP_Forest => _terrainPortraitAtlas.GetSprite(EU_TP_Forest),
+                        EU_TP_Marsh => _terrainPortraitAtlas.GetSprite(EU_TP_Marsh),
+                        EU_TP_Mountains => _terrainPortraitAtlas.GetSprite(EU_TP_Mountains),
+                        EU_TP_Rough => _terrainPortraitAtlas.GetSprite(EU_TP_Rough),
+                        EU_TP_City => _terrainPortraitAtlas.GetSprite(EU_TP_City),
+                        EU_TP_Town => _terrainPortraitAtlas.GetSprite(EU_TP_Town),
+                        CH_TP_Clear => _terrainPortraitAtlas.GetSprite(CH_TP_Clear),
+                        CH_TP_Forest => _terrainPortraitAtlas.GetSprite(CH_TP_Forest),
+                        CH_TP_Marsh => _terrainPortraitAtlas.GetSprite(CH_TP_Marsh),
+                        CH_TP_Mountains => _terrainPortraitAtlas.GetSprite(CH_TP_Mountains),
+                        CH_TP_Rough => _terrainPortraitAtlas.GetSprite(CH_TP_Rough),
+                        CH_TP_City => _terrainPortraitAtlas.GetSprite(CH_TP_City),
+                        CH_TP_Town => _terrainPortraitAtlas.GetSprite(CH_TP_Town),
                         _ => throw new ArgumentException($"{CLASS_NAME}.GetSprite: Invalid sprite name '{spriteName}' for atlas type '{atlasType}'.")
                     };
                 }

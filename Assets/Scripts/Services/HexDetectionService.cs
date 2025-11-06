@@ -94,9 +94,8 @@ namespace HammerAndSickle.Services
             new Dictionary<string, HashSet<object>>();
 
         private Action<Position2D> _onHexSelected;
-        /// <summary>
-        /// Fired when a hex is selected or deselected. Position will be NoHexSelected for deselection.
-        /// </summary>
+
+        // Fired when a hex is selected or deselected. Position will be NoHexSelected for deselection.
         public event Action<Position2D> OnHexSelected
         {
             add { AddSubscriber("OnHexSelected", value.Target, ref _onHexSelected, value); }
@@ -371,6 +370,11 @@ namespace HammerAndSickle.Services
             {
                 // Reset hex selection to NoHexSelected
                 GameDataManager.SelectedHex = GameDataManager.NoHexSelected;
+
+                // Reset the selected hex data
+                GameDataManager.SelectedHexData = null;
+
+                // Invoke the event to notify subscribers
                 _onHexSelected?.Invoke(GameDataManager.NoHexSelected);
 
                 if (enableDebugLogging)
