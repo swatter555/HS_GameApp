@@ -1,54 +1,54 @@
 using HammerAndSickle.Services;
-using Newtonsoft.Json;
 using System;
 using System.IO;
+using System.Text.Json.Serialization;
 
 namespace HammerAndSickle.Core.GameData
 {
     /// <summary>
     /// Serializable data structure representing a scenario manifest file.
     /// Lists all files required to load a scenario and provides metadata for UI display.
-    /// Uses Newtonsoft.Json for serialization/deserialization.
+    /// Uses System.Text.Json for serialization/deserialization.
     /// </summary>
     [Serializable]
     public class ScenarioManifest
     {
         #region JSON Properties
 
-        [JsonProperty("scenarioId")]
+        [JsonPropertyName("scenarioId")]
         public string ScenarioId { get; set; } = string.Empty;
 
-        [JsonProperty("displayName")]
+        [JsonPropertyName("displayName")]
         public string DisplayName { get; set; } = string.Empty;
 
-        [JsonProperty("description")]
+        [JsonPropertyName("description")]
         public string Description { get; set; } = string.Empty;
 
-        [JsonProperty("thumbnailFilename")]
+        [JsonPropertyName("thumbnailFilename")]
         public string ThumbnailFilename { get; set; } = string.Empty;
 
-        [JsonProperty("mapFilename")]
+        [JsonPropertyName("mapFilename")]
         public string MapFilename { get; set; } = string.Empty;
 
-        [JsonProperty("oobFilename")]
+        [JsonPropertyName("oobFilename")]
         public string OobFilename { get; set; } = string.Empty;
 
-        [JsonProperty("aiiFilename")]
+        [JsonPropertyName("aiiFilename")]
         public string AiiFilename { get; set; } = string.Empty;
 
-        [JsonProperty("briefingFilename")]
+        [JsonPropertyName("briefingFilename")]
         public string BriefingFilename { get; set; } = string.Empty;
 
-        [JsonProperty("prestigePool")]
+        [JsonPropertyName("prestigePool")]
         public int PrestigePool { get; set; } = 0;
 
-        [JsonProperty("isCampaignScenario")]
+        [JsonPropertyName("isCampaignScenario")]
         public bool IsCampaignScenario { get; set; } = false;
 
-        [JsonProperty("mapTheme")]
+        [JsonPropertyName("mapTheme")]
         public MapTheme MapTheme { get; set; } = MapTheme.MiddleEast;
 
-        [JsonProperty("difficultyLevel")]
+        [JsonPropertyName("difficultyLevel")]
         public DifficultyLevel DifficultyLevel { get; set; } = DifficultyLevel.Colonel;
 
         #endregion // JSON Properties

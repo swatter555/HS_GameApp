@@ -1,7 +1,7 @@
 using HammerAndSickle.Services;
-using Newtonsoft.Json;
 using System;
 using System.Collections.Generic;
+using System.Text.Json.Serialization;
 using UnityEngine;
 using HammerAndSickle.Core.GameData;
 
@@ -35,82 +35,82 @@ namespace HammerAndSickle.Models.Map
         public bool IsDisposed { get; private set; }
 
         // Core Position and Identity
-        [JsonProperty("position")]
+        [JsonPropertyName("position")]
         public Position2D Position { get; set; }
 
         // Terrain Properties
-        [JsonProperty("terrain")]
+        [JsonPropertyName("terrain")]
         public TerrainType Terrain { get; set; }
 
-        [JsonProperty("movementCost")]
+        [JsonPropertyName("movementCost")]
         public int MovementCost { get; private set; }
 
         // Infrastructure Features
-        [JsonProperty("isRail")]
+        [JsonPropertyName("isRail")]
         public bool IsRail { get; set; }
 
-        [JsonProperty("isRoad")]
+        [JsonPropertyName("isRoad")]
         public bool IsRoad { get; set; }
 
-        [JsonProperty("isFort")]
+        [JsonPropertyName("isFort")]
         public bool IsFort { get; set; }
 
-        [JsonProperty("isAirbase")]
+        [JsonPropertyName("isAirbase")]
         public bool IsAirbase { get; set; }
 
         // Game State
-        [JsonProperty("isObjective")]
+        [JsonPropertyName("isObjective")]
         public bool IsObjective { get; set; }
 
-        [JsonProperty("isVisible")]
+        [JsonPropertyName("isVisible")]
         public bool IsVisible { get; set; }
 
-        [JsonProperty("tileControl")]
+        [JsonPropertyName("tileControl")]
         public TileControl TileControl { get; set; }
 
-        [JsonProperty("defaultTileControl")]
+        [JsonPropertyName("defaultTileControl")]
         public DefaultTileControl DefaultTileControl { get; set; }
 
         // Labels and Display
-        [JsonProperty("tileLabel")]
+        [JsonPropertyName("tileLabel")]
         public string TileLabel { get; set; }
 
-        [JsonProperty("largeTileLabel")]
+        [JsonPropertyName("largeTileLabel")]
         public string LargeTileLabel { get; set; }
 
-        [JsonProperty("labelSize")]
+        [JsonPropertyName("labelSize")]
         public TextSize LabelSize { get; set; }
 
-        [JsonProperty("labelWeight")]
+        [JsonPropertyName("labelWeight")]
         public FontWeight LabelWeight { get; set; }
 
-        [JsonProperty("labelColor")]
+        [JsonPropertyName("labelColor")]
         public TextColor LabelColor { get; set; }
 
-        [JsonProperty("labelOutlineThickness")]
+        [JsonPropertyName("labelOutlineThickness")]
         public float LabelOutlineThickness { get; set; }
 
         // Victory and Damage
-        [JsonProperty("victoryValue")]
+        [JsonPropertyName("victoryValue")]
         public float VictoryValue { get; set; }
 
-        [JsonProperty("airbaseDamage")]
+        [JsonPropertyName("airbaseDamage")]
         public float AirbaseDamage { get; set; }
 
-        [JsonProperty("urbanDamage")]
+        [JsonPropertyName("urbanDamage")]
         public int UrbanDamage { get; set; }
 
         // Border Features
-        [JsonProperty("riverBorders")]
+        [JsonPropertyName("riverBorders")]
         public JSONFeatureBorders RiverBorders { get; set; }
 
-        [JsonProperty("bridgeBorders")]
+        [JsonPropertyName("bridgeBorders")]
         public JSONFeatureBorders BridgeBorders { get; set; }
 
-        [JsonProperty("pontoonBridgeBorders")]
+        [JsonPropertyName("pontoonBridgeBorders")]
         public JSONFeatureBorders PontoonBridgeBorders { get; set; }
 
-        [JsonProperty("damagedBridgeBorders")]
+        [JsonPropertyName("damagedBridgeBorders")]
         public JSONFeatureBorders DamagedBridgeBorders { get; set; }
 
         #endregion // Properties

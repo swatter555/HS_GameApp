@@ -399,7 +399,7 @@ namespace HammerAndSickle.Core.Map
 
                     // Create and configure the tile
                     Tile tile = ScriptableObject.CreateInstance<Tile>();
-                    tile.sprite = SpriteManager.Instance.GetSprite(AtlasTypes.HexOutlineIcons, SpriteManager.HexSelectOutline);
+                    tile.sprite = SpriteManager.GetSprite(SpriteManager.HexSelectOutline);
 
                     // Set the tile at the position
                     hexSelectionTilemap.SetTile(new Vector3Int(selectedHex.IntX, selectedHex.IntY, 0), tile);
@@ -479,7 +479,7 @@ namespace HammerAndSickle.Core.Map
 
                 // Get the appropriate sprite based on outline color
                 string spriteName = GetOutlineSpriteName();
-                Sprite sprite = SpriteManager.Instance.GetSprite(AtlasTypes.HexOutlineIcons, spriteName);
+                Sprite sprite = SpriteManager.GetSprite(spriteName);
 
                 if (_debug) Debug.Log($"[{CLASS_NAME}.DrawHexOutlines] Using outline color: {GameDataManager.CurrentHexOutlineColor}, sprite: {spriteName}");
 
@@ -549,11 +549,11 @@ namespace HammerAndSickle.Core.Map
             {
                 if (hex.IsAirbase)
                 {
-                    CreateMapIcon(hex, MapIconType.Airbase, ThemedSpriteTypes.Airbase);
+                    CreateMapIcon(hex, MapIconType.Airbase);
                 }
                 else if (hex.IsFort)
                 {
-                    CreateMapIcon(hex, MapIconType.Fort, ThemedSpriteTypes.Fort);
+                    CreateMapIcon(hex, MapIconType.Fort);
                 }
             }
             catch (Exception e)
@@ -565,7 +565,7 @@ namespace HammerAndSickle.Core.Map
         /// <summary>
         /// Creates a map icon prefab at the specified hex position.
         /// </summary>
-        private void CreateMapIcon(HexTile hex, MapIconType iconType, ThemedSpriteTypes spriteType)
+        private void CreateMapIcon(HexTile hex, MapIconType iconType)
         {
             if (_debug) Debug.Log($"[{CLASS_NAME}.CreateMapIcon] Creating {iconType} icon at ({hex.Position.IntX}, {hex.Position.IntY})");
 
@@ -579,7 +579,16 @@ namespace HammerAndSickle.Core.Map
             // Configure prefab
             mapIconPrefab.SetIconType(iconType);
             mapIconPrefab.SetPosition(new Vector2Int(hex.Position.IntX, hex.Position.IntY));
-            mapIconPrefab.GetSpriteRenderer().sprite = SpriteManager.Instance.GetThemedSprite(GameDataManager.CurrentMapTheme, spriteType);
+
+            // Get the appropriate sprite name
+            string spriteName;
+            if (iconType == MapIconType.Airbase)
+                spriteName = SpriteManager.GEN_Airbase;
+            else
+                spriteName = SpriteManager.GEN_Fort;
+
+            // Set the sprite
+            mapIconPrefab.GetSpriteRenderer().sprite = SpriteManager.GetSprite(spriteName);
 
             // Position the prefab
             mapIconObject.transform.position = GetRenderPosition(new Vector2Int(hex.Position.IntX, hex.Position.IntY));
@@ -792,7 +801,7 @@ namespace HammerAndSickle.Core.Map
                 _ => throw new ArgumentOutOfRangeException(nameof(direction))
             };
 
-            return SpriteManager.Instance.GetSprite(AtlasTypes.BridgeIcons, spriteName);
+            return SpriteManager.GetSprite(spriteName);
         }
 
         #endregion // Private Methods - Bridges

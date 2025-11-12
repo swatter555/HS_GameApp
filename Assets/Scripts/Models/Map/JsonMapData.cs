@@ -1,5 +1,5 @@
 using System;
-using Newtonsoft.Json;
+using System.Text.Json.Serialization;
 using HammerAndSickle.Services;
 
 namespace HammerAndSickle.Models.Map
@@ -19,13 +19,13 @@ namespace HammerAndSickle.Models.Map
         /// <summary>
         /// Map header containing metadata and integrity information.
         /// </summary>
-        [JsonProperty("header")]
+        [JsonPropertyName("header")]
         public JsonMapHeader Header { get; set; }
 
         /// <summary>
         /// Array of all hex tiles in the map.
         /// </summary>
-        [JsonProperty("hexes")]
+        [JsonPropertyName("hexes")]
         public HexTile[] Hexes { get; set; }
         #endregion
 
