@@ -5,8 +5,8 @@ using HammerAndSickle.Services;
 using System;
 using System.Collections.Generic;
 using System.IO;
+using System.Text.Json;
 using UnityEngine;
-using Newtonsoft.Json;
 
 namespace HammerAndSickle.SceneDirectors
 {
@@ -210,7 +210,7 @@ namespace HammerAndSickle.SceneDirectors
                     {
                         string json = File.ReadAllText(manifestFile);
 
-                        ScenarioManifest manifest = JsonConvert.DeserializeObject<ScenarioManifest>(json);
+                        ScenarioManifest manifest = JsonSerializer.Deserialize<ScenarioManifest>(json);
 
                         if (manifest == null || !manifest.IsValid())
                         {

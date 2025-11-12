@@ -233,7 +233,7 @@ namespace HammerAndSickle.Controllers
             if (string.IsNullOrEmpty(spriteName))
                 return;
 
-            var sprite = SpriteManager.Instance?.GetSprite(AtlasTypes.TerrainPortraits, spriteName);
+            var sprite = SpriteManager.GetSprite(spriteName);
             if (sprite != null)
                 SetTerrainImage(sprite);
         }

@@ -1,5 +1,5 @@
 using System;
-using Newtonsoft.Json;
+using System.Text.Json.Serialization;
 using HammerAndSickle.Services;
 using HammerAndSickle.Core.GameData;
 
@@ -23,31 +23,31 @@ namespace HammerAndSickle.Models.Map
         /// <summary>
         /// Display name of the map.
         /// </summary>
-        [JsonProperty("mapName")]
+        [JsonPropertyName("mapName")]
         public string MapName { get; set; }
 
         /// <summary>
         /// Map size configuration (Small, Large, None).
         /// </summary>
-        [JsonProperty("mapConfiguration")]
+        [JsonPropertyName("mapConfiguration")]
         public MapConfig MapConfiguration { get; set; }
 
         /// <summary>
         /// Save format version for compatibility tracking.
         /// </summary>
-        [JsonProperty("saveVersion")]
+        [JsonPropertyName("saveVersion")]
         public int SaveVersion { get; set; }
 
         /// <summary>
         /// Data integrity checksum for validation.
         /// </summary>
-        [JsonProperty("checksum")]
+        [JsonPropertyName("checksum")]
         public string Checksum { get; set; }
 
         /// <summary>
         /// Creation timestamp for the JSON file.
         /// </summary>
-        [JsonProperty("createdAt")]
+        [JsonPropertyName("createdAt")]
         public DateTime CreatedAt { get; set; }
 
         #endregion // Properties

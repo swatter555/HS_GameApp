@@ -63,9 +63,9 @@ namespace HammerAndSickle.Core
                 {
                     cityIconRenderer.sprite = theme switch
                     {
-                        MapTheme.MiddleEast => SpriteManager.Instance.GetThemedSprite(MapTheme.MiddleEast, ThemedSpriteTypes.MajorCity),
-                        MapTheme.Europe => SpriteManager.Instance.GetThemedSprite(MapTheme.Europe, ThemedSpriteTypes.MajorCity),
-                        MapTheme.China => SpriteManager.Instance.GetThemedSprite(MapTheme.China, ThemedSpriteTypes.MajorCity),
+                        MapTheme.MiddleEast => SpriteManager.GetSprite(SpriteManager.ME_MajorCity),
+                        MapTheme.Europe => SpriteManager.GetSprite(SpriteManager.EU_MajorCity),
+                        MapTheme.China => SpriteManager.GetSprite(SpriteManager.CH_MajorCity),
                         _ => throw new ArgumentException($"{CLASS_NAME}.UpdateCityIcon: Invalid map theme '{theme}'.")
                     };
                 }
@@ -73,9 +73,9 @@ namespace HammerAndSickle.Core
                 {
                     cityIconRenderer.sprite = theme switch
                     {
-                        MapTheme.MiddleEast => SpriteManager.Instance.GetThemedSprite(MapTheme.MiddleEast, ThemedSpriteTypes.MinorCity),
-                        MapTheme.Europe => SpriteManager.Instance.GetThemedSprite(MapTheme.Europe, ThemedSpriteTypes.MinorCity),
-                        MapTheme.China => SpriteManager.Instance.GetThemedSprite(MapTheme.China, ThemedSpriteTypes.MinorCity),
+                        MapTheme.MiddleEast => SpriteManager.GetSprite(SpriteManager.ME_MinorCity),
+                        MapTheme.Europe => SpriteManager.GetSprite(SpriteManager.EU_MinorCity),
+                        MapTheme.China => SpriteManager.GetSprite(SpriteManager.CH_MinorCity),
                         _ => throw new ArgumentException($"{CLASS_NAME}.UpdateCityIcon: Invalid map theme '{theme}'.")
                     };
                 }
@@ -99,9 +99,9 @@ namespace HammerAndSickle.Core
             {
                 nameplateRenderer.sprite = theme switch
                 {
-                    MapTheme.MiddleEast => SpriteManager.Instance.GetThemedSprite(MapTheme.MiddleEast, ThemedSpriteTypes.Nameplate),
-                    MapTheme.Europe => SpriteManager.Instance.GetThemedSprite(MapTheme.Europe, ThemedSpriteTypes.Nameplate),
-                    MapTheme.China => SpriteManager.Instance.GetThemedSprite(MapTheme.China, ThemedSpriteTypes.Nameplate),
+                    MapTheme.MiddleEast => SpriteManager.GetSprite(SpriteManager.ME_Nameplate),
+                    MapTheme.Europe => SpriteManager.GetSprite(SpriteManager.EU_Nameplate),
+                    MapTheme.China => SpriteManager.GetSprite(SpriteManager.CH_Nameplate),
                     _ => throw new ArgumentException($"{CLASS_NAME}.UpdateNameplate: Invalid map theme '{theme}'.")
                 };
             }
@@ -122,27 +122,27 @@ namespace HammerAndSickle.Core
                 {
                     controlFlagRenderer.sprite = defaultControl switch
                     {
-                        DefaultTileControl.BE => SpriteManager.Instance.GetSprite(AtlasTypes.ControlIcons, SpriteManager.Control_BE),
-                        DefaultTileControl.DE => SpriteManager.Instance.GetSprite(AtlasTypes.ControlIcons, SpriteManager.Control_DE),
-                        DefaultTileControl.FR => SpriteManager.Instance.GetSprite(AtlasTypes.ControlIcons, SpriteManager.Control_FR),
-                        DefaultTileControl.MJ => SpriteManager.Instance.GetSprite(AtlasTypes.ControlIcons, SpriteManager.Control_MJ),
-                        DefaultTileControl.NE => SpriteManager.Instance.GetSprite(AtlasTypes.ControlIcons, SpriteManager.Control_NE),
-                        DefaultTileControl.UK => SpriteManager.Instance.GetSprite(AtlasTypes.ControlIcons, SpriteManager.Control_UK),
-                        DefaultTileControl.US => SpriteManager.Instance.GetSprite(AtlasTypes.ControlIcons, SpriteManager.Control_US),
-                        DefaultTileControl.GE => SpriteManager.Instance.GetSprite(AtlasTypes.ControlIcons, SpriteManager.Control_GE),
-                        DefaultTileControl.CH => SpriteManager.Instance.GetSprite(AtlasTypes.ControlIcons, SpriteManager.Control_China),
-                        DefaultTileControl.IR => SpriteManager.Instance.GetSprite(AtlasTypes.ControlIcons, SpriteManager.Control_Iran),
-                        DefaultTileControl.IQ => SpriteManager.Instance.GetSprite(AtlasTypes.ControlIcons, SpriteManager.Control_Iraq),
-                        DefaultTileControl.SA => SpriteManager.Instance.GetSprite(AtlasTypes.ControlIcons, SpriteManager.Control_Saudi),
-                        DefaultTileControl.KW => SpriteManager.Instance.GetSprite(AtlasTypes.ControlIcons, SpriteManager.Control_Kuwait),
-                        DefaultTileControl.None => SpriteManager.Instance.GetSprite(AtlasTypes.ControlIcons, SpriteManager.Control_None),
+                        DefaultTileControl.BE => SpriteManager.GetSprite(SpriteManager.Control_BE),
+                        DefaultTileControl.DE => SpriteManager.GetSprite(SpriteManager.Control_DE),
+                        DefaultTileControl.FR => SpriteManager.GetSprite(SpriteManager.Control_FR),
+                        DefaultTileControl.MJ => SpriteManager.GetSprite(SpriteManager.Control_MJ),
+                        DefaultTileControl.NE => SpriteManager.GetSprite(SpriteManager.Control_NE),
+                        DefaultTileControl.UK => SpriteManager.GetSprite(SpriteManager.Control_UK),
+                        DefaultTileControl.US => SpriteManager.GetSprite(SpriteManager.Control_US),
+                        DefaultTileControl.GE => SpriteManager.GetSprite(SpriteManager.Control_GE),
+                        DefaultTileControl.CH => SpriteManager.GetSprite(SpriteManager.Control_China),
+                        DefaultTileControl.IR => SpriteManager.GetSprite(SpriteManager.Control_Iran),
+                        DefaultTileControl.IQ => SpriteManager.GetSprite(SpriteManager.Control_Iraq),
+                        DefaultTileControl.SA => SpriteManager.GetSprite(SpriteManager.Control_Saudi),
+                        DefaultTileControl.KW => SpriteManager.GetSprite(SpriteManager.Control_Kuwait),
+                        DefaultTileControl.None => SpriteManager.GetSprite(SpriteManager.Control_None),
                         _ => throw new ArgumentException($"{CLASS_NAME}.UpdateControlFlag: Invalid default control '{tileControl}.{defaultControl}'.")
                     };
                 }
                 else
                 {
                     // All red controlled tiles are always SV
-                    controlFlagRenderer.sprite = SpriteManager.Instance.GetSprite(AtlasTypes.ControlIcons, SpriteManager.Control_SV);
+                    controlFlagRenderer.sprite = SpriteManager.GetSprite(SpriteManager.Control_SV);
                 }
             }
             catch (Exception e)
