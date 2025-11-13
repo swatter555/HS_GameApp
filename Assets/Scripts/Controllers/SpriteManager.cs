@@ -27,6 +27,7 @@ namespace HammerAndSickle.Controllers
         public const string ME_Nameplate = "ME_Nameplate";
         public const string ME_MajorCity = "ME_MajorCity";
         public const string ME_MinorCity = "ME_MinorCity";
+        public const string ME_Sprawl  = "ME_Sprawl";
 
         // Europe
         public const string EU_Nameplate = "EU_Nameplate";

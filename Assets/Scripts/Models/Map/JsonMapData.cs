@@ -30,34 +30,18 @@ namespace HammerAndSickle.Models.Map
         #endregion
 
         #region Constructors
-        /// <summary>
-        /// Parameterless constructor for JSON serialization.
-        /// </summary>
-        [JsonConstructor]
-        public JsonMapData()
-        {
-            Header = new JsonMapHeader();
-            Hexes = Array.Empty<HexTile>();
-        }
 
         /// <summary>
-        /// Creates a new JsonMapData instance with header and hex data.
+        /// JSON deserialization constructor with explicit parameters for all serializable properties.
+        /// System.Text.Json uses this constructor to create objects with all data available at construction time.
         /// </summary>
-        /// <param name="header">Map header information</param>
-        /// <param name="hexes">Array of hex tiles</param>
+        [JsonConstructor]
         public JsonMapData(JsonMapHeader header, HexTile[] hexes)
         {
-            try
-            {
-                Header = header ?? throw new ArgumentNullException(nameof(header));
-                Hexes = hexes ?? throw new ArgumentNullException(nameof(hexes));
-            }
-            catch (Exception ex)
-            {
-                AppService.HandleException(CLASS_NAME, nameof(JsonMapData), ex);
-                throw;
-            }
+            Header = header;
+            Hexes = hexes;
         }
+
         #endregion
 
         #region Public Methods

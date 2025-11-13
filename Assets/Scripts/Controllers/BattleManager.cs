@@ -92,80 +92,39 @@ namespace HammerAndSickle.Controllers
 
         #region Properties
 
-        /// <summary>
-        /// Indicates whether the battle manager has been fully initialized.
-        /// </summary>
+        // Indicates whether the battle manager has been fully initialized.
         public bool IsReady => _isInitialized;
 
         /// --------------------
         /// Turn Management
         /// --------------------
 
-        /// <summary>
-        /// Current turn number (1-based).
-        /// </summary>
         public int CurrentTurnNumber { get; private set; } = 1;
-
-        /// <summary>
-        /// Maximum number of turns before scenario ends.
-        /// </summary>
         public int MaxTurnNumber { get; private set; } = 20;
-
-        /// <summary>
-        /// Current battle phase.
-        /// </summary>
         public BattlePhase CurrentPhase { get; private set; } = BattlePhase.NotStarted;
 
         /// --------------------
-        /// Environmental Conditions
+        /// Conditions
         /// --------------------
 
-        /// <summary>
-        /// Current weather condition affecting operations.
-        /// </summary>
         public WeatherCondition CurrentWeather { get; private set; } = WeatherCondition.Clear;
+        public int MaxNumberCoreUnitAllowed { get; private set; } = 0;
 
         /// --------------------
         /// Objective Tracking
         /// --------------------
 
-        /// <summary>
-        /// Number of objective hexes controlled by player.
-        /// </summary>
         public int ObjectiveHexesOccupied { get; private set; } = 0;
-
-        /// <summary>
-        /// Number of objective hexes not controlled by player.
-        /// </summary>
         public int ObjectiveHexesUnoccupied { get; private set; } = 0;
-
-        /// <summary>
-        /// Total number of objective hexes in scenario.
-        /// </summary>
         public int TotalObjectiveHexes { get; private set; } = 0;
 
         /// --------------------
         /// Battle Statistics
         /// --------------------
 
-        /// <summary>
-        /// Current battle result status.
-        /// </summary>
         public BattleResult CurrentResult { get; private set; } = BattleResult.Ongoing;
-
-        /// <summary>
-        /// Prestige points earned during battle.
-        /// </summary>
         public int PrestigeEarned { get; private set; } = 0;
-
-        /// <summary>
-        /// Prestige points spent during battle.
-        /// </summary>
         public int PrestigeSpent { get; private set; } = 0;
-
-        /// <summary>
-        /// Gets the current prestige level of the player.
-        /// </summary>
         public int CurrentPrestige { get; private set; } = 0;
 
         // TODO: Loss tracking system
@@ -179,14 +138,7 @@ namespace HammerAndSickle.Controllers
         /// Battle Configuration
         /// --------------------
 
-        /// <summary>
-        /// Indicates if this is a campaign battle or standalone scenario.
-        /// </summary>
         public bool IsCampaignBattle { get; private set; } = false;
-
-        /// <summary>
-        /// Scenario unique identifier.
-        /// </summary>
         public string ScenarioID { get; private set; } = string.Empty;
 
         #endregion // Properties
@@ -260,7 +212,7 @@ namespace HammerAndSickle.Controllers
         /// <summary>
         /// Initializes a new battle with specified parameters.
         /// </summary>
-        public void StartBattle(string scenarioId, int maxTurns, int prestige, bool isCampaignBattle = false)
+        public void StartBattle(string scenarioId, int maxTurns, int prestige, int maxCore, bool isCampaignBattle = false)
         {
             try
             {
@@ -271,6 +223,7 @@ namespace HammerAndSickle.Controllers
                 CurrentPhase = BattlePhase.PlayerTurn;
                 CurrentResult = BattleResult.Ongoing;
                 CurrentPrestige = prestige;
+                MaxNumberCoreUnitAllowed = maxCore;
 
                 // Reset statistics
                 PrestigeEarned = 0;

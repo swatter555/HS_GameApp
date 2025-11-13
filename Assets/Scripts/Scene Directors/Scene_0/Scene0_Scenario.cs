@@ -426,7 +426,9 @@ namespace HammerAndSickle.SceneDirectors
                     selected.PrestigePool,
                     selected.IsCampaignScenario,
                     selected.MapTheme,
-                    selected.DifficultyLevel
+                    selected.DifficultyLevel,
+                    selected.MaxTurns,
+                    selected.MaxCoreUnits
                 );
 
                 // Store the new instance in GDM to persist across scenes.

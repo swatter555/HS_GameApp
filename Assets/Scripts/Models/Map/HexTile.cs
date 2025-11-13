@@ -42,8 +42,9 @@ namespace HammerAndSickle.Models.Map
         [JsonPropertyName("terrain")]
         public TerrainType Terrain { get; set; }
 
+        // Movement Cost
         [JsonPropertyName("movementCost")]
-        public int MovementCost { get; private set; }
+        public int MovementCost { get; set; }
 
         // Infrastructure Features
         [JsonPropertyName("isRail")]
@@ -97,6 +98,7 @@ namespace HammerAndSickle.Models.Map
         [JsonPropertyName("airbaseDamage")]
         public float AirbaseDamage { get; set; }
 
+        // Urban Damage is now a proxy value for urban sprawl tiles.
         [JsonPropertyName("urbanDamage")]
         public int UrbanDamage { get; set; }
 
@@ -128,58 +130,37 @@ namespace HammerAndSickle.Models.Map
         #region Constructors
 
         /// <summary>
-        /// Parameterless constructor.
-        /// </summary>
-        public HexTile()
-        {
-            Terrain = TerrainType.Clear;
-            enableDebugLogging = false;
-            Initialize();
-        }
-
-        /// <summary>
-        /// Initializes a new hex instance at the specified position.
-        /// </summary>
-        /// <param name="position">Grid position of the hex</param>
-        /// <param name="enableLogging">Enable debug logging for this hex</param>
-        public HexTile(Vector2Int position, bool enableLogging = false)
-        {
-            Position = position;
-            enableDebugLogging = enableLogging;
-            Initialize();
-        }
-
-        /// <summary>
-        /// Parameterized constructor for JSON deserialization with explicit field mapping.
+        /// JSON deserialization constructor with explicit parameters for all serializable properties.
+        /// System.Text.Json uses this constructor to create objects with all data available at construction time.
         /// </summary>
         [JsonConstructor]
         public HexTile(
-           Position2D position,
-           TerrainType terrain,
-           int movementCost,
-           bool isRail,
-           bool isRoad,
-           bool isFort,
-           bool isAirbase,
-           bool isObjective,
-           bool isVisible,
-           TileControl tileControl,
-           DefaultTileControl defaultTileControl,
-           string tileLabel,
-           string largeTileLabel,
-           TextSize labelSize,
-           FontWeight labelWeight,
-           TextColor labelColor,
-           float labelOutlineThickness,
-           float victoryValue,
-           float airbaseDamage,
-           int urbanDamage,
-           JSONFeatureBorders riverBorders,
-           JSONFeatureBorders bridgeBorders,
-           JSONFeatureBorders pontoonBridgeBorders,
-           JSONFeatureBorders damagedBridgeBorders)
+            Position2D position,
+            TerrainType terrain,
+            int movementCost,
+            bool isRail,
+            bool isRoad,
+            bool isFort,
+            bool isAirbase,
+            bool isObjective,
+            bool isVisible,
+            TileControl tileControl,
+            DefaultTileControl defaultTileControl,
+            string tileLabel,
+            string largeTileLabel,
+            TextSize labelSize,
+            FontWeight labelWeight,
+            TextColor labelColor,
+            float labelOutlineThickness,
+            float victoryValue,
+            float airbaseDamage,
+            int urbanDamage,
+            JSONFeatureBorders riverBorders,
+            JSONFeatureBorders bridgeBorders,
+            JSONFeatureBorders pontoonBridgeBorders,
+            JSONFeatureBorders damagedBridgeBorders)
         {
-            // Set all properties directly from parameters
+            // Assign all properties from JSON data
             Position = position;
             Terrain = terrain;
             MovementCost = movementCost;
@@ -191,8 +172,8 @@ namespace HammerAndSickle.Models.Map
             IsVisible = isVisible;
             TileControl = tileControl;
             DefaultTileControl = defaultTileControl;
-            TileLabel = tileLabel ?? string.Empty;
-            LargeTileLabel = largeTileLabel ?? string.Empty;
+            TileLabel = tileLabel;
+            LargeTileLabel = largeTileLabel;
             LabelSize = labelSize;
             LabelWeight = labelWeight;
             LabelColor = labelColor;
@@ -205,11 +186,35 @@ namespace HammerAndSickle.Models.Map
             PontoonBridgeBorders = pontoonBridgeBorders;
             DamagedBridgeBorders = damagedBridgeBorders;
 
+            // Initialize non-serialized fields
             enableDebugLogging = false;
 
-            if (enableDebugLogging)
-                Debug.Log($"HexTile JsonConstructor Position: {Position.X}, {Position.Y}");
+            // Recalculate movement cost from terrain (intentionally overwrites JSON value)
+            UpdateMovementCost();
 
+            // Initialize transient state only
+            Initialize();
+        }
+
+        /// <summary>
+        /// Initializes a new hex instance at the specified position.
+        /// Used for manual hex creation (not JSON deserialization).
+        /// </summary>
+        /// <param name="position">Grid position of the hex</param>
+        /// <param name="enableLogging">Enable debug logging for this hex</param>
+        public HexTile(Vector2Int position, bool enableLogging = false)
+        {
+            Position = position;
+            Terrain = TerrainType.Clear;
+            enableDebugLogging = enableLogging;
+
+            // Apply default values for labels and display properties
+            SetDefaults();
+
+            // Calculate movement cost from terrain
+            UpdateMovementCost();
+
+            // Initialize transient state
             Initialize();
         }
 
@@ -218,33 +223,15 @@ namespace HammerAndSickle.Models.Map
         #region Initialization
 
         /// <summary>
-        /// Initializes the hex with default values.
+        /// Initializes transient state only. All serializable properties must already be set.
+        /// This method only handles [JsonIgnore] fields that cannot be serialized.
         /// </summary>
         private void Initialize()
         {
             try
             {
-                UpdateMovementCost();
-
-                // Initialize infrastructure features
-                // Keep existing values if they were set during deserialization
-
-                // Initialize labels and display if not already set
-                TileLabel ??= string.Empty;
-                LargeTileLabel ??= string.Empty;
-                if (LabelSize == default) LabelSize = TextSize.Small;
-                if (LabelWeight == default) LabelWeight = FontWeight.Medium;
-                if (LabelColor == default) LabelColor = TextColor.Blue;
-                if (LabelOutlineThickness == default) LabelOutlineThickness = 0.1f;
-
-                // Initialize border features if not already set
-                RiverBorders ??= new JSONFeatureBorders(BorderType.River);
-                BridgeBorders ??= new JSONFeatureBorders(BorderType.Bridge);
-                PontoonBridgeBorders ??= new JSONFeatureBorders(BorderType.PontoonBridge);
-                DamagedBridgeBorders ??= new JSONFeatureBorders(BorderType.DestroyedBridge);
-
-                // Initialize neighbors dictionary
-                neighbors = new Dictionary<HexDirection, HexTile>();
+                // Initialize neighbors dictionary (not serialized due to circular references)
+                neighbors ??= new Dictionary<HexDirection, HexTile>();
 
                 IsInitialized = true;
 
@@ -257,6 +244,28 @@ namespace HammerAndSickle.Models.Map
             {
                 AppService.HandleException(CLASS_NAME, nameof(Initialize), ex);
                 IsInitialized = false;
+                throw;
+            }
+        }
+
+        /// <summary>
+        /// Sets default values for labels and display properties.
+        /// Used only during manual hex creation, not JSON deserialization.
+        /// </summary>
+        private void SetDefaults()
+        {
+            try
+            {
+                TileLabel = string.Empty;
+                LargeTileLabel = string.Empty;
+                LabelSize = TextSize.Small;
+                LabelWeight = FontWeight.Medium;
+                LabelColor = TextColor.Blue;
+                LabelOutlineThickness = 0.1f;
+            }
+            catch (Exception ex)
+            {
+                AppService.HandleException(CLASS_NAME, nameof(SetDefaults), ex);
                 throw;
             }
         }
@@ -295,7 +304,22 @@ namespace HammerAndSickle.Models.Map
         /// <param name="position">The new position to assign, represented as a <see cref="Position2D"/> object.</param>
         public void SetPosition(Position2D position)
         {
-            Position = position;
+            ValidateState();
+
+            try
+            {
+                Position = position;
+
+                if (enableDebugLogging)
+                {
+                    Debug.Log($"{CLASS_NAME}: Position set to {position}");
+                }
+            }
+            catch (Exception ex)
+            {
+                AppService.HandleException(CLASS_NAME, nameof(SetPosition), ex);
+                throw;
+            }
         }
 
         /// <summary>

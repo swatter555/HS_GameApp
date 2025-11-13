@@ -51,23 +51,37 @@ namespace HammerAndSickle.Core.GameData
         [JsonPropertyName("difficultyLevel")]
         public DifficultyLevel DifficultyLevel { get; set; } = DifficultyLevel.Colonel;
 
+        [JsonPropertyName("maxTurns")]
+        public int MaxTurns { get; set; } = 0;
+
+        [JsonPropertyName("maxCoreUnits")]
+        public int MaxCoreUnits { get; set; } = 0;
+
         #endregion // JSON Properties
 
         #region Constructors
 
         /// <summary>
-        /// Parameterless constructor for JSON deserialization.
+        /// JSON deserialization constructor with explicit parameters for all serializable properties.
+        /// System.Text.Json uses this constructor to create objects with all data available at construction time.
+        /// Also used for creating manifest copies programmatically.
         /// </summary>
-        public ScenarioManifest()
-        {
-        }
-
-        /// <summary>
-        /// Constructor with full parameters for creating manifests programmatically.
-        /// </summary>
-        public ScenarioManifest(string scenarioId, string displayName, string description,
-            string thumbnailFilename, string mapFilename, string oobFilename,
-            string aiiFilename, string briefingFilename, int prestigePool, bool isCampaignScenario, MapTheme mapTheme, DifficultyLevel difficultyLevel)
+        [JsonConstructor]
+        public ScenarioManifest(
+            string scenarioId,
+            string displayName,
+            string description,
+            string thumbnailFilename,
+            string mapFilename,
+            string oobFilename,
+            string aiiFilename,
+            string briefingFilename,
+            int prestigePool,
+            bool isCampaignScenario,
+            MapTheme mapTheme,
+            DifficultyLevel difficultyLevel,
+            int maxTurns,
+            int maxCoreUnits)
         {
             ScenarioId = scenarioId;
             DisplayName = displayName;
@@ -81,6 +95,8 @@ namespace HammerAndSickle.Core.GameData
             IsCampaignScenario = isCampaignScenario;
             MapTheme = mapTheme;
             DifficultyLevel = difficultyLevel;
+            MaxTurns = maxTurns;
+            MaxCoreUnits = maxCoreUnits;
         }
 
         #endregion // Constructors
