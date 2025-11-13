@@ -555,6 +555,11 @@ namespace HammerAndSickle.Core.Map
                 {
                     CreateMapIcon(hex, MapIconType.Fort);
                 }
+                // Note that UrbanDamage is a proxy for urban sprawl
+                else if (hex.UrbanDamage > 0)
+                {
+                    CreateMapIcon(hex, MapIconType.UrbanSprawl);
+                }
             }
             catch (Exception e)
             {
@@ -583,9 +588,17 @@ namespace HammerAndSickle.Core.Map
             // Get the appropriate sprite name
             string spriteName;
             if (iconType == MapIconType.Airbase)
+            {
                 spriteName = SpriteManager.GEN_Airbase;
-            else
+            }
+            else if (iconType == MapIconType.Fort)
+            {
                 spriteName = SpriteManager.GEN_Fort;
+            }
+            else
+            {
+                spriteName = SpriteManager.ME_Sprawl;
+            }
 
             // Set the sprite
             mapIconPrefab.GetSpriteRenderer().sprite = SpriteManager.GetSprite(spriteName);

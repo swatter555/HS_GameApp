@@ -55,20 +55,27 @@ namespace HammerAndSickle.Models.Map
         #region Constructors
 
         /// <summary>
-        /// Parameterless constructor for JSON serialization.
+        /// JSON deserialization constructor with explicit parameters for all serializable properties.
+        /// System.Text.Json uses this constructor to create objects with all data available at construction time.
         /// </summary>
         [JsonConstructor]
-        public JsonMapHeader()
+        public JsonMapHeader(
+            string mapName,
+            MapConfig mapConfiguration,
+            int saveVersion,
+            string checksum,
+            DateTime createdAt)
         {
-            MapName = string.Empty;
-            MapConfiguration = MapConfig.None;
-            SaveVersion = ProgramData.CurrentMapDataVersion;
-            Checksum = string.Empty;
-            CreatedAt = DateTime.UtcNow;
+            MapName = mapName;
+            MapConfiguration = mapConfiguration;
+            SaveVersion = saveVersion;
+            Checksum = checksum;
+            CreatedAt = createdAt;
         }
 
         /// <summary>
         /// Creates a new JsonMapHeader with specified values.
+        /// Used for manual header creation (not JSON deserialization).
         /// </summary>
         /// <param name="mapName">Name of the map</param>
         /// <param name="mapConfiguration">Size configuration of the map</param>

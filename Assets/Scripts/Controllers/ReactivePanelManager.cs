@@ -218,7 +218,7 @@ namespace HammerAndSickle.Controllers
             SetLocationText(FormatPosition(GameDataManager.SelectedHex));
             SetTitleText(hexData.TileLabel);
             SetRiverBordersText(FormatBorders(hexData.RiverBorders, "Rivers: "));
-            SetBridgeBordersText(FormatBorders(hexData.BridgeBorders, " Bridges: "));
+            SetBridgeBordersText(FormatBridgeBorders(hexData.BridgeBorders, hexData.DamagedBridgeBorders, hexData.PontoonBridgeBorders));
             SetMoveCostText($"Move Cost: {hexData.MovementCost}");
             SetDefenseBonusText($"{GetDefenseBonus(hexData.Terrain)}");
             SetSummaryText(GenerateSummary(hexData));
@@ -280,6 +280,47 @@ namespace HammerAndSickle.Controllers
                 return $"{prefix}NW(F),NE(F),E(F),SE(F),SW(F),W(F)";
 
             return $"{prefix}NW({(borders.Northwest ? "T" : "F")}),NE({(borders.Northeast ? "T" : "F")}),E({(borders.East ? "T" : "F")}),SE({(borders.Southeast ? "T" : "F")}),SW({(borders.Southwest ? "T" : "F")}),W({(borders.West ? "T" : "F")})";
+        }
+
+        /// <summary>
+        /// Formats bridge borders considering all three bridge types (regular, damaged, pontoon).
+        /// Shows T for functioning bridges (regular or pontoon), F for damaged or no bridges.
+        /// </summary>
+        private string FormatBridgeBorders(JSONFeatureBorders regularBridges, JSONFeatureBorders damagedBridges, JSONFeatureBorders pontoonBridges)
+        {
+            string GetBridgeStatus(bool regular, bool damaged, bool pontoon)
+            {
+                if (pontoon) return "T";  // Pontoon bridge is functioning
+                if (regular) return "T";  // Regular bridge is functioning
+                if (damaged) return "F";  // Bridge exists but is damaged/not functioning
+                return "F";               // No bridge
+            }
+
+            bool regularNW = regularBridges?.Northwest ?? false;
+            bool damagedNW = damagedBridges?.Northwest ?? false;
+            bool pontoonNW = pontoonBridges?.Northwest ?? false;
+
+            bool regularNE = regularBridges?.Northeast ?? false;
+            bool damagedNE = damagedBridges?.Northeast ?? false;
+            bool pontoonNE = pontoonBridges?.Northeast ?? false;
+
+            bool regularE = regularBridges?.East ?? false;
+            bool damagedE = damagedBridges?.East ?? false;
+            bool pontoonE = pontoonBridges?.East ?? false;
+
+            bool regularSE = regularBridges?.Southeast ?? false;
+            bool damagedSE = damagedBridges?.Southeast ?? false;
+            bool pontoonSE = pontoonBridges?.Southeast ?? false;
+
+            bool regularSW = regularBridges?.Southwest ?? false;
+            bool damagedSW = damagedBridges?.Southwest ?? false;
+            bool pontoonSW = pontoonBridges?.Southwest ?? false;
+
+            bool regularW = regularBridges?.West ?? false;
+            bool damagedW = damagedBridges?.West ?? false;
+            bool pontoonW = pontoonBridges?.West ?? false;
+
+            return $" Bridges: NW({GetBridgeStatus(regularNW, damagedNW, pontoonNW)}),NE({GetBridgeStatus(regularNE, damagedNE, pontoonNE)}),E({GetBridgeStatus(regularE, damagedE, pontoonE)}),SE({GetBridgeStatus(regularSE, damagedSE, pontoonSE)}),SW({GetBridgeStatus(regularSW, damagedSW, pontoonSW)}),W({GetBridgeStatus(regularW, damagedW, pontoonW)})";
         }
 
         /// <summary>

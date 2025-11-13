@@ -21,24 +21,31 @@ namespace HammerAndSickle.Models.Map
 
         #region Properties
 
+        [JsonPropertyName("northwest")]
         [JsonInclude]
         public bool Northwest { get; set; }
 
+        [JsonPropertyName("northeast")]
         [JsonInclude]
         public bool Northeast { get; set; }
 
+        [JsonPropertyName("east")]
         [JsonInclude]
         public bool East { get; set; }
 
+        [JsonPropertyName("southeast")]
         [JsonInclude]
         public bool Southeast { get; set; }
 
+        [JsonPropertyName("southwest")]
         [JsonInclude]
         public bool Southwest { get; set; }
 
+        [JsonPropertyName("west")]
         [JsonInclude]
         public bool West { get; set; }
 
+        [JsonPropertyName("type")]
         [JsonInclude]
         public BorderType Type { get; set; }
 
@@ -47,22 +54,31 @@ namespace HammerAndSickle.Models.Map
         #region Constructors
 
         /// <summary>
-        /// Parameterless constructor for JSON serialization.
+        /// JSON deserialization constructor with explicit parameters for all serializable properties.
+        /// System.Text.Json uses this constructor to create objects with all data available at construction time.
         /// </summary>
         [JsonConstructor]
-        public JSONFeatureBorders()
+        public JSONFeatureBorders(
+            bool northwest,
+            bool northeast,
+            bool east,
+            bool southeast,
+            bool southwest,
+            bool west,
+            BorderType type)
         {
-            Northwest = false;
-            Northeast = false;
-            East = false;
-            Southeast = false;
-            Southwest = false;
-            West = false;
-            Type = BorderType.None;
+            Northwest = northwest;
+            Northeast = northeast;
+            East = east;
+            Southeast = southeast;
+            Southwest = southwest;
+            West = west;
+            Type = type;
         }
 
         /// <summary>
         /// Constructor that initializes the borders with specific directions.
+        /// Used for manual border creation (not JSON deserialization).
         /// </summary>
         /// <param name="type">Border type</param>
         /// <param name="nw">Northwest border value</param>
@@ -92,6 +108,7 @@ namespace HammerAndSickle.Models.Map
 
         /// <summary>
         /// Constructor that initializes the borders with a specific type.
+        /// Used for manual border creation (not JSON deserialization).
         /// </summary>
         /// <param name="type">Border type</param>
         public JSONFeatureBorders(BorderType type)
@@ -115,6 +132,7 @@ namespace HammerAndSickle.Models.Map
 
         /// <summary>
         /// Constructor that initializes the borders from a binary string.
+        /// Used for manual border creation (not JSON deserialization).
         /// String positions map to: [0]=NW, [1]=NE, [2]=E, [3]=SE, [4]=SW, [5]=W
         /// </summary>
         /// <param name="input">Binary string representing the hex matrix (6 chars)</param>
