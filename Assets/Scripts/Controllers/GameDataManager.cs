@@ -1,22 +1,3 @@
-// ============================================================================
-// ⚠️ ⚠️ ⚠️  JSON SERIALIZATION WARNING  ⚠️ ⚠️ ⚠️
-// ============================================================================
-// This project uses NEWTONSOFT.JSON (Json.NET) for ALL JSON serialization!
-//
-// DO NOT USE: System.Text.Json
-// DO USE:     Newtonsoft.Json
-//
-// Why? Unity compatibility, private field serialization, and existing
-// codebase consistency. System.Text.Json does NOT work properly with Unity's
-// [SerializeField] attributes and private field patterns used throughout
-// this project.
-//
-// Correct usage:
-//   using Newtonsoft.Json;
-//   var obj = JsonConvert.DeserializeObject<T>(json);
-//   var json = JsonConvert.SerializeObject(obj);
-// ============================================================================
-
 using HammerAndSickle.Models;
 using HammerAndSickle.Persistence;
 using HammerAndSickle.Services;
@@ -30,62 +11,12 @@ using HammerAndSickle.Models.Map;
 namespace HammerAndSickle.Controllers
 {
     /// <summary>
-    /// General constants used throughout the Hammer & Sickle application.
-    /// </summary>
-    public class GeneralConstants
-    {
-        #region Menu/Dialog IDs
-
-        // Main startup scene menu/dialog IDs
-        public const int DefaultID                   = 0;
-        public const int MainScene_CoreInterface_ID  = 1;
-        public const int MainScene_ContinueDialog_ID = 2;
-        public const int MainScene_CampaignDialog_ID = 3;
-        public const int MainScene_ScenarioDialog_ID = 4;
-        public const int MainScene_OptionsDialog_ID  = 5;
-        public const int MainScene_ExitDialog_ID     = 6;
-
-        // Khost scenario scene menu/dialog IDs
-        public const int KhostScene_CoreInterface_ID = 7;
-        public const int KhostScene_OrdersDialog_ID  = 8;
-
-        #endregion
-    }
-
-    /// <summary>
     /// Central data management system for Hammer & Sickle, managing combat units, 
     /// leaders, and game state with Unity-compliant singleton pattern.
     /// </summary>
     public class GameDataManager : MonoBehaviour
     {
         private const string CLASS_NAME = nameof(GameDataManager);
-
-        #region Enumerations
-
-        public enum SceneID
-        {
-            MainMenu = 0,
-            Scenario_Khost = 1,
-            Campaign_Khost = 2
-        }
-
-        #endregion // Enumerations
-
-        #region Constants
-
-        // File extensions for future use
-        public const string MANIFEST_EXTENSION = ".manifest";
-        public const string MAP_EXTENSION = ".map";
-        public const string OOB_EXTENSION = ".oob";
-        public const string AII_EXTENSION = ".aii";
-        public const string BRF_EXTENSION = ".brf";
-        public const string CMP_EXTENSION = ".cmp";
-
-        // Scenario ID constants
-        public const string SCENARIO_ID_MISSION_KHOST = "Mission_Khost";
-        public const string SCENARIO_ID_CAMPAIGN_KHOST = "Campaign_Khost";
-
-        #endregion // Constants
 
         #region Singleton
 
@@ -189,7 +120,7 @@ namespace HammerAndSickle.Controllers
             _instance = this;
             DontDestroyOnLoad(gameObject);
 
-            // Initialize core systems early
+            // PrepareBattle core systems early
             InitializeDatabases();
         }
 
@@ -215,7 +146,7 @@ namespace HammerAndSickle.Controllers
                 if (_isInitialized)
                     return;
 
-                // Initialize static databases
+                // PrepareBattle static databases
                 WeaponSystemsDatabase.Initialize();
                 IntelProfileDatabase.Initialize();
                 CombatUnitDatabase.Initialize();
@@ -354,7 +285,7 @@ namespace HammerAndSickle.Controllers
         {
             return _combatUnits.Values.ToList();
         }
-
+        
         /// <summary>
         /// Retrieves all leaders currently stored in the system.
         /// </summary>

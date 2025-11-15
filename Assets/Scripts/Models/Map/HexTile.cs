@@ -186,13 +186,13 @@ namespace HammerAndSickle.Models.Map
             PontoonBridgeBorders = pontoonBridgeBorders;
             DamagedBridgeBorders = damagedBridgeBorders;
 
-            // Initialize non-serialized fields
+            // PrepareBattle non-serialized fields
             enableDebugLogging = false;
 
             // Recalculate movement cost from terrain (intentionally overwrites JSON value)
             UpdateMovementCost();
 
-            // Initialize transient state only
+            // PrepareBattle transient state only
             Initialize();
         }
 
@@ -214,7 +214,7 @@ namespace HammerAndSickle.Models.Map
             // Calculate movement cost from terrain
             UpdateMovementCost();
 
-            // Initialize transient state
+            // PrepareBattle transient state
             Initialize();
         }
 
@@ -230,7 +230,7 @@ namespace HammerAndSickle.Models.Map
         {
             try
             {
-                // Initialize neighbors dictionary (not serialized due to circular references)
+                // PrepareBattle neighbors dictionary (not serialized due to circular references)
                 neighbors ??= new Dictionary<HexDirection, HexTile>();
 
                 IsInitialized = true;
@@ -590,7 +590,7 @@ namespace HammerAndSickle.Models.Map
                     return false;
                 }
 
-                // Initialize movement cost matches terrain
+                // PrepareBattle movement cost matches terrain
                 int expectedCost = GetExpectedMovementCost(Terrain);
                 if (MovementCost != expectedCost)
                 {

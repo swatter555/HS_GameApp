@@ -57,7 +57,7 @@ namespace HammerAndSickle.SceneDirectors
             base.Awake();
 
             // Set the dialog ID.
-            Initialize(GeneralConstants.MainScene_ScenarioDialog_ID, false);
+            Initialize(GameData.MainScene_ScenarioDialog_ID, false);
         }
 
         private void OnEnable()
@@ -116,7 +116,7 @@ namespace HammerAndSickle.SceneDirectors
 
         public void OnLoadButton()
         {
-            // Initialize a scenario is selected and get the manifest.
+            // PrepareBattle a scenario is selected and get the manifest.
             ScenarioManifest manifest = GetSelectedManifest();
             if (manifest == null)
             {
@@ -127,8 +127,8 @@ namespace HammerAndSickle.SceneDirectors
             // Get the scene ID based on the selected scenario ID.
             int? sceneId = manifest.ScenarioId switch
             {
-                GameDataManager.SCENARIO_ID_MISSION_KHOST => (int)GameDataManager.SceneID.Scenario_Khost,
-                GameDataManager.SCENARIO_ID_CAMPAIGN_KHOST => (int)GameDataManager.SceneID.Campaign_Khost,
+                GameData.SCENARIO_ID_MISSION_KHOST => (int)SceneID.Scenario_Khost,
+                GameData.SCENARIO_ID_CAMPAIGN_KHOST => (int)SceneID.Campaign_Khost,
                 _ => null
             };
 
@@ -161,7 +161,7 @@ namespace HammerAndSickle.SceneDirectors
         public void OnExitButton()
         {
             // Return to the main interface.
-            Scene0_Director.Instance.SetActiveMenuByID(GeneralConstants.MainScene_CoreInterface_ID);
+            Scene0_Director.Instance.SetActiveMenuByID(GameData.MainScene_CoreInterface_ID);
         }
 
         #endregion // Callbacks
@@ -193,7 +193,7 @@ namespace HammerAndSickle.SceneDirectors
                     return;
                 }
 
-                string[] manifestFiles = Directory.GetFiles(manifestPath, "*" + GameDataManager.MANIFEST_EXTENSION);
+                string[] manifestFiles = Directory.GetFiles(manifestPath, "*" + GameData.MANIFEST_EXTENSION);
 
                 if (manifestFiles.Length == 0)
                 {

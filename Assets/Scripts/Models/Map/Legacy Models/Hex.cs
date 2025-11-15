@@ -96,7 +96,7 @@ namespace HammerAndSickle.Legacy.Map
         {
             try
             {
-                // Initialize all properties with default values
+                // PrepareBattle all properties with default values
                 Terrain = TerrainType.Clear;
                 IsRail = false;
                 IsRoad = false;
@@ -116,7 +116,7 @@ namespace HammerAndSickle.Legacy.Map
                 TileControl = TileControl.None;
                 DefaultTileControl = DefaultTileControl.None;
 
-                // Initialize border features
+                // PrepareBattle border features
                 RiverBorders = new FeatureBorders(BorderType.River);
                 BridgeBorders = new FeatureBorders(BorderType.Bridge);
                 PontoonBridgeBorders = new FeatureBorders(BorderType.PontoonBridge);

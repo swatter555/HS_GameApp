@@ -73,12 +73,12 @@ namespace HammerAndSickle.Models
             {
                 if (!IsBase) return;
 
-                // Initialize common facility properties
+                // PrepareBattle common facility properties
                 BaseDamage = 0;
                 OperationalCapacity = OperationalCapacity.Full;
                 SupplyPenetration = false;
 
-                // Initialize readonly collection
+                // PrepareBattle readonly collection
                 AirUnitsAttached = _airUnitsAttached.AsReadOnly();
 
                 // Set facility type and specific properties based on classification

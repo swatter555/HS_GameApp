@@ -51,7 +51,7 @@ namespace HammerAndSickle.Core.UI
         #region Unity Lifecycle
 
         /// <summary>
-        /// Initialize references and cache original scale.
+        /// PrepareBattle references and cache original scale.
         /// </summary>
         private void Awake()
         {

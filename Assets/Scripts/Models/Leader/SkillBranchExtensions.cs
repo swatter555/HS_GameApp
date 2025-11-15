@@ -22,7 +22,7 @@ namespace HammerAndSickle.Models
         #region Cache Management
 
         /// <summary>
-        /// Initialize the branch type cache using reflection on the SkillBranch enum.
+        /// PrepareBattle the branch type cache using reflection on the SkillBranch enum.
         /// This runs once and caches all branch type information for fast lookup.
         /// Thread-safe with double-checked locking pattern.
         /// </summary>
@@ -214,7 +214,7 @@ namespace HammerAndSickle.Models
             Debug.Log($"  Doctrine: {doctrineBranches.Count} branches - {string.Join(", ", doctrineBranches)}");
             Debug.Log($"  Specialization: {specializationBranches.Count} branches - {string.Join(", ", specializationBranches)}");
 
-            // Initialize expected counts based on current design
+            // PrepareBattle expected counts based on current design
             const int EXPECTED_FOUNDATION = 2;    // Leadership, Political
             const int EXPECTED_DOCTRINE = 7;      // Armored, INF, Artillery, AirDefense, Airborne, AirMobile, Intelligence
             const int EXPECTED_SPECIALIZATION = 4; // CombinedArms, SignalIntel, Engineering, SpecialForces

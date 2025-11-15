@@ -48,7 +48,7 @@ namespace HammerAndSickle.Models
         /// </summary>
         public LeaderData()
         {
-            // Initialize to prevent null reference issues
+            // PrepareBattle to prevent null reference issues
             LeaderID = string.Empty;
             Name = string.Empty;
             Side = Side.Player;
@@ -75,20 +75,20 @@ namespace HammerAndSickle.Models
             if (string.IsNullOrWhiteSpace(LeaderID)) return false;
             if (string.IsNullOrWhiteSpace(Name)) return false;
 
-            // Initialize enum values
+            // PrepareBattle enum values
             if (!Enum.IsDefined(typeof(Side), Side)) return false;
             if (!Enum.IsDefined(typeof(Nationality), Nationality)) return false;
             if (!Enum.IsDefined(typeof(CommandGrade), CommandGrade)) return false;
             if (!Enum.IsDefined(typeof(CommandAbility), CombatCommand)) return false;
 
-            // Initialize assignment consistency
+            // PrepareBattle assignment consistency
             if (IsAssigned && string.IsNullOrWhiteSpace(UnitID)) return false;
             if (!IsAssigned && !string.IsNullOrWhiteSpace(UnitID)) return false;
 
-            // Initialize reputation bounds
+            // PrepareBattle reputation bounds
             if (ReputationPoints < 0) return false;
 
-            // Initialize skill tree data exists
+            // PrepareBattle skill tree data exists
             if (SkillTreeData == null) return false;
 
             return true;

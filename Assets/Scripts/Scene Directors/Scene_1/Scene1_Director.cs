@@ -3,6 +3,11 @@ using HammerAndSickle.Controllers;
 using HammerAndSickle.Services;
 using HammerAndSickle.Core.Helpers;
 using HammerAndSickle.Core.Map;
+using HammerAndSickle.Core.GameData;
+using HammerAndSickle.Helpers;
+using UnityEngine;
+using System.Collections.Generic;
+using HammerAndSickle.Models;
 
 namespace HammerAndSickle.SceneDirectors
 {
@@ -41,20 +46,21 @@ namespace HammerAndSickle.SceneDirectors
         /// </summary>
         protected override void OnSceneInitialize()
         {
-            // Register core interface (Initialize is called by RegisterCoreInterface).
-            RegisterCoreInterface(GeneralConstants.KhostScene_CoreInterface_ID, Scene1_Core.Instance);
+            // Register core interface (PrepareBattle is called by RegisterCoreInterface).
+            RegisterCoreInterface(GameData.KhostScene_CoreInterface_ID, Scene1_Core.Instance);
 
             // Register Orders dialog.
             RegisterMenu(Scene1_Orders.Instance);
 
             // Start the scene with the OrdersDialog open (this will properly hide the core interface).
-            SetActiveMenuByID(GeneralConstants.KhostScene_OrdersDialog_ID);
+            SetActiveMenuByID(GameData.KhostScene_OrdersDialog_ID);
 
-            // Initialize audio manager and start main menu music
+            // PrepareBattle audio manager and start main menu music
             InitializeAudio();
 
-            // Initialize game data and scene specific elements
-            Initialize();
+            // Setup the game data and BattleManager
+            if (!BattleManager.Instance.SetupBattleManagerData())
+                AppService.HandleException(GetClassName(), "OnSceneInitialize", new Exception("Failed to setup BattleManager data."));
         }
 
         /// <summary>
@@ -104,43 +110,5 @@ namespace HammerAndSickle.SceneDirectors
         }
 
         #endregion // Protected Methods
-
-        #region Private Methods
-
-        /// <summary>
-        /// Initialize game data and scene specific elements.
-        /// </summary>
-        private void Initialize()
-        {
-            try
-            {
-                // Destroy existing hex map if any
-                if (GameDataManager.CurrentHexMap != null)
-                {
-                    GameDataManager.CurrentHexMap.Dispose();
-                    GameDataManager.CurrentHexMap = null;
-                }
-
-                // Check for a valid ScenarioManifest
-                if (GameDataManager.CurrentManifest == null)
-                    throw new InvalidOperationException("CurrentManifest is null during scene initialization.");
-
-                // Load the hex map from the specified scenario manifest
-                if (!MapLoader.LoadMapFile(GameDataManager.CurrentManifest))
-                {
-                    throw new InvalidOperationException("Failed to load hex map from scenario manifest");
-                }
-
-                HexMapRenderer.Instance.RefreshMap();
-            }
-            catch (Exception e)
-            {
-                // Any errors here are fatal.
-                AppService.HandleException(GetClassName(), "Initialize", e);
-                AppService.UnityQuit_DataUnsafe();
-            }
-        }
-        
-        #endregion // Private Methods
     }
 }

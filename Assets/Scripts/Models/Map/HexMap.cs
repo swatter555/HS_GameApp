@@ -107,7 +107,7 @@ namespace HammerAndSickle.Models.Map
                 // Tell the GameDataManager the map dimensions
                 GameDataManager.CurrentMapSize = MapSize;
 
-                // Initialize the hex dictionary with coordinate comparer
+                // PrepareBattle the hex dictionary with coordinate comparer
                 hexDictionary = new Dictionary<Position2D, HexTile>(coordinateComparer);
                 IsInitialized = true;
 
@@ -133,8 +133,8 @@ namespace HammerAndSickle.Models.Map
         {
             return config switch
             {
-                MapConfig.Small => new Vector2Int(ProgramData.SmallHexWidth, ProgramData.SmallHexHeight),
-                MapConfig.Large => new Vector2Int(ProgramData.LargeHexWidth, ProgramData.LargeHexHeight),
+                MapConfig.Small => new Vector2Int(GameData.SmallHexWidth, GameData.SmallHexHeight),
+                MapConfig.Large => new Vector2Int(GameData.LargeHexWidth, GameData.LargeHexHeight),
                 _ => Vector2Int.zero
             };
         }
@@ -345,7 +345,7 @@ namespace HammerAndSickle.Models.Map
                     Debug.Log($"{CLASS_NAME}: Starting integrity validation for {HexCount} hexes");
                 }
 
-                // Initialize basic map state
+                // PrepareBattle basic map state
                 if (hexDictionary == null)
                 {
                     AppService.CaptureUiMessage("Map integrity failed: Hex dictionary is null");
@@ -358,7 +358,7 @@ namespace HammerAndSickle.Models.Map
                     return false;
                 }
 
-                // Initialize each hex for internal consistency
+                // PrepareBattle each hex for internal consistency
                 foreach (var hex in hexDictionary.Values)
                 {
                     if (hex == null)
@@ -369,7 +369,7 @@ namespace HammerAndSickle.Models.Map
                         continue;
                     }
 
-                    // Initialize hex internal consistency
+                    // PrepareBattle hex internal consistency
                     if (!hex.ValidateHex())
                     {
                         AppService.CaptureUiMessage($"Map integrity failed: Hex at {hex.Position} failed validation");
@@ -377,7 +377,7 @@ namespace HammerAndSickle.Models.Map
                         isValid = false;
                     }
 
-                    // Initialize hex position matches dictionary key
+                    // PrepareBattle hex position matches dictionary key
                     if (hexDictionary.TryGetValue(hex.Position, out HexTile storedHex))
                     {
                         if (!ReferenceEquals(hex, storedHex))
@@ -463,7 +463,7 @@ namespace HammerAndSickle.Models.Map
                         continue; // Skip null hexes (will be caught by integrity validation)
                     }
 
-                    // Initialize position is within map bounds
+                    // PrepareBattle position is within map bounds
                     if (!IsPositionInBounds(hex.Position))
                     {
                         AppService.CaptureUiMessage($"Dimension validation failed: Hex at {hex.Position} is outside map bounds ({MapSize.x}x{MapSize.y})");
@@ -476,7 +476,7 @@ namespace HammerAndSickle.Models.Map
                         }
                     }
 
-                    // Initialize position components are non-negative
+                    // PrepareBattle position components are non-negative
                     if (hex.Position.X < 0 || hex.Position.Y < 0)
                     {
                         AppService.CaptureUiMessage($"Dimension validation failed: Hex at {hex.Position} has negative coordinates");
@@ -628,7 +628,7 @@ namespace HammerAndSickle.Models.Map
                             hasAnyNeighbor = true;
                         }
 
-                        // Initialize bidirectional relationships
+                        // PrepareBattle bidirectional relationships
                         if (actualNeighbor != null && expectedNeighbor != null && ReferenceEquals(actualNeighbor, expectedNeighbor))
                         {
                             // Check if the neighbor points back to this hex

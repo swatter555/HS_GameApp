@@ -294,7 +294,7 @@ namespace HammerAndSickle.Models
         }
 
         /// <summary>
-        /// Initialize leadership skills - command progression and promotions
+        /// PrepareBattle leadership skills - command progression and promotions
         /// </summary>
         private static void InitLeadership()
         {
@@ -366,7 +366,7 @@ namespace HammerAndSickle.Models
         }
 
         /// <summary>
-        /// Initialize armored warfare skills - tank/mechanized combat specialization
+        /// PrepareBattle armored warfare skills - tank/mechanized combat specialization
         /// </summary>
         private static void InitArmoredWarfareDoctrine()
         {
@@ -412,7 +412,7 @@ namespace HammerAndSickle.Models
         }
 
         /// <summary>
-        /// Initialize infantry doctrine skills - soft-target and tactical infantry operations
+        /// PrepareBattle infantry doctrine skills - soft-target and tactical infantry operations
         /// </summary>
         private static void InitInfantryDoctrine()
         {
@@ -459,7 +459,7 @@ namespace HammerAndSickle.Models
         }
 
         /// <summary>
-        /// Initialize artillery doctrine skills - indirect fire and precision targeting
+        /// PrepareBattle artillery doctrine skills - indirect fire and precision targeting
         /// </summary>
         private static void InitArtilleryDoctrine()
         {
@@ -504,7 +504,7 @@ namespace HammerAndSickle.Models
         }
 
         /// <summary>
-        /// Initialize air defense doctrine skills - anti-air and opportunity fire
+        /// PrepareBattle air defense doctrine skills - anti-air and opportunity fire
         /// </summary>
         private static void InitAirDefenseDoctrine()
         {
@@ -551,7 +551,7 @@ namespace HammerAndSickle.Models
         }
 
         /// <summary>
-        /// Initialize airborne doctrine skills - paratrooper operations
+        /// PrepareBattle airborne doctrine skills - paratrooper operations
         /// </summary>
         private static void InitAirborneDoctrine()
         {
@@ -595,7 +595,7 @@ namespace HammerAndSickle.Models
         }
 
         /// <summary>
-        /// Initialize air mobile doctrine skills - helicopter operations
+        /// PrepareBattle air mobile doctrine skills - helicopter operations
         /// </summary>
         private static void InitAirMobileDoctrine()
         {
@@ -639,7 +639,7 @@ namespace HammerAndSickle.Models
         }
 
         /// <summary>
-        /// Initialize intelligence skills - reconnaissance and target acquisition
+        /// PrepareBattle intelligence skills - reconnaissance and target acquisition
         /// </summary>
         private static void InitIntelligenceDoctrine()
         {
@@ -685,7 +685,7 @@ namespace HammerAndSickle.Models
         }
 
         /// <summary>
-        /// Initialize combined arms specialization skills.
+        /// PrepareBattle combined arms specialization skills.
         /// </summary>
         private static void InitCombinedArmsSpecialization()
         {
@@ -746,7 +746,7 @@ namespace HammerAndSickle.Models
         }
 
         /// <summary>
-        /// Initialize signal intelligence skills - electronic warfare and analysis
+        /// PrepareBattle signal intelligence skills - electronic warfare and analysis
         /// </summary>
         private static void InitSignalIntelligenceSpecialization()
         {
@@ -804,7 +804,7 @@ namespace HammerAndSickle.Models
         }
 
         /// <summary>
-        /// Initialize engineering skills - terrain manipulation and river crossing
+        /// PrepareBattle engineering skills - terrain manipulation and river crossing
         /// </summary>
         private static void InitEngineeringSpecialization()
         {
@@ -863,7 +863,7 @@ namespace HammerAndSickle.Models
         }
 
         /// <summary>
-        /// Initialize special forces doctrine skills - unconventional warfare
+        /// PrepareBattle special forces doctrine skills - unconventional warfare
         /// </summary>
         private static void InitSpecialForcesSpecialization()
         {
@@ -923,7 +923,7 @@ namespace HammerAndSickle.Models
         }
 
         /// <summary>
-        /// Initialize politically connected skills - special political bonuses
+        /// PrepareBattle politically connected skills - special political bonuses
         /// This branch can be combined with other specializations
         /// </summary>
         private static void InitPoliticallyConnected()

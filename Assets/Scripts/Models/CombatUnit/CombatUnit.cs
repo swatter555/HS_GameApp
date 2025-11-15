@@ -106,7 +106,7 @@ namespace HammerAndSickle.Models
         {
             try
             {
-                // Initialize required parameters
+                // PrepareBattle required parameters
                 if (string.IsNullOrEmpty(unitName))
                     throw new ArgumentException("Unit name cannot be null or empty", nameof(unitName));
 
@@ -132,7 +132,7 @@ namespace HammerAndSickle.Models
                         throw new ArgumentException($"Transport profile ID {embarkProfileID} not found in database", nameof(embarkProfileID));
                 }
 
-                // Initialize intel profile type
+                // PrepareBattle intel profile type
                 if (!Enum.IsDefined(typeof(IntelProfileTypes), intelProfileType))
                     throw new ArgumentException("Invalid intel profile type", nameof(intelProfileType));
 
@@ -150,7 +150,7 @@ namespace HammerAndSickle.Models
                 Side = side;
                 Nationality = nationality;
 
-                // Initialize deployment position based on embarkable and mountable states
+                // PrepareBattle deployment position based on embarkable and mountable states
                 InitializeDeploymentSystem(isEmbarkable, isMountable);
 
                 // Set profile IDs
@@ -165,29 +165,29 @@ namespace HammerAndSickle.Models
                     InitializeFacility(category, size);
                 }
 
-                // Initialize action counts based on unit type and classification
+                // PrepareBattle action counts based on unit type and classification
                 InitializeActionCounts();
 
                 // Set the initial spotted level
                 SpottedLevel = SpottedLevel.Level1;
 
-                // Initialize experience system
+                // PrepareBattle experience system
                 InitializeExperienceSystem();
 
-                // Initialize StatsMaxCurrent properties
+                // PrepareBattle StatsMaxCurrent properties
                 HitPoints = new StatsMaxCurrent(GameData.MAX_HP);
                 DaysSupply = new StatsMaxCurrent(GameData.MaxDaysSupplyUnit);
 
-                // Initialize movement based on unit classification
+                // PrepareBattle movement based on unit classification
                 InitializeMovementPoints();
 
                 // Set operational efficiency
                 EfficiencyLevel = EfficiencyLevel.FullOperations;
 
-                // Initialize position to origin (will be set when placed on map)
+                // PrepareBattle position to origin (will be set when placed on map)
                 MapPos = Position2D.Zero;
 
-                // Initialize individual combat modifier to default
+                // PrepareBattle individual combat modifier to default
                 IndividualCombatModifier = GameData.ICM_DEFAULT;
             }
             catch (Exception e)
@@ -208,7 +208,7 @@ namespace HammerAndSickle.Models
         {
             try
             {
-                // Initialize identification - JSON deserializer will set actual values for [JsonInclude] properties
+                // PrepareBattle identification - JSON deserializer will set actual values for [JsonInclude] properties
                 UnitID = Guid.NewGuid().ToString(); // Will be overwritten by JSON
                 UnitName = string.Empty; // Public setter, will be set by JSON
                 Classification = UnitClassification.INF; // Will be overwritten by JSON
@@ -217,20 +217,20 @@ namespace HammerAndSickle.Models
                 Nationality = Nationality.USSR; // Will be overwritten by JSON
                 IntelProfileType = IntelProfileTypes.SV_MRR_BTR70; // Will be overwritten by JSON
 
-                // Initialize weapon system profile IDs - JSON will set actual values
+                // PrepareBattle weapon system profile IDs - JSON will set actual values
                 DeployedProfileID = WeaponSystems.DEFAULT; // Will be overwritten by JSON
                 MobileProfileID = WeaponSystems.DEFAULT; // Will be overwritten by JSON
                 EmbarkedProfileID = WeaponSystems.DEFAULT; // Will be overwritten by JSON
 
-                // Initialize deployment capabilities - JSON will set actual values
+                // PrepareBattle deployment capabilities - JSON will set actual values
                 IsEmbarkable = false; // Will be overwritten by JSON
                 IsMountable = false; // Will be overwritten by JSON
                 SetDeploymentPosition(DeploymentPosition.Deployed); // Will be overwritten by JSON
 
-                // Initialize efficiency - JSON will set actual value
+                // PrepareBattle efficiency - JSON will set actual value
                 EfficiencyLevel = EfficiencyLevel.FullOperations; // Will be overwritten by JSON
 
-                // Initialize required StatsMaxCurrent objects to prevent null reference exceptions
+                // PrepareBattle required StatsMaxCurrent objects to prevent null reference exceptions
                 // JSON deserializer will replace these with actual values
                 HitPoints = new StatsMaxCurrent(1f); // Will be overwritten by JSON
                 DaysSupply = new StatsMaxCurrent(1f); // Will be overwritten by JSON
@@ -241,17 +241,17 @@ namespace HammerAndSickle.Models
                 OpportunityActions = new StatsMaxCurrent(1f); // Will be overwritten by JSON
                 IntelActions = new StatsMaxCurrent(1f); // Will be overwritten by JSON
 
-                // Initialize position and state - JSON will set actual values
+                // PrepareBattle position and state - JSON will set actual values
                 MapPos = Position2D.Zero; // Will be overwritten by JSON
                 SpottedLevel = SpottedLevel.Level1; // Will be overwritten by JSON
                 LeaderID = string.Empty; // Will be overwritten by JSON
                 IndividualCombatModifier = GameData.ICM_DEFAULT; // Will be overwritten by JSON
 
-                // Initialize experience system - JSON will set actual values
+                // PrepareBattle experience system - JSON will set actual values
                 ExperienceLevel = ExperienceLevel.Raw; // Will be overwritten by JSON
                 ExperiencePoints = 0; // Will be overwritten by JSON
 
-                // Initialize facility properties - JSON will set actual values for base units
+                // PrepareBattle facility properties - JSON will set actual values for base units
                 BaseDamage = 0; // Will be overwritten by JSON
                 OperationalCapacity = OperationalCapacity.Full; // Will be overwritten by JSON
                 FacilityType = FacilityType.HQ; // Will be overwritten by JSON
@@ -262,7 +262,7 @@ namespace HammerAndSickle.Models
                 SupplyProjection = SupplyProjection.Local; // Will be overwritten by JSON
                 SupplyPenetration = false; // Will be overwritten by JSON
 
-                // Initialize facility collections
+                // PrepareBattle facility collections
                 _airUnitsAttached = new List<CombatUnit>();
                 _attachedUnitIDs = new List<string>();
                 AirUnitsAttached = _airUnitsAttached.AsReadOnly();
@@ -685,7 +685,7 @@ namespace HammerAndSickle.Models
         {
             try
             {
-                // Initialize the new level
+                // PrepareBattle the new level
                 if (!Enum.IsDefined(typeof(EfficiencyLevel), level))
                 {
                     throw new ArgumentOutOfRangeException(nameof(level), "Invalid efficiency level");
@@ -1036,6 +1036,14 @@ namespace HammerAndSickle.Models
         public void SetRole(UnitRole role)
         {
             Role = role;
+        }
+
+        /// <summary>
+        /// Sets the position of the object on the map.
+        /// </summary>
+        public void SetPosition(Position2D pos)
+        {
+            MapPos = pos;
         }
 
         #endregion // Core
@@ -1402,82 +1410,6 @@ namespace HammerAndSickle.Models
         }
 
         #endregion // CombatUnit Actions
-
-        #region Position and Movement
-
-        /// <summary>
-        /// Sets the unit's position on the map.
-        /// </summary>
-        /// <param name="newPos">The new position coordinates</param>
-        public void SetPosition(Position2D newPos)
-        {
-            try
-            {
-                MapPos = newPos; // Direct assignment instead of reflection
-            }
-            catch (Exception e)
-            {
-                AppService.HandleException(CLASS_NAME, "SetPosition", e);
-                throw;
-            }
-        }
-
-        /// <summary>
-        /// Checks if the unit can move to the specified position.
-        /// This is a basic validation - full movement rules will be implemented later.
-        /// </summary>
-        /// <param name="targetPos">The target position to validate</param>
-        /// <returns>True if movement appears valid</returns>
-        public bool CanMoveTo(Position2D targetPos)
-        {
-            try
-            {
-                throw new NotImplementedException("Movement validation logic not implemented yet.");
-            }
-            catch (Exception e)
-            {
-                AppService.HandleException(CLASS_NAME, "CanMoveTo", e);
-                return false;
-            }
-        }
-
-        /// <summary>
-        /// Gets the distance between this unit and a target position in Unity units.
-        /// </summary>
-        /// <param name="targetPos">The target position</param>
-        /// <returns>Distance in Unity units</returns>
-        public float GetDistanceTo(Position2D targetPos)
-        {
-            try
-            {
-                throw new NotImplementedException("Distance calculation logic not implemented yet.");
-            }
-            catch (Exception e)
-            {
-                AppService.HandleException(CLASS_NAME, "GetDistanceTo", e);
-                return 0f;
-            }
-        }
-
-        /// <summary>
-        /// Gets the distance between this unit and another unit.
-        /// </summary>
-        /// <param name="otherUnit">The other unit</param>
-        /// <returns>Distance in Unity units</returns>
-        public float GetDistanceTo(CombatUnit otherUnit)
-        {
-            try
-            {
-                throw new NotImplementedException("Distance calculation logic not implemented yet.");
-            }
-            catch (Exception e)
-            {
-                AppService.HandleException(CLASS_NAME, "GetDistanceTo", e);
-                return 0f;
-            }
-        }
-
-        #endregion // Position and Movement
 
         #region Debugging
 

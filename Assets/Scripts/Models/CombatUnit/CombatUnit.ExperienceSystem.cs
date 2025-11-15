@@ -45,7 +45,7 @@ namespace HammerAndSickle.Models
                 if (points <= 0)
                     return false;
 
-                // Initialize points do not exceed maximum gain per action.
+                // PrepareBattle points do not exceed maximum gain per action.
                 if (points > GameData.MAX_EXP_GAIN_PER_ACTION)
                 {
                     points = GameData.MAX_EXP_GAIN_PER_ACTION;
@@ -135,7 +135,7 @@ namespace HammerAndSickle.Models
             if (level == ExperienceLevel)
                 return; // No change, nothing to do
 
-            // Initialize level is within bounds
+            // PrepareBattle level is within bounds
             if (level < ExperienceLevel.Raw || level > ExperienceLevel.Elite)
             {
                 throw new ArgumentOutOfRangeException(nameof(level), "Invalid experience level");

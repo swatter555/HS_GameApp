@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using UnityEngine;
 using HammerAndSickle.Core.GameData;
@@ -236,7 +236,7 @@ namespace HammerAndSickle.Services
         {
             try
             {
-                // Initialize random number generator
+                // PrepareBattle random number generator
                 random = new System.Random();
 
                 if (enableDebugLogging)

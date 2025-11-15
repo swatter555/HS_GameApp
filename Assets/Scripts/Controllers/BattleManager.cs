@@ -1,3 +1,7 @@
+using HammerAndSickle.Core.GameData;
+using HammerAndSickle.Core.Helpers;
+using HammerAndSickle.Core.Map;
+using HammerAndSickle.Helpers;
 using HammerAndSickle.Services;
 using System;
 using UnityEngine;
@@ -10,50 +14,6 @@ namespace HammerAndSickle.Controllers
     public class BattleManager : MonoBehaviour
     {
         private const string CLASS_NAME = nameof(BattleManager);
-
-        #region Enumerations
-
-        /// <summary>
-        /// Weather conditions affecting combat operations and visibility.
-        /// </summary>
-        public enum WeatherCondition
-        {
-            Clear = 0,
-            Overcast = 1,
-            Storm = 2,
-            Snow = 3,
-            Blizzard = 4,
-            Sandstorm = 5
-        }
-
-        /// <summary>
-        /// Current phase of the battle turn.
-        /// </summary>
-        public enum BattlePhase
-        {
-            NotStarted = 0,
-            PlayerTurn = 1,
-            AITurn = 2,
-            EndTurnProcessing = 3,
-            BattleComplete = 4
-        }
-
-        /// <summary>
-        /// Final result of the battle scenario.
-        /// </summary>
-        public enum BattleResult
-        {
-            Ongoing = 0,
-            DecisiveVictory = 1,
-            MajorVictory = 2,
-            MinorVictory = 3,
-            Draw = 4,
-            MinorDefeat = 5,
-            MajorDefeat = 6,
-            DecisiveDefeat = 7
-        }
-
-        #endregion // Enumerations
 
         #region Singleton
 
@@ -207,6 +167,76 @@ namespace HammerAndSickle.Controllers
             {
                 _ = Instance; // Forces creation through the getter
             }
+        }
+
+        /// <summary>
+        /// Sets up the battle manager data by loading the hex map and order of battle (OOB) files  based on the current
+        /// scenario manifest.
+        /// </summary>
+        /// an error occurs during the setup.</returns>
+        public bool SetupBattleManagerData()
+        {
+            // Destroy existing hex map if any
+            if (GameDataManager.CurrentHexMap != null)
+            {
+                GameDataManager.CurrentHexMap.Dispose();
+                GameDataManager.CurrentHexMap = null;
+            }
+
+            // Check for a valid ScenarioManifest
+            if (GameDataManager.CurrentManifest == null)
+            {
+                Debug.LogError("BattleManager.SetupBattleManagerData: No valid ScenarioManifest found.");
+                return false;
+            }
+                
+
+            // Load the hex map from the specified scenario manifest
+            if (!MapLoader.LoadMapFile(GameDataManager.CurrentManifest))
+            {
+                Debug.LogError($"BattleManager.SetupBattleManagerData: Failed to load map file: {GameDataManager.CurrentManifest.MapFilename}");
+                return false;
+            }
+
+            // Refresh the hex map renderer to display the newly loaded map
+            HexMapRenderer.Instance.RefreshMap();
+
+            // Load the order of battle (OOB) file based on whether it's a campaign or stand-alone scenario
+            if (GameDataManager.CurrentManifest.IsCampaignScenario)
+            {
+                if(!OOBFileLoader.LoadCampaignOob(GameDataManager.CurrentManifest.OobFilename))
+                {
+                    Debug.LogError($"BattleManager.SetupBattleManagerData: Failed to load campaign OOB file: {GameDataManager.CurrentManifest.OobFilename}");
+                    return false;
+                }
+            }
+            else
+            {
+                // Load the stand-alone oob file.
+                if (!OOBFileLoader.LoadStandaloneOob(GameDataManager.CurrentManifest.OobFilename))
+                {
+                    Debug.LogError($"BattleManager.SetupBattleManagerData: Failed to load OOB file: {GameDataManager.CurrentManifest.OobFilename}");
+                    return false;
+                }
+            }
+
+            // Grab and store other data from the scenario manifest
+            GrabManifestData();
+
+            return true;
+        }
+
+        /// <summary>
+        /// Retrieves and assigns data from the current game manifest to the corresponding properties.
+        /// </summary>
+        private void GrabManifestData()
+        {
+            ScenarioID = GameDataManager.CurrentManifest.ScenarioId;
+            IsCampaignBattle = GameDataManager.CurrentManifest.IsCampaignScenario;
+            CurrentPrestige = GameDataManager.CurrentManifest.PrestigePool;
+            MaxNumberCoreUnitAllowed = GameDataManager.CurrentManifest.MaxCoreUnits;
+            MaxTurnNumber = GameDataManager.CurrentManifest.MaxTurns;
+
         }
 
         /// <summary>

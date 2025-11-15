@@ -86,7 +86,7 @@ namespace HammerAndSickle.Models.Map
             {
                 MapName = mapName ?? throw new ArgumentNullException(nameof(mapName));
                 MapConfiguration = mapConfiguration;
-                SaveVersion = ProgramData.CurrentMapDataVersion;
+                SaveVersion = GameData.CurrentMapDataVersion;
                 Checksum = checksum ?? throw new ArgumentNullException(nameof(checksum));
                 CreatedAt = DateTime.UtcNow;
             }
@@ -176,7 +176,7 @@ namespace HammerAndSickle.Models.Map
         /// <returns>Current save version</returns>
         public static int GetCurrentSaveVersion()
         {
-            return ProgramData.CurrentMapDataVersion;
+            return GameData.CurrentMapDataVersion;
         }
 
         /// <summary>
@@ -189,7 +189,7 @@ namespace HammerAndSickle.Models.Map
             {
                 // For now, only exact version matches are compatible
                 // Future versions can implement backward compatibility logic
-                return SaveVersion == ProgramData.CurrentMapDataVersion;
+                return SaveVersion == GameData.CurrentMapDataVersion;
             }
             catch (Exception ex)
             {

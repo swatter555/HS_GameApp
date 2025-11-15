@@ -34,7 +34,7 @@ namespace HammerAndSickle.Controllers
                     _instance = FindAnyObjectByType<GameAudioManager>();
                     if (_instance == null)
                     {
-                        GameObject go = new GameObject("GameAudioManager");
+                        GameObject go = new("GameAudioManager");
                         _instance = go.AddComponent<GameAudioManager>();
                         DontDestroyOnLoad(go);
                     }
@@ -102,7 +102,7 @@ namespace HammerAndSickle.Controllers
         /// Maps MusicTrack enum values to their corresponding OGG filenames.
         /// Used for loading music files from StreamingAssets.
         /// </summary>
-        private static readonly Dictionary<MusicTrack, string> MusicTrackFiles = new Dictionary<MusicTrack, string>
+        private static readonly Dictionary<MusicTrack, string> MusicTrackFiles = new()
         {
             { MusicTrack.MainMenu, "Music_MainMenu.ogg" }
         };
@@ -111,7 +111,7 @@ namespace HammerAndSickle.Controllers
         /// Maps AmbientSound enum values to their corresponding OGG filenames.
         /// Used for loading ambient audio files from StreamingAssets.
         /// </summary>
-        private static readonly Dictionary<AmbientSound, string> AmbientSoundFiles = new Dictionary<AmbientSound, string>
+        private static readonly Dictionary<AmbientSound, string> AmbientSoundFiles = new()
         {
             { AmbientSound.AmbientCombat, "Ambient_DistantCombat.ogg" }
         };
@@ -120,7 +120,7 @@ namespace HammerAndSickle.Controllers
         /// Maps SoundEffect enum values to their corresponding WAV filenames.
         /// Used for loading sound effect files from StreamingAssets.
         /// </summary>
-        private static readonly Dictionary<SoundEffect, string> SoundEffectFiles = new Dictionary<SoundEffect, string>
+        private static readonly Dictionary<SoundEffect, string> SoundEffectFiles = new()
         {
             { SoundEffect.ButtonClick, "SFX_ButtonClick.wav" },
             { SoundEffect.MenuOpen, "SFX_MenuOpen.wav" },
@@ -134,7 +134,7 @@ namespace HammerAndSickle.Controllers
         /// Maps BriefingNarration enum values to their corresponding OGG filenames.
         /// Used for loading briefing audio files from StreamingAssets.
         /// </summary>
-        private static readonly Dictionary<BriefingNarration, string> BriefingFiles = new Dictionary<BriefingNarration, string>
+        private static readonly Dictionary<BriefingNarration, string> BriefingFiles = new()
         {
             { BriefingNarration.Khost, "Briefing_Khost.ogg" }
         };
@@ -188,10 +188,10 @@ namespace HammerAndSickle.Controllers
         private string _settingsPath;
 
         // Audio clip caching to avoid repeated loading
-        private Dictionary<MusicTrack, AudioClip> _musicCache = new Dictionary<MusicTrack, AudioClip>();
-        private Dictionary<AmbientSound, AudioClip> _ambientCache = new Dictionary<AmbientSound, AudioClip>();
-        private Dictionary<SoundEffect, AudioClip> _sfxCache = new Dictionary<SoundEffect, AudioClip>();
-        private Dictionary<BriefingNarration, AudioClip> _briefingCache = new Dictionary<BriefingNarration, AudioClip>();
+        private readonly Dictionary<MusicTrack, AudioClip> _musicCache = new();
+        private readonly Dictionary<AmbientSound, AudioClip> _ambientCache = new();
+        private readonly Dictionary<SoundEffect, AudioClip> _sfxCache = new();
+        private readonly Dictionary<BriefingNarration, AudioClip> _briefingCache = new();
 
         // Configuration constants
         private const float DEFAULT_CROSSFADE_DURATION = 1.5f; // Industry standard crossfade time in seconds
@@ -314,28 +314,28 @@ namespace HammerAndSickle.Controllers
             try
             {
                 // Create primary music source for continuous background music
-                GameObject musicObj = new GameObject("MusicSource");
+                GameObject musicObj = new("MusicSource");
                 musicObj.transform.parent = transform;
                 _musicSource = musicObj.AddComponent<AudioSource>();
                 _musicSource.loop = true;
                 _musicSource.playOnAwake = false;
 
                 // Create secondary music source for crossfade transitions
-                GameObject crossfadeObj = new GameObject("CrossfadeSource");
+                GameObject crossfadeObj = new("CrossfadeSource");
                 crossfadeObj.transform.parent = transform;
                 _crossfadeSource = crossfadeObj.AddComponent<AudioSource>();
                 _crossfadeSource.loop = true;
                 _crossfadeSource.playOnAwake = false;
 
                 // Create ambient sound source for environmental atmosphere
-                GameObject ambientObj = new GameObject("AmbientSource");
+                GameObject ambientObj = new("AmbientSource");
                 ambientObj.transform.parent = transform;
                 _ambientSource = ambientObj.AddComponent<AudioSource>();
                 _ambientSource.loop = true;  // Ambient sounds loop by default
                 _ambientSource.playOnAwake = false;
 
                 // Create dedicated source for briefing narration (non-looping)
-                GameObject briefingObj = new GameObject("BriefingSource");
+                GameObject briefingObj = new("BriefingSource");
                 briefingObj.transform.parent = transform;
                 _briefingSource = briefingObj.AddComponent<AudioSource>();
                 _briefingSource.loop = false;
@@ -345,7 +345,7 @@ namespace HammerAndSickle.Controllers
                 _sfxPool = new AudioSource[SFX_POOL_SIZE];
                 for (int i = 0; i < SFX_POOL_SIZE; i++)
                 {
-                    GameObject sfxObj = new GameObject($"SFXSource_{i}");
+                    GameObject sfxObj = new($"SFXSource_{i}");
                     sfxObj.transform.parent = transform;
                     _sfxPool[i] = sfxObj.AddComponent<AudioSource>();
                     _sfxPool[i].loop = false;
@@ -1280,22 +1280,20 @@ namespace HammerAndSickle.Controllers
             string path = Path.Combine(Application.streamingAssetsPath, MUSIC_FOLDER, filename);
             string url = "file:///" + path.Replace("\\", "/");
 
-            using (UnityWebRequest www = UnityWebRequestMultimedia.GetAudioClip(url, AudioType.OGGVORBIS))
-            {
-                // Load complete file for PC platform (no streaming needed)
-                ((DownloadHandlerAudioClip)www.downloadHandler).streamAudio = false;
-                yield return www.SendWebRequest();
+            using UnityWebRequest www = UnityWebRequestMultimedia.GetAudioClip(url, AudioType.OGGVORBIS);
+            // Load complete file for PC platform (no streaming needed)
+            ((DownloadHandlerAudioClip)www.downloadHandler).streamAudio = false;
+            yield return www.SendWebRequest();
 
-                if (www.result == UnityWebRequest.Result.Success)
-                {
-                    AudioClip clip = DownloadHandlerAudioClip.GetContent(www);
-                    _musicCache[track] = clip;
-                }
-                else
-                {
-                    AppService.HandleException("GameAudioManager", "LoadMusicTrack",
-                        new Exception($"Failed to load {filename}: {www.error}"));
-                }
+            if (www.result == UnityWebRequest.Result.Success)
+            {
+                AudioClip clip = DownloadHandlerAudioClip.GetContent(www);
+                _musicCache[track] = clip;
+            }
+            else
+            {
+                AppService.HandleException("GameAudioManager", "LoadMusicTrack",
+                    new Exception($"Failed to load {filename}: {www.error}"));
             }
         }
 
@@ -1314,22 +1312,20 @@ namespace HammerAndSickle.Controllers
             string path = Path.Combine(Application.streamingAssetsPath, AMBIENT_FOLDER, filename);
             string url = "file:///" + path.Replace("\\", "/");
 
-            using (UnityWebRequest www = UnityWebRequestMultimedia.GetAudioClip(url, AudioType.OGGVORBIS))
-            {
-                // Load complete file for reliable looping
-                ((DownloadHandlerAudioClip)www.downloadHandler).streamAudio = false;
-                yield return www.SendWebRequest();
+            using UnityWebRequest www = UnityWebRequestMultimedia.GetAudioClip(url, AudioType.OGGVORBIS);
+            // Load complete file for reliable looping
+            ((DownloadHandlerAudioClip)www.downloadHandler).streamAudio = false;
+            yield return www.SendWebRequest();
 
-                if (www.result == UnityWebRequest.Result.Success)
-                {
-                    AudioClip clip = DownloadHandlerAudioClip.GetContent(www);
-                    _ambientCache[ambient] = clip;
-                }
-                else
-                {
-                    AppService.HandleException("GameAudioManager", "LoadAmbientSound",
-                        new Exception($"Failed to load {filename}: {www.error}"));
-                }
+            if (www.result == UnityWebRequest.Result.Success)
+            {
+                AudioClip clip = DownloadHandlerAudioClip.GetContent(www);
+                _ambientCache[ambient] = clip;
+            }
+            else
+            {
+                AppService.HandleException("GameAudioManager", "LoadAmbientSound",
+                    new Exception($"Failed to load {filename}: {www.error}"));
             }
         }
 
@@ -1348,20 +1344,18 @@ namespace HammerAndSickle.Controllers
             string path = Path.Combine(Application.streamingAssetsPath, SFX_FOLDER, filename);
             string url = "file:///" + path.Replace("\\", "/");
 
-            using (UnityWebRequest www = UnityWebRequestMultimedia.GetAudioClip(url, AudioType.WAV))
-            {
-                yield return www.SendWebRequest();
+            using UnityWebRequest www = UnityWebRequestMultimedia.GetAudioClip(url, AudioType.WAV);
+            yield return www.SendWebRequest();
 
-                if (www.result == UnityWebRequest.Result.Success)
-                {
-                    AudioClip clip = DownloadHandlerAudioClip.GetContent(www);
-                    _sfxCache[sfx] = clip;
-                }
-                else
-                {
-                    AppService.HandleException("GameAudioManager", "LoadSFX",
-                        new Exception($"Failed to load {filename}: {www.error}"));
-                }
+            if (www.result == UnityWebRequest.Result.Success)
+            {
+                AudioClip clip = DownloadHandlerAudioClip.GetContent(www);
+                _sfxCache[sfx] = clip;
+            }
+            else
+            {
+                AppService.HandleException("GameAudioManager", "LoadSFX",
+                    new Exception($"Failed to load {filename}: {www.error}"));
             }
         }
 
@@ -1380,22 +1374,20 @@ namespace HammerAndSickle.Controllers
             string path = Path.Combine(Application.streamingAssetsPath, BRIEFING_FOLDER, filename);
             string url = "file:///" + path.Replace("\\", "/");
 
-            using (UnityWebRequest www = UnityWebRequestMultimedia.GetAudioClip(url, AudioType.OGGVORBIS))
-            {
-                // Don't stream briefings - load them completely for reliable playback
-                ((DownloadHandlerAudioClip)www.downloadHandler).streamAudio = false;
-                yield return www.SendWebRequest();
+            using UnityWebRequest www = UnityWebRequestMultimedia.GetAudioClip(url, AudioType.OGGVORBIS);
+            // Don't stream briefings - load them completely for reliable playback
+            ((DownloadHandlerAudioClip)www.downloadHandler).streamAudio = false;
+            yield return www.SendWebRequest();
 
-                if (www.result == UnityWebRequest.Result.Success)
-                {
-                    AudioClip clip = DownloadHandlerAudioClip.GetContent(www);
-                    _briefingCache[briefing] = clip;
-                }
-                else
-                {
-                    AppService.HandleException("GameAudioManager", "LoadBriefingNarration",
-                        new Exception($"Failed to load {filename}: {www.error}"));
-                }
+            if (www.result == UnityWebRequest.Result.Success)
+            {
+                AudioClip clip = DownloadHandlerAudioClip.GetContent(www);
+                _briefingCache[briefing] = clip;
+            }
+            else
+            {
+                AppService.HandleException("GameAudioManager", "LoadBriefingNarration",
+                    new Exception($"Failed to load {filename}: {www.error}"));
             }
         }
 
