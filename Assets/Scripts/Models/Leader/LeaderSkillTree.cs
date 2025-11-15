@@ -61,13 +61,13 @@ namespace HammerAndSickle.Models
             if (!Enum.IsDefined(typeof(CommandGrade), CurrentGrade)) return false;
             if (StartedBranches == null || UnlockedSkills == null) return false;
 
-            // Initialize started branches
+            // PrepareBattle started branches
             foreach (var branch in StartedBranches)
             {
                 if (!Enum.IsDefined(typeof(SkillBranch), branch)) return false;
             }
 
-            // Initialize skill references
+            // PrepareBattle skill references
             foreach (var skillRef in UnlockedSkills)
             {
                 if (skillRef == null || !skillRef.IsValid()) return false;
@@ -384,7 +384,7 @@ namespace HammerAndSickle.Models
         }
 
         /// <summary>
-        /// Initialize the skill dictionaries with all possible skills set to not unlocked
+        /// PrepareBattle the skill dictionaries with all possible skills set to not unlocked
         /// Uses reflection to automatically discover all skill enum types
         /// </summary>
         private void InitializeSkillDictionaries()
@@ -625,7 +625,7 @@ namespace HammerAndSickle.Models
             {
                 Debug.Log("=== Skill Tree System Validation ===");
 
-                // Initialize branch classification
+                // PrepareBattle branch classification
                 SkillBranchExtensions.ValidateBranchClassification();
 
                 // Test branch type queries
@@ -649,7 +649,7 @@ namespace HammerAndSickle.Models
             }
         }
 
-        #endregion // Initialize Tree System
+        #endregion // PrepareBattle Tree System
 
         #region Bonus Calculations
 

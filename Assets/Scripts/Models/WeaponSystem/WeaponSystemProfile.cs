@@ -90,7 +90,7 @@ namespace HammerAndSickle.Models
         {
             try
             {
-                // Initialize required parameters
+                // PrepareBattle required parameters
                 if (string.IsNullOrEmpty(name))
                     throw new ArgumentException("Profile name cannot be null or empty", nameof(name));
 

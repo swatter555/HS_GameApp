@@ -1,4 +1,5 @@
 using HammerAndSickle.Controllers;
+using HammerAndSickle.Core.GameData;
 using HammerAndSickle.Core.UI;
 using HammerAndSickle.Services;
 using System;
@@ -31,7 +32,7 @@ namespace HammerAndSickle.SceneDirectors
             base.Awake();
 
             // Set the dialog ID.
-            Initialize(GeneralConstants.KhostScene_OrdersDialog_ID, false);
+            Initialize(GameData.KhostScene_OrdersDialog_ID, false);
         }
 
         #endregion // Unity Lifecycle
@@ -64,11 +65,9 @@ namespace HammerAndSickle.SceneDirectors
         public void OnBeginButton()
         {
             // Return to main interface
-            Scene1_Director.Instance.SetActiveMenuByID(GeneralConstants.KhostScene_CoreInterface_ID);
+            Scene1_Director.Instance.SetActiveMenuByID(GameData.KhostScene_CoreInterface_ID);
         }
 
         #endregion // Callbacks
-
-
     }
 }

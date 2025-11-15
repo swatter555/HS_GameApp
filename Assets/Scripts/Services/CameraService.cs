@@ -23,6 +23,10 @@ namespace HammerAndSickle.Services
         [Tooltip("The camera to control")]
         private Camera controlledCamera;
 
+        [SerializeField]
+        [Tooltip("Overlay camera that mirrors the controlled camera")]
+        private Camera overlayCamera;
+
         [Header("Scroll Settings")]
         [SerializeField]
         [Range(1f, 50f)]
@@ -164,6 +168,21 @@ namespace HammerAndSickle.Services
                     controlledCamera.orthographicSize = defaultOrthographicSize;
                 }
 
+                // Initialize overlay camera if assigned
+                if (overlayCamera != null)
+                {
+                    if (!overlayCamera.orthographic)
+                    {
+                        Debug.LogWarning($"{CLASS_NAME}: Overlay camera is not orthographic. Converting to orthographic mode.");
+                        overlayCamera.orthographic = true;
+                    }
+
+                    // Mirror the controlled camera's initial state
+                    SyncOverlayCamera();
+
+                    if (debugLog) Debug.Log($"{CLASS_NAME}: Overlay camera initialized and synced.");
+                }
+
                 IsInitialized = true;
                 if (debugLog) Debug.Log($"{CLASS_NAME}: Service initialized successfully.");
             }
@@ -252,6 +271,9 @@ namespace HammerAndSickle.Services
                 Vector3 movement = new Vector3(scrollVector.x, scrollVector.y, 0f) * scrollSpeed * Time.deltaTime;
                 controlledCamera.transform.position += movement;
 
+                // Sync overlay camera
+                SyncOverlayCamera();
+
                 // Report new position to InputService for boundary checking
                 UpdateCameraPositionInInputService();
             }
@@ -276,6 +298,9 @@ namespace HammerAndSickle.Services
                 Vector3 movement = new Vector3(scrollVector.x, scrollVector.y, 0f) * Time.deltaTime;
                 controlledCamera.transform.position += movement;
 
+                // Sync overlay camera
+                SyncOverlayCamera();
+
                 // Report new position to InputService for boundary checking
                 UpdateCameraPositionInInputService();
             }
@@ -298,6 +323,9 @@ namespace HammerAndSickle.Services
                 // No Time.deltaTime needed - fires every frame already at consistent rate
                 float newSize = controlledCamera.orthographicSize + (zoomDelta * zoomSpeed * 0.01f);
                 controlledCamera.orthographicSize = Mathf.Clamp(newSize, minOrthographicSize, maxOrthographicSize);
+
+                // Sync overlay camera
+                SyncOverlayCamera();
             }
             catch (Exception e)
             {
@@ -315,6 +343,10 @@ namespace HammerAndSickle.Services
                 if (controlledCamera == null) return;
 
                 controlledCamera.orthographicSize = defaultOrthographicSize;
+
+                // Sync overlay camera
+                SyncOverlayCamera();
+
                 if (debugLog) Debug.Log($"{CLASS_NAME}: Zoom reset to default ({defaultOrthographicSize}).");
             }
             catch (Exception e)
@@ -343,5 +375,27 @@ namespace HammerAndSickle.Services
         }
 
         #endregion // Event Handlers
+
+        #region Camera Synchronization
+
+        /// <summary>
+        /// Synchronizes the overlay camera to match the controlled camera's position and zoom.
+        /// </summary>
+        private void SyncOverlayCamera()
+        {
+            try
+            {
+                if (overlayCamera == null || controlledCamera == null) return;
+
+                overlayCamera.transform.position = controlledCamera.transform.position;
+                overlayCamera.orthographicSize = controlledCamera.orthographicSize;
+            }
+            catch (Exception e)
+            {
+                AppService.HandleException(CLASS_NAME, "SyncOverlayCamera", e);
+            }
+        }
+
+        #endregion // Camera Synchronization
     }
 }

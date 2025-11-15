@@ -89,7 +89,7 @@ namespace HammerAndSickle.Models
             {
                 InitializeCommonProperties(side, nationality);
 
-                // Initialize and set name
+                // PrepareBattle and set name
                 if (string.IsNullOrWhiteSpace(name) ||
                     name.Length < GameData.MIN_LEADER_NAME_LENGTH ||
                     name.Length > GameData.MAX_LEADER_NAME_LENGTH)
@@ -99,7 +99,7 @@ namespace HammerAndSickle.Models
 
                 Name = name.Trim();
 
-                // Initialize command ability
+                // PrepareBattle command ability
                 if (!Enum.IsDefined(typeof(CommandAbility), command))
                 {
                     throw new ArgumentException($"Invalid command ability: {command}");
@@ -124,7 +124,7 @@ namespace HammerAndSickle.Models
         {
             try
             {
-                // Initialize with safe defaults - JSON will overwrite these
+                // PrepareBattle with safe defaults - JSON will overwrite these
                 LeaderID = GenerateUniqueID();
                 Name = string.Empty;
                 Side = Side.Player;
@@ -135,7 +135,7 @@ namespace HammerAndSickle.Models
                 IsAssigned = false;
                 UnitID = null;
 
-                // Initialize skill tree with default reputation
+                // PrepareBattle skill tree with default reputation
                 skillTree = new LeaderSkillTree(0);
             }
             catch (Exception e)
@@ -150,7 +150,7 @@ namespace HammerAndSickle.Models
         #region Initialization Helpers
 
         /// <summary>
-        /// Initialize common properties shared by all constructors
+        /// PrepareBattle common properties shared by all constructors
         /// </summary>
         private void InitializeCommonProperties(Side side, Nationality nationality)
         {
@@ -165,7 +165,7 @@ namespace HammerAndSickle.Models
         }
 
         /// <summary>
-        /// Initialize the skill tree and wire up events
+        /// PrepareBattle the skill tree and wire up events
         /// </summary>
         private void InitializeSkillTree()
         {
@@ -413,7 +413,7 @@ namespace HammerAndSickle.Models
                     _ => 0
                 };
 
-                // Initialize multiplier bounds
+                // PrepareBattle multiplier bounds
                 contextMultiplier = Math.Clamp(contextMultiplier, GameData.MIN_REP_MULTIPLIER, GameData.MAX_REP_MULTIPLIER);
 
                 int finalREP = Mathf.RoundToInt(baseREP * contextMultiplier);

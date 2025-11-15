@@ -74,6 +74,7 @@ namespace HammerAndSickle.Core.Map
         [SerializeField] private GameObject bridgeIconLayer;
         [SerializeField] private GameObject cityIconLayer;
         [SerializeField] private GameObject textLabelLayer;
+        [SerializeField] private GameObject mainUnitLayer;
 
         #endregion // Inspector Fields
 
@@ -308,7 +309,7 @@ namespace HammerAndSickle.Core.Map
             {
                 if (_debug) Debug.Log($"[{CLASS_NAME}.RefreshMap] Starting map refresh...");
 
-                // Initialize that we have a map to render
+                // PrepareBattle that we have a map to render
                 if (GameDataManager.CurrentHexMap == null)
                 {
                     AppService.CaptureUiMessage("Cannot refresh map: No hex map loaded.");
@@ -424,7 +425,7 @@ namespace HammerAndSickle.Core.Map
             {
                 if (_debug) Debug.Log($"[{CLASS_NAME}.ChangeControlFlag] Attempting to change control flag at position ({position.IntX}, {position.IntY})");
 
-                // Initialize map exists
+                // PrepareBattle map exists
                 if (GameDataManager.CurrentHexMap == null)
                 {
                     AppService.CaptureUiMessage("Cannot change control flag: No hex map loaded.");
@@ -442,7 +443,7 @@ namespace HammerAndSickle.Core.Map
                 }
 
                 // Check if there's a city prefab at this position
-                Vector2Int pos = new Vector2Int(position.IntX, position.IntY);
+                Vector2Int pos = new(position.IntX, position.IntY);
                 if (!cityPrefabs.TryGetValue(pos, out Prefab_CityIcon cityPrefab))
                 {
                     AppService.CaptureUiMessage($"Cannot change control flag: No city found at position {position}.");

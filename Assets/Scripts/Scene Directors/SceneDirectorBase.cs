@@ -1,4 +1,5 @@
 using HammerAndSickle.Controllers;
+using HammerAndSickle.Core.GameData;
 using HammerAndSickle.Services;
 using System;
 using System.Collections.Generic;
@@ -17,10 +18,10 @@ namespace HammerAndSickle.SceneDirectors
         private Dictionary<int, MenuHandler> menuDictionary = new Dictionary<int, MenuHandler>();
 
         // Scene core interface menu ID
-        private int _coreInterfaceMenuID = GeneralConstants.DefaultID;
+        private int _coreInterfaceMenuID = GameData.DefaultID;
 
         // Currently active menu ID
-        private int _activeMenuID = GeneralConstants.DefaultID;
+        private int _activeMenuID = GameData.DefaultID;
 
         #endregion //Input State Management
 
@@ -44,7 +45,7 @@ namespace HammerAndSickle.SceneDirectors
             ValidateGameSystems();
             OnSceneInitialize();
 
-            if (_coreInterfaceMenuID == GeneralConstants.DefaultID)
+            if (_coreInterfaceMenuID == GameData.DefaultID)
             {
                 AppService.HandleException(GetClassName(), nameof(Start),
                     new Exception("Core interface not set after initialization"));
@@ -79,7 +80,7 @@ namespace HammerAndSickle.SceneDirectors
             // Set the core interface ID.
             _coreInterfaceMenuID = menuID;
 
-            // Initialize the interface.
+            // PrepareBattle the interface.
             menuHandler.Initialize(menuID, true);
 
             // Register the menu.
@@ -105,14 +106,14 @@ namespace HammerAndSickle.SceneDirectors
                 // Check if the requested menu is already active
                 if (_activeMenuID == menuID) return;
 
-                // Initialize the new menu exists
+                // PrepareBattle the new menu exists
                 if (!menuDictionary.TryGetValue(menuID, out MenuHandler newMenu))
                 {
                     throw new Exception($"Menu with ID {menuID} not found in the menu dictionary.");
                 }
 
                 // Handle the currently active menu
-                if (_activeMenuID != GeneralConstants.DefaultID)
+                if (_activeMenuID != GameData.DefaultID)
                 {
                     if (menuDictionary.TryGetValue(_activeMenuID, out MenuHandler currentMenu))
                     {
@@ -153,7 +154,7 @@ namespace HammerAndSickle.SceneDirectors
                 AppService.HandleException(GetClassName(), nameof(SetActiveMenuByID), e);
 
                 // Fallback: try to activate core interface if available
-                if (_coreInterfaceMenuID != GeneralConstants.DefaultID &&
+                if (_coreInterfaceMenuID != GameData.DefaultID &&
                     _coreInterfaceMenuID != menuID &&
                     menuDictionary.ContainsKey(_coreInterfaceMenuID))
                 {

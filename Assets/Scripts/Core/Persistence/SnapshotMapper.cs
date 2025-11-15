@@ -1,5 +1,6 @@
 using HammerAndSickle.Controllers;
 using HammerAndSickle.Models;
+using HammerAndSickle.Models.Map;
 using HammerAndSickle.Services;
 using System;
 using System.Collections.Generic;
@@ -45,8 +46,45 @@ namespace HammerAndSickle.Persistence
                     Scenario = mgr.CurrentScenarioData,
                     SaveVersion = CURRENT_SAVE_VERSION,
                     Units = new Dictionary<string, CombatUnit>(StringComparer.Ordinal),
-                    Leaders = new Dictionary<string, Leader>(StringComparer.Ordinal)
+                    Leaders = new Dictionary<string, Leader>(StringComparer.Ordinal),
+                    MapData = null // Will be set below if map is loaded
                 };
+
+                // Capture map data if a map is currently loaded
+                if (GameDataManager.CurrentHexMap != null)
+                {
+                    try
+                    {
+                        // Generate checksum for map integrity (simple hash based on map state)
+                        var checksum = $"{GameDataManager.CurrentHexMap.MapName}_{GameDataManager.CurrentHexMap.Configuration}_{GameDataManager.CurrentHexMap.HexCount}_{DateTime.UtcNow:yyyyMMddHHmmss}";
+
+                        // Create map header
+                        var mapHeader = new JsonMapHeader(
+                            GameDataManager.CurrentHexMap.MapName,
+                            GameDataManager.CurrentHexMap.Configuration,
+                            checksum
+                        );
+
+                        // Extract all hexes from the map (HexMap implements IEnumerable<HexTile>)
+                        var hexes = GameDataManager.CurrentHexMap.ToArray();
+
+                        // Create JsonMapData with header and hexes
+                        snapshot.MapData = new JsonMapData(mapHeader, hexes);
+
+                        AppService.CaptureUiMessage($"Captured map data: {GameDataManager.CurrentHexMap.MapName} ({hexes.Length} hexes)");
+                    }
+                    catch (Exception ex)
+                    {
+                        AppService.HandleException(CLASS_NAME, METHOD_NAME,
+                            new InvalidOperationException("Failed to capture map data in snapshot", ex));
+                        // Continue with snapshot creation even if map capture fails
+                        snapshot.MapData = null;
+                    }
+                }
+                else
+                {
+                    AppService.CaptureUiMessage("No map loaded - creating between-battle save");
+                }
 
                 // Create fresh units with same parameters but independent state
                 foreach (var unit in mgr.GetAllCombatUnits())
@@ -171,6 +209,63 @@ namespace HammerAndSickle.Persistence
                     }
                 }
 
+                // Synchronize campaign core roster with active units/leaders
+                // This ensures the campaign roster reflects current battle state (casualties, experience, new purchases)
+                if (snapshot.Campaign != null)
+                {
+                    try
+                    {
+                        // Clear existing core roster
+                        snapshot.Campaign.PlayerUnits.Clear();
+                        snapshot.Campaign.PlayerLeaders.Clear();
+
+                        // Rebuild core unit roster from active player units
+                        int coreUnitCount = 0;
+                        foreach (var unit in snapshot.Units.Values)
+                        {
+                            if (unit != null && unit.Side == Side.Player)
+                            {
+                                snapshot.Campaign.PlayerUnits[unit.UnitID] = unit;
+                                coreUnitCount++;
+                            }
+                        }
+
+                        // Rebuild core leader roster from player leaders
+                        // Leaders assigned to player units OR unassigned leaders in the player pool
+                        int coreLeaderCount = 0;
+                        foreach (var leader in snapshot.Leaders.Values)
+                        {
+                            if (leader != null)
+                            {
+                                // Leader is core if: assigned to player unit OR unassigned but owned by player
+                                bool isAssignedToPlayerUnit = false;
+                                if (!string.IsNullOrEmpty(leader.UnitID) && snapshot.Campaign.PlayerUnits.ContainsKey(leader.UnitID))
+                                {
+                                    isAssignedToPlayerUnit = true;
+                                }
+
+                                // For unassigned leaders, check if they're in the original player roster
+                                // (This handles leaders in reserve between assignments)
+                                bool isInPlayerPool = !leader.IsAssigned;
+
+                                if (isAssignedToPlayerUnit || isInPlayerPool)
+                                {
+                                    snapshot.Campaign.PlayerLeaders[leader.LeaderID] = leader;
+                                    coreLeaderCount++;
+                                }
+                            }
+                        }
+
+                        AppService.CaptureUiMessage($"Synchronized core roster: {coreUnitCount} units, {coreLeaderCount} leaders");
+                    }
+                    catch (Exception ex)
+                    {
+                        AppService.HandleException(CLASS_NAME, METHOD_NAME,
+                            new InvalidOperationException("Failed to synchronize campaign core roster", ex));
+                        // Continue - non-fatal error
+                    }
+                }
+
                 AppService.CaptureUiMessage($"Snapshot created with {snapshot.Units.Count} units and {snapshot.Leaders.Count} leaders");
                 return snapshot;
             }
@@ -195,7 +290,7 @@ namespace HammerAndSickle.Persistence
 
             try
             {
-                // Initialize inputs
+                // PrepareBattle inputs
                 if (snap == null)
                     throw new ArgumentNullException(nameof(snap), "GameStateSnapshot cannot be null");
                 if (mgr == null)
@@ -224,6 +319,86 @@ namespace HammerAndSickle.Persistence
                 AppService.CaptureUiMessage("Restoring campaign and scenario data...");
                 mgr.CurrentCampaignData = snap.Campaign ?? new CampaignData();
                 mgr.CurrentScenarioData = snap.Scenario; // May remain null for campaign-only saves
+
+                // Step 2.5: Restore map data if present
+                AppService.CaptureUiMessage("Restoring map data...");
+
+                // The current hex map is statically referenced, so we set it to null first
+                GameDataManager.CurrentHexMap = null;
+
+                if (snap.MapData != null)
+                {
+                    try
+                    {
+                        // Validate map data before attempting to restore
+                        if (!snap.MapData.IsValid())
+                        {
+                            throw new InvalidOperationException("Map data validation failed - corrupt or incomplete map data in save file");
+                        }
+
+                        AppService.CaptureUiMessage($"Restoring map: {snap.MapData.Header.MapName}");
+
+                        // Create HexMap instance (following MapLoader pattern)
+                        var hexMap = new HexMap(snap.MapData.Header.MapName, snap.MapData.Header.MapConfiguration);
+
+                        // Populate the map with hex tiles
+                        int successCount = 0;
+                        int failCount = 0;
+
+                        foreach (HexTile hex in snap.MapData.Hexes)
+                        {
+                            if (hex == null)
+                            {
+                                AppService.HandleException(CLASS_NAME, METHOD_NAME,
+                                    new InvalidOperationException("Null hex tile found in map data"));
+                                continue;
+                            }
+
+                            if (!hexMap.SetHexAt(hex))
+                            {
+                                failCount++;
+                                if (failCount <= 5) // Only log first 5 failures
+                                {
+                                    AppService.HandleException(CLASS_NAME, METHOD_NAME,
+                                        new InvalidOperationException($"Failed to restore hex at position {hex.Position}"));
+                                }
+                            }
+                            else
+                            {
+                                successCount++;
+                            }
+                        }
+
+                        AppService.CaptureUiMessage($"Restored {successCount} hexes, {failCount} failures");
+
+                        // Build neighbor relationships (critical for hex connectivity)
+                        hexMap.BuildNeighborRelationships();
+
+                        // Validate constructed map integrity
+                        if (!hexMap.ValidateIntegrity())
+                        {
+                            throw new InvalidOperationException("Map integrity validation failed after restoration");
+                        }
+
+                        // Assign to GameDataManager
+                        GameDataManager.CurrentHexMap = hexMap;
+                        GameDataManager.CurrentMapSize = hexMap.MapSize;
+
+                        AppService.CaptureUiMessage($"Map restored successfully: {hexMap.MapName} ({hexMap.HexCount} hexes)");
+                    }
+                    catch (Exception ex)
+                    {
+                        AppService.HandleException(CLASS_NAME, METHOD_NAME,
+                            new InvalidOperationException("Failed to restore map data from snapshot", ex));
+                        // Set to null on failure
+                        GameDataManager.CurrentHexMap = null;
+                        throw; // Re-throw since map restoration failure is critical for scenario saves
+                    }
+                }
+                else
+                {
+                    AppService.CaptureUiMessage("No map data in save - between-battle save detected");
+                }
 
                 // Step 3: Re-populate entity dictionaries using manager's registration methods
                 // This ensures all internal invariants and validation logic is preserved
@@ -272,7 +447,7 @@ namespace HammerAndSickle.Persistence
                 AppService.CaptureUiMessage("Rebuilding transient caches and cross-references...");
                 mgr.RebuildTransientCaches();
 
-                // Step 5: Initialize the loaded state
+                // Step 5: PrepareBattle the loaded state
                 ValidateLoadedState(mgr);
 
                 AppService.CaptureUiMessage("Game state successfully restored from snapshot");
@@ -353,6 +528,44 @@ namespace HammerAndSickle.Persistence
                         AppService.HandleException(CLASS_NAME, METHOD_NAME,
                             new InvalidOperationException($"Unit-Leader assignment mismatch: Unit {unit.UnitID} thinks its leader is {unit.LeaderID}, but leader is not properly assigned back"));
                     }
+                }
+
+                // Validate map data if present
+                if (GameDataManager.CurrentHexMap != null)
+                {
+                    AppService.CaptureUiMessage("Validating map integrity...");
+
+                    // Run comprehensive map validation
+                    if (!GameDataManager.CurrentHexMap.ValidateIntegrity())
+                    {
+                        AppService.HandleException(CLASS_NAME, METHOD_NAME,
+                            new InvalidOperationException("Map integrity validation failed after load"));
+                    }
+
+                    if (!GameDataManager.CurrentHexMap.ValidateDimensions())
+                    {
+                        AppService.HandleException(CLASS_NAME, METHOD_NAME,
+                            new InvalidOperationException("Map dimensions validation failed after load"));
+                    }
+
+                    if (!GameDataManager.CurrentHexMap.ValidateConnectivity())
+                    {
+                        AppService.HandleException(CLASS_NAME, METHOD_NAME,
+                            new InvalidOperationException("Map connectivity validation failed after load"));
+                    }
+
+                    // Validate that unit positions reference valid hexes on the map
+                    foreach (var unit in allUnits.Where(u => u.MapPos != null && u.MapPos != Position2D.Zero))
+                    {
+                        var hex = GameDataManager.CurrentHexMap.GetHexAt(unit.MapPos);
+                        if (hex == null)
+                        {
+                            AppService.HandleException(CLASS_NAME, METHOD_NAME,
+                                new InvalidOperationException($"Unit {unit.UnitID} at position {unit.MapPos} references non-existent hex"));
+                        }
+                    }
+
+                    AppService.CaptureUiMessage($"Map validation passed: {GameDataManager.CurrentHexMap.MapName} ({GameDataManager.CurrentHexMap.HexCount} hexes)");
                 }
 
                 AppService.CaptureUiMessage($"State validation completed: {allUnits.Count} units, {allLeaders.Count} leaders");

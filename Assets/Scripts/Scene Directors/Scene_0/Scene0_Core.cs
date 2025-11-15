@@ -2,6 +2,7 @@ using HammerAndSickle.Services;
 using UnityEngine;
 using UnityEngine.UI;
 using HammerAndSickle.Controllers;
+using HammerAndSickle.Core.GameData;
 
 namespace HammerAndSickle.SceneDirectors
 {
@@ -113,7 +114,7 @@ namespace HammerAndSickle.SceneDirectors
         public void OnScenarioButton()
         {
             // Switch to scenario dialog.
-            Scene0_Director.Instance.SetActiveMenuByID(GeneralConstants.MainScene_ScenarioDialog_ID);
+            Scene0_Director.Instance.SetActiveMenuByID(GameData.MainScene_ScenarioDialog_ID);
         }
 
         public void OnSettingsButton()

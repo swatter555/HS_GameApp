@@ -12,22 +12,22 @@ namespace HammerAndSickle.Models.Map
     public class JsonMapData
     {
         #region Constants
+
         private const string CLASS_NAME = nameof(JsonMapData);
+
         #endregion
 
         #region Properties
-        /// <summary>
-        /// Map header containing metadata and integrity information.
-        /// </summary>
+
+        // Map header containing metadata and integrity information.
         [JsonPropertyName("header")]
         public JsonMapHeader Header { get; set; }
 
-        /// <summary>
-        /// Array of all hex tiles in the map.
-        /// </summary>
+        // Array of all hex tiles in the map.
         [JsonPropertyName("hexes")]
         public HexTile[] Hexes { get; set; }
-        #endregion
+
+        #endregion // Properties
 
         #region Constructors
 
@@ -42,9 +42,10 @@ namespace HammerAndSickle.Models.Map
             Hexes = hexes;
         }
 
-        #endregion
+        #endregion // Constructors
 
         #region Public Methods
+
         /// <summary>
         /// Validates the map data for consistency and completeness.
         /// </summary>
@@ -130,6 +131,7 @@ namespace HammerAndSickle.Models.Map
                 return "JsonMapData: Error generating summary";
             }
         }
-        #endregion
+
+        #endregion // Public Methods
     }
 }

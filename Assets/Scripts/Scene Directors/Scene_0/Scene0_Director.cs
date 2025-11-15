@@ -1,4 +1,5 @@
 using HammerAndSickle.Controllers;
+using HammerAndSickle.Core.GameData;
 using HammerAndSickle.Services;
 
 namespace HammerAndSickle.SceneDirectors
@@ -38,13 +39,13 @@ namespace HammerAndSickle.SceneDirectors
         protected override void OnSceneInitialize()
         {
             // Provide ID to core interface and register.
-            Scene0_Core.Instance.Initialize(GeneralConstants.MainScene_CoreInterface_ID, true);
-            RegisterCoreInterface(GeneralConstants.MainScene_CoreInterface_ID, Scene0_Core.Instance);
+            Scene0_Core.Instance.Initialize(GameData.MainScene_CoreInterface_ID, true);
+            RegisterCoreInterface(GameData.MainScene_CoreInterface_ID, Scene0_Core.Instance);
 
             // Register other interfaces.
             RegisterMenu(Scene0_ScenarioDialog.Instance);
 
-            // Initialize audio manager and start main menu music
+            // PrepareBattle audio manager and start main menu music
             InitializeAudio();
         }
 
