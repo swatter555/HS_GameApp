@@ -67,6 +67,7 @@ namespace HammerAndSickle.Controllers
         public const string Control_Kuwait = "Control_Kuwait";
         public const string Control_Saudi  = "Control_Saudi";
         public const string Control_None   = "Control_None";
+        public const string MainObjective  = "MainObjective";
 
         #endregion // Control Icons
 
@@ -520,7 +521,7 @@ namespace HammerAndSickle.Controllers
         public const string MJ_Regulars = "MJ_Regulars";
         public const string MJ_Elite = "MJ_Elite";
 
-        // Generic NATO Units
+        // Generic Units
         public const string GEN_HeavyArtillery_E = "GEN_HvyArt_E";
         public const string GEN_HeavyArtillery_W = "GEN_HvyArt_W";
         public const string GEN_LightArtillery_E = "GEN_LtArt_E";
@@ -531,27 +532,60 @@ namespace HammerAndSickle.Controllers
         public const string GEN_M31_W = "GEN_Mortar_W";
         public const string GEN_M35_E = "GEN_M35_E";
         public const string GEN_M35_W = "GEN_M35_W";
+        public const string GEN_NavalTransport = "GEN_NavalTransport";
 
         #endregion // NATO Unit Icons
 
-        #region Nationality Icons
+        #region Nationality Flags
 
-        public const string BEIcon = "BEIcon";
-        public const string CHIcon = "CHIcon";
-        public const string DEIcon = "DEIcon";
-        public const string FRAIcon = "FRAIcon";
-        public const string GERIcon = "GERIcon";
-        public const string IRIcon = "IRIcon";
-        public const string IRQIcon = "IRQIcon";
-        public const string KWIcon = "KWIcon";
-        public const string MJIcon = "MJIcon";
-        public const string NEIcon = "NEIcon";
-        public const string SAIcon = "SAIcon";
-        public const string SovietIcon = "SovietIcon";
-        public const string UKIcon = "UKIcon";
-        public const string USIcon = "USIcon";
+        public const string Flag_BE     = "Flag_BE";
+        public const string Flag_China  = "Flag_China";
+        public const string Flag_DE     = "Flag_DE";
+        public const string Flag_FR     = "Flag_FR";
+        public const string Flag_GE     = "Flag_GE";
+        public const string Flag_Iran   = "Flag_Iran";
+        public const string Flag_Iraq   = "Flag_Iraq";
+        public const string Flag_Kuwait = "Flag_Kuwait";
+        public const string Flag_MJ     = "Flag_MJ";
+        public const string Flag_NE     = "Flag_NE";
+        public const string Flag_Saudi  = "Flag_Saudi";
+        public const string Flag_SV     = "Flag_SV";
+        public const string Flag_UK     = "Flag_UK";
+        public const string Flag_US     = "Flag_US";
 
-        #endregion // Nationality Icons
+        #endregion // Nationality Flags
+
+        #region NATO Symbol Icons
+
+        public const string Icon_AAA            = "Icon_AAA";
+        public const string Icon_AirAssault     = "Icon_AirAssault";
+        public const string Icon_Airbase        = "Icon_Airbase";
+        public const string Icon_Antitank       = "Icon_Antitank";
+        public const string Icon_ArmoredCav     = "Icon_ArmoredCav";
+        public const string Icon_ArmoredMarine  = "Icon_ArmoredMarine";
+        public const string Icon_Artillery      = "Icon_Artillery";
+        public const string Icon_Engineer       = "Icon_Engineer";
+        public const string Icon_FixedWing      = "Icon_FixedWing";
+        public const string Icon_FixedWingRecon = "Icon_FixedWingRecon";
+        public const string Icon_Infantry       = "Icon_Infantry";
+        public const string Icon_Marine         = "Icon_Marine";
+        public const string Icon_Mech           = "Icon_Mech";
+        public const string Icon_Mot            = "Icon_Mot";
+        public const string Icon_Recon          = "Icon_Recon";
+        public const string Icon_SAM            = "Icon_SAM";
+        public const string Icon_Signal         = "Icon_Signal";
+        public const string Icon_SPArtillery    = "Icon_SPArtillery";
+        public const string Icon_Tank           = "Icon_Tank";
+
+        #endregion // NATO Symbol Icons
+
+        #region Unit Base Icons
+
+        public const string BlueIconBase = "BlueIconBase";
+        public const string GreenIconBase = "GreenIconBase";
+        public const string RedIconBase = "RedIconBase";
+
+        #endregion // Unit Base Icons
 
         #region Singleton
 
@@ -591,18 +625,20 @@ namespace HammerAndSickle.Controllers
         [SerializeField] private SpriteAtlas _bridgeIconAtlas;
         [SerializeField] private SpriteAtlas _rankAtlas;
         [SerializeField] private SpriteAtlas _terrainPortraitAtlas;
+        [SerializeField] private SpriteAtlas _sovietIconAtlas;
+        [SerializeField] private SpriteAtlas _natoIconAtlas;
+        [SerializeField] private SpriteAtlas _genericIconAtlas;
+        [SerializeField] private SpriteAtlas _natoSymbolIconAtlas;
+        [SerializeField] private SpriteAtlas _nationalFlagAtlas;
+
 
         [Header("Prefabs")]
         [SerializeField] private GameObject _cityPrefab;
         [SerializeField] private GameObject _mapIconPrefab;
         [SerializeField] private GameObject _bridgeIconPrefab;
         [SerializeField] private GameObject _mapTextPrefab;
-
-        [Header("Unit Icons")]
-        [SerializeField] private SpriteAtlas _sovietIconAtlas;
-        [SerializeField] private SpriteAtlas _natoIconAtlas;
-        [SerializeField] private SpriteAtlas _genericIconAtlas;
-        [SerializeField] private SpriteAtlas _nationalIconAtlas;
+        [SerializeField] private GameObject _blueUnitIconPrefab;
+        [SerializeField] private GameObject _redUnitIconPrefab;
 
         #endregion
 
@@ -612,6 +648,8 @@ namespace HammerAndSickle.Controllers
         public GameObject MapIconPrefab => _mapIconPrefab;
         public GameObject BridgeIconPrefab => _bridgeIconPrefab;
         public GameObject MapTextPrefab => _mapTextPrefab;
+        public GameObject BlueUnitIconPrefab => _blueUnitIconPrefab;
+        public GameObject RedUnitIconPrefab => _redUnitIconPrefab;
 
         #endregion // Properties
 
@@ -721,10 +759,17 @@ namespace HammerAndSickle.Controllers
                     if (sprite != null) return sprite;
                 }
 
-                // Try national icon atlas
-                if (Instance._nationalIconAtlas != null)
+                // Try NATO symbol icon atlas
+                if (Instance._natoSymbolIconAtlas != null)
                 {
-                    sprite = Instance._nationalIconAtlas.GetSprite(spriteName);
+                    sprite = Instance._natoSymbolIconAtlas.GetSprite(spriteName);
+                    if (sprite != null) return sprite;
+                }
+
+                // Try national flag atlas
+                if (Instance._nationalFlagAtlas != null)
+                {
+                    sprite = Instance._nationalFlagAtlas.GetSprite(spriteName);
                     if (sprite != null) return sprite;
                 }
 
