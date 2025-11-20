@@ -68,6 +68,8 @@ namespace HammerAndSickle.Models
         public StatsMaxCurrent MovementPoints { get; private set; }
         [JsonInclude]
         public Position2D MapPos { get; internal set; }
+        [JsonIgnore]
+        public HexDirection Facing { get; set; } // Unit facing direction (not saved, initialized from Side)
         [JsonInclude]
         public SpottedLevel SpottedLevel { get; private set; }
         [JsonInclude]
@@ -150,6 +152,9 @@ namespace HammerAndSickle.Models
                 Side = side;
                 Nationality = nationality;
 
+                // Initialize facing based on side (Player faces West, AI faces East)
+                Facing = side == Side.Player ? HexDirection.W : HexDirection.E;
+
                 // PrepareBattle deployment position based on embarkable and mountable states
                 InitializeDeploymentSystem(isEmbarkable, isMountable);
 
@@ -216,6 +221,9 @@ namespace HammerAndSickle.Models
                 Side = Side.Player; // Will be overwritten by JSON
                 Nationality = Nationality.USSR; // Will be overwritten by JSON
                 IntelProfileType = IntelProfileTypes.SV_MRR_BTR70; // Will be overwritten by JSON
+
+                // Initialize facing based on side (not saved, must be set from Side after deserialization)
+                Facing = HexDirection.W; // Default for Player, will be updated in RebuildTransientCaches
 
                 // PrepareBattle weapon system profile IDs - JSON will set actual values
                 DeployedProfileID = WeaponSystems.DEFAULT; // Will be overwritten by JSON
@@ -1028,6 +1036,8 @@ namespace HammerAndSickle.Models
         public void SetSide(Side side)
         {
             Side = side;
+            // Update facing based on new side (Player faces West, AI faces East)
+            Facing = side == Side.Player ? HexDirection.W : HexDirection.E;
         }
 
         /// <summary>

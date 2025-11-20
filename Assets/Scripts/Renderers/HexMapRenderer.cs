@@ -1,12 +1,20 @@
-using System;
-using System.Collections.Generic;
-using UnityEngine;
-using UnityEngine.Tilemaps;
 using HammerAndSickle.Controllers;
 using HammerAndSickle.Core.GameData;
+using HammerAndSickle.Models;
 using HammerAndSickle.Models.Map;
 using HammerAndSickle.Services;
-using HammerAndSickle.Models;
+using System;
+using System.Collections.Generic;
+using System.Net.Sockets;
+using System.Numerics;
+using UnityEditor;
+using UnityEngine;
+using UnityEngine.Tilemaps;
+using UnityEngine.UI;
+using UnityEngine.UIElements;
+using static TMPro.SpriteAssetUtilities.TexturePacker_JsonArray;
+using static Unity.IO.LowLevel.Unsafe.AsyncReadManagerMetrics;
+using static UnityEngine.UI.CanvasScaler;
 
 namespace HammerAndSickle.Core.Map
 {
@@ -50,6 +58,11 @@ namespace HammerAndSickle.Core.Map
         /// Dictionary to store and track text label prefab instances by their hex coordinates.
         /// </summary>
         private readonly Dictionary<Vector2Int, Prefab_MapText> textLabelPrefabs = new();
+
+        /// <summary>
+        /// Dictionary to store and track unit icon prefab instances by their unit ID.
+        /// </summary>
+        private readonly Dictionary<string, Prefab_CombatUnitIcon> unitIconPrefabs = new();
 
         /// <summary>
         /// Controls whether map labels are rendered on the map.
@@ -292,7 +305,7 @@ namespace HammerAndSickle.Core.Map
         /// <summary>
         /// Gets the world position of a hex tile based on its grid coordinates.
         /// </summary>
-        public Vector3 GetRenderPosition(Vector2Int gridPos)
+        public UnityEngine.Vector3 GetRenderPosition(Vector2Int gridPos)
         {
             if (!IsInitialized)
                 throw new InvalidOperationException($"{CLASS_NAME}.GetRenderPosition: Service not initialized.");
@@ -324,12 +337,14 @@ namespace HammerAndSickle.Core.Map
                 bridgePrefabs.Clear();
                 mapIconPrefabs.Clear();
                 textLabelPrefabs.Clear();
+                unitIconPrefabs.Clear();
 
                 // Clear existing visual elements
                 ClearContainer(mapIconLayer.transform);
                 ClearContainer(bridgeIconLayer.transform);
                 ClearContainer(cityIconLayer.transform);
                 ClearContainer(textLabelLayer.transform);
+                ClearContainer(mainUnitLayer.transform);
 
                 // Draw the hex outlines
                 DrawHexOutlines();
@@ -342,6 +357,7 @@ namespace HammerAndSickle.Core.Map
                 int mapIconCount = 0;
                 int bridgeCount = 0;
                 int labelCount = 0;
+                int unitCount = 0;
 
                 // Iterate through all hexes and render their features
                 foreach (var hex in GameDataManager.CurrentHexMap)
@@ -374,7 +390,11 @@ namespace HammerAndSickle.Core.Map
                     }
                 }
 
-                if (_debug) Debug.Log($"[{CLASS_NAME}.RefreshMap] Map refresh complete. Processed {hexCount} hexes. Created {cityCount} cities, {mapIconCount} map icons, {bridgeCount} bridges, {labelCount} labels.");
+                // Draw all combat units on the map
+                // TODO: Get units from GameDataManager - need to verify how units are stored/accessed
+                DrawAllUnits(ref unitCount);
+
+                if (_debug) Debug.Log($"[{CLASS_NAME}.RefreshMap] Map refresh complete. Processed {hexCount} hexes. Created {cityCount} cities, {mapIconCount} map icons, {bridgeCount} bridges, {labelCount} labels, {unitCount} units.");
             }
             catch (Exception e)
             {
@@ -651,7 +671,7 @@ namespace HammerAndSickle.Core.Map
             Prefab_CityIcon cityPrefab = cityObj.GetComponent<Prefab_CityIcon>();
 
             // Position the prefab
-            Vector3 position = hexOutlineTilemap.GetCellCenterWorld(new Vector3Int(hex.Position.IntX, hex.Position.IntY, 0));
+            UnityEngine.Vector3 position = hexOutlineTilemap.GetCellCenterWorld(new Vector3Int(hex.Position.IntX, hex.Position.IntY, 0));
             cityObj.transform.position = position;
 
             // Update the prefab's visual elements
@@ -748,7 +768,7 @@ namespace HammerAndSickle.Core.Map
             bridgeIconPrefab.Renderer.sprite = GetBridgeSprite(bridgeType, direction);
 
             // Position the prefab
-            Vector3 position = hexOutlineTilemap.GetCellCenterWorld(new Vector3Int(hex.Position.IntX, hex.Position.IntY, 0));
+            UnityEngine.Vector3 position = hexOutlineTilemap.GetCellCenterWorld(new Vector3Int(hex.Position.IntX, hex.Position.IntY, 0));
             bridgeIconObject.transform.position = position;
 
             // Store the prefab reference
@@ -884,7 +904,7 @@ namespace HammerAndSickle.Core.Map
             textPrefab.SetOutlineThickness(hex.LabelOutlineThickness);
 
             // Position the prefab at the hex center
-            Vector3 position = GetRenderPosition(new Vector2Int(hex.Position.IntX, hex.Position.IntY));
+            UnityEngine.Vector3 position = GetRenderPosition(new Vector2Int(hex.Position.IntX, hex.Position.IntY));
             textObject.transform.position = position;
 
             // Store the prefab reference
@@ -918,5 +938,314 @@ namespace HammerAndSickle.Core.Map
         }
 
         #endregion // Private Methods - Utilities
+
+        #region Private Methods - Unit Icons
+
+  //✅ What's Done:
+  //- Unit icon prefab dictionary and tracking
+  //- Outline color and thickness inspector fields
+  //- Unit rendering integrated into RefreshMap()
+  //- Sprite name resolution based on:
+  //- DeployedProfileID → base sprite name
+  //- Facing → directional suffix(_E/_W)
+  //- DeploymentPosition → deployment suffix(_P or none)
+  //- Embarked → special handling(AB/MAB/SPECF → AN8, others → naval)
+  //- Animated sprite detection(Frame checking)
+  //- Soviet unit mappings(tanks, IFVs, artillery, aircraft, helicopters)
+
+  //📋 TODOs Marked in Code:
+  //1. How to access units from GameDataManager
+  //2. Complete USA/German/UK/French unit mappings
+  //3. Infantry sprite selection based on Nationality
+  //4. Generic unit handling
+  //5. Naval transport sprite(doesn't exist yet in SpriteManager)
+  //6. Flag sprite mapping
+  //7. NATO icon mapping
+  //8. Hit points ratio text
+  //9. Outline rendering implementation (dual-render approach)
+  //10. Animated sprite rendering method
+
+        /// <summary>
+        /// Draws all combat units on the map.
+        /// </summary>
+        private void DrawAllUnits(ref int unitCount)
+        {
+            try
+            {
+                // TODO: Determine how units are stored in GameDataManager
+                // Options: GameDataManager.AllUnits? GameDataManager.CurrentUnits?
+                // For now, using placeholder logic
+
+                if (_debug) Debug.Log($"[{CLASS_NAME}.DrawAllUnits] Starting unit rendering...");
+
+                // TODO: Replace with actual unit collection access
+                // Example: foreach (var unit in GameDataManager.Instance.GetAllUnits())
+
+                // Placeholder - remove when actual implementation is done
+                if (_debug) Debug.LogWarning($"[{CLASS_NAME}.DrawAllUnits] Unit rendering not yet implemented - need GameDataManager unit access");
+            }
+            catch (Exception e)
+            {
+                AppService.HandleException(CLASS_NAME, "DrawAllUnits", e);
+            }
+        }
+
+        /// <summary>
+        /// Creates a unit icon prefab at the specified position.
+        /// </summary>
+        private void CreateUnitIcon(CombatUnit unit)
+        {
+            try
+            {
+                if (unit == null)
+                {
+                    if (_debug) Debug.LogWarning($"[{CLASS_NAME}.CreateUnitIcon] Unit is null, skipping.");
+                    return;
+                }
+
+                if (_debug) Debug.Log($"[{CLASS_NAME}.CreateUnitIcon] Creating icon for unit '{unit.UnitName}' at ({unit.MapPos.IntX}, {unit.MapPos.IntY})");
+
+                // Create prefab instance
+                GameObject unitIconObject = null;
+                if (unit.Side == Side.Player)
+                {
+                    unitIconObject = Instantiate(SpriteManager.Instance.RedUnitIconPrefab, mainUnitLayer.transform);
+                }
+                else
+                {
+                    unitIconObject = Instantiate(SpriteManager.Instance.BlueUnitIconPrefab, mainUnitLayer.transform);
+                }
+                unitIconObject.name = $"Unit_{unit.UnitID}_{unit.UnitName}";
+
+                // Get prefab component
+                Prefab_CombatUnitIcon unitIcon = unitIconObject.GetComponent<Prefab_CombatUnitIcon>();
+                if (unitIcon == null)
+                {
+                    Debug.LogError($"{CLASS_NAME}.CreateUnitIcon: Prefab_CombatUnitIcon component not found on prefab!");
+                    Destroy(unitIconObject);
+                    return;
+                }
+
+                // Get sprite name for this unit
+                string spriteName = GetSpriteNameForUnit(unit);
+
+                // Check if this is an animated sprite
+                if (spriteName.Contains("Frame", StringComparison.OrdinalIgnoreCase))
+                {
+                    // TODO: Route to animated rendering method
+                    // For now, just use the static sprite (Frame0 is already in spriteName)
+                    if (_debug) Debug.Log($"[{CLASS_NAME}.CreateUnitIcon] Unit uses animated sprite: {spriteName}");
+                }
+
+                // Set the unit icon sprite
+                unitIcon.SetUnitIcon(spriteName);
+
+                // TODO: Set NATO icon based on Classification/Role
+                // unitIcon.SetNatoIcon(GetNatoIcon(unit.Classification));
+
+                // TODO: Set hit points ratio text
+                // unitIcon.HitPointsRatio = $"{unit.HitPoints.Current:F0}/{unit.HitPoints.Max:F0}";
+
+                // Position the prefab
+                UnityEngine.Vector3 position = GetRenderPosition(new Vector2Int(unit.MapPos.IntX, unit.MapPos.IntY));
+                unitIconObject.transform.position = position;
+
+                // TODO: Apply outline rendering (dual-render approach)
+                // This will be handled by a separate outline component/method
+                // ApplyOutlineToUnit(unitIcon, outlineColor, outlineThickness);
+
+                // Store reference
+                unitIconPrefabs[unit.UnitID] = unitIcon;
+
+                if (_debug) Debug.Log($"[{CLASS_NAME}.CreateUnitIcon] Successfully created icon for unit '{unit.UnitName}'");
+            }
+            catch (Exception e)
+            {
+                AppService.HandleException(CLASS_NAME, "CreateUnitIcon", e);
+            }
+        }
+
+        /// <summary>
+        /// Gets the appropriate sprite name for a combat unit based on its properties.
+        /// </summary>
+        private string GetSpriteNameForUnit(CombatUnit unit)
+        {
+            try
+            {
+                // Handle embarked units separately
+                if (unit.DeploymentPosition == DeploymentPosition.Embarked)
+                {
+                    return GetEmbarkedSpriteName(unit);
+                }
+
+                // Get base sprite name from DeployedProfileID
+                string baseSpriteName = GetBaseSpriteFromProfile(unit.DeployedProfileID);
+
+                // Add directional suffix based on unit facing
+                string directionalSuffix = unit.Facing == HexDirection.E ? "_E" : "_W";
+
+                // Determine if we need _P (packed) variant based on deployment position
+                string deploymentSuffix = GetDeploymentSuffix(unit.DeploymentPosition);
+
+                // Combine: base + directional + deployment
+                string finalSpriteName = baseSpriteName + directionalSuffix + deploymentSuffix;
+
+                if (_debug) Debug.Log($"[{CLASS_NAME}.GetSpriteNameForUnit] Unit '{unit.UnitName}': Profile={unit.DeployedProfileID}, Sprite={finalSpriteName}");
+
+                return finalSpriteName;
+            }
+            catch (Exception e)
+            {
+                AppService.HandleException(CLASS_NAME, "GetSpriteNameForUnit", e);
+                // Return fallback sprite
+                return "SV_Regulars"; // TODO: Define a better fallback
+            }
+        }
+
+        /// <summary>
+        /// Gets the embarked sprite name based on unit classification.
+        /// </summary>
+        private string GetEmbarkedSpriteName(CombatUnit unit)
+        {
+            // Airborne, Mechanized Airborne, and Special Forces use air transport
+            if (unit.Classification == UnitClassification.AB ||
+                unit.Classification == UnitClassification.MAB ||
+                unit.Classification == UnitClassification.SPECF)
+            {
+                return "SV_AN8_Frame0"; // Air transport (animated helicopter, use Frame0 for static)
+            }
+            else
+            {
+                // TODO: Create naval transport sprite in SpriteManager
+                // For now, return placeholder
+                return "GEN_M35_E"; // Temporary - should be naval transport sprite
+            }
+        }
+
+        /// <summary>
+        /// Gets deployment suffix (_P for deployed positions, empty for mobile).
+        /// </summary>
+        private string GetDeploymentSuffix(DeploymentPosition position)
+        {
+            return position switch
+            {
+                DeploymentPosition.Mobile => "",      // Mobile = no _P suffix
+                DeploymentPosition.Embarked => "",    // Handled separately
+                _ => "_P"                              // Deployed/HastyDefense/Entrenched/Fortified = _P suffix
+            };
+        }
+
+        /// <summary>
+        /// Maps WeaponSystems enum to base sprite name (without directional/deployment suffixes).
+        /// </summary>
+        private string GetBaseSpriteFromProfile(WeaponSystems profile)
+        {
+            // TODO: Complete mapping for all WeaponSystems values
+            // TODO: Handle missing sprites (many UK, French units don't have sprites)
+            // TODO: Handle infantry profiles - need to use Nationality to pick correct sprite
+            // TODO: Handle generic profiles properly
+
+            return profile switch
+            {
+                // Soviet Tanks
+                WeaponSystems.TANK_T55A => "SV_T55A",
+                WeaponSystems.TANK_T64A => "SV_T64A",
+                WeaponSystems.TANK_T64B => "SV_T64B",
+                WeaponSystems.TANK_T72A => "SV_T72A",
+                WeaponSystems.TANK_T72B => "SV_T72B",
+                WeaponSystems.TANK_T80B => "SV_T80B",
+                WeaponSystems.TANK_T80U => "SV_T80U",
+                WeaponSystems.TANK_T80BV => "SV_T80BV",
+
+                // Soviet APCs
+                WeaponSystems.APC_MTLB => "SV_MTLB",
+                WeaponSystems.APC_BTR70 => "SV_BTR70",
+                WeaponSystems.APC_BTR80 => "SV_BTR80",
+
+                // Soviet IFVs
+                WeaponSystems.IFV_BMP1 => "SV_BMP1",
+                WeaponSystems.IFV_BMP2 => "SV_BMP2",
+                WeaponSystems.IFV_BMP3 => "SV_BMP3",
+                // WeaponSystems.IFV_BMD1 => "SV_BMD2", // TODO: No BMD1 sprite, using BMD2 as fallback
+                WeaponSystems.IFV_BMD2 => "SV_BMD2",
+                WeaponSystems.IFV_BMD3 => "SV_BMD3",
+
+                // Soviet Recon
+                WeaponSystems.RCN_BRDM2 => "SV_BRDM2",
+                WeaponSystems.RCN_BRDM2AT => "SV_BRDM2AT",
+
+                // Soviet Self-Propelled Artillery (these have _P variants)
+                WeaponSystems.SPA_2S1 => "SV_2S1",
+                WeaponSystems.SPA_2S3 => "SV_2S3",
+                WeaponSystems.SPA_2S5 => "SV_2S5",
+                WeaponSystems.SPA_2S19 => "SV_2S19",
+
+                // Soviet Rocket Artillery (these have _P variants)
+                WeaponSystems.ROC_BM21 => "SV_BM21",
+                WeaponSystems.ROC_BM27 => "SV_BM27",
+                WeaponSystems.ROC_BM30 => "SV_BM30",
+
+                // Soviet SSM (has _P variant)
+                WeaponSystems.SSM_SCUD => "SV_ScudB",
+
+                // Soviet SPAAA (some have _P variants)
+                WeaponSystems.SPAAA_ZSU57 => "SV_ZSU57",
+                WeaponSystems.SPAAA_ZSU23 => "SV_ZSU23",
+                WeaponSystems.SPAAA_2K22 => "SV_2K22",
+
+                // Soviet SPSAM (has _P variant)
+                WeaponSystems.SPSAM_9K31 => "SV_9K31",
+
+                // Soviet SAM (some have _P variants)
+                WeaponSystems.SAM_S75 => "SV_S75",
+                WeaponSystems.SAM_S125 => "SV_S125",
+                WeaponSystems.SAM_S300 => "SV_S300",
+
+                // Soviet Helicopters (animated - use Frame0)
+                WeaponSystems.TRANHEL_MI8T => "SV_MI8T_Frame0",
+                WeaponSystems.HEL_MI8AT => "SV_MI8_Frame0",
+                WeaponSystems.HEL_MI24D => "SV_MI24D_Frame0",
+                WeaponSystems.HEL_MI24V => "SV_MI24V_Frame0",
+                WeaponSystems.HEL_MI28 => "SV_MI28_Frame0",
+
+                // Soviet Transport Aircraft (animated)
+                // WeaponSystems.TRANAIR_AN12 => "SV_AN8_Frame0", // TODO: No AN12 sprite, using AN8
+
+                // Soviet AWACS
+                // WeaponSystems.AWACS_A50 => "SV_AN50", // TODO: Verify if AN50 is same as A50
+
+                // Soviet Fighters
+                WeaponSystems.FGT_MIG21 => "SV_MIG21",
+                WeaponSystems.FGT_MIG23 => "SV_MIG23",
+                WeaponSystems.FGT_MIG25 => "SV_MIG25",
+                WeaponSystems.FGT_MIG29 => "SV_MIG29",
+                WeaponSystems.FGT_MIG31 => "SV_MIG31",
+                WeaponSystems.FGT_SU27 => "SV_SU27",
+                WeaponSystems.FGT_SU47 => "SV_SU47",
+                WeaponSystems.FGT_MIG27 => "SV_MIG27",
+
+                // Soviet Attack Aircraft
+                WeaponSystems.ATT_SU25 => "SV_SU25",
+                WeaponSystems.ATT_SU25B => "SV_SU25B",
+
+                // Soviet Bombers
+                WeaponSystems.BMB_SU24 => "SV_SU24",
+                WeaponSystems.BMB_TU16 => "SV_TU16",
+                WeaponSystems.BMB_TU22 => "SV_TU22",
+                WeaponSystems.BMB_TU22M3 => "SV_TU22M3",
+
+                // TODO: Add USA units
+                // TODO: Add German units
+                // TODO: Add UK units
+                // TODO: Add French units
+                // TODO: Add Generic units
+                // TODO: Add Infantry profiles (need to map based on Nationality)
+
+                // Fallback
+                _ => "SV_Regulars" // Default fallback sprite
+            };
+        }
+
+        #endregion // Private Methods - Unit Icons
     }
 }
