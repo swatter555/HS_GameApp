@@ -817,7 +817,7 @@ namespace HammerAndSickle.Models
                 { WeaponSystems.ATGM_GENERIC,       14 },  // mixed AT‑4/AT‑5 sections
                 { WeaponSystems.MANPAD_GENERIC,     45 },  // SA‑14/16 squads
                 { WeaponSystems.AAA_GENERIC,         2 },  // ZSU‑23‑4 Shilka (reduced strength)
-                { WeaponSystems.TRANHEL_MI8T,     166 },  // 2× transport helicopter squadrons
+                { WeaponSystems.HEL_MI8T,     166 },  // 2× transport helicopter squadrons
             };
             _profiles[IntelProfileTypes.SV_AAR_MTLB] = aar_MTLB;
 
@@ -833,7 +833,7 @@ namespace HammerAndSickle.Models
                 { WeaponSystems.ATGM_GENERIC,       14 },  // mixed AT‑4/AT‑5 sections
                 { WeaponSystems.MANPAD_GENERIC,     45 },  // SA‑14/16 squads
                 { WeaponSystems.AAA_GENERIC,         2 },  // ZSU‑23‑4 Shilka (reduced strength)
-                { WeaponSystems.TRANHEL_MI8T,     166 },  // 2× transport helicopter squadrons
+                { WeaponSystems.HEL_MI8T,     166 },  // 2× transport helicopter squadrons
             };
             _profiles[IntelProfileTypes.SV_AAR_BMD1] = aar_BMD1;
 
@@ -849,7 +849,7 @@ namespace HammerAndSickle.Models
                 { WeaponSystems.ATGM_GENERIC,       14 },  // mixed AT‑4/AT‑5 sections
                 { WeaponSystems.MANPAD_GENERIC,     45 },  // SA‑14/16 squads
                 { WeaponSystems.AAA_GENERIC,         2 },  // ZSU‑23‑4 Shilka (reduced strength)
-                { WeaponSystems.TRANHEL_MI8T,      166 },  // 2× transport helicopter squadrons
+                { WeaponSystems.HEL_MI8T,      166 },  // 2× transport helicopter squadrons
             };
             _profiles[IntelProfileTypes.SV_AAR_BMD2] = aar_BMD2;
 
@@ -865,7 +865,7 @@ namespace HammerAndSickle.Models
                 { WeaponSystems.ATGM_GENERIC,       14 },  // mixed AT‑4/AT‑5 sections
                 { WeaponSystems.MANPAD_GENERIC,     45 },  // SA‑14/16 squads
                 { WeaponSystems.AAA_GENERIC,         2 },  // ZSU‑23‑4 Shilka (reduced strength)
-                { WeaponSystems.TRANHEL_MI8T,     166 },  // 2× transport helicopter squadrons
+                { WeaponSystems.HEL_MI8T,     166 },  // 2× transport helicopter squadrons
             };
             _profiles[IntelProfileTypes.SV_AAR_BMD3] = aar_BMD3;
 

@@ -992,7 +992,7 @@ namespace HammerAndSickle.Models
                 intelProfileType: IntelProfileTypes.SV_AAR_MTLB,
                 deployedProfileID: WeaponSystems.APC_MTLB,
                 isMountable: true,
-                mobileProfileID: WeaponSystems.TRANHEL_MI8T,
+                mobileProfileID: WeaponSystems.HEL_MI8T,
                 isEmbarkable: false,
                 embarkProfileID: WeaponSystems.DEFAULT,
                 category: DepotCategory.Secondary,
@@ -1021,7 +1021,7 @@ namespace HammerAndSickle.Models
                 intelProfileType: IntelProfileTypes.SV_AAR_BMD1,
                 deployedProfileID: WeaponSystems.IFV_BMD1,
                 isMountable: true,
-                mobileProfileID: WeaponSystems.TRANHEL_MI8T,
+                mobileProfileID: WeaponSystems.HEL_MI8T,
                 isEmbarkable: false,
                 embarkProfileID: WeaponSystems.DEFAULT,
                 category: DepotCategory.Secondary,
@@ -1050,7 +1050,7 @@ namespace HammerAndSickle.Models
                 intelProfileType: IntelProfileTypes.SV_AAR_BMD2,
                 deployedProfileID: WeaponSystems.IFV_BMD2,
                 isMountable: true,
-                mobileProfileID: WeaponSystems.TRANHEL_MI8T,
+                mobileProfileID: WeaponSystems.HEL_MI8T,
                 isEmbarkable: false,
                 embarkProfileID: WeaponSystems.DEFAULT,
                 category: DepotCategory.Secondary,
@@ -1079,7 +1079,7 @@ namespace HammerAndSickle.Models
                 intelProfileType: IntelProfileTypes.SV_AAR_BMD3,
                 deployedProfileID: WeaponSystems.IFV_BMD3,
                 isMountable: true,
-                mobileProfileID: WeaponSystems.TRANHEL_MI8T,
+                mobileProfileID: WeaponSystems.HEL_MI8T,
                 isEmbarkable: false,
                 embarkProfileID: WeaponSystems.DEFAULT,
                 category: DepotCategory.Secondary,
@@ -1120,7 +1120,7 @@ namespace HammerAndSickle.Models
                 isMountable: true,
                 mobileProfileID: WeaponSystems.IFV_BMD1,
                 isEmbarkable: true,
-                embarkProfileID: WeaponSystems.TRANAIR_AN12,
+                embarkProfileID: WeaponSystems.Transport_AIR,
                 category: DepotCategory.Secondary,
                 size: DepotSize.Small
             );
@@ -1149,7 +1149,7 @@ namespace HammerAndSickle.Models
                 isMountable: true,
                 mobileProfileID: WeaponSystems.IFV_BMD2,
                 isEmbarkable: true,
-                embarkProfileID: WeaponSystems.TRANAIR_AN12,
+                embarkProfileID: WeaponSystems.Transport_AIR,
                 category: DepotCategory.Secondary,
                 size: DepotSize.Small
             );
@@ -1178,7 +1178,7 @@ namespace HammerAndSickle.Models
                 isMountable: true,
                 mobileProfileID: WeaponSystems.IFV_BMD3,
                 isEmbarkable: true,
-                embarkProfileID: WeaponSystems.TRANAIR_AN12,
+                embarkProfileID: WeaponSystems.Transport_AIR,
                 category: DepotCategory.Secondary,
                 size: DepotSize.Small
             );
@@ -1207,7 +1207,7 @@ namespace HammerAndSickle.Models
                 isMountable: true,
                 mobileProfileID: WeaponSystems.APC_MTLB,
                 isEmbarkable: true,
-                embarkProfileID: WeaponSystems.TRANAIR_AN12,
+                embarkProfileID: WeaponSystems.Transport_AIR,
                 category: DepotCategory.Secondary,
                 size: DepotSize.Small
             );
@@ -1236,7 +1236,7 @@ namespace HammerAndSickle.Models
                 isMountable: false,
                 mobileProfileID: WeaponSystems.DEFAULT,
                 isEmbarkable: true,
-                embarkProfileID: WeaponSystems.TRANAIR_AN12,
+                embarkProfileID: WeaponSystems.Transport_AIR,
                 category: DepotCategory.Secondary,
                 size: DepotSize.Small
             );
@@ -1275,7 +1275,7 @@ namespace HammerAndSickle.Models
                 isMountable: true,
                 mobileProfileID: WeaponSystems.APC_BTR70,
                 isEmbarkable: true,
-                embarkProfileID: WeaponSystems.TRANNAV_NAVAL,
+                embarkProfileID: WeaponSystems.Transport_NAVAL,
                 category: DepotCategory.Secondary,
                 size: DepotSize.Small
             );
@@ -1304,7 +1304,7 @@ namespace HammerAndSickle.Models
                 isMountable: true,
                 mobileProfileID: WeaponSystems.APC_BTR80,
                 isEmbarkable: true,
-                embarkProfileID: WeaponSystems.TRANNAV_NAVAL,
+                embarkProfileID: WeaponSystems.Transport_NAVAL,
                 category: DepotCategory.Secondary,
                 size: DepotSize.Small
             );
@@ -1370,7 +1370,7 @@ namespace HammerAndSickle.Models
                 intelProfileType: IntelProfileTypes.SV_GRU,
                 deployedProfileID: WeaponSystems.INF_SPEC,
                 isMountable: true,
-                mobileProfileID: WeaponSystems.TRANHEL_MI8T,
+                mobileProfileID: WeaponSystems.HEL_MI8T,
                 isEmbarkable: false,
                 embarkProfileID: WeaponSystems.DEFAULT,
                 category: DepotCategory.Secondary,

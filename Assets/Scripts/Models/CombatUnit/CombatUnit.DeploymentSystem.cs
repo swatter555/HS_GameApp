@@ -199,7 +199,7 @@ namespace HammerAndSickle.Models
                 if (Classification == UnitClassification.SPECF)
                 {
                     // Special forces with aircraft transport must be on an airbase.
-                    if (embarkedProfile.WeaponSystemID == WeaponSystems.TRANAIR_AN12 && !onAirbase)
+                    if (embarkedProfile.WeaponSystemID == WeaponSystems.Transport_AIR && !onAirbase)
                     {
                         errorMsg = $"{UnitName} must be on an airbase to deploy to Embarked position with AN-12 transport.";
                         return false;
@@ -221,7 +221,7 @@ namespace HammerAndSickle.Models
                 // Airmobile and mechanized airmobile units must have a valid helicopter transport profile to deploy to Embarked position.
                 if (Classification == UnitClassification.AM || Classification == UnitClassification.MAM)
                 {
-                    if (embarkedProfile.WeaponSystemID != WeaponSystems.TRANHEL_MI8T)
+                    if (embarkedProfile.WeaponSystemID != WeaponSystems.HEL_MI8T)
                     {
                         errorMsg = $"{UnitName} must have a valid helicopter transport profile to deploy to Embarked position.";
                         return false;

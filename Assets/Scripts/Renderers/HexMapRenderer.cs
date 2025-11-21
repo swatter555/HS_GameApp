@@ -943,17 +943,20 @@ namespace HammerAndSickle.Core.Map
 
   //✅ What's Done:
   //- Unit icon prefab dictionary and tracking
-  //- Outline color and thickness inspector fields
   //- Unit rendering integrated into RefreshMap()
   //- Sprite name resolution based on:
-  //- DeployedProfileID → base sprite name
-  //- Facing → directional suffix(_E/_W)
-  //- DeploymentPosition → deployment suffix(_P or none)
-  //- Embarked → special handling(AB/MAB/SPECF → AN8, others → naval)
+  //  - DeployedProfileID → base sprite name
+  //  - Facing → directional suffix(_E/_W)
+  //  - DeploymentPosition → deployment suffix(_P or none)
+  //  - Embarked → special handling(AB/MAB/SPECF → AN8, others → naval)
   //- Animated sprite detection(Frame checking)
   //- Soviet unit mappings(tanks, IFVs, artillery, aircraft, helicopters)
+  //- Outline rendering implementation (dual-render approach)
+  //  - Nationality-based colors: Soviet=Red, Middle East=Green, NATO/Others=Blue
+  //  - Outline sprite auto-syncs with main sprite in SetUnitIcon()
+  //  - Scale and sorting order configured in ApplyOutline()
 
-  //📋 TODOs Marked in Code:
+  //📋 TODOs Remaining:
   //1. How to access units from GameDataManager
   //2. Complete USA/German/UK/French unit mappings
   //3. Infantry sprite selection based on Nationality
@@ -962,8 +965,7 @@ namespace HammerAndSickle.Core.Map
   //6. Flag sprite mapping
   //7. NATO icon mapping
   //8. Hit points ratio text
-  //9. Outline rendering implementation (dual-render approach)
-  //10. Animated sprite rendering method
+  //9. Animated sprite rendering method
 
         /// <summary>
         /// Draws all combat units on the map.
@@ -1006,15 +1008,7 @@ namespace HammerAndSickle.Core.Map
                 if (_debug) Debug.Log($"[{CLASS_NAME}.CreateUnitIcon] Creating icon for unit '{unit.UnitName}' at ({unit.MapPos.IntX}, {unit.MapPos.IntY})");
 
                 // Create prefab instance
-                GameObject unitIconObject = null;
-                if (unit.Side == Side.Player)
-                {
-                    unitIconObject = Instantiate(SpriteManager.Instance.RedUnitIconPrefab, mainUnitLayer.transform);
-                }
-                else
-                {
-                    unitIconObject = Instantiate(SpriteManager.Instance.BlueUnitIconPrefab, mainUnitLayer.transform);
-                }
+                GameObject unitIconObject = Instantiate(SpriteManager.Instance.UnitIconPrefab, mainUnitLayer.transform);
                 unitIconObject.name = $"Unit_{unit.UnitID}_{unit.UnitName}";
 
                 // Get prefab component
@@ -1032,27 +1026,28 @@ namespace HammerAndSickle.Core.Map
                 // Check if this is an animated sprite
                 if (spriteName.Contains("Frame", StringComparison.OrdinalIgnoreCase))
                 {
-                    // TODO: Route to animated rendering method
-                    // For now, just use the static sprite (Frame0 is already in spriteName)
+                    // TODO: Implement animated sprite rendering (frame cycling)
+                    // For now, using Frame0 as static sprite
                     if (_debug) Debug.Log($"[{CLASS_NAME}.CreateUnitIcon] Unit uses animated sprite: {spriteName}");
                 }
 
-                // Set the unit icon sprite
+                // Set the unit icon sprite (also updates outline sprite automatically)
                 unitIcon.SetUnitIcon(spriteName);
 
-                // TODO: Set NATO icon based on Classification/Role
+                // TODO: Implement NATO icon rendering
+                // Requires: SetNatoIcon() method in Prefab_CombatUnitIcon
                 // unitIcon.SetNatoIcon(GetNatoIcon(unit.Classification));
 
-                // TODO: Set hit points ratio text
+                // TODO: Implement hit points ratio text display
+                // Requires: HitPointsRatio property in Prefab_CombatUnitIcon
                 // unitIcon.HitPointsRatio = $"{unit.HitPoints.Current:F0}/{unit.HitPoints.Max:F0}";
 
                 // Position the prefab
                 UnityEngine.Vector3 position = GetRenderPosition(new Vector2Int(unit.MapPos.IntX, unit.MapPos.IntY));
                 unitIconObject.transform.position = position;
 
-                // TODO: Apply outline rendering (dual-render approach)
-                // This will be handled by a separate outline component/method
-                // ApplyOutlineToUnit(unitIcon, outlineColor, outlineThickness);
+                // Apply outline rendering based on nationality
+                unitIcon.ApplyOutline(unit.Nationality);
 
                 // Store reference
                 unitIconPrefabs[unit.UnitID] = unitIcon;
@@ -1116,9 +1111,9 @@ namespace HammerAndSickle.Core.Map
             }
             else
             {
-                // TODO: Create naval transport sprite in SpriteManager
-                // For now, return placeholder
-                return "GEN_M35_E"; // Temporary - should be naval transport sprite
+                // TODO: Add naval transport sprite to SpriteManager
+                // Need: GEN_NavalTransport sprite constant and atlas entry
+                return "GEN_NavalTransport"; // Falls back to error sprite if not found
             }
         }
 
@@ -1140,10 +1135,14 @@ namespace HammerAndSickle.Core.Map
         /// </summary>
         private string GetBaseSpriteFromProfile(WeaponSystems profile)
         {
-            // TODO: Complete mapping for all WeaponSystems values
-            // TODO: Handle missing sprites (many UK, French units don't have sprites)
-            // TODO: Handle infantry profiles - need to use Nationality to pick correct sprite
-            // TODO: Handle generic profiles properly
+            // TODO: Complete sprite mappings for remaining nations:
+            //   - USA units (tanks, IFVs, aircraft) - partially done
+            //   - UK units (Challenger, Warrior, etc.) - sprites may not exist
+            //   - German units (Leopard, Marder, etc.) - sprites may not exist
+            //   - French units (AMX-30, etc.) - sprites may not exist
+            // TODO: Infantry sprite selection needs nationality context
+            //   - INF_REG, INF_AB, etc. should map to SV_Regulars, US_Regulars, etc.
+            // TODO: Generic unit handling (GEN_* weapons)
 
             return profile switch
             {
@@ -1202,14 +1201,14 @@ namespace HammerAndSickle.Core.Map
                 WeaponSystems.SAM_S300 => "SV_S300",
 
                 // Soviet Helicopters (animated - use Frame0)
-                WeaponSystems.TRANHEL_MI8T => "SV_MI8T_Frame0",
+                WeaponSystems.HEL_MI8T => "SV_MI8T_Frame0",
                 WeaponSystems.HEL_MI8AT => "SV_MI8_Frame0",
                 WeaponSystems.HEL_MI24D => "SV_MI24D_Frame0",
                 WeaponSystems.HEL_MI24V => "SV_MI24V_Frame0",
                 WeaponSystems.HEL_MI28 => "SV_MI28_Frame0",
 
                 // Soviet Transport Aircraft (animated)
-                // WeaponSystems.TRANAIR_AN12 => "SV_AN8_Frame0", // TODO: No AN12 sprite, using AN8
+                // WeaponSystems.Transport_AIR => "SV_AN8_Frame0", // TODO: No AN12 sprite, using AN8
 
                 // Soviet AWACS
                 // WeaponSystems.AWACS_A50 => "SV_AN50", // TODO: Verify if AN50 is same as A50
@@ -1234,14 +1233,9 @@ namespace HammerAndSickle.Core.Map
                 WeaponSystems.BMB_TU22 => "SV_TU22",
                 WeaponSystems.BMB_TU22M3 => "SV_TU22M3",
 
-                // TODO: Add USA units
-                // TODO: Add German units
-                // TODO: Add UK units
-                // TODO: Add French units
-                // TODO: Add Generic units
-                // TODO: Add Infantry profiles (need to map based on Nationality)
+                // Additional nations and infantry mappings - see TODOs at method header
 
-                // Fallback
+                // Fallback for unmapped weapon systems
                 _ => "SV_Regulars" // Default fallback sprite
             };
         }

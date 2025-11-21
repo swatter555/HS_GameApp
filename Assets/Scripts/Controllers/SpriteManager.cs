@@ -483,6 +483,8 @@ namespace HammerAndSickle.Controllers
         public const string FR_Regulars = "FR_Regulars";
 
         // French Vehicles
+        public const string FRA_AMX30_E = "FRA_AMX30_E";
+        public const string FRA_AMX30_W = "FRA_AMX30_W";
         public const string FRA_M113_E = "FRA_M113_E";
         public const string FRA_M113_W = "FRA_M113_W";
 
@@ -637,8 +639,7 @@ namespace HammerAndSickle.Controllers
         [SerializeField] private GameObject _mapIconPrefab;
         [SerializeField] private GameObject _bridgeIconPrefab;
         [SerializeField] private GameObject _mapTextPrefab;
-        [SerializeField] private GameObject _blueUnitIconPrefab;
-        [SerializeField] private GameObject _redUnitIconPrefab;
+        [SerializeField] private GameObject _unitIconPrefab;
 
         #endregion
 
@@ -648,8 +649,7 @@ namespace HammerAndSickle.Controllers
         public GameObject MapIconPrefab => _mapIconPrefab;
         public GameObject BridgeIconPrefab => _bridgeIconPrefab;
         public GameObject MapTextPrefab => _mapTextPrefab;
-        public GameObject BlueUnitIconPrefab => _blueUnitIconPrefab;
-        public GameObject RedUnitIconPrefab => _redUnitIconPrefab;
+        public GameObject UnitIconPrefab => _unitIconPrefab;
 
         #endregion // Properties
 

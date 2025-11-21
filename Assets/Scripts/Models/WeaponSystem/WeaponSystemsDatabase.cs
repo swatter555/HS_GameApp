@@ -2051,7 +2051,7 @@ namespace HammerAndSickle.Models
                 var profile = new WeaponSystemProfile(
                     name: "Mi-8 Hip Transport Helicopter",
                     nationality: Nationality.USSR,
-                    weaponSystemID: WeaponSystems.TRANHEL_MI8T,
+                    weaponSystemID: WeaponSystems.HEL_MI8T,
                     prestigeCost: GameData.PRESTIGE_TIER_1,
                     weaponSystemType: WeaponSystemType.Hard,
                     hardAttack: GameData.BASE_HEL_HARD_ATTACK + MEDIUM_MALUS,
@@ -2082,7 +2082,7 @@ namespace HammerAndSickle.Models
                 profile.SetTurnAvailable(250);
 
                 // Store in master dictionary
-                _weaponSystemProfiles[WeaponSystems.TRANHEL_MI8T] = profile;
+                _weaponSystemProfiles[WeaponSystems.HEL_MI8T] = profile;
             }
             catch (Exception e)
             {
@@ -2301,7 +2301,7 @@ namespace HammerAndSickle.Models
                 var profile = new WeaponSystemProfile(
                     name: "An-12 Antonov Transport Plane",
                     nationality: Nationality.USSR,
-                    weaponSystemID: WeaponSystems.TRANAIR_AN12,
+                    weaponSystemID: WeaponSystems.Transport_AIR,
                     prestigeCost: GameData.PRESTIGE_TIER_2,
                     weaponSystemType: WeaponSystemType.Air,
                     dogfighting: GameData.AC_BOMBER_DOGFIGHT,
@@ -2333,7 +2333,7 @@ namespace HammerAndSickle.Models
                 profile.SetTurnAvailable(250);
 
                 // Store in master dictionary
-                _weaponSystemProfiles[WeaponSystems.TRANAIR_AN12] = profile;
+                _weaponSystemProfiles[WeaponSystems.Transport_AIR] = profile;
             }
             catch (Exception e)
             {
@@ -3172,7 +3172,7 @@ namespace HammerAndSickle.Models
                 var profile = new WeaponSystemProfile(
                     name: "Transport Flotilla",
                     nationality: Nationality.USSR,
-                    weaponSystemID: WeaponSystems.TRANNAV_NAVAL,
+                    weaponSystemID: WeaponSystems.Transport_NAVAL,
                     prestigeCost: GameData.PRESTIGE_TIER_5,
                     weaponSystemType: WeaponSystemType.Hard,
                     groundAirDefense: 12,
@@ -3198,7 +3198,7 @@ namespace HammerAndSickle.Models
                 profile.SetTurnAvailable(250);
 
                 // Store in master dictionary
-                _weaponSystemProfiles[WeaponSystems.TRANNAV_NAVAL] = profile;
+                _weaponSystemProfiles[WeaponSystems.Transport_NAVAL] = profile;
             }
             catch (Exception e)
             {
