@@ -1,5 +1,4 @@
 using HammerAndSickle.Controllers;
-using HammerAndSickle.Core.GameData;
 using HammerAndSickle.Services;
 using System;
 using TMPro;
@@ -18,19 +17,41 @@ namespace HammerAndSickle.Core
 
         [Header("Component References")]
         [SerializeField] private SpriteRenderer unitIconRenderer;
-        [SerializeField] private SpriteRenderer outlineRenderer;
+        [SerializeField] private SpriteRenderer flagRenderer;
+        [SerializeField] private TextMeshPro hitPointsText;
 
-        [Header("Unit Outline Settings")]
-        [SerializeField][Range(1f, 100f)] private float outlineThickness = 10f;
+        [Header("Font Settings")]
+        [SerializeField] private TMP_FontAsset fontAsset;
+        [SerializeField] private Color ratioTextColor = Color.black;
 
         #endregion // Inspector Fields
 
         #region Properties
 
         /// <summary>
-        /// Gets the unit icon sprite renderer (the one that will receive outline treatment).
+        /// Gets the unit icon sprite renderer.
         /// </summary>
         public SpriteRenderer UnitIconRenderer => unitIconRenderer;
+
+        /// <summary>
+        /// Gets the flag sprite renderer.
+        /// </summary>
+        public SpriteRenderer FlagRenderer => flagRenderer;
+
+        /// <summary>
+        /// Gets or sets the hit points display text.
+        /// </summary>
+        public string HitPointsRatio
+        {
+            get => hitPointsText != null ? hitPointsText.text : string.Empty;
+            set
+            {
+                if (hitPointsText != null)
+                {
+                    hitPointsText.text = value;
+                }
+            }
+        }
 
         #endregion // Properties
 
@@ -46,7 +67,7 @@ namespace HammerAndSickle.Core
         #region Public Methods
 
         /// <summary>
-        /// Sets the unit icon sprite and updates the outline to match.
+        /// Sets the unit icon sprite.
         /// </summary>
         public void SetUnitIcon(string spriteName)
         {
@@ -58,14 +79,7 @@ namespace HammerAndSickle.Core
                     return;
                 }
 
-                // Set the main sprite
                 unitIconRenderer.sprite = SpriteManager.GetSprite(spriteName);
-
-                // Update outline sprite to match (if outline renderer exists)
-                if (outlineRenderer != null)
-                {
-                    outlineRenderer.sprite = unitIconRenderer.sprite;
-                }
             }
             catch (Exception e)
             {
@@ -74,35 +88,45 @@ namespace HammerAndSickle.Core
         }
 
         /// <summary>
-        /// Applies outline rendering configuration based on unit nationality.
-        /// Sets outline color, scale, and sorting order. The outline sprite is automatically
-        /// matched to the unit sprite via SetUnitIcon().
+        /// Sets the unit flag sprite.
         /// </summary>
-        public void ApplyOutline(Nationality nationality)
+        public void SetFlag(string spriteName)
         {
             try
             {
-                if (outlineRenderer == null || unitIconRenderer == null)
+                if (flagRenderer == null)
                 {
-                    AppService.CaptureUiMessage($"{CLASS_NAME}.ApplyOutline: Renderer references are null.");
                     return;
                 }
 
-                // Get color based on nationality
-                Color outlineColor = GetOutlineColorForNationality(nationality);
-                outlineRenderer.color = outlineColor;
+                if (string.IsNullOrEmpty(spriteName))
+                {
+                    AppService.CaptureUiMessage($"{CLASS_NAME}.SetFlag: Sprite name is null or empty.");
+                    return;
+                }
 
-                // Scale the outline to be larger than the main sprite
-                float scaleFactor = 1f + (outlineThickness / 100f);
-                outlineRenderer.transform.localScale = new Vector3(scaleFactor, scaleFactor, 1f);
-
-                // Ensure outline renders behind the main sprite
-                outlineRenderer.sortingOrder = unitIconRenderer.sortingOrder - 1;
+                flagRenderer.sprite = SpriteManager.GetSprite(spriteName);
             }
             catch (Exception e)
             {
-                AppService.HandleException(CLASS_NAME, nameof(ApplyOutline), e);
+                AppService.HandleException(CLASS_NAME, nameof(SetFlag), e);
             }
+        }
+
+        /// <summary>
+        /// Initializes the TextMeshPro component with the assigned font and color.
+        /// Call this after instantiation if settings need to be applied dynamically.
+        /// </summary>
+        public void InitializeHitPointsText()
+        {
+            if (hitPointsText == null) return;
+
+            if (fontAsset != null)
+            {
+                hitPointsText.font = fontAsset;
+            }
+
+            hitPointsText.color = ratioTextColor;
         }
 
         #endregion // Public Methods
@@ -117,25 +141,15 @@ namespace HammerAndSickle.Core
             if (unitIconRenderer == null)
                 throw new NullReferenceException($"{CLASS_NAME}.ValidateReferences: unitIconRenderer is null");
 
-            if (outlineRenderer == null)
-                throw new NullReferenceException($"{CLASS_NAME}.ValidateReferences: outlineRenderer is null");
-        }
+            // Optional components - log warnings but don't throw
+            if (flagRenderer == null)
+                Debug.LogWarning($"{CLASS_NAME}.ValidateReferences: flagRenderer is not assigned");
 
-        /// <summary>
-        /// Gets the outline color based on unit nationality.
-        /// Soviet units = Red, Middle Eastern nations = Green, Others = Blue.
-        /// </summary>
-        private static Color GetOutlineColorForNationality(Nationality nationality)
-        {
-            return nationality switch
-            {
-                Nationality.USSR => Color.red,
-                Nationality.MJ => Color.green,
-                Nationality.IR => Color.green,
-                Nationality.IQ => Color.green,
-                Nationality.SAUD => Color.green,
-                _ => Color.blue // USA, FRG, UK, FRA, GENERIC
-            };
+            if (hitPointsText == null)
+                Debug.LogWarning($"{CLASS_NAME}.ValidateReferences: hitPointsText is not assigned");
+
+            if (fontAsset == null)
+                Debug.LogWarning($"{CLASS_NAME}.ValidateReferences: fontAsset is not assigned");
         }
 
         #endregion // Private Methods

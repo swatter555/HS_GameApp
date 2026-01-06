@@ -86,6 +86,7 @@ namespace HammerAndSickle.Core.GameData
         IR,
         IQ,
         SAUD,
+        China,
         GENERIC
     }
 
@@ -628,7 +629,7 @@ namespace HammerAndSickle.Core.GameData
         IFV_BMP1,
         IFV_BMP2,
         IFV_BMP3,
-        IFV_BMD1,
+        IFV_BMD1, // Use BMD2 sprite
         IFV_BMD2,
         IFV_BMD3,
         RCN_BRDM2,
@@ -675,7 +676,7 @@ namespace HammerAndSickle.Core.GameData
         // USA
         TANK_M1,
         TANK_M60A3,
-        TANK_M551,
+        TANK_M551_IPO,
         IFV_M2,
         IFV_M3,
         APC_M113,
@@ -685,7 +686,7 @@ namespace HammerAndSickle.Core.GameData
         SPAAA_M163,
         SPSAM_CHAP,
         SAM_HAWK,
-        HEL_OH58,
+        HEL_OH58_IPO,
         HEL_AH64,
         HEL_UH60,        // This is a transport helicopter for air mobile troops, for mobile profile.
         AWACS_E3,
@@ -701,7 +702,7 @@ namespace HammerAndSickle.Core.GameData
         TANK_LEOPARD1,
         TANK_LEOPARD2,
         IFV_MARDER,
-        RCN_LUCHS,
+        RCN_LUCHS_IPO,
         SPAAA_GEPARD,
         HEL_BO105,
         FGT_TORNADO_IDS,
@@ -709,18 +710,18 @@ namespace HammerAndSickle.Core.GameData
         // UK
         TANK_CHALLENGER1,
         IFV_WARRIOR,
-        APC_FV432,
-        RCN_SCIMITAR,
-        SAM_RAPIER,
-        HEL_LYNX,
+        APC_FV432_IPO,
+        RCN_SCIMITAR_IPO,
+        SAM_RAPIER, // Use US_Hawk sprite
+        HEL_LYNX_IPO,
         FGT_TORNADO_GR1,
 
         // France
         TANK_AMX30,
-        IFV_AMX10P,
-        APC_VAB,
-        RCN_ERC90,
-        SPA_AUF1,
+        IFV_AMX10P_IPO,
+        APC_VAB, // Use M113 Sprite
+        RCN_ERC90_IPO,
+        SPA_AUF1_IPO,
         SPSAM_ROLAND,
         FGT_MIRAGE2000,
         ATT_JAGUAR,
@@ -729,12 +730,12 @@ namespace HammerAndSickle.Core.GameData
         AAA_GENERIC,
         ART_LIGHT_GENERIC,
         ART_HEAVY_GENERIC,
-        MANPAD_GENERIC,
-        ATGM_GENERIC,
-        AT_RPG7,
-        MORTAR_81MM,
-        MORTAR_120MM,
-        RR_RECOILLESS_RIFLE,
+        MANPAD_GENERIC_IPO,
+        ATGM_GENERIC_IPO,
+        AT_RPG7_IPO,
+        MORTAR_81MM_IPO,
+        MORTAR_120MM_IPO,
+        RR_RECOILLESS_RIFLE_IPO,
         CAVALRY_GENERIC,
         TRUCK_GENERIC,
 
