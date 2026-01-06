@@ -3321,7 +3321,7 @@ namespace HammerAndSickle.Models
                 var profile = new WeaponSystemProfile(
                     name: "M551 Sheridan Light Tank",
                     nationality: Nationality.USA,
-                    weaponSystemID: WeaponSystems.TANK_M551,
+                    weaponSystemID: WeaponSystems.TANK_M551_IPO,
                     prestigeCost: GameData.PRESTIGE_TIER_FREE,
                     weaponSystemType: WeaponSystemType.Hard,
                     hardAttack: GameData.GEN1_TANK_HARD_ATTACK + LARGE_BONUS,
@@ -3351,7 +3351,7 @@ namespace HammerAndSickle.Models
                 profile.SetTurnAvailable(250);
 
                 // Store in master dictionary
-                _weaponSystemProfiles[WeaponSystems.TANK_M551] = profile;
+                _weaponSystemProfiles[WeaponSystems.TANK_M551_IPO] = profile;
             }
             catch (Exception e)
             {
@@ -3885,7 +3885,7 @@ namespace HammerAndSickle.Models
                 var profile = new WeaponSystemProfile(
                     name: "OH-58 Kiowa Recon Helicopter",
                     nationality: Nationality.USA,
-                    weaponSystemID: WeaponSystems.HEL_OH58,
+                    weaponSystemID: WeaponSystems.HEL_OH58_IPO,
                     prestigeCost: GameData.PRESTIGE_TIER_FREE,
                     weaponSystemType: WeaponSystemType.Hard,
                     hardAttack: GameData.BASE_HEL_HARD_ATTACK + SMALL_MALUS,
@@ -3915,7 +3915,7 @@ namespace HammerAndSickle.Models
                 profile.SetTurnAvailable(500);
 
                 // Store in master dictionary
-                _weaponSystemProfiles[WeaponSystems.HEL_OH58] = profile;
+                _weaponSystemProfiles[WeaponSystems.HEL_OH58_IPO] = profile;
             }
             catch (Exception e)
             {
@@ -4465,7 +4465,7 @@ namespace HammerAndSickle.Models
                 var profile = new WeaponSystemProfile(
                     name: "Luchs Reconnaissance Vehicle",
                     nationality: Nationality.FRG,
-                    weaponSystemID: WeaponSystems.RCN_LUCHS,
+                    weaponSystemID: WeaponSystems.RCN_LUCHS_IPO,
                     prestigeCost: GameData.PRESTIGE_TIER_0 + MASSIVE_BONUS,
                     weaponSystemType: WeaponSystemType.Hard,
                     hardAttack: GameData.BASE_IFV_HARD_ATTACK,
@@ -4498,7 +4498,7 @@ namespace HammerAndSickle.Models
                 profile.SetTurnAvailable(276);
 
                 // Store in master dictionary
-                _weaponSystemProfiles[WeaponSystems.RCN_LUCHS] = profile;
+                _weaponSystemProfiles[WeaponSystems.RCN_LUCHS_IPO] = profile;
             }
             catch (Exception e)
             {
@@ -4721,7 +4721,7 @@ namespace HammerAndSickle.Models
                 var profile = new WeaponSystemProfile(
                     name: "FV 432",
                     nationality: Nationality.UK,
-                    weaponSystemID: WeaponSystems.APC_FV432,
+                    weaponSystemID: WeaponSystems.APC_FV432_IPO,
                     prestigeCost: GameData.PRESTIGE_TIER_FREE,
                     weaponSystemType: WeaponSystemType.Hard,
                     hardAttack: GameData.BASE_APC_HARD_ATTACK,
@@ -4751,7 +4751,7 @@ namespace HammerAndSickle.Models
                 profile.SetTurnAvailable(264);
 
                 // Store in master dictionary
-                _weaponSystemProfiles[WeaponSystems.APC_FV432] = profile;
+                _weaponSystemProfiles[WeaponSystems.APC_FV432_IPO] = profile;
             }
             catch (Exception e)
             {
@@ -4770,7 +4770,7 @@ namespace HammerAndSickle.Models
                 var profile = new WeaponSystemProfile(
                     name: "Scimitar Recon Vehicle",
                     nationality: Nationality.UK,
-                    weaponSystemID: WeaponSystems.RCN_SCIMITAR,
+                    weaponSystemID: WeaponSystems.RCN_SCIMITAR_IPO,
                     prestigeCost: GameData.PRESTIGE_TIER_FREE,
                     weaponSystemType: WeaponSystemType.Hard,
                     hardAttack: GameData.BASE_IFV_HARD_ATTACK + XLARGE_BONUS,
@@ -4800,7 +4800,7 @@ namespace HammerAndSickle.Models
                 profile.SetTurnAvailable(320);
 
                 // Store in master dictionary
-                _weaponSystemProfiles[WeaponSystems.RCN_SCIMITAR] = profile;
+                _weaponSystemProfiles[WeaponSystems.RCN_SCIMITAR_IPO] = profile;
             }
             catch (Exception e)
             {
@@ -4869,7 +4869,7 @@ namespace HammerAndSickle.Models
                 var profile = new WeaponSystemProfile(
                     name: "Westland Lynx",
                     nationality: Nationality.UK,
-                    weaponSystemID: WeaponSystems.HEL_LYNX,
+                    weaponSystemID: WeaponSystems.HEL_LYNX_IPO,
                     prestigeCost: GameData.PRESTIGE_TIER_FREE,
                     weaponSystemType: WeaponSystemType.Hard,
                     hardAttack: GameData.BASE_HEL_HARD_ATTACK,
@@ -4899,7 +4899,7 @@ namespace HammerAndSickle.Models
                 profile.SetTurnAvailable(400);
 
                 // Store in master dictionary
-                _weaponSystemProfiles[WeaponSystems.HEL_LYNX] = profile;
+                _weaponSystemProfiles[WeaponSystems.HEL_LYNX_IPO] = profile;
             }
             catch (Exception e)
             {
@@ -5052,7 +5052,7 @@ namespace HammerAndSickle.Models
                 var profile = new WeaponSystemProfile(
                     name: "AMX-10P",
                     nationality: Nationality.FRA,
-                    weaponSystemID: WeaponSystems.IFV_AMX10P,
+                    weaponSystemID: WeaponSystems.IFV_AMX10P_IPO,
                     prestigeCost: GameData.PRESTIGE_TIER_FREE,
                     weaponSystemType: WeaponSystemType.Hard,
                     hardAttack: GameData.BASE_IFV_HARD_ATTACK + LARGE_BONUS,
@@ -5075,7 +5075,7 @@ namespace HammerAndSickle.Models
                 profile.AddUpgradeType(UpgradeType.IFV);
                 profile.SetShortName("AMX-10P");
                 profile.SetTurnAvailable(300); // 1973
-                _weaponSystemProfiles[WeaponSystems.IFV_AMX10P] = profile;
+                _weaponSystemProfiles[WeaponSystems.IFV_AMX10P_IPO] = profile;
             }
             catch (Exception e) { AppService.HandleException(CLASS_NAME, nameof(Create_IFV_AMX10P_Profile), e); throw; }
         }
@@ -5139,7 +5139,7 @@ namespace HammerAndSickle.Models
                 var profile = new WeaponSystemProfile(
                     name: "ERC-90 Recon Vehicle",
                     nationality: Nationality.FRA,
-                    weaponSystemID: WeaponSystems.RCN_ERC90,
+                    weaponSystemID: WeaponSystems.RCN_ERC90_IPO,
                     prestigeCost: GameData.PRESTIGE_TIER_FREE,
                     weaponSystemType: WeaponSystemType.Hard,
                     hardAttack: GameData.BASE_IFV_HARD_ATTACK,
@@ -5172,7 +5172,7 @@ namespace HammerAndSickle.Models
                 profile.SetTurnAvailable(288);
 
                 // Store in master dictionary
-                _weaponSystemProfiles[WeaponSystems.RCN_ERC90] = profile;
+                _weaponSystemProfiles[WeaponSystems.RCN_ERC90_IPO] = profile;
             }
             catch (Exception e)
             {
@@ -5191,7 +5191,7 @@ namespace HammerAndSickle.Models
                 var profile = new WeaponSystemProfile(
                     name: "AMX-30 AuF1 Self-Propelled Artillery",
                     nationality: Nationality.FRA,
-                    weaponSystemID: WeaponSystems.SPA_AUF1,
+                    weaponSystemID: WeaponSystems.SPA_AUF1_IPO,
                     prestigeCost: GameData.PRESTIGE_TIER_FREE,
                     weaponSystemType: WeaponSystemType.Hard,
                     hardAttack: GameData.BASE_ARTY_HARD_ATTACK,
@@ -5221,7 +5221,7 @@ namespace HammerAndSickle.Models
                 profile.SetTurnAvailable(300);
 
                 // Store in master dictionary
-                _weaponSystemProfiles[WeaponSystems.SPA_AUF1] = profile;
+                _weaponSystemProfiles[WeaponSystems.SPA_AUF1_IPO] = profile;
             }
             catch (Exception e)
             {
@@ -5398,7 +5398,7 @@ namespace HammerAndSickle.Models
                 var profile = new WeaponSystemProfile(
                     name: "Man-Portable Air Defense",
                     nationality: Nationality.GENERIC,
-                    weaponSystemID: WeaponSystems.MANPAD_GENERIC,
+                    weaponSystemID: WeaponSystems.MANPAD_GENERIC_IPO,
                     prestigeCost: GameData.PRESTIGE_TIER_0,
                     weaponSystemType: WeaponSystemType.Soft,
                     hardAttack: GameData.BASE_INF_HARD_ATTACK,
@@ -5428,7 +5428,7 @@ namespace HammerAndSickle.Models
                 profile.SetTurnAvailable(360);
 
                 // Store in master dictionary
-                _weaponSystemProfiles[WeaponSystems.MANPAD_GENERIC] = profile;
+                _weaponSystemProfiles[WeaponSystems.MANPAD_GENERIC_IPO] = profile;
             }
             catch (Exception e)
             {
@@ -5545,7 +5545,7 @@ namespace HammerAndSickle.Models
                 var profile = new WeaponSystemProfile(
                     name: "Anti-Tank Guided Missile",
                     nationality: Nationality.GENERIC,
-                    weaponSystemID: WeaponSystems.ATGM_GENERIC,
+                    weaponSystemID: WeaponSystems.ATGM_GENERIC_IPO,
                     prestigeCost: GameData.PRESTIGE_TIER_0,
                     weaponSystemType: WeaponSystemType.Soft,
                     hardAttack: GameData.BASE_INF_HARD_ATTACK + XXLARGE_BONUS,
@@ -5575,7 +5575,7 @@ namespace HammerAndSickle.Models
                 profile.SetTurnAvailable(432);
 
                 // Store in master dictionary
-                _weaponSystemProfiles[WeaponSystems.ATGM_GENERIC] = profile;
+                _weaponSystemProfiles[WeaponSystems.ATGM_GENERIC_IPO] = profile;
             }
             catch (Exception e)
             {
@@ -5594,7 +5594,7 @@ namespace HammerAndSickle.Models
                 var profile = new WeaponSystemProfile(
                     name: "82mm Light Mortar",
                     nationality: Nationality.GENERIC,
-                    weaponSystemID: WeaponSystems.MORTAR_81MM,
+                    weaponSystemID: WeaponSystems.MORTAR_81MM_IPO,
                     prestigeCost: GameData.PRESTIGE_TIER_0 + MASSIVE_MALUS,
                     weaponSystemType: WeaponSystemType.Soft,
                     hardAttack: GameData.BASE_ARTY_HARD_ATTACK + MEDIUM_MALUS,
@@ -5624,7 +5624,7 @@ namespace HammerAndSickle.Models
                 profile.SetTurnAvailable(1);
 
                 // Store in master dictionary
-                _weaponSystemProfiles[WeaponSystems.MORTAR_81MM] = profile;
+                _weaponSystemProfiles[WeaponSystems.MORTAR_81MM_IPO] = profile;
             }
             catch (Exception e)
             {
@@ -5643,7 +5643,7 @@ namespace HammerAndSickle.Models
                 var profile = new WeaponSystemProfile(
                     name: "120mm Heavy Mortar",
                     nationality: Nationality.GENERIC,
-                    weaponSystemID: WeaponSystems.MORTAR_120MM,
+                    weaponSystemID: WeaponSystems.MORTAR_120MM_IPO,
                     prestigeCost: GameData.PRESTIGE_TIER_0 + LARGE_MALUS,
                     weaponSystemType: WeaponSystemType.Soft,
                     hardAttack: GameData.BASE_ARTY_HARD_ATTACK + SMALL_MALUS,
@@ -5673,7 +5673,7 @@ namespace HammerAndSickle.Models
                 profile.SetTurnAvailable(1);
 
                 // Store in master dictionary
-                _weaponSystemProfiles[WeaponSystems.MORTAR_120MM] = profile;
+                _weaponSystemProfiles[WeaponSystems.MORTAR_120MM_IPO] = profile;
             }
             catch (Exception e)
             {
@@ -5692,7 +5692,7 @@ namespace HammerAndSickle.Models
                 var profile = new WeaponSystemProfile(
                     name: "RPG-7",
                     nationality: Nationality.GENERIC,
-                    weaponSystemID: WeaponSystems.AT_RPG7,
+                    weaponSystemID: WeaponSystems.AT_RPG7_IPO,
                     prestigeCost: GameData.PRESTIGE_TIER_0 + MASSIVE_MALUS,
                     weaponSystemType: WeaponSystemType.Soft,
                     hardAttack: GameData.BASE_INF_HARD_ATTACK + LARGE_BONUS,
@@ -5722,7 +5722,7 @@ namespace HammerAndSickle.Models
                 profile.SetTurnAvailable(250);
 
                 // Store in master dictionary
-                _weaponSystemProfiles[WeaponSystems.AT_RPG7] = profile;
+                _weaponSystemProfiles[WeaponSystems.AT_RPG7_IPO] = profile;
             }
             catch (Exception e)
             {
@@ -5741,7 +5741,7 @@ namespace HammerAndSickle.Models
                 var profile = new WeaponSystemProfile(
                     name: "Recoilless Rifle",
                     nationality: Nationality.GENERIC,
-                    weaponSystemID: WeaponSystems.RR_RECOILLESS_RIFLE,
+                    weaponSystemID: WeaponSystems.RR_RECOILLESS_RIFLE_IPO,
                     prestigeCost: GameData.PRESTIGE_TIER_0 + MASSIVE_MALUS,
                     weaponSystemType: WeaponSystemType.Soft,
                     hardAttack: GameData.BASE_INF_HARD_ATTACK + LARGE_BONUS,
@@ -5771,7 +5771,7 @@ namespace HammerAndSickle.Models
                 profile.SetTurnAvailable(250);
 
                 // Store in master dictionary
-                _weaponSystemProfiles[WeaponSystems.RR_RECOILLESS_RIFLE] = profile;
+                _weaponSystemProfiles[WeaponSystems.RR_RECOILLESS_RIFLE_IPO] = profile;
             }
             catch (Exception e)
             {
