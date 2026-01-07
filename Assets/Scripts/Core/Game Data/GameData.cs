@@ -82,10 +82,14 @@ namespace HammerAndSickle.Core.GameData
         FRG,
         UK,
         FRA,
+        BE,
+        DE,
+        NE,
         MJ,
         IR,
         IQ,
         SAUD,
+        KW,
         China,
         GENERIC
     }
@@ -231,6 +235,17 @@ namespace HammerAndSickle.Core.GameData
         HastyDefense = 2,
         Entrenched   = 1,
         Fortified    = 0
+    }
+
+    /// <summary>
+    /// Represents the type of transport a unit is currently embarked on.
+    /// </summary>
+    public enum EmbarkmentState
+    {
+        NotEmbarked     = 0,
+        EmbarkedNaval   = 1,
+        EmbarkedFixedWing = 2,
+        EmbarkedHelo    = 3
     }
 
     #endregion // DeploymentStateMachine

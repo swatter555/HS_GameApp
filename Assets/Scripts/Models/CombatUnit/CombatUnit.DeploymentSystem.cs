@@ -22,6 +22,8 @@ namespace HammerAndSickle.Models
         public bool IsEmbarkable { get; private set; } // Equipped with helicopter/airlift transport/naval.
         [JsonInclude]
         public bool IsMountable { get; private set; }  // Equipped with ground transport (e.g., trucks, APCs).
+        [JsonInclude]
+        public EmbarkmentState CurrentEmbarkmentState { get; private set; } = EmbarkmentState.NotEmbarked;
 
         #endregion //Properties
 
@@ -37,6 +39,7 @@ namespace HammerAndSickle.Models
             IsEmbarkable = embarkable;
             IsMountable = mountable;
             _deploymentPosition = DeploymentPosition.Deployed;
+            CurrentEmbarkmentState = EmbarkmentState.NotEmbarked;
         }
 
         #endregion
@@ -71,7 +74,10 @@ namespace HammerAndSickle.Models
             if (!SpecialEmbarkmentChecks(out errorMsg, targetPosition, onAirbase, onPort)) 
                 return false;
 
-            // When fortified or entrenched, we must transition to deployed first.
+            // When fortified or entrenched, we skip directly to Deployed rather than transitioning
+            // through each intermediate state. This is intentional: leaving a defensive position
+            // represents abandoning that position entirely, not incrementally reducing entrenchment.
+            // The unit pays the full movement cost to break from cover in one action.
             if (oldPosition == DeploymentPosition.Fortified || oldPosition == DeploymentPosition.Entrenched)
             {
                 _deploymentPosition = DeploymentPosition.Deployed;
@@ -93,8 +99,19 @@ namespace HammerAndSickle.Models
             UpdateMovementPointsForProfile();
 
             // Apply the Mobile movement bonus if applicable.
-            if (_deploymentPosition == DeploymentPosition.Mobile) ApplyMobileBonus();
-            
+            if (_deploymentPosition == DeploymentPosition.Mobile)
+            {
+                // Validate IsMountable configuration matches MobileProfileID.
+                if (IsMountable && GetMobileProfile() == null)
+                {
+                    AppService.HandleException(CLASS_NAME, "TryDeployUP",
+                        new InvalidOperationException(
+                            $"{UnitName} is marked as IsMountable but has no valid MobileProfileID configured."));
+                }
+
+                ApplyMobileBonus();
+            }
+
             return true;
         }
 
@@ -153,7 +170,18 @@ namespace HammerAndSickle.Models
             UpdateMovementPointsForProfile();
 
             // Apply the Mobile movement bonus if applicable.
-            if (_deploymentPosition == DeploymentPosition.Mobile) ApplyMobileBonus();
+            if (_deploymentPosition == DeploymentPosition.Mobile)
+            {
+                // Validate IsMountable configuration matches MobileProfileID.
+                if (IsMountable && GetMobileProfile() == null)
+                {
+                    AppService.HandleException(CLASS_NAME, "TryDeployDOWN",
+                        new InvalidOperationException(
+                            $"{UnitName} is marked as IsMountable but has no valid MobileProfileID configured."));
+                }
+
+                ApplyMobileBonus();
+            }
 
             return true;
         }
@@ -175,6 +203,15 @@ namespace HammerAndSickle.Models
             // Conduct special embarkment checks.
             if (targetPos == DeploymentPosition.Embarked)
             {
+                // Verify unit is configured as embarkable.
+                if (!IsEmbarkable)
+                {
+                    errorMsg = $"{UnitName} is not configured as embarkable.";
+                    AppService.HandleException(CLASS_NAME, "SpecialEmbarkmentChecks",
+                        new InvalidOperationException(errorMsg));
+                    return false;
+                }
+
                 // Get the embarked profile for this unit.
                 var embarkedProfile = GetEmbarkedProfile();
 
@@ -221,9 +258,9 @@ namespace HammerAndSickle.Models
                 // Airmobile and mechanized airmobile units must have a valid helicopter transport profile to deploy to Embarked position.
                 if (Classification == UnitClassification.AM || Classification == UnitClassification.MAM)
                 {
-                    if (embarkedProfile.WeaponSystemID != WeaponSystems.HEL_MI8T)
+                    if (!embarkedProfile.HasUpgradeType(UpgradeType.TRNHELO))
                     {
-                        errorMsg = $"{UnitName} must have a valid helicopter transport profile to deploy to Embarked position.";
+                        errorMsg = $"{UnitName} must have a valid helicopter transport profile (TRNHELO) to deploy to Embarked position.";
                         return false;
                     }
                 }
@@ -385,7 +422,11 @@ namespace HammerAndSickle.Models
         /// <returns>Target deployment position</returns>
         private DeploymentPosition GetDownwardTargetPosition(DeploymentPosition currentPosition)
         {
-            // Special case: Embarked always goes to Deployed (bypasses Mobile)
+            // Special case: Embarked always goes directly to Deployed, bypassing Mobile.
+            // This is intentional: when debarking from transport (air, naval, or helicopter),
+            // troops dismount directly into a combat-ready Deployed state rather than
+            // transitioning through Mobile. The unit pays the full movement cost to debark
+            // and establish a defensive position in one action.
             if (currentPosition == DeploymentPosition.Embarked)
             {
                 return DeploymentPosition.Deployed;
@@ -458,6 +499,15 @@ namespace HammerAndSickle.Models
         public void SetDeploymentPosition(DeploymentPosition newPosition)
         {
             _deploymentPosition = newPosition;
+        }
+
+        /// <summary>
+        /// Sets the embarkment state of the unit.
+        /// </summary>
+        /// <param name="state">The embarkment state to set.</param>
+        public void SetCurrentEmbarkmentState(EmbarkmentState state)
+        {
+            CurrentEmbarkmentState = state;
         }
 
         #endregion
