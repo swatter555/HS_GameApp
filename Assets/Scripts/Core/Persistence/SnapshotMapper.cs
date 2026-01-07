@@ -136,6 +136,10 @@ namespace HammerAndSickle.Persistence
                             freshUnit.SetSpottedLevel(unit.SpottedLevel);
                             freshUnit.SetICM(unit.IndividualCombatModifier);
 
+                            // Copy facing and embarkment state
+                            freshUnit.Facing = unit.Facing;
+                            freshUnit.SetCurrentEmbarkmentState(unit.CurrentEmbarkmentState);
+
                             // Copy leader assignment (just the ID string, not the object)
                             freshUnit.LeaderID = unit.LeaderID;
 

@@ -541,6 +541,26 @@ namespace HammerAndSickle.Controllers
 
         #endregion // Unit Base Icons
 
+        #region National Symbols
+
+        public const string Symbol_BE     = "Symbol_BE";
+        public const string Symbol_China  = "Symbol_CH";
+        public const string Symbol_DE     = "Symbol_DE";
+        public const string Symbol_FR     = "Symbol_FR";
+        public const string Symbol_GE     = "Symbol_GE";
+        public const string Symbol_Iran   = "Symbol_IR";
+        public const string Symbol_Iraq   = "Symbol_IQ";
+        public const string Symbol_Kuwait = "Symbol_KQ";
+        public const string Symbol_MJ     = "Symbol_MJ";
+        public const string Symbol_NE     = "Symbol_NE";
+        public const string Symbol_Saudi  = "Symbol_SA";
+        public const string Symbol_SV     = "Symbol_SV";
+        public const string Symbol_UK     = "Symbol_UK";
+        public const string Symbol_US     = "Symbol_US";
+        public const string Symbol_Default = "Symbol_DF";
+
+        #endregion // National Symbols
+
         #region Singleton
 
         private static SpriteManager _instance;
@@ -584,6 +604,7 @@ namespace HammerAndSickle.Controllers
         [SerializeField] private SpriteAtlas _genericIconAtlas;
         [SerializeField] private SpriteAtlas _natoSymbolIconAtlas;
         [SerializeField] private SpriteAtlas _nationalFlagAtlas;
+        [SerializeField] private SpriteAtlas _nationalSymbolAtlas;
 
 
         [Header("Prefabs")]
@@ -722,6 +743,13 @@ namespace HammerAndSickle.Controllers
                 if (Instance._nationalFlagAtlas != null)
                 {
                     sprite = Instance._nationalFlagAtlas.GetSprite(spriteName);
+                    if (sprite != null) return sprite;
+                }
+
+                // Try national symbol atlas
+                if (Instance._nationalSymbolAtlas != null)
+                {
+                    sprite = Instance._nationalSymbolAtlas.GetSprite(spriteName);
                     if (sprite != null) return sprite;
                 }
 
