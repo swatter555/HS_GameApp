@@ -301,6 +301,7 @@ namespace HammerAndSickle.Controllers
         public const string SV_S75_W = "SV_S75_W";
         public const string SV_S125_W = "SV_S125_W";
         public const string SV_S300_W = "SV_S300_W";
+        public const string SV_S300_W_F = "SV_S300_W_F";
 
         // Infantry & Support
         public const string SV_Airborne = "SV_Airborne";

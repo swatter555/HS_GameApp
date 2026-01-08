@@ -1220,6 +1220,8 @@ namespace HammerAndSickle.Core.Map
                 WeaponSystems.ROC_BM30 => true,
                 // Soviet SSM
                 WeaponSystems.SSM_SCUD => true,
+                // Soviet S300
+                WeaponSystems.SAM_S300 => true,
                 // US Artillery
                 WeaponSystems.SPA_M109 => true,
                 WeaponSystems.ROC_MLRS => true,
