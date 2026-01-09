@@ -100,9 +100,9 @@ namespace HammerAndSickle.Models
             IntelProfileTypes intelProfileType,
             WeaponSystems deployedProfileID,
             bool isMountable = false,
-            WeaponSystems mobileProfileID = WeaponSystems.DEFAULT,
+            WeaponSystems mobileProfileID = WeaponSystems.NONE,
             bool isEmbarkable = false,
-            WeaponSystems embarkProfileID = WeaponSystems.DEFAULT,
+            WeaponSystems embarkProfileID = WeaponSystems.NONE,
             DepotCategory category = DepotCategory.Secondary,
             DepotSize size = DepotSize.Small)
         {
@@ -113,22 +113,22 @@ namespace HammerAndSickle.Models
                     throw new ArgumentException("Unit name cannot be null or empty", nameof(unitName));
 
                 // Deployed profile ID must point to a valid profile.
-                if (deployedProfileID == WeaponSystems.DEFAULT)
+                if (deployedProfileID == WeaponSystems.NONE)
                     throw new ArgumentException("Deployed profile ID cannot be DEFAULT", nameof(deployedProfileID));
 
                 // Check that deployed profile exists in database.
                 if (WeaponSystemsDatabase.GetWeaponSystemProfile(deployedProfileID) == null)
                     throw new ArgumentException($"Deployed profile ID {deployedProfileID} not found in database", nameof(deployedProfileID));
 
-                // When not DEFAULT, mounted profile ID must point to a valid profile.
-                if (isMountable && mobileProfileID != WeaponSystems.DEFAULT)
+                // When not NONE, mounted profile ID must point to a valid profile.
+                if (isMountable && mobileProfileID != WeaponSystems.NONE)
                 {
                     if (WeaponSystemsDatabase.GetWeaponSystemProfile(mobileProfileID) == null)
                         throw new ArgumentException($"Mounted profile ID {mobileProfileID} not found in database", nameof(mobileProfileID));
                 }
 
-                // When not DEFAULT, transport profile ID must point to a valid profile.
-                if (isEmbarkable && embarkProfileID != WeaponSystems.DEFAULT)
+                // When not NONE, transport profile ID must point to a valid profile.
+                if (isEmbarkable && embarkProfileID != WeaponSystems.NONE)
                 {
                     if (WeaponSystemsDatabase.GetWeaponSystemProfile(embarkProfileID) == null)
                         throw new ArgumentException($"Transport profile ID {embarkProfileID} not found in database", nameof(embarkProfileID));
@@ -226,9 +226,9 @@ namespace HammerAndSickle.Models
                 Facing = HexDirection.W; // Will be overwritten by JSON
 
                 // PrepareBattle weapon system profile IDs - JSON will set actual values
-                DeployedProfileID = WeaponSystems.DEFAULT; // Will be overwritten by JSON
-                MobileProfileID = WeaponSystems.DEFAULT; // Will be overwritten by JSON
-                EmbarkedProfileID = WeaponSystems.DEFAULT; // Will be overwritten by JSON
+                DeployedProfileID = WeaponSystems.NONE; // Will be overwritten by JSON
+                MobileProfileID = WeaponSystems.NONE; // Will be overwritten by JSON
+                EmbarkedProfileID = WeaponSystems.NONE; // Will be overwritten by JSON
 
                 // PrepareBattle deployment capabilities - JSON will set actual values
                 IsEmbarkable = false; // Will be overwritten by JSON
@@ -300,7 +300,7 @@ namespace HammerAndSickle.Models
             try
             {
                 // "No profile" is a valid state.
-                if (DeployedProfileID == WeaponSystems.DEFAULT)
+                if (DeployedProfileID == WeaponSystems.NONE)
                     return null;
 
                 var profile = WeaponSystemsDatabase.GetWeaponSystemProfile(DeployedProfileID);
@@ -324,8 +324,8 @@ namespace HammerAndSickle.Models
         {
             try
             {
-                // DEFAULT means the unit is foot‑mobile (no transport profile).
-                if (MobileProfileID == WeaponSystems.DEFAULT)
+                // NONE means the unit is foot‑mobile (no transport profile).
+                if (MobileProfileID == WeaponSystems.NONE)
                     return null;
 
                 var profile = WeaponSystemsDatabase.GetWeaponSystemProfile(MobileProfileID);
@@ -349,8 +349,8 @@ namespace HammerAndSickle.Models
         {
             try
             {
-                // DEFAULT means the unit has no transport profile.
-                if (EmbarkedProfileID == WeaponSystems.DEFAULT)
+                // NONE means the unit has no transport profile.
+                if (EmbarkedProfileID == WeaponSystems.NONE)
                     return null;
 
                 var profile = WeaponSystemsDatabase.GetWeaponSystemProfile(EmbarkedProfileID);
@@ -456,7 +456,7 @@ namespace HammerAndSickle.Models
                 var tempProfile = new WeaponSystemProfile(
                     activeProfile.Name + "_Combat",
                     activeProfile.Nationality,
-                    WeaponSystems.COMBAT,
+                    WeaponSystems.UTILITY_ID,
                     0
                 );
 

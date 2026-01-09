@@ -562,6 +562,19 @@ namespace HammerAndSickle.Controllers
 
         #endregion // National Symbols
 
+        #region Utility Icons
+
+        public const string Utility_AirbaseStack1 = "AirbaseStack1";
+        public const string Utility_AirbaseStack2 = "AirbaseStack2";
+        public const string Utility_AirbaseStack3 = "AirbaseStack3";
+        public const string Utility_AirbaseStack4 = "AirbaseStack4";
+        public const string Utility_AirMissionMarker = "AirMissionMarker";
+        public const string Utility_StackingIconAir = "StackingIcon_AirSelect";
+        public const string Utility_StackingIconLand = "StackingIcon_LandSelect";
+        public const string Utility_MismatchIcon = "MismatchIcon";
+
+        #endregion
+
         #region Singleton
 
         private static SpriteManager _instance;
@@ -606,7 +619,7 @@ namespace HammerAndSickle.Controllers
         [SerializeField] private SpriteAtlas _natoSymbolIconAtlas;
         [SerializeField] private SpriteAtlas _nationalFlagAtlas;
         [SerializeField] private SpriteAtlas _nationalSymbolAtlas;
-
+        [SerializeField] private SpriteAtlas _utilityIconAtlas;
 
         [Header("Prefabs")]
         [SerializeField] private GameObject _cityPrefab;
@@ -751,6 +764,13 @@ namespace HammerAndSickle.Controllers
                 if (Instance._nationalSymbolAtlas != null)
                 {
                     sprite = Instance._nationalSymbolAtlas.GetSprite(spriteName);
+                    if (sprite != null) return sprite;
+                }
+
+                // Try utility icon atlas
+                if (Instance._utilityIconAtlas != null)
+                {
+                    sprite = Instance._utilityIconAtlas.GetSprite(spriteName);
                     if (sprite != null) return sprite;
                 }
 

@@ -236,7 +236,7 @@ namespace HammerAndSickle.Models
                 if (Classification == UnitClassification.SPECF)
                 {
                     // Special forces with aircraft transport must be on an airbase.
-                    if (embarkedProfile.WeaponSystemID == WeaponSystems.Transport_AIR && !onAirbase)
+                    if (embarkedProfile.WeaponSystemID == WeaponSystems.TRN_AN8 && !onAirbase)
                     {
                         errorMsg = $"{UnitName} must be on an airbase to deploy to Embarked position with AN-12 transport.";
                         return false;

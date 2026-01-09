@@ -629,6 +629,10 @@ namespace HammerAndSickle.Core.GameData
     /// </summary>
     public enum WeaponSystems
     {
+        // Utility values
+        NONE,       // No weapon system
+        UTILITY_ID, // Used for generic combat calculations
+        
         // Soviet weapon systems
         TANK_T55A,
         TANK_T64A,
@@ -685,8 +689,8 @@ namespace HammerAndSickle.Core.GameData
         BMB_TU22,
         BMB_TU22M3,
         RCNA_MIG25R,
-        Transport_AIR,   // Embarkment profile transport for paratroopers. Player side only.
-        Transport_NAVAL, // Embarkment profile transport for maritime operations. Player side only.
+        TRN_AN8,   // Embarkment profile, Player side only.
+        TRN_NAVAL, // Embarkment profile, Player side only.
 
         // USA
         TANK_M1,
@@ -741,18 +745,16 @@ namespace HammerAndSickle.Core.GameData
         FGT_MIRAGE2000,
         ATT_JAGUAR,
 
-        // Generic types
-        AAA_GENERIC,
-        ART_LIGHT_GENERIC,
-        ART_HEAVY_GENERIC,
-        MANPAD_GENERIC_IPO,
-        ATGM_GENERIC_IPO,
-        AT_RPG7_IPO,
-        MORTAR_81MM_IPO,
-        MORTAR_120MM_IPO,
-        RR_RECOILLESS_RIFLE_IPO,
-        CAVALRY_GENERIC,
-        TRUCK_GENERIC,
+        // Generic weapon systems
+        ART_LIGHT_MORTAR_GEN,
+        ART_HEAVY_MORTAR_GEN,
+        ART_LIGHT_GEN,
+        ART_HEAVY_GEN,
+        AT_LIGHT_GEN,
+        INF_CAV_GEN,
+        TRUCK_GEN,
+        MANPAD_GEN,
+        AAA_GEN,
 
         // Shared profiles for infantry
         INF_REG,    // Regular INF
@@ -767,8 +769,30 @@ namespace HammerAndSickle.Core.GameData
         AIRBASE_GENERIC,
         SUPPLYDEPOT_GENERIC,
 
-        COMBAT, // Used for generic combat calculations
-        DEFAULT // Fallback value
+
+
+        // Generic types
+        AAA_GENERIC,
+        ART_LIGHT_GENERIC,
+        ART_HEAVY_GENERIC,
+
+
+        // Additional IDs for intelligence profile tracking.
+        MANPAD_GENERIC_IPO,
+        ATGM_GENERIC_IPO,
+        AT_RPG7_IPO,
+        MORTAR_81MM_IPO,
+        MORTAR_120MM_IPO,
+        RR_RECOILLESS_RIFLE_IPO,
+
+
+
+        CAVALRY_GENERIC,
+        TRUCK_GENERIC,
+
+        
+
+        // Weapon systems for intelligence profiles only, not used for combat.
     }
 
     /// <summary>
@@ -806,6 +830,138 @@ namespace HammerAndSickle.Core.GameData
     #endregion // WeaponSystem Enums
 
     #region Intel Enums
+
+    /// <summary>
+    /// Specific weapon types for IntelProfiles, used for tracking purposes.
+    /// </summary>
+    public enum Intel_WeaponTypes
+    {
+        // Utility values
+        NONE,
+
+        // Soviet weapon systems
+        T55A,
+        T64A,
+        T64B,
+        T72A,
+        T72B,
+        T80B,
+        T80U,
+        T80BV,
+        MTLB,
+        BTR70,
+        BTR80,
+        BMP1,
+        BMP2,
+        BMP3,
+        BMD1,
+        BMD2,
+        BMD3,
+        BRDM2,
+        BRDM2AT,
+        SPA_2S1,
+        SPA_2S3,
+        SPA_2S5,
+        SPA_2S19,
+        BM21,
+        BM27,
+        BM30,
+        SCUD,
+        ZSU57,
+        ZSU23,
+        SPSAM_2K22,
+        SPSAM_9K31,
+        S75,
+        S125,
+        S300,
+        MI8T,
+        MI8AT,
+        MI24D,
+        MI24V,
+        MI28,
+        A50,
+        MIG21,
+        MIG23,
+        MIG25,
+        MIG29,
+        MIG31,
+        SU27,
+        SU47,
+        MIG27,
+        SU25,
+        SU25B,
+        SU24,
+        TU16,
+        TU22,
+        TU22M3,
+        MIG25R,
+
+        // USA
+        M1,
+        M60A3,
+        M551,
+        M2,
+        M3,
+        M113,
+        LVTP7,
+        M109,
+        MLRS,
+        M163,
+        CHAP,
+        HAWK,
+        OH58,
+        AH64,
+        UH60,
+        E3,
+        F15,
+        F4,
+        F16,
+        A10,
+        F111,
+        F117,
+        SR71,
+
+        // West Germany (FRG)
+        LEOPARD1,
+        LEOPARD2,
+        MARDER,
+        LUCHS,
+        GEPARD,
+        BO105,
+        TORNADO_IDS,
+
+        // UK
+        CHALLENGER1,
+        WARRIOR,
+        FV432,
+        SCIMITAR,
+        SAM_RAPIER,
+        LYNX,
+        TORNADO_GR1,
+
+        // France
+        AMX30,
+        AMX10P,
+        VAB,
+        ERC90,
+        AUF1,
+        ROLAND,
+        MIRAGE2000,
+        JAGUAR,
+
+        // Generic weapon systems
+        Truck,
+        LightMortar,
+        HeavyMortar,
+        LightArtillery,
+        HeavyArtillery,
+        RPG7,
+        Manpad,
+        AAA,
+        RecoilessRifle,
+        ATGM,
+        Infantry
+    }
 
     /// <summary>
     /// Type of UnitProfiles
@@ -1514,9 +1670,10 @@ namespace HammerAndSickle.Core.GameData
 
         // Standard indirect range values.
         public const float INDIRECT_RANGE_DEFAULT = 0;
-        public const float INDIRECT_RANGE_120MM = 4;
-        public const float INDIRECT_RANGE_155MM = 5;
-        public const float INDIRECT_RANGE_203MM = 6;
+        public const float INDIRECT_RANGE_MINIMUM = 3;
+        public const float INDIRECT_RANGE_SHORT = 4;
+        public const float INDIRECT_RANGE_MEDIUM = 5;
+        public const float INDIRECT_RANGE_LONG = 6;
         public const float INDIRECT_RANGE_ROC_SR = 4;
         public const float INDIRECT_RANGE_ROC_MR = 6;
         public const float INDIRECT_RANGE_ROC_LR = 10;
