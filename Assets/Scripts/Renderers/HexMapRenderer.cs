@@ -1321,8 +1321,8 @@ namespace HammerAndSickle.Core.Map
                 WeaponSystems.CAVALRY_GENERIC => false,
 
                 // System values - no sprite
-                WeaponSystems.COMBAT => false,
-                WeaponSystems.DEFAULT => false,
+                WeaponSystems.UTILITY_ID => false,
+                WeaponSystems.NONE => false,
 
                 // Everything else has direction suffix
                 _ => true
@@ -1376,12 +1376,12 @@ namespace HammerAndSickle.Core.Map
             return unit.DeploymentPosition switch
             {
                 // Embarked uses embarked profile if available
-                DeploymentPosition.Embarked => unit.EmbarkedProfileID != WeaponSystems.DEFAULT
+                DeploymentPosition.Embarked => unit.EmbarkedProfileID != WeaponSystems.NONE
                     ? unit.EmbarkedProfileID
                     : unit.DeployedProfileID,
 
                 // Mobile uses mobile profile if available
-                DeploymentPosition.Mobile => unit.MobileProfileID != WeaponSystems.DEFAULT
+                DeploymentPosition.Mobile => unit.MobileProfileID != WeaponSystems.NONE
                     ? unit.MobileProfileID
                     : unit.DeployedProfileID,
 
@@ -1506,8 +1506,8 @@ namespace HammerAndSickle.Core.Map
                 WeaponSystems.RCNA_MIG25R => "SV_Mig25R",
 
                 // Soviet Transport
-                WeaponSystems.Transport_AIR => "SV_AN8",
-                WeaponSystems.Transport_NAVAL => SpriteManager.GEN_NavalTransport,
+                WeaponSystems.TRN_AN8 => "SV_AN8",
+                WeaponSystems.TRN_NAVAL => SpriteManager.GEN_NavalTransport,
 
                 // ═══════════════════════════════════════════════════════════════
                 // USA WEAPON SYSTEMS
@@ -1648,8 +1648,8 @@ namespace HammerAndSickle.Core.Map
                 WeaponSystems.RR_RECOILLESS_RIFLE_IPO => null,
 
                 // System values
-                WeaponSystems.COMBAT => null,
-                WeaponSystems.DEFAULT => null,
+                WeaponSystems.UTILITY_ID => null,
+                WeaponSystems.NONE => null,
 
                 // Fallback
                 _ => null

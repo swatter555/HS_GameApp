@@ -18,7 +18,7 @@ namespace HammerAndSickle.Models
 
         public string Name { get; private set; }                   = "Default";
         public string ShortName { get; private set; }              = "Default";
-        public WeaponSystems WeaponSystemID { get; private set; }  = WeaponSystems.DEFAULT;
+        public WeaponSystems WeaponSystemID { get; private set; }  = WeaponSystems.NONE;
         public Nationality Nationality { get; private set; }       = Nationality.USSR;
         public WeaponSystemType WeaponSystemType { get; private set; } = WeaponSystemType.Soft;
         public List<UpgradeType> UpgradeTypes { get; private set; } = new List<UpgradeType>();

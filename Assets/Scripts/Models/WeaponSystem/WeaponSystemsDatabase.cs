@@ -94,7 +94,7 @@ namespace HammerAndSickle.Models
                     return null;
                 }
 
-                if (weaponSystemID == WeaponSystems.DEFAULT)
+                if (weaponSystemID == WeaponSystems.NONE)
                 {
                     return null;
                 }
@@ -122,7 +122,7 @@ namespace HammerAndSickle.Models
                     return false;
                 }
 
-                if (weaponSystemID == WeaponSystems.DEFAULT)
+                if (weaponSystemID == WeaponSystems.NONE)
                 {
                     return false;
                 }
@@ -1295,7 +1295,7 @@ namespace HammerAndSickle.Models
                     softDefense: GameData.BASE_ARTY_SOFT_DEFENSE + MEDIUM_BONUS,
                     groundAirDefense: GameData.GROUND_DEFENSE_LIGHTARMOR,
                     primaryRange: GameData.PRIMARY_RANGE_DEFAULT,
-                    indirectRange: GameData.INDIRECT_RANGE_120MM,
+                    indirectRange: GameData.INDIRECT_RANGE_SHORT,
                     spottingRange: GameData.BASE_UNIT_SPOTTING_RANGE,
                     allWeatherCapability: AllWeatherRating.GroundUnit,
                     nvgCapability: NVG_Rating.None,
@@ -1344,7 +1344,7 @@ namespace HammerAndSickle.Models
                     softDefense: GameData.BASE_ARTY_SOFT_DEFENSE + MEDIUM_BONUS,
                     groundAirDefense: GameData.GROUND_DEFENSE_LIGHTARMOR,
                     primaryRange: GameData.PRIMARY_RANGE_DEFAULT,
-                    indirectRange: GameData.INDIRECT_RANGE_155MM,
+                    indirectRange: GameData.INDIRECT_RANGE_MEDIUM,
                     spottingRange: GameData.BASE_UNIT_SPOTTING_RANGE,
                     allWeatherCapability: AllWeatherRating.GroundUnit,
                     nvgCapability: NVG_Rating.None,
@@ -1393,7 +1393,7 @@ namespace HammerAndSickle.Models
                     softDefense: GameData.BASE_ARTY_SOFT_DEFENSE + MEDIUM_BONUS,
                     groundAirDefense: GameData.GROUND_DEFENSE_LIGHTARMOR,
                     primaryRange: GameData.PRIMARY_RANGE_DEFAULT,
-                    indirectRange: GameData.INDIRECT_RANGE_203MM,
+                    indirectRange: GameData.INDIRECT_RANGE_LONG,
                     spottingRange: GameData.BASE_UNIT_SPOTTING_RANGE,
                     allWeatherCapability: AllWeatherRating.GroundUnit,
                     nvgCapability: NVG_Rating.None,
@@ -1442,7 +1442,7 @@ namespace HammerAndSickle.Models
                     softDefense: GameData.BASE_ARTY_SOFT_DEFENSE + MEDIUM_BONUS,
                     groundAirDefense: GameData.GROUND_DEFENSE_LIGHTARMOR,
                     primaryRange: GameData.PRIMARY_RANGE_DEFAULT,
-                    indirectRange: GameData.INDIRECT_RANGE_155MM,
+                    indirectRange: GameData.INDIRECT_RANGE_MEDIUM,
                     spottingRange: GameData.BASE_UNIT_SPOTTING_RANGE,
                     allWeatherCapability: AllWeatherRating.GroundUnit,
                     nvgCapability: NVG_Rating.None,
@@ -2301,7 +2301,7 @@ namespace HammerAndSickle.Models
                 var profile = new WeaponSystemProfile(
                     name: "An-12 Antonov Transport Plane",
                     nationality: Nationality.USSR,
-                    weaponSystemID: WeaponSystems.Transport_AIR,
+                    weaponSystemID: WeaponSystems.TRN_AN8,
                     prestigeCost: GameData.PRESTIGE_TIER_2,
                     weaponSystemType: WeaponSystemType.Air,
                     dogfighting: GameData.AC_BOMBER_DOGFIGHT,
@@ -2333,7 +2333,7 @@ namespace HammerAndSickle.Models
                 profile.SetTurnAvailable(250);
 
                 // Store in master dictionary
-                _weaponSystemProfiles[WeaponSystems.Transport_AIR] = profile;
+                _weaponSystemProfiles[WeaponSystems.TRN_AN8] = profile;
             }
             catch (Exception e)
             {
@@ -3172,7 +3172,7 @@ namespace HammerAndSickle.Models
                 var profile = new WeaponSystemProfile(
                     name: "Transport Flotilla",
                     nationality: Nationality.USSR,
-                    weaponSystemID: WeaponSystems.Transport_NAVAL,
+                    weaponSystemID: WeaponSystems.TRN_NAVAL,
                     prestigeCost: GameData.PRESTIGE_TIER_5,
                     weaponSystemType: WeaponSystemType.Hard,
                     groundAirDefense: 12,
@@ -3198,7 +3198,7 @@ namespace HammerAndSickle.Models
                 profile.SetTurnAvailable(250);
 
                 // Store in master dictionary
-                _weaponSystemProfiles[WeaponSystems.Transport_NAVAL] = profile;
+                _weaponSystemProfiles[WeaponSystems.TRN_NAVAL] = profile;
             }
             catch (Exception e)
             {
@@ -3586,7 +3586,7 @@ namespace HammerAndSickle.Models
                     softDefense: GameData.BASE_ARTY_SOFT_DEFENSE + MEDIUM_BONUS,
                     groundAirDefense: GameData.GROUND_DEFENSE_LIGHTARMOR,
                     primaryRange: GameData.PRIMARY_RANGE_DEFAULT,
-                    indirectRange: GameData.INDIRECT_RANGE_155MM,
+                    indirectRange: GameData.INDIRECT_RANGE_MEDIUM,
                     spottingRange: GameData.BASE_UNIT_SPOTTING_RANGE,
                     allWeatherCapability: AllWeatherRating.GroundUnit,
                     sigintRating: SIGINT_Rating.UnitLevel,
@@ -5200,7 +5200,7 @@ namespace HammerAndSickle.Models
                     softDefense: GameData.BASE_ARTY_SOFT_DEFENSE + MEDIUM_BONUS,
                     groundAirDefense: GameData.GROUND_DEFENSE_LIGHTARMOR,
                     primaryRange: GameData.PRIMARY_RANGE_DEFAULT,
-                    indirectRange: GameData.INDIRECT_RANGE_155MM,
+                    indirectRange: GameData.INDIRECT_RANGE_MEDIUM,
                     spottingRange: GameData.BASE_UNIT_SPOTTING_RANGE,
                     allWeatherCapability: AllWeatherRating.GroundUnit,
                     sigintRating: SIGINT_Rating.UnitLevel,
@@ -5456,7 +5456,7 @@ namespace HammerAndSickle.Models
                     softDefense: GameData.BASE_ARTY_SOFT_DEFENSE,
                     groundAirDefense: GameData.GROUND_DEFENSE_INFANTRY,
                     primaryRange: GameData.PRIMARY_RANGE_DEFAULT,
-                    indirectRange: GameData.INDIRECT_RANGE_120MM,
+                    indirectRange: GameData.INDIRECT_RANGE_SHORT,
                     spottingRange: GameData.BASE_UNIT_SPOTTING_RANGE,
                     allWeatherCapability: AllWeatherRating.GroundUnit,
                     nvgCapability: NVG_Rating.None,
@@ -5505,7 +5505,7 @@ namespace HammerAndSickle.Models
                     softDefense: GameData.BASE_ARTY_SOFT_DEFENSE,
                     groundAirDefense: GameData.GROUND_DEFENSE_INFANTRY,
                     primaryRange: GameData.PRIMARY_RANGE_DEFAULT,
-                    indirectRange: GameData.INDIRECT_RANGE_155MM,
+                    indirectRange: GameData.INDIRECT_RANGE_MEDIUM,
                     spottingRange: GameData.BASE_UNIT_SPOTTING_RANGE,
                     allWeatherCapability: AllWeatherRating.GroundUnit,
                     nvgCapability: NVG_Rating.None,
@@ -5603,7 +5603,7 @@ namespace HammerAndSickle.Models
                     softDefense: GameData.BASE_ARTY_SOFT_DEFENSE,
                     groundAirDefense: GameData.GROUND_DEFENSE_INFANTRY,
                     primaryRange: GameData.PRIMARY_RANGE_DEFAULT,
-                    indirectRange: GameData.INDIRECT_RANGE_120MM + MEDIUM_MALUS,
+                    indirectRange: GameData.INDIRECT_RANGE_SHORT + MEDIUM_MALUS,
                     spottingRange: GameData.BASE_UNIT_SPOTTING_RANGE,
                     allWeatherCapability: AllWeatherRating.GroundUnit,
                     nvgCapability: NVG_Rating.None,
@@ -5652,7 +5652,7 @@ namespace HammerAndSickle.Models
                     softDefense: GameData.BASE_ARTY_SOFT_DEFENSE,
                     groundAirDefense: GameData.GROUND_DEFENSE_INFANTRY,
                     primaryRange: GameData.PRIMARY_RANGE_DEFAULT,
-                    indirectRange: GameData.INDIRECT_RANGE_120MM + SMALL_MALUS,
+                    indirectRange: GameData.INDIRECT_RANGE_SHORT + SMALL_MALUS,
                     spottingRange: GameData.BASE_UNIT_SPOTTING_RANGE,
                     allWeatherCapability: AllWeatherRating.GroundUnit,
                     nvgCapability: NVG_Rating.None,
