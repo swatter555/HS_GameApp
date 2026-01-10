@@ -738,22 +738,6 @@ namespace HammerAndSickle.Controllers
         }
 
         /// <summary>
-        /// Gets the maximum count for a specific weapon system in an intel profile type.
-        /// </summary>
-        public static int GetIntelWeaponSystemCount(IntelProfileTypes profileType, WeaponSystems weaponSystem)
-        {
-            try
-            {
-                return IntelProfileDatabase.GetWeaponSystemCount(profileType, weaponSystem);
-            }
-            catch (Exception e)
-            {
-                AppService.HandleException(CLASS_NAME, nameof(GetIntelWeaponSystemCount), e);
-                return 0;
-            }
-        }
-
-        /// <summary>
         /// Generates an intelligence report for a unit based on the specified spotted level.
         /// </summary>
         public static IntelReport GenerateIntelReport(IntelProfileTypes profileType, string unitName, int hitPoints,

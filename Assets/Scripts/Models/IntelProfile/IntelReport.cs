@@ -1,4 +1,4 @@
-﻿using HammerAndSickle.Core.GameData;
+using HammerAndSickle.Core.GameData;
 
 namespace HammerAndSickle.Models
 {
@@ -19,15 +19,15 @@ namespace HammerAndSickle.Models
         public int AAAs { get; set; } = 0;
         public int MANPADs { get; set; } = 0;
         public int ATGMs { get; set; } = 0;
-        public int HEL { get; set; } = 0;
-        public int TRANHEL { get; set; } = 0;
+        public int AttackHelos { get; set; } = 0;
+        public int TransportHelos { get; set; } = 0;
         public int FGTs { get; set; } = 0;
         public int ATTs { get; set; } = 0;
         public int BMBs { get; set; } = 0;
         public int AWACS { get; set; } = 0;
         public int TRANAIR { get; set; } = 0;
         public int RCNAs { get; set; } = 0;
-        public int TRANNAV { get; set; } = 0;
+        public int TransportAir { get; set; } = 0;
         public int LightAT { get; set; } = 0;
         public int Mortars { get; set; } = 0;
         public int Recoilless { get; set; } = 0;
