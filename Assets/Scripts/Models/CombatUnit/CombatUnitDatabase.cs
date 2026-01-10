@@ -286,8 +286,8 @@ namespace HammerAndSickle.Models
                 deployedProfileID: WeaponSystems.INF_REG,
                 isMountable: true,
                 mobileProfileID: WeaponSystems.APC_BTR70,
-                isEmbarkable: false,
-                embarkProfileID: WeaponSystems.NONE,
+                isEmbarkable: true,
+                embarkProfileID: WeaponSystems.TRN_NAVAL,
                 category: DepotCategory.Secondary,
                 size: DepotSize.Small
             );
@@ -315,8 +315,8 @@ namespace HammerAndSickle.Models
                 deployedProfileID: WeaponSystems.INF_REG,
                 isMountable: true,
                 mobileProfileID: WeaponSystems.APC_BTR80,
-                isEmbarkable: false,
-                embarkProfileID: WeaponSystems.NONE,
+                isEmbarkable: true,
+                embarkProfileID: WeaponSystems.TRN_NAVAL,
                 category: DepotCategory.Secondary,
                 size: DepotSize.Small
             );
@@ -344,8 +344,8 @@ namespace HammerAndSickle.Models
                 deployedProfileID: WeaponSystems.INF_REG,
                 isMountable: true,
                 mobileProfileID: WeaponSystems.IFV_BMP1,
-                isEmbarkable: false,
-                embarkProfileID: WeaponSystems.NONE,
+                isEmbarkable: true,
+                embarkProfileID: WeaponSystems.TRN_NAVAL,
                 category: DepotCategory.Secondary,
                 size: DepotSize.Small
             );
@@ -373,8 +373,8 @@ namespace HammerAndSickle.Models
                 deployedProfileID: WeaponSystems.INF_REG,
                 isMountable: true,
                 mobileProfileID: WeaponSystems.IFV_BMP2,
-                isEmbarkable: false,
-                embarkProfileID: WeaponSystems.NONE,
+                isEmbarkable: true,
+                embarkProfileID: WeaponSystems.TRN_NAVAL,
                 category: DepotCategory.Secondary,
                 size: DepotSize.Small
             );
@@ -402,8 +402,8 @@ namespace HammerAndSickle.Models
                 deployedProfileID: WeaponSystems.INF_REG,
                 isMountable: true,
                 mobileProfileID: WeaponSystems.IFV_BMP3,
-                isEmbarkable: false,
-                embarkProfileID: WeaponSystems.NONE,
+                isEmbarkable: true,
+                embarkProfileID: WeaponSystems.TRN_NAVAL,
                 category: DepotCategory.Secondary,
                 size: DepotSize.Small
             );
@@ -441,8 +441,8 @@ namespace HammerAndSickle.Models
                 deployedProfileID: WeaponSystems.TANK_T55A,
                 isMountable: false,
                 mobileProfileID: WeaponSystems.NONE,
-                isEmbarkable: false,
-                embarkProfileID: WeaponSystems.NONE,
+                isEmbarkable: true,
+                embarkProfileID: WeaponSystems.TRN_NAVAL,
                 category: DepotCategory.Secondary,
                 size: DepotSize.Small
             );
@@ -470,8 +470,8 @@ namespace HammerAndSickle.Models
                 deployedProfileID: WeaponSystems.TANK_T64A,
                 isMountable: false,
                 mobileProfileID: WeaponSystems.NONE,
-                isEmbarkable: false,
-                embarkProfileID: WeaponSystems.NONE,
+                isEmbarkable: true,
+                embarkProfileID: WeaponSystems.TRN_NAVAL,
                 category: DepotCategory.Secondary,
                 size: DepotSize.Small
             );
@@ -499,8 +499,8 @@ namespace HammerAndSickle.Models
                 deployedProfileID: WeaponSystems.TANK_T64B,
                 isMountable: false,
                 mobileProfileID: WeaponSystems.NONE,
-                isEmbarkable: false,
-                embarkProfileID: WeaponSystems.NONE,
+                isEmbarkable: true,
+                embarkProfileID: WeaponSystems.TRN_NAVAL,
                 category: DepotCategory.Secondary,
                 size: DepotSize.Small
             );
@@ -528,8 +528,8 @@ namespace HammerAndSickle.Models
                 deployedProfileID: WeaponSystems.TANK_T72A,
                 isMountable: false,
                 mobileProfileID: WeaponSystems.NONE,
-                isEmbarkable: false,
-                embarkProfileID: WeaponSystems.NONE,
+                isEmbarkable: true,
+                embarkProfileID: WeaponSystems.TRN_NAVAL,
                 category: DepotCategory.Secondary,
                 size: DepotSize.Small
             );
@@ -557,8 +557,8 @@ namespace HammerAndSickle.Models
                 deployedProfileID: WeaponSystems.TANK_T72B,
                 isMountable: false,
                 mobileProfileID: WeaponSystems.NONE,
-                isEmbarkable: false,
-                embarkProfileID: WeaponSystems.NONE,
+                isEmbarkable: true,
+                embarkProfileID: WeaponSystems.TRN_NAVAL,
                 category: DepotCategory.Secondary,
                 size: DepotSize.Small
             );
@@ -586,8 +586,8 @@ namespace HammerAndSickle.Models
                 deployedProfileID: WeaponSystems.TANK_T80B,
                 isMountable: false,
                 mobileProfileID: WeaponSystems.NONE,
-                isEmbarkable: false,
-                embarkProfileID: WeaponSystems.NONE,
+                isEmbarkable: true,
+                embarkProfileID: WeaponSystems.TRN_NAVAL,
                 category: DepotCategory.Secondary,
                 size: DepotSize.Small
             );
@@ -615,8 +615,8 @@ namespace HammerAndSickle.Models
                 deployedProfileID: WeaponSystems.TANK_T80U,
                 isMountable: false,
                 mobileProfileID: WeaponSystems.NONE,
-                isEmbarkable: false,
-                embarkProfileID: WeaponSystems.NONE,
+                isEmbarkable: true,
+                embarkProfileID: WeaponSystems.TRN_NAVAL,
                 category: DepotCategory.Secondary,
                 size: DepotSize.Small
             );
@@ -644,8 +644,8 @@ namespace HammerAndSickle.Models
                 deployedProfileID: WeaponSystems.TANK_T80BV,
                 isMountable: false,
                 mobileProfileID: WeaponSystems.NONE,
-                isEmbarkable: false,
-                embarkProfileID: WeaponSystems.NONE,
+                isEmbarkable: true,
+                embarkProfileID: WeaponSystems.TRN_NAVAL,
                 category: DepotCategory.Secondary,
                 size: DepotSize.Small
             );
@@ -680,11 +680,11 @@ namespace HammerAndSickle.Models
                 side: Side.Player,
                 nationality: Nationality.USSR,
                 intelProfileType: IntelProfileTypes.SV_AR_LGT,
-                deployedProfileID: WeaponSystems.ART_LIGHT_GENERIC,
+                deployedProfileID: WeaponSystems.ART_LIGHT_GEN,
                 isMountable: true,
-                mobileProfileID: WeaponSystems.TRUCK_GENERIC,
-                isEmbarkable: false,
-                embarkProfileID: WeaponSystems.NONE,
+                mobileProfileID: WeaponSystems.TRUCK_GEN,
+                isEmbarkable: true,
+                embarkProfileID: WeaponSystems.TRN_NAVAL,
                 category: DepotCategory.Secondary,
                 size: DepotSize.Small
             );
@@ -709,11 +709,11 @@ namespace HammerAndSickle.Models
                 side: Side.Player,
                 nationality: Nationality.USSR,
                 intelProfileType: IntelProfileTypes.SV_AR_HVY,
-                deployedProfileID: WeaponSystems.ART_HEAVY_GENERIC,
+                deployedProfileID: WeaponSystems.ART_HEAVY_GEN,
                 isMountable: true,
-                mobileProfileID: WeaponSystems.TRUCK_GENERIC,
-                isEmbarkable: false,
-                embarkProfileID: WeaponSystems.NONE,
+                mobileProfileID: WeaponSystems.TRUCK_GEN,
+                isEmbarkable: true,
+                embarkProfileID: WeaponSystems.TRN_NAVAL,
                 category: DepotCategory.Secondary,
                 size: DepotSize.Small
             );
@@ -741,8 +741,8 @@ namespace HammerAndSickle.Models
                 deployedProfileID: WeaponSystems.SPA_2S1,
                 isMountable: false,
                 mobileProfileID: WeaponSystems.NONE,
-                isEmbarkable: false,
-                embarkProfileID: WeaponSystems.NONE,
+                isEmbarkable: true,
+                embarkProfileID: WeaponSystems.TRN_NAVAL,
                 category: DepotCategory.Secondary,
                 size: DepotSize.Small
             );
@@ -770,8 +770,8 @@ namespace HammerAndSickle.Models
                 deployedProfileID: WeaponSystems.SPA_2S3,
                 isMountable: false,
                 mobileProfileID: WeaponSystems.NONE,
-                isEmbarkable: false,
-                embarkProfileID: WeaponSystems.NONE,
+                isEmbarkable: true,
+                embarkProfileID: WeaponSystems.TRN_NAVAL,
                 category: DepotCategory.Secondary,
                 size: DepotSize.Small
             );
@@ -799,8 +799,8 @@ namespace HammerAndSickle.Models
                 deployedProfileID: WeaponSystems.SPA_2S5,
                 isMountable: false,
                 mobileProfileID: WeaponSystems.NONE,
-                isEmbarkable: false,
-                embarkProfileID: WeaponSystems.NONE,
+                isEmbarkable: true,
+                embarkProfileID: WeaponSystems.TRN_NAVAL,
                 category: DepotCategory.Secondary,
                 size: DepotSize.Small
             );
@@ -828,8 +828,8 @@ namespace HammerAndSickle.Models
                 deployedProfileID: WeaponSystems.SPA_2S19,
                 isMountable: false,
                 mobileProfileID: WeaponSystems.NONE,
-                isEmbarkable: false,
-                embarkProfileID: WeaponSystems.NONE,
+                isEmbarkable: true,
+                embarkProfileID: WeaponSystems.TRN_NAVAL,
                 category: DepotCategory.Secondary,
                 size: DepotSize.Small
             );
@@ -867,8 +867,8 @@ namespace HammerAndSickle.Models
                 deployedProfileID: WeaponSystems.ROC_BM21,
                 isMountable: false,
                 mobileProfileID: WeaponSystems.NONE,
-                isEmbarkable: false,
-                embarkProfileID: WeaponSystems.NONE,
+                isEmbarkable: true,
+                embarkProfileID: WeaponSystems.TRN_NAVAL,
                 category: DepotCategory.Secondary,
                 size: DepotSize.Small
             );
@@ -896,8 +896,8 @@ namespace HammerAndSickle.Models
                 deployedProfileID: WeaponSystems.ROC_BM27,
                 isMountable: false,
                 mobileProfileID: WeaponSystems.NONE,
-                isEmbarkable: false,
-                embarkProfileID: WeaponSystems.NONE,
+                isEmbarkable: true,
+                embarkProfileID: WeaponSystems.TRN_NAVAL,
                 category: DepotCategory.Secondary,
                 size: DepotSize.Small
             );
@@ -925,8 +925,8 @@ namespace HammerAndSickle.Models
                 deployedProfileID: WeaponSystems.ROC_BM30,
                 isMountable: false,
                 mobileProfileID: WeaponSystems.NONE,
-                isEmbarkable: false,
-                embarkProfileID: WeaponSystems.NONE,
+                isEmbarkable: true,
+                embarkProfileID: WeaponSystems.TRN_NAVAL,
                 category: DepotCategory.Secondary,
                 size: DepotSize.Small
             );
@@ -954,8 +954,8 @@ namespace HammerAndSickle.Models
                 deployedProfileID: WeaponSystems.SSM_SCUD,
                 isMountable: false,
                 mobileProfileID: WeaponSystems.NONE,
-                isEmbarkable: false,
-                embarkProfileID: WeaponSystems.NONE,
+                isEmbarkable: true,
+                embarkProfileID: WeaponSystems.TRN_NAVAL,
                 category: DepotCategory.Secondary,
                 size: DepotSize.Small
             );
@@ -990,11 +990,11 @@ namespace HammerAndSickle.Models
                 side: Side.Player,
                 nationality: Nationality.USSR,
                 intelProfileType: IntelProfileTypes.SV_AAR_MTLB,
-                deployedProfileID: WeaponSystems.APC_MTLB,
+                deployedProfileID: WeaponSystems.INF_AM,
                 isMountable: true,
-                mobileProfileID: WeaponSystems.HEL_MI8T,
-                isEmbarkable: false,
-                embarkProfileID: WeaponSystems.NONE,
+                mobileProfileID: WeaponSystems.APC_MTLB,
+                isEmbarkable: true,
+                embarkProfileID: WeaponSystems.HEL_MI8T,
                 category: DepotCategory.Secondary,
                 size: DepotSize.Small
             );
@@ -1019,11 +1019,11 @@ namespace HammerAndSickle.Models
                 side: Side.Player,
                 nationality: Nationality.USSR,
                 intelProfileType: IntelProfileTypes.SV_AAR_BMD1,
-                deployedProfileID: WeaponSystems.IFV_BMD1,
+                deployedProfileID: WeaponSystems.INF_AM,
                 isMountable: true,
-                mobileProfileID: WeaponSystems.HEL_MI8T,
-                isEmbarkable: false,
-                embarkProfileID: WeaponSystems.NONE,
+                mobileProfileID: WeaponSystems.IFV_BMD1,
+                isEmbarkable: true,
+                embarkProfileID: WeaponSystems.HEL_MI8T,
                 category: DepotCategory.Secondary,
                 size: DepotSize.Small
             );
@@ -1048,11 +1048,11 @@ namespace HammerAndSickle.Models
                 side: Side.Player,
                 nationality: Nationality.USSR,
                 intelProfileType: IntelProfileTypes.SV_AAR_BMD2,
-                deployedProfileID: WeaponSystems.IFV_BMD2,
+                deployedProfileID: WeaponSystems.INF_AM,
                 isMountable: true,
-                mobileProfileID: WeaponSystems.HEL_MI8T,
-                isEmbarkable: false,
-                embarkProfileID: WeaponSystems.NONE,
+                mobileProfileID: WeaponSystems.IFV_BMD2,
+                isEmbarkable: true,
+                embarkProfileID: WeaponSystems.HEL_MI8T,
                 category: DepotCategory.Secondary,
                 size: DepotSize.Small
             );
@@ -1077,11 +1077,11 @@ namespace HammerAndSickle.Models
                 side: Side.Player,
                 nationality: Nationality.USSR,
                 intelProfileType: IntelProfileTypes.SV_AAR_BMD3,
-                deployedProfileID: WeaponSystems.IFV_BMD3,
+                deployedProfileID: WeaponSystems.INF_AM,
                 isMountable: true,
-                mobileProfileID: WeaponSystems.HEL_MI8T,
-                isEmbarkable: false,
-                embarkProfileID: WeaponSystems.NONE,
+                mobileProfileID: WeaponSystems.IFV_BMD3,
+                isEmbarkable: true,
+                embarkProfileID: WeaponSystems.HEL_MI8T,
                 category: DepotCategory.Secondary,
                 size: DepotSize.Small
             );
@@ -1203,7 +1203,7 @@ namespace HammerAndSickle.Models
                 side: Side.Player,
                 nationality: Nationality.USSR,
                 intelProfileType: IntelProfileTypes.SV_VDV_ART,
-                deployedProfileID: WeaponSystems.ART_LIGHT_GENERIC,
+                deployedProfileID: WeaponSystems.ART_LIGHT_GEN,
                 isMountable: true,
                 mobileProfileID: WeaponSystems.APC_MTLB,
                 isEmbarkable: true,
@@ -1342,8 +1342,8 @@ namespace HammerAndSickle.Models
                 deployedProfileID: WeaponSystems.INF_ENG,
                 isMountable: true,
                 mobileProfileID: WeaponSystems.APC_MTLB,
-                isEmbarkable: false,
-                embarkProfileID: WeaponSystems.NONE,
+                isEmbarkable: true,
+                embarkProfileID: WeaponSystems.TRN_NAVAL,
                 category: DepotCategory.Secondary,
                 size: DepotSize.Small
             );
@@ -1371,8 +1371,8 @@ namespace HammerAndSickle.Models
                 deployedProfileID: WeaponSystems.INF_SPEC,
                 isMountable: true,
                 mobileProfileID: WeaponSystems.HEL_MI8T,
-                isEmbarkable: false,
-                embarkProfileID: WeaponSystems.NONE,
+                isEmbarkable: true,
+                embarkProfileID: WeaponSystems.TRN_NAVAL,
                 category: DepotCategory.Secondary,
                 size: DepotSize.Small
             );
@@ -1410,8 +1410,8 @@ namespace HammerAndSickle.Models
                 deployedProfileID: WeaponSystems.RCN_BRDM2,
                 isMountable: false,
                 mobileProfileID: WeaponSystems.NONE,
-                isEmbarkable: false,
-                embarkProfileID: WeaponSystems.NONE,
+                isEmbarkable: true,
+                embarkProfileID: WeaponSystems.TRN_NAVAL,
                 category: DepotCategory.Secondary,
                 size: DepotSize.Small
             );
@@ -1439,8 +1439,8 @@ namespace HammerAndSickle.Models
                 deployedProfileID: WeaponSystems.RCN_BRDM2AT,
                 isMountable: false,
                 mobileProfileID: WeaponSystems.NONE,
-                isEmbarkable: false,
-                embarkProfileID: WeaponSystems.NONE,
+                isEmbarkable: true,
+                embarkProfileID: WeaponSystems.TRN_NAVAL,
                 category: DepotCategory.Secondary,
                 size: DepotSize.Small
             );
@@ -1475,11 +1475,11 @@ namespace HammerAndSickle.Models
                 side: Side.Player,
                 nationality: Nationality.USSR,
                 intelProfileType: IntelProfileTypes.SV_ADR_AAA,
-                deployedProfileID: WeaponSystems.AAA_GENERIC,
+                deployedProfileID: WeaponSystems.AAA_GEN,
                 isMountable: true,
-                mobileProfileID: WeaponSystems.TRUCK_GENERIC,
-                isEmbarkable: false,
-                embarkProfileID: WeaponSystems.NONE,
+                mobileProfileID: WeaponSystems.TRUCK_GEN,
+                isEmbarkable: true,
+                embarkProfileID: WeaponSystems.TRN_NAVAL,
                 category: DepotCategory.Secondary,
                 size: DepotSize.Small
             );
@@ -1507,8 +1507,8 @@ namespace HammerAndSickle.Models
                 deployedProfileID: WeaponSystems.SPAAA_ZSU57,
                 isMountable: false,
                 mobileProfileID: WeaponSystems.NONE,
-                isEmbarkable: false,
-                embarkProfileID: WeaponSystems.NONE,
+                isEmbarkable: true,
+                embarkProfileID: WeaponSystems.TRN_NAVAL,
                 category: DepotCategory.Secondary,
                 size: DepotSize.Small
             );
@@ -1536,8 +1536,8 @@ namespace HammerAndSickle.Models
                 deployedProfileID: WeaponSystems.SPAAA_ZSU23,
                 isMountable: false,
                 mobileProfileID: WeaponSystems.NONE,
-                isEmbarkable: false,
-                embarkProfileID: WeaponSystems.NONE,
+                isEmbarkable: true,
+                embarkProfileID: WeaponSystems.TRN_NAVAL,
                 category: DepotCategory.Secondary,
                 size: DepotSize.Small
             );
@@ -1565,8 +1565,8 @@ namespace HammerAndSickle.Models
                 deployedProfileID: WeaponSystems.SPAAA_2K22,
                 isMountable: false,
                 mobileProfileID: WeaponSystems.NONE,
-                isEmbarkable: false,
-                embarkProfileID: WeaponSystems.NONE,
+                isEmbarkable: true,
+                embarkProfileID: WeaponSystems.TRN_NAVAL,
                 category: DepotCategory.Secondary,
                 size: DepotSize.Small
             );
@@ -1604,8 +1604,8 @@ namespace HammerAndSickle.Models
                 deployedProfileID: WeaponSystems.SPSAM_9K31,
                 isMountable: false,
                 mobileProfileID: WeaponSystems.NONE,
-                isEmbarkable: false,
-                embarkProfileID: WeaponSystems.NONE,
+                isEmbarkable: true,
+                embarkProfileID: WeaponSystems.TRN_NAVAL,
                 category: DepotCategory.Secondary,
                 size: DepotSize.Small
             );
@@ -1632,9 +1632,9 @@ namespace HammerAndSickle.Models
                 intelProfileType: IntelProfileTypes.SV_SAM_S75,
                 deployedProfileID: WeaponSystems.SAM_S75,
                 isMountable: true,
-                mobileProfileID: WeaponSystems.TRUCK_GENERIC,
-                isEmbarkable: false,
-                embarkProfileID: WeaponSystems.NONE,
+                mobileProfileID: WeaponSystems.TRUCK_GEN,
+                isEmbarkable: true,
+                embarkProfileID: WeaponSystems.TRN_NAVAL,
                 category: DepotCategory.Secondary,
                 size: DepotSize.Small
             );
@@ -1661,9 +1661,9 @@ namespace HammerAndSickle.Models
                 intelProfileType: IntelProfileTypes.SV_SAM_S125,
                 deployedProfileID: WeaponSystems.SAM_S125,
                 isMountable: true,
-                mobileProfileID: WeaponSystems.TRUCK_GENERIC,
-                isEmbarkable: false,
-                embarkProfileID: WeaponSystems.NONE,
+                mobileProfileID: WeaponSystems.TRUCK_GEN,
+                isEmbarkable: true,
+                embarkProfileID: WeaponSystems.TRN_NAVAL,
                 category: DepotCategory.Secondary,
                 size: DepotSize.Small
             );
@@ -1690,9 +1690,9 @@ namespace HammerAndSickle.Models
                 intelProfileType: IntelProfileTypes.SV_SAM_S300,
                 deployedProfileID: WeaponSystems.SAM_S300,
                 isMountable: true,
-                mobileProfileID: WeaponSystems.TRUCK_GENERIC,
-                isEmbarkable: false,
-                embarkProfileID: WeaponSystems.NONE,
+                mobileProfileID: WeaponSystems.NONE,
+                isEmbarkable: true,
+                embarkProfileID: WeaponSystems.TRN_NAVAL,
                 category: DepotCategory.Secondary,
                 size: DepotSize.Small
             );
@@ -2360,8 +2360,8 @@ namespace HammerAndSickle.Models
                 deployedProfileID: WeaponSystems.SUPPLYDEPOT_GENERIC,
                 isMountable: false,
                 mobileProfileID: WeaponSystems.NONE,
-                isEmbarkable: false,
-                embarkProfileID: WeaponSystems.NONE,
+                isEmbarkable: true,
+                embarkProfileID: WeaponSystems.TRN_NAVAL,
                 category: DepotCategory.Main,
                 size: DepotSize.Large
             );
@@ -2389,8 +2389,8 @@ namespace HammerAndSickle.Models
                 deployedProfileID: WeaponSystems.AIRBASE_GENERIC,
                 isMountable: false,
                 mobileProfileID: WeaponSystems.NONE,
-                isEmbarkable: false,
-                embarkProfileID: WeaponSystems.NONE,
+                isEmbarkable: true,
+                embarkProfileID: WeaponSystems.TRN_NAVAL,
                 category: DepotCategory.Main,
                 size: DepotSize.Large
             );
@@ -2418,8 +2418,8 @@ namespace HammerAndSickle.Models
                 deployedProfileID: WeaponSystems.LANDBASE_GENERIC,
                 isMountable: false,
                 mobileProfileID: WeaponSystems.NONE,
-                isEmbarkable: false,
-                embarkProfileID: WeaponSystems.NONE,
+                isEmbarkable: true,
+                embarkProfileID: WeaponSystems.TRN_NAVAL,
                 category: DepotCategory.Main,
                 size: DepotSize.Medium
             );
@@ -2447,8 +2447,8 @@ namespace HammerAndSickle.Models
                 deployedProfileID: WeaponSystems.LANDBASE_GENERIC,
                 isMountable: false,
                 mobileProfileID: WeaponSystems.NONE,
-                isEmbarkable: false,
-                embarkProfileID: WeaponSystems.NONE,
+                isEmbarkable: true,
+                embarkProfileID: WeaponSystems.TRN_NAVAL,
                 category: DepotCategory.Main,
                 size: DepotSize.Small
             );
@@ -2540,7 +2540,7 @@ namespace HammerAndSickle.Models
                 side: Side.AI,
                 nationality: Nationality.MJ,
                 intelProfileType: IntelProfileTypes.MJ_CAV_HORSE,
-                deployedProfileID: WeaponSystems.CAVALRY_GENERIC,
+                deployedProfileID: WeaponSystems.INF_CAV_GEN,
                 isMountable: false,
                 mobileProfileID: WeaponSystems.NONE,
                 isEmbarkable: false,
@@ -2569,9 +2569,9 @@ namespace HammerAndSickle.Models
                 side: Side.AI,
                 nationality: Nationality.MJ,
                 intelProfileType: IntelProfileTypes.MJ_AA,
-                deployedProfileID: WeaponSystems.MANPAD_GENERIC_IPO,
+                deployedProfileID: WeaponSystems.MANPAD_GEN,
                 isMountable: true,
-                mobileProfileID: WeaponSystems.TRUCK_GENERIC,
+                mobileProfileID: WeaponSystems.TRUCK_GEN,
                 isEmbarkable: false,
                 embarkProfileID: WeaponSystems.NONE,
                 category: DepotCategory.Secondary,
@@ -2598,9 +2598,9 @@ namespace HammerAndSickle.Models
                 side: Side.AI,
                 nationality: Nationality.MJ,
                 intelProfileType: IntelProfileTypes.MJ_ART_LIGHT_MORTAR,
-                deployedProfileID: WeaponSystems.MORTAR_81MM_IPO,
+                deployedProfileID: WeaponSystems.ART_LIGHT_MORTAR_GEN,
                 isMountable: true,
-                mobileProfileID: WeaponSystems.TRUCK_GENERIC,
+                mobileProfileID: WeaponSystems.TRUCK_GEN,
                 isEmbarkable: false,
                 embarkProfileID: WeaponSystems.NONE,
                 category: DepotCategory.Secondary,
@@ -2627,9 +2627,9 @@ namespace HammerAndSickle.Models
                 side: Side.AI,
                 nationality: Nationality.MJ,
                 intelProfileType: IntelProfileTypes.MJ_ART_HEAVY_MORTAR,
-                deployedProfileID: WeaponSystems.MORTAR_120MM_IPO,
+                deployedProfileID: WeaponSystems.ART_HEAVY_MORTAR_GEN,
                 isMountable: true,
-                mobileProfileID: WeaponSystems.TRUCK_GENERIC,
+                mobileProfileID: WeaponSystems.TRUCK_GEN,
                 isEmbarkable: false,
                 embarkProfileID: WeaponSystems.NONE,
                 category: DepotCategory.Secondary,

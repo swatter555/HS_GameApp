@@ -694,8 +694,7 @@ namespace HammerAndSickle.Core.GameData
 
         // USA
         TANK_M1,
-        TANK_M60A3,
-        TANK_M551_IPO,
+        TANK_M60A3, // Needs M60 sprite
         IFV_M2,
         IFV_M3,
         APC_M113,
@@ -705,9 +704,8 @@ namespace HammerAndSickle.Core.GameData
         SPAAA_M163,
         SPSAM_CHAP,
         SAM_HAWK,
-        HEL_OH58_IPO,
         HEL_AH64,
-        HEL_UH60,        // This is a transport helicopter for air mobile troops, for mobile profile.
+        HEL_UH60,   // Transport helo for mobile profiles.
         AWACS_E3,
         FGT_F15,
         FGT_F4,
@@ -721,7 +719,6 @@ namespace HammerAndSickle.Core.GameData
         TANK_LEOPARD1,
         TANK_LEOPARD2,
         IFV_MARDER,
-        RCN_LUCHS_IPO,
         SPAAA_GEPARD,
         HEL_BO105,
         FGT_TORNADO_IDS,
@@ -729,18 +726,12 @@ namespace HammerAndSickle.Core.GameData
         // UK
         TANK_CHALLENGER1,
         IFV_WARRIOR,
-        APC_FV432_IPO,
-        RCN_SCIMITAR_IPO,
-        SAM_RAPIER, // Use US_Hawk sprite
-        HEL_LYNX_IPO,
+        SAM_RAPIER,     // Use US_Hawk sprite
         FGT_TORNADO_GR1,
 
         // France
         TANK_AMX30,
-        IFV_AMX10P_IPO,
-        APC_VAB, // Use M113 Sprite
-        RCN_ERC90_IPO,
-        SPA_AUF1_IPO,
+        APC_VAB,        // Uses M113 Sprite
         SPSAM_ROLAND,
         FGT_MIRAGE2000,
         ATT_JAGUAR,
@@ -768,31 +759,6 @@ namespace HammerAndSickle.Core.GameData
         LANDBASE_GENERIC,
         AIRBASE_GENERIC,
         SUPPLYDEPOT_GENERIC,
-
-
-
-        // Generic types
-        AAA_GENERIC,
-        ART_LIGHT_GENERIC,
-        ART_HEAVY_GENERIC,
-
-
-        // Additional IDs for intelligence profile tracking.
-        MANPAD_GENERIC_IPO,
-        ATGM_GENERIC_IPO,
-        AT_RPG7_IPO,
-        MORTAR_81MM_IPO,
-        MORTAR_120MM_IPO,
-        RR_RECOILLESS_RIFLE_IPO,
-
-
-
-        CAVALRY_GENERIC,
-        TRUCK_GENERIC,
-
-        
-
-        // Weapon systems for intelligence profiles only, not used for combat.
     }
 
     /// <summary>
@@ -814,7 +780,7 @@ namespace HammerAndSickle.Core.GameData
         SPSAM,
         AAA,
         SPAAA,
-        ATGM,
+        AT,
         FGT,
         ATT,
         BMB,
