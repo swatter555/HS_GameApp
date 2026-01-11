@@ -564,6 +564,7 @@ namespace HammerAndSickle.Controllers
 
         #region Utility Icons
 
+        public const string Utility_AirbaseStack0 = "AirbaseStack0";
         public const string Utility_AirbaseStack1 = "AirbaseStack1";
         public const string Utility_AirbaseStack2 = "AirbaseStack2";
         public const string Utility_AirbaseStack3 = "AirbaseStack3";
