@@ -18,6 +18,7 @@ namespace HammerAndSickle.Core
         [Header("Component References")]
         [SerializeField] private SpriteRenderer unitIconRenderer;
         [SerializeField] private SpriteRenderer flagRenderer;
+        [SerializeField] private SpriteRenderer stackingIconRenderer;
         [SerializeField] private TextMeshPro hitPointsText;
 
         [Header("Font Settings")]
@@ -37,6 +38,11 @@ namespace HammerAndSickle.Core
         /// Gets the flag sprite renderer.
         /// </summary>
         public SpriteRenderer FlagRenderer => flagRenderer;
+
+        /// <summary>
+        /// Gets the stacking icon sprite renderer.
+        /// </summary>
+        public SpriteRenderer StackingIconRenderer => stackingIconRenderer;
 
         /// <summary>
         /// Gets or sets the hit points display text.
@@ -129,6 +135,76 @@ namespace HammerAndSickle.Core
             hitPointsText.color = ratioTextColor;
         }
 
+        /// <summary>
+        /// Sets the stacking icon sprite for air/land stacking toggle.
+        /// </summary>
+        /// <param name="spriteName">Name of the stacking icon sprite</param>
+        public void SetStackingIcon(string spriteName)
+        {
+            try
+            {
+                if (stackingIconRenderer == null)
+                {
+                    return;
+                }
+
+                if (string.IsNullOrEmpty(spriteName))
+                {
+                    AppService.CaptureUiMessage($"{CLASS_NAME}.SetStackingIcon: Sprite name is null or empty.");
+                    return;
+                }
+
+                stackingIconRenderer.sprite = SpriteManager.GetSprite(spriteName);
+            }
+            catch (Exception e)
+            {
+                AppService.HandleException(CLASS_NAME, nameof(SetStackingIcon), e);
+            }
+        }
+
+        /// <summary>
+        /// Shows or hides the stacking icon.
+        /// </summary>
+        /// <param name="show">True to show, false to hide</param>
+        public void ShowStackingIcon(bool show)
+        {
+            if (stackingIconRenderer != null)
+            {
+                stackingIconRenderer.enabled = show;
+            }
+        }
+
+        /// <summary>
+        /// Sets the opacity of the unit icon and flag renderers.
+        /// Used for stacking to show non-dominant units at reduced opacity.
+        /// </summary>
+        /// <param name="opacity">Opacity value from 0 (transparent) to 1 (opaque)</param>
+        public void SetOpacity(float opacity)
+        {
+            opacity = Mathf.Clamp01(opacity);
+
+            if (unitIconRenderer != null)
+            {
+                Color color = unitIconRenderer.color;
+                color.a = opacity;
+                unitIconRenderer.color = color;
+            }
+
+            if (flagRenderer != null)
+            {
+                Color color = flagRenderer.color;
+                color.a = opacity;
+                flagRenderer.color = color;
+            }
+
+            if (hitPointsText != null)
+            {
+                Color color = hitPointsText.color;
+                color.a = opacity;
+                hitPointsText.color = color;
+            }
+        }
+
         #endregion // Public Methods
 
         #region Private Methods
@@ -144,6 +220,9 @@ namespace HammerAndSickle.Core
             // Optional components - log warnings but don't throw
             if (flagRenderer == null)
                 Debug.LogWarning($"{CLASS_NAME}.ValidateReferences: flagRenderer is not assigned");
+
+            if (stackingIconRenderer == null)
+                Debug.LogWarning($"{CLASS_NAME}.ValidateReferences: stackingIconRenderer is not assigned");
 
             if (hitPointsText == null)
                 Debug.LogWarning($"{CLASS_NAME}.ValidateReferences: hitPointsText is not assigned");
