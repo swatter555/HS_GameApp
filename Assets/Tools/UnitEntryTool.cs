@@ -26,7 +26,7 @@ namespace HammerAndSickle.Tools
         public Nationality Nationality { get; set; }
         public UnitClassification Classification { get; set; }
         public UnitRole Role { get; set; }
-        public IntelProfileTypes IntelProfileType { get; set; }
+        public RegimentProfileType IntelProfileType { get; set; }
         public WeaponSystems DeployedProfileID { get; set; }
         public WeaponSystems MobileProfileID { get; set; }
         public WeaponSystems EmbarkedProfileID { get; set; }

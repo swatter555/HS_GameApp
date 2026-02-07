@@ -146,43 +146,95 @@ namespace HammerAndSickle.Controllers
         #region Soviet Unit Icons
 
         // Anti-Aircraft Systems
-        public const string SV_2K22_W   = "SV_2K22_W";
-        public const string SV_2K22_NW  = "SV_2K22_NW";
-        public const string SV_2K22_SW  = "SV_2K22_SW";
-        public const string SV_9K31_W   = "SV_9K31_W";
-        public const string SV_9K31_NW  = "SV_9K31_NW";
-        public const string SV_9K31_SW  = "SV_9K31_SW";
-        public const string SV_ZSU23_W  = "SV_ZSU23_W";
-        public const string SV_ZSU23_NW = "SV_ZSU23_NW";
-        public const string SV_ZSU23_SW = "SV_ZSU23_SW";
-        public const string SV_ZSU57_W  = "SV_ZSU57_W";
-        public const string SV_ZSU57_NW = "SV_ZSU57_NW";
-        public const string SV_ZSU57_SW = "SV_ZSU57_SW";
+        public const string SV_2K22_W    = "SV_2K22_W";
+        public const string SV_2K22_NW   = "SV_2K22_NW";
+        public const string SV_2K22_SW   = "SV_2K22_SW";
+        public const string SV_2K22_W_F  = "SV_2K22_W_F";
+        public const string SV_2K22_NW_F = "SV_2K22_NW_F";
+        public const string SV_2K22_SW_F = "SV_2K22_SW_F";
+        public const string SV_9K31_W    = "SV_9K31_W";
+        public const string SV_9K31_NW   = "SV_9K31_NW";
+        public const string SV_9K31_SW   = "SV_9K31_SW";
+        public const string SV_9K31_W_F  = "SV_9K31_W_F";
+        public const string SV_9K31_NW_F = "SV_9K31_NW_F";
+        public const string SV_9K31_SW_F = "SV_9K31_SW_F";
+        public const string SV_ZSU23_W    = "SV_ZSU23_W";
+        public const string SV_ZSU23_NW   = "SV_ZSU23_NW";
+        public const string SV_ZSU23_SW   = "SV_ZSU23_SW";
+        public const string SV_ZSU23_W_F  = "SV_ZSU23_W_F";
+        public const string SV_ZSU23_NW_F = "SV_ZSU23_NW_F";
+        public const string SV_ZSU23_SW_F = "SV_ZSU23_SW_F";
+        public const string SV_ZSU57_W    = "SV_ZSU57_W";
+        public const string SV_ZSU57_NW   = "SV_ZSU57_NW";
+        public const string SV_ZSU57_SW   = "SV_ZSU57_SW";
+        public const string SV_ZSU57_W_F  = "SV_ZSU57_W_F";
+        public const string SV_ZSU57_NW_F = "SV_ZSU57_NW_F";
+        public const string SV_ZSU57_SW_F = "SV_ZSU57_SW_F";
+
+        // 2K12 SPSAM
+        public const string SV_2K12_W    = "SV_2K12_W";
+        public const string SV_2K12_NW   = "SV_2K12_NW";
+        public const string SV_2K12_SW   = "SV_2K12_SW";
+        public const string SV_2K12_W_F  = "SV_2K12_W_F";
+        public const string SV_2K12_NW_F = "SV_2K12_NW_F";
+        public const string SV_2K12_SW_F = "SV_2K12_SW_F";
 
         // Artillery
-        public const string SV_2S1      = "SV_2S1";
-        public const string SV_2S1_F    = "SV_2S1_F";
-        public const string SV_2S3      = "SV_2S3";
-        public const string SV_2S3_F    = "SV_2S3_F";
-        public const string SV_2S5      = "SV_2S5";
-        public const string SV_2S5_F    = "SV_2S5_F";
-        public const string SV_2S19     = "SV_2S19";
-        public const string SV_2S19_F   = "SV_2S19_F";
+        public const string SV_2S1_W    = "SV_2S1_W";
+        public const string SV_2S1_NW   = "SV_2S1_NW";
+        public const string SV_2S1_SW   = "SV_2S1_SW";
+        public const string SV_2S1_W_F  = "SV_2S1_W_F";
+        public const string SV_2S1_NW_F = "SV_2S1_NW_F";
+        public const string SV_2S1_SW_F = "SV_2S1_SW_F";
+        public const string SV_2S3_W    = "SV_2S3_W";
+        public const string SV_2S3_NW   = "SV_2S3_NW";
+        public const string SV_2S3_SW   = "SV_2S3_SW";
+        public const string SV_2S3_W_F  = "SV_2S3_W_F";
+        public const string SV_2S3_NW_F = "SV_2S3_NW_F";
+        public const string SV_2S3_SW_F = "SV_2S3_SW_F";
+        public const string SV_2S5_W    = "SV_2S5_W";
+        public const string SV_2S5_NW   = "SV_2S5_NW";
+        public const string SV_2S5_SW   = "SV_2S5_SW";
+        public const string SV_2S5_W_F  = "SV_2S5_W_F";
+        public const string SV_2S5_NW_F = "SV_2S5_NW_F";
+        public const string SV_2S5_SW_F = "SV_2S5_SW_F";
+        public const string SV_2S19_W    = "SV_2S19_W";
+        public const string SV_2S19_NW   = "SV_2S19_NW";
+        public const string SV_2S19_SW   = "SV_2S19_SW";
+        public const string SV_2S19_W_F  = "SV_2S19_W_F";
+        public const string SV_2S19_NW_F = "SV_2S19_NW_F";
+        public const string SV_2S19_SW_F = "SV_2S19_SW_F";
         public const string SV_AA       = "SV_AA";
         public const string SV_HeavyArt = "SV_HeavyArt";
         public const string SV_LightArt = "SV_LightArt";
 
         // Rocket Artillery
-        public const string SV_BM21   = "SV_BM21";
-        public const string SV_BM21_F = "SV_BM21_F";
-        public const string SV_BM27   = "SV_BM27";
-        public const string SV_BM27_F = "SV_BM27_F";
-        public const string SV_BM30   = "SV_BM30";
-        public const string SV_BM30_F = "SV_BM30_F";
+        public const string SV_BM21_W    = "SV_BM21_W";
+        public const string SV_BM21_NW   = "SV_BM21_NW";
+        public const string SV_BM21_SW   = "SV_BM21_SW";
+        public const string SV_BM21_W_F  = "SV_BM21_W_F";
+        public const string SV_BM21_NW_F = "SV_BM21_NW_F";
+        public const string SV_BM21_SW_F = "SV_BM21_SW_F";
+        public const string SV_BM27_W    = "SV_BM27_W";
+        public const string SV_BM27_NW   = "SV_BM27_NW";
+        public const string SV_BM27_SW   = "SV_BM27_SW";
+        public const string SV_BM27_W_F  = "SV_BM27_W_F";
+        public const string SV_BM27_NW_F = "SV_BM27_NW_F";
+        public const string SV_BM27_SW_F = "SV_BM27_SW_F";
+        public const string SV_BM30_W    = "SV_BM30_W";
+        public const string SV_BM30_NW   = "SV_BM30_NW";
+        public const string SV_BM30_SW   = "SV_BM30_SW";
+        public const string SV_BM30_W_F  = "SV_BM30_W_F";
+        public const string SV_BM30_NW_F = "SV_BM30_NW_F";
+        public const string SV_BM30_SW_F = "SV_BM30_SW_F";
 
         // Missiles
-        public const string SV_ScudB   = "SV_ScudB";
-        public const string SV_ScudB_F = "SV_ScudB_F";
+        public const string SV_ScudB_W    = "SV_ScudB_W";
+        public const string SV_ScudB_NW   = "SV_ScudB_NW";
+        public const string SV_ScudB_SW   = "SV_ScudB_SW";
+        public const string SV_ScudB_W_F  = "SV_ScudB_W_F";
+        public const string SV_ScudB_NW_F = "SV_ScudB_NW_F";
+        public const string SV_ScudB_SW_F = "SV_ScudB_SW_F";
 
         // Infantry Fighting Vehicles
         public const string SV_BMD2_W = "SV_BMD2_W";
@@ -262,6 +314,7 @@ namespace HammerAndSickle.Controllers
         public const string SV_Mig27  = "SV_Mig27";
         public const string SV_Mig29  = "SV_Mig29";
         public const string SV_Mig31  = "SV_Mig31";
+        public const string SV_SU17   = "SV_SU17";
         public const string SV_SU24   = "SV_SU24";
         public const string SV_SU25   = "SV_SU25";
         public const string SV_SU25B  = "SV_SU25B";
@@ -275,6 +328,9 @@ namespace HammerAndSickle.Controllers
         public const string SV_T55A_W = "SV_T55A_W";
         public const string SV_T55A_NW = "SV_T55A_NW";
         public const string SV_T55A_SW = "SV_T55A_SW";
+        public const string SV_T62_W  = "SV_T62_W";
+        public const string SV_T62_NW = "SV_T62_NW";
+        public const string SV_T62_SW = "SV_T62_SW";
         public const string SV_T64A_W = "SV_T64A_W";
         public const string SV_T64A_NW = "SV_T64A_NW";
         public const string SV_T64A_SW = "SV_T64A_SW";
@@ -298,10 +354,14 @@ namespace HammerAndSickle.Controllers
         public const string SV_T80U_SW = "SV_T80U_SW";
 
         // SAM Systems
-        public const string SV_S75    = "SV_S75";
-        public const string SV_S125   = "SV_S125";
-        public const string SV_S300   = "SV_S300";
-        public const string SV_S300_F = "SV_S300_F";
+        public const string SV_S75     = "SV_S75";
+        public const string SV_S125    = "SV_S125";
+        public const string SV_S300_W    = "SV_S300_W";
+        public const string SV_S300_NW   = "SV_S300_NW";
+        public const string SV_S300_SW   = "SV_S300_SW";
+        public const string SV_S300_W_F  = "SV_S300_W_F";
+        public const string SV_S300_NW_F = "SV_S300_NW_F";
+        public const string SV_S300_SW_F = "SV_S300_SW_F";
 
         // Infantry & Support
         public const string SV_Airborne = "SV_Airborne";
@@ -337,23 +397,40 @@ namespace HammerAndSickle.Controllers
         public const string US_M2_SW = "US_M2_SW";
 
         // US Tanks
-        public const string US_M1_W = "US_M1_W";
+        public const string US_M1_W  = "US_M1_W";
         public const string US_M1_NW = "US_M1_NW";
         public const string US_M1_SW = "US_M1_SW";
+        public const string US_M60_W  = "US_M60_W";
+        public const string US_M60_NW = "US_M60_NW";
+        public const string US_M60_SW = "US_M60_SW";
 
         // US Artillery
-        public const string US_M109   = "US_M109";
-        public const string US_M109_F = "US_M109_F";
-        public const string US_MLRS   = "US_MLRS";
-        public const string US_MLRS_F = "US_MLRS_F";
+        public const string US_M109_W    = "US_M109_W";
+        public const string US_M109_NW   = "US_M109_NW";
+        public const string US_M109_SW   = "US_M109_SW";
+        public const string US_M109_W_F  = "US_M109_W_F";
+        public const string US_M109_NW_F = "US_M109_NW_F";
+        public const string US_M109_SW_F = "US_M109_SW_F";
+        public const string US_MLRS_W    = "US_MLRS_W";
+        public const string US_MLRS_NW   = "US_MLRS_NW";
+        public const string US_MLRS_SW   = "US_MLRS_SW";
+        public const string US_MLRS_W_F  = "US_MLRS_W_F";
+        public const string US_MLRS_NW_F = "US_MLRS_NW_F";
+        public const string US_MLRS_SW_F = "US_MLRS_SW_F";
 
         // US Anti-Aircraft
-        public const string US_Chaparral_W = "US_Chaparral_W";
-        public const string US_Chaparral_NW = "US_Chaparral_NW";
-        public const string US_Chaparral_SW = "US_Chaparral_SW";
-        public const string US_M163_W = "US_M163_W";
-        public const string US_M163_NW = "US_M163_NW";
-        public const string US_M163_SW = "US_M163_SW";
+        public const string US_Chaparral_W    = "US_Chaparral_W";
+        public const string US_Chaparral_NW   = "US_Chaparral_NW";
+        public const string US_Chaparral_SW   = "US_Chaparral_SW";
+        public const string US_Chaparral_W_F  = "US_Chaparral_W_F";
+        public const string US_Chaparral_NW_F = "US_Chaparral_NW_F";
+        public const string US_Chaparral_SW_F = "US_Chaparral_SW_F";
+        public const string US_M163_W    = "US_M163_W";
+        public const string US_M163_NW   = "US_M163_NW";
+        public const string US_M163_SW   = "US_M163_SW";
+        public const string US_M163_W_F  = "US_M163_W_F";
+        public const string US_M163_NW_F = "US_M163_NW_F";
+        public const string US_M163_SW_F = "US_M163_SW_F";
 
         // US SAM Systems
         public const string US_Hawk = "US_Hawk";
@@ -377,6 +454,7 @@ namespace HammerAndSickle.Controllers
         public const string US_A10  = "US_A10";
         public const string US_F111 = "US_F111";
         public const string US_F117 = "US_F117";
+        public const string US_F14  = "US_F14";
         public const string US_F15  = "US_F15";
         public const string US_F16  = "US_F16";
         public const string US_F4   = "US_F4";
@@ -396,14 +474,18 @@ namespace HammerAndSickle.Controllers
         public const string UK_Challenger1_SW = "UK_Challenger1_SW";
 
         // UK Artillery
-        public const string UK_M109   = "UK_M109";
-        public const string UK_M109_F = "UK_M109_F";
+        public const string UK_M109_W    = "UK_M109_W";
+        public const string UK_M109_NW   = "UK_M109_NW";
+        public const string UK_M109_SW   = "UK_M109_SW";
+        public const string UK_M109_W_F  = "UK_M109_W_F";
+        public const string UK_M109_NW_F = "UK_M109_NW_F";
+        public const string UK_M109_SW_F = "UK_M109_SW_F";
 
         // UK Aircraft
         public const string UK_TornadoGR1 = "UK_TornadoGR1";
 
         // German Infantry & Support
-        public const string GE_Regulars = "GE_Regulars";
+        public const string GER_Regulars = "GER_Regulars";
 
         // German Vehicles
         public const string GE_Marder_W = "GE_Marder_W";
@@ -419,13 +501,20 @@ namespace HammerAndSickle.Controllers
         public const string GE_Leopard2_SW = "GE_Leopard2_SW";
 
         // German Artillery
-        public const string GE_M109   = "GE_M109";
-        public const string GE_M109_F = "GE_M109_F";
+        public const string GE_M109_W    = "GE_M109_W";
+        public const string GE_M109_NW   = "GE_M109_NW";
+        public const string GE_M109_SW   = "GE_M109_SW";
+        public const string GE_M109_W_F  = "GE_M109_W_F";
+        public const string GE_M109_NW_F = "GE_M109_NW_F";
+        public const string GE_M109_SW_F = "GE_M109_SW_F";
 
         // German Anti-Aircraft
-        public const string GE_Gepard_W = "GE_Gepard_W";
-        public const string GE_Gepard_NW = "GE_Gepard_NW";
-        public const string GE_Gepard_SW = "GE_Gepard_SW";
+        public const string GE_Gepard_W    = "GE_Gepard_W";
+        public const string GE_Gepard_NW   = "GE_Gepard_NW";
+        public const string GE_Gepard_SW   = "GE_Gepard_SW";
+        public const string GE_Gepard_W_F  = "GE_Gepard_W_F";
+        public const string GE_Gepard_NW_F = "GE_Gepard_NW_F";
+        public const string GE_Gepard_SW_F = "GE_Gepard_SW_F";
 
         // German Helicopters - Animated
         public const string GE_BO105_Frame0 = "GE_BO105_Frame0";
@@ -450,23 +539,26 @@ namespace HammerAndSickle.Controllers
         public const string FR_M113_NW = "FR_M113_NW";
         public const string FR_M113_SW = "FR_M113_SW";
 
-        // French Artillery
-        public const string FR_M109   = "FR_M109";
-        public const string FR_M109_F = "FR_M109_F";
-
         // French Anti-Aircraft
-        public const string FR_Gepard_W = "FR_Gepard_W";
-        public const string FR_Gepard_NW = "FR_Gepard_NW";
-        public const string FR_Gepard_SW = "FR_Gepard_SW";
+        public const string FR_Gepard_W    = "FR_Gepard_W";
+        public const string FR_Gepard_NW   = "FR_Gepard_NW";
+        public const string FR_Gepard_SW   = "FR_Gepard_SW";
+        public const string FR_Gepard_W_F  = "FR_Gepard_W_F";
+        public const string FR_Gepard_NW_F = "FR_Gepard_NW_F";
+        public const string FR_Gepard_SW_F = "FR_Gepard_SW_F";
 
         // French SAM Systems
-        public const string FR_Roland_W = "FR_Roland_W";
-        public const string FR_Roland_NW = "FR_Roland_NW";
-        public const string FR_Roland_SW = "FR_Roland_SW";
+        public const string FR_Roland_W    = "FR_Roland_W";
+        public const string FR_Roland_NW   = "FR_Roland_NW";
+        public const string FR_Roland_SW   = "FR_Roland_SW";
+        public const string FR_Roland_W_F  = "FR_Roland_W_F";
+        public const string FR_Roland_NW_F = "FR_Roland_NW_F";
+        public const string FR_Roland_SW_F = "FR_Roland_SW_F";
 
         // French Aircraft
         public const string FR_Jaguar     = "FR_Jaguar";
         public const string FR_Mirage2000 = "FR_Mirage2000";
+        public const string FR_MirageF1   = "FR_MirageF1";
 
         // Mujahideen
         public const string MJ_AA = "MJ_AA";
@@ -477,6 +569,146 @@ namespace HammerAndSickle.Controllers
         public const string MJ_Regulars = "MJ_Regulars";
         public const string MJ_RPG = "MJ_RPG";
         public const string MJ_Stinger = "MJ_Stinger";
+
+        // NATO Generic
+        public const string NATO_Regulars = "NATO_Regulars";
+
+        // Iraq
+        public const string IQ_Regulars = "IQ_Regulars";
+        public const string IQ_MirageF1 = "IQ_MirageF1";
+
+        // Iran
+        public const string IR_Regulars = "IR_Regulars";
+
+        #endregion // NATO Unit Icons
+
+        #region Arab Unit Icons
+
+        // Arab Tanks
+        public const string AR_M60_W  = "AR_M60_W";
+        public const string AR_M60_NW = "AR_M60_NW";
+        public const string AR_M60_SW = "AR_M60_SW";
+        public const string AR_T55_W  = "AR_T55_W";
+        public const string AR_T55_NW = "AR_T55_NW";
+        public const string AR_T55_SW = "AR_T55_SW";
+
+        // Arab Vehicles
+        public const string AR_BMP1_W  = "AR_BMP1_W";
+        public const string AR_BMP1_NW = "AR_BMP1_NW";
+        public const string AR_BMP1_SW = "AR_BMP1_SW";
+        public const string AR_M113_W  = "AR_M113_W";
+        public const string AR_M113_NW = "AR_M113_NW";
+        public const string AR_M113_SW = "AR_M113_SW";
+        public const string AR_MTLB_W  = "AR_MTLB_W";
+        public const string AR_MTLB_NW = "AR_MTLB_NW";
+        public const string AR_MTLB_SW = "AR_MTLB_SW";
+        public const string AR_Truck_W  = "AR_Truck_W";
+        public const string AR_Truck_NW = "AR_Truck_NW";
+        public const string AR_Truck_SW = "AR_Truck_SW";
+
+        // Arab Artillery
+        public const string AR_2S1_W    = "AR_2S1_W";
+        public const string AR_2S1_NW   = "AR_2S1_NW";
+        public const string AR_2S1_SW   = "AR_2S1_SW";
+        public const string AR_2S1_W_F  = "AR_2S1_W_F";
+        public const string AR_2S1_NW_F = "AR_2S1_NW_F";
+        public const string AR_2S1_SW_F = "AR_2S1_SW_F";
+        public const string AR_2K12_W    = "AR_2K12_W";
+        public const string AR_2K12_NW   = "AR_2K12_NW";
+        public const string AR_2K12_SW   = "AR_2K12_SW";
+        public const string AR_2K12_W_F  = "AR_2K12_W_F";
+        public const string AR_2K12_NW_F = "AR_2K12_NW_F";
+        public const string AR_2K12_SW_F = "AR_2K12_SW_F";
+
+        // Arab Anti-Aircraft
+        public const string AR_ZSU57_W    = "AR_ZSU57_W";
+        public const string AR_ZSU57_NW   = "AR_ZSU57_NW";
+        public const string AR_ZSU57_SW   = "AR_ZSU57_SW";
+        public const string AR_ZSU57_W_F  = "AR_ZSU57_W_F";
+        public const string AR_ZSU57_NW_F = "AR_ZSU57_NW_F";
+        public const string AR_ZSU57_SW_F = "AR_ZSU57_SW_F";
+
+        // Arab Aircraft
+        public const string AR_F4    = "AR_F4";
+        public const string AR_F14   = "AR_F14";
+        public const string AR_Mig21 = "AR_Mig21";
+        public const string AR_Mig23 = "AR_Mig23";
+        public const string AR_SU17  = "AR_SU17";
+
+        #endregion // Arab Unit Icons
+
+        #region Chinese Unit Icons
+
+        // Chinese Infantry
+        public const string CH_Infantry = "CH_Infantry";
+        public const string CH_Airborne = "CH_Airborne";
+
+        // Chinese Tanks
+        public const string CH_Type59_W  = "CH_Type59_W"; // T-54 equivalent
+        public const string CH_Type59_NW = "CH_Type59_NW";
+        public const string CH_Type59_SW = "CH_Type59_SW";
+        public const string CH_Type80_W  = "CH_Type80_W"; // T-62 equivalent
+        public const string CH_Type80_NW = "CH_Type80_NW";
+        public const string CH_Type80_SW = "CH_Type80_SW";
+        public const string CH_Type95_W  = "CH_Type95_W"; // T-80 equivalent
+        public const string CH_Type95_NW = "CH_Type95_NW";
+        public const string CH_Type95_SW = "CH_Type95_SW";
+
+        // Chinese Vehicles
+        public const string CH_Type63_W  = "CH_Type63_W"; // MTLB equivalent
+        public const string CH_Type63_NW = "CH_Type63_NW";
+        public const string CH_Type63_SW = "CH_Type63_SW";
+        public const string CH_Type86_W  = "CH_Type86_W"; // BMP-1 equivalent
+        public const string CH_Type86_NW = "CH_Type86_NW";
+        public const string CH_Type86_SW = "CH_Type86_SW";
+
+        // Chinese Artillery
+        public const string CH_Type82_W    = "CH_Type82_W";   // 2S1 equivalent
+        public const string CH_Type82_NW   = "CH_Type82_NW";
+        public const string CH_Type82_SW   = "CH_Type82_SW";
+        public const string CH_Type82_W_F  = "CH_Type82_W_F";
+        public const string CH_Type82_NW_F = "CH_Type82_NW_F";
+        public const string CH_Type82_SW_F = "CH_Type82_SW_F";
+        public const string CH_PHZ89_W    = "CH_PHZ89_W";      // BM-21 equivalent
+        public const string CH_PHZ89_NW   = "CH_PHZ89_NW";
+        public const string CH_PHZ89_SW   = "CH_PHZ89_SW";
+        public const string CH_PHZ89_W_F  = "CH_PHZ89_W_F";
+        public const string CH_PHZ89_NW_F = "CH_PHZ89_NW_F";
+        public const string CH_PHZ89_SW_F = "CH_PHZ89_SW_F";
+
+        // Chinese AAA
+        public const string CH_Type53_W = "CH_Type53_W";  // ZSU-57-2 equivalent
+        public const string CH_Type53_NW = "CH_Type53_NW";
+        public const string CH_Type53_SW = "CH_Type53_SW";
+        public const string CH_Type53_W_F = "CH_Type53_W_F";
+        public const string CH_Type53_NW_F = "CH_Type53_NW_F";
+        public const string CH_Type53_SW_F = "CH_Type53_SW_F";
+
+        // Chinese Anti-Aircraft 9K31 equivalent
+        public const string CH_HQ7_W    = "CH_HQ7_W";
+        public const string CH_HQ7_NW   = "CH_HQ7_NW";
+        public const string CH_HQ7_SW   = "CH_HQ7_SW";
+        public const string CH_HQ7_W_F  = "CH_HQ7_W_F";
+        public const string CH_HQ7_NW_F = "CH_HQ7_NW_F";
+        public const string CH_HQ7_SW_F = "CH_HQ7_SW_F";
+
+        // Chinese Helicopters - Animated (6 frames)
+        public const string CH_H9_Frame0 = "CH_H9_Frame0"; // MI-24 equivalent
+        public const string CH_H9_Frame1 = "CH_H9_Frame1";
+        public const string CH_H9_Frame2 = "CH_H9_Frame2";
+        public const string CH_H9_Frame3 = "CH_H9_Frame3";
+        public const string CH_H9_Frame4 = "CH_H9_Frame4";
+        public const string CH_H9_Frame5 = "CH_H9_Frame5";
+
+        // Chinese Aircraft
+        public const string CH_H6 = "CH_H6"; // Bomber
+        public const string CH_J7 = "CH_J7"; // Mig21
+        public const string CH_J8 = "CH_J8"; // Mig23
+        public const string CH_Q5 = "CH_Q5"; // Attack Mig19
+
+        #endregion // Chinese Unit Icons
+
+        #region Generic Unit Icons
 
         // Generic Units
         public const string GEN_AA = "GEN_AA";
@@ -489,7 +721,7 @@ namespace HammerAndSickle.Controllers
         public const string GEN_Truck_NW = "GEN_Truck_NW";
         public const string GEN_Truck_SW = "GEN_Truck_SW";
 
-        #endregion // NATO Unit Icons
+        #endregion // Generic Unit Icons
 
         #region Nationality Flags
 
@@ -575,6 +807,7 @@ namespace HammerAndSickle.Controllers
         public const string Utility_MismatchIcon = "MismatchIcon";
 
         #endregion
+
 
         #region Singleton
 

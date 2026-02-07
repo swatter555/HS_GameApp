@@ -41,7 +41,7 @@ namespace HammerAndSickle.Models
         [JsonInclude]
         public WeaponSystems DeployedProfileID { get; private set; }     // Profile that all units have
         [JsonInclude]
-        public IntelProfileTypes IntelProfileType { get; internal set; } // Profile for intelligence reports
+        public RegimentProfileType IntelProfileType { get; internal set; } // Profile for intelligence reports
 
         // How combat effective is a unit is tracked by EfficiencyLevel.
         [JsonInclude]
@@ -97,7 +97,7 @@ namespace HammerAndSickle.Models
             UnitRole role,
             Side side,
             Nationality nationality,
-            IntelProfileTypes intelProfileType,
+            RegimentProfileType intelProfileType,
             WeaponSystems deployedProfileID,
             bool isMountable = false,
             WeaponSystems mobileProfileID = WeaponSystems.NONE,
@@ -135,7 +135,7 @@ namespace HammerAndSickle.Models
                 }
 
                 // PrepareBattle intel profile type
-                if (!Enum.IsDefined(typeof(IntelProfileTypes), intelProfileType))
+                if (!Enum.IsDefined(typeof(RegimentProfileType), intelProfileType))
                     throw new ArgumentException("Invalid intel profile type", nameof(intelProfileType));
 
                 //---------------------------------
@@ -220,7 +220,7 @@ namespace HammerAndSickle.Models
                 Role = UnitRole.GroundCombat; // Will be overwritten by JSON
                 Side = Side.Player; // Will be overwritten by JSON
                 Nationality = Nationality.USSR; // Will be overwritten by JSON
-                IntelProfileType = IntelProfileTypes.SV_MRR_BTR70; // Will be overwritten by JSON
+                IntelProfileType = RegimentProfileType.SV_MRR_BTR70; // Will be overwritten by JSON
 
                 // Initialize facing - will be overwritten by JSON
                 Facing = HexDirection.W; // Will be overwritten by JSON

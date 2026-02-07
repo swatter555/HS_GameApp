@@ -724,7 +724,7 @@ namespace HammerAndSickle.Controllers
         /// <summary>
         /// Checks if a specific intel profile type has been defined in the system.
         /// </summary>
-        public static bool HasIntelProfile(IntelProfileTypes profileType)
+        public static bool HasIntelProfile(RegimentProfileType profileType)
         {
             try
             {
@@ -740,7 +740,7 @@ namespace HammerAndSickle.Controllers
         /// <summary>
         /// Generates an intelligence report for a unit based on the specified spotted level.
         /// </summary>
-        public static IntelReport GenerateIntelReport(IntelProfileTypes profileType, string unitName, int hitPoints,
+        public static IntelReport GenerateIntelReport(RegimentProfileType profileType, string unitName, int hitPoints,
             Nationality nationality, DeploymentPosition deploymentPosition, ExperienceLevel experienceLevel,
             EfficiencyLevel efficiencyLevel, SpottedLevel spottedLevel = SpottedLevel.Level1)
         {

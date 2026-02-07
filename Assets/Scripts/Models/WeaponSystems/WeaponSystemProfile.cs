@@ -61,6 +61,9 @@ namespace HammerAndSickle.Models
         public NVG_Rating NVGCapability { get; private set; }              = NVG_Rating.None;
         public UnitSilhouette Silhouette { get; private set; }             = UnitSilhouette.Medium;
 
+        // Icon picker
+        public RegimentIconProfile IconPicker { get; private set; } = null;
+
         #endregion // Properties
 
         #region Constructors
@@ -164,6 +167,10 @@ namespace HammerAndSickle.Models
         public void SetGroundAttack(int value) { GroundAttack = ValidateCombatValue(value); }
         public void SetOrdinanceLoad(int value) { OrdinanceLoad = ValidateCombatValue(value); }
         public void SetStealth(int value) { Stealth = ValidateCombatValue(value); }
+        public void SetIconPicker(RegimentIconProfile iconPicker)
+        {
+            IconPicker = iconPicker ?? throw new ArgumentNullException(nameof(iconPicker));
+        }
 
         // Short name accessor/mutator
         public void SetShortName(string shortName)

@@ -612,154 +612,7 @@ namespace HammerAndSickle.Core.GameData
 
     #endregion // LeaderEnums
 
-    #region WeaponSystem Enums
-
-    /// <summary>
-    /// Represents the general category of weapon system.
-    /// </summary>
-    public enum WeaponSystemType
-    {
-        Hard,
-        Soft,
-        Air
-    }
-
-    /// <summary>
-    /// Weapon systems in the game.
-    /// </summary>
-    public enum WeaponSystems
-    {
-        // Utility values
-        NONE,       // No weapon system
-        UTILITY_ID, // Used for generic combat calculations
-        
-        // Soviet weapon systems
-        TANK_T55A,
-        TANK_T64A,
-        TANK_T64B,
-        TANK_T72A,
-        TANK_T72B,
-        TANK_T80B,
-        TANK_T80U,
-        TANK_T80BV,
-        APC_MTLB,
-        APC_BTR70,
-        APC_BTR80,
-        IFV_BMP1,
-        IFV_BMP2,
-        IFV_BMP3,
-        IFV_BMD1, // Use BMD2 sprite
-        IFV_BMD2,
-        IFV_BMD3,
-        RCN_BRDM2,
-        RCN_BRDM2AT,
-        SPA_2S1,
-        SPA_2S3,
-        SPA_2S5,
-        SPA_2S19,
-        ROC_BM21,
-        ROC_BM27,
-        ROC_BM30,
-        SSM_SCUD,
-        SPAAA_ZSU57,
-        SPAAA_ZSU23,
-        SPAAA_2K22,
-        SPSAM_9K31,
-        SAM_S75,
-        SAM_S125,
-        SAM_S300,
-        HEL_MI8T,        // This is a transport helicopter for air mobile troops, for mobile profile.
-        HEL_MI8AT,
-        HEL_MI24D,
-        HEL_MI24V,
-        HEL_MI28,
-        AWACS_A50,
-        FGT_MIG21,
-        FGT_MIG23,
-        FGT_MIG25,
-        FGT_MIG29,
-        FGT_MIG31,
-        FGT_SU27,
-        FGT_SU47,
-        FGT_MIG27,
-        ATT_SU25,
-        ATT_SU25B,
-        BMB_SU24,
-        BMB_TU16,
-        BMB_TU22,
-        BMB_TU22M3,
-        RCNA_MIG25R,
-        TRN_AN8,   // Embarkment profile, Player side only.
-        TRN_NAVAL, // Embarkment profile, Player side only.
-
-        // USA
-        TANK_M1,
-        TANK_M60A3, // Needs M60 sprite
-        IFV_M2,
-        IFV_M3,
-        APC_M113,
-        APC_LVTP7,
-        SPA_M109,
-        ROC_MLRS,
-        SPAAA_M163,
-        SPSAM_CHAP,
-        SAM_HAWK,
-        HEL_AH64,
-        HEL_UH60,   // Transport helo for mobile profiles.
-        AWACS_E3,
-        FGT_F15,
-        FGT_F4,
-        FGT_F16,
-        ATT_A10,
-        BMB_F111,
-        BMB_F117,
-        RCNA_SR71,
-
-        // West Germany (FRG)
-        TANK_LEOPARD1,
-        TANK_LEOPARD2,
-        IFV_MARDER,
-        SPAAA_GEPARD,
-        HEL_BO105,
-        FGT_TORNADO_IDS,
-
-        // UK
-        TANK_CHALLENGER1,
-        IFV_WARRIOR,
-        SAM_RAPIER,     // Use US_Hawk sprite
-        FGT_TORNADO_GR1,
-
-        // France
-        TANK_AMX30,
-        APC_VAB,        // Uses M113 Sprite
-        SPSAM_ROLAND,
-        FGT_MIRAGE2000,
-        ATT_JAGUAR,
-
-        // Generic weapon systems
-        ART_LIGHT_MORTAR_GEN,
-        ART_HEAVY_MORTAR_GEN,
-        ART_LIGHT_GEN,
-        ART_HEAVY_GEN,
-        AT_LIGHT_GEN,
-        INF_CAV_GEN,
-        TRUCK_GEN,
-        MANPAD_GEN,
-        AAA_GEN,
-
-        // Shared profiles for infantry
-        INF_REG,    // Regular INF
-        INF_AB,     // Airborne INF
-        INF_AM,     // Air Mobile INF
-        INF_MAR,    // Marine INF
-        INF_SPEC,   // Special Forces INF
-        INF_ENG,    // Engineer INF
-
-        // Bases
-        LANDBASE_GENERIC,
-        AIRBASE_GENERIC,
-        SUPPLYDEPOT_GENERIC,
-    }
+    #region RegimentProfile Enums
 
     /// <summary>
     /// The type of upgrade a unit can receive.
@@ -793,147 +646,225 @@ namespace HammerAndSickle.Core.GameData
         BASE
     }
 
-    #endregion // WeaponSystem Enums
-
-    #region Intel Enums
-
     /// <summary>
-    /// Specific weapon types for IntelProfiles, used for tracking purposes.
+    /// The number of icon sprites needed by the Regiment
     /// </summary>
-    public enum Intel_WeaponTypes
+    public enum RegimentIconType
+    {
+        Single,           // Typically weapons systems that are unloaded off a transport.
+        Directional,      // Vehicles that can face multiple directions (W, NW, SW).
+        Directional_Fire, // Same as above, by with separate firing icon.
+        Helo_Animation    // Helo animations have 6 frames.
+    }
+
+    public enum WeaponType
     {
         // Utility values
-        NONE,
+        NONE,       // No weapon system
+        UTILITY_ID, // Used for generic combat calculations
 
-        // Soviet weapon systems
-        T55A,
-        T64A,
-        T64B,
-        T72A,
-        T72B,
-        T80B,
-        T80U,
-        T80BV,
-        MTLB,
-        BTR70,
-        BTR80,
-        BMP1,
-        BMP2,
-        BMP3,
-        BMD1,
-        BMD2,
-        BMD3,
-        BRDM2,
-        BRDM2AT,
+        // Tanks
+        TANK_T55A,
+        TANK_T55A_ARAB,
+        TANK_T62A,
+        TANK_T62A_ARAB,
+        TANK_T64A,
+        TANK_T64B,
+        TANK_T72A,
+        TANK_T72B,
+        TANK_T80B,
+        TANK_T80U,
+        TANK_T80BV,
+        TANK_TYPE59, // Chinese T-54 variant
+        TANK_TYPE80, // Chinese T-62 variant
+        TANK_TYPE95, // Fictional Chinese T-80 variant
+        TANK_M1,
+        TANK_M60,
+        TANK_LEOPARD1,
+        TANK_LEOPARD2,
+        TANK_CHALLENGER1,
+        TANK_AMX30,
+        TANK_M60_ARAB,
+        TANK_T55_ARAB,
+
+        // IFVs
+        IFV_BMP1,
+        IFV_BMP2,
+        IFV_BMP3,
+        IFV_BMD1,     // Use BMD2 sprite
+        IFV_BMD2,
+        IFV_BMD3,
+        IFV_M2,
+        IFV_WARRIOR,
+        IFV_MARDER,
+        IFV_BMP1_ARAB,
+        IFV_TYPE86,   // Chinese BMP variant
+
+        // APCs
+        APC_MTLB,
+        APC_BTR70,
+        APC_BTR80,
+        APC_M113_US,
+        APC_HUMVEE,
+        APC_LVTP7,
+        APC_VAB,      // FR_M113 sprite
+        APC_M113_ARAB,
+        APC_MTLB_ARAB,
+
+        // Recon
+        RCN_BRDM2,
+        RCN_BRDM2AT,
+        RCN_M3,
+
+        // SPA
         SPA_2S1,
         SPA_2S3,
         SPA_2S5,
         SPA_2S19,
-        BM21,
-        BM27,
-        BM30,
-        SCUD,
-        ZSU57,
-        ZSU23,
-        SPSAM_2K22,
+        SPA_M109,
+        SPA_M109_GE,
+        SPA_M109_FR,
+        SPA_M109_UK,
+        SPA_TYPE82,   // Chinese SPA similar to 2S1
+
+        // Artillery
+        ART_LIGHT_SOV,
+        ART_HEAVY_SOV,
+        ART_LIGHT_MJ,
+        ART_MORTAR_MJ,
+        ART_LIGHT_WEST,
+        ART_HEAVY_WEST,
+
+        // Rocket
+        ROC_BM21,
+        ROC_BM27,
+        ROC_BM30,
+        SSM_SCUD,
+        ROC_MLRS,
+        ROC_PHZ89,     // Chinese MLRS similar to BM-21
+
+        // AAA and Air Defense
+        SPAAA_ZSU57,
+        SPAAA_ZSU23,
+        SPAAA_2K22,
         SPSAM_9K31,
-        S75,
-        S125,
-        S300,
-        MI8T,
-        MI8AT,
-        MI24D,
-        MI24V,
-        MI28,
-        A50,
-        MIG21,
-        MIG23,
-        MIG25,
-        MIG29,
-        MIG31,
-        SU27,
-        SU47,
-        MIG27,
-        SU25,
-        SU25B,
-        SU24,
-        TU16,
-        TU22,
-        TU22M3,
-        MIG25R,
+        SAM_S75,
+        SAM_S125,
+        SAM_S300,
+        SPAAA_M163,
+        SPSAM_CHAP,
+        SAM_HAWK,
+        SPSAM_GEPARD,
+        SAM_RAPIER,       // Use US_Hawk sprite
+        SPSAM_HQ7,        // Chinese SAM similar to SA-2
+        SPAAA_TYPE53,     // Chinese AAA similar to ZSU-57
 
-        // USA
-        M1,
-        M60A3,
-        M551,
-        M2,
-        M3,
-        M113,
-        LVTP7,
-        M109,
-        MLRS,
-        M163,
-        CHAP,
-        HAWK,
-        OH58,
-        AH64,
-        UH60,
-        E3,
-        F15,
-        F4,
-        F16,
-        A10,
-        F111,
-        F117,
-        SR71,
+        // Helicopters
+        HEL_MI8T,
+        HEL_MI8AT,
+        HEL_MI24D,
+        HEL_MI24V,
+        HEL_MI28,
+        HEL_AH64,
+        HEL_UH60,
+        HEL_BO105,
+        HEL_H9,
 
-        // West Germany (FRG)
-        LEOPARD1,
-        LEOPARD2,
-        MARDER,
-        LUCHS,
-        GEPARD,
-        BO105,
-        TORNADO_IDS,
+        // Jets
+        AWACS_A50,
+        FGT_MIG21,
+        FGT_MIG23,
+        FGT_MIG25,
+        FGT_MIG29,
+        FGT_MIG31,
+        ATT_SU17,
+        FGT_SU27,
+        FGT_SU47,
+        FGT_MIG27,
+        ATT_SU25,
+        ATT_SU25B,
+        BMB_SU24,
+        BMB_TU16,
+        BMB_TU22,
+        BMB_TU22M3,
+        RCNA_MIG25R,
+        AWACS_E3,
+        FGT_F15,
+        FGT_F4,
+        FGT_F16,
+        FGT_F14,
+        ATT_A10,
+        BMB_F111,
+        BMB_F117,
+        RCNA_SR71,
+        FGT_TORNADO_IDS,
+        FGT_TORNADO_GR1,
+        FGT_F4_GE,
+        FGT_MIRAGE2000,
+        FGT_MIRAGEF1,
+        ATT_JAGUAR,
+        FGT_F4_ARAB,
+        FGT_F14_ARAB,
+        FGT_MIG21_ARAB,
+        FGT_MIG23_ARAB,
+        ATT_SU17_ARAB,
+        FGT_J7,        // Chinese MiG-21 variant
+        FGT_J8,        // Chinese MiG-23 variant
+        ATT_Q5,        // Chinese Su-17 variant
+        BMB_H6,        // Chinese Tu-16 variant
 
-        // UK
-        CHALLENGER1,
-        WARRIOR,
-        FV432,
-        SCIMITAR,
-        SAM_RAPIER,
-        LYNX,
-        TORNADO_GR1,
+        // Transport aircraft
+        TRN_AN8,
 
-        // France
-        AMX30,
-        AMX10P,
-        VAB,
-        ERC90,
-        AUF1,
-        ROLAND,
-        MIRAGE2000,
-        JAGUAR,
+        // Transport naval
+        TRN_NAVAL,
 
-        // Generic weapon systems
-        Truck,
-        LightMortar,
-        HeavyMortar,
-        LightArtillery,
-        HeavyArtillery,
-        RPG7,
-        Manpad,
-        AAA,
-        RecoilessRifle,
-        ATGM,
-        Infantry
+        // Trucks
+        TRK_SOV,
+        TRK_WEST,
+        TRK_ARAB,
+
+        // Infantry
+        INF_REG_SOV,
+        INF_AB_SOV,
+        INF_AM_SOV,
+        INF_MAR_SOV,
+        INF_SPEC_SOV,
+        INF_ENG_SOV,
+        INF_REG_US,
+        INF_MAR_US,
+        INF_AB_US,
+        INF_AM_US,
+        INF_REG_UK,
+        INF_REG_GE,
+        INF_REG_FR,
+        INF_REG_MJ,
+        INF_SPEC_MJ,
+        INF_CAV_MJ,
+        INF_RPG_MJ,
+        INF_SAM_MJ,
+        INF_REG_IQ,
+        INF_REG_IR,
+        INF_REG_CH,
+        INF_AB_CH,
+
+        // Bases
+        LANDBASE_GENERIC,
+        LANBASE_DEPOT,
+
+        // AAA non-SPAA
+        AAA_SOV,
+        AAA_MJ,
+
     }
 
     /// <summary>
     /// Type of UnitProfiles
     /// </summary>
-    public enum IntelProfileTypes
+    public enum RegimentProfileType
     {
+        Default,
+
         // Soviet profiles
         SV_MRR_BTR70,   // Motor Rifle Regiment
         SV_MRR_BTR80,   // Motor Rifle Regiment
@@ -942,13 +873,14 @@ namespace HammerAndSickle.Core.GameData
         SV_MRR_BMP3,    // Motor Rifle Regiment (BMP)
 
         SV_TR_T55,      // Tank Regiment T-55
-        SV_TR_T64A,     // Tank Regiment T-72
-        SV_TR_T64B,     // Tank Regiment T-72
-        SV_TR_T72A,     // Tank Regiment T-72
-        SV_TR_T72B,     // Tank Regiment T-72
-        SV_TR_T80B,     // Tank Regiment T-80
-        SV_TR_T80U,     // Tank Regiment T-80
-        SV_TR_T80BV,    // Tank Regiment T-80
+        SV_TR_T62,      // Tank Regiment T-62
+        SV_TR_T64A,     // Tank Regiment T-64A
+        SV_TR_T64B,     // Tank Regiment T-64B
+        SV_TR_T72A,     // Tank Regiment T-72A
+        SV_TR_T72B,     // Tank Regiment T-72B
+        SV_TR_T80B,     // Tank Regiment T-80B
+        SV_TR_T80U,     // Tank Regiment T-80U
+        SV_TR_T80BV,    // Tank Regiment T-80BV
 
         SV_AR_HVY,     // Artillery Regiment
         SV_AR_LGT,     // Artillery Regiment
@@ -1111,6 +1043,327 @@ namespace HammerAndSickle.Core.GameData
         ARAB_SAM_REG_S125,         // Regular Arab SAM Regiment S-125
         ARAB_SAM_REG_HAWK,         // Regular Arab SAM Regiment HAWK
     }
+
+    #endregion // RegimentProfile Enums
+
+
+
+    #region WeaponSystem Enums
+
+    /// <summary>
+    /// Represents the general category of weapon system.
+    /// </summary>
+    public enum WeaponSystemType
+    {
+        Hard,
+        Soft,
+        Air
+    }
+
+    /// <summary>
+    /// Weapon systems in the game.
+    /// </summary>
+    public enum WeaponSystems
+    {
+        // Utility values
+        NONE,       // No weapon system
+        UTILITY_ID, // Used for generic combat calculations
+        
+        // Soviet tanks
+        TANK_T55A,
+        TANK_T64A,
+        TANK_T64B,
+        TANK_T72A,
+        TANK_T72B,
+        TANK_T80B,
+        TANK_T80U,
+        TANK_T80BV,
+
+        // Soviet other armored vehicles
+        APC_MTLB,
+        APC_BTR70,
+        APC_BTR80,
+        IFV_BMP1,
+        IFV_BMP2,
+        IFV_BMP3,
+        IFV_BMD1, // Use BMD2 sprite
+        IFV_BMD2,
+        IFV_BMD3,
+        RCN_BRDM2,
+        RCN_BRDM2AT,
+
+        // Soviet SPA
+        SPA_2S1,
+        SPA_2S3,
+        SPA_2S5,
+        SPA_2S19,
+
+        // Soviet Rocket
+        ROC_BM21,
+        ROC_BM27,
+        ROC_BM30,
+        SSM_SCUD,
+
+        // Soviet AAA and Air Defense
+        SPAAA_ZSU57,
+        SPAAA_ZSU23,
+        SPAAA_2K22,
+        SPSAM_9K31,
+        SAM_S75,
+        SAM_S125,
+        SAM_S300,
+
+        // Soviet Helicopters
+        HEL_MI8T,        // This is a transport helicopter for air mobile troops, for mobile profile.
+        HEL_MI8AT,
+        HEL_MI24D,
+        HEL_MI24V,
+        HEL_MI28,
+
+        // Soviet Fighter/Attack/Bomber/AWACS/Recon
+        AWACS_A50,
+        FGT_MIG21,
+        FGT_MIG23,
+        FGT_MIG25,
+        FGT_MIG29,
+        FGT_MIG31,
+        FGT_SU27,
+        FGT_SU47,
+        FGT_MIG27,
+        ATT_SU25,
+        ATT_SU25B,
+        BMB_SU24,
+        BMB_TU16,
+        BMB_TU22,
+        BMB_TU22M3,
+        RCNA_MIG25R,
+
+        // Embarkment profiles
+        TRN_AN8,   // Embarkment profile, Player side only.
+        TRN_NAVAL, // Embarkment profile, Player side only.
+
+        // Tanks - USA
+        TANK_M1,
+        TANK_M60A3,
+
+        // Other armored vehicles - USA
+        IFV_M2,
+        IFV_M3,
+        APC_M113,
+        APC_LVTP7,
+
+        // USA SPA
+        SPA_M109,
+        ROC_MLRS,
+
+        // USA AAA and Air Defense
+        SPAAA_M163,
+        SPSAM_CHAP,
+        SAM_HAWK,
+
+        // USA Helicopters
+        HEL_AH64,
+        HEL_UH60,   // Transport helo for mobile profiles.
+
+        // USA Fighter/Attack/Bomber/AWACS/Recon
+        AWACS_E3,
+        FGT_F15,
+        FGT_F4,
+        FGT_F16,
+        ATT_A10,
+        BMB_F111,
+        BMB_F117,
+        RCNA_SR71,
+
+        // West Germany (FRG)
+        TANK_LEOPARD1,
+        TANK_LEOPARD2,
+        IFV_MARDER,
+        SPA_M109_GE,
+        SPAAA_ROLAND_GE,
+        SPSAM_GEPARD,
+        HEL_BO105,
+        FGT_TORNADO_IDS,
+
+        // UK
+        TANK_CHALLENGER1,
+        IFV_WARRIOR,
+        SPA_M109_UK,
+        SAM_RAPIER,       // Use US_Hawk sprite
+        FGT_TORNADO_GR1,
+
+        // France
+        TANK_AMX30,
+        APC_VAB,          // Uses M113 Sprite
+        SPA_M109_FR,
+        SPAAA_ROLAND_FR,
+        FGT_MIRAGE2000,
+        ATT_JAGUAR,
+
+        // Generic weapon systems
+        ART_LIGHT_MORTAR_GEN,
+        ART_HEAVY_MORTAR_GEN,
+        ART_LIGHT_GEN,
+        ART_HEAVY_GEN,
+        AT_LIGHT_GEN,
+        INF_CAV_GEN,
+        TRUCK_GEN,
+        MANPAD_GEN,
+        AAA_GEN,
+
+        // Shared profiles for infantry
+        INF_REG,    // Regular INF
+        INF_AB,     // Airborne INF
+        INF_AM,     // Air Mobile INF
+        INF_MAR,    // Marine INF
+        INF_SPEC,   // Special Forces INF
+        INF_ENG,    // Engineer INF
+
+        // Bases
+        LANDBASE_GENERIC,
+        AIRBASE_GENERIC,
+        SUPPLYDEPOT_GENERIC,
+    }
+
+    
+
+    #endregion // WeaponSystem Enums
+
+    #region Intel Enums
+
+    /// <summary>
+    /// Specific weapon types for IntelProfiles, used for tracking purposes.
+    /// </summary>
+    public enum Intel_WeaponTypes
+    {
+        // Utility values
+        NONE,
+
+        // Soviet weapon systems
+        T55A,
+        T64A,
+        T64B,
+        T72A,
+        T72B,
+        T80B,
+        T80U,
+        T80BV,
+        MTLB,
+        BTR70,
+        BTR80,
+        BMP1,
+        BMP2,
+        BMP3,
+        BMD1,
+        BMD2,
+        BMD3,
+        BRDM2,
+        BRDM2AT,
+        SPA_2S1,
+        SPA_2S3,
+        SPA_2S5,
+        SPA_2S19,
+        BM21,
+        BM27,
+        BM30,
+        SCUD,
+        ZSU57,
+        ZSU23,
+        SPSAM_2K22,
+        SPSAM_9K31,
+        S75,
+        S125,
+        S300,
+        MI8T,
+        MI8AT,
+        MI24D,
+        MI24V,
+        MI28,
+        A50,
+        MIG21,
+        MIG23,
+        MIG25,
+        MIG29,
+        MIG31,
+        SU27,
+        SU47,
+        MIG27,
+        SU25,
+        SU25B,
+        SU24,
+        TU16,
+        TU22,
+        TU22M3,
+        MIG25R,
+
+        // USA
+        M1,
+        M60A3,
+        M551,
+        M2,
+        M3,
+        M113,
+        LVTP7,
+        M109,
+        MLRS,
+        M163,
+        CHAP,
+        HAWK,
+        OH58,
+        AH64,
+        UH60,
+        E3,
+        F15,
+        F4,
+        F16,
+        A10,
+        F111,
+        F117,
+        SR71,
+
+        // West Germany (FRG)
+        LEOPARD1,
+        LEOPARD2,
+        MARDER,
+        LUCHS,
+        GEPARD,
+        BO105,
+        TORNADO_IDS,
+
+        // UK
+        CHALLENGER1,
+        WARRIOR,
+        FV432,
+        SCIMITAR,
+        SAM_RAPIER,
+        LYNX,
+        TORNADO_GR1,
+
+        // France
+        AMX30,
+        AMX10P,
+        VAB,
+        ERC90,
+        AUF1,
+        ROLAND,
+        MIRAGE2000,
+        JAGUAR,
+
+        // Generic weapon systems
+        Truck,
+        LightMortar,
+        HeavyMortar,
+        LightArtillery,
+        HeavyArtillery,
+        RPG7,
+        Manpad,
+        AAA,
+        RecoilessRifle,
+        ATGM,
+        Infantry
+    }
+
+    
 
     #endregion
 
@@ -1598,11 +1851,14 @@ namespace HammerAndSickle.Core.GameData
 
         /* Note: Attacker targets defenders hardness/softness type. Defender targets attackers hardness/softness type */
 
+        // Placeholder for non-applicable values.
+        public const int NOT_APPLICABLE = 0;
+
         // WeaponSystem constants.
         public const int MAX_COMBAT_VALUE = 25;
         public const int MIN_COMBAT_VALUE = 1;
-        public const float MAX_RANGE = 100.0f;
-        public const float MIN_RANGE = 0.0f;
+        public const int MAX_RANGE = 100;
+        public const int MIN_RANGE = 0;
 
         // Movement constants for WeaponSystems,in movement points.
         public const int STATIC_UNIT = 0;
@@ -1616,37 +1872,39 @@ namespace HammerAndSickle.Core.GameData
 
         // Ground defense against air attack.
         public const int GROUND_DEFENSE_LIGHTARMOR = 5;  // Base ground defense for APCs units
-        public const int GROUND_DEFENSE_INFANTRY = 6;  // Base ground defense for Infantry units
-        public const int GROUND_DEFENSE_ARMOR = 8;  // Base ground defense for tank units
-        public const int GROUND_DEFENSE_SAM = 8;  // Base ground defense for SAM units
-        public const int GROUND_DEFENSE_HELO = 10;  // Base air defense for helo units
-        public const int GROUND_DEFENSE_AAA = 12;  // Base ground defense for AAA units
+        public const int GROUND_DEFENSE_INFANTRY   = 6;  // Base ground defense for Infantry units
+        public const int GROUND_DEFENSE_ARMOR      = 8;  // Base ground defense for tank units
+        public const int GROUND_DEFENSE_SAM        = 8;  // Base ground defense for SAM units
+        public const int GROUND_DEFENSE_HELO       = 10; // Base air defense for helo units
+        public const int GROUND_DEFENSE_AAA        = 12; // Base ground defense for AAA units
 
+        // Ground attack against air units.
+        public const int GROUND_AIR_ATTACK_DEFAULT = 1;  // Base ground-to-air attack default
 
         // Standard spotting range values
-        public const float BASE_UNIT_SPOTTING_RANGE = 2;
-        public const float RECON_UNIT_SPOTTING_RANGE = 3;
-        public const float BASE_AAA_SPOTTING_RANGE = 3;
-        public const float FACILITY_SPOTTING_RANGE = 4;
-        public const float BASE_SAM_SPOTTING_RANGE = 6;
-        public const float INTEL_UNIT_SPOTTING_RANGE = 6;
+        public const int BASE_UNIT_SPOTTING_RANGE = 2;
+        public const int RECON_UNIT_SPOTTING_RANGE = 3;
+        public const int BASE_AAA_SPOTTING_RANGE = 3;
+        public const int FACILITY_SPOTTING_RANGE = 4;
+        public const int BASE_SAM_SPOTTING_RANGE = 6;
+        public const int INTEL_UNIT_SPOTTING_RANGE = 6;
 
         // Standard primary range values.
-        public const float PRIMARY_RANGE_DEFAULT = 1;
+        public const int PRIMARY_RANGE_DEFAULT = 1;
 
         // Standard indirect range values.
-        public const float INDIRECT_RANGE_DEFAULT = 0;
-        public const float INDIRECT_RANGE_MINIMUM = 3;
-        public const float INDIRECT_RANGE_SHORT = 4;
-        public const float INDIRECT_RANGE_MEDIUM = 5;
-        public const float INDIRECT_RANGE_LONG = 6;
-        public const float INDIRECT_RANGE_ROC_SR = 4;
-        public const float INDIRECT_RANGE_ROC_MR = 6;
-        public const float INDIRECT_RANGE_ROC_LR = 10;
+        public const int INDIRECT_RANGE_DEFAULT = 0;
+        public const int INDIRECT_RANGE_MINIMUM = 3;
+        public const int INDIRECT_RANGE_SHORT = 4;
+        public const int INDIRECT_RANGE_MEDIUM = 5;
+        public const int INDIRECT_RANGE_LONG = 6;
+        public const int INDIRECT_RANGE_ROC_SR = 4;
+        public const int INDIRECT_RANGE_ROC_MR = 6;
+        public const int INDIRECT_RANGE_ROC_LR = 10;
 
         // Standard anti-air range values.
-        public const float INDIRECT_RANGE_AAA = 3;
-        public const float INDIRECT_RANGE_SAM = 6;
+        public const int INDIRECT_RANGE_AAA = 3;
+        public const int INDIRECT_RANGE_SAM = 6;
 
         // Standard infantry values
         public const int BASE_INF_HARD_ATTACK = 5;
@@ -1787,7 +2045,7 @@ namespace HammerAndSickle.Core.GameData
         public const int BASE_SOFT_ATTACK = 6;
         public const int BASE_SOFT_DEFENSE = 7;
 
-        #endregion
+        #endregion // WeaponSystem Constants
 
         #region Leader Constants
 

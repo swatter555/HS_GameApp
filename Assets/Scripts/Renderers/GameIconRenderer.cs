@@ -441,11 +441,11 @@ namespace HammerAndSickle.Core.Map
         /// Returns the sprite name and sets the out parameter for whether to flip horizontally.
         ///
         /// Icon Categories:
-        /// 1. Airbases: AirbaseStack0-4 based on attached air unit count
-        /// 2. 3-Direction Vehicles: Base + _W/_NW/_SW suffix (tanks, IFVs, APCs, etc.)
-        /// 3. Animated: Base + _Frame0 suffix (helicopters)
-        /// 4. Fired Variant: Base + optional _F suffix (artillery when deployed)
-        /// 5. No Suffix: Base name only (infantry, aircraft, SAMs, bases)
+        /// 0. Airbases: AirbaseStack0-4 based on attached air unit count
+        /// 1. Animated: Base + _Frame0 suffix (helicopters)
+        /// 2. 3-Direction + Fired: Base + _W/_NW/_SW + optional _F (artillery, rockets, SPAAA, SPSAM)
+        /// 3. 3-Direction Vehicles: Base + _W/_NW/_SW suffix (tanks, IFVs, APCs, recon, trucks)
+        /// 4. No Suffix: Base name only (infantry, aircraft, static SAMs, bases)
         ///
         /// All icons can be flipped horizontally for easterly directions (E, NE, SE).
         /// </summary>
@@ -480,7 +480,24 @@ namespace HammerAndSickle.Core.Map
                     return animatedSprite ?? SpriteManager.Utility_MismatchIcon;
                 }
 
-                // Category 2: 3-Direction vehicles (tanks, IFVs, APCs, SPAAA, SPSAM, trucks)
+                // Category 2: 3-Direction + Fired variant (artillery, rockets, SSM, S300, SPAAA, SPSAM)
+                if (Has3DirectionsAndFiredVariant(weaponSystem))
+                {
+                    string baseSprite = GetBaseSpriteFromProfile(weaponSystem, nationality);
+                    if (string.IsNullOrEmpty(baseSprite))
+                    {
+                        return SpriteManager.Utility_MismatchIcon;
+                    }
+
+                    string directionSuffix = GetDirectionSuffixFor3Dir(unit.Facing);
+                    string firedSuffix = IsFiredPosition(unit.DeploymentPosition) ? "_F" : "";
+                    string finalSprite = baseSprite + directionSuffix + firedSuffix;
+
+                    if (_debug) Debug.Log($"[{CLASS_NAME}.GetSpriteNameForUnit] Unit '{unit.UnitName}': 3-Dir+Fired={finalSprite}, Flip={shouldFlip}");
+                    return finalSprite;
+                }
+
+                // Category 3: 3-Direction vehicles without fired variant (tanks, IFVs, APCs, recon, trucks)
                 if (Has3Directions(weaponSystem))
                 {
                     string baseSprite = GetBaseSpriteFromProfile(weaponSystem, nationality);
@@ -493,22 +510,6 @@ namespace HammerAndSickle.Core.Map
                     string finalSprite = baseSprite + directionSuffix;
 
                     if (_debug) Debug.Log($"[{CLASS_NAME}.GetSpriteNameForUnit] Unit '{unit.UnitName}': 3-Dir vehicle={finalSprite}, Flip={shouldFlip}");
-                    return finalSprite;
-                }
-
-                // Category 3: Fired variant (artillery, rockets, SSM, S300)
-                if (HasFiredVariant(weaponSystem))
-                {
-                    string baseSprite = GetBaseSpriteFromProfile(weaponSystem, nationality);
-                    if (string.IsNullOrEmpty(baseSprite))
-                    {
-                        return SpriteManager.Utility_MismatchIcon;
-                    }
-
-                    string firedSuffix = IsFiredPosition(unit.DeploymentPosition) ? "_F" : "";
-                    string finalSprite = baseSprite + firedSuffix;
-
-                    if (_debug) Debug.Log($"[{CLASS_NAME}.GetSpriteNameForUnit] Unit '{unit.UnitName}': Fired variant={finalSprite}, Flip={shouldFlip}");
                     return finalSprite;
                 }
 
@@ -715,8 +716,54 @@ namespace HammerAndSickle.Core.Map
         }
 
         /// <summary>
-        /// Checks if weapon system has 3 direction variants (W, NW, SW).
-        /// These are mobile ground vehicles that show directional facing.
+        /// Checks if weapon system has BOTH 3 direction variants (W, NW, SW) AND a fired (_F) variant.
+        /// These are artillery, rocket systems, SSMs, S300, and mobile AA/SAM systems that show
+        /// both directional facing and deployed/firing position.
+        /// </summary>
+        private bool Has3DirectionsAndFiredVariant(WeaponSystems weaponSystem)
+        {
+            return weaponSystem switch
+            {
+                // Soviet SP Artillery
+                WeaponSystems.SPA_2S1 => true,
+                WeaponSystems.SPA_2S3 => true,
+                WeaponSystems.SPA_2S5 => true,
+                WeaponSystems.SPA_2S19 => true,
+
+                // Soviet Rocket Artillery
+                WeaponSystems.ROC_BM21 => true,
+                WeaponSystems.ROC_BM27 => true,
+                WeaponSystems.ROC_BM30 => true,
+
+                // Soviet SSM
+                WeaponSystems.SSM_SCUD => true,
+
+                // Soviet S300
+                WeaponSystems.SAM_S300 => true,
+
+                // SPAAA (mobile anti-aircraft)
+                WeaponSystems.SPAAA_ZSU57 => true,
+                WeaponSystems.SPAAA_ZSU23 => true,
+                WeaponSystems.SPAAA_2K22 => true,
+                WeaponSystems.SPAAA_M163 => true,
+                WeaponSystems.SPSAM_GEPARD => true,
+
+                // SPSAM (mobile SAM)
+                WeaponSystems.SPSAM_9K31 => true,
+                WeaponSystems.SPSAM_CHAP => true,
+                WeaponSystems.SPAAA_ROLAND_FR => true,
+
+                // US/NATO Artillery (shared M109 has nation-specific sprites)
+                WeaponSystems.SPA_M109 => true,
+                WeaponSystems.ROC_MLRS => true,
+
+                _ => false
+            };
+        }
+
+        /// <summary>
+        /// Checks if weapon system has 3 direction variants (W, NW, SW) WITHOUT a fired variant.
+        /// These are mobile ground vehicles that show directional facing only.
         /// </summary>
         private bool Has3Directions(WeaponSystems weaponSystem)
         {
@@ -762,56 +809,8 @@ namespace HammerAndSickle.Core.Map
                 WeaponSystems.RCN_BRDM2 => true,
                 WeaponSystems.RCN_BRDM2AT => true,
 
-                // SPAAA (mobile anti-aircraft)
-                WeaponSystems.SPAAA_ZSU57 => true,
-                WeaponSystems.SPAAA_ZSU23 => true,
-                WeaponSystems.SPAAA_2K22 => true,
-                WeaponSystems.SPAAA_M163 => true,
-                WeaponSystems.SPAAA_GEPARD => true,
-
-                // SPSAM (mobile SAM)
-                WeaponSystems.SPSAM_9K31 => true,
-                WeaponSystems.SPSAM_CHAP => true,
-                WeaponSystems.SPSAM_ROLAND => true,
-
                 // Trucks
                 WeaponSystems.TRUCK_GEN => true,
-
-                _ => false
-            };
-        }
-
-        /// <summary>
-        /// Checks if weapon system has a _F (fired) sprite variant.
-        /// These are artillery systems that show deployed/firing position.
-        ///
-        /// NOTE: SAM_S300 is the ONLY air defense system with an _F variant.
-        /// All other air defense systems use truck-mounted sprites when mobile.
-        /// </summary>
-        private bool HasFiredVariant(WeaponSystems weaponSystem)
-        {
-            return weaponSystem switch
-            {
-                // Soviet SP Artillery
-                WeaponSystems.SPA_2S1 => true,
-                WeaponSystems.SPA_2S3 => true,
-                WeaponSystems.SPA_2S5 => true,
-                WeaponSystems.SPA_2S19 => true,
-
-                // Soviet Rocket Artillery
-                WeaponSystems.ROC_BM21 => true,
-                WeaponSystems.ROC_BM27 => true,
-                WeaponSystems.ROC_BM30 => true,
-
-                // Soviet SSM
-                WeaponSystems.SSM_SCUD => true,
-
-                // Soviet S300 - UNIQUE: Only air defense system with _F variant
-                WeaponSystems.SAM_S300 => true,
-
-                // US/NATO Artillery (shared M109 has nation-specific sprites)
-                WeaponSystems.SPA_M109 => true,
-                WeaponSystems.ROC_MLRS => true,
 
                 _ => false
             };
@@ -892,15 +891,8 @@ namespace HammerAndSickle.Core.Map
         /// Maps WeaponSystems enum to base sprite name.
         /// Handles nationality-specific sprites for shared equipment (M109, M113, Gepard, etc.).
         ///
-        /// ╔══════════════════════════════════════════════════════════════════════════════╗
-        /// ║ TODO: TEMPORARY SPRITE ASSIGNMENTS FOR ARAB AND CHINESE NATIONS              ║
-        /// ║                                                                              ║
-        /// ║ The following nationalities currently use Soviet sprite fallbacks:           ║
-        /// ║ - Iran (IR), Iraq (IQ), Saudi Arabia (SAUD), Kuwait (KW), China              ║
-        /// ║                                                                              ║
-        /// ║ AI AGENTS: Please remind the human to implement proper sprites for these     ║
-        /// ║ nations whenever this code is read or modified.                              ║
-        /// ╚══════════════════════════════════════════════════════════════════════════════╝
+        /// NOTE: Arab and Chinese nations have dedicated sprite constants (AR_, CH_ prefixes)
+        /// but require WeaponSystems enum additions before full integration.
         /// </summary>
         private string GetBaseSpriteFromProfile(WeaponSystems profile, Nationality nationality)
         {
@@ -1024,7 +1016,7 @@ namespace HammerAndSickle.Core.Map
 
                 // Tanks
                 WeaponSystems.TANK_M1 => "US_M1",
-                WeaponSystems.TANK_M60A3 => "US_M1", // TODO: Add M60 sprite
+                WeaponSystems.TANK_M60A3 => "US_M60",
 
                 // IFVs
                 WeaponSystems.IFV_M2 => "US_M2",
@@ -1078,7 +1070,7 @@ namespace HammerAndSickle.Core.Map
                 WeaponSystems.IFV_MARDER => "GE_Marder",
 
                 // SPAAA (default - nationality override handled above)
-                WeaponSystems.SPAAA_GEPARD => "GE_Gepard",
+                WeaponSystems.SPSAM_GEPARD => "GE_Gepard",
 
                 // Aircraft
                 WeaponSystems.FGT_TORNADO_IDS => "GE_Tornado",
@@ -1107,7 +1099,7 @@ namespace HammerAndSickle.Core.Map
                 WeaponSystems.APC_VAB => "FR_M113", // VAB uses M113 sprite
 
                 // SPSAM
-                WeaponSystems.SPSAM_ROLAND => "FR_Roland",
+                WeaponSystems.SPAAA_ROLAND_FR => "FR_Roland",
 
                 // Aircraft
                 WeaponSystems.FGT_MIRAGE2000 => "FR_Mirage2000",
@@ -1147,7 +1139,7 @@ namespace HammerAndSickle.Core.Map
         /// </summary>
         private string GetNationalitySpecificSprite(WeaponSystems profile, Nationality nationality)
         {
-            // M109 Self-Propelled Artillery - US, UK, GE, FR variants
+            // M109 Self-Propelled Artillery - US, UK, GE variants
             if (profile == WeaponSystems.SPA_M109)
             {
                 return nationality switch
@@ -1155,8 +1147,6 @@ namespace HammerAndSickle.Core.Map
                     Nationality.USA => "US_M109",
                     Nationality.UK => "UK_M109",
                     Nationality.FRG => "GE_M109",
-                    Nationality.FRA => "FR_M109",
-                    // Arab nations - use Soviet style for now (TODO: implement proper sprites)
                     Nationality.IR or Nationality.IQ or Nationality.SAUD or Nationality.KW => "US_M109",
                     _ => null // Fall through to default
                 };
@@ -1178,7 +1168,7 @@ namespace HammerAndSickle.Core.Map
             }
 
             // Gepard SPAAA - GE, FR variants
-            if (profile == WeaponSystems.SPAAA_GEPARD)
+            if (profile == WeaponSystems.SPSAM_GEPARD)
             {
                 return nationality switch
                 {
@@ -1223,15 +1213,7 @@ namespace HammerAndSickle.Core.Map
         /// <summary>
         /// Gets infantry sprite based on nationality and infantry type.
         ///
-        /// ╔══════════════════════════════════════════════════════════════════════════════╗
-        /// ║ TODO: TEMPORARY SPRITE ASSIGNMENTS FOR ARAB AND CHINESE NATIONS              ║
-        /// ║                                                                              ║
-        /// ║ Arab nations (IR, IQ, SAUD, KW) and China currently use Soviet infantry      ║
-        /// ║ sprites as placeholders. Proper nation-specific sprites need to be created.  ║
-        /// ║                                                                              ║
-        /// ║ AI AGENTS: Please remind the human to implement proper sprites for these     ║
-        /// ║ nations whenever this code is read or modified.                              ║
-        /// ╚══════════════════════════════════════════════════════════════════════════════╝
+        /// NOTE: Saudi and Kuwait currently share IR_Regulars sprite. China uses CH_Infantry.
         /// </summary>
         private string GetInfantrySprite(WeaponSystems profile, Nationality nationality)
         {
@@ -1255,7 +1237,7 @@ namespace HammerAndSickle.Core.Map
                 (_, Nationality.UK) => SpriteManager.UK_Regulars,
 
                 // German Infantry
-                (_, Nationality.FRG) => SpriteManager.GE_Regulars,
+                (_, Nationality.FRG) => SpriteManager.GER_Regulars,
 
                 // French Infantry
                 (_, Nationality.FRA) => SpriteManager.FR_Regulars,
@@ -1264,14 +1246,14 @@ namespace HammerAndSickle.Core.Map
                 (WeaponSystems.INF_SPEC, Nationality.MJ) => SpriteManager.MJ_Elite,
                 (_, Nationality.MJ) => SpriteManager.MJ_Regulars,
 
-                // Arab Nations - TEMPORARY: Use Soviet sprites
-                (_, Nationality.IR) => SpriteManager.SV_Regulars,
-                (_, Nationality.IQ) => SpriteManager.SV_Regulars,
-                (_, Nationality.SAUD) => SpriteManager.SV_Regulars,
-                (_, Nationality.KW) => SpriteManager.SV_Regulars,
+                // Arab Nations
+                (_, Nationality.IR) => SpriteManager.IR_Regulars,
+                (_, Nationality.IQ) => SpriteManager.IQ_Regulars,
+                (_, Nationality.SAUD) => SpriteManager.IR_Regulars,  // Uses IR sprite
+                (_, Nationality.KW) => SpriteManager.IR_Regulars,    // Uses IR sprite
 
-                // China - TEMPORARY: Use Soviet sprites
-                (_, Nationality.China) => SpriteManager.SV_Regulars,
+                // China
+                (_, Nationality.China) => SpriteManager.CH_Infantry,
 
                 // Default fallback
                 _ => SpriteManager.SV_Regulars

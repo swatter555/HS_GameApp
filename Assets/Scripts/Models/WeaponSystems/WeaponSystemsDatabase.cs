@@ -4356,7 +4356,7 @@ namespace HammerAndSickle.Models
                 var profile = new WeaponSystemProfile(
                     name: "Flakpanzer Gepard SPAAA",
                     nationality: Nationality.FRG,
-                    weaponSystemID: WeaponSystems.SPAAA_GEPARD,
+                    weaponSystemID: WeaponSystems.SPSAM_GEPARD,
                     prestigeCost: GameData.PRESTIGE_TIER_FREE,
                     weaponSystemType: WeaponSystemType.Hard,
                     hardAttack: GameData.BASE_AAA_HARD_ATTACK,
@@ -4380,7 +4380,7 @@ namespace HammerAndSickle.Models
                 profile.AddUpgradeType(UpgradeType.SPAAA);
                 profile.SetShortName("Gepard");
                 profile.SetTurnAvailable(444); // 1975
-                _weaponSystemProfiles[WeaponSystems.SPAAA_GEPARD] = profile;
+                _weaponSystemProfiles[WeaponSystems.SPSAM_GEPARD] = profile;
             }
             catch (Exception e) { AppService.HandleException(CLASS_NAME, nameof(Create_SPAAA_Gepard_Profile), e); throw; }
         }
@@ -4705,7 +4705,7 @@ namespace HammerAndSickle.Models
                 var profile = new WeaponSystemProfile(
                     name: "Roland SAM",
                     nationality: Nationality.FRA,
-                    weaponSystemID: WeaponSystems.SPSAM_ROLAND,
+                    weaponSystemID: WeaponSystems.SPAAA_ROLAND_FR,
                     prestigeCost: GameData.PRESTIGE_TIER_FREE,
                     weaponSystemType: WeaponSystemType.Soft,
                     hardAttack: GameData.BASE_SAM_HARD_ATTACK,
@@ -4729,7 +4729,7 @@ namespace HammerAndSickle.Models
                 profile.AddUpgradeType(UpgradeType.SPSAM);
                 profile.SetShortName("Roland");
                 profile.SetTurnAvailable(456); // 1976
-                _weaponSystemProfiles[WeaponSystems.SPSAM_ROLAND] = profile;
+                _weaponSystemProfiles[WeaponSystems.SPAAA_ROLAND_FR] = profile;
             }
             catch (Exception e) { AppService.HandleException(CLASS_NAME, nameof(Create_SPSAM_Roland_Profile), e); throw; }
         }
