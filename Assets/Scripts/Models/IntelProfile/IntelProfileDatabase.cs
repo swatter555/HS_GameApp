@@ -15,7 +15,7 @@ namespace HammerAndSickle.Models
 
         #region Fields
 
-        private static readonly Dictionary<IntelProfileTypes, Dictionary<Intel_WeaponTypes, int>> _intelProfiles = new();
+        private static readonly Dictionary<RegimentProfileType, Dictionary<Intel_WeaponTypes, int>> _intelProfiles = new();
         private static readonly object _initializationLock = new();
         private static bool _isInitialized = false;
 
@@ -62,7 +62,7 @@ namespace HammerAndSickle.Models
         /// </summary>
         /// <param name="profileType">The profile type to check</param>
         /// <returns>True if the profile type is defined</returns>
-        public static bool HasProfile(IntelProfileTypes profileType)
+        public static bool HasProfile(RegimentProfileType profileType)
         {
             try
             {
@@ -82,7 +82,7 @@ namespace HammerAndSickle.Models
         /// <param name="profileType">The profile type to query</param>
         /// <param name="weaponType">The weapon type to look up</param>
         /// <returns>Maximum count, or 0 if not found</returns>
-        public static int GetWeaponTypeCount(IntelProfileTypes profileType, Intel_WeaponTypes weaponType)
+        public static int GetWeaponTypeCount(RegimentProfileType profileType, Intel_WeaponTypes weaponType)
         {
             try
             {
@@ -107,7 +107,7 @@ namespace HammerAndSickle.Models
         /// </summary>
         /// <param name="profileType">The profile type to query</param>
         /// <returns>Dictionary of weapon types and their maximum counts</returns>
-        public static IReadOnlyDictionary<Intel_WeaponTypes, int> GetDefinedWeaponTypes(IntelProfileTypes profileType)
+        public static IReadOnlyDictionary<Intel_WeaponTypes, int> GetDefinedWeaponTypes(RegimentProfileType profileType)
         {
             try
             {
@@ -140,7 +140,7 @@ namespace HammerAndSickle.Models
         /// <param name="spottedLevel"></param>
         /// <returns></returns>
         public static IntelReport GenerateIntelReport(
-            IntelProfileTypes profileType,
+            RegimentProfileType profileType,
             string unitName,
             int currentHitPoints,
             Nationality nationality,
@@ -530,7 +530,7 @@ namespace HammerAndSickle.Models
                 { Intel_WeaponTypes.ATGM, 16 },
                 { Intel_WeaponTypes.Manpad, 30 },
             };
-            _intelProfiles[IntelProfileTypes.SV_MRR_BTR70] = mrrBTR70;
+            _intelProfiles[RegimentProfileType.SV_MRR_BTR70] = mrrBTR70;
 
             // Motor Rifle Regiment- BTR80 profile
             var mrrBTR80 = new Dictionary<Intel_WeaponTypes, int>
@@ -548,7 +548,7 @@ namespace HammerAndSickle.Models
                 { Intel_WeaponTypes.ATGM, 16 },
                 { Intel_WeaponTypes.Manpad, 30 },
             };
-            _intelProfiles[IntelProfileTypes.SV_MRR_BTR80] = mrrBTR80;
+            _intelProfiles[RegimentProfileType.SV_MRR_BTR80] = mrrBTR80;
             
             #endregion // Soviet APCs
 
@@ -570,7 +570,7 @@ namespace HammerAndSickle.Models
                 { Intel_WeaponTypes.ATGM, 16 },
                 { Intel_WeaponTypes.Manpad, 30 },
             };
-            _intelProfiles[IntelProfileTypes.SV_MRR_BMP1] = mrrBMP1;
+            _intelProfiles[RegimentProfileType.SV_MRR_BMP1] = mrrBMP1;
 
             // Motor Rifle Regiment- BMP2 profile
             var mrrBMP2 = new Dictionary<Intel_WeaponTypes, int>
@@ -588,7 +588,7 @@ namespace HammerAndSickle.Models
                 { Intel_WeaponTypes.ATGM, 16 },
                 { Intel_WeaponTypes.Manpad, 30 },
             };
-            _intelProfiles[IntelProfileTypes.SV_MRR_BMP2] = mrrBMP2;
+            _intelProfiles[RegimentProfileType.SV_MRR_BMP2] = mrrBMP2;
 
             // Motor Rifle Regiment- BMP3 profile
             var mrrBMP3 = new Dictionary<Intel_WeaponTypes, int>
@@ -606,7 +606,7 @@ namespace HammerAndSickle.Models
                 { Intel_WeaponTypes.ATGM, 16 },
                 { Intel_WeaponTypes.Manpad, 30 },
             };
-            _intelProfiles[IntelProfileTypes.SV_MRR_BMP3] = mrrBMP3;
+            _intelProfiles[RegimentProfileType.SV_MRR_BMP3] = mrrBMP3;
 
             #endregion // Soviet IFVs
 
@@ -628,7 +628,7 @@ namespace HammerAndSickle.Models
                 { Intel_WeaponTypes.ATGM, 12 },
                 { Intel_WeaponTypes.Manpad, 12 },
             };
-            _intelProfiles[IntelProfileTypes.SV_TR_T55] = tr_T55;
+            _intelProfiles[RegimentProfileType.SV_TR_T55] = tr_T55;
 
             // Tank Regiment- T64A profile
             var tr_T64A = new Dictionary<Intel_WeaponTypes, int>
@@ -646,7 +646,7 @@ namespace HammerAndSickle.Models
                 { Intel_WeaponTypes.ATGM, 12 },
                 { Intel_WeaponTypes.Manpad, 12 },
             };
-            _intelProfiles[IntelProfileTypes.SV_TR_T64A] = tr_T64A;
+            _intelProfiles[RegimentProfileType.SV_TR_T64A] = tr_T64A;
 
             // Tank Regiment- T64B profile
             var tr_T64B = new Dictionary<Intel_WeaponTypes, int>
@@ -664,7 +664,7 @@ namespace HammerAndSickle.Models
                 { Intel_WeaponTypes.ATGM, 12 },
                 { Intel_WeaponTypes.Manpad, 12 },
             };
-            _intelProfiles[IntelProfileTypes.SV_TR_T64B] = tr_T64B;
+            _intelProfiles[RegimentProfileType.SV_TR_T64B] = tr_T64B;
 
             // Tank Regiment- T72A profile
             var tr_T72A = new Dictionary<Intel_WeaponTypes, int>
@@ -682,7 +682,7 @@ namespace HammerAndSickle.Models
                 { Intel_WeaponTypes.ATGM, 12 },
                 { Intel_WeaponTypes.Manpad, 12 },
             };
-            _intelProfiles[IntelProfileTypes.SV_TR_T72A] = tr_T72A;
+            _intelProfiles[RegimentProfileType.SV_TR_T72A] = tr_T72A;
 
             // Tank Regiment- T72B profile
             var tr_T72B = new Dictionary<Intel_WeaponTypes, int>
@@ -700,7 +700,7 @@ namespace HammerAndSickle.Models
                 { Intel_WeaponTypes.ATGM, 12 },
                 { Intel_WeaponTypes.Manpad, 12 },
             };
-            _intelProfiles[IntelProfileTypes.SV_TR_T72B] = tr_T72B;
+            _intelProfiles[RegimentProfileType.SV_TR_T72B] = tr_T72B;
 
             // Tank Regiment- T80B profile
             var tr_T80B = new Dictionary<Intel_WeaponTypes, int>
@@ -718,7 +718,7 @@ namespace HammerAndSickle.Models
                 { Intel_WeaponTypes.ATGM, 12 },
                 { Intel_WeaponTypes.Manpad, 12 },
             };
-            _intelProfiles[IntelProfileTypes.SV_TR_T80B] = tr_T80B;
+            _intelProfiles[RegimentProfileType.SV_TR_T80B] = tr_T80B;
 
             // Tank Regiment- T80U profile
             var tr_T80U = new Dictionary<Intel_WeaponTypes, int>
@@ -736,7 +736,7 @@ namespace HammerAndSickle.Models
                 { Intel_WeaponTypes.ATGM, 12 },
                 { Intel_WeaponTypes.Manpad, 12 },
             };
-            _intelProfiles[IntelProfileTypes.SV_TR_T80U] = tr_T80U;
+            _intelProfiles[RegimentProfileType.SV_TR_T80U] = tr_T80U;
 
             // Tank Regiment- T80BV profile
             var tr_T80BV = new Dictionary<Intel_WeaponTypes, int>
@@ -754,7 +754,7 @@ namespace HammerAndSickle.Models
                 { Intel_WeaponTypes.ATGM, 12 },
                 { Intel_WeaponTypes.Manpad, 12 },
             };
-            _intelProfiles[IntelProfileTypes.SV_TR_T80BV] = tr_T80BV;
+            _intelProfiles[RegimentProfileType.SV_TR_T80BV] = tr_T80BV;
 
             #endregion // Soviet Tank Units
 
@@ -769,7 +769,7 @@ namespace HammerAndSickle.Models
                 { Intel_WeaponTypes.BTR70, 24 },
                 { Intel_WeaponTypes.Manpad, 21 },
             };
-            _intelProfiles[IntelProfileTypes.SV_AR_HVY] = sv_heavyart;
+            _intelProfiles[RegimentProfileType.SV_AR_HVY] = sv_heavyart;
 
             // Soviet light towed artillery
             var sv_lightart = new Dictionary<Intel_WeaponTypes, int>
@@ -780,7 +780,7 @@ namespace HammerAndSickle.Models
                 { Intel_WeaponTypes.BTR70, 24 },
                 { Intel_WeaponTypes.Manpad, 21 },
             };
-            _intelProfiles[IntelProfileTypes.SV_AR_LGT] = sv_lightart;
+            _intelProfiles[RegimentProfileType.SV_AR_LGT] = sv_lightart;
 
             // Soviet artillery regiment 2S1
             var sv_2s1 = new Dictionary<Intel_WeaponTypes, int>
@@ -791,7 +791,7 @@ namespace HammerAndSickle.Models
                 { Intel_WeaponTypes.BTR70, 24 },
                 { Intel_WeaponTypes.Manpad, 21 },
             };
-            _intelProfiles[IntelProfileTypes.SV_AR_2S1] = sv_2s1;
+            _intelProfiles[RegimentProfileType.SV_AR_2S1] = sv_2s1;
 
             // Soviet artillery regiment 2S3
             var sv_2s3 = new Dictionary<Intel_WeaponTypes, int>
@@ -802,7 +802,7 @@ namespace HammerAndSickle.Models
                 { Intel_WeaponTypes.BTR70, 24 },
                 { Intel_WeaponTypes.Manpad, 21 },
             };
-            _intelProfiles[IntelProfileTypes.SV_AR_2S3] = sv_2s3;
+            _intelProfiles[RegimentProfileType.SV_AR_2S3] = sv_2s3;
 
             // Soviet artillery regiment 2S5
             var sv_2s5 = new Dictionary<Intel_WeaponTypes, int>
@@ -813,7 +813,7 @@ namespace HammerAndSickle.Models
                 { Intel_WeaponTypes.BTR70, 44 },
                 { Intel_WeaponTypes.Manpad, 21 },
             };
-            _intelProfiles[IntelProfileTypes.SV_AR_2S5] = sv_2s5;
+            _intelProfiles[RegimentProfileType.SV_AR_2S5] = sv_2s5;
 
             // Soviet artillery regiment 2S19
             var sv_2s19 = new Dictionary<Intel_WeaponTypes, int>
@@ -824,7 +824,7 @@ namespace HammerAndSickle.Models
                 { Intel_WeaponTypes.BTR70, 36 },
                 { Intel_WeaponTypes.Manpad, 21 },
             };
-            _intelProfiles[IntelProfileTypes.SV_AR_2S19] = sv_2s19;
+            _intelProfiles[RegimentProfileType.SV_AR_2S19] = sv_2s19;
 
             // Soviet rocket artillery regiment BM-21
             var sv_bm21 = new Dictionary<Intel_WeaponTypes, int>
@@ -835,7 +835,7 @@ namespace HammerAndSickle.Models
                 { Intel_WeaponTypes.BTR70, 24 },
                 { Intel_WeaponTypes.Manpad, 21 },
             };
-            _intelProfiles[IntelProfileTypes.SV_ROC_BM21] = sv_bm21;
+            _intelProfiles[RegimentProfileType.SV_ROC_BM21] = sv_bm21;
 
             // Soviet rocket artillery regiment BM-27
             var sv_bm27 = new Dictionary<Intel_WeaponTypes, int>
@@ -846,7 +846,7 @@ namespace HammerAndSickle.Models
                 { Intel_WeaponTypes.BTR70, 24 },
                 { Intel_WeaponTypes.Manpad, 21 },
             };
-            _intelProfiles[IntelProfileTypes.SV_ROC_BM27] = sv_bm27;
+            _intelProfiles[RegimentProfileType.SV_ROC_BM27] = sv_bm27;
 
             // Soviet rocket artillery regiment BM-30
             var sv_bm30 = new Dictionary<Intel_WeaponTypes, int>
@@ -857,7 +857,7 @@ namespace HammerAndSickle.Models
                 { Intel_WeaponTypes.BTR70, 24 },
                 { Intel_WeaponTypes.Manpad, 21 },
             };
-            _intelProfiles[IntelProfileTypes.SV_ROC_BM30] = sv_bm30;
+            _intelProfiles[RegimentProfileType.SV_ROC_BM30] = sv_bm30;
 
             // Soviet ballistic missile regiment SCUD
             var sv_scud = new Dictionary<Intel_WeaponTypes, int>
@@ -868,7 +868,7 @@ namespace HammerAndSickle.Models
                 { Intel_WeaponTypes.BTR70, 24 },
                 { Intel_WeaponTypes.Manpad, 21 },
             };
-            _intelProfiles[IntelProfileTypes.SV_BM_SCUDB] = sv_scud;
+            _intelProfiles[RegimentProfileType.SV_BM_SCUDB] = sv_scud;
 
             #endregion // Soviet Artillery Units
 
@@ -888,7 +888,7 @@ namespace HammerAndSickle.Models
                 { Intel_WeaponTypes.AAA,         2 },  // ZSU‑23‑4 Shilka (reduced strength)
                 { Intel_WeaponTypes.MI8T,     166 },  // 2× transport helicopter squadrons
             };
-            _intelProfiles[IntelProfileTypes.SV_AAR_MTLB] = aar_MTLB;
+            _intelProfiles[RegimentProfileType.SV_AAR_MTLB] = aar_MTLB;
 
             // Soviet air mobile regiment BMD1
             var aar_BMD1 = new Dictionary<Intel_WeaponTypes, int>
@@ -904,7 +904,7 @@ namespace HammerAndSickle.Models
                 { Intel_WeaponTypes.AAA,         2 },  // ZSU‑23‑4 Shilka (reduced strength)
                 { Intel_WeaponTypes.MI8T,     166 },  // 2× transport helicopter squadrons
             };
-            _intelProfiles[IntelProfileTypes.SV_AAR_BMD1] = aar_BMD1;
+            _intelProfiles[RegimentProfileType.SV_AAR_BMD1] = aar_BMD1;
 
             // Soviet air mobile regiment BTR80
             var aar_BMD2 = new Dictionary<Intel_WeaponTypes, int>
@@ -920,7 +920,7 @@ namespace HammerAndSickle.Models
                 { Intel_WeaponTypes.AAA,         2 },  // ZSU‑23‑4 Shilka (reduced strength)
                 { Intel_WeaponTypes.MI8T,      166 },  // 2× transport helicopter squadrons
             };
-            _intelProfiles[IntelProfileTypes.SV_AAR_BMD2] = aar_BMD2;
+            _intelProfiles[RegimentProfileType.SV_AAR_BMD2] = aar_BMD2;
 
             // Soviet air mobile regiment BMD3
             var aar_BMD3 = new Dictionary<Intel_WeaponTypes, int>
@@ -936,7 +936,7 @@ namespace HammerAndSickle.Models
                 { Intel_WeaponTypes.AAA,         2 },  // ZSU‑23‑4 Shilka (reduced strength)
                 { Intel_WeaponTypes.MI8T,     166 },  // 2× transport helicopter squadrons
             };
-            _intelProfiles[IntelProfileTypes.SV_AAR_BMD3] = aar_BMD3;
+            _intelProfiles[RegimentProfileType.SV_AAR_BMD3] = aar_BMD3;
 
             #endregion // Soviet air mobile units
 
@@ -956,7 +956,7 @@ namespace HammerAndSickle.Models
                 { Intel_WeaponTypes.Manpad,       45 }, // SA‑14/16 squads
                 { Intel_WeaponTypes.AAA,           6 },
             };
-            _intelProfiles[IntelProfileTypes.SV_VDV_BMD1] = vdv_BMD1;
+            _intelProfiles[RegimentProfileType.SV_VDV_BMD1] = vdv_BMD1;
 
             // VDV airborne regiment – BMD‑2 (mid‑1980s baseline)
             var vdv_BMD2 = new Dictionary<Intel_WeaponTypes, int>
@@ -970,7 +970,7 @@ namespace HammerAndSickle.Models
                 { Intel_WeaponTypes.Manpad,       45 }, // SA‑14/16 squads
                 { Intel_WeaponTypes.AAA,           6 },
             };
-            _intelProfiles[IntelProfileTypes.SV_VDV_BMD2] = vdv_BMD2;
+            _intelProfiles[RegimentProfileType.SV_VDV_BMD2] = vdv_BMD2;
 
             // VDV airborne regiment – BMD‑3 (mid‑1980s baseline)
             var vdv_BMD3 = new Dictionary<Intel_WeaponTypes, int>
@@ -984,7 +984,7 @@ namespace HammerAndSickle.Models
                 { Intel_WeaponTypes.Manpad,       45 }, // SA‑14/16 squads
                 { Intel_WeaponTypes.AAA,           6 },
             };
-            _intelProfiles[IntelProfileTypes.SV_VDV_BMD3] = vdv_BMD3;
+            _intelProfiles[RegimentProfileType.SV_VDV_BMD3] = vdv_BMD3;
 
             // VDV artillery regiment
             var vdv_artreg = new Dictionary<Intel_WeaponTypes, int>
@@ -995,7 +995,7 @@ namespace HammerAndSickle.Models
                 { Intel_WeaponTypes.HeavyMortar,         36 }, // 120 mm 2S9 Nona‑S battery
                 { Intel_WeaponTypes.LightMortar,          18 },
             };
-            _intelProfiles[IntelProfileTypes.SV_VDV_ART] = vdv_artreg;
+            _intelProfiles[RegimentProfileType.SV_VDV_ART] = vdv_artreg;
 
             // VDV airborne regiment – support (mid‑1980s baseline)
             var vdv_sup = new Dictionary<Intel_WeaponTypes, int>
@@ -1008,7 +1008,7 @@ namespace HammerAndSickle.Models
                 { Intel_WeaponTypes.Manpad,       12 }, 
                 { Intel_WeaponTypes.AAA,           2 },
             };
-            _intelProfiles[IntelProfileTypes.SV_VDV_SUP] = vdv_sup;
+            _intelProfiles[RegimentProfileType.SV_VDV_SUP] = vdv_sup;
 
             #endregion // Soviet VDV units
 
@@ -1030,7 +1030,7 @@ namespace HammerAndSickle.Models
                 { Intel_WeaponTypes.ATGM, 12 },
                 { Intel_WeaponTypes.Manpad, 36 },
             };
-            _intelProfiles[IntelProfileTypes.SV_NAV_BTR70] = navBTR70;
+            _intelProfiles[RegimentProfileType.SV_NAV_BTR70] = navBTR70;
 
             // Naval Assault Brigade- BTR80 profile
             var navBTR80 = new Dictionary<Intel_WeaponTypes, int>
@@ -1048,7 +1048,7 @@ namespace HammerAndSickle.Models
                 { Intel_WeaponTypes.ATGM, 12 },
                 { Intel_WeaponTypes.Manpad, 36 },
             };
-            _intelProfiles[IntelProfileTypes.SV_NAV_BTR80] = navBTR80;
+            _intelProfiles[RegimentProfileType.SV_NAV_BTR80] = navBTR80;
 
             #endregion // Soviet naval infantry units
 
@@ -1060,7 +1060,7 @@ namespace HammerAndSickle.Models
                 { Intel_WeaponTypes.Infantry, 340 },
                 { Intel_WeaponTypes.BTR70, 20 },
             };
-            _intelProfiles[IntelProfileTypes.SV_ENG] = svengineers;
+            _intelProfiles[RegimentProfileType.SV_ENG] = svengineers;
 
             #endregion // Soviet engineer units
 
@@ -1078,7 +1078,7 @@ namespace HammerAndSickle.Models
                 { Intel_WeaponTypes.ATGM, 12 },
                 { Intel_WeaponTypes.Manpad, 12 },
             };
-            _intelProfiles[IntelProfileTypes.SV_RCR] = svreconrgt;
+            _intelProfiles[RegimentProfileType.SV_RCR] = svreconrgt;
 
             // Soviet recon regiment AT
             var svreconrgtAT = new Dictionary<Intel_WeaponTypes, int>
@@ -1092,7 +1092,7 @@ namespace HammerAndSickle.Models
                 { Intel_WeaponTypes.ATGM, 12 },
                 { Intel_WeaponTypes.Manpad, 12 },
             };
-            _intelProfiles[IntelProfileTypes.SV_RCR_AT] = svreconrgtAT;
+            _intelProfiles[RegimentProfileType.SV_RCR_AT] = svreconrgtAT;
 
             #endregion // Soviet recon units
 
@@ -1106,7 +1106,7 @@ namespace HammerAndSickle.Models
                 { Intel_WeaponTypes.Manpad, 21 },
                 { Intel_WeaponTypes.BTR70, 22 }
             };
-            _intelProfiles[IntelProfileTypes.SV_ADR_AAA] = svadr_AAA;
+            _intelProfiles[RegimentProfileType.SV_ADR_AAA] = svadr_AAA;
 
             // AAA Regiment- ZSU-57 profile
             var svadr_ZSU57 = new Dictionary<Intel_WeaponTypes, int>
@@ -1116,7 +1116,7 @@ namespace HammerAndSickle.Models
                 { Intel_WeaponTypes.Manpad, 21 },
                 { Intel_WeaponTypes.BTR70, 22 }
             };
-            _intelProfiles[IntelProfileTypes.SV_ADR_ZSU57] = svadr_ZSU57;
+            _intelProfiles[RegimentProfileType.SV_ADR_ZSU57] = svadr_ZSU57;
 
             // AAA Regiment- ZSU-23 profile
             var svadr_ZSU23 = new Dictionary<Intel_WeaponTypes, int>
@@ -1126,7 +1126,7 @@ namespace HammerAndSickle.Models
                 { Intel_WeaponTypes.Manpad, 21 },
                 { Intel_WeaponTypes.BTR70, 22 }
             };
-            _intelProfiles[IntelProfileTypes.SV_ADR_ZSU57] = svadr_ZSU23;
+            _intelProfiles[RegimentProfileType.SV_ADR_ZSU57] = svadr_ZSU23;
 
             // AAA Regiment- 2K22 profile
             var svadr_2K22 = new Dictionary<Intel_WeaponTypes, int>
@@ -1136,7 +1136,7 @@ namespace HammerAndSickle.Models
                 { Intel_WeaponTypes.Manpad, 21 },
                 { Intel_WeaponTypes.BTR70, 22 }
             };
-            _intelProfiles[IntelProfileTypes.SV_ADR_2K22] = svadr_2K22;
+            _intelProfiles[RegimentProfileType.SV_ADR_2K22] = svadr_2K22;
 
             #endregion // Soviet air defence units
 
@@ -1150,7 +1150,7 @@ namespace HammerAndSickle.Models
                 { Intel_WeaponTypes.Manpad, 21 },
                 { Intel_WeaponTypes.BTR70, 22 }
             };
-            _intelProfiles[IntelProfileTypes.SV_SPSAM_9K31] = sam9k31;
+            _intelProfiles[RegimentProfileType.SV_SPSAM_9K31] = sam9k31;
 
             // SAM Regiment- S75 profile
             var samS75 = new Dictionary<Intel_WeaponTypes, int>
@@ -1160,7 +1160,7 @@ namespace HammerAndSickle.Models
                 { Intel_WeaponTypes.Manpad, 21 },
                 { Intel_WeaponTypes.BTR70, 48 }
             };
-            _intelProfiles[IntelProfileTypes.SV_SAM_S75] = samS75;
+            _intelProfiles[RegimentProfileType.SV_SAM_S75] = samS75;
 
             // SAM Regiment- S125 profile
             var samS125 = new Dictionary<Intel_WeaponTypes, int>
@@ -1170,7 +1170,7 @@ namespace HammerAndSickle.Models
                 { Intel_WeaponTypes.Manpad, 21 },
                 { Intel_WeaponTypes.BTR70, 48 }
             };
-            _intelProfiles[IntelProfileTypes.SV_SAM_S125] = samS125;
+            _intelProfiles[RegimentProfileType.SV_SAM_S125] = samS125;
 
             // SAM Regiment- S300 profile
             var samS300 = new Dictionary<Intel_WeaponTypes, int>
@@ -1180,7 +1180,7 @@ namespace HammerAndSickle.Models
                 { Intel_WeaponTypes.Manpad, 21 },
                 { Intel_WeaponTypes.BTR70, 48 }
             };
-            _intelProfiles[IntelProfileTypes.SV_SAM_S300] = samS300;
+            _intelProfiles[RegimentProfileType.SV_SAM_S300] = samS300;
 
             #endregion // Soviet SAM units
 
@@ -1191,28 +1191,28 @@ namespace HammerAndSickle.Models
             {
                 { Intel_WeaponTypes.MI8AT, 54 }
             };
-            _intelProfiles[IntelProfileTypes.SV_HEL_MI8AT] = helo_MI8T;
+            _intelProfiles[RegimentProfileType.SV_HEL_MI8AT] = helo_MI8T;
 
             // Attack regiment- Mi-24D profile
             var helo_MI24D = new Dictionary<Intel_WeaponTypes, int>
             {
                 { Intel_WeaponTypes.MI24D, 54 }
             };
-            _intelProfiles[IntelProfileTypes.SV_HEL_MI24D] = helo_MI24D;
+            _intelProfiles[RegimentProfileType.SV_HEL_MI24D] = helo_MI24D;
 
             // Attack regiment- Mi-24V profile
             var helo_MI24V = new Dictionary<Intel_WeaponTypes, int>
             {
                 { Intel_WeaponTypes.MI24V, 54 }
             };
-            _intelProfiles[IntelProfileTypes.SV_HEL_MI24V] = helo_MI24V;
+            _intelProfiles[RegimentProfileType.SV_HEL_MI24V] = helo_MI24V;
 
             // Attack regiment- Mi-28 profile
             var helo_MI28 = new Dictionary<Intel_WeaponTypes, int>
             {
                 { Intel_WeaponTypes.MI28, 54 }
             };
-            _intelProfiles[IntelProfileTypes.SV_HEL_MI28] = helo_MI28;
+            _intelProfiles[RegimentProfileType.SV_HEL_MI28] = helo_MI28;
 
             #endregion
 
@@ -1226,7 +1226,7 @@ namespace HammerAndSickle.Models
                 { Intel_WeaponTypes.Manpad, 12 },
                 { Intel_WeaponTypes.LightMortar,    18 },
             };
-            _intelProfiles[IntelProfileTypes.SV_GRU] = spetz;
+            _intelProfiles[RegimentProfileType.SV_GRU] = spetz;
 
             #endregion // Spetznaz units
 
@@ -1237,112 +1237,112 @@ namespace HammerAndSickle.Models
             {
                 { Intel_WeaponTypes.A50, 6 }
             };
-            _intelProfiles[IntelProfileTypes.SV_AWACS_A50] = awacsRegiment;
+            _intelProfiles[RegimentProfileType.SV_AWACS_A50] = awacsRegiment;
 
             // Fighter Regiment- MiG-21 profile
             var fighterRegiment_Mig21 = new Dictionary<Intel_WeaponTypes, int>
             {
                 { Intel_WeaponTypes.MIG21, 36 }
             };
-            _intelProfiles[IntelProfileTypes.SV_FR_MIG21] = fighterRegiment_Mig21;
+            _intelProfiles[RegimentProfileType.SV_FR_MIG21] = fighterRegiment_Mig21;
 
             // Fighter Regiment- MiG-23 profile
             var fighterRegiment_Mig23 = new Dictionary<Intel_WeaponTypes, int>
             {
                 { Intel_WeaponTypes.MIG23, 36 }
             };
-            _intelProfiles[IntelProfileTypes.SV_FR_MIG23] = fighterRegiment_Mig23;
+            _intelProfiles[RegimentProfileType.SV_FR_MIG23] = fighterRegiment_Mig23;
 
             // Fighter Regiment- MiG-25 profile
             var fighterRegiment_Mig25 = new Dictionary<Intel_WeaponTypes, int>
             {
                 { Intel_WeaponTypes.MIG25, 36 }
             };
-            _intelProfiles[IntelProfileTypes.SV_FR_MIG25] = fighterRegiment_Mig25;
+            _intelProfiles[RegimentProfileType.SV_FR_MIG25] = fighterRegiment_Mig25;
 
             // Fighter Regiment- MiG-29 profile
             var fighterRegiment_Mig29 = new Dictionary<Intel_WeaponTypes, int>
             {
                 { Intel_WeaponTypes.MIG29, 36 }
             };
-            _intelProfiles[IntelProfileTypes.SV_FR_MIG29] = fighterRegiment_Mig29;
+            _intelProfiles[RegimentProfileType.SV_FR_MIG29] = fighterRegiment_Mig29;
 
             // Fighter Regiment- Mig-31 profile
             var fighterRegiment_Mig31 = new Dictionary<Intel_WeaponTypes, int>
             {
                 { Intel_WeaponTypes.MIG31, 36 }
             };
-            _intelProfiles[IntelProfileTypes.SV_FR_MIG31] = fighterRegiment_Mig31;
+            _intelProfiles[RegimentProfileType.SV_FR_MIG31] = fighterRegiment_Mig31;
 
             // Fighter Regiment- Su-27 profile
             var fighterRegiment_Su27 = new Dictionary<Intel_WeaponTypes, int>
             {
                 { Intel_WeaponTypes.SU27, 36 }
             };
-            _intelProfiles[IntelProfileTypes.SV_FR_SU27] = fighterRegiment_Su27;
+            _intelProfiles[RegimentProfileType.SV_FR_SU27] = fighterRegiment_Su27;
 
             // Fighter Regiment- SU-47 profile
             var fighterRegiment_Su47 = new Dictionary<Intel_WeaponTypes, int>
             {
                 { Intel_WeaponTypes.SU47, 36 }
             };
-            _intelProfiles[IntelProfileTypes.SV_FR_SU47] = fighterRegiment_Su47;
+            _intelProfiles[RegimentProfileType.SV_FR_SU47] = fighterRegiment_Su47;
 
             // Fighter Regiment- Mig-27
             var fighterRegiment_Mig27 = new Dictionary<Intel_WeaponTypes, int>
             {
                 { Intel_WeaponTypes.MIG27, 36 }
             };
-            _intelProfiles[IntelProfileTypes.SV_MR_MIG27] = fighterRegiment_Mig27;
+            _intelProfiles[RegimentProfileType.SV_MR_MIG27] = fighterRegiment_Mig27;
 
             // Attack Regiment- Su-25 profile
             var attackRegiment_Su25 = new Dictionary<Intel_WeaponTypes, int>
             {
                 { Intel_WeaponTypes.SU25, 36 }
             };
-            _intelProfiles[IntelProfileTypes.SV_AR_SU25] = attackRegiment_Su25;
+            _intelProfiles[RegimentProfileType.SV_AR_SU25] = attackRegiment_Su25;
 
             // Attack Regiment- Su-25B profile
             var attackRegiment_Su25B = new Dictionary<Intel_WeaponTypes, int>
             {
                 { Intel_WeaponTypes.SU25B, 36 }
             };
-            _intelProfiles[IntelProfileTypes.SV_AR_SU25B] = attackRegiment_Su25B;
+            _intelProfiles[RegimentProfileType.SV_AR_SU25B] = attackRegiment_Su25B;
 
             // Bomber Regiment- SU-24 profile
             var bomberRegiment_Su24 = new Dictionary<Intel_WeaponTypes, int>
             {
                 { Intel_WeaponTypes.SU24, 36 }
             };
-            _intelProfiles[IntelProfileTypes.SV_BR_SU24] = bomberRegiment_Su24;
+            _intelProfiles[RegimentProfileType.SV_BR_SU24] = bomberRegiment_Su24;
 
             // Bomber Regiment- TU-16
             var bomberRegiment_Tu16 = new Dictionary<Intel_WeaponTypes, int>
             {
                 { Intel_WeaponTypes.TU16, 24 }
             };
-            _intelProfiles[IntelProfileTypes.SV_BR_TU16] = bomberRegiment_Tu16;
+            _intelProfiles[RegimentProfileType.SV_BR_TU16] = bomberRegiment_Tu16;
 
             // Bomber Regiment- TU-22
             var bomberRegiment_Tu22 = new Dictionary<Intel_WeaponTypes, int>
             {
                 { Intel_WeaponTypes.TU22, 24 }
             };
-            _intelProfiles[IntelProfileTypes.SV_BR_TU22] = bomberRegiment_Tu22;
+            _intelProfiles[RegimentProfileType.SV_BR_TU22] = bomberRegiment_Tu22;
 
             // Bomber Regiment- TU-22M3
             var bomberRegiment_Tu22M3 = new Dictionary<Intel_WeaponTypes, int>
             {
                 { Intel_WeaponTypes.TU22M3, 24 }
             };
-            _intelProfiles[IntelProfileTypes.SV_BR_TU22M3] = bomberRegiment_Tu22M3;
+            _intelProfiles[RegimentProfileType.SV_BR_TU22M3] = bomberRegiment_Tu22M3;
 
             // Air Recon Regiment- MiG-25R profile
             var airRecon_Mig25R = new Dictionary<Intel_WeaponTypes, int>
             {
                 { Intel_WeaponTypes.MIG25R, 12 }
             };
-            _intelProfiles[IntelProfileTypes.SV_RR_MIG25R] = airRecon_Mig25R;
+            _intelProfiles[RegimentProfileType.SV_RR_MIG25R] = airRecon_Mig25R;
 
             #endregion // Soviet air units
 
@@ -1353,21 +1353,21 @@ namespace HammerAndSickle.Models
             {
                 { Intel_WeaponTypes.Infantry, 3000 }
             };
-            _intelProfiles[IntelProfileTypes.SV_DEPOT] = sv_supplydepot;
+            _intelProfiles[RegimentProfileType.SV_DEPOT] = sv_supplydepot;
 
             // Airbase profile
             var sv_airbase = new Dictionary<Intel_WeaponTypes, int>
             {
                 { Intel_WeaponTypes.Infantry, 2500 }
             };
-            _intelProfiles[IntelProfileTypes.SV_AIRB] = sv_airbase;
+            _intelProfiles[RegimentProfileType.SV_AIRB] = sv_airbase;
 
             // Regular base profile
             var sv_regularbase = new Dictionary<Intel_WeaponTypes, int>
             {
                 { Intel_WeaponTypes.Infantry, 1500 }
             };
-            _intelProfiles[IntelProfileTypes.SV_BASE] = sv_regularbase;
+            _intelProfiles[RegimentProfileType.SV_BASE] = sv_regularbase;
 
             #endregion // Soviet bases
 
@@ -1389,7 +1389,7 @@ namespace HammerAndSickle.Models
                 { Intel_WeaponTypes.HeavyMortar,   18 },
                 { Intel_WeaponTypes.M163,      4 },  // Vulcan air defense guns
             };
-            _intelProfiles[IntelProfileTypes.US_ARMORED_BDE_M1] = us_armoredBde_M1;
+            _intelProfiles[RegimentProfileType.US_ARMORED_BDE_M1] = us_armoredBde_M1;
 
             // US Armored Brigade - M60A3 (Division 86 structure)
             var us_armoredBde_M60A3 = new Dictionary<Intel_WeaponTypes, int>
@@ -1405,7 +1405,7 @@ namespace HammerAndSickle.Models
                 { Intel_WeaponTypes.HeavyMortar,   18 },
                 { Intel_WeaponTypes.M163,      4 },  // Vulcan air defense guns
             };
-            _intelProfiles[IntelProfileTypes.US_ARMORED_BDE_M60A3] = us_armoredBde_M60A3;
+            _intelProfiles[RegimentProfileType.US_ARMORED_BDE_M60A3] = us_armoredBde_M60A3;
 
             // US Heavy Mechanized Brigade - M1A1 Abrams (Division 86 structure)
             var us_heavyMechBde_M1 = new Dictionary<Intel_WeaponTypes, int>
@@ -1421,7 +1421,7 @@ namespace HammerAndSickle.Models
                 { Intel_WeaponTypes.HeavyMortar,   18 },
                 { Intel_WeaponTypes.M163,      4 }, // Vulcan air defense guns
             };
-            _intelProfiles[IntelProfileTypes.US_HEAVY_MECH_BDE_M1] = us_heavyMechBde_M1;
+            _intelProfiles[RegimentProfileType.US_HEAVY_MECH_BDE_M1] = us_heavyMechBde_M1;
 
             // US Heavy Mechanized Brigade - M60A3 (Division 86 structure)
             var us_heavyMechBde_M60A3 = new Dictionary<Intel_WeaponTypes, int>
@@ -1437,7 +1437,7 @@ namespace HammerAndSickle.Models
                 { Intel_WeaponTypes.HeavyMortar,   18 },
                 { Intel_WeaponTypes.M163,      4 }, // Vulcan air defense guns
             };
-            _intelProfiles[IntelProfileTypes.US_HEAVY_MECH_BDE_M60A3] = us_heavyMechBde_M60A3;
+            _intelProfiles[RegimentProfileType.US_HEAVY_MECH_BDE_M60A3] = us_heavyMechBde_M60A3;
 
             // US Parachute Infantry Brigade (82nd Airborne)
             var us_paraBde_82nd = new Dictionary<Intel_WeaponTypes, int>
@@ -1451,7 +1451,7 @@ namespace HammerAndSickle.Models
                 { Intel_WeaponTypes.M113,          12 }, // Command posts and support vehicles
                 { Intel_WeaponTypes.HeavyMortar,      18 }
             };
-            _intelProfiles[IntelProfileTypes.US_PARA_BDE_82ND] = us_paraBde_82nd;
+            _intelProfiles[RegimentProfileType.US_PARA_BDE_82ND] = us_paraBde_82nd;
 
             // US Air Assault Infantry Brigade (101st Airborne)
             var us_airAssaultBde_101st = new Dictionary<Intel_WeaponTypes, int>
@@ -1465,7 +1465,7 @@ namespace HammerAndSickle.Models
                 { Intel_WeaponTypes.OH58,          12 }, // Scout helicopters
                 { Intel_WeaponTypes.M113,           8 }, // Command posts and support vehicles
             };
-            _intelProfiles[IntelProfileTypes.US_AIR_ASSAULT_BDE_101ST] = us_airAssaultBde_101st;
+            _intelProfiles[RegimentProfileType.US_AIR_ASSAULT_BDE_101ST] = us_airAssaultBde_101st;
 
             // US Armored Cavalry Squadron (ACR) - Corps reconnaissance squadron
             var us_armoredCavSqdn = new Dictionary<Intel_WeaponTypes, int>
@@ -1481,7 +1481,7 @@ namespace HammerAndSickle.Models
                 { Intel_WeaponTypes.M109,        8 }, // Organic 155mm artillery battery
                 { Intel_WeaponTypes.M163,      4 }, // Vulcan air defense guns
             };
-            _intelProfiles[IntelProfileTypes.US_ARMORED_CAV_SQDN] = us_armoredCavSqdn;
+            _intelProfiles[RegimentProfileType.US_ARMORED_CAV_SQDN] = us_armoredCavSqdn;
 
             // US Division Artillery Battalion (DIVARTY)
             var us_divisionArtilleryBde_M109 = new Dictionary<Intel_WeaponTypes, int>
@@ -1492,7 +1492,7 @@ namespace HammerAndSickle.Models
                 { Intel_WeaponTypes.Manpad, 12 }, // Stinger teams for air defense
                 { Intel_WeaponTypes.M3,          6 },          // Forward observer vehicles
             };
-            _intelProfiles[IntelProfileTypes.US_ARTILLERY_BDE_M109] = us_divisionArtilleryBde_M109;
+            _intelProfiles[RegimentProfileType.US_ARTILLERY_BDE_M109] = us_divisionArtilleryBde_M109;
 
             // US Division Artillery Battalion (DIVARTY) - MLRS focused
             var us_divisionArtilleryBde_MLRS = new Dictionary<Intel_WeaponTypes, int>
@@ -1503,7 +1503,7 @@ namespace HammerAndSickle.Models
                 { Intel_WeaponTypes.Manpad, 12 }, // Stinger teams for air defense
                 { Intel_WeaponTypes.M3,          6 }, // Forward observer vehicles
             };
-            _intelProfiles[IntelProfileTypes.US_ARTILLERY_BDE_MLRS] = us_divisionArtilleryBde_MLRS;
+            _intelProfiles[RegimentProfileType.US_ARTILLERY_BDE_MLRS] = us_divisionArtilleryBde_MLRS;
 
             // US Aviation Attack Brigade
             var us_aviationAttackBde = new Dictionary<Intel_WeaponTypes, int>
@@ -1513,7 +1513,7 @@ namespace HammerAndSickle.Models
                 { Intel_WeaponTypes.OH58,  18 },  // OH-58 Kiowa scout helicopters
                 { Intel_WeaponTypes.M113,  48 },  // Ground support and maintenance vehicles
             };
-            _intelProfiles[IntelProfileTypes.US_AVIATION_ATTACK_BDE] = us_aviationAttackBde;
+            _intelProfiles[RegimentProfileType.US_AVIATION_ATTACK_BDE] = us_aviationAttackBde;
 
             // US Engineer Brigade
             var us_engineerBde = new Dictionary<Intel_WeaponTypes, int>
@@ -1524,7 +1524,7 @@ namespace HammerAndSickle.Models
                 { Intel_WeaponTypes.Manpad, 18 }, // Stinger teams
                 { Intel_WeaponTypes.ATGM,   24 }, // TOW missiles for defensive positions
             };
-            _intelProfiles[IntelProfileTypes.US_ENGINEER_BDE] = us_engineerBde;
+            _intelProfiles[RegimentProfileType.US_ENGINEER_BDE] = us_engineerBde;
 
             // US Air Defense Brigade- Hawk SAMs
             var us_airDefenseBde_Hawk = new Dictionary<Intel_WeaponTypes, int>
@@ -1535,7 +1535,7 @@ namespace HammerAndSickle.Models
                 { Intel_WeaponTypes.Manpad, 12 }, // Stinger teams distributed throughout
                 { Intel_WeaponTypes.M113,       24 }, // Command and control vehicles
             };
-            _intelProfiles[IntelProfileTypes.US_AIR_DEFENSE_BDE_HAWK] = us_airDefenseBde_Hawk;
+            _intelProfiles[RegimentProfileType.US_AIR_DEFENSE_BDE_HAWK] = us_airDefenseBde_Hawk;
 
             // US Air Defense Brigade- Chaparral
             var us_airDefenseBde_Chap = new Dictionary<Intel_WeaponTypes, int>
@@ -1546,63 +1546,63 @@ namespace HammerAndSickle.Models
                 { Intel_WeaponTypes.Manpad, 12 }, // Stinger teams distributed throughout
                 { Intel_WeaponTypes.M113,       24 }, // Command and control vehicles
             };
-            _intelProfiles[IntelProfileTypes.US_AIR_DEFENSE_BDE_CHAPARRAL] = us_airDefenseBde_Chap;
+            _intelProfiles[RegimentProfileType.US_AIR_DEFENSE_BDE_CHAPARRAL] = us_airDefenseBde_Chap;
 
             // US Fighter Wing - F-15 Eagle
             var us_fighterWing_F15 = new Dictionary<Intel_WeaponTypes, int>
             {
                 { Intel_WeaponTypes.F15, 36 }
             };
-            _intelProfiles[IntelProfileTypes.US_FIGHTER_WING_F15] = us_fighterWing_F15;
+            _intelProfiles[RegimentProfileType.US_FIGHTER_WING_F15] = us_fighterWing_F15;
 
             // US Fighter Wing - F-4 Phantom II
             var us_fighterWing_F4 = new Dictionary<Intel_WeaponTypes, int>
             {
                 { Intel_WeaponTypes.F4, 36 }
             };
-            _intelProfiles[IntelProfileTypes.US_FIGHTER_WING_F4] = us_fighterWing_F4;
+            _intelProfiles[RegimentProfileType.US_FIGHTER_WING_F4] = us_fighterWing_F4;
 
             // US Fighter Wing - F-16 Fighting Falcon
             var us_fighterWing_F16 = new Dictionary<Intel_WeaponTypes, int>
             {
                 { Intel_WeaponTypes.F16, 36 }
             };
-            _intelProfiles[IntelProfileTypes.US_FIGHTER_WING_F16] = us_fighterWing_F16;
+            _intelProfiles[RegimentProfileType.US_FIGHTER_WING_F16] = us_fighterWing_F16;
 
             // US Tactical Fighter Wing - A-10 Thunderbolt II
             var us_tacticalWing_A10 = new Dictionary<Intel_WeaponTypes, int>
             {
                 { Intel_WeaponTypes.A10, 36 }
             };
-            _intelProfiles[IntelProfileTypes.US_TACTICAL_WING_A10] = us_tacticalWing_A10;
+            _intelProfiles[RegimentProfileType.US_TACTICAL_WING_A10] = us_tacticalWing_A10;
 
             // US Bomber Wing - Mixed Types
             var us_bomberWing_F111 = new Dictionary<Intel_WeaponTypes, int>
             {
                 { Intel_WeaponTypes.F111, 18 },
             };
-            _intelProfiles[IntelProfileTypes.US_BOMBER_WING_F111] = us_bomberWing_F111;
+            _intelProfiles[RegimentProfileType.US_BOMBER_WING_F111] = us_bomberWing_F111;
 
             // US Bomber Wing - Mixed Types
             var us_bomberWing_F117 = new Dictionary<Intel_WeaponTypes, int>
             {
                 { Intel_WeaponTypes.F117, 18 },
             };
-            _intelProfiles[IntelProfileTypes.US_BOMBER_WING_F117] = us_bomberWing_F117;
+            _intelProfiles[RegimentProfileType.US_BOMBER_WING_F117] = us_bomberWing_F117;
 
             // US Reconnaissance Squadron - SR-71 Blackbird
             var us_reconSqdn_SR71 = new Dictionary<Intel_WeaponTypes, int>
             {
                 { Intel_WeaponTypes.SR71, 12 }
             };
-            _intelProfiles[IntelProfileTypes.US_RECON_SQDN_SR71] = us_reconSqdn_SR71;
+            _intelProfiles[RegimentProfileType.US_RECON_SQDN_SR71] = us_reconSqdn_SR71;
 
             // US AWACS Squadron - E-3 Sentry
             var us_awacsSqdn_E3 = new Dictionary<Intel_WeaponTypes, int>
             {
                 { Intel_WeaponTypes.E3, 6 }
             };
-            _intelProfiles[IntelProfileTypes.US_AWACS_E3] = us_awacsSqdn_E3;
+            _intelProfiles[RegimentProfileType.US_AWACS_E3] = us_awacsSqdn_E3;
 
             #endregion
 
@@ -1624,7 +1624,7 @@ namespace HammerAndSickle.Models
                 { Intel_WeaponTypes.GEPARD,    8 }, // Gepard air defense guns (brigade level)
                 { Intel_WeaponTypes.HeavyMortar,   12 }, // 120mm mortars distributed across battalions
             };
-            _intelProfiles[IntelProfileTypes.FRG_PANZER_BDE_LEO2] = frg_panzerBde_Leo2;
+            _intelProfiles[RegimentProfileType.FRG_PANZER_BDE_LEO2] = frg_panzerBde_Leo2;
 
             // FRG Panzer Brigade - Leopard 1
             var frg_panzerBde_Leo1 = new Dictionary<Intel_WeaponTypes, int>
@@ -1640,7 +1640,7 @@ namespace HammerAndSickle.Models
                 { Intel_WeaponTypes.GEPARD,    8 }, // Gepard air defense guns (brigade level)
                 { Intel_WeaponTypes.HeavyMortar,   12 }, // 120mm mortars distributed across battalions
             };
-            _intelProfiles[IntelProfileTypes.FRG_PANZER_BDE_LEO1] = frg_panzerBde_Leo1;
+            _intelProfiles[RegimentProfileType.FRG_PANZER_BDE_LEO1] = frg_panzerBde_Leo1;
 
             // FRG Panzergrenadier Brigade
             var frg_pzgrenBde = new Dictionary<Intel_WeaponTypes, int>
@@ -1656,7 +1656,7 @@ namespace HammerAndSickle.Models
                 { Intel_WeaponTypes.GEPARD,    8 }, // Gepard air defense guns (brigade level)
                 { Intel_WeaponTypes.HeavyMortar,   18 }, // 120mm mortars (higher count for infantry support)
             };
-            _intelProfiles[IntelProfileTypes.FRG_PZGREN_BDE_MARDER] = frg_pzgrenBde;
+            _intelProfiles[RegimentProfileType.FRG_PZGREN_BDE_MARDER] = frg_pzgrenBde;
 
             // FRG Artillery Brigade
             var frg_artilleryBde_M109 = new Dictionary<Intel_WeaponTypes, int>
@@ -1668,7 +1668,7 @@ namespace HammerAndSickle.Models
                 { Intel_WeaponTypes.Manpad, 16 }, // Roland/Stinger air defense (counter-battery protection)
                 { Intel_WeaponTypes.GEPARD,    4 }, // Enhanced air defense for high-value artillery assets
             };
-            _intelProfiles[IntelProfileTypes.FRG_ARTILLERY_BDE_M109] = frg_artilleryBde_M109;
+            _intelProfiles[RegimentProfileType.FRG_ARTILLERY_BDE_M109] = frg_artilleryBde_M109;
 
             // FRG Artillery Brigade
             var frg_artilleryBde_MLRS = new Dictionary<Intel_WeaponTypes, int>
@@ -1680,7 +1680,7 @@ namespace HammerAndSickle.Models
                 { Intel_WeaponTypes.Manpad, 16 }, // Roland/Stinger air defense (counter-battery protection)
                 { Intel_WeaponTypes.GEPARD,    4 }, // Enhanced air defense for high-value artillery assets
             };
-            _intelProfiles[IntelProfileTypes.FRG_ARTILLERY_BDE_MLRS] = frg_artilleryBde_MLRS;
+            _intelProfiles[RegimentProfileType.FRG_ARTILLERY_BDE_MLRS] = frg_artilleryBde_MLRS;
 
             // FRG Airborne Brigade
             var frg_luftlandeBde = new Dictionary<Intel_WeaponTypes, int>
@@ -1694,7 +1694,7 @@ namespace HammerAndSickle.Models
                 { Intel_WeaponTypes.AAA,     8 }, // Light air defense guns (20mm)
                 { Intel_WeaponTypes.BO105,      72 }, // Organic utility helicopters for mobility
             };
-            _intelProfiles[IntelProfileTypes.FRG_LUFTLANDE_BDE] = frg_luftlandeBde;
+            _intelProfiles[RegimentProfileType.FRG_LUFTLANDE_BDE] = frg_luftlandeBde;
 
             // FRG Mountain Brigade
             var frg_mountainBde = new Dictionary<Intel_WeaponTypes, int>
@@ -1708,7 +1708,7 @@ namespace HammerAndSickle.Models
                 { Intel_WeaponTypes.AAA,       12 }, // Light air defense (20mm for valley defense)
                 { Intel_WeaponTypes.BO105,          8 }, // Utility helicopters for mountain resupply
             };
-            _intelProfiles[IntelProfileTypes.FRG_MOUNTAIN_BDE] = frg_mountainBde;
+            _intelProfiles[RegimentProfileType.FRG_MOUNTAIN_BDE] = frg_mountainBde;
 
             // FRG Air Defense Brigade
             var frg_airDefenseBde_HAWK = new Dictionary<Intel_WeaponTypes, int>
@@ -1720,7 +1720,7 @@ namespace HammerAndSickle.Models
                 { Intel_WeaponTypes.LUCHS,       6 }, // Forward air defense reconnaissance
                 { Intel_WeaponTypes.Manpad, 12 }, // Stinger teams for gap coverage and mobility
             };
-            _intelProfiles[IntelProfileTypes.FRG_AIR_DEFENSE_BDE_HAWK] = frg_airDefenseBde_HAWK;
+            _intelProfiles[RegimentProfileType.FRG_AIR_DEFENSE_BDE_HAWK] = frg_airDefenseBde_HAWK;
 
             // FRG Air Defense Brigade
             var frg_airDefenseBde_ROLAND = new Dictionary<Intel_WeaponTypes, int>
@@ -1732,7 +1732,7 @@ namespace HammerAndSickle.Models
                 { Intel_WeaponTypes.LUCHS,       6 }, // Forward air defense reconnaissance
                 { Intel_WeaponTypes.Manpad, 12 }, // Stinger teams for gap coverage and mobility
             };
-            _intelProfiles[IntelProfileTypes.FRG_AIR_DEFENSE_BDE_ROLAND] = frg_airDefenseBde_ROLAND;
+            _intelProfiles[RegimentProfileType.FRG_AIR_DEFENSE_BDE_ROLAND] = frg_airDefenseBde_ROLAND;
 
             // FRG Air Defense Brigade
             var frg_airDefenseBde_GEPARD = new Dictionary<Intel_WeaponTypes, int>
@@ -1743,21 +1743,21 @@ namespace HammerAndSickle.Models
                 { Intel_WeaponTypes.LUCHS,       6 }, // Forward air defense reconnaissance
                 { Intel_WeaponTypes.Manpad, 12 }, // Stinger teams for gap coverage and mobility
             };
-            _intelProfiles[IntelProfileTypes.FRG_AIR_DEFENSE_BDE_GEPARD] = frg_airDefenseBde_GEPARD;
+            _intelProfiles[RegimentProfileType.FRG_AIR_DEFENSE_BDE_GEPARD] = frg_airDefenseBde_GEPARD;
 
             // FRG Air Defense Brigade
             var frg_aviation_Bde = new Dictionary<Intel_WeaponTypes, int>
             {
                 { Intel_WeaponTypes.BO105, 54 },
             };
-            _intelProfiles[IntelProfileTypes.FRG_AVIATION_BDE_BO105] = frg_aviation_Bde;
+            _intelProfiles[RegimentProfileType.FRG_AVIATION_BDE_BO105] = frg_aviation_Bde;
 
             // FRG Air Defense Brigade
             var frg_fighterWing = new Dictionary<Intel_WeaponTypes, int>
             {
                 { Intel_WeaponTypes.TORNADO_IDS, 36 },
             };
-            _intelProfiles[IntelProfileTypes.FRG_FIGHTER_WING_TORNADO_IDS] = frg_fighterWing;
+            _intelProfiles[RegimentProfileType.FRG_FIGHTER_WING_TORNADO_IDS] = frg_fighterWing;
 
             #endregion
 
@@ -1779,7 +1779,7 @@ namespace HammerAndSickle.Models
                 { Intel_WeaponTypes.LightMortar,       18 }, // 81mm mortars distributed across battalions
                 { Intel_WeaponTypes.SAM_RAPIER,         6 }, // Rapier air defense missiles (brigade level)
             };
-            _intelProfiles[IntelProfileTypes.UK_ARMOURED_BDE_CHALLENGER] = uk_armouredBde_Challenger;
+            _intelProfiles[RegimentProfileType.UK_ARMOURED_BDE_CHALLENGER] = uk_armouredBde_Challenger;
 
             // UK Mechanised Brigade - Warrior IFV (Infantry-heavy: 1 tank + 2 mech infantry)
             var uk_mechanisedBde_Warrior = new Dictionary<Intel_WeaponTypes, int>
@@ -1795,7 +1795,7 @@ namespace HammerAndSickle.Models
                 { Intel_WeaponTypes.LightMortar,      18 },  // 81mm mortars
                 { Intel_WeaponTypes.SAM_RAPIER,        6 },  // Brigade air defense
             };
-            _intelProfiles[IntelProfileTypes.UK_MECHANISED_BDE_WARRIOR] = uk_mechanisedBde_Warrior;
+            _intelProfiles[RegimentProfileType.UK_MECHANISED_BDE_WARRIOR] = uk_mechanisedBde_Warrior;
 
             // UK Infantry Brigade - FV432 APC (Traditional infantry with vehicular mobility)
             var uk_infantryBde_FV432 = new Dictionary<Intel_WeaponTypes, int>
@@ -1809,7 +1809,7 @@ namespace HammerAndSickle.Models
                 { Intel_WeaponTypes.LightMortar,    18 }, // 81mm mortars
                 { Intel_WeaponTypes.SAM_RAPIER,      6 }, // Brigade air defense
             };
-            _intelProfiles[IntelProfileTypes.UK_INFANTRY_BDE_FV432] = uk_infantryBde_FV432;
+            _intelProfiles[RegimentProfileType.UK_INFANTRY_BDE_FV432] = uk_infantryBde_FV432;
 
             // UK Airmobile Brigade - Enhanced AT (1983-1988 experimental formation)
             var uk_airmobileBde = new Dictionary<Intel_WeaponTypes, int>
@@ -1821,7 +1821,7 @@ namespace HammerAndSickle.Models
                 { Intel_WeaponTypes.LightMortar,    12 }, // 81mm mortars (air-portable)
                 { Intel_WeaponTypes.FV432,       8 }, // Command vehicles only
             };
-            _intelProfiles[IntelProfileTypes.UK_AIRMOBILE_BDE] = uk_airmobileBde;
+            _intelProfiles[RegimentProfileType.UK_AIRMOBILE_BDE] = uk_airmobileBde;
 
             // UK Artillery Brigade - Royal Artillery
             var uk_artilleryBde = new Dictionary<Intel_WeaponTypes, int>
@@ -1832,7 +1832,7 @@ namespace HammerAndSickle.Models
                 { Intel_WeaponTypes.SCIMITAR,    6 }, // Artillery reconnaissance
                 { Intel_WeaponTypes.Manpad, 12 }, // Self-defense air defense
             };
-            _intelProfiles[IntelProfileTypes.UK_ARTILLERY_BDE] = uk_artilleryBde;
+            _intelProfiles[RegimentProfileType.UK_ARTILLERY_BDE] = uk_artilleryBde;
 
             // UK Air Defense Brigade - Royal Artillery Air Defense
             var uk_airDefenseBde = new Dictionary<Intel_WeaponTypes, int>
@@ -1843,7 +1843,7 @@ namespace HammerAndSickle.Models
                 { Intel_WeaponTypes.FV432,   24 }, // Command, radar, support vehicles
                 { Intel_WeaponTypes.SCIMITAR, 4 }, // Air defense reconnaissance
             };
-            _intelProfiles[IntelProfileTypes.UK_AIR_DEFENSE_BDE] = uk_airDefenseBde;
+            _intelProfiles[RegimentProfileType.UK_AIR_DEFENSE_BDE] = uk_airDefenseBde;
 
             #endregion
 
@@ -1864,7 +1864,7 @@ namespace HammerAndSickle.Models
                 { Intel_WeaponTypes.AUF1,       18 }, // Organic artillery regiment
                 { Intel_WeaponTypes.HeavyMortar,   18 }, // 120mm mortars
             };
-            _intelProfiles[IntelProfileTypes.FR_BRIGADE_BLINDEE_AMX30] = fr_brigadeBlindee_AMX30;
+            _intelProfiles[RegimentProfileType.FR_BRIGADE_BLINDEE_AMX30] = fr_brigadeBlindee_AMX30;
 
             // French Division d'Infanterie Mécanisée (Mechanized Infantry Division)
             var fr_brigadeInfMeca_AMX10P = new Dictionary<Intel_WeaponTypes, int>
@@ -1879,7 +1879,7 @@ namespace HammerAndSickle.Models
                 { Intel_WeaponTypes.AUF1,       18 }, // Organic artillery regiment
                 { Intel_WeaponTypes.HeavyMortar,   18 }, // 120mm mortars
             };
-            _intelProfiles[IntelProfileTypes.FR_BRIGADE_INF_MECA_AMX10P] = fr_brigadeInfMeca_AMX10P;
+            _intelProfiles[RegimentProfileType.FR_BRIGADE_INF_MECA_AMX10P] = fr_brigadeInfMeca_AMX10P;
 
             // French Division d'Infanterie Motorisée (Motorized Infantry Division)
             var fr_brigadeInfMoto_VAB = new Dictionary<Intel_WeaponTypes, int>
@@ -1893,7 +1893,7 @@ namespace HammerAndSickle.Models
                 { Intel_WeaponTypes.AUF1,       18 }, // Organic artillery regiment
                 { Intel_WeaponTypes.HeavyMortar,   18 }, // 120mm mortars
             };
-            _intelProfiles[IntelProfileTypes.FR_BRIGADE_INF_MOTO_VAB] = fr_brigadeInfMoto_VAB;
+            _intelProfiles[RegimentProfileType.FR_BRIGADE_INF_MOTO_VAB] = fr_brigadeInfMoto_VAB;
 
             // 11e Division Parachutiste (Airborne Division)
             var fr_brigadePara = new Dictionary<Intel_WeaponTypes, int>
@@ -1905,7 +1905,7 @@ namespace HammerAndSickle.Models
                 { Intel_WeaponTypes.Manpad, 24 }, // Mistral SAM teams
                 { Intel_WeaponTypes.HeavyMortar,   36 }, // 120mm mortars (air-droppable)
             };
-            _intelProfiles[IntelProfileTypes.FR_BRIGADE_PARACHUTISTE] = fr_brigadePara;
+            _intelProfiles[RegimentProfileType.FR_BRIGADE_PARACHUTISTE] = fr_brigadePara;
 
             // French Régiment d'Artillerie (Artillery Regiment)
             var fr_regimentArtillerie = new Dictionary<Intel_WeaponTypes, int>
@@ -1915,7 +1915,7 @@ namespace HammerAndSickle.Models
                 { Intel_WeaponTypes.VAB,       10 }, // Fire direction, supply vehicles
                 { Intel_WeaponTypes.Manpad, 6 }, // Self-defense Mistral teams
             };
-            _intelProfiles[IntelProfileTypes.FR_REGIMENT_ARTILLERIE] = fr_regimentArtillerie;
+            _intelProfiles[RegimentProfileType.FR_REGIMENT_ARTILLERIE] = fr_regimentArtillerie;
 
             // French Régiment de Défense Antiaérienne (Air Defense Regiment)
             var fr_regimentDefenseAA = new Dictionary<Intel_WeaponTypes, int>
@@ -1926,21 +1926,21 @@ namespace HammerAndSickle.Models
                 { Intel_WeaponTypes.Manpad, 36 }, // Mistral SAM teams
                 { Intel_WeaponTypes.VAB,        12 }, // Command, radar vehicles
             };
-            _intelProfiles[IntelProfileTypes.FR_REGIMENT_DEFENSE_AA] = fr_regimentDefenseAA;
+            _intelProfiles[RegimentProfileType.FR_REGIMENT_DEFENSE_AA] = fr_regimentDefenseAA;
 
             // French Escadron de Chasse (Fighter Squadron) - Mirage 2000
             var fr_fighterSquadron_Mirage2000 = new Dictionary<Intel_WeaponTypes, int>
             {
                 { Intel_WeaponTypes.MIRAGE2000, 36 },
             };
-            _intelProfiles[IntelProfileTypes.FR_FIGHTER_WING_MIRAGE2000] = fr_fighterSquadron_Mirage2000;
+            _intelProfiles[RegimentProfileType.FR_FIGHTER_WING_MIRAGE2000] = fr_fighterSquadron_Mirage2000;
 
             // French Escadron de Chasse (Fighter Squadron) - Jaguar
             var fr_fighterSquadron_Jaguar = new Dictionary<Intel_WeaponTypes, int>
             {
                 { Intel_WeaponTypes.JAGUAR, 36 },
             };
-            _intelProfiles[IntelProfileTypes.FR_ATTACK_WING_JAGUAR] = fr_fighterSquadron_Jaguar;
+            _intelProfiles[RegimentProfileType.FR_ATTACK_WING_JAGUAR] = fr_fighterSquadron_Jaguar;
 
             #endregion
 
@@ -1958,7 +1958,7 @@ namespace HammerAndSickle.Models
                 { Intel_WeaponTypes.Manpad,         8 }, // SA-7/Stinger teams
                 { Intel_WeaponTypes.AAA,            6 }, // DShK/ZU-23 positions
             };
-            _intelProfiles[IntelProfileTypes.MJ_INF_GUERRILLA] = mj_infGuerrilla;
+            _intelProfiles[RegimentProfileType.MJ_INF_GUERRILLA] = mj_infGuerrilla;
 
             // Mujahideen Special Forces/Commando Regiment
             var mj_specCommando = new Dictionary<Intel_WeaponTypes, int>
@@ -1969,7 +1969,7 @@ namespace HammerAndSickle.Models
                 { Intel_WeaponTypes.Manpad,      20 }, // Better air defense
                 { Intel_WeaponTypes.ATGM,        12 }, // Limited advanced ATGMs (TOW/Dragon)
             };
-            _intelProfiles[IntelProfileTypes.MJ_SPEC_COMMANDO] = mj_specCommando;
+            _intelProfiles[RegimentProfileType.MJ_SPEC_COMMANDO] = mj_specCommando;
 
             // Mujahideen Horse Cavalry Regiment
             var mj_cavHorse = new Dictionary<Intel_WeaponTypes, int>
@@ -1980,7 +1980,7 @@ namespace HammerAndSickle.Models
                 { Intel_WeaponTypes.RecoilessRifle, 8 }, // Limited heavy weapons
                 { Intel_WeaponTypes.Manpad,        10 }, // Air defense teams
             };
-            _intelProfiles[IntelProfileTypes.MJ_CAV_HORSE] = mj_cavHorse;
+            _intelProfiles[RegimentProfileType.MJ_CAV_HORSE] = mj_cavHorse;
 
             // Mujahideen Air Defense Regiment
             var mj_adManpad = new Dictionary<Intel_WeaponTypes, int>
@@ -1989,7 +1989,7 @@ namespace HammerAndSickle.Models
                 { Intel_WeaponTypes.Manpad,   24 }, // Primary air defense (SA-7/Stinger)
                 { Intel_WeaponTypes.AAA,      24 }, // Heavy machine guns/AAA
             };
-            _intelProfiles[IntelProfileTypes.MJ_AA] = mj_adManpad;
+            _intelProfiles[RegimentProfileType.MJ_AA] = mj_adManpad;
 
             // Mujahideen Mortar Regiment
             var mj_artMortarLight = new Dictionary<Intel_WeaponTypes, int>
@@ -2000,7 +2000,7 @@ namespace HammerAndSickle.Models
                 { Intel_WeaponTypes.RPG7,          12 }, // Infantry protection
                 { Intel_WeaponTypes.Manpad,         6 }, // Air defense
             };
-            _intelProfiles[IntelProfileTypes.MJ_ART_LIGHT_MORTAR] = mj_artMortarLight;
+            _intelProfiles[RegimentProfileType.MJ_ART_LIGHT_MORTAR] = mj_artMortarLight;
 
             // Mujahideen Heavy Mortar Regiment
             var mj_artMortarHeavy = new Dictionary<Intel_WeaponTypes, int>
@@ -2012,7 +2012,7 @@ namespace HammerAndSickle.Models
                 { Intel_WeaponTypes.RPG7,           18 }, // Infantry defense
                 { Intel_WeaponTypes.Manpad,          8 }, // Limited air defense
             };
-            _intelProfiles[IntelProfileTypes.MJ_ART_HEAVY_MORTAR] = mj_artMortarHeavy;
+            _intelProfiles[RegimentProfileType.MJ_ART_HEAVY_MORTAR] = mj_artMortarHeavy;
 
             #endregion
 
@@ -2031,7 +2031,7 @@ namespace HammerAndSickle.Models
                 { Intel_WeaponTypes.Manpad, 8 }, // SA-7 teams for air defense
                 { Intel_WeaponTypes.AAA, 4 }, // ZU-23 air defense guns
             };
-            _intelProfiles[IntelProfileTypes.ARAB_TANK_REG_T55] = arab_tankReg_T55;
+            _intelProfiles[RegimentProfileType.ARAB_TANK_REG_T55] = arab_tankReg_T55;
 
             // Arab Tank Regiment - T-72
             var arab_tankReg_T72 = new Dictionary<Intel_WeaponTypes, int>
@@ -2044,7 +2044,7 @@ namespace HammerAndSickle.Models
                 { Intel_WeaponTypes.Manpad, 10 }, // SA-14 teams for air defense
                 { Intel_WeaponTypes.ZSU23, 4 }, // ZSU-23-4 air defense guns
             };
-            _intelProfiles[IntelProfileTypes.ARAB_TANK_REG_T72] = arab_tankReg_T72;
+            _intelProfiles[RegimentProfileType.ARAB_TANK_REG_T72] = arab_tankReg_T72;
 
             // Arab Tank Regiment - M60A3
             var arab_tankReg_M60A3 = new Dictionary<Intel_WeaponTypes, int>
@@ -2057,7 +2057,7 @@ namespace HammerAndSickle.Models
                 { Intel_WeaponTypes.Manpad, 6 }, // Stinger teams for air defense
                 { Intel_WeaponTypes.AAA, 4 }, // M163 Vulcan air defense guns
             };
-            _intelProfiles[IntelProfileTypes.ARAB_TANK_REG_M60A3] = arab_tankReg_M60A3;
+            _intelProfiles[RegimentProfileType.ARAB_TANK_REG_M60A3] = arab_tankReg_M60A3;
 
             // Arab Tank Regiment - M1 Abrams
             var arab_tankReg_M1 = new Dictionary<Intel_WeaponTypes, int>
@@ -2070,7 +2070,7 @@ namespace HammerAndSickle.Models
                 { Intel_WeaponTypes.Manpad, 8 }, // Stinger teams for air defense
                 { Intel_WeaponTypes.M163, 4 }, // M163 Vulcan air defense guns
             };
-            _intelProfiles[IntelProfileTypes.ARAB_TANK_REG_M1] = arab_tankReg_M1;
+            _intelProfiles[RegimentProfileType.ARAB_TANK_REG_M1] = arab_tankReg_M1;
 
             #endregion // Arab Army Tank Regiments
 
@@ -2089,7 +2089,7 @@ namespace HammerAndSickle.Models
                 { Intel_WeaponTypes.LightMortar, 24 }, // 82mm mortars
 
             };
-            _intelProfiles[IntelProfileTypes.ARAB_MECH_REG_BMP1] = arab_mechReg_BMP1;
+            _intelProfiles[RegimentProfileType.ARAB_MECH_REG_BMP1] = arab_mechReg_BMP1;
 
             // Arab Mechanized Infantry Regiment - M2 Bradley
             var arab_mechReg_M2 = new Dictionary<Intel_WeaponTypes, int>
@@ -2103,7 +2103,7 @@ namespace HammerAndSickle.Models
                 { Intel_WeaponTypes.LightArtillery, 18 }, // Howitzers
                 { Intel_WeaponTypes.LightMortar, 24 }, // 82mm mortars
             };
-            _intelProfiles[IntelProfileTypes.ARAB_MECH_REG_M2] = arab_mechReg_M2;
+            _intelProfiles[RegimentProfileType.ARAB_MECH_REG_M2] = arab_mechReg_M2;
 
             // Arab Mechanized Infantry Regiment - BTR-70
             var arab_mechReg_BTR70 = new Dictionary<Intel_WeaponTypes, int>
@@ -2116,7 +2116,7 @@ namespace HammerAndSickle.Models
                 { Intel_WeaponTypes.LightArtillery, 18 }, // 120mm mortars
                 { Intel_WeaponTypes.LightMortar, 24 }, // 82mm mortars
             };
-            _intelProfiles[IntelProfileTypes.ARAB_MECH_REG_BTR70] = arab_mechReg_BTR70;
+            _intelProfiles[RegimentProfileType.ARAB_MECH_REG_BTR70] = arab_mechReg_BTR70;
 
             // Arab Mechanized Infantry Regiment - M113
             var arab_mechReg_M113 = new Dictionary<Intel_WeaponTypes, int>
@@ -2129,7 +2129,7 @@ namespace HammerAndSickle.Models
                 { Intel_WeaponTypes.LightArtillery, 18 }, // 120mm mortars
                 { Intel_WeaponTypes.LightMortar, 24 }, // 82mm mortars
             };
-            _intelProfiles[IntelProfileTypes.ARAB_MECH_REG_M113] = arab_mechReg_M113;
+            _intelProfiles[RegimentProfileType.ARAB_MECH_REG_M113] = arab_mechReg_M113;
 
             #endregion // Arab Army Mechanized Infantry Regiments
 
@@ -2145,7 +2145,7 @@ namespace HammerAndSickle.Models
                 { Intel_WeaponTypes.LightArtillery, 18 }, // 120mm mortars
                 { Intel_WeaponTypes.LightMortar, 24 }, // 82mm mortars
             };
-            _intelProfiles[IntelProfileTypes.ARAB_REG_MOT] = arab_regMot;
+            _intelProfiles[RegimentProfileType.ARAB_REG_MOT] = arab_regMot;
 
             // Arab Infantry Regiment
             var arab_regInf = new Dictionary<Intel_WeaponTypes, int>
@@ -2157,7 +2157,7 @@ namespace HammerAndSickle.Models
                 { Intel_WeaponTypes.LightArtillery, 18 }, // 120mm mortars
                 { Intel_WeaponTypes.LightMortar, 24 }, // 82mm mortars
             };
-            _intelProfiles[IntelProfileTypes.ARAB_REG_INF] = arab_regInf;
+            _intelProfiles[RegimentProfileType.ARAB_REG_INF] = arab_regInf;
 
             #endregion // Arab Army Infantry Regiments
 
@@ -2172,7 +2172,7 @@ namespace HammerAndSickle.Models
                 { Intel_WeaponTypes.Manpad, 8 }, // Air defense teams
                 { Intel_WeaponTypes.AAA, 4 }, // Anti-aircraft guns
             };
-            _intelProfiles[IntelProfileTypes.ARAB_REG_HVY_ART] = arab_regHvyArt;
+            _intelProfiles[RegimentProfileType.ARAB_REG_HVY_ART] = arab_regHvyArt;
 
             // Arab Light Artillery Regiment
             var arab_regLgtArt = new Dictionary<Intel_WeaponTypes, int>
@@ -2183,7 +2183,7 @@ namespace HammerAndSickle.Models
                 { Intel_WeaponTypes.Manpad, 6 }, // Air defense teams
                 { Intel_WeaponTypes.AAA, 4 }, // Anti-aircraft guns
             };
-            _intelProfiles[IntelProfileTypes.ARAB_REG_LGT_ART] = arab_regLgtArt;
+            _intelProfiles[RegimentProfileType.ARAB_REG_LGT_ART] = arab_regLgtArt;
 
             // Arab Self-Propelled Artillery Regiment - 2S1
             var arab_spaReg_2S1 = new Dictionary<Intel_WeaponTypes, int>
@@ -2194,7 +2194,7 @@ namespace HammerAndSickle.Models
                 { Intel_WeaponTypes.Manpad, 8 }, // Air defense teams
                 { Intel_WeaponTypes.ZSU23, 4 }, // ZSU-23-4 air defense
             };
-            _intelProfiles[IntelProfileTypes.ARAB_SPA_REG_2S1] = arab_spaReg_2S1;
+            _intelProfiles[RegimentProfileType.ARAB_SPA_REG_2S1] = arab_spaReg_2S1;
 
             // Arab Self-Propelled Artillery Regiment - M109
             var arab_spaReg_M109 = new Dictionary<Intel_WeaponTypes, int>
@@ -2205,7 +2205,7 @@ namespace HammerAndSickle.Models
                 { Intel_WeaponTypes.Manpad, 6 }, // Air defense teams
                 { Intel_WeaponTypes.M163, 4 }, // M163 Vulcan air defense
             };
-            _intelProfiles[IntelProfileTypes.ARAB_SPA_REG_M109] = arab_spaReg_M109;
+            _intelProfiles[RegimentProfileType.ARAB_SPA_REG_M109] = arab_spaReg_M109;
 
             // Arab Rocket Artillery Regiment - BM-21
             var arab_rocReg_BM21 = new Dictionary<Intel_WeaponTypes, int>
@@ -2216,7 +2216,7 @@ namespace HammerAndSickle.Models
                 { Intel_WeaponTypes.Manpad, 8 }, // Air defense teams
                 { Intel_WeaponTypes.ZSU23, 4 }, // ZSU-23-4 air defense
             };
-            _intelProfiles[IntelProfileTypes.ARAB_ROC_REG_BM21] = arab_rocReg_BM21;
+            _intelProfiles[RegimentProfileType.ARAB_ROC_REG_BM21] = arab_rocReg_BM21;
 
             // Arab Rocket Artillery Regiment - MLRS
             var arab_rocReg_MLRS = new Dictionary<Intel_WeaponTypes, int>
@@ -2227,7 +2227,7 @@ namespace HammerAndSickle.Models
                 { Intel_WeaponTypes.Manpad, 6 }, // Air defense teams
                 { Intel_WeaponTypes.M163, 4 }, // M163 Vulcan air defense
             };
-            _intelProfiles[IntelProfileTypes.ARAB_ROC_REG_MLRS] = arab_rocReg_MLRS;
+            _intelProfiles[RegimentProfileType.ARAB_ROC_REG_MLRS] = arab_rocReg_MLRS;
 
             #endregion // Arab Army Artillery Regiments
 
@@ -2242,7 +2242,7 @@ namespace HammerAndSickle.Models
                 { Intel_WeaponTypes.BTR70, 8 }, // Support vehicles
                 { Intel_WeaponTypes.Manpad, 8 }, // Air defense teams
             };
-            _intelProfiles[IntelProfileTypes.ARAB_RCN_REG_BRDM] = arab_rcnReg_BRDM;
+            _intelProfiles[RegimentProfileType.ARAB_RCN_REG_BRDM] = arab_rcnReg_BRDM;
 
             // Arab Reconnaissance Regiment - M3 Bradley
             var arab_rcnReg_M3 = new Dictionary<Intel_WeaponTypes, int>
@@ -2254,7 +2254,7 @@ namespace HammerAndSickle.Models
                 { Intel_WeaponTypes.Manpad, 6 }, // Air defense teams
             };
 
-            _intelProfiles[IntelProfileTypes.ARAB_RCN_REG_M3] = arab_rcnReg_M3;
+            _intelProfiles[RegimentProfileType.ARAB_RCN_REG_M3] = arab_rcnReg_M3;
 
             #endregion // Arab Army Reconnaissance Regiments
 
@@ -2268,7 +2268,7 @@ namespace HammerAndSickle.Models
                 { Intel_WeaponTypes.BTR70, 12 }, // Command, supply vehicles
                 { Intel_WeaponTypes.Manpad, 24 }, // SA-7/SA-14 teams
             };
-            _intelProfiles[IntelProfileTypes.ARAB_SPAAA_REG_ZSU23] = arab_spaaaReg_ZSU23;
+            _intelProfiles[RegimentProfileType.ARAB_SPAAA_REG_ZSU23] = arab_spaaaReg_ZSU23;
 
             // Arab SAM Regiment - S-75 Dvina (SA-2)
             var arab_samReg_S75 = new Dictionary<Intel_WeaponTypes, int>
@@ -2278,7 +2278,7 @@ namespace HammerAndSickle.Models
                 { Intel_WeaponTypes.MTLB, 12 }, // Command, radar vehicles
                 { Intel_WeaponTypes.AAA, 12 }, // Supporting AAA guns
             };
-            _intelProfiles[IntelProfileTypes.ARAB_SAM_REG_S75] = arab_samReg_S75;
+            _intelProfiles[RegimentProfileType.ARAB_SAM_REG_S75] = arab_samReg_S75;
 
             // Arab SAM Regiment - S-125 Neva (SA-3)
             var arab_samReg_S125 = new Dictionary<Intel_WeaponTypes, int>
@@ -2288,7 +2288,7 @@ namespace HammerAndSickle.Models
                 { Intel_WeaponTypes.BTR70, 12 }, // Command, radar vehicles
                 { Intel_WeaponTypes.ZSU23, 8 }, // Supporting SPAAA
             };
-            _intelProfiles[IntelProfileTypes.ARAB_SAM_REG_S125] = arab_samReg_S125;
+            _intelProfiles[RegimentProfileType.ARAB_SAM_REG_S125] = arab_samReg_S125;
 
             // Arab SAM Regiment - Hawk
             var arab_samReg_Hawk = new Dictionary<Intel_WeaponTypes, int>
@@ -2298,7 +2298,7 @@ namespace HammerAndSickle.Models
                 { Intel_WeaponTypes.M113, 12 }, // Command, radar vehicles
                 { Intel_WeaponTypes.M163, 8 }, // Supporting M163 Vulcan
             };
-            _intelProfiles[IntelProfileTypes.ARAB_SAM_REG_HAWK] = arab_samReg_Hawk;
+            _intelProfiles[RegimentProfileType.ARAB_SAM_REG_HAWK] = arab_samReg_Hawk;
 
             #endregion // Arab Army Air Defense Regiments
 
