@@ -100,12 +100,12 @@ namespace HammerAndSickle.Persistence
                                 role: unit.Role,
                                 side: unit.Side,
                                 nationality: unit.Nationality,
-                                intelProfileType: unit.IntelProfileType,
-                                deployedProfileID: unit.DeployedProfileID,
+                                profileType: unit.RegimentProfile.ProfileType,
+                                deployedProfile: unit.RegimentProfile.Deployed,
                                 isMountable: unit.IsMountable,
-                                mobileProfileID: unit.MobileProfileID,
+                                mobileProfile: unit.RegimentProfile.Mobile,
                                 isEmbarkable: unit.IsEmbarkable,
-                                embarkProfileID: unit.EmbarkedProfileID,
+                                embarkedProfile: unit.RegimentProfile.Embarked,
                                 category: unit.IsBase ? unit.DepotCategory : DepotCategory.Secondary,
                                 size: unit.IsBase ? unit.DepotSize : DepotSize.Small
                             );

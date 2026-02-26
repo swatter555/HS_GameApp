@@ -68,10 +68,10 @@ namespace HammerAndSickle.Controllers
 
         private void Initialize()
         {
-            // Initialize Panels to be inactive at start
+            // InitializeRegimentProfile Panels to be inactive at start
             if (_terrainPanelObject != null)
             {
-                // Initialize the panel
+                // InitializeRegimentProfile the panel
                 if(!Prefab_TerrainPanel.Instance.Initialize())
                 {
                     Debug.LogError("Failed to initialize Terrain Panel.");

@@ -1,9 +1,47 @@
 using HammerAndSickle.Services;
 using System;
+using System.Text.Json.Serialization;
 using HammerAndSickle.Core.GameData;
+using System.Collections.Generic;
 
 namespace HammerAndSickle.Models
 {
+    /// <summary>
+    /// Contains the weapon system buckets for profile stats.
+    /// </summary>
+    public class IntelReport
+    {
+        #region Properties
+
+        // Bucketted numbers for each unit type.
+        public int Personnel { get; set; } = 0;
+        public int TANK { get; set; } = 0;
+        public int IFV { get; set; } = 0;
+        public int APC { get; set; } = 0;
+        public int RCN { get; set; } = 0;
+        public int ART { get; set; } = 0;
+        public int ROC { get; set; } = 0;
+        public int SAM { get; set; } = 0;
+        public int AAA { get; set; } = 0;
+        public int AT { get; set; } = 0;
+        public int HEL { get; set; } = 0;
+        public int AWACS { get; set; } = 0;
+        public int TRN { get; set; } = 0;
+        public int FGT { get; set; } = 0;
+        public int ATT { get; set; } = 0;
+        public int BMB { get; set; } = 0;
+        public int RCNA { get; set; } = 0;
+
+        // More intel about parent unit.
+        public Nationality UnitNationality = Nationality.USSR;
+        public string UnitName { get; set; } = "Default";
+        public DeploymentPosition DeploymentPosition { get; set; } = DeploymentPosition.Deployed;
+        public ExperienceLevel UnitExperienceLevel = ExperienceLevel.Raw;
+        public EfficiencyLevel UnitEfficiencyLevel = EfficiencyLevel.StaticOperations;
+
+        #endregion // Properties
+    }
+
     /// <summary>
     /// Maps a unit icon to its required sprite resource strings.
     /// </summary>
@@ -32,6 +70,17 @@ namespace HammerAndSickle.Models
         public RegimentIconProfile()
         {
             IconType = RegimentIconType.Single;
+            W = string.Empty;
+            NW = string.Empty;
+            SW = string.Empty;
+            W_F = string.Empty;
+            NW_F = string.Empty;
+            SW_F = string.Empty;
+        }
+
+        public RegimentIconProfile(RegimentIconType _iconType)
+        {
+            IconType = _iconType;
             W = string.Empty;
             NW = string.Empty;
             SW = string.Empty;
@@ -195,7 +244,22 @@ namespace HammerAndSickle.Models
     /// </summary>
     public class WeaponProfile
     {
+        /*
+         * Important notes:
+         * WeaponProfile acts as both a repository of ratings for the RegimentProfile, but
+         * also as repository of data for intel reports.
+         */
+
         #region Properties
+
+        public string LongName { get; private set; } = "Default Weapon";
+        public string ShortName { get; private set; } = "Default";
+
+        // The type of weapon, for sprite picking and upgrade logic.
+        public WeaponType WeaponType { get; private set; } = WeaponType.NONE;
+
+        // Bucketted stats for intel report purposes.
+        public Dictionary<WeaponType, int> IntelReportStats { get; private set; } = null;
 
         // Properties for ground units
         public float HardAttack { get; private set; } = 0;
@@ -237,15 +301,24 @@ namespace HammerAndSickle.Models
         // Unit icon sprites associated with this stat profile
         public RegimentIconProfile IconProfile { get; set; } = null;
 
+        // Upgrade and availability properties
+        public UpgradePath UpgradePath { get; private set; } = UpgradePath.None;
+        public int PrestigeCost { get; private set; } = 0;
+        public int TurnAvailable { get; private set; } = 0;
+
         #endregion // Properties
 
         #region Constructors
 
-        public WeaponProfile(int _hardAtt, int _hardDef, int _softAtt, int _softDef, int _gat, int _gad, int _df, int _man,
-                                    int _topSpd, int _surv, int _ga, int _ol, int _stealth, int _pr, int _ir, int _sr, int _mmp,
-                                    bool _isAmph, bool _isDF, bool _isAtt, AllWeatherRating _awr, SIGINT_Rating _sir, NBC_Rating _nbc,
-                                    NVG_Rating _nvg, UnitSilhouette _sil)
+        public WeaponProfile(string _longName, string _shortName, WeaponType _type, int _hardAtt, int _hardDef,
+                             int _softAtt, int _softDef, int _gat, int _gad,int _df, int _man,int _topSpd, int _surv, int _ga, int _ol,
+                             int _stealth, int _pr, int _ir, int _sr, int _mmp, bool _isAmph, bool _isDF, bool _isAtt,
+                             AllWeatherRating _awr, SIGINT_Rating _sir, NBC_Rating _nbc, NVG_Rating _nvg, UnitSilhouette _sil,
+                             UpgradePath _upgradePath = UpgradePath.None, int _turnAvailable = 0)
         {
+            LongName = _longName;
+            ShortName = _shortName;
+            WeaponType = _type;
             HardAttack = _hardAtt;
             HardDefense = _hardDef;
             SoftAttack = _softAtt;
@@ -271,12 +344,39 @@ namespace HammerAndSickle.Models
             NBC_Rating = _nbc;
             NVGCapability = _nvg;
             Silhouette = _sil;
+            UpgradePath = _upgradePath;
+            TurnAvailable = _turnAvailable;
             IconProfile = new RegimentIconProfile();
+            IntelReportStats = new Dictionary<WeaponType, int>();
         }
 
         #endregion // Constructors
+
+        #region Public Methods
+
+        /// <summary>
+        /// Adds a stat value to the IntelReportStats dictionary for this weapon profile.
+        /// </summary>
+        /// <param name="type"></param>
+        /// <param name="value"></param>
+        public void AddIntelReportStat(WeaponType type, int value)
+        {
+            if (IntelReportStats == null)
+                IntelReportStats = new Dictionary<WeaponType, int>();
+            IntelReportStats[type] = value;
+        }
+
+        /// <summary>
+        /// Sets the prestige cost of this weapon profile based on the given tier and type costs.
+        /// </summary>
+        public void SetPrestigeCost(PrestigeTierCost _tier, PrestigeTypeCost _type)
+        {
+            PrestigeCost = (int)_tier + (int)_type;
+        }
+
+        #endregion // Public Methods
     }
-    
+
     /// <summary>
     /// A RegimentProfile provides stat profiles for different deployment states in CombatUnits.
     /// </summary>
@@ -284,229 +384,140 @@ namespace HammerAndSickle.Models
     {
         #region Constants
 
-        private const string CLASS_NAME = nameof(RegimentProfile);
+        private const string CLASS_NAME = nameof(Models.RegimentProfile);
 
         #endregion // Constants
 
         #region Properties
 
         // General properties
+        [JsonInclude]
+        [JsonPropertyName("name")]
         public string Name { get; private set; } = "Default";
+
+        [JsonInclude]
+        [JsonPropertyName("profileType")]
         public RegimentProfileType ProfileType { get; private set; } = RegimentProfileType.Default;
-        public int TurnAvailable { get; private set; } = 0;      // The campaign turn this is available.
-        public int PrestigeCost { get; private set; } = 0;       // Prestige cost for purchasing this unit type
-        public UpgradeType UpgradePath { get; private set; } = UpgradeType.None;  // The upgrade path for this profile
-
-        // The stat profile associated with the mobile deployment state.
-        public WeaponProfile Mobile { get; private set; } = null;
-
-        // The stat profile associated with the deployed deployment state.
-        public WeaponProfile Deployed { get; private set; } = null;
 
         // The stat profile associated with the embarked deployment state.
-        public WeaponProfile Embarked { get; private set; } = null;
+        [JsonInclude]
+        [JsonPropertyName("embarked")]
+        public WeaponType Embarked { get; private set; } = WeaponType.NONE;
+
+        // The stat profile associated with the mobile deployment state.
+        [JsonInclude]
+        [JsonPropertyName("mobile")]
+        public WeaponType Mobile { get; private set; } = WeaponType.NONE;
+
+        // The stat profile associated with the deployed deployment state.
+        [JsonInclude]
+        [JsonPropertyName("deployed")]
+        public WeaponType Deployed { get; private set; } = WeaponType.NONE;
+
+        // Contains all bucketted stats totaled from the stat profile. Rebuilt at runtime.
+        [JsonIgnore]
+        public Dictionary<WeaponType, int> TotalIntelStats = null;
 
         #endregion // Properties
+
+        #region Constructors
+
+        /// <summary>
+        /// Parameterless constructor for JSON deserialization.
+        /// The deserializer will populate [JsonInclude] properties after construction.
+        /// </summary>
+        [JsonConstructor]
+        public RegimentProfile()
+        {
+            TotalIntelStats = new Dictionary<WeaponType, int>();
+        }
+
+        #endregion // Constructors
 
         #region Initialization
 
         /// <summary>
-        /// Initializes the RegimentProfile with all required data.
+        /// Initializes RegimentProfile with all required data.
         /// </summary>
-        public void Initialize(
+        public void InitializeRegimentProfile(
             string name,
             RegimentProfileType profileType,
-            int turnAvailable,
-            int prestigeCost,
-            UpgradeType upgradePath,
-            WeaponProfile mobile,
-            WeaponProfile deployed,
-            WeaponProfile embarked)
+            WeaponType mobile,
+            WeaponType deployed,
+            WeaponType embarked)
         {
             try
             {
                 Name = name;
                 ProfileType = profileType;
-                TurnAvailable = turnAvailable;
-                PrestigeCost = prestigeCost;
-                UpgradePath = upgradePath;
                 Mobile = mobile;
                 Deployed = deployed;
                 Embarked = embarked;
+                TotalIntelStats = new Dictionary<WeaponType, int>();
             }
             catch (Exception e)
             {
-                AppService.HandleException(CLASS_NAME, nameof(Initialize), e);
+                AppService.HandleException(CLASS_NAME, nameof(InitializeRegimentProfile), e);
                 throw;
             }
         }
 
         #endregion // Initialization
 
-        #region Derived Properties
-
-        /// <summary>
-        /// Returns true if this profile has a mobile stats profile.
-        /// </summary>
-        public bool HasMobileProfile => Mobile != null;
-
-        /// <summary>
-        /// Returns true if this profile has a deployed stats profile.
-        /// </summary>
-        public bool HasDeployedProfile => Deployed != null;
-
-        /// <summary>
-        /// Returns true if this profile has an embarked stats profile.
-        /// </summary>
-        public bool HasEmbarkedProfile => Embarked != null;
-
-        /// <summary>
-        /// Returns true if any profile has air combat stats (Dogfighting, Maneuverability, TopSpeed).
-        /// </summary>
-        public bool IsAirUnit =>
-            (Mobile != null && (Mobile.Dogfighting > 0 || Mobile.Maneuverability > 0 || Mobile.TopSpeed > 0)) ||
-            (Deployed != null && (Deployed.Dogfighting > 0 || Deployed.Maneuverability > 0 || Deployed.TopSpeed > 0)) ||
-            (Embarked != null && (Embarked.Dogfighting > 0 || Embarked.Maneuverability > 0 || Embarked.TopSpeed > 0));
-
-        /// <summary>
-        /// Returns true if any profile has ground combat stats (HardAttack, SoftAttack, HardDefense, SoftDefense).
-        /// </summary>
-        public bool IsGroundUnit =>
-            (Mobile != null && (Mobile.HardAttack > 0 || Mobile.SoftAttack > 0 || Mobile.HardDefense > 0 || Mobile.SoftDefense > 0)) ||
-            (Deployed != null && (Deployed.HardAttack > 0 || Deployed.SoftAttack > 0 || Deployed.HardDefense > 0 || Deployed.SoftDefense > 0)) ||
-            (Embarked != null && (Embarked.HardAttack > 0 || Embarked.SoftAttack > 0 || Embarked.HardDefense > 0 || Embarked.SoftDefense > 0));
-
-        #endregion // Derived Properties
-
-        #region Setters
-
-        public void SetEmbarkedProfile(WeaponProfile profile)
-        {
-            Embarked = profile;
-        }
-
-        #endregion // Setters
-
         #region Accessors
 
         /// <summary>
-        /// Returns the appropriate WeaponProfile based on deployment position.
-        /// Deployed, HastyDefense, Entrenched, and Fortified use the Deployed profile.
-        /// Mobile falls back to Deployed if no Mobile profile exists (e.g., static units).
-        /// Embarked returns null if no Embarked profile exists (unit cannot be transported).
+        /// Returns the WeaponProfile for the deployed state from the WeaponProfileDB.
+        /// Returns null if no deployed profile is assigned.
         /// </summary>
-        public WeaponProfile GetStatsProfile(DeploymentPosition position)
+        public WeaponProfile GetDeployedProfile()
         {
             try
             {
-                return position switch
-                {
-                    DeploymentPosition.Embarked => Embarked,
-                    DeploymentPosition.Mobile => Mobile ?? Deployed,
-                    DeploymentPosition.Deployed => Deployed,
-                    DeploymentPosition.HastyDefense => Deployed,
-                    DeploymentPosition.Entrenched => Deployed,
-                    DeploymentPosition.Fortified => Deployed,
-                    _ => throw new ArgumentException($"Invalid deployment position: {position}", nameof(position))
-                };
+                return Deployed == WeaponType.NONE ? null : WeaponProfileDB.GetWeaponProfile(Deployed);
             }
             catch (Exception e)
             {
-                AppService.HandleException(CLASS_NAME, nameof(GetStatsProfile), e);
-                throw;
+                AppService.HandleException(CLASS_NAME, nameof(GetDeployedProfile), e);
+                return null;
             }
         }
 
         /// <summary>
-        /// Returns the maximum movement points for the given deployment position.
+        /// Returns the WeaponProfile for the mobile state from the WeaponProfileDB.
+        /// Returns null if no mobile profile is assigned.
         /// </summary>
-        public int GetMaxMovementPoints(DeploymentPosition position)
+        public WeaponProfile GetMobileProfile()
         {
-            var profile = GetStatsProfile(position);
-            return profile?.MaxMovementPoints ?? 0;
+            try
+            {
+                return Mobile == WeaponType.NONE ? null : WeaponProfileDB.GetWeaponProfile(Mobile);
+            }
+            catch (Exception e)
+            {
+                AppService.HandleException(CLASS_NAME, nameof(GetMobileProfile), e);
+                return null;
+            }
         }
 
         /// <summary>
-        /// Returns the primary range for the given deployment position.
+        /// Returns the WeaponProfile for the embarked state from the WeaponProfileDB.
+        /// Returns null if no embarked profile is assigned.
         /// </summary>
-        public float GetPrimaryRange(DeploymentPosition position)
+        public WeaponProfile GetEmbarkedProfile()
         {
-            var profile = GetStatsProfile(position);
-            return profile?.PrimaryRange ?? 0f;
-        }
-
-        /// <summary>
-        /// Returns the indirect fire range for the given deployment position.
-        /// </summary>
-        public float GetIndirectRange(DeploymentPosition position)
-        {
-            var profile = GetStatsProfile(position);
-            return profile?.IndirectRange ?? 0f;
-        }
-
-        /// <summary>
-        /// Returns the spotting range for the given deployment position.
-        /// </summary>
-        public float GetSpottingRange(DeploymentPosition position)
-        {
-            var profile = GetStatsProfile(position);
-            return profile?.SpottingRange ?? 0f;
+            try
+            {
+                return Embarked == WeaponType.NONE ? null : WeaponProfileDB.GetWeaponProfile(Embarked);
+            }
+            catch (Exception e)
+            {
+                AppService.HandleException(CLASS_NAME, nameof(GetEmbarkedProfile), e);
+                return null;
+            }
         }
 
         #endregion // Accessors
-
-        #region Capability Checks
-
-        /// <summary>
-        /// Returns true if the unit is amphibious at the given deployment position.
-        /// </summary>
-        public bool IsAmphibious(DeploymentPosition position)
-        {
-            var profile = GetStatsProfile(position);
-            return profile?.IsAmphibious ?? false;
-        }
-
-        /// <summary>
-        /// Returns true if the unit has double fire capability at the given deployment position.
-        /// </summary>
-        public bool IsDoubleFire(DeploymentPosition position)
-        {
-            var profile = GetStatsProfile(position);
-            return profile?.IsDoubleFire ?? false;
-        }
-
-        /// <summary>
-        /// Returns true if the unit can perform attacks at the given deployment position.
-        /// </summary>
-        public bool IsAttackCapable(DeploymentPosition position)
-        {
-            var profile = GetStatsProfile(position);
-            return profile?.IsAttackCapable ?? false;
-        }
-
-        /// <summary>
-        /// Returns true if the unit has indirect fire capability at the given deployment position.
-        /// </summary>
-        public bool HasIndirectFire(DeploymentPosition position)
-        {
-            var profile = GetStatsProfile(position);
-            return profile != null && profile.IndirectRange > 0;
-        }
-
-        /// <summary>
-        /// Returns true if this profile has a valid stats profile for the given deployment position.
-        /// </summary>
-        public bool HasStatsProfile(DeploymentPosition position)
-        {
-            return position switch
-            {
-                DeploymentPosition.Embarked => Embarked != null,
-                DeploymentPosition.Mobile => Mobile != null,
-                _ => Deployed != null
-            };
-        }
-
-        #endregion // Capability Checks
 
         #region Icon Helpers
 
@@ -518,7 +529,13 @@ namespace HammerAndSickle.Models
         {
             try
             {
-                var profile = GetStatsProfile(position);
+                var profile = position switch
+                {
+                    DeploymentPosition.Embarked => GetEmbarkedProfile(),
+                    DeploymentPosition.Mobile => GetMobileProfile(),
+                    _ => GetDeployedProfile()
+                };
+
                 if (profile?.IconProfile == null)
                     throw new InvalidOperationException($"No icon profile available for position {position}");
 
@@ -547,6 +564,5 @@ namespace HammerAndSickle.Models
         }
 
         #endregion // Icon Helpers
-
     }
 }

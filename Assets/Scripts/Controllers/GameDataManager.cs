@@ -147,8 +147,7 @@ namespace HammerAndSickle.Controllers
                     return;
 
                 // PrepareBattle static databases
-                WeaponSystemsDatabase.Initialize();
-                IntelProfileDatabase.Initialize();
+                WeaponProfileDB.Initialize();
                 CombatUnitDatabase.Initialize();
 
                 _isInitialized = true;
@@ -567,8 +566,7 @@ namespace HammerAndSickle.Controllers
             try
             {
                 return CombatUnitDatabase.IsInitialized &&
-                       WeaponSystemsDatabase.IsInitialized &&
-                       IntelProfileDatabase.IsInitialized;
+                       WeaponProfileDB.IsInitialized;
             }
             catch (Exception e)
             {
@@ -690,69 +688,34 @@ namespace HammerAndSickle.Controllers
         }
 
         /// <summary>
-        /// Retrieves a weapon system profile by its enum identifier.
+        /// Retrieves a weapon profile by its enum identifier.
         /// </summary>
-        public static WeaponSystemProfile GetWeaponSystemProfile(WeaponSystems weaponSystemID)
+        public static WeaponProfile GetWeaponProfile(WeaponType weaponProfileID)
         {
             try
             {
-                return WeaponSystemsDatabase.GetWeaponSystemProfile(weaponSystemID);
+                return WeaponProfileDB.GetWeaponProfile(weaponProfileID);
             }
             catch (Exception e)
             {
-                AppService.HandleException(CLASS_NAME, nameof(GetWeaponSystemProfile), e);
+                AppService.HandleException(CLASS_NAME, nameof(GetWeaponProfile), e);
                 return null;
             }
         }
 
         /// <summary>
-        /// Gets the total number of weapon system profiles in the database.
+        /// Gets the total number of weapon profiles in the database.
         /// </summary>
-        public static int GetWeaponSystemProfileCount()
+        public static int GetWeaponProfileCount()
         {
             try
             {
-                return WeaponSystemsDatabase.ProfileCount;
+                return WeaponProfileDB.ProfileCount;
             }
             catch (Exception e)
             {
-                AppService.HandleException(CLASS_NAME, nameof(GetWeaponSystemProfileCount), e);
+                AppService.HandleException(CLASS_NAME, nameof(GetWeaponProfileCount), e);
                 return 0;
-            }
-        }
-
-        /// <summary>
-        /// Checks if a specific intel profile type has been defined in the system.
-        /// </summary>
-        public static bool HasIntelProfile(RegimentProfileType profileType)
-        {
-            try
-            {
-                return IntelProfileDatabase.HasProfile(profileType);
-            }
-            catch (Exception e)
-            {
-                AppService.HandleException(CLASS_NAME, nameof(HasIntelProfile), e);
-                return false;
-            }
-        }
-
-        /// <summary>
-        /// Generates an intelligence report for a unit based on the specified spotted level.
-        /// </summary>
-        public static IntelReport GenerateIntelReport(RegimentProfileType profileType, string unitName, int hitPoints,
-            Nationality nationality, DeploymentPosition deploymentPosition, ExperienceLevel experienceLevel,
-            EfficiencyLevel efficiencyLevel, SpottedLevel spottedLevel = SpottedLevel.Level1)
-        {
-            try
-            {
-                return IntelProfileDatabase.GenerateIntelReport(profileType, unitName, hitPoints, nationality,
-                    deploymentPosition, experienceLevel, efficiencyLevel, spottedLevel);
-            }
-            catch (Exception e)
-            {
-                AppService.HandleException(CLASS_NAME, nameof(GenerateIntelReport), e);
-                return null;
             }
         }
 

@@ -416,7 +416,7 @@ namespace HammerAndSickle.Models
         /// </summary>
         private static void InitInfantryDoctrine()
         {
-            // Tier 1: INF Assault Tactics - Soft ATT bonus
+            // Tier 1: TANK Assault Tactics - Soft ATT bonus
             AddSkill(new SkillDefinition(
                 InfantryDoctrine.InfantryAssaultTactics_SoftAttack,
                 "Infantry Assault Tactics",

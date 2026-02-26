@@ -209,7 +209,7 @@ namespace HammerAndSickle.Core.Campaign
         /// <summary>
         /// Checks if a weapon system is available at the current campaign turn.
         /// </summary>
-        public bool IsWeaponSystemAvailable(WeaponSystemProfile profile)
+        public bool IsWeaponSystemAvailable(WeaponProfile profile)
         {
             try
             {

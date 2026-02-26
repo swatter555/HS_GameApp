@@ -282,12 +282,12 @@ namespace HammerAndSickle.Models
                 role: UnitRole.GroundCombat,
                 side: Side.Player,
                 nationality: Nationality.USSR,
-                intelProfileType: RegimentProfileType.SV_MRR_BTR70,
-                deployedProfileID: WeaponSystems.INF_REG,
+                profileType: RegimentProfileType.DEP_MOB,
+                deployedProfile: WeaponType.INF_REG_SV,
                 isMountable: true,
-                mobileProfileID: WeaponSystems.APC_BTR70,
+                mobileProfile: WeaponType.APC_BTR70_SV,
                 isEmbarkable: true,
-                embarkProfileID: WeaponSystems.TRN_NAVAL,
+                embarkedProfile: WeaponType.NONE,
                 category: DepotCategory.Secondary,
                 size: DepotSize.Small
             );
@@ -311,12 +311,12 @@ namespace HammerAndSickle.Models
                 role: UnitRole.GroundCombat,
                 side: Side.Player,
                 nationality: Nationality.USSR,
-                intelProfileType: RegimentProfileType.SV_MRR_BTR80,
-                deployedProfileID: WeaponSystems.INF_REG,
+                profileType: RegimentProfileType.DEP_MOB,
+                deployedProfile: WeaponType.INF_REG_SV,
                 isMountable: true,
-                mobileProfileID: WeaponSystems.APC_BTR80,
+                mobileProfile: WeaponType.APC_BTR80_SV,
                 isEmbarkable: true,
-                embarkProfileID: WeaponSystems.TRN_NAVAL,
+                embarkedProfile: WeaponType.NONE,
                 category: DepotCategory.Secondary,
                 size: DepotSize.Small
             );
@@ -340,12 +340,12 @@ namespace HammerAndSickle.Models
                 role: UnitRole.GroundCombat,
                 side: Side.Player,
                 nationality: Nationality.USSR,
-                intelProfileType: RegimentProfileType.SV_MRR_BMP1,
-                deployedProfileID: WeaponSystems.INF_REG,
+                profileType: RegimentProfileType.DEP_MOB,
+                deployedProfile: WeaponType.INF_REG_SV,
                 isMountable: true,
-                mobileProfileID: WeaponSystems.IFV_BMP1,
+                mobileProfile: WeaponType.IFV_BMP1_SV,
                 isEmbarkable: true,
-                embarkProfileID: WeaponSystems.TRN_NAVAL,
+                embarkedProfile: WeaponType.NONE,
                 category: DepotCategory.Secondary,
                 size: DepotSize.Small
             );
@@ -369,12 +369,12 @@ namespace HammerAndSickle.Models
                 role: UnitRole.GroundCombat,
                 side: Side.Player,
                 nationality: Nationality.USSR,
-                intelProfileType: RegimentProfileType.SV_MRR_BMP2,
-                deployedProfileID: WeaponSystems.INF_REG,
+                profileType: RegimentProfileType.DEP_MOB,
+                deployedProfile: WeaponType.INF_REG_SV,
                 isMountable: true,
-                mobileProfileID: WeaponSystems.IFV_BMP2,
+                mobileProfile: WeaponType.IFV_BMP2_SV,
                 isEmbarkable: true,
-                embarkProfileID: WeaponSystems.TRN_NAVAL,
+                embarkedProfile: WeaponType.NONE,
                 category: DepotCategory.Secondary,
                 size: DepotSize.Small
             );
@@ -398,12 +398,12 @@ namespace HammerAndSickle.Models
                 role: UnitRole.GroundCombat,
                 side: Side.Player,
                 nationality: Nationality.USSR,
-                intelProfileType: RegimentProfileType.SV_MRR_BMP3,
-                deployedProfileID: WeaponSystems.INF_REG,
+                profileType: RegimentProfileType.DEP_MOB,
+                deployedProfile: WeaponType.INF_REG_SV,
                 isMountable: true,
-                mobileProfileID: WeaponSystems.IFV_BMP3,
+                mobileProfile: WeaponType.IFV_BMP3_SV,
                 isEmbarkable: true,
-                embarkProfileID: WeaponSystems.TRN_NAVAL,
+                embarkedProfile: WeaponType.NONE,
                 category: DepotCategory.Secondary,
                 size: DepotSize.Small
             );
@@ -437,12 +437,12 @@ namespace HammerAndSickle.Models
                 role: UnitRole.GroundCombat,
                 side: Side.Player,
                 nationality: Nationality.USSR,
-                intelProfileType: RegimentProfileType.SV_TR_T55,
-                deployedProfileID: WeaponSystems.TANK_T55A,
+                profileType: RegimentProfileType.DEP,
+                deployedProfile: WeaponType.TANK_T55A_SV,
                 isMountable: false,
-                mobileProfileID: WeaponSystems.NONE,
+                mobileProfile: WeaponType.NONE,
                 isEmbarkable: true,
-                embarkProfileID: WeaponSystems.TRN_NAVAL,
+                embarkedProfile: WeaponType.NONE,
                 category: DepotCategory.Secondary,
                 size: DepotSize.Small
             );
@@ -458,6 +458,35 @@ namespace HammerAndSickle.Models
 
             #endregion //T55 Tank Regiment
 
+            #region T62A Tank Regiment
+
+            var t62aRegiment = new CombatUnit(
+                unitName: "Tank Regiment (T-62A)",
+                classification: UnitClassification.TANK,
+                role: UnitRole.GroundCombat,
+                side: Side.Player,
+                nationality: Nationality.USSR,
+                profileType: RegimentProfileType.DEP,
+                deployedProfile: WeaponType.TANK_T62A_SV,
+                isMountable: false,
+                mobileProfile: WeaponType.NONE,
+                isEmbarkable: true,
+                embarkedProfile: WeaponType.NONE,
+                category: DepotCategory.Secondary,
+                size: DepotSize.Small
+            );
+
+            // Set experience level
+            t62aRegiment.SetExperienceLevel(ExperienceLevel.Trained);
+
+            // Set the ICM
+            t62aRegiment.SetICM(GameData.ICM_DEFAULT);
+
+            // Add the template to the database
+            AddTemplate("USSR_TR_T62A", t62aRegiment);
+
+            #endregion //T62A Tank Regiment
+
             #region T64A Tank Regiment
 
             var t64aRegiment = new CombatUnit(
@@ -466,12 +495,12 @@ namespace HammerAndSickle.Models
                 role: UnitRole.GroundCombat,
                 side: Side.Player,
                 nationality: Nationality.USSR,
-                intelProfileType: RegimentProfileType.SV_TR_T64A,
-                deployedProfileID: WeaponSystems.TANK_T64A,
+                profileType: RegimentProfileType.DEP,
+                deployedProfile: WeaponType.TANK_T64A_SV,
                 isMountable: false,
-                mobileProfileID: WeaponSystems.NONE,
+                mobileProfile: WeaponType.NONE,
                 isEmbarkable: true,
-                embarkProfileID: WeaponSystems.TRN_NAVAL,
+                embarkedProfile: WeaponType.NONE,
                 category: DepotCategory.Secondary,
                 size: DepotSize.Small
             );
@@ -495,12 +524,12 @@ namespace HammerAndSickle.Models
                 role: UnitRole.GroundCombat,
                 side: Side.Player,
                 nationality: Nationality.USSR,
-                intelProfileType: RegimentProfileType.SV_TR_T64B,
-                deployedProfileID: WeaponSystems.TANK_T64B,
+                profileType: RegimentProfileType.DEP,
+                deployedProfile: WeaponType.TANK_T64B_SV,
                 isMountable: false,
-                mobileProfileID: WeaponSystems.NONE,
+                mobileProfile: WeaponType.NONE,
                 isEmbarkable: true,
-                embarkProfileID: WeaponSystems.TRN_NAVAL,
+                embarkedProfile: WeaponType.NONE,
                 category: DepotCategory.Secondary,
                 size: DepotSize.Small
             );
@@ -524,12 +553,12 @@ namespace HammerAndSickle.Models
                 role: UnitRole.GroundCombat,
                 side: Side.Player,
                 nationality: Nationality.USSR,
-                intelProfileType: RegimentProfileType.SV_TR_T72A,
-                deployedProfileID: WeaponSystems.TANK_T72A,
+                profileType: RegimentProfileType.DEP,
+                deployedProfile: WeaponType.TANK_T72A_SV,
                 isMountable: false,
-                mobileProfileID: WeaponSystems.NONE,
+                mobileProfile: WeaponType.NONE,
                 isEmbarkable: true,
-                embarkProfileID: WeaponSystems.TRN_NAVAL,
+                embarkedProfile: WeaponType.NONE,
                 category: DepotCategory.Secondary,
                 size: DepotSize.Small
             );
@@ -553,12 +582,12 @@ namespace HammerAndSickle.Models
                 role: UnitRole.GroundCombat,
                 side: Side.Player,
                 nationality: Nationality.USSR,
-                intelProfileType: RegimentProfileType.SV_TR_T72B,
-                deployedProfileID: WeaponSystems.TANK_T72B,
+                profileType: RegimentProfileType.DEP,
+                deployedProfile: WeaponType.TANK_T72B_SV,
                 isMountable: false,
-                mobileProfileID: WeaponSystems.NONE,
+                mobileProfile: WeaponType.NONE,
                 isEmbarkable: true,
-                embarkProfileID: WeaponSystems.TRN_NAVAL,
+                embarkedProfile: WeaponType.NONE,
                 category: DepotCategory.Secondary,
                 size: DepotSize.Small
             );
@@ -582,12 +611,12 @@ namespace HammerAndSickle.Models
                 role: UnitRole.GroundCombat,
                 side: Side.Player,
                 nationality: Nationality.USSR,
-                intelProfileType: RegimentProfileType.SV_TR_T80B,
-                deployedProfileID: WeaponSystems.TANK_T80B,
+                profileType: RegimentProfileType.DEP,
+                deployedProfile: WeaponType.TANK_T80B_SV,
                 isMountable: false,
-                mobileProfileID: WeaponSystems.NONE,
+                mobileProfile: WeaponType.NONE,
                 isEmbarkable: true,
-                embarkProfileID: WeaponSystems.TRN_NAVAL,
+                embarkedProfile: WeaponType.NONE,
                 category: DepotCategory.Secondary,
                 size: DepotSize.Small
             );
@@ -611,12 +640,12 @@ namespace HammerAndSickle.Models
                 role: UnitRole.GroundCombat,
                 side: Side.Player,
                 nationality: Nationality.USSR,
-                intelProfileType: RegimentProfileType.SV_TR_T80U,
-                deployedProfileID: WeaponSystems.TANK_T80U,
+                profileType: RegimentProfileType.DEP,
+                deployedProfile: WeaponType.TANK_T80U_SV,
                 isMountable: false,
-                mobileProfileID: WeaponSystems.NONE,
+                mobileProfile: WeaponType.NONE,
                 isEmbarkable: true,
-                embarkProfileID: WeaponSystems.TRN_NAVAL,
+                embarkedProfile: WeaponType.NONE,
                 category: DepotCategory.Secondary,
                 size: DepotSize.Small
             );
@@ -640,12 +669,12 @@ namespace HammerAndSickle.Models
                 role: UnitRole.GroundCombat,
                 side: Side.Player,
                 nationality: Nationality.USSR,
-                intelProfileType: RegimentProfileType.SV_TR_T80BV,
-                deployedProfileID: WeaponSystems.TANK_T80BV,
+                profileType: RegimentProfileType.DEP,
+                deployedProfile: WeaponType.TANK_T80BV_SV,
                 isMountable: false,
-                mobileProfileID: WeaponSystems.NONE,
+                mobileProfile: WeaponType.NONE,
                 isEmbarkable: true,
-                embarkProfileID: WeaponSystems.TRN_NAVAL,
+                embarkedProfile: WeaponType.NONE,
                 category: DepotCategory.Secondary,
                 size: DepotSize.Small
             );
@@ -679,12 +708,12 @@ namespace HammerAndSickle.Models
                 role: UnitRole.GroundCombatIndirect,
                 side: Side.Player,
                 nationality: Nationality.USSR,
-                intelProfileType: RegimentProfileType.SV_AR_LGT,
-                deployedProfileID: WeaponSystems.ART_LIGHT_GEN,
+                profileType: RegimentProfileType.DEP_MOB,
+                deployedProfile: WeaponType.ART_LIGHT_SV,
                 isMountable: true,
-                mobileProfileID: WeaponSystems.TRUCK_GEN,
+                mobileProfile: WeaponType.TRK_GEN_SV,
                 isEmbarkable: true,
-                embarkProfileID: WeaponSystems.TRN_NAVAL,
+                embarkedProfile: WeaponType.NONE,
                 category: DepotCategory.Secondary,
                 size: DepotSize.Small
             );
@@ -708,12 +737,12 @@ namespace HammerAndSickle.Models
                 role: UnitRole.GroundCombatIndirect,
                 side: Side.Player,
                 nationality: Nationality.USSR,
-                intelProfileType: RegimentProfileType.SV_AR_HVY,
-                deployedProfileID: WeaponSystems.ART_HEAVY_GEN,
+                profileType: RegimentProfileType.DEP_MOB,
+                deployedProfile: WeaponType.ART_HEAVY_SV,
                 isMountable: true,
-                mobileProfileID: WeaponSystems.TRUCK_GEN,
+                mobileProfile: WeaponType.TRK_GEN_SV,
                 isEmbarkable: true,
-                embarkProfileID: WeaponSystems.TRN_NAVAL,
+                embarkedProfile: WeaponType.NONE,
                 category: DepotCategory.Secondary,
                 size: DepotSize.Small
             );
@@ -737,12 +766,12 @@ namespace HammerAndSickle.Models
                 role: UnitRole.GroundCombatIndirect,
                 side: Side.Player,
                 nationality: Nationality.USSR,
-                intelProfileType: RegimentProfileType.SV_AR_2S1,
-                deployedProfileID: WeaponSystems.SPA_2S1,
+                profileType: RegimentProfileType.DEP,
+                deployedProfile: WeaponType.SPA_2S1_SV,
                 isMountable: false,
-                mobileProfileID: WeaponSystems.NONE,
+                mobileProfile: WeaponType.NONE,
                 isEmbarkable: true,
-                embarkProfileID: WeaponSystems.TRN_NAVAL,
+                embarkedProfile: WeaponType.NONE,
                 category: DepotCategory.Secondary,
                 size: DepotSize.Small
             );
@@ -766,12 +795,12 @@ namespace HammerAndSickle.Models
                 role: UnitRole.GroundCombatIndirect,
                 side: Side.Player,
                 nationality: Nationality.USSR,
-                intelProfileType: RegimentProfileType.SV_AR_2S3,
-                deployedProfileID: WeaponSystems.SPA_2S3,
+                profileType: RegimentProfileType.DEP,
+                deployedProfile: WeaponType.SPA_2S3_SV,
                 isMountable: false,
-                mobileProfileID: WeaponSystems.NONE,
+                mobileProfile: WeaponType.NONE,
                 isEmbarkable: true,
-                embarkProfileID: WeaponSystems.TRN_NAVAL,
+                embarkedProfile: WeaponType.NONE,
                 category: DepotCategory.Secondary,
                 size: DepotSize.Small
             );
@@ -795,12 +824,12 @@ namespace HammerAndSickle.Models
                 role: UnitRole.GroundCombatIndirect,
                 side: Side.Player,
                 nationality: Nationality.USSR,
-                intelProfileType: RegimentProfileType.SV_AR_2S5,
-                deployedProfileID: WeaponSystems.SPA_2S5,
+                profileType: RegimentProfileType.DEP,
+                deployedProfile: WeaponType.SPA_2S5_SV,
                 isMountable: false,
-                mobileProfileID: WeaponSystems.NONE,
+                mobileProfile: WeaponType.NONE,
                 isEmbarkable: true,
-                embarkProfileID: WeaponSystems.TRN_NAVAL,
+                embarkedProfile: WeaponType.NONE,
                 category: DepotCategory.Secondary,
                 size: DepotSize.Small
             );
@@ -824,12 +853,12 @@ namespace HammerAndSickle.Models
                 role: UnitRole.GroundCombatIndirect,
                 side: Side.Player,
                 nationality: Nationality.USSR,
-                intelProfileType: RegimentProfileType.SV_AR_2S19,
-                deployedProfileID: WeaponSystems.SPA_2S19,
+                profileType: RegimentProfileType.DEP,
+                deployedProfile: WeaponType.SPA_2S19_SV,
                 isMountable: false,
-                mobileProfileID: WeaponSystems.NONE,
+                mobileProfile: WeaponType.NONE,
                 isEmbarkable: true,
-                embarkProfileID: WeaponSystems.TRN_NAVAL,
+                embarkedProfile: WeaponType.NONE,
                 category: DepotCategory.Secondary,
                 size: DepotSize.Small
             );
@@ -863,12 +892,12 @@ namespace HammerAndSickle.Models
                 role: UnitRole.GroundCombatIndirect,
                 side: Side.Player,
                 nationality: Nationality.USSR,
-                intelProfileType: RegimentProfileType.SV_ROC_BM21,
-                deployedProfileID: WeaponSystems.ROC_BM21,
+                profileType: RegimentProfileType.DEP,
+                deployedProfile: WeaponType.ROC_BM21_SV,
                 isMountable: false,
-                mobileProfileID: WeaponSystems.NONE,
+                mobileProfile: WeaponType.NONE,
                 isEmbarkable: true,
-                embarkProfileID: WeaponSystems.TRN_NAVAL,
+                embarkedProfile: WeaponType.NONE,
                 category: DepotCategory.Secondary,
                 size: DepotSize.Small
             );
@@ -892,12 +921,12 @@ namespace HammerAndSickle.Models
                 role: UnitRole.GroundCombatIndirect,
                 side: Side.Player,
                 nationality: Nationality.USSR,
-                intelProfileType: RegimentProfileType.SV_ROC_BM27,
-                deployedProfileID: WeaponSystems.ROC_BM27,
+                profileType: RegimentProfileType.DEP,
+                deployedProfile: WeaponType.ROC_BM27_SV,
                 isMountable: false,
-                mobileProfileID: WeaponSystems.NONE,
+                mobileProfile: WeaponType.NONE,
                 isEmbarkable: true,
-                embarkProfileID: WeaponSystems.TRN_NAVAL,
+                embarkedProfile: WeaponType.NONE,
                 category: DepotCategory.Secondary,
                 size: DepotSize.Small
             );
@@ -921,12 +950,12 @@ namespace HammerAndSickle.Models
                 role: UnitRole.GroundCombatIndirect,
                 side: Side.Player,
                 nationality: Nationality.USSR,
-                intelProfileType: RegimentProfileType.SV_ROC_BM30,
-                deployedProfileID: WeaponSystems.ROC_BM30,
+                profileType: RegimentProfileType.DEP,
+                deployedProfile: WeaponType.ROC_BM30_SV,
                 isMountable: false,
-                mobileProfileID: WeaponSystems.NONE,
+                mobileProfile: WeaponType.NONE,
                 isEmbarkable: true,
-                embarkProfileID: WeaponSystems.TRN_NAVAL,
+                embarkedProfile: WeaponType.NONE,
                 category: DepotCategory.Secondary,
                 size: DepotSize.Small
             );
@@ -950,12 +979,12 @@ namespace HammerAndSickle.Models
                 role: UnitRole.GroundCombatIndirect,
                 side: Side.Player,
                 nationality: Nationality.USSR,
-                intelProfileType: RegimentProfileType.SV_BM_SCUDB,
-                deployedProfileID: WeaponSystems.SSM_SCUD,
+                profileType: RegimentProfileType.DEP,
+                deployedProfile: WeaponType.ROC_SCUD_SV,
                 isMountable: false,
-                mobileProfileID: WeaponSystems.NONE,
+                mobileProfile: WeaponType.NONE,
                 isEmbarkable: true,
-                embarkProfileID: WeaponSystems.TRN_NAVAL,
+                embarkedProfile: WeaponType.NONE,
                 category: DepotCategory.Secondary,
                 size: DepotSize.Small
             );
@@ -989,12 +1018,12 @@ namespace HammerAndSickle.Models
                 role: UnitRole.GroundCombat,
                 side: Side.Player,
                 nationality: Nationality.USSR,
-                intelProfileType: RegimentProfileType.SV_AAR_MTLB,
-                deployedProfileID: WeaponSystems.INF_AM,
+                profileType: RegimentProfileType.DEP_MOB_EMB_HELO,
+                deployedProfile: WeaponType.INF_AM_SV,
                 isMountable: true,
-                mobileProfileID: WeaponSystems.APC_MTLB,
+                mobileProfile: WeaponType.APC_MTLB_SV,
                 isEmbarkable: true,
-                embarkProfileID: WeaponSystems.HEL_MI8T,
+                embarkedProfile: WeaponType.HEL_MI8T_SV,
                 category: DepotCategory.Secondary,
                 size: DepotSize.Small
             );
@@ -1010,35 +1039,6 @@ namespace HammerAndSickle.Models
 
             #endregion //Air Assault Regiment (MT-LB)
 
-            #region Air Assault Regiment (BMD-1)
-
-            var aarBmd1Regiment = new CombatUnit(
-                unitName: "Air Assault Regiment (BMD-1)",
-                classification: UnitClassification.MAM,
-                role: UnitRole.GroundCombat,
-                side: Side.Player,
-                nationality: Nationality.USSR,
-                intelProfileType: RegimentProfileType.SV_AAR_BMD1,
-                deployedProfileID: WeaponSystems.INF_AM,
-                isMountable: true,
-                mobileProfileID: WeaponSystems.IFV_BMD1,
-                isEmbarkable: true,
-                embarkProfileID: WeaponSystems.HEL_MI8T,
-                category: DepotCategory.Secondary,
-                size: DepotSize.Small
-            );
-
-            // Set experience level
-            aarBmd1Regiment.SetExperienceLevel(ExperienceLevel.Experienced);
-
-            // Set the ICM
-            aarBmd1Regiment.SetICM(GameData.ICM_DEFAULT);
-
-            // Add the template to the database
-            AddTemplate("USSR_AAR_BMD1", aarBmd1Regiment);
-
-            #endregion //Air Assault Regiment (BMD-1)
-
             #region Air Assault Regiment (BMD-2)
 
             var aarBmd2Regiment = new CombatUnit(
@@ -1047,12 +1047,12 @@ namespace HammerAndSickle.Models
                 role: UnitRole.GroundCombat,
                 side: Side.Player,
                 nationality: Nationality.USSR,
-                intelProfileType: RegimentProfileType.SV_AAR_BMD2,
-                deployedProfileID: WeaponSystems.INF_AM,
+                profileType: RegimentProfileType.DEP_MOB_EMB_HELO,
+                deployedProfile: WeaponType.INF_AM_SV,
                 isMountable: true,
-                mobileProfileID: WeaponSystems.IFV_BMD2,
+                mobileProfile: WeaponType.IFV_BMD2_SV,
                 isEmbarkable: true,
-                embarkProfileID: WeaponSystems.HEL_MI8T,
+                embarkedProfile: WeaponType.HEL_MI8T_SV,
                 category: DepotCategory.Secondary,
                 size: DepotSize.Small
             );
@@ -1076,12 +1076,12 @@ namespace HammerAndSickle.Models
                 role: UnitRole.GroundCombat,
                 side: Side.Player,
                 nationality: Nationality.USSR,
-                intelProfileType: RegimentProfileType.SV_AAR_BMD3,
-                deployedProfileID: WeaponSystems.INF_AM,
+                profileType: RegimentProfileType.DEP_MOB_EMB_HELO,
+                deployedProfile: WeaponType.INF_AM_SV,
                 isMountable: true,
-                mobileProfileID: WeaponSystems.IFV_BMD3,
+                mobileProfile: WeaponType.IFV_BMD3_SV,
                 isEmbarkable: true,
-                embarkProfileID: WeaponSystems.HEL_MI8T,
+                embarkedProfile: WeaponType.HEL_MI8T_SV,
                 category: DepotCategory.Secondary,
                 size: DepotSize.Small
             );
@@ -1107,35 +1107,6 @@ namespace HammerAndSickle.Models
         /// </summary>
         public static void CreateSovietAirborneRegiments()
         {
-            #region VDV Airborne Regiment (BMD-1)
-
-            var vdvBmd1Regiment = new CombatUnit(
-                unitName: "VDV Airborne Regiment (BMD-1)",
-                classification: UnitClassification.MAB,
-                role: UnitRole.GroundCombat,
-                side: Side.Player,
-                nationality: Nationality.USSR,
-                intelProfileType: RegimentProfileType.SV_VDV_BMD1,
-                deployedProfileID: WeaponSystems.INF_AB,
-                isMountable: true,
-                mobileProfileID: WeaponSystems.IFV_BMD1,
-                isEmbarkable: true,
-                embarkProfileID: WeaponSystems.TRN_AN8,
-                category: DepotCategory.Secondary,
-                size: DepotSize.Small
-            );
-
-            // Set experience level
-            vdvBmd1Regiment.SetExperienceLevel(ExperienceLevel.Experienced);
-
-            // Set the ICM
-            vdvBmd1Regiment.SetICM(GameData.ICM_DEFAULT);
-
-            // Add the template to the database
-            AddTemplate("USSR_VDV_BMD1", vdvBmd1Regiment);
-
-            #endregion //VDV Airborne Regiment (BMD-1)
-
             #region VDV Airborne Regiment (BMD-2)
 
             var vdvBmd2Regiment = new CombatUnit(
@@ -1144,12 +1115,12 @@ namespace HammerAndSickle.Models
                 role: UnitRole.GroundCombat,
                 side: Side.Player,
                 nationality: Nationality.USSR,
-                intelProfileType: RegimentProfileType.SV_VDV_BMD2,
-                deployedProfileID: WeaponSystems.INF_AB,
+                profileType: RegimentProfileType.DEP_MOB_EMB_AIR,
+                deployedProfile: WeaponType.INF_AB_SV,
                 isMountable: true,
-                mobileProfileID: WeaponSystems.IFV_BMD2,
+                mobileProfile: WeaponType.IFV_BMD2_SV,
                 isEmbarkable: true,
-                embarkProfileID: WeaponSystems.TRN_AN8,
+                embarkedProfile: WeaponType.TRN_AN8_SV,
                 category: DepotCategory.Secondary,
                 size: DepotSize.Small
             );
@@ -1173,12 +1144,12 @@ namespace HammerAndSickle.Models
                 role: UnitRole.GroundCombat,
                 side: Side.Player,
                 nationality: Nationality.USSR,
-                intelProfileType: RegimentProfileType.SV_VDV_BMD3,
-                deployedProfileID: WeaponSystems.INF_AB,
+                profileType: RegimentProfileType.DEP_MOB_EMB_AIR,
+                deployedProfile: WeaponType.INF_AB_SV,
                 isMountable: true,
-                mobileProfileID: WeaponSystems.IFV_BMD3,
+                mobileProfile: WeaponType.IFV_BMD3_SV,
                 isEmbarkable: true,
-                embarkProfileID: WeaponSystems.TRN_AN8,
+                embarkedProfile: WeaponType.TRN_AN8_SV,
                 category: DepotCategory.Secondary,
                 size: DepotSize.Small
             );
@@ -1202,12 +1173,12 @@ namespace HammerAndSickle.Models
                 role: UnitRole.GroundCombatIndirect,
                 side: Side.Player,
                 nationality: Nationality.USSR,
-                intelProfileType: RegimentProfileType.SV_VDV_ART,
-                deployedProfileID: WeaponSystems.ART_LIGHT_GEN,
+                profileType: RegimentProfileType.DEP_MOB_EMB_AIR,
+                deployedProfile: WeaponType.ART_LIGHT_SV,
                 isMountable: true,
-                mobileProfileID: WeaponSystems.APC_MTLB,
+                mobileProfile: WeaponType.APC_MTLB_SV,
                 isEmbarkable: true,
-                embarkProfileID: WeaponSystems.TRN_AN8,
+                embarkedProfile: WeaponType.TRN_AN8_SV,
                 category: DepotCategory.Secondary,
                 size: DepotSize.Small
             );
@@ -1231,12 +1202,12 @@ namespace HammerAndSickle.Models
                 role: UnitRole.GroundCombat,
                 side: Side.Player,
                 nationality: Nationality.USSR,
-                intelProfileType: RegimentProfileType.SV_VDV_SUP,
-                deployedProfileID: WeaponSystems.TANK_T55A,
+                profileType: RegimentProfileType.DEP_MOB_EMB_AIR,
+                deployedProfile: WeaponType.RCN_BRDM2AT_SV,
                 isMountable: false,
-                mobileProfileID: WeaponSystems.NONE,
+                mobileProfile: WeaponType.NONE,
                 isEmbarkable: true,
-                embarkProfileID: WeaponSystems.TRN_AN8,
+                embarkedProfile: WeaponType.TRN_AN8_SV,
                 category: DepotCategory.Secondary,
                 size: DepotSize.Small
             );
@@ -1270,12 +1241,12 @@ namespace HammerAndSickle.Models
                 role: UnitRole.GroundCombat,
                 side: Side.Player,
                 nationality: Nationality.USSR,
-                intelProfileType: RegimentProfileType.SV_NAV_BTR70,
-                deployedProfileID: WeaponSystems.INF_MAR,
+                profileType: RegimentProfileType.DEP_MOB_EMB_NAVAL,
+                deployedProfile: WeaponType.INF_MAR_SV,
                 isMountable: true,
-                mobileProfileID: WeaponSystems.APC_BTR70,
+                mobileProfile: WeaponType.APC_BTR70_SV,
                 isEmbarkable: true,
-                embarkProfileID: WeaponSystems.TRN_NAVAL,
+                embarkedProfile: WeaponType.TRN_NAVAL,
                 category: DepotCategory.Secondary,
                 size: DepotSize.Small
             );
@@ -1289,7 +1260,7 @@ namespace HammerAndSickle.Models
             // Add the template to the database
             AddTemplate("USSR_NAV_BTR70", navalInfantryBtr70Regiment);
 
-            #endregion //Naval Infantry Regiment (BTR-70)
+            #endregion //Naval Personnel Regiment (BTR-70)
 
             #region Naval Infantry Regiment (BTR-80)
 
@@ -1299,12 +1270,12 @@ namespace HammerAndSickle.Models
                 role: UnitRole.GroundCombat,
                 side: Side.Player,
                 nationality: Nationality.USSR,
-                intelProfileType: RegimentProfileType.SV_NAV_BTR80,
-                deployedProfileID: WeaponSystems.INF_MAR,
+                profileType: RegimentProfileType.DEP_MOB_EMB_NAVAL,
+                deployedProfile: WeaponType.INF_MAR_SV,
                 isMountable: true,
-                mobileProfileID: WeaponSystems.APC_BTR80,
+                mobileProfile: WeaponType.APC_BTR80_SV,
                 isEmbarkable: true,
-                embarkProfileID: WeaponSystems.TRN_NAVAL,
+                embarkedProfile: WeaponType.TRN_NAVAL,
                 category: DepotCategory.Secondary,
                 size: DepotSize.Small
             );
@@ -1318,7 +1289,7 @@ namespace HammerAndSickle.Models
             // Add the template to the database
             AddTemplate("USSR_NAV_BTR80", navalInfantryBtr80Regiment);
 
-            #endregion //Naval Infantry Regiment (BTR-80)
+            #endregion //Naval Personnel Regiment (BTR-80)
         }
 
         #endregion
@@ -1338,12 +1309,12 @@ namespace HammerAndSickle.Models
                 role: UnitRole.GroundCombat,
                 side: Side.Player,
                 nationality: Nationality.USSR,
-                intelProfileType: RegimentProfileType.SV_ENG,
-                deployedProfileID: WeaponSystems.INF_ENG,
+                profileType: RegimentProfileType.DEP_MOB,
+                deployedProfile: WeaponType.INF_ENG_SV,
                 isMountable: true,
-                mobileProfileID: WeaponSystems.APC_MTLB,
+                mobileProfile: WeaponType.TRK_GEN_SV,
                 isEmbarkable: true,
-                embarkProfileID: WeaponSystems.TRN_NAVAL,
+                embarkedProfile: WeaponType.NONE,
                 category: DepotCategory.Secondary,
                 size: DepotSize.Small
             );
@@ -1367,12 +1338,12 @@ namespace HammerAndSickle.Models
                 role: UnitRole.GroundCombatRecon,
                 side: Side.Player,
                 nationality: Nationality.USSR,
-                intelProfileType: RegimentProfileType.SV_GRU,
-                deployedProfileID: WeaponSystems.INF_SPEC,
+                profileType: RegimentProfileType.DEP_MOB,
+                deployedProfile: WeaponType.INF_SPEC_SV,
                 isMountable: true,
-                mobileProfileID: WeaponSystems.HEL_MI8T,
+                mobileProfile: WeaponType.HEL_MI8T_SV,
                 isEmbarkable: true,
-                embarkProfileID: WeaponSystems.TRN_NAVAL,
+                embarkedProfile: WeaponType.NONE,
                 category: DepotCategory.Secondary,
                 size: DepotSize.Small
             );
@@ -1406,12 +1377,12 @@ namespace HammerAndSickle.Models
                 role: UnitRole.GroundCombatRecon,
                 side: Side.Player,
                 nationality: Nationality.USSR,
-                intelProfileType: RegimentProfileType.SV_RCR,
-                deployedProfileID: WeaponSystems.RCN_BRDM2,
+                profileType: RegimentProfileType.DEP,
+                deployedProfile: WeaponType.RCN_BRDM2_SV,
                 isMountable: false,
-                mobileProfileID: WeaponSystems.NONE,
+                mobileProfile: WeaponType.NONE,
                 isEmbarkable: true,
-                embarkProfileID: WeaponSystems.TRN_NAVAL,
+                embarkedProfile: WeaponType.NONE,
                 category: DepotCategory.Secondary,
                 size: DepotSize.Small
             );
@@ -1435,12 +1406,12 @@ namespace HammerAndSickle.Models
                 role: UnitRole.GroundCombat,
                 side: Side.Player,
                 nationality: Nationality.USSR,
-                intelProfileType: RegimentProfileType.SV_RCR_AT,
-                deployedProfileID: WeaponSystems.RCN_BRDM2AT,
+                profileType: RegimentProfileType.DEP,
+                deployedProfile: WeaponType.RCN_BRDM2AT_SV,
                 isMountable: false,
-                mobileProfileID: WeaponSystems.NONE,
+                mobileProfile: WeaponType.NONE,
                 isEmbarkable: true,
-                embarkProfileID: WeaponSystems.TRN_NAVAL,
+                embarkedProfile: WeaponType.NONE,
                 category: DepotCategory.Secondary,
                 size: DepotSize.Small
             );
@@ -1474,12 +1445,12 @@ namespace HammerAndSickle.Models
                 role: UnitRole.AirDefenseArea,
                 side: Side.Player,
                 nationality: Nationality.USSR,
-                intelProfileType: RegimentProfileType.SV_ADR_AAA,
-                deployedProfileID: WeaponSystems.AAA_GEN,
+                profileType: RegimentProfileType.DEP_MOB,
+                deployedProfile: WeaponType.AAA_GEN_SV,
                 isMountable: true,
-                mobileProfileID: WeaponSystems.TRUCK_GEN,
+                mobileProfile: WeaponType.TRK_GEN_SV,
                 isEmbarkable: true,
-                embarkProfileID: WeaponSystems.TRN_NAVAL,
+                embarkedProfile: WeaponType.NONE,
                 category: DepotCategory.Secondary,
                 size: DepotSize.Small
             );
@@ -1503,12 +1474,12 @@ namespace HammerAndSickle.Models
                 role: UnitRole.AirDefenseArea,
                 side: Side.Player,
                 nationality: Nationality.USSR,
-                intelProfileType: RegimentProfileType.SV_ADR_ZSU57,
-                deployedProfileID: WeaponSystems.SPAAA_ZSU57,
+                profileType: RegimentProfileType.DEP,
+                deployedProfile: WeaponType.SPAAA_ZSU57_SV,
                 isMountable: false,
-                mobileProfileID: WeaponSystems.NONE,
+                mobileProfile: WeaponType.NONE,
                 isEmbarkable: true,
-                embarkProfileID: WeaponSystems.TRN_NAVAL,
+                embarkedProfile: WeaponType.NONE,
                 category: DepotCategory.Secondary,
                 size: DepotSize.Small
             );
@@ -1532,12 +1503,12 @@ namespace HammerAndSickle.Models
                 role: UnitRole.AirDefenseArea,
                 side: Side.Player,
                 nationality: Nationality.USSR,
-                intelProfileType: RegimentProfileType.SV_ADR_ZSU23,
-                deployedProfileID: WeaponSystems.SPAAA_ZSU23,
+                profileType: RegimentProfileType.DEP,
+                deployedProfile: WeaponType.SPAAA_ZSU23_SV,
                 isMountable: false,
-                mobileProfileID: WeaponSystems.NONE,
+                mobileProfile: WeaponType.NONE,
                 isEmbarkable: true,
-                embarkProfileID: WeaponSystems.TRN_NAVAL,
+                embarkedProfile: WeaponType.NONE,
                 category: DepotCategory.Secondary,
                 size: DepotSize.Small
             );
@@ -1553,6 +1524,35 @@ namespace HammerAndSickle.Models
 
             #endregion //Air Defense Regiment (ZSU-23)
 
+            #region Air Defense Regiment (2K12 Kub)
+
+            var adr2k12Regiment = new CombatUnit(
+                unitName: "Air Defense Regiment (2K12 Kub)",
+                classification: UnitClassification.SPAAA,
+                role: UnitRole.AirDefenseArea,
+                side: Side.Player,
+                nationality: Nationality.USSR,
+                profileType: RegimentProfileType.DEP,
+                deployedProfile: WeaponType.SPSAM_2K12_SV,
+                isMountable: false,
+                mobileProfile: WeaponType.NONE,
+                isEmbarkable: true,
+                embarkedProfile: WeaponType.NONE,
+                category: DepotCategory.Secondary,
+                size: DepotSize.Small
+            );
+
+            // Set experience level
+            adr2k12Regiment.SetExperienceLevel(ExperienceLevel.Trained);
+
+            // Set the ICM
+            adr2k12Regiment.SetICM(GameData.ICM_DEFAULT);
+
+            // Add the template to the database
+            AddTemplate("USSR_ADR_2K12", adr2k12Regiment);
+
+            #endregion //Air Defense Regiment (2K12 Kub)
+
             #region Air Defense Regiment (2K22 Tunguska)
 
             var adr2k22Regiment = new CombatUnit(
@@ -1561,12 +1561,12 @@ namespace HammerAndSickle.Models
                 role: UnitRole.AirDefenseArea,
                 side: Side.Player,
                 nationality: Nationality.USSR,
-                intelProfileType: RegimentProfileType.SV_ADR_2K22,
-                deployedProfileID: WeaponSystems.SPAAA_2K22,
+                profileType: RegimentProfileType.DEP,
+                deployedProfile: WeaponType.SPSAM_2K22_SV,
                 isMountable: false,
-                mobileProfileID: WeaponSystems.NONE,
+                mobileProfile: WeaponType.NONE,
                 isEmbarkable: true,
-                embarkProfileID: WeaponSystems.TRN_NAVAL,
+                embarkedProfile: WeaponType.NONE,
                 category: DepotCategory.Secondary,
                 size: DepotSize.Small
             );
@@ -1600,12 +1600,12 @@ namespace HammerAndSickle.Models
                 role: UnitRole.AirDefenseArea,
                 side: Side.Player,
                 nationality: Nationality.USSR,
-                intelProfileType: RegimentProfileType.SV_SPSAM_9K31,
-                deployedProfileID: WeaponSystems.SPSAM_9K31,
+                profileType: RegimentProfileType.DEP,
+                deployedProfile: WeaponType.SPSAM_9K31_SV,
                 isMountable: false,
-                mobileProfileID: WeaponSystems.NONE,
+                mobileProfile: WeaponType.NONE,
                 isEmbarkable: true,
-                embarkProfileID: WeaponSystems.TRN_NAVAL,
+                embarkedProfile: WeaponType.NONE,
                 category: DepotCategory.Secondary,
                 size: DepotSize.Small
             );
@@ -1629,12 +1629,12 @@ namespace HammerAndSickle.Models
                 role: UnitRole.AirDefenseArea,
                 side: Side.Player,
                 nationality: Nationality.USSR,
-                intelProfileType: RegimentProfileType.SV_SAM_S75,
-                deployedProfileID: WeaponSystems.SAM_S75,
+                profileType: RegimentProfileType.DEP_MOB,
+                deployedProfile: WeaponType.SAM_S75_SV,
                 isMountable: true,
-                mobileProfileID: WeaponSystems.TRUCK_GEN,
+                mobileProfile: WeaponType.TRK_GEN_SV,
                 isEmbarkable: true,
-                embarkProfileID: WeaponSystems.TRN_NAVAL,
+                embarkedProfile: WeaponType.NONE,
                 category: DepotCategory.Secondary,
                 size: DepotSize.Small
             );
@@ -1658,12 +1658,12 @@ namespace HammerAndSickle.Models
                 role: UnitRole.AirDefenseArea,
                 side: Side.Player,
                 nationality: Nationality.USSR,
-                intelProfileType: RegimentProfileType.SV_SAM_S125,
-                deployedProfileID: WeaponSystems.SAM_S125,
+                profileType: RegimentProfileType.DEP_MOB,
+                deployedProfile: WeaponType.SAM_S125_SV,
                 isMountable: true,
-                mobileProfileID: WeaponSystems.TRUCK_GEN,
+                mobileProfile: WeaponType.TRK_GEN_SV,
                 isEmbarkable: true,
-                embarkProfileID: WeaponSystems.TRN_NAVAL,
+                embarkedProfile: WeaponType.NONE,
                 category: DepotCategory.Secondary,
                 size: DepotSize.Small
             );
@@ -1687,12 +1687,12 @@ namespace HammerAndSickle.Models
                 role: UnitRole.AirDefenseArea,
                 side: Side.Player,
                 nationality: Nationality.USSR,
-                intelProfileType: RegimentProfileType.SV_SAM_S300,
-                deployedProfileID: WeaponSystems.SAM_S300,
+                profileType: RegimentProfileType.DEP_MOB,
+                deployedProfile: WeaponType.SAM_S300_SV,
                 isMountable: true,
-                mobileProfileID: WeaponSystems.NONE,
+                mobileProfile: WeaponType.NONE,
                 isEmbarkable: true,
-                embarkProfileID: WeaponSystems.TRN_NAVAL,
+                embarkedProfile: WeaponType.NONE,
                 category: DepotCategory.Secondary,
                 size: DepotSize.Small
             );
@@ -1726,12 +1726,12 @@ namespace HammerAndSickle.Models
                 role: UnitRole.AirGroundAttack,
                 side: Side.Player,
                 nationality: Nationality.USSR,
-                intelProfileType: RegimentProfileType.SV_HEL_MI8AT,
-                deployedProfileID: WeaponSystems.HEL_MI8AT,
+                profileType: RegimentProfileType.DEP,
+                deployedProfile: WeaponType.HEL_MI8AT_SV,
                 isMountable: false,
-                mobileProfileID: WeaponSystems.NONE,
+                mobileProfile: WeaponType.NONE,
                 isEmbarkable: false,
-                embarkProfileID: WeaponSystems.NONE,
+                embarkedProfile: WeaponType.NONE,
                 category: DepotCategory.Secondary,
                 size: DepotSize.Small
             );
@@ -1755,12 +1755,12 @@ namespace HammerAndSickle.Models
                 role: UnitRole.AirGroundAttack,
                 side: Side.Player,
                 nationality: Nationality.USSR,
-                intelProfileType: RegimentProfileType.SV_HEL_MI24D,
-                deployedProfileID: WeaponSystems.HEL_MI24D,
+                profileType: RegimentProfileType.DEP,
+                deployedProfile: WeaponType.HEL_MI24D_SV,
                 isMountable: false,
-                mobileProfileID: WeaponSystems.NONE,
+                mobileProfile: WeaponType.NONE,
                 isEmbarkable: false,
-                embarkProfileID: WeaponSystems.NONE,
+                embarkedProfile: WeaponType.NONE,
                 category: DepotCategory.Secondary,
                 size: DepotSize.Small
             );
@@ -1784,12 +1784,12 @@ namespace HammerAndSickle.Models
                 role: UnitRole.AirGroundAttack,
                 side: Side.Player,
                 nationality: Nationality.USSR,
-                intelProfileType: RegimentProfileType.SV_HEL_MI24V,
-                deployedProfileID: WeaponSystems.HEL_MI24V,
+                profileType: RegimentProfileType.DEP,
+                deployedProfile: WeaponType.HEL_MI24V_SV,
                 isMountable: false,
-                mobileProfileID: WeaponSystems.NONE,
+                mobileProfile: WeaponType.NONE,
                 isEmbarkable: false,
-                embarkProfileID: WeaponSystems.NONE,
+                embarkedProfile: WeaponType.NONE,
                 category: DepotCategory.Secondary,
                 size: DepotSize.Small
             );
@@ -1813,12 +1813,12 @@ namespace HammerAndSickle.Models
                 role: UnitRole.AirGroundAttack,
                 side: Side.Player,
                 nationality: Nationality.USSR,
-                intelProfileType: RegimentProfileType.SV_HEL_MI28,
-                deployedProfileID: WeaponSystems.HEL_MI28,
+                profileType: RegimentProfileType.DEP,
+                deployedProfile: WeaponType.HEL_MI28_SV,
                 isMountable: false,
-                mobileProfileID: WeaponSystems.NONE,
+                mobileProfile: WeaponType.NONE,
                 isEmbarkable: false,
-                embarkProfileID: WeaponSystems.NONE,
+                embarkedProfile: WeaponType.NONE,
                 category: DepotCategory.Secondary,
                 size: DepotSize.Small
             );
@@ -1852,12 +1852,12 @@ namespace HammerAndSickle.Models
                 role: UnitRole.AirSuperiority,
                 side: Side.Player,
                 nationality: Nationality.USSR,
-                intelProfileType: RegimentProfileType.SV_FR_MIG21,
-                deployedProfileID: WeaponSystems.FGT_MIG21,
+                profileType: RegimentProfileType.DEP,
+                deployedProfile: WeaponType.FGT_MIG21_SV,
                 isMountable: false,
-                mobileProfileID: WeaponSystems.NONE,
+                mobileProfile: WeaponType.NONE,
                 isEmbarkable: false,
-                embarkProfileID: WeaponSystems.NONE,
+                embarkedProfile: WeaponType.NONE,
                 category: DepotCategory.Secondary,
                 size: DepotSize.Small
             );
@@ -1881,12 +1881,12 @@ namespace HammerAndSickle.Models
                 role: UnitRole.AirSuperiority,
                 side: Side.Player,
                 nationality: Nationality.USSR,
-                intelProfileType: RegimentProfileType.SV_FR_MIG23,
-                deployedProfileID: WeaponSystems.FGT_MIG23,
+                profileType: RegimentProfileType.DEP,
+                deployedProfile: WeaponType.FGT_MIG23_SV,
                 isMountable: false,
-                mobileProfileID: WeaponSystems.NONE,
+                mobileProfile: WeaponType.NONE,
                 isEmbarkable: false,
-                embarkProfileID: WeaponSystems.NONE,
+                embarkedProfile: WeaponType.NONE,
                 category: DepotCategory.Secondary,
                 size: DepotSize.Small
             );
@@ -1910,12 +1910,12 @@ namespace HammerAndSickle.Models
                 role: UnitRole.AirSuperiority,
                 side: Side.Player,
                 nationality: Nationality.USSR,
-                intelProfileType: RegimentProfileType.SV_FR_MIG25,
-                deployedProfileID: WeaponSystems.FGT_MIG25,
+                profileType: RegimentProfileType.DEP,    
+                deployedProfile: WeaponType.FGT_MIG25_SV,
                 isMountable: false,
-                mobileProfileID: WeaponSystems.NONE,
+                mobileProfile: WeaponType.NONE,
                 isEmbarkable: false,
-                embarkProfileID: WeaponSystems.NONE,
+                embarkedProfile: WeaponType.NONE,
                 category: DepotCategory.Secondary,
                 size: DepotSize.Small
             );
@@ -1939,12 +1939,12 @@ namespace HammerAndSickle.Models
                 role: UnitRole.AirSuperiority,
                 side: Side.Player,
                 nationality: Nationality.USSR,
-                intelProfileType: RegimentProfileType.SV_FR_MIG29,
-                deployedProfileID: WeaponSystems.FGT_MIG29,
+                profileType: RegimentProfileType.DEP,
+                deployedProfile: WeaponType.FGT_MIG29_SV,
                 isMountable: false,
-                mobileProfileID: WeaponSystems.NONE,
+                mobileProfile: WeaponType.NONE,
                 isEmbarkable: false,
-                embarkProfileID: WeaponSystems.NONE,
+                embarkedProfile: WeaponType.NONE,
                 category: DepotCategory.Secondary,
                 size: DepotSize.Small
             );
@@ -1968,12 +1968,12 @@ namespace HammerAndSickle.Models
                 role: UnitRole.AirSuperiority,
                 side: Side.Player,
                 nationality: Nationality.USSR,
-                intelProfileType: RegimentProfileType.SV_FR_MIG31,
-                deployedProfileID: WeaponSystems.FGT_MIG31,
+                profileType: RegimentProfileType.DEP,
+                deployedProfile: WeaponType.FGT_MIG31_SV,
                 isMountable: false,
-                mobileProfileID: WeaponSystems.NONE,
+                mobileProfile: WeaponType.NONE,
                 isEmbarkable: false,
-                embarkProfileID: WeaponSystems.NONE,
+                embarkedProfile: WeaponType.NONE,
                 category: DepotCategory.Secondary,
                 size: DepotSize.Small
             );
@@ -1997,12 +1997,12 @@ namespace HammerAndSickle.Models
                 role: UnitRole.AirSuperiority,
                 side: Side.Player,
                 nationality: Nationality.USSR,
-                intelProfileType: RegimentProfileType.SV_FR_SU27,
-                deployedProfileID: WeaponSystems.FGT_SU27,
+                profileType: RegimentProfileType.DEP,
+                deployedProfile: WeaponType.FGT_SU27_SV,
                 isMountable: false,
-                mobileProfileID: WeaponSystems.NONE,
+                mobileProfile: WeaponType.NONE,
                 isEmbarkable: false,
-                embarkProfileID: WeaponSystems.NONE,
+                embarkedProfile: WeaponType.NONE,
                 category: DepotCategory.Secondary,
                 size: DepotSize.Small
             );
@@ -2026,12 +2026,12 @@ namespace HammerAndSickle.Models
                 role: UnitRole.AirSuperiority,
                 side: Side.Player,
                 nationality: Nationality.USSR,
-                intelProfileType: RegimentProfileType.SV_FR_SU47,
-                deployedProfileID: WeaponSystems.FGT_SU47,
+                profileType: RegimentProfileType.DEP,
+                deployedProfile: WeaponType.FGT_SU47_SV,
                 isMountable: false,
-                mobileProfileID: WeaponSystems.NONE,
+                mobileProfile: WeaponType.NONE,
                 isEmbarkable: false,
-                embarkProfileID: WeaponSystems.NONE,
+                embarkedProfile: WeaponType.NONE,
                 category: DepotCategory.Secondary,
                 size: DepotSize.Small
             );
@@ -2055,12 +2055,12 @@ namespace HammerAndSickle.Models
                 role: UnitRole.AirMultirole,
                 side: Side.Player,
                 nationality: Nationality.USSR,
-                intelProfileType: RegimentProfileType.SV_MR_MIG27,
-                deployedProfileID: WeaponSystems.FGT_MIG27,
+                profileType: RegimentProfileType.DEP,
+                deployedProfile: WeaponType.FGT_MIG27_SV,
                 isMountable: false,
-                mobileProfileID: WeaponSystems.NONE,
+                mobileProfile: WeaponType.NONE,
                 isEmbarkable: false,
-                embarkProfileID: WeaponSystems.NONE,
+                embarkedProfile: WeaponType.NONE,
                 category: DepotCategory.Secondary,
                 size: DepotSize.Small
             );
@@ -2086,6 +2086,35 @@ namespace HammerAndSickle.Models
         /// </summary>
         public static void CreateSovietAttackAviationRegiments()
         {
+            #region Attack Regiment (Su-17)
+
+             var attSu17Regiment = new CombatUnit(
+                unitName: "Attack Regiment (Su-17)",
+                classification: UnitClassification.ATT,
+                role: UnitRole.AirGroundAttack,
+                side: Side.Player,
+                nationality: Nationality.USSR,
+                profileType: RegimentProfileType.DEP,
+                deployedProfile: WeaponType.ATT_SU17_SV,
+                isMountable: false,
+                mobileProfile: WeaponType.NONE,
+                isEmbarkable: false,
+                embarkedProfile: WeaponType.NONE,
+                category: DepotCategory.Secondary,
+                size: DepotSize.Small
+            );
+
+            // Set experience level
+            attSu17Regiment.SetExperienceLevel(ExperienceLevel.Trained);
+
+            // Set the ICM
+            attSu17Regiment.SetICM(GameData.ICM_DEFAULT);
+
+            // Add the template to the database
+            AddTemplate("USSR_ATT_SU17", attSu17Regiment);
+
+            #endregion //Attack Regiment (Su-17)
+
             #region Attack Regiment (Su-25)
 
             var attSu25Regiment = new CombatUnit(
@@ -2094,12 +2123,12 @@ namespace HammerAndSickle.Models
                 role: UnitRole.AirGroundAttack,
                 side: Side.Player,
                 nationality: Nationality.USSR,
-                intelProfileType: RegimentProfileType.SV_AR_SU25,
-                deployedProfileID: WeaponSystems.ATT_SU25,
+                profileType: RegimentProfileType.DEP,
+                deployedProfile: WeaponType.ATT_SU25_SV,
                 isMountable: false,
-                mobileProfileID: WeaponSystems.NONE,
+                mobileProfile: WeaponType.NONE,
                 isEmbarkable: false,
-                embarkProfileID: WeaponSystems.NONE,
+                embarkedProfile: WeaponType.NONE,
                 category: DepotCategory.Secondary,
                 size: DepotSize.Small
             );
@@ -2123,12 +2152,12 @@ namespace HammerAndSickle.Models
                 role: UnitRole.AirGroundAttack,
                 side: Side.Player,
                 nationality: Nationality.USSR,
-                intelProfileType: RegimentProfileType.SV_AR_SU25B,
-                deployedProfileID: WeaponSystems.ATT_SU25B,
+                profileType: RegimentProfileType.DEP,
+                deployedProfile: WeaponType.ATT_SU25B_SV,
                 isMountable: false,
-                mobileProfileID: WeaponSystems.NONE,
+                mobileProfile: WeaponType.NONE,
                 isEmbarkable: false,
-                embarkProfileID: WeaponSystems.NONE,
+                embarkedProfile: WeaponType.NONE,
                 category: DepotCategory.Secondary,
                 size: DepotSize.Small
             );
@@ -2162,12 +2191,12 @@ namespace HammerAndSickle.Models
                 role: UnitRole.AirborneEarlyWarning,
                 side: Side.Player,
                 nationality: Nationality.USSR,
-                intelProfileType: RegimentProfileType.SV_AWACS_A50,
-                deployedProfileID: WeaponSystems.AWACS_A50,
+                profileType: RegimentProfileType.DEP,
+                deployedProfile: WeaponType.AWACS_A50_SV,
                 isMountable: false,
-                mobileProfileID: WeaponSystems.NONE,
+                mobileProfile: WeaponType.NONE,
                 isEmbarkable: false,
-                embarkProfileID: WeaponSystems.NONE,
+                embarkedProfile: WeaponType.NONE,
                 category: DepotCategory.Secondary,
                 size: DepotSize.Small
             );
@@ -2191,12 +2220,12 @@ namespace HammerAndSickle.Models
                 role: UnitRole.AirStrategicAttack,
                 side: Side.Player,
                 nationality: Nationality.USSR,
-                intelProfileType: RegimentProfileType.SV_BR_SU24,
-                deployedProfileID: WeaponSystems.BMB_SU24,
+                profileType: RegimentProfileType.DEP,
+                deployedProfile: WeaponType.BMB_SU24_SV,
                 isMountable: false,
-                mobileProfileID: WeaponSystems.NONE,
+                mobileProfile: WeaponType.NONE,
                 isEmbarkable: false,
-                embarkProfileID: WeaponSystems.NONE,
+                embarkedProfile: WeaponType.NONE,
                 category: DepotCategory.Secondary,
                 size: DepotSize.Small
             );
@@ -2220,12 +2249,12 @@ namespace HammerAndSickle.Models
                 role: UnitRole.AirStrategicAttack,
                 side: Side.Player,
                 nationality: Nationality.USSR,
-                intelProfileType: RegimentProfileType.SV_BR_TU16,
-                deployedProfileID: WeaponSystems.BMB_TU16,
+                profileType: RegimentProfileType.DEP,
+                deployedProfile: WeaponType.BMB_TU16_SV,
                 isMountable: false,
-                mobileProfileID: WeaponSystems.NONE,
+                mobileProfile: WeaponType.NONE,
                 isEmbarkable: false,
-                embarkProfileID: WeaponSystems.NONE,
+                embarkedProfile: WeaponType.NONE,
                 category: DepotCategory.Secondary,
                 size: DepotSize.Small
             );
@@ -2249,12 +2278,12 @@ namespace HammerAndSickle.Models
                 role: UnitRole.AirStrategicAttack,
                 side: Side.Player,
                 nationality: Nationality.USSR,
-                intelProfileType: RegimentProfileType.SV_BR_TU22,
-                deployedProfileID: WeaponSystems.BMB_TU22,
+                profileType: RegimentProfileType.DEP,
+                deployedProfile: WeaponType.BMB_TU22_SV,
                 isMountable: false,
-                mobileProfileID: WeaponSystems.NONE,
+                mobileProfile: WeaponType.NONE,
                 isEmbarkable: false,
-                embarkProfileID: WeaponSystems.NONE,
+                embarkedProfile: WeaponType.NONE,
                 category: DepotCategory.Secondary,
                 size: DepotSize.Small
             );
@@ -2278,12 +2307,12 @@ namespace HammerAndSickle.Models
                 role: UnitRole.AirStrategicAttack,
                 side: Side.Player,
                 nationality: Nationality.USSR,
-                intelProfileType: RegimentProfileType.SV_BR_TU22M3,
-                deployedProfileID: WeaponSystems.BMB_TU22M3,
+                profileType: RegimentProfileType.DEP,
+                deployedProfile: WeaponType.BMB_TU22M3_SV,
                 isMountable: false,
-                mobileProfileID: WeaponSystems.NONE,
+                mobileProfile: WeaponType.NONE,
                 isEmbarkable: false,
-                embarkProfileID: WeaponSystems.NONE,
+                embarkedProfile: WeaponType.NONE,
                 category: DepotCategory.Secondary,
                 size: DepotSize.Small
             );
@@ -2317,12 +2346,12 @@ namespace HammerAndSickle.Models
                 role: UnitRole.AirRecon,
                 side: Side.Player,
                 nationality: Nationality.USSR,
-                intelProfileType: RegimentProfileType.SV_RR_MIG25R,
-                deployedProfileID: WeaponSystems.RCNA_MIG25R,
+                profileType: RegimentProfileType.DEP,
+                deployedProfile: WeaponType.RCNA_MIG25R_SV,
                 isMountable: false,
-                mobileProfileID: WeaponSystems.NONE,
+                mobileProfile: WeaponType.NONE,
                 isEmbarkable: false,
-                embarkProfileID: WeaponSystems.NONE,
+                embarkedProfile: WeaponType.NONE,
                 category: DepotCategory.Secondary,
                 size: DepotSize.Small
             );
@@ -2356,12 +2385,12 @@ namespace HammerAndSickle.Models
                 role: UnitRole.GroundCombatStatic,
                 side: Side.Player,
                 nationality: Nationality.USSR,
-                intelProfileType: RegimentProfileType.SV_DEPOT,
-                deployedProfileID: WeaponSystems.SUPPLYDEPOT_GENERIC,
+                profileType: RegimentProfileType.DEP,
+                deployedProfile: WeaponType.BASE_LARGE,
                 isMountable: false,
-                mobileProfileID: WeaponSystems.NONE,
-                isEmbarkable: true,
-                embarkProfileID: WeaponSystems.TRN_NAVAL,
+                mobileProfile: WeaponType.NONE,
+                isEmbarkable: false,
+                embarkedProfile: WeaponType.NONE,
                 category: DepotCategory.Main,
                 size: DepotSize.Large
             );
@@ -2385,12 +2414,12 @@ namespace HammerAndSickle.Models
                 role: UnitRole.GroundCombatStatic,
                 side: Side.Player,
                 nationality: Nationality.USSR,
-                intelProfileType: RegimentProfileType.SV_AIRB,
-                deployedProfileID: WeaponSystems.AIRBASE_GENERIC,
+                profileType: RegimentProfileType.DEP,
+                deployedProfile: WeaponType.BASE_LARGE,
                 isMountable: false,
-                mobileProfileID: WeaponSystems.NONE,
-                isEmbarkable: true,
-                embarkProfileID: WeaponSystems.TRN_NAVAL,
+                mobileProfile: WeaponType.NONE,
+                isEmbarkable: false,
+                embarkedProfile: WeaponType.NONE,
                 category: DepotCategory.Main,
                 size: DepotSize.Large
             );
@@ -2414,12 +2443,12 @@ namespace HammerAndSickle.Models
                 role: UnitRole.GroundCombatStatic,
                 side: Side.Player,
                 nationality: Nationality.USSR,
-                intelProfileType: RegimentProfileType.SV_BASE,
-                deployedProfileID: WeaponSystems.LANDBASE_GENERIC,
+                profileType: RegimentProfileType.DEP,
+                deployedProfile: WeaponType.BASE_MEDIUM,
                 isMountable: false,
-                mobileProfileID: WeaponSystems.NONE,
-                isEmbarkable: true,
-                embarkProfileID: WeaponSystems.TRN_NAVAL,
+                mobileProfile: WeaponType.NONE,
+                isEmbarkable: false,
+                embarkedProfile: WeaponType.NONE,
                 category: DepotCategory.Main,
                 size: DepotSize.Medium
             );
@@ -2443,12 +2472,12 @@ namespace HammerAndSickle.Models
                 role: UnitRole.GroundCombatStatic,
                 side: Side.Player,
                 nationality: Nationality.USSR,
-                intelProfileType: RegimentProfileType.SV_BASE,
-                deployedProfileID: WeaponSystems.LANDBASE_GENERIC,
+                profileType: RegimentProfileType.DEP,
+                deployedProfile: WeaponType.BASE_SMALL,
                 isMountable: false,
-                mobileProfileID: WeaponSystems.NONE,
-                isEmbarkable: true,
-                embarkProfileID: WeaponSystems.TRN_NAVAL,
+                mobileProfile: WeaponType.NONE,
+                isEmbarkable: false,
+                embarkedProfile: WeaponType.NONE,
                 category: DepotCategory.Main,
                 size: DepotSize.Small
             );
@@ -2473,49 +2502,78 @@ namespace HammerAndSickle.Models
 
         public static void CreateMujahideenForces()
         {
-            #region Mujahideen Guerrilla Infantry
+            #region Mujahideen Infantry
 
-            var mjGuerrillaInf = new CombatUnit(
-                unitName: "Mujahideen Guerrilla Infantry",
+            var mjInf = new CombatUnit(
+                unitName: "Mujahideen Infantry",
                 classification: UnitClassification.INF,
                 role: UnitRole.GroundCombat,
                 side: Side.AI,
                 nationality: Nationality.MJ,
-                intelProfileType: RegimentProfileType.MJ_INF_GUERRILLA,
-                deployedProfileID: WeaponSystems.INF_REG,
+                profileType: RegimentProfileType.DEP,
+                deployedProfile: WeaponType.INF_REG_MJ,
                 isMountable: false,
-                mobileProfileID: WeaponSystems.NONE,
+                mobileProfile: WeaponType.NONE,
                 isEmbarkable: false,
-                embarkProfileID: WeaponSystems.NONE,
+                embarkedProfile: WeaponType.NONE,
                 category: DepotCategory.Secondary,
                 size: DepotSize.Small
             );
 
             // Set experience level
-            mjGuerrillaInf.SetExperienceLevel(ExperienceLevel.Experienced);
+            mjInf.SetExperienceLevel(ExperienceLevel.Experienced);
 
             // Set the ICM - guerrillas are tough fighters on home terrain
-            mjGuerrillaInf.SetICM(GameData.ICM_DEFAULT);
+            mjInf.SetICM(GameData.ICM_DEFAULT);
 
             // Add the template to the database
-            AddTemplate("MJ_INF_GUERRILLA", mjGuerrillaInf);
+            AddTemplate("MJ_INF", mjInf);
 
-            #endregion //Mujahideen Guerrilla Infantry
+            #endregion //Mujahideen Infantry
+
+            #region Mujahideen RPG Unit
+
+            var mjRPGUnit = new CombatUnit(
+                unitName: "Mujahideen RPG Unit",
+                classification: UnitClassification.INF,
+                role: UnitRole.GroundCombat,
+                side: Side.AI,
+                nationality: Nationality.MJ,
+                profileType: RegimentProfileType.DEP,
+                deployedProfile: WeaponType.INF_RPG_MJ,
+                isMountable: false,
+                mobileProfile: WeaponType.NONE,
+                isEmbarkable: false,
+                embarkedProfile: WeaponType.NONE,
+                category: DepotCategory.Secondary,
+                size: DepotSize.Small
+            );
+
+            // Set experience level - guerrillas are tough fighters on home terrain
+            mjRPGUnit.SetExperienceLevel(ExperienceLevel.Experienced);
+
+            // Set the ICM - specialized anti-armor unit
+            mjRPGUnit.SetICM(GameData.ICM_DEFAULT);
+
+            // Add the template to the database
+            AddTemplate("MJ_RPG_UNIT", mjRPGUnit);
+
+            #endregion //Mujahideen RPG Unit
 
             #region Mujahideen Special Forces Commando
 
             var mjSpecCommando = new CombatUnit(
-                unitName: "Mujahideen Special Forces Commando",
+                unitName: "Mujahideen Commandos",
                 classification: UnitClassification.SPECF,
                 role: UnitRole.GroundCombatRecon,
                 side: Side.AI,
                 nationality: Nationality.MJ,
-                intelProfileType: RegimentProfileType.MJ_SPEC_COMMANDO,
-                deployedProfileID: WeaponSystems.INF_SPEC,
+                profileType: RegimentProfileType.DEP,
+                deployedProfile: WeaponType.INF_SPEC_MJ,
                 isMountable: false,
-                mobileProfileID: WeaponSystems.NONE,
+                mobileProfile: WeaponType.NONE,
                 isEmbarkable: false,
-                embarkProfileID: WeaponSystems.NONE,
+                embarkedProfile: WeaponType.NONE,
                 category: DepotCategory.Secondary,
                 size: DepotSize.Small
             );
@@ -2539,12 +2597,12 @@ namespace HammerAndSickle.Models
                 role: UnitRole.GroundCombatRecon,
                 side: Side.AI,
                 nationality: Nationality.MJ,
-                intelProfileType: RegimentProfileType.MJ_CAV_HORSE,
-                deployedProfileID: WeaponSystems.INF_CAV_GEN,
+                profileType: RegimentProfileType.DEP,
+                deployedProfile: WeaponType.INF_CAV_MJ,
                 isMountable: false,
-                mobileProfileID: WeaponSystems.NONE,
+                mobileProfile: WeaponType.NONE,
                 isEmbarkable: false,
-                embarkProfileID: WeaponSystems.NONE,
+                embarkedProfile: WeaponType.NONE,
                 category: DepotCategory.Secondary,
                 size: DepotSize.Small
             );
@@ -2568,12 +2626,12 @@ namespace HammerAndSickle.Models
                 role: UnitRole.AirDefenseArea,
                 side: Side.AI,
                 nationality: Nationality.MJ,
-                intelProfileType: RegimentProfileType.MJ_AA,
-                deployedProfileID: WeaponSystems.MANPAD_GEN,
+                profileType: RegimentProfileType.DEP_MOB,
+                deployedProfile: WeaponType.AAA_GEN_MJ,
                 isMountable: true,
-                mobileProfileID: WeaponSystems.TRUCK_GEN,
+                mobileProfile: WeaponType.TRK_GEN_ARAB,
                 isEmbarkable: false,
-                embarkProfileID: WeaponSystems.NONE,
+                embarkedProfile: WeaponType.NONE,
                 category: DepotCategory.Secondary,
                 size: DepotSize.Small
             );
@@ -2585,24 +2643,53 @@ namespace HammerAndSickle.Models
             mjAntiAircraft.SetICM(GameData.ICM_SMALL_UNIT);
 
             // Add the template to the database
-            AddTemplate("MJ_AA", mjAntiAircraft);
+            AddTemplate("MJ_AAA", mjAntiAircraft);
 
             #endregion //Mujahideen Anti-Aircraft Unit
 
-            #region Mujahideen Light Mortar Unit
+            #region Mujahideen SAM Unit
+
+            var mjSAMUnit = new CombatUnit(
+                unitName: "Mujahideen SAM Unit",
+                classification: UnitClassification.SAM,
+                role: UnitRole.AirDefenseArea,
+                side: Side.AI,
+                nationality: Nationality.MJ,
+                profileType: RegimentProfileType.DEP,
+                deployedProfile: WeaponType.SAM_GEN_MJ,
+                isMountable: true,
+                mobileProfile: WeaponType.NONE,
+                isEmbarkable: false,
+                embarkedProfile: WeaponType.NONE,
+                category: DepotCategory.Secondary,
+                size: DepotSize.Small
+            );
+
+            // Set experience level
+            mjSAMUnit.SetExperienceLevel(ExperienceLevel.Trained);
+
+            // Set the ICM - specialized air defense unit
+            mjSAMUnit.SetICM(GameData.ICM_SMALL_UNIT);
+
+            // Add the template to the database
+            AddTemplate("MJ_SAM_UNIT", mjSAMUnit);
+
+            #endregion // Mujahideen SAM Unit
+
+            #region Mujahideen Mortar Unit
 
             var mjLightMortar = new CombatUnit(
-                unitName: "Mujahideen Light Mortar Unit",
+                unitName: "Mujahideen Mortar Unit",
                 classification: UnitClassification.ART,
                 role: UnitRole.GroundCombatIndirect,
                 side: Side.AI,
                 nationality: Nationality.MJ,
-                intelProfileType: RegimentProfileType.MJ_ART_LIGHT_MORTAR,
-                deployedProfileID: WeaponSystems.ART_LIGHT_MORTAR_GEN,
+                profileType: RegimentProfileType.DEP_MOB,
+                deployedProfile: WeaponType.ART_MORTAR_MJ,
                 isMountable: true,
-                mobileProfileID: WeaponSystems.TRUCK_GEN,
+                mobileProfile: WeaponType.TRK_GEN_ARAB,
                 isEmbarkable: false,
-                embarkProfileID: WeaponSystems.NONE,
+                embarkedProfile: WeaponType.NONE,
                 category: DepotCategory.Secondary,
                 size: DepotSize.Small
             );
@@ -2616,34 +2703,34 @@ namespace HammerAndSickle.Models
             // Add the template to the database
             AddTemplate("MJ_ART_LIGHT_MORTAR", mjLightMortar);
 
-            #endregion //Mujahideen Light Mortar Unit
+            #endregion //Mujahideen Mortar Unit
 
-            #region Mujahideen Heavy Mortar Unit
+            #region Mujahideen Light Artillery
 
-            var mjHeavyMortar = new CombatUnit(
-                unitName: "Mujahideen Heavy Mortar Unit",
+            var mjLightArt = new CombatUnit(
+                unitName: "Mujahideen Light Artillery",
                 classification: UnitClassification.ART,
                 role: UnitRole.GroundCombatIndirect,
                 side: Side.AI,
                 nationality: Nationality.MJ,
-                intelProfileType: RegimentProfileType.MJ_ART_HEAVY_MORTAR,
-                deployedProfileID: WeaponSystems.ART_HEAVY_MORTAR_GEN,
+                profileType: RegimentProfileType.DEP_MOB,
+                deployedProfile: WeaponType.ART_LIGHT_MJ,
                 isMountable: true,
-                mobileProfileID: WeaponSystems.TRUCK_GEN,
+                mobileProfile: WeaponType.TRK_GEN_ARAB,
                 isEmbarkable: false,
-                embarkProfileID: WeaponSystems.NONE,
+                embarkedProfile: WeaponType.NONE,
                 category: DepotCategory.Secondary,
                 size: DepotSize.Small
             );
 
             // Set experience level
-            mjHeavyMortar.SetExperienceLevel(ExperienceLevel.Trained);
+            mjLightArt.SetExperienceLevel(ExperienceLevel.Trained);
 
             // Set the ICM - heavier artillery support
-            mjHeavyMortar.SetICM(GameData.ICM_SMALL_UNIT);
+            mjLightArt.SetICM(GameData.ICM_SMALL_UNIT);
 
             // Add the template to the database
-            AddTemplate("MJ_ART_HEAVY_MORTAR", mjHeavyMortar);
+            AddTemplate("MJ_ART_LIGHT", mjLightArt);
 
             #endregion //Mujahideen Heavy Mortar Unit
 
@@ -2655,12 +2742,12 @@ namespace HammerAndSickle.Models
                 role: UnitRole.GroundCombatStatic,
                 side: Side.AI,
                 nationality: Nationality.MJ,
-                intelProfileType: RegimentProfileType.SV_DEPOT, // Using generic depot intel profile
-                deployedProfileID: WeaponSystems.SUPPLYDEPOT_GENERIC,
+                profileType: RegimentProfileType.DEP,
+                deployedProfile: WeaponType.BASE_LARGE,
                 isMountable: false,
-                mobileProfileID: WeaponSystems.NONE,
+                mobileProfile: WeaponType.NONE,
                 isEmbarkable: false,
-                embarkProfileID: WeaponSystems.NONE,
+                embarkedProfile: WeaponType.NONE,
                 category: DepotCategory.Secondary,
                 size: DepotSize.Small
             );

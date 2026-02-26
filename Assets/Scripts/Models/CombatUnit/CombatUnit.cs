@@ -33,15 +33,11 @@ namespace HammerAndSickle.Models
         public Nationality Nationality { get; private set; }
         public bool IsBase => IsBaseType(Classification);
 
-        // Profiles
+        // Regiment profile containing weapon profiles for each deployment state.
+        // Initialized after construction via InitializeRegimentProfile().
         [JsonInclude]
-        public WeaponSystems EmbarkedProfileID { get; private set; }     // Profile for external transport
-        [JsonInclude]
-        public WeaponSystems MobileProfileID { get; private set; }       // Profile for organic transport
-        [JsonInclude]
-        public WeaponSystems DeployedProfileID { get; private set; }     // Profile that all units have
-        [JsonInclude]
-        public RegimentProfileType IntelProfileType { get; internal set; } // Profile for intelligence reports
+        [JsonPropertyName("regimentProfile")]
+        public RegimentProfile RegimentProfile { get; private set; }
 
         // How combat effective is a unit is tracked by EfficiencyLevel.
         [JsonInclude]
@@ -97,54 +93,21 @@ namespace HammerAndSickle.Models
             UnitRole role,
             Side side,
             Nationality nationality,
-            RegimentProfileType intelProfileType,
-            WeaponSystems deployedProfileID,
             bool isMountable = false,
-            WeaponSystems mobileProfileID = WeaponSystems.NONE,
             bool isEmbarkable = false,
-            WeaponSystems embarkProfileID = WeaponSystems.NONE,
             DepotCategory category = DepotCategory.Secondary,
             DepotSize size = DepotSize.Small)
         {
             try
             {
-                // PrepareBattle required parameters
-                if (string.IsNullOrEmpty(unitName))
-                    throw new ArgumentException("Unit name cannot be null or empty", nameof(unitName));
-
-                // Deployed profile ID must point to a valid profile.
-                if (deployedProfileID == WeaponSystems.NONE)
-                    throw new ArgumentException("Deployed profile ID cannot be DEFAULT", nameof(deployedProfileID));
-
-                // Check that deployed profile exists in database.
-                if (WeaponSystemsDatabase.GetWeaponSystemProfile(deployedProfileID) == null)
-                    throw new ArgumentException($"Deployed profile ID {deployedProfileID} not found in database", nameof(deployedProfileID));
-
-                // When not NONE, mounted profile ID must point to a valid profile.
-                if (isMountable && mobileProfileID != WeaponSystems.NONE)
-                {
-                    if (WeaponSystemsDatabase.GetWeaponSystemProfile(mobileProfileID) == null)
-                        throw new ArgumentException($"Mounted profile ID {mobileProfileID} not found in database", nameof(mobileProfileID));
-                }
-
-                // When not NONE, transport profile ID must point to a valid profile.
-                if (isEmbarkable && embarkProfileID != WeaponSystems.NONE)
-                {
-                    if (WeaponSystemsDatabase.GetWeaponSystemProfile(embarkProfileID) == null)
-                        throw new ArgumentException($"Transport profile ID {embarkProfileID} not found in database", nameof(embarkProfileID));
-                }
-
-                // PrepareBattle intel profile type
-                if (!Enum.IsDefined(typeof(RegimentProfileType), intelProfileType))
-                    throw new ArgumentException("Invalid intel profile type", nameof(intelProfileType));
+                // Validate required parameters
+                if (string.IsNullOrWhiteSpace(unitName))
+                    throw new ArgumentException("Unit name cannot be null or whitespace", nameof(unitName));
 
                 //---------------------------------
                 // Set identification and metadata
                 //---------------------------------
 
-                // Basic argument validation
-                if (string.IsNullOrWhiteSpace(unitName))
-                    throw new ArgumentException("Unit name cannot be null or whitespace", nameof(unitName));
                 UnitName = unitName.Trim();
                 UnitID = Guid.NewGuid().ToString();
                 Classification = classification;
@@ -155,14 +118,11 @@ namespace HammerAndSickle.Models
                 // Initialize facing based on side (Player faces West, AI faces East)
                 Facing = side == Side.Player ? HexDirection.W : HexDirection.E;
 
-                // PrepareBattle deployment position based on embarkable and mountable states
+                // Initialize deployment position based on embarkable and mountable states
                 InitializeDeploymentSystem(isEmbarkable, isMountable);
 
-                // Set profile IDs
-                EmbarkedProfileID = embarkProfileID;
-                DeployedProfileID = deployedProfileID;
-                MobileProfileID = mobileProfileID;
-                IntelProfileType = intelProfileType;
+                // RegimentProfile is initialized after construction via InitializeRegimentProfile()
+                RegimentProfile = new RegimentProfile();
 
                 // Initialise facility data when appropriate
                 if (IsBase)
@@ -220,15 +180,11 @@ namespace HammerAndSickle.Models
                 Role = UnitRole.GroundCombat; // Will be overwritten by JSON
                 Side = Side.Player; // Will be overwritten by JSON
                 Nationality = Nationality.USSR; // Will be overwritten by JSON
-                IntelProfileType = RegimentProfileType.SV_MRR_BTR70; // Will be overwritten by JSON
-
                 // Initialize facing - will be overwritten by JSON
                 Facing = HexDirection.W; // Will be overwritten by JSON
 
-                // PrepareBattle weapon system profile IDs - JSON will set actual values
-                DeployedProfileID = WeaponSystems.NONE; // Will be overwritten by JSON
-                MobileProfileID = WeaponSystems.NONE; // Will be overwritten by JSON
-                EmbarkedProfileID = WeaponSystems.NONE; // Will be overwritten by JSON
+                // RegimentProfile - JSON will deserialize the nested object
+                RegimentProfile = new RegimentProfile(); // Will be overwritten by JSON
 
                 // PrepareBattle deployment capabilities - JSON will set actual values
                 IsEmbarkable = false; // Will be overwritten by JSON
@@ -287,108 +243,79 @@ namespace HammerAndSickle.Models
             }
         }
 
+        /// <summary>
+        /// Constructor with regiment profile parameters.
+        /// Used by OOB loading, template cloning, and snapshot creation.
+        /// </summary>
+        public CombatUnit(string unitName,
+            UnitClassification classification,
+            UnitRole role,
+            Side side,
+            Nationality nationality,
+            RegimentProfileType profileType,
+            WeaponType deployedProfile,
+            bool isMountable,
+            WeaponType mobileProfile,
+            bool isEmbarkable,
+            WeaponType embarkedProfile,
+            DepotCategory category = DepotCategory.Secondary,
+            DepotSize size = DepotSize.Small)
+            : this(unitName, classification, role, side, nationality, isMountable, isEmbarkable, category, size)
+        {
+            RegimentProfile.InitializeRegimentProfile(unitName, profileType, mobileProfile, deployedProfile, embarkedProfile);
+
+            // Re-initialize movement points now that profile is available
+            InitializeMovementPoints();
+        }
+
         #endregion // Constructors
 
         #region Core
 
         /// <summary>
-        /// Retrieves the weapon‑system profile the unit employs in its deployed state.
+        /// Retrieves the weapon profile the unit employs in its deployed state.
         /// </summary>
-        /// <returns></returns>
-        public WeaponSystemProfile GetDeployedProfile()
+        public WeaponProfile GetDeployedProfile()
         {
             try
             {
-                // "No profile" is a valid state.
-                if (DeployedProfileID == WeaponSystems.NONE)
-                    return null;
-
-                var profile = WeaponSystemsDatabase.GetWeaponSystemProfile(DeployedProfileID);
-                if (profile == null)
-                    throw new InvalidOperationException($"Deployed profile ID '{DeployedProfileID}' not found in weapon‑systems database.");
-
-                return profile;
+                return RegimentProfile?.GetDeployedProfile();
             }
             catch (Exception ex)
             {
-                AppService.HandleException(nameof(CombatUnit), nameof(GetDeployedProfile), ex);
+                AppService.HandleException(CLASS_NAME, nameof(GetDeployedProfile), ex);
                 return null;
             }
         }
 
         /// <summary>
-        /// Gets the weapon‑system profile for the mobile state.
+        /// Gets the weapon profile for the mobile state.
         /// </summary>
-        /// <returns></returns>
-        public WeaponSystemProfile GetMobileProfile()
+        public WeaponProfile GetMobileProfile()
         {
             try
             {
-                // NONE means the unit is foot‑mobile (no transport profile).
-                if (MobileProfileID == WeaponSystems.NONE)
-                    return null;
-
-                var profile = WeaponSystemsDatabase.GetWeaponSystemProfile(MobileProfileID);
-                if (profile == null)
-                    throw new InvalidOperationException($"Mobile profile ID '{MobileProfileID}' not found in weapon‑systems database.");
-
-                return profile;
+                return RegimentProfile?.GetMobileProfile();
             }
             catch (Exception ex)
             {
-                AppService.HandleException(nameof(CombatUnit), nameof(GetMobileProfile), ex);
+                AppService.HandleException(CLASS_NAME, nameof(GetMobileProfile), ex);
                 return null;
             }
         }
 
         /// <summary>
-        /// Retrieves the weapon‑system profile the unit employs when in transport (airlift/sea).
+        /// Retrieves the weapon profile the unit employs when in transport (airlift/sea).
         /// </summary>
-        /// <returns></returns>
-        public WeaponSystemProfile GetEmbarkedProfile()
+        public WeaponProfile GetEmbarkedProfile()
         {
             try
             {
-                // NONE means the unit has no transport profile.
-                if (EmbarkedProfileID == WeaponSystems.NONE)
-                    return null;
-
-                var profile = WeaponSystemsDatabase.GetWeaponSystemProfile(EmbarkedProfileID);
-                if (profile == null)
-                    throw new InvalidOperationException($"Embarked profile ID '{EmbarkedProfileID}' not found in weapon‑systems database.");
-                
-                return profile;
+                return RegimentProfile?.GetEmbarkedProfile();
             }
             catch (Exception ex)
             {
-                AppService.HandleException(nameof(CombatUnit), nameof(GetEmbarkedProfile), ex);
-                return null;
-            }
-        }
-
-        /// <summary>
-        /// Generates an intelligence report for this unit based on the specified spotted level.
-        /// Uses the static IntelProfileDatabase system to create fog-of-war filtered intelligence data.
-        /// </summary>
-        /// <param name="spottedLevel">Intelligence accuracy level (default Level1)</param>
-        /// <returns>IntelReport with unit intelligence data, or null if not spotted</returns>
-        public IntelReport GenerateIntelReport(SpottedLevel spottedLevel = SpottedLevel.Level1)
-        {
-            try
-            {
-                return IntelProfileDatabase.GenerateIntelReport(
-                    IntelProfileType,
-                    UnitName,
-                    (int)HitPoints.Current,
-                    Nationality,
-                    DeploymentPosition,
-                    ExperienceLevel,
-                    EfficiencyLevel,
-                    spottedLevel);
-            }
-            catch (Exception e)
-            {
-                AppService.HandleException(CLASS_NAME, "GenerateIntelReport", e);
+                AppService.HandleException(CLASS_NAME, nameof(GetEmbarkedProfile), ex);
                 return null;
             }
         }
@@ -425,11 +352,9 @@ namespace HammerAndSickle.Models
         }
 
         /// <summary>
-        /// Retrieves the active weapon system profile based on the current mounted state.
+        /// Retrieves the active weapon profile based on the current deployment state.
         /// </summary>
-        /// <returns>The active <see cref="WeaponSystemProfile"/>. Returns the <see cref="MountedProfile"/> if the system is
-        /// mounted; otherwise, returns the <see cref="DeployedProfile"/>.</returns>
-        public WeaponSystemProfile GetActiveWeaponSystemProfile()
+        public WeaponProfile GetActiveWeaponProfile()
         {
             return DeploymentPosition switch
             {
@@ -437,57 +362,6 @@ namespace HammerAndSickle.Models
                 DeploymentPosition.Mobile => GetMobileProfile() ?? GetDeployedProfile(),
                 _=> GetDeployedProfile()
             };
-        }
-
-        /// <summary>
-        /// Get the adjusted combat strength based on current mounted state and all applicable modifiers.
-        /// </summary>
-        /// <returns>Temporary WeaponSystemProfile with modified combat values for immediate calculation</returns>
-        public WeaponSystemProfile GetCurrentCombatStrength()
-        {
-            try
-            {
-                // Ensure we have a valid active weapon system profile
-                var activeProfile = GetActiveWeaponSystemProfile();
-                if (activeProfile == null)
-                    throw new InvalidOperationException("Active weapon system profile is null");
-
-                // Modify the constructor call to specify the correct parameters for WeaponSystemProfile
-                var tempProfile = new WeaponSystemProfile(
-                    activeProfile.Name + "_Combat",
-                    activeProfile.Nationality,
-                    WeaponSystems.UTILITY_ID,
-                    0
-                );
-
-                // Compute all modifiers that can affect a combat rating
-                float finalModifier = GetFinalCombatRatingModifier();
-                float finalModifier_Air = GetFinalCombatRatingModifier_Aircraft();
-
-                // Copy and apply modifiers to combat ratings for ground units.
-                tempProfile.SetHardAttack(Mathf.CeilToInt(activeProfile.HardAttack * finalModifier));
-                tempProfile.SetHardDefense(Mathf.CeilToInt(activeProfile.HardDefense * finalModifier));
-                tempProfile.SetSoftAttack(Mathf.CeilToInt(activeProfile.SoftAttack * finalModifier));
-                tempProfile.SetSoftDefense(Mathf.CeilToInt(activeProfile.SoftDefense * finalModifier));
-                tempProfile.SetGroundAirAttack(Mathf.CeilToInt(activeProfile.GroundAirAttack * finalModifier));
-                tempProfile.SetGroundAirDefense(Mathf.CeilToInt(activeProfile.GroundAirDefense * finalModifier));
-
-                // Copy and apply modifiers to combat ratings for air units.
-                tempProfile.SetDogfighting(Mathf.CeilToInt(activeProfile.Dogfighting * finalModifier_Air));
-                tempProfile.SetManeuverability(activeProfile.Maneuverability);
-                tempProfile.SetTopSpeed(activeProfile.TopSpeed);
-                tempProfile.SetSurvivability(activeProfile.Survivability);
-                tempProfile.SetGroundAttack(activeProfile.GroundAttack);
-                tempProfile.SetOrdinanceLoad(Mathf.CeilToInt(activeProfile.OrdinanceLoad * finalModifier_Air));
-                tempProfile.SetStealth(activeProfile.Stealth);
-
-                return tempProfile;
-            }
-            catch (Exception e)
-            {
-                AppService.HandleException(CLASS_NAME, "GetCurrentCombatStrength", e);
-                return null;
-            }
         }
 
         /// <summary>
@@ -838,7 +712,7 @@ namespace HammerAndSickle.Models
                 if (deployedProfile == null)
                     throw new InvalidOperationException("Unit must have a valid deployed profile");
 
-                MovementPoints = new StatsMaxCurrent(deployedProfile.MovementPoints);
+                MovementPoints = new StatsMaxCurrent(deployedProfile.MaxMovementPoints);
             }
             catch (Exception e)
             {
@@ -1479,11 +1353,13 @@ namespace HammerAndSickle.Models
                 Side = template.Side;
                 Nationality = template.Nationality;
 
-                // Copy profile IDs (the template characteristics)
-                DeployedProfileID = template.DeployedProfileID;
-                MobileProfileID = template.MobileProfileID;
-                EmbarkedProfileID = template.EmbarkedProfileID;
-                IntelProfileType = template.IntelProfileType;
+                // Copy regiment profile from template
+                RegimentProfile.InitializeRegimentProfile(
+                    template.UnitName,
+                    template.RegimentProfile.ProfileType,
+                    template.RegimentProfile.Mobile,
+                    template.RegimentProfile.Deployed,
+                    template.RegimentProfile.Embarked);
 
                 // Copy deployment capabilities
                 IsEmbarkable = template.IsEmbarkable;
@@ -1550,12 +1426,12 @@ namespace HammerAndSickle.Models
                     role: Role,
                     side: Side,
                     nationality: Nationality,
-                    intelProfileType: IntelProfileType,
-                    deployedProfileID: DeployedProfileID,
+                    profileType: RegimentProfile.ProfileType,
+                    deployedProfile: RegimentProfile.Deployed,
                     isMountable: IsMountable,
-                    mobileProfileID: MobileProfileID,
+                    mobileProfile: RegimentProfile.Mobile,
                     isEmbarkable: IsEmbarkable,
-                    embarkProfileID: EmbarkedProfileID,
+                    embarkedProfile: RegimentProfile.Embarked,
                     category: IsBase ? DepotCategory : DepotCategory.Secondary,
                     size: IsBase ? DepotSize : DepotSize.Small
                 );

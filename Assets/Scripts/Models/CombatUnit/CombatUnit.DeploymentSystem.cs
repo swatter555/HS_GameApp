@@ -21,7 +21,7 @@ namespace HammerAndSickle.Models
         [JsonInclude]
         public bool IsEmbarkable { get; private set; } // Equipped with helicopter/airlift transport/naval.
         [JsonInclude]
-        public bool IsMountable { get; private set; }  // Equipped with ground transport (e.g., trucks, APCs).
+        public bool IsMountable { get; private set; }  // Equipped with ground transport (e.g., trucks, APC).
         [JsonInclude]
         public EmbarkmentState CurrentEmbarkmentState { get; private set; } = EmbarkmentState.NotEmbarked;
 
@@ -236,7 +236,7 @@ namespace HammerAndSickle.Models
                 if (Classification == UnitClassification.SPECF)
                 {
                     // Special forces with aircraft transport must be on an airbase.
-                    if (embarkedProfile.WeaponSystemID == WeaponSystems.TRN_AN8 && !onAirbase)
+                    if (embarkedProfile.WeaponType == WeaponType.TRN_AN8_SV && !onAirbase)
                     {
                         errorMsg = $"{UnitName} must be on an airbase to deploy to Embarked position with AN-12 transport.";
                         return false;
@@ -258,7 +258,7 @@ namespace HammerAndSickle.Models
                 // Airmobile and mechanized airmobile units must have a valid helicopter transport profile to deploy to Embarked position.
                 if (Classification == UnitClassification.AM || Classification == UnitClassification.MAM)
                 {
-                    if (!embarkedProfile.HasUpgradeType(UpgradeType.TRNHELO))
+                    if (embarkedProfile.UpgradePath != UpgradePath.HELT)
                     {
                         errorMsg = $"{UnitName} must have a valid helicopter transport profile (TRNHELO) to deploy to Embarked position.";
                         return false;
@@ -295,12 +295,12 @@ namespace HammerAndSickle.Models
             try
             {
                 // Get the active weapon system profile for the combat unit.
-                var activeProfile = GetActiveWeaponSystemProfile();
+                var activeProfile = GetActiveWeaponProfile();
                 if (activeProfile == null)
                     throw new InvalidOperationException("No active weapon system profile available");
 
                 // Set the new maximum movement points based on the active profile.
-                int newMaxMovement = activeProfile.MovementPoints;
+                int newMaxMovement = activeProfile.MaxMovementPoints;
 
                 // Calculate current movement as percentage of old max
                 float movementPercentage = MovementPoints.Max > 0
