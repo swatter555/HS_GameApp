@@ -168,7 +168,7 @@ namespace HammerAndSickle.Services
                     controlledCamera.orthographicSize = defaultOrthographicSize;
                 }
 
-                // Initialize overlay camera if assigned
+                // InitializeRegimentProfile overlay camera if assigned
                 if (overlayCamera != null)
                 {
                     if (!overlayCamera.orthographic)

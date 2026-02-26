@@ -236,7 +236,7 @@ namespace HammerAndSickle.Controllers
         public const string SV_ScudB_NW_F = "SV_ScudB_NW_F";
         public const string SV_ScudB_SW_F = "SV_ScudB_SW_F";
 
-        // Infantry Fighting Vehicles
+        // Personnel Fighting Vehicles
         public const string SV_BMD2_W = "SV_BMD2_W";
         public const string SV_BMD2_NW = "SV_BMD2_NW";
         public const string SV_BMD2_SW = "SV_BMD2_SW";
@@ -253,7 +253,7 @@ namespace HammerAndSickle.Controllers
         public const string SV_BMP3_NW = "SV_BMP3_NW";
         public const string SV_BMP3_SW = "SV_BMP3_SW";
 
-        // Reconnaissance & APCs
+        // Reconnaissance & APC
         public const string SV_BRDM2_W = "SV_BRDM2_W";
         public const string SV_BRDM2_NW = "SV_BRDM2_NW";
         public const string SV_BRDM2_SW = "SV_BRDM2_SW";
@@ -324,7 +324,7 @@ namespace HammerAndSickle.Controllers
         public const string SV_TU22   = "SV_TU22";
         public const string SV_TU22M3 = "SV_TU22M3";
 
-        // Tanks
+        // MBT
         public const string SV_T55A_W = "SV_T55A_W";
         public const string SV_T55A_NW = "SV_T55A_NW";
         public const string SV_T55A_SW = "SV_T55A_SW";
@@ -363,10 +363,11 @@ namespace HammerAndSickle.Controllers
         public const string SV_S300_NW_F = "SV_S300_NW_F";
         public const string SV_S300_SW_F = "SV_S300_SW_F";
 
-        // Infantry & Support
+        // Personnel & Support
         public const string SV_Airborne = "SV_Airborne";
         public const string SV_AirMobile = "SV_AirMobile";
         public const string SV_Engineers = "SV_Engineers";
+        public const string SV_Marines = "SV_Marines";
         public const string SV_Regulars = "SV_Regulars";
         public const string SV_Spetsnaz = "SV_Spetsnaz";
         public const string SV_Truck_W = "SV_Truck_W";
@@ -377,8 +378,9 @@ namespace HammerAndSickle.Controllers
 
         #region NATO Unit Icons
 
-        // US Infantry & Support
+        // US Personnel & Support
         public const string US_Airborne = "US_Airborne";
+        public const string US_AirMobile = "US_AirMobile";
         public const string US_Marines = "US_Marines";
         public const string US_Regulars = "US_Regulars";
 
@@ -396,7 +398,7 @@ namespace HammerAndSickle.Controllers
         public const string US_M2_NW = "US_M2_NW";
         public const string US_M2_SW = "US_M2_SW";
 
-        // US Tanks
+        // US MBT
         public const string US_M1_W  = "US_M1_W";
         public const string US_M1_NW = "US_M1_NW";
         public const string US_M1_SW = "US_M1_SW";
@@ -460,15 +462,19 @@ namespace HammerAndSickle.Controllers
         public const string US_F4   = "US_F4";
         public const string US_SR71 = "US_SR71";
 
-        // UK Infantry & Support
+        // UK Personnel & Support
+        public const string UK_Airborne = "UK_Airborne";
         public const string UK_Regulars = "UK_Regulars";
 
         // UK Vehicles
+        public const string UK_FV105_W = "UK_FV105_W";
+        public const string UK_FV105_NW = "UK_FV105_NW";
+        public const string UK_FV105_SW = "UK_FV105_SW";
         public const string UK_Warrior_W = "UK_Warrior_W";
         public const string UK_Warrior_NW = "UK_Warrior_NW";
         public const string UK_Warrior_SW = "UK_Warrior_SW";
 
-        // UK Tanks
+        // UK MBT
         public const string UK_Challenger1_W = "UK_Challenger1_W";
         public const string UK_Challenger1_NW = "UK_Challenger1_NW";
         public const string UK_Challenger1_SW = "UK_Challenger1_SW";
@@ -484,15 +490,19 @@ namespace HammerAndSickle.Controllers
         // UK Aircraft
         public const string UK_TornadoGR1 = "UK_TornadoGR1";
 
-        // German Infantry & Support
+        // German Personnel & Support
+        public const string GER_Airborne = "GER_Airborne";
         public const string GER_Regulars = "GER_Regulars";
 
         // German Vehicles
+        public const string GE_Luchs_W = "GE_Luchs_W";
+        public const string GE_Luchs_NW = "GE_Luchs_NW";
+        public const string GE_Luchs_SW = "GE_Luchs_SW";
         public const string GE_Marder_W = "GE_Marder_W";
         public const string GE_Marder_NW = "GE_Marder_NW";
         public const string GE_Marder_SW = "GE_Marder_SW";
 
-        // German Tanks
+        // German MBT
         public const string GE_Leopard1_W = "GE_Leopard1_W";
         public const string GE_Leopard1_NW = "GE_Leopard1_NW";
         public const string GE_Leopard1_SW = "GE_Leopard1_SW";
@@ -528,13 +538,17 @@ namespace HammerAndSickle.Controllers
         public const string GE_Tornado = "GE_Tornado";
         public const string GE_F4      = "GE_F4";
 
-        // French Infantry & Support
+        // French Personnel & Support
+        public const string FR_Airborne = "FR_Airborne";
         public const string FR_Regulars = "FR_Regulars";
 
         // French Vehicles
         public const string FR_AMX30_W = "FR_AMX30_W";
         public const string FR_AMX30_NW = "FR_AMX30_NW";
         public const string FR_AMX30_SW = "FR_AMX30_SW";
+        public const string FR_ERC90_W = "FR_ERC90_W";
+        public const string FR_ERC90_NW = "FR_ERC90_NW";
+        public const string FR_ERC90_SW = "FR_ERC90_SW";
         public const string FR_M113_W = "FR_M113_W";
         public const string FR_M113_NW = "FR_M113_NW";
         public const string FR_M113_SW = "FR_M113_SW";
@@ -584,7 +598,7 @@ namespace HammerAndSickle.Controllers
 
         #region Arab Unit Icons
 
-        // Arab Tanks
+        // Arab MBT
         public const string AR_M60_W  = "AR_M60_W";
         public const string AR_M60_NW = "AR_M60_NW";
         public const string AR_M60_SW = "AR_M60_SW";
@@ -607,6 +621,8 @@ namespace HammerAndSickle.Controllers
         public const string AR_Truck_SW = "AR_Truck_SW";
 
         // Arab Artillery
+        public const string AR_HeavyArt = "AR_HeavyArt";
+        public const string AR_LightArt = "AR_LightArt";
         public const string AR_2S1_W    = "AR_2S1_W";
         public const string AR_2S1_NW   = "AR_2S1_NW";
         public const string AR_2S1_SW   = "AR_2S1_SW";
@@ -639,11 +655,11 @@ namespace HammerAndSickle.Controllers
 
         #region Chinese Unit Icons
 
-        // Chinese Infantry
+        // Chinese Personnel
         public const string CH_Infantry = "CH_Infantry";
         public const string CH_Airborne = "CH_Airborne";
 
-        // Chinese Tanks
+        // Chinese MBT
         public const string CH_Type59_W  = "CH_Type59_W"; // T-54 equivalent
         public const string CH_Type59_NW = "CH_Type59_NW";
         public const string CH_Type59_SW = "CH_Type59_SW";
@@ -663,6 +679,8 @@ namespace HammerAndSickle.Controllers
         public const string CH_Type86_SW = "CH_Type86_SW";
 
         // Chinese Artillery
+        public const string CH_HeavyArt = "CH_HeavyArt";
+        public const string CH_LightArt = "CH_LightArt";
         public const string CH_Type82_W    = "CH_Type82_W";   // 2S1 equivalent
         public const string CH_Type82_NW   = "CH_Type82_NW";
         public const string CH_Type82_SW   = "CH_Type82_SW";

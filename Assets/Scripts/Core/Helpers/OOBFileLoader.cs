@@ -26,9 +26,9 @@ namespace HammerAndSickle.Helpers
         public UnitClassification Classification { get; set; }
         public UnitRole Role { get; set; }
         public RegimentProfileType IntelProfileType { get; set; }
-        public WeaponSystems DeployedProfileID { get; set; }
-        public WeaponSystems MobileProfileID { get; set; }
-        public WeaponSystems EmbarkedProfileID { get; set; }
+        public WeaponType DeployedProfileID { get; set; }
+        public WeaponType MobileProfileID { get; set; }
+        public WeaponType EmbarkedProfileID { get; set; }
         public bool IsMountable { get; set; }
         public bool IsEmbarkable { get; set; }
         public ExperienceLevel Experience { get; set; }

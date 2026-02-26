@@ -439,14 +439,8 @@ namespace HammerAndSickle.Core.Map
         /// <summary>
         /// Gets the appropriate sprite name for a combat unit based on its properties.
         /// Returns the sprite name and sets the out parameter for whether to flip horizontally.
-        ///
-        /// Icon Categories:
-        /// 0. Airbases: AirbaseStack0-4 based on attached air unit count
-        /// 1. Animated: Base + _Frame0 suffix (helicopters)
-        /// 2. 3-Direction + Fired: Base + _W/_NW/_SW + optional _F (artillery, rockets, SPAAA, SPSAM)
-        /// 3. 3-Direction Vehicles: Base + _W/_NW/_SW suffix (tanks, IFVs, APCs, recon, trucks)
-        /// 4. No Suffix: Base name only (infantry, aircraft, static SAMs, bases)
-        ///
+        /// Resolves sprites through the WeaponProfile IconProfile system.
+        /// Airbases are handled separately with stacking icons.
         /// All icons can be flipped horizontally for easterly directions (E, NE, SE).
         /// </summary>
         public string GetSpriteNameForUnit(CombatUnit unit, out bool shouldFlip)
@@ -455,7 +449,7 @@ namespace HammerAndSickle.Core.Map
 
             try
             {
-                // Category 0: Airbases use stacking icons based on attached air unit count
+                // Airbases use stacking icons based on attached air unit count
                 if (unit.Classification == UnitClassification.AIRB)
                 {
                     int airUnitCount = unit.GetAttachedAirUnitCount();
@@ -465,63 +459,23 @@ namespace HammerAndSickle.Core.Map
                     return airbaseSprite;
                 }
 
-                // Get active weapon system based on deployment position (handles Embarked, Mobile, Deployed)
-                WeaponSystems weaponSystem = GetActiveWeaponSystem(unit);
-                Nationality nationality = unit.Nationality;
-
                 // All icons flip for easterly directions
                 shouldFlip = ShouldFlipSprite(unit.Facing);
 
-                // Category 1: Animated sprites (helicopters)
-                if (IsAnimatedSprite(weaponSystem))
+                // Normalize easterly directions to their western equivalents for sprite lookup
+                HexDirection normalizedDirection = NormalizeDirection(unit.Facing);
+
+                // Resolve sprite through the RegimentProfile icon system
+                string spriteName = unit.RegimentProfile.GetIcon(unit.DeploymentPosition, normalizedDirection);
+
+                if (string.IsNullOrEmpty(spriteName))
                 {
-                    string animatedSprite = GetAnimatedSpriteName(weaponSystem);
-                    if (_debug) Debug.Log($"[{CLASS_NAME}.GetSpriteNameForUnit] Unit '{unit.UnitName}': Animated sprite={animatedSprite}, Flip={shouldFlip}");
-                    return animatedSprite ?? SpriteManager.Utility_MismatchIcon;
-                }
-
-                // Category 2: 3-Direction + Fired variant (artillery, rockets, SSM, S300, SPAAA, SPSAM)
-                if (Has3DirectionsAndFiredVariant(weaponSystem))
-                {
-                    string baseSprite = GetBaseSpriteFromProfile(weaponSystem, nationality);
-                    if (string.IsNullOrEmpty(baseSprite))
-                    {
-                        return SpriteManager.Utility_MismatchIcon;
-                    }
-
-                    string directionSuffix = GetDirectionSuffixFor3Dir(unit.Facing);
-                    string firedSuffix = IsFiredPosition(unit.DeploymentPosition) ? "_F" : "";
-                    string finalSprite = baseSprite + directionSuffix + firedSuffix;
-
-                    if (_debug) Debug.Log($"[{CLASS_NAME}.GetSpriteNameForUnit] Unit '{unit.UnitName}': 3-Dir+Fired={finalSprite}, Flip={shouldFlip}");
-                    return finalSprite;
-                }
-
-                // Category 3: 3-Direction vehicles without fired variant (tanks, IFVs, APCs, recon, trucks)
-                if (Has3Directions(weaponSystem))
-                {
-                    string baseSprite = GetBaseSpriteFromProfile(weaponSystem, nationality);
-                    if (string.IsNullOrEmpty(baseSprite))
-                    {
-                        return SpriteManager.Utility_MismatchIcon;
-                    }
-
-                    string directionSuffix = GetDirectionSuffixFor3Dir(unit.Facing);
-                    string finalSprite = baseSprite + directionSuffix;
-
-                    if (_debug) Debug.Log($"[{CLASS_NAME}.GetSpriteNameForUnit] Unit '{unit.UnitName}': 3-Dir vehicle={finalSprite}, Flip={shouldFlip}");
-                    return finalSprite;
-                }
-
-                // Category 4: No suffix (infantry, aircraft, SAMs, bases, transports, generic)
-                string noSuffixSprite = GetBaseSpriteFromProfile(weaponSystem, nationality);
-                if (string.IsNullOrEmpty(noSuffixSprite))
-                {
+                    if (_debug) Debug.LogWarning($"[{CLASS_NAME}.GetSpriteNameForUnit] No sprite found for unit '{unit.UnitName}'");
                     return SpriteManager.Utility_MismatchIcon;
                 }
 
-                if (_debug) Debug.Log($"[{CLASS_NAME}.GetSpriteNameForUnit] Unit '{unit.UnitName}': No suffix={noSuffixSprite}, Flip={shouldFlip}");
-                return noSuffixSprite;
+                if (_debug) Debug.Log($"[{CLASS_NAME}.GetSpriteNameForUnit] Unit '{unit.UnitName}': sprite={spriteName}, Flip={shouldFlip}");
+                return spriteName;
             }
             catch (Exception e)
             {
@@ -585,65 +539,24 @@ namespace HammerAndSickle.Core.Map
         /// </summary>
         private GameObject GetTargetLayerForUnit(CombatUnit unit)
         {
-            WeaponSystems weaponSystem = GetActiveWeaponSystem(unit);
-
-            // Fixed-wing aircraft go to air layer
-            if (IsFixedWingAircraft(weaponSystem))
+            if (IsFixedWingAircraft(unit.Classification))
             {
                 return airUnitLayer;
             }
 
-            // Everything else (ground units, bases, helicopters) goes to ground layer
             return groundUnitLayer;
         }
 
         /// <summary>
-        /// Checks if weapon system is a fixed-wing aircraft (not helicopter).
+        /// Checks if a unit classification is a fixed-wing aircraft (not helicopter).
         /// </summary>
-        private bool IsFixedWingAircraft(WeaponSystems weaponSystem)
+        private bool IsFixedWingAircraft(UnitClassification classification)
         {
-            return weaponSystem switch
-            {
-                // Fighters
-                WeaponSystems.FGT_MIG21 => true,
-                WeaponSystems.FGT_MIG23 => true,
-                WeaponSystems.FGT_MIG25 => true,
-                WeaponSystems.FGT_MIG29 => true,
-                WeaponSystems.FGT_MIG31 => true,
-                WeaponSystems.FGT_MIG27 => true,
-                WeaponSystems.FGT_SU27 => true,
-                WeaponSystems.FGT_SU47 => true,
-                WeaponSystems.FGT_F15 => true,
-                WeaponSystems.FGT_F4 => true,
-                WeaponSystems.FGT_F16 => true,
-                WeaponSystems.FGT_TORNADO_IDS => true,
-                WeaponSystems.FGT_TORNADO_GR1 => true,
-                WeaponSystems.FGT_MIRAGE2000 => true,
-
-                // Attack Aircraft
-                WeaponSystems.ATT_SU25 => true,
-                WeaponSystems.ATT_SU25B => true,
-                WeaponSystems.ATT_A10 => true,
-                WeaponSystems.ATT_JAGUAR => true,
-
-                // Bombers
-                WeaponSystems.BMB_SU24 => true,
-                WeaponSystems.BMB_TU16 => true,
-                WeaponSystems.BMB_TU22 => true,
-                WeaponSystems.BMB_TU22M3 => true,
-                WeaponSystems.BMB_F111 => true,
-                WeaponSystems.BMB_F117 => true,
-
-                // Recon Aircraft
-                WeaponSystems.RCNA_MIG25R => true,
-                WeaponSystems.RCNA_SR71 => true,
-
-                // AWACS
-                WeaponSystems.AWACS_A50 => true,
-                WeaponSystems.AWACS_E3 => true,
-
-                _ => false
-            };
+            return classification == UnitClassification.FGT ||
+                   classification == UnitClassification.ATT ||
+                   classification == UnitClassification.BMB ||
+                   classification == UnitClassification.RECONA ||
+                   classification == UnitClassification.AWACS;
         }
 
         #endregion // Private Methods - Utilities
@@ -669,184 +582,22 @@ namespace HammerAndSickle.Core.Map
             };
         }
 
-        /// <summary>
-        /// Checks if weapon system uses animated sprites (helicopters).
-        /// Animated sprites have Frame0-5 variants for rotor animation.
-        /// </summary>
-        private bool IsAnimatedSprite(WeaponSystems weaponSystem)
-        {
-            return weaponSystem switch
-            {
-                // Soviet Helicopters
-                WeaponSystems.HEL_MI8T => true,
-                WeaponSystems.HEL_MI8AT => true,
-                WeaponSystems.HEL_MI24D => true,
-                WeaponSystems.HEL_MI24V => true,
-                WeaponSystems.HEL_MI28 => true,
-                // US Helicopters
-                WeaponSystems.HEL_AH64 => true,
-                WeaponSystems.HEL_UH60 => true,
-                // German Helicopters
-                WeaponSystems.HEL_BO105 => true,
-                _ => false
-            };
-        }
-
-        /// <summary>
-        /// Gets the Frame0 sprite name for animated weapon systems.
-        /// TODO: Implement animation cycling when unit is selected.
-        /// </summary>
-        private string GetAnimatedSpriteName(WeaponSystems weaponSystem)
-        {
-            return weaponSystem switch
-            {
-                // Soviet Helicopters
-                WeaponSystems.HEL_MI8T => SpriteManager.SV_MI8_Frame0,
-                WeaponSystems.HEL_MI8AT => SpriteManager.SV_MI8AT_Frame0,
-                WeaponSystems.HEL_MI24D => SpriteManager.SV_MI24D_Frame0,
-                WeaponSystems.HEL_MI24V => SpriteManager.SV_MI24V_Frame0,
-                WeaponSystems.HEL_MI28 => SpriteManager.SV_MI28_Frame0,
-                // US Helicopters
-                WeaponSystems.HEL_AH64 => SpriteManager.US_AH64_Frame0,
-                WeaponSystems.HEL_UH60 => SpriteManager.US_UH60_Frame0,
-                // German Helicopters
-                WeaponSystems.HEL_BO105 => SpriteManager.GE_BO105_Frame0,
-                _ => null
-            };
-        }
-
-        /// <summary>
-        /// Checks if weapon system has BOTH 3 direction variants (W, NW, SW) AND a fired (_F) variant.
-        /// These are artillery, rocket systems, SSMs, S300, and mobile AA/SAM systems that show
-        /// both directional facing and deployed/firing position.
-        /// </summary>
-        private bool Has3DirectionsAndFiredVariant(WeaponSystems weaponSystem)
-        {
-            return weaponSystem switch
-            {
-                // Soviet SP Artillery
-                WeaponSystems.SPA_2S1 => true,
-                WeaponSystems.SPA_2S3 => true,
-                WeaponSystems.SPA_2S5 => true,
-                WeaponSystems.SPA_2S19 => true,
-
-                // Soviet Rocket Artillery
-                WeaponSystems.ROC_BM21 => true,
-                WeaponSystems.ROC_BM27 => true,
-                WeaponSystems.ROC_BM30 => true,
-
-                // Soviet SSM
-                WeaponSystems.SSM_SCUD => true,
-
-                // Soviet S300
-                WeaponSystems.SAM_S300 => true,
-
-                // SPAAA (mobile anti-aircraft)
-                WeaponSystems.SPAAA_ZSU57 => true,
-                WeaponSystems.SPAAA_ZSU23 => true,
-                WeaponSystems.SPAAA_2K22 => true,
-                WeaponSystems.SPAAA_M163 => true,
-                WeaponSystems.SPSAM_GEPARD => true,
-
-                // SPSAM (mobile SAM)
-                WeaponSystems.SPSAM_9K31 => true,
-                WeaponSystems.SPSAM_CHAP => true,
-                WeaponSystems.SPAAA_ROLAND_FR => true,
-
-                // US/NATO Artillery (shared M109 has nation-specific sprites)
-                WeaponSystems.SPA_M109 => true,
-                WeaponSystems.ROC_MLRS => true,
-
-                _ => false
-            };
-        }
-
-        /// <summary>
-        /// Checks if weapon system has 3 direction variants (W, NW, SW) WITHOUT a fired variant.
-        /// These are mobile ground vehicles that show directional facing only.
-        /// </summary>
-        private bool Has3Directions(WeaponSystems weaponSystem)
-        {
-            return weaponSystem switch
-            {
-                // Tanks
-                WeaponSystems.TANK_T55A => true,
-                WeaponSystems.TANK_T64A => true,
-                WeaponSystems.TANK_T64B => true,
-                WeaponSystems.TANK_T72A => true,
-                WeaponSystems.TANK_T72B => true,
-                WeaponSystems.TANK_T80B => true,
-                WeaponSystems.TANK_T80U => true,
-                WeaponSystems.TANK_T80BV => true,
-                WeaponSystems.TANK_M1 => true,
-                WeaponSystems.TANK_M60A3 => true,
-                WeaponSystems.TANK_LEOPARD1 => true,
-                WeaponSystems.TANK_LEOPARD2 => true,
-                WeaponSystems.TANK_CHALLENGER1 => true,
-                WeaponSystems.TANK_AMX30 => true,
-
-                // APCs
-                WeaponSystems.APC_MTLB => true,
-                WeaponSystems.APC_BTR70 => true,
-                WeaponSystems.APC_BTR80 => true,
-                WeaponSystems.APC_M113 => true,
-                WeaponSystems.APC_LVTP7 => true,
-                WeaponSystems.APC_VAB => true,
-
-                // IFVs
-                WeaponSystems.IFV_BMP1 => true,
-                WeaponSystems.IFV_BMP2 => true,
-                WeaponSystems.IFV_BMP3 => true,
-                WeaponSystems.IFV_BMD1 => true,
-                WeaponSystems.IFV_BMD2 => true,
-                WeaponSystems.IFV_BMD3 => true,
-                WeaponSystems.IFV_M2 => true,
-                WeaponSystems.IFV_M3 => true,
-                WeaponSystems.IFV_MARDER => true,
-                WeaponSystems.IFV_WARRIOR => true,
-
-                // Recon
-                WeaponSystems.RCN_BRDM2 => true,
-                WeaponSystems.RCN_BRDM2AT => true,
-
-                // Trucks
-                WeaponSystems.TRUCK_GEN => true,
-
-                _ => false
-            };
-        }
-
-        /// <summary>
-        /// Determines if unit is in a "fired" deployment position.
-        /// Units in defensive positions show their deployed/firing sprite.
-        /// </summary>
-        private bool IsFiredPosition(DeploymentPosition position)
-        {
-            return position == DeploymentPosition.HastyDefense ||
-                   position == DeploymentPosition.Entrenched ||
-                   position == DeploymentPosition.Fortified;
-        }
-
         #endregion // Icon Category Methods
 
         #region Direction and Flip Methods
 
         /// <summary>
-        /// Gets direction suffix for 3-direction vehicle sprites.
-        /// Returns _W, _NW, or _SW based on facing. Easterly directions use
-        /// their western counterpart (flipped horizontally by the renderer).
+        /// Normalizes easterly directions to their western equivalents for sprite lookup.
+        /// E maps to W, NE maps to NW, SE maps to SW. Western directions pass through unchanged.
         /// </summary>
-        private string GetDirectionSuffixFor3Dir(HexDirection facing)
+        private HexDirection NormalizeDirection(HexDirection direction)
         {
-            return facing switch
+            return direction switch
             {
-                HexDirection.W => "_W",
-                HexDirection.NW => "_NW",
-                HexDirection.SW => "_SW",
-                HexDirection.E => "_W",   // Use W sprite, flip horizontally
-                HexDirection.NE => "_NW", // Use NW sprite, flip horizontally
-                HexDirection.SE => "_SW", // Use SW sprite, flip horizontally
-                _ => "_W"
+                HexDirection.E => HexDirection.W,
+                HexDirection.NE => HexDirection.NW,
+                HexDirection.SE => HexDirection.SW,
+                _ => direction
             };
         }
 
@@ -862,424 +613,6 @@ namespace HammerAndSickle.Core.Map
         }
 
         #endregion // Direction and Flip Methods
-
-        #region Profile Resolution Methods
-
-        /// <summary>
-        /// Gets the active weapon system based on unit deployment position.
-        /// - Embarked: Uses EmbarkedProfileID (air or naval transport)
-        /// - Mobile: Uses MobileProfileID if available
-        /// - Deployed/Defensive: Uses DeployedProfileID
-        /// </summary>
-        private WeaponSystems GetActiveWeaponSystem(CombatUnit unit)
-        {
-            return unit.DeploymentPosition switch
-            {
-                DeploymentPosition.Embarked => unit.EmbarkedProfileID != WeaponSystems.NONE
-                    ? unit.EmbarkedProfileID
-                    : unit.DeployedProfileID,
-
-                DeploymentPosition.Mobile => unit.MobileProfileID != WeaponSystems.NONE
-                    ? unit.MobileProfileID
-                    : unit.DeployedProfileID,
-
-                _ => unit.DeployedProfileID
-            };
-        }
-
-        /// <summary>
-        /// Maps WeaponSystems enum to base sprite name.
-        /// Handles nationality-specific sprites for shared equipment (M109, M113, Gepard, etc.).
-        ///
-        /// NOTE: Arab and Chinese nations have dedicated sprite constants (AR_, CH_ prefixes)
-        /// but require WeaponSystems enum additions before full integration.
-        /// </summary>
-        private string GetBaseSpriteFromProfile(WeaponSystems profile, Nationality nationality)
-        {
-            // Handle infantry profiles - requires nationality-specific sprites
-            if (IsInfantryProfile(profile))
-            {
-                return GetInfantrySprite(profile, nationality);
-            }
-
-            // Handle Mujahideen special equipment sprites
-            if (nationality == Nationality.MJ)
-            {
-                string mjSprite = GetMujahideenSprite(profile);
-                if (!string.IsNullOrEmpty(mjSprite))
-                {
-                    return mjSprite;
-                }
-            }
-
-            // Handle nationality-specific vehicle sprites (M109, M113, Gepard shared across nations)
-            string nationalitySprite = GetNationalitySpecificSprite(profile, nationality);
-            if (!string.IsNullOrEmpty(nationalitySprite))
-            {
-                return nationalitySprite;
-            }
-
-            // Default weapon system mappings
-            return profile switch
-            {
-                // ═══════════════════════════════════════════════════════════════
-                // SOVIET WEAPON SYSTEMS
-                // ═══════════════════════════════════════════════════════════════
-
-                // Tanks
-                WeaponSystems.TANK_T55A => "SV_T55A",
-                WeaponSystems.TANK_T64A => "SV_T64A",
-                WeaponSystems.TANK_T64B => "SV_T64B",
-                WeaponSystems.TANK_T72A => "SV_T72A",
-                WeaponSystems.TANK_T72B => "SV_T72B",
-                WeaponSystems.TANK_T80B => "SV_T80B",
-                WeaponSystems.TANK_T80U => "SV_T80U",
-                WeaponSystems.TANK_T80BV => "SV_T80BVM",
-
-                // APCs
-                WeaponSystems.APC_MTLB => "SV_MTLB",
-                WeaponSystems.APC_BTR70 => "SV_BTR70",
-                WeaponSystems.APC_BTR80 => "SV_BTR80",
-
-                // IFVs
-                WeaponSystems.IFV_BMP1 => "SV_BMP1",
-                WeaponSystems.IFV_BMP2 => "SV_BMP2",
-                WeaponSystems.IFV_BMP3 => "SV_BMP3",
-                WeaponSystems.IFV_BMD1 => "SV_BMD2", // Fallback: no BMD1 sprite
-                WeaponSystems.IFV_BMD2 => "SV_BMD2",
-                WeaponSystems.IFV_BMD3 => "SV_BMD3",
-
-                // Recon
-                WeaponSystems.RCN_BRDM2 => "SV_BRDM2",
-                WeaponSystems.RCN_BRDM2AT => "SV_BRDM2AT",
-
-                // Self-Propelled Artillery
-                WeaponSystems.SPA_2S1 => "SV_2S1",
-                WeaponSystems.SPA_2S3 => "SV_2S3",
-                WeaponSystems.SPA_2S5 => "SV_2S5",
-                WeaponSystems.SPA_2S19 => "SV_2S19",
-
-                // Rocket Artillery
-                WeaponSystems.ROC_BM21 => "SV_BM21",
-                WeaponSystems.ROC_BM27 => "SV_BM27",
-                WeaponSystems.ROC_BM30 => "SV_BM30",
-
-                // SSM
-                WeaponSystems.SSM_SCUD => "SV_ScudB",
-
-                // SPAAA
-                WeaponSystems.SPAAA_ZSU57 => "SV_ZSU57",
-                WeaponSystems.SPAAA_ZSU23 => "SV_ZSU23",
-                WeaponSystems.SPAAA_2K22 => "SV_2K22",
-
-                // SPSAM
-                WeaponSystems.SPSAM_9K31 => "SV_9K31",
-
-                // Static SAM
-                WeaponSystems.SAM_S75 => "SV_S75",
-                WeaponSystems.SAM_S125 => "SV_S125",
-                WeaponSystems.SAM_S300 => "SV_S300",
-
-                // AWACS
-                WeaponSystems.AWACS_A50 => "SV_A50",
-
-                // Fighters
-                WeaponSystems.FGT_MIG21 => "SV_Mig21",
-                WeaponSystems.FGT_MIG23 => "SV_Mig23",
-                WeaponSystems.FGT_MIG25 => "SV_Mig25",
-                WeaponSystems.FGT_MIG29 => "SV_Mig29",
-                WeaponSystems.FGT_MIG31 => "SV_Mig31",
-                WeaponSystems.FGT_SU27 => "SV_SU27",
-                WeaponSystems.FGT_SU47 => "SV_SU47",
-                WeaponSystems.FGT_MIG27 => "SV_Mig27",
-
-                // Attack Aircraft
-                WeaponSystems.ATT_SU25 => "SV_SU25",
-                WeaponSystems.ATT_SU25B => "SV_SU25B",
-
-                // Bombers
-                WeaponSystems.BMB_SU24 => "SV_SU24",
-                WeaponSystems.BMB_TU16 => "SV_TU16",
-                WeaponSystems.BMB_TU22 => "SV_TU22",
-                WeaponSystems.BMB_TU22M3 => "SV_TU22M3",
-
-                // Recon Aircraft
-                WeaponSystems.RCNA_MIG25R => "SV_Mig25R",
-
-                // Transport
-                WeaponSystems.TRN_AN8 => SpriteManager.SV_AN8,
-                WeaponSystems.TRN_NAVAL => SpriteManager.GEN_NavalTransport,
-
-                // ═══════════════════════════════════════════════════════════════
-                // USA WEAPON SYSTEMS
-                // ═══════════════════════════════════════════════════════════════
-
-                // Tanks
-                WeaponSystems.TANK_M1 => "US_M1",
-                WeaponSystems.TANK_M60A3 => "US_M60",
-
-                // IFVs
-                WeaponSystems.IFV_M2 => "US_M2",
-                WeaponSystems.IFV_M3 => "US_M2", // Uses M2 sprite
-
-                // APCs (default - nationality override handled above)
-                WeaponSystems.APC_M113 => "US_M113",
-                WeaponSystems.APC_LVTP7 => "US_LVTP",
-
-                // Artillery (default - nationality override handled above)
-                WeaponSystems.SPA_M109 => "US_M109",
-                WeaponSystems.ROC_MLRS => "US_MLRS",
-
-                // SPAAA
-                WeaponSystems.SPAAA_M163 => "US_M163",
-
-                // SPSAM
-                WeaponSystems.SPSAM_CHAP => "US_Chaparral",
-
-                // Static SAM
-                WeaponSystems.SAM_HAWK => "US_Hawk",
-                WeaponSystems.SAM_RAPIER => "US_Hawk", // UK Rapier uses Hawk sprite
-
-                // AWACS
-                WeaponSystems.AWACS_E3 => "US_E3",
-
-                // Fighters
-                WeaponSystems.FGT_F15 => "US_F15",
-                WeaponSystems.FGT_F4 => "US_F4",
-                WeaponSystems.FGT_F16 => "US_F16",
-
-                // Attack Aircraft
-                WeaponSystems.ATT_A10 => "US_A10",
-
-                // Bombers
-                WeaponSystems.BMB_F111 => "US_F111",
-                WeaponSystems.BMB_F117 => "US_F117",
-
-                // Recon Aircraft
-                WeaponSystems.RCNA_SR71 => "US_SR71",
-
-                // ═══════════════════════════════════════════════════════════════
-                // WEST GERMANY (FRG) WEAPON SYSTEMS
-                // ═══════════════════════════════════════════════════════════════
-
-                // Tanks
-                WeaponSystems.TANK_LEOPARD1 => "GE_Leopard1",
-                WeaponSystems.TANK_LEOPARD2 => "GE_Leopard2",
-
-                // IFVs
-                WeaponSystems.IFV_MARDER => "GE_Marder",
-
-                // SPAAA (default - nationality override handled above)
-                WeaponSystems.SPSAM_GEPARD => "GE_Gepard",
-
-                // Aircraft
-                WeaponSystems.FGT_TORNADO_IDS => "GE_Tornado",
-
-                // ═══════════════════════════════════════════════════════════════
-                // UK WEAPON SYSTEMS
-                // ═══════════════════════════════════════════════════════════════
-
-                // Tanks
-                WeaponSystems.TANK_CHALLENGER1 => "UK_Challenger1",
-
-                // IFVs
-                WeaponSystems.IFV_WARRIOR => "UK_Warrior",
-
-                // Aircraft
-                WeaponSystems.FGT_TORNADO_GR1 => "UK_TornadoGR1",
-
-                // ═══════════════════════════════════════════════════════════════
-                // FRANCE WEAPON SYSTEMS
-                // ═══════════════════════════════════════════════════════════════
-
-                // Tanks
-                WeaponSystems.TANK_AMX30 => "FR_AMX30",
-
-                // APCs
-                WeaponSystems.APC_VAB => "FR_M113", // VAB uses M113 sprite
-
-                // SPSAM
-                WeaponSystems.SPAAA_ROLAND_FR => "FR_Roland",
-
-                // Aircraft
-                WeaponSystems.FGT_MIRAGE2000 => "FR_Mirage2000",
-                WeaponSystems.ATT_JAGUAR => "FR_Jaguar",
-
-                // ═══════════════════════════════════════════════════════════════
-                // GENERIC WEAPON SYSTEMS
-                // ═══════════════════════════════════════════════════════════════
-
-                WeaponSystems.AAA_GEN => SpriteManager.GEN_AA,
-                WeaponSystems.ART_LIGHT_GEN => SpriteManager.GEN_LightArt,
-                WeaponSystems.ART_HEAVY_GEN => SpriteManager.GEN_HeavyArt,
-                WeaponSystems.ART_LIGHT_MORTAR_GEN => SpriteManager.GEN_LightArt,
-                WeaponSystems.ART_HEAVY_MORTAR_GEN => SpriteManager.GEN_HeavyArt,
-                WeaponSystems.TRUCK_GEN => "GEN_Truck",
-                WeaponSystems.INF_CAV_GEN => SpriteManager.MJ_Mounted,
-                WeaponSystems.MANPAD_GEN => SpriteManager.GEN_AA,
-                WeaponSystems.AT_LIGHT_GEN => SpriteManager.GEN_LightArt,
-
-                // Bases
-                WeaponSystems.LANDBASE_GENERIC => SpriteManager.GEN_Base,
-                WeaponSystems.AIRBASE_GENERIC => SpriteManager.GEN_Base, // TODO: Needs airbase sprite
-                WeaponSystems.SUPPLYDEPOT_GENERIC => SpriteManager.GEN_Depot,
-
-                // System values
-                WeaponSystems.UTILITY_ID => null,
-                WeaponSystems.NONE => null,
-
-                _ => null
-            };
-        }
-
-        /// <summary>
-        /// Returns nationality-specific sprite for shared equipment.
-        /// Equipment like M109, M113, and Gepard have different sprites per nation.
-        /// Returns null if no nationality-specific sprite exists.
-        /// </summary>
-        private string GetNationalitySpecificSprite(WeaponSystems profile, Nationality nationality)
-        {
-            // M109 Self-Propelled Artillery - US, UK, GE variants
-            if (profile == WeaponSystems.SPA_M109)
-            {
-                return nationality switch
-                {
-                    Nationality.USA => "US_M109",
-                    Nationality.UK => "UK_M109",
-                    Nationality.FRG => "GE_M109",
-                    Nationality.IR or Nationality.IQ or Nationality.SAUD or Nationality.KW => "US_M109",
-                    _ => null // Fall through to default
-                };
-            }
-
-            // M113 APC - US, FR variants
-            if (profile == WeaponSystems.APC_M113)
-            {
-                return nationality switch
-                {
-                    Nationality.USA => "US_M113",
-                    Nationality.FRA => "FR_M113",
-                    Nationality.FRG => "US_M113", // Germany uses US sprite
-                    Nationality.UK => "US_M113",  // UK uses US sprite
-                    // Arab nations
-                    Nationality.IR or Nationality.IQ or Nationality.SAUD or Nationality.KW => "US_M113",
-                    _ => null
-                };
-            }
-
-            // Gepard SPAAA - GE, FR variants
-            if (profile == WeaponSystems.SPSAM_GEPARD)
-            {
-                return nationality switch
-                {
-                    Nationality.FRG => "GE_Gepard",
-                    Nationality.FRA => "FR_Gepard",
-                    _ => null
-                };
-            }
-
-            // MLRS - currently only US has sprite
-            if (profile == WeaponSystems.ROC_MLRS)
-            {
-                return nationality switch
-                {
-                    Nationality.USA => "US_MLRS",
-                    Nationality.UK => "US_MLRS",   // UK uses US sprite
-                    Nationality.FRG => "US_MLRS", // Germany uses US sprite
-                    _ => null
-                };
-            }
-
-            return null;
-        }
-
-        #endregion // Profile Resolution Methods
-
-        #region Infantry and Special Unit Sprites
-
-        /// <summary>
-        /// Checks if weapon system is an infantry profile.
-        /// </summary>
-        private bool IsInfantryProfile(WeaponSystems profile)
-        {
-            return profile == WeaponSystems.INF_REG ||
-                   profile == WeaponSystems.INF_AB ||
-                   profile == WeaponSystems.INF_AM ||
-                   profile == WeaponSystems.INF_MAR ||
-                   profile == WeaponSystems.INF_SPEC ||
-                   profile == WeaponSystems.INF_ENG;
-        }
-
-        /// <summary>
-        /// Gets infantry sprite based on nationality and infantry type.
-        ///
-        /// NOTE: Saudi and Kuwait currently share IR_Regulars sprite. China uses CH_Infantry.
-        /// </summary>
-        private string GetInfantrySprite(WeaponSystems profile, Nationality nationality)
-        {
-            return (profile, nationality) switch
-            {
-                // Soviet Infantry
-                (WeaponSystems.INF_REG, Nationality.USSR) => SpriteManager.SV_Regulars,
-                (WeaponSystems.INF_AB, Nationality.USSR) => SpriteManager.SV_Airborne,
-                (WeaponSystems.INF_AM, Nationality.USSR) => SpriteManager.SV_AirMobile,
-                (WeaponSystems.INF_SPEC, Nationality.USSR) => SpriteManager.SV_Spetsnaz,
-                (WeaponSystems.INF_ENG, Nationality.USSR) => SpriteManager.SV_Engineers,
-                (WeaponSystems.INF_MAR, Nationality.USSR) => SpriteManager.SV_Regulars,
-
-                // US Infantry
-                (WeaponSystems.INF_REG, Nationality.USA) => SpriteManager.US_Regulars,
-                (WeaponSystems.INF_AB, Nationality.USA) => SpriteManager.US_Airborne,
-                (WeaponSystems.INF_MAR, Nationality.USA) => SpriteManager.US_Marines,
-                (_, Nationality.USA) => SpriteManager.US_Regulars,
-
-                // UK Infantry
-                (_, Nationality.UK) => SpriteManager.UK_Regulars,
-
-                // German Infantry
-                (_, Nationality.FRG) => SpriteManager.GER_Regulars,
-
-                // French Infantry
-                (_, Nationality.FRA) => SpriteManager.FR_Regulars,
-
-                // Mujahideen Infantry
-                (WeaponSystems.INF_SPEC, Nationality.MJ) => SpriteManager.MJ_Elite,
-                (_, Nationality.MJ) => SpriteManager.MJ_Regulars,
-
-                // Arab Nations
-                (_, Nationality.IR) => SpriteManager.IR_Regulars,
-                (_, Nationality.IQ) => SpriteManager.IQ_Regulars,
-                (_, Nationality.SAUD) => SpriteManager.IR_Regulars,  // Uses IR sprite
-                (_, Nationality.KW) => SpriteManager.IR_Regulars,    // Uses IR sprite
-
-                // China
-                (_, Nationality.China) => SpriteManager.CH_Infantry,
-
-                // Default fallback
-                _ => SpriteManager.SV_Regulars
-            };
-        }
-
-        /// <summary>
-        /// Gets Mujahideen-specific sprites for special weapon systems.
-        /// MJ units use unique sprites for mortars, manpads, RPGs, etc.
-        /// </summary>
-        private string GetMujahideenSprite(WeaponSystems profile)
-        {
-            return profile switch
-            {
-                WeaponSystems.ART_LIGHT_MORTAR_GEN => SpriteManager.MJ_Mortar,
-                WeaponSystems.ART_HEAVY_MORTAR_GEN => SpriteManager.MJ_Mortar,
-                WeaponSystems.MANPAD_GEN => SpriteManager.MJ_Stinger,
-                WeaponSystems.AT_LIGHT_GEN => SpriteManager.MJ_RPG,
-                WeaponSystems.AAA_GEN => SpriteManager.MJ_AA,
-                WeaponSystems.ART_LIGHT_GEN => SpriteManager.MJ_Artillery,
-                WeaponSystems.INF_CAV_GEN => SpriteManager.MJ_Mounted,
-                _ => null
-            };
-        }
-
-        #endregion // Infantry and Special Unit Sprites
 
         #region Nationality Symbol Methods
 

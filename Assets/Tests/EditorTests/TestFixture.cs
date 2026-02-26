@@ -1,4 +1,4 @@
-﻿using HammerAndSickle.Controllers;
+using HammerAndSickle.Controllers;
 using HammerAndSickle.Models;
 using HammerAndSickle.Services;
 using NUnit.Framework;
@@ -144,7 +144,7 @@ namespace HammerAndSickle.Tests
             {
                 TestLog.Add("Initializing test environment");
 
-                // Initialize AppService for testing
+                // InitializeRegimentProfile AppService for testing
                 TestHandler = new TestHandler();
                 AppService.SetTestHandler(TestHandler);
 
@@ -217,9 +217,8 @@ namespace HammerAndSickle.Tests
         {
             try
             {
-                Assert.IsTrue(WeaponSystemsDatabase.IsInitialized, "WeaponSystemsDatabase should be initialized");
-                Assert.IsTrue(IntelProfileDatabase.IsInitialized, "IntelProfile should be initialized");
                 Assert.IsTrue(CombatUnitDatabase.IsInitialized, "CombatUnitDatabase should be initialized");
+                Assert.IsTrue(WeaponProfileDB.IsInitialized, "WeaponProfileDB should be initialized");
                 Assert.IsNotNull(TestHandler, "TestHandler should be initialized");
                 Assert.IsNotNull(TestRandom, "TestRandom should be initialized");
                 Assert.IsNotNull(GameManager, "GameManager should be initialized");
