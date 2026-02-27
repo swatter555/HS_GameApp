@@ -454,6 +454,7 @@ namespace HammerAndSickle.Models
                 Deployed = deployed;
                 Embarked = embarked;
                 TotalIntelStats = new Dictionary<WeaponType, int>();
+                BuildIntelStats();
             }
             catch (Exception e)
             {
@@ -462,9 +463,107 @@ namespace HammerAndSickle.Models
             }
         }
 
+        /// <summary>
+        /// Accumulates intel report stats from all assigned weapon profiles into TotalIntelStats.
+        /// Merges entries from deployed, mobile, and embarked profiles, summing duplicate keys.
+        /// </summary>
+        public void BuildIntelStats()
+        {
+            try
+            {
+                TotalIntelStats = new Dictionary<WeaponType, int>();
+
+                AccumulateIntelStats(GetDeployedProfile());
+                AccumulateIntelStats(GetMobileProfile());
+                AccumulateIntelStats(GetEmbarkedProfile());
+            }
+            catch (Exception e)
+            {
+                AppService.HandleException(CLASS_NAME, nameof(BuildIntelStats), e);
+                throw;
+            }
+        }
+
+        private void AccumulateIntelStats(WeaponProfile profile)
+        {
+            if (profile?.IntelReportStats == null)
+                return;
+
+            foreach (var kvp in profile.IntelReportStats)
+            {
+                if (TotalIntelStats.ContainsKey(kvp.Key))
+                    TotalIntelStats[kvp.Key] += kvp.Value;
+                else
+                    TotalIntelStats[kvp.Key] = kvp.Value;
+            }
+        }
+
         #endregion // Initialization
 
         #region Accessors
+
+        /// <summary>
+        /// Creates an IntelReport by sorting TotalIntelStats into equipment buckets
+        /// based on WeaponType name prefixes.
+        /// </summary>
+        public IntelReport GetIntelReport()
+        {
+            try
+            {
+                var report = new IntelReport();
+
+                if (TotalIntelStats == null)
+                    return report;
+
+                foreach (var kvp in TotalIntelStats)
+                {
+                    string name = kvp.Key.ToString();
+                    int value = kvp.Value;
+
+                    if (name == nameof(WeaponType.Personnel) || name.StartsWith("INF_"))
+                        report.Personnel += value;
+                    else if (name.StartsWith("TANK_"))
+                        report.TANK += value;
+                    else if (name.StartsWith("IFV_"))
+                        report.IFV += value;
+                    else if (name.StartsWith("APC_"))
+                        report.APC += value;
+                    else if (name.StartsWith("RCN_"))
+                        report.RCN += value;
+                    else if (name.StartsWith("ART_") || name.StartsWith("SPA_"))
+                        report.ART += value;
+                    else if (name.StartsWith("ROC_"))
+                        report.ROC += value;
+                    else if (name.StartsWith("SAM_") || name.StartsWith("SPSAM_") || name.StartsWith("MANPAD_"))
+                        report.SAM += value;
+                    else if (name.StartsWith("AAA_") || name.StartsWith("SPAAA_"))
+                        report.AAA += value;
+                    else if (name.StartsWith("AT_"))
+                        report.AT += value;
+                    else if (name.StartsWith("HEL_"))
+                        report.HEL += value;
+                    else if (name.StartsWith("AWACS_"))
+                        report.AWACS += value;
+                    else if (name.StartsWith("TRN_") || name.StartsWith("TRK_"))
+                        report.TRN += value;
+                    else if (name.StartsWith("FGT_"))
+                        report.FGT += value;
+                    else if (name.StartsWith("ATT_"))
+                        report.ATT += value;
+                    else if (name.StartsWith("BMB_"))
+                        report.BMB += value;
+                    else if (name.StartsWith("RCNA_"))
+                        report.RCNA += value;
+                }
+
+                return report;
+            }
+            catch (Exception e)
+            {
+                AppService.HandleException(CLASS_NAME, nameof(GetIntelReport), e);
+                throw;
+            }
+        }
 
         /// <summary>
         /// Returns the WeaponProfile for the deployed state from the WeaponProfileDB.

@@ -10,7 +10,7 @@ namespace HammerAndSickle.Models
     /// Templates are immutable once created and provide baseline configurations
     /// for spawning actual combat units in scenarios.
     /// </summary>
-    public static class CombatUnitDatabase
+    public static class CombatUnitDB
     {
         #region Private Fields
 
@@ -57,7 +57,7 @@ namespace HammerAndSickle.Models
             }
             catch (Exception e)
             {
-                AppService.HandleException(nameof(CombatUnitDatabase), nameof(Initialize), e);
+                AppService.HandleException(nameof(CombatUnitDB), nameof(Initialize), e);
                 throw;
             }
         }
@@ -78,7 +78,7 @@ namespace HammerAndSickle.Models
             }
             catch (Exception e)
             {
-                AppService.HandleException(nameof(CombatUnitDatabase), nameof(GetUnitTemplate), e);
+                AppService.HandleException(nameof(CombatUnitDB), nameof(GetUnitTemplate), e);
                 return null;
             }
         }
@@ -99,7 +99,7 @@ namespace HammerAndSickle.Models
             }
             catch (Exception e)
             {
-                AppService.HandleException(nameof(CombatUnitDatabase), nameof(HasUnitTemplate), e);
+                AppService.HandleException(nameof(CombatUnitDB), nameof(HasUnitTemplate), e);
                 return false;
             }
         }
@@ -124,7 +124,7 @@ namespace HammerAndSickle.Models
             }
             catch (Exception e)
             {
-                AppService.HandleException(nameof(CombatUnitDatabase), nameof(CreateUnitFromTemplate), e);
+                AppService.HandleException(nameof(CombatUnitDB), nameof(CreateUnitFromTemplate), e);
                 return null;
             }
         }
@@ -148,7 +148,7 @@ namespace HammerAndSickle.Models
             }
             catch (Exception e)
             {
-                AppService.HandleException(nameof(CombatUnitDatabase), nameof(GetTemplatesByNationality), e);
+                AppService.HandleException(nameof(CombatUnitDB), nameof(GetTemplatesByNationality), e);
                 return new List<string>();
             }
         }
@@ -172,7 +172,7 @@ namespace HammerAndSickle.Models
             }
             catch (Exception e)
             {
-                AppService.HandleException(nameof(CombatUnitDatabase), nameof(GetTemplatesByClassification), e);
+                AppService.HandleException(nameof(CombatUnitDB), nameof(GetTemplatesByClassification), e);
                 return new List<string>();
             }
         }
@@ -189,7 +189,7 @@ namespace HammerAndSickle.Models
             }
             catch (Exception e)
             {
-                AppService.HandleException(nameof(CombatUnitDatabase), nameof(GetAllTemplateIds), e);
+                AppService.HandleException(nameof(CombatUnitDB), nameof(GetAllTemplateIds), e);
                 return new List<string>();
             }
         }
@@ -220,7 +220,7 @@ namespace HammerAndSickle.Models
             }
             catch (Exception e)
             {
-                AppService.HandleException(nameof(CombatUnitDatabase), nameof(AddTemplate), e);
+                AppService.HandleException(nameof(CombatUnitDB), nameof(AddTemplate), e);
                 throw;
             }
         }
@@ -257,7 +257,7 @@ namespace HammerAndSickle.Models
             }
             catch (Exception e)
             {
-                AppService.HandleException(nameof(CombatUnitDatabase), nameof(CreateAllUnitTemplates), e);
+                AppService.HandleException(nameof(CombatUnitDB), nameof(CreateAllUnitTemplates), e);
                 throw;
             }
         }

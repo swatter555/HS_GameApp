@@ -148,7 +148,7 @@ namespace HammerAndSickle.Controllers
 
                 // PrepareBattle static databases
                 WeaponProfileDB.Initialize();
-                CombatUnitDatabase.Initialize();
+                CombatUnitDB.Initialize();
 
                 _isInitialized = true;
                 AppService.CaptureUiMessage("Game databases initialized successfully");
@@ -565,7 +565,7 @@ namespace HammerAndSickle.Controllers
         {
             try
             {
-                return CombatUnitDatabase.IsInitialized &&
+                return CombatUnitDB.IsInitialized &&
                        WeaponProfileDB.IsInitialized;
             }
             catch (Exception e)
@@ -582,7 +582,7 @@ namespace HammerAndSickle.Controllers
         {
             try
             {
-                return CombatUnitDatabase.GetUnitTemplate(templateId);
+                return CombatUnitDB.GetUnitTemplate(templateId);
             }
             catch (Exception e)
             {
@@ -598,7 +598,7 @@ namespace HammerAndSickle.Controllers
         {
             try
             {
-                return CombatUnitDatabase.CreateUnitFromTemplate(templateId, unitName);
+                return CombatUnitDB.CreateUnitFromTemplate(templateId, unitName);
             }
             catch (Exception e)
             {
@@ -614,7 +614,7 @@ namespace HammerAndSickle.Controllers
         {
             try
             {
-                return CombatUnitDatabase.GetTemplatesByNationality(nationality);
+                return CombatUnitDB.GetTemplatesByNationality(nationality);
             }
             catch (Exception e)
             {
@@ -630,7 +630,7 @@ namespace HammerAndSickle.Controllers
         {
             try
             {
-                return CombatUnitDatabase.GetTemplatesByClassification(classification);
+                return CombatUnitDB.GetTemplatesByClassification(classification);
             }
             catch (Exception e)
             {
@@ -646,7 +646,7 @@ namespace HammerAndSickle.Controllers
         {
             try
             {
-                return CombatUnitDatabase.HasUnitTemplate(templateId);
+                return CombatUnitDB.HasUnitTemplate(templateId);
             }
             catch (Exception e)
             {
@@ -662,7 +662,7 @@ namespace HammerAndSickle.Controllers
         {
             try
             {
-                return CombatUnitDatabase.TemplateCount;
+                return CombatUnitDB.TemplateCount;
             }
             catch (Exception e)
             {
@@ -678,7 +678,7 @@ namespace HammerAndSickle.Controllers
         {
             try
             {
-                return CombatUnitDatabase.GetAllTemplateIds();
+                return CombatUnitDB.GetAllTemplateIds();
             }
             catch (Exception e)
             {

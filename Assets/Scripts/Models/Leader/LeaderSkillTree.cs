@@ -3,6 +3,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Reflection;
+using System.Text.Json.Serialization;
 using UnityEngine;
 using HammerAndSickle.Core.GameData;
 
@@ -11,33 +12,30 @@ namespace HammerAndSickle.Models
     /// <summary>
     /// Updated LeaderSkillTreeData with proper enum serialization support
     /// </summary>
-    [Serializable]
     public class LeaderSkillTreeData
     {
-        #region Core State
+        #region Properties
 
-        public int ReputationPoints;
-        public CommandGrade CurrentGrade;
+        [JsonPropertyName("reputationPoints")]
+        public int ReputationPoints { get; set; }
 
-        #endregion // Core State
+        [JsonPropertyName("currentGrade")]
+        public CommandGrade CurrentGrade { get; set; }
 
-        #region Branch Tracking
+        [JsonPropertyName("startedBranches")]
+        public List<SkillBranch> StartedBranches { get; set; }
 
-        public List<SkillBranch> StartedBranches;
+        [JsonPropertyName("unlockedSkills")]
+        public List<SkillReference> UnlockedSkills { get; set; }
 
-        #endregion // Branch Tracking
-
-        #region Skill Storage
-
-        public List<SkillReference> UnlockedSkills;
-
-        #endregion // Skill Storage
+        #endregion // Properties
 
         #region Constructor
 
         /// <summary>
         /// Parameterless constructor for serialization
         /// </summary>
+        [JsonConstructor]
         public LeaderSkillTreeData()
         {
             ReputationPoints = 0;
@@ -82,22 +80,27 @@ namespace HammerAndSickle.Models
     /// <summary>
     /// Updated SkillReference with better enum handling
     /// </summary>
-    [Serializable]
     public class SkillReference
     {
-        #region Fields
+        #region Properties
 
-        public string EnumTypeName;  // Full type name for reconstruction
-        public string EnumValueName; // String name of the enum value
-        public int EnumValueInt;     // Integer value for validation
+        [JsonPropertyName("enumTypeName")]
+        public string EnumTypeName { get; set; }  // Full type name for reconstruction
 
-        #endregion // Fields
+        [JsonPropertyName("enumValueName")]
+        public string EnumValueName { get; set; } // String name of the enum value
+
+        [JsonPropertyName("enumValueInt")]
+        public int EnumValueInt { get; set; }     // Integer value for validation
+
+        #endregion // Properties
 
         #region Constructors
 
         /// <summary>
         /// Parameterless constructor for serialization
         /// </summary>
+        [JsonConstructor]
         public SkillReference()
         {
             EnumTypeName = string.Empty;

@@ -1455,7 +1455,7 @@ namespace HammerAndSickle.Core.GameData
 
         #region General Constants
 
-        public const int SAVE_VERSION = 1;
+        public const int SAVE_VERSION = 2;
 
         #endregion
 
@@ -1487,7 +1487,7 @@ namespace HammerAndSickle.Core.GameData
         public const float COMBAT_ACTION_MOVEMENT_COST = 0.25f; // Combat actions cost 25% of max movement
         public const float INTEL_ACTION_MOVEMENT_COST = 0.15f; // Intel actions cost 15% of max movement
 
-        public const float COMBAT_MOD_MOBILE = 0.9f;  // Mobile units get 10% combat malus
+        public const float COMBAT_MOD_MOBILE = 1.0f;  // Mobile units get 10% combat malus
         public const float COMBAT_MOD_DEPLOYED = 1.0f;  // Deployed units have no combat modifier
         public const float COMBAT_MOD_HASTY_DEFENSE = 1.1f;  // Hasty defense gives +10% combat bonus
         public const float COMBAT_MOD_ENTRENCHED = 1.2f;  // Entrenched units get +20% combat bonus

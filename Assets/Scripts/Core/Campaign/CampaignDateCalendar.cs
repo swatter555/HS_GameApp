@@ -1,6 +1,7 @@
 using HammerAndSickle.Models;
 using HammerAndSickle.Services;
 using System;
+using System.Text.Json.Serialization;
 
 namespace HammerAndSickle.Core.Campaign
 {
@@ -26,27 +27,43 @@ namespace HammerAndSickle.Core.Campaign
         /// <summary>
         /// Current turn number (0-based, where 0 = January 1938).
         /// </summary>
+        [JsonInclude] [JsonPropertyName("currentTurn")]
         public int CurrentTurn { get; private set; }
 
         /// <summary>
         /// Campaign start turn number.
         /// </summary>
+        [JsonInclude] [JsonPropertyName("campaignStartTurn")]
         public int CampaignStartTurn { get; private set; }
 
         /// <summary>
         /// Campaign end turn number.
         /// </summary>
+        [JsonInclude] [JsonPropertyName("campaignEndTurn")]
         public int CampaignEndTurn { get; private set; }
 
         /// <summary>
         /// Whether the campaign is currently active (current turn within bounds).
         /// </summary>
+        [JsonIgnore]
         public bool IsActive => CurrentTurn >= CampaignStartTurn && CurrentTurn <= CampaignEndTurn;
 
         #endregion //Properties
 
 
         #region Constructor
+
+        /// <summary>
+        /// Parameterless constructor for JSON deserialization.
+        /// Properties will be set by the deserializer.
+        /// </summary>
+        [JsonConstructor]
+        public CampaignDateCalendar()
+        {
+            CurrentTurn = 0;
+            CampaignStartTurn = 0;
+            CampaignEndTurn = 0;
+        }
 
         /// <summary>
         /// Initializes a new campaign calendar with specified date range.
