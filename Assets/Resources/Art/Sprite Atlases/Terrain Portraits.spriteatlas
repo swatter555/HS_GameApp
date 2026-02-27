@@ -1,0 +1,145 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!687078895 &4343727234628468602
+SpriteAtlas:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_Name: Terrain Portraits
+  m_EditorData:
+    serializedVersion: 2
+    textureSettings:
+      serializedVersion: 2
+      anisoLevel: 0
+      compressionQuality: 0
+      maxTextureSize: 0
+      textureCompression: 0
+      filterMode: 1
+      generateMipMaps: 1
+      readable: 0
+      crunchedCompression: 0
+      sRGB: 1
+    platformSettings:
+    - serializedVersion: 4
+      m_BuildTarget: DefaultTexturePlatform
+      m_MaxTextureSize: 2048
+      m_ResizeAlgorithm: 0
+      m_TextureFormat: -1
+      m_TextureCompression: 2
+      m_CompressionQuality: 50
+      m_CrunchedCompression: 0
+      m_AllowsAlphaSplitting: 0
+      m_Overridden: 0
+      m_IgnorePlatformSupport: 0
+      m_AndroidETC2FallbackOverride: 0
+      m_ForceMaximumCompressionQuality_BC6H_BC7: 0
+    packingSettings:
+      serializedVersion: 2
+      padding: 2
+      blockOffset: 0
+      allowAlphaSplitting: 0
+      enableRotation: 0
+      enableTightPacking: 0
+      enableAlphaDilation: 0
+    secondaryTextureSettings: {}
+    variantMultiplier: 1
+    packables:
+    - {fileID: 21300000, guid: af95c9cb3910d1845b9a780175b56839, type: 3}
+    - {fileID: 21300000, guid: b294edb66b0a6d14fa67fceb670a4f0c, type: 3}
+    - {fileID: 21300000, guid: 1acb11cf515ec5e43b48e6abc15a1bae, type: 3}
+    - {fileID: 21300000, guid: b3c9bacfa6f0a8b42bf37e58a7b0557b, type: 3}
+    - {fileID: 21300000, guid: 981b6b5700715ab41b06dc247f425ffe, type: 3}
+    - {fileID: 21300000, guid: dde584bc4da38c946af12a319fab5996, type: 3}
+    - {fileID: 21300000, guid: e57620490eaeb7245a2a67c0c1f7a5a0, type: 3}
+    - {fileID: 21300000, guid: d6a4781f819ebb842b6977cf2845c055, type: 3}
+    - {fileID: 21300000, guid: 74b4b710501f9a744aa449493ab864cd, type: 3}
+    - {fileID: 21300000, guid: e53645fbdb227d44fb78aaf9167955c7, type: 3}
+    - {fileID: 21300000, guid: 3f55d166ccb679844b4d7cb5441369e1, type: 3}
+    - {fileID: 21300000, guid: b28777b0edd33374f9301640957157e7, type: 3}
+    - {fileID: 21300000, guid: b20325019d5b45e4c85f15836714781e, type: 3}
+    - {fileID: 21300000, guid: 31d35fd8a46b09e45a378d9cf8e792b7, type: 3}
+    - {fileID: 21300000, guid: 0356e5124a5cdf54597e9db8aaf7b90a, type: 3}
+    - {fileID: 21300000, guid: 44cd4d442ab627243a3f152648e826b6, type: 3}
+    - {fileID: 21300000, guid: e386e348902aa6e41888ae464b29b328, type: 3}
+    - {fileID: 21300000, guid: f61dead449f377d46a122d77f52b7580, type: 3}
+    - {fileID: 21300000, guid: e1e3764e835cc6b4cb96b43d3474b06c, type: 3}
+    - {fileID: 21300000, guid: 3f7e9cd8732ced94fbcdaa90b4d34167, type: 3}
+    - {fileID: 21300000, guid: 5bbb7311b9385e74ebdbf9bbc38a893d, type: 3}
+    - {fileID: 21300000, guid: 267368e0a6e824e4d8fb950425953f4d, type: 3}
+    bindAsDefault: 1
+    isAtlasV2: 0
+    cachedData: {fileID: 0}
+    packedSpriteRenderDataKeys:
+    - 74b4b710501f9a744aa449493ab864cd: 21300000
+    - b28777b0edd33374f9301640957157e7: 21300000
+    - 267368e0a6e824e4d8fb950425953f4d: 21300000
+    - b20325019d5b45e4c85f15836714781e: 21300000
+    - 5bbb7311b9385e74ebdbf9bbc38a893d: 21300000
+    - 0356e5124a5cdf54597e9db8aaf7b90a: 21300000
+    - 44cd4d442ab627243a3f152648e826b6: 21300000
+    - f61dead449f377d46a122d77f52b7580: 21300000
+    - 3f55d166ccb679844b4d7cb5441369e1: 21300000
+    - b294edb66b0a6d14fa67fceb670a4f0c: 21300000
+    - 981b6b5700715ab41b06dc247f425ffe: 21300000
+    - e386e348902aa6e41888ae464b29b328: 21300000
+    - 3f7e9cd8732ced94fbcdaa90b4d34167: 21300000
+    - 31d35fd8a46b09e45a378d9cf8e792b7: 21300000
+    - e57620490eaeb7245a2a67c0c1f7a5a0: 21300000
+    - af95c9cb3910d1845b9a780175b56839: 21300000
+    - e53645fbdb227d44fb78aaf9167955c7: 21300000
+    - dde584bc4da38c946af12a319fab5996: 21300000
+    - e1e3764e835cc6b4cb96b43d3474b06c: 21300000
+    - d6a4781f819ebb842b6977cf2845c055: 21300000
+    - 1acb11cf515ec5e43b48e6abc15a1bae: 21300000
+    - b3c9bacfa6f0a8b42bf37e58a7b0557b: 21300000
+  m_MasterAtlas: {fileID: 0}
+  m_PackedSprites:
+  - {fileID: 21300000, guid: 74b4b710501f9a744aa449493ab864cd, type: 3}
+  - {fileID: 21300000, guid: b28777b0edd33374f9301640957157e7, type: 3}
+  - {fileID: 21300000, guid: 267368e0a6e824e4d8fb950425953f4d, type: 3}
+  - {fileID: 21300000, guid: b20325019d5b45e4c85f15836714781e, type: 3}
+  - {fileID: 21300000, guid: 5bbb7311b9385e74ebdbf9bbc38a893d, type: 3}
+  - {fileID: 21300000, guid: 0356e5124a5cdf54597e9db8aaf7b90a, type: 3}
+  - {fileID: 21300000, guid: 44cd4d442ab627243a3f152648e826b6, type: 3}
+  - {fileID: 21300000, guid: f61dead449f377d46a122d77f52b7580, type: 3}
+  - {fileID: 21300000, guid: 3f55d166ccb679844b4d7cb5441369e1, type: 3}
+  - {fileID: 21300000, guid: b294edb66b0a6d14fa67fceb670a4f0c, type: 3}
+  - {fileID: 21300000, guid: 981b6b5700715ab41b06dc247f425ffe, type: 3}
+  - {fileID: 21300000, guid: e386e348902aa6e41888ae464b29b328, type: 3}
+  - {fileID: 21300000, guid: 3f7e9cd8732ced94fbcdaa90b4d34167, type: 3}
+  - {fileID: 21300000, guid: 31d35fd8a46b09e45a378d9cf8e792b7, type: 3}
+  - {fileID: 21300000, guid: e57620490eaeb7245a2a67c0c1f7a5a0, type: 3}
+  - {fileID: 21300000, guid: af95c9cb3910d1845b9a780175b56839, type: 3}
+  - {fileID: 21300000, guid: e53645fbdb227d44fb78aaf9167955c7, type: 3}
+  - {fileID: 21300000, guid: dde584bc4da38c946af12a319fab5996, type: 3}
+  - {fileID: 21300000, guid: e1e3764e835cc6b4cb96b43d3474b06c, type: 3}
+  - {fileID: 21300000, guid: d6a4781f819ebb842b6977cf2845c055, type: 3}
+  - {fileID: 21300000, guid: 1acb11cf515ec5e43b48e6abc15a1bae, type: 3}
+  - {fileID: 21300000, guid: b3c9bacfa6f0a8b42bf37e58a7b0557b, type: 3}
+  m_PackedSpriteNamesToIndex:
+  - EU_Clear
+  - EU_Mountain
+  - Ocean
+  - EU_Rough
+  - ME_Town
+  - ME_City
+  - ME_Clear
+  - ME_Marsh
+  - EU_Marsh
+  - CH_Clear
+  - CH_Mountains
+  - ME_Forest
+  - ME_Rough
+  - EU_Town
+  - CH_Town
+  - CH_City
+  - EU_Forest
+  - CH_Rough
+  - ME_Mountains
+  - EU_City
+  - CH_Forest
+  - CH_Marsh
+  m_RenderDataMap: {}
+  m_Tag: Terrain Portraits
+  m_IsVariant: 0

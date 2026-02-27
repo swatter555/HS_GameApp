@@ -1,0 +1,108 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!687078895 &4343727234628468602
+SpriteAtlas:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_Name: Control Flags
+  m_EditorData:
+    serializedVersion: 2
+    textureSettings:
+      serializedVersion: 2
+      anisoLevel: 0
+      compressionQuality: 0
+      maxTextureSize: 0
+      textureCompression: 0
+      filterMode: 1
+      generateMipMaps: 1
+      readable: 0
+      crunchedCompression: 0
+      sRGB: 1
+    platformSettings: []
+    packingSettings:
+      serializedVersion: 2
+      padding: 2
+      blockOffset: 0
+      allowAlphaSplitting: 0
+      enableRotation: 0
+      enableTightPacking: 0
+      enableAlphaDilation: 0
+    secondaryTextureSettings: {}
+    variantMultiplier: 1
+    packables:
+    - {fileID: 21300000, guid: 747a66d2cd858be43aacda7a1d6035b0, type: 3}
+    - {fileID: 21300000, guid: 435faef6f42c6744baadc6e2095a046b, type: 3}
+    - {fileID: 21300000, guid: b59cee5f2b0ce104eb2f70411b7a3203, type: 3}
+    - {fileID: 21300000, guid: b5d60cd86668b314b87256a044a85245, type: 3}
+    - {fileID: 21300000, guid: 7c3403a2d0abaf04cadc0bb16fcecc8b, type: 3}
+    - {fileID: 21300000, guid: 7b95d76df99b5754b9e036c14f4f4645, type: 3}
+    - {fileID: 21300000, guid: 9367e03b8f0e7754cb3d6f29edac105a, type: 3}
+    - {fileID: 21300000, guid: db863d0fb1cfa1745bc33e6ffbcdc20b, type: 3}
+    - {fileID: 21300000, guid: 52486ac4353398f498295b648253366d, type: 3}
+    - {fileID: 21300000, guid: 2fbb9e1579a8f5a4e938e2875bbbdc4e, type: 3}
+    - {fileID: 21300000, guid: 99f8463e2e05094459637963bc8ca92f, type: 3}
+    - {fileID: 21300000, guid: 0ab588674bceb3f4b8fcb625daed612b, type: 3}
+    - {fileID: 21300000, guid: c7545b561dd71e741b34bbf7d397cc48, type: 3}
+    - {fileID: 21300000, guid: eb3adf58a72ef2b4cb9691d154e1a442, type: 3}
+    - {fileID: 21300000, guid: ea813e6337334e743bfc8c469b452e81, type: 3}
+    - {fileID: 21300000, guid: 7dbe47776bc049e4b8ec2f2cafcbfc5f, type: 3}
+    bindAsDefault: 1
+    isAtlasV2: 0
+    cachedData: {fileID: 0}
+    packedSpriteRenderDataKeys:
+    - 7c3403a2d0abaf04cadc0bb16fcecc8b: 21300000
+    - 747a66d2cd858be43aacda7a1d6035b0: 21300000
+    - ea813e6337334e743bfc8c469b452e81: 21300000
+    - 52486ac4353398f498295b648253366d: 21300000
+    - 2fbb9e1579a8f5a4e938e2875bbbdc4e: 21300000
+    - c7545b561dd71e741b34bbf7d397cc48: 21300000
+    - 435faef6f42c6744baadc6e2095a046b: 21300000
+    - 0ab588674bceb3f4b8fcb625daed612b: 21300000
+    - 7dbe47776bc049e4b8ec2f2cafcbfc5f: 21300000
+    - eb3adf58a72ef2b4cb9691d154e1a442: 21300000
+    - b5d60cd86668b314b87256a044a85245: 21300000
+    - 9367e03b8f0e7754cb3d6f29edac105a: 21300000
+    - 7b95d76df99b5754b9e036c14f4f4645: 21300000
+    - 99f8463e2e05094459637963bc8ca92f: 21300000
+    - db863d0fb1cfa1745bc33e6ffbcdc20b: 21300000
+    - b59cee5f2b0ce104eb2f70411b7a3203: 21300000
+  m_MasterAtlas: {fileID: 0}
+  m_PackedSprites:
+  - {fileID: 21300000, guid: 7c3403a2d0abaf04cadc0bb16fcecc8b, type: 3}
+  - {fileID: 21300000, guid: 747a66d2cd858be43aacda7a1d6035b0, type: 3}
+  - {fileID: 21300000, guid: ea813e6337334e743bfc8c469b452e81, type: 3}
+  - {fileID: 21300000, guid: 52486ac4353398f498295b648253366d, type: 3}
+  - {fileID: 21300000, guid: 2fbb9e1579a8f5a4e938e2875bbbdc4e, type: 3}
+  - {fileID: 21300000, guid: c7545b561dd71e741b34bbf7d397cc48, type: 3}
+  - {fileID: 21300000, guid: 435faef6f42c6744baadc6e2095a046b, type: 3}
+  - {fileID: 21300000, guid: 0ab588674bceb3f4b8fcb625daed612b, type: 3}
+  - {fileID: 21300000, guid: 7dbe47776bc049e4b8ec2f2cafcbfc5f, type: 3}
+  - {fileID: 21300000, guid: eb3adf58a72ef2b4cb9691d154e1a442, type: 3}
+  - {fileID: 21300000, guid: b5d60cd86668b314b87256a044a85245, type: 3}
+  - {fileID: 21300000, guid: 9367e03b8f0e7754cb3d6f29edac105a, type: 3}
+  - {fileID: 21300000, guid: 7b95d76df99b5754b9e036c14f4f4645, type: 3}
+  - {fileID: 21300000, guid: 99f8463e2e05094459637963bc8ca92f, type: 3}
+  - {fileID: 21300000, guid: db863d0fb1cfa1745bc33e6ffbcdc20b, type: 3}
+  - {fileID: 21300000, guid: b59cee5f2b0ce104eb2f70411b7a3203, type: 3}
+  m_PackedSpriteNamesToIndex:
+  - Control_GE
+  - Control_BE
+  - Control_US
+  - Control_MJ
+  - Control_NE
+  - Control_SV
+  - Control_China
+  - Control_Saudi
+  - MainObjective
+  - Control_UK
+  - Control_FR
+  - Control_Iraq
+  - Control_Iran
+  - Control_None
+  - Control_Kuwait
+  - Control_DE
+  m_RenderDataMap: {}
+  m_Tag: Control Flags
+  m_IsVariant: 0

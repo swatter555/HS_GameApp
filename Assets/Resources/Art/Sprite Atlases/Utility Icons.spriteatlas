@@ -1,0 +1,93 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!687078895 &4343727234628468602
+SpriteAtlas:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_Name: Utility Icons
+  m_EditorData:
+    serializedVersion: 2
+    textureSettings:
+      serializedVersion: 2
+      anisoLevel: 0
+      compressionQuality: 0
+      maxTextureSize: 0
+      textureCompression: 0
+      filterMode: 1
+      generateMipMaps: 1
+      readable: 0
+      crunchedCompression: 0
+      sRGB: 1
+    platformSettings:
+    - serializedVersion: 4
+      m_BuildTarget: DefaultTexturePlatform
+      m_MaxTextureSize: 2048
+      m_ResizeAlgorithm: 0
+      m_TextureFormat: -1
+      m_TextureCompression: 2
+      m_CompressionQuality: 50
+      m_CrunchedCompression: 0
+      m_AllowsAlphaSplitting: 0
+      m_Overridden: 0
+      m_IgnorePlatformSupport: 0
+      m_AndroidETC2FallbackOverride: 0
+      m_ForceMaximumCompressionQuality_BC6H_BC7: 0
+    packingSettings:
+      serializedVersion: 2
+      padding: 2
+      blockOffset: 0
+      allowAlphaSplitting: 0
+      enableRotation: 0
+      enableTightPacking: 0
+      enableAlphaDilation: 0
+    secondaryTextureSettings: {}
+    variantMultiplier: 1
+    packables:
+    - {fileID: 21300000, guid: d8b3de4fab91fe54da74125edb752ea2, type: 3}
+    - {fileID: 21300000, guid: 88908aec89a7c98469d8893fa475d8e8, type: 3}
+    - {fileID: 21300000, guid: 44a941f49130a914193f724131fc9899, type: 3}
+    - {fileID: 21300000, guid: 77e10abfa83ca854999dcb4c55989177, type: 3}
+    - {fileID: 21300000, guid: d047a826053bb9647b75c0125bd4e4c5, type: 3}
+    - {fileID: 21300000, guid: 2fe0de176a4e2fc44b0b81ea10eb4129, type: 3}
+    - {fileID: 21300000, guid: abf1cb12e7b73f144840d8bdde54ef2e, type: 3}
+    - {fileID: 21300000, guid: 725c04d859b3d514fa809713a5b671c9, type: 3}
+    - {fileID: 21300000, guid: 9ded75b49b3f06744b217f0a0e5aea59, type: 3}
+    bindAsDefault: 1
+    isAtlasV2: 0
+    cachedData: {fileID: 0}
+    packedSpriteRenderDataKeys:
+    - abf1cb12e7b73f144840d8bdde54ef2e: 21300000
+    - 9ded75b49b3f06744b217f0a0e5aea59: 21300000
+    - 44a941f49130a914193f724131fc9899: 21300000
+    - d047a826053bb9647b75c0125bd4e4c5: 21300000
+    - 2fe0de176a4e2fc44b0b81ea10eb4129: 21300000
+    - 725c04d859b3d514fa809713a5b671c9: 21300000
+    - 88908aec89a7c98469d8893fa475d8e8: 21300000
+    - d8b3de4fab91fe54da74125edb752ea2: 21300000
+    - 77e10abfa83ca854999dcb4c55989177: 21300000
+  m_MasterAtlas: {fileID: 0}
+  m_PackedSprites:
+  - {fileID: 21300000, guid: abf1cb12e7b73f144840d8bdde54ef2e, type: 3}
+  - {fileID: 21300000, guid: 9ded75b49b3f06744b217f0a0e5aea59, type: 3}
+  - {fileID: 21300000, guid: 44a941f49130a914193f724131fc9899, type: 3}
+  - {fileID: 21300000, guid: d047a826053bb9647b75c0125bd4e4c5, type: 3}
+  - {fileID: 21300000, guid: 2fe0de176a4e2fc44b0b81ea10eb4129, type: 3}
+  - {fileID: 21300000, guid: 725c04d859b3d514fa809713a5b671c9, type: 3}
+  - {fileID: 21300000, guid: 88908aec89a7c98469d8893fa475d8e8, type: 3}
+  - {fileID: 21300000, guid: d8b3de4fab91fe54da74125edb752ea2, type: 3}
+  - {fileID: 21300000, guid: 77e10abfa83ca854999dcb4c55989177, type: 3}
+  m_PackedSpriteNamesToIndex:
+  - MismatchIcon
+  - StackingIcon_LandSelect
+  - AirbaseStack_2
+  - AirbaseStack_4
+  - AirMissionMarker
+  - StackingIcon_AirSelect
+  - AirbaseStack_1
+  - AirbaseStack_0
+  - AirbaseStack_3
+  m_RenderDataMap: {}
+  m_Tag: Utility Icons
+  m_IsVariant: 0

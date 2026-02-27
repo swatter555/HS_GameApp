@@ -5,7 +5,6 @@ using UnityEngine;
 
 namespace HammerAndSickle.Models
 {
-    [Serializable]
     public class StatsMaxCurrent
     {
         #region Constants
@@ -18,10 +17,10 @@ namespace HammerAndSickle.Models
 
         #region Properties
 
-
-        [JsonInclude] 
+        [JsonInclude] [JsonPropertyName("max")]
         public float Max { get; private set; }
-        [JsonInclude]
+
+        [JsonInclude] [JsonPropertyName("current")]
         public float Current { get; private set; }
 
         #endregion
@@ -57,27 +56,27 @@ namespace HammerAndSickle.Models
         /// Creates a new StatsMaxCurrent with specified maximum and current values.
         /// Used for deserialization when restoring saved state.
         /// </summary>
-        /// <param name="maxValue">The maximum value for this statistic</param>
-        /// <param name="currentValue">The current value for this statistic</param>
+        /// <param name="max">The maximum value for this statistic</param>
+        /// <param name="current">The current value for this statistic</param>
         [JsonConstructor]
-        public StatsMaxCurrent(float maxValue, float currentValue)
+        public StatsMaxCurrent(float max, float current)
         {
             try
             {
-                if (maxValue < MIN_VALID_VALUE || maxValue > MAX_VALID_VALUE)
+                if (max < MIN_VALID_VALUE || max > MAX_VALID_VALUE)
                 {
-                    throw new ArgumentOutOfRangeException(nameof(maxValue),
+                    throw new ArgumentOutOfRangeException(nameof(max),
                         $"Max value must be between {MIN_VALID_VALUE} and {MAX_VALID_VALUE}");
                 }
 
-                if (currentValue < MIN_VALID_VALUE || currentValue > MAX_VALID_VALUE)
+                if (current < MIN_VALID_VALUE || current > MAX_VALID_VALUE)
                 {
-                    throw new ArgumentOutOfRangeException(nameof(currentValue),
+                    throw new ArgumentOutOfRangeException(nameof(current),
                         $"Current value must be between {MIN_VALID_VALUE} and {MAX_VALID_VALUE}");
                 }
 
-                Max = maxValue;
-                Current = currentValue;
+                Max = max;
+                Current = current;
             }
             catch (Exception e)
             {

@@ -1,0 +1,117 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!687078895 &4343727234628468602
+SpriteAtlas:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_Name: National Symbols
+  m_EditorData:
+    serializedVersion: 2
+    textureSettings:
+      serializedVersion: 2
+      anisoLevel: 0
+      compressionQuality: 0
+      maxTextureSize: 0
+      textureCompression: 0
+      filterMode: 1
+      generateMipMaps: 1
+      readable: 0
+      crunchedCompression: 0
+      sRGB: 1
+    platformSettings:
+    - serializedVersion: 4
+      m_BuildTarget: DefaultTexturePlatform
+      m_MaxTextureSize: 4096
+      m_ResizeAlgorithm: 0
+      m_TextureFormat: -1
+      m_TextureCompression: 0
+      m_CompressionQuality: 50
+      m_CrunchedCompression: 0
+      m_AllowsAlphaSplitting: 0
+      m_Overridden: 0
+      m_IgnorePlatformSupport: 0
+      m_AndroidETC2FallbackOverride: 0
+      m_ForceMaximumCompressionQuality_BC6H_BC7: 0
+    packingSettings:
+      serializedVersion: 2
+      padding: 2
+      blockOffset: 0
+      allowAlphaSplitting: 0
+      enableRotation: 0
+      enableTightPacking: 0
+      enableAlphaDilation: 0
+    secondaryTextureSettings: {}
+    variantMultiplier: 1
+    packables:
+    - {fileID: 21300000, guid: d4fc53942dd5c8a44aa37ab237ac9cd6, type: 3}
+    - {fileID: 21300000, guid: 1eefa4e37f4cfa54d9991c1d4bdc7493, type: 3}
+    - {fileID: 21300000, guid: 70b25a74cc7214a4da978b4241a10c6e, type: 3}
+    - {fileID: 21300000, guid: 5511948d2a0a3f5498e733385ac914fe, type: 3}
+    - {fileID: 21300000, guid: e991df5d9e65bfb4fa8097c7c77e5b04, type: 3}
+    - {fileID: 21300000, guid: 97d4b6e722b0b774091be1df1a53012f, type: 3}
+    - {fileID: 21300000, guid: 23505928b8bc685478ff7447b680f324, type: 3}
+    - {fileID: 21300000, guid: 35d927986fd652141b2d85511bacb163, type: 3}
+    - {fileID: 21300000, guid: 95017312ebcc4c0488323363e556d21e, type: 3}
+    - {fileID: 21300000, guid: f79288b93e1e68d4f9aa05575db2b1f1, type: 3}
+    - {fileID: 21300000, guid: dd8d72848fabef24cbe49ad98e4c90a4, type: 3}
+    - {fileID: 21300000, guid: a63f2e93f5e0e344495504b267e400f5, type: 3}
+    - {fileID: 21300000, guid: 92fec5de3e020f44297c1372a1a209d5, type: 3}
+    - {fileID: 21300000, guid: 76562d4166c24664abd8c4ed84f0c9c9, type: 3}
+    - {fileID: 21300000, guid: 7cd25112b7c23484983383b4826ea364, type: 3}
+    bindAsDefault: 1
+    isAtlasV2: 0
+    cachedData: {fileID: 0}
+    packedSpriteRenderDataKeys:
+    - 76562d4166c24664abd8c4ed84f0c9c9: 21300000
+    - 7cd25112b7c23484983383b4826ea364: 21300000
+    - 95017312ebcc4c0488323363e556d21e: 21300000
+    - a63f2e93f5e0e344495504b267e400f5: 21300000
+    - 1eefa4e37f4cfa54d9991c1d4bdc7493: 21300000
+    - 70b25a74cc7214a4da978b4241a10c6e: 21300000
+    - dd8d72848fabef24cbe49ad98e4c90a4: 21300000
+    - d4fc53942dd5c8a44aa37ab237ac9cd6: 21300000
+    - 97d4b6e722b0b774091be1df1a53012f: 21300000
+    - 23505928b8bc685478ff7447b680f324: 21300000
+    - 35d927986fd652141b2d85511bacb163: 21300000
+    - f79288b93e1e68d4f9aa05575db2b1f1: 21300000
+    - e991df5d9e65bfb4fa8097c7c77e5b04: 21300000
+    - 5511948d2a0a3f5498e733385ac914fe: 21300000
+    - 92fec5de3e020f44297c1372a1a209d5: 21300000
+  m_MasterAtlas: {fileID: 0}
+  m_PackedSprites:
+  - {fileID: 21300000, guid: 76562d4166c24664abd8c4ed84f0c9c9, type: 3}
+  - {fileID: 21300000, guid: 7cd25112b7c23484983383b4826ea364, type: 3}
+  - {fileID: 21300000, guid: 95017312ebcc4c0488323363e556d21e, type: 3}
+  - {fileID: 21300000, guid: a63f2e93f5e0e344495504b267e400f5, type: 3}
+  - {fileID: 21300000, guid: 1eefa4e37f4cfa54d9991c1d4bdc7493, type: 3}
+  - {fileID: 21300000, guid: 70b25a74cc7214a4da978b4241a10c6e, type: 3}
+  - {fileID: 21300000, guid: dd8d72848fabef24cbe49ad98e4c90a4, type: 3}
+  - {fileID: 21300000, guid: d4fc53942dd5c8a44aa37ab237ac9cd6, type: 3}
+  - {fileID: 21300000, guid: 97d4b6e722b0b774091be1df1a53012f, type: 3}
+  - {fileID: 21300000, guid: 23505928b8bc685478ff7447b680f324, type: 3}
+  - {fileID: 21300000, guid: 35d927986fd652141b2d85511bacb163, type: 3}
+  - {fileID: 21300000, guid: f79288b93e1e68d4f9aa05575db2b1f1, type: 3}
+  - {fileID: 21300000, guid: e991df5d9e65bfb4fa8097c7c77e5b04, type: 3}
+  - {fileID: 21300000, guid: 5511948d2a0a3f5498e733385ac914fe, type: 3}
+  - {fileID: 21300000, guid: 92fec5de3e020f44297c1372a1a209d5, type: 3}
+  m_PackedSpriteNamesToIndex:
+  - UK_Symbol
+  - US_Symbol
+  - KW_Symbol
+  - SA_Symbol
+  - CH_Symbol
+  - DE_Symbol
+  - NE_Symbol
+  - BE_Symbol
+  - GE_Symbol
+  - IQ_Symbol
+  - IR_Symbol
+  - MJ_Symbol
+  - FR_Symbol
+  - DF_Symbol
+  - SV_Symbol
+  m_RenderDataMap: {}
+  m_Tag: National Symbols
+  m_IsVariant: 0

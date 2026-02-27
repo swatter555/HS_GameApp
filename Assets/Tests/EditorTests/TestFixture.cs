@@ -217,7 +217,7 @@ namespace HammerAndSickle.Tests
         {
             try
             {
-                Assert.IsTrue(CombatUnitDatabase.IsInitialized, "CombatUnitDatabase should be initialized");
+                Assert.IsTrue(CombatUnitDB.IsInitialized, "CombatUnitDatabase should be initialized");
                 Assert.IsTrue(WeaponProfileDB.IsInitialized, "WeaponProfileDB should be initialized");
                 Assert.IsNotNull(TestHandler, "TestHandler should be initialized");
                 Assert.IsNotNull(TestRandom, "TestRandom should be initialized");

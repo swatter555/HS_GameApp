@@ -30,27 +30,30 @@ namespace HammerAndSickle.Models
 
         #region Properties
 
-        [JsonInclude]
+        [JsonInclude] [JsonPropertyName("name")]
         public string Name { get; private set; }                             // Use random name generator
-        [JsonInclude]
+        [JsonInclude] [JsonPropertyName("side")]
         public Side Side { get; private set; }                               // Player or AI
-        [JsonInclude]
+        [JsonInclude] [JsonPropertyName("nationality")]
         public Nationality Nationality { get; private set; }                 // Nation of origin
-        [JsonInclude]
+        [JsonInclude] [JsonPropertyName("commandGrade")]
         public CommandGrade CommandGrade { get; private set; }               // Rank of the officer
-        [JsonInclude]
+        [JsonInclude] [JsonPropertyName("reputationPoints")]
         public int ReputationPoints { get; private set; }                    // Points for promotions and skill upgrades
-        [JsonInclude]
+        [JsonInclude] [JsonPropertyName("combatCommand")]
         public CommandAbility CombatCommand { get; private set; }            // Direct combat modifier
-        [JsonInclude]
+        [JsonInclude] [JsonPropertyName("isAssigned")]
         public bool IsAssigned { get; internal set; }                        // Is the officer assigned to a unit?
-        [JsonInclude]
+        [JsonInclude] [JsonPropertyName("leaderID")]
         public string LeaderID { get; private set; }                         // Unique identifier for the officer
-        [JsonInclude]
+        [JsonInclude] [JsonPropertyName("unitID")]
         public string UnitID { get; internal set; }                          // UnitID of the unit assigned to the officer
 
-        // Real-world rank of the officer
-        public string FormattedRank { get { return GetFormattedRank(); } }   
+        [JsonInclude] [JsonPropertyName("skillTreeData")]
+        public LeaderSkillTreeData SkillTreeData { get; private set; }
+
+        [JsonIgnore]
+        public string FormattedRank { get { return GetFormattedRank(); } }   // Real-world rank of the officer
 
         #endregion // Properties
 
@@ -606,6 +609,43 @@ namespace HammerAndSickle.Models
         #endregion // Unit Assignment
 
         #region Snapshot Support Methods
+
+        /// <summary>
+        /// Captures skill tree state into the serializable SkillTreeData property.
+        /// Must be called before JSON serialization.
+        /// </summary>
+        public void PrepareForSerialization()
+        {
+            try
+            {
+                SkillTreeData = skillTree?.ToSnapshot() ?? new LeaderSkillTreeData();
+            }
+            catch (Exception e)
+            {
+                AppService.HandleException(CLASS_NAME, nameof(PrepareForSerialization), e);
+                throw;
+            }
+        }
+
+        /// <summary>
+        /// Restores skill tree from the deserialized SkillTreeData property.
+        /// Must be called after JSON deserialization.
+        /// </summary>
+        public void RestoreFromDeserialization()
+        {
+            try
+            {
+                if (SkillTreeData != null)
+                {
+                    RestoreSkillTree(SkillTreeData);
+                }
+            }
+            catch (Exception e)
+            {
+                AppService.HandleException(CLASS_NAME, nameof(RestoreFromDeserialization), e);
+                throw;
+            }
+        }
 
         /// <summary>
         /// Gets the skill tree for snapshot operations (internal access)

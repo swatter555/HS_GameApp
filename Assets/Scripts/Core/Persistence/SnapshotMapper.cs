@@ -202,6 +202,7 @@ namespace HammerAndSickle.Persistence
                         {
                             var leaderData = leader.ToSnapshot();
                             var leaderCopy = LeaderSnapshotExtensions.FromSnapshot(leaderData);
+                            leaderCopy.PrepareForSerialization();
                             snapshot.Leaders[leaderCopy.LeaderID] = leaderCopy;
                         }
                         catch (Exception ex)
@@ -443,6 +444,12 @@ namespace HammerAndSickle.Persistence
                             AppService.HandleException(CLASS_NAME, METHOD_NAME,
                                 new InvalidOperationException($"Failed to register leader {leader.LeaderID}"));
                         }
+                    }
+
+                    // Restore skill trees from deserialized SkillTreeData
+                    foreach (var leader in snap.Leaders.Values)
+                    {
+                        leader?.RestoreFromDeserialization();
                     }
                 }
 

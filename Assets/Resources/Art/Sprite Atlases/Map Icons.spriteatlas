@@ -1,0 +1,89 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!687078895 &4343727234628468602
+SpriteAtlas:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_Name: Map Icons
+  m_EditorData:
+    serializedVersion: 2
+    textureSettings:
+      serializedVersion: 2
+      anisoLevel: 0
+      compressionQuality: 0
+      maxTextureSize: 0
+      textureCompression: 0
+      filterMode: 1
+      generateMipMaps: 1
+      readable: 0
+      crunchedCompression: 0
+      sRGB: 1
+    platformSettings:
+    - serializedVersion: 4
+      m_BuildTarget: DefaultTexturePlatform
+      m_MaxTextureSize: 1024
+      m_ResizeAlgorithm: 0
+      m_TextureFormat: -1
+      m_TextureCompression: 2
+      m_CompressionQuality: 50
+      m_CrunchedCompression: 0
+      m_AllowsAlphaSplitting: 0
+      m_Overridden: 0
+      m_IgnorePlatformSupport: 0
+      m_AndroidETC2FallbackOverride: 0
+      m_ForceMaximumCompressionQuality_BC6H_BC7: 0
+    packingSettings:
+      serializedVersion: 2
+      padding: 2
+      blockOffset: 0
+      allowAlphaSplitting: 0
+      enableRotation: 0
+      enableTightPacking: 0
+      enableAlphaDilation: 0
+    secondaryTextureSettings: {}
+    variantMultiplier: 1
+    packables:
+    - {fileID: 21300000, guid: b4f1e55b5407973428c0420dbc5e315c, type: 3}
+    - {fileID: 21300000, guid: 4c27aaa6f9f12d646a8419c3f024e4f7, type: 3}
+    - {fileID: 21300000, guid: ab0a5f085f542ed4dbce9f756e0a4712, type: 3}
+    - {fileID: 21300000, guid: d185166c51fff98468379eda6860bb26, type: 3}
+    - {fileID: 21300000, guid: caca6b043313f674dab432ac78ecf3a7, type: 3}
+    - {fileID: 21300000, guid: 128080279d59fca4aa64110ca31ff462, type: 3}
+    - {fileID: 21300000, guid: 59a80ae07fb3a8a4993308c44e85eb7c, type: 3}
+    - {fileID: 21300000, guid: 645668d7a95f7f94989c9ee52a1a16d6, type: 3}
+    bindAsDefault: 1
+    isAtlasV2: 0
+    cachedData: {fileID: 0}
+    packedSpriteRenderDataKeys:
+    - 59a80ae07fb3a8a4993308c44e85eb7c: 21300000
+    - caca6b043313f674dab432ac78ecf3a7: 21300000
+    - 4c27aaa6f9f12d646a8419c3f024e4f7: 21300000
+    - 128080279d59fca4aa64110ca31ff462: 21300000
+    - 645668d7a95f7f94989c9ee52a1a16d6: 21300000
+    - ab0a5f085f542ed4dbce9f756e0a4712: 21300000
+    - b4f1e55b5407973428c0420dbc5e315c: 21300000
+    - d185166c51fff98468379eda6860bb26: 21300000
+  m_MasterAtlas: {fileID: 0}
+  m_PackedSprites:
+  - {fileID: 21300000, guid: 59a80ae07fb3a8a4993308c44e85eb7c, type: 3}
+  - {fileID: 21300000, guid: caca6b043313f674dab432ac78ecf3a7, type: 3}
+  - {fileID: 21300000, guid: 4c27aaa6f9f12d646a8419c3f024e4f7, type: 3}
+  - {fileID: 21300000, guid: 128080279d59fca4aa64110ca31ff462, type: 3}
+  - {fileID: 21300000, guid: 645668d7a95f7f94989c9ee52a1a16d6, type: 3}
+  - {fileID: 21300000, guid: ab0a5f085f542ed4dbce9f756e0a4712, type: 3}
+  - {fileID: 21300000, guid: b4f1e55b5407973428c0420dbc5e315c, type: 3}
+  - {fileID: 21300000, guid: d185166c51fff98468379eda6860bb26, type: 3}
+  m_PackedSpriteNamesToIndex:
+  - ME_Nameplate
+  - ME_MajorCity
+  - GEN_Base
+  - ME_MinorCity
+  - ME_Sprawl
+  - GEN_Depot
+  - GEN_Airbase
+  - GEN_Fort
+  m_RenderDataMap: {}
+  m_Tag: Map Icons
+  m_IsVariant: 0

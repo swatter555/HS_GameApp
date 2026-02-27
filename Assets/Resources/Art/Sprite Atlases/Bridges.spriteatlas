@@ -1,0 +1,129 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!687078895 &4343727234628468602
+SpriteAtlas:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_Name: Bridges
+  m_EditorData:
+    serializedVersion: 2
+    textureSettings:
+      serializedVersion: 2
+      anisoLevel: 0
+      compressionQuality: 0
+      maxTextureSize: 0
+      textureCompression: 0
+      filterMode: 1
+      generateMipMaps: 1
+      readable: 0
+      crunchedCompression: 0
+      sRGB: 1
+    platformSettings:
+    - serializedVersion: 4
+      m_BuildTarget: DefaultTexturePlatform
+      m_MaxTextureSize: 2048
+      m_ResizeAlgorithm: 0
+      m_TextureFormat: -1
+      m_TextureCompression: 2
+      m_CompressionQuality: 50
+      m_CrunchedCompression: 0
+      m_AllowsAlphaSplitting: 0
+      m_Overridden: 0
+      m_IgnorePlatformSupport: 0
+      m_AndroidETC2FallbackOverride: 0
+      m_ForceMaximumCompressionQuality_BC6H_BC7: 0
+    packingSettings:
+      serializedVersion: 2
+      padding: 2
+      blockOffset: 0
+      allowAlphaSplitting: 0
+      enableRotation: 0
+      enableTightPacking: 0
+      enableAlphaDilation: 0
+    secondaryTextureSettings: {}
+    variantMultiplier: 1
+    packables:
+    - {fileID: 21300000, guid: 2301a0b7369178f438d75d98c5903570, type: 3}
+    - {fileID: 21300000, guid: eb75f6cdb5ee8c7409636e49e485e2d3, type: 3}
+    - {fileID: 21300000, guid: 559ccdb1d63ffed4db5e55e6cbe52625, type: 3}
+    - {fileID: 21300000, guid: 3f832a97de07bf540add281258e54a4c, type: 3}
+    - {fileID: 21300000, guid: 29c50cdd95a01e247b1705994ab90ee6, type: 3}
+    - {fileID: 21300000, guid: b9c5969cce6a4814b9eb1ba5ab7c193a, type: 3}
+    - {fileID: 21300000, guid: ffae641aaf065314d8a9fee0ba16f3d5, type: 3}
+    - {fileID: 21300000, guid: ce7a1e0e0a314744d97d82bc35141718, type: 3}
+    - {fileID: 21300000, guid: 4b3b077f1b8497d479a3d7c999d683f9, type: 3}
+    - {fileID: 21300000, guid: d161951e8ffa6fb41b7719a4fd366754, type: 3}
+    - {fileID: 21300000, guid: 48ed317a252ca5a4a8a97fdbdecf5a3b, type: 3}
+    - {fileID: 21300000, guid: ef1fe8554acfdee4bb741dc9d7827c5b, type: 3}
+    - {fileID: 21300000, guid: 3d3b6117a34f8a74eafbdd0e9049deb2, type: 3}
+    - {fileID: 21300000, guid: 441428f4d30bd5c46ae56ac1a99d1ea9, type: 3}
+    - {fileID: 21300000, guid: 401ef019d1cd7ff4a93ba0ade77e93f0, type: 3}
+    - {fileID: 21300000, guid: 2784bf0710d2b2742b678ca99b14adf4, type: 3}
+    - {fileID: 21300000, guid: 480c53b91f00352458cfda17db4669d5, type: 3}
+    - {fileID: 21300000, guid: eaf8e8910db476343817fc7acedf0bcc, type: 3}
+    bindAsDefault: 1
+    isAtlasV2: 0
+    cachedData: {fileID: 0}
+    packedSpriteRenderDataKeys:
+    - eaf8e8910db476343817fc7acedf0bcc: 21300000
+    - 559ccdb1d63ffed4db5e55e6cbe52625: 21300000
+    - 441428f4d30bd5c46ae56ac1a99d1ea9: 21300000
+    - ef1fe8554acfdee4bb741dc9d7827c5b: 21300000
+    - 2784bf0710d2b2742b678ca99b14adf4: 21300000
+    - 3d3b6117a34f8a74eafbdd0e9049deb2: 21300000
+    - 3f832a97de07bf540add281258e54a4c: 21300000
+    - 2301a0b7369178f438d75d98c5903570: 21300000
+    - 401ef019d1cd7ff4a93ba0ade77e93f0: 21300000
+    - 480c53b91f00352458cfda17db4669d5: 21300000
+    - ffae641aaf065314d8a9fee0ba16f3d5: 21300000
+    - 48ed317a252ca5a4a8a97fdbdecf5a3b: 21300000
+    - b9c5969cce6a4814b9eb1ba5ab7c193a: 21300000
+    - eb75f6cdb5ee8c7409636e49e485e2d3: 21300000
+    - 29c50cdd95a01e247b1705994ab90ee6: 21300000
+    - ce7a1e0e0a314744d97d82bc35141718: 21300000
+    - d161951e8ffa6fb41b7719a4fd366754: 21300000
+    - 4b3b077f1b8497d479a3d7c999d683f9: 21300000
+  m_MasterAtlas: {fileID: 0}
+  m_PackedSprites:
+  - {fileID: 21300000, guid: eaf8e8910db476343817fc7acedf0bcc, type: 3}
+  - {fileID: 21300000, guid: 559ccdb1d63ffed4db5e55e6cbe52625, type: 3}
+  - {fileID: 21300000, guid: 441428f4d30bd5c46ae56ac1a99d1ea9, type: 3}
+  - {fileID: 21300000, guid: ef1fe8554acfdee4bb741dc9d7827c5b, type: 3}
+  - {fileID: 21300000, guid: 2784bf0710d2b2742b678ca99b14adf4, type: 3}
+  - {fileID: 21300000, guid: 3d3b6117a34f8a74eafbdd0e9049deb2, type: 3}
+  - {fileID: 21300000, guid: 3f832a97de07bf540add281258e54a4c, type: 3}
+  - {fileID: 21300000, guid: 2301a0b7369178f438d75d98c5903570, type: 3}
+  - {fileID: 21300000, guid: 401ef019d1cd7ff4a93ba0ade77e93f0, type: 3}
+  - {fileID: 21300000, guid: 480c53b91f00352458cfda17db4669d5, type: 3}
+  - {fileID: 21300000, guid: ffae641aaf065314d8a9fee0ba16f3d5, type: 3}
+  - {fileID: 21300000, guid: 48ed317a252ca5a4a8a97fdbdecf5a3b, type: 3}
+  - {fileID: 21300000, guid: b9c5969cce6a4814b9eb1ba5ab7c193a, type: 3}
+  - {fileID: 21300000, guid: eb75f6cdb5ee8c7409636e49e485e2d3, type: 3}
+  - {fileID: 21300000, guid: 29c50cdd95a01e247b1705994ab90ee6, type: 3}
+  - {fileID: 21300000, guid: ce7a1e0e0a314744d97d82bc35141718, type: 3}
+  - {fileID: 21300000, guid: d161951e8ffa6fb41b7719a4fd366754, type: 3}
+  - {fileID: 21300000, guid: 4b3b077f1b8497d479a3d7c999d683f9, type: 3}
+  m_PackedSpriteNamesToIndex:
+  - Pont_W
+  - Bridge_NW
+  - Pont_NE
+  - DamagedBridge_W
+  - Pont_SE
+  - Pont_E
+  - Bridge_SE
+  - Bridge_E
+  - Pont_NW
+  - Pont_SW
+  - DamagedBridge_E
+  - DamagedBridge_SW
+  - Bridge_W
+  - Bridge_NE
+  - Bridge_SW
+  - DamagedBridge_NE
+  - DamagedBridge_SE
+  - DamagedBridge_NW
+  m_RenderDataMap: {}
+  m_Tag: Bridges
+  m_IsVariant: 0

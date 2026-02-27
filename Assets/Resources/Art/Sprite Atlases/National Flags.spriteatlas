@@ -1,0 +1,113 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!687078895 &4343727234628468602
+SpriteAtlas:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_Name: National Flags
+  m_EditorData:
+    serializedVersion: 2
+    textureSettings:
+      serializedVersion: 2
+      anisoLevel: 0
+      compressionQuality: 0
+      maxTextureSize: 0
+      textureCompression: 0
+      filterMode: 1
+      generateMipMaps: 1
+      readable: 0
+      crunchedCompression: 0
+      sRGB: 1
+    platformSettings:
+    - serializedVersion: 4
+      m_BuildTarget: DefaultTexturePlatform
+      m_MaxTextureSize: 2048
+      m_ResizeAlgorithm: 0
+      m_TextureFormat: -1
+      m_TextureCompression: 2
+      m_CompressionQuality: 50
+      m_CrunchedCompression: 0
+      m_AllowsAlphaSplitting: 0
+      m_Overridden: 0
+      m_IgnorePlatformSupport: 0
+      m_AndroidETC2FallbackOverride: 0
+      m_ForceMaximumCompressionQuality_BC6H_BC7: 0
+    packingSettings:
+      serializedVersion: 2
+      padding: 2
+      blockOffset: 0
+      allowAlphaSplitting: 0
+      enableRotation: 0
+      enableTightPacking: 0
+      enableAlphaDilation: 0
+    secondaryTextureSettings: {}
+    variantMultiplier: 1
+    packables:
+    - {fileID: 21300000, guid: 0cfc7b6338a083e4b8b5a1c32db92fb0, type: 3}
+    - {fileID: 21300000, guid: 9b8d41b906a3be44ea91d0221a8e6c17, type: 3}
+    - {fileID: 21300000, guid: abed09fe7d112584abd9f31650e90b9c, type: 3}
+    - {fileID: 21300000, guid: 822dd33c806ba8f41938403885c2e470, type: 3}
+    - {fileID: 21300000, guid: 715864c6014f67441ac77f1221cd478e, type: 3}
+    - {fileID: 21300000, guid: 0ef4ec65e3fb5fc4aaae77531363d1a0, type: 3}
+    - {fileID: 21300000, guid: 287fb4b6ba3231e448f087d63d2afcd0, type: 3}
+    - {fileID: 21300000, guid: 791a77f5f37d8fb48ae3ed3b85d91727, type: 3}
+    - {fileID: 21300000, guid: 8e09b243b0e2c0f4e943d53cb1a728f4, type: 3}
+    - {fileID: 21300000, guid: dac6ac1111810e74d866f3740ad19244, type: 3}
+    - {fileID: 21300000, guid: c198443fafad546429bb4506a769034e, type: 3}
+    - {fileID: 21300000, guid: eafe6a6af929c3042b0659703471869d, type: 3}
+    - {fileID: 21300000, guid: 639b7739bc847aa4ba4f33d971e94a3a, type: 3}
+    - {fileID: 21300000, guid: b1eb81e140f2c9c4697bc0b76f4c0582, type: 3}
+    bindAsDefault: 1
+    isAtlasV2: 0
+    cachedData: {fileID: 0}
+    packedSpriteRenderDataKeys:
+    - dac6ac1111810e74d866f3740ad19244: 21300000
+    - b1eb81e140f2c9c4697bc0b76f4c0582: 21300000
+    - 8e09b243b0e2c0f4e943d53cb1a728f4: 21300000
+    - 0cfc7b6338a083e4b8b5a1c32db92fb0: 21300000
+    - 0ef4ec65e3fb5fc4aaae77531363d1a0: 21300000
+    - 791a77f5f37d8fb48ae3ed3b85d91727: 21300000
+    - 287fb4b6ba3231e448f087d63d2afcd0: 21300000
+    - 715864c6014f67441ac77f1221cd478e: 21300000
+    - 639b7739bc847aa4ba4f33d971e94a3a: 21300000
+    - 9b8d41b906a3be44ea91d0221a8e6c17: 21300000
+    - eafe6a6af929c3042b0659703471869d: 21300000
+    - 822dd33c806ba8f41938403885c2e470: 21300000
+    - abed09fe7d112584abd9f31650e90b9c: 21300000
+    - c198443fafad546429bb4506a769034e: 21300000
+  m_MasterAtlas: {fileID: 0}
+  m_PackedSprites:
+  - {fileID: 21300000, guid: dac6ac1111810e74d866f3740ad19244, type: 3}
+  - {fileID: 21300000, guid: b1eb81e140f2c9c4697bc0b76f4c0582, type: 3}
+  - {fileID: 21300000, guid: 8e09b243b0e2c0f4e943d53cb1a728f4, type: 3}
+  - {fileID: 21300000, guid: 0cfc7b6338a083e4b8b5a1c32db92fb0, type: 3}
+  - {fileID: 21300000, guid: 0ef4ec65e3fb5fc4aaae77531363d1a0, type: 3}
+  - {fileID: 21300000, guid: 791a77f5f37d8fb48ae3ed3b85d91727, type: 3}
+  - {fileID: 21300000, guid: 287fb4b6ba3231e448f087d63d2afcd0, type: 3}
+  - {fileID: 21300000, guid: 715864c6014f67441ac77f1221cd478e, type: 3}
+  - {fileID: 21300000, guid: 639b7739bc847aa4ba4f33d971e94a3a, type: 3}
+  - {fileID: 21300000, guid: 9b8d41b906a3be44ea91d0221a8e6c17, type: 3}
+  - {fileID: 21300000, guid: eafe6a6af929c3042b0659703471869d, type: 3}
+  - {fileID: 21300000, guid: 822dd33c806ba8f41938403885c2e470, type: 3}
+  - {fileID: 21300000, guid: abed09fe7d112584abd9f31650e90b9c, type: 3}
+  - {fileID: 21300000, guid: c198443fafad546429bb4506a769034e, type: 3}
+  m_PackedSpriteNamesToIndex:
+  - Flag_NE
+  - Flag_US
+  - Flag_MJ
+  - Flag_BE
+  - Flag_Iran
+  - Flag_Kuwait
+  - Flag_Iraq
+  - Flag_GE
+  - Flag_UK
+  - Flag_China
+  - Flag_SV
+  - Flag_FR
+  - Flag_DE
+  - Flag_Saudi
+  m_RenderDataMap: {}
+  m_Tag: National Flags
+  m_IsVariant: 0
