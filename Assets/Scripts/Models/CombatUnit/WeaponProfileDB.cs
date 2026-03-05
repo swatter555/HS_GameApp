@@ -50,7 +50,7 @@
 //   Call WeaponProfileDB.InitializeRegimentProfile() at startup.
 //   Retrieve profiles via WeaponProfileDB.GetWeaponProfile(WeaponType.TANK_T55A_SV).
 //
-// SIZE: ~10,048 lines | 173 weapon profiles | ~653 KB
+// SIZE: ~10,048 lines
 //
 // To AI Agents: only read beyond this block unless explicitly told to do so.
 // =============================================================================
@@ -70,8 +70,8 @@ namespace HammerAndSickle.Models
         private const string CLASS_NAME = nameof(WeaponProfileDB);
 
         // Centralized place for combat rating modifiers
-        private const int MASSIVE_MALUS = -10;
-        private const int XXLARGE_MALUS = -5;
+        //private const int MASSIVE_MALUS = -10;
+        //private const int XXLARGE_MALUS = -5;
         private const int XLARGE_MALUS = -4;
         private const int LARGE_MALUS = -3;
         private const int MEDIUM_MALUS = -2;
@@ -82,7 +82,7 @@ namespace HammerAndSickle.Models
         private const int XLARGE_BONUS = 4;
         private const int XXLARGE_BONUS = 5;
         private const int XXXLARGE_BONUS = 6;
-        private const int MASSIVE_BONUS = 10;
+        //private const int MASSIVE_BONUS = 10;
 
         #endregion // Constants
 
@@ -309,10 +309,12 @@ namespace HammerAndSickle.Models
             T55A.AddIntelReportStat(WeaponType.MANPAD_STRELA,    12);
 
             // Handle the icon profile.
-            T55A.IconProfile = new RegimentIconProfile(RegimentIconType.Directional);
-            T55A.IconProfile.W = SpriteManager.SV_T55A_W;
-            T55A.IconProfile.NW = SpriteManager.SV_T55A_NW;
-            T55A.IconProfile.SW = SpriteManager.SV_T55A_SW;
+            T55A.IconProfile = new RegimentIconProfile(RegimentIconType.Directional)
+            {
+                W = SpriteManager.SV_T55A_W,
+                NW = SpriteManager.SV_T55A_NW,
+                SW = SpriteManager.SV_T55A_SW
+            };
 
 
             // Add the T-55A profile to the database
@@ -375,10 +377,12 @@ namespace HammerAndSickle.Models
             T62A.AddIntelReportStat(WeaponType.MANPAD_STRELA,       12);
 
             // Handle the icon profile.
-            T62A.IconProfile = new RegimentIconProfile(RegimentIconType.Directional);
-            T62A.IconProfile.W = SpriteManager.SV_T62_W;
-            T62A.IconProfile.NW = SpriteManager.SV_T62_NW;
-            T62A.IconProfile.SW = SpriteManager.SV_T62_SW;
+            T62A.IconProfile = new RegimentIconProfile(RegimentIconType.Directional)
+            {
+                W = SpriteManager.SV_T62_W,
+                NW = SpriteManager.SV_T62_NW,
+                SW = SpriteManager.SV_T62_SW
+            };
 
             // Add the T-62A profile to the database
             AddProfile(WeaponType.TANK_T62A_SV, T62A);
@@ -440,10 +444,12 @@ namespace HammerAndSickle.Models
             T64A.AddIntelReportStat(WeaponType.MANPAD_STRELA,       12);
 
             // Handle the icon profile.
-            T64A.IconProfile = new RegimentIconProfile(RegimentIconType.Directional);
-            T64A.IconProfile.W = SpriteManager.SV_T64A_W;
-            T64A.IconProfile.NW = SpriteManager.SV_T64A_NW;
-            T64A.IconProfile.SW = SpriteManager.SV_T64A_SW;
+            T64A.IconProfile = new RegimentIconProfile(RegimentIconType.Directional)
+            {
+                W = SpriteManager.SV_T64A_W,
+                NW = SpriteManager.SV_T64A_NW,
+                SW = SpriteManager.SV_T64A_SW
+            };
 
             // Add the T-64A profile to the database
             AddProfile(WeaponType.TANK_T64A_SV, T64A);
@@ -505,10 +511,12 @@ namespace HammerAndSickle.Models
             T64B.AddIntelReportStat(WeaponType.MANPAD_STRELA,       12);
 
             // Handle the icon profile.
-            T64B.IconProfile = new RegimentIconProfile(RegimentIconType.Directional);
-            T64B.IconProfile.W = SpriteManager.SV_T64B_W;
-            T64B.IconProfile.NW = SpriteManager.SV_T64B_NW;
-            T64B.IconProfile.SW = SpriteManager.SV_T64B_SW;
+            T64B.IconProfile = new RegimentIconProfile(RegimentIconType.Directional)
+            {
+                W = SpriteManager.SV_T64B_W,
+                NW = SpriteManager.SV_T64B_NW,
+                SW = SpriteManager.SV_T64B_SW
+            };
 
             // Add the T-64B profile to the database
             AddProfile(WeaponType.TANK_T64B_SV, T64B);
@@ -570,10 +578,12 @@ namespace HammerAndSickle.Models
             T72A.AddIntelReportStat(WeaponType.MANPAD_STRELA,       12);
 
             // Handle the icon profile.
-            T72A.IconProfile = new RegimentIconProfile(RegimentIconType.Directional);
-            T72A.IconProfile.W = SpriteManager.SV_T72A_W;
-            T72A.IconProfile.NW = SpriteManager.SV_T72A_NW;
-            T72A.IconProfile.SW = SpriteManager.SV_T72A_SW;
+            T72A.IconProfile = new RegimentIconProfile(RegimentIconType.Directional)
+            {
+                W = SpriteManager.SV_T72A_W,
+                NW = SpriteManager.SV_T72A_NW,
+                SW = SpriteManager.SV_T72A_SW
+            };
 
             // Add the T-72A profile to the database
             AddProfile(WeaponType.TANK_T72A_SV, T72A);
@@ -635,10 +645,12 @@ namespace HammerAndSickle.Models
             T72B.AddIntelReportStat(WeaponType.MANPAD_STRELA,       12);
 
             // Handle the icon profile.
-            T72B.IconProfile = new RegimentIconProfile(RegimentIconType.Directional);
-            T72B.IconProfile.W = SpriteManager.SV_T72B_W;
-            T72B.IconProfile.NW = SpriteManager.SV_T72B_NW;
-            T72B.IconProfile.SW = SpriteManager.SV_T72B_SW;
+            T72B.IconProfile = new RegimentIconProfile(RegimentIconType.Directional)
+            {
+                W = SpriteManager.SV_T72B_W,
+                NW = SpriteManager.SV_T72B_NW,
+                SW = SpriteManager.SV_T72B_SW
+            };
 
             // Add the T-72B profile to the database
             AddProfile(WeaponType.TANK_T72B_SV, T72B);
@@ -700,10 +712,12 @@ namespace HammerAndSickle.Models
             T80B.AddIntelReportStat(WeaponType.MANPAD_STRELA,       12);
 
             // Handle the icon profile.
-            T80B.IconProfile = new RegimentIconProfile(RegimentIconType.Directional);
-            T80B.IconProfile.W = SpriteManager.SV_T80B_W;
-            T80B.IconProfile.NW = SpriteManager.SV_T80B_NW;
-            T80B.IconProfile.SW = SpriteManager.SV_T80B_SW;
+            T80B.IconProfile = new RegimentIconProfile(RegimentIconType.Directional)
+            {
+                W = SpriteManager.SV_T80B_W,
+                NW = SpriteManager.SV_T80B_NW,
+                SW = SpriteManager.SV_T80B_SW
+            };
 
             // Add the T-80B profile to the database
             AddProfile(WeaponType.TANK_T80B_SV, T80B);
@@ -765,10 +779,12 @@ namespace HammerAndSickle.Models
             T80U.AddIntelReportStat(WeaponType.MANPAD_STRELA,       12);
 
             // Handle the icon profile.
-            T80U.IconProfile = new RegimentIconProfile(RegimentIconType.Directional);
-            T80U.IconProfile.W = SpriteManager.SV_T80U_W;
-            T80U.IconProfile.NW = SpriteManager.SV_T80U_NW;
-            T80U.IconProfile.SW = SpriteManager.SV_T80U_SW;
+            T80U.IconProfile = new RegimentIconProfile(RegimentIconType.Directional)
+            {
+                W = SpriteManager.SV_T80U_W,
+                NW = SpriteManager.SV_T80U_NW,
+                SW = SpriteManager.SV_T80U_SW
+            };
 
             // Add the T-80U profile to the database
             AddProfile(WeaponType.TANK_T80U_SV, T80U);
@@ -830,10 +846,12 @@ namespace HammerAndSickle.Models
             T80BV.AddIntelReportStat(WeaponType.MANPAD_STRELA,       12);
 
             // Handle the icon profile.
-            T80BV.IconProfile = new RegimentIconProfile(RegimentIconType.Directional);
-            T80BV.IconProfile.W = SpriteManager.SV_T80BVM_W;
-            T80BV.IconProfile.NW = SpriteManager.SV_T80BVM_NW;
-            T80BV.IconProfile.SW = SpriteManager.SV_T80BVM_SW;
+            T80BV.IconProfile = new RegimentIconProfile(RegimentIconType.Directional)
+            {
+                W = SpriteManager.SV_T80BVM_W,
+                NW = SpriteManager.SV_T80BVM_NW,
+                SW = SpriteManager.SV_T80BVM_SW
+            };
 
             // Add the T-80BV profile to the database
             AddProfile(WeaponType.TANK_T80BV_SV, T80BV);
@@ -891,10 +909,12 @@ namespace HammerAndSickle.Models
             BMP1.AddIntelReportStat(WeaponType.RCN_BRDM2_SV,     12);
 
             // Handle the icon profile.
-            BMP1.IconProfile = new RegimentIconProfile(RegimentIconType.Directional);
-            BMP1.IconProfile.W = SpriteManager.SV_BMP1_W;
-            BMP1.IconProfile.NW = SpriteManager.SV_BMP1_NW;
-            BMP1.IconProfile.SW = SpriteManager.SV_BMP1_SW;
+            BMP1.IconProfile = new RegimentIconProfile(RegimentIconType.Directional)
+            {
+                W = SpriteManager.SV_BMP1_W,
+                NW = SpriteManager.SV_BMP1_NW,
+                SW = SpriteManager.SV_BMP1_SW
+            };
 
             // Add the BMP-1P profile to the database
             AddProfile(WeaponType.IFV_BMP1_SV, BMP1);
@@ -948,10 +968,12 @@ namespace HammerAndSickle.Models
             BMP2.AddIntelReportStat(WeaponType.RCN_BRDM2_SV,     12);
 
             // Handle the icon profile.
-            BMP2.IconProfile = new RegimentIconProfile(RegimentIconType.Directional);
-            BMP2.IconProfile.W = SpriteManager.SV_BMP2_W;
-            BMP2.IconProfile.NW = SpriteManager.SV_BMP2_NW;
-            BMP2.IconProfile.SW = SpriteManager.SV_BMP2_SW;
+            BMP2.IconProfile = new RegimentIconProfile(RegimentIconType.Directional)
+            {
+                W = SpriteManager.SV_BMP2_W,
+                NW = SpriteManager.SV_BMP2_NW,
+                SW = SpriteManager.SV_BMP2_SW
+            };
 
             // Add the BMP-2 profile to the database
             AddProfile(WeaponType.IFV_BMP2_SV, BMP2);
@@ -1005,10 +1027,12 @@ namespace HammerAndSickle.Models
             BMP3.AddIntelReportStat(WeaponType.RCN_BRDM2_SV,     12);
 
             // Handle the icon profile.
-            BMP3.IconProfile = new RegimentIconProfile(RegimentIconType.Directional);
-            BMP3.IconProfile.W = SpriteManager.SV_BMP3_W;
-            BMP3.IconProfile.NW = SpriteManager.SV_BMP3_NW;
-            BMP3.IconProfile.SW = SpriteManager.SV_BMP3_SW;
+            BMP3.IconProfile = new RegimentIconProfile(RegimentIconType.Directional)
+            {
+                W = SpriteManager.SV_BMP3_W,
+                NW = SpriteManager.SV_BMP3_NW,
+                SW = SpriteManager.SV_BMP3_SW
+            };
 
             // Add the BMP-3 profile to the database
             AddProfile(WeaponType.IFV_BMP3_SV, BMP3);
@@ -1061,10 +1085,12 @@ namespace HammerAndSickle.Models
             BMD2.AddIntelReportStat(WeaponType.RCN_BRDM2_SV,     13);
 
             // Handle the icon profile.
-            BMD2.IconProfile = new RegimentIconProfile(RegimentIconType.Directional);
-            BMD2.IconProfile.W = SpriteManager.SV_BMD2_W;
-            BMD2.IconProfile.NW = SpriteManager.SV_BMD2_NW;
-            BMD2.IconProfile.SW = SpriteManager.SV_BMD2_SW;
+            BMD2.IconProfile = new RegimentIconProfile(RegimentIconType.Directional)
+            {
+                W = SpriteManager.SV_BMD2_W,
+                NW = SpriteManager.SV_BMD2_NW,
+                SW = SpriteManager.SV_BMD2_SW
+            };
 
             // Add the BMD-2 profile to the database
             AddProfile(WeaponType.IFV_BMD2_SV, BMD2);
@@ -1117,10 +1143,12 @@ namespace HammerAndSickle.Models
             BMD3.AddIntelReportStat(WeaponType.RCN_BRDM2_SV,     13);
 
             // Handle the icon profile.
-            BMD3.IconProfile = new RegimentIconProfile(RegimentIconType.Directional);
-            BMD3.IconProfile.W = SpriteManager.SV_BMD3_W;
-            BMD3.IconProfile.NW = SpriteManager.SV_BMD3_NW;
-            BMD3.IconProfile.SW = SpriteManager.SV_BMD3_SW;
+            BMD3.IconProfile = new RegimentIconProfile(RegimentIconType.Directional)
+            {
+                W = SpriteManager.SV_BMD3_W,
+                NW = SpriteManager.SV_BMD3_NW,
+                SW = SpriteManager.SV_BMD3_SW
+            };
 
             // Add the BMD-3 profile to the database
             AddProfile(WeaponType.IFV_BMD3_SV, BMD3);
@@ -1173,10 +1201,12 @@ namespace HammerAndSickle.Models
             MTLB.AddIntelReportStat(WeaponType.RCN_BRDM2_SV,     13);
 
             // Handle the icon profile.
-            MTLB.IconProfile = new RegimentIconProfile(RegimentIconType.Directional);
-            MTLB.IconProfile.W = SpriteManager.SV_MTLB_W;
-            MTLB.IconProfile.NW = SpriteManager.SV_MTLB_NW;
-            MTLB.IconProfile.SW = SpriteManager.SV_MTLB_SW;
+            MTLB.IconProfile = new RegimentIconProfile(RegimentIconType.Directional)
+            {
+                W = SpriteManager.SV_MTLB_W,
+                NW = SpriteManager.SV_MTLB_NW,
+                SW = SpriteManager.SV_MTLB_SW
+            };
 
             // Add the MT-LB profile to the database
             AddProfile(WeaponType.APC_MTLB_SV, MTLB);
@@ -1230,10 +1260,12 @@ namespace HammerAndSickle.Models
             BTR70.AddIntelReportStat(WeaponType.RCN_BRDM2_SV,     12);
 
             // Handle the icon profile.
-            BTR70.IconProfile = new RegimentIconProfile(RegimentIconType.Directional);
-            BTR70.IconProfile.W = SpriteManager.SV_BTR70_W;
-            BTR70.IconProfile.NW = SpriteManager.SV_BTR70_NW;
-            BTR70.IconProfile.SW = SpriteManager.SV_BTR70_SW;
+            BTR70.IconProfile = new RegimentIconProfile(RegimentIconType.Directional)
+            {
+                W = SpriteManager.SV_BTR70_W,
+                NW = SpriteManager.SV_BTR70_NW,
+                SW = SpriteManager.SV_BTR70_SW
+            };
 
             // Add the BTR-70 profile to the database
             AddProfile(WeaponType.APC_BTR70_SV, BTR70);
@@ -1287,10 +1319,12 @@ namespace HammerAndSickle.Models
             BTR80.AddIntelReportStat(WeaponType.RCN_BRDM2_SV,     12);
 
             // Handle the icon profile.
-            BTR80.IconProfile = new RegimentIconProfile(RegimentIconType.Directional);
-            BTR80.IconProfile.W = SpriteManager.SV_BTR80_W;
-            BTR80.IconProfile.NW = SpriteManager.SV_BTR80_NW;
-            BTR80.IconProfile.SW = SpriteManager.SV_BTR80_SW;
+            BTR80.IconProfile = new RegimentIconProfile(RegimentIconType.Directional)
+            {
+                W = SpriteManager.SV_BTR80_W,
+                NW = SpriteManager.SV_BTR80_NW,
+                SW = SpriteManager.SV_BTR80_SW
+            };
 
             // Add the BTR-80 profile to the database
             AddProfile(WeaponType.APC_BTR80_SV, BTR80);
@@ -1354,10 +1388,12 @@ namespace HammerAndSickle.Models
             BRDM2.AddIntelReportStat(WeaponType.AT_ATGM,          24);
             BRDM2.AddIntelReportStat(WeaponType.MANPAD_STRELA,       12);
             // Handle the icon profile.
-            BRDM2.IconProfile = new RegimentIconProfile(RegimentIconType.Directional);
-            BRDM2.IconProfile.W = SpriteManager.SV_BRDM2_W;
-            BRDM2.IconProfile.NW = SpriteManager.SV_BRDM2_NW;
-            BRDM2.IconProfile.SW = SpriteManager.SV_BRDM2_SW;
+            BRDM2.IconProfile = new RegimentIconProfile(RegimentIconType.Directional)
+            {
+                W = SpriteManager.SV_BRDM2_W,
+                NW = SpriteManager.SV_BRDM2_NW,
+                SW = SpriteManager.SV_BRDM2_SW
+            };
 
             // Add the BRDM-2 profile to the database
             AddProfile(WeaponType.RCN_BRDM2_SV, BRDM2);
@@ -1418,10 +1454,12 @@ namespace HammerAndSickle.Models
             BRDM2AT.AddIntelReportStat(WeaponType.MANPAD_STRELA, 12);
 
             // Handle the icon profile.
-            BRDM2AT.IconProfile = new RegimentIconProfile(RegimentIconType.Directional);
-            BRDM2AT.IconProfile.W = SpriteManager.SV_BRDM2AT_W;
-            BRDM2AT.IconProfile.NW = SpriteManager.SV_BRDM2AT_NW;
-            BRDM2AT.IconProfile.SW = SpriteManager.SV_BRDM2AT_SW;
+            BRDM2AT.IconProfile = new RegimentIconProfile(RegimentIconType.Directional)
+            {
+                W = SpriteManager.SV_BRDM2AT_W,
+                NW = SpriteManager.SV_BRDM2AT_NW,
+                SW = SpriteManager.SV_BRDM2AT_SW
+            };
 
             // Add the BRDM-2 AT profile to the database
             AddProfile(WeaponType.RCN_BRDM2AT_SV, BRDM2AT);
@@ -1480,13 +1518,15 @@ namespace HammerAndSickle.Models
             SPA2S1.AddIntelReportStat(WeaponType.MANPAD_STRELA,       21);
 
             // Handle the icon profile.
-            SPA2S1.IconProfile = new RegimentIconProfile(RegimentIconType.Directional_Fire);
-            SPA2S1.IconProfile.W = SpriteManager.SV_2S1_W;
-            SPA2S1.IconProfile.NW = SpriteManager.SV_2S1_NW;
-            SPA2S1.IconProfile.SW = SpriteManager.SV_2S1_SW;
-            SPA2S1.IconProfile.W_F = SpriteManager.SV_2S1_W_F;
-            SPA2S1.IconProfile.NW_F = SpriteManager.SV_2S1_NW_F;
-            SPA2S1.IconProfile.SW_F = SpriteManager.SV_2S1_SW_F;
+            SPA2S1.IconProfile = new RegimentIconProfile(RegimentIconType.Directional_Fire)
+            {
+                W = SpriteManager.SV_2S1_W,
+                NW = SpriteManager.SV_2S1_NW,
+                SW = SpriteManager.SV_2S1_SW,
+                W_F = SpriteManager.SV_2S1_W_F,
+                NW_F = SpriteManager.SV_2S1_NW_F,
+                SW_F = SpriteManager.SV_2S1_SW_F
+            };
 
             // Add the 2S1 profile to the database
             AddProfile(WeaponType.SPA_2S1_SV, SPA2S1);
@@ -1541,13 +1581,15 @@ namespace HammerAndSickle.Models
             SPA2S3.AddIntelReportStat(WeaponType.MANPAD_STRELA,       21);
 
             // Handle the icon profile.
-            SPA2S3.IconProfile = new RegimentIconProfile(RegimentIconType.Directional_Fire);
-            SPA2S3.IconProfile.W = SpriteManager.SV_2S3_W;
-            SPA2S3.IconProfile.NW = SpriteManager.SV_2S3_NW;
-            SPA2S3.IconProfile.SW = SpriteManager.SV_2S3_SW;
-            SPA2S3.IconProfile.W_F = SpriteManager.SV_2S3_W_F;
-            SPA2S3.IconProfile.NW_F = SpriteManager.SV_2S3_NW_F;
-            SPA2S3.IconProfile.SW_F = SpriteManager.SV_2S3_SW_F;
+            SPA2S3.IconProfile = new RegimentIconProfile(RegimentIconType.Directional_Fire)
+            {
+                W = SpriteManager.SV_2S3_W,
+                NW = SpriteManager.SV_2S3_NW,
+                SW = SpriteManager.SV_2S3_SW,
+                W_F = SpriteManager.SV_2S3_W_F,
+                NW_F = SpriteManager.SV_2S3_NW_F,
+                SW_F = SpriteManager.SV_2S3_SW_F
+            };
 
             // Add the 2S3 profile to the database
             AddProfile(WeaponType.SPA_2S3_SV, SPA2S3);
@@ -1602,13 +1644,15 @@ namespace HammerAndSickle.Models
             SPA2S5.AddIntelReportStat(WeaponType.MANPAD_STRELA,       21);
 
             // Handle the icon profile.
-            SPA2S5.IconProfile = new RegimentIconProfile(RegimentIconType.Directional_Fire);
-            SPA2S5.IconProfile.W = SpriteManager.SV_2S5_W;
-            SPA2S5.IconProfile.NW = SpriteManager.SV_2S5_NW;
-            SPA2S5.IconProfile.SW = SpriteManager.SV_2S5_SW;
-            SPA2S5.IconProfile.W_F = SpriteManager.SV_2S5_W_F;
-            SPA2S5.IconProfile.NW_F = SpriteManager.SV_2S5_NW_F;
-            SPA2S5.IconProfile.SW_F = SpriteManager.SV_2S5_SW_F;
+            SPA2S5.IconProfile = new RegimentIconProfile(RegimentIconType.Directional_Fire)
+            {
+                W = SpriteManager.SV_2S5_W,
+                NW = SpriteManager.SV_2S5_NW,
+                SW = SpriteManager.SV_2S5_SW,
+                W_F = SpriteManager.SV_2S5_W_F,
+                NW_F = SpriteManager.SV_2S5_NW_F,
+                SW_F = SpriteManager.SV_2S5_SW_F
+            };
 
             // Add the 2S5 profile to the database
             AddProfile(WeaponType.SPA_2S5_SV, SPA2S5);
@@ -1663,13 +1707,15 @@ namespace HammerAndSickle.Models
             SPA2S19.AddIntelReportStat(WeaponType.MANPAD_STRELA,      21);
 
             // Handle the icon profile.
-            SPA2S19.IconProfile = new RegimentIconProfile(RegimentIconType.Directional_Fire);
-            SPA2S19.IconProfile.W = SpriteManager.SV_2S19_W;
-            SPA2S19.IconProfile.NW = SpriteManager.SV_2S19_NW;
-            SPA2S19.IconProfile.SW = SpriteManager.SV_2S19_SW;
-            SPA2S19.IconProfile.W_F = SpriteManager.SV_2S19_W_F;
-            SPA2S19.IconProfile.NW_F = SpriteManager.SV_2S19_NW_F;
-            SPA2S19.IconProfile.SW_F = SpriteManager.SV_2S19_SW_F;
+            SPA2S19.IconProfile = new RegimentIconProfile(RegimentIconType.Directional_Fire)
+            {
+                W = SpriteManager.SV_2S19_W,
+                NW = SpriteManager.SV_2S19_NW,
+                SW = SpriteManager.SV_2S19_SW,
+                W_F = SpriteManager.SV_2S19_W_F,
+                NW_F = SpriteManager.SV_2S19_NW_F,
+                SW_F = SpriteManager.SV_2S19_SW_F
+            };
 
             // Add the 2S19 profile to the database
             AddProfile(WeaponType.SPA_2S19_SV, SPA2S19);
@@ -1728,8 +1774,10 @@ namespace HammerAndSickle.Models
             ArtLight.AddIntelReportStat(WeaponType.MANPAD_STRELA,       21);
 
             // Handle the icon profile.
-            ArtLight.IconProfile = new RegimentIconProfile(RegimentIconType.Single);
-            ArtLight.IconProfile.W = SpriteManager.SV_LightArt;
+            ArtLight.IconProfile = new RegimentIconProfile(RegimentIconType.Single)
+            {
+                W = SpriteManager.SV_LightArt
+            };
 
             // Add the Light Artillery profile to the database
             AddProfile(WeaponType.ART_LIGHT_SV, ArtLight);
@@ -1784,8 +1832,10 @@ namespace HammerAndSickle.Models
             ArtHeavy.AddIntelReportStat(WeaponType.MANPAD_STRELA,       21);
 
             // Handle the icon profile.
-            ArtHeavy.IconProfile = new RegimentIconProfile(RegimentIconType.Single);
-            ArtHeavy.IconProfile.W = SpriteManager.SV_HeavyArt;
+            ArtHeavy.IconProfile = new RegimentIconProfile(RegimentIconType.Single)
+            {
+                W = SpriteManager.SV_HeavyArt
+            };
 
             // Add the Heavy Artillery profile to the database
             AddProfile(WeaponType.ART_HEAVY_SV, ArtHeavy);
@@ -1844,13 +1894,15 @@ namespace HammerAndSickle.Models
             BM21.AddIntelReportStat(WeaponType.MANPAD_STRELA,       21);
 
             // Handle the icon profile.
-            BM21.IconProfile = new RegimentIconProfile(RegimentIconType.Directional_Fire);
-            BM21.IconProfile.W = SpriteManager.SV_BM21_W;
-            BM21.IconProfile.NW = SpriteManager.SV_BM21_NW;
-            BM21.IconProfile.SW = SpriteManager.SV_BM21_SW;
-            BM21.IconProfile.W_F = SpriteManager.SV_BM21_W_F;
-            BM21.IconProfile.NW_F = SpriteManager.SV_BM21_NW_F;
-            BM21.IconProfile.SW_F = SpriteManager.SV_BM21_SW_F;
+            BM21.IconProfile = new RegimentIconProfile(RegimentIconType.Directional_Fire)
+            {
+                W = SpriteManager.SV_BM21_W,
+                NW = SpriteManager.SV_BM21_NW,
+                SW = SpriteManager.SV_BM21_SW,
+                W_F = SpriteManager.SV_BM21_W_F,
+                NW_F = SpriteManager.SV_BM21_NW_F,
+                SW_F = SpriteManager.SV_BM21_SW_F
+            };
 
             // Add the BM-21 profile to the database
             AddProfile(WeaponType.ROC_BM21_SV, BM21);
@@ -1905,13 +1957,15 @@ namespace HammerAndSickle.Models
             BM27.AddIntelReportStat(WeaponType.MANPAD_STRELA,       21);
 
             // Handle the icon profile.
-            BM27.IconProfile = new RegimentIconProfile(RegimentIconType.Directional_Fire);
-            BM27.IconProfile.W = SpriteManager.SV_BM27_W;
-            BM27.IconProfile.NW = SpriteManager.SV_BM27_NW;
-            BM27.IconProfile.SW = SpriteManager.SV_BM27_SW;
-            BM27.IconProfile.W_F = SpriteManager.SV_BM27_W_F;
-            BM27.IconProfile.NW_F = SpriteManager.SV_BM27_NW_F;
-            BM27.IconProfile.SW_F = SpriteManager.SV_BM27_SW_F;
+            BM27.IconProfile = new RegimentIconProfile(RegimentIconType.Directional_Fire)
+            {
+                W = SpriteManager.SV_BM27_W,
+                NW = SpriteManager.SV_BM27_NW,
+                SW = SpriteManager.SV_BM27_SW,
+                W_F = SpriteManager.SV_BM27_W_F,
+                NW_F = SpriteManager.SV_BM27_NW_F,
+                SW_F = SpriteManager.SV_BM27_SW_F
+            };
 
             // Add the BM-27 profile to the database
             AddProfile(WeaponType.ROC_BM27_SV, BM27);
@@ -1966,13 +2020,15 @@ namespace HammerAndSickle.Models
             BM30.AddIntelReportStat(WeaponType.MANPAD_STRELA,       21);
 
             // Handle the icon profile.
-            BM30.IconProfile = new RegimentIconProfile(RegimentIconType.Directional_Fire);
-            BM30.IconProfile.W = SpriteManager.SV_BM30_W;
-            BM30.IconProfile.NW = SpriteManager.SV_BM30_NW;
-            BM30.IconProfile.SW = SpriteManager.SV_BM30_SW;
-            BM30.IconProfile.W_F = SpriteManager.SV_BM30_W_F;
-            BM30.IconProfile.NW_F = SpriteManager.SV_BM30_NW_F;
-            BM30.IconProfile.SW_F = SpriteManager.SV_BM30_SW_F;
+            BM30.IconProfile = new RegimentIconProfile(RegimentIconType.Directional_Fire)
+            {
+                W = SpriteManager.SV_BM30_W,
+                NW = SpriteManager.SV_BM30_NW,
+                SW = SpriteManager.SV_BM30_SW,
+                W_F = SpriteManager.SV_BM30_W_F,
+                NW_F = SpriteManager.SV_BM30_NW_F,
+                SW_F = SpriteManager.SV_BM30_SW_F
+            };
 
             // Add the BM-30 profile to the database
             AddProfile(WeaponType.ROC_BM30_SV, BM30);
@@ -2027,13 +2083,15 @@ namespace HammerAndSickle.Models
             SCUD.AddIntelReportStat(WeaponType.MANPAD_STRELA,      21);
 
             // Handle the icon profile.
-            SCUD.IconProfile = new RegimentIconProfile(RegimentIconType.Directional_Fire);
-            SCUD.IconProfile.W = SpriteManager.SV_ScudB_W;
-            SCUD.IconProfile.NW = SpriteManager.SV_ScudB_NW;
-            SCUD.IconProfile.SW = SpriteManager.SV_ScudB_SW;
-            SCUD.IconProfile.W_F = SpriteManager.SV_ScudB_W_F;
-            SCUD.IconProfile.NW_F = SpriteManager.SV_ScudB_NW_F;
-            SCUD.IconProfile.SW_F = SpriteManager.SV_ScudB_SW_F;
+            SCUD.IconProfile = new RegimentIconProfile(RegimentIconType.Directional_Fire)
+            {
+                W = SpriteManager.SV_ScudB_W,
+                NW = SpriteManager.SV_ScudB_NW,
+                SW = SpriteManager.SV_ScudB_SW,
+                W_F = SpriteManager.SV_ScudB_W_F,
+                NW_F = SpriteManager.SV_ScudB_NW_F,
+                SW_F = SpriteManager.SV_ScudB_SW_F
+            };
 
             // Add the Scud-B profile to the database
             AddProfile(WeaponType.ROC_SCUD_SV, SCUD);
@@ -2091,13 +2149,15 @@ namespace HammerAndSickle.Models
             ZSU57.AddIntelReportStat(WeaponType.APC_BTR70_SV,      22);
 
             // Handle the icon profile.
-            ZSU57.IconProfile = new RegimentIconProfile(RegimentIconType.Directional_Fire);
-            ZSU57.IconProfile.W = SpriteManager.SV_ZSU57_W;
-            ZSU57.IconProfile.NW = SpriteManager.SV_ZSU57_NW;
-            ZSU57.IconProfile.SW = SpriteManager.SV_ZSU57_SW;
-            ZSU57.IconProfile.W_F = SpriteManager.SV_ZSU57_W_F;
-            ZSU57.IconProfile.NW_F = SpriteManager.SV_ZSU57_NW_F;
-            ZSU57.IconProfile.SW_F = SpriteManager.SV_ZSU57_SW_F;
+            ZSU57.IconProfile = new RegimentIconProfile(RegimentIconType.Directional_Fire)
+            {
+                W = SpriteManager.SV_ZSU57_W,
+                NW = SpriteManager.SV_ZSU57_NW,
+                SW = SpriteManager.SV_ZSU57_SW,
+                W_F = SpriteManager.SV_ZSU57_W_F,
+                NW_F = SpriteManager.SV_ZSU57_NW_F,
+                SW_F = SpriteManager.SV_ZSU57_SW_F
+            };
 
             // Add the ZSU-57-2 profile to the database
             AddProfile(WeaponType.SPAAA_ZSU57_SV, ZSU57);
@@ -2151,13 +2211,15 @@ namespace HammerAndSickle.Models
             ZSU23.AddIntelReportStat(WeaponType.APC_BTR70_SV,      22);
 
             // Handle the icon profile.
-            ZSU23.IconProfile = new RegimentIconProfile(RegimentIconType.Directional_Fire);
-            ZSU23.IconProfile.W = SpriteManager.SV_ZSU23_W;
-            ZSU23.IconProfile.NW = SpriteManager.SV_ZSU23_NW;
-            ZSU23.IconProfile.SW = SpriteManager.SV_ZSU23_SW;
-            ZSU23.IconProfile.W_F = SpriteManager.SV_ZSU23_W_F;
-            ZSU23.IconProfile.NW_F = SpriteManager.SV_ZSU23_NW_F;
-            ZSU23.IconProfile.SW_F = SpriteManager.SV_ZSU23_SW_F;
+            ZSU23.IconProfile = new RegimentIconProfile(RegimentIconType.Directional_Fire)
+            {
+                W = SpriteManager.SV_ZSU23_W,
+                NW = SpriteManager.SV_ZSU23_NW,
+                SW = SpriteManager.SV_ZSU23_SW,
+                W_F = SpriteManager.SV_ZSU23_W_F,
+                NW_F = SpriteManager.SV_ZSU23_NW_F,
+                SW_F = SpriteManager.SV_ZSU23_SW_F
+            };
 
             // Add the ZSU-23-4 profile to the database
             AddProfile(WeaponType.SPAAA_ZSU23_SV, ZSU23);
@@ -2211,13 +2273,15 @@ namespace HammerAndSickle.Models
             Tunguska.AddIntelReportStat(WeaponType.APC_BTR70_SV,     22);
 
             // Handle the icon profile.
-            Tunguska.IconProfile = new RegimentIconProfile(RegimentIconType.Directional_Fire);
-            Tunguska.IconProfile.W = SpriteManager.SV_2K22_W;
-            Tunguska.IconProfile.NW = SpriteManager.SV_2K22_NW;
-            Tunguska.IconProfile.SW = SpriteManager.SV_2K22_SW;
-            Tunguska.IconProfile.W_F = SpriteManager.SV_2K22_W_F;
-            Tunguska.IconProfile.NW_F = SpriteManager.SV_2K22_NW_F;
-            Tunguska.IconProfile.SW_F = SpriteManager.SV_2K22_SW_F;
+            Tunguska.IconProfile = new RegimentIconProfile(RegimentIconType.Directional_Fire)
+            {
+                W = SpriteManager.SV_2K22_W,
+                NW = SpriteManager.SV_2K22_NW,
+                SW = SpriteManager.SV_2K22_SW,
+                W_F = SpriteManager.SV_2K22_W_F,
+                NW_F = SpriteManager.SV_2K22_NW_F,
+                SW_F = SpriteManager.SV_2K22_SW_F
+            };
 
             // Add the 2K22 Tunguska profile to the database
             AddProfile(WeaponType.SPSAM_2K22_SV, Tunguska);
@@ -2271,13 +2335,15 @@ namespace HammerAndSickle.Models
             Kub.AddIntelReportStat(WeaponType.APC_BTR70_SV,      22);
 
             // Handle the icon profile.
-            Kub.IconProfile = new RegimentIconProfile(RegimentIconType.Directional_Fire);
-            Kub.IconProfile.W = SpriteManager.SV_2K12_W;
-            Kub.IconProfile.NW = SpriteManager.SV_2K12_NW;
-            Kub.IconProfile.SW = SpriteManager.SV_2K12_SW;
-            Kub.IconProfile.W_F = SpriteManager.SV_2K12_W_F;
-            Kub.IconProfile.NW_F = SpriteManager.SV_2K12_NW_F;
-            Kub.IconProfile.SW_F = SpriteManager.SV_2K12_SW_F;
+            Kub.IconProfile = new RegimentIconProfile(RegimentIconType.Directional_Fire)
+            {
+                W = SpriteManager.SV_2K12_W,
+                NW = SpriteManager.SV_2K12_NW,
+                SW = SpriteManager.SV_2K12_SW,
+                W_F = SpriteManager.SV_2K12_W_F,
+                NW_F = SpriteManager.SV_2K12_NW_F,
+                SW_F = SpriteManager.SV_2K12_SW_F
+            };
 
             // Add the 2K12 Kub profile to the database
             AddProfile(WeaponType.SPSAM_2K12_SV, Kub);
@@ -2331,13 +2397,15 @@ namespace HammerAndSickle.Models
             Strela1.AddIntelReportStat(WeaponType.APC_BTR70_SV,     22);
 
             // Handle the icon profile.
-            Strela1.IconProfile = new RegimentIconProfile(RegimentIconType.Directional_Fire);
-            Strela1.IconProfile.W = SpriteManager.SV_9K31_W;
-            Strela1.IconProfile.NW = SpriteManager.SV_9K31_NW;
-            Strela1.IconProfile.SW = SpriteManager.SV_9K31_SW;
-            Strela1.IconProfile.W_F = SpriteManager.SV_9K31_W_F;
-            Strela1.IconProfile.NW_F = SpriteManager.SV_9K31_NW_F;
-            Strela1.IconProfile.SW_F = SpriteManager.SV_9K31_SW_F;
+            Strela1.IconProfile = new RegimentIconProfile(RegimentIconType.Directional_Fire)
+            {
+                W = SpriteManager.SV_9K31_W,
+                NW = SpriteManager.SV_9K31_NW,
+                SW = SpriteManager.SV_9K31_SW,
+                W_F = SpriteManager.SV_9K31_W_F,
+                NW_F = SpriteManager.SV_9K31_NW_F,
+                SW_F = SpriteManager.SV_9K31_SW_F
+            };
 
             // Add the 9K31 Strela-1 profile to the database
             AddProfile(WeaponType.SPSAM_9K31_SV, Strela1);
@@ -2391,8 +2459,10 @@ namespace HammerAndSickle.Models
             S75.AddIntelReportStat(WeaponType.APC_BTR70_SV,    48);
 
             // Handle the icon profile.
-            S75.IconProfile = new RegimentIconProfile(RegimentIconType.Single);
-            S75.IconProfile.W = SpriteManager.SV_S75;
+            S75.IconProfile = new RegimentIconProfile(RegimentIconType.Single)
+            {
+                W = SpriteManager.SV_S75
+            };
 
             // Add the S-75 Dvina profile to the database
             AddProfile(WeaponType.SAM_S75_SV, S75);
@@ -2446,8 +2516,10 @@ namespace HammerAndSickle.Models
             S125.AddIntelReportStat(WeaponType.APC_BTR70_SV,    48);
 
             // Handle the icon profile.
-            S125.IconProfile = new RegimentIconProfile(RegimentIconType.Single);
-            S125.IconProfile.W = SpriteManager.SV_S125;
+            S125.IconProfile = new RegimentIconProfile(RegimentIconType.Single)
+            {
+                W = SpriteManager.SV_S125
+            };
 
             // Add the S-125 Neva profile to the database
             AddProfile(WeaponType.SAM_S125_SV, S125);
@@ -2501,13 +2573,15 @@ namespace HammerAndSickle.Models
             S300.AddIntelReportStat(WeaponType.APC_BTR70_SV,    48);
 
             // Handle the icon profile.
-            S300.IconProfile = new RegimentIconProfile(RegimentIconType.Directional_Fire);
-            S300.IconProfile.W = SpriteManager.SV_S300_W;
-            S300.IconProfile.NW = SpriteManager.SV_S300_NW;
-            S300.IconProfile.SW = SpriteManager.SV_S300_SW;
-            S300.IconProfile.W_F = SpriteManager.SV_S300_W_F;
-            S300.IconProfile.NW_F = SpriteManager.SV_S300_NW_F;
-            S300.IconProfile.SW_F = SpriteManager.SV_S300_SW_F;
+            S300.IconProfile = new RegimentIconProfile(RegimentIconType.Directional_Fire)
+            {
+                W = SpriteManager.SV_S300_W,
+                NW = SpriteManager.SV_S300_NW,
+                SW = SpriteManager.SV_S300_SW,
+                W_F = SpriteManager.SV_S300_W_F,
+                NW_F = SpriteManager.SV_S300_NW_F,
+                SW_F = SpriteManager.SV_S300_SW_F
+            };
 
             // Add the S-300 profile to the database
             AddProfile(WeaponType.SAM_S300_SV, S300);
@@ -2561,8 +2635,10 @@ namespace HammerAndSickle.Models
             AAA_GEN.AddIntelReportStat(WeaponType.APC_BTR70_SV,    22);
 
             // Handle the icon profile.
-            // Note- No sprites exist yet for this platform.
-            AAA_GEN.IconProfile = new RegimentIconProfile(RegimentIconType.Single);
+            AAA_GEN.IconProfile = new RegimentIconProfile(RegimentIconType.Single)
+            {
+                W = SpriteManager.GEN_AA
+            };
 
             // Add the Generic AAA profile to the database
             AddProfile(WeaponType.AAA_GEN_SV, AAA_GEN);
@@ -2617,13 +2693,15 @@ namespace HammerAndSickle.Models
             MI8T.AddIntelReportStat(WeaponType.HEL_MI8T_SV,       109);
 
             // Handle the icon profile.
-            MI8T.IconProfile = new RegimentIconProfile(RegimentIconType.Helo_Animation);
-            MI8T.IconProfile.W = SpriteManager.SV_MI8_Frame0;
-            MI8T.IconProfile.NW = SpriteManager.SV_MI8_Frame1;
-            MI8T.IconProfile.SW = SpriteManager.SV_MI8_Frame2;
-            MI8T.IconProfile.W_F = SpriteManager.SV_MI8_Frame3;
-            MI8T.IconProfile.NW_F = SpriteManager.SV_MI8_Frame4;
-            MI8T.IconProfile.SW_F = SpriteManager.SV_MI8_Frame5;
+            MI8T.IconProfile = new RegimentIconProfile(RegimentIconType.Helo_Animation)
+            {
+                W = SpriteManager.SV_MI8_Frame0,
+                NW = SpriteManager.SV_MI8_Frame1,
+                SW = SpriteManager.SV_MI8_Frame2,
+                W_F = SpriteManager.SV_MI8_Frame3,
+                NW_F = SpriteManager.SV_MI8_Frame4,
+                SW_F = SpriteManager.SV_MI8_Frame5
+            };
 
             // Add the Mi-8T profile to the database
             AddProfile(WeaponType.HEL_MI8T_SV, MI8T);
@@ -2675,13 +2753,15 @@ namespace HammerAndSickle.Models
             MI8AT.AddIntelReportStat(WeaponType.HEL_MI8AT_SV,     54);
 
             // Handle the icon profile.
-            MI8AT.IconProfile = new RegimentIconProfile(RegimentIconType.Helo_Animation);
-            MI8AT.IconProfile.W = SpriteManager.SV_MI8AT_Frame0;
-            MI8AT.IconProfile.NW = SpriteManager.SV_MI8AT_Frame1;
-            MI8AT.IconProfile.SW = SpriteManager.SV_MI8AT_Frame2;
-            MI8AT.IconProfile.W_F = SpriteManager.SV_MI8AT_Frame3;
-            MI8AT.IconProfile.NW_F = SpriteManager.SV_MI8AT_Frame4;
-            MI8AT.IconProfile.SW_F = SpriteManager.SV_MI8AT_Frame5;
+            MI8AT.IconProfile = new RegimentIconProfile(RegimentIconType.Helo_Animation)
+            {
+                W = SpriteManager.SV_MI8AT_Frame0,
+                NW = SpriteManager.SV_MI8AT_Frame1,
+                SW = SpriteManager.SV_MI8AT_Frame2,
+                W_F = SpriteManager.SV_MI8AT_Frame3,
+                NW_F = SpriteManager.SV_MI8AT_Frame4,
+                SW_F = SpriteManager.SV_MI8AT_Frame5
+            };
 
             // Add the Mi-8AT profile to the database
             AddProfile(WeaponType.HEL_MI8AT_SV, MI8AT);
@@ -2733,13 +2813,15 @@ namespace HammerAndSickle.Models
             MI24D.AddIntelReportStat(WeaponType.HEL_MI24D_SV,     54);
 
             // Handle the icon profile.
-            MI24D.IconProfile = new RegimentIconProfile(RegimentIconType.Helo_Animation);
-            MI24D.IconProfile.W = SpriteManager.SV_MI24D_Frame0;
-            MI24D.IconProfile.NW = SpriteManager.SV_MI24D_Frame1;
-            MI24D.IconProfile.SW = SpriteManager.SV_MI24D_Frame2;
-            MI24D.IconProfile.W_F = SpriteManager.SV_MI24D_Frame3;
-            MI24D.IconProfile.NW_F = SpriteManager.SV_MI24D_Frame4;
-            MI24D.IconProfile.SW_F = SpriteManager.SV_MI24D_Frame5;
+            MI24D.IconProfile = new RegimentIconProfile(RegimentIconType.Helo_Animation)
+            {
+                W = SpriteManager.SV_MI24D_Frame0,
+                NW = SpriteManager.SV_MI24D_Frame1,
+                SW = SpriteManager.SV_MI24D_Frame2,
+                W_F = SpriteManager.SV_MI24D_Frame3,
+                NW_F = SpriteManager.SV_MI24D_Frame4,
+                SW_F = SpriteManager.SV_MI24D_Frame5
+            };
 
             // Add the Mi-24D profile to the database
             AddProfile(WeaponType.HEL_MI24D_SV, MI24D);
@@ -2791,13 +2873,15 @@ namespace HammerAndSickle.Models
             MI24V.AddIntelReportStat(WeaponType.HEL_MI24V_SV,     54);
 
             // Handle the icon profile.
-            MI24V.IconProfile = new RegimentIconProfile(RegimentIconType.Helo_Animation);
-            MI24V.IconProfile.W = SpriteManager.SV_MI24V_Frame0;
-            MI24V.IconProfile.NW = SpriteManager.SV_MI24V_Frame1;
-            MI24V.IconProfile.SW = SpriteManager.SV_MI24V_Frame2;
-            MI24V.IconProfile.W_F = SpriteManager.SV_MI24V_Frame3;
-            MI24V.IconProfile.NW_F = SpriteManager.SV_MI24V_Frame4;
-            MI24V.IconProfile.SW_F = SpriteManager.SV_MI24V_Frame5;
+            MI24V.IconProfile = new RegimentIconProfile(RegimentIconType.Helo_Animation)
+            {
+                W = SpriteManager.SV_MI24V_Frame0,
+                NW = SpriteManager.SV_MI24V_Frame1,
+                SW = SpriteManager.SV_MI24V_Frame2,
+                W_F = SpriteManager.SV_MI24V_Frame3,
+                NW_F = SpriteManager.SV_MI24V_Frame4,
+                SW_F = SpriteManager.SV_MI24V_Frame5
+            };
 
             // Add the Mi-24V profile to the database
             AddProfile(WeaponType.HEL_MI24V_SV, MI24V);
@@ -2849,13 +2933,15 @@ namespace HammerAndSickle.Models
             MI28.AddIntelReportStat(WeaponType.HEL_MI28_SV,       54);
 
             // Handle the icon profile.
-            MI28.IconProfile = new RegimentIconProfile(RegimentIconType.Helo_Animation);
-            MI28.IconProfile.W = SpriteManager.SV_MI28_Frame0;
-            MI28.IconProfile.NW = SpriteManager.SV_MI28_Frame1;
-            MI28.IconProfile.SW = SpriteManager.SV_MI28_Frame2;
-            MI28.IconProfile.W_F = SpriteManager.SV_MI28_Frame3;
-            MI28.IconProfile.NW_F = SpriteManager.SV_MI28_Frame4;
-            MI28.IconProfile.SW_F = SpriteManager.SV_MI28_Frame5;
+            MI28.IconProfile = new RegimentIconProfile(RegimentIconType.Helo_Animation)
+            {
+                W = SpriteManager.SV_MI28_Frame0,
+                NW = SpriteManager.SV_MI28_Frame1,
+                SW = SpriteManager.SV_MI28_Frame2,
+                W_F = SpriteManager.SV_MI28_Frame3,
+                NW_F = SpriteManager.SV_MI28_Frame4,
+                SW_F = SpriteManager.SV_MI28_Frame5
+            };
 
             // Add the Mi-28 profile to the database
             AddProfile(WeaponType.HEL_MI28_SV, MI28);
@@ -2910,8 +2996,10 @@ namespace HammerAndSickle.Models
             AN12.AddIntelReportStat(WeaponType.TRN_AN8_SV,        48);
 
             // Handle the icon profile.
-            AN12.IconProfile = new RegimentIconProfile(RegimentIconType.Single);
-            AN12.IconProfile.W = SpriteManager.SV_AN8;
+            AN12.IconProfile = new RegimentIconProfile(RegimentIconType.Single)
+            {
+                W = SpriteManager.SV_AN8
+            };
 
             // Add the An-12 profile to the database
             AddProfile(WeaponType.TRN_AN8_SV, AN12);
@@ -2962,8 +3050,10 @@ namespace HammerAndSickle.Models
             A50.AddIntelReportStat(WeaponType.AWACS_A50_SV,        6);
 
             // Handle the icon profile.
-            A50.IconProfile = new RegimentIconProfile(RegimentIconType.Single);
-            A50.IconProfile.W = SpriteManager.SV_A50;
+            A50.IconProfile = new RegimentIconProfile(RegimentIconType.Single)
+            {
+                W = SpriteManager.SV_A50
+            };
 
             // Add the A-50 profile to the database
             AddProfile(WeaponType.AWACS_A50_SV, A50);
@@ -3014,8 +3104,10 @@ namespace HammerAndSickle.Models
             MIG21.AddIntelReportStat(WeaponType.FGT_MIG21_SV,     36);
 
             // Handle the icon profile.
-            MIG21.IconProfile = new RegimentIconProfile(RegimentIconType.Single);
-            MIG21.IconProfile.W = SpriteManager.SV_Mig21;
+            MIG21.IconProfile = new RegimentIconProfile(RegimentIconType.Single)
+            {
+                W = SpriteManager.SV_Mig21
+            };
 
             // Add the MiG-21 profile to the database
             AddProfile(WeaponType.FGT_MIG21_SV, MIG21);
@@ -3066,8 +3158,10 @@ namespace HammerAndSickle.Models
             MIG23.AddIntelReportStat(WeaponType.FGT_MIG23_SV,     36);
 
             // Handle the icon profile.
-            MIG23.IconProfile = new RegimentIconProfile(RegimentIconType.Single);
-            MIG23.IconProfile.W = SpriteManager.SV_Mig23;
+            MIG23.IconProfile = new RegimentIconProfile(RegimentIconType.Single)
+            {
+                W = SpriteManager.SV_Mig23
+            };
 
             // Add the MiG-23 profile to the database
             AddProfile(WeaponType.FGT_MIG23_SV, MIG23);
@@ -3118,8 +3212,10 @@ namespace HammerAndSickle.Models
             MIG25.AddIntelReportStat(WeaponType.FGT_MIG25_SV,     36);
 
             // Handle the icon profile.
-            MIG25.IconProfile = new RegimentIconProfile(RegimentIconType.Single);
-            MIG25.IconProfile.W = SpriteManager.SV_Mig25;
+            MIG25.IconProfile = new RegimentIconProfile(RegimentIconType.Single)
+            {
+                W = SpriteManager.SV_Mig25
+            };
 
             // Add the MiG-25 profile to the database
             AddProfile(WeaponType.FGT_MIG25_SV, MIG25);
@@ -3170,8 +3266,10 @@ namespace HammerAndSickle.Models
             MIG29.AddIntelReportStat(WeaponType.FGT_MIG29_SV,     36);
 
             // Handle the icon profile.
-            MIG29.IconProfile = new RegimentIconProfile(RegimentIconType.Single);
-            MIG29.IconProfile.W = SpriteManager.SV_Mig29;
+            MIG29.IconProfile = new RegimentIconProfile(RegimentIconType.Single)
+            {
+                W = SpriteManager.SV_Mig29
+            };
 
             // Add the MiG-29 profile to the database
             AddProfile(WeaponType.FGT_MIG29_SV, MIG29);
@@ -3222,8 +3320,10 @@ namespace HammerAndSickle.Models
             MIG31.AddIntelReportStat(WeaponType.FGT_MIG31_SV,     36);
 
             // Handle the icon profile.
-            MIG31.IconProfile = new RegimentIconProfile(RegimentIconType.Single);
-            MIG31.IconProfile.W = SpriteManager.SV_Mig31;
+            MIG31.IconProfile = new RegimentIconProfile(RegimentIconType.Single)
+            {
+                W = SpriteManager.SV_Mig31
+            };
 
             // Add the MiG-31 profile to the database
             AddProfile(WeaponType.FGT_MIG31_SV, MIG31);
@@ -3274,8 +3374,10 @@ namespace HammerAndSickle.Models
             SU27.AddIntelReportStat(WeaponType.FGT_SU27_SV,       36);
 
             // Handle the icon profile.
-            SU27.IconProfile = new RegimentIconProfile(RegimentIconType.Single);
-            SU27.IconProfile.W = SpriteManager.SV_SU27;
+            SU27.IconProfile = new RegimentIconProfile(RegimentIconType.Single)
+            {
+                W = SpriteManager.SV_SU27
+            };
 
             // Add the Su-27 profile to the database
             AddProfile(WeaponType.FGT_SU27_SV, SU27);
@@ -3326,8 +3428,10 @@ namespace HammerAndSickle.Models
             SU47.AddIntelReportStat(WeaponType.FGT_SU47_SV,       36);
 
             // Handle the icon profile.
-            SU47.IconProfile = new RegimentIconProfile(RegimentIconType.Single);
-            SU47.IconProfile.W = SpriteManager.SV_SU47;
+            SU47.IconProfile = new RegimentIconProfile(RegimentIconType.Single)
+            {
+                W = SpriteManager.SV_SU47
+            };
 
             // Add the Su-47 profile to the database
             AddProfile(WeaponType.FGT_SU47_SV, SU47);
@@ -3378,8 +3482,10 @@ namespace HammerAndSickle.Models
             MIG27.AddIntelReportStat(WeaponType.FGT_MIG27_SV,     36);
 
             // Handle the icon profile.
-            MIG27.IconProfile = new RegimentIconProfile(RegimentIconType.Single);
-            MIG27.IconProfile.W = SpriteManager.SV_Mig27;
+            MIG27.IconProfile = new RegimentIconProfile(RegimentIconType.Single)
+            {
+                W = SpriteManager.SV_Mig27
+            };
 
             // Add the MiG-27 profile to the database
             AddProfile(WeaponType.FGT_MIG27_SV, MIG27);
@@ -3430,8 +3536,10 @@ namespace HammerAndSickle.Models
             SU17.AddIntelReportStat(WeaponType.ATT_SU17_SV,       36);
 
             // Handle the icon profile.
-            SU17.IconProfile = new RegimentIconProfile(RegimentIconType.Single);
-            SU17.IconProfile.W = SpriteManager.SV_SU17;
+            SU17.IconProfile = new RegimentIconProfile(RegimentIconType.Single)
+            {
+                W = SpriteManager.SV_SU17
+            };
 
             // Add the Su-17 profile to the database
             AddProfile(WeaponType.ATT_SU17_SV, SU17);
@@ -3482,8 +3590,10 @@ namespace HammerAndSickle.Models
             SU25.AddIntelReportStat(WeaponType.ATT_SU25_SV,       36);
 
             // Handle the icon profile.
-            SU25.IconProfile = new RegimentIconProfile(RegimentIconType.Single);
-            SU25.IconProfile.W = SpriteManager.SV_SU25;
+            SU25.IconProfile = new RegimentIconProfile(RegimentIconType.Single)
+            {
+                W = SpriteManager.SV_SU25
+            };
 
             // Add the Su-25 profile to the database
             AddProfile(WeaponType.ATT_SU25_SV, SU25);
@@ -3534,8 +3644,10 @@ namespace HammerAndSickle.Models
             SU25B.AddIntelReportStat(WeaponType.ATT_SU25B_SV,     36);
 
             // Handle the icon profile.
-            SU25B.IconProfile = new RegimentIconProfile(RegimentIconType.Single);
-            SU25B.IconProfile.W = SpriteManager.SV_SU25B;
+            SU25B.IconProfile = new RegimentIconProfile(RegimentIconType.Single)
+            {
+                W = SpriteManager.SV_SU25B
+            };
 
             // Add the Su-25B profile to the database
             AddProfile(WeaponType.ATT_SU25B_SV, SU25B);
@@ -3586,8 +3698,10 @@ namespace HammerAndSickle.Models
             SU24.AddIntelReportStat(WeaponType.BMB_SU24_SV,       36);
 
             // Handle the icon profile.
-            SU24.IconProfile = new RegimentIconProfile(RegimentIconType.Single);
-            SU24.IconProfile.W = SpriteManager.SV_SU24;
+            SU24.IconProfile = new RegimentIconProfile(RegimentIconType.Single)
+            {
+                W = SpriteManager.SV_SU24
+            };
 
             // Add the Su-24 profile to the database
             AddProfile(WeaponType.BMB_SU24_SV, SU24);
@@ -3638,8 +3752,10 @@ namespace HammerAndSickle.Models
             TU16.AddIntelReportStat(WeaponType.BMB_TU16_SV,       24);
 
             // Handle the icon profile.
-            TU16.IconProfile = new RegimentIconProfile(RegimentIconType.Single);
-            TU16.IconProfile.W = SpriteManager.SV_TU16;
+            TU16.IconProfile = new RegimentIconProfile(RegimentIconType.Single)
+            {
+                W = SpriteManager.SV_TU16
+            };
 
             // Add the Tu-16 profile to the database
             AddProfile(WeaponType.BMB_TU16_SV, TU16);
@@ -3690,8 +3806,10 @@ namespace HammerAndSickle.Models
             TU22.AddIntelReportStat(WeaponType.BMB_TU22_SV,       24);
 
             // Handle the icon profile.
-            TU22.IconProfile = new RegimentIconProfile(RegimentIconType.Single);
-            TU22.IconProfile.W = SpriteManager.SV_TU22;
+            TU22.IconProfile = new RegimentIconProfile(RegimentIconType.Single)
+            {
+                W = SpriteManager.SV_TU22
+            };
 
             // Add the Tu-22 profile to the database
             AddProfile(WeaponType.BMB_TU22_SV, TU22);
@@ -3742,8 +3860,10 @@ namespace HammerAndSickle.Models
             TU22M3.AddIntelReportStat(WeaponType.BMB_TU22M3_SV,   24);
 
             // Handle the icon profile.
-            TU22M3.IconProfile = new RegimentIconProfile(RegimentIconType.Single);
-            TU22M3.IconProfile.W = SpriteManager.SV_TU22M3;
+            TU22M3.IconProfile = new RegimentIconProfile(RegimentIconType.Single)
+            {
+                W = SpriteManager.SV_TU22M3
+            };
 
             // Add the Tu-22M3 profile to the database
             AddProfile(WeaponType.BMB_TU22M3_SV, TU22M3);
@@ -3794,8 +3914,10 @@ namespace HammerAndSickle.Models
             MIG25R.AddIntelReportStat(WeaponType.RCNA_MIG25R_SV,  12);
 
             // Handle the icon profile.
-            MIG25R.IconProfile = new RegimentIconProfile(RegimentIconType.Single);
-            MIG25R.IconProfile.W = SpriteManager.SV_Mig25R;
+            MIG25R.IconProfile = new RegimentIconProfile(RegimentIconType.Single)
+            {
+                W = SpriteManager.SV_Mig25R
+            };
 
             // Add the MiG-25R profile to the database
             AddProfile(WeaponType.RCNA_MIG25R_SV, MIG25R);
@@ -3842,10 +3964,12 @@ namespace HammerAndSickle.Models
             );
 
             // Handle the icon profile.
-            TRK_GEN.IconProfile = new RegimentIconProfile(RegimentIconType.Directional);
-            TRK_GEN.IconProfile.W = SpriteManager.SV_Truck_W;
-            TRK_GEN.IconProfile.NW = SpriteManager.SV_Truck_NW;
-            TRK_GEN.IconProfile.SW = SpriteManager.SV_Truck_SW;
+            TRK_GEN.IconProfile = new RegimentIconProfile(RegimentIconType.Directional)
+            {
+                W = SpriteManager.SV_Truck_W,
+                NW = SpriteManager.SV_Truck_NW,
+                SW = SpriteManager.SV_Truck_SW
+            };
 
             // Add the Truck profile to the database
             AddProfile(WeaponType.TRK_GEN_SV, TRK_GEN);
@@ -3888,8 +4012,10 @@ namespace HammerAndSickle.Models
             );
 
             // Handle the icon profile.
-            NAVAL.IconProfile = new RegimentIconProfile(RegimentIconType.Single);
-            NAVAL.IconProfile.W = SpriteManager.GEN_NavalTransport;
+            NAVAL.IconProfile = new RegimentIconProfile(RegimentIconType.Single)
+            {
+                W = SpriteManager.GEN_NavalTransport
+            };
 
             // Add the Naval Transport profile to the database
             AddProfile(WeaponType.TRN_NAVAL, NAVAL);
@@ -3947,8 +4073,10 @@ namespace HammerAndSickle.Models
             INF_REG.AddIntelReportStat(WeaponType.MANPAD_STRELA,          30);
 
             // Handle the icon profile.
-            INF_REG.IconProfile = new RegimentIconProfile(RegimentIconType.Single);
-            INF_REG.IconProfile.W = SpriteManager.SV_Regulars;
+            INF_REG.IconProfile = new RegimentIconProfile(RegimentIconType.Single)
+            {
+                W = SpriteManager.SV_Regulars
+            };
 
             // Add the Regular Infantry profile to the database
             AddProfile(WeaponType.INF_REG_SV, INF_REG);
@@ -3999,8 +4127,10 @@ namespace HammerAndSickle.Models
             INF_AB.AddIntelReportStat(WeaponType.AAA_GEN_SV,            6);
 
             // Handle the icon profile.
-            INF_AB.IconProfile = new RegimentIconProfile(RegimentIconType.Single);
-            INF_AB.IconProfile.W = SpriteManager.SV_Airborne;
+            INF_AB.IconProfile = new RegimentIconProfile(RegimentIconType.Single)
+            {
+                W = SpriteManager.SV_Airborne
+            };
 
             // Add the Airborne Infantry profile to the database
             AddProfile(WeaponType.INF_AB_SV, INF_AB);
@@ -4053,8 +4183,10 @@ namespace HammerAndSickle.Models
             INF_AM.AddIntelReportStat(WeaponType.HEL_MI8T_SV,        166);
 
             // Handle the icon profile.
-            INF_AM.IconProfile = new RegimentIconProfile(RegimentIconType.Single);
-            INF_AM.IconProfile.W = SpriteManager.SV_AirMobile;
+            INF_AM.IconProfile = new RegimentIconProfile(RegimentIconType.Single)
+            {
+                W = SpriteManager.SV_AirMobile
+            };
 
             // Add the Air-Mobile Infantry profile to the database
             AddProfile(WeaponType.INF_AM_SV, INF_AM);
@@ -4109,8 +4241,10 @@ namespace HammerAndSickle.Models
 
             // Handle the icon profile.
             // Note- No Marines-specific sprite exists yet.
-            INF_MAR.IconProfile = new RegimentIconProfile(RegimentIconType.Single);
-            INF_MAR.IconProfile.W = SpriteManager.SV_Marines;
+            INF_MAR.IconProfile = new RegimentIconProfile(RegimentIconType.Single)
+            {
+                W = SpriteManager.SV_Marines
+            };
 
             // Add the Marine Infantry profile to the database
             AddProfile(WeaponType.INF_MAR_SV, INF_MAR);
@@ -4161,8 +4295,10 @@ namespace HammerAndSickle.Models
             INF_SPEC.AddIntelReportStat(WeaponType.AAA_GEN_SV,         2);
 
             // Handle the icon profile.
-            INF_SPEC.IconProfile = new RegimentIconProfile(RegimentIconType.Single);
-            INF_SPEC.IconProfile.W = SpriteManager.SV_Spetsnaz;
+            INF_SPEC.IconProfile = new RegimentIconProfile(RegimentIconType.Single)
+            {
+                W = SpriteManager.SV_Spetsnaz
+            };
 
             // Add the Spetsnaz profile to the database
             AddProfile(WeaponType.INF_SPEC_SV, INF_SPEC);
@@ -4209,8 +4345,10 @@ namespace HammerAndSickle.Models
             INF_ENG.AddIntelReportStat(WeaponType.APC_BTR70_SV,        20);
 
             // Handle the icon profile.
-            INF_ENG.IconProfile = new RegimentIconProfile(RegimentIconType.Single);
-            INF_ENG.IconProfile.W = SpriteManager.SV_Engineers;
+            INF_ENG.IconProfile = new RegimentIconProfile(RegimentIconType.Single)
+            {
+                W = SpriteManager.SV_Engineers
+            };
 
             // Add the Combat Engineers profile to the database
             AddProfile(WeaponType.INF_ENG_SV, INF_ENG);
@@ -4266,8 +4404,10 @@ namespace HammerAndSickle.Models
             BASE_LRG.AddIntelReportStat(WeaponType.Personnel, 3000);
 
             // Handle the icon profile.
-            BASE_LRG.IconProfile = new RegimentIconProfile(RegimentIconType.Single);
-            BASE_LRG.IconProfile.W = SpriteManager.GEN_Airbase;
+            BASE_LRG.IconProfile = new RegimentIconProfile(RegimentIconType.Single)
+            {
+                W = SpriteManager.GEN_Airbase
+            };
 
             // Add the Large Base profile to the database
             AddProfile(WeaponType.BASE_LARGE, BASE_LRG);
@@ -4313,8 +4453,10 @@ namespace HammerAndSickle.Models
             BASE_MED.AddIntelReportStat(WeaponType.Personnel, 2000);
 
             // Handle the icon profile.
-            BASE_MED.IconProfile = new RegimentIconProfile(RegimentIconType.Single);
-            BASE_MED.IconProfile.W = SpriteManager.GEN_Base;
+            BASE_MED.IconProfile = new RegimentIconProfile(RegimentIconType.Single)
+            {
+                W = SpriteManager.GEN_Base
+            };
 
             // Add the Medium Base profile to the database
             AddProfile(WeaponType.BASE_MEDIUM, BASE_MED);
@@ -4360,8 +4502,10 @@ namespace HammerAndSickle.Models
             BASE_SML.AddIntelReportStat(WeaponType.Personnel, 1500);
 
             // Handle the icon profile.
-            BASE_SML.IconProfile = new RegimentIconProfile(RegimentIconType.Single);
-            BASE_SML.IconProfile.W = SpriteManager.GEN_Depot;
+            BASE_SML.IconProfile = new RegimentIconProfile(RegimentIconType.Single)
+            {
+                W = SpriteManager.GEN_Depot
+            };
 
             // Add the Small Base profile to the database
             AddProfile(WeaponType.BASE_SMALL, BASE_SML);
@@ -4431,10 +4575,12 @@ namespace HammerAndSickle.Models
             M1_US.AddIntelReportStat(WeaponType.SPAAA_M163_US,      4);  // Vulcan air defense guns
 
             // Handle the icon profile.
-            M1_US.IconProfile = new RegimentIconProfile(RegimentIconType.Directional);
-            M1_US.IconProfile.W = SpriteManager.US_M1_W;
-            M1_US.IconProfile.NW = SpriteManager.US_M1_NW;
-            M1_US.IconProfile.SW = SpriteManager.US_M1_SW;
+            M1_US.IconProfile = new RegimentIconProfile(RegimentIconType.Directional)
+            {
+                W = SpriteManager.US_M1_W,
+                NW = SpriteManager.US_M1_NW,
+                SW = SpriteManager.US_M1_SW
+            };
 
             // Add the M1 Abrams profile to the database
             AddProfile(WeaponType.TANK_M1_US, M1_US);
@@ -4483,7 +4629,7 @@ namespace HammerAndSickle.Models
 
             // Intel stats: US Armored Cavalry Squadron (ACR) - Corps reconnaissance squadron
             M60_US.AddIntelReportStat(WeaponType.Personnel,       1500);
-            M60_US.AddIntelReportStat(WeaponType.TANK_M1_US,        41);  // M1 Abrams tanks distributed across troops
+            M60_US.AddIntelReportStat(WeaponType.TANK_M60_US,       41); // M60A3 tanks distributed across troops
             M60_US.AddIntelReportStat(WeaponType.RCN_M3_US,         36);  // M3 Bradley cavalry fighting vehicles
             M60_US.AddIntelReportStat(WeaponType.APC_M113_US,       18);  // Command posts, mortars, support vehicles
             M60_US.AddIntelReportStat(WeaponType.AT_ATGM,           24);  // TOW missiles (M3 Bradley + ground teams)
@@ -4494,10 +4640,12 @@ namespace HammerAndSickle.Models
             M60_US.AddIntelReportStat(WeaponType.SPAAA_M163_US,      4);  // Vulcan air defense guns
 
             // Handle the icon profile.
-            M60_US.IconProfile = new RegimentIconProfile(RegimentIconType.Directional);
-            M60_US.IconProfile.W = SpriteManager.US_M60_W;
-            M60_US.IconProfile.NW = SpriteManager.US_M60_NW;
-            M60_US.IconProfile.SW = SpriteManager.US_M60_SW;
+            M60_US.IconProfile = new RegimentIconProfile(RegimentIconType.Directional)
+            {
+                W = SpriteManager.US_M60_W,
+                NW = SpriteManager.US_M60_NW,
+                SW = SpriteManager.US_M60_SW
+            };
 
             // Add the M60A3 profile to the database
             AddProfile(WeaponType.TANK_M60_US, M60_US);
@@ -4557,10 +4705,12 @@ namespace HammerAndSickle.Models
             LEO1_GE.AddIntelReportStat(WeaponType.ART_120MM_MORTAR,    12);  // 120mm mortars
 
             // Handle the icon profile.
-            LEO1_GE.IconProfile = new RegimentIconProfile(RegimentIconType.Directional);
-            LEO1_GE.IconProfile.W = SpriteManager.GE_Leopard1_W;
-            LEO1_GE.IconProfile.NW = SpriteManager.GE_Leopard1_NW;
-            LEO1_GE.IconProfile.SW = SpriteManager.GE_Leopard1_SW;
+            LEO1_GE.IconProfile = new RegimentIconProfile(RegimentIconType.Directional)
+            {
+                W = SpriteManager.GE_Leopard1_W,
+                NW = SpriteManager.GE_Leopard1_NW,
+                SW = SpriteManager.GE_Leopard1_SW
+            };
 
             // Add the Leopard 1 profile to the database
             AddProfile(WeaponType.TANK_LEOPARD1_GE, LEO1_GE);
@@ -4620,10 +4770,12 @@ namespace HammerAndSickle.Models
             LEO2_GE.AddIntelReportStat(WeaponType.ART_120MM_MORTAR,    12);  // 120mm mortars
 
             // Handle the icon profile.
-            LEO2_GE.IconProfile = new RegimentIconProfile(RegimentIconType.Directional);
-            LEO2_GE.IconProfile.W = SpriteManager.GE_Leopard2_W;
-            LEO2_GE.IconProfile.NW = SpriteManager.GE_Leopard2_NW;
-            LEO2_GE.IconProfile.SW = SpriteManager.GE_Leopard2_SW;
+            LEO2_GE.IconProfile = new RegimentIconProfile(RegimentIconType.Directional)
+            {
+                W = SpriteManager.GE_Leopard2_W,
+                NW = SpriteManager.GE_Leopard2_NW,
+                SW = SpriteManager.GE_Leopard2_SW
+            };
 
             // Add the Leopard 2 profile to the database
             AddProfile(WeaponType.TANK_LEOPARD2_GE, LEO2_GE);
@@ -4683,10 +4835,12 @@ namespace HammerAndSickle.Models
             CHALL1_UK.AddIntelReportStat(WeaponType.MANPAD_RAPIER,        6);  // Rapier air defense missiles
 
             // Handle the icon profile.
-            CHALL1_UK.IconProfile = new RegimentIconProfile(RegimentIconType.Directional);
-            CHALL1_UK.IconProfile.W = SpriteManager.UK_Challenger1_W;
-            CHALL1_UK.IconProfile.NW = SpriteManager.UK_Challenger1_NW;
-            CHALL1_UK.IconProfile.SW = SpriteManager.UK_Challenger1_SW;
+            CHALL1_UK.IconProfile = new RegimentIconProfile(RegimentIconType.Directional)
+            {
+                W = SpriteManager.UK_Challenger1_W,
+                NW = SpriteManager.UK_Challenger1_NW,
+                SW = SpriteManager.UK_Challenger1_SW
+            };
 
             // Add the Challenger 1 profile to the database
             AddProfile(WeaponType.TANK_CHALLENGER1_UK, CHALL1_UK);
@@ -4745,10 +4899,12 @@ namespace HammerAndSickle.Models
             AMX30_FR.AddIntelReportStat(WeaponType.ART_120MM_MORTAR,   18);  // 120mm mortars
 
             // Handle the icon profile.
-            AMX30_FR.IconProfile = new RegimentIconProfile(RegimentIconType.Directional);
-            AMX30_FR.IconProfile.W = SpriteManager.FR_AMX30_W;
-            AMX30_FR.IconProfile.NW = SpriteManager.FR_AMX30_NW;
-            AMX30_FR.IconProfile.SW = SpriteManager.FR_AMX30_SW;
+            AMX30_FR.IconProfile = new RegimentIconProfile(RegimentIconType.Directional)
+            {
+                W = SpriteManager.FR_AMX30_W,
+                NW = SpriteManager.FR_AMX30_NW,
+                SW = SpriteManager.FR_AMX30_SW
+            };
 
             // Add the AMX-30 profile to the database
             AddProfile(WeaponType.TANK_AMX30_FR, AMX30_FR);
@@ -4806,10 +4962,12 @@ namespace HammerAndSickle.Models
             M2_US.AddIntelReportStat(WeaponType.APC_M113_US,      32);
 
             // Handle the icon profile.
-            M2_US.IconProfile = new RegimentIconProfile(RegimentIconType.Directional);
-            M2_US.IconProfile.W = SpriteManager.US_M2_W;
-            M2_US.IconProfile.NW = SpriteManager.US_M2_NW;
-            M2_US.IconProfile.SW = SpriteManager.US_M2_SW;
+            M2_US.IconProfile = new RegimentIconProfile(RegimentIconType.Directional)
+            {
+                W = SpriteManager.US_M2_W,
+                NW = SpriteManager.US_M2_NW,
+                SW = SpriteManager.US_M2_SW
+            };
 
             // Add the M2 Bradley profile to the database
             AddProfile(WeaponType.IFV_M2_US, M2_US);
@@ -4863,10 +5021,12 @@ namespace HammerAndSickle.Models
             WARRIOR_UK.AddIntelReportStat(WeaponType.RCN_FV105_UK,             8);
 
             // Handle the icon profile.
-            WARRIOR_UK.IconProfile = new RegimentIconProfile(RegimentIconType.Directional);
-            WARRIOR_UK.IconProfile.W = SpriteManager.UK_Warrior_W;
-            WARRIOR_UK.IconProfile.NW = SpriteManager.UK_Warrior_NW;
-            WARRIOR_UK.IconProfile.SW = SpriteManager.UK_Warrior_SW;
+            WARRIOR_UK.IconProfile = new RegimentIconProfile(RegimentIconType.Directional)
+            {
+                W = SpriteManager.UK_Warrior_W,
+                NW = SpriteManager.UK_Warrior_NW,
+                SW = SpriteManager.UK_Warrior_SW
+            };
 
             // Add the Warrior profile to the database
             AddProfile(WeaponType.IFV_WARRIOR_UK, WARRIOR_UK);
@@ -4920,10 +5080,12 @@ namespace HammerAndSickle.Models
             MARDER_GE.AddIntelReportStat(WeaponType.RCN_LUCHS_GE,      12);
 
             // Handle the icon profile.
-            MARDER_GE.IconProfile = new RegimentIconProfile(RegimentIconType.Directional);
-            MARDER_GE.IconProfile.W = SpriteManager.GE_Marder_W;
-            MARDER_GE.IconProfile.NW = SpriteManager.GE_Marder_NW;
-            MARDER_GE.IconProfile.SW = SpriteManager.GE_Marder_SW;
+            MARDER_GE.IconProfile = new RegimentIconProfile(RegimentIconType.Directional)
+            {
+                W = SpriteManager.GE_Marder_W,
+                NW = SpriteManager.GE_Marder_NW,
+                SW = SpriteManager.GE_Marder_SW
+            };
 
             // Add the Marder profile to the database
             AddProfile(WeaponType.IFV_MARDER_GE, MARDER_GE);
@@ -4977,10 +5139,12 @@ namespace HammerAndSickle.Models
             M113_US.AddIntelReportStat(WeaponType.IFV_M2_US,    32);
 
             // Handle the icon profile.
-            M113_US.IconProfile = new RegimentIconProfile(RegimentIconType.Directional);
-            M113_US.IconProfile.W = SpriteManager.US_M113_W;
-            M113_US.IconProfile.NW = SpriteManager.US_M113_NW;
-            M113_US.IconProfile.SW = SpriteManager.US_M113_SW;
+            M113_US.IconProfile = new RegimentIconProfile(RegimentIconType.Directional)
+            {
+                W = SpriteManager.US_M113_W,
+                NW = SpriteManager.US_M113_NW,
+                SW = SpriteManager.US_M113_SW
+            };
 
             // Add the M113 profile to the database
             AddProfile(WeaponType.APC_M113_US, M113_US);
@@ -5034,10 +5198,12 @@ namespace HammerAndSickle.Models
             M113_US.AddIntelReportStat(WeaponType.APC_M113_US, 32);
 
             // Handle the icon profile.
-            HUMVEE_US.IconProfile = new RegimentIconProfile(RegimentIconType.Directional);
-            HUMVEE_US.IconProfile.W = SpriteManager.US_Humvee_W;
-            HUMVEE_US.IconProfile.NW = SpriteManager.US_Humvee_NW;
-            HUMVEE_US.IconProfile.SW = SpriteManager.US_Humvee_SW;
+            HUMVEE_US.IconProfile = new RegimentIconProfile(RegimentIconType.Directional)
+            {
+                W = SpriteManager.US_Humvee_W,
+                NW = SpriteManager.US_Humvee_NW,
+                SW = SpriteManager.US_Humvee_SW
+            };
 
             // Add the Humvee profile to the database
             AddProfile(WeaponType.APC_HUMVEE_US, HUMVEE_US);
@@ -5090,10 +5256,12 @@ namespace HammerAndSickle.Models
             LVTP7_US.AddIntelReportStat(WeaponType.HEL_AH1, 12);
 
             // Handle the icon profile.
-            LVTP7_US.IconProfile = new RegimentIconProfile(RegimentIconType.Directional);
-            LVTP7_US.IconProfile.W = SpriteManager.US_LVTP_W;
-            LVTP7_US.IconProfile.NW = SpriteManager.US_LVTP_NW;
-            LVTP7_US.IconProfile.SW = SpriteManager.US_LVTP_SW;
+            LVTP7_US.IconProfile = new RegimentIconProfile(RegimentIconType.Directional)
+            {
+                W = SpriteManager.US_LVTP_W,
+                NW = SpriteManager.US_LVTP_NW,
+                SW = SpriteManager.US_LVTP_SW
+            };
 
             // Add the LVTP-7 profile to the database
             AddProfile(WeaponType.APC_LVTP7_US, LVTP7_US);
@@ -5146,10 +5314,12 @@ namespace HammerAndSickle.Models
             VAB_FR.AddIntelReportStat(WeaponType.RCN_ERC90_FR,     12);
 
             // Handle the icon profile.
-            VAB_FR.IconProfile = new RegimentIconProfile(RegimentIconType.Directional);
-            VAB_FR.IconProfile.W = SpriteManager.FR_M113_W;
-            VAB_FR.IconProfile.NW = SpriteManager.FR_M113_NW;
-            VAB_FR.IconProfile.SW = SpriteManager.FR_M113_SW;
+            VAB_FR.IconProfile = new RegimentIconProfile(RegimentIconType.Directional)
+            {
+                W = SpriteManager.FR_M113_W,
+                NW = SpriteManager.FR_M113_NW,
+                SW = SpriteManager.FR_M113_SW
+            };
 
             // Add the VAB profile to the database
             AddProfile(WeaponType.APC_VAB_FR, VAB_FR);
@@ -5206,15 +5376,17 @@ namespace HammerAndSickle.Models
             M109_US.AddIntelReportStat(WeaponType.APC_M113_US,  48);
             M109_US.AddIntelReportStat(WeaponType.MANPAD_STINGER,  12);
             M109_US.AddIntelReportStat(WeaponType.RCN_M3_US,        6);
-    
+
             // Handle the icon profile.
-            M109_US.IconProfile = new RegimentIconProfile(RegimentIconType.Directional_Fire);
-            M109_US.IconProfile.W = SpriteManager.US_M109_W;
-            M109_US.IconProfile.NW = SpriteManager.US_M109_NW;
-            M109_US.IconProfile.SW = SpriteManager.US_M109_SW;
-            M109_US.IconProfile.W_F = SpriteManager.US_M109_W_F;
-            M109_US.IconProfile.NW_F = SpriteManager.US_M109_NW_F;
-            M109_US.IconProfile.SW_F = SpriteManager.US_M109_SW_F;
+            M109_US.IconProfile = new RegimentIconProfile(RegimentIconType.Directional_Fire)
+            {
+                W = SpriteManager.US_M109_W,
+                NW = SpriteManager.US_M109_NW,
+                SW = SpriteManager.US_M109_SW,
+                W_F = SpriteManager.US_M109_W_F,
+                NW_F = SpriteManager.US_M109_NW_F,
+                SW_F = SpriteManager.US_M109_SW_F
+            };
 
             // Add the M109 US profile to the database
             AddProfile(WeaponType.SPA_M109_US, M109_US);
@@ -5269,13 +5441,15 @@ namespace HammerAndSickle.Models
             M109_GE.AddIntelReportStat(WeaponType.RCN_LUCHS_GE,      6);
 
             // Handle the icon profile.
-            M109_GE.IconProfile = new RegimentIconProfile(RegimentIconType.Directional_Fire);
-            M109_GE.IconProfile.W = SpriteManager.GE_M109_W;
-            M109_GE.IconProfile.NW = SpriteManager.GE_M109_NW;
-            M109_GE.IconProfile.SW = SpriteManager.GE_M109_SW;
-            M109_GE.IconProfile.W_F = SpriteManager.GE_M109_W_F;
-            M109_GE.IconProfile.NW_F = SpriteManager.GE_M109_NW_F;
-            M109_GE.IconProfile.SW_F = SpriteManager.GE_M109_SW_F;
+            M109_GE.IconProfile = new RegimentIconProfile(RegimentIconType.Directional_Fire)
+            {
+                W = SpriteManager.GE_M109_W,
+                NW = SpriteManager.GE_M109_NW,
+                SW = SpriteManager.GE_M109_SW,
+                W_F = SpriteManager.GE_M109_W_F,
+                NW_F = SpriteManager.GE_M109_NW_F,
+                SW_F = SpriteManager.GE_M109_SW_F
+            };
 
             // Add the M109 GE profile to the database
             AddProfile(WeaponType.SPA_M109_GE, M109_GE);
@@ -5330,13 +5504,15 @@ namespace HammerAndSickle.Models
             M109_FR.AddIntelReportStat(WeaponType.RCN_ERC90_FR,    6);
 
             // Handle the icon profile. (No dedicated French M109 sprites, using US M109)
-            M109_FR.IconProfile = new RegimentIconProfile(RegimentIconType.Directional_Fire);
-            M109_FR.IconProfile.W = SpriteManager.US_M109_W;
-            M109_FR.IconProfile.NW = SpriteManager.US_M109_NW;
-            M109_FR.IconProfile.SW = SpriteManager.US_M109_SW;
-            M109_FR.IconProfile.W_F = SpriteManager.US_M109_W_F;
-            M109_FR.IconProfile.NW_F = SpriteManager.US_M109_NW_F;
-            M109_FR.IconProfile.SW_F = SpriteManager.US_M109_SW_F;
+            M109_FR.IconProfile = new RegimentIconProfile(RegimentIconType.Directional_Fire)
+            {
+                W = SpriteManager.US_M109_W,
+                NW = SpriteManager.US_M109_NW,
+                SW = SpriteManager.US_M109_SW,
+                W_F = SpriteManager.US_M109_W_F,
+                NW_F = SpriteManager.US_M109_NW_F,
+                SW_F = SpriteManager.US_M109_SW_F
+            };
             // Add the M109 FR profile to the database
             AddProfile(WeaponType.SPA_M109_FR, M109_FR);
             //----------------------------------------------
@@ -5390,13 +5566,15 @@ namespace HammerAndSickle.Models
             M109_UK.AddIntelReportStat(WeaponType.RCN_FV105_UK, 6);
 
             // Handle the icon profile.
-            M109_UK.IconProfile = new RegimentIconProfile(RegimentIconType.Directional_Fire);
-            M109_UK.IconProfile.W = SpriteManager.UK_M109_W;
-            M109_UK.IconProfile.NW = SpriteManager.UK_M109_NW;
-            M109_UK.IconProfile.SW = SpriteManager.UK_M109_SW;
-            M109_UK.IconProfile.W_F = SpriteManager.UK_M109_W_F;
-            M109_UK.IconProfile.NW_F = SpriteManager.UK_M109_NW_F;
-            M109_UK.IconProfile.SW_F = SpriteManager.UK_M109_SW_F;
+            M109_UK.IconProfile = new RegimentIconProfile(RegimentIconType.Directional_Fire)
+            {
+                W = SpriteManager.UK_M109_W,
+                NW = SpriteManager.UK_M109_NW,
+                SW = SpriteManager.UK_M109_SW,
+                W_F = SpriteManager.UK_M109_W_F,
+                NW_F = SpriteManager.UK_M109_NW_F,
+                SW_F = SpriteManager.UK_M109_SW_F
+            };
 
             // Add the M109 UK profile to the database
             AddProfile(WeaponType.SPA_M109_UK, M109_UK);
@@ -5454,8 +5632,10 @@ namespace HammerAndSickle.Models
             ArtLightWest.AddIntelReportStat(WeaponType.APC_HUMVEE_US,12);
 
             // Handle the icon profile.
-            ArtLightWest.IconProfile = new RegimentIconProfile(RegimentIconType.Single);
-            ArtLightWest.IconProfile.W = SpriteManager.GEN_LightArt;
+            ArtLightWest.IconProfile = new RegimentIconProfile(RegimentIconType.Single)
+            {
+                W = SpriteManager.GEN_LightArt
+            };
 
             // Add the Light Artillery profile to the database
             AddProfile(WeaponType.ART_LIGHT_WEST, ArtLightWest);
@@ -5509,8 +5689,10 @@ namespace HammerAndSickle.Models
             ArtHeavyWest.AddIntelReportStat(WeaponType.APC_HUMVEE_US,12);
 
             // Handle the icon profile.
-            ArtHeavyWest.IconProfile = new RegimentIconProfile(RegimentIconType.Single);
-            ArtHeavyWest.IconProfile.W = SpriteManager.GEN_HeavyArt;
+            ArtHeavyWest.IconProfile = new RegimentIconProfile(RegimentIconType.Single)
+            {
+                W = SpriteManager.GEN_HeavyArt
+            };
 
             // Add the Heavy Artillery profile to the database
             AddProfile(WeaponType.ART_HEAVY_WEST, ArtHeavyWest);
@@ -5569,13 +5751,15 @@ namespace HammerAndSickle.Models
             MLRS_US.AddIntelReportStat(WeaponType.RCN_M3_US,        6);
 
             // Handle the icon profile.
-            MLRS_US.IconProfile = new RegimentIconProfile(RegimentIconType.Directional_Fire);
-            MLRS_US.IconProfile.W = SpriteManager.US_MLRS_W;
-            MLRS_US.IconProfile.NW = SpriteManager.US_MLRS_NW;
-            MLRS_US.IconProfile.SW = SpriteManager.US_MLRS_SW;
-            MLRS_US.IconProfile.W_F = SpriteManager.US_MLRS_W_F;
-            MLRS_US.IconProfile.NW_F = SpriteManager.US_MLRS_NW_F;
-            MLRS_US.IconProfile.SW_F = SpriteManager.US_MLRS_SW_F;
+            MLRS_US.IconProfile = new RegimentIconProfile(RegimentIconType.Directional_Fire)
+            {
+                W = SpriteManager.US_MLRS_W,
+                NW = SpriteManager.US_MLRS_NW,
+                SW = SpriteManager.US_MLRS_SW,
+                W_F = SpriteManager.US_MLRS_W_F,
+                NW_F = SpriteManager.US_MLRS_NW_F,
+                SW_F = SpriteManager.US_MLRS_SW_F
+            };
 
             // Add the MLRS US profile to the database
             AddProfile(WeaponType.ROC_MLRS_US, MLRS_US);
@@ -5633,13 +5817,15 @@ namespace HammerAndSickle.Models
             M163_US.AddIntelReportStat(WeaponType.MANPAD_STINGER,     12); // Chaparral mobile SAM systems
 
             // Handle the icon profile.
-            M163_US.IconProfile = new RegimentIconProfile(RegimentIconType.Directional_Fire);
-            M163_US.IconProfile.W = SpriteManager.US_M163_W;
-            M163_US.IconProfile.NW = SpriteManager.US_M163_NW;
-            M163_US.IconProfile.SW = SpriteManager.US_M163_SW;
-            M163_US.IconProfile.W_F = SpriteManager.US_M163_W_F;
-            M163_US.IconProfile.NW_F = SpriteManager.US_M163_NW_F;
-            M163_US.IconProfile.SW_F = SpriteManager.US_M163_SW_F;
+            M163_US.IconProfile = new RegimentIconProfile(RegimentIconType.Directional_Fire)
+            {
+                W = SpriteManager.US_M163_W,
+                NW = SpriteManager.US_M163_NW,
+                SW = SpriteManager.US_M163_SW,
+                W_F = SpriteManager.US_M163_W_F,
+                NW_F = SpriteManager.US_M163_NW_F,
+                SW_F = SpriteManager.US_M163_SW_F
+            };
 
             // Add the M163 US profile to the database
             AddProfile(WeaponType.SPAAA_M163_US, M163_US);
@@ -5693,13 +5879,15 @@ namespace HammerAndSickle.Models
             Chaparral.AddIntelReportStat(WeaponType.SPAAA_M163_US,  4); // Chaparral mobile SAM systems
 
             // Handle the icon profile.
-            Chaparral.IconProfile = new RegimentIconProfile(RegimentIconType.Directional_Fire);
-            Chaparral.IconProfile.W = SpriteManager.US_Chaparral_W;
-            Chaparral.IconProfile.NW = SpriteManager.US_Chaparral_NW;
-            Chaparral.IconProfile.SW = SpriteManager.US_Chaparral_SW;
-            Chaparral.IconProfile.W_F = SpriteManager.US_Chaparral_W_F;
-            Chaparral.IconProfile.NW_F = SpriteManager.US_Chaparral_NW_F;
-            Chaparral.IconProfile.SW_F = SpriteManager.US_Chaparral_SW_F;
+            Chaparral.IconProfile = new RegimentIconProfile(RegimentIconType.Directional_Fire)
+            {
+                W = SpriteManager.US_Chaparral_W,
+                NW = SpriteManager.US_Chaparral_NW,
+                SW = SpriteManager.US_Chaparral_SW,
+                W_F = SpriteManager.US_Chaparral_W_F,
+                NW_F = SpriteManager.US_Chaparral_NW_F,
+                SW_F = SpriteManager.US_Chaparral_SW_F
+            };
 
             // Add the Chaparral profile to the database
             AddProfile(WeaponType.SPSAM_CHAP_US, Chaparral);
@@ -5753,8 +5941,10 @@ namespace HammerAndSickle.Models
             Hawk_US.AddIntelReportStat(WeaponType.APC_M113_US,    24); // Chaparral mobile SAM systems
 
             // Handle the icon profile.
-            Hawk_US.IconProfile = new RegimentIconProfile(RegimentIconType.Single);
-            Hawk_US.IconProfile.W = SpriteManager.US_Hawk;
+            Hawk_US.IconProfile = new RegimentIconProfile(RegimentIconType.Single)
+            {
+                W = SpriteManager.US_Hawk
+            };
 
             // Add the Hawk US profile to the database
             AddProfile(WeaponType.SAM_HAWK_US, Hawk_US);
@@ -5809,13 +5999,15 @@ namespace HammerAndSickle.Models
             Gepard_GE.AddIntelReportStat(WeaponType.RCN_LUCHS_GE,        12);
 
             // Handle the icon profile.
-            Gepard_GE.IconProfile = new RegimentIconProfile(RegimentIconType.Directional_Fire);
-            Gepard_GE.IconProfile.W = SpriteManager.GE_Gepard_W;
-            Gepard_GE.IconProfile.NW = SpriteManager.GE_Gepard_NW;
-            Gepard_GE.IconProfile.SW = SpriteManager.GE_Gepard_SW;
-            Gepard_GE.IconProfile.W_F = SpriteManager.GE_Gepard_W_F;
-            Gepard_GE.IconProfile.NW_F = SpriteManager.GE_Gepard_NW_F;
-            Gepard_GE.IconProfile.SW_F = SpriteManager.GE_Gepard_SW_F;
+            Gepard_GE.IconProfile = new RegimentIconProfile(RegimentIconType.Directional_Fire)
+            {
+                W = SpriteManager.GE_Gepard_W,
+                NW = SpriteManager.GE_Gepard_NW,
+                SW = SpriteManager.GE_Gepard_SW,
+                W_F = SpriteManager.GE_Gepard_W_F,
+                NW_F = SpriteManager.GE_Gepard_NW_F,
+                SW_F = SpriteManager.GE_Gepard_SW_F
+            };
 
             // Add the Gepard GE profile to the database
             AddProfile(WeaponType.SPSAM_GEPARD_GE, Gepard_GE);
@@ -5869,13 +6061,15 @@ namespace HammerAndSickle.Models
             Roland_FR.AddIntelReportStat(WeaponType.RCN_ERC90_FR,       12);
 
             // Handle the icon profile.
-            Roland_FR.IconProfile = new RegimentIconProfile(RegimentIconType.Directional_Fire);
-            Roland_FR.IconProfile.W = SpriteManager.FR_Roland_W;
-            Roland_FR.IconProfile.NW = SpriteManager.FR_Roland_NW;
-            Roland_FR.IconProfile.SW = SpriteManager.FR_Roland_SW;
-            Roland_FR.IconProfile.W_F = SpriteManager.FR_Roland_W_F;
-            Roland_FR.IconProfile.NW_F = SpriteManager.FR_Roland_NW_F;
-            Roland_FR.IconProfile.SW_F = SpriteManager.FR_Roland_SW_F;
+            Roland_FR.IconProfile = new RegimentIconProfile(RegimentIconType.Directional_Fire)
+            {
+                W = SpriteManager.FR_Roland_W,
+                NW = SpriteManager.FR_Roland_NW,
+                SW = SpriteManager.FR_Roland_SW,
+                W_F = SpriteManager.FR_Roland_W_F,
+                NW_F = SpriteManager.FR_Roland_NW_F,
+                SW_F = SpriteManager.FR_Roland_SW_F
+            };
 
             // Add the Gepard FR profile to the database
             AddProfile(WeaponType.SPAAA_ROLAND_FR, Roland_FR);
@@ -5930,13 +6124,15 @@ namespace HammerAndSickle.Models
             Crotale.AddIntelReportStat(WeaponType.RCN_ERC90_FR,      12);
 
             // Handle the icon profile. (Using FR Roland sprites)
-            Crotale.IconProfile = new RegimentIconProfile(RegimentIconType.Directional_Fire);
-            Crotale.IconProfile.W = SpriteManager.US_Chaparral_W;
-            Crotale.IconProfile.NW = SpriteManager.US_Chaparral_NW;
-            Crotale.IconProfile.SW = SpriteManager.US_Chaparral_SW;
-            Crotale.IconProfile.W_F = SpriteManager.US_Chaparral_W_F;
-            Crotale.IconProfile.NW_F = SpriteManager.US_Chaparral_NW_F;
-            Crotale.IconProfile.SW_F = SpriteManager.US_Chaparral_SW_F;
+            Crotale.IconProfile = new RegimentIconProfile(RegimentIconType.Directional_Fire)
+            {
+                W = SpriteManager.US_Chaparral_W,
+                NW = SpriteManager.US_Chaparral_NW,
+                SW = SpriteManager.US_Chaparral_SW,
+                W_F = SpriteManager.US_Chaparral_W_F,
+                NW_F = SpriteManager.US_Chaparral_NW_F,
+                SW_F = SpriteManager.US_Chaparral_SW_F
+            };
 
             // Add the Crotale profile to the database
             AddProfile(WeaponType.SPSAM_CROTALE_FR, Crotale);
@@ -5991,13 +6187,15 @@ namespace HammerAndSickle.Models
             Rapier_SP.AddIntelReportStat(WeaponType.RCN_FV105_UK,     12);
 
             // Handle the icon profile. (No dedicated UK Rapier sprites, using FR Roland)
-            Rapier_SP.IconProfile = new RegimentIconProfile(RegimentIconType.Directional_Fire);
-            Rapier_SP.IconProfile.W = SpriteManager.US_Chaparral_W;
-            Rapier_SP.IconProfile.NW = SpriteManager.US_Chaparral_NW;
-            Rapier_SP.IconProfile.SW = SpriteManager.US_Chaparral_SW;
-            Rapier_SP.IconProfile.W_F = SpriteManager.US_Chaparral_W_F;
-            Rapier_SP.IconProfile.NW_F = SpriteManager.US_Chaparral_NW_F;
-            Rapier_SP.IconProfile.SW_F = SpriteManager.US_Chaparral_SW_F;
+            Rapier_SP.IconProfile = new RegimentIconProfile(RegimentIconType.Directional_Fire)
+            {
+                W = SpriteManager.US_Chaparral_W,
+                NW = SpriteManager.US_Chaparral_NW,
+                SW = SpriteManager.US_Chaparral_SW,
+                W_F = SpriteManager.US_Chaparral_W_F,
+                NW_F = SpriteManager.US_Chaparral_NW_F,
+                SW_F = SpriteManager.US_Chaparral_SW_F
+            };
 
             // Add the Tracked Rapier profile to the database
             AddProfile(WeaponType.SPSAM_RAPIER_UK, Rapier_SP);
@@ -6056,10 +6254,12 @@ namespace HammerAndSickle.Models
             M3_US.AddIntelReportStat(WeaponType.MANPAD_STINGER,    6);
 
             // Handle the icon profile. (Using M2 Bradley sprites)
-            M3_US.IconProfile = new RegimentIconProfile(RegimentIconType.Directional);
-            M3_US.IconProfile.W = SpriteManager.US_M2_W;
-            M3_US.IconProfile.NW = SpriteManager.US_M2_NW;
-            M3_US.IconProfile.SW = SpriteManager.US_M2_SW;
+            M3_US.IconProfile = new RegimentIconProfile(RegimentIconType.Directional)
+            {
+                W = SpriteManager.US_M2_W,
+                NW = SpriteManager.US_M2_NW,
+                SW = SpriteManager.US_M2_SW
+            };
 
             // Add the M3 Bradley profile to the database
             AddProfile(WeaponType.RCN_M3_US, M3_US);
@@ -6114,10 +6314,12 @@ namespace HammerAndSickle.Models
             LUCHS_GE.AddIntelReportStat(WeaponType.MANPAD_STINGER,    6);
 
             // Handle the icon profile. (Using Marder sprites as stand-in)
-            LUCHS_GE.IconProfile = new RegimentIconProfile(RegimentIconType.Directional);
-            LUCHS_GE.IconProfile.W = SpriteManager.GE_Luchs_W;
-            LUCHS_GE.IconProfile.NW = SpriteManager.GE_Luchs_NW;
-            LUCHS_GE.IconProfile.SW = SpriteManager.GE_Luchs_SW;
+            LUCHS_GE.IconProfile = new RegimentIconProfile(RegimentIconType.Directional)
+            {
+                W = SpriteManager.GE_Luchs_W,
+                NW = SpriteManager.GE_Luchs_NW,
+                SW = SpriteManager.GE_Luchs_SW
+            };
 
             // Add the Luchs profile to the database
             AddProfile(WeaponType.RCN_LUCHS_GE, LUCHS_GE);
@@ -6172,10 +6374,12 @@ namespace HammerAndSickle.Models
             FV105_UK.AddIntelReportStat(WeaponType.MANPAD_RAPIER,     6);
 
             // Handle the icon profile. (Using Warrior sprites as stand-in)
-            FV105_UK.IconProfile = new RegimentIconProfile(RegimentIconType.Directional);
-            FV105_UK.IconProfile.W = SpriteManager.UK_FV105_W;
-            FV105_UK.IconProfile.NW = SpriteManager.UK_FV105_NW;
-            FV105_UK.IconProfile.SW = SpriteManager.UK_FV105_SW;
+            FV105_UK.IconProfile = new RegimentIconProfile(RegimentIconType.Directional)
+            {
+                W = SpriteManager.UK_FV105_W,
+                NW = SpriteManager.UK_FV105_NW,
+                SW = SpriteManager.UK_FV105_SW
+            };
 
             // Add the FV105 Sultan profile to the database
             AddProfile(WeaponType.RCN_FV105_UK, FV105_UK);
@@ -6230,10 +6434,12 @@ namespace HammerAndSickle.Models
             ERC90_FR.AddIntelReportStat(WeaponType.MANPAD_MISTRAL,      6);
 
             // Handle the icon profile. (Using French M113 sprites as stand-in)
-            ERC90_FR.IconProfile = new RegimentIconProfile(RegimentIconType.Directional);
-            ERC90_FR.IconProfile.W = SpriteManager.FR_ERC90_W;
-            ERC90_FR.IconProfile.NW = SpriteManager.FR_ERC90_NW;
-            ERC90_FR.IconProfile.SW = SpriteManager.FR_ERC90_SW;
+            ERC90_FR.IconProfile = new RegimentIconProfile(RegimentIconType.Directional)
+            {
+                W = SpriteManager.FR_ERC90_W,
+                NW = SpriteManager.FR_ERC90_NW,
+                SW = SpriteManager.FR_ERC90_SW
+            };
 
             // Add the ERC 90 profile to the database
             AddProfile(WeaponType.RCN_ERC90_FR, ERC90_FR);
@@ -6290,13 +6496,15 @@ namespace HammerAndSickle.Models
             AH64.AddIntelReportStat(WeaponType.HEL_OH58,         24);
 
             // Handle the icon profile.
-            AH64.IconProfile = new RegimentIconProfile(RegimentIconType.Helo_Animation);
-            AH64.IconProfile.W = SpriteManager.US_AH64_Frame0;
-            AH64.IconProfile.NW = SpriteManager.US_AH64_Frame1;
-            AH64.IconProfile.SW = SpriteManager.US_AH64_Frame2;
-            AH64.IconProfile.W_F = SpriteManager.US_AH64_Frame3;
-            AH64.IconProfile.NW_F = SpriteManager.US_AH64_Frame4;
-            AH64.IconProfile.SW_F = SpriteManager.US_AH64_Frame5;
+            AH64.IconProfile = new RegimentIconProfile(RegimentIconType.Helo_Animation)
+            {
+                W = SpriteManager.US_AH64_Frame0,
+                NW = SpriteManager.US_AH64_Frame1,
+                SW = SpriteManager.US_AH64_Frame2,
+                W_F = SpriteManager.US_AH64_Frame3,
+                NW_F = SpriteManager.US_AH64_Frame4,
+                SW_F = SpriteManager.US_AH64_Frame5
+            };
 
             // Add the AH-64 Apache profile to the database
             AddProfile(WeaponType.HEL_AH64_US, AH64);
@@ -6349,13 +6557,15 @@ namespace HammerAndSickle.Models
             UH60.AddIntelReportStat(WeaponType.HEL_OH58,      24);
 
             // Handle the icon profile.
-            UH60.IconProfile = new RegimentIconProfile(RegimentIconType.Helo_Animation);
-            UH60.IconProfile.W = SpriteManager.US_UH60_Frame0;
-            UH60.IconProfile.NW = SpriteManager.US_UH60_Frame1;
-            UH60.IconProfile.SW = SpriteManager.US_UH60_Frame2;
-            UH60.IconProfile.W_F = SpriteManager.US_UH60_Frame3;
-            UH60.IconProfile.NW_F = SpriteManager.US_UH60_Frame4;
-            UH60.IconProfile.SW_F = SpriteManager.US_UH60_Frame5;
+            UH60.IconProfile = new RegimentIconProfile(RegimentIconType.Helo_Animation)
+            {
+                W = SpriteManager.US_UH60_Frame0,
+                NW = SpriteManager.US_UH60_Frame1,
+                SW = SpriteManager.US_UH60_Frame2,
+                W_F = SpriteManager.US_UH60_Frame3,
+                NW_F = SpriteManager.US_UH60_Frame4,
+                SW_F = SpriteManager.US_UH60_Frame5
+            };
 
             // Add the UH-60 Black Hawk profile to the database
             AddProfile(WeaponType.HEL_UH60_US, UH60);
@@ -6407,13 +6617,15 @@ namespace HammerAndSickle.Models
             BO105.AddIntelReportStat(WeaponType.HEL_BO105_GE,     54);
 
             // Handle the icon profile.
-            BO105.IconProfile = new RegimentIconProfile(RegimentIconType.Helo_Animation);
-            BO105.IconProfile.W = SpriteManager.GE_BO105_Frame0;
-            BO105.IconProfile.NW = SpriteManager.GE_BO105_Frame1;
-            BO105.IconProfile.SW = SpriteManager.GE_BO105_Frame2;
-            BO105.IconProfile.W_F = SpriteManager.GE_BO105_Frame3;
-            BO105.IconProfile.NW_F = SpriteManager.GE_BO105_Frame4;
-            BO105.IconProfile.SW_F = SpriteManager.GE_BO105_Frame5;
+            BO105.IconProfile = new RegimentIconProfile(RegimentIconType.Helo_Animation)
+            {
+                W = SpriteManager.GE_BO105_Frame0,
+                NW = SpriteManager.GE_BO105_Frame1,
+                SW = SpriteManager.GE_BO105_Frame2,
+                W_F = SpriteManager.GE_BO105_Frame3,
+                NW_F = SpriteManager.GE_BO105_Frame4,
+                SW_F = SpriteManager.GE_BO105_Frame5
+            };
 
             // Add the Bo 105 profile to the database
             AddProfile(WeaponType.HEL_BO105_GE, BO105);
@@ -6466,13 +6678,15 @@ namespace HammerAndSickle.Models
 
             // Handle the icon profile.
             // Note- No dedicated AH-1 sprites exist yet.
-            AH1.IconProfile = new RegimentIconProfile(RegimentIconType.Helo_Animation);
-            AH1.IconProfile.W = SpriteManager.US_AH64_Frame0;
-            AH1.IconProfile.NW = SpriteManager.US_AH64_Frame1;
-            AH1.IconProfile.SW = SpriteManager.US_AH64_Frame2;
-            AH1.IconProfile.W_F = SpriteManager.US_AH64_Frame3;
-            AH1.IconProfile.NW_F = SpriteManager.US_AH64_Frame4;
-            AH1.IconProfile.SW_F = SpriteManager.US_AH64_Frame5;
+            AH1.IconProfile = new RegimentIconProfile(RegimentIconType.Helo_Animation)
+            {
+                W = SpriteManager.US_AH64_Frame0,
+                NW = SpriteManager.US_AH64_Frame1,
+                SW = SpriteManager.US_AH64_Frame2,
+                W_F = SpriteManager.US_AH64_Frame3,
+                NW_F = SpriteManager.US_AH64_Frame4,
+                SW_F = SpriteManager.US_AH64_Frame5
+            };
 
             // Add the AH-1 Cobra profile to the database
             AddProfile(WeaponType.HEL_AH1, AH1);
@@ -6527,8 +6741,10 @@ namespace HammerAndSickle.Models
             F15.AddIntelReportStat(WeaponType.FGT_F15_US,     36);
 
             // Handle the icon profile.
-            F15.IconProfile = new RegimentIconProfile(RegimentIconType.Single);
-            F15.IconProfile.W = SpriteManager.US_F15;
+            F15.IconProfile = new RegimentIconProfile(RegimentIconType.Single)
+            {
+                W = SpriteManager.US_F15
+            };
 
             // Add the F-15 Eagle profile to the database
             AddProfile(WeaponType.FGT_F15_US, F15);
@@ -6579,8 +6795,10 @@ namespace HammerAndSickle.Models
             F16.AddIntelReportStat(WeaponType.FGT_F16_US,     36);
 
             // Handle the icon profile.
-            F16.IconProfile = new RegimentIconProfile(RegimentIconType.Single);
-            F16.IconProfile.W = SpriteManager.US_F16;
+            F16.IconProfile = new RegimentIconProfile(RegimentIconType.Single)
+            {
+                W = SpriteManager.US_F16
+            };
 
             // Add the F-16 Fighting Falcon profile to the database
             AddProfile(WeaponType.FGT_F16_US, F16);
@@ -6631,8 +6849,10 @@ namespace HammerAndSickle.Models
             F4_US.AddIntelReportStat(WeaponType.FGT_F4_US,     36);
 
             // Handle the icon profile.
-            F4_US.IconProfile = new RegimentIconProfile(RegimentIconType.Single);
-            F4_US.IconProfile.W = SpriteManager.US_F4;
+            F4_US.IconProfile = new RegimentIconProfile(RegimentIconType.Single)
+            {
+                W = SpriteManager.US_F4
+            };
 
             // Add the F-4 Phantom profile to the database
             AddProfile(WeaponType.FGT_F4_US, F4_US);
@@ -6683,8 +6903,10 @@ namespace HammerAndSickle.Models
             F14_US.AddIntelReportStat(WeaponType.FGT_F14_US,     36);
 
             // Handle the icon profile.
-            F14_US.IconProfile = new RegimentIconProfile(RegimentIconType.Single);
-            F14_US.IconProfile.W = SpriteManager.US_F14;
+            F14_US.IconProfile = new RegimentIconProfile(RegimentIconType.Single)
+            {
+                W = SpriteManager.US_F14
+            };
 
             // Add the F-14 Tomcat profile to the database
             AddProfile(WeaponType.FGT_F14_US, F14_US);
@@ -6735,8 +6957,10 @@ namespace HammerAndSickle.Models
             TORNADO_IDS.AddIntelReportStat(WeaponType.FGT_TORNADO_IDS_UK,     36);
 
             // Handle the icon profile.
-            TORNADO_IDS.IconProfile = new RegimentIconProfile(RegimentIconType.Single);
-            TORNADO_IDS.IconProfile.W = SpriteManager.GE_Tornado;
+            TORNADO_IDS.IconProfile = new RegimentIconProfile(RegimentIconType.Single)
+            {
+                W = SpriteManager.GE_Tornado
+            };
 
             // Add the Tornado IDS profile to the database
             AddProfile(WeaponType.FGT_TORNADO_IDS_UK, TORNADO_IDS);
@@ -6787,8 +7011,10 @@ namespace HammerAndSickle.Models
             TORNADO_GR1.AddIntelReportStat(WeaponType.FGT_TORNADO_GR1_US,     36);
 
             // Handle the icon profile.
-            TORNADO_GR1.IconProfile = new RegimentIconProfile(RegimentIconType.Single);
-            TORNADO_GR1.IconProfile.W = SpriteManager.UK_TornadoGR1;
+            TORNADO_GR1.IconProfile = new RegimentIconProfile(RegimentIconType.Single)
+            {
+                W = SpriteManager.UK_TornadoGR1
+            };
 
             // Add the Tornado GR.1 profile to the database
             AddProfile(WeaponType.FGT_TORNADO_GR1_US, TORNADO_GR1);
@@ -6839,8 +7065,10 @@ namespace HammerAndSickle.Models
             F4_GE.AddIntelReportStat(WeaponType.FGT_F4_GE,     36);
 
             // Handle the icon profile.
-            F4_GE.IconProfile = new RegimentIconProfile(RegimentIconType.Single);
-            F4_GE.IconProfile.W = SpriteManager.GE_F4;
+            F4_GE.IconProfile = new RegimentIconProfile(RegimentIconType.Single)
+            {
+                W = SpriteManager.GE_F4
+            };
 
             // Add the F-4F Phantom profile to the database
             AddProfile(WeaponType.FGT_F4_GE, F4_GE);
@@ -6891,8 +7119,10 @@ namespace HammerAndSickle.Models
             MIRAGE2000.AddIntelReportStat(WeaponType.FGT_MIRAGE2000_FR,     36);
 
             // Handle the icon profile.
-            MIRAGE2000.IconProfile = new RegimentIconProfile(RegimentIconType.Single);
-            MIRAGE2000.IconProfile.W = SpriteManager.FR_Mirage2000;
+            MIRAGE2000.IconProfile = new RegimentIconProfile(RegimentIconType.Single)
+            {
+                W = SpriteManager.FR_Mirage2000
+            };
 
             // Add the Mirage 2000 profile to the database
             AddProfile(WeaponType.FGT_MIRAGE2000_FR, MIRAGE2000);
@@ -6943,8 +7173,10 @@ namespace HammerAndSickle.Models
             MIRAGEF1.AddIntelReportStat(WeaponType.FGT_MIRAGEF1_FR,     36);
 
             // Handle the icon profile.
-            MIRAGEF1.IconProfile = new RegimentIconProfile(RegimentIconType.Single);
-            MIRAGEF1.IconProfile.W = SpriteManager.FR_MirageF1;
+            MIRAGEF1.IconProfile = new RegimentIconProfile(RegimentIconType.Single)
+            {
+                W = SpriteManager.FR_MirageF1
+            };
 
             // Add the Mirage F1 profile to the database
             AddProfile(WeaponType.FGT_MIRAGEF1_FR, MIRAGEF1);
@@ -6995,8 +7227,10 @@ namespace HammerAndSickle.Models
             A10.AddIntelReportStat(WeaponType.ATT_A10_US,     36);
 
             // Handle the icon profile.
-            A10.IconProfile = new RegimentIconProfile(RegimentIconType.Single);
-            A10.IconProfile.W = SpriteManager.US_A10;
+            A10.IconProfile = new RegimentIconProfile(RegimentIconType.Single)
+            {
+                W = SpriteManager.US_A10
+            };
 
             // Add the A-10 Thunderbolt profile to the database
             AddProfile(WeaponType.ATT_A10_US, A10);
@@ -7047,8 +7281,10 @@ namespace HammerAndSickle.Models
             F117.AddIntelReportStat(WeaponType.ATT_F117_US,     36);
 
             // Handle the icon profile.
-            F117.IconProfile = new RegimentIconProfile(RegimentIconType.Single);
-            F117.IconProfile.W = SpriteManager.US_F117;
+            F117.IconProfile = new RegimentIconProfile(RegimentIconType.Single)
+            {
+                W = SpriteManager.US_F117
+            };
 
             // Add the F-117 Nighthawk profile to the database
             AddProfile(WeaponType.ATT_F117_US, F117);
@@ -7099,8 +7335,10 @@ namespace HammerAndSickle.Models
             JAGUAR.AddIntelReportStat(WeaponType.ATT_JAGUAR_FR,     36);
 
             // Handle the icon profile.
-            JAGUAR.IconProfile = new RegimentIconProfile(RegimentIconType.Single);
-            JAGUAR.IconProfile.W = SpriteManager.FR_Jaguar;
+            JAGUAR.IconProfile = new RegimentIconProfile(RegimentIconType.Single)
+            {
+                W = SpriteManager.FR_Jaguar
+            };
 
             // Add the Jaguar profile to the database
             AddProfile(WeaponType.ATT_JAGUAR_FR, JAGUAR);
@@ -7151,8 +7389,10 @@ namespace HammerAndSickle.Models
             F111.AddIntelReportStat(WeaponType.BMB_F111_US,     24);
 
             // Handle the icon profile.
-            F111.IconProfile = new RegimentIconProfile(RegimentIconType.Single);
-            F111.IconProfile.W = SpriteManager.US_F111;
+            F111.IconProfile = new RegimentIconProfile(RegimentIconType.Single)
+            {
+                W = SpriteManager.US_F111
+            };
 
             // Add the F-111 Aardvark profile to the database
             AddProfile(WeaponType.BMB_F111_US, F111);
@@ -7203,8 +7443,10 @@ namespace HammerAndSickle.Models
             E3.AddIntelReportStat(WeaponType.AWACS_E3_US,     12);
 
             // Handle the icon profile.
-            E3.IconProfile = new RegimentIconProfile(RegimentIconType.Single);
-            E3.IconProfile.W = SpriteManager.US_E3;
+            E3.IconProfile = new RegimentIconProfile(RegimentIconType.Single)
+            {
+                W = SpriteManager.US_E3
+            };
 
             // Add the E-3 Sentry profile to the database
             AddProfile(WeaponType.AWACS_E3_US, E3);
@@ -7255,8 +7497,10 @@ namespace HammerAndSickle.Models
             SR71.AddIntelReportStat(WeaponType.RCNA_SR71_US,     12);
 
             // Handle the icon profile.
-            SR71.IconProfile = new RegimentIconProfile(RegimentIconType.Single);
-            SR71.IconProfile.W = SpriteManager.US_SR71;
+            SR71.IconProfile = new RegimentIconProfile(RegimentIconType.Single)
+            {
+                W = SpriteManager.US_SR71
+            };
 
             // Add the SR-71 Blackbird profile to the database
             AddProfile(WeaponType.RCNA_SR71_US, SR71);
@@ -7303,10 +7547,12 @@ namespace HammerAndSickle.Models
             );
 
             // Handle the icon profile.
-            TRK_W.IconProfile = new RegimentIconProfile(RegimentIconType.Directional);
-            TRK_W.IconProfile.W = SpriteManager.GEN_Truck_W;
-            TRK_W.IconProfile.NW = SpriteManager.GEN_Truck_NW;
-            TRK_W.IconProfile.SW = SpriteManager.GEN_Truck_SW;
+            TRK_W.IconProfile = new RegimentIconProfile(RegimentIconType.Directional)
+            {
+                W = SpriteManager.GEN_Truck_W,
+                NW = SpriteManager.GEN_Truck_NW,
+                SW = SpriteManager.GEN_Truck_SW
+            };
 
             // Add the Western Truck profile to the database
             AddProfile(WeaponType.TRK_WEST, TRK_W);
@@ -7361,8 +7607,10 @@ namespace HammerAndSickle.Models
             INF_REG_US_P.AddIntelReportStat(WeaponType.MANPAD_STINGER,        22);
 
             // Handle the icon profile.
-            INF_REG_US_P.IconProfile = new RegimentIconProfile(RegimentIconType.Single);
-            INF_REG_US_P.IconProfile.W = SpriteManager.US_Regulars;
+            INF_REG_US_P.IconProfile = new RegimentIconProfile(RegimentIconType.Single)
+            {
+                W = SpriteManager.US_Regulars
+            };
 
             // Add the US Regular Infantry profile to the database
             AddProfile(WeaponType.INF_REG_US, INF_REG_US_P);
@@ -7412,8 +7660,10 @@ namespace HammerAndSickle.Models
             INF_MAR_US_P.AddIntelReportStat(WeaponType.MANPAD_STINGER,        22);
 
             // Handle the icon profile.
-            INF_MAR_US_P.IconProfile = new RegimentIconProfile(RegimentIconType.Single);
-            INF_MAR_US_P.IconProfile.W = SpriteManager.US_Marines;
+            INF_MAR_US_P.IconProfile = new RegimentIconProfile(RegimentIconType.Single)
+            {
+                W = SpriteManager.US_Marines
+            };
 
             // Add the US Marine Infantry profile to the database
             AddProfile(WeaponType.INF_MAR_US, INF_MAR_US_P);
@@ -7461,10 +7711,12 @@ namespace HammerAndSickle.Models
             INF_AB_US_P.AddIntelReportStat(WeaponType.ART_120MM_MORTAR,      18);
             INF_AB_US_P.AddIntelReportStat(WeaponType.AT_ATGM,               54);
             INF_AB_US_P.AddIntelReportStat(WeaponType.MANPAD_STINGER,        36);
-            
+
             // Handle the icon profile.
-            INF_AB_US_P.IconProfile = new RegimentIconProfile(RegimentIconType.Single);
-            INF_AB_US_P.IconProfile.W = SpriteManager.US_Airborne;
+            INF_AB_US_P.IconProfile = new RegimentIconProfile(RegimentIconType.Single)
+            {
+                W = SpriteManager.US_Airborne
+            };
 
             // Add the US Airborne Infantry profile to the database
             AddProfile(WeaponType.INF_AB_US, INF_AB_US_P);
@@ -7514,8 +7766,10 @@ namespace HammerAndSickle.Models
             INF_AM_US_P.AddIntelReportStat(WeaponType.ART_82MM_MORTAR,       18);
 
             // Handle the icon profile.
-            INF_AM_US_P.IconProfile = new RegimentIconProfile(RegimentIconType.Single);
-            INF_AM_US_P.IconProfile.W = SpriteManager.US_Airborne;
+            INF_AM_US_P.IconProfile = new RegimentIconProfile(RegimentIconType.Single)
+            {
+                W = SpriteManager.US_Airborne
+            };
 
             // Add the US Air-Mobile Infantry profile to the database
             AddProfile(WeaponType.INF_AM_US, INF_AM_US_P);
@@ -7565,8 +7819,10 @@ namespace HammerAndSickle.Models
             INF_REG_UK_P.AddIntelReportStat(WeaponType.MANPAD_RAPIER,         24);
 
             // Handle the icon profile.
-            INF_REG_UK_P.IconProfile = new RegimentIconProfile(RegimentIconType.Single);
-            INF_REG_UK_P.IconProfile.W = SpriteManager.UK_Regulars;
+            INF_REG_UK_P.IconProfile = new RegimentIconProfile(RegimentIconType.Single)
+            {
+                W = SpriteManager.UK_Regulars
+            };
 
             // Add the UK Regular Infantry profile to the database
             AddProfile(WeaponType.INF_REG_UK, INF_REG_UK_P);
@@ -7616,8 +7872,10 @@ namespace HammerAndSickle.Models
             INF_AB_UK_P.AddIntelReportStat(WeaponType.MANPAD_RAPIER,         24);
 
             // Handle the icon profile.
-            INF_AB_UK_P.IconProfile = new RegimentIconProfile(RegimentIconType.Single);
-            INF_AB_UK_P.IconProfile.W = SpriteManager.UK_Airborne;
+            INF_AB_UK_P.IconProfile = new RegimentIconProfile(RegimentIconType.Single)
+            {
+                W = SpriteManager.UK_Airborne
+            };
 
             // Add the UK Airborne Infantry profile to the database
             AddProfile(WeaponType.INF_AB_UK, INF_AB_UK_P);
@@ -7667,8 +7925,10 @@ namespace HammerAndSickle.Models
             INF_REG_GE_P.AddIntelReportStat(WeaponType.MANPAD_STINGER,        28);
 
             // Handle the icon profile.
-            INF_REG_GE_P.IconProfile = new RegimentIconProfile(RegimentIconType.Single);
-            INF_REG_GE_P.IconProfile.W = SpriteManager.GER_Regulars;
+            INF_REG_GE_P.IconProfile = new RegimentIconProfile(RegimentIconType.Single)
+            {
+                W = SpriteManager.GER_Regulars
+            };
 
             // Add the FRG Regular Infantry profile to the database
             AddProfile(WeaponType.INF_REG_GE, INF_REG_GE_P);
@@ -7715,10 +7975,12 @@ namespace HammerAndSickle.Models
             INF_AB_GE_P.AddIntelReportStat(WeaponType.ART_120MM_MORTAR,      24);
             INF_AB_GE_P.AddIntelReportStat(WeaponType.AT_ATGM,               54);
             INF_AB_GE_P.AddIntelReportStat(WeaponType.MANPAD_STINGER,        36);
-            
+
             // Handle the icon profile.
-            INF_AB_GE_P.IconProfile = new RegimentIconProfile(RegimentIconType.Single);
-            INF_AB_GE_P.IconProfile.W = SpriteManager.GER_Airborne;
+            INF_AB_GE_P.IconProfile = new RegimentIconProfile(RegimentIconType.Single)
+            {
+                W = SpriteManager.GER_Airborne
+            };
 
             // Add the FRG Airborne Infantry profile to the database
             AddProfile(WeaponType.INF_AB_GE, INF_AB_GE_P);
@@ -7768,8 +8030,10 @@ namespace HammerAndSickle.Models
             INF_REG_FR_P.AddIntelReportStat(WeaponType.MANPAD_MISTRAL,        12);
 
             // Handle the icon profile.
-            INF_REG_FR_P.IconProfile = new RegimentIconProfile(RegimentIconType.Single);
-            INF_REG_FR_P.IconProfile.W = SpriteManager.FR_Regulars;
+            INF_REG_FR_P.IconProfile = new RegimentIconProfile(RegimentIconType.Single)
+            {
+                W = SpriteManager.FR_Regulars
+            };
 
             // Add the French Regular Infantry profile to the database
             AddProfile(WeaponType.INF_REG_FR, INF_REG_FR_P);
@@ -7816,10 +8080,12 @@ namespace HammerAndSickle.Models
             INF_AB_FR_P.AddIntelReportStat(WeaponType.ART_120MM_MORTAR,      36);
             INF_AB_FR_P.AddIntelReportStat(WeaponType.AT_ATGM,               36);
             INF_AB_FR_P.AddIntelReportStat(WeaponType.MANPAD_MISTRAL,        24);
-            
+
             // Handle the icon profile.
-            INF_AB_FR_P.IconProfile = new RegimentIconProfile(RegimentIconType.Single);
-            INF_AB_FR_P.IconProfile.W = SpriteManager.FR_Airborne;
+            INF_AB_FR_P.IconProfile = new RegimentIconProfile(RegimentIconType.Single)
+            {
+                W = SpriteManager.FR_Airborne
+            };
 
             // Add the French Airborne Infantry profile to the database
             AddProfile(WeaponType.INF_AB_FR, INF_AB_FR_P);
@@ -7889,10 +8155,12 @@ namespace HammerAndSickle.Models
             T55A.AddIntelReportStat(WeaponType.SPSAM_2K12_IQ,      4);
 
             // Handle the icon profile.
-            T55A.IconProfile = new RegimentIconProfile(RegimentIconType.Directional);
-            T55A.IconProfile.W = SpriteManager.AR_T55_W;
-            T55A.IconProfile.NW = SpriteManager.AR_T55_NW;
-            T55A.IconProfile.SW = SpriteManager.AR_T55_SW;
+            T55A.IconProfile = new RegimentIconProfile(RegimentIconType.Directional)
+            {
+                W = SpriteManager.AR_T55_W,
+                NW = SpriteManager.AR_T55_NW,
+                SW = SpriteManager.AR_T55_SW
+            };
 
             // Add the T-55A profile to the database
             AddProfile(WeaponType.TANK_T55A_IQ, T55A);
@@ -7953,10 +8221,12 @@ namespace HammerAndSickle.Models
             T62A.AddIntelReportStat(WeaponType.SPSAM_2K12_IQ,     4);
 
             // Handle the icon profile. (Using T-55 sprites as stand-in)
-            T62A.IconProfile = new RegimentIconProfile(RegimentIconType.Directional);
-            T62A.IconProfile.W = SpriteManager.AR_T55_W;
-            T62A.IconProfile.NW = SpriteManager.AR_T55_NW;
-            T62A.IconProfile.SW = SpriteManager.AR_T55_SW;
+            T62A.IconProfile = new RegimentIconProfile(RegimentIconType.Directional)
+            {
+                W = SpriteManager.AR_T55_W,
+                NW = SpriteManager.AR_T55_NW,
+                SW = SpriteManager.AR_T55_SW
+            };
 
             // Add the T-62A profile to the database
             AddProfile(WeaponType.TANK_T62A_IQ, T62A);
@@ -8015,10 +8285,12 @@ namespace HammerAndSickle.Models
             M60A3.AddIntelReportStat(WeaponType.SPAAA_ZSU23_SV,     4);
 
             // Handle the icon profile.
-            M60A3.IconProfile = new RegimentIconProfile(RegimentIconType.Directional);
-            M60A3.IconProfile.W = SpriteManager.AR_M60_W;
-            M60A3.IconProfile.NW = SpriteManager.AR_M60_NW;
-            M60A3.IconProfile.SW = SpriteManager.AR_M60_SW;
+            M60A3.IconProfile = new RegimentIconProfile(RegimentIconType.Directional)
+            {
+                W = SpriteManager.AR_M60_W,
+                NW = SpriteManager.AR_M60_NW,
+                SW = SpriteManager.AR_M60_SW
+            };
 
             // Add the M60A3 profile to the database
             AddProfile(WeaponType.TANK_M60A3_IR, M60A3);
@@ -8075,10 +8347,12 @@ namespace HammerAndSickle.Models
             BMP1_IQ.AddIntelReportStat(WeaponType.APC_MTLB_IQ,        8);
 
             // Handle the icon profile.
-            BMP1_IQ.IconProfile = new RegimentIconProfile(RegimentIconType.Directional);
-            BMP1_IQ.IconProfile.W = SpriteManager.AR_BMP1_W;
-            BMP1_IQ.IconProfile.NW = SpriteManager.AR_BMP1_NW;
-            BMP1_IQ.IconProfile.SW = SpriteManager.AR_BMP1_SW;
+            BMP1_IQ.IconProfile = new RegimentIconProfile(RegimentIconType.Directional)
+            {
+                W = SpriteManager.AR_BMP1_W,
+                NW = SpriteManager.AR_BMP1_NW,
+                SW = SpriteManager.AR_BMP1_SW
+            };
 
             // Add the BMP-1 profile to the database
             AddProfile(WeaponType.IFV_BMP1_IQ, BMP1_IQ);
@@ -8130,10 +8404,12 @@ namespace HammerAndSickle.Models
             MTLB_IQ.AddIntelReportStat(WeaponType.TANK_T55A_IQ,      31);
 
             // Handle the icon profile.
-            MTLB_IQ.IconProfile = new RegimentIconProfile(RegimentIconType.Directional);
-            MTLB_IQ.IconProfile.W = SpriteManager.AR_MTLB_W;
-            MTLB_IQ.IconProfile.NW = SpriteManager.AR_MTLB_NW;
-            MTLB_IQ.IconProfile.SW = SpriteManager.AR_MTLB_SW;
+            MTLB_IQ.IconProfile = new RegimentIconProfile(RegimentIconType.Directional)
+            {
+                W = SpriteManager.AR_MTLB_W,
+                NW = SpriteManager.AR_MTLB_NW,
+                SW = SpriteManager.AR_MTLB_SW
+            };
 
             // Add the MT-LB profile to the database
             AddProfile(WeaponType.APC_MTLB_IQ, MTLB_IQ);
@@ -8185,10 +8461,12 @@ namespace HammerAndSickle.Models
             M113_IR.AddIntelReportStat(WeaponType.TANK_M60A3_IR,     31);
 
             // Handle the icon profile.
-            M113_IR.IconProfile = new RegimentIconProfile(RegimentIconType.Directional);
-            M113_IR.IconProfile.W = SpriteManager.AR_M113_W;
-            M113_IR.IconProfile.NW = SpriteManager.AR_M113_NW;
-            M113_IR.IconProfile.SW = SpriteManager.AR_M113_SW;
+            M113_IR.IconProfile = new RegimentIconProfile(RegimentIconType.Directional)
+            {
+                W = SpriteManager.AR_M113_W,
+                NW = SpriteManager.AR_M113_NW,
+                SW = SpriteManager.AR_M113_SW
+            };
 
             // Add the M113 profile to the database
             AddProfile(WeaponType.APC_M113_IR, M113_IR);
@@ -8246,13 +8524,15 @@ namespace HammerAndSickle.Models
             SPA_2S1_AR.AddIntelReportStat(WeaponType.MANPAD_STRELA,      8);
 
             // Handle the icon profile.
-            SPA_2S1_AR.IconProfile = new RegimentIconProfile(RegimentIconType.Directional_Fire);
-            SPA_2S1_AR.IconProfile.W = SpriteManager.AR_2S1_W;
-            SPA_2S1_AR.IconProfile.NW = SpriteManager.AR_2S1_NW;
-            SPA_2S1_AR.IconProfile.SW = SpriteManager.AR_2S1_SW;
-            SPA_2S1_AR.IconProfile.W_F = SpriteManager.AR_2S1_W_F;
-            SPA_2S1_AR.IconProfile.NW_F = SpriteManager.AR_2S1_NW_F;
-            SPA_2S1_AR.IconProfile.SW_F = SpriteManager.AR_2S1_SW_F;
+            SPA_2S1_AR.IconProfile = new RegimentIconProfile(RegimentIconType.Directional_Fire)
+            {
+                W = SpriteManager.AR_2S1_W,
+                NW = SpriteManager.AR_2S1_NW,
+                SW = SpriteManager.AR_2S1_SW,
+                W_F = SpriteManager.AR_2S1_W_F,
+                NW_F = SpriteManager.AR_2S1_NW_F,
+                SW_F = SpriteManager.AR_2S1_SW_F
+            };
 
             // Add the 2S1 Gvozdika profile to the database
             AddProfile(WeaponType.SPA_2S1_IQ, SPA_2S1_AR);
@@ -8306,8 +8586,10 @@ namespace HammerAndSickle.Models
             ART_LT_AR.AddIntelReportStat(WeaponType.MANPAD_STRELA,        6);
 
             // Handle the icon profile.
-            ART_LT_AR.IconProfile = new RegimentIconProfile(RegimentIconType.Single);
-            ART_LT_AR.IconProfile.W = SpriteManager.GEN_LightArt;
+            ART_LT_AR.IconProfile = new RegimentIconProfile(RegimentIconType.Single)
+            {
+                W = SpriteManager.GEN_LightArt
+            };
 
             // Add the Arab Light Artillery profile to the database
             AddProfile(WeaponType.ART_LIGHT_ARAB, ART_LT_AR);
@@ -8361,8 +8643,10 @@ namespace HammerAndSickle.Models
             ART_HV_AR.AddIntelReportStat(WeaponType.MANPAD_STRELA,        8);
 
             // Handle the icon profile.
-            ART_HV_AR.IconProfile = new RegimentIconProfile(RegimentIconType.Single);
-            ART_HV_AR.IconProfile.W = SpriteManager.GEN_HeavyArt;
+            ART_HV_AR.IconProfile = new RegimentIconProfile(RegimentIconType.Single)
+            {
+                W = SpriteManager.GEN_HeavyArt
+            };
 
             // Add the Arab Heavy Artillery profile to the database
             AddProfile(WeaponType.ART_HEAVY_ARAB, ART_HV_AR);
@@ -8419,8 +8703,10 @@ namespace HammerAndSickle.Models
             AAA_MJ.AddIntelReportStat(WeaponType.AAA_GEN_MJ,        24);
 
             // Handle the icon profile.
-            AAA_MJ.IconProfile = new RegimentIconProfile(RegimentIconType.Single);
-            AAA_MJ.IconProfile.W = SpriteManager.MJ_AA;
+            AAA_MJ.IconProfile = new RegimentIconProfile(RegimentIconType.Single)
+            {
+                W = SpriteManager.MJ_AA
+            };
 
             // Add the Mujahideen AAA profile to the database
             AddProfile(WeaponType.AAA_GEN_MJ, AAA_MJ);
@@ -8473,13 +8759,139 @@ namespace HammerAndSickle.Models
             SAM_MJ.AddIntelReportStat(WeaponType.MANPAD_STINGER,    12);
 
             // Handle the icon profile.
-            SAM_MJ.IconProfile = new RegimentIconProfile(RegimentIconType.Single);
-            SAM_MJ.IconProfile.W = SpriteManager.MJ_Stinger;
+            SAM_MJ.IconProfile = new RegimentIconProfile(RegimentIconType.Single)
+            {
+                W = SpriteManager.MJ_Stinger
+            };
 
             // Add the Mujahideen SAM profile to the database
             AddProfile(WeaponType.SAM_GEN_MJ, SAM_MJ);
             //----------------------------------------------
             // Mujahideen Stinger SAM Team
+            //----------------------------------------------
+
+            //----------------------------------------------
+            // IQ ZSU-57 Self-Propelled Anti-Aircraft Gun
+            //----------------------------------------------
+            WeaponProfile ZSU_57_IQ = new WeaponProfile(
+                _longName: "ZSU-57 Self-Propelled Anti-Aircraft Gun",
+                _shortName: "ZSU-57",
+                _type: WeaponType.SPAAA_ZSU57_IQ,
+                _hardAtt: GameData.BASE_AAA_HARD_ATTACK,                    // Hard Attack Rating
+                _hardDef: GameData.BASE_AAA_HARD_DEFENSE,                   // Hard Defense Rating
+                _softAtt: GameData.BASE_AAA_SOFT_ATTACK,                    // Soft Attack Rating
+                _softDef: GameData.BASE_AAA_SOFT_DEFENSE,                   // Soft Defense Rating
+                _gat: GameData.BASE_AAA_GROUND_AIR_ATTACK + SMALL_BONUS,   // Ground-to-Air Attack Rating
+                _gad: GameData.GROUND_DEFENSE_AAA,                          // Ground Defense Armor Rating
+                _df: 0,                                    // Dogfighting Rating
+                _man: 0,                                   // Maneuverability Rating
+                _topSpd: 0,                                // Top Speed Rating
+                _surv: 0,                                  // Survivability Rating
+                _ga: 0,                                    // Ground Attack Rating
+                _ol: 0,                                    // Ordinance Rating
+                _stealth: 0,                               // Stealth Rating
+                _pr: GameData.PRIMARY_RANGE_DEFAULT,       // Primary Range
+                _ir: GameData.INDIRECT_RANGE_AAA,          // Indirect Range
+                _sr: GameData.BASE_AAA_SPOTTING_RANGE,     // Spotting Range
+                _mmp: GameData.MECH_UNIT,                  // Max Movement Points
+                _isAmph: false,                            // Is Amphibious
+                _isDF: false,                              // Is DoubleFire
+                _isAtt: true,                              // Can this profile attack
+                _awr: AllWeatherRating.GroundUnit,         // All-Weather Capability
+                _sir: SIGINT_Rating.UnitLevel,             // SIGINT Rating
+                _nbc: NBC_Rating.Gen1,                     // NBC Rating
+                _nvg: NVG_Rating.Gen1,                     // NVG Rating
+                _sil: UnitSilhouette.Medium,               // Unit Silhouette
+                _upgradePath: UpgradePath.AAA,             // Upgrade Path
+                _turnAvailable: 372                        // How many months past Jan. 1938
+            );
+
+            // Set the prestige cost for the profile.
+            ZSU_57_IQ.SetPrestigeCost(PrestigeTierCost.Gen1, PrestigeTypeCost.SPAAA);
+
+            // Intel report stats
+            ZSU_57_IQ.AddIntelReportStat(WeaponType.Personnel, 900); // Air defense personnel
+            ZSU_57_IQ.AddIntelReportStat(WeaponType.SPAAA_ZSU57_IQ, 18); // ZSU-57 SPAAA units
+            ZSU_57_IQ.AddIntelReportStat(WeaponType.APC_MTLB_IQ, 24); // Command and control vehicles
+            ZSU_57_IQ.AddIntelReportStat(WeaponType.MANPAD_STRELA, 12); // Strela mobile SAM systems
+
+            // Handle the icon profile.
+            ZSU_57_IQ.IconProfile = new RegimentIconProfile(RegimentIconType.Directional_Fire)
+            {
+                W = SpriteManager.AR_ZSU57_W,
+                NW = SpriteManager.AR_ZSU57_NW,
+                SW = SpriteManager.AR_ZSU57_SW,
+                W_F = SpriteManager.AR_ZSU57_W_F,
+                NW_F = SpriteManager.AR_ZSU57_NW_F,
+                SW_F = SpriteManager.AR_ZSU57_SW_F
+            };
+
+            // Add the ZSU-57 IQ profile to the database
+            AddProfile(WeaponType.SPAAA_ZSU57_IQ, ZSU_57_IQ);
+            //----------------------------------------------
+            // IQ ZSU-57 Self-Propelled Anti-Aircraft Gun
+            //----------------------------------------------
+
+            //----------------------------------------------
+            // IQ 2k12 Self-Propelled SAM System
+            //----------------------------------------------
+            WeaponProfile SPSAM_2k12 = new WeaponProfile(
+                _longName: "2K12 Self-Propelled SAM",
+                _shortName: "2K12",
+                _type: WeaponType.SPSAM_2K12_IQ,
+                _hardAtt: GameData.BASE_SAM_HARD_ATTACK,                    // Hard Attack Rating
+                _hardDef: GameData.BASE_SAM_HARD_DEFENSE,                   // Hard Defense Rating
+                _softAtt: GameData.BASE_SAM_SOFT_ATTACK,                    // Soft Attack Rating
+                _softDef: GameData.BASE_SAM_SOFT_DEFENSE,                   // Soft Defense Rating
+                _gat: GameData.BASE_SAM_GROUND_AIR_ATTACK + SMALL_BONUS,    // Ground-to-Air Attack Rating
+                _gad: GameData.GROUND_DEFENSE_SAM,                          // Ground Defense Armor Rating
+                _df: 0,                                    // Dogfighting Rating
+                _man: 0,                                   // Maneuverability Rating
+                _topSpd: 0,                                // Top Speed Rating
+                _surv: 0,                                  // Survivability Rating
+                _ga: 0,                                    // Ground Attack Rating
+                _ol: 0,                                    // Ordinance Rating
+                _stealth: 0,                               // Stealth Rating
+                _pr: GameData.PRIMARY_RANGE_DEFAULT,       // Primary Range
+                _ir: GameData.INDIRECT_RANGE_SAM,          // Indirect Range
+                _sr: GameData.BASE_SAM_SPOTTING_RANGE,     // Spotting Range
+                _mmp: GameData.MECH_UNIT,                  // Max Movement Points
+                _isAmph: false,                            // Is Amphibious
+                _isDF: false,                              // Is DoubleFire
+                _isAtt: true,                              // Can this profile attack
+                _awr: AllWeatherRating.GroundUnit,         // All-Weather Capability
+                _sir: SIGINT_Rating.UnitLevel,             // SIGINT Rating
+                _nbc: NBC_Rating.Gen1,                     // NBC Rating
+                _nvg: NVG_Rating.Gen1,                     // NVG Rating
+                _sil: UnitSilhouette.Medium,               // Unit Silhouette
+                _upgradePath: UpgradePath.AAA,             // Upgrade Path
+                _turnAvailable: 372                        // How many months past Jan. 1938
+            );
+
+            // Set the prestige cost for the profile.
+            SPSAM_2k12.SetPrestigeCost(PrestigeTierCost.Gen1, PrestigeTypeCost.SPAAA);
+
+            // Intel report stats
+            SPSAM_2k12.AddIntelReportStat(WeaponType.Personnel, 900); // Air defense personnel
+            SPSAM_2k12.AddIntelReportStat(WeaponType.SPSAM_2K12_IQ, 18); // 2K12 SPAAA units
+            SPSAM_2k12.AddIntelReportStat(WeaponType.APC_MTLB_IQ, 24); // Command and control vehicles
+            SPSAM_2k12.AddIntelReportStat(WeaponType.MANPAD_STRELA, 12); // Strela mobile SAM systems
+
+            // Handle the icon profile.
+            SPSAM_2k12.IconProfile = new RegimentIconProfile(RegimentIconType.Directional_Fire)
+            {
+                W = SpriteManager.AR_2K12_W,
+                NW = SpriteManager.AR_2K12_NW,
+                SW = SpriteManager.AR_2K12_SW,
+                W_F = SpriteManager.AR_2K12_W_F,
+                NW_F = SpriteManager.AR_2K12_NW_F,
+                SW_F = SpriteManager.AR_2K12_SW_F
+            };
+
+            // Add the 2K12 IQ profile to the database
+            AddProfile(WeaponType.SPSAM_2K12_IQ, SPSAM_2k12);
+            //----------------------------------------------
+            // IQ 2k12 Self-Propelled SAM
             //----------------------------------------------
 
             #endregion // Air Defense
@@ -8529,8 +8941,10 @@ namespace HammerAndSickle.Models
             MIG21_IQ.AddIntelReportStat(WeaponType.FGT_MIG21_IQ,     36);
 
             // Handle the icon profile.
-            MIG21_IQ.IconProfile = new RegimentIconProfile(RegimentIconType.Single);
-            MIG21_IQ.IconProfile.W = SpriteManager.AR_Mig21;
+            MIG21_IQ.IconProfile = new RegimentIconProfile(RegimentIconType.Single)
+            {
+                W = SpriteManager.AR_Mig21
+            };
 
             // Add the MiG-21 profile to the database
             AddProfile(WeaponType.FGT_MIG21_IQ, MIG21_IQ);
@@ -8581,8 +8995,10 @@ namespace HammerAndSickle.Models
             MIG23_IQ.AddIntelReportStat(WeaponType.FGT_MIG23_IQ,     36);
 
             // Handle the icon profile.
-            MIG23_IQ.IconProfile = new RegimentIconProfile(RegimentIconType.Single);
-            MIG23_IQ.IconProfile.W = SpriteManager.AR_Mig23;
+            MIG23_IQ.IconProfile = new RegimentIconProfile(RegimentIconType.Single)
+            {
+                W = SpriteManager.AR_Mig23
+            };
 
             // Add the MiG-23 profile to the database
             AddProfile(WeaponType.FGT_MIG23_IQ, MIG23_IQ);
@@ -8633,8 +9049,10 @@ namespace HammerAndSickle.Models
             SU17_IQ.AddIntelReportStat(WeaponType.ATT_SU17_IQ,     36);
 
             // Handle the icon profile.
-            SU17_IQ.IconProfile = new RegimentIconProfile(RegimentIconType.Single);
-            SU17_IQ.IconProfile.W = SpriteManager.AR_SU17;
+            SU17_IQ.IconProfile = new RegimentIconProfile(RegimentIconType.Single)
+            {
+                W = SpriteManager.AR_SU17
+            };
 
             // Add the Su-17 profile to the database
             AddProfile(WeaponType.ATT_SU17_IQ, SU17_IQ);
@@ -8685,8 +9103,10 @@ namespace HammerAndSickle.Models
             F4_IR.AddIntelReportStat(WeaponType.FGT_F4_IR,     48);
 
             // Handle the icon profile.
-            F4_IR.IconProfile = new RegimentIconProfile(RegimentIconType.Single);
-            F4_IR.IconProfile.W = SpriteManager.AR_F4;
+            F4_IR.IconProfile = new RegimentIconProfile(RegimentIconType.Single)
+            {
+                W = SpriteManager.AR_F4
+            };
 
             // Add the Iranian F-4 profile to the database
             AddProfile(WeaponType.FGT_F4_IR, F4_IR);
@@ -8737,8 +9157,10 @@ namespace HammerAndSickle.Models
             F14_IR.AddIntelReportStat(WeaponType.FGT_F14_IR,     48);
 
             // Handle the icon profile.
-            F14_IR.IconProfile = new RegimentIconProfile(RegimentIconType.Single);
-            F14_IR.IconProfile.W = SpriteManager.AR_F14;
+            F14_IR.IconProfile = new RegimentIconProfile(RegimentIconType.Single)
+            {
+                W = SpriteManager.AR_F14
+            };
 
             // Add the Iranian F-14 profile to the database
             AddProfile(WeaponType.FGT_F14_IR, F14_IR);
@@ -8785,10 +9207,12 @@ namespace HammerAndSickle.Models
             );
 
             // Handle the icon profile.
-            TRK_AR.IconProfile = new RegimentIconProfile(RegimentIconType.Directional);
-            TRK_AR.IconProfile.W = SpriteManager.AR_Truck_W;
-            TRK_AR.IconProfile.NW = SpriteManager.AR_Truck_NW;
-            TRK_AR.IconProfile.SW = SpriteManager.AR_Truck_SW;
+            TRK_AR.IconProfile = new RegimentIconProfile(RegimentIconType.Directional)
+            {
+                W = SpriteManager.AR_Truck_W,
+                NW = SpriteManager.AR_Truck_NW,
+                SW = SpriteManager.AR_Truck_SW
+            };
 
             // Add the Arab Truck profile to the database
             AddProfile(WeaponType.TRK_GEN_ARAB, TRK_AR);
@@ -8797,6 +9221,118 @@ namespace HammerAndSickle.Models
             //----------------------------------------------
 
             #endregion // Trucks
+
+            #region Infantry
+
+            //----------------------------------------------
+            // IQ Regular Infantry
+            //----------------------------------------------
+            WeaponProfile INF_REG_IQ_P = new WeaponProfile(
+                _longName: "Iraqi Regular Infantry",
+                _shortName: "IQ Regulars",
+                _type: WeaponType.INF_REG_IQ,
+                _hardAtt: GameData.BASE_INF_HARD_ATTACK,                    // Hard Attack Rating
+                _hardDef: GameData.BASE_INF_HARD_DEFENSE,                   // Hard Defense Rating
+                _softAtt: GameData.BASE_INF_SOFT_ATTACK,                    // Soft Attack Rating
+                _softDef: GameData.BASE_INF_SOFT_DEFENSE,                   // Soft Defense Rating
+                _gat: GameData.GROUND_AIR_ATTACK_DEFAULT,  // Ground-to-Air Attack Rating
+                _gad: GameData.GROUND_DEFENSE_INFANTRY,    // Ground Defense Armor Rating
+                _df: 0,                                    // Dogfighting Rating
+                _man: 0,                                   // Maneuverability Rating
+                _topSpd: 0,                                // Top Speed Rating
+                _surv: 0,                                  // Survivability Rating
+                _ga: 0,                                    // Ground Attack Rating
+                _ol: 0,                                    // Ordinance Rating
+                _stealth: 0,                               // Stealth Rating
+                _pr: GameData.PRIMARY_RANGE_DEFAULT,       // Primary Range
+                _ir: GameData.INDIRECT_RANGE_DEFAULT,      // Indirect Range
+                _sr: GameData.BASE_UNIT_SPOTTING_RANGE,    // Spotting Range
+                _mmp: GameData.FOOT_UNIT,                  // Max Movement Points
+                _isAmph: false,                            // Is Amphibious
+                _isDF: false,                              // Is DoubleFire
+                _isAtt: true,                              // Can this profile attack
+                _awr: AllWeatherRating.GroundUnit,         // All-Weather Capability
+                _sir: SIGINT_Rating.UnitLevel,             // SIGINT Rating
+                _nbc: NBC_Rating.Gen1,                     // NBC Rating
+                _nvg: NVG_Rating.None,                     // NVG Rating
+                _sil: UnitSilhouette.Small                 // Unit Silhouette
+            );
+
+            // Intel stats
+            INF_REG_IQ_P.AddIntelReportStat(WeaponType.Personnel, 2040);
+            INF_REG_IQ_P.AddIntelReportStat(WeaponType.ART_HEAVY_ARAB, 18);
+            INF_REG_IQ_P.AddIntelReportStat(WeaponType.ART_120MM_MORTAR, 18);
+            INF_REG_IQ_P.AddIntelReportStat(WeaponType.AT_ATGM, 12);
+            INF_REG_IQ_P.AddIntelReportStat(WeaponType.MANPAD_STRELA, 24);
+
+            // Handle the icon profile.
+            INF_REG_IQ_P.IconProfile = new RegimentIconProfile(RegimentIconType.Single)
+            {
+                W = SpriteManager.IQ_Regulars
+            };
+
+            // Add the IQ Regular Infantry profile to the database
+            AddProfile(WeaponType.INF_REG_IQ, INF_REG_IQ_P);
+
+            //----------------------------------------------
+            // IQ Regular Infantry
+            //----------------------------------------------
+
+            //----------------------------------------------
+            // IR Regular Infantry
+            //----------------------------------------------
+            WeaponProfile INF_REG_IR_P = new WeaponProfile(
+                _longName: "Iranian Regular Infantry",
+                _shortName: "IR Regulars",
+                _type: WeaponType.INF_REG_IR,
+                _hardAtt: GameData.BASE_INF_HARD_ATTACK,                    // Hard Attack Rating
+                _hardDef: GameData.BASE_INF_HARD_DEFENSE,                   // Hard Defense Rating
+                _softAtt: GameData.BASE_INF_SOFT_ATTACK,                    // Soft Attack Rating
+                _softDef: GameData.BASE_INF_SOFT_DEFENSE,                   // Soft Defense Rating
+                _gat: GameData.GROUND_AIR_ATTACK_DEFAULT,  // Ground-to-Air Attack Rating
+                _gad: GameData.GROUND_DEFENSE_INFANTRY,    // Ground Defense Armor Rating
+                _df: 0,                                    // Dogfighting Rating
+                _man: 0,                                   // Maneuverability Rating
+                _topSpd: 0,                                // Top Speed Rating
+                _surv: 0,                                  // Survivability Rating
+                _ga: 0,                                    // Ground Attack Rating
+                _ol: 0,                                    // Ordinance Rating
+                _stealth: 0,                               // Stealth Rating
+                _pr: GameData.PRIMARY_RANGE_DEFAULT,       // Primary Range
+                _ir: GameData.INDIRECT_RANGE_DEFAULT,      // Indirect Range
+                _sr: GameData.BASE_UNIT_SPOTTING_RANGE,    // Spotting Range
+                _mmp: GameData.FOOT_UNIT,                  // Max Movement Points
+                _isAmph: false,                            // Is Amphibious
+                _isDF: false,                              // Is DoubleFire
+                _isAtt: true,                              // Can this profile attack
+                _awr: AllWeatherRating.GroundUnit,         // All-Weather Capability
+                _sir: SIGINT_Rating.UnitLevel,             // SIGINT Rating
+                _nbc: NBC_Rating.Gen1,                     // NBC Rating
+                _nvg: NVG_Rating.None,                     // NVG Rating
+                _sil: UnitSilhouette.Small                 // Unit Silhouette
+            );
+
+            // Intel stats
+            INF_REG_IR_P.AddIntelReportStat(WeaponType.Personnel, 2040);
+            INF_REG_IR_P.AddIntelReportStat(WeaponType.ART_HEAVY_ARAB, 18);
+            INF_REG_IR_P.AddIntelReportStat(WeaponType.ART_120MM_MORTAR, 18);
+            INF_REG_IR_P.AddIntelReportStat(WeaponType.AT_ATGM, 12);
+            INF_REG_IR_P.AddIntelReportStat(WeaponType.MANPAD_STRELA, 24);
+
+            // Handle the icon profile.
+            INF_REG_IR_P.IconProfile = new RegimentIconProfile(RegimentIconType.Single)
+            {
+                W = SpriteManager.IR_Regulars
+            };
+
+            // Add the IR Regular Infantry profile to the database
+            AddProfile(WeaponType.INF_REG_IR, INF_REG_IR_P);
+
+            //----------------------------------------------
+            // IR Regular Infantry
+            //----------------------------------------------
+
+            #endregion // Infantry
 
             #region Mujahideen Infantry
 
@@ -8842,8 +9378,10 @@ namespace HammerAndSickle.Models
             INF_MJ_REG.AddIntelReportStat(WeaponType.AAA_20MM,           8);
 
             // Handle the icon profile.
-            INF_MJ_REG.IconProfile = new RegimentIconProfile(RegimentIconType.Single);
-            INF_MJ_REG.IconProfile.W = SpriteManager.MJ_Regulars;
+            INF_MJ_REG.IconProfile = new RegimentIconProfile(RegimentIconType.Single)
+            {
+                W = SpriteManager.MJ_Regulars
+            };
 
             // Add the Mujahideen Regular Infantry profile to the database
             AddProfile(WeaponType.INF_REG_MJ, INF_MJ_REG);
@@ -8893,8 +9431,10 @@ namespace HammerAndSickle.Models
             INF_MJ_SPEC.AddIntelReportStat(WeaponType.AT_ATGM,          12);
 
             // Handle the icon profile.
-            INF_MJ_SPEC.IconProfile = new RegimentIconProfile(RegimentIconType.Single);
-            INF_MJ_SPEC.IconProfile.W = SpriteManager.MJ_Elite;
+            INF_MJ_SPEC.IconProfile = new RegimentIconProfile(RegimentIconType.Single)
+            {
+                W = SpriteManager.MJ_Elite
+            };
 
             // Add the Mujahideen Special Forces profile to the database
             AddProfile(WeaponType.INF_SPEC_MJ, INF_MJ_SPEC);
@@ -8944,8 +9484,10 @@ namespace HammerAndSickle.Models
             INF_MJ_CAV.AddIntelReportStat(WeaponType.AAA_20MM,           8);
 
             // Handle the icon profile.
-            INF_MJ_CAV.IconProfile = new RegimentIconProfile(RegimentIconType.Single);
-            INF_MJ_CAV.IconProfile.W = SpriteManager.MJ_Mounted;
+            INF_MJ_CAV.IconProfile = new RegimentIconProfile(RegimentIconType.Single)
+            {
+                W = SpriteManager.MJ_Mounted
+            };
 
             // Add the Mujahideen Horse Cavalry profile to the database
             AddProfile(WeaponType.INF_CAV_MJ, INF_MJ_CAV);
@@ -8995,8 +9537,10 @@ namespace HammerAndSickle.Models
             INF_MJ_RPG.AddIntelReportStat(WeaponType.AAA_20MM,          6);
 
             // Handle the icon profile.
-            INF_MJ_RPG.IconProfile = new RegimentIconProfile(RegimentIconType.Single);
-            INF_MJ_RPG.IconProfile.W = SpriteManager.MJ_RPG;
+            INF_MJ_RPG.IconProfile = new RegimentIconProfile(RegimentIconType.Single)
+            {
+                W = SpriteManager.MJ_RPG
+            };
 
             // Add the Mujahideen RPG Teams profile to the database
             AddProfile(WeaponType.INF_RPG_MJ, INF_MJ_RPG);
@@ -9045,8 +9589,10 @@ namespace HammerAndSickle.Models
             ART_MJ_MORT.AddIntelReportStat(WeaponType.AAA_20MM,          6);
 
             // Handle the icon profile.
-            ART_MJ_MORT.IconProfile = new RegimentIconProfile(RegimentIconType.Single);
-            ART_MJ_MORT.IconProfile.W = SpriteManager.MJ_Mortar;
+            ART_MJ_MORT.IconProfile = new RegimentIconProfile(RegimentIconType.Single)
+            {
+                W = SpriteManager.MJ_Mortar
+            };
 
             // Add the Mujahideen Heavy Mortar profile to the database
             AddProfile(WeaponType.ART_MORTAR_MJ, ART_MJ_MORT);
@@ -9094,8 +9640,10 @@ namespace HammerAndSickle.Models
             ART_MJ_LT.AddIntelReportStat(WeaponType.AAA_20MM,          6);
 
             // Handle the icon profile.
-            ART_MJ_LT.IconProfile = new RegimentIconProfile(RegimentIconType.Single);
-            ART_MJ_LT.IconProfile.W = SpriteManager.MJ_Artillery;
+            ART_MJ_LT.IconProfile = new RegimentIconProfile(RegimentIconType.Single)
+            {
+                W = SpriteManager.MJ_Artillery
+            };
 
             // Add the Mujahideen Light Artillery profile to the database
             AddProfile(WeaponType.ART_LIGHT_MJ, ART_MJ_LT);
@@ -9164,10 +9712,12 @@ namespace HammerAndSickle.Models
             TYPE59.AddIntelReportStat(WeaponType.MANPAD_STRELA,     18);
 
             // Handle the icon profile.
-            TYPE59.IconProfile = new RegimentIconProfile(RegimentIconType.Directional);
-            TYPE59.IconProfile.W = SpriteManager.CH_Type59_W;
-            TYPE59.IconProfile.NW = SpriteManager.CH_Type59_NW;
-            TYPE59.IconProfile.SW = SpriteManager.CH_Type59_SW;
+            TYPE59.IconProfile = new RegimentIconProfile(RegimentIconType.Directional)
+            {
+                W = SpriteManager.CH_Type59_W,
+                NW = SpriteManager.CH_Type59_NW,
+                SW = SpriteManager.CH_Type59_SW
+            };
 
             // Add the Type 59 profile to the database
             AddProfile(WeaponType.TANK_TYPE59, TYPE59);
@@ -9226,10 +9776,12 @@ namespace HammerAndSickle.Models
             TYPE80.AddIntelReportStat(WeaponType.MANPAD_STRELA, 18);
 
             // Handle the icon profile.
-            TYPE80.IconProfile = new RegimentIconProfile(RegimentIconType.Directional);
-            TYPE80.IconProfile.W = SpriteManager.CH_Type80_W;
-            TYPE80.IconProfile.NW = SpriteManager.CH_Type80_NW;
-            TYPE80.IconProfile.SW = SpriteManager.CH_Type80_SW;
+            TYPE80.IconProfile = new RegimentIconProfile(RegimentIconType.Directional)
+            {
+                W = SpriteManager.CH_Type80_W,
+                NW = SpriteManager.CH_Type80_NW,
+                SW = SpriteManager.CH_Type80_SW
+            };
 
             // Add the Type 80 profile to the database
             AddProfile(WeaponType.TANK_TYPE80, TYPE80);
@@ -9288,10 +9840,12 @@ namespace HammerAndSickle.Models
             TYPE95.AddIntelReportStat(WeaponType.MANPAD_STRELA, 18);
 
             // Handle the icon profile.
-            TYPE95.IconProfile = new RegimentIconProfile(RegimentIconType.Directional);
-            TYPE95.IconProfile.W = SpriteManager.CH_Type95_W;
-            TYPE95.IconProfile.NW = SpriteManager.CH_Type95_NW;
-            TYPE95.IconProfile.SW = SpriteManager.CH_Type95_SW;
+            TYPE95.IconProfile = new RegimentIconProfile(RegimentIconType.Directional)
+            {
+                W = SpriteManager.CH_Type95_W,
+                NW = SpriteManager.CH_Type95_NW,
+                SW = SpriteManager.CH_Type95_SW
+            };
 
             // Add the Type 95 profile to the database
             AddProfile(WeaponType.TANK_TYPE95, TYPE95);
@@ -9347,10 +9901,12 @@ namespace HammerAndSickle.Models
             TYPE86.AddIntelReportStat(WeaponType.TANK_TYPE59,       40);
 
             // Handle the icon profile.
-            TYPE86.IconProfile = new RegimentIconProfile(RegimentIconType.Directional);
-            TYPE86.IconProfile.W = SpriteManager.CH_Type86_W;
-            TYPE86.IconProfile.NW = SpriteManager.CH_Type86_NW;
-            TYPE86.IconProfile.SW = SpriteManager.CH_Type86_SW;
+            TYPE86.IconProfile = new RegimentIconProfile(RegimentIconType.Directional)
+            {
+                W = SpriteManager.CH_Type86_W,
+                NW = SpriteManager.CH_Type86_NW,
+                SW = SpriteManager.CH_Type86_SW
+            };
 
             // Add the Type 86 profile to the database
             AddProfile(WeaponType.IFV_TYPE86, TYPE86);
@@ -9408,13 +9964,15 @@ namespace HammerAndSickle.Models
             SPA_TYPE82.AddIntelReportStat(WeaponType.MANPAD_STRELA,      8);
 
             // Handle the icon profile.
-            SPA_TYPE82.IconProfile = new RegimentIconProfile(RegimentIconType.Directional_Fire);
-            SPA_TYPE82.IconProfile.W = SpriteManager.CH_Type82_W;
-            SPA_TYPE82.IconProfile.NW = SpriteManager.CH_Type82_NW;
-            SPA_TYPE82.IconProfile.SW = SpriteManager.CH_Type82_SW;
-            SPA_TYPE82.IconProfile.W_F = SpriteManager.CH_Type82_W_F;
-            SPA_TYPE82.IconProfile.NW_F = SpriteManager.CH_Type82_NW_F;
-            SPA_TYPE82.IconProfile.SW_F = SpriteManager.CH_Type82_SW_F;
+            SPA_TYPE82.IconProfile = new RegimentIconProfile(RegimentIconType.Directional_Fire)
+            {
+                W = SpriteManager.CH_Type82_W,
+                NW = SpriteManager.CH_Type82_NW,
+                SW = SpriteManager.CH_Type82_SW,
+                W_F = SpriteManager.CH_Type82_W_F,
+                NW_F = SpriteManager.CH_Type82_NW_F,
+                SW_F = SpriteManager.CH_Type82_SW_F
+            };
 
             // Add the Type 82 profile to the database
             AddProfile(WeaponType.SPA_TYPE82, SPA_TYPE82);
@@ -9468,13 +10026,15 @@ namespace HammerAndSickle.Models
             PHZ89.AddIntelReportStat(WeaponType.MANPAD_STRELA,      8);
 
             // Handle the icon profile.
-            PHZ89.IconProfile = new RegimentIconProfile(RegimentIconType.Directional_Fire);
-            PHZ89.IconProfile.W = SpriteManager.CH_PHZ89_W;
-            PHZ89.IconProfile.NW = SpriteManager.CH_PHZ89_NW;
-            PHZ89.IconProfile.SW = SpriteManager.CH_PHZ89_SW;
-            PHZ89.IconProfile.W_F = SpriteManager.CH_PHZ89_W_F;
-            PHZ89.IconProfile.NW_F = SpriteManager.CH_PHZ89_NW_F;
-            PHZ89.IconProfile.SW_F = SpriteManager.CH_PHZ89_SW_F;
+            PHZ89.IconProfile = new RegimentIconProfile(RegimentIconType.Directional_Fire)
+            {
+                W = SpriteManager.CH_PHZ89_W,
+                NW = SpriteManager.CH_PHZ89_NW,
+                SW = SpriteManager.CH_PHZ89_SW,
+                W_F = SpriteManager.CH_PHZ89_W_F,
+                NW_F = SpriteManager.CH_PHZ89_NW_F,
+                SW_F = SpriteManager.CH_PHZ89_SW_F
+            };
 
             // Add the PHZ-89 profile to the database
             AddProfile(WeaponType.ROC_PHZ89, PHZ89);
@@ -9528,8 +10088,10 @@ namespace HammerAndSickle.Models
             ART_LT_CH.AddIntelReportStat(WeaponType.MANPAD_STRELA,      6);
 
             // Handle the icon profile.
-            ART_LT_CH.IconProfile = new RegimentIconProfile(RegimentIconType.Single);
-            ART_LT_CH.IconProfile.W = SpriteManager.GEN_LightArt;
+            ART_LT_CH.IconProfile = new RegimentIconProfile(RegimentIconType.Single)
+            {
+                W = SpriteManager.GEN_LightArt
+            };
 
             // Add the Chinese Light Artillery profile to the database
             AddProfile(WeaponType.ART_LIGHT_CH, ART_LT_CH);
@@ -9583,8 +10145,10 @@ namespace HammerAndSickle.Models
             ART_HV_CH.AddIntelReportStat(WeaponType.MANPAD_STRELA,      8);
 
             // Handle the icon profile.
-            ART_HV_CH.IconProfile = new RegimentIconProfile(RegimentIconType.Single);
-            ART_HV_CH.IconProfile.W = SpriteManager.GEN_HeavyArt;
+            ART_HV_CH.IconProfile = new RegimentIconProfile(RegimentIconType.Single)
+            {
+                W = SpriteManager.GEN_HeavyArt
+            };
 
             // Add the Chinese Heavy Artillery profile to the database
             AddProfile(WeaponType.ART_HEAVY_CH, ART_HV_CH);
@@ -9642,13 +10206,15 @@ namespace HammerAndSickle.Models
             TYPE53.AddIntelReportStat(WeaponType.MANPAD_STRELA,       24);
 
             // Handle the icon profile.
-            TYPE53.IconProfile = new RegimentIconProfile(RegimentIconType.Directional_Fire);
-            TYPE53.IconProfile.W = SpriteManager.CH_Type53_W;
-            TYPE53.IconProfile.NW = SpriteManager.CH_Type53_NW;
-            TYPE53.IconProfile.SW = SpriteManager.CH_Type53_SW;
-            TYPE53.IconProfile.W_F = SpriteManager.CH_Type53_W_F;
-            TYPE53.IconProfile.NW_F = SpriteManager.CH_Type53_NW_F;
-            TYPE53.IconProfile.SW_F = SpriteManager.CH_Type53_SW_F;
+            TYPE53.IconProfile = new RegimentIconProfile(RegimentIconType.Directional_Fire)
+            {
+                W = SpriteManager.CH_Type53_W,
+                NW = SpriteManager.CH_Type53_NW,
+                SW = SpriteManager.CH_Type53_SW,
+                W_F = SpriteManager.CH_Type53_W_F,
+                NW_F = SpriteManager.CH_Type53_NW_F,
+                SW_F = SpriteManager.CH_Type53_SW_F
+            };
 
             // Add the Type 53 profile to the database
             AddProfile(WeaponType.SPAAA_TYPE53, TYPE53);
@@ -9702,13 +10268,15 @@ namespace HammerAndSickle.Models
             HQ7.AddIntelReportStat(WeaponType.SPAAA_TYPE53,       4);
 
             // Handle the icon profile.
-            HQ7.IconProfile = new RegimentIconProfile(RegimentIconType.Directional_Fire);
-            HQ7.IconProfile.W = SpriteManager.CH_HQ7_W;
-            HQ7.IconProfile.NW = SpriteManager.CH_HQ7_NW;
-            HQ7.IconProfile.SW = SpriteManager.CH_HQ7_SW;
-            HQ7.IconProfile.W_F = SpriteManager.CH_HQ7_W_F;
-            HQ7.IconProfile.NW_F = SpriteManager.CH_HQ7_NW_F;
-            HQ7.IconProfile.SW_F = SpriteManager.CH_HQ7_SW_F;
+            HQ7.IconProfile = new RegimentIconProfile(RegimentIconType.Directional_Fire)
+            {
+                W = SpriteManager.CH_HQ7_W,
+                NW = SpriteManager.CH_HQ7_NW,
+                SW = SpriteManager.CH_HQ7_SW,
+                W_F = SpriteManager.CH_HQ7_W_F,
+                NW_F = SpriteManager.CH_HQ7_NW_F,
+                SW_F = SpriteManager.CH_HQ7_SW_F
+            };
 
             // Add the HQ-7 profile to the database
             AddProfile(WeaponType.SPSAM_HQ7, HQ7);
@@ -9764,13 +10332,15 @@ namespace HammerAndSickle.Models
             H9.AddIntelReportStat(WeaponType.HEL_H9,           54);
 
             // Handle the icon profile.
-            H9.IconProfile = new RegimentIconProfile(RegimentIconType.Helo_Animation);
-            H9.IconProfile.W = SpriteManager.CH_H9_Frame0;
-            H9.IconProfile.NW = SpriteManager.CH_H9_Frame1;
-            H9.IconProfile.SW = SpriteManager.CH_H9_Frame2;
-            H9.IconProfile.W_F = SpriteManager.CH_H9_Frame3;
-            H9.IconProfile.NW_F = SpriteManager.CH_H9_Frame4;
-            H9.IconProfile.SW_F = SpriteManager.CH_H9_Frame5;
+            H9.IconProfile = new RegimentIconProfile(RegimentIconType.Helo_Animation)
+            {
+                W = SpriteManager.CH_H9_Frame0,
+                NW = SpriteManager.CH_H9_Frame1,
+                SW = SpriteManager.CH_H9_Frame2,
+                W_F = SpriteManager.CH_H9_Frame3,
+                NW_F = SpriteManager.CH_H9_Frame4,
+                SW_F = SpriteManager.CH_H9_Frame5
+            };
 
             // Add the H-9 profile to the database
             AddProfile(WeaponType.HEL_H9, H9);
@@ -9825,8 +10395,10 @@ namespace HammerAndSickle.Models
             J7.AddIntelReportStat(WeaponType.FGT_J7,     36);
 
             // Handle the icon profile.
-            J7.IconProfile = new RegimentIconProfile(RegimentIconType.Single);
-            J7.IconProfile.W = SpriteManager.CH_J7;
+            J7.IconProfile = new RegimentIconProfile(RegimentIconType.Single)
+            {
+                W = SpriteManager.CH_J7
+            };
 
             // Add the J-7 profile to the database
             AddProfile(WeaponType.FGT_J7, J7);
@@ -9877,8 +10449,10 @@ namespace HammerAndSickle.Models
             J8.AddIntelReportStat(WeaponType.FGT_J8,     36);
 
             // Handle the icon profile.
-            J8.IconProfile = new RegimentIconProfile(RegimentIconType.Single);
-            J8.IconProfile.W = SpriteManager.CH_J8;
+            J8.IconProfile = new RegimentIconProfile(RegimentIconType.Single)
+            {
+                W = SpriteManager.CH_J8
+            };
 
             // Add the J-8 profile to the database
             AddProfile(WeaponType.FGT_J8, J8);
@@ -9929,8 +10503,10 @@ namespace HammerAndSickle.Models
             Q5.AddIntelReportStat(WeaponType.ATT_Q5,     36);
 
             // Handle the icon profile.
-            Q5.IconProfile = new RegimentIconProfile(RegimentIconType.Single);
-            Q5.IconProfile.W = SpriteManager.CH_Q5;
+            Q5.IconProfile = new RegimentIconProfile(RegimentIconType.Single)
+            {
+                W = SpriteManager.CH_Q5
+            };
 
             // Add the Q-5 profile to the database
             AddProfile(WeaponType.ATT_Q5, Q5);
@@ -9981,8 +10557,10 @@ namespace HammerAndSickle.Models
             H6.AddIntelReportStat(WeaponType.BMB_H6,     24);
 
             // Handle the icon profile.
-            H6.IconProfile = new RegimentIconProfile(RegimentIconType.Single);
-            H6.IconProfile.W = SpriteManager.CH_H6;
+            H6.IconProfile = new RegimentIconProfile(RegimentIconType.Single)
+            {
+                W = SpriteManager.CH_H6
+            };
 
             // Add the H-6 profile to the database
             AddProfile(WeaponType.BMB_H6, H6);
@@ -10038,8 +10616,10 @@ namespace HammerAndSickle.Models
             INF_REG_CH_P.AddIntelReportStat(WeaponType.SPAAA_TYPE53,       6);
 
             // Handle the icon profile.
-            INF_REG_CH_P.IconProfile = new RegimentIconProfile(RegimentIconType.Single);
-            INF_REG_CH_P.IconProfile.W = SpriteManager.CH_Infantry;
+            INF_REG_CH_P.IconProfile = new RegimentIconProfile(RegimentIconType.Single)
+            {
+                W = SpriteManager.CH_Infantry
+            };
 
             // Add the Chinese Regular Infantry profile to the database
             AddProfile(WeaponType.INF_REG_CH, INF_REG_CH_P);
@@ -10090,8 +10670,10 @@ namespace HammerAndSickle.Models
             INF_AB_CH_P.AddIntelReportStat(WeaponType.MANPAD_STRELA,     30);
 
             // Handle the icon profile.
-            INF_AB_CH_P.IconProfile = new RegimentIconProfile(RegimentIconType.Single);
-            INF_AB_CH_P.IconProfile.W = SpriteManager.CH_Airborne;
+            INF_AB_CH_P.IconProfile = new RegimentIconProfile(RegimentIconType.Single)
+            {
+                W = SpriteManager.CH_Airborne
+            };
 
             // Add the Chinese Airborne Infantry profile to the database
             AddProfile(WeaponType.INF_AB_CH, INF_AB_CH_P);
