@@ -254,6 +254,17 @@ namespace HammerAndSickle.Models
                 // Mujahedin units
                 CreateMujahideenForces();
 
+                // Create Western units
+                CreateUSForces();
+                CreateGermanForces();
+                CreateBritishForces();
+                CreateFrenchForces();
+
+                // Create Arab Forces
+                CreateArabForces();
+
+                // Create Chinese Forces
+                CreateChineseForces();
             }
             catch (Exception e)
             {
@@ -1403,7 +1414,7 @@ namespace HammerAndSickle.Models
             var antiTankRegiment = new CombatUnit(
                 unitName: "Recon Regiment AT",
                 classification: UnitClassification.RECON,
-                role: UnitRole.GroundCombat,
+                role: UnitRole.GroundCombatRecon,
                 side: Side.Player,
                 nationality: Nationality.USSR,
                 profileType: RegimentProfileType.DEP,
@@ -1528,7 +1539,7 @@ namespace HammerAndSickle.Models
 
             var adr2k12Regiment = new CombatUnit(
                 unitName: "Air Defense Regiment (2K12 Kub)",
-                classification: UnitClassification.SPAAA,
+                classification: UnitClassification.SPSAM,
                 role: UnitRole.AirDefenseArea,
                 side: Side.Player,
                 nationality: Nationality.USSR,
@@ -1557,7 +1568,7 @@ namespace HammerAndSickle.Models
 
             var adr2k22Regiment = new CombatUnit(
                 unitName: "Air Defense Regiment (2K22 Tunguska)",
-                classification: UnitClassification.SPAAA,
+                classification: UnitClassification.SPSAM,
                 role: UnitRole.AirDefenseArea,
                 side: Side.Player,
                 nationality: Nationality.USSR,
@@ -2764,8 +2775,2619 @@ namespace HammerAndSickle.Models
             #endregion //Mujahideen Supply Cache
         }
 
-        #endregion
+        #endregion // Mujahideen Units
+
+        #region Western Units
+
+        public static void CreateUSForces()
+        {
+            #region US Armored Brigade
+
+            var us_armored_brigade = new CombatUnit(
+                unitName: "US Armored Brigade",
+                classification: UnitClassification.TANK,
+                role: UnitRole.GroundCombat,
+                side: Side.AI,
+                nationality: Nationality.USA,
+                profileType: RegimentProfileType.DEP,
+                deployedProfile: WeaponType.TANK_M1_US,
+                isMountable: false,
+                mobileProfile: WeaponType.NONE,
+                isEmbarkable: false,
+                embarkedProfile: WeaponType.NONE,
+                category: DepotCategory.Secondary,
+                size: DepotSize.Small
+            );
+
+            // Set experience level
+            us_armored_brigade.SetExperienceLevel(ExperienceLevel.Trained);
+
+            // Set the ICM
+            us_armored_brigade.SetICM(GameData.ICM_DEFAULT);
+
+            // Add the template to the database
+            AddTemplate("US_ARMOR_BRIGADE", us_armored_brigade);
+
+            #endregion // US Armored Brigade
+
+            #region US Mechanized Infantry Brigade
+
+            var us_mech_brigade = new CombatUnit(
+                unitName: "US Mechanized Infantry Brigade",
+                classification: UnitClassification.MECH,
+                role: UnitRole.GroundCombat,
+                side: Side.AI,
+                nationality: Nationality.USA,
+                profileType: RegimentProfileType.DEP_MOB,
+                deployedProfile: WeaponType.INF_REG_US,
+                isMountable: true,
+                mobileProfile: WeaponType.IFV_M2_US,
+                isEmbarkable: false,
+                embarkedProfile: WeaponType.NONE,
+                category: DepotCategory.Secondary,
+                size: DepotSize.Small
+            );
+
+            // Set experience level
+            us_mech_brigade.SetExperienceLevel(ExperienceLevel.Trained);
+
+            // Set the ICM
+            us_mech_brigade.SetICM(GameData.ICM_DEFAULT);
+
+            // Add the template to the database
+            AddTemplate("US_MECH_BRIGADE", us_mech_brigade);
+
+            #endregion // US Mechanized Infantry Brigade
+
+            #region US Armored Cavalry Squadron
+
+            var us_armored_cavalry_squadron = new CombatUnit(
+                unitName: "US Armored Cavalry Squadron",
+                classification: UnitClassification.TANK,
+                role: UnitRole.GroundCombat,
+                side: Side.AI,
+                nationality: Nationality.USA,
+                profileType: RegimentProfileType.DEP,
+                deployedProfile: WeaponType.TANK_M60_US,
+                isMountable: false,
+                mobileProfile: WeaponType.NONE,
+                isEmbarkable: false,
+                embarkedProfile: WeaponType.NONE,
+                category: DepotCategory.Secondary,
+                size: DepotSize.Small
+            );
+
+            // Set experience level
+            us_armored_cavalry_squadron.SetExperienceLevel(ExperienceLevel.Experienced);
+
+            // Set the ICM
+            us_armored_cavalry_squadron.SetICM(GameData.ICM_DEFAULT);
+
+            // Add the template to the database
+            AddTemplate("US_ARMORED_CAVALRY_SQUADRON", us_armored_cavalry_squadron);
+
+            #endregion // US Armored Cavalry Squadron
+
+            #region US Artillery Regiment
+
+            var us_artillery_regiment = new CombatUnit(
+                unitName: "US Artillery Regiment",
+                classification: UnitClassification.ART,
+                role: UnitRole.GroundCombat,
+                side: Side.AI,
+                nationality: Nationality.USA,
+                profileType: RegimentProfileType.DEP,
+                deployedProfile: WeaponType.SPA_M109_US,
+                isMountable: false,
+                mobileProfile: WeaponType.NONE,
+                isEmbarkable: false,
+                embarkedProfile: WeaponType.NONE,
+                category: DepotCategory.Secondary,
+                size: DepotSize.Small
+            );
+
+            // Set experience level
+            us_artillery_regiment.SetExperienceLevel(ExperienceLevel.Experienced);
+
+            // Set the ICM
+            us_artillery_regiment.SetICM(GameData.ICM_DEFAULT);
+
+            // Add the template to the database
+            AddTemplate("US_ARTILLERY_REGIMENT", us_artillery_regiment);
+
+            #endregion // US Artillery Regiment
+
+            #region US Rocket Artillery Regiment
+
+            var us_rocket_artillery_regiment = new CombatUnit(
+                unitName: "US Rocket Artillery Regiment",
+                classification: UnitClassification.ROC,
+                role: UnitRole.GroundCombat,
+                side: Side.AI,
+                nationality: Nationality.USA,
+                profileType: RegimentProfileType.DEP,
+                deployedProfile: WeaponType.ROC_MLRS_US,
+                isMountable: false,
+                mobileProfile: WeaponType.NONE,
+                isEmbarkable: false,
+                embarkedProfile: WeaponType.NONE,
+                category: DepotCategory.Secondary,
+                size: DepotSize.Small
+            );
+
+            // Set experience level
+            us_rocket_artillery_regiment.SetExperienceLevel(ExperienceLevel.Experienced);
+
+            // Set the ICM
+            us_rocket_artillery_regiment.SetICM(GameData.ICM_DEFAULT);
+
+            // Add the template to the database
+            AddTemplate("US_ROCKET_ARTILLERY_REGIMENT", us_rocket_artillery_regiment);
+
+            #endregion // US Rocket Artillery Regiment
+
+            #region US Air Defense Regiment
+
+            var us_air_defense_regiment = new CombatUnit(
+                unitName: "US Air Defense Regiment",
+                classification: UnitClassification.SPAAA,
+                role: UnitRole.AirDefenseArea,
+                side: Side.AI,
+                nationality: Nationality.USA,
+                profileType: RegimentProfileType.DEP,
+                deployedProfile: WeaponType.SPAAA_M163_US,
+                isMountable: false,
+                mobileProfile: WeaponType.NONE,
+                isEmbarkable: false,
+                embarkedProfile: WeaponType.NONE,
+                category: DepotCategory.Secondary,
+                size: DepotSize.Small
+            );
+
+            // Set experience level
+            us_air_defense_regiment.SetExperienceLevel(ExperienceLevel.Trained);
+
+            // Set the ICM
+            us_air_defense_regiment.SetICM(GameData.ICM_DEFAULT);
+
+            // Add the template to the database
+            AddTemplate("US_AIR_DEFENSE_REGIMENT", us_air_defense_regiment);
+
+            #endregion // US Air Defense Regiment
+
+            #region US Hawk Regiment
+
+            var us_hawk_regiment = new CombatUnit(
+                unitName: "US Hawk Regiment",
+                classification: UnitClassification.SAM,
+                role: UnitRole.AirDefenseArea,
+                side: Side.AI,
+                nationality: Nationality.USA,
+                profileType: RegimentProfileType.DEP_MOB,
+                deployedProfile: WeaponType.SAM_HAWK_US,
+                isMountable: true,
+                mobileProfile: WeaponType.TRK_WEST,
+                isEmbarkable: false,
+                embarkedProfile: WeaponType.NONE,
+                category: DepotCategory.Secondary,
+                size: DepotSize.Small
+            );
+
+            // Set experience level
+            us_hawk_regiment.SetExperienceLevel(ExperienceLevel.Trained);
+
+            // Set the ICM
+            us_hawk_regiment.SetICM(GameData.ICM_DEFAULT);
+
+            // Add the template to the database
+            AddTemplate("US_HAWK_REGIMENT", us_hawk_regiment);
+
+            #endregion // US Hawk Regiment
+
+            #region US Chaparral Regiment
+
+            var us_chaparral_regiment = new CombatUnit(
+                unitName: "US Chaparral Regiment",
+                classification: UnitClassification.SPSAM,
+                role: UnitRole.AirDefenseArea,
+                side: Side.AI,
+                nationality: Nationality.USA,
+                profileType: RegimentProfileType.DEP,
+                deployedProfile: WeaponType.SPSAM_CHAP_US,
+                isMountable: false,
+                mobileProfile: WeaponType.NONE,
+                isEmbarkable: false,
+                embarkedProfile: WeaponType.NONE,
+                category: DepotCategory.Secondary,
+                size: DepotSize.Small
+            );
+
+            // Set experience level
+            us_chaparral_regiment.SetExperienceLevel(ExperienceLevel.Trained);
+
+            // Set the ICM
+            us_chaparral_regiment.SetICM(GameData.ICM_DEFAULT);
+
+            // Add the template to the database
+            AddTemplate("US_CHAPARRAL_REGIMENT", us_chaparral_regiment);
+
+            #endregion // US Chaparral Regiment
+
+            #region US Marine Expeditionary Unit
+
+            var us_marine_expeditionary_unit = new CombatUnit(
+                unitName: "US Marine Expeditionary Unit",
+                classification: UnitClassification.MAR,
+                role: UnitRole.GroundCombat,
+                side: Side.AI,
+                nationality: Nationality.USA,
+                profileType: RegimentProfileType.DEP_MOB,
+                deployedProfile: WeaponType.INF_MAR_US,
+                isMountable: true,
+                mobileProfile: WeaponType.APC_LVTP7_US,
+                isEmbarkable: false,
+                embarkedProfile: WeaponType.NONE,
+                category: DepotCategory.Secondary,
+                size: DepotSize.Small
+            );
+
+            // Set experience level
+            us_marine_expeditionary_unit.SetExperienceLevel(ExperienceLevel.Veteran);
+            // Set the ICM
+            us_marine_expeditionary_unit.SetICM(GameData.ICM_DEFAULT);
+
+            // Add the template to the database
+            AddTemplate("US_MARINE_EXPEDITIONARY_UNIT", us_marine_expeditionary_unit);
+
+            #endregion // US Marine Expeditionary Unit
+
+            #region US Airborne Brigade
+
+            var us_airborne_brigade = new CombatUnit(
+                unitName: "US Airborne Brigade",
+                classification: UnitClassification.AB,
+                role: UnitRole.GroundCombat,
+                side: Side.AI,
+                nationality: Nationality.USA,
+                profileType: RegimentProfileType.DEP_MOB,
+                deployedProfile: WeaponType.INF_AB_US,
+                isMountable: true,
+                mobileProfile: WeaponType.APC_HUMVEE_US,
+                isEmbarkable: false,
+                embarkedProfile: WeaponType.NONE,
+                category: DepotCategory.Secondary,
+                size: DepotSize.Small
+            );
+
+            // Set experience level
+            us_airborne_brigade.SetExperienceLevel(ExperienceLevel.Veteran);
+            // Set the ICM
+            us_airborne_brigade.SetICM(GameData.ICM_DEFAULT);
+
+            // Add the template to the database
+            AddTemplate("US_AIRBORNE_BRIGADE", us_airborne_brigade);
+
+            #endregion // US Airborne Brigade
+
+            #region US Airmobile Brigade
+
+            var us_airmobile_brigade = new CombatUnit(
+                unitName: "US Airmobile Brigade",
+                classification: UnitClassification.AM,
+                role: UnitRole.GroundCombat,
+                side: Side.AI,
+                nationality: Nationality.USA,
+                profileType: RegimentProfileType.DEP_MOB_EMB_HELO,
+                deployedProfile: WeaponType.INF_AM_US,
+                isMountable: true,
+                mobileProfile: WeaponType.APC_HUMVEE_US,
+                isEmbarkable: true,
+                embarkedProfile: WeaponType.HEL_UH60_US,
+                category: DepotCategory.Secondary,
+                size: DepotSize.Small
+            );
+
+            // Set experience level
+            us_airmobile_brigade.SetExperienceLevel(ExperienceLevel.Veteran);
+            // Set the ICM
+            us_airmobile_brigade.SetICM(GameData.ICM_DEFAULT);
+
+            // Add the template to the database
+            AddTemplate("US_AIRMOBILE_BRIGADE", us_airmobile_brigade);
+
+            #endregion // US Airmobile Brigade
+
+            #region US Recon Detachment
+
+            var us_recon_detachment = new CombatUnit(
+                unitName: "US Recon Detachment",
+                classification: UnitClassification.RECON,
+                role: UnitRole.GroundCombat,
+                side: Side.AI,
+                nationality: Nationality.USA,
+                profileType: RegimentProfileType.DEP,
+                deployedProfile: WeaponType.RCN_M3_US,
+                isMountable: false,
+                mobileProfile: WeaponType.NONE,
+                isEmbarkable: false,
+                embarkedProfile: WeaponType.NONE,
+                category: DepotCategory.Secondary,
+                size: DepotSize.Small
+            );
+
+            // Set experience level
+            us_recon_detachment.SetExperienceLevel(ExperienceLevel.Experienced);
+
+            // Set the ICM
+            us_recon_detachment.SetICM(GameData.ICM_DEFAULT);
+
+            // Add the template to the database
+            AddTemplate("US_RECON_DETACHMENT", us_recon_detachment);
+
+            #endregion // US Recon Detachment
+
+            #region US Aviation Brigade
+
+            var us_aviation_brigade = new CombatUnit(
+                unitName: "US Aviation Brigade",
+                classification: UnitClassification.HELO,
+                role: UnitRole.GroundCombat,
+                side: Side.AI,
+                nationality: Nationality.USA,
+                profileType: RegimentProfileType.DEP,
+                deployedProfile: WeaponType.HEL_AH64_US,
+                isMountable: false,
+                mobileProfile: WeaponType.NONE,
+                isEmbarkable: false,
+                embarkedProfile: WeaponType.NONE,
+                category: DepotCategory.Secondary,
+                size: DepotSize.Small
+            );
+
+            // Set experience level
+            us_aviation_brigade.SetExperienceLevel(ExperienceLevel.Experienced);
+
+            // Set the ICM
+            us_aviation_brigade.SetICM(GameData.ICM_DEFAULT);
+
+            // Add the template to the database
+            AddTemplate("US_AVIATION_BRIGADE", us_aviation_brigade);
+
+            #endregion // US Aviation Brigade
+
+            #region US AWACS Squadron
+
+            var us_awacs_squadron = new CombatUnit(
+                unitName: "US AWACS Squadron",
+                classification: UnitClassification.AWACS,
+                role: UnitRole.AirborneEarlyWarning,
+                side: Side.AI,
+                nationality: Nationality.USA,
+                profileType: RegimentProfileType.DEP,
+                deployedProfile: WeaponType.AWACS_E3_US,
+                isMountable: false,
+                mobileProfile: WeaponType.NONE,
+                isEmbarkable: false,
+                embarkedProfile: WeaponType.NONE,
+                category: DepotCategory.Secondary,
+                size: DepotSize.Small
+            );
+
+            // Set experience level
+            us_awacs_squadron.SetExperienceLevel(ExperienceLevel.Experienced);
+
+            // Set the ICM
+            us_awacs_squadron.SetICM(GameData.ICM_DEFAULT);
+
+            // Add the template to the database
+            AddTemplate("US_AWACS_SQUADRON", us_awacs_squadron);
+
+            #endregion // US AWACS Squadron
+
+            #region US F-15 Fighter Wing
+
+            var us_f15_squadron = new CombatUnit(
+                unitName: "US F-15 Fighter Squadron",
+                classification: UnitClassification.FGT,
+                role: UnitRole.AirSuperiority,
+                side: Side.AI,
+                nationality: Nationality.USA,
+                profileType: RegimentProfileType.DEP,
+                deployedProfile: WeaponType.FGT_F15_US,
+                isMountable: false,
+                mobileProfile: WeaponType.NONE,
+                isEmbarkable: false,
+                embarkedProfile: WeaponType.NONE,
+                category: DepotCategory.Secondary,
+                size: DepotSize.Small
+            );
+
+            // Set experience level
+            us_f15_squadron.SetExperienceLevel(ExperienceLevel.Experienced);
+
+            // Set the ICM
+            us_f15_squadron.SetICM(GameData.ICM_DEFAULT);
+
+            // Add the template to the database
+            AddTemplate("US_F15_FIGHTER_SQUADRON", us_f15_squadron);
+
+            #endregion // US F-15 Fighter Wing
+
+            #region US F-16 Fighter Wing
+
+            var us_f16_squadron = new CombatUnit(
+                unitName: "US F-16 Fighter Squadron",
+                classification: UnitClassification.FGT,
+                role: UnitRole.AirSuperiority,
+                side: Side.AI,
+                nationality: Nationality.USA,
+                profileType: RegimentProfileType.DEP,
+                deployedProfile: WeaponType.FGT_F16_US,
+                isMountable: false,
+                mobileProfile: WeaponType.NONE,
+                isEmbarkable: false,
+                embarkedProfile: WeaponType.NONE,
+                category: DepotCategory.Secondary,
+                size: DepotSize.Small
+            );
+
+            // Set experience level
+            us_f16_squadron.SetExperienceLevel(ExperienceLevel.Experienced);
+
+            // Set the ICM
+            us_f16_squadron.SetICM(GameData.ICM_DEFAULT);
+
+            // Add the template to the database
+            AddTemplate("US_F16_FIGHTER_SQUADRON", us_f16_squadron);
+
+            #endregion // US F-16 Fighter Wing
+
+            #region US F4 Phantom Fighter Wing
+
+            var us_f4_squadron = new CombatUnit(
+                unitName: "US F-4 Phantom Fighter Squadron",
+                classification: UnitClassification.FGT,
+                role: UnitRole.AirSuperiority,
+                side: Side.AI,
+                nationality: Nationality.USA,
+                profileType: RegimentProfileType.DEP,
+                deployedProfile: WeaponType.FGT_F4_US,
+                isMountable: false,
+                mobileProfile: WeaponType.NONE,
+                isEmbarkable: false,
+                embarkedProfile: WeaponType.NONE,
+                category: DepotCategory.Secondary,
+                size: DepotSize.Small
+            );
+
+            // Set experience level
+            us_f4_squadron.SetExperienceLevel(ExperienceLevel.Experienced);
+
+            // Set the ICM
+            us_f4_squadron.SetICM(GameData.ICM_DEFAULT);
+
+            // Add the template to the database
+            AddTemplate("US_F4_PHANTOM_FIGHTER_SQUADRON", us_f4_squadron);
+
+            #endregion // US F4 Phantom Fighter Wing
+
+            #region US Navy F-14 Fighter Squadron
+
+            var us_f14_squadron = new CombatUnit(
+                unitName: "US F-14 Fighter Squadron",
+                classification: UnitClassification.FGT,
+                role: UnitRole.AirSuperiority,
+                side: Side.AI,
+                nationality: Nationality.USA,
+                profileType: RegimentProfileType.DEP,
+                deployedProfile: WeaponType.FGT_F14_US,
+                isMountable: false,
+                mobileProfile: WeaponType.NONE,
+                isEmbarkable: false,
+                embarkedProfile: WeaponType.NONE,
+                category: DepotCategory.Secondary,
+                size: DepotSize.Small
+            );
+
+            // Set experience level
+            us_f14_squadron.SetExperienceLevel(ExperienceLevel.Experienced);
+
+            // Set the ICM
+            us_f14_squadron.SetICM(GameData.ICM_DEFAULT);
+
+            // Add the template to the database
+            AddTemplate("US_F14_FIGHTER_SQUADRON", us_f14_squadron);
+
+            #endregion // US Navy F-14 Fighter Squadron
+
+            #region US A-10 Attack Wing
+
+            var us_a10_squadron = new CombatUnit(
+                unitName: "US A-10 Attack Squadron",
+                classification: UnitClassification.ATT,
+                role: UnitRole.AirGroundAttack,
+                side: Side.AI,
+                nationality: Nationality.USA,
+                profileType: RegimentProfileType.DEP,
+                deployedProfile: WeaponType.ATT_A10_US,
+                isMountable: false,
+                mobileProfile: WeaponType.NONE,
+                isEmbarkable: false,
+                embarkedProfile: WeaponType.NONE,
+                category: DepotCategory.Secondary,
+                size: DepotSize.Small
+            );
+
+            // Set experience level
+            us_a10_squadron.SetExperienceLevel(ExperienceLevel.Experienced);
+
+            // Set the ICM
+            us_a10_squadron.SetICM(GameData.ICM_DEFAULT);
+
+            // Add the template to the database
+            AddTemplate("US_A10_ATTACK_SQUADRON", us_a10_squadron);
+
+            #endregion // US A-10 Attack Wing
+
+            #region US F-111 Strike Wing
+
+            var us_f111_squadron = new CombatUnit(
+                unitName: "US F-111 Strike Squadron",
+                classification: UnitClassification.BMB,
+                role: UnitRole.AirStrategicAttack,
+                side: Side.AI,
+                nationality: Nationality.USA,
+                profileType: RegimentProfileType.DEP,
+                deployedProfile: WeaponType.BMB_F111_US,
+                isMountable: false,
+                mobileProfile: WeaponType.NONE,
+                isEmbarkable: false,
+                embarkedProfile: WeaponType.NONE,
+                category: DepotCategory.Secondary,
+                size: DepotSize.Small
+            );
+
+            // Set experience level
+            us_f111_squadron.SetExperienceLevel(ExperienceLevel.Experienced);
+
+            // Set the ICM
+            us_f111_squadron.SetICM(GameData.ICM_DEFAULT);
+
+            // Add the template to the database
+            AddTemplate("US_F111_STRIKE_SQUADRON", us_f111_squadron);
+
+            #endregion // US F-111 Strike Wing
+
+            #region US F-117 Stealth Fighter Wing
+
+            var us_f117_squadron = new CombatUnit(
+                unitName: "US F-117 Stealth Fighter Squadron",
+                classification: UnitClassification.ATT,
+                role: UnitRole.AirStrategicAttack,
+                side: Side.AI,
+                nationality: Nationality.USA,
+                profileType: RegimentProfileType.DEP,
+                deployedProfile: WeaponType.ATT_F117_US,
+                isMountable: false,
+                mobileProfile: WeaponType.NONE,
+                isEmbarkable: false,
+                embarkedProfile: WeaponType.NONE,
+                category: DepotCategory.Secondary,
+                size: DepotSize.Small
+            );
+
+            // Set experience level
+            us_f117_squadron.SetExperienceLevel(ExperienceLevel.Elite);
+
+            // Set the ICM
+            us_f111_squadron.SetICM(GameData.ICM_DEFAULT);
+
+            // Add the template to the database
+            AddTemplate("US_F117_STEALTH_FIGHTER_SQUADRON", us_f117_squadron);
+
+            #endregion // US F-117 Stealth Fighter Wing
+
+            #region US Recon Squadron
+
+            var us_SR71_squadron = new CombatUnit(
+                unitName: "US SR-71 Recon Squadron",
+                classification: UnitClassification.RECONA,
+                role: UnitRole.AirRecon,
+                side: Side.AI,
+                nationality: Nationality.USA,
+                profileType: RegimentProfileType.DEP,
+                deployedProfile: WeaponType.RCNA_SR71_US,
+                isMountable: false,
+                mobileProfile: WeaponType.NONE,
+                isEmbarkable: false,
+                embarkedProfile: WeaponType.NONE,
+                category: DepotCategory.Secondary,
+                size: DepotSize.Small
+            );
+
+            // Set experience level
+            us_SR71_squadron.SetExperienceLevel(ExperienceLevel.Elite);
+
+            // Set the ICM
+            us_SR71_squadron.SetICM(GameData.ICM_DEFAULT);
+
+            // Add the template to the database
+            AddTemplate("US_SR71_RECON_SQUADRON", us_SR71_squadron);
+
+            #endregion // US Recon Squadron
+        }
+
+        public static void CreateGermanForces()
+        {
+            #region GE Panzer Regiment Leopard 1
+
+            var ge_panzer_regiment_leo1 = new CombatUnit(
+                unitName: "GE Panzer Regiment (Leopard 1)",
+                classification: UnitClassification.TANK,
+                role: UnitRole.GroundCombat,
+                side: Side.AI,
+                nationality: Nationality.FRG,
+                profileType: RegimentProfileType.DEP,
+                deployedProfile: WeaponType.TANK_LEOPARD1_GE,
+                isMountable: false,
+                mobileProfile: WeaponType.NONE,
+                isEmbarkable: false,
+                embarkedProfile: WeaponType.NONE,
+                category: DepotCategory.Secondary,
+                size: DepotSize.Small
+            );
+
+            // Set experience level
+            ge_panzer_regiment_leo1.SetExperienceLevel(ExperienceLevel.Experienced);
+
+            // Set the ICM
+            ge_panzer_regiment_leo1.SetICM(GameData.ICM_DEFAULT);
+
+            // Add the template to the database
+            AddTemplate("GE_PANZER_REGIMENT_LEO1", ge_panzer_regiment_leo1);
+
+            #endregion // GE Panzer Regiment
+
+            #region GE Panzer Regiment Leopard 2
+
+            var ge_panzer_regiment_leo2 = new CombatUnit(
+                unitName: "GE Panzer Regiment (Leopard 2)",
+                classification: UnitClassification.TANK,
+                role: UnitRole.GroundCombat,
+                side: Side.AI,
+                nationality: Nationality.FRG,
+                profileType: RegimentProfileType.DEP,
+                deployedProfile: WeaponType.TANK_LEOPARD2_GE,
+                isMountable: false,
+                mobileProfile: WeaponType.NONE,
+                isEmbarkable: false,
+                embarkedProfile: WeaponType.NONE,
+                category: DepotCategory.Secondary,
+                size: DepotSize.Small
+            );
+
+            // Set experience level
+            ge_panzer_regiment_leo2.SetExperienceLevel(ExperienceLevel.Experienced);
+
+            // Set the ICM
+            ge_panzer_regiment_leo2.SetICM(GameData.ICM_DEFAULT);
+
+            // Add the template to the database
+            AddTemplate("GE_PANZER_REGIMENT_LEO2", ge_panzer_regiment_leo2);
+
+            #endregion // GE Panzer Regiment
+
+            #region GE Panzergrenadier Regiment
+
+            var ge_panzergrenadier_regiment = new CombatUnit(
+                unitName: "GE Panzergrenadier Regiment",
+                classification: UnitClassification.MECH,
+                role: UnitRole.GroundCombat,
+                side: Side.AI,
+                nationality: Nationality.FRG,
+                profileType: RegimentProfileType.DEP_MOB,
+                deployedProfile: WeaponType.INF_REG_GE,
+                isMountable: true,
+                mobileProfile: WeaponType.IFV_MARDER_GE,
+                isEmbarkable: false,
+                embarkedProfile: WeaponType.NONE,
+                category: DepotCategory.Secondary,
+                size: DepotSize.Small
+            );
+
+            // Set experience level
+            ge_panzergrenadier_regiment.SetExperienceLevel(ExperienceLevel.Experienced);
+
+            // Set the ICM
+            ge_panzergrenadier_regiment.SetICM(GameData.ICM_DEFAULT);
+
+            // Add the template to the database
+            AddTemplate("GE_PANZERGRENADIER_REGIMENT", ge_panzergrenadier_regiment);
+
+            #endregion // GE Panzergrenadier Regiment
+
+            #region GE Airborne Regiment
+
+            var ge_airborne_regiment = new CombatUnit(
+                unitName: "GE Airborne Regiment",
+                classification: UnitClassification.INF,
+                role: UnitRole.GroundCombat,
+                side: Side.AI,
+                nationality: Nationality.FRG,
+                profileType: RegimentProfileType.DEP,
+                deployedProfile: WeaponType.INF_AB_GE,
+                isMountable: false,
+                mobileProfile: WeaponType.NONE,
+                isEmbarkable: false,
+                embarkedProfile: WeaponType.NONE,
+                category: DepotCategory.Secondary,
+                size: DepotSize.Small
+            );
+
+            // Set experience level
+            ge_airborne_regiment.SetExperienceLevel(ExperienceLevel.Veteran);
+
+            // Set the ICM
+            ge_airborne_regiment.SetICM(GameData.ICM_DEFAULT);
+
+            // Add the template to the database
+            AddTemplate("GE_AIRBORNE_REGIMENT", ge_airborne_regiment);
+
+            #endregion // GE Airborne Regiment
+
+            #region GE Recon Unit
+
+            var ge_recon_unit = new CombatUnit(
+                unitName: "GE Recon Unit",
+                classification: UnitClassification.RECON,
+                role: UnitRole.GroundCombat,
+                side: Side.AI,
+                nationality: Nationality.FRG,
+                profileType: RegimentProfileType.DEP,
+                deployedProfile: WeaponType.RCN_LUCHS_GE,
+                isMountable: false,
+                mobileProfile: WeaponType.NONE,
+                isEmbarkable: false,
+                embarkedProfile: WeaponType.NONE,
+                category: DepotCategory.Secondary,
+                size: DepotSize.Small
+            );
+
+            // Set experience level
+            ge_recon_unit.SetExperienceLevel(ExperienceLevel.Experienced);
+
+            // Set the ICM
+            ge_recon_unit.SetICM(GameData.ICM_DEFAULT);
+
+            // Add the template to the database
+            AddTemplate("GE_RECON_UNIT", ge_recon_unit);
+
+            #endregion // GE Recon Unit
+
+            #region GE Self-Propelled Artillery Regiment
+
+            var ge_sp_artillery_regiment = new CombatUnit(
+                unitName: "GE Self-Propelled Artillery Regiment",
+                classification: UnitClassification.ART,
+                role: UnitRole.GroundCombat,
+                side: Side.AI,
+                nationality: Nationality.FRG,
+                profileType: RegimentProfileType.DEP,
+                deployedProfile: WeaponType.SPA_M109_GE,
+                isMountable: false,
+                mobileProfile: WeaponType.NONE,
+                isEmbarkable: false,
+                embarkedProfile: WeaponType.NONE,
+                category: DepotCategory.Secondary,
+                size: DepotSize.Small
+            );
+
+            // Set experience level
+            ge_sp_artillery_regiment.SetExperienceLevel(ExperienceLevel.Experienced);
+
+            // Set the ICM
+            ge_sp_artillery_regiment.SetICM(GameData.ICM_DEFAULT);
+
+            // Add the template to the database
+            AddTemplate("GE_SP_ARTILLERY_REGIMENT", ge_sp_artillery_regiment);
+
+            #endregion // GE Self-Propelled Artillery Regiment
+
+            #region GE Air Defense Regiment (Gepard)
+
+            var ge_air_defense_regiment = new CombatUnit(
+                unitName: "GE Air Defense Regiment (Gepard)",
+                classification: UnitClassification.SPAAA,
+                role: UnitRole.AirDefenseArea,
+                side: Side.AI,
+                nationality: Nationality.FRG,
+                profileType: RegimentProfileType.DEP,
+                deployedProfile: WeaponType.SPSAM_GEPARD_GE,
+                isMountable: false,
+                mobileProfile: WeaponType.NONE,
+                isEmbarkable: false,
+                embarkedProfile: WeaponType.NONE,
+                category: DepotCategory.Secondary,
+                size: DepotSize.Small
+            );
+
+            // Set experience level
+            ge_air_defense_regiment.SetExperienceLevel(ExperienceLevel.Experienced);
+
+            // Set the ICM
+            ge_air_defense_regiment.SetICM(GameData.ICM_DEFAULT);
+
+            // Add the template to the database
+            AddTemplate("GE_AIR_DEFENSE_REGIMENT", ge_air_defense_regiment);
+
+            #endregion // GE Air Defense Regiment (Gepard)
+
+            #region GE SAM Regiment (Hawk)
+
+            var ge_hawk_regiment = new CombatUnit(
+                unitName: "GE SAM Regiment (Hawk)",
+                classification: UnitClassification.SAM,
+                role: UnitRole.AirDefenseArea,
+                side: Side.AI,
+                nationality: Nationality.FRG,
+                profileType: RegimentProfileType.DEP_MOB,
+                deployedProfile: WeaponType.SAM_HAWK_US,
+                isMountable: true,
+                mobileProfile: WeaponType.TRK_WEST,
+                isEmbarkable: false,
+                embarkedProfile: WeaponType.NONE,
+                category: DepotCategory.Secondary,
+                size: DepotSize.Small
+            );
+
+            // Set experience level
+            ge_hawk_regiment.SetExperienceLevel(ExperienceLevel.Experienced);
+
+            // Set the ICM
+            ge_hawk_regiment.SetICM(GameData.ICM_DEFAULT);
+
+            // Add the template to the database
+            AddTemplate("GE_HAWK_REGIMENT", ge_hawk_regiment);
+
+            #endregion // GE SAM Regiment (Hawk)
+
+            #region GE Aviation Regiment (BO105)
+
+            var ge_aviation_regiment = new CombatUnit(
+                unitName: "GE Aviation Regiment (BO105)",
+                classification: UnitClassification.HELO,
+                role: UnitRole.GroundCombat,
+                side: Side.AI,
+                nationality: Nationality.FRG,
+                profileType: RegimentProfileType.DEP,
+                deployedProfile: WeaponType.HEL_BO105_GE,
+                isMountable: false,
+                mobileProfile: WeaponType.NONE,
+                isEmbarkable: false,
+                embarkedProfile: WeaponType.NONE,
+                category: DepotCategory.Secondary,
+                size: DepotSize.Small
+            );
+
+            // Set experience level
+            ge_aviation_regiment.SetExperienceLevel(ExperienceLevel.Experienced);
+
+            // Set the ICM
+            ge_aviation_regiment.SetICM(GameData.ICM_DEFAULT);
+
+            // Add the template to the database
+            AddTemplate("GE_AVIATION_REGIMENT", ge_aviation_regiment);
+
+            #endregion // GE Aviation Regiment (BO105)
+
+            #region GE F-4 Phantom Fighter Squadron
+
+            var ge_f4_squadron = new CombatUnit(
+                unitName: "GE F-4 Phantom Fighter Squadron",
+                classification: UnitClassification.FGT,
+                role: UnitRole.AirSuperiority,
+                side: Side.AI,
+                nationality: Nationality.FRG,
+                profileType: RegimentProfileType.DEP,
+                deployedProfile: WeaponType.FGT_F4_GE,
+                isMountable: false,
+                mobileProfile: WeaponType.NONE,
+                isEmbarkable: false,
+                embarkedProfile: WeaponType.NONE,
+                category: DepotCategory.Secondary,
+                size: DepotSize.Small
+            );
+
+            // Set experience level
+            ge_f4_squadron.SetExperienceLevel(ExperienceLevel.Experienced);
+
+            // Set the ICM
+            ge_f4_squadron.SetICM(GameData.ICM_DEFAULT);
+
+            // Add the template to the database
+            AddTemplate("GE_F4_PHANTOM_FIGHTER_SQUADRON", ge_f4_squadron);
+
+            #endregion // GE F-4 Phantom Fighter Squadron
+
+            #region GE Tornado Fighter Squadron
+
+            var ge_tornado_squadron = new CombatUnit(
+                unitName: "GE Tornado Fighter Squadron",
+                classification: UnitClassification.FGT,
+                role: UnitRole.AirSuperiority,
+                side: Side.AI,
+                nationality: Nationality.FRG,
+                profileType: RegimentProfileType.DEP,
+                deployedProfile: WeaponType.FGT_TORNADO_GR1_US,
+                isMountable: false,
+                mobileProfile: WeaponType.NONE,
+                isEmbarkable: false,
+                embarkedProfile: WeaponType.NONE,
+                category: DepotCategory.Secondary,
+                size: DepotSize.Small
+            );
+
+            // Set experience level
+            ge_tornado_squadron.SetExperienceLevel(ExperienceLevel.Experienced);
+
+            // Set the ICM
+            ge_tornado_squadron.SetICM(GameData.ICM_DEFAULT);
+
+            // Add the template to the database
+            AddTemplate("GE_TORNADO_FIGHTER_SQUADRON", ge_tornado_squadron);
+
+            #endregion // GE Tornado Fighter Squadron
+        }
+
+        public static void CreateBritishForces()
+        {
+            #region UK Challenger 1 Armored Regiment
+
+            var uk_armoured_regiment = new CombatUnit(
+                unitName: "UK Armoured Regiment (Challenger 1)",
+                classification: UnitClassification.TANK,
+                role: UnitRole.GroundCombat,
+                side: Side.AI,
+                nationality: Nationality.UK,
+                profileType: RegimentProfileType.DEP,
+                deployedProfile: WeaponType.TANK_CHALLENGER1_UK,
+                isMountable: false,
+                mobileProfile: WeaponType.NONE,
+                isEmbarkable: false,
+                embarkedProfile: WeaponType.NONE,
+                category: DepotCategory.Secondary,
+                size: DepotSize.Small
+            );
+
+            // Set experience level
+            uk_armoured_regiment.SetExperienceLevel(ExperienceLevel.Experienced);
+
+            // Set the ICM
+            uk_armoured_regiment.SetICM(GameData.ICM_DEFAULT);
+
+            // Add the template to the database
+            AddTemplate("UK_ARMOURED_REGIMENT", uk_armoured_regiment);
+
+            #endregion // UK Challenger 1 Armored Regiment
+
+            #region UK Mechanized Infantry Regiment
+
+            var uk_mech_infantry_regiment = new CombatUnit(
+                unitName: "UK Mechanized Infantry Regiment",
+                classification: UnitClassification.MECH,
+                role: UnitRole.GroundCombat,
+                side: Side.AI,
+                nationality: Nationality.UK,
+                profileType: RegimentProfileType.DEP_MOB,
+                deployedProfile: WeaponType.INF_REG_UK,
+                isMountable: true,
+                mobileProfile: WeaponType.IFV_WARRIOR_UK,
+                isEmbarkable: false,
+                embarkedProfile: WeaponType.NONE,
+                category: DepotCategory.Secondary,
+                size: DepotSize.Small
+            );
+
+            // Set experience level
+            uk_mech_infantry_regiment.SetExperienceLevel(ExperienceLevel.Experienced);
+
+            // Set the ICM
+            uk_mech_infantry_regiment.SetICM(GameData.ICM_DEFAULT);
+
+            // Add the template to the database
+            AddTemplate("UK_MECH_INFANTRY_REGIMENT", uk_mech_infantry_regiment);
+
+            #endregion // UK Mechanized Infantry Regiment
+
+            #region UK Airborne Regiment
+
+            var uk_airborne_regiment = new CombatUnit(
+                unitName: "UK Airborne Regiment",
+                classification: UnitClassification.AB,
+                role: UnitRole.GroundCombat,
+                side: Side.AI,
+                nationality: Nationality.UK,
+                profileType: RegimentProfileType.DEP_MOB,
+                deployedProfile: WeaponType.INF_AB_UK,
+                isMountable: true,
+                mobileProfile: WeaponType.TRK_WEST,
+                isEmbarkable: false,
+                embarkedProfile: WeaponType.NONE,
+                category: DepotCategory.Secondary,
+                size: DepotSize.Small
+            );
+
+            // Set experience level
+            uk_airborne_regiment.SetExperienceLevel(ExperienceLevel.Experienced);
+
+            // Set the ICM
+            uk_airborne_regiment.SetICM(GameData.ICM_DEFAULT);
+
+            // Add the template to the database
+            AddTemplate("UK_AIRBORNE_REGIMENT", uk_airborne_regiment);
+
+            #endregion // UK Airborne Regiment
+
+            #region UK Recon Unit
+
+            var uk_recon_unit = new CombatUnit(
+                unitName: "UK Recon Unit",
+                classification: UnitClassification.RECON,
+                role: UnitRole.GroundCombat,
+                side: Side.AI,
+                nationality: Nationality.UK,
+                profileType: RegimentProfileType.DEP,
+                deployedProfile: WeaponType.RCN_FV105_UK,
+                isMountable: false,
+                mobileProfile: WeaponType.NONE,
+                isEmbarkable: false,
+                embarkedProfile: WeaponType.NONE,
+                category: DepotCategory.Secondary,
+                size: DepotSize.Small
+            );
+
+            // Set experience level
+            uk_recon_unit.SetExperienceLevel(ExperienceLevel.Experienced);
+
+            // Set the ICM
+            uk_recon_unit.SetICM(GameData.ICM_DEFAULT);
+
+            // Add the template to the database
+            AddTemplate("UK_RECON_UNIT", uk_recon_unit);
+
+            #endregion // UK Recon Unit
+
+            #region UK Self-Propelled Artillery Regiment
+
+            var uk_sp_artillery_regiment = new CombatUnit(
+                unitName: "UK Self-Propelled Artillery Regiment",
+                classification: UnitClassification.ART,
+                role: UnitRole.GroundCombat,
+                side: Side.AI,
+                nationality: Nationality.UK,
+                profileType: RegimentProfileType.DEP,
+                deployedProfile: WeaponType.SPA_M109_UK,
+                isMountable: false,
+                mobileProfile: WeaponType.NONE,
+                isEmbarkable: false,
+                embarkedProfile: WeaponType.NONE,
+                category: DepotCategory.Secondary,
+                size: DepotSize.Small
+            );
+
+            // Set experience level
+            uk_sp_artillery_regiment.SetExperienceLevel(ExperienceLevel.Experienced);
+
+            // Set the ICM
+            uk_sp_artillery_regiment.SetICM(GameData.ICM_DEFAULT);
+
+            // Add the template to the database
+            AddTemplate("UK_SP_ARTILLERY_REGIMENT", uk_sp_artillery_regiment);
+
+            #endregion // UK Self-Propelled Artillery Regiment
+
+            #region UK Air Defense Regiment (US M163)
+
+            var uk_air_defense_regiment = new CombatUnit(
+                unitName: "UK Air Defense Regiment (M163)",
+                classification: UnitClassification.SPAAA,
+                role: UnitRole.AirDefenseArea,
+                side: Side.AI,
+                nationality: Nationality.UK,
+                profileType: RegimentProfileType.DEP,
+                deployedProfile: WeaponType.SPAAA_M163_US,
+                isMountable: false,
+                mobileProfile: WeaponType.NONE,
+                isEmbarkable: false,
+                embarkedProfile: WeaponType.NONE,
+                category: DepotCategory.Secondary,
+                size: DepotSize.Small
+            );
+
+            // Set experience level
+            uk_air_defense_regiment.SetExperienceLevel(ExperienceLevel.Experienced);
+
+            // Set the ICM
+            uk_air_defense_regiment.SetICM(GameData.ICM_DEFAULT);
+
+            // Add the template to the database
+            AddTemplate("UK_AIR_DEFENSE_REGIMENT", uk_air_defense_regiment);
+
+            #endregion // UK Air Defense Regiment (US M163)
+
+            #region UK SAM Regiment (Rapier)
+
+            var uk_rapier_regiment = new CombatUnit(
+                unitName: "UK SAM Regiment (Rapier)",
+                classification: UnitClassification.SPSAM,
+                role: UnitRole.AirDefenseArea,
+                side: Side.AI,
+                nationality: Nationality.UK,
+                profileType: RegimentProfileType.DEP,
+                deployedProfile: WeaponType.SPSAM_RAPIER_UK,
+                isMountable: false,
+                mobileProfile: WeaponType.NONE,
+                isEmbarkable: false,
+                embarkedProfile: WeaponType.NONE,
+                category: DepotCategory.Secondary,
+                size: DepotSize.Small
+            );
+
+            // Set experience level
+            uk_rapier_regiment.SetExperienceLevel(ExperienceLevel.Experienced);
+
+            // Set the ICM
+            uk_rapier_regiment.SetICM(GameData.ICM_DEFAULT);
+
+            // Add the template to the database
+            AddTemplate("UK_RAPIER_REGIMENT", uk_rapier_regiment);
+
+            #endregion // UK SAM Regiment (Rapier)
+
+            #region UK Tornado Fighter Squadron
+
+            var uk_tornado_squadron = new CombatUnit(
+                unitName: "UK Tornado Fighter Squadron",
+                classification: UnitClassification.FGT,
+                role: UnitRole.AirSuperiority,
+                side: Side.AI,
+                nationality: Nationality.UK,
+                profileType: RegimentProfileType.DEP,
+                deployedProfile: WeaponType.FGT_TORNADO_IDS_UK,
+                isMountable: false,
+                mobileProfile: WeaponType.NONE,
+                isEmbarkable: false,
+                embarkedProfile: WeaponType.NONE,
+                category: DepotCategory.Secondary,
+                size: DepotSize.Small
+            );
+
+            // Set experience level
+            uk_tornado_squadron.SetExperienceLevel(ExperienceLevel.Experienced);
+
+            // Set the ICM
+            uk_tornado_squadron.SetICM(GameData.ICM_DEFAULT);
+
+            // Add the template to the database
+            AddTemplate("UK_TORNADO_FIGHTER_SQUADRON", uk_tornado_squadron);
+
+            #endregion // UK Tornado Fighter Squadron
+        }
+
+        public static void CreateFrenchForces()
+        {
+            #region FR Armored Brigade
+
+            var fr_armored_brigade = new CombatUnit(
+                unitName: "FR Armored Brigade (AMX-30)",
+                classification: UnitClassification.TANK,
+                role: UnitRole.GroundCombat,
+                side: Side.AI,
+                nationality: Nationality.FRA,
+                profileType: RegimentProfileType.DEP,
+                deployedProfile: WeaponType.TANK_AMX30_FR,
+                isMountable: false,
+                mobileProfile: WeaponType.NONE,
+                isEmbarkable: false,
+                embarkedProfile: WeaponType.NONE,
+                category: DepotCategory.Secondary,
+                size: DepotSize.Small
+            );
+
+            // Set experience level
+            fr_armored_brigade.SetExperienceLevel(ExperienceLevel.Trained);
+
+            // Set the ICM
+            fr_armored_brigade.SetICM(GameData.ICM_DEFAULT);
+
+            // Add the template to the database
+            AddTemplate("FR_ARMORED_BRIGADE", fr_armored_brigade);
+
+            #endregion // FR Armored Brigade
+
+            #region FR Mechanized Infantry Brigade
+
+            var fr_mech_infantry_brigade = new CombatUnit(
+                unitName: "FR Mechanized Infantry Brigade",
+                classification: UnitClassification.MECH,
+                role: UnitRole.GroundCombat,
+                side: Side.AI,
+                nationality: Nationality.FRA,
+                profileType: RegimentProfileType.DEP_MOB,
+                deployedProfile: WeaponType.INF_REG_FR,
+                isMountable: true,
+                mobileProfile: WeaponType.APC_VAB_FR,
+                isEmbarkable: false,
+                embarkedProfile: WeaponType.NONE,
+                category: DepotCategory.Secondary,
+                size: DepotSize.Small
+            );
+
+            // Set experience level
+            fr_mech_infantry_brigade.SetExperienceLevel(ExperienceLevel.Trained);
+
+            // Set the ICM
+            fr_mech_infantry_brigade.SetICM(GameData.ICM_DEFAULT);
+
+            // Add the template to the database
+            AddTemplate("FR_MECH_INFANTRY_BRIGADE", fr_mech_infantry_brigade);
+
+            #endregion // FR Mechanized Infantry Brigade
+
+            #region FR Airborne Brigade
+
+            var fr_airborne_brigade = new CombatUnit(
+                unitName: "FR Airborne Brigade",
+                classification: UnitClassification.AB,
+                role: UnitRole.GroundCombat,
+                side: Side.AI,
+                nationality: Nationality.FRA,
+                profileType: RegimentProfileType.DEP_MOB,
+                deployedProfile: WeaponType.INF_AB_FR,
+                isMountable: true,
+                mobileProfile: WeaponType.TRK_WEST,
+                isEmbarkable: false,
+                embarkedProfile: WeaponType.NONE,
+                category: DepotCategory.Secondary,
+                size: DepotSize.Small
+            );
+
+            // Set experience level
+            fr_airborne_brigade.SetExperienceLevel(ExperienceLevel.Trained);
+
+            // Set the ICM
+            fr_airborne_brigade.SetICM(GameData.ICM_DEFAULT);
+
+            // Add the template to the database
+            AddTemplate("FR_AIRBORNE_BRIGADE", fr_airborne_brigade);
+
+            #endregion // FR Airborne Brigade
+
+            #region FR Recon Unit
+
+            var fr_recon_unit = new CombatUnit(
+                unitName: "FR Recon Unit (ERC-90)",
+                classification: UnitClassification.RECON,
+                role: UnitRole.GroundCombat,
+                side: Side.AI,
+                nationality: Nationality.FRA,
+                profileType: RegimentProfileType.DEP,
+                deployedProfile: WeaponType.RCN_ERC90_FR,
+                isMountable: false,
+                mobileProfile: WeaponType.NONE,
+                isEmbarkable: false,
+                embarkedProfile: WeaponType.NONE,
+                category: DepotCategory.Secondary,
+                size: DepotSize.Small
+            );
+
+            // Set experience level
+            fr_recon_unit.SetExperienceLevel(ExperienceLevel.Trained);
+
+            // Set the ICM
+            fr_recon_unit.SetICM(GameData.ICM_DEFAULT);
+
+            // Add the template to the database
+            AddTemplate("FR_RECON_UNIT", fr_recon_unit);
+
+            #endregion // FR Recon Unit
+
+            #region FR Self-Propelled Artillery Regiment
+
+            var fr_sp_artillery_regiment = new CombatUnit(
+                unitName: "FR Self-Propelled Artillery Regiment",
+                classification: UnitClassification.ART,
+                role: UnitRole.GroundCombat,
+                side: Side.AI,
+                nationality: Nationality.FRA,
+                profileType: RegimentProfileType.DEP,
+                deployedProfile: WeaponType.SPA_M109_FR,
+                isMountable: false,
+                mobileProfile: WeaponType.NONE,
+                isEmbarkable: false,
+                embarkedProfile: WeaponType.NONE,
+                category: DepotCategory.Secondary,
+                size: DepotSize.Small
+            );
+
+            // Set experience level
+            fr_sp_artillery_regiment.SetExperienceLevel(ExperienceLevel.Trained);
+
+            // Set the ICM
+            fr_sp_artillery_regiment.SetICM(GameData.ICM_DEFAULT);
+
+            // Add the template to the database
+            AddTemplate("FR_SP_ARTILLERY_REGIMENT", fr_sp_artillery_regiment);
+
+            #endregion // FR Self-Propelled Artillery Regiment
+
+            #region FR Air Defense Regiment (Roland)
+
+            var fr_air_defense_regiment = new CombatUnit(
+                unitName: "FR Air Defense Regiment (Roland)",
+                classification: UnitClassification.SPAAA,
+                role: UnitRole.AirDefenseArea,
+                side: Side.AI,
+                nationality: Nationality.FRA,
+                profileType: RegimentProfileType.DEP,
+                deployedProfile: WeaponType.SPAAA_ROLAND_FR,
+                isMountable: false,
+                mobileProfile: WeaponType.NONE,
+                isEmbarkable: false,
+                embarkedProfile: WeaponType.NONE,
+                category: DepotCategory.Secondary,
+                size: DepotSize.Small
+            );
+
+            // Set experience level
+            fr_air_defense_regiment.SetExperienceLevel(ExperienceLevel.Trained);
+
+            // Set the ICM
+            fr_air_defense_regiment.SetICM(GameData.ICM_DEFAULT);
+
+            // Add the template to the database
+            AddTemplate("FR_AIR_DEFENSE_REGIMENT", fr_air_defense_regiment);
+
+            #endregion // FR Air Defense Regiment (Roland)
+
+            #region FR SAM Regiment (Crotale)
+
+            var fr_crotale_regiment = new CombatUnit(
+                unitName: "FR SAM Regiment (Crotale)",
+                classification: UnitClassification.SPSAM,
+                role: UnitRole.AirDefenseArea,
+                side: Side.AI,
+                nationality: Nationality.FRA,
+                profileType: RegimentProfileType.DEP,
+                deployedProfile: WeaponType.SPSAM_CROTALE_FR,
+                isMountable: false,
+                mobileProfile: WeaponType.NONE,
+                isEmbarkable: false,
+                embarkedProfile: WeaponType.NONE,
+                category: DepotCategory.Secondary,
+                size: DepotSize.Small
+            );
+
+            // Set experience level
+            fr_crotale_regiment.SetExperienceLevel(ExperienceLevel.Trained);
+
+            // Set the ICM
+            fr_crotale_regiment.SetICM(GameData.ICM_DEFAULT);
+
+            // Add the template to the database
+            AddTemplate("FR_CROTALE_REGIMENT", fr_crotale_regiment);
+
+            #endregion // FR SAM Regiment (Crotale)
+
+            #region FR Mirage F1 Fighter Squadron
+
+            var fr_mirage_f1_squadron = new CombatUnit(
+                unitName: "FR Mirage F1 Fighter Squadron",
+                classification: UnitClassification.FGT,
+                role: UnitRole.AirSuperiority,
+                side: Side.AI,
+                nationality: Nationality.FRA,
+                profileType: RegimentProfileType.DEP,
+                deployedProfile: WeaponType.FGT_MIRAGEF1_FR,
+                isMountable: false,
+                mobileProfile: WeaponType.NONE,
+                isEmbarkable: false,
+                embarkedProfile: WeaponType.NONE,
+                category: DepotCategory.Secondary,
+                size: DepotSize.Small
+            );
+
+            // Set experience level
+            fr_mirage_f1_squadron.SetExperienceLevel(ExperienceLevel.Experienced);
+
+            // Set the ICM
+            fr_mirage_f1_squadron.SetICM(GameData.ICM_DEFAULT);
+
+            // Add the template to the database
+            AddTemplate("FR_MIRAGE_F1_FIGHTER_SQUADRON", fr_mirage_f1_squadron);
+
+            #endregion // FR Mirage F1 Fighter Squadron
+
+            #region FR Mirage 2000 Fighter Squadron
+
+            var fr_mirage_2000_squadron = new CombatUnit(
+                unitName: "FR Mirage 2000 Fighter Squadron",
+                classification: UnitClassification.FGT,
+                role: UnitRole.AirSuperiority,
+                side: Side.AI,
+                nationality: Nationality.FRA,
+                profileType: RegimentProfileType.DEP,
+                deployedProfile: WeaponType.FGT_MIRAGE2000_FR,
+                isMountable: false,
+                mobileProfile: WeaponType.NONE,
+                isEmbarkable: false,
+                embarkedProfile: WeaponType.NONE,
+                category: DepotCategory.Secondary,
+                size: DepotSize.Small
+            );
+
+            // Set experience level
+            fr_mirage_2000_squadron.SetExperienceLevel(ExperienceLevel.Experienced);
+
+            // Set the ICM
+            fr_mirage_2000_squadron.SetICM(GameData.ICM_DEFAULT);
+
+            // Add the template to the database
+            AddTemplate("FR_MIRAGE_2000_FIGHTER_SQUADRON", fr_mirage_2000_squadron);
+
+            #endregion // FR Mirage 2000 Fighter Squadron
+
+            #region FR Jaguar Attack Squadron
+
+            var fr_jaguar_squadron = new CombatUnit(
+                unitName: "FR Jaguar Attack Squadron",
+                classification: UnitClassification.ATT,
+                role: UnitRole.AirGroundAttack,
+                side: Side.AI,
+                nationality: Nationality.FRA,
+                profileType: RegimentProfileType.DEP,
+                deployedProfile: WeaponType.ATT_JAGUAR_FR,
+                isMountable: false,
+                mobileProfile: WeaponType.NONE,
+                isEmbarkable: false,
+                embarkedProfile: WeaponType.NONE,
+                category: DepotCategory.Secondary,
+                size: DepotSize.Small
+            );
+
+            // Set experience level
+            fr_jaguar_squadron.SetExperienceLevel(ExperienceLevel.Experienced);
+
+            // Set the ICM
+            fr_jaguar_squadron.SetICM(GameData.ICM_DEFAULT);
+
+            // Add the template to the database
+            AddTemplate("FR_JAGUAR_ATTACK_SQUADRON", fr_jaguar_squadron);
+
+            #endregion // FR Jaguar Attack Squadron
+        }
+
+        #endregion // Western Units
 
         //-------------------------------------------------------------------------------------------------
+
+        #region Arab Units
+
+        public static void CreateArabForces()
+        {
+            #region Iraqi Tank Regiment (T-55)
+
+            var iq_tank_regiment_t55 = new CombatUnit(
+                unitName: "Iraqi Tank Regiment (T-55)",
+                classification: UnitClassification.TANK,
+                role: UnitRole.GroundCombat,
+                side: Side.AI,
+                nationality: Nationality.IQ,
+                profileType: RegimentProfileType.DEP,
+                deployedProfile: WeaponType.TANK_T55A_IQ,
+                isMountable: false,
+                mobileProfile: WeaponType.NONE,
+                isEmbarkable: false,
+                embarkedProfile: WeaponType.NONE,
+                category: DepotCategory.Secondary,
+                size: DepotSize.Small
+            );
+
+            // Set experience level
+            iq_tank_regiment_t55.SetExperienceLevel(ExperienceLevel.Green);
+
+            // Set the ICM
+            iq_tank_regiment_t55.SetICM(GameData.ICM_DEFAULT);
+
+            // Add the template to the database
+            AddTemplate("IQ_TANK_REGIMENT_T55", iq_tank_regiment_t55);
+
+            #endregion // Iraqi Tank Regiment (T-55)
+
+            #region Iraqi Tank Regiment (T-62)
+
+            var iq_tank_regiment_t62 = new CombatUnit(
+                unitName: "Iraqi Tank Regiment (T-62)",
+                classification: UnitClassification.TANK,
+                role: UnitRole.GroundCombat,
+                side: Side.AI,
+                nationality: Nationality.IQ,
+                profileType: RegimentProfileType.DEP,
+                deployedProfile: WeaponType.TANK_T62A_IQ,
+                isMountable: false,
+                mobileProfile: WeaponType.NONE,
+                isEmbarkable: false,
+                embarkedProfile: WeaponType.NONE,
+                category: DepotCategory.Secondary,
+                size: DepotSize.Small
+            );
+
+            // Set experience level
+            iq_tank_regiment_t62.SetExperienceLevel(ExperienceLevel.Green);
+
+            // Set the ICM
+            iq_tank_regiment_t62.SetICM(GameData.ICM_DEFAULT);
+
+            // Add the template to the database
+            AddTemplate("IQ_TANK_REGIMENT_T62", iq_tank_regiment_t62);
+
+            #endregion // Iraqi Tank Regiment (T-62)
+
+            #region Iraqi Armored Infantry Regiment
+
+            var iq_armored_infantry_regiment = new CombatUnit(
+                unitName: "Iraqi Armored Infantry Regiment (BMP-1)",
+                classification: UnitClassification.MECH,
+                role: UnitRole.GroundCombat,
+                side: Side.AI,
+                nationality: Nationality.IQ,
+                profileType: RegimentProfileType.DEP_MOB,
+                deployedProfile: WeaponType.INF_REG_IQ,
+                isMountable: true,
+                mobileProfile: WeaponType.IFV_BMP1_IQ,
+                isEmbarkable: false,
+                embarkedProfile: WeaponType.NONE,
+                category: DepotCategory.Secondary,
+                size: DepotSize.Small
+            );
+
+            // Set experience level
+            iq_armored_infantry_regiment.SetExperienceLevel(ExperienceLevel.Green);
+
+            // Set the ICM
+            iq_armored_infantry_regiment.SetICM(GameData.ICM_DEFAULT);
+
+            // Add the template to the database
+            AddTemplate("IQ_ARMORED_INFANTRY_REGIMENT", iq_armored_infantry_regiment);
+
+            #endregion // Iraqi Armored Infantry Regiment (BMP-1)
+
+            #region Iraqi Infantry Regiment
+
+            var iq_infantry_regiment = new CombatUnit(
+                unitName: "Iraqi Infantry Regiment",
+                classification: UnitClassification.INF,
+                role: UnitRole.GroundCombat,
+                side: Side.AI,
+                nationality: Nationality.IQ,
+                profileType: RegimentProfileType.DEP_MOB,
+                deployedProfile: WeaponType.INF_REG_IQ,
+                isMountable: true,
+                mobileProfile: WeaponType.TRK_GEN_ARAB,
+                isEmbarkable: false,
+                embarkedProfile: WeaponType.NONE,
+                category: DepotCategory.Secondary,
+                size: DepotSize.Small
+            );
+
+            // Set experience level
+            iq_infantry_regiment.SetExperienceLevel(ExperienceLevel.Raw);
+
+            // Set the ICM
+            iq_infantry_regiment.SetICM(GameData.ICM_DEFAULT);
+
+            // Add the template to the database
+            AddTemplate("IQ_INFANTRY_REGIMENT", iq_infantry_regiment);
+
+            #endregion // Iraqi Infantry Regiment
+
+            #region Iraqi Self-Propelled Artillery Regiment (2S1)
+
+            var iq_sp_artillery_regiment = new CombatUnit(
+                unitName: "Iraqi Self-Propelled Artillery Regiment (2S1)",
+                classification: UnitClassification.ART,
+                role: UnitRole.GroundCombat,
+                side: Side.AI,
+                nationality: Nationality.IQ,
+                profileType: RegimentProfileType.DEP,
+                deployedProfile: WeaponType.SPA_2S1_IQ,
+                isMountable: false,
+                mobileProfile: WeaponType.NONE,
+                isEmbarkable: false,
+                embarkedProfile: WeaponType.NONE,
+                category: DepotCategory.Secondary,
+                size: DepotSize.Small
+            );
+
+            // Set experience level
+            iq_sp_artillery_regiment.SetExperienceLevel(ExperienceLevel.Green);
+
+            // Set the ICM
+            iq_sp_artillery_regiment.SetICM(GameData.ICM_DEFAULT);
+
+            // Add the template to the database
+            AddTemplate("IQ_SP_ARTILLERY_REGIMENT", iq_sp_artillery_regiment);
+
+            #endregion // Iraqi Self-Propelled Artillery Regiment
+
+            #region Iraqi Towed Artillery Regiment (ART_HEAVY_ARAB)
+
+            var iq_towed_artillery_regiment = new CombatUnit(
+                unitName: "Iraqi Towed Artillery Regiment",
+                classification: UnitClassification.ART,
+                role: UnitRole.GroundCombat,
+                side: Side.AI,
+                nationality: Nationality.IQ,
+                profileType: RegimentProfileType.DEP_MOB,
+                deployedProfile: WeaponType.ART_HEAVY_ARAB,
+                isMountable: true,
+                mobileProfile: WeaponType.TRK_GEN_ARAB,
+                isEmbarkable: false,
+                embarkedProfile: WeaponType.NONE,
+                category: DepotCategory.Secondary,
+                size: DepotSize.Small
+            );
+
+            // Set experience level
+            iq_towed_artillery_regiment.SetExperienceLevel(ExperienceLevel.Green);
+
+            // Set the ICM
+            iq_towed_artillery_regiment.SetICM(GameData.ICM_DEFAULT);
+
+            // Add the template to the database
+            AddTemplate("IQ_TOWED_ARTILLERY_REGIMENT", iq_towed_artillery_regiment);
+
+            #endregion // Iraqi Towed Artillery Regiment
+
+            #region Iraqi Air Defense Regiment (ZSU-57)
+
+            var iq_air_defense_regiment = new CombatUnit(
+                unitName: "Iraqi Air Defense Regiment (ZSU-57)",
+                classification: UnitClassification.SPAAA,
+                role: UnitRole.AirDefenseArea,
+                side: Side.AI,
+                nationality: Nationality.IQ,
+                profileType: RegimentProfileType.DEP,
+                deployedProfile: WeaponType.SPAAA_ZSU57_IQ,
+                isMountable: false,
+                mobileProfile: WeaponType.NONE,
+                isEmbarkable: false,
+                embarkedProfile: WeaponType.NONE,
+                category: DepotCategory.Secondary,
+                size: DepotSize.Small
+            );
+
+            // Set experience level
+            iq_air_defense_regiment.SetExperienceLevel(ExperienceLevel.Green);
+
+            // Set the ICM
+            iq_air_defense_regiment.SetICM(GameData.ICM_DEFAULT);
+
+            // Add the template to the database
+            AddTemplate("IQ_AIR_DEFENSE_REGIMENT", iq_air_defense_regiment);
+
+            #endregion // Iraqi Air Defense Regiment (ZSU-57)
+
+            #region Iraqi Self Propelled SAM Regiment (2K12)
+
+            var iq_spsam_regiment = new CombatUnit(
+                unitName: "Iraqi Self-Propelled SAM Regiment (2K12)",
+                classification: UnitClassification.SPSAM,
+                role: UnitRole.AirDefenseArea,
+                side: Side.AI,
+                nationality: Nationality.IQ,
+                profileType: RegimentProfileType.DEP,
+                deployedProfile: WeaponType.SPSAM_2K12_IQ,
+                isMountable: false,
+                mobileProfile: WeaponType.NONE,
+                isEmbarkable: false,
+                embarkedProfile: WeaponType.NONE,
+                category: DepotCategory.Secondary,
+                size: DepotSize.Small
+            );
+
+            // Set experience level
+            iq_spsam_regiment.SetExperienceLevel(ExperienceLevel.Green);
+
+            // Set the ICM
+            iq_spsam_regiment.SetICM(GameData.ICM_DEFAULT);
+
+            // Add the template to the database
+            AddTemplate("IQ_SPSAM_REGIMENT", iq_spsam_regiment);
+
+            #endregion // Iraqi Self Propelled SAM Regiment (2K12)
+
+            #region Iraqi SAM Regiment (SAM_S75_SV)
+
+            var iq_sam_regiment = new CombatUnit(
+                unitName: "Iraqi SAM Regiment (S-75)",
+                classification: UnitClassification.SAM,
+                role: UnitRole.AirDefenseArea,
+                side: Side.AI,
+                nationality: Nationality.IQ,
+                profileType: RegimentProfileType.DEP_MOB,
+                deployedProfile: WeaponType.SAM_S75_SV,
+                isMountable: true,
+                mobileProfile: WeaponType.TRK_GEN_ARAB,
+                isEmbarkable: false,
+                embarkedProfile: WeaponType.NONE,
+                category: DepotCategory.Secondary,
+                size: DepotSize.Small
+            );
+
+            // Set experience level
+            iq_sam_regiment.SetExperienceLevel(ExperienceLevel.Green);
+
+            // Set the ICM
+            iq_sam_regiment.SetICM(GameData.ICM_DEFAULT);
+
+            // Add the template to the database
+            AddTemplate("IQ_SAM_REGIMENT", iq_sam_regiment);
+
+            #endregion // Iraqi SAM Regiment (SAM_S75_SV)
+
+            #region Iraqi Fighter Squadron (MiG-21)
+
+            var iq_mig21_squadron = new CombatUnit(
+                unitName: "Iraqi Fighter Squadron (MiG-21)",
+                classification: UnitClassification.FGT,
+                role: UnitRole.AirSuperiority,
+                side: Side.AI,
+                nationality: Nationality.IQ,
+                profileType: RegimentProfileType.DEP,
+                deployedProfile: WeaponType.FGT_MIG21_IQ,
+                isMountable: false,
+                mobileProfile: WeaponType.NONE,
+                isEmbarkable: false,
+                embarkedProfile: WeaponType.NONE,
+                category: DepotCategory.Secondary,
+                size: DepotSize.Small
+            );
+
+            // Set experience level
+            iq_mig21_squadron.SetExperienceLevel(ExperienceLevel.Green);
+
+            // Set the ICM
+            iq_mig21_squadron.SetICM(GameData.ICM_DEFAULT);
+
+            // Add the template to the database
+            AddTemplate("IQ_MIG21_FIGHTER_SQUADRON", iq_mig21_squadron);
+
+            #endregion // Iraqi Fighter Squadron (MiG-21)
+
+            #region Iraqi Fighter Squadron (MiG-23)
+
+            var iq_mig23_squadron = new CombatUnit(
+                unitName: "Iraqi Fighter Squadron (MiG-23)",
+                classification: UnitClassification.FGT,
+                role: UnitRole.AirSuperiority,
+                side: Side.AI,
+                nationality: Nationality.IQ,
+                profileType: RegimentProfileType.DEP,
+                deployedProfile: WeaponType.FGT_MIG23_IQ,
+                isMountable: false,
+                mobileProfile: WeaponType.NONE,
+                isEmbarkable: false,
+                embarkedProfile: WeaponType.NONE,
+                category: DepotCategory.Secondary,
+                size: DepotSize.Small
+            );
+
+            // Set experience level
+            iq_mig23_squadron.SetExperienceLevel(ExperienceLevel.Green);
+
+            // Set the ICM
+            iq_mig23_squadron.SetICM(GameData.ICM_DEFAULT);
+
+            // Add the template to the database
+            AddTemplate("IQ_MIG23_FIGHTER_SQUADRON", iq_mig23_squadron);
+
+            #endregion // Iraqi Fighter Squadron (MiG-23)
+
+            #region Iraqi Attack Squadron (Su-17)
+
+            var iq_su17_squadron = new CombatUnit(
+                unitName: "Iraqi Attack Squadron (Su-17)",
+                classification: UnitClassification.ATT,
+                role: UnitRole.AirGroundAttack,
+                side: Side.AI,
+                nationality: Nationality.IQ,
+                profileType: RegimentProfileType.DEP,
+                deployedProfile: WeaponType.ATT_SU17_IQ,
+                isMountable: false,
+                mobileProfile: WeaponType.NONE,
+                isEmbarkable: false,
+                embarkedProfile: WeaponType.NONE,
+                category: DepotCategory.Secondary,
+                size: DepotSize.Small
+            );
+
+            // Set experience level
+            iq_su17_squadron.SetExperienceLevel(ExperienceLevel.Green);
+
+            // Set the ICM
+            iq_su17_squadron.SetICM(GameData.ICM_DEFAULT);
+
+            // Add the template to the database
+            AddTemplate("IQ_SU17_ATTACK_SQUADRON", iq_su17_squadron);
+
+            #endregion // Iraqi Attack Squadron (Su-17)
+
+
+            #region Iranian Tank Regiment (M-60)
+
+            var ir_tank_regiment = new CombatUnit(
+                unitName: "Iranian Tank Regiment (M-60)",
+                classification: UnitClassification.TANK,
+                role: UnitRole.GroundCombat,
+                side: Side.AI,
+                nationality: Nationality.IR,
+                profileType: RegimentProfileType.DEP,
+                deployedProfile: WeaponType.TANK_M60A3_IR,
+                isMountable: false,
+                mobileProfile: WeaponType.NONE,
+                isEmbarkable: false,
+                embarkedProfile: WeaponType.NONE,
+                category: DepotCategory.Secondary,
+                size: DepotSize.Small
+            );
+
+            // Set experience level
+            ir_tank_regiment.SetExperienceLevel(ExperienceLevel.Green);
+
+            // Set the ICM
+            ir_tank_regiment.SetICM(GameData.ICM_DEFAULT);
+
+            // Add the template to the database
+            AddTemplate("IR_TANK_REGIMENT", ir_tank_regiment);
+
+            #endregion // Iranian Tank Regiment (M-60)
+
+            #region Iranian Armored Infantry Regiment (M-113)
+
+            var ir_armored_infantry_regiment = new CombatUnit(
+                unitName: "Iranian Armored Infantry Regiment (M-113)",
+                classification: UnitClassification.MECH,
+                role: UnitRole.GroundCombat,
+                side: Side.AI,
+                nationality: Nationality.IR,
+                profileType: RegimentProfileType.DEP_MOB,
+                deployedProfile: WeaponType.INF_REG_IR,
+                isMountable: true,
+                mobileProfile: WeaponType.APC_M113_IR,
+                isEmbarkable: false,
+                embarkedProfile: WeaponType.NONE,
+                category: DepotCategory.Secondary,
+                size: DepotSize.Small
+            );
+
+            // Set experience level
+            ir_armored_infantry_regiment.SetExperienceLevel(ExperienceLevel.Green);
+
+            // Set the ICM
+            ir_armored_infantry_regiment.SetICM(GameData.ICM_DEFAULT);
+
+            // Add the template to the database
+            AddTemplate("IR_ARMORED_INFANTRY_REGIMENT", ir_armored_infantry_regiment);
+
+            #endregion // Iranian Armored Infantry Regiment (M-113)
+
+            #region Iranian Infantry Regiment
+
+            var ir_infantry_regiment = new CombatUnit(
+                unitName: "Iranian Infantry Regiment",
+                classification: UnitClassification.INF,
+                role: UnitRole.GroundCombat,
+                side: Side.AI,
+                nationality: Nationality.IR,
+                profileType: RegimentProfileType.DEP_MOB,
+                deployedProfile: WeaponType.INF_REG_IR,
+                isMountable: true,
+                mobileProfile: WeaponType.TRK_GEN_ARAB,
+                isEmbarkable: false,
+                embarkedProfile: WeaponType.NONE,
+                category: DepotCategory.Secondary,
+                size: DepotSize.Small
+            );
+
+            // Set experience level
+            ir_infantry_regiment.SetExperienceLevel(ExperienceLevel.Raw);
+
+            // Set the ICM
+            ir_infantry_regiment.SetICM(GameData.ICM_DEFAULT);
+
+            // Add the template to the database
+            AddTemplate("IR_INFANTRY_REGIMENT", ir_infantry_regiment);
+
+            #endregion // Iranian Infantry Regiment
+
+            #region Iranian Towed Heavy Artillery Regiment (ART_HEAVY_ARAB)
+
+            var ir_heavy_artillery_regiment = new CombatUnit(
+                unitName: "Iranian Towed Heavy Artillery Regiment",
+                classification: UnitClassification.ART,
+                role: UnitRole.GroundCombat,
+                side: Side.AI,
+                nationality: Nationality.IR,
+                profileType: RegimentProfileType.DEP_MOB,
+                deployedProfile: WeaponType.ART_HEAVY_ARAB,
+                isMountable: true,
+                mobileProfile: WeaponType.TRK_GEN_ARAB,
+                isEmbarkable: false,
+                embarkedProfile: WeaponType.NONE,
+                category: DepotCategory.Secondary,
+                size: DepotSize.Small
+            );
+
+            // Set experience level
+            ir_heavy_artillery_regiment.SetExperienceLevel(ExperienceLevel.Green);
+
+            // Set the ICM
+            ir_heavy_artillery_regiment.SetICM(GameData.ICM_DEFAULT);
+
+            // Add the template to the database
+            AddTemplate("IR_HEAVY_ARTILLERY_REGIMENT", ir_heavy_artillery_regiment);
+
+            #endregion // Iranian Heavy Artillery Regiment
+
+            #region Iranian Towed Light Artillery Regiment (ART_LIGHT_ARAB)
+
+            var ir_light_artillery_regiment = new CombatUnit(
+                unitName: "Iranian Towed Light Artillery Regiment",
+                classification: UnitClassification.ART,
+                role: UnitRole.GroundCombat,
+                side: Side.AI,
+                nationality: Nationality.IR,
+                profileType: RegimentProfileType.DEP_MOB,
+                deployedProfile: WeaponType.ART_LIGHT_ARAB,
+                isMountable: true,
+                mobileProfile: WeaponType.TRK_GEN_ARAB,
+                isEmbarkable: false,
+                embarkedProfile: WeaponType.NONE,
+                category: DepotCategory.Secondary,
+                size: DepotSize.Small
+            );
+
+            // Set experience level
+            ir_light_artillery_regiment.SetExperienceLevel(ExperienceLevel.Green);
+
+            // Set the ICM
+            ir_light_artillery_regiment.SetICM(GameData.ICM_DEFAULT);
+
+            // Add the template to the database
+            AddTemplate("IR_LIGHT_ARTILLERY_REGIMENT", ir_light_artillery_regiment);
+
+            #endregion // Iranian Light Artillery Regiment
+
+            #region Iranian Towed Air Defense Regiment (AAA_GEN_SV)
+
+            var ir_air_defense_regiment = new CombatUnit(
+                unitName: "Iranian Air Defense Regiment",
+                classification: UnitClassification.AAA,
+                role: UnitRole.AirDefenseArea,
+                side: Side.AI,
+                nationality: Nationality.IR,
+                profileType: RegimentProfileType.DEP_MOB,
+                deployedProfile: WeaponType.AAA_GEN_SV,
+                isMountable: true,
+                mobileProfile: WeaponType.TRK_GEN_ARAB,
+                isEmbarkable: false,
+                embarkedProfile: WeaponType.NONE,
+                category: DepotCategory.Secondary,
+                size: DepotSize.Small
+            );
+
+            // Set experience level
+            ir_air_defense_regiment.SetExperienceLevel(ExperienceLevel.Green);
+
+            // Set the ICM
+            ir_air_defense_regiment.SetICM(GameData.ICM_DEFAULT);
+
+            // Add the template to the database
+            AddTemplate("IR_AIR_DEFENSE_REGIMENT", ir_air_defense_regiment);
+
+            #endregion // Iranian Towed Air Defense Regiment (AAA_GEN_SV)
+
+            #region Iranian Towed SAM Regiment (SAM_S75_SV)
+
+            var ir_sam_regiment = new CombatUnit(
+                unitName: "Iranian SAM Regiment (S-75)",
+                classification: UnitClassification.SAM,
+                role: UnitRole.AirDefenseArea,
+                side: Side.AI,
+                nationality: Nationality.IR,
+                profileType: RegimentProfileType.DEP_MOB,
+                deployedProfile: WeaponType.SAM_S75_SV,
+                isMountable: true,
+                mobileProfile: WeaponType.TRK_GEN_ARAB,
+                isEmbarkable: false,
+                embarkedProfile: WeaponType.NONE,
+                category: DepotCategory.Secondary,
+                size: DepotSize.Small
+            );
+
+            // Set experience level
+            ir_sam_regiment.SetExperienceLevel(ExperienceLevel.Green);
+
+            // Set the ICM
+            ir_sam_regiment.SetICM(GameData.ICM_DEFAULT);
+
+            // Add the template to the database
+            AddTemplate("IR_SAM_REGIMENT", ir_sam_regiment);
+
+            #endregion // Iranian Towed SAM Regiment (SAM_S75_SV)
+
+            #region Iranian Fighter Squadron (F-14)
+
+            var ir_f14_squadron = new CombatUnit(
+                unitName: "Iranian Fighter Squadron (F-14)",
+                classification: UnitClassification.FGT,
+                role: UnitRole.AirSuperiority,
+                side: Side.AI,
+                nationality: Nationality.IR,
+                profileType: RegimentProfileType.DEP,
+                deployedProfile: WeaponType.FGT_F14_IR,
+                isMountable: false,
+                mobileProfile: WeaponType.NONE,
+                isEmbarkable: false,
+                embarkedProfile: WeaponType.NONE,
+                category: DepotCategory.Secondary,
+                size: DepotSize.Small
+            );
+
+            // Set experience level
+            ir_f14_squadron.SetExperienceLevel(ExperienceLevel.Experienced);
+
+            // Set the ICM
+            ir_f14_squadron.SetICM(GameData.ICM_DEFAULT);
+
+            // Add the template to the database
+            AddTemplate("IR_F14_FIGHTER_SQUADRON", ir_f14_squadron);
+
+            #endregion // Iranian Fighter Squadron (F-14)
+
+            #region Iranian Fighter Squadron (F4)
+
+            var ir_f4_squadron = new CombatUnit(
+                unitName: "Iranian Fighter Squadron (F-4)",
+                classification: UnitClassification.FGT,
+                role: UnitRole.AirSuperiority,
+                side: Side.AI,
+                nationality: Nationality.IR,
+                profileType: RegimentProfileType.DEP,
+                deployedProfile: WeaponType.FGT_F4_IR,
+                isMountable: false,
+                mobileProfile: WeaponType.NONE,
+                isEmbarkable: false,
+                embarkedProfile: WeaponType.NONE,
+                category: DepotCategory.Secondary,
+                size: DepotSize.Small
+            );
+
+            // Set experience level
+            ir_f4_squadron.SetExperienceLevel(ExperienceLevel.Experienced);
+
+            // Set the ICM
+            ir_f4_squadron.SetICM(GameData.ICM_DEFAULT);
+
+            // Add the template to the database
+            AddTemplate("IR_F4_FIGHTER_SQUADRON", ir_f4_squadron);
+
+            #endregion // Iranian Fighter Squadron (F4)
+        }
+
+        #endregion // Arab Units
+
+        //-------------------------------------------------------------------------------------------------
+
+        #region Chines Units
+
+        public static void CreateChineseForces()
+        {
+            #region Chinese Tank Regiment (Type59)
+
+            var ch_tank_regiment_type59 = new CombatUnit(
+                unitName: "Chinese Tank Regiment (Type 59)",
+                classification: UnitClassification.TANK,
+                role: UnitRole.GroundCombat,
+                side: Side.AI,
+                nationality: Nationality.China,
+                profileType: RegimentProfileType.DEP,
+                deployedProfile: WeaponType.TANK_TYPE59,
+                isMountable: false,
+                mobileProfile: WeaponType.NONE,
+                isEmbarkable: false,
+                embarkedProfile: WeaponType.NONE,
+                category: DepotCategory.Secondary,
+                size: DepotSize.Small
+            );
+
+            // Set experience level
+            ch_tank_regiment_type59.SetExperienceLevel(ExperienceLevel.Trained);
+
+            // Set the ICM
+            ch_tank_regiment_type59.SetICM(GameData.ICM_DEFAULT);
+
+            // Add the template to the database
+            AddTemplate("CH_TANK_REGIMENT_TYPE59", ch_tank_regiment_type59);
+
+            #endregion // Chinese Tank Regiment (Type59)
+
+            #region Chinese Tank Regiment (Type80)
+
+            var ch_tank_regiment_type80 = new CombatUnit(
+                unitName: "Chinese Tank Regiment (Type 80)",
+                classification: UnitClassification.TANK,
+                role: UnitRole.GroundCombat,
+                side: Side.AI,
+                nationality: Nationality.China,
+                profileType: RegimentProfileType.DEP,
+                deployedProfile: WeaponType.TANK_TYPE80,
+                isMountable: false,
+                mobileProfile: WeaponType.NONE,
+                isEmbarkable: false,
+                embarkedProfile: WeaponType.NONE,
+                category: DepotCategory.Secondary,
+                size: DepotSize.Small
+            );
+
+            // Set experience level
+            ch_tank_regiment_type80.SetExperienceLevel(ExperienceLevel.Trained);
+
+            // Set the ICM
+            ch_tank_regiment_type80.SetICM(GameData.ICM_DEFAULT);
+
+            // Add the template to the database
+            AddTemplate("CH_TANK_REGIMENT_TYPE80", ch_tank_regiment_type80);
+
+            #endregion // Chinese Tank Regiment (Type80)
+
+            #region Chinese Tank Regiment (Type95)
+
+            var ch_tank_regiment_type95 = new CombatUnit(
+                unitName: "Chinese Tank Regiment (Type 95)",
+                classification: UnitClassification.TANK,
+                role: UnitRole.GroundCombat,
+                side: Side.AI,
+                nationality: Nationality.China,
+                profileType: RegimentProfileType.DEP,
+                deployedProfile: WeaponType.TANK_TYPE95,
+                isMountable: false,
+                mobileProfile: WeaponType.NONE,
+                isEmbarkable: false,
+                embarkedProfile: WeaponType.NONE,
+                category: DepotCategory.Secondary,
+                size: DepotSize.Small
+            );
+
+            // Set experience level
+            ch_tank_regiment_type95.SetExperienceLevel(ExperienceLevel.Trained);
+
+            // Set the ICM
+            ch_tank_regiment_type95.SetICM(GameData.ICM_DEFAULT);
+
+            // Add the template to the database
+            AddTemplate("CH_TANK_REGIMENT_TYPE95", ch_tank_regiment_type95);
+
+            #endregion // Chinese Tank Regiment (Type95)
+
+            #region Chinese Mechanized Infantry Regiment (Type86)
+
+            var ch_mech_infantry_regiment = new CombatUnit(
+                unitName: "Chinese Mechanized Infantry Regiment (Type 86)",
+                classification: UnitClassification.MECH,
+                role: UnitRole.GroundCombat,
+                side: Side.AI,
+                nationality: Nationality.China,
+                profileType: RegimentProfileType.DEP_MOB,
+                deployedProfile: WeaponType.INF_REG_CH,
+                isMountable: true,
+                mobileProfile: WeaponType.IFV_TYPE86,
+                isEmbarkable: false,
+                embarkedProfile: WeaponType.NONE,
+                category: DepotCategory.Secondary,
+                size: DepotSize.Small
+            );
+
+            // Set experience level
+            ch_mech_infantry_regiment.SetExperienceLevel(ExperienceLevel.Trained);
+
+            // Set the ICM
+            ch_mech_infantry_regiment.SetICM(GameData.ICM_DEFAULT);
+
+            // Add the template to the database
+            AddTemplate("CH_MECH_INFANTRY_REGIMENT", ch_mech_infantry_regiment);
+
+            #endregion // Chinese Mechanized Infantry Regiment (Type86)
+
+            #region Chinese Infantry Regiment
+
+            var ch_infantry_regiment = new CombatUnit(
+                unitName: "Chinese Infantry Regiment",
+                classification: UnitClassification.INF,
+                role: UnitRole.GroundCombat,
+                side: Side.AI,
+                nationality: Nationality.China,
+                profileType: RegimentProfileType.DEP_MOB,
+                deployedProfile: WeaponType.INF_REG_CH,
+                isMountable: true,
+                mobileProfile: WeaponType.TRK_GEN_SV,
+                isEmbarkable: false,
+                embarkedProfile: WeaponType.NONE,
+                category: DepotCategory.Secondary,
+                size: DepotSize.Small
+            );
+
+            // Set experience level
+            ch_infantry_regiment.SetExperienceLevel(ExperienceLevel.Trained);
+
+            // Set the ICM
+            ch_infantry_regiment.SetICM(GameData.ICM_DEFAULT);
+
+            // Add the template to the database
+            AddTemplate("CH_INFANTRY_REGIMENT", ch_infantry_regiment);
+
+            #endregion // Chinese Infantry Regiment
+
+            #region Chinese Airborne Regiment
+
+            var ch_airborne_regiment = new CombatUnit(
+                unitName: "Chinese Airborne Regiment",
+                classification: UnitClassification.AB,
+                role: UnitRole.GroundCombat,
+                side: Side.AI,
+                nationality: Nationality.China,
+                profileType: RegimentProfileType.DEP_MOB,
+                deployedProfile: WeaponType.INF_AB_CH,
+                isMountable: true,
+                mobileProfile: WeaponType.TRK_GEN_SV,
+                isEmbarkable: false,
+                embarkedProfile: WeaponType.NONE,
+                category: DepotCategory.Secondary,
+                size: DepotSize.Small
+            );
+
+            // Set experience level
+            ch_airborne_regiment.SetExperienceLevel(ExperienceLevel.Trained);
+
+            // Set the ICM
+            ch_airborne_regiment.SetICM(GameData.ICM_DEFAULT);
+
+            // Add the template to the database
+            AddTemplate("CH_AIRBORNE_REGIMENT", ch_airborne_regiment);
+
+            #endregion // Chinese Airborne Regiment
+
+            #region Chinese Towed Artillery Regiment (ART_HEAVY_CH)
+
+            var ch_heavy_artillery_regiment = new CombatUnit(
+                unitName: "Chinese Towed Heavy Artillery Regiment",
+                classification: UnitClassification.ART,
+                role: UnitRole.GroundCombat,
+                side: Side.AI,
+                nationality: Nationality.China,
+                profileType: RegimentProfileType.DEP_MOB,
+                deployedProfile: WeaponType.ART_HEAVY_CH,
+                isMountable: true,
+                mobileProfile: WeaponType.TRK_GEN_SV,
+                isEmbarkable: false,
+                embarkedProfile: WeaponType.NONE,
+                category: DepotCategory.Secondary,
+                size: DepotSize.Small
+            );
+
+            // Set experience level
+            ch_heavy_artillery_regiment.SetExperienceLevel(ExperienceLevel.Trained);
+
+            // Set the ICM
+            ch_heavy_artillery_regiment.SetICM(GameData.ICM_DEFAULT);
+
+            // Add the template to the database
+            AddTemplate("CH_HEAVY_ARTILLERY_REGIMENT", ch_heavy_artillery_regiment);
+
+            #endregion // Chinese Towed Artillery Regiment (ART_HEAVY_CH)
+
+            #region Chinese Towed Artillery Regiment (ART_LIGHT_CH)
+
+            var ch_light_artillery_regiment = new CombatUnit(
+                unitName: "Chinese Towed Light Artillery Regiment",
+                classification: UnitClassification.ART,
+                role: UnitRole.GroundCombat,
+                side: Side.AI,
+                nationality: Nationality.China,
+                profileType: RegimentProfileType.DEP_MOB,
+                deployedProfile: WeaponType.ART_LIGHT_CH,
+                isMountable: true,
+                mobileProfile: WeaponType.TRK_GEN_SV,
+                isEmbarkable: false,
+                embarkedProfile: WeaponType.NONE,
+                category: DepotCategory.Secondary,
+                size: DepotSize.Small
+            );
+
+            // Set experience level
+            ch_light_artillery_regiment.SetExperienceLevel(ExperienceLevel.Trained);
+
+            // Set the ICM
+            ch_light_artillery_regiment.SetICM(GameData.ICM_DEFAULT);
+
+            // Add the template to the database
+            AddTemplate("CH_LIGHT_ARTILLERY_REGIMENT", ch_light_artillery_regiment);
+
+            #endregion // Chinese Towed Artillery Regiment (ART_LIGHT_CH)
+
+            #region Chinese Self-Propelled Artillery Regiment (PHZ89)
+
+            var ch_sp_artillery_regiment = new CombatUnit(
+                unitName: "Chinese Self-Propelled Artillery Regiment (PHZ-89)",
+                classification: UnitClassification.ROC,
+                role: UnitRole.GroundCombat,
+                side: Side.AI,
+                nationality: Nationality.China,
+                profileType: RegimentProfileType.DEP,
+                deployedProfile: WeaponType.ROC_PHZ89,
+                isMountable: false,
+                mobileProfile: WeaponType.NONE,
+                isEmbarkable: false,
+                embarkedProfile: WeaponType.NONE,
+                category: DepotCategory.Secondary,
+                size: DepotSize.Small
+            );
+
+            // Set experience level
+            ch_sp_artillery_regiment.SetExperienceLevel(ExperienceLevel.Trained);
+
+            // Set the ICM
+            ch_sp_artillery_regiment.SetICM(GameData.ICM_DEFAULT);
+
+            // Add the template to the database
+            AddTemplate("CH_SP_ARTILLERY_REGIMENT", ch_sp_artillery_regiment);
+
+            #endregion // Chinese Self-Propelled Artillery Regiment (PHZ89)
+
+            #region Chinese Air Defense Regiment (Type53)
+
+            var ch_air_defense_regiment = new CombatUnit(
+                unitName: "Chinese Air Defense Regiment (Type 53)",
+                classification: UnitClassification.SPAAA,
+                role: UnitRole.AirDefenseArea,
+                side: Side.AI,
+                nationality: Nationality.China,
+                profileType: RegimentProfileType.DEP,
+                deployedProfile: WeaponType.SPAAA_TYPE53,
+                isMountable: false,
+                mobileProfile: WeaponType.NONE,
+                isEmbarkable: false,
+                embarkedProfile: WeaponType.NONE,
+                category: DepotCategory.Secondary,
+                size: DepotSize.Small
+            );
+
+            // Set experience level
+            ch_air_defense_regiment.SetExperienceLevel(ExperienceLevel.Trained);
+
+            // Set the ICM
+            ch_air_defense_regiment.SetICM(GameData.ICM_DEFAULT);
+
+            // Add the template to the database
+            AddTemplate("CH_AIR_DEFENSE_REGIMENT", ch_air_defense_regiment);
+
+            #endregion // Chinese Air Defense Regiment (Type53)
+
+            #region Chinese SAM Regiment (HQ-7)
+
+            var ch_hq7_regiment = new CombatUnit(
+                unitName: "Chinese SAM Regiment (HQ-7)",
+                classification: UnitClassification.SPSAM,
+                role: UnitRole.AirDefenseArea,
+                side: Side.AI,
+                nationality: Nationality.China,
+                profileType: RegimentProfileType.DEP,
+                deployedProfile: WeaponType.SPSAM_HQ7,
+                isMountable: false,
+                mobileProfile: WeaponType.NONE,
+                isEmbarkable: false,
+                embarkedProfile: WeaponType.NONE,
+                category: DepotCategory.Secondary,
+                size: DepotSize.Small
+            );
+
+            // Set experience level
+            ch_hq7_regiment.SetExperienceLevel(ExperienceLevel.Trained);
+
+            // Set the ICM
+            ch_hq7_regiment.SetICM(GameData.ICM_DEFAULT);
+
+            // Add the template to the database
+            AddTemplate("CH_HQ7_REGIMENT", ch_hq7_regiment);
+
+            #endregion // Chinese SAM Regiment (HQ-7)
+
+            #region Chinese SAM Regiment (SAM_S125_SV)
+
+            var ch_sam_regiment = new CombatUnit(
+                unitName: "Chinese SAM Regiment (S-125)",
+                classification: UnitClassification.SAM,
+                role: UnitRole.AirDefenseArea,
+                side: Side.AI,
+                nationality: Nationality.China,
+                profileType: RegimentProfileType.DEP_MOB,
+                deployedProfile: WeaponType.SAM_S125_SV,
+                isMountable: true,
+                mobileProfile: WeaponType.TRK_GEN_SV,
+                isEmbarkable: false,
+                embarkedProfile: WeaponType.NONE,
+                category: DepotCategory.Secondary,
+                size: DepotSize.Small
+            );
+
+            // Set experience level
+            ch_sam_regiment.SetExperienceLevel(ExperienceLevel.Trained);
+
+            // Set the ICM
+            ch_sam_regiment.SetICM(GameData.ICM_DEFAULT);
+
+            // Add the template to the database
+            AddTemplate("CH_SAM_REGIMENT", ch_sam_regiment);
+
+            #endregion // Chinese SAM Regiment (SAM_S125_SV)
+
+            #region Chinese Fighter Squadron (J-7)
+
+            var ch_j7_squadron = new CombatUnit(
+                unitName: "Chinese Fighter Squadron (J-7)",
+                classification: UnitClassification.FGT,
+                role: UnitRole.AirSuperiority,
+                side: Side.AI,
+                nationality: Nationality.China,
+                profileType: RegimentProfileType.DEP,
+                deployedProfile: WeaponType.FGT_J7,
+                isMountable: false,
+                mobileProfile: WeaponType.NONE,
+                isEmbarkable: false,
+                embarkedProfile: WeaponType.NONE,
+                category: DepotCategory.Secondary,
+                size: DepotSize.Small
+            );
+
+            // Set experience level
+            ch_j7_squadron.SetExperienceLevel(ExperienceLevel.Trained);
+
+            // Set the ICM
+            ch_j7_squadron.SetICM(GameData.ICM_DEFAULT);
+
+            // Add the template to the database
+            AddTemplate("CH_J7_FIGHTER_SQUADRON", ch_j7_squadron);
+
+            #endregion // Chinese Fighter Squadron (J-7)
+
+            #region Chinese Fighter Squadron (J-8)
+
+            var ch_j8_squadron = new CombatUnit(
+                unitName: "Chinese Fighter Squadron (J-8)",
+                classification: UnitClassification.FGT,
+                role: UnitRole.AirSuperiority,
+                side: Side.AI,
+                nationality: Nationality.China,
+                profileType: RegimentProfileType.DEP,
+                deployedProfile: WeaponType.FGT_J8,
+                isMountable: false,
+                mobileProfile: WeaponType.NONE,
+                isEmbarkable: false,
+                embarkedProfile: WeaponType.NONE,
+                category: DepotCategory.Secondary,
+                size: DepotSize.Small
+            );
+
+            // Set experience level
+            ch_j8_squadron.SetExperienceLevel(ExperienceLevel.Trained);
+
+            // Set the ICM
+            ch_j8_squadron.SetICM(GameData.ICM_DEFAULT);
+
+            // Add the template to the database
+            AddTemplate("CH_J8_FIGHTER_SQUADRON", ch_j8_squadron);
+
+            #endregion // Chinese Fighter Squadron (J-8)
+
+            #region Chinese Attack Squadron (Q-5)
+
+            var ch_q5_squadron = new CombatUnit(
+                unitName: "Chinese Attack Squadron (Q-5)",
+                classification: UnitClassification.ATT,
+                role: UnitRole.AirGroundAttack,
+                side: Side.AI,
+                nationality: Nationality.China,
+                profileType: RegimentProfileType.DEP,
+                deployedProfile: WeaponType.ATT_Q5,
+                isMountable: false,
+                mobileProfile: WeaponType.NONE,
+                isEmbarkable: false,
+                embarkedProfile: WeaponType.NONE,
+                category: DepotCategory.Secondary,
+                size: DepotSize.Small
+            );
+
+            // Set experience level
+            ch_q5_squadron.SetExperienceLevel(ExperienceLevel.Trained);
+
+            // Set the ICM
+            ch_q5_squadron.SetICM(GameData.ICM_DEFAULT);
+
+            // Add the template to the database
+            AddTemplate("CH_Q5_ATTACK_SQUADRON", ch_q5_squadron);
+
+            #endregion // Chinese Attack Squadron (Q-5)
+
+            #region Chinese Bomber Squadron (H-6)
+
+            var ch_h6_squadron = new CombatUnit(
+                unitName: "Chinese Bomber Squadron (H-6)",
+                classification: UnitClassification.BMB,
+                role: UnitRole.AirStrategicAttack,
+                side: Side.AI,
+                nationality: Nationality.China,
+                profileType: RegimentProfileType.DEP,
+                deployedProfile: WeaponType.BMB_H6,
+                isMountable: false,
+                mobileProfile: WeaponType.NONE,
+                isEmbarkable: false,
+                embarkedProfile: WeaponType.NONE,
+                category: DepotCategory.Secondary,
+                size: DepotSize.Small
+            );
+
+            // Set experience level
+            ch_h6_squadron.SetExperienceLevel(ExperienceLevel.Trained);
+
+            // Set the ICM
+            ch_h6_squadron.SetICM(GameData.ICM_DEFAULT);
+
+            // Add the template to the database
+            AddTemplate("CH_H6_BOMBER_SQUADRON", ch_h6_squadron);
+
+            #endregion // Chinese Bomber Squadron (H-6)
+
+            #region Chinese Aviation Regiment (H9)
+
+            var ch_aviation_regiment = new CombatUnit(
+                unitName: "Chinese Aviation Regiment (H-9)",
+                classification: UnitClassification.HELO,
+                role: UnitRole.GroundCombat,
+                side: Side.AI,
+                nationality: Nationality.China,
+                profileType: RegimentProfileType.DEP,
+                deployedProfile: WeaponType.HEL_H9,
+                isMountable: false,
+                mobileProfile: WeaponType.NONE,
+                isEmbarkable: false,
+                embarkedProfile: WeaponType.NONE,
+                category: DepotCategory.Secondary,
+                size: DepotSize.Small
+            );
+
+            // Set experience level
+            ch_aviation_regiment.SetExperienceLevel(ExperienceLevel.Trained);
+
+            // Set the ICM
+            ch_aviation_regiment.SetICM(GameData.ICM_DEFAULT);
+
+            // Add the template to the database
+            AddTemplate("CH_AVIATION_REGIMENT", ch_aviation_regiment);
+
+            #endregion // Chinese Aviation Regiment
+        }
+
+        #endregion // Chinese Units
     }
 }
