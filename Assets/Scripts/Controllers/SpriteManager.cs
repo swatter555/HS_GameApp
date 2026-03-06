@@ -762,25 +762,49 @@ namespace HammerAndSickle.Controllers
 
         #region NATO Symbol Icons
 
+        // Mechanized
+        public const string Icon_Tank          = "Icon_TANK";
+        public const string Icon_Mech          = "Icon_MECH";
+        public const string Icon_Mot           = "Icon_MOT";
+        public const string Icon_ArmoredCav    = "Icon_ARMCAV";
+
+        // Infantry
+        public const string Icon_Infantry      = "Icon_Infantry";
+        public const string Icon_Engineer      = "Icon_ENG";
+        public const string Icon_Marine        = "Icon_MAR";
+        public const string Icon_ArmoredMarine = "Icon_ARMMAR";
+        public const string Icon_Antitank      = "Icon_AT";
+        public const string Icon_Recon         = "Icon_RECON";
+        public const string Icon_Airborne      = "Icon_AB";
+        public const string Icon_MechAB        = "Icon_MECHAB";
+        public const string Icon_AirMobile     = "Icon_AM";
+        public const string Icon_MechanizedAM  = "Icon_MECHAM";
+        public const string Icon_SpecialForces = "Icon_SOF";
+
+        // Artillery
+        public const string Icon_Artillery        = "Icon_ART";
+        public const string Icon_SPA              = "Icon_SPA";
+        public const string Icon_RocketArtillery  = "Icon_ROC";
+        public const string Icon_BallisticMissile = "Icon_BM";
+
+        // Air defense
         public const string Icon_AAA            = "Icon_AAA";
-        public const string Icon_AirAssault     = "Icon_AirAssault";
-        public const string Icon_Airbase        = "Icon_Airbase";
-        public const string Icon_Antitank       = "Icon_Antitank";
-        public const string Icon_ArmoredCav     = "Icon_ArmoredCav";
-        public const string Icon_ArmoredMarine  = "Icon_ArmoredMarine";
-        public const string Icon_Artillery      = "Icon_Artillery";
-        public const string Icon_Engineer       = "Icon_Engineer";
-        public const string Icon_FixedWing      = "Icon_FixedWing";
-        public const string Icon_FixedWingRecon = "Icon_FixedWingRecon";
-        public const string Icon_Infantry       = "Icon_Infantry";
-        public const string Icon_Marine         = "Icon_Marine";
-        public const string Icon_Mech           = "Icon_Mech";
-        public const string Icon_Mot            = "Icon_Mot";
-        public const string Icon_Recon          = "Icon_Recon";
+        public const string Icon_SPAAA          = "Icon_SPAAA";
         public const string Icon_SAM            = "Icon_SAM";
-        public const string Icon_Signal         = "Icon_Signal";
-        public const string Icon_SPArtillery    = "Icon_SPArtillery";
-        public const string Icon_Tank           = "Icon_Tank";
+        public const string Icon_SPSAM          = "Icon_SPSAM";
+
+        // Aircraft and Helos
+        public const string Icon_HELO           = "Icon_Helo";
+        public const string Icon_FGT            = "Icon_FGT";
+        public const string Icon_ATT            = "Icon_ATT";
+        public const string Icon_BMB            = "Icon_BMB";
+        public const string Icon_LargeFW        = "Icon_LARGEFW";
+        public const string Icon_RCA            = "Icon_RCA";
+
+        // Bases
+        public const string Icon_Depot          = "Icon_DEPOT";
+        public const string Icon_Airbase        = "Icon_AIRBASE";
+        public const string Icon_HQ             = "Icon_HQ";
 
         #endregion // NATO Symbol Icons
 

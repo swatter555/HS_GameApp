@@ -2803,7 +2803,7 @@ namespace HammerAndSickle.Models
             us_armored_brigade.SetExperienceLevel(ExperienceLevel.Trained);
 
             // Set the ICM
-            us_armored_brigade.SetICM(GameData.ICM_DEFAULT);
+            us_armored_brigade.SetICM(1.3f);
 
             // Add the template to the database
             AddTemplate("US_ARMOR_BRIGADE", us_armored_brigade);
@@ -2861,7 +2861,7 @@ namespace HammerAndSickle.Models
             us_armored_cavalry_squadron.SetExperienceLevel(ExperienceLevel.Experienced);
 
             // Set the ICM
-            us_armored_cavalry_squadron.SetICM(GameData.ICM_DEFAULT);
+            us_armored_cavalry_squadron.SetICM(1.2f);
 
             // Add the template to the database
             AddTemplate("US_ARMORED_CAVALRY_SQUADRON", us_armored_cavalry_squadron);
