@@ -1057,7 +1057,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 1, y: 1}
-  m_AnchoredPosition: {x: -107.19043, y: 138}
+  m_AnchoredPosition: {x: -107.18994, y: 138}
   m_SizeDelta: {x: -2187.82, y: -922.72}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &337108516
@@ -2666,6 +2666,7 @@ GameObject:
   - component: {fileID: 899861718}
   - component: {fileID: 899861719}
   - component: {fileID: 899861720}
+  - component: {fileID: 899861721}
   m_Layer: 0
   m_Name: Controllers
   m_TagString: Untagged
@@ -2744,9 +2745,9 @@ MonoBehaviour:
   _bridgeIconAtlas: {fileID: 4343727234628468602, guid: b10f7848acc85a34aaa29c244c658d99, type: 2}
   _rankAtlas: {fileID: 4343727234628468602, guid: 8dd0961d1c3e1204dbb53805cb816a75, type: 2}
   _terrainPortraitAtlas: {fileID: 4343727234628468602, guid: 19431aebb52997b40b156b08ad11e733, type: 2}
-  _sovietIconAtlas: {fileID: 4343727234628468602, guid: 8500eadc48415544db68dd7b6116e177, type: 2}
-  _natoIconAtlas: {fileID: 4343727234628468602, guid: c4d47e5319cd71f48a46b67da1575ecc, type: 2}
-  _genericIconAtlas: {fileID: 4343727234628468602, guid: 08490f6dc34962040a45fb5acf394092, type: 2}
+  _sovietIconAtlas: {fileID: 4343727234628468602, guid: 6c0b2fd47d655164bac4b8812a1c9365, type: 2}
+  _natoIconAtlas: {fileID: 4343727234628468602, guid: 5f2278d3e08aed54c9b9d1def487b453, type: 2}
+  _genericIconAtlas: {fileID: 4343727234628468602, guid: 2dd4bc4d154ac5545bfc2d59a397aa04, type: 2}
   _natoSymbolIconAtlas: {fileID: 4343727234628468602, guid: e747ac75fe2b4e241afe37ae5d3da622, type: 2}
   _nationalFlagAtlas: {fileID: 4343727234628468602, guid: ef80470ff0b7ed54db27572a3e15faf3, type: 2}
   _nationalSymbolAtlas: {fileID: 4343727234628468602, guid: 43e3faccee7cdbb44a029fc21e881785, type: 2}
@@ -2756,6 +2757,18 @@ MonoBehaviour:
   _bridgeIconPrefab: {fileID: 5243574783591119677, guid: 91d431e0e0a058d449e59f8104db365b, type: 3}
   _mapTextPrefab: {fileID: 7874713165326714446, guid: 2616902db357b4e4e8ebdbbc9ac5b765, type: 3}
   _unitIconPrefab: {fileID: 2236523252615894659, guid: 7f0c6c58b9a45d94aa3c4717a2baf39a, type: 3}
+--- !u!114 &899861721
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 899861714}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: ff564d299a7298e4a92ae3558acce7d7, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: Main::HammerAndSickle.Controllers.EventManager
 --- !u!1 &909978851
 GameObject:
   m_ObjectHideFlags: 0
@@ -4838,51 +4851,6 @@ MonoBehaviour:
   blendDistance: 0
   weight: 1
   sharedProfile: {fileID: 11400000, guid: ab09877e2e707104187f6f83e2f62510, type: 2}
---- !u!1 &1622639450
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 1622639452}
-  - component: {fileID: 1622639455}
-  m_Layer: 0
-  m_Name: Script Tools
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!4 &1622639452
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1622639450}
-  serializedVersion: 2
-  m_LocalRotation: {x: -0, y: -0, z: -0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children: []
-  m_Father: {fileID: 1946103633}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
---- !u!114 &1622639455
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1622639450}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: f635bd1f0a1d09e46b22b1c453aac882, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Assembly-CSharp::HammerAndSickle.Tools.UnitEntryTool
-  showGUI: 0
 --- !u!1001 &1626392805
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -6207,38 +6175,6 @@ MonoBehaviour:
   m_ChildScaleWidth: 0
   m_ChildScaleHeight: 0
   m_ReverseArrangement: 0
---- !u!1 &1946103632
-GameObject:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  serializedVersion: 6
-  m_Component:
-  - component: {fileID: 1946103633}
-  m_Layer: 0
-  m_Name: Tools
-  m_TagString: Untagged
-  m_Icon: {fileID: 0}
-  m_NavMeshLayer: 0
-  m_StaticEditorFlags: 0
-  m_IsActive: 1
---- !u!4 &1946103633
-Transform:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1946103632}
-  serializedVersion: 2
-  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
-  m_LocalPosition: {x: 0, y: 0, z: 0}
-  m_LocalScale: {x: 1, y: 1, z: 1}
-  m_ConstrainProportionsScale: 0
-  m_Children:
-  - {fileID: 1622639452}
-  m_Father: {fileID: 0}
-  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &1959786839
 GameObject:
   m_ObjectHideFlags: 0
@@ -6995,7 +6931,6 @@ SceneRoots:
   m_ObjectHideFlags: 0
   m_Roots:
   - {fileID: 1639642422}
-  - {fileID: 1946103633}
   - {fileID: 974063014}
   - {fileID: 899861716}
   - {fileID: 2037831636}

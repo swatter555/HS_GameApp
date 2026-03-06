@@ -172,7 +172,7 @@ namespace HammerAndSickle.Models
                 InitializeExperienceSystem();
                 HitPoints = new StatsMaxCurrent(GameData.MAX_HP);
                 DaysSupply = new StatsMaxCurrent(GameData.MaxDaysSupplyUnit);
-                InitializeMovementPoints();
+                MovementPoints = new StatsMaxCurrent(GameData.FOOT_UNIT);
                 EfficiencyLevel = EfficiencyLevel.FullOperations;
                 MapPos = Position2D.Zero;
                 IndividualCombatModifier = GameData.ICM_DEFAULT;
