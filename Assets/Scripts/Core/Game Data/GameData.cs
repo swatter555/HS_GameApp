@@ -1436,22 +1436,6 @@ namespace HammerAndSickle.Core.GameData
 
         #endregion // Scenario ID Constants
 
-        #region Menu/Dialog IDs
-
-        // Main startup scene menu/dialog IDs
-        public const int DefaultID = 0;
-        public const int MainScene_CoreInterface_ID = 1;
-        public const int MainScene_ContinueDialog_ID = 2;
-        public const int MainScene_CampaignDialog_ID = 3;
-        public const int MainScene_ScenarioDialog_ID = 4;
-        public const int MainScene_OptionsDialog_ID = 5;
-        public const int MainScene_ExitDialog_ID = 6;
-
-        // Khost scenario scene menu/dialog IDs
-        public const int KhostScene_CoreInterface_ID = 7;
-        public const int KhostScene_OrdersDialog_ID = 8;
-
-        #endregion
 
         #region General Constants
 
