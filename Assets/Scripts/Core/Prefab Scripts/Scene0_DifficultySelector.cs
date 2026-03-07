@@ -36,6 +36,9 @@ namespace HammerAndSickle.Core
         [SerializeField] private Image colonelImage;
         [SerializeField] private Image generalImage;
 
+        [Header("References")]
+        [SerializeField] private ScenarioPanel _scenarioPanel;
+
         [Header("Settings")]
         [SerializeField] private EnlargementSize enlargementSize = EnlargementSize.TenPercent;
         [SerializeField] private bool _debug = false;
@@ -98,16 +101,16 @@ namespace HammerAndSickle.Core
                 if (_debug) Debug.Log("Scene0_DifficultySelector.OnEnable called");
 
                 // Subscribe to events when dialog becomes active
-                if (Scene0_ScenarioDialog.Instance != null)
+                if (_scenarioPanel != null)
                 {
                     if (_debug) Debug.Log("Subscribing to DifficultyButtonPressed and ScenarioSelectionChanged events");
-                    Scene0_ScenarioDialog.Instance.DifficultyButtonPressed += OnDifficultyButtonPressed;
-                    Scene0_ScenarioDialog.Instance.ScenarioSelectionChanged += OnScenarioSelectionChanged;
+                    _scenarioPanel.DifficultyButtonPressed += OnDifficultyButtonPressed;
+                    _scenarioPanel.ScenarioSelectionChanged += OnScenarioSelectionChanged;
                     if (_debug) Debug.Log("Successfully subscribed to events");
                 }
                 else
                 {
-                    Debug.LogWarning("Scene0_ScenarioDialog.Instance is null in OnEnable");
+                    Debug.LogWarning("_scenarioPanel is null in OnEnable");
                 }
 
                 // PrepareBattle difficulty display when dialog becomes active
@@ -122,10 +125,10 @@ namespace HammerAndSickle.Core
         private void OnDisable()
         {
             // Unsubscribe from events
-            if (Scene0_ScenarioDialog.Instance != null)
+            if (_scenarioPanel != null)
             {
-                Scene0_ScenarioDialog.Instance.DifficultyButtonPressed -= OnDifficultyButtonPressed;
-                Scene0_ScenarioDialog.Instance.ScenarioSelectionChanged -= OnScenarioSelectionChanged;
+                _scenarioPanel.DifficultyButtonPressed -= OnDifficultyButtonPressed;
+                _scenarioPanel.ScenarioSelectionChanged -= OnScenarioSelectionChanged;
             }
         }
 
@@ -157,13 +160,13 @@ namespace HammerAndSickle.Core
                 SetDifficulty(newDifficulty);
 
                 // Update the manifest
-                if (Scene0_ScenarioDialog.Instance != null)
+                if (_scenarioPanel != null)
                 {
-                    Scene0_ScenarioDialog.Instance.UpdateSelectedManifestDifficulty(newDifficulty);
+                    _scenarioPanel.UpdateSelectedManifestDifficulty(newDifficulty);
                 }
                 else
                 {
-                    Debug.LogWarning("Scene0_ScenarioDialog.Instance is null - cannot update manifest");
+                    Debug.LogWarning("_scenarioPanel is null - cannot update manifest");
                 }
             }
             catch (System.Exception e)
@@ -196,13 +199,13 @@ namespace HammerAndSickle.Core
         /// </summary>
         private void InitializeDifficultyDisplay()
         {
-            if (Scene0_ScenarioDialog.Instance == null)
+            if (_scenarioPanel == null)
             {
-                Debug.LogWarning("Cannot initialize difficulty display - Scene0_ScenarioDialog.Instance is null");
+                Debug.LogWarning("Cannot initialize difficulty display - _scenarioPanel is null");
                 return;
             }
 
-            ScenarioManifest currentManifest = Scene0_ScenarioDialog.Instance.GetCurrentlySelectedManifest();
+            ScenarioManifest currentManifest = _scenarioPanel.GetCurrentlySelectedManifest();
             if (currentManifest != null)
             {
                 SetDifficulty(currentManifest.DifficultyLevel);

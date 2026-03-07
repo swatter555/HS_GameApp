@@ -365,7 +365,7 @@ namespace HammerAndSickle.Core.Map
                 AppService.HandleException(CLASS_NAME, "CreateUnitIcon", e);
             }
         }
-
+        
         /// <summary>
         /// Removes a unit icon from the renderer.
         /// Also rechecks stacking at the unit's position.

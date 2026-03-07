@@ -21,7 +21,7 @@ namespace HammerAndSickle.Core.UI
         [SerializeField] private Sprite   _placeholderThumbnail;
         [SerializeField] private Image    _thumbnailImage;
         [SerializeField] private Button   _loadButton;
-        [SerializeField] private Button   _randomButton;
+        [SerializeField] private Button   _difficultyButton;
         [SerializeField] private Button   _exitButton;
 
         #endregion // Serialized Fields
@@ -61,10 +61,10 @@ namespace HammerAndSickle.Core.UI
             set => _loadButton = value;
         }
 
-        public Button RandomButton
+        public Button DifficultyButton
         {
-            get => _randomButton;
-            set => _randomButton = value;
+            get => _difficultyButton;
+            set => _difficultyButton = value;
         }
 
         public Button ExitButton
@@ -86,7 +86,7 @@ namespace HammerAndSickle.Core.UI
                     _placeholderThumbnail == null ||
                     _thumbnailImage == null ||
                     _loadButton == null ||
-                    _randomButton == null ||
+                    _difficultyButton == null ||
                     _exitButton == null)
                 {
                     throw new System.Exception($"{CLASS_NAME} controls invalid");
