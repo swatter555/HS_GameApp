@@ -50,8 +50,8 @@ namespace HammerAndSickle.Models
         [JsonInclude] [JsonPropertyName("deploymentPosition")]
         private DeploymentPosition _deploymentPosition = DeploymentPosition.Deployed;
 
-        private List<CombatUnit> _airUnitsAttached = new List<CombatUnit>();
-        private List<string> _attachedUnitIDs = new List<string>();
+        private readonly List<CombatUnit> _airUnitsAttached = new();
+        private List<string> _attachedUnitIDs = new();
 
         #endregion // Fields
 
@@ -854,8 +854,6 @@ namespace HammerAndSickle.Models
         /// </summary>
         public bool TryDeployUP(out string errorMsg, bool onAirbase = false, bool onPort = false)
         {
-            errorMsg = string.Empty;
-
             if (MovementPoints.Max <= 0f)
             {
                 errorMsg = "Unit has invalid movement profile; cannot deploy.";
@@ -884,10 +882,8 @@ namespace HammerAndSickle.Models
         /// <summary>
         /// Attempt to change deployment state to a lower level (more defensive).
         /// </summary>
-        public bool TryDeployDOWN(out string errorMsg, bool isBeachhead = false)
+        public bool TryDeployDOWN(out string errorMsg)
         {
-            errorMsg = string.Empty;
-
             if (MovementPoints.Max <= 0f)
             {
                 errorMsg = "Unit has invalid movement profile; cannot deploy.";

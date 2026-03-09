@@ -2776,18 +2776,21 @@ MonoBehaviour:
   _bridgeIconAtlas: {fileID: 4343727234628468602, guid: b10f7848acc85a34aaa29c244c658d99, type: 2}
   _rankAtlas: {fileID: 4343727234628468602, guid: 8dd0961d1c3e1204dbb53805cb816a75, type: 2}
   _terrainPortraitAtlas: {fileID: 4343727234628468602, guid: 19431aebb52997b40b156b08ad11e733, type: 2}
-  _sovietIconAtlas: {fileID: 4343727234628468602, guid: 6c0b2fd47d655164bac4b8812a1c9365, type: 2}
-  _natoIconAtlas: {fileID: 4343727234628468602, guid: 5f2278d3e08aed54c9b9d1def487b453, type: 2}
-  _genericIconAtlas: {fileID: 4343727234628468602, guid: 2dd4bc4d154ac5545bfc2d59a397aa04, type: 2}
   _natoSymbolIconAtlas: {fileID: 4343727234628468602, guid: e747ac75fe2b4e241afe37ae5d3da622, type: 2}
   _nationalFlagAtlas: {fileID: 4343727234628468602, guid: ef80470ff0b7ed54db27572a3e15faf3, type: 2}
   _nationalSymbolAtlas: {fileID: 4343727234628468602, guid: 43e3faccee7cdbb44a029fc21e881785, type: 2}
   _utilityIconAtlas: {fileID: 4343727234628468602, guid: 3fe5ea4e07a7cfe47853b4870e48730d, type: 2}
+  _unitPrefabIconAtlas: {fileID: 4343727234628468602, guid: 2943a0266f300294d94147b5c731c4b2, type: 2}
+  _sovietIconAtlas: {fileID: 4343727234628468602, guid: 6c0b2fd47d655164bac4b8812a1c9365, type: 2}
+  _natoIconAtlas: {fileID: 4343727234628468602, guid: 5f2278d3e08aed54c9b9d1def487b453, type: 2}
+  _genericIconAtlas: {fileID: 4343727234628468602, guid: 2dd4bc4d154ac5545bfc2d59a397aa04, type: 2}
+  _arabIconAtlas: {fileID: 4343727234628468602, guid: 9cf7530c863cb1f448b292a192cd8a1d, type: 2}
+  _chineseIconAtlas: {fileID: 4343727234628468602, guid: e51e4198296b6b545877b15e0ccd9449, type: 2}
   _cityPrefab: {fileID: 6918065533927288165, guid: 57e28a5638f80ae4ba33829e7f1298af, type: 3}
   _mapIconPrefab: {fileID: 765304800649413729, guid: a9a0625cb1efddf47aa12e578cae460d, type: 3}
   _bridgeIconPrefab: {fileID: 5243574783591119677, guid: 91d431e0e0a058d449e59f8104db365b, type: 3}
   _mapTextPrefab: {fileID: 7874713165326714446, guid: 2616902db357b4e4e8ebdbbc9ac5b765, type: 3}
-  _unitIconPrefab: {fileID: 2236523252615894659, guid: 7f0c6c58b9a45d94aa3c4717a2baf39a, type: 3}
+  _unitIconPrefab: {fileID: 6393160224673948975, guid: cf4cf13518eaa224190c49b8b72fc95b, type: 3}
 --- !u!114 &899861721
 MonoBehaviour:
   m_ObjectHideFlags: 0

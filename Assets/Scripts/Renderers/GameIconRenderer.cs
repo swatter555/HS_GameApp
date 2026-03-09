@@ -63,6 +63,9 @@ namespace HammerAndSickle.Core.Map
 
         #region Inspector Fields
 
+        [Header("Prefabs")]
+        [SerializeField] private GameObject combatUnitIconPrefab;
+
         [Header("Rendering Layers")]
         [SerializeField] private GameObject groundUnitLayer;
         [SerializeField] private GameObject airUnitLayer;
@@ -132,13 +135,6 @@ namespace HammerAndSickle.Core.Map
         }
 
         /// <summary>
-        /// Unity's Update method. Reserved for future animation and update logic.
-        /// </summary>
-        private void Update()
-        {
-        }
-
-        /// <summary>
         /// Unity's OnDestroy method. Handles cleanup.
         /// </summary>
         private void OnDestroy()
@@ -152,7 +148,7 @@ namespace HammerAndSickle.Core.Map
         }
 
         #endregion // Unity Lifecycle
-
+        
         #region Initialization
 
         /// <summary>
@@ -187,7 +183,8 @@ namespace HammerAndSickle.Core.Map
         {
             if (EventManager.Instance != null)
             {
-                EventManager.Instance.OnUnitPositionChanged += OnUnitPositionChanged;
+                EventManager.Instance.OnRedrawMapIcons += OnRedrawMapIcons;
+                EventManager.Instance.OnStackingToggleRequested += OnStackingToggleRequested;
                 if (_debug) Debug.Log($"[{CLASS_NAME}.SubscribeToEvents] Subscribed to EventManager events.");
             }
             else
@@ -203,7 +200,8 @@ namespace HammerAndSickle.Core.Map
         {
             if (EventManager.Instance != null)
             {
-                EventManager.Instance.OnUnitPositionChanged -= OnUnitPositionChanged;
+                EventManager.Instance.OnRedrawMapIcons -= OnRedrawMapIcons;
+                EventManager.Instance.OnStackingToggleRequested -= OnStackingToggleRequested;
                 if (_debug) Debug.Log($"[{CLASS_NAME}.UnsubscribeFromEvents] Unsubscribed from EventManager events.");
             }
         }
@@ -215,6 +213,9 @@ namespace HammerAndSickle.Core.Map
         private void ValidateComponents()
         {
             if (_debug) Debug.Log($"[{CLASS_NAME}.ValidateComponents] Validating required components...");
+
+            if (combatUnitIconPrefab == null)
+                throw new NullReferenceException($"{CLASS_NAME}.ValidateComponents: {nameof(combatUnitIconPrefab)} is missing.");
 
             if (groundUnitLayer == null)
                 throw new NullReferenceException($"{CLASS_NAME}.ValidateComponents: {nameof(groundUnitLayer)} is missing.");
@@ -260,21 +261,22 @@ namespace HammerAndSickle.Core.Map
         /// <summary>
         /// Draws all combat units on the map.
         /// </summary>
-        public void DrawAllUnits(ref int unitCount)
+        public void DrawAllUnits()
         {
             try
             {
-                // TODO: Determine how units are stored in GameDataManager
-                // Options: GameDataManager.AllUnits? GameDataManager.CurrentUnits?
-                // For now, using placeholder logic
-
                 if (_debug) Debug.Log($"[{CLASS_NAME}.DrawAllUnits] Starting unit rendering...");
 
-                // TODO: Replace with actual unit collection access
-                // Example: foreach (var unit in GameDataManager.Instance.GetAllUnits())
+                var units = GameDataManager.Instance.GetAllCombatUnits();
 
-                // Placeholder - remove when actual implementation is done
-                if (_debug) Debug.LogWarning($"[{CLASS_NAME}.DrawAllUnits] Unit rendering not yet implemented - need GameDataManager unit access");
+                int count = 0;
+                foreach (var unit in units)
+                {
+                    CreateUnitIcon(unit);
+                    count++;
+                }
+
+                if (_debug) Debug.Log($"[{CLASS_NAME}.DrawAllUnits] Rendered {count} unit icons.");
             }
             catch (Exception e)
             {
@@ -298,18 +300,24 @@ namespace HammerAndSickle.Core.Map
                     return;
                 }
 
+                // Don't render air units that are attached to a friendly airbase
+                if (IsFixedWingAircraft(unit.Classification) && IsAtFriendlyAirbase(unit))
+                {
+                    if (_debug) Debug.Log($"[{CLASS_NAME}.CreateUnitIcon] Skipping '{unit.UnitName}' - attached to friendly airbase.");
+                    return;
+                }
+
                 if (_debug) Debug.Log($"[{CLASS_NAME}.CreateUnitIcon] Creating icon for unit '{unit.UnitName}' at ({unit.MapPos.IntX}, {unit.MapPos.IntY})");
 
                 // Determine appropriate layer based on unit type
                 GameObject targetLayer = GetTargetLayerForUnit(unit);
 
                 // Create prefab instance
-                GameObject unitIconObject = UnityEngine.Object.Instantiate(SpriteManager.Instance.UnitIconPrefab, targetLayer.transform);
+                GameObject unitIconObject = Instantiate(combatUnitIconPrefab, targetLayer.transform);
                 unitIconObject.name = $"Unit_{unit.UnitID}_{unit.UnitName}";
 
                 // Get prefab component
-                Prefab_CombatUnitIcon unitIcon = unitIconObject.GetComponent<Prefab_CombatUnitIcon>();
-                if (unitIcon == null)
+                if (!unitIconObject.TryGetComponent<Prefab_CombatUnitIcon>(out var unitIcon))
                 {
                     Debug.LogError($"{CLASS_NAME}.CreateUnitIcon: Prefab_CombatUnitIcon component not found on prefab!");
                     Destroy(unitIconObject);
@@ -336,14 +344,20 @@ namespace HammerAndSickle.Core.Map
                     unitIcon.UnitIconRenderer.flipX = true;
                     if (_debug) Debug.Log($"[{CLASS_NAME}.CreateUnitIcon] Flipping sprite for unit '{unit.UnitName}' facing {unit.Facing}");
                 }
-
+                
                 // Set nationality symbol
                 string symbolSprite = GetNationalSymbol(unit.Nationality);
-                unitIcon.SetFlag(symbolSprite);
+                unitIcon.SetNationIcon(symbolSprite);
 
-                // Set hit points display
-                unitIcon.InitializeHitPointsText();
-                unitIcon.HitPointsRatio = $"{unit.HitPoints.Current}/{unit.HitPoints.Max}";
+                // Set box icon base (color based on faction)
+                string boxSprite = GetBoxIconBase(unit.Nationality);
+                unitIcon.SetBoxIcon(boxSprite);
+
+                // Calculate HP percentage (1-100)
+                int hpPercent = Mathf.Clamp(Mathf.RoundToInt(unit.HitPoints.GetPercentage() * 100f), 1, 100);
+
+                // Initialize the prefab with unit ID, current state, and deploy sprite resolver
+                unitIcon.Initialize(unit.UnitID, hpPercent, unit.DeploymentPosition, unit.CurrentEmbarkmentState, GetDeploySpriteName);
 
                 // Position the prefab
                 Vector3 position = GetRenderPosition(new Vector2Int(unit.MapPos.IntX, unit.MapPos.IntY));
@@ -381,12 +395,9 @@ namespace HammerAndSickle.Core.Map
                 }
 
                 // Get unit position before removal for stacking check
-                Position2D unitPosition = Position2D.Zero;
                 CombatUnit unit = GameDataManager.Instance.GetCombatUnit(unitId);
-                if (unit != null)
-                {
-                    unitPosition = unit.MapPos;
-                }
+                Position2D unitPosition = unit?.MapPos ?? Position2D.Zero;
+                bool hasValidPosition = unit != null;
 
                 if (unitIconPrefabs.TryGetValue(unitId, out Prefab_CombatUnitIcon unitIcon))
                 {
@@ -399,7 +410,7 @@ namespace HammerAndSickle.Core.Map
                     if (_debug) Debug.Log($"[{CLASS_NAME}.RemoveUnitIcon] Removed icon for unit '{unitId}'");
 
                     // Recheck stacking at the removed unit's position
-                    if (unitPosition != null)
+                    if (hasValidPosition)
                     {
                         CheckForStacking(unitPosition);
                     }
@@ -548,6 +559,27 @@ namespace HammerAndSickle.Core.Map
         }
 
         /// <summary>
+        /// Checks if an air unit is currently attached to a friendly airbase.
+        /// </summary>
+        private bool IsAtFriendlyAirbase(CombatUnit unit)
+        {
+            var airbases = GameDataManager.Instance.GetUnits(u =>
+                u.Classification == UnitClassification.AIRB && u.Side == unit.Side);
+
+            foreach (var airbase in airbases)
+            {
+                var attachedIds = airbase.AttachedUnitIDs;
+                for (int i = 0; i < attachedIds.Count; i++)
+                {
+                    if (attachedIds[i] == unit.UnitID)
+                        return true;
+                }
+            }
+
+            return false;
+        }
+
+        /// <summary>
         /// Checks if a unit classification is a fixed-wing aircraft (not helicopter).
         /// </summary>
         private bool IsFixedWingAircraft(UnitClassification classification)
@@ -579,6 +611,34 @@ namespace HammerAndSickle.Core.Map
                 2 => SpriteManager.Utility_AirbaseStack2,
                 3 => SpriteManager.Utility_AirbaseStack3,
                 _ => SpriteManager.Utility_AirbaseStack4  // 4 or more (capped at MAX_AIR_UNITS)
+            };
+        }
+
+        /// <summary>
+        /// Gets the deployment state sprite name for a given deployment position.
+        /// Used as a callback by Prefab_CombatUnitIcon to resolve deploy icon sprites.
+        /// </summary>
+        /// <param name="position">The deployment position to get the sprite for</param>
+        /// <returns>Sprite name for the deployment state icon, or null if no icon should be shown</returns>
+        private string GetDeploySpriteName(DeploymentPosition position, EmbarkmentState embarkmentState)
+        {
+            if (position == DeploymentPosition.Embarked)
+            {
+                return embarkmentState switch
+                {
+                    EmbarkmentState.EmbarkedNaval => SpriteManager.EmbarkedNavalIcon,
+                    _ => SpriteManager.EmbarkedAirIcon // Fixed-wing and helo both use air icon
+                };
+            }
+
+            return position switch
+            {
+                DeploymentPosition.Fortified => SpriteManager.FortifiedIcon,
+                DeploymentPosition.Entrenched => SpriteManager.EntrenchedIcon,
+                DeploymentPosition.HastyDefense => SpriteManager.DefensiveIcon,
+                DeploymentPosition.Deployed => SpriteManager.DeployedIcon,
+                DeploymentPosition.Mobile => SpriteManager.MountedIcon,
+                _ => null
             };
         }
 
@@ -644,22 +704,41 @@ namespace HammerAndSickle.Core.Map
             };
         }
 
+        /// <summary>
+        /// Gets the box icon base sprite name for a given nationality.
+        /// Soviet = Red, NATO = Blue, Mujahideen/Arab = Green, Chinese = Grey.
+        /// </summary>
+        /// <param name="nationality">The nationality to get the box icon for</param>
+        /// <returns>Sprite name for the icon base</returns>
+        private string GetBoxIconBase(Nationality nationality)
+        {
+            return nationality switch
+            {
+                Nationality.USSR => SpriteManager.RedIconBase,
+                Nationality.MJ => SpriteManager.GreenIconBase,
+                Nationality.IR => SpriteManager.GreenIconBase,
+                Nationality.IQ => SpriteManager.GreenIconBase,
+                Nationality.SAUD => SpriteManager.GreenIconBase,
+                Nationality.KW => SpriteManager.GreenIconBase,
+                Nationality.China => SpriteManager.GreyIconBase,
+                _ => SpriteManager.BlueIconBase // NATO nations (USA, UK, FRG, FRA, BE, DE, NE)
+            };
+        }
+
         #endregion // Nationality Symbol Methods
 
         #region Unit Stacking Methods
 
         /// <summary>
         /// Determines if a unit is an air unit based on its classification.
-        /// Air units include fighters, attackers, bombers, and reconnaissance aircraft.
+        /// All fixed-wing aircraft are considered air units for stacking purposes.
+        /// Helicopters are ground units.
         /// </summary>
         /// <param name="unit">The unit to check</param>
         /// <returns>True if the unit is an air unit</returns>
         private bool IsAirUnit(CombatUnit unit)
         {
-            return unit.Classification == UnitClassification.FGT ||
-                   unit.Classification == UnitClassification.ATT ||
-                   unit.Classification == UnitClassification.BMB ||
-                   unit.Classification == UnitClassification.RECONA;
+            return IsFixedWingAircraft(unit.Classification);
         }
 
         /// <summary>
@@ -887,24 +966,32 @@ namespace HammerAndSickle.Core.Map
         }
 
         /// <summary>
-        /// Handles unit position changed events from EventManager.
-        /// Checks both old and new positions for stacking changes.
+        /// Handles the stacking toggle request from EventManager.
+        /// Delegates to ToggleStackDominance to flip the air/ground dominance at the position.
         /// </summary>
-        private void OnUnitPositionChanged(UnitPositionChangedEventArgs args)
+        private void OnStackingToggleRequested(Position2D position)
+        {
+            ToggleStackDominance(position);
+        }
+
+        /// <summary>
+        /// Handles the redraw map icons event from EventManager.
+        /// Clears all existing icons and redraws them.
+        /// </summary>
+        private void OnRedrawMapIcons()
         {
             try
             {
-                if (_debug) Debug.Log($"[{CLASS_NAME}.OnUnitPositionChanged] Unit {args.UnitID} moved from ({args.OldPosition.IntX}, {args.OldPosition.IntY}) to ({args.NewPosition.IntX}, {args.NewPosition.IntY})");
+                if (_debug) Debug.Log($"[{CLASS_NAME}.OnRedrawMapIcons] Redrawing all map icons...");
 
-                // Check old position - stacking may have been resolved
-                CheckForStacking(args.OldPosition);
+                ClearAllUnitIcons();
+                DrawAllUnits();
 
-                // Check new position - new stacking may have occurred
-                CheckForStacking(args.NewPosition);
+                if (_debug) Debug.Log($"[{CLASS_NAME}.OnRedrawMapIcons] Redraw complete.");
             }
             catch (Exception e)
             {
-                AppService.HandleException(CLASS_NAME, "OnUnitPositionChanged", e);
+                AppService.HandleException(CLASS_NAME, "OnRedrawMapIcons", e);
             }
         }
 

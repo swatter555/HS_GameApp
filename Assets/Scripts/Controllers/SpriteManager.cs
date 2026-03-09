@@ -2,7 +2,6 @@ using HammerAndSickle.Services;
 using System;
 using UnityEngine;
 using UnityEngine.U2D;
-using HammerAndSickle.Core.GameData;
 
 namespace HammerAndSickle.Controllers
 {
@@ -574,25 +573,8 @@ namespace HammerAndSickle.Controllers
         public const string FR_Mirage2000 = "FR_Mirage2000";
         public const string FR_MirageF1   = "FR_MirageF1";
 
-        // Mujahideen
-        public const string MJ_AA = "MJ_AA";
-        public const string MJ_Artillery = "MJ_Artillery";
-        public const string MJ_Elite = "MJ_Elite";
-        public const string MJ_Mortar = "MJ_Mortar";
-        public const string MJ_Mounted = "MJ_Mounted";
-        public const string MJ_Regulars = "MJ_Regulars";
-        public const string MJ_RPG = "MJ_RPG";
-        public const string MJ_Stinger = "MJ_Stinger";
-
         // NATO Generic
         public const string NATO_Regulars = "NATO_Regulars";
-
-        // Iraq
-        public const string IQ_Regulars = "IQ_Regulars";
-        public const string IQ_MirageF1 = "IQ_MirageF1";
-
-        // Iran
-        public const string IR_Regulars = "IR_Regulars";
 
         #endregion // NATO Unit Icons
 
@@ -650,6 +632,23 @@ namespace HammerAndSickle.Controllers
         public const string AR_Mig21 = "AR_Mig21";
         public const string AR_Mig23 = "AR_Mig23";
         public const string AR_SU17  = "AR_SU17";
+
+        // Iraq
+        public const string IQ_Regulars = "IQ_Regulars";
+        public const string IQ_MirageF1 = "IQ_MirageF1";
+
+        // Iran
+        public const string IR_Regulars = "IR_Regulars";
+
+        // Mujahideen
+        public const string MJ_AA        = "MJ_AA";
+        public const string MJ_Artillery = "MJ_Artillery";
+        public const string MJ_Elite     = "MJ_Elite";
+        public const string MJ_Mortar    = "MJ_Mortar";
+        public const string MJ_Mounted   = "MJ_Mounted";
+        public const string MJ_Regulars  = "MJ_Regulars";
+        public const string MJ_RPG       = "MJ_RPG";
+        public const string MJ_Stinger   = "MJ_Stinger";
 
         #endregion // Arab Unit Icons
 
@@ -729,15 +728,15 @@ namespace HammerAndSickle.Controllers
         #region Generic Unit Icons
 
         // Generic Units
-        public const string GEN_AA = "GEN_AA";
-        public const string GEN_Base = "GEN_Base";
-        public const string GEN_Depot = "GEN_Depot";
-        public const string GEN_HeavyArt = "GEN_HeavyArt";
-        public const string GEN_LightArt = "GEN_LightArt";
+        public const string GEN_AA             = "GEN_AA";
+        public const string GEN_Base           = "GEN_Base";
+        public const string GEN_Depot          = "GEN_Depot";
+        public const string GEN_HeavyArt       = "GEN_HeavyArt";
+        public const string GEN_LightArt       = "GEN_LightArt";
         public const string GEN_NavalTransport = "GEN_NavalTransport";
-        public const string GEN_Truck_W = "GEN_Truck_W";
-        public const string GEN_Truck_NW = "GEN_Truck_NW";
-        public const string GEN_Truck_SW = "GEN_Truck_SW";
+        public const string GEN_Truck_W        = "GEN_Truck_W";
+        public const string GEN_Truck_NW       = "GEN_Truck_NW";
+        public const string GEN_Truck_SW       = "GEN_Truck_SW";
 
         #endregion // Generic Unit Icons
 
@@ -808,48 +807,54 @@ namespace HammerAndSickle.Controllers
 
         #endregion // NATO Symbol Icons
 
-        #region Unit Base Icons
+        #region Prefab_CombatUnitIcon
 
-        public const string BlueIconBase = "BlueIconBase";
-        public const string GreenIconBase = "GreenIconBase";
-        public const string RedIconBase = "RedIconBase";
+        // Nationality Symbols
+        public const string Symbol_BE      = "BE_Symbol";
+        public const string Symbol_China   = "CH_Symbol";
+        public const string Symbol_DE      = "DE_Symbol";
+        public const string Symbol_FR      = "FR_Symbol";
+        public const string Symbol_GE      = "GE_Symbol";
+        public const string Symbol_Iran    = "IR_Symbol";
+        public const string Symbol_Iraq    = "IQ_Symbol";
+        public const string Symbol_Kuwait  = "KQ_Symbol";
+        public const string Symbol_MJ      = "MJ_Symbol";
+        public const string Symbol_NE      = "NE_Symbol";
+        public const string Symbol_Saudi   = "SA_Symbol";
+        public const string Symbol_SV      = "SV_Symbol";
+        public const string Symbol_UK      = "UK_Symbol";
+        public const string Symbol_US      = "US_Symbol";
+        public const string Symbol_Default = "DF_Symbol";
+        // Icon Bases
+        public const string BlueIconBase  = "BlueUnitBase";
+        public const string GreenIconBase = "GreenUnitBase";
+        public const string RedIconBase   = "RedUnitBase";
+        public const string GreyIconBase  = "GreyUnitBase";
 
-        #endregion // Unit Base Icons
+        // Deployment Status
+        public const string DeployedIcon      = "DeployedIcon";
+        public const string DefensiveIcon     = "DefensiveIcon";
+        public const string EntrenchedIcon    = "EntrenchedIcon";
+        public const string FortifiedIcon     = "FortifiedIcon";
+        public const string MountedIcon       = "MountedIcon";
+        public const string EmbarkedAirIcon   = "EmbarkedAirIcon";
+        public const string EmbarkedNavalIcon = "EmbarkedNavalIcon";
 
-        #region National Symbols
-
-        public const string Symbol_BE     = "Symbol_BE";
-        public const string Symbol_China  = "Symbol_CH";
-        public const string Symbol_DE     = "Symbol_DE";
-        public const string Symbol_FR     = "Symbol_FR";
-        public const string Symbol_GE     = "Symbol_GE";
-        public const string Symbol_Iran   = "Symbol_IR";
-        public const string Symbol_Iraq   = "Symbol_IQ";
-        public const string Symbol_Kuwait = "Symbol_KQ";
-        public const string Symbol_MJ     = "Symbol_MJ";
-        public const string Symbol_NE     = "Symbol_NE";
-        public const string Symbol_Saudi  = "Symbol_SA";
-        public const string Symbol_SV     = "Symbol_SV";
-        public const string Symbol_UK     = "Symbol_UK";
-        public const string Symbol_US     = "Symbol_US";
-        public const string Symbol_Default = "Symbol_DF";
-
-        #endregion // National Symbols
+        #endregion
 
         #region Utility Icons
 
-        public const string Utility_AirbaseStack0 = "AirbaseStack0";
-        public const string Utility_AirbaseStack1 = "AirbaseStack1";
-        public const string Utility_AirbaseStack2 = "AirbaseStack2";
-        public const string Utility_AirbaseStack3 = "AirbaseStack3";
-        public const string Utility_AirbaseStack4 = "AirbaseStack4";
+        public const string Utility_AirbaseStack0 = "AirbaseStack_0";
+        public const string Utility_AirbaseStack1 = "AirbaseStack_1";
+        public const string Utility_AirbaseStack2 = "AirbaseStack_2";
+        public const string Utility_AirbaseStack3 = "AirbaseStack_3";
+        public const string Utility_AirbaseStack4 = "AirbaseStack_4";
         public const string Utility_AirMissionMarker = "AirMissionMarker";
         public const string Utility_StackingIconAir = "StackingIcon_AirSelect";
         public const string Utility_StackingIconLand = "StackingIcon_LandSelect";
         public const string Utility_MismatchIcon = "MismatchIcon";
 
-        #endregion
-
+        #endregion // Utility Icons
 
         #region Singleton
 
@@ -889,13 +894,16 @@ namespace HammerAndSickle.Controllers
         [SerializeField] private SpriteAtlas _bridgeIconAtlas;
         [SerializeField] private SpriteAtlas _rankAtlas;
         [SerializeField] private SpriteAtlas _terrainPortraitAtlas;
-        [SerializeField] private SpriteAtlas _sovietIconAtlas;
-        [SerializeField] private SpriteAtlas _natoIconAtlas;
-        [SerializeField] private SpriteAtlas _genericIconAtlas;
         [SerializeField] private SpriteAtlas _natoSymbolIconAtlas;
         [SerializeField] private SpriteAtlas _nationalFlagAtlas;
         [SerializeField] private SpriteAtlas _nationalSymbolAtlas;
         [SerializeField] private SpriteAtlas _utilityIconAtlas;
+        [SerializeField] private SpriteAtlas _unitPrefabIconAtlas;
+        [SerializeField] private SpriteAtlas _sovietIconAtlas;
+        [SerializeField] private SpriteAtlas _natoIconAtlas;
+        [SerializeField] private SpriteAtlas _genericIconAtlas;
+        [SerializeField] private SpriteAtlas _arabIconAtlas;
+        [SerializeField] private SpriteAtlas _chineseIconAtlas;
 
         [Header("Prefabs")]
         [SerializeField] private GameObject _cityPrefab;
@@ -1022,6 +1030,20 @@ namespace HammerAndSickle.Controllers
                     if (sprite != null) return sprite;
                 }
 
+                // Try Arab unit icon atlas
+                if (Instance._arabIconAtlas != null)
+                {
+                    sprite = Instance._arabIconAtlas.GetSprite(spriteName);
+                    if (sprite != null) return sprite;
+                }
+
+                // Try Chinese unit icon atlas
+                if (Instance._chineseIconAtlas != null)
+                {
+                    sprite = Instance._chineseIconAtlas.GetSprite(spriteName);
+                    if (sprite != null) return sprite;
+                }
+
                 // Try NATO symbol icon atlas
                 if (Instance._natoSymbolIconAtlas != null)
                 {
@@ -1047,6 +1069,13 @@ namespace HammerAndSickle.Controllers
                 if (Instance._utilityIconAtlas != null)
                 {
                     sprite = Instance._utilityIconAtlas.GetSprite(spriteName);
+                    if (sprite != null) return sprite;
+                }
+
+                // Try unit prefab icon atlas
+                if (Instance._unitPrefabIconAtlas != null)
+                {
+                    sprite = Instance._unitPrefabIconAtlas.GetSprite(spriteName);
                     if (sprite != null) return sprite;
                 }
 

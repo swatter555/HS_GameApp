@@ -223,6 +223,16 @@ namespace HammerAndSickle.Controllers
             // Grab and store other data from the scenario manifest
             GrabManifestData();
 
+            // Redraw all map icons now that units are loaded
+            if (GameIconRenderer.Instance == null || !GameIconRenderer.Instance.IsInitialized)
+            {
+                Debug.LogWarning($"{CLASS_NAME}.SetupBattleManagerData: GameIconRenderer not ready — skipping map icon redraw.");
+            }
+            else
+            {
+                EventManager.Instance.RaiseRedrawMapIcons();
+            }
+
             return true;
         }
 
