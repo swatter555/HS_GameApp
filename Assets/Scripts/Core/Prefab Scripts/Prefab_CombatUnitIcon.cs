@@ -1,4 +1,5 @@
 using HammerAndSickle.Controllers;
+using HammerAndSickle.Core.GameData;
 using HammerAndSickle.Services;
 using System;
 using TMPro;
@@ -7,7 +8,9 @@ using UnityEngine;
 namespace HammerAndSickle.Core
 {
     /// <summary>
-    /// Manages a combat unit icon prefab instance including unit sprite, flag, and NATO icon.
+    /// Manages a combat unit icon prefab instance including unit sprite, nationality symbol,
+    /// hit points display, deployment state icon, and stacking icon.
+    /// Subscribes to EventManager for hit point and deployment state changes.
     /// </summary>
     public class Prefab_CombatUnitIcon : MonoBehaviour
     {
@@ -16,10 +19,12 @@ namespace HammerAndSickle.Core
         #region Inspector Fields
 
         [Header("Component References")]
-        [SerializeField] private SpriteRenderer unitIconRenderer;
-        [SerializeField] private SpriteRenderer flagRenderer;
-        [SerializeField] private SpriteRenderer stackingIconRenderer;
-        [SerializeField] private TextMeshPro hitPointsText;
+        [SerializeField] private SpriteRenderer unitIcon;
+        [SerializeField] private SpriteRenderer nationIcon;
+        [SerializeField] private SpriteRenderer boxIcon;
+        [SerializeField] private TextMeshPro boxText;
+        [SerializeField] private SpriteRenderer deployIcon;
+        [SerializeField] private SpriteRenderer stackingIcon;
 
         [Header("Font Settings")]
         [SerializeField] private TMP_FontAsset fontAsset;
@@ -27,34 +32,53 @@ namespace HammerAndSickle.Core
 
         #endregion // Inspector Fields
 
+        #region Fields
+
+        /// <summary>
+        /// The unit ID this prefab instance represents. Set during initialization.
+        /// </summary>
+        private string _unitId;
+
+        /// <summary>
+        /// Callback provided by the renderer to resolve a deployment position and embarkment state into a sprite name.
+        /// </summary>
+        private Func<DeploymentPosition, EmbarkmentState, string> _resolveDeploySprite;
+
+        #endregion // Fields
+
         #region Properties
+
+        /// <summary>
+        /// Gets the unit ID this icon represents.
+        /// </summary>
+        public string UnitId => _unitId;
 
         /// <summary>
         /// Gets the unit icon sprite renderer.
         /// </summary>
-        public SpriteRenderer UnitIconRenderer => unitIconRenderer;
+        public SpriteRenderer UnitIconRenderer => unitIcon;
 
         /// <summary>
-        /// Gets the flag sprite renderer.
+        /// Gets the nationality icon sprite renderer.
         /// </summary>
-        public SpriteRenderer FlagRenderer => flagRenderer;
+        public SpriteRenderer NationIconRenderer => nationIcon;
 
         /// <summary>
         /// Gets the stacking icon sprite renderer.
         /// </summary>
-        public SpriteRenderer StackingIconRenderer => stackingIconRenderer;
+        public SpriteRenderer StackingIconRenderer => stackingIcon;
 
         /// <summary>
-        /// Gets or sets the hit points display text.
+        /// Gets or sets the hit points display text as a percentage (1-100).
         /// </summary>
         public string HitPointsRatio
         {
-            get => hitPointsText != null ? hitPointsText.text : string.Empty;
+            get => boxText != null ? boxText.text : string.Empty;
             set
             {
-                if (hitPointsText != null)
+                if (boxText != null)
                 {
-                    hitPointsText.text = value;
+                    boxText.text = value;
                 }
             }
         }
@@ -68,9 +92,41 @@ namespace HammerAndSickle.Core
             ValidateReferences();
         }
 
+        private void OnDestroy()
+        {
+            UnsubscribeFromEvents();
+        }
+
         #endregion // Unity Lifecycle
 
         #region Public Methods
+
+        /// <summary>
+        /// Initializes the prefab with its owning unit ID, sets initial visual state, and subscribes to events.
+        /// Must be called after instantiation before the prefab will respond to events.
+        /// </summary>
+        /// <param name="unitId">The unit ID this icon represents</param>
+        /// <param name="hitPointPercent">Current hit points as a percentage (1-100)</param>
+        /// <param name="deploymentPosition">Current deployment position for the deploy icon</param>
+        /// <param name="embarkmentState">Current embarkment state (relevant when position is Embarked)</param>
+        /// <param name="resolveDeploySprite">Callback to resolve a DeploymentPosition and EmbarkmentState to a sprite name</param>
+        public void Initialize(string unitId, int hitPointPercent, DeploymentPosition deploymentPosition,
+            EmbarkmentState embarkmentState, Func<DeploymentPosition, EmbarkmentState, string> resolveDeploySprite = null)
+        {
+            _unitId = unitId;
+            _resolveDeploySprite = resolveDeploySprite;
+
+            InitializeHitPointsText();
+            HitPointsRatio = hitPointPercent.ToString();
+
+            if (_resolveDeploySprite != null)
+            {
+                string spriteName = _resolveDeploySprite(deploymentPosition, embarkmentState);
+                SetDeployIcon(spriteName);
+            }
+
+            SubscribeToEvents();
+        }
 
         /// <summary>
         /// Sets the unit icon sprite.
@@ -85,7 +141,7 @@ namespace HammerAndSickle.Core
                     return;
                 }
 
-                unitIconRenderer.sprite = SpriteManager.GetSprite(spriteName);
+                unitIcon.sprite = SpriteManager.GetSprite(spriteName);
             }
             catch (Exception e)
             {
@@ -94,56 +150,113 @@ namespace HammerAndSickle.Core
         }
 
         /// <summary>
-        /// Sets the unit flag sprite.
+        /// Sets the nationality symbol sprite.
         /// </summary>
-        public void SetFlag(string spriteName)
+        public void SetNationIcon(string spriteName)
         {
             try
             {
-                if (flagRenderer == null)
+                if (nationIcon == null)
                 {
                     return;
                 }
 
                 if (string.IsNullOrEmpty(spriteName))
                 {
-                    AppService.CaptureUiMessage($"{CLASS_NAME}.SetFlag: Sprite name is null or empty.");
+                    AppService.CaptureUiMessage($"{CLASS_NAME}.SetNationIcon: Sprite name is null or empty.");
                     return;
                 }
 
-                flagRenderer.sprite = SpriteManager.GetSprite(spriteName);
+                nationIcon.sprite = SpriteManager.GetSprite(spriteName);
             }
             catch (Exception e)
             {
-                AppService.HandleException(CLASS_NAME, nameof(SetFlag), e);
+                AppService.HandleException(CLASS_NAME, nameof(SetNationIcon), e);
             }
         }
 
         /// <summary>
-        /// Initializes the TextMeshPro component with the assigned font and color.
-        /// Call this after instantiation if settings need to be applied dynamically.
+        /// Sets the box icon sprite (background behind hit points text).
         /// </summary>
-        public void InitializeHitPointsText()
+        public void SetBoxIcon(string spriteName)
         {
-            if (hitPointsText == null) return;
-
-            if (fontAsset != null)
+            try
             {
-                hitPointsText.font = fontAsset;
-            }
+                if (boxIcon == null)
+                {
+                    return;
+                }
 
-            hitPointsText.color = ratioTextColor;
+                if (string.IsNullOrEmpty(spriteName))
+                {
+                    AppService.CaptureUiMessage($"{CLASS_NAME}.SetBoxIcon: Sprite name is null or empty.");
+                    return;
+                }
+
+                boxIcon.sprite = SpriteManager.GetSprite(spriteName);
+            }
+            catch (Exception e)
+            {
+                AppService.HandleException(CLASS_NAME, nameof(SetBoxIcon), e);
+            }
+        }
+
+        /// <summary>
+        /// Shows or hides the box icon.
+        /// </summary>
+        public void ShowBoxIcon(bool show)
+        {
+            if (boxIcon != null)
+            {
+                boxIcon.enabled = show;
+            }
+        }
+
+        /// <summary>
+        /// Sets the deployment state icon sprite.
+        /// </summary>
+        public void SetDeployIcon(string spriteName)
+        {
+            try
+            {
+                if (deployIcon == null)
+                {
+                    return;
+                }
+
+                if (string.IsNullOrEmpty(spriteName))
+                {
+                    AppService.CaptureUiMessage($"{CLASS_NAME}.SetDeployIcon: Sprite name is null or empty.");
+                    return;
+                }
+
+                deployIcon.sprite = SpriteManager.GetSprite(spriteName);
+            }
+            catch (Exception e)
+            {
+                AppService.HandleException(CLASS_NAME, nameof(SetDeployIcon), e);
+            }
+        }
+
+        /// <summary>
+        /// Shows or hides the deployment state icon.
+        /// </summary>
+        public void ShowDeployIcon(bool show)
+        {
+            if (deployIcon != null)
+            {
+                deployIcon.enabled = show;
+            }
         }
 
         /// <summary>
         /// Sets the stacking icon sprite for air/land stacking toggle.
         /// </summary>
-        /// <param name="spriteName">Name of the stacking icon sprite</param>
         public void SetStackingIcon(string spriteName)
         {
             try
             {
-                if (stackingIconRenderer == null)
+                if (stackingIcon == null)
                 {
                     return;
                 }
@@ -154,7 +267,7 @@ namespace HammerAndSickle.Core
                     return;
                 }
 
-                stackingIconRenderer.sprite = SpriteManager.GetSprite(spriteName);
+                stackingIcon.sprite = SpriteManager.GetSprite(spriteName);
             }
             catch (Exception e)
             {
@@ -165,43 +278,55 @@ namespace HammerAndSickle.Core
         /// <summary>
         /// Shows or hides the stacking icon.
         /// </summary>
-        /// <param name="show">True to show, false to hide</param>
         public void ShowStackingIcon(bool show)
         {
-            if (stackingIconRenderer != null)
+            if (stackingIcon != null)
             {
-                stackingIconRenderer.enabled = show;
+                stackingIcon.enabled = show;
             }
         }
 
         /// <summary>
-        /// Sets the opacity of the unit icon and flag renderers.
+        /// Sets the opacity of the unit icon, nationality icon, and hit points text.
         /// Used for stacking to show non-dominant units at reduced opacity.
         /// </summary>
-        /// <param name="opacity">Opacity value from 0 (transparent) to 1 (opaque)</param>
         public void SetOpacity(float opacity)
         {
             opacity = Mathf.Clamp01(opacity);
 
-            if (unitIconRenderer != null)
+            if (unitIcon != null)
             {
-                Color color = unitIconRenderer.color;
+                Color color = unitIcon.color;
                 color.a = opacity;
-                unitIconRenderer.color = color;
+                unitIcon.color = color;
             }
 
-            if (flagRenderer != null)
+            if (nationIcon != null)
             {
-                Color color = flagRenderer.color;
+                Color color = nationIcon.color;
                 color.a = opacity;
-                flagRenderer.color = color;
+                nationIcon.color = color;
             }
 
-            if (hitPointsText != null)
+            if (boxIcon != null)
             {
-                Color color = hitPointsText.color;
+                Color color = boxIcon.color;
                 color.a = opacity;
-                hitPointsText.color = color;
+                boxIcon.color = color;
+            }
+
+            if (boxText != null)
+            {
+                Color color = boxText.color;
+                color.a = opacity;
+                boxText.color = color;
+            }
+
+            if (deployIcon != null)
+            {
+                Color color = deployIcon.color;
+                color.a = opacity;
+                deployIcon.color = color;
             }
         }
 
@@ -210,27 +335,101 @@ namespace HammerAndSickle.Core
         #region Private Methods
 
         /// <summary>
+        /// Initializes the TextMeshPro component with the assigned font and color.
+        /// </summary>
+        private void InitializeHitPointsText()
+        {
+            if (boxText == null) return;
+
+            if (fontAsset != null)
+            {
+                boxText.font = fontAsset;
+            }
+
+            boxText.color = ratioTextColor;
+        }
+
+        /// <summary>
+        /// Subscribes to EventManager events for hit points and deployment changes.
+        /// </summary>
+        private void SubscribeToEvents()
+        {
+            if (EventManager.Instance != null)
+            {
+                EventManager.Instance.OnUnitHitPointsChanged += OnUnitHitPointsChanged;
+                EventManager.Instance.OnUnitDeploymentChanged += OnUnitDeploymentChanged;
+            }
+        }
+
+        /// <summary>
+        /// Unsubscribes from EventManager events.
+        /// </summary>
+        private void UnsubscribeFromEvents()
+        {
+            if (EventManager.Instance != null)
+            {
+                EventManager.Instance.OnUnitHitPointsChanged -= OnUnitHitPointsChanged;
+                EventManager.Instance.OnUnitDeploymentChanged -= OnUnitDeploymentChanged;
+            }
+        }
+
+        /// <summary>
         /// Validates that all required references are set.
         /// </summary>
         private void ValidateReferences()
         {
-            if (unitIconRenderer == null)
-                throw new NullReferenceException($"{CLASS_NAME}.ValidateReferences: unitIconRenderer is null");
+            if (unitIcon == null)
+                throw new NullReferenceException($"{CLASS_NAME}.ValidateReferences: unitIcon is null");
 
-            // Optional components - log warnings but don't throw
-            if (flagRenderer == null)
-                Debug.LogWarning($"{CLASS_NAME}.ValidateReferences: flagRenderer is not assigned");
+            if (nationIcon == null)
+                Debug.LogWarning($"{CLASS_NAME}.ValidateReferences: nationIcon is not assigned");
 
-            if (stackingIconRenderer == null)
-                Debug.LogWarning($"{CLASS_NAME}.ValidateReferences: stackingIconRenderer is not assigned");
+            if (boxIcon == null)
+                Debug.LogWarning($"{CLASS_NAME}.ValidateReferences: boxIcon is not assigned");
 
-            if (hitPointsText == null)
-                Debug.LogWarning($"{CLASS_NAME}.ValidateReferences: hitPointsText is not assigned");
+            if (boxText == null)
+                Debug.LogWarning($"{CLASS_NAME}.ValidateReferences: boxText is not assigned");
+
+            if (deployIcon == null)
+                Debug.LogWarning($"{CLASS_NAME}.ValidateReferences: deployIcon is not assigned");
+
+            if (stackingIcon == null)
+                Debug.LogWarning($"{CLASS_NAME}.ValidateReferences: stackingIcon is not assigned");
 
             if (fontAsset == null)
                 Debug.LogWarning($"{CLASS_NAME}.ValidateReferences: fontAsset is not assigned");
         }
 
         #endregion // Private Methods
+
+        #region Event Handlers
+
+        /// <summary>
+        /// Handles hit point changes for this unit. Updates the hit points text display.
+        /// </summary>
+        private void OnUnitHitPointsChanged(string unitId, int currentPercent)
+        {
+            if (unitId != _unitId) return;
+
+            HitPointsRatio = currentPercent.ToString();
+        }
+
+        /// <summary>
+        /// Handles deployment state changes for this unit. Updates the deploy icon sprite.
+        /// </summary>
+        private void OnUnitDeploymentChanged(string unitId, DeploymentPosition newPosition, EmbarkmentState embarkmentState)
+        {
+            if (unitId != _unitId) return;
+
+            if (_resolveDeploySprite == null)
+            {
+                return;
+            }
+
+            string spriteName = _resolveDeploySprite(newPosition, embarkmentState);
+            SetDeployIcon(spriteName);
+        }
+
+        #endregion // Event Handlers
     }
 }

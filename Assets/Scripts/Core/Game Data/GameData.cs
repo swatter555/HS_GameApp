@@ -796,9 +796,9 @@ namespace HammerAndSickle.Core.GameData
 
         #region Generic Units
 
-        BASE_LARGE,  // Large base suited for airbase units.
-        BASE_MEDIUM, // Medium base suited for HQs.
-        BASE_SMALL,  // Small base suited for intel posts.
+        BASE_AIRBASE, // Large base suited for airbase units.
+        BASE_DEPOT,   // Medium base suited for HQs.
+        BASE_HQ,      // Small base suited for intel posts.
 
         #endregion // Generic Units
 

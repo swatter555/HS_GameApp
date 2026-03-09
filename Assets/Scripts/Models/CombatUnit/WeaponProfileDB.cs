@@ -4369,10 +4369,10 @@ namespace HammerAndSickle.Models
             //----------------------------------------------
             // Large Base (Airbase)
             //----------------------------------------------
-            WeaponProfile BASE_LRG = new WeaponProfile(
+            WeaponProfile BASE_AIRBASE = new WeaponProfile(
                 _longName: "Miltary Airbase",
                 _shortName: "Airbase",
-                _type: WeaponType.BASE_LARGE,
+                _type: WeaponType.BASE_AIRBASE,
                 _hardAtt: GameData.BASE_INF_HARD_ATTACK + LARGE_MALUS,     // Hard Attack Rating
                 _hardDef: GameData.BASE_INF_HARD_DEFENSE + LARGE_MALUS,    // Hard Defense Rating
                 _softAtt: GameData.BASE_INF_SOFT_ATTACK + LARGE_MALUS,     // Soft Attack Rating
@@ -4401,16 +4401,16 @@ namespace HammerAndSickle.Models
             );
 
             // Fill out intel stats for the Large Base
-            BASE_LRG.AddIntelReportStat(WeaponType.Personnel, 3000);
+            BASE_AIRBASE.AddIntelReportStat(WeaponType.Personnel, 3000);
 
             // Handle the icon profile.
-            BASE_LRG.IconProfile = new RegimentIconProfile(RegimentIconType.Single)
+            BASE_AIRBASE.IconProfile = new RegimentIconProfile(RegimentIconType.Single)
             {
                 W = SpriteManager.GEN_Airbase
             };
 
             // Add the Large Base profile to the database
-            AddProfile(WeaponType.BASE_LARGE, BASE_LRG);
+            AddProfile(WeaponType.BASE_AIRBASE, BASE_AIRBASE);
             //----------------------------------------------
             // Large Base (Airbase)
             //----------------------------------------------
@@ -4418,10 +4418,10 @@ namespace HammerAndSickle.Models
             //----------------------------------------------
             // Medium Base
             //----------------------------------------------
-            WeaponProfile BASE_MED = new WeaponProfile(
+            WeaponProfile BASE_DEPOT = new WeaponProfile(
                 _longName: "Supply Depot",
                 _shortName: "Depot",
-                _type: WeaponType.BASE_MEDIUM,
+                _type: WeaponType.BASE_DEPOT,
                 _hardAtt: GameData.BASE_INF_HARD_ATTACK + LARGE_MALUS,     // Hard Attack Rating
                 _hardDef: GameData.BASE_INF_HARD_DEFENSE + LARGE_MALUS,    // Hard Defense Rating
                 _softAtt: GameData.BASE_INF_SOFT_ATTACK + LARGE_MALUS,     // Soft Attack Rating
@@ -4450,27 +4450,27 @@ namespace HammerAndSickle.Models
             );
 
             // Fill out intel stats for the Medium Base
-            BASE_MED.AddIntelReportStat(WeaponType.Personnel, 2000);
+            BASE_DEPOT.AddIntelReportStat(WeaponType.Personnel, 2000);
 
             // Handle the icon profile.
-            BASE_MED.IconProfile = new RegimentIconProfile(RegimentIconType.Single)
+            BASE_DEPOT.IconProfile = new RegimentIconProfile(RegimentIconType.Single)
             {
-                W = SpriteManager.GEN_Base
+                W = SpriteManager.GEN_Depot
             };
 
             // Add the Medium Base profile to the database
-            AddProfile(WeaponType.BASE_MEDIUM, BASE_MED);
+            AddProfile(WeaponType.BASE_DEPOT, BASE_DEPOT);
             //----------------------------------------------
             // Medium Base
             //----------------------------------------------
 
             //----------------------------------------------
-            // Small Base (Depot)
+            // Small Base (HQ)
             //----------------------------------------------
-            WeaponProfile BASE_SML = new WeaponProfile(
+            WeaponProfile BASE_HQ = new WeaponProfile(
                 _longName: "Intel Base",
                 _shortName: "Intel",
-                _type: WeaponType.BASE_SMALL,
+                _type: WeaponType.BASE_HQ,
                 _hardAtt: GameData.BASE_INF_HARD_ATTACK + LARGE_MALUS,     // Hard Attack Rating
                 _hardDef: GameData.BASE_INF_HARD_DEFENSE + LARGE_MALUS,    // Hard Defense Rating
                 _softAtt: GameData.BASE_INF_SOFT_ATTACK + LARGE_MALUS,     // Soft Attack Rating
@@ -4499,16 +4499,16 @@ namespace HammerAndSickle.Models
             );
 
             // Fill out intel stats for the Small Base
-            BASE_SML.AddIntelReportStat(WeaponType.Personnel, 1500);
+            BASE_HQ.AddIntelReportStat(WeaponType.Personnel, 1500);
 
             // Handle the icon profile.
-            BASE_SML.IconProfile = new RegimentIconProfile(RegimentIconType.Single)
+            BASE_HQ.IconProfile = new RegimentIconProfile(RegimentIconType.Single)
             {
-                W = SpriteManager.GEN_Depot
+                W = SpriteManager.GEN_Base
             };
 
             // Add the Small Base profile to the database
-            AddProfile(WeaponType.BASE_SMALL, BASE_SML);
+            AddProfile(WeaponType.BASE_HQ, BASE_HQ);
             //----------------------------------------------
             // Small Base (Depot)
             //----------------------------------------------
