@@ -1773,7 +1773,7 @@ Camera:
   far clip plane: 1000
   field of view: 60
   orthographic: 1
-  orthographic size: 15
+  orthographic size: 12
   m_Depth: -1
   m_CullingMask:
     serializedVersion: 2
@@ -2293,7 +2293,7 @@ MonoBehaviour:
   priority: 0
   blendDistance: 0
   weight: 0.951
-  sharedProfile: {fileID: 11400000, guid: 2ddca5de84094f140adf1c762c33ee89, type: 2}
+  sharedProfile: {fileID: 11400000, guid: 37067c91db4095e4daa8cf4bbf5a27bb, type: 2}
 --- !u!4 &1160234427
 Transform:
   m_ObjectHideFlags: 0
@@ -4034,7 +4034,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Main::HammerAndSickle.Core.Map.GameIconRenderer
   _debug: 1
-  combatUnitIconPrefab: {fileID: 6393160224673948975, guid: cf4cf13518eaa224190c49b8b72fc95b, type: 3}
+  combatUnitIconPrefab: {fileID: 132875725262670945, guid: d74c397ba39cddd4e9e297d86a59f443, type: 3}
   groundUnitLayer: {fileID: 969665629}
   airUnitLayer: {fileID: 547023260}
   utilityLayer1: {fileID: 40004800}
