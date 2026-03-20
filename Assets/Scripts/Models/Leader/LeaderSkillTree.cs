@@ -210,8 +210,8 @@ namespace HammerAndSickle.Models
                     UnlockedSkills = new List<SkillReference>()
                 };
 
-                // Use the internal method to get unlocked skills
-                var unlockedSkills = GetUnlockedSkillsFromTree(skillTree);
+                // Use the internal accessor to get unlocked skills
+                var unlockedSkills = skillTree.GetUnlockedSkills();
 
                 foreach (var skillKvp in unlockedSkills)
                 {
@@ -288,38 +288,6 @@ namespace HammerAndSickle.Models
 
         #endregion // Snapshot Conversion
 
-        #region Helper Methods
-
-        /// <summary>
-        /// Gets unlocked skills from skill tree using reflection
-        /// This is needed because unlockedSkills is private
-        /// </summary>
-        /// <param name="skillTree">The skill tree to read from</param>
-        /// <returns>Dictionary of skill states</returns>
-        private static Dictionary<Enum, bool> GetUnlockedSkillsFromTree(LeaderSkillTree skillTree)
-        {
-            try
-            {
-                var fieldInfo = typeof(LeaderSkillTree).GetField("unlockedSkills",
-                    System.Reflection.BindingFlags.NonPublic | System.Reflection.BindingFlags.Instance);
-
-                if (fieldInfo != null)
-                {
-                    return (Dictionary<Enum, bool>)fieldInfo.GetValue(skillTree);
-                }
-
-                // Fallback: return empty dictionary and log error
-                AppService.CaptureUiMessage("Warning: Could not access skill tree data via reflection");
-                return new Dictionary<Enum, bool>();
-            }
-            catch (Exception e)
-            {
-                AppService.HandleException(nameof(LeaderSkillTreeSnapshotExtensions), nameof(GetUnlockedSkillsFromTree), e);
-                return new Dictionary<Enum, bool>();
-            }
-        }
-
-        #endregion // Helper Methods
     }
 
     /// <summary>
@@ -525,25 +493,19 @@ namespace HammerAndSickle.Models
                 return false; // Should never happen if CanUnlockSkill returned true
             }
 
-            // Handle promotion before spending reputation.
-            var primaryEffect = skillDef.GetPrimaryEffect();
-            bool isPromotion = primaryEffect?.BonusType == SkillBonusType.SeniorPromotion ||
-                              primaryEffect?.BonusType == SkillBonusType.TopPromotion;
-            if (isPromotion)
-            {
-                // Update grade first so reputation events fire with correct context
-                if (primaryEffect.BonusType == SkillBonusType.SeniorPromotion)
-                {
-                    CurrentGrade = CommandGrade.SeniorGrade;
-                }
-                else if (primaryEffect.BonusType == SkillBonusType.TopPromotion)
-                {
-                    CurrentGrade = CommandGrade.TopGrade;
-                }
-            }
-
-            // Spend the experience
+            // Spend reputation first to ensure consistent state if spend fails
             if (!SpendReputation(skillDef.REPCost)) return false;
+
+            // Handle promotion after spending reputation
+            var primaryEffect = skillDef.GetPrimaryEffect();
+            if (primaryEffect?.BonusType == SkillBonusType.SeniorPromotion)
+            {
+                CurrentGrade = CommandGrade.SeniorGrade;
+            }
+            else if (primaryEffect?.BonusType == SkillBonusType.TopPromotion)
+            {
+                CurrentGrade = CommandGrade.TopGrade;
+            }
 
             // Track the branch if this is the first skill in it
             startedBranches.Add(skillDef.Branch);
@@ -746,48 +708,19 @@ namespace HammerAndSickle.Models
         #region Skill Reset (Respec)
 
         /// <summary>
-        /// Resets all skills, refunding experience points
+        /// Resets all skills, refunding experience points.
+        /// Promotion skills are preserved — once promoted, always promoted.
         /// </summary>
         /// <returns>True if any skills were reset</returns>
         public bool ResetAllSkills()
         {
-            int refundedXP = 0;
-            bool skillsWereReset = false;
-
-            // Get all unlocked skills
-            var unlockedSkillKeys = unlockedSkills.Where(kvp => kvp.Value).Select(kvp => kvp.Key).ToList();
-
-            foreach (Enum skillEnum in unlockedSkillKeys)
+            return ResetSkillsInternal(skillDef =>
             {
-                if (LeaderSkillCatalog.TryGetSkillDefinition(skillEnum, out SkillDefinition skillDef))
-                {
-                    // Skip promotion skills - once promoted, always promoted
-                    if (skillDef.GetPrimaryEffect()?.BonusType == SkillBonusType.SeniorPromotion ||
-                        skillDef.GetPrimaryEffect()?.BonusType == SkillBonusType.TopPromotion)
-                    {
-                        continue;
-                    }
-
-                    refundedXP += skillDef.REPCost;
-                    unlockedSkills[skillEnum] = false;
-                    skillsWereReset = true;
-                }
-            }
-
-            if (skillsWereReset)
-            {
-                // Reset branch tracking (except LeadershipFoundation which is tied to promotions)
-                startedBranches.RemoveWhere(b =>
-                    b != SkillBranch.LeadershipFoundation);
-
-                // Add refunded XP
-                ReputationPoints += refundedXP;
-
-                // Clear caches
-                ClearBonusCaches();
-            }
-
-            return skillsWereReset;
+                // Skip promotion skills - once promoted, always promoted
+                var primaryEffect = skillDef.GetPrimaryEffect();
+                return primaryEffect?.BonusType != SkillBonusType.SeniorPromotion &&
+                       primaryEffect?.BonusType != SkillBonusType.TopPromotion;
+            });
         }
 
         /// <summary>
@@ -800,24 +733,34 @@ namespace HammerAndSickle.Models
             // Cannot reset LeadershipFoundation branch (contains promotions)
             if (branch == SkillBranch.LeadershipFoundation) return false;
 
+            return ResetSkillsInternal(skillDef => skillDef.Branch == branch);
+        }
+
+        /// <summary>
+        /// Resets all skills except those in the LeadershipFoundation branch
+        /// </summary>
+        /// <returns>True if any skills were reset</returns>
+        public bool ResetAllSkillsExceptLeadership()
+        {
+            return ResetSkillsInternal(skillDef => skillDef.Branch != SkillBranch.LeadershipFoundation);
+        }
+
+        /// <summary>
+        /// Shared reset logic. Resets unlocked skills that match the filter, refunds reputation.
+        /// </summary>
+        /// <param name="shouldReset">Predicate applied to the skill definition; return true to reset the skill</param>
+        /// <returns>True if any skills were reset</returns>
+        private bool ResetSkillsInternal(Func<SkillDefinition, bool> shouldReset)
+        {
             int refundedREP = 0;
             bool skillsWereReset = false;
 
-            // Get all unlocked skills in this branch
-            var branchSkills = unlockedSkills.Where(kvp => kvp.Value).Select(kvp => kvp.Key)
-                .Where(key =>
-                {
-                    if (LeaderSkillCatalog.TryGetSkillDefinition(key, out SkillDefinition def))
-                    {
-                        return def.Branch == branch;
-                    }
-                    return false;
-                })
-                .ToList();
+            var unlockedSkillKeys = unlockedSkills.Where(kvp => kvp.Value).Select(kvp => kvp.Key).ToList();
 
-            foreach (Enum skillEnum in branchSkills)
+            foreach (Enum skillEnum in unlockedSkillKeys)
             {
-                if (LeaderSkillCatalog.TryGetSkillDefinition(skillEnum, out SkillDefinition skillDef))
+                if (LeaderSkillCatalog.TryGetSkillDefinition(skillEnum, out SkillDefinition skillDef) &&
+                    shouldReset(skillDef))
                 {
                     refundedREP += skillDef.REPCost;
                     unlockedSkills[skillEnum] = false;
@@ -827,60 +770,10 @@ namespace HammerAndSickle.Models
 
             if (skillsWereReset)
             {
-                // Remove branch from tracking
-                startedBranches.Remove(branch);
+                // Reset branch tracking (except LeadershipFoundation which is tied to promotions)
+                startedBranches.RemoveWhere(b => b != SkillBranch.LeadershipFoundation);
 
-                // Add refunded XP
                 ReputationPoints += refundedREP;
-
-                // Clear caches
-                ClearBonusCaches();
-            }
-
-            return skillsWereReset;
-        }
-
-        /// <summary>
-        /// Resets all skills except those in the LeadershipFoundation branch
-        /// </summary>
-        /// <returns>True if any skills were reset</returns>
-        public bool ResetAllSkillsExceptLeadership()
-        {
-            int refundedXP = 0;
-            bool skillsWereReset = false;
-
-            // Get all unlocked skills not in LeadershipFoundation branch
-            var nonLeadershipSkills = unlockedSkills.Where(kvp => kvp.Value).Select(kvp => kvp.Key)
-                .Where(key =>
-                {
-                    if (LeaderSkillCatalog.TryGetSkillDefinition(key, out SkillDefinition def))
-                    {
-                        return def.Branch != SkillBranch.LeadershipFoundation;
-                    }
-                    return false;
-                })
-                .ToList();
-
-            foreach (Enum skillEnum in nonLeadershipSkills)
-            {
-                if (LeaderSkillCatalog.TryGetSkillDefinition(skillEnum, out SkillDefinition skillDef))
-                {
-                    refundedXP += skillDef.REPCost;
-                    unlockedSkills[skillEnum] = false;
-                    skillsWereReset = true;
-                }
-            }
-
-            if (skillsWereReset)
-            {
-                // Reset branch tracking (except LeadershipFoundation)
-                startedBranches.RemoveWhere(b =>
-                    b != SkillBranch.LeadershipFoundation);
-
-                // Add refunded XP
-                ReputationPoints += refundedXP;
-
-                // Clear caches
                 ClearBonusCaches();
             }
 
