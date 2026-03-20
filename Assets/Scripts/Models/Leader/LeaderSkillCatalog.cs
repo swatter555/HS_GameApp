@@ -11,6 +11,34 @@ namespace HammerAndSickle.Models
     /// </summary>
     public class SkillEffect
     {
+        #region Fields
+
+        private static readonly HashSet<SkillBonusType> BooleanBonusTypes = new()
+        {
+            SkillBonusType.Breakthrough,
+            SkillBonusType.ShootAndScoot,
+            SkillBonusType.AirMobile,
+            SkillBonusType.AirMobileAssault,
+            SkillBonusType.AirMobileElite,
+            SkillBonusType.ImpromptuPlanning,
+            SkillBonusType.AirborneAssault,
+            SkillBonusType.AirborneElite,
+            SkillBonusType.BridgeBuilding,
+            SkillBonusType.FieldFortification,
+            SkillBonusType.AmbushTactics,
+            SkillBonusType.SignalDecryption,
+            SkillBonusType.SpaceAssets,
+            SkillBonusType.ElectronicWarfare,
+            SkillBonusType.PatternRecognition,
+            SkillBonusType.EmergencyResupply,
+            SkillBonusType.NVG,
+            SkillBonusType.AdvancedTargetting,
+            SkillBonusType.SeniorPromotion,
+            SkillBonusType.TopPromotion
+        };
+
+        #endregion // Fields
+
         #region Properties
 
         /// <summary>
@@ -32,29 +60,10 @@ namespace HammerAndSickle.Models
         public string EffectDescription { get; }
 
         /// <summary>
-        /// Whether this bonus represents a boolean capability rather than a numeric value
+        /// Whether this bonus represents a boolean capability rather than a numeric value.
+        /// New boolean bonus types must be added to the BooleanBonusTypes set above.
         /// </summary>
-        public bool IsBoolean =>
-            BonusType == SkillBonusType.Breakthrough ||
-            BonusType == SkillBonusType.ShootAndScoot ||
-            BonusType == SkillBonusType.AirMobile ||
-            BonusType == SkillBonusType.AirMobileAssault ||
-            BonusType == SkillBonusType.AirMobileElite ||
-            BonusType == SkillBonusType.ImpromptuPlanning ||
-            BonusType == SkillBonusType.AirborneAssault ||
-            BonusType == SkillBonusType.AirborneElite ||
-            BonusType == SkillBonusType.BridgeBuilding ||
-            BonusType == SkillBonusType.FieldFortification ||
-            BonusType == SkillBonusType.AmbushTactics ||
-            BonusType == SkillBonusType.SignalDecryption ||
-            BonusType == SkillBonusType.SpaceAssets ||
-            BonusType == SkillBonusType.ElectronicWarfare ||
-            BonusType == SkillBonusType.PatternRecognition ||
-            BonusType == SkillBonusType.EmergencyResupply ||
-            BonusType == SkillBonusType.NVG ||
-            BonusType == SkillBonusType.AdvancedTargetting ||
-            BonusType == SkillBonusType.SeniorPromotion ||
-            BonusType == SkillBonusType.TopPromotion;
+        public bool IsBoolean => BooleanBonusTypes.Contains(BonusType);
 
         #endregion // Properties
 

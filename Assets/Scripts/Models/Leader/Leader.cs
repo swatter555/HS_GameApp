@@ -138,8 +138,10 @@ namespace HammerAndSickle.Models
                 IsAssigned = false;
                 UnitID = null;
 
-                // PrepareBattle skill tree with default reputation
-                skillTree = new LeaderSkillTree(0);
+                // Skill tree left null — RestoreFromDeserialization() will rebuild it
+                // from the deserialized SkillTreeData. All skill tree methods use null-conditional
+                // delegation (skillTree?.Method()) so null is safe here.
+                skillTree = null;
             }
             catch (Exception e)
             {
