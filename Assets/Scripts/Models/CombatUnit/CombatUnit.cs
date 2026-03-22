@@ -58,13 +58,13 @@ namespace HammerAndSickle.Models
         #region Properties
 
         // Identity
-        [JsonPropertyName("unitName")] public string UnitName { get; set; }
-        [JsonInclude] [JsonPropertyName("unitID")] public string UnitID { get; private set; }
+        [JsonPropertyName("unitName")]                     public string UnitName { get; set; }
+        [JsonInclude] [JsonPropertyName("unitID")]         public string UnitID { get; private set; }
         [JsonInclude] [JsonPropertyName("classification")] public UnitClassification Classification { get; private set; }
-        [JsonInclude] [JsonPropertyName("role")] public UnitRole Role { get; private set; }
-        [JsonInclude] [JsonPropertyName("side")] public Side Side { get; private set; }
-        [JsonInclude] [JsonPropertyName("nationality")] public Nationality Nationality { get; private set; }
-        [JsonIgnore] public bool IsBase => IsBaseType(Classification);
+        [JsonInclude] [JsonPropertyName("role")]           public UnitRole Role { get; private set; }
+        [JsonInclude] [JsonPropertyName("side")]           public Side Side { get; private set; }
+        [JsonInclude] [JsonPropertyName("nationality")]    public Nationality Nationality { get; private set; }
+        [JsonIgnore]                                       public bool IsBase => IsBaseType(Classification);
 
         [JsonInclude]
         [JsonPropertyName("regimentProfile")]
@@ -74,19 +74,19 @@ namespace HammerAndSickle.Models
         public EfficiencyLevel EfficiencyLevel { get; internal set; }
 
         // Actions
-        [JsonInclude] [JsonPropertyName("moveActions")] public StatsMaxCurrent MoveActions { get; private set; }
-        [JsonInclude] [JsonPropertyName("combatActions")] public StatsMaxCurrent CombatActions { get; private set; }
-        [JsonInclude] [JsonPropertyName("deploymentActions")] public StatsMaxCurrent DeploymentActions { get; private set; }
+        [JsonInclude] [JsonPropertyName("moveActions")]        public StatsMaxCurrent MoveActions { get; private set; }
+        [JsonInclude] [JsonPropertyName("combatActions")]      public StatsMaxCurrent CombatActions { get; private set; }
+        [JsonInclude] [JsonPropertyName("deploymentActions")]  public StatsMaxCurrent DeploymentActions { get; private set; }
         [JsonInclude] [JsonPropertyName("opportunityActions")] public StatsMaxCurrent OpportunityActions { get; private set; }
-        [JsonInclude] [JsonPropertyName("intelActions")] public StatsMaxCurrent IntelActions { get; private set; }
+        [JsonInclude] [JsonPropertyName("intelActions")]       public StatsMaxCurrent IntelActions { get; private set; }
 
         // State
-        [JsonInclude] [JsonPropertyName("hitPoints")] public StatsMaxCurrent HitPoints { get; private set; }
-        [JsonInclude] [JsonPropertyName("daysSupply")] public StatsMaxCurrent DaysSupply { get; private set; }
+        [JsonInclude] [JsonPropertyName("hitPoints")]      public StatsMaxCurrent HitPoints { get; private set; }
+        [JsonInclude] [JsonPropertyName("daysSupply")]     public StatsMaxCurrent DaysSupply { get; private set; }
         [JsonInclude] [JsonPropertyName("movementPoints")] public StatsMaxCurrent MovementPoints { get; private set; }
-        [JsonInclude] [JsonPropertyName("mapPos")] public Position2D MapPos { get; internal set; }
-        [JsonInclude] [JsonPropertyName("facing")] public HexDirection Facing { get; set; }
-        [JsonInclude] [JsonPropertyName("spottedLevel")] public SpottedLevel SpottedLevel { get; private set; }
+        [JsonInclude] [JsonPropertyName("mapPos")]         public Position2D MapPos { get; internal set; }
+        [JsonInclude] [JsonPropertyName("facing")]         public HexDirection Facing { get; set; }
+        [JsonInclude] [JsonPropertyName("spottedLevel")]   public SpottedLevel SpottedLevel { get; private set; }
         [JsonInclude] [JsonPropertyName("individualCombatModifier")] public float IndividualCombatModifier { get; private set; }
 
         // Leader
@@ -96,14 +96,14 @@ namespace HammerAndSickle.Models
             IsLeaderAssigned ? GameDataManager.Instance.GetLeader(LeaderID) : null;
 
         // Deployment
-        [JsonIgnore] public DeploymentPosition DeploymentPosition => _deploymentPosition;
+        [JsonIgnore]                                     public DeploymentPosition DeploymentPosition => _deploymentPosition;
         [JsonInclude] [JsonPropertyName("isEmbarkable")] public bool IsEmbarkable { get; private set; }
-        [JsonInclude] [JsonPropertyName("isMountable")] public bool IsMountable { get; private set; }
+        [JsonInclude] [JsonPropertyName("isMountable")]  public bool IsMountable { get; private set; }
         [JsonInclude] [JsonPropertyName("currentEmbarkmentState")] public EmbarkmentState CurrentEmbarkmentState { get; private set; } = EmbarkmentState.NotEmbarked;
 
         // Experience
         [JsonInclude] [JsonPropertyName("experiencePoints")] public int ExperiencePoints { get; internal set; }
-        [JsonInclude] [JsonPropertyName("experienceLevel")] public ExperienceLevel ExperienceLevel { get; internal set; }
+        [JsonInclude] [JsonPropertyName("experienceLevel")]  public ExperienceLevel ExperienceLevel { get; internal set; }
 
         // Facility - common
         [JsonInclude] [JsonPropertyName("attachedUnitIDs")]
@@ -112,17 +112,17 @@ namespace HammerAndSickle.Models
             get => _attachedUnitIDs.AsReadOnly();
             private set => _attachedUnitIDs = value?.ToList() ?? new List<string>();
         }
-        [JsonInclude] [JsonPropertyName("baseDamage")] public int BaseDamage { get; private set; }
+        [JsonInclude] [JsonPropertyName("baseDamage")]          public int BaseDamage { get; private set; }
         [JsonInclude] [JsonPropertyName("operationalCapacity")] public OperationalCapacity OperationalCapacity { get; private set; }
-        [JsonInclude] [JsonPropertyName("facilityType")] public FacilityType FacilityType { get; private set; }
+        [JsonInclude] [JsonPropertyName("facilityType")]        public FacilityType FacilityType { get; private set; }
 
         // Facility - supply depot
-        [JsonInclude] [JsonPropertyName("depotSize")] public DepotSize DepotSize { get; private set; }
-        [JsonInclude] [JsonPropertyName("stockpileInDays")] public float StockpileInDays { get; private set; }
-        [JsonInclude] [JsonPropertyName("generationRate")] public SupplyGenerationRate GenerationRate { get; private set; }
-        [JsonInclude] [JsonPropertyName("supplyProjection")] public SupplyProjection SupplyProjection { get; private set; }
+        [JsonInclude] [JsonPropertyName("depotSize")]         public DepotSize DepotSize { get; private set; }
+        [JsonInclude] [JsonPropertyName("stockpileInDays")]   public float StockpileInDays { get; private set; }
+        [JsonInclude] [JsonPropertyName("generationRate")]    public SupplyGenerationRate GenerationRate { get; private set; }
+        [JsonInclude] [JsonPropertyName("supplyProjection")]  public SupplyProjection SupplyProjection { get; private set; }
         [JsonInclude] [JsonPropertyName("supplyPenetration")] public bool SupplyPenetration { get; private set; }
-        [JsonInclude] [JsonPropertyName("depotCategory")] public DepotCategory DepotCategory { get; private set; }
+        [JsonInclude] [JsonPropertyName("depotCategory")]     public DepotCategory DepotCategory { get; private set; }
         [JsonIgnore] public int ProjectionRadius => IsBase ? GameData.ProjectionRangeValues[SupplyProjection] : 0;
         [JsonIgnore] public bool IsMainDepot => IsBase && DepotCategory == DepotCategory.Main;
 
@@ -130,6 +130,11 @@ namespace HammerAndSickle.Models
         [JsonIgnore] public IReadOnlyList<CombatUnit> AirUnitsAttached { get; private set; }
 
         // TODO: Add an event that fires on DeploymentPosition changes, to update icon picking.
+
+        // Range proxy properties from active weapon profile
+        [JsonIgnore] public float ActivePrimaryRange => GetActiveWeaponProfile()?.PrimaryRange ?? 0f;
+        [JsonIgnore] public float ActiveIndirectRange => GetActiveWeaponProfile()?.IndirectRange ?? 0f;
+        [JsonIgnore] public float ActiveSpottingRange => GetActiveWeaponProfile()?.SpottingRange ?? 0f;
 
         #endregion // Properties
 
