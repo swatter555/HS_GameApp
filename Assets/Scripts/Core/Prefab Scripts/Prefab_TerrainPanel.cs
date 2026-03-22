@@ -284,7 +284,7 @@ namespace HammerAndSickle.Core
         /// </summary>
         private string FormatBridgeBorders(JSONFeatureBorders regularBridges, JSONFeatureBorders damagedBridges, JSONFeatureBorders pontoonBridges)
         {
-            string GetBridgeStatus(bool regular, bool damaged, bool pontoon)
+            static string GetBridgeStatus(bool regular, bool damaged, bool pontoon)
             {
                 if (pontoon) return "T";  // Pontoon bridge is functioning
                 if (regular) return "T";  // Regular bridge is functioning

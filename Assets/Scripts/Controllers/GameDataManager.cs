@@ -99,6 +99,12 @@ namespace HammerAndSickle.Controllers
         // Data of the currently selected hex (null if none).
         public static HexTile SelectedHexData { get; set; } = null;
 
+        // Currently selected combat unit (null if no unit on selected hex).
+        public static CombatUnit SelectedUnit { get; set; } = null;
+
+        // Currently selected leader (null if selected unit has no leader).
+        public static Leader SelectedLeader { get; set; } = null;
+
         /// ----------------------
         /// Scenario related data
         /// ----------------------
@@ -373,6 +379,33 @@ namespace HammerAndSickle.Controllers
         public IReadOnlyCollection<Leader> GetLeadersByGrade(CommandGrade grade)
         {
             return GetLeaders(leader => leader.CommandGrade == grade);
+        }
+
+        /// <summary>
+        /// Gets the first combat unit located at the specified map position, or null if none.
+        /// </summary>
+        public CombatUnit GetUnitAtPosition(Position2D position)
+        {
+            try
+            {
+                return _combatUnits.Values.FirstOrDefault(u => u.MapPos == position);
+            }
+            catch (Exception e)
+            {
+                AppService.HandleException(CLASS_NAME, nameof(GetUnitAtPosition), e);
+                return null;
+            }
+        }
+
+        /// <summary>
+        /// Clears all selection state (hex, unit, leader).
+        /// </summary>
+        public static void ClearSelection()
+        {
+            SelectedHex = NoHexSelected;
+            SelectedHexData = null;
+            SelectedUnit = null;
+            SelectedLeader = null;
         }
 
         #endregion // Query Methods

@@ -361,8 +361,7 @@ namespace HammerAndSickle.Models
         /// <param name="value"></param>
         public void AddIntelReportStat(WeaponType type, int value)
         {
-            if (IntelReportStats == null)
-                IntelReportStats = new Dictionary<WeaponType, int>();
+            IntelReportStats ??= new Dictionary<WeaponType, int>();
             IntelReportStats[type] = value;
         }
 

@@ -368,11 +368,8 @@ namespace HammerAndSickle.Services
         {
             try
             {
-                // Reset hex selection to NoHexSelected
-                GameDataManager.SelectedHex = GameDataManager.NoHexSelected;
-
-                // Reset the selected hex data
-                GameDataManager.SelectedHexData = null;
+                // Clear all selection state (hex, unit, leader)
+                GameDataManager.ClearSelection();
 
                 // Invoke the event to notify subscribers
                 _onHexSelected?.Invoke(GameDataManager.NoHexSelected);
