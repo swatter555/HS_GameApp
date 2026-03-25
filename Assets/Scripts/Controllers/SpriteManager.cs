@@ -98,11 +98,15 @@ namespace HammerAndSickle.Controllers
 
         #region Rank Icons
 
-        public const string Colonel           = "Col";
-        public const string ColonelGeneral    = "ColGeneral";
-        public const string GeneralOfArmy     = "GenArmy";
-        public const string LieutenantGeneral = "LtGeneral";
-        public const string MajorGeneral      = "MjGeneral";
+        public const string Colonel             = "Col";
+        public const string ColonelGeneral      = "ColGeneral";
+        public const string GeneralOfArmy       = "GenArmy";
+        public const string LieutenantGeneral   = "LtGeneral";
+        public const string MajorGeneral        = "MjGeneral";
+        public const string Colonel_H           = "Colonel_H";           // Used for ldr panel
+        public const string MajorGeneral_H      = "MajorGeneral_H";      // Used for ldr panel
+        public const string LieutenantGeneral_H = "LieutenantGeneral_H"; // Used for ldr panel
+
 
         #endregion // Rank Icons
 
@@ -139,8 +143,6 @@ namespace HammerAndSickle.Controllers
         public const string CH_TP_Town      = "CH_Town";
 
         #endregion // Terrain Portraits
-
-        #endregion // Sprite Name Constants
 
         #region Soviet Unit Icons
 
@@ -856,6 +858,48 @@ namespace HammerAndSickle.Controllers
 
         #endregion // Utility Icons
 
+        #region Officer Portraits
+
+        public const string RussianPortrait01 = "Russian01";
+        public const string RussianPortrait02 = "Russian02";
+        public const string RussianPortrait03 = "Russian03";
+        public const string RussianPortrait04 = "Russian04";
+        public const string RussianPortrait05 = "Russian05";
+        public const string RussianPortrait06 = "Russian06";
+        public const string RussianPortrait07 = "Russian07";
+        public const string RussianPortrait08 = "Russian08";
+        public const string RussianPortrait09 = "Russian09";
+        public const string RussianPortrait10 = "Russian10";
+        public const string RussianPortrait11 = "Russian11";
+        public const string RussianPortrait12 = "Russian12";
+        public const string RussianPortrait13 = "Russian13";
+        public const string RussianPortrait14 = "Russian14";
+        public const string RussianPortrait15 = "Russian15";
+        public const string RussianPortrait16 = "Russian16";
+        public const string RussianPortrait17 = "Russian17";
+        public const string RussianPortrait18 = "Russian18";
+        public const string RussianPortrait19 = "Russian19";
+        public const string RussianPortrait20 = "Russian20";
+        public const string RussianPortrait21 = "Russian21";
+        public const string RussianPortrait22 = "Russian22";
+        public const string RussianPortrait23 = "Russian23";
+        public const string RussianPortrait24 = "Russian24";
+        public const string RussianPortrait25 = "Russian25";
+        public const string RussianPortrait26 = "Russian26";
+        public const string RussianPortrait27 = "Russian27";
+        public const string RussianPortrait28 = "Russian28";
+        public const string RussianPortrait29 = "Russian29";
+        public const string RussianPortrait30 = "Russian30";
+        public const string RussianPortrait31 = "Russian31";
+        public const string RussianPortrait32 = "Russian32";
+        public const string RussianPortrait33 = "Russian33";
+        public const string RussianPortrait34 = "Russian34";
+        public const string RussianPortrait35 = "Russian35";
+
+        #endregion // Officer Portraits
+
+        #endregion // Sprite Name Constants
+
         #region Singleton
 
         private static SpriteManager _instance;
@@ -904,6 +948,7 @@ namespace HammerAndSickle.Controllers
         [SerializeField] private SpriteAtlas _genericIconAtlas;
         [SerializeField] private SpriteAtlas _arabIconAtlas;
         [SerializeField] private SpriteAtlas _chineseIconAtlas;
+        [SerializeField] private SpriteAtlas _officerPortraitAtlas;
 
         [Header("Prefabs")]
         [SerializeField] private GameObject _cityPrefab;
@@ -1076,6 +1121,13 @@ namespace HammerAndSickle.Controllers
                 if (Instance._unitPrefabIconAtlas != null)
                 {
                     sprite = Instance._unitPrefabIconAtlas.GetSprite(spriteName);
+                    if (sprite != null) return sprite;
+                }
+
+                // Try officer portrait atlas
+                if (Instance._officerPortraitAtlas != null)
+                {
+                    sprite = Instance._officerPortraitAtlas.GetSprite(spriteName);
                     if (sprite != null) return sprite;
                 }
 

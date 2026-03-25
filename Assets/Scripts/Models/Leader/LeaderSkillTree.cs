@@ -806,6 +806,24 @@ namespace HammerAndSickle.Models
             }
         }
 
+        /// <summary>
+        /// Gets the count of unlocked skills at a specific tier
+        /// </summary>
+        /// <param name="tier">The tier to count</param>
+        /// <returns>Number of unlocked skills at that tier</returns>
+        public int GetUnlockedSkillCountByTier(SkillTier tier)
+        {
+            int count = 0;
+
+            ProcessUnlockedSkills(skillDef =>
+            {
+                if (skillDef.Tier == tier)
+                    count++;
+            });
+
+            return count;
+        }
+
         #endregion // Helper Methods
 
         #region Snapshot Support Methods

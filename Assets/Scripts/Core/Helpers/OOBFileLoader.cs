@@ -80,6 +80,7 @@ namespace HammerAndSickle.Helpers
         public int CommandGrade { get; set; }
         public int CommandAbility { get; set; }
         public int ReputationPoints { get; set; }
+        public string PortraitId { get; set; }
         public List<string> UnlockedSkills { get; set; } = new List<string>();
     }
 
@@ -453,15 +454,27 @@ namespace HammerAndSickle.Helpers
                     leader.SetCommandGrade(commandGrade);
                     leader.SetReputationPoints(ld.ReputationPoints);
 
-                    // Assign to unit
-                    leader.AssignToUnit(ld.UnitID);
+                    // Restore portrait from OOB data
+                    if (!string.IsNullOrEmpty(ld.PortraitId))
+                    {
+                        leader.SetPortraitId(ld.PortraitId);
+                    }
 
-                    // Register with GameDataManager
+                    // Register with GameDataManager first, then assign to unit via
+                    // GameDataManager.AssignLeaderToUnit to maintain bidirectional links
                     if (GameDataManager.Instance.RegisterLeader(leader))
                     {
-                        leaderCount++;
-                        if (_debug)
-                            Debug.Log($"{CLASS_NAME}.{nameof(LoadOobFile)}: Registered leader: {leader.Name} -> {targetUnit.UnitName}");
+                        if (GameDataManager.Instance.AssignLeaderToUnit(leader.LeaderID, ld.UnitID))
+                        {
+                            leaderCount++;
+                            if (_debug)
+                                Debug.Log($"{CLASS_NAME}.{nameof(LoadOobFile)}: Registered leader: {leader.Name} -> {targetUnit.UnitName}");
+                        }
+                        else
+                        {
+                            Debug.LogWarning($"{CLASS_NAME}.{nameof(LoadOobFile)}: Failed to assign leader '{ld.LeaderName}' to unit '{ld.UnitID}'");
+                            leaderWarnings++;
+                        }
                     }
                     else
                     {
