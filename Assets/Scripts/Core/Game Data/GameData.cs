@@ -1722,6 +1722,9 @@ namespace HammerAndSickle.Core.GameData
         public const string LEADER_ID_PREFIX = "LDR";
         public const int LEADER_ID_LENGTH = 8; // LDR + 5 random chars
 
+        // Numbers of portraits by nationality
+        public const int NUM_PORTRAITS_SOVIET = 35;
+
         // Leader validation bounds
         public const int MIN_REPUTATION = 0;
         public const int MAX_REPUTATION = 9999;

@@ -1,4 +1,5 @@
 using HammerAndSickle.Core.GameData;
+using HammerAndSickle.Core.UI;
 using HammerAndSickle.Models;
 using HammerAndSickle.Services;
 using System;
@@ -62,6 +63,11 @@ namespace HammerAndSickle.Controllers
         /// Fired when the player toggles air/ground stacking dominance at a hex position.
         /// </summary>
         public event Action<Position2D> OnStackingToggleRequested;
+
+        /// <summary>
+        /// Fired when a structured message should be displayed on the HQ printer.
+        /// </summary>
+        public event Action<PrinterMessage> OnPrinterMessage;
 
         #endregion // Events
 
@@ -157,6 +163,22 @@ namespace HammerAndSickle.Controllers
             }
         }
 
+        /// <summary>
+        /// Raises the printer message event.
+        /// </summary>
+        /// <param name="message">The structured message to print</param>
+        public void RaisePrinterMessage(PrinterMessage message)
+        {
+            try
+            {
+                OnPrinterMessage?.Invoke(message);
+            }
+            catch (Exception e)
+            {
+                AppService.HandleException(CLASS_NAME, nameof(RaisePrinterMessage), e);
+            }
+        }
+
         #endregion // Event Raising Methods
 
         #region Utility Methods
@@ -170,6 +192,7 @@ namespace HammerAndSickle.Controllers
             OnUnitHitPointsChanged = null;
             OnUnitDeploymentChanged = null;
             OnStackingToggleRequested = null;
+            OnPrinterMessage = null;
         }
 
         #endregion // Utility Methods

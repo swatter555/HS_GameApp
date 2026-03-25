@@ -95,6 +95,11 @@ namespace HammerAndSickle.Controllers
 
             if (_leaderPanelObject != null)
             {
+                if (!Prefab_LeaderPanel.Instance.Initialize())
+                {
+                    Debug.LogError("Failed to initialize Leader Panel.");
+                }
+
                 _leaderPanelObject.SetActive(false);
             }
             else Debug.LogWarning("Leader Panel Object is not assigned in the inspector.");
@@ -169,6 +174,9 @@ namespace HammerAndSickle.Controllers
                 return;
 
             _leaderPanelObject.SetActive(show);
+
+            if (show && Prefab_LeaderPanel.Instance != null)
+                Prefab_LeaderPanel.Instance.UpdateLeaderPanel();
         }
 
         /// <summary>

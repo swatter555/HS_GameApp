@@ -2810,6 +2810,7 @@ MonoBehaviour:
   _genericIconAtlas: {fileID: 4343727234628468602, guid: 2dd4bc4d154ac5545bfc2d59a397aa04, type: 2}
   _arabIconAtlas: {fileID: 4343727234628468602, guid: 9cf7530c863cb1f448b292a192cd8a1d, type: 2}
   _chineseIconAtlas: {fileID: 4343727234628468602, guid: e51e4198296b6b545877b15e0ccd9449, type: 2}
+  _officerPortraitAtlas: {fileID: 4343727234628468602, guid: 7e3e4700d7bd653409c10a32005a11ea, type: 2}
   _cityPrefab: {fileID: 6918065533927288165, guid: 57e28a5638f80ae4ba33829e7f1298af, type: 3}
   _mapIconPrefab: {fileID: 765304800649413729, guid: a9a0625cb1efddf47aa12e578cae460d, type: 3}
   _bridgeIconPrefab: {fileID: 5243574783591119677, guid: 91d431e0e0a058d449e59f8104db365b, type: 3}

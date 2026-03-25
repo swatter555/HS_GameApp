@@ -23,7 +23,7 @@ SpriteAtlas:
     platformSettings:
     - serializedVersion: 4
       m_BuildTarget: DefaultTexturePlatform
-      m_MaxTextureSize: 2048
+      m_MaxTextureSize: 4096
       m_ResizeAlgorithm: 0
       m_TextureFormat: -1
       m_TextureCompression: 2
@@ -39,7 +39,7 @@ SpriteAtlas:
       padding: 2
       blockOffset: 0
       allowAlphaSplitting: 0
-      enableRotation: 1
+      enableRotation: 0
       enableTightPacking: 0
       enableAlphaDilation: 0
     secondaryTextureSettings: {}
@@ -47,31 +47,43 @@ SpriteAtlas:
     packables:
     - {fileID: 21300000, guid: ca2d927e1255c484bab3d5ae068f5be4, type: 3}
     - {fileID: 21300000, guid: c97f316095b970241abfbb248fa43ad2, type: 3}
+    - {fileID: 21300000, guid: d66296a3551552c45865fbc1983d3f55, type: 3}
     - {fileID: 21300000, guid: adb236e7ca28d4c4f932fc728002b9c9, type: 3}
+    - {fileID: 21300000, guid: 78b8006002121684b93b5d58df3a8060, type: 3}
     - {fileID: 21300000, guid: f8a0bf62fe9831a45b5c36b525256736, type: 3}
+    - {fileID: 21300000, guid: ae602734bf4a1fd42b763577a739d998, type: 3}
     - {fileID: 21300000, guid: c350121af59c3ab47b6520371a5145b7, type: 3}
     - {fileID: 21300000, guid: f2164378c10347248869005c97e12826, type: 3}
     bindAsDefault: 1
     isAtlasV2: 0
     cachedData: {fileID: 0}
     packedSpriteRenderDataKeys:
+    - 78b8006002121684b93b5d58df3a8060: 21300000
     - c97f316095b970241abfbb248fa43ad2: 21300000
     - f8a0bf62fe9831a45b5c36b525256736: 21300000
+    - d66296a3551552c45865fbc1983d3f55: 21300000
+    - ae602734bf4a1fd42b763577a739d998: 21300000
     - adb236e7ca28d4c4f932fc728002b9c9: 21300000
     - f2164378c10347248869005c97e12826: 21300000
     - c350121af59c3ab47b6520371a5145b7: 21300000
     - ca2d927e1255c484bab3d5ae068f5be4: 21300000
   m_MasterAtlas: {fileID: 0}
   m_PackedSprites:
+  - {fileID: 21300000, guid: 78b8006002121684b93b5d58df3a8060, type: 3}
   - {fileID: 21300000, guid: c97f316095b970241abfbb248fa43ad2, type: 3}
   - {fileID: 21300000, guid: f8a0bf62fe9831a45b5c36b525256736, type: 3}
+  - {fileID: 21300000, guid: d66296a3551552c45865fbc1983d3f55, type: 3}
+  - {fileID: 21300000, guid: ae602734bf4a1fd42b763577a739d998, type: 3}
   - {fileID: 21300000, guid: adb236e7ca28d4c4f932fc728002b9c9, type: 3}
   - {fileID: 21300000, guid: f2164378c10347248869005c97e12826, type: 3}
   - {fileID: 21300000, guid: c350121af59c3ab47b6520371a5145b7, type: 3}
   - {fileID: 21300000, guid: ca2d927e1255c484bab3d5ae068f5be4, type: 3}
   m_PackedSpriteNamesToIndex:
+  - LeiutenantGeneral_H
   - ColGeneral
   - LtGeneral
+  - Colonel_H
+  - MajorGeneral_H
   - GenArmy
   - MjGeneral
   - Marshal

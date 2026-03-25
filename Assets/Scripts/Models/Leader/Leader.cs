@@ -49,6 +49,9 @@ namespace HammerAndSickle.Models
         [JsonInclude] [JsonPropertyName("unitID")]
         public string UnitID { get; internal set; }                          // UnitID of the unit assigned to the officer
 
+        [JsonInclude] [JsonPropertyName("portraitId")]
+        public string PortraitId { get; private set; }                       // Sprite constant for the officer's portrait
+
         [JsonInclude] [JsonPropertyName("skillTreeData")]
         public LeaderSkillTreeData SkillTreeData { get; private set; }
 
@@ -137,6 +140,7 @@ namespace HammerAndSickle.Models
                 ReputationPoints = 0;
                 IsAssigned = false;
                 UnitID = null;
+                PortraitId = string.Empty;
 
                 // Skill tree left null — RestoreFromDeserialization() will rebuild it
                 // from the deserialized SkillTreeData. All skill tree methods use null-conditional
@@ -167,6 +171,7 @@ namespace HammerAndSickle.Models
             ReputationPoints = 0;
             IsAssigned = false;
             UnitID = null;
+            PortraitId = string.Empty;
         }
 
         /// <summary>
@@ -251,9 +256,9 @@ namespace HammerAndSickle.Models
                 {
                     Nationality.USSR => CommandGrade switch
                     {
-                        CommandGrade.JuniorGrade => "Lieutenant Colonel",
-                        CommandGrade.SeniorGrade => "Colonel",
-                        CommandGrade.TopGrade => "Major General",
+                        CommandGrade.JuniorGrade => "Colonel",
+                        CommandGrade.SeniorGrade => "Mj. General",
+                        CommandGrade.TopGrade => "Lt. General",
                         _ => "Officer",
                     },
                     Nationality.USA or Nationality.UK or Nationality.IQ or Nationality.IR or Nationality.SAUD => CommandGrade switch
@@ -336,6 +341,23 @@ namespace HammerAndSickle.Models
             }
         }
 
+        /// <summary>
+        /// Set the portrait identifier for this leader
+        /// </summary>
+        /// <param name="portraitId">Sprite constant identifying the portrait</param>
+        public void SetPortraitId(string portraitId)
+        {
+            try
+            {
+                PortraitId = portraitId ?? string.Empty;
+            }
+            catch (Exception e)
+            {
+                AppService.HandleException(CLASS_NAME, "SetPortraitId", e);
+                throw;
+            }
+        }
+
         #endregion // Public Methods
 
         #region Helpers
@@ -369,6 +391,39 @@ namespace HammerAndSickle.Models
             catch (Exception e)
             {
                 AppService.HandleException(CLASS_NAME, "RandomlyGenerateMe", e);
+                throw;
+            }
+        }
+
+        /// <summary>
+        /// Creates a random low-tier Soviet general with a random name, portrait, lowest rank, no skills, and 60 reputation.
+        /// </summary>
+        /// <param name="nationality">Must be USSR; other nationalities are not yet supported.</param>
+        /// <returns>A new Leader configured as a junior-grade Soviet officer</returns>
+        public static Leader GenerateRandomJuniorLeader(Nationality nationality)
+        {
+            try
+            {
+                if (nationality != Nationality.USSR)
+                {
+                    throw new ArgumentException($"Nationality {nationality} is not supported. Only USSR is currently implemented.");
+                }
+
+                var leader = new Leader(Side.Player, nationality);
+
+                // Assign 60 starting reputation directly (bypasses skill tree sync since no skills are unlocked)
+                leader.SetReputationPoints(60);
+
+                // Assign a random portrait from the Soviet portrait pool
+                var random = new System.Random();
+                int portraitIndex = random.Next(1, GameData.NUM_PORTRAITS_SOVIET + 1);
+                leader.PortraitId = $"Russian{portraitIndex:D2}";
+
+                return leader;
+            }
+            catch (Exception e)
+            {
+                AppService.HandleException(CLASS_NAME, nameof(GenerateRandomJuniorLeader), e);
                 throw;
             }
         }
@@ -565,6 +620,91 @@ namespace HammerAndSickle.Models
         }
 
         #endregion // Skill Tree Interface
+
+        #region Skill Convenience Properties
+
+        // Leadership Foundation
+        [JsonIgnore] public float CommandTier1Bonus => GetBonusValue(SkillBonusType.CommandTier1);
+        [JsonIgnore] public float CommandTier2Bonus => GetBonusValue(SkillBonusType.CommandTier2);
+        [JsonIgnore] public float CommandTier3Bonus => GetBonusValue(SkillBonusType.CommandTier3);
+        [JsonIgnore] public bool HasSeniorPromotion => HasCapability(SkillBonusType.SeniorPromotion);
+        [JsonIgnore] public bool HasTopPromotion => HasCapability(SkillBonusType.TopPromotion);
+
+        // Politically Connected Foundation
+        [JsonIgnore] public bool HasEmergencyResupply => HasCapability(SkillBonusType.EmergencyResupply);
+        [JsonIgnore] public float SupplyConsumptionModifier => GetBonusValue(SkillBonusType.SupplyConsumption);
+        [JsonIgnore] public bool HasNVG => HasCapability(SkillBonusType.NVG);
+        [JsonIgnore] public float ReplacementXPBonus => GetBonusValue(SkillBonusType.ReplacementXP);
+        [JsonIgnore] public float PrestigeCostModifier => GetBonusValue(SkillBonusType.PrestigeCost);
+
+        // Armored Doctrine
+        [JsonIgnore] public float HardAttackBonus => GetBonusValue(SkillBonusType.HardAttack);
+        [JsonIgnore] public float HardDefenseBonus => GetBonusValue(SkillBonusType.HardDefense);
+        [JsonIgnore] public bool HasBreakthrough => HasCapability(SkillBonusType.Breakthrough);
+
+        // Infantry Doctrine
+        [JsonIgnore] public float SoftAttackBonus => GetBonusValue(SkillBonusType.SoftAttack);
+        [JsonIgnore] public float SoftDefenseBonus => GetBonusValue(SkillBonusType.SoftDefense);
+        [JsonIgnore] public float RTOModifier => GetBonusValue(SkillBonusType.RTO);
+
+        // Artillery Doctrine
+        [JsonIgnore] public float IndirectRangeBonus => GetBonusValue(SkillBonusType.IndirectRange);
+        [JsonIgnore] public bool HasShootAndScoot => HasCapability(SkillBonusType.ShootAndScoot);
+        [JsonIgnore] public bool HasAdvancedTargeting => HasCapability(SkillBonusType.AdvancedTargetting);
+
+        // Air Defense Doctrine
+        [JsonIgnore] public float AirAttackBonus => GetBonusValue(SkillBonusType.AirAttack);
+        [JsonIgnore] public float AirDefenseBonus => GetBonusValue(SkillBonusType.AirDefense);
+        [JsonIgnore] public float OpportunityActionBonus => GetBonusValue(SkillBonusType.OpportunityAction);
+
+        // Airborne Doctrine
+        [JsonIgnore] public bool HasImpromptuPlanning => HasCapability(SkillBonusType.ImpromptuPlanning);
+        [JsonIgnore] public bool HasAirborneAssault => HasCapability(SkillBonusType.AirborneAssault);
+        [JsonIgnore] public bool IsAirborneElite => HasCapability(SkillBonusType.AirborneElite);
+
+        // Air Mobile Doctrine
+        [JsonIgnore] public bool IsAirMobile => HasCapability(SkillBonusType.AirMobile);
+        [JsonIgnore] public bool HasAirMobileAssault => HasCapability(SkillBonusType.AirMobileAssault);
+        [JsonIgnore] public bool IsAirMobileElite => HasCapability(SkillBonusType.AirMobileElite);
+
+        // Intelligence Doctrine
+        [JsonIgnore] public float IntelActionBonus => GetBonusValue(SkillBonusType.ImprovedGathering);
+        [JsonIgnore] public float SilhouetteReduction => GetBonusValue(SkillBonusType.UndergroundBunker);
+        [JsonIgnore] public bool HasSpaceAssets => HasCapability(SkillBonusType.SpaceAssets);
+
+        // Combined Arms Specialization (SpottingRangeBonus also aggregates Signal Intel contributions)
+        [JsonIgnore] public float SpottingRangeBonus => GetBonusValue(SkillBonusType.SpottingRange);
+        [JsonIgnore] public float MovementActionBonus => GetBonusValue(SkillBonusType.MovementAction);
+        [JsonIgnore] public float CombatActionBonus => GetBonusValue(SkillBonusType.CombatAction);
+        [JsonIgnore] public float NightCombatModifier => GetBonusValue(SkillBonusType.NightCombat);
+
+        // Signal Intelligence Specialization
+        [JsonIgnore] public bool HasSignalDecryption => HasCapability(SkillBonusType.SignalDecryption);
+        [JsonIgnore] public bool HasElectronicWarfare => HasCapability(SkillBonusType.ElectronicWarfare);
+        [JsonIgnore] public bool HasPatternRecognition => HasCapability(SkillBonusType.PatternRecognition);
+
+        // Engineering Specialization
+        [JsonIgnore] public float RiverCrossingModifier => GetBonusValue(SkillBonusType.RiverCrossing);
+        [JsonIgnore] public float RiverAssaultModifier => GetBonusValue(SkillBonusType.RiverAssault);
+        [JsonIgnore] public bool CanBuildBridges => HasCapability(SkillBonusType.BridgeBuilding);
+        [JsonIgnore] public bool CanBuildFortifications => HasCapability(SkillBonusType.FieldFortification);
+
+        // Special Forces Specialization
+        [JsonIgnore] public float TerrainMasteryModifier => GetBonusValue(SkillBonusType.TerrainMastery);
+        [JsonIgnore] public float InfiltrationModifier => GetBonusValue(SkillBonusType.InfiltrationMovement);
+        [JsonIgnore] public float ConcealedPositionsReduction => GetBonusValue(SkillBonusType.ConcealedPositions);
+        [JsonIgnore] public bool HasAmbushTactics => HasCapability(SkillBonusType.AmbushTactics);
+
+        // Tier counts
+        /// <summary>
+        /// Gets the count of unlocked skills at the specified tier
+        /// </summary>
+        public int GetUnlockedSkillCountByTier(SkillTier tier)
+        {
+            return skillTree?.GetUnlockedSkillCountByTier(tier) ?? 0;
+        }
+
+        #endregion // Skill Convenience Properties
 
         #region Unit Assignment
 

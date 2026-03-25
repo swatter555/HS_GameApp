@@ -35,6 +35,12 @@ namespace HammerAndSickle.Models
 
         #endregion // Assignment State
 
+        #region Portrait
+
+        public string PortraitId;
+
+        #endregion // Portrait
+
         #region Skill System
 
         public LeaderSkillTreeData SkillTreeData;
@@ -58,6 +64,7 @@ namespace HammerAndSickle.Models
             CombatCommand = CommandAbility.Average;
             IsAssigned = false;
             UnitID = null;
+            PortraitId = string.Empty;
             SkillTreeData = new LeaderSkillTreeData();
         }
 
@@ -128,7 +135,8 @@ namespace HammerAndSickle.Models
                     ReputationPoints = leader.ReputationPoints,
                     CombatCommand = leader.CombatCommand,
                     IsAssigned = leader.IsAssigned,
-                    UnitID = leader.UnitID
+                    UnitID = leader.UnitID,
+                    PortraitId = leader.PortraitId ?? string.Empty
                 };
 
                 // Get skill tree snapshot - will need to implement this in LeaderSkillTree
@@ -176,6 +184,9 @@ namespace HammerAndSickle.Models
                 leader.SetLeaderID(data.LeaderID);
                 leader.SetCommandGrade(data.CommandGrade);
                 leader.SetReputationPoints(data.ReputationPoints);
+
+                // Restore portrait
+                leader.SetPortraitId(data.PortraitId);
 
                 // Restore assignment state
                 if (data.IsAssigned && !string.IsNullOrWhiteSpace(data.UnitID))
