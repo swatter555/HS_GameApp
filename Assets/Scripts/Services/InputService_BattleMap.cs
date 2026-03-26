@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using HammerAndSickle.Core.UI;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
@@ -662,6 +663,11 @@ namespace HammerAndSickle.Services
 
                 Vector2 mousePosition = cachedMouse.position.ReadValue();
                 LastLeftClickPosition = mousePosition;
+
+                // Block click if over a UI panel
+                if (ClickThroughController.Instance != null
+                    && ClickThroughController.Instance.IsScreenPointOverUI(mousePosition))
+                    return;
 
                 // Check for double-click
                 float currentTime = Time.time;

@@ -1,4 +1,5 @@
 using HammerAndSickle.Core;
+using HammerAndSickle.Core.UI;
 using HammerAndSickle.Services;
 using UnityEngine;
 
@@ -27,6 +28,12 @@ namespace HammerAndSickle.Controllers
         private GameObject _leaderPanelObject;
 
         #endregion // Inspector Fields
+
+        #region Fields
+
+        private string _lastSelectedUnitID;
+
+        #endregion // Fields
 
         #region Unity Lifecycle
 
@@ -58,6 +65,19 @@ namespace HammerAndSickle.Controllers
             // Unit panel shown only when a unit occupies the selected hex
             bool hasUnit = GameDataManager.SelectedUnit != null;
             UpdateUnitPanel(hasUnit);
+
+            // Send unit report to printer when selection changes to a new unit
+            string currentUnitID = GameDataManager.SelectedUnit?.UnitID;
+            if (hasUnit && currentUnitID != _lastSelectedUnitID)
+            {
+                _lastSelectedUnitID = currentUnitID;
+                EventManager.Instance.RaisePrinterMessage(
+                    PrinterMessage.CreateUnitReport(GameDataManager.SelectedUnit, string.Empty));
+            }
+            else if (!hasUnit)
+            {
+                _lastSelectedUnitID = null;
+            }
 
             // Leader panel shown only when the selected unit has an assigned leader
             bool hasLeader = GameDataManager.SelectedLeader != null;
