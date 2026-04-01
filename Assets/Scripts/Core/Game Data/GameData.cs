@@ -1203,9 +1203,9 @@ namespace HammerAndSickle.Core.GameData
     /// </summary>
     public enum DifficultyLevel
     {
-        Major,
         Colonel,
-        General
+        MjGeneral,
+        LtGeneral
     }
 
     #endregion // Campaign and Scenario Enums

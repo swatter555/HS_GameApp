@@ -103,10 +103,6 @@ namespace HammerAndSickle.Controllers
         public const string GeneralOfArmy       = "GenArmy";
         public const string LieutenantGeneral   = "LtGeneral";
         public const string MajorGeneral        = "MjGeneral";
-        public const string Colonel_H           = "Colonel_H";           // Used for ldr panel
-        public const string MajorGeneral_H      = "MajorGeneral_H";      // Used for ldr panel
-        public const string LieutenantGeneral_H = "LieutenantGeneral_H"; // Used for ldr panel
-
 
         #endregion // Rank Icons
 
@@ -119,7 +115,7 @@ namespace HammerAndSickle.Controllers
         public const string ME_TP_Clear     = "ME_Clear";
         public const string ME_TP_Forest    = "ME_Forest";
         public const string ME_TP_Marsh     = "ME_Marsh";
-        public const string ME_TP_Mountains = "ME_Mountains";
+        public const string ME_TP_Mountains = "ME_Mountain";
         public const string ME_TP_Rough     = "ME_Rough";
         public const string ME_TP_City      = "ME_City";
         public const string ME_TP_Town      = "ME_Town";
@@ -128,7 +124,7 @@ namespace HammerAndSickle.Controllers
         public const string EU_TP_Clear     = "EU_Clear";
         public const string EU_TP_Forest    = "EU_Forest";
         public const string EU_TP_Marsh     = "EU_Marsh";
-        public const string EU_TP_Mountains = "EU_Mountains";
+        public const string EU_TP_Mountains = "EU_Mountain";
         public const string EU_TP_Rough     = "EU_Rough";
         public const string EU_TP_City      = "EU_City";
         public const string EU_TP_Town      = "EU_Town";
@@ -137,7 +133,7 @@ namespace HammerAndSickle.Controllers
         public const string CH_TP_Clear     = "CH_Clear";
         public const string CH_TP_Forest    = "CH_Forest";
         public const string CH_TP_Marsh     = "CH_Marsh";
-        public const string CH_TP_Mountains = "CH_Mountains";
+        public const string CH_TP_Mountains = "CH_Mountain";
         public const string CH_TP_Rough     = "CH_Rough";
         public const string CH_TP_City      = "CH_City";
         public const string CH_TP_Town      = "CH_Town";

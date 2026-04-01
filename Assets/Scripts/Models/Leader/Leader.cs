@@ -257,8 +257,8 @@ namespace HammerAndSickle.Models
                     Nationality.USSR => CommandGrade switch
                     {
                         CommandGrade.JuniorGrade => "Colonel",
-                        CommandGrade.SeniorGrade => "Mj. General",
-                        CommandGrade.TopGrade => "Lt. General",
+                        CommandGrade.SeniorGrade => "Major General",
+                        CommandGrade.TopGrade => "Lieutenant General",
                         _ => "Officer",
                     },
                     Nationality.USA or Nationality.UK or Nationality.IQ or Nationality.IR or Nationality.SAUD => CommandGrade switch
