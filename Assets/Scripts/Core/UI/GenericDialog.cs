@@ -148,6 +148,24 @@ namespace HammerAndSickle.Core.UI
             return _selectedIndex;
         }
 
+        /// <summary>
+        /// Programmatically selects a row by index, updating visuals, input field, and firing OnSelectionChanged.
+        /// </summary>
+        public void SelectIndex(int index)
+        {
+            try
+            {
+                if (index < 0 || index >= _listItems.Count)
+                    return;
+
+                OnRowClicked(index);
+            }
+            catch (System.Exception e)
+            {
+                AppService.HandleException(CLASS_NAME, "SelectIndex", e);
+            }
+        }
+
         #endregion // Public Methods
 
         #region Private Methods

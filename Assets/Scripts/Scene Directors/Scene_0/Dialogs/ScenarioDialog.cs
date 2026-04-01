@@ -20,9 +20,7 @@ namespace HammerAndSickle.Core.UI
         [SerializeField] private TMP_Text _briefingText;
         [SerializeField] private Sprite   _placeholderThumbnail;
         [SerializeField] private Image    _thumbnailImage;
-        [SerializeField] private Button   _loadButton;
-        [SerializeField] private Button   _difficultyButton;
-        [SerializeField] private Button   _exitButton;
+        [SerializeField] private TMP_Text _difficultyText;
 
         #endregion // Serialized Fields
 
@@ -55,22 +53,10 @@ namespace HammerAndSickle.Core.UI
             set => _thumbnailImage = value;
         }
 
-        public Button LoadButton
+        public TMP_Text DifficultyText
         {
-            get => _loadButton;
-            set => _loadButton = value;
-        }
-
-        public Button DifficultyButton
-        {
-            get => _difficultyButton;
-            set => _difficultyButton = value;
-        }
-
-        public Button ExitButton
-        {
-            get => _exitButton;
-            set => _exitButton = value;
+            get => _difficultyText;
+            set => _difficultyText = value;
         }
 
         #endregion // Properties
@@ -85,9 +71,7 @@ namespace HammerAndSickle.Core.UI
                 if (_briefingText == null ||
                     _placeholderThumbnail == null ||
                     _thumbnailImage == null ||
-                    _loadButton == null ||
-                    _difficultyButton == null ||
-                    _exitButton == null)
+                    _difficultyText == null)
                 {
                     throw new System.Exception($"{CLASS_NAME} controls invalid");
                 }
@@ -99,7 +83,7 @@ namespace HammerAndSickle.Core.UI
             }
         }
 
-        #endregion
+        #endregion // Unity Lifecycle
 
         #region Selection Handling
 
