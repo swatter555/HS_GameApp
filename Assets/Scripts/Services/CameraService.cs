@@ -1,5 +1,4 @@
 using System;
-using HammerAndSickle.Core.UI;
 using UnityEngine;
 
 namespace HammerAndSickle.Services
@@ -319,7 +318,6 @@ namespace HammerAndSickle.Services
             try
             {
                 if (controlledCamera == null) return;
-                if (ClickThroughController.Instance != null && ClickThroughController.Instance.IsMouseOverPrinter()) return;
 
                 // Adjust orthographic size (negative delta = zoom in, positive = zoom out)
                 // No Time.deltaTime needed - fires every frame already at consistent rate

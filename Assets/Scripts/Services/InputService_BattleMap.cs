@@ -1,6 +1,6 @@
 using System;
 using System.Collections.Generic;
-using HammerAndSickle.Core.UI;
+using HammerAndSickle.SceneManagement;
 using UnityEngine;
 using UnityEngine.InputSystem;
 
@@ -287,7 +287,7 @@ namespace HammerAndSickle.Services
         // Input state tracking
         private float lastZoomValue;
         private float nextSubscriberValidationTime;
-        private bool inputEnabled = true;
+        private bool inputEnabled = false;
 
         // Double-click tracking
         private float lastLeftClickTime;
@@ -532,15 +532,8 @@ namespace HammerAndSickle.Services
                 if (rightMouseAction == null)
                     Debug.LogWarning($"{CLASS_NAME}: Right Mouse Action is not assigned.");
 
-                // Enable all input actions
-                mapScrollAction?.Enable();
-                mapZoomAction?.Enable();
-                mouseWheelZoomAction?.Enable();
-                resetZoomAction?.Enable();
-                leftMouseAction?.Enable();
-                rightMouseAction?.Enable();
-
-                // Subscribe to input events
+                // Subscribe to input events (actions start disabled;
+                // SetInputEnabled(true) will enable them when the HUD gains focus)
                 SubscribeToInputEvents();
 
                 IsInitialized = true;
@@ -664,9 +657,10 @@ namespace HammerAndSickle.Services
                 Vector2 mousePosition = cachedMouse.position.ReadValue();
                 LastLeftClickPosition = mousePosition;
 
-                // Block click if over a UI panel
-                if (ClickThroughController.Instance != null
-                    && ClickThroughController.Instance.IsScreenPointOverUI(mousePosition))
+                // Block click if over a HUD panel (terrain, unit, leader, printer, etc.)
+                // Click-through detection lives on DefaultDialog_Scene1, which owns the HUD panel references
+                if (DefaultDialog_Scene1.Instance != null
+                    && DefaultDialog_Scene1.Instance.IsScreenPointOverUI(mousePosition))
                     return;
 
                 // Check for double-click
