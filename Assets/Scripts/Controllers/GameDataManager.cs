@@ -110,6 +110,18 @@ namespace HammerAndSickle.Controllers
         /// ----------------------
         public static ScenarioManifest CurrentManifest { get; set; } = null;
 
+        // Cached scenario manifests loaded from disk. Persists across ClearAll() since
+        // manifests are static metadata, not game state. Populated once by ScenarioDialog_Scene0.
+        public static IReadOnlyList<ScenarioManifest> LoadedManifests => _loadedManifests;
+        private static readonly List<ScenarioManifest> _loadedManifests = new();
+
+        public static void SetLoadedManifests(List<ScenarioManifest> manifests)
+        {
+            _loadedManifests.Clear();
+            if (manifests != null)
+                _loadedManifests.AddRange(manifests);
+        }
+
         #endregion // Properties
 
         #region Unity Lifecycle

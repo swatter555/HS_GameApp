@@ -32,7 +32,7 @@ namespace HammerAndSickle.Core.UI
         #region Private Fields
 
         private Button _button;
-        private bool _isHovering = false;
+        //private bool _isHovering = false;
 
         #endregion // Private Fields
 
@@ -55,11 +55,11 @@ namespace HammerAndSickle.Core.UI
         /// </summary>
         public void OnPointerEnter(PointerEventData eventData)
         {
-            if (!_isHovering && ShouldPlayHoverSound())
-            {
-                _isHovering = true;
-                PlayHoverSound();
-            }
+            //if (!_isHovering && ShouldPlayHoverSound())
+            //{
+            //    _isHovering = true;
+            //    PlayHoverSound();
+            //}
         }
 
         /// <summary>
@@ -67,7 +67,7 @@ namespace HammerAndSickle.Core.UI
         /// </summary>
         public void OnPointerExit(PointerEventData eventData)
         {
-            _isHovering = false;
+            //_isHovering = false;
         }
 
         /// <summary>

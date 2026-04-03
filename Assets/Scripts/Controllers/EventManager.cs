@@ -41,7 +41,7 @@ namespace HammerAndSickle.Controllers
 
         #endregion // Singleton
 
-        #region Events
+        #region Battle Scene Events
 
         /// <summary>
         /// Fired when all map icons need to be redrawn.
@@ -69,7 +69,23 @@ namespace HammerAndSickle.Controllers
         /// </summary>
         public event Action<PrinterMessage> OnPrinterMessage;
 
-        #endregion // Events
+        #endregion // Battle Scene Events
+
+        #region Dialog Events
+
+        /// <summary>
+        /// Fired when a dialog change is requested in Scene 0 (Main Menu).
+        /// The UIPanel parameter is the target dialog to show.
+        /// </summary>
+        public event Action<UIPanel> OnScene0DialogRequested;
+
+        /// <summary>
+        /// Fired when a dialog change is requested in Scene 1 (Battle).
+        /// The UIPanel parameter is the target dialog to show.
+        /// </summary>
+        public event Action<UIPanel> OnScene1DialogRequested;
+
+        #endregion // Dialog Events
 
         #region Unity Lifecycle
 
@@ -179,6 +195,42 @@ namespace HammerAndSickle.Controllers
             }
         }
 
+        #region Dialog Event Raising Methods
+
+        /// <summary>
+        /// Raises a Scene 0 dialog change request.
+        /// </summary>
+        /// <param name="dialog">The target dialog panel to show</param>
+        public void RaiseScene0DialogRequested(UIPanel dialog)
+        {
+            try
+            {
+                OnScene0DialogRequested?.Invoke(dialog);
+            }
+            catch (Exception e)
+            {
+                AppService.HandleException(CLASS_NAME, nameof(RaiseScene0DialogRequested), e);
+            }
+        }
+
+        /// <summary>
+        /// Raises a Scene 1 dialog change request.
+        /// </summary>
+        /// <param name="dialog">The target dialog panel to show</param>
+        public void RaiseScene1DialogRequested(UIPanel dialog)
+        {
+            try
+            {
+                OnScene1DialogRequested?.Invoke(dialog);
+            }
+            catch (Exception e)
+            {
+                AppService.HandleException(CLASS_NAME, nameof(RaiseScene1DialogRequested), e);
+            }
+        }
+
+        #endregion // Dialog Event Raising Methods
+
         #endregion // Event Raising Methods
 
         #region Utility Methods
@@ -193,6 +245,8 @@ namespace HammerAndSickle.Controllers
             OnUnitDeploymentChanged = null;
             OnStackingToggleRequested = null;
             OnPrinterMessage = null;
+            OnScene0DialogRequested = null;
+            OnScene1DialogRequested = null;
         }
 
         #endregion // Utility Methods
