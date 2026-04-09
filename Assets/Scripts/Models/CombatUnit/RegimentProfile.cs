@@ -248,6 +248,76 @@ namespace HammerAndSickle.Models
          * Important notes:
          * WeaponProfile acts as both a repository of ratings for the RegimentProfile, but
          * also as repository of data for intel reports.
+         *
+         * =====================================================================
+         * RATING DEFINITIONS (authoritative, per design 2026-04)
+         * =====================================================================
+         * HardAttack (HA)
+         *     The ability and effectiveness to deliver high-caliber ballistic
+         *     or ATGM anti-tank rounds.
+         *
+         * HardDefense (HD)
+         *     The ability to survive incoming HardAttack fire.
+         *
+         * SoftAttack (SA)
+         *     The ability to kill soft targets across environments.
+         *
+         * SoftDefense (SD)
+         *     The ability to withstand weapons typically associated with
+         *     infantry, including their organic anti-tank capability.
+         *
+         * GroundAirAttack (GAT)
+         *     The ability to deliver anti-air capability at long range.
+         *     Think dedicated SAM batteries meant to control large amounts of
+         *     airspace and interdict air operations in an area. This is the
+         *     INTERDICTION stat — it reaches beyond the owning hex.
+         *
+         * GroundAirDefense (GAD)
+         *     The inherent capability of a ground unit to defend the hex it is
+         *     in from air attack and inflict losses. Strictly local: GAD never
+         *     counts outside the hex the ground unit occupies. Defensive only,
+         *     non-interdiction.
+         *
+         * Dogfighting (DF)
+         *     The ability to shoot down enemy aircraft effectively. Includes
+         *     radar targeting effectiveness and the lethality of onboard guns
+         *     and missiles.
+         *
+         * Maneuverability (MAN)
+         *     Raw agility of the aircraft — used to avoid damage and to get
+         *     into a position to win a dogfight.
+         *
+         * TopSpeed (TS)
+         *     The ability to intercept and to escape enemy aircraft.
+         *
+         * Survivability (SUR)
+         *     The aircraft's ability to take physical damage, and also its
+         *     electronic defense capabilities. An AWACS has relatively high
+         *     Survivability because of electronic defenses; an A-10 has high
+         *     Survivability strictly because of armor. Both are valid.
+         *
+         * GroundAttack (GA)
+         *     The ability of an aircraft to damage ground units.
+         *
+         * OrdnanceLoad (OL)
+         *     How many bombs and missiles the aircraft carries. Works as a
+         *     MULTIPLIER on Ground Attack effect (more payload = more damage
+         *     per sortie).
+         *
+         * Stealth (STL)
+         *     The ability to avoid interception entirely. Stealth bypasses
+         *     (or reduces) both GroundAirAttack AND GroundAirDefense.
+         *
+         * =====================================================================
+         * NOTES ON SPECIAL CASES
+         * =====================================================================
+         * - Rocket artillery (ROC_*) carry the DoubleFire capability. They are
+         *   the ultimate form of artillery — two indirect volleys per action.
+         * - Helicopters are statted on the ground axis (HA/HD/SA/SD). They do
+         *   not use DF/MAN/TS/SUR/GA/OL.
+         * - Pure SAM systems (HA 1 / SA 1) are air-only and cannot meaningfully
+         *   engage ground targets.
+         * =====================================================================
          */
 
         #region Properties
