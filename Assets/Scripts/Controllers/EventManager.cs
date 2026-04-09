@@ -69,6 +69,25 @@ namespace HammerAndSickle.Controllers
         /// </summary>
         public event Action<PrinterMessage> OnPrinterMessage;
 
+        /// <summary>
+        /// Fired whenever the BattleManager transitions into a new BattlePhase.
+        /// Carries the new phase. Subscribers can react to phase entry (e.g. UI gating, audio cues).
+        /// </summary>
+        public event Action<BattlePhase> OnBattlePhaseChanged;
+
+        /// <summary>
+        /// Fired whenever the BattleManager advances the turn counter.
+        /// Carries the new (current) turn number. Turn 0 is the deployment phase, Turn 1+ are played turns.
+        /// </summary>
+        public event Action<int> OnBattleTurnAdvanced;
+
+        /// <summary>
+        /// Fired exactly once when the battle ends, either via reaching the final turn,
+        /// an immediate victory (all objectives held), or other terminal condition.
+        /// Carries the final BattleResult.
+        /// </summary>
+        public event Action<BattleResult> OnBattleEnded;
+
         #endregion // Battle Scene Events
 
         #region Dialog Events
@@ -195,6 +214,54 @@ namespace HammerAndSickle.Controllers
             }
         }
 
+        /// <summary>
+        /// Raises the battle phase changed event.
+        /// </summary>
+        /// <param name="newPhase">The phase the BattleManager has just entered</param>
+        public void RaiseBattlePhaseChanged(BattlePhase newPhase)
+        {
+            try
+            {
+                OnBattlePhaseChanged?.Invoke(newPhase);
+            }
+            catch (Exception e)
+            {
+                AppService.HandleException(CLASS_NAME, nameof(RaiseBattlePhaseChanged), e);
+            }
+        }
+
+        /// <summary>
+        /// Raises the battle turn advanced event.
+        /// </summary>
+        /// <param name="newTurn">The new (current) turn number after the advance</param>
+        public void RaiseBattleTurnAdvanced(int newTurn)
+        {
+            try
+            {
+                OnBattleTurnAdvanced?.Invoke(newTurn);
+            }
+            catch (Exception e)
+            {
+                AppService.HandleException(CLASS_NAME, nameof(RaiseBattleTurnAdvanced), e);
+            }
+        }
+
+        /// <summary>
+        /// Raises the battle ended event.
+        /// </summary>
+        /// <param name="finalResult">The final BattleResult that ended the scenario</param>
+        public void RaiseBattleEnded(BattleResult finalResult)
+        {
+            try
+            {
+                OnBattleEnded?.Invoke(finalResult);
+            }
+            catch (Exception e)
+            {
+                AppService.HandleException(CLASS_NAME, nameof(RaiseBattleEnded), e);
+            }
+        }
+
         #region Dialog Event Raising Methods
 
         /// <summary>
@@ -245,6 +312,9 @@ namespace HammerAndSickle.Controllers
             OnUnitDeploymentChanged = null;
             OnStackingToggleRequested = null;
             OnPrinterMessage = null;
+            OnBattlePhaseChanged = null;
+            OnBattleTurnAdvanced = null;
+            OnBattleEnded = null;
             OnScene0DialogRequested = null;
             OnScene1DialogRequested = null;
         }

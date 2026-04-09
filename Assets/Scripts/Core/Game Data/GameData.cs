@@ -1180,7 +1180,9 @@ namespace HammerAndSickle.Core.GameData
         PlayerTurn = 1,
         AITurn = 2,
         EndTurnProcessing = 3,
-        BattleComplete = 4
+        BattleComplete = 4,
+        Deployment = 5,
+        AdminPhase = 6
     }
 
     /// <summary>
@@ -1435,7 +1437,6 @@ namespace HammerAndSickle.Core.GameData
         public const string SCENARIO_ID_CAMPAIGN_KHOST = "Campaign_Khost";
 
         #endregion // Scenario ID Constants
-
 
         #region General Constants
 
