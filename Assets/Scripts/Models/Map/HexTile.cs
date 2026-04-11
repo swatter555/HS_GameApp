@@ -623,7 +623,7 @@ namespace HammerAndSickle.Models.Map
             catch (Exception ex)
             {
                 AppService.HandleException(CLASS_NAME, nameof(UpdateMovementCost), ex);
-                MovementCost = (int)HexMovementCost.Plains; // Safe default
+                MovementCost = (int)HexMovementCost.Clear; // Safe default
             }
         }
 
@@ -637,7 +637,7 @@ namespace HammerAndSickle.Models.Map
             return terrain switch
             {
                 TerrainType.Water => (int)HexMovementCost.Water,
-                TerrainType.Clear => (int)HexMovementCost.Plains,
+                TerrainType.Clear => (int)HexMovementCost.Clear,
                 TerrainType.Forest => (int)HexMovementCost.Forest,
                 TerrainType.Rough => (int)HexMovementCost.Rough,
                 TerrainType.Marsh => (int)HexMovementCost.Marsh,
@@ -645,7 +645,7 @@ namespace HammerAndSickle.Models.Map
                 TerrainType.MinorCity => (int)HexMovementCost.MinorCity,
                 TerrainType.MajorCity => (int)HexMovementCost.MajorCity,
                 TerrainType.Impassable => (int)HexMovementCost.Impassable,
-                _ => (int)HexMovementCost.Plains
+                _ => (int)HexMovementCost.Clear
             };
         }
 

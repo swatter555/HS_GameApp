@@ -1282,7 +1282,7 @@ namespace HammerAndSickle.Core.GameData
     {
         Impassable = 0,
         Water = 1,
-        Plains = 1,
+        Clear = 1,
         Forest = 2,
         Rough = 3,
         Marsh = 4,
@@ -1941,6 +1941,7 @@ namespace HammerAndSickle.Core.GameData
         public const float PixelScaleX = 1;
         public const float PixelScaleY = 1;
         public const int SpritePPU = 256;
+        public const float MapPPU = 100f;  // Background map sprite pixels-per-unit
 
         // Hex grid size constants.
         public const int SmallHexWidth = 32;

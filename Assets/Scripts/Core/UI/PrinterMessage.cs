@@ -91,11 +91,35 @@ namespace HammerAndSickle.Core.UI
         }
 
         /// <summary>
-        /// Creates a movement report for the HQ printer. Stub for future implementation.
+        /// Creates a movement report for the HQ printer.
         /// </summary>
         public static PrinterMessage CreateMovementReport(string[] details, string timestamp)
         {
-            return new PrinterMessage( details, timestamp);
+            return new PrinterMessage(details, timestamp);
+        }
+
+        /// <summary>
+        /// Creates a "new contact" printer message when an enemy is first spotted.
+        /// </summary>
+        public static PrinterMessage CreateNewContactReport(string unitName, string timestamp)
+        {
+            return new PrinterMessage(new[] { $"NEW CONTACT: {unitName}" }, timestamp);
+        }
+
+        /// <summary>
+        /// Creates an ambush notification for the printer.
+        /// </summary>
+        public static PrinterMessage CreateAmbushReport(string ambusherName, string victimName, string timestamp)
+        {
+            return new PrinterMessage(new[] { $"AMBUSH! {ambusherName} attacks {victimName}" }, timestamp);
+        }
+
+        /// <summary>
+        /// Creates an air ambush detection notification for the printer.
+        /// </summary>
+        public static PrinterMessage CreateAirThreatDetectedReport(string timestamp)
+        {
+            return new PrinterMessage(new[] { "Threat detected — mission continues" }, timestamp);
         }
 
         /// <summary>

@@ -1,4 +1,6 @@
 using System;
+using HammerAndSickle.Core;
+using HammerAndSickle.Models;
 using UnityEngine;
 
 namespace HammerAndSickle.Services
@@ -375,6 +377,33 @@ namespace HammerAndSickle.Services
         }
 
         #endregion // Event Handlers
+
+        #region Public Methods
+
+        /// <summary>
+        /// Centers the camera on the world position corresponding to a hex coordinate.
+        /// </summary>
+        public void CenterOnPosition(Position2D hexPos)
+        {
+            try
+            {
+                if (controlledCamera == null) return;
+
+                Vector3 worldPos = HexGridSystem.Instance.HexToWorld(hexPos);
+                controlledCamera.transform.position = new Vector3(worldPos.x, worldPos.y, controlledCamera.transform.position.z);
+
+                SyncOverlayCamera();
+                UpdateCameraPositionInInputService();
+
+                if (debugLog) Debug.Log($"{CLASS_NAME}: Centered on hex ({hexPos.IntX}, {hexPos.IntY})");
+            }
+            catch (Exception e)
+            {
+                AppService.HandleException(CLASS_NAME, nameof(CenterOnPosition), e);
+            }
+        }
+
+        #endregion // Public Methods
 
         #region Camera Synchronization
 

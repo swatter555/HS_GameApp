@@ -1,4 +1,5 @@
 using HammerAndSickle.Controllers;
+using HammerAndSickle.Models.Map;
 using HammerAndSickle.Services;
 using System;
 using System.Collections.Generic;
@@ -65,6 +66,28 @@ namespace HammerAndSickle.Models
         [JsonInclude] [JsonPropertyName("side")]           public Side Side { get; private set; }
         [JsonInclude] [JsonPropertyName("nationality")]    public Nationality Nationality { get; private set; }
         [JsonIgnore]                                       public bool IsBase => IsBaseType(Classification);
+
+        // Unit classification helpers for movement, occupancy, and ZoC
+        [JsonIgnore] public bool IsAirUnit =>
+            Classification is UnitClassification.FGT or UnitClassification.ATT
+            or UnitClassification.BMB or UnitClassification.RECONA or UnitClassification.AWACS;
+
+        [JsonIgnore] public bool IsFixedWingAirUnit => IsAirUnit;
+
+        [JsonIgnore] public bool IsHelicopter => Classification == UnitClassification.HELO;
+
+        [JsonIgnore] public bool IsReconUnit =>
+            Classification is UnitClassification.RECON or UnitClassification.RECONA;
+
+        [JsonIgnore] public bool ProjectsZoC
+        {
+            get
+            {
+                if (IsAirUnit || IsBase) return false;
+                if (_deploymentPosition == DeploymentPosition.Embarked) return false;
+                return true;
+            }
+        }
 
         [JsonInclude]
         [JsonPropertyName("regimentProfile")]
@@ -711,6 +734,7 @@ namespace HammerAndSickle.Models
         /// <summary>
         /// Consumes the required actions, movement points, and supplies to perform a move action.
         /// </summary>
+        [Obsolete("Use BeginMoveOrder + DeductMovementCost. Zero external callers.")]
         public bool PerformMoveAction(int movtCost)
         {
             try
@@ -844,19 +868,118 @@ namespace HammerAndSickle.Models
         private float GetDeployMovementCost() =>
             Mathf.CeilToInt(MovementPoints.Max * GameData.DEPLOYMENT_ACTION_MOVEMENT_COST);
 
-        private float GetCombatMovementCost() =>
+        public float GetCombatMovementCost() =>
             Mathf.CeilToInt(MovementPoints.Max * GameData.COMBAT_ACTION_MOVEMENT_COST);
 
-        private float GetIntelMovementCost() =>
+        public float GetIntelMovementCost() =>
             Mathf.CeilToInt(MovementPoints.Max * GameData.INTEL_ACTION_MOVEMENT_COST);
 
         #endregion // Actions
+
+        #region Movement Order API
+
+        /// <summary>
+        /// Validates and begins a move order. Decrements MoveActions by 1.
+        /// MP is NOT deducted here — it is deducted per-hex by MovementController.
+        /// </summary>
+        public bool BeginMoveOrder()
+        {
+            try
+            {
+                if (!CanMove()) return false;
+                if (MoveActions.Current < 1) return false;
+                if (MovementPoints.Current <= 0) return false;
+                if (IsBase) return false;
+                if (_deploymentPosition == DeploymentPosition.Fortified ||
+                    _deploymentPosition == DeploymentPosition.Entrenched ||
+                    _deploymentPosition == DeploymentPosition.HastyDefense)
+                    return false;
+
+                MoveActions.DecrementCurrent();
+                // TODO: Supply rules pending
+                return true;
+            }
+            catch (Exception e)
+            {
+                AppService.HandleException(CLASS_NAME, nameof(BeginMoveOrder), e);
+                return false;
+            }
+        }
+
+        /// <summary>
+        /// Deducts movement points for a single hex step. Returns false if insufficient MP.
+        /// </summary>
+        public bool DeductMovementCost(int cost)
+        {
+            try
+            {
+                return ConsumeMovementPoints(cost);
+            }
+            catch (Exception e)
+            {
+                AppService.HandleException(CLASS_NAME, nameof(DeductMovementCost), e);
+                return false;
+            }
+        }
+
+        /// <summary>
+        /// Force-sets movement points to a specific value. Used by ZoC halt and ambush rules.
+        /// </summary>
+        public void ForceSetMovementPoints(float value)
+        {
+            MovementPoints.SetCurrent(Mathf.Max(0f, value));
+        }
+
+        /// <summary>
+        /// Force-sets action counts. Used by amphibious crossing and ambush zeroing.
+        /// </summary>
+        public void ForceSetActions(float moveActions, float combatActions, float intelActions)
+        {
+            MoveActions.SetCurrent(Mathf.Max(0f, moveActions));
+            CombatActions.SetCurrent(Mathf.Max(0f, combatActions));
+            IntelActions.SetCurrent(Mathf.Max(0f, intelActions));
+        }
+
+        /// <summary>
+        /// Rotates facing toward a new direction, costing 1 MP per hex-edge step.
+        /// Does not consume a MoveAction.
+        /// </summary>
+        public bool TryRotateFacing(HexDirection newFacing)
+        {
+            try
+            {
+                if (newFacing == Facing) return true;
+
+                int currentIdx = (int)Facing;
+                int targetIdx = (int)newFacing;
+
+                // Shortest rotation around 6 edges
+                int clockwise = ((targetIdx - currentIdx) % 6 + 6) % 6;
+                int counterClockwise = 6 - clockwise;
+                int steps = Math.Min(clockwise, counterClockwise);
+
+                if (MovementPoints.Current < steps) return false;
+
+                ConsumeMovementPoints(steps);
+                Facing = newFacing;
+                return true;
+            }
+            catch (Exception e)
+            {
+                AppService.HandleException(CLASS_NAME, nameof(TryRotateFacing), e);
+                return false;
+            }
+        }
+
+        #endregion // Movement Order API
 
         #region Deployment
 
         /// <summary>
         /// Attempt to change deployment state to a higher level (towards Embarked).
         /// </summary>
+        /// <param name="onAirbase">True if unit is adjacent to an active friendly airbase unit.</param>
+        /// <param name="onPort">True if unit is on a port hex.</param>
         public bool TryDeployUP(out string errorMsg, bool onAirbase = false, bool onPort = false)
         {
             if (MovementPoints.Max <= 0f)
@@ -868,8 +991,28 @@ namespace HammerAndSickle.Models
             DeploymentPosition oldPosition = _deploymentPosition;
             DeploymentPosition targetPosition = _deploymentPosition + 1;
 
+            // Airborne deploy-up override: AB/MAB (and SPECF with AN-12 transport) in Deployed
+            // state, adjacent to an active friendly airbase, skip Mobile → target Embarked directly.
+            // These units have no ground-mobile profile; their organic transport is airborne.
+            if (oldPosition == DeploymentPosition.Deployed && onAirbase && IsEmbarkable)
+            {
+                bool isAirborneType = Classification == UnitClassification.AB
+                                   || Classification == UnitClassification.MAB;
+                bool isSpecfWithAirTransport = Classification == UnitClassification.SPECF
+                    && GetEmbarkedProfile()?.WeaponType == WeaponType.TRN_AN8_SV;
+
+                if (isAirborneType || isSpecfWithAirTransport)
+                    targetPosition = DeploymentPosition.Embarked;
+            }
+
             if (!CanChangeToState(targetPosition, out errorMsg))
                 return false;
+
+            // Skip IsMountable gate when targeting Embarked via the airborne override path
+            if (targetPosition != DeploymentPosition.Embarked || targetPosition == oldPosition + 1)
+            {
+                // Normal path: check mountable for Mobile transition
+            }
 
             if (!SpecialEmbarkmentChecks(out errorMsg, targetPosition, onAirbase, onPort))
                 return false;

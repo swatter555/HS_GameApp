@@ -1,0 +1,101 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!687078895 &4343727234628468602
+SpriteAtlas:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_Name: UnitPrefab Icons
+  m_EditorData:
+    serializedVersion: 2
+    textureSettings:
+      serializedVersion: 2
+      anisoLevel: 0
+      compressionQuality: 0
+      maxTextureSize: 0
+      textureCompression: 0
+      filterMode: 1
+      generateMipMaps: 1
+      readable: 0
+      crunchedCompression: 0
+      sRGB: 1
+    platformSettings:
+    - serializedVersion: 4
+      m_BuildTarget: DefaultTexturePlatform
+      m_MaxTextureSize: 4096
+      m_ResizeAlgorithm: 0
+      m_TextureFormat: -1
+      m_TextureCompression: 2
+      m_CompressionQuality: 50
+      m_CrunchedCompression: 0
+      m_AllowsAlphaSplitting: 0
+      m_Overridden: 0
+      m_IgnorePlatformSupport: 0
+      m_AndroidETC2FallbackOverride: 0
+      m_ForceMaximumCompressionQuality_BC6H_BC7: 0
+    packingSettings:
+      serializedVersion: 2
+      padding: 2
+      blockOffset: 0
+      allowAlphaSplitting: 0
+      enableRotation: 0
+      enableTightPacking: 0
+      enableAlphaDilation: 0
+    secondaryTextureSettings: {}
+    variantMultiplier: 1
+    packables:
+    - {fileID: 21300000, guid: 365a55a3d659d134d92f8e42eeb93827, type: 3}
+    - {fileID: 21300000, guid: 5047717550940834e968234750f9c5e1, type: 3}
+    - {fileID: 21300000, guid: f432776f021df8145988490b5f5b04c1, type: 3}
+    - {fileID: 21300000, guid: 657986de00710534781367e573f528ff, type: 3}
+    - {fileID: 21300000, guid: 880dd1d6225741246a45278039a6a741, type: 3}
+    - {fileID: 21300000, guid: 1c62f7e8564b6764cba1390ce01e136e, type: 3}
+    - {fileID: 21300000, guid: e981b44643d258b4c9202866cc2cc7e6, type: 3}
+    - {fileID: 21300000, guid: 84c781ded1906c64ea3a8f244a64414c, type: 3}
+    - {fileID: 21300000, guid: b28dd8ec23b9763408599f5a919c8298, type: 3}
+    - {fileID: 21300000, guid: 415f8dd7bff620d4680b8d574b1c9650, type: 3}
+    - {fileID: 21300000, guid: b7a8cdb5ad9d80c4eb148b27c41d6907, type: 3}
+    bindAsDefault: 1
+    isAtlasV2: 0
+    cachedData: {fileID: 0}
+    packedSpriteRenderDataKeys:
+    - 365a55a3d659d134d92f8e42eeb93827: 21300000
+    - 5047717550940834e968234750f9c5e1: 21300000
+    - b7a8cdb5ad9d80c4eb148b27c41d6907: 21300000
+    - e981b44643d258b4c9202866cc2cc7e6: 21300000
+    - 880dd1d6225741246a45278039a6a741: 21300000
+    - 415f8dd7bff620d4680b8d574b1c9650: 21300000
+    - 1c62f7e8564b6764cba1390ce01e136e: 21300000
+    - b28dd8ec23b9763408599f5a919c8298: 21300000
+    - 84c781ded1906c64ea3a8f244a64414c: 21300000
+    - 657986de00710534781367e573f528ff: 21300000
+    - f432776f021df8145988490b5f5b04c1: 21300000
+  m_MasterAtlas: {fileID: 0}
+  m_PackedSprites:
+  - {fileID: 21300000, guid: 365a55a3d659d134d92f8e42eeb93827, type: 3}
+  - {fileID: 21300000, guid: 5047717550940834e968234750f9c5e1, type: 3}
+  - {fileID: 21300000, guid: b7a8cdb5ad9d80c4eb148b27c41d6907, type: 3}
+  - {fileID: 21300000, guid: e981b44643d258b4c9202866cc2cc7e6, type: 3}
+  - {fileID: 21300000, guid: 880dd1d6225741246a45278039a6a741, type: 3}
+  - {fileID: 21300000, guid: 415f8dd7bff620d4680b8d574b1c9650, type: 3}
+  - {fileID: 21300000, guid: 1c62f7e8564b6764cba1390ce01e136e, type: 3}
+  - {fileID: 21300000, guid: b28dd8ec23b9763408599f5a919c8298, type: 3}
+  - {fileID: 21300000, guid: 84c781ded1906c64ea3a8f244a64414c, type: 3}
+  - {fileID: 21300000, guid: 657986de00710534781367e573f528ff, type: 3}
+  - {fileID: 21300000, guid: f432776f021df8145988490b5f5b04c1, type: 3}
+  m_PackedSpriteNamesToIndex:
+  - BlueUnitBase
+  - DefensiveIcon
+  - RedUnitBase
+  - FortifiedIcon
+  - EmbarkedNavalIcon
+  - MountedIcon
+  - EntrenchedIcon
+  - GreyUnitBase
+  - GreenUnitBase
+  - EmbarkedAirIcon
+  - DeployedIcon
+  m_RenderDataMap: {}
+  m_Tag: UnitPrefab Icons
+  m_IsVariant: 0

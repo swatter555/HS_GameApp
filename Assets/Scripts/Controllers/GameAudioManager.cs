@@ -1,3 +1,4 @@
+using HammerAndSickle.Core.GameData;
 using HammerAndSickle.Services;
 using System;
 using System.Collections;
@@ -81,7 +82,26 @@ namespace HammerAndSickle.Controllers
             MenuClose,
             RadioButtonClick,
             MeduimSnareDrum,
-            PrinterTick
+            PrinterTick,
+
+            // Movement SFX
+            UnitSelect,
+            UnitDeselect,
+            MoveOrderConfirm,
+            MoveOrderCancel,
+            UnitMoveTracked,
+            UnitMoveWheeled,
+            UnitMoveFoot,
+            UnitMoveHelo,
+            UnitMoveJet,
+            UnitMoveBlocked,
+            OutOfMP,
+            UnitSpotted,
+            AmbushTriggered,
+            AmbushDetected,
+            FacingChange,
+            NextUnit,
+            PrevUnit
         }
 
         /// <summary>
@@ -129,7 +149,26 @@ namespace HammerAndSickle.Controllers
             { SoundEffect.RadioButtonClick, "SFX_RadioButtonClick.wav" },
             { SoundEffect.ButtonHover, "SFX_ButtonHover.wav" },
             { SoundEffect.MeduimSnareDrum, "SFX_MediumSnareDrum.wav"},
-            { SoundEffect.PrinterTick, "SFX_PrinterTick.wav"}
+            { SoundEffect.PrinterTick, "SFX_PrinterTick.wav"},
+
+            // Movement SFX
+            { SoundEffect.UnitSelect, "SFX_UnitSelect.wav" },
+            { SoundEffect.UnitDeselect, "SFX_UnitDeselect.wav" },
+            { SoundEffect.MoveOrderConfirm, "SFX_MoveOrderConfirm.wav" },
+            { SoundEffect.MoveOrderCancel, "SFX_MoveOrderCancel.wav" },
+            { SoundEffect.UnitMoveTracked, "SFX_UnitMoveTracked.wav" },
+            { SoundEffect.UnitMoveWheeled, "SFX_UnitMoveWheeled.wav" },
+            { SoundEffect.UnitMoveFoot, "SFX_UnitMoveFoot.wav" },
+            { SoundEffect.UnitMoveHelo, "SFX_UnitMoveHelo.wav" },
+            { SoundEffect.UnitMoveJet, "SFX_UnitMoveJet.wav" },
+            { SoundEffect.UnitMoveBlocked, "SFX_UnitMoveBlocked.wav" },
+            { SoundEffect.OutOfMP, "SFX_OutOfMP.wav" },
+            { SoundEffect.UnitSpotted, "SFX_UnitSpotted.wav" },
+            { SoundEffect.AmbushTriggered, "SFX_AmbushTriggered.wav" },
+            { SoundEffect.AmbushDetected, "SFX_AmbushDetected.wav" },
+            { SoundEffect.FacingChange, "SFX_FacingChange.wav" },
+            { SoundEffect.NextUnit, "SFX_NextUnit.wav" },
+            { SoundEffect.PrevUnit, "SFX_PrevUnit.wav" }
         };
 
         /// <summary>
@@ -139,6 +178,23 @@ namespace HammerAndSickle.Controllers
         private static readonly Dictionary<BriefingNarration, string> BriefingFiles = new()
         {
             { BriefingNarration.Khost, "Briefing_Khost.ogg" }
+        };
+
+        /// <summary>
+        /// Returns the appropriate movement SFX based on unit classification.
+        /// </summary>
+        public static SoundEffect GetMovementSFX(UnitClassification classification) => classification switch
+        {
+            UnitClassification.TANK or UnitClassification.MECH or UnitClassification.SPA
+                or UnitClassification.SPSAM or UnitClassification.SPAAA => SoundEffect.UnitMoveTracked,
+            UnitClassification.RECON or UnitClassification.MOT => SoundEffect.UnitMoveWheeled,
+            UnitClassification.INF or UnitClassification.AB or UnitClassification.MAB
+                or UnitClassification.MAR or UnitClassification.MMAR or UnitClassification.SPECF
+                or UnitClassification.ENG or UnitClassification.AM or UnitClassification.MAM => SoundEffect.UnitMoveFoot,
+            UnitClassification.HELO => SoundEffect.UnitMoveHelo,
+            UnitClassification.FGT or UnitClassification.ATT or UnitClassification.BMB
+                or UnitClassification.RECONA or UnitClassification.AWACS => SoundEffect.UnitMoveJet,
+            _ => SoundEffect.UnitMoveWheeled
         };
 
         #endregion // Static Mappings

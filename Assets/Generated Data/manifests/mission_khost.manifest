@@ -12,5 +12,7 @@
   "mapTheme": 0,
   "difficultyLevel": 1,
   "maxTurns": 21,
-  "maxCoreUnits": 0
+  "maxCoreUnits": 0,
+  "mapWidth": 32,
+  "mapHeight": 21
 }

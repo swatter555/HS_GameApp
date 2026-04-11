@@ -263,7 +263,7 @@ namespace HammerAndSickle.Core
             return terrain switch
             {
                 TerrainType.Water => (int)HexMovementCost.Water,
-                TerrainType.Clear => (int)HexMovementCost.Plains,
+                TerrainType.Clear => (int)HexMovementCost.Clear,
                 TerrainType.Forest => (int)HexMovementCost.Forest,
                 TerrainType.Rough => (int)HexMovementCost.Rough,
                 TerrainType.Marsh => (int)HexMovementCost.Marsh,
