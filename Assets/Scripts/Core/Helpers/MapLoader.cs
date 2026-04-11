@@ -1,4 +1,5 @@
 using HammerAndSickle.Controllers;
+using HammerAndSickle.Core;
 using HammerAndSickle.Core.GameData;
 using HammerAndSickle.Models.Map;
 using HammerAndSickle.Services;
@@ -281,8 +282,34 @@ namespace HammerAndSickle.Core.Helpers
                 // Write to log.
                 if (log) Debug.Log($"{CLASS_NAME}: Creating HexMap instance...");
 
-                // Create HexMap instance
-                HexMap hexMap = new HexMap(mapData.Header.MapName, mapData.Header.MapConfiguration);
+                // Resolve map dimensions: prefer manifest, fall back to MapConfig header
+                var dims = manifest.GetMapDimensions();
+                int mapWidth = dims.x;
+                int mapHeight = dims.y;
+
+                // If manifest didn't have explicit dimensions, derive from map header config
+                if (manifest.MapWidth < 10 || manifest.MapHeight < 10)
+                {
+                    var configDims = mapData.Header.MapConfiguration switch
+                    {
+                        MapConfig.Large => new Vector2Int(HammerAndSickle.Core.GameData.GameData.LargeHexWidth, HammerAndSickle.Core.GameData.GameData.LargeHexHeight),
+                        _ => new Vector2Int(HammerAndSickle.Core.GameData.GameData.SmallHexWidth, HammerAndSickle.Core.GameData.GameData.SmallHexHeight)
+                    };
+                    mapWidth = configDims.x;
+                    mapHeight = configDims.y;
+                }
+
+                if (log) Debug.Log($"{CLASS_NAME}: Resolved map dimensions: {mapWidth}x{mapHeight}");
+
+                // Initialize the hex grid coordinate system
+                if (HexGridSystem.Instance != null)
+                {
+                    HexGridSystem.Instance.Initialize(mapWidth, mapHeight);
+                    if (log) Debug.Log($"{CLASS_NAME}: HexGridSystem initialized with {mapWidth}x{mapHeight}");
+                }
+
+                // Create HexMap instance with explicit dimensions
+                HexMap hexMap = new HexMap(mapData.Header.MapName, mapWidth, mapHeight);
 
                 // Write to log.
                 if (log) Debug.Log($"{CLASS_NAME}: HexMap created - Expected size: {hexMap.MapSize}");

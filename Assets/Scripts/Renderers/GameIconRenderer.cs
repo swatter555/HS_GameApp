@@ -1,6 +1,8 @@
 using HammerAndSickle.Controllers;
+using HammerAndSickle.Core;
 using HammerAndSickle.Core.GameData;
 using HammerAndSickle.Models;
+using HammerAndSickle.Renderers;
 using HammerAndSickle.Services;
 using System;
 using System.Collections.Generic;
@@ -66,12 +68,6 @@ namespace HammerAndSickle.Core.Map
         [Header("Prefabs")]
         [SerializeField] private GameObject combatUnitIconPrefab;
 
-        [Header("Rendering Layers")]
-        [SerializeField] private GameObject groundUnitLayer;
-        [SerializeField] private GameObject airUnitLayer;
-        [SerializeField] private GameObject utilityLayer1;
-        [SerializeField] private GameObject utilityLayer2;
-
         #endregion // Inspector Fields
 
         #region Properties
@@ -80,26 +76,6 @@ namespace HammerAndSickle.Core.Map
         /// Indicates if the renderer is properly initialized.
         /// </summary>
         public bool IsInitialized { get; private set; }
-
-        /// <summary>
-        /// Gets the GameObject reference for the ground unit layer.
-        /// </summary>
-        public GameObject GroundUnitLayer => groundUnitLayer;
-
-        /// <summary>
-        /// Gets the GameObject reference for the air unit layer.
-        /// </summary>
-        public GameObject AirUnitLayer => airUnitLayer;
-
-        /// <summary>
-        /// Gets the GameObject reference for utility layer 1.
-        /// </summary>
-        public GameObject UtilityLayer1 => utilityLayer1;
-
-        /// <summary>
-        /// Gets the GameObject reference for utility layer 2.
-        /// </summary>
-        public GameObject UtilityLayer2 => utilityLayer2;
 
         #endregion // Properties
 
@@ -185,6 +161,7 @@ namespace HammerAndSickle.Core.Map
             {
                 EventManager.Instance.OnRedrawMapIcons += OnRedrawMapIcons;
                 EventManager.Instance.OnStackingToggleRequested += OnStackingToggleRequested;
+                EventManager.Instance.OnUnitSpottedLevelChanged += HandleUnitSpottedLevelChanged;
                 if (_debug) Debug.Log($"[{CLASS_NAME}.SubscribeToEvents] Subscribed to EventManager events.");
             }
             else
@@ -202,6 +179,7 @@ namespace HammerAndSickle.Core.Map
             {
                 EventManager.Instance.OnRedrawMapIcons -= OnRedrawMapIcons;
                 EventManager.Instance.OnStackingToggleRequested -= OnStackingToggleRequested;
+                EventManager.Instance.OnUnitSpottedLevelChanged -= HandleUnitSpottedLevelChanged;
                 if (_debug) Debug.Log($"[{CLASS_NAME}.UnsubscribeFromEvents] Unsubscribed from EventManager events.");
             }
         }
@@ -217,17 +195,8 @@ namespace HammerAndSickle.Core.Map
             if (combatUnitIconPrefab == null)
                 throw new NullReferenceException($"{CLASS_NAME}.ValidateComponents: {nameof(combatUnitIconPrefab)} is missing.");
 
-            if (groundUnitLayer == null)
-                throw new NullReferenceException($"{CLASS_NAME}.ValidateComponents: {nameof(groundUnitLayer)} is missing.");
-
-            if (airUnitLayer == null)
-                throw new NullReferenceException($"{CLASS_NAME}.ValidateComponents: {nameof(airUnitLayer)} is missing.");
-
-            if (utilityLayer1 == null)
-                throw new NullReferenceException($"{CLASS_NAME}.ValidateComponents: {nameof(utilityLayer1)} is missing.");
-
-            if (utilityLayer2 == null)
-                throw new NullReferenceException($"{CLASS_NAME}.ValidateComponents: {nameof(utilityLayer2)} is missing.");
+            if (HexGridRenderer.Instance == null)
+                throw new NullReferenceException($"{CLASS_NAME}.ValidateComponents: HexGridRenderer singleton not found.");
 
             if (_debug) Debug.Log($"[{CLASS_NAME}.ValidateComponents] All required components validated successfully.");
         }
@@ -247,8 +216,8 @@ namespace HammerAndSickle.Core.Map
 
                 unitIconPrefabs.Clear();
                 ClearStackingState();
-                ClearContainer(groundUnitLayer.transform);
-                ClearContainer(airUnitLayer.transform);
+                ClearContainer(HexGridRenderer.Instance.GroundUnitLayerTransform);
+                ClearContainer(HexGridRenderer.Instance.AirUnitLayerTransform);
 
                 if (_debug) Debug.Log($"[{CLASS_NAME}.ClearAllUnitIcons] All unit icons cleared.");
             }
@@ -272,6 +241,10 @@ namespace HammerAndSickle.Core.Map
                 int count = 0;
                 foreach (var unit in units)
                 {
+                    // Fog of war: skip non-player units at SpottedLevel.Level0
+                    if (unit.Side != Side.Player && unit.SpottedLevel == SpottedLevel.Level0)
+                        continue;
+
                     CreateUnitIcon(unit);
                     count++;
                 }
@@ -310,10 +283,10 @@ namespace HammerAndSickle.Core.Map
                 if (_debug) Debug.Log($"[{CLASS_NAME}.CreateUnitIcon] Creating icon for unit '{unit.UnitName}' at ({unit.MapPos.IntX}, {unit.MapPos.IntY})");
 
                 // Determine appropriate layer based on unit type
-                GameObject targetLayer = GetTargetLayerForUnit(unit);
+                Transform targetLayer = GetTargetLayerForUnit(unit);
 
                 // Create prefab instance
-                GameObject unitIconObject = Instantiate(combatUnitIconPrefab, targetLayer.transform);
+                GameObject unitIconObject = Instantiate(combatUnitIconPrefab, targetLayer);
                 unitIconObject.name = $"Unit_{unit.UnitID}_{unit.UnitName}";
 
                 // Get prefab component
@@ -530,16 +503,16 @@ namespace HammerAndSickle.Core.Map
 
         /// <summary>
         /// Gets the world position for a hex tile based on its grid coordinates.
-        /// Uses HexMapRenderer for coordinate conversion.
+        /// Uses HexGridSystem for coordinate conversion.
         /// </summary>
         private Vector3 GetRenderPosition(Vector2Int gridPos)
         {
-            if (HexMapRenderer.Instance != null && HexMapRenderer.Instance.IsInitialized)
+            if (HexGridSystem.Instance != null && HexGridSystem.Instance.IsInitialized)
             {
-                return HexMapRenderer.Instance.GetRenderPosition(gridPos);
+                return HexGridSystem.Instance.HexToWorld(new Position2D(gridPos.x, gridPos.y));
             }
 
-            Debug.LogWarning($"{CLASS_NAME}.GetRenderPosition: HexMapRenderer not available.");
+            Debug.LogWarning($"{CLASS_NAME}.GetRenderPosition: HexGridSystem not available.");
             return Vector3.zero;
         }
 
@@ -548,14 +521,14 @@ namespace HammerAndSickle.Core.Map
         /// Ground units, bases, and helicopters go to GroundUnitLayer.
         /// Fixed-wing aircraft go to AirUnitLayer.
         /// </summary>
-        private GameObject GetTargetLayerForUnit(CombatUnit unit)
+        private Transform GetTargetLayerForUnit(CombatUnit unit)
         {
             if (IsFixedWingAircraft(unit.Classification))
             {
-                return airUnitLayer;
+                return HexGridRenderer.Instance.AirUnitLayerTransform;
             }
 
-            return groundUnitLayer;
+            return HexGridRenderer.Instance.GroundUnitLayerTransform;
         }
 
         /// <summary>
@@ -996,5 +969,36 @@ namespace HammerAndSickle.Core.Map
         }
 
         #endregion // Unit Stacking Methods
+
+        #region Fog of War
+
+        /// <summary>
+        /// Handles spotting level changes: show/hide units transitioning to/from Level0.
+        /// </summary>
+        private void HandleUnitSpottedLevelChanged(CombatUnit unit, SpottedLevel oldLevel, SpottedLevel newLevel)
+        {
+            try
+            {
+                if (unit.Side == Side.Player) return;
+
+                if (oldLevel == SpottedLevel.Level0 && newLevel > SpottedLevel.Level0)
+                {
+                    // Unit just became visible — create its icon
+                    CreateUnitIcon(unit);
+                }
+                else if (newLevel == SpottedLevel.Level0 && oldLevel > SpottedLevel.Level0)
+                {
+                    // Unit disappeared — remove its icon
+                    RemoveUnitIcon(unit.UnitID);
+                }
+            }
+            catch (Exception e)
+            {
+                AppService.HandleException(CLASS_NAME, nameof(HandleUnitSpottedLevelChanged), e);
+            }
+        }
+
+        #endregion // Fog of War
     }
 }
+

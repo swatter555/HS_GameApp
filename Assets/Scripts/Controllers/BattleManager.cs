@@ -2,6 +2,7 @@ using HammerAndSickle.Core.GameData;
 using HammerAndSickle.Core.Helpers;
 using HammerAndSickle.Core.Map;
 using HammerAndSickle.Helpers;
+using HammerAndSickle.Renderers;
 using HammerAndSickle.Services;
 using System;
 using System.Collections;
@@ -286,7 +287,7 @@ namespace HammerAndSickle.Controllers
             }
 
             // Refresh the hex map renderer to display the newly loaded map
-            HexMapRenderer.Instance.RefreshMap();
+            HexGridRenderer.Instance.RefreshMap();
 
             // Load the order of battle (OOB) file based on whether it's a campaign or stand-alone scenario
             if (GameDataManager.CurrentManifest.IsCampaignScenario)

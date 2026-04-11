@@ -20,6 +20,7 @@
 using UnityEngine;
 using System;
 using HammerAndSickle.Controllers;
+using HammerAndSickle.Core;
 using HammerAndSickle.Models;
 using System.Collections.Generic;
 
@@ -59,10 +60,6 @@ namespace HammerAndSickle.Services
         [SerializeField]
         [Tooltip("Enable debug logging for hex detection and validation")]
         private bool enableDebugLogging = false;
-
-        [SerializeField]
-        [Tooltip("Unity Grid component used for coordinate conversion")]
-        private Grid hexGrid;
 
         #endregion // Inspector Fields
 
@@ -190,8 +187,8 @@ namespace HammerAndSickle.Services
         /// </summary>
         private void ValidateComponents()
         {
-            if (hexGrid == null)
-                throw new NullReferenceException($"{CLASS_NAME}.ValidateComponents: {nameof(hexGrid)} is missing.");
+            if (HexGridSystem.Instance == null)
+                throw new NullReferenceException($"{CLASS_NAME}.ValidateComponents: HexGridSystem singleton not found.");
         }
 
         /// <summary>
@@ -396,15 +393,12 @@ namespace HammerAndSickle.Services
         /// <returns>Valid hex coordinates or NoHexSelected if invalid</returns>
         private Position2D GetValidGridCoordinates(Vector2 mousePosition)
         {
-            // Convert mouse position to world position
-            Vector3 worldPosition = Camera.main.ScreenToWorldPoint(new Vector3(mousePosition.x, mousePosition.y, 0));
-
-            // Convert world position to cell position
-            Vector3Int cellPosition = hexGrid.WorldToCell(worldPosition);
-            Position2D gridPosition = new Position2D(cellPosition.x, cellPosition.y);
+            // Convert screen position to hex via HexGridSystem
+            Position2D gridPosition = HexGridSystem.Instance.ScreenToHex(
+                new Vector3(mousePosition.x, mousePosition.y, 0), Camera.main);
 
             // Validate the coordinates are within the map bounds
-            if (IsValidHexPosition(gridPosition))
+            if (HexGridSystem.Instance.IsInBounds(gridPosition))
             {
                 return gridPosition;
             }
@@ -415,39 +409,6 @@ namespace HammerAndSickle.Services
             }
 
             return GameDataManager.NoHexSelected;
-        }
-
-        /// <summary>
-        /// Validates if a position is within the hex map bounds.
-        /// </summary>
-        /// <param name="position">Position to validate</param>
-        /// <returns>True if position is valid, false otherwise</returns>
-        private bool IsValidHexPosition(Position2D position)
-        {
-            if (GameDataManager.CurrentHexMap == null)
-            {
-                if (enableDebugLogging)
-                {
-                    Debug.LogWarning($"{CLASS_NAME}: CurrentHexMap is null, cannot validate position");
-                }
-                return false;
-            }
-
-            // Check basic bounds
-            if (position.X < 0 || position.Y < 0 ||
-                position.X >= GameDataManager.CurrentHexMap.MapSize.x ||
-                position.Y >= GameDataManager.CurrentHexMap.MapSize.y)
-            {
-                return false;
-            }
-
-            // Check the extra rule for odd rows (they have one less column in odd-r alignment)
-            if (position.Y % 2 != 0 && position.X >= GameDataManager.CurrentHexMap.MapSize.x - 1)
-            {
-                return false;
-            }
-
-            return true;
         }
 
         #endregion // Private Methods

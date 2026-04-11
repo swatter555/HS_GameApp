@@ -53,6 +53,9 @@ namespace HammerAndSickle.Controllers
         private readonly Dictionary<string, Leader> _leaders = new();
         private bool _isInitialized = false;
 
+        // Occupancy cache — rebuilt at turn start and after each completed move order
+        private Dictionary<Position2D, List<CombatUnit>> _occupancyCache;
+
         #endregion // Fields
 
         #region Properties
@@ -485,6 +488,129 @@ namespace HammerAndSickle.Controllers
         }
 
         #endregion // Leader-Unit Assignment
+
+        #region Occupancy Cache
+
+        /// <summary>
+        /// Builds the occupancy cache by scanning all registered units grouped by MapPos.
+        /// Call at turn start and after every completed move order.
+        /// </summary>
+        public void BuildOccupancyCache()
+        {
+            try
+            {
+                _occupancyCache = new Dictionary<Position2D, List<CombatUnit>>();
+
+                foreach (var unit in _combatUnits.Values)
+                {
+                    if (unit.IsDestroyed()) continue;
+
+                    if (!_occupancyCache.TryGetValue(unit.MapPos, out var list))
+                    {
+                        list = new List<CombatUnit>();
+                        _occupancyCache[unit.MapPos] = list;
+                    }
+                    list.Add(unit);
+                }
+            }
+            catch (Exception e)
+            {
+                AppService.HandleException(CLASS_NAME, nameof(BuildOccupancyCache), e);
+            }
+        }
+
+        /// <summary>
+        /// Clears the occupancy cache, forcing a rebuild on next query.
+        /// </summary>
+        public void InvalidateOccupancy()
+        {
+            _occupancyCache = null;
+        }
+
+        private void EnsureOccupancyCache()
+        {
+            if (_occupancyCache == null)
+                BuildOccupancyCache();
+        }
+
+        /// <summary>
+        /// Returns all units at the given hex position.
+        /// </summary>
+        public List<CombatUnit> GetUnitsAtHex(Position2D pos)
+        {
+            try
+            {
+                EnsureOccupancyCache();
+                return _occupancyCache.TryGetValue(pos, out var list) ? list : new List<CombatUnit>();
+            }
+            catch (Exception e)
+            {
+                AppService.HandleException(CLASS_NAME, nameof(GetUnitsAtHex), e);
+                return new List<CombatUnit>();
+            }
+        }
+
+        /// <summary>
+        /// Returns the ground unit at the given position, or null if none.
+        /// </summary>
+        public CombatUnit GetGroundUnitAtHex(Position2D pos)
+        {
+            try
+            {
+                var units = GetUnitsAtHex(pos);
+                foreach (var u in units)
+                {
+                    if (!u.IsAirUnit) return u;
+                }
+                return null;
+            }
+            catch (Exception e)
+            {
+                AppService.HandleException(CLASS_NAME, nameof(GetGroundUnitAtHex), e);
+                return null;
+            }
+        }
+
+        /// <summary>
+        /// Returns the air unit at the given position, or null if none.
+        /// </summary>
+        public CombatUnit GetAirUnitAtHex(Position2D pos)
+        {
+            try
+            {
+                var units = GetUnitsAtHex(pos);
+                foreach (var u in units)
+                {
+                    if (u.IsAirUnit) return u;
+                }
+                return null;
+            }
+            catch (Exception e)
+            {
+                AppService.HandleException(CLASS_NAME, nameof(GetAirUnitAtHex), e);
+                return null;
+            }
+        }
+
+        /// <summary>
+        /// Returns true if a friendly ground unit occupies the hex.
+        /// </summary>
+        public bool IsHexOccupiedByFriendlyGround(Position2D pos, Side side)
+        {
+            var ground = GetGroundUnitAtHex(pos);
+            return ground != null && ground.Side == side;
+        }
+
+        /// <summary>
+        /// Returns true if an enemy ground unit occupies the hex.
+        /// </summary>
+        public bool IsHexOccupiedByEnemyGround(Position2D pos, Side side)
+        {
+            var ground = GetGroundUnitAtHex(pos);
+            return ground != null && ground.Side != side;
+        }
+
+        #endregion // Occupancy Cache
 
         #region State Management
 

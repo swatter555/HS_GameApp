@@ -1,8 +1,10 @@
 using HammerAndSickle.Core.GameData;
 using HammerAndSickle.Core.UI;
 using HammerAndSickle.Models;
+using HammerAndSickle.Models.Map;
 using HammerAndSickle.Services;
 using System;
+using System.Collections.Generic;
 using UnityEngine;
 
 namespace HammerAndSickle.Controllers
@@ -89,6 +91,57 @@ namespace HammerAndSickle.Controllers
         public event Action<BattleResult> OnBattleEnded;
 
         #endregion // Battle Scene Events
+
+        #region Movement Events
+
+        // See EventManager for all game events
+        public event Action<CombatUnit> OnPlayerUnitSelected;
+        public event Action OnPlayerUnitDeselected;
+        public event Action<CombatUnit, List<Position2D>> OnUnitMoveStarted;
+        public event Action<CombatUnit> OnUnitMoveCompleted;
+        public event Action<CombatUnit> OnUnitMovementPointsChanged;
+        public event Action<CombatUnit> OnUnitActionsChanged;
+
+        #endregion // Movement Events
+
+        #region Spotting Events
+
+        // See EventManager for all game events
+        public event Action<CombatUnit, SpottedLevel, SpottedLevel> OnUnitSpottedLevelChanged;
+
+        #endregion // Spotting Events
+
+        #region Movement Range Display Events
+
+        // See EventManager for all game events
+        public event Action<CombatUnit, Dictionary<Position2D, int>> OnMovementRangeComputed;
+        public event Action OnMovementRangeCleared;
+
+        #endregion // Movement Range Display Events
+
+        #region Unit Cycling Events
+
+        // See EventManager for all game events
+        public event Action OnNextUnitRequested;
+        public event Action OnPreviousUnitRequested;
+        public event Action<CombatUnit> OnCurrentUnitChanged;
+
+        #endregion // Unit Cycling Events
+
+        #region Ambush Events
+
+        // See EventManager for all game events
+        public event Action<CombatUnit, CombatUnit> OnAmbushTriggered;
+        public event Action<CombatUnit, CombatUnit> OnAirAmbushDetected;
+
+        #endregion // Ambush Events
+
+        #region Air Auto-Return Events
+
+        // See EventManager for all game events
+        public event Action<CombatUnit> OnAirUnitReturning;
+
+        #endregion // Air Auto-Return Events
 
         #region Dialog Events
 
@@ -262,6 +315,100 @@ namespace HammerAndSickle.Controllers
             }
         }
 
+        #region Movement Event Raising Methods
+
+        public void RaisePlayerUnitSelected(CombatUnit unit)
+        {
+            try { OnPlayerUnitSelected?.Invoke(unit); }
+            catch (Exception e) { AppService.HandleException(CLASS_NAME, nameof(RaisePlayerUnitSelected), e); }
+        }
+
+        public void RaisePlayerUnitDeselected()
+        {
+            try { OnPlayerUnitDeselected?.Invoke(); }
+            catch (Exception e) { AppService.HandleException(CLASS_NAME, nameof(RaisePlayerUnitDeselected), e); }
+        }
+
+        public void RaiseUnitMoveStarted(CombatUnit unit, List<Position2D> path)
+        {
+            try { OnUnitMoveStarted?.Invoke(unit, path); }
+            catch (Exception e) { AppService.HandleException(CLASS_NAME, nameof(RaiseUnitMoveStarted), e); }
+        }
+
+        public void RaiseUnitMoveCompleted(CombatUnit unit)
+        {
+            try { OnUnitMoveCompleted?.Invoke(unit); }
+            catch (Exception e) { AppService.HandleException(CLASS_NAME, nameof(RaiseUnitMoveCompleted), e); }
+        }
+
+        public void RaiseUnitMovementPointsChanged(CombatUnit unit)
+        {
+            try { OnUnitMovementPointsChanged?.Invoke(unit); }
+            catch (Exception e) { AppService.HandleException(CLASS_NAME, nameof(RaiseUnitMovementPointsChanged), e); }
+        }
+
+        public void RaiseUnitActionsChanged(CombatUnit unit)
+        {
+            try { OnUnitActionsChanged?.Invoke(unit); }
+            catch (Exception e) { AppService.HandleException(CLASS_NAME, nameof(RaiseUnitActionsChanged), e); }
+        }
+
+        public void RaiseUnitSpottedLevelChanged(CombatUnit unit, SpottedLevel oldLevel, SpottedLevel newLevel)
+        {
+            try { OnUnitSpottedLevelChanged?.Invoke(unit, oldLevel, newLevel); }
+            catch (Exception e) { AppService.HandleException(CLASS_NAME, nameof(RaiseUnitSpottedLevelChanged), e); }
+        }
+
+        public void RaiseMovementRangeComputed(CombatUnit unit, Dictionary<Position2D, int> reachable)
+        {
+            try { OnMovementRangeComputed?.Invoke(unit, reachable); }
+            catch (Exception e) { AppService.HandleException(CLASS_NAME, nameof(RaiseMovementRangeComputed), e); }
+        }
+
+        public void RaiseMovementRangeCleared()
+        {
+            try { OnMovementRangeCleared?.Invoke(); }
+            catch (Exception e) { AppService.HandleException(CLASS_NAME, nameof(RaiseMovementRangeCleared), e); }
+        }
+
+        public void RaiseNextUnitRequested()
+        {
+            try { OnNextUnitRequested?.Invoke(); }
+            catch (Exception e) { AppService.HandleException(CLASS_NAME, nameof(RaiseNextUnitRequested), e); }
+        }
+
+        public void RaisePreviousUnitRequested()
+        {
+            try { OnPreviousUnitRequested?.Invoke(); }
+            catch (Exception e) { AppService.HandleException(CLASS_NAME, nameof(RaisePreviousUnitRequested), e); }
+        }
+
+        public void RaiseCurrentUnitChanged(CombatUnit unit)
+        {
+            try { OnCurrentUnitChanged?.Invoke(unit); }
+            catch (Exception e) { AppService.HandleException(CLASS_NAME, nameof(RaiseCurrentUnitChanged), e); }
+        }
+
+        public void RaiseAmbushTriggered(CombatUnit ambusher, CombatUnit victim)
+        {
+            try { OnAmbushTriggered?.Invoke(ambusher, victim); }
+            catch (Exception e) { AppService.HandleException(CLASS_NAME, nameof(RaiseAmbushTriggered), e); }
+        }
+
+        public void RaiseAirAmbushDetected(CombatUnit aaUnit, CombatUnit airUnit)
+        {
+            try { OnAirAmbushDetected?.Invoke(aaUnit, airUnit); }
+            catch (Exception e) { AppService.HandleException(CLASS_NAME, nameof(RaiseAirAmbushDetected), e); }
+        }
+
+        public void RaiseAirUnitReturning(CombatUnit unit)
+        {
+            try { OnAirUnitReturning?.Invoke(unit); }
+            catch (Exception e) { AppService.HandleException(CLASS_NAME, nameof(RaiseAirUnitReturning), e); }
+        }
+
+        #endregion // Movement Event Raising Methods
+
         #region Dialog Event Raising Methods
 
         /// <summary>
@@ -307,6 +454,7 @@ namespace HammerAndSickle.Controllers
         /// </summary>
         public void ClearAllSubscriptions()
         {
+            // Battle scene events
             OnRedrawMapIcons = null;
             OnUnitHitPointsChanged = null;
             OnUnitDeploymentChanged = null;
@@ -315,6 +463,35 @@ namespace HammerAndSickle.Controllers
             OnBattlePhaseChanged = null;
             OnBattleTurnAdvanced = null;
             OnBattleEnded = null;
+
+            // Movement events
+            OnPlayerUnitSelected = null;
+            OnPlayerUnitDeselected = null;
+            OnUnitMoveStarted = null;
+            OnUnitMoveCompleted = null;
+            OnUnitMovementPointsChanged = null;
+            OnUnitActionsChanged = null;
+
+            // Spotting events
+            OnUnitSpottedLevelChanged = null;
+
+            // Movement range display events
+            OnMovementRangeComputed = null;
+            OnMovementRangeCleared = null;
+
+            // Unit cycling events
+            OnNextUnitRequested = null;
+            OnPreviousUnitRequested = null;
+            OnCurrentUnitChanged = null;
+
+            // Ambush events
+            OnAmbushTriggered = null;
+            OnAirAmbushDetected = null;
+
+            // Air auto-return events
+            OnAirUnitReturning = null;
+
+            // Dialog events
             OnScene0DialogRequested = null;
             OnScene1DialogRequested = null;
         }

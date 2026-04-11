@@ -79,6 +79,38 @@ namespace HammerAndSickle.Models.Map
         }
 
         /// <summary>
+        /// Creates a new hex map with explicit dimensions (preferred for new code).
+        /// </summary>
+        /// <param name="mapName">Display name of the map</param>
+        /// <param name="width">Number of hex columns (>= 10)</param>
+        /// <param name="height">Number of hex rows (>= 10)</param>
+        public HexMap(string mapName, int width, int height)
+        {
+            try
+            {
+                MapName = mapName ?? throw new ArgumentNullException(nameof(mapName));
+                if (width < 10 || height < 10)
+                    throw new ArgumentException($"Map dimensions must be >= 10. Got {width}x{height}.");
+
+                Configuration = MapConfig.None;
+                coordinateComparer = new Coordinate2DEqualityComparer();
+
+                MapSize = new Vector2Int(width, height);
+                GameDataManager.CurrentMapSize = MapSize;
+                hexDictionary = new Dictionary<Position2D, HexTile>(coordinateComparer);
+                IsInitialized = true;
+
+                if (enableDebugLogging)
+                    Debug.Log($"{CLASS_NAME}: Created map '{MapName}' with explicit dimensions {width}x{height}");
+            }
+            catch (Exception ex)
+            {
+                AppService.HandleException(CLASS_NAME, nameof(HexMap), ex);
+                throw;
+            }
+        }
+
+        /// <summary>
         /// Parameterless constructor for serialization.
         /// </summary>
         [JsonConstructor]

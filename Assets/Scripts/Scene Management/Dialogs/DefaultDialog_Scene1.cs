@@ -1,7 +1,9 @@
+using HammerAndSickle.Controllers;
 using HammerAndSickle.Core.UI;
 using HammerAndSickle.Services;
 using System;
 using UnityEngine;
+using UnityEngine.UI;
 
 namespace HammerAndSickle.SceneManagement
 {
@@ -53,6 +55,10 @@ namespace HammerAndSickle.SceneManagement
         [SerializeField] private RectTransform _leaderPanel;
         [SerializeField] private RectTransform _printerPanel;
 
+        [Header("Unit Cycling")]
+        [SerializeField] private Button _nextUnitButton;
+        [SerializeField] private Button _prevUnitButton;
+
         [Header("Debug")]
         [SerializeField] private bool _debug;
 
@@ -71,8 +77,6 @@ namespace HammerAndSickle.SceneManagement
         private void Start()
         {
             // Build the panel array once for efficient iteration during hit-testing.
-            // These are the HUD panels that sit on top of the map — clicks landing
-            // on them should not pass through to hex selection.
             _panels = new[]
             {
                 _topMenuBar,
@@ -82,6 +86,10 @@ namespace HammerAndSickle.SceneManagement
                 _leaderPanel,
                 _printerPanel
             };
+
+            // Wire unit cycling buttons
+            _nextUnitButton?.onClick.AddListener(() => EventManager.Instance?.RaiseNextUnitRequested());
+            _prevUnitButton?.onClick.AddListener(() => EventManager.Instance?.RaisePreviousUnitRequested());
         }
 
         #endregion // Unity Lifecycle

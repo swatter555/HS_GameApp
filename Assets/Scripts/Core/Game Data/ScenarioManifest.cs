@@ -57,6 +57,12 @@ namespace HammerAndSickle.Core.GameData
         [JsonPropertyName("maxCoreUnits")]
         public int MaxCoreUnits { get; set; } = 0;
 
+        [JsonPropertyName("mapWidth")]
+        public int MapWidth { get; set; } = 0;
+
+        [JsonPropertyName("mapHeight")]
+        public int MapHeight { get; set; } = 0;
+
         #endregion // JSON Properties
 
         #region Constructors
@@ -81,7 +87,9 @@ namespace HammerAndSickle.Core.GameData
             MapTheme mapTheme,
             DifficultyLevel difficultyLevel,
             int maxTurns,
-            int maxCoreUnits)
+            int maxCoreUnits,
+            int mapWidth = 0,
+            int mapHeight = 0)
         {
             ScenarioId = scenarioId;
             DisplayName = displayName;
@@ -97,6 +105,8 @@ namespace HammerAndSickle.Core.GameData
             DifficultyLevel = difficultyLevel;
             MaxTurns = maxTurns;
             MaxCoreUnits = maxCoreUnits;
+            MapWidth = mapWidth;
+            MapHeight = mapHeight;
         }
 
         #endregion // Constructors
@@ -123,7 +133,27 @@ namespace HammerAndSickle.Core.GameData
             if (PrestigePool < 0)
                 return false;
 
+            // Dimensions must resolve to valid values (explicit or via MapConfig fallback)
+            var dims = GetMapDimensions();
+            if (dims.x < 10 || dims.y < 10)
+                return false;
+
             return true;
+        }
+
+        /// <summary>
+        /// Resolves map dimensions. Uses explicit MapWidth/MapHeight when present,
+        /// otherwise falls back to MapConfig-derived defaults for legacy manifests.
+        /// </summary>
+        public UnityEngine.Vector2Int GetMapDimensions()
+        {
+            if (MapWidth >= 10 && MapHeight >= 10)
+                return new UnityEngine.Vector2Int(MapWidth, MapHeight);
+
+            // Backward compat: derive from MapConfig header in the .map file.
+            // Callers that need dimensions before the map is loaded should ensure
+            // manifests include explicit width/height fields.
+            return new UnityEngine.Vector2Int(GameData.SmallHexWidth, GameData.SmallHexHeight);
         }
 
         /// <summary>
