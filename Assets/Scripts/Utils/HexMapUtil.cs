@@ -30,25 +30,27 @@ namespace HammerAndSickle.Models.Map
 
         private const string CLASS_NAME = nameof(HexMapUtil);
 
-        // Direction vectors for pointy-top, odd-r hex system
+        // Direction vectors for pointy-top, odd-r with Y-up world coords (row+1 = higher world Y).
+        // Odd rows stagger right by half a hex width. Rows are indexed by HexDirection enum:
+        // NE=0, E=1, SE=2, SW=3, W=4, NW=5.
         private static readonly Vector2Int[] EvenRowDirections = new Vector2Int[]
         {
-            new (-1, -1), // NW
-            new (0, -1),  // NE  
-            new (1, 0),   // E
-            new (0, 1),   // SE
-            new (-1, 1),  // SW
-            new (-1, 0)   // W
+            new (0, 1),    // NE: upper-right
+            new (1, 0),    // E:  right, same row
+            new (0, -1),   // SE: lower-right
+            new (-1, -1),  // SW: lower-left
+            new (-1, 0),   // W:  left, same row
+            new (-1, 1)    // NW: upper-left
         };
 
         private static readonly Vector2Int[] OddRowDirections = new Vector2Int[]
         {
-            new (0, -1),  // NW
-            new (1, -1),  // NE
-            new (1, 0),   // E
-            new (1, 1),   // SE
-            new (0, 1),   // SW
-            new (-1, 0)   // W
+            new (1, 1),    // NE: upper-right
+            new (1, 0),    // E:  right, same row
+            new (1, -1),   // SE: lower-right
+            new (0, -1),   // SW: lower-left
+            new (-1, 0),   // W:  left, same row
+            new (0, 1)     // NW: upper-left
         };
 
         #endregion // Constants

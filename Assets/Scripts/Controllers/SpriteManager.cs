@@ -26,7 +26,9 @@ namespace HammerAndSickle.Controllers
         public const string ME_Nameplate = "ME_Nameplate";
         public const string ME_MajorCity = "ME_MajorCity";
         public const string ME_MinorCity = "ME_MinorCity";
-        public const string ME_Sprawl  = "ME_Sprawl";
+        public const string ME_Sprawl    = "ME_Sprawl";
+        public const string ME_Fort      = "ME_Fort";
+        public const string ME_Airbase   = "ME_Airbase";
 
         // Europe
         public const string EU_Nameplate = "EU_Nameplate";
@@ -38,9 +40,8 @@ namespace HammerAndSickle.Controllers
         public const string CH_MajorCity = "CH_MajorCity";
         public const string CH_MinorCity = "CH_MinorCity";
 
-        // Generic
-        public const string GEN_Fort = "GEN_Fort";
-        public const string GEN_Airbase = "GEN_Airbase";
+        // Theme-agnostic
+        public const string Impassable = "Impassable";
 
         // Void sprite parameter
         public const string VoidSpriteName = "None";
@@ -95,6 +96,184 @@ namespace HammerAndSickle.Controllers
         public const string PontBridgeSE = "Pont_SE";
 
         #endregion // Bridge Icons
+
+        #region River Sprites
+
+        // Each river water sprite has a paired "_Bank" companion drawn on a layer beneath. Banks
+        // form the green/earth halo around water; identical art at identical position composes
+        // across overlapping stamps without geometric junction logic.
+
+        // Edge sprites (6) — one per HexDirection. Each hex draws all of its own river edges.
+        // Shared edges get drawn twice (once per neighbor); identical art at identical position.
+        public const string RiverEdge_NE_0      = "RiverEdge_NE_0";
+        public const string RiverEdge_NE_0_Bank = "RiverEdge_NE_0_Bank";
+        public const string RiverEdge_E_0       = "RiverEdge_E_0";
+        public const string RiverEdge_E_0_Bank  = "RiverEdge_E_0_Bank";
+        public const string RiverEdge_SE_0      = "RiverEdge_SE_0";
+        public const string RiverEdge_SE_0_Bank = "RiverEdge_SE_0_Bank";
+        public const string RiverEdge_SW_0      = "RiverEdge_SW_0";
+        public const string RiverEdge_SW_0_Bank = "RiverEdge_SW_0_Bank";
+        public const string RiverEdge_W_0       = "RiverEdge_W_0";
+        public const string RiverEdge_W_0_Bank  = "RiverEdge_W_0_Bank";
+        public const string RiverEdge_NW_0      = "RiverEdge_NW_0";
+        public const string RiverEdge_NW_0_Bank = "RiverEdge_NW_0_Bank";
+
+        // Terminus sprites (12) — 2 per edge direction, named by edge + endpoint corner compass.
+        // count==1 at a corner: stamp terminus for the lone river edge.
+        public const string RiverTerm_NE_N       = "RiverTerm_NE_N";
+        public const string RiverTerm_NE_N_Bank  = "RiverTerm_NE_N_Bank";
+        public const string RiverTerm_NE_NE      = "RiverTerm_NE_NE";
+        public const string RiverTerm_NE_NE_Bank = "RiverTerm_NE_NE_Bank";
+        public const string RiverTerm_E_NE       = "RiverTerm_E_NE";
+        public const string RiverTerm_E_NE_Bank  = "RiverTerm_E_NE_Bank";
+        public const string RiverTerm_E_SE       = "RiverTerm_E_SE";
+        public const string RiverTerm_E_SE_Bank  = "RiverTerm_E_SE_Bank";
+        public const string RiverTerm_SE_SE      = "RiverTerm_SE_SE";
+        public const string RiverTerm_SE_SE_Bank = "RiverTerm_SE_SE_Bank";
+        public const string RiverTerm_SE_S       = "RiverTerm_SE_S";
+        public const string RiverTerm_SE_S_Bank  = "RiverTerm_SE_S_Bank";
+        public const string RiverTerm_SW_S       = "RiverTerm_SW_S";
+        public const string RiverTerm_SW_S_Bank  = "RiverTerm_SW_S_Bank";
+        public const string RiverTerm_SW_SW      = "RiverTerm_SW_SW";
+        public const string RiverTerm_SW_SW_Bank = "RiverTerm_SW_SW_Bank";
+        public const string RiverTerm_W_SW       = "RiverTerm_W_SW";
+        public const string RiverTerm_W_SW_Bank  = "RiverTerm_W_SW_Bank";
+        public const string RiverTerm_W_NW       = "RiverTerm_W_NW";
+        public const string RiverTerm_W_NW_Bank  = "RiverTerm_W_NW_Bank";
+        public const string RiverTerm_NW_NW      = "RiverTerm_NW_NW";
+        public const string RiverTerm_NW_NW_Bank = "RiverTerm_NW_NW_Bank";
+        public const string RiverTerm_NW_N       = "RiverTerm_NW_N";
+        public const string RiverTerm_NW_N_Bank  = "RiverTerm_NW_N_Bank";
+
+        // Double junctions (6) — one per corner orientation. count==3 at a corner.
+        public const string RiverDouble_N       = "RiverDouble_N";
+        public const string RiverDouble_N_Bank  = "RiverDouble_N_Bank";
+        public const string RiverDouble_NE      = "RiverDouble_NE";
+        public const string RiverDouble_NE_Bank = "RiverDouble_NE_Bank";
+        public const string RiverDouble_SE      = "RiverDouble_SE";
+        public const string RiverDouble_SE_Bank = "RiverDouble_SE_Bank";
+        public const string RiverDouble_S       = "RiverDouble_S";
+        public const string RiverDouble_S_Bank  = "RiverDouble_S_Bank";
+        public const string RiverDouble_SW      = "RiverDouble_SW";
+        public const string RiverDouble_SW_Bank = "RiverDouble_SW_Bank";
+        public const string RiverDouble_NW      = "RiverDouble_NW";
+        public const string RiverDouble_NW_Bank = "RiverDouble_NW_Bank";
+
+        // Single junctions (12) — 2 per corner orientation, with L/R disambiguating which inside
+        // edge pairs with the outer. L = the focal-side edge that's left from the vertex looking
+        // outward. count==2 with one focal + outer at a corner.
+        public const string RiverSingle_N_L       = "RiverSingle_N_L";
+        public const string RiverSingle_N_L_Bank  = "RiverSingle_N_L_Bank";
+        public const string RiverSingle_N_R       = "RiverSingle_N_R";
+        public const string RiverSingle_N_R_Bank  = "RiverSingle_N_R_Bank";
+        public const string RiverSingle_NE_L      = "RiverSingle_NE_L";
+        public const string RiverSingle_NE_L_Bank = "RiverSingle_NE_L_Bank";
+        public const string RiverSingle_NE_R      = "RiverSingle_NE_R";
+        public const string RiverSingle_NE_R_Bank = "RiverSingle_NE_R_Bank";
+        public const string RiverSingle_SE_L      = "RiverSingle_SE_L";
+        public const string RiverSingle_SE_L_Bank = "RiverSingle_SE_L_Bank";
+        public const string RiverSingle_SE_R      = "RiverSingle_SE_R";
+        public const string RiverSingle_SE_R_Bank = "RiverSingle_SE_R_Bank";
+        public const string RiverSingle_S_L       = "RiverSingle_S_L";
+        public const string RiverSingle_S_L_Bank  = "RiverSingle_S_L_Bank";
+        public const string RiverSingle_S_R       = "RiverSingle_S_R";
+        public const string RiverSingle_S_R_Bank  = "RiverSingle_S_R_Bank";
+        public const string RiverSingle_SW_L      = "RiverSingle_SW_L";
+        public const string RiverSingle_SW_L_Bank = "RiverSingle_SW_L_Bank";
+        public const string RiverSingle_SW_R      = "RiverSingle_SW_R";
+        public const string RiverSingle_SW_R_Bank = "RiverSingle_SW_R_Bank";
+        public const string RiverSingle_NW_L      = "RiverSingle_NW_L";
+        public const string RiverSingle_NW_L_Bank = "RiverSingle_NW_L_Bank";
+        public const string RiverSingle_NW_R      = "RiverSingle_NW_R";
+        public const string RiverSingle_NW_R_Bank = "RiverSingle_NW_R_Bank";
+
+        #endregion // River Sprites
+
+        #region Road Sprites
+
+        // One whole-hex sprite per edge configuration. Six-bit mask Road_<NE><E><SE><SW><W><NW>.
+        // 63 sprites total — Road_000000 (no road) is omitted; hexes whose IsRoad is false (or
+        // whose neighbors have no IsRoad neighbors) skip stamping. The renderer derives the mask
+        // at draw time from HexTile.IsRoad on the focal + 6 neighbors. Each sprite is full-canvas
+        // authored to depict all that hex's road edges plus intersections; renderer just looks
+        // up by mask, no rotation/flip/composition.
+
+        // 1 edge (6)
+        public const string Road_100000 = "Road_100000";
+        public const string Road_010000 = "Road_010000";
+        public const string Road_001000 = "Road_001000";
+        public const string Road_000100 = "Road_000100";
+        public const string Road_000010 = "Road_000010";
+        public const string Road_000001 = "Road_000001";
+
+        // 2 edges (15)
+        public const string Road_110000 = "Road_110000";
+        public const string Road_101000 = "Road_101000";
+        public const string Road_100100 = "Road_100100";
+        public const string Road_100010 = "Road_100010";
+        public const string Road_100001 = "Road_100001";
+        public const string Road_011000 = "Road_011000";
+        public const string Road_010100 = "Road_010100";
+        public const string Road_010010 = "Road_010010";
+        public const string Road_010001 = "Road_010001";
+        public const string Road_001100 = "Road_001100";
+        public const string Road_001010 = "Road_001010";
+        public const string Road_001001 = "Road_001001";
+        public const string Road_000110 = "Road_000110";
+        public const string Road_000101 = "Road_000101";
+        public const string Road_000011 = "Road_000011";
+
+        // 3 edges (20)
+        public const string Road_111000 = "Road_111000";
+        public const string Road_110100 = "Road_110100";
+        public const string Road_110010 = "Road_110010";
+        public const string Road_110001 = "Road_110001";
+        public const string Road_101100 = "Road_101100";
+        public const string Road_101010 = "Road_101010";
+        public const string Road_101001 = "Road_101001";
+        public const string Road_100110 = "Road_100110";
+        public const string Road_100101 = "Road_100101";
+        public const string Road_100011 = "Road_100011";
+        public const string Road_011100 = "Road_011100";
+        public const string Road_011010 = "Road_011010";
+        public const string Road_011001 = "Road_011001";
+        public const string Road_010110 = "Road_010110";
+        public const string Road_010101 = "Road_010101";
+        public const string Road_010011 = "Road_010011";
+        public const string Road_001110 = "Road_001110";
+        public const string Road_001101 = "Road_001101";
+        public const string Road_001011 = "Road_001011";
+        public const string Road_000111 = "Road_000111";
+
+        // 4 edges (15)
+        public const string Road_111100 = "Road_111100";
+        public const string Road_111010 = "Road_111010";
+        public const string Road_111001 = "Road_111001";
+        public const string Road_110110 = "Road_110110";
+        public const string Road_110101 = "Road_110101";
+        public const string Road_110011 = "Road_110011";
+        public const string Road_101110 = "Road_101110";
+        public const string Road_101101 = "Road_101101";
+        public const string Road_101011 = "Road_101011";
+        public const string Road_100111 = "Road_100111";
+        public const string Road_011110 = "Road_011110";
+        public const string Road_011101 = "Road_011101";
+        public const string Road_011011 = "Road_011011";
+        public const string Road_010111 = "Road_010111";
+        public const string Road_001111 = "Road_001111";
+
+        // 5 edges (6)
+        public const string Road_111110 = "Road_111110";
+        public const string Road_111101 = "Road_111101";
+        public const string Road_111011 = "Road_111011";
+        public const string Road_110111 = "Road_110111";
+        public const string Road_101111 = "Road_101111";
+        public const string Road_011111 = "Road_011111";
+
+        // 6 edges (1)
+        public const string Road_111111 = "Road_111111";
+
+        #endregion // Road Sprites
 
         #region Rank Icons
 
@@ -945,6 +1124,8 @@ namespace HammerAndSickle.Controllers
         [SerializeField] private SpriteAtlas _arabIconAtlas;
         [SerializeField] private SpriteAtlas _chineseIconAtlas;
         [SerializeField] private SpriteAtlas _officerPortraitAtlas;
+        [SerializeField] private SpriteAtlas _riverIconAtlas;
+        [SerializeField] private SpriteAtlas _roadIconAtlas;
 
         [Header("Prefabs")]
         [SerializeField] private GameObject _cityPrefab;
@@ -1033,6 +1214,20 @@ namespace HammerAndSickle.Controllers
                 if (Instance._bridgeIconAtlas != null)
                 {
                     sprite = Instance._bridgeIconAtlas.GetSprite(spriteName);
+                    if (sprite != null) return sprite;
+                }
+
+                // Try river icon atlas
+                if (Instance._riverIconAtlas != null)
+                {
+                    sprite = Instance._riverIconAtlas.GetSprite(spriteName);
+                    if (sprite != null) return sprite;
+                }
+
+                // Try road icon atlas
+                if (Instance._roadIconAtlas != null)
+                {
+                    sprite = Instance._roadIconAtlas.GetSprite(spriteName);
                     if (sprite != null) return sprite;
                 }
 

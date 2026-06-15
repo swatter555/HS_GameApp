@@ -4406,7 +4406,7 @@ namespace HammerAndSickle.Models
             // Handle the icon profile.
             BASE_AIRBASE.IconProfile = new RegimentIconProfile(RegimentIconType.Single)
             {
-                W = SpriteManager.GEN_Airbase
+                W = SpriteManager.ME_Airbase
             };
 
             // Add the Large Base profile to the database

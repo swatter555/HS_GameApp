@@ -1,5 +1,4 @@
 using HammerAndSickle.Controllers;
-using HammerAndSickle.Core;
 using HammerAndSickle.Core.GameData;
 using HammerAndSickle.Models.Map;
 using HammerAndSickle.Services;
@@ -282,34 +281,8 @@ namespace HammerAndSickle.Core.Helpers
                 // Write to log.
                 if (log) Debug.Log($"{CLASS_NAME}: Creating HexMap instance...");
 
-                // Resolve map dimensions: prefer manifest, fall back to MapConfig header
-                var dims = manifest.GetMapDimensions();
-                int mapWidth = dims.x;
-                int mapHeight = dims.y;
-
-                // If manifest didn't have explicit dimensions, derive from map header config
-                if (manifest.MapWidth < 10 || manifest.MapHeight < 10)
-                {
-                    var configDims = mapData.Header.MapConfiguration switch
-                    {
-                        MapConfig.Large => new Vector2Int(HammerAndSickle.Core.GameData.GameData.LargeHexWidth, HammerAndSickle.Core.GameData.GameData.LargeHexHeight),
-                        _ => new Vector2Int(HammerAndSickle.Core.GameData.GameData.SmallHexWidth, HammerAndSickle.Core.GameData.GameData.SmallHexHeight)
-                    };
-                    mapWidth = configDims.x;
-                    mapHeight = configDims.y;
-                }
-
-                if (log) Debug.Log($"{CLASS_NAME}: Resolved map dimensions: {mapWidth}x{mapHeight}");
-
-                // Initialize the hex grid coordinate system
-                if (HexGridSystem.Instance != null)
-                {
-                    HexGridSystem.Instance.Initialize(mapWidth, mapHeight);
-                    if (log) Debug.Log($"{CLASS_NAME}: HexGridSystem initialized with {mapWidth}x{mapHeight}");
-                }
-
-                // Create HexMap instance with explicit dimensions
-                HexMap hexMap = new HexMap(mapData.Header.MapName, mapWidth, mapHeight);
+                // Create HexMap instance
+                HexMap hexMap = new HexMap(mapData.Header.MapName, mapData.Header.MapConfiguration);
 
                 // Write to log.
                 if (log) Debug.Log($"{CLASS_NAME}: HexMap created - Expected size: {hexMap.MapSize}");
@@ -349,6 +322,45 @@ namespace HammerAndSickle.Core.Helpers
                 if (log) Debug.Log($"{CLASS_NAME}: Building neighbor relationships...");
                 hexMap.BuildNeighborRelationships();
                 if (log) Debug.Log($"{CLASS_NAME}: Neighbor relationships built successfully");
+
+                // Symmetrize border data: ensure both hexes sharing an edge agree on
+                // rivers, bridges, pontoon bridges, and damaged bridges. Map files may
+                // store border flags on only one side of a shared edge; this pass
+                // propagates each flag to the neighboring hex's opposite edge.
+                if (log) Debug.Log($"{CLASS_NAME}: Symmetrizing border data...");
+                int bordersFixed = 0;
+
+                foreach (HexTile hex in hexMap)
+                {
+                    if (hex == null) continue;
+
+                    for (int d = 0; d < 6; d++)
+                    {
+                        HexDirection dir = (HexDirection)d;
+                        HexDirection opposite = HexMapUtil.GetOppositeDirection(dir);
+                        HexTile neighbor = hex.GetNeighbor(dir);
+
+                        if (neighbor == null) continue;
+
+                        // Rivers
+                        SymmetrizeBorder(hex.RiverBorders, neighbor.RiverBorders, dir, opposite, ref bordersFixed);
+
+                        // Bridges
+                        SymmetrizeBorder(hex.BridgeBorders, neighbor.BridgeBorders, dir, opposite, ref bordersFixed);
+
+                        // Pontoon bridges
+                        SymmetrizeBorder(hex.PontoonBridgeBorders, neighbor.PontoonBridgeBorders, dir, opposite, ref bordersFixed);
+
+                        // Damaged bridges
+                        SymmetrizeBorder(hex.DamagedBridgeBorders, neighbor.DamagedBridgeBorders, dir, opposite, ref bordersFixed);
+                    }
+                }
+
+                if (log) Debug.Log($"{CLASS_NAME}: Border symmetrization complete - {bordersFixed} one-sided borders fixed");
+                if (bordersFixed > 0)
+                {
+                    AppService.CaptureUiMessage($"Fixed {bordersFixed} asymmetric border entries");
+                }
 
                 // PrepareBattle the constructed map
                 if (log) Debug.Log($"{CLASS_NAME}: Validating constructed map integrity...");
@@ -392,5 +404,42 @@ namespace HammerAndSickle.Core.Helpers
         }
 
         #endregion // Public Methods
+
+        #region Private Methods
+
+        /// <summary>
+        /// Ensures both sides of a shared hex edge have matching border data.
+        /// If one side has a border set and the other does not, the missing side is filled in.
+        /// </summary>
+        /// <param name="aBorders">Border data for hex A</param>
+        /// <param name="bBorders">Border data for hex B (neighbor)</param>
+        /// <param name="aDir">Direction from A toward B</param>
+        /// <param name="bDir">Direction from B toward A (opposite)</param>
+        /// <param name="fixCount">Running count of fixes applied</param>
+        private static void SymmetrizeBorder(
+            JSONFeatureBorders aBorders,
+            JSONFeatureBorders bBorders,
+            HexDirection aDir,
+            HexDirection bDir,
+            ref int fixCount)
+        {
+            if (aBorders == null || bBorders == null) return;
+
+            bool aHas = aBorders.GetBorder(aDir);
+            bool bHas = bBorders.GetBorder(bDir);
+
+            if (aHas && !bHas)
+            {
+                bBorders.SetBorder(bDir, true);
+                fixCount++;
+            }
+            else if (!aHas && bHas)
+            {
+                aBorders.SetBorder(aDir, true);
+                fixCount++;
+            }
+        }
+
+        #endregion // Private Methods
     }
 }

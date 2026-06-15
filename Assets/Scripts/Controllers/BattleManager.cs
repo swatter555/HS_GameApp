@@ -1,8 +1,10 @@
+using HammerAndSickle.Core;
 using HammerAndSickle.Core.GameData;
 using HammerAndSickle.Core.Helpers;
 using HammerAndSickle.Core.Map;
 using HammerAndSickle.Helpers;
 using HammerAndSickle.Renderers;
+using HammerAndSickle.Renderers.Chunked;
 using HammerAndSickle.Services;
 using System;
 using System.Collections;
@@ -286,7 +288,25 @@ namespace HammerAndSickle.Controllers
                 return false;
             }
 
-            // Refresh the hex map renderer to display the newly loaded map
+            // Initialize the coordinate system with the loaded map's dimensions.
+            // HexGridSystem is required by the chunk renderer and any consumer that
+            // does hex↔world math; MapLoader does not call this itself.
+            var mapSize = GameDataManager.CurrentMapSize;
+            HexGridSystem.Instance.Initialize(mapSize.IntX, mapSize.IntY);
+
+            // Build the chunk-based terrain. Null-check so the scene still runs if the
+            // HexChunkRenderer GameObject is not yet present in the scene hierarchy.
+            if (HexChunkRenderer.Instance != null)
+            {
+                HexChunkRenderer.Instance.SetActiveTerrainSet(GameDataManager.CurrentMapTheme);
+                HexChunkRenderer.Instance.BuildAllChunks(GameDataManager.CurrentHexMap, HexGridSystem.Instance);
+            }
+            else
+            {
+                Debug.LogWarning("BattleManager.SetupBattleManagerData: HexChunkRenderer not found in scene — terrain will not render.");
+            }
+
+            // Refresh the hex map renderer (draws outlines, icons, labels on top of the chunked terrain).
             HexGridRenderer.Instance.RefreshMap();
 
             // Load the order of battle (OOB) file based on whether it's a campaign or stand-alone scenario

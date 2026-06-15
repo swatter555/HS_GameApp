@@ -1467,16 +1467,17 @@ namespace HammerAndSickle.Core.GameData
         public const float VETERAN_XP_MODIFIER = 1.2f; // +20% effectiveness
         public const float ELITE_XP_MODIFIER = 1.3f; // +30% effectiveness
 
-        public const float MOBILE_MOVEMENT_BONUS = 2.0f;  // Movement point bonus for Mobile units without MountedProfile
+        //public const float MOBILE_MOVEMENT_BONUS = 2.0f;  // Movement point bonus for Mobile units without MountedProfile
         public const float DEPLOYMENT_ACTION_MOVEMENT_COST = 0.5f;  // Deployment actions cost 50% of max movement
         public const float COMBAT_ACTION_MOVEMENT_COST = 0.25f; // Combat actions cost 25% of max movement
         public const float INTEL_ACTION_MOVEMENT_COST = 0.15f; // Intel actions cost 15% of max movement
 
-        public const float COMBAT_MOD_MOBILE = 1.0f;  // Mobile units get 10% combat malus
-        public const float COMBAT_MOD_DEPLOYED = 1.0f;  // Deployed units have no combat modifier
+
+        // Defender firepower modifications for deployment states.
+        public const float COMBAT_MOD_NONE          = 1.0f;  // Deployed units have no combat modifier
         public const float COMBAT_MOD_HASTY_DEFENSE = 1.1f;  // Hasty defense gives +10% combat bonus
-        public const float COMBAT_MOD_ENTRENCHED = 1.2f;  // Entrenched units get +20% combat bonus
-        public const float COMBAT_MOD_FORTIFIED = 1.3f;  // Fortified units get +30% combat bonus
+        public const float COMBAT_MOD_ENTRENCHED    = 1.2f;  // Entrenched units get +20% combat bonus
+        public const float COMBAT_MOD_FORTIFIED     = 1.3f;  // Fortified units get +30% combat bonus
 
         public const float STRENGTH_MOD_FULL = 1.15f; // Full strength units get +15% combat bonus
         public const float STRENGTH_MOD_DEPLETED = 0.75f; // Depleted strength units get -25% combat malus
@@ -1950,12 +1951,12 @@ namespace HammerAndSickle.Core.GameData
         public const int LargeHexHeight = 42;
 
         /// <summary>
-        /// Gets vertical spacing for the hex grid.
+        /// Gets vertical spacing for the hex grid in pixels.
+        /// Regular pointy-top hex: row spacing = width * sqrt(3)/2.
         /// </summary>
-        /// <returns></returns>
         public static float GetVerticalSpacing()
         {
-            return HexSize * 0.75f;
+            return HexSize * 0.8660254038f;
         }
 
         // Version of the .map file format.

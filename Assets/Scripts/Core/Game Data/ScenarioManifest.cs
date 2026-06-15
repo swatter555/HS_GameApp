@@ -163,8 +163,8 @@ namespace HammerAndSickle.Core.GameData
         {
             if (string.IsNullOrWhiteSpace(ThumbnailFilename))
                 return string.Empty;
-
-            return "Art/Scenario Thumbs/" + ThumbnailFilename;
+            
+            return Path.Combine(AppService.ScenarioThumbnailPath, ThumbnailFilename);
         }
 
         /// <summary>

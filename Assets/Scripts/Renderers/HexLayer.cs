@@ -55,7 +55,9 @@ namespace HammerAndSickle.Renderers
         /// <param name="sprite">Sprite to render.</param>
         /// <param name="worldPos">World position for the child GameObject.</param>
         /// <param name="color">Tint color for the SpriteRenderer.</param>
-        public void SetSprite(string key, Sprite sprite, Vector3 worldPos, Color color)
+        /// <param name="flipX">If true, mirror the sprite horizontally.</param>
+        /// <param name="flipY">If true, mirror the sprite vertically.</param>
+        public void SetSprite(string key, Sprite sprite, Vector3 worldPos, Color color, bool flipX = false, bool flipY = false)
         {
             if (_children.TryGetValue(key, out var existing))
             {
@@ -63,6 +65,8 @@ namespace HammerAndSickle.Renderers
                 var sr = existing.GetComponent<SpriteRenderer>();
                 sr.sprite = sprite;
                 sr.color = color;
+                sr.flipX = flipX;
+                sr.flipY = flipY;
                 return;
             }
 
@@ -74,6 +78,8 @@ namespace HammerAndSickle.Renderers
             var renderer = go.AddComponent<SpriteRenderer>();
             renderer.sprite = sprite;
             renderer.color = color;
+            renderer.flipX = flipX;
+            renderer.flipY = flipY;
             renderer.sortingLayerName = SortingLayerName;
             renderer.sortingOrder = sortingOrder;
 

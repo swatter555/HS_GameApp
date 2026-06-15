@@ -22,29 +22,35 @@ namespace HammerAndSickle.Core
         // Hex geometry in world units (hex pixel size / background map PPU)
         // Hex sprites are 256px; background map is at 100 PPU.
         // Each hex cell = 256/100 = 2.56 world units to align with the background.
-        private const float HEX_WIDTH = GameData.GameData.HexSize / GameData.GameData.MapPPU;   // 2.56f
-        private const float HALF_HEX_WIDTH = HEX_WIDTH * 0.5f;                 // 1.28f
-        private const float VERTICAL_SPACING = HEX_WIDTH * 0.75f;              // 1.92f
+        // Public so the chunk renderer (and any future geometry consumer) reads from
+        // the single source of truth instead of duplicating literals.
+        public const float HEX_WIDTH = GameData.GameData.HexSize / GameData.GameData.MapPPU;   // 2.56f
+        public const float HALF_HEX_WIDTH = HEX_WIDTH * 0.5f;                  // 1.28f
+        // Regular pointy-top hex: row spacing = width * sqrt(3)/2.
+        // sqrt(3)/2 = 0.86602540378443864676...
+        public const float VERTICAL_SPACING = HEX_WIDTH * 0.8660254038f;       // 2.21702503f
 
-        // Direction offsets for pointy-top, odd-r (matches HexMapUtil order: NE, E, SE, SW, W, NW)
+        // Direction offsets for pointy-top, odd-r with Y-up world coords (row+1 = higher world Y).
+        // Odd rows stagger right by half a hex width. Rows are indexed by HexDirection enum:
+        // NE=0, E=1, SE=2, SW=3, W=4, NW=5.
         private static readonly Vector2Int[] EvenRowDirections =
         {
-            new(-1, -1), // NW
-            new(0, -1),  // NE
-            new(1, 0),   // E
-            new(0, 1),   // SE
-            new(-1, 1),  // SW
-            new(-1, 0)   // W
+            new(0, 1),    // NE: upper-right
+            new(1, 0),    // E:  right, same row
+            new(0, -1),   // SE: lower-right
+            new(-1, -1),  // SW: lower-left
+            new(-1, 0),   // W:  left, same row
+            new(-1, 1)    // NW: upper-left
         };
 
         private static readonly Vector2Int[] OddRowDirections =
         {
-            new(0, -1),  // NW
-            new(1, -1),  // NE
-            new(1, 0),   // E
-            new(1, 1),   // SE
-            new(0, 1),   // SW
-            new(-1, 0)   // W
+            new(1, 1),    // NE: upper-right
+            new(1, 0),    // E:  right, same row
+            new(1, -1),   // SE: lower-right
+            new(0, -1),   // SW: lower-left
+            new(-1, 0),   // W:  left, same row
+            new(0, 1)     // NW: upper-left
         };
 
         #endregion // Constants

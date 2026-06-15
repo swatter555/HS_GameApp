@@ -12,7 +12,7 @@ namespace HammerAndSickle.Models.Map
     /// Contains terrain, features, borders, labels, and game state information.
     /// </summary>
     [Serializable]
-    public class HexTile : IDisposable
+    public class HexTile : IDisposable, IJsonOnDeserialized
     {
         #region Constants
 
@@ -59,6 +59,11 @@ namespace HammerAndSickle.Models.Map
         [JsonPropertyName("isAirbase")]
         public bool IsAirbase { get; set; }
 
+        // Naval port hex. Mutually exclusive with Fort and Airbase. CombatUnits will check this
+        // when up-deploying onto ships.
+        [JsonPropertyName("isPort")]
+        public bool IsPort { get; set; }
+
         // Game State
         [JsonPropertyName("isObjective")]
         public bool IsObjective { get; set; }
@@ -66,11 +71,33 @@ namespace HammerAndSickle.Models.Map
         [JsonPropertyName("isVisible")]
         public bool IsVisible { get; set; }
 
+        /// <summary>
+        /// Scenario-authored flag marking hexes where the player may place ground/helo units
+        /// during the Deployment phase.
+        /// </summary>
+        [JsonPropertyName("isDeploymentZone")]
+        public bool IsDeploymentZone { get; set; }
+
+        /// <summary>
+        /// Map flag for Marine coastal landings (beachhead). Serialized data only for now — no
+        /// consumer is wired to it yet.
+        /// </summary>
+        [JsonPropertyName("isBeachhead")]
+        public bool IsBeachhead { get; set; }
+
         [JsonPropertyName("tileControl")]
         public TileControl TileControl { get; set; }
 
         [JsonPropertyName("defaultTileControl")]
         public DefaultTileControl DefaultTileControl { get; set; }
+
+        /// <summary>
+        /// Ownership-persistence scalar in the range (0, 1.0], default 1.0. This is the supply-decay
+        /// hex-control value (±0.4 per Upkeep) that sits underneath the binary <see cref="TileControl"/>
+        /// owner — it is NOT the owner itself. Serialized with map data.
+        /// </summary>
+        [JsonPropertyName("hexControlLevel")]
+        public float HexControlLevel { get; set; } = 1.0f;
 
         // Labels and Display
         [JsonPropertyName("tileLabel")]
@@ -95,9 +122,6 @@ namespace HammerAndSickle.Models.Map
         [JsonPropertyName("victoryValue")]
         public float VictoryValue { get; set; }
 
-        [JsonPropertyName("airbaseDamage")]
-        public float AirbaseDamage { get; set; }
-
         // Urban Damage is now a proxy value for urban sprawl tiles.
         [JsonPropertyName("urbanDamage")]
         public int UrbanDamage { get; set; }
@@ -115,6 +139,28 @@ namespace HammerAndSickle.Models.Map
         [JsonPropertyName("damagedBridgeBorders")]
         public JSONFeatureBorders DamagedBridgeBorders { get; set; }
 
+        /// <summary>
+        /// True when any river edge is set on this hex. Computed from RiverBorders so the edges
+        /// remain the single source of truth — no sync risk between a separate flag and the edge data.
+        /// Renderer uses this for an early-exit optimization on non-river hexes.
+        /// </summary>
+        [JsonIgnore]
+        public bool IsRiver => RiverBorders?.HasAnyBorders() ?? false;
+
+        // Reserved for future use — serialized so the map/save schema stays forward-compatible.
+        // These carry no behavior today; repurpose one of them later instead of breaking the schema.
+        [JsonPropertyName("reservedInt1")]
+        public int ReservedInt1 { get; set; }
+
+        [JsonPropertyName("reservedInt2")]
+        public int ReservedInt2 { get; set; }
+
+        [JsonPropertyName("reservedFlag1")]
+        public bool ReservedFlag1 { get; set; }
+
+        [JsonPropertyName("reservedFlag2")]
+        public bool ReservedFlag2 { get; set; }
+
         #endregion // Properties
 
         #region Private Fields
@@ -130,70 +176,17 @@ namespace HammerAndSickle.Models.Map
         #region Constructors
 
         /// <summary>
-        /// JSON deserialization constructor with explicit parameters for all serializable properties.
-        /// System.Text.Json uses this constructor to create objects with all data available at construction time.
+        /// Parameterless constructor used by System.Text.Json. Serializable properties are populated by
+        /// the deserializer after construction; movement cost and transient state are finalized in
+        /// <see cref="OnDeserialized"/>. Adding a new serialized field is now just a new property — no
+        /// constructor surgery and no break to existing call sites.
         /// </summary>
         [JsonConstructor]
-        public HexTile(
-            Position2D position,
-            TerrainType terrain,
-            int movementCost,
-            bool isRail,
-            bool isRoad,
-            bool isFort,
-            bool isAirbase,
-            bool isObjective,
-            bool isVisible,
-            TileControl tileControl,
-            DefaultTileControl defaultTileControl,
-            string tileLabel,
-            string largeTileLabel,
-            TextSize labelSize,
-            FontWeight labelWeight,
-            TextColor labelColor,
-            float labelOutlineThickness,
-            float victoryValue,
-            float airbaseDamage,
-            int urbanDamage,
-            JSONFeatureBorders riverBorders,
-            JSONFeatureBorders bridgeBorders,
-            JSONFeatureBorders pontoonBridgeBorders,
-            JSONFeatureBorders damagedBridgeBorders)
+        public HexTile()
         {
-            // Assign all properties from JSON data
-            Position = position;
-            Terrain = terrain;
-            MovementCost = movementCost;
-            IsRail = isRail;
-            IsRoad = isRoad;
-            IsFort = isFort;
-            IsAirbase = isAirbase;
-            IsObjective = isObjective;
-            IsVisible = isVisible;
-            TileControl = tileControl;
-            DefaultTileControl = defaultTileControl;
-            TileLabel = tileLabel;
-            LargeTileLabel = largeTileLabel;
-            LabelSize = labelSize;
-            LabelWeight = labelWeight;
-            LabelColor = labelColor;
-            LabelOutlineThickness = labelOutlineThickness;
-            VictoryValue = victoryValue;
-            AirbaseDamage = airbaseDamage;
-            UrbanDamage = urbanDamage;
-            RiverBorders = riverBorders;
-            BridgeBorders = bridgeBorders;
-            PontoonBridgeBorders = pontoonBridgeBorders;
-            DamagedBridgeBorders = damagedBridgeBorders;
-
-            // PrepareBattle non-serialized fields
+            // Non-serialized fields only. All serializable properties are set by the deserializer
+            // after this runs, then OnDeserialized() finalizes derived/transient state.
             enableDebugLogging = false;
-
-            // Recalculate movement cost from terrain (intentionally overwrites JSON value)
-            UpdateMovementCost();
-
-            // PrepareBattle transient state only
-            Initialize();
         }
 
         /// <summary>
@@ -246,6 +239,20 @@ namespace HammerAndSickle.Models.Map
                 IsInitialized = false;
                 throw;
             }
+        }
+
+        /// <summary>
+        /// System.Text.Json post-deserialization hook. Runs after all serialized properties are set,
+        /// taking over the work the old explicit JSON constructor performed: it recalculates movement
+        /// cost from terrain (authoritative over any serialized value) and initializes transient state.
+        /// </summary>
+        public void OnDeserialized()
+        {
+            // Recalculate movement cost from terrain (intentionally overrides any serialized value)
+            UpdateMovementCost();
+
+            // Initialize transient (non-serialized) state
+            Initialize();
         }
 
         /// <summary>
@@ -348,7 +355,7 @@ namespace HammerAndSickle.Models.Map
         }
 
         /// <summary>
-        /// Sets the fort status of the hex. Mutually exclusive with airbase.
+        /// Sets the fort status of the hex. Mutually exclusive with airbase and port.
         /// </summary>
         /// <param name="value">True to enable fort, false to disable</param>
         public void SetIsFort(bool value)
@@ -358,10 +365,18 @@ namespace HammerAndSickle.Models.Map
             try
             {
                 IsFort = value;
-                if (IsFort && IsAirbase)
+                if (IsFort)
                 {
-                    IsAirbase = false;
-                    AppService.CaptureUiMessage("Fort and Airbase are mutually exclusive. Airbase disabled.");
+                    if (IsAirbase)
+                    {
+                        IsAirbase = false;
+                        AppService.CaptureUiMessage("Fort, Airbase, and Port are mutually exclusive. Airbase disabled.");
+                    }
+                    if (IsPort)
+                    {
+                        IsPort = false;
+                        AppService.CaptureUiMessage("Fort, Airbase, and Port are mutually exclusive. Port disabled.");
+                    }
                 }
 
                 if (enableDebugLogging)
@@ -377,7 +392,7 @@ namespace HammerAndSickle.Models.Map
         }
 
         /// <summary>
-        /// Sets the airbase status of the hex. Mutually exclusive with fort.
+        /// Sets the airbase status of the hex. Mutually exclusive with fort and port.
         /// </summary>
         /// <param name="value">True to enable airbase, false to disable</param>
         public void SetIsAirbase(bool value)
@@ -387,10 +402,18 @@ namespace HammerAndSickle.Models.Map
             try
             {
                 IsAirbase = value;
-                if (IsAirbase && IsFort)
+                if (IsAirbase)
                 {
-                    IsFort = false;
-                    AppService.CaptureUiMessage("Fort and Airbase are mutually exclusive. Fort disabled.");
+                    if (IsFort)
+                    {
+                        IsFort = false;
+                        AppService.CaptureUiMessage("Fort, Airbase, and Port are mutually exclusive. Fort disabled.");
+                    }
+                    if (IsPort)
+                    {
+                        IsPort = false;
+                        AppService.CaptureUiMessage("Fort, Airbase, and Port are mutually exclusive. Port disabled.");
+                    }
                 }
 
                 if (enableDebugLogging)
@@ -401,6 +424,44 @@ namespace HammerAndSickle.Models.Map
             catch (Exception ex)
             {
                 AppService.HandleException(CLASS_NAME, nameof(SetIsAirbase), ex);
+                throw;
+            }
+        }
+
+        /// <summary>
+        /// Sets the port status of the hex. Mutually exclusive with fort and airbase.
+        /// CombatUnits will check this when up-deploying onto ships.
+        /// </summary>
+        /// <param name="value">True to enable port, false to disable</param>
+        public void SetIsPort(bool value)
+        {
+            ValidateState();
+
+            try
+            {
+                IsPort = value;
+                if (IsPort)
+                {
+                    if (IsFort)
+                    {
+                        IsFort = false;
+                        AppService.CaptureUiMessage("Fort, Airbase, and Port are mutually exclusive. Fort disabled.");
+                    }
+                    if (IsAirbase)
+                    {
+                        IsAirbase = false;
+                        AppService.CaptureUiMessage("Fort, Airbase, and Port are mutually exclusive. Airbase disabled.");
+                    }
+                }
+
+                if (enableDebugLogging)
+                {
+                    Debug.Log($"{CLASS_NAME}: Port status at {Position} set to {value}");
+                }
+            }
+            catch (Exception ex)
+            {
+                AppService.HandleException(CLASS_NAME, nameof(SetIsPort), ex);
                 throw;
             }
         }
@@ -576,10 +637,11 @@ namespace HammerAndSickle.Models.Map
         {
             try
             {
-                // Check mutually exclusive features
-                if (IsFort && IsAirbase)
+                // Check mutually exclusive features (Fort / Airbase / Port — at most one)
+                int facilityCount = (IsFort ? 1 : 0) + (IsAirbase ? 1 : 0) + (IsPort ? 1 : 0);
+                if (facilityCount > 1)
                 {
-                    AppService.CaptureUiMessage($"Hex at {Position}: Fort and Airbase cannot both be true");
+                    AppService.CaptureUiMessage($"Hex at {Position}: Fort, Airbase, and Port are mutually exclusive");
                     return false;
                 }
 
