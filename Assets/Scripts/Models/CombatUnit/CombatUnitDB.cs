@@ -307,7 +307,6 @@ namespace HammerAndSickle.Models
             btr70Regiment.SetExperienceLevel(ExperienceLevel.Trained);
 
             // Set the ICM
-            btr70Regiment.SetICM(GameData.ICM_DEFAULT);
 
             // Add the template to the database
             AddTemplate("USSR_MRR_BTR70", btr70Regiment);
@@ -336,7 +335,6 @@ namespace HammerAndSickle.Models
             btr80Regiment.SetExperienceLevel(ExperienceLevel.Trained);
 
             // Set the ICM
-            btr80Regiment.SetICM(GameData.ICM_DEFAULT);
 
             // Add the template to the database
             AddTemplate("USSR_MRR_BTR80", btr80Regiment);
@@ -365,7 +363,6 @@ namespace HammerAndSickle.Models
             bmp1Regiment.SetExperienceLevel(ExperienceLevel.Trained);
 
             // Set the ICM
-            bmp1Regiment.SetICM(GameData.ICM_DEFAULT);
 
             // Add the template to the database
             AddTemplate("USSR_MRR_BMP1", bmp1Regiment);
@@ -394,7 +391,6 @@ namespace HammerAndSickle.Models
             bmp2Regiment.SetExperienceLevel(ExperienceLevel.Trained);
 
             // Set the ICM
-            bmp2Regiment.SetICM(GameData.ICM_DEFAULT);
 
             // Add the template to the database
             AddTemplate("USSR_MRR_BMP2", bmp2Regiment);
@@ -423,7 +419,6 @@ namespace HammerAndSickle.Models
             bmp3Regiment.SetExperienceLevel(ExperienceLevel.Trained);
 
             // Set the ICM
-            bmp3Regiment.SetICM(GameData.ICM_DEFAULT);
 
             // Add the template to the database
             AddTemplate("USSR_MRR_BMP3", bmp3Regiment);
@@ -462,7 +457,6 @@ namespace HammerAndSickle.Models
             t55Regiment.SetExperienceLevel(ExperienceLevel.Trained);
 
             // Set the ICM
-            t55Regiment.SetICM(GameData.ICM_DEFAULT);
 
             // Add the template to the database
             AddTemplate("USSR_TR_T55", t55Regiment);
@@ -491,7 +485,6 @@ namespace HammerAndSickle.Models
             t62aRegiment.SetExperienceLevel(ExperienceLevel.Trained);
 
             // Set the ICM
-            t62aRegiment.SetICM(GameData.ICM_DEFAULT);
 
             // Add the template to the database
             AddTemplate("USSR_TR_T62A", t62aRegiment);
@@ -520,7 +513,6 @@ namespace HammerAndSickle.Models
             t64aRegiment.SetExperienceLevel(ExperienceLevel.Trained);
 
             // Set the ICM
-            t64aRegiment.SetICM(GameData.ICM_DEFAULT);
 
             // Add the template to the database
             AddTemplate("USSR_TR_T64A", t64aRegiment);
@@ -549,7 +541,6 @@ namespace HammerAndSickle.Models
             t64bRegiment.SetExperienceLevel(ExperienceLevel.Trained);
 
             // Set the ICM
-            t64bRegiment.SetICM(GameData.ICM_DEFAULT);
 
             // Add the template to the database
             AddTemplate("USSR_TR_T64B", t64bRegiment);
@@ -578,7 +569,6 @@ namespace HammerAndSickle.Models
             t72aRegiment.SetExperienceLevel(ExperienceLevel.Trained);
 
             // Set the ICM
-            t72aRegiment.SetICM(GameData.ICM_DEFAULT);
 
             // Add the template to the database
             AddTemplate("USSR_TR_T72A", t72aRegiment);
@@ -607,7 +597,6 @@ namespace HammerAndSickle.Models
             t72bRegiment.SetExperienceLevel(ExperienceLevel.Trained);
 
             // Set the ICM
-            t72bRegiment.SetICM(GameData.ICM_DEFAULT);
 
             // Add the template to the database
             AddTemplate("USSR_TR_T72B", t72bRegiment);
@@ -636,7 +625,6 @@ namespace HammerAndSickle.Models
             t80bRegiment.SetExperienceLevel(ExperienceLevel.Trained);
 
             // Set the ICM
-            t80bRegiment.SetICM(GameData.ICM_DEFAULT);
 
             // Add the template to the database
             AddTemplate("USSR_TR_T80B", t80bRegiment);
@@ -665,7 +653,6 @@ namespace HammerAndSickle.Models
             t80uRegiment.SetExperienceLevel(ExperienceLevel.Trained);
 
             // Set the ICM
-            t80uRegiment.SetICM(GameData.ICM_DEFAULT);
 
             // Add the template to the database
             AddTemplate("USSR_TR_T80U", t80uRegiment);
@@ -694,7 +681,6 @@ namespace HammerAndSickle.Models
             t80bvRegiment.SetExperienceLevel(ExperienceLevel.Trained);
 
             // Set the ICM
-            t80bvRegiment.SetICM(GameData.ICM_DEFAULT);
 
             // Add the template to the database
             AddTemplate("USSR_TR_T80BV", t80bvRegiment);
@@ -733,7 +719,6 @@ namespace HammerAndSickle.Models
             lightArtilleryRegiment.SetExperienceLevel(ExperienceLevel.Trained);
 
             // Set the ICM
-            lightArtilleryRegiment.SetICM(GameData.ICM_DEFAULT);
 
             // Add the template to the database
             AddTemplate("USSR_AR_LIGHT", lightArtilleryRegiment);
@@ -762,7 +747,6 @@ namespace HammerAndSickle.Models
             heavyArtilleryRegiment.SetExperienceLevel(ExperienceLevel.Trained);
 
             // Set the ICM
-            heavyArtilleryRegiment.SetICM(GameData.ICM_DEFAULT);
 
             // Add the template to the database
             AddTemplate("USSR_AR_HEAVY", heavyArtilleryRegiment);
@@ -791,7 +775,6 @@ namespace HammerAndSickle.Models
             spa2s1Regiment.SetExperienceLevel(ExperienceLevel.Trained);
 
             // Set the ICM
-            spa2s1Regiment.SetICM(GameData.ICM_DEFAULT);
 
             // Add the template to the database
             AddTemplate("USSR_SPA_2S1", spa2s1Regiment);
@@ -820,7 +803,6 @@ namespace HammerAndSickle.Models
             spa2s3Regiment.SetExperienceLevel(ExperienceLevel.Trained);
 
             // Set the ICM
-            spa2s3Regiment.SetICM(GameData.ICM_DEFAULT);
 
             // Add the template to the database
             AddTemplate("USSR_SPA_2S3", spa2s3Regiment);
@@ -849,7 +831,6 @@ namespace HammerAndSickle.Models
             spa2s5Regiment.SetExperienceLevel(ExperienceLevel.Trained);
 
             // Set the ICM
-            spa2s5Regiment.SetICM(GameData.ICM_DEFAULT);
 
             // Add the template to the database
             AddTemplate("USSR_SPA_2S5", spa2s5Regiment);
@@ -878,7 +859,6 @@ namespace HammerAndSickle.Models
             spa2s19Regiment.SetExperienceLevel(ExperienceLevel.Trained);
 
             // Set the ICM
-            spa2s19Regiment.SetICM(GameData.ICM_DEFAULT);
 
             // Add the template to the database
             AddTemplate("USSR_SPA_2S19", spa2s19Regiment);
@@ -917,7 +897,6 @@ namespace HammerAndSickle.Models
             rocBm21Regiment.SetExperienceLevel(ExperienceLevel.Trained);
 
             // Set the ICM
-            rocBm21Regiment.SetICM(GameData.ICM_DEFAULT);
 
             // Add the template to the database
             AddTemplate("USSR_ROC_BM21", rocBm21Regiment);
@@ -946,7 +925,6 @@ namespace HammerAndSickle.Models
             rocBm27Regiment.SetExperienceLevel(ExperienceLevel.Trained);
 
             // Set the ICM
-            rocBm27Regiment.SetICM(GameData.ICM_DEFAULT);
 
             // Add the template to the database
             AddTemplate("USSR_ROC_BM27", rocBm27Regiment);
@@ -975,7 +953,6 @@ namespace HammerAndSickle.Models
             rocBm30Regiment.SetExperienceLevel(ExperienceLevel.Trained);
 
             // Set the ICM
-            rocBm30Regiment.SetICM(GameData.ICM_DEFAULT);
 
             // Add the template to the database
             AddTemplate("USSR_ROC_BM30", rocBm30Regiment);
@@ -1004,7 +981,6 @@ namespace HammerAndSickle.Models
             bmScudRegiment.SetExperienceLevel(ExperienceLevel.Trained);
 
             // Set the ICM
-            bmScudRegiment.SetICM(GameData.ICM_DEFAULT);
 
             // Add the template to the database
             AddTemplate("USSR_BM_SCUD", bmScudRegiment);
@@ -1043,7 +1019,6 @@ namespace HammerAndSickle.Models
             aarMtlbRegiment.SetExperienceLevel(ExperienceLevel.Experienced);
 
             // Set the ICM
-            aarMtlbRegiment.SetICM(GameData.ICM_DEFAULT);
 
             // Add the template to the database
             AddTemplate("USSR_AAR_MTLB", aarMtlbRegiment);
@@ -1072,7 +1047,6 @@ namespace HammerAndSickle.Models
             aarBmd2Regiment.SetExperienceLevel(ExperienceLevel.Experienced);
 
             // Set the ICM
-            aarBmd2Regiment.SetICM(GameData.ICM_DEFAULT);
 
             // Add the template to the database
             AddTemplate("USSR_AAR_BMD2", aarBmd2Regiment);
@@ -1101,7 +1075,6 @@ namespace HammerAndSickle.Models
             aarBmd3Regiment.SetExperienceLevel(ExperienceLevel.Experienced);
 
             // Set the ICM
-            aarBmd3Regiment.SetICM(GameData.ICM_DEFAULT);
 
             // Add the template to the database
             AddTemplate("USSR_AAR_BMD3", aarBmd3Regiment);
@@ -1140,7 +1113,6 @@ namespace HammerAndSickle.Models
             vdvBmd2Regiment.SetExperienceLevel(ExperienceLevel.Experienced);
 
             // Set the ICM
-            vdvBmd2Regiment.SetICM(GameData.ICM_DEFAULT);
 
             // Add the template to the database
             AddTemplate("USSR_VDV_BMD2", vdvBmd2Regiment);
@@ -1169,7 +1141,6 @@ namespace HammerAndSickle.Models
             vdvBmd3Regiment.SetExperienceLevel(ExperienceLevel.Experienced);
 
             // Set the ICM
-            vdvBmd3Regiment.SetICM(GameData.ICM_DEFAULT);
 
             // Add the template to the database
             AddTemplate("USSR_VDV_BMD3", vdvBmd3Regiment);
@@ -1198,7 +1169,6 @@ namespace HammerAndSickle.Models
             vdvArtilleryRegiment.SetExperienceLevel(ExperienceLevel.Experienced);
 
             // Set the ICM
-            vdvArtilleryRegiment.SetICM(GameData.ICM_SMALL_UNIT);
 
             // Add the template to the database
             AddTemplate("USSR_VDV_ART", vdvArtilleryRegiment);
@@ -1227,7 +1197,6 @@ namespace HammerAndSickle.Models
             vdvSupportRegiment.SetExperienceLevel(ExperienceLevel.Experienced);
 
             // Set the ICM
-            vdvSupportRegiment.SetICM(GameData.ICM_SMALL_UNIT);
 
             // Add the template to the database
             AddTemplate("USSR_VDV_SUP", vdvSupportRegiment);
@@ -1266,7 +1235,6 @@ namespace HammerAndSickle.Models
             navalInfantryBtr70Regiment.SetExperienceLevel(ExperienceLevel.Experienced);
 
             // Set the ICM
-            navalInfantryBtr70Regiment.SetICM(GameData.ICM_DEFAULT);
 
             // Add the template to the database
             AddTemplate("USSR_NAV_BTR70", navalInfantryBtr70Regiment);
@@ -1295,7 +1263,6 @@ namespace HammerAndSickle.Models
             navalInfantryBtr80Regiment.SetExperienceLevel(ExperienceLevel.Experienced);
 
             // Set the ICM
-            navalInfantryBtr80Regiment.SetICM(GameData.ICM_DEFAULT);
 
             // Add the template to the database
             AddTemplate("USSR_NAV_BTR80", navalInfantryBtr80Regiment);
@@ -1334,7 +1301,6 @@ namespace HammerAndSickle.Models
             engineerRegiment.SetExperienceLevel(ExperienceLevel.Trained);
 
             // Set the ICM
-            engineerRegiment.SetICM(GameData.ICM_DEFAULT);
 
             // Add the template to the database
             AddTemplate("USSR_ENG", engineerRegiment);
@@ -1363,7 +1329,6 @@ namespace HammerAndSickle.Models
             spetsnazRegiment.SetExperienceLevel(ExperienceLevel.Veteran);
 
             // Set the ICM
-            spetsnazRegiment.SetICM(GameData.ICM_SMALL_UNIT);
 
             // Add the template to the database
             AddTemplate("USSR_GRU", spetsnazRegiment);
@@ -1402,7 +1367,6 @@ namespace HammerAndSickle.Models
             reconRegiment.SetExperienceLevel(ExperienceLevel.Trained);
 
             // Set the ICM
-            reconRegiment.SetICM(GameData.ICM_DEFAULT);
 
             // Add the template to the database
             AddTemplate("USSR_RCR", reconRegiment);
@@ -1431,7 +1395,6 @@ namespace HammerAndSickle.Models
             antiTankRegiment.SetExperienceLevel(ExperienceLevel.Trained);
 
             // Set the ICM
-            antiTankRegiment.SetICM(GameData.ICM_DEFAULT);
 
             // Add the template to the database
             AddTemplate("USSR_RCR_AT", antiTankRegiment);
@@ -1470,7 +1433,6 @@ namespace HammerAndSickle.Models
             adrGenericRegiment.SetExperienceLevel(ExperienceLevel.Trained);
 
             // Set the ICM
-            adrGenericRegiment.SetICM(GameData.ICM_DEFAULT);
 
             // Add the template to the database
             AddTemplate("USSR_ADR_AAA", adrGenericRegiment);
@@ -1499,7 +1461,6 @@ namespace HammerAndSickle.Models
             adrZsu57Regiment.SetExperienceLevel(ExperienceLevel.Trained);
 
             // Set the ICM
-            adrZsu57Regiment.SetICM(GameData.ICM_DEFAULT);
 
             // Add the template to the database
             AddTemplate("USSR_ADR_ZSU57", adrZsu57Regiment);
@@ -1528,7 +1489,6 @@ namespace HammerAndSickle.Models
             adrZsu23Regiment.SetExperienceLevel(ExperienceLevel.Trained);
 
             // Set the ICM
-            adrZsu23Regiment.SetICM(GameData.ICM_DEFAULT);
 
             // Add the template to the database
             AddTemplate("USSR_ADR_ZSU23", adrZsu23Regiment);
@@ -1557,7 +1517,6 @@ namespace HammerAndSickle.Models
             adr2k12Regiment.SetExperienceLevel(ExperienceLevel.Trained);
 
             // Set the ICM
-            adr2k12Regiment.SetICM(GameData.ICM_DEFAULT);
 
             // Add the template to the database
             AddTemplate("USSR_ADR_2K12", adr2k12Regiment);
@@ -1586,7 +1545,6 @@ namespace HammerAndSickle.Models
             adr2k22Regiment.SetExperienceLevel(ExperienceLevel.Trained);
 
             // Set the ICM
-            adr2k22Regiment.SetICM(GameData.ICM_DEFAULT);
 
             // Add the template to the database
             AddTemplate("USSR_ADR_2K22", adr2k22Regiment);
@@ -1625,7 +1583,6 @@ namespace HammerAndSickle.Models
             spsam9k31Regiment.SetExperienceLevel(ExperienceLevel.Trained);
 
             // Set the ICM
-            spsam9k31Regiment.SetICM(GameData.ICM_DEFAULT);
 
             // Add the template to the database
             AddTemplate("USSR_SPSAM_9K31", spsam9k31Regiment);
@@ -1654,7 +1611,6 @@ namespace HammerAndSickle.Models
             samS75Regiment.SetExperienceLevel(ExperienceLevel.Trained);
 
             // Set the ICM
-            samS75Regiment.SetICM(GameData.ICM_DEFAULT);
 
             // Add the template to the database
             AddTemplate("USSR_SAM_S75", samS75Regiment);
@@ -1683,7 +1639,6 @@ namespace HammerAndSickle.Models
             samS125Regiment.SetExperienceLevel(ExperienceLevel.Trained);
 
             // Set the ICM
-            samS125Regiment.SetICM(GameData.ICM_DEFAULT);
 
             // Add the template to the database
             AddTemplate("USSR_SAM_S125", samS125Regiment);
@@ -1712,7 +1667,6 @@ namespace HammerAndSickle.Models
             samS300Regiment.SetExperienceLevel(ExperienceLevel.Trained);
 
             // Set the ICM
-            samS300Regiment.SetICM(GameData.ICM_DEFAULT);
 
             // Add the template to the database
             AddTemplate("USSR_SAM_S300", samS300Regiment);
@@ -1751,7 +1705,6 @@ namespace HammerAndSickle.Models
             helMi8atRegiment.SetExperienceLevel(ExperienceLevel.Trained);
 
             // Set the ICM
-            helMi8atRegiment.SetICM(GameData.ICM_DEFAULT);
 
             // Add the template to the database
             AddTemplate("USSR_HEL_MI8AT", helMi8atRegiment);
@@ -1780,7 +1733,6 @@ namespace HammerAndSickle.Models
             helMi24dRegiment.SetExperienceLevel(ExperienceLevel.Trained);
 
             // Set the ICM
-            helMi24dRegiment.SetICM(GameData.ICM_DEFAULT);
 
             // Add the template to the database
             AddTemplate("USSR_HEL_MI24D", helMi24dRegiment);
@@ -1809,7 +1761,6 @@ namespace HammerAndSickle.Models
             helMi24vRegiment.SetExperienceLevel(ExperienceLevel.Trained);
 
             // Set the ICM
-            helMi24vRegiment.SetICM(GameData.ICM_DEFAULT);
 
             // Add the template to the database
             AddTemplate("USSR_HEL_MI24V", helMi24vRegiment);
@@ -1838,7 +1789,6 @@ namespace HammerAndSickle.Models
             helMi28Regiment.SetExperienceLevel(ExperienceLevel.Trained);
 
             // Set the ICM
-            helMi28Regiment.SetICM(GameData.ICM_DEFAULT);
 
             // Add the template to the database
             AddTemplate("USSR_HEL_MI28", helMi28Regiment);
@@ -1877,7 +1827,6 @@ namespace HammerAndSickle.Models
             fgtMig21Regiment.SetExperienceLevel(ExperienceLevel.Trained);
 
             // Set the ICM
-            fgtMig21Regiment.SetICM(GameData.ICM_DEFAULT);
 
             // Add the template to the database
             AddTemplate("USSR_FGT_MIG21", fgtMig21Regiment);
@@ -1906,7 +1855,6 @@ namespace HammerAndSickle.Models
             fgtMig23Regiment.SetExperienceLevel(ExperienceLevel.Trained);
 
             // Set the ICM
-            fgtMig23Regiment.SetICM(GameData.ICM_DEFAULT);
 
             // Add the template to the database
             AddTemplate("USSR_FGT_MIG23", fgtMig23Regiment);
@@ -1935,7 +1883,6 @@ namespace HammerAndSickle.Models
             fgtMig25Regiment.SetExperienceLevel(ExperienceLevel.Trained);
 
             // Set the ICM
-            fgtMig25Regiment.SetICM(GameData.ICM_DEFAULT);
 
             // Add the template to the database
             AddTemplate("USSR_FGT_MIG25", fgtMig25Regiment);
@@ -1964,7 +1911,6 @@ namespace HammerAndSickle.Models
             fgtMig29Regiment.SetExperienceLevel(ExperienceLevel.Trained);
 
             // Set the ICM
-            fgtMig29Regiment.SetICM(GameData.ICM_DEFAULT);
 
             // Add the template to the database
             AddTemplate("USSR_FGT_MIG29", fgtMig29Regiment);
@@ -1993,7 +1939,6 @@ namespace HammerAndSickle.Models
             fgtMig31Regiment.SetExperienceLevel(ExperienceLevel.Trained);
 
             // Set the ICM
-            fgtMig31Regiment.SetICM(GameData.ICM_DEFAULT);
 
             // Add the template to the database
             AddTemplate("USSR_FGT_MIG31", fgtMig31Regiment);
@@ -2022,7 +1967,6 @@ namespace HammerAndSickle.Models
             fgtSu27Regiment.SetExperienceLevel(ExperienceLevel.Trained);
 
             // Set the ICM
-            fgtSu27Regiment.SetICM(GameData.ICM_DEFAULT);
 
             // Add the template to the database
             AddTemplate("USSR_FGT_SU27", fgtSu27Regiment);
@@ -2051,7 +1995,6 @@ namespace HammerAndSickle.Models
             fgtSu47Regiment.SetExperienceLevel(ExperienceLevel.Elite);
 
             // Set the ICM
-            fgtSu47Regiment.SetICM(GameData.ICM_LARGE_UNIT);
 
             // Add the template to the database
             AddTemplate("USSR_FGT_SU47", fgtSu47Regiment);
@@ -2080,7 +2023,6 @@ namespace HammerAndSickle.Models
             mrfMig27Regiment.SetExperienceLevel(ExperienceLevel.Trained);
 
             // Set the ICM
-            mrfMig27Regiment.SetICM(GameData.ICM_DEFAULT);
 
             // Add the template to the database
             AddTemplate("USSR_MRF_MIG27", mrfMig27Regiment);
@@ -2119,7 +2061,6 @@ namespace HammerAndSickle.Models
             attSu17Regiment.SetExperienceLevel(ExperienceLevel.Trained);
 
             // Set the ICM
-            attSu17Regiment.SetICM(GameData.ICM_DEFAULT);
 
             // Add the template to the database
             AddTemplate("USSR_ATT_SU17", attSu17Regiment);
@@ -2148,7 +2089,6 @@ namespace HammerAndSickle.Models
             attSu25Regiment.SetExperienceLevel(ExperienceLevel.Trained);
 
             // Set the ICM
-            attSu25Regiment.SetICM(GameData.ICM_DEFAULT);
 
             // Add the template to the database
             AddTemplate("USSR_ATT_SU25", attSu25Regiment);
@@ -2177,7 +2117,6 @@ namespace HammerAndSickle.Models
             attSu25bRegiment.SetExperienceLevel(ExperienceLevel.Trained);
 
             // Set the ICM
-            attSu25bRegiment.SetICM(GameData.ICM_DEFAULT);
 
             // Add the template to the database
             AddTemplate("USSR_ATT_SU25B", attSu25bRegiment);
@@ -2216,7 +2155,6 @@ namespace HammerAndSickle.Models
             awacsA50Regiment.SetExperienceLevel(ExperienceLevel.Trained);
 
             // Set the ICM
-            awacsA50Regiment.SetICM(GameData.ICM_DEFAULT);
 
             // Add the template to the database
             AddTemplate("USSR_AWACS_A50", awacsA50Regiment);
@@ -2245,7 +2183,6 @@ namespace HammerAndSickle.Models
             bmbSu24Regiment.SetExperienceLevel(ExperienceLevel.Trained);
 
             // Set the ICM
-            bmbSu24Regiment.SetICM(GameData.ICM_DEFAULT);
 
             // Add the template to the database
             AddTemplate("USSR_BMB_SU24", bmbSu24Regiment);
@@ -2274,7 +2211,6 @@ namespace HammerAndSickle.Models
             bmbTu16Regiment.SetExperienceLevel(ExperienceLevel.Trained);
 
             // Set the ICM
-            bmbTu16Regiment.SetICM(GameData.ICM_DEFAULT);
 
             // Add the template to the database
             AddTemplate("USSR_BMB_TU16", bmbTu16Regiment);
@@ -2303,7 +2239,6 @@ namespace HammerAndSickle.Models
             bmbTu22Regiment.SetExperienceLevel(ExperienceLevel.Trained);
 
             // Set the ICM
-            bmbTu22Regiment.SetICM(GameData.ICM_DEFAULT);
 
             // Add the template to the database
             AddTemplate("USSR_BMB_TU22", bmbTu22Regiment);
@@ -2332,7 +2267,6 @@ namespace HammerAndSickle.Models
             bmbTu22m3Regiment.SetExperienceLevel(ExperienceLevel.Trained);
 
             // Set the ICM
-            bmbTu22m3Regiment.SetICM(GameData.ICM_DEFAULT);
 
             // Add the template to the database
             AddTemplate("USSR_BMB_TU22M3", bmbTu22m3Regiment);
@@ -2371,7 +2305,6 @@ namespace HammerAndSickle.Models
             rcnMig25rRegiment.SetExperienceLevel(ExperienceLevel.Trained);
 
             // Set the ICM
-            rcnMig25rRegiment.SetICM(GameData.ICM_DEFAULT);
 
             // Add the template to the database
             AddTemplate("USSR_RCN_MIG25R", rcnMig25rRegiment);
@@ -2410,7 +2343,6 @@ namespace HammerAndSickle.Models
             sovSupplyDepot.SetExperienceLevel(ExperienceLevel.Trained);
 
             // Set the ICM - standard facility
-            sovSupplyDepot.SetICM(GameData.ICM_DEFAULT);
 
             // Add the template to the database
             AddTemplate("USSR_DEPOT", sovSupplyDepot);
@@ -2439,7 +2371,6 @@ namespace HammerAndSickle.Models
             sovAirbase.SetExperienceLevel(ExperienceLevel.Trained);
 
             // Set the ICM - standard facility
-            sovAirbase.SetICM(GameData.ICM_DEFAULT);
 
             // Add the template to the database
             AddTemplate("USSR_AIRBASE", sovAirbase);
@@ -2468,7 +2399,6 @@ namespace HammerAndSickle.Models
             sovHQ.SetExperienceLevel(ExperienceLevel.Trained);
 
             // Set the ICM - command facility
-            sovHQ.SetICM(GameData.ICM_DEFAULT);
 
             // Add the template to the database
             AddTemplate("USSR_HQ", sovHQ);
@@ -2497,7 +2427,6 @@ namespace HammerAndSickle.Models
             sovIntelBase.SetExperienceLevel(ExperienceLevel.Trained);
 
             // Set the ICM - specialized intelligence facility
-            sovIntelBase.SetICM(GameData.ICM_DEFAULT);
 
             // Add the template to the database
             AddTemplate("USSR_INTEL_BASE", sovIntelBase);
@@ -2535,7 +2464,6 @@ namespace HammerAndSickle.Models
             mjInf.SetExperienceLevel(ExperienceLevel.Experienced);
 
             // Set the ICM - guerrillas are tough fighters on home terrain
-            mjInf.SetICM(GameData.ICM_DEFAULT);
 
             // Add the template to the database
             AddTemplate("MJ_INF", mjInf);
@@ -2564,7 +2492,6 @@ namespace HammerAndSickle.Models
             mjRPGUnit.SetExperienceLevel(ExperienceLevel.Experienced);
 
             // Set the ICM - specialized anti-armor unit
-            mjRPGUnit.SetICM(GameData.ICM_DEFAULT);
 
             // Add the template to the database
             AddTemplate("MJ_RPG_UNIT", mjRPGUnit);
@@ -2593,7 +2520,6 @@ namespace HammerAndSickle.Models
             mjSpecCommando.SetExperienceLevel(ExperienceLevel.Veteran);
 
             // Set the ICM - small elite unit
-            mjSpecCommando.SetICM(GameData.ICM_SMALL_UNIT);
 
             // Add the template to the database
             AddTemplate("MJ_SPEC_COMMANDO", mjSpecCommando);
@@ -2622,7 +2548,6 @@ namespace HammerAndSickle.Models
             mjHorseCavalry.SetExperienceLevel(ExperienceLevel.Experienced);
 
             // Set the ICM - traditional mobile fighters
-            mjHorseCavalry.SetICM(GameData.ICM_DEFAULT);
 
             // Add the template to the database
             AddTemplate("MJ_CAV_HORSE", mjHorseCavalry);
@@ -2651,7 +2576,6 @@ namespace HammerAndSickle.Models
             mjAntiAircraft.SetExperienceLevel(ExperienceLevel.Trained);
 
             // Set the ICM - portable air defense
-            mjAntiAircraft.SetICM(GameData.ICM_SMALL_UNIT);
 
             // Add the template to the database
             AddTemplate("MJ_AAA", mjAntiAircraft);
@@ -2680,7 +2604,6 @@ namespace HammerAndSickle.Models
             mjSAMUnit.SetExperienceLevel(ExperienceLevel.Trained);
 
             // Set the ICM - specialized air defense unit
-            mjSAMUnit.SetICM(GameData.ICM_SMALL_UNIT);
 
             // Add the template to the database
             AddTemplate("MJ_SAM_UNIT", mjSAMUnit);
@@ -2709,7 +2632,6 @@ namespace HammerAndSickle.Models
             mjLightMortar.SetExperienceLevel(ExperienceLevel.Trained);
 
             // Set the ICM - light artillery support
-            mjLightMortar.SetICM(GameData.ICM_SMALL_UNIT);
 
             // Add the template to the database
             AddTemplate("MJ_ART_LIGHT_MORTAR", mjLightMortar);
@@ -2738,7 +2660,6 @@ namespace HammerAndSickle.Models
             mjLightArt.SetExperienceLevel(ExperienceLevel.Trained);
 
             // Set the ICM - heavier artillery support
-            mjLightArt.SetICM(GameData.ICM_SMALL_UNIT);
 
             // Add the template to the database
             AddTemplate("MJ_ART_LIGHT", mjLightArt);
@@ -2767,7 +2688,6 @@ namespace HammerAndSickle.Models
             mjSupplyCache.SetExperienceLevel(ExperienceLevel.Trained);
 
             // Set the ICM - small hidden supply cache
-            mjSupplyCache.SetICM(GameData.ICM_SMALL_UNIT);
 
             // Add the template to the database
             AddTemplate("MJ_DEPOT", mjSupplyCache);
@@ -2803,7 +2723,6 @@ namespace HammerAndSickle.Models
             us_armored_brigade.SetExperienceLevel(ExperienceLevel.Trained);
 
             // Set the ICM
-            us_armored_brigade.SetICM(1.3f);
 
             // Add the template to the database
             AddTemplate("US_ARMOR_BRIGADE", us_armored_brigade);
@@ -2832,7 +2751,6 @@ namespace HammerAndSickle.Models
             us_mech_brigade.SetExperienceLevel(ExperienceLevel.Trained);
 
             // Set the ICM
-            us_mech_brigade.SetICM(GameData.ICM_DEFAULT);
 
             // Add the template to the database
             AddTemplate("US_MECH_BRIGADE", us_mech_brigade);
@@ -2861,7 +2779,6 @@ namespace HammerAndSickle.Models
             us_armored_cavalry_squadron.SetExperienceLevel(ExperienceLevel.Experienced);
 
             // Set the ICM
-            us_armored_cavalry_squadron.SetICM(1.2f);
 
             // Add the template to the database
             AddTemplate("US_ARMORED_CAVALRY_SQUADRON", us_armored_cavalry_squadron);
@@ -2890,7 +2807,6 @@ namespace HammerAndSickle.Models
             us_artillery_regiment.SetExperienceLevel(ExperienceLevel.Experienced);
 
             // Set the ICM
-            us_artillery_regiment.SetICM(GameData.ICM_DEFAULT);
 
             // Add the template to the database
             AddTemplate("US_ARTILLERY_REGIMENT", us_artillery_regiment);
@@ -2919,7 +2835,6 @@ namespace HammerAndSickle.Models
             us_rocket_artillery_regiment.SetExperienceLevel(ExperienceLevel.Experienced);
 
             // Set the ICM
-            us_rocket_artillery_regiment.SetICM(GameData.ICM_DEFAULT);
 
             // Add the template to the database
             AddTemplate("US_ROCKET_ARTILLERY_REGIMENT", us_rocket_artillery_regiment);
@@ -2948,7 +2863,6 @@ namespace HammerAndSickle.Models
             us_air_defense_regiment.SetExperienceLevel(ExperienceLevel.Trained);
 
             // Set the ICM
-            us_air_defense_regiment.SetICM(GameData.ICM_DEFAULT);
 
             // Add the template to the database
             AddTemplate("US_AIR_DEFENSE_REGIMENT", us_air_defense_regiment);
@@ -2977,7 +2891,6 @@ namespace HammerAndSickle.Models
             us_hawk_regiment.SetExperienceLevel(ExperienceLevel.Trained);
 
             // Set the ICM
-            us_hawk_regiment.SetICM(GameData.ICM_DEFAULT);
 
             // Add the template to the database
             AddTemplate("US_HAWK_REGIMENT", us_hawk_regiment);
@@ -3006,7 +2919,6 @@ namespace HammerAndSickle.Models
             us_chaparral_regiment.SetExperienceLevel(ExperienceLevel.Trained);
 
             // Set the ICM
-            us_chaparral_regiment.SetICM(GameData.ICM_DEFAULT);
 
             // Add the template to the database
             AddTemplate("US_CHAPARRAL_REGIMENT", us_chaparral_regiment);
@@ -3034,7 +2946,6 @@ namespace HammerAndSickle.Models
             // Set experience level
             us_marine_expeditionary_unit.SetExperienceLevel(ExperienceLevel.Veteran);
             // Set the ICM
-            us_marine_expeditionary_unit.SetICM(GameData.ICM_DEFAULT);
 
             // Add the template to the database
             AddTemplate("US_MARINE_EXPEDITIONARY_UNIT", us_marine_expeditionary_unit);
@@ -3062,7 +2973,6 @@ namespace HammerAndSickle.Models
             // Set experience level
             us_airborne_brigade.SetExperienceLevel(ExperienceLevel.Veteran);
             // Set the ICM
-            us_airborne_brigade.SetICM(GameData.ICM_DEFAULT);
 
             // Add the template to the database
             AddTemplate("US_AIRBORNE_BRIGADE", us_airborne_brigade);
@@ -3090,7 +3000,6 @@ namespace HammerAndSickle.Models
             // Set experience level
             us_airmobile_brigade.SetExperienceLevel(ExperienceLevel.Veteran);
             // Set the ICM
-            us_airmobile_brigade.SetICM(GameData.ICM_DEFAULT);
 
             // Add the template to the database
             AddTemplate("US_AIRMOBILE_BRIGADE", us_airmobile_brigade);
@@ -3119,7 +3028,6 @@ namespace HammerAndSickle.Models
             us_recon_detachment.SetExperienceLevel(ExperienceLevel.Experienced);
 
             // Set the ICM
-            us_recon_detachment.SetICM(GameData.ICM_DEFAULT);
 
             // Add the template to the database
             AddTemplate("US_RECON_DETACHMENT", us_recon_detachment);
@@ -3148,7 +3056,6 @@ namespace HammerAndSickle.Models
             us_aviation_brigade.SetExperienceLevel(ExperienceLevel.Experienced);
 
             // Set the ICM
-            us_aviation_brigade.SetICM(GameData.ICM_DEFAULT);
 
             // Add the template to the database
             AddTemplate("US_AVIATION_BRIGADE", us_aviation_brigade);
@@ -3177,7 +3084,6 @@ namespace HammerAndSickle.Models
             us_awacs_squadron.SetExperienceLevel(ExperienceLevel.Experienced);
 
             // Set the ICM
-            us_awacs_squadron.SetICM(GameData.ICM_DEFAULT);
 
             // Add the template to the database
             AddTemplate("US_AWACS_SQUADRON", us_awacs_squadron);
@@ -3206,7 +3112,6 @@ namespace HammerAndSickle.Models
             us_f15_squadron.SetExperienceLevel(ExperienceLevel.Experienced);
 
             // Set the ICM
-            us_f15_squadron.SetICM(GameData.ICM_DEFAULT);
 
             // Add the template to the database
             AddTemplate("US_F15_FIGHTER_SQUADRON", us_f15_squadron);
@@ -3235,7 +3140,6 @@ namespace HammerAndSickle.Models
             us_f16_squadron.SetExperienceLevel(ExperienceLevel.Experienced);
 
             // Set the ICM
-            us_f16_squadron.SetICM(GameData.ICM_DEFAULT);
 
             // Add the template to the database
             AddTemplate("US_F16_FIGHTER_SQUADRON", us_f16_squadron);
@@ -3264,7 +3168,6 @@ namespace HammerAndSickle.Models
             us_f4_squadron.SetExperienceLevel(ExperienceLevel.Experienced);
 
             // Set the ICM
-            us_f4_squadron.SetICM(GameData.ICM_DEFAULT);
 
             // Add the template to the database
             AddTemplate("US_F4_PHANTOM_FIGHTER_SQUADRON", us_f4_squadron);
@@ -3293,7 +3196,6 @@ namespace HammerAndSickle.Models
             us_f14_squadron.SetExperienceLevel(ExperienceLevel.Experienced);
 
             // Set the ICM
-            us_f14_squadron.SetICM(GameData.ICM_DEFAULT);
 
             // Add the template to the database
             AddTemplate("US_F14_FIGHTER_SQUADRON", us_f14_squadron);
@@ -3322,7 +3224,6 @@ namespace HammerAndSickle.Models
             us_a10_squadron.SetExperienceLevel(ExperienceLevel.Experienced);
 
             // Set the ICM
-            us_a10_squadron.SetICM(GameData.ICM_DEFAULT);
 
             // Add the template to the database
             AddTemplate("US_A10_ATTACK_SQUADRON", us_a10_squadron);
@@ -3351,7 +3252,6 @@ namespace HammerAndSickle.Models
             us_f111_squadron.SetExperienceLevel(ExperienceLevel.Experienced);
 
             // Set the ICM
-            us_f111_squadron.SetICM(GameData.ICM_DEFAULT);
 
             // Add the template to the database
             AddTemplate("US_F111_STRIKE_SQUADRON", us_f111_squadron);
@@ -3380,7 +3280,6 @@ namespace HammerAndSickle.Models
             us_f117_squadron.SetExperienceLevel(ExperienceLevel.Elite);
 
             // Set the ICM
-            us_f111_squadron.SetICM(GameData.ICM_DEFAULT);
 
             // Add the template to the database
             AddTemplate("US_F117_STEALTH_FIGHTER_SQUADRON", us_f117_squadron);
@@ -3409,7 +3308,6 @@ namespace HammerAndSickle.Models
             us_SR71_squadron.SetExperienceLevel(ExperienceLevel.Elite);
 
             // Set the ICM
-            us_SR71_squadron.SetICM(GameData.ICM_DEFAULT);
 
             // Add the template to the database
             AddTemplate("US_SR71_RECON_SQUADRON", us_SR71_squadron);
@@ -3441,7 +3339,6 @@ namespace HammerAndSickle.Models
             ge_panzer_regiment_leo1.SetExperienceLevel(ExperienceLevel.Experienced);
 
             // Set the ICM
-            ge_panzer_regiment_leo1.SetICM(GameData.ICM_DEFAULT);
 
             // Add the template to the database
             AddTemplate("GE_PANZER_REGIMENT_LEO1", ge_panzer_regiment_leo1);
@@ -3470,7 +3367,6 @@ namespace HammerAndSickle.Models
             ge_panzer_regiment_leo2.SetExperienceLevel(ExperienceLevel.Experienced);
 
             // Set the ICM
-            ge_panzer_regiment_leo2.SetICM(GameData.ICM_DEFAULT);
 
             // Add the template to the database
             AddTemplate("GE_PANZER_REGIMENT_LEO2", ge_panzer_regiment_leo2);
@@ -3499,7 +3395,6 @@ namespace HammerAndSickle.Models
             ge_panzergrenadier_regiment.SetExperienceLevel(ExperienceLevel.Experienced);
 
             // Set the ICM
-            ge_panzergrenadier_regiment.SetICM(GameData.ICM_DEFAULT);
 
             // Add the template to the database
             AddTemplate("GE_PANZERGRENADIER_REGIMENT", ge_panzergrenadier_regiment);
@@ -3528,7 +3423,6 @@ namespace HammerAndSickle.Models
             ge_airborne_regiment.SetExperienceLevel(ExperienceLevel.Veteran);
 
             // Set the ICM
-            ge_airborne_regiment.SetICM(GameData.ICM_DEFAULT);
 
             // Add the template to the database
             AddTemplate("GE_AIRBORNE_REGIMENT", ge_airborne_regiment);
@@ -3557,7 +3451,6 @@ namespace HammerAndSickle.Models
             ge_recon_unit.SetExperienceLevel(ExperienceLevel.Experienced);
 
             // Set the ICM
-            ge_recon_unit.SetICM(GameData.ICM_DEFAULT);
 
             // Add the template to the database
             AddTemplate("GE_RECON_UNIT", ge_recon_unit);
@@ -3586,7 +3479,6 @@ namespace HammerAndSickle.Models
             ge_sp_artillery_regiment.SetExperienceLevel(ExperienceLevel.Experienced);
 
             // Set the ICM
-            ge_sp_artillery_regiment.SetICM(GameData.ICM_DEFAULT);
 
             // Add the template to the database
             AddTemplate("GE_SP_ARTILLERY_REGIMENT", ge_sp_artillery_regiment);
@@ -3615,7 +3507,6 @@ namespace HammerAndSickle.Models
             ge_air_defense_regiment.SetExperienceLevel(ExperienceLevel.Experienced);
 
             // Set the ICM
-            ge_air_defense_regiment.SetICM(GameData.ICM_DEFAULT);
 
             // Add the template to the database
             AddTemplate("GE_AIR_DEFENSE_REGIMENT", ge_air_defense_regiment);
@@ -3644,7 +3535,6 @@ namespace HammerAndSickle.Models
             ge_hawk_regiment.SetExperienceLevel(ExperienceLevel.Experienced);
 
             // Set the ICM
-            ge_hawk_regiment.SetICM(GameData.ICM_DEFAULT);
 
             // Add the template to the database
             AddTemplate("GE_HAWK_REGIMENT", ge_hawk_regiment);
@@ -3673,7 +3563,6 @@ namespace HammerAndSickle.Models
             ge_aviation_regiment.SetExperienceLevel(ExperienceLevel.Experienced);
 
             // Set the ICM
-            ge_aviation_regiment.SetICM(GameData.ICM_DEFAULT);
 
             // Add the template to the database
             AddTemplate("GE_AVIATION_REGIMENT", ge_aviation_regiment);
@@ -3702,7 +3591,6 @@ namespace HammerAndSickle.Models
             ge_f4_squadron.SetExperienceLevel(ExperienceLevel.Experienced);
 
             // Set the ICM
-            ge_f4_squadron.SetICM(GameData.ICM_DEFAULT);
 
             // Add the template to the database
             AddTemplate("GE_F4_PHANTOM_FIGHTER_SQUADRON", ge_f4_squadron);
@@ -3731,7 +3619,6 @@ namespace HammerAndSickle.Models
             ge_tornado_squadron.SetExperienceLevel(ExperienceLevel.Experienced);
 
             // Set the ICM
-            ge_tornado_squadron.SetICM(GameData.ICM_DEFAULT);
 
             // Add the template to the database
             AddTemplate("GE_TORNADO_FIGHTER_SQUADRON", ge_tornado_squadron);
@@ -3763,7 +3650,6 @@ namespace HammerAndSickle.Models
             uk_armoured_regiment.SetExperienceLevel(ExperienceLevel.Experienced);
 
             // Set the ICM
-            uk_armoured_regiment.SetICM(GameData.ICM_DEFAULT);
 
             // Add the template to the database
             AddTemplate("UK_ARMOURED_REGIMENT", uk_armoured_regiment);
@@ -3792,7 +3678,6 @@ namespace HammerAndSickle.Models
             uk_mech_infantry_regiment.SetExperienceLevel(ExperienceLevel.Experienced);
 
             // Set the ICM
-            uk_mech_infantry_regiment.SetICM(GameData.ICM_DEFAULT);
 
             // Add the template to the database
             AddTemplate("UK_MECH_INFANTRY_REGIMENT", uk_mech_infantry_regiment);
@@ -3821,7 +3706,6 @@ namespace HammerAndSickle.Models
             uk_airborne_regiment.SetExperienceLevel(ExperienceLevel.Experienced);
 
             // Set the ICM
-            uk_airborne_regiment.SetICM(GameData.ICM_DEFAULT);
 
             // Add the template to the database
             AddTemplate("UK_AIRBORNE_REGIMENT", uk_airborne_regiment);
@@ -3850,7 +3734,6 @@ namespace HammerAndSickle.Models
             uk_recon_unit.SetExperienceLevel(ExperienceLevel.Experienced);
 
             // Set the ICM
-            uk_recon_unit.SetICM(GameData.ICM_DEFAULT);
 
             // Add the template to the database
             AddTemplate("UK_RECON_UNIT", uk_recon_unit);
@@ -3879,7 +3762,6 @@ namespace HammerAndSickle.Models
             uk_sp_artillery_regiment.SetExperienceLevel(ExperienceLevel.Experienced);
 
             // Set the ICM
-            uk_sp_artillery_regiment.SetICM(GameData.ICM_DEFAULT);
 
             // Add the template to the database
             AddTemplate("UK_SP_ARTILLERY_REGIMENT", uk_sp_artillery_regiment);
@@ -3908,7 +3790,6 @@ namespace HammerAndSickle.Models
             uk_air_defense_regiment.SetExperienceLevel(ExperienceLevel.Experienced);
 
             // Set the ICM
-            uk_air_defense_regiment.SetICM(GameData.ICM_DEFAULT);
 
             // Add the template to the database
             AddTemplate("UK_AIR_DEFENSE_REGIMENT", uk_air_defense_regiment);
@@ -3937,7 +3818,6 @@ namespace HammerAndSickle.Models
             uk_rapier_regiment.SetExperienceLevel(ExperienceLevel.Experienced);
 
             // Set the ICM
-            uk_rapier_regiment.SetICM(GameData.ICM_DEFAULT);
 
             // Add the template to the database
             AddTemplate("UK_RAPIER_REGIMENT", uk_rapier_regiment);
@@ -3966,7 +3846,6 @@ namespace HammerAndSickle.Models
             uk_tornado_squadron.SetExperienceLevel(ExperienceLevel.Experienced);
 
             // Set the ICM
-            uk_tornado_squadron.SetICM(GameData.ICM_DEFAULT);
 
             // Add the template to the database
             AddTemplate("UK_TORNADO_FIGHTER_SQUADRON", uk_tornado_squadron);
@@ -3998,7 +3877,6 @@ namespace HammerAndSickle.Models
             fr_armored_brigade.SetExperienceLevel(ExperienceLevel.Trained);
 
             // Set the ICM
-            fr_armored_brigade.SetICM(GameData.ICM_DEFAULT);
 
             // Add the template to the database
             AddTemplate("FR_ARMORED_BRIGADE", fr_armored_brigade);
@@ -4027,7 +3905,6 @@ namespace HammerAndSickle.Models
             fr_mech_infantry_brigade.SetExperienceLevel(ExperienceLevel.Trained);
 
             // Set the ICM
-            fr_mech_infantry_brigade.SetICM(GameData.ICM_DEFAULT);
 
             // Add the template to the database
             AddTemplate("FR_MECH_INFANTRY_BRIGADE", fr_mech_infantry_brigade);
@@ -4056,7 +3933,6 @@ namespace HammerAndSickle.Models
             fr_airborne_brigade.SetExperienceLevel(ExperienceLevel.Trained);
 
             // Set the ICM
-            fr_airborne_brigade.SetICM(GameData.ICM_DEFAULT);
 
             // Add the template to the database
             AddTemplate("FR_AIRBORNE_BRIGADE", fr_airborne_brigade);
@@ -4085,7 +3961,6 @@ namespace HammerAndSickle.Models
             fr_recon_unit.SetExperienceLevel(ExperienceLevel.Trained);
 
             // Set the ICM
-            fr_recon_unit.SetICM(GameData.ICM_DEFAULT);
 
             // Add the template to the database
             AddTemplate("FR_RECON_UNIT", fr_recon_unit);
@@ -4114,7 +3989,6 @@ namespace HammerAndSickle.Models
             fr_sp_artillery_regiment.SetExperienceLevel(ExperienceLevel.Trained);
 
             // Set the ICM
-            fr_sp_artillery_regiment.SetICM(GameData.ICM_DEFAULT);
 
             // Add the template to the database
             AddTemplate("FR_SP_ARTILLERY_REGIMENT", fr_sp_artillery_regiment);
@@ -4143,7 +4017,6 @@ namespace HammerAndSickle.Models
             fr_air_defense_regiment.SetExperienceLevel(ExperienceLevel.Trained);
 
             // Set the ICM
-            fr_air_defense_regiment.SetICM(GameData.ICM_DEFAULT);
 
             // Add the template to the database
             AddTemplate("FR_AIR_DEFENSE_REGIMENT", fr_air_defense_regiment);
@@ -4172,7 +4045,6 @@ namespace HammerAndSickle.Models
             fr_crotale_regiment.SetExperienceLevel(ExperienceLevel.Trained);
 
             // Set the ICM
-            fr_crotale_regiment.SetICM(GameData.ICM_DEFAULT);
 
             // Add the template to the database
             AddTemplate("FR_CROTALE_REGIMENT", fr_crotale_regiment);
@@ -4201,7 +4073,6 @@ namespace HammerAndSickle.Models
             fr_mirage_f1_squadron.SetExperienceLevel(ExperienceLevel.Experienced);
 
             // Set the ICM
-            fr_mirage_f1_squadron.SetICM(GameData.ICM_DEFAULT);
 
             // Add the template to the database
             AddTemplate("FR_MIRAGE_F1_FIGHTER_SQUADRON", fr_mirage_f1_squadron);
@@ -4230,7 +4101,6 @@ namespace HammerAndSickle.Models
             fr_mirage_2000_squadron.SetExperienceLevel(ExperienceLevel.Experienced);
 
             // Set the ICM
-            fr_mirage_2000_squadron.SetICM(GameData.ICM_DEFAULT);
 
             // Add the template to the database
             AddTemplate("FR_MIRAGE_2000_FIGHTER_SQUADRON", fr_mirage_2000_squadron);
@@ -4259,7 +4129,6 @@ namespace HammerAndSickle.Models
             fr_jaguar_squadron.SetExperienceLevel(ExperienceLevel.Experienced);
 
             // Set the ICM
-            fr_jaguar_squadron.SetICM(GameData.ICM_DEFAULT);
 
             // Add the template to the database
             AddTemplate("FR_JAGUAR_ATTACK_SQUADRON", fr_jaguar_squadron);
@@ -4297,7 +4166,6 @@ namespace HammerAndSickle.Models
             iq_tank_regiment_t55.SetExperienceLevel(ExperienceLevel.Green);
 
             // Set the ICM
-            iq_tank_regiment_t55.SetICM(GameData.ICM_DEFAULT);
 
             // Add the template to the database
             AddTemplate("IQ_TANK_REGIMENT_T55", iq_tank_regiment_t55);
@@ -4326,7 +4194,6 @@ namespace HammerAndSickle.Models
             iq_tank_regiment_t62.SetExperienceLevel(ExperienceLevel.Green);
 
             // Set the ICM
-            iq_tank_regiment_t62.SetICM(GameData.ICM_DEFAULT);
 
             // Add the template to the database
             AddTemplate("IQ_TANK_REGIMENT_T62", iq_tank_regiment_t62);
@@ -4355,7 +4222,6 @@ namespace HammerAndSickle.Models
             iq_armored_infantry_regiment.SetExperienceLevel(ExperienceLevel.Green);
 
             // Set the ICM
-            iq_armored_infantry_regiment.SetICM(GameData.ICM_DEFAULT);
 
             // Add the template to the database
             AddTemplate("IQ_ARMORED_INFANTRY_REGIMENT", iq_armored_infantry_regiment);
@@ -4384,7 +4250,6 @@ namespace HammerAndSickle.Models
             iq_infantry_regiment.SetExperienceLevel(ExperienceLevel.Raw);
 
             // Set the ICM
-            iq_infantry_regiment.SetICM(GameData.ICM_DEFAULT);
 
             // Add the template to the database
             AddTemplate("IQ_INFANTRY_REGIMENT", iq_infantry_regiment);
@@ -4413,7 +4278,6 @@ namespace HammerAndSickle.Models
             iq_sp_artillery_regiment.SetExperienceLevel(ExperienceLevel.Green);
 
             // Set the ICM
-            iq_sp_artillery_regiment.SetICM(GameData.ICM_DEFAULT);
 
             // Add the template to the database
             AddTemplate("IQ_SP_ARTILLERY_REGIMENT", iq_sp_artillery_regiment);
@@ -4442,7 +4306,6 @@ namespace HammerAndSickle.Models
             iq_towed_artillery_regiment.SetExperienceLevel(ExperienceLevel.Green);
 
             // Set the ICM
-            iq_towed_artillery_regiment.SetICM(GameData.ICM_DEFAULT);
 
             // Add the template to the database
             AddTemplate("IQ_TOWED_ARTILLERY_REGIMENT", iq_towed_artillery_regiment);
@@ -4471,7 +4334,6 @@ namespace HammerAndSickle.Models
             iq_air_defense_regiment.SetExperienceLevel(ExperienceLevel.Green);
 
             // Set the ICM
-            iq_air_defense_regiment.SetICM(GameData.ICM_DEFAULT);
 
             // Add the template to the database
             AddTemplate("IQ_AIR_DEFENSE_REGIMENT", iq_air_defense_regiment);
@@ -4500,7 +4362,6 @@ namespace HammerAndSickle.Models
             iq_spsam_regiment.SetExperienceLevel(ExperienceLevel.Green);
 
             // Set the ICM
-            iq_spsam_regiment.SetICM(GameData.ICM_DEFAULT);
 
             // Add the template to the database
             AddTemplate("IQ_SPSAM_REGIMENT", iq_spsam_regiment);
@@ -4529,7 +4390,6 @@ namespace HammerAndSickle.Models
             iq_sam_regiment.SetExperienceLevel(ExperienceLevel.Green);
 
             // Set the ICM
-            iq_sam_regiment.SetICM(GameData.ICM_DEFAULT);
 
             // Add the template to the database
             AddTemplate("IQ_SAM_REGIMENT", iq_sam_regiment);
@@ -4558,7 +4418,6 @@ namespace HammerAndSickle.Models
             iq_mig21_squadron.SetExperienceLevel(ExperienceLevel.Green);
 
             // Set the ICM
-            iq_mig21_squadron.SetICM(GameData.ICM_DEFAULT);
 
             // Add the template to the database
             AddTemplate("IQ_MIG21_FIGHTER_SQUADRON", iq_mig21_squadron);
@@ -4587,7 +4446,6 @@ namespace HammerAndSickle.Models
             iq_mig23_squadron.SetExperienceLevel(ExperienceLevel.Green);
 
             // Set the ICM
-            iq_mig23_squadron.SetICM(GameData.ICM_DEFAULT);
 
             // Add the template to the database
             AddTemplate("IQ_MIG23_FIGHTER_SQUADRON", iq_mig23_squadron);
@@ -4616,7 +4474,6 @@ namespace HammerAndSickle.Models
             iq_su17_squadron.SetExperienceLevel(ExperienceLevel.Green);
 
             // Set the ICM
-            iq_su17_squadron.SetICM(GameData.ICM_DEFAULT);
 
             // Add the template to the database
             AddTemplate("IQ_SU17_ATTACK_SQUADRON", iq_su17_squadron);
@@ -4646,7 +4503,6 @@ namespace HammerAndSickle.Models
             ir_tank_regiment.SetExperienceLevel(ExperienceLevel.Green);
 
             // Set the ICM
-            ir_tank_regiment.SetICM(GameData.ICM_DEFAULT);
 
             // Add the template to the database
             AddTemplate("IR_TANK_REGIMENT", ir_tank_regiment);
@@ -4675,7 +4531,6 @@ namespace HammerAndSickle.Models
             ir_armored_infantry_regiment.SetExperienceLevel(ExperienceLevel.Green);
 
             // Set the ICM
-            ir_armored_infantry_regiment.SetICM(GameData.ICM_DEFAULT);
 
             // Add the template to the database
             AddTemplate("IR_ARMORED_INFANTRY_REGIMENT", ir_armored_infantry_regiment);
@@ -4704,7 +4559,6 @@ namespace HammerAndSickle.Models
             ir_infantry_regiment.SetExperienceLevel(ExperienceLevel.Raw);
 
             // Set the ICM
-            ir_infantry_regiment.SetICM(GameData.ICM_DEFAULT);
 
             // Add the template to the database
             AddTemplate("IR_INFANTRY_REGIMENT", ir_infantry_regiment);
@@ -4733,7 +4587,6 @@ namespace HammerAndSickle.Models
             ir_heavy_artillery_regiment.SetExperienceLevel(ExperienceLevel.Green);
 
             // Set the ICM
-            ir_heavy_artillery_regiment.SetICM(GameData.ICM_DEFAULT);
 
             // Add the template to the database
             AddTemplate("IR_HEAVY_ARTILLERY_REGIMENT", ir_heavy_artillery_regiment);
@@ -4762,7 +4615,6 @@ namespace HammerAndSickle.Models
             ir_light_artillery_regiment.SetExperienceLevel(ExperienceLevel.Green);
 
             // Set the ICM
-            ir_light_artillery_regiment.SetICM(GameData.ICM_DEFAULT);
 
             // Add the template to the database
             AddTemplate("IR_LIGHT_ARTILLERY_REGIMENT", ir_light_artillery_regiment);
@@ -4791,7 +4643,6 @@ namespace HammerAndSickle.Models
             ir_air_defense_regiment.SetExperienceLevel(ExperienceLevel.Green);
 
             // Set the ICM
-            ir_air_defense_regiment.SetICM(GameData.ICM_DEFAULT);
 
             // Add the template to the database
             AddTemplate("IR_AIR_DEFENSE_REGIMENT", ir_air_defense_regiment);
@@ -4820,7 +4671,6 @@ namespace HammerAndSickle.Models
             ir_sam_regiment.SetExperienceLevel(ExperienceLevel.Green);
 
             // Set the ICM
-            ir_sam_regiment.SetICM(GameData.ICM_DEFAULT);
 
             // Add the template to the database
             AddTemplate("IR_SAM_REGIMENT", ir_sam_regiment);
@@ -4849,7 +4699,6 @@ namespace HammerAndSickle.Models
             ir_f14_squadron.SetExperienceLevel(ExperienceLevel.Experienced);
 
             // Set the ICM
-            ir_f14_squadron.SetICM(GameData.ICM_DEFAULT);
 
             // Add the template to the database
             AddTemplate("IR_F14_FIGHTER_SQUADRON", ir_f14_squadron);
@@ -4878,7 +4727,6 @@ namespace HammerAndSickle.Models
             ir_f4_squadron.SetExperienceLevel(ExperienceLevel.Experienced);
 
             // Set the ICM
-            ir_f4_squadron.SetICM(GameData.ICM_DEFAULT);
 
             // Add the template to the database
             AddTemplate("IR_F4_FIGHTER_SQUADRON", ir_f4_squadron);
@@ -4916,7 +4764,6 @@ namespace HammerAndSickle.Models
             ch_tank_regiment_type59.SetExperienceLevel(ExperienceLevel.Trained);
 
             // Set the ICM
-            ch_tank_regiment_type59.SetICM(GameData.ICM_DEFAULT);
 
             // Add the template to the database
             AddTemplate("CH_TANK_REGIMENT_TYPE59", ch_tank_regiment_type59);
@@ -4945,7 +4792,6 @@ namespace HammerAndSickle.Models
             ch_tank_regiment_type80.SetExperienceLevel(ExperienceLevel.Trained);
 
             // Set the ICM
-            ch_tank_regiment_type80.SetICM(GameData.ICM_DEFAULT);
 
             // Add the template to the database
             AddTemplate("CH_TANK_REGIMENT_TYPE80", ch_tank_regiment_type80);
@@ -4974,7 +4820,6 @@ namespace HammerAndSickle.Models
             ch_tank_regiment_type95.SetExperienceLevel(ExperienceLevel.Trained);
 
             // Set the ICM
-            ch_tank_regiment_type95.SetICM(GameData.ICM_DEFAULT);
 
             // Add the template to the database
             AddTemplate("CH_TANK_REGIMENT_TYPE95", ch_tank_regiment_type95);
@@ -5003,7 +4848,6 @@ namespace HammerAndSickle.Models
             ch_mech_infantry_regiment.SetExperienceLevel(ExperienceLevel.Trained);
 
             // Set the ICM
-            ch_mech_infantry_regiment.SetICM(GameData.ICM_DEFAULT);
 
             // Add the template to the database
             AddTemplate("CH_MECH_INFANTRY_REGIMENT", ch_mech_infantry_regiment);
@@ -5032,7 +4876,6 @@ namespace HammerAndSickle.Models
             ch_infantry_regiment.SetExperienceLevel(ExperienceLevel.Trained);
 
             // Set the ICM
-            ch_infantry_regiment.SetICM(GameData.ICM_DEFAULT);
 
             // Add the template to the database
             AddTemplate("CH_INFANTRY_REGIMENT", ch_infantry_regiment);
@@ -5061,7 +4904,6 @@ namespace HammerAndSickle.Models
             ch_airborne_regiment.SetExperienceLevel(ExperienceLevel.Trained);
 
             // Set the ICM
-            ch_airborne_regiment.SetICM(GameData.ICM_DEFAULT);
 
             // Add the template to the database
             AddTemplate("CH_AIRBORNE_REGIMENT", ch_airborne_regiment);
@@ -5090,7 +4932,6 @@ namespace HammerAndSickle.Models
             ch_heavy_artillery_regiment.SetExperienceLevel(ExperienceLevel.Trained);
 
             // Set the ICM
-            ch_heavy_artillery_regiment.SetICM(GameData.ICM_DEFAULT);
 
             // Add the template to the database
             AddTemplate("CH_HEAVY_ARTILLERY_REGIMENT", ch_heavy_artillery_regiment);
@@ -5119,7 +4960,6 @@ namespace HammerAndSickle.Models
             ch_light_artillery_regiment.SetExperienceLevel(ExperienceLevel.Trained);
 
             // Set the ICM
-            ch_light_artillery_regiment.SetICM(GameData.ICM_DEFAULT);
 
             // Add the template to the database
             AddTemplate("CH_LIGHT_ARTILLERY_REGIMENT", ch_light_artillery_regiment);
@@ -5148,7 +4988,6 @@ namespace HammerAndSickle.Models
             ch_sp_artillery_regiment.SetExperienceLevel(ExperienceLevel.Trained);
 
             // Set the ICM
-            ch_sp_artillery_regiment.SetICM(GameData.ICM_DEFAULT);
 
             // Add the template to the database
             AddTemplate("CH_SP_ARTILLERY_REGIMENT", ch_sp_artillery_regiment);
@@ -5177,7 +5016,6 @@ namespace HammerAndSickle.Models
             ch_air_defense_regiment.SetExperienceLevel(ExperienceLevel.Trained);
 
             // Set the ICM
-            ch_air_defense_regiment.SetICM(GameData.ICM_DEFAULT);
 
             // Add the template to the database
             AddTemplate("CH_AIR_DEFENSE_REGIMENT", ch_air_defense_regiment);
@@ -5206,7 +5044,6 @@ namespace HammerAndSickle.Models
             ch_hq7_regiment.SetExperienceLevel(ExperienceLevel.Trained);
 
             // Set the ICM
-            ch_hq7_regiment.SetICM(GameData.ICM_DEFAULT);
 
             // Add the template to the database
             AddTemplate("CH_HQ7_REGIMENT", ch_hq7_regiment);
@@ -5235,7 +5072,6 @@ namespace HammerAndSickle.Models
             ch_sam_regiment.SetExperienceLevel(ExperienceLevel.Trained);
 
             // Set the ICM
-            ch_sam_regiment.SetICM(GameData.ICM_DEFAULT);
 
             // Add the template to the database
             AddTemplate("CH_SAM_REGIMENT", ch_sam_regiment);
@@ -5264,7 +5100,6 @@ namespace HammerAndSickle.Models
             ch_j7_squadron.SetExperienceLevel(ExperienceLevel.Trained);
 
             // Set the ICM
-            ch_j7_squadron.SetICM(GameData.ICM_DEFAULT);
 
             // Add the template to the database
             AddTemplate("CH_J7_FIGHTER_SQUADRON", ch_j7_squadron);
@@ -5293,7 +5128,6 @@ namespace HammerAndSickle.Models
             ch_j8_squadron.SetExperienceLevel(ExperienceLevel.Trained);
 
             // Set the ICM
-            ch_j8_squadron.SetICM(GameData.ICM_DEFAULT);
 
             // Add the template to the database
             AddTemplate("CH_J8_FIGHTER_SQUADRON", ch_j8_squadron);
@@ -5322,7 +5156,6 @@ namespace HammerAndSickle.Models
             ch_q5_squadron.SetExperienceLevel(ExperienceLevel.Trained);
 
             // Set the ICM
-            ch_q5_squadron.SetICM(GameData.ICM_DEFAULT);
 
             // Add the template to the database
             AddTemplate("CH_Q5_ATTACK_SQUADRON", ch_q5_squadron);
@@ -5351,7 +5184,6 @@ namespace HammerAndSickle.Models
             ch_h6_squadron.SetExperienceLevel(ExperienceLevel.Trained);
 
             // Set the ICM
-            ch_h6_squadron.SetICM(GameData.ICM_DEFAULT);
 
             // Add the template to the database
             AddTemplate("CH_H6_BOMBER_SQUADRON", ch_h6_squadron);
@@ -5380,7 +5212,6 @@ namespace HammerAndSickle.Models
             ch_aviation_regiment.SetExperienceLevel(ExperienceLevel.Trained);
 
             // Set the ICM
-            ch_aviation_regiment.SetICM(GameData.ICM_DEFAULT);
 
             // Add the template to the database
             AddTemplate("CH_AVIATION_REGIMENT", ch_aviation_regiment);

@@ -158,51 +158,14 @@ namespace HammerAndSickle.Core.GameData
         FullOperations
     }
 
-    /// <summary>
-    /// How stealthy a unit is.
-    /// </summary>
-    public enum UnitSilhouette
-    {
-        Tiny,
-        Small,
-        Medium,
-        Large
-    }
+    // NOTE: UnitSilhouette, NVG_Rating, NBC_Rating, AllWeatherRating enums removed 2026-06-15 — the
+    // write-only WeaponProfile capability fields they backed are obsoleted by the trait system
+    // (NBC/NVG re-enter as traits; silhouette retired per W3; all-weather folds into THERMAL_IMAGER's
+    // weather ramp).
 
     /// <summary>
-    /// Night Vision Gear rating.
-    /// </summary>
-    public enum NVG_Rating
-    {
-        None,
-        Gen1,
-        Gen2,
-        Gen3
-    }
-
-    /// <summary>
-    /// Nuclear, Biological, and Chemical (NBC) protection rating.
-    /// </summary>
-    public enum NBC_Rating
-    {
-        None,
-        Gen1,
-        Gen2
-    }
-
-    /// <summary>
-    /// Aircraft's ability to fly in various conditions.
-    /// </summary>
-    public enum AllWeatherRating
-    {
-        GroundUnit,
-        Day,
-        Night,
-        AllWeather
-    }
-
-    /// <summary>
-    /// Signals IntelligenceDoctrine (SIGINT) rating.
+    /// Signals IntelligenceDoctrine (SIGINT) rating. Parked (currently unreferenced) pending
+    /// reintroduction on CombatUnit — see Claude_TODO.md §5.
     /// </summary>
     public enum SIGINT_Rating
     {
@@ -686,6 +649,29 @@ namespace HammerAndSickle.Core.GameData
         Directional,      // Vehicles that can face multiple directions (W, NW, SW).
         Directional_Fire, // Same as above, by with separate firing icon.
         Helo_Animation    // Helo animations have 6 frames.
+    }
+
+    /// <summary>
+    /// The hard/soft class of a weapon profile (Appendix W §7.4.1). The TARGET's class selects the
+    /// ground combat axis: Hard target → HA vs HD; Soft target → SA vs SD. Defaulted per WeaponType
+    /// prefix on the profile, overridable per profile. Ground-only — never applied to aircraft (§7.7.11).
+    /// </summary>
+    public enum TargetClass
+    {
+        Soft,
+        Hard
+    }
+
+    /// <summary>
+    /// Transport role of a weapon profile (design §10.3.13), used for embarked-slot validation.
+    /// HeloTransport profiles are organic-only (AM/MAM Embarked slots); FixedWingTransport profiles
+    /// serve both organic (AB/MAB/SPECF Embarked) and inorganic (standalone TRN) roles. None = not a transport.
+    /// </summary>
+    public enum TransportCategory
+    {
+        None,
+        HeloTransport,
+        FixedWingTransport
     }
 
     /// <summary>
@@ -1450,8 +1436,6 @@ namespace HammerAndSickle.Core.GameData
         public const float ICM_MIN = 0.1f;
         public const float ICM_MAX = 10.0f;
         public const float ICM_DEFAULT = 1.0f;
-        public const float ICM_LARGE_UNIT = 1.25f;
-        public const float ICM_SMALL_UNIT = 0.75f;
 
         // CombatUnit constants.
         public const int MAX_HP = 40; // Maximum hit points for a CombatUnit

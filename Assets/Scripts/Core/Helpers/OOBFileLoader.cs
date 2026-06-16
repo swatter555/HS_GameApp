@@ -55,7 +55,6 @@ namespace HammerAndSickle.Helpers
         public int Efficiency { get; set; }
         public int Deployment { get; set; }
         public int Spotted { get; set; }
-        public float ICM { get; set; }
         public float HitPoints { get; set; }
         public float DaysSupply { get; set; }
         public int DepotCategory { get; set; }
@@ -364,7 +363,6 @@ namespace HammerAndSickle.Helpers
                     unit.SetEfficiencyLevel((EfficiencyLevel)data.Efficiency);
                     unit.SetDeploymentPosition((DeploymentPosition)data.Deployment);
                     unit.SetSpottedLevel((SpottedLevel)data.Spotted);
-                    unit.SetICM(data.ICM);
                     unit.HitPoints.SetCurrent(unit.HitPoints.Max * data.HitPoints);
                     unit.DaysSupply.SetCurrent(unit.DaysSupply.Max * data.DaysSupply);
 

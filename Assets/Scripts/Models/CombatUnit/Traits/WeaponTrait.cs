@@ -1,0 +1,58 @@
+namespace HammerAndSickle.Models
+{
+    /// <summary>
+    /// The full Cold-War equipment trait set (WeaponTrait_Catalog_01, ~86 traits). Names match the
+    /// catalog IDs verbatim. T86 CONSCRIPT_CREW was dropped (handled by Experience). Definitions and
+    /// magnitudes live in <see cref="WeaponTraitCatalog"/>.
+    /// </summary>
+    public enum WeaponTrait
+    {
+        None = 0,
+
+        // §2 Tank — Protection
+        ERA_LIGHT, ERA_HEAVY, COMPOSITE_CERAMIC, COMPOSITE_DU, SPACED_ARMOR, LOW_PROFILE,
+        BELLY_ARMOR, SMOKE_DISCHARGERS, AUTO_FIRE_SUPPRESSION, AMMO_CAROUSEL_VULN,
+
+        // §3 Tank — Firepower
+        GUN_105_RIFLED, GUN_120_SMOOTH, GUN_120_RIFLED, GUN_125_SMOOTH, APFSDS_ADVANCED,
+        GUN_LAUNCHED_ATGM, THERMOBARIC, CANISTER_HE,
+
+        // §3b Artillery munitions
+        SMART_MUNITION,
+
+        // §4 Fire Control & Optics
+        LASER_RANGEFINDER, BALLISTIC_COMPUTER, OPTICS_GEN2, OPTICS_GEN3, THERMAL_IMAGER,
+        HUNTER_KILLER, NVG_PASSIVE, ACTIVE_IR_SEARCHLIGHT, GUN_STABILIZER_2PLANE,
+
+        // §5 Mobility & Survivability — ground
+        GAS_TURBINE, DEEP_WADING_SNORKEL, AMPHIBIOUS, AIR_DROPPABLE, EXTENDED_RANGE_FUEL,
+        HIGH_GROUND_PRESSURE,
+
+        // §6 IFV / APC
+        AUTOCANNON_LIGHT, AUTOCANNON_HEAVY, ATGM_RAIL, FIRING_PORTS, THIN_TOP,
+
+        // §7 Infantry
+        ATGM_LIGHT, ATGM_MEDIUM, ATGM_HEAVY, MANPADS_BASIC, MANPADS_STINGER, MANPADS_IGLA,
+        RPG_LAW, BODY_ARMOR, SPECIAL_FORCES, MOUNTAIN_TRAINED, NBC_PROTECTED,
+
+        // §8 Helicopters
+        ATGM_HELO_SACLOS, ATGM_HELO_FNF, CANNON_HELO, ROCKET_PODS, MAST_MOUNTED_SIGHT,
+        HELO_COUNTERMEASURES, ARMORED_COCKPIT, NOE_FLIGHT,
+
+        // §9 Fixed-Wing
+        RWR, ECM_JAMMER, CHAFF_FLARE, TERRAIN_FOLLOW_RADAR, TARGETING_POD, LASER_GUIDED_MUNITIONS,
+        STEALTH_RAM, HIGH_MACH_DASH, BVR_RADAR_MISSILE, AGILE_AIRFRAME, LOOKDOWN_SHOOTDOWN,
+        AERIAL_REFUEL, ESCAPE_PROFILE, HARDENED_STRIKE,
+
+        // §10 Air Defense (SAM / AAA)
+        RADAR_GUIDED_GUN, GUN_MISSILE_COMBO, SARH_LONG_RANGE, IR_HOMING, COMMAND_GUIDANCE,
+        TVM_GUIDANCE, MOBILE_SHOOT_SCOOT, WILD_WEASEL,
+
+        // §11 Engineering & Utility
+        BRIDGELAYER, MINE_PLOW_ROLLER, FIELD_FORTIFICATION, RIVER_ASSAULT, OBSTACLE_BREACH,
+        ARV_RECOVERY,
+
+        // §12 Universal / economy
+        NON_COMBATANT, ROCKET_ARTILLERY, EXPORT_DOWNGRADE
+    }
+}

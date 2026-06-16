@@ -110,7 +110,6 @@ namespace HammerAndSickle.Models
         [JsonInclude] [JsonPropertyName("mapPos")]         public Position2D MapPos { get; internal set; }
         [JsonInclude] [JsonPropertyName("facing")]         public HexDirection Facing { get; set; }
         [JsonInclude] [JsonPropertyName("spottedLevel")]   public SpottedLevel SpottedLevel { get; private set; }
-        [JsonInclude] [JsonPropertyName("individualCombatModifier")] public float IndividualCombatModifier { get; private set; }
 
         // Leader
         [JsonInclude] [JsonPropertyName("leaderID")] public string LeaderID { get; internal set; } = string.Empty;
@@ -203,7 +202,6 @@ namespace HammerAndSickle.Models
                 MovementPoints = new StatsMaxCurrent(GameData.FOOT_UNIT);
                 EfficiencyLevel = EfficiencyLevel.FullOperations;
                 MapPos = Position2D.Zero;
-                IndividualCombatModifier = GameData.ICM_DEFAULT;
             }
             catch (Exception e)
             {
@@ -249,7 +247,6 @@ namespace HammerAndSickle.Models
                 MapPos = Position2D.Zero;
                 SpottedLevel = SpottedLevel.Level1;
                 LeaderID = string.Empty;
-                IndividualCombatModifier = GameData.ICM_DEFAULT;
 
                 ExperienceLevel = ExperienceLevel.Raw;
                 ExperiencePoints = 0;
@@ -479,17 +476,6 @@ namespace HammerAndSickle.Models
             UnitID = unitId.Trim();
         }
 
-        /// <summary>
-        /// Sets the Individual Combat Modifier (ICM).
-        /// </summary>
-        public void SetICM(float icm)
-        {
-            if (icm < GameData.ICM_MIN || icm > GameData.ICM_MAX)
-                throw new ArgumentOutOfRangeException(nameof(icm),
-                    $"ICM must be between {GameData.ICM_MIN} and {GameData.ICM_MAX}");
-            IndividualCombatModifier = icm;
-        }
-
         public void SetNationality(Nationality nationality) => Nationality = nationality;
 
         /// <summary>
@@ -621,7 +607,7 @@ namespace HammerAndSickle.Models
                 float modifier = GetStrengthModifier() *
                                  GetEfficiencyModifier() *
                                  GetExperienceMultiplier() *
-                                 IndividualCombatModifier;
+                                 (GetActiveWeaponProfile()?.ICM ?? GameData.ICM_DEFAULT);
 
                 // Air units (not helos) skip deployment state modifier
                 if (!IsAirUnitClassification(Classification))

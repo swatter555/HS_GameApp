@@ -39,8 +39,7 @@
 //     - Combat stats: hard/soft attack/defense, ground-air, dogfighting, etc.
 //     - Range stats: primary, indirect, spotting
 //     - Movement points and amphibious capability
-//     - Ratings: AllWeather, SIGINT, NBC, NVG
-//     - UnitSilhouette, UpgradePath, turnAvailable
+//     - UpgradePath, turnAvailable
 //     - Prestige cost (tier + type)
 //     - Intel report stats (equipment quantities via AddIntelReportStat)
 //     - Icon profile (RegimentIconProfile + sprite assignments)
@@ -282,11 +281,6 @@ namespace HammerAndSickle.Models
                 _isAmph: false,                            // Is Amphibious
                 _isDF: false,                              // Is DoubleFire
                 _isAtt: true,                              // Can this profile attack
-                _awr: AllWeatherRating.GroundUnit,         // All-Weather Capability
-                _sir: SIGINT_Rating.UnitLevel,             // SIGINT Rating
-                _nbc: NBC_Rating.Gen1,                     // NBC Rating
-                _nvg: NVG_Rating.None,                     // NVG Rating
-                _sil: UnitSilhouette.Medium,               // Unit Silhouette
                 _upgradePath: UpgradePath.TANK,            // Upgrade Path
                 _turnAvailable: 240                        // How many months past Jan. 1938
             );
@@ -350,11 +344,6 @@ namespace HammerAndSickle.Models
                 _isAmph: false,                            // Is Amphibious
                 _isDF: false,                              // Is DoubleFire
                 _isAtt: true,                              // Can this profile attack
-                _awr: AllWeatherRating.GroundUnit,         // All-Weather Capability
-                _sir: SIGINT_Rating.UnitLevel,             // SIGINT Rating
-                _nbc: NBC_Rating.Gen1,                     // NBC Rating
-                _nvg: NVG_Rating.None,                     // NVG Rating
-                _sil: UnitSilhouette.Medium,               // Unit Silhouette
                 _upgradePath: UpgradePath.TANK,            // Upgrade Path
                 _turnAvailable: 276                        // How many months past Jan. 1938
             );
@@ -417,11 +406,6 @@ namespace HammerAndSickle.Models
                 _isAmph: false,                            // Is Amphibious
                 _isDF: false,                              // Is DoubleFire
                 _isAtt: true,                              // Can this profile attack
-                _awr: AllWeatherRating.GroundUnit,         // All-Weather Capability
-                _sir: SIGINT_Rating.UnitLevel,             // SIGINT Rating
-                _nbc: NBC_Rating.Gen1,                     // NBC Rating
-                _nvg: NVG_Rating.Gen1,                     // NVG Rating
-                _sil: UnitSilhouette.Small,                // Unit Silhouette
                 _upgradePath: UpgradePath.TANK,            // Upgrade Path
                 _turnAvailable: 336                        // How many months past Jan. 1938
             );
@@ -484,11 +468,6 @@ namespace HammerAndSickle.Models
                 _isAmph: false,                            // Is Amphibious
                 _isDF: false,                              // Is DoubleFire
                 _isAtt: true,                              // Can this profile attack
-                _awr: AllWeatherRating.GroundUnit,         // All-Weather Capability
-                _sir: SIGINT_Rating.UnitLevel,             // SIGINT Rating
-                _nbc: NBC_Rating.Gen2,                     // NBC Rating
-                _nvg: NVG_Rating.Gen2,                     // NVG Rating
-                _sil: UnitSilhouette.Small,                // Unit Silhouette
                 _upgradePath: UpgradePath.TANK,            // Upgrade Path
                 _turnAvailable: 456                        // How many months past Jan. 1938
             );
@@ -551,11 +530,6 @@ namespace HammerAndSickle.Models
                 _isAmph: true,                             // Is Amphibious
                 _isDF: false,                              // Is DoubleFire
                 _isAtt: true,                              // Can this profile attack
-                _awr: AllWeatherRating.GroundUnit,         // All-Weather Capability
-                _sir: SIGINT_Rating.UnitLevel,             // SIGINT Rating
-                _nbc: NBC_Rating.Gen1,                     // NBC Rating
-                _nvg: NVG_Rating.Gen1,                     // NVG Rating
-                _sil: UnitSilhouette.Medium,               // Unit Silhouette
                 _upgradePath: UpgradePath.TANK,            // Upgrade Path
                 _turnAvailable: 420                        // How many months past Jan. 1938
             );
@@ -618,11 +592,6 @@ namespace HammerAndSickle.Models
                 _isAmph: true,                             // Is Amphibious
                 _isDF: false,                              // Is DoubleFire
                 _isAtt: true,                              // Can this profile attack
-                _awr: AllWeatherRating.GroundUnit,         // All-Weather Capability
-                _sir: SIGINT_Rating.UnitLevel,             // SIGINT Rating
-                _nbc: NBC_Rating.Gen2,                     // NBC Rating
-                _nvg: NVG_Rating.Gen2,                     // NVG Rating
-                _sil: UnitSilhouette.Medium,               // Unit Silhouette
                 _upgradePath: UpgradePath.TANK,            // Upgrade Path
                 _turnAvailable: 564                        // How many months past Jan. 1938
             );
@@ -685,11 +654,6 @@ namespace HammerAndSickle.Models
                 _isAmph: false,                            // Is Amphibious
                 _isDF: false,                              // Is DoubleFire
                 _isAtt: true,                              // Can this profile attack
-                _awr: AllWeatherRating.GroundUnit,         // All-Weather Capability
-                _sir: SIGINT_Rating.UnitLevel,             // SIGINT Rating
-                _nbc: NBC_Rating.Gen1,                     // NBC Rating
-                _nvg: NVG_Rating.Gen1,                     // NVG Rating
-                _sil: UnitSilhouette.Medium,               // Unit Silhouette
                 _upgradePath: UpgradePath.TANK,            // Upgrade Path
                 _turnAvailable: 480                        // How many months past Jan. 1938
             );
@@ -752,11 +716,6 @@ namespace HammerAndSickle.Models
                 _isAmph: false,                            // Is Amphibious
                 _isDF: false,                              // Is DoubleFire
                 _isAtt: true,                              // Can this profile attack
-                _awr: AllWeatherRating.GroundUnit,         // All-Weather Capability
-                _sir: SIGINT_Rating.UnitLevel,             // SIGINT Rating
-                _nbc: NBC_Rating.Gen2,                     // NBC Rating
-                _nvg: NVG_Rating.Gen2,                     // NVG Rating
-                _sil: UnitSilhouette.Medium,               // Unit Silhouette
                 _upgradePath: UpgradePath.TANK,            // Upgrade Path
                 _turnAvailable: 564                        // How many months past Jan. 1938
             );
@@ -819,11 +778,6 @@ namespace HammerAndSickle.Models
                 _isAmph: false,                            // Is Amphibious
                 _isDF: false,                              // Is DoubleFire
                 _isAtt: true,                              // Can this profile attack
-                _awr: AllWeatherRating.GroundUnit,         // All-Weather Capability
-                _sir: SIGINT_Rating.UnitLevel,             // SIGINT Rating
-                _nbc: NBC_Rating.Gen2,                     // NBC Rating
-                _nvg: NVG_Rating.Gen2,                     // NVG Rating
-                _sil: UnitSilhouette.Medium,               // Unit Silhouette
                 _upgradePath: UpgradePath.TANK,            // Upgrade Path
                 _turnAvailable: 584                        // How many months past Jan. 1938
             );
@@ -890,11 +844,6 @@ namespace HammerAndSickle.Models
                 _isAmph: true,                                 // Is Amphibious
                 _isDF: false,                                  // Is DoubleFire
                 _isAtt: true,                                  // Can this profile attack
-                _awr: AllWeatherRating.GroundUnit,             // All-Weather Capability
-                _sir: SIGINT_Rating.UnitLevel,                 // SIGINT Rating
-                _nbc: NBC_Rating.Gen1,                         // NBC Rating
-                _nvg: NVG_Rating.Gen1,                         // NVG Rating
-                _sil: UnitSilhouette.Small,                    // Unit Silhouette
                 _upgradePath: UpgradePath.IFV,                 // Upgrade Path
                 _turnAvailable: 336                            // How many months past Jan. 1938
             );
@@ -949,11 +898,6 @@ namespace HammerAndSickle.Models
                 _isAmph: true,                                 // Is Amphibious
                 _isDF: false,                                  // Is DoubleFire
                 _isAtt: true,                                  // Can this profile attack
-                _awr: AllWeatherRating.GroundUnit,             // All-Weather Capability
-                _sir: SIGINT_Rating.UnitLevel,                 // SIGINT Rating
-                _nbc: NBC_Rating.Gen1,                         // NBC Rating
-                _nvg: NVG_Rating.Gen2,                         // NVG Rating
-                _sil: UnitSilhouette.Small,                    // Unit Silhouette
                 _upgradePath: UpgradePath.IFV,                 // Upgrade Path
                 _turnAvailable: 504                            // How many months past Jan. 1938
             );
@@ -1008,11 +952,6 @@ namespace HammerAndSickle.Models
                 _isAmph: true,                                 // Is Amphibious
                 _isDF: false,                                  // Is DoubleFire
                 _isAtt: true,                                  // Can this profile attack
-                _awr: AllWeatherRating.GroundUnit,             // All-Weather Capability
-                _sir: SIGINT_Rating.UnitLevel,                 // SIGINT Rating
-                _nbc: NBC_Rating.Gen2,                         // NBC Rating
-                _nvg: NVG_Rating.Gen2,                         // NVG Rating
-                _sil: UnitSilhouette.Small,                    // Unit Silhouette
                 _upgradePath: UpgradePath.IFV,                 // Upgrade Path
                 _turnAvailable: 588                            // How many months past Jan. 1938
             );
@@ -1068,11 +1007,6 @@ namespace HammerAndSickle.Models
                 _isAmph: true,                                 // Is Amphibious
                 _isDF: false,                                  // Is DoubleFire
                 _isAtt: true,                                  // Can this profile attack
-                _awr: AllWeatherRating.GroundUnit,             // All-Weather Capability
-                _sir: SIGINT_Rating.UnitLevel,                 // SIGINT Rating
-                _nbc: NBC_Rating.Gen1,                         // NBC Rating
-                _nvg: NVG_Rating.Gen1,                         // NVG Rating
-                _sil: UnitSilhouette.Small,                    // Unit Silhouette
                 _upgradePath: UpgradePath.IFV,                 // Upgrade Path
                 _turnAvailable: 564                            // How many months past Jan. 1938
             );
@@ -1126,11 +1060,6 @@ namespace HammerAndSickle.Models
                 _isAmph: true,                                 // Is Amphibious
                 _isDF: false,                                  // Is DoubleFire
                 _isAtt: true,                                  // Can this profile attack
-                _awr: AllWeatherRating.GroundUnit,             // All-Weather Capability
-                _sir: SIGINT_Rating.UnitLevel,                 // SIGINT Rating
-                _nbc: NBC_Rating.Gen2,                         // NBC Rating
-                _nvg: NVG_Rating.Gen2,                         // NVG Rating
-                _sil: UnitSilhouette.Small,                    // Unit Silhouette
                 _upgradePath: UpgradePath.IFV,                 // Upgrade Path
                 _turnAvailable: 624                            // How many months past Jan. 1938
             );
@@ -1184,11 +1113,6 @@ namespace HammerAndSickle.Models
                 _isAmph: true,                                 // Is Amphibious
                 _isDF: false,                                  // Is DoubleFire
                 _isAtt: true,                                  // Can this profile attack
-                _awr: AllWeatherRating.GroundUnit,             // All-Weather Capability
-                _sir: SIGINT_Rating.UnitLevel,                 // SIGINT Rating
-                _nbc: NBC_Rating.Gen1,                         // NBC Rating
-                _nvg: NVG_Rating.Gen1,                         // NVG Rating
-                _sil: UnitSilhouette.Small,                    // Unit Silhouette
                 _upgradePath: UpgradePath.APC,                 // Upgrade Path
                 _turnAvailable: 312                            // How many months past Jan. 1938
             );
@@ -1241,11 +1165,6 @@ namespace HammerAndSickle.Models
                 _isAmph: true,                                  // Is Amphibious
                 _isDF: false,                                   // Is DoubleFire
                 _isAtt: true,                                   // Can this profile attack
-                _awr: AllWeatherRating.GroundUnit,              // All-Weather Capability
-                _sir: SIGINT_Rating.UnitLevel,                  // SIGINT Rating
-                _nbc: NBC_Rating.Gen1,                          // NBC Rating
-                _nvg: NVG_Rating.Gen1,                          // NVG Rating
-                _sil: UnitSilhouette.Small,                     // Unit Silhouette
                 _upgradePath: UpgradePath.APC,                  // Upgrade Path
                 _turnAvailable: 408                             // How many months past Jan. 1938
             );
@@ -1300,11 +1219,6 @@ namespace HammerAndSickle.Models
                 _isAmph: true,                                  // Is Amphibious
                 _isDF: false,                                   // Is DoubleFire
                 _isAtt: true,                                   // Can this profile attack
-                _awr: AllWeatherRating.GroundUnit,              // All-Weather Capability
-                _sir: SIGINT_Rating.UnitLevel,                  // SIGINT Rating
-                _nbc: NBC_Rating.Gen1,                          // NBC Rating
-                _nvg: NVG_Rating.Gen2,                          // NVG Rating
-                _sil: UnitSilhouette.Small,                     // Unit Silhouette
                 _upgradePath: UpgradePath.APC,                  // Upgrade Path
                 _turnAvailable: 576                             // How many months past Jan. 1938
             );
@@ -1363,11 +1277,6 @@ namespace HammerAndSickle.Models
                 _isAmph: true,                                 // Is Amphibious
                 _isDF: false,                                  // Is DoubleFire
                 _isAtt: true,                                  // Can this profile attack
-                _awr: AllWeatherRating.GroundUnit,             // All-Weather Capability
-                _sir: SIGINT_Rating.UnitLevel,                 // SIGINT Rating
-                _nbc: NBC_Rating.Gen1,                         // NBC Rating
-                _nvg: NVG_Rating.Gen1,                         // NVG Rating
-                _sil: UnitSilhouette.Small,                    // Unit Silhouette
                 _upgradePath: UpgradePath.RCN,                 // Upgrade Path
                 _turnAvailable: 288                            // How many months past Jan. 1938
             );
@@ -1428,11 +1337,6 @@ namespace HammerAndSickle.Models
                 _isAmph: true,                                 // Is Amphibious
                 _isDF: false,                                  // Is DoubleFire
                 _isAtt: true,                                  // Can this profile attack
-                _awr: AllWeatherRating.GroundUnit,             // All-Weather Capability
-                _sir: SIGINT_Rating.UnitLevel,                 // SIGINT Rating
-                _nbc: NBC_Rating.Gen1,                         // NBC Rating
-                _nvg: NVG_Rating.Gen1,                         // NVG Rating
-                _sil: UnitSilhouette.Small,                    // Unit Silhouette
                 _upgradePath: UpgradePath.RCN,                 // Upgrade Path
                 _turnAvailable: 336                            // How many months past Jan. 1938
             );
@@ -1462,6 +1366,8 @@ namespace HammerAndSickle.Models
             };
 
             // Add the BRDM-2 AT profile to the database
+            // W1: armored-car recon fights as a Hard target (§7.4.1.2 override).
+            BRDM2AT.SetTargetClass(TargetClass.Hard);
             AddProfile(WeaponType.RCN_BRDM2AT_SV, BRDM2AT);
             //----------------------------------------------
             // Soviet BRDM-2 AT-5 Recon Vehicle
@@ -1498,11 +1404,6 @@ namespace HammerAndSickle.Models
                 _isAmph: false,                            // Is Amphibious
                 _isDF: false,                              // Is DoubleFire
                 _isAtt: true,                              // Can this profile attack
-                _awr: AllWeatherRating.GroundUnit,         // All-Weather Capability
-                _sir: SIGINT_Rating.UnitLevel,             // SIGINT Rating
-                _nbc: NBC_Rating.Gen1,                     // NBC Rating
-                _nvg: NVG_Rating.None,                     // NVG Rating
-                _sil: UnitSilhouette.Medium,               // Unit Silhouette
                 _upgradePath: UpgradePath.ART,             // Upgrade Path
                 _turnAvailable: 396                        // How many months past Jan. 1938
             );
@@ -1561,11 +1462,6 @@ namespace HammerAndSickle.Models
                 _isAmph: false,                            // Is Amphibious
                 _isDF: false,                              // Is DoubleFire
                 _isAtt: true,                              // Can this profile attack
-                _awr: AllWeatherRating.GroundUnit,         // All-Weather Capability
-                _sir: SIGINT_Rating.UnitLevel,             // SIGINT Rating
-                _nbc: NBC_Rating.Gen1,                     // NBC Rating
-                _nvg: NVG_Rating.None,                     // NVG Rating
-                _sil: UnitSilhouette.Medium,               // Unit Silhouette
                 _upgradePath: UpgradePath.ART,             // Upgrade Path
                 _turnAvailable: 396                        // How many months past Jan. 1938
             );
@@ -1624,11 +1520,6 @@ namespace HammerAndSickle.Models
                 _isAmph: false,                            // Is Amphibious
                 _isDF: false,                              // Is DoubleFire
                 _isAtt: true,                              // Can this profile attack
-                _awr: AllWeatherRating.GroundUnit,         // All-Weather Capability
-                _sir: SIGINT_Rating.UnitLevel,             // SIGINT Rating
-                _nbc: NBC_Rating.Gen1,                     // NBC Rating
-                _nvg: NVG_Rating.None,                     // NVG Rating
-                _sil: UnitSilhouette.Medium,               // Unit Silhouette
                 _upgradePath: UpgradePath.ART,             // Upgrade Path
                 _turnAvailable: 456                        // How many months past Jan. 1938
             );
@@ -1687,11 +1578,6 @@ namespace HammerAndSickle.Models
                 _isAmph: false,                            // Is Amphibious
                 _isDF: false,                              // Is DoubleFire
                 _isAtt: true,                              // Can this profile attack
-                _awr: AllWeatherRating.GroundUnit,         // All-Weather Capability
-                _sir: SIGINT_Rating.UnitLevel,             // SIGINT Rating
-                _nbc: NBC_Rating.Gen1,                     // NBC Rating
-                _nvg: NVG_Rating.None,                     // NVG Rating
-                _sil: UnitSilhouette.Medium,               // Unit Silhouette
                 _upgradePath: UpgradePath.ART,             // Upgrade Path
                 _turnAvailable: 612                        // How many months past Jan. 1938
             );
@@ -1754,11 +1640,6 @@ namespace HammerAndSickle.Models
                 _isAmph: false,                                // Is Amphibious
                 _isDF: false,                                  // Is DoubleFire
                 _isAtt: true,                                  // Can this profile attack
-                _awr: AllWeatherRating.GroundUnit,             // All-Weather Capability
-                _sir: SIGINT_Rating.UnitLevel,                 // SIGINT Rating
-                _nbc: NBC_Rating.None,                         // NBC Rating
-                _nvg: NVG_Rating.None,                         // NVG Rating
-                _sil: UnitSilhouette.Large,                    // Unit Silhouette
                 _upgradePath: UpgradePath.ART,                 // Upgrade Path
                 _turnAvailable: 60                             // How many months past Jan. 1938
             );
@@ -1812,11 +1693,6 @@ namespace HammerAndSickle.Models
                 _isAmph: false,                                // Is Amphibious
                 _isDF: false,                                  // Is DoubleFire
                 _isAtt: true,                                  // Can this profile attack
-                _awr: AllWeatherRating.GroundUnit,             // All-Weather Capability
-                _sir: SIGINT_Rating.UnitLevel,                 // SIGINT Rating
-                _nbc: NBC_Rating.None,                         // NBC Rating
-                _nvg: NVG_Rating.None,                         // NVG Rating
-                _sil: UnitSilhouette.Large,                    // Unit Silhouette
                 _upgradePath: UpgradePath.ART,                 // Upgrade Path
                 _turnAvailable: 60                             // How many months past Jan. 1938
             );
@@ -1874,11 +1750,6 @@ namespace HammerAndSickle.Models
                 _isAmph: false,                            // Is Amphibious
                 _isDF: true,                               // Is DoubleFire
                 _isAtt: true,                              // Can this profile attack
-                _awr: AllWeatherRating.GroundUnit,         // All-Weather Capability
-                _sir: SIGINT_Rating.UnitLevel,             // SIGINT Rating
-                _nbc: NBC_Rating.Gen1,                     // NBC Rating
-                _nvg: NVG_Rating.None,                     // NVG Rating
-                _sil: UnitSilhouette.Medium,               // Unit Silhouette
                 _upgradePath: UpgradePath.ROC,             // Upgrade Path
                 _turnAvailable: 300                        // How many months past Jan. 1938
             );
@@ -1937,11 +1808,6 @@ namespace HammerAndSickle.Models
                 _isAmph: false,                            // Is Amphibious
                 _isDF: true,                               // Is DoubleFire
                 _isAtt: true,                              // Can this profile attack
-                _awr: AllWeatherRating.GroundUnit,         // All-Weather Capability
-                _sir: SIGINT_Rating.UnitLevel,             // SIGINT Rating
-                _nbc: NBC_Rating.Gen1,                     // NBC Rating
-                _nvg: NVG_Rating.None,                     // NVG Rating
-                _sil: UnitSilhouette.Medium,               // Unit Silhouette
                 _upgradePath: UpgradePath.ROC,             // Upgrade Path
                 _turnAvailable: 444                        // How many months past Jan. 1938
             );
@@ -2000,11 +1866,6 @@ namespace HammerAndSickle.Models
                 _isAmph: false,                            // Is Amphibious
                 _isDF: true,                               // Is DoubleFire
                 _isAtt: true,                              // Can this profile attack
-                _awr: AllWeatherRating.GroundUnit,         // All-Weather Capability
-                _sir: SIGINT_Rating.UnitLevel,             // SIGINT Rating
-                _nbc: NBC_Rating.Gen1,                     // NBC Rating
-                _nvg: NVG_Rating.None,                     // NVG Rating
-                _sil: UnitSilhouette.Medium,               // Unit Silhouette
                 _upgradePath: UpgradePath.ROC,             // Upgrade Path
                 _turnAvailable: 588                        // How many months past Jan. 1938
             );
@@ -2063,11 +1924,6 @@ namespace HammerAndSickle.Models
                 _isAmph: false,                            // Is Amphibious
                 _isDF: true,                               // Is DoubleFire
                 _isAtt: true,                              // Can this profile attack
-                _awr: AllWeatherRating.GroundUnit,         // All-Weather Capability
-                _sir: SIGINT_Rating.UnitLevel,             // SIGINT Rating
-                _nbc: NBC_Rating.Gen1,                     // NBC Rating
-                _nvg: NVG_Rating.None,                     // NVG Rating
-                _sil: UnitSilhouette.Large,                    // Unit Silhouette
                 _upgradePath: UpgradePath.ROC,                 // Upgrade Path
                 _turnAvailable: 324                            // How many months past Jan. 1938
             );
@@ -2130,11 +1986,6 @@ namespace HammerAndSickle.Models
                 _isAmph: false,                            // Is Amphibious
                 _isDF: false,                              // Is DoubleFire
                 _isAtt: true,                              // Can this profile attack
-                _awr: AllWeatherRating.GroundUnit,         // All-Weather Capability
-                _sir: SIGINT_Rating.UnitLevel,             // SIGINT Rating
-                _nbc: NBC_Rating.None,                     // NBC Rating
-                _nvg: NVG_Rating.None,                     // NVG Rating
-                _sil: UnitSilhouette.Medium,               // Unit Silhouette
                 _upgradePath: UpgradePath.AAA,             // Upgrade Path
                 _turnAvailable: 204                        // How many months past Jan. 1938
             );
@@ -2192,11 +2043,6 @@ namespace HammerAndSickle.Models
                 _isAmph: false,                            // Is Amphibious
                 _isDF: false,                              // Is DoubleFire
                 _isAtt: true,                              // Can this profile attack
-                _awr: AllWeatherRating.GroundUnit,         // All-Weather Capability
-                _sir: SIGINT_Rating.UnitLevel,             // SIGINT Rating
-                _nbc: NBC_Rating.Gen1,                     // NBC Rating
-                _nvg: NVG_Rating.None,                     // NVG Rating
-                _sil: UnitSilhouette.Medium,               // Unit Silhouette
                 _upgradePath: UpgradePath.AAA,             // Upgrade Path
                 _turnAvailable: 324                        // How many months past Jan. 1938
             );
@@ -2254,11 +2100,6 @@ namespace HammerAndSickle.Models
                 _isAmph: false,                            // Is Amphibious
                 _isDF: false,                              // Is DoubleFire
                 _isAtt: true,                              // Can this profile attack
-                _awr: AllWeatherRating.GroundUnit,         // All-Weather Capability
-                _sir: SIGINT_Rating.SpecializedLevel,      // SIGINT Rating
-                _nbc: NBC_Rating.Gen2,                     // NBC Rating
-                _nvg: NVG_Rating.Gen2,                     // NVG Rating
-                _sil: UnitSilhouette.Medium,               // Unit Silhouette
                 _upgradePath: UpgradePath.AAA,             // Upgrade Path
                 _turnAvailable: 528                        // How many months past Jan. 1938
             );
@@ -2316,11 +2157,6 @@ namespace HammerAndSickle.Models
                 _isAmph: false,                            // Is Amphibious
                 _isDF: false,                              // Is DoubleFire
                 _isAtt: true,                              // Can this profile attack
-                _awr: AllWeatherRating.GroundUnit,         // All-Weather Capability
-                _sir: SIGINT_Rating.UnitLevel,             // SIGINT Rating
-                _nbc: NBC_Rating.Gen1,                     // NBC Rating
-                _nvg: NVG_Rating.None,                     // NVG Rating
-                _sil: UnitSilhouette.Medium,               // Unit Silhouette
                 _upgradePath: UpgradePath.SAM,             // Upgrade Path
                 _turnAvailable: 348                        // How many months past Jan. 1938
             );
@@ -2378,11 +2214,6 @@ namespace HammerAndSickle.Models
                 _isAmph: true,                             // Is Amphibious
                 _isDF: false,                              // Is DoubleFire
                 _isAtt: true,                              // Can this profile attack
-                _awr: AllWeatherRating.GroundUnit,         // All-Weather Capability
-                _sir: SIGINT_Rating.UnitLevel,             // SIGINT Rating
-                _nbc: NBC_Rating.Gen1,                     // NBC Rating
-                _nvg: NVG_Rating.None,                     // NVG Rating
-                _sil: UnitSilhouette.Small,                // Unit Silhouette
                 _upgradePath: UpgradePath.SAM,             // Upgrade Path
                 _turnAvailable: 360                        // How many months past Jan. 1938
             );
@@ -2440,11 +2271,6 @@ namespace HammerAndSickle.Models
                 _isAmph: false,                            // Is Amphibious
                 _isDF: false,                              // Is DoubleFire
                 _isAtt: true,                              // Can this profile attack
-                _awr: AllWeatherRating.GroundUnit,         // All-Weather Capability
-                _sir: SIGINT_Rating.SpecializedLevel,      // SIGINT Rating
-                _nbc: NBC_Rating.None,                     // NBC Rating
-                _nvg: NVG_Rating.None,                     // NVG Rating
-                _sil: UnitSilhouette.Large,                // Unit Silhouette
                 _upgradePath: UpgradePath.SAM,             // Upgrade Path
                 _turnAvailable: 228                        // How many months past Jan. 1938
             );
@@ -2497,11 +2323,6 @@ namespace HammerAndSickle.Models
                 _isAmph: false,                            // Is Amphibious
                 _isDF: false,                              // Is DoubleFire
                 _isAtt: true,                              // Can this profile attack
-                _awr: AllWeatherRating.GroundUnit,         // All-Weather Capability
-                _sir: SIGINT_Rating.SpecializedLevel,      // SIGINT Rating
-                _nbc: NBC_Rating.Gen1,                     // NBC Rating
-                _nvg: NVG_Rating.None,                     // NVG Rating
-                _sil: UnitSilhouette.Large,                // Unit Silhouette
                 _upgradePath: UpgradePath.SAM,             // Upgrade Path
                 _turnAvailable: 276                        // How many months past Jan. 1938
             );
@@ -2554,11 +2375,6 @@ namespace HammerAndSickle.Models
                 _isAmph: false,                            // Is Amphibious
                 _isDF: false,                              // Is DoubleFire
                 _isAtt: true,                              // Can this profile attack
-                _awr: AllWeatherRating.GroundUnit,         // All-Weather Capability
-                _sir: SIGINT_Rating.SpecializedLevel,      // SIGINT Rating
-                _nbc: NBC_Rating.Gen2,                     // NBC Rating
-                _nvg: NVG_Rating.None,                     // NVG Rating
-                _sil: UnitSilhouette.Large,                // Unit Silhouette
                 _upgradePath: UpgradePath.SAM,             // Upgrade Path
                 _turnAvailable: 480                        // How many months past Jan. 1938
             );
@@ -2616,11 +2432,6 @@ namespace HammerAndSickle.Models
                 _isAmph: false,                            // Is Amphibious
                 _isDF: false,                              // Is DoubleFire
                 _isAtt: true,                              // Can this profile attack
-                _awr: AllWeatherRating.GroundUnit,         // All-Weather Capability
-                _sir: SIGINT_Rating.UnitLevel,             // SIGINT Rating
-                _nbc: NBC_Rating.None,                     // NBC Rating
-                _nvg: NVG_Rating.None,                     // NVG Rating
-                _sil: UnitSilhouette.Medium,               // Unit Silhouette
                 _upgradePath: UpgradePath.AAA,             // Upgrade Path
                 _turnAvailable: 144                        // How many months past Jan. 1938
             );
@@ -2677,11 +2488,6 @@ namespace HammerAndSickle.Models
                 _isAmph: false,                            // Is Amphibious
                 _isDF: false,                              // Is DoubleFire
                 _isAtt: true,                              // Can this profile attack
-                _awr: AllWeatherRating.GroundUnit,         // All-Weather Capability
-                _sir: SIGINT_Rating.UnitLevel,             // SIGINT Rating
-                _nbc: NBC_Rating.None,                     // NBC Rating
-                _nvg: NVG_Rating.Gen1,                     // NVG Rating
-                _sil: UnitSilhouette.Medium,               // Unit Silhouette
                 _upgradePath: UpgradePath.HELT,            // Upgrade Path
                 _turnAvailable: 348                        // How many months past Jan. 1938
             );
@@ -2704,6 +2510,8 @@ namespace HammerAndSickle.Models
             };
 
             // Add the Mi-8T profile to the database
+            // W2: Mi-8T is the Soviet AM/MAM organic helo transport.
+            MI8T.SetTransportCategory(TransportCategory.HeloTransport);
             AddProfile(WeaponType.HEL_MI8T_SV, MI8T);
             //----------------------------------------------
             // Soviet Mi-8T Hip Transport Helicopter
@@ -2736,11 +2544,6 @@ namespace HammerAndSickle.Models
                 _isAmph: false,                            // Is Amphibious
                 _isDF: false,                              // Is DoubleFire
                 _isAtt: true,                              // Can this profile attack
-                _awr: AllWeatherRating.GroundUnit,         // All-Weather Capability
-                _sir: SIGINT_Rating.UnitLevel,             // SIGINT Rating
-                _nbc: NBC_Rating.None,                     // NBC Rating
-                _nvg: NVG_Rating.Gen1,                     // NVG Rating
-                _sil: UnitSilhouette.Medium,               // Unit Silhouette
                 _upgradePath: UpgradePath.HELT,            // Upgrade Path
                 _turnAvailable: 444                        // How many months past Jan. 1938
             );
@@ -2796,11 +2599,6 @@ namespace HammerAndSickle.Models
                 _isAmph: false,                            // Is Amphibious
                 _isDF: false,                              // Is DoubleFire
                 _isAtt: true,                              // Can this profile attack
-                _awr: AllWeatherRating.GroundUnit,         // All-Weather Capability
-                _sir: SIGINT_Rating.UnitLevel,             // SIGINT Rating
-                _nbc: NBC_Rating.Gen1,                     // NBC Rating
-                _nvg: NVG_Rating.Gen1,                     // NVG Rating
-                _sil: UnitSilhouette.Medium,               // Unit Silhouette
                 _upgradePath: UpgradePath.HEL,             // Upgrade Path
                 _turnAvailable: 408                        // How many months past Jan. 1938
             );
@@ -2856,11 +2654,6 @@ namespace HammerAndSickle.Models
                 _isAmph: false,                            // Is Amphibious
                 _isDF: false,                              // Is DoubleFire
                 _isAtt: true,                              // Can this profile attack
-                _awr: AllWeatherRating.GroundUnit,         // All-Weather Capability
-                _sir: SIGINT_Rating.UnitLevel,             // SIGINT Rating
-                _nbc: NBC_Rating.Gen1,                     // NBC Rating
-                _nvg: NVG_Rating.Gen2,                     // NVG Rating
-                _sil: UnitSilhouette.Medium,               // Unit Silhouette
                 _upgradePath: UpgradePath.HEL,             // Upgrade Path
                 _turnAvailable: 456                        // How many months past Jan. 1938
             );
@@ -2916,11 +2709,6 @@ namespace HammerAndSickle.Models
                 _isAmph: false,                            // Is Amphibious
                 _isDF: false,                              // Is DoubleFire
                 _isAtt: true,                              // Can this profile attack
-                _awr: AllWeatherRating.GroundUnit,         // All-Weather Capability
-                _sir: SIGINT_Rating.SpecializedLevel,      // SIGINT Rating
-                _nbc: NBC_Rating.Gen2,                     // NBC Rating
-                _nvg: NVG_Rating.Gen2,                     // NVG Rating
-                _sil: UnitSilhouette.Medium,               // Unit Silhouette
                 _upgradePath: UpgradePath.HEL,             // Upgrade Path
                 _turnAvailable: 600                        // How many months past Jan. 1938
             );
@@ -2980,11 +2768,6 @@ namespace HammerAndSickle.Models
                 _isAmph: false,                            // Is Amphibious
                 _isDF: false,                              // Is DoubleFire
                 _isAtt: true,                              // Can this profile attack
-                _awr: AllWeatherRating.AllWeather,         // All-Weather Capability
-                _sir: SIGINT_Rating.UnitLevel,             // SIGINT Rating
-                _nbc: NBC_Rating.Gen1,                     // NBC Rating
-                _nvg: NVG_Rating.None,                     // NVG Rating
-                _sil: UnitSilhouette.Large,               // Unit Silhouette
                 _upgradePath: UpgradePath.TRN,            // Upgrade Path
                 _turnAvailable: 252                       // How many months past Jan. 1938
             );
@@ -3002,6 +2785,8 @@ namespace HammerAndSickle.Models
             };
 
             // Add the An-12 profile to the database
+            // W2: An-12 is the Soviet AB/MAB/SPECF fixed-wing transport (organic + inorganic TRN).
+            AN12.SetTransportCategory(TransportCategory.FixedWingTransport);
             AddProfile(WeaponType.TRN_AN8_SV, AN12);
             //----------------------------------------------
             // Soviet An-12 Antonov Transport Plane
@@ -3034,11 +2819,6 @@ namespace HammerAndSickle.Models
                 _isAmph: false,                            // Is Amphibious
                 _isDF: false,                              // Is DoubleFire
                 _isAtt: true,                              // Can this profile attack
-                _awr: AllWeatherRating.AllWeather,         // All-Weather Capability
-                _sir: SIGINT_Rating.SpecializedLevel,      // SIGINT Rating
-                _nbc: NBC_Rating.Gen2,                     // NBC Rating
-                _nvg: NVG_Rating.None,                     // NVG Rating
-                _sil: UnitSilhouette.Large,               // Unit Silhouette
                 _upgradePath: UpgradePath.AWACS,          // Upgrade Path
                 _turnAvailable: 552                       // How many months past Jan. 1938
             );
@@ -3088,11 +2868,6 @@ namespace HammerAndSickle.Models
                 _isAmph: false,                            // Is Amphibious
                 _isDF: false,                              // Is DoubleFire
                 _isAtt: true,                              // Can this profile attack
-                _awr: AllWeatherRating.Day,                // All-Weather Capability
-                _sir: SIGINT_Rating.UnitLevel,             // SIGINT Rating
-                _nbc: NBC_Rating.None,                     // NBC Rating
-                _nvg: NVG_Rating.None,                     // NVG Rating
-                _sil: UnitSilhouette.Small,               // Unit Silhouette
                 _upgradePath: UpgradePath.FGT,            // Upgrade Path
                 _turnAvailable: 252                       // How many months past Jan. 1938
             );
@@ -3142,11 +2917,6 @@ namespace HammerAndSickle.Models
                 _isAmph: false,                            // Is Amphibious
                 _isDF: false,                              // Is DoubleFire
                 _isAtt: true,                              // Can this profile attack
-                _awr: AllWeatherRating.Night,              // All-Weather Capability
-                _sir: SIGINT_Rating.UnitLevel,             // SIGINT Rating
-                _nbc: NBC_Rating.Gen1,                     // NBC Rating
-                _nvg: NVG_Rating.None,                     // NVG Rating
-                _sil: UnitSilhouette.Medium,               // Unit Silhouette
                 _upgradePath: UpgradePath.FGT,             // Upgrade Path
                 _turnAvailable: 384                        // How many months past Jan. 1938
             );
@@ -3196,11 +2966,6 @@ namespace HammerAndSickle.Models
                 _isAmph: false,                            // Is Amphibious
                 _isDF: false,                              // Is DoubleFire
                 _isAtt: true,                              // Can this profile attack
-                _awr: AllWeatherRating.Night,              // All-Weather Capability
-                _sir: SIGINT_Rating.SpecializedLevel,      // SIGINT Rating
-                _nbc: NBC_Rating.Gen1,                     // NBC Rating
-                _nvg: NVG_Rating.None,                     // NVG Rating
-                _sil: UnitSilhouette.Medium,               // Unit Silhouette
                 _upgradePath: UpgradePath.FGT,             // Upgrade Path
                 _turnAvailable: 384                        // How many months past Jan. 1938
             );
@@ -3250,11 +3015,6 @@ namespace HammerAndSickle.Models
                 _isAmph: false,                            // Is Amphibious
                 _isDF: false,                              // Is DoubleFire
                 _isAtt: true,                              // Can this profile attack
-                _awr: AllWeatherRating.AllWeather,         // All-Weather Capability
-                _sir: SIGINT_Rating.UnitLevel,             // SIGINT Rating
-                _nbc: NBC_Rating.Gen2,                     // NBC Rating
-                _nvg: NVG_Rating.None,                     // NVG Rating
-                _sil: UnitSilhouette.Medium,               // Unit Silhouette
                 _upgradePath: UpgradePath.FGT,             // Upgrade Path
                 _turnAvailable: 540                        // How many months past Jan. 1938
             );
@@ -3304,11 +3064,6 @@ namespace HammerAndSickle.Models
                 _isAmph: false,                            // Is Amphibious
                 _isDF: false,                              // Is DoubleFire
                 _isAtt: true,                              // Can this profile attack
-                _awr: AllWeatherRating.AllWeather,         // All-Weather Capability
-                _sir: SIGINT_Rating.SpecializedLevel,      // SIGINT Rating
-                _nbc: NBC_Rating.Gen2,                     // NBC Rating
-                _nvg: NVG_Rating.None,                     // NVG Rating
-                _sil: UnitSilhouette.Medium,               // Unit Silhouette
                 _upgradePath: UpgradePath.FGT,             // Upgrade Path
                 _turnAvailable: 516                        // How many months past Jan. 1938
             );
@@ -3358,11 +3113,6 @@ namespace HammerAndSickle.Models
                 _isAmph: false,                            // Is Amphibious
                 _isDF: false,                              // Is DoubleFire
                 _isAtt: true,                              // Can this profile attack
-                _awr: AllWeatherRating.AllWeather,         // All-Weather Capability
-                _sir: SIGINT_Rating.UnitLevel,             // SIGINT Rating
-                _nbc: NBC_Rating.Gen2,                     // NBC Rating
-                _nvg: NVG_Rating.None,                     // NVG Rating
-                _sil: UnitSilhouette.Medium,               // Unit Silhouette
                 _upgradePath: UpgradePath.FGT,             // Upgrade Path
                 _turnAvailable: 564                        // How many months past Jan. 1938
             );
@@ -3412,11 +3162,6 @@ namespace HammerAndSickle.Models
                 _isAmph: false,                            // Is Amphibious
                 _isDF: false,                              // Is DoubleFire
                 _isAtt: true,                              // Can this profile attack
-                _awr: AllWeatherRating.AllWeather,         // All-Weather Capability
-                _sir: SIGINT_Rating.SpecializedLevel,      // SIGINT Rating
-                _nbc: NBC_Rating.Gen2,                     // NBC Rating
-                _nvg: NVG_Rating.None,                     // NVG Rating
-                _sil: UnitSilhouette.Medium,               // Unit Silhouette
                 _upgradePath: UpgradePath.FGT,             // Upgrade Path
                 _turnAvailable: 708                        // How many months past Jan. 1938
             );
@@ -3466,11 +3211,6 @@ namespace HammerAndSickle.Models
                 _isAmph: false,                            // Is Amphibious
                 _isDF: false,                              // Is DoubleFire
                 _isAtt: true,                              // Can this profile attack
-                _awr: AllWeatherRating.Night,              // All-Weather Capability
-                _sir: SIGINT_Rating.UnitLevel,             // SIGINT Rating
-                _nbc: NBC_Rating.Gen1,                     // NBC Rating
-                _nvg: NVG_Rating.None,                     // NVG Rating
-                _sil: UnitSilhouette.Medium,               // Unit Silhouette
                 _upgradePath: UpgradePath.ATT,             // Upgrade Path
                 _turnAvailable: 444                        // How many months past Jan. 1938
             );
@@ -3520,11 +3260,6 @@ namespace HammerAndSickle.Models
                 _isAmph: false,                            // Is Amphibious
                 _isDF: false,                              // Is DoubleFire
                 _isAtt: true,                              // Can this profile attack
-                _awr: AllWeatherRating.Night,              // All-Weather Capability
-                _sir: SIGINT_Rating.UnitLevel,             // SIGINT Rating
-                _nbc: NBC_Rating.Gen1,                     // NBC Rating
-                _nvg: NVG_Rating.None,                     // NVG Rating
-                _sil: UnitSilhouette.Medium,               // Unit Silhouette
                 _upgradePath: UpgradePath.ATT,             // Upgrade Path
                 _turnAvailable: 384                        // How many months past Jan. 1938
             );
@@ -3574,11 +3309,6 @@ namespace HammerAndSickle.Models
                 _isAmph: false,                            // Is Amphibious
                 _isDF: false,                              // Is DoubleFire
                 _isAtt: true,                              // Can this profile attack
-                _awr: AllWeatherRating.Night,              // All-Weather Capability
-                _sir: SIGINT_Rating.UnitLevel,             // SIGINT Rating
-                _nbc: NBC_Rating.Gen1,                     // NBC Rating
-                _nvg: NVG_Rating.None,                     // NVG Rating
-                _sil: UnitSilhouette.Medium,               // Unit Silhouette
                 _upgradePath: UpgradePath.ATT,             // Upgrade Path
                 _turnAvailable: 516                        // How many months past Jan. 1938
             );
@@ -3628,11 +3358,6 @@ namespace HammerAndSickle.Models
                 _isAmph: false,                            // Is Amphibious
                 _isDF: false,                              // Is DoubleFire
                 _isAtt: true,                              // Can this profile attack
-                _awr: AllWeatherRating.AllWeather,         // All-Weather Capability
-                _sir: SIGINT_Rating.UnitLevel,             // SIGINT Rating
-                _nbc: NBC_Rating.Gen2,                     // NBC Rating
-                _nvg: NVG_Rating.None,                     // NVG Rating
-                _sil: UnitSilhouette.Medium,               // Unit Silhouette
                 _upgradePath: UpgradePath.ATT,             // Upgrade Path
                 _turnAvailable: 588                        // How many months past Jan. 1938
             );
@@ -3682,11 +3407,6 @@ namespace HammerAndSickle.Models
                 _isAmph: false,                            // Is Amphibious
                 _isDF: false,                              // Is DoubleFire
                 _isAtt: true,                              // Can this profile attack
-                _awr: AllWeatherRating.AllWeather,         // All-Weather Capability
-                _sir: SIGINT_Rating.UnitLevel,             // SIGINT Rating
-                _nbc: NBC_Rating.Gen1,                     // NBC Rating
-                _nvg: NVG_Rating.None,                     // NVG Rating
-                _sil: UnitSilhouette.Medium,               // Unit Silhouette
                 _upgradePath: UpgradePath.ATT,             // Upgrade Path
                 _turnAvailable: 432                        // How many months past Jan. 1938
             );
@@ -3736,11 +3456,6 @@ namespace HammerAndSickle.Models
                 _isAmph: false,                            // Is Amphibious
                 _isDF: false,                              // Is DoubleFire
                 _isAtt: true,                              // Can this profile attack
-                _awr: AllWeatherRating.Day,                // All-Weather Capability
-                _sir: SIGINT_Rating.UnitLevel,             // SIGINT Rating
-                _nbc: NBC_Rating.None,                     // NBC Rating
-                _nvg: NVG_Rating.None,                     // NVG Rating
-                _sil: UnitSilhouette.Large,               // Unit Silhouette
                 _upgradePath: UpgradePath.BMB,            // Upgrade Path
                 _turnAvailable: 192                       // How many months past Jan. 1938
             );
@@ -3790,11 +3505,6 @@ namespace HammerAndSickle.Models
                 _isAmph: false,                            // Is Amphibious
                 _isDF: false,                              // Is DoubleFire
                 _isAtt: true,                              // Can this profile attack
-                _awr: AllWeatherRating.Night,              // All-Weather Capability
-                _sir: SIGINT_Rating.UnitLevel,             // SIGINT Rating
-                _nbc: NBC_Rating.Gen1,                     // NBC Rating
-                _nvg: NVG_Rating.None,                     // NVG Rating
-                _sil: UnitSilhouette.Large,               // Unit Silhouette
                 _upgradePath: UpgradePath.BMB,            // Upgrade Path
                 _turnAvailable: 288                       // How many months past Jan. 1938
             );
@@ -3844,11 +3554,6 @@ namespace HammerAndSickle.Models
                 _isAmph: false,                            // Is Amphibious
                 _isDF: false,                              // Is DoubleFire
                 _isAtt: true,                              // Can this profile attack
-                _awr: AllWeatherRating.AllWeather,         // All-Weather Capability
-                _sir: SIGINT_Rating.SpecializedLevel,      // SIGINT Rating
-                _nbc: NBC_Rating.Gen2,                     // NBC Rating
-                _nvg: NVG_Rating.None,                     // NVG Rating
-                _sil: UnitSilhouette.Large,               // Unit Silhouette
                 _upgradePath: UpgradePath.BMB,            // Upgrade Path
                 _turnAvailable: 480                       // How many months past Jan. 1938
             );
@@ -3898,11 +3603,6 @@ namespace HammerAndSickle.Models
                 _isAmph: false,                            // Is Amphibious
                 _isDF: false,                              // Is DoubleFire
                 _isAtt: true,                              // Can this profile attack
-                _awr: AllWeatherRating.AllWeather,         // All-Weather Capability
-                _sir: SIGINT_Rating.SpecializedLevel,      // SIGINT Rating
-                _nbc: NBC_Rating.Gen1,                     // NBC Rating
-                _nvg: NVG_Rating.None,                     // NVG Rating
-                _sil: UnitSilhouette.Medium,               // Unit Silhouette
                 _upgradePath: UpgradePath.RCNA,            // Upgrade Path
                 _turnAvailable: 384                        // How many months past Jan. 1938
             );
@@ -3955,12 +3655,7 @@ namespace HammerAndSickle.Models
                 _mmp: GameData.MOT_UNIT,                   // Max Movement Points
                 _isAmph: false,                            // Is Amphibious
                 _isDF: false,                              // Is DoubleFire
-                _isAtt: true,                              // Can this profile attack
-                _awr: AllWeatherRating.GroundUnit,         // All-Weather Capability
-                _sir: SIGINT_Rating.UnitLevel,             // SIGINT Rating
-                _nbc: NBC_Rating.None,                     // NBC Rating
-                _nvg: NVG_Rating.None,                     // NVG Rating
-                _sil: UnitSilhouette.Medium                // Unit Silhouette
+                _isAtt: true                              // Can this profile attack
             );
 
             // Handle the icon profile.
@@ -4003,12 +3698,7 @@ namespace HammerAndSickle.Models
                 _mmp: GameData.NAVAL_UNIT,                 // Max Movement Points
                 _isAmph: false,                            // Is Amphibious
                 _isDF: false,                              // Is DoubleFire
-                _isAtt: true,                              // Can this profile attack
-                _awr: AllWeatherRating.AllWeather,         // All-Weather Capability
-                _sir: SIGINT_Rating.UnitLevel,             // SIGINT Rating
-                _nbc: NBC_Rating.None,                     // NBC Rating
-                _nvg: NVG_Rating.None,                     // NVG Rating
-                _sil: UnitSilhouette.Large                 // Unit Silhouette
+                _isAtt: true                              // Can this profile attack
             );
 
             // Handle the icon profile.
@@ -4053,12 +3743,7 @@ namespace HammerAndSickle.Models
                 _mmp: GameData.FOOT_UNIT,                  // Max Movement Points
                 _isAmph: false,                            // Is Amphibious
                 _isDF: false,                              // Is DoubleFire
-                _isAtt: true,                              // Can this profile attack
-                _awr: AllWeatherRating.GroundUnit,         // All-Weather Capability
-                _sir: SIGINT_Rating.UnitLevel,             // SIGINT Rating
-                _nbc: NBC_Rating.Gen1,                     // NBC Rating
-                _nvg: NVG_Rating.None,                     // NVG Rating
-                _sil: UnitSilhouette.Small                 // Unit Silhouette
+                _isAtt: true                              // Can this profile attack
             );
 
             // Fill out intel stats for the Regular Infantry profile (Soviet MRR BTR-70)
@@ -4110,12 +3795,7 @@ namespace HammerAndSickle.Models
                 _mmp: GameData.FOOT_UNIT,                  // Max Movement Points
                 _isAmph: false,                            // Is Amphibious
                 _isDF: false,                              // Is DoubleFire
-                _isAtt: true,                              // Can this profile attack
-                _awr: AllWeatherRating.GroundUnit,         // All-Weather Capability
-                _sir: SIGINT_Rating.UnitLevel,             // SIGINT Rating
-                _nbc: NBC_Rating.Gen1,                     // NBC Rating
-                _nvg: NVG_Rating.Gen1,                     // NVG Rating
-                _sil: UnitSilhouette.Small                 // Unit Silhouette
+                _isAtt: true                              // Can this profile attack
             );
 
             // Fill out intel stats for the Airborne Infantry profile (Soviet VDV BMD-1)
@@ -4164,12 +3844,7 @@ namespace HammerAndSickle.Models
                 _mmp: GameData.FOOT_UNIT,                  // Max Movement Points
                 _isAmph: false,                            // Is Amphibious
                 _isDF: false,                              // Is DoubleFire
-                _isAtt: true,                              // Can this profile attack
-                _awr: AllWeatherRating.GroundUnit,         // All-Weather Capability
-                _sir: SIGINT_Rating.UnitLevel,             // SIGINT Rating
-                _nbc: NBC_Rating.Gen1,                     // NBC Rating
-                _nvg: NVG_Rating.Gen1,                     // NVG Rating
-                _sil: UnitSilhouette.Small                 // Unit Silhouette
+                _isAtt: true                              // Can this profile attack
             );
 
             // Fill out intel stats for the Air-Mobile Infantry profile (Soviet AAR MT-LB)
@@ -4220,12 +3895,7 @@ namespace HammerAndSickle.Models
                 _mmp: GameData.FOOT_UNIT,                  // Max Movement Points
                 _isAmph: false,                            // Is Amphibious
                 _isDF: false,                              // Is DoubleFire
-                _isAtt: true,                              // Can this profile attack
-                _awr: AllWeatherRating.GroundUnit,         // All-Weather Capability
-                _sir: SIGINT_Rating.UnitLevel,             // SIGINT Rating
-                _nbc: NBC_Rating.Gen1,                     // NBC Rating
-                _nvg: NVG_Rating.None,                     // NVG Rating
-                _sil: UnitSilhouette.Small                 // Unit Silhouette
+                _isAtt: true                              // Can this profile attack
             );
 
             // Fill out intel stats for the Marine Infantry profile (Soviet Naval BTR-70)
@@ -4278,12 +3948,7 @@ namespace HammerAndSickle.Models
                 _mmp: GameData.FOOT_UNIT,                  // Max Movement Points
                 _isAmph: false,                            // Is Amphibious
                 _isDF: false,                              // Is DoubleFire
-                _isAtt: true,                              // Can this profile attack
-                _awr: AllWeatherRating.GroundUnit,         // All-Weather Capability
-                _sir: SIGINT_Rating.SpecializedLevel,      // SIGINT Rating
-                _nbc: NBC_Rating.Gen1,                     // NBC Rating
-                _nvg: NVG_Rating.Gen2,                     // NVG Rating
-                _sil: UnitSilhouette.Small                 // Unit Silhouette
+                _isAtt: true                              // Can this profile attack
             );
 
             // Fill out intel stats for the Spetsnaz profile (Soviet AAR MT-LB)
@@ -4332,12 +3997,7 @@ namespace HammerAndSickle.Models
                 _mmp: GameData.FOOT_UNIT,                  // Max Movement Points
                 _isAmph: false,                            // Is Amphibious
                 _isDF: false,                              // Is DoubleFire
-                _isAtt: true,                              // Can this profile attack
-                _awr: AllWeatherRating.GroundUnit,         // All-Weather Capability
-                _sir: SIGINT_Rating.UnitLevel,             // SIGINT Rating
-                _nbc: NBC_Rating.Gen1,                     // NBC Rating
-                _nvg: NVG_Rating.None,                     // NVG Rating
-                _sil: UnitSilhouette.Small                 // Unit Silhouette
+                _isAtt: true                              // Can this profile attack
             );
 
             // Fill out intel stats for the Combat Engineers profile
@@ -4392,12 +4052,7 @@ namespace HammerAndSickle.Models
                 _mmp: GameData.STATIC_UNIT,                // Max Movement Points
                 _isAmph: false,                            // Is Amphibious
                 _isDF: false,                              // Is DoubleFire
-                _isAtt: false,                             // Can this profile attack
-                _awr: AllWeatherRating.GroundUnit,         // All-Weather Capability
-                _sir: SIGINT_Rating.UnitLevel,             // SIGINT Rating
-                _nbc: NBC_Rating.None,                     // NBC Rating
-                _nvg: NVG_Rating.None,                     // NVG Rating
-                _sil: UnitSilhouette.Large                 // Unit Silhouette
+                _isAtt: false                             // Can this profile attack
             );
 
             // Fill out intel stats for the Large Base
@@ -4441,12 +4096,7 @@ namespace HammerAndSickle.Models
                 _mmp: GameData.STATIC_UNIT,                // Max Movement Points
                 _isAmph: false,                            // Is Amphibious
                 _isDF: false,                              // Is DoubleFire
-                _isAtt: false,                             // Can this profile attack
-                _awr: AllWeatherRating.GroundUnit,         // All-Weather Capability
-                _sir: SIGINT_Rating.HQLevel,               // SIGINT Rating
-                _nbc: NBC_Rating.None,                     // NBC Rating
-                _nvg: NVG_Rating.None,                     // NVG Rating
-                _sil: UnitSilhouette.Large                 // Unit Silhouette
+                _isAtt: false                             // Can this profile attack
             );
 
             // Fill out intel stats for the Medium Base
@@ -4490,12 +4140,7 @@ namespace HammerAndSickle.Models
                 _mmp: GameData.STATIC_UNIT,                // Max Movement Points
                 _isAmph: false,                            // Is Amphibious
                 _isDF: false,                              // Is DoubleFire
-                _isAtt: false,                             // Can this profile attack
-                _awr: AllWeatherRating.GroundUnit,         // All-Weather Capability
-                _sir: SIGINT_Rating.SpecializedLevel,      // SIGINT Rating
-                _nbc: NBC_Rating.None,                     // NBC Rating
-                _nvg: NVG_Rating.None,                     // NVG Rating
-                _sil: UnitSilhouette.Large                 // Unit Silhouette
+                _isAtt: false                             // Can this profile attack
             );
 
             // Fill out intel stats for the Small Base
@@ -4550,11 +4195,6 @@ namespace HammerAndSickle.Models
                 _isAmph: false,                                // Is Amphibious
                 _isDF: false,                                  // Is DoubleFire
                 _isAtt: true,                                  // Can this profile attack
-                _awr: AllWeatherRating.GroundUnit,             // All-Weather Capability
-                _sir: SIGINT_Rating.UnitLevel,                 // SIGINT Rating
-                _nbc: NBC_Rating.Gen2,                         // NBC Rating
-                _nvg: NVG_Rating.Gen2,                         // NVG Rating
-                _sil: UnitSilhouette.Large,                    // Unit Silhouette
                 _upgradePath: UpgradePath.TANK,                // Upgrade Path
                 _turnAvailable: 504                            // How many months past Jan. 1938
             );
@@ -4615,11 +4255,6 @@ namespace HammerAndSickle.Models
                 _isAmph: false,                                // Is Amphibious
                 _isDF: false,                                  // Is DoubleFire
                 _isAtt: true,                                  // Can this profile attack
-                _awr: AllWeatherRating.GroundUnit,             // All-Weather Capability
-                _sir: SIGINT_Rating.UnitLevel,                 // SIGINT Rating
-                _nbc: NBC_Rating.Gen1,                         // NBC Rating
-                _nvg: NVG_Rating.Gen1,                         // NVG Rating
-                _sil: UnitSilhouette.Medium,                   // Unit Silhouette
                 _upgradePath: UpgradePath.TANK,                // Upgrade Path
                 _turnAvailable: 264                            // How many months past Jan. 1938
             );
@@ -4680,11 +4315,6 @@ namespace HammerAndSickle.Models
                 _isAmph: false,                                // Is Amphibious
                 _isDF: false,                                  // Is DoubleFire
                 _isAtt: true,                                  // Can this profile attack
-                _awr: AllWeatherRating.GroundUnit,             // All-Weather Capability
-                _sir: SIGINT_Rating.UnitLevel,                 // SIGINT Rating
-                _nbc: NBC_Rating.Gen1,                         // NBC Rating
-                _nvg: NVG_Rating.None,                         // NVG Rating
-                _sil: UnitSilhouette.Medium,                   // Unit Silhouette
                 _upgradePath: UpgradePath.TANK,                // Upgrade Path
                 _turnAvailable: 324                            // How many months past Jan. 1938
             );
@@ -4745,11 +4375,6 @@ namespace HammerAndSickle.Models
                 _isAmph: false,                                // Is Amphibious
                 _isDF: false,                                  // Is DoubleFire
                 _isAtt: true,                                  // Can this profile attack
-                _awr: AllWeatherRating.GroundUnit,             // All-Weather Capability
-                _sir: SIGINT_Rating.UnitLevel,                 // SIGINT Rating
-                _nbc: NBC_Rating.Gen2,                         // NBC Rating
-                _nvg: NVG_Rating.Gen2,                         // NVG Rating
-                _sil: UnitSilhouette.Medium,                   // Unit Silhouette
                 _upgradePath: UpgradePath.TANK,                // Upgrade Path
                 _turnAvailable: 492                            // How many months past Jan. 1938
             );
@@ -4810,11 +4435,6 @@ namespace HammerAndSickle.Models
                 _isAmph: false,                                // Is Amphibious
                 _isDF: false,                                  // Is DoubleFire
                 _isAtt: true,                                  // Can this profile attack
-                _awr: AllWeatherRating.GroundUnit,             // All-Weather Capability
-                _sir: SIGINT_Rating.UnitLevel,                 // SIGINT Rating
-                _nbc: NBC_Rating.Gen2,                         // NBC Rating
-                _nvg: NVG_Rating.Gen2,                         // NVG Rating
-                _sil: UnitSilhouette.Medium,                   // Unit Silhouette
                 _upgradePath: UpgradePath.TANK,                // Upgrade Path
                 _turnAvailable: 540                            // How many months past Jan. 1938
             );
@@ -4875,11 +4495,6 @@ namespace HammerAndSickle.Models
                 _isAmph: false,                                // Is Amphibious
                 _isDF: false,                                  // Is DoubleFire
                 _isAtt: true,                                  // Can this profile attack
-                _awr: AllWeatherRating.GroundUnit,             // All-Weather Capability
-                _sir: SIGINT_Rating.UnitLevel,                 // SIGINT Rating
-                _nbc: NBC_Rating.Gen1,                         // NBC Rating
-                _nvg: NVG_Rating.None,                         // NVG Rating
-                _sil: UnitSilhouette.Medium,                   // Unit Silhouette
                 _upgradePath: UpgradePath.TANK,                // Upgrade Path
                 _turnAvailable: 336                            // How many months past Jan. 1938
             );
@@ -4943,11 +4558,6 @@ namespace HammerAndSickle.Models
                 _isAmph: false,                                // Is Amphibious
                 _isDF: false,                                  // Is DoubleFire
                 _isAtt: true,                                  // Can this profile attack
-                _awr: AllWeatherRating.GroundUnit,             // All-Weather Capability
-                _sir: SIGINT_Rating.UnitLevel,                 // SIGINT Rating
-                _nbc: NBC_Rating.Gen2,                         // NBC Rating
-                _nvg: NVG_Rating.Gen2,                         // NVG Rating
-                _sil: UnitSilhouette.Medium,                   // Unit Silhouette
                 _upgradePath: UpgradePath.IFV,                 // Upgrade Path
                 _turnAvailable: 516                            // How many months past Jan. 1938
             );
@@ -5002,11 +4612,6 @@ namespace HammerAndSickle.Models
                 _isAmph: false,                                // Is Amphibious
                 _isDF: false,                                  // Is DoubleFire
                 _isAtt: true,                                  // Can this profile attack
-                _awr: AllWeatherRating.GroundUnit,             // All-Weather Capability
-                _sir: SIGINT_Rating.UnitLevel,                 // SIGINT Rating
-                _nbc: NBC_Rating.Gen2,                         // NBC Rating
-                _nvg: NVG_Rating.Gen2,                         // NVG Rating
-                _sil: UnitSilhouette.Small,                    // Unit Silhouette
                 _upgradePath: UpgradePath.IFV,                 // Upgrade Path
                 _turnAvailable: 588                            // How many months past Jan. 1938
             );
@@ -5061,11 +4666,6 @@ namespace HammerAndSickle.Models
                 _isAmph: false,                                // Is Amphibious
                 _isDF: false,                                  // Is DoubleFire
                 _isAtt: true,                                  // Can this profile attack
-                _awr: AllWeatherRating.GroundUnit,             // All-Weather Capability
-                _sir: SIGINT_Rating.UnitLevel,                 // SIGINT Rating
-                _nbc: NBC_Rating.Gen1,                         // NBC Rating
-                _nvg: NVG_Rating.Gen1,                         // NVG Rating
-                _sil: UnitSilhouette.Small,                    // Unit Silhouette
                 _upgradePath: UpgradePath.IFV,                 // Upgrade Path
                 _turnAvailable: 396                            // How many months past Jan. 1938
             );
@@ -5120,11 +4720,6 @@ namespace HammerAndSickle.Models
                 _isAmph: false,                                // Is Amphibious
                 _isDF: false,                                  // Is DoubleFire
                 _isAtt: true,                                  // Can this profile attack
-                _awr: AllWeatherRating.GroundUnit,             // All-Weather Capability
-                _sir: SIGINT_Rating.UnitLevel,                 // SIGINT Rating
-                _nbc: NBC_Rating.Gen1,                         // NBC Rating
-                _nvg: NVG_Rating.Gen1,                         // NVG Rating
-                _sil: UnitSilhouette.Small,                    // Unit Silhouette
                 _upgradePath: UpgradePath.APC,                 // Upgrade Path
                 _turnAvailable: 264                            // How many months past Jan. 1938
             );
@@ -5179,11 +4774,6 @@ namespace HammerAndSickle.Models
                 _isAmph: false,                                // Is Amphibious
                 _isDF: false,                                  // Is DoubleFire
                 _isAtt: true,                                  // Can this profile attack
-                _awr: AllWeatherRating.GroundUnit,             // All-Weather Capability
-                _sir: SIGINT_Rating.UnitLevel,                 // SIGINT Rating
-                _nbc: NBC_Rating.None,                         // NBC Rating
-                _nvg: NVG_Rating.Gen1,                         // NVG Rating
-                _sil: UnitSilhouette.Small,                    // Unit Silhouette
                 _upgradePath: UpgradePath.APC,                 // Upgrade Path
                 _turnAvailable: 552                            // How many months past Jan. 1938
             );
@@ -5238,11 +4828,6 @@ namespace HammerAndSickle.Models
                 _isAmph: true,                                 // Is Amphibious
                 _isDF: false,                                  // Is DoubleFire
                 _isAtt: true,                                  // Can this profile attack
-                _awr: AllWeatherRating.GroundUnit,             // All-Weather Capability
-                _sir: SIGINT_Rating.UnitLevel,                 // SIGINT Rating
-                _nbc: NBC_Rating.Gen1,                         // NBC Rating
-                _nvg: NVG_Rating.Gen1,                         // NVG Rating
-                _sil: UnitSilhouette.Medium,                   // Unit Silhouette
                 _upgradePath: UpgradePath.APC,                 // Upgrade Path
                 _turnAvailable: 408                            // How many months past Jan. 1938
             );
@@ -5296,11 +4881,6 @@ namespace HammerAndSickle.Models
                 _isAmph: false,                                // Is Amphibious
                 _isDF: false,                                  // Is DoubleFire
                 _isAtt: true,                                  // Can this profile attack
-                _awr: AllWeatherRating.GroundUnit,             // All-Weather Capability
-                _sir: SIGINT_Rating.UnitLevel,                 // SIGINT Rating
-                _nbc: NBC_Rating.Gen1,                         // NBC Rating
-                _nvg: NVG_Rating.Gen1,                         // NVG Rating
-                _sil: UnitSilhouette.Small,                    // Unit Silhouette
                 _upgradePath: UpgradePath.APC,                 // Upgrade Path
                 _turnAvailable: 456                            // How many months past Jan. 1938
             );
@@ -5358,11 +4938,6 @@ namespace HammerAndSickle.Models
                 _isAmph: false,                            // Is Amphibious
                 _isDF: false,                              // Is DoubleFire
                 _isAtt: true,                              // Can this profile attack
-                _awr: AllWeatherRating.GroundUnit,         // All-Weather Capability
-                _sir: SIGINT_Rating.UnitLevel,             // SIGINT Rating
-                _nbc: NBC_Rating.Gen2,                     // NBC Rating
-                _nvg: NVG_Rating.Gen2,                     // NVG Rating
-                _sil: UnitSilhouette.Large,                // Unit Silhouette
                 _upgradePath: UpgradePath.ART,             // Upgrade Path
                 _turnAvailable: 300                        // How many months past Jan. 1938
             );
@@ -5421,11 +4996,6 @@ namespace HammerAndSickle.Models
                 _isAmph: false,                            // Is Amphibious
                 _isDF: false,                              // Is DoubleFire
                 _isAtt: true,                              // Can this profile attack
-                _awr: AllWeatherRating.GroundUnit,         // All-Weather Capability
-                _sir: SIGINT_Rating.UnitLevel,             // SIGINT Rating
-                _nbc: NBC_Rating.Gen1,                     // NBC Rating
-                _nvg: NVG_Rating.Gen1,                     // NVG Rating
-                _sil: UnitSilhouette.Large,                // Unit Silhouette
                 _upgradePath: UpgradePath.ART,             // Upgrade Path
                 _turnAvailable: 300                        // How many months past Jan. 1938
             );
@@ -5484,11 +5054,6 @@ namespace HammerAndSickle.Models
                 _isAmph: false,                            // Is Amphibious
                 _isDF: false,                              // Is DoubleFire
                 _isAtt: true,                              // Can this profile attack
-                _awr: AllWeatherRating.GroundUnit,         // All-Weather Capability
-                _sir: SIGINT_Rating.UnitLevel,             // SIGINT Rating
-                _nbc: NBC_Rating.Gen1,                     // NBC Rating
-                _nvg: NVG_Rating.None,                     // NVG Rating
-                _sil: UnitSilhouette.Large,                // Unit Silhouette
                 _upgradePath: UpgradePath.ART,             // Upgrade Path
                 _turnAvailable: 300                        // How many months past Jan. 1938
             );
@@ -5546,11 +5111,6 @@ namespace HammerAndSickle.Models
                 _isAmph: false,                            // Is Amphibious
                 _isDF: false,                              // Is DoubleFire
                 _isAtt: true,                              // Can this profile attack
-                _awr: AllWeatherRating.GroundUnit,         // All-Weather Capability
-                _sir: SIGINT_Rating.UnitLevel,             // SIGINT Rating
-                _nbc: NBC_Rating.Gen2,                     // NBC Rating
-                _nvg: NVG_Rating.Gen2,                     // NVG Rating
-                _sil: UnitSilhouette.Large,                // Unit Silhouette
                 _upgradePath: UpgradePath.ART,             // Upgrade Path
                 _turnAvailable: 300                        // How many months past Jan. 1938
             );
@@ -5613,11 +5173,6 @@ namespace HammerAndSickle.Models
                 _isAmph: false,                                // Is Amphibious
                 _isDF: false,                                  // Is DoubleFire
                 _isAtt: true,                                  // Can this profile attack
-                _awr: AllWeatherRating.GroundUnit,             // All-Weather Capability
-                _sir: SIGINT_Rating.UnitLevel,                 // SIGINT Rating
-                _nbc: NBC_Rating.None,                         // NBC Rating
-                _nvg: NVG_Rating.None,                         // NVG Rating
-                _sil: UnitSilhouette.Large,                    // Unit Silhouette
                 _upgradePath: UpgradePath.ART,                 // Upgrade Path
                 _turnAvailable: 144                            // How many months past Jan. 1938
             );
@@ -5670,11 +5225,6 @@ namespace HammerAndSickle.Models
                 _isAmph: false,                                // Is Amphibious
                 _isDF: false,                                  // Is DoubleFire
                 _isAtt: true,                                  // Can this profile attack
-                _awr: AllWeatherRating.GroundUnit,             // All-Weather Capability
-                _sir: SIGINT_Rating.UnitLevel,                 // SIGINT Rating
-                _nbc: NBC_Rating.None,                         // NBC Rating
-                _nvg: NVG_Rating.None,                         // NVG Rating
-                _sil: UnitSilhouette.Large,                    // Unit Silhouette
                 _upgradePath: UpgradePath.ART,                 // Upgrade Path
                 _turnAvailable: 144                            // How many months past Jan. 1938
             );
@@ -5731,11 +5281,6 @@ namespace HammerAndSickle.Models
                 _isAmph: false,                            // Is Amphibious
                 _isDF: true,                               // Is DoubleFire
                 _isAtt: true,                              // Can this profile attack
-                _awr: AllWeatherRating.GroundUnit,         // All-Weather Capability
-                _sir: SIGINT_Rating.UnitLevel,             // SIGINT Rating
-                _nbc: NBC_Rating.Gen2,                     // NBC Rating
-                _nvg: NVG_Rating.Gen2,                     // NVG Rating
-                _sil: UnitSilhouette.Large,                // Unit Silhouette
                 _upgradePath: UpgradePath.ROC,             // Upgrade Path
                 _turnAvailable: 540                        // How many months past Jan. 1938
             );
@@ -5798,11 +5343,6 @@ namespace HammerAndSickle.Models
                 _isAmph: false,                            // Is Amphibious
                 _isDF: false,                              // Is DoubleFire
                 _isAtt: true,                              // Can this profile attack
-                _awr: AllWeatherRating.GroundUnit,         // All-Weather Capability
-                _sir: SIGINT_Rating.UnitLevel,             // SIGINT Rating
-                _nbc: NBC_Rating.Gen1,                     // NBC Rating
-                _nvg: NVG_Rating.Gen1,                     // NVG Rating
-                _sil: UnitSilhouette.Medium,               // Unit Silhouette
                 _upgradePath: UpgradePath.AAA,             // Upgrade Path
                 _turnAvailable: 372                        // How many months past Jan. 1938
             );
@@ -5860,11 +5400,6 @@ namespace HammerAndSickle.Models
                 _isAmph: false,                            // Is Amphibious
                 _isDF: false,                              // Is DoubleFire
                 _isAtt: true,                              // Can this profile attack
-                _awr: AllWeatherRating.GroundUnit,         // All-Weather Capability
-                _sir: SIGINT_Rating.UnitLevel,             // SIGINT Rating
-                _nbc: NBC_Rating.Gen1,                     // NBC Rating
-                _nvg: NVG_Rating.Gen1,                     // NVG Rating
-                _sil: UnitSilhouette.Medium,               // Unit Silhouette
                 _upgradePath: UpgradePath.SAM,             // Upgrade Path
                 _turnAvailable: 372                        // How many months past Jan. 1938
             );
@@ -5922,11 +5457,6 @@ namespace HammerAndSickle.Models
                 _isAmph: false,                            // Is Amphibious
                 _isDF: false,                              // Is DoubleFire
                 _isAtt: true,                              // Can this profile attack
-                _awr: AllWeatherRating.GroundUnit,         // All-Weather Capability
-                _sir: SIGINT_Rating.SpecializedLevel,      // SIGINT Rating
-                _nbc: NBC_Rating.Gen1,                     // NBC Rating
-                _nvg: NVG_Rating.None,                     // NVG Rating
-                _sil: UnitSilhouette.Large,                // Unit Silhouette
                 _upgradePath: UpgradePath.SAM,             // Upgrade Path
                 _turnAvailable: 264                        // How many months past Jan. 1938
             );
@@ -5979,11 +5509,6 @@ namespace HammerAndSickle.Models
                 _isAmph: false,                            // Is Amphibious
                 _isDF: false,                              // Is DoubleFire
                 _isAtt: true,                              // Can this profile attack
-                _awr: AllWeatherRating.GroundUnit,         // All-Weather Capability
-                _sir: SIGINT_Rating.UnitLevel,             // SIGINT Rating
-                _nbc: NBC_Rating.Gen1,                     // NBC Rating
-                _nvg: NVG_Rating.None,                     // NVG Rating
-                _sil: UnitSilhouette.Medium,               // Unit Silhouette
                 _upgradePath: UpgradePath.AAA,             // Upgrade Path
                 _turnAvailable: 456                        // How many months past Jan. 1938
             );
@@ -6042,11 +5567,6 @@ namespace HammerAndSickle.Models
                 _isAmph: false,                            // Is Amphibious
                 _isDF: false,                              // Is DoubleFire
                 _isAtt: true,                              // Can this profile attack
-                _awr: AllWeatherRating.GroundUnit,         // All-Weather Capability
-                _sir: SIGINT_Rating.UnitLevel,             // SIGINT Rating
-                _nbc: NBC_Rating.Gen1,                     // NBC Rating
-                _nvg: NVG_Rating.None,                     // NVG Rating
-                _sil: UnitSilhouette.Medium,               // Unit Silhouette
                 _upgradePath: UpgradePath.SAM,             // Upgrade Path
                 _turnAvailable: 468                        // How many months past Jan. 1938
             );
@@ -6104,11 +5624,6 @@ namespace HammerAndSickle.Models
                 _isAmph: false,                            // Is Amphibious
                 _isDF: false,                              // Is DoubleFire
                 _isAtt: true,                              // Can this profile attack
-                _awr: AllWeatherRating.AllWeather,         // All-Weather Capability
-                _sir: SIGINT_Rating.SpecializedLevel,      // SIGINT Rating
-                _nbc: NBC_Rating.Gen1,                     // NBC Rating
-                _nvg: NVG_Rating.None,                     // NVG Rating
-                _sil: UnitSilhouette.Medium,               // Unit Silhouette
                 _upgradePath: UpgradePath.SAM,             // Upgrade Path
                 _turnAvailable: 396                        // How many months past Jan. 1938
             );
@@ -6167,11 +5682,6 @@ namespace HammerAndSickle.Models
                 _isAmph: false,                            // Is Amphibious
                 _isDF: false,                              // Is DoubleFire
                 _isAtt: true,                              // Can this profile attack
-                _awr: AllWeatherRating.GroundUnit,         // All-Weather Capability
-                _sir: SIGINT_Rating.SpecializedLevel,      // SIGINT Rating
-                _nbc: NBC_Rating.Gen1,                     // NBC Rating
-                _nvg: NVG_Rating.None,                     // NVG Rating
-                _sil: UnitSilhouette.Medium,               // Unit Silhouette
                 _upgradePath: UpgradePath.SAM,             // Upgrade Path
                 _turnAvailable: 432                        // How many months past Jan. 1938
             );
@@ -6234,11 +5744,6 @@ namespace HammerAndSickle.Models
                 _isAmph: false,                                // Is Amphibious
                 _isDF: false,                                  // Is DoubleFire
                 _isAtt: true,                                  // Can this profile attack
-                _awr: AllWeatherRating.GroundUnit,             // All-Weather Capability
-                _sir: SIGINT_Rating.UnitLevel,                 // SIGINT Rating
-                _nbc: NBC_Rating.Gen2,                         // NBC Rating
-                _nvg: NVG_Rating.Gen2,                         // NVG Rating
-                _sil: UnitSilhouette.Small,                    // Unit Silhouette
                 _upgradePath: UpgradePath.RCN,                 // Upgrade Path
                 _turnAvailable: 516                            // How many months past Jan. 1938
             );
@@ -6262,6 +5767,8 @@ namespace HammerAndSickle.Models
             };
 
             // Add the M3 Bradley profile to the database
+            // W1: armored-car recon fights as a Hard target (§7.4.1.2 override).
+            M3_US.SetTargetClass(TargetClass.Hard);
             AddProfile(WeaponType.RCN_M3_US, M3_US);
             //----------------------------------------------
             // US M3 Bradley Cavalry Fighting Vehicle
@@ -6294,11 +5801,6 @@ namespace HammerAndSickle.Models
                 _isAmph: true,                                 // Is Amphibious
                 _isDF: false,                                  // Is DoubleFire
                 _isAtt: true,                                  // Can this profile attack
-                _awr: AllWeatherRating.GroundUnit,             // All-Weather Capability
-                _sir: SIGINT_Rating.UnitLevel,                 // SIGINT Rating
-                _nbc: NBC_Rating.Gen1,                         // NBC Rating
-                _nvg: NVG_Rating.Gen1,                         // NVG Rating
-                _sil: UnitSilhouette.Small,                    // Unit Silhouette
                 _upgradePath: UpgradePath.RCN,                 // Upgrade Path
                 _turnAvailable: 444                            // How many months past Jan. 1938
             );
@@ -6322,6 +5824,8 @@ namespace HammerAndSickle.Models
             };
 
             // Add the Luchs profile to the database
+            // W1: armored-car recon fights as a Hard target (§7.4.1.2 override).
+            LUCHS_GE.SetTargetClass(TargetClass.Hard);
             AddProfile(WeaponType.RCN_LUCHS_GE, LUCHS_GE);
             //----------------------------------------------
             // FRG Spähpanzer Luchs Reconnaissance Vehicle
@@ -6354,11 +5858,6 @@ namespace HammerAndSickle.Models
                 _isAmph: false,                                // Is Amphibious
                 _isDF: false,                                  // Is DoubleFire
                 _isAtt: true,                                  // Can this profile attack
-                _awr: AllWeatherRating.GroundUnit,             // All-Weather Capability
-                _sir: SIGINT_Rating.UnitLevel,                 // SIGINT Rating
-                _nbc: NBC_Rating.Gen1,                         // NBC Rating
-                _nvg: NVG_Rating.Gen1,                         // NVG Rating
-                _sil: UnitSilhouette.Small,                    // Unit Silhouette
                 _upgradePath: UpgradePath.RCN,                 // Upgrade Path
                 _turnAvailable: 420                            // How many months past Jan. 1938
             );
@@ -6382,6 +5881,8 @@ namespace HammerAndSickle.Models
             };
 
             // Add the FV105 Sultan profile to the database
+            // W1: UK recon vehicle fights as a Hard target (§7.4.1.2 override).
+            FV105_UK.SetTargetClass(TargetClass.Hard);
             AddProfile(WeaponType.RCN_FV105_UK, FV105_UK);
             //----------------------------------------------
             // UK FV105 Sultan
@@ -6414,11 +5915,6 @@ namespace HammerAndSickle.Models
                 _isAmph: false,                                // Is Amphibious
                 _isDF: false,                                  // Is DoubleFire
                 _isAtt: true,                                  // Can this profile attack
-                _awr: AllWeatherRating.GroundUnit,             // All-Weather Capability
-                _sir: SIGINT_Rating.UnitLevel,                 // SIGINT Rating
-                _nbc: NBC_Rating.Gen1,                         // NBC Rating
-                _nvg: NVG_Rating.None,                         // NVG Rating
-                _sil: UnitSilhouette.Small,                    // Unit Silhouette
                 _upgradePath: UpgradePath.RCN,                 // Upgrade Path
                 _turnAvailable: 492                            // How many months past Jan. 1938
             );
@@ -6442,6 +5938,8 @@ namespace HammerAndSickle.Models
             };
 
             // Add the ERC 90 profile to the database
+            // W1: armored-car recon fights as a Hard target (§7.4.1.2 override).
+            ERC90_FR.SetTargetClass(TargetClass.Hard);
             AddProfile(WeaponType.RCN_ERC90_FR, ERC90_FR);
             //----------------------------------------------
             // French ERC 90 Sagaie Reconnaissance Vehicle
@@ -6478,11 +5976,6 @@ namespace HammerAndSickle.Models
                 _isAmph: false,                            // Is Amphibious
                 _isDF: false,                              // Is DoubleFire
                 _isAtt: true,                              // Can this profile attack
-                _awr: AllWeatherRating.GroundUnit,         // All-Weather Capability
-                _sir: SIGINT_Rating.SpecializedLevel,      // SIGINT Rating
-                _nbc: NBC_Rating.Gen2,                     // NBC Rating
-                _nvg: NVG_Rating.Gen2,                     // NVG Rating
-                _sil: UnitSilhouette.Medium,               // Unit Silhouette
                 _upgradePath: UpgradePath.HEL,            // Upgrade Path
                 _turnAvailable: 576                        // How many months past Jan. 1938
             );
@@ -6539,11 +6032,6 @@ namespace HammerAndSickle.Models
                 _isAmph: false,                            // Is Amphibious
                 _isDF: false,                              // Is DoubleFire
                 _isAtt: true,                              // Can this profile attack
-                _awr: AllWeatherRating.GroundUnit,         // All-Weather Capability
-                _sir: SIGINT_Rating.UnitLevel,             // SIGINT Rating
-                _nbc: NBC_Rating.Gen1,                     // NBC Rating
-                _nvg: NVG_Rating.Gen1,                     // NVG Rating
-                _sil: UnitSilhouette.Medium,               // Unit Silhouette
                 _upgradePath: UpgradePath.HELT,            // Upgrade Path
                 _turnAvailable: 492                        // How many months past Jan. 1938
             );
@@ -6568,6 +6056,8 @@ namespace HammerAndSickle.Models
             };
 
             // Add the UH-60 Black Hawk profile to the database
+            // W2: UH-60 is the US AM/MAM organic helo transport.
+            UH60.SetTransportCategory(TransportCategory.HeloTransport);
             AddProfile(WeaponType.HEL_UH60_US, UH60);
             //----------------------------------------------
             // US UH-60 Black Hawk Transport Helicopter
@@ -6600,11 +6090,6 @@ namespace HammerAndSickle.Models
                 _isAmph: false,                            // Is Amphibious
                 _isDF: false,                              // Is DoubleFire
                 _isAtt: true,                              // Can this profile attack
-                _awr: AllWeatherRating.GroundUnit,         // All-Weather Capability
-                _sir: SIGINT_Rating.UnitLevel,             // SIGINT Rating
-                _nbc: NBC_Rating.None,                     // NBC Rating
-                _nvg: NVG_Rating.Gen1,                     // NVG Rating
-                _sil: UnitSilhouette.Medium,               // Unit Silhouette
                 _upgradePath: UpgradePath.HEL,            // Upgrade Path
                 _turnAvailable: 492                        // How many months past Jan. 1938
             );
@@ -6660,11 +6145,6 @@ namespace HammerAndSickle.Models
                 _isAmph: false,                            // Is Amphibious
                 _isDF: false,                              // Is DoubleFire
                 _isAtt: true,                              // Can this profile attack
-                _awr: AllWeatherRating.GroundUnit,         // All-Weather Capability
-                _sir: SIGINT_Rating.UnitLevel,             // SIGINT Rating
-                _nbc: NBC_Rating.None,                     // NBC Rating
-                _nvg: NVG_Rating.Gen1,                     // NVG Rating
-                _sil: UnitSilhouette.Medium,               // Unit Silhouette
                 _upgradePath: UpgradePath.HEL,            // Upgrade Path
                 _turnAvailable: 348                        // How many months past Jan. 1938
             );
@@ -6725,11 +6205,6 @@ namespace HammerAndSickle.Models
                 _isAmph: false,                            // Is Amphibious
                 _isDF: false,                              // Is DoubleFire
                 _isAtt: true,                              // Can this profile attack
-                _awr: AllWeatherRating.AllWeather,         // All-Weather Capability
-                _sir: SIGINT_Rating.UnitLevel,             // SIGINT Rating
-                _nbc: NBC_Rating.Gen2,                     // NBC Rating
-                _nvg: NVG_Rating.None,                     // NVG Rating
-                _sil: UnitSilhouette.Medium,               // Unit Silhouette
                 _upgradePath: UpgradePath.FGT,            // Upgrade Path
                 _turnAvailable: 456                        // How many months past Jan. 1938
             );
@@ -6779,11 +6254,6 @@ namespace HammerAndSickle.Models
                 _isAmph: false,                            // Is Amphibious
                 _isDF: false,                              // Is DoubleFire
                 _isAtt: true,                              // Can this profile attack
-                _awr: AllWeatherRating.AllWeather,         // All-Weather Capability
-                _sir: SIGINT_Rating.UnitLevel,             // SIGINT Rating
-                _nbc: NBC_Rating.Gen2,                     // NBC Rating
-                _nvg: NVG_Rating.None,                     // NVG Rating
-                _sil: UnitSilhouette.Medium,               // Unit Silhouette
                 _upgradePath: UpgradePath.FGT,            // Upgrade Path
                 _turnAvailable: 480                        // How many months past Jan. 1938
             );
@@ -6833,11 +6303,6 @@ namespace HammerAndSickle.Models
                 _isAmph: false,                            // Is Amphibious
                 _isDF: false,                              // Is DoubleFire
                 _isAtt: true,                              // Can this profile attack
-                _awr: AllWeatherRating.Night,              // All-Weather Capability
-                _sir: SIGINT_Rating.UnitLevel,             // SIGINT Rating
-                _nbc: NBC_Rating.Gen1,                     // NBC Rating
-                _nvg: NVG_Rating.None,                     // NVG Rating
-                _sil: UnitSilhouette.Medium,               // Unit Silhouette
                 _upgradePath: UpgradePath.FGT,            // Upgrade Path
                 _turnAvailable: 276                        // How many months past Jan. 1938
             );
@@ -6887,11 +6352,6 @@ namespace HammerAndSickle.Models
                 _isAmph: false,                            // Is Amphibious
                 _isDF: false,                              // Is DoubleFire
                 _isAtt: true,                              // Can this profile attack
-                _awr: AllWeatherRating.AllWeather,         // All-Weather Capability
-                _sir: SIGINT_Rating.UnitLevel,             // SIGINT Rating
-                _nbc: NBC_Rating.Gen2,                     // NBC Rating
-                _nvg: NVG_Rating.None,                     // NVG Rating
-                _sil: UnitSilhouette.Medium,               // Unit Silhouette
                 _upgradePath: UpgradePath.FGT,            // Upgrade Path
                 _turnAvailable: 432                        // How many months past Jan. 1938
             );
@@ -6941,11 +6401,6 @@ namespace HammerAndSickle.Models
                 _isAmph: false,                            // Is Amphibious
                 _isDF: false,                              // Is DoubleFire
                 _isAtt: true,                              // Can this profile attack
-                _awr: AllWeatherRating.AllWeather,         // All-Weather Capability
-                _sir: SIGINT_Rating.UnitLevel,             // SIGINT Rating
-                _nbc: NBC_Rating.Gen1,                     // NBC Rating
-                _nvg: NVG_Rating.None,                     // NVG Rating
-                _sil: UnitSilhouette.Medium,               // Unit Silhouette
                 _upgradePath: UpgradePath.FGT,            // Upgrade Path
                 _turnAvailable: 492                        // How many months past Jan. 1938
             );
@@ -6995,11 +6450,6 @@ namespace HammerAndSickle.Models
                 _isAmph: false,                            // Is Amphibious
                 _isDF: false,                              // Is DoubleFire
                 _isAtt: true,                              // Can this profile attack
-                _awr: AllWeatherRating.AllWeather,         // All-Weather Capability
-                _sir: SIGINT_Rating.UnitLevel,             // SIGINT Rating
-                _nbc: NBC_Rating.Gen1,                     // NBC Rating
-                _nvg: NVG_Rating.None,                     // NVG Rating
-                _sil: UnitSilhouette.Medium,               // Unit Silhouette
                 _upgradePath: UpgradePath.ATT,            // Upgrade Path
                 _turnAvailable: 528                        // How many months past Jan. 1938
             );
@@ -7049,11 +6499,6 @@ namespace HammerAndSickle.Models
                 _isAmph: false,                            // Is Amphibious
                 _isDF: false,                              // Is DoubleFire
                 _isAtt: true,                              // Can this profile attack
-                _awr: AllWeatherRating.Night,              // All-Weather Capability
-                _sir: SIGINT_Rating.UnitLevel,             // SIGINT Rating
-                _nbc: NBC_Rating.Gen1,                     // NBC Rating
-                _nvg: NVG_Rating.None,                     // NVG Rating
-                _sil: UnitSilhouette.Medium,               // Unit Silhouette
                 _upgradePath: UpgradePath.FGT,            // Upgrade Path
                 _turnAvailable: 276                        // How many months past Jan. 1938
             );
@@ -7103,11 +6548,6 @@ namespace HammerAndSickle.Models
                 _isAmph: false,                            // Is Amphibious
                 _isDF: false,                              // Is DoubleFire
                 _isAtt: true,                              // Can this profile attack
-                _awr: AllWeatherRating.AllWeather,         // All-Weather Capability
-                _sir: SIGINT_Rating.UnitLevel,             // SIGINT Rating
-                _nbc: NBC_Rating.Gen2,                     // NBC Rating
-                _nvg: NVG_Rating.None,                     // NVG Rating
-                _sil: UnitSilhouette.Medium,               // Unit Silhouette
                 _upgradePath: UpgradePath.FGT,            // Upgrade Path
                 _turnAvailable: 552                        // How many months past Jan. 1938
             );
@@ -7157,11 +6597,6 @@ namespace HammerAndSickle.Models
                 _isAmph: false,                            // Is Amphibious
                 _isDF: false,                              // Is DoubleFire
                 _isAtt: true,                              // Can this profile attack
-                _awr: AllWeatherRating.Night,              // All-Weather Capability
-                _sir: SIGINT_Rating.UnitLevel,             // SIGINT Rating
-                _nbc: NBC_Rating.Gen1,                     // NBC Rating
-                _nvg: NVG_Rating.None,                     // NVG Rating
-                _sil: UnitSilhouette.Medium,               // Unit Silhouette
                 _upgradePath: UpgradePath.FGT,            // Upgrade Path
                 _turnAvailable: 420                        // How many months past Jan. 1938
             );
@@ -7211,11 +6646,6 @@ namespace HammerAndSickle.Models
                 _isAmph: false,                            // Is Amphibious
                 _isDF: false,                              // Is DoubleFire
                 _isAtt: true,                              // Can this profile attack
-                _awr: AllWeatherRating.AllWeather,         // All-Weather Capability
-                _sir: SIGINT_Rating.UnitLevel,             // SIGINT Rating
-                _nbc: NBC_Rating.Gen1,                     // NBC Rating
-                _nvg: NVG_Rating.None,                     // NVG Rating
-                _sil: UnitSilhouette.Medium,               // Unit Silhouette
                 _upgradePath: UpgradePath.ATT,            // Upgrade Path
                 _turnAvailable: 468                        // How many months past Jan. 1938
             );
@@ -7265,11 +6695,6 @@ namespace HammerAndSickle.Models
                 _isAmph: false,                            // Is Amphibious
                 _isDF: false,                              // Is DoubleFire
                 _isAtt: true,                              // Can this profile attack
-                _awr: AllWeatherRating.AllWeather,         // All-Weather Capability
-                _sir: SIGINT_Rating.SpecializedLevel,      // SIGINT Rating
-                _nbc: NBC_Rating.Gen2,                     // NBC Rating
-                _nvg: NVG_Rating.None,                     // NVG Rating
-                _sil: UnitSilhouette.Tiny,               // Unit Silhouette
                 _upgradePath: UpgradePath.ATT,            // Upgrade Path
                 _turnAvailable: 540                        // How many months past Jan. 1938
             );
@@ -7319,11 +6744,6 @@ namespace HammerAndSickle.Models
                 _isAmph: false,                            // Is Amphibious
                 _isDF: false,                              // Is DoubleFire
                 _isAtt: true,                              // Can this profile attack
-                _awr: AllWeatherRating.AllWeather,         // All-Weather Capability
-                _sir: SIGINT_Rating.UnitLevel,             // SIGINT Rating
-                _nbc: NBC_Rating.Gen2,                     // NBC Rating
-                _nvg: NVG_Rating.None,                     // NVG Rating
-                _sil: UnitSilhouette.Medium,               // Unit Silhouette
                 _upgradePath: UpgradePath.ATT,            // Upgrade Path
                 _turnAvailable: 420                        // How many months past Jan. 1938
             );
@@ -7373,11 +6793,6 @@ namespace HammerAndSickle.Models
                 _isAmph: false,                            // Is Amphibious
                 _isDF: false,                              // Is DoubleFire
                 _isAtt: true,                              // Can this profile attack
-                _awr: AllWeatherRating.AllWeather,         // All-Weather Capability
-                _sir: SIGINT_Rating.UnitLevel,             // SIGINT Rating
-                _nbc: NBC_Rating.Gen1,                     // NBC Rating
-                _nvg: NVG_Rating.None,                     // NVG Rating
-                _sil: UnitSilhouette.Medium,               // Unit Silhouette
                 _upgradePath: UpgradePath.BMB,            // Upgrade Path
                 _turnAvailable: 348                        // How many months past Jan. 1938
             );
@@ -7427,11 +6842,6 @@ namespace HammerAndSickle.Models
                 _isAmph: false,                            // Is Amphibious
                 _isDF: false,                              // Is DoubleFire
                 _isAtt: true,                              // Can this profile attack
-                _awr: AllWeatherRating.AllWeather,         // All-Weather Capability
-                _sir: SIGINT_Rating.SpecializedLevel,      // SIGINT Rating
-                _nbc: NBC_Rating.Gen2,                     // NBC Rating
-                _nvg: NVG_Rating.None,                     // NVG Rating
-                _sil: UnitSilhouette.Large,               // Unit Silhouette
                 _upgradePath: UpgradePath.AWACS,            // Upgrade Path
                 _turnAvailable: 468                        // How many months past Jan. 1938
             );
@@ -7481,11 +6891,6 @@ namespace HammerAndSickle.Models
                 _isAmph: false,                            // Is Amphibious
                 _isDF: false,                              // Is DoubleFire
                 _isAtt: true,                              // Can this profile attack
-                _awr: AllWeatherRating.AllWeather,         // All-Weather Capability
-                _sir: SIGINT_Rating.SpecializedLevel,      // SIGINT Rating
-                _nbc: NBC_Rating.Gen2,                     // NBC Rating
-                _nvg: NVG_Rating.None,                     // NVG Rating
-                _sil: UnitSilhouette.Medium,               // Unit Silhouette
                 _upgradePath: UpgradePath.RCNA,            // Upgrade Path
                 _turnAvailable: 336                        // How many months past Jan. 1938
             );
@@ -7538,12 +6943,7 @@ namespace HammerAndSickle.Models
                 _mmp: GameData.MOT_UNIT,                   // Max Movement Points
                 _isAmph: false,                            // Is Amphibious
                 _isDF: false,                              // Is DoubleFire
-                _isAtt: true,                              // Can this profile attack
-                _awr: AllWeatherRating.GroundUnit,         // All-Weather Capability
-                _sir: SIGINT_Rating.UnitLevel,             // SIGINT Rating
-                _nbc: NBC_Rating.None,                     // NBC Rating
-                _nvg: NVG_Rating.None,                     // NVG Rating
-                _sil: UnitSilhouette.Medium                // Unit Silhouette
+                _isAtt: true                              // Can this profile attack
             );
 
             // Handle the icon profile.
@@ -7590,12 +6990,7 @@ namespace HammerAndSickle.Models
                 _mmp: GameData.FOOT_UNIT,                  // Max Movement Points
                 _isAmph: false,                            // Is Amphibious
                 _isDF: false,                              // Is DoubleFire
-                _isAtt: true,                              // Can this profile attack
-                _awr: AllWeatherRating.GroundUnit,         // All-Weather Capability
-                _sir: SIGINT_Rating.UnitLevel,             // SIGINT Rating
-                _nbc: NBC_Rating.Gen1,                     // NBC Rating
-                _nvg: NVG_Rating.None,                     // NVG Rating
-                _sil: UnitSilhouette.Small                 // Unit Silhouette
+                _isAtt: true                              // Can this profile attack
             );
 
             // Intel stats
@@ -7644,12 +7039,7 @@ namespace HammerAndSickle.Models
                 _mmp: GameData.FOOT_UNIT,                  // Max Movement Points
                 _isAmph: false,                            // Is Amphibious
                 _isDF: false,                              // Is DoubleFire
-                _isAtt: true,                              // Can this profile attack
-                _awr: AllWeatherRating.GroundUnit,         // All-Weather Capability
-                _sir: SIGINT_Rating.UnitLevel,             // SIGINT Rating
-                _nbc: NBC_Rating.Gen1,                     // NBC Rating
-                _nvg: NVG_Rating.None,                     // NVG Rating
-                _sil: UnitSilhouette.Small                 // Unit Silhouette
+                _isAtt: true                              // Can this profile attack
             );
 
             // Intel stats
@@ -7697,12 +7087,7 @@ namespace HammerAndSickle.Models
                 _mmp: GameData.FOOT_UNIT,                  // Max Movement Points
                 _isAmph: false,                            // Is Amphibious
                 _isDF: false,                              // Is DoubleFire
-                _isAtt: true,                              // Can this profile attack
-                _awr: AllWeatherRating.GroundUnit,         // All-Weather Capability
-                _sir: SIGINT_Rating.UnitLevel,             // SIGINT Rating
-                _nbc: NBC_Rating.Gen1,                     // NBC Rating
-                _nvg: NVG_Rating.Gen1,                     // NVG Rating
-                _sil: UnitSilhouette.Small                 // Unit Silhouette
+                _isAtt: true                              // Can this profile attack
             );
 
             // Intel stats (82nd Airborne composition)
@@ -7750,12 +7135,7 @@ namespace HammerAndSickle.Models
                 _mmp: GameData.FOOT_UNIT,                  // Max Movement Points
                 _isAmph: false,                            // Is Amphibious
                 _isDF: false,                              // Is DoubleFire
-                _isAtt: true,                              // Can this profile attack
-                _awr: AllWeatherRating.GroundUnit,         // All-Weather Capability
-                _sir: SIGINT_Rating.UnitLevel,             // SIGINT Rating
-                _nbc: NBC_Rating.Gen1,                     // NBC Rating
-                _nvg: NVG_Rating.Gen1,                     // NVG Rating
-                _sil: UnitSilhouette.Small                 // Unit Silhouette
+                _isAtt: true                              // Can this profile attack
             );
 
             // Intel stats (101st Airborne composition)
@@ -7803,12 +7183,7 @@ namespace HammerAndSickle.Models
                 _mmp: GameData.FOOT_UNIT,                  // Max Movement Points
                 _isAmph: false,                            // Is Amphibious
                 _isDF: false,                              // Is DoubleFire
-                _isAtt: true,                              // Can this profile attack
-                _awr: AllWeatherRating.GroundUnit,         // All-Weather Capability
-                _sir: SIGINT_Rating.UnitLevel,             // SIGINT Rating
-                _nbc: NBC_Rating.Gen1,                     // NBC Rating
-                _nvg: NVG_Rating.None,                     // NVG Rating
-                _sil: UnitSilhouette.Small                 // Unit Silhouette
+                _isAtt: true                              // Can this profile attack
             );
 
             // Intel stats
@@ -7856,12 +7231,7 @@ namespace HammerAndSickle.Models
                 _mmp: GameData.FOOT_UNIT,                  // Max Movement Points
                 _isAmph: false,                            // Is Amphibious
                 _isDF: false,                              // Is DoubleFire
-                _isAtt: true,                              // Can this profile attack
-                _awr: AllWeatherRating.GroundUnit,         // All-Weather Capability
-                _sir: SIGINT_Rating.UnitLevel,             // SIGINT Rating
-                _nbc: NBC_Rating.Gen1,                     // NBC Rating
-                _nvg: NVG_Rating.Gen1,                     // NVG Rating
-                _sil: UnitSilhouette.Small                 // Unit Silhouette
+                _isAtt: true                              // Can this profile attack
             );
 
             // Intel stats
@@ -7909,12 +7279,7 @@ namespace HammerAndSickle.Models
                 _mmp: GameData.FOOT_UNIT,                  // Max Movement Points
                 _isAmph: false,                            // Is Amphibious
                 _isDF: false,                              // Is DoubleFire
-                _isAtt: true,                              // Can this profile attack
-                _awr: AllWeatherRating.GroundUnit,         // All-Weather Capability
-                _sir: SIGINT_Rating.UnitLevel,             // SIGINT Rating
-                _nbc: NBC_Rating.Gen1,                     // NBC Rating
-                _nvg: NVG_Rating.None,                     // NVG Rating
-                _sil: UnitSilhouette.Small                 // Unit Silhouette
+                _isAtt: true                              // Can this profile attack
             );
 
             // Intel stats (Panzergrenadier Brigade composition)
@@ -7962,12 +7327,7 @@ namespace HammerAndSickle.Models
                 _mmp: GameData.FOOT_UNIT,                  // Max Movement Points
                 _isAmph: false,                            // Is Amphibious
                 _isDF: false,                              // Is DoubleFire
-                _isAtt: true,                              // Can this profile attack
-                _awr: AllWeatherRating.GroundUnit,         // All-Weather Capability
-                _sir: SIGINT_Rating.UnitLevel,             // SIGINT Rating
-                _nbc: NBC_Rating.Gen1,                     // NBC Rating
-                _nvg: NVG_Rating.Gen1,                     // NVG Rating
-                _sil: UnitSilhouette.Small                 // Unit Silhouette
+                _isAtt: true                              // Can this profile attack
             );
 
             // Intel stats (Luftlandebrigade composition)
@@ -8014,12 +7374,7 @@ namespace HammerAndSickle.Models
                 _mmp: GameData.FOOT_UNIT,                  // Max Movement Points
                 _isAmph: false,                            // Is Amphibious
                 _isDF: false,                              // Is DoubleFire
-                _isAtt: true,                              // Can this profile attack
-                _awr: AllWeatherRating.GroundUnit,         // All-Weather Capability
-                _sir: SIGINT_Rating.UnitLevel,             // SIGINT Rating
-                _nbc: NBC_Rating.Gen1,                     // NBC Rating
-                _nvg: NVG_Rating.None,                     // NVG Rating
-                _sil: UnitSilhouette.Small                 // Unit Silhouette
+                _isAtt: true                              // Can this profile attack
             );
 
             // Intel stats (Brigade d'Infanterie Mecanisee composition)
@@ -8067,12 +7422,7 @@ namespace HammerAndSickle.Models
                 _mmp: GameData.FOOT_UNIT,                  // Max Movement Points
                 _isAmph: false,                            // Is Amphibious
                 _isDF: false,                              // Is DoubleFire
-                _isAtt: true,                              // Can this profile attack
-                _awr: AllWeatherRating.GroundUnit,         // All-Weather Capability
-                _sir: SIGINT_Rating.UnitLevel,             // SIGINT Rating
-                _nbc: NBC_Rating.Gen1,                     // NBC Rating
-                _nvg: NVG_Rating.Gen1,                     // NVG Rating
-                _sil: UnitSilhouette.Small                 // Unit Silhouette
+                _isAtt: true                              // Can this profile attack
             );
 
             // Intel stats (11e Division Parachutiste composition)
@@ -8130,11 +7480,6 @@ namespace HammerAndSickle.Models
                 _isAmph: false,                            // Is Amphibious
                 _isDF: false,                              // Is DoubleFire
                 _isAtt: true,                              // Can this profile attack
-                _awr: AllWeatherRating.GroundUnit,         // All-Weather Capability
-                _sir: SIGINT_Rating.UnitLevel,             // SIGINT Rating
-                _nbc: NBC_Rating.None,                     // NBC Rating
-                _nvg: NVG_Rating.None,                     // NVG Rating
-                _sil: UnitSilhouette.Medium,               // Unit Silhouette
                 _upgradePath: UpgradePath.TANK,            // Upgrade Path
                 _turnAvailable: 240                        // How many months past Jan. 1938
             );
@@ -8195,11 +7540,6 @@ namespace HammerAndSickle.Models
                 _isAmph: false,                            // Is Amphibious
                 _isDF: false,                              // Is DoubleFire
                 _isAtt: true,                              // Can this profile attack
-                _awr: AllWeatherRating.GroundUnit,         // All-Weather Capability
-                _sir: SIGINT_Rating.UnitLevel,             // SIGINT Rating
-                _nbc: NBC_Rating.Gen1,                     // NBC Rating
-                _nvg: NVG_Rating.Gen1,                     // NVG Rating
-                _sil: UnitSilhouette.Medium,               // Unit Silhouette
                 _upgradePath: UpgradePath.TANK,            // Upgrade Path
                 _turnAvailable: 276                        // How many months past Jan. 1938
             );
@@ -8261,11 +7601,6 @@ namespace HammerAndSickle.Models
                 _isAmph: false,                            // Is Amphibious
                 _isDF: false,                              // Is DoubleFire
                 _isAtt: true,                              // Can this profile attack
-                _awr: AllWeatherRating.GroundUnit,         // All-Weather Capability
-                _sir: SIGINT_Rating.UnitLevel,             // SIGINT Rating
-                _nbc: NBC_Rating.Gen1,                     // NBC Rating
-                _nvg: NVG_Rating.Gen1,                     // NVG Rating
-                _sil: UnitSilhouette.Medium,               // Unit Silhouette
                 _upgradePath: UpgradePath.TANK,            // Upgrade Path
                 _turnAvailable: 480                        // How many months past Jan. 1938
             );
@@ -8329,11 +7664,6 @@ namespace HammerAndSickle.Models
                 _isAmph: true,                             // Is Amphibious
                 _isDF: false,                              // Is DoubleFire
                 _isAtt: true,                              // Can this profile attack
-                _awr: AllWeatherRating.GroundUnit,         // All-Weather Capability
-                _sir: SIGINT_Rating.UnitLevel,             // SIGINT Rating
-                _nbc: NBC_Rating.Gen1,                     // NBC Rating
-                _nvg: NVG_Rating.None,                     // NVG Rating
-                _sil: UnitSilhouette.Small,                // Unit Silhouette
                 _upgradePath: UpgradePath.IFV,             // Upgrade Path
                 _turnAvailable: 336                        // How many months past Jan. 1938
             );
@@ -8387,11 +7717,6 @@ namespace HammerAndSickle.Models
                 _isAmph: true,                             // Is Amphibious
                 _isDF: false,                              // Is DoubleFire
                 _isAtt: true,                              // Can this profile attack
-                _awr: AllWeatherRating.GroundUnit,         // All-Weather Capability
-                _sir: SIGINT_Rating.UnitLevel,             // SIGINT Rating
-                _nbc: NBC_Rating.Gen1,                     // NBC Rating
-                _nvg: NVG_Rating.None,                     // NVG Rating
-                _sil: UnitSilhouette.Small,                // Unit Silhouette
                 _upgradePath: UpgradePath.APC,             // Upgrade Path
                 _turnAvailable: 312                        // How many months past Jan. 1938
             );
@@ -8444,11 +7769,6 @@ namespace HammerAndSickle.Models
                 _isAmph: true,                             // Is Amphibious
                 _isDF: false,                              // Is DoubleFire
                 _isAtt: true,                              // Can this profile attack
-                _awr: AllWeatherRating.GroundUnit,         // All-Weather Capability
-                _sir: SIGINT_Rating.UnitLevel,             // SIGINT Rating
-                _nbc: NBC_Rating.Gen1,                     // NBC Rating
-                _nvg: NVG_Rating.None,                     // NVG Rating
-                _sil: UnitSilhouette.Small,                // Unit Silhouette
                 _upgradePath: UpgradePath.APC,             // Upgrade Path
                 _turnAvailable: 264                        // How many months past Jan. 1938
             );
@@ -8505,11 +7825,6 @@ namespace HammerAndSickle.Models
                 _isAmph: false,                            // Is Amphibious
                 _isDF: false,                              // Is DoubleFire
                 _isAtt: true,                              // Can this profile attack
-                _awr: AllWeatherRating.GroundUnit,         // All-Weather Capability
-                _sir: SIGINT_Rating.UnitLevel,             // SIGINT Rating
-                _nbc: NBC_Rating.Gen1,                     // NBC Rating
-                _nvg: NVG_Rating.None,                     // NVG Rating
-                _sil: UnitSilhouette.Medium,               // Unit Silhouette
                 _upgradePath: UpgradePath.ART,             // Upgrade Path
                 _turnAvailable: 396                        // How many months past Jan. 1938
             );
@@ -8567,11 +7882,6 @@ namespace HammerAndSickle.Models
                 _isAmph: false,                            // Is Amphibious
                 _isDF: false,                              // Is DoubleFire
                 _isAtt: true,                              // Can this profile attack
-                _awr: AllWeatherRating.GroundUnit,         // All-Weather Capability
-                _sir: SIGINT_Rating.UnitLevel,             // SIGINT Rating
-                _nbc: NBC_Rating.None,                     // NBC Rating
-                _nvg: NVG_Rating.None,                     // NVG Rating
-                _sil: UnitSilhouette.Medium,               // Unit Silhouette
                 _upgradePath: UpgradePath.ART,             // Upgrade Path
                 _turnAvailable: 144                        // How many months past Jan. 1938
             );
@@ -8624,11 +7934,6 @@ namespace HammerAndSickle.Models
                 _isAmph: false,                            // Is Amphibious
                 _isDF: false,                              // Is DoubleFire
                 _isAtt: true,                              // Can this profile attack
-                _awr: AllWeatherRating.GroundUnit,         // All-Weather Capability
-                _sir: SIGINT_Rating.UnitLevel,             // SIGINT Rating
-                _nbc: NBC_Rating.None,                     // NBC Rating
-                _nvg: NVG_Rating.None,                     // NVG Rating
-                _sil: UnitSilhouette.Large,                // Unit Silhouette
                 _upgradePath: UpgradePath.ART,             // Upgrade Path
                 _turnAvailable: 144                        // How many months past Jan. 1938
             );
@@ -8685,11 +7990,6 @@ namespace HammerAndSickle.Models
                 _isAmph: false,                            // Is Amphibious
                 _isDF: false,                              // Is DoubleFire
                 _isAtt: true,                              // Can this profile attack
-                _awr: AllWeatherRating.GroundUnit,         // All-Weather Capability
-                _sir: SIGINT_Rating.UnitLevel,             // SIGINT Rating
-                _nbc: NBC_Rating.None,                     // NBC Rating
-                _nvg: NVG_Rating.None,                     // NVG Rating
-                _sil: UnitSilhouette.Small,                // Unit Silhouette
                 _upgradePath: UpgradePath.AAA,             // Upgrade Path
                 _turnAvailable: 144                        // How many months past Jan. 1938
             );
@@ -8741,11 +8041,6 @@ namespace HammerAndSickle.Models
                 _isAmph: false,                            // Is Amphibious
                 _isDF: false,                              // Is DoubleFire
                 _isAtt: true,                              // Can this profile attack
-                _awr: AllWeatherRating.GroundUnit,         // All-Weather Capability
-                _sir: SIGINT_Rating.UnitLevel,             // SIGINT Rating
-                _nbc: NBC_Rating.None,                     // NBC Rating
-                _nvg: NVG_Rating.None,                     // NVG Rating
-                _sil: UnitSilhouette.Small,                // Unit Silhouette
                 _upgradePath: UpgradePath.SAM,             // Upgrade Path
                 _turnAvailable: 264                        // How many months past Jan. 1938
             );
@@ -8797,11 +8092,6 @@ namespace HammerAndSickle.Models
                 _isAmph: false,                            // Is Amphibious
                 _isDF: false,                              // Is DoubleFire
                 _isAtt: true,                              // Can this profile attack
-                _awr: AllWeatherRating.GroundUnit,         // All-Weather Capability
-                _sir: SIGINT_Rating.UnitLevel,             // SIGINT Rating
-                _nbc: NBC_Rating.Gen1,                     // NBC Rating
-                _nvg: NVG_Rating.Gen1,                     // NVG Rating
-                _sil: UnitSilhouette.Medium,               // Unit Silhouette
                 _upgradePath: UpgradePath.AAA,             // Upgrade Path
                 _turnAvailable: 372                        // How many months past Jan. 1938
             );
@@ -8859,11 +8149,6 @@ namespace HammerAndSickle.Models
                 _isAmph: false,                            // Is Amphibious
                 _isDF: false,                              // Is DoubleFire
                 _isAtt: true,                              // Can this profile attack
-                _awr: AllWeatherRating.GroundUnit,         // All-Weather Capability
-                _sir: SIGINT_Rating.UnitLevel,             // SIGINT Rating
-                _nbc: NBC_Rating.Gen1,                     // NBC Rating
-                _nvg: NVG_Rating.Gen1,                     // NVG Rating
-                _sil: UnitSilhouette.Medium,               // Unit Silhouette
                 _upgradePath: UpgradePath.AAA,             // Upgrade Path
                 _turnAvailable: 372                        // How many months past Jan. 1938
             );
@@ -8925,11 +8210,6 @@ namespace HammerAndSickle.Models
                 _isAmph: false,                            // Is Amphibious
                 _isDF: false,                              // Is DoubleFire
                 _isAtt: true,                              // Can this profile attack
-                _awr: AllWeatherRating.Day,                // All-Weather Capability
-                _sir: SIGINT_Rating.UnitLevel,             // SIGINT Rating
-                _nbc: NBC_Rating.None,                     // NBC Rating
-                _nvg: NVG_Rating.None,                     // NVG Rating
-                _sil: UnitSilhouette.Medium,               // Unit Silhouette
                 _upgradePath: UpgradePath.FGT,             // Upgrade Path
                 _turnAvailable: 252                        // How many months past Jan. 1938
             );
@@ -8979,11 +8259,6 @@ namespace HammerAndSickle.Models
                 _isAmph: false,                            // Is Amphibious
                 _isDF: false,                              // Is DoubleFire
                 _isAtt: true,                              // Can this profile attack
-                _awr: AllWeatherRating.Night,              // All-Weather Capability
-                _sir: SIGINT_Rating.UnitLevel,             // SIGINT Rating
-                _nbc: NBC_Rating.Gen1,                     // NBC Rating
-                _nvg: NVG_Rating.None,                     // NVG Rating
-                _sil: UnitSilhouette.Medium,               // Unit Silhouette
                 _upgradePath: UpgradePath.FGT,             // Upgrade Path
                 _turnAvailable: 384                        // How many months past Jan. 1938
             );
@@ -9033,11 +8308,6 @@ namespace HammerAndSickle.Models
                 _isAmph: false,                            // Is Amphibious
                 _isDF: false,                              // Is DoubleFire
                 _isAtt: true,                              // Can this profile attack
-                _awr: AllWeatherRating.Night,              // All-Weather Capability
-                _sir: SIGINT_Rating.UnitLevel,             // SIGINT Rating
-                _nbc: NBC_Rating.Gen1,                     // NBC Rating
-                _nvg: NVG_Rating.None,                     // NVG Rating
-                _sil: UnitSilhouette.Medium,               // Unit Silhouette
                 _upgradePath: UpgradePath.ATT,             // Upgrade Path
                 _turnAvailable: 384                        // How many months past Jan. 1938
             );
@@ -9087,11 +8357,6 @@ namespace HammerAndSickle.Models
                 _isAmph: false,                            // Is Amphibious
                 _isDF: false,                              // Is DoubleFire
                 _isAtt: true,                              // Can this profile attack
-                _awr: AllWeatherRating.Night,              // All-Weather Capability
-                _sir: SIGINT_Rating.UnitLevel,             // SIGINT Rating
-                _nbc: NBC_Rating.Gen1,                     // NBC Rating
-                _nvg: NVG_Rating.None,                     // NVG Rating
-                _sil: UnitSilhouette.Medium,               // Unit Silhouette
                 _upgradePath: UpgradePath.FGT,             // Upgrade Path
                 _turnAvailable: 276                        // How many months past Jan. 1938
             );
@@ -9141,11 +8406,6 @@ namespace HammerAndSickle.Models
                 _isAmph: false,                            // Is Amphibious
                 _isDF: false,                              // Is DoubleFire
                 _isAtt: true,                              // Can this profile attack
-                _awr: AllWeatherRating.AllWeather,         // All-Weather Capability
-                _sir: SIGINT_Rating.UnitLevel,             // SIGINT Rating
-                _nbc: NBC_Rating.Gen1,                     // NBC Rating
-                _nvg: NVG_Rating.None,                     // NVG Rating
-                _sil: UnitSilhouette.Medium,               // Unit Silhouette
                 _upgradePath: UpgradePath.FGT,             // Upgrade Path
                 _turnAvailable: 432                        // How many months past Jan. 1938
             );
@@ -9198,12 +8458,7 @@ namespace HammerAndSickle.Models
                 _mmp: GameData.MOT_UNIT,                   // Max Movement Points
                 _isAmph: false,                            // Is Amphibious
                 _isDF: false,                              // Is DoubleFire
-                _isAtt: true,                              // Can this profile attack
-                _awr: AllWeatherRating.GroundUnit,         // All-Weather Capability
-                _sir: SIGINT_Rating.UnitLevel,             // SIGINT Rating
-                _nbc: NBC_Rating.None,                     // NBC Rating
-                _nvg: NVG_Rating.None,                     // NVG Rating
-                _sil: UnitSilhouette.Medium                // Unit Silhouette
+                _isAtt: true                              // Can this profile attack
             );
 
             // Handle the icon profile.
@@ -9250,12 +8505,7 @@ namespace HammerAndSickle.Models
                 _mmp: GameData.FOOT_UNIT,                  // Max Movement Points
                 _isAmph: false,                            // Is Amphibious
                 _isDF: false,                              // Is DoubleFire
-                _isAtt: true,                              // Can this profile attack
-                _awr: AllWeatherRating.GroundUnit,         // All-Weather Capability
-                _sir: SIGINT_Rating.UnitLevel,             // SIGINT Rating
-                _nbc: NBC_Rating.Gen1,                     // NBC Rating
-                _nvg: NVG_Rating.None,                     // NVG Rating
-                _sil: UnitSilhouette.Small                 // Unit Silhouette
+                _isAtt: true                              // Can this profile attack
             );
 
             // Intel stats
@@ -9304,12 +8554,7 @@ namespace HammerAndSickle.Models
                 _mmp: GameData.FOOT_UNIT,                  // Max Movement Points
                 _isAmph: false,                            // Is Amphibious
                 _isDF: false,                              // Is DoubleFire
-                _isAtt: true,                              // Can this profile attack
-                _awr: AllWeatherRating.GroundUnit,         // All-Weather Capability
-                _sir: SIGINT_Rating.UnitLevel,             // SIGINT Rating
-                _nbc: NBC_Rating.Gen1,                     // NBC Rating
-                _nvg: NVG_Rating.None,                     // NVG Rating
-                _sil: UnitSilhouette.Small                 // Unit Silhouette
+                _isAtt: true                              // Can this profile attack
             );
 
             // Intel stats
@@ -9362,12 +8607,7 @@ namespace HammerAndSickle.Models
                 _mmp: GameData.FOOT_UNIT,                  // Max Movement Points
                 _isAmph: false,                            // Is Amphibious
                 _isDF: false,                              // Is DoubleFire
-                _isAtt: true,                              // Can this profile attack
-                _awr: AllWeatherRating.GroundUnit,         // All-Weather Capability
-                _sir: SIGINT_Rating.UnitLevel,             // SIGINT Rating
-                _nbc: NBC_Rating.None,                     // NBC Rating
-                _nvg: NVG_Rating.None,                     // NVG Rating
-                _sil: UnitSilhouette.Small                 // Unit Silhouette
+                _isAtt: true                              // Can this profile attack
             );
 
             // Intel stats
@@ -9415,12 +8655,7 @@ namespace HammerAndSickle.Models
                 _mmp: GameData.FOOT_UNIT,                  // Max Movement Points
                 _isAmph: false,                            // Is Amphibious
                 _isDF: false,                              // Is DoubleFire
-                _isAtt: true,                              // Can this profile attack
-                _awr: AllWeatherRating.GroundUnit,         // All-Weather Capability
-                _sir: SIGINT_Rating.SpecializedLevel,      // SIGINT Rating
-                _nbc: NBC_Rating.None,                     // NBC Rating
-                _nvg: NVG_Rating.Gen1,                     // NVG Rating
-                _sil: UnitSilhouette.Small                 // Unit Silhouette
+                _isAtt: true                              // Can this profile attack
             );
 
             // Intel stats
@@ -9468,12 +8703,7 @@ namespace HammerAndSickle.Models
                 _mmp: GameData.CAVALRY_UNIT,               // Max Movement Points
                 _isAmph: false,                            // Is Amphibious
                 _isDF: false,                              // Is DoubleFire
-                _isAtt: true,                              // Can this profile attack
-                _awr: AllWeatherRating.GroundUnit,         // All-Weather Capability
-                _sir: SIGINT_Rating.UnitLevel,             // SIGINT Rating
-                _nbc: NBC_Rating.None,                     // NBC Rating
-                _nvg: NVG_Rating.None,                     // NVG Rating
-                _sil: UnitSilhouette.Small                 // Unit Silhouette
+                _isAtt: true                              // Can this profile attack
             );
 
             // Intel stats
@@ -9521,12 +8751,7 @@ namespace HammerAndSickle.Models
                 _mmp: GameData.FOOT_UNIT,                  // Max Movement Points
                 _isAmph: false,                            // Is Amphibious
                 _isDF: false,                              // Is DoubleFire
-                _isAtt: true,                              // Can this profile attack
-                _awr: AllWeatherRating.GroundUnit,         // All-Weather Capability
-                _sir: SIGINT_Rating.UnitLevel,             // SIGINT Rating
-                _nbc: NBC_Rating.None,                     // NBC Rating
-                _nvg: NVG_Rating.None,                     // NVG Rating
-                _sil: UnitSilhouette.Small                 // Unit Silhouette
+                _isAtt: true                              // Can this profile attack
             );
 
             // Intel stats
@@ -9574,12 +8799,7 @@ namespace HammerAndSickle.Models
                 _mmp: GameData.FOOT_UNIT,                  // Max Movement Points
                 _isAmph: false,                            // Is Amphibious
                 _isDF: false,                              // Is DoubleFire
-                _isAtt: true,                              // Can this profile attack
-                _awr: AllWeatherRating.GroundUnit,         // All-Weather Capability
-                _sir: SIGINT_Rating.UnitLevel,             // SIGINT Rating
-                _nbc: NBC_Rating.None,                     // NBC Rating
-                _nvg: NVG_Rating.None,                     // NVG Rating
-                _sil: UnitSilhouette.Small                 // Unit Silhouette
+                _isAtt: true                              // Can this profile attack
             );
 
             // Intel stats
@@ -9626,12 +8846,7 @@ namespace HammerAndSickle.Models
                 _mmp: GameData.FOOT_UNIT,                  // Max Movement Points
                 _isAmph: false,                            // Is Amphibious
                 _isDF: false,                              // Is DoubleFire
-                _isAtt: true,                              // Can this profile attack
-                _awr: AllWeatherRating.GroundUnit,         // All-Weather Capability
-                _sir: SIGINT_Rating.UnitLevel,             // SIGINT Rating
-                _nbc: NBC_Rating.None,                     // NBC Rating
-                _nvg: NVG_Rating.None,                     // NVG Rating
-                _sil: UnitSilhouette.Small                 // Unit Silhouette
+                _isAtt: true                              // Can this profile attack
             );
 
             // Intel stats
@@ -9688,11 +8903,6 @@ namespace HammerAndSickle.Models
                 _isAmph: false,                            // Is Amphibious
                 _isDF: false,                              // Is DoubleFire
                 _isAtt: true,                              // Can this profile attack
-                _awr: AllWeatherRating.GroundUnit,         // All-Weather Capability
-                _sir: SIGINT_Rating.UnitLevel,             // SIGINT Rating
-                _nbc: NBC_Rating.None,                     // NBC Rating
-                _nvg: NVG_Rating.None,                     // NVG Rating
-                _sil: UnitSilhouette.Medium,               // Unit Silhouette
                 _upgradePath: UpgradePath.TANK,            // Upgrade Path
                 _turnAvailable: 252                        // How many months past Jan. 1938
             );
@@ -9752,11 +8962,6 @@ namespace HammerAndSickle.Models
                 _isAmph: false,                            // Is Amphibious
                 _isDF: false,                              // Is DoubleFire
                 _isAtt: true,                              // Can this profile attack
-                _awr: AllWeatherRating.GroundUnit,         // All-Weather Capability
-                _sir: SIGINT_Rating.UnitLevel,             // SIGINT Rating
-                _nbc: NBC_Rating.Gen1,                     // NBC Rating
-                _nvg: NVG_Rating.Gen1,                     // NVG Rating
-                _sil: UnitSilhouette.Medium,               // Unit Silhouette
                 _upgradePath: UpgradePath.TANK,            // Upgrade Path
                 _turnAvailable: 564                        // How many months past Jan. 1938
             );
@@ -9816,11 +9021,6 @@ namespace HammerAndSickle.Models
                 _isAmph: false,                            // Is Amphibious
                 _isDF: false,                              // Is DoubleFire
                 _isAtt: true,                              // Can this profile attack
-                _awr: AllWeatherRating.GroundUnit,         // All-Weather Capability
-                _sir: SIGINT_Rating.UnitLevel,             // SIGINT Rating
-                _nbc: NBC_Rating.Gen2,                     // NBC Rating
-                _nvg: NVG_Rating.Gen2,                     // NVG Rating
-                _sil: UnitSilhouette.Medium,               // Unit Silhouette
                 _upgradePath: UpgradePath.TANK,            // Upgrade Path
                 _turnAvailable: 588                        // How many months past Jan. 1938
             );
@@ -9884,11 +9084,6 @@ namespace HammerAndSickle.Models
                 _isAmph: true,                             // Is Amphibious
                 _isDF: false,                              // Is DoubleFire
                 _isAtt: true,                              // Can this profile attack
-                _awr: AllWeatherRating.GroundUnit,         // All-Weather Capability
-                _sir: SIGINT_Rating.UnitLevel,             // SIGINT Rating
-                _nbc: NBC_Rating.Gen1,                     // NBC Rating
-                _nvg: NVG_Rating.None,                     // NVG Rating
-                _sil: UnitSilhouette.Small,                // Unit Silhouette
                 _upgradePath: UpgradePath.IFV,             // Upgrade Path
                 _turnAvailable: 576                        // How many months past Jan. 1938
             );
@@ -9945,11 +9140,6 @@ namespace HammerAndSickle.Models
                 _isAmph: false,                            // Is Amphibious
                 _isDF: false,                              // Is DoubleFire
                 _isAtt: true,                              // Can this profile attack
-                _awr: AllWeatherRating.GroundUnit,         // All-Weather Capability
-                _sir: SIGINT_Rating.UnitLevel,             // SIGINT Rating
-                _nbc: NBC_Rating.Gen1,                     // NBC Rating
-                _nvg: NVG_Rating.None,                     // NVG Rating
-                _sil: UnitSilhouette.Medium,               // Unit Silhouette
                 _upgradePath: UpgradePath.ART,             // Upgrade Path
                 _turnAvailable: 552                        // How many months past Jan. 1938
             );
@@ -10007,11 +9197,6 @@ namespace HammerAndSickle.Models
                 _isAmph: false,                            // Is Amphibious
                 _isDF: false,                              // Is DoubleFire
                 _isAtt: true,                              // Can this profile attack
-                _awr: AllWeatherRating.GroundUnit,         // All-Weather Capability
-                _sir: SIGINT_Rating.UnitLevel,             // SIGINT Rating
-                _nbc: NBC_Rating.Gen1,                     // NBC Rating
-                _nvg: NVG_Rating.None,                     // NVG Rating
-                _sil: UnitSilhouette.Medium,               // Unit Silhouette
                 _upgradePath: UpgradePath.ROC,             // Upgrade Path
                 _turnAvailable: 500                        // How many months past Jan. 1938
             );
@@ -10069,11 +9254,6 @@ namespace HammerAndSickle.Models
                 _isAmph: false,                            // Is Amphibious
                 _isDF: false,                              // Is DoubleFire
                 _isAtt: true,                              // Can this profile attack
-                _awr: AllWeatherRating.GroundUnit,         // All-Weather Capability
-                _sir: SIGINT_Rating.UnitLevel,             // SIGINT Rating
-                _nbc: NBC_Rating.None,                     // NBC Rating
-                _nvg: NVG_Rating.None,                     // NVG Rating
-                _sil: UnitSilhouette.Medium,               // Unit Silhouette
                 _upgradePath: UpgradePath.ART,             // Upgrade Path
                 _turnAvailable: 144                        // How many months past Jan. 1938
             );
@@ -10126,11 +9306,6 @@ namespace HammerAndSickle.Models
                 _isAmph: false,                            // Is Amphibious
                 _isDF: false,                              // Is DoubleFire
                 _isAtt: true,                              // Can this profile attack
-                _awr: AllWeatherRating.GroundUnit,         // All-Weather Capability
-                _sir: SIGINT_Rating.UnitLevel,             // SIGINT Rating
-                _nbc: NBC_Rating.None,                     // NBC Rating
-                _nvg: NVG_Rating.None,                     // NVG Rating
-                _sil: UnitSilhouette.Large,                // Unit Silhouette
                 _upgradePath: UpgradePath.ART,             // Upgrade Path
                 _turnAvailable: 144                        // How many months past Jan. 1938
             );
@@ -10187,11 +9362,6 @@ namespace HammerAndSickle.Models
                 _isAmph: false,                            // Is Amphibious
                 _isDF: false,                              // Is DoubleFire
                 _isAtt: true,                              // Can this profile attack
-                _awr: AllWeatherRating.GroundUnit,         // All-Weather Capability
-                _sir: SIGINT_Rating.UnitLevel,             // SIGINT Rating
-                _nbc: NBC_Rating.None,                     // NBC Rating
-                _nvg: NVG_Rating.None,                     // NVG Rating
-                _sil: UnitSilhouette.Medium,               // Unit Silhouette
                 _upgradePath: UpgradePath.AAA,             // Upgrade Path
                 _turnAvailable: 204                        // How many months past Jan. 1938
             );
@@ -10249,11 +9419,6 @@ namespace HammerAndSickle.Models
                 _isAmph: false,                            // Is Amphibious
                 _isDF: false,                              // Is DoubleFire
                 _isAtt: true,                              // Can this profile attack
-                _awr: AllWeatherRating.AllWeather,         // All-Weather Capability
-                _sir: SIGINT_Rating.SpecializedLevel,      // SIGINT Rating
-                _nbc: NBC_Rating.Gen1,                     // NBC Rating
-                _nvg: NVG_Rating.None,                     // NVG Rating
-                _sil: UnitSilhouette.Medium,               // Unit Silhouette
                 _upgradePath: UpgradePath.SAM,             // Upgrade Path
                 _turnAvailable: 564                        // How many months past Jan. 1938
             );
@@ -10315,11 +9480,6 @@ namespace HammerAndSickle.Models
                 _isAmph: false,                            // Is Amphibious
                 _isDF: false,                              // Is DoubleFire
                 _isAtt: true,                              // Can this profile attack
-                _awr: AllWeatherRating.GroundUnit,         // All-Weather Capability
-                _sir: SIGINT_Rating.UnitLevel,             // SIGINT Rating
-                _nbc: NBC_Rating.Gen1,                     // NBC Rating
-                _nvg: NVG_Rating.Gen1,                     // NVG Rating
-                _sil: UnitSilhouette.Medium,               // Unit Silhouette
                 _upgradePath: UpgradePath.HEL,             // Upgrade Path
                 _turnAvailable: 528                        // How many months past Jan. 1938
             );
@@ -10379,11 +9539,6 @@ namespace HammerAndSickle.Models
                 _isAmph: false,                            // Is Amphibious
                 _isDF: false,                              // Is DoubleFire
                 _isAtt: true,                              // Can this profile attack
-                _awr: AllWeatherRating.Day,                // All-Weather Capability
-                _sir: SIGINT_Rating.UnitLevel,             // SIGINT Rating
-                _nbc: NBC_Rating.None,                     // NBC Rating
-                _nvg: NVG_Rating.None,                     // NVG Rating
-                _sil: UnitSilhouette.Medium,               // Unit Silhouette
                 _upgradePath: UpgradePath.FGT,             // Upgrade Path
                 _turnAvailable: 324                        // How many months past Jan. 1938
             );
@@ -10433,11 +9588,6 @@ namespace HammerAndSickle.Models
                 _isAmph: false,                            // Is Amphibious
                 _isDF: false,                              // Is DoubleFire
                 _isAtt: true,                              // Can this profile attack
-                _awr: AllWeatherRating.Night,              // All-Weather Capability
-                _sir: SIGINT_Rating.UnitLevel,             // SIGINT Rating
-                _nbc: NBC_Rating.Gen1,                     // NBC Rating
-                _nvg: NVG_Rating.None,                     // NVG Rating
-                _sil: UnitSilhouette.Medium,               // Unit Silhouette
                 _upgradePath: UpgradePath.FGT,             // Upgrade Path
                 _turnAvailable: 504                        // How many months past Jan. 1938
             );
@@ -10487,11 +9637,6 @@ namespace HammerAndSickle.Models
                 _isAmph: false,                            // Is Amphibious
                 _isDF: false,                              // Is DoubleFire
                 _isAtt: true,                              // Can this profile attack
-                _awr: AllWeatherRating.Day,                // All-Weather Capability
-                _sir: SIGINT_Rating.UnitLevel,             // SIGINT Rating
-                _nbc: NBC_Rating.None,                     // NBC Rating
-                _nvg: NVG_Rating.None,                     // NVG Rating
-                _sil: UnitSilhouette.Medium,               // Unit Silhouette
                 _upgradePath: UpgradePath.ATT,             // Upgrade Path
                 _turnAvailable: 384                        // How many months past Jan. 1938
             );
@@ -10541,11 +9686,6 @@ namespace HammerAndSickle.Models
                 _isAmph: false,                            // Is Amphibious
                 _isDF: false,                              // Is DoubleFire
                 _isAtt: true,                              // Can this profile attack
-                _awr: AllWeatherRating.Day,                // All-Weather Capability
-                _sir: SIGINT_Rating.UnitLevel,             // SIGINT Rating
-                _nbc: NBC_Rating.None,                     // NBC Rating
-                _nvg: NVG_Rating.None,                     // NVG Rating
-                _sil: UnitSilhouette.Large,                // Unit Silhouette
                 _upgradePath: UpgradePath.BMB,             // Upgrade Path
                 _turnAvailable: 372                        // How many months past Jan. 1938
             );
@@ -10598,12 +9738,7 @@ namespace HammerAndSickle.Models
                 _mmp: GameData.FOOT_UNIT,                  // Max Movement Points
                 _isAmph: false,                            // Is Amphibious
                 _isDF: false,                              // Is DoubleFire
-                _isAtt: true,                              // Can this profile attack
-                _awr: AllWeatherRating.GroundUnit,         // All-Weather Capability
-                _sir: SIGINT_Rating.UnitLevel,             // SIGINT Rating
-                _nbc: NBC_Rating.Gen1,                     // NBC Rating
-                _nvg: NVG_Rating.None,                     // NVG Rating
-                _sil: UnitSilhouette.Small                 // Unit Silhouette
+                _isAtt: true                              // Can this profile attack
             );
 
             // Intel stats
@@ -10653,12 +9788,7 @@ namespace HammerAndSickle.Models
                 _mmp: GameData.FOOT_UNIT,                  // Max Movement Points
                 _isAmph: false,                            // Is Amphibious
                 _isDF: false,                              // Is DoubleFire
-                _isAtt: true,                              // Can this profile attack
-                _awr: AllWeatherRating.GroundUnit,         // All-Weather Capability
-                _sir: SIGINT_Rating.UnitLevel,             // SIGINT Rating
-                _nbc: NBC_Rating.Gen1,                     // NBC Rating
-                _nvg: NVG_Rating.Gen1,                     // NVG Rating
-                _sil: UnitSilhouette.Small                 // Unit Silhouette
+                _isAtt: true                              // Can this profile attack
             );
 
             // Intel stats

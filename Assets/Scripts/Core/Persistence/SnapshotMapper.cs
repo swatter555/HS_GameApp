@@ -134,7 +134,6 @@ namespace HammerAndSickle.Persistence
                             // Copy position and spotted state
                             freshUnit.SetPosition(unit.MapPos);
                             freshUnit.SetSpottedLevel(unit.SpottedLevel);
-                            freshUnit.SetICM(unit.IndividualCombatModifier);
 
                             // Copy facing and embarkment state
                             freshUnit.Facing = unit.Facing;

@@ -269,6 +269,13 @@ namespace HammerAndSickle.Models.Map
                 LabelWeight = FontWeight.Medium;
                 LabelColor = TextColor.Blue;
                 LabelOutlineThickness = 0.1f;
+
+                // Border sets — non-null so manually-created hexes can write edges (e.g. SetBorder).
+                // JSON load populates these via the property setters instead; reads are null-safe (IsRiver).
+                RiverBorders = new JSONFeatureBorders(BorderType.River);
+                BridgeBorders = new JSONFeatureBorders(BorderType.Bridge);
+                PontoonBridgeBorders = new JSONFeatureBorders(BorderType.PontoonBridge);
+                DamagedBridgeBorders = new JSONFeatureBorders(BorderType.DestroyedBridge);
             }
             catch (Exception ex)
             {
