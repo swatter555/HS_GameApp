@@ -37,6 +37,7 @@ namespace HammerAndSickle.Models
         MountedFire,       // T37 — firing ports
         NightObscurant,    // T08/T26/T54 — smoke / IR / NoE concealment
         Stealth,           // T61 — RAM, intercept evasion
+        ActiveProtection,  // hard-kill APS (Arena/Afganit/Trophy) — intercept incoming ATGM/HEAT (mechanic DORMANT)
         NonCombatant,      // T83 — cannot initiate attack
         RocketArtillery    // T84 — +1 CombatAction (MRL salvo)
     }

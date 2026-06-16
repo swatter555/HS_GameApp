@@ -42,6 +42,9 @@ namespace HammerAndSickle.Models
                 "Kontakt-1 ERA; defeats HEAT only.", Delta(ProfileStat.HD, 2)));
             Add(new TraitDef(WeaponTrait.ERA_HEAVY, TraitCategory.TankProtection,
                 "Kontakt-5; integrated, defeats APFSDS.", Delta(ProfileStat.HD, 3)));
+            Add(new TraitDef(WeaponTrait.ERA_RELIKT, TraitCategory.TankProtection,
+                "Relikt/Kontakt-7 (3rd-gen ERA, T-80BVM/T-90M); defeats tandem HEAT + trims APFSDS.",
+                Delta(ProfileStat.HD, 4)));
             Add(new TraitDef(WeaponTrait.COMPOSITE_CERAMIC, TraitCategory.TankProtection,
                 "Chobham/Burlington ceramic.", Delta(ProfileStat.HD, 2)));
             Add(new TraitDef(WeaponTrait.COMPOSITE_DU, TraitCategory.TankProtection,
@@ -58,6 +61,10 @@ namespace HammerAndSickle.Models
                 Cap(WeaponCapability.NightObscurant, EffectStatus.Dormant)));
             Add(new TraitDef(WeaponTrait.AUTO_FIRE_SUPPRESSION, TraitCategory.TankProtection,
                 "Halon crew/engine systems (NATO lead).", Delta(ProfileStat.SD, 1)));
+            Add(new TraitDef(WeaponTrait.ACTIVE_PROTECTION_HARDKILL, TraitCategory.TankProtection,
+                "Hard-kill APS (Arena-M/Afganit; NATO Trophy) — intercepts ATGM/HEAT. HD+1 live; the explicit " +
+                "intercept mechanic is DORMANT.",
+                Delta(ProfileStat.HD, 1), Cap(WeaponCapability.ActiveProtection, EffectStatus.Dormant)));
             Add(new TraitDef(WeaponTrait.AMMO_CAROUSEL_VULN, TraitCategory.TankProtection,
                 "DORMANT → crit/cook-off: higher destroy-on-kill malus."));
             #endregion
@@ -126,6 +133,14 @@ namespace HammerAndSickle.Models
                 "Soviet long-range drums — supply ×0.9.", Cap(WeaponCapability.ExtendedRange)));
             Add(new TraitDef(WeaponTrait.HIGH_GROUND_PRESSURE, TraitCategory.GroundMobility,
                 "DORMANT → per-class terrain move: heavy MBTs bog in soft terrain."));
+            Add(new TraitDef(WeaponTrait.SELF_PROPELLED, TraitCategory.GroundMobility,
+                "Tracked self-propelled chassis (SP guns, tracked SP-AAA/SAM) — mobility off the MMP-4 towed " +
+                "baseline + an armoured hull; a vehicle is a slightly bigger air target than a dispersed towed battery.",
+                Delta(ProfileStat.MMP, 6), Delta(ProfileStat.HD, 2), Delta(ProfileStat.SD, 2), Delta(ProfileStat.GAD, -1)));
+            Add(new TraitDef(WeaponTrait.TRUCK_MOUNTED, TraitCategory.GroundMobility,
+                "Wheeled launch/transport chassis (MRLs, Scud TEL, wheeled SP-SAM) — mobility on a soft-skinned " +
+                "truck that is markedly air-vulnerable.",
+                Delta(ProfileStat.MMP, 4), Delta(ProfileStat.GAD, -2)));
             #endregion
 
             #region §6 IFV / APC
@@ -281,6 +296,10 @@ namespace HammerAndSickle.Models
             Add(new TraitDef(WeaponTrait.EXPORT_DOWNGRADE, TraitCategory.Economy,
                 "Monkey-model export — thinner armour, simpler FCS.",
                 Delta(ProfileStat.HD, -2), Delta(ProfileStat.SD, -1), Icm(0.9f)));
+            Add(new TraitDef(WeaponTrait.RECON_FRAGILE, TraitCategory.Economy,
+                "Scout 'don't brawl' discouragement (Appendix W R6) — preserves the old recon ICM penalty. " +
+                "Magnitude ×0.6 is the doc's proposed value (still open to confirm).",
+                Icm(0.6f)));
             #endregion
 
             return d;

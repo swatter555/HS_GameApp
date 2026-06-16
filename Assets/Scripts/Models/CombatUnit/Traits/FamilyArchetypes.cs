@@ -30,18 +30,23 @@ namespace HammerAndSickle.Models
         public static readonly Archetype Apc        = Ground(3, 4, 6, 7, 7, 8);
         /// <summary>IFV (MECH) — soft attack 8 (R4), light-armour GAD 7 (R1).</summary>
         public static readonly Archetype Ifv        = Ground(4, 4, 8, 7, 7, 10);
+        /// <summary>Light scout car (BRDM/M3-class) — weak gun but DELIBERATELY survivable (HD 5 / SD 9) so
+        /// scouts soak the first blow and withdraw rather than getting one-shot out front (design call,
+        /// 2026-06-15: "harden the hull"). Fast, SR 3. Add RECON_FRAGILE (R6) per scout profile to discourage
+        /// brawling (offense ICM ×0.6); AT-recon variants drop it and add an ATGM trait instead.</summary>
+        public static readonly Archetype Recon      = Ground(2, 5, 5, 9, 7, 10, sr: 3);
         /// <summary>Towed artillery baseline; soft towed GAD 8. SP gun = +mobility in Phase 3.</summary>
         public static readonly Archetype Artillery  = Ground(5, 5, 9, 5, 8, 4);
-        /// <summary>Towed AAA; resists air (GAD 12) and engages it (GAT 9). SP = +mobility in Phase 3.</summary>
-        public static readonly Archetype Aaa        = Ground(4, 4, 9, 6, 12, 4, gat: 9);
-        /// <summary>Towed/site SAM; air-only (HA/SA 1, §7A.13), GAT 10. SP = +mobility in Phase 3.</summary>
-        public static readonly Archetype Sam        = Ground(1, 3, 1, 3, 8, 4, gat: 10);
-        /// <summary>Attack-helicopter gunship; fast (MMP 24), glass-cannon (§7A.14).</summary>
-        public static readonly Archetype Helicopter = Ground(7, 6, 10, 7, 10, 24);
+        /// <summary>Towed AAA; resists air (GAD 12) and engages it (GAT 9), SR 3. SP = +mobility in Phase 3.</summary>
+        public static readonly Archetype Aaa        = Ground(4, 4, 9, 6, 12, 4, gat: 9, sr: 3);
+        /// <summary>Towed/site SAM; air-only (HA/SA 1, §7A.13), GAT 10, SR 6. SP = +mobility in Phase 3.</summary>
+        public static readonly Archetype Sam        = Ground(1, 3, 1, 3, 8, 4, gat: 10, sr: 6);
+        /// <summary>Attack-helicopter gunship; fast (MMP 24), glass-cannon (§7A.14); elevated observation SR 3.</summary>
+        public static readonly Archetype Helicopter = Ground(7, 6, 10, 7, 10, 24, sr: 3);
         /// <summary>Soft transport; thin-topped air target (GAD 6).</summary>
         public static readonly Archetype Truck      = Ground(3, 3, 3, 3, 6, 8);
-        /// <summary>Static base (HQ/DEPOT/AIRB); MANPADS-equippable (GAD 6). HP 60 is a CombatUnit concern.</summary>
-        public static readonly Archetype Facility   = Ground(4, 6, 6, 7, 6, 0);
+        /// <summary>Static base (HQ/DEPOT/AIRB); MANPADS-equippable (GAD 6), SR 4. HP 60 is a CombatUnit concern.</summary>
+        public static readonly Archetype Facility   = Ground(4, 6, 6, 7, 6, 0, sr: 4);
 
         #endregion // Ground families
 
@@ -67,7 +72,8 @@ namespace HammerAndSickle.Models
         /// Builds a ground archetype (HA/HD/SA/SD/GAD/MMP, plus GAT when the family has a real
         /// air-attack baseline). GAT is omitted when 0 so it never gets clamped up off the W7 default.
         /// </summary>
-        private static Archetype Ground(int ha, int hd, int sa, int sd, int gad, int mmp, int gat = 0)
+        private static Archetype Ground(int ha, int hd, int sa, int sd, int gad, int mmp,
+                                        int gat = 0, int sr = 2, int pr = 1)
         {
             var stats = new Dictionary<ProfileStat, int>
             {
@@ -76,21 +82,29 @@ namespace HammerAndSickle.Models
                 { ProfileStat.SA, sa },
                 { ProfileStat.SD, sd },
                 { ProfileStat.GAD, gad },
-                { ProfileStat.MMP, mmp }
+                { ProfileStat.MMP, mmp },
+                // Family base spotting / primary-fire range (§12.3.1). Defaults SR 2 / PR 1; families with a
+                // different baseline (recon SR 3, AAA SR 3, SAM SR 6, facility SR 4) override sr. Per design §2
+                // (Option A) these flow through the resolver so optics/sensor traits adjust off the base.
+                { ProfileStat.SR, sr },
+                { ProfileStat.PR, pr }
             };
             if (gat > 0) stats[ProfileStat.GAT] = gat;
             return new Archetype(stats);
         }
 
-        /// <summary>Builds a fixed-wing archetype (DF/MAN/TS/SUR/MMP). GA/OL are per-profile deltas.</summary>
-        private static Archetype Air(int df, int man, int ts, int sur, int mmp)
+        /// <summary>Builds a fixed-wing archetype (DF/MAN/TS/SUR/MMP, plus base air SR). GA/OL are per-profile
+        /// deltas. Base SR 4 = W8 AIR_UNIT_SPOTTING_RANGE (Option A — routed through the resolver); recon (8) and
+        /// AWACS (12) add the difference as a per-profile delta.</summary>
+        private static Archetype Air(int df, int man, int ts, int sur, int mmp, int sr = 4)
             => new Archetype(new Dictionary<ProfileStat, int>
             {
                 { ProfileStat.DF, df },
                 { ProfileStat.MAN, man },
                 { ProfileStat.TS, ts },
                 { ProfileStat.SUR, sur },
-                { ProfileStat.MMP, mmp }
+                { ProfileStat.MMP, mmp },
+                { ProfileStat.SR, sr }
             });
 
         #endregion // Factories

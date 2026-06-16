@@ -1656,6 +1656,12 @@ namespace HammerAndSickle.Core.GameData
         public const int AC_SPOTTING_ADVANCED = 3;
         public const int AC_SPOTTING_SUPERIOR = 4;
 
+        // W8 air spotting (Appendix W) — Phase-3 air-SR scale, routed through the resolver (Option A).
+        // Supersedes the old AC_SPOTTING 1-4 scale for converted aircraft: planes see much farther.
+        public const int AIR_UNIT_SPOTTING_RANGE = 4;    // fighters / attack / bombers
+        public const int AIR_RECON_SPOTTING_RANGE = 8;   // tactical reconnaissance
+        public const int AWACS_SPOTTING_RANGE = 12;      // airborne early warning
+
         // Air unit prestige costs
         public const int PRESTIGE_TIER_FREE = 1;
         public const int PRESTIGE_TIER_0 = 25;
