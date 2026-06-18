@@ -22,6 +22,17 @@ namespace HammerAndSickle.Models
         PR,   // Primary Range
         IR,   // Indirect Range
         SR,   // Spotting Range
-        MMP   // Max Movement Points
+        MMP,  // Max Movement Points
+
+        // Air-to-ground STRIKE RIDERS (Rule B / Appendix W §3 R10). NOT band stats and NOT part of the
+        // 17-stat line — they are attacker-side, target-conditional bonuses that the resolver accumulates
+        // and FromProfileDef stores on the WeaponProfile rider fields. effGA = GA + (Hard?GaVsHard:GaVsSoft)
+        // + (base?GaVsBase:0); GAD never splits. The base sub-system riders feed OC suppression / parked
+        // hits. STORED but unconsumed until the air-to-ground combat path reads them (see Claude_TODO.md).
+        GaVsHard,      // additive onto effGA when the target is Hard
+        GaVsSoft,      // additive onto effGA when the target is Soft
+        GaVsBase,      // additive onto effGA when the target is a base
+        OcSuppression, // base operational-capacity suppression (runway cratering)
+        ParkedHit      // band bonus vs parked aircraft on an airbase
     }
 }

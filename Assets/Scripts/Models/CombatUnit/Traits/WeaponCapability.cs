@@ -19,6 +19,8 @@ namespace HammerAndSickle.Models
         // Air engagement
         EngageAir,         // T42 family — MANPADS grants ground-to-air engage
         FireAndForget,     // T49 / T72 — lock-after-launch, no warning
+        IgnoreAirDefense,  // T68j STANDOFF_CRUISE_MISSILE — strike ignores target GAD (DORMANT → avoid-GAD hook)
+        LoiterReattack,    // T68d LOITER_PERSISTENCE — +1 CAS re-attack/OpportunityAction (DORMANT → re-attack hook)
 
         // Engineering / utility
         Bridgelayer,       // T77

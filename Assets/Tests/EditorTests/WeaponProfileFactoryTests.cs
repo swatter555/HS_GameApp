@@ -170,5 +170,63 @@ namespace HammerAndSickle.Tests
         }
 
         #endregion // Capability bridge
+
+        #region Rule B air-to-ground strike riders (plumbing — stored, unconsumed)
+
+        // Builds on the Attack air archetype (GA 10 / OL 9) so the flat GA deltas land alongside the riders.
+        private static WeaponProfile Strike(params WeaponTrait[] traits)
+            => WeaponProfile.FromProfileDef("x", "x", WeaponType.ATT_SU25_SV,
+                new ProfileDef(FamilyArchetypes.Attack, new Dictionary<ProfileStat, int>(), traits));
+
+        [Test]
+        public void RuleB_StrikeRiders_AccumulateAndStore()
+        {
+            try
+            {
+                // HEAVY_AG_CANNON (GA+2, GaVsHard+2) + AT_GUIDED_AIR (GA+3, GaVsHard+1) + CARPET_BOMBING (GA+1, GaVsSoft+3)
+                // + BUNKER_PENETRATOR (GaVsBase+4) + RUNWAY_CRATERING (OcSuppression+20) + RAMP_STRIKE (ParkedHit+1).
+                WeaponProfile p = Strike(WeaponTrait.HEAVY_AG_CANNON, WeaponTrait.AT_GUIDED_AIR,
+                    WeaponTrait.CARPET_BOMBING, WeaponTrait.BUNKER_PENETRATOR,
+                    WeaponTrait.RUNWAY_CRATERING, WeaponTrait.RAMP_STRIKE);
+
+                Assert.AreEqual(3,  p.GaBonusVsHard,      "GaVsHard 2+1");
+                Assert.AreEqual(3,  p.GaBonusVsSoft,      "GaVsSoft 3");
+                Assert.AreEqual(4,  p.GaBonusVsBase,      "GaVsBase 4");
+                Assert.AreEqual(20, p.OcSuppressionBonus, "OcSuppression 20");
+                Assert.AreEqual(1,  p.ParkedHitBonus,     "ParkedHit 1");
+                Assert.AreEqual(16, p.GroundAttack,       "flat GA 10+2+3+1 lands alongside riders");
+            }
+            catch (Exception ex) { AppService.HandleException(CLASS_NAME, nameof(RuleB_StrikeRiders_AccumulateAndStore), ex); throw; }
+        }
+
+        [Test]
+        public void RuleB_NoStrikeTraits_RidersZero()
+        {
+            try
+            {
+                WeaponProfile p = Strike(WeaponTrait.CAS_ARMORED); // SUR+2 only, no riders
+                Assert.AreEqual(0, p.GaBonusVsHard,      "no GaVsHard");
+                Assert.AreEqual(0, p.GaBonusVsSoft,      "no GaVsSoft");
+                Assert.AreEqual(0, p.GaBonusVsBase,      "no GaVsBase");
+                Assert.AreEqual(0, p.OcSuppressionBonus, "no OcSuppression");
+                Assert.AreEqual(0, p.ParkedHitBonus,     "no ParkedHit");
+            }
+            catch (Exception ex) { AppService.HandleException(CLASS_NAME, nameof(RuleB_NoStrikeTraits_RidersZero), ex); throw; }
+        }
+
+        [Test]
+        public void RuleB_CapabilityHooks_AreDormant()
+        {
+            try
+            {
+                // avoid-GAD and loiter re-attack are Dormant (no consumer yet) — the resolver must skip them.
+                WeaponProfile p = Strike(WeaponTrait.STANDOFF_CRUISE_MISSILE, WeaponTrait.LOITER_PERSISTENCE);
+                Assert.IsFalse(p.HasCapability(WeaponCapability.IgnoreAirDefense), "avoid-GAD dormant (skipped)");
+                Assert.IsFalse(p.HasCapability(WeaponCapability.LoiterReattack),  "loiter dormant (skipped)");
+            }
+            catch (Exception ex) { AppService.HandleException(CLASS_NAME, nameof(RuleB_CapabilityHooks_AreDormant), ex); throw; }
+        }
+
+        #endregion // Rule B air-to-ground strike riders
     }
 }

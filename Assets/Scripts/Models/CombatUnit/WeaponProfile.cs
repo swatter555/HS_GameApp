@@ -112,6 +112,16 @@ namespace HammerAndSickle.Models
         public int OrdinanceLoad { get; private set; } = 0;
         public int Stealth { get; private set; } = 0;
 
+        // Air-to-ground STRIKE RIDERS (Rule B / Appendix W §3 R10). Attacker-side, target-conditional bonuses
+        // resolved from the §9b traits and stored here by FromProfileDef. effGA = GA + (Hard?GaBonusVsHard
+        // :GaBonusVsSoft) + (base?GaBonusVsBase:0); GAD never splits. STORED now but NOT yet read by any
+        // combat path — the air-to-ground engine wiring is the per-rider "extra plumbing" in Claude_TODO.md.
+        public int GaBonusVsHard { get; private set; } = 0;
+        public int GaBonusVsSoft { get; private set; } = 0;
+        public int GaBonusVsBase { get; private set; } = 0;
+        public int OcSuppressionBonus { get; private set; } = 0;  // runway cratering vs base operational capacity
+        public int ParkedHitBonus { get; private set; } = 0;      // band bonus vs parked aircraft on an airbase
+
         // Range and movement properties
         public float PrimaryRange { get; private set; } = 0;
         public float IndirectRange { get; private set; } = 0;
@@ -225,6 +235,19 @@ namespace HammerAndSickle.Models
         }
 
         /// <summary>
+        /// Stores the air-to-ground strike riders resolved from the §9b traits (Rule B / Appendix W §3).
+        /// Called by FromProfileDef. Inert until the air-to-ground combat path reads these fields.
+        /// </summary>
+        public void SetStrikeRiders(int gaVsHard, int gaVsSoft, int gaVsBase, int ocSuppression, int parkedHit)
+        {
+            GaBonusVsHard = gaVsHard;
+            GaBonusVsSoft = gaVsSoft;
+            GaBonusVsBase = gaVsBase;
+            OcSuppressionBonus = ocSuppression;
+            ParkedHitBonus = parkedHit;
+        }
+
+        /// <summary>
         /// Overrides the hard/soft target class set by the constructor's prefix default (§7.4.1.2 —
         /// e.g. armored-car / cavalry-scout recon profiles that fight as Hard targets).
         /// </summary>
@@ -294,6 +317,9 @@ namespace HammerAndSickle.Models
 
             profile.SetICM(r.ICM);
             profile.SetCapabilities(caps);
+            profile.SetStrikeRiders(
+                r.Stat(ProfileStat.GaVsHard), r.Stat(ProfileStat.GaVsSoft), r.Stat(ProfileStat.GaVsBase),
+                r.Stat(ProfileStat.OcSuppression), r.Stat(ProfileStat.ParkedHit));
             return profile;
         }
 

@@ -44,6 +44,13 @@ namespace HammerAndSickle.Models
         STEALTH_RAM, HIGH_MACH_DASH, BVR_RADAR_MISSILE, AGILE_AIRFRAME, LOOKDOWN_SHOOTDOWN,
         AERIAL_REFUEL, ESCAPE_PROFILE, HARDENED_STRIKE,
 
+        // §9b Air-to-Ground munitions & roles (Rule A/B). Flat GA/OL/SUR/PR deltas are LIVE; the additive
+        // strike riders (GaVsHard/Soft/Base, OcSuppression, ParkedHit) are STORED-but-unconsumed; the
+        // capability/interaction hooks (avoid-GAD, loiter, the conditional maluses) are Dormant.
+        HEAVY_AG_CANNON, AT_GUIDED_AIR, CAS_ARMORED, LOITER_PERSISTENCE, LOW_LEVEL_STRAFE, HEAVY_PAYLOAD,
+        STANDOFF_PGM, CARPET_BOMBING, STRATEGIC_PAYLOAD, STANDOFF_CRUISE_MISSILE, HIGH_ALTITUDE_BOMBER,
+        MULTIROLE_STRIKE, RUNWAY_CRATERING, BUNKER_PENETRATOR, RAMP_STRIKE,
+
         // §10 Air Defense (SAM / AAA)
         RADAR_GUIDED_GUN, GUN_MISSILE_COMBO, SARH_LONG_RANGE, IR_HOMING, COMMAND_GUIDANCE,
         TVM_GUIDANCE, MOBILE_SHOOT_SCOOT, WILD_WEASEL,

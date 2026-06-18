@@ -245,6 +245,54 @@ namespace HammerAndSickle.Models
                 "F-111/F-117 heavy precision punch.", Delta(ProfileStat.GA, 3), Delta(ProfileStat.OL, 2)));
             #endregion
 
+            #region §9b Air-to-Ground munitions & roles (Rule A/B)
+            // Flat GA/OL/SUR/PR deltas are LIVE. The numeric strike riders (GaVsHard/Soft/Base, OcSuppression,
+            // ParkedHit) resolve LIVE so they are STORED on the WeaponProfile rider fields, but NO combat path
+            // consumes them yet — that downstream wiring is the per-rider "extra plumbing" in Claude_TODO.md.
+            // Capability / interaction hooks (avoid-GAD, loiter re-attack, the conditional maluses) stay Dormant.
+            Add(new TraitDef(WeaponTrait.HEAVY_AG_CANNON, TraitCategory.FixedWing,
+                "A-10 GAU-8 / Su-25 GSh-30 — dedicated tank-busting gun.",
+                Delta(ProfileStat.GA, 2), Delta(ProfileStat.GaVsHard, 2)));
+            Add(new TraitDef(WeaponTrait.AT_GUIDED_AIR, TraitCategory.FixedWing,
+                "AGM-65 Maverick / Kh-25/29 / Vikhr — air-launched precision AT.",
+                Delta(ProfileStat.GA, 3), Delta(ProfileStat.GaVsHard, 1)));
+            Add(new TraitDef(WeaponTrait.CAS_ARMORED, TraitCategory.FixedWing,
+                "A-10 'bathtub' / Su-25 armoured tub — CAS survivability.", Delta(ProfileStat.SUR, 2)));
+            Add(new TraitDef(WeaponTrait.LOITER_PERSISTENCE, TraitCategory.FixedWing,
+                "Slow-CAS endurance — multiple passes (DORMANT → CAS re-attack hook).",
+                Cap(WeaponCapability.LoiterReattack, EffectStatus.Dormant)));
+            Add(new TraitDef(WeaponTrait.LOW_LEVEL_STRAFE, TraitCategory.FixedWing,
+                "Treetop gun/rocket runs — GA+1 live; exposure malus (defender GAT +1) DORMANT.",
+                Delta(ProfileStat.GA, 1)));
+            Add(new TraitDef(WeaponTrait.HEAVY_PAYLOAD, TraitCategory.FixedWing,
+                "Large bomb load (Su-24 / F-111 / Tornado).", Delta(ProfileStat.OL, 3)));
+            Add(new TraitDef(WeaponTrait.STANDOFF_PGM, TraitCategory.FixedWing,
+                "Kh-25/59, AGM-130 — stand-off precision; PR+2 live, −1 incoming GAT DORMANT.",
+                Delta(ProfileStat.PR, 2)));
+            Add(new TraitDef(WeaponTrait.CARPET_BOMBING, TraitCategory.FixedWing,
+                "Saturation dumb-bomb stick — area anti-soft.",
+                Delta(ProfileStat.GA, 1), Delta(ProfileStat.GaVsSoft, 3)));
+            Add(new TraitDef(WeaponTrait.STRATEGIC_PAYLOAD, TraitCategory.FixedWing,
+                "Maximum tonnage (Tu-22 / Tu-95 / B-52) → OL XLarge.", Delta(ProfileStat.OL, 4)));
+            Add(new TraitDef(WeaponTrait.STANDOFF_CRUISE_MISSILE, TraitCategory.FixedWing,
+                "Kh-22 cruise missile — strike ignores target GAD (DORMANT → avoid-GAD hook). Tu-22/Tu-22M3 only.",
+                Cap(WeaponCapability.IgnoreAirDefense, EffectStatus.Dormant)));
+            Add(new TraitDef(WeaponTrait.HIGH_ALTITUDE_BOMBER, TraitCategory.FixedWing,
+                "High-level bombing — SUR+2 vs gun-AAA/MANPADS, malus vs radar SAM; conditional, DORMANT → altitude/AD layer.",
+                Delta(ProfileStat.SUR, 2, EffectStatus.Dormant)));
+            Add(new TraitDef(WeaponTrait.MULTIROLE_STRIKE, TraitCategory.FixedWing,
+                "Strike-fighter A2G fit — the dual-role lever off the fighter GA-2 floor.", Delta(ProfileStat.GA, 4)));
+            Add(new TraitDef(WeaponTrait.RUNWAY_CRATERING, TraitCategory.FixedWing,
+                "Durandal / JP233 / BetAB — anti-airfield denial (rider stored).",
+                Delta(ProfileStat.OcSuppression, 20)));
+            Add(new TraitDef(WeaponTrait.BUNKER_PENETRATOR, TraitCategory.FixedWing,
+                "BLU-109/GBU-28 / KAB-1500 — hardened-target penetration (rider stored).",
+                Delta(ProfileStat.GaVsBase, 4)));
+            Add(new TraitDef(WeaponTrait.RAMP_STRIKE, TraitCategory.FixedWing,
+                "CBU-87 / RBK-500 cluster vs parked aircraft (rider stored).",
+                Delta(ProfileStat.ParkedHit, 1)));
+            #endregion
+
             #region §10 Air Defense (SAM / AAA)
             Add(new TraitDef(WeaponTrait.RADAR_GUIDED_GUN, TraitCategory.AirDefense,
                 "ZSU-23-4 / Gepard / Tunguska — radar-directed flak.", Delta(ProfileStat.GAT, 2)));
