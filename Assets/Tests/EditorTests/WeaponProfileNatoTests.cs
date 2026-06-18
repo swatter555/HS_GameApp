@@ -205,5 +205,53 @@ namespace HammerAndSickle.Tests
         }
 
         #endregion // Batch E — Helicopters
+
+        #region Batch F — Infantry
+
+        [Test]
+        public void Infantry_ResolveConvertedLines()
+        {
+            try
+            {
+                // All NATO infantry = Infantry archetype (5/7/7/8 GAD10 MMP4) + RPG_LAW (HA+1) + an ATGM trait.
+                // Regular/Marine carry ATGM_LIGHT (HA8); Airborne/Air-Mobile carry ATGM_MEDIUM (HA9, light forces lean on ATGM).
+                // MANPADS: US/FRG/FR = Stinger-class (GAT 8 + ICM 1.05 + FNF); UK = MANPADS_BASIC (Blowpipe, GAT 6, no ICM).
+
+                // --- US (Stinger) ---
+                AssertGround(WeaponType.INF_REG_US, 8, 7, 7, 8, 10, 8);
+                Assert.AreEqual(1.05f, P(WeaponType.INF_REG_US).ICM, 0.01f, "US Regulars Stinger ICM");
+                Assert.IsTrue(P(WeaponType.INF_REG_US).HasCapability(WeaponCapability.EngageAir), "US Regulars engage-air");
+                Assert.IsTrue(P(WeaponType.INF_REG_US).HasCapability(WeaponCapability.FireAndForget), "US Regulars Stinger FNF");
+
+                AssertGround(WeaponType.INF_MAR_US, 8, 7, 7, 8, 10, 8);
+                Assert.IsTrue(P(WeaponType.INF_MAR_US).IsAmphibious, "US Marines amphibious");
+
+                AssertGround(WeaponType.INF_AB_US, 9, 7, 7, 8, 10, 8);
+                Assert.IsTrue(P(WeaponType.INF_AB_US).HasCapability(WeaponCapability.AirDroppable), "US Airborne air-droppable");
+
+                AssertGround(WeaponType.INF_AM_US, 9, 7, 7, 8, 10, 8);
+                Assert.IsTrue(P(WeaponType.INF_AM_US).HasCapability(WeaponCapability.MountainMovement), "US Air-Mobile mountain movement");
+
+                // --- UK (MANPADS_BASIC — deliberately weaker AD: GAT 6, ICM 1.00) ---
+                AssertGround(WeaponType.INF_REG_UK, 8, 7, 7, 8, 10, 6);
+                Assert.AreEqual(1.00f, P(WeaponType.INF_REG_UK).ICM, 0.01f, "UK Regulars no Stinger ICM");
+                AssertGround(WeaponType.INF_AB_UK, 9, 7, 7, 8, 10, 6);
+                Assert.IsTrue(P(WeaponType.INF_AB_UK).HasCapability(WeaponCapability.AirDroppable), "UK Airborne air-droppable");
+
+                // --- FRG (Stinger) ---
+                AssertGround(WeaponType.INF_REG_GE, 8, 7, 7, 8, 10, 8);
+                AssertGround(WeaponType.INF_AB_GE, 9, 7, 7, 8, 10, 8);
+                Assert.IsTrue(P(WeaponType.INF_AB_GE).HasCapability(WeaponCapability.AirDroppable), "FRG Airborne air-droppable");
+
+                // --- FR (Mistral = Stinger-class) ---
+                AssertGround(WeaponType.INF_REG_FR, 8, 7, 7, 8, 10, 8);
+                Assert.AreEqual(1.05f, P(WeaponType.INF_REG_FR).ICM, 0.01f, "FR Regulars Mistral ICM");
+                AssertGround(WeaponType.INF_AB_FR, 9, 7, 7, 8, 10, 8);
+                Assert.IsTrue(P(WeaponType.INF_AB_FR).HasCapability(WeaponCapability.AirDroppable), "FR Airborne air-droppable");
+            }
+            catch (Exception ex) { AppService.HandleException(CLASS_NAME, nameof(Infantry_ResolveConvertedLines), ex); throw; }
+        }
+
+        #endregion // Batch F — Infantry
     }
 }

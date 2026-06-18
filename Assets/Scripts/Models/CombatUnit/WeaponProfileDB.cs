@@ -5088,31 +5088,14 @@ namespace HammerAndSickle.Models
             //----------------------------------------------
             // US Regular Infantry
             //----------------------------------------------
-            WeaponProfile INF_REG_US_P = new WeaponProfile(
-                _longName: "US Regular Infantry",
-                _shortName: "US Regulars",
-                _type: WeaponType.INF_REG_US,
-                _hardAtt: GameData.BASE_INF_HARD_ATTACK,                    // Hard Attack Rating
-                _hardDef: GameData.BASE_INF_HARD_DEFENSE,                   // Hard Defense Rating
-                _softAtt: GameData.BASE_INF_SOFT_ATTACK,                    // Soft Attack Rating
-                _softDef: GameData.BASE_INF_SOFT_DEFENSE,                   // Soft Defense Rating
-                _gat: GameData.GROUND_AIR_ATTACK_DEFAULT,  // Ground-to-Air Attack Rating
-                _gad: GameData.GROUND_DEFENSE_INFANTRY,    // Ground Defense Armor Rating
-                _df: 0,                                    // Dogfighting Rating
-                _man: 0,                                   // Maneuverability Rating
-                _topSpd: 0,                                // Top Speed Rating
-                _surv: 0,                                  // Survivability Rating
-                _ga: 0,                                    // Ground Attack Rating
-                _ol: 0,                                    // Ordinance Rating
-                _stealth: 0,                               // Stealth Rating
-                _pr: GameData.PRIMARY_RANGE_DEFAULT,       // Primary Range
-                _ir: GameData.INDIRECT_RANGE_DEFAULT,      // Indirect Range
-                _sr: GameData.BASE_UNIT_SPOTTING_RANGE,    // Spotting Range
-                _mmp: GameData.FOOT_UNIT,                  // Max Movement Points
-                _isAmph: false,                            // Is Amphibious
-                _isDF: false,                              // Is DoubleFire
-                _isAtt: true                              // Can this profile attack
-            );
+            // Phase 3 (derived): Infantry archetype (GAD 10, R1) + RPG_LAW (HA+1) + ATGM_LIGHT (Dragon, HA+2) +
+            // MANPADS_STINGER (FIM-92 — GAT floor 8 + ICM ×1.05 + fire-and-forget). NATO line infantry.
+            // → HA8 HD7 SA7 SD8 GAD10 · GAT8 · ICM 1.05 · MMP4 · SR2.
+            WeaponProfile INF_REG_US_P = WeaponProfile.FromProfileDef(
+                "US Regular Infantry", "US Regulars", WeaponType.INF_REG_US,
+                new ProfileDef(FamilyArchetypes.Infantry,
+                    new Dictionary<ProfileStat, int>(),
+                    new[] { WeaponTrait.RPG_LAW, WeaponTrait.ATGM_LIGHT, WeaponTrait.MANPADS_STINGER }));
 
             // Intel stats
             INF_REG_US_P.AddIntelReportStat(WeaponType.Personnel,           2200);
@@ -5137,31 +5120,13 @@ namespace HammerAndSickle.Models
             //----------------------------------------------
             // US Marine Infantry
             //----------------------------------------------
-            WeaponProfile INF_MAR_US_P = new WeaponProfile(
-                _longName: "US Marine Infantry",
-                _shortName: "US Marines",
-                _type: WeaponType.INF_MAR_US,
-                _hardAtt: GameData.BASE_INF_HARD_ATTACK,                    // Hard Attack Rating
-                _hardDef: GameData.BASE_INF_HARD_DEFENSE,                   // Hard Defense Rating
-                _softAtt: GameData.BASE_INF_SOFT_ATTACK,                    // Soft Attack Rating
-                _softDef: GameData.BASE_INF_SOFT_DEFENSE,                   // Soft Defense Rating
-                _gat: GameData.GROUND_AIR_ATTACK_DEFAULT,  // Ground-to-Air Attack Rating
-                _gad: GameData.GROUND_DEFENSE_INFANTRY,    // Ground Defense Armor Rating
-                _df: 0,                                    // Dogfighting Rating
-                _man: 0,                                   // Maneuverability Rating
-                _topSpd: 0,                                // Top Speed Rating
-                _surv: 0,                                  // Survivability Rating
-                _ga: 0,                                    // Ground Attack Rating
-                _ol: 0,                                    // Ordinance Rating
-                _stealth: 0,                               // Stealth Rating
-                _pr: GameData.PRIMARY_RANGE_DEFAULT,       // Primary Range
-                _ir: GameData.INDIRECT_RANGE_DEFAULT,      // Indirect Range
-                _sr: GameData.BASE_UNIT_SPOTTING_RANGE,    // Spotting Range
-                _mmp: GameData.FOOT_UNIT,                  // Max Movement Points
-                _isAmph: false,                            // Is Amphibious
-                _isDF: false,                              // Is DoubleFire
-                _isAtt: true                              // Can this profile attack
-            );
+            // Phase 3 (derived): Infantry + RPG_LAW + ATGM_LIGHT + MANPADS_STINGER + AMPHIBIOUS (USMC assault swim).
+            // → HA8 HD7 SA7 SD8 GAD10 · GAT8 · ICM 1.05 · MMP4 · SR2 · amphibious.
+            WeaponProfile INF_MAR_US_P = WeaponProfile.FromProfileDef(
+                "US Marine Infantry", "US Marines", WeaponType.INF_MAR_US,
+                new ProfileDef(FamilyArchetypes.Infantry,
+                    new Dictionary<ProfileStat, int>(),
+                    new[] { WeaponTrait.RPG_LAW, WeaponTrait.ATGM_LIGHT, WeaponTrait.MANPADS_STINGER, WeaponTrait.AMPHIBIOUS }));
 
             // Intel stats
             INF_MAR_US_P.AddIntelReportStat(WeaponType.Personnel,           2750);
@@ -5185,31 +5150,14 @@ namespace HammerAndSickle.Models
             //----------------------------------------------
             // US Airborne Infantry
             //----------------------------------------------
-            WeaponProfile INF_AB_US_P = new WeaponProfile(
-                _longName: "US Airborne Infantry",
-                _shortName: "US Airborne",
-                _type: WeaponType.INF_AB_US,
-                _hardAtt: GameData.BASE_INF_HARD_ATTACK,                    // Hard Attack Rating
-                _hardDef: GameData.BASE_INF_HARD_DEFENSE,                   // Hard Defense Rating
-                _softAtt: GameData.BASE_INF_SOFT_ATTACK,                    // Soft Attack Rating
-                _softDef: GameData.BASE_INF_SOFT_DEFENSE,                   // Soft Defense Rating
-                _gat: GameData.GROUND_AIR_ATTACK_DEFAULT,  // Ground-to-Air Attack Rating
-                _gad: GameData.GROUND_DEFENSE_INFANTRY,    // Ground Defense Armor Rating
-                _df: 0,                                    // Dogfighting Rating
-                _man: 0,                                   // Maneuverability Rating
-                _topSpd: 0,                                // Top Speed Rating
-                _surv: 0,                                  // Survivability Rating
-                _ga: 0,                                    // Ground Attack Rating
-                _ol: 0,                                    // Ordinance Rating
-                _stealth: 0,                               // Stealth Rating
-                _pr: GameData.PRIMARY_RANGE_DEFAULT,       // Primary Range
-                _ir: GameData.INDIRECT_RANGE_DEFAULT,      // Indirect Range
-                _sr: GameData.BASE_UNIT_SPOTTING_RANGE,    // Spotting Range
-                _mmp: GameData.FOOT_UNIT,                  // Max Movement Points
-                _isAmph: false,                            // Is Amphibious
-                _isDF: false,                              // Is DoubleFire
-                _isAtt: true                              // Can this profile attack
-            );
+            // Phase 3 (derived): Infantry + RPG_LAW + ATGM_MEDIUM (TOW/Dragon mix, HA+3 — light forces lean on ATGM) +
+            // MANPADS_STINGER + AIR_DROPPABLE (82nd Airborne parachute deploy).
+            // → HA9 HD7 SA7 SD8 GAD10 · GAT8 · ICM 1.05 · MMP4 · SR2 · air-droppable.
+            WeaponProfile INF_AB_US_P = WeaponProfile.FromProfileDef(
+                "US Airborne Infantry", "US Airborne", WeaponType.INF_AB_US,
+                new ProfileDef(FamilyArchetypes.Infantry,
+                    new Dictionary<ProfileStat, int>(),
+                    new[] { WeaponTrait.RPG_LAW, WeaponTrait.ATGM_MEDIUM, WeaponTrait.MANPADS_STINGER, WeaponTrait.AIR_DROPPABLE }));
 
             // Intel stats (82nd Airborne composition)
             INF_AB_US_P.AddIntelReportStat(WeaponType.Personnel,           1950);
@@ -5233,31 +5181,14 @@ namespace HammerAndSickle.Models
             //----------------------------------------------
             // US Air-Mobile Infantry
             //----------------------------------------------
-            WeaponProfile INF_AM_US_P = new WeaponProfile(
-                _longName: "US Air-Mobile Infantry",
-                _shortName: "US Air-Mobile",
-                _type: WeaponType.INF_AM_US,
-                _hardAtt: GameData.BASE_INF_HARD_ATTACK,                    // Hard Attack Rating
-                _hardDef: GameData.BASE_INF_HARD_DEFENSE,                   // Hard Defense Rating
-                _softAtt: GameData.BASE_INF_SOFT_ATTACK,                    // Soft Attack Rating
-                _softDef: GameData.BASE_INF_SOFT_DEFENSE,                   // Soft Defense Rating
-                _gat: GameData.GROUND_AIR_ATTACK_DEFAULT,  // Ground-to-Air Attack Rating
-                _gad: GameData.GROUND_DEFENSE_INFANTRY,    // Ground Defense Armor Rating
-                _df: 0,                                    // Dogfighting Rating
-                _man: 0,                                   // Maneuverability Rating
-                _topSpd: 0,                                // Top Speed Rating
-                _surv: 0,                                  // Survivability Rating
-                _ga: 0,                                    // Ground Attack Rating
-                _ol: 0,                                    // Ordinance Rating
-                _stealth: 0,                               // Stealth Rating
-                _pr: GameData.PRIMARY_RANGE_DEFAULT,       // Primary Range
-                _ir: GameData.INDIRECT_RANGE_DEFAULT,      // Indirect Range
-                _sr: GameData.BASE_UNIT_SPOTTING_RANGE,    // Spotting Range
-                _mmp: GameData.FOOT_UNIT,                  // Max Movement Points
-                _isAmph: false,                            // Is Amphibious
-                _isDF: false,                              // Is DoubleFire
-                _isAtt: true                              // Can this profile attack
-            );
+            // Phase 3 (derived): Infantry + RPG_LAW + ATGM_MEDIUM + MANPADS_STINGER + MOUNTAIN_TRAINED
+            // (101st Airborne — helo-inserted light infantry, reduced move cost in non-clear terrain).
+            // → HA9 HD7 SA7 SD8 GAD10 · GAT8 · ICM 1.05 · MMP4 · SR2 · mountain movement.
+            WeaponProfile INF_AM_US_P = WeaponProfile.FromProfileDef(
+                "US Air-Mobile Infantry", "US Air-Mobile", WeaponType.INF_AM_US,
+                new ProfileDef(FamilyArchetypes.Infantry,
+                    new Dictionary<ProfileStat, int>(),
+                    new[] { WeaponTrait.RPG_LAW, WeaponTrait.ATGM_MEDIUM, WeaponTrait.MANPADS_STINGER, WeaponTrait.MOUNTAIN_TRAINED }));
 
             // Intel stats (101st Airborne composition)
             INF_AM_US_P.AddIntelReportStat(WeaponType.Personnel,           2040);
@@ -5281,31 +5212,14 @@ namespace HammerAndSickle.Models
             //----------------------------------------------
             // UK Regular Infantry
             //----------------------------------------------
-            WeaponProfile INF_REG_UK_P = new WeaponProfile(
-                _longName: "UK Regular Infantry",
-                _shortName: "UK Regulars",
-                _type: WeaponType.INF_REG_UK,
-                _hardAtt: GameData.BASE_INF_HARD_ATTACK,                    // Hard Attack Rating
-                _hardDef: GameData.BASE_INF_HARD_DEFENSE,                   // Hard Defense Rating
-                _softAtt: GameData.BASE_INF_SOFT_ATTACK,                    // Soft Attack Rating
-                _softDef: GameData.BASE_INF_SOFT_DEFENSE,                   // Soft Defense Rating
-                _gat: GameData.GROUND_AIR_ATTACK_DEFAULT,  // Ground-to-Air Attack Rating
-                _gad: GameData.GROUND_DEFENSE_INFANTRY,    // Ground Defense Armor Rating
-                _df: 0,                                    // Dogfighting Rating
-                _man: 0,                                   // Maneuverability Rating
-                _topSpd: 0,                                // Top Speed Rating
-                _surv: 0,                                  // Survivability Rating
-                _ga: 0,                                    // Ground Attack Rating
-                _ol: 0,                                    // Ordinance Rating
-                _stealth: 0,                               // Stealth Rating
-                _pr: GameData.PRIMARY_RANGE_DEFAULT,       // Primary Range
-                _ir: GameData.INDIRECT_RANGE_DEFAULT,      // Indirect Range
-                _sr: GameData.BASE_UNIT_SPOTTING_RANGE,    // Spotting Range
-                _mmp: GameData.FOOT_UNIT,                  // Max Movement Points
-                _isAmph: false,                            // Is Amphibious
-                _isDF: false,                              // Is DoubleFire
-                _isAtt: true                              // Can this profile attack
-            );
+            // Phase 3 (derived): Infantry + RPG_LAW + ATGM_LIGHT + MANPADS_BASIC (Blowpipe/Javelin — early SACLOS,
+            // GAT floor 6; deliberately weaker organic AD than the US/FRG Stinger). Rapier is the brigade's separate AD.
+            // → HA8 HD7 SA7 SD8 GAD10 · GAT6 · ICM 1.00 · MMP4 · SR2.
+            WeaponProfile INF_REG_UK_P = WeaponProfile.FromProfileDef(
+                "UK Regular Infantry", "UK Regulars", WeaponType.INF_REG_UK,
+                new ProfileDef(FamilyArchetypes.Infantry,
+                    new Dictionary<ProfileStat, int>(),
+                    new[] { WeaponTrait.RPG_LAW, WeaponTrait.ATGM_LIGHT, WeaponTrait.MANPADS_BASIC }));
 
             // Intel stats
             INF_REG_UK_P.AddIntelReportStat(WeaponType.Personnel,           2040);
@@ -5329,31 +5243,13 @@ namespace HammerAndSickle.Models
             //----------------------------------------------
             // UK Airborne Infantry
             //----------------------------------------------
-            WeaponProfile INF_AB_UK_P = new WeaponProfile(
-                _longName: "UK Airborne Infantry",
-                _shortName: "UK Airborne",
-                _type: WeaponType.INF_AB_UK,
-                _hardAtt: GameData.BASE_INF_HARD_ATTACK,                    // Hard Attack Rating
-                _hardDef: GameData.BASE_INF_HARD_DEFENSE,                   // Hard Defense Rating
-                _softAtt: GameData.BASE_INF_SOFT_ATTACK,                    // Soft Attack Rating
-                _softDef: GameData.BASE_INF_SOFT_DEFENSE,                   // Soft Defense Rating
-                _gat: GameData.GROUND_AIR_ATTACK_DEFAULT,  // Ground-to-Air Attack Rating
-                _gad: GameData.GROUND_DEFENSE_INFANTRY,    // Ground Defense Armor Rating
-                _df: 0,                                    // Dogfighting Rating
-                _man: 0,                                   // Maneuverability Rating
-                _topSpd: 0,                                // Top Speed Rating
-                _surv: 0,                                  // Survivability Rating
-                _ga: 0,                                    // Ground Attack Rating
-                _ol: 0,                                    // Ordinance Rating
-                _stealth: 0,                               // Stealth Rating
-                _pr: GameData.PRIMARY_RANGE_DEFAULT,       // Primary Range
-                _ir: GameData.INDIRECT_RANGE_DEFAULT,      // Indirect Range
-                _sr: GameData.BASE_UNIT_SPOTTING_RANGE,    // Spotting Range
-                _mmp: GameData.FOOT_UNIT,                  // Max Movement Points
-                _isAmph: false,                            // Is Amphibious
-                _isDF: false,                              // Is DoubleFire
-                _isAtt: true                              // Can this profile attack
-            );
+            // Phase 3 (derived): Infantry + RPG_LAW + ATGM_MEDIUM + MANPADS_BASIC + AIR_DROPPABLE (Parachute Regiment).
+            // → HA9 HD7 SA7 SD8 GAD10 · GAT6 · ICM 1.00 · MMP4 · SR2 · air-droppable.
+            WeaponProfile INF_AB_UK_P = WeaponProfile.FromProfileDef(
+                "UK Airborne Infantry", "UK Airborne", WeaponType.INF_AB_UK,
+                new ProfileDef(FamilyArchetypes.Infantry,
+                    new Dictionary<ProfileStat, int>(),
+                    new[] { WeaponTrait.RPG_LAW, WeaponTrait.ATGM_MEDIUM, WeaponTrait.MANPADS_BASIC, WeaponTrait.AIR_DROPPABLE }));
 
             // Intel stats
             INF_AB_UK_P.AddIntelReportStat(WeaponType.Personnel,           1860);
@@ -5377,31 +5273,13 @@ namespace HammerAndSickle.Models
             //----------------------------------------------
             // FRG Regular Infantry
             //----------------------------------------------
-            WeaponProfile INF_REG_GE_P = new WeaponProfile(
-                _longName: "FRG Regular Infantry",
-                _shortName: "FRG Regulars",
-                _type: WeaponType.INF_REG_GE,
-                _hardAtt: GameData.BASE_INF_HARD_ATTACK,                    // Hard Attack Rating
-                _hardDef: GameData.BASE_INF_HARD_DEFENSE,                   // Hard Defense Rating
-                _softAtt: GameData.BASE_INF_SOFT_ATTACK,                    // Soft Attack Rating
-                _softDef: GameData.BASE_INF_SOFT_DEFENSE,                   // Soft Defense Rating
-                _gat: GameData.GROUND_AIR_ATTACK_DEFAULT,  // Ground-to-Air Attack Rating
-                _gad: GameData.GROUND_DEFENSE_INFANTRY,    // Ground Defense Armor Rating
-                _df: 0,                                    // Dogfighting Rating
-                _man: 0,                                   // Maneuverability Rating
-                _topSpd: 0,                                // Top Speed Rating
-                _surv: 0,                                  // Survivability Rating
-                _ga: 0,                                    // Ground Attack Rating
-                _ol: 0,                                    // Ordinance Rating
-                _stealth: 0,                               // Stealth Rating
-                _pr: GameData.PRIMARY_RANGE_DEFAULT,       // Primary Range
-                _ir: GameData.INDIRECT_RANGE_DEFAULT,      // Indirect Range
-                _sr: GameData.BASE_UNIT_SPOTTING_RANGE,    // Spotting Range
-                _mmp: GameData.FOOT_UNIT,                  // Max Movement Points
-                _isAmph: false,                            // Is Amphibious
-                _isDF: false,                              // Is DoubleFire
-                _isAtt: true                              // Can this profile attack
-            );
+            // Phase 3 (derived): Infantry + RPG_LAW + ATGM_LIGHT + MANPADS_STINGER (Bundeswehr Fliegerfaust/Stinger).
+            // → HA8 HD7 SA7 SD8 GAD10 · GAT8 · ICM 1.05 · MMP4 · SR2.
+            WeaponProfile INF_REG_GE_P = WeaponProfile.FromProfileDef(
+                "FRG Regular Infantry", "FRG Regulars", WeaponType.INF_REG_GE,
+                new ProfileDef(FamilyArchetypes.Infantry,
+                    new Dictionary<ProfileStat, int>(),
+                    new[] { WeaponTrait.RPG_LAW, WeaponTrait.ATGM_LIGHT, WeaponTrait.MANPADS_STINGER }));
 
             // Intel stats (Panzergrenadier Brigade composition)
             INF_REG_GE_P.AddIntelReportStat(WeaponType.Personnel,           2600);
@@ -5425,31 +5303,13 @@ namespace HammerAndSickle.Models
             //----------------------------------------------
             // FRG Airborne Infantry
             //----------------------------------------------
-            WeaponProfile INF_AB_GE_P = new WeaponProfile(
-                _longName: "FRG Airborne Infantry",
-                _shortName: "FRG Airborne",
-                _type: WeaponType.INF_AB_GE,
-                _hardAtt: GameData.BASE_INF_HARD_ATTACK,                    // Hard Attack Rating
-                _hardDef: GameData.BASE_INF_HARD_DEFENSE,                   // Hard Defense Rating
-                _softAtt: GameData.BASE_INF_SOFT_ATTACK,                    // Soft Attack Rating
-                _softDef: GameData.BASE_INF_SOFT_DEFENSE,                   // Soft Defense Rating
-                _gat: GameData.GROUND_AIR_ATTACK_DEFAULT,  // Ground-to-Air Attack Rating
-                _gad: GameData.GROUND_DEFENSE_INFANTRY,    // Ground Defense Armor Rating
-                _df: 0,                                    // Dogfighting Rating
-                _man: 0,                                   // Maneuverability Rating
-                _topSpd: 0,                                // Top Speed Rating
-                _surv: 0,                                  // Survivability Rating
-                _ga: 0,                                    // Ground Attack Rating
-                _ol: 0,                                    // Ordinance Rating
-                _stealth: 0,                               // Stealth Rating
-                _pr: GameData.PRIMARY_RANGE_DEFAULT,       // Primary Range
-                _ir: GameData.INDIRECT_RANGE_DEFAULT,      // Indirect Range
-                _sr: GameData.BASE_UNIT_SPOTTING_RANGE,    // Spotting Range
-                _mmp: GameData.FOOT_UNIT,                  // Max Movement Points
-                _isAmph: false,                            // Is Amphibious
-                _isDF: false,                              // Is DoubleFire
-                _isAtt: true                              // Can this profile attack
-            );
+            // Phase 3 (derived): Infantry + RPG_LAW + ATGM_MEDIUM + MANPADS_STINGER + AIR_DROPPABLE (Luftlandebrigade).
+            // → HA9 HD7 SA7 SD8 GAD10 · GAT8 · ICM 1.05 · MMP4 · SR2 · air-droppable.
+            WeaponProfile INF_AB_GE_P = WeaponProfile.FromProfileDef(
+                "FRG Airborne Infantry", "FRG Airborne", WeaponType.INF_AB_GE,
+                new ProfileDef(FamilyArchetypes.Infantry,
+                    new Dictionary<ProfileStat, int>(),
+                    new[] { WeaponTrait.RPG_LAW, WeaponTrait.ATGM_MEDIUM, WeaponTrait.MANPADS_STINGER, WeaponTrait.AIR_DROPPABLE }));
 
             // Intel stats (Luftlandebrigade composition)
             INF_AB_GE_P.AddIntelReportStat(WeaponType.Personnel,           1900);
@@ -5472,31 +5332,14 @@ namespace HammerAndSickle.Models
             //----------------------------------------------
             // French Regular Infantry
             //----------------------------------------------
-            WeaponProfile INF_REG_FR_P = new WeaponProfile(
-                _longName: "French Regular Infantry",
-                _shortName: "FR Regulars",
-                _type: WeaponType.INF_REG_FR,
-                _hardAtt: GameData.BASE_INF_HARD_ATTACK,                    // Hard Attack Rating
-                _hardDef: GameData.BASE_INF_HARD_DEFENSE,                   // Hard Defense Rating
-                _softAtt: GameData.BASE_INF_SOFT_ATTACK,                    // Soft Attack Rating
-                _softDef: GameData.BASE_INF_SOFT_DEFENSE,                   // Soft Defense Rating
-                _gat: GameData.GROUND_AIR_ATTACK_DEFAULT,  // Ground-to-Air Attack Rating
-                _gad: GameData.GROUND_DEFENSE_INFANTRY,    // Ground Defense Armor Rating
-                _df: 0,                                    // Dogfighting Rating
-                _man: 0,                                   // Maneuverability Rating
-                _topSpd: 0,                                // Top Speed Rating
-                _surv: 0,                                  // Survivability Rating
-                _ga: 0,                                    // Ground Attack Rating
-                _ol: 0,                                    // Ordinance Rating
-                _stealth: 0,                               // Stealth Rating
-                _pr: GameData.PRIMARY_RANGE_DEFAULT,       // Primary Range
-                _ir: GameData.INDIRECT_RANGE_DEFAULT,      // Indirect Range
-                _sr: GameData.BASE_UNIT_SPOTTING_RANGE,    // Spotting Range
-                _mmp: GameData.FOOT_UNIT,                  // Max Movement Points
-                _isAmph: false,                            // Is Amphibious
-                _isDF: false,                              // Is DoubleFire
-                _isAtt: true                              // Can this profile attack
-            );
+            // Phase 3 (derived): Infantry + RPG_LAW + ATGM_LIGHT + MANPADS_STINGER (Mistral — all-aspect FNF IR,
+            // Stinger-class: GAT floor 8 + ICM ×1.05 + fire-and-forget).
+            // → HA8 HD7 SA7 SD8 GAD10 · GAT8 · ICM 1.05 · MMP4 · SR2.
+            WeaponProfile INF_REG_FR_P = WeaponProfile.FromProfileDef(
+                "French Regular Infantry", "FR Regulars", WeaponType.INF_REG_FR,
+                new ProfileDef(FamilyArchetypes.Infantry,
+                    new Dictionary<ProfileStat, int>(),
+                    new[] { WeaponTrait.RPG_LAW, WeaponTrait.ATGM_LIGHT, WeaponTrait.MANPADS_STINGER }));
 
             // Intel stats (Brigade d'Infanterie Mecanisee composition)
             INF_REG_FR_P.AddIntelReportStat(WeaponType.Personnel,           1950);
@@ -5520,31 +5363,14 @@ namespace HammerAndSickle.Models
             //----------------------------------------------
             // French Airborne Infantry
             //----------------------------------------------
-            WeaponProfile INF_AB_FR_P = new WeaponProfile(
-                _longName: "French Airborne Infantry",
-                _shortName: "FR Airborne",
-                _type: WeaponType.INF_AB_FR,
-                _hardAtt: GameData.BASE_INF_HARD_ATTACK,                    // Hard Attack Rating
-                _hardDef: GameData.BASE_INF_HARD_DEFENSE,                   // Hard Defense Rating
-                _softAtt: GameData.BASE_INF_SOFT_ATTACK,                    // Soft Attack Rating
-                _softDef: GameData.BASE_INF_SOFT_DEFENSE,                   // Soft Defense Rating
-                _gat: GameData.GROUND_AIR_ATTACK_DEFAULT,  // Ground-to-Air Attack Rating
-                _gad: GameData.GROUND_DEFENSE_INFANTRY,    // Ground Defense Armor Rating
-                _df: 0,                                    // Dogfighting Rating
-                _man: 0,                                   // Maneuverability Rating
-                _topSpd: 0,                                // Top Speed Rating
-                _surv: 0,                                  // Survivability Rating
-                _ga: 0,                                    // Ground Attack Rating
-                _ol: 0,                                    // Ordinance Rating
-                _stealth: 0,                               // Stealth Rating
-                _pr: GameData.PRIMARY_RANGE_DEFAULT,       // Primary Range
-                _ir: GameData.INDIRECT_RANGE_DEFAULT,      // Indirect Range
-                _sr: GameData.BASE_UNIT_SPOTTING_RANGE,    // Spotting Range
-                _mmp: GameData.FOOT_UNIT,                  // Max Movement Points
-                _isAmph: false,                            // Is Amphibious
-                _isDF: false,                              // Is DoubleFire
-                _isAtt: true                              // Can this profile attack
-            );
+            // Phase 3 (derived): Infantry + RPG_LAW + ATGM_MEDIUM + MANPADS_STINGER (Mistral) + AIR_DROPPABLE
+            // (11e Brigade Parachutiste).
+            // → HA9 HD7 SA7 SD8 GAD10 · GAT8 · ICM 1.05 · MMP4 · SR2 · air-droppable.
+            WeaponProfile INF_AB_FR_P = WeaponProfile.FromProfileDef(
+                "French Airborne Infantry", "FR Airborne", WeaponType.INF_AB_FR,
+                new ProfileDef(FamilyArchetypes.Infantry,
+                    new Dictionary<ProfileStat, int>(),
+                    new[] { WeaponTrait.RPG_LAW, WeaponTrait.ATGM_MEDIUM, WeaponTrait.MANPADS_STINGER, WeaponTrait.AIR_DROPPABLE }));
 
             // Intel stats (11e Division Parachutiste composition)
             INF_AB_FR_P.AddIntelReportStat(WeaponType.Personnel,           2200);
