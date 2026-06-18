@@ -230,12 +230,24 @@ namespace HammerAndSickle.Models
             Add(new TraitDef(WeaponTrait.HIGH_MACH_DASH, TraitCategory.FixedWing,
                 "MiG-25/31, SR-71 — high top speed (set via archetype/TS constants)."));
             Add(new TraitDef(WeaponTrait.BVR_RADAR_MISSILE, TraitCategory.FixedWing,
-                "AIM-7/54, R-27/33 — long-range A2A.", Delta(ProfileStat.DF, 2)));
+                "Semi-active radar BVR (AIM-7 Sparrow, R-27 Alamo) — standard 4th-gen long-range A2A.",
+                Delta(ProfileStat.DF, 2)));
+            Add(new TraitDef(WeaponTrait.ACTIVE_RADAR_AAM, TraitCategory.FixedWing,
+                "Active fire-and-forget BVR (AIM-120 AMRAAM, AIM-54 Phoenix, R-77/AA-12 Adder) — the step above " +
+                "semi-active: launch-and-leave, multiple simultaneous engagements. Top-tier A2A. Use INSTEAD of " +
+                "BVR_RADAR_MISSILE, not on top of it.",
+                Delta(ProfileStat.DF, 3)));
+            Add(new TraitDef(WeaponTrait.HIGH_OFF_BORESIGHT_IR, TraitCategory.FixedWing,
+                "High-off-boresight IR missile + helmet-mounted sight (R-73/AA-11 Archer, later AIM-9X) — decisive " +
+                "close-in dogfight edge: shoot before you point. A standout WVR weapon of the era.",
+                Delta(ProfileStat.DF, 1)));
             Add(new TraitDef(WeaponTrait.AGILE_AIRFRAME, TraitCategory.FixedWing,
                 "F-16/MiG-29/Mirage 2000 — high-AoA dogfighter.", Delta(ProfileStat.MAN, 2)));
             Add(new TraitDef(WeaponTrait.LOOKDOWN_SHOOTDOWN, TraitCategory.FixedWing,
-                "DORMANT → LoS/altitude: pulse-Doppler vs low fliers.",
-                Icm(1.10f, EffectStatus.Dormant)));
+                "Pulse-Doppler radar suite (F-15 APG-63, MiG-31 Zaslon, Su-27 N001) — clutter-rejecting look-down/" +
+                "shoot-down fire control. The air analog of a tank's FCS traits → ICM ×1.10. (The LoS/altitude " +
+                "sub-effect vs low fliers stays for the future LoS pass.)",
+                Icm(1.10f)));
             Add(new TraitDef(WeaponTrait.AERIAL_REFUEL, TraitCategory.FixedWing,
                 "DORMANT → fuel model: endurance/range."));
             Add(new TraitDef(WeaponTrait.ESCAPE_PROFILE, TraitCategory.FixedWing,

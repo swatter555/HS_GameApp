@@ -14,7 +14,7 @@ namespace HammerAndSickle.Models
     ///  - "Towed = foot": ART / AAA / SAM carry MMP 4 (the emplaced weapon). Self-propelled and
     ///    truck-mobile variants get their mobility from a transport (Mobile-slot) profile or a
     ///    chassis trait/delta in Phase 3 — there are no separate SP archetypes.
-    ///  - GAT is carried ONLY where the family has a real baseline (AAA 9, SAM 10). Everything else
+    ///  - GAT is carried ONLY where the family has a real baseline (AAA 11, SAM 12 after the 2026-06-18 rebalance). Everything else
     ///    is GAT 0 (W7) and gains air-attack via the MANPADS trait (GAT floor) in Phase 3.
     ///  - GA / OL on aircraft ARE archetype baselines (Appendix W §2 air table / Rule A, 2026-06-16):
     ///    Attack GA 10 / OL 9, Bomber GA 8 / OL 12, fighters GA 2 / OL 6 (the dual-role floor). Traits
@@ -38,10 +38,13 @@ namespace HammerAndSickle.Models
         public static readonly Archetype Recon      = Ground(2, 5, 5, 9, 7, 10, sr: 3);
         /// <summary>Towed artillery baseline; soft towed GAD 8. SP gun = +mobility in Phase 3.</summary>
         public static readonly Archetype Artillery  = Ground(5, 5, 9, 5, 8, 4);
-        /// <summary>Towed AAA; resists air (GAD 12) and engages it (GAT 9), SR 3. SP = +mobility in Phase 3.</summary>
-        public static readonly Archetype Aaa        = Ground(4, 4, 9, 6, 12, 4, gat: 9, sr: 3);
-        /// <summary>Towed/site SAM; air-only (HA/SA 1, §7A.13), GAT 10, SR 6. SP = +mobility in Phase 3.</summary>
-        public static readonly Archetype Sam        = Ground(1, 3, 1, 3, 8, 4, gat: 10, sr: 6);
+        /// <summary>Towed AAA; resists air (GAD 12) and engages it (GAT 11), SR 3. SP = +mobility in Phase 3.
+        /// GAT base 9→11 in the 2026-06-18 GAT rebalance (7/10 lethality target — backbone AD lands Favorable on
+        /// fighters / Advantaged-Strong on slow strikers; the guidance-quality trait spread is unchanged).</summary>
+        public static readonly Archetype Aaa        = Ground(4, 4, 9, 6, 12, 4, gat: 11, sr: 3);
+        /// <summary>Towed/site SAM; air-only (HA/SA 1, §7A.13), GAT 12, SR 6. SP = +mobility in Phase 3.
+        /// GAT base 10→12 in the 2026-06-18 GAT rebalance (see Aaa).</summary>
+        public static readonly Archetype Sam        = Ground(1, 3, 1, 3, 8, 4, gat: 12, sr: 6);
         /// <summary>Attack-helicopter gunship; fast (MMP 24), glass-cannon (§7A.14); elevated observation SR 3.</summary>
         public static readonly Archetype Helicopter = Ground(7, 6, 10, 7, 10, 24, sr: 3);
         /// <summary>Soft transport; thin-topped air target (GAD 6).</summary>

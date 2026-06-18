@@ -143,20 +143,20 @@ namespace HammerAndSickle.Tests
         {
             try
             {
-                // Iraqi ZSU-57-2: Soviet line (Aaa + SELF_PROPELLED), optical gun. GAT provisional (rebalance pass).
-                AssertGround(WeaponType.SPAAA_ZSU57_IQ, 4, 6, 9, 8, 11, 9);
+                // GAT rebalance (2026-06-18, +2 base). Iraqi ZSU-57-2: Soviet line (Aaa + SELF_PROPELLED), optical gun → GAT 11.
+                AssertGround(WeaponType.SPAAA_ZSU57_IQ, 4, 6, 9, 8, 11, 11);
                 Assert.AreEqual(10, (int)P(WeaponType.SPAAA_ZSU57_IQ).MaxMovementPoints, "ZSU-57_IQ MMP 10");
 
-                // Iraqi 2K12 Kub: Soviet line (Sam + SELF_PROPELLED + SARH_LONG_RANGE + MOBILE_SHOOT_SCOOT).
-                AssertGround(WeaponType.SPSAM_2K12_IQ, 1, 5, 1, 5, 7, 13);
+                // Iraqi 2K12 Kub: Soviet line (Sam + SELF_PROPELLED + SARH_LONG_RANGE + MOBILE_SHOOT_SCOOT) → GAT 15.
+                AssertGround(WeaponType.SPSAM_2K12_IQ, 1, 5, 1, 5, 7, 15);
                 Assert.AreEqual(6, (int)P(WeaponType.SPSAM_2K12_IQ).IndirectRange, "2K12_IQ IR 6");
 
-                // Mujahideen AAA: improvised, weaker GAT + non-dug-in GAD (invented MJ line).
-                AssertGround(WeaponType.AAA_GEN_MJ, 3, 4, 8, 6, 10, 7);
+                // Mujahideen AAA: improvised (Aaa + GAT−2), still −2 below standard → GAT 9 post-rebalance.
+                AssertGround(WeaponType.AAA_GEN_MJ, 3, 4, 8, 6, 10, 9);
                 Assert.AreEqual(4, (int)P(WeaponType.AAA_GEN_MJ).MaxMovementPoints, "MJ AAA foot MMP 4");
 
-                // Mujahideen Stinger team: air-only MANPADS, GAT 8, no radar (SR 2).
-                AssertGround(WeaponType.SAM_GEN_MJ, 1, 3, 1, 3, 10, 8);
+                // Mujahideen Stinger team: air-only (Sam + GAT−2), GAT 10 post-rebalance, no radar (SR 2).
+                AssertGround(WeaponType.SAM_GEN_MJ, 1, 3, 1, 3, 10, 10);
                 Assert.AreEqual(2, (int)P(WeaponType.SAM_GEN_MJ).SpottingRange, "MJ Stinger SR 2 (no radar)");
             }
             catch (Exception ex) { AppService.HandleException(CLASS_NAME, nameof(AirDefense_ResolveConvertedLines), ex); throw; }

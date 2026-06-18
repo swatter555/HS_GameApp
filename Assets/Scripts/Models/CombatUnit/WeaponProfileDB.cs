@@ -1457,7 +1457,7 @@ namespace HammerAndSickle.Models
             //----------------------------------------------
             // Phase 3 (derived): Aaa archetype + SELF_PROPELLED (tracked) + IR AAA. Optically-aimed twin 57mm —
             // no radar, so it stays at the base AAA gunnery (RADAR_GUIDED_GUN is what elevates the Shilka).
-            // → HA4 HD6 SA9 SD8 GAD11 · GAT9 · MMP10 · IR3 · SR3.
+            // → HA4 HD6 SA9 SD8 GAD11 · GAT11 · MMP10 · IR3 · SR3.
             WeaponProfile ZSU57 = WeaponProfile.FromProfileDef(
                 "ZSU-57-2 Sparka Self-Propelled Anti-Aircraft Gun", "ZSU-57-2 Sparka", WeaponType.SPAAA_ZSU57_SV,
                 new ProfileDef(FamilyArchetypes.Aaa,
@@ -1495,7 +1495,7 @@ namespace HammerAndSickle.Models
             // Soviet ZSU-23-4 Shilka SPAAA
             //----------------------------------------------
             // Phase 3 (derived): Aaa + SELF_PROPELLED + RADAR_GUIDED_GUN (Gun-Dish radar, GAT+2) + IR AAA.
-            // → HA4 HD6 SA9 SD8 GAD11 · GAT11 · MMP10 · IR3 · SR3.
+            // → HA4 HD6 SA9 SD8 GAD11 · GAT13 · MMP10 · IR3 · SR3.
             WeaponProfile ZSU23 = WeaponProfile.FromProfileDef(
                 "ZSU-23-4 Shilka Self-Propelled Anti-Aircraft Gun", "ZSU-23-4 Shilka", WeaponType.SPAAA_ZSU23_SV,
                 new ProfileDef(FamilyArchetypes.Aaa,
@@ -1534,7 +1534,7 @@ namespace HammerAndSickle.Models
             //----------------------------------------------
             // Phase 3 (derived): Aaa + SELF_PROPELLED + RADAR_GUIDED_GUN (GAT+2) + GUN_MISSILE_COMBO (gun+9M311
             // SAM, GAT+2/IR+2) + IR AAA base. Apex Soviet short-range AD (gun & missile).
-            // → HA4 HD6 SA9 SD8 GAD11 · GAT13 · MMP10 · IR5 · SR3.
+            // → HA4 HD6 SA9 SD8 GAD11 · GAT15 · MMP10 · IR5 · SR3.
             WeaponProfile Tunguska = WeaponProfile.FromProfileDef(
                 "2K22 Tunguska Self-Propelled Anti-Aircraft System", "2K22 Tunguska", WeaponType.SPSAM_2K22_SV,
                 new ProfileDef(FamilyArchetypes.Aaa,
@@ -1573,7 +1573,7 @@ namespace HammerAndSickle.Models
             //----------------------------------------------
             // Phase 3 (derived): Sam archetype (air-only) + SELF_PROPELLED (tracked) + SARH_LONG_RANGE (radar-
             // illuminated medium reach, GAT+3) + MOBILE_SHOOT_SCOOT (relocate after firing) + IR SAM.
-            // → HA1 HD5 SA1 SD5 GAD7 · GAT13 · MMP10 · IR6 · SR6 · shoot-scoot.
+            // → HA1 HD5 SA1 SD5 GAD7 · GAT15 · MMP10 · IR6 · SR6 · shoot-scoot.
             WeaponProfile Kub = WeaponProfile.FromProfileDef(
                 "2K12 Kub Self-Propelled SAM System", "2K12 Kub", WeaponType.SPSAM_2K12_SV,
                 new ProfileDef(FamilyArchetypes.Sam,
@@ -1612,7 +1612,7 @@ namespace HammerAndSickle.Models
             //----------------------------------------------
             // Phase 3 (derived): Sam + TRUCK_MOUNTED (wheeled BRDM chassis, soft/air-vulnerable) + IR_HOMING
             // (passive IR, fire-and-forget, GAT+1) + AMPHIBIOUS (BRDM hull) + short IR. Cheap mobile point SAM.
-            // → HA1 HD3 SA1 SD3 GAD6 · GAT11 · MMP8 · IR4 · SR6 · fire-and-forget · amphibious.
+            // → HA1 HD3 SA1 SD3 GAD6 · GAT13 · MMP8 · IR4 · SR6 · fire-and-forget · amphibious.
             WeaponProfile Strela1 = WeaponProfile.FromProfileDef(
                 "9K31 Strela-1 Self-Propelled SAM System", "9K31 Strela-1", WeaponType.SPSAM_9K31_SV,
                 new ProfileDef(FamilyArchetypes.Sam,
@@ -1651,7 +1651,7 @@ namespace HammerAndSickle.Models
             //----------------------------------------------
             // Phase 3 (derived): Sam archetype, STATIC (MMP 4→0) + SARH_LONG_RANGE (radar-illuminated long reach,
             // GAT+3) + IR SAM. Classic high-altitude site SAM.
-            // → HA1 HD3 SA1 SD3 GAD8 · GAT13 · MMP0 · IR6 · SR6.
+            // → HA1 HD3 SA1 SD3 GAD8 · GAT15 · MMP0 · IR6 · SR6.
             WeaponProfile S75 = WeaponProfile.FromProfileDef(
                 "S-75 Dvina Surface-to-Air Missile System", "S-75 Dvina", WeaponType.SAM_S75_SV,
                 new ProfileDef(FamilyArchetypes.Sam,
@@ -1685,7 +1685,7 @@ namespace HammerAndSickle.Models
             //----------------------------------------------
             // Phase 3 (derived): Sam archetype, STATIC + COMMAND_GUIDANCE (GAT+2) + IR 5. Low/medium-altitude
             // site SAM — shorter reach than the S-75.
-            // → HA1 HD3 SA1 SD3 GAD8 · GAT12 · MMP0 · IR5 · SR6.
+            // → HA1 HD3 SA1 SD3 GAD8 · GAT14 · MMP0 · IR5 · SR6.
             WeaponProfile S125 = WeaponProfile.FromProfileDef(
                 "S-125 Neva Surface-to-Air Missile System", "S-125 Neva", WeaponType.SAM_S125_SV,
                 new ProfileDef(FamilyArchetypes.Sam,
@@ -1720,7 +1720,7 @@ namespace HammerAndSickle.Models
             // Phase 3 (derived): Sam archetype + TVM_GUIDANCE (track-via-missile, GAT+4) + long IR 10 + SR+4
             // (large acquisition radar → SR 10). MMP +4 → MOT 8: the launchers ride integrated TEL trucks
             // (Bob: transported as part of the system, NOT towed/static), keeping the hardened GAD 8.
-            // → HA1 HD3 SA1 SD3 GAD8 · GAT14 · MMP8 · IR10 · SR10.
+            // → HA1 HD3 SA1 SD3 GAD8 · GAT16 · MMP8 · IR10 · SR10.
             WeaponProfile S300 = WeaponProfile.FromProfileDef(
                 "S-300 Surface-to-Air Missile System", "S-300", WeaponType.SAM_S300_SV,
                 new ProfileDef(FamilyArchetypes.Sam,
@@ -1759,7 +1759,7 @@ namespace HammerAndSickle.Models
             //----------------------------------------------
             // Phase 3 (derived): bare Aaa archetype (towed = foot, MMP 4) + a small malus (HA/SA/GAT -1) for the
             // cheap generic emplacement + IR AAA. No chassis trait; keeps the AAA GAD 12 (digs in, resists air).
-            // → HA3 HD4 SA8 SD6 GAD12 · GAT8 · MMP4 · IR3 · SR3.
+            // → HA3 HD4 SA8 SD6 GAD12 · GAT10 · MMP4 · IR3 · SR3.
             WeaponProfile AAA_GEN = WeaponProfile.FromProfileDef(
                 "Generic Anti-Aircraft Artillery Emplacement", "Generic AAA", WeaponType.AAA_GEN_SV,
                 new ProfileDef(FamilyArchetypes.Aaa,
@@ -2081,13 +2081,14 @@ namespace HammerAndSickle.Models
             //----------------------------------------------
             // Soviet MiG-23 Flogger Air Superiority Fighter
             //----------------------------------------------
-            // Phase 3 (final-intent): FighterEarly + DF+3/TS+1/SUR+2 (radar-armed Flogger). Pure air-superiority
-            // → GA Rule-A floor 2. → DF11 MAN9 TS11 SUR8 · GA2 OL6 · MMP100 · SR4.
+            // Phase 3 (air-stat enrichment): FighterEarly + BVR_RADAR_MISSILE (semi-active R-23/24, DF+2) + RWR +
+            // CHAFF_FLARE (defensive suite, SUR+2) + TS+1 (fast swing-wing singleton). Radar-armed pure air-superiority
+            // → GA floor 2. → DF10 MAN9 TS11 SUR8 · GA2 OL6 · MMP100 · SR4.
             WeaponProfile MIG23 = WeaponProfile.FromProfileDef(
                 "MiG-23 Flogger Air Superiority Fighter", "MiG-23 Flogger", WeaponType.FGT_MIG23_SV,
                 new ProfileDef(FamilyArchetypes.FighterEarly,
-                    new Dictionary<ProfileStat, int> { { ProfileStat.DF, 3 }, { ProfileStat.TS, 1 }, { ProfileStat.SUR, 2 } },
-                    System.Array.Empty<WeaponTrait>()),
+                    new Dictionary<ProfileStat, int> { { ProfileStat.TS, 1 } },
+                    new[] { WeaponTrait.BVR_RADAR_MISSILE, WeaponTrait.RWR, WeaponTrait.CHAFF_FLARE }),
                 UpgradePath.FGT, 384);
 
             // Set the prestige cost for the profile.
@@ -2111,13 +2112,14 @@ namespace HammerAndSickle.Models
             //----------------------------------------------
             // Soviet MiG-25 Foxbat Interceptor
             //----------------------------------------------
-            // Phase 3 (final-intent): FighterEarly + TS+7 (Mach-3 dash, AC_HIGHSPEED_RUSSIAN) + HIGH_MACH_DASH.
-            // Pure high-speed interceptor → GA Rule-A floor 2. → DF8 MAN9 TS17 SUR6 · GA2 OL6 · MMP100 · SR4.
+            // Phase 3 (air-stat enrichment): FighterEarly + BVR_RADAR_MISSILE (big R-40 radar missiles, DF+2) +
+            // HIGH_MACH_DASH + TS+7 (Mach-3 Foxbat — the record-holder singleton). Crude but fast/heavily-armed
+            // interceptor → GA floor 2. → DF10 MAN9 TS17 SUR6 · GA2 OL6 · MMP100 · SR4.
             WeaponProfile MIG25 = WeaponProfile.FromProfileDef(
                 "MiG-25 Foxbat Interceptor", "MiG-25 Foxbat", WeaponType.FGT_MIG25_SV,
                 new ProfileDef(FamilyArchetypes.FighterEarly,
                     new Dictionary<ProfileStat, int> { { ProfileStat.TS, 7 } },
-                    new[] { WeaponTrait.HIGH_MACH_DASH }),
+                    new[] { WeaponTrait.BVR_RADAR_MISSILE, WeaponTrait.HIGH_MACH_DASH }),
                 UpgradePath.FGT, 384);
 
             // Set the prestige cost for the profile.
@@ -2141,14 +2143,16 @@ namespace HammerAndSickle.Models
             //----------------------------------------------
             // Soviet MiG-29 Fulcrum Air Superiority Fighter
             //----------------------------------------------
-            // Phase 3 (final-intent): FighterMid + DF+3/MAN+5/TS+1 (agile Fulcrum) + MULTIROLE_STRIKE (dual-role
-            // Fulcrum-A/S: GA+4 → 6). (AGILE_AIRFRAME folds the MAN edge in the later air-trait pass.)
-            // → DF13 MAN16 TS11 SUR7 · GA6 OL6 · MMP100 · SR4.
+            // Phase 3 (air-stat enrichment): FighterLate (correct 4th-gen home) + AGILE_AIRFRAME (MAN+2) +
+            // HIGH_OFF_BORESIGHT_IR (R-73/AA-11 Archer + helmet sight, DF+1) + BVR_RADAR_MISSILE (R-27, DF+2) + RWR +
+            // CHAFF_FLARE (SUR+2) + MULTIROLE_STRIKE (Fulcrum-A/S dual-role, GA+4→6). Agile, well-armed, no radar-suite
+            // ICM edge (N019 lagged Western sets). → DF15 MAN14 TS10 SUR11 · ICM 1.00 · GA6 OL6 · MMP100 · SR4.
             WeaponProfile MIG29 = WeaponProfile.FromProfileDef(
                 "MiG-29 Fulcrum Air Superiority Fighter", "MiG-29 Fulcrum", WeaponType.FGT_MIG29_SV,
-                new ProfileDef(FamilyArchetypes.FighterMid,
-                    new Dictionary<ProfileStat, int> { { ProfileStat.DF, 3 }, { ProfileStat.MAN, 5 }, { ProfileStat.TS, 1 } },
-                    new[] { WeaponTrait.MULTIROLE_STRIKE }),
+                new ProfileDef(FamilyArchetypes.FighterLate,
+                    new Dictionary<ProfileStat, int>(),
+                    new[] { WeaponTrait.AGILE_AIRFRAME, WeaponTrait.HIGH_OFF_BORESIGHT_IR, WeaponTrait.BVR_RADAR_MISSILE,
+                            WeaponTrait.RWR, WeaponTrait.CHAFF_FLARE, WeaponTrait.MULTIROLE_STRIKE }),
                 UpgradePath.FGT, 540);
 
             // Set the prestige cost for the profile.
@@ -2172,14 +2176,16 @@ namespace HammerAndSickle.Models
             //----------------------------------------------
             // Soviet MiG-31 Foxhound Interceptor
             //----------------------------------------------
-            // Phase 3 (final-intent): FighterMid + DF+3/TS+7 (Mach-2.8 long-range interceptor) + HIGH_MACH_DASH.
-            // Pure interceptor → GA Rule-A floor 2. (BVR_RADAR_MISSILE long reach folds in the later air pass.)
-            // → DF13 MAN11 TS17 SUR7 · GA2 OL6 · MMP100 · SR4.
+            // Phase 3 (air-stat enrichment): FighterLate + ACTIVE_RADAR_AAM (R-33 long-range fire-and-forget, DF+3) +
+            // LOOKDOWN_SHOOTDOWN (Zaslon PESA — first fighter phased-array, ICM ×1.10) + HIGH_MACH_DASH + RWR + TS+7
+            // (Mach-2.8 Foxhound singleton). Pure long-range interceptor → GA floor 2.
+            // → DF15 MAN12 TS17 SUR10 · ICM 1.10 · GA2 OL6 · MMP100 · SR4.
             WeaponProfile MIG31 = WeaponProfile.FromProfileDef(
                 "MiG-31 Foxhound Interceptor", "MiG-31 Foxhound", WeaponType.FGT_MIG31_SV,
-                new ProfileDef(FamilyArchetypes.FighterMid,
-                    new Dictionary<ProfileStat, int> { { ProfileStat.DF, 3 }, { ProfileStat.TS, 7 } },
-                    new[] { WeaponTrait.HIGH_MACH_DASH }),
+                new ProfileDef(FamilyArchetypes.FighterLate,
+                    new Dictionary<ProfileStat, int> { { ProfileStat.TS, 7 } },
+                    new[] { WeaponTrait.ACTIVE_RADAR_AAM, WeaponTrait.LOOKDOWN_SHOOTDOWN, WeaponTrait.HIGH_MACH_DASH,
+                            WeaponTrait.RWR }),
                 UpgradePath.FGT, 516);
 
             // Set the prestige cost for the profile.
@@ -2203,14 +2209,17 @@ namespace HammerAndSickle.Models
             //----------------------------------------------
             // Soviet Su-27 Flanker Air Superiority Fighter
             //----------------------------------------------
-            // Phase 3 (final-intent): FighterMid + DF+5/MAN+2/TS+2/SUR+2 (apex Flanker) + MULTIROLE_STRIKE
-            // (multirole Flanker: GA+4 → 6). (AGILE_AIRFRAME + BVR fold in the later air pass.)
-            // → DF15 MAN13 TS12 SUR9 · GA6 OL6 · MMP100 · SR4.
+            // Phase 3 (air-stat enrichment): FighterLate + AGILE_AIRFRAME (MAN+2) + ACTIVE_RADAR_AAM (R-77/AA-12 Adder,
+            // DF+3) + HIGH_OFF_BORESIGHT_IR (R-73 Archer, DF+1) + LOOKDOWN_SHOOTDOWN (N001 radar suite, ICM ×1.10) +
+            // RWR + CHAFF_FLARE (SUR+2) + MULTIROLE_STRIKE (GA+4→6) + TS+1 (fast Flanker singleton). Apex Soviet
+            // air-superiority fighter. → DF16 MAN14 TS11 SUR11 · ICM 1.10 · GA6 OL6 · MMP100 · SR4.
             WeaponProfile SU27 = WeaponProfile.FromProfileDef(
                 "Su-27 Flanker Air Superiority Fighter", "Su-27 Flanker", WeaponType.FGT_SU27_SV,
-                new ProfileDef(FamilyArchetypes.FighterMid,
-                    new Dictionary<ProfileStat, int> { { ProfileStat.DF, 5 }, { ProfileStat.MAN, 2 }, { ProfileStat.TS, 2 }, { ProfileStat.SUR, 2 } },
-                    new[] { WeaponTrait.MULTIROLE_STRIKE }),
+                new ProfileDef(FamilyArchetypes.FighterLate,
+                    new Dictionary<ProfileStat, int> { { ProfileStat.TS, 1 } },
+                    new[] { WeaponTrait.AGILE_AIRFRAME, WeaponTrait.ACTIVE_RADAR_AAM, WeaponTrait.HIGH_OFF_BORESIGHT_IR,
+                            WeaponTrait.LOOKDOWN_SHOOTDOWN, WeaponTrait.RWR, WeaponTrait.CHAFF_FLARE,
+                            WeaponTrait.MULTIROLE_STRIKE }),
                 UpgradePath.FGT, 564);
 
             // Set the prestige cost for the profile.
@@ -2234,14 +2243,18 @@ namespace HammerAndSickle.Models
             //----------------------------------------------
             // Soviet Su-47 Berkut Experimental Fighter
             //----------------------------------------------
-            // Phase 3 (final-intent): FighterLate + DF+6/MAN+5 (experimental super-maneuverable forward-swept) +
-            // MULTIROLE_STRIKE (multirole apex airframe: GA+4 → 6). The what-if super-fighter.
-            // → DF18 MAN17 TS10 SUR9 · GA6 OL6 · MMP100 · SR4.
+            // Phase 3 (air-stat enrichment): FighterLate + AGILE_AIRFRAME + MAN+3 (forward-swept thrust-vectoring
+            // super-maneuver — the experimental singleton) + ACTIVE_RADAR_AAM (DF+3) + HIGH_OFF_BORESIGHT_IR (DF+1) +
+            // LOOKDOWN_SHOOTDOWN (ICM ×1.10) + RWR + ECM_JAMMER + CHAFF_FLARE (full suite, SUR+3) + MULTIROLE_STRIKE.
+            // The what-if apex super-fighter — tops the roster on agility/survivability.
+            // → DF16 MAN17 TS10 SUR12 · ICM 1.10 · GA6 OL6 · MMP100 · SR4.
             WeaponProfile SU47 = WeaponProfile.FromProfileDef(
                 "Su-47 Berkut Experimental Fighter", "Su-47 Berkut", WeaponType.FGT_SU47_SV,
                 new ProfileDef(FamilyArchetypes.FighterLate,
-                    new Dictionary<ProfileStat, int> { { ProfileStat.DF, 6 }, { ProfileStat.MAN, 5 } },
-                    new[] { WeaponTrait.MULTIROLE_STRIKE }),
+                    new Dictionary<ProfileStat, int> { { ProfileStat.MAN, 3 } },
+                    new[] { WeaponTrait.AGILE_AIRFRAME, WeaponTrait.ACTIVE_RADAR_AAM, WeaponTrait.HIGH_OFF_BORESIGHT_IR,
+                            WeaponTrait.LOOKDOWN_SHOOTDOWN, WeaponTrait.RWR, WeaponTrait.ECM_JAMMER,
+                            WeaponTrait.CHAFF_FLARE, WeaponTrait.MULTIROLE_STRIKE }),
                 UpgradePath.FGT, 708);
 
             // Set the prestige cost for the profile.
@@ -2265,14 +2278,14 @@ namespace HammerAndSickle.Models
             //----------------------------------------------
             // Soviet MiG-27 Flogger-D Multi-Role Fighter
             //----------------------------------------------
-            // Phase 3 (final-intent): re-homed from the Attack archetype to FighterEarly + SUR+2 (rugged Flogger-D)
-            // + MULTIROLE_STRIKE (the §9b dual-role lever off the fighter floor: GA+4 → 6). Dumb-bomb fighter-bomber,
-            // deliberately below the precision-PGM F-16 (GA9). → DF8 MAN9 TS10 SUR8 · GA6 OL6 · MMP100 · SR4.
+            // Phase 3 (air-stat enrichment): FighterEarly (re-homed from Attack) + MULTIROLE_STRIKE (dual-role lever,
+            // GA+4→6) + RWR + CHAFF_FLARE (defensive suite, SUR+2). Dumb-bomb fighter-bomber, deliberately below the
+            // precision-PGM F-16 (GA9). → DF8 MAN9 TS10 SUR8 · GA6 OL6 · MMP100 · SR4.
             WeaponProfile MIG27 = WeaponProfile.FromProfileDef(
                 "MiG-27 Flogger-D Multi-Role Fighter", "MiG-27 Flogger-D", WeaponType.FGT_MIG27_SV,
                 new ProfileDef(FamilyArchetypes.FighterEarly,
-                    new Dictionary<ProfileStat, int> { { ProfileStat.SUR, 2 } },
-                    new[] { WeaponTrait.MULTIROLE_STRIKE }),
+                    new Dictionary<ProfileStat, int>(),
+                    new[] { WeaponTrait.MULTIROLE_STRIKE, WeaponTrait.RWR, WeaponTrait.CHAFF_FLARE }),
                 UpgradePath.ATT, 444);
 
             // Set the prestige cost for the profile.
@@ -2296,14 +2309,14 @@ namespace HammerAndSickle.Models
             //----------------------------------------------
             // Soviet Su-17 Fitter Attack Aircraft
             //----------------------------------------------
-            // Phase 3 (final-intent): re-homed from the Attack archetype to FighterEarly + SUR+1 + MULTIROLE_STRIKE
-            // (§9b dual-role lever: GA+4 → 6). Swing-wing fighter-bomber, dumb-bomb striker.
+            // Phase 3 (air-stat enrichment): FighterEarly (re-homed from Attack) + MULTIROLE_STRIKE (dual-role lever,
+            // GA+4→6) + RWR (basic warning suite, SUR+1). Swing-wing fighter-bomber, dumb-bomb striker.
             // → DF8 MAN9 TS10 SUR7 · GA6 OL6 · MMP100 · SR4.
             WeaponProfile SU17 = WeaponProfile.FromProfileDef(
                 "Su-17 Fitter Attack Aircraft", "Su-17 Fitter", WeaponType.ATT_SU17_SV,
                 new ProfileDef(FamilyArchetypes.FighterEarly,
-                    new Dictionary<ProfileStat, int> { { ProfileStat.SUR, 1 } },
-                    new[] { WeaponTrait.MULTIROLE_STRIKE }),
+                    new Dictionary<ProfileStat, int>(),
+                    new[] { WeaponTrait.MULTIROLE_STRIKE, WeaponTrait.RWR }),
                 UpgradePath.ATT, 384);
 
             // Set the prestige cost for the profile.
@@ -3729,8 +3742,8 @@ namespace HammerAndSickle.Models
             //----------------------------------------------
             // US M163 Vulcan Self-Propelled Anti-Aircraft Gun
             //----------------------------------------------
-            // Phase 3 (NATO): Aaa + SELF_PROPELLED (M113 chassis); optical/ranging 20mm gun, no radar-direction trait (GAT 9, = ZSU-57-2).
-            // → HA4 HD6 SA9 SD8 GAD11 · GAT9 · MMP10 · IR3 · SR3.
+            // Phase 3 (NATO): Aaa + SELF_PROPELLED (M113 chassis); optical/ranging 20mm gun, no radar-direction trait (GAT 11, = ZSU-57-2).
+            // → HA4 HD6 SA9 SD8 GAD11 · GAT11 · MMP10 · IR3 · SR3.
             WeaponProfile M163_US = WeaponProfile.FromProfileDef(
                 "M163 Vulcan Self-Propelled Anti-Aircraft Gun", "M163 Vulcan", WeaponType.SPAAA_M163_US,
                 new ProfileDef(FamilyArchetypes.Aaa,
@@ -3767,8 +3780,8 @@ namespace HammerAndSickle.Models
             //----------------------------------------------
             // US M48 Chaparral Self-Propelled SAM
             //----------------------------------------------
-            // Phase 3 (NATO): Sam + SELF_PROPELLED (M48 chassis) + IR_HOMING (fire-and-forget IR SAM → GAT 11, = Strela line).
-            // → HA1 HD5 SA1 SD5 GAD7 · GAT11 · MMP10 · IR6 · SR6.
+            // Phase 3 (NATO): Sam + SELF_PROPELLED (M48 chassis) + IR_HOMING (fire-and-forget IR SAM → GAT 13, = Strela line).
+            // → HA1 HD5 SA1 SD5 GAD7 · GAT13 · MMP10 · IR6 · SR6.
             WeaponProfile Chaparral = WeaponProfile.FromProfileDef(
                 "M48 Chaparral Self-Propelled SAM System", "M48 Chaparral", WeaponType.SPSAM_CHAP_US,
                 new ProfileDef(FamilyArchetypes.Sam,
@@ -3805,8 +3818,8 @@ namespace HammerAndSickle.Models
             //----------------------------------------------
             // US MIM-23 Hawk Strategic SAM System
             //----------------------------------------------
-            // Phase 3 (NATO): Sam + SARH_LONG_RANGE (radar-illuminated medium SAM → GAT 13) + static (MMP→0). = NATO's S-75.
-            // → HA1 HD3 SA1 SD3 GAD8 · GAT13 · MMP0 · IR6 · SR6.
+            // Phase 3 (NATO): Sam + SARH_LONG_RANGE (radar-illuminated medium SAM → GAT 15) + static (MMP→0). = NATO's S-75.
+            // → HA1 HD3 SA1 SD3 GAD8 · GAT15 · MMP0 · IR6 · SR6.
             WeaponProfile Hawk_US = WeaponProfile.FromProfileDef(
                 "MIM-23 Hawk Strategic SAM System", "MIM-23 Hawk", WeaponType.SAM_HAWK_US,
                 new ProfileDef(FamilyArchetypes.Sam,
@@ -3838,8 +3851,8 @@ namespace HammerAndSickle.Models
             //----------------------------------------------
             // German Flakpanzer Gepard SPSAM
             //----------------------------------------------
-            // Phase 3 (NATO): Aaa + SELF_PROPELLED + RADAR_GUIDED_GUN (35mm radar-directed = NATO's ZSU-23-4 → GAT 11).
-            // → HA4 HD6 SA9 SD8 GAD11 · GAT11 · MMP10 · IR4 · SR3. (Classified SPSAM in source but is a GUN — see TODO flag.)
+            // Phase 3 (NATO): Aaa + SELF_PROPELLED + RADAR_GUIDED_GUN (35mm radar-directed = NATO's ZSU-23-4 → GAT 13).
+            // → HA4 HD6 SA9 SD8 GAD11 · GAT13 · MMP10 · IR4 · SR3. (Classified SPSAM in source but is a GUN — see TODO flag.)
             WeaponProfile Gepard_GE = WeaponProfile.FromProfileDef(
                 "Flakpanzer Gepard Self-Propelled Anti-Aircraft Gun", "Gepard", WeaponType.SPSAM_GEPARD_GE,
                 new ProfileDef(FamilyArchetypes.Aaa,
@@ -3877,9 +3890,9 @@ namespace HammerAndSickle.Models
             //----------------------------------------------
             // French Roland SPAAA
             //----------------------------------------------
-            // Phase 3 (NATO): Aaa + SELF_PROPELLED + COMMAND_GUIDANCE (radar-command point SAM → GAT 11). NOTE: Roland is a
+            // Phase 3 (NATO): Aaa + SELF_PROPELLED + COMMAND_GUIDANCE (radar-command point SAM → GAT 13). NOTE: Roland is a
             // missile system but is classified SPAAA with AAA (gun) stats in the source — kept the dual-role line; see TODO flag.
-            // → HA4 HD6 SA9 SD8 GAD11 · GAT11 · MMP10 · IR3 · SR3.
+            // → HA4 HD6 SA9 SD8 GAD11 · GAT13 · MMP10 · IR3 · SR3.
             WeaponProfile Roland_FR = WeaponProfile.FromProfileDef(
                 "Roland Self-Propelled Anti-Aircraft Gun", "Roland", WeaponType.SPAAA_ROLAND_FR,
                 new ProfileDef(FamilyArchetypes.Aaa,
@@ -3916,8 +3929,8 @@ namespace HammerAndSickle.Models
             //----------------------------------------------
             // French Crotale Self-Propelled SAM
             //----------------------------------------------
-            // Phase 3 (NATO): Sam + SELF_PROPELLED + COMMAND_GUIDANCE (radar-command point SAM → GAT 12).
-            // → HA1 HD5 SA1 SD5 GAD7 · GAT12 · MMP10 · IR6 · SR6.
+            // Phase 3 (NATO): Sam + SELF_PROPELLED + COMMAND_GUIDANCE (radar-command point SAM → GAT 14).
+            // → HA1 HD5 SA1 SD5 GAD7 · GAT14 · MMP10 · IR6 · SR6.
             WeaponProfile Crotale = WeaponProfile.FromProfileDef(
                 "Crotale Self-Propelled SAM System", "Crotale", WeaponType.SPSAM_CROTALE_FR,
                 new ProfileDef(FamilyArchetypes.Sam,
@@ -3955,8 +3968,8 @@ namespace HammerAndSickle.Models
             //----------------------------------------------
             // British Tracked Rapier Self-Propelled SAM
             //----------------------------------------------
-            // Phase 3 (NATO): Sam + SELF_PROPELLED + COMMAND_GUIDANCE (SACLOS point SAM → GAT 12).
-            // → HA1 HD5 SA1 SD5 GAD7 · GAT12 · MMP10 · IR6 · SR6.
+            // Phase 3 (NATO): Sam + SELF_PROPELLED + COMMAND_GUIDANCE (SACLOS point SAM → GAT 14).
+            // → HA1 HD5 SA1 SD5 GAD7 · GAT14 · MMP10 · IR6 · SR6.
             WeaponProfile Rapier_SP = WeaponProfile.FromProfileDef(
                 "Tracked Rapier Self-Propelled SAM System", "Tracked Rapier", WeaponType.SPSAM_RAPIER_UK,
                 new ProfileDef(FamilyArchetypes.Sam,
@@ -4308,15 +4321,16 @@ namespace HammerAndSickle.Models
             //----------------------------------------------
             // US F-15 Eagle Air Superiority Fighter
             //----------------------------------------------
-            // Phase 3 (final-intent): FighterMid + DF+6/MAN+3/TS+2/SUR+4 (preserve the premier-fighter air-combat
-            // line). Pure air-superiority → GA stays at the Rule-A floor 2 (DROPPED from old tier-2 GA12; F-15A/C
-            // carries no strike fit here) + small load. BVR/AGILE air-stat enrichment deferred.
-            // → DF16 MAN14 TS12 SUR11 · GA2 OL6 · MMP100 · SR4.
+            // Phase 3 (air-stat enrichment): FighterLate + ACTIVE_RADAR_AAM (AIM-7→AMRAAM BVR, DF+3) + AGILE_AIRFRAME
+            // (high T/W energy fighter, MAN+2) + LOOKDOWN_SHOOTDOWN (APG-63 pulse-Doppler — the definitive look-down
+            // radar, ICM ×1.10) + RWR + ECM_JAMMER + CHAFF_FLARE (full suite, SUR+3) + TS+2 (fast singleton). Apex US
+            // air-superiority fighter → GA floor 2. → DF15 MAN14 TS12 SUR12 · ICM 1.10 · GA2 OL6 · MMP100 · SR4.
             WeaponProfile F15 = WeaponProfile.FromProfileDef(
                 "F-15 Eagle Air Superiority Fighter", "F-15 Eagle", WeaponType.FGT_F15_US,
-                new ProfileDef(FamilyArchetypes.FighterMid,
-                    new Dictionary<ProfileStat, int> { { ProfileStat.DF, 6 }, { ProfileStat.MAN, 3 }, { ProfileStat.TS, 2 }, { ProfileStat.SUR, 4 } },
-                    System.Array.Empty<WeaponTrait>()),
+                new ProfileDef(FamilyArchetypes.FighterLate,
+                    new Dictionary<ProfileStat, int> { { ProfileStat.TS, 2 } },
+                    new[] { WeaponTrait.ACTIVE_RADAR_AAM, WeaponTrait.AGILE_AIRFRAME, WeaponTrait.LOOKDOWN_SHOOTDOWN,
+                            WeaponTrait.RWR, WeaponTrait.ECM_JAMMER, WeaponTrait.CHAFF_FLARE }),
                 UpgradePath.FGT, 456);
 
             // Set the prestige cost for the profile.
@@ -4340,14 +4354,16 @@ namespace HammerAndSickle.Models
             //----------------------------------------------
             // US F-16 Fighting Falcon Multi-Role Fighter
             //----------------------------------------------
-            // Phase 3 (final-intent): FighterMid + DF+4/MAN+4/TS+1/SUR+1 (agile lightweight) + the dual-role lever
-            // MULTIROLE_STRIKE (GA+4) + AT_GUIDED_AIR (Maverick: GA+3, GaVsHard+1 stored). Multirole strike GA9
-            // (down from old tier-2 GA12, now earned by traits). → DF14 MAN15 TS11 SUR8 · GA9 OL6 · MMP100 · SR4.
+            // Phase 3 (air-stat enrichment): FighterMid (lightweight tier, below the F-15) + AGILE_AIRFRAME (MAN+2) +
+            // BVR_RADAR_MISSILE (AIM-7/AMRAAM, DF+2) + LOOKDOWN_SHOOTDOWN (APG-66 pulse-Doppler, ICM ×1.10) + RWR +
+            // CHAFF_FLARE (SUR+2) + MULTIROLE_STRIKE (GA+4) + AT_GUIDED_AIR (Maverick: GA+3, GaVsHard+1) + TS+1.
+            // Agile multirole; NATO avionics edge shows as ICM, not raw DF. → DF12 MAN13 TS11 SUR9 · ICM 1.10 · GA9 OL6 · SR4.
             WeaponProfile F16 = WeaponProfile.FromProfileDef(
                 "F-16 Fighting Falcon Multi-Role Fighter", "F-16 Falcon", WeaponType.FGT_F16_US,
                 new ProfileDef(FamilyArchetypes.FighterMid,
-                    new Dictionary<ProfileStat, int> { { ProfileStat.DF, 4 }, { ProfileStat.MAN, 4 }, { ProfileStat.TS, 1 }, { ProfileStat.SUR, 1 } },
-                    new[] { WeaponTrait.MULTIROLE_STRIKE, WeaponTrait.AT_GUIDED_AIR }),
+                    new Dictionary<ProfileStat, int> { { ProfileStat.TS, 1 } },
+                    new[] { WeaponTrait.AGILE_AIRFRAME, WeaponTrait.BVR_RADAR_MISSILE, WeaponTrait.LOOKDOWN_SHOOTDOWN,
+                            WeaponTrait.RWR, WeaponTrait.CHAFF_FLARE, WeaponTrait.MULTIROLE_STRIKE, WeaponTrait.AT_GUIDED_AIR }),
                 UpgradePath.FGT, 480);
 
             // Set the prestige cost for the profile.
@@ -4371,13 +4387,14 @@ namespace HammerAndSickle.Models
             //----------------------------------------------
             // US F-4 Phantom II Fighter
             //----------------------------------------------
-            // Phase 3 (final-intent): FighterEarly + DF+2/TS+2/SUR+2 (workhorse interceptor). Air-superiority
-            // variant → GA at the Rule-A floor 2 (old was NA/0). → DF10 MAN9 TS12 SUR8 · GA2 OL6 · MMP100 · SR4.
+            // Phase 3 (air-stat enrichment): FighterEarly + BVR_RADAR_MISSILE (AIM-7 Sparrow, DF+2) + RWR + CHAFF_FLARE
+            // (SUR+2) + TS+2 (fast singleton). Radar-armed workhorse interceptor → GA floor 2.
+            // → DF10 MAN9 TS12 SUR8 · GA2 OL6 · MMP100 · SR4.
             WeaponProfile F4_US = WeaponProfile.FromProfileDef(
                 "F-4 Phantom II Fighter", "F-4 Phantom", WeaponType.FGT_F4_US,
                 new ProfileDef(FamilyArchetypes.FighterEarly,
-                    new Dictionary<ProfileStat, int> { { ProfileStat.DF, 2 }, { ProfileStat.TS, 2 }, { ProfileStat.SUR, 2 } },
-                    System.Array.Empty<WeaponTrait>()),
+                    new Dictionary<ProfileStat, int> { { ProfileStat.TS, 2 } },
+                    new[] { WeaponTrait.BVR_RADAR_MISSILE, WeaponTrait.RWR, WeaponTrait.CHAFF_FLARE }),
                 UpgradePath.FGT, 276);
 
             // Set the prestige cost for the profile.
@@ -4401,14 +4418,16 @@ namespace HammerAndSickle.Models
             //----------------------------------------------
             // US F-14 Tomcat Fleet Defense Fighter
             //----------------------------------------------
-            // Phase 3 (final-intent): FighterLate + DF+2/MAN+1/TS+2 (long-range fleet interceptor). Pure air
-            // defense → GA at the Rule-A floor 2 (old NA/0); the Phoenix BVR edge is air-stat enrichment (deferred).
-            // → DF14 MAN13 TS12 SUR9 · GA2 OL6 · MMP100 · SR4.
+            // Phase 3 (air-stat enrichment): FighterLate + ACTIVE_RADAR_AAM (AIM-54 Phoenix — the ultimate long-range
+            // fire-and-forget, DF+3) + LOOKDOWN_SHOOTDOWN (AWG-9, ICM ×1.10) + RWR + ECM_JAMMER + CHAFF_FLARE (SUR+3) +
+            // TS+2 (fast singleton). The BVR sniper — pure fleet air-defense, no AGILE (big heavy interceptor) → GA
+            // floor 2. → DF15 MAN12 TS12 SUR12 · ICM 1.10 · GA2 OL6 · MMP100 · SR4.
             WeaponProfile F14_US = WeaponProfile.FromProfileDef(
                 "F-14 Tomcat Fleet Defense Fighter", "F-14 Tomcat", WeaponType.FGT_F14_US,
                 new ProfileDef(FamilyArchetypes.FighterLate,
-                    new Dictionary<ProfileStat, int> { { ProfileStat.DF, 2 }, { ProfileStat.MAN, 1 }, { ProfileStat.TS, 2 } },
-                    System.Array.Empty<WeaponTrait>()),
+                    new Dictionary<ProfileStat, int> { { ProfileStat.TS, 2 } },
+                    new[] { WeaponTrait.ACTIVE_RADAR_AAM, WeaponTrait.LOOKDOWN_SHOOTDOWN,
+                            WeaponTrait.RWR, WeaponTrait.ECM_JAMMER, WeaponTrait.CHAFF_FLARE }),
                 UpgradePath.FGT, 432);
 
             // Set the prestige cost for the profile.
@@ -4495,13 +4514,13 @@ namespace HammerAndSickle.Models
             //----------------------------------------------
             // FRG F-4F Phantom Fighter
             //----------------------------------------------
-            // Phase 3 (final-intent): FighterEarly + DF+2/TS+2/SUR+2 (FRG air-defense Phantom, ICE upgrade era).
-            // Pure interceptor → GA Rule-A floor 2 (old NA/0). Mirrors the US F-4. → DF10 MAN9 TS12 SUR8 · GA2 OL6 · SR4.
+            // Phase 3 (air-stat enrichment): FighterEarly + BVR_RADAR_MISSILE (Sparrow, DF+2) + RWR + CHAFF_FLARE
+            // (SUR+2) + TS+2. FRG air-defense Phantom — mirrors the US F-4 line. → DF10 MAN9 TS12 SUR8 · GA2 OL6 · SR4.
             WeaponProfile F4_GE = WeaponProfile.FromProfileDef(
                 "F-4F Phantom Fighter", "F-4F Phantom", WeaponType.FGT_F4_GE,
                 new ProfileDef(FamilyArchetypes.FighterEarly,
-                    new Dictionary<ProfileStat, int> { { ProfileStat.DF, 2 }, { ProfileStat.TS, 2 }, { ProfileStat.SUR, 2 } },
-                    System.Array.Empty<WeaponTrait>()),
+                    new Dictionary<ProfileStat, int> { { ProfileStat.TS, 2 } },
+                    new[] { WeaponTrait.BVR_RADAR_MISSILE, WeaponTrait.RWR, WeaponTrait.CHAFF_FLARE }),
                 UpgradePath.FGT, 276);
 
             // Set the prestige cost for the profile.
@@ -4525,14 +4544,16 @@ namespace HammerAndSickle.Models
             //----------------------------------------------
             // French Mirage 2000 Multi-Role Fighter
             //----------------------------------------------
-            // Phase 3 (final-intent): FighterMid + DF+4/MAN+4/TS+2 (agile delta-wing, the most maneuverable NATO
-            // fighter here) + MULTIROLE_STRIKE (GA+4) + LASER_GUIDED_MUNITIONS (GA+2) — the 2000D strike fit.
-            // → DF14 MAN15 TS12 SUR7 · GA8 OL6 · SR4.
+            // Phase 3 (air-stat enrichment): FighterMid + AGILE_AIRFRAME (delta-wing, MAN+2) + BVR_RADAR_MISSILE
+            // (Super 530D, DF+2) + LOOKDOWN_SHOOTDOWN (RDI radar, ICM ×1.10) + RWR + CHAFF_FLARE (SUR+2) +
+            // MULTIROLE_STRIKE (GA+4) + LASER_GUIDED_MUNITIONS (GA+2) + TS+2. Agile multirole delta.
+            // → DF12 MAN13 TS12 SUR9 · ICM 1.10 · GA8 OL6 · SR4.
             WeaponProfile MIRAGE2000 = WeaponProfile.FromProfileDef(
                 "Mirage 2000 Multi-Role Fighter", "Mirage 2000", WeaponType.FGT_MIRAGE2000_FR,
                 new ProfileDef(FamilyArchetypes.FighterMid,
-                    new Dictionary<ProfileStat, int> { { ProfileStat.DF, 4 }, { ProfileStat.MAN, 4 }, { ProfileStat.TS, 2 } },
-                    new[] { WeaponTrait.MULTIROLE_STRIKE, WeaponTrait.LASER_GUIDED_MUNITIONS }),
+                    new Dictionary<ProfileStat, int> { { ProfileStat.TS, 2 } },
+                    new[] { WeaponTrait.AGILE_AIRFRAME, WeaponTrait.BVR_RADAR_MISSILE, WeaponTrait.LOOKDOWN_SHOOTDOWN,
+                            WeaponTrait.RWR, WeaponTrait.CHAFF_FLARE, WeaponTrait.MULTIROLE_STRIKE, WeaponTrait.LASER_GUIDED_MUNITIONS }),
                 UpgradePath.FGT, 552);
 
             // Set the prestige cost for the profile.
@@ -4556,13 +4577,14 @@ namespace HammerAndSickle.Models
             //----------------------------------------------
             // French Mirage F1 Fighter
             //----------------------------------------------
-            // Phase 3 (final-intent): FighterEarly + DF+3/MAN+1/TS+1/SUR+2 (older multirole) + MULTIROLE_STRIKE
-            // (GA+4). Lighter striker than the Mirage 2000 (GA6 vs 8). → DF11 MAN10 TS11 SUR8 · GA6 OL6 · SR4.
+            // Phase 3 (air-stat enrichment): FighterEarly + BVR_RADAR_MISSILE (Super 530, DF+2) + RWR + CHAFF_FLARE
+            // (SUR+2) + MULTIROLE_STRIKE (GA+4) + MAN+1/TS+1. Older multirole — no radar ICM (Cyrano set); lighter
+            // striker than the Mirage 2000 (GA6 vs 8). → DF10 MAN10 TS11 SUR8 · GA6 OL6 · SR4.
             WeaponProfile MIRAGEF1 = WeaponProfile.FromProfileDef(
                 "Mirage F1 Fighter", "Mirage F1", WeaponType.FGT_MIRAGEF1_FR,
                 new ProfileDef(FamilyArchetypes.FighterEarly,
-                    new Dictionary<ProfileStat, int> { { ProfileStat.DF, 3 }, { ProfileStat.MAN, 1 }, { ProfileStat.TS, 1 }, { ProfileStat.SUR, 2 } },
-                    new[] { WeaponTrait.MULTIROLE_STRIKE }),
+                    new Dictionary<ProfileStat, int> { { ProfileStat.MAN, 1 }, { ProfileStat.TS, 1 } },
+                    new[] { WeaponTrait.BVR_RADAR_MISSILE, WeaponTrait.RWR, WeaponTrait.CHAFF_FLARE, WeaponTrait.MULTIROLE_STRIKE }),
                 UpgradePath.FGT, 420);
 
             // Set the prestige cost for the profile.
@@ -4652,15 +4674,16 @@ namespace HammerAndSickle.Models
             //----------------------------------------------
             // French SEPECAT Jaguar Attack Aircraft
             //----------------------------------------------
-            // Phase 3 (final-intent): FighterEarly + TS−1 (low-level, not a fast climber) + SUR+3 (rugged twin) +
-            // MULTIROLE_STRIKE (GA+4) + LASER_GUIDED_MUNITIONS (GA+2) + HEAVY_PAYLOAD (OL+3) + RUNWAY_CRATERING
-            // (BAP-100: OcSuppression+20 stored). Dedicated low-level attack jet. → DF8 MAN9 TS9 SUR9 · GA8 OL9 ·
-            // SR4 · OcSuppression 20.
+            // Phase 3 (air-stat enrichment): FighterEarly + MULTIROLE_STRIKE (GA+4) + LASER_GUIDED_MUNITIONS (GA+2) +
+            // HEAVY_PAYLOAD (OL+3) + RUNWAY_CRATERING (BAP-100: OcSuppression+20 stored) + RWR + ECM_JAMMER +
+            // CHAFF_FLARE (rugged twin's defensive suite, SUR+3) + TS−1 (low-level, not a fast climber). Dedicated
+            // low-level attack jet. → DF8 MAN9 TS9 SUR9 · GA8 OL9 · SR4 · OcSuppression 20.
             WeaponProfile JAGUAR = WeaponProfile.FromProfileDef(
                 "SEPECAT Jaguar Attack Aircraft", "Jaguar", WeaponType.ATT_JAGUAR_FR,
                 new ProfileDef(FamilyArchetypes.FighterEarly,
-                    new Dictionary<ProfileStat, int> { { ProfileStat.TS, -1 }, { ProfileStat.SUR, 3 } },
-                    new[] { WeaponTrait.MULTIROLE_STRIKE, WeaponTrait.LASER_GUIDED_MUNITIONS, WeaponTrait.HEAVY_PAYLOAD, WeaponTrait.RUNWAY_CRATERING }),
+                    new Dictionary<ProfileStat, int> { { ProfileStat.TS, -1 } },
+                    new[] { WeaponTrait.MULTIROLE_STRIKE, WeaponTrait.LASER_GUIDED_MUNITIONS, WeaponTrait.HEAVY_PAYLOAD,
+                            WeaponTrait.RUNWAY_CRATERING, WeaponTrait.RWR, WeaponTrait.ECM_JAMMER, WeaponTrait.CHAFF_FLARE }),
                 UpgradePath.ATT, 420);
 
             // Set the prestige cost for the profile.
@@ -4782,31 +4805,13 @@ namespace HammerAndSickle.Models
             //----------------------------------------------
             // Western Generic Truck
             //----------------------------------------------
-            WeaponProfile TRK_W = new WeaponProfile(
-                _longName: "Generic Transport Truck",
-                _shortName: "Transport Truck",
-                _type: WeaponType.TRK_WEST,
-                _hardAtt: GameData.BASE_APC_HARD_ATTACK + LARGE_MALUS,     // Hard Attack Rating
-                _hardDef: GameData.BASE_APC_HARD_DEFENSE + LARGE_MALUS,    // Hard Defense Rating
-                _softAtt: GameData.BASE_APC_SOFT_ATTACK + LARGE_MALUS,     // Soft Attack Rating
-                _softDef: GameData.BASE_APC_SOFT_DEFENSE + LARGE_MALUS,    // Soft Defense Rating
-                _gat: GameData.GROUND_AIR_ATTACK_DEFAULT,                  // Ground-to-Air Attack Rating
-                _gad: GameData.GROUND_DEFENSE_LIGHTARMOR,                  // Ground Defense Armor Rating
-                _df: 0,                                    // Dogfighting Rating
-                _man: 0,                                   // Maneuverability Rating
-                _topSpd: 0,                                // Top Speed Rating
-                _surv: 0,                                  // Survivability Rating
-                _ga: 0,                                    // Ground Attack Rating
-                _ol: 0,                                    // Ordinance Rating
-                _stealth: 0,                               // Stealth Rating
-                _pr: GameData.PRIMARY_RANGE_DEFAULT,       // Primary Range
-                _ir: GameData.INDIRECT_RANGE_DEFAULT,      // Indirect Range
-                _sr: GameData.BASE_UNIT_SPOTTING_RANGE,    // Spotting Range
-                _mmp: GameData.MOT_UNIT,                   // Max Movement Points
-                _isAmph: false,                            // Is Amphibious
-                _isDF: false,                              // Is DoubleFire
-                _isAtt: true                              // Can this profile attack
-            );
+            // Phase 3 (derived): Truck archetype (soft, GAD 6, MOT 8) + NON_COMBATANT (unarmed transport). Mirrors the
+            // Soviet/Arab generic-truck conversion. → HA3 HD3 SA3 SD3 GAD6 · MMP8 · SR2 · non-combatant.
+            WeaponProfile TRK_W = WeaponProfile.FromProfileDef(
+                "Generic Transport Truck", "Transport Truck", WeaponType.TRK_WEST,
+                new ProfileDef(FamilyArchetypes.Truck,
+                    new Dictionary<ProfileStat, int>(),
+                    new[] { WeaponTrait.NON_COMBATANT }));
 
             // Handle the icon profile.
             TRK_W.IconProfile = new RegimentIconProfile(RegimentIconType.Directional)
@@ -5495,7 +5500,7 @@ namespace HammerAndSickle.Models
             // Phase 3 (final-intent): improvised Mujahideen AAA (DShK/ZU-23 on technicals). Aaa archetype +
             // {HA-1, SA-1, GAT-2 (no fire control), GAD-2 (not a dug-in battery — on trucks/dispersed)} + IR AAA.
             // DESIGN CALL — no ratified MJ AD line; invented as a weaker generic AAA. Flag/tunable (GAT rebalance pass).
-            // → HA3 HD4 SA8 SD6 GAD10 · GAT7 · MMP4 · IR3 · SR3.
+            // → HA3 HD4 SA8 SD6 GAD10 · GAT9 · MMP4 · IR3 · SR3.
             WeaponProfile AAA_MJ = WeaponProfile.FromProfileDef(
                 "Mujahideen Anti-Aircraft Artillery", "MJ AAA", WeaponType.AAA_GEN_MJ,
                 new ProfileDef(FamilyArchetypes.Aaa,
@@ -5530,7 +5535,7 @@ namespace HammerAndSickle.Models
             // Sam archetype (air-only HA/SA 1) + {GAT-2 (→8, the shoulder-Stinger value, not a radar SAM), GAD+2
             // (→10, dispersed infantry team), SR-4 (→2, no radar), IR AAA(3, short reach)}. DESIGN CALL — no ratified
             // MJ AD line; Sam base is a loose fit for a shoulder team. Flag/tunable (GAT rebalance pass).
-            // → HA1 HD3 SA1 SD3 GAD10 · GAT8 · MMP4 · IR3 · SR2.
+            // → HA1 HD3 SA1 SD3 GAD10 · GAT10 · MMP4 · IR3 · SR2.
             WeaponProfile SAM_MJ = WeaponProfile.FromProfileDef(
                 "Mujahideen Stinger SAM Team", "MJ SAM", WeaponType.SAM_GEN_MJ,
                 new ProfileDef(FamilyArchetypes.Sam,
@@ -5562,7 +5567,7 @@ namespace HammerAndSickle.Models
             // IQ ZSU-57 Self-Propelled Anti-Aircraft Gun
             //----------------------------------------------
             // Phase 3 (final-intent): Iraqi ZSU-57-2 = the Soviet ZSU-57-2 line (Aaa + IR AAA + SELF_PROPELLED).
-            // Optical twin-57mm SP gun; no EXPORT_DOWNGRADE (gun system). → HA4 HD6 SA9 SD8 GAD11 · GAT9 · MMP10 · IR3 · SR3.
+            // Optical twin-57mm SP gun; no EXPORT_DOWNGRADE (gun system). → HA4 HD6 SA9 SD8 GAD11 · GAT11 · MMP10 · IR3 · SR3.
             WeaponProfile ZSU_57_IQ = WeaponProfile.FromProfileDef(
                 "ZSU-57 Self-Propelled Anti-Aircraft Gun", "ZSU-57", WeaponType.SPAAA_ZSU57_IQ,
                 new ProfileDef(FamilyArchetypes.Aaa,
@@ -5601,7 +5606,7 @@ namespace HammerAndSickle.Models
             //----------------------------------------------
             // Phase 3 (final-intent): Iraqi 2K12 Kub = the Soviet Kub line (Sam + IR SAM + SELF_PROPELLED +
             // SARH_LONG_RANGE + MOBILE_SHOOT_SCOOT). Radar-illuminated medium SAM; no EXPORT_DOWNGRADE.
-            // → HA1 HD5 SA1 SD5 GAD7 · GAT13 · MMP10 · IR6 · SR6 · shoot-scoot.
+            // → HA1 HD5 SA1 SD5 GAD7 · GAT15 · MMP10 · IR6 · SR6 · shoot-scoot.
             WeaponProfile SPSAM_2k12 = WeaponProfile.FromProfileDef(
                 "2K12 Self-Propelled SAM", "2K12", WeaponType.SPSAM_2K12_IQ,
                 new ProfileDef(FamilyArchetypes.Sam,
@@ -5673,13 +5678,14 @@ namespace HammerAndSickle.Models
             //----------------------------------------------
             // Iraqi MiG-23 Flogger Fighter
             //----------------------------------------------
-            // Phase 3 (final-intent): export MiG-23 = FighterEarly + DF+2/TS+1/SUR+1 (a notch below the Soviet
-            // MiG-23's DF+3/SUR+2). Pure fighter → GA floor 2. → DF10 MAN9 TS11 SUR7 · GA2 OL6 · MMP100 · SR4.
+            // Phase 3 (air-stat enrichment): export MiG-23 = FighterEarly + BVR_RADAR_MISSILE (radar-armed, DF+2) +
+            // RWR (SUR+1) + TS+1. A notch below the Soviet MiG-23 (no chaff — one less countermeasure). Pure fighter
+            // → GA floor 2. → DF10 MAN9 TS11 SUR7 · GA2 OL6 · MMP100 · SR4.
             WeaponProfile MIG23_IQ = WeaponProfile.FromProfileDef(
                 "MiG-23 Flogger Fighter", "MiG-23 Flogger", WeaponType.FGT_MIG23_IQ,
                 new ProfileDef(FamilyArchetypes.FighterEarly,
-                    new Dictionary<ProfileStat, int> { { ProfileStat.DF, 2 }, { ProfileStat.TS, 1 }, { ProfileStat.SUR, 1 } },
-                    System.Array.Empty<WeaponTrait>()),
+                    new Dictionary<ProfileStat, int> { { ProfileStat.TS, 1 } },
+                    new[] { WeaponTrait.BVR_RADAR_MISSILE, WeaponTrait.RWR }),
                 UpgradePath.FGT, 384);
 
             // Set the prestige cost for the profile.
@@ -5703,13 +5709,13 @@ namespace HammerAndSickle.Models
             //----------------------------------------------
             // Iraqi Su-17 Fitter Attack Aircraft
             //----------------------------------------------
-            // Phase 3 (final-intent): Iraqi Su-17 = the Soviet Su-17 line (FighterEarly + SUR+1 + MULTIROLE_STRIKE,
-            // GA6). Same airframe; dumb-bomb fighter-bomber. → DF8 MAN9 TS10 SUR7 · GA6 OL6 · MMP100 · SR4.
+            // Phase 3 (air-stat enrichment): Iraqi Su-17 = the Soviet Su-17 line (FighterEarly + MULTIROLE_STRIKE +
+            // RWR, GA6). Same airframe; dumb-bomb fighter-bomber. → DF8 MAN9 TS10 SUR7 · GA6 OL6 · MMP100 · SR4.
             WeaponProfile SU17_IQ = WeaponProfile.FromProfileDef(
                 "Su-17 Fitter Attack Aircraft", "Su-17 Fitter", WeaponType.ATT_SU17_IQ,
                 new ProfileDef(FamilyArchetypes.FighterEarly,
-                    new Dictionary<ProfileStat, int> { { ProfileStat.SUR, 1 } },
-                    new[] { WeaponTrait.MULTIROLE_STRIKE }),
+                    new Dictionary<ProfileStat, int>(),
+                    new[] { WeaponTrait.MULTIROLE_STRIKE, WeaponTrait.RWR }),
                 UpgradePath.ATT, 384);
 
             // Set the prestige cost for the profile.
@@ -5733,14 +5739,14 @@ namespace HammerAndSickle.Models
             //----------------------------------------------
             // Iranian F-4 Phantom Fighter
             //----------------------------------------------
-            // Phase 3 (final-intent): Iranian F-4 = FighterEarly + DF+1/MAN-1/TS+1/SUR+1 (real US Phantom; the
-            // air-combat line preserved). Pure fighter → GA floor 2 (= the US/FRG F-4 treatment).
-            // → DF9 MAN8 TS11 SUR7 · GA2 OL6 · MMP100 · SR4.
+            // Phase 3 (air-stat enrichment): Iranian F-4 = FighterEarly + BVR_RADAR_MISSILE (Sparrow, DF+2) + RWR
+            // (SUR+1) + DF-1/MAN-1/TS+1 (real US Phantom, degraded by post-1979 isolation — a notch below the US F-4).
+            // Pure fighter → GA floor 2. → DF9 MAN8 TS11 SUR7 · GA2 OL6 · MMP100 · SR4.
             WeaponProfile F4_IR = WeaponProfile.FromProfileDef(
                 "F-4 Phantom Fighter", "F-4 Phantom", WeaponType.FGT_F4_IR,
                 new ProfileDef(FamilyArchetypes.FighterEarly,
-                    new Dictionary<ProfileStat, int> { { ProfileStat.DF, 1 }, { ProfileStat.MAN, -1 }, { ProfileStat.TS, 1 }, { ProfileStat.SUR, 1 } },
-                    System.Array.Empty<WeaponTrait>()),
+                    new Dictionary<ProfileStat, int> { { ProfileStat.DF, -1 }, { ProfileStat.MAN, -1 }, { ProfileStat.TS, 1 } },
+                    new[] { WeaponTrait.BVR_RADAR_MISSILE, WeaponTrait.RWR }),
                 UpgradePath.FGT, 276);
 
             // Set the prestige cost for the profile.
@@ -5764,14 +5770,15 @@ namespace HammerAndSickle.Models
             //----------------------------------------------
             // Iranian F-14 Tomcat Fleet Defense Fighter
             //----------------------------------------------
-            // Phase 3 (final-intent): Iranian F-14 = FighterLate + MAN-1/TS+1/SUR-1 — the prized Tomcats, but a
-            // notch below the US F-14 (DF12 vs 14) reflecting Iran's post-1979 isolation/maintenance. Pure fleet
-            // interceptor → GA floor 2. → DF12 MAN11 TS11 SUR8 · GA2 OL6 · MMP100 · SR4.
+            // Phase 3 (air-stat enrichment): Iranian F-14 = FighterLate + RWR (SUR+1) + MAN-1/TS+1/SUR-2. The prized
+            // Tomcats but degraded by post-1979 isolation — NO Phoenix active-radar AAM (stocks gone) and NO look-down
+            // ICM premium (vs the US F-14's DF15/ICM 1.10), so it sits at the bare FighterLate DF12. Pure fleet
+            // interceptor → GA floor 2. → DF12 MAN11 TS11 SUR8 · ICM 1.00 · GA2 OL6 · MMP100 · SR4.
             WeaponProfile F14_IR = WeaponProfile.FromProfileDef(
                 "F-14 Tomcat Fleet Defense Fighter", "F-14 Tomcat", WeaponType.FGT_F14_IR,
                 new ProfileDef(FamilyArchetypes.FighterLate,
-                    new Dictionary<ProfileStat, int> { { ProfileStat.MAN, -1 }, { ProfileStat.TS, 1 }, { ProfileStat.SUR, -1 } },
-                    System.Array.Empty<WeaponTrait>()),
+                    new Dictionary<ProfileStat, int> { { ProfileStat.MAN, -1 }, { ProfileStat.TS, 1 }, { ProfileStat.SUR, -2 } },
+                    new[] { WeaponTrait.RWR }),
                 UpgradePath.FGT, 432);
 
             // Set the prestige cost for the profile.
@@ -6212,33 +6219,14 @@ namespace HammerAndSickle.Models
             //----------------------------------------------
             // Chinese Type 86 Infantry Fighting Vehicle
             //----------------------------------------------
-            WeaponProfile TYPE86 = new WeaponProfile(
-                _longName: "Type 86 Infantry Fighting Vehicle",
-                _shortName: "Type 86",
-                _type: WeaponType.IFV_TYPE86,
-                _hardAtt: GameData.BASE_IFV_HARD_ATTACK,                   // Hard Attack Rating
-                _hardDef: GameData.BASE_IFV_HARD_DEFENSE,                  // Hard Defense Rating
-                _softAtt: GameData.BASE_IFV_SOFT_ATTACK,                   // Soft Attack Rating
-                _softDef: GameData.BASE_IFV_SOFT_DEFENSE,                  // Soft Defense Rating
-                _gat: GameData.GROUND_AIR_ATTACK_DEFAULT,  // Ground-to-Air Attack Rating
-                _gad: GameData.GROUND_DEFENSE_LIGHTARMOR,  // Ground Defense Armor Rating
-                _df: 0,                                    // Dogfighting Rating
-                _man: 0,                                   // Maneuverability Rating
-                _topSpd: 0,                                // Top Speed Rating
-                _surv: 0,                                  // Survivability Rating
-                _ga: 0,                                    // Ground Attack Rating
-                _ol: 0,                                    // Ordinance Rating
-                _stealth: 0,                               // Stealth Rating
-                _pr: GameData.PRIMARY_RANGE_DEFAULT,       // Primary Range
-                _ir: GameData.INDIRECT_RANGE_DEFAULT,      // Indirect Range
-                _sr: GameData.BASE_UNIT_SPOTTING_RANGE,    // Spotting Range
-                _mmp: GameData.MECH_UNIT,                  // Max Movement Points
-                _isAmph: true,                             // Is Amphibious
-                _isDF: false,                              // Is DoubleFire
-                _isAtt: true,                              // Can this profile attack
-                _upgradePath: UpgradePath.IFV,             // Upgrade Path
-                _turnAvailable: 576                        // How many months past Jan. 1938
-            );
+            // Phase 3 (derived): Ifv + ATGM_RAIL (HJ-73 rail on the BMP-1-copy hull, HA+4) + AMPHIBIOUS.
+            // Mirrors the Soviet BMP-1P line. → HA8 HD4 SA8 SD7 GAD7 · ICM 1.00 · MMP10 · SR2 · amphibious.
+            WeaponProfile TYPE86 = WeaponProfile.FromProfileDef(
+                "Type 86 Infantry Fighting Vehicle", "Type 86", WeaponType.IFV_TYPE86,
+                new ProfileDef(FamilyArchetypes.Ifv,
+                    new Dictionary<ProfileStat, int>(),
+                    new[] { WeaponTrait.ATGM_RAIL, WeaponTrait.AMPHIBIOUS }),
+                UpgradePath.IFV, 576);
 
             // Set the prestige cost for the profile.
             TYPE86.SetPrestigeCost(PrestigeTierCost.Gen2, PrestigeTypeCost.IFV);
@@ -6268,33 +6256,14 @@ namespace HammerAndSickle.Models
             //----------------------------------------------
             // Chinese Type 82 Self-Propelled Howitzer
             //----------------------------------------------
-            WeaponProfile SPA_TYPE82 = new WeaponProfile(
-                _longName: "Type 82 Self-Propelled Howitzer",
-                _shortName: "Type 82",
-                _type: WeaponType.SPA_TYPE82,
-                _hardAtt: GameData.BASE_ARTY_HARD_ATTACK,                  // Hard Attack Rating
-                _hardDef: GameData.BASE_ARTY_HARD_DEFENSE,                 // Hard Defense Rating
-                _softAtt: GameData.BASE_ARTY_SOFT_ATTACK,                  // Soft Attack Rating
-                _softDef: GameData.BASE_ARTY_SOFT_DEFENSE,                 // Soft Defense Rating
-                _gat: GameData.GROUND_AIR_ATTACK_DEFAULT,  // Ground-to-Air Attack Rating
-                _gad: GameData.GROUND_DEFENSE_LIGHTARMOR,  // Ground Defense Armor Rating
-                _df: 0,                                    // Dogfighting Rating
-                _man: 0,                                   // Maneuverability Rating
-                _topSpd: 0,                                // Top Speed Rating
-                _surv: 0,                                  // Survivability Rating
-                _ga: 0,                                    // Ground Attack Rating
-                _ol: 0,                                    // Ordinance Rating
-                _stealth: 0,                               // Stealth Rating
-                _pr: GameData.PRIMARY_RANGE_DEFAULT,       // Primary Range
-                _ir: GameData.INDIRECT_RANGE_MEDIUM,       // Indirect Range
-                _sr: GameData.BASE_UNIT_SPOTTING_RANGE,    // Spotting Range
-                _mmp: GameData.MECH_UNIT,                  // Max Movement Points
-                _isAmph: false,                            // Is Amphibious
-                _isDF: false,                              // Is DoubleFire
-                _isAtt: true,                              // Can this profile attack
-                _upgradePath: UpgradePath.ART,             // Upgrade Path
-                _turnAvailable: 552                        // How many months past Jan. 1938
-            );
+            // Phase 3 (derived): Artillery + SELF_PROPELLED (tracked chassis: MMP+6→10, HD/SD+2, GAD-1) + IR MEDIUM.
+            // 122mm tracked SP howitzer, the Soviet 2S1 analogue. → HA5 HD7 SA9 SD7 GAD7 · MMP10 · IR MEDIUM.
+            WeaponProfile SPA_TYPE82 = WeaponProfile.FromProfileDef(
+                "Type 82 Self-Propelled Howitzer", "Type 82", WeaponType.SPA_TYPE82,
+                new ProfileDef(FamilyArchetypes.Artillery,
+                    new Dictionary<ProfileStat, int> { { ProfileStat.IR, GameData.INDIRECT_RANGE_MEDIUM } },
+                    new[] { WeaponTrait.SELF_PROPELLED }),
+                UpgradePath.ART, 552);
 
             // Set the prestige cost for the profile.
             SPA_TYPE82.SetPrestigeCost(PrestigeTierCost.Gen3, PrestigeTypeCost.SPA);
@@ -6325,33 +6294,15 @@ namespace HammerAndSickle.Models
             //----------------------------------------------
             // Chinese PHZ-89 Multiple Rocket Launcher
             //----------------------------------------------
-            WeaponProfile PHZ89 = new WeaponProfile(
-                _longName: "PHZ-89 Multiple Rocket Launcher",
-                _shortName: "PHZ-89",
-                _type: WeaponType.ROC_PHZ89,
-                _hardAtt: GameData.BASE_ARTY_HARD_ATTACK + SMALL_BONUS,    // Hard Attack Rating
-                _hardDef: GameData.BASE_ARTY_HARD_DEFENSE,                 // Hard Defense Rating
-                _softAtt: GameData.BASE_ARTY_SOFT_ATTACK + LARGE_BONUS,    // Soft Attack Rating
-                _softDef: GameData.BASE_ARTY_SOFT_DEFENSE,                 // Soft Defense Rating
-                _gat: GameData.GROUND_AIR_ATTACK_DEFAULT,  // Ground-to-Air Attack Rating
-                _gad: GameData.GROUND_DEFENSE_LIGHTARMOR,  // Ground Defense Armor Rating
-                _df: 0,                                    // Dogfighting Rating
-                _man: 0,                                   // Maneuverability Rating
-                _topSpd: 0,                                // Top Speed Rating
-                _surv: 0,                                  // Survivability Rating
-                _ga: 0,                                    // Ground Attack Rating
-                _ol: 0,                                    // Ordinance Rating
-                _stealth: 0,                               // Stealth Rating
-                _pr: GameData.PRIMARY_RANGE_DEFAULT,       // Primary Range
-                _ir: GameData.INDIRECT_RANGE_ROC_MR,       // Indirect Range
-                _sr: GameData.BASE_UNIT_SPOTTING_RANGE,    // Spotting Range
-                _mmp: GameData.MECH_UNIT,                  // Max Movement Points
-                _isAmph: false,                            // Is Amphibious
-                _isDF: false,                              // Is DoubleFire
-                _isAtt: true,                              // Can this profile attack
-                _upgradePath: UpgradePath.ROC,             // Upgrade Path
-                _turnAvailable: 500                        // How many months past Jan. 1938
-            );
+            // Phase 3 (derived): Artillery + SELF_PROPELLED (tracked 122mm MRL chassis) + ROCKET_ARTILLERY (salvo →
+            // +1 CombatAction, derives IsDoubleFire) + IR ROC_MR. Tracked Grad-class — drops the old flat SA bonus and
+            // carries its punch via the extra action, as the Soviet BM-21 does. → HA5 HD7 SA9 SD7 GAD7 · MMP10 · double-fire.
+            WeaponProfile PHZ89 = WeaponProfile.FromProfileDef(
+                "PHZ-89 Multiple Rocket Launcher", "PHZ-89", WeaponType.ROC_PHZ89,
+                new ProfileDef(FamilyArchetypes.Artillery,
+                    new Dictionary<ProfileStat, int> { { ProfileStat.IR, GameData.INDIRECT_RANGE_ROC_MR } },
+                    new[] { WeaponTrait.SELF_PROPELLED, WeaponTrait.ROCKET_ARTILLERY }),
+                UpgradePath.ROC, 500);
 
             // Set the prestige cost for the profile.
             PHZ89.SetPrestigeCost(PrestigeTierCost.Gen3, PrestigeTypeCost.ROC);
@@ -6382,33 +6333,14 @@ namespace HammerAndSickle.Models
             //----------------------------------------------
             // Chinese Light Towed Artillery
             //----------------------------------------------
-            WeaponProfile ART_LT_CH = new WeaponProfile(
-                _longName: "Light Towed Artillery",
-                _shortName: "Light Artillery",
-                _type: WeaponType.ART_LIGHT_CH,
-                _hardAtt: GameData.BASE_ARTY_HARD_ATTACK + SMALL_MALUS,    // Hard Attack Rating
-                _hardDef: GameData.BASE_ARTY_HARD_DEFENSE + MEDIUM_MALUS,  // Hard Defense Rating
-                _softAtt: GameData.BASE_ARTY_SOFT_ATTACK + SMALL_MALUS,    // Soft Attack Rating
-                _softDef: GameData.BASE_ARTY_SOFT_DEFENSE + MEDIUM_MALUS,  // Soft Defense Rating
-                _gat: GameData.GROUND_AIR_ATTACK_DEFAULT,  // Ground-to-Air Attack Rating
-                _gad: GameData.GROUND_DEFENSE_INFANTRY,    // Ground Defense Armor Rating
-                _df: 0,                                    // Dogfighting Rating
-                _man: 0,                                   // Maneuverability Rating
-                _topSpd: 0,                                // Top Speed Rating
-                _surv: 0,                                  // Survivability Rating
-                _ga: 0,                                    // Ground Attack Rating
-                _ol: 0,                                    // Ordinance Rating
-                _stealth: 0,                               // Stealth Rating
-                _pr: GameData.PRIMARY_RANGE_DEFAULT,       // Primary Range
-                _ir: GameData.INDIRECT_RANGE_SHORT,        // Indirect Range
-                _sr: GameData.BASE_UNIT_SPOTTING_RANGE,    // Spotting Range
-                _mmp: GameData.MOT_UNIT,                   // Max Movement Points
-                _isAmph: false,                            // Is Amphibious
-                _isDF: false,                              // Is DoubleFire
-                _isAtt: true,                              // Can this profile attack
-                _upgradePath: UpgradePath.ART,             // Upgrade Path
-                _turnAvailable: 144                        // How many months past Jan. 1938
-            );
+            // Phase 3 (derived): Artillery archetype bare (towed = foot, MMP 4) + IR SHORT. Generic light towed piece,
+            // identical to the Soviet light towed line. → HA5 HD5 SA9 SD5 GAD8 · MMP4 · IR SHORT.
+            WeaponProfile ART_LT_CH = WeaponProfile.FromProfileDef(
+                "Light Towed Artillery", "Light Artillery", WeaponType.ART_LIGHT_CH,
+                new ProfileDef(FamilyArchetypes.Artillery,
+                    new Dictionary<ProfileStat, int> { { ProfileStat.IR, GameData.INDIRECT_RANGE_SHORT } },
+                    System.Array.Empty<WeaponTrait>()),
+                UpgradePath.ART, 144);
 
             // Set the prestige cost for the profile.
             ART_LT_CH.SetPrestigeCost(PrestigeTierCost.Gen1, PrestigeTypeCost.ART);
@@ -6434,33 +6366,14 @@ namespace HammerAndSickle.Models
             //----------------------------------------------
             // Chinese Heavy Towed Artillery
             //----------------------------------------------
-            WeaponProfile ART_HV_CH = new WeaponProfile(
-                _longName: "Heavy Towed Artillery",
-                _shortName: "Heavy Artillery",
-                _type: WeaponType.ART_HEAVY_CH,
-                _hardAtt: GameData.BASE_ARTY_HARD_ATTACK + SMALL_BONUS,    // Hard Attack Rating
-                _hardDef: GameData.BASE_ARTY_HARD_DEFENSE + MEDIUM_MALUS,  // Hard Defense Rating
-                _softAtt: GameData.BASE_ARTY_SOFT_ATTACK + MEDIUM_BONUS,   // Soft Attack Rating
-                _softDef: GameData.BASE_ARTY_SOFT_DEFENSE + MEDIUM_MALUS,  // Soft Defense Rating
-                _gat: GameData.GROUND_AIR_ATTACK_DEFAULT,  // Ground-to-Air Attack Rating
-                _gad: GameData.GROUND_DEFENSE_INFANTRY,    // Ground Defense Armor Rating
-                _df: 0,                                    // Dogfighting Rating
-                _man: 0,                                   // Maneuverability Rating
-                _topSpd: 0,                                // Top Speed Rating
-                _surv: 0,                                  // Survivability Rating
-                _ga: 0,                                    // Ground Attack Rating
-                _ol: 0,                                    // Ordinance Rating
-                _stealth: 0,                               // Stealth Rating
-                _pr: GameData.PRIMARY_RANGE_DEFAULT,       // Primary Range
-                _ir: GameData.INDIRECT_RANGE_LONG,         // Indirect Range
-                _sr: GameData.BASE_UNIT_SPOTTING_RANGE,    // Spotting Range
-                _mmp: GameData.MOT_UNIT,                   // Max Movement Points
-                _isAmph: false,                            // Is Amphibious
-                _isDF: false,                              // Is DoubleFire
-                _isAtt: true,                              // Can this profile attack
-                _upgradePath: UpgradePath.ART,             // Upgrade Path
-                _turnAvailable: 144                        // How many months past Jan. 1938
-            );
+            // Phase 3 (derived): Artillery archetype (towed = foot, MMP 4) + IR LONG + SA+1 (heavier tube). Generic
+            // heavy towed piece, mirrors the Soviet heavy towed line (keeps its own LONG reach). → HA5 HD5 SA10 SD5 GAD8 · MMP4 · IR LONG.
+            WeaponProfile ART_HV_CH = WeaponProfile.FromProfileDef(
+                "Heavy Towed Artillery", "Heavy Artillery", WeaponType.ART_HEAVY_CH,
+                new ProfileDef(FamilyArchetypes.Artillery,
+                    new Dictionary<ProfileStat, int> { { ProfileStat.IR, GameData.INDIRECT_RANGE_LONG }, { ProfileStat.SA, 1 } },
+                    System.Array.Empty<WeaponTrait>()),
+                UpgradePath.ART, 144);
 
             // Set the prestige cost for the profile.
             ART_HV_CH.SetPrestigeCost(PrestigeTierCost.Gen1, PrestigeTypeCost.ART);
@@ -6490,33 +6403,14 @@ namespace HammerAndSickle.Models
             //----------------------------------------------
             // Chinese Type 53 Self-Propelled AAA
             //----------------------------------------------
-            WeaponProfile TYPE53 = new WeaponProfile(
-                _longName: "Type 53 Self-Propelled Anti-Aircraft Gun",
-                _shortName: "Type 53",
-                _type: WeaponType.SPAAA_TYPE53,
-                _hardAtt: GameData.BASE_AAA_HARD_ATTACK,                   // Hard Attack Rating
-                _hardDef: GameData.BASE_AAA_HARD_DEFENSE,                  // Hard Defense Rating
-                _softAtt: GameData.BASE_AAA_SOFT_ATTACK,                   // Soft Attack Rating
-                _softDef: GameData.BASE_AAA_SOFT_DEFENSE,                  // Soft Defense Rating
-                _gat: GameData.BASE_AAA_GROUND_AIR_ATTACK,                 // Ground-to-Air Attack Rating
-                _gad: GameData.GROUND_DEFENSE_AAA,         // Ground Defense Armor Rating
-                _df: 0,                                    // Dogfighting Rating
-                _man: 0,                                   // Maneuverability Rating
-                _topSpd: 0,                                // Top Speed Rating
-                _surv: 0,                                  // Survivability Rating
-                _ga: 0,                                    // Ground Attack Rating
-                _ol: 0,                                    // Ordinance Rating
-                _stealth: 0,                               // Stealth Rating
-                _pr: GameData.PRIMARY_RANGE_DEFAULT,       // Primary Range
-                _ir: GameData.INDIRECT_RANGE_AAA,          // Indirect Range
-                _sr: GameData.BASE_AAA_SPOTTING_RANGE,     // Spotting Range
-                _mmp: GameData.MECH_UNIT,                  // Max Movement Points
-                _isAmph: false,                            // Is Amphibious
-                _isDF: false,                              // Is DoubleFire
-                _isAtt: true,                              // Can this profile attack
-                _upgradePath: UpgradePath.AAA,             // Upgrade Path
-                _turnAvailable: 204                        // How many months past Jan. 1938
-            );
+            // Phase 3 (derived): Aaa archetype + SELF_PROPELLED (tracked) + IR AAA. Optically-aimed twin 57mm with no
+            // radar (the Chinese ZSU-57-2 analogue), so it stays at base AAA gunnery. → HA4 HD6 SA9 SD8 GAD11 GAT11 · MMP10 · SR3.
+            WeaponProfile TYPE53 = WeaponProfile.FromProfileDef(
+                "Type 53 Self-Propelled Anti-Aircraft Gun", "Type 53", WeaponType.SPAAA_TYPE53,
+                new ProfileDef(FamilyArchetypes.Aaa,
+                    new Dictionary<ProfileStat, int> { { ProfileStat.IR, GameData.INDIRECT_RANGE_AAA } },
+                    new[] { WeaponTrait.SELF_PROPELLED }),
+                UpgradePath.AAA, 204);
 
             // Set the prestige cost for the profile.
             TYPE53.SetPrestigeCost(PrestigeTierCost.Gen1, PrestigeTypeCost.AAA);
@@ -6547,33 +6441,15 @@ namespace HammerAndSickle.Models
             //----------------------------------------------
             // Chinese HQ-7 Self-Propelled SAM
             //----------------------------------------------
-            WeaponProfile HQ7 = new WeaponProfile(
-                _longName: "HQ-7 Self-Propelled SAM System",
-                _shortName: "HQ-7",
-                _type: WeaponType.SPSAM_HQ7,
-                _hardAtt: GameData.BASE_SAM_HARD_ATTACK,                   // Hard Attack Rating
-                _hardDef: GameData.BASE_SAM_HARD_DEFENSE,                  // Hard Defense Rating
-                _softAtt: GameData.BASE_SAM_SOFT_ATTACK,                   // Soft Attack Rating
-                _softDef: GameData.BASE_SAM_SOFT_DEFENSE,                  // Soft Defense Rating
-                _gat: GameData.BASE_SAM_GROUND_AIR_ATTACK + SMALL_BONUS,   // Ground-to-Air Attack Rating
-                _gad: GameData.GROUND_DEFENSE_SAM,         // Ground Defense Armor Rating
-                _df: 0,                                    // Dogfighting Rating
-                _man: 0,                                   // Maneuverability Rating
-                _topSpd: 0,                                // Top Speed Rating
-                _surv: 0,                                  // Survivability Rating
-                _ga: 0,                                    // Ground Attack Rating
-                _ol: 0,                                    // Ordinance Rating
-                _stealth: 0,                               // Stealth Rating
-                _pr: GameData.PRIMARY_RANGE_DEFAULT,       // Primary Range
-                _ir: GameData.INDIRECT_RANGE_SAM,          // Indirect Range
-                _sr: GameData.BASE_SAM_SPOTTING_RANGE,     // Spotting Range
-                _mmp: GameData.MECH_UNIT,                  // Max Movement Points
-                _isAmph: false,                            // Is Amphibious
-                _isDF: false,                              // Is DoubleFire
-                _isAtt: true,                              // Can this profile attack
-                _upgradePath: UpgradePath.SAM,             // Upgrade Path
-                _turnAvailable: 564                        // How many months past Jan. 1938
-            );
+            // Phase 3 (derived): Sam archetype (air-only) + SELF_PROPELLED (tracked) + COMMAND_GUIDANCE (Crotale-class
+            // CLOS, GAT+2) + MOBILE_SHOOT_SCOOT (relocate after firing) + IR SAM. Tracked mobile point-defence SAM.
+            // → HA1 HD5 SA1 SD5 GAD7 GAT14 · MMP10 · SR6 · shoot-scoot.
+            WeaponProfile HQ7 = WeaponProfile.FromProfileDef(
+                "HQ-7 Self-Propelled SAM System", "HQ-7", WeaponType.SPSAM_HQ7,
+                new ProfileDef(FamilyArchetypes.Sam,
+                    new Dictionary<ProfileStat, int> { { ProfileStat.IR, GameData.INDIRECT_RANGE_SAM } },
+                    new[] { WeaponTrait.SELF_PROPELLED, WeaponTrait.COMMAND_GUIDANCE, WeaponTrait.MOBILE_SHOOT_SCOOT }),
+                UpgradePath.SAM, 564);
 
             // Set the prestige cost for the profile.
             HQ7.SetPrestigeCost(PrestigeTierCost.Gen3, PrestigeTypeCost.SAM);
@@ -6608,33 +6484,14 @@ namespace HammerAndSickle.Models
             //----------------------------------------------
             // Chinese H-9 Attack Helicopter
             //----------------------------------------------
-            WeaponProfile H9 = new WeaponProfile(
-                _longName: "H-9 Attack Helicopter",
-                _shortName: "H-9",
-                _type: WeaponType.HEL_H9,
-                _hardAtt: GameData.BASE_HEL_HARD_ATTACK + MEDIUM_BONUS,    // Hard Attack Rating
-                _hardDef: GameData.BASE_HEL_HARD_DEFENSE,                  // Hard Defense Rating
-                _softAtt: GameData.BASE_HEL_SOFT_ATTACK,                   // Soft Attack Rating
-                _softDef: GameData.BASE_HEL_SOFT_DEFENSE,                  // Soft Defense Rating
-                _gat: GameData.GROUND_AIR_ATTACK_DEFAULT,  // Ground-to-Air Attack Rating
-                _gad: GameData.GROUND_DEFENSE_HELO,        // Ground Defense Armor Rating
-                _df: 0,                                    // Dogfighting Rating
-                _man: 0,                                   // Maneuverability Rating
-                _topSpd: 0,                                // Top Speed Rating
-                _surv: 0,                                  // Survivability Rating
-                _ga: 0,                                    // Ground Attack Rating
-                _ol: 0,                                    // Ordinance Rating
-                _stealth: 0,                               // Stealth Rating
-                _pr: GameData.PRIMARY_RANGE_DEFAULT,       // Primary Range
-                _ir: GameData.INDIRECT_RANGE_DEFAULT,      // Indirect Range
-                _sr: GameData.RECON_UNIT_SPOTTING_RANGE,   // Spotting Range
-                _mmp: GameData.HELO_UNIT,                  // Max Movement Points
-                _isAmph: false,                            // Is Amphibious
-                _isDF: false,                              // Is DoubleFire
-                _isAtt: true,                              // Can this profile attack
-                _upgradePath: UpgradePath.HEL,             // Upgrade Path
-                _turnAvailable: 528                        // How many months past Jan. 1938
-            );
+            // Phase 3 (derived): Helicopter + ATGM_HELO_SACLOS (HJ-8 SACLOS missiles, HA+4). Light Z-9-class AT helo —
+            // unarmoured, no heavy cannon, so it sits below the armoured Hind. → HA11 HD6 SA10 SD7 GAD10 · ICM 1.00 · MMP24 · SR3.
+            WeaponProfile H9 = WeaponProfile.FromProfileDef(
+                "H-9 Attack Helicopter", "H-9", WeaponType.HEL_H9,
+                new ProfileDef(FamilyArchetypes.Helicopter,
+                    new Dictionary<ProfileStat, int>(),
+                    new[] { WeaponTrait.ATGM_HELO_SACLOS }),
+                UpgradePath.HEL, 528);
 
             // Set the prestige cost for the profile.
             H9.SetPrestigeCost(PrestigeTierCost.Gen2, PrestigeTypeCost.HEL);
@@ -6667,33 +6524,14 @@ namespace HammerAndSickle.Models
             //----------------------------------------------
             // Chinese J-7 Fighter
             //----------------------------------------------
-            WeaponProfile J7 = new WeaponProfile(
-                _longName: "J-7 Fighter",
-                _shortName: "J-7",
-                _type: WeaponType.FGT_J7,
-                _hardAtt: 0,                                               // Hard Attack Rating
-                _hardDef: 0,                                               // Hard Defense Rating
-                _softAtt: 0,                                               // Soft Attack Rating
-                _softDef: 0,                                               // Soft Defense Rating
-                _gat: 0,                                                   // Ground-to-Air Attack Rating
-                _gad: 0,                                                   // Ground Defense Armor Rating
-                _df: GameData.EARLY_FGT_DOGFIGHT,                          // Dogfighting Rating
-                _man: GameData.EARLY_FGT_MANEUVER,                         // Maneuverability Rating
-                _topSpd: GameData.EARLY_FGT_TOPSPEED,                      // Top Speed Rating
-                _surv: GameData.EARLY_FGT_SURVIVE,                         // Survivability Rating
-                _ga: GameData.GROUND_ATTACK_NA,                            // Ground Attack Rating
-                _ol: GameData.SMALL_AC_LOAD,                               // Ordinance Rating
-                _stealth: 0,                                               // Stealth Rating
-                _pr: GameData.PRIMARY_RANGE_DEFAULT,       // Primary Range
-                _ir: GameData.INDIRECT_RANGE_DEFAULT,      // Indirect Range
-                _sr: GameData.AC_SPOTTING_BASIC,           // Spotting Range
-                _mmp: GameData.FIXEDWING_UNIT,             // Max Movement Points
-                _isAmph: false,                            // Is Amphibious
-                _isDF: false,                              // Is DoubleFire
-                _isAtt: true,                              // Can this profile attack
-                _upgradePath: UpgradePath.FGT,             // Upgrade Path
-                _turnAvailable: 324                        // How many months past Jan. 1938
-            );
+            // Phase 3 (derived): FighterEarly archetype bare (MiG-21 copy). Basic early air-superiority jet, GA Rule-A
+            // floor 2. → DF8 MAN9 TS10 SUR6 GA2 OL6 · MMP100 · SR4.
+            WeaponProfile J7 = WeaponProfile.FromProfileDef(
+                "J-7 Fighter", "J-7", WeaponType.FGT_J7,
+                new ProfileDef(FamilyArchetypes.FighterEarly,
+                    new Dictionary<ProfileStat, int>(),
+                    System.Array.Empty<WeaponTrait>()),
+                UpgradePath.FGT, 324);
 
             // Set the prestige cost for the profile.
             J7.SetPrestigeCost(PrestigeTierCost.Gen1, PrestigeTypeCost.FGT);
@@ -6716,33 +6554,16 @@ namespace HammerAndSickle.Models
             //----------------------------------------------
             // Chinese J-8 Interceptor
             //----------------------------------------------
-            WeaponProfile J8 = new WeaponProfile(
-                _longName: "J-8 Interceptor",
-                _shortName: "J-8",
-                _type: WeaponType.FGT_J8,
-                _hardAtt: 0,                                               // Hard Attack Rating
-                _hardDef: 0,                                               // Hard Defense Rating
-                _softAtt: 0,                                               // Soft Attack Rating
-                _softDef: 0,                                               // Soft Defense Rating
-                _gat: 0,                                                   // Ground-to-Air Attack Rating
-                _gad: 0,                                                   // Ground Defense Armor Rating
-                _df: GameData.MID_FGT_DOGFIGHT,                            // Dogfighting Rating
-                _man: GameData.MID_FGT_MANEUVER,                           // Maneuverability Rating
-                _topSpd: GameData.MID_FGT_TOPSPEED + SMALL_BONUS,          // Top Speed Rating
-                _surv: GameData.MID_FGT_SURVIVE,                           // Survivability Rating
-                _ga: GameData.GROUND_ATTACK_TIER_1,                        // Ground Attack Rating
-                _ol: GameData.SMALL_AC_LOAD,                               // Ordinance Rating
-                _stealth: 0,                                               // Stealth Rating
-                _pr: GameData.PRIMARY_RANGE_DEFAULT,       // Primary Range
-                _ir: GameData.INDIRECT_RANGE_DEFAULT,      // Indirect Range
-                _sr: GameData.AC_SPOTTING_ENHANCED,        // Spotting Range
-                _mmp: GameData.FIXEDWING_UNIT,             // Max Movement Points
-                _isAmph: false,                            // Is Amphibious
-                _isDF: false,                              // Is DoubleFire
-                _isAtt: true,                              // Can this profile attack
-                _upgradePath: UpgradePath.FGT,             // Upgrade Path
-                _turnAvailable: 504                        // How many months past Jan. 1938
-            );
+            // Phase 3 (air-stat enrichment): FighterEarly + BVR_RADAR_MISSILE (Type 208 radar + PL-11 SARH, DF+2) +
+            // RWR (SUR+1) + TS+3 (Mach-2.2 dash) + HIGH_MACH_DASH. Fast radar interceptor on early-gen agility — no
+            // look-down ICM (Chinese radar lag), so a notch under the radar-ICM Western jets. JUDGMENT CALL (flagged):
+            // agility stays early-gen. → DF10 MAN9 TS13 SUR7 · GA2 OL6 · MMP100 · SR4.
+            WeaponProfile J8 = WeaponProfile.FromProfileDef(
+                "J-8 Interceptor", "J-8", WeaponType.FGT_J8,
+                new ProfileDef(FamilyArchetypes.FighterEarly,
+                    new Dictionary<ProfileStat, int> { { ProfileStat.TS, 3 } },
+                    new[] { WeaponTrait.BVR_RADAR_MISSILE, WeaponTrait.RWR, WeaponTrait.HIGH_MACH_DASH }),
+                UpgradePath.FGT, 504);
 
             // Set the prestige cost for the profile.
             J8.SetPrestigeCost(PrestigeTierCost.Gen2, PrestigeTypeCost.FGT);
@@ -6765,33 +6586,15 @@ namespace HammerAndSickle.Models
             //----------------------------------------------
             // Chinese Q-5 Fantan Attack Aircraft
             //----------------------------------------------
-            WeaponProfile Q5 = new WeaponProfile(
-                _longName: "Q-5 Fantan Attack Aircraft",
-                _shortName: "Q-5 Fantan",
-                _type: WeaponType.ATT_Q5,
-                _hardAtt: 0,                                               // Hard Attack Rating
-                _hardDef: 0,                                               // Hard Defense Rating
-                _softAtt: 0,                                               // Soft Attack Rating
-                _softDef: 0,                                               // Soft Defense Rating
-                _gat: 0,                                                   // Ground-to-Air Attack Rating
-                _gad: 0,                                                   // Ground Defense Armor Rating
-                _df: GameData.AC_ATTACK_DOGFIGHT,                          // Dogfighting Rating
-                _man: GameData.AC_ATTACK_MANEUVER,                         // Maneuverability Rating
-                _topSpd: GameData.AC_ATTACK_TOPSPEED,                      // Top Speed Rating
-                _surv: GameData.AC_ATTACK_SURVIVE,                         // Survivability Rating
-                _ga: GameData.GROUND_ATTACK_TIER_0 + MEDIUM_BONUS,         // Ground Attack Rating
-                _ol: GameData.SMALL_AC_LOAD + SMALL_BONUS,                 // Ordinance Rating
-                _stealth: 0,                                               // Stealth Rating
-                _pr: GameData.PRIMARY_RANGE_DEFAULT,       // Primary Range
-                _ir: GameData.INDIRECT_RANGE_DEFAULT,      // Indirect Range
-                _sr: GameData.AC_SPOTTING_BASIC,           // Spotting Range
-                _mmp: GameData.FIXEDWING_UNIT,             // Max Movement Points
-                _isAmph: false,                            // Is Amphibious
-                _isDF: false,                              // Is DoubleFire
-                _isAtt: true,                              // Can this profile attack
-                _upgradePath: UpgradePath.ATT,             // Upgrade Path
-                _turnAvailable: 384                        // How many months past Jan. 1938
-            );
+            // Phase 3 (final-intent): Attack archetype + DF-2 (no air-to-air) + TS+2 (supersonic, MiG-19 heritage). Crude
+            // light attacker — no precision AG traits, so GA stays at the archetype floor 10, clearly below the A-10/Su-25
+            // trait stack (15). JUDGMENT CALL (flagged). → DF2 MAN4 TS9 SUR10 GA10 OL9.
+            WeaponProfile Q5 = WeaponProfile.FromProfileDef(
+                "Q-5 Fantan Attack Aircraft", "Q-5 Fantan", WeaponType.ATT_Q5,
+                new ProfileDef(FamilyArchetypes.Attack,
+                    new Dictionary<ProfileStat, int> { { ProfileStat.DF, -2 }, { ProfileStat.TS, 2 } },
+                    System.Array.Empty<WeaponTrait>()),
+                UpgradePath.ATT, 384);
 
             // Set the prestige cost for the profile.
             Q5.SetPrestigeCost(PrestigeTierCost.Gen2, PrestigeTypeCost.ATT);
@@ -6814,33 +6617,14 @@ namespace HammerAndSickle.Models
             //----------------------------------------------
             // Chinese H-6 Bomber
             //----------------------------------------------
-            WeaponProfile H6 = new WeaponProfile(
-                _longName: "H-6 Bomber",
-                _shortName: "H-6",
-                _type: WeaponType.BMB_H6,
-                _hardAtt: 0,                                               // Hard Attack Rating
-                _hardDef: 0,                                               // Hard Defense Rating
-                _softAtt: 0,                                               // Soft Attack Rating
-                _softDef: 0,                                               // Soft Defense Rating
-                _gat: 0,                                                   // Ground-to-Air Attack Rating
-                _gad: 0,                                                   // Ground Defense Armor Rating
-                _df: GameData.AC_BOMBER_DOGFIGHT,                          // Dogfighting Rating
-                _man: GameData.AC_BOMBER_MANEUVER,                         // Maneuverability Rating
-                _topSpd: GameData.AC_BOMBER_TOPSPEED,                      // Top Speed Rating
-                _surv: GameData.AC_BOMBER_SURVIVE + MEDIUM_BONUS,          // Survivability Rating
-                _ga: GameData.GROUND_ATTACK_TIER_1,                        // Ground Attack Rating
-                _ol: GameData.XLARGE_AC_LOAD,                              // Ordinance Rating
-                _stealth: 0,                                               // Stealth Rating
-                _pr: GameData.PRIMARY_RANGE_DEFAULT,       // Primary Range
-                _ir: GameData.INDIRECT_RANGE_DEFAULT,      // Indirect Range
-                _sr: GameData.AC_SPOTTING_BASIC,           // Spotting Range
-                _mmp: GameData.FIXEDWING_UNIT,             // Max Movement Points
-                _isAmph: false,                            // Is Amphibious
-                _isDF: false,                              // Is DoubleFire
-                _isAtt: true,                              // Can this profile attack
-                _upgradePath: UpgradePath.BMB,             // Upgrade Path
-                _turnAvailable: 372                        // How many months past Jan. 1938
-            );
+            // Phase 3 (final-intent): Bomber + SUR+2 + CARPET_BOMBING (area anti-soft: GA+1→9, GaVsSoft+3 stored) +
+            // STRATEGIC_PAYLOAD (OL+4→16). The H-6 IS the Tu-16 (licence copy) — same area level-bomber line. → DF1 MAN3 TS10 SUR10 GA9 OL16.
+            WeaponProfile H6 = WeaponProfile.FromProfileDef(
+                "H-6 Bomber", "H-6", WeaponType.BMB_H6,
+                new ProfileDef(FamilyArchetypes.Bomber,
+                    new Dictionary<ProfileStat, int> { { ProfileStat.SUR, 2 } },
+                    new[] { WeaponTrait.CARPET_BOMBING, WeaponTrait.STRATEGIC_PAYLOAD }),
+                UpgradePath.BMB, 372);
 
             // Set the prestige cost for the profile.
             H6.SetPrestigeCost(PrestigeTierCost.Gen1, PrestigeTypeCost.BMB);
@@ -6867,31 +6651,13 @@ namespace HammerAndSickle.Models
             //----------------------------------------------
             // Chinese Regular Infantry
             //----------------------------------------------
-            WeaponProfile INF_REG_CH_P = new WeaponProfile(
-                _longName: "Chinese Regular Infantry",
-                _shortName: "PLA Regulars",
-                _type: WeaponType.INF_REG_CH,
-                _hardAtt: GameData.BASE_INF_HARD_ATTACK,                    // Hard Attack Rating
-                _hardDef: GameData.BASE_INF_HARD_DEFENSE,                   // Hard Defense Rating
-                _softAtt: GameData.BASE_INF_SOFT_ATTACK,                    // Soft Attack Rating
-                _softDef: GameData.BASE_INF_SOFT_DEFENSE,                   // Soft Defense Rating
-                _gat: GameData.GROUND_AIR_ATTACK_DEFAULT,  // Ground-to-Air Attack Rating
-                _gad: GameData.GROUND_DEFENSE_INFANTRY,    // Ground Defense Armor Rating
-                _df: 0,                                    // Dogfighting Rating
-                _man: 0,                                   // Maneuverability Rating
-                _topSpd: 0,                                // Top Speed Rating
-                _surv: 0,                                  // Survivability Rating
-                _ga: 0,                                    // Ground Attack Rating
-                _ol: 0,                                    // Ordinance Rating
-                _stealth: 0,                               // Stealth Rating
-                _pr: GameData.PRIMARY_RANGE_DEFAULT,       // Primary Range
-                _ir: GameData.INDIRECT_RANGE_DEFAULT,      // Indirect Range
-                _sr: GameData.BASE_UNIT_SPOTTING_RANGE,    // Spotting Range
-                _mmp: GameData.FOOT_UNIT,                  // Max Movement Points
-                _isAmph: false,                            // Is Amphibious
-                _isDF: false,                              // Is DoubleFire
-                _isAtt: true                              // Can this profile attack
-            );
+            // Phase 3 (derived): Infantry archetype (GAD 10, R1) + RPG_LAW (HA+1) + MANPADS_BASIC (Strela, GAT floor 6
+            // + EngageAir). PLA line infantry with organic AT + short-range air defence. → HA6 HD7 SA7 SD8 GAD10 · GAT6 · MMP4 · SR2.
+            WeaponProfile INF_REG_CH_P = WeaponProfile.FromProfileDef(
+                "Chinese Regular Infantry", "PLA Regulars", WeaponType.INF_REG_CH,
+                new ProfileDef(FamilyArchetypes.Infantry,
+                    new Dictionary<ProfileStat, int>(),
+                    new[] { WeaponTrait.RPG_LAW, WeaponTrait.MANPADS_BASIC }));
 
             // Intel stats
             INF_REG_CH_P.AddIntelReportStat(WeaponType.Personnel,       2200);
@@ -6917,31 +6683,13 @@ namespace HammerAndSickle.Models
             //----------------------------------------------
             // Chinese Airborne Infantry
             //----------------------------------------------
-            WeaponProfile INF_AB_CH_P = new WeaponProfile(
-                _longName: "Chinese Airborne Infantry",
-                _shortName: "PLA Airborne",
-                _type: WeaponType.INF_AB_CH,
-                _hardAtt: GameData.BASE_INF_HARD_ATTACK,                    // Hard Attack Rating
-                _hardDef: GameData.BASE_INF_HARD_DEFENSE,                   // Hard Defense Rating
-                _softAtt: GameData.BASE_INF_SOFT_ATTACK,                    // Soft Attack Rating
-                _softDef: GameData.BASE_INF_SOFT_DEFENSE,                   // Soft Defense Rating
-                _gat: GameData.GROUND_AIR_ATTACK_DEFAULT,  // Ground-to-Air Attack Rating
-                _gad: GameData.GROUND_DEFENSE_INFANTRY,    // Ground Defense Armor Rating
-                _df: 0,                                    // Dogfighting Rating
-                _man: 0,                                   // Maneuverability Rating
-                _topSpd: 0,                                // Top Speed Rating
-                _surv: 0,                                  // Survivability Rating
-                _ga: 0,                                    // Ground Attack Rating
-                _ol: 0,                                    // Ordinance Rating
-                _stealth: 0,                               // Stealth Rating
-                _pr: GameData.PRIMARY_RANGE_DEFAULT,       // Primary Range
-                _ir: GameData.INDIRECT_RANGE_DEFAULT,      // Indirect Range
-                _sr: GameData.BASE_UNIT_SPOTTING_RANGE,    // Spotting Range
-                _mmp: GameData.FOOT_UNIT,                  // Max Movement Points
-                _isAmph: false,                            // Is Amphibious
-                _isDF: false,                              // Is DoubleFire
-                _isAtt: true                              // Can this profile attack
-            );
+            // Phase 3 (derived): Infantry + RPG_LAW + MANPADS_BASIC + AIR_DROPPABLE (PLA airborne — parachute deploy).
+            // → HA6 HD7 SA7 SD8 GAD10 · GAT6 · MMP4 · SR2 · air-droppable.
+            WeaponProfile INF_AB_CH_P = WeaponProfile.FromProfileDef(
+                "Chinese Airborne Infantry", "PLA Airborne", WeaponType.INF_AB_CH,
+                new ProfileDef(FamilyArchetypes.Infantry,
+                    new Dictionary<ProfileStat, int>(),
+                    new[] { WeaponTrait.RPG_LAW, WeaponTrait.MANPADS_BASIC, WeaponTrait.AIR_DROPPABLE }));
 
             // Intel stats
             INF_AB_CH_P.AddIntelReportStat(WeaponType.Personnel,       1800);

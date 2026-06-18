@@ -227,6 +227,30 @@ namespace HammerAndSickle.Tests
             catch (Exception ex) { AppService.HandleException(CLASS_NAME, nameof(RuleB_CapabilityHooks_AreDormant), ex); throw; }
         }
 
+        [Test]
+        public void RuleB_EffectiveGroundAttack_AddsTargetClassRiders()
+        {
+            try
+            {
+                // HEAVY_AG_CANNON (GA+2, GaVsHard+2) + CARPET_BOMBING (GA+1, GaVsSoft+3) + BUNKER_PENETRATOR (GaVsBase+4).
+                // Base Attack GA 10 → GA 13; riders GaVsHard 2 / GaVsSoft 3 / GaVsBase 4.
+                WeaponProfile p = Strike(WeaponTrait.HEAVY_AG_CANNON, WeaponTrait.CARPET_BOMBING,
+                    WeaponTrait.BUNKER_PENETRATOR);
+                Assert.AreEqual(13, p.GroundAttack, "base GA 13");
+
+                Assert.AreEqual(15, p.EffectiveGroundAttack(TargetClass.Hard, isBase: false), "Hard, non-base = 13+2");
+                Assert.AreEqual(16, p.EffectiveGroundAttack(TargetClass.Soft, isBase: false), "Soft, non-base = 13+3");
+                Assert.AreEqual(19, p.EffectiveGroundAttack(TargetClass.Hard, isBase: true),  "Hard base = 13+2+4");
+                Assert.AreEqual(20, p.EffectiveGroundAttack(TargetClass.Soft, isBase: true),  "Soft base = 13+3+4");
+
+                // No strike traits → effGA is just GA for every target (riders all 0).
+                WeaponProfile bare = Strike();
+                Assert.AreEqual(10, bare.EffectiveGroundAttack(TargetClass.Hard, isBase: false), "bare Hard = GA");
+                Assert.AreEqual(10, bare.EffectiveGroundAttack(TargetClass.Soft, isBase: true),  "bare Soft base = GA");
+            }
+            catch (Exception ex) { AppService.HandleException(CLASS_NAME, nameof(RuleB_EffectiveGroundAttack_AddsTargetClassRiders), ex); throw; }
+        }
+
         #endregion // Rule B air-to-ground strike riders
     }
 }

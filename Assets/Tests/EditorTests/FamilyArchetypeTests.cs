@@ -87,16 +87,16 @@ namespace HammerAndSickle.Tests
         [Test]
         public void Aaa_ResolvesRatifiedLine()
         {
-            // GAT 9, GAD 12, towed = foot (MMP 4).
-            try { AssertGround(Resolve(FamilyArchetypes.Aaa), 4, 4, 9, 6, 12, 4, gat: 9); }
+            // GAT 11 (2026-06-18 GAT rebalance, 7/10 lethality), GAD 12, towed = foot (MMP 4).
+            try { AssertGround(Resolve(FamilyArchetypes.Aaa), 4, 4, 9, 6, 12, 4, gat: 11); }
             catch (Exception ex) { AppService.HandleException(CLASS_NAME, nameof(Aaa_ResolvesRatifiedLine), ex); throw; }
         }
 
         [Test]
         public void Sam_ResolvesRatifiedLine()
         {
-            // Air-only (HA/SA 1, §7A.13), GAT 10, towed = foot (MMP 4).
-            try { AssertGround(Resolve(FamilyArchetypes.Sam), 1, 3, 1, 3, 8, 4, gat: 10); }
+            // Air-only (HA/SA 1, §7A.13), GAT 12 (2026-06-18 GAT rebalance), towed = foot (MMP 4).
+            try { AssertGround(Resolve(FamilyArchetypes.Sam), 1, 3, 1, 3, 8, 4, gat: 12); }
             catch (Exception ex) { AppService.HandleException(CLASS_NAME, nameof(Sam_ResolvesRatifiedLine), ex); throw; }
         }
 

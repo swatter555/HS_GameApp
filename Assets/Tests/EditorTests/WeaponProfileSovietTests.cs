@@ -141,15 +141,15 @@ namespace HammerAndSickle.Tests
         {
             try
             {
-                // ZSU-23-4 SPAAA: Aaa + radar gun → GAT 11, GAD 11, MMP 10.
-                AssertGround(WeaponType.SPAAA_ZSU23_SV, 4, 6, 9, 8, 11, 11);
+                // GAT rebalance (2026-06-18, +2 base): ZSU-23-4 SPAAA: Aaa + radar gun → GAT 13, GAD 11, MMP 10.
+                AssertGround(WeaponType.SPAAA_ZSU23_SV, 4, 6, 9, 8, 11, 13);
 
-                // S-75 site SAM: air-only, GAT 13, static (MMP 0).
-                AssertGround(WeaponType.SAM_S75_SV, 1, 3, 1, 3, 8, 13);
+                // S-75 site SAM: air-only, GAT 15, static (MMP 0).
+                AssertGround(WeaponType.SAM_S75_SV, 1, 3, 1, 3, 8, 15);
                 Assert.AreEqual(0, (int)P(WeaponType.SAM_S75_SV).MaxMovementPoints, "S-75 static MMP 0");
 
-                // S-300: apex GAT 14, truck-mobile (MMP 8 per Bob), SR 10.
-                AssertGround(WeaponType.SAM_S300_SV, 1, 3, 1, 3, 8, 14);
+                // S-300: apex GAT 16, truck-mobile (MMP 8 per Bob), SR 10.
+                AssertGround(WeaponType.SAM_S300_SV, 1, 3, 1, 3, 8, 16);
                 Assert.AreEqual(8,  (int)P(WeaponType.SAM_S300_SV).MaxMovementPoints, "S-300 truck MMP 8");
                 Assert.AreEqual(10, (int)P(WeaponType.SAM_S300_SV).SpottingRange, "S-300 SR 10");
             }
@@ -209,18 +209,47 @@ namespace HammerAndSickle.Tests
         {
             try
             {
-                // Final-intent re-sweep: GA driven by §9b traits, not residuals.
-                // Pure interceptor → Rule-A GA floor 2.
-                Assert.AreEqual(2, (int)P(WeaponType.FGT_MIG31_SV).GroundAttack, "MiG-31 pure interceptor GA 2");
+                // Air-stat enrichment: fighter DF/MAN/TS/SUR now built from traits off the generation archetype
+                // (FighterEarly/Mid/Late), not preservation residuals. Air-to-air missile tiers: BVR_RADAR_MISSILE
+                // (semi-active, DF+2) < ACTIVE_RADAR_AAM (AA-12/AMRAAM, DF+3); HIGH_OFF_BORESIGHT_IR (Archer, DF+1);
+                // LOOKDOWN_SHOOTDOWN = radar-suite ICM ×1.10.
 
-                // MiG-29 Fulcrum: multirole (MULTIROLE_STRIKE) → GA 6; agile air block preserved; W8 base air SR 4.
+                // MiG-31 Foxhound: FighterLate + ACTIVE_RADAR_AAM (DF+3) + LOOKDOWN_SHOOTDOWN (ICM 1.10) + RWR; pure
+                // interceptor → GA floor 2.
+                WeaponProfile mig31 = P(WeaponType.FGT_MIG31_SV);
+                Assert.AreEqual(2,  (int)mig31.GroundAttack, "MiG-31 pure interceptor GA 2");
+                Assert.AreEqual(15, (int)mig31.Dogfighting,  "MiG-31 DF (active-radar AAM)");
+                Assert.AreEqual(1.10f, mig31.ICM, ICM_TOL,   "MiG-31 look-down/shoot-down ICM");
+
+                // MiG-29 Fulcrum: FighterLate + AGILE + Archer (DF+1) + R-27 BVR (DF+2) + RWR/chaff + MULTIROLE; the
+                // N019 radar lagged the West → NO radar-suite ICM. W8 base air SR 4.
                 WeaponProfile mig29 = P(WeaponType.FGT_MIG29_SV);
-                Assert.AreEqual(13, (int)mig29.Dogfighting,    "MiG-29 DF");
-                Assert.AreEqual(16, (int)mig29.Maneuverability,"MiG-29 MAN");
-                Assert.AreEqual(11, (int)mig29.TopSpeed,       "MiG-29 TS");
+                Assert.AreEqual(15, (int)mig29.Dogfighting,    "MiG-29 DF");
+                Assert.AreEqual(14, (int)mig29.Maneuverability,"MiG-29 MAN (AGILE)");
+                Assert.AreEqual(10, (int)mig29.TopSpeed,       "MiG-29 TS (archetype)");
+                Assert.AreEqual(11, (int)mig29.Survivability,  "MiG-29 SUR (RWR+chaff)");
                 Assert.AreEqual(6,  (int)mig29.GroundAttack,   "MiG-29 multirole GA 6");
+                Assert.AreEqual(1.00f, mig29.ICM, ICM_TOL,     "MiG-29 no radar-suite ICM");
                 Assert.AreEqual(4,  (int)mig29.SpottingRange,  "MiG-29 air SR 4 (W8)");
-                Assert.AreEqual(6,  (int)P(WeaponType.FGT_SU27_SV).GroundAttack, "Su-27 multirole GA 6");
+
+                // Su-27 Flanker: apex air-superiority — FighterLate + AGILE + AA-12 (DF+3) + Archer (DF+1) +
+                // look-down ICM + RWR/chaff + MULTIROLE.
+                WeaponProfile su27 = P(WeaponType.FGT_SU27_SV);
+                Assert.AreEqual(16, (int)su27.Dogfighting,     "Su-27 DF (apex A2A)");
+                Assert.AreEqual(14, (int)su27.Maneuverability, "Su-27 MAN");
+                Assert.AreEqual(11, (int)su27.Survivability,   "Su-27 SUR");
+                Assert.AreEqual(1.10f, su27.ICM, ICM_TOL,      "Su-27 radar-suite ICM");
+                Assert.AreEqual(6,  (int)su27.GroundAttack,    "Su-27 multirole GA 6");
+
+                // Su-47 Berkut: experimental super-maneuver singleton — tops the roster on MAN/SUR.
+                WeaponProfile su47 = P(WeaponType.FGT_SU47_SV);
+                Assert.AreEqual(17, (int)su47.Maneuverability, "Su-47 MAN (forward-swept TVC)");
+                Assert.AreEqual(12, (int)su47.Survivability,   "Su-47 SUR (full suite)");
+
+                // MiG-23 radar fighter: semi-active BVR (DF+2) + RWR/chaff (SUR+2).
+                WeaponProfile mig23 = P(WeaponType.FGT_MIG23_SV);
+                Assert.AreEqual(10, (int)mig23.Dogfighting,   "MiG-23 DF (BVR)");
+                Assert.AreEqual(8,  (int)mig23.Survivability, "MiG-23 SUR (RWR+chaff)");
 
                 // MiG-27 Flogger-D: re-homed Attack→FighterEarly + MULTIROLE_STRIKE → GA 6.
                 WeaponProfile mig27 = P(WeaponType.FGT_MIG27_SV);

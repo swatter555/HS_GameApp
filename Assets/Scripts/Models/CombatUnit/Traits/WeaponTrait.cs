@@ -41,8 +41,8 @@ namespace HammerAndSickle.Models
 
         // §9 Fixed-Wing
         RWR, ECM_JAMMER, CHAFF_FLARE, TERRAIN_FOLLOW_RADAR, TARGETING_POD, LASER_GUIDED_MUNITIONS,
-        STEALTH_RAM, HIGH_MACH_DASH, BVR_RADAR_MISSILE, AGILE_AIRFRAME, LOOKDOWN_SHOOTDOWN,
-        AERIAL_REFUEL, ESCAPE_PROFILE, HARDENED_STRIKE,
+        STEALTH_RAM, HIGH_MACH_DASH, BVR_RADAR_MISSILE, ACTIVE_RADAR_AAM, HIGH_OFF_BORESIGHT_IR,
+        AGILE_AIRFRAME, LOOKDOWN_SHOOTDOWN, AERIAL_REFUEL, ESCAPE_PROFILE, HARDENED_STRIKE,
 
         // §9b Air-to-Ground munitions & roles (Rule A/B). Flat GA/OL/SUR/PR deltas are LIVE; the additive
         // strike riders (GaVsHard/Soft/Base, OcSuppression, ParkedHit) are STORED-but-unconsumed; the

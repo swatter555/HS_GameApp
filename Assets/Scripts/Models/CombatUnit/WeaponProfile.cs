@@ -248,6 +248,21 @@ namespace HammerAndSickle.Models
         }
 
         /// <summary>
+        /// Effective ground-attack rating against a specific target (Rule B / Appendix W §3 R10):
+        /// effGA = GA + (target Hard ? GaBonusVsHard : GaBonusVsSoft) + (target is a base ? GaBonusVsBase : 0).
+        /// The target-class riders are summed onto the base GA; GAD never splits (the defender uses its single
+        /// GAD regardless). This is the read side of the §9b GaVsHard/Soft/Base riders — the future air-to-ground
+        /// resolver calls it once it knows the target's class and base-ness (§7.3.7 / §11.6.1.1). It does NOT
+        /// fold in OcSuppressionBonus / ParkedHitBonus (those are separate base/airbase effects, not GA).
+        /// </summary>
+        public int EffectiveGroundAttack(TargetClass targetClass, bool isBase)
+        {
+            int classRider = targetClass == TargetClass.Hard ? GaBonusVsHard : GaBonusVsSoft;
+            int baseRider = isBase ? GaBonusVsBase : 0;
+            return GroundAttack + classRider + baseRider;
+        }
+
+        /// <summary>
         /// Overrides the hard/soft target class set by the constructor's prefix default (§7.4.1.2 —
         /// e.g. armored-car / cavalry-scout recon profiles that fight as Hard targets).
         /// </summary>

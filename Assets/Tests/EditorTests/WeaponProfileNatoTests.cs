@@ -170,18 +170,18 @@ namespace HammerAndSickle.Tests
         {
             try
             {
-                // Guns (Aaa archetype + SELF_PROPELLED). GAT provisional (pending GAT rebalance).
-                AssertGround(WeaponType.SPAAA_M163_US, 4, 6, 9, 8, 11, 9);   // optical Vulcan (= ZSU-57-2)
-                AssertGround(WeaponType.SPSAM_GEPARD_GE, 4, 6, 9, 8, 11, 11); // radar 35mm (= ZSU-23-4); SPSAM-classified gun
-                AssertGround(WeaponType.SPAAA_ROLAND_FR, 4, 6, 9, 8, 11, 11); // SPAAA-classified missile (AAA stat line)
+                // Guns (Aaa archetype + SELF_PROPELLED). GAT +2 in the 2026-06-18 rebalance (7/10 lethality).
+                AssertGround(WeaponType.SPAAA_M163_US, 4, 6, 9, 8, 11, 11);   // optical Vulcan (= ZSU-57-2)
+                AssertGround(WeaponType.SPSAM_GEPARD_GE, 4, 6, 9, 8, 11, 13); // radar 35mm (= ZSU-23-4); SPSAM-classified gun
+                AssertGround(WeaponType.SPAAA_ROLAND_FR, 4, 6, 9, 8, 11, 13); // SPAAA-classified missile (AAA stat line)
 
                 // SP SAMs (Sam archetype + SELF_PROPELLED), air-only HA/SA 1.
-                AssertGround(WeaponType.SPSAM_CHAP_US, 1, 5, 1, 5, 7, 11);    // IR fire-and-forget
-                AssertGround(WeaponType.SPSAM_CROTALE_FR, 1, 5, 1, 5, 7, 12); // command
-                AssertGround(WeaponType.SPSAM_RAPIER_UK, 1, 5, 1, 5, 7, 12);  // SACLOS
+                AssertGround(WeaponType.SPSAM_CHAP_US, 1, 5, 1, 5, 7, 13);    // IR fire-and-forget
+                AssertGround(WeaponType.SPSAM_CROTALE_FR, 1, 5, 1, 5, 7, 14); // command
+                AssertGround(WeaponType.SPSAM_RAPIER_UK, 1, 5, 1, 5, 7, 14);  // SACLOS
 
                 // Hawk: static medium SARH SAM (= NATO S-75), MMP 0.
-                AssertGround(WeaponType.SAM_HAWK_US, 1, 3, 1, 3, 8, 13);
+                AssertGround(WeaponType.SAM_HAWK_US, 1, 3, 1, 3, 8, 15);
                 Assert.AreEqual(0, (int)P(WeaponType.SAM_HAWK_US).MaxMovementPoints, "Hawk static MMP 0");
                 Assert.AreEqual(10, (int)P(WeaponType.SPSAM_CHAP_US).MaxMovementPoints, "Chaparral SP MMP 10");
             }
@@ -272,15 +272,24 @@ namespace HammerAndSickle.Tests
         {
             try
             {
-                // Pure air-superiority fighters → Rule-A GA floor 2 (DF/MAN/TS/SUR preserved via residuals).
-                AssertAir(WeaponType.FGT_F15_US, 16, 14, 12, 11, 2);
+                // Air-stat enrichment: fighter DF/MAN/SUR rebuilt from traits. NATO edge = BVR + radar-suite ICM
+                // (ACTIVE_RADAR_AAM / LOOKDOWN_SHOOTDOWN), vs the Soviet close-in Archer (HOBS).
+                // F-15: FighterLate + AMRAAM (DF+3) + AGILE + APG-63 look-down ICM + full defensive suite.
+                AssertAir(WeaponType.FGT_F15_US, 15, 14, 12, 12, 2);
                 Assert.AreEqual(6, (int)P(WeaponType.FGT_F15_US).OrdinanceLoad, "F-15 OL 6");
                 Assert.AreEqual(4, (int)P(WeaponType.FGT_F15_US).SpottingRange, "F-15 SR 4");
-                AssertAir(WeaponType.FGT_F4_US, 10, 9, 12, 8, 2);
-                AssertAir(WeaponType.FGT_F14_US, 14, 13, 12, 9, 2);
+                Assert.AreEqual(1.10f, P(WeaponType.FGT_F15_US).ICM, 0.01f, "F-15 look-down ICM");
 
-                // F-16 multirole: MULTIROLE_STRIKE (+4) + AT_GUIDED_AIR (+3) → GA9; GaVsHard 1 stored.
-                AssertAir(WeaponType.FGT_F16_US, 14, 15, 11, 8, 9);
+                // F-4: semi-active BVR (Sparrow), no radar ICM.
+                AssertAir(WeaponType.FGT_F4_US, 10, 9, 12, 8, 2);
+
+                // F-14: AIM-54 Phoenix (ACTIVE_RADAR_AAM, DF+3) + AWG-9 look-down ICM — the BVR sniper.
+                AssertAir(WeaponType.FGT_F14_US, 15, 12, 12, 12, 2);
+                Assert.AreEqual(1.10f, P(WeaponType.FGT_F14_US).ICM, 0.01f, "F-14 look-down ICM");
+
+                // F-16 multirole: AGILE + BVR + APG-66 look-down ICM + MULTIROLE_STRIKE (+4) + AT_GUIDED_AIR (+3) → GA9.
+                AssertAir(WeaponType.FGT_F16_US, 12, 13, 11, 9, 9);
+                Assert.AreEqual(1.10f, P(WeaponType.FGT_F16_US).ICM, 0.01f, "F-16 look-down ICM");
                 Assert.AreEqual(1, P(WeaponType.FGT_F16_US).GaBonusVsHard, "F-16 GaVsHard 1 (Maverick)");
 
                 // A-10: apex CAS — HEAVY_AG_CANNON + AT_GUIDED_AIR → GA15, GaVsHard 3; SUR15/OL11 preserved.
@@ -334,11 +343,12 @@ namespace HammerAndSickle.Tests
                 // F-4F: pure interceptor, GA floor 2 (= US F-4).
                 AssertAir(WeaponType.FGT_F4_GE, 10, 9, 12, 8, 2);
 
-                // Mirage 2000: most agile NATO fighter here; multirole strike GA8.
-                AssertAir(WeaponType.FGT_MIRAGE2000_FR, 14, 15, 12, 7, 8);
+                // Mirage 2000: agile delta — AGILE + BVR + RDI look-down ICM + MULTIROLE + LGB → GA8.
+                AssertAir(WeaponType.FGT_MIRAGE2000_FR, 12, 13, 12, 9, 8);
+                Assert.AreEqual(1.10f, P(WeaponType.FGT_MIRAGE2000_FR).ICM, 0.01f, "Mirage 2000 look-down ICM");
 
-                // Mirage F1: older, lighter striker GA6.
-                AssertAir(WeaponType.FGT_MIRAGEF1_FR, 11, 10, 11, 8, 6);
+                // Mirage F1: older, lighter striker — BVR but no radar ICM (Cyrano set) → GA6.
+                AssertAir(WeaponType.FGT_MIRAGEF1_FR, 10, 10, 11, 8, 6);
 
                 // Jaguar: low-level attack — GA8, OL9, runway cratering.
                 AssertAir(WeaponType.ATT_JAGUAR_FR, 8, 9, 9, 9, 8);
