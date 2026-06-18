@@ -275,8 +275,9 @@ namespace HammerAndSickle.Models
             Add(new TraitDef(WeaponTrait.STRATEGIC_PAYLOAD, TraitCategory.FixedWing,
                 "Maximum tonnage (Tu-22 / Tu-95 / B-52) → OL XLarge.", Delta(ProfileStat.OL, 4)));
             Add(new TraitDef(WeaponTrait.STANDOFF_CRUISE_MISSILE, TraitCategory.FixedWing,
-                "Kh-22 cruise missile — strike ignores target GAD (DORMANT → avoid-GAD hook). Tu-22/Tu-22M3 only.",
-                Cap(WeaponCapability.IgnoreAirDefense, EffectStatus.Dormant)));
+                "Kh-22 heavy supersonic cruise missile — massive warhead (GA+3, LIVE) on a strike that also ignores " +
+                "target GAD (avoid-GAD capability DORMANT → hook). Tu-22/Tu-22M3 only.",
+                Delta(ProfileStat.GA, 3), Cap(WeaponCapability.IgnoreAirDefense, EffectStatus.Dormant)));
             Add(new TraitDef(WeaponTrait.HIGH_ALTITUDE_BOMBER, TraitCategory.FixedWing,
                 "High-level bombing — SUR+2 vs gun-AAA/MANPADS, malus vs radar SAM; conditional, DORMANT → altitude/AD layer.",
                 Delta(ProfileStat.SUR, 2, EffectStatus.Dormant)));

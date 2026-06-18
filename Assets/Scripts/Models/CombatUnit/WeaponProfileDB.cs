@@ -2081,12 +2081,12 @@ namespace HammerAndSickle.Models
             //----------------------------------------------
             // Soviet MiG-23 Flogger Air Superiority Fighter
             //----------------------------------------------
-            // Phase 3 (derived): FighterEarly + DF+3/TS+1/SUR+2 (radar-armed Flogger) + GA tier-0 + small load.
-            // → DF11 MAN9 TS11 SUR8 · GA6 OL6 · MMP100 · SR4.
+            // Phase 3 (final-intent): FighterEarly + DF+3/TS+1/SUR+2 (radar-armed Flogger). Pure air-superiority
+            // → GA Rule-A floor 2. → DF11 MAN9 TS11 SUR8 · GA2 OL6 · MMP100 · SR4.
             WeaponProfile MIG23 = WeaponProfile.FromProfileDef(
                 "MiG-23 Flogger Air Superiority Fighter", "MiG-23 Flogger", WeaponType.FGT_MIG23_SV,
                 new ProfileDef(FamilyArchetypes.FighterEarly,
-                    new Dictionary<ProfileStat, int> { { ProfileStat.DF, 3 }, { ProfileStat.TS, 1 }, { ProfileStat.SUR, 2 }, { ProfileStat.GA, 4 } },
+                    new Dictionary<ProfileStat, int> { { ProfileStat.DF, 3 }, { ProfileStat.TS, 1 }, { ProfileStat.SUR, 2 } },
                     System.Array.Empty<WeaponTrait>()),
                 UpgradePath.FGT, 384);
 
@@ -2111,13 +2111,12 @@ namespace HammerAndSickle.Models
             //----------------------------------------------
             // Soviet MiG-25 Foxbat Interceptor
             //----------------------------------------------
-            // Phase 3 (derived): FighterEarly + TS+7 (Mach-3 dash, AC_HIGHSPEED_RUSSIAN) + GA tier-0 + small load
-            // + HIGH_MACH_DASH (note marker). High-speed interceptor, poor turner.
-            // → DF8 MAN9 TS17 SUR6 · GA6 OL6 · MMP100 · SR4.
+            // Phase 3 (final-intent): FighterEarly + TS+7 (Mach-3 dash, AC_HIGHSPEED_RUSSIAN) + HIGH_MACH_DASH.
+            // Pure high-speed interceptor → GA Rule-A floor 2. → DF8 MAN9 TS17 SUR6 · GA2 OL6 · MMP100 · SR4.
             WeaponProfile MIG25 = WeaponProfile.FromProfileDef(
                 "MiG-25 Foxbat Interceptor", "MiG-25 Foxbat", WeaponType.FGT_MIG25_SV,
                 new ProfileDef(FamilyArchetypes.FighterEarly,
-                    new Dictionary<ProfileStat, int> { { ProfileStat.TS, 7 }, { ProfileStat.GA, 4 } },
+                    new Dictionary<ProfileStat, int> { { ProfileStat.TS, 7 } },
                     new[] { WeaponTrait.HIGH_MACH_DASH }),
                 UpgradePath.FGT, 384);
 
@@ -2142,14 +2141,14 @@ namespace HammerAndSickle.Models
             //----------------------------------------------
             // Soviet MiG-29 Fulcrum Air Superiority Fighter
             //----------------------------------------------
-            // Phase 3 (derived): FighterMid + DF+3/MAN+5/TS+1 (agile Fulcrum) + GA tier-1 + small load.
-            // (AGILE_AIRFRAME folds the MAN edge in the later air-trait pass.)
-            // → DF13 MAN16 TS11 SUR7 · GA9 OL6 · MMP100 · SR4.
+            // Phase 3 (final-intent): FighterMid + DF+3/MAN+5/TS+1 (agile Fulcrum) + MULTIROLE_STRIKE (dual-role
+            // Fulcrum-A/S: GA+4 → 6). (AGILE_AIRFRAME folds the MAN edge in the later air-trait pass.)
+            // → DF13 MAN16 TS11 SUR7 · GA6 OL6 · MMP100 · SR4.
             WeaponProfile MIG29 = WeaponProfile.FromProfileDef(
                 "MiG-29 Fulcrum Air Superiority Fighter", "MiG-29 Fulcrum", WeaponType.FGT_MIG29_SV,
                 new ProfileDef(FamilyArchetypes.FighterMid,
-                    new Dictionary<ProfileStat, int> { { ProfileStat.DF, 3 }, { ProfileStat.MAN, 5 }, { ProfileStat.TS, 1 }, { ProfileStat.GA, 7 } },
-                    System.Array.Empty<WeaponTrait>()),
+                    new Dictionary<ProfileStat, int> { { ProfileStat.DF, 3 }, { ProfileStat.MAN, 5 }, { ProfileStat.TS, 1 } },
+                    new[] { WeaponTrait.MULTIROLE_STRIKE }),
                 UpgradePath.FGT, 540);
 
             // Set the prestige cost for the profile.
@@ -2173,13 +2172,13 @@ namespace HammerAndSickle.Models
             //----------------------------------------------
             // Soviet MiG-31 Foxhound Interceptor
             //----------------------------------------------
-            // Phase 3 (derived): FighterMid + DF+3/TS+7 (Mach-2.8 long-range interceptor) + GA tier-1−3 + small load
-            // + HIGH_MACH_DASH. (BVR_RADAR_MISSILE folds the long reach in the later air pass.)
-            // → DF13 MAN11 TS17 SUR7 · GA6 OL6 · MMP100 · SR4.
+            // Phase 3 (final-intent): FighterMid + DF+3/TS+7 (Mach-2.8 long-range interceptor) + HIGH_MACH_DASH.
+            // Pure interceptor → GA Rule-A floor 2. (BVR_RADAR_MISSILE long reach folds in the later air pass.)
+            // → DF13 MAN11 TS17 SUR7 · GA2 OL6 · MMP100 · SR4.
             WeaponProfile MIG31 = WeaponProfile.FromProfileDef(
                 "MiG-31 Foxhound Interceptor", "MiG-31 Foxhound", WeaponType.FGT_MIG31_SV,
                 new ProfileDef(FamilyArchetypes.FighterMid,
-                    new Dictionary<ProfileStat, int> { { ProfileStat.DF, 3 }, { ProfileStat.TS, 7 }, { ProfileStat.GA, 4 } },
+                    new Dictionary<ProfileStat, int> { { ProfileStat.DF, 3 }, { ProfileStat.TS, 7 } },
                     new[] { WeaponTrait.HIGH_MACH_DASH }),
                 UpgradePath.FGT, 516);
 
@@ -2204,14 +2203,14 @@ namespace HammerAndSickle.Models
             //----------------------------------------------
             // Soviet Su-27 Flanker Air Superiority Fighter
             //----------------------------------------------
-            // Phase 3 (derived): FighterMid + DF+5/MAN+2/TS+2/SUR+2 (apex Flanker) + GA tier-1 + small load.
-            // (AGILE_AIRFRAME + BVR fold in the later air pass.)
-            // → DF15 MAN13 TS12 SUR9 · GA9 OL6 · MMP100 · SR4.
+            // Phase 3 (final-intent): FighterMid + DF+5/MAN+2/TS+2/SUR+2 (apex Flanker) + MULTIROLE_STRIKE
+            // (multirole Flanker: GA+4 → 6). (AGILE_AIRFRAME + BVR fold in the later air pass.)
+            // → DF15 MAN13 TS12 SUR9 · GA6 OL6 · MMP100 · SR4.
             WeaponProfile SU27 = WeaponProfile.FromProfileDef(
                 "Su-27 Flanker Air Superiority Fighter", "Su-27 Flanker", WeaponType.FGT_SU27_SV,
                 new ProfileDef(FamilyArchetypes.FighterMid,
-                    new Dictionary<ProfileStat, int> { { ProfileStat.DF, 5 }, { ProfileStat.MAN, 2 }, { ProfileStat.TS, 2 }, { ProfileStat.SUR, 2 }, { ProfileStat.GA, 7 } },
-                    System.Array.Empty<WeaponTrait>()),
+                    new Dictionary<ProfileStat, int> { { ProfileStat.DF, 5 }, { ProfileStat.MAN, 2 }, { ProfileStat.TS, 2 }, { ProfileStat.SUR, 2 } },
+                    new[] { WeaponTrait.MULTIROLE_STRIKE }),
                 UpgradePath.FGT, 564);
 
             // Set the prestige cost for the profile.
@@ -2235,14 +2234,14 @@ namespace HammerAndSickle.Models
             //----------------------------------------------
             // Soviet Su-47 Berkut Experimental Fighter
             //----------------------------------------------
-            // Phase 3 (derived): FighterLate + DF+6/MAN+5 (experimental super-maneuverable forward-swept) + GA tier-2
-            // + small load. The what-if apex air-superiority airframe.
-            // → DF18 MAN17 TS10 SUR9 · GA12 OL6 · MMP100 · SR4.
+            // Phase 3 (final-intent): FighterLate + DF+6/MAN+5 (experimental super-maneuverable forward-swept) +
+            // MULTIROLE_STRIKE (multirole apex airframe: GA+4 → 6). The what-if super-fighter.
+            // → DF18 MAN17 TS10 SUR9 · GA6 OL6 · MMP100 · SR4.
             WeaponProfile SU47 = WeaponProfile.FromProfileDef(
                 "Su-47 Berkut Experimental Fighter", "Su-47 Berkut", WeaponType.FGT_SU47_SV,
                 new ProfileDef(FamilyArchetypes.FighterLate,
-                    new Dictionary<ProfileStat, int> { { ProfileStat.DF, 6 }, { ProfileStat.MAN, 5 }, { ProfileStat.GA, 10 } },
-                    System.Array.Empty<WeaponTrait>()),
+                    new Dictionary<ProfileStat, int> { { ProfileStat.DF, 6 }, { ProfileStat.MAN, 5 } },
+                    new[] { WeaponTrait.MULTIROLE_STRIKE }),
                 UpgradePath.FGT, 708);
 
             // Set the prestige cost for the profile.
@@ -2266,13 +2265,14 @@ namespace HammerAndSickle.Models
             //----------------------------------------------
             // Soviet MiG-27 Flogger-D Multi-Role Fighter
             //----------------------------------------------
-            // Phase 3 (derived): Attack archetype + DF+3/MAN+2/TS+2/SUR+1 (fighter-bomber Flogger-D) + GA 10 + medium load.
-            // → DF7 MAN6 TS9 SUR11 · GA10 OL9 · MMP100 · SR4.
+            // Phase 3 (final-intent): re-homed from the Attack archetype to FighterEarly + SUR+2 (rugged Flogger-D)
+            // + MULTIROLE_STRIKE (the §9b dual-role lever off the fighter floor: GA+4 → 6). Dumb-bomb fighter-bomber,
+            // deliberately below the precision-PGM F-16 (GA9). → DF8 MAN9 TS10 SUR8 · GA6 OL6 · MMP100 · SR4.
             WeaponProfile MIG27 = WeaponProfile.FromProfileDef(
                 "MiG-27 Flogger-D Multi-Role Fighter", "MiG-27 Flogger-D", WeaponType.FGT_MIG27_SV,
-                new ProfileDef(FamilyArchetypes.Attack,
-                    new Dictionary<ProfileStat, int> { { ProfileStat.DF, 3 }, { ProfileStat.MAN, 2 }, { ProfileStat.TS, 2 }, { ProfileStat.SUR, 1 } },
-                    System.Array.Empty<WeaponTrait>()),
+                new ProfileDef(FamilyArchetypes.FighterEarly,
+                    new Dictionary<ProfileStat, int> { { ProfileStat.SUR, 2 } },
+                    new[] { WeaponTrait.MULTIROLE_STRIKE }),
                 UpgradePath.ATT, 444);
 
             // Set the prestige cost for the profile.
@@ -2296,13 +2296,14 @@ namespace HammerAndSickle.Models
             //----------------------------------------------
             // Soviet Su-17 Fitter Attack Aircraft
             //----------------------------------------------
-            // Phase 3 (derived): Attack archetype + TS+1 + GA tier-1 + medium load. Swing-wing fighter-bomber.
-            // → DF4 MAN4 TS8 SUR10 · GA9 OL9 · MMP100 · SR4.
+            // Phase 3 (final-intent): re-homed from the Attack archetype to FighterEarly + SUR+1 + MULTIROLE_STRIKE
+            // (§9b dual-role lever: GA+4 → 6). Swing-wing fighter-bomber, dumb-bomb striker.
+            // → DF8 MAN9 TS10 SUR7 · GA6 OL6 · MMP100 · SR4.
             WeaponProfile SU17 = WeaponProfile.FromProfileDef(
                 "Su-17 Fitter Attack Aircraft", "Su-17 Fitter", WeaponType.ATT_SU17_SV,
-                new ProfileDef(FamilyArchetypes.Attack,
-                    new Dictionary<ProfileStat, int> { { ProfileStat.TS, 1 }, { ProfileStat.GA, -1 } },
-                    System.Array.Empty<WeaponTrait>()),
+                new ProfileDef(FamilyArchetypes.FighterEarly,
+                    new Dictionary<ProfileStat, int> { { ProfileStat.SUR, 1 } },
+                    new[] { WeaponTrait.MULTIROLE_STRIKE }),
                 UpgradePath.ATT, 384);
 
             // Set the prestige cost for the profile.
@@ -2326,14 +2327,14 @@ namespace HammerAndSickle.Models
             //----------------------------------------------
             // Soviet Su-25 Frogfoot Attack Aircraft
             //----------------------------------------------
-            // Phase 3 (derived): Attack archetype + DF-2 (no air-to-air) + SUR+2 (armoured CAS) + GA tier-2 + medium load.
-            // The Frogfoot — durable close-support.
-            // → DF2 MAN4 TS7 SUR12 · GA12 OL9 · MMP100 · SR4.
+            // Phase 3 (final-intent): Attack + DF-2 (no air-to-air) + HEAVY_AG_CANNON (GSh-30: GA+2, GaVsHard+2) +
+            // AT_GUIDED_AIR (Vikhr/Kh-25: GA+3, GaVsHard+1) + CAS_ARMORED (SUR+2) + LOITER_PERSISTENCE. The Soviet
+            // A-10 — GA15, GaVsHard 3 stored. → DF2 MAN4 TS7 SUR12 · GA15 OL9 · MMP100 · SR4 · GaVsHard 3.
             WeaponProfile SU25 = WeaponProfile.FromProfileDef(
                 "Su-25 Frogfoot Attack Aircraft", "Su-25 Frogfoot", WeaponType.ATT_SU25_SV,
                 new ProfileDef(FamilyArchetypes.Attack,
-                    new Dictionary<ProfileStat, int> { { ProfileStat.DF, -2 }, { ProfileStat.SUR, 2 }, { ProfileStat.GA, 2 } },
-                    System.Array.Empty<WeaponTrait>()),
+                    new Dictionary<ProfileStat, int> { { ProfileStat.DF, -2 } },
+                    new[] { WeaponTrait.HEAVY_AG_CANNON, WeaponTrait.AT_GUIDED_AIR, WeaponTrait.CAS_ARMORED, WeaponTrait.LOITER_PERSISTENCE }),
                 UpgradePath.ATT, 516);
 
             // Set the prestige cost for the profile.
@@ -2357,13 +2358,14 @@ namespace HammerAndSickle.Models
             //----------------------------------------------
             // Soviet Su-25B Frogfoot-B Attack Aircraft
             //----------------------------------------------
-            // Phase 3 (derived): Attack archetype + SUR+5 (heavily-armoured upgrade) + GA tier-3 (apex CAS) + OL 10.
-            // → DF4 MAN4 TS7 SUR15 · GA15 OL10 · MMP100 · SR4.
+            // Phase 3 (final-intent): Attack + SUR+3/OL+1 (heavily-armoured upgrade) + HEAVY_AG_CANNON + AT_GUIDED_AIR
+            // + CAS_ARMORED (SUR+2) + LOITER_PERSISTENCE. Apex Soviet CAS — GA15, max armour SUR15, GaVsHard 3.
+            // → DF4 MAN4 TS7 SUR15 · GA15 OL10 · MMP100 · SR4 · GaVsHard 3.
             WeaponProfile SU25B = WeaponProfile.FromProfileDef(
                 "Su-25B Frogfoot-B Attack Aircraft", "Su-25B Frogfoot-B", WeaponType.ATT_SU25B_SV,
                 new ProfileDef(FamilyArchetypes.Attack,
-                    new Dictionary<ProfileStat, int> { { ProfileStat.SUR, 5 }, { ProfileStat.GA, 5 }, { ProfileStat.OL, 1 } },
-                    System.Array.Empty<WeaponTrait>()),
+                    new Dictionary<ProfileStat, int> { { ProfileStat.SUR, 3 }, { ProfileStat.OL, 1 } },
+                    new[] { WeaponTrait.HEAVY_AG_CANNON, WeaponTrait.AT_GUIDED_AIR, WeaponTrait.CAS_ARMORED, WeaponTrait.LOITER_PERSISTENCE }),
                 UpgradePath.ATT, 588);
 
             // Set the prestige cost for the profile.
@@ -2387,13 +2389,14 @@ namespace HammerAndSickle.Models
             //----------------------------------------------
             // Soviet Su-24 Fencer Bomber
             //----------------------------------------------
-            // Phase 3 (derived): Bomber archetype + DF+5/MAN+3/TS+4 (fast low-level strike Fencer) + GA tier-2 + large load.
-            // → DF6 MAN6 TS14 SUR8 · GA12 OL12 · MMP100 · SR4.
+            // Phase 3 (final-intent): Bomber + DF+5/MAN+3/TS+4 (fast low-level Fencer) + HARDENED_STRIKE (GA+3, OL+2)
+            // + LASER_GUIDED_MUNITIONS (Kh-29L: GA+2) + BUNKER_PENETRATOR (GaVsBase+4 stored) + TERRAIN_FOLLOW_RADAR.
+            // The Soviet F-111 — GA13. → DF6 MAN6 TS14 SUR8 · GA13 OL14 · MMP100 · SR4 · GaVsBase 4.
             WeaponProfile SU24 = WeaponProfile.FromProfileDef(
                 "Su-24 Fencer Bomber", "Su-24 Fencer", WeaponType.BMB_SU24_SV,
                 new ProfileDef(FamilyArchetypes.Bomber,
-                    new Dictionary<ProfileStat, int> { { ProfileStat.DF, 5 }, { ProfileStat.MAN, 3 }, { ProfileStat.TS, 4 }, { ProfileStat.GA, 4 } },
-                    System.Array.Empty<WeaponTrait>()),
+                    new Dictionary<ProfileStat, int> { { ProfileStat.DF, 5 }, { ProfileStat.MAN, 3 }, { ProfileStat.TS, 4 } },
+                    new[] { WeaponTrait.HARDENED_STRIKE, WeaponTrait.LASER_GUIDED_MUNITIONS, WeaponTrait.BUNKER_PENETRATOR, WeaponTrait.TERRAIN_FOLLOW_RADAR }),
                 UpgradePath.ATT, 432);
 
             // Set the prestige cost for the profile.
@@ -2417,13 +2420,14 @@ namespace HammerAndSickle.Models
             //----------------------------------------------
             // Soviet Tu-16 Badger Bomber
             //----------------------------------------------
-            // Phase 3 (derived): Bomber archetype + SUR+2 + GA tier-1 + XL load. Old heavy-lift level bomber.
-            // → DF1 MAN3 TS10 SUR10 · GA9 OL16 · MMP100 · SR4.
+            // Phase 3 (final-intent): Bomber + SUR+2 + CARPET_BOMBING (area anti-soft: GA+1 → 9, GaVsSoft+3 stored)
+            // + STRATEGIC_PAYLOAD (OL+4 → 16). Old heavy-lift level bomber — area saturation, not precision.
+            // → DF1 MAN3 TS10 SUR10 · GA9 OL16 · MMP100 · SR4 · GaVsSoft 3.
             WeaponProfile TU16 = WeaponProfile.FromProfileDef(
                 "Tu-16 Badger Bomber", "Tu-16 Badger", WeaponType.BMB_TU16_SV,
                 new ProfileDef(FamilyArchetypes.Bomber,
-                    new Dictionary<ProfileStat, int> { { ProfileStat.SUR, 2 }, { ProfileStat.GA, 1 }, { ProfileStat.OL, 4 } },
-                    System.Array.Empty<WeaponTrait>()),
+                    new Dictionary<ProfileStat, int> { { ProfileStat.SUR, 2 } },
+                    new[] { WeaponTrait.CARPET_BOMBING, WeaponTrait.STRATEGIC_PAYLOAD }),
                 UpgradePath.BMB, 192);
 
             // Set the prestige cost for the profile.
@@ -2447,13 +2451,14 @@ namespace HammerAndSickle.Models
             //----------------------------------------------
             // Soviet Tu-22 Blinder Bomber
             //----------------------------------------------
-            // Phase 3 (derived): Bomber archetype + TS+4 (supersonic Blinder) + GA 13 + OL 11 + HIGH_MACH_DASH.
-            // → DF1 MAN3 TS14 SUR8 · GA13 OL11 · MMP100 · SR4.
+            // Phase 3 (final-intent): Bomber + TS+4 (supersonic Blinder) + HIGH_MACH_DASH + CARPET_BOMBING (GA+1,
+            // GaVsSoft+3 stored) + STANDOFF_CRUISE_MISSILE (Kh-22 — GA+3 heavy warhead, strike ignores GAD; avoid-GAD
+            // hook dormant). Area/standoff bomber. → DF1 MAN3 TS14 SUR8 · GA12 OL12 · MMP100 · SR4 · GaVsSoft 3 · avoid-GAD.
             WeaponProfile TU22 = WeaponProfile.FromProfileDef(
                 "Tu-22 Blinder Bomber", "Tu-22 Blinder", WeaponType.BMB_TU22_SV,
                 new ProfileDef(FamilyArchetypes.Bomber,
-                    new Dictionary<ProfileStat, int> { { ProfileStat.TS, 4 }, { ProfileStat.GA, 5 }, { ProfileStat.OL, -1 } },
-                    new[] { WeaponTrait.HIGH_MACH_DASH }),
+                    new Dictionary<ProfileStat, int> { { ProfileStat.TS, 4 } },
+                    new[] { WeaponTrait.HIGH_MACH_DASH, WeaponTrait.CARPET_BOMBING, WeaponTrait.STANDOFF_CRUISE_MISSILE }),
                 UpgradePath.BMB, 288);
 
             // Set the prestige cost for the profile.
@@ -2477,14 +2482,15 @@ namespace HammerAndSickle.Models
             //----------------------------------------------
             // Soviet Tu-22M3 Backfire-C Strategic Bomber
             //----------------------------------------------
-            // Phase 3 (derived): Bomber archetype + TS+6 (Mach-1.8 Backfire) + GA tier-3 + OL 15 + HIGH_MACH_DASH.
-            // Apex Soviet strategic strike bomber.
-            // → DF1 MAN3 TS16 SUR8 · GA15 OL15 · MMP100 · SR4.
+            // Phase 3 (final-intent): Bomber + TS+6 (Mach-1.8 Backfire) + HIGH_MACH_DASH + CARPET_BOMBING (GA+1,
+            // GaVsSoft+3) + STRATEGIC_PAYLOAD (OL+4 → 16) + STANDOFF_CRUISE_MISSILE (Kh-22: GA+3 heavy warhead,
+            // avoid-GAD dormant) + BUNKER_PENETRATOR (GaVsBase+4). Apex strategic bomber — heavy GA plus riders + payload.
+            // → DF1 MAN3 TS16 SUR8 · GA12 OL16 · MMP100 · SR4 · GaVsSoft 3 · GaVsBase 4 · avoid-GAD.
             WeaponProfile TU22M3 = WeaponProfile.FromProfileDef(
                 "Tu-22M3 Backfire-C Strategic Bomber", "Tu-22M3 Backfire", WeaponType.BMB_TU22M3_SV,
                 new ProfileDef(FamilyArchetypes.Bomber,
-                    new Dictionary<ProfileStat, int> { { ProfileStat.TS, 6 }, { ProfileStat.GA, 7 }, { ProfileStat.OL, 3 } },
-                    new[] { WeaponTrait.HIGH_MACH_DASH }),
+                    new Dictionary<ProfileStat, int> { { ProfileStat.TS, 6 } },
+                    new[] { WeaponTrait.HIGH_MACH_DASH, WeaponTrait.CARPET_BOMBING, WeaponTrait.STRATEGIC_PAYLOAD, WeaponTrait.STANDOFF_CRUISE_MISSILE, WeaponTrait.BUNKER_PENETRATOR }),
                 UpgradePath.BMB, 480);
 
             // Set the prestige cost for the profile.

@@ -209,23 +209,59 @@ namespace HammerAndSickle.Tests
         {
             try
             {
-                // MiG-29 Fulcrum: FighterMid + agile deltas; W8 base air SR 4.
+                // Final-intent re-sweep: GA driven by §9b traits, not residuals.
+                // Pure interceptor → Rule-A GA floor 2.
+                Assert.AreEqual(2, (int)P(WeaponType.FGT_MIG31_SV).GroundAttack, "MiG-31 pure interceptor GA 2");
+
+                // MiG-29 Fulcrum: multirole (MULTIROLE_STRIKE) → GA 6; agile air block preserved; W8 base air SR 4.
                 WeaponProfile mig29 = P(WeaponType.FGT_MIG29_SV);
                 Assert.AreEqual(13, (int)mig29.Dogfighting,    "MiG-29 DF");
                 Assert.AreEqual(16, (int)mig29.Maneuverability,"MiG-29 MAN");
                 Assert.AreEqual(11, (int)mig29.TopSpeed,       "MiG-29 TS");
+                Assert.AreEqual(6,  (int)mig29.GroundAttack,   "MiG-29 multirole GA 6");
                 Assert.AreEqual(4,  (int)mig29.SpottingRange,  "MiG-29 air SR 4 (W8)");
+                Assert.AreEqual(6,  (int)P(WeaponType.FGT_SU27_SV).GroundAttack, "Su-27 multirole GA 6");
 
-                // Su-25B: apex CAS — heavy survivability + GA tier-3.
+                // MiG-27 Flogger-D: re-homed Attack→FighterEarly + MULTIROLE_STRIKE → GA 6.
+                WeaponProfile mig27 = P(WeaponType.FGT_MIG27_SV);
+                Assert.AreEqual(8, (int)mig27.Dogfighting,  "MiG-27 fighter-base DF 8");
+                Assert.AreEqual(6, (int)mig27.GroundAttack, "MiG-27 multirole GA 6");
+
+                // Su-25 Frogfoot: Soviet A-10 — HEAVY_AG_CANNON + AT_GUIDED_AIR → GA 15, GaVsHard 3 stored.
+                WeaponProfile su25 = P(WeaponType.ATT_SU25_SV);
+                Assert.AreEqual(15, (int)su25.GroundAttack, "Su-25 GA 15");
+                Assert.AreEqual(3,  su25.GaBonusVsHard,     "Su-25 GaVsHard 3");
+
+                // Su-25B: apex CAS — heavy survivability, GA 15, GaVsHard 3.
                 WeaponProfile su25b = P(WeaponType.ATT_SU25B_SV);
                 Assert.AreEqual(15, (int)su25b.Survivability, "Su-25B SUR");
-                Assert.AreEqual(15, (int)su25b.GroundAttack,  "Su-25B GA tier-3");
+                Assert.AreEqual(15, (int)su25b.GroundAttack,  "Su-25B GA 15");
+                Assert.AreEqual(3,  su25b.GaBonusVsHard,      "Su-25B GaVsHard 3");
 
-                // Tu-22M3: strategic bomber — top speed + GA/OL tier-3.
+                // Su-24 Fencer: Soviet F-111 interdictor — GA 13, GaVsBase 4.
+                WeaponProfile su24 = P(WeaponType.BMB_SU24_SV);
+                Assert.AreEqual(13, (int)su24.GroundAttack, "Su-24 GA 13");
+                Assert.AreEqual(4,  su24.GaBonusVsBase,     "Su-24 GaVsBase 4");
+
+                // Tu-16 Badger: area level bomber — CARPET_BOMBING (GaVsSoft 3) + STRATEGIC_PAYLOAD (OL 16).
+                WeaponProfile tu16 = P(WeaponType.BMB_TU16_SV);
+                Assert.AreEqual(9,  (int)tu16.GroundAttack,  "Tu-16 GA 9");
+                Assert.AreEqual(16, (int)tu16.OrdinanceLoad, "Tu-16 OL 16");
+                Assert.AreEqual(3,  tu16.GaBonusVsSoft,      "Tu-16 GaVsSoft 3");
+
+                // Tu-22 Blinder: standoff/area — Kh-22 heavy warhead → GA 12; GaVsSoft 3; avoid-GAD cap DORMANT.
+                WeaponProfile tu22 = P(WeaponType.BMB_TU22_SV);
+                Assert.AreEqual(12, (int)tu22.GroundAttack, "Tu-22 GA 12 (Kh-22)");
+                Assert.AreEqual(3,  tu22.GaBonusVsSoft,     "Tu-22 GaVsSoft 3");
+                Assert.IsFalse(tu22.HasCapability(WeaponCapability.IgnoreAirDefense), "Tu-22 avoid-GAD dormant");
+
+                // Tu-22M3: apex strategic — Kh-22 heavy warhead GA 12, riders + payload on top.
                 WeaponProfile tu = P(WeaponType.BMB_TU22M3_SV);
-                Assert.AreEqual(16, (int)tu.TopSpeed,    "Tu-22M3 TS");
-                Assert.AreEqual(15, (int)tu.GroundAttack,"Tu-22M3 GA");
-                Assert.AreEqual(15, (int)tu.OrdinanceLoad,"Tu-22M3 OL");
+                Assert.AreEqual(16, (int)tu.TopSpeed,     "Tu-22M3 TS");
+                Assert.AreEqual(12, (int)tu.GroundAttack, "Tu-22M3 GA 12 (Kh-22)");
+                Assert.AreEqual(16, (int)tu.OrdinanceLoad,"Tu-22M3 OL 16");
+                Assert.AreEqual(3,  tu.GaBonusVsSoft,     "Tu-22M3 GaVsSoft 3");
+                Assert.AreEqual(4,  tu.GaBonusVsBase,     "Tu-22M3 GaVsBase 4");
 
                 // A-50 AWACS: W8 SR 12, non-combatant.
                 Assert.AreEqual(12, (int)P(WeaponType.AWACS_A50_SV).SpottingRange, "A-50 AWACS SR 12 (W8)");
