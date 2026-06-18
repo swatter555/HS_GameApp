@@ -44,6 +44,17 @@ namespace HammerAndSickle.Tests
             Assert.AreEqual(gat, (int)p.GroundAirAttack,  $"{wt} GAT");
         }
 
+        /// <summary>Asserts the air-combat block (DF/MAN/TS/SUR) + GA for an aircraft profile.</summary>
+        private static void AssertAir(WeaponType wt, int df, int man, int ts, int sur, int ga)
+        {
+            WeaponProfile p = P(wt);
+            Assert.AreEqual(df,  (int)p.Dogfighting,    $"{wt} DF");
+            Assert.AreEqual(man, (int)p.Maneuverability, $"{wt} MAN");
+            Assert.AreEqual(ts,  (int)p.TopSpeed,       $"{wt} TS");
+            Assert.AreEqual(sur, (int)p.Survivability,  $"{wt} SUR");
+            Assert.AreEqual(ga,  (int)p.GroundAttack,   $"{wt} GA");
+        }
+
         #endregion // Helpers
 
         #region Batch A — IFV / APC
@@ -253,5 +264,90 @@ namespace HammerAndSickle.Tests
         }
 
         #endregion // Batch F — Infantry
+
+        #region Batch G — Jets (US sub-batch)
+
+        [Test]
+        public void Jets_US_ResolveConvertedLines()
+        {
+            try
+            {
+                // Pure air-superiority fighters → Rule-A GA floor 2 (DF/MAN/TS/SUR preserved via residuals).
+                AssertAir(WeaponType.FGT_F15_US, 16, 14, 12, 11, 2);
+                Assert.AreEqual(6, (int)P(WeaponType.FGT_F15_US).OrdinanceLoad, "F-15 OL 6");
+                Assert.AreEqual(4, (int)P(WeaponType.FGT_F15_US).SpottingRange, "F-15 SR 4");
+                AssertAir(WeaponType.FGT_F4_US, 10, 9, 12, 8, 2);
+                AssertAir(WeaponType.FGT_F14_US, 14, 13, 12, 9, 2);
+
+                // F-16 multirole: MULTIROLE_STRIKE (+4) + AT_GUIDED_AIR (+3) → GA9; GaVsHard 1 stored.
+                AssertAir(WeaponType.FGT_F16_US, 14, 15, 11, 8, 9);
+                Assert.AreEqual(1, P(WeaponType.FGT_F16_US).GaBonusVsHard, "F-16 GaVsHard 1 (Maverick)");
+
+                // A-10: apex CAS — HEAVY_AG_CANNON + AT_GUIDED_AIR → GA15, GaVsHard 3; SUR15/OL11 preserved.
+                AssertAir(WeaponType.ATT_A10_US, 4, 4, 7, 15, 15);
+                Assert.AreEqual(11, (int)P(WeaponType.ATT_A10_US).OrdinanceLoad, "A-10 OL 11");
+                Assert.AreEqual(3, P(WeaponType.ATT_A10_US).GaBonusVsHard, "A-10 GaVsHard 3");
+
+                // F-117 stealth strike: GA13, tiny bay OL6, STL15, GaVsBase 4, Stealth cap.
+                AssertAir(WeaponType.ATT_F117_US, 1, 3, 10, 8, 13);
+                Assert.AreEqual(6, (int)P(WeaponType.ATT_F117_US).OrdinanceLoad, "F-117 OL 6 (internal bay)");
+                Assert.AreEqual(15, (int)P(WeaponType.ATT_F117_US).Stealth, "F-117 STL 15");
+                Assert.AreEqual(4, P(WeaponType.ATT_F117_US).GaBonusVsBase, "F-117 GaVsBase 4");
+                Assert.IsTrue(P(WeaponType.ATT_F117_US).HasCapability(WeaponCapability.Stealth), "F-117 stealth");
+
+                // F-111 interdictor: GA13, OL14, GaVsBase 4.
+                AssertAir(WeaponType.BMB_F111_US, 6, 6, 14, 8, 13);
+                Assert.AreEqual(14, (int)P(WeaponType.BMB_F111_US).OrdinanceLoad, "F-111 OL 14");
+                Assert.AreEqual(4, P(WeaponType.BMB_F111_US).GaBonusVsBase, "F-111 GaVsBase 4");
+
+                // E-3 AWACS: non-combatant, SR 12.
+                Assert.IsFalse(P(WeaponType.AWACS_E3_US).IsAttackCapable, "E-3 non-combatant");
+                Assert.AreEqual(12, (int)P(WeaponType.AWACS_E3_US).SpottingRange, "E-3 SR 12");
+
+                // SR-71 recon: non-combatant, Mach-3 TS 21, SR 8.
+                Assert.IsFalse(P(WeaponType.RCNA_SR71_US).IsAttackCapable, "SR-71 non-combatant");
+                Assert.AreEqual(21, (int)P(WeaponType.RCNA_SR71_US).TopSpeed, "SR-71 TS 21");
+                Assert.AreEqual(8, (int)P(WeaponType.RCNA_SR71_US).SpottingRange, "SR-71 SR 8");
+            }
+            catch (Exception ex) { AppService.HandleException(CLASS_NAME, nameof(Jets_US_ResolveConvertedLines), ex); throw; }
+        }
+
+        #endregion // Batch G — Jets (US sub-batch)
+
+        #region Batch G — Jets (Euro-NATO sub-batch)
+
+        [Test]
+        public void Jets_Euro_ResolveConvertedLines()
+        {
+            try
+            {
+                // Tornado IDS: heavy interdictor — MULTIROLE_STRIKE + LASER_GUIDED + HEAVY_PAYLOAD + RUNWAY_CRATERING.
+                AssertAir(WeaponType.FGT_TORNADO_IDS_UK, 12, 11, 10, 7, 8);
+                Assert.AreEqual(9, (int)P(WeaponType.FGT_TORNADO_IDS_UK).OrdinanceLoad, "Tornado IDS OL 9");
+                Assert.AreEqual(20, P(WeaponType.FGT_TORNADO_IDS_UK).OcSuppressionBonus, "Tornado IDS runway cratering");
+
+                // Tornado GR.1: lighter UK strike variant (no HEAVY_PAYLOAD → OL6).
+                AssertAir(WeaponType.FGT_TORNADO_GR1_US, 13, 11, 10, 7, 8);
+                Assert.AreEqual(6, (int)P(WeaponType.FGT_TORNADO_GR1_US).OrdinanceLoad, "Tornado GR.1 OL 6");
+                Assert.AreEqual(20, P(WeaponType.FGT_TORNADO_GR1_US).OcSuppressionBonus, "Tornado GR.1 runway cratering");
+
+                // F-4F: pure interceptor, GA floor 2 (= US F-4).
+                AssertAir(WeaponType.FGT_F4_GE, 10, 9, 12, 8, 2);
+
+                // Mirage 2000: most agile NATO fighter here; multirole strike GA8.
+                AssertAir(WeaponType.FGT_MIRAGE2000_FR, 14, 15, 12, 7, 8);
+
+                // Mirage F1: older, lighter striker GA6.
+                AssertAir(WeaponType.FGT_MIRAGEF1_FR, 11, 10, 11, 8, 6);
+
+                // Jaguar: low-level attack — GA8, OL9, runway cratering.
+                AssertAir(WeaponType.ATT_JAGUAR_FR, 8, 9, 9, 9, 8);
+                Assert.AreEqual(9, (int)P(WeaponType.ATT_JAGUAR_FR).OrdinanceLoad, "Jaguar OL 9");
+                Assert.AreEqual(20, P(WeaponType.ATT_JAGUAR_FR).OcSuppressionBonus, "Jaguar runway cratering");
+            }
+            catch (Exception ex) { AppService.HandleException(CLASS_NAME, nameof(Jets_Euro_ResolveConvertedLines), ex); throw; }
+        }
+
+        #endregion // Batch G — Jets (Euro-NATO sub-batch)
     }
 }

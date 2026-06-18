@@ -4302,33 +4302,16 @@ namespace HammerAndSickle.Models
             //----------------------------------------------
             // US F-15 Eagle Air Superiority Fighter
             //----------------------------------------------
-            WeaponProfile F15 = new WeaponProfile(
-                _longName: "F-15 Eagle Air Superiority Fighter",
-                _shortName: "F-15 Eagle",
-                _type: WeaponType.FGT_F15_US,
-                _hardAtt: 0,                                               // Hard Attack Rating
-                _hardDef: 0,                                               // Hard Defense Rating
-                _softAtt: 0,                                               // Soft Attack Rating
-                _softDef: 0,                                               // Soft Defense Rating
-                _gat: 0,                                                   // Ground-to-Air Attack Rating
-                _gad: 0,                                                   // Ground Defense Armor Rating
-                _df: GameData.MID_FGT_DOGFIGHT + XXXLARGE_BONUS,           // Dogfighting Rating
-                _man: GameData.MID_FGT_MANEUVER + LARGE_BONUS,             // Maneuverability Rating
-                _topSpd: GameData.MID_FGT_TOPSPEED + MEDIUM_BONUS,         // Top Speed Rating
-                _surv: GameData.MID_FGT_SURVIVE + XLARGE_BONUS,            // Survivability Rating
-                _ga: GameData.GROUND_ATTACK_TIER_2,                        // Ground Attack Rating
-                _ol: GameData.SMALL_AC_LOAD + LARGE_BONUS,                 // Ordinance Rating
-                _stealth: 0,                                               // Stealth Rating
-                _pr: GameData.PRIMARY_RANGE_DEFAULT,       // Primary Range
-                _ir: GameData.INDIRECT_RANGE_DEFAULT,      // Indirect Range
-                _sr: GameData.AC_SPOTTING_SUPERIOR,        // Spotting Range
-                _mmp: GameData.FIXEDWING_UNIT,             // Max Movement Points
-                _isAmph: false,                            // Is Amphibious
-                _isDF: false,                              // Is DoubleFire
-                _isAtt: true,                              // Can this profile attack
-                _upgradePath: UpgradePath.FGT,            // Upgrade Path
-                _turnAvailable: 456                        // How many months past Jan. 1938
-            );
+            // Phase 3 (final-intent): FighterMid + DF+6/MAN+3/TS+2/SUR+4 (preserve the premier-fighter air-combat
+            // line). Pure air-superiority → GA stays at the Rule-A floor 2 (DROPPED from old tier-2 GA12; F-15A/C
+            // carries no strike fit here) + small load. BVR/AGILE air-stat enrichment deferred.
+            // → DF16 MAN14 TS12 SUR11 · GA2 OL6 · MMP100 · SR4.
+            WeaponProfile F15 = WeaponProfile.FromProfileDef(
+                "F-15 Eagle Air Superiority Fighter", "F-15 Eagle", WeaponType.FGT_F15_US,
+                new ProfileDef(FamilyArchetypes.FighterMid,
+                    new Dictionary<ProfileStat, int> { { ProfileStat.DF, 6 }, { ProfileStat.MAN, 3 }, { ProfileStat.TS, 2 }, { ProfileStat.SUR, 4 } },
+                    System.Array.Empty<WeaponTrait>()),
+                UpgradePath.FGT, 456);
 
             // Set the prestige cost for the profile.
             F15.SetPrestigeCost(PrestigeTierCost.Gen3, PrestigeTypeCost.FGT);
@@ -4351,33 +4334,15 @@ namespace HammerAndSickle.Models
             //----------------------------------------------
             // US F-16 Fighting Falcon Multi-Role Fighter
             //----------------------------------------------
-            WeaponProfile F16 = new WeaponProfile(
-                _longName: "F-16 Fighting Falcon Multi-Role Fighter",
-                _shortName: "F-16 Falcon",
-                _type: WeaponType.FGT_F16_US,
-                _hardAtt: 0,                                               // Hard Attack Rating
-                _hardDef: 0,                                               // Hard Defense Rating
-                _softAtt: 0,                                               // Soft Attack Rating
-                _softDef: 0,                                               // Soft Defense Rating
-                _gat: 0,                                                   // Ground-to-Air Attack Rating
-                _gad: 0,                                                   // Ground Defense Armor Rating
-                _df: GameData.MID_FGT_DOGFIGHT + XLARGE_BONUS,             // Dogfighting Rating
-                _man: GameData.MID_FGT_MANEUVER + XLARGE_BONUS,            // Maneuverability Rating
-                _topSpd: GameData.MID_FGT_TOPSPEED + SMALL_BONUS,          // Top Speed Rating
-                _surv: GameData.MID_FGT_SURVIVE + SMALL_BONUS,             // Survivability Rating
-                _ga: GameData.GROUND_ATTACK_TIER_2,                        // Ground Attack Rating
-                _ol: GameData.SMALL_AC_LOAD + MEDIUM_BONUS,                // Ordinance Rating
-                _stealth: 0,                                               // Stealth Rating
-                _pr: GameData.PRIMARY_RANGE_DEFAULT,       // Primary Range
-                _ir: GameData.INDIRECT_RANGE_DEFAULT,      // Indirect Range
-                _sr: GameData.AC_SPOTTING_ADVANCED,        // Spotting Range
-                _mmp: GameData.FIXEDWING_UNIT,             // Max Movement Points
-                _isAmph: false,                            // Is Amphibious
-                _isDF: false,                              // Is DoubleFire
-                _isAtt: true,                              // Can this profile attack
-                _upgradePath: UpgradePath.FGT,            // Upgrade Path
-                _turnAvailable: 480                        // How many months past Jan. 1938
-            );
+            // Phase 3 (final-intent): FighterMid + DF+4/MAN+4/TS+1/SUR+1 (agile lightweight) + the dual-role lever
+            // MULTIROLE_STRIKE (GA+4) + AT_GUIDED_AIR (Maverick: GA+3, GaVsHard+1 stored). Multirole strike GA9
+            // (down from old tier-2 GA12, now earned by traits). → DF14 MAN15 TS11 SUR8 · GA9 OL6 · MMP100 · SR4.
+            WeaponProfile F16 = WeaponProfile.FromProfileDef(
+                "F-16 Fighting Falcon Multi-Role Fighter", "F-16 Falcon", WeaponType.FGT_F16_US,
+                new ProfileDef(FamilyArchetypes.FighterMid,
+                    new Dictionary<ProfileStat, int> { { ProfileStat.DF, 4 }, { ProfileStat.MAN, 4 }, { ProfileStat.TS, 1 }, { ProfileStat.SUR, 1 } },
+                    new[] { WeaponTrait.MULTIROLE_STRIKE, WeaponTrait.AT_GUIDED_AIR }),
+                UpgradePath.FGT, 480);
 
             // Set the prestige cost for the profile.
             F16.SetPrestigeCost(PrestigeTierCost.Gen3, PrestigeTypeCost.FGT);
@@ -4400,33 +4365,14 @@ namespace HammerAndSickle.Models
             //----------------------------------------------
             // US F-4 Phantom II Fighter
             //----------------------------------------------
-            WeaponProfile F4_US = new WeaponProfile(
-                _longName: "F-4 Phantom II Fighter",
-                _shortName: "F-4 Phantom",
-                _type: WeaponType.FGT_F4_US,
-                _hardAtt: 0,                                               // Hard Attack Rating
-                _hardDef: 0,                                               // Hard Defense Rating
-                _softAtt: 0,                                               // Soft Attack Rating
-                _softDef: 0,                                               // Soft Defense Rating
-                _gat: 0,                                                   // Ground-to-Air Attack Rating
-                _gad: 0,                                                   // Ground Defense Armor Rating
-                _df: GameData.EARLY_FGT_DOGFIGHT + MEDIUM_BONUS,           // Dogfighting Rating
-                _man: GameData.EARLY_FGT_MANEUVER,                         // Maneuverability Rating
-                _topSpd: GameData.EARLY_FGT_TOPSPEED + MEDIUM_BONUS,       // Top Speed Rating
-                _surv: GameData.EARLY_FGT_SURVIVE + MEDIUM_BONUS,          // Survivability Rating
-                _ga: GameData.GROUND_ATTACK_NA,                            // Ground Attack Rating
-                _ol: GameData.SMALL_AC_LOAD,                               // Ordinance Rating
-                _stealth: 0,                                               // Stealth Rating
-                _pr: GameData.PRIMARY_RANGE_DEFAULT,       // Primary Range
-                _ir: GameData.INDIRECT_RANGE_DEFAULT,      // Indirect Range
-                _sr: GameData.AC_SPOTTING_ENHANCED,        // Spotting Range
-                _mmp: GameData.FIXEDWING_UNIT,             // Max Movement Points
-                _isAmph: false,                            // Is Amphibious
-                _isDF: false,                              // Is DoubleFire
-                _isAtt: true,                              // Can this profile attack
-                _upgradePath: UpgradePath.FGT,            // Upgrade Path
-                _turnAvailable: 276                        // How many months past Jan. 1938
-            );
+            // Phase 3 (final-intent): FighterEarly + DF+2/TS+2/SUR+2 (workhorse interceptor). Air-superiority
+            // variant → GA at the Rule-A floor 2 (old was NA/0). → DF10 MAN9 TS12 SUR8 · GA2 OL6 · MMP100 · SR4.
+            WeaponProfile F4_US = WeaponProfile.FromProfileDef(
+                "F-4 Phantom II Fighter", "F-4 Phantom", WeaponType.FGT_F4_US,
+                new ProfileDef(FamilyArchetypes.FighterEarly,
+                    new Dictionary<ProfileStat, int> { { ProfileStat.DF, 2 }, { ProfileStat.TS, 2 }, { ProfileStat.SUR, 2 } },
+                    System.Array.Empty<WeaponTrait>()),
+                UpgradePath.FGT, 276);
 
             // Set the prestige cost for the profile.
             F4_US.SetPrestigeCost(PrestigeTierCost.Gen1, PrestigeTypeCost.FGT);
@@ -4449,33 +4395,15 @@ namespace HammerAndSickle.Models
             //----------------------------------------------
             // US F-14 Tomcat Fleet Defense Fighter
             //----------------------------------------------
-            WeaponProfile F14_US = new WeaponProfile(
-                _longName: "F-14 Tomcat Fleet Defense Fighter",
-                _shortName: "F-14 Tomcat",
-                _type: WeaponType.FGT_F14_US,
-                _hardAtt: 0,                                               // Hard Attack Rating
-                _hardDef: 0,                                               // Hard Defense Rating
-                _softAtt: 0,                                               // Soft Attack Rating
-                _softDef: 0,                                               // Soft Defense Rating
-                _gat: 0,                                                   // Ground-to-Air Attack Rating
-                _gad: 0,                                                   // Ground Defense Armor Rating
-                _df: GameData.LATE_FGT_DOGFIGHT + MEDIUM_BONUS,            // Dogfighting Rating
-                _man: GameData.LATE_FGT_MANEUVER + SMALL_BONUS,            // Maneuverability Rating
-                _topSpd: GameData.LATE_FGT_TOPSPEED + MEDIUM_BONUS,        // Top Speed Rating
-                _surv: GameData.LATE_FGT_SURVIVE,                          // Survivability Rating
-                _ga: GameData.GROUND_ATTACK_NA,                            // Ground Attack Rating
-                _ol: GameData.SMALL_AC_LOAD,                               // Ordinance Rating
-                _stealth: 0,                                               // Stealth Rating
-                _pr: GameData.PRIMARY_RANGE_DEFAULT,       // Primary Range
-                _ir: GameData.INDIRECT_RANGE_DEFAULT,      // Indirect Range
-                _sr: GameData.AC_SPOTTING_SUPERIOR,        // Spotting Range
-                _mmp: GameData.FIXEDWING_UNIT,             // Max Movement Points
-                _isAmph: false,                            // Is Amphibious
-                _isDF: false,                              // Is DoubleFire
-                _isAtt: true,                              // Can this profile attack
-                _upgradePath: UpgradePath.FGT,            // Upgrade Path
-                _turnAvailable: 432                        // How many months past Jan. 1938
-            );
+            // Phase 3 (final-intent): FighterLate + DF+2/MAN+1/TS+2 (long-range fleet interceptor). Pure air
+            // defense → GA at the Rule-A floor 2 (old NA/0); the Phoenix BVR edge is air-stat enrichment (deferred).
+            // → DF14 MAN13 TS12 SUR9 · GA2 OL6 · MMP100 · SR4.
+            WeaponProfile F14_US = WeaponProfile.FromProfileDef(
+                "F-14 Tomcat Fleet Defense Fighter", "F-14 Tomcat", WeaponType.FGT_F14_US,
+                new ProfileDef(FamilyArchetypes.FighterLate,
+                    new Dictionary<ProfileStat, int> { { ProfileStat.DF, 2 }, { ProfileStat.MAN, 1 }, { ProfileStat.TS, 2 } },
+                    System.Array.Empty<WeaponTrait>()),
+                UpgradePath.FGT, 432);
 
             // Set the prestige cost for the profile.
             F14_US.SetPrestigeCost(PrestigeTierCost.Gen3, PrestigeTypeCost.FGT);
@@ -4498,33 +4426,16 @@ namespace HammerAndSickle.Models
             //----------------------------------------------
             // UK Tornado IDS Interdictor/Strike Fighter
             //----------------------------------------------
-            WeaponProfile TORNADO_IDS = new WeaponProfile(
-                _longName: "Tornado IDS Interdictor/Strike Fighter",
-                _shortName: "Tornado IDS",
-                _type: WeaponType.FGT_TORNADO_IDS_UK,
-                _hardAtt: 0,                                               // Hard Attack Rating
-                _hardDef: 0,                                               // Hard Defense Rating
-                _softAtt: 0,                                               // Soft Attack Rating
-                _softDef: 0,                                               // Soft Defense Rating
-                _gat: 0,                                                   // Ground-to-Air Attack Rating
-                _gad: 0,                                                   // Ground Defense Armor Rating
-                _df: GameData.MID_FGT_DOGFIGHT + MEDIUM_BONUS,             // Dogfighting Rating
-                _man: GameData.MID_FGT_MANEUVER,                           // Maneuverability Rating
-                _topSpd: GameData.MID_FGT_TOPSPEED,                        // Top Speed Rating
-                _surv: GameData.MID_FGT_SURVIVE,                           // Survivability Rating
-                _ga: GameData.GROUND_ATTACK_TIER_2,                        // Ground Attack Rating
-                _ol: GameData.SMALL_AC_LOAD + MEDIUM_BONUS,                // Ordinance Rating
-                _stealth: 0,                                               // Stealth Rating
-                _pr: GameData.PRIMARY_RANGE_DEFAULT,       // Primary Range
-                _ir: GameData.INDIRECT_RANGE_DEFAULT,      // Indirect Range
-                _sr: GameData.AC_SPOTTING_ENHANCED,        // Spotting Range
-                _mmp: GameData.FIXEDWING_UNIT,             // Max Movement Points
-                _isAmph: false,                            // Is Amphibious
-                _isDF: false,                              // Is DoubleFire
-                _isAtt: true,                              // Can this profile attack
-                _upgradePath: UpgradePath.FGT,            // Upgrade Path
-                _turnAvailable: 492                        // How many months past Jan. 1938
-            );
+            // Phase 3 (final-intent): FighterMid + DF+2 (decent self-defense) + MULTIROLE_STRIKE (GA+4) +
+            // LASER_GUIDED_MUNITIONS (GA+2) + HEAVY_PAYLOAD (OL+3) + RUNWAY_CRATERING (JP233: OcSuppression+20
+            // stored) + TERRAIN_FOLLOW_RADAR (low-level penetration, dormant SUR). Heavy all-weather interdictor:
+            // GA8 (down from old 12) but big OL9 payload. → DF12 MAN11 TS10 SUR7 · GA8 OL9 · SR4 · OcSuppression 20.
+            WeaponProfile TORNADO_IDS = WeaponProfile.FromProfileDef(
+                "Tornado IDS Interdictor/Strike Fighter", "Tornado IDS", WeaponType.FGT_TORNADO_IDS_UK,
+                new ProfileDef(FamilyArchetypes.FighterMid,
+                    new Dictionary<ProfileStat, int> { { ProfileStat.DF, 2 } },
+                    new[] { WeaponTrait.MULTIROLE_STRIKE, WeaponTrait.LASER_GUIDED_MUNITIONS, WeaponTrait.HEAVY_PAYLOAD, WeaponTrait.RUNWAY_CRATERING, WeaponTrait.TERRAIN_FOLLOW_RADAR }),
+                UpgradePath.FGT, 492);
 
             // Set the prestige cost for the profile.
             TORNADO_IDS.SetPrestigeCost(PrestigeTierCost.Gen3, PrestigeTypeCost.FGT);
@@ -4547,33 +4458,15 @@ namespace HammerAndSickle.Models
             //----------------------------------------------
             // UK Tornado GR.1 Strike Fighter
             //----------------------------------------------
-            WeaponProfile TORNADO_GR1 = new WeaponProfile(
-                _longName: "Tornado GR.1 Strike Fighter",
-                _shortName: "Tornado GR.1",
-                _type: WeaponType.FGT_TORNADO_GR1_US,
-                _hardAtt: 0,                                               // Hard Attack Rating
-                _hardDef: 0,                                               // Hard Defense Rating
-                _softAtt: 0,                                               // Soft Attack Rating
-                _softDef: 0,                                               // Soft Defense Rating
-                _gat: 0,                                                   // Ground-to-Air Attack Rating
-                _gad: 0,                                                   // Ground Defense Armor Rating
-                _df: GameData.MID_FGT_DOGFIGHT + LARGE_BONUS,              // Dogfighting Rating
-                _man: GameData.MID_FGT_MANEUVER,                           // Maneuverability Rating
-                _topSpd: GameData.MID_FGT_TOPSPEED,                        // Top Speed Rating
-                _surv: GameData.MID_FGT_SURVIVE,                           // Survivability Rating
-                _ga: GameData.GROUND_ATTACK_TIER_2,                        // Ground Attack Rating
-                _ol: GameData.SMALL_AC_LOAD,                               // Ordinance Rating
-                _stealth: 0,                                               // Stealth Rating
-                _pr: GameData.PRIMARY_RANGE_DEFAULT,       // Primary Range
-                _ir: GameData.INDIRECT_RANGE_DEFAULT,      // Indirect Range
-                _sr: GameData.AC_SPOTTING_ENHANCED,        // Spotting Range
-                _mmp: GameData.FIXEDWING_UNIT,             // Max Movement Points
-                _isAmph: false,                            // Is Amphibious
-                _isDF: false,                              // Is DoubleFire
-                _isAtt: true,                              // Can this profile attack
-                _upgradePath: UpgradePath.ATT,            // Upgrade Path
-                _turnAvailable: 528                        // How many months past Jan. 1938
-            );
+            // Phase 3 (final-intent): FighterMid + DF+3 + MULTIROLE_STRIKE (GA+4) + LASER_GUIDED_MUNITIONS (GA+2)
+            // + RUNWAY_CRATERING (OcSuppression+20 stored) + TERRAIN_FOLLOW_RADAR (dormant). The lighter UK strike
+            // variant (no HEAVY_PAYLOAD → OL6, vs IDS's OL9). → DF13 MAN11 TS10 SUR7 · GA8 OL6 · SR4 · OcSuppression 20.
+            WeaponProfile TORNADO_GR1 = WeaponProfile.FromProfileDef(
+                "Tornado GR.1 Strike Fighter", "Tornado GR.1", WeaponType.FGT_TORNADO_GR1_US,
+                new ProfileDef(FamilyArchetypes.FighterMid,
+                    new Dictionary<ProfileStat, int> { { ProfileStat.DF, 3 } },
+                    new[] { WeaponTrait.MULTIROLE_STRIKE, WeaponTrait.LASER_GUIDED_MUNITIONS, WeaponTrait.RUNWAY_CRATERING, WeaponTrait.TERRAIN_FOLLOW_RADAR }),
+                UpgradePath.ATT, 528);
 
             // Set the prestige cost for the profile.
             TORNADO_GR1.SetPrestigeCost(PrestigeTierCost.Gen3, PrestigeTypeCost.ATT);
@@ -4596,33 +4489,14 @@ namespace HammerAndSickle.Models
             //----------------------------------------------
             // FRG F-4F Phantom Fighter
             //----------------------------------------------
-            WeaponProfile F4_GE = new WeaponProfile(
-                _longName: "F-4F Phantom Fighter",
-                _shortName: "F-4F Phantom",
-                _type: WeaponType.FGT_F4_GE,
-                _hardAtt: 0,                                               // Hard Attack Rating
-                _hardDef: 0,                                               // Hard Defense Rating
-                _softAtt: 0,                                               // Soft Attack Rating
-                _softDef: 0,                                               // Soft Defense Rating
-                _gat: 0,                                                   // Ground-to-Air Attack Rating
-                _gad: 0,                                                   // Ground Defense Armor Rating
-                _df: GameData.EARLY_FGT_DOGFIGHT + MEDIUM_BONUS,           // Dogfighting Rating
-                _man: GameData.EARLY_FGT_MANEUVER,                         // Maneuverability Rating
-                _topSpd: GameData.EARLY_FGT_TOPSPEED + MEDIUM_BONUS,       // Top Speed Rating
-                _surv: GameData.EARLY_FGT_SURVIVE + MEDIUM_BONUS,          // Survivability Rating
-                _ga: GameData.GROUND_ATTACK_NA,                            // Ground Attack Rating
-                _ol: GameData.SMALL_AC_LOAD,                               // Ordinance Rating
-                _stealth: 0,                                               // Stealth Rating
-                _pr: GameData.PRIMARY_RANGE_DEFAULT,       // Primary Range
-                _ir: GameData.INDIRECT_RANGE_DEFAULT,      // Indirect Range
-                _sr: GameData.AC_SPOTTING_ENHANCED,        // Spotting Range
-                _mmp: GameData.FIXEDWING_UNIT,             // Max Movement Points
-                _isAmph: false,                            // Is Amphibious
-                _isDF: false,                              // Is DoubleFire
-                _isAtt: true,                              // Can this profile attack
-                _upgradePath: UpgradePath.FGT,            // Upgrade Path
-                _turnAvailable: 276                        // How many months past Jan. 1938
-            );
+            // Phase 3 (final-intent): FighterEarly + DF+2/TS+2/SUR+2 (FRG air-defense Phantom, ICE upgrade era).
+            // Pure interceptor → GA Rule-A floor 2 (old NA/0). Mirrors the US F-4. → DF10 MAN9 TS12 SUR8 · GA2 OL6 · SR4.
+            WeaponProfile F4_GE = WeaponProfile.FromProfileDef(
+                "F-4F Phantom Fighter", "F-4F Phantom", WeaponType.FGT_F4_GE,
+                new ProfileDef(FamilyArchetypes.FighterEarly,
+                    new Dictionary<ProfileStat, int> { { ProfileStat.DF, 2 }, { ProfileStat.TS, 2 }, { ProfileStat.SUR, 2 } },
+                    System.Array.Empty<WeaponTrait>()),
+                UpgradePath.FGT, 276);
 
             // Set the prestige cost for the profile.
             F4_GE.SetPrestigeCost(PrestigeTierCost.Gen1, PrestigeTypeCost.FGT);
@@ -4645,33 +4519,15 @@ namespace HammerAndSickle.Models
             //----------------------------------------------
             // French Mirage 2000 Multi-Role Fighter
             //----------------------------------------------
-            WeaponProfile MIRAGE2000 = new WeaponProfile(
-                _longName: "Mirage 2000 Multi-Role Fighter",
-                _shortName: "Mirage 2000",
-                _type: WeaponType.FGT_MIRAGE2000_FR,
-                _hardAtt: 0,                                               // Hard Attack Rating
-                _hardDef: 0,                                               // Hard Defense Rating
-                _softAtt: 0,                                               // Soft Attack Rating
-                _softDef: 0,                                               // Soft Defense Rating
-                _gat: 0,                                                   // Ground-to-Air Attack Rating
-                _gad: 0,                                                   // Ground Defense Armor Rating
-                _df: GameData.MID_FGT_DOGFIGHT + XLARGE_BONUS,             // Dogfighting Rating
-                _man: GameData.MID_FGT_MANEUVER + XLARGE_BONUS,            // Maneuverability Rating
-                _topSpd: GameData.MID_FGT_TOPSPEED + MEDIUM_BONUS,         // Top Speed Rating
-                _surv: GameData.MID_FGT_SURVIVE,                           // Survivability Rating
-                _ga: GameData.GROUND_ATTACK_TIER_2,                        // Ground Attack Rating
-                _ol: GameData.SMALL_AC_LOAD,                               // Ordinance Rating
-                _stealth: 0,                                               // Stealth Rating
-                _pr: GameData.PRIMARY_RANGE_DEFAULT,       // Primary Range
-                _ir: GameData.INDIRECT_RANGE_DEFAULT,      // Indirect Range
-                _sr: GameData.AC_SPOTTING_ENHANCED,        // Spotting Range
-                _mmp: GameData.FIXEDWING_UNIT,             // Max Movement Points
-                _isAmph: false,                            // Is Amphibious
-                _isDF: false,                              // Is DoubleFire
-                _isAtt: true,                              // Can this profile attack
-                _upgradePath: UpgradePath.FGT,            // Upgrade Path
-                _turnAvailable: 552                        // How many months past Jan. 1938
-            );
+            // Phase 3 (final-intent): FighterMid + DF+4/MAN+4/TS+2 (agile delta-wing, the most maneuverable NATO
+            // fighter here) + MULTIROLE_STRIKE (GA+4) + LASER_GUIDED_MUNITIONS (GA+2) — the 2000D strike fit.
+            // → DF14 MAN15 TS12 SUR7 · GA8 OL6 · SR4.
+            WeaponProfile MIRAGE2000 = WeaponProfile.FromProfileDef(
+                "Mirage 2000 Multi-Role Fighter", "Mirage 2000", WeaponType.FGT_MIRAGE2000_FR,
+                new ProfileDef(FamilyArchetypes.FighterMid,
+                    new Dictionary<ProfileStat, int> { { ProfileStat.DF, 4 }, { ProfileStat.MAN, 4 }, { ProfileStat.TS, 2 } },
+                    new[] { WeaponTrait.MULTIROLE_STRIKE, WeaponTrait.LASER_GUIDED_MUNITIONS }),
+                UpgradePath.FGT, 552);
 
             // Set the prestige cost for the profile.
             MIRAGE2000.SetPrestigeCost(PrestigeTierCost.Gen4, PrestigeTypeCost.FGT);
@@ -4694,33 +4550,14 @@ namespace HammerAndSickle.Models
             //----------------------------------------------
             // French Mirage F1 Fighter
             //----------------------------------------------
-            WeaponProfile MIRAGEF1 = new WeaponProfile(
-                _longName: "Mirage F1 Fighter",
-                _shortName: "Mirage F1",
-                _type: WeaponType.FGT_MIRAGEF1_FR,
-                _hardAtt: 0,                                               // Hard Attack Rating
-                _hardDef: 0,                                               // Hard Defense Rating
-                _softAtt: 0,                                               // Soft Attack Rating
-                _softDef: 0,                                               // Soft Defense Rating
-                _gat: 0,                                                   // Ground-to-Air Attack Rating
-                _gad: 0,                                                   // Ground Defense Armor Rating
-                _df: GameData.EARLY_FGT_DOGFIGHT + LARGE_BONUS,            // Dogfighting Rating
-                _man: GameData.EARLY_FGT_MANEUVER + SMALL_BONUS,           // Maneuverability Rating
-                _topSpd: GameData.EARLY_FGT_TOPSPEED + SMALL_BONUS,        // Top Speed Rating
-                _surv: GameData.EARLY_FGT_SURVIVE + MEDIUM_BONUS,          // Survivability Rating
-                _ga: GameData.GROUND_ATTACK_TIER_1,                        // Ground Attack Rating
-                _ol: GameData.SMALL_AC_LOAD,                               // Ordinance Rating
-                _stealth: 0,                                               // Stealth Rating
-                _pr: GameData.PRIMARY_RANGE_DEFAULT,       // Primary Range
-                _ir: GameData.INDIRECT_RANGE_DEFAULT,      // Indirect Range
-                _sr: GameData.AC_SPOTTING_ENHANCED,        // Spotting Range
-                _mmp: GameData.FIXEDWING_UNIT,             // Max Movement Points
-                _isAmph: false,                            // Is Amphibious
-                _isDF: false,                              // Is DoubleFire
-                _isAtt: true,                              // Can this profile attack
-                _upgradePath: UpgradePath.FGT,            // Upgrade Path
-                _turnAvailable: 420                        // How many months past Jan. 1938
-            );
+            // Phase 3 (final-intent): FighterEarly + DF+3/MAN+1/TS+1/SUR+2 (older multirole) + MULTIROLE_STRIKE
+            // (GA+4). Lighter striker than the Mirage 2000 (GA6 vs 8). → DF11 MAN10 TS11 SUR8 · GA6 OL6 · SR4.
+            WeaponProfile MIRAGEF1 = WeaponProfile.FromProfileDef(
+                "Mirage F1 Fighter", "Mirage F1", WeaponType.FGT_MIRAGEF1_FR,
+                new ProfileDef(FamilyArchetypes.FighterEarly,
+                    new Dictionary<ProfileStat, int> { { ProfileStat.DF, 3 }, { ProfileStat.MAN, 1 }, { ProfileStat.TS, 1 }, { ProfileStat.SUR, 2 } },
+                    new[] { WeaponTrait.MULTIROLE_STRIKE }),
+                UpgradePath.FGT, 420);
 
             // Set the prestige cost for the profile.
             MIRAGEF1.SetPrestigeCost(PrestigeTierCost.Gen2, PrestigeTypeCost.FGT);
@@ -4743,33 +4580,17 @@ namespace HammerAndSickle.Models
             //----------------------------------------------
             // US A-10 Thunderbolt II Attack Aircraft
             //----------------------------------------------
-            WeaponProfile A10 = new WeaponProfile(
-                _longName: "A-10 Thunderbolt II Attack Aircraft",
-                _shortName: "A-10 Warthog",
-                _type: WeaponType.ATT_A10_US,
-                _hardAtt: 0,                                               // Hard Attack Rating
-                _hardDef: 0,                                               // Hard Defense Rating
-                _softAtt: 0,                                               // Soft Attack Rating
-                _softDef: 0,                                               // Soft Defense Rating
-                _gat: 0,                                                   // Ground-to-Air Attack Rating
-                _gad: 0,                                                   // Ground Defense Armor Rating
-                _df: GameData.AC_ATTACK_DOGFIGHT,                          // Dogfighting Rating
-                _man: GameData.AC_ATTACK_MANEUVER,                         // Maneuverability Rating
-                _topSpd: GameData.AC_ATTACK_TOPSPEED,                      // Top Speed Rating
-                _surv: GameData.AC_ATTACK_SURVIVE + XXLARGE_BONUS,         // Survivability Rating
-                _ga: GameData.GROUND_ATTACK_TIER_2 + XXLARGE_BONUS,        // Ground Attack Rating
-                _ol: GameData.SMALL_AC_LOAD + XXLARGE_BONUS,               // Ordinance Rating
-                _stealth: 0,                                               // Stealth Rating
-                _pr: GameData.PRIMARY_RANGE_DEFAULT,       // Primary Range
-                _ir: GameData.INDIRECT_RANGE_DEFAULT,      // Indirect Range
-                _sr: GameData.AC_SPOTTING_BASIC,           // Spotting Range
-                _mmp: GameData.FIXEDWING_UNIT,             // Max Movement Points
-                _isAmph: false,                            // Is Amphibious
-                _isDF: false,                              // Is DoubleFire
-                _isAtt: true,                              // Can this profile attack
-                _upgradePath: UpgradePath.ATT,            // Upgrade Path
-                _turnAvailable: 468                        // How many months past Jan. 1938
-            );
+            // Phase 3 (final-intent): Attack archetype (GA10/OL9, the apex CAS baseline) + HEAVY_AG_CANNON
+            // (GAU-8: GA+2, GaVsHard+2 stored) + AT_GUIDED_AIR (Maverick: GA+3, GaVsHard+1 stored) + CAS_ARMORED
+            // (SUR+2) + LOITER_PERSISTENCE (re-attack hook, dormant). SUR+3 / OL+2 residuals preserve the
+            // "flying tank" line. GA15 final (down from old 17), with GaVsHard 3 stored for the anti-armour bite.
+            // → DF4 MAN4 TS7 SUR15 · GA15 OL11 · MMP100 · SR4 · GaVsHard 3.
+            WeaponProfile A10 = WeaponProfile.FromProfileDef(
+                "A-10 Thunderbolt II Attack Aircraft", "A-10 Warthog", WeaponType.ATT_A10_US,
+                new ProfileDef(FamilyArchetypes.Attack,
+                    new Dictionary<ProfileStat, int> { { ProfileStat.SUR, 3 }, { ProfileStat.OL, 2 } },
+                    new[] { WeaponTrait.HEAVY_AG_CANNON, WeaponTrait.AT_GUIDED_AIR, WeaponTrait.CAS_ARMORED, WeaponTrait.LOITER_PERSISTENCE }),
+                UpgradePath.ATT, 468);
 
             // Set the prestige cost for the profile.
             A10.SetPrestigeCost(PrestigeTierCost.Gen3, PrestigeTypeCost.ATT);
@@ -4792,33 +4613,17 @@ namespace HammerAndSickle.Models
             //----------------------------------------------
             // US F-117 Nighthawk Stealth Attack Aircraft
             //----------------------------------------------
-            WeaponProfile F117 = new WeaponProfile(
-                _longName: "F-117 Nighthawk Stealth Attack Aircraft",
-                _shortName: "F-117 Nighthawk",
-                _type: WeaponType.ATT_F117_US,
-                _hardAtt: 0,                                               // Hard Attack Rating
-                _hardDef: 0,                                               // Hard Defense Rating
-                _softAtt: 0,                                               // Soft Attack Rating
-                _softDef: 0,                                               // Soft Defense Rating
-                _gat: 0,                                                   // Ground-to-Air Attack Rating
-                _gad: 0,                                                   // Ground Defense Armor Rating
-                _df: GameData.AC_BOMBER_DOGFIGHT,                          // Dogfighting Rating
-                _man: GameData.AC_BOMBER_MANEUVER,                         // Maneuverability Rating
-                _topSpd: GameData.AC_BOMBER_TOPSPEED,                      // Top Speed Rating
-                _surv: GameData.AC_BOMBER_SURVIVE,                         // Survivability Rating
-                _ga: GameData.GROUND_ATTACK_TIER_3 + LARGE_BONUS,          // Ground Attack Rating
-                _ol: GameData.SMALL_AC_LOAD,                               // Ordinance Rating
-                _stealth: 15,                                              // Stealth Rating
-                _pr: GameData.PRIMARY_RANGE_DEFAULT,       // Primary Range
-                _ir: GameData.INDIRECT_RANGE_DEFAULT,      // Indirect Range
-                _sr: GameData.AC_SPOTTING_BASIC,           // Spotting Range
-                _mmp: GameData.FIXEDWING_UNIT,             // Max Movement Points
-                _isAmph: false,                            // Is Amphibious
-                _isDF: false,                              // Is DoubleFire
-                _isAtt: true,                              // Can this profile attack
-                _upgradePath: UpgradePath.ATT,            // Upgrade Path
-                _turnAvailable: 540                        // How many months past Jan. 1938
-            );
+            // Phase 3 (final-intent): Bomber archetype (the F-117 air-combat line = bomber: DF1/MAN3/TS10/SUR8)
+            // + HARDENED_STRIKE (GA+3, OL+2) + LASER_GUIDED_MUNITIONS (GA+2) + BUNKER_PENETRATOR (GaVsBase+4 stored)
+            // + STEALTH_RAM (Stealth cap). STL+15 residual preserves the radar-cross-section; OL−8 residual reflects
+            // the tiny internal bay (2 LGBs). GA13 precision strike (down from old 18). → DF1 MAN3 TS10 SUR8 ·
+            // GA13 OL6 · STL15 · MMP100 · SR4 · GaVsBase 4 · stealth.
+            WeaponProfile F117 = WeaponProfile.FromProfileDef(
+                "F-117 Nighthawk Stealth Attack Aircraft", "F-117 Nighthawk", WeaponType.ATT_F117_US,
+                new ProfileDef(FamilyArchetypes.Bomber,
+                    new Dictionary<ProfileStat, int> { { ProfileStat.OL, -8 }, { ProfileStat.STL, 15 } },
+                    new[] { WeaponTrait.HARDENED_STRIKE, WeaponTrait.LASER_GUIDED_MUNITIONS, WeaponTrait.BUNKER_PENETRATOR, WeaponTrait.STEALTH_RAM }),
+                UpgradePath.ATT, 540);
 
             // Set the prestige cost for the profile.
             F117.SetPrestigeCost(PrestigeTierCost.Gen4, PrestigeTypeCost.ATT);
@@ -4841,33 +4646,16 @@ namespace HammerAndSickle.Models
             //----------------------------------------------
             // French SEPECAT Jaguar Attack Aircraft
             //----------------------------------------------
-            WeaponProfile JAGUAR = new WeaponProfile(
-                _longName: "SEPECAT Jaguar Attack Aircraft",
-                _shortName: "Jaguar",
-                _type: WeaponType.ATT_JAGUAR_FR,
-                _hardAtt: 0,                                               // Hard Attack Rating
-                _hardDef: 0,                                               // Hard Defense Rating
-                _softAtt: 0,                                               // Soft Attack Rating
-                _softDef: 0,                                               // Soft Defense Rating
-                _gat: 0,                                                   // Ground-to-Air Attack Rating
-                _gad: 0,                                                   // Ground Defense Armor Rating
-                _df: GameData.EARLY_FGT_DOGFIGHT,                          // Dogfighting Rating
-                _man: GameData.EARLY_FGT_MANEUVER,                         // Maneuverability Rating
-                _topSpd: GameData.EARLY_FGT_TOPSPEED + SMALL_MALUS,        // Top Speed Rating
-                _surv: GameData.MID_FGT_SURVIVE + MEDIUM_BONUS,            // Survivability Rating
-                _ga: GameData.GROUND_ATTACK_TIER_2,                        // Ground Attack Rating
-                _ol: GameData.SMALL_AC_LOAD + LARGE_BONUS,                 // Ordinance Rating
-                _stealth: 0,                                               // Stealth Rating
-                _pr: GameData.PRIMARY_RANGE_DEFAULT,       // Primary Range
-                _ir: GameData.INDIRECT_RANGE_DEFAULT,      // Indirect Range
-                _sr: GameData.AC_SPOTTING_BASIC,           // Spotting Range
-                _mmp: GameData.FIXEDWING_UNIT,             // Max Movement Points
-                _isAmph: false,                            // Is Amphibious
-                _isDF: false,                              // Is DoubleFire
-                _isAtt: true,                              // Can this profile attack
-                _upgradePath: UpgradePath.ATT,            // Upgrade Path
-                _turnAvailable: 420                        // How many months past Jan. 1938
-            );
+            // Phase 3 (final-intent): FighterEarly + TS−1 (low-level, not a fast climber) + SUR+3 (rugged twin) +
+            // MULTIROLE_STRIKE (GA+4) + LASER_GUIDED_MUNITIONS (GA+2) + HEAVY_PAYLOAD (OL+3) + RUNWAY_CRATERING
+            // (BAP-100: OcSuppression+20 stored). Dedicated low-level attack jet. → DF8 MAN9 TS9 SUR9 · GA8 OL9 ·
+            // SR4 · OcSuppression 20.
+            WeaponProfile JAGUAR = WeaponProfile.FromProfileDef(
+                "SEPECAT Jaguar Attack Aircraft", "Jaguar", WeaponType.ATT_JAGUAR_FR,
+                new ProfileDef(FamilyArchetypes.FighterEarly,
+                    new Dictionary<ProfileStat, int> { { ProfileStat.TS, -1 }, { ProfileStat.SUR, 3 } },
+                    new[] { WeaponTrait.MULTIROLE_STRIKE, WeaponTrait.LASER_GUIDED_MUNITIONS, WeaponTrait.HEAVY_PAYLOAD, WeaponTrait.RUNWAY_CRATERING }),
+                UpgradePath.ATT, 420);
 
             // Set the prestige cost for the profile.
             JAGUAR.SetPrestigeCost(PrestigeTierCost.Gen2, PrestigeTypeCost.ATT);
@@ -4890,33 +4678,16 @@ namespace HammerAndSickle.Models
             //----------------------------------------------
             // US F-111 Aardvark Bomber
             //----------------------------------------------
-            WeaponProfile F111 = new WeaponProfile(
-                _longName: "F-111 Aardvark Bomber",
-                _shortName: "F-111 Aardvark",
-                _type: WeaponType.BMB_F111_US,
-                _hardAtt: 0,                                               // Hard Attack Rating
-                _hardDef: 0,                                               // Hard Defense Rating
-                _softAtt: 0,                                               // Soft Attack Rating
-                _softDef: 0,                                               // Soft Defense Rating
-                _gat: 0,                                                   // Ground-to-Air Attack Rating
-                _gad: 0,                                                   // Ground Defense Armor Rating
-                _df: GameData.AC_BOMBER_DOGFIGHT + XXLARGE_BONUS,          // Dogfighting Rating
-                _man: GameData.AC_BOMBER_MANEUVER + LARGE_BONUS,           // Maneuverability Rating
-                _topSpd: GameData.AC_BOMBER_TOPSPEED + XLARGE_BONUS,       // Top Speed Rating
-                _surv: GameData.AC_BOMBER_SURVIVE,                         // Survivability Rating
-                _ga: GameData.GROUND_ATTACK_TIER_2 + LARGE_BONUS,          // Ground Attack Rating
-                _ol: GameData.LARGE_AC_LOAD + MEDIUM_BONUS,                // Ordinance Rating
-                _stealth: 0,                                               // Stealth Rating
-                _pr: GameData.PRIMARY_RANGE_DEFAULT,       // Primary Range
-                _ir: GameData.INDIRECT_RANGE_DEFAULT,      // Indirect Range
-                _sr: GameData.AC_SPOTTING_ENHANCED,        // Spotting Range
-                _mmp: GameData.FIXEDWING_UNIT,             // Max Movement Points
-                _isAmph: false,                            // Is Amphibious
-                _isDF: false,                              // Is DoubleFire
-                _isAtt: true,                              // Can this profile attack
-                _upgradePath: UpgradePath.BMB,            // Upgrade Path
-                _turnAvailable: 348                        // How many months past Jan. 1938
-            );
+            // Phase 3 (final-intent): Bomber archetype + DF+5/MAN+3/TS+4 (fast swing-wing interdictor) +
+            // HARDENED_STRIKE (GA+3, OL+2) + LASER_GUIDED_MUNITIONS (Pave Tack: GA+2) + BUNKER_PENETRATOR
+            // (GaVsBase+4 stored) + TERRAIN_FOLLOW_RADAR (SUR vs ground-AD, dormant). GA13 heavy interdiction
+            // (down from old 15); OL14 preserved. → DF6 MAN6 TS14 SUR8 · GA13 OL14 · MMP100 · SR4 · GaVsBase 4.
+            WeaponProfile F111 = WeaponProfile.FromProfileDef(
+                "F-111 Aardvark Bomber", "F-111 Aardvark", WeaponType.BMB_F111_US,
+                new ProfileDef(FamilyArchetypes.Bomber,
+                    new Dictionary<ProfileStat, int> { { ProfileStat.DF, 5 }, { ProfileStat.MAN, 3 }, { ProfileStat.TS, 4 } },
+                    new[] { WeaponTrait.HARDENED_STRIKE, WeaponTrait.LASER_GUIDED_MUNITIONS, WeaponTrait.BUNKER_PENETRATOR, WeaponTrait.TERRAIN_FOLLOW_RADAR }),
+                UpgradePath.BMB, 348);
 
             // Set the prestige cost for the profile.
             F111.SetPrestigeCost(PrestigeTierCost.Gen2, PrestigeTypeCost.BMB);
@@ -4939,33 +4710,15 @@ namespace HammerAndSickle.Models
             //----------------------------------------------
             // US E-3 Sentry AWACS
             //----------------------------------------------
-            WeaponProfile E3 = new WeaponProfile(
-                _longName: "E-3 Sentry AWACS",
-                _shortName: "E-3 Sentry",
-                _type: WeaponType.AWACS_E3_US,
-                _hardAtt: 0,                                               // Hard Attack Rating
-                _hardDef: 0,                                               // Hard Defense Rating
-                _softAtt: 0,                                               // Soft Attack Rating
-                _softDef: 0,                                               // Soft Defense Rating
-                _gat: 0,                                                   // Ground-to-Air Attack Rating
-                _gad: 0,                                                   // Ground Defense Armor Rating
-                _df: GameData.AC_BOMBER_DOGFIGHT,                          // Dogfighting Rating
-                _man: GameData.AC_BOMBER_MANEUVER,                         // Maneuverability Rating
-                _topSpd: GameData.AC_BOMBER_TOPSPEED,                      // Top Speed Rating
-                _surv: GameData.AC_BOMBER_SURVIVE,                         // Survivability Rating
-                _ga: GameData.GROUND_ATTACK_NA,                            // Ground Attack Rating
-                _ol: GameData.LARGE_AC_LOAD,                               // Ordinance Rating
-                _stealth: 0,                                               // Stealth Rating
-                _pr: GameData.PRIMARY_RANGE_DEFAULT,       // Primary Range
-                _ir: GameData.INDIRECT_RANGE_DEFAULT,      // Indirect Range
-                _sr: GameData.AC_SPOTTING_BASIC,           // Spotting Range
-                _mmp: GameData.FIXEDWING_UNIT,             // Max Movement Points
-                _isAmph: false,                            // Is Amphibious
-                _isDF: false,                              // Is DoubleFire
-                _isAtt: true,                              // Can this profile attack
-                _upgradePath: UpgradePath.AWACS,            // Upgrade Path
-                _turnAvailable: 468                        // How many months past Jan. 1938
-            );
+            // Phase 3 (final-intent): Bomber archetype + NON_COMBATANT + SR+8 → AWACS_SPOTTING_RANGE 12 (the air
+            // picture; W8). Mirrors the Soviet A-50. Carries no strike (GA inert). → DF1 MAN3 TS10 SUR8 · OL12 ·
+            // MMP100 · SR12 · non-combatant.
+            WeaponProfile E3 = WeaponProfile.FromProfileDef(
+                "E-3 Sentry AWACS", "E-3 Sentry", WeaponType.AWACS_E3_US,
+                new ProfileDef(FamilyArchetypes.Bomber,
+                    new Dictionary<ProfileStat, int> { { ProfileStat.SR, GameData.AWACS_SPOTTING_RANGE - GameData.AIR_UNIT_SPOTTING_RANGE } },
+                    new[] { WeaponTrait.NON_COMBATANT }),
+                UpgradePath.AWACS, 468);
 
             // Set the prestige cost for the profile.
             E3.SetPrestigeCost(PrestigeTierCost.Gen3, PrestigeTypeCost.AWACS);
@@ -4988,33 +4741,15 @@ namespace HammerAndSickle.Models
             //----------------------------------------------
             // US SR-71 Blackbird Reconnaissance Aircraft
             //----------------------------------------------
-            WeaponProfile SR71 = new WeaponProfile(
-                _longName: "SR-71 Blackbird Reconnaissance Aircraft",
-                _shortName: "SR-71 Blackbird",
-                _type: WeaponType.RCNA_SR71_US,
-                _hardAtt: 0,                                               // Hard Attack Rating
-                _hardDef: 0,                                               // Hard Defense Rating
-                _softAtt: 0,                                               // Soft Attack Rating
-                _softDef: 0,                                               // Soft Defense Rating
-                _gat: 0,                                                   // Ground-to-Air Attack Rating
-                _gad: 0,                                                   // Ground Defense Armor Rating
-                _df: GameData.EARLY_FGT_DOGFIGHT,                          // Dogfighting Rating
-                _man: GameData.EARLY_FGT_MANEUVER,                         // Maneuverability Rating
-                _topSpd: GameData.AC_HIGHSPEED_WESTERN,                    // Top Speed Rating
-                _surv: GameData.EARLY_FGT_SURVIVE,                         // Survivability Rating
-                _ga: GameData.GROUND_ATTACK_TIER_0,                        // Ground Attack Rating
-                _ol: GameData.SMALL_AC_LOAD,                               // Ordinance Rating
-                _stealth: 0,                                               // Stealth Rating
-                _pr: GameData.PRIMARY_RANGE_DEFAULT,       // Primary Range
-                _ir: GameData.INDIRECT_RANGE_DEFAULT,      // Indirect Range
-                _sr: GameData.AC_SPOTTING_BASIC,           // Spotting Range
-                _mmp: GameData.FIXEDWING_UNIT,             // Max Movement Points
-                _isAmph: false,                            // Is Amphibious
-                _isDF: false,                              // Is DoubleFire
-                _isAtt: true,                              // Can this profile attack
-                _upgradePath: UpgradePath.RCNA,            // Upgrade Path
-                _turnAvailable: 336                        // How many months past Jan. 1938
-            );
+            // Phase 3 (final-intent): FighterEarly + NON_COMBATANT (air recon — no direct engagement, §7A.19) +
+            // HIGH_MACH_DASH + TS+11 → AC_HIGHSPEED_WESTERN 21 (Mach-3 dash) + SR+4 → AIR_RECON_SPOTTING_RANGE 8.
+            // Mirrors the Soviet MiG-25R. → DF8 MAN9 TS21 SUR6 · MMP100 · SR8 · non-combatant.
+            WeaponProfile SR71 = WeaponProfile.FromProfileDef(
+                "SR-71 Blackbird Reconnaissance Aircraft", "SR-71 Blackbird", WeaponType.RCNA_SR71_US,
+                new ProfileDef(FamilyArchetypes.FighterEarly,
+                    new Dictionary<ProfileStat, int> { { ProfileStat.TS, GameData.AC_HIGHSPEED_WESTERN - GameData.EARLY_FGT_TOPSPEED }, { ProfileStat.SR, GameData.AIR_RECON_SPOTTING_RANGE - GameData.AIR_UNIT_SPOTTING_RANGE } },
+                    new[] { WeaponTrait.NON_COMBATANT, WeaponTrait.HIGH_MACH_DASH }),
+                UpgradePath.RCNA, 336);
 
             // Set the prestige cost for the profile.
             SR71.SetPrestigeCost(PrestigeTierCost.Gen2, PrestigeTypeCost.RCNA);
