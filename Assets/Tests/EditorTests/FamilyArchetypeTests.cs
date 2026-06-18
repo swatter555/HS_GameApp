@@ -161,6 +161,32 @@ namespace HammerAndSickle.Tests
             catch (Exception ex) { AppService.HandleException(CLASS_NAME, nameof(Bomber_ResolvesRatifiedLine), ex); throw; }
         }
 
+        [Test]
+        public void Air_GA_OL_Baselines_PerRuleA()
+        {
+            // Rule A (2026-06-16): GA + OL are now air-archetype baselines, not per-profile tier deltas.
+            // Fighters carry the dual-role GA floor 2 / OL 6; Attack 10 / 9; Bomber 8 / 12. GA is a band
+            // stat (clamp 1..25); OL floors at 0.
+            try
+            {
+                foreach (Archetype f in new[] { FamilyArchetypes.FighterEarly, FamilyArchetypes.FighterMid, FamilyArchetypes.FighterLate })
+                {
+                    TraitResolver.Result r = Resolve(f);
+                    Assert.AreEqual(2, r.Stat(ProfileStat.GA), "fighter GA floor");
+                    Assert.AreEqual(6, r.Stat(ProfileStat.OL), "fighter OL");
+                }
+
+                TraitResolver.Result att = Resolve(FamilyArchetypes.Attack);
+                Assert.AreEqual(10, att.Stat(ProfileStat.GA), "Attack GA");
+                Assert.AreEqual(9,  att.Stat(ProfileStat.OL), "Attack OL");
+
+                TraitResolver.Result bmb = Resolve(FamilyArchetypes.Bomber);
+                Assert.AreEqual(8,  bmb.Stat(ProfileStat.GA), "Bomber GA");
+                Assert.AreEqual(12, bmb.Stat(ProfileStat.OL), "Bomber OL");
+            }
+            catch (Exception ex) { AppService.HandleException(CLASS_NAME, nameof(Air_GA_OL_Baselines_PerRuleA), ex); throw; }
+        }
+
         #endregion // Air archetype lines
 
         #region Mechanics guards

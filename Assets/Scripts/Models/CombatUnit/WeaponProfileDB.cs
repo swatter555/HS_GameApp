@@ -1993,7 +1993,7 @@ namespace HammerAndSickle.Models
             WeaponProfile AN12 = WeaponProfile.FromProfileDef(
                 "An-12 Antonov Transport Plane", "An-12 Antonov", WeaponType.TRN_AN8_SV,
                 new ProfileDef(FamilyArchetypes.Bomber,
-                    new Dictionary<ProfileStat, int> { { ProfileStat.TS, -3 }, { ProfileStat.OL, GameData.LARGE_AC_LOAD } },
+                    new Dictionary<ProfileStat, int> { { ProfileStat.TS, -3 } },
                     new[] { WeaponTrait.NON_COMBATANT }),
                 UpgradePath.TRN, 252);
 
@@ -2056,7 +2056,7 @@ namespace HammerAndSickle.Models
             WeaponProfile MIG21 = WeaponProfile.FromProfileDef(
                 "MiG-21 Fishbed Air Superiority Fighter", "MiG-21 Fishbed", WeaponType.FGT_MIG21_SV,
                 new ProfileDef(FamilyArchetypes.FighterEarly,
-                    new Dictionary<ProfileStat, int> { { ProfileStat.OL, GameData.SMALL_AC_LOAD } },
+                    new Dictionary<ProfileStat, int>(),
                     System.Array.Empty<WeaponTrait>()),
                 UpgradePath.FGT, 252);
 
@@ -2086,7 +2086,7 @@ namespace HammerAndSickle.Models
             WeaponProfile MIG23 = WeaponProfile.FromProfileDef(
                 "MiG-23 Flogger Air Superiority Fighter", "MiG-23 Flogger", WeaponType.FGT_MIG23_SV,
                 new ProfileDef(FamilyArchetypes.FighterEarly,
-                    new Dictionary<ProfileStat, int> { { ProfileStat.DF, 3 }, { ProfileStat.TS, 1 }, { ProfileStat.SUR, 2 }, { ProfileStat.GA, GameData.GROUND_ATTACK_TIER_0 }, { ProfileStat.OL, GameData.SMALL_AC_LOAD } },
+                    new Dictionary<ProfileStat, int> { { ProfileStat.DF, 3 }, { ProfileStat.TS, 1 }, { ProfileStat.SUR, 2 }, { ProfileStat.GA, 4 } },
                     System.Array.Empty<WeaponTrait>()),
                 UpgradePath.FGT, 384);
 
@@ -2117,7 +2117,7 @@ namespace HammerAndSickle.Models
             WeaponProfile MIG25 = WeaponProfile.FromProfileDef(
                 "MiG-25 Foxbat Interceptor", "MiG-25 Foxbat", WeaponType.FGT_MIG25_SV,
                 new ProfileDef(FamilyArchetypes.FighterEarly,
-                    new Dictionary<ProfileStat, int> { { ProfileStat.TS, 7 }, { ProfileStat.GA, GameData.GROUND_ATTACK_TIER_0 }, { ProfileStat.OL, GameData.SMALL_AC_LOAD } },
+                    new Dictionary<ProfileStat, int> { { ProfileStat.TS, 7 }, { ProfileStat.GA, 4 } },
                     new[] { WeaponTrait.HIGH_MACH_DASH }),
                 UpgradePath.FGT, 384);
 
@@ -2148,7 +2148,7 @@ namespace HammerAndSickle.Models
             WeaponProfile MIG29 = WeaponProfile.FromProfileDef(
                 "MiG-29 Fulcrum Air Superiority Fighter", "MiG-29 Fulcrum", WeaponType.FGT_MIG29_SV,
                 new ProfileDef(FamilyArchetypes.FighterMid,
-                    new Dictionary<ProfileStat, int> { { ProfileStat.DF, 3 }, { ProfileStat.MAN, 5 }, { ProfileStat.TS, 1 }, { ProfileStat.GA, GameData.GROUND_ATTACK_TIER_1 }, { ProfileStat.OL, GameData.SMALL_AC_LOAD } },
+                    new Dictionary<ProfileStat, int> { { ProfileStat.DF, 3 }, { ProfileStat.MAN, 5 }, { ProfileStat.TS, 1 }, { ProfileStat.GA, 7 } },
                     System.Array.Empty<WeaponTrait>()),
                 UpgradePath.FGT, 540);
 
@@ -2179,7 +2179,7 @@ namespace HammerAndSickle.Models
             WeaponProfile MIG31 = WeaponProfile.FromProfileDef(
                 "MiG-31 Foxhound Interceptor", "MiG-31 Foxhound", WeaponType.FGT_MIG31_SV,
                 new ProfileDef(FamilyArchetypes.FighterMid,
-                    new Dictionary<ProfileStat, int> { { ProfileStat.DF, 3 }, { ProfileStat.TS, 7 }, { ProfileStat.GA, GameData.GROUND_ATTACK_TIER_0 }, { ProfileStat.OL, GameData.SMALL_AC_LOAD } },
+                    new Dictionary<ProfileStat, int> { { ProfileStat.DF, 3 }, { ProfileStat.TS, 7 }, { ProfileStat.GA, 4 } },
                     new[] { WeaponTrait.HIGH_MACH_DASH }),
                 UpgradePath.FGT, 516);
 
@@ -2210,7 +2210,7 @@ namespace HammerAndSickle.Models
             WeaponProfile SU27 = WeaponProfile.FromProfileDef(
                 "Su-27 Flanker Air Superiority Fighter", "Su-27 Flanker", WeaponType.FGT_SU27_SV,
                 new ProfileDef(FamilyArchetypes.FighterMid,
-                    new Dictionary<ProfileStat, int> { { ProfileStat.DF, 5 }, { ProfileStat.MAN, 2 }, { ProfileStat.TS, 2 }, { ProfileStat.SUR, 2 }, { ProfileStat.GA, GameData.GROUND_ATTACK_TIER_1 }, { ProfileStat.OL, GameData.SMALL_AC_LOAD } },
+                    new Dictionary<ProfileStat, int> { { ProfileStat.DF, 5 }, { ProfileStat.MAN, 2 }, { ProfileStat.TS, 2 }, { ProfileStat.SUR, 2 }, { ProfileStat.GA, 7 } },
                     System.Array.Empty<WeaponTrait>()),
                 UpgradePath.FGT, 564);
 
@@ -2241,7 +2241,7 @@ namespace HammerAndSickle.Models
             WeaponProfile SU47 = WeaponProfile.FromProfileDef(
                 "Su-47 Berkut Experimental Fighter", "Su-47 Berkut", WeaponType.FGT_SU47_SV,
                 new ProfileDef(FamilyArchetypes.FighterLate,
-                    new Dictionary<ProfileStat, int> { { ProfileStat.DF, 6 }, { ProfileStat.MAN, 5 }, { ProfileStat.GA, GameData.GROUND_ATTACK_TIER_2 }, { ProfileStat.OL, GameData.SMALL_AC_LOAD } },
+                    new Dictionary<ProfileStat, int> { { ProfileStat.DF, 6 }, { ProfileStat.MAN, 5 }, { ProfileStat.GA, 10 } },
                     System.Array.Empty<WeaponTrait>()),
                 UpgradePath.FGT, 708);
 
@@ -2271,7 +2271,7 @@ namespace HammerAndSickle.Models
             WeaponProfile MIG27 = WeaponProfile.FromProfileDef(
                 "MiG-27 Flogger-D Multi-Role Fighter", "MiG-27 Flogger-D", WeaponType.FGT_MIG27_SV,
                 new ProfileDef(FamilyArchetypes.Attack,
-                    new Dictionary<ProfileStat, int> { { ProfileStat.DF, 3 }, { ProfileStat.MAN, 2 }, { ProfileStat.TS, 2 }, { ProfileStat.SUR, 1 }, { ProfileStat.GA, 10 }, { ProfileStat.OL, GameData.MEDIUM_AC_LOAD } },
+                    new Dictionary<ProfileStat, int> { { ProfileStat.DF, 3 }, { ProfileStat.MAN, 2 }, { ProfileStat.TS, 2 }, { ProfileStat.SUR, 1 } },
                     System.Array.Empty<WeaponTrait>()),
                 UpgradePath.ATT, 444);
 
@@ -2301,7 +2301,7 @@ namespace HammerAndSickle.Models
             WeaponProfile SU17 = WeaponProfile.FromProfileDef(
                 "Su-17 Fitter Attack Aircraft", "Su-17 Fitter", WeaponType.ATT_SU17_SV,
                 new ProfileDef(FamilyArchetypes.Attack,
-                    new Dictionary<ProfileStat, int> { { ProfileStat.TS, 1 }, { ProfileStat.GA, GameData.GROUND_ATTACK_TIER_1 }, { ProfileStat.OL, GameData.MEDIUM_AC_LOAD } },
+                    new Dictionary<ProfileStat, int> { { ProfileStat.TS, 1 }, { ProfileStat.GA, -1 } },
                     System.Array.Empty<WeaponTrait>()),
                 UpgradePath.ATT, 384);
 
@@ -2332,7 +2332,7 @@ namespace HammerAndSickle.Models
             WeaponProfile SU25 = WeaponProfile.FromProfileDef(
                 "Su-25 Frogfoot Attack Aircraft", "Su-25 Frogfoot", WeaponType.ATT_SU25_SV,
                 new ProfileDef(FamilyArchetypes.Attack,
-                    new Dictionary<ProfileStat, int> { { ProfileStat.DF, -2 }, { ProfileStat.SUR, 2 }, { ProfileStat.GA, GameData.GROUND_ATTACK_TIER_2 }, { ProfileStat.OL, GameData.MEDIUM_AC_LOAD } },
+                    new Dictionary<ProfileStat, int> { { ProfileStat.DF, -2 }, { ProfileStat.SUR, 2 }, { ProfileStat.GA, 2 } },
                     System.Array.Empty<WeaponTrait>()),
                 UpgradePath.ATT, 516);
 
@@ -2362,7 +2362,7 @@ namespace HammerAndSickle.Models
             WeaponProfile SU25B = WeaponProfile.FromProfileDef(
                 "Su-25B Frogfoot-B Attack Aircraft", "Su-25B Frogfoot-B", WeaponType.ATT_SU25B_SV,
                 new ProfileDef(FamilyArchetypes.Attack,
-                    new Dictionary<ProfileStat, int> { { ProfileStat.SUR, 5 }, { ProfileStat.GA, GameData.GROUND_ATTACK_TIER_3 }, { ProfileStat.OL, 10 } },
+                    new Dictionary<ProfileStat, int> { { ProfileStat.SUR, 5 }, { ProfileStat.GA, 5 }, { ProfileStat.OL, 1 } },
                     System.Array.Empty<WeaponTrait>()),
                 UpgradePath.ATT, 588);
 
@@ -2392,7 +2392,7 @@ namespace HammerAndSickle.Models
             WeaponProfile SU24 = WeaponProfile.FromProfileDef(
                 "Su-24 Fencer Bomber", "Su-24 Fencer", WeaponType.BMB_SU24_SV,
                 new ProfileDef(FamilyArchetypes.Bomber,
-                    new Dictionary<ProfileStat, int> { { ProfileStat.DF, 5 }, { ProfileStat.MAN, 3 }, { ProfileStat.TS, 4 }, { ProfileStat.GA, GameData.GROUND_ATTACK_TIER_2 }, { ProfileStat.OL, GameData.LARGE_AC_LOAD } },
+                    new Dictionary<ProfileStat, int> { { ProfileStat.DF, 5 }, { ProfileStat.MAN, 3 }, { ProfileStat.TS, 4 }, { ProfileStat.GA, 4 } },
                     System.Array.Empty<WeaponTrait>()),
                 UpgradePath.ATT, 432);
 
@@ -2422,7 +2422,7 @@ namespace HammerAndSickle.Models
             WeaponProfile TU16 = WeaponProfile.FromProfileDef(
                 "Tu-16 Badger Bomber", "Tu-16 Badger", WeaponType.BMB_TU16_SV,
                 new ProfileDef(FamilyArchetypes.Bomber,
-                    new Dictionary<ProfileStat, int> { { ProfileStat.SUR, 2 }, { ProfileStat.GA, GameData.GROUND_ATTACK_TIER_1 }, { ProfileStat.OL, GameData.XLARGE_AC_LOAD } },
+                    new Dictionary<ProfileStat, int> { { ProfileStat.SUR, 2 }, { ProfileStat.GA, 1 }, { ProfileStat.OL, 4 } },
                     System.Array.Empty<WeaponTrait>()),
                 UpgradePath.BMB, 192);
 
@@ -2452,7 +2452,7 @@ namespace HammerAndSickle.Models
             WeaponProfile TU22 = WeaponProfile.FromProfileDef(
                 "Tu-22 Blinder Bomber", "Tu-22 Blinder", WeaponType.BMB_TU22_SV,
                 new ProfileDef(FamilyArchetypes.Bomber,
-                    new Dictionary<ProfileStat, int> { { ProfileStat.TS, 4 }, { ProfileStat.GA, 13 }, { ProfileStat.OL, 11 } },
+                    new Dictionary<ProfileStat, int> { { ProfileStat.TS, 4 }, { ProfileStat.GA, 5 }, { ProfileStat.OL, -1 } },
                     new[] { WeaponTrait.HIGH_MACH_DASH }),
                 UpgradePath.BMB, 288);
 
@@ -2483,7 +2483,7 @@ namespace HammerAndSickle.Models
             WeaponProfile TU22M3 = WeaponProfile.FromProfileDef(
                 "Tu-22M3 Backfire-C Strategic Bomber", "Tu-22M3 Backfire", WeaponType.BMB_TU22M3_SV,
                 new ProfileDef(FamilyArchetypes.Bomber,
-                    new Dictionary<ProfileStat, int> { { ProfileStat.TS, 6 }, { ProfileStat.GA, GameData.GROUND_ATTACK_TIER_3 }, { ProfileStat.OL, 15 } },
+                    new Dictionary<ProfileStat, int> { { ProfileStat.TS, 6 }, { ProfileStat.GA, 7 }, { ProfileStat.OL, 3 } },
                     new[] { WeaponTrait.HIGH_MACH_DASH }),
                 UpgradePath.BMB, 480);
 
@@ -3203,33 +3203,14 @@ namespace HammerAndSickle.Models
             //----------------------------------------------
             // US M2 Bradley Infantry Fighting Vehicle
             //----------------------------------------------
-            WeaponProfile M2_US = new WeaponProfile(
-                _longName: "M2 Bradley Infantry Fighting Vehicle",
-                _shortName: "M2 Bradley",
-                _type: WeaponType.IFV_M2_US,
-                _hardAtt: GameData.BASE_IFV_HARD_ATTACK + XXXLARGE_BONUS,  // Hard Attack Rating
-                _hardDef: GameData.BASE_IFV_HARD_DEFENSE,                  // Hard Defense Rating
-                _softAtt: GameData.BASE_IFV_SOFT_ATTACK + SMALL_BONUS,     // Soft Attack Rating
-                _softDef: GameData.BASE_IFV_SOFT_DEFENSE,                  // Soft Defense Rating
-                _gat: GameData.GROUND_AIR_ATTACK_DEFAULT,      // Ground-to-Air Attack Rating
-                _gad: GameData.GROUND_DEFENSE_LIGHTARMOR,      // Ground Defense Armor Rating
-                _df: 0,                                        // Dogfighting Rating
-                _man: 0,                                       // Maneuverability Rating
-                _topSpd: 0,                                    // Top Speed Rating
-                _surv: 0,                                      // Survivability Rating
-                _ga: 0,                                        // Ground Attack Rating
-                _ol: 0,                                        // Ordinance Rating
-                _stealth: 0,                                   // Stealth Rating
-                _pr: GameData.PRIMARY_RANGE_DEFAULT,           // Primary Range
-                _ir: GameData.INDIRECT_RANGE_DEFAULT,          // Indirect Range
-                _sr: GameData.BASE_UNIT_SPOTTING_RANGE,        // Spotting Range
-                _mmp: GameData.MECH_UNIT,                      // Max Movement Points
-                _isAmph: false,                                // Is Amphibious
-                _isDF: false,                                  // Is DoubleFire
-                _isAtt: true,                                  // Can this profile attack
-                _upgradePath: UpgradePath.IFV,                 // Upgrade Path
-                _turnAvailable: 516                            // How many months past Jan. 1938
-            );
+            // Phase 3 (NATO): Ifv + ATGM_RAIL (TOW, HA+4) + AUTOCANNON_LIGHT (25mm Bushmaster, SA+1).
+            // → HA8 HD4 SA9 SD7 GAD7 · ICM 1.00 · MMP10 · SR2 · PR1.
+            WeaponProfile M2_US = WeaponProfile.FromProfileDef(
+                "M2 Bradley Infantry Fighting Vehicle", "M2 Bradley", WeaponType.IFV_M2_US,
+                new ProfileDef(FamilyArchetypes.Ifv,
+                    new Dictionary<ProfileStat, int>(),
+                    new[] { WeaponTrait.ATGM_RAIL, WeaponTrait.AUTOCANNON_LIGHT }),
+                UpgradePath.IFV, 516);
 
             // Set the prestige cost for the profile.
             M2_US.SetPrestigeCost(PrestigeTierCost.Gen3, PrestigeTypeCost.IFV);
@@ -3257,33 +3238,14 @@ namespace HammerAndSickle.Models
             //----------------------------------------------
             // UK Warrior Infantry Fighting Vehicle
             //----------------------------------------------
-            WeaponProfile WARRIOR_UK = new WeaponProfile(
-                _longName: "Warrior Infantry Fighting Vehicle",
-                _shortName: "Warrior",
-                _type: WeaponType.IFV_WARRIOR_UK,
-                _hardAtt: GameData.BASE_IFV_HARD_ATTACK + MEDIUM_BONUS,    // Hard Attack Rating
-                _hardDef: GameData.BASE_IFV_HARD_DEFENSE,                  // Hard Defense Rating
-                _softAtt: GameData.BASE_IFV_SOFT_ATTACK,                   // Soft Attack Rating
-                _softDef: GameData.BASE_IFV_SOFT_DEFENSE,                  // Soft Defense Rating
-                _gat: GameData.GROUND_AIR_ATTACK_DEFAULT,      // Ground-to-Air Attack Rating
-                _gad: GameData.GROUND_DEFENSE_LIGHTARMOR,      // Ground Defense Armor Rating
-                _df: 0,                                        // Dogfighting Rating
-                _man: 0,                                       // Maneuverability Rating
-                _topSpd: 0,                                    // Top Speed Rating
-                _surv: 0,                                      // Survivability Rating
-                _ga: 0,                                        // Ground Attack Rating
-                _ol: 0,                                        // Ordinance Rating
-                _stealth: 0,                                   // Stealth Rating
-                _pr: GameData.PRIMARY_RANGE_DEFAULT,           // Primary Range
-                _ir: GameData.INDIRECT_RANGE_DEFAULT,          // Indirect Range
-                _sr: GameData.BASE_UNIT_SPOTTING_RANGE,        // Spotting Range
-                _mmp: GameData.MECH_UNIT,                      // Max Movement Points
-                _isAmph: false,                                // Is Amphibious
-                _isDF: false,                                  // Is DoubleFire
-                _isAtt: true,                                  // Can this profile attack
-                _upgradePath: UpgradePath.IFV,                 // Upgrade Path
-                _turnAvailable: 588                            // How many months past Jan. 1938
-            );
+            // Phase 3 (NATO): Ifv + AUTOCANNON_HEAVY (30mm RARDEN, HA+1/SA+1); MILAN is dismounted (no vehicle ATGM).
+            // → HA5 HD4 SA9 SD7 GAD7 · ICM 1.00 · MMP10 · SR2.
+            WeaponProfile WARRIOR_UK = WeaponProfile.FromProfileDef(
+                "Warrior Infantry Fighting Vehicle", "Warrior", WeaponType.IFV_WARRIOR_UK,
+                new ProfileDef(FamilyArchetypes.Ifv,
+                    new Dictionary<ProfileStat, int>(),
+                    new[] { WeaponTrait.AUTOCANNON_HEAVY }),
+                UpgradePath.IFV, 588);
 
             // Set the prestige cost for the profile.
             WARRIOR_UK.SetPrestigeCost(PrestigeTierCost.Gen3, PrestigeTypeCost.IFV);
@@ -3311,33 +3273,14 @@ namespace HammerAndSickle.Models
             //----------------------------------------------
             // FRG Marder Infantry Fighting Vehicle
             //----------------------------------------------
-            WeaponProfile MARDER_GE = new WeaponProfile(
-                _longName: "Marder Infantry Fighting Vehicle",
-                _shortName: "Marder",
-                _type: WeaponType.IFV_MARDER_GE,
-                _hardAtt: GameData.BASE_IFV_HARD_ATTACK + LARGE_BONUS,     // Hard Attack Rating
-                _hardDef: GameData.BASE_IFV_HARD_DEFENSE,                  // Hard Defense Rating
-                _softAtt: GameData.BASE_IFV_SOFT_ATTACK,                   // Soft Attack Rating
-                _softDef: GameData.BASE_IFV_SOFT_DEFENSE,                  // Soft Defense Rating
-                _gat: GameData.GROUND_AIR_ATTACK_DEFAULT,      // Ground-to-Air Attack Rating
-                _gad: GameData.GROUND_DEFENSE_LIGHTARMOR,      // Ground Defense Armor Rating
-                _df: 0,                                        // Dogfighting Rating
-                _man: 0,                                       // Maneuverability Rating
-                _topSpd: 0,                                    // Top Speed Rating
-                _surv: 0,                                      // Survivability Rating
-                _ga: 0,                                        // Ground Attack Rating
-                _ol: 0,                                        // Ordinance Rating
-                _stealth: 0,                                   // Stealth Rating
-                _pr: GameData.PRIMARY_RANGE_DEFAULT,           // Primary Range
-                _ir: GameData.INDIRECT_RANGE_DEFAULT,          // Indirect Range
-                _sr: GameData.BASE_UNIT_SPOTTING_RANGE,        // Spotting Range
-                _mmp: GameData.MECH_UNIT,                      // Max Movement Points
-                _isAmph: false,                                // Is Amphibious
-                _isDF: false,                                  // Is DoubleFire
-                _isAtt: true,                                  // Can this profile attack
-                _upgradePath: UpgradePath.IFV,                 // Upgrade Path
-                _turnAvailable: 396                            // How many months past Jan. 1938
-            );
+            // Phase 3 (NATO): Ifv + ATGM_RAIL (MILAN, HA+4) + AUTOCANNON_LIGHT (20mm, SA+1).
+            // → HA8 HD4 SA9 SD7 GAD7 · ICM 1.00 · MMP10 · SR2.
+            WeaponProfile MARDER_GE = WeaponProfile.FromProfileDef(
+                "Marder Infantry Fighting Vehicle", "Marder", WeaponType.IFV_MARDER_GE,
+                new ProfileDef(FamilyArchetypes.Ifv,
+                    new Dictionary<ProfileStat, int>(),
+                    new[] { WeaponTrait.ATGM_RAIL, WeaponTrait.AUTOCANNON_LIGHT }),
+                UpgradePath.IFV, 396);
 
             // Set the prestige cost for the profile.
             MARDER_GE.SetPrestigeCost(PrestigeTierCost.Gen2, PrestigeTypeCost.IFV);
@@ -3365,33 +3308,14 @@ namespace HammerAndSickle.Models
             //----------------------------------------------
             // US M113 Armored Personnel Carrier
             //----------------------------------------------
-            WeaponProfile M113_US = new WeaponProfile(
-                _longName: "M113 Armored Personnel Carrier",
-                _shortName: "M113",
-                _type: WeaponType.APC_M113_US,
-                _hardAtt: GameData.BASE_APC_HARD_ATTACK,       // Hard Attack Rating
-                _hardDef: GameData.BASE_APC_HARD_DEFENSE,      // Hard Defense Rating
-                _softAtt: GameData.BASE_APC_SOFT_ATTACK,       // Soft Attack Rating
-                _softDef: GameData.BASE_APC_SOFT_DEFENSE,      // Soft Defense Rating
-                _gat: GameData.GROUND_AIR_ATTACK_DEFAULT,      // Ground-to-Air Attack Rating
-                _gad: GameData.GROUND_DEFENSE_LIGHTARMOR,      // Ground Defense Armor Rating
-                _df: 0,                                        // Dogfighting Rating
-                _man: 0,                                       // Maneuverability Rating
-                _topSpd: 0,                                    // Top Speed Rating
-                _surv: 0,                                      // Survivability Rating
-                _ga: 0,                                        // Ground Attack Rating
-                _ol: 0,                                        // Ordinance Rating
-                _stealth: 0,                                   // Stealth Rating
-                _pr: GameData.PRIMARY_RANGE_DEFAULT,           // Primary Range
-                _ir: GameData.INDIRECT_RANGE_DEFAULT,          // Indirect Range
-                _sr: GameData.BASE_UNIT_SPOTTING_RANGE,        // Spotting Range
-                _mmp: GameData.MECH_UNIT,                      // Max Movement Points
-                _isAmph: false,                                // Is Amphibious
-                _isDF: false,                                  // Is DoubleFire
-                _isAtt: true,                                  // Can this profile attack
-                _upgradePath: UpgradePath.APC,                 // Upgrade Path
-                _turnAvailable: 264                            // How many months past Jan. 1938
-            );
+            // Phase 3 (NATO): bare Apc archetype (tracked, .50-cal only).
+            // → HA3 HD4 SA6 SD7 GAD7 · ICM 1.00 · MMP8 · SR2.
+            WeaponProfile M113_US = WeaponProfile.FromProfileDef(
+                "M113 Armored Personnel Carrier", "M113", WeaponType.APC_M113_US,
+                new ProfileDef(FamilyArchetypes.Apc,
+                    new Dictionary<ProfileStat, int>(),
+                    System.Array.Empty<WeaponTrait>()),
+                UpgradePath.APC, 264);
 
             // Set the prestige cost for the profile.
             M113_US.SetPrestigeCost(PrestigeTierCost.Gen1, PrestigeTypeCost.APC);
@@ -3419,33 +3343,14 @@ namespace HammerAndSickle.Models
             //----------------------------------------------
             // US HMMWV (Humvee)
             //----------------------------------------------
-            WeaponProfile HUMVEE_US = new WeaponProfile(
-                _longName: "HMMWV Utility Vehicle",
-                _shortName: "Humvee",
-                _type: WeaponType.APC_HUMVEE_US,
-                _hardAtt: GameData.BASE_APC_HARD_ATTACK + SMALL_MALUS,     // Hard Attack Rating
-                _hardDef: GameData.BASE_APC_HARD_DEFENSE + SMALL_MALUS,    // Hard Defense Rating
-                _softAtt: GameData.BASE_APC_SOFT_ATTACK + SMALL_MALUS,     // Soft Attack Rating
-                _softDef: GameData.BASE_APC_SOFT_DEFENSE + SMALL_MALUS,    // Soft Defense Rating
-                _gat: GameData.GROUND_AIR_ATTACK_DEFAULT,      // Ground-to-Air Attack Rating
-                _gad: GameData.GROUND_DEFENSE_LIGHTARMOR,      // Ground Defense Armor Rating
-                _df: 0,                                        // Dogfighting Rating
-                _man: 0,                                       // Maneuverability Rating
-                _topSpd: 0,                                    // Top Speed Rating
-                _surv: 0,                                      // Survivability Rating
-                _ga: 0,                                        // Ground Attack Rating
-                _ol: 0,                                        // Ordinance Rating
-                _stealth: 0,                                   // Stealth Rating
-                _pr: GameData.PRIMARY_RANGE_DEFAULT,           // Primary Range
-                _ir: GameData.INDIRECT_RANGE_DEFAULT,          // Indirect Range
-                _sr: GameData.BASE_UNIT_SPOTTING_RANGE,        // Spotting Range
-                _mmp: GameData.MOT_UNIT,                       // Max Movement Points
-                _isAmph: false,                                // Is Amphibious
-                _isDF: false,                                  // Is DoubleFire
-                _isAtt: true,                                  // Can this profile attack
-                _upgradePath: UpgradePath.APC,                 // Upgrade Path
-                _turnAvailable: 552                            // How many months past Jan. 1938
-            );
+            // Phase 3 (NATO): Apc + THIN_TOP (open-mount soft-skin, GAD−1). Wheeled utility carrier.
+            // → HA3 HD4 SA6 SD7 GAD6 · ICM 1.00 · MMP8 · SR2.
+            WeaponProfile HUMVEE_US = WeaponProfile.FromProfileDef(
+                "HMMWV Utility Vehicle", "Humvee", WeaponType.APC_HUMVEE_US,
+                new ProfileDef(FamilyArchetypes.Apc,
+                    new Dictionary<ProfileStat, int>(),
+                    new[] { WeaponTrait.THIN_TOP }),
+                UpgradePath.APC, 552);
 
             // Set the prestige cost for the profile.
             HUMVEE_US.SetPrestigeCost(PrestigeTierCost.Gen2, PrestigeTypeCost.APC);
@@ -3473,33 +3378,14 @@ namespace HammerAndSickle.Models
             //----------------------------------------------
             // US LVTP-7 Amphibious Assault Vehicle
             //----------------------------------------------
-            WeaponProfile LVTP7_US = new WeaponProfile(
-                _longName: "LVTP-7 Amphibious Assault Vehicle",
-                _shortName: "LVTP-7",
-                _type: WeaponType.APC_LVTP7_US,
-                _hardAtt: GameData.BASE_APC_HARD_ATTACK,       // Hard Attack Rating
-                _hardDef: GameData.BASE_APC_HARD_DEFENSE,      // Hard Defense Rating
-                _softAtt: GameData.BASE_APC_SOFT_ATTACK,       // Soft Attack Rating
-                _softDef: GameData.BASE_APC_SOFT_DEFENSE,      // Soft Defense Rating
-                _gat: GameData.GROUND_AIR_ATTACK_DEFAULT,      // Ground-to-Air Attack Rating
-                _gad: GameData.GROUND_DEFENSE_LIGHTARMOR,      // Ground Defense Armor Rating
-                _df: 0,                                        // Dogfighting Rating
-                _man: 0,                                       // Maneuverability Rating
-                _topSpd: 0,                                    // Top Speed Rating
-                _surv: 0,                                      // Survivability Rating
-                _ga: 0,                                        // Ground Attack Rating
-                _ol: 0,                                        // Ordinance Rating
-                _stealth: 0,                                   // Stealth Rating
-                _pr: GameData.PRIMARY_RANGE_DEFAULT,           // Primary Range
-                _ir: GameData.INDIRECT_RANGE_DEFAULT,          // Indirect Range
-                _sr: GameData.BASE_UNIT_SPOTTING_RANGE,        // Spotting Range
-                _mmp: GameData.MECH_UNIT,                      // Max Movement Points
-                _isAmph: true,                                 // Is Amphibious
-                _isDF: false,                                  // Is DoubleFire
-                _isAtt: true,                                  // Can this profile attack
-                _upgradePath: UpgradePath.APC,                 // Upgrade Path
-                _turnAvailable: 408                            // How many months past Jan. 1938
-            );
+            // Phase 3 (NATO): Apc + AMPHIBIOUS (Marine assault swimmer).
+            // → HA3 HD4 SA6 SD7 GAD7 · ICM 1.00 · MMP8 · SR2 · amphibious.
+            WeaponProfile LVTP7_US = WeaponProfile.FromProfileDef(
+                "LVTP-7 Amphibious Assault Vehicle", "LVTP-7", WeaponType.APC_LVTP7_US,
+                new ProfileDef(FamilyArchetypes.Apc,
+                    new Dictionary<ProfileStat, int>(),
+                    new[] { WeaponTrait.AMPHIBIOUS }),
+                UpgradePath.APC, 408);
 
             // Set the prestige cost for the profile.
             LVTP7_US.SetPrestigeCost(PrestigeTierCost.Gen2, PrestigeTypeCost.APC);
@@ -3526,33 +3412,14 @@ namespace HammerAndSickle.Models
             //----------------------------------------------
             // French VAB Armored Personnel Carrier
             //----------------------------------------------
-            WeaponProfile VAB_FR = new WeaponProfile(
-                _longName: "VAB Armored Personnel Carrier",
-                _shortName: "VAB",
-                _type: WeaponType.APC_VAB_FR,
-                _hardAtt: GameData.BASE_APC_HARD_ATTACK,       // Hard Attack Rating
-                _hardDef: GameData.BASE_APC_HARD_DEFENSE,      // Hard Defense Rating
-                _softAtt: GameData.BASE_APC_SOFT_ATTACK,       // Soft Attack Rating
-                _softDef: GameData.BASE_APC_SOFT_DEFENSE,      // Soft Defense Rating
-                _gat: GameData.GROUND_AIR_ATTACK_DEFAULT,      // Ground-to-Air Attack Rating
-                _gad: GameData.GROUND_DEFENSE_LIGHTARMOR,      // Ground Defense Armor Rating
-                _df: 0,                                        // Dogfighting Rating
-                _man: 0,                                       // Maneuverability Rating
-                _topSpd: 0,                                    // Top Speed Rating
-                _surv: 0,                                      // Survivability Rating
-                _ga: 0,                                        // Ground Attack Rating
-                _ol: 0,                                        // Ordinance Rating
-                _stealth: 0,                                   // Stealth Rating
-                _pr: GameData.PRIMARY_RANGE_DEFAULT,           // Primary Range
-                _ir: GameData.INDIRECT_RANGE_DEFAULT,          // Indirect Range
-                _sr: GameData.BASE_UNIT_SPOTTING_RANGE,        // Spotting Range
-                _mmp: GameData.MECH_UNIT,                      // Max Movement Points
-                _isAmph: false,                                // Is Amphibious
-                _isDF: false,                                  // Is DoubleFire
-                _isAtt: true,                                  // Can this profile attack
-                _upgradePath: UpgradePath.APC,                 // Upgrade Path
-                _turnAvailable: 456                            // How many months past Jan. 1938
-            );
+            // Phase 3 (NATO): bare Apc archetype (wheeled 6x6 carrier).
+            // → HA3 HD4 SA6 SD7 GAD7 · ICM 1.00 · MMP8 · SR2.
+            WeaponProfile VAB_FR = WeaponProfile.FromProfileDef(
+                "VAB Armored Personnel Carrier", "VAB", WeaponType.APC_VAB_FR,
+                new ProfileDef(FamilyArchetypes.Apc,
+                    new Dictionary<ProfileStat, int>(),
+                    System.Array.Empty<WeaponTrait>()),
+                UpgradePath.APC, 456);
 
             // Set the prestige cost for the profile.
             VAB_FR.SetPrestigeCost(PrestigeTierCost.Gen2, PrestigeTypeCost.APC);
@@ -3583,33 +3450,14 @@ namespace HammerAndSickle.Models
             //----------------------------------------------
             // US M109 Paladin Self-Propelled Artillery
             //----------------------------------------------
-            WeaponProfile M109_US = new WeaponProfile(
-                _longName: "M109 Paladin Self-Propelled Artillery",  // Full name for UI display and intel reports
-                _shortName: "M109 Paladin",                          // Short name for UI display and intel reports
-                _type: WeaponType.SPA_M109_US,             // Enum identifier for this profile
-                _hardAtt: GameData.BASE_ARTY_HARD_ATTACK + LARGE_BONUS,    // Hard Attack Rating
-                _hardDef: GameData.BASE_ARTY_HARD_DEFENSE + MEDIUM_BONUS,  // Hard Defense Rating
-                _softAtt: GameData.BASE_ARTY_SOFT_ATTACK + XLARGE_BONUS,   // Soft Attack Rating
-                _softDef: GameData.BASE_ARTY_SOFT_DEFENSE + MEDIUM_BONUS,  // Soft Defense Rating
-                _gat: GameData.GROUND_AIR_ATTACK_DEFAULT,  // Ground-to-Air Attack Rating
-                _gad: GameData.GROUND_DEFENSE_LIGHTARMOR,  // Ground Defense Armor Rating
-                _df: 0,                                    // Dogfighting Rating
-                _man: 0,                                   // Maneuverability Rating
-                _topSpd: 0,                                // Top Speed Rating
-                _surv: 0,                                  // Survivability Rating
-                _ga: 0,                                    // Ground Attack Rating
-                _ol: 0,                                    // Ordinance Rating
-                _stealth: 0,                               // Stealth Rating
-                _pr: GameData.PRIMARY_RANGE_DEFAULT,       // Primary Range
-                _ir: GameData.INDIRECT_RANGE_MEDIUM,       // Indirect Range
-                _sr: GameData.BASE_UNIT_SPOTTING_RANGE,    // Spotting Range
-                _mmp: GameData.MECH_UNIT,                  // Max Movement Points
-                _isAmph: false,                            // Is Amphibious
-                _isDF: false,                              // Is DoubleFire
-                _isAtt: true,                              // Can this profile attack
-                _upgradePath: UpgradePath.ART,             // Upgrade Path
-                _turnAvailable: 300                        // How many months past Jan. 1938
-            );
+            // Phase 3 (NATO): Artillery + SELF_PROPELLED (tracked 155mm SP) + SA+1 (calibre), IR medium. Standard SP howitzer (= 2S3 line).
+            // → HA5 HD7 SA10 SD7 GAD7 · ICM 1.00 · MMP10 · IR5.
+            WeaponProfile M109_US = WeaponProfile.FromProfileDef(
+                "M109 Paladin Self-Propelled Artillery", "M109 Paladin", WeaponType.SPA_M109_US,
+                new ProfileDef(FamilyArchetypes.Artillery,
+                    new Dictionary<ProfileStat, int> { { ProfileStat.SA, 1 }, { ProfileStat.IR, GameData.INDIRECT_RANGE_MEDIUM } },
+                    new[] { WeaponTrait.SELF_PROPELLED }),
+                UpgradePath.ART, 300);
 
             // Set the prestige cost for the profile.
             M109_US.SetPrestigeCost(PrestigeTierCost.Gen2, PrestigeTypeCost.SPA);
@@ -3641,33 +3489,14 @@ namespace HammerAndSickle.Models
             //----------------------------------------------
             // German M109 Self-Propelled Artillery
             //----------------------------------------------
-            WeaponProfile M109_GE = new WeaponProfile(
-                _longName: "M109 Self-Propelled Artillery",          // Full name for UI display and intel reports
-                _shortName: "M109",                                  // Short name for UI display and intel reports
-                _type: WeaponType.SPA_M109_GE,             // Enum identifier for this profile
-                _hardAtt: GameData.BASE_ARTY_HARD_ATTACK + LARGE_BONUS,    // Hard Attack Rating
-                _hardDef: GameData.BASE_ARTY_HARD_DEFENSE + MEDIUM_BONUS,  // Hard Defense Rating
-                _softAtt: GameData.BASE_ARTY_SOFT_ATTACK + XLARGE_BONUS,   // Soft Attack Rating
-                _softDef: GameData.BASE_ARTY_SOFT_DEFENSE + MEDIUM_BONUS,  // Soft Defense Rating
-                _gat: GameData.GROUND_AIR_ATTACK_DEFAULT,  // Ground-to-Air Attack Rating
-                _gad: GameData.GROUND_DEFENSE_LIGHTARMOR,  // Ground Defense Armor Rating
-                _df: 0,                                    // Dogfighting Rating
-                _man: 0,                                   // Maneuverability Rating
-                _topSpd: 0,                                // Top Speed Rating
-                _surv: 0,                                  // Survivability Rating
-                _ga: 0,                                    // Ground Attack Rating
-                _ol: 0,                                    // Ordinance Rating
-                _stealth: 0,                               // Stealth Rating
-                _pr: GameData.PRIMARY_RANGE_DEFAULT,       // Primary Range
-                _ir: GameData.INDIRECT_RANGE_MEDIUM,       // Indirect Range
-                _sr: GameData.BASE_UNIT_SPOTTING_RANGE,    // Spotting Range
-                _mmp: GameData.MECH_UNIT,                  // Max Movement Points
-                _isAmph: false,                            // Is Amphibious
-                _isDF: false,                              // Is DoubleFire
-                _isAtt: true,                              // Can this profile attack
-                _upgradePath: UpgradePath.ART,             // Upgrade Path
-                _turnAvailable: 300                        // How many months past Jan. 1938
-            );
+            // Phase 3 (NATO): Artillery + SELF_PROPELLED + SA+1 (calibre), IR medium. Standard SP howitzer.
+            // → HA5 HD7 SA10 SD7 GAD7 · ICM 1.00 · MMP10 · IR5.
+            WeaponProfile M109_GE = WeaponProfile.FromProfileDef(
+                "M109 Self-Propelled Artillery", "M109", WeaponType.SPA_M109_GE,
+                new ProfileDef(FamilyArchetypes.Artillery,
+                    new Dictionary<ProfileStat, int> { { ProfileStat.SA, 1 }, { ProfileStat.IR, GameData.INDIRECT_RANGE_MEDIUM } },
+                    new[] { WeaponTrait.SELF_PROPELLED }),
+                UpgradePath.ART, 300);
 
             // Set the prestige cost for the profile.
             M109_GE.SetPrestigeCost(PrestigeTierCost.Gen2, PrestigeTypeCost.SPA);
@@ -3699,33 +3528,14 @@ namespace HammerAndSickle.Models
             //----------------------------------------------
             // French M109 Self-Propelled Artillery
             //----------------------------------------------
-            WeaponProfile M109_FR = new WeaponProfile(
-                _longName: "M109 Self-Propelled Artillery",          // Full name for UI display and intel reports
-                _shortName: "M109",                                  // Short name for UI display and intel reports
-                _type: WeaponType.SPA_M109_FR,             // Enum identifier for this profile
-                _hardAtt: GameData.BASE_ARTY_HARD_ATTACK + LARGE_BONUS,    // Hard Attack Rating
-                _hardDef: GameData.BASE_ARTY_HARD_DEFENSE + MEDIUM_BONUS,  // Hard Defense Rating
-                _softAtt: GameData.BASE_ARTY_SOFT_ATTACK + XLARGE_BONUS,   // Soft Attack Rating
-                _softDef: GameData.BASE_ARTY_SOFT_DEFENSE + MEDIUM_BONUS,  // Soft Defense Rating
-                _gat: GameData.GROUND_AIR_ATTACK_DEFAULT,  // Ground-to-Air Attack Rating
-                _gad: GameData.GROUND_DEFENSE_LIGHTARMOR,  // Ground Defense Armor Rating
-                _df: 0,                                    // Dogfighting Rating
-                _man: 0,                                   // Maneuverability Rating
-                _topSpd: 0,                                // Top Speed Rating
-                _surv: 0,                                  // Survivability Rating
-                _ga: 0,                                    // Ground Attack Rating
-                _ol: 0,                                    // Ordinance Rating
-                _stealth: 0,                               // Stealth Rating
-                _pr: GameData.PRIMARY_RANGE_DEFAULT,       // Primary Range
-                _ir: GameData.INDIRECT_RANGE_MEDIUM,       // Indirect Range
-                _sr: GameData.BASE_UNIT_SPOTTING_RANGE,    // Spotting Range
-                _mmp: GameData.MECH_UNIT,                  // Max Movement Points
-                _isAmph: false,                            // Is Amphibious
-                _isDF: false,                              // Is DoubleFire
-                _isAtt: true,                              // Can this profile attack
-                _upgradePath: UpgradePath.ART,             // Upgrade Path
-                _turnAvailable: 300                        // How many months past Jan. 1938
-            );
+            // Phase 3 (NATO): Artillery + SELF_PROPELLED + SA+1 (calibre), IR medium. Standard SP howitzer.
+            // → HA5 HD7 SA10 SD7 GAD7 · ICM 1.00 · MMP10 · IR5.
+            WeaponProfile M109_FR = WeaponProfile.FromProfileDef(
+                "M109 Self-Propelled Artillery", "M109", WeaponType.SPA_M109_FR,
+                new ProfileDef(FamilyArchetypes.Artillery,
+                    new Dictionary<ProfileStat, int> { { ProfileStat.SA, 1 }, { ProfileStat.IR, GameData.INDIRECT_RANGE_MEDIUM } },
+                    new[] { WeaponTrait.SELF_PROPELLED }),
+                UpgradePath.ART, 300);
 
             // Set the prestige cost for the profile.
             M109_FR.SetPrestigeCost(PrestigeTierCost.Gen2, PrestigeTypeCost.SPA);
@@ -3756,33 +3566,14 @@ namespace HammerAndSickle.Models
             //----------------------------------------------
             // British M109 Self-Propelled Artillery
             //----------------------------------------------
-            WeaponProfile M109_UK = new WeaponProfile(
-                _longName: "M109 Self-Propelled Artillery",          // Full name for UI display and intel reports
-                _shortName: "M109",                                  // Short name for UI display and intel reports
-                _type: WeaponType.SPA_M109_UK,             // Enum identifier for this profile
-                _hardAtt: GameData.BASE_ARTY_HARD_ATTACK + LARGE_BONUS,    // Hard Attack Rating
-                _hardDef: GameData.BASE_ARTY_HARD_DEFENSE + MEDIUM_BONUS,  // Hard Defense Rating
-                _softAtt: GameData.BASE_ARTY_SOFT_ATTACK + XLARGE_BONUS,   // Soft Attack Rating
-                _softDef: GameData.BASE_ARTY_SOFT_DEFENSE + MEDIUM_BONUS,  // Soft Defense Rating
-                _gat: GameData.GROUND_AIR_ATTACK_DEFAULT,  // Ground-to-Air Attack Rating
-                _gad: GameData.GROUND_DEFENSE_LIGHTARMOR,  // Ground Defense Armor Rating
-                _df: 0,                                    // Dogfighting Rating
-                _man: 0,                                   // Maneuverability Rating
-                _topSpd: 0,                                // Top Speed Rating
-                _surv: 0,                                  // Survivability Rating
-                _ga: 0,                                    // Ground Attack Rating
-                _ol: 0,                                    // Ordinance Rating
-                _stealth: 0,                               // Stealth Rating
-                _pr: GameData.PRIMARY_RANGE_DEFAULT,       // Primary Range
-                _ir: GameData.INDIRECT_RANGE_MEDIUM,       // Indirect Range
-                _sr: GameData.BASE_UNIT_SPOTTING_RANGE,    // Spotting Range
-                _mmp: GameData.MECH_UNIT,                  // Max Movement Points
-                _isAmph: false,                            // Is Amphibious
-                _isDF: false,                              // Is DoubleFire
-                _isAtt: true,                              // Can this profile attack
-                _upgradePath: UpgradePath.ART,             // Upgrade Path
-                _turnAvailable: 300                        // How many months past Jan. 1938
-            );
+            // Phase 3 (NATO): Artillery + SELF_PROPELLED + SA+1 (calibre), IR medium. Standard SP howitzer.
+            // → HA5 HD7 SA10 SD7 GAD7 · ICM 1.00 · MMP10 · IR5.
+            WeaponProfile M109_UK = WeaponProfile.FromProfileDef(
+                "M109 Self-Propelled Artillery", "M109", WeaponType.SPA_M109_UK,
+                new ProfileDef(FamilyArchetypes.Artillery,
+                    new Dictionary<ProfileStat, int> { { ProfileStat.SA, 1 }, { ProfileStat.IR, GameData.INDIRECT_RANGE_MEDIUM } },
+                    new[] { WeaponTrait.SELF_PROPELLED }),
+                UpgradePath.ART, 300);
 
             // Set the prestige cost for the profile.
             M109_UK.SetPrestigeCost(PrestigeTierCost.Gen2, PrestigeTypeCost.SPA);
@@ -3818,33 +3609,14 @@ namespace HammerAndSickle.Models
             //----------------------------------------------
             // Western Light Towed Artillery
             //----------------------------------------------
-            WeaponProfile ArtLightWest = new WeaponProfile(
-                _longName: "Light Towed Artillery",            // Full name for UI display and intel reports
-                _shortName: "Lt Artillery",                    // Short name for UI display and intel reports
-                _type: WeaponType.ART_LIGHT_WEST,              // Enum identifier for this profile
-                _hardAtt: GameData.BASE_ARTY_HARD_ATTACK,      // Hard Attack Rating
-                _hardDef: GameData.BASE_ARTY_HARD_DEFENSE,     // Hard Defense Rating
-                _softAtt: GameData.BASE_ARTY_SOFT_ATTACK,      // Soft Attack Rating
-                _softDef: GameData.BASE_ARTY_SOFT_DEFENSE,     // Soft Defense Rating
-                _gat: GameData.GROUND_AIR_ATTACK_DEFAULT,      // Ground-to-Air Attack Rating
-                _gad: GameData.GROUND_DEFENSE_LIGHTARMOR,      // Ground Defense Armor Rating
-                _df: 0,                                        // Dogfighting Rating
-                _man: 0,                                       // Maneuverability Rating
-                _topSpd: 0,                                    // Top Speed Rating
-                _surv: 0,                                      // Survivability Rating
-                _ga: 0,                                        // Ground Attack Rating
-                _ol: 0,                                        // Ordinance Rating
-                _stealth: 0,                                   // Stealth Rating
-                _pr: GameData.PRIMARY_RANGE_DEFAULT,           // Primary Range
-                _ir: GameData.INDIRECT_RANGE_SHORT,            // Indirect Range
-                _sr: GameData.BASE_UNIT_SPOTTING_RANGE,        // Spotting Range
-                _mmp: GameData.FOOT_UNIT,                      // Max Movement Points
-                _isAmph: false,                                // Is Amphibious
-                _isDF: false,                                  // Is DoubleFire
-                _isAtt: true,                                  // Can this profile attack
-                _upgradePath: UpgradePath.ART,                 // Upgrade Path
-                _turnAvailable: 144                            // How many months past Jan. 1938
-            );
+            // Phase 3 (NATO): bare Artillery archetype (105mm towed, foot MMP4), IR short.
+            // → HA5 HD5 SA9 SD5 GAD8 · ICM 1.00 · MMP4 · IR4.
+            WeaponProfile ArtLightWest = WeaponProfile.FromProfileDef(
+                "Light Towed Artillery", "Lt Artillery", WeaponType.ART_LIGHT_WEST,
+                new ProfileDef(FamilyArchetypes.Artillery,
+                    new Dictionary<ProfileStat, int> { { ProfileStat.IR, GameData.INDIRECT_RANGE_SHORT } },
+                    System.Array.Empty<WeaponTrait>()),
+                UpgradePath.ART, 144);
 
             // Set the prestige cost for the profile.
             ArtLightWest.SetPrestigeCost(PrestigeTierCost.Gen1, PrestigeTypeCost.ART);
@@ -3870,33 +3642,14 @@ namespace HammerAndSickle.Models
             //----------------------------------------------
             // Western Heavy Towed Artillery
             //----------------------------------------------
-            WeaponProfile ArtHeavyWest = new WeaponProfile(
-                _longName: "Heavy Towed Artillery",            // Full name for UI display and intel reports
-                _shortName: "Hvy Artillery",                   // Short name for UI display and intel reports
-                _type: WeaponType.ART_HEAVY_WEST,              // Enum identifier for this profile
-                _hardAtt: GameData.BASE_ARTY_HARD_ATTACK,      // Hard Attack Rating
-                _hardDef: GameData.BASE_ARTY_HARD_DEFENSE,     // Hard Defense Rating
-                _softAtt: GameData.BASE_ARTY_SOFT_ATTACK + MEDIUM_BONUS,  // Soft Attack Rating
-                _softDef: GameData.BASE_ARTY_SOFT_DEFENSE,     // Soft Defense Rating
-                _gat: GameData.GROUND_AIR_ATTACK_DEFAULT,      // Ground-to-Air Attack Rating
-                _gad: GameData.GROUND_DEFENSE_LIGHTARMOR,      // Ground Defense Armor Rating
-                _df: 0,                                        // Dogfighting Rating
-                _man: 0,                                       // Maneuverability Rating
-                _topSpd: 0,                                    // Top Speed Rating
-                _surv: 0,                                      // Survivability Rating
-                _ga: 0,                                        // Ground Attack Rating
-                _ol: 0,                                        // Ordinance Rating
-                _stealth: 0,                                   // Stealth Rating
-                _pr: GameData.PRIMARY_RANGE_DEFAULT,           // Primary Range
-                _ir: GameData.INDIRECT_RANGE_MEDIUM,           // Indirect Range
-                _sr: GameData.BASE_UNIT_SPOTTING_RANGE,        // Spotting Range
-                _mmp: GameData.FOOT_UNIT,                      // Max Movement Points
-                _isAmph: false,                                // Is Amphibious
-                _isDF: false,                                  // Is DoubleFire
-                _isAtt: true,                                  // Can this profile attack
-                _upgradePath: UpgradePath.ART,                 // Upgrade Path
-                _turnAvailable: 144                            // How many months past Jan. 1938
-            );
+            // Phase 3 (NATO): Artillery + SA+1 (155mm calibre), IR medium. Heavy towed (foot MMP4).
+            // → HA5 HD5 SA10 SD5 GAD8 · ICM 1.00 · MMP4 · IR5.
+            WeaponProfile ArtHeavyWest = WeaponProfile.FromProfileDef(
+                "Heavy Towed Artillery", "Hvy Artillery", WeaponType.ART_HEAVY_WEST,
+                new ProfileDef(FamilyArchetypes.Artillery,
+                    new Dictionary<ProfileStat, int> { { ProfileStat.SA, 1 }, { ProfileStat.IR, GameData.INDIRECT_RANGE_MEDIUM } },
+                    System.Array.Empty<WeaponTrait>()),
+                UpgradePath.ART, 144);
 
             // Set the prestige cost for the profile.
             ArtHeavyWest.SetPrestigeCost(PrestigeTierCost.Gen1, PrestigeTypeCost.ART);
@@ -3926,33 +3679,15 @@ namespace HammerAndSickle.Models
             //----------------------------------------------
             // US M270 MLRS Multiple Launch Rocket System
             //----------------------------------------------
-            WeaponProfile MLRS_US = new WeaponProfile(
-                _longName: "M270 MLRS Multiple Launch Rocket System",  // Full name for UI display and intel reports
-                _shortName: "M270 MLRS",                               // Short name for UI display and intel reports
-                _type: WeaponType.ROC_MLRS_US,             // Enum identifier for this profile
-                _hardAtt: GameData.BASE_ARTY_HARD_ATTACK + LARGE_BONUS,    // Hard Attack Rating
-                _hardDef: GameData.BASE_ARTY_HARD_DEFENSE + MEDIUM_BONUS,  // Hard Defense Rating
-                _softAtt: GameData.BASE_ARTY_SOFT_ATTACK + LARGE_BONUS,    // Soft Attack Rating
-                _softDef: GameData.BASE_ARTY_SOFT_DEFENSE + MEDIUM_BONUS,  // Soft Defense Rating
-                _gat: GameData.GROUND_AIR_ATTACK_DEFAULT,  // Ground-to-Air Attack Rating
-                _gad: GameData.GROUND_DEFENSE_LIGHTARMOR,  // Ground Defense Armor Rating
-                _df: 0,                                    // Dogfighting Rating
-                _man: 0,                                   // Maneuverability Rating
-                _topSpd: 0,                                // Top Speed Rating
-                _surv: 0,                                  // Survivability Rating
-                _ga: 0,                                    // Ground Attack Rating
-                _ol: 0,                                    // Ordinance Rating
-                _stealth: 0,                               // Stealth Rating
-                _pr: GameData.PRIMARY_RANGE_DEFAULT,       // Primary Range
-                _ir: GameData.INDIRECT_RANGE_ROC_MR,       // Indirect Range
-                _sr: GameData.BASE_UNIT_SPOTTING_RANGE,    // Spotting Range
-                _mmp: GameData.MECH_UNIT,                  // Max Movement Points
-                _isAmph: false,                            // Is Amphibious
-                _isDF: true,                               // Is DoubleFire
-                _isAtt: true,                              // Can this profile attack
-                _upgradePath: UpgradePath.ROC,             // Upgrade Path
-                _turnAvailable: 540                        // How many months past Jan. 1938
-            );
+            // Phase 3 (NATO): Artillery + SELF_PROPELLED (tracked M993 chassis) + ROCKET_ARTILLERY (double-fire)
+            // + SMART_MUNITION (SADARM, HA+3/SA+1) + SA+1 (warhead), IR ROC_MR. Tracked analog of BM-27.
+            // → HA8 HD7 SA11 SD7 GAD7 · ICM 1.00 · MMP10 · IR6 · double-fire.
+            WeaponProfile MLRS_US = WeaponProfile.FromProfileDef(
+                "M270 MLRS Multiple Launch Rocket System", "M270 MLRS", WeaponType.ROC_MLRS_US,
+                new ProfileDef(FamilyArchetypes.Artillery,
+                    new Dictionary<ProfileStat, int> { { ProfileStat.SA, 1 }, { ProfileStat.IR, GameData.INDIRECT_RANGE_ROC_MR } },
+                    new[] { WeaponTrait.SELF_PROPELLED, WeaponTrait.ROCKET_ARTILLERY, WeaponTrait.SMART_MUNITION }),
+                UpgradePath.ROC, 540);
 
             // Set the prestige cost for the profile.
             MLRS_US.SetPrestigeCost(PrestigeTierCost.Gen3, PrestigeTypeCost.ROC);
@@ -3988,33 +3723,14 @@ namespace HammerAndSickle.Models
             //----------------------------------------------
             // US M163 Vulcan Self-Propelled Anti-Aircraft Gun
             //----------------------------------------------
-            WeaponProfile M163_US = new WeaponProfile(
-                _longName: "M163 Vulcan Self-Propelled Anti-Aircraft Gun",
-                _shortName: "M163 Vulcan",
-                _type: WeaponType.SPAAA_M163_US,
-                _hardAtt: GameData.BASE_AAA_HARD_ATTACK,                    // Hard Attack Rating
-                _hardDef: GameData.BASE_AAA_HARD_DEFENSE,                   // Hard Defense Rating
-                _softAtt: GameData.BASE_AAA_SOFT_ATTACK,                    // Soft Attack Rating
-                _softDef: GameData.BASE_AAA_SOFT_DEFENSE,                   // Soft Defense Rating
-                _gat: GameData.BASE_AAA_GROUND_AIR_ATTACK + SMALL_BONUS,   // Ground-to-Air Attack Rating
-                _gad: GameData.GROUND_DEFENSE_AAA,                          // Ground Defense Armor Rating
-                _df: 0,                                    // Dogfighting Rating
-                _man: 0,                                   // Maneuverability Rating
-                _topSpd: 0,                                // Top Speed Rating
-                _surv: 0,                                  // Survivability Rating
-                _ga: 0,                                    // Ground Attack Rating
-                _ol: 0,                                    // Ordinance Rating
-                _stealth: 0,                               // Stealth Rating
-                _pr: GameData.PRIMARY_RANGE_DEFAULT,       // Primary Range
-                _ir: GameData.INDIRECT_RANGE_AAA,          // Indirect Range
-                _sr: GameData.BASE_AAA_SPOTTING_RANGE,     // Spotting Range
-                _mmp: GameData.MECH_UNIT,                  // Max Movement Points
-                _isAmph: false,                            // Is Amphibious
-                _isDF: false,                              // Is DoubleFire
-                _isAtt: true,                              // Can this profile attack
-                _upgradePath: UpgradePath.AAA,             // Upgrade Path
-                _turnAvailable: 372                        // How many months past Jan. 1938
-            );
+            // Phase 3 (NATO): Aaa + SELF_PROPELLED (M113 chassis); optical/ranging 20mm gun, no radar-direction trait (GAT 9, = ZSU-57-2).
+            // → HA4 HD6 SA9 SD8 GAD11 · GAT9 · MMP10 · IR3 · SR3.
+            WeaponProfile M163_US = WeaponProfile.FromProfileDef(
+                "M163 Vulcan Self-Propelled Anti-Aircraft Gun", "M163 Vulcan", WeaponType.SPAAA_M163_US,
+                new ProfileDef(FamilyArchetypes.Aaa,
+                    new Dictionary<ProfileStat, int> { { ProfileStat.IR, GameData.INDIRECT_RANGE_AAA } },
+                    new[] { WeaponTrait.SELF_PROPELLED }),
+                UpgradePath.AAA, 372);
 
             // Set the prestige cost for the profile.
             M163_US.SetPrestigeCost(PrestigeTierCost.Gen1, PrestigeTypeCost.SPAAA);
@@ -4045,33 +3761,14 @@ namespace HammerAndSickle.Models
             //----------------------------------------------
             // US M48 Chaparral Self-Propelled SAM
             //----------------------------------------------
-            WeaponProfile Chaparral = new WeaponProfile(
-                _longName: "M48 Chaparral Self-Propelled SAM System",
-                _shortName: "M48 Chaparral",
-                _type: WeaponType.SPSAM_CHAP_US,
-                _hardAtt: GameData.BASE_SAM_HARD_ATTACK,                   // Hard Attack Rating
-                _hardDef: GameData.BASE_SAM_HARD_DEFENSE,                  // Hard Defense Rating
-                _softAtt: GameData.BASE_SAM_SOFT_ATTACK,                   // Soft Attack Rating
-                _softDef: GameData.BASE_SAM_SOFT_DEFENSE,                  // Soft Defense Rating
-                _gat: GameData.BASE_SAM_GROUND_AIR_ATTACK,                 // Ground-to-Air Attack Rating
-                _gad: GameData.GROUND_DEFENSE_SAM,                         // Ground Defense Armor Rating
-                _df: 0,                                    // Dogfighting Rating
-                _man: 0,                                   // Maneuverability Rating
-                _topSpd: 0,                                // Top Speed Rating
-                _surv: 0,                                  // Survivability Rating
-                _ga: 0,                                    // Ground Attack Rating
-                _ol: 0,                                    // Ordinance Rating
-                _stealth: 0,                               // Stealth Rating
-                _pr: GameData.PRIMARY_RANGE_DEFAULT,       // Primary Range
-                _ir: GameData.INDIRECT_RANGE_SAM,          // Indirect Range
-                _sr: GameData.BASE_SAM_SPOTTING_RANGE,     // Spotting Range
-                _mmp: GameData.MECH_UNIT,                  // Max Movement Points
-                _isAmph: false,                            // Is Amphibious
-                _isDF: false,                              // Is DoubleFire
-                _isAtt: true,                              // Can this profile attack
-                _upgradePath: UpgradePath.SAM,             // Upgrade Path
-                _turnAvailable: 372                        // How many months past Jan. 1938
-            );
+            // Phase 3 (NATO): Sam + SELF_PROPELLED (M48 chassis) + IR_HOMING (fire-and-forget IR SAM → GAT 11, = Strela line).
+            // → HA1 HD5 SA1 SD5 GAD7 · GAT11 · MMP10 · IR6 · SR6.
+            WeaponProfile Chaparral = WeaponProfile.FromProfileDef(
+                "M48 Chaparral Self-Propelled SAM System", "M48 Chaparral", WeaponType.SPSAM_CHAP_US,
+                new ProfileDef(FamilyArchetypes.Sam,
+                    new Dictionary<ProfileStat, int> { { ProfileStat.IR, GameData.INDIRECT_RANGE_SAM } },
+                    new[] { WeaponTrait.SELF_PROPELLED, WeaponTrait.IR_HOMING }),
+                UpgradePath.SAM, 372);
 
             // Set the prestige cost for the profile.
             Chaparral.SetPrestigeCost(PrestigeTierCost.Gen2, PrestigeTypeCost.SPSAM);
@@ -4102,33 +3799,14 @@ namespace HammerAndSickle.Models
             //----------------------------------------------
             // US MIM-23 Hawk Strategic SAM System
             //----------------------------------------------
-            WeaponProfile Hawk_US = new WeaponProfile(
-                _longName: "MIM-23 Hawk Strategic SAM System",
-                _shortName: "MIM-23 Hawk",
-                _type: WeaponType.SAM_HAWK_US,
-                _hardAtt: GameData.BASE_SAM_HARD_ATTACK,                           // Hard Attack Rating
-                _hardDef: GameData.BASE_SAM_HARD_DEFENSE,                          // Hard Defense Rating
-                _softAtt: GameData.BASE_SAM_SOFT_ATTACK,                           // Soft Attack Rating
-                _softDef: GameData.BASE_SAM_SOFT_DEFENSE,                          // Soft Defense Rating
-                _gat: GameData.BASE_SAM_GROUND_AIR_ATTACK + LARGE_BONUS,           // Ground-to-Air Attack Rating
-                _gad: GameData.GROUND_DEFENSE_SAM,                                 // Ground Defense Armor Rating
-                _df: 0,                                    // Dogfighting Rating
-                _man: 0,                                   // Maneuverability Rating
-                _topSpd: 0,                                // Top Speed Rating
-                _surv: 0,                                  // Survivability Rating
-                _ga: 0,                                    // Ground Attack Rating
-                _ol: 0,                                    // Ordinance Rating
-                _stealth: 0,                               // Stealth Rating
-                _pr: GameData.PRIMARY_RANGE_DEFAULT,       // Primary Range
-                _ir: GameData.INDIRECT_RANGE_SAM + LARGE_BONUS,    // Indirect Range
-                _sr: GameData.BASE_SAM_SPOTTING_RANGE + LARGE_BONUS,  // Spotting Range
-                _mmp: GameData.STATIC_UNIT,                // Max Movement Points
-                _isAmph: false,                            // Is Amphibious
-                _isDF: false,                              // Is DoubleFire
-                _isAtt: true,                              // Can this profile attack
-                _upgradePath: UpgradePath.SAM,             // Upgrade Path
-                _turnAvailable: 264                        // How many months past Jan. 1938
-            );
+            // Phase 3 (NATO): Sam + SARH_LONG_RANGE (radar-illuminated medium SAM → GAT 13) + static (MMP→0). = NATO's S-75.
+            // → HA1 HD3 SA1 SD3 GAD8 · GAT13 · MMP0 · IR6 · SR6.
+            WeaponProfile Hawk_US = WeaponProfile.FromProfileDef(
+                "MIM-23 Hawk Strategic SAM System", "MIM-23 Hawk", WeaponType.SAM_HAWK_US,
+                new ProfileDef(FamilyArchetypes.Sam,
+                    new Dictionary<ProfileStat, int> { { ProfileStat.MMP, GameData.STATIC_UNIT - GameData.FOOT_UNIT }, { ProfileStat.IR, GameData.INDIRECT_RANGE_SAM } },
+                    new[] { WeaponTrait.SARH_LONG_RANGE }),
+                UpgradePath.SAM, 264);
 
             // Set the prestige cost for the profile.
             Hawk_US.SetPrestigeCost(PrestigeTierCost.Gen1, PrestigeTypeCost.SAM);
@@ -4154,33 +3832,14 @@ namespace HammerAndSickle.Models
             //----------------------------------------------
             // German Flakpanzer Gepard SPSAM
             //----------------------------------------------
-            WeaponProfile Gepard_GE = new WeaponProfile(
-                _longName: "Flakpanzer Gepard Self-Propelled Anti-Aircraft Gun",
-                _shortName: "Gepard",
-                _type: WeaponType.SPSAM_GEPARD_GE,
-                _hardAtt: GameData.BASE_AAA_HARD_ATTACK,                    // Hard Attack Rating
-                _hardDef: GameData.BASE_AAA_HARD_DEFENSE,                   // Hard Defense Rating
-                _softAtt: GameData.BASE_AAA_SOFT_ATTACK,                    // Soft Attack Rating
-                _softDef: GameData.BASE_AAA_SOFT_DEFENSE,                   // Soft Defense Rating
-                _gat: GameData.BASE_AAA_GROUND_AIR_ATTACK + SMALL_BONUS,   // Ground-to-Air Attack Rating
-                _gad: GameData.GROUND_DEFENSE_AAA,                          // Ground Defense Armor Rating
-                _df: 0,                                    // Dogfighting Rating
-                _man: 0,                                   // Maneuverability Rating
-                _topSpd: 0,                                // Top Speed Rating
-                _surv: 0,                                  // Survivability Rating
-                _ga: 0,                                    // Ground Attack Rating
-                _ol: 0,                                    // Ordinance Rating
-                _stealth: 0,                               // Stealth Rating
-                _pr: GameData.PRIMARY_RANGE_DEFAULT,       // Primary Range
-                _ir: GameData.INDIRECT_RANGE_MEDIUM + SMALL_MALUS,       // Indirect Range
-                _sr: GameData.BASE_SAM_SPOTTING_RANGE + SMALL_MALUS,     // Spotting Range
-                _mmp: GameData.MECH_UNIT,                  // Max Movement Points
-                _isAmph: false,                            // Is Amphibious
-                _isDF: false,                              // Is DoubleFire
-                _isAtt: true,                              // Can this profile attack
-                _upgradePath: UpgradePath.AAA,             // Upgrade Path
-                _turnAvailable: 456                        // How many months past Jan. 1938
-            );
+            // Phase 3 (NATO): Aaa + SELF_PROPELLED + RADAR_GUIDED_GUN (35mm radar-directed = NATO's ZSU-23-4 → GAT 11).
+            // → HA4 HD6 SA9 SD8 GAD11 · GAT11 · MMP10 · IR4 · SR3. (Classified SPSAM in source but is a GUN — see TODO flag.)
+            WeaponProfile Gepard_GE = WeaponProfile.FromProfileDef(
+                "Flakpanzer Gepard Self-Propelled Anti-Aircraft Gun", "Gepard", WeaponType.SPSAM_GEPARD_GE,
+                new ProfileDef(FamilyArchetypes.Aaa,
+                    new Dictionary<ProfileStat, int> { { ProfileStat.IR, GameData.INDIRECT_RANGE_SHORT } },
+                    new[] { WeaponTrait.SELF_PROPELLED, WeaponTrait.RADAR_GUIDED_GUN }),
+                UpgradePath.AAA, 456);
 
             // Set the prestige cost for the profile.
             Gepard_GE.SetPrestigeCost(PrestigeTierCost.Gen3, PrestigeTypeCost.SPAAA);
@@ -4212,33 +3871,15 @@ namespace HammerAndSickle.Models
             //----------------------------------------------
             // French Roland SPAAA
             //----------------------------------------------
-            WeaponProfile Roland_FR = new WeaponProfile(
-                _longName: "Roland Self-Propelled Anti-Aircraft Gun",
-                _shortName: "Roland",
-                _type: WeaponType.SPAAA_ROLAND_FR,
-                _hardAtt: GameData.BASE_AAA_HARD_ATTACK,                    // Hard Attack Rating
-                _hardDef: GameData.BASE_AAA_HARD_DEFENSE,                   // Hard Defense Rating
-                _softAtt: GameData.BASE_AAA_SOFT_ATTACK,                    // Soft Attack Rating
-                _softDef: GameData.BASE_AAA_SOFT_DEFENSE,                   // Soft Defense Rating
-                _gat: GameData.BASE_AAA_GROUND_AIR_ATTACK + SMALL_BONUS,   // Ground-to-Air Attack Rating
-                _gad: GameData.GROUND_DEFENSE_AAA,                          // Ground Defense Armor Rating
-                _df: 0,                                    // Dogfighting Rating
-                _man: 0,                                   // Maneuverability Rating
-                _topSpd: 0,                                // Top Speed Rating
-                _surv: 0,                                  // Survivability Rating
-                _ga: 0,                                    // Ground Attack Rating
-                _ol: 0,                                    // Ordinance Rating
-                _stealth: 0,                               // Stealth Rating
-                _pr: GameData.PRIMARY_RANGE_DEFAULT,       // Primary Range
-                _ir: GameData.INDIRECT_RANGE_AAA,          // Indirect Range
-                _sr: GameData.BASE_AAA_SPOTTING_RANGE,     // Spotting Range
-                _mmp: GameData.MECH_UNIT,                  // Max Movement Points
-                _isAmph: false,                            // Is Amphibious
-                _isDF: false,                              // Is DoubleFire
-                _isAtt: true,                              // Can this profile attack
-                _upgradePath: UpgradePath.SAM,             // Upgrade Path
-                _turnAvailable: 468                        // How many months past Jan. 1938
-            );
+            // Phase 3 (NATO): Aaa + SELF_PROPELLED + COMMAND_GUIDANCE (radar-command point SAM → GAT 11). NOTE: Roland is a
+            // missile system but is classified SPAAA with AAA (gun) stats in the source — kept the dual-role line; see TODO flag.
+            // → HA4 HD6 SA9 SD8 GAD11 · GAT11 · MMP10 · IR3 · SR3.
+            WeaponProfile Roland_FR = WeaponProfile.FromProfileDef(
+                "Roland Self-Propelled Anti-Aircraft Gun", "Roland", WeaponType.SPAAA_ROLAND_FR,
+                new ProfileDef(FamilyArchetypes.Aaa,
+                    new Dictionary<ProfileStat, int> { { ProfileStat.IR, GameData.INDIRECT_RANGE_AAA } },
+                    new[] { WeaponTrait.SELF_PROPELLED, WeaponTrait.COMMAND_GUIDANCE }),
+                UpgradePath.SAM, 468);
 
             // Set the prestige cost for the profile.
             Roland_FR.SetPrestigeCost(PrestigeTierCost.Gen3, PrestigeTypeCost.SPSAM);
@@ -4269,33 +3910,14 @@ namespace HammerAndSickle.Models
             //----------------------------------------------
             // French Crotale Self-Propelled SAM
             //----------------------------------------------
-            WeaponProfile Crotale = new WeaponProfile(
-                _longName: "Crotale Self-Propelled SAM System",
-                _shortName: "Crotale",
-                _type: WeaponType.SPSAM_CROTALE_FR,
-                _hardAtt: GameData.BASE_SAM_HARD_ATTACK,                    // Hard Attack Rating
-                _hardDef: GameData.BASE_SAM_HARD_DEFENSE,                   // Hard Defense Rating
-                _softAtt: GameData.BASE_SAM_SOFT_ATTACK,                    // Soft Attack Rating
-                _softDef: GameData.BASE_SAM_SOFT_DEFENSE,                   // Soft Defense Rating
-                _gat: GameData.BASE_SAM_GROUND_AIR_ATTACK + MEDIUM_BONUS,   // Ground-to-Air Attack Rating
-                _gad: GameData.GROUND_DEFENSE_SAM,                          // Ground Defense Armor Rating
-                _df: 0,                                    // Dogfighting Rating
-                _man: 0,                                   // Maneuverability Rating
-                _topSpd: 0,                                // Top Speed Rating
-                _surv: 0,                                  // Survivability Rating
-                _ga: 0,                                    // Ground Attack Rating
-                _ol: 0,                                    // Ordinance Rating
-                _stealth: 0,                               // Stealth Rating
-                _pr: GameData.PRIMARY_RANGE_DEFAULT,       // Primary Range
-                _ir: GameData.INDIRECT_RANGE_SAM,          // Indirect Range
-                _sr: GameData.BASE_SAM_SPOTTING_RANGE,     // Spotting Range
-                _mmp: GameData.MECH_UNIT,                  // Max Movement Points
-                _isAmph: false,                            // Is Amphibious
-                _isDF: false,                              // Is DoubleFire
-                _isAtt: true,                              // Can this profile attack
-                _upgradePath: UpgradePath.SAM,             // Upgrade Path
-                _turnAvailable: 396                        // How many months past Jan. 1938
-            );
+            // Phase 3 (NATO): Sam + SELF_PROPELLED + COMMAND_GUIDANCE (radar-command point SAM → GAT 12).
+            // → HA1 HD5 SA1 SD5 GAD7 · GAT12 · MMP10 · IR6 · SR6.
+            WeaponProfile Crotale = WeaponProfile.FromProfileDef(
+                "Crotale Self-Propelled SAM System", "Crotale", WeaponType.SPSAM_CROTALE_FR,
+                new ProfileDef(FamilyArchetypes.Sam,
+                    new Dictionary<ProfileStat, int> { { ProfileStat.IR, GameData.INDIRECT_RANGE_SAM } },
+                    new[] { WeaponTrait.SELF_PROPELLED, WeaponTrait.COMMAND_GUIDANCE }),
+                UpgradePath.SAM, 396);
 
             // Set the prestige cost for the profile.
             Crotale.SetPrestigeCost(PrestigeTierCost.Gen2, PrestigeTypeCost.SPSAM);
@@ -4327,33 +3949,14 @@ namespace HammerAndSickle.Models
             //----------------------------------------------
             // British Tracked Rapier Self-Propelled SAM
             //----------------------------------------------
-            WeaponProfile Rapier_SP = new WeaponProfile(
-                _longName: "Tracked Rapier Self-Propelled SAM System",
-                _shortName: "Tracked Rapier",
-                _type: WeaponType.SPSAM_RAPIER_UK,
-                _hardAtt: GameData.BASE_SAM_HARD_ATTACK,                    // Hard Attack Rating
-                _hardDef: GameData.BASE_SAM_HARD_DEFENSE,                   // Hard Defense Rating
-                _softAtt: GameData.BASE_SAM_SOFT_ATTACK,                    // Soft Attack Rating
-                _softDef: GameData.BASE_SAM_SOFT_DEFENSE,                   // Soft Defense Rating
-                _gat: GameData.BASE_SAM_GROUND_AIR_ATTACK + SMALL_BONUS,    // Ground-to-Air Attack Rating
-                _gad: GameData.GROUND_DEFENSE_SAM,                          // Ground Defense Armor Rating
-                _df: 0,                                    // Dogfighting Rating
-                _man: 0,                                   // Maneuverability Rating
-                _topSpd: 0,                                // Top Speed Rating
-                _surv: 0,                                  // Survivability Rating
-                _ga: 0,                                    // Ground Attack Rating
-                _ol: 0,                                    // Ordinance Rating
-                _stealth: 0,                               // Stealth Rating
-                _pr: GameData.PRIMARY_RANGE_DEFAULT,       // Primary Range
-                _ir: GameData.INDIRECT_RANGE_SAM,          // Indirect Range
-                _sr: GameData.BASE_SAM_SPOTTING_RANGE,     // Spotting Range
-                _mmp: GameData.MECH_UNIT,                  // Max Movement Points
-                _isAmph: false,                            // Is Amphibious
-                _isDF: false,                              // Is DoubleFire
-                _isAtt: true,                              // Can this profile attack
-                _upgradePath: UpgradePath.SAM,             // Upgrade Path
-                _turnAvailable: 432                        // How many months past Jan. 1938
-            );
+            // Phase 3 (NATO): Sam + SELF_PROPELLED + COMMAND_GUIDANCE (SACLOS point SAM → GAT 12).
+            // → HA1 HD5 SA1 SD5 GAD7 · GAT12 · MMP10 · IR6 · SR6.
+            WeaponProfile Rapier_SP = WeaponProfile.FromProfileDef(
+                "Tracked Rapier Self-Propelled SAM System", "Tracked Rapier", WeaponType.SPSAM_RAPIER_UK,
+                new ProfileDef(FamilyArchetypes.Sam,
+                    new Dictionary<ProfileStat, int> { { ProfileStat.IR, GameData.INDIRECT_RANGE_SAM } },
+                    new[] { WeaponTrait.SELF_PROPELLED, WeaponTrait.COMMAND_GUIDANCE }),
+                UpgradePath.SAM, 432);
 
             // Set the prestige cost for the profile.
             Rapier_SP.SetPrestigeCost(PrestigeTierCost.Gen2, PrestigeTypeCost.SPSAM);
@@ -4389,33 +3992,14 @@ namespace HammerAndSickle.Models
             //----------------------------------------------
             // US M3 Bradley Cavalry Fighting Vehicle
             //----------------------------------------------
-            WeaponProfile M3_US = new WeaponProfile(
-                _longName: "M3 Bradley Cavalry Fighting Vehicle",
-                _shortName: "M3 Bradley",
-                _type: WeaponType.RCN_M3_US,
-                _hardAtt: GameData.BASE_IFV_HARD_ATTACK + XXXLARGE_BONUS,  // Hard Attack Rating
-                _hardDef: GameData.BASE_IFV_HARD_DEFENSE,                  // Hard Defense Rating
-                _softAtt: GameData.BASE_IFV_SOFT_ATTACK + SMALL_BONUS,     // Soft Attack Rating
-                _softDef: GameData.BASE_IFV_SOFT_DEFENSE,                  // Soft Defense Rating
-                _gat: GameData.GROUND_AIR_ATTACK_DEFAULT,      // Ground-to-Air Attack Rating
-                _gad: GameData.GROUND_DEFENSE_LIGHTARMOR,      // Ground Defense Armor Rating
-                _df: 0,                                        // Dogfighting Rating
-                _man: 0,                                       // Maneuverability Rating
-                _topSpd: 0,                                    // Top Speed Rating
-                _surv: 0,                                      // Survivability Rating
-                _ga: 0,                                        // Ground Attack Rating
-                _ol: 0,                                        // Ordinance Rating
-                _stealth: 0,                                   // Stealth Rating
-                _pr: GameData.PRIMARY_RANGE_DEFAULT,           // Primary Range
-                _ir: GameData.INDIRECT_RANGE_DEFAULT,          // Indirect Range
-                _sr: GameData.RECON_UNIT_SPOTTING_RANGE,       // Spotting Range
-                _mmp: GameData.MECH_UNIT,                      // Max Movement Points
-                _isAmph: false,                                // Is Amphibious
-                _isDF: false,                                  // Is DoubleFire
-                _isAtt: true,                                  // Can this profile attack
-                _upgradePath: UpgradePath.RCN,                 // Upgrade Path
-                _turnAvailable: 516                            // How many months past Jan. 1938
-            );
+            // Phase 3 (NATO): Recon + ATGM_RAIL (TOW, HA+4) + AUTOCANNON_LIGHT (25mm); Bradley-chassis combat scout.
+            // → HA6 HD5 SA6 SD9 GAD7 · ICM 1.00 · MMP10 · SR3 · Hard (post-call). Not RECON_FRAGILE (armored cavalry).
+            WeaponProfile M3_US = WeaponProfile.FromProfileDef(
+                "M3 Bradley Cavalry Fighting Vehicle", "M3 Bradley", WeaponType.RCN_M3_US,
+                new ProfileDef(FamilyArchetypes.Recon,
+                    new Dictionary<ProfileStat, int>(),
+                    new[] { WeaponTrait.ATGM_RAIL, WeaponTrait.AUTOCANNON_LIGHT }),
+                UpgradePath.RCN, 516);
 
             // Set the prestige cost for the profile.
             M3_US.SetPrestigeCost(PrestigeTierCost.Gen3, PrestigeTypeCost.RCN);
@@ -4446,33 +4030,14 @@ namespace HammerAndSickle.Models
             //----------------------------------------------
             // FRG Spähpanzer Luchs Reconnaissance Vehicle
             //----------------------------------------------
-            WeaponProfile LUCHS_GE = new WeaponProfile(
-                _longName: "Spähpanzer Luchs Reconnaissance Vehicle",
-                _shortName: "Luchs",
-                _type: WeaponType.RCN_LUCHS_GE,
-                 _hardAtt: GameData.BASE_IFV_HARD_ATTACK + XXXLARGE_BONUS,  // Hard Attack Rating
-                _hardDef: GameData.BASE_IFV_HARD_DEFENSE,                  // Hard Defense Rating
-                _softAtt: GameData.BASE_IFV_SOFT_ATTACK + SMALL_BONUS,     // Soft Attack Rating
-                _softDef: GameData.BASE_IFV_SOFT_DEFENSE,                  // Soft Defense Rating
-                _gat: GameData.GROUND_AIR_ATTACK_DEFAULT,      // Ground-to-Air Attack Rating
-                _gad: GameData.GROUND_DEFENSE_LIGHTARMOR,      // Ground Defense Armor Rating
-                _df: 0,                                        // Dogfighting Rating
-                _man: 0,                                       // Maneuverability Rating
-                _topSpd: 0,                                    // Top Speed Rating
-                _surv: 0,                                      // Survivability Rating
-                _ga: 0,                                        // Ground Attack Rating
-                _ol: 0,                                        // Ordinance Rating
-                _stealth: 0,                                   // Stealth Rating
-                _pr: GameData.PRIMARY_RANGE_DEFAULT,           // Primary Range
-                _ir: GameData.INDIRECT_RANGE_DEFAULT,          // Indirect Range
-                _sr: GameData.RECON_UNIT_SPOTTING_RANGE,       // Spotting Range
-                _mmp: GameData.MECH_UNIT,                      // Max Movement Points
-                _isAmph: true,                                 // Is Amphibious
-                _isDF: false,                                  // Is DoubleFire
-                _isAtt: true,                                  // Can this profile attack
-                _upgradePath: UpgradePath.RCN,                 // Upgrade Path
-                _turnAvailable: 444                            // How many months past Jan. 1938
-            );
+            // Phase 3 (NATO): Recon + AUTOCANNON_LIGHT (20mm) + AMPHIBIOUS; 8x8 wheeled scout, light gun.
+            // → HA2 HD5 SA6 SD9 GAD7 · ICM 1.00 · MMP10 · SR3 · amphibious · Hard (post-call).
+            WeaponProfile LUCHS_GE = WeaponProfile.FromProfileDef(
+                "Spähpanzer Luchs Reconnaissance Vehicle", "Luchs", WeaponType.RCN_LUCHS_GE,
+                new ProfileDef(FamilyArchetypes.Recon,
+                    new Dictionary<ProfileStat, int>(),
+                    new[] { WeaponTrait.AUTOCANNON_LIGHT, WeaponTrait.AMPHIBIOUS }),
+                UpgradePath.RCN, 444);
 
             // Set the prestige cost for the profile.
             LUCHS_GE.SetPrestigeCost(PrestigeTierCost.Gen2, PrestigeTypeCost.RCN);
@@ -4503,33 +4068,14 @@ namespace HammerAndSickle.Models
             //----------------------------------------------
             // UK FV105 Sultan
             //----------------------------------------------
-            WeaponProfile FV105_UK = new WeaponProfile(
-                _longName: "FV105 Sultan",
-                _shortName: "FV105",
-                _type: WeaponType.RCN_FV105_UK,
-                _hardAtt: GameData.BASE_APC_HARD_ATTACK,       // Hard Attack Rating (30mm RARDEN)
-                _hardDef: GameData.BASE_APC_HARD_DEFENSE,      // Hard Defense Rating
-                _softAtt: GameData.BASE_APC_SOFT_ATTACK,       // Soft Attack Rating
-                _softDef: GameData.BASE_APC_SOFT_DEFENSE,      // Soft Defense Rating
-                _gat: GameData.GROUND_AIR_ATTACK_DEFAULT,      // Ground-to-Air Attack Rating
-                _gad: GameData.GROUND_DEFENSE_LIGHTARMOR,      // Ground Defense Armor Rating
-                _df: 0,                                        // Dogfighting Rating
-                _man: 0,                                       // Maneuverability Rating
-                _topSpd: 0,                                    // Top Speed Rating
-                _surv: 0,                                      // Survivability Rating
-                _ga: 0,                                        // Ground Attack Rating
-                _ol: 0,                                        // Ordinance Rating
-                _stealth: 0,                                   // Stealth Rating
-                _pr: GameData.PRIMARY_RANGE_DEFAULT,           // Primary Range
-                _ir: GameData.INDIRECT_RANGE_DEFAULT,          // Indirect Range
-                _sr: GameData.RECON_UNIT_SPOTTING_RANGE,       // Spotting Range
-                _mmp: GameData.MECH_UNIT,                      // Max Movement Points
-                _isAmph: false,                                // Is Amphibious
-                _isDF: false,                                  // Is DoubleFire
-                _isAtt: true,                                  // Can this profile attack
-                _upgradePath: UpgradePath.RCN,                 // Upgrade Path
-                _turnAvailable: 420                            // How many months past Jan. 1938
-            );
+            // Phase 3 (NATO): Recon + AUTOCANNON_HEAVY (30mm RARDEN, CVR(T)-class scout).
+            // → HA3 HD5 SA6 SD9 GAD7 · ICM 1.00 · MMP10 · SR3 · Hard (post-call).
+            WeaponProfile FV105_UK = WeaponProfile.FromProfileDef(
+                "FV105 Sultan", "FV105", WeaponType.RCN_FV105_UK,
+                new ProfileDef(FamilyArchetypes.Recon,
+                    new Dictionary<ProfileStat, int>(),
+                    new[] { WeaponTrait.AUTOCANNON_HEAVY }),
+                UpgradePath.RCN, 420);
 
             // Set the prestige cost for the profile.
             FV105_UK.SetPrestigeCost(PrestigeTierCost.Gen2, PrestigeTypeCost.RCN);
@@ -4560,33 +4106,14 @@ namespace HammerAndSickle.Models
             //----------------------------------------------
             // French ERC 90 Sagaie Reconnaissance Vehicle
             //----------------------------------------------
-            WeaponProfile ERC90_FR = new WeaponProfile(
-                _longName: "ERC 90 Sagaie Reconnaissance Vehicle",
-                _shortName: "ERC 90",
-                _type: WeaponType.RCN_ERC90_FR,
-                _hardAtt: GameData.BASE_IFV_HARD_ATTACK + XXXLARGE_BONUS, // Hard Attack Rating (90mm gun)
-                _hardDef: GameData.BASE_IFV_HARD_DEFENSE,                 // Hard Defense Rating
-                _softAtt: GameData.BASE_IFV_SOFT_ATTACK,                  // Soft Attack Rating
-                _softDef: GameData.BASE_IFV_SOFT_DEFENSE,                 // Soft Defense Rating
-                _gat: GameData.GROUND_AIR_ATTACK_DEFAULT,      // Ground-to-Air Attack Rating
-                _gad: GameData.GROUND_DEFENSE_LIGHTARMOR,      // Ground Defense Armor Rating
-                _df: 0,                                        // Dogfighting Rating
-                _man: 0,                                       // Maneuverability Rating
-                _topSpd: 0,                                    // Top Speed Rating
-                _surv: 0,                                      // Survivability Rating
-                _ga: 0,                                        // Ground Attack Rating
-                _ol: 0,                                        // Ordinance Rating
-                _stealth: 0,                                   // Stealth Rating
-                _pr: GameData.PRIMARY_RANGE_DEFAULT,           // Primary Range
-                _ir: GameData.INDIRECT_RANGE_DEFAULT,          // Indirect Range
-                _sr: GameData.RECON_UNIT_SPOTTING_RANGE,       // Spotting Range
-                _mmp: GameData.MECH_UNIT,                      // Max Movement Points
-                _isAmph: false,                                // Is Amphibious
-                _isDF: false,                                  // Is DoubleFire
-                _isAtt: true,                                  // Can this profile attack
-                _upgradePath: UpgradePath.RCN,                 // Upgrade Path
-                _turnAvailable: 492                            // How many months past Jan. 1938
-            );
+            // Phase 3 (NATO): Recon + residual HA+4 (90mm low-pressure gun — one-off; calibre traits are tanks-only).
+            // → HA6 HD5 SA5 SD9 GAD7 · ICM 1.00 · MMP10 · SR3 · Hard (post-call). Fire-support scout, mirrors BRDM-2 AT.
+            WeaponProfile ERC90_FR = WeaponProfile.FromProfileDef(
+                "ERC 90 Sagaie Reconnaissance Vehicle", "ERC 90", WeaponType.RCN_ERC90_FR,
+                new ProfileDef(FamilyArchetypes.Recon,
+                    new Dictionary<ProfileStat, int> { { ProfileStat.HA, 4 } },
+                    System.Array.Empty<WeaponTrait>()),
+                UpgradePath.RCN, 492);
 
             // Set the prestige cost for the profile.
             ERC90_FR.SetPrestigeCost(PrestigeTierCost.Gen2, PrestigeTypeCost.RCN);
@@ -4621,33 +4148,15 @@ namespace HammerAndSickle.Models
             //----------------------------------------------
             // US AH-64 Apache Attack Helicopter
             //----------------------------------------------
-            WeaponProfile AH64 = new WeaponProfile(
-                _longName: "AH-64 Apache Attack Helicopter",
-                _shortName: "AH-64 Apache",
-                _type: WeaponType.HEL_AH64_US,
-                _hardAtt: GameData.BASE_HEL_HARD_ATTACK + XXXLARGE_BONUS,  // Hard Attack Rating (Hellfire missiles)
-                _hardDef: GameData.BASE_HEL_HARD_DEFENSE + SMALL_BONUS,    // Hard Defense Rating
-                _softAtt: GameData.BASE_HEL_SOFT_ATTACK + MEDIUM_BONUS,    // Soft Attack Rating
-                _softDef: GameData.BASE_HEL_SOFT_DEFENSE + SMALL_BONUS,    // Soft Defense Rating
-                _gat: GameData.GROUND_AIR_ATTACK_DEFAULT,  // Ground-to-Air Attack Rating
-                _gad: GameData.GROUND_DEFENSE_HELO,        // Ground Defense Armor Rating
-                _df: 0,                                    // Dogfighting Rating
-                _man: 0,                                   // Maneuverability Rating
-                _topSpd: 0,                                // Top Speed Rating
-                _surv: 0,                                  // Survivability Rating
-                _ga: 0,                                    // Ground Attack Rating
-                _ol: 0,                                    // Ordinance Rating
-                _stealth: 0,                               // Stealth Rating
-                _pr: GameData.PRIMARY_RANGE_DEFAULT,       // Primary Range
-                _ir: GameData.INDIRECT_RANGE_DEFAULT,      // Indirect Range
-                _sr: GameData.RECON_UNIT_SPOTTING_RANGE,   // Spotting Range
-                _mmp: GameData.HELO_UNIT,                  // Max Movement Points
-                _isAmph: false,                            // Is Amphibious
-                _isDF: false,                              // Is DoubleFire
-                _isAtt: true,                              // Can this profile attack
-                _upgradePath: UpgradePath.HEL,            // Upgrade Path
-                _turnAvailable: 576                        // How many months past Jan. 1938
-            );
+            // Phase 3 (NATO): Helicopter + ATGM_HELO_FNF (Hellfire, HA+5/ICM1.05) + CANNON_HELO (M230 30mm) + ROCKET_PODS
+            // (Hydra-70) + ARMORED_COCKPIT + HELO_COUNTERMEASURES. Apex NATO gunship (= Mi-28 line).
+            // → HA12 HD7 SA13 SD8 GAD12 · ICM 1.05 · MMP24 · SR3.
+            WeaponProfile AH64 = WeaponProfile.FromProfileDef(
+                "AH-64 Apache Attack Helicopter", "AH-64 Apache", WeaponType.HEL_AH64_US,
+                new ProfileDef(FamilyArchetypes.Helicopter,
+                    new Dictionary<ProfileStat, int>(),
+                    new[] { WeaponTrait.ATGM_HELO_FNF, WeaponTrait.CANNON_HELO, WeaponTrait.ROCKET_PODS, WeaponTrait.ARMORED_COCKPIT, WeaponTrait.HELO_COUNTERMEASURES }),
+                UpgradePath.HEL, 576);
 
             // Set the prestige cost for the profile.
             AH64.SetPrestigeCost(PrestigeTierCost.Gen4, PrestigeTypeCost.HEL);
@@ -4677,33 +4186,14 @@ namespace HammerAndSickle.Models
             //----------------------------------------------
             // US UH-60 Black Hawk Transport Helicopter
             //----------------------------------------------
-            WeaponProfile UH60 = new WeaponProfile(
-                _longName: "UH-60 Black Hawk Transport Helicopter",
-                _shortName: "UH-60 Black Hawk",
-                _type: WeaponType.HEL_UH60_US,
-                _hardAtt: GameData.BASE_HEL_HARD_ATTACK + MEDIUM_MALUS,   // Hard Attack Rating
-                _hardDef: GameData.BASE_HEL_HARD_DEFENSE + MEDIUM_MALUS,  // Hard Defense Rating
-                _softAtt: GameData.BASE_HEL_SOFT_ATTACK + MEDIUM_MALUS,   // Soft Attack Rating
-                _softDef: GameData.BASE_HEL_SOFT_DEFENSE + MEDIUM_MALUS,  // Soft Defense Rating
-                _gat: GameData.GROUND_AIR_ATTACK_DEFAULT,  // Ground-to-Air Attack Rating
-                _gad: GameData.GROUND_DEFENSE_HELO,        // Ground Defense Armor Rating
-                _df: 0,                                    // Dogfighting Rating
-                _man: 0,                                   // Maneuverability Rating
-                _topSpd: 0,                                // Top Speed Rating
-                _surv: 0,                                  // Survivability Rating
-                _ga: 0,                                    // Ground Attack Rating
-                _ol: 0,                                    // Ordinance Rating
-                _stealth: 0,                               // Stealth Rating
-                _pr: GameData.PRIMARY_RANGE_DEFAULT,       // Primary Range
-                _ir: GameData.INDIRECT_RANGE_DEFAULT,      // Indirect Range
-                _sr: GameData.RECON_UNIT_SPOTTING_RANGE,   // Spotting Range
-                _mmp: GameData.HELO_UNIT,                  // Max Movement Points
-                _isAmph: false,                            // Is Amphibious
-                _isDF: false,                              // Is DoubleFire
-                _isAtt: true,                              // Can this profile attack
-                _upgradePath: UpgradePath.HELT,            // Upgrade Path
-                _turnAvailable: 492                        // How many months past Jan. 1938
-            );
+            // Phase 3 (NATO): Helicopter + NON_COMBATANT; organic AM/MAM lift (= Mi-8T). HeloTransport category (post-call).
+            // → bare 7/6/10/7 GAD10 · MMP24 · SR3 · non-combatant.
+            WeaponProfile UH60 = WeaponProfile.FromProfileDef(
+                "UH-60 Black Hawk Transport Helicopter", "UH-60 Black Hawk", WeaponType.HEL_UH60_US,
+                new ProfileDef(FamilyArchetypes.Helicopter,
+                    new Dictionary<ProfileStat, int>(),
+                    new[] { WeaponTrait.NON_COMBATANT }),
+                UpgradePath.HELT, 492);
 
             // Set the prestige cost for the profile.
             UH60.SetPrestigeCost(PrestigeTierCost.Gen2, PrestigeTypeCost.HELT);
@@ -4735,33 +4225,14 @@ namespace HammerAndSickle.Models
             //----------------------------------------------
             // FRG Bo 105 Light Attack Helicopter
             //----------------------------------------------
-            WeaponProfile BO105 = new WeaponProfile(
-                _longName: "Bo 105 Light Attack Helicopter",
-                _shortName: "Bo 105",
-                _type: WeaponType.HEL_BO105_GE,
-                _hardAtt: GameData.BASE_HEL_HARD_ATTACK + MEDIUM_BONUS,    // Hard Attack Rating (HOT missiles)
-                _hardDef: GameData.BASE_HEL_HARD_DEFENSE,                  // Hard Defense Rating
-                _softAtt: GameData.BASE_HEL_SOFT_ATTACK,                   // Soft Attack Rating
-                _softDef: GameData.BASE_HEL_SOFT_DEFENSE,                  // Soft Defense Rating
-                _gat: GameData.GROUND_AIR_ATTACK_DEFAULT,  // Ground-to-Air Attack Rating
-                _gad: GameData.GROUND_DEFENSE_HELO,        // Ground Defense Armor Rating
-                _df: 0,                                    // Dogfighting Rating
-                _man: 0,                                   // Maneuverability Rating
-                _topSpd: 0,                                // Top Speed Rating
-                _surv: 0,                                  // Survivability Rating
-                _ga: 0,                                    // Ground Attack Rating
-                _ol: 0,                                    // Ordinance Rating
-                _stealth: 0,                               // Stealth Rating
-                _pr: GameData.PRIMARY_RANGE_DEFAULT,       // Primary Range
-                _ir: GameData.INDIRECT_RANGE_DEFAULT,      // Indirect Range
-                _sr: GameData.RECON_UNIT_SPOTTING_RANGE,   // Spotting Range
-                _mmp: GameData.HELO_UNIT,                  // Max Movement Points
-                _isAmph: false,                            // Is Amphibious
-                _isDF: false,                              // Is DoubleFire
-                _isAtt: true,                              // Can this profile attack
-                _upgradePath: UpgradePath.HEL,            // Upgrade Path
-                _turnAvailable: 492                        // How many months past Jan. 1938
-            );
+            // Phase 3 (NATO): Helicopter + ATGM_HELO_SACLOS (HOT, HA+4). Light AT helo — potent missiles, no cannon/armor (glass cannon).
+            // → HA11 HD6 SA10 SD7 GAD10 · ICM 1.00 · MMP24 · SR3. (SA10 is archetype-inherited; Bo-105 PAH-1 is AT-only.)
+            WeaponProfile BO105 = WeaponProfile.FromProfileDef(
+                "Bo 105 Light Attack Helicopter", "Bo 105", WeaponType.HEL_BO105_GE,
+                new ProfileDef(FamilyArchetypes.Helicopter,
+                    new Dictionary<ProfileStat, int>(),
+                    new[] { WeaponTrait.ATGM_HELO_SACLOS }),
+                UpgradePath.HEL, 492);
 
             // Set the prestige cost for the profile.
             BO105.SetPrestigeCost(PrestigeTierCost.Gen2, PrestigeTypeCost.HEL);
@@ -4790,33 +4261,14 @@ namespace HammerAndSickle.Models
             //----------------------------------------------
             // US AH-1 Cobra Attack Helicopter
             //----------------------------------------------
-            WeaponProfile AH1 = new WeaponProfile(
-                _longName: "AH-1 Cobra Attack Helicopter",
-                _shortName: "AH-1 Cobra",
-                _type: WeaponType.HEL_AH1,
-                _hardAtt: GameData.BASE_HEL_HARD_ATTACK + SMALL_BONUS,    // Hard Attack Rating (TOW missiles)
-                _hardDef: GameData.BASE_HEL_HARD_DEFENSE,                 // Hard Defense Rating
-                _softAtt: GameData.BASE_HEL_SOFT_ATTACK,                  // Soft Attack Rating
-                _softDef: GameData.BASE_HEL_SOFT_DEFENSE,                 // Soft Defense Rating
-                _gat: GameData.GROUND_AIR_ATTACK_DEFAULT,  // Ground-to-Air Attack Rating
-                _gad: GameData.GROUND_DEFENSE_HELO,        // Ground Defense Armor Rating
-                _df: 0,                                    // Dogfighting Rating
-                _man: 0,                                   // Maneuverability Rating
-                _topSpd: 0,                                // Top Speed Rating
-                _surv: 0,                                  // Survivability Rating
-                _ga: 0,                                    // Ground Attack Rating
-                _ol: 0,                                    // Ordinance Rating
-                _stealth: 0,                               // Stealth Rating
-                _pr: GameData.PRIMARY_RANGE_DEFAULT,       // Primary Range
-                _ir: GameData.INDIRECT_RANGE_DEFAULT,      // Indirect Range
-                _sr: GameData.RECON_UNIT_SPOTTING_RANGE,   // Spotting Range
-                _mmp: GameData.HELO_UNIT,                  // Max Movement Points
-                _isAmph: false,                            // Is Amphibious
-                _isDF: false,                              // Is DoubleFire
-                _isAtt: true,                              // Can this profile attack
-                _upgradePath: UpgradePath.HEL,            // Upgrade Path
-                _turnAvailable: 348                        // How many months past Jan. 1938
-            );
+            // Phase 3 (NATO): Helicopter + ATGM_HELO_SACLOS (TOW) + CANNON_HELO (20mm) + ROCKET_PODS. = Mi-24D line minus the armor.
+            // → HA11 HD6 SA13 SD7 GAD10 · ICM 1.00 · MMP24 · SR3.
+            WeaponProfile AH1 = WeaponProfile.FromProfileDef(
+                "AH-1 Cobra Attack Helicopter", "AH-1 Cobra", WeaponType.HEL_AH1,
+                new ProfileDef(FamilyArchetypes.Helicopter,
+                    new Dictionary<ProfileStat, int>(),
+                    new[] { WeaponTrait.ATGM_HELO_SACLOS, WeaponTrait.CANNON_HELO, WeaponTrait.ROCKET_PODS }),
+                UpgradePath.HEL, 348);
 
             // Set the prestige cost for the profile.
             AH1.SetPrestigeCost(PrestigeTierCost.Gen1, PrestigeTypeCost.HEL);

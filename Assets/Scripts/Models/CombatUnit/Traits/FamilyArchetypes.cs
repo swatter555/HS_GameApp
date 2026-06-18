@@ -16,8 +16,9 @@ namespace HammerAndSickle.Models
     ///    chassis trait/delta in Phase 3 — there are no separate SP archetypes.
     ///  - GAT is carried ONLY where the family has a real baseline (AAA 9, SAM 10). Everything else
     ///    is GAT 0 (W7) and gains air-attack via the MANPADS trait (GAT floor) in Phase 3.
-    ///  - GA / OL on aircraft are per-profile tiers (§7B.4/§7B.5), NOT archetype baselines — applied
-    ///    as deltas during the Phase 3 rebuild.
+    ///  - GA / OL on aircraft ARE archetype baselines (Appendix W §2 air table / Rule A, 2026-06-16):
+    ///    Attack GA 10 / OL 9, Bomber GA 8 / OL 12, fighters GA 2 / OL 6 (the dual-role floor). Traits
+    ///    and residual deltas adjust off these like every other stat — no bare GA tier delta per profile.
     /// </summary>
     public static class FamilyArchetypes
     {
@@ -52,17 +53,17 @@ namespace HammerAndSickle.Models
 
         #region Air families
 
-        //                                             DF MAN TS SUR  MMP
-        /// <summary>Early jet (MiG-21, F-4).</summary>
-        public static readonly Archetype FighterEarly = Air(8, 9, 10, 6, 100);
-        /// <summary>Mid jet (MiG-23/27, F-16).</summary>
-        public static readonly Archetype FighterMid   = Air(10, 11, 10, 7, 100);
-        /// <summary>Late jet (MiG-29, Su-27, F-15).</summary>
-        public static readonly Archetype FighterLate  = Air(12, 12, 10, 9, 100);
-        /// <summary>Attack aircraft (Su-25, A-10) — low agility, high survivability.</summary>
-        public static readonly Archetype Attack       = Air(4, 4, 7, 10, 100);
-        /// <summary>Bomber (Tu-22, F-111) — no dogfight, fast, durable.</summary>
-        public static readonly Archetype Bomber       = Air(1, 3, 10, 8, 100);
+        //                                             DF MAN TS SUR  MMP  GA  OL
+        /// <summary>Early jet (MiG-21, F-4); dual-role GA floor 2 (Rule A).</summary>
+        public static readonly Archetype FighterEarly = Air(8, 9, 10, 6, 100, ga: 2, ol: 6);
+        /// <summary>Mid jet (MiG-23/27, F-16); dual-role GA floor 2 (Rule A).</summary>
+        public static readonly Archetype FighterMid   = Air(10, 11, 10, 7, 100, ga: 2, ol: 6);
+        /// <summary>Late jet (MiG-29, Su-27, F-15); dual-role GA floor 2 (Rule A).</summary>
+        public static readonly Archetype FighterLate  = Air(12, 12, 10, 9, 100, ga: 2, ol: 6);
+        /// <summary>Attack aircraft (Su-25, A-10) — low agility, high survivability, GA specialist (10/OL 9).</summary>
+        public static readonly Archetype Attack       = Air(4, 4, 7, 10, 100, ga: 10, ol: 9);
+        /// <summary>Bomber (Su-24, Tu-22, F-111) — no dogfight, fast, durable; strike GA 8 / heavy OL 12.</summary>
+        public static readonly Archetype Bomber       = Air(1, 3, 10, 8, 100, ga: 8, ol: 12);
 
         #endregion // Air families
 
@@ -93,10 +94,11 @@ namespace HammerAndSickle.Models
             return new Archetype(stats);
         }
 
-        /// <summary>Builds a fixed-wing archetype (DF/MAN/TS/SUR/MMP, plus base air SR). GA/OL are per-profile
-        /// deltas. Base SR 4 = W8 AIR_UNIT_SPOTTING_RANGE (Option A — routed through the resolver); recon (8) and
-        /// AWACS (12) add the difference as a per-profile delta.</summary>
-        private static Archetype Air(int df, int man, int ts, int sur, int mmp, int sr = 4)
+        /// <summary>Builds a fixed-wing archetype (DF/MAN/TS/SUR/MMP, plus base air SR, GA and OL). GA and OL are
+        /// now archetype baselines (Rule A): GA is a band stat (1..25), OL the air payload (OL/9 multiplier). Base
+        /// SR 4 = W8 AIR_UNIT_SPOTTING_RANGE (Option A — routed through the resolver); recon (8) and AWACS (12) add
+        /// the difference as a per-profile delta.</summary>
+        private static Archetype Air(int df, int man, int ts, int sur, int mmp, int ga, int ol, int sr = 4)
             => new Archetype(new Dictionary<ProfileStat, int>
             {
                 { ProfileStat.DF, df },
@@ -104,6 +106,8 @@ namespace HammerAndSickle.Models
                 { ProfileStat.TS, ts },
                 { ProfileStat.SUR, sur },
                 { ProfileStat.MMP, mmp },
+                { ProfileStat.GA, ga },
+                { ProfileStat.OL, ol },
                 { ProfileStat.SR, sr }
             });
 
