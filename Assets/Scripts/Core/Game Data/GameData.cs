@@ -607,9 +607,9 @@ namespace HammerAndSickle.Core.GameData
     public enum PrestigeTierCost
     {
         Gen1 = 0,
-        Gen2 = 50,
-        Gen3 = 100,
-        Gen4 = 150
+        Gen2 = 60,
+        Gen3 = 120,
+        Gen4 = 180
     }
 
     /// <summary>
@@ -617,26 +617,29 @@ namespace HammerAndSickle.Core.GameData
     /// </summary>
     public enum PrestigeTypeCost
     {
+        // Prestige pass 2026-06-18 (price-to-potential, PG-style): floor INF 50, apex 450 (Scud/AWACS).
         None  = 0,
-        TANK  = 55,  // Tanks
-        IFV   = 40,  // Infantry Fighting Vehicles
-        APC   = 30,  // Armored Personnel Carriers
-        RCN   = 35,  // Reconnaissance vehicles
-        ART   = 100, // Artillery
-        SPA   = 150, // Self-Propelled Artillery
+        INF   = 50,  // Infantry (NEW — the core floor)
+        TRK   = 20,  // Trucks / unarmed ground + naval transport (NEW — token utility)
+        TANK  = 65,  // Tanks
+        IFV   = 55,  // Infantry Fighting Vehicles
+        APC   = 40,  // Armored Personnel Carriers
+        RCN   = 45,  // Reconnaissance vehicles
+        ART   = 90,  // Towed Artillery (cheaper than SPA)
+        SPA   = 130, // Self-Propelled Artillery (premium support)
         ROC   = 175, // Rocket Artillery
-        BMS   = 215, // Ballistic Missile Systems
-        AAA   = 75,  // Anti-Aircraft Artillery
+        BMS   = 450, // Ballistic Missile Systems (apex — Scud; pinned at Gen1)
+        AAA   = 70,  // Anti-Aircraft Artillery
         SPAAA = 135, // Self-Propelled Anti-Aircraft Artillery
         SAM   = 145, // Surface-to-Air Missiles
         SPSAM = 175, // Self-Propelled Surface-to-Air Missiles
-        HEL   = 120,   // Helicopters
-        HELT  = 100,   // Helicopter Transport
-        AWACS = 300, // Airborne Warning and Control System
+        HEL   = 130, // Helicopters
+        HELT  = 90,  // Helicopter Transport
+        AWACS = 450, // Airborne Warning and Control System (apex, pinned at Gen1)
         TRN   = 150, // Transport aircraft
         FGT   = 150, // Fighter aircraft
         ATT   = 135, // Attack aircraft
-        BMB   = 250, // Bomber aircraft
+        BMB   = 240, // Bomber aircraft
         RCNA  = 200  // Reconnaissance aircraft
     }
 
@@ -1406,6 +1409,20 @@ namespace HammerAndSickle.Core.GameData
 
     public class GameData : MonoBehaviour
     {
+        #region Prestige Exceptions
+
+        // Profiles whose final prestige is set EXPLICITLY here, OVERRIDING the tier+type formula
+        // (PrestigeTierCost + PrestigeTypeCost), because the formula can't capture a special capability.
+        // Every deviation from the formula lives in this region so a future reader knows exactly where —
+        // and why — we broke the pattern. Apply with WeaponProfile.SetPrestigeCost(int).
+        //
+        // 2026-06-18 — Cruise-missile bombers: a Gen3 bomber carrying STANDOFF_CRUISE_MISSILE (the Kh-22
+        // GAD-ignoring "free" strike — Tu-22M3) is priced as a premium strike asset. The BMB type+gen
+        // formula (~360) under-values an attack that bypasses air defence entirely.
+        public const int PRESTIGE_CRUISE_BOMBER = 400;
+
+        #endregion // Prestige Exceptions
+
         #region File Constants
 
         public const string MANIFEST_EXTENSION = ".manifest";

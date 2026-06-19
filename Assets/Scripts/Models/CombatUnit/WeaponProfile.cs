@@ -226,6 +226,15 @@ namespace HammerAndSickle.Models
         }
 
         /// <summary>
+        /// Sets an EXPLICIT prestige cost, overriding the tier+type formula. Use ONLY for the documented
+        /// exceptions in GameData's "Prestige Exceptions" region (e.g. GameData.PRESTIGE_CRUISE_BOMBER).
+        /// </summary>
+        public void SetPrestigeCost(int explicitCost)
+        {
+            PrestigeCost = explicitCost;
+        }
+
+        /// <summary>
         /// Sets the stored ICM (product of this profile's fire-control/quality traits), clamped to
         /// the GameData guardrails. Called by the trait resolver during profile construction.
         /// </summary>

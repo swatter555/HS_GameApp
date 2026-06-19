@@ -1065,7 +1065,7 @@ namespace HammerAndSickle.Models
                 UpgradePath.ART, 396);
 
             // Set the prestige cost for the profile.
-            SPA2S1.SetPrestigeCost(PrestigeTierCost.Gen2, PrestigeTypeCost.SPA);
+            SPA2S1.SetPrestigeCost(PrestigeTierCost.Gen1, PrestigeTypeCost.SPA);
 
             // Fill out intel stats for the 2S1 profile
             SPA2S1.AddIntelReportStat(WeaponType.Personnel,      1100);
@@ -2031,7 +2031,7 @@ namespace HammerAndSickle.Models
                 UpgradePath.AWACS, 552);
 
             // Set the prestige cost for the profile.
-            A50.SetPrestigeCost(PrestigeTierCost.Gen4, PrestigeTypeCost.AWACS);
+            A50.SetPrestigeCost(PrestigeTierCost.Gen1, PrestigeTypeCost.AWACS);
 
             // Fill out intel stats for the A-50 profile
             A50.AddIntelReportStat(WeaponType.AWACS_A50_SV,        6);
@@ -2507,7 +2507,7 @@ namespace HammerAndSickle.Models
                 UpgradePath.BMB, 480);
 
             // Set the prestige cost for the profile.
-            TU22M3.SetPrestigeCost(PrestigeTierCost.Gen3, PrestigeTypeCost.BMB);
+            TU22M3.SetPrestigeCost(GameData.PRESTIGE_CRUISE_BOMBER);  // EXCEPTION: GAD-ignoring cruise strike (see GameData Prestige Exceptions)
 
             // Fill out intel stats for the Tu-22M3 profile
             TU22M3.AddIntelReportStat(WeaponType.BMB_TU22M3_SV,   24);
@@ -2579,6 +2579,7 @@ namespace HammerAndSickle.Models
             };
 
             // Add the Truck profile to the database
+            TRK_GEN.SetPrestigeCost(PrestigeTierCost.Gen1, PrestigeTypeCost.TRK);
             AddProfile(WeaponType.TRK_GEN_SV, TRK_GEN);
             //----------------------------------------------
             // Soviet Generic Truck
@@ -2603,6 +2604,7 @@ namespace HammerAndSickle.Models
             };
 
             // Add the Naval Transport profile to the database
+            NAVAL.SetPrestigeCost(PrestigeTierCost.Gen1, PrestigeTypeCost.TRK);
             AddProfile(WeaponType.TRN_NAVAL, NAVAL);
             //----------------------------------------------
             // Soviet Naval Transport Flotilla
@@ -2642,6 +2644,7 @@ namespace HammerAndSickle.Models
             };
 
             // Add the Regular Infantry profile to the database
+            INF_REG.SetPrestigeCost(PrestigeTierCost.Gen1, PrestigeTypeCost.INF);
             AddProfile(WeaponType.INF_REG_SV, INF_REG);
             //----------------------------------------------
             // Soviet Regular Infantry
@@ -2673,6 +2676,7 @@ namespace HammerAndSickle.Models
             };
 
             // Add the Airborne Infantry profile to the database
+            INF_AB.SetPrestigeCost(PrestigeTierCost.Gen1, PrestigeTypeCost.INF);
             AddProfile(WeaponType.INF_AB_SV, INF_AB);
             //----------------------------------------------
             // Soviet Airborne Infantry
@@ -2707,6 +2711,7 @@ namespace HammerAndSickle.Models
             };
 
             // Add the Air-Mobile Infantry profile to the database
+            INF_AM.SetPrestigeCost(PrestigeTierCost.Gen1, PrestigeTypeCost.INF);
             AddProfile(WeaponType.INF_AM_SV, INF_AM);
             //----------------------------------------------
             // Soviet Air-Mobile Infantry
@@ -2742,6 +2747,7 @@ namespace HammerAndSickle.Models
             };
 
             // Add the Marine Infantry profile to the database
+            INF_MAR.SetPrestigeCost(PrestigeTierCost.Gen1, PrestigeTypeCost.INF);
             AddProfile(WeaponType.INF_MAR_SV, INF_MAR);
             //----------------------------------------------
             // Soviet Marine Infantry
@@ -2774,6 +2780,7 @@ namespace HammerAndSickle.Models
             };
 
             // Add the Spetsnaz profile to the database
+            INF_SPEC.SetPrestigeCost(PrestigeTierCost.Gen2, PrestigeTypeCost.INF);
             AddProfile(WeaponType.INF_SPEC_SV, INF_SPEC);
             //----------------------------------------------
             // Soviet Special Forces (Spetsnaz)
@@ -2802,6 +2809,7 @@ namespace HammerAndSickle.Models
             };
 
             // Add the Combat Engineers profile to the database
+            INF_ENG.SetPrestigeCost(PrestigeTierCost.Gen1, PrestigeTypeCost.INF);
             AddProfile(WeaponType.INF_ENG_SV, INF_ENG);
             //----------------------------------------------
             // Soviet Combat Engineers
@@ -4750,7 +4758,7 @@ namespace HammerAndSickle.Models
                 UpgradePath.AWACS, 468);
 
             // Set the prestige cost for the profile.
-            E3.SetPrestigeCost(PrestigeTierCost.Gen3, PrestigeTypeCost.AWACS);
+            E3.SetPrestigeCost(PrestigeTierCost.Gen1, PrestigeTypeCost.AWACS);
 
             // Intel stats
             E3.AddIntelReportStat(WeaponType.AWACS_E3_US,     12);
@@ -4822,6 +4830,7 @@ namespace HammerAndSickle.Models
             };
 
             // Add the Western Truck profile to the database
+            TRK_W.SetPrestigeCost(PrestigeTierCost.Gen1, PrestigeTypeCost.TRK);
             AddProfile(WeaponType.TRK_WEST, TRK_W);
             //----------------------------------------------
             // Western Generic Truck
@@ -4858,6 +4867,7 @@ namespace HammerAndSickle.Models
             };
 
             // Add the US Regular Infantry profile to the database
+            INF_REG_US_P.SetPrestigeCost(PrestigeTierCost.Gen1, PrestigeTypeCost.INF);
             AddProfile(WeaponType.INF_REG_US, INF_REG_US_P);
             //----------------------------------------------
             // US Regular Infantry
@@ -4888,6 +4898,7 @@ namespace HammerAndSickle.Models
             };
 
             // Add the US Marine Infantry profile to the database
+            INF_MAR_US_P.SetPrestigeCost(PrestigeTierCost.Gen1, PrestigeTypeCost.INF);
             AddProfile(WeaponType.INF_MAR_US, INF_MAR_US_P);
             //----------------------------------------------
             // US Marine Infantry
@@ -4919,6 +4930,7 @@ namespace HammerAndSickle.Models
             };
 
             // Add the US Airborne Infantry profile to the database
+            INF_AB_US_P.SetPrestigeCost(PrestigeTierCost.Gen1, PrestigeTypeCost.INF);
             AddProfile(WeaponType.INF_AB_US, INF_AB_US_P);
             //----------------------------------------------
             // US Airborne Infantry
@@ -4950,6 +4962,7 @@ namespace HammerAndSickle.Models
             };
 
             // Add the US Air-Mobile Infantry profile to the database
+            INF_AM_US_P.SetPrestigeCost(PrestigeTierCost.Gen1, PrestigeTypeCost.INF);
             AddProfile(WeaponType.INF_AM_US, INF_AM_US_P);
             //----------------------------------------------
             // US Air-Mobile Infantry
@@ -4981,6 +4994,7 @@ namespace HammerAndSickle.Models
             };
 
             // Add the UK Regular Infantry profile to the database
+            INF_REG_UK_P.SetPrestigeCost(PrestigeTierCost.Gen1, PrestigeTypeCost.INF);
             AddProfile(WeaponType.INF_REG_UK, INF_REG_UK_P);
             //----------------------------------------------
             // UK Regular Infantry
@@ -5011,6 +5025,7 @@ namespace HammerAndSickle.Models
             };
 
             // Add the UK Airborne Infantry profile to the database
+            INF_AB_UK_P.SetPrestigeCost(PrestigeTierCost.Gen1, PrestigeTypeCost.INF);
             AddProfile(WeaponType.INF_AB_UK, INF_AB_UK_P);
             //----------------------------------------------
             // UK Airborne Infantry
@@ -5041,6 +5056,7 @@ namespace HammerAndSickle.Models
             };
 
             // Add the FRG Regular Infantry profile to the database
+            INF_REG_GE_P.SetPrestigeCost(PrestigeTierCost.Gen1, PrestigeTypeCost.INF);
             AddProfile(WeaponType.INF_REG_GE, INF_REG_GE_P);
             //----------------------------------------------
             // FRG Regular Infantry
@@ -5070,6 +5086,7 @@ namespace HammerAndSickle.Models
             };
 
             // Add the FRG Airborne Infantry profile to the database
+            INF_AB_GE_P.SetPrestigeCost(PrestigeTierCost.Gen1, PrestigeTypeCost.INF);
             AddProfile(WeaponType.INF_AB_GE, INF_AB_GE_P);
             //----------------------------------------------
             // FRG Airborne Infantry
@@ -5101,6 +5118,7 @@ namespace HammerAndSickle.Models
             };
 
             // Add the French Regular Infantry profile to the database
+            INF_REG_FR_P.SetPrestigeCost(PrestigeTierCost.Gen1, PrestigeTypeCost.INF);
             AddProfile(WeaponType.INF_REG_FR, INF_REG_FR_P);
             //----------------------------------------------
             // French Regular Infantry
@@ -5131,6 +5149,7 @@ namespace HammerAndSickle.Models
             };
 
             // Add the French Airborne Infantry profile to the database
+            INF_AB_FR_P.SetPrestigeCost(PrestigeTierCost.Gen1, PrestigeTypeCost.INF);
             AddProfile(WeaponType.INF_AB_FR, INF_AB_FR_P);
             //----------------------------------------------
             // French Airborne Infantry
@@ -5397,7 +5416,7 @@ namespace HammerAndSickle.Models
                 UpgradePath.ART, 396);
 
             // Set the prestige cost for the profile.
-            SPA_2S1_AR.SetPrestigeCost(PrestigeTierCost.Gen2, PrestigeTypeCost.SPA);
+            SPA_2S1_AR.SetPrestigeCost(PrestigeTierCost.Gen1, PrestigeTypeCost.SPA);
 
             // Intel stats
             SPA_2S1_AR.AddIntelReportStat(WeaponType.Personnel,       720);
@@ -5823,6 +5842,7 @@ namespace HammerAndSickle.Models
             };
 
             // Add the Arab Truck profile to the database
+            TRK_AR.SetPrestigeCost(PrestigeTierCost.Gen1, PrestigeTypeCost.TRK);
             AddProfile(WeaponType.TRK_GEN_ARAB, TRK_AR);
             //----------------------------------------------
             // Arab Generic Truck
@@ -5857,6 +5877,7 @@ namespace HammerAndSickle.Models
             };
 
             // Add the IQ Regular Infantry profile to the database
+            INF_REG_IQ_P.SetPrestigeCost(PrestigeTierCost.Gen1, PrestigeTypeCost.INF);
             AddProfile(WeaponType.INF_REG_IQ, INF_REG_IQ_P);
 
             //----------------------------------------------
@@ -5888,6 +5909,7 @@ namespace HammerAndSickle.Models
             };
 
             // Add the IR Regular Infantry profile to the database
+            INF_REG_IR_P.SetPrestigeCost(PrestigeTierCost.Gen1, PrestigeTypeCost.INF);
             AddProfile(WeaponType.INF_REG_IR, INF_REG_IR_P);
 
             //----------------------------------------------
@@ -5925,6 +5947,7 @@ namespace HammerAndSickle.Models
             };
 
             // Add the Mujahideen Regular Infantry profile to the database
+            INF_MJ_REG.SetPrestigeCost(PrestigeTierCost.Gen1, PrestigeTypeCost.INF);
             AddProfile(WeaponType.INF_REG_MJ, INF_MJ_REG);
             //----------------------------------------------
             // Mujahideen Regular Infantry
@@ -5956,6 +5979,7 @@ namespace HammerAndSickle.Models
             };
 
             // Add the Mujahideen Special Forces profile to the database
+            INF_MJ_SPEC.SetPrestigeCost(PrestigeTierCost.Gen2, PrestigeTypeCost.INF);
             AddProfile(WeaponType.INF_SPEC_MJ, INF_MJ_SPEC);
             //----------------------------------------------
             // Mujahideen Special Forces
@@ -5986,6 +6010,7 @@ namespace HammerAndSickle.Models
             };
 
             // Add the Mujahideen Horse Cavalry profile to the database
+            INF_MJ_CAV.SetPrestigeCost(PrestigeTierCost.Gen1, PrestigeTypeCost.INF);
             AddProfile(WeaponType.INF_CAV_MJ, INF_MJ_CAV);
             //----------------------------------------------
             // Mujahideen Horse Cavalry
@@ -6017,6 +6042,7 @@ namespace HammerAndSickle.Models
             };
 
             // Add the Mujahideen RPG Teams profile to the database
+            INF_MJ_RPG.SetPrestigeCost(PrestigeTierCost.Gen1, PrestigeTypeCost.INF);
             AddProfile(WeaponType.INF_RPG_MJ, INF_MJ_RPG);
             //----------------------------------------------
             // Mujahideen RPG Teams
@@ -6675,6 +6701,7 @@ namespace HammerAndSickle.Models
             };
 
             // Add the Chinese Regular Infantry profile to the database
+            INF_REG_CH_P.SetPrestigeCost(PrestigeTierCost.Gen1, PrestigeTypeCost.INF);
             AddProfile(WeaponType.INF_REG_CH, INF_REG_CH_P);
             //----------------------------------------------
             // Chinese Regular Infantry
@@ -6706,6 +6733,7 @@ namespace HammerAndSickle.Models
             };
 
             // Add the Chinese Airborne Infantry profile to the database
+            INF_AB_CH_P.SetPrestigeCost(PrestigeTierCost.Gen1, PrestigeTypeCost.INF);
             AddProfile(WeaponType.INF_AB_CH, INF_AB_CH_P);
             //----------------------------------------------
             // Chinese Airborne Infantry
