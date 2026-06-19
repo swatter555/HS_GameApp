@@ -33,7 +33,7 @@ namespace HammerAndSickle.Tests
 
         /// <summary>A bare, all-zero-stat profile — exercises the constructor's prefix default with no DB.</summary>
         private static WeaponProfile Bare(WeaponType wt)
-            => new WeaponProfile("t", "t", wt, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, false, false, false);
+            => new WeaponProfile("t", "t", wt, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0, 0);
 
         #endregion // Helpers
 

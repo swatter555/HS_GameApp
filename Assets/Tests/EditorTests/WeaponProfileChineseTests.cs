@@ -80,7 +80,7 @@ namespace HammerAndSickle.Tests
             {
                 // Type 86 (BMP-1 copy + HJ-73 rail): Ifv + ATGM_RAIL (HA+4) + AMPHIBIOUS. Mirrors BMP-1P.
                 AssertGround(WeaponType.IFV_TYPE86, 8, 4, 8, 7, 7, 0);
-                Assert.IsTrue(P(WeaponType.IFV_TYPE86).IsAmphibious, "Type 86 amphibious");
+                Assert.IsTrue(P(WeaponType.IFV_TYPE86).HasCapability(WeaponCapability.Amphibious), "Type 86 amphibious");
                 Assert.AreEqual(1.00f, P(WeaponType.IFV_TYPE86).ICM, 0.01f, "Type 86 ICM 1.00");
             }
             catch (Exception ex) { AppService.HandleException(CLASS_NAME, nameof(Ifv_ResolvesConvertedLines), ex); throw; }
@@ -101,7 +101,7 @@ namespace HammerAndSickle.Tests
 
                 // PHZ-89 tracked MRL: SELF_PROPELLED + ROCKET_ARTILLERY → double-fire.
                 AssertGround(WeaponType.ROC_PHZ89, 5, 7, 9, 7, 7, 0);
-                Assert.IsTrue(P(WeaponType.ROC_PHZ89).IsDoubleFire, "PHZ-89 rocket-artillery double-fire");
+                Assert.IsTrue(P(WeaponType.ROC_PHZ89).HasCapability(WeaponCapability.RocketArtillery), "PHZ-89 rocket-artillery double-fire");
 
                 // Light towed: bare Artillery archetype (foot, MMP 4), GAD 8.
                 AssertGround(WeaponType.ART_LIGHT_CH, 5, 5, 9, 5, 8, 0);

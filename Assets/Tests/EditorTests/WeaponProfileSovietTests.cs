@@ -69,7 +69,7 @@ namespace HammerAndSickle.Tests
                 // Validated §16 T-72A.
                 AssertGround(WeaponType.TANK_T72A_SV, 12, 9, 7, 6, 7, 0);
                 Assert.AreEqual(1.05f, P(WeaponType.TANK_T72A_SV).ICM, ICM_TOL, "T-72A ICM");
-                Assert.IsTrue(P(WeaponType.TANK_T72A_SV).IsAmphibious, "T-72A amphibious (trait-restored)");
+                Assert.IsTrue(P(WeaponType.TANK_T72A_SV).HasCapability(WeaponCapability.Amphibious), "T-72A amphibious (trait-restored)");
             }
             catch (Exception ex) { AppService.HandleException(CLASS_NAME, nameof(Tanks_ResolveConvertedLines), ex); throw; }
         }
@@ -84,7 +84,7 @@ namespace HammerAndSickle.Tests
             try
             {
                 AssertGround(WeaponType.IFV_BMP2_SV, 9, 4, 9, 7, 7, 0);   // 30mm + Konkurs
-                Assert.IsTrue(P(WeaponType.IFV_BMP2_SV).IsAmphibious, "BMP-2 amphibious");
+                Assert.IsTrue(P(WeaponType.IFV_BMP2_SV).HasCapability(WeaponCapability.Amphibious), "BMP-2 amphibious");
 
                 AssertGround(WeaponType.APC_BTR70_SV, 3, 4, 6, 8, 7, 0);  // APC archetype + SD
                 Assert.AreEqual(8, (int)P(WeaponType.APC_BTR70_SV).MaxMovementPoints, "BTR-70 MMP (APC baseline 8)");
@@ -120,14 +120,14 @@ namespace HammerAndSickle.Tests
                 AssertGround(WeaponType.ART_LIGHT_SV, 5, 5, 9, 5, 8, 0);
                 Assert.AreEqual(4, (int)P(WeaponType.ART_LIGHT_SV).MaxMovementPoints, "Lt towed MMP 4");
 
-                // BM-21: rocket artillery → IsDoubleFire; truck chassis GAD 6, MMP 8.
+                // BM-21: rocket artillery → RocketArtillery capability; truck chassis GAD 6, MMP 8.
                 AssertGround(WeaponType.ROC_BM21_SV, 5, 5, 9, 5, 6, 0);
-                Assert.IsTrue(P(WeaponType.ROC_BM21_SV).IsDoubleFire, "BM-21 rocket-artillery double-fire");
+                Assert.IsTrue(P(WeaponType.ROC_BM21_SV).HasCapability(WeaponCapability.RocketArtillery), "BM-21 rocket-artillery double-fire");
                 Assert.AreEqual(8, (int)P(WeaponType.ROC_BM21_SV).MaxMovementPoints, "BM-21 MMP (TRUCK_MOUNTED)");
 
                 // Scud (R3): HA 11 / SA 15, single-fire (W5 excludes it from ROCKET_ARTILLERY).
                 AssertGround(WeaponType.ROC_SCUD_SV, 11, 5, 15, 5, 6, 0);
-                Assert.IsFalse(P(WeaponType.ROC_SCUD_SV).IsDoubleFire, "Scud is single-fire (W5)");
+                Assert.IsFalse(P(WeaponType.ROC_SCUD_SV).HasCapability(WeaponCapability.RocketArtillery), "Scud is single-fire (W5)");
             }
             catch (Exception ex) { AppService.HandleException(CLASS_NAME, nameof(Artillery_ResolveConvertedLines), ex); throw; }
         }
@@ -171,7 +171,7 @@ namespace HammerAndSickle.Tests
                 Assert.AreEqual(3, (int)P(WeaponType.HEL_MI28_SV).SpottingRange, "Mi-28 SR 3");
 
                 // Mi-8T transport: non-combatant + helo-transport category.
-                Assert.IsFalse(P(WeaponType.HEL_MI8T_SV).IsAttackCapable, "Mi-8T non-combatant");
+                Assert.IsTrue(P(WeaponType.HEL_MI8T_SV).HasCapability(WeaponCapability.NonCombatant), "Mi-8T non-combatant");
                 Assert.AreEqual(TransportCategory.HeloTransport, P(WeaponType.HEL_MI8T_SV).TransportCategory, "Mi-8T helo transport");
             }
             catch (Exception ex) { AppService.HandleException(CLASS_NAME, nameof(Helicopters_ResolveConvertedLines), ex); throw; }
@@ -194,7 +194,7 @@ namespace HammerAndSickle.Tests
                 Assert.AreEqual(1.10f, P(WeaponType.INF_SPEC_SV).ICM, ICM_TOL, "Spetsnaz SF ICM");
                 Assert.AreEqual(3, (int)P(WeaponType.INF_SPEC_SV).SpottingRange, "Spetsnaz SR 3");
 
-                Assert.IsTrue(P(WeaponType.INF_MAR_SV).IsAmphibious, "Marines amphibious");
+                Assert.IsTrue(P(WeaponType.INF_MAR_SV).HasCapability(WeaponCapability.Amphibious), "Marines amphibious");
                 Assert.IsTrue(P(WeaponType.INF_ENG_SV).HasCapability(WeaponCapability.FieldFortification), "Engineers field-fortification");
             }
             catch (Exception ex) { AppService.HandleException(CLASS_NAME, nameof(Infantry_ResolveConvertedLines), ex); throw; }
@@ -294,14 +294,14 @@ namespace HammerAndSickle.Tests
 
                 // A-50 AWACS: W8 SR 12, non-combatant.
                 Assert.AreEqual(12, (int)P(WeaponType.AWACS_A50_SV).SpottingRange, "A-50 AWACS SR 12 (W8)");
-                Assert.IsFalse(P(WeaponType.AWACS_A50_SV).IsAttackCapable, "A-50 non-combatant");
+                Assert.IsTrue(P(WeaponType.AWACS_A50_SV).HasCapability(WeaponCapability.NonCombatant), "A-50 non-combatant");
 
                 // MiG-25R recon: W8 SR 8, non-combatant.
                 Assert.AreEqual(8, (int)P(WeaponType.RCNA_MIG25R_SV).SpottingRange, "MiG-25R recon SR 8 (W8)");
-                Assert.IsFalse(P(WeaponType.RCNA_MIG25R_SV).IsAttackCapable, "MiG-25R non-combatant");
+                Assert.IsTrue(P(WeaponType.RCNA_MIG25R_SV).HasCapability(WeaponCapability.NonCombatant), "MiG-25R non-combatant");
 
                 // An-12 fixed-wing transport: non-combatant + transport category.
-                Assert.IsFalse(P(WeaponType.TRN_AN8_SV).IsAttackCapable, "An-12 non-combatant");
+                Assert.IsTrue(P(WeaponType.TRN_AN8_SV).HasCapability(WeaponCapability.NonCombatant), "An-12 non-combatant");
                 Assert.AreEqual(TransportCategory.FixedWingTransport, P(WeaponType.TRN_AN8_SV).TransportCategory, "An-12 fixed-wing transport");
             }
             catch (Exception ex) { AppService.HandleException(CLASS_NAME, nameof(Jets_ResolveConvertedLines), ex); throw; }
@@ -316,11 +316,11 @@ namespace HammerAndSickle.Tests
         {
             try
             {
-                Assert.IsFalse(P(WeaponType.TRK_GEN_SV).IsAttackCapable, "Truck non-combatant");
+                Assert.IsTrue(P(WeaponType.TRK_GEN_SV).HasCapability(WeaponCapability.NonCombatant), "Truck non-combatant");
                 Assert.AreEqual(6, (int)P(WeaponType.TRK_GEN_SV).GroundAirDefense, "Truck GAD 6 (R1)");
 
-                Assert.IsFalse(P(WeaponType.TRN_NAVAL).IsAttackCapable, "Naval non-combatant");
-                Assert.IsTrue(P(WeaponType.TRN_NAVAL).IsAmphibious, "Naval amphibious");
+                Assert.IsTrue(P(WeaponType.TRN_NAVAL).HasCapability(WeaponCapability.NonCombatant), "Naval non-combatant");
+                Assert.IsTrue(P(WeaponType.TRN_NAVAL).HasCapability(WeaponCapability.Amphibious), "Naval amphibious");
                 Assert.AreEqual(10, (int)P(WeaponType.TRN_NAVAL).MaxMovementPoints, "Naval MMP 10");
             }
             catch (Exception ex) { AppService.HandleException(CLASS_NAME, nameof(Transports_ResolveConvertedLines), ex); throw; }

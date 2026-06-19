@@ -68,20 +68,8 @@ namespace HammerAndSickle.Models
 
         private const string CLASS_NAME = nameof(WeaponProfileDB);
 
-        // Centralized place for combat rating modifiers
-        //private const int MASSIVE_MALUS = -10;
-        //private const int XXLARGE_MALUS = -5;
-        private const int XLARGE_MALUS = -4;
-        private const int LARGE_MALUS = -3;
-        private const int MEDIUM_MALUS = -2;
-        private const int SMALL_MALUS = -1;
-        private const int SMALL_BONUS = 1;
-        private const int MEDIUM_BONUS = 2;
-        private const int LARGE_BONUS = 3;
-        private const int XLARGE_BONUS = 4;
-        private const int XXLARGE_BONUS = 5;
-        private const int XXXLARGE_BONUS = 6;
-        //private const int MASSIVE_BONUS = 10;
+        // The old additive combat-rating modifier consts (XLARGE_MALUS … XXXLARGE_BONUS) were removed in
+        // Phase 4 (R9) — superseded by the Archetype + Delta + Trait model (all profiles build via FromProfileDef).
 
         #endregion // Constants
 
@@ -2828,31 +2816,13 @@ namespace HammerAndSickle.Models
             //----------------------------------------------
             // Large Base (Airbase)
             //----------------------------------------------
-            WeaponProfile BASE_AIRBASE = new WeaponProfile(
-                _longName: "Miltary Airbase",
-                _shortName: "Airbase",
-                _type: WeaponType.BASE_AIRBASE,
-                _hardAtt: GameData.BASE_INF_HARD_ATTACK + LARGE_MALUS,     // Hard Attack Rating
-                _hardDef: GameData.BASE_INF_HARD_DEFENSE + LARGE_MALUS,    // Hard Defense Rating
-                _softAtt: GameData.BASE_INF_SOFT_ATTACK + LARGE_MALUS,     // Soft Attack Rating
-                _softDef: GameData.BASE_INF_SOFT_DEFENSE + LARGE_MALUS,    // Soft Defense Rating
-                _gat: GameData.GROUND_AIR_ATTACK_DEFAULT,  // Ground-to-Air Attack Rating
-                _gad: GameData.GROUND_DEFENSE_INFANTRY,    // Ground Defense Armor Rating
-                _df: 0,                                    // Dogfighting Rating
-                _man: 0,                                   // Maneuverability Rating
-                _topSpd: 0,                                // Top Speed Rating
-                _surv: 0,                                  // Survivability Rating
-                _ga: 0,                                    // Ground Attack Rating
-                _ol: 0,                                    // Ordinance Rating
-                _stealth: 0,                               // Stealth Rating
-                _pr: GameData.PRIMARY_RANGE_DEFAULT,       // Primary Range
-                _ir: GameData.INDIRECT_RANGE_DEFAULT,      // Indirect Range
-                _sr: GameData.BASE_UNIT_SPOTTING_RANGE,    // Spotting Range
-                _mmp: GameData.STATIC_UNIT,                // Max Movement Points
-                _isAmph: false,                            // Is Amphibious
-                _isDF: false,                              // Is DoubleFire
-                _isAtt: false                             // Can this profile attack
-            );
+            // Phase 3 (Generic): Facility archetype (ratified §7B base line) + NON_COMBATANT (static, can't initiate attack).
+            // → HA4 HD6 SA6 SD7 GAD6 · GAT0 · MMP0 · PR1 · IR0 · SR4 · non-combatant.
+            WeaponProfile BASE_AIRBASE = WeaponProfile.FromProfileDef(
+                "Miltary Airbase", "Airbase", WeaponType.BASE_AIRBASE,
+                new ProfileDef(FamilyArchetypes.Facility,
+                    new Dictionary<ProfileStat, int>(),
+                    new[] { WeaponTrait.NON_COMBATANT }));
 
             // Fill out intel stats for the Large Base
             BASE_AIRBASE.AddIntelReportStat(WeaponType.Personnel, 3000);
@@ -2872,31 +2842,12 @@ namespace HammerAndSickle.Models
             //----------------------------------------------
             // Medium Base
             //----------------------------------------------
-            WeaponProfile BASE_DEPOT = new WeaponProfile(
-                _longName: "Supply Depot",
-                _shortName: "Depot",
-                _type: WeaponType.BASE_DEPOT,
-                _hardAtt: GameData.BASE_INF_HARD_ATTACK + LARGE_MALUS,     // Hard Attack Rating
-                _hardDef: GameData.BASE_INF_HARD_DEFENSE + LARGE_MALUS,    // Hard Defense Rating
-                _softAtt: GameData.BASE_INF_SOFT_ATTACK + LARGE_MALUS,     // Soft Attack Rating
-                _softDef: GameData.BASE_INF_SOFT_DEFENSE + LARGE_MALUS,    // Soft Defense Rating
-                _gat: GameData.GROUND_AIR_ATTACK_DEFAULT,  // Ground-to-Air Attack Rating
-                _gad: GameData.GROUND_DEFENSE_INFANTRY,    // Ground Defense Armor Rating
-                _df: 0,                                    // Dogfighting Rating
-                _man: 0,                                   // Maneuverability Rating
-                _topSpd: 0,                                // Top Speed Rating
-                _surv: 0,                                  // Survivability Rating
-                _ga: 0,                                    // Ground Attack Rating
-                _ol: 0,                                    // Ordinance Rating
-                _stealth: 0,                               // Stealth Rating
-                _pr: GameData.PRIMARY_RANGE_DEFAULT,       // Primary Range
-                _ir: GameData.INDIRECT_RANGE_DEFAULT,      // Indirect Range
-                _sr: GameData.BASE_UNIT_SPOTTING_RANGE,    // Spotting Range
-                _mmp: GameData.STATIC_UNIT,                // Max Movement Points
-                _isAmph: false,                            // Is Amphibious
-                _isDF: false,                              // Is DoubleFire
-                _isAtt: false                             // Can this profile attack
-            );
+            // Phase 3 (Generic): Facility archetype + NON_COMBATANT. → HA4 HD6 SA6 SD7 GAD6 · GAT0 · MMP0 · PR1 · IR0 · SR4 · non-combatant.
+            WeaponProfile BASE_DEPOT = WeaponProfile.FromProfileDef(
+                "Supply Depot", "Depot", WeaponType.BASE_DEPOT,
+                new ProfileDef(FamilyArchetypes.Facility,
+                    new Dictionary<ProfileStat, int>(),
+                    new[] { WeaponTrait.NON_COMBATANT }));
 
             // Fill out intel stats for the Medium Base
             BASE_DEPOT.AddIntelReportStat(WeaponType.Personnel, 2000);
@@ -2916,31 +2867,12 @@ namespace HammerAndSickle.Models
             //----------------------------------------------
             // Small Base (HQ)
             //----------------------------------------------
-            WeaponProfile BASE_HQ = new WeaponProfile(
-                _longName: "Intel Base",
-                _shortName: "Intel",
-                _type: WeaponType.BASE_HQ,
-                _hardAtt: GameData.BASE_INF_HARD_ATTACK + LARGE_MALUS,     // Hard Attack Rating
-                _hardDef: GameData.BASE_INF_HARD_DEFENSE + LARGE_MALUS,    // Hard Defense Rating
-                _softAtt: GameData.BASE_INF_SOFT_ATTACK + LARGE_MALUS,     // Soft Attack Rating
-                _softDef: GameData.BASE_INF_SOFT_DEFENSE + LARGE_MALUS,    // Soft Defense Rating
-                _gat: GameData.GROUND_AIR_ATTACK_DEFAULT,  // Ground-to-Air Attack Rating
-                _gad: GameData.GROUND_DEFENSE_INFANTRY,    // Ground Defense Armor Rating
-                _df: 0,                                    // Dogfighting Rating
-                _man: 0,                                   // Maneuverability Rating
-                _topSpd: 0,                                // Top Speed Rating
-                _surv: 0,                                  // Survivability Rating
-                _ga: 0,                                    // Ground Attack Rating
-                _ol: 0,                                    // Ordinance Rating
-                _stealth: 0,                               // Stealth Rating
-                _pr: GameData.PRIMARY_RANGE_DEFAULT,       // Primary Range
-                _ir: GameData.INDIRECT_RANGE_DEFAULT,      // Indirect Range
-                _sr: GameData.BASE_UNIT_SPOTTING_RANGE,    // Spotting Range
-                _mmp: GameData.STATIC_UNIT,                // Max Movement Points
-                _isAmph: false,                            // Is Amphibious
-                _isDF: false,                              // Is DoubleFire
-                _isAtt: false                             // Can this profile attack
-            );
+            // Phase 3 (Generic): Facility archetype + NON_COMBATANT. → HA4 HD6 SA6 SD7 GAD6 · GAT0 · MMP0 · PR1 · IR0 · SR4 · non-combatant.
+            WeaponProfile BASE_HQ = WeaponProfile.FromProfileDef(
+                "Intel Base", "Intel", WeaponType.BASE_HQ,
+                new ProfileDef(FamilyArchetypes.Facility,
+                    new Dictionary<ProfileStat, int>(),
+                    new[] { WeaponTrait.NON_COMBATANT }));
 
             // Fill out intel stats for the Small Base
             BASE_HQ.AddIntelReportStat(WeaponType.Personnel, 1500);
@@ -3078,7 +3010,7 @@ namespace HammerAndSickle.Models
             LEO1_GE.AddIntelReportStat(WeaponType.AT_ATGM,             32);  // Milan AT teams
             LEO1_GE.AddIntelReportStat(WeaponType.MANPAD_STINGER,      24);  // Roland/Stinger air defense sections
             LEO1_GE.AddIntelReportStat(WeaponType.SPA_M109_GE,         18);  // Organic artillery battalion (155mm SP)
-            LEO1_GE.AddIntelReportStat(WeaponType.SPSAM_GEPARD_GE,      8);  // Gepard air defense guns
+            LEO1_GE.AddIntelReportStat(WeaponType.SPAAA_GEPARD_GE,      8);  // Gepard air defense guns
             LEO1_GE.AddIntelReportStat(WeaponType.ART_120MM_MORTAR,    12);  // 120mm mortars
 
             // Handle the icon profile.
@@ -3121,7 +3053,7 @@ namespace HammerAndSickle.Models
             LEO2_GE.AddIntelReportStat(WeaponType.AT_ATGM,             32);  // Milan AT teams
             LEO2_GE.AddIntelReportStat(WeaponType.MANPAD_STINGER,      24);  // Roland/Stinger air defense sections
             LEO2_GE.AddIntelReportStat(WeaponType.SPA_M109_GE,         18);  // Organic artillery battalion (155mm SP)
-            LEO2_GE.AddIntelReportStat(WeaponType.SPSAM_GEPARD_GE,      8);  // Gepard air defense guns
+            LEO2_GE.AddIntelReportStat(WeaponType.SPAAA_GEPARD_GE,      8);  // Gepard air defense guns
             LEO2_GE.AddIntelReportStat(WeaponType.ART_120MM_MORTAR,    12);  // 120mm mortars
 
             // Handle the icon profile.
@@ -3857,12 +3789,12 @@ namespace HammerAndSickle.Models
             //----------------------------------------------
 
             //----------------------------------------------
-            // German Flakpanzer Gepard SPSAM
+            // German Flakpanzer Gepard SPAAA
             //----------------------------------------------
             // Phase 3 (NATO): Aaa + SELF_PROPELLED + RADAR_GUIDED_GUN (35mm radar-directed = NATO's ZSU-23-4 → GAT 13).
-            // → HA4 HD6 SA9 SD8 GAD11 · GAT13 · MMP10 · IR4 · SR3. (Classified SPSAM in source but is a GUN — see TODO flag.)
+            // → HA4 HD6 SA9 SD8 GAD11 · GAT13 · MMP10 · IR4 · SR3. SPAAA gun (dual-role) — classification corrected 2026-06-18.
             WeaponProfile Gepard_GE = WeaponProfile.FromProfileDef(
-                "Flakpanzer Gepard Self-Propelled Anti-Aircraft Gun", "Gepard", WeaponType.SPSAM_GEPARD_GE,
+                "Flakpanzer Gepard Self-Propelled Anti-Aircraft Gun", "Gepard", WeaponType.SPAAA_GEPARD_GE,
                 new ProfileDef(FamilyArchetypes.Aaa,
                     new Dictionary<ProfileStat, int> { { ProfileStat.IR, GameData.INDIRECT_RANGE_SHORT } },
                     new[] { WeaponTrait.SELF_PROPELLED, WeaponTrait.RADAR_GUIDED_GUN }),
@@ -3874,7 +3806,7 @@ namespace HammerAndSickle.Models
             // Intel report stats
             Gepard_GE.AddIntelReportStat(WeaponType.Personnel,      1100);
             Gepard_GE.AddIntelReportStat(WeaponType.SAM_HAWK_US,       4);
-            Gepard_GE.AddIntelReportStat(WeaponType.SPSAM_GEPARD_GE,  18);
+            Gepard_GE.AddIntelReportStat(WeaponType.SPAAA_GEPARD_GE,  18);
             Gepard_GE.AddIntelReportStat(WeaponType.IFV_MARDER_GE,    24);
             Gepard_GE.AddIntelReportStat(WeaponType.RCN_LUCHS_GE,        12);
 
@@ -3890,21 +3822,21 @@ namespace HammerAndSickle.Models
             };
 
             // Add the Gepard GE profile to the database
-            AddProfile(WeaponType.SPSAM_GEPARD_GE, Gepard_GE);
+            AddProfile(WeaponType.SPAAA_GEPARD_GE, Gepard_GE);
             //----------------------------------------------
-            // German Flakpanzer Gepard SPSAM
+            // German Flakpanzer Gepard SPAAA
             //----------------------------------------------
 
             //----------------------------------------------
-            // French Roland SPAAA
+            // French Roland Self-Propelled SAM
             //----------------------------------------------
-            // Phase 3 (NATO): Aaa + SELF_PROPELLED + COMMAND_GUIDANCE (radar-command point SAM → GAT 13). NOTE: Roland is a
-            // missile system but is classified SPAAA with AAA (gun) stats in the source — kept the dual-role line; see TODO flag.
-            // → HA4 HD6 SA9 SD8 GAD11 · GAT13 · MMP10 · IR3 · SR3.
+            // Phase 3 (NATO): Sam + SELF_PROPELLED + COMMAND_GUIDANCE (radar-command point SAM → GAT 14). Classification
+            // corrected SPAAA→SPSAM (2026-06-18): Roland is an air-only missile system, now on the Sam line (= Crotale).
+            // → HA1 HD5 SA1 SD5 GAD7 · GAT14 · MMP10 · IR6 · SR6.
             WeaponProfile Roland_FR = WeaponProfile.FromProfileDef(
-                "Roland Self-Propelled Anti-Aircraft Gun", "Roland", WeaponType.SPAAA_ROLAND_FR,
-                new ProfileDef(FamilyArchetypes.Aaa,
-                    new Dictionary<ProfileStat, int> { { ProfileStat.IR, GameData.INDIRECT_RANGE_AAA } },
+                "Roland Self-Propelled SAM System", "Roland", WeaponType.SPSAM_ROLAND_FR,
+                new ProfileDef(FamilyArchetypes.Sam,
+                    new Dictionary<ProfileStat, int> { { ProfileStat.IR, GameData.INDIRECT_RANGE_SAM } },
                     new[] { WeaponTrait.SELF_PROPELLED, WeaponTrait.COMMAND_GUIDANCE }),
                 UpgradePath.SAM, 468);
 
@@ -3913,7 +3845,7 @@ namespace HammerAndSickle.Models
 
             // Intel report stats
             Roland_FR.AddIntelReportStat(WeaponType.Personnel,      950);
-            Roland_FR.AddIntelReportStat(WeaponType.SPAAA_ROLAND_FR, 18);
+            Roland_FR.AddIntelReportStat(WeaponType.SPSAM_ROLAND_FR, 18);
             Roland_FR.AddIntelReportStat(WeaponType.APC_VAB_FR,      24);
             Roland_FR.AddIntelReportStat(WeaponType.RCN_ERC90_FR,       12);
 
@@ -3928,10 +3860,10 @@ namespace HammerAndSickle.Models
                 SW_F = SpriteManager.FR_Roland_SW_F
             };
 
-            // Add the Gepard FR profile to the database
-            AddProfile(WeaponType.SPAAA_ROLAND_FR, Roland_FR);
+            // Add the Roland FR profile to the database
+            AddProfile(WeaponType.SPSAM_ROLAND_FR, Roland_FR);
             //----------------------------------------------
-            // French Roland SPAAA
+            // French Roland Self-Propelled SAM
             //----------------------------------------------
 
             //----------------------------------------------
@@ -3953,7 +3885,7 @@ namespace HammerAndSickle.Models
             Crotale.AddIntelReportStat(WeaponType.Personnel,    1050);
             Crotale.AddIntelReportStat(WeaponType.SPSAM_CROTALE_FR,  18);
             Crotale.AddIntelReportStat(WeaponType.APC_VAB_FR,     24);
-            Crotale.AddIntelReportStat(WeaponType.SPAAA_ROLAND_FR, 4);
+            Crotale.AddIntelReportStat(WeaponType.SPSAM_ROLAND_FR, 4);
             Crotale.AddIntelReportStat(WeaponType.RCN_ERC90_FR,      12);
 
             // Handle the icon profile. (Using FR Roland sprites)

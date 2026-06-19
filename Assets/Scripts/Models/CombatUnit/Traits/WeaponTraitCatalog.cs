@@ -349,10 +349,10 @@ namespace HammerAndSickle.Models
 
             #region §12 Universal / economy
             Add(new TraitDef(WeaponTrait.NON_COMBATANT, TraitCategory.Economy,
-                "Trucks/unarmed transport — cannot initiate attack (folds IsAttackCapable=false).",
+                "Trucks/unarmed transport — cannot initiate attack (NonCombatant capability).",
                 Cap(WeaponCapability.NonCombatant)));
             Add(new TraitDef(WeaponTrait.ROCKET_ARTILLERY, TraitCategory.Economy,
-                "MRL salvo — +1 CombatAction (folds IsDoubleFire/ROC, per 7.14).",
+                "MRL salvo — +1 CombatAction (RocketArtillery capability, per 7.14).",
                 Cap(WeaponCapability.RocketArtillery)));
             Add(new TraitDef(WeaponTrait.EXPORT_DOWNGRADE, TraitCategory.Economy,
                 "Monkey-model export — thinner armour, simpler FCS.",

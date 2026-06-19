@@ -3494,7 +3494,7 @@ namespace HammerAndSickle.Models
                 side: Side.AI,
                 nationality: Nationality.FRG,
                 profileType: RegimentProfileType.DEP,
-                deployedProfile: WeaponType.SPSAM_GEPARD_GE,
+                deployedProfile: WeaponType.SPAAA_GEPARD_GE,
                 isMountable: false,
                 mobileProfile: WeaponType.NONE,
                 isEmbarkable: false,
@@ -3999,12 +3999,12 @@ namespace HammerAndSickle.Models
 
             var fr_air_defense_regiment = new CombatUnit(
                 unitName: "FR Air Defense Regiment (Roland)",
-                classification: UnitClassification.SPAAA,
+                classification: UnitClassification.SPSAM,
                 role: UnitRole.AirDefenseArea,
                 side: Side.AI,
                 nationality: Nationality.FRA,
                 profileType: RegimentProfileType.DEP,
-                deployedProfile: WeaponType.SPAAA_ROLAND_FR,
+                deployedProfile: WeaponType.SPSAM_ROLAND_FR,
                 isMountable: false,
                 mobileProfile: WeaponType.NONE,
                 isEmbarkable: false,

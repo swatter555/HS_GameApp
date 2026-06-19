@@ -6,9 +6,8 @@ namespace HammerAndSickle.Models
     /// Generation × role stat baselines for every non-tank weapon family (Appendix W §2 / §7B).
     /// Tanks live in <see cref="TankArchetypes"/>; this class covers the rest. Like TankArchetypes,
     /// these encode the RATIFIED Appendix W values (R1 GAD inversion, R4 IFV soft-attack, W7 GAT
-    /// default 0) and therefore intentionally differ from the still-pre-correction live GameData
-    /// constants (e.g. GROUND_DEFENSE_INFANTRY 6, BASE_IFV_SOFT_ATTACK 7) — GameData reconciliation
-    /// lands in Phase 3/4. The resolver/tests read these values directly.
+    /// default 0) and ARE the source of truth for these stats — the old pre-migration GameData baseline
+    /// consts were removed in Phase 4. The resolver/tests read these values directly.
     ///
     /// Conventions:
     ///  - "Towed = foot": ART / AAA / SAM carry MMP 4 (the emplaced weapon). Self-propelled and

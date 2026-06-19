@@ -91,7 +91,7 @@ namespace HammerAndSickle.Tests
 
                 // LVTP-7: Apc + AMPHIBIOUS.
                 AssertGround(WeaponType.APC_LVTP7_US, 3, 4, 6, 7, 7, 0);
-                Assert.IsTrue(P(WeaponType.APC_LVTP7_US).IsAmphibious, "LVTP-7 amphibious");
+                Assert.IsTrue(P(WeaponType.APC_LVTP7_US).HasCapability(WeaponCapability.Amphibious), "LVTP-7 amphibious");
 
                 // VAB: bare Apc (wheeled).
                 AssertGround(WeaponType.APC_VAB_FR, 3, 4, 6, 7, 7, 0);
@@ -118,7 +118,7 @@ namespace HammerAndSickle.Tests
                 // Luchs: Recon + AUTOCANNON_LIGHT (20mm) + AMPHIBIOUS.
                 AssertGround(WeaponType.RCN_LUCHS_GE, 2, 5, 6, 9, 7, 0);
                 Assert.AreEqual(TargetClass.Hard, P(WeaponType.RCN_LUCHS_GE).TargetClass, "Luchs Hard");
-                Assert.IsTrue(P(WeaponType.RCN_LUCHS_GE).IsAmphibious, "Luchs amphibious");
+                Assert.IsTrue(P(WeaponType.RCN_LUCHS_GE).HasCapability(WeaponCapability.Amphibious), "Luchs amphibious");
 
                 // FV105: Recon + AUTOCANNON_HEAVY (30mm RARDEN).
                 AssertGround(WeaponType.RCN_FV105_UK, 3, 5, 6, 9, 7, 0);
@@ -156,7 +156,7 @@ namespace HammerAndSickle.Tests
                 // MLRS: tracked rocket artillery — SELF_PROPELLED + ROCKET_ARTILLERY + SMART_MUNITION (analog of BM-27).
                 AssertGround(WeaponType.ROC_MLRS_US, 8, 7, 11, 7, 7, 0);
                 Assert.AreEqual(6, (int)P(WeaponType.ROC_MLRS_US).IndirectRange, "MLRS IR 6");
-                Assert.IsTrue(P(WeaponType.ROC_MLRS_US).IsDoubleFire, "MLRS rocket-artillery double-fire");
+                Assert.IsTrue(P(WeaponType.ROC_MLRS_US).HasCapability(WeaponCapability.RocketArtillery), "MLRS rocket-artillery double-fire");
             }
             catch (Exception ex) { AppService.HandleException(CLASS_NAME, nameof(Artillery_ResolveConvertedLines), ex); throw; }
         }
@@ -172,12 +172,12 @@ namespace HammerAndSickle.Tests
             {
                 // Guns (Aaa archetype + SELF_PROPELLED). GAT +2 in the 2026-06-18 rebalance (7/10 lethality).
                 AssertGround(WeaponType.SPAAA_M163_US, 4, 6, 9, 8, 11, 11);   // optical Vulcan (= ZSU-57-2)
-                AssertGround(WeaponType.SPSAM_GEPARD_GE, 4, 6, 9, 8, 11, 13); // radar 35mm (= ZSU-23-4); SPSAM-classified gun
-                AssertGround(WeaponType.SPAAA_ROLAND_FR, 4, 6, 9, 8, 11, 13); // SPAAA-classified missile (AAA stat line)
+                AssertGround(WeaponType.SPAAA_GEPARD_GE, 4, 6, 9, 8, 11, 13); // radar 35mm gun (= ZSU-23-4)
 
                 // SP SAMs (Sam archetype + SELF_PROPELLED), air-only HA/SA 1.
                 AssertGround(WeaponType.SPSAM_CHAP_US, 1, 5, 1, 5, 7, 13);    // IR fire-and-forget
                 AssertGround(WeaponType.SPSAM_CROTALE_FR, 1, 5, 1, 5, 7, 14); // command
+                AssertGround(WeaponType.SPSAM_ROLAND_FR, 1, 5, 1, 5, 7, 14);  // command (= Crotale, reclassified missile)
                 AssertGround(WeaponType.SPSAM_RAPIER_UK, 1, 5, 1, 5, 7, 14);  // SACLOS
 
                 // Hawk: static medium SARH SAM (= NATO S-75), MMP 0.
@@ -209,7 +209,7 @@ namespace HammerAndSickle.Tests
                 AssertGround(WeaponType.HEL_BO105_GE, 11, 6, 10, 7, 10, 0);
 
                 // UH-60 Black Hawk: non-combatant lift + helo-transport category.
-                Assert.IsFalse(P(WeaponType.HEL_UH60_US).IsAttackCapable, "UH-60 non-combatant");
+                Assert.IsTrue(P(WeaponType.HEL_UH60_US).HasCapability(WeaponCapability.NonCombatant), "UH-60 non-combatant");
                 Assert.AreEqual(TransportCategory.HeloTransport, P(WeaponType.HEL_UH60_US).TransportCategory, "UH-60 helo transport");
             }
             catch (Exception ex) { AppService.HandleException(CLASS_NAME, nameof(Helicopters_ResolveConvertedLines), ex); throw; }
@@ -235,7 +235,7 @@ namespace HammerAndSickle.Tests
                 Assert.IsTrue(P(WeaponType.INF_REG_US).HasCapability(WeaponCapability.FireAndForget), "US Regulars Stinger FNF");
 
                 AssertGround(WeaponType.INF_MAR_US, 8, 7, 7, 8, 10, 8);
-                Assert.IsTrue(P(WeaponType.INF_MAR_US).IsAmphibious, "US Marines amphibious");
+                Assert.IsTrue(P(WeaponType.INF_MAR_US).HasCapability(WeaponCapability.Amphibious), "US Marines amphibious");
 
                 AssertGround(WeaponType.INF_AB_US, 9, 7, 7, 8, 10, 8);
                 Assert.IsTrue(P(WeaponType.INF_AB_US).HasCapability(WeaponCapability.AirDroppable), "US Airborne air-droppable");
@@ -310,11 +310,11 @@ namespace HammerAndSickle.Tests
                 Assert.AreEqual(4, P(WeaponType.BMB_F111_US).GaBonusVsBase, "F-111 GaVsBase 4");
 
                 // E-3 AWACS: non-combatant, SR 12.
-                Assert.IsFalse(P(WeaponType.AWACS_E3_US).IsAttackCapable, "E-3 non-combatant");
+                Assert.IsTrue(P(WeaponType.AWACS_E3_US).HasCapability(WeaponCapability.NonCombatant), "E-3 non-combatant");
                 Assert.AreEqual(12, (int)P(WeaponType.AWACS_E3_US).SpottingRange, "E-3 SR 12");
 
                 // SR-71 recon: non-combatant, Mach-3 TS 21, SR 8.
-                Assert.IsFalse(P(WeaponType.RCNA_SR71_US).IsAttackCapable, "SR-71 non-combatant");
+                Assert.IsTrue(P(WeaponType.RCNA_SR71_US).HasCapability(WeaponCapability.NonCombatant), "SR-71 non-combatant");
                 Assert.AreEqual(21, (int)P(WeaponType.RCNA_SR71_US).TopSpeed, "SR-71 TS 21");
                 Assert.AreEqual(8, (int)P(WeaponType.RCNA_SR71_US).SpottingRange, "SR-71 SR 8");
             }

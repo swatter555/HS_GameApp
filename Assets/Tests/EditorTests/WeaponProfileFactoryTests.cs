@@ -118,58 +118,55 @@ namespace HammerAndSickle.Tests
 
         #endregion // §16 worked tank statlines
 
-        #region Capability bridge (legacy bools derived from resolved caps)
+        #region Capability resolution (traits → capability set)
 
         [Test]
-        public void Bridge_Amphibious_SetsCapAndBool()
+        public void Capability_Amphibious_Resolves()
         {
             try
             {
                 WeaponProfile p = WithTraits(WeaponTrait.AMPHIBIOUS);
                 Assert.IsTrue(p.HasCapability(WeaponCapability.Amphibious), "HasCapability(Amphibious)");
-                Assert.IsTrue(p.IsAmphibious, "IsAmphibious bridge");
             }
-            catch (Exception ex) { AppService.HandleException(CLASS_NAME, nameof(Bridge_Amphibious_SetsCapAndBool), ex); throw; }
+            catch (Exception ex) { AppService.HandleException(CLASS_NAME, nameof(Capability_Amphibious_Resolves), ex); throw; }
         }
 
         [Test]
-        public void Bridge_NonCombatant_ClearsIsAttackCapable()
+        public void Capability_NonCombatant_Resolves()
         {
             try
             {
                 WeaponProfile p = WithTraits(WeaponTrait.NON_COMBATANT);
                 Assert.IsTrue(p.HasCapability(WeaponCapability.NonCombatant), "HasCapability(NonCombatant)");
-                Assert.IsFalse(p.IsAttackCapable, "IsAttackCapable bridge (NON_COMBATANT)");
             }
-            catch (Exception ex) { AppService.HandleException(CLASS_NAME, nameof(Bridge_NonCombatant_ClearsIsAttackCapable), ex); throw; }
+            catch (Exception ex) { AppService.HandleException(CLASS_NAME, nameof(Capability_NonCombatant_Resolves), ex); throw; }
         }
 
         [Test]
-        public void Bridge_RocketArtillery_SetsIsDoubleFire()
+        public void Capability_RocketArtillery_Resolves()
         {
             try
             {
                 WeaponProfile p = WithTraits(WeaponTrait.ROCKET_ARTILLERY);
                 Assert.IsTrue(p.HasCapability(WeaponCapability.RocketArtillery), "HasCapability(RocketArtillery)");
-                Assert.IsTrue(p.IsDoubleFire, "IsDoubleFire bridge (ROCKET_ARTILLERY)");
             }
-            catch (Exception ex) { AppService.HandleException(CLASS_NAME, nameof(Bridge_RocketArtillery_SetsIsDoubleFire), ex); throw; }
+            catch (Exception ex) { AppService.HandleException(CLASS_NAME, nameof(Capability_RocketArtillery_Resolves), ex); throw; }
         }
 
         [Test]
-        public void Bridge_NoCapabilityTraits_DefaultBools()
+        public void Capability_StatOnlyTrait_ResolvesNone()
         {
             try
             {
                 WeaponProfile p = WithTraits(WeaponTrait.LOW_PROFILE); // a stat-only trait, no capabilities
-                Assert.IsFalse(p.IsAmphibious, "IsAmphibious default false");
-                Assert.IsFalse(p.IsDoubleFire, "IsDoubleFire default false");
-                Assert.IsTrue(p.IsAttackCapable, "IsAttackCapable default true");
+                Assert.IsFalse(p.HasCapability(WeaponCapability.Amphibious),      "no Amphibious cap");
+                Assert.IsFalse(p.HasCapability(WeaponCapability.RocketArtillery), "no RocketArtillery cap");
+                Assert.IsFalse(p.HasCapability(WeaponCapability.NonCombatant),    "no NonCombatant cap");
             }
-            catch (Exception ex) { AppService.HandleException(CLASS_NAME, nameof(Bridge_NoCapabilityTraits_DefaultBools), ex); throw; }
+            catch (Exception ex) { AppService.HandleException(CLASS_NAME, nameof(Capability_StatOnlyTrait_ResolvesNone), ex); throw; }
         }
 
-        #endregion // Capability bridge
+        #endregion // Capability resolution
 
         #region Rule B air-to-ground strike riders (plumbing — stored, unconsumed)
 
@@ -252,5 +249,33 @@ namespace HammerAndSickle.Tests
         }
 
         #endregion // Rule B air-to-ground strike riders
+
+        #region Generic bases (Facility archetype)
+
+        [Test]
+        public void GenericBase_ResolvesFacilityLine()
+        {
+            try
+            {
+                // All three bases (Airbase/Depot/HQ) share one ProfileDef: Facility archetype + NON_COMBATANT.
+                WeaponProfile p = WeaponProfile.FromProfileDef("Base", "Base", WeaponType.BASE_AIRBASE,
+                    new ProfileDef(FamilyArchetypes.Facility, new Dictionary<ProfileStat, int>(),
+                        new[] { WeaponTrait.NON_COMBATANT }));
+
+                Assert.AreEqual(4, (int)p.HardAttack,       "base HA");
+                Assert.AreEqual(6, (int)p.HardDefense,      "base HD");
+                Assert.AreEqual(6, (int)p.SoftAttack,       "base SA");
+                Assert.AreEqual(7, (int)p.SoftDefense,      "base SD");
+                Assert.AreEqual(0, (int)p.GroundAirAttack,  "base GAT (W7 default 0)");
+                Assert.AreEqual(6, (int)p.GroundAirDefense, "base GAD");
+                Assert.AreEqual(0, p.MaxMovementPoints,     "base MMP (static)");
+                Assert.AreEqual(4, (int)p.SpottingRange,    "base SR");
+                Assert.AreEqual(1, (int)p.PrimaryRange,     "base PR");
+                Assert.IsTrue(p.HasCapability(WeaponCapability.NonCombatant), "base non-combatant (NON_COMBATANT)");
+            }
+            catch (Exception ex) { AppService.HandleException(CLASS_NAME, nameof(GenericBase_ResolvesFacilityLine), ex); throw; }
+        }
+
+        #endregion // Generic bases (Facility archetype)
     }
 }

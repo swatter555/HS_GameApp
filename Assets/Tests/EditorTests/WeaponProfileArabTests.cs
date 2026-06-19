@@ -92,17 +92,17 @@ namespace HammerAndSickle.Tests
             {
                 // Iraqi BMP-1: Soviet BMP-1P line (Ifv + ATGM_RAIL + AMPHIBIOUS), no export downgrade.
                 AssertGround(WeaponType.IFV_BMP1_IQ, 8, 4, 8, 7, 7, 0);
-                Assert.IsTrue(P(WeaponType.IFV_BMP1_IQ).IsAmphibious, "BMP-1_IQ amphibious");
+                Assert.IsTrue(P(WeaponType.IFV_BMP1_IQ).HasCapability(WeaponCapability.Amphibious), "BMP-1_IQ amphibious");
                 Assert.AreEqual(10, (int)P(WeaponType.IFV_BMP1_IQ).MaxMovementPoints, "BMP-1_IQ MMP 10");
 
                 // Iraqi MT-LB: Soviet MT-LB line (Apc + AMPHIBIOUS).
                 AssertGround(WeaponType.APC_MTLB_IQ, 3, 4, 6, 7, 7, 0);
-                Assert.IsTrue(P(WeaponType.APC_MTLB_IQ).IsAmphibious, "MT-LB_IQ amphibious");
+                Assert.IsTrue(P(WeaponType.APC_MTLB_IQ).HasCapability(WeaponCapability.Amphibious), "MT-LB_IQ amphibious");
                 Assert.AreEqual(8, (int)P(WeaponType.APC_MTLB_IQ).MaxMovementPoints, "MT-LB_IQ MMP 8");
 
                 // Iranian M113: bare NATO M113 line (real US APC, amphibious dropped to match NATO M113).
                 AssertGround(WeaponType.APC_M113_IR, 3, 4, 6, 7, 7, 0);
-                Assert.IsFalse(P(WeaponType.APC_M113_IR).IsAmphibious, "M113_IR non-amphibious (matches NATO M113)");
+                Assert.IsFalse(P(WeaponType.APC_M113_IR).HasCapability(WeaponCapability.Amphibious), "M113_IR non-amphibious (matches NATO M113)");
                 Assert.AreEqual(8, (int)P(WeaponType.APC_M113_IR).MaxMovementPoints, "M113_IR MMP 8");
             }
             catch (Exception ex) { AppService.HandleException(CLASS_NAME, nameof(IfvApc_ResolveConvertedLines), ex); throw; }
@@ -199,7 +199,7 @@ namespace HammerAndSickle.Tests
             try
             {
                 // Arab truck: Truck + NON_COMBATANT (= Soviet/NATO generic truck).
-                Assert.IsFalse(P(WeaponType.TRK_GEN_ARAB).IsAttackCapable, "Arab truck non-combatant");
+                Assert.IsTrue(P(WeaponType.TRK_GEN_ARAB).HasCapability(WeaponCapability.NonCombatant), "Arab truck non-combatant");
 
                 // Iraqi/Iranian regulars: Soviet regular line (RPG_LAW + MANPADS_BASIC Strela).
                 AssertGround(WeaponType.INF_REG_IQ, 6, 7, 7, 8, 10, 6);

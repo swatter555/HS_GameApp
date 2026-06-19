@@ -19,9 +19,8 @@ namespace HammerAndSickle.Models
 
     /// <summary>
     /// The four tank generation archetypes, exactly as published in Appendix W §16 (SA spread + GAD
-    /// inversion applied). NOTE: these intentionally differ from the live GameData constants
-    /// (BASE_TANK_SOFT_ATTACK 8, GROUND_DEFENSE_ARMOR 8) — the R1/R2 corrections that reconcile
-    /// GameData land in Phase 3. The resolver/test read these §16 values directly.
+    /// inversion applied — the R1/R2 corrections). These ARE the source of truth for tank stats; the old
+    /// pre-migration GameData baseline consts were removed in Phase 4. The resolver/test read these §16 values.
     /// </summary>
     public static class TankArchetypes
     {
@@ -40,7 +39,7 @@ namespace HammerAndSickle.Models
                 { ProfileStat.SD, sd },
                 { ProfileStat.GAD, gad },
                 { ProfileStat.MMP, mmp },
-                // Family base spotting/primary range (§12.3.1 SR 2 / PRIMARY_RANGE_DEFAULT 1). Per design §2
+                // Family base spotting/primary range (§12.3.1 — SR 2 / PR 1 defaults). Per design §2
                 // (Option A) these flow through the resolver, so OPTICS/THERMAL SR+1 and GUN_LAUNCHED_ATGM
                 // PR+1 (standoff) adjust off this base.
                 { ProfileStat.SR, 2 },
