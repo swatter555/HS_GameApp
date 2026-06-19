@@ -687,6 +687,72 @@ namespace HammerAndSickle.Models
 
         #endregion // Combat Rating
 
+        #region Combat Engine Integration
+
+        // Lane-aware accessors that feed the §7.7.1 damage engine (Models/Combat/). Unlike the legacy
+        // GetCombatRatingTotal (which bakes every modifier into the stats for the UI), these expose RAW stats
+        // and the multiplier PIECES separately, so the engine computes Δ on raw stats and applies the
+        // multiplier only to the rolled HP — and applies deployment ONLY on a defender's return lane (§7.5.2).
+
+        /// <summary>
+        /// The firer's QUALITY multiplier for the damage engine (§7.7.1 step 4 core): Strength × Efficiency ×
+        /// Experience × ICM. Deliberately EXCLUDES the deployment COMBAT_MOD (that is a defender-only return-fire
+        /// term, §7.5.2, supplied separately by <see cref="GetDeploymentCombatMod"/>).
+        /// </summary>
+        public float GetCombatQualityMultiplier()
+        {
+            try
+            {
+                return GetStrengthModifier()
+                     * GetEfficiencyModifier()
+                     * GetExperienceMultiplier()
+                     * (GetActiveWeaponProfile()?.ICM ?? GameData.ICM_DEFAULT);
+            }
+            catch (Exception e)
+            {
+                AppService.HandleException(CLASS_NAME, nameof(GetCombatQualityMultiplier), e);
+                return 1.0f;
+            }
+        }
+
+        /// <summary>
+        /// The deployment COMBAT_MOD this unit contributes as a DEFENDER returning fire (§7.5.2): Fortified 1.3 /
+        /// Entrenched 1.2 / HastyDefense 1.1, else 1.0. Fixed-wing skip deployment entirely (§10.3c.1) → 1.0.
+        /// The engine applies this only on the return lane.
+        /// </summary>
+        public float GetDeploymentCombatMod() =>
+            IsFixedWingAirUnit ? 1.0f : GetCombatStateModifier();
+
+        /// <summary>The active profile's Hard/Soft target class (§7.4.1) — the axis an attacker uses against THIS unit.</summary>
+        public TargetClass ActiveTargetClass => GetActiveWeaponProfile()?.TargetClass ?? TargetClass.Soft;
+
+        /// <summary>
+        /// Raw attack stat on the axis selected by the lane's target class (§7.4.1 / §7.7.8): Hard → HardAttack,
+        /// Soft → SoftAttack. Builds a lane's firer-attack value (engine step 2).
+        /// </summary>
+        public int GetAttackStatVsClass(TargetClass axisClass)
+        {
+            var p = GetActiveWeaponProfile();
+            if (p == null) return 0;
+            return axisClass == TargetClass.Hard ? p.HardAttack : p.SoftAttack;
+        }
+
+        /// <summary>
+        /// Raw defense stat on the axis selected by the lane's target class (§7.4.1): Hard → HardDefense,
+        /// Soft → SoftDefense. Builds a lane's target-defense value (engine step 2).
+        /// </summary>
+        public int GetDefenseStatVsClass(TargetClass axisClass)
+        {
+            var p = GetActiveWeaponProfile();
+            if (p == null) return 0;
+            return axisClass == TargetClass.Hard ? p.HardDefense : p.SoftDefense;
+        }
+
+        /// <summary>Active profile's Ordnance Load (the airstrike OL/9 multiplier, §11.6.1). 0 if none.</summary>
+        public int ActiveOrdnanceLoad => GetActiveWeaponProfile()?.OrdinanceLoad ?? 0;
+
+        #endregion // Combat Engine Integration
+
         #region Actions
 
         /// <summary>

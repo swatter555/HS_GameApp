@@ -674,6 +674,43 @@ namespace HammerAndSickle.Models.Map
             return null;
         }
 
+        // Cube-space unit vectors for the 6 hex directions (indexed by HexDirection: NE,E,SE,SW,W,NW). Used to
+        // pick a general bearing via integer cube math — no HexGridSystem/world-coord dependency.
+        private static readonly Vector3Int[] CubeDirections =
+        {
+            new Vector3Int(0, -1, 1),  // NE
+            new Vector3Int(1, -1, 0),  // E
+            new Vector3Int(1, 0, -1),  // SE
+            new Vector3Int(0, 1, -1),  // SW
+            new Vector3Int(-1, 1, 0),  // W
+            new Vector3Int(-1, 0, 1),  // NW
+        };
+
+        /// <summary>
+        /// The hex direction from <paramref name="from"/> that best points toward <paramref name="to"/>, for
+        /// ANY separation (not just adjacency). Picks the direction whose cube-space unit vector best aligns
+        /// (max dot product) with the cube vector to the target. Pure integer math — for adjacent hexes this
+        /// agrees with <see cref="GetDirectionBetween"/>; used for retreat bearing from a non-adjacent firer.
+        /// </summary>
+        public static HexDirection GetGeneralDirection(Position2D from, Position2D to)
+        {
+            if (from == to) return HexDirection.E; // degenerate; arbitrary
+
+            Vector3Int a = OffsetToCube(from);
+            Vector3Int b = OffsetToCube(to);
+            int dx = b.x - a.x, dy = b.y - a.y, dz = b.z - a.z;
+
+            HexDirection best = HexDirection.NE;
+            int bestDot = int.MinValue;
+            for (int d = 0; d < 6; d++)
+            {
+                Vector3Int cd = CubeDirections[d];
+                int dot = cd.x * dx + cd.y * dy + cd.z * dz;
+                if (dot > bestDot) { bestDot = dot; best = (HexDirection)d; }
+            }
+            return best;
+        }
+
         private static void AddToFrontier(SortedList<int, List<Position2D>> frontier, int cost, Position2D pos)
         {
             if (!frontier.TryGetValue(cost, out var list))

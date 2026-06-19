@@ -835,8 +835,8 @@ namespace HammerAndSickle.Core.GameData
         SPAAA_M163_US,
         SPSAM_CHAP_US,
         SAM_HAWK_US,
-        SPSAM_GEPARD_GE,
-        SPAAA_ROLAND_FR,
+        SPAAA_GEPARD_GE,   // 35mm radar gun (SPAAA, dual-role)
+        SPSAM_ROLAND_FR,   // command-guided point SAM (SPSAM, air-only)
         SPSAM_RAPIER_UK,
         SPSAM_CROTALE_FR,
 
@@ -1493,6 +1493,36 @@ namespace HammerAndSickle.Core.GameData
         public const float FULL_STRENGTH_FLOOR = 0.8f; // Minimum strength for full effectiveness
         public const float DEPLETED_STRENGTH_FLOOR = 0.5f; // Minimum strength for depleted effectiveness
 
+        // Global combat balance dials (§7.7.10) — two co-equal master lethality levers, applied as the final
+        // factor of every damage calculation (engine step 6). Ground units (direct/indirect/ground-to-air)
+        // use GROUND_BALANCE_MOD; air units (air-to-air/air-to-ground/WW/recon) use AIR_BALANCE_MOD. Both
+        // default 1.0 and are tuned per-domain at playtest without touching individual stats.
+        public const float GROUND_BALANCE_MOD = 1.0f;
+        public const float AIR_BALANCE_MOD = 1.0f;
+
+        // Stand check (§7.9) — the three tunable knobs (§7.9.5.1: tune base / gaps / shock divisor together)
+        // plus the Shock cap. SV = STAND_BASE + posture/terrain/exp/leader/command mods − flank − Shock; a
+        // 1d10 ≤ SV holds, ≤ SV+RETREAT_GAP retreats, ≤ SV+ROUT_GAP routs, above that shatters (§7.9.5).
+        public const int STAND_BASE = 6;
+        public const int STAND_RETREAT_GAP = 3;
+        public const int STAND_ROUT_GAP = 6;
+        public const int SHOCK_DIVISOR = 4;          // Shock = ceil(HP_dealt / 4) (§7.9.1.1)
+        public const int SHOCK_MAX = 8;              // Shock clamp
+        public const int LEADER_STAND_MOD_CAP = 3;   // defender skill-tier Leader_mod cap (§14.13.4)
+
+        // Flanking knobs (§31.4a.15) — P3 two-part mechanism: ×1.15 attacker damage (flank_mod, §7.5.5.9)
+        // AND −1 defender Stand Value (FlankAttack_mod, §7.9.4c).
+        public const float FLANK_DAMAGE_MULT = 1.15f;
+        public const int FLANK_SV_PENALTY = 1;
+
+        // Shatter / Surrender / Static-collapse knobs (§31.4a.19, §7.9.6–§7.9.7).
+        public const int SHATTER_EXTRA_DAMAGE = 4;        // +10% MAX_HP on shatter (§7.9.6.2)
+        public const int SURRENDER_CHECK_BASE = 10;       // 1d20 check = BASE − EXP_FACTOR×ExpMod (§7.9.6a.2)
+        public const int SURRENDER_CHECK_EXP_FACTOR = 2;
+        public const int SURRENDER_SURVIVAL_LOSS = 10;    // 25% MAX_HP on a passed surrender check (§7.9.6a.2)
+        public const int STATIC_COLLAPSE_BASE = 30;       // 1d100 ≤ threshold destroys (§7.9.7.1)
+        public const int STATIC_COLLAPSE_PER_EXP = 5;     // threshold = BASE − PER_EXP×ExpMod
+
         // Combat action defaults
         public const int DEFAULT_MOVE_ACTIONS = 1;
         public const int DEFAULT_COMBAT_ACTIONS = 1;
@@ -1542,30 +1572,13 @@ namespace HammerAndSickle.Core.GameData
         public const int HELO_UNIT = 24;
         public const int FIXEDWING_UNIT = 100;
 
-        // Ground defense against air attack.
-        public const int GROUND_DEFENSE_LIGHTARMOR = 5;  // Base ground defense for APC units
-        public const int GROUND_DEFENSE_INFANTRY   = 6;  // Base ground defense for Personnel units
-        public const int GROUND_DEFENSE_ARMOR      = 8;  // Base ground defense for tank units
-        public const int GROUND_DEFENSE_SAM        = 8;  // Base ground defense for SAM units
-        public const int GROUND_DEFENSE_HELO       = 10; // Base air defense for helo units
-        public const int GROUND_DEFENSE_AAA        = 12; // Base ground defense for AAA units
-
-        // Ground attack against air units.
-        public const int GROUND_AIR_ATTACK_DEFAULT = 1;  // Base ground-to-air attack default
-
-        // Standard spotting range values
-        public const int BASE_UNIT_SPOTTING_RANGE = 2;
-        public const int RECON_UNIT_SPOTTING_RANGE = 3;
-        public const int BASE_AAA_SPOTTING_RANGE = 3;
-        public const int FACILITY_SPOTTING_RANGE = 4;
-        public const int BASE_SAM_SPOTTING_RANGE = 6;
-        public const int INTEL_UNIT_SPOTTING_RANGE = 6;
-
-        // Standard primary range values.
-        public const int PRIMARY_RANGE_DEFAULT = 1;
+        // NOTE: the pre-migration per-family stat baselines (GROUND_DEFENSE_*, GROUND_AIR_ATTACK_DEFAULT, the
+        // *_SPOTTING_RANGE defaults, PRIMARY/INDIRECT_RANGE_DEFAULT, and the BASE_*/GEN*_TANK_*/*_FGT_*/AC_*
+        // combat consts) were removed in Phase 4 (2026-06-18) — superseded by the Archetype + Delta + Trait model
+        // (archetypes own these numbers). The indirect-range and air-spotting values below remain: they're still
+        // consumed as per-profile deltas in WeaponProfileDB.
 
         // Standard indirect range values.
-        public const int INDIRECT_RANGE_DEFAULT = 0;
         public const int INDIRECT_RANGE_MINIMUM = 3;
         public const int INDIRECT_RANGE_SHORT = 4;
         public const int INDIRECT_RANGE_MEDIUM = 5;
@@ -1578,100 +1591,8 @@ namespace HammerAndSickle.Core.GameData
         public const int INDIRECT_RANGE_AAA = 3;
         public const int INDIRECT_RANGE_SAM = 6;
 
-        // Standard infantry values
-        public const int BASE_INF_HARD_ATTACK = 5;
-        public const int BASE_INF_HARD_DEFENSE = 7;
-
-        public const int BASE_INF_SOFT_ATTACK = 7;
-        public const int BASE_INF_SOFT_DEFENSE = 8;
-
-        // Standard APC values
-        public const int BASE_APC_HARD_ATTACK = 3;
-        public const int BASE_APC_HARD_DEFENSE = 4;
-        public const int BASE_APC_SOFT_ATTACK = 6;
-        public const int BASE_APC_SOFT_DEFENSE = 7;
-
-        // Standard IFV values
-        public const int BASE_IFV_HARD_ATTACK = 4;
-        public const int BASE_IFV_HARD_DEFENSE = 4;
-        public const int BASE_IFV_SOFT_ATTACK = 7;
-        public const int BASE_IFV_SOFT_DEFENSE = 7;
-
-        // Standard tank soft combat values
-        public const int BASE_TANK_SOFT_ATTACK = 8;
-        public const int BASE_TANK_SOFT_DEFENSE = 6;
-
-        // Gen1 standard tank values
-        public const int GEN1_TANK_HARD_ATTACK = 7;
-        public const int GEN1_TANK_HARD_DEFENSE = 5;
-
-        // Gen2 standard tank values
-        public const int GEN2_TANK_HARD_ATTACK = 10;
-        public const int GEN2_TANK_HARD_DEFENSE = 8;
-
-        // Gen3 standard tank values
-        public const int GEN3_TANK_HARD_ATTACK = 13;
-        public const int GEN3_TANK_HARD_DEFENSE = 11;
-
-        // Gen4 standard tank values
-        public const int GEN4_TANK_HARD_ATTACK = 16;
-        public const int GEN4_TANK_HARD_DEFENSE = 14;
-
-        // Standard artillery values
-        public const int BASE_ARTY_HARD_ATTACK = 5;
-        public const int BASE_ARTY_HARD_DEFENSE = 5;
-        public const int BASE_ARTY_SOFT_ATTACK = 9;
-        public const int BASE_ARTY_SOFT_DEFENSE = 5;
-
-        // AAA standard values
-        public const int BASE_AAA_HARD_ATTACK = 4;
-        public const int BASE_AAA_HARD_DEFENSE = 4;
-        public const int BASE_AAA_SOFT_ATTACK = 9;
-        public const int BASE_AAA_SOFT_DEFENSE = 6;
-        public const int BASE_AAA_GROUND_AIR_ATTACK = 9;
-
-        // SAM standard values
-        public const int BASE_SAM_HARD_ATTACK = 1;
-        public const int BASE_SAM_HARD_DEFENSE = 3;
-        public const int BASE_SAM_SOFT_ATTACK = 1;
-        public const int BASE_SAM_SOFT_DEFENSE = 3;
-        public const int BASE_SAM_GROUND_AIR_ATTACK = 10;
-
-        // Standard helo values
-        public const int BASE_HEL_HARD_ATTACK = 7;
-        public const int BASE_HEL_HARD_DEFENSE = 6;
-        public const int BASE_HEL_SOFT_ATTACK = 10;
-        public const int BASE_HEL_SOFT_DEFENSE = 7;
-
-        // Standard fixed wing values, early generation
-        public const int EARLY_FGT_DOGFIGHT = 8;
-        public const int EARLY_FGT_MANEUVER = 9;
+        // Early-jet top-speed anchor — retained as the TS-delta base for high-mach recon variants (e.g. MiG-25R).
         public const int EARLY_FGT_TOPSPEED = 10;
-        public const int EARLY_FGT_SURVIVE = 6;
-
-        // Standard fixed wing values, mid generation
-        public const int MID_FGT_DOGFIGHT = 10;
-        public const int MID_FGT_MANEUVER = 11;
-        public const int MID_FGT_TOPSPEED = 10;
-        public const int MID_FGT_SURVIVE = 7;
-
-        // Standard fixed wing values, late generation
-        public const int LATE_FGT_DOGFIGHT = 12;
-        public const int LATE_FGT_MANEUVER = 12;
-        public const int LATE_FGT_TOPSPEED = 10;
-        public const int LATE_FGT_SURVIVE = 9;
-
-        // Ordinance Loads
-        public const int SMALL_AC_LOAD = 6;  // Small air-to-ground load
-        public const int MEDIUM_AC_LOAD = 9;  // Medium air-to-ground load
-        public const int LARGE_AC_LOAD = 12;  // Large air-to-ground load
-        public const int XLARGE_AC_LOAD = 16;  // Extra large air-to-ground load
-
-        // Spotting in the AC context express ability for long range engagements
-        public const int AC_SPOTTING_BASIC = 1;
-        public const int AC_SPOTTING_ENHANCED = 2;
-        public const int AC_SPOTTING_ADVANCED = 3;
-        public const int AC_SPOTTING_SUPERIOR = 4;
 
         // W8 air spotting (Appendix W) — Phase-3 air-SR scale, routed through the resolver (Option A).
         // Supersedes the old AC_SPOTTING 1-4 scale for converted aircraft: planes see much farther.
@@ -1679,49 +1600,9 @@ namespace HammerAndSickle.Core.GameData
         public const int AIR_RECON_SPOTTING_RANGE = 8;   // tactical reconnaissance
         public const int AWACS_SPOTTING_RANGE = 12;      // airborne early warning
 
-        // Air unit prestige costs
-        public const int PRESTIGE_TIER_FREE = 1;
-        public const int PRESTIGE_TIER_0 = 25;
-        public const int PRESTIGE_TIER_1 = 50;
-        public const int PRESTIGE_TIER_2 = 75;
-        public const int PRESTIGE_TIER_3 = 100;
-        public const int PRESTIGE_TIER_4 = 125;
-        public const int PRESTIGE_TIER_5 = 150;
-
-        // Standard attack aircraft values
-        public const int AC_ATTACK_DOGFIGHT = 4;
-        public const int AC_ATTACK_MANEUVER = 4;
-        public const int AC_ATTACK_TOPSPEED = 7;
-        public const int AC_ATTACK_SURVIVE = 10;
-
-        // Standard bomber values
-        public const int AC_BOMBER_DOGFIGHT = 1;
-        public const int AC_BOMBER_MANEUVER = 3;
-        public const int AC_BOMBER_TOPSPEED = 10;
-        public const int AC_BOMBER_SURVIVE = 8;
-
         // High mach aircraft speeds
         public const int AC_HIGHSPEED_RUSSIAN = 17;
         public const int AC_HIGHSPEED_WESTERN = 21;
-
-        // Standard fixed wing values, attack aircraft
-        public const int GROUND_ATTACK_NA = 0;
-        public const int GROUND_ATTACK_TIER_0 = 6;
-        public const int GROUND_ATTACK_TIER_1 = 9;
-        public const int GROUND_ATTACK_TIER_2 = 12;
-        public const int GROUND_ATTACK_TIER_3 = 15;
-
-        // Standard values for truck transport units
-        public const int TRUCK_HARD_ATTACK = 3;
-        public const int TRUCK_HARD_DEFENSE = 3;
-        public const int TRUCK_SOFT_ATTACK = 3;
-        public const int TRUCK_SOFT_DEFENSE = 3;
-
-        // Standard values for facilities
-        public const int BASE_HARD_ATTACK = 4;
-        public const int BASE_HARD_DEFENSE = 6;
-        public const int BASE_SOFT_ATTACK = 6;
-        public const int BASE_SOFT_DEFENSE = 7;
 
         #endregion // WeaponProfile Constants
 

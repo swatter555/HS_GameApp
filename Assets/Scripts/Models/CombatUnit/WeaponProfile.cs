@@ -96,7 +96,7 @@ namespace HammerAndSickle.Models
         public Dictionary<WeaponType, int> IntelReportStats { get; private set; } = null;
 
         // Properties for ground units
-        public float HardAttack { get; private set; } = 0;
+        public int HardAttack { get; private set; } = 0;
         public int HardDefense { get; private set; } = 0;
         public int SoftAttack { get; private set; } = 0;
         public int SoftDefense { get; private set; } = 0;
@@ -130,11 +130,6 @@ namespace HammerAndSickle.Models
         // Max movement points
         public int MaxMovementPoints { get; private set; } = 0;
 
-        // Special capability flags
-        public bool IsAmphibious { get; private set; } = false;   // Whether this unit can cross rivers easily
-        public bool IsDoubleFire { get; private set; } = false;   // MLRS units fire twice per attack
-        public bool IsAttackCapable { get; private set; } = false; // Whether this unit can perform attacks
-
         // Unit icon sprites associated with this stat profile
         public RegimentIconProfile IconProfile { get; set; } = null;
 
@@ -158,9 +153,8 @@ namespace HammerAndSickle.Models
         public TransportCategory TransportCategory { get; private set; } = TransportCategory.None;
 
         // Capabilities resolved from this profile's traits (Appendix W §1). Populated by FromProfileDef.
-        // The legacy IsAmphibious / IsDoubleFire / IsAttackCapable bools are DERIVED from this set at build
-        // so existing gameplay readers keep working; Phase 4 migrates readers to HasCapability and removes
-        // the bools.
+        // Query via HasCapability (e.g. Amphibious, RocketArtillery, NonCombatant). The legacy
+        // IsAmphibious / IsDoubleFire / IsAttackCapable mirror bools were removed in Phase 4 (R9).
         private readonly HashSet<WeaponCapability> _capabilities = new HashSet<WeaponCapability>();
 
         #endregion // Properties
@@ -169,7 +163,7 @@ namespace HammerAndSickle.Models
 
         public WeaponProfile(string _longName, string _shortName, WeaponType _type, int _hardAtt, int _hardDef,
                              int _softAtt, int _softDef, int _gat, int _gad,int _df, int _man,int _topSpd, int _surv, int _ga, int _ol,
-                             int _stealth, int _pr, int _ir, int _sr, int _mmp, bool _isAmph, bool _isDF, bool _isAtt,
+                             int _stealth, int _pr, int _ir, int _sr, int _mmp,
                              UpgradePath _upgradePath = UpgradePath.None, int _turnAvailable = 0)
         {
             LongName = _longName;
@@ -193,9 +187,6 @@ namespace HammerAndSickle.Models
             IndirectRange = _ir;
             SpottingRange = _sr;
             MaxMovementPoints = _mmp;
-            IsAmphibious = _isAmph;
-            IsDoubleFire = _isDF;
-            IsAttackCapable = _isAtt;
             UpgradePath = _upgradePath;
             TurnAvailable = _turnAvailable;
             IconProfile = new RegimentIconProfile();
@@ -316,9 +307,9 @@ namespace HammerAndSickle.Models
         /// (standoff direct fire) and OPTICS/THERMAL's SR +1. The archetype carries the family base for these
         /// (e.g. SR 2 / PR 1 for tanks); deltas + traits adjust off it.
         ///
-        /// The legacy capability bools are DERIVED from the resolved capabilities (the Phase-4 bridge):
-        ///   IsAmphibious = Amphibious · IsDoubleFire = RocketArtillery · IsAttackCapable = !NonCombatant.
-        /// TargetClass is auto-set from the WeaponType prefix by the constructor; override afterward if needed.
+        /// Capabilities resolved from the traits are stored on the profile (query via HasCapability —
+        /// e.g. Amphibious, RocketArtillery, NonCombatant). TargetClass is auto-set from the WeaponType
+        /// prefix by the constructor; override afterward if needed.
         /// </summary>
         public static WeaponProfile FromProfileDef(
             string longName, string shortName, WeaponType type, ProfileDef def,
@@ -334,9 +325,6 @@ namespace HammerAndSickle.Models
                 r.Stat(ProfileStat.DF), r.Stat(ProfileStat.MAN), r.Stat(ProfileStat.TS), r.Stat(ProfileStat.SUR),
                 r.Stat(ProfileStat.GA), r.Stat(ProfileStat.OL), r.Stat(ProfileStat.STL),
                 r.Stat(ProfileStat.PR), r.Stat(ProfileStat.IR), r.Stat(ProfileStat.SR), r.Stat(ProfileStat.MMP),
-                caps.Contains(WeaponCapability.Amphibious),        // _isAmph
-                caps.Contains(WeaponCapability.RocketArtillery),   // _isDF
-                !caps.Contains(WeaponCapability.NonCombatant),     // _isAtt
                 upgradePath, turnAvailable);
 
             profile.SetICM(r.ICM);
