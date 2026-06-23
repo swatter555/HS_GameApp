@@ -80,6 +80,30 @@ namespace HammerAndSickle.Models.Combat
     }
 
     /// <summary>
+    /// Context for a fixed-wing air-to-ground strike (§11.6): the target hex terrain (the flat-HP block applies to
+    /// air-to-ground per §7.5.6.3) and whether a Wild Weasel is still alive at the ground-attack phase (§11.4.8.6 /
+    /// §11.1.2.4 — its SEAD effect shifts the strike's damage band up one). No contested-crossing block (§7.5.6.9.3).
+    /// </summary>
+    public struct AirStrikeContext
+    {
+        public TerrainType TargetTerrain;
+        public bool WildWeaselAlive;
+    }
+
+    /// <summary>
+    /// Outcome of an air-to-ground strike. HP is applied to the target. Airstrikes are DAMAGE-ONLY (Bob, 2026-06-22):
+    /// no stand check, no forced movement — the target's "suppression" is carried by the §7.15 efficiency
+    /// degradation the caller rolls, NOT by a retreat/rout. <see cref="GadIgnored"/> flags the
+    /// STANDOFF_CRUISE_MISSILE GAD-ignore branch (§11.6.1.1).
+    /// </summary>
+    public struct AirStrikeResult
+    {
+        public int DamageToTarget;
+        public bool GadIgnored;
+        public bool TargetDestroyed;
+    }
+
+    /// <summary>
     /// Adapter between <see cref="CombatUnit"/> and the pure damage engine. Builds the two damage lanes and the
     /// defender stand input from unit state + context, runs <see cref="CombatEngine.ResolveDirectEngagement"/>
     /// (universal return fire §6.12 / §7.7.3), and applies the resulting HP. It does NOT do the map-coupled
@@ -435,5 +459,76 @@ namespace HammerAndSickle.Models.Combat
             c == UnitClassification.ROC || c == UnitClassification.BM;
 
         #endregion // Indirect fire + counter-battery
+
+        #region Air-to-ground strike (§11.6)
+
+        /// <summary>
+        /// Resolves a fixed-wing air-to-ground strike (§11.6): one forward GA-vs-GAD shot through the §7.7.1 engine
+        /// in its Airstrike configuration (OL/9 §11.6.1.2, target-hex terrain block, AirBalanceMod, fixed-wing skip
+        /// deployment §10.3c.1). A STANDOFF_CRUISE_MISSILE strike ignores target GAD (§11.6.1.1); a surviving Wild
+        /// Weasel shifts the damage band up one (§11.4.8.6). HP is applied to the target.
+        ///
+        /// DAMAGE-ONLY (Bob, 2026-06-22): an airstrike does NOT run a stand check and never forces movement — the
+        /// firing aircraft never advances (§7.9.9.3) and the target is not displaced. Post-strike "suppression" is
+        /// the §7.15 efficiency-degradation roll the caller applies, not a retreat/rout.
+        ///
+        /// SCOPE: fixed-wing strike aircraft only — helicopters hit ground as ground units with NO OL (§11.6.1.5 /
+        /// §7A.14). The CALLER (air pipeline) supplies the surviving-strike list, in-hex ground fire (§11.4.8.5),
+        /// egress fire (§11.4.8.7), and the efficiency-degradation roll. Dice: the strike damage lane only.
+        /// </summary>
+        public static AirStrikeResult ResolveAirStrike(CombatUnit strike, CombatUnit target, in AirStrikeContext ctx, ICombatRandom rng)
+        {
+            try
+            {
+                if (strike == null) throw new ArgumentNullException(nameof(strike));
+                if (target == null) throw new ArgumentNullException(nameof(target));
+                if (rng == null) throw new ArgumentNullException(nameof(rng));
+
+                LaneInput lane = BuildAirStrikeLane(strike, target, ctx);
+                int dmg = CombatEngine.ResolveLane(lane, rng);
+                target.TakeDamage(dmg);
+
+                return new AirStrikeResult
+                {
+                    DamageToTarget = dmg,
+                    GadIgnored = strike.IgnoresAirDefense,
+                    TargetDestroyed = target.HitPoints.Current <= 0f,
+                };
+            }
+            catch (Exception e)
+            {
+                AppService.HandleException(CLASS_NAME, nameof(ResolveAirStrike), e);
+                return default;
+            }
+        }
+
+        /// <summary>
+        /// The air-strike forward lane (§11.6.1): Δ = effGA − target GAD, where effGA carries the Rule-B
+        /// target-class/base riders (§11.6.1.1) and GAD is the single defense stat (never split). A
+        /// STANDOFF_CRUISE_MISSILE strike zeroes the GAD term. Airstrike config applies OL/9; the target hex
+        /// terrain blocks; FirerIsDefender stays false so fixed-wing skip the deployment mult. Band shifts stack:
+        /// a surviving WW (§11.4.8.6) and an EMBARKED target caught in transit (§7.10.1.1) each add +1; an embarked
+        /// target also takes the ×2 embarkment scalar (§7.10.1.2). An embarked air-mobile unit is a ground unit
+        /// caught airborne — a fixed-wing strike can catch it if the lift was too far to debark (Bob, 2026-06-22).
+        /// </summary>
+        public static LaneInput BuildAirStrikeLane(CombatUnit strike, CombatUnit target, in AirStrikeContext ctx)
+        {
+            bool ignoreGad = strike.IgnoresAirDefense;
+            bool targetEmbarked = target.DeploymentPosition == DeploymentPosition.Embarked;
+            return new LaneInput
+            {
+                FirerAttack = strike.GetEffectiveGroundAttack(target.ActiveTargetClass, target.IsBase),
+                TargetDefense = ignoreGad ? 0 : target.ActiveGroundAirDefense,
+                FirerQualityMult = strike.GetCombatQualityMultiplier(),
+                OrdnanceLoad = strike.ActiveOrdnanceLoad,
+                AttackType = AttackType.Airstrike,
+                FirerIsAir = true,
+                TargetTerrain = ctx.TargetTerrain,
+                BandShift = (ctx.WildWeaselAlive ? 1 : 0) + (targetEmbarked ? 1 : 0),
+                PostStackScalar = targetEmbarked ? 2.0f : 1.0f,
+            };
+        }
+
+        #endregion // Air-to-ground strike
     }
 }

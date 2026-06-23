@@ -66,4 +66,15 @@ namespace HammerAndSickle.Models.Combat
         HoldInPlace, // 1d20 ABOVE the check number — forced to bare Deployed, takes SURRENDER_SURVIVAL_LOSS
         Destroyed    // 1d20 AT OR BELOW — surrenders, removed from play (attacker gains ½ purchase cost)
     }
+
+    /// <summary>
+    /// Result of the binary air-unit stand check (HS_DesignDoc §7.9.8). Unlike the ground StandOutcome there is
+    /// no rout/shatter tier (§7.9.8.4) — an aircraft either holds and stays in the engagement, or disengages and
+    /// flies home (no hex displacement; the caller applies fixed-wing auto-return, §5.13.5).
+    /// </summary>
+    public enum AirStandOutcome
+    {
+        Hold,      // roll ≤ SV_air — remains available for further passes / its mission phase
+        Disengage  // roll > SV_air — leaves the AOB and flies home; damage + action commitment stand
+    }
 }

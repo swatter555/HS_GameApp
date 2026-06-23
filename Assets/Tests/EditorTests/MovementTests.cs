@@ -147,28 +147,35 @@ namespace HammerAndSickle.Tests
         }
 
         [Test]
-        public void BFS_RiverWithBridge_AllowsCrossing()
+        public void BFS_River_ForcesDetour_BridgeRestoresDirectCrossing()
         {
+            // A river on a single edge blocks only that DIRECT crossing — it does NOT make the
+            // neighbor unreachable, because on an open map the BFS legitimately detours around it
+            // (start → NE → neighbor = 2 MP). So the river block is measured by COST, not reachability:
+            // without a bridge the neighbor costs 2 MP (detour); a bridge restores the direct 1-MP step.
             var map = CreateClearMap();
             GameDataManager.CurrentHexMap = map;
 
             var startPos = new Position2D(5, 5);
             var neighborPos = HexMapUtil.GetNeighborPosition(startPos, HexDirection.E);
 
-            // Add river border
             var startHex = map.GetHexAt(startPos);
             startHex.RiverBorders.SetBorder(HexDirection.E, true);
 
-            // No bridge — should block
+            // No bridge: direct E edge blocked → reachable only via a 2-MP detour.
             var unit = CreateGroundUnit(startPos, 5);
             var blockedResult = HexMapUtil.GetValidMoveDestinations(map, unit);
-            Assert.IsFalse(blockedResult.Reachable.ContainsKey(neighborPos), "River without bridge should block");
+            Assert.IsTrue(blockedResult.Reachable.ContainsKey(neighborPos),
+                "Neighbor stays reachable via detour even with the direct river edge blocked");
+            Assert.AreEqual(2, blockedResult.Reachable[neighborPos],
+                "River forces a 2-MP detour — the direct 1-MP edge is blocked without a bridge");
 
-            // Add bridge — should allow
+            // Add a bridge: the direct E edge opens → neighbor now costs the direct 1 MP.
             startHex.BridgeBorders.SetBorder(HexDirection.E, true);
             GameManager.InvalidateOccupancy();
             var bridgedResult = HexMapUtil.GetValidMoveDestinations(map, unit);
-            Assert.IsTrue(bridgedResult.Reachable.ContainsKey(neighborPos), "River with bridge should allow crossing");
+            Assert.AreEqual(1, bridgedResult.Reachable[neighborPos],
+                "Bridge restores the direct 1-MP river crossing");
         }
 
         [TestCase(1, 1, Description = "Clear road-to-road: base 1, halved floor = 1 (min 1)")]

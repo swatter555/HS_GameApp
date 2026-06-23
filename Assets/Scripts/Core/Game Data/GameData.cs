@@ -37,9 +37,11 @@ namespace HammerAndSickle.Core.GameData
         HELO,   // ATT helicopter
         FGT,    // Fighter aircraft
         ATT,    // ATT aircraft
+        WW,     // Wild Weasel (SEAD) aircraft
         AWACS,  // AWACS aircraft
         BMB,    // Bomber aircraft
         RECONA, // Recon Aircraft
+        TRN,    // Transport aircraft (airborne resupply)
         HQ,     // HQ facility
         DEPOT,  // Supply Depot
         AIRB    // Airbase
@@ -1084,11 +1086,11 @@ namespace HammerAndSickle.Core.GameData
     /// </summary>
     public enum SupplyGenerationRate
     {
-        Minimal,        // 0.5 days of supply per turn
-        Basic,          // 1.0 days of supply per turn
-        Standard,       // 1.5 days of supply per turn
-        Enhanced,       // 2.5 days of supply per turn
-        Industrial      // 4.0 days of supply per turn
+        Minimal,        // 5% of own max stockpile per turn
+        Basic,          // 10% of own max stockpile per turn
+        Standard,       // 15% of own max stockpile per turn
+        Enhanced,       // 25% of own max stockpile per turn
+        Industrial      // 40% of own max stockpile per turn
     }
 
     /// <summary>
@@ -1165,13 +1167,16 @@ namespace HammerAndSickle.Core.GameData
     /// </summary>
     public enum BattlePhase
     {
-        NotStarted = 0,
-        PlayerTurn = 1,
-        AITurn = 2,
-        EndTurnProcessing = 3,
-        BattleComplete = 4,
-        Deployment = 5,
-        AdminPhase = 6
+        NotStarted = 0,     // scenario loaded but not entered
+        Deployment = 1,     // pre-battle setup (CFR Deployment tab, §35.3)
+        PlayerRefresh = 2,  // player turn-start refresh (§3.3 — contents wired in M13)
+        PlayerTurn = 3,     // player issues orders
+        PlayerUpkeep = 4,   // end-of-player-side cleanup (§3.5)
+        AI_Refresh = 5,     // AI turn-start refresh (§3.3 — contents wired in M13)
+        AI_Turn = 6,        // AI issues orders
+        AI_Upkeep = 7,      // end-of-AI-side cleanup (§3.5)
+        TurnBoundary = 8,   // between-turns processing: battle-result/victory check, turn increment, calendar tick (§3.6; was EndTurnProcessing/AdminPhase)
+        BattleComplete = 9  // battle terminated; victory/defeat screen
     }
 
     /// <summary>
@@ -1443,7 +1448,7 @@ namespace HammerAndSickle.Core.GameData
 
         #region General Constants
 
-        public const int SAVE_VERSION = 2;
+        public const int SAVE_VERSION = 3;
 
         #endregion
 
@@ -1455,7 +1460,8 @@ namespace HammerAndSickle.Core.GameData
         public const float ICM_DEFAULT = 1.0f;
 
         // CombatUnit constants.
-        public const int MAX_HP = 40; // Maximum hit points for a CombatUnit
+        public const int MAX_HP = 40; // Maximum hit points for a mobile CombatUnit
+        public const int BASE_MAX_HP = 60; // Maximum hit points for a base/facility (HP-0 = destroyed; decoupled from OperationalCapacity)
         public const int MIN_HP = 1;  // Minimum hit points for a CombatUnit
         public const int ZOC_RANGE = 1;  // Zone of Control Range
         public const int MAX_EXP_GAIN_PER_ACTION = 10; // Max XP gain per action
@@ -1528,7 +1534,7 @@ namespace HammerAndSickle.Core.GameData
         public const int DEFAULT_COMBAT_ACTIONS = 1;
         public const int DEFAULT_INTEL_ACTIONS = 1;
         public const int DEFAULT_DEPLOYMENT_ACTIONS = 1;
-        public const int DEFAULT_OPPORTUNITY_ACTIONS = 1;
+        public const int DEFAULT_OPPORTUNITY_ACTIONS = 0;  // §8.5.4 — Opp is NOT universal; granted only to reactive-fire roles
 
         // Unit supply constants.
         public const float LOW_SUPPLY_THRESHOLD = 1f;    // Threshold for low supply warning
@@ -1772,13 +1778,15 @@ namespace HammerAndSickle.Core.GameData
             { DepotSize.Huge, 110f }
         };
 
-        // Supply generation rates by level
+        // Supply generation rate by level, expressed as a FRACTION of the depot's own max stockpile per turn.
+        // Generated days/turn = fraction * GetMaxStockpile() * facility-efficiency (see CombatUnit.GetCurrentGenerationRate).
         public static readonly Dictionary<SupplyGenerationRate, float> GenerationRateValues = new()
         {
-            { SupplyGenerationRate.Minimal, 10.0f },
-            { SupplyGenerationRate.Basic, 20.0f },
-            { SupplyGenerationRate.Standard, 40.0f },
-            { SupplyGenerationRate.Enhanced, 80.0f }
+            { SupplyGenerationRate.Minimal,    0.05f },  // 5%
+            { SupplyGenerationRate.Basic,      0.10f },  // 10%
+            { SupplyGenerationRate.Standard,   0.15f },  // 15%
+            { SupplyGenerationRate.Enhanced,   0.25f },  // 25%
+            { SupplyGenerationRate.Industrial, 0.40f }   // 40%
         };
 
         // Supply projection ranges in hexes
@@ -1791,8 +1799,8 @@ namespace HammerAndSickle.Core.GameData
         };
 
         // Amount any unit can stockpile
-        public const float MaxDaysSupplyDepot = 100f;       // Max supply a depot can carry
-        public const float MaxDaysSupplyUnit = 7f;          // Max supply a unit can carry
+        public const float MaxDaysSupplyUnit = 5f;          // Max operating supply a mobile unit can carry
+        public const float MaxDaysSupplyAirbase = 30f;      // Max operating supply an airbase can carry (sortie-hungry)
 
         // Supply efficiency multipliers
         public const float DISTANCE_EFF_MULT = 0.4f;

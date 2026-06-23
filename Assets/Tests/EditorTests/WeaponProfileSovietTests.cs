@@ -278,11 +278,11 @@ namespace HammerAndSickle.Tests
                 Assert.AreEqual(16, (int)tu16.OrdinanceLoad, "Tu-16 OL 16");
                 Assert.AreEqual(3,  tu16.GaBonusVsSoft,      "Tu-16 GaVsSoft 3");
 
-                // Tu-22 Blinder: standoff/area — Kh-22 heavy warhead → GA 12; GaVsSoft 3; avoid-GAD cap DORMANT.
+                // Tu-22 Blinder: standoff/area — Kh-22 heavy warhead → GA 12; GaVsSoft 3; avoid-GAD cap LIVE (M8, §11.6.1.1).
                 WeaponProfile tu22 = P(WeaponType.BMB_TU22_SV);
                 Assert.AreEqual(12, (int)tu22.GroundAttack, "Tu-22 GA 12 (Kh-22)");
                 Assert.AreEqual(3,  tu22.GaBonusVsSoft,     "Tu-22 GaVsSoft 3");
-                Assert.IsFalse(tu22.HasCapability(WeaponCapability.IgnoreAirDefense), "Tu-22 avoid-GAD dormant");
+                Assert.IsTrue(tu22.HasCapability(WeaponCapability.IgnoreAirDefense), "Tu-22 avoid-GAD Live (ResolveAirStrike ignores GAD)");
 
                 // Tu-22M3: apex strategic — Kh-22 heavy warhead GA 12, riders + payload on top.
                 WeaponProfile tu = P(WeaponType.BMB_TU22M3_SV);

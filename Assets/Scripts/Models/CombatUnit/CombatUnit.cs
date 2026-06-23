@@ -197,8 +197,9 @@ namespace HammerAndSickle.Models
                 InitializeActionCounts();
                 SpottedLevel = SpottedLevel.Level1;
                 InitializeExperienceSystem();
-                HitPoints = new StatsMaxCurrent(GameData.MAX_HP);
-                DaysSupply = new StatsMaxCurrent(GameData.MaxDaysSupplyUnit);
+                HitPoints = new StatsMaxCurrent(IsBase ? GameData.BASE_MAX_HP : GameData.MAX_HP);
+                DaysSupply = new StatsMaxCurrent(IsBase && FacilityType == FacilityType.Airbase
+                    ? GameData.MaxDaysSupplyAirbase : GameData.MaxDaysSupplyUnit);
                 MovementPoints = new StatsMaxCurrent(GameData.FOOT_UNIT);
                 EfficiencyLevel = EfficiencyLevel.FullOperations;
                 MapPos = Position2D.Zero;
@@ -516,8 +517,12 @@ namespace HammerAndSickle.Models
             int opportunityActions = GameData.DEFAULT_OPPORTUNITY_ACTIONS;
             int intelActions = GameData.DEFAULT_INTEL_ACTIONS;
 
+            // Action-count overrides per §8.5.8 (authoritative table). Baseline = 1/1/1/0/1
+            // (Move/Combat/Deploy/Opportunity/Intel); Opportunity defaults to 0 — granted only
+            // to reactive-fire roles (§8.5.4).
             switch (Classification)
             {
+                // Ground combat — baseline. Reactive facing is free (§8.5.5), so no Opp.
                 case UnitClassification.TANK:
                 case UnitClassification.MECH:
                 case UnitClassification.MOT:
@@ -527,39 +532,74 @@ namespace HammerAndSickle.Models
                 case UnitClassification.MMAR:
                 case UnitClassification.AT:
                 case UnitClassification.INF:
-                case UnitClassification.ART:
-                case UnitClassification.SPA:
-                case UnitClassification.ROC:
-                case UnitClassification.BM:
+                case UnitClassification.CAV:
                 case UnitClassification.ENG:
-                case UnitClassification.HELO:
+                case UnitClassification.BM:
                     break;
-                case UnitClassification.RECON:
+                case UnitClassification.RECON:                  // §10.3a.1
                     moveActions += 1;
                     break;
-                case UnitClassification.AM:
+                case UnitClassification.AM:                     // §10.3a.2
                 case UnitClassification.MAM:
                     deploymentActions += 1;
                     break;
-                case UnitClassification.SPECF:
+                case UnitClassification.SPECF:                  // §10.3a.3
                     intelActions += 1;
                     break;
+                // Tube artillery — Opp for counter-battery (§8.5.4 / §7.13.5.7)
+                case UnitClassification.ART:
+                case UnitClassification.SPA:
+                    opportunityActions += 1;
+                    break;
+                // Rocket artillery — +1 CombatAction (§7.14) + counter-battery Opp
+                case UnitClassification.ROC:
+                    combatActions += 1;
+                    opportunityActions += 1;
+                    break;
+                // Air defense — keeps baseline CombatAction (restricted to HELO / embarked AM-MAM,
+                // §8.5.3, enforced in combat validation) + 2 reactive-fire Opp (§8.5.4 / §10.3a.4)
                 case UnitClassification.SAM:
                 case UnitClassification.SPSAM:
                 case UnitClassification.AAA:
                 case UnitClassification.SPAAA:
-                    opportunityActions += 1;
+                    opportunityActions += 2;
                     break;
-                case UnitClassification.FGT:
-                case UnitClassification.ATT:
-                case UnitClassification.BMB:
-                case UnitClassification.RECONA:
-                    moveActions += 2;
+                // Attack helicopter — cannot entrench/embark (§8.5.6): 0 Deploy, 0 Opp (no op-fire)
+                case UnitClassification.HELO:
                     deploymentActions = 0;
                     break;
+                // Interceptor fighter — fixed-wing economy + 1 Opp for interception (§8.5.4 / §11.4.7.2)
+                case UnitClassification.FGT:
+                    moveActions += 2;
+                    deploymentActions = 0;
+                    intelActions = 0;
+                    opportunityActions += 1;
+                    break;
+                // Wild Weasel — fixed-wing economy + 3 Opp for heavy SEAD counter-fire (§8.5.4 / §10.3a.9)
+                case UnitClassification.WW:
+                    moveActions += 2;
+                    deploymentActions = 0;
+                    intelActions = 0;
+                    opportunityActions += 3;
+                    break;
+                // Other fixed-wing — +2 Move, 0 Deploy, 0 Intel (§8.5.2)
+                case UnitClassification.ATT:
+                case UnitClassification.BMB:
+                case UnitClassification.AWACS:
+                case UnitClassification.RECONA:
+                case UnitClassification.TRN:
+                    moveActions += 2;
+                    deploymentActions = 0;
+                    intelActions = 0;
+                    break;
+                // HQ — static intelligence hub (§8.5.7): only Intel acts
                 case UnitClassification.HQ:
+                    moveActions = 0;
+                    combatActions = 0;
+                    deploymentActions = 0;
                     intelActions += 1;
                     break;
+                // Passive facilities — all actions 0 (§8.5.7)
                 case UnitClassification.DEPOT:
                 case UnitClassification.AIRB:
                     moveActions = 0;
@@ -750,6 +790,16 @@ namespace HammerAndSickle.Models
 
         /// <summary>Active profile's Ordnance Load (the airstrike OL/9 multiplier, §11.6.1). 0 if none.</summary>
         public int ActiveOrdnanceLoad => GetActiveWeaponProfile()?.OrdinanceLoad ?? 0;
+
+        /// <summary>Active profile's Ground-Air Defense (GAD) — the stat an airstrike attacks (§7.7.5). 0 if none.</summary>
+        public int ActiveGroundAirDefense => GetActiveWeaponProfile()?.GroundAirDefense ?? 0;
+
+        /// <summary>True if the active profile's strike ignores target GAD (STANDOFF_CRUISE_MISSILE → IgnoreAirDefense, §11.6.1.1).</summary>
+        public bool IgnoresAirDefense => GetActiveWeaponProfile()?.HasCapability(WeaponCapability.IgnoreAirDefense) ?? false;
+
+        /// <summary>Active profile's effective Ground Attack vs a target's class / base-ness (Rule B riders, §11.6.1.1). 0 if none.</summary>
+        public int GetEffectiveGroundAttack(TargetClass targetClass, bool isBase) =>
+            GetActiveWeaponProfile()?.EffectiveGroundAttack(targetClass, isBase) ?? 0;
 
         #endregion // Combat Engine Integration
 
@@ -1790,7 +1840,8 @@ namespace HammerAndSickle.Models
         private float GetCurrentGenerationRate()
         {
             if (!IsBase || FacilityType != FacilityType.SupplyDepot) return 0f;
-            return GameData.GenerationRateValues[GenerationRate] * GetFacilityEfficiencyMultiplier();
+            // GenerationRateValues is a FRACTION of own capacity; scale by max stockpile to get days/turn.
+            return GameData.GenerationRateValues[GenerationRate] * GetMaxStockpile() * GetFacilityEfficiencyMultiplier();
         }
 
         /// <summary>

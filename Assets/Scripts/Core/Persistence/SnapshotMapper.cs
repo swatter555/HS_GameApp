@@ -148,7 +148,7 @@ namespace HammerAndSickle.Persistence
                                 freshUnit.SetFacilityDamage(unit.BaseDamage);
                                 if (unit.FacilityType == FacilityType.SupplyDepot)
                                 {
-                                    freshUnit.DaysSupply.SetCurrent(GameData.MaxDaysSupplyDepot);
+                                    freshUnit.DaysSupply.SetCurrent(freshUnit.DaysSupply.Max);
                                 }
 
                                 // Copy attached air unit IDs for airbases

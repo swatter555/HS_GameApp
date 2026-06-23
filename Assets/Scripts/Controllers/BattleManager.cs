@@ -67,7 +67,7 @@ namespace HammerAndSickle.Controllers
         [SerializeField] private TMP_Text _turnText;
 
         // Parent panel that hosts the phase text. Acts as a "turn processing"
-        // indicator — shown during Deployment, EOT, AITurn, and AdminPhase to tell
+        // indicator — shown during Deployment, Upkeep, AI_Turn, and TurnBoundary to tell
         // the player something other than their own turn is happening, and hidden
         // during PlayerTurn so it does not clutter the HUD while they're acting.
         [SerializeField] private GameObject _turnProcessingPanel;
@@ -438,7 +438,7 @@ namespace HammerAndSickle.Controllers
 
         /// <summary>
         /// Shows the turn-processing panel during any phase that is not the player's
-        /// own turn (Deployment, EOT, AITurn, AdminPhase, BattleComplete) and hides
+        /// own turn (Deployment, Upkeep, AI_Turn, TurnBoundary, BattleComplete) and hides
         /// it during PlayerTurn so the HUD stays clean while the player is acting.
         /// Hiding the panel also hides the phase text since the text is parented to it.
         /// Safe no-op if the panel reference is unwired.
@@ -474,14 +474,17 @@ namespace HammerAndSickle.Controllers
         /// </summary>
         private static string GetPhaseDisplayName(BattlePhase phase) => phase switch
         {
-            BattlePhase.NotStarted        => "Not Started",
-            BattlePhase.Deployment        => "Deployment",
-            BattlePhase.PlayerTurn        => "Your Turn",
-            BattlePhase.EndTurnProcessing => "Processing...",
-            BattlePhase.AITurn            => "Enemy Turn",
-            BattlePhase.AdminPhase        => "Admin",
-            BattlePhase.BattleComplete    => "Battle Over",
-            _                             => phase.ToString()
+            BattlePhase.NotStarted     => "Not Started",
+            BattlePhase.Deployment     => "Deployment",
+            BattlePhase.PlayerRefresh  => "Refreshing...",
+            BattlePhase.PlayerTurn     => "Your Turn",
+            BattlePhase.PlayerUpkeep   => "Processing...",
+            BattlePhase.AI_Refresh     => "Refreshing...",
+            BattlePhase.AI_Turn        => "Enemy Turn",
+            BattlePhase.AI_Upkeep      => "Processing...",
+            BattlePhase.TurnBoundary   => "Processing...",
+            BattlePhase.BattleComplete => "Battle Over",
+            _                          => phase.ToString()
         };
 
         #endregion // Turn HUD and Phase Transitions
@@ -493,7 +496,7 @@ namespace HammerAndSickle.Controllers
         /// player's single point of interaction with the turn flow:
         ///   - During Deployment, clicking it leaves deployment and starts Turn 1.
         ///   - During PlayerTurn, clicking it kicks off the full turn sequence
-        ///     (EOT → AITurn → EOT → AdminPhase → next PlayerTurn).
+        ///     (PlayerUpkeep → AI_Turn → AI_Upkeep → TurnBoundary → next PlayerTurn).
         /// The button is hard-disabled the instant the click is processed and only
         /// re-enabled when control returns to the player. This prevents double-fires.
         /// </summary>
@@ -545,11 +548,14 @@ namespace HammerAndSickle.Controllers
         /// Drives the full turn sequence as a coroutine:
         ///
         ///     PlayerTurn (just ended)
-        ///         → EndTurnProcessing  (post-player EOT, supply/ZOC/etc)
-        ///         → AITurn             (AI moves and fights — placeholder for now)
-        ///         → EndTurnProcessing  (post-AI EOT, same logic as post-player)
-        ///         → AdminPhase         (turn counter increment, victory checks)
+        ///         → PlayerUpkeep       (post-player cleanup, supply/ZOC/etc)
+        ///         → AI_Turn            (AI moves and fights — placeholder for now)
+        ///         → AI_Upkeep          (post-AI cleanup, same logic as post-player)
+        ///         → TurnBoundary       (turn counter increment, victory checks)
         ///         → PlayerTurn         (new turn) -OR- BattleComplete
+        ///
+        /// NOTE: the §3.2 PlayerRefresh / AI_Refresh phases are not entered yet — their
+        /// contents (spotting decay, efficiency recovery, supply) land with M13.
         ///
         /// Between every phase transition we yield for _phaseTransitionDelay so the
         /// player can register what is happening on the HUD. The _battleEnded flag
@@ -558,8 +564,8 @@ namespace HammerAndSickle.Controllers
         /// </summary>
         private IEnumerator RunTurnSequence()
         {
-            // -------- Post-player EOT --------
-            SetPhase(BattlePhase.EndTurnProcessing);
+            // -------- Post-player Upkeep --------
+            SetPhase(BattlePhase.PlayerUpkeep);
             AppService.CaptureUiMessage("Processing end of player turn...");
             ProcessEndOfTurn(isPlayerSide: true);
             yield return new WaitForSeconds(_phaseTransitionDelay);
@@ -568,23 +574,23 @@ namespace HammerAndSickle.Controllers
             // -------- AI Turn --------
             // Placeholder until real AI exists. The phase enters, sits for the
             // configured dwell, and exits. When AI logic lands it slots in here.
-            SetPhase(BattlePhase.AITurn);
+            SetPhase(BattlePhase.AI_Turn);
             AppService.CaptureUiMessage("Enemy turn underway...");
             yield return new WaitForSeconds(_aiTurnPlaceholderDelay);
             if (_battleEnded) { _turnSequenceCoroutine = null; yield break; }
 
-            // -------- Post-AI EOT --------
-            SetPhase(BattlePhase.EndTurnProcessing);
+            // -------- Post-AI Upkeep --------
+            SetPhase(BattlePhase.AI_Upkeep);
             AppService.CaptureUiMessage("Processing end of enemy turn...");
             ProcessEndOfTurn(isPlayerSide: false);
             yield return new WaitForSeconds(_phaseTransitionDelay);
             if (_battleEnded) { _turnSequenceCoroutine = null; yield break; }
 
-            // -------- Admin Phase --------
-            // Turn counter is incremented here, *after* both EOTs have run. Victory
+            // -------- Turn Boundary --------
+            // Turn counter is incremented here, *after* both Upkeeps have run. Victory
             // checks (turn-limit and objective) also live here so the very last turn
             // can end cleanly without rolling into a phantom Turn (Max+1).
-            SetPhase(BattlePhase.AdminPhase);
+            SetPhase(BattlePhase.TurnBoundary);
             yield return new WaitForSeconds(_phaseTransitionDelay);
 
             // Turn-limit check: if we just finished the final scheduled turn, the

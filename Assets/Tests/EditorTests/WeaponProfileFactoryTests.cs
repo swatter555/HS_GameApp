@@ -212,16 +212,17 @@ namespace HammerAndSickle.Tests
         }
 
         [Test]
-        public void RuleB_CapabilityHooks_AreDormant()
+        public void RuleB_CapabilityHooks_AvoidGadLive_LoiterDormant()
         {
             try
             {
-                // avoid-GAD and loiter re-attack are Dormant (no consumer yet) — the resolver must skip them.
+                // avoid-GAD went LIVE with the M8 air-strike resolver (§11.6.1.1 — STANDOFF_CRUISE_MISSILE ignores GAD).
+                // Loiter re-attack is still Dormant (no consumer until the CAS re-attack milestone).
                 WeaponProfile p = Strike(WeaponTrait.STANDOFF_CRUISE_MISSILE, WeaponTrait.LOITER_PERSISTENCE);
-                Assert.IsFalse(p.HasCapability(WeaponCapability.IgnoreAirDefense), "avoid-GAD dormant (skipped)");
-                Assert.IsFalse(p.HasCapability(WeaponCapability.LoiterReattack),  "loiter dormant (skipped)");
+                Assert.IsTrue(p.HasCapability(WeaponCapability.IgnoreAirDefense), "avoid-GAD Live (consumed by ResolveAirStrike)");
+                Assert.IsFalse(p.HasCapability(WeaponCapability.LoiterReattack),  "loiter still dormant (no consumer)");
             }
-            catch (Exception ex) { AppService.HandleException(CLASS_NAME, nameof(RuleB_CapabilityHooks_AreDormant), ex); throw; }
+            catch (Exception ex) { AppService.HandleException(CLASS_NAME, nameof(RuleB_CapabilityHooks_AvoidGadLive_LoiterDormant), ex); throw; }
         }
 
         [Test]
