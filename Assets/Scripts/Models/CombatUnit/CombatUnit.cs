@@ -794,12 +794,27 @@ namespace HammerAndSickle.Models
         /// <summary>Active profile's Ground-Air Defense (GAD) — the stat an airstrike attacks (§7.7.5). 0 if none.</summary>
         public int ActiveGroundAirDefense => GetActiveWeaponProfile()?.GroundAirDefense ?? 0;
 
+        /// <summary>Active profile's Ground-Air Attack (GAT) — the interdiction stat vs transiting aircraft (§11.8.1). 0 if none.</summary>
+        public int ActiveGroundAirAttack => GetActiveWeaponProfile()?.GroundAirAttack ?? 0;
+
+        /// <summary>Active profile's Maneuverability (MAN) — feeds the fixed-wing ground-to-air defense term (§11.8.1). 0 if none.</summary>
+        public int ActiveManeuverability => GetActiveWeaponProfile()?.Maneuverability ?? 0;
+
+        /// <summary>Active profile's Survivability (SUR) — feeds the fixed-wing ground-to-air defense term (§11.8.1). 0 if none.</summary>
+        public int ActiveSurvivability => GetActiveWeaponProfile()?.Survivability ?? 0;
+
         /// <summary>True if the active profile's strike ignores target GAD (STANDOFF_CRUISE_MISSILE → IgnoreAirDefense, §11.6.1.1).</summary>
         public bool IgnoresAirDefense => GetActiveWeaponProfile()?.HasCapability(WeaponCapability.IgnoreAirDefense) ?? false;
 
         /// <summary>Active profile's effective Ground Attack vs a target's class / base-ness (Rule B riders, §11.6.1.1). 0 if none.</summary>
         public int GetEffectiveGroundAttack(TargetClass targetClass, bool isBase) =>
             GetActiveWeaponProfile()?.EffectiveGroundAttack(targetClass, isBase) ?? 0;
+
+        /// <summary>Active profile's runway-cratering OC-suppression rider (RUNWAY_CRATERING) — extra base OC damage (§11.7.2.2a). 0 if none.</summary>
+        public int ActiveOcSuppressionBonus => GetActiveWeaponProfile()?.OcSuppressionBonus ?? 0;
+
+        /// <summary>Active profile's parked-aircraft band bonus (RAMP_STRIKE) — band shift on the parked-aircraft roll (§11.7.2.3). 0 if none.</summary>
+        public int ActiveParkedHitBonus => GetActiveWeaponProfile()?.ParkedHitBonus ?? 0;
 
         #endregion // Combat Engine Integration
 

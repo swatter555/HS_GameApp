@@ -1529,6 +1529,15 @@ namespace HammerAndSickle.Core.GameData
         public const int STATIC_COLLAPSE_BASE = 30;       // 1d100 ≤ threshold destroys (§7.9.7.1)
         public const int STATIC_COLLAPSE_PER_EXP = 5;     // threshold = BASE − PER_EXP×ExpMod
 
+        // Base combat / strategic-attack knob (§31.4a.20, §11.7.2.2a). Flat OC-damage premium added to EVERY
+        // standoff (air/indirect) attack on a base, on top of the proportional round(HP_dealt÷60×100) amount
+        // (§11.7.2.2). = one OC tier; models interdiction suppressing FUNCTION out of proportion to HP loss.
+        public const int STRATEGIC_OC_BONUS = 20;
+
+        // Ground-to-air interdiction gate (§11.8.2): a unit needs GAT ≥ this to fire on a transiting aircraft;
+        // below it, GAT is treated as 0 (no engagement). Infantry regain limited GAT only via the MANPADS trait.
+        public const int GAT_INTERDICT_THRESHOLD = 6;
+
         // Combat action defaults
         public const int DEFAULT_MOVE_ACTIONS = 1;
         public const int DEFAULT_COMBAT_ACTIONS = 1;

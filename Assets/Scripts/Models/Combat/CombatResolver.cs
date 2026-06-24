@@ -104,6 +104,52 @@ namespace HammerAndSickle.Models.Combat
     }
 
     /// <summary>
+    /// Context for a STANDOFF (air/indirect) attack on a base (§11.7.5 strategic attack). BaseTerrain blocks the
+    /// forward shot (§7.5.6.3); WildWeaselAlive shifts an AIR strike's band up one (§11.4.8.6 — ignored for indirect).
+    /// </summary>
+    public struct BaseAttackContext
+    {
+        public TerrainType BaseTerrain;
+        public bool WildWeaselAlive;
+    }
+
+    /// <summary>Per-aircraft outcome of the parked-aircraft band roll on an airbase strike (§11.7.2.3).</summary>
+    public struct ParkedAircraftDamage
+    {
+        public string AircraftId;
+        public int Damage;
+        public bool Destroyed;
+    }
+
+    /// <summary>
+    /// Outcome of a standoff base attack. HP is applied to the base and to each parked aircraft, and OC suppression
+    /// is applied via AddFacilityDamage. The stateful follow-ups — aircraft REMOVAL/evacuation, the 2-strike
+    /// auto-evac counter (§11.7.2.4), destruction-loses-aircraft (§11.7.2.6), and the ZoC repair-lock — are the
+    /// caller's (turn-loop state), driven off this result.
+    /// </summary>
+    public struct BaseAttackResult
+    {
+        public int DamageToBase;
+        public int OcDamageApplied;     // proportional + STRATEGIC_OC_BONUS + RUNWAY_CRATERING rider (pre-clamp)
+        public bool BaseDestroyed;
+        public ParkedAircraftDamage[] ParkedAircraft;   // empty if the base is not an airbase / has none attached
+    }
+
+    /// <summary>
+    /// Outcome of a ground-to-air opportunity-fire shot (§11.8). One-way — the transiting aircraft does NOT return
+    /// fire (§7.12.3). <see cref="Engaged"/> is false when the firer is below the GAT interdiction gate (§11.8.2);
+    /// <see cref="HeloAxis"/> records which Δ axis resolved (GAT−GAD for helos §7A.14, else GAT−(MAN+SUR)/2). The
+    /// per-turn shot budget, anti-dogpile cap, towed posture gate, and detection roll are the caller's (§11.8.3/.6/.8).
+    /// </summary>
+    public struct AirDefenseFireResult
+    {
+        public bool Engaged;
+        public bool HeloAxis;
+        public int DamageToAircraft;
+        public bool AircraftDestroyed;
+    }
+
+    /// <summary>
     /// Adapter between <see cref="CombatUnit"/> and the pure damage engine. Builds the two damage lanes and the
     /// defender stand input from unit state + context, runs <see cref="CombatEngine.ResolveDirectEngagement"/>
     /// (universal return fire §6.12 / §7.7.3), and applies the resulting HP. It does NOT do the map-coupled
@@ -530,5 +576,186 @@ namespace HammerAndSickle.Models.Combat
         }
 
         #endregion // Air-to-ground strike
+
+        #region Base combat (§11.7 / §7.7.9)
+
+        /// <summary>
+        /// Resolves a STANDOFF attack on a base (§11.7.5 strategic attack — air OR indirect): the base is a soft
+        /// 60-HP target run through the existing forward lane (air → effGA-vs-GAD with OL; indirect → soft axis,
+        /// BM bypasses terrain). One-way — a base takes NO stand check (destruction-only, §17.6) and a non-artillery
+        /// base has no counter-battery. Drives three base-specific effects off the one hit:
+        ///   • HP via TakeDamage (HP→0 ⇒ BaseDestroyed, §11.7.2.1/.6);
+        ///   • OperationalCapacity via AddFacilityDamage = round(HP÷60×100) + STRATEGIC_OC_BONUS + the attacker's
+        ///     RUNWAY_CRATERING OcSuppressionBonus rider (§11.7.2.2/.2a);
+        ///   • each attached aircraft takes a flat RollBandDamage of the strike's Δ-band shifted by the attacker's
+        ///     RAMP_STRIKE ParkedHitBonus — no multipliers, no terrain (§11.7.2.3).
+        ///
+        /// SCOPE: standoff only. A GROUND attack on a base (force OC 100 + base return fire + evac, §11.7.2.5) and the
+        /// stateful turn-loop bits — aircraft evacuation/removal, the 2-strike auto-evac counter (§11.7.2.4), ZoC
+        /// repair-lock, repurchase/activation (§11.7.2.7) — are the CALLER's, driven off this result. Dice order: the
+        /// base damage lane, then one parked-aircraft roll per attached aircraft (in AirUnitsAttached order).
+        /// </summary>
+        public static BaseAttackResult ResolveBaseAttack(CombatUnit attacker, CombatUnit baseUnit, in BaseAttackContext ctx, ICombatRandom rng)
+        {
+            try
+            {
+                if (attacker == null) throw new ArgumentNullException(nameof(attacker));
+                if (baseUnit == null) throw new ArgumentNullException(nameof(baseUnit));
+                if (!baseUnit.IsBase) throw new ArgumentException("Target is not a base", nameof(baseUnit));
+                if (rng == null) throw new ArgumentNullException(nameof(rng));
+
+                LaneInput lane = BuildBaseForwardLane(attacker, baseUnit, ctx);
+                int dmg = CombatEngine.ResolveLane(lane, rng);
+                baseUnit.TakeDamage(dmg);
+                bool destroyed = baseUnit.HitPoints.Current <= 0f;
+
+                // OC suppression (§11.7.2.2/.2a): proportional + flat strategic premium + RUNWAY_CRATERING rider.
+                int ocDamage = CombatMath.RoundHalfUp((double)dmg / GameData.BASE_MAX_HP * 100.0)
+                             + GameData.STRATEGIC_OC_BONUS
+                             + attacker.ActiveOcSuppressionBonus;
+                if (ocDamage > 0) baseUnit.AddFacilityDamage(ocDamage);
+
+                // Parked-aircraft band roll (§11.7.2.3): flat roll of the strike's Δ-band, no multipliers/terrain.
+                ParkedAircraftDamage[] parked = RollParkedAircraft(attacker, baseUnit, lane, rng);
+
+                return new BaseAttackResult
+                {
+                    DamageToBase = dmg,
+                    OcDamageApplied = ocDamage,
+                    BaseDestroyed = destroyed,
+                    ParkedAircraft = parked,
+                };
+            }
+            catch (Exception e)
+            {
+                AppService.HandleException(CLASS_NAME, nameof(ResolveBaseAttack), e);
+                return default;
+            }
+        }
+
+        /// <summary>
+        /// The forward lane for a standoff base attack: a fixed-wing attacker uses the air-strike lane (effGA vs the
+        /// base GAD, OL/9, AirBalanceMod); any other (artillery / BM) uses the indirect forward lane (soft axis — a
+        /// base is SOFT §7.4.1.2, BM bypasses terrain). Arc-agnostic: bases never take flank/crossing (§5.8.7).
+        /// </summary>
+        public static LaneInput BuildBaseForwardLane(CombatUnit attacker, CombatUnit baseUnit, in BaseAttackContext ctx)
+        {
+            if (attacker.IsFixedWingAirUnit)
+                return BuildAirStrikeLane(attacker, baseUnit,
+                    new AirStrikeContext { TargetTerrain = ctx.BaseTerrain, WildWeaselAlive = ctx.WildWeaselAlive });
+
+            return BuildIndirectForwardLane(attacker, baseUnit,
+                new IndirectAttackContext { TargetTerrain = ctx.BaseTerrain });
+        }
+
+        /// <summary>
+        /// Rolls the parked-aircraft hit for each aircraft attached to <paramref name="baseUnit"/> (§11.7.2.3) and
+        /// applies the HP. Band = the strike's Δ-band (lane.FirerAttack − lane.TargetDefense) shifted up by the
+        /// attacker's ParkedHitBonus (RAMP_STRIKE); no multipliers, no terrain. Empty array if not an airbase /
+        /// nothing attached. Removal/evac is the caller's.
+        /// </summary>
+        private static ParkedAircraftDamage[] RollParkedAircraft(CombatUnit attacker, CombatUnit baseUnit, in LaneInput lane, ICombatRandom rng)
+        {
+            var attached = baseUnit.AirUnitsAttached;
+            if (attached == null || attached.Count == 0) return Array.Empty<ParkedAircraftDamage>();
+
+            DamageBand band = CombatMath.ShiftBand(
+                CombatMath.DeltaBand(lane.FirerAttack - lane.TargetDefense), attacker.ActiveParkedHitBonus);
+
+            var results = new ParkedAircraftDamage[attached.Count];
+            for (int i = 0; i < attached.Count; i++)
+            {
+                CombatUnit ac = attached[i];
+                int pdmg = CombatMath.RollBandDamage(band, rng);
+                ac.TakeDamage(pdmg);
+                results[i] = new ParkedAircraftDamage
+                {
+                    AircraftId = ac.UnitID,
+                    Damage = pdmg,
+                    Destroyed = ac.HitPoints.Current <= 0f,
+                };
+            }
+            return results;
+        }
+
+        #endregion // Base combat
+
+        #region Ground-to-air opportunity fire (§11.8 / §7.12)
+
+        /// <summary>
+        /// Resolves one ground-to-air opportunity-fire shot from an air-defense unit against a transiting aircraft
+        /// (§11.8.1). One-way (the aircraft does NOT return fire, §7.12.3); the attacker pipeline only — no deployment
+        /// mult (§7.12.2), no terrain/OL aloft, GroundBalanceMod (the firer is a ground unit, §7.7.10). The Δ axis is
+        /// target-driven: a HELO (or an air-mobile unit in EmbarkedHelo transit) is engaged GAT−GAD (§7A.14 — helo air
+        /// stats are zero, GAD is the evasion proxy); a fixed-wing aircraft is engaged GAT−(MAN+SUR)/2. A firer below
+        /// the GAT interdiction gate (§11.8.2) does not engage (Engaged=false, no dice). HP is applied to the aircraft.
+        ///
+        /// SCOPE: the single damage shot only. The per-turn shot budget (§11.8.3), the one-shot-per-aircraft anti-dogpile
+        /// cap (§11.8.6), the towed posture gate (§11.8.8), the 1d6 air-ambush detection roll (§6.10), and the helo
+        /// transit stand check (§11.8.9) are the CALLER's (movement/air-pipeline). Dice: the damage lane only.
+        /// </summary>
+        public static AirDefenseFireResult ResolveAirDefenseFire(CombatUnit defender, CombatUnit aircraft, ICombatRandom rng)
+        {
+            try
+            {
+                if (defender == null) throw new ArgumentNullException(nameof(defender));
+                if (aircraft == null) throw new ArgumentNullException(nameof(aircraft));
+                if (rng == null) throw new ArgumentNullException(nameof(rng));
+
+                if (defender.ActiveGroundAirAttack < GameData.GAT_INTERDICT_THRESHOLD)
+                    return new AirDefenseFireResult { Engaged = false };
+
+                LaneInput lane = BuildAirDefenseFireLane(defender, aircraft);
+                int dmg = CombatEngine.ResolveLane(lane, rng);
+                aircraft.TakeDamage(dmg);
+
+                return new AirDefenseFireResult
+                {
+                    Engaged = true,
+                    HeloAxis = IsHeloAirDefenseTarget(aircraft),
+                    DamageToAircraft = dmg,
+                    AircraftDestroyed = aircraft.HitPoints.Current <= 0f,
+                };
+            }
+            catch (Exception e)
+            {
+                AppService.HandleException(CLASS_NAME, nameof(ResolveAirDefenseFire), e);
+                return default;
+            }
+        }
+
+        /// <summary>
+        /// The ground-to-air opportunity-fire lane (§11.8.1): FirerAttack = GAT; TargetDefense = the aircraft's air
+        /// evasion — GAD for a helo (§7A.14), else floor((MAN + SUR) / 2). Attacker pipeline (FirerIsDefender false →
+        /// no deployment mult, §7.12.2); FirerIsAir false → GroundBalanceMod (§7.7.10); terrain bypassed (aloft);
+        /// AttackType.Direct → no OL.
+        /// </summary>
+        public static LaneInput BuildAirDefenseFireLane(CombatUnit defender, CombatUnit aircraft)
+        {
+            bool helo = IsHeloAirDefenseTarget(aircraft);
+            int targetDef = helo
+                ? aircraft.ActiveGroundAirDefense
+                : (aircraft.ActiveManeuverability + aircraft.ActiveSurvivability) / 2;
+            return new LaneInput
+            {
+                FirerAttack = defender.ActiveGroundAirAttack,
+                TargetDefense = targetDef,
+                FirerQualityMult = defender.GetCombatQualityMultiplier(),
+                FirerIsDefender = false,
+                AttackType = AttackType.Direct,
+                FirerIsAir = false,
+                BypassTerrainBlock = true,
+            };
+        }
+
+        /// <summary>
+        /// True if the aircraft is engaged on the helo air-defense axis (GAT−GAD, §7A.14): an attack helicopter
+        /// (HELO) or an air-mobile unit caught mid-transit in EmbarkedHelo state (§11.8.9 / §5.13.2.4).
+        /// </summary>
+        public static bool IsHeloAirDefenseTarget(CombatUnit aircraft) =>
+            aircraft.Classification == UnitClassification.HELO
+            || aircraft.CurrentEmbarkmentState == EmbarkmentState.EmbarkedHelo;
+
+        #endregion // Ground-to-air opportunity fire
     }
 }
