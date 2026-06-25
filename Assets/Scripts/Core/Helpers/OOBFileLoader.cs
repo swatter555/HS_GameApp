@@ -41,6 +41,11 @@ namespace HammerAndSickle.Helpers
         public int Side { get; set; }
         public int Nationality { get; set; }
         public int Classification { get; set; }
+        // Preferred classification field: the UnitClassification enum NAME (e.g. "BMB").
+        // Resolved ahead of the legacy int Classification, which is fragile to mid-enum
+        // insertions (WW/TRN added at M0 shifted every value after ATT). Regenerated .oob
+        // files should emit this; older int-only files still load via the legacy fallback.
+        public string ClassificationName { get; set; }
         public int Role { get; set; }
         public int IntelProfileType { get; set; }
 
@@ -211,6 +216,24 @@ namespace HammerAndSickle.Helpers
         }
 
         /// <summary>
+        /// Resolves a unit's classification, preferring the string enum NAME (reorder-safe)
+        /// over the legacy integer. The int path is fragile: M0 inserted WW/TRN mid-enum, so
+        /// any .oob authored before that has its post-ATT classifications shifted by +1. New
+        /// .oob files should carry ClassificationName; regenerate older ones to be safe.
+        /// </summary>
+        private static UnitClassification ResolveClassification(string name, int legacyInt)
+        {
+            if (!string.IsNullOrEmpty(name)
+                && Enum.TryParse(name, ignoreCase: true, out UnitClassification parsed))
+                return parsed;
+
+            if (!string.IsNullOrEmpty(name))
+                Debug.LogWarning($"{CLASS_NAME}.{nameof(ResolveClassification)}: Unknown classification name '{name}', falling back to legacy int {legacyInt}");
+
+            return (UnitClassification)legacyInt;
+        }
+
+        /// <summary>
         /// Detects whether the JSON content is the new wrapper format or legacy flat array.
         /// Parses accordingly and returns the unit list and optional leader list.
         /// </summary>
@@ -333,7 +356,7 @@ namespace HammerAndSickle.Helpers
                     // Cast integer enum fields to their proper types
                     var side = (Side)data.Side;
                     var nationality = (Nationality)data.Nationality;
-                    var classification = (UnitClassification)data.Classification;
+                    var classification = ResolveClassification(data.ClassificationName, data.Classification);
                     var role = (UnitRole)data.Role;
                     var profileType = (RegimentProfileType)data.IntelProfileType;
                     var depotCategory = (DepotCategory)data.DepotCategory;

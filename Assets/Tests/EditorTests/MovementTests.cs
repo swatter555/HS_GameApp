@@ -384,11 +384,11 @@ namespace HammerAndSickle.Tests
             var enemy = CreateEnemyUnit(new Position2D(9, 9), spotted: SpottedLevel.Level2);
 
             // No player units near — decay should drop to Level1
-            SpottingService.ProcessAdminPhaseDecay();
+            SpottingService.ProcessSpottingDecay();
             Assert.AreEqual(SpottedLevel.Level1, enemy.SpottedLevel, "Level2 should decay to Level1");
 
             // Again — Level1 should decay to Level0
-            SpottingService.ProcessAdminPhaseDecay();
+            SpottingService.ProcessSpottingDecay();
             Assert.AreEqual(SpottedLevel.Level0, enemy.SpottedLevel, "Level1 should decay to Level0");
         }
 

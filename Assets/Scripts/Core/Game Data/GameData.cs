@@ -1864,8 +1864,10 @@ namespace HammerAndSickle.Core.GameData
             return HexSize * 0.8660254038f;
         }
 
-        // Version of the .map file format.
-        public const int CurrentMapDataVersion = 1;
+        // Version of the .map file format. Bumped 1→2 for the HexTile model rework: added
+        // isPort / isDeploymentZone / isBeachhead / hexControlLevel / reservedInt1-2 / reservedFlag1-2,
+        // removed airbaseDamage. Maps authored before v2 should be regenerated from the Scenario Editor.
+        public const int CurrentMapDataVersion = 2;
 
         #endregion // HexMap Constants
     }

@@ -2,6 +2,7 @@ using HammerAndSickle.Core.GameData;
 using HammerAndSickle.Core.UI;
 using HammerAndSickle.Models;
 using HammerAndSickle.Models.Map;
+using HammerAndSickle.Renderers;
 using HammerAndSickle.Services;
 using System;
 using System.Collections;
@@ -335,6 +336,11 @@ namespace HammerAndSickle.Controllers
             bool isFixedWing = CurrentUnit.IsFixedWingAirUnit;
             Position2D previousPos = CurrentUnit.MapPos;
 
+            // Hexes actually entered this move (in order; last = where the unit ends). Drives the
+            // §6.13 tile-control flips after the move settles. May be shorter than the planned path
+            // if an ambush / ZoC halt cuts the move short.
+            var enteredHexes = new List<Position2D>();
+
             // TODO: Move undo — allowed only when no new spotting events fired during the move
 
             for (int i = 0; i < _currentPath.Count; i++)
@@ -360,6 +366,12 @@ namespace HammerAndSickle.Controllers
                 // Update position
                 previousPos = CurrentUnit.MapPos;
                 HexMapUtil.MoveUnitTo(map, CurrentUnit, targetPos);
+
+                // §3.5.8 recovery input: the unit moved this turn (set per step; read at Upkeep).
+                CurrentUnit.MarkMovedThisTurn();
+
+                // Record the entered hex for the post-move §6.13 tile-control pass.
+                enteredHexes.Add(targetPos);
 
                 // Animate hex step
                 // TODO: Integrate UnitMoveAnimator.AnimateHexStep here
@@ -423,6 +435,20 @@ namespace HammerAndSickle.Controllers
             // Move complete
             CameraService.Instance?.CenterOnPosition(CurrentUnit.MapPos);
 
+            // §6.13 / §17.5 — movement-driven tile control. Ground + helicopters flip terrain;
+            // fixed-wing fly over and never flip (§6.13.2). Applied once the move has settled.
+            if (!isFixedWing && enteredHexes.Count > 0)
+            {
+                var territory = TerritoryService.ApplyMoveControl(map, CurrentUnit, enteredHexes);
+                ApplyTerritoryAccounting(territory);
+
+                // Repaint the Map layer so city/objective control flags reflect the flips.
+                // RefreshMap touches only the Map layers (not units or the movement overlay).
+                // Full redraw per move order — fine at this tempo; targeted refresh is a later optimization.
+                if (territory.AnyChange)
+                    HexGridRenderer.Instance?.RefreshMap();
+            }
+
             if (EventManager.Instance != null)
             {
                 EventManager.Instance.RaiseUnitMoveCompleted(CurrentUnit);
@@ -474,6 +500,35 @@ namespace HammerAndSickle.Controllers
                 else
                 {
                     unit.ForceSetMovementPoints(0);
+                }
+            }
+        }
+
+        /// <summary>
+        /// Applies the objective-capture consequences of a move's territory changes (§17.5.3 / §18.2.1).
+        /// A PLAYER capture credits the hex's VictoryValue in prestige and bumps the held-objective count
+        /// (which runs the immediate-win check); an AI capture of a player-held (Red) objective decrements
+        /// it. Plain tile flips (non-objective) carry no prestige. Routed through BattleManager so the HUD,
+        /// victory checks, and prestige counters stay in sync.
+        /// </summary>
+        private void ApplyTerritoryAccounting(TerritoryChangeResult territory)
+        {
+            if (territory.CapturedObjectives == null || territory.CapturedObjectives.Count == 0)
+                return;
+
+            var bm = BattleManager.Instance;
+            if (bm == null) return;
+
+            foreach (var cap in territory.CapturedObjectives)
+            {
+                if (CurrentUnit.Side == Side.Player)
+                {
+                    bm.AddPrestige(Mathf.RoundToInt(cap.VictoryValue));
+                    bm.CaptureObjective();
+                }
+                else if (cap.PreviousControl == TileControl.Red)
+                {
+                    bm.LoseObjective();
                 }
             }
         }

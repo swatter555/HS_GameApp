@@ -3,11 +3,14 @@ using HammerAndSickle.Core.GameData;
 using HammerAndSickle.Core.Helpers;
 using HammerAndSickle.Core.Map;
 using HammerAndSickle.Helpers;
+using HammerAndSickle.Models;
+using HammerAndSickle.Models.Combat;
 using HammerAndSickle.Renderers;
 using HammerAndSickle.Renderers.Chunked;
 using HammerAndSickle.Services;
 using System;
 using System.Collections;
+using System.Linq;
 using TMPro;
 using UnityEngine;
 using UnityEngine.UI;
@@ -127,7 +130,10 @@ namespace HammerAndSickle.Controllers
         /// --------------------
 
         public WeatherCondition CurrentWeather { get; private set; } = WeatherCondition.Clear;
-        public int MaxNumberCoreUnitAllowed { get; private set; } = 0;
+
+        // Per-scenario Deployment fielding budget (§20.1 / §35.4), from the manifest.
+        // (Replaces the retired MaxNumberCoreUnitAllowed / manifest.maxCoreUnits.)
+        public int DeploymentPointCap { get; private set; } = 0;
 
         /// --------------------
         /// Objective Tracking
@@ -352,7 +358,95 @@ namespace HammerAndSickle.Controllers
             SetTurn(0);
             SetPhase(BattlePhase.Deployment);
 
+            // Seed objective tracking from the loaded map so the §17 victory check has real
+            // totals to compare against as hexes flip during play.
+            InitializeObjectivesFromMap();
+
+            // Open the battle framed on the player's main supply depot (view only — no
+            // selection). Done after units load so the depot exists to center on.
+            CenterCameraOnStart();
+
             return true;
+        }
+
+        /// <summary>
+        /// Counts objective hexes on the loaded map and seeds the held/total counters (player = Red,
+        /// §4.7.1). Recomputed from the map rather than tracked incrementally at load so the totals are
+        /// always truthful; movement-driven captures then adjust the counters via CaptureObjective /
+        /// LoseObjective (§17.5). Safe no-op if no map is loaded.
+        /// </summary>
+        private void InitializeObjectivesFromMap()
+        {
+            try
+            {
+                var map = GameDataManager.CurrentHexMap;
+                int total = 0, occupied = 0;
+
+                if (map != null)
+                {
+                    foreach (var hex in map)
+                    {
+                        if (hex == null || !hex.IsObjective) continue;
+                        total++;
+                        if (hex.TileControl == TileControl.Red) occupied++;
+                    }
+                }
+
+                TotalObjectiveHexes = total;
+                ObjectiveHexesOccupied = occupied;
+                ObjectiveHexesUnoccupied = total - occupied;
+            }
+            catch (Exception ex)
+            {
+                AppService.HandleException(CLASS_NAME, nameof(InitializeObjectivesFromMap), ex);
+            }
+        }
+
+        /// <summary>
+        /// Centers the map on the player's main supply depot at battle start (A7). View only —
+        /// no unit is selected. If the player fields more than one main depot, one is chosen at
+        /// random (UnityEngine.Random — presentation only, NOT the seeded combat RNG). Falls back
+        /// to any living player unit, then the map center, if no main depot is present.
+        /// </summary>
+        private void CenterCameraOnStart()
+        {
+            try
+            {
+                if (CameraService.Instance == null) return;
+
+                var players = GameDataManager.Instance.GetPlayerUnits();
+
+                // Primary: a player main supply depot (IsMainDepot = IsBase && DepotCategory.Main).
+                var mainDepots = players
+                    .Where(u => u != null && !u.IsDestroyed() && u.IsMainDepot)
+                    .ToList();
+
+                Position2D target;
+                if (mainDepots.Count > 0)
+                {
+                    target = mainDepots[UnityEngine.Random.Range(0, mainDepots.Count)].MapPos;
+                }
+                else
+                {
+                    // Fallback: any living player unit, else the map center.
+                    var anyPlayer = players.FirstOrDefault(u => u != null && !u.IsDestroyed());
+                    if (anyPlayer != null)
+                    {
+                        target = anyPlayer.MapPos;
+                    }
+                    else
+                    {
+                        var size = GameDataManager.CurrentMapSize;
+                        target = new Position2D(size.IntX / 2, size.IntY / 2);
+                    }
+                }
+
+                CameraService.Instance.CenterOnPosition(target);
+            }
+            catch (Exception ex)
+            {
+                AppService.HandleException(CLASS_NAME, nameof(CenterCameraOnStart), ex);
+            }
         }
 
         /// <summary>
@@ -363,7 +457,7 @@ namespace HammerAndSickle.Controllers
             ScenarioID = GameDataManager.CurrentManifest.ScenarioId;
             IsCampaignBattle = GameDataManager.CurrentManifest.IsCampaignScenario;
             CurrentPrestige = GameDataManager.CurrentManifest.PrestigePool;
-            MaxNumberCoreUnitAllowed = GameDataManager.CurrentManifest.MaxCoreUnits;
+            DeploymentPointCap = GameDataManager.CurrentManifest.DeploymentPointCap;
             MaxTurnNumber = GameDataManager.CurrentManifest.MaxTurns;
 
         }
@@ -519,14 +613,14 @@ namespace HammerAndSickle.Controllers
                     return;
                 }
 
-                // Deployment exit: same button advances Turn 0 → Turn 1 PlayerTurn.
-                // No EOT/AI runs on the deployment-exit click — the player simply
-                // begins their first played turn.
+                // Deployment exit: same button advances Turn 0 → Turn 1. No EOT/AI runs
+                // on the deployment-exit click — the player simply begins their first
+                // played turn, which still runs through PlayerRefresh (§3.3) first so
+                // units start the turn with full actions/MP and a fresh spotting sweep.
                 if (CurrentPhase == BattlePhase.Deployment)
                 {
-                    SetTurn(1);
-                    SetPhase(BattlePhase.PlayerTurn);
                     AppService.CaptureUiMessage("Deployment complete — Turn 1 begins.");
+                    _turnSequenceCoroutine = StartCoroutine(RunPlayerTurnStart(1));
                     return;
                 }
 
@@ -545,17 +639,17 @@ namespace HammerAndSickle.Controllers
         }
 
         /// <summary>
-        /// Drives the full turn sequence as a coroutine:
+        /// Drives the back half of a turn as a coroutine, then chains into the next turn's
+        /// start (§3.1 cycle):
         ///
         ///     PlayerTurn (just ended)
-        ///         → PlayerUpkeep       (post-player cleanup, supply/ZOC/etc)
-        ///         → AI_Turn            (AI moves and fights — placeholder for now)
-        ///         → AI_Upkeep          (post-AI cleanup, same logic as post-player)
-        ///         → TurnBoundary       (turn counter increment, victory checks)
-        ///         → PlayerTurn         (new turn) -OR- BattleComplete
-        ///
-        /// NOTE: the §3.2 PlayerRefresh / AI_Refresh phases are not entered yet — their
-        /// contents (spotting decay, efficiency recovery, supply) land with M13.
+        ///         → PlayerUpkeep   (§3.5 — efficiency recovery; supply chain stubbed)
+        ///         → AI_Refresh     (§3.3 — refresh AI side)
+        ///         → AI_Turn        (AI moves and fights — placeholder for now)
+        ///         → AI_Upkeep      (§3.5 — efficiency recovery for AI)
+        ///         → TurnBoundary   (turn counter increment, victory checks)
+        ///         → PlayerRefresh  (§3.3 — refresh player side, spotting sweep)
+        ///         → PlayerTurn     (new turn) -OR- BattleComplete
         ///
         /// Between every phase transition we yield for _phaseTransitionDelay so the
         /// player can register what is happening on the HUD. The _battleEnded flag
@@ -564,10 +658,16 @@ namespace HammerAndSickle.Controllers
         /// </summary>
         private IEnumerator RunTurnSequence()
         {
-            // -------- Post-player Upkeep --------
+            // -------- Post-player Upkeep (§3.5) --------
             SetPhase(BattlePhase.PlayerUpkeep);
             AppService.CaptureUiMessage("Processing end of player turn...");
-            ProcessEndOfTurn(isPlayerSide: true);
+            ProcessUpkeep(isPlayerSide: true);
+            yield return new WaitForSeconds(_phaseTransitionDelay);
+            if (_battleEnded) { _turnSequenceCoroutine = null; yield break; }
+
+            // -------- AI Refresh (§3.3) --------
+            SetPhase(BattlePhase.AI_Refresh);
+            ProcessRefresh(isPlayerSide: false);
             yield return new WaitForSeconds(_phaseTransitionDelay);
             if (_battleEnded) { _turnSequenceCoroutine = null; yield break; }
 
@@ -579,17 +679,17 @@ namespace HammerAndSickle.Controllers
             yield return new WaitForSeconds(_aiTurnPlaceholderDelay);
             if (_battleEnded) { _turnSequenceCoroutine = null; yield break; }
 
-            // -------- Post-AI Upkeep --------
+            // -------- Post-AI Upkeep (§3.5) --------
             SetPhase(BattlePhase.AI_Upkeep);
             AppService.CaptureUiMessage("Processing end of enemy turn...");
-            ProcessEndOfTurn(isPlayerSide: false);
+            ProcessUpkeep(isPlayerSide: false);
             yield return new WaitForSeconds(_phaseTransitionDelay);
             if (_battleEnded) { _turnSequenceCoroutine = null; yield break; }
 
             // -------- Turn Boundary --------
-            // Turn counter is incremented here, *after* both Upkeeps have run. Victory
-            // checks (turn-limit and objective) also live here so the very last turn
-            // can end cleanly without rolling into a phantom Turn (Max+1).
+            // Turn counter is incremented at PlayerRefresh (below), *after* both Upkeeps
+            // have run. Victory checks (turn-limit and objective) live here so the very
+            // last turn can end cleanly without rolling into a phantom Turn (Max+1).
             SetPhase(BattlePhase.TurnBoundary);
             yield return new WaitForSeconds(_phaseTransitionDelay);
 
@@ -611,40 +711,132 @@ namespace HammerAndSickle.Controllers
                 yield break;
             }
 
-            // -------- Next Player Turn --------
-            // Increment-at-start semantics: the displayed turn matches what the
-            // player is about to play, not what they just finished.
-            SetTurn(CurrentTurnNumber + 1);
+            // -------- Next Player Turn (PlayerRefresh → PlayerTurn) --------
+            // Hand off to the shared turn-start coroutine. It owns clearing
+            // _turnSequenceCoroutine, so this method must not touch it afterward.
+            yield return RunPlayerTurnStart(CurrentTurnNumber + 1);
+        }
+
+        /// <summary>
+        /// Opens a player turn: advances the turn counter, runs PlayerRefresh (§3.3), then
+        /// hands control to the player at PlayerTurn. Shared by the deployment-exit click and
+        /// the end-of-turn sequence so the §3.3 refresh always precedes a player turn. Clears
+        /// _turnSequenceCoroutine on exit (it is the turn flow's final step).
+        /// </summary>
+        private IEnumerator RunPlayerTurnStart(int turnNumber)
+        {
+            SetTurn(turnNumber);
+
+            // -------- Player Refresh (§3.3) --------
+            SetPhase(BattlePhase.PlayerRefresh);
+            ProcessRefresh(isPlayerSide: true);
+            yield return new WaitForSeconds(_phaseTransitionDelay);
+            if (_battleEnded) { _turnSequenceCoroutine = null; yield break; }
+
+            // -------- Player Turn --------
             SetPhase(BattlePhase.PlayerTurn);
-            AppService.CaptureUiMessage($"Turn {CurrentTurnNumber} of {MaxTurnNumber} — your move.");
+            AppService.CaptureUiMessage($"Turn {turnNumber} of {MaxTurnNumber} — your move.");
 
             _turnSequenceCoroutine = null;
         }
 
         /// <summary>
-        /// Runs end-of-turn upkeep for the side that just finished. Both EOTs (post-
-        /// player and post-AI) share this implementation; the side parameter exists so
-        /// future logic can scope effects to the correct faction (e.g. only the side
-        /// that just acted recalculates its supply net).
+        /// Refresh phase (§3.3) for one side. Order per §3.3: action/MP refresh and per-turn
+        /// flag reset for every living unit on that side; (out-of-supply consequences §3.3.3 —
+        /// HOOK reserved, inert until the supply system lands); spotting decay + recompute
+        /// (§3.3.4); weather check (§3.3.6).
         ///
-        /// Currently a stub. Planned upkeep:
-        ///   - Refresh unit actions and movement points for the side ending its turn
-        ///   - Recompute supply status: depot range checks + ZOC interdiction
-        ///   - Process facility effects (supply generation, repair, etc.)
-        ///   - Optional: weather/time-of-day rolls (likely admin phase, not here)
+        /// Spotting (§3.3.4) runs only for the player side: SpottedLevel lives on AI units and
+        /// is set by player spotters; AI-side fog of war is unmodelled in v1.
         /// </summary>
-        private void ProcessEndOfTurn(bool isPlayerSide)
+        private void ProcessRefresh(bool isPlayerSide)
         {
             try
             {
-                // TODO: implement EOT upkeep — see method summary for the planned list.
-                // For now this exists so the coroutine has a real call site to hang
-                // future logic off of without re-plumbing the state machine.
+                var units = isPlayerSide
+                    ? GameDataManager.Instance.GetPlayerUnits()
+                    : GameDataManager.Instance.GetAIUnits();
+
+                // §3.3.1 / §3.3.2 — counters + MP to max; §7.15.8 recovery flags cleared.
+                foreach (var u in units)
+                {
+                    if (u == null || u.IsDestroyed()) continue;
+                    RefreshUnitForNewTurn(u);
+                }
+
+                // §3.3.3 out-of-supply consequences — HOOK reserved, INERT this pass. No depot
+                // distribution exists yet, so applying the 2-tier Efficiency drop + 10% MAX_HP
+                // loss now would punish everything immediately. Activated with the supply pass.
+                // ApplyOutOfSupplyConsequences(units);
+
+                // §3.3.4 spotting decay + full recompute — player perspective only.
+                if (isPlayerSide)
+                {
+                    SpottingService.ProcessSpottingDecay();
+                    SpottingService.RecomputeAllSpotting();
+                }
+
+                // §3.3.6 weather check — single-state (Clear) in v1; per-turn weather variance
+                // is a future pass (§4.5.5). No-op placeholder.
             }
             catch (Exception ex)
             {
-                AppService.HandleException(CLASS_NAME, nameof(ProcessEndOfTurn), ex);
+                AppService.HandleException(CLASS_NAME, nameof(ProcessRefresh), ex);
             }
+        }
+
+        /// <summary>
+        /// Upkeep phase (§3.5) for the side that just finished its turn. Implemented now:
+        /// efficiency recovery (§3.5.8) per living unit, driven by whether it moved/fought.
+        /// STUBBED pending the supply system: loss tracking (§3.5.1), depot generation /
+        /// minor-depot / airbase replenishment (§3.5.4–.6), HCL decay (§3.5.9).
+        /// </summary>
+        private void ProcessUpkeep(bool isPlayerSide)
+        {
+            try
+            {
+                var units = isPlayerSide
+                    ? GameDataManager.Instance.GetPlayerUnits()
+                    : GameDataManager.Instance.GetAIUnits();
+
+                // §3.5.1 loss tracking — STUB (stats system not built; see RecordPlayerUnitLoss).
+                // §3.5.4–.6 depot generation / minor-depot / airbase replenishment — STUB (supply pass).
+
+                // §3.5.8 efficiency recovery: +2 idle / +1 moved / 0 fought, cap Full.
+                foreach (var u in units)
+                {
+                    if (u == null || u.IsDestroyed()) continue;
+                    ApplyUpkeepRecovery(u);
+                }
+
+                // §3.5.9 HCL decay/recovery — STUB (needs depot supply tracing; supply pass).
+            }
+            catch (Exception ex)
+            {
+                AppService.HandleException(CLASS_NAME, nameof(ProcessUpkeep), ex);
+            }
+        }
+
+        // ----------------------------------------------------------------------------
+        // Per-unit turn-boundary helpers. Static + side-effect-only on the passed unit so
+        // they are unit-test-friendly (no BattleManager/Unity singleton coupling).
+        // ----------------------------------------------------------------------------
+
+        /// <summary>§3.3.1/.2 — reset a single unit's action counters, MP, and per-turn flags.</summary>
+        public static void RefreshUnitForNewTurn(CombatUnit unit)
+        {
+            unit.RefreshAllActions();
+            unit.RefreshMovementPoints();
+            unit.ResetTurnFlags();
+        }
+
+        /// <summary>§3.5.8 — apply Efficiency recovery to a single unit from its moved/fought flags.
+        /// (Recovery PAUSE for out-of-supply units, §15.5.3.5, is deferred with the supply pass.)</summary>
+        public static void ApplyUpkeepRecovery(CombatUnit unit)
+        {
+            var recovered = DegradationCheck.ApplyUpkeepRecovery(
+                unit.EfficiencyLevel, unit.HasMovedThisTurn, unit.HasFoughtThisTurn);
+            unit.SetEfficiencyLevel(recovered);
         }
 
         /// <summary>

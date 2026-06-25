@@ -1033,6 +1033,40 @@ namespace HammerAndSickle.Controllers
 
         #endregion // Utility Icons
 
+        #region Movement & Turn Overlays
+
+        // ----------------------------------------------------------------------------
+        // Movement overlays — world-space hex sprites stamped on the HexGridRenderer
+        // Overlay layers (movementRange / movementPath). Resolve via _movementOverlayAtlas.
+        // ART NEEDED FROM BOB (see todo.md "Graphics needed"): one ~256px sprite each.
+        // ----------------------------------------------------------------------------
+
+        // Reachable-hex highlight (translucent fill / ring) drawn over every in-range hex.
+        public const string Overlay_MoveRange = "Overlay_MoveRange";
+
+        // Marker for a reachable hex that is a ZoC-to-ZoC terminal — movement ends here (§5.6).
+        public const string Overlay_ZocBlocked = "Overlay_ZocBlocked";
+
+        // Path-preview waypoint dot for intermediate hexes on the previewed path (§5.10).
+        public const string Overlay_PathStep = "Overlay_PathStep";
+
+        // Path-preview arrowhead stamped on the destination hex.
+        public const string Overlay_PathArrow = "Overlay_PathArrow";
+
+        // Facing arrow/chevron for manual (Shift+click) facing rotation (§5.8).
+        public const string Overlay_FacingChevron = "Overlay_FacingChevron";
+
+        // ----------------------------------------------------------------------------
+        // Weather HUD icons (optional) — screen-space status indicator. Single-state in
+        // v1 (§4.5); per-turn variance is a future pass. Resolve via the EXISTING
+        // _utilityIconAtlas (drop the 3 sprites into that atlas — no new atlas needed).
+        // ----------------------------------------------------------------------------
+        public const string Weather_Clear    = "Weather_Clear";
+        public const string Weather_Overcast = "Weather_Overcast";
+        public const string Weather_Storm    = "Weather_Storm";
+
+        #endregion // Movement & Turn Overlays
+
         #region Officer Portraits
 
         public const string RussianPortrait01 = "Russian01";
@@ -1126,6 +1160,10 @@ namespace HammerAndSickle.Controllers
         [SerializeField] private SpriteAtlas _officerPortraitAtlas;
         [SerializeField] private SpriteAtlas _riverIconAtlas;
         [SerializeField] private SpriteAtlas _roadIconAtlas;
+
+        // Movement/turn overlays (range, path, ZoC, facing). Null until Bob creates the
+        // atlas asset and wires it; GetSprite null-guards it like every other atlas.
+        [SerializeField] private SpriteAtlas _movementOverlayAtlas;
 
         [Header("Prefabs")]
         [SerializeField] private GameObject _cityPrefab;
@@ -1319,6 +1357,13 @@ namespace HammerAndSickle.Controllers
                 if (Instance._officerPortraitAtlas != null)
                 {
                     sprite = Instance._officerPortraitAtlas.GetSprite(spriteName);
+                    if (sprite != null) return sprite;
+                }
+
+                // Try movement/turn overlay atlas (range, path, ZoC, facing)
+                if (Instance._movementOverlayAtlas != null)
+                {
+                    sprite = Instance._movementOverlayAtlas.GetSprite(spriteName);
                     if (sprite != null) return sprite;
                 }
 

@@ -54,8 +54,11 @@ namespace HammerAndSickle.Core.GameData
         [JsonPropertyName("maxTurns")]
         public int MaxTurns { get; set; } = 0;
 
-        [JsonPropertyName("maxCoreUnits")]
-        public int MaxCoreUnits { get; set; } = 0;
+        // Per-scenario point budget the player may spend fielding units during Deployment
+        // (§20.1 / §35.4). Replaces the RETIRED maxCoreUnits/maxDeployLand/maxDeployAir fields;
+        // the campaign-wide ownership cap (coreForcePointCap) lives in the .cmp, not here.
+        [JsonPropertyName("deploymentPointCap")]
+        public int DeploymentPointCap { get; set; } = 0;
 
         [JsonPropertyName("mapWidth")]
         public int MapWidth { get; set; } = 0;
@@ -87,7 +90,7 @@ namespace HammerAndSickle.Core.GameData
             MapTheme mapTheme,
             DifficultyLevel difficultyLevel,
             int maxTurns,
-            int maxCoreUnits,
+            int deploymentPointCap,
             int mapWidth = 0,
             int mapHeight = 0)
         {
@@ -104,7 +107,7 @@ namespace HammerAndSickle.Core.GameData
             MapTheme = mapTheme;
             DifficultyLevel = difficultyLevel;
             MaxTurns = maxTurns;
-            MaxCoreUnits = maxCoreUnits;
+            DeploymentPointCap = deploymentPointCap;
             MapWidth = mapWidth;
             MapHeight = mapHeight;
         }

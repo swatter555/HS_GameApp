@@ -331,6 +331,34 @@ namespace HammerAndSickle.Models
         /// </summary>
         public void RefreshMovementPoints() => MovementPoints.ResetToMax();
 
+        // ----------------------------------------------------------------------------
+        // Per-turn activity flags (§3.5.8 efficiency recovery input). Transient — reset
+        // at the unit's Refresh (3.3), set during its Turn as it moves / fights, read at
+        // its Upkeep to decide recovery (+2 idle / +1 moved / 0 fought). [JsonIgnore]:
+        // pure intra-turn bookkeeping, never serialized (a mid-turn save reloads with the
+        // flags cleared, which is correct — recovery only matters at Upkeep).
+        // ----------------------------------------------------------------------------
+
+        /// <summary>True if this unit moved at least one hex this turn (§7.15.8.2).</summary>
+        [JsonIgnore] public bool HasMovedThisTurn { get; private set; }
+
+        /// <summary>True if this unit fought this turn — attacker, defender, ambusher,
+        /// opportunity firer, or counter-battery (§7.15.8.3).</summary>
+        [JsonIgnore] public bool HasFoughtThisTurn { get; private set; }
+
+        /// <summary>Flags the unit as having moved this turn (called by MovementController per step).</summary>
+        public void MarkMovedThisTurn() => HasMovedThisTurn = true;
+
+        /// <summary>Flags the unit as having fought this turn (called by the combat resolver path).</summary>
+        public void MarkFoughtThisTurn() => HasFoughtThisTurn = true;
+
+        /// <summary>Clears the per-turn activity flags. Called at the unit's Refresh (§3.3).</summary>
+        public void ResetTurnFlags()
+        {
+            HasMovedThisTurn = false;
+            HasFoughtThisTurn = false;
+        }
+
         public void SetSpottedLevel(SpottedLevel spottedLevel) => SpottedLevel = spottedLevel;
 
         /// <summary>

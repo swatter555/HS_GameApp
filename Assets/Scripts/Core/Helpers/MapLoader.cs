@@ -273,6 +273,21 @@ namespace HammerAndSickle.Core.Helpers
                     throw new InvalidDataException("Map data validation failed - see logs for details");
                 }
 
+                // Version-compatibility gate. A structurally-valid map can still be the WRONG format
+                // version: IsValid() only checks SaveVersion > 0, so without this an old map loads with
+                // the post-rework HexTile fields (isPort/isDeploymentZone/isBeachhead/hexControlLevel/...)
+                // silently defaulted. Reject the mismatch here so stale maps are regenerated, not loaded
+                // half-populated. (CurrentMapDataVersion was bumped 1→2 for the HexTile rework.)
+                if (mapData.Header != null && !mapData.Header.IsCompatibleVersion())
+                {
+                    string versionMsg =
+                        $"Map '{mapData.Header.MapName}' is format version {mapData.Header.SaveVersion}, but this " +
+                        $"build requires version {JsonMapHeader.GetCurrentSaveVersion()}. Regenerate the map from the Scenario Editor.";
+                    Debug.LogError($"{CLASS_NAME}: {versionMsg}");
+                    AppService.CaptureUiMessage(versionMsg);
+                    throw new InvalidDataException(versionMsg);
+                }
+
                 // Write to log.
                 if (log) Debug.Log($"{CLASS_NAME}: Map data validation successful");
 

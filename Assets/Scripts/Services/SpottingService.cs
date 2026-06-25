@@ -130,10 +130,12 @@ namespace HammerAndSickle.Services
         }
 
         /// <summary>
-        /// Admin phase decay: enemies not in range of any player spotter decay toward Level0.
-        /// Level2+ drops to Level1, Level1 drops to Level0. One step per admin phase.
+        /// Spotting decay (§3.3.4 / §12.6) — runs once per side at Refresh. Enemies not in range
+        /// of any player spotter decay toward Level0: Level2+ drops to Level1, Level1 drops to
+        /// Level0. One step per turn. (Renamed from ProcessAdminPhaseDecay: the AdminPhase is gone
+        /// under the ratified §3.2 BattlePhase set; decay now lives in the Refresh phase.)
         /// </summary>
-        public static void ProcessAdminPhaseDecay()
+        public static void ProcessSpottingDecay()
         {
             try
             {
@@ -161,7 +163,7 @@ namespace HammerAndSickle.Services
             }
             catch (Exception e)
             {
-                AppService.HandleException(CLASS_NAME, nameof(ProcessAdminPhaseDecay), e);
+                AppService.HandleException(CLASS_NAME, nameof(ProcessSpottingDecay), e);
             }
         }
 
