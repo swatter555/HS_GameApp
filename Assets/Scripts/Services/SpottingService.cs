@@ -1,6 +1,7 @@
 using HammerAndSickle.Controllers;
 using HammerAndSickle.Core.GameData;
 using HammerAndSickle.Models;
+using HammerAndSickle.Models.Combat;
 using HammerAndSickle.Models.Map;
 using System;
 using System.Collections.Generic;
@@ -44,14 +45,13 @@ namespace HammerAndSickle.Services
                 foreach (var spotter in playerUnits)
                 {
                     if (spotter.IsDestroyed()) continue;
-                    int range = Mathf.FloorToInt(spotter.ActiveSpottingRange);
-                    if (range <= 0) continue;
 
                     foreach (var enemy in enemyUnits)
                     {
                         if (enemy.IsDestroyed()) continue;
                         if (enemy.SpottedLevel == SpottedLevel.Level4) continue;
 
+                        int range = SpottingRangeAgainst(spotter, enemy);
                         int dist = HexMapUtil.GetHexDistance(spotter.MapPos, enemy.MapPos);
                         if (dist <= range)
                             IncrementSpottedLevel(enemy);
@@ -74,15 +74,13 @@ namespace HammerAndSickle.Services
             var newlySpotted = new List<CombatUnit>();
             try
             {
-                int range = Mathf.FloorToInt(mover.ActiveSpottingRange);
-                if (range <= 0) return newlySpotted;
-
                 var enemies = GameDataManager.Instance.GetAIUnits();
                 foreach (var enemy in enemies)
                 {
                     if (enemy.IsDestroyed()) continue;
                     if (enemy.SpottedLevel == SpottedLevel.Level4) continue;
 
+                    int range = SpottingRangeAgainst(mover, enemy);
                     int dist = HexMapUtil.GetHexDistance(newPos, enemy.MapPos);
                     if (dist <= range)
                     {
@@ -115,9 +113,8 @@ namespace HammerAndSickle.Services
                 foreach (var spotter in playerUnits)
                 {
                     if (spotter.IsDestroyed()) continue;
-                    int range = Mathf.FloorToInt(spotter.ActiveSpottingRange);
-                    if (range <= 0) continue;
 
+                    int range = SpottingRangeAgainst(spotter, movedEnemy);
                     int dist = HexMapUtil.GetHexDistance(spotter.MapPos, movedEnemy.MapPos);
                     if (dist <= range)
                         IncrementSpottedLevel(movedEnemy);
@@ -178,9 +175,8 @@ namespace HammerAndSickle.Services
                 foreach (var spotter in playerUnits)
                 {
                     if (spotter.IsDestroyed()) continue;
-                    int range = Mathf.FloorToInt(spotter.ActiveSpottingRange);
-                    if (range <= 0) continue;
 
+                    int range = SpottingRangeAgainst(spotter, enemy);
                     int dist = HexMapUtil.GetHexDistance(spotter.MapPos, enemy.MapPos);
                     if (dist <= range) return true;
                 }
@@ -255,11 +251,8 @@ namespace HammerAndSickle.Services
                     int dist = HexMapUtil.GetHexDistance(newPos, enemy.MapPos);
                     if (dist > engagementRange) continue;
 
-                    // Roll detection check
-                    int roll = UnityEngine.Random.Range(1, 7); // 1d6
-                    int detectThreshold = GetAirDetectionThreshold(mover.ExperienceLevel);
-
-                    if (roll >= detectThreshold)
+                    // Detection roll (§6.10.3/.4) — delegated to the pure, seedable AirAmbushCheck.
+                    if (AirAmbushCheck.RollDetection(mover.ExperienceLevel, new CombatRandom()))
                     {
                         // Detection success: enemy spotted at Level1
                         IncrementSpottedLevel(enemy);
@@ -287,6 +280,18 @@ namespace HammerAndSickle.Services
 
         #region Private Helpers
 
+        /// <summary>
+        /// The spotting range <paramref name="spotter"/> uses against <paramref name="target"/> under the
+        /// dual-domain rule (§12.3): the spotter's AIR range vs an airborne target (any fixed-wing, or an
+        /// AM/MAM air-assault lift in EmbarkedHelo state), its GROUND range otherwise. Classification-driven
+        /// and decoupled from the profile SpottingRange (which is UI-only now). Attack helos fly NOE and are
+        /// ground targets; air-defence platforms' long ranges are air-search only (a SAM reveals ground at 2).
+        /// </summary>
+        private static int SpottingRangeAgainst(CombatUnit spotter, CombatUnit target) =>
+            target.IsAirborneSpottingTarget
+                ? spotter.ActiveAirSpottingRange
+                : spotter.ActiveGroundSpottingRange;
+
         private static void IncrementSpottedLevel(CombatUnit unit)
         {
             if (unit.SpottedLevel >= SpottedLevel.Level4) return;
@@ -298,20 +303,6 @@ namespace HammerAndSickle.Services
             if (EventManager.Instance != null)
                 EventManager.Instance.RaiseUnitSpottedLevelChanged(unit, oldLevel, newLevel);
         }
-
-        /// <summary>
-        /// Returns the minimum d6 roll needed to detect an air ambush, keyed by experience.
-        /// </summary>
-        private static int GetAirDetectionThreshold(ExperienceLevel level) => level switch
-        {
-            ExperienceLevel.Raw => 6,
-            ExperienceLevel.Green => 5,
-            ExperienceLevel.Trained => 4,
-            ExperienceLevel.Experienced => 3,
-            ExperienceLevel.Veteran => 2,
-            ExperienceLevel.Elite => 1,
-            _ => 6
-        };
 
         #endregion // Private Helpers
     }

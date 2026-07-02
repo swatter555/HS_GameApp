@@ -77,4 +77,16 @@ namespace HammerAndSickle.Models.Combat
         Hold,      // roll ≤ SV_air — remains available for further passes / its mission phase
         Disengage  // roll > SV_air — leaves the AOB and flies home; damage + action commitment stand
     }
+
+    /// <summary>
+    /// Result of the helicopter transit stand check (HS_DesignDoc §11.8.9 — the ground-AD-fire path only, after
+    /// the 2026-06-23 narrowing). Like <see cref="AirStandOutcome"/> it is binary with no rout/shatter, but the
+    /// disengage semantics differ: a helo does not leave an AOB — it returns to the hex its move began on. The
+    /// caller applies the return (and, for an embarked transport, the forced disembark to Deployed at the origin).
+    /// </summary>
+    public enum HeloTransitOutcome
+    {
+        Hold,   // roll ≤ SV_helo — continues the move with remaining MP and actions
+        Abort   // roll > SV_helo — returns FREE to the origin hex; MP/actions → 0 (transports force-disembark)
+    }
 }

@@ -1615,6 +1615,48 @@ namespace HammerAndSickle.Core.GameData
         public const int AIR_RECON_SPOTTING_RANGE = 8;   // tactical reconnaissance
         public const int AWACS_SPOTTING_RANGE = 12;      // airborne early warning
 
+        // ── Dual-domain spotting (§12.3, RATIFIED 2026-06-25) ────────────────────────────────────────
+        // Spotting is TARGET-DOMAIN-AWARE: a spotter uses its GROUND range against ground targets and its AIR
+        // range against airborne targets. Classification-driven and DECOUPLED from the per-profile SpottingRange
+        // stat (which RECONA would otherwise mis-map). The long ranges on air-defence platforms are AIR-SEARCH
+        // ONLY — a SAM reveals ground units at just the basic 2. Leader spotting bonuses (§12.3.11) add to both
+        // and wire in M14; SIGINT-specialised ground spotting (6/6, §12.3.6) lands with M15.
+
+        /// <summary>Spotting range against a GROUND target (§12.3), by spotter classification.</summary>
+        public static int GroundSpottingRange(UnitClassification spotter) => spotter switch
+        {
+            UnitClassification.RECON                                                      => 3,
+            UnitClassification.HQ or UnitClassification.DEPOT or UnitClassification.AIRB  => 4,
+            UnitClassification.RECONA or UnitClassification.AWACS                         => 8,  // look-down recon / AEW
+            _                                                                             => 2,  // all other ground + fixed-wing + helo
+        };
+
+        /// <summary>Spotting range against an AIRBORNE target (§12.3), by spotter classification.</summary>
+        public static int AirSpottingRange(UnitClassification spotter) => spotter switch
+        {
+            UnitClassification.RECON                                                      => 3,
+            UnitClassification.AAA or UnitClassification.SPAAA                            => 3,  // air-search
+            UnitClassification.SAM or UnitClassification.SPSAM                            => 6,  // air-search
+            UnitClassification.HQ or UnitClassification.DEPOT or UnitClassification.AIRB  => 4,
+            UnitClassification.FGT or UnitClassification.ATT or UnitClassification.BMB
+                or UnitClassification.WW or UnitClassification.TRN
+                or UnitClassification.RECONA                                             => AIR_UNIT_SPOTTING_RANGE, // 4
+            UnitClassification.AWACS                                                      => AWACS_SPOTTING_RANGE,    // 12
+            _                                                                             => 2,  // all other ground units
+        };
+
+        /// <summary>
+        /// True if a classification is an AIRBORNE spotting TARGET (spotters use their AIR range against it): the
+        /// fixed-wing classes only. Attack helos (HELO) are NOT airborne targets — they fly Nap-of-the-Earth (NOE),
+        /// hugging terrain, so they are spotted on the GROUND range and are hard to catch on air-search. The AM/MAM
+        /// air-assault transit case (EmbarkedHelo — a lift that cannot hide as easily) IS air, but it is runtime
+        /// state, added at the CombatUnit level (see CombatUnit.IsAirborneSpottingTarget).
+        /// </summary>
+        public static bool IsAirborneClassification(UnitClassification c) =>
+            c == UnitClassification.FGT || c == UnitClassification.ATT || c == UnitClassification.BMB
+            || c == UnitClassification.RECONA || c == UnitClassification.AWACS
+            || c == UnitClassification.WW || c == UnitClassification.TRN;
+
         // High mach aircraft speeds
         public const int AC_HIGHSPEED_RUSSIAN = 17;
         public const int AC_HIGHSPEED_WESTERN = 21;
@@ -1810,6 +1852,20 @@ namespace HammerAndSickle.Core.GameData
         // Amount any unit can stockpile
         public const float MaxDaysSupplyUnit = 5f;          // Max operating supply a mobile unit can carry
         public const float MaxDaysSupplyAirbase = 30f;      // Max operating supply an airbase can carry (sortie-hungry)
+
+        // Sortie supply (§11.2.3) — every aircraft draws from its LAUNCHING airbase: a flat cost at launch plus a
+        // per-shot cost each time it fires (dogfight pass, air-to-ground, ASB ground attack, WW counter-fire). Net
+        // per-aircraft cost scales with engagement intensity (quiet escort 1, bomber w/ 1 strike 1.5, WW w/ 3 shots 2.5).
+        public const float SORTIE_LAUNCH_COST = 1f;         // supply deducted from the launching airbase at launch
+        public const float SORTIE_SHOT_COST = 0.5f;         // supply deducted per shot fired during the mission
+
+        // Airbase launch gate (§11.2.3a) — a hard operational reserve. An airbase whose stockpile is BELOW this
+        // (days) cannot launch any aircraft this turn, preventing partial-supply launches and mid-mission aborts.
+        public const float AIRBASE_LAUNCH_FLOOR = 5f;
+
+        // Air-supply load (§11.9.3) — a TRN is considered to load this many days from its launching airbase at
+        // takeoff (refunded if it lands without entering an AOB, §11.9.6). Deduction/refund wiring is caller-side.
+        public const float AIR_SUPPLY_LOAD = 5f;
 
         // Supply efficiency multipliers
         public const float DISTANCE_EFF_MULT = 0.4f;

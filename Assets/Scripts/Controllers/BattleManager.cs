@@ -945,6 +945,7 @@ namespace HammerAndSickle.Controllers
             try
             {
                 CurrentWeather = weather;
+                EventManager.Instance?.RaiseWeatherChanged(weather);
                 AppService.CaptureUiMessage($"Weather changed to: {weather}");
             }
             catch (Exception ex)

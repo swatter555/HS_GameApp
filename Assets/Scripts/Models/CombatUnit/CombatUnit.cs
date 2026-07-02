@@ -158,6 +158,19 @@ namespace HammerAndSickle.Models
         [JsonIgnore] public float ActiveIndirectRange => GetActiveWeaponProfile()?.IndirectRange ?? 0f;
         [JsonIgnore] public float ActiveSpottingRange => GetActiveWeaponProfile()?.SpottingRange ?? 0f;
 
+        // Dual-domain spotting (§12.3) — classification-driven, decoupled from the profile SR. The spotting sweep
+        // picks ground-vs-air by the TARGET's IsAirborneSpottingTarget. (Leader bonus §12.3.11 → M14; SIGINT → M15.)
+        [JsonIgnore] public int ActiveGroundSpottingRange => GameData.GroundSpottingRange(Classification);
+        [JsonIgnore] public int ActiveAirSpottingRange => GameData.AirSpottingRange(Classification);
+
+        /// <summary>True if THIS unit is an airborne spotting target (a spotter uses its AIR range against it): any
+        /// fixed-wing, or an AM/MAM riding a helo (EmbarkedHelo air-assault, §7A.14 — a lift that can't easily hide).
+        /// Attack helos (HELO) are NOT — they fly Nap-of-the-Earth and are spotted on the ground range. A dismounted
+        /// AM/MAM is also a ground target.</summary>
+        [JsonIgnore] public bool IsAirborneSpottingTarget =>
+            GameData.IsAirborneClassification(Classification)
+            || CurrentEmbarkmentState == EmbarkmentState.EmbarkedHelo;
+
         #endregion // Properties
 
         #region Constructors
@@ -849,7 +862,10 @@ namespace HammerAndSickle.Models
         #region Actions
 
         /// <summary>
-        /// Consumes actions, movement points, and supplies to perform a combat action.
+        /// Spends the action economy for a combat action: 1 CombatAction + 25% max MP (§8.2.1). Supply is a GATE
+        /// (must stay above COMBAT_ACTION_SUPPLY_THRESHOLD) but is NOT deterministically consumed here — the old
+        /// flat per-attack supply cost is rescinded (§7.15.7.1). Combat supply loss is now probabilistic (§7.15.5)
+        /// and is rolled per side by the combat orchestrator (<see cref="HammerAndSickle.Models.Combat.GroundCombatAction"/>).
         /// </summary>
         public bool PerformCombatAction()
         {
@@ -862,7 +878,6 @@ namespace HammerAndSickle.Models
                 {
                     CombatActions.DecrementCurrent();
                     ConsumeMovementPoints(GetCombatMovementCost());
-                    ConsumeSupplies(GameData.COMBAT_ACTION_SUPPLY_COST);
                     return true;
                 }
 
@@ -1805,6 +1820,15 @@ namespace HammerAndSickle.Models
             IsBase && FacilityType == FacilityType.Airbase &&
             OperationalCapacity != OperationalCapacity.OutOfOperation &&
             _airUnitsAttached.Count > 0;
+
+        /// <summary>
+        /// Airbase launch gate (§11.2.3a): true only if the airbase can run air operations AND its stockpile is at
+        /// or above the AIRBASE_LAUNCH_FLOOR hard reserve (5 days). Below the floor no aircraft may launch this turn
+        /// — the reserve prevents partial-supply launches that would strand a sortie mid-mission. The per-sortie
+        /// stockpile deduction (SORTIE_LAUNCH_COST + SORTIE_SHOT_COST, §11.2.3) is applied by the air-mission caller.
+        /// </summary>
+        public bool CanLaunchSortie() =>
+            CanLaunchAirOperations() && DaysSupply.Current >= GameData.AIRBASE_LAUNCH_FLOOR;
 
         public bool CanRepairAircraft() =>
             IsBase && FacilityType == FacilityType.Airbase &&

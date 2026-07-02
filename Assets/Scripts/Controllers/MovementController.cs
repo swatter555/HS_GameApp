@@ -1,6 +1,7 @@
 using HammerAndSickle.Core.GameData;
 using HammerAndSickle.Core.UI;
 using HammerAndSickle.Models;
+using HammerAndSickle.Models.Combat;
 using HammerAndSickle.Models.Map;
 using HammerAndSickle.Renderers;
 using HammerAndSickle.Services;
@@ -253,6 +254,17 @@ namespace HammerAndSickle.Controllers
                 return;
             }
 
+            // Click on an ENEMY unit → attempt a direct ground attack (§7.7.3). GroundCombatAction validates
+            // adjacency / spotting / action budget itself and reports the reason if the attack is illegal.
+            // (INTERIM input model for the combat play-test: click-adjacent-enemy = attack. The §24.5.4 Combat
+            // button / OnCombatActionRequested path is Bob's UI; this gives a playable loop with no new prefab.)
+            if (clickedUnit != null && clickedUnit.Side != Side.Player
+                && clickedUnit.SpottedLevel >= SpottedLevel.Level1)
+            {
+                TryAttack(clickedUnit);
+                return;
+            }
+
             // Click on empty hex outside range → deselect
             if (clickedUnit == null)
             {
@@ -260,7 +272,7 @@ namespace HammerAndSickle.Controllers
                 return;
             }
 
-            // Click on non-reachable hex with a unit → SFX denial
+            // Click on non-reachable hex with a friendly unit → SFX denial
             // TODO: Play UnitMoveBlocked SFX
         }
 
@@ -308,6 +320,76 @@ namespace HammerAndSickle.Controllers
         }
 
         #endregion // Selection Flow
+
+        #region Combat
+
+        /// <summary>
+        /// Resolves a direct ground attack by the selected unit against <paramref name="target"/> through the
+        /// model-layer orchestrator (<see cref="GroundCombatAction"/>), then refreshes the board: HP overlays,
+        /// removed/displaced unit icons, the attacker's spent actions/MP, and the movement overlay. The
+        /// orchestrator owns all eligibility gates and returns the rejection reason when the attack is illegal.
+        /// Automatic Advance (§7.9.9) is reported by the orchestrator but not yet executed here (TODO — needs a
+        /// player prompt for the optional free advance into the vacated hex).
+        /// </summary>
+        private void TryAttack(CombatUnit target)
+        {
+            try
+            {
+                if (CurrentUnit == null || target == null) return;
+                var map = GameDataManager.CurrentHexMap;
+                if (map == null) return;
+
+                // TODO §7.5.6.9.1 — compute contestedCrossing from river/bridge geometry between the two hexes.
+                GroundCombatOutcome outcome =
+                    GroundCombatAction.Execute(CurrentUnit, target, map, new CombatRandom());
+
+                if (!outcome.Executed)
+                {
+                    AppService.CaptureUiMessage(outcome.Reason);
+                    // TODO: Play UnitMoveBlocked / denial SFX
+                    return;
+                }
+
+                AppService.CaptureUiMessage(BuildCombatMessage(CurrentUnit, target, outcome));
+
+                // Refresh the board off the new unit state.
+                GameDataManager.Instance.BuildOccupancyCache();
+                if (EventManager.Instance != null)
+                {
+                    EventManager.Instance.RaiseRedrawMapIcons();             // HP %, removals, defender displacement
+                    EventManager.Instance.RaiseUnitActionsChanged(CurrentUnit);
+                    EventManager.Instance.RaiseUnitMovementPointsChanged(CurrentUnit);
+                }
+
+                // Attacker killed by return fire (§7.4.2.3) → nothing left to keep selected.
+                if (outcome.AttackerDestroyed)
+                {
+                    DeselectUnit();
+                    return;
+                }
+
+                // Keep the unit selected and refresh its movement overlay (combat spent 25% MP).
+                _currentRange = HexMapUtil.GetValidMoveDestinations(map, CurrentUnit);
+                State = MovementState.UnitSelected;
+                if (EventManager.Instance != null)
+                    EventManager.Instance.RaiseMovementRangeComputed(CurrentUnit, _currentRange.Reachable);
+            }
+            catch (Exception e)
+            {
+                AppService.HandleException(CLASS_NAME, nameof(TryAttack), e);
+            }
+        }
+
+        /// <summary>Short HUD line summarizing a resolved attack.</summary>
+        private static string BuildCombatMessage(CombatUnit attacker, CombatUnit target, GroundCombatOutcome o)
+        {
+            if (o.DefenderDestroyed) return $"{attacker.UnitName} destroyed {target.UnitName}.";
+            if (o.DefenderRemovedFromMap) return $"{attacker.UnitName} broke {target.UnitName} — it withdrew from the field.";
+            if (o.DefenderMoved) return $"{attacker.UnitName} hit {target.UnitName} for {o.DamageToDefender} — it fell back.";
+            return $"{attacker.UnitName} hit {target.UnitName} for {o.DamageToDefender} (held).";
+        }
+
+        #endregion // Combat
 
         #region Movement Execution
 

@@ -1,6 +1,7 @@
 using HammerAndSickle.Core.GameData;
 using HammerAndSickle.Core.UI;
 using HammerAndSickle.Models;
+using HammerAndSickle.Models.Combat;
 using HammerAndSickle.Models.Map;
 using HammerAndSickle.Services;
 using System;
@@ -142,6 +143,48 @@ namespace HammerAndSickle.Controllers
         public event Action<CombatUnit> OnAirUnitReturning;
 
         #endregion // Air Auto-Return Events
+
+        #region Battle Flow / HUD Events
+
+        // See EventManager for all game events
+        public event Action OnEndTurnRequested;
+        public event Action OnRequisitionPanelRequested;
+        public event Action OnDailyLossesRequested;
+        public event Action OnTotalLossesRequested;
+        public event Action<bool> OnSupplyOverlayToggled;
+
+        #endregion // Battle Flow / HUD Events
+
+        #region Unit Action Events
+
+        // See EventManager for all game events
+        public event Action<CombatUnit> OnCombatActionRequested;
+        public event Action<CombatUnit> OnDeployUpRequested;
+        public event Action<CombatUnit> OnDeployDownRequested;
+        public event Action<CombatUnit> OnIntelActionRequested;
+        public event Action<CombatUnit, bool> OnResupplyRequested;   // (unit, includeReplacements §15.4a.4a)
+        public event Action<CombatUnit> OnUpgradeEquipmentRequested;
+        public event Action<CombatUnit> OnReplaceLossesRequested;
+
+        #endregion // Unit Action Events
+
+        #region Weather Events
+
+        // See EventManager for all game events
+        public event Action<WeatherCondition> OnWeatherChanged;
+
+        #endregion // Weather Events
+
+        #region Air Operations Box Events
+
+        // See EventManager for all game events
+        public event Action<Position2D> OnAOBPlacedOnHex;   // drag-drop placement onto a hex (§24.7a.1)
+        public event Action OnAOBCommitDone;                // a side signals "done" committing aircraft (§11.4.6)
+        public event Action OnAOBResolveRequested;          // Resolve pressed (§11.4.6)
+        public event Action OnAOBRemoveRequested;           // the single Remove button (§24.7a.1)
+        public event Action<AOBStatus> OnAOBStateChanged;   // live status snapshot for the AOB Status Panel (§24.7a.7)
+
+        #endregion // Air Operations Box Events
 
         #region Dialog Events
 
@@ -409,6 +452,130 @@ namespace HammerAndSickle.Controllers
 
         #endregion // Movement Event Raising Methods
 
+        #region Battle Flow / HUD Event Raising Methods
+
+        public void RaiseEndTurnRequested()
+        {
+            try { OnEndTurnRequested?.Invoke(); }
+            catch (Exception e) { AppService.HandleException(CLASS_NAME, nameof(RaiseEndTurnRequested), e); }
+        }
+
+        public void RaiseRequisitionPanelRequested()
+        {
+            try { OnRequisitionPanelRequested?.Invoke(); }
+            catch (Exception e) { AppService.HandleException(CLASS_NAME, nameof(RaiseRequisitionPanelRequested), e); }
+        }
+
+        public void RaiseDailyLossesRequested()
+        {
+            try { OnDailyLossesRequested?.Invoke(); }
+            catch (Exception e) { AppService.HandleException(CLASS_NAME, nameof(RaiseDailyLossesRequested), e); }
+        }
+
+        public void RaiseTotalLossesRequested()
+        {
+            try { OnTotalLossesRequested?.Invoke(); }
+            catch (Exception e) { AppService.HandleException(CLASS_NAME, nameof(RaiseTotalLossesRequested), e); }
+        }
+
+        public void RaiseSupplyOverlayToggled(bool visible)
+        {
+            try { OnSupplyOverlayToggled?.Invoke(visible); }
+            catch (Exception e) { AppService.HandleException(CLASS_NAME, nameof(RaiseSupplyOverlayToggled), e); }
+        }
+
+        #endregion // Battle Flow / HUD Event Raising Methods
+
+        #region Unit Action Event Raising Methods
+
+        public void RaiseCombatActionRequested(CombatUnit unit)
+        {
+            try { OnCombatActionRequested?.Invoke(unit); }
+            catch (Exception e) { AppService.HandleException(CLASS_NAME, nameof(RaiseCombatActionRequested), e); }
+        }
+
+        public void RaiseDeployUpRequested(CombatUnit unit)
+        {
+            try { OnDeployUpRequested?.Invoke(unit); }
+            catch (Exception e) { AppService.HandleException(CLASS_NAME, nameof(RaiseDeployUpRequested), e); }
+        }
+
+        public void RaiseDeployDownRequested(CombatUnit unit)
+        {
+            try { OnDeployDownRequested?.Invoke(unit); }
+            catch (Exception e) { AppService.HandleException(CLASS_NAME, nameof(RaiseDeployDownRequested), e); }
+        }
+
+        public void RaiseIntelActionRequested(CombatUnit unit)
+        {
+            try { OnIntelActionRequested?.Invoke(unit); }
+            catch (Exception e) { AppService.HandleException(CLASS_NAME, nameof(RaiseIntelActionRequested), e); }
+        }
+
+        public void RaiseResupplyRequested(CombatUnit unit, bool includeReplacements)
+        {
+            try { OnResupplyRequested?.Invoke(unit, includeReplacements); }
+            catch (Exception e) { AppService.HandleException(CLASS_NAME, nameof(RaiseResupplyRequested), e); }
+        }
+
+        public void RaiseUpgradeEquipmentRequested(CombatUnit unit)
+        {
+            try { OnUpgradeEquipmentRequested?.Invoke(unit); }
+            catch (Exception e) { AppService.HandleException(CLASS_NAME, nameof(RaiseUpgradeEquipmentRequested), e); }
+        }
+
+        public void RaiseReplaceLossesRequested(CombatUnit unit)
+        {
+            try { OnReplaceLossesRequested?.Invoke(unit); }
+            catch (Exception e) { AppService.HandleException(CLASS_NAME, nameof(RaiseReplaceLossesRequested), e); }
+        }
+
+        #endregion // Unit Action Event Raising Methods
+
+        #region Weather Event Raising Methods
+
+        public void RaiseWeatherChanged(WeatherCondition weather)
+        {
+            try { OnWeatherChanged?.Invoke(weather); }
+            catch (Exception e) { AppService.HandleException(CLASS_NAME, nameof(RaiseWeatherChanged), e); }
+        }
+
+        #endregion // Weather Event Raising Methods
+
+        #region Air Operations Box Event Raising Methods
+
+        public void RaiseAOBPlacedOnHex(Position2D hex)
+        {
+            try { OnAOBPlacedOnHex?.Invoke(hex); }
+            catch (Exception e) { AppService.HandleException(CLASS_NAME, nameof(RaiseAOBPlacedOnHex), e); }
+        }
+
+        public void RaiseAOBCommitDone()
+        {
+            try { OnAOBCommitDone?.Invoke(); }
+            catch (Exception e) { AppService.HandleException(CLASS_NAME, nameof(RaiseAOBCommitDone), e); }
+        }
+
+        public void RaiseAOBResolveRequested()
+        {
+            try { OnAOBResolveRequested?.Invoke(); }
+            catch (Exception e) { AppService.HandleException(CLASS_NAME, nameof(RaiseAOBResolveRequested), e); }
+        }
+
+        public void RaiseAOBRemoveRequested()
+        {
+            try { OnAOBRemoveRequested?.Invoke(); }
+            catch (Exception e) { AppService.HandleException(CLASS_NAME, nameof(RaiseAOBRemoveRequested), e); }
+        }
+
+        public void RaiseAOBStateChanged(AOBStatus status)
+        {
+            try { OnAOBStateChanged?.Invoke(status); }
+            catch (Exception e) { AppService.HandleException(CLASS_NAME, nameof(RaiseAOBStateChanged), e); }
+        }
+
+        #endregion // Air Operations Box Event Raising Methods
+
         #region Dialog Event Raising Methods
 
         /// <summary>
@@ -490,6 +657,32 @@ namespace HammerAndSickle.Controllers
 
             // Air auto-return events
             OnAirUnitReturning = null;
+
+            // Battle flow / HUD events
+            OnEndTurnRequested = null;
+            OnRequisitionPanelRequested = null;
+            OnDailyLossesRequested = null;
+            OnTotalLossesRequested = null;
+            OnSupplyOverlayToggled = null;
+
+            // Unit action events
+            OnCombatActionRequested = null;
+            OnDeployUpRequested = null;
+            OnDeployDownRequested = null;
+            OnIntelActionRequested = null;
+            OnResupplyRequested = null;
+            OnUpgradeEquipmentRequested = null;
+            OnReplaceLossesRequested = null;
+
+            // Weather events
+            OnWeatherChanged = null;
+
+            // Air Operations Box events
+            OnAOBPlacedOnHex = null;
+            OnAOBCommitDone = null;
+            OnAOBResolveRequested = null;
+            OnAOBRemoveRequested = null;
+            OnAOBStateChanged = null;
 
             // Dialog events
             OnScene0DialogRequested = null;
