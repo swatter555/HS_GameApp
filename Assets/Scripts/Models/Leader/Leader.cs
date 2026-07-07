@@ -442,8 +442,8 @@ namespace HammerAndSickle.Models
             {
                 if (amount <= 0) return;
 
-                ReputationPoints += amount;
                 skillTree.AddReputation(amount);
+                SyncFromSkillTree();
             }
             catch (Exception e)
             {
@@ -470,6 +470,7 @@ namespace HammerAndSickle.Models
                     GameData.ReputationAction.AirborneJump => GameData.REP_PER_AIRBORNE_JUMP,
                     GameData.ReputationAction.ForcedRetreat => GameData.REP_PER_FORCED_RETREAT,
                     GameData.ReputationAction.UnitDestroyed => GameData.REP_PER_UNIT_DESTROYED,
+                    GameData.ReputationAction.SupplyDelivered => GameData.REP_PER_SUPPLY_DELIVERED,
                     _ => 0
                 };
 
@@ -521,13 +522,27 @@ namespace HammerAndSickle.Models
         {
             try
             {
-                return skillTree?.UnlockSkill(skillEnum) ?? false;
+                bool unlocked = skillTree?.UnlockSkill(skillEnum) ?? false;
+                if (unlocked) SyncFromSkillTree();
+                return unlocked;
             }
             catch (Exception e)
             {
                 AppService.HandleException(CLASS_NAME, "UnlockSkill", e);
                 return false;
             }
+        }
+
+        /// <summary>
+        /// Mirrors the skill tree's authoritative state onto the Leader-side copies after any spend/refund/
+        /// promotion. The tree is the source of truth for ReputationPoints and CurrentGrade; without this sync
+        /// the Leader-side values drift (rank strings and UI REP were showing stale values — fixed 2026-07-03).
+        /// </summary>
+        private void SyncFromSkillTree()
+        {
+            if (skillTree == null) return;
+            ReputationPoints = skillTree.ReputationPoints;
+            CommandGrade = skillTree.CurrentGrade;
         }
 
         /// <summary>
@@ -603,6 +618,52 @@ namespace HammerAndSickle.Models
         }
 
         /// <summary>
+        /// Effective command for combat purposes (§14.4.2, ratified 2026-07-03): innate CommandAbility plus the
+        /// Leadership training tiers (CommandTier1/2/3, +1 each), capped at the Genius value (3) — training
+        /// closes the talent gap, it never exceeds it. Consumed by command shock (7.9.4a) and Command
+        /// Mitigation (7.7.12).
+        /// </summary>
+        [JsonIgnore]
+        public int EffectiveCommand
+        {
+            get
+            {
+                try
+                {
+                    int tiers = (int)(CommandTier1Bonus + CommandTier2Bonus + CommandTier3Bonus);
+                    return Math.Min((int)CombatCommand + tiers, (int)CommandAbility.Genius);
+                }
+                catch (Exception e)
+                {
+                    AppService.HandleException(CLASS_NAME, "EffectiveCommand", e);
+                    return (int)CombatCommand;
+                }
+            }
+        }
+
+        /// <summary>
+        /// Defender skill-tier Stand Value contribution (§14.13, Leader_mod term in the 7.9.1 stand check):
+        /// +1 per distinct unlocked tier across the seven Doctrine branches + Combined Arms, clamped to
+        /// GameData.LEADER_STAND_MOD_CAP (+3). Consumed by CombatResolver when this leader's unit defends.
+        /// </summary>
+        [JsonIgnore]
+        public int StandValueContribution
+        {
+            get
+            {
+                try
+                {
+                    return skillTree?.GetStandValueContribution() ?? 0;
+                }
+                catch (Exception e)
+                {
+                    AppService.HandleException(CLASS_NAME, "StandValueContribution", e);
+                    return 0;
+                }
+            }
+        }
+
+        /// <summary>
         /// Reset all skills except leadership (respec functionality)
         /// </summary>
         /// <returns>True if any skills were reset</returns>
@@ -610,7 +671,9 @@ namespace HammerAndSickle.Models
         {
             try
             {
-                return skillTree?.ResetAllSkillsExceptLeadership() ?? false;
+                bool reset = skillTree?.ResetAllSkillsExceptLeadership() ?? false;
+                if (reset) SyncFromSkillTree();
+                return reset;
             }
             catch (Exception e)
             {
@@ -636,6 +699,7 @@ namespace HammerAndSickle.Models
         [JsonIgnore] public bool HasNVG => HasCapability(SkillBonusType.NVG);
         [JsonIgnore] public float ReplacementXPBonus => GetBonusValue(SkillBonusType.ReplacementXP);
         [JsonIgnore] public float PrestigeCostModifier => GetBonusValue(SkillBonusType.PrestigeCost);
+        [JsonIgnore] public float ReplacementCostModifier => GetBonusValue(SkillBonusType.ReplacementCost); // ×0.7 replacements prestige (15.4a.4a/18.4)
 
         // Armored Doctrine
         [JsonIgnore] public float HardAttackBonus => GetBonusValue(SkillBonusType.HardAttack);
@@ -669,7 +733,7 @@ namespace HammerAndSickle.Models
 
         // Intelligence Doctrine
         [JsonIgnore] public float IntelActionBonus => GetBonusValue(SkillBonusType.ImprovedGathering);
-        [JsonIgnore] public float SilhouetteReduction => GetBonusValue(SkillBonusType.UndergroundBunker);
+        [JsonIgnore] public bool HasUndergroundBunker => GetBonusValue(SkillBonusType.UndergroundBunker) > 0f; // §14.8.7 — enemy intel capped at SpottedLevel 3
         [JsonIgnore] public bool HasSpaceAssets => HasCapability(SkillBonusType.SpaceAssets);
 
         // Combined Arms Specialization (SpottingRangeBonus also aggregates Signal Intel contributions)

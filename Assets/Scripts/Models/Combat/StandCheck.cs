@@ -20,13 +20,12 @@ namespace HammerAndSickle.Models.Combat
         /// <summary>Defender's experience → §7.9.4 mod (Raw −2 … Elite +3).</summary>
         public ExperienceLevel Experience;
 
-        /// <summary>Defender's skill-tier Leader_mod (§14.13), already counted and capped at +3. 0 if unled.</summary>
+        /// <summary>Defender's skill-tier Leader_mod (§14.13), already counted and capped at +3 — the ONLY
+        /// defensive leader SV term (the DefenderCommand term is retired, §7.9.4b tombstone 2026-07-03).
+        /// 0 if unled.</summary>
         public int LeaderMod;
 
-        /// <summary>Defender's CommandAbility value 0..3 (§7.9.4b), added. 0 if unled.</summary>
-        public int DefenderCommand;
-
-        /// <summary>Attacker's CommandAbility value 0..3 (§7.9.4a), subtracted. 0 if attacker unled.</summary>
+        /// <summary>Attacker's EffectiveCommand value 0..3 (§7.9.4a), subtracted. 0 if attacker unled.</summary>
         public int AttackerCommand;
 
         /// <summary>True if the resolving attack came through the defender's flank arc (§7.9.4c) — subtracts FLANK_SV_PENALTY.</summary>
@@ -100,8 +99,8 @@ namespace HammerAndSickle.Models.Combat
         #region Stand Value + resolution (§7.9.1 / §7.9.5)
 
         /// <summary>
-        /// Assembles the defender's Stand Value (§7.9.1):
-        ///   SV = STAND_BASE + Deployment + Terrain + Experience + LeaderMod + DefenderCommand
+        /// Assembles the defender's Stand Value (§7.9.1, amended 2026-07-03 — DefenderCommand retired):
+        ///   SV = STAND_BASE + Deployment + Terrain + Experience + LeaderMod
         ///        − AttackerCommand − (FlankAttack ? FLANK_SV_PENALTY : 0) − Shock(HpDealtThisAttack).
         /// SV is not clamped — a hammered/exposed unit can go below 0 (shatter reachable); a dug-in veteran
         /// can sit high enough that every 1d10 holds.
@@ -115,7 +114,6 @@ namespace HammerAndSickle.Models.Combat
                        + TerrainStandMod(input.Terrain)
                        + ExperienceStandMod(input.Experience)
                        + input.LeaderMod
-                       + input.DefenderCommand
                        - input.AttackerCommand
                        - (input.FlankAttack ? GameData.FLANK_SV_PENALTY : 0)
                        - Shock(input.HpDealtThisAttack);

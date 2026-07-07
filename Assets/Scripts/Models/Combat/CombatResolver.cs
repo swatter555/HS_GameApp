@@ -7,8 +7,9 @@ namespace HammerAndSickle.Models.Combat
 {
     /// <summary>
     /// Context the map/turn layer supplies for a direct attack — the bits the engine can't read off the units
-    /// themselves (the defender's hex terrain, whether the vector is a flank or a contested river crossing, and
-    /// the defender's leader stand bonus). Defaults are the neutral case (Clear, no flank, no crossing, no leader).
+    /// themselves (the defender's hex terrain, whether the vector is a flank or a contested river crossing).
+    /// Defaults are the neutral case (Clear, no flank, no crossing). The defender's skill-tier Leader_mod
+    /// (§14.13) is read off the defending unit's attached leader by the resolver itself.
     /// </summary>
     public struct DirectAttackContext
     {
@@ -17,10 +18,6 @@ namespace HammerAndSickle.Models.Combat
 
         /// <summary>True if the direct-fire vector crosses a river edge — adds the Contested Crossing Block (§7.5.6.9).</summary>
         public bool ContestedCrossing;
-
-        /// <summary>Defender's skill-tier Leader_mod for the stand check (§14.13), capped +3. Supply 0 until
-        /// Leader.StandValueContribution is implemented (the leader-skill pass).</summary>
-        public int DefenderLeaderStandMod;
     }
 
     /// <summary>
@@ -53,13 +50,13 @@ namespace HammerAndSickle.Models.Combat
 
     /// <summary>
     /// Context for an indirect attack: the terrain of both hexes (the target hex blocks the forward shot; the
-    /// firer hex blocks any counter-battery return) and the target's leader stand bonus.
+    /// firer hex blocks any counter-battery return). The target's skill-tier Leader_mod (§14.13) is read off
+    /// the target unit's attached leader by the resolver itself.
     /// </summary>
     public struct IndirectAttackContext
     {
         public TerrainType TargetTerrain;
         public TerrainType FirerTerrain;
-        public int TargetLeaderStandMod;
     }
 
     /// <summary>
@@ -228,6 +225,7 @@ namespace HammerAndSickle.Models.Combat
                 ContestedCrossing = ctx.ContestedCrossing,
                 BandShift = defenderEmbarked ? 1 : 0,
                 PostStackScalar = postScalar,
+                FirerCommand = CommandValue(attacker),           // Command Mitigation §7.7.12
             };
         }
 
@@ -249,6 +247,7 @@ namespace HammerAndSickle.Models.Combat
                 AttackType = AttackType.Direct,
                 FirerIsAir = defender.IsFixedWingAirUnit,
                 BypassTerrainBlock = true,
+                FirerCommand = CommandValue(defender),           // §7.7.12 — defense's command payoff is the counterpunch
             };
         }
 
@@ -260,18 +259,29 @@ namespace HammerAndSickle.Models.Combat
                 Deployment = defender.DeploymentPosition,
                 Terrain = ctx.DefenderTerrain,
                 Experience = defender.ExperienceLevel,
-                LeaderMod = ctx.DefenderLeaderStandMod,
-                DefenderCommand = CommandValue(defender),
+                LeaderMod = LeaderStandMod(defender),
                 AttackerCommand = CommandValue(attacker),
                 FlankAttack = flank,
             };
         }
 
-        /// <summary>The unit's leader CommandAbility as an SV term value 0..3 (§7.9.4a/b); 0 if unled.</summary>
+        /// <summary>
+        /// The unit's leader EffectiveCommand (§14.4.2: min(CombatCommand + CommandTiers, 3)) — feeds the
+        /// attacker command shock (§7.9.4a) and Command Mitigation (§7.7.12). 0 if unled; 0 for facilities
+        /// (command is combat-inert on a base, §7.7.12.2 / §35.4.3).
+        /// </summary>
         private static int CommandValue(CombatUnit unit)
         {
+            if (unit.IsBase) return 0;
             var leader = unit.GetAssignedLeader();
-            return leader != null ? (int)leader.CombatCommand : 0;
+            return leader?.EffectiveCommand ?? 0;
+        }
+
+        /// <summary>The defending unit's skill-tier Leader_mod (§14.13) — capped +3 by the property; 0 if unled.</summary>
+        private static int LeaderStandMod(CombatUnit unit)
+        {
+            var leader = unit.GetAssignedLeader();
+            return leader?.StandValueContribution ?? 0;
         }
 
         /// <summary>
@@ -306,6 +316,11 @@ namespace HammerAndSickle.Models.Combat
 
                 LaneInput lane = BuildAmbushLane(ambusher, mover);
                 int dmg = CombatEngine.ResolveLane(lane, rng);
+
+                // Night Combat Operations — defensive half (§14.9.1): an NCO-led victim is immune to ambush
+                // DAMAGE (the attack resolves, deals 0); the caller still ends the mover's turn per §6.9.6.
+                if (HasNightCombatOps(mover)) dmg = 0;
+
                 mover.TakeDamage(dmg);
 
                 StandValueInput stand = BuildAmbushStand(ambusher, mover, ctx, dmg);
@@ -350,8 +365,30 @@ namespace HammerAndSickle.Models.Combat
                 FirerIsAir = ambusher.IsFixedWingAirUnit,
                 BypassTerrainBlock = true,
                 BandShift = moverEmbarked ? 1 : 0,
-                PostStackScalar = GameData.AMBUSH_BONUS_MULT * (moverEmbarked ? 2.0f : 1.0f),
+                PostStackScalar = AmbushScalar(ambusher) * (moverEmbarked ? 2.0f : 1.0f),
+                FirerCommand = CommandValue(ambusher),           // Command Mitigation §7.7.12
             };
+        }
+
+        /// <summary>
+        /// The §6.9.4 ambush scalar ladder (ratified 2026-07-03): base 1.5 → Ambush Tactics 1.75 → Night Combat
+        /// Operations 2.0. REPLACE, never compound; the two capstones can never coexist (Specializations are
+        /// mutually exclusive, §14.6.1).
+        /// </summary>
+        private static float AmbushScalar(CombatUnit ambusher)
+        {
+            var leader = ambusher.GetAssignedLeader();
+            if (leader == null) return GameData.AMBUSH_BONUS_MULT;
+            if (leader.NightCombatModifier > 0f) return GameData.NIGHT_COMBAT_AMBUSH_MULT;
+            if (leader.HasAmbushTactics) return GameData.AMBUSH_TACTICS_MULT;
+            return GameData.AMBUSH_BONUS_MULT;
+        }
+
+        /// <summary>Night Combat Operations (Combined Arms T5, §14.9.1) — the ambush-immunity flag.</summary>
+        private static bool HasNightCombatOps(CombatUnit unit)
+        {
+            var leader = unit.GetAssignedLeader();
+            return leader != null && leader.NightCombatModifier > 0f;
         }
 
         /// <summary>The mover's stand input for an ambush — flank is never checked (§7.5.5.9); the ambusher's command still bites (§7.9.4a).</summary>
@@ -362,8 +399,7 @@ namespace HammerAndSickle.Models.Combat
                 Deployment = mover.DeploymentPosition,
                 Terrain = ctx.DefenderTerrain,
                 Experience = mover.ExperienceLevel,
-                LeaderMod = ctx.DefenderLeaderStandMod,
-                DefenderCommand = CommandValue(mover),
+                LeaderMod = LeaderStandMod(mover),
                 AttackerCommand = CommandValue(ambusher),
                 FlankAttack = false,
                 HpDealtThisAttack = dmg,
@@ -439,6 +475,7 @@ namespace HammerAndSickle.Models.Combat
                 AttackType = AttackType.Indirect,
                 TargetTerrain = ctx.TargetTerrain,
                 BypassTerrainBlock = firer.Classification == UnitClassification.BM,
+                FirerCommand = CommandValue(firer),              // Command Mitigation §7.7.12
             };
         }
 
@@ -460,6 +497,7 @@ namespace HammerAndSickle.Models.Combat
                 AttackType = AttackType.Indirect,
                 TargetTerrain = ctx.FirerTerrain,
                 BypassTerrainBlock = target.Classification == UnitClassification.BM,
+                FirerCommand = CommandValue(target),             // Command Mitigation §7.7.12
             };
         }
 
@@ -471,8 +509,7 @@ namespace HammerAndSickle.Models.Combat
                 Deployment = target.DeploymentPosition,
                 Terrain = ctx.TargetTerrain,
                 Experience = target.ExperienceLevel,
-                LeaderMod = ctx.TargetLeaderStandMod,
-                DefenderCommand = CommandValue(target),
+                LeaderMod = LeaderStandMod(target),
                 AttackerCommand = CommandValue(firer),
                 FlankAttack = false,
                 HpDealtThisAttack = dmg,

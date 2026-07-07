@@ -430,10 +430,11 @@ namespace HammerAndSickle.Core.GameData
 
         // PoliticallyConnectedFoundation
         EmergencyResupply,    // Boolean, one free emergency resupply per scenario.
-        SupplyConsumption,    // Supplies are consumed at reduced rate.
+        SupplyConsumption,    // RETIRED 2026-07-03 (stale currency post-§7.15) — kept for enum stability, no skill grants it.
         NVG,                  // Boolean, upgrade unit to latest gen NVG.
-        ReplacementXP,        // Unit gets better replacements (X bonus levels).
-        PrestigeCost,         // Unit is cheaper to upgrade (X% discount).
+        ReplacementXP,        // 1-tier offset vs the §18.4.3 replacement downgrade.
+        PrestigeCost,         // Upgrades are cheaper (×0.7, Connections At The Top — scoped to 18.5).
+        ReplacementCost,      // Replacements are cheaper (×0.7, Direct Line To HQ — scoped to 15.4a.4a/18.4; ratified 2026-07-03).
 
         // ArmoredDoctine
         HardAttack,           // Bonus to HardAttack
@@ -1700,13 +1701,14 @@ namespace HammerAndSickle.Core.GameData
         public const int COMBAT_ACTION_BONUS_VAL = 1;
         public const int OPPORTUNITY_ACTION_BONUS_VAL = 1;
 
-        // Combat rating bonuses.
-        public const int HARD_ATTACK_BONUS_VAL = 5;
-        public const int HARD_DEFENSE_BONUS_VAL = 5;
-        public const int SOFT_ATTACK_BONUS_VAL = 5;
-        public const int SOFT_DEFENSE_BONUS_VAL = 5;
-        public const int AIR_ATTACK_BONUS_VAL = 5;
-        public const int AIR_DEFENSE_BONUS_VAL = 5;
+        // Combat rating bonuses — Δ-side stat deltas applied at combat lane build,
+        // NOT ICM multipliers (§14.10.4; retuned 5→2 for the direct-HP band ladder, ratified 2026-07-03).
+        public const int HARD_ATTACK_BONUS_VAL = 2;
+        public const int HARD_DEFENSE_BONUS_VAL = 2;
+        public const int SOFT_ATTACK_BONUS_VAL = 2;
+        public const int SOFT_DEFENSE_BONUS_VAL = 2;
+        public const int AIR_ATTACK_BONUS_VAL = 2;
+        public const int AIR_DEFENSE_BONUS_VAL = 2;
 
         // Bonus value validation bounds
         public const int MIN_COMBAT_BONUS = 1;
@@ -1720,10 +1722,10 @@ namespace HammerAndSickle.Core.GameData
         public const int LARGE_SPOTTING_RANGE_BONUS_VAL = 3;
         public const int INDIRECT_RANGE_BONUS_VAL = 1;
 
-        // Silouette bonuses.
-        public const int SMALL_SILHOUETTE_REDUCTION_VAL = 1;
-        public const int MEDIUM_SILHOUETTE_REDUCTION_VAL = 2;
-        public const int MAX_SILHOUETTE_REDUCTION_VAL = 3;
+        // Superior Camouflage (§14.9.4): enemy spotting range is treated as this many hexes shorter
+        // against the leader-attached unit (applied at the §12.3.10 range comparison).
+        // The silhouette mechanic and its *_SILHOUETTE_REDUCTION_VAL consts are REMOVED (§21.6 tombstone).
+        public const int ENEMY_SPOTTING_REDUCTION_VAL = 1;
 
         // General multiplier bounds (for any positive effect)
         public const float MIN_MULTIPLIER = 0.01f;    // 1% of original value (extreme reduction)
@@ -1765,7 +1767,7 @@ namespace HammerAndSickle.Core.GameData
         public const float RTO_MOVE_MULT = 0.8f;           // 20% movement cost reduction for RTOs.
 
         // Politically connected bonuses and multipliers.
-        public const int REPLACEMENT_XP_LEVEL_VAL = 1;    // Replacements get +1 XP level.
+        public const int REPLACEMENT_XP_LEVEL_VAL = 1;    // 1 experience TIER offset vs the §18.4.3 replacement downgrade (never a raise; ratified 2026-07-03).
         public const float SUPPLY_ECONOMY_MULT = 0.8f; // Supply consumption gets 20% cost reduction.
         public const float PRESTIGE_COST_MULT = 0.7f; // Unit upgrades get 30% price reduction.
 
@@ -1776,10 +1778,15 @@ namespace HammerAndSickle.Core.GameData
         // Special forces bonuses
         public const float TMASTERY_MOVE_MULT = 0.8f; // X% movement cost reduction in non-clear terrain.
         public const float INFILTRATION_MULT = 0.5f; // X% ZOC penalty reduction
-        public const float AMBUSH_BONUS_MULT = 1.5f; // X% combat bonus
+        public const float AMBUSH_BONUS_MULT = 1.5f; // Universal ambush scalar (§6.9.4) — every ambusher gets this.
+        public const float AMBUSH_TACTICS_MULT = 1.75f; // Ambush Tactics T5 REPLACES the base scalar (ladder 1.5/1.75/2.0, §6.9.4).
 
         // Combined arms bonus.
-        public const float NIGHT_COMBAT_MULT = 1.25f;// X% combat bonus at night
+        public const float NIGHT_COMBAT_MULT = 1.25f;// retained-but-unapplied (repurposed skill, §14.9.1)
+        public const float NIGHT_COMBAT_AMBUSH_MULT = 2.0f; // NCO T5 REPLACES the ambush scalar (§6.9.4 ladder top).
+
+        // Politically Connected: Direct Line To HQ — −30% prestige on replacements (15.4a.4a + 18.4), ratified 2026-07-03.
+        public const float REPLACEMENT_COST_MULT = 0.7f;
 
         /// <summary>
         /// Types of actions that can award reputation to leaders
@@ -1792,7 +1799,8 @@ namespace HammerAndSickle.Core.GameData
             Combat,
             AirborneJump,
             ForcedRetreat,
-            UnitDestroyed
+            UnitDestroyed,
+            SupplyDelivered   // depot-attached leader services a Supply / Supply-and-Replacements call (§14.5.7a)
         }
 
         // Base REP gain per action type
@@ -1803,6 +1811,7 @@ namespace HammerAndSickle.Core.GameData
         public const int REP_PER_AIRBORNE_JUMP = 3;            // Paratrooper insertion (high risk)
         public const int REP_PER_FORCED_RETREAT = 5;           // Causing enemy to retreat (tactical success)
         public const int REP_PER_UNIT_DESTROYED = 8;           // Destroying enemy unit (major victory)
+        public const int REP_PER_SUPPLY_DELIVERED = 1;         // Depot leader services a supply call (§14.5.7a)
 
         // REP action validation bounds
         public const int MIN_REP_PER_ACTION = 1;

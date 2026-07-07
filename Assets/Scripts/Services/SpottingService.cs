@@ -286,22 +286,30 @@ namespace HammerAndSickle.Services
         /// AM/MAM air-assault lift in EmbarkedHelo state), its GROUND range otherwise. Classification-driven
         /// and decoupled from the profile SpottingRange (which is UI-only now). Attack helos fly NOE and are
         /// ground targets; air-defence platforms' long ranges are air-search only (a SAM reveals ground at 2).
+        /// Superior Camouflage (§14.9.4) shortens the range against a led target — applied here, at the
+        /// §12.3.10 comparison, so it affects the sweep, per-hex checks, and decay uniformly.
         /// </summary>
-        private static int SpottingRangeAgainst(CombatUnit spotter, CombatUnit target) =>
-            target.IsAirborneSpottingTarget
+        private static int SpottingRangeAgainst(CombatUnit spotter, CombatUnit target)
+        {
+            int range = target.IsAirborneSpottingTarget
                 ? spotter.ActiveAirSpottingRange
                 : spotter.ActiveGroundSpottingRange;
+
+            return Math.Max(0, range - target.EnemySpottingRangeReduction);
+        }
 
         private static void IncrementSpottedLevel(CombatUnit unit)
         {
             if (unit.SpottedLevel >= SpottedLevel.Level4) return;
 
             var oldLevel = unit.SpottedLevel;
-            var newLevel = oldLevel + 1;
-            unit.SetSpottedLevel(newLevel);
+            unit.SetSpottedLevel(oldLevel + 1);
+
+            // SetSpottedLevel may clamp (Underground Bunker Level-3 cap, §14.8.7) — report the actual level.
+            if (unit.SpottedLevel == oldLevel) return;
 
             if (EventManager.Instance != null)
-                EventManager.Instance.RaiseUnitSpottedLevelChanged(unit, oldLevel, newLevel);
+                EventManager.Instance.RaiseUnitSpottedLevelChanged(unit, oldLevel, unit.SpottedLevel);
         }
 
         #endregion // Private Helpers

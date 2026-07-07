@@ -537,6 +537,15 @@ namespace HammerAndSickle.Controllers
                 EventManager.Instance.RaiseUnitActionsChanged(CurrentUnit);
             }
 
+            // Leader reputation for the move order (§14.5.1, wired 2026-07-03) — one award per completed
+            // move order (not per hex); Veteran/Elite units earn ×1.5 (§14.5.10).
+            if (enteredHexes.Count > 0)
+            {
+                var moveLeader = CurrentUnit.GetAssignedLeader();
+                moveLeader?.AwardReputationForAction(GameData.ReputationAction.Move,
+                    CurrentUnit.ExperienceLevel >= ExperienceLevel.Veteran ? GameData.REP_EXPERIENCE_MULTIPLIER : 1.0f);
+            }
+
             GameDataManager.Instance.BuildOccupancyCache();
 
             // Return to UnitSelected if unit still has actions, otherwise Idle

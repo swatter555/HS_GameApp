@@ -78,7 +78,7 @@ namespace HammerAndSickle.Models.Combat
                 {
                     DefenderTerrain = TerrainAt(map, defender.MapPos),
                     ContestedCrossing = contestedCrossing,
-                    DefenderLeaderStandMod = 0, // §14.13 Leader.StandValueContribution lands in the M14 leader pass
+                    // §14.13 Leader_mod is read off the defender's leader inside the resolver.
                 };
 
                 // (1) Engagement — applies HP to both units, returns the defender's stand outcome (§7.7.3).
@@ -137,6 +137,9 @@ namespace HammerAndSickle.Models.Combat
                 ApplyCombatDegradation(attacker, alive: !outcome.AttackerDestroyed, rng);
                 ApplyCombatDegradation(defender, alive: !outcome.DefenderRemovedFromMap, rng);
 
+                // (5) Leader reputation (§14.5) — attacker's leader earns for the action and its results.
+                AwardAttackerReputation(attacker, defender, outcome);
+
                 return outcome;
             }
             catch (Exception e)
@@ -173,6 +176,42 @@ namespace HammerAndSickle.Models.Combat
                 return "Attacker has no combat action available.";
 
             return null;
+        }
+
+        /// <summary>
+        /// Awards the attacker's leader reputation for this attack (§14.5, wired 2026-07-03 — the earn side
+        /// of the REP economy). Combat (3) always; ForcedRetreat (5) when the defender was displaced or quit
+        /// the field; UnitDestroyed (8, ×2 for an Elite kill) on a permanent destruction. Veteran/Elite
+        /// attacker units earn ×1.5 on every award (§14.5.10). No-op if the attacker is unled or dead.
+        /// </summary>
+        private static void AwardAttackerReputation(CombatUnit attacker, CombatUnit defender, in GroundCombatOutcome outcome)
+        {
+            try
+            {
+                if (outcome.AttackerDestroyed) return;
+                var leader = attacker.GetAssignedLeader();
+                if (leader == null) return;
+
+                float unitMult = attacker.ExperienceLevel >= ExperienceLevel.Veteran
+                    ? GameData.REP_EXPERIENCE_MULTIPLIER : 1.0f;
+
+                leader.AwardReputationForAction(GameData.ReputationAction.Combat, unitMult);
+
+                if (outcome.DefenderDestroyed)
+                {
+                    float killMult = defender.ExperienceLevel == ExperienceLevel.Elite
+                        ? unitMult * GameData.REP_ELITE_DIFFICULTY_BONUS : unitMult;
+                    leader.AwardReputationForAction(GameData.ReputationAction.UnitDestroyed, killMult);
+                }
+                else if (outcome.DefenderMoved || outcome.DefenderRemovedFromMap)
+                {
+                    leader.AwardReputationForAction(GameData.ReputationAction.ForcedRetreat, unitMult);
+                }
+            }
+            catch (Exception e)
+            {
+                AppService.HandleException(CLASS_NAME, nameof(AwardAttackerReputation), e);
+            }
         }
 
         /// <summary>Rolls combat Efficiency (§7.15.3) then Supply (§7.15.5) loss for a unit still in play.</summary>

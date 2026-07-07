@@ -91,14 +91,13 @@ namespace HammerAndSickle.Tests
                 Deployment = DeploymentPosition.Fortified,   // +3
                 Terrain = TerrainType.Mountains,             // +2
                 Experience = ExperienceLevel.Elite,          // +3
-                LeaderMod = 3,                               // +3 (capped)
-                DefenderCommand = 3,                         // +3 Genius
+                LeaderMod = 3,                               // +3 (capped — the ONLY defensive leader SV term, §7.9.4b tombstone)
                 AttackerCommand = 2,                         // −2 Superior
                 FlankAttack = true,                          // −1
                 HpDealtThisAttack = 8,                       // shock 2
             };
-            // 6 +3 +2 +3 +3 +3 −2 −1 −2 = 15
-            Assert.AreEqual(15, StandCheck.ComputeStandValue(input));
+            // 6 +3 +2 +3 +3 −2 −1 −2 = 12 (max defensive stack is 16 pre-shock since the 7.9.4b retirement)
+            Assert.AreEqual(12, StandCheck.ComputeStandValue(input));
         }
 
         [Test]

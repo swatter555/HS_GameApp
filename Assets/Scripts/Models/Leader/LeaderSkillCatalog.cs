@@ -665,16 +665,17 @@ namespace HammerAndSickle.Models
                 CommandGrade.JuniorGrade
             ));
 
-            // Tier 2: Concealed Operations Base - Underground Bunker capability
+            // Tier 2: Concealed Operations Base — enemy intel on the unit is capped at SpottedLevel 3
+            // (§14.8.7, repurposed 2026-06-11 after the silhouette removal; wired M14 2026-07-03).
             AddSkill(new SkillDefinition(
                 IntelligenceDoctrine.ConcealedOperationsBase_UndergroundBunker,
                 "Concealed Operations Base",
                 GameData.TIER2_REP_COST,
                 SkillBranch.IntelligenceDoctrine,
                 SkillTier.Tier2,
-                "Specialized camouflage and concealment techniques significantly reduce unit visibility on the battlefield.",
+                "Concealed operations security caps enemy intelligence on this unit at Level 3 — it can never be fully compromised.",
                 SkillBonusType.UndergroundBunker,
-                GameData.MEDIUM_SILHOUETTE_REDUCTION_VAL,
+                1.0f, // flag semantics — presence caps enemy SpottedLevel at 3 (CombatUnit.SetSpottedLevel)
                 CommandGrade.SeniorGrade,
                 new List<Enum> { IntelligenceDoctrine.EnhancedIntelligenceCollection_ImprovedGathering }
             ));
@@ -903,16 +904,17 @@ namespace HammerAndSickle.Models
                 new List<Enum> { SpecialForcesSpecialization.TerrainExpert_TerrainMastery }
             ));
 
-            // Tier 4: Superior Camouflage - Concealed Positions capability
+            // Tier 4: Superior Camouflage — enemy spotting range −1 hex vs this unit
+            // (§14.9.4, repurposed 2026-06-11 after the silhouette removal; wired M14 2026-07-03).
             AddSkill(new SkillDefinition(
                 SpecialForcesSpecialization.SuperiorCamouflage_ConcealedPositions,
                 "Superior Camouflage",
                 GameData.TIER4_REP_COST,
                 SkillBranch.SpecialForcesSpecialization,
                 SkillTier.Tier4,
-                "Advanced concealment techniques reduce unit siloette.",
+                "Advanced concealment reduces enemy spotting range against this unit by one hex.",
                 SkillBonusType.ConcealedPositions,
-                GameData.SMALL_SILHOUETTE_REDUCTION_VAL,
+                GameData.ENEMY_SPOTTING_REDUCTION_VAL,
                 CommandGrade.TopGrade,
                 new List<Enum> { SpecialForcesSpecialization.InfiltrationTactics_InfiltrationMovement }
             ));
@@ -956,9 +958,9 @@ namespace HammerAndSickle.Models
                 GameData.TIER2_REP_COST,
                 SkillBranch.PoliticallyConnectedFoundation,
                 SkillTier.Tier2,
-                $"Priority supply allocation reduces consumption by {(1.0f - GameData.SUPPLY_ECONOMY_MULT) * 100}%.",
-                SkillBonusType.SupplyConsumption,
-                GameData.SUPPLY_ECONOMY_MULT,
+                $"A direct line to headquarters cuts the prestige cost of replacements by {(1.0f - GameData.REPLACEMENT_COST_MULT) * 100}%.",
+                SkillBonusType.ReplacementCost,
+                GameData.REPLACEMENT_COST_MULT,
                 CommandGrade.JuniorGrade,
                 new List<Enum> { PoliticallyConnectedFoundation.EmergencyAirDrop_EmergencyResupply }
             ));
@@ -983,7 +985,7 @@ namespace HammerAndSickle.Models
                 GameData.TIER3_REP_COST,
                 SkillBranch.PoliticallyConnectedFoundation,
                 SkillTier.Tier3,
-                $"Political influence ensures better trained replacements, increasing experience gain by {GameData.REPLACEMENT_XP_LEVEL_VAL * 100}%.",
+                "Political influence ensures better-trained replacements: the unit does not lose an experience level when taking major replacements.",
                 SkillBonusType.ReplacementXP,
                 GameData.REPLACEMENT_XP_LEVEL_VAL,
                 CommandGrade.SeniorGrade,

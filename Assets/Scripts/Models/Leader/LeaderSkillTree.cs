@@ -557,16 +557,18 @@ namespace HammerAndSickle.Models
             if (branch.IsFoundation())
                 return true;
 
-            // For doctrine branches, check if any other doctrine has been started
+            // For doctrine branches, check if any OTHER doctrine has been started — the branch itself
+            // being started must not block its own deeper tiers (fixed 2026-07-03; the missing
+            // b != branch exclusion made every doctrine/specialization dead-end after its first skill).
             if (branch.IsDoctrine())
             {
-                return !startedBranches.Any(b => b.IsDoctrine());
+                return !startedBranches.Any(b => b.IsDoctrine() && b != branch);
             }
 
-            // For specialization branches, check if any other specialization has been started
+            // For specialization branches, check if any OTHER specialization has been started
             if (branch.IsSpecialization())
             {
-                return !startedBranches.Any(b => b.IsSpecialization());
+                return !startedBranches.Any(b => b.IsSpecialization() && b != branch);
             }
 
             // This should never happen if all branches are properly attributed
@@ -688,9 +690,10 @@ namespace HammerAndSickle.Models
         /// </summary>
         private bool IsMultiplicativeBonus(SkillBonusType bonusType)
         {
-            // These bonus types stack multiplicatively
+            // These bonus types stack multiplicatively (base 1.0)
             return bonusType == SkillBonusType.SupplyConsumption ||
-                   bonusType == SkillBonusType.PrestigeCost;
+                   bonusType == SkillBonusType.PrestigeCost ||
+                   bonusType == SkillBonusType.ReplacementCost;
         }
 
         /// <summary>
@@ -823,6 +826,38 @@ namespace HammerAndSickle.Models
 
             return count;
         }
+
+        /// <summary>
+        /// Defender skill-tier Stand Value contribution (§14.13): +1 per DISTINCT unlocked tier
+        /// across the seven Doctrine branches + Combined Arms, clamped to LEADER_STAND_MOD_CAP (+3).
+        /// Multiple skills in the same (branch, tier) count once (§14.13.3).
+        /// </summary>
+        public int GetStandValueContribution()
+        {
+            var unlockedTiers = new HashSet<(SkillBranch, SkillTier)>();
+
+            ProcessUnlockedSkills(skillDef =>
+            {
+                if (IsStandValueBranch(skillDef.Branch))
+                    unlockedTiers.Add((skillDef.Branch, skillDef.Tier));
+            });
+
+            return Math.Min(unlockedTiers.Count, GameData.LEADER_STAND_MOD_CAP);
+        }
+
+        // §14.13.1 contributing branches; Foundations + the other three Specializations are excluded (§14.13.2).
+        private static bool IsStandValueBranch(SkillBranch branch) => branch switch
+        {
+            SkillBranch.ArmoredDoctrine => true,
+            SkillBranch.InfantryDoctrine => true,
+            SkillBranch.ArtilleryDoctrine => true,
+            SkillBranch.AirDefenseDoctrine => true,
+            SkillBranch.AirborneDoctrine => true,
+            SkillBranch.AirMobileDoctrine => true,
+            SkillBranch.IntelligenceDoctrine => true,
+            SkillBranch.CombinedArmsSpecialization => true,
+            _ => false
+        };
 
         #endregion // Helper Methods
 

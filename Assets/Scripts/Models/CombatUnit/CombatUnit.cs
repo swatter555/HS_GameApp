@@ -372,7 +372,25 @@ namespace HammerAndSickle.Models
             HasFoughtThisTurn = false;
         }
 
-        public void SetSpottedLevel(SpottedLevel spottedLevel) => SpottedLevel = spottedLevel;
+        /// <summary>
+        /// Sets the enemy-side intel level on this unit. If the attached leader has Concealed Operations
+        /// Base (Underground Bunker, §14.8.7), enemy intel is hard-capped at Level 3 — the unit can never
+        /// be spotted to Level 4 / perfect intel, regardless of spotting pressure or opp-fire reveals.
+        /// </summary>
+        public void SetSpottedLevel(SpottedLevel spottedLevel)
+        {
+            if (spottedLevel > SpottedLevel.Level3 && (GetAssignedLeader()?.HasUndergroundBunker ?? false))
+                spottedLevel = SpottedLevel.Level3;
+
+            SpottedLevel = spottedLevel;
+        }
+
+        /// <summary>
+        /// Hexes by which ENEMY spotting range is reduced against this unit (Superior Camouflage, §14.9.4).
+        /// Applied at the §12.3.10 range comparison by SpottingService. 0 if unled.
+        /// </summary>
+        public int EnemySpottingRangeReduction =>
+            GetAssignedLeader() is { } l ? (int)l.ConcealedPositionsReduction : 0;
 
         /// <summary>
         /// Applies damage to the unit, reducing hit points.
@@ -808,35 +826,89 @@ namespace HammerAndSickle.Models
         public TargetClass ActiveTargetClass => GetActiveWeaponProfile()?.TargetClass ?? TargetClass.Soft;
 
         /// <summary>
-        /// Raw attack stat on the axis selected by the lane's target class (§7.4.1 / §7.7.8): Hard → HardAttack,
-        /// Soft → SoftAttack. Builds a lane's firer-attack value (engine step 2).
+        /// Attack stat on the axis selected by the lane's target class (§7.4.1 / §7.7.8): Hard → HardAttack,
+        /// Soft → SoftAttack, plus the attached leader's doctrine Δ-delta (§14.10.4, +2 per §14.8).
+        /// Builds a lane's firer-attack value (engine step 2).
         /// </summary>
         public int GetAttackStatVsClass(TargetClass axisClass)
         {
             var p = GetActiveWeaponProfile();
             if (p == null) return 0;
-            return axisClass == TargetClass.Hard ? p.HardAttack : p.SoftAttack;
+            return axisClass == TargetClass.Hard
+                ? p.HardAttack + LeaderStatDelta(SkillBonusType.HardAttack)
+                : p.SoftAttack + LeaderStatDelta(SkillBonusType.SoftAttack);
         }
 
         /// <summary>
-        /// Raw defense stat on the axis selected by the lane's target class (§7.4.1): Hard → HardDefense,
-        /// Soft → SoftDefense. Builds a lane's target-defense value (engine step 2).
+        /// Defense stat on the axis selected by the lane's target class (§7.4.1): Hard → HardDefense,
+        /// Soft → SoftDefense, plus the attached leader's doctrine Δ-delta (§14.10.4).
+        /// Builds a lane's target-defense value (engine step 2).
         /// </summary>
         public int GetDefenseStatVsClass(TargetClass axisClass)
         {
             var p = GetActiveWeaponProfile();
             if (p == null) return 0;
-            return axisClass == TargetClass.Hard ? p.HardDefense : p.SoftDefense;
+            return axisClass == TargetClass.Hard
+                ? p.HardDefense + LeaderStatDelta(SkillBonusType.HardDefense)
+                : p.SoftDefense + LeaderStatDelta(SkillBonusType.SoftDefense);
+        }
+
+        /// <summary>
+        /// The attached leader's Δ-side combat-stat delta (§14.10.4 — doctrine bonuses are stat deltas at lane
+        /// build, NOT ICM). 0 if unled. Inert on facilities (combat skills do nothing on a base, §35.4.3) and
+        /// CLASS-GATED (§14.8, ratified 2026-07-03): each doctrine's deltas apply only within its class family,
+        /// so e.g. Infantry Assault Tactics on a TANK grants nothing (blocks the SA+2 end-run around the
+        /// 1.8.4 combined-arms pillar). Same enforcement pattern as AdvancedTargetting's ART/SPA gate.
+        /// </summary>
+        private int LeaderStatDelta(SkillBonusType bonusType)
+        {
+            if (IsBase) return 0;
+            if (!DoctrineDeltaAppliesTo(bonusType, Classification)) return 0;
+            var leader = GetAssignedLeader();
+            return leader != null ? (int)leader.GetBonusValue(bonusType) : 0;
+        }
+
+        /// <summary>The §14.8 doctrine class-gate table. MECH is deliberately in two families (mounted IFV lane
+        /// vs dismounted lane); one doctrine per leader, so no double-dip is possible.</summary>
+        private static bool DoctrineDeltaAppliesTo(SkillBonusType bonusType, UnitClassification cls)
+        {
+            switch (bonusType)
+            {
+                case SkillBonusType.HardAttack:
+                case SkillBonusType.HardDefense:
+                    return cls == UnitClassification.TANK || cls == UnitClassification.MECH;
+
+                case SkillBonusType.SoftAttack:
+                case SkillBonusType.SoftDefense:
+                    return cls == UnitClassification.INF || cls == UnitClassification.MECH ||
+                           cls == UnitClassification.MOT || cls == UnitClassification.AB ||
+                           cls == UnitClassification.MAB || cls == UnitClassification.MAR ||
+                           cls == UnitClassification.MMAR || cls == UnitClassification.AM ||
+                           cls == UnitClassification.MAM || cls == UnitClassification.CAV ||
+                           cls == UnitClassification.SPECF;
+
+                case SkillBonusType.AirAttack:
+                case SkillBonusType.AirDefense:
+                    return cls == UnitClassification.SAM || cls == UnitClassification.SPSAM ||
+                           cls == UnitClassification.AAA || cls == UnitClassification.SPAAA;
+
+                default:
+                    return false;
+            }
         }
 
         /// <summary>Active profile's Ordnance Load (the airstrike OL/9 multiplier, §11.6.1). 0 if none.</summary>
         public int ActiveOrdnanceLoad => GetActiveWeaponProfile()?.OrdinanceLoad ?? 0;
 
-        /// <summary>Active profile's Ground-Air Defense (GAD) — the stat an airstrike attacks (§7.7.5). 0 if none.</summary>
-        public int ActiveGroundAirDefense => GetActiveWeaponProfile()?.GroundAirDefense ?? 0;
+        /// <summary>Ground-Air Defense (GAD) — the stat an airstrike attacks (§7.7.5), plus the leader's
+        /// Air Defense doctrine Δ-delta (§14.8.4). 0 if no profile.</summary>
+        public int ActiveGroundAirDefense =>
+            GetActiveWeaponProfile() is { } p ? p.GroundAirDefense + LeaderStatDelta(SkillBonusType.AirDefense) : 0;
 
-        /// <summary>Active profile's Ground-Air Attack (GAT) — the interdiction stat vs transiting aircraft (§11.8.1). 0 if none.</summary>
-        public int ActiveGroundAirAttack => GetActiveWeaponProfile()?.GroundAirAttack ?? 0;
+        /// <summary>Ground-Air Attack (GAT) — the interdiction stat vs transiting aircraft (§11.8.1), plus the
+        /// leader's Air Defense doctrine Δ-delta (§14.8.4). 0 if no profile.</summary>
+        public int ActiveGroundAirAttack =>
+            GetActiveWeaponProfile() is { } p ? p.GroundAirAttack + LeaderStatDelta(SkillBonusType.AirAttack) : 0;
 
         /// <summary>Active profile's Maneuverability (MAN) — feeds the fixed-wing ground-to-air defense term (§11.8.1). 0 if none.</summary>
         public int ActiveManeuverability => GetActiveWeaponProfile()?.Maneuverability ?? 0;

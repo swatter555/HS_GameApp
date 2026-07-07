@@ -52,6 +52,10 @@ namespace HammerAndSickle.Models.Combat
         /// <summary>Band shift in rungs: +1 embarkment malus (§7.10.1.1) or WW survival (§11.1.2.4); 0 normally.</summary>
         public int BandShift;
 
+        /// <summary>Firer's EffectiveCommand for Command Mitigation (§7.7.12): if Δ ≤ −2, Δ is lifted by this
+        /// value, clamped at −1 (the Even floor). 0 = unled / facility / air (no effect).</summary>
+        public int FirerCommand;
+
         /// <summary>Post-stack damage scalar: ambush 1.5 (§6.9.4), night-ambush 2.0, embarkment 2.0 (§7.10.1.2). 0 = treat as 1.0.</summary>
         public float PostStackScalar;
     }
@@ -105,8 +109,14 @@ namespace HammerAndSickle.Models.Combat
             {
                 if (rng == null) throw new ArgumentNullException(nameof(rng));
 
-                // Steps 1–2: delta → band → optional shift.
+                // Steps 1–2: delta → command mitigation → band → optional shift.
                 int delta = input.FirerAttack - input.TargetDefense;
+
+                // Command Mitigation (§7.7.12): a led firer at a disadvantage lifts Δ toward Even, hard-clamped
+                // at Even's FLOOR (−1) so a boosted unit never resolves better than an unaided unit at higher Δ.
+                if (input.FirerCommand > 0 && delta < -1)
+                    delta = Math.Min(delta + input.FirerCommand, -1);
+
                 DamageBand band = CombatMath.DeltaBand(delta);
                 if (input.BandShift != 0)
                     band = CombatMath.ShiftBand(band, input.BandShift);
