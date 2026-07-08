@@ -7,6 +7,7 @@ using HammerAndSickle.Services;
 using System;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.InputSystem;
 
 namespace HammerAndSickle.Core.Map
 {
@@ -227,6 +228,34 @@ namespace HammerAndSickle.Core.Map
             }
         }
 
+        // ====================================================================================
+        // ⚠⚠⚠ SECRET DEBUG CHEAT — REMOVE BEFORE SHIPPING (tracked in Claude_TODO cleanup) ⚠⚠⚠
+        // Tilde (~ / backquote) toggles full enemy visibility. RENDERING-ONLY: the fog filter
+        // below is bypassed, but SpottedLevel itself is untouched — intel reports and the
+        // Ctrl-attack spotting gate still behave per the real fog of war.
+        // ====================================================================================
+        public static bool DebugRevealAllEnemies { get; private set; }
+
+        private void Update()
+        {
+            try
+            {
+                var kb = Keyboard.current;
+                if (kb == null || !kb.backquoteKey.wasPressedThisFrame) return;
+
+                DebugRevealAllEnemies = !DebugRevealAllEnemies;
+                AppService.CaptureUiMessage(DebugRevealAllEnemies
+                    ? "DEBUG: all enemy units revealed (~ to hide)."
+                    : "DEBUG: enemy reveal off — fog of war restored.");
+                ClearAllUnitIcons();
+                DrawAllUnits();
+            }
+            catch (Exception e)
+            {
+                AppService.HandleException(CLASS_NAME, nameof(Update), e);
+            }
+        }
+
         /// <summary>
         /// Draws all combat units on the map.
         /// </summary>
@@ -242,7 +271,8 @@ namespace HammerAndSickle.Core.Map
                 foreach (var unit in units)
                 {
                     // Fog of war: skip non-player units at SpottedLevel.Level0
-                    if (unit.Side != Side.Player && unit.SpottedLevel == SpottedLevel.Level0)
+                    // (DebugRevealAllEnemies bypass = the tilde cheat above — REMOVE BEFORE SHIPPING)
+                    if (!DebugRevealAllEnemies && unit.Side != Side.Player && unit.SpottedLevel == SpottedLevel.Level0)
                         continue;
 
                     CreateUnitIcon(unit);
@@ -988,8 +1018,9 @@ namespace HammerAndSickle.Core.Map
                 }
                 else if (newLevel == SpottedLevel.Level0 && oldLevel > SpottedLevel.Level0)
                 {
-                    // Unit disappeared — remove its icon
-                    RemoveUnitIcon(unit.UnitID);
+                    // Unit disappeared — remove its icon (unless the tilde debug reveal is holding it visible)
+                    if (!DebugRevealAllEnemies)
+                        RemoveUnitIcon(unit.UnitID);
                 }
             }
             catch (Exception e)

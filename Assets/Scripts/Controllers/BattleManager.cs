@@ -337,6 +337,14 @@ namespace HammerAndSickle.Controllers
             // Grab and store other data from the scenario manifest
             GrabManifestData();
 
+            // Fog-of-war reset (fix 2026-07-06): OOB files can carry stale/spurious Spotted values, and
+            // RecomputeAllSpotting only ever INCREMENTS — without this, "spotted" enemies from the data file
+            // render from Deployment onward. Zero every AI unit, then run the initial sweep so only enemies
+            // genuinely inside player spotting range start the battle visible.
+            foreach (var aiUnit in GameDataManager.Instance.GetAIUnits())
+                aiUnit.SetSpottedLevel(SpottedLevel.Level0);
+            SpottingService.RecomputeAllSpotting();
+
             // Redraw all map icons now that units are loaded
             if (GameIconRenderer.Instance == null || !GameIconRenderer.Instance.IsInitialized)
             {
@@ -741,6 +749,14 @@ namespace HammerAndSickle.Controllers
         }
 
         /// <summary>
+        /// The AI side's belief store (AI-Design-Supplement Part 3 — honest-spotting Option B).
+        /// Owned here until the dedicated AI turn driver exists (AI3); fed by the SpottingService
+        /// symmetric sweep at AI_Refresh. Scene-scoped like the manager itself; snapshot
+        /// serialization is the AI2b-3 work item.
+        /// </summary>
+        public Models.AI.AIPerceptionState AIPerception { get; private set; } = new Models.AI.AIPerceptionState();
+
+        /// <summary>
         /// Refresh phase (§3.3) for one side. Order per §3.3: action/MP refresh and per-turn
         /// flag reset for every living unit on that side; (out-of-supply consequences §3.3.3 —
         /// HOOK reserved, inert until the supply system lands); spotting decay + recompute
@@ -769,11 +785,18 @@ namespace HammerAndSickle.Controllers
                 // loss now would punish everything immediately. Activated with the supply pass.
                 // ApplyOutOfSupplyConsequences(units);
 
-                // §3.3.4 spotting decay + full recompute — player perspective only.
+                // §3.3.4 spotting decay + sweep, per side: the player perspective mutates
+                // CombatUnit.SpottedLevel; the AI perspective feeds its belief store (Part 3.2)
+                // through the symmetric SpottingService sweep — same rules, separate ledger.
                 if (isPlayerSide)
                 {
                     SpottingService.ProcessSpottingDecay();
                     SpottingService.RecomputeAllSpotting();
+                }
+                else
+                {
+                    SpottingService.StepAIPerceptionDecay(AIPerception, CurrentTurnNumber);
+                    SpottingService.RecomputeAIPerception(AIPerception, CurrentTurnNumber);
                 }
 
                 // §3.3.6 weather check — single-state (Clear) in v1; per-turn weather variance

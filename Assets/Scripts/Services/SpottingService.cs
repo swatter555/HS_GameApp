@@ -191,6 +191,95 @@ namespace HammerAndSickle.Services
 
         #endregion // Core Spotting
 
+        #region AI-Side Perception (AI2b — symmetric sweep, AI-Design-Supplement Part 3)
+
+        /// <summary>
+        /// The AI-side mirror of <see cref="RecomputeAllSpotting"/>: every AI spotter checks every player
+        /// unit under the same dual-domain ranges (§12.3), but hits feed the AI's BELIEF STORE — never
+        /// CombatUnit.SpottedLevel, which remains the player's view of AI units. Run at AI_Refresh
+        /// (§3.3.4 "per side"). Camouflage (§14.9.4) applies symmetrically via SpottingRangeAgainst.
+        /// </summary>
+        public static void RecomputeAIPerception(Models.AI.AIPerceptionState perception, int currentTurn)
+        {
+            try
+            {
+                if (perception == null) return;
+
+                var gdm = GameDataManager.Instance;
+                foreach (var spotter in gdm.GetAIUnits())
+                {
+                    if (spotter.IsDestroyed()) continue;
+
+                    foreach (var target in gdm.GetPlayerUnits())
+                    {
+                        if (target.IsDestroyed()) continue;
+
+                        int range = SpottingRangeAgainst(spotter, target);
+                        int dist = HexMapUtil.GetHexDistance(spotter.MapPos, target.MapPos);
+                        if (dist <= range)
+                        {
+                            perception.RecordSpot(
+                                target.UnitID, target.MapPos, currentTurn,
+                                target.Classification,
+                                ObservedHpPercent(target),
+                                Mathf.Max(1, Mathf.RoundToInt(target.MovementPoints.Max)));
+                        }
+                    }
+                }
+            }
+            catch (Exception e)
+            {
+                AppService.HandleException(CLASS_NAME, nameof(RecomputeAIPerception), e);
+            }
+        }
+
+        /// <summary>
+        /// The AI-side mirror of <see cref="ProcessSpottingDecay"/> (§12.6): player units currently inside
+        /// some AI spotter's range hold their contact level; the rest decay one step in the belief store
+        /// (ghosting at Level0). Run at AI_Refresh, after <see cref="RecomputeAIPerception"/>.
+        /// </summary>
+        public static void StepAIPerceptionDecay(Models.AI.AIPerceptionState perception, int currentTurn)
+        {
+            try
+            {
+                if (perception == null) return;
+
+                var gdm = GameDataManager.Instance;
+                var inRange = new HashSet<string>();
+                foreach (var target in gdm.GetPlayerUnits())
+                {
+                    if (target.IsDestroyed()) continue;
+
+                    foreach (var spotter in gdm.GetAIUnits())
+                    {
+                        if (spotter.IsDestroyed()) continue;
+
+                        int range = SpottingRangeAgainst(spotter, target);
+                        int dist = HexMapUtil.GetHexDistance(spotter.MapPos, target.MapPos);
+                        if (dist <= range)
+                        {
+                            inRange.Add(target.UnitID);
+                            break;
+                        }
+                    }
+                }
+
+                perception.StepDecay(currentTurn, inRange);
+            }
+            catch (Exception e)
+            {
+                AppService.HandleException(CLASS_NAME, nameof(StepAIPerceptionDecay), e);
+            }
+        }
+
+        private static int ObservedHpPercent(CombatUnit unit)
+        {
+            float max = unit.HitPoints.Max;
+            return max <= 0f ? 0 : Mathf.RoundToInt(unit.HitPoints.Current / max * 100f);
+        }
+
+        #endregion // AI-Side Perception
+
         #region Ambush Detection
 
         /// <summary>

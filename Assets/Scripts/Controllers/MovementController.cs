@@ -10,17 +10,18 @@ using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
+using UnityEngine.InputSystem;
 
 namespace HammerAndSickle.Controllers
 {
     /// <summary>
     /// Movement state machine for player-controlled unit movement during BattlePhase.PlayerTurn.
+    /// (AwaitingTarget removed 2026-07-06 — §5.10.4 has no order-confirmation step: right-click moves immediately.)
     /// </summary>
     public enum MovementState
     {
         Idle,
         UnitSelected,
-        AwaitingTarget,
         Executing
     }
 
@@ -106,7 +107,10 @@ namespace HammerAndSickle.Controllers
         private void SubscribeToEvents()
         {
             if (HexDetectionService.Instance != null)
+            {
                 HexDetectionService.Instance.OnHexSelected += HandleHexSelected;
+                HexDetectionService.Instance.OnHexRightClicked += HandleHexRightClicked;
+            }
 
             if (EventManager.Instance != null)
             {
@@ -120,7 +124,10 @@ namespace HammerAndSickle.Controllers
         private void UnsubscribeFromEvents()
         {
             if (HexDetectionService.Instance != null)
+            {
                 HexDetectionService.Instance.OnHexSelected -= HandleHexSelected;
+                HexDetectionService.Instance.OnHexRightClicked -= HandleHexRightClicked;
+            }
 
             if (EventManager.Instance != null)
             {
@@ -165,10 +172,21 @@ namespace HammerAndSickle.Controllers
                 var map = GameDataManager.CurrentHexMap;
                 if (map == null) return;
 
-                // Check for Shift+click facing rotation
-                if (State == MovementState.UnitSelected && CurrentUnit != null && Input.GetKey(KeyCode.LeftShift))
+                // Modifier family (§5.10.6): Shift+click = facing, Ctrl+click = engage.
+                // Input System API — the project runs Input System-only; legacy UnityEngine.Input throws.
+                var kb = Keyboard.current;
+                bool shift = kb != null && (kb.leftShiftKey.isPressed || kb.rightShiftKey.isPressed);
+                bool ctrl = kb != null && (kb.leftCtrlKey.isPressed || kb.rightCtrlKey.isPressed);
+
+                if (State == MovementState.UnitSelected && CurrentUnit != null && shift)
                 {
                     HandleFacingRotation(hexPos);
+                    return;
+                }
+
+                if (ctrl)
+                {
+                    HandleCtrlClick(hexPos);
                     return;
                 }
 
@@ -180,10 +198,6 @@ namespace HammerAndSickle.Controllers
 
                     case MovementState.UnitSelected:
                         HandleUnitSelectedClick(hexPos);
-                        break;
-
-                    case MovementState.AwaitingTarget:
-                        HandleAwaitingTargetClick(hexPos);
                         break;
                 }
             }
@@ -229,81 +243,93 @@ namespace HammerAndSickle.Controllers
             }
         }
 
+        /// <summary>
+        /// Plain left-click with a unit selected — UNIVERSAL SELECTION (§5.10.6): the click selects whatever is
+        /// under the cursor, never moves and never attacks. Friendly unit → re-select; enemy unit or terrain →
+        /// the movement selection drops (HexDetectionService already set SelectedHex, so the panels/printer show
+        /// the enemy intel report / terrain — that pipeline needs nothing from us here).
+        /// </summary>
         private void HandleUnitSelectedClick(Position2D hexPos)
         {
             var gdm = GameDataManager.Instance;
-
-            // Click on a different friendly unit → re-select
             var ground = gdm.GetGroundUnitAtHex(hexPos);
             var air = gdm.GetAirUnitAtHex(hexPos);
             var clickedUnit = ground ?? air;
 
+            // Another friendly unit → re-select it.
             if (clickedUnit != null && clickedUnit.Side == Side.Player && clickedUnit != CurrentUnit)
             {
                 SelectUnit(clickedUnit);
                 return;
             }
 
-            // Click within range → compute path and show preview
-            if (_currentRange.Reachable.ContainsKey(hexPos))
-            {
-                var map = GameDataManager.CurrentHexMap;
-                _currentPath = HexMapUtil.FindPath(map, CurrentUnit, CurrentUnit.MapPos, hexPos);
-                State = MovementState.AwaitingTarget;
-                // TODO: Show path preview via renderer
+            // The already-selected unit → keep it selected (no-op).
+            if (clickedUnit == CurrentUnit && clickedUnit != null)
                 return;
-            }
 
-            // Click on an ENEMY unit → attempt a direct ground attack (§7.7.3). GroundCombatAction validates
-            // adjacency / spotting / action budget itself and reports the reason if the attack is illegal.
-            // (INTERIM input model for the combat play-test: click-adjacent-enemy = attack. The §24.5.4 Combat
-            // button / OnCombatActionRequested path is Bob's UI; this gives a playable loop with no new prefab.)
-            if (clickedUnit != null && clickedUnit.Side != Side.Player
-                && clickedUnit.SpottedLevel >= SpottedLevel.Level1)
-            {
-                TryAttack(clickedUnit);
-                return;
-            }
-
-            // Click on empty hex outside range → deselect
-            if (clickedUnit == null)
-            {
-                DeselectUnit();
-                return;
-            }
-
-            // Click on non-reachable hex with a friendly unit → SFX denial
-            // TODO: Play UnitMoveBlocked SFX
+            // Enemy unit or terrain (inside OR outside the radius) → drop the movement selection; the clicked
+            // hex/unit is now the inspection target via SelectedHex (§5.10.6 — terrain click implicitly deselects).
+            DeselectUnit();
         }
 
-        private void HandleAwaitingTargetClick(Position2D hexPos)
+        /// <summary>
+        /// Right-click (§5.10.4 / §5.10.5): inside the movement radius with a unit selected → commit the move
+        /// immediately (no confirmation step); anywhere else → clear the unit AND terrain selection.
+        /// </summary>
+        private void HandleHexRightClicked(Position2D hexPos)
         {
-            if (_currentPath == null || _currentPath.Count == 0)
+            try
             {
-                State = MovementState.UnitSelected;
-                return;
-            }
+                if (_currentPhase != BattlePhase.PlayerTurn) return;
+                if (State == MovementState.Executing) return;
 
-            var destination = _currentPath[_currentPath.Count - 1].Position;
-
-            // Confirm: click on the same destination → execute
-            if (hexPos == destination)
-            {
-                StartCoroutine(ExecuteMovement());
-                return;
-            }
-
-            // Click on a different reachable hex → recompute path
-            if (_currentRange.Reachable.ContainsKey(hexPos))
-            {
                 var map = GameDataManager.CurrentHexMap;
-                _currentPath = HexMapUtil.FindPath(map, CurrentUnit, CurrentUnit.MapPos, hexPos);
+
+                if (State == MovementState.UnitSelected && CurrentUnit != null && map != null
+                    && _currentRange.Reachable.ContainsKey(hexPos))
+                {
+                    _currentPath = HexMapUtil.FindPath(map, CurrentUnit, CurrentUnit.MapPos, hexPos);
+                    if (_currentPath != null && _currentPath.Count > 0)
+                    {
+                        StartCoroutine(ExecuteMovement());
+                        return;
+                    }
+                }
+
+                // Outside the radius (or nothing selected) → clear unit + terrain selection (§5.10.5).
+                DeselectUnit();
+                HexDetectionService.Instance?.ClearSelectionAndNotify();
+            }
+            catch (Exception e)
+            {
+                AppService.HandleException(CLASS_NAME, nameof(HandleHexRightClicked), e);
+            }
+        }
+
+        /// <summary>
+        /// Ctrl+left-click — the ONLY combat trigger (§5.10.6). A legal enemy target → attack (direct or
+        /// indirect by the firer's class); anything else is a NO-OP with denial feedback — it never falls
+        /// through to selection, so a missed Ctrl+click can never move or deselect anything.
+        /// </summary>
+        private void HandleCtrlClick(Position2D hexPos)
+        {
+            if (State != MovementState.UnitSelected || CurrentUnit == null)
+            {
+                // No attacker selected → nothing to engage with.
+                // TODO: Play denial SFX
                 return;
             }
 
-            // Click outside range → cancel back to UnitSelected
-            State = MovementState.UnitSelected;
-            _currentPath = null;
+            var gdm = GameDataManager.Instance;
+            var target = gdm.GetGroundUnitAtHex(hexPos) ?? gdm.GetAirUnitAtHex(hexPos);
+
+            if (target == null || target.Side == Side.Player)
+            {
+                // TODO: Play denial SFX
+                return;
+            }
+
+            TryAttack(target);
         }
 
         private void DeselectUnit()
@@ -324,12 +350,27 @@ namespace HammerAndSickle.Controllers
         #region Combat
 
         /// <summary>
-        /// Resolves a direct ground attack by the selected unit against <paramref name="target"/> through the
-        /// model-layer orchestrator (<see cref="GroundCombatAction"/>), then refreshes the board: HP overlays,
-        /// removed/displaced unit icons, the attacker's spent actions/MP, and the movement overlay. The
-        /// orchestrator owns all eligibility gates and returns the rejection reason when the attack is illegal.
-        /// Automatic Advance (§7.9.9) is reported by the orchestrator but not yet executed here (TODO — needs a
-        /// player prompt for the optional free advance into the vacated hex).
+        /// Attack legality for the CURRENT unit against <paramref name="target"/> — null if legal, else the
+        /// reason. Routes by the firer's class (ratified 2026-07-06): indirect-fire classes (ART/SPA/ROC/BM)
+        /// ALWAYS use the §7.13 indirect pipeline (adjacent included); everyone else the §7.7.3 direct one.
+        /// PUBLIC because the cursor feedback (§24.11.3) must run the SAME gate the click runs — it never lies.
+        /// </summary>
+        public string AttackLegality(CombatUnit target)
+        {
+            if (CurrentUnit == null) return "No unit selected.";
+            var map = GameDataManager.CurrentHexMap;
+            return CombatResolver.IsIndirectFireClass(CurrentUnit.Classification)
+                ? IndirectCombatAction.CanExecute(CurrentUnit, target, map)
+                : GroundCombatAction.CanExecute(CurrentUnit, target, map);
+        }
+
+        /// <summary>
+        /// Resolves an attack by the selected unit against <paramref name="target"/> through the model-layer
+        /// orchestrators — <see cref="IndirectCombatAction"/> for ART/SPA/ROC/BM firers (§7.13, any range in
+        /// [1, IR]), <see cref="GroundCombatAction"/> for everyone else (§7.7.3, adjacent) — then refreshes the
+        /// board: HP overlays, removed/displaced icons, spent actions/MP, and the movement overlay. The
+        /// orchestrators own all eligibility gates and report the rejection reason when the attack is illegal.
+        /// Automatic Advance (§7.9.9, direct only) is reported but not yet executed here (TODO — player prompt).
         /// </summary>
         private void TryAttack(CombatUnit target)
         {
@@ -339,18 +380,34 @@ namespace HammerAndSickle.Controllers
                 var map = GameDataManager.CurrentHexMap;
                 if (map == null) return;
 
-                // TODO §7.5.6.9.1 — compute contestedCrossing from river/bridge geometry between the two hexes.
-                GroundCombatOutcome outcome =
-                    GroundCombatAction.Execute(CurrentUnit, target, map, new CombatRandom());
+                bool executed;
+                string message;
+                bool attackerDestroyed;
 
-                if (!outcome.Executed)
+                if (CombatResolver.IsIndirectFireClass(CurrentUnit.Classification))
                 {
-                    AppService.CaptureUiMessage(outcome.Reason);
-                    // TODO: Play UnitMoveBlocked / denial SFX
+                    IndirectCombatOutcome o = IndirectCombatAction.Execute(CurrentUnit, target, map, new CombatRandom());
+                    executed = o.Executed;
+                    message = o.Executed ? BuildIndirectMessage(CurrentUnit, target, o) : o.Reason;
+                    attackerDestroyed = o.FirerDestroyed;
+                }
+                else
+                {
+                    // TODO §7.5.6.9.1 — compute contestedCrossing from river/bridge geometry between the two hexes.
+                    GroundCombatOutcome o = GroundCombatAction.Execute(CurrentUnit, target, map, new CombatRandom());
+                    executed = o.Executed;
+                    message = o.Executed ? BuildCombatMessage(CurrentUnit, target, o) : o.Reason;
+                    attackerDestroyed = o.AttackerDestroyed;
+                }
+
+                if (!executed)
+                {
+                    AppService.CaptureUiMessage(message);
+                    // TODO: Play denial SFX
                     return;
                 }
 
-                AppService.CaptureUiMessage(BuildCombatMessage(CurrentUnit, target, outcome));
+                AppService.CaptureUiMessage(message);
 
                 // Refresh the board off the new unit state.
                 GameDataManager.Instance.BuildOccupancyCache();
@@ -361,8 +418,8 @@ namespace HammerAndSickle.Controllers
                     EventManager.Instance.RaiseUnitMovementPointsChanged(CurrentUnit);
                 }
 
-                // Attacker killed by return fire (§7.4.2.3) → nothing left to keep selected.
-                if (outcome.AttackerDestroyed)
+                // Attacker killed (return fire §7.4.2.3 / counter-battery §7.13.5) → nothing left to keep selected.
+                if (attackerDestroyed)
                 {
                     DeselectUnit();
                     return;
@@ -380,13 +437,23 @@ namespace HammerAndSickle.Controllers
             }
         }
 
-        /// <summary>Short HUD line summarizing a resolved attack.</summary>
+        /// <summary>Short HUD line summarizing a resolved direct attack.</summary>
         private static string BuildCombatMessage(CombatUnit attacker, CombatUnit target, GroundCombatOutcome o)
         {
             if (o.DefenderDestroyed) return $"{attacker.UnitName} destroyed {target.UnitName}.";
             if (o.DefenderRemovedFromMap) return $"{attacker.UnitName} broke {target.UnitName} — it withdrew from the field.";
             if (o.DefenderMoved) return $"{attacker.UnitName} hit {target.UnitName} for {o.DamageToDefender} — it fell back.";
             return $"{attacker.UnitName} hit {target.UnitName} for {o.DamageToDefender} (held).";
+        }
+
+        /// <summary>Short HUD line summarizing a resolved indirect fire mission (§7.13).</summary>
+        private static string BuildIndirectMessage(CombatUnit firer, CombatUnit target, IndirectCombatOutcome o)
+        {
+            string cb = o.CounterBatteryFired ? $" Counter-battery hit back for {o.DamageToFirer}." : string.Empty;
+            if (o.TargetDestroyed) return $"{firer.UnitName} destroyed {target.UnitName} with indirect fire.{cb}";
+            if (o.TargetRemovedFromMap) return $"{firer.UnitName} broke {target.UnitName} — it withdrew from the field.{cb}";
+            if (o.TargetMoved) return $"{firer.UnitName} shelled {target.UnitName} for {o.DamageToTarget} — it fell back.{cb}";
+            return $"{firer.UnitName} shelled {target.UnitName} for {o.DamageToTarget} (held).{cb}";
         }
 
         #endregion // Combat

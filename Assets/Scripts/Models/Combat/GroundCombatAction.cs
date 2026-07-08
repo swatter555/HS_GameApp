@@ -62,7 +62,9 @@ namespace HammerAndSickle.Models.Combat
         {
             try
             {
-                string reason = Validate(attacker, defender, map, rng);
+                if (rng == null)
+                    return new GroundCombatOutcome { Executed = false, Reason = "No RNG." };
+                string reason = CanExecute(attacker, defender, map);
                 if (reason != null)
                     return new GroundCombatOutcome { Executed = false, Reason = reason };
 
@@ -151,13 +153,16 @@ namespace HammerAndSickle.Models.Combat
 
         #region Helpers
 
-        /// <summary>Eligibility gate for a direct ground attack. Returns null if legal, else the rejection reason.</summary>
-        private static string Validate(CombatUnit attacker, CombatUnit defender, HexMap map, ICombatRandom rng)
+        /// <summary>
+        /// Eligibility gate for a direct ground attack. Returns null if legal, else the rejection reason.
+        /// PUBLIC because the input layer's cursor feedback (§24.11.3) must run the SAME check the click runs —
+        /// the cursor never lies. No dice, no costs.
+        /// </summary>
+        public static string CanExecute(CombatUnit attacker, CombatUnit defender, HexMap map)
         {
             if (attacker == null) return "No attacker.";
             if (defender == null) return "No target.";
             if (map == null) return "No map.";
-            if (rng == null) return "No RNG.";
             if (attacker.IsDestroyed()) return "Attacker is destroyed.";
             if (defender.IsDestroyed()) return "Target is already destroyed.";
             if (attacker.Side == defender.Side) return "Cannot attack a friendly unit.";

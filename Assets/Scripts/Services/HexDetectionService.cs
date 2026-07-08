@@ -99,6 +99,17 @@ namespace HammerAndSickle.Services
             remove { RemoveSubscriber("OnHexSelected", value.Target, ref _onHexSelected, value); }
         }
 
+        private Action<Position2D> _onHexRightClicked;
+
+        // Fired on a right-click with the hex under the cursor (NoHexSelected when off-map). The subscriber
+        // decides what the right-click MEANS — move inside the radius vs clear otherwise (§5.10.4 / §5.10.5);
+        // this service no longer clears unconditionally (input rework 2026-07-06).
+        public event Action<Position2D> OnHexRightClicked
+        {
+            add { AddSubscriber("OnHexRightClicked", value.Target, ref _onHexRightClicked, value); }
+            remove { RemoveSubscriber("OnHexRightClicked", value.Target, ref _onHexRightClicked, value); }
+        }
+
         #endregion // Events and Delegates
 
         #region Unity Lifecycle
@@ -358,17 +369,39 @@ namespace HammerAndSickle.Services
         }
 
         /// <summary>
-        /// Handles right mouse click events, resetting the hex selection.
+        /// Handles right mouse click events. Reports the hex under the cursor via OnHexRightClicked and lets
+        /// the subscriber (MovementController) decide: move inside the radius, clear otherwise (§5.10.4/.5).
+        /// The old unconditional clear lives on as <see cref="ClearSelectionAndNotify"/> for that clear branch.
         /// </summary>
         /// <param name="mousePosition">Screen position of the mouse click</param>
         private void HandleRightMouseClick(Vector2 mousePosition)
         {
             try
             {
-                // Clear all selection state (hex, unit, leader)
-                GameDataManager.ClearSelection();
+                Position2D gridPosition = GetValidGridCoordinates(mousePosition);
+                _onHexRightClicked?.Invoke(gridPosition);
 
-                // Invoke the event to notify subscribers
+                if (enableDebugLogging)
+                {
+                    Debug.Log($"{CLASS_NAME}: Right-click at grid position: {gridPosition}");
+                }
+            }
+            catch (Exception e)
+            {
+                AppService.HandleException(CLASS_NAME, nameof(HandleRightMouseClick), e);
+            }
+        }
+
+        /// <summary>
+        /// Clears all selection state (hex, unit, leader) and notifies OnHexSelected subscribers — the §5.10.5
+        /// "right-click outside the radius" branch, invoked by MovementController. Behavior-identical to the
+        /// pre-rework unconditional right-click clear, so panels/printer reset exactly as before.
+        /// </summary>
+        public void ClearSelectionAndNotify()
+        {
+            try
+            {
+                GameDataManager.ClearSelection();
                 _onHexSelected?.Invoke(GameDataManager.NoHexSelected);
 
                 if (enableDebugLogging)
@@ -378,7 +411,7 @@ namespace HammerAndSickle.Services
             }
             catch (Exception e)
             {
-                AppService.HandleException(CLASS_NAME, nameof(HandleRightMouseClick), e);
+                AppService.HandleException(CLASS_NAME, nameof(ClearSelectionAndNotify), e);
             }
         }
 
@@ -436,8 +469,9 @@ namespace HammerAndSickle.Services
                 {
                     UnsubscribeFromEvents();
 
-                    // Clear event delegate
+                    // Clear event delegates
                     _onHexSelected = null;
+                    _onHexRightClicked = null;
 
                     if (enableDebugLogging)
                     {

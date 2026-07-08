@@ -57,6 +57,7 @@ namespace HammerAndSickle.Models.Combat
     {
         public TerrainType TargetTerrain;
         public TerrainType FirerTerrain;
+        public bool SuppressCounterBattery;   // §7.13.5.7 — set by the caller when the target has no OpportunityAction to pay for the CB shot
     }
 
     /// <summary>
@@ -428,7 +429,7 @@ namespace HammerAndSickle.Models.Combat
 
                 int toTarget = CombatEngine.ResolveLane(BuildIndirectForwardLane(firer, target, ctx), rng);
 
-                bool cb = IsCounterBatteryEligible(firer, target);
+                bool cb = !ctx.SuppressCounterBattery && IsCounterBatteryEligible(firer, target);
                 int toFirer = cb ? CombatEngine.ResolveLane(BuildCounterBatteryLane(firer, target, ctx), rng) : 0;
 
                 // Simultaneous (§7.13.5.5) — apply after both lanes computed on pre-damage stats.
@@ -522,7 +523,7 @@ namespace HammerAndSickle.Models.Combat
         /// </summary>
         public static bool IsCounterBatteryEligible(CombatUnit firer, CombatUnit target)
         {
-            if (!IsArtillery(target.Classification)) return false;
+            if (!IsIndirectFireClass(target.Classification)) return false;
             float ir = target.ActiveIndirectRange;
             if (ir <= 0f) return false;
             return HexMapUtil.GetHexDistance(target.MapPos, firer.MapPos) <= ir;
@@ -537,7 +538,13 @@ namespace HammerAndSickle.Models.Combat
             return dist >= 1 && dist <= ir;
         }
 
-        private static bool IsArtillery(UnitClassification c) =>
+        /// <summary>
+        /// The indirect-fire classifications (ART/SPA/ROC/BM). Doubles as the input-layer ROUTING rule
+        /// (ratified 2026-07-06): a unit of these classes ALWAYS attacks through the indirect pipeline
+        /// (§7.13) — even against an adjacent target (range [1, IR] includes 1) — and never fights a
+        /// direct engagement. Same set as counter-battery eligibility (§7.13.5.1).
+        /// </summary>
+        public static bool IsIndirectFireClass(UnitClassification c) =>
             c == UnitClassification.ART || c == UnitClassification.SPA ||
             c == UnitClassification.ROC || c == UnitClassification.BM;
 

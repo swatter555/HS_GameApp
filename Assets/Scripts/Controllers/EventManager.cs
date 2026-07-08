@@ -152,19 +152,23 @@ namespace HammerAndSickle.Controllers
         public event Action OnDailyLossesRequested;
         public event Action OnTotalLossesRequested;
         public event Action<bool> OnSupplyOverlayToggled;
+        public event Action<bool> OnUnitIconsToggled;      // unit-icon layer visibility for a clear terrain read (§24.3.1)
+        public event Action OnLeaderPoolRequested;         // Leader Pool dialog (§24.5.5; rest of the leader-UI family lands with L2/L3)
 
         #endregion // Battle Flow / HUD Events
 
         #region Unit Action Events
 
         // See EventManager for all game events
-        public event Action<CombatUnit> OnCombatActionRequested;
+        // (OnCombatActionRequested retired 2026-07-06 — no Combat button; Ctrl+left-click is the only combat trigger, §5.10.6)
         public event Action<CombatUnit> OnDeployUpRequested;
         public event Action<CombatUnit> OnDeployDownRequested;
         public event Action<CombatUnit> OnIntelActionRequested;
         public event Action<CombatUnit, bool> OnResupplyRequested;   // (unit, includeReplacements §15.4a.4a)
         public event Action<CombatUnit> OnUpgradeEquipmentRequested;
         public event Action<CombatUnit> OnReplaceLossesRequested;
+        public event Action<CombatUnit> OnMoveUndoRequested;         // single undo of the last move (§5.11)
+        public event Action<CombatUnit> OnUnitDetailsRequested;      // on-demand detail readout (§24.5.2.4)
 
         #endregion // Unit Action Events
 
@@ -178,10 +182,12 @@ namespace HammerAndSickle.Controllers
         #region Air Operations Box Events
 
         // See EventManager for all game events
-        public event Action<Position2D> OnAOBPlacedOnHex;   // drag-drop placement onto a hex (§24.7a.1)
-        public event Action OnAOBCommitDone;                // a side signals "done" committing aircraft (§11.4.6)
-        public event Action OnAOBResolveRequested;          // Resolve pressed (§11.4.6)
-        public event Action OnAOBRemoveRequested;           // the single Remove button (§24.7a.1)
+        // (OnAOBCommitDone retired 2026-07-06 — the "both sides signal done" handshake is superseded by
+        //  per-arrival reaction windows §11.1.8; Resolve is attacker-unilateral per §11.4.6.)
+        public event Action OnAOBPlacementModeRequested;    // AOB HUD button arms placement mode (§24.7a.1)
+        public event Action<Position2D> OnAOBPlacedOnHex;   // Ctrl+left-click placement onto a hex (§24.7a.1)
+        public event Action OnAOBResolveRequested;          // Resolve pressed (§11.4.6 — attacker-unilateral)
+        public event Action OnAOBAbortRequested;            // the Abort button (§24.7a.7)
         public event Action<AOBStatus> OnAOBStateChanged;   // live status snapshot for the AOB Status Panel (§24.7a.7)
 
         #endregion // Air Operations Box Events
@@ -484,15 +490,21 @@ namespace HammerAndSickle.Controllers
             catch (Exception e) { AppService.HandleException(CLASS_NAME, nameof(RaiseSupplyOverlayToggled), e); }
         }
 
+        public void RaiseUnitIconsToggled(bool visible)
+        {
+            try { OnUnitIconsToggled?.Invoke(visible); }
+            catch (Exception e) { AppService.HandleException(CLASS_NAME, nameof(RaiseUnitIconsToggled), e); }
+        }
+
+        public void RaiseLeaderPoolRequested()
+        {
+            try { OnLeaderPoolRequested?.Invoke(); }
+            catch (Exception e) { AppService.HandleException(CLASS_NAME, nameof(RaiseLeaderPoolRequested), e); }
+        }
+
         #endregion // Battle Flow / HUD Event Raising Methods
 
         #region Unit Action Event Raising Methods
-
-        public void RaiseCombatActionRequested(CombatUnit unit)
-        {
-            try { OnCombatActionRequested?.Invoke(unit); }
-            catch (Exception e) { AppService.HandleException(CLASS_NAME, nameof(RaiseCombatActionRequested), e); }
-        }
 
         public void RaiseDeployUpRequested(CombatUnit unit)
         {
@@ -530,6 +542,18 @@ namespace HammerAndSickle.Controllers
             catch (Exception e) { AppService.HandleException(CLASS_NAME, nameof(RaiseReplaceLossesRequested), e); }
         }
 
+        public void RaiseMoveUndoRequested(CombatUnit unit)
+        {
+            try { OnMoveUndoRequested?.Invoke(unit); }
+            catch (Exception e) { AppService.HandleException(CLASS_NAME, nameof(RaiseMoveUndoRequested), e); }
+        }
+
+        public void RaiseUnitDetailsRequested(CombatUnit unit)
+        {
+            try { OnUnitDetailsRequested?.Invoke(unit); }
+            catch (Exception e) { AppService.HandleException(CLASS_NAME, nameof(RaiseUnitDetailsRequested), e); }
+        }
+
         #endregion // Unit Action Event Raising Methods
 
         #region Weather Event Raising Methods
@@ -550,10 +574,10 @@ namespace HammerAndSickle.Controllers
             catch (Exception e) { AppService.HandleException(CLASS_NAME, nameof(RaiseAOBPlacedOnHex), e); }
         }
 
-        public void RaiseAOBCommitDone()
+        public void RaiseAOBPlacementModeRequested()
         {
-            try { OnAOBCommitDone?.Invoke(); }
-            catch (Exception e) { AppService.HandleException(CLASS_NAME, nameof(RaiseAOBCommitDone), e); }
+            try { OnAOBPlacementModeRequested?.Invoke(); }
+            catch (Exception e) { AppService.HandleException(CLASS_NAME, nameof(RaiseAOBPlacementModeRequested), e); }
         }
 
         public void RaiseAOBResolveRequested()
@@ -562,10 +586,10 @@ namespace HammerAndSickle.Controllers
             catch (Exception e) { AppService.HandleException(CLASS_NAME, nameof(RaiseAOBResolveRequested), e); }
         }
 
-        public void RaiseAOBRemoveRequested()
+        public void RaiseAOBAbortRequested()
         {
-            try { OnAOBRemoveRequested?.Invoke(); }
-            catch (Exception e) { AppService.HandleException(CLASS_NAME, nameof(RaiseAOBRemoveRequested), e); }
+            try { OnAOBAbortRequested?.Invoke(); }
+            catch (Exception e) { AppService.HandleException(CLASS_NAME, nameof(RaiseAOBAbortRequested), e); }
         }
 
         public void RaiseAOBStateChanged(AOBStatus status)
@@ -664,24 +688,27 @@ namespace HammerAndSickle.Controllers
             OnDailyLossesRequested = null;
             OnTotalLossesRequested = null;
             OnSupplyOverlayToggled = null;
+            OnUnitIconsToggled = null;
+            OnLeaderPoolRequested = null;
 
             // Unit action events
-            OnCombatActionRequested = null;
             OnDeployUpRequested = null;
             OnDeployDownRequested = null;
             OnIntelActionRequested = null;
             OnResupplyRequested = null;
             OnUpgradeEquipmentRequested = null;
             OnReplaceLossesRequested = null;
+            OnMoveUndoRequested = null;
+            OnUnitDetailsRequested = null;
 
             // Weather events
             OnWeatherChanged = null;
 
             // Air Operations Box events
+            OnAOBPlacementModeRequested = null;
             OnAOBPlacedOnHex = null;
-            OnAOBCommitDone = null;
             OnAOBResolveRequested = null;
-            OnAOBRemoveRequested = null;
+            OnAOBAbortRequested = null;
             OnAOBStateChanged = null;
 
             // Dialog events
