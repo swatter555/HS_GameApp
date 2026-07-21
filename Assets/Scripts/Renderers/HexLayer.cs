@@ -57,11 +57,15 @@ namespace HammerAndSickle.Renderers
         /// <param name="color">Tint color for the SpriteRenderer.</param>
         /// <param name="flipX">If true, mirror the sprite horizontally.</param>
         /// <param name="flipY">If true, mirror the sprite vertically.</param>
-        public void SetSprite(string key, Sprite sprite, Vector3 worldPos, Color color, bool flipX = false, bool flipY = false)
+        /// <param name="scale">Optional local scale (e.g. fit-to-cell stretch); null = unscaled.</param>
+        public void SetSprite(string key, Sprite sprite, Vector3 worldPos, Color color, bool flipX = false, bool flipY = false, Vector2? scale = null)
         {
+            var localScale = scale.HasValue ? new Vector3(scale.Value.x, scale.Value.y, 1f) : Vector3.one;
+
             if (_children.TryGetValue(key, out var existing))
             {
                 existing.transform.position = worldPos;
+                existing.transform.localScale = localScale;
                 var sr = existing.GetComponent<SpriteRenderer>();
                 sr.sprite = sprite;
                 sr.color = color;
@@ -74,6 +78,7 @@ namespace HammerAndSickle.Renderers
             var go = new GameObject(key);
             go.transform.SetParent(transform, false);
             go.transform.position = worldPos;
+            go.transform.localScale = localScale;
 
             var renderer = go.AddComponent<SpriteRenderer>();
             renderer.sprite = sprite;

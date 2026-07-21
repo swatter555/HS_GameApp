@@ -735,6 +735,12 @@ namespace HammerAndSickle.Services
                 Vector2 mousePosition = cachedMouse.position.ReadValue();
                 LastRightClickPosition = mousePosition;
 
+                // Block click if over a HUD panel — same gate as left-click (a right-click over the
+                // printer/unit panels must not issue a move order to the hex underneath, §5.10.4)
+                if (DefaultDialog_Scene1.Instance != null
+                    && DefaultDialog_Scene1.Instance.IsScreenPointOverUI(mousePosition))
+                    return;
+
                 // Check for double-click
                 float currentTime = Time.time;
                 if (currentTime - lastRightClickTime < DOUBLE_CLICK_TIME)

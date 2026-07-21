@@ -1,3 +1,4 @@
+using HammerAndSickle.Core.GameData;
 using HammerAndSickle.Services;
 using System;
 using UnityEngine;
@@ -1037,24 +1038,48 @@ namespace HammerAndSickle.Controllers
 
         // ----------------------------------------------------------------------------
         // Movement overlays — world-space hex sprites stamped on the HexGridRenderer
-        // Overlay layers (movementRange / movementPath). Resolve via _movementOverlayAtlas.
-        // ART NEEDED FROM BOB (see todo.md "Graphics needed"): one ~256px sprite each.
+        // Overlay layers (movementRange / movementPath / threat rings). Resolve via
+        // _movementOverlayAtlas. Values match the packed sprite names in the "Movement
+        // Overlays" atlas (= the PNG filenames in Assets/Art/Sprites/Movement Overlays/).
+        // Art carries its OWN color and alpha and is stamped as-authored, fully opaque
+        // (Color.white, no code tint — ratified 2026-07-21). HexGridRenderer's serialized
+        // tint colors apply only to its procedural-fill FALLBACK when a sprite is missing.
+        // HEX-SHAPED sprites (MoveRangeFill, MoveRangeZocStop, TargetPickOutline, ThreatFill_*)
+        // are stamped through HexGridRenderer.FitToCellScale — the cell is a REGULAR pointy-top
+        // hex, 2.56 wide × 2.956 tall, so square-canvas hex art renders ~13.5% short without it.
+        // Point markers (MovePathStep/End, FacingChevrons) render authored-size. Ask Bob which
+        // kind any NEW overlay sprite is at planning time (ratified 2026-07-21).
         // ----------------------------------------------------------------------------
 
-        // Reachable-hex highlight (translucent fill / ring) drawn over every in-range hex.
-        public const string Overlay_MoveRange = "Overlay_MoveRange";
+        // Reachable-hex highlight drawn over every in-range hex (§5.10.1).
+        public const string MoveRangeFill = "MoveRangeFill";
 
-        // Marker for a reachable hex that is a ZoC-to-ZoC terminal — movement ends here (§5.6).
-        public const string Overlay_ZocBlocked = "Overlay_ZocBlocked";
+        // Reachable hex that is a ZoC-to-ZoC terminal — movement ends here (§5.6).
+        public const string MoveRangeZocStop = "MoveRangeZocStop";
 
-        // Path-preview waypoint dot for intermediate hexes on the previewed path (§5.10).
-        public const string Overlay_PathStep = "Overlay_PathStep";
+        // Path-preview waypoint marker for intermediate hexes on the previewed path (§5.10.3).
+        public const string MovePathStep = "MovePathStep";
 
-        // Path-preview arrowhead stamped on the destination hex.
-        public const string Overlay_PathArrow = "Overlay_PathArrow";
+        // Path-preview destination marker stamped on the endpoint hex (§5.10.3).
+        public const string MovePathEnd = "MovePathEnd";
 
-        // Facing arrow/chevron for manual (Shift+click) facing rotation (§5.8).
-        public const string Overlay_FacingChevron = "Overlay_FacingChevron";
+        // Facing chevron for manual (Shift+click) facing rotation (§5.8) — one pre-rotated sprite per
+        // HexDirection so no runtime rotation is needed. Values match HexDirection.ToString(); resolve
+        // via GetFacingChevron(HexDirection).
+        public const string FacingChevron_NE = "FacingChevron_NE";
+        public const string FacingChevron_E  = "FacingChevron_E";
+        public const string FacingChevron_SE = "FacingChevron_SE";
+        public const string FacingChevron_SW = "FacingChevron_SW";
+        public const string FacingChevron_W  = "FacingChevron_W";
+        public const string FacingChevron_NW = "FacingChevron_NW";
+
+        // Valid-target highlight in pick modes — leader unit-pick (§24.5.5) + AOB placement (§24.7a.1).
+        public const string TargetPickOutline = "TargetPickOutline";
+
+        // AD threat rings by GAT band (§24.7a.8): 9–11 amber / 12–14 orange-red / 15+ deep red.
+        public const string ThreatFill_Amber  = "ThreatFill_Amber";
+        public const string ThreatFill_Red    = "ThreatFill_Red";
+        public const string ThreatFill_DeepRed = "ThreatFill_DeepRed";
 
         // ----------------------------------------------------------------------------
         // Weather HUD icons (optional) — screen-space status indicator. Single-state in
@@ -1210,6 +1235,22 @@ namespace HammerAndSickle.Controllers
         #endregion // Unity Lifecycle
 
         #region Static Methods
+
+        /// <summary>
+        /// Resolves the pre-rotated facing chevron sprite for a HexDirection (§5.8). One sprite per
+        /// direction — no runtime rotation. Returns null (with the standard GetSprite warning) if the
+        /// sprite is missing from the movement-overlay atlas.
+        /// </summary>
+        public static Sprite GetFacingChevron(HexDirection direction) => direction switch
+        {
+            HexDirection.NE => GetSprite(FacingChevron_NE),
+            HexDirection.E  => GetSprite(FacingChevron_E),
+            HexDirection.SE => GetSprite(FacingChevron_SE),
+            HexDirection.SW => GetSprite(FacingChevron_SW),
+            HexDirection.W  => GetSprite(FacingChevron_W),
+            HexDirection.NW => GetSprite(FacingChevron_NW),
+            _               => null,
+        };
 
         /// <summary>
         /// Retrieves a sprite by name, searching through all atlases.

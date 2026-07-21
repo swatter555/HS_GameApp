@@ -29,6 +29,9 @@ namespace HammerAndSickle.Core
         // Regular pointy-top hex: row spacing = width * sqrt(3)/2.
         // sqrt(3)/2 = 0.86602540378443864676...
         public const float VERTICAL_SPACING = HEX_WIDTH * 0.8660254038f;       // 2.21702503f
+        // Full point-to-point cell height = width * 2/sqrt(3). A hex drawn in a SQUARE canvas is
+        // ~13.5% too short vertically — overlay stamping stretches art to this height (FitToCellScale).
+        public const float HEX_HEIGHT = HEX_WIDTH * 1.1547005f;                // 2.95603...f
 
         // Direction offsets for pointy-top, odd-r with Y-up world coords (row+1 = higher world Y).
         // Odd rows stagger right by half a hex width. Rows are indexed by HexDirection enum:

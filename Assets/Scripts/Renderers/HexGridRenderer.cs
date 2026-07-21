@@ -175,6 +175,8 @@ namespace HammerAndSickle.Renderers
             {
                 EventManager.Instance.OnMovementRangeComputed += HandleMovementRangeComputed;
                 EventManager.Instance.OnMovementRangeCleared += ClearMovementRange;
+                EventManager.Instance.OnMovementPathPreviewShown += ShowPathPreview;
+                EventManager.Instance.OnMovementPathPreviewCleared += ClearPathPreview;
             }
         }
 
@@ -187,6 +189,8 @@ namespace HammerAndSickle.Renderers
             {
                 EventManager.Instance.OnMovementRangeComputed -= HandleMovementRangeComputed;
                 EventManager.Instance.OnMovementRangeCleared -= ClearMovementRange;
+                EventManager.Instance.OnMovementPathPreviewShown -= ShowPathPreview;
+                EventManager.Instance.OnMovementPathPreviewCleared -= ClearPathPreview;
             }
         }
 
@@ -213,14 +217,10 @@ namespace HammerAndSickle.Renderers
             }
         }
 
-        private void HandleMovementRangeComputed(CombatUnit unit, Dictionary<Position2D, int> reachable)
+        private void HandleMovementRangeComputed(CombatUnit unit, Dictionary<Position2D, int> reachable, HashSet<Position2D> zocTerminals)
         {
             try
             {
-                HashSet<Position2D> zocTerminals = null;
-                if (MovementController.Instance != null)
-                    zocTerminals = new HashSet<Position2D>();
-
                 ShowMovementRange(reachable, zocTerminals);
             }
             catch (Exception e)
@@ -387,22 +387,55 @@ namespace HammerAndSickle.Renderers
             try
             {
                 movementRangeLayer.Clear();
-                var sprite = GetOrCreateHexFillSprite();
+
+                // Atlas art is stamped AS-AUTHORED, fully opaque (Color.white — Bob 2026-07-21). The
+                // serialized tint colors apply ONLY to the procedural-fill fallback, so a missing sprite
+                // degrades to the old translucent placeholder instead of an opaque white square.
+                var fillSprite = SpriteManager.GetSprite(SpriteManager.MoveRangeFill);
+                var fillColor = fillSprite != null ? Color.white : movementRangeColor;
+                if (fillSprite == null) fillSprite = GetOrCreateHexFillSprite();
+
+                var zocSprite = SpriteManager.GetSprite(SpriteManager.MoveRangeZocStop);
+                var zocColor = zocSprite != null ? Color.white : zocTerminalColor;
+                if (zocSprite == null) zocSprite = fillSprite;
+
+                // Stretch each sprite to exactly cover one hex cell (2.56 × 2.956) — hex art authored in a
+                // SQUARE canvas is ~13.5% short vertically; a regular hex maps onto the cell by pure Y-stretch.
+                var fillScale = FitToCellScale(fillSprite);
+                var zocScale = FitToCellScale(zocSprite);
 
                 foreach (var kvp in reachable)
                 {
-                    var color = (zocTerminals != null && zocTerminals.Contains(kvp.Key))
-                        ? zocTerminalColor
-                        : movementRangeColor;
+                    bool isZocTerminal = zocTerminals != null && zocTerminals.Contains(kvp.Key);
+                    var sprite = isZocTerminal ? zocSprite : fillSprite;
+                    var color = isZocTerminal ? zocColor : fillColor;
 
                     var worldPos = HexGridSystem.Instance.HexToWorld(kvp.Key);
-                    movementRangeLayer.SetSprite($"mr_{kvp.Key.IntX}_{kvp.Key.IntY}", sprite, worldPos, color);
+                    movementRangeLayer.SetSprite($"mr_{kvp.Key.IntX}_{kvp.Key.IntY}", sprite, worldPos, color,
+                        scale: isZocTerminal ? zocScale : fillScale);
                 }
             }
             catch (Exception e)
             {
                 AppService.HandleException(CLASS_NAME, nameof(ShowMovementRange), e);
             }
+        }
+
+        /// <summary>
+        /// World-space scale that stretches a sprite to exactly cover one hex cell (pointy-top, width
+        /// HEX_WIDTH × height HEX_HEIGHT). Full-bleed regular-hex art lands exactly on the cell silhouette
+        /// regardless of its canvas proportions; transparent padding in the source art will skew the fit.
+        /// CONVENTION (Bob, 2026-07-21): EVERY hex-shaped overlay sprite is stamped through this — currently
+        /// MoveRangeFill/MoveRangeZocStop; TargetPickOutline (unit-pick §24.5.5) and the three ThreatFill
+        /// bands (§24.7a.8) MUST route through it when their draw code lands. Point markers (path dots/end,
+        /// facing chevrons) stay authored-size. When adding any NEW overlay sprite consumer, ask Bob at
+        /// planning time whether the art is hex-shaped (fit-scaled) or a marker (authored-size).
+        /// </summary>
+        public static Vector2 FitToCellScale(Sprite sprite)
+        {
+            var size = sprite != null ? sprite.bounds.size : Vector3.zero;
+            if (size.x <= 0f || size.y <= 0f) return Vector2.one;
+            return new Vector2(HexGridSystem.HEX_WIDTH / size.x, HexGridSystem.HEX_HEIGHT / size.y);
         }
 
         /// <summary>Clears the movement range overlay.</summary>
@@ -418,12 +451,24 @@ namespace HammerAndSickle.Renderers
             try
             {
                 movementPathLayer.Clear();
-                var sprite = GetOrCreateHexFillSprite();
 
-                foreach (var pos in path)
+                // Waypoint marker per intermediate hex, destination marker on the endpoint (§5.10.3).
+                // As-authored art, fully opaque (Bob 2026-07-21); tint only the procedural fallback.
+                var stepSprite = SpriteManager.GetSprite(SpriteManager.MovePathStep);
+                var stepColor = stepSprite != null ? Color.white : pathPreviewColor;
+                if (stepSprite == null) stepSprite = GetOrCreateHexFillSprite();
+
+                var endSprite = SpriteManager.GetSprite(SpriteManager.MovePathEnd);
+                var endColor = endSprite != null ? Color.white : stepColor;
+                if (endSprite == null) endSprite = stepSprite;
+
+                for (int i = 0; i < path.Count; i++)
                 {
+                    var pos = path[i];
+                    bool isEnd = i == path.Count - 1;
                     var worldPos = HexGridSystem.Instance.HexToWorld(pos);
-                    movementPathLayer.SetSprite($"pp_{pos.IntX}_{pos.IntY}", sprite, worldPos, pathPreviewColor);
+                    movementPathLayer.SetSprite($"pp_{pos.IntX}_{pos.IntY}",
+                        isEnd ? endSprite : stepSprite, worldPos, isEnd ? endColor : stepColor);
                 }
             }
             catch (Exception e)

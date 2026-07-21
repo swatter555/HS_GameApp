@@ -1,9 +1,12 @@
+using HammerAndSickle.Core;
 using HammerAndSickle.Core.GameData;
+using HammerAndSickle.Core.Map;
 using HammerAndSickle.Core.UI;
 using HammerAndSickle.Models;
 using HammerAndSickle.Models.Combat;
 using HammerAndSickle.Models.Map;
 using HammerAndSickle.Renderers;
+using HammerAndSickle.SceneManagement;
 using HammerAndSickle.Services;
 using System;
 using System.Collections;
@@ -67,6 +70,9 @@ namespace HammerAndSickle.Controllers
         private List<CombatUnit> _eligibleUnits = new();
         private int _cycleIndex = -1;
 
+        // Hover path preview (§5.10.3) — last hex the pointer was over; NoHexSelected = no preview showing.
+        private Position2D _lastHoverHex = GameDataManager.NoHexSelected;
+
         #endregion // Fields
 
         #region Properties
@@ -89,9 +95,18 @@ namespace HammerAndSickle.Controllers
             DontDestroyOnLoad(gameObject);
         }
 
-        private void OnEnable()
+        // Subscribe in Start, NOT OnEnable: HexDetectionService (SEO 150) and InputService (SEO 140)
+        // set their Instances in Awake AFTER every default-order script's Awake/OnEnable pair has run,
+        // so an OnEnable subscribe here deterministically finds them null. Start is guaranteed to run
+        // after ALL Awake/OnEnable regardless of Script Execution Order.
+        private void Start()
         {
             SubscribeToEvents();
+        }
+
+        private void Update()
+        {
+            UpdatePathPreviewHover();
         }
 
         private void OnDestroy()
@@ -226,14 +241,12 @@ namespace HammerAndSickle.Controllers
                 CurrentUnit = unit;
                 var map = GameDataManager.CurrentHexMap;
 
-                _currentRange = HexMapUtil.GetValidMoveDestinations(map, unit);
                 State = MovementState.UnitSelected;
+                EventManager.Instance?.RaisePlayerUnitSelected(unit);
 
-                if (EventManager.Instance != null)
-                {
-                    EventManager.Instance.RaisePlayerUnitSelected(unit);
-                    EventManager.Instance.RaiseMovementRangeComputed(unit, _currentRange.Reachable);
-                }
+                // Empty range for a unit with no move left (spent actions/MP, dug-in posture, base) — no
+                // overlay, no hover preview, and right-click can never match a reachable hex (Bob 2026-07-21).
+                RecomputeRangeAndRaise(map);
 
                 CameraService.Instance?.CenterOnPosition(unit.MapPos);
             }
@@ -241,6 +254,31 @@ namespace HammerAndSickle.Controllers
             {
                 AppService.HandleException(CLASS_NAME, nameof(SelectUnit), e);
             }
+        }
+
+        /// <summary>
+        /// Recomputes the movement range for the selected unit and raises the matching overlay event.
+        /// A unit that can no longer BEGIN a move (spent MoveActions/MP, dug-in, base) gets an EMPTY range —
+        /// overlay and hover preview stay dark and right-click can never match. NOT used by the mid-move
+        /// per-hex recompute: the MoveAction is already spent there, and its ZocTerminals drive the halt rule.
+        /// </summary>
+        private void RecomputeRangeAndRaise(HexMap map)
+        {
+            if (CurrentUnit == null || map == null) return;
+
+            _currentRange = CurrentUnit.CanBeginMoveOrder()
+                ? HexMapUtil.GetValidMoveDestinations(map, CurrentUnit)
+                : new MovementRangeResult
+                {
+                    Reachable = new Dictionary<Position2D, int>(),
+                    ZocTerminals = new HashSet<Position2D>()
+                };
+
+            if (EventManager.Instance == null) return;
+            if (_currentRange.Reachable.Count > 0)
+                EventManager.Instance.RaiseMovementRangeComputed(CurrentUnit, _currentRange.Reachable, _currentRange.ZocTerminals);
+            else
+                EventManager.Instance.RaiseMovementRangeCleared();
         }
 
         /// <summary>
@@ -337,12 +375,74 @@ namespace HammerAndSickle.Controllers
             CurrentUnit = null;
             _currentPath = null;
             State = MovementState.Idle;
+            _lastHoverHex = GameDataManager.NoHexSelected;
 
             if (EventManager.Instance != null)
             {
                 EventManager.Instance.RaisePlayerUnitDeselected();
                 EventManager.Instance.RaiseMovementRangeCleared();
+                EventManager.Instance.RaiseMovementPathPreviewCleared();
             }
+        }
+
+        /// <summary>
+        /// Hover-driven path preview (§5.10.3): while a unit is selected, the hex under the pointer — if
+        /// reachable — previews the exact path a right-click would commit. Poll-based from Update() (no hover
+        /// event exists in the input chain); FindPath runs only when the hovered hex CHANGES. Suppressed over
+        /// HUD panels and outside the UnitSelected/PlayerTurn state.
+        /// </summary>
+        private void UpdatePathPreviewHover()
+        {
+            try
+            {
+                if (State != MovementState.UnitSelected || _currentPhase != BattlePhase.PlayerTurn || CurrentUnit == null)
+                {
+                    ClearPathPreviewIfShown();
+                    return;
+                }
+
+                var mouse = Mouse.current;
+                if (mouse == null) return;
+
+                Vector2 screenPos = mouse.position.ReadValue();
+                if (DefaultDialog_Scene1.Instance != null && DefaultDialog_Scene1.Instance.IsScreenPointOverUI(screenPos))
+                {
+                    ClearPathPreviewIfShown();
+                    return;
+                }
+
+                Position2D hex = HexGridSystem.Instance.ScreenToHex(new Vector3(screenPos.x, screenPos.y, 0f), Camera.main);
+                if (hex == _lastHoverHex) return;
+                _lastHoverHex = hex;
+
+                var map = GameDataManager.CurrentHexMap;
+                if (map == null || hex == CurrentUnit.MapPos || !_currentRange.Reachable.ContainsKey(hex))
+                {
+                    EventManager.Instance?.RaiseMovementPathPreviewCleared();
+                    return;
+                }
+
+                var path = HexMapUtil.FindPath(map, CurrentUnit, CurrentUnit.MapPos, hex);
+                if (path == null || path.Count == 0)
+                {
+                    EventManager.Instance?.RaiseMovementPathPreviewCleared();
+                    return;
+                }
+
+                EventManager.Instance?.RaiseMovementPathPreviewShown(path.ConvertAll(t => t.Position));
+            }
+            catch (Exception e)
+            {
+                AppService.HandleException(CLASS_NAME, nameof(UpdatePathPreviewHover), e);
+            }
+        }
+
+        /// <summary>Clears the hover preview once when leaving a preview-capable state.</summary>
+        private void ClearPathPreviewIfShown()
+        {
+            if (_lastHoverHex == GameDataManager.NoHexSelected) return;
+            _lastHoverHex = GameDataManager.NoHexSelected;
+            EventManager.Instance?.RaiseMovementPathPreviewCleared();
         }
 
         #endregion // Selection Flow
@@ -426,10 +526,8 @@ namespace HammerAndSickle.Controllers
                 }
 
                 // Keep the unit selected and refresh its movement overlay (combat spent 25% MP).
-                _currentRange = HexMapUtil.GetValidMoveDestinations(map, CurrentUnit);
                 State = MovementState.UnitSelected;
-                if (EventManager.Instance != null)
-                    EventManager.Instance.RaiseMovementRangeComputed(CurrentUnit, _currentRange.Reachable);
+                RecomputeRangeAndRaise(map);
             }
             catch (Exception e)
             {
@@ -484,6 +582,7 @@ namespace HammerAndSickle.Controllers
             bool isAir = CurrentUnit.IsAirUnit || CurrentUnit.IsHelicopter;
             bool isFixedWing = CurrentUnit.IsFixedWingAirUnit;
             Position2D previousPos = CurrentUnit.MapPos;
+            Position2D originPos = CurrentUnit.MapPos;   // for the post-move stacking refresh
 
             // Hexes actually entered this move (in order; last = where the unit ends). Drives the
             // §6.13 tile-control flips after the move settles. May be shorter than the planned path
@@ -522,9 +621,21 @@ namespace HammerAndSickle.Controllers
                 // Record the entered hex for the post-move §6.13 tile-control pass.
                 enteredHexes.Add(targetPos);
 
-                // Animate hex step
-                // TODO: Integrate UnitMoveAnimator.AnimateHexStep here
-                yield return new WaitForSeconds(isFixedWing ? 0.08f : 0.18f);
+                // Animate the icon a single hex step and WAIT for the tween before running the arrival
+                // checks below — the unit visibly enters the hex, then spotting/ambush/ZoC resolve there.
+                float stepDuration = isFixedWing ? 0.08f : 0.18f;
+                var iconRenderer = GameIconRenderer.Instance;
+                if (iconRenderer != null)
+                {
+                    bool stepDone = false;
+                    iconRenderer.AnimateIconStep(CurrentUnit.UnitID, targetPos, stepDuration, () => stepDone = true);
+                    yield return new WaitUntil(() => stepDone);
+                }
+                else
+                {
+                    // Headless / no renderer (tests) — keep the cadence without animating.
+                    yield return new WaitForSeconds(stepDuration);
+                }
 
                 // Spotting pass
                 var newlySpotted = SpottingService.CheckSpottingForMover(CurrentUnit, targetPos);
@@ -574,14 +685,25 @@ namespace HammerAndSickle.Controllers
                 {
                     var updatedRange = HexMapUtil.GetValidMoveDestinations(map, CurrentUnit);
                     _currentRange = updatedRange;
-                    EventManager.Instance.RaiseMovementRangeComputed(CurrentUnit, updatedRange.Reachable);
+                    EventManager.Instance.RaiseMovementRangeComputed(CurrentUnit, updatedRange.Reachable, updatedRange.ZocTerminals);
                 }
 
                 if (EventManager.Instance != null)
                     EventManager.Instance.RaiseUnitMovementPointsChanged(CurrentUnit);
             }
 
-            // Move complete
+            // Move complete. Snap the icon to its final hex (defends against tween rounding or a halted
+            // last step) and refresh air/ground stacking at both ends (a departed origin may reveal a
+            // hidden stack; the destination may form a new one).
+            var finalRenderer = GameIconRenderer.Instance;
+            if (finalRenderer != null)
+            {
+                finalRenderer.SnapIcon(CurrentUnit.UnitID, CurrentUnit.MapPos);
+                if (originPos != CurrentUnit.MapPos)
+                    finalRenderer.CheckForStacking(originPos);
+                finalRenderer.CheckForStacking(CurrentUnit.MapPos);
+            }
+
             CameraService.Instance?.CenterOnPosition(CurrentUnit.MapPos);
 
             // §6.13 / §17.5 — movement-driven tile control. Ground + helicopters flip terrain;
@@ -615,15 +737,11 @@ namespace HammerAndSickle.Controllers
 
             GameDataManager.Instance.BuildOccupancyCache();
 
-            // Return to UnitSelected if unit still has actions, otherwise Idle
-            bool hasActionsLeft = CurrentUnit.MoveActions.Current > 0
-                               && CurrentUnit.MovementPoints.Current > 0;
-            if (hasActionsLeft)
+            // Return to UnitSelected if the unit could still begin another move, otherwise Idle
+            if (CurrentUnit.CanBeginMoveOrder())
             {
-                _currentRange = HexMapUtil.GetValidMoveDestinations(map, CurrentUnit);
                 State = MovementState.UnitSelected;
-                if (EventManager.Instance != null)
-                    EventManager.Instance.RaiseMovementRangeComputed(CurrentUnit, _currentRange.Reachable);
+                RecomputeRangeAndRaise(map);
             }
             else
             {
@@ -709,11 +827,8 @@ namespace HammerAndSickle.Controllers
                     if (EventManager.Instance != null)
                         EventManager.Instance.RaiseUnitMovementPointsChanged(CurrentUnit);
 
-                    // Recompute range with updated MP
-                    var map = GameDataManager.CurrentHexMap;
-                    _currentRange = HexMapUtil.GetValidMoveDestinations(map, CurrentUnit);
-                    if (EventManager.Instance != null)
-                        EventManager.Instance.RaiseMovementRangeComputed(CurrentUnit, _currentRange.Reachable);
+                    // Recompute range with updated MP (clears the overlay if rotation spent the last MP)
+                    RecomputeRangeAndRaise(GameDataManager.CurrentHexMap);
                 }
                 // TODO: Play FacingChange SFX
             }

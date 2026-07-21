@@ -1114,18 +1114,29 @@ namespace HammerAndSickle.Models
         /// Validates and begins a move order. Decrements MoveActions by 1.
         /// MP is NOT deducted here — it is deducted per-hex by MovementController.
         /// </summary>
+        /// <summary>
+        /// True when this unit could legally begin a move order right now (action/MP economy, mobility,
+        /// posture). Read-only twin of <see cref="BeginMoveOrder"/> — the UI keys movement overlays and
+        /// path previews off it; BeginMoveOrder runs the SAME gate and then spends the MoveAction.
+        /// </summary>
+        public bool CanBeginMoveOrder()
+        {
+            if (!CanMove()) return false;
+            if (MoveActions.Current < 1) return false;
+            if (MovementPoints.Current <= 0) return false;
+            if (IsBase) return false;
+            if (_deploymentPosition == DeploymentPosition.Fortified ||
+                _deploymentPosition == DeploymentPosition.Entrenched ||
+                _deploymentPosition == DeploymentPosition.HastyDefense)
+                return false;
+            return true;
+        }
+
         public bool BeginMoveOrder()
         {
             try
             {
-                if (!CanMove()) return false;
-                if (MoveActions.Current < 1) return false;
-                if (MovementPoints.Current <= 0) return false;
-                if (IsBase) return false;
-                if (_deploymentPosition == DeploymentPosition.Fortified ||
-                    _deploymentPosition == DeploymentPosition.Entrenched ||
-                    _deploymentPosition == DeploymentPosition.HastyDefense)
-                    return false;
+                if (!CanBeginMoveOrder()) return false;
 
                 MoveActions.DecrementCurrent();
                 // TODO: Supply rules pending

@@ -115,8 +115,10 @@ namespace HammerAndSickle.Controllers
         #region Movement Range Display Events
 
         // See EventManager for all game events
-        public event Action<CombatUnit, Dictionary<Position2D, int>> OnMovementRangeComputed;
+        public event Action<CombatUnit, Dictionary<Position2D, int>, HashSet<Position2D>> OnMovementRangeComputed;
         public event Action OnMovementRangeCleared;
+        public event Action<List<Position2D>> OnMovementPathPreviewShown;
+        public event Action OnMovementPathPreviewCleared;
 
         #endregion // Movement Range Display Events
 
@@ -408,9 +410,9 @@ namespace HammerAndSickle.Controllers
             catch (Exception e) { AppService.HandleException(CLASS_NAME, nameof(RaiseUnitSpottedLevelChanged), e); }
         }
 
-        public void RaiseMovementRangeComputed(CombatUnit unit, Dictionary<Position2D, int> reachable)
+        public void RaiseMovementRangeComputed(CombatUnit unit, Dictionary<Position2D, int> reachable, HashSet<Position2D> zocTerminals)
         {
-            try { OnMovementRangeComputed?.Invoke(unit, reachable); }
+            try { OnMovementRangeComputed?.Invoke(unit, reachable, zocTerminals); }
             catch (Exception e) { AppService.HandleException(CLASS_NAME, nameof(RaiseMovementRangeComputed), e); }
         }
 
@@ -418,6 +420,18 @@ namespace HammerAndSickle.Controllers
         {
             try { OnMovementRangeCleared?.Invoke(); }
             catch (Exception e) { AppService.HandleException(CLASS_NAME, nameof(RaiseMovementRangeCleared), e); }
+        }
+
+        public void RaiseMovementPathPreviewShown(List<Position2D> path)
+        {
+            try { OnMovementPathPreviewShown?.Invoke(path); }
+            catch (Exception e) { AppService.HandleException(CLASS_NAME, nameof(RaiseMovementPathPreviewShown), e); }
+        }
+
+        public void RaiseMovementPathPreviewCleared()
+        {
+            try { OnMovementPathPreviewCleared?.Invoke(); }
+            catch (Exception e) { AppService.HandleException(CLASS_NAME, nameof(RaiseMovementPathPreviewCleared), e); }
         }
 
         public void RaiseNextUnitRequested()
@@ -669,6 +683,8 @@ namespace HammerAndSickle.Controllers
             // Movement range display events
             OnMovementRangeComputed = null;
             OnMovementRangeCleared = null;
+            OnMovementPathPreviewShown = null;
+            OnMovementPathPreviewCleared = null;
 
             // Unit cycling events
             OnNextUnitRequested = null;

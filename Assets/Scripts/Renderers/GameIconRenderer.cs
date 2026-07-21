@@ -451,6 +451,55 @@ namespace HammerAndSickle.Core.Map
         }
 
         /// <summary>
+        /// Animates an existing unit icon a single hex step to <paramref name="to"/> via LeanTween
+        /// (<see cref="UnitMoveAnimator.AnimateHexStep"/>), firing <paramref name="onComplete"/> when the tween
+        /// finishes so <c>MovementController.ExecuteMovement</c> can run its per-hex spotting/ambush/ZoC checks
+        /// on arrival. If the icon is missing (never drawn / already removed), <paramref name="onComplete"/> is
+        /// invoked immediately so the move coroutine never stalls.
+        /// </summary>
+        public void AnimateIconStep(string unitId, Position2D to, float duration, Action onComplete)
+        {
+            try
+            {
+                if (unitIconPrefabs.TryGetValue(unitId, out Prefab_CombatUnitIcon unitIcon) && unitIcon != null)
+                {
+                    Vector3 world = GetRenderPosition(new Vector2Int(to.IntX, to.IntY));
+                    UnitMoveAnimator.AnimateHexStep(unitIcon.gameObject, world, duration, onComplete);
+                }
+                else
+                {
+                    onComplete?.Invoke();
+                }
+            }
+            catch (Exception e)
+            {
+                AppService.HandleException(CLASS_NAME, nameof(AnimateIconStep), e);
+                onComplete?.Invoke();
+            }
+        }
+
+        /// <summary>
+        /// Cancels any in-flight movement tween on a unit icon and hard-places it on <paramref name="to"/>
+        /// (<see cref="UnitMoveAnimator.CancelAndSnap"/>). Used for the final exact placement after a move and
+        /// as a safety snap on an ambush / ZoC halt.
+        /// </summary>
+        public void SnapIcon(string unitId, Position2D to)
+        {
+            try
+            {
+                if (unitIconPrefabs.TryGetValue(unitId, out Prefab_CombatUnitIcon unitIcon) && unitIcon != null)
+                {
+                    Vector3 world = GetRenderPosition(new Vector2Int(to.IntX, to.IntY));
+                    UnitMoveAnimator.CancelAndSnap(unitIcon.gameObject, world);
+                }
+            }
+            catch (Exception e)
+            {
+                AppService.HandleException(CLASS_NAME, nameof(SnapIcon), e);
+            }
+        }
+
+        /// <summary>
         /// Gets the appropriate sprite name for a combat unit based on its properties.
         /// Returns the sprite name and sets the out parameter for whether to flip horizontally.
         /// Resolves sprites through the WeaponProfile IconProfile system.
