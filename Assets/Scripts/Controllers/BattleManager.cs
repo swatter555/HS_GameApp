@@ -300,6 +300,19 @@ namespace HammerAndSickle.Controllers
             var mapSize = GameDataManager.CurrentMapSize;
             HexGridSystem.Instance.Initialize(mapSize.IntX, mapSize.IntY);
 
+            // Fit the background room art to the loaded map's footprint (any map size). The
+            // glowing table window is baked into the image; the fitter moves/scales the
+            // background only — the map never moves. Null-tolerant like the chunk renderer.
+            var backgroundFitter = FindAnyObjectByType<BattleBackgroundFitter>();
+            if (backgroundFitter != null)
+            {
+                backgroundFitter.FitToMap(mapSize.IntX, mapSize.IntY);
+            }
+            else
+            {
+                Debug.LogWarning("BattleManager.SetupBattleManagerData: BattleBackgroundFitter not found in scene — background not fitted to map size.");
+            }
+
             // Build the chunk-based terrain. Null-check so the scene still runs if the
             // HexChunkRenderer GameObject is not yet present in the scene hierarchy.
             if (HexChunkRenderer.Instance != null)
