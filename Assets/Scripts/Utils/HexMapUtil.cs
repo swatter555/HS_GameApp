@@ -380,8 +380,14 @@ namespace HammerAndSickle.Models.Map
                         // Occupancy filtering
                         if (!isAir)
                         {
-                            // Enemy ground unit blocks entry (spotted only)
-                            if (gdm.IsHexOccupiedByEnemyGround(neighborPos, unit.Side))
+                            // Enemy ground unit blocks entry — but only if the player has SPOTTED it.
+                            // An unspotted (Level0) enemy must NOT shape the known movement range: doing so
+                            // punches a visible hole around its hex and leaks its position through fog of war
+                            // (§12). The mid-move spotting sweep reveals and halts on contact instead. Mirrors
+                            // the Level0 exclusion in the ZoC set built above.
+                            var enemyGround = gdm.GetGroundUnitAtHex(neighborPos);
+                            if (enemyGround != null && enemyGround.Side != unit.Side
+                                && enemyGround.SpottedLevel != SpottedLevel.Level0)
                                 continue;
                         }
                         else
