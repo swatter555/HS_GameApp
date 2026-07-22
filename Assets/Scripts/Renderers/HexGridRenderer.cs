@@ -46,10 +46,15 @@ namespace HammerAndSickle.Renderers
         [SerializeField] private HexLayer movementRangeLayer;
         [SerializeField] private HexLayer movementPathLayer;
 
-        [Header("Movement Overlay Colors")]
-        [SerializeField] private Color movementRangeColor = new(0.2f, 0.8f, 0.2f, 0.25f);
-        [SerializeField] private Color zocTerminalColor = new(1.0f, 0.5f, 0.0f, 0.35f);
-        [SerializeField] private Color pathPreviewColor = new(0.2f, 0.4f, 1.0f, 0.3f);
+        [Header("Movement Overlay Tint & Opacity")]
+        // Overlay art ships as a SOLID-WHITE texture; these fields drive the final look (Bob 2026-07-21).
+        // RGB comes from the color, alpha from the matching opacity slider — the color's own alpha is IGNORED.
+        [SerializeField] private Color movementRangeColor = new(0.2f, 0.8f, 0.2f, 1f);
+        [SerializeField, Range(0f, 1f)] private float movementRangeOpacity = 0.25f;
+        [SerializeField] private Color zocTerminalColor = new(1.0f, 0.5f, 0.0f, 1f);
+        [SerializeField, Range(0f, 1f)] private float zocTerminalOpacity = 0.35f;
+        [SerializeField] private Color pathPreviewColor = new(0.2f, 0.4f, 1.0f, 1f);
+        [SerializeField, Range(0f, 1f)] private float pathPreviewOpacity = 0.3f;
 
         [Header("Debug")]
         [SerializeField] private bool _debug;
@@ -107,7 +112,11 @@ namespace HammerAndSickle.Renderers
         protected override void Awake()
         {
             base.Awake();
-            if (Instance == this) ValidateLayers();
+            if (Instance == this)
+            {
+                ValidateLayers();
+                if (IsInitialized) ConfigureLayerSorting();
+            }
         }
 
         private void Start()
@@ -157,6 +166,30 @@ namespace HammerAndSickle.Renderers
                 AppService.HandleException(CLASS_NAME, nameof(ValidateLayers), ex);
                 IsInitialized = false;
             }
+        }
+
+        /// <summary>
+        /// Assigns each HexLayer its sorting slot from code (SortingConfig is the single sorting authority —
+        /// HexLayers no longer carry serialized sorting). Runs once in Awake, before any RefreshMap stamp.
+        /// </summary>
+        private void ConfigureLayerSorting()
+        {
+            hexOutlineLayer.Configure(SortSlot.HexOutline);
+            hexSelectLayer.Configure(SortSlot.HexSelect);
+            mapIconLayer.Configure(SortSlot.MapIcon);
+            riverBankLayer.Configure(SortSlot.RiverBank);
+            riverWaterLayer.Configure(SortSlot.RiverWater);
+            roadLayer.Configure(SortSlot.Road);
+            bridgeIconLayer.Configure(SortSlot.BridgeIcon);
+            cityIconLayer.Configure(SortSlot.CityIcon);
+            impassableLayer.Configure(SortSlot.Impassable);
+            mapTextLayer.Configure(SortSlot.MapText);
+            groundUnitLayer.Configure(SortSlot.GroundUnit);
+            airUnitLayer.Configure(SortSlot.AirUnit);
+            utility1Layer.Configure(SortSlot.Utility1);
+            utility2Layer.Configure(SortSlot.Utility2);
+            movementRangeLayer.Configure(SortSlot.MovementRange);
+            movementPathLayer.Configure(SortSlot.MovementPath);
         }
 
         #endregion // Initialization
@@ -388,16 +421,16 @@ namespace HammerAndSickle.Renderers
             {
                 movementRangeLayer.Clear();
 
-                // Atlas art is stamped AS-AUTHORED, fully opaque (Color.white — Bob 2026-07-21). The
-                // serialized tint colors apply ONLY to the procedural-fill fallback, so a missing sprite
-                // degrades to the old translucent placeholder instead of an opaque white square.
+                // Overlay art ships as a SOLID-WHITE texture; the final look is the serialized RGB tint ×
+                // the per-overlay opacity slider (Bob 2026-07-21 — supersedes the same-day as-authored/no-tint
+                // pass). The procedural fallback gets the identical treatment.
                 var fillSprite = SpriteManager.GetSprite(SpriteManager.MoveRangeFill);
-                var fillColor = fillSprite != null ? Color.white : movementRangeColor;
                 if (fillSprite == null) fillSprite = GetOrCreateHexFillSprite();
+                var fillColor = OverlayTint(movementRangeColor, movementRangeOpacity);
 
                 var zocSprite = SpriteManager.GetSprite(SpriteManager.MoveRangeZocStop);
-                var zocColor = zocSprite != null ? Color.white : zocTerminalColor;
                 if (zocSprite == null) zocSprite = fillSprite;
+                var zocColor = OverlayTint(zocTerminalColor, zocTerminalOpacity);
 
                 // Stretch each sprite to exactly cover one hex cell (2.56 × 2.956) — hex art authored in a
                 // SQUARE canvas is ~13.5% short vertically; a regular hex maps onto the cell by pure Y-stretch.
@@ -438,6 +471,12 @@ namespace HammerAndSickle.Renderers
             return new Vector2(HexGridSystem.HEX_WIDTH / size.x, HexGridSystem.HEX_HEIGHT / size.y);
         }
 
+        /// <summary>Final overlay color: the serialized RGB tint with the per-overlay opacity slider as alpha.</summary>
+        private static Color OverlayTint(Color tint, float opacity)
+        {
+            return new Color(tint.r, tint.g, tint.b, opacity);
+        }
+
         /// <summary>Clears the movement range overlay.</summary>
         public void ClearMovementRange()
         {
@@ -453,14 +492,14 @@ namespace HammerAndSickle.Renderers
                 movementPathLayer.Clear();
 
                 // Waypoint marker per intermediate hex, destination marker on the endpoint (§5.10.3).
-                // As-authored art, fully opaque (Bob 2026-07-21); tint only the procedural fallback.
+                // Solid-white art tinted by the serialized path color × opacity slider (Bob 2026-07-21).
                 var stepSprite = SpriteManager.GetSprite(SpriteManager.MovePathStep);
-                var stepColor = stepSprite != null ? Color.white : pathPreviewColor;
                 if (stepSprite == null) stepSprite = GetOrCreateHexFillSprite();
 
                 var endSprite = SpriteManager.GetSprite(SpriteManager.MovePathEnd);
-                var endColor = endSprite != null ? Color.white : stepColor;
                 if (endSprite == null) endSprite = stepSprite;
+
+                var pathColor = OverlayTint(pathPreviewColor, pathPreviewOpacity);
 
                 for (int i = 0; i < path.Count; i++)
                 {
@@ -468,7 +507,7 @@ namespace HammerAndSickle.Renderers
                     bool isEnd = i == path.Count - 1;
                     var worldPos = HexGridSystem.Instance.HexToWorld(pos);
                     movementPathLayer.SetSprite($"pp_{pos.IntX}_{pos.IntY}",
-                        isEnd ? endSprite : stepSprite, worldPos, isEnd ? endColor : stepColor);
+                        isEnd ? endSprite : stepSprite, worldPos, pathColor);
                 }
             }
             catch (Exception e)
@@ -563,6 +602,7 @@ namespace HammerAndSickle.Renderers
                 _ => SpriteManager.ME_Sprawl
             };
             prefab.GetSpriteRenderer().sprite = SpriteManager.GetSprite(spriteName);
+            prefab.ApplySorting(SortSlot.MapIcon);
 
             obj.transform.position = GetRenderPosition(new Vector2Int(hex.Position.IntX, hex.Position.IntY));
             mapIconPrefabs[new Vector2Int(hex.Position.IntX, hex.Position.IntY)] = prefab;
@@ -616,6 +656,9 @@ namespace HammerAndSickle.Renderers
             prefab.UpdateControlFlag(hex.TileControl, hex.DefaultTileControl);
             prefab.UpdateCityName(hex.TileLabel);
             prefab.UpdateObjectiveStatus(hex.IsObjective);
+
+            // Sorting comes from SortingConfig, overriding the prefab's baked (and previously stale) sorting.
+            prefab.ApplySorting(SortSlot.CityIcon);
 
             cityPrefabs[new Vector2Int(hex.Position.IntX, hex.Position.IntY)] = prefab;
         }
@@ -968,6 +1011,7 @@ namespace HammerAndSickle.Renderers
             prefab.Dir = direction;
             prefab.Pos = hex.Position.ToVector2Int();
             prefab.Renderer.sprite = GetBridgeSprite(bridgeType, direction);
+            prefab.ApplySorting(SortSlot.BridgeIcon);
 
             obj.transform.position = GetRenderPosition(new Vector2Int(hex.Position.IntX, hex.Position.IntY));
             bridgePrefabs[bridgeKey] = prefab;
@@ -1059,6 +1103,7 @@ namespace HammerAndSickle.Renderers
             prefab.SetFont(coreFontWeight);
             prefab.SetColor(hex.LabelColor);
             prefab.SetOutlineThickness(hex.LabelOutlineThickness);
+            prefab.ApplySorting(SortSlot.MapText);
 
             obj.transform.position = GetRenderPosition(new Vector2Int(hex.Position.IntX, hex.Position.IntY));
             textLabelPrefabs[new Vector2Int(hex.Position.IntX, hex.Position.IntY)] = prefab;

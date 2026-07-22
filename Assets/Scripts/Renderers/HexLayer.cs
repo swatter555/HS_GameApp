@@ -19,19 +19,18 @@ namespace HammerAndSickle.Renderers
     /// </summary>
     public class HexLayer : MonoBehaviour
     {
-        #region Serialized Fields
+        #region Sorting
 
-        [SerializeField] private HexSortingLayer sortingLayer = HexSortingLayer.Map;
-        [SerializeField] private int sortingOrder;
+        /// <summary>
+        /// This layer's sorting slot. Assigned once in code via <see cref="Configure"/> (HexGridRenderer at
+        /// startup) — sorting is NOT authored on this component anymore; SortingConfig is the single authority.
+        /// </summary>
+        public SortSlot Slot { get; private set; }
 
-        #endregion // Serialized Fields
+        /// <summary>Assigns this layer's sorting slot. Call before any SetSprite.</summary>
+        public void Configure(SortSlot slot) => Slot = slot;
 
-        #region Private Helpers
-
-        /// <summary>Converts the enum to the sorting layer name string Unity expects.</summary>
-        private string SortingLayerName => sortingLayer.ToString();
-
-        #endregion // Private Helpers
+        #endregion // Sorting
 
         #region Fields
 
@@ -76,6 +75,12 @@ namespace HammerAndSickle.Renderers
 
             // Pool hook: replace Instantiate with pool.Get() here
             var go = new GameObject(key);
+            // Inherit the host's Unity layer. New GameObjects default to layer 0 (Default), but the URP
+            // Forward Renderer's transparent mask EXCLUDES layer 7 ("No Volume Layer"), which the
+            // NoVolumeRendering RenderObjects feature redraws AFTER post-processing — so a layer-0 stamp
+            // draws in the EARLY pass and sits under every layer-7 prefab icon regardless of sorting layer.
+            // The map hierarchy (and every HexLayer host) lives on layer 7; stamps must too.
+            go.layer = gameObject.layer;
             go.transform.SetParent(transform, false);
             go.transform.position = worldPos;
             go.transform.localScale = localScale;
@@ -85,8 +90,7 @@ namespace HammerAndSickle.Renderers
             renderer.color = color;
             renderer.flipX = flipX;
             renderer.flipY = flipY;
-            renderer.sortingLayerName = SortingLayerName;
-            renderer.sortingOrder = sortingOrder;
+            SortingConfig.Apply(renderer, Slot);
 
             _children[key] = go;
         }

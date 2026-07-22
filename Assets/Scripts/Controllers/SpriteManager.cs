@@ -1041,9 +1041,9 @@ namespace HammerAndSickle.Controllers
         // Overlay layers (movementRange / movementPath / threat rings). Resolve via
         // _movementOverlayAtlas. Values match the packed sprite names in the "Movement
         // Overlays" atlas (= the PNG filenames in Assets/Art/Sprites/Movement Overlays/).
-        // Art carries its OWN color and alpha and is stamped as-authored, fully opaque
-        // (Color.white, no code tint — ratified 2026-07-21). HexGridRenderer's serialized
-        // tint colors apply only to its procedural-fill FALLBACK when a sprite is missing.
+        // Overlay art ships as a SOLID-WHITE texture (Bob 2026-07-21, supersedes the same-day
+        // as-authored/no-tint pass). HexGridRenderer applies its serialized RGB tint × per-overlay
+        // opacity slider to atlas art and the procedural fallback identically.
         // HEX-SHAPED sprites (MoveRangeFill, MoveRangeZocStop, TargetPickOutline, ThreatFill_*)
         // are stamped through HexGridRenderer.FitToCellScale — the cell is a REGULAR pointy-top
         // hex, 2.56 wide × 2.956 tall, so square-canvas hex art renders ~13.5% short without it.

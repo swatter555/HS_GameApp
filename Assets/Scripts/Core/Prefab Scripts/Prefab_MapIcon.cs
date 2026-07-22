@@ -1,4 +1,5 @@
 using HammerAndSickle.Core.GameData;
+using HammerAndSickle.Renderers;
 using UnityEngine;
 
 namespace HammerAndSickle.Core
@@ -70,6 +71,14 @@ namespace HammerAndSickle.Core
         public void SetSpriteRenderer(SpriteRenderer spriteRenderer)
         {
             SpriteRenderer = spriteRenderer;
+        }
+
+        /// <summary>
+        /// Stamps this icon's renderer onto <paramref name="slot"/> via SortingConfig, overriding baked sorting.
+        /// </summary>
+        public void ApplySorting(SortSlot slot)
+        {
+            SortingConfig.Apply(SpriteRenderer, slot);
         }
 
         #endregion

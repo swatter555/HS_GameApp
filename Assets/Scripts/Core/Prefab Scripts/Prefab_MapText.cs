@@ -1,5 +1,6 @@
 using HammerAndSickle.Core.GameData;
 using HammerAndSickle.Services;
+using HammerAndSickle.Renderers;
 using TMPro;
 using UnityEngine;
 
@@ -191,6 +192,16 @@ namespace HammerAndSickle.Core
             {
                 AppService.HandleException(CLASS_NAME, "SetOutlineThickness", e);
             }
+        }
+
+        /// <summary>
+        /// Stamps the label's renderer onto <paramref name="slot"/> via SortingConfig, overriding baked sorting.
+        /// TextMeshPro (3D) sorts via its underlying Renderer.
+        /// </summary>
+        public void ApplySorting(SortSlot slot)
+        {
+            if (textComponent != null)
+                SortingConfig.Apply(textComponent.GetComponent<Renderer>(), slot);
         }
 
         #endregion // Public Methods

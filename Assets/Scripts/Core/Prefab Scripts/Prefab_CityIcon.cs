@@ -1,6 +1,7 @@
 using HammerAndSickle.Core.GameData;
 using HammerAndSickle.Services;
 using HammerAndSickle.Controllers;
+using HammerAndSickle.Renderers;
 using System;
 using TMPro;
 using UnityEngine;
@@ -173,6 +174,36 @@ namespace HammerAndSickle.Core
         public void UpdateObjectiveStatus(bool isObjective)
         {
             objectiveFlagRenderer.gameObject.SetActive(isObjective);
+        }
+
+        // Render order of the elements WITHIN this prefab (offset added to the slot's base order by
+        // SortingConfig). Lives here in the script — the single place the internal stack is defined.
+        private const int IconSubOrder = 0;
+        private const int NamePlateSubOrder = 1;
+        private const int FlagSubOrder = 2;
+        private const int ObjSubOrder = 3;
+        private const int TextSubOrder = 4;
+
+        /// <summary>
+        /// Stamps every child renderer onto <paramref name="slot"/> via <see cref="SortingConfig"/>, overriding
+        /// whatever sorting was baked into the prefab. The per-element sub-orders above preserve the internal
+        /// Icon→NamePlate→Flag→Obj→Text stack. Called from HexGridRenderer.CreateCityIcon.
+        /// </summary>
+        public void ApplySorting(SortSlot slot)
+        {
+            try
+            {
+                SortingConfig.Apply(cityIconRenderer, slot, IconSubOrder);
+                SortingConfig.Apply(nameplateRenderer, slot, NamePlateSubOrder);
+                SortingConfig.Apply(controlFlagRenderer, slot, FlagSubOrder);
+                SortingConfig.Apply(objectiveFlagRenderer, slot, ObjSubOrder);
+                // TextMeshPro (3D) sorts via its underlying Renderer.
+                SortingConfig.Apply(cityNameText.GetComponent<Renderer>(), slot, TextSubOrder);
+            }
+            catch (Exception e)
+            {
+                AppService.HandleException(CLASS_NAME, nameof(ApplySorting), e);
+            }
         }
 
         #endregion

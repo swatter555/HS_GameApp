@@ -1,5 +1,6 @@
 using HammerAndSickle.Controllers;
 using HammerAndSickle.Core.GameData;
+using HammerAndSickle.Renderers;
 using HammerAndSickle.Services;
 using System;
 using TMPro;
@@ -283,6 +284,37 @@ namespace HammerAndSickle.Core
             if (stackingIcon != null)
             {
                 stackingIcon.enabled = show;
+            }
+        }
+
+        // Render order of the elements WITHIN this prefab (offset added to the slot's base order by
+        // SortingConfig). Lives here in the script — the single place the internal stack is defined.
+        private const int UnitIconSubOrder = 0;
+        private const int NationIconSubOrder = 1;
+        private const int DeployIconSubOrder = 2;
+        private const int BoxIconSubOrder = 3;
+        private const int BoxTextSubOrder = 4;
+        private const int StackingIconSubOrder = 5;
+
+        /// <summary>
+        /// Stamps every child renderer onto <paramref name="slot"/> (GroundUnit or AirUnit) via
+        /// <see cref="SortingConfig"/>, overriding baked prefab sorting. Sub-orders above define the internal
+        /// unit-icon stack. Called from GameIconRenderer.CreateUnitIcon after instantiation.
+        /// </summary>
+        public void ApplySorting(SortSlot slot)
+        {
+            try
+            {
+                SortingConfig.Apply(unitIcon, slot, UnitIconSubOrder);
+                SortingConfig.Apply(nationIcon, slot, NationIconSubOrder);
+                SortingConfig.Apply(deployIcon, slot, DeployIconSubOrder);
+                SortingConfig.Apply(boxIcon, slot, BoxIconSubOrder);
+                SortingConfig.Apply(boxText != null ? boxText.GetComponent<Renderer>() : null, slot, BoxTextSubOrder);
+                SortingConfig.Apply(stackingIcon, slot, StackingIconSubOrder);
+            }
+            catch (Exception e)
+            {
+                AppService.HandleException(CLASS_NAME, nameof(ApplySorting), e);
             }
         }
 

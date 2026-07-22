@@ -1,4 +1,5 @@
 using HammerAndSickle.Core.GameData;
+using HammerAndSickle.Renderers;
 using UnityEngine;
 
 namespace HammerAndSickle.Core
@@ -53,5 +54,17 @@ namespace HammerAndSickle.Core
         }
 
         #endregion // Properties
+
+        #region Public Methods
+
+        /// <summary>
+        /// Stamps this bridge's renderer onto <paramref name="slot"/> via SortingConfig, overriding baked sorting.
+        /// </summary>
+        public void ApplySorting(SortSlot slot)
+        {
+            SortingConfig.Apply(SpriteRenderer, slot);
+        }
+
+        #endregion // Public Methods
     }
 }

@@ -362,6 +362,9 @@ namespace HammerAndSickle.Core.Map
                 // Initialize the prefab with unit ID, current state, and deploy sprite resolver
                 unitIcon.Initialize(unit.UnitID, hpPercent, unit.DeploymentPosition, unit.CurrentEmbarkmentState, GetDeploySpriteName);
 
+                // Sorting from SortingConfig, overriding baked prefab sorting (matches the target layer).
+                unitIcon.ApplySorting(IsFixedWingAircraft(unit.Classification) ? SortSlot.AirUnit : SortSlot.GroundUnit);
+
                 // Position the prefab
                 Vector3 position = GetRenderPosition(new Vector2Int(unit.MapPos.IntX, unit.MapPos.IntY));
                 unitIconObject.transform.position = position;
