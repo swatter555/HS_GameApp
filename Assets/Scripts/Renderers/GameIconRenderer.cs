@@ -387,6 +387,35 @@ namespace HammerAndSickle.Core.Map
         }
         
         /// <summary>
+        /// Re-resolves an existing icon's unit sprite + horizontal flip from the unit's CURRENT Facing
+        /// (both the sprite variant and the easterly mirror derive from it — see GetSpriteNameForUnit).
+        /// Called per hex step during movement and after a manual Shift+click rotation. Cheaper than a
+        /// full redraw: leaves position, tweens, nation/box/HP elements and stacking state alone.
+        /// </summary>
+        public void RefreshIconFacing(string unitId)
+        {
+            try
+            {
+                if (string.IsNullOrEmpty(unitId)) return;
+                if (!unitIconPrefabs.TryGetValue(unitId, out Prefab_CombatUnitIcon unitIcon) || unitIcon == null) return;
+
+                CombatUnit unit = GameDataManager.Instance.GetCombatUnit(unitId);
+                if (unit == null) return;
+
+                string spriteName = GetSpriteNameForUnit(unit, out bool shouldFlip);
+                unitIcon.SetUnitIcon(spriteName);
+                // Assign both ways — a unit turning back west must UN-flip.
+                unitIcon.UnitIconRenderer.flipX = shouldFlip;
+
+                if (_debug) Debug.Log($"[{CLASS_NAME}.RefreshIconFacing] '{unit.UnitName}' now facing {unit.Facing} (flip={shouldFlip}).");
+            }
+            catch (Exception e)
+            {
+                AppService.HandleException(CLASS_NAME, nameof(RefreshIconFacing), e);
+            }
+        }
+
+        /// <summary>
         /// Removes a unit icon from the renderer.
         /// Also rechecks stacking at the unit's position.
         /// </summary>

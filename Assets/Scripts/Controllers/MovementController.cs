@@ -627,6 +627,10 @@ namespace HammerAndSickle.Controllers
                 var iconRenderer = GameIconRenderer.Instance;
                 if (iconRenderer != null)
                 {
+                    // Turn the icon INTO the step direction before it glides — MoveUnitTo above already
+                    // rotated unit.Facing toward this step; the icon re-resolves sprite + flip from it.
+                    iconRenderer.RefreshIconFacing(CurrentUnit.UnitID);
+
                     bool stepDone = false;
                     iconRenderer.AnimateIconStep(CurrentUnit.UnitID, targetPos, stepDuration, () => stepDone = true);
                     yield return new WaitUntil(() => stepDone);
@@ -824,6 +828,10 @@ namespace HammerAndSickle.Controllers
 
                 if (CurrentUnit.TryRotateFacing(dir.Value))
                 {
+                    // The icon's sprite variant + flip derive from Facing — refresh it (same gap as
+                    // movement: icons only resolved facing at create time before 2026-07-22).
+                    GameIconRenderer.Instance?.RefreshIconFacing(CurrentUnit.UnitID);
+
                     if (EventManager.Instance != null)
                         EventManager.Instance.RaiseUnitMovementPointsChanged(CurrentUnit);
 
