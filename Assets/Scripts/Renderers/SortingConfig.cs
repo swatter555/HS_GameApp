@@ -7,9 +7,10 @@ namespace HammerAndSickle.Renderers
     /// </summary>
     public enum SortSlot
     {
-        // Map sorting layer (bottom -> top)
+        // Map sorting layer (bottom -> top). HexSelect sits ABOVE all terrain features and icons
+        // (rivers/roads/bridges/cities/impassable) so the selection ring is never occluded — only
+        // MapText renders over it (Bob 2026-07-22).
         HexOutline,
-        HexSelect,
         MapIcon,
         RiverBank,
         RiverWater,
@@ -17,6 +18,7 @@ namespace HammerAndSickle.Renderers
         BridgeIcon,
         CityIcon,
         Impassable,
+        HexSelect,
         MapText,
 
         // Units sorting layer
@@ -51,14 +53,14 @@ namespace HammerAndSickle.Renderers
         private static (HexSortingLayer layer, int order) Resolve(SortSlot slot) => slot switch
         {
             SortSlot.HexOutline    => (HexSortingLayer.Map, 0),
-            SortSlot.HexSelect     => (HexSortingLayer.Map, 10),
-            SortSlot.MapIcon       => (HexSortingLayer.Map, 20),
-            SortSlot.RiverBank     => (HexSortingLayer.Map, 30),
-            SortSlot.RiverWater    => (HexSortingLayer.Map, 40),
-            SortSlot.Road          => (HexSortingLayer.Map, 50),
-            SortSlot.BridgeIcon    => (HexSortingLayer.Map, 60),
-            SortSlot.CityIcon      => (HexSortingLayer.Map, 70),
-            SortSlot.Impassable    => (HexSortingLayer.Map, 80),
+            SortSlot.MapIcon       => (HexSortingLayer.Map, 10),
+            SortSlot.RiverBank     => (HexSortingLayer.Map, 20),
+            SortSlot.RiverWater    => (HexSortingLayer.Map, 30),
+            SortSlot.Road          => (HexSortingLayer.Map, 40),
+            SortSlot.BridgeIcon    => (HexSortingLayer.Map, 50),
+            SortSlot.CityIcon      => (HexSortingLayer.Map, 60),
+            SortSlot.Impassable    => (HexSortingLayer.Map, 70),
+            SortSlot.HexSelect     => (HexSortingLayer.Map, 80),
             SortSlot.MapText       => (HexSortingLayer.Map, 90),
 
             SortSlot.GroundUnit    => (HexSortingLayer.Units, 0),

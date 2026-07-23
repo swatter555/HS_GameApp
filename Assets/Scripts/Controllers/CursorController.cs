@@ -1,6 +1,7 @@
 using HammerAndSickle.Core;
 using HammerAndSickle.Core.GameData;
 using HammerAndSickle.Models;
+using HammerAndSickle.Renderers;
 using HammerAndSickle.Services;
 using System;
 using UnityEngine;
@@ -9,14 +10,15 @@ using UnityEngine.InputSystem;
 namespace HammerAndSickle.Controllers
 {
     /// <summary>
-    /// Live cursor feedback (§24.11.3) — the mouse cursor is an input-state readout: default arrow in normal
-    /// selection, CROSSHAIR while Ctrl is held over a legal combat target, DENIED while Ctrl is held over
-    /// anything illegal. Legality comes from MovementController.AttackLegality — the SAME gate the click runs,
-    /// so the cursor never lies. Poll-based (no EventManager subscriptions — survives scene transitions and
+    /// Live combat-input feedback (§24.11.3, amended 2026-07-22) — while Ctrl is held over a LEGAL combat
+    /// target, the TargetPickOutline hex stamp appears on the target hex (via HexGridRenderer) and the cursor
+    /// stays the default arrow; Ctrl over anything illegal shows the DENIED cursor (the old crosshair cursor
+    /// is retired). Legality comes from MovementController.AttackLegality — the SAME gate the click runs, so
+    /// the feedback never lies. Poll-based (no EventManager subscriptions — survives scene transitions and
     /// ClearAllSubscriptions): inert whenever no battle map is loaded. Per-mode cursors for future input modes
     /// (unit-pick §24.5.5, AOB placement §24.7a.1) slot in here as those modes land.
-    /// Cursor art: assign textures on a scene instance to use real sprites; a bootstrap-created instance falls
-    /// back to procedural placeholder textures so the play-test has visible feedback before art exists.
+    /// Cursor art: assign a denied texture on a scene instance to use a real sprite; a bootstrap-created
+    /// instance falls back to a procedural placeholder.
     /// </summary>
     public class CursorController : MonoBehaviour
     {
@@ -43,15 +45,14 @@ namespace HammerAndSickle.Controllers
 
         #region Fields
 
-        private enum CursorVisual { Default, Crosshair, Denied }
+        private enum CursorVisual { Default, Denied }
 
-        [Header("Cursor Art (optional — procedural placeholders used when empty)")]
-        [SerializeField] private Texture2D crosshairCursor;
+        [Header("Cursor Art (optional — procedural placeholder used when empty)")]
         [SerializeField] private Texture2D deniedCursor;
 
-        private Texture2D _fallbackCrosshair;
         private Texture2D _fallbackDenied;
         private CursorVisual _current = CursorVisual.Default;
+        private Position2D? _stampedTarget;   // hex currently wearing the TargetPickOutline stamp
 
         #endregion // Fields
 
@@ -69,7 +70,6 @@ namespace HammerAndSickle.Controllers
 
             try
             {
-                _fallbackCrosshair = BuildCrosshairTexture();
                 _fallbackDenied = BuildDeniedTexture();
             }
             catch (Exception e)
@@ -82,12 +82,13 @@ namespace HammerAndSickle.Controllers
         {
             try
             {
-                CursorVisual desired = DetermineVisual();
+                CursorVisual desired = DetermineVisual(out Position2D? legalTarget);
                 if (desired != _current)
                 {
                     Apply(desired);
                     _current = desired;
                 }
+                UpdateTargetStamp(legalTarget);
             }
             catch (Exception e)
             {
@@ -109,12 +110,15 @@ namespace HammerAndSickle.Controllers
         #region Cursor State
 
         /// <summary>
-        /// §5.10.6 semantics: the crosshair/denied pair exists ONLY while Ctrl (the combat modifier) is held on
-        /// a live battle map; everything else is the default arrow. With Ctrl held: legal target → crosshair,
+        /// §5.10.6 semantics (amended 2026-07-22): the feedback pair exists ONLY while Ctrl (the combat
+        /// modifier) is held on a live battle map; everything else is the default arrow. With Ctrl held:
+        /// legal target → default arrow + TargetPickOutline stamp on the target hex (via legalTarget),
         /// anything else (no unit selected, empty hex, friendly, out of range, no action) → denied.
         /// </summary>
-        private CursorVisual DetermineVisual()
+        private CursorVisual DetermineVisual(out Position2D? legalTarget)
         {
+            legalTarget = null;
+
             // Input System API (the project runs Input System-only — legacy UnityEngine.Input throws).
             var kb = Keyboard.current;
             var mouse = Mouse.current;
@@ -143,7 +147,12 @@ namespace HammerAndSickle.Controllers
             if (target == null || target.Side == Side.Player)
                 return CursorVisual.Denied;
 
-            return mc.AttackLegality(target) == null ? CursorVisual.Crosshair : CursorVisual.Denied;
+            if (mc.AttackLegality(target) == null)
+            {
+                legalTarget = hex;
+                return CursorVisual.Default;
+            }
+            return CursorVisual.Denied;
         }
 
         private void Apply(CursorVisual visual)
@@ -151,9 +160,6 @@ namespace HammerAndSickle.Controllers
             Vector2 center = new(TEX_SIZE / 2f, TEX_SIZE / 2f);
             switch (visual)
             {
-                case CursorVisual.Crosshair:
-                    Cursor.SetCursor(crosshairCursor != null ? crosshairCursor : _fallbackCrosshair, center, CursorMode.Auto);
-                    break;
                 case CursorVisual.Denied:
                     Cursor.SetCursor(deniedCursor != null ? deniedCursor : _fallbackDenied, center, CursorMode.Auto);
                     break;
@@ -163,24 +169,34 @@ namespace HammerAndSickle.Controllers
             }
         }
 
+        /// <summary>
+        /// Keeps the TargetPickOutline stamp in sync with the Ctrl-hover legality poll: stamps the hex when a
+        /// legal target is hovered, clears it the moment there isn't one. Only re-stamps on hex CHANGE.
+        /// </summary>
+        private void UpdateTargetStamp(Position2D? target)
+        {
+            if (Nullable.Equals(target, _stampedTarget)) return;
+
+            // No live battle map → the renderer (and any stamp) went down with the scene; just drop the
+            // bookkeeping. Guard BEFORE touching the singleton so its lazy find never runs outside battle.
+            if (GameDataManager.CurrentHexMap == null)
+            {
+                _stampedTarget = null;
+                return;
+            }
+
+            var renderer = HexGridRenderer.Instance;
+            if (renderer != null)
+            {
+                if (target.HasValue) renderer.ShowCombatTargetPick(target.Value);
+                else renderer.ClearCombatTargetPick();
+            }
+            _stampedTarget = target;
+        }
+
         #endregion // Cursor State
 
         #region Placeholder Textures
-
-        /// <summary>White crosshair with a black outline and an open center — readable on any terrain.</summary>
-        private static Texture2D BuildCrosshairTexture()
-        {
-            var tex = NewCursorTexture();
-            int c = TEX_SIZE / 2;
-            for (int i = 2; i < TEX_SIZE - 2; i++)
-            {
-                if (Mathf.Abs(i - c) < 4) continue;      // open center
-                PlotOutlined(tex, i, c, Color.white);    // horizontal arm
-                PlotOutlined(tex, c, i, Color.white);    // vertical arm
-            }
-            tex.Apply();
-            return tex;
-        }
 
         /// <summary>Red ring with a diagonal slash — the universal "no".</summary>
         private static Texture2D BuildDeniedTexture()
@@ -208,20 +224,6 @@ namespace HammerAndSickle.Controllers
                 for (int y = 0; y < TEX_SIZE; y++)
                     tex.SetPixel(x, y, clear);
             return tex;
-        }
-
-        /// <summary>Plots a pixel with a 1px black outline around it (drawn first, overwritten by the core color).</summary>
-        private static void PlotOutlined(Texture2D tex, int x, int y, Color core)
-        {
-            for (int dx = -1; dx <= 1; dx++)
-                for (int dy = -1; dy <= 1; dy++)
-                {
-                    int px = x + dx, py = y + dy;
-                    if (px < 0 || py < 0 || px >= TEX_SIZE || py >= TEX_SIZE) continue;
-                    if (tex.GetPixel(px, py).a < 0.5f)
-                        tex.SetPixel(px, py, Color.black);
-                }
-            tex.SetPixel(x, y, core);
         }
 
         #endregion // Placeholder Textures

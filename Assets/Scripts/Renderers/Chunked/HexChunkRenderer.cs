@@ -57,6 +57,9 @@ namespace HammerAndSickle.Renderers.Chunked
         [Tooltip("When true, builder changes automatically trigger a rebuild via the cached map.")]
         [SerializeField] private bool autoRebuildOnValidate = false;
 
+        [Tooltip("Log chunk-build timing and terrain-array binding to the console. Warnings/errors about broken setup always log.")]
+        [SerializeField] private bool debugLog = false;
+
         private readonly Dictionary<(int cx, int cy), HexChunk> _chunks = new();
         private int _chunksX;
         private int _chunksY;
@@ -125,8 +128,9 @@ namespace HammerAndSickle.Renderers.Chunked
                 }
 
                 sw.Stop();
-                Debug.Log($"[{CLASS_NAME}] Built {_chunksX}x{_chunksY} chunk grid " +
-                          $"({_chunks.Count} chunks) in {sw.ElapsedMilliseconds}ms.");
+                if (debugLog)
+                    Debug.Log($"[{CLASS_NAME}] Built {_chunksX}x{_chunksY} chunk grid " +
+                              $"({_chunks.Count} chunks) in {sw.ElapsedMilliseconds}ms.");
             }
             catch (System.Exception ex)
             {
@@ -211,7 +215,8 @@ namespace HammerAndSickle.Renderers.Chunked
             }
 
             terrainMaterial.SetTexture("_TerrainArray", array);
-            Debug.Log($"[{CLASS_NAME}] Bound TerrainArray_{terrainSet} ({array.depth} slices, {array.width}x{array.height}).");
+            if (debugLog)
+                Debug.Log($"[{CLASS_NAME}] Bound TerrainArray_{terrainSet} ({array.depth} slices, {array.width}x{array.height}).");
         }
 
         /// <summary>Pushes shader-side tuning knobs to the material. No rebuild required.</summary>

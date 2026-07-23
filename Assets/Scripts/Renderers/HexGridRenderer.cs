@@ -55,6 +55,8 @@ namespace HammerAndSickle.Renderers
         [SerializeField, Range(0f, 1f)] private float zocTerminalOpacity = 0.35f;
         [SerializeField] private Color pathPreviewColor = new(0.2f, 0.4f, 1.0f, 1f);
         [SerializeField, Range(0f, 1f)] private float pathPreviewOpacity = 0.3f;
+        [SerializeField] private Color combatTargetColor = new(1.0f, 0.15f, 0.15f, 1f);
+        [SerializeField, Range(0f, 1f)] private float combatTargetOpacity = 0.9f;
 
         [Header("Debug")]
         [SerializeField] private bool _debug;
@@ -459,7 +461,8 @@ namespace HammerAndSickle.Renderers
         /// HEX_WIDTH × height HEX_HEIGHT). Full-bleed regular-hex art lands exactly on the cell silhouette
         /// regardless of its canvas proportions; transparent padding in the source art will skew the fit.
         /// CONVENTION (Bob, 2026-07-21): EVERY hex-shaped overlay sprite is stamped through this — currently
-        /// MoveRangeFill/MoveRangeZocStop; TargetPickOutline (unit-pick §24.5.5) and the three ThreatFill
+        /// MoveRangeFill/MoveRangeZocStop/TargetPickOutline (Ctrl-combat legal-target stamp, 2026-07-22;
+        /// unit-pick §24.5.5 will reuse it); the three ThreatFill
         /// bands (§24.7a.8) MUST route through it when their draw code lands. Point markers (path dots/end,
         /// facing chevrons) stay authored-size. When adding any NEW overlay sprite consumer, ask Bob at
         /// planning time whether the art is hex-shaped (fit-scaled) or a marker (authored-size).
@@ -521,6 +524,41 @@ namespace HammerAndSickle.Renderers
         {
             try { movementPathLayer.Clear(); }
             catch (Exception e) { AppService.HandleException(CLASS_NAME, nameof(ClearPathPreview), e); }
+        }
+
+        /// <summary>
+        /// Stamps the TargetPickOutline on a legal Ctrl+click combat target hex (§24.11.3, amended
+        /// 2026-07-22 — the hex outline replaces the old crosshair cursor as the legal-target
+        /// indicator). One stamp at a time, on the utility1 layer; driven per-frame by
+        /// CursorController's Ctrl-hover poll.
+        /// </summary>
+        public void ShowCombatTargetPick(Position2D hex)
+        {
+            try
+            {
+                utility1Layer.Clear();
+
+                // Hex-shaped overlay art → fit-scaled to the cell; solid-white texture tinted by the
+                // serialized color × opacity, same pattern as the movement overlays.
+                var sprite = SpriteManager.GetSprite(SpriteManager.TargetPickOutline);
+                if (sprite == null) sprite = GetOrCreateHexFillSprite();
+                var color = OverlayTint(combatTargetColor, combatTargetOpacity);
+
+                var worldPos = HexGridSystem.Instance.HexToWorld(hex);
+                utility1Layer.SetSprite("combat_target", sprite, worldPos, color,
+                    scale: FitToCellScale(sprite));
+            }
+            catch (Exception e)
+            {
+                AppService.HandleException(CLASS_NAME, nameof(ShowCombatTargetPick), e);
+            }
+        }
+
+        /// <summary>Clears the combat-target pick stamp.</summary>
+        public void ClearCombatTargetPick()
+        {
+            try { utility1Layer.Clear(); }
+            catch (Exception e) { AppService.HandleException(CLASS_NAME, nameof(ClearCombatTargetPick), e); }
         }
 
         #endregion // Public API — Movement Overlays
