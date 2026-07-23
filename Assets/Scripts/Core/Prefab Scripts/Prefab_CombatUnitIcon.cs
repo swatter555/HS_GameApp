@@ -31,6 +31,10 @@ namespace HammerAndSickle.Core
         [SerializeField] private TMP_FontAsset fontAsset;
         [SerializeField] private Color ratioTextColor = Color.black;
 
+        [Header("Motion Animation")]
+        [Tooltip("Frame rate for the 6-frame motion flipbook (helo rotors) while the icon is moving. 40 play-tested best (Bob 2026-07-22).")]
+        [SerializeField] private float animationFps = 40f;
+
         #endregion // Inspector Fields
 
         #region Fields
@@ -44,6 +48,18 @@ namespace HammerAndSickle.Core
         /// Callback provided by the renderer to resolve a deployment position and embarkment state into a sprite name.
         /// </summary>
         private Func<DeploymentPosition, EmbarkmentState, string> _resolveDeploySprite;
+
+        // Motion flipbook (RegimentIconType.Helo_Animation): atlas ships 6 frames per helo named
+        // "<unit>_Frame0".."_Frame5". While the icon is tween-moving the frames loop at animationFps;
+        // at rest the icon sits on Frame0 (motion-only by design, Bob 2026-07-22).
+        private const int MOTION_FRAME_COUNT = 6;
+        private const string MOTION_FRAME0_SUFFIX = "_Frame0";
+
+        private string _unitSpriteName;    // last name passed to SetUnitIcon (atlas clones mangle sprite.name)
+        private Sprite[] _motionFrames;    // resolved frames while the loop runs; null otherwise
+        private int _motionIndex;
+        private float _motionTimer;
+        private bool _motionActive;
 
         #endregion // Fields
 
@@ -91,6 +107,22 @@ namespace HammerAndSickle.Core
         private void Awake()
         {
             ValidateReferences();
+        }
+
+        private void Update()
+        {
+            // Motion flipbook: advance frames while active. Multi-step advance keeps the cycle
+            // smooth through frame hitches.
+            if (!_motionActive || _motionFrames == null || unitIcon == null) return;
+
+            float frameTime = 1f / Mathf.Max(1f, animationFps);
+            _motionTimer += Time.deltaTime;
+            if (_motionTimer < frameTime) return;
+
+            int steps = (int)(_motionTimer / frameTime);
+            _motionTimer -= steps * frameTime;
+            _motionIndex = (_motionIndex + steps) % _motionFrames.Length;
+            unitIcon.sprite = _motionFrames[_motionIndex];
         }
 
         private void OnDestroy()
@@ -142,11 +174,73 @@ namespace HammerAndSickle.Core
                     return;
                 }
 
+                // A DIFFERENT sprite invalidates a running motion loop's cached frames (the next
+                // AnimateIconStep restarts it from the new name). Re-setting the SAME name mid-loop
+                // (facing refresh during a move) leaves the loop running — its next tick overrides
+                // the Frame0 assigned below.
+                if (_motionActive && spriteName != _unitSpriteName)
+                    StopMotionAnimation();
+
+                _unitSpriteName = spriteName;
                 unitIcon.sprite = SpriteManager.GetSprite(spriteName);
             }
             catch (Exception e)
             {
                 AppService.HandleException(CLASS_NAME, nameof(SetUnitIcon), e);
+            }
+        }
+
+        /// <summary>
+        /// Starts the motion flipbook (helo rotor loop). No-op unless the current unit sprite is a
+        /// "&lt;name&gt;_Frame0" flipbook set — callers never need to know the unit type. Idempotent while
+        /// running. GameIconRenderer.AnimateIconStep starts it; SnapIcon stops it (motion-only).
+        /// </summary>
+        public void StartMotionAnimation()
+        {
+            try
+            {
+                if (_motionActive) return;
+                if (unitIcon == null || string.IsNullOrEmpty(_unitSpriteName)) return;
+                if (!_unitSpriteName.EndsWith(MOTION_FRAME0_SUFFIX, StringComparison.Ordinal)) return;
+
+                // "<unit>_Frame0" -> "<unit>_Frame" + i. Resolve all frames once; tolerate atlas gaps
+                // by looping only what resolves.
+                string baseName = _unitSpriteName[..^1];
+                var resolved = new Sprite[MOTION_FRAME_COUNT];
+                int count = 0;
+                for (int i = 0; i < MOTION_FRAME_COUNT; i++)
+                {
+                    var frame = SpriteManager.GetSprite(baseName + i);
+                    if (frame != null) resolved[count++] = frame;
+                }
+                if (count < 2) return;   // nothing to loop
+
+                _motionFrames = new Sprite[count];
+                Array.Copy(resolved, _motionFrames, count);
+                _motionIndex = 0;
+                _motionTimer = 0f;
+                _motionActive = true;
+            }
+            catch (Exception e)
+            {
+                AppService.HandleException(CLASS_NAME, nameof(StartMotionAnimation), e);
+            }
+        }
+
+        /// <summary>Stops the motion flipbook and rests the icon on Frame0. Safe to call when not running.</summary>
+        public void StopMotionAnimation()
+        {
+            try
+            {
+                if (!_motionActive) return;
+                _motionActive = false;
+                if (unitIcon != null && _motionFrames != null && _motionFrames.Length > 0)
+                    unitIcon.sprite = _motionFrames[0];
+                _motionFrames = null;
+            }
+            catch (Exception e)
+            {
+                AppService.HandleException(CLASS_NAME, nameof(StopMotionAnimation), e);
             }
         }
 

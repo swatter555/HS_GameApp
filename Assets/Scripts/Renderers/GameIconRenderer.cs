@@ -330,15 +330,9 @@ namespace HammerAndSickle.Core.Map
                 // Get sprite name and flip info for this unit
                 string spriteName = GetSpriteNameForUnit(unit, out bool shouldFlip);
 
-                // Check if this is an animated sprite
-                if (spriteName.Contains("Frame", StringComparison.OrdinalIgnoreCase))
-                {
-                    // TODO: Implement animated sprite rendering (frame cycling)
-                    // For now, using Frame0 as static sprite
-                    if (_debug) Debug.Log($"[{CLASS_NAME}.CreateUnitIcon] Unit uses animated sprite: {spriteName}");
-                }
-
-                // Set the unit icon sprite
+                // Frame-based icons (Helo_Animation) rest on Frame0 here; the motion flipbook cycles
+                // them while the icon tween-moves (Prefab_CombatUnitIcon.StartMotionAnimation, driven
+                // by AnimateIconStep/SnapIcon — implemented 2026-07-22).
                 unitIcon.SetUnitIcon(spriteName);
 
                 // Apply horizontal flip if unit is facing east (E, NE, SE)
@@ -495,6 +489,10 @@ namespace HammerAndSickle.Core.Map
             {
                 if (unitIconPrefabs.TryGetValue(unitId, out Prefab_CombatUnitIcon unitIcon) && unitIcon != null)
                 {
+                    // Motion flipbook (helo rotors): no-op for non-animated icons, idempotent across
+                    // the per-hex steps of one move. SnapIcon is the matching stop.
+                    unitIcon.StartMotionAnimation();
+
                     Vector3 world = GetRenderPosition(new Vector2Int(to.IntX, to.IntY));
                     UnitMoveAnimator.AnimateHexStep(unitIcon.gameObject, world, duration, onComplete);
                 }
@@ -521,6 +519,10 @@ namespace HammerAndSickle.Core.Map
             {
                 if (unitIconPrefabs.TryGetValue(unitId, out Prefab_CombatUnitIcon unitIcon) && unitIcon != null)
                 {
+                    // Motion stops with the motion (rests on Frame0) — SnapIcon fires at move end and
+                    // on every cancel/halt path, which is exactly the "in motion" boundary.
+                    unitIcon.StopMotionAnimation();
+
                     Vector3 world = GetRenderPosition(new Vector2Int(to.IntX, to.IntY));
                     UnitMoveAnimator.CancelAndSnap(unitIcon.gameObject, world);
                 }
