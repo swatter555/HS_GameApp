@@ -40,6 +40,50 @@ namespace HammerAndSickle.Models
         public EfficiencyLevel UnitEfficiencyLevel = EfficiencyLevel.StaticOperations;
 
         #endregion // Properties
+
+        #region Equipment Entries
+
+        // Non-breaking space so an entry ("120 tanks") never splits across a wrap — a flowed list
+        // of entries wraps only at the separators between entries.
+        private const char NB = ' ';
+
+        /// <summary>
+        /// The non-zero equipment buckets as atomic display entries ("120 tanks"), ground first then air,
+        /// each joined by a non-breaking space. Shared by the unit panel (friendly, full intel) and the
+        /// printer's enemy report so the two can never drift. AFVs fold IFV+APC+RCN (armored carriers).
+        /// </summary>
+        public List<string> GetEquipmentEntries()
+        {
+            var entries = new List<string>();
+
+            void Add(int value, string label)
+            {
+                if (value > 0) entries.Add($"{value}{NB}{label}");
+            }
+
+            // Ground
+            Add(Personnel, "men");
+            Add(TANK, "tanks");
+            Add(IFV + APC + RCN, "AFVs");
+            Add(ART, "guns");
+            Add(ROC, "rockets");
+            Add(SAM, "SAMs");
+            Add(AAA, "AAA");
+            Add(AT, "AT");
+            Add(HEL, "helos");
+
+            // Air
+            Add(FGT, "fighters");
+            Add(ATT, "attack");
+            Add(BMB, "bombers");
+            Add(AWACS, "AWACS");
+            Add(RCNA, "air recon");
+            Add(TRN, "transport");
+
+            return entries;
+        }
+
+        #endregion // Equipment Entries
     }
 
     /// <summary>

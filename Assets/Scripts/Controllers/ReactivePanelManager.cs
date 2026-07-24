@@ -1,13 +1,13 @@
 using HammerAndSickle.Core;
-using HammerAndSickle.Core.UI;
+using HammerAndSickle.Core.GameData;
 using HammerAndSickle.Services;
 using UnityEngine;
 
 namespace HammerAndSickle.Controllers
 {
     /// <summary>
-    /// Manages reactive UI panels for terrain, units, and leaders.
-    /// Panels stack vertically: unit (top), leader (middle), terrain (bottom).
+    /// Manages reactive UI panels for terrain and units. (Leader info moved to a modal dialog
+    /// 2026-07-23 — the reactive leader panel was removed.)
     /// </summary>
     public class ReactivePanelManager : MonoBehaviour
     {
@@ -25,15 +25,10 @@ namespace HammerAndSickle.Controllers
         private GameObject _unitPanelObject;
 
         [SerializeField]
-        private GameObject _leaderPanelObject;
+        [Tooltip("The printer/message panel root. INTERIM: shown with the other panels on selection, hidden on right-click deselect. The planned printer pass makes visibility message-driven — see Claude_TODO.")]
+        private GameObject _messagePanelObject;
 
         #endregion // Inspector Fields
-
-        #region Fields
-
-        private string _lastSelectedUnitID;
-
-        #endregion // Fields
 
         #region Unity Lifecycle
 
@@ -59,29 +54,17 @@ namespace HammerAndSickle.Controllers
             // Resolve unit and leader at the selected hex
             ResolveSelection();
 
-            // Terrain panel is always shown when a hex is selected
+            // Terrain + message panels are shown whenever a hex is selected and hide together on
+            // right-click deselect. (Message-panel visibility is INTERIM — the planned printer pass makes
+            // it message-driven; see Claude_TODO.)
             UpdateTerrainPanel(true);
+            UpdateMessagePanel(true);
 
-            // Unit panel shown only when a unit occupies the selected hex
-            bool hasUnit = GameDataManager.SelectedUnit != null;
-            UpdateUnitPanel(hasUnit);
-
-            // Send unit report to printer when selection changes to a new unit
-            string currentUnitID = GameDataManager.SelectedUnit?.UnitID;
-            if (hasUnit && currentUnitID != _lastSelectedUnitID)
-            {
-                _lastSelectedUnitID = currentUnitID;
-                EventManager.Instance.RaisePrinterMessage(
-                    PrinterMessage.CreateUnitReport(GameDataManager.SelectedUnit, string.Empty));
-            }
-            else if (!hasUnit)
-            {
-                _lastSelectedUnitID = null;
-            }
-
-            // Leader panel shown only when the selected unit has an assigned leader
-            bool hasLeader = GameDataManager.SelectedLeader != null;
-            UpdateLeaderPanel(hasLeader);
+            // Unit panel is FRIENDLY-ONLY (2026-07-24): enemy intel goes to the printer (wired in the
+            // printer pass). Shown only when a player-side unit occupies the selected hex.
+            bool hasFriendlyUnit = GameDataManager.SelectedUnit != null
+                && GameDataManager.SelectedUnit.Side == Side.Player;
+            UpdateUnitPanel(hasFriendlyUnit);
         }
 
         #endregion // Unity Lifecycle
@@ -113,16 +96,10 @@ namespace HammerAndSickle.Controllers
             }
             else Debug.LogWarning("Unit Panel Object is not assigned in the inspector.");
 
-            if (_leaderPanelObject != null)
-            {
-                if (!Prefab_LeaderPanel.Instance.Initialize())
-                {
-                    Debug.LogError("Failed to initialize Leader Panel.");
-                }
-
-                _leaderPanelObject.SetActive(false);
-            }
-            else Debug.LogWarning("Leader Panel Object is not assigned in the inspector.");
+            // Message panel starts hidden; shown on selection, hidden on deselect (INTERIM — see Update).
+            if (_messagePanelObject != null)
+                _messagePanelObject.SetActive(false);
+            else Debug.LogWarning("Message Panel Object is not assigned in the inspector.");
         }
 
         #endregion // Initialization
@@ -139,7 +116,9 @@ namespace HammerAndSickle.Controllers
                 // Find unit at the selected hex position
                 GameDataManager.SelectedUnit = GameDataManager.Instance.GetUnitAtPosition(GameDataManager.SelectedHex);
 
-                // Resolve leader from the selected unit
+                // Resolve leader from the selected unit. Kept live (cheap) so the planned leader modal
+                // and any future consumer can read GameDataManager.SelectedLeader off the current
+                // selection; the reactive leader panel that used to display it was removed 2026-07-23.
                 if (GameDataManager.SelectedUnit != null && GameDataManager.SelectedUnit.IsLeaderAssigned)
                 {
                     GameDataManager.SelectedLeader = GameDataManager.Instance.GetLeader(GameDataManager.SelectedUnit.LeaderID);
@@ -186,17 +165,16 @@ namespace HammerAndSickle.Controllers
         }
 
         /// <summary>
-        /// Updates the leader panel visibility and content.
+        /// Updates the message (printer) panel visibility. INTERIM: tracks selection like the other panels
+        /// so right-click deselect closes it. The planned printer pass replaces this with message-driven
+        /// visibility (show on message received, hide on deselect) — see Claude_TODO.
         /// </summary>
-        private void UpdateLeaderPanel(bool show)
+        private void UpdateMessagePanel(bool show)
         {
-            if (_leaderPanelObject == null)
+            if (_messagePanelObject == null)
                 return;
 
-            _leaderPanelObject.SetActive(show);
-
-            if (show && Prefab_LeaderPanel.Instance != null)
-                Prefab_LeaderPanel.Instance.UpdateLeaderPanel();
+            _messagePanelObject.SetActive(show);
         }
 
         /// <summary>
@@ -213,8 +191,8 @@ namespace HammerAndSickle.Controllers
             if (_unitPanelObject != null)
                 _unitPanelObject.SetActive(false);
 
-            if (_leaderPanelObject != null)
-                _leaderPanelObject.SetActive(false);
+            if (_messagePanelObject != null)
+                _messagePanelObject.SetActive(false);
         }
 
         #endregion // Panel Updates

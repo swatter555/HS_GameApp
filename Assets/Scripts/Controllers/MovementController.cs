@@ -741,16 +741,16 @@ namespace HammerAndSickle.Controllers
 
             GameDataManager.Instance.BuildOccupancyCache();
 
-            // Return to UnitSelected if the unit could still begin another move, otherwise Idle
-            if (CurrentUnit.CanBeginMoveOrder())
-            {
-                State = MovementState.UnitSelected;
-                RecomputeRangeAndRaise(map);
-            }
-            else
-            {
-                DeselectUnit();
-            }
+            // Panzer-General-style: the unit STAYS selected after a move (2026-07-24). A unit with move left
+            // keeps its range overlay; a spent one stays selected with an empty overlay (still Ctrl-attackable,
+            // still deselectable by right-click). RecomputeRangeAndRaise already yields an empty range when the
+            // unit can no longer begin a move.
+            State = MovementState.UnitSelected;
+            RecomputeRangeAndRaise(map);
+
+            // Make the hex selection FOLLOW the unit to its new position so the panels + hex highlight track
+            // it (re-selecting the same unit is a no-op in HandleUnitSelectedClick).
+            HexDetectionService.Instance?.SelectHex(CurrentUnit.MapPos);
         }
 
         /// <summary>

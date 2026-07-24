@@ -1,3 +1,4 @@
+using System.Collections.Generic;
 using HammerAndSickle.Controllers;
 using HammerAndSickle.Core.GameData;
 using HammerAndSickle.Models;
@@ -8,6 +9,10 @@ using UnityEngine.UI;
 
 namespace HammerAndSickle.Core
 {
+    /// <summary>
+    /// Reactive terrain panel: a terrain portrait image + a single formatted text block
+    /// (slimmed from per-field labels 2026-07-23).
+    /// </summary>
     public class Prefab_TerrainPanel : MonoBehaviour
     {
         #region Singleton
@@ -43,12 +48,7 @@ namespace HammerAndSickle.Core
 
         [Header("Terrain Panel Fields")]
         [SerializeField] private Image _terrainImage;
-        [SerializeField] private TextMeshProUGUI _typeText;
-        [SerializeField] private TextMeshProUGUI _locationText;
-        [SerializeField] private TextMeshProUGUI _titleText;
-        [SerializeField] private TextMeshProUGUI _moveCostText;
-        [SerializeField] private TextMeshProUGUI _defenseBonusText;
-        [SerializeField] private TextMeshProUGUI _summaryText;
+        [SerializeField] private TextMeshProUGUI _infoText;
 
         #endregion // Inspector Fields
 
@@ -60,34 +60,8 @@ namespace HammerAndSickle.Core
         public bool Initialize()
         {
             string errorString = "";
-            if (_terrainImage == null)
-            {
-                errorString += "Terrain Image is not assigned. ";
-            }
-            if (_typeText == null)
-            {
-                errorString += "Type Text is not assigned. ";
-            }
-            if (_locationText == null)
-            {
-                errorString += "Location Text is not assigned. ";
-            }
-            if (_titleText == null)
-            {
-                errorString += "Title Text is not assigned. ";
-            }
-            if (_moveCostText == null)
-            {
-                errorString += "Move Cost Text is not assigned. ";
-            }
-            if (_defenseBonusText == null)
-            {
-                errorString += "Defense Bonus Text is not assigned. ";
-            }
-            if (_summaryText == null)
-            {
-                errorString += "Summary Text is not assigned. ";
-            }
+            if (_terrainImage == null) errorString += "Terrain Image is not assigned. ";
+            if (_infoText == null) errorString += "Info Text is not assigned. ";
 
             if (!string.IsNullOrEmpty(errorString))
             {
@@ -104,6 +78,10 @@ namespace HammerAndSickle.Core
 
         /// <summary>
         /// Updates the terrain panel with data from the currently selected hex.
+        /// Line 1: "x, y  &lt;terrain type&gt;".
+        /// Line 2: location name (omitted when the hex has no label).
+        /// Line 3: "Move Cost N, Defense Bonus N".
+        /// Line 4: feature summary.
         /// </summary>
         public void UpdateTerrainPanel()
         {
@@ -115,12 +93,29 @@ namespace HammerAndSickle.Core
                 return;
 
             UpdateTerrainPortrait(hexData.Terrain, GameDataManager.CurrentMapTheme);
-            SetTypeText(FormatTerrainType(hexData.Terrain));
-            SetLocationText(FormatPosition(GameDataManager.SelectedHex));
-            SetTitleText(hexData.TileLabel);
-            SetMoveCostText($"{GetMoveCost(hexData.Terrain)}");
-            SetDefenseBonusText($"{GetDefenseBonus(hexData.Terrain)}");
-            SetSummaryText(GenerateSummary(hexData));
+
+            var pos = GameDataManager.SelectedHex;
+            var lines = new List<string>();
+
+            // This line only when the hex is named.
+            if (!string.IsNullOrWhiteSpace(hexData.TileLabel))
+                lines.Add(hexData.TileLabel);
+
+            // Add hex type.
+            lines.Add(FormatTerrainType(hexData.Terrain));
+
+            // Add move cost and defense bonus.
+            lines.Add($"MOV:{GetMoveCost(hexData.Terrain)}");
+            lines.Add($"DEF:{GetDefenseBonus(hexData.Terrain)}");
+
+            // Add the location text.
+            lines.Add($"{pos.IntX},{pos.IntY}");
+
+            // Add summary text.
+            lines.Add(GenerateSummary(hexData));
+
+            if (_infoText != null)
+                _infoText.text = string.Join("\n", lines);
         }
 
         /// <summary>
@@ -133,78 +128,11 @@ namespace HammerAndSickle.Core
                 return;
 
             var sprite = SpriteManager.GetSprite(spriteName);
-            if (sprite != null)
-                SetTerrainImage(sprite);
-        }
-
-        #endregion
-
-        #region Terrain Panel Helper Methods
-
-        /// <summary>
-        /// Sets the terrain image sprite.
-        /// </summary>
-        public void SetTerrainImage(Sprite sprite)
-        {
-            if (_terrainImage != null)
+            if (sprite != null && _terrainImage != null)
                 _terrainImage.sprite = sprite;
         }
 
-        /// <summary>
-        /// Sets the terrain type text.
-        /// </summary>
-        public void SetTypeText(string text)
-        {
-            if (_typeText != null)
-                _typeText.text = text;
-        }
-
-        /// <summary>
-        /// Sets the location text.
-        /// </summary>
-        public void SetLocationText(string text)
-        {
-            if (_locationText != null)
-                _locationText.text = text;
-        }
-
-        /// <summary>
-        /// Sets the title text.
-        /// </summary>
-        public void SetTitleText(string text)
-        {
-            if (_titleText != null)
-                _titleText.text = text;
-        }
-
-        /// <summary>
-        /// Sets the movement cost text.
-        /// </summary>
-        public void SetMoveCostText(string text)
-        {
-            if (_moveCostText != null)
-                _moveCostText.text = text;
-        }
-
-        /// <summary>
-        /// Sets the defense bonus text.
-        /// </summary>
-        public void SetDefenseBonusText(string text)
-        {
-            if (_defenseBonusText != null)
-                _defenseBonusText.text = text;
-        }
-
-        /// <summary>
-        /// Sets the summary text.
-        /// </summary>
-        public void SetSummaryText(string text)
-        {
-            if (_summaryText != null)
-                _summaryText.text = text;
-        }
-
-        #endregion // Terrain Panel Helper Methods
+        #endregion
 
         #region Formatting Helpers
 
@@ -226,14 +154,6 @@ namespace HammerAndSickle.Core
                 TerrainType.Impassable => "Impassable",
                 _ => "Unknown"
             };
-        }
-
-        /// <summary>
-        /// Formats Position2D as "x, y".
-        /// </summary>
-        private string FormatPosition(Position2D position)
-        {
-            return $"{position.X}, {position.Y}";
         }
 
         /// <summary>
@@ -279,9 +199,9 @@ namespace HammerAndSickle.Core
         /// </summary>
         private string GenerateSummary(HexTile hexData)
         {
-            var features = new System.Collections.Generic.List<string>();
+            var features = new List<string>();
 
-            if (hexData.UrbanDamage > 0) features.Add($"Urban Sprawl");
+            if (hexData.UrbanDamage > 0) features.Add("Urban Sprawl");
             if (hexData.IsRoad) features.Add("Road");
             if (hexData.IsRail) features.Add("Rail");
             if (hexData.IsFort) features.Add("Fort");

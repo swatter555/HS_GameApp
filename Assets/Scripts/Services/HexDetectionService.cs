@@ -374,6 +374,28 @@ namespace HammerAndSickle.Services
         }
 
         /// <summary>
+        /// Programmatically selects a hex — the same pipeline a left-click drives (sets
+        /// GameDataManager.SelectedHex + notifies OnHexSelected), without the screen→hex conversion. Used by
+        /// MovementController to make the selection FOLLOW a unit to its new hex after a move, so the panels
+        /// and hex highlight track it (Panzer-General-style stay-selected, 2026-07-24). Re-selecting the same
+        /// already-selected unit is a no-op in MovementController's handler.
+        /// </summary>
+        public void SelectHex(Position2D gridPosition)
+        {
+            try
+            {
+                if (gridPosition == GameDataManager.NoHexSelected) return;
+
+                GameDataManager.SelectedHex = gridPosition;
+                _onHexSelected?.Invoke(gridPosition);
+            }
+            catch (Exception e)
+            {
+                AppService.HandleException(CLASS_NAME, nameof(SelectHex), e);
+            }
+        }
+
+        /// <summary>
         /// Clears all selection state (hex, unit, leader) and notifies OnHexSelected subscribers — the §5.10.5
         /// "right-click outside the radius" branch, invoked by MovementController. Behavior-identical to the
         /// pre-rework unconditional right-click clear, so panels/printer reset exactly as before.
