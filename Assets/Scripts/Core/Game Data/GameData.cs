@@ -179,13 +179,29 @@ namespace HammerAndSickle.Core.GameData
     /// <summary>
     /// The intelligence info on enemy units as they are spotted on the map.
     /// </summary>
+    /// <summary>
+    /// Enemy intel ladder (§12.2, SIX RUNGS — rewritten 2026-07-24). This is the ENEMY-side ladder only:
+    /// friendly units are shown at FULL detail, which is an ownership fact rather than a rung (§12.2.7) and
+    /// is never stored here — see CombatUnit.GetFullIntelReport().
+    /// </summary>
     public enum SpottedLevel
     {
-        Level0, // Not spotted
-        Level1, // Unit name visible
-        Level2, // Above plus DeploymentStatus and an error rate of about 30%
-        Level3, // Above plus EXP and EFF levels, and a 10% error rate.
-        Level4, // Above plus no error rate.
+        Level0, // Unspotted — no icon drawn
+        Level1, // Contact: the icon only (deployment icon shows "?", hit-point box shows a dash)
+        Level2, // + unit name
+        Level3, // + deployment position (real deployment icon)
+        Level4, // + equipment in the six COARSE buckets @ MAX_INTEL_ERROR; hit-point box shows a strength band
+        Level5, // + experience and efficiency @ MODERATE_INTEL_ERROR; hit-point box shows the exact percentage
+    }
+
+    /// <summary>
+    /// How an enemy unit icon renders its hit-point box under the §12.2 ladder / §24.3.2 icon gating.
+    /// </summary>
+    public enum HitPointDisplayMode
+    {
+        Hidden, // Below Level4 — a dash
+        Band,   // Level4 — Full / Depleted / Low (the Section 8 strength tiers)
+        Exact,  // Level5 and all friendly units — the percentage
     }
 
     #endregion // CombatUnit Enums
@@ -1558,10 +1574,15 @@ namespace HammerAndSickle.Core.GameData
         public const float OPPORTUNITY_ACTION_SUPPLY_THRESHOLD = 1.5f;  // Threshold for opportunity action supply cost.
         public const float OPPORTUNITY_ACTION_SUPPLY_COST = 0.5f;  // Supply cost for opportunity actions.
 
-        // Intel error margins
-        public const float MIN_INTEL_ERROR = 4f;   // Minimum intel error margin
-        public const float MODERATE_INTEL_ERROR = 8f;   // Maximum intel error margin
-        public const float MAX_INTEL_ERROR = 12f;  // Maximum intel error margin
+        // Intel error margins (§12.2.9, REVISED 2026-07-24 for the six-rung ladder).
+        // MIN_INTEL_ERROR (was 4) is RETIRED — the six-rung ladder has no consumer for it.
+        public const float MODERATE_INTEL_ERROR = 8f;   // Level 5 equipment error
+        public const float MAX_INTEL_ERROR = 16f;       // Level 4 equipment error (was 12)
+
+        // NOTE: the Level-4 hit-point band readout (§12.2.5) reuses FULL_STRENGTH_FLOOR /
+        // DEPLETED_STRENGTH_FLOOR from the combat constants below — the Section 8 strength tiers. Do not
+        // add display-side copies of those thresholds; the band the player reads must be the band the
+        // combat engine actually applies.
 
         #endregion // CombatUnit Constants
 

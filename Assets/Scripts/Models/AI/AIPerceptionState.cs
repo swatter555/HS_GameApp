@@ -86,12 +86,17 @@ namespace HammerAndSickle.Models.AI
         #region Updates
 
         /// <summary>
-        /// Registers a spotting hit (§12.4 incremental +1, cap Level4) or refreshes an existing contact's
-        /// position/turn/strength. A ghosted unit re-acquired here loses its ghost (§12.6.6 reset).
+        /// Registers a passive spotting contact or refreshes an existing one. A ghosted unit re-acquired here
+        /// loses its ghost (§12.6.5 reset).
+        ///
+        /// REWRITTEN 2026-07-24 for the source-ceiling model (§12.4.1): a contact is RAISED TO the ceiling the
+        /// spotter earned, never incremented — repeated looks no longer accumulate. The caller passes the
+        /// ceiling it computed from the same rules the player side uses (§12.9 symmetry requirement).
         /// </summary>
         public void RecordSpot(
             string unitId, Position2D pos, int currentTurn,
-            UnitClassification classification, int observedHpPercent, int estimatedMpPerTurn)
+            UnitClassification classification, int observedHpPercent, int estimatedMpPerTurn,
+            SpottedLevel contactCeiling = SpottedLevel.Level1)
         {
             try
             {
@@ -104,7 +109,7 @@ namespace HammerAndSickle.Models.AI
                     _contacts[unitId] = c;
                 }
 
-                if (c.Level < SpottedLevel.Level4) c.Level = c.Level + 1;
+                if (c.Level < contactCeiling) c.Level = contactCeiling;
                 c.LastKnownPos = pos;
                 c.LastSeenTurn = currentTurn;
                 c.Classification = classification;
@@ -126,26 +131,47 @@ namespace HammerAndSickle.Models.AI
         }
 
         /// <summary>
-        /// The §12.6 decay sweep, run once per AI Refresh: contacts in sensor range hold; out-of-range
-        /// contacts drop Level2+→Level1 or Level1→Level0 (becoming ghosts), subject to the R2 grace dial.
-        /// Expired ghosts are culled. <paramref name="inRangeUnitIds"/> comes from the AI2b sweep.
+        /// The §12.6 decay sweep, run once per AI Refresh. REWRITTEN 2026-07-24 to mirror the graduated player
+        /// model EXACTLY (§12.9 symmetry), which means mirroring the SUSTAINED FLOOR and not merely "is it in
+        /// range": a contact erodes one rung per turn down to the best ceiling current sensors still earn on
+        /// it, holds entirely while adjacent, and becomes a ghost only on the step out of Level1. The R2 grace
+        /// dial short-circuits the whole thing, and expired ghosts are culled.
+        ///
+        /// Two things this must NOT do, both of which desynchronise the AI's memory from the player's — and
+        /// under Option-B honest spotting a desynchronised mirror is a cheat, not an approximation:
+        ///  · collapse Level2+ to Level1 in one step (the pre-2026-07-24 model, which on a six-rung ladder
+        ///    would discard several rungs at once);
+        ///  · treat "in sensor range" as holding a contact at ANY rung. Being watched from six hexes away
+        ///    sustains Level1, not the Level4 that an earlier engagement paid for.
+        /// <paramref name="sustainedFloors"/> and <paramref name="adjacentUnitIds"/> come from the AI2b sweep;
+        /// a unit absent from the floors map has no live contact and decays from wherever it is.
         /// </summary>
-        public void StepDecay(int currentTurn, HashSet<string> inRangeUnitIds)
+        public void StepDecay(int currentTurn, Dictionary<string, SpottedLevel> sustainedFloors,
+            HashSet<string> adjacentUnitIds = null)
         {
             try
             {
-                if (inRangeUnitIds == null) inRangeUnitIds = new HashSet<string>();
+                if (sustainedFloors == null) sustainedFloors = new Dictionary<string, SpottedLevel>();
 
                 foreach (ContactRecord c in _contacts.Values.ToList())
                 {
-                    if (inRangeUnitIds.Contains(c.UnitId)) continue;                 // §12.6.2 — contact held
+                    SpottedLevel floor = sustainedFloors.TryGetValue(c.UnitId, out SpottedLevel f)
+                        ? f
+                        : SpottedLevel.Level0;
+
+                    if (c.Level <= floor) continue;                                  // §12.6.2 — sustained by live contact
+                    if (adjacentUnitIds != null && adjacentUnitIds.Contains(c.UnitId)) continue; // §12.6.3 — adjacency holds
                     if (currentTurn - c.LastSeenTurn <= DecayGraceTurns) continue;   // R2 dial (0 = honest)
 
-                    if (c.Level >= SpottedLevel.Level2)
+                    if (c.Level - 1 > floor)
                     {
-                        c.Level = SpottedLevel.Level1;                               // §12.6.3 — one visible step
+                        c.Level = c.Level - 1;                                       // §12.6.3 — exactly one rung
                     }
-                    else if (c.Level == SpottedLevel.Level1)
+                    else if (floor > SpottedLevel.Level0)
+                    {
+                        c.Level = floor;                                             // erosion stops at the floor
+                    }
+                    else
                     {
                         _contacts.Remove(c.UnitId);                                  // §12.6.4 — gone dark
                         _ghosts[c.UnitId] = new GhostContact

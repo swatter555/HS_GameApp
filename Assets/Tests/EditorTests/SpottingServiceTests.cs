@@ -177,18 +177,71 @@ namespace HammerAndSickle.Tests
         }
 
         [Test]
-        public void Decay_RespectsDualDomain_AirTargetHeld_GroundTargetDecays()
+        public void Decay_RespectsDualDomain_AirFloorHeld_GroundTargetDecays()
         {
-            // ProcessSpottingDecay delegates the "still in range?" test to IsCurrentlySpotted, which is now
-            // dual-domain. A SAM at distance 5 keeps a fixed-wing visible (air 6) but lets a ground unit decay (ground 2).
+            // The SUSTAINED FLOOR (§12.6.2) is computed with the same dual-domain range selection as the sweep.
+            // A SAM at distance 5 sustains a Level1 floor on a fixed-wing (air range 6) but sustains nothing on
+            // a ground unit at distance 4 (ground range 2), which therefore decays away.
             var sam = Spotter(UnitClassification.SAM);
-            var air = Target(UnitClassification.FGT, SPOT_X + 5, SpottedLevel.Level2);   // dist 5 ≤ air 6 → held
-            var ground = Target(UnitClassification.TANK, SPOT_X + 4, SpottedLevel.Level2); // dist 4 > ground 2 → decays
+            var air = Target(UnitClassification.FGT, SPOT_X + 5, SpottedLevel.Level1);     // dist 5 ≤ air 6 → floor L1
+            var ground = Target(UnitClassification.TANK, SPOT_X + 4, SpottedLevel.Level1); // dist 4 > ground 2 → floor L0
 
             SpottingService.ProcessSpottingDecay();
 
-            Assert.AreEqual(SpottedLevel.Level2, air.SpottedLevel, "Fixed-wing within air range holds its level (no decay)");
-            Assert.AreEqual(SpottedLevel.Level1, ground.SpottedLevel, "Ground unit beyond ground range decays one step");
+            Assert.AreEqual(SpottedLevel.Level1, air.SpottedLevel, "Fixed-wing inside air range is sustained at its floor");
+            Assert.AreEqual(SpottedLevel.Level0, ground.SpottedLevel, "Ground unit beyond ground range has no floor and decays away");
+        }
+
+        [Test]
+        public void Decay_EarnedRungsAboveTheFloor_ErodeOneStepAtATime()
+        {
+            // §12.6.3 (rewritten): rungs bought with combat or IntelActions sit ABOVE the passive floor and
+            // erode one per Refresh — not the old single-step collapse to Level1, which on the six-rung ladder
+            // would wipe out three IntelActions of investment in one turn.
+            var tank = Spotter(UnitClassification.TANK);
+            var target = Target(UnitClassification.MOT, SPOT_X + 2, SpottedLevel.Level5); // dist 2 → floor L1
+
+            SpottingService.ProcessSpottingDecay();
+            Assert.AreEqual(SpottedLevel.Level4, target.SpottedLevel, "one rung per Refresh");
+
+            SpottingService.ProcessSpottingDecay();
+            Assert.AreEqual(SpottedLevel.Level3, target.SpottedLevel);
+
+            SpottingService.ProcessSpottingDecay();
+            SpottingService.ProcessSpottingDecay();
+            Assert.AreEqual(SpottedLevel.Level1, target.SpottedLevel, "erosion stops at the sustained floor");
+
+            SpottingService.ProcessSpottingDecay();
+            Assert.AreEqual(SpottedLevel.Level1, target.SpottedLevel, "the floor itself never decays while contact holds");
+        }
+
+        [Test]
+        public void Decay_AdjacentEnemy_HoldsEarnedRungs()
+        {
+            // §12.6.3: physical contact preserves hard-won intel. The spotter is adjacent, so a Level5 contact
+            // does not erode at all — this is what makes "keep somebody in contact" a live tactical decision.
+            var tank = Spotter(UnitClassification.TANK);
+            var target = Target(UnitClassification.MOT, SPOT_X + 1, SpottedLevel.Level5);
+
+            SpottingService.ProcessSpottingDecay();
+            SpottingService.ProcessSpottingDecay();
+
+            Assert.AreEqual(SpottedLevel.Level5, target.SpottedLevel, "adjacency holds every earned rung");
+        }
+
+        [Test]
+        public void Sweep_AdjacentSpotter_EarnsLevel2_AndAdjacentRecon_EarnsLevel3()
+        {
+            // §12.4.2: range establishes contact, adjacency decides what it is worth. A RECON unit standing
+            // next to a target reads it one rung deeper than a line unit does.
+            var recon = Spotter(UnitClassification.RECON);
+            var adjacent = Target(UnitClassification.MOT, SPOT_X + 1);
+            var atRange = Target(UnitClassification.MOT, SPOT_X + 3);
+
+            SpottingService.RecomputeAllSpotting();
+
+            Assert.AreEqual(SpottedLevel.Level3, adjacent.SpottedLevel, "adjacent RECON earns Level3");
+            Assert.AreEqual(SpottedLevel.Level1, atRange.SpottedLevel, "the same RECON at range earns only contact");
         }
 
         #endregion // Baseline + decay

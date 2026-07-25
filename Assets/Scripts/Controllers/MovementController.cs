@@ -133,6 +133,7 @@ namespace HammerAndSickle.Controllers
                 EventManager.Instance.OnNextUnitRequested += CycleNext;
                 EventManager.Instance.OnPreviousUnitRequested += CyclePrevious;
                 EventManager.Instance.OnUnitMoveCompleted += HandleMoveCompleted;
+                EventManager.Instance.OnIntelActionRequested += HandleIntelActionRequested;
             }
         }
 
@@ -150,10 +151,55 @@ namespace HammerAndSickle.Controllers
                 EventManager.Instance.OnNextUnitRequested -= CycleNext;
                 EventManager.Instance.OnPreviousUnitRequested -= CyclePrevious;
                 EventManager.Instance.OnUnitMoveCompleted -= HandleMoveCompleted;
+                EventManager.Instance.OnIntelActionRequested -= HandleIntelActionRequested;
             }
         }
 
         #endregion // Event Subscriptions
+
+        #region Intel Action
+
+        /// <summary>
+        /// Handles a GatherIntel request (§12.4.5): spends the unit's IntelAction, then raises every ADJACENT
+        /// enemy one rung (ceiling Level 5). This is the only route to Level 5 and the deliberate alternative
+        /// to attacking — three IntelActions walk a contact to a full picture without firing a shot.
+        ///
+        /// Player turn only, and the action is spent BEFORE the intel is applied so a unit that cannot pay
+        /// (no IntelAction, or below the §8.2.4 MP/supply floor) learns nothing.
+        /// </summary>
+        private void HandleIntelActionRequested(CombatUnit unit)
+        {
+            try
+            {
+                if (unit == null) return;
+                if (_currentPhase != BattlePhase.PlayerTurn) return;
+                if (unit.Side != Side.Player) return;
+
+                if (!unit.PerformIntelAction())
+                {
+                    AppService.CaptureUiMessage($"{unit.UnitName} cannot gather intel right now.");
+                    return;
+                }
+
+                SpottingService.ApplyGroundIntelAction(unit);
+
+                if (EventManager.Instance != null)
+                {
+                    EventManager.Instance.RaiseUnitActionsChanged(unit);
+                    EventManager.Instance.RaiseUnitMovementPointsChanged(unit);
+                    EventManager.Instance.RaiseRedrawMapIcons();
+                }
+
+                // Intel spends MP, so the movement overlay must be re-derived for the selected unit.
+                if (CurrentUnit == unit) RecomputeRangeAndRaise(GameDataManager.CurrentHexMap);
+            }
+            catch (Exception e)
+            {
+                AppService.HandleException(CLASS_NAME, nameof(HandleIntelActionRequested), e);
+            }
+        }
+
+        #endregion // Intel Action
 
         #region Phase Handling
 

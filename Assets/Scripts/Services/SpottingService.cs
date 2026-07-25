@@ -30,9 +30,12 @@ namespace HammerAndSickle.Services
         #region Core Spotting
 
         /// <summary>
-        /// Full spotting pass: each player spotter checks all enemy units within range.
-        /// Each spotter-target pair in range generates one spotting hit.
-        /// Called at turn start.
+        /// Full spotting pass: each player spotter checks all enemy units within range and applies its
+        /// PASSIVE CONTACT CEILING (§12.4.2 — Level 1 at range, Level 2 adjacent, Level 3 for an adjacent
+        /// RECON unit). Called at turn start.
+        ///
+        /// Passive spotting can no longer walk a unit up the whole ladder: repeated looks do not accumulate
+        /// (§12.4.1). Equipment counts and morale come from combat and IntelActions, never from staring.
         /// </summary>
         public static void RecomputeAllSpotting()
         {
@@ -49,12 +52,11 @@ namespace HammerAndSickle.Services
                     foreach (var enemy in enemyUnits)
                     {
                         if (enemy.IsDestroyed()) continue;
-                        if (enemy.SpottedLevel == SpottedLevel.Level4) continue;
 
                         int range = SpottingRangeAgainst(spotter, enemy);
                         int dist = HexMapUtil.GetHexDistance(spotter.MapPos, enemy.MapPos);
                         if (dist <= range)
-                            IncrementSpottedLevel(enemy);
+                            RaiseToCeiling(enemy, PassiveContactCeiling(spotter, dist));
                     }
                 }
             }
@@ -78,14 +80,13 @@ namespace HammerAndSickle.Services
                 foreach (var enemy in enemies)
                 {
                     if (enemy.IsDestroyed()) continue;
-                    if (enemy.SpottedLevel == SpottedLevel.Level4) continue;
 
                     int range = SpottingRangeAgainst(mover, enemy);
                     int dist = HexMapUtil.GetHexDistance(newPos, enemy.MapPos);
                     if (dist <= range)
                     {
                         var oldLevel = enemy.SpottedLevel;
-                        IncrementSpottedLevel(enemy);
+                        RaiseToCeiling(enemy, PassiveContactCeiling(mover, dist));
                         if (oldLevel == SpottedLevel.Level0)
                             newlySpotted.Add(enemy);
                     }
@@ -107,7 +108,6 @@ namespace HammerAndSickle.Services
             try
             {
                 if (movedEnemy == null || movedEnemy.IsDestroyed()) return;
-                if (movedEnemy.SpottedLevel == SpottedLevel.Level4) return;
 
                 var playerUnits = GameDataManager.Instance.GetPlayerUnits();
                 foreach (var spotter in playerUnits)
@@ -117,7 +117,7 @@ namespace HammerAndSickle.Services
                     int range = SpottingRangeAgainst(spotter, movedEnemy);
                     int dist = HexMapUtil.GetHexDistance(spotter.MapPos, movedEnemy.MapPos);
                     if (dist <= range)
-                        IncrementSpottedLevel(movedEnemy);
+                        RaiseToCeiling(movedEnemy, PassiveContactCeiling(spotter, dist));
                 }
             }
             catch (Exception e)
@@ -127,10 +127,17 @@ namespace HammerAndSickle.Services
         }
 
         /// <summary>
-        /// Spotting decay (§3.3.4 / §12.6) — runs once per side at Refresh. Enemies not in range
-        /// of any player spotter decay toward Level0: Level2+ drops to Level1, Level1 drops to
-        /// Level0. One step per turn. (Renamed from ProcessAdminPhaseDecay: the AdminPhase is gone
-        /// under the ratified §3.2 BattlePhase set; decay now lives in the Refresh phase.)
+        /// Spotting decay (§3.3.4 / §12.6, REWRITTEN 2026-07-24) — runs once per side at Refresh, one step
+        /// per turn. GRADUATED, not a collapse:
+        ///
+        ///  1. Re-derive the enemy's SUSTAINED FLOOR from the board (§12.6.2). Passive contact never decays.
+        ///  2. At or below the floor: hold (and top up to the floor if something has pushed it lower).
+        ///  3. Above the floor but ADJACENT to a friendly unit: hold (§12.6.3 — contact preserves intel).
+        ///  4. Otherwise: drop exactly one rung, never below the floor, all the way down to Level0.
+        ///
+        /// The old model dropped anything at Level2+ straight to Level1, which on a six-rung ladder would
+        /// erase three IntelActions of investment in a single Refresh. Decay must still be able to reach
+        /// Level0 or units would stop disappearing and fog of war (§12.8) would break.
         /// </summary>
         public static void ProcessSpottingDecay()
         {
@@ -140,27 +147,84 @@ namespace HammerAndSickle.Services
                 foreach (var enemy in enemies)
                 {
                     if (enemy.IsDestroyed()) continue;
-                    if (enemy.SpottedLevel == SpottedLevel.Level0) continue;
 
-                    if (IsCurrentlySpotted(enemy)) continue;
+                    var floor = SustainedFloor(enemy);
+                    var current = enemy.SpottedLevel;
 
-                    var oldLevel = enemy.SpottedLevel;
-                    SpottedLevel newLevel;
+                    if (current <= floor)
+                    {
+                        RaiseToCeiling(enemy, floor);   // no-op unless passive contact outranks the current level
+                        continue;
+                    }
 
-                    if (oldLevel >= SpottedLevel.Level2)
-                        newLevel = SpottedLevel.Level1;
-                    else
-                        newLevel = SpottedLevel.Level0;
+                    if (IsAdjacentToPlayerUnit(enemy)) continue;
 
-                    enemy.SetSpottedLevel(newLevel);
+                    var newLevel = current - 1;
+                    if (newLevel < floor) newLevel = floor;
 
-                    if (EventManager.Instance != null)
-                        EventManager.Instance.RaiseUnitSpottedLevelChanged(enemy, oldLevel, newLevel);
+                    ApplyLevel(enemy, newLevel);
                 }
             }
             catch (Exception e)
             {
                 AppService.HandleException(CLASS_NAME, nameof(ProcessSpottingDecay), e);
+            }
+        }
+
+        /// <summary>
+        /// Ground IntelAction application (§12.4.5): every ENEMY unit ADJACENT to <paramref name="actor"/>
+        /// gains one rung, ceiling Level 5. Adjacency is required — there is no intel range — and all adjacent
+        /// enemies are affected rather than a picked target.
+        ///
+        /// This is the ONLY route to Level 5, and the deliberate alternative to attacking: three IntelActions
+        /// walk a unit from contact to a full picture without firing a shot, where combat buys Level 4 in one
+        /// action but starts a fight. The caller is responsible for spending the action itself
+        /// (CombatUnit.PerformIntelAction) — this method only applies the intel result.
+        /// </summary>
+        public static void ApplyGroundIntelAction(CombatUnit actor)
+        {
+            try
+            {
+                if (actor == null || actor.IsDestroyed()) return;
+
+                var gdm = GameDataManager.Instance;
+                foreach (var neighborPos in HexMapUtil.GetAllNeighborPositions(actor.MapPos))
+                {
+                    var target = gdm.GetGroundUnitAtHex(neighborPos);
+                    if (target == null || target.IsDestroyed()) continue;
+                    if (target.Side == actor.Side) continue;
+
+                    RaiseByOneRung(target, SpottedLevel.Level5);
+                }
+            }
+            catch (Exception e)
+            {
+                AppService.HandleException(CLASS_NAME, nameof(ApplyGroundIntelAction), e);
+            }
+        }
+
+        /// <summary>
+        /// Direct-combat intel (§12.4.6): both participants are set to Level 4 against each other — you have
+        /// been close enough to count what the other side is fighting with. Applied to the ENEMY side only,
+        /// since CombatUnit.SpottedLevel is the player's view of AI units; the AI's reciprocal knowledge lives
+        /// in its belief store.
+        ///
+        /// Scope note: this is DIRECT combat only. Indirect fire has its own explicit reveal rule for the
+        /// FIRER (§12.4.9.2, +1 rung minimum Level 1); the doc says nothing about what an indirect firer
+        /// learns about its target, so nothing is applied there rather than inventing a rule.
+        /// </summary>
+        public static void ApplyDirectCombatContact(CombatUnit attacker, CombatUnit defender)
+        {
+            try
+            {
+                if (attacker == null || defender == null) return;
+
+                if (attacker.Side != Side.Player) RaiseToCeiling(attacker, SpottedLevel.Level4);
+                if (defender.Side != Side.Player) RaiseToCeiling(defender, SpottedLevel.Level4);
+            }
+            catch (Exception e)
+            {
+                AppService.HandleException(CLASS_NAME, nameof(ApplyDirectCombatContact), e);
             }
         }
 
@@ -218,11 +282,14 @@ namespace HammerAndSickle.Services
                         int dist = HexMapUtil.GetHexDistance(spotter.MapPos, target.MapPos);
                         if (dist <= range)
                         {
+                            // Same source-ceiling rule the player side uses (§12.4.2) — the AI does not get
+                            // a different progression model, only a different store.
                             perception.RecordSpot(
                                 target.UnitID, target.MapPos, currentTurn,
                                 target.Classification,
                                 ObservedHpPercent(target),
-                                Mathf.Max(1, Mathf.RoundToInt(target.MovementPoints.Max)));
+                                Mathf.Max(1, Mathf.RoundToInt(target.MovementPoints.Max)),
+                                PassiveContactCeiling(spotter, dist));
                         }
                     }
                 }
@@ -245,7 +312,9 @@ namespace HammerAndSickle.Services
                 if (perception == null) return;
 
                 var gdm = GameDataManager.Instance;
-                var inRange = new HashSet<string>();
+                var floors = new Dictionary<string, SpottedLevel>();
+                var adjacent = new HashSet<string>();
+
                 foreach (var target in gdm.GetPlayerUnits())
                 {
                     if (target.IsDestroyed()) continue;
@@ -254,17 +323,22 @@ namespace HammerAndSickle.Services
                     {
                         if (spotter.IsDestroyed()) continue;
 
-                        int range = SpottingRangeAgainst(spotter, target);
                         int dist = HexMapUtil.GetHexDistance(spotter.MapPos, target.MapPos);
-                        if (dist <= range)
-                        {
-                            inRange.Add(target.UnitID);
-                            break;
-                        }
+                        if (dist <= 1) adjacent.Add(target.UnitID);
+
+                        int range = SpottingRangeAgainst(spotter, target);
+                        if (dist > range) continue;
+
+                        // The AI's SUSTAINED FLOOR, built from the same PassiveContactCeiling the player side
+                        // uses (§12.6.2). It must be the best ceiling across ALL spotters, so this cannot
+                        // break early on the first in-range hit the way a boolean in-range test could.
+                        var ceiling = PassiveContactCeiling(spotter, dist);
+                        if (!floors.TryGetValue(target.UnitID, out var best) || ceiling > best)
+                            floors[target.UnitID] = ceiling;
                     }
                 }
 
-                perception.StepDecay(currentTurn, inRange);
+                perception.StepDecay(currentTurn, floors, adjacent);
             }
             catch (Exception e)
             {
@@ -343,8 +417,10 @@ namespace HammerAndSickle.Services
                     // Detection roll (§6.10.3/.4) — delegated to the pure, seedable AirAmbushCheck.
                     if (AirAmbushCheck.RollDetection(mover.ExperienceLevel, new CombatRandom()))
                     {
-                        // Detection success: enemy spotted at Level1
-                        IncrementSpottedLevel(enemy);
+                        // Detection success, no shot fired: the AA unit is revealed at Level1 (§12.4.8).
+                        // (The FAILED branch — ambusher fires — reveals at Level4 per §12.4.9.1; that
+                        // belongs to the AD-fire wiring, which is M13 caller work.)
+                        RaiseToCeiling(enemy, SpottedLevel.Level1);
 
                         if (EventManager.Instance != null)
                             EventManager.Instance.RaiseAirAmbushDetected(enemy, mover);
@@ -387,18 +463,90 @@ namespace HammerAndSickle.Services
             return Math.Max(0, range - target.EnemySpottingRangeReduction);
         }
 
-        private static void IncrementSpottedLevel(CombatUnit unit)
+        /// <summary>
+        /// The PASSIVE-CONTACT ceiling a spotter earns against a target (§12.4.2): Level 3 if the spotter is a
+        /// RECON-class unit standing adjacent, Level 2 if any spotter is adjacent, Level 1 at range. Range only
+        /// establishes CONTACT — how much that contact is worth is decided here, which is what stops a unit
+        /// from learning everything by standing still and staring (§12.4.4).
+        /// </summary>
+        private static SpottedLevel PassiveContactCeiling(CombatUnit spotter, int distance)
         {
-            if (unit.SpottedLevel >= SpottedLevel.Level4) return;
+            if (distance > 1) return SpottedLevel.Level1;
 
+            return spotter.Classification == UnitClassification.RECON
+                ? SpottedLevel.Level3
+                : SpottedLevel.Level2;
+        }
+
+        /// <summary>
+        /// "Set to" source semantics (§12.4.3): raises the target UP TO <paramref name="ceiling"/> and never
+        /// lowers an already-higher level. Used by passive spotting, combat, and the ambush reveals.
+        /// </summary>
+        private static void RaiseToCeiling(CombatUnit unit, SpottedLevel ceiling)
+        {
+            if (unit.SpottedLevel >= ceiling) return;
+            ApplyLevel(unit, ceiling);
+        }
+
+        /// <summary>
+        /// "+1 rung" source semantics (§12.4.3): adds exactly one level and stops at <paramref name="ceiling"/>.
+        /// Used by IntelActions, the SIGINT sweep, and air recon.
+        /// </summary>
+        private static void RaiseByOneRung(CombatUnit unit, SpottedLevel ceiling)
+        {
+            if (unit.SpottedLevel >= ceiling) return;
+            ApplyLevel(unit, unit.SpottedLevel + 1);
+        }
+
+        /// <summary>
+        /// Commits a level change and raises the change event. SetSpottedLevel may clamp below the requested
+        /// value (Concealed Operations Base, §14.8.7), so the event always reports the level that actually
+        /// landed rather than the one asked for.
+        /// </summary>
+        private static void ApplyLevel(CombatUnit unit, SpottedLevel level)
+        {
             var oldLevel = unit.SpottedLevel;
-            unit.SetSpottedLevel(oldLevel + 1);
+            unit.SetSpottedLevel(level);
 
-            // SetSpottedLevel may clamp (Underground Bunker Level-3 cap, §14.8.7) — report the actual level.
             if (unit.SpottedLevel == oldLevel) return;
 
             if (EventManager.Instance != null)
                 EventManager.Instance.RaiseUnitSpottedLevelChanged(unit, oldLevel, unit.SpottedLevel);
+        }
+
+        /// <summary>True when any live player unit stands adjacent to <paramref name="enemy"/> (§12.6.3 hold).</summary>
+        private static bool IsAdjacentToPlayerUnit(CombatUnit enemy)
+        {
+            foreach (var spotter in GameDataManager.Instance.GetPlayerUnits())
+            {
+                if (spotter.IsDestroyed()) continue;
+                if (HexMapUtil.GetHexDistance(spotter.MapPos, enemy.MapPos) <= 1) return true;
+            }
+            return false;
+        }
+
+        /// <summary>
+        /// The SUSTAINED FLOOR (§12.6.2): the best passive ceiling any live player spotter currently earns
+        /// against this enemy. Re-derived from the board every Refresh, and never decays — decay only eats the
+        /// rungs that were bought with combat, IntelActions, or a sweep.
+        /// </summary>
+        private static SpottedLevel SustainedFloor(CombatUnit enemy)
+        {
+            var floor = SpottedLevel.Level0;
+
+            foreach (var spotter in GameDataManager.Instance.GetPlayerUnits())
+            {
+                if (spotter.IsDestroyed()) continue;
+
+                int range = SpottingRangeAgainst(spotter, enemy);
+                int dist = HexMapUtil.GetHexDistance(spotter.MapPos, enemy.MapPos);
+                if (dist > range) continue;
+
+                var ceiling = PassiveContactCeiling(spotter, dist);
+                if (ceiling > floor) floor = ceiling;
+            }
+
+            return floor;
         }
 
         #endregion // Private Helpers

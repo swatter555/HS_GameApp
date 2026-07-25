@@ -39,6 +39,13 @@ namespace HammerAndSickle.Models
         public ExperienceLevel UnitExperienceLevel = ExperienceLevel.Raw;
         public EfficiencyLevel UnitEfficiencyLevel = EfficiencyLevel.StaticOperations;
 
+        /// <summary>
+        /// True for the FULL friendly view (§12.2.7): all seventeen buckets, zero error. False for an enemy
+        /// report, which publishes only the six COARSE buckets (§12.5.2). Set by the report factory, never by
+        /// display code — GetEquipmentEntries below is the single place the two tiers are allowed to diverge.
+        /// </summary>
+        public bool IsFullDetail { get; set; } = false;
+
         #endregion // Properties
 
         #region Equipment Entries
@@ -61,7 +68,22 @@ namespace HammerAndSickle.Models
                 if (value > 0) entries.Add($"{value}{NB}{label}");
             }
 
-            // Ground
+            if (!IsFullDetail)
+            {
+                // COARSE — the ENEMY view (§12.5.2). Six ground buckets, air folded into one entry.
+                // The ART/ROC and SAM/AAA/AT merges are deliberate: knowing whether that battery is tube
+                // or rocket artillery is exactly the detail that should cost intel work to learn.
+                Add(Personnel, "men");
+                Add(TANK, "tanks");
+                Add(IFV + APC + RCN, "AFVs");
+                Add(ART + ROC, "guns");
+                Add(SAM + AAA + AT, "AA");
+                Add(HEL, "helos");
+                Add(FGT + ATT + BMB + AWACS + RCNA + TRN, "aircraft");
+                return entries;
+            }
+
+            // FULL — the FRIENDLY view. Ground first, then air.
             Add(Personnel, "men");
             Add(TANK, "tanks");
             Add(IFV + APC + RCN, "AFVs");
@@ -72,7 +94,6 @@ namespace HammerAndSickle.Models
             Add(AT, "AT");
             Add(HEL, "helos");
 
-            // Air
             Add(FGT, "fighters");
             Add(ATT, "attack");
             Add(BMB, "bombers");

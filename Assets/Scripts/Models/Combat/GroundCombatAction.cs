@@ -86,6 +86,12 @@ namespace HammerAndSickle.Models.Combat
                 // (1) Engagement — applies HP to both units, returns the defender's stand outcome (§7.7.3).
                 DirectAttackResult atk = CombatResolver.ResolveDirectAttack(attacker, defender, ctx, rng);
 
+                // (1a) Direct-combat intel (§12.4.6): closing to contact reveals what the other side is
+                // fighting with — both participants are set to Level 4. Applied AFTER the engagement so a
+                // unit destroyed in the exchange is not left visible by a reveal it did not survive; the
+                // removal path below unregisters it either way.
+                SpottingService.ApplyDirectCombatContact(attacker, defender);
+
                 var outcome = new GroundCombatOutcome
                 {
                     Executed = true,

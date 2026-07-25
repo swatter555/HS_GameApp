@@ -97,11 +97,30 @@ namespace HammerAndSickle.Tests
         }
 
         [Test]
-        public void AISweep_ContactLost_DecaysToGhost()
+        public void AISweep_AdjacentTarget_EarnsLevel2()
         {
+            // §12.4.2 threaded through the AI sweep: range establishes contact, adjacency decides what it is
+            // worth. This is the symmetry check — the AI must apply the SAME source ceilings as the player
+            // side, not a private progression model.
             var perception = new AIPerceptionState();
             AISpotter(UnitClassification.INF);
-            CombatUnit tank = PlayerTarget(UnitClassification.TANK, SPOT_X + 1);
+            CombatUnit adjacent = PlayerTarget(UnitClassification.TANK, SPOT_X + 1);
+            CombatUnit atRange = PlayerTarget(UnitClassification.MOT, SPOT_X + 2);
+
+            SpottingService.RecomputeAIPerception(perception, currentTurn: 1);
+
+            Assert.AreEqual(SpottedLevel.Level2, perception.LevelOf(adjacent.UnitID), "adjacency earns Level2");
+            Assert.AreEqual(SpottedLevel.Level1, perception.LevelOf(atRange.UnitID), "the same spotter at range earns only contact");
+        }
+
+        [Test]
+        public void AISweep_ContactLost_DecaysToGhost()
+        {
+            // Target at distance 2 (in range, NOT adjacent) so the sweep ceiling is Level1 and a single decay
+            // step takes it dark — this test is about the ghost lifecycle, not about ceilings.
+            var perception = new AIPerceptionState();
+            AISpotter(UnitClassification.INF);
+            CombatUnit tank = PlayerTarget(UnitClassification.TANK, SPOT_X + 2);
 
             SpottingService.RecomputeAIPerception(perception, currentTurn: 1);
             Assert.AreEqual(SpottedLevel.Level1, perception.LevelOf(tank.UnitID));
@@ -113,7 +132,48 @@ namespace HammerAndSickle.Tests
             Assert.AreEqual(SpottedLevel.Level0, perception.LevelOf(tank.UnitID), "Level1 contact went dark");
             GhostContact ghost = perception.GetGhost(tank.UnitID);
             Assert.IsNotNull(ghost, "lost contact persists as a ghost");
-            Assert.AreEqual(new Position2D(SPOT_X + 1, ROW_Y), ghost.LastKnownPos, "ghost anchors to LAST KNOWN position, not the true one");
+            Assert.AreEqual(new Position2D(SPOT_X + 2, ROW_Y), ghost.LastKnownPos, "ghost anchors to LAST KNOWN position, not the true one");
+        }
+
+        [Test]
+        public void AISweep_RungsAboveTheFloor_ErodeWhileTheUnitIsStillWatched()
+        {
+            // §12.9 symmetry, the case a boolean in-range test gets wrong: the belief store is pushed to
+            // Level4 (as combat would), then the target sits at distance 2 where passive contact sustains only
+            // Level1. It must erode toward that floor rather than being frozen at Level4 by "still in range".
+            var perception = new AIPerceptionState();
+            AISpotter(UnitClassification.INF);
+            CombatUnit tank = PlayerTarget(UnitClassification.TANK, SPOT_X + 2);
+
+            SpottingService.RecomputeAIPerception(perception, currentTurn: 1);
+            perception.RecordSpot(tank.UnitID, tank.MapPos, 1, tank.Classification, 100, 2, SpottedLevel.Level4);
+            Assert.AreEqual(SpottedLevel.Level4, perception.LevelOf(tank.UnitID));
+
+            SpottingService.StepAIPerceptionDecay(perception, currentTurn: 2);
+            Assert.AreEqual(SpottedLevel.Level3, perception.LevelOf(tank.UnitID), "one rung, despite still being watched");
+
+            SpottingService.StepAIPerceptionDecay(perception, currentTurn: 3);
+            SpottingService.StepAIPerceptionDecay(perception, currentTurn: 4);
+            Assert.AreEqual(SpottedLevel.Level1, perception.LevelOf(tank.UnitID), "erosion stops at the passive floor");
+            Assert.IsNull(perception.GetGhost(tank.UnitID), "a sustained contact never ghosts");
+        }
+
+        [Test]
+        public void AISweep_AdjacencyHoldsEveryEarnedRung()
+        {
+            // §12.6.3 mirrored AI-side: with the target standing next to the spotter, nothing erodes at all.
+            var perception = new AIPerceptionState();
+            AISpotter(UnitClassification.INF);
+            CombatUnit tank = PlayerTarget(UnitClassification.TANK, SPOT_X + 1);
+
+            SpottingService.RecomputeAIPerception(perception, currentTurn: 1);
+            perception.RecordSpot(tank.UnitID, tank.MapPos, 1, tank.Classification, 100, 2, SpottedLevel.Level5);
+
+            SpottingService.StepAIPerceptionDecay(perception, currentTurn: 2);
+            SpottingService.StepAIPerceptionDecay(perception, currentTurn: 3);
+
+            Assert.AreEqual(SpottedLevel.Level5, perception.LevelOf(tank.UnitID), "adjacency holds every earned rung");
+            Assert.IsNull(perception.GetGhost(tank.UnitID));
         }
     }
 }

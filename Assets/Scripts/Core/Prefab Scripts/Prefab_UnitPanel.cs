@@ -98,9 +98,11 @@ namespace HammerAndSickle.Core
                     lines.Add($"{leader.FormattedRank} {leader.Name}");
             }
 
-            // Equipment flow: full Level-4 report (friendly), non-zero entries joined by 2 spaces. The
-            // shared IntelReport formatter is reused by the printer's enemy report so the two never drift.
-            var entries = unit.GetIntelReport(SpottedLevel.Level4).GetEquipmentEntries();
+            // Equipment flow: the FULL friendly view (§12.2.7 — an ownership fact, not a rung, so it is not
+            // reachable through GetIntelReport at any SpottedLevel), non-zero entries joined by 2 spaces. The
+            // shared IntelReport formatter is reused by the printer's enemy report so the two never drift —
+            // the enemy side gets the coarse six-bucket tier from the same method.
+            var entries = unit.GetFullIntelReport().GetEquipmentEntries();
             if (entries.Count > 0)
                 lines.Add(string.Join("  ", entries));
 

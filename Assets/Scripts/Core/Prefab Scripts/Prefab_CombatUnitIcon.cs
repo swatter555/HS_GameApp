@@ -6,6 +6,12 @@ using System;
 using TMPro;
 using UnityEngine;
 
+// This file sits in namespace HammerAndSickle.Core, where the bare name "GameData" binds to the CHILD
+// NAMESPACE HammerAndSickle.Core.GameData rather than to the constants class of the same name inside it.
+// The alias disambiguates. (Files in HammerAndSickle.Models etc. can write GameData.FOO directly, which is
+// why this bites only here.)
+using GameDataConst = HammerAndSickle.Core.GameData.GameData;
+
 namespace HammerAndSickle.Core
 {
     /// <summary>
@@ -60,6 +66,21 @@ namespace HammerAndSickle.Core
         private int _motionIndex;
         private float _motionTimer;
         private bool _motionActive;
+
+        // Intel gating (§12.2 / §24.3.2). The icon is an intel channel, so the hit-point box and the
+        // deployment icon are gated by the viewer's rung on this unit. Friendly units are always Exact +
+        // known-posture. The last true HP percent is cached so a mode change re-renders without needing a
+        // fresh event, and so an HP change mid-fog does not leak through the band.
+        private HitPointDisplayMode _hpMode = HitPointDisplayMode.Exact;
+        private bool _deploymentKnown = true;
+        private int _hpPercent;
+        private DeploymentPosition _deploymentPosition;
+        private EmbarkmentState _embarkmentState;
+
+        private const string HP_HIDDEN_TEXT = "-";
+        private const string HP_BAND_FULL = "FUL";
+        private const string HP_BAND_DEPLETED = "DEP";
+        private const string HP_BAND_LOW = "LOW";
 
         #endregion // Fields
 
@@ -148,17 +169,39 @@ namespace HammerAndSickle.Core
         {
             _unitId = unitId;
             _resolveDeploySprite = resolveDeploySprite;
+            _hpPercent = hitPointPercent;
+            _deploymentPosition = deploymentPosition;
+            _embarkmentState = embarkmentState;
 
             InitializeHitPointsText();
-            HitPointsRatio = hitPointPercent.ToString();
-
-            if (_resolveDeploySprite != null)
-            {
-                string spriteName = _resolveDeploySprite(deploymentPosition, embarkmentState);
-                SetDeployIcon(spriteName);
-            }
+            RefreshHitPointText();
+            RefreshDeployIcon();
 
             SubscribeToEvents();
+        }
+
+        /// <summary>
+        /// Applies the viewer's intel gating to this icon (§12.2 / §24.3.2): how the hit-point box reads, and
+        /// whether the real deployment posture is shown or replaced by the unknown marker. Called by
+        /// GameIconRenderer at spawn and again whenever the unit's SpottedLevel changes. Friendly units are
+        /// always (Exact, known).
+        /// </summary>
+        public void SetIntelDisplay(HitPointDisplayMode hpMode, bool deploymentKnown)
+        {
+            try
+            {
+                if (_hpMode == hpMode && _deploymentKnown == deploymentKnown) return;
+
+                _hpMode = hpMode;
+                _deploymentKnown = deploymentKnown;
+
+                RefreshHitPointText();
+                RefreshDeployIcon();
+            }
+            catch (Exception e)
+            {
+                AppService.HandleException(CLASS_NAME, nameof(SetIntelDisplay), e);
+            }
         }
 
         /// <summary>
@@ -526,34 +569,77 @@ namespace HammerAndSickle.Core
                 Debug.LogWarning($"{CLASS_NAME}.ValidateReferences: fontAsset is not assigned");
         }
 
+        /// <summary>
+        /// Renders the hit-point box from the cached true percentage through the current gate (§12.2.5/.6):
+        /// a dash below Level4, a strength band at Level4, the exact percentage at Level5 and for friendlies.
+        /// </summary>
+        private void RefreshHitPointText()
+        {
+            HitPointsRatio = _hpMode switch
+            {
+                HitPointDisplayMode.Hidden => HP_HIDDEN_TEXT,
+                HitPointDisplayMode.Band => StrengthBandText(_hpPercent),
+                _ => _hpPercent.ToString(),
+            };
+        }
+
+        /// <summary>
+        /// The Section 8 strength tiers as a short box label — Full (>=80%), Depleted (>=50%), Low below that.
+        /// Reads the SAME floors the combat engine uses, so the band the player sees is the band that is
+        /// actually being applied to the unit's damage output.
+        /// </summary>
+        private static string StrengthBandText(int hpPercent)
+        {
+            float ratio = hpPercent / 100f;
+
+            if (ratio >= GameDataConst.FULL_STRENGTH_FLOOR) return HP_BAND_FULL;
+            if (ratio >= GameDataConst.DEPLETED_STRENGTH_FLOOR) return HP_BAND_DEPLETED;
+            return HP_BAND_LOW;
+        }
+
+        /// <summary>
+        /// Renders the deployment icon from the cached true posture through the current gate: the real posture
+        /// sprite once Level3 is reached, the unknown marker below it (§12.2.2 / §24.3.2.2).
+        /// </summary>
+        private void RefreshDeployIcon()
+        {
+            if (_resolveDeploySprite == null) return;
+
+            string spriteName = _deploymentKnown
+                ? _resolveDeploySprite(_deploymentPosition, _embarkmentState)
+                : SpriteManager.UnknownDeploymentIcon;
+
+            SetDeployIcon(spriteName);
+        }
+
         #endregion // Private Methods
 
         #region Event Handlers
 
         /// <summary>
-        /// Handles hit point changes for this unit. Updates the hit points text display.
+        /// Handles hit point changes for this unit. Caches the true value and re-renders through the
+        /// current intel gate — a fogged enemy's box must not start showing numbers just because it took damage.
         /// </summary>
         private void OnUnitHitPointsChanged(string unitId, int currentPercent)
         {
             if (unitId != _unitId) return;
 
-            HitPointsRatio = currentPercent.ToString();
+            _hpPercent = currentPercent;
+            RefreshHitPointText();
         }
 
         /// <summary>
-        /// Handles deployment state changes for this unit. Updates the deploy icon sprite.
+        /// Handles deployment state changes for this unit. Caches the true posture and re-renders through the
+        /// current intel gate — while posture is unknown (§12.2.2) the icon keeps the unknown marker, so a
+        /// hidden enemy digging in does not announce itself.
         /// </summary>
         private void OnUnitDeploymentChanged(string unitId, DeploymentPosition newPosition, EmbarkmentState embarkmentState)
         {
             if (unitId != _unitId) return;
 
-            if (_resolveDeploySprite == null)
-            {
-                return;
-            }
-
-            string spriteName = _resolveDeploySprite(newPosition, embarkmentState);
-            SetDeployIcon(spriteName);
+            _deploymentPosition = newPosition;
+            _embarkmentState = embarkmentState;
+            RefreshDeployIcon();
         }
 
         #endregion // Event Handlers

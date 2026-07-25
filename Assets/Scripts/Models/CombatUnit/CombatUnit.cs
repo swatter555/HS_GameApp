@@ -374,8 +374,14 @@ namespace HammerAndSickle.Models
 
         /// <summary>
         /// Sets the enemy-side intel level on this unit. If the attached leader has Concealed Operations
-        /// Base (Underground Bunker, §14.8.7), enemy intel is hard-capped at Level 3 — the unit can never
-        /// be spotted to Level 4 / perfect intel, regardless of spotting pressure or opp-fire reveals.
+        /// Base (Underground Bunker, §14.8.7), enemy intel is hard-capped at Level 3.
+        ///
+        /// ⚠ SKILL RE-REPURPOSE PENDING (2026-07-24, deferred to its own pass): this cap was written against
+        /// the OLD five-level ladder, where Level 3 was the penultimate rung and the cap denied "perfect
+        /// intel." On the six-rung ladder (§12.2) Level 3 is mid-ladder — reachable by a SIGINT sweep or air
+        /// recon alone — so the cap now denies equipment counts AND experience/efficiency, which is a much
+        /// bigger effect than the skill was priced for. Behaviour is left EXACTLY as it was rather than
+        /// silently retuned; see Claude_TODO and DesignDoc §14.8.7 for the candidate re-home.
         /// </summary>
         public void SetSpottedLevel(SpottedLevel spottedLevel)
         {
@@ -2377,45 +2383,51 @@ namespace HammerAndSickle.Models
         #region Intel Reports
 
         /// <summary>
-        /// Returns an IntelReport about this unit filtered by the given SpottedLevel.
-        /// Level0: Empty report (not spotted).
-        /// Level1: Unit name and nationality only.
-        /// Level2: Above plus deployment status and equipment buckets with ~30% error.
-        /// Level3: Above plus experience/efficiency levels and equipment with ~10% error.
-        /// Level4: Full intel, no error.
+        /// Returns an ENEMY-side IntelReport about this unit, filtered by the given SpottedLevel
+        /// (§12.2, the six-rung ladder — rewritten 2026-07-24):
+        /// Level0: empty report (unspotted).
+        /// Level1: nothing but contact — the icon carries everything at this rung, so even the name is withheld.
+        /// Level2: + unit name and nationality.
+        /// Level3: + deployment position.
+        /// Level4: + equipment in the six COARSE buckets at MAX_INTEL_ERROR (16%).
+        /// Level5: + experience and efficiency, equipment error down to MODERATE_INTEL_ERROR (8%).
+        /// FULL detail is NOT reachable here — it is an ownership fact, see <see cref="GetFullIntelReport"/>.
         /// </summary>
         public IntelReport GetIntelReport(SpottedLevel spottedLevel)
         {
             try
             {
-                var report = new IntelReport();
+                var report = new IntelReport { IsFullDetail = false };
 
-                if (spottedLevel == SpottedLevel.Level0)
-                    return report;
+                if (spottedLevel <= SpottedLevel.Level1)
+                    return report;   // Level0 = nothing; Level1 = contact only, the icon is the whole report
 
-                // Level1+: Name and nationality
+                // Level2+: name and nationality
                 report.UnitName = UnitName;
                 report.UnitNationality = Nationality;
-
-                if (spottedLevel == SpottedLevel.Level1)
-                    return report;
-
-                // Level2+: Deployment status and equipment buckets with error
-                report.DeploymentPosition = DeploymentPosition;
-
-                float errorRate = spottedLevel switch
-                {
-                    SpottedLevel.Level2 => GameData.MAX_INTEL_ERROR / 100f,
-                    SpottedLevel.Level3 => GameData.MIN_INTEL_ERROR / 100f,
-                    _ => 0f
-                };
-
-                ApplyEquipmentBuckets(report, errorRate);
 
                 if (spottedLevel == SpottedLevel.Level2)
                     return report;
 
-                // Level3+: Experience and efficiency levels
+                // Level3+: deployment position
+                report.DeploymentPosition = DeploymentPosition;
+
+                if (spottedLevel == SpottedLevel.Level3)
+                    return report;
+
+                // Level4+: equipment buckets, coarse, with the rung's error band
+                float errorRate = spottedLevel switch
+                {
+                    SpottedLevel.Level4 => GameData.MAX_INTEL_ERROR / 100f,
+                    _ => GameData.MODERATE_INTEL_ERROR / 100f,   // Level5
+                };
+
+                ApplyEquipmentBuckets(report, errorRate);
+
+                if (spottedLevel == SpottedLevel.Level4)
+                    return report;
+
+                // Level5: experience and efficiency
                 report.UnitExperienceLevel = ExperienceLevel;
                 report.UnitEfficiencyLevel = EfficiencyLevel;
 
@@ -2428,6 +2440,36 @@ namespace HammerAndSickle.Models
             }
         }
 
+        /// <summary>
+        /// The FULL view of this unit (§12.2.7): every field, all seventeen equipment buckets, zero error.
+        /// This is an OWNERSHIP fact rather than a rung on the spotting ladder — it is unreachable by spotting,
+        /// never stored in SpottedLevel, and never decayed. Call it for Side.Player units; call
+        /// <see cref="GetIntelReport"/> for everything else.
+        /// </summary>
+        public IntelReport GetFullIntelReport()
+        {
+            try
+            {
+                var report = new IntelReport
+                {
+                    IsFullDetail = true,
+                    UnitName = UnitName,
+                    UnitNationality = Nationality,
+                    DeploymentPosition = DeploymentPosition,
+                    UnitExperienceLevel = ExperienceLevel,
+                    UnitEfficiencyLevel = EfficiencyLevel,
+                };
+
+                ApplyEquipmentBuckets(report, 0f);
+                return report;
+            }
+            catch (Exception e)
+            {
+                AppService.HandleException(CLASS_NAME, nameof(GetFullIntelReport), e);
+                throw;
+            }
+        }
+
         private void ApplyEquipmentBuckets(IntelReport report, float errorRate)
         {
             var baseReport = RegimentProfile?.GetIntelReport();
@@ -2436,26 +2478,30 @@ namespace HammerAndSickle.Models
 
             float strengthRatio = HitPoints.Max > 0 ? HitPoints.Current / HitPoints.Max : 0f;
 
-            report.Personnel = ApplyIntelError(baseReport.Personnel, strengthRatio, errorRate);
-            report.TANK = ApplyIntelError(baseReport.TANK, strengthRatio, errorRate);
-            report.IFV = ApplyIntelError(baseReport.IFV, strengthRatio, errorRate);
-            report.APC = ApplyIntelError(baseReport.APC, strengthRatio, errorRate);
-            report.RCN = ApplyIntelError(baseReport.RCN, strengthRatio, errorRate);
-            report.ART = ApplyIntelError(baseReport.ART, strengthRatio, errorRate);
-            report.ROC = ApplyIntelError(baseReport.ROC, strengthRatio, errorRate);
-            report.SAM = ApplyIntelError(baseReport.SAM, strengthRatio, errorRate);
-            report.AAA = ApplyIntelError(baseReport.AAA, strengthRatio, errorRate);
-            report.AT = ApplyIntelError(baseReport.AT, strengthRatio, errorRate);
-            report.HEL = ApplyIntelError(baseReport.HEL, strengthRatio, errorRate);
-            report.AWACS = ApplyIntelError(baseReport.AWACS, strengthRatio, errorRate);
-            report.TRN = ApplyIntelError(baseReport.TRN, strengthRatio, errorRate);
-            report.FGT = ApplyIntelError(baseReport.FGT, strengthRatio, errorRate);
-            report.ATT = ApplyIntelError(baseReport.ATT, strengthRatio, errorRate);
-            report.BMB = ApplyIntelError(baseReport.BMB, strengthRatio, errorRate);
-            report.RCNA = ApplyIntelError(baseReport.RCNA, strengthRatio, errorRate);
+            // The error seed is keyed on the CURRENT HP so a report changes when the unit actually changes,
+            // and only then (§12.5.5). Rounded to a whole percent to keep float drift from re-rolling it.
+            int hpKey = Mathf.RoundToInt(strengthRatio * 100f);
+
+            report.Personnel = ApplyIntelError(baseReport.Personnel, strengthRatio, errorRate, hpKey, 0);
+            report.TANK = ApplyIntelError(baseReport.TANK, strengthRatio, errorRate, hpKey, 1);
+            report.IFV = ApplyIntelError(baseReport.IFV, strengthRatio, errorRate, hpKey, 2);
+            report.APC = ApplyIntelError(baseReport.APC, strengthRatio, errorRate, hpKey, 3);
+            report.RCN = ApplyIntelError(baseReport.RCN, strengthRatio, errorRate, hpKey, 4);
+            report.ART = ApplyIntelError(baseReport.ART, strengthRatio, errorRate, hpKey, 5);
+            report.ROC = ApplyIntelError(baseReport.ROC, strengthRatio, errorRate, hpKey, 6);
+            report.SAM = ApplyIntelError(baseReport.SAM, strengthRatio, errorRate, hpKey, 7);
+            report.AAA = ApplyIntelError(baseReport.AAA, strengthRatio, errorRate, hpKey, 8);
+            report.AT = ApplyIntelError(baseReport.AT, strengthRatio, errorRate, hpKey, 9);
+            report.HEL = ApplyIntelError(baseReport.HEL, strengthRatio, errorRate, hpKey, 10);
+            report.AWACS = ApplyIntelError(baseReport.AWACS, strengthRatio, errorRate, hpKey, 11);
+            report.TRN = ApplyIntelError(baseReport.TRN, strengthRatio, errorRate, hpKey, 12);
+            report.FGT = ApplyIntelError(baseReport.FGT, strengthRatio, errorRate, hpKey, 13);
+            report.ATT = ApplyIntelError(baseReport.ATT, strengthRatio, errorRate, hpKey, 14);
+            report.BMB = ApplyIntelError(baseReport.BMB, strengthRatio, errorRate, hpKey, 15);
+            report.RCNA = ApplyIntelError(baseReport.RCNA, strengthRatio, errorRate, hpKey, 16);
         }
 
-        private int ApplyIntelError(int baseValue, float strengthRatio, float errorRate)
+        private int ApplyIntelError(int baseValue, float strengthRatio, float errorRate, int hpKey, int bucketIndex)
         {
             if (baseValue <= 0) return 0;
 
@@ -2464,8 +2510,51 @@ namespace HammerAndSickle.Models
             if (errorRate <= 0f)
                 return Mathf.RoundToInt(scaled);
 
-            float offset = scaled * UnityEngine.Random.Range(-errorRate, errorRate);
+            float offset = scaled * errorRate * IntelErrorNoise(UnitID, hpKey, bucketIndex);
             return Mathf.Max(0, Mathf.RoundToInt(scaled + offset));
+        }
+
+        /// <summary>
+        /// Deterministic noise in [-1, 1] for one intel bucket (§12.5.5). Keyed on (UnitID, HP, bucket) so
+        /// reselecting the same enemy REPRINTS THE SAME NUMBERS. The prior implementation called
+        /// UnityEngine.Random per request, which both jittered the display on every click and leaked the true
+        /// value to any player willing to sample repeatedly — repeated draws converge on the mean.
+        ///
+        /// Note the error rate is applied OUTSIDE this function, so a unit's Level-4 and Level-5 reports lean
+        /// the same direction and differ only in magnitude. That is deliberate: better intel should tighten an
+        /// estimate, not swing it to the other side of the truth.
+        ///
+        /// Uses an inlined FNV-1a over the ID rather than string.GetHashCode, which is not guaranteed stable
+        /// across runtimes or processes and would break the round-trip after a save/load.
+        /// </summary>
+        private static float IntelErrorNoise(string unitId, int hpKey, int bucketIndex)
+        {
+            unchecked
+            {
+                const uint FNV_OFFSET = 2166136261u;
+                const uint FNV_PRIME = 16777619u;
+
+                uint h = FNV_OFFSET;
+                if (!string.IsNullOrEmpty(unitId))
+                {
+                    foreach (char c in unitId)
+                    {
+                        h = (h ^ c) * FNV_PRIME;
+                    }
+                }
+
+                h = (h ^ (uint)hpKey) * FNV_PRIME;
+                h = (h ^ (uint)bucketIndex) * FNV_PRIME;
+
+                // Final avalanche so adjacent keys don't produce adjacent outputs.
+                h ^= h >> 16;
+                h *= 0x7feb352du;
+                h ^= h >> 15;
+                h *= 0x846ca68bu;
+                h ^= h >> 16;
+
+                return (h / (float)uint.MaxValue) * 2f - 1f;
+            }
         }
 
         #endregion // Intel Reports

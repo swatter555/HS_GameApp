@@ -2,6 +2,7 @@ using HammerAndSickle.Controllers;
 using HammerAndSickle.Models;
 using HammerAndSickle.Core.GameData;
 using System;
+using System.Collections.Generic;
 
 namespace HammerAndSickle.Core.UI
 {
@@ -36,32 +37,39 @@ namespace HammerAndSickle.Core.UI
         {
             if (unit == null) throw new ArgumentNullException(nameof(unit));
 
-            // Get intel report based on unit's side.
-            IntelReport report;
-            string reportType;
-            if (unit.Side == Side.Player)
-            {
-                report = unit.GetIntelReport(SpottedLevel.Level4); // Full intel for player units
-                reportType = "Message from:";
-            }
-            else
-            {
-                report = unit.GetIntelReport(unit.SpottedLevel);
-                reportType = "Intel report on:";
-            }
+            bool isFriendly = unit.Side == Side.Player;
 
-            // Construct the report lines based on the intel report and unit properties.
-            string[] lines = new[]
+            // §24.5a: the report is built from the FILTERED report, never from the live unit. Every line is
+            // gated by the rung that reveals it, and a line whose rung has not been earned is OMITTED rather
+            // than printed as a default. Supply and leader are FRIENDLY-ONLY — they are not in the intel model
+            // at any enemy rung (§24.5a.5/.6).
+            IntelReport report = isFriendly ? unit.GetFullIntelReport() : unit.GetIntelReport(unit.SpottedLevel);
+            var level = unit.SpottedLevel;
+
+            var lines = new List<string>
             {
-                $"{reportType} {unit.UnitName}",
-                $"{report.Personnel} Men  {report.TANK} Tanks  {report.IFV + report.APC + report.RCN} IFVs/APCs",
-                $"{report.ART + report.ROC} Guns/Rockets  {report.AAA + report.SAM} AAA/SAM  {report.AT} AT/ATGMs",
-                $"{report.HEL} Helicopters",
-                $"Experience: {unit.ExperienceLevel} | Effeciency: {FormatEfficiency(unit.EfficiencyLevel)}",
-                $"Deployment: {unit.DeploymentPosition} | {unit.DaysSupply.Current:F1} days of supply",
+                isFriendly ? $"Message from: {unit.UnitName}" : IntelHeader(report, level)
             };
 
-            return new PrinterMessage(lines, timestamp);
+            // Equipment — Level4+ for an enemy (§24.5a.3). The shared formatter yields the coarse six-bucket
+            // tier for enemies and all seventeen for friendlies, so the two views can never drift.
+            var entries = report.GetEquipmentEntries();
+            if (entries.Count > 0)
+                lines.Add(string.Join("  ", entries));
+
+            // Deployment — Level3+ (§24.5a.2).
+            if (isFriendly || level >= SpottedLevel.Level3)
+                lines.Add($"Deployment: {report.DeploymentPosition}");
+
+            // Experience + efficiency — Level5 only (§24.5a.4).
+            if (isFriendly || level >= SpottedLevel.Level5)
+                lines.Add($"Experience: {report.UnitExperienceLevel} | Efficiency: {FormatEfficiency(report.UnitEfficiencyLevel)}");
+
+            // Supply — friendly only (§24.5a.5).
+            if (isFriendly)
+                lines.Add($"{unit.DaysSupply.Current:F1} days of supply");
+
+            return new PrinterMessage(lines.ToArray(), timestamp);
         }
 
         /// <summary>
@@ -133,6 +141,16 @@ namespace HammerAndSickle.Core.UI
         #endregion // Static Factory Methods
 
         #region Private Helpers
+
+        /// <summary>
+        /// The enemy report header. Below Level2 the unit's NAME has not been earned (§12.2.3), so the report
+        /// says only that something is there — which is itself information, and is what teaches the player
+        /// that the ladder exists (§24.5a.7).
+        /// </summary>
+        private static string IntelHeader(IntelReport report, SpottedLevel level) =>
+            level >= SpottedLevel.Level2
+                ? $"Intel report on: {report.UnitName}"
+                : "Intel report: UNIDENTIFIED CONTACT";
 
         private static string FormatEfficiency(EfficiencyLevel level) => level switch
         {

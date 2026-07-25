@@ -1018,6 +1018,10 @@ namespace HammerAndSickle.Controllers
         public const string EmbarkedAirIcon   = "EmbarkedAirIcon";
         public const string EmbarkedNavalIcon = "EmbarkedNavalIcon";
 
+        // Deployment posture UNKNOWN (§12.2.2 / §24.3.2.2): shown on an enemy icon below SpottedLevel3,
+        // where the ladder has not yet revealed the real posture. Same slot and size as the icons above.
+        public const string UnknownDeploymentIcon = "UnknownIcon";
+
         #endregion
 
         #region Utility Icons

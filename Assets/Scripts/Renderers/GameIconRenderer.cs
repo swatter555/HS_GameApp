@@ -356,6 +356,9 @@ namespace HammerAndSickle.Core.Map
                 // Initialize the prefab with unit ID, current state, and deploy sprite resolver
                 unitIcon.Initialize(unit.UnitID, hpPercent, unit.DeploymentPosition, unit.CurrentEmbarkmentState, GetDeploySpriteName);
 
+                // Gate the icon's intel-bearing elements to the viewer's rung on this unit (§24.3.2).
+                ApplyIntelDisplay(unitIcon, unit);
+
                 // Sorting from SortingConfig, overriding baked prefab sorting (matches the target layer).
                 unitIcon.ApplySorting(IsFixedWingAircraft(unit.Classification) ? SortSlot.AirUnit : SortSlot.GroundUnit);
 
@@ -706,6 +709,34 @@ namespace HammerAndSickle.Core.Map
         /// </summary>
         /// <param name="position">The deployment position to get the sprite for</param>
         /// <returns>Sprite name for the deployment state icon, or null if no icon should be shown</returns>
+        /// <summary>
+        /// Applies §12.2 / §24.3.2 intel gating to a unit icon: friendly units show everything; an enemy shows
+        /// a dashed hit-point box below Level4, a strength band at Level4, the exact percentage at Level5, and
+        /// keeps the unknown deployment marker until Level3. The tilde debug reveal deliberately does NOT
+        /// unlock these — it is a rendering cheat for finding units, not an intel cheat (REMOVE BEFORE SHIPPING).
+        /// </summary>
+        private void ApplyIntelDisplay(Prefab_CombatUnitIcon icon, CombatUnit unit)
+        {
+            if (icon == null || unit == null) return;
+
+            if (unit.Side == Side.Player)
+            {
+                icon.SetIntelDisplay(HitPointDisplayMode.Exact, true);
+                return;
+            }
+
+            var level = unit.SpottedLevel;
+
+            HitPointDisplayMode hpMode = level switch
+            {
+                SpottedLevel.Level5 => HitPointDisplayMode.Exact,
+                SpottedLevel.Level4 => HitPointDisplayMode.Band,
+                _ => HitPointDisplayMode.Hidden,
+            };
+
+            icon.SetIntelDisplay(hpMode, level >= SpottedLevel.Level3);
+        }
+
         private string GetDeploySpriteName(DeploymentPosition position, EmbarkmentState embarkmentState)
         {
             if (position == DeploymentPosition.Embarked)
@@ -1104,6 +1135,13 @@ namespace HammerAndSickle.Core.Map
                     // Unit disappeared — remove its icon (unless the tilde debug reveal is holding it visible)
                     if (!DebugRevealAllEnemies)
                         RemoveUnitIcon(unit.UnitID);
+                }
+                else if (unitIconPrefabs.TryGetValue(unit.UnitID, out var existingIcon))
+                {
+                    // Still visible, but the rung moved — re-gate the icon's intel elements (§24.3.2).
+                    // Covers BOTH directions: climbing reveals the HP box and real posture, decaying hides
+                    // them again. Cheaper than a redraw and leaves tweens/facing/stacking untouched.
+                    ApplyIntelDisplay(existingIcon, unit);
                 }
             }
             catch (Exception e)
