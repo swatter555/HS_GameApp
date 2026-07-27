@@ -175,11 +175,27 @@ both compresses and delta-patches well.
       a patch. Handle with a named, specific error and a way forward, not a crash — and treat scenarioId as
       permanent once shipped.
 
-## PHASE 4 — Integrity
+## PHASE 4 — Integrity ⚠ REPLANNED 2026-07-27 — THE ORIGINAL PLAN WOULD HAVE BROKEN EVERY MAP
 
-- [ ] **4.1** Manifest declares the SHA-256 of its map and oob; loader verifies on load
-      (`MapChecksumUtility` already exists and `MapLoader` already checksum-validates).
-- [ ] **4.2** Failures name the file and the mismatch (P6).
+⚠ **`MapChecksumUtility` HAS ZERO EXTERNAL CALLERS.** Every reference to `CalculateChecksum`/`ValidateChecksum`
+is inside that file. `MapLoader` checks only `saveVersion > 0`, that `checksum` is non-empty (never comparing
+it), and that `saveVersion` matches the current format. **Nothing validates a map checksum, ever.** The
+statement in Claude_Project that "MapLoader already checksum-validates" was wrong.
+
+⚠ **AND THE TWO SIDES DO NOT AGREE ON THE BYTES.** The scenario-editor agent found this from the outside,
+without the source: `System.Text.Json` serializes in property-declaration order, and `HexTile` declares
+`reservedInt1/2` + `reservedFlag1/2` AFTER the four border objects, while every editor-authored `.map` emits
+them BEFORE. So the editor's hash input is not the byte string `SerializeToUtf8Bytes(hexes, options)` would
+produce. Turning validation on as originally planned would have hard-failed every existing map on day one.
+
+- [ ] **4.1 DECIDE FIRST: are per-map checksums worth keeping at all?** Their value was integrity for
+      user-supplied maps, and modding is designed OUT. Steam already verifies shipped file integrity, which is
+      the same guarantee for free. Leaning: DELETE `MapChecksumUtility` and the `checksum` header field rather
+      than fix a hash nobody checks.
+- [ ] **4.2 IF KEPT:** the EDITOR's byte order is the ground truth — every authored map already hashes that
+      way — so the game must adopt it, never the reverse. Changing the game's order invalidates nothing;
+      changing the editor's invalidates every map ever written.
+- [ ] **4.3** Whatever survives, failures name the file and the mismatch.
 
 ---
 

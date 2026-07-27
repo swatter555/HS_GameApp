@@ -39,16 +39,22 @@ namespace HammerAndSickle.Helpers
         public string UnitName { get; set; }
         public float MapPosX { get; set; }
         public float MapPosY { get; set; }
-        public int Side { get; set; }
-        public int Nationality { get; set; }
-        public int Classification { get; set; }
+        // ⚠ These are ENUM-TYPED, not int, since 2026-07-27 — and that is load-bearing.
+        // JsonStringEnumConverter (JsonPolicy.Content) only applies to enum-TYPED properties. While these
+        // were declared `int`, a name-form .oob ("Side": "AI") could not be read at ALL: System.Text.Json
+        // would throw converting a string to Int32 and the whole file would fail. Declared as enums, the
+        // converter accepts BOTH the old integers and the new names, so old and regenerated .oob files
+        // both load, and an unknown NAME throws loudly instead of silently landing on member 0.
+        public Side Side { get; set; }
+        public Nationality Nationality { get; set; }
+        public UnitClassification Classification { get; set; }
         // Preferred classification field: the UnitClassification enum NAME (e.g. "BMB").
-        // Resolved ahead of the legacy int Classification, which is fragile to mid-enum
-        // insertions (WW/TRN added at M0 shifted every value after ATT). Regenerated .oob
-        // files should emit this; older int-only files still load via the legacy fallback.
+        // Resolved ahead of Classification, which is fragile in files written BEFORE name-form existed —
+        // M0 inserted WW/TRN mid-enum, shifting every value after ATT. Keep emitting this until name-form
+        // Classification is confirmed in play; it is the only thing that would mask a failure.
         public string ClassificationName { get; set; }
-        public int Role { get; set; }
-        public int IntelProfileType { get; set; }
+        public UnitRole Role { get; set; }
+        public RegimentProfileType IntelProfileType { get; set; }
 
         // String-based weapon profile IDs from the Scenario Editor
         public string DeployedProfileID { get; set; }
@@ -57,14 +63,14 @@ namespace HammerAndSickle.Helpers
 
         public bool IsMountable { get; set; }
         public bool IsEmbarkable { get; set; }
-        public int Experience { get; set; }
-        public int Efficiency { get; set; }
-        public int Deployment { get; set; }
-        public int Spotted { get; set; }
+        public ExperienceLevel Experience { get; set; }
+        public EfficiencyLevel Efficiency { get; set; }
+        public DeploymentPosition Deployment { get; set; }
+        public SpottedLevel Spotted { get; set; }
         public float HitPoints { get; set; }
         public float DaysSupply { get; set; }
-        public int DepotCategory { get; set; }
-        public int DepotSize { get; set; }
+        public DepotCategory DepotCategory { get; set; }
+        public DepotSize DepotSize { get; set; }
         public List<string> AttachedAirUnitIDs { get; set; } = new List<string>();
     }
 
@@ -226,16 +232,16 @@ namespace HammerAndSickle.Helpers
         /// any .oob authored before that has its post-ATT classifications shifted by +1. New
         /// .oob files should carry ClassificationName; regenerate older ones to be safe.
         /// </summary>
-        private static UnitClassification ResolveClassification(string name, int legacyInt)
+        private static UnitClassification ResolveClassification(string name, UnitClassification fromField)
         {
             if (!string.IsNullOrEmpty(name)
                 && Enum.TryParse(name, ignoreCase: true, out UnitClassification parsed))
                 return parsed;
 
             if (!string.IsNullOrEmpty(name))
-                Debug.LogWarning($"{CLASS_NAME}.{nameof(ResolveClassification)}: Unknown classification name '{name}', falling back to legacy int {legacyInt}");
+                Debug.LogWarning($"{CLASS_NAME}.{nameof(ResolveClassification)}: Unknown classification name '{name}', falling back to the Classification field ({fromField})");
 
-            return (UnitClassification)legacyInt;
+            return fromField;
         }
 
         /// <summary>
@@ -356,14 +362,15 @@ namespace HammerAndSickle.Helpers
                         resolveWarnings++;
                     }
 
-                    // Cast integer enum fields to their proper types
-                    var side = (Side)data.Side;
-                    var nationality = (Nationality)data.Nationality;
+                    // No casts needed — the DTO is enum-typed and the converter has already parsed either
+                    // form. ClassificationName still wins where present (see the field comment).
+                    var side = data.Side;
+                    var nationality = data.Nationality;
                     var classification = ResolveClassification(data.ClassificationName, data.Classification);
-                    var role = (UnitRole)data.Role;
-                    var profileType = (RegimentProfileType)data.IntelProfileType;
-                    var depotCategory = (DepotCategory)data.DepotCategory;
-                    var depotSize = (DepotSize)data.DepotSize;
+                    var role = data.Role;
+                    var profileType = data.IntelProfileType;
+                    var depotCategory = data.DepotCategory;
+                    var depotSize = data.DepotSize;
 
                     // Create unit with full constructor
                     var unit = new CombatUnit(
@@ -385,10 +392,10 @@ namespace HammerAndSickle.Helpers
                     // Apply saved state
                     unit.SetUnitID(data.UnitID);
                     unit.SetPosition(new Position2D(data.MapPosX, data.MapPosY));
-                    unit.SetExperienceLevel((ExperienceLevel)data.Experience);
-                    unit.SetEfficiencyLevel((EfficiencyLevel)data.Efficiency);
-                    unit.SetDeploymentPosition((DeploymentPosition)data.Deployment);
-                    unit.SetSpottedLevel((SpottedLevel)data.Spotted);
+                    unit.SetExperienceLevel(data.Experience);
+                    unit.SetEfficiencyLevel(data.Efficiency);
+                    unit.SetDeploymentPosition(data.Deployment);
+                    unit.SetSpottedLevel(data.Spotted);
                     unit.HitPoints.SetCurrent(unit.HitPoints.Max * data.HitPoints);
                     unit.DaysSupply.SetCurrent(unit.DaysSupply.Max * data.DaysSupply);
 
