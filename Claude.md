@@ -39,6 +39,11 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
     is a breaking change that must ship with a `SAVE_VERSION` bump and a migration step.
 12. **Every `SAVE_VERSION` bump ships with its migration step** in `SnapshotMapper.UpgradeSnapshot`. The
     ladder throws if a step is missing rather than loading mismatched data.
+13. **Buttons: the Inspector owns onClick — never write `onClick.AddListener`.** Expose a public
+    `OnXButton()` callback and Bob wires it. A script holds a serialized `Button` reference ONLY when it
+    must drive that button's *state* (`interactable`, label, visibility), never to wire it.
+    **`On*Button()` names are a public contract:** UnityEvent binds by method-name string, so renaming one
+    silently breaks the scene wiring with no compile error. Do not rename without telling Bob.
 ---
 
 ## SECTION 3: Game Information

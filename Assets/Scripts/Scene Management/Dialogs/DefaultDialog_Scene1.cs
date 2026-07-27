@@ -4,7 +4,6 @@ using HammerAndSickle.Services;
 using System;
 using UnityEngine;
 using UnityEngine.Serialization;
-using UnityEngine.UI;
 
 namespace HammerAndSickle.SceneManagement
 {
@@ -59,10 +58,6 @@ namespace HammerAndSickle.SceneManagement
         [SerializeField] private RectTransform _unitPanel;
         [SerializeField] private RectTransform _printerPanel;
 
-        [Header("Unit Cycling")]
-        [SerializeField] private Button _nextUnitButton;
-        [SerializeField] private Button _prevUnitButton;
-
         [Header("Debug")]
         [SerializeField] private bool _debug;
 
@@ -90,10 +85,6 @@ namespace HammerAndSickle.SceneManagement
             };
 
             WarnOnUnassignedPanels();
-
-            // Wire unit cycling buttons
-            _nextUnitButton?.onClick.AddListener(() => EventManager.Instance?.RaiseNextUnitRequested());
-            _prevUnitButton?.onClick.AddListener(() => EventManager.Instance?.RaisePreviousUnitRequested());
         }
 
         /// <summary>
@@ -188,15 +179,25 @@ namespace HammerAndSickle.SceneManagement
 
         #endregion // Click-Through Detection
 
+        #region Unit Cycling Button Callbacks
+
+        /// <summary>Selects the next eligible unit. See EventManager.</summary>
+        public void OnNextUnitButton() => EventManager.Instance?.RaiseNextUnitRequested();
+
+        /// <summary>Selects the previous eligible unit. See EventManager.</summary>
+        public void OnPreviousUnitButton() => EventManager.Instance?.RaisePreviousUnitRequested();
+
+        #endregion // Unit Cycling Button Callbacks
+
         #region Printer Button Callbacks
 
         // ----------------------------------------------------------------------------
         // The six on-CRT navigation buttons of the HQ dispatch feed (§24.8.4.1).
         //
-        // These are Inspector-wired: Bob assigns each Button's onClick to the matching
-        // method here (the §3.6b nav-button half of the division of labour). They must
-        // therefore NOT also be hooked with AddListener in Start() — a code listener on
-        // top of the Inspector wiring would fire every press twice.
+        // Inspector-wired like every other button since 2026-07-27 (§3.6b): Bob assigns
+        // each Button's onClick to the matching method here. They must NOT also be hooked
+        // with AddListener — a code listener on top of the Inspector wiring would fire
+        // every press twice.
         //
         // Each callback does exactly one thing: raise its event. PrinterControl owns all
         // history/cursor/filter state and subscribes to these. See EventManager.

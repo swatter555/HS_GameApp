@@ -252,10 +252,17 @@ Outside the chain, poll-based and NOT gated by `SetInputEnabled`: `CursorControl
 **Script Execution Order (Bob-owned, Project Settings; stored in .cs.meta, NOT in git):**
 default 0 (everything else) → GameIconRenderer 100 → BattleManager 120 → InputService_BattleMap 140 → HexDetectionService 150. Unity runs each script's Awake+OnEnable as a pair in SEO order at scene load, so the ordered services' `Instance`s DO NOT exist yet while any default-order script runs Awake/OnEnable. **RULE: cross-singleton event subscriptions happen in `Start()`, never in Awake/OnEnable** (ReactivePanelManager and MovementController comply; HexDetectionService subscribes to InputService in Awake only because 140 < 150 makes it safe). Adding a new subscriber: subscribe in Start, or ask Bob for an SEO slot.
 
-**Division of labor (ratified 2026-07-20):**
-- **Bob (Inspector/scene):** scene hierarchy + component placement; ALL serialized references (controllers' dialog panels, dialogs' nav targets, HUD panel rects, `_uiCamera`, Buttons, printer); InputAction bindings; the SEO list; and onClick wiring for **dialog-navigation buttons** → public `OnXButton()` callback methods (Scene 0 menu, Orders Begin).
-- **Agent (code):** everything from the callback inward — dialog-flow logic, focus semantics, EventManager raise/subscribe, input-service internals, all consumers; and **gameplay buttons** = serialized `Button` ref + `AddListener` in code (End Turn on BattleManager, unit cycling on DefaultDialog_Scene1).
-- **New battle-HUD buttons:** grow `DefaultDialog_Scene1` with callbacks that raise the settled EventManager events — nav-style buttons get public methods Bob wires; gameplay-style get code `AddListener`.
+**Division of labor (RATIFIED 2026-07-27, supersedes the 2026-07-20 split):**
+- **Bob (Inspector/scene):** scene hierarchy + component placement; ALL serialized references (controllers' dialog panels, dialogs' nav targets, HUD panel rects, `_uiCamera`, printer); InputAction bindings; the SEO list; and **every button's onClick** → a public `OnXButton()` callback method.
+- **Agent (code):** everything from the callback inward — dialog-flow logic, focus semantics, EventManager raise/subscribe, input-service internals, all consumers.
+
+**⚠ ONE RULE FOR BUTTONS: the Inspector owns onClick. There is NO code `AddListener` anywhere.** The old split (nav = Inspector, gameplay = code `AddListener`) is RETIRED — it forced a judgment call per button, and getting it wrong either double-fired or did nothing. One mechanism means the double-fire hazard cannot exist. The three code-wired holdouts (End Turn on BattleManager, next/prev unit on DefaultDialog_Scene1) were converted the same day, and their `Button` fields deleted.
+
+**A script holds a serialized `Button` ONLY if it must drive that button's state** — `interactable`, label, visibility — never for wiring. `DefaultDialog_Scene0` is the reference case: menu buttons are Inspector-wired for onClick, and the refs exist purely so `OnFocusChanged` can grey them out while an overlay is up. Wiring and state are separate concerns.
+
+**⚠ Public `On*Button()` NAMES ARE A CONTRACT.** A UnityEvent binds by method-name STRING, so renaming a callback silently breaks the Inspector wiring — no compile error, just a dead button. Never rename one without telling Bob (CLAUDE.md §2.13). This is the cost of the Inspector owning the wiring, and it is paid deliberately: the alternative cost was Bob needing a code change for every button while reworking the HUD.
+
+**Where state gating went when the Button refs left:** `BattleManager.CanEndTurn` (phase + battle-over check) is now evaluated INSIDE `OnEndTurnButton`, not used to disable a button. A guard on the logic holds however the button is wired, or if it is not wired at all — strictly more robust than a UI-level gate. The visible greying-out of End Turn during non-player phases is GONE; `_turnProcessingPanel` still shows during those phases, so the player is not without feedback.
 
 ### 3.6c HQ Dispatch Feed (the printer — §24.8; CRT + emitters CONFIRMED IN PLAY 2026-07-27)
 

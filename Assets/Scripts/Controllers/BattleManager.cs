@@ -13,7 +13,6 @@ using System.Collections;
 using System.Linq;
 using TMPro;
 using UnityEngine;
-using UnityEngine.UI;
 
 namespace HammerAndSickle.Controllers
 {
@@ -58,10 +57,12 @@ namespace HammerAndSickle.Controllers
         private bool _isInitialized = false;
 
         // ----------------------------------------------------------------------------
-        // Inspector-assigned UI references.
-        // Wire these up in the Unity Inspector on the BattleManager GameObject in the
-        // battle scene. They drive the player-facing turn/phase HUD and the end-turn
-        // button. All three are required for the turn flow to be visible and operable.
+        // Inspector-assigned UI references — the player-facing turn/phase HUD.
+        // Wire these up on the BattleManager GameObject in the battle scene.
+        // ⚠ There is deliberately NO Button reference here. Since 2026-07-27 (§3.6b) every button is
+        // Inspector-wired to a public callback, and a script holds a Button ONLY if it must drive that
+        // button's state. BattleManager does not: the end-turn gate lives in `CanEndTurn`, checked inside
+        // `OnEndTurnButton` itself, so it holds however the button is wired — or if it is not wired at all.
         // ----------------------------------------------------------------------------
 
         [Header("Turn HUD References")]
@@ -79,10 +80,6 @@ namespace HammerAndSickle.Controllers
         // "Enemy Turn", "Processing..."). Lives as a child of _turnProcessingPanel,
         // so toggling the panel automatically hides/shows this text as well.
         [SerializeField] private TMP_Text _phaseText;
-
-        // Button the player clicks to end their turn (or to leave deployment).
-        // Disabled automatically while non-player phases are running.
-        [SerializeField] private Button _endTurnButton;
 
         // ----------------------------------------------------------------------------
         // Coroutine pacing knobs. The turn sequence pauses briefly between phases so
@@ -183,29 +180,10 @@ namespace HammerAndSickle.Controllers
             DontDestroyOnLoad(gameObject);
 
             InitializeBattleManager();
-
-            // Hook the inspector-assigned end-turn button. Done here (rather than
-            // Start) so the binding is in place before any other system can poke us.
-            // Null-check is defensive: if a developer hasn't wired the button yet, we
-            // log and continue rather than crashing the scene load.
-            if (_endTurnButton != null)
-            {
-                _endTurnButton.onClick.AddListener(OnEndTurnButtonClicked);
-            }
-            else
-            {
-                Debug.LogWarning($"{CLASS_NAME}.Awake: _endTurnButton not assigned in Inspector — turn flow will be inert.");
-            }
         }
 
         private void OnDestroy()
         {
-            // Unhook the button so we don't leak the listener through scene reloads.
-            // Always paired with the AddListener above to keep subscription hygiene clean.
-            if (_endTurnButton != null)
-            {
-                _endTurnButton.onClick.RemoveListener(OnEndTurnButtonClicked);
-            }
 
             // Stop any in-flight turn sequence so the coroutine doesn't keep running
             // after this MonoBehaviour is destroyed.
@@ -521,7 +499,6 @@ namespace HammerAndSickle.Controllers
             CurrentPhase = newPhase;
             RefreshPhaseText();
             RefreshTurnProcessingPanel();
-            RefreshEndTurnButtonInteractable();
 
             // See EventManager — broadcast so any subscriber (UI, audio, AI) can react.
             if (EventManager.Instance != null)
@@ -567,21 +544,16 @@ namespace HammerAndSickle.Controllers
         }
 
         /// <summary>
-        /// Enables the end-turn button only when the player can legitimately act —
-        /// during Deployment (to leave deployment) and during PlayerTurn (to end the
-        /// turn). All other phases hard-disable it to prevent double-fires from frame-
-        /// perfect clicks. Safe no-op if the button is unwired.
+        /// True while the player may legitimately end the turn — during Deployment (to leave it) and
+        /// during PlayerTurn (to end it), and never once the battle is over.
+        /// This used to drive a serialized Button's `interactable` flag. BattleManager no longer holds a
+        /// Button (§3.6b, 2026-07-27), so the check moved INTO <see cref="OnEndTurnButton"/> where it
+        /// gates the action itself — a guard on the logic holds however the button is wired, or if it is
+        /// not wired at all.
         /// </summary>
-        private void RefreshEndTurnButtonInteractable()
-        {
-            if (_endTurnButton == null) return;
-
-            bool canPlayerAct =
-                CurrentPhase == BattlePhase.PlayerTurn ||
-                CurrentPhase == BattlePhase.Deployment;
-
-            _endTurnButton.interactable = canPlayerAct && !_battleEnded;
-        }
+        private bool CanEndTurn =>
+            (CurrentPhase == BattlePhase.PlayerTurn || CurrentPhase == BattlePhase.Deployment)
+            && !_battleEnded;
 
         /// <summary>
         /// Translates a BattlePhase enum value into a player-facing string for the
@@ -607,23 +579,30 @@ namespace HammerAndSickle.Controllers
         #region Turn Management
 
         /// <summary>
-        /// Click handler for the inspector-assigned end-turn button. The button is the
-        /// player's single point of interaction with the turn flow:
+        /// END TURN button callback — Bob wires this to the Button's onClick in the Inspector (§3.6b).
+        /// The button is the player's single point of interaction with the turn flow:
         ///   - During Deployment, clicking it leaves deployment and starts Turn 1.
         ///   - During PlayerTurn, clicking it kicks off the full turn sequence
         ///     (PlayerUpkeep → AI_Turn → AI_Upkeep → TurnBoundary → next PlayerTurn).
-        /// The button is hard-disabled the instant the click is processed and only
-        /// re-enabled when control returns to the player. This prevents double-fires.
+        /// ⚠ PUBLIC NAME IS A CONTRACT — a UnityEvent binds by method-name STRING, so renaming this
+        /// silently breaks the Inspector wiring with no compile error. See CLAUDE.md §2.13.
+        /// ⚠ Every re-entry guard here is a LOGIC guard, deliberately: BattleManager no longer holds the
+        /// Button, so it cannot disable it, and a click arriving at the wrong moment must be refused on
+        /// its own merits rather than prevented by the UI.
         /// </summary>
-        private void OnEndTurnButtonClicked()
+        public void OnEndTurnButton()
         {
             try
             {
-                // Hard-disable immediately to block frame-perfect re-clicks before any
-                // logic runs. Phase changes will manage the interactable flag from here.
-                if (_endTurnButton != null) _endTurnButton.interactable = false;
+                // Wrong phase, or the battle is over. Replaces the old hard-disable of the button's
+                // interactable flag, which could not survive the button reference being removed.
+                if (!CanEndTurn)
+                {
+                    return;
+                }
 
-                // Refuse to do anything if a turn sequence is already in flight.
+                // Refuse to do anything if a turn sequence is already in flight. This is what actually
+                // stops a frame-perfect double-click, and it did even while the button was being disabled.
                 if (_turnSequenceCoroutine != null)
                 {
                     return;
@@ -655,7 +634,7 @@ namespace HammerAndSickle.Controllers
             }
             catch (Exception ex)
             {
-                AppService.HandleException(CLASS_NAME, nameof(OnEndTurnButtonClicked), ex);
+                AppService.HandleException(CLASS_NAME, nameof(OnEndTurnButton), ex);
             }
         }
 
