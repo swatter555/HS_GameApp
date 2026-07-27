@@ -80,11 +80,18 @@ Fix: an explicit `Migrate(snap)` chain — v3→v4→v5, each step a named metho
 - [x] **0.3 Rules recorded in CLAUDE.md §2** as items 10–12: all JSON through `JsonPolicy`; persisted enums
       are never RENAMED (add/reorder is now free — rename is the only breaking operation); every
       `SAVE_VERSION` bump ships with its migration step.
-- [ ] **0.4 ⚠ FOLLOW-UP, NOT YET DONE — shipped content does not GAIN the protection until it is
-      RE-EMITTED with string enums.** Today the reader merely tolerates both forms, so the ordinal
-      fragility is still latent inside the existing `Khost.map` / `khost.oob`. Re-emitting a `.map` also
-      changes its stored checksum, so this needs a deliberate pass with whatever authored those files —
-      NOT a silent rewrite. Do it before 1.0 ships, and ideally alongside the Phase 1 file move.
+- [ ] **0.4 ⚠ FOLLOW-UP — shipped content does not GAIN the protection until it is RE-EMITTED with string
+      enums.** The reader tolerates both forms, so the ordinal fragility is still latent inside the shipped
+      `khost.map` / `khost.oob`: it only bites the day a member is INSERTED mid-enum (appending stays safe
+      even with ints).
+      ✅ **CORRECTION 2026-07-27 — re-emitting does NOT invalidate the checksum**, contrary to what I said
+      earlier. `MapChecksumUtility.ValidateChecksum` hashes the DESERIALIZED `HexTile[]` re-serialized with
+      its own frozen options (`:106`), not the file text, so the on-disk enum representation cannot affect
+      it. Re-emitting is therefore just load → re-serialize with `JsonPolicy.Content` → write.
+      ⚠ **THE REAL DECISION IS UPSTREAM, NOT A ONE-OFF REWRITE:** Bob's external scenario editor authors
+      these files, so a one-time re-emit gets clobbered on the next export. Either the editor learns to write
+      string enums, or the game gets a `Tools/Content/Normalize` menu item run after each export. Ask before
+      building either.
 - [ ] **0.5 EditorTest** the ladder: below-minimum refused, missing-step throws, a step that fails to
       advance throws. Cheap, and it locks the contract before any real migration exists.
 
@@ -107,11 +114,9 @@ Assets/StreamingAssets/
 Sizing: ~30 scenarios × ~1 MB ≈ 30 MB on top of the 7.9 MB audio. Nothing for a Steam depot, and JSON
 both compresses and delta-patches well.
 
-**PHASE 1 CODE LANDED 2026-07-27 — all three assemblies build clean, PENDING BOB'S PLAY-TEST.**
-⚠ Still owed on disk: `Campaigns/m01_khost` is a SIBLING of `grand_campaign` and must move INSIDE it, and both
-campaign folders are still EMPTY (needs `campaign_khost.manifest` + `campaign_khost.brf` from Generated Data,
-plus the NEWER `khost.map`/`khost.oob` from `Scenarios/khost`). The standalone path is complete and testable
-without them — the campaign tree simply lists nothing until populated.
+**✅ PHASE 1 COMPLETE AND CONFIRMED IN GAME (Bob, 2026-07-27).** Content structure on disk is correct —
+`Scenarios/khost/` and `Campaigns/grand_campaign/m01_khost/`, both holding the NEWER map/oob (1,056.8 KB /
+40.3 KB) with the campaign-specific manifest and briefing. Scenario loads and plays from StreamingAssets.
 
 - [x] **1.1** Content moved to the layout above (Bob) — `Scenarios/khost/` holds the newer files, lowercase
       `khost.map` now matching the manifest.
