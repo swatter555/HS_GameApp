@@ -159,6 +159,20 @@ namespace HammerAndSickle.Controllers
 
         #endregion // Battle Flow / HUD Events
 
+        #region Printer Events
+
+        // See EventManager for all game events
+        // The six on-CRT navigation buttons of the HQ dispatch feed (§24.8.4.1). Raised by
+        // DefaultDialog_Scene1's button callbacks, consumed by PrinterControl.
+        public event Action OnPrinterOldestRequested;       // jump to the oldest message in the filtered view
+        public event Action OnPrinterPreviousRequested;     // step one message back
+        public event Action OnPrinterNextRequested;         // step one message forward
+        public event Action OnPrinterLatestRequested;       // jump to the newest message (doubles as unread flag)
+        public event Action OnPrinterFilterCycleRequested;  // advance the filter: All → Combat → Intel → Supply → Personnel
+        public event Action OnPrinterClearRequested;        // purge the dispatch history
+
+        #endregion // Printer Events
+
         #region Unit Action Events
 
         // See EventManager for all game events
@@ -580,6 +594,46 @@ namespace HammerAndSickle.Controllers
 
         #endregion // Weather Event Raising Methods
 
+        #region Printer Event Raising Methods
+
+        public void RaisePrinterOldestRequested()
+        {
+            try { OnPrinterOldestRequested?.Invoke(); }
+            catch (Exception e) { AppService.HandleException(CLASS_NAME, nameof(RaisePrinterOldestRequested), e); }
+        }
+
+        public void RaisePrinterPreviousRequested()
+        {
+            try { OnPrinterPreviousRequested?.Invoke(); }
+            catch (Exception e) { AppService.HandleException(CLASS_NAME, nameof(RaisePrinterPreviousRequested), e); }
+        }
+
+        public void RaisePrinterNextRequested()
+        {
+            try { OnPrinterNextRequested?.Invoke(); }
+            catch (Exception e) { AppService.HandleException(CLASS_NAME, nameof(RaisePrinterNextRequested), e); }
+        }
+
+        public void RaisePrinterLatestRequested()
+        {
+            try { OnPrinterLatestRequested?.Invoke(); }
+            catch (Exception e) { AppService.HandleException(CLASS_NAME, nameof(RaisePrinterLatestRequested), e); }
+        }
+
+        public void RaisePrinterFilterCycleRequested()
+        {
+            try { OnPrinterFilterCycleRequested?.Invoke(); }
+            catch (Exception e) { AppService.HandleException(CLASS_NAME, nameof(RaisePrinterFilterCycleRequested), e); }
+        }
+
+        public void RaisePrinterClearRequested()
+        {
+            try { OnPrinterClearRequested?.Invoke(); }
+            catch (Exception e) { AppService.HandleException(CLASS_NAME, nameof(RaisePrinterClearRequested), e); }
+        }
+
+        #endregion // Printer Event Raising Methods
+
         #region Air Operations Box Event Raising Methods
 
         public void RaiseAOBPlacedOnHex(Position2D hex)
@@ -716,6 +770,14 @@ namespace HammerAndSickle.Controllers
             OnReplaceLossesRequested = null;
             OnMoveUndoRequested = null;
             OnUnitDetailsRequested = null;
+
+            // Printer events
+            OnPrinterOldestRequested = null;
+            OnPrinterPreviousRequested = null;
+            OnPrinterNextRequested = null;
+            OnPrinterLatestRequested = null;
+            OnPrinterFilterCycleRequested = null;
+            OnPrinterClearRequested = null;
 
             // Weather events
             OnWeatherChanged = null;

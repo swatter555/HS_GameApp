@@ -530,12 +530,26 @@ namespace HammerAndSickle.Controllers
                 string message;
                 bool attackerDestroyed;
 
+                // Where the engagement happens, captured BEFORE resolution: a defender that retreats or routs
+                // has already moved by the time the outcome returns, and the dispatch must name the hex the
+                // fight was at, not the one the enemy fell back to.
+                Position2D contactHex = target.MapPos;
+
+                // Combat awards experience (§14 REP/XP), so a promotion can fall out of this attack. CombatUnit
+                // is a pure model and raises no events, so the level change is detected here by comparison.
+                ExperienceLevel expBefore = CurrentUnit.ExperienceLevel;
+
                 if (CombatResolver.IsIndirectFireClass(CurrentUnit.Classification))
                 {
                     IndirectCombatOutcome o = IndirectCombatAction.Execute(CurrentUnit, target, map, new CombatRandom());
                     executed = o.Executed;
                     message = o.Executed ? BuildIndirectMessage(CurrentUnit, target, o) : o.Reason;
                     attackerDestroyed = o.FirerDestroyed;
+
+                    // §24.8.6 dispatch. Filed AFTER the whole action resolves so counter-battery losses are
+                    // included — reporting mid-action would print "no losses" and then be contradicted.
+                    // PrinterDispatch decides whether it is worth printing and handles both sides.
+                    if (o.Executed) PrinterDispatch.ReportIndirectCombat(CurrentUnit, target, contactHex, o);
                 }
                 else
                 {
@@ -544,6 +558,9 @@ namespace HammerAndSickle.Controllers
                     executed = o.Executed;
                     message = o.Executed ? BuildCombatMessage(CurrentUnit, target, o) : o.Reason;
                     attackerDestroyed = o.AttackerDestroyed;
+
+                    // See EventManager / §24.8.6 — one call files whichever side's report the player owns.
+                    if (o.Executed) PrinterDispatch.ReportGroundCombat(CurrentUnit, target, contactHex, o);
                 }
 
                 if (!executed)
@@ -554,6 +571,11 @@ namespace HammerAndSickle.Controllers
                 }
 
                 AppService.CaptureUiMessage(message);
+
+                // §24.8.6 — announce a promotion earned in this engagement. Guarded on the attacker surviving:
+                // a destroyed regiment has already filed its own loss report and cannot also report good news.
+                if (!attackerDestroyed && CurrentUnit.ExperienceLevel != expBefore)
+                    PrinterDispatch.ReportUnitHardened(CurrentUnit);
 
                 // Refresh the board off the new unit state.
                 GameDataManager.Instance.BuildOccupancyCache();
@@ -700,6 +722,9 @@ namespace HammerAndSickle.Controllers
 
                         if (EventManager.Instance != null)
                             EventManager.Instance.RaiseAmbushTriggered(ambusher, CurrentUnit);
+
+                        // §24.8.6 — the attribution case: fire came from a hex the player had no contact on.
+                        PrinterDispatch.ReportAmbush(ambusher, CurrentUnit, targetPos);
 
                         break;
                     }
@@ -849,12 +874,17 @@ namespace HammerAndSickle.Controllers
             {
                 if (CurrentUnit.Side == Side.Player)
                 {
-                    bm.AddPrestige(Mathf.RoundToInt(cap.VictoryValue));
+                    int prestige = Mathf.RoundToInt(cap.VictoryValue);
+                    bm.AddPrestige(prestige);
                     bm.CaptureObjective();
+
+                    // §24.8.6 — see PrinterDispatch.
+                    PrinterDispatch.ReportObjectiveCaptured(cap.Position, prestige);
                 }
                 else if (cap.PreviousControl == TileControl.Red)
                 {
                     bm.LoseObjective();
+                    PrinterDispatch.ReportObjectiveLost(cap.Position);
                 }
             }
         }

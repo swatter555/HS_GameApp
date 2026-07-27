@@ -33,7 +33,11 @@ namespace HammerAndSickle.Models
         [JsonInclude] [JsonPropertyName("name")]
         public string Name { get; private set; }                             // Use random name generator
         [JsonInclude] [JsonPropertyName("side")]
-        public Side Side { get; private set; }                               // Player or AI
+        // ⚠ VESTIGIAL. There are NO enemy leaders in the game (§14.1.1 / §14.2.3, permanent as of 2026-07-25):
+        // every construction path passes Side.Player, so this is always Side.Player at runtime. Kept because it
+        // is serialized into saves. Do NOT write side-gating logic against it, and do not read it as evidence
+        // that AI-side leaders are supported — the AI never receives leader effects at all.
+        public Side Side { get; private set; }                               // Always Player — see note above
         [JsonInclude] [JsonPropertyName("nationality")]
         public Nationality Nationality { get; private set; }                 // Nation of origin
         [JsonInclude] [JsonPropertyName("commandGrade")]

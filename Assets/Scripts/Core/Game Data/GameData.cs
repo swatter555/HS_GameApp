@@ -1418,6 +1418,57 @@ namespace HammerAndSickle.Core.GameData
 
     #endregion // HexMap Enums
 
+    #region Printer Enums
+
+    /// <summary>
+    /// How a unit describes the damage it took in ONE engagement, for dispatch text (§24.8.6).
+    ///
+    /// ⚠ NOT the same axis as the Section 8 strength tiers. `FULL_STRENGTH_FLOOR` / `DEPLETED_STRENGTH_FLOOR`
+    /// describe CUMULATIVE hit points remaining and drive combat multipliers; these describe damage taken in a
+    /// SINGLE exchange and drive nothing but prose. Do not merge them, and do not reuse those floors here —
+    /// a unit at full strength can take heavy losses in one attack, and a nearly-dead unit can take very light ones.
+    /// </summary>
+    public enum LossBand
+    {
+        None,
+        VeryLight,
+        Light,
+        Moderate,
+        Heavy,
+        VeryHeavy,
+    }
+
+    /// <summary>
+    /// What kind of dispatch a <c>PrinterMessage</c> is (§24.8.6). Tags the message so the CRT's FILTER button
+    /// can narrow the feed. The catalogue maps on as follows: battle reports, objective captures/losses, and
+    /// air operations are all Combat; intel reports are Intel; logistics is Supply; decorations, promotions,
+    /// leader deaths and unit hardening are Personnel. Weather is General — §24.8.4.1 ratifies only four filter
+    /// values besides All, so anything outside them is reachable under All alone.
+    /// </summary>
+    public enum PrinterCategory
+    {
+        Combat,
+        Intel,
+        Supply,
+        Personnel,
+        General,
+    }
+
+    /// <summary>
+    /// The cycle state of the CRT's FILTER button (§24.8.4.1). Pressing the button advances through these in
+    /// declaration order and wraps.
+    /// </summary>
+    public enum PrinterFilter
+    {
+        All,
+        Combat,
+        Intel,
+        Supply,
+        Personnel,
+    }
+
+    #endregion // Printer Enums
+
     #region Scene IDs
 
     public enum SceneID
@@ -1920,6 +1971,26 @@ namespace HammerAndSickle.Core.GameData
         public const int MAX_AIR_UNITS = 4;        // Max air units that can be attached to an airbase.
 
         #endregion // Facility Constants
+
+        #region Printer Constants
+
+        // Loss-band thresholds for dispatch text (§24.8.6): HIT POINTS lost in ONE engagement. Upper bound of
+        // each band; anything above the Heavy bound is VeryHeavy, and exactly zero damage is None ("we have
+        // taken no losses" — the common case for artillery, which takes nothing back unless counter-battery
+        // fires). Set by Bob 2026-07-27, replacing the provisional fractions-of-max-HP version.
+        //
+        // ⚠ ABSOLUTE, not a share of the unit's maximum. A 60-HP facility (BASE_MAX_HP) therefore reads one
+        // band gentler than a 40-HP regiment for the same proportional mauling — deliberate, since these
+        // describe how much was lost, not how much of the unit was lost.
+        //
+        // ⚠ Deliberately NOT the Section 8 strength floors. See the LossBand enum note: those measure hit points
+        // REMAINING and feed combat multipliers; these measure damage TAKEN in one exchange and feed prose only.
+        public const int LOSS_BAND_VERY_LIGHT_MAX = 3;
+        public const int LOSS_BAND_LIGHT_MAX      = 6;
+        public const int LOSS_BAND_MODERATE_MAX   = 12;
+        public const int LOSS_BAND_HEAVY_MAX      = 24;   // above this = VeryHeavy
+
+        #endregion // Printer Constants
 
         #region HexMap Constants
 

@@ -150,5 +150,39 @@ namespace HammerAndSickle.SceneManagement
         }
 
         #endregion // Click-Through Detection
+
+        #region Printer Button Callbacks
+
+        // ----------------------------------------------------------------------------
+        // The six on-CRT navigation buttons of the HQ dispatch feed (§24.8.4.1).
+        //
+        // These are Inspector-wired: Bob assigns each Button's onClick to the matching
+        // method here (the §3.6b nav-button half of the division of labour). They must
+        // therefore NOT also be hooked with AddListener in Start() — a code listener on
+        // top of the Inspector wiring would fire every press twice.
+        //
+        // Each callback does exactly one thing: raise its event. PrinterControl owns all
+        // history/cursor/filter state and subscribes to these. See EventManager.
+        // ----------------------------------------------------------------------------
+
+        /// <summary>Jumps the dispatch feed to the oldest message in the current filter.</summary>
+        public void OnPrinterOldestButton() => EventManager.Instance?.RaisePrinterOldestRequested();
+
+        /// <summary>Steps the dispatch feed back one message.</summary>
+        public void OnPrinterPreviousButton() => EventManager.Instance?.RaisePrinterPreviousRequested();
+
+        /// <summary>Steps the dispatch feed forward one message.</summary>
+        public void OnPrinterNextButton() => EventManager.Instance?.RaisePrinterNextRequested();
+
+        /// <summary>Jumps the dispatch feed to the newest message.</summary>
+        public void OnPrinterLatestButton() => EventManager.Instance?.RaisePrinterLatestRequested();
+
+        /// <summary>Advances the feed filter: All → Combat → Intel → Supply → Personnel → All.</summary>
+        public void OnPrinterFilterButton() => EventManager.Instance?.RaisePrinterFilterCycleRequested();
+
+        /// <summary>Purges the dispatch history.</summary>
+        public void OnPrinterClearButton() => EventManager.Instance?.RaisePrinterClearRequested();
+
+        #endregion // Printer Button Callbacks
     }
 }

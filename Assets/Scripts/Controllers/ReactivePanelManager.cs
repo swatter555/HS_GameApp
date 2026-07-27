@@ -24,9 +24,9 @@ namespace HammerAndSickle.Controllers
         [SerializeField]
         private GameObject _unitPanelObject;
 
-        [SerializeField]
-        [Tooltip("The printer/message panel root. INTERIM: shown with the other panels on selection, hidden on right-click deselect. The planned printer pass makes visibility message-driven — see Claude_TODO.")]
-        private GameObject _messagePanelObject;
+        // The printer/message panel is no longer managed here. Its visibility became message-driven in the
+        // printer pass (2026-07-25): PrinterControl owns its own _panelRoot, shows it when a dispatch arrives,
+        // and hides it on right-click deselect. See PrinterControl and HS_DesignDoc §24.8.
 
         #endregion // Inspector Fields
 
@@ -41,65 +41,78 @@ namespace HammerAndSickle.Controllers
         }
 
         /// <summary>
-        /// Update is called once per frame to manage panel visibility and updates.
+        /// Update is called once per frame to manage panel content.
+        ///
+        /// PANEL MODEL (revised 2026-07-27). The three information panels — terrain, unit, and the printer's
+        /// dispatch CRT — are OPEN FROM SCENE START and never close. Visibility is not a thing that happens
+        /// any more: right-click deselect CLEARS contents, it does not hide, so the HUD holds one stable
+        /// layout for the whole battle. The printer is the exception to the clearing half — a dispatch log is
+        /// not about the selected hex, so it keeps its history (§24.8). The printer opens itself; this manager
+        /// owns only the terrain and unit panels.
         /// </summary>
         private void Update()
         {
             if (GameDataManager.SelectedHex == GameDataManager.NoHexSelected)
             {
-                HideAllPanels();
+                ClearSelectionPanels();
                 return;
             }
 
             // Resolve unit and leader at the selected hex
             ResolveSelection();
 
-            // Terrain + message panels are shown whenever a hex is selected and hide together on
-            // right-click deselect. (Message-panel visibility is INTERIM — the planned printer pass makes
-            // it message-driven; see Claude_TODO.)
-            UpdateTerrainPanel(true);
-            UpdateMessagePanel(true);
+            Prefab_TerrainPanel.Instance.UpdateTerrainPanel();
 
-            // Unit panel is FRIENDLY-ONLY (2026-07-24): enemy intel goes to the printer (wired in the
-            // printer pass). Shown only when a player-side unit occupies the selected hex.
-            bool hasFriendlyUnit = GameDataManager.SelectedUnit != null
-                && GameDataManager.SelectedUnit.Side == Side.Player;
-            UpdateUnitPanel(hasFriendlyUnit);
+            // Unit panel shows BOTH sides as of 2026-07-25 (reverses the 2026-07-24 friendly-only rule; the
+            // printer keeps every other dispatch class). An empty hex blanks the panel.
+            //
+            // ⚠ The Level0 gate is a fog-of-war boundary, not a formatting choice: GetUnitAtPosition answers
+            // from the map regardless of spotting, so without it clicking an empty-looking hex would report an
+            // unspotted enemy sitting on it and hand the player free intel the ladder never granted.
+            var selected = GameDataManager.SelectedUnit;
+            bool displayable = selected != null
+                && (selected.Side == Side.Player || selected.SpottedLevel >= SpottedLevel.Level1);
+
+            if (displayable) Prefab_UnitPanel.Instance.UpdateUnitPanel();
+            else Prefab_UnitPanel.Instance.Clear();
         }
 
         #endregion // Unity Lifecycle
 
         #region Initialization
 
+        /// <summary>
+        /// Brings both panels up EMPTY at scene start (2026-07-27). They stay up for the rest of the battle —
+        /// only their contents change. Clearing here matters: without it the panels would display whatever
+        /// placeholder text the prefab was authored with until the player's first hex click.
+        /// </summary>
         private void Initialize()
         {
-            // Initialize panels to be inactive at start
             if (_terrainPanelObject != null)
             {
+                _terrainPanelObject.SetActive(true);
+
                 if (!Prefab_TerrainPanel.Instance.Initialize())
                 {
                     Debug.LogError("Failed to initialize Terrain Panel.");
                 }
 
-                _terrainPanelObject.SetActive(false);
+                Prefab_TerrainPanel.Instance.Clear();
             }
             else Debug.LogWarning("Terrain Panel Object is not assigned in the inspector.");
 
             if (_unitPanelObject != null)
             {
+                _unitPanelObject.SetActive(true);
+
                 if (!Prefab_UnitPanel.Instance.Initialize())
                 {
                     Debug.LogError("Failed to initialize Unit Panel.");
                 }
 
-                _unitPanelObject.SetActive(false);
+                Prefab_UnitPanel.Instance.Clear();
             }
             else Debug.LogWarning("Unit Panel Object is not assigned in the inspector.");
-
-            // Message panel starts hidden; shown on selection, hidden on deselect (INTERIM — see Update).
-            if (_messagePanelObject != null)
-                _messagePanelObject.SetActive(false);
-            else Debug.LogWarning("Message Panel Object is not assigned in the inspector.");
         }
 
         #endregion // Initialization
@@ -119,6 +132,10 @@ namespace HammerAndSickle.Controllers
                 // Resolve leader from the selected unit. Kept live (cheap) so the planned leader modal
                 // and any future consumer can read GameDataManager.SelectedLeader off the current
                 // selection; the reactive leader panel that used to display it was removed 2026-07-23.
+                //
+                // No side gate is needed here: there are NO enemy leaders in the game (§14.2.3, permanent —
+                // every Leader construction path passes Side.Player). An enemy unit therefore never reports
+                // IsLeaderAssigned, so this can only ever resolve a friendly commander.
                 if (GameDataManager.SelectedUnit != null && GameDataManager.SelectedUnit.IsLeaderAssigned)
                 {
                     GameDataManager.SelectedLeader = GameDataManager.Instance.GetLeader(GameDataManager.SelectedUnit.LeaderID);
@@ -137,62 +154,17 @@ namespace HammerAndSickle.Controllers
         }
 
         /// <summary>
-        /// Updates the terrain panel visibility and content.
+        /// Empties the terrain and unit panels on deselect and drops the resolved unit/leader. The panels stay
+        /// OPEN — only their contents go. The printer is deliberately untouched: its history is not about the
+        /// selected hex, so a right-click does not wipe the dispatch log.
         /// </summary>
-        private void UpdateTerrainPanel(bool show)
-        {
-            if (_terrainPanelObject == null)
-                return;
-
-            _terrainPanelObject.SetActive(show);
-
-            if (show && Prefab_TerrainPanel.Instance != null)
-                Prefab_TerrainPanel.Instance.UpdateTerrainPanel();
-        }
-
-        /// <summary>
-        /// Updates the unit panel visibility and content.
-        /// </summary>
-        private void UpdateUnitPanel(bool show)
-        {
-            if (_unitPanelObject == null)
-                return;
-
-            _unitPanelObject.SetActive(show);
-
-            if (show && Prefab_UnitPanel.Instance != null)
-                Prefab_UnitPanel.Instance.UpdateUnitPanel();
-        }
-
-        /// <summary>
-        /// Updates the message (printer) panel visibility. INTERIM: tracks selection like the other panels
-        /// so right-click deselect closes it. The planned printer pass replaces this with message-driven
-        /// visibility (show on message received, hide on deselect) — see Claude_TODO.
-        /// </summary>
-        private void UpdateMessagePanel(bool show)
-        {
-            if (_messagePanelObject == null)
-                return;
-
-            _messagePanelObject.SetActive(show);
-        }
-
-        /// <summary>
-        /// Hides all panels and clears unit/leader selection state.
-        /// </summary>
-        private void HideAllPanels()
+        private void ClearSelectionPanels()
         {
             GameDataManager.SelectedUnit = null;
             GameDataManager.SelectedLeader = null;
 
-            if (_terrainPanelObject != null)
-                _terrainPanelObject.SetActive(false);
-
-            if (_unitPanelObject != null)
-                _unitPanelObject.SetActive(false);
-
-            if (_messagePanelObject != null)
-                _messagePanelObject.SetActive(false);
+            Prefab_TerrainPanel.Instance.Clear();
+            Prefab_UnitPanel.Instance.Clear();
         }
 
         #endregion // Panel Updates

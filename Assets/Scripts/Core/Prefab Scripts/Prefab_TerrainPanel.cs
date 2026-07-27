@@ -119,6 +119,26 @@ namespace HammerAndSickle.Core
         }
 
         /// <summary>
+        /// Blanks the panel's contents without closing it. The reactive panels open on the first hex selection
+        /// of the battle and stay open (2026-07-25) — right-click deselect empties them instead of hiding them,
+        /// so the HUD keeps a stable layout rather than popping panels in and out.
+        ///
+        /// The portrait Image is DISABLED rather than just having its sprite nulled: an Image with a null
+        /// sprite still draws as a solid white rectangle.
+        /// </summary>
+        public void Clear()
+        {
+            if (_infoText != null)
+                _infoText.text = string.Empty;
+
+            if (_terrainImage != null)
+            {
+                _terrainImage.sprite = null;
+                _terrainImage.enabled = false;
+            }
+        }
+
+        /// <summary>
         /// Updates the terrain portrait image based on terrain type and map theme.
         /// </summary>
         private void UpdateTerrainPortrait(TerrainType terrain, MapTheme theme)
@@ -129,7 +149,12 @@ namespace HammerAndSickle.Core
 
             var sprite = SpriteManager.GetSprite(spriteName);
             if (sprite != null && _terrainImage != null)
+            {
                 _terrainImage.sprite = sprite;
+
+                // Re-enable after a Clear() — the Image is switched off, not just emptied.
+                _terrainImage.enabled = true;
+            }
         }
 
         #endregion
