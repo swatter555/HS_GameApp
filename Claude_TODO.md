@@ -252,11 +252,17 @@ sweeps (player + `RecomputeAIPerception`) AND the `AIPerceptionState.StepDecay` 
       UnityEvent binds by string, so a rename silently kills the wiring. See Claude_Project §3.6b.
       Cross-singleton subscriptions still in `Start()` only. Button art still owed (Bob): Leader Pool,
       Upgrade/second-replacements.
-- [ ] **Editor audit tool — `Tools/UI/Audit Button Wiring`** (agreed 2026-07-27, NOT YET BUILT). Walks the
-      scene's Buttons and reports any with ZERO persistent listeners, plus any whose listener targets a
-      method that no longer exists. This is the detection half of the Inspector-owns-wiring trade: it is
-      what makes a silently-dead button findable without a play-test. Pattern exists — `RiverSymmetryVerifier`
-      is already a `[MenuItem]` tool.
+- [x] **Editor audit tools BUILT 2026-07-27** — `Assets/Editor/UI/ButtonWiringAudit.cs`, the detection half of
+      the Inspector-owns-wiring trade. `Tools/UI/Audit Button Wiring` walks every Button in the OPEN scenes
+      (inactive included) and reports the four silent failures: nothing wired · a method that no longer
+      exists (the RENAME detector) · a listener set to Off · the same method wired twice. Findings log with
+      the Button as context, so clicking the console entry pings it in the hierarchy.
+      `Tools/UI/Find Unwired Button Callbacks` is the reverse — public `On*Button()` methods that no scene or
+      prefab references, i.e. the ones that look dead to a cleanup pass. It reads the scene/prefab YAML for
+      `m_MethodName:` rather than opening scenes (Asset Serialization is ForceText), so it covers the whole
+      project without disturbing what is open. ⚠ Matches by NAME only — two classes sharing a callback name
+      are indistinguishable, and a name wired to the WRONG object still counts as wired. The tool says so in
+      its own output. Editor assembly builds clean; ⚠ not yet RUN (needs Unity).
 
 ### Leader completion (§9: L1–L4) — L1+L4 approved, headless-safe
 **Context:** M14 safe slice made the leader MECHANICS live; this is the remaining product layer. **Spec:** §14.14
