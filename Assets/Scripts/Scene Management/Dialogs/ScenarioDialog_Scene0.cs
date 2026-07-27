@@ -1,6 +1,7 @@
 using HammerAndSickle.Controllers;
 using HammerAndSickle.Core.GameData;
 using HammerAndSickle.Core.UI;
+using HammerAndSickle.Persistence;
 using HammerAndSickle.Services;
 using System;
 using System.Collections.Generic;
@@ -176,19 +177,26 @@ namespace HammerAndSickle.SceneManagement
 
             try
             {
-                string manifestPath = AppService.ManifestsPath;
+                // Content ships inside the build under StreamingAssets (Phase 1, 2026-07-27), so a missing
+                // root is a BROKEN INSTALL, not a user-fixable state. The three former error strings told the
+                // player to "consult settings to rebuild scenario data and manifests" — a feature that never
+                // existed, and which nothing could offer now that content is read-only and shipped.
+                string root = AppService.ScenariosRootPath;
 
-                if (!Directory.Exists(manifestPath))
+                if (!Directory.Exists(root))
                 {
-                    ShowErrorState("Scenario manifests directory not found. Please consult settings to rebuild scenario data and manifests.");
+                    ShowErrorState("Scenario content is missing from this installation. Try verifying the game files.");
                     return;
                 }
 
-                string[] manifestFiles = Directory.GetFiles(manifestPath, "*" + GameData.MANIFEST_EXTENSION);
+                // A scenario is a self-contained FOLDER, so search recursively and take each manifest's
+                // own directory as its content root.
+                string[] manifestFiles = Directory.GetFiles(
+                    root, "*" + GameData.MANIFEST_EXTENSION, SearchOption.AllDirectories);
 
                 if (manifestFiles.Length == 0)
                 {
-                    ShowErrorState("No scenario manifests found. Please consult settings to rebuild scenario data and manifests.");
+                    ShowErrorState("No scenarios found in this installation. Try verifying the game files.");
                     return;
                 }
 
@@ -199,13 +207,17 @@ namespace HammerAndSickle.SceneManagement
                     try
                     {
                         string json = File.ReadAllText(manifestFile);
-                        ScenarioManifest manifest = JsonSerializer.Deserialize<ScenarioManifest>(json);
+                        ScenarioManifest manifest = JsonSerializer.Deserialize<ScenarioManifest>(json, JsonPolicy.Content);
 
                         if (manifest == null || !manifest.IsValid())
                         {
                             AppService.CaptureUiMessage($"Invalid manifest: {Path.GetFileName(manifestFile)}");
                             continue;
                         }
+
+                        // ⚠ The manifest resolves its map/oob/aii/brf against this — set it before the
+                        // manifest is handed to anything, or every content path comes back empty.
+                        manifest.ContentRoot = Path.GetDirectoryName(manifestFile);
 
                         _loadedManifests.Add(manifest);
                         displayNames.Add(manifest.DisplayName);
@@ -218,7 +230,7 @@ namespace HammerAndSickle.SceneManagement
 
                 if (_loadedManifests.Count == 0)
                 {
-                    ShowErrorState("No valid scenario manifests available. Please consult settings to rebuild scenario data and manifests.");
+                    ShowErrorState("No valid scenarios found in this installation. Try verifying the game files.");
                     return;
                 }
 
@@ -231,7 +243,7 @@ namespace HammerAndSickle.SceneManagement
             catch (Exception e)
             {
                 AppService.HandleException(CLASS_NAME, nameof(LoadScenarioManifests), e);
-                ShowErrorState("Error loading scenario manifests. Please consult settings to rebuild scenario data and manifests.");
+                ShowErrorState("Error loading scenarios. Try verifying the game files.");
             }
         }
 

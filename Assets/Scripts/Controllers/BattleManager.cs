@@ -306,23 +306,13 @@ namespace HammerAndSickle.Controllers
             // Refresh the hex map renderer (draws outlines, icons, labels on top of the chunked terrain).
             HexGridRenderer.Instance.RefreshMap();
 
-            // Load the order of battle (OOB) file based on whether it's a campaign or stand-alone scenario
-            if (GameDataManager.CurrentManifest.IsCampaignScenario)
+            // Load the order of battle from the scenario's own content folder. Campaign and standalone
+            // scenarios load identically since 2026-07-27 — the manifest knows where it came from.
+            if (!OOBFileLoader.LoadOob(GameDataManager.CurrentManifest))
             {
-                if(!OOBFileLoader.LoadCampaignOob(GameDataManager.CurrentManifest.OobFilename))
-                {
-                    Debug.LogError($"BattleManager.SetupBattleManagerData: Failed to load campaign OOB file: {GameDataManager.CurrentManifest.OobFilename}");
-                    return false;
-                }
-            }
-            else
-            {
-                // Load the stand-alone oob file.
-                if (!OOBFileLoader.LoadStandaloneOob(GameDataManager.CurrentManifest.OobFilename))
-                {
-                    Debug.LogError($"BattleManager.SetupBattleManagerData: Failed to load OOB file: {GameDataManager.CurrentManifest.OobFilename}");
-                    return false;
-                }
+                Debug.LogError($"{CLASS_NAME}.SetupBattleManagerData: Failed to load OOB file: " +
+                               $"{GameDataManager.CurrentManifest.GetOobFilePath()}");
+                return false;
             }
 
             // Grab and store other data from the scenario manifest

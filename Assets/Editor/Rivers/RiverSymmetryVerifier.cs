@@ -24,7 +24,9 @@ namespace HammerAndSickle.EditorTools.Rivers
         [MenuItem("Tools/Rivers/Verify River Symmetry...")]
         public static void VerifyFromFile()
         {
-            string startDir = Path.Combine(Application.dataPath, "Generated Data/map");
+            // Content moved to StreamingAssets 2026-07-27; maps now live inside each scenario's own folder,
+            // so open the picker at the content root and let the user drill in.
+            string startDir = Application.streamingAssetsPath;
             if (!Directory.Exists(startDir)) startDir = Application.dataPath;
 
             string path = EditorUtility.OpenFilePanel("Select .map file", startDir, "map");

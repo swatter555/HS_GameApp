@@ -170,92 +170,51 @@ namespace HammerAndSickle.Core.GameData
             return Path.Combine(AppService.ScenarioThumbnailPath, ThumbnailFilename);
         }
 
-        /// <summary>
-        /// Gets the full file system path to the map file.
-        /// </summary>
-        public string GetMapFilePath()
-        {
-            if (string.IsNullOrWhiteSpace(MapFilename))
-                return string.Empty;
-
-            return Path.Combine(AppService.MapPath, MapFilename);
-        }
-
-        /// <summary>
-        /// Gets the full file system path to the OOB file.
-        /// </summary>
-        public string GetOobFilePath()
-        {
-            if (string.IsNullOrWhiteSpace(OobFilename))
-                return string.Empty;
-
-            return Path.Combine(AppService.OobPath, OobFilename);
-        }
+        // ────────────────────────────────────────────────────────────────────────────────────────────
+        // CONTENT PATHS (rewritten 2026-07-27, content pipeline Phase 1).
+        //
+        // ⚠ This REPLACED two parallel method families — GetMapFilePath() resolving to Documents/My Games
+        // and GetMapFilePath_GDP() resolving to Assets/Generated Data — which MapLoader and BattleManager
+        // chose between on IsCampaignScenario. That welded a GAMEPLAY concept (campaign vs standalone) to
+        // a STORAGE one (which folder), so a campaign could not be standalone-tested and the two copies
+        // silently diverged. Now there is one family, and it resolves against the folder the manifest was
+        // loaded from, so where a scenario lives is nobody's business but the loader's.
+        // ────────────────────────────────────────────────────────────────────────────────────────────
 
         /// <summary>
-        /// Gets the full file system path to the AII file.
+        /// Directory this manifest was loaded from — its scenario's self-contained content folder.
+        /// Set by the loader at read time; transient, never serialized (the manifest must not carry a
+        /// machine-specific absolute path into a save or into shipped content).
         /// </summary>
-        public string GetAiiFilePath()
-        {
-            if (string.IsNullOrWhiteSpace(AiiFilename))
-                return string.Empty;
+        [JsonIgnore]
+        public string ContentRoot { get; set; } = string.Empty;
 
-            return Path.Combine(AppService.AiiPath, AiiFilename);
-        }
+        /// <summary>Full path to the map file, or empty if unnamed.</summary>
+        public string GetMapFilePath() => ResolveContentFile(MapFilename);
+
+        /// <summary>Full path to the OOB file, or empty if unnamed.</summary>
+        public string GetOobFilePath() => ResolveContentFile(OobFilename);
 
         /// <summary>
-        /// Gets the full file system path to the briefing file.
+        /// Full path to the AII (AI hints) file, or empty if unnamed.
+        /// ⚠ No .aii files exist yet — the AI pass will author them (Bob, 2026-07-27). Callers must treat
+        /// a missing AII as a clean no-op, NOT an error.
         /// </summary>
-        public string GetBriefingFilePath()
-        {
-            if (string.IsNullOrWhiteSpace(BriefingFilename))
-                return string.Empty;
+        public string GetAiiFilePath() => ResolveContentFile(AiiFilename);
 
-            return Path.Combine(AppService.BrfPath, BriefingFilename);
-        }
+        /// <summary>Full path to the briefing file, or empty if unnamed.</summary>
+        public string GetBriefingFilePath() => ResolveContentFile(BriefingFilename);
 
         /// <summary>
-        /// Retrieves the full file path for the GDP (generated data path) map file, for campaign scenarios.
+        /// Resolves a filename against this scenario's own content folder.
+        /// Returns empty for an unnamed file so callers can treat "not specified" and "not found" alike.
         /// </summary>
-        public string GetMapFilePath_GDP()
+        private string ResolveContentFile(string filename)
         {
-            if (string.IsNullOrWhiteSpace(MapFilename))
+            if (string.IsNullOrWhiteSpace(filename) || string.IsNullOrWhiteSpace(ContentRoot))
                 return string.Empty;
 
-            return Path.Combine(AppService.GDP_MapPath, MapFilename);
-        }
-
-        /// <summary>
-        /// Retrieves the full file path for the GDP OOB file, for campaign scenarios.
-        /// </summary>
-        public string GetOobFilePath_GDP()
-        {
-            if (string.IsNullOrWhiteSpace(OobFilename))
-                return string.Empty;
-
-            return Path.Combine(AppService.GDP_OobPath, OobFilename);
-        }
-
-        /// <summary>
-        /// Retrieves the full file path for the GDP AII file, for campaign scenarios.
-        /// </summary>
-        public string GetAiiFilePath_GDP()
-        {
-            if (string.IsNullOrWhiteSpace(AiiFilename))
-                return string.Empty;
-
-            return Path.Combine(AppService.GDP_AiiPath, AiiFilename);
-        }
-
-        /// <summary>
-        /// Retrieves the full file path for the GDP briefing file, for campaign scenarios.
-        /// </summary>
-        public string GetBriefingFilePath_GDP()
-        {
-            if (string.IsNullOrWhiteSpace(BriefingFilename))
-                return string.Empty;
-
-            return Path.Combine(AppService.GDP_BrfPath, BriefingFilename);
+            return Path.Combine(ContentRoot, filename);
         }
 
         #endregion // Public Methods

@@ -39,35 +39,15 @@ namespace HammerAndSickle.Core.Helpers
                 // Write to log.
                 if (log) Debug.Log($"{CLASS_NAME}: Manifest validated - ScenarioId: {manifest.ScenarioId}");
 
-                // Get the proper path to load the map data
-                string mapFilePath;
+                // One path family since 2026-07-27 — the manifest resolves against its own content folder,
+                // so campaign and standalone scenarios load identically and neither knows where it lives.
+                string mapFilePath = manifest.GetMapFilePath();
 
-                // Determine whether this is the campaign version or the scenario version.
-                if (manifest.IsCampaignScenario)
+                if (string.IsNullOrWhiteSpace(mapFilePath))
                 {
-                    mapFilePath = manifest.GetMapFilePath_GDP();
-
-                    // Write to log.
-                    if (log) Debug.Log($"{CLASS_NAME}: Campaign scenario detected");
-
-                    if (string.IsNullOrWhiteSpace(mapFilePath))
-                    {
-                        Debug.LogError($"{CLASS_NAME}: Campaign scenario has no map file path");
-                        throw new ArgumentException("Campaign scenario manifest has no map file path", nameof(manifest));
-                    }
-                }
-                else
-                {
-                    mapFilePath = manifest.GetMapFilePath();
-
-                    // Write to log.
-                    if (log) Debug.Log($"{CLASS_NAME}: Standard scenario detected");
-
-                    if (string.IsNullOrWhiteSpace(mapFilePath))
-                    {
-                        Debug.LogError($"{CLASS_NAME}: Scenario has no map file path");
-                        throw new ArgumentException("Scenario manifest has no map file path", nameof(manifest));
-                    }
+                    Debug.LogError($"{CLASS_NAME}: Manifest '{manifest.ScenarioId}' has no map file path " +
+                                   $"(MapFilename='{manifest.MapFilename}', ContentRoot='{manifest.ContentRoot}')");
+                    throw new ArgumentException("Scenario manifest has no map file path", nameof(manifest));
                 }
 
                 // Write to log.

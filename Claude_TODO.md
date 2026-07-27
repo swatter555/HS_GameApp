@@ -40,9 +40,24 @@ emitters · the three-panel HUD · the two 07-27 input bugs (unit-panel click-th
 AI-track suites. Per-item detail is in the change log — do NOT re-accumulate a confirmation list here.
 **Anything still owed lives in ⚑ TESTING REQUESTS below, which is the ONLY place open test asks belong.**
 
-**Next frontiers, in rough order:** printer P5 loss ledger → P6 loss report → §9 leader completion (L1+L4 approved,
-headless) → M13 turn loop + movement-dynamics/AOB package (consolidated below) → AI track AI3+ (`Claude_AI_TODO.md`).
+**⚠ BLOCKING RIGHT NOW:** the End Turn / next-unit / prev-unit buttons have no onClick. The 2026-07-27 wiring
+change removed their code `AddListener`s, so **turn flow is dead in play until Bob wires the three callbacks**
+(`BattleManager.OnEndTurnButton`, `DefaultDialog_Scene1.OnNextUnitButton` / `.OnPreviousUnitButton`).
+
+**Next frontiers, in rough order:**
+1. **CONTENT PIPELINE Phase 1** (`todo.md`) — the StreamingAssets move. TIME-SENSITIVE: it costs almost nothing
+   at 1 scenario and grows with every one authored, and the campaign is planned at 25–30. Phase 0 landed
+   2026-07-27; Phase 1 is loaders and paths only, so it does not collide with the battle-HUD rework.
+   Carries the two Phase 0 leftovers with it: 0.4 re-emit content with string enums, 0.5 ladder EditorTests.
+2. **Printer P5 loss ledger** → P6 loss report. P5's `SAVE_VERSION` bump now has a real migration ladder to
+   land in (Phase 0.2), which it did not before.
+3. **§9 leader completion** (L1+L4 approved, headless-safe).
+4. **M13** turn loop + movement-dynamics/AOB package (consolidated below).
+5. **AI track AI3+** (`Claude_AI_TODO.md`).
+
 I7 (HQ SIGINT sweep = M15) is unblocked and can slot in anywhere; I8 waits on the M13/AOB caller.
+`SetScrollBounds`-from-map-size pairs with the gated `BattleBackgroundFitter` — both land on the first
+differently-sized map.
 
 ---
 

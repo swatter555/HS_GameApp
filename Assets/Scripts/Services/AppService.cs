@@ -83,14 +83,10 @@ namespace HammerAndSickle.Services
 
         #region Private Fields
 
-        // Cached paths
+        // Cached paths. Only the WRITABLE ones are cached-and-created; shipped content under
+        // StreamingAssets is read-only and must never be created on demand — if it is missing, that is a
+        // broken install and should surface as an error, not be papered over with an empty folder.
         private static string _mainAppPath;
-        private static string _scenariosPath;
-        private static string _manifestsPath;
-        private static string _mapPath;
-        private static string _oobPath;
-        private static string _aiiPath;
-        private static string _brfPath;
         private static string _logsPath;
 
         // Session data
@@ -125,35 +121,33 @@ namespace HammerAndSickle.Services
         // Path to the scenario thumbnail folder, relative to any Resources/ folder (for Resources.Load).
         public const string ScenarioThumbnailPath = "Scenario Thumbs/";
 
-        /// <summary>
-        /// Path to scenario storage: Documents/My Games/Hammer and Sickle/scenario data/
-        /// </summary>
-        public static string ScenarioDataPath => GetOrCreatePath(ref _scenariosPath,
-            Path.Combine(MainAppPath, "scenario data"));
+        // ────────────────────────────────────────────────────────────────────────────────────────────
+        // SHIPPED CONTENT — read-only, inside the build (content pipeline Phase 1, 2026-07-27).
+        //
+        // Everything the player did not create lives under StreamingAssets: Unity copies that folder
+        // verbatim into the player, and `Application.streamingAssetsPath` resolves to
+        // <project>/Assets/StreamingAssets in the Editor and <Game>_Data/StreamingAssets in a build —
+        // the same code path both sides, with no #if UNITY_EDITOR.
+        //
+        // ⚠ This REPLACES two parallel load paths that had silently diverged: Documents/My Games for
+        // standalone scenarios and Assets/Generated Data for campaign ones. The latter could never have
+        // worked in a build at all, since Application.dataPath is <Game>_Data there and that folder does
+        // not exist. Documents now holds ONLY player-written data — saves and logs.
+        //
+        // A scenario is a SELF-CONTAINED FOLDER holding its own manifest, map, oob, aii and brf, so
+        // patching one scenario touches one folder and two scenarios can share a filename without
+        // colliding. The manifest remembers where it was loaded from (ScenarioManifest.ContentRoot) and
+        // resolves its files relative to that.
+        // ────────────────────────────────────────────────────────────────────────────────────────────
 
-        /// <summary>
-        /// This is the path to the directory where generated data files are stored.
-        /// </summary>
-        public static string GeneratedDataPath => Path.Combine(InteralAssetsPath, "Generated Data");
+        /// <summary>Root of all shipped content.</summary>
+        public static string StreamingContentPath => Application.streamingAssetsPath;
 
-        // File paths for campaign scenario data.
-        public static string GDP_ManifestsPath => Path.Combine(GeneratedDataPath, "Manifests");
-        public static string GDP_MapPath => Path.Combine(GeneratedDataPath, "Map");
-        public static string GDP_OobPath => Path.Combine(GeneratedDataPath, "Oob");
-        public static string GDP_AiiPath => Path.Combine(GeneratedDataPath, "Aii");
-        public static string GDP_BrfPath => Path.Combine(GeneratedDataPath, "Brf");
+        /// <summary>Standalone scenarios: StreamingAssets/Scenarios/&lt;scenarioFolder&gt;/</summary>
+        public static string ScenariosRootPath => Path.Combine(StreamingContentPath, "Scenarios");
 
-        // File paths of stand alone scenerio data in the documents folder.
-        public static string ManifestsPath => GetOrCreatePath(ref _manifestsPath,
-            Path.Combine(ScenarioDataPath, "manifests"));
-        public static string MapPath => GetOrCreatePath(ref _mapPath,
-            Path.Combine(ScenarioDataPath, "map"));
-        public static string OobPath => GetOrCreatePath(ref _oobPath,
-            Path.Combine(ScenarioDataPath, "oob"));
-        public static string AiiPath => GetOrCreatePath(ref _aiiPath,
-            Path.Combine(ScenarioDataPath, "aii"));
-        public static string BrfPath => GetOrCreatePath(ref _brfPath,
-            Path.Combine(ScenarioDataPath, "brf"));
+        /// <summary>Campaigns: StreamingAssets/Campaigns/&lt;campaignFolder&gt;/&lt;missionFolder&gt;/</summary>
+        public static string CampaignsRootPath => Path.Combine(StreamingContentPath, "Campaigns");
 
         /// <summary>
         /// Path to log files: Documents/My Games/Hammer and Sickle/logs/

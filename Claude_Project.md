@@ -454,7 +454,31 @@ PANEL MODEL (revised 2026-07-27, CONFIRMED IN PLAY same day). The three informat
 
 ---
 
-## 7. Generated Data Formats
+## 7. Content Pipeline & Data Formats
+
+### 7.1 Where content lives (Phase 1, 2026-07-27)
+
+All shipped content is READ-ONLY and lives inside the build under `StreamingAssets`. `Documents/My Games/Hammer and Sickle/` holds ONLY player-written data — saves (`cmp/`) and `logs/`. **Nothing is ever copied between them**, which is what makes a Steam patch a file replacement rather than an install-and-merge problem.
+
+```
+Assets/StreamingAssets/
+  Audio/{Ambient,Briefings,Music,SFX}      loaded via UnityWebRequestMultimedia (GameAudioManager)
+  Scenarios/<scenario>/                    standalone — manifest · map · oob · aii · brf
+  Campaigns/<campaign>/campaign.manifest   the mission graph (Phase 2, not yet built)
+  Campaigns/<campaign>/<mission>/          manifest · map · oob · aii · brf
+```
+
+**A scenario is a SELF-CONTAINED FOLDER.** `ScenarioManifest.ContentRoot` (transient, `[JsonIgnore]`) is stamped with the manifest's own directory at load, and `GetMapFilePath()`/`GetOobFilePath()`/`GetAiiFilePath()`/`GetBriefingFilePath()` resolve against it. So patching one scenario touches one folder, and two scenarios can share a filename without colliding — which they do: the standalone Khost and the campaign's Khost are separate content with different briefings and OOBs.
+
+⚠ **`ContentRoot` has ONE point of entry** — `ScenarioDialog_Scene0.LoadScenarioManifests`, the only place a manifest is deserialized. Any new code that builds a manifest must set it, or every content path silently returns empty; `MapLoader` and `OOBFileLoader` both name `ContentRoot` in their failure messages so this surfaces loudly rather than as a mysterious not-found.
+
+⚠ **A scenario's FOLDER NAME IS ITS IDENTITY AND IS PERMANENT ONCE SHIPPED**, because saves reference the scenario by id. Mission ORDER is not encoded in folder names — it lives in `campaign.manifest`, which is exactly what lets a post-release reshuffle be a content patch. A `m01_`/`m02_` prefix is a filing convention recording authoring order and readability at 25–30 missions; **never renumber a folder after release**. Display names (`"Grand Campaign"`, `"Operation Molot"`) live inside the manifests and can change freely, including in a patch — folder/id is machine-facing (lowercase, underscores), display name is human-facing.
+
+**Retired here:** the two parallel path families. `GetMapFilePath()` used to resolve to Documents/My Games and `GetMapFilePath_GDP()` to `Assets/Generated Data`, with `MapLoader` and `BattleManager` choosing on `IsCampaignScenario` — welding a gameplay concept to a storage one, so a campaign could not be standalone-tested and the two copies silently diverged (they had, by eight months). `AppService.GDP_*`, `ScenarioDataPath`, `ManifestsPath`/`MapPath`/`OobPath`/`AiiPath`/`BrfPath`, `OOBFileLoader.LoadStandaloneOob`/`LoadCampaignOob` are all GONE. ⚠ The GDP family could never have worked in a build at all — `Application.dataPath` is `<Game>_Data` in a player, where `Assets/Generated Data` does not exist.
+
+⚠ **No `.aii` files exist yet** — the AI pass will author them (Bob, 2026-07-27). A missing AII must stay a clean no-op, never an error.
+
+### 7.2 Formats
 
 **Manifest (.manifest):** JSON — scenarioId, displayName, description, thumbnailFilename, mapFilename, oobFilename, aiiFilename, briefingFilename, prestigePool, isCampaignScenario, mapTheme, difficultyLevel, maxTurns, maxCoreUnits.
 

@@ -123,33 +123,37 @@ namespace HammerAndSickle.Helpers
         #region Public Methods
 
         /// <summary>
-        /// Loads a standalone OOB file from the user's Documents folder.
+        /// Loads the OOB named by a scenario's manifest, from that scenario's own content folder.
         /// Clears existing units and registers loaded units with GameDataManager.
+        ///
+        /// ⚠ REPLACED LoadStandaloneOob + LoadCampaignOob (2026-07-27). Those differed ONLY in which root
+        /// they read from — Documents/My Games vs Assets/Generated Data — a storage distinction the caller
+        /// had to make by inspecting IsCampaignScenario. Scenarios are now self-contained folders, so
+        /// there is nothing left to choose between.
         /// </summary>
-        /// <param name="filename">Filename with or without .oob extension</param>
+        /// <param name="manifest">The scenario whose OOB should be loaded.</param>
         /// <returns>True if load succeeded, false otherwise</returns>
-        public static bool LoadStandaloneOob(string filename)
+        public static bool LoadOob(ScenarioManifest manifest)
         {
+            if (manifest == null)
+            {
+                Debug.LogError($"{CLASS_NAME}.{nameof(LoadOob)}: manifest is null");
+                return false;
+            }
+
+            string filePath = manifest.GetOobFilePath();
+
+            if (string.IsNullOrWhiteSpace(filePath))
+            {
+                Debug.LogError($"{CLASS_NAME}.{nameof(LoadOob)}: manifest '{manifest.ScenarioId}' names no OOB " +
+                               $"file (OobFilename='{manifest.OobFilename}', ContentRoot='{manifest.ContentRoot}')");
+                return false;
+            }
+
             if (_debug)
-                Debug.Log($"{CLASS_NAME}.{nameof(LoadStandaloneOob)}: Loading standalone OOB file: {filename}");
+                Debug.Log($"{CLASS_NAME}.{nameof(LoadOob)}: Loading OOB for '{manifest.ScenarioId}': {filePath}");
 
-            string filePath = BuildFilePath(filename, AppService.OobPath);
-            return LoadOobFile(filePath, "standalone");
-        }
-
-        /// <summary>
-        /// Loads a campaign OOB file from the generated data folder.
-        /// Clears existing units and registers loaded units with GameDataManager.
-        /// </summary>
-        /// <param name="filename">Filename with or without .oob extension</param>
-        /// <returns>True if load succeeded, false otherwise</returns>
-        public static bool LoadCampaignOob(string filename)
-        {
-            if (_debug)
-                Debug.Log($"{CLASS_NAME}.{nameof(LoadCampaignOob)}: Loading campaign OOB file: {filename}");
-
-            string filePath = BuildFilePath(filename, AppService.GDP_OobPath);
-            return LoadOobFile(filePath, "campaign");
+            return LoadOobFile(filePath, manifest.ScenarioId);
         }
 
         #endregion // Public Methods
