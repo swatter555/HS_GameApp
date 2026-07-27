@@ -2,21 +2,16 @@ using HammerAndSickle.Controllers;
 using System.IO;
 using System.Threading.Tasks;
 using System.Text.Json;
-using System.Text.Json.Serialization;
 
 namespace HammerAndSickle.Persistence
 {
     public static class SaveLoad
     {
         /// <summary>
-        /// JSON serialization options to handle object references and formatting.
+        /// Serialization policy lives in <see cref="JsonPolicy"/> — see the note there on why enums must
+        /// persist by NAME. Do not reintroduce a local options object.
         /// </summary>
-        private static readonly JsonSerializerOptions _opts = new()
-
-        {
-            ReferenceHandler = ReferenceHandler.Preserve,
-            WriteIndented = true
-        };
+        private static JsonSerializerOptions Opts => JsonPolicy.Save;
 
         /// <summary>
         /// Saves the current game state to a file asynchronously.
@@ -25,7 +20,7 @@ namespace HammerAndSickle.Persistence
         {
             var snap = SnapshotMapper.ToSnapshot(GameDataManager.Instance);
             await using var fs = File.Create(path);
-            await JsonSerializer.SerializeAsync(fs, snap, _opts);
+            await JsonSerializer.SerializeAsync(fs, snap, Opts);
         }
 
         /// <summary>
@@ -34,7 +29,7 @@ namespace HammerAndSickle.Persistence
         public static async Task LoadAsync(string path)
         {
             await using var fs = File.OpenRead(path);
-            var snap = await JsonSerializer.DeserializeAsync<GameStateSnapshot>(fs, _opts);
+            var snap = await JsonSerializer.DeserializeAsync<GameStateSnapshot>(fs, Opts);
             SnapshotMapper.ApplySnapshot(snap!, GameDataManager.Instance);
         }
     }

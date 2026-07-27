@@ -1,129 +1,189 @@
-# todo.md — PRINTER PASS, slice 1 (P1–P4): the CRT and its navigation
+# todo.md — CONTENT PIPELINE PASS: shipping scenarios & campaigns, patch-safe
 
-(Prior INTEL PASS slice is landed, green, and Bob-confirmed — record lives in Claude_TODO's change log.)
+**Goal (Bob, 2026-07-27):** one comprehensive design for scenarios AND campaign scenarios that makes
+post-release patching as cheap and safe as possible. **Explicit non-goal: user editing/modding.**
+(Prior PRINTER PASS slice is landed, green and Bob-confirmed — record lives in Claude_TODO.)
 
-**Spec:** HS_DesignDoc §24.8 (rewritten 2026-07-25) · **Plan of record:** Claude_TODO "PRINTER PASS" P1–P8
-**Scope (Bob, 2026-07-25):** P1–P4 only. P5 (loss ledger) / P6 (loss report) / P7 (emitters) / P8b (tests) are
-the following slices — the ledger lands on a CRT Bob has already confirmed works.
+---
 
-**Bob's three calls this session:**
-1. The six CRT button callbacks live on `DefaultDialog_Scene1` (the ratified §3.6b HUD rule), each raising an
-   EventManager event that `PrinterControl` subscribes to. Bob wires onClick in the Inspector.
-2. Date line = month + year from the existing campaign calendar ("TURN 4 — JUNE 1981").
-3. This slice is P1–P4.
+## TWO FINDINGS THAT SET THE AGENDA
 
-⚠ **FLAGGED — the ratified frame cannot be built as written.** §24.8.5a specifies `TURN 4 — 14 JUNE 1980`, a
-day-level date. `CampaignDateCalendar.GetCurrentDateString()` returns month+year only, is driven by the CAMPAIGN
-turn (1981–1989 span) rather than the battle turn, and `ScenarioManifest` has no start-date field, so the day is
-not derivable from any current data. Bob's call: month+year for v1. Isolated behind
-`PrinterMessage.BuildHeader(turn, dateString)` so a day-level date drops in later without touching an emitter.
-DesignDoc §24.8.5a owes an amendment noting the v1 form.
+Both are in the persistence layer, both are cheap to fix now and expensive-to-impossible after 1.0 ships.
 
-## In this slice
+### F1 — Enums serialize as INTEGERS. This is the single biggest patch hazard in the project.
 
-- [ ] **T1 Enums** — `PrinterCategory` { Combat, Intel, Supply, Personnel, General } (message tag) +
-      `PrinterFilter` { All, Combat, Intel, Supply, Personnel } (FILTER button cycle state) into GameData.cs.
-      Catalogue → category map (§24.8.6): Battle/Objectives/Air → Combat · Intel → Intel · Logistics → Supply ·
-      Personnel → Personnel · Weather → General (General visible only under All).
-- [ ] **T2 EventManager** — six discrete nav events + `Raise*` + `ClearAllSubscriptions` entries, house style.
-- [ ] **T3 `DefaultDialog_Scene1`** — six public `OnPrinter*Button()` callbacks for Bob's Inspector onClick.
-      NO `AddListener` for these: Bob owns the onClick, so a code listener as well would double-fire every press.
-- [ ] **T4 `PrinterMessage` (P2)** — `Header`/`Source`/`Lines`/`Category`; `BuildHeader(turn, date)` pure +
-      testable, `CurrentHeader()` null-tolerant off the live singletons; letterhead constants; `FullText`;
-      `FlowIntoColumns` so equipment lists pack to CRT width instead of being truncated. Keep `CreateUnitReport`'s
-      rung gating exactly as-is (2026-07-24), re-fronted with the new frame.
-- [ ] **T5 `PrinterControl` (P1)** — delete the row pool / greenbar sprites / ScrollRect / `_printDelay`;
-      one message, one TMP, typewriter at `Time.deltaTime * _charsPerSecond` (default 120), blink at rest,
-      nav-during-typing completes (§24.8.4.2). Font FIXED, auto-size OFF, anchored top-left.
-- [ ] **T6 Nav + filter + readout (P4)** — cursor indexes the FILTERED view; `MSG n / N`; clamp on filter change;
-      auto-follow a new dispatch only when already on the newest, so the latest-indicator works as the unread flag.
-- [ ] **T7 Visibility (P3)** — always-active host + serialized `_panelRoot`; OPEN FROM SCENE START and never
-      closes (final model, 2026-07-27); subscribe in `Start()`; drop RPM's `_messagePanelObject`.
-- [ ] **T8 Debug harness** — serialized `_debugSeedMessages` toggle enqueuing representative dispatches so Bob can
-      exercise nav/filter/typewriter before P7 emitters exist. Off by default.
-- [ ] **T9 Docs** — Claude_Project §3.6 + Claude_TODO P1–P4 + change log. Do NOT delete the P1–P8 plan block yet.
+⚠ **SCOPED 2026-07-27 AND IT IS WIDER THAN FIRST REPORTED — FOUR options objects, none with a converter:**
+`SaveLoad._opts` · `MapLoader` :101 · `OOBFileLoader` :310 · `MapChecksumUtility` :36. So this is not only a
+SAVE problem: the **shipped `.map` and `.oob` files store enums as ordinals too.** Insert a `TerrainType` and
+every shipped map reinterprets its terrain; insert a `WeaponType` and every shipped OOB reinterprets its
+units — silently, in content already sold.
 
-## Judgment calls to flag
+System.Text.Json writes enums as numbers by default. So every `WeaponType`, `UnitClassification`,
+`Nationality`, `TerrainType`, `DeploymentPosition`, `SpottedLevel` on disk is stored as an ORDINAL.
 
-- **THREE-PANEL MODEL — FINAL FORM (Bob, 2026-07-27).** Terrain, unit and printer CRT are open from scene start
-  and never close; right-click CLEARS the terrain and unit panels, the printer keeps its history. Visibility is
-  not a behaviour anywhere in the HUD. Two earlier models were tried: hide-on-right-click (mine, wrong —
-  inherited from RPM where the message panel tracked the selected hex; the dispatch feed is not contextual, so
-  dismissing it stranded the history behind nav buttons inside the hidden root) and open-on-first-hex-click.
-- **No enemy leaders, permanently (Bob, 2026-07-25).** DesignDoc §14.2.3 amended; §14.1.1 already said it.
-  `Leader.Side` is vestigial — never side-gate on it. The enemy-leader leak I flagged in `ResolveSelection`
-  was a non-issue and the comment there is corrected: an enemy unit never reports `IsLeaderAssigned`.
-- `Weather` gets its own `General` category rather than being forced into one of the four ratified filters.
-  §24.8.4.1 names only All/Combat/Intel/Supply/Personnel, so weather would otherwise be unreachable under any
-  filter but All — which is the behaviour I have implemented, just made explicit.
+Insert `T72B` between `T72A` and `T80B` in `WeaponType` — an utterly routine patch for this genre — and every
+existing save's tanks silently become different vehicles. The numbers still parse, so there is no exception and
+no warning; the player just finds their veteran T-72 regiment is now something else. Adding units in patches is
+not a risk for a Panzer-General-style game, it is a certainty.
 
-## Review
+Fix: `Converters = { new JsonStringEnumConverter() }`. Names survive insertion and reordering; only a RENAME
+breaks, and a rename is visible, compile-checked and deliberate.
 
-**T1–T9 done. Compiles clean — `dotnet build Main.csproj` and `EditorTests.csproj`, 0 errors.**
-NOT yet play-confirmed: needs Bob's Inspector rewiring first.
+### F2 — There is no migration path for OLDER saves.
 
-Files touched (9):
-- `ReactivePanelManager.cs` — three-panel model: one-way `OpenPanels` latch + `ClearSelectionPanels`.
-- `Prefab_TerrainPanel.cs` — new `Clear()`; portrait Image disabled on clear, re-enabled on update.
-- `Prefab_UnitPanel.cs` — new `Clear()`.
-- `GameData.cs` — new `PrinterCategory` + `PrinterFilter`.
-- `EventManager.cs` — six printer nav events + raisers + `ClearAllSubscriptions` entries.
-- `DefaultDialog_Scene1.cs` — six public `OnPrinter*Button()` callbacks.
-- `PrinterMessage.cs` — rebuilt to the §24.8.5a frame; `HeaderProvider` seam; `FlowIntoColumns`;
-  `CreateUnitReport` re-fronted with its rung gating intact; seven dead ad-hoc factories deleted.
-- `PrinterControl.cs` — rewritten as the one-message CRT.
+`SnapshotMapper.ApplySnapshot` throws only when `snap.SaveVersion > CURRENT_SAVE_VERSION` (:304). An older save
+is loaded with no transformation at all — every field added since simply takes its default, silently. Two
+version bumps are already queued (AI2's `AIPerceptionState`, P5's loss ledger) with no ladder to run them on.
 
-**Two traps worth remembering:**
-- `BattleManager.Instance` and `GameDataManager.Instance` LAZY-CREATE a GameObject. A plain data class reading
-  them spawns managers out of headless tests, so the header goes through `PrinterMessage.HeaderProvider`.
-- Hiding the printer by SetActive on its own GameObject would unsubscribe the component that receives the
-  message that shows it again. Hence always-active host + `_panelRoot`, plus a startup warning if the two are
-  the same object.
+Fix: an explicit `Migrate(snap)` chain — v3→v4→v5, each step a named method with a round-trip test.
 
-**Slice 2 (2026-07-26) — combat dispatches + the Verbose switch.** New `PrinterDispatch` static owning the
-§24.8.6 text and the three-gate volume model; `Verbose` serialized on PrinterControl (ON = narrate everything,
-OFF = report by exception). Frame revised to `12: Message from 3rd Tank Rgt` with render-time name
-abbreviation — which retired the day-level-date debt, since no date is rendered at all now. `LossBand` +
-thresholds. Ground and indirect combat wired through `MovementController.TryAttack`, both sides in one call.
-`_fontSize` added and a 9-line calibration seed. Compiles clean.
+---
 
-**Slice 3 (2026-07-26) — remaining emitters.** Ambush (both directions), objectives captured/lost, unit
-hardened, weather, first contact + intel rungs. `PrinterDispatch.Attach()/Detach()` for the broadcast triggers.
-Three guards worth remembering: promotion detected by caller-side comparison (CombatUnit raises no events and
-must not start); first contact suppressed at turn 0 (scenario load runs a full spotting sweep); weather text
-truncated because its ratified sentences claim mechanics that do not exist. Compiles clean, Main + EditorTests.
+## PRINCIPLES
 
-**Slice 4 (2026-07-27) — all three panels open from scene start.** The open-on-first-click latch is removed;
-terrain and unit come up active-and-cleared, the CRT comes up showing the empty placeholder. Visibility is no
-longer a behaviour anywhere in the HUD. Takes the lazy-singleton hazard with it — that only mattered while the
-panels started inactive. Third and final model: hide-on-right-click → open-on-first-click → open-always.
+- **P1 — One source of truth per artifact.** Shipped content lives in exactly ONE place. No copy step, no
+  second root, no precedence rules. Duplication is not a backup, it is a divergence waiting to happen — which
+  is exactly what `Assets/Generated Data` vs `Documents/.../scenario data` already became.
+- **P2 — Address by stable identity, never by position.** IDs are strings; enums persist by NAME; no array
+  index, enum ordinal or file offset is ever written to disk.
+- **P3 — Every persisted artifact declares its version, and loading is an explicit migration.** Never a hope
+  that the shape still matches.
+- **P4 — References point ONE way: campaign → scenario.** A scenario must not know whether it belongs to a
+  campaign. That is what allows campaign structure to be patched without touching scenario files, and one
+  scenario to appear in two campaigns.
+- **P5 — In-battle saves are SELF-CONTAINED; between-battle saves are CONTENT-INDEPENDENT.** This is the
+  property that makes content patching safe, and it is already half-true: `GameStateSnapshot.MapData` is
+  embedded and documented "Null for between-battle saves". Formalise it. A patch then cannot corrupt a battle
+  in progress (it carries its own map and units) and cannot corrupt a campaign between battles (it holds only
+  the core roster, results, and a scenarioId).
+- **P6 — Fail loudly at the boundary.** Version and checksum validated on load, with a message naming the file
+  and the mismatch. Silent defaulting is the enemy — it is how F1, F2 and the click-through slot bug all hide.
 
-**✅ DOC AMENDMENTS LANDED 2026-07-27 — HS_DesignDoc is reconciled with the code.**
-- **§12.5.3** rewritten: unit panel shows BOTH sides, enemy filtered by rung, same layout. +12.5.3.1 the
-  Level0 display gate, +12.5.3.2 the printer no longer carries the enemy selection readout.
-- **§24.5a** re-homed: rung gates now govern the panel AND the intel dispatch, not a per-selection printout.
-- **§24.8.2** sharpened to the subordinates/three-gates model, +24.8.2.3 the combat receipts carve-out,
-  +24.8.2.4 report-by-exception, +24.8.2.5 verbose mode.
-- **§24.8.4.3** NEW: panel visibility for the whole HUD, incl. the two rejected models so neither returns.
-- **§24.8.5a** reframed to `12: Message from X`; +.1 the date removal (retires the day-date conflict),
-  +.2 name abbreviation.
-- **§24.8.6 Battle** rewritten to the two templates + special cases; NEW §24.8.6.1 loss bands (3/6/12/24),
-  §24.8.6.2 intel verbose-only, §24.8.6.3 turn-0 suppression, §24.8.6.4 weather text held back.
-- **§14.2.3** (earlier this thread) no enemy leaders, permanent.
+---
 
-**Design deviations, all deliberate and flagged:**
-- Date is month+year, not the doc's day-level example (Bob's call; not derivable from current data).
-  DesignDoc §24.8.5a owes an amendment.
-- Panels start closed, open together on the first hex selection, never close; deselect clears terrain+unit
-  content but not the printer (Bob's call after the first play-test). The DesignDoc is silent on panel
-  visibility and owes a line recording the model.
-- `Weather` sits in a `General` category, reachable only under the All filter — §24.8.4.1 ratifies four filter
-  values and weather is not among them.
-- CLEAR leaves the panel up showing an empty placeholder rather than hiding it: the player pressed a button and
-  should see its result.
+## PHASE 0 — Pre-ship blockers — **CODE DONE 2026-07-27, builds clean, pending Bob**
 
-**Owed by Bob:** Inspector rewiring (always-active host, `_panelRoot`, `_messageText` with auto-size off and
-sized for 9 lines, optional readout/filter/indicator refs, six Button onClicks) then a play-test.
-`_debugSeedMessages` exercises the CRT before P7 emitters exist.
+- [x] **0.1 One serialization policy + string enums.** NEW `Core/Persistence/JsonPolicy.cs` with two presets:
+      `Save` (adds `ReferenceHandler.Preserve` — the snapshot is an object GRAPH and emits `$id`/`$ref`) and
+      `Content` (a plain tree; deliberately the UNION of the settings the loaders each carried, so it is
+      strictly more permissive and nothing that parsed before can stop parsing). Both register
+      `JsonStringEnumConverter`. `SaveLoad`, `MapLoader` and `OOBFileLoader` now route through it.
+      ✅ Reading old files stays safe — the converter accepts BOTH a string and a number on read.
+      ⚠ **`MapChecksumUtility` DELIBERATELY NOT ROUTED.** Its options are a HASH INPUT: the bytes they
+      produce ARE the checksum, so adding a converter would change every hash and invalidate the stored
+      checksum in every `.map` ever written. Warning comment added at the site so it is not "tidied" later.
+- [x] **0.2 Migration ladder** in `SnapshotMapper.UpgradeSnapshot`. ⚠ The old body was NOT merely a stub —
+      it stamped `SaveVersion = CURRENT` and returned, i.e. it RELABELLED old data as current, destroying
+      the evidence any future migration would need. Replaced with: refuse anything below
+      `MINIMUM_SUPPORTED_SAVE_VERSION` (= the 1.0 baseline, per Bob's clean-break ruling), then apply steps
+      one version at a time, throwing if a step is missing or fails to advance exactly one version.
+- [x] **0.3 Rules recorded in CLAUDE.md §2** as items 10–12: all JSON through `JsonPolicy`; persisted enums
+      are never RENAMED (add/reorder is now free — rename is the only breaking operation); every
+      `SAVE_VERSION` bump ships with its migration step.
+- [ ] **0.4 ⚠ FOLLOW-UP, NOT YET DONE — shipped content does not GAIN the protection until it is
+      RE-EMITTED with string enums.** Today the reader merely tolerates both forms, so the ordinal
+      fragility is still latent inside the existing `Khost.map` / `khost.oob`. Re-emitting a `.map` also
+      changes its stored checksum, so this needs a deliberate pass with whatever authored those files —
+      NOT a silent rewrite. Do it before 1.0 ships, and ideally alongside the Phase 1 file move.
+- [ ] **0.5 EditorTest** the ladder: below-minimum refused, missing-step throws, a step that fails to
+      advance throws. Cheap, and it locks the contract before any real migration exists.
 
-**Next slices:** P5 loss ledger (+ `SAVE_VERSION` bump) → P6 loss report → P7 emitters → P8b tests.
+## PHASE 1 — Content location
+
+**LAYOUT — REVISED after Bob's 2026-07-27 answer that standalone scenarios differ from the campaign in
+BRIEFING AND OOB.** That rules out flat type-folders: a standalone `Khost.map`/`khost.oob` and the campaign's
+differently-tuned versions would collide on filename. Per-SCENARIO folders instead, which also makes a
+scenario an atomic content unit — patching one touches one folder, and Steam patches at file level.
+```
+Assets/StreamingAssets/
+  Audio/                       ← existing, untouched
+  Scenarios/                   ← the 3 standalone
+    <scenarioId>/  manifest · map · oob · aii · brf
+  Campaigns/
+    khost/
+      campaign.manifest        ← the 25–30 node graph
+      <scenarioId>/  manifest · map · oob · aii · brf
+```
+Sizing: ~30 scenarios × ~1 MB ≈ 30 MB on top of the 7.9 MB audio. Nothing for a Steam depot, and JSON
+both compresses and delta-patches well.
+
+- [ ] **1.1** Move scenario content to the layout above.
+      `Application.streamingAssetsPath` resolves in BOTH Editor and player with no `#if UNITY_EDITOR`, and the
+      folder sits inside `Assets/` so it is covered by the tracking policy set 2026-07-27.
+      ⚠ Take the **Documents** copies — they are the newer ones (Khost.map 1,056 KB / 24 Jun 2026 vs the repo's
+      968 KB / 12 Nov 2025).
+- [ ] **1.2** Collapse the two path families to one. DELETE `AppService.GDP_*` and the four `*_GDP()` methods
+      on `ScenarioManifest`; `GetMapFilePath()` and friends resolve against the single content root.
+      ⚠ The GDP family is Editor-only by construction — `Application.dataPath` is `<Game>_Data` in a build, so
+      `Assets/Generated Data` does not exist there. The campaign path has never run in a build.
+- [ ] **1.3** Documents keeps `cmp/` saves, `logs/` and settings. No scenario data. Delete the three
+      "consult settings to rebuild scenario data and manifests" error paths in `ScenarioDialog_Scene0`
+      (:183/:191/:221) — they promise a feature that does not exist, and become unreachable once content ships
+      with the build.
+- [x] **1.4 SCOPED 2026-07-27 — StreamingAssets IS already in use and the answer is favourable.**
+      (An earlier note claimed no C# referenced it; that grep hit its result cap on documentation matches
+      before reaching the code.) `GameAudioManager` uses it at :1338/:1370/:1402/:1432 —
+      `Path.Combine(Application.streamingAssetsPath, MUSIC_FOLDER, filename)` → `"file:///" + …` →
+      `UnityWebRequestMultimedia.GetAudioClip`, async, cached per category, folder consts at :257–260.
+      ⚠ **Scenario JSON does NOT need UnityWebRequest.** The audio uses it because `GetAudioClip` is how you
+      DECODE audio into an `AudioClip` at runtime — an audio requirement, not a StreamingAssets one. On
+      Windows standalone `streamingAssetsPath` is an ordinary filesystem path, so `File.ReadAllText` works
+      synchronously (UnityWebRequest is only mandatory on Android, where StreamingAssets sits inside the
+      compressed APK, and WebGL — neither is a target). `MapLoader` (:76/:92) and `OOBFileLoader` already do
+      exactly that, so **only the root path changes**: no async rewrite, no coroutine plumbing.
+      Unity copies StreamingAssets verbatim into the build and STRIPS `.meta`, so those do not ship.
+
+## PHASE 2 — Campaign as data (P4)
+
+- [ ] **2.1** New `CampaignManifest`: `campaignId`, `displayName`, `description`, `thumbnail`,
+      `contentVersion`, `startingPrestige`, core-unit carryover rules, and an ordered list of
+      `CampaignNode { scenarioId, unlockConditions, nextOnVictory, nextOnDefeat }`.
+- [ ] **2.2** DELETE `ScenarioManifest.IsCampaignScenario`. The campaign owns the relationship; the scenario
+      is a reusable leaf. This is what turns "rebalance the campaign path" into a content patch rather than a
+      code patch.
+- [ ] **2.3** Menu lists campaigns and standalone scenarios from the same root, distinguished by which
+      manifest type declares them — not by a bool on the scenario.
+- [ ] **2.4** Branch shape: CLAUDE.md commits to "dynamic outcomes influence future missions and unlock
+      alternate paths", so build the branching DATA SHAPE now even if v1 ships a linear path. Retrofitting a
+      graph onto a list is a content migration across every shipped campaign.
+
+## PHASE 3 — The save/content contract (P3, P5)
+
+- [ ] **3.1** Save records `saveVersion` + `gameVersion` (both exist on `GameDataHeader`) + NEW
+      `contentVersion` and the `scenarioId`/`campaignId` it came from.
+- [ ] **3.2** Formalise P5: between-battle campaign saves store core roster + completed results + campaign
+      position BY scenarioId — never a pointer into any scenario's internals. In-battle saves stay
+      self-contained with embedded `MapData`.
+- [ ] **3.3** The one genuine hazard this leaves: a campaign save whose NEXT scenario was removed or renamed by
+      a patch. Handle with a named, specific error and a way forward, not a crash — and treat scenarioId as
+      permanent once shipped.
+
+## PHASE 4 — Integrity
+
+- [ ] **4.1** Manifest declares the SHA-256 of its map and oob; loader verifies on load
+      (`MapChecksumUtility` already exists and `MapLoader` already checksum-validates).
+- [ ] **4.2** Failures name the file and the mismatch (P6).
+
+---
+
+## DELIBERATE NON-GOALS — recorded so they are not re-litigated
+
+- **No user editing / modding** (Bob, 2026-07-27). This is what keeps the design small: no Documents scenario
+  root, no search-path overlay, no dedup, no user-wins precedence, no install/copy step, no staleness logic.
+- **Balance constants stay COMPILED in `GameData`,** not data-driven. A Steam patch ships a new exe regardless,
+  so externalising them buys nothing and adds a parsing and validation surface. Revisit only if live tuning
+  without a build is ever wanted.
+- **No AssetBundles / Addressables.** Loose JSON in StreamingAssets is simpler, inspectable and adequate at
+  this scale (Khost.map ≈ 1 MB). Revisit only if load times or download size become real problems.
+
+## SETTLED BY BOB, 2026-07-27
+
+1. **Pre-1.0 saves — CLEAN BREAK.** Dev saves are discarded; the ladder starts at the 1.0 baseline
+   (`MINIMUM_SUPPORTED_SAVE_VERSION`). This is what makes the string-enum change free of a migration step.
+2. **Standalone scenarios stay SEPARATE from the campaign** — a limited list, differing from the campaign in
+   briefing and OOB. Drives the per-scenario folder layout above.
+3. **Volume:** 3 standalone scenarios now; the campaign will run 25–30. So the Phase 1 move is cheap today
+   and gets steadily more expensive — do it before authoring the campaign.
+4. **Content location:** scenario AND campaign files both ship inside `Assets/StreamingAssets`, read-only.
+   `Documents/My Games` keeps saves, logs and settings ONLY. Nothing is ever copied between them — that is
+   precisely what makes a Steam patch a file replacement rather than an install-and-merge problem.

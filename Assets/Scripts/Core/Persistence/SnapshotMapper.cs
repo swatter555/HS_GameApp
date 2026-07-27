@@ -22,6 +22,15 @@ namespace HammerAndSickle.Persistence
         private const string CLASS_NAME = nameof(SnapshotMapper);
         private const int CURRENT_SAVE_VERSION = GameData.SAVE_VERSION;
 
+        /// <summary>
+        /// Oldest save version this build can migrate FROM. Anything older is refused outright rather
+        /// than guessed at. Set to the 1.0 shipping baseline per Bob's clean-break ruling (2026-07-27):
+        /// pre-release dev saves are NOT supported, which is what keeps the string-enum change of that
+        /// date free of a migration step.
+        /// ⚠ Raise this ONLY when dropping support for a version that shipped to players.
+        /// </summary>
+        private const int MINIMUM_SUPPORTED_SAVE_VERSION = GameData.SAVE_VERSION;
+
         #endregion // Constants
 
         #region Public API
@@ -592,16 +601,50 @@ namespace HammerAndSickle.Persistence
         #region Private Upgrade Logic
 
         /// <summary>
-        /// Upgrades an old snapshot to the current save format.
+        /// Migrates an older snapshot up to the current save format, one version at a time.
+        /// Every <see cref="GameData.SAVE_VERSION"/> bump must add its step to the switch below.
         /// </summary>
-        /// <param name="oldSnap"></param>
-        /// <returns></returns>
-        private static GameStateSnapshot UpgradeSnapshot(GameStateSnapshot oldSnap)
+        private static GameStateSnapshot UpgradeSnapshot(GameStateSnapshot snap)
         {
-            // TODO: Implement migration logic when save format changes
-            // For now, just update the version number
-            oldSnap.SaveVersion = CURRENT_SAVE_VERSION;
-            return oldSnap;
+            // A save older than the supported floor is REFUSED, not guessed at.
+            // ⚠ The previous implementation stamped `SaveVersion = CURRENT` and returned, which is worse
+            // than doing nothing: it relabelled old data as current, so the save then claimed a shape it
+            // did not have and no later migration could tell what it really was. Fail loudly instead.
+            if (snap.SaveVersion < MINIMUM_SUPPORTED_SAVE_VERSION)
+            {
+                throw new InvalidOperationException(
+                    $"Save file version {snap.SaveVersion} is older than the minimum supported version " +
+                    $"{MINIMUM_SUPPORTED_SAVE_VERSION} and cannot be loaded. Saves written by pre-release " +
+                    "builds are not supported.");
+            }
+
+            // Apply steps in order. Each step transforms the snapshot AND stamps its own new version;
+            // the guard below catches a step that forgets to, which would otherwise spin here forever.
+            while (snap.SaveVersion < CURRENT_SAVE_VERSION)
+            {
+                int from = snap.SaveVersion;
+
+                snap = from switch
+                {
+                    // One arm per version bump, e.g.:
+                    //   3 => MigrateV3ToV4(snap),   // AI2: AIPerceptionState enters the snapshot
+                    //   4 => MigrateV4ToV5(snap),   // P5: loss ledger enters the snapshot
+                    _ => throw new InvalidOperationException(
+                        $"No migration step is defined from save version {from} to {from + 1}. " +
+                        $"A {nameof(GameData.SAVE_VERSION)} bump must ship with its migration step.")
+                };
+
+                if (snap.SaveVersion != from + 1)
+                {
+                    throw new InvalidOperationException(
+                        $"Migration step from version {from} left the snapshot at version {snap.SaveVersion}; " +
+                        "each step must advance exactly one version.");
+                }
+
+                AppService.CaptureUiMessage($"Migrated save from version {from} to {snap.SaveVersion}");
+            }
+
+            return snap;
         }
 
         #endregion

@@ -29,6 +29,16 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 7. Keep class comments brief, but informative.
 8. Use #region formatting for distinct sections of code, #endregion // Region Name`
 9. Avoid loops in Editor tests
+10. **All JSON goes through `JsonPolicy`** (`Persistence/JsonPolicy.cs`): `JsonPolicy.Save` for save files,
+    `JsonPolicy.Content` for shipped content (.map/.oob/manifests). Never construct a local
+    `JsonSerializerOptions` — four divergent copies is how the string-enum defect went unnoticed.
+    The ONE exception is `MapChecksumUtility`, whose options are a frozen hash input, not a data format.
+11. **Persisted enums are never renamed.** `WeaponType`, `UnitClassification`, `Nationality`, `TerrainType`
+    and friends are written to saves and to shipped content. Because they now persist BY NAME, members may
+    be added or reordered freely — but a RENAME silently breaks every existing save and content file, so it
+    is a breaking change that must ship with a `SAVE_VERSION` bump and a migration step.
+12. **Every `SAVE_VERSION` bump ships with its migration step** in `SnapshotMapper.UpgradeSnapshot`. The
+    ladder throws if a step is missing rather than loading mismatched data.
 ---
 
 ## SECTION 3: Game Information

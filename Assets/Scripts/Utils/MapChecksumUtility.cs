@@ -32,7 +32,11 @@ namespace HammerAndSickle.Utils
                     throw new ArgumentNullException(nameof(hexes));
                 }
 
-                // Create JSON options for consistent serialization
+                // ⚠ FROZEN — DO NOT ROUTE THROUGH JsonPolicy, AND DO NOT "TIDY" THESE SETTINGS.
+                // These options are a HASH INPUT, not a data format. The bytes they produce ARE the
+                // checksum, so any change — a naming policy, an enum converter, indentation — yields a
+                // different hash and invalidates the stored checksum in EVERY .map file ever written.
+                // That is why the string-enum fix of 2026-07-27 deliberately stopped at this class.
                 var options = new JsonSerializerOptions
                 {
                     WriteIndented = false, // Compact format for checksum consistency

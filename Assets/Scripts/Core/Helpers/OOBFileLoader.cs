@@ -7,6 +7,7 @@ using System.Text.Json.Serialization;
 using UnityEngine;
 using HammerAndSickle.Models;
 using HammerAndSickle.Controllers;
+using HammerAndSickle.Persistence;
 using HammerAndSickle.Services;
 using HammerAndSickle.Core.GameData;
 
@@ -307,11 +308,9 @@ namespace HammerAndSickle.Helpers
                     Debug.Log($"{CLASS_NAME}.{nameof(LoadOobFile)}: Read {jsonContent.Length} characters from file");
 
                 // Deserialize — auto-detects wrapper vs legacy format
-                var options = new JsonSerializerOptions
-                {
-                    WriteIndented = true,
-                    PropertyNameCaseInsensitive = true
-                };
+                // Serialization policy is centralized — see JsonPolicy for why enums must persist by NAME.
+                // Do not reintroduce a local options object here.
+                var options = JsonPolicy.Content;
 
                 var (oobDataList, leaderDataList) = DeserializeOobContent(jsonContent, options);
 

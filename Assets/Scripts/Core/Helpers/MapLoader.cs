@@ -1,6 +1,7 @@
 using HammerAndSickle.Controllers;
 using HammerAndSickle.Core.GameData;
 using HammerAndSickle.Models.Map;
+using HammerAndSickle.Persistence;
 using HammerAndSickle.Services;
 using System;
 using System.IO;
@@ -97,15 +98,9 @@ namespace HammerAndSickle.Core.Helpers
                 // Deserialize using System.Text.Json
                 if (log) Debug.Log($"{CLASS_NAME}: Deserializing JSON data...");
 
-                // Configure JSON options for proper deserialization
-                var jsonOptions = new JsonSerializerOptions
-                {
-                    PropertyNameCaseInsensitive = false,
-                    IncludeFields = false,
-                    DefaultIgnoreCondition = System.Text.Json.Serialization.JsonIgnoreCondition.Never,
-                    AllowTrailingCommas = true,
-                    ReadCommentHandling = System.Text.Json.JsonCommentHandling.Skip
-                };
+                // Serialization policy is centralized — see JsonPolicy for why enums must persist by NAME.
+                // Do not reintroduce a local options object here.
+                var jsonOptions = JsonPolicy.Content;
 
                 JsonMapData mapData;
 
