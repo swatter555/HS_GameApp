@@ -67,11 +67,17 @@ crashlytics-build.properties
 /Assets/Resources/Chunked/TestArray_*.asset.meta
 
 # --- NOT ignored, deliberately, against the obvious instinct --------------
-# Assets/Generated Data/  — this is the LIVE scenario load path, not build output.
-#   ScenarioManifest.GetMapFilePath/GetOobFilePath/GetAiiFilePath/GetBriefingFilePath
-#   and OOBFileLoader resolve through AppService.GDP_* = Application.dataPath +
-#   "Generated Data". A clone without it has code but no content and cannot load a
-#   scenario. It grows with the campaign, but it is text JSON; if .map files ever get
-#   heavy, add them to LFS in .gitattributes rather than dropping them from the repo.
+# Assets/Generated Data/  — scenario CONTENT, not build output. There are TWO load
+#   paths and ScenarioManifest exposes a method family for each:
+#     campaign   -> GetMapFilePath_GDP() etc -> AppService.GDP_*   -> THIS folder
+#     standalone -> GetMapFilePath()     etc -> AppService.MapPath -> Documents/
+#                                                My Games/Hammer and Sickle/scenario data
+#   MapLoader picks between them (MapLoader.cs:47/:60), as does BattleManager for the
+#   OOB (LoadCampaignOob vs LoadStandaloneOob). So this folder is the CAMPAIGN content.
+#   It grows with the campaign, but it is text JSON; if .map files ever get heavy, add
+#   them to LFS in .gitattributes rather than dropping them from the repo.
+#   ⚠ THE STANDALONE CONTENT IN Documents/ IS STILL UNVERSIONED, and as of 2026-07-27
+#   it is NEWER than the copies here (Khost.map 1,056 KB / 24 Jun 2026 vs 968 KB /
+#   12 Nov 2025). Unresolved — see Claude_TODO.
 # Packages/            — manifest.json, packages-lock.json AND the extracted NuGet
 #   dependencies Main.asmdef compiles against. Without them a clone does not build.

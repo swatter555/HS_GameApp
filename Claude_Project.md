@@ -206,6 +206,8 @@ Mesh-based terrain rendering that replaces per-hex sprite stamping with GPU-blen
 
 **Editor tools** (`HammerAndSickle.EditorTools.Chunked`): `TextureArrayBuilder` builds a 108-slice Texture2DArray from terrain tile PNGs in `Assets/Art/HexTiles/` (slot math: terrainType * 12 + variant, 512px tiles). `HexBlendTestAssetBuilder` generates Phase 1 POC test assets (3-slice RGB Texture2DArray + tileable noise PNG).
 
+⚠ **REBUILD AFTER A FRESH CLONE — these two outputs are NOT in git.** `Assets/Resources/Chunked/TerrainArray_MiddleEast.asset` is 288 MB, over GitHub's 100 MB hard per-file limit, and `TestArray_RGB.asset` is 8 MB; both are `.gitignore`d (see the rationale block there) while the source PNGs they are built from ARE tracked. A clone therefore has no terrain array until the tools are re-run, and the rebuilt asset carries a NEW GUID — any serialized reference to it must be re-pointed.
+
 **POC drivers** (removed): earlier prototypes `HexChunkPOCDriver`, `HexBlendShaderTest`, and `POCCameraController` have been deleted now that the chunked renderer is driven from `BattleManager` against real scenario data.
 
 ### 3.5b Movement System
