@@ -273,6 +273,8 @@ namespace HammerAndSickle.Services
                 Vector3 movement = new Vector3(scrollVector.x, scrollVector.y, 0f) * scrollSpeed * Time.deltaTime;
                 controlledCamera.transform.position += movement;
 
+                ClampCameraToBounds();
+
                 // Sync overlay camera
                 SyncOverlayCamera();
 
@@ -299,6 +301,8 @@ namespace HammerAndSickle.Services
                 // We only need to apply Time.deltaTime for frame-rate independence
                 Vector3 movement = new Vector3(scrollVector.x, scrollVector.y, 0f) * Time.deltaTime;
                 controlledCamera.transform.position += movement;
+
+                ClampCameraToBounds();
 
                 // Sync overlay camera
                 SyncOverlayCamera();
@@ -354,6 +358,37 @@ namespace HammerAndSickle.Services
             catch (Exception e)
             {
                 AppService.HandleException(CLASS_NAME, "HandleResetZoom", e);
+            }
+        }
+
+        /// <summary>
+        /// Clamps the controlled camera inside the InputService scroll bounds after a scroll step.
+        /// The input constraints ease the camera INTO an edge; this guarantees it never ends up OUTSIDE one.
+        /// Belt and braces on purpose — an out-of-bounds camera used to be unreachable by scrolling and
+        /// needed a <see cref="CenterOnPosition"/> to escape (2026-07-27).
+        ///
+        /// NOT applied to CenterOnPosition: that is a deliberate teleport, and the bounds are still a
+        /// hand-set Inspector value rather than being derived from the loaded map (SetScrollBounds has no
+        /// callers), so clamping it could refuse to centre on a unit sitting near the map edge.
+        /// </summary>
+        private void ClampCameraToBounds()
+        {
+            try
+            {
+                var bounds = InputService_BattleMap.Instance?.Bounds;
+                if (bounds == null || controlledCamera == null) return;
+
+                Vector3 pos = controlledCamera.transform.position;
+                Vector2 clamped = bounds.GetClampedPosition(new Vector2(pos.x, pos.y));
+
+                if (!Mathf.Approximately(clamped.x, pos.x) || !Mathf.Approximately(clamped.y, pos.y))
+                {
+                    controlledCamera.transform.position = new Vector3(clamped.x, clamped.y, pos.z);
+                }
+            }
+            catch (Exception e)
+            {
+                AppService.HandleException(CLASS_NAME, nameof(ClampCameraToBounds), e);
             }
         }
 

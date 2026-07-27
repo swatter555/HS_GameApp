@@ -3,6 +3,7 @@ using HammerAndSickle.Core.UI;
 using HammerAndSickle.Services;
 using System;
 using UnityEngine;
+using UnityEngine.Serialization;
 using UnityEngine.UI;
 
 namespace HammerAndSickle.SceneManagement
@@ -50,9 +51,12 @@ namespace HammerAndSickle.SceneManagement
         [Header("Click-Through Panels")]
         [SerializeField] private RectTransform _topMenuBar;
         [SerializeField] private RectTransform _terrainPanel;
-        [SerializeField] private RectTransform _unitGroundPanel;
-        [SerializeField] private RectTransform _unitAirPanel;
-        [SerializeField] private RectTransform _leaderPanel;
+
+        // ONE unit panel since the consolidation (§4.3) — the separate ground/air panels and the leader
+        // panel are gone. FormerlySerializedAs migrates a live _unitGroundPanel binding rather than
+        // silently dropping it. Slots left null fail OPEN (see WarnOnUnassignedPanels).
+        [FormerlySerializedAs("_unitGroundPanel")]
+        [SerializeField] private RectTransform _unitPanel;
         [SerializeField] private RectTransform _printerPanel;
 
         [Header("Unit Cycling")]
@@ -81,15 +85,48 @@ namespace HammerAndSickle.SceneManagement
             {
                 _topMenuBar,
                 _terrainPanel,
-                _unitGroundPanel,
-                _unitAirPanel,
-                _leaderPanel,
+                _unitPanel,
                 _printerPanel
             };
+
+            WarnOnUnassignedPanels();
 
             // Wire unit cycling buttons
             _nextUnitButton?.onClick.AddListener(() => EventManager.Instance?.RaiseNextUnitRequested());
             _prevUnitButton?.onClick.AddListener(() => EventManager.Instance?.RaisePreviousUnitRequested());
+        }
+
+        /// <summary>
+        /// Warns for every unassigned click-through slot. <see cref="IsScreenPointOverUI"/> skips nulls, so a
+        /// missing reference FAILS OPEN — the click reaches the map, and for right-click that is a move order
+        /// issued under the panel the player thought they were clicking. Silent for four days once already.
+        /// </summary>
+        private void WarnOnUnassignedPanels()
+        {
+            (string name, RectTransform rect)[] slots =
+            {
+                (nameof(_topMenuBar), _topMenuBar),
+                (nameof(_terrainPanel), _terrainPanel),
+                (nameof(_unitPanel), _unitPanel),
+                (nameof(_printerPanel), _printerPanel)
+            };
+
+            foreach ((string name, RectTransform rect) in slots)
+            {
+                if (rect == null)
+                {
+                    Debug.LogWarning($"{CLASS_NAME}: click-through slot '{name}' is UNASSIGNED — clicks over that " +
+                        "panel will reach the map (right-click there = move order).");
+                }
+            }
+
+            // Screen Space - Camera canvases need the camera for the rect test; without it every panel
+            // mis-tests and the whole HUD leaks clicks, not just one slot.
+            if (_uiCamera == null)
+            {
+                Debug.LogWarning($"{CLASS_NAME}: _uiCamera is UNASSIGNED — click-through hit-testing will be " +
+                    "wrong for any Screen Space - Camera canvas.");
+            }
         }
 
         #endregion // Unity Lifecycle

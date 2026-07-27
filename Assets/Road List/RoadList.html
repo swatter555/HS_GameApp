@@ -1,0 +1,398 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<title>Road Sprite Checklist</title>
+<style>
+  :root {
+    --bg: #1e1e22;
+    --panel: #2a2a30;
+    --text: #e8e8ec;
+    --muted: #9a9aa3;
+    --accent: #6aa9ff;
+    --done: #4caf50;
+    --border: #3a3a42;
+    --hover: #34343c;
+  }
+  * { box-sizing: border-box; }
+  body {
+    margin: 0;
+    font-family: -apple-system, "Segoe UI", Roboto, sans-serif;
+    background: var(--bg);
+    color: var(--text);
+    padding: 24px;
+  }
+  header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 24px;
+    padding-bottom: 16px;
+    border-bottom: 1px solid var(--border);
+    flex-wrap: wrap;
+    gap: 12px;
+  }
+  h1 {
+    margin: 0;
+    font-size: 22px;
+    font-weight: 600;
+  }
+  .progress {
+    font-size: 14px;
+    color: var(--muted);
+  }
+  .progress strong {
+    color: var(--accent);
+    font-size: 18px;
+  }
+  .controls {
+    display: flex;
+    gap: 8px;
+    flex-wrap: wrap;
+  }
+  button {
+    background: var(--panel);
+    color: var(--text);
+    border: 1px solid var(--border);
+    padding: 8px 16px;
+    border-radius: 4px;
+    font-size: 13px;
+    cursor: pointer;
+    font-family: inherit;
+  }
+  button:hover { background: var(--hover); }
+  button.primary { background: var(--accent); color: #fff; border-color: var(--accent); }
+  button.primary:hover { background: #5a99ef; }
+  .group {
+    margin-bottom: 24px;
+  }
+  .group-header {
+    font-size: 13px;
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    color: var(--muted);
+    margin-bottom: 8px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+  }
+  .group-header .group-count {
+    font-size: 12px;
+  }
+  .grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+    gap: 6px;
+  }
+  .item {
+    background: var(--panel);
+    border: 1px solid var(--border);
+    border-radius: 4px;
+    padding: 8px 12px;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+    font-family: "Consolas", "SF Mono", Menlo, monospace;
+    font-size: 13px;
+    cursor: pointer;
+    user-select: none;
+    transition: background 0.1s, border-color 0.1s;
+  }
+  .item:hover { background: var(--hover); }
+  .item.done {
+    border-color: var(--done);
+    background: rgba(76, 175, 80, 0.08);
+  }
+  .item.done .name {
+    text-decoration: line-through;
+    color: var(--muted);
+  }
+  .item input[type="checkbox"] {
+    width: 16px;
+    height: 16px;
+    accent-color: var(--done);
+    cursor: pointer;
+    margin: 0;
+    flex-shrink: 0;
+  }
+  .item .name { flex: 1; }
+  .item .edges {
+    font-size: 10px;
+    color: var(--muted);
+    font-family: -apple-system, "Segoe UI", Roboto, sans-serif;
+    text-transform: uppercase;
+    letter-spacing: 0.04em;
+  }
+  .copy-btn {
+    background: transparent;
+    color: var(--muted);
+    border: 1px solid var(--border);
+    border-radius: 3px;
+    padding: 2px 6px;
+    font-size: 11px;
+    font-family: inherit;
+    cursor: pointer;
+    flex-shrink: 0;
+    transition: all 0.1s;
+  }
+  .copy-btn:hover {
+    color: var(--text);
+    border-color: var(--accent);
+  }
+  .copy-btn.copied {
+    color: var(--done);
+    border-color: var(--done);
+  }
+  footer {
+    margin-top: 32px;
+    padding-top: 16px;
+    border-top: 1px solid var(--border);
+    color: var(--muted);
+    font-size: 12px;
+    text-align: center;
+  }
+  input[type="file"] { display: none; }
+</style>
+</head>
+<body>
+
+<header>
+  <div>
+    <h1>Road Sprite Checklist</h1>
+    <div class="progress"><strong id="completed">0</strong> / <span id="total">63</span> complete</div>
+  </div>
+  <div class="controls">
+    <button id="checkAll">Check All</button>
+    <button id="uncheckAll">Uncheck All</button>
+    <button id="loadBtn">Load…</button>
+    <button id="saveBtn" class="primary">Save</button>
+    <input type="file" id="fileInput" accept=".json">
+  </div>
+</header>
+
+<main id="lists"></main>
+
+<footer>
+  State auto-saves to browser localStorage on every change. Use <em>Save</em> to download a JSON backup, <em>Load</em> to restore.
+</footer>
+
+<script>
+const SPRITES = [
+  { group: "1 edge (6)", items: [
+    "Road_100000", "Road_010000", "Road_001000",
+    "Road_000100", "Road_000010", "Road_000001",
+  ]},
+  { group: "2 edges (15)", items: [
+    "Road_110000", "Road_101000", "Road_100100",
+    "Road_100010", "Road_100001", "Road_011000",
+    "Road_010100", "Road_010010", "Road_010001",
+    "Road_001100", "Road_001010", "Road_001001",
+    "Road_000110", "Road_000101", "Road_000011",
+  ]},
+  { group: "3 edges (20)", items: [
+    "Road_111000", "Road_110100", "Road_110010",
+    "Road_110001", "Road_101100", "Road_101010",
+    "Road_101001", "Road_100110", "Road_100101",
+    "Road_100011", "Road_011100", "Road_011010",
+    "Road_011001", "Road_010110", "Road_010101",
+    "Road_010011", "Road_001110", "Road_001101",
+    "Road_001011", "Road_000111",
+  ]},
+  { group: "4 edges (15)", items: [
+    "Road_111100", "Road_111010", "Road_111001",
+    "Road_110110", "Road_110101", "Road_110011",
+    "Road_101110", "Road_101101", "Road_101011",
+    "Road_100111", "Road_011110", "Road_011101",
+    "Road_011011", "Road_010111", "Road_001111",
+  ]},
+  { group: "5 edges (6)", items: [
+    "Road_111110", "Road_111101", "Road_111011",
+    "Road_110111", "Road_101111", "Road_011111",
+  ]},
+  { group: "6 edges (1)", items: [
+    "Road_111111",
+  ]},
+];
+
+const EDGE_LABELS = ["NE", "E", "SE", "SW", "W", "NW"];
+const STORAGE_KEY = "hs_road_checklist_v1";
+
+function decodeEdges(name) {
+  const bits = name.replace("Road_", "");
+  const active = [];
+  for (let i = 0; i < 6; i++) {
+    if (bits[i] === "1") active.push(EDGE_LABELS[i]);
+  }
+  return active.join(", ");
+}
+
+function copyToClipboard(text, btn) {
+  const flashCopied = () => {
+    const orig = btn.textContent;
+    btn.textContent = "copied!";
+    btn.classList.add("copied");
+    setTimeout(() => {
+      btn.textContent = orig;
+      btn.classList.remove("copied");
+    }, 900);
+  };
+
+  // Try modern API first (requires secure context — works in https/localhost; file:// may block).
+  if (navigator.clipboard && window.isSecureContext) {
+    navigator.clipboard.writeText(text).then(flashCopied).catch(() => fallbackCopy(text, flashCopied));
+  } else {
+    fallbackCopy(text, flashCopied);
+  }
+}
+
+function fallbackCopy(text, onSuccess) {
+  const ta = document.createElement("textarea");
+  ta.value = text;
+  ta.setAttribute("readonly", "");
+  ta.style.position = "fixed";
+  ta.style.top = "-1000px";
+  ta.style.opacity = "0";
+  document.body.appendChild(ta);
+  ta.select();
+  try {
+    const ok = document.execCommand("copy");
+    if (ok) onSuccess();
+    else alert("Copy failed. Text: " + text);
+  } catch (err) {
+    alert("Copy failed: " + err.message);
+  }
+  document.body.removeChild(ta);
+}
+
+function loadState() {
+  try {
+    const raw = localStorage.getItem(STORAGE_KEY);
+    return raw ? JSON.parse(raw) : {};
+  } catch { return {}; }
+}
+
+function saveState(state) {
+  try { localStorage.setItem(STORAGE_KEY, JSON.stringify(state)); } catch {}
+}
+
+let state = loadState();
+
+function render() {
+  const main = document.getElementById("lists");
+  main.innerHTML = "";
+
+  for (const group of SPRITES) {
+    const groupDiv = document.createElement("div");
+    groupDiv.className = "group";
+
+    const doneInGroup = group.items.filter(n => state[n]).length;
+    const header = document.createElement("div");
+    header.className = "group-header";
+    header.innerHTML = `<span>${group.group}</span><span class="group-count">${doneInGroup} / ${group.items.length}</span>`;
+    groupDiv.appendChild(header);
+
+    const grid = document.createElement("div");
+    grid.className = "grid";
+
+    for (const name of group.items) {
+      const item = document.createElement("label");
+      item.className = "item" + (state[name] ? " done" : "");
+
+      const cb = document.createElement("input");
+      cb.type = "checkbox";
+      cb.checked = !!state[name];
+      cb.addEventListener("change", () => {
+        state[name] = cb.checked;
+        saveState(state);
+        render();
+      });
+
+      const nameSpan = document.createElement("span");
+      nameSpan.className = "name";
+      nameSpan.textContent = name;
+
+      const edgesSpan = document.createElement("span");
+      edgesSpan.className = "edges";
+      edgesSpan.textContent = decodeEdges(name);
+
+      const copyBtn = document.createElement("button");
+      copyBtn.className = "copy-btn";
+      copyBtn.textContent = "copy";
+      copyBtn.title = `Copy "${name}.png" to clipboard`;
+      copyBtn.addEventListener("click", (e) => {
+        e.preventDefault();
+        e.stopPropagation();
+        copyToClipboard(`${name}.png`, copyBtn);
+      });
+
+      item.appendChild(cb);
+      item.appendChild(nameSpan);
+      item.appendChild(edgesSpan);
+      item.appendChild(copyBtn);
+      grid.appendChild(item);
+    }
+
+    groupDiv.appendChild(grid);
+    main.appendChild(groupDiv);
+  }
+
+  const total = SPRITES.reduce((sum, g) => sum + g.items.length, 0);
+  const completed = Object.values(state).filter(Boolean).length;
+  document.getElementById("completed").textContent = completed;
+  document.getElementById("total").textContent = total;
+}
+
+document.getElementById("checkAll").addEventListener("click", () => {
+  for (const group of SPRITES) for (const n of group.items) state[n] = true;
+  saveState(state); render();
+});
+document.getElementById("uncheckAll").addEventListener("click", () => {
+  if (!confirm("Uncheck all sprites?")) return;
+  state = {};
+  saveState(state); render();
+});
+
+document.getElementById("saveBtn").addEventListener("click", () => {
+  const payload = {
+    savedAt: new Date().toISOString(),
+    state: state,
+  };
+  const blob = new Blob([JSON.stringify(payload, null, 2)], { type: "application/json" });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = `road-checklist-${new Date().toISOString().slice(0,10)}.json`;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+});
+
+document.getElementById("loadBtn").addEventListener("click", () => {
+  document.getElementById("fileInput").click();
+});
+document.getElementById("fileInput").addEventListener("change", (e) => {
+  const file = e.target.files[0];
+  if (!file) return;
+  const reader = new FileReader();
+  reader.onload = () => {
+    try {
+      const parsed = JSON.parse(reader.result);
+      const loaded = parsed.state || parsed;
+      if (typeof loaded !== "object" || loaded === null) throw new Error("invalid file");
+      state = loaded;
+      saveState(state);
+      render();
+    } catch (err) {
+      alert("Could not load file: " + err.message);
+    }
+  };
+  reader.readAsText(file);
+  e.target.value = "";
+});
+
+render();
+</script>
+
+</body>
+</html>

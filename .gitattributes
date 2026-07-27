@@ -1,0 +1,82 @@
+# Hammer and Sickle — git attributes.
+#
+# Deliberately does NOT set `* text=auto`: the 210 .cs files were committed under the
+# old code-only policy with their existing line endings, and a global renormalization
+# would rewrite every one of them in a single noise commit. Leave source alone.
+
+# --- Unity YAML -----------------------------------------------------------
+# Asset Serialization is ForceText (ProjectSettings/EditorSettings.asset,
+# m_SerializationMode: 2), so scenes/prefabs/materials are diffable YAML.
+# merge=unityyamlmerge engages Unity's SmartMerge when it is configured in
+# .git/config; without it git falls back to the normal merge, harmlessly.
+# eol=lf because Unity WRITES lf: core.autocrlf is true on this machine, so without it
+# every .meta and .unity would be checked out CRLF and rewritten LF by Unity on every
+# touch. Pinning lf keeps the working copy byte-identical to what Unity produces.
+*.unity           text eol=lf merge=unityyamlmerge
+*.prefab          text eol=lf merge=unityyamlmerge
+*.mat             text eol=lf merge=unityyamlmerge
+*.anim            text eol=lf merge=unityyamlmerge
+*.controller      text eol=lf merge=unityyamlmerge
+*.overrideController text eol=lf merge=unityyamlmerge
+*.physicMaterial  text eol=lf merge=unityyamlmerge
+*.physicsMaterial2D text eol=lf merge=unityyamlmerge
+*.playable        text eol=lf merge=unityyamlmerge
+*.mask            text eol=lf merge=unityyamlmerge
+*.meta            text eol=lf merge=unityyamlmerge
+*.asset           text eol=lf merge=unityyamlmerge
+
+# --- Text formats ---------------------------------------------------------
+# ⚠ *.cs gets diff=csharp but deliberately NOT the `text` attribute. The 210 files
+# committed under the old policy already carry their line endings in history; adding
+# `text` would renormalize all of them into one meaningless whole-repo diff.
+*.cs              diff=csharp
+*.shader          text eol=lf
+*.hlsl            text eol=lf
+*.cginc           text eol=lf
+*.json            text eol=lf
+*.md              text
+*.map             text eol=lf
+*.oob             text eol=lf
+*.manifest        text eol=lf
+*.aii             text eol=lf
+*.brf             text eol=lf
+
+# --- Git LFS: binaries ----------------------------------------------------
+# Art is ~200 MB across ~1000 files. Plain git would put every revision of every
+# texture into history and every clone would pay for all of it forever.
+*.png             filter=lfs diff=lfs merge=lfs -text
+*.jpg             filter=lfs diff=lfs merge=lfs -text
+*.jpeg            filter=lfs diff=lfs merge=lfs -text
+*.gif             filter=lfs diff=lfs merge=lfs -text
+*.bmp             filter=lfs diff=lfs merge=lfs -text
+*.tga             filter=lfs diff=lfs merge=lfs -text
+*.tif             filter=lfs diff=lfs merge=lfs -text
+*.tiff            filter=lfs diff=lfs merge=lfs -text
+*.psd             filter=lfs diff=lfs merge=lfs -text
+*.exr             filter=lfs diff=lfs merge=lfs -text
+*.hdr             filter=lfs diff=lfs merge=lfs -text
+*.ico             filter=lfs diff=lfs merge=lfs -text
+
+# Audio (StreamingAssets — ambient, briefings, music, SFX)
+*.wav             filter=lfs diff=lfs merge=lfs -text
+*.mp3             filter=lfs diff=lfs merge=lfs -text
+*.ogg             filter=lfs diff=lfs merge=lfs -text
+*.aif             filter=lfs diff=lfs merge=lfs -text
+*.aiff            filter=lfs diff=lfs merge=lfs -text
+
+# Fonts
+*.ttf             filter=lfs diff=lfs merge=lfs -text
+*.otf             filter=lfs diff=lfs merge=lfs -text
+
+# Models / video / archives / native libs
+*.fbx             filter=lfs diff=lfs merge=lfs -text
+*.obj             filter=lfs diff=lfs merge=lfs -text
+*.blend           filter=lfs diff=lfs merge=lfs -text
+*.mp4             filter=lfs diff=lfs merge=lfs -text
+*.mov             filter=lfs diff=lfs merge=lfs -text
+*.zip             filter=lfs diff=lfs merge=lfs -text
+*.7z              filter=lfs diff=lfs merge=lfs -text
+*.dll             filter=lfs diff=lfs merge=lfs -text
+*.so              filter=lfs diff=lfs merge=lfs -text
+*.dylib           filter=lfs diff=lfs merge=lfs -text
+*.bundle          filter=lfs diff=lfs merge=lfs -text

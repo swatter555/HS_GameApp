@@ -1,0 +1,11 @@
+fileFormatVersion: 2
+guid: e542cd707989475478978a989229a8fa
+ShaderImporter:
+  externalObjects: {}
+  defaultTextures:
+  - _TerrainArray: {fileID: 18700000, guid: 16abecab16d4a404a8f1108490ac26c1, type: 2}
+  - _NoiseTex: {fileID: 2800000, guid: 97e9095816d85bc4c8e633c7233e6888, type: 3}
+  nonModifiableTextures: []
+  userData: 
+  assetBundleName: 
+  assetBundleVariant: 

@@ -1,29 +1,77 @@
-# Hammer and Sickle — code-only repository.
-# Policy: track ONLY C# source (*.cs) and this .gitignore. Everything else
-# (Unity assets, meta files, generated folders, binaries) is ignored.
+# Hammer and Sickle — Unity project repository.
+#
+# POLICY CHANGED 2026-07-27: OPT-OUT. Everything is tracked unless it appears below.
+# The previous policy was opt-in (`*` then `!*.cs`), which tracked 210 source files and
+# nothing else — no .meta, no ProjectSettings, no scenes. That repo could not rebuild a
+# working project: a clone regenerates every GUID, so all prefab/scene -> script
+# references break, and the Unity layer setup (layer 7 / NoVolumeRendering, sorting
+# layers), the Script Execution Order list and every Inspector wiring were unbacked.
+#
+# It also failed the same way an unassigned click-through slot does: SILENTLY, by
+# omission. A new file type was simply never tracked and nothing said so. Opt-out fails
+# loudly instead — unwanted files appear in `git status` where they can be seen.
 
-# --- Ignore everything by default ---
-*
-
-# --- but let git descend into directories so it can find .cs files ---
-!*/
-
-# --- keep C# source and this ignore file ---
-!*.cs
-!.gitignore
-
-# --- Re-ignore generated / external folders ENTIRELY (even .cs inside them).
-#     These must come last so they win over the !*/ rule above.
+# --- Unity generated folders (rebuilt on open) ---------------------------
 /[Ll]ibrary/
 /[Tt]emp/
 /[Oo]bj/
 /[Bb]uild/
 /[Bb]uilds/
 /[Ll]ogs/
+/[Uu]ser[Ss]ettings/
 /[Mm]emoryCaptures/
 /[Rr]ecordings/
-/[Uu]ser[Ss]ettings/
+
+# --- IDE / tooling -------------------------------------------------------
 .vs/
+.idea/
 .gradle/
 .consulo/
 .utmp/
+*.csproj
+*.sln
+*.user
+*.userprefs
+*.pidb
+*.booproj
+*.svd
+*.suo
+*.unityproj
+*.tmp
+
+# --- OS ------------------------------------------------------------------
+.DS_Store
+Thumbs.db
+desktop.ini
+
+# --- Build / crash artifacts ---------------------------------------------
+sysinfo.txt
+*.apk
+*.aab
+*.unitypackage
+*.app
+crashlytics-build.properties
+
+# --- GENERATED ASSETS — rebuilt by Editor tools, must NEVER be committed --
+# TerrainArray_MiddleEast.asset is 288 MB and TestArray_RGB.asset is 8 MB. GitHub
+# HARD-REJECTS any single file over 100 MB, so the terrain array cannot go into plain
+# git at all, and putting it in LFS would burn ~29% of the 1 GB free quota per revision.
+# Both are outputs of Assets/Editor/Chunked:
+#   TerrainArray_* <- TextureArrayBuilder      (terrain PNGs in Assets/Art/HexTiles)
+#   TestArray_*    <- HexBlendTestAssetBuilder (Phase 1 POC assets)
+# ⚠ REBUILD STEP AFTER A FRESH CLONE — see Claude_Project §3.5c. The rebuilt asset gets
+# a NEW GUID, so anything holding a serialized reference to it must be re-pointed.
+/Assets/Resources/Chunked/TerrainArray_*.asset
+/Assets/Resources/Chunked/TerrainArray_*.asset.meta
+/Assets/Resources/Chunked/TestArray_*.asset
+/Assets/Resources/Chunked/TestArray_*.asset.meta
+
+# --- NOT ignored, deliberately, against the obvious instinct --------------
+# Assets/Generated Data/  — this is the LIVE scenario load path, not build output.
+#   ScenarioManifest.GetMapFilePath/GetOobFilePath/GetAiiFilePath/GetBriefingFilePath
+#   and OOBFileLoader resolve through AppService.GDP_* = Application.dataPath +
+#   "Generated Data". A clone without it has code but no content and cannot load a
+#   scenario. It grows with the campaign, but it is text JSON; if .map files ever get
+#   heavy, add them to LFS in .gitattributes rather than dropping them from the repo.
+# Packages/            — manifest.json, packages-lock.json AND the extracted NuGet
+#   dependencies Main.asmdef compiles against. Without them a clone does not build.

@@ -958,38 +958,50 @@ namespace HammerAndSickle.Services
         }
 
         /// <summary>
-        /// Applies boundary constraints to scroll input based on current view position
+        /// Applies boundary constraints to scroll input based on current view position.
+        /// Hard stop and soft stop are both PER AXIS and act ONLY on motion heading OUT of bounds —
+        /// motion heading back inside is never touched.
+        ///
+        /// ⚠ FIXED 2026-07-27: the previous version multiplied the WHOLE vector by one isotropic factor
+        /// taken from <c>GetBoundaryProximity</c> (distance to the NEAREST edge, floored at 0). At or past
+        /// any boundary that factor was 0, so every direction zeroed — including back toward the map — and
+        /// the camera was stranded until a <c>CenterOnPosition</c> teleported it inside. Damping off the
+        /// nearest edge also meant approaching the left edge throttled VERTICAL scrolling.
         /// </summary>
         private Vector2 ApplyBoundaryConstraints(Vector2 input)
         {
             if (scrollBounds == null) return input;
 
-            Vector2 constrainedInput = input;
-            Vector2 predictedPosition = CurrentViewPosition + input;
+            return new Vector2(
+                ConstrainScrollAxis(input.x, CurrentViewPosition.x, scrollBounds.Min.x, scrollBounds.Max.x),
+                ConstrainScrollAxis(input.y, CurrentViewPosition.y, scrollBounds.Min.y, scrollBounds.Max.y));
+        }
 
-            // Check if we're at or would exceed boundaries
-            if (predictedPosition.x <= scrollBounds.Min.x && input.x < 0)
-                constrainedInput.x = Mathf.Max(0, scrollBounds.Min.x - CurrentViewPosition.x);
-            else if (predictedPosition.x >= scrollBounds.Max.x && input.x > 0)
-                constrainedInput.x = Mathf.Min(0, scrollBounds.Max.x - CurrentViewPosition.x);
+        /// <summary>
+        /// Constrains one axis of scroll input: blocks motion that has already left [min, max] on that axis
+        /// and eases motion approaching the edge it is heading for. Returns inward motion unchanged, which is
+        /// what makes an out-of-bounds camera recoverable by scrolling.
+        ///
+        /// Headroom and SoftStopDistance are both WORLD units, so the ramp is unaffected by the caller's
+        /// units — the old code predicted a landing position from a raw −1..1 axis value while the real step
+        /// was <c>axis × scrollSpeed × deltaTime</c>, which is how the camera got past the edge in the first place.
+        /// </summary>
+        private float ConstrainScrollAxis(float input, float position, float min, float max)
+        {
+            if (Mathf.Approximately(input, 0f)) return 0f;
 
-            if (predictedPosition.y <= scrollBounds.Min.y && input.y < 0)
-                constrainedInput.y = Mathf.Max(0, scrollBounds.Min.y - CurrentViewPosition.y);
-            else if (predictedPosition.y >= scrollBounds.Max.y && input.y > 0)
-                constrainedInput.y = Mathf.Min(0, scrollBounds.Max.y - CurrentViewPosition.y);
+            // Distance to the edge THIS input is heading toward; <= 0 means already at or past it.
+            float headroom = input > 0f ? max - position : position - min;
+            if (headroom <= 0f) return 0f;
 
-            // Apply soft stops if enabled
-            if (scrollBounds.EnableSoftStops && scrollBounds.SoftStopDistance > 0)
+            if (scrollBounds.EnableSoftStops
+                && scrollBounds.SoftStopDistance > 0f
+                && headroom < scrollBounds.SoftStopDistance)
             {
-                float proximity = scrollBounds.GetBoundaryProximity(CurrentViewPosition);
-                if (proximity < scrollBounds.SoftStopDistance)
-                {
-                    float softStopMultiplier = proximity / scrollBounds.SoftStopDistance;
-                    constrainedInput *= softStopMultiplier;
-                }
+                input *= headroom / scrollBounds.SoftStopDistance;
             }
 
-            return constrainedInput;
+            return input;
         }
 
         /// <summary>

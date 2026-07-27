@@ -1,0 +1,113 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!687078895 &4343727234628468602
+SpriteAtlas:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_Name: Movement Overlays
+  m_EditorData:
+    serializedVersion: 2
+    textureSettings:
+      serializedVersion: 2
+      anisoLevel: 0
+      compressionQuality: 0
+      maxTextureSize: 0
+      textureCompression: 0
+      filterMode: 1
+      generateMipMaps: 1
+      readable: 0
+      crunchedCompression: 0
+      sRGB: 1
+    platformSettings:
+    - serializedVersion: 4
+      m_BuildTarget: DefaultTexturePlatform
+      m_MaxTextureSize: 2048
+      m_ResizeAlgorithm: 0
+      m_TextureFormat: -1
+      m_TextureCompression: 2
+      m_CompressionQuality: 50
+      m_CrunchedCompression: 0
+      m_AllowsAlphaSplitting: 0
+      m_Overridden: 0
+      m_IgnorePlatformSupport: 0
+      m_AndroidETC2FallbackOverride: 0
+      m_ForceMaximumCompressionQuality_BC6H_BC7: 0
+    packingSettings:
+      serializedVersion: 2
+      padding: 2
+      blockOffset: 0
+      allowAlphaSplitting: 0
+      enableRotation: 0
+      enableTightPacking: 0
+      enableAlphaDilation: 0
+    secondaryTextureSettings: {}
+    variantMultiplier: 1
+    packables:
+    - {fileID: 21300000, guid: 8548b7ff7a1d65d4ba053d2aa143b9ed, type: 3}
+    - {fileID: 21300000, guid: 1b890ffc3b295ee4a8d2b72ac717fde8, type: 3}
+    - {fileID: 21300000, guid: e7429e3cd1719014aa397e212fca87df, type: 3}
+    - {fileID: 21300000, guid: 694620453acc0a849b7a494c985c4613, type: 3}
+    - {fileID: 21300000, guid: f6d554109384807479f7942fb7572f67, type: 3}
+    - {fileID: 21300000, guid: 8ba01c84d66802b4a8ebc6cbd65b20e4, type: 3}
+    - {fileID: 21300000, guid: 36effecbb4949154aab4e70471ee949a, type: 3}
+    - {fileID: 21300000, guid: 34f9f8de8d1dfcd44b883931d7d97495, type: 3}
+    - {fileID: 21300000, guid: 4c8fdc32ad0aac947857abce7a010ea1, type: 3}
+    - {fileID: 21300000, guid: a70ccbae5ca954949ab591340e2e3c27, type: 3}
+    - {fileID: 21300000, guid: b0390203a9cab9e448526e1cdec065cb, type: 3}
+    - {fileID: 21300000, guid: 8387607bac74a1449986c84b58b7ae23, type: 3}
+    - {fileID: 21300000, guid: 6b96817d9948146498139277733fb6ef, type: 3}
+    - {fileID: 21300000, guid: 7cf0d900744769443b9501e2e807b9df, type: 3}
+    bindAsDefault: 1
+    isAtlasV2: 0
+    cachedData: {fileID: 0}
+    packedSpriteRenderDataKeys:
+    - 7cf0d900744769443b9501e2e807b9df: 21300000
+    - f6d554109384807479f7942fb7572f67: 21300000
+    - 4c8fdc32ad0aac947857abce7a010ea1: 21300000
+    - b0390203a9cab9e448526e1cdec065cb: 21300000
+    - 8ba01c84d66802b4a8ebc6cbd65b20e4: 21300000
+    - 694620453acc0a849b7a494c985c4613: 21300000
+    - 8387607bac74a1449986c84b58b7ae23: 21300000
+    - 36effecbb4949154aab4e70471ee949a: 21300000
+    - e7429e3cd1719014aa397e212fca87df: 21300000
+    - 1b890ffc3b295ee4a8d2b72ac717fde8: 21300000
+    - 6b96817d9948146498139277733fb6ef: 21300000
+    - a70ccbae5ca954949ab591340e2e3c27: 21300000
+    - 34f9f8de8d1dfcd44b883931d7d97495: 21300000
+    - 8548b7ff7a1d65d4ba053d2aa143b9ed: 21300000
+  m_MasterAtlas: {fileID: 0}
+  m_PackedSprites:
+  - {fileID: 21300000, guid: 7cf0d900744769443b9501e2e807b9df, type: 3}
+  - {fileID: 21300000, guid: f6d554109384807479f7942fb7572f67, type: 3}
+  - {fileID: 21300000, guid: 4c8fdc32ad0aac947857abce7a010ea1, type: 3}
+  - {fileID: 21300000, guid: b0390203a9cab9e448526e1cdec065cb, type: 3}
+  - {fileID: 21300000, guid: 8ba01c84d66802b4a8ebc6cbd65b20e4, type: 3}
+  - {fileID: 21300000, guid: 694620453acc0a849b7a494c985c4613, type: 3}
+  - {fileID: 21300000, guid: 8387607bac74a1449986c84b58b7ae23, type: 3}
+  - {fileID: 21300000, guid: 36effecbb4949154aab4e70471ee949a, type: 3}
+  - {fileID: 21300000, guid: e7429e3cd1719014aa397e212fca87df, type: 3}
+  - {fileID: 21300000, guid: 1b890ffc3b295ee4a8d2b72ac717fde8, type: 3}
+  - {fileID: 21300000, guid: 6b96817d9948146498139277733fb6ef, type: 3}
+  - {fileID: 21300000, guid: a70ccbae5ca954949ab591340e2e3c27, type: 3}
+  - {fileID: 21300000, guid: 34f9f8de8d1dfcd44b883931d7d97495, type: 3}
+  - {fileID: 21300000, guid: 8548b7ff7a1d65d4ba053d2aa143b9ed, type: 3}
+  m_PackedSpriteNamesToIndex:
+  - ThreatFill_Red
+  - FacingChevron_SW
+  - MoveRangeFill
+  - TargetPickOutline
+  - FacingChevron_W
+  - FacingChevron_SE
+  - ThreatFill_Amber
+  - MovePathEnd
+  - FacingChevron_NW
+  - FacingChevron_NE
+  - ThreatFill_DeepRed
+  - MoveRangeZocStop
+  - MovePathStep
+  - FacingChevron_E
+  m_RenderDataMap: {}
+  m_Tag: Movement Overlays
+  m_IsVariant: 0
