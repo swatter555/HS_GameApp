@@ -77,7 +77,7 @@ namespace HammerAndSickle.Helpers
     /// <summary>
     /// A flat data representation of a leader for serialization to/from OOB files.
     /// The Scenario Editor generates leaders with:
-    ///   - CommandGrade/CommandAbility as integer enum values
+    ///   - CommandGrade/CommandAbility as enum NAMES or integers (both accepted since 2026-07-28)
     ///   - UnitID linking the leader to its assigned combat unit
     ///   - UnlockedSkills as an empty array (skills are unlocked in-game)
     /// </summary>
@@ -86,12 +86,25 @@ namespace HammerAndSickle.Helpers
     {
         public string LeaderName { get; set; }
         public string UnitID { get; set; }
-        public int Side { get; set; }
-        public int Nationality { get; set; }
-        public int CommandGrade { get; set; }
-        public int CommandAbility { get; set; }
+
+        // ⚠ ENUM-TYPED since 2026-07-28, for the same reason as OobUnitData — and this class was MISSED in
+        // that sweep, which the scenario-editor agent caught by reading the file. While these were `int`,
+        // a name-form leader entry would have thrown on deserialize and taken the WHOLE .oob down with it,
+        // units and all. Enum-typed, the converter accepts either form.
+        public Side Side { get; set; }
+        public Nationality Nationality { get; set; }
+
+        // ⚠ CommandGrade is NOT zero-indexed — JuniorGrade = 1 (GameData.cs:241). An absent or 0-valued
+        // field would otherwise deserialize to an UNDEFINED enum value that passes every cast silently, so
+        // the default is set explicitly here rather than left to default(CommandGrade).
+        public CommandGrade CommandGrade { get; set; } = CommandGrade.JuniorGrade;
+        public CommandAbility CommandAbility { get; set; } = CommandAbility.Average;
+
         public int ReputationPoints { get; set; }
         public string PortraitId { get; set; }
+
+        // Skill IDs as strings; the editor always writes []. Skills are unlocked in-game, and saves persist
+        // them through SkillReference (name-first), so no enum ordinal is involved on either side.
         public List<string> UnlockedSkills { get; set; } = new List<string>();
     }
 
@@ -473,10 +486,11 @@ namespace HammerAndSickle.Helpers
                         continue;
                     }
 
-                    var commandAbility = (CommandAbility)ld.CommandAbility;
-                    var side = (Side)ld.Side;
-                    var nationality = (Nationality)ld.Nationality;
-                    var commandGrade = (CommandGrade)ld.CommandGrade;
+                    // No casts — the DTO is enum-typed and the converter has already parsed either form.
+                    var commandAbility = ld.CommandAbility;
+                    var side = ld.Side;
+                    var nationality = ld.Nationality;
+                    var commandGrade = ld.CommandGrade;
 
                     // Create leader using the standard constructor: (name, side, nationality, commandAbility)
                     var leader = new Leader(ld.LeaderName, side, nationality, commandAbility);
