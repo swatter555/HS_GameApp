@@ -37,8 +37,12 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
     and friends are written to saves and to shipped content. Because they now persist BY NAME, members may
     be added or reordered freely — but a RENAME silently breaks every existing save and content file, so it
     is a breaking change that must ship with a `SAVE_VERSION` bump and a migration step.
-12. **Every `SAVE_VERSION` bump ships with its migration step** in `SnapshotMapper.UpgradeSnapshot`. The
+12. **Every `SAVE_VERSION` bump ships with its migration step** in `SnapshotMapper.MigrateStep`. The
     ladder throws if a step is missing rather than loading mismatched data.
+    ⚠ **PRE-1.0 EXCEPTION, and it expires:** while `MINIMUM_SUPPORTED_SAVE_VERSION` tracks `SAVE_VERSION`
+    (Bob's clean-break ruling), an older save is REFUSED by the floor check before the ladder is entered,
+    so a step for it would be unreachable code pretending to be a migration — bump without one. The moment
+    1.0 ships, freeze `MINIMUM` and this exception is over: every later bump needs a real step.
 13. **Buttons: the Inspector owns onClick — never write `onClick.AddListener`.** Expose a public
     `OnXButton()` callback and Bob wires it. A script holds a serialized `Button` reference ONLY when it
     must drive that button's *state* (`interactable`, label, visibility), never to wire it.

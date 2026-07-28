@@ -1,5 +1,12 @@
 # todo.md — CONTENT PIPELINE PASS: shipping scenarios & campaigns, patch-safe
 
+> **STATUS 2026-07-28 — PHASES 0, 1, 3 and 4 ARE CLOSED. Only PHASE 2 (campaign as data) remains, and Bob
+> deferred it:** the `Campaigns/grand_campaign/m01_khost/` files are a layout MOCKUP, and only one real
+> scenario exists. What shipped: shipped content lives read-only in StreamingAssets, **a scenario is a
+> folder and nothing else** (no code change to add one), all content is name-form, the save carries a
+> provenance header and addresses campaign progress by string id, and the migration ladder is tested.
+> Everything below is kept as the reasoning record; the Phase 2 plan and its findings are at the bottom.
+
 **Goal (Bob, 2026-07-27):** one comprehensive design for scenarios AND campaign scenarios that makes
 post-release patching as cheap and safe as possible. **Explicit non-goal: user editing/modding.**
 (Prior PRINTER PASS slice is landed, green and Bob-confirmed — record lives in Claude_TODO.)
@@ -80,10 +87,12 @@ Fix: an explicit `Migrate(snap)` chain — v3→v4→v5, each step a named metho
 - [x] **0.3 Rules recorded in CLAUDE.md §2** as items 10–12: all JSON through `JsonPolicy`; persisted enums
       are never RENAMED (add/reorder is now free — rename is the only breaking operation); every
       `SAVE_VERSION` bump ships with its migration step.
-- [ ] **0.4 ⚠ FOLLOW-UP — shipped content does not GAIN the protection until it is RE-EMITTED with string
-      enums.** The reader tolerates both forms, so the ordinal fragility is still latent inside the shipped
-      `khost.map` / `khost.oob`: it only bites the day a member is INSERTED mid-enum (appending stays safe
-      even with ints).
+- [x] **0.4 ✅ DONE 2026-07-28 — all shipped content is name-form.** `.map`/`.oob` came back from the
+      scenario editor's re-export (Bob confirmed they load in game, 07-27); `.manifest` was the third
+      content type and still carried `"mapTheme": 0, "difficultyLevel": 1` — converted 07-28.
+      ⚠ The reader tolerates both forms, so a file that regresses to ordinals loads silently and stays
+      fragile until the day a member is INSERTED mid-enum. Name-form is what is being protected; the parse
+      succeeding proves nothing. (Original note kept below for the reasoning.)
       ✅ **CORRECTION 2026-07-27 — re-emitting does NOT invalidate the checksum**, contrary to what I said
       earlier. `MapChecksumUtility.ValidateChecksum` hashes the DESERIALIZED `HexTile[]` re-serialized with
       its own frozen options (`:106`), not the file text, so the on-disk enum representation cannot affect
@@ -92,8 +101,18 @@ Fix: an explicit `Migrate(snap)` chain — v3→v4→v5, each step a named metho
       these files, so a one-time re-emit gets clobbered on the next export. Either the editor learns to write
       string enums, or the game gets a `Tools/Content/Normalize` menu item run after each export. Ask before
       building either.
-- [ ] **0.5 EditorTest** the ladder: below-minimum refused, missing-step throws, a step that fails to
-      advance throws. Cheap, and it locks the contract before any real migration exists.
+- [x] **0.5 ✅ DONE 2026-07-28. NEW `SaveMigrationLadderTests` (9).** Below-minimum refused (naming both
+      versions) · at-minimum accepted · missing step throws · missing step PART WAY UP throws at the right
+      rung · step that fails to advance throws · step that SKIPS a version throws · step returning null
+      throws · well-formed 3→6 chain visits 3,4,5 in order · already-current runs no steps.
+      ⚠ **REQUIRED A TEST SEAM, and the reason is the point:** with the shipping constants
+      `MINIMUM_SUPPORTED == CURRENT`, so every older save is refused by the floor check and the ladder loop
+      is UNREACHABLE — its guards could not be reached through the production entry point at all, and would
+      have been first exercised by the real migration they exist to protect. `UpgradeSnapshot` now delegates
+      to `internal RunMigrationLadder(snap, minimumSupported, currentVersion, stepLookup)`; production passes
+      the real constants, tests inject their own. The switch became `MigrateStep(from)` returning a step or
+      null. NEW `Assets/Scripts/AssemblyInfo.cs` with `[assembly: InternalsVisibleTo("EditorTests")]` —
+      this is the only thing it is for.
 
 ## PHASE 1 — Content location
 
@@ -164,16 +183,191 @@ both compresses and delta-patches well.
       alternate paths", so build the branching DATA SHAPE now even if v1 ships a linear path. Retrofitting a
       graph onto a list is a content migration across every shipped campaign.
 
-## PHASE 3 — The save/content contract (P3, P5)
+---
 
-- [ ] **3.1** Save records `saveVersion` + `gameVersion` (both exist on `GameDataHeader`) + NEW
-      `contentVersion` and the `scenarioId`/`campaignId` it came from.
-- [ ] **3.2** Formalise P5: between-battle campaign saves store core roster + completed results + campaign
-      position BY scenarioId — never a pointer into any scenario's internals. In-battle saves stay
-      self-contained with embedded `MapData`.
-- [ ] **3.3** The one genuine hazard this leaves: a campaign save whose NEXT scenario was removed or renamed by
-      a patch. Handle with a named, specific error and a way forward, not a crash — and treat scenarioId as
-      permanent once shipped.
+# PHASE 1 FINISHED — the last per-scenario hardcode is gone (2026-07-28)
+
+**Bob's scoping call, 2026-07-28:** the files under `Campaigns/grand_campaign/m01_khost/` are a LAYOUT
+MOCKUP — Bob dropped them in to show the shape. Only ONE real scenario exists (Khost, used to exercise
+combat and the AI). **Campaign-as-data (Phase 2) is deferred**; this pass finished the directory/loading
+rework instead.
+
+- [x] **The scenarioId → SceneID switch is DELETED** (`ScenarioDialog_Scene0.OnLoadButton`). It was the last
+      place a scenario had to be known to the EXECUTABLE: shipping one meant adding a scenario-id constant,
+      a `SceneID` member, a switch arm and a build-settings entry, or the player got "Unknown scenario ID"
+      on a scenario the menu had just listed. `SceneID` is now `{ MainMenu = 0, BattleScene = 1 }`, matching
+      build settings; `SCENARIO_ID_MISSION_KHOST`/`_CAMPAIGN_KHOST` are gone. `Scene1_Controller` was
+      already fully generic.
+      ⚠ This also fixed a live crash: `Campaign_Khost = 2` called `LoadSceneAsync(2)` and build settings
+      hold two scenes. Nobody had hit it only because campaign content was never discoverable.
+- [x] **Discovery hardened for scenario #2.** Sorted by display name (`Directory.GetFiles` order is
+      filesystem-dependent, invisible with one scenario), and a duplicate-`scenarioId` warning — a
+      collision is otherwise completely silent, and saves reference scenarios by id.
+- [x] **0.4 CLOSED — `.manifest` converted to name-form** (`"mapTheme": "MiddleEast"`,
+      `"difficultyLevel": "MjGeneral"`). The 27-07 re-export covered `.map`/`.oob`; the manifest was the
+      third content type and still carried ordinals.
+- [x] **Stale-comment sweep:** `JsonPolicy` had a dangling `<see cref>` to the deleted `MapChecksumUtility`
+      and still repeated the "re-emitting changes the checksum" claim that 0.4 disproved.
+
+**NET EFFECT — a scenario is now a FOLDER and nothing else.** Drop one under `Scenarios/`, it is
+discovered, listed and played with no code change and no rebuild.
+
+⚠ **Still code-side, flagged not fixed:** `GameAudioManager.BriefingNarration` is an enum mapping
+`Khost` → `Briefing_Khost.ogg`. It has NO callers and no manifest field, so it is dormant rather than
+broken — but it is the same per-scenario-enum shape as the switch just deleted. When briefing audio is
+switched on, make it a manifest filename like the other four content files.
+
+**Left in the mockup deliberately** (`m01_khost/`): its manifest duplicates the standalone's `scenarioId`
+and `displayName`, and names a briefing file that is not in its folder. Harmless while `Campaigns/` is
+never scanned; all three are Phase 2's problem, recorded under Finding B below.
+
+---
+
+# EXECUTION PLAN — Phase 2 + 3 (agent, 2026-07-28) — ⚠ DEFERRED BY BOB, kept for when campaign work starts
+
+## FINDINGS FROM THE READ-THROUGH — settle these before Phase 2 code
+
+### ⚠ FINDING A — DESIGN-DOC CONTRADICTION. §19.1.6 vs Principle P4.
+
+**DesignDoc §19.1.6:** "Player branch selection driven by scenario victory thresholds (per-scenario
+manifest); **branching paths between branches are scenario-defined**."
+**todo.md P4:** "References point ONE way: campaign → scenario. A scenario must not know whether it belongs
+to a campaign." And 2.1 puts `nextOnVictory`/`nextOnDefeat` on the CAMPAIGN node.
+
+These cannot both hold. Flagging rather than silently encoding, per the standing rule.
+
+**Counter-argument (agent's, and I think §19.1.6 is the one that should move):** if a scenario names its own
+successors it is no longer reusable — the same Khost map cannot appear in two campaigns, and "reshuffle the
+mission order" goes back to being a content edit across every affected SCENARIO file instead of one campaign
+file. That is exactly the patch cost Phase 2 exists to remove.
+
+**Proposed reconciliation — split SCORING from ROUTING.** They are different things and §19.1.6 conflates
+them:
+- **Scenario owns SCORING** — what counts as Decisive/Major/Minor victory here (objectives held, turn
+  used, losses). Intrinsic to the map and its objectives; belongs in the scenario manifest. §19.1.6's
+  "victory thresholds (per-scenario manifest)" is RIGHT and stays.
+- **Campaign owns ROUTING** — which `BattleResult` leads to which next node. Belongs in `campaign.manifest`.
+  The clause "branching paths between branches are scenario-defined" is the part that needs amending.
+
+Under this split §19.1.6 keeps its intent — thresholds still drive branch selection — while the graph stays
+patchable. ⚠ **Neither half exists in code today:** `ScenarioManifest` carries no threshold fields, and
+`BattleManager.CompleteBattle` (:922-924) hardcodes `CurrentResult = BattleResult.Draw` under a TODO. So
+this pass builds the SHAPE the routing reads; the scoring that feeds it is later work (M13-adjacent).
+
+**Needs Bob:** ratify the split and let me amend §19.1.6, or overrule and tell me to put successors on the
+scenario.
+
+### ⚠ FINDING B — the campaign content folder is broken three ways, and this was invisible because
+discovery never scanned `Campaigns/`.
+
+`Campaigns/grand_campaign/m01_khost/campaign_khost.manifest` says:
+1. `"scenarioId": "Mission_Khost"` — **identical to the standalone's id.** Campaign nodes address scenarios
+   BY ID, so a duplicate id is unresolvable. Should be `Campaign_Khost` — the constant already exists
+   (`GameData.SCENARIO_ID_CAMPAIGN_KHOST`, GameData.cs:1513) and is currently used by nothing that works.
+2. `"briefingFilename": "mission_khost.brf"` — but the folder holds `campaign_khost.brf`. The briefing would
+   have loaded "Briefing file not found." the first time anyone opened it.
+3. `"displayName": "Operation Molot"` — also identical, so the two would have appeared as indistinguishable
+   rows in one list.
+
+⚠ **Question for Bob: does the external scenario editor author `.manifest` files, or are they hand-kept?**
+The map/oob are dated 27 Jul (the re-export) but both manifests are 24 Jun — which reads like hand-kept. If
+the editor writes them, my fix gets clobbered on the next export and the fix belongs on their side instead.
+
+### ✅ FINDING C — RESOLVED 2026-07-28. See the Phase 1 section above; the switch is deleted.
+
+### ✅ FINDING D — RESOLVED 2026-07-28 for the shipped scenario. `Scenarios/khost/mission_khost.manifest`
+is name-form. The mockup campaign manifest was left as-is with the rest of the mockup.
+
+---
+
+## THE STEPS
+
+- [x] **S1 — ✅ DONE 2026-07-28.** See Phase 0.5 above.
+- [ ] **S2 — 2.1 + 2.4, `CampaignManifest`.** NEW `Core/Game Data/CampaignManifest.cs`:
+      `campaignId · displayName · description · thumbnailFilename · contentVersion · startingPrestige ·
+      coreForcePointCap · nodes[]`, plus transient `ContentRoot` exactly like `ScenarioManifest`.
+      `CampaignNode { nodeId · scenarioFolder · scenarioId · requiresCompleted[] · outcomes[] }`.
+      **Branch shape (2.4) = outcome EDGES, not `nextOnVictory`/`nextOnDefeat`:**
+      `CampaignEdge { minResult: BattleResult, nextNodeId }`, evaluated best→worst with the first match
+      winning, plus a `nextNodeDefault`. A binary victory/defeat pair cannot express "Decisive opens the
+      Iran branch, Major continues the main line" — which is precisely what §19.1.6 asks for, and the enum
+      to key it on (`BattleResult`, 8 members) already exists. Same cost now, and it is a content migration
+      across every shipped campaign later.
+- [ ] **S3 — 2.2, delete `ScenarioManifest.IsCampaignScenario`** (property + `[JsonConstructor]` param).
+      `BattleManager.IsCampaignBattle` (:447) re-sourced from campaign CONTEXT
+      (`GameDataManager.CurrentCampaign != null`) — note it is currently write-only, nothing reads it.
+      Also delete `ScenarioData.IsCampaignScenario` (GameDataObjects.cs:48), which is a PERSISTED save field
+      → see S6. Old manifests carrying the key still parse (unmapped members are skipped).
+- [ ] **S4 — 2.3, campaign discovery + the menu.** NEW `GameData.CAMPAIGN_EXTENSION = ".campaign"` so the
+      two manifest types are distinguished by EXTENSION, making 2.3's "which manifest type declares them"
+      literal — a recursive `*.manifest` scan of `Campaigns/` would otherwise swallow the mission manifests
+      too. `CampaignLoader` scans `CampaignsRootPath`, stamps `ContentRoot`, and resolves each node's
+      scenario manifest from its own folder. `GameDataManager.CurrentCampaign` + `CurrentNode`.
+      ✅ The SceneID switch that used to belong to this step is already gone (2026-07-28), so a campaign
+      mission needs no scene work — it loads `BattleScene` exactly like a standalone.
+      ⚠ **BOB-GATED UI.** `DefaultDialog_Scene0` already has an unwired `_campaignDialog` slot (:29), so the
+      menu anticipated this. I will write `CampaignDialog_Scene0` as a structural TWIN of
+      `ScenarioDialog_Scene0` — same `UIListBox` + briefing text + thumbnail + Start/Back buttons, same
+      `On*Button()` callback names — so you can duplicate the scenario dialog's prefab and wire it without
+      new layout work. **Nothing lists campaigns in game until you do.**
+- [x] **S5/S6/S7 — ✅ DONE 2026-07-28.** All of Phase 3; see that section above for what shipped and the
+      corrections to its premises. ⚠ ONE PART REMAINS FOR PHASE 2: 3.3 currently resolves a saved
+      **scenarioId**. When campaign nodes exist, extend `VerifyContentAvailable` to also check the NEXT
+      node's scenario and to offer a way back to the menu rather than only naming the failure.
+- [ ] **S8 — content fixes for the campaign mockup** (Finding B): real `scenarioId`, its own `displayName`,
+      the briefing filename that is actually in the folder, name-form enums. ⚠ First answer **who authors
+      `.manifest` files** — if the external scenario editor emits them, the fix belongs on their side or it
+      is clobbered on the next export.
+- [ ] **S9 — docs.** ✅ Claude_Project §1/§7.1/§7.2 and the `JsonPolicy` comments were reconciled 2026-07-28
+      with the Phase 1 finish. Still owed when Phase 2 lands: §4.1, §5, and — if Bob ratifies — the
+      DesignDoc §19.1.6 amendment per Finding A.
+
+**Not in Phase 2 either:** victory-threshold scoring (needs the §19.1.6 ruling AND a real `BattleResult`
+calculation — `CompleteBattle` hardcodes `Draw` today; M13-adjacent), and the
+`Documents/.../scenario data` deletion (Bob's, not in git).
+
+**⚠ Test handoff:** S1 adds EditorTests and S2–S7 touch persistence. I cannot run Unity. When the code is in
+I will ask for a Test Runner pass and will not tick anything green before your result.
+
+## PHASE 3 — The save/content contract (P3, P5) — ✅ COMPLETE 2026-07-28
+
+⚠ **CORRECTION TO 3.1 AS WRITTEN:** it said `saveVersion` + `gameVersion` "both exist on `GameDataHeader`",
+implying saves already carried a header. They did not — `GameDataHeader` was declared in
+`GameDataObjects.cs` and referenced by **nothing**; it was not on `GameStateSnapshot` and no save ever wrote
+one. Only `saveVersion` was persisted. So 3.1 was not "add two fields", it was "put a header on the save at
+all".
+
+⚠ **The bump was FREE, and worth knowing why:** `SaveLoad.SaveAsync`/`LoadAsync` still have **zero callers**
+— save/load is not wired to any UI — so no save exists that these shape changes could strand.
+
+- [x] **3.1 DONE.** `GameStateSnapshot.Header` wired in, carrying `saveTime · gameVersion · contentVersion ·
+      scenarioId · campaignId · combatUnitCount · leaderCount`, stamped by `SnapshotMapper.BuildHeader`.
+      ⚠ It deliberately carries **no `version`** — `GameStateSnapshot.SaveVersion` is the ONE authority the
+      ladder keys off, and a save reporting two versions that can disagree is worse than one reporting none.
+      ⚠ And the old **`checksum` field is DELETED**: never computed, never validated — precisely the shape
+      that produced the false "MapLoader checksum-validates" claim and the phase built on it. Integrity
+      checking ships with its verifier or not at all.
+      NEW `ScenarioManifest.ContentVersion` is the header's source; currently unset, because no authoring
+      tool emits it and an absent version is honest where a defaulted `"1.0.0"` asserts one nobody set.
+- [x] **3.2 DONE — P5 is now load-bearing rather than descriptive.** `MapData != null` = IN-BATTLE,
+      self-contained; `MapData == null` = BETWEEN-BATTLE, content-dependent. Documented on the field itself
+      and branched on in code (3.3), so it can no longer quietly stop being true.
+      Campaign position is BY ID: `CampaignData.CurrentScenarioId` + `CompletedScenarioIds` (strings), plus
+      `CampaignId`. ⚠ These were typed `CampaignScenario` — a **23-member enum of hard-coded mission names**
+      in GameData.cs — which put campaign structure in the executable and recorded progress as an ORDINAL:
+      inserting a mission shifted every later member, silently repointing every existing save. **Enum
+      DELETED.** Also dropped: `ScenarioData.IsCampaignScenario` (superseded by the header's `campaignId`)
+      and `ScenarioData.MaxCoreUnits` (retired by §20.1 → `DeploymentPointCap`).
+      **`SAVE_VERSION` 3 → 4**, no migration step — `MINIMUM_SUPPORTED` tracks it pre-1.0, so a v3 save is
+      refused by name rather than misread. CLAUDE.md §2 item 12 amended to record that exception AND that it
+      expires at 1.0.
+- [x] **3.3 DONE.** `SnapshotMapper.VerifyContentAvailable` + `GameDataManager.FindManifestById`.
+      The verdict branches on the P5 distinction, which is what makes it right rather than merely present:
+      an in-battle save whose scenario was uninstalled **still loads** (it carries its own map — refusing
+      would throw away a battle the file can fully restore) and only warns; a between-battle save refuses
+      with a message that NAMES the missing scenario and says the save is not damaged.
+      ⚠ It runs **before `ClearAll()`** — throwing after the wipe would destroy the player's current game in
+      order to report that a different one could not be loaded.
 
 ## PHASE 4 — Integrity — ✅ CLOSED 2026-07-28: RETIRED, NOT BUILT
 

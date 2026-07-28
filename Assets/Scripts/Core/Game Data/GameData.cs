@@ -1135,36 +1135,14 @@ namespace HammerAndSickle.Core.GameData
 
     #region Campaign and Scenario Enums
 
-    /// <summary>
-    /// List of scenarios available in the campaign
-    /// </summary>
-    public enum CampaignScenario
-    {
-        None,
-        Khost_Valley_branch1,
-        Panjshir_Valley_branch1,
-        Tabriz_branch2,
-        Tehran_branch2,
-        Bandar_Abbas_branch2,
-        Iraq_branch2,
-        Saudi_Arabia_branch2,
-        Hamburg_branch3,
-        Breman_branch3,
-        Low_Countries_branch3,
-        France_branch3,
-        BritishIsles_branch3,
-        Yugoslavia_branch4,
-        Po_Valley_branch4,
-        Central_Italy_branch4,
-        Southern_Italy_branch4,
-        Harbin_branch5,
-        Shenyang_branch5,
-        Beijing_branch5,
-        South_Korea_branch5,
-        Kyushu_branch5,
-        Inland_Sea_branch5,
-        Tokyo_branch5
-    }
+    // ⚠ `CampaignScenario` DELETED 2026-07-28 (content pipeline §3.2). It was a 23-member enum listing
+    // every planned mission — Khost_Valley_branch1 … Tokyo_branch5 — and `CampaignData` used it to record
+    // the player's position and completed missions. That put the campaign's STRUCTURE in the executable
+    // and addressed a save's progress BY ORDINAL: inserting a mission mid-list shifted every later member,
+    // so every existing save silently pointed at a different scenario, and adding a mission at all was a
+    // code change rather than a content patch. Campaign progress is now `currentScenarioId` +
+    // `completedScenarioIds` (strings — a scenario's folder name IS its identity, §7.1).
+    // The mission LIST itself belongs in campaign.manifest when Phase 2 lands, not here.
 
     /// <summary>
     /// Weather conditions affecting combat operations and visibility.
@@ -1471,11 +1449,20 @@ namespace HammerAndSickle.Core.GameData
 
     #region Scene IDs
 
+    /// <summary>
+    /// Build-settings scene indices. These MUST match Project Settings ▸ Build Profiles order.
+    ///
+    /// ⚠ There is ONE battle scene and there always will be. The members that used to live here —
+    /// Scenario_Khost = 1 and Campaign_Khost = 2 — were a scene PER SCENARIO, which does not survive
+    /// contact with 25–30 missions: every new scenario folder would have needed an enum member, a switch
+    /// arm and a build-settings entry before it could be played. Campaign_Khost = 2 was already a live
+    /// crash, since build settings hold exactly two scenes and LoadSceneAsync(2) has nothing to load.
+    /// A scenario is DATA now (its manifest folder); the scene it plays in is not part of that data.
+    /// </summary>
     public enum SceneID
     {
         MainMenu = 0,
-        Scenario_Khost = 1,
-        Campaign_Khost = 2
+        BattleScene = 1
     }
 
     #endregion // Enumerations
@@ -1507,16 +1494,25 @@ namespace HammerAndSickle.Core.GameData
 
         #endregion // File Constants
 
-        #region Scenario ID Constants
-
-        public const string SCENARIO_ID_MISSION_KHOST = "Mission_Khost";
-        public const string SCENARIO_ID_CAMPAIGN_KHOST = "Campaign_Khost";
-
-        #endregion // Scenario ID Constants
+        // ⚠ SCENARIO ID CONSTANTS DELETED 2026-07-28 (content pipeline).
+        // SCENARIO_ID_MISSION_KHOST / SCENARIO_ID_CAMPAIGN_KHOST existed for exactly one purpose: the
+        // scenarioId → SceneID switch in ScenarioDialog_Scene0, which is gone. Hard-coding a scenario's id
+        // in the executable is the same mistake as hard-coding its scene — it makes shipping a scenario a
+        // CODE change. Scenario ids live in manifest files and are known only to content.
 
         #region General Constants
 
-        public const int SAVE_VERSION = 3;
+        // Save format version. ⚠ Every bump ships with its migration step in
+        // SnapshotMapper.UpgradeSnapshot (CLAUDE.md §2 item 12) — EXCEPT while
+        // MINIMUM_SUPPORTED_SAVE_VERSION still tracks this constant, as it does pre-1.0: older saves are
+        // then refused with a named message instead of being migrated, which is Bob's clean-break ruling
+        // (2026-07-27). The moment 1.0 ships, MINIMUM freezes and every later bump needs a real step.
+        //
+        // 3 → 4 (2026-07-28): campaign progress moved from the `CampaignScenario` ENUM to string
+        // scenario ids, `ScenarioData.isCampaignScenario`/`maxCoreUnits` were dropped, and the save gained
+        // its provenance header. No migration step — no v3 save can exist that matters, since SaveLoad
+        // still has no callers.
+        public const int SAVE_VERSION = 4;
 
         #endregion
 

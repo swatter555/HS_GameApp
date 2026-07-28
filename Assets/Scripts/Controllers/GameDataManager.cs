@@ -125,6 +125,27 @@ namespace HammerAndSickle.Controllers
                 _loadedManifests.AddRange(manifests);
         }
 
+        /// <summary>
+        /// Resolves a scenario id to its discovered manifest, or null if no installed scenario declares it.
+        ///
+        /// ⚠ A scenario id is PERMANENT ONCE SHIPPED (§7.1) precisely so this lookup keeps working across
+        /// patches: saves reference scenarios by id, so renaming or removing one strands every save that
+        /// names it. Callers must treat null as "content missing", never as "empty campaign".
+        /// </summary>
+        public static ScenarioManifest FindManifestById(string scenarioId)
+        {
+            if (string.IsNullOrWhiteSpace(scenarioId))
+                return null;
+
+            foreach (ScenarioManifest manifest in _loadedManifests)
+            {
+                if (string.Equals(manifest.ScenarioId, scenarioId, StringComparison.OrdinalIgnoreCase))
+                    return manifest;
+            }
+
+            return null;
+        }
+
         #endregion // Properties
 
         #region Unity Lifecycle

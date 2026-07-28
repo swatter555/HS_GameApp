@@ -39,6 +39,18 @@ namespace HammerAndSickle.Core.GameData
         [JsonPropertyName("briefingFilename")]
         public string BriefingFilename { get; set; } = string.Empty;
 
+        /// <summary>
+        /// Content version of this scenario, stamped into a save's provenance header (§3.1) so a save
+        /// made against patched content can be identified rather than silently mismatched.
+        ///
+        /// ⚠ OPTIONAL AND CURRENTLY UNSET — no authoring tool emits it yet, so it reads as empty and the
+        /// header records empty. That is deliberate: an absent version is honest, whereas defaulting it to
+        /// "1.0.0" would assert a version nobody set. Free to start emitting whenever the editor is ready;
+        /// nothing needs to change here when it does.
+        /// </summary>
+        [JsonPropertyName("contentVersion")]
+        public string ContentVersion { get; set; } = string.Empty;
+
         [JsonPropertyName("prestigePool")]
         public int PrestigePool { get; set; } = 0;
 

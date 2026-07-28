@@ -16,8 +16,9 @@ namespace HammerAndSickle.Persistence
     /// quietly becomes something else. Four copies of the policy also meant the fix had to be remembered
     /// in four places. One place now.
     ///
-    /// ⚠ <see cref="Utils.MapChecksumUtility"/> is DELIBERATELY NOT routed through here — see the note
-    /// at that class. Its options are a HASH INPUT, not a data format.
+    /// (The fourth, MapChecksumUtility, was DELETED 2026-07-28 — it had never validated anything. The
+    /// checksum field stays in the .map header as the scenario editor's content fingerprint. See
+    /// Claude_Project §7.1; do not restore game-side validation.)
     /// </summary>
     public static class JsonPolicy
     {
@@ -60,8 +61,13 @@ namespace HammerAndSickle.Persistence
         //
         // ⚠ CONSEQUENCE WORTH HOLDING ONTO: shipped content does not actually GAIN the protection until
         // it is re-emitted with string enums. Until then the ordinal fragility is still latent in those
-        // files — the reader just tolerates both forms. Re-emitting a .map also changes its checksum, so
-        // that is a deliberate follow-up, not a side effect (see todo.md Phase 0).
+        // files — the reader just tolerates both forms.
+        //
+        // ✅ DONE for everything currently shipped (2026-07-28): the scenario editor re-exported .map and
+        // .oob in name-form, and the .manifest was converted with them. Any NEW content type added here
+        // must be emitted name-form from the start, and any hand-authored file must not regress to
+        // ordinals — the reader will not complain, which is exactly the problem.
+        // (Re-emitting does NOT invalidate the .map checksum: the editor hashes map DATA, not file text.)
         // ─────────────────────────────────────────────────────────────────────────────────────────────
     }
 }

@@ -3,7 +3,7 @@
 Unity Version = 6000.2.6f2
 URP Version = 17.2.0
 
-_Last reconciled against the codebase: 2026-07-27._
+_Last reconciled against the codebase: 2026-07-28._
 
 **Large files (>1000 lines):** WeaponProfileDB.cs (6,677), CombatUnitDB.cs (5,224), CombatUnit.cs (2,469), GameData.cs (1,939), GameAudioManager.cs (1,682), InputService_BattleMap.cs (1,431), SpriteManager.cs (1,420), BattleManager.cs (1,171), HexGridRenderer.cs (1,096), LeaderSkillCatalog.cs (1,096), GameIconRenderer.cs (1,084). Read these in chunks.
 
@@ -63,7 +63,6 @@ Assets/Art/               Backgrounds, HexTiles/MiddleEast, Maps/Khost, Material
                           Printer, Scenario Thumbs, Shoulder Boards/Rank Boards, Terrain Portraits, Words)
 Assets/Editor/            Chunked/ (HexBlendTestAssetBuilder.cs, TextureArrayBuilder.cs),
                           Rivers/ (RiverSymmetryVerifier.cs)
-Assets/Generated Data/    aii/, brf/, cmp/, manifests/, map/, oob/
 Assets/Input/             Unity Input System config
 Assets/LeanTween/         Third-party tween library (Documentation, Editor, Examples, Framework, Testing)
 Assets/NuGet/             NuGet for Unity (Editor, Resources)
@@ -74,7 +73,10 @@ Assets/Resources/         Chunked/ (TestArray_RGB.asset, NoiseTexture.png, terra
 Assets/Scenes/            MainMenu.unity, BattleScene.unity (+ auto-generated Battle Scene/ lighting folder)
 Assets/Shaders/           Chunked/ (HexTerrainBlend.shader, Includes/HexNoise.hlsl)
 Assets/Settings/          URP pipeline assets
-Assets/StreamingAssets/   Audio (ambient, briefings, music, SFX)
+Assets/StreamingAssets/   ALL shipped content (§7.1): Audio/ (ambient, briefings, music, SFX),
+                          Scenarios/<scenario>/, Campaigns/<campaign>/<mission>/
+                          (`Assets/Generated Data/` DELETED 2026-07-28 — it was the old second content
+                          root, unreachable in a build; do not recreate it, see P1 in todo.md)
 Assets/Tests/             EditorTests/ (42 NUnit files: combat/AI/spotting/movement/leader/weapon-profile
                           suites + TestFixture.cs base + CombatTestDice); RuntimeTests/ currently unused
 Assets/Tools/             (empty — BinaryToJsonConverter deleted 2026-06-15)
@@ -86,7 +88,9 @@ Assets/Tools/             (empty — BinaryToJsonConverter deleted 2026-06-15)
 
 ### File System (Runtime)
 
-`Documents/My Games/Hammer and Sickle/`: `scenario/` (.manifest), `map/` (.map), `oob/` (.oob), `cmp/` (.cmp saves), `logs/`
+`Documents/My Games/Hammer and Sickle/` holds ONLY player-written data: `cmp/` (.cmp saves), `logs/`. `AppService` creates exactly these two (`MainAppPath`, `LogsPath`) and nothing else.
+
+⚠ It no longer holds `scenario/`, `map/` or `oob/` — shipped content moved to StreamingAssets in Phase 1 (§7.1). A leftover `scenario data` folder may still exist on Bob's machine from before the move; it is inert, nothing reads it, and it is not in git.
 
 ---
 
@@ -445,7 +449,7 @@ PANEL MODEL (revised 2026-07-27, CONFIRMED IN PLAY same day). The three informat
 
 **Supply:** MaxDaysSupplyUnit=5, MaxDaysSupplyAirbase=30 (depot-days model RETIRED). Generation = %-of-capacity per turn: Minimal 5% → Industrial 40%. Sorties: SORTIE_LAUNCH_COST=1, SORTIE_SHOT_COST=0.5, AIRBASE_LAUNCH_FLOOR=5, AIR_SUPPLY_LOAD=5.
 
-**Persistence:** SAVE_VERSION=3 (next bump scheduled: AI2 adds AIPerceptionState to the snapshot).
+**Persistence:** SAVE_VERSION=4 (3→4 on 2026-07-28: campaign progress by string id, provenance header, retired fields dropped — no migration step, see §7.3). `MINIMUM_SUPPORTED_SAVE_VERSION` tracks it pre-1.0, so older saves are refused, not migrated. Bumps still pending: AI2 (AIPerceptionState) and P5 (loss ledger). ⚠ `SaveLoad.SaveAsync`/`LoadAsync` still have NO callers — save/load is not wired to any UI, which is why the bump was free.
 
 **Prestige:** Weapon tier: Gen1(free)→Gen4(150). Unit type: TANK(55), IFV(40), APC(30), ART(100), ROC(175), SAM(145).
 
@@ -477,19 +481,39 @@ Assets/StreamingAssets/
 
 **Retired here:** the two parallel path families. `GetMapFilePath()` used to resolve to Documents/My Games and `GetMapFilePath_GDP()` to `Assets/Generated Data`, with `MapLoader` and `BattleManager` choosing on `IsCampaignScenario` — welding a gameplay concept to a storage one, so a campaign could not be standalone-tested and the two copies silently diverged (they had, by eight months). `AppService.GDP_*`, `ScenarioDataPath`, `ManifestsPath`/`MapPath`/`OobPath`/`AiiPath`/`BrfPath`, `OOBFileLoader.LoadStandaloneOob`/`LoadCampaignOob` are all GONE. ⚠ The GDP family could never have worked in a build at all — `Application.dataPath` is `<Game>_Data` in a player, where `Assets/Generated Data` does not exist.
 
+**A SCENARIO IS A FOLDER, AND NOTHING ELSE (2026-07-28).** Adding one is a pure content operation: drop a folder under `Scenarios/` and it is discovered, listed and playable with no code change, no rebuild and no rewiring. Everything that used to make a scenario known to the executable is gone — `ScenarioDialog_Scene0` no longer maps `scenarioId` → `SceneID`, and the `SCENARIO_ID_MISSION_KHOST`/`SCENARIO_ID_CAMPAIGN_KHOST` constants are deleted. ⚠ **There is ONE battle scene**, `SceneID { MainMenu = 0, BattleScene = 1 }`, matching build settings exactly. The retired members were a scene PER SCENARIO, which does not survive 25–30 missions; `Campaign_Khost = 2` was moreover a live crash, since `LoadSceneAsync(2)` had nothing to load. `Scene1_Controller` is fully generic and reads `GameDataManager.CurrentManifest`. **Do not reintroduce a per-scenario branch anywhere in the load path** — that is the coupling this pipeline exists to remove.
+
+Discovery sorts by display name (then `scenarioId`) because `Directory.GetFiles` order is filesystem-dependent, and warns on a duplicate `scenarioId` — a collision is silent otherwise, and saves reference scenarios by id.
+
 ⚠ **No `.aii` files exist yet** — the AI pass will author them (Bob, 2026-07-27). A missing AII must stay a clean no-op, never an error.
+
+⚠ **Briefing NARRATION is still code-side and dormant:** `GameAudioManager.BriefingNarration` is an enum mapping `Khost` → `Briefing_Khost.ogg`, with no manifest field and currently no callers at all. When briefing audio is switched on it should be a manifest filename like the other four content files, not another per-scenario enum member.
 
 **Map checksums are RETIRED game-side (2026-07-28, ratified).** `MapChecksumUtility` is deleted. It had zero callers and had never validated anything, but read convincingly enough that it put a false "MapLoader checksum-validates" claim into this very document, which in turn shaped a planned phase that would have hard-failed every map on the day it shipped. **The `checksum` field STAYS in the `.map` header** and the scenario editor keeps computing it: removing it would mean a map-format version bump, an editor change and a re-export of every map, for no gain. Its remaining job is a CONTENT FINGERPRINT — it is how the 2026-07-28 name-form conversion was proved to have changed the representation and not the data. ⚠ **Do not "restore" validation.** The editor's hash input is the hex array in ITS key order, which does not match C# property-declaration order, so the two can never agree without the game permanently mirroring the editor's field layout — a standing breakage risk for a guarantee Steam's file verification already provides on shipped, read-only content.
 
 ### 7.2 Formats
 
-**Manifest (.manifest):** JSON — scenarioId, displayName, description, thumbnailFilename, mapFilename, oobFilename, aiiFilename, briefingFilename, prestigePool, isCampaignScenario, mapTheme, difficultyLevel, maxTurns, maxCoreUnits.
+**Manifest (.manifest):** JSON — scenarioId, displayName, description, thumbnailFilename, mapFilename, oobFilename, aiiFilename, briefingFilename, prestigePool, isCampaignScenario, mapTheme, difficultyLevel, maxTurns, **deploymentPointCap**, mapWidth, mapHeight. (`maxCoreUnits` is RETIRED — §20.1; the campaign-wide `coreForcePointCap` lives in the .cmp, not here. `isCampaignScenario` is now inert — nothing reads it — and is scheduled for deletion in Phase 2.2.)
 
 **Map (.map):** JSON — header (name, config, version, checksum, timestamp) + hexes array (position, terrain, movementCost, infrastructure, objective, tileControl, labels, victoryValue, borders).
 
 **OOB (.oob):** JSON — unit definitions (ID, name, pos, nationality, side, classification, role, weapon IDs, stats) + leader definitions (ID, name, grade, ability, skills, assignment).
 
 **Briefing (.brf):** Plain text narrative.
+
+**Save (.cmp):** JSON — `header` (provenance, §7.3) + `campaign` + `scenario` + `mapData` (embedded, null between battles) + `units` + `leaders` + `saveVersion`. Written through `JsonPolicy.Save`, which adds `ReferenceHandler.Preserve` because the snapshot is an object GRAPH.
+
+⚠ **Every enum in every one of these files is written BY NAME** (`"terrain": "Rough"`, `"Nationality": "MJ"`, `"mapTheme": "MiddleEast"`), via `JsonPolicy`. All shipped content was converted 2026-07-28 — `.map`/`.oob` by the scenario editor's re-export, `.manifest` by hand. The reader accepts ordinals too, so a file that regresses to numbers will load silently and stay fragile until the day a member is inserted mid-enum; name-form is the thing being protected, not the parse. See CLAUDE.md §2 items 10–11.
+
+### 7.3 The save/content contract (Phase 3, 2026-07-28)
+
+**A save declares what it was made against.** `GameStateSnapshot.Header` (`GameDataHeader`) carries `saveTime`, `gameVersion`, `contentVersion`, `scenarioId` and `campaignId`. ⚠ The class existed before this but was referenced by NOTHING — no save ever carried it. It deliberately holds **no version field** (`GameStateSnapshot.SaveVersion` is the single authority the migration ladder keys off; two version fields can disagree) and **no checksum** (the old one was never computed or validated — exactly the shape that produced the false checksum claim in §7.1; integrity checking lands with its verifier or not at all). `ScenarioManifest.ContentVersion` is the header's source and is currently unset — no authoring tool emits it yet, and an absent version is honest where a defaulted "1.0.0" would assert one nobody set.
+
+**P5 is now load-bearing, not descriptive.** `MapData != null` means an IN-BATTLE save: self-contained, carries its own map, loads fine even if its scenario was uninstalled. `MapData == null` means BETWEEN-BATTLE: a roster plus a `scenarioId`, so the scenario must still exist. `SnapshotMapper.VerifyContentAvailable` branches on exactly that — warn for the first, refuse-by-name for the second. It runs **before** `ClearAll()`, so a save that cannot load does not destroy the game in progress.
+
+**Campaign progress is addressed BY ID.** `CampaignData.CurrentScenarioId` + `CompletedScenarioIds` (strings). ⚠ These were typed `CampaignScenario`, a 23-member enum of hard-coded mission names; that put campaign structure in the executable and progress at an ORDINAL, so inserting a mission shifted every later member and silently repointed every save. The enum is deleted. Also gone: `ScenarioData.IsCampaignScenario` (the header's `campaignId` supersedes it) and `ScenarioData.MaxCoreUnits` (retired by §20.1 in favour of `DeploymentPointCap`).
+
+**The migration ladder is tested** (`SaveMigrationLadderTests`, 9). ⚠ Its guards are unreachable through the production entry point while `MINIMUM == CURRENT`, so `SnapshotMapper.RunMigrationLadder` takes injected versions and a step lookup and the tests drive that; `UpgradeSnapshot` passes the real constants. This is the only thing `[assembly: InternalsVisibleTo("EditorTests")]` exists for.
 
 ---
 

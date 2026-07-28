@@ -51,6 +51,7 @@ namespace HammerAndSickle.Persistence
                 // Create the snapshot with current game state
                 var snapshot = new GameStateSnapshot
                 {
+                    Header = BuildHeader(mgr),
                     Campaign = mgr.CurrentCampaignData,
                     Scenario = mgr.CurrentScenarioData,
                     SaveVersion = CURRENT_SAVE_VERSION,
@@ -323,6 +324,11 @@ namespace HammerAndSickle.Persistence
                     AppService.CaptureUiMessage($"Upgrading save file from version {snap.SaveVersion} to {CURRENT_SAVE_VERSION}");
                     snap = UpgradeSnapshot(snap);
                 }
+
+                // Step 0.5: the save names the content it was made against — verify it is still installed
+                // ⚠ BEFORE the wipe below. Throwing after ClearAll() would destroy the player's current
+                // game to report that a DIFFERENT one could not be loaded.
+                VerifyContentAvailable(snap);
 
                 // Step 1: Complete wipe of current runtime state
                 AppService.CaptureUiMessage("Clearing current game state...");
@@ -598,41 +604,156 @@ namespace HammerAndSickle.Persistence
 
         #endregion // Private Validation
 
+        #region Private Content Resolution
+
+        /// <summary>
+        /// Verifies the scenario this save names is still installed (§3.3) — the one genuine hazard the
+        /// content/save split leaves open: a patch that removes or renames a scenario strands every save
+        /// that referenced it.
+        ///
+        /// ⚠ THE VERDICT DEPENDS ON THE SAVE'S KIND, which is principle P5 doing real work rather than
+        /// being a description:
+        ///   • IN-BATTLE (MapData != null) — SELF-CONTAINED. The map and units travel inside the save, so
+        ///     it loads and plays perfectly well with its scenario uninstalled. Warn only; refusing here
+        ///     would throw away a battle the file is fully capable of restoring.
+        ///   • BETWEEN-BATTLE (MapData == null) — CONTENT-DEPENDENT. It holds a roster and a scenarioId
+        ///     and nothing else, so a missing scenario means there is genuinely nothing to load. Refuse
+        ///     with a message that NAMES the scenario, so the cause is "content X is missing" and not a
+        ///     null-reference somewhere downstream.
+        ///
+        /// A save naming no scenario at all is legal (a bare roster) and is not checked.
+        /// </summary>
+        private static void VerifyContentAvailable(GameStateSnapshot snap)
+        {
+            string scenarioId = snap.Header?.ScenarioId;
+
+            if (string.IsNullOrWhiteSpace(scenarioId))
+                return;
+
+            if (GameDataManager.FindManifestById(scenarioId) != null)
+                return;
+
+            if (snap.MapData != null)
+            {
+                AppService.CaptureUiMessage(
+                    $"Scenario '{scenarioId}' is no longer installed, but this save carries its own map " +
+                    "and will load normally.");
+                return;
+            }
+
+            throw new InvalidOperationException(
+                $"This save continues scenario '{scenarioId}', which is not installed. It may have been " +
+                "removed or renamed by an update. Verify the game files, or start a new game — the save " +
+                "itself is not damaged.");
+        }
+
+        #endregion // Private Content Resolution
+
+        #region Private Provenance
+
+        /// <summary>
+        /// Builds the save's provenance header (§3.1): what wrote this file, and against what content.
+        ///
+        /// The scenario/campaign ids are what make a content patch diagnosable — without them, a save that
+        /// no longer matches the installed content fails as a mystery instead of naming what it wanted.
+        /// </summary>
+        private static GameDataHeader BuildHeader(GameDataManager mgr)
+        {
+            var manifest = GameDataManager.CurrentManifest;
+
+            return new GameDataHeader
+            {
+                SaveTime = DateTime.UtcNow,
+                GameVersion = UnityEngine.Application.version ?? string.Empty,
+
+                // ⚠ Prefer the live manifest, fall back to the restored ScenarioData: a between-battle save
+                // has no manifest loaded, but still knows which scenario it just finished.
+                ScenarioId = manifest?.ScenarioId ?? mgr.CurrentScenarioData?.ScenarioId ?? string.Empty,
+                ContentVersion = manifest?.ContentVersion ?? string.Empty,
+                CampaignId = mgr.CurrentCampaignData?.CampaignId ?? string.Empty,
+
+                CombatUnitCount = mgr.UnitCount,
+                LeaderCount = mgr.LeaderCount
+            };
+        }
+
+        #endregion // Private Provenance
+
         #region Private Upgrade Logic
 
         /// <summary>
         /// Migrates an older snapshot up to the current save format, one version at a time.
         /// Every <see cref="GameData.SAVE_VERSION"/> bump must add its step to the switch below.
         /// </summary>
-        private static GameStateSnapshot UpgradeSnapshot(GameStateSnapshot snap)
+        private static GameStateSnapshot UpgradeSnapshot(GameStateSnapshot snap) =>
+            RunMigrationLadder(snap, MINIMUM_SUPPORTED_SAVE_VERSION, CURRENT_SAVE_VERSION, MigrateStep);
+
+        /// <summary>
+        /// Looks up the migration step that advances a snapshot from <paramref name="from"/> to
+        /// <paramref name="from"/>+1. Returns null when no step is defined — the ladder turns that into
+        /// the "a SAVE_VERSION bump must ship with its step" failure.
+        ///
+        /// ⚠ ONE ARM PER VERSION BUMP. Adding a member here is the whole of CLAUDE.md §2 item 12.
+        /// </summary>
+        private static Func<GameStateSnapshot, GameStateSnapshot> MigrateStep(int from) => from switch
+        {
+            // e.g.  3 => MigrateV3ToV4,   // AI2: AIPerceptionState enters the snapshot
+            //       4 => MigrateV4ToV5,   // P5: loss ledger enters the snapshot
+            //
+            // NOTE there is deliberately NO 3 => arm for the 3→4 bump of 2026-07-28. While
+            // MINIMUM_SUPPORTED_SAVE_VERSION tracks SAVE_VERSION (pre-1.0), a v3 save is refused by the
+            // floor check before the ladder is ever entered, so a step would be unreachable code
+            // pretending to be a migration. See the SAVE_VERSION comment in GameData.
+            _ => null
+        };
+
+        /// <summary>
+        /// The migration ladder itself, parameterised so it can be exercised.
+        ///
+        /// ⚠ WHY THE PARAMETERS EXIST: with the shipping constants, MINIMUM_SUPPORTED == CURRENT, so every
+        /// older save is refused by the floor check and the loop below is UNREACHABLE. Its guards — the
+        /// missing step and the step that fails to advance — could therefore never be tested through the
+        /// production entry point, and would first be exercised by the real migration they exist to
+        /// protect. Injecting the versions and the step lookup keeps ONE implementation while letting
+        /// <c>SaveMigrationLadderTests</c> drive it. Production callers use
+        /// <see cref="UpgradeSnapshot"/> and get the real constants.
+        /// </summary>
+        internal static GameStateSnapshot RunMigrationLadder(
+            GameStateSnapshot snap,
+            int minimumSupported,
+            int currentVersion,
+            Func<int, Func<GameStateSnapshot, GameStateSnapshot>> stepLookup)
         {
             // A save older than the supported floor is REFUSED, not guessed at.
             // ⚠ The previous implementation stamped `SaveVersion = CURRENT` and returned, which is worse
             // than doing nothing: it relabelled old data as current, so the save then claimed a shape it
             // did not have and no later migration could tell what it really was. Fail loudly instead.
-            if (snap.SaveVersion < MINIMUM_SUPPORTED_SAVE_VERSION)
+            if (snap.SaveVersion < minimumSupported)
             {
                 throw new InvalidOperationException(
                     $"Save file version {snap.SaveVersion} is older than the minimum supported version " +
-                    $"{MINIMUM_SUPPORTED_SAVE_VERSION} and cannot be loaded. Saves written by pre-release " +
+                    $"{minimumSupported} and cannot be loaded. Saves written by pre-release " +
                     "builds are not supported.");
             }
 
             // Apply steps in order. Each step transforms the snapshot AND stamps its own new version;
             // the guard below catches a step that forgets to, which would otherwise spin here forever.
-            while (snap.SaveVersion < CURRENT_SAVE_VERSION)
+            while (snap.SaveVersion < currentVersion)
             {
                 int from = snap.SaveVersion;
 
-                snap = from switch
-                {
-                    // One arm per version bump, e.g.:
-                    //   3 => MigrateV3ToV4(snap),   // AI2: AIPerceptionState enters the snapshot
-                    //   4 => MigrateV4ToV5(snap),   // P5: loss ledger enters the snapshot
-                    _ => throw new InvalidOperationException(
+                var step = stepLookup(from)
+                    ?? throw new InvalidOperationException(
                         $"No migration step is defined from save version {from} to {from + 1}. " +
-                        $"A {nameof(GameData.SAVE_VERSION)} bump must ship with its migration step.")
-                };
+                        $"A {nameof(GameData.SAVE_VERSION)} bump must ship with its migration step.");
+
+                snap = step(snap);
+
+                if (snap == null)
+                {
+                    throw new InvalidOperationException(
+                        $"Migration step from version {from} returned null.");
+                }
 
                 if (snap.SaveVersion != from + 1)
                 {
