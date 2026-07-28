@@ -362,11 +362,11 @@ stubs; needs a `SAVE_VERSION` bump), P6 loss report, P8b tests.
 
 ### 3.8 File Loaders
 
-**MapLoader:** .map JSON → HexMap with neighbors. Checksum validation. **OOBFileLoader:** 3-pass load — (1) units, (2) air attachments, (3) leaders. Auto-detects legacy format.
+**MapLoader:** .map JSON → HexMap with neighbors. Validates that `saveVersion` matches the current map format (hard reject), that it is > 0, and that `checksum` is non-empty. ⚠ **It does NOT compare the checksum — nothing does.** An earlier version of this line claimed "checksum validation" and was wrong. **OOBFileLoader:** 3-pass load — (1) units, (2) air attachments, (3) leaders. Auto-detects legacy format.
 
 ### 3.9 Utilities
 
-**HexMapUtil:** Pathfinding, neighbor queries. **MapChecksumUtility:** SHA-256. **NationalityUtils:** Display names, flags, rank symbols.
+**HexMapUtil:** Pathfinding, neighbor queries. **MapChecksumUtility:** SHA-256 over the hex array — ⚠ **DEAD CODE, zero external callers**, every reference to `CalculateChecksum`/`ValidateChecksum` is inside its own file. It reads like a working integrity system and is not one. Retirement pending (Claude_TODO). **NationalityUtils:** Display names, flags, rank symbols.
 
 ---
 
