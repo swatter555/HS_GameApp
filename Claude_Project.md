@@ -51,7 +51,7 @@ Assets/Scripts/
 ├── Services/            AppService.cs, CameraService.cs, HexDetectionService.cs,
 │                        InputService_BattleMap.cs, NameGenService.cs, SpottingService.cs,
 │                        TerritoryService.cs
-└── Utils/               HexMapUtil.cs, MapChecksumUtility.cs, NationalityUtils.cs
+└── Utils/               HexMapUtil.cs, NationalityUtils.cs
 ```
 
 ```
@@ -362,11 +362,12 @@ stubs; needs a `SAVE_VERSION` bump), P6 loss report, P8b tests.
 
 ### 3.8 File Loaders
 
-**MapLoader:** .map JSON → HexMap with neighbors. Validates that `saveVersion` matches the current map format (hard reject), that it is > 0, and that `checksum` is non-empty. ⚠ **It does NOT compare the checksum — nothing does.** An earlier version of this line claimed "checksum validation" and was wrong. **OOBFileLoader:** 3-pass load — (1) units, (2) air attachments, (3) leaders. Auto-detects legacy format.
+**MapLoader:** .map JSON → HexMap with neighbors. Validates that `saveVersion` matches the current map format (hard reject), that it is > 0, and that `checksum` is non-empty. ⚠ **It does NOT compare the checksum, by design since 2026-07-28 — see §7.1.** **OOBFileLoader:** 3-pass load — (1) units, (2) air attachments, (3) leaders. Auto-detects legacy format.
 
 ### 3.9 Utilities
 
-**HexMapUtil:** Pathfinding, neighbor queries. **MapChecksumUtility:** SHA-256 over the hex array — ⚠ **DEAD CODE, zero external callers**, every reference to `CalculateChecksum`/`ValidateChecksum` is inside its own file. It reads like a working integrity system and is not one. Retirement pending (Claude_TODO). **NationalityUtils:** Display names, flags, rank symbols.
+**HexMapUtil:** Pathfinding, neighbor queries. **NationalityUtils:** Display names, flags, rank symbols.
+(`MapChecksumUtility` was DELETED 2026-07-28 — see §7.1 for why the map `checksum` field survives it.)
 
 ---
 
@@ -477,6 +478,8 @@ Assets/StreamingAssets/
 **Retired here:** the two parallel path families. `GetMapFilePath()` used to resolve to Documents/My Games and `GetMapFilePath_GDP()` to `Assets/Generated Data`, with `MapLoader` and `BattleManager` choosing on `IsCampaignScenario` — welding a gameplay concept to a storage one, so a campaign could not be standalone-tested and the two copies silently diverged (they had, by eight months). `AppService.GDP_*`, `ScenarioDataPath`, `ManifestsPath`/`MapPath`/`OobPath`/`AiiPath`/`BrfPath`, `OOBFileLoader.LoadStandaloneOob`/`LoadCampaignOob` are all GONE. ⚠ The GDP family could never have worked in a build at all — `Application.dataPath` is `<Game>_Data` in a player, where `Assets/Generated Data` does not exist.
 
 ⚠ **No `.aii` files exist yet** — the AI pass will author them (Bob, 2026-07-27). A missing AII must stay a clean no-op, never an error.
+
+**Map checksums are RETIRED game-side (2026-07-28, ratified).** `MapChecksumUtility` is deleted. It had zero callers and had never validated anything, but read convincingly enough that it put a false "MapLoader checksum-validates" claim into this very document, which in turn shaped a planned phase that would have hard-failed every map on the day it shipped. **The `checksum` field STAYS in the `.map` header** and the scenario editor keeps computing it: removing it would mean a map-format version bump, an editor change and a re-export of every map, for no gain. Its remaining job is a CONTENT FINGERPRINT — it is how the 2026-07-28 name-form conversion was proved to have changed the representation and not the data. ⚠ **Do not "restore" validation.** The editor's hash input is the hex array in ITS key order, which does not match C# property-declaration order, so the two can never agree without the game permanently mirroring the editor's field layout — a standing breakage risk for a guarantee Steam's file verification already provides on shipped, read-only content.
 
 ### 7.2 Formats
 

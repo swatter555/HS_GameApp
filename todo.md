@@ -175,7 +175,14 @@ both compresses and delta-patches well.
       a patch. Handle with a named, specific error and a way forward, not a crash — and treat scenarioId as
       permanent once shipped.
 
-## PHASE 4 — Integrity ⚠ REPLANNED 2026-07-27 — THE ORIGINAL PLAN WOULD HAVE BROKEN EVERY MAP
+## PHASE 4 — Integrity — ✅ CLOSED 2026-07-28: RETIRED, NOT BUILT
+
+**Decision (Bob, 2026-07-28): delete the game-side checksum, keep the header field.** `MapChecksumUtility` is
+gone. The `checksum` stays in the `.map` header, maintained by the scenario editor as a content fingerprint —
+removing it would cost a map-format bump, an editor change and a re-export of every map for no gain. Rationale
+and the do-not-restore warning are recorded in Claude_Project §7.1. Nothing further to build here.
+
+<details><summary>Why the original plan was wrong (kept as the reasoning record)</summary>
 
 ⚠ **`MapChecksumUtility` HAS ZERO EXTERNAL CALLERS.** Every reference to `CalculateChecksum`/`ValidateChecksum`
 is inside that file. `MapLoader` checks only `saveVersion > 0`, that `checksum` is non-empty (never comparing
@@ -195,7 +202,9 @@ produce. Turning validation on as originally planned would have hard-failed ever
 - [ ] **4.2 IF KEPT:** the EDITOR's byte order is the ground truth — every authored map already hashes that
       way — so the game must adopt it, never the reverse. Changing the game's order invalidates nothing;
       changing the editor's invalidates every map ever written.
-- [ ] **4.3** Whatever survives, failures name the file and the mismatch.
+- [-] **4.3** Superseded — nothing validates, so there is no failure to report.
+
+</details>
 
 ---
 
