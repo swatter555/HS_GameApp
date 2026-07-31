@@ -1512,6 +1512,14 @@ namespace HammerAndSickle.Core.GameData
         // scenario ids, `ScenarioData.isCampaignScenario`/`maxCoreUnits` were dropped, and the save gained
         // its provenance header. No migration step — no v3 save can exist that matters, since SaveLoad
         // still has no callers.
+        //
+        // ⚠ v4's header shape was AMENDED later the same day (contentVersion removed) and DELIBERATELY not
+        // re-bumped to 5. Two things make that safe rather than sloppy: `SaveLoad.SaveAsync`/`LoadAsync`
+        // still have zero callers, so no v4 file exists anywhere to be misread; and dropping a field is
+        // read-compatible regardless, since unmapped JSON members are skipped and an absent one defaults.
+        // ⚠ THIS REASONING EXPIRES THE MOMENT SAVING IS WIRED UP. Once a save can exist in the wild, any
+        // shape change needs its own version — amending a released version's shape in place is exactly the
+        // silent-mismatch failure the ladder exists to prevent.
         public const int SAVE_VERSION = 4;
 
         #endregion

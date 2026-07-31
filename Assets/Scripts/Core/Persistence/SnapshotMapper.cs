@@ -669,7 +669,6 @@ namespace HammerAndSickle.Persistence
                 // ⚠ Prefer the live manifest, fall back to the restored ScenarioData: a between-battle save
                 // has no manifest loaded, but still knows which scenario it just finished.
                 ScenarioId = manifest?.ScenarioId ?? mgr.CurrentScenarioData?.ScenarioId ?? string.Empty,
-                ContentVersion = manifest?.ContentVersion ?? string.Empty,
                 CampaignId = mgr.CurrentCampaignData?.CampaignId ?? string.Empty,
 
                 CombatUnitCount = mgr.UnitCount,

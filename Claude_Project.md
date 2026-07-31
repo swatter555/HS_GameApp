@@ -90,7 +90,7 @@ Assets/Tools/             (empty — BinaryToJsonConverter deleted 2026-06-15)
 
 `Documents/My Games/Hammer and Sickle/` holds ONLY player-written data: `cmp/` (.cmp saves), `logs/`. `AppService` creates exactly these two (`MainAppPath`, `LogsPath`) and nothing else.
 
-⚠ It no longer holds `scenario/`, `map/` or `oob/` — shipped content moved to StreamingAssets in Phase 1 (§7.1). A leftover `scenario data` folder may still exist on Bob's machine from before the move; it is inert, nothing reads it, and it is not in git.
+⚠ It no longer holds `scenario/`, `map/` or `oob/` — shipped content moved to StreamingAssets in Phase 1 (§7.1), and the leftover `scenario data` folder was DELETED from Bob's machine 2026-07-28. Documents is now saves and logs only, which is the end state P1 was after: one source of truth per artifact, with no second content root to diverge from.
 
 ---
 
@@ -461,6 +461,17 @@ PANEL MODEL (revised 2026-07-27, CONFIRMED IN PLAY same day). The three informat
 
 ## 7. Content Pipeline & Data Formats
 
+### 7.0 TERMINOLOGY — there are TWO kinds of scenario, always say which (§20.4.1, ratified 2026-07-28)
+
+| Term | What it is | Ships under |
+|---|---|---|
+| **Standalone scenario** | A self-contained one-off battle picked from the Scenario menu. No core-force carryover, no campaign position. | `StreamingAssets/Scenarios/<id>/` |
+| **Campaign scenario** (= **mission**) | A node in a campaign, played in sequence, carrying core units and prestige forward. | `StreamingAssets/Campaigns/<campaign>/<mission>/` |
+
+⚠ **Never write bare "scenario" where the two would behave differently — name the kind.** They differ in briefing, OOB, progression and narration. The unqualified word has already caused one real conflation: the retired `IsCampaignScenario` path split welded a *gameplay* distinction to a *storage* one, so a campaign scenario could not be standalone-tested and the two content copies silently diverged by eight months. Where a statement genuinely covers both, "both kinds of scenario" is the phrasing.
+
+**Briefing narration is CAMPAIGN-SCENARIO ONLY** (§20.4.2). Standalone scenarios get the written `.brf` text and no audio, so an absent narration asset is the normal case rather than an error. Written `.brf` text is required for both.
+
 ### 7.1 Where content lives (Phase 1, 2026-07-27)
 
 All shipped content is READ-ONLY and lives inside the build under `StreamingAssets`. `Documents/My Games/Hammer and Sickle/` holds ONLY player-written data — saves (`cmp/`) and `logs/`. **Nothing is ever copied between them**, which is what makes a Steam patch a file replacement rather than an install-and-merge problem.
@@ -487,7 +498,7 @@ Discovery sorts by display name (then `scenarioId`) because `Directory.GetFiles`
 
 ⚠ **No `.aii` files exist yet** — the AI pass will author them (Bob, 2026-07-27). A missing AII must stay a clean no-op, never an error.
 
-⚠ **Briefing NARRATION is still code-side and dormant:** `GameAudioManager.BriefingNarration` is an enum mapping `Khost` → `Briefing_Khost.ogg`, with no manifest field and currently no callers at all. When briefing audio is switched on it should be a manifest filename like the other four content files, not another per-scenario enum member.
+⚠ **Briefing NARRATION is still code-side and dormant:** `GameAudioManager.BriefingNarration` is an enum mapping `Khost` → `Briefing_Khost.ogg`, with no manifest field and currently no callers at all. When briefing audio is switched on it should be a manifest filename like the other four content files, not another per-scenario enum member. ⚠ It applies to **campaign scenarios only** (§7.0 / §20.4.2), so whatever field carries it must treat "absent" as the normal standalone case and never as a missing-content error.
 
 **Map checksums are RETIRED game-side (2026-07-28, ratified).** `MapChecksumUtility` is deleted. It had zero callers and had never validated anything, but read convincingly enough that it put a false "MapLoader checksum-validates" claim into this very document, which in turn shaped a planned phase that would have hard-failed every map on the day it shipped. **The `checksum` field STAYS in the `.map` header** and the scenario editor keeps computing it: removing it would mean a map-format version bump, an editor change and a re-export of every map, for no gain. Its remaining job is a CONTENT FINGERPRINT — it is how the 2026-07-28 name-form conversion was proved to have changed the representation and not the data. ⚠ **Do not "restore" validation.** The editor's hash input is the hex array in ITS key order, which does not match C# property-declaration order, so the two can never agree without the game permanently mirroring the editor's field layout — a standing breakage risk for a guarantee Steam's file verification already provides on shipped, read-only content.
 
@@ -507,7 +518,12 @@ Discovery sorts by display name (then `scenarioId`) because `Directory.GetFiles`
 
 ### 7.3 The save/content contract (Phase 3, 2026-07-28)
 
-**A save declares what it was made against.** `GameStateSnapshot.Header` (`GameDataHeader`) carries `saveTime`, `gameVersion`, `contentVersion`, `scenarioId` and `campaignId`. ⚠ The class existed before this but was referenced by NOTHING — no save ever carried it. It deliberately holds **no version field** (`GameStateSnapshot.SaveVersion` is the single authority the migration ladder keys off; two version fields can disagree) and **no checksum** (the old one was never computed or validated — exactly the shape that produced the false checksum claim in §7.1; integrity checking lands with its verifier or not at all). `ScenarioManifest.ContentVersion` is the header's source and is currently unset — no authoring tool emits it yet, and an absent version is honest where a defaulted "1.0.0" would assert one nobody set.
+**A save declares what it was made against.** `GameStateSnapshot.Header` (`GameDataHeader`) carries `saveTime`, `gameVersion`, `scenarioId` and `campaignId`. ⚠ The class existed before this but was referenced by NOTHING — no save ever carried it.
+
+It deliberately holds **three things it does not have**, each for the same underlying reason — a field that looks meaningful but is never populated or verified is worse than no field:
+- **No version field.** `GameStateSnapshot.SaveVersion` is the single authority the migration ladder keys off; two version fields can disagree.
+- **No checksum.** The old one was never computed or validated — exactly the shape that produced the false checksum claim in §7.1. Integrity checking lands with its verifier or not at all.
+- **No `contentVersion`.** Added 2026-07-28 and deleted the same day (Bob's call), along with `ScenarioManifest.ContentVersion`. Content ships INSIDE the build, so `gameVersion` already identifies it exactly and the two could never legitimately differ; modding is designed out; and the `.map` header's editor-maintained checksum is a better content identity than a hand-kept string. It would have shipped always-empty. ⚠ **Revisit only if content ever reaches a player without a new build** — e.g. hand-patching a rebalanced campaign graph to remote testers. That condition is why `CampaignManifest.contentVersion` is still an open question in Phase 2.1 rather than settled the same way.
 
 **P5 is now load-bearing, not descriptive.** `MapData != null` means an IN-BATTLE save: self-contained, carries its own map, loads fine even if its scenario was uninstalled. `MapData == null` means BETWEEN-BATTLE: a roster plus a `scenarioId`, so the scenario must still exist. `SnapshotMapper.VerifyContentAvailable` branches on exactly that — warn for the first, refuse-by-name for the second. It runs **before** `ClearAll()`, so a save that cannot load does not destroy the game in progress.
 

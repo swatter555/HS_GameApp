@@ -30,7 +30,14 @@ namespace HammerAndSickle.Persistence
 
         // What content this save was made against. ScenarioId is empty for a pure between-battle campaign
         // save; CampaignId is empty for a standalone scenario. Both empty is legal (a bare roster save).
-        [JsonPropertyName("contentVersion")] public string ContentVersion { get; set; } = string.Empty;
+        //
+        // ⚠ NO `contentVersion` — added then removed 2026-07-28 (Bob's call). Content ships INSIDE the
+        // build, so `gameVersion` above already identifies it exactly; a content version could never
+        // legitimately differ, and an always-empty field that looks meaningful is the mistake §7.1 records.
+        // ⚠ REVISIT IF CONTENT EVER SHIPS SEPARATELY FROM THE EXE — e.g. hand-patching a rebalanced
+        // campaign graph out to remote testers between builds. That is the one scenario where the two
+        // versions genuinely diverge, and it is why the CAMPAIGN manifest's version is still an open
+        // question (todo.md Phase 2.1) rather than settled the same way.
         [JsonPropertyName("scenarioId")] public string ScenarioId { get; set; } = string.Empty;
         [JsonPropertyName("campaignId")] public string CampaignId { get; set; } = string.Empty;
 

@@ -174,6 +174,21 @@ both compresses and delta-patches well.
 - [ ] **2.1** New `CampaignManifest`: `campaignId`, `displayName`, `description`, `thumbnail`,
       `contentVersion`, `startingPrestige`, core-unit carryover rules, and an ordered list of
       `CampaignNode { scenarioId, unlockConditions, nextOnVictory, nextOnDefeat }`.
+      ⚠ **`contentVersion` STAYS OPEN HERE — and it is a genuinely different case from the scenario one.**
+      The same field was deleted from `ScenarioManifest` and from the save header on 2026-07-28 because
+      content ships INSIDE the build, so `gameVersion` already identifies it exactly and a per-scenario
+      version could never legitimately differ. **Bob's 2026-07-28 note breaks that assumption for the
+      campaign:** he expects to REBALANCE THE CAMPAIGN GRAPH once remote testers have builds. If a
+      rebalanced `campaign.manifest` is ever handed to a tester WITHOUT a full rebuild — which is the
+      cheap way to iterate on balance — then content genuinely moves independently of the exe, and
+      `gameVersion` stops identifying the graph a save was made under. That is the one condition that
+      makes a content version earn its place.
+      **So decide it with this question, not by analogy to the scenario manifest:** will graph revisions
+      ever reach a player without a new build? If yes, `contentVersion` is justified AND the save header
+      needs it back (as a campaign-graph version, not a scenario one). If every revision ships as a build,
+      delete it here too for the same reasons.
+      ⚠ Note the shape of the earlier mistake so it is not repeated: the field must be POPULATED by
+      whatever authors the manifest, or it is another always-empty field that merely looks meaningful.
 - [ ] **2.2** DELETE `ScenarioManifest.IsCampaignScenario`. The campaign owns the relationship; the scenario
       is a reusable leaf. This is what turns "rebalance the campaign path" into a content patch rather than a
       code patch.
@@ -227,7 +242,14 @@ never scanned; all three are Phase 2's problem, recorded under Finding B below.
 
 ## FINDINGS FROM THE READ-THROUGH — settle these before Phase 2 code
 
-### ⚠ FINDING A — DESIGN-DOC CONTRADICTION. §19.1.6 vs Principle P4.
+### ✅ FINDING A — RESOLVED 2026-07-28. Bob ratified the SCORING/ROUTING split.
+
+DesignDoc **§19.1.6 is amended** (19.1.6.1–.4): the campaign scenario owns its victory THRESHOLDS, the
+campaign owns the ROUTING between missions, as outcome edges keyed on `BattleResult`. The old
+"branching paths between branches are scenario-defined" clause is superseded. Phase 2 builds to this.
+The original argument is kept below as the reasoning record.
+
+<details><summary>The contradiction as originally found</summary>
 
 **DesignDoc §19.1.6:** "Player branch selection driven by scenario victory thresholds (per-scenario
 manifest); **branching paths between branches are scenario-defined**."
@@ -257,10 +279,19 @@ this pass builds the SHAPE the routing reads; the scoring that feeds it is later
 **Needs Bob:** ratify the split and let me amend §19.1.6, or overrule and tell me to put successors on the
 scenario.
 
-### ⚠ FINDING B — the campaign content folder is broken three ways, and this was invisible because
-discovery never scanned `Campaigns/`.
+</details>
 
-`Campaigns/grand_campaign/m01_khost/campaign_khost.manifest` says:
+### ✅ FINDING B — FIXED 2026-07-28. Bob's call: manifests are the agent's to maintain.
+
+`campaign_khost.manifest` now reads `scenarioId: "Campaign_Khost"` (distinct from the standalone's
+`Mission_Khost`), `displayName: "Operation Molot (Campaign)"`, `briefingFilename: "campaign_khost.brf"`
+(the file that is actually in the folder), name-form enums, and `isCampaignScenario: true` — it had been
+`false` on a campaign scenario. Still a layout mockup, but a CORRECT one, so Phase 2 starts from content
+that resolves instead of content that silently collides.
+
+<details><summary>The three defects as found</summary>
+
+`Campaigns/grand_campaign/m01_khost/campaign_khost.manifest` said:
 1. `"scenarioId": "Mission_Khost"` — **identical to the standalone's id.** Campaign nodes address scenarios
    BY ID, so a duplicate id is unresolvable. Should be `Campaign_Khost` — the constant already exists
    (`GameData.SCENARIO_ID_CAMPAIGN_KHOST`, GameData.cs:1513) and is currently used by nothing that works.
@@ -272,6 +303,9 @@ discovery never scanned `Campaigns/`.
 ⚠ **Question for Bob: does the external scenario editor author `.manifest` files, or are they hand-kept?**
 The map/oob are dated 27 Jul (the re-export) but both manifests are 24 Jun — which reads like hand-kept. If
 the editor writes them, my fix gets clobbered on the next export and the fix belongs on their side instead.
+**ANSWERED 2026-07-28: the agent maintains manifests.** No clobber risk.
+
+</details>
 
 ### ✅ FINDING C — RESOLVED 2026-07-28. See the Phase 1 section above; the switch is deleted.
 
@@ -314,13 +348,10 @@ is name-form. The mockup campaign manifest was left as-is with the rest of the m
       corrections to its premises. ⚠ ONE PART REMAINS FOR PHASE 2: 3.3 currently resolves a saved
       **scenarioId**. When campaign nodes exist, extend `VerifyContentAvailable` to also check the NEXT
       node's scenario and to offer a way back to the menu rather than only naming the failure.
-- [ ] **S8 — content fixes for the campaign mockup** (Finding B): real `scenarioId`, its own `displayName`,
-      the briefing filename that is actually in the folder, name-form enums. ⚠ First answer **who authors
-      `.manifest` files** — if the external scenario editor emits them, the fix belongs on their side or it
-      is clobbered on the next export.
-- [ ] **S9 — docs.** ✅ Claude_Project §1/§7.1/§7.2 and the `JsonPolicy` comments were reconciled 2026-07-28
-      with the Phase 1 finish. Still owed when Phase 2 lands: §4.1, §5, and — if Bob ratifies — the
-      DesignDoc §19.1.6 amendment per Finding A.
+- [x] **S8 — ✅ DONE 2026-07-28.** See Finding B above. Manifests are the agent's to maintain (Bob).
+- [ ] **S9 — docs.** ✅ Done 2026-07-28: Claude_Project §1/§7.0/§7.1/§7.2/§7.3, the `JsonPolicy` comments,
+      the **DesignDoc §19.1.6 amendment** (Finding A ratified) and the NEW **§20.4.1/.2 terminology +
+      narration rules**. Still owed when Phase 2 lands: Claude_Project §4.1 and §5.
 
 **Not in Phase 2 either:** victory-threshold scoring (needs the §19.1.6 ruling AND a real `BattleResult`
 calculation — `CompleteBattle` hardcodes `Draw` today; M13-adjacent), and the
@@ -340,8 +371,15 @@ all".
 ⚠ **The bump was FREE, and worth knowing why:** `SaveLoad.SaveAsync`/`LoadAsync` still have **zero callers**
 — save/load is not wired to any UI — so no save exists that these shape changes could strand.
 
-- [x] **3.1 DONE.** `GameStateSnapshot.Header` wired in, carrying `saveTime · gameVersion · contentVersion ·
-      scenarioId · campaignId · combatUnitCount · leaderCount`, stamped by `SnapshotMapper.BuildHeader`.
+- [x] **3.1 DONE.** `GameStateSnapshot.Header` wired in, carrying `saveTime · gameVersion · scenarioId ·
+      campaignId · combatUnitCount · leaderCount`, stamped by `SnapshotMapper.BuildHeader`.
+      ⚠ **`contentVersion` was added and then DELETED the same day (Bob's call), and the reasoning is worth
+      keeping:** it came from this plan, was never in the design doc, and had no defined semantics. Content
+      ships INSIDE the build, so `gameVersion` already identifies it exactly and the two could never
+      legitimately disagree; modding is out, so there is no foreign content; and the `.map` checksum is a
+      better content identity than a hand-kept string. It would have shipped as an always-empty field that
+      LOOKED meaningful — the `MapChecksumUtility` mistake (§7.1) starting over. Caught before it shipped a
+      claim. See 2.1 for why the CAMPAIGN case is different and still open.
       ⚠ It deliberately carries **no `version`** — `GameStateSnapshot.SaveVersion` is the ONE authority the
       ladder keys off, and a save reporting two versions that can disagree is worse than one reporting none.
       ⚠ And the old **`checksum` field is DELETED**: never computed, never validated — precisely the shape
@@ -389,13 +427,12 @@ without the source: `System.Text.Json` serializes in property-declaration order,
 them BEFORE. So the editor's hash input is not the byte string `SerializeToUtf8Bytes(hexes, options)` would
 produce. Turning validation on as originally planned would have hard-failed every existing map on day one.
 
-- [ ] **4.1 DECIDE FIRST: are per-map checksums worth keeping at all?** Their value was integrity for
-      user-supplied maps, and modding is designed OUT. Steam already verifies shipped file integrity, which is
-      the same guarantee for free. Leaning: DELETE `MapChecksumUtility` and the `checksum` header field rather
-      than fix a hash nobody checks.
-- [ ] **4.2 IF KEPT:** the EDITOR's byte order is the ground truth — every authored map already hashes that
-      way — so the game must adopt it, never the reverse. Changing the game's order invalidates nothing;
-      changing the editor's invalidates every map ever written.
+- [-] **4.1 ANSWERED — no.** (Was: "are per-map checksums worth keeping at all?") Their value was integrity
+      for user-supplied maps, and modding is designed OUT; Steam verifies shipped file integrity for free.
+      Resolved by the RETIRED ruling above: `MapChecksumUtility` deleted, header field kept as the editor's
+      fingerprint.
+- [-] **4.2 MOOT** — nothing was kept on the game side, so there is no byte order for the game to adopt.
+      (Was: if kept, the EDITOR's order is ground truth, since changing it invalidates every map written.)
 - [-] **4.3** Superseded — nothing validates, so there is no failure to report.
 
 </details>

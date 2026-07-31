@@ -39,17 +39,16 @@ namespace HammerAndSickle.Core.GameData
         [JsonPropertyName("briefingFilename")]
         public string BriefingFilename { get; set; } = string.Empty;
 
-        /// <summary>
-        /// Content version of this scenario, stamped into a save's provenance header (§3.1) so a save
-        /// made against patched content can be identified rather than silently mismatched.
-        ///
-        /// ⚠ OPTIONAL AND CURRENTLY UNSET — no authoring tool emits it yet, so it reads as empty and the
-        /// header records empty. That is deliberate: an absent version is honest, whereas defaulting it to
-        /// "1.0.0" would assert a version nobody set. Free to start emitting whenever the editor is ready;
-        /// nothing needs to change here when it does.
-        /// </summary>
-        [JsonPropertyName("contentVersion")]
-        public string ContentVersion { get; set; } = string.Empty;
+        // ⚠ NO `contentVersion` HERE, DELIBERATELY (added then removed 2026-07-28, Bob's call).
+        // A per-scenario content version cannot earn its place while content ships INSIDE the build:
+        // StreamingAssets is replaced wholesale by a Steam patch, so content and exe move together and a
+        // scenario's version could never legitimately disagree with the `gameVersion` already recorded in
+        // the save header. Modding is designed out, so there is no foreign content to reconcile either,
+        // and the .map header's editor-maintained `checksum` is a better content identity than a
+        // hand-kept string — automatic and tamper-evident, where a forgotten version stamp asserts
+        // something false. An always-empty field that LOOKS meaningful is the MapChecksumUtility mistake
+        // (§7.1); this one was caught before it shipped a claim.
+        // ⚠ The CAMPAIGN manifest is a genuinely different case and stays open — see todo.md Phase 2.1.
 
         [JsonPropertyName("prestigePool")]
         public int PrestigePool { get; set; } = 0;
