@@ -36,6 +36,10 @@ Phases 0, 1, 3 and 4 COMPLETE, so **adding a STANDALONE SCENARIO needs no code**
 `Scenarios/` — discovered, listed, played) and the save declares the content it was made against.
 ⚠ Only Phase 2 is left and it is PAUSED — **campaign scenarios are not reachable yet**, and saving/loading
 is not wired to anything. See frontier 1 below for the full resume note.
+Plus the 2026-07-28 HUD pass: **20 battle-scene button callbacks wired** (most deliberate stubs that announce
+themselves — see Claude_Project §3.6e), with next/prev unit, the printer nav, the loss reports and **deploy
+up/down** all LIVE and play-confirmed; the equipment loss ledger + loss report (§3.6d); six click-through
+panels.
 
 **Verification history — ALL CLEAR as of 2026-07-28.** Confirmed in play or by suite run: selection/movement ·
 movement overlays incl. over city hexes · ground combat · indirect fire + counter-battery · icon facing · helo
@@ -45,14 +49,18 @@ AI-track suites · the 07-28 scenario-load path (SceneID switch deleted, name-fo
 Per-item detail is in the change log — do NOT re-accumulate a confirmation list here.
 **Anything still owed lives in ⚑ TESTING REQUESTS below, which is the ONLY place open test asks belong.**
 
-**⚠ BLOCKING RIGHT NOW:** the End Turn / next-unit / prev-unit buttons have no onClick. The 2026-07-27 wiring
-change removed their code `AddListener`s, so **turn flow is dead in play until Bob wires the three callbacks**
-(`BattleManager.OnEndTurnButton`, `DefaultDialog_Scene1.OnNextUnitButton` / `.OnPreviousUnitButton`).
+**⚠ NOTHING IS BLOCKING.** The 2026-07-27 button-wiring gap is CLOSED — Bob wired the callbacks during the
+07-28 HUD pass and turn flow plays.
+
+**▶ NEXT SESSION — ROUGH-EDGES PASS on the battle scene (Bob's call, 2026-07-28).** Consolidate before adding
+functionality: "straighten out some rough edges before too many pile up", covering everything in the battle
+scene so far, not just the recent work. ⚠ Start by ASKING Bob which edges he has in mind — this note records
+the intent, not a diagnosis, and the agent should not assume its own list is his.
 
 ### BOB'S QUEUE (nobody else can do these)
 
-- [ ] **Wire the three button onClicks** — the blocking item above. Then run `Tools/UI/Audit Button Wiring`;
-      it should come back clean, and that is the tool's first real exercise.
+- [ ] **Run `Tools/UI/Audit Button Wiring`** now that ~20 buttons are wired — it should come back clean, and
+      that is the tool's first real exercise. (The three-button blocker it was queued behind is resolved.)
 - [ ] **Relay to the SCENARIO EDITOR agent** (`ScenarioEditor_Status_2026-07-28.md` covers most of it):
       (a) the **checksum decision is SETTLED, not pending** — `MapChecksumUtility` is deleted, the header
       field stays as their fingerprint, they can stop treating their hash path as provisional;
@@ -242,9 +250,29 @@ sweeps (player + `RecomputeAIPerception`) AND the `AIPerceptionState.StepDecay` 
 > The finished slices are compressed into the DONE section below. Design lives in HS_DesignDoc §24.8; shipped
 > behaviour in Claude_Project §3.6c. Only unbuilt work is listed here — P5 ledger, P6 report, P8b tests.
 
-- [ ] **P5 — LOSS LEDGER (a new system — the real work in this pass).** `BattleManager.RecordPlayerUnitLoss()` /
-      `RecordAIUnitDestroyed()` are EMPTY STUBS with zero callers, under a `// TODO: Loss tracking system`
-      comment. Nothing tracks losses today.
+- [~] **P5 — LOSS LEDGER — ✅ BUILT, GREEN AND PLAY-CONFIRMED 2026-07-28. Only PERSISTENCE remains.**
+      ✅ **DONE:** `GameDataManager` now owns a static `Dictionary<Side, Dictionary<WeaponType, float>>`
+      ledger (Bob's placement call) + `RecordEquipmentLosses` / `RecordRemainingEquipmentAsLost` /
+      `GetLossLedger` / `ClearLossLedger`, cleared in `ClearAll` since losses are per-battle. Booking is
+      hooked in **`CombatUnit.TakeDamage`** — see the deviation note below — plus the surrender case in
+      `RetreatResolver`. NEW `LossLedgerTests` (12).
+      ⚠ **DEVIATION FROM THE BRIEF, deliberate:** Bob said "directly after combat". Hooking there would
+      have silently missed return fire, ambush, counter-battery and AD opportunity fire, which resolve
+      OUTSIDE the main exchange. `CombatUnit.TakeDamage(float)` is already the single funnel every damage
+      site passes through (12 call sites across `CombatResolver` + `RetreatResolver`), so booking there
+      catches every source AND cannot be forgotten when a new damage source is added.
+      ⚠ **STATIC, not instance:** `GameDataManager.Instance` lazy-creates a GameObject, so an instance call
+      from `CombatUnit` would spawn a manager in every headless EditorTest that damages a unit — the same
+      trap `PrinterMessage` hit. Statics sidestep it.
+      ⚠ **Books HP ACTUALLY REMOVED, not damage requested** — overkill on a nearly-dead unit must not book
+      equipment it no longer had, and the two differ on precisely the blow that kills.
+      ⏳ **STILL OWED for P5:** the ledger does NOT yet survive save/load — snapshot field +
+      `SAVE_VERSION` bump (⚠ and that bump ends the "amend v4 in place" allowance recorded at the constant).
+      Original findings kept below.
+
+      `BattleManager.RecordPlayerUnitLoss()` / `RecordAIUnitDestroyed()` are EMPTY STUBS with zero callers,
+      under a `// TODO: Loss tracking system` comment. ⚠ **They are now a SECOND HOME for this concept and
+      should be DELETED** — the ledger lives in GDM.
 
       **ACCOUNTING MODEL — RATIFIED 2026-07-25 (Bob's, and it is better than the "proportional buckets" version
       I proposed):** HP already ARE equipment. §12.2.6 scales a unit's equipment counts linearly by
@@ -276,9 +304,49 @@ sweeps (player + `RecomputeAIPerception`) AND the `AIPerceptionState.StepDecay` 
       able to deduce a little hidden intel from it after a couple of attacks, but that signal drowns out fast.
 
       Ledger must survive save/load → snapshot field + `SAVE_VERSION` bump (one is already owed for AI2).
-- [ ] **P6 — Loss report message + its button.** Two columns (OURS / ENEMY), rows per P5, cumulative for the
-      scenario, `Divisional HQ` letterhead. Sets the 9-line height budget for P1. Button is OFF the CRT →
-      gameplay button, serialized ref + `AddListener`, callback on `DefaultDialog_Scene1`.
+- [x] **P6 — LOSS REPORT — ✅ DONE, GREEN AND CONFIRMED IN PLAY 2026-07-28.**
+      ✅ NEW `PrinterMessage.CreateLossReport(ourLedger, enemyLedger)` — two columns (OURS / ENEMY), the six
+      ratified rows, `Divisional HQ` letterhead, `PrinterCategory.Combat`. `OnDisplayLossesButton()` is now
+      LIVE: it reads both GDM ledgers and raises the message. Bob wires the button; no other setup.
+      ⚠ **THE ROLLUP SHARES THE INTEL REPORT'S CLASSIFIER.** Extracted NEW
+      `RegimentProfile.ClassifyWeaponType(WeaponType) → EquipmentBucket` (+ the enum, transient/not
+      persisted) and re-pointed `GetIntelReport()` at it, so the loss report and the intel report cannot
+      drift about what counts as a tank. The ratified P5 note required exactly this instead of a second copy
+      of the prefix list.
+      ⚠ **ROUNDS ONCE, AFTER SUMMING A ROW** — rounding each bucket before adding would re-introduce the
+      small-value loss the fractional ledger exists to prevent (0.4 + 0.4 must read 1, not 0).
+      ✅ **DAILY REPORT ADDED 2026-07-28 (Bob asked for it).** Second callback
+      `OnDisplayDailyLossesButton()` → **wire to its own button.** Backed by a SECOND accumulator
+      (`GetDailyLossLedger`) fed by the same booking and reset in `BattleManager.SetTurn` — the one place
+      the turn number changes. ⚠ A second accumulator rather than a snapshot-and-subtract: a baseline diff
+      breaks silently the moment the cumulative ledger is cleared or restored, with no way to detect it.
+      Headed "LOSSES THIS TURN" / empty-state "No losses this turn."
+      ✅ **TRUCKS RESOLVED — NOT A GAP (Bob, 2026-07-28).** Verified in `WeaponProfileDB`: NO truck profile
+      declares any intel stats (`TRK_GEN_SV`, `TRK_WEST` add none), so trucks are absent from the intel
+      model itself and there is nothing to report.
+      ⚠ **BUT THE CHECK FOUND A REAL HOLE, NOW FIXED:** the `TRN` bucket's ONE profile with intel stats is
+      the **An-12, a fixed-wing transport carrying 48** — so a destroyed transport regiment printed
+      "Aircraft 0" while 48 aircraft vanished. `TRN` is now in the **Aircraft** row, which is exact today
+      since trucks and `TRN_NAVAL` declare nothing. ⚠ Revisit if a truck or naval transport ever GAINS
+      intel stats — they would then land under Aircraft and the bucket needs splitting.
+      ✅ **HEIGHT FIXED 2026-07-28 after Bob's play-test: fits horizontally, OVERRAN VERTICALLY.** The CRT
+      shows ~10 lines including the frame's `turn: Message from …` header; the first layout spent 10 on
+      heading + blank spacer + column header + six rows, so anything past Helicopters was clipped.
+      Two lines recovered, now **8 with a line in hand**: (a) the heading MERGED INTO the column-header row
+      ("ALL LOSSES / TURN LOSSES" sits in the row-label column, which was dead space carrying nothing), and
+      (b) the blank spacer deleted.
+      ⚠ **AND IT FIXED A DEFECT THE OVERRUN WAS HIDING:** the empty-state notice was APPENDED BELOW the six
+      zero rows, i.e. past the bottom of the panel — so "No losses reported." was invisible in exactly the
+      case it existed to explain. The empty report now REPLACES the table (3 lines) instead of trailing it.
+      ✅ Horizontal alignment CONFIRMED in play — the CRT font is monospace, as the layout assumed.
+      NEW `Report_FitsTheCrtHeightBudget` pins ≤9 rendered lines, since an overrun clips SILENTLY.
+      ⚠ **CORRECTED 2026-07-28 — the old "serialized ref + `AddListener`" instruction is OBSOLETE and would
+      now violate CLAUDE.md §2.13.** This slice predates the 2026-07-27 wiring ruling: the Inspector owns
+      every `onClick`, and a code `AddListener` on top of it double-fires. ✅ The callback ALREADY EXISTS —
+      `DefaultDialog_Scene1.OnDisplayLossesButton()`, stubbed 2026-07-28 and ready for Bob to wire. P6 makes
+      it real by replacing its `Report(...)` line.
+      ⚠ **STILL UNDECIDED:** two events exist, `RaiseDailyLossesRequested()` and `RaiseTotalLossesRequested()`,
+      so whether this is ONE button or TWO is a design choice nobody has made.
 - [ ] **P8b — Tests.** History cursor
       bounds, dedup, filter, ledger arithmetic (proportional maths + save round-trip), and that a message whose
       rung was not earned omits its line rather than printing a default.
@@ -309,27 +377,71 @@ sweeps (player + `RecomputeAIPerception`) AND the `AIPerceptionState.StepDecay` 
 - [x] **Unit-panel click-through + camera edge-stall — BOTH FIXED AND CONFIRMED (Bob, 2026-07-27).** Diagnosis and
       fix detail in the change log; the two lessons worth keeping are recorded in Claude_Project §3.6/§3.7 —
       a null click-through slot FAILS OPEN, and scroll damping must be per-axis and outward-only.
-- [ ] **⚠ THE STANDALONE SCENARIO CONTENT IS STILL UNVERSIONED (found 2026-07-27, needs Bob's call).**
-      Two load paths exist and both are live, selected by `isCampaignScenario`: campaign reads
-      `Assets/Generated Data` (now tracked), standalone reads `Documents/My Games/Hammer and Sickle/scenario data`
-      (NOT in the repo, and outside the repo tree so git cannot reach it). What is actually playable today is the
-      STANDALONE one — `ScenarioDialog_Scene0:179` builds the scenario list from `AppService.ManifestsPath`, i.e.
-      Documents, which holds only `mission_khost.manifest`; the repo's `campaign_khost.manifest` never appears in
-      the menu. And the two copies have DIVERGED, with Documents newer:
-      `Khost.map` 1,056.8 KB (24 Jun 2026) vs repo 968.3 KB (12 Nov 2025) · `khost.oob` 40.3 KB vs 29.3 KB ·
-      `mission_khost.manifest` same size, different hash. So the repo now holds a stale snapshot of the content
-      being played, and the real thing is one disk failure from gone.
-      **Options:** (a) copy the Documents files over the repo copies and treat `Assets/Generated Data` as the
-      authoring source with Documents as a deploy target — cheap, but they re-diverge on every edit unless the
-      copy is scripted; (b) point the standalone path at the project folder too and keep Documents for saves and
-      logs only — versioned by construction, but a shipped build cannot read `Application.dataPath` this way, so
-      it needs StreamingAssets; (c) accept it. ⚠ Do NOT overwrite anything without Bob: `Khost.map`/`khost.oob`
-      are shared by BOTH manifests, so syncing the mission version also changes what the campaign path loads.
+- [x] **✅ CLOSED 2026-07-28 — standalone scenario content is versioned. (Was: "STILL UNVERSIONED", found
+      2026-07-27.)** Resolved by the CONTENT PIPELINE pass, which took option (b): all shipped content moved
+      into `Assets/StreamingAssets/`, so it is versioned by construction and reachable in a build. Every claim
+      in the original item is now false — `AppService.ManifestsPath` and `Assets/Generated Data` are deleted,
+      the `isCampaignScenario` path split is gone, the divergent Documents copy was deleted after its newer
+      files were taken as the source of truth, and Documents holds saves and logs only.
 - [ ] **`SetScrollBounds` HAS ZERO CALLERS** — scroll bounds are whatever is serialized on the Inspector
       (`ScrollBounds` defaults ±100), never derived from the loaded map. Hand-calibrated for 32x21 Khost, so it
       WILL be wrong at any other map size. Pairs with the `BattleBackgroundFitter` deferral: both are "breaks on
       the first differently-sized map" items — do them in the same pass. `BattleManager.SetupBattleManagerData`
       already calls `FitToMap(w,h)` and is the natural call site.
+- [x] **DEPLOY UP / DOWN — ✅ DONE, SUITE GREEN AND CONFIRMED IN PLAY 2026-07-28.**
+
+      ### What already exists (verified, not assumed)
+      - `CombatUnit.TryDeployUP(out errorMsg, onAirbase, onPort)` / `TryDeployDOWN(out errorMsg)` are
+        COMPLETE: `CanChangeToState` + `SpecialEmbarkmentChecks` validation, the airborne override
+        (AB/MAB, and SPECF carrying an An-12, skipping Mobile straight to Embarked beside a friendly
+        airbase), the Fortified/Entrenched→Deployed collapse, and `ApplyDeploymentTransitionCosts`
+        (supply · `DeploymentAction` · 50% of max MP · re-max MP from the newly active profile).
+      - `Prefab_CombatUnitIcon` already subscribes to `OnUnitDeploymentChanged` → `RefreshDeployIcon()`,
+        which resolves through the intel gate (`UnknownDeploymentIcon` when the rung is unearned).
+      - **Zero callers.** Nothing invokes `TryDeploy*`; nothing raises `RaiseUnitDeploymentChanged`.
+
+      ### ⚠ CORRECTION TO AN EARLIER CLAIM IN THIS FILE'S CONVERSATION — THERE IS NO STALE-ICON BUG
+      I previously reported that combat-driven deployment changes leave the icon stale. **That is wrong.**
+      `MovementController:584` already raises `RaiseRedrawMapIcons()` after every combat (its comment
+      names "defender displacement"), `OnRedrawMapIcons` does `ClearAllUnitIcons()` + `DrawAllUnits()`,
+      and `DrawAllUnits` initialises each icon with the unit's LIVE `DeploymentPosition`. So the
+      RetreatResolver paths (§7.9.5.2 dug-in drop, §7.9.6a surrender→Deployed) render correctly today.
+      `RaiseUnitDeploymentChanged` is unused SCAFFOLDING, not a broken link — the coarse redraw covers
+      the same ground. Nothing to fix; the work below is a feature, not a repair.
+
+      ### ⚠ Two traps that shape the design
+      1. **The model layer must NOT raise events.** No class under `Models/` raises anything today, and
+         `EventManager.Instance` LAZY-CREATES a GameObject — so a raise inside `CombatUnit` would spawn an
+         EventManager in every headless EditorTest that changes deployment. ⚠ `?.` does NOT save you: the
+         getter creates the object and never returns null. The raise belongs in the CONTROLLER subscriber.
+      2. **`TryDeploy*` bypass `SetDeploymentPosition`** — they assign `_deploymentPosition` directly
+         (:1285/:1287/:1315), so that setter is NOT the single write funnel it appears to be. Either route
+         them through it or accept two write paths; do not assume one.
+
+      ### The steps
+      - [x] **D1 — Missing action-economy gate.** `CanChangeToState` checks same-state, destroyed,
+            unit-type, critical supply and StaticOperations — but **NOT that a `DeploymentAction` remains**,
+            while `ApplyDeploymentTransitionCosts` decrements one unconditionally. Add the check, or a unit
+            deploys freely all turn. Cheapest correct home is `CanChangeToState`, so both entry points get it.
+      - [x] **D2 — Controller subscriber.** `MovementController` (it already owns the unit-action input handlers and
+            calls the combat orchestrators) subscribes to `OnDeployUpRequested`/`OnDeployDownRequested` in
+            `Start()`, resolves `onAirbase`/`onPort`, calls `TryDeploy*`, and on success raises
+            `RaiseUnitDeploymentChanged(unit.UnitID, unit.DeploymentPosition, unit.CurrentEmbarkmentState)`
+            — finally giving that event its first caller — plus `RaiseUnitActionsChanged`/movement-point
+            refresh so the HUD reflects the spent action and MP.
+      - [x] **D3 — `onAirbase` / `onPort` resolution.** `onPort` is `HexTile.IsPort` on the unit's hex.
+            `onAirbase` is "adjacent to an ACTIVE friendly airbase unit" — needs a helper; `GameDataManager`
+            already filters `u.IsBase && u.FacilityType == FacilityType.Airbase` (:883). Must respect
+            side and operational state, not merely presence.
+      - [x] **D4 — Refusal feedback.** `TryDeploy*` return a human-readable `errorMsg`.
+            ⚠ **§24.8.5 says deployment refusals are DENIAL SFX, NOT printer dispatches** — do not route
+            these to the CRT. `AppService.CaptureUiMessage` + the (unbuilt) denial SFX hook.
+      - [x] **D5 — Point the two button stubs** `OnDeployUpButton`/`OnDeployDownButton` at the events,
+            replacing their `ReportForSelectedUnit` lines.
+      - [x] **D6 — Tests.** Costs applied exactly once; refusal leaves state AND action count untouched;
+            no `DeploymentAction` = refusal; Fortified→Deployed collapse; the airborne override;
+            critical-supply refusal.
+
 - [ ] **Move Undo (§5.11 — v1 CONFIRMED, HUD button art exists):** `MovementController` pre-move snapshot (MP,
       actions, position, facing, deployment profile) + spotting-dirty flag during traversal (§5.11.1: undo only if
       no enemy SpottedLevel rose); voided by ambush / ZoC-halt / extra supply (§5.11.4); single undo per move;
@@ -672,6 +784,14 @@ suppressed). Panel model settled at three always-open panels (§3.6c/§4.3) afte
 say *what* changed, not *why* (rationale lives in the design doc / gap analysis) · if it needs more
 than one line, it belongs elsewhere.
 
+- 2026-07-28 — ✅ DEPLOY UP/DOWN CONFIRMED IN PLAY (Bob) — buttons wired, deployment changes correctly in game with the unit's map art following the state, and the two new click-through panels stop the order panels leaking clicks to the map. Shipped behaviour recorded in Claude_Project §3.6e (button callback inventory, the controller-not-model raise rule, the redraw-not-badge rule, and the `CanChangeToState` action gate) and the six-slot click-through list in §3.6b. ⚠ NEXT SESSION IS A ROUGH-EDGES PASS on the battle scene (Bob's call, 2026-07-28) — consolidate before building more functionality.
+- 2026-07-28 — ✅ DEPLOY UP/DOWN SUITE GREEN (Bob) + two NEW click-through slots on `DefaultDialog_Scene1`: `_unitOpsPanel` and `_battleOpsPanel`, added to the `_panels` hit-test array AND to `WarnOnUnassignedPanels`. ⚠ Both are needed because an unlisted panel FAILS OPEN — clicks pass through it to the map, and a right-click reaching the map is a MOVE ORDER issued under the panel the player thought they were pressing (the same defect that went unnoticed for four days in July). Bob assigns both RectTransforms in the Inspector. ⚠ FOUR TEST FAILURES EN ROUTE WERE MINE, one cause: the five-argument `CombatUnit` ctor installs NO weapon profiles (only the eleven-argument one calls `InitializeRegimentProfile`), so a completing transition threw in `UpdateMovementPointsForProfile` — "No active weapon system profile available". The tell was WHICH tests failed: all four were the SUCCESS cases, while the five refusal cases passed because they return before reaching the cost step, so a profile-less fixture exercised half the suite perfectly and broke the other half. Fixed by installing `WeaponType.INF_REG_SV` the way the combat suites do. Also hardened `DeploymentAlsoCostsSupplyAndMovement`, which asserted `Current < Max` — but a transition RE-MAXES movement points from the newly active profile, so Max is a moving target and the assertion turned on profile MMP rather than on the cost; it now compares against the pre-transition current. LESSON: trace the SUCCESS path's full call chain when writing a fixture against unfamiliar model code, not just the validation gates being asserted on (DefaultDialog_Scene1/DeploymentActionTests/Claude_TODO)
+- 2026-07-28 — DEPLOY UP/DOWN WIRED END TO END (D1–D6), and D1 was a REAL DEFECT not just plumbing: `CanChangeToState` gated on same-state, destroyed, unit-type, critical supply, StaticOperations and movement points but NOT on having a `DeploymentAction` left, while `ApplyDeploymentTransitionCosts` decremented one unconditionally — so a unit could dig in and un-dig every turn for free. ⚠ The movement-point check was NOT covering for it: MP is re-maxed from the newly active profile on every transition, so a unit can hold plenty of MP with no action left. NEW handlers on `MovementController` (`OnDeployUpRequested`/`OnDeployDownRequested`), modelled exactly on `HandleIntelActionRequested`: phase + side gate, call `TryDeploy*`, publish on success. The controller supplies the two pieces of MAP context the model cannot see — `onPort` from `HexTile.IsPort`, and `onAirbase` from adjacency to a friendly airbase that is neither destroyed nor `OutOfOperation` (⚠ ACTIVE is checked, not merely present: a wrecked airfield must not launch paratroopers). ⚠ THE RAISE LIVES IN THE CONTROLLER, NOT THE MODEL — nothing under `Models/` raises events and `EventManager.Instance` LAZY-CREATES a GameObject, so a model-side raise would spawn an EventManager in every headless EditorTest that changes deployment; `?.` does not help because the getter creates the object and never returns null. ⚠ SUCCESS RAISES A FULL `RaiseRedrawMapIcons`, DELIBERATELY NOT `RaiseUnitDeploymentChanged`: that event only refreshes the deploy BADGE, but deployment also swaps the unit's MAIN ART (`GameIconRenderer` resolves it through `RegimentProfile.GetIcon(DeploymentPosition, facing)`), so a badge-only refresh would leave a mounted unit drawn as infantry. Refusals go to `AppService.CaptureUiMessage`, NEVER the printer (§24.8.5 — deployment refusals are denial feedback, not dispatches). Button stubs `OnDeployUpButton`/`OnDeployDownButton` now raise the events. NEW `DeploymentActionTests` (9): one action spent exactly, refusal when none remain, a refused change leaves state/supply/MP/actions untouched, supply+MP both charged, dig-in one step, Fortified refuses further, dug-in→Deployed collapses in one action, critical-supply refusal. Main + EditorTests build clean (CombatUnit/MovementController/DefaultDialog_Scene1/DeploymentActionTests/Claude_TODO)
+- 2026-07-28 — ✅ PRINTER P5 + P6 GREEN AND CONFIRMED IN PLAY (Bob): all 22 `LossLedgerTests` pass, every existing combat suite still green despite the booking call now running inside `CombatUnit.TakeDamage` in every test that damages a unit, and the loss report works end-to-end in game — both buttons, correct figures, fits the CRT. One test failure en route was MINE, not the code's: `Report_ShowsAllSixRatifiedRows` built its report from EMPTY ledgers, and the height fix had just made an empty report replace the table with a one-line notice, so it went looking for a "Men" row in a message that deliberately has none — the test's premise went stale when I changed the shape, and I should have swept the report tests in that same edit rather than after the run. Fixed by booking a loss first, which pins the contract that actually matters (when there ARE losses, all six rows appear including zeroed ones). Audited the other seven report tests for the same stale assumption — only that one had it; the two still using empty ledgers are the ones asserting empty-state behaviour. Shipped behaviour recorded in Claude_Project §3.6d (LossLedgerTests/Claude_Project/Claude_TODO)
+- 2026-07-28 — PRINTER P6 HEIGHT FIX after Bob's play-test: the report FITS HORIZONTALLY (monospace CRT confirmed, columns align) but OVERRAN VERTICALLY — the panel shows ~10 lines including the frame's `turn: Message from …` header, and the layout spent exactly 10 on heading + blank spacer + column header + six equipment rows, so anything past Helicopters was clipped. Recovered two lines, now 8 with one in hand: the heading MERGED INTO the column-header row (it now occupies the row-label column, which on that row was dead space carrying no information — the cheapest line in the message to delete), and the blank spacer removed. ⚠ THE OVERRUN WAS HIDING A DEFECT: the empty-state notice was APPENDED BELOW the six zero rows, i.e. onto the first clipped line, so "No losses reported." was invisible in precisely the case it existed to explain and the player saw six zeroes and nothing else. The empty report now REPLACES the table (3 lines) rather than trailing it. NEW `Report_FitsTheCrtHeightBudget` pins ≤9 rendered lines and a companion assert proves the empty report has no table — worth tests because an overrun CLIPS SILENTLY: it never throws, and it is invisible from outside the editor. Headings shortened to "ALL LOSSES" / "TURN LOSSES". `LossLedgerTests` 21 → 22 (PrinterMessage/LossLedgerTests/Claude_TODO)
+- 2026-07-28 — PRINTER P6 DAILY LOSS REPORT + A REAL HOLE FOUND BY CHECKING BOB'S TRUCK CLAIM. Bob asked for a daily-losses callback: NEW `OnDisplayDailyLossesButton()` (its own button) backed by a SECOND accumulator `_dailyLossLedger` fed from the same booking site and reset in `BattleManager.SetTurn`, the one place the turn number changes. ⚠ A SECOND ACCUMULATOR RATHER THAN SNAPSHOT-AND-SUBTRACT: a baseline diff looks cheaper but breaks silently whenever the cumulative ledger is cleared or restored (new battle, save load), because baseline and total then disagree with nothing to detect it; two accumulators fed from one call site cannot drift. Report heading switches to "LOSSES THIS TURN" with its own empty state. ⚠ BOB'S TRUCK RULING IS CORRECT AND IS NOW VERIFIED, NOT ASSUMED: no truck profile declares ANY intel stats (`TRK_GEN_SV`/`TRK_WEST` add none), so trucks are absent from the intel model and there is genuinely nothing to report — not a gap. ⚠ BUT THE SAME CHECK FOUND A REAL DEFECT: the only `TRN`-bucket profile that DOES declare intel stats is the **An-12, a fixed-wing transport plane carrying 48**, and with `TRN` in no display row a destroyed transport regiment would have printed "Aircraft 0" while 48 aircraft vanished from the tally. `TRN` folded into the **Aircraft** row, which is EXACT today rather than approximate because trucks and `TRN_NAVAL` declare nothing — flagged to revisit if either ever gains intel stats, since they would then wrongly file under Aircraft. `LossLedgerTests` grew 17 → 21 (daily tracks alongside cumulative, new period clears daily but NOT cumulative, daily accumulates only within its period, daily report labelling + empty state, transport aircraft appear under Aircraft). Main + EditorTests build clean (GameDataManager/BattleManager/PrinterMessage/DefaultDialog_Scene1/LossLedgerTests/Claude_TODO)
+- 2026-07-28 — PRINTER P6 LOSS REPORT BUILT AND PRINTABLE (P5 suites green, Bob). NEW `PrinterMessage.CreateLossReport(ourLedger, enemyLedger)` — two columns OURS/ENEMY over the six ratified rows (Men·Tanks·AFVs·Guns·Aircraft·Helicopters), `Divisional HQ` letterhead, `PrinterCategory.Combat`; `DefaultDialog_Scene1.OnDisplayLossesButton()` is LIVE, reading both GDM ledgers and raising the message, so wiring the button is the only step left. ⚠ THE ROLLUP NOW SHARES THE INTEL REPORT'S CLASSIFIER, which the ratified P5 note specifically required rather than a second copy of the prefix list: extracted NEW `RegimentProfile.ClassifyWeaponType(WeaponType) → EquipmentBucket` (new transient, non-persisted enum) and re-pointed `GetIntelReport()` through it, so the loss report can never call something a tank that the intel report calls an AFV. ⚠ ROUNDS ONCE PER ROW, AFTER SUMMING ITS BUCKETS — rounding each bucket first would re-introduce exactly the small-value destruction the fractional ledger prevents (0.4 IFV + 0.4 APC must read 1 AFV, not 0), and there is an end-to-end test for precisely that. ⚠ THE BUTTON REPORTS CUMULATIVE LOSSES AND FIRES NEITHER `RaiseDailyLossesRequested` NOR `RaiseTotalLossesRequested`: both still have zero subscribers, and cumulative is what the ledger actually holds — per-turn requires PARTITIONING the ledger by turn, so the one-button-or-two question is downstream of that decision rather than upstream of it. ⚠ GAP FLAGGED, NOT SILENTLY PATCHED: trucks/transport (`TRN_`/`TRK_`) fit none of the six ratified rows, so their losses are NOT reported — needs either a seventh row or an explicit ruling that soft transport is not worth reporting; deliberately NOT folded into AFVs, which they are not. Empty ledgers print "No losses reported." rather than six zeroes, which reads as a bug. `LossLedgerTests` grew to 17 (5 new: six-row presence, empty-state text, IFV+APC+RCN→AFVs rollup, sum-before-round, per-side column order). Main + EditorTests build clean (PrinterMessage/RegimentProfile/DefaultDialog_Scene1/LossLedgerTests/Claude_TODO)
+- 2026-07-28 — PRINTER P5 ACCOUNTING CORE BUILT: the equipment loss ledger. NEW static `Dictionary<Side, Dictionary<WeaponType, float>>` on `GameDataManager` (Bob's placement) + `RecordEquipmentLosses`/`RecordRemainingEquipmentAsLost`/`GetLossLedger`/`ClearLossLedger`, cleared in `ClearAll` (losses are per-battle). THE MODEL, confirmed against code before building: `WeaponProfile.IntelReportStats` are the intel stats on ONE weapon profile; `RegimentProfile.TotalIntelStats` sums them across deployed/mobile/embarked and is NEVER HP-scaled at rest — the strengthRatio scaling happens at DISPLAY time in `CombatUnit.ApplyEquipmentBuckets` — which is exactly what makes TotalIntelStats the correct full-strength multiplicand, so `lost[type] = TotalIntelStats[type] × (hpLost / HitPoints.Max)`. ⚠ THREE DELIBERATE DEVIATIONS FROM THE BRIEF, all recorded at their sites: (a) Bob said "directly after combat" — booking is instead hooked in `CombatUnit.TakeDamage(float)`, ALREADY the single funnel every damage source passes through (12 call sites across CombatResolver + RetreatResolver), because "after combat" would have silently missed return fire, ambush, counter-battery and AD opportunity fire, which resolve outside the main exchange, AND would need remembering for every future damage source; (b) the ledger is STATIC because `GameDataManager.Instance` LAZY-CREATES a GameObject, so an instance call from the `CombatUnit` model would spawn a manager in every headless EditorTest that damages a unit — the identical trap `PrinterMessage` hit in the printer pass; (c) it books HP ACTUALLY REMOVED (`previous - new`) rather than damage REQUESTED, since overkill on a nearly-dead unit would otherwise book equipment the unit no longer had, and the two diverge on precisely the blow that kills. Surrender (§7.9.6a) is the ONE case `TakeDamage` cannot see — a unit removed INTACT, no damage event — so `RetreatResolver.ResolveSurrender`'s destroyed branch books remaining equipment explicitly; shatter deliberately needs nothing, its extra damage is booked but the WITHDRAWAL is not a loss. Values are float and that is load-bearing: an int ledger silently drops 3 tanks × 1HP/40 = 0.075 to zero, so a unit can be ground to death reporting no tank losses. NEW `LossLedgerTests` (12) pinning proportional maths, cross-event accumulation, the two rounding traps, overkill, per-side booking, repair-does-not-unbook, and surrender. Main + EditorTests build clean, 0 errors. ⏳ NOT YET DONE for P5: ledger does not survive save/load (snapshot field + SAVE_VERSION bump owed); `BattleManager.RecordPlayerUnitLoss`/`RecordAIUnitDestroyed` are now a second home for the concept and should be deleted (GameDataManager/CombatUnit/RetreatResolver/LossLedgerTests/Claude_TODO)
 - 2026-07-28 — `contentVersion` DELETED from `ScenarioManifest` AND the save header (Bob's call, after a research pass). ✅ GREEN: all EditorTest suites pass after the removal (Bob, 2026-07-28). ⚠ THE FIELD CAME FROM MY OWN PLANNING DOC, was never in the design doc, and had NO DEFINED SEMANTICS anywhere — implemented in Phase 3 because the plan said to, not because anyone decided what it meant. It cannot earn its place while content ships INSIDE the build: StreamingAssets is replaced wholesale by a Steam patch, so content and exe move together and `gameVersion` (already in the header) identifies the content exactly; modding is designed out, so there is no foreign content to reconcile; and the `.map` header's editor-maintained checksum is a better content identity than a hand-kept string, being automatic and tamper-evident where a forgotten stamp asserts something false. It would have shipped ALWAYS-EMPTY AND LOOKING MEANINGFUL — the `MapChecksumUtility` mistake starting over, caught this time before it put a false claim into a doc. (Industry practice, checked: the standard concept is a SAVE FORMAT version with an upgrade chain — which is `SAVE_VERSION` + the ladder, already built — not a separate content version.) ⚠ `SAVE_VERSION` deliberately NOT re-bumped to 5: v4's header shape was amended in place, which is safe ONLY because `SaveLoad` still has zero callers so no v4 file exists, and because dropping a field is read-compatible anyway; the code comment records that this reasoning EXPIRES the moment saving is wired up. ⚠ KEPT OPEN FOR `CampaignManifest` (Phase 2.1) on Bob's note that he expects to REBALANCE THE CAMPAIGN GRAPH once remote testers have builds: if a revised `campaign.manifest` ever reaches a tester WITHOUT a rebuild, content genuinely moves independently of the exe and `gameVersion` stops identifying the graph — the one condition that justifies the field. Phase 2 decides it on that question, not by analogy (ScenarioManifest/GameDataObjects/SnapshotMapper/GameData/Claude_Project/todo)
 - 2026-07-28 — FOUR BOB RULINGS RECORDED, and a TERMINOLOGY rule that outranks the rest. (1) DESIGNDOC §19.1.6 AMENDED AND RATIFIED — the SCORING/ROUTING split: a campaign scenario owns its victory THRESHOLDS (intrinsic to its map and objectives), the CAMPAIGN owns the ROUTING between missions as outcome edges keyed on `BattleResult` (first match, best→worst, plus a default — a victory/defeat PAIR cannot express "Decisive opens the Iran branch, Major continues the main line", which is the branching the section asks for). The old "branching paths between branches are scenario-defined" clause is superseded: a scenario naming its own successors cannot be reused and turns a campaign reshuffle into an edit across every affected scenario file. Neither half exists in code — `CompleteBattle` still hardcodes `Draw`. (2) NEW DESIGNDOC §20.4.1 — **THERE ARE TWO KINDS OF SCENARIO AND BARE "SCENARIO" IS NO LONGER ACCEPTABLE** where they differ: STANDALONE SCENARIO (one-off, no carryover, `Scenarios/`) vs CAMPAIGN SCENARIO / MISSION (campaign node, carries core units + prestige, `Campaigns/`). The unqualified word already caused a real defect — the retired `IsCampaignScenario` split welded a GAMEPLAY distinction to a STORAGE one, so a campaign scenario could not be standalone-tested and the two copies diverged by eight months. Recorded as Claude_Project §7.0 with a comparison table, relayed to the scenario-editor agent, and saved to agent memory. (3) NEW DESIGNDOC §20.4.2 — briefing NARRATION is CAMPAIGN-SCENARIO ONLY; standalone scenarios get written `.brf` text and no audio, so an ABSENT narration asset is the normal case and must never be an error (this is now a constraint on whatever field eventually replaces the dormant `GameAudioManager.BriefingNarration` enum). (4) MANIFESTS ARE THE AGENT'S TO MAINTAIN (not the external editor), so the campaign mockup manifest is FIXED: `scenarioId` `Mission_Khost`→`Campaign_Khost` (it had duplicated the standalone's id, which is unresolvable since campaign nodes address scenarios BY ID), its own `displayName`, `briefingFilename` corrected to the `campaign_khost.brf` actually in the folder, name-form enums, and `isCampaignScenario` `false`→`true` — it had been false on a campaign scenario. Also: Bob DELETED `Documents/.../scenario data`, so Documents is saves + logs only and P1's one-source-of-truth end state is reached (HS_DesignDoc/Claude_Project/Claude_TODO/todo/campaign_khost.manifest/agent memory)
 - 2026-07-28 — CONTENT PIPELINE PHASES 0.5 + 3 LANDED; the pass is CLOSED except Phase 2 (deferred). ✅ GREEN: all EditorTest suites incl. the new `SaveMigrationLadderTests` (9) pass (Bob, 2026-07-28). ⚠ THE `GameDataHeader` PREMISE IN 3.1 WAS WRONG: todo.md said `saveVersion`+`gameVersion` "both exist on GameDataHeader", implying saves carried a header — the class was referenced by NOTHING, was not on `GameStateSnapshot`, and no save ever wrote one; only `saveVersion` persisted. So 3.1 was "put a header on the save at all". It now carries `saveTime · gameVersion · contentVersion · scenarioId · campaignId · combatUnitCount · leaderCount` via `SnapshotMapper.BuildHeader`, with NO `version` field (`GameStateSnapshot.SaveVersion` is the one authority the ladder keys off; a save reporting two versions that can disagree is worse than one reporting none) and the old never-computed `checksum` DELETED (the exact shape that produced the false "MapLoader checksum-validates" claim). NEW `ScenarioManifest.ContentVersion` feeds it, deliberately unset — no tool emits it and an absent version is honest where a defaulted "1.0.0" asserts one nobody set. P5 IS NOW LOAD-BEARING: `MapData != null` = in-battle/self-contained, `== null` = between-battle/content-dependent, documented on the field and branched on by NEW `VerifyContentAvailable` (3.3) — an in-battle save whose scenario was uninstalled STILL LOADS with a warning because it carries its own map, a between-battle one refuses with a message NAMING the missing scenario; it runs BEFORE `ClearAll()`, since throwing after the wipe would destroy the player's current game to report a different one failed. CAMPAIGN PROGRESS BY ID: `CurrentScenarioId`/`CompletedScenarioIds`/`CampaignId` strings replace `CampaignScenario` — a 23-MEMBER ENUM OF HARD-CODED MISSION NAMES that put campaign structure in the executable and progress at an ordinal, so inserting a mission silently repointed every save; enum DELETED, along with `ScenarioData.IsCampaignScenario` (superseded by header `campaignId`) and `MaxCoreUnits` (retired §20.1 → `DeploymentPointCap`). `SAVE_VERSION` 3→4 with NO migration step — `MINIMUM_SUPPORTED` tracks it pre-1.0 so v3 is refused by name, not misread; CLAUDE.md §2 item 12 amended to record that exception and that it EXPIRES at 1.0. ⚠ The bump was free because `SaveLoad.SaveAsync`/`LoadAsync` still have ZERO callers. 0.5: NEW `SaveMigrationLadderTests` (9) — required a test seam, and the reason is the point: with `MINIMUM == CURRENT` the ladder loop is UNREACHABLE from production, so its guards would first have been exercised by the real migration they protect; `UpgradeSnapshot` now delegates to `internal RunMigrationLadder(snap, min, current, stepLookup)` and the switch became `MigrateStep(from)`, with NEW `AssemblyInfo.cs` `[InternalsVisibleTo("EditorTests")]` existing solely for this. Main + EditorTests build clean, 0 errors (GameDataObjects/GameStateSnapshot/SnapshotMapper/ScenarioManifest/GameDataManager/GameData/AssemblyInfo/SaveMigrationLadderTests/CLAUDE/Claude_Project/todo)

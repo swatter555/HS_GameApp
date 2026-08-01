@@ -156,6 +156,13 @@ namespace HammerAndSickle.Models.Combat
         {
             if (SurrenderCheck.ResolveSurrender(defender.ExperienceLevel, rng) == SurrenderOutcome.Destroyed)
             {
+                // ⚠ THE ONE LOSS-LEDGER CASE TakeDamage CANNOT SEE (printer P5). This unit is lost WITHOUT
+                // being damaged to zero — it is removed intact — so no damage event ever fires and its
+                // surviving equipment would otherwise vanish from the loss report entirely. Book it here.
+                // ⚠ Contrast SHATTER above, which is a WITHDRAWAL (§7.9.6.4): its extra damage is booked by
+                // TakeDamage, but the removal itself is deliberately NOT a loss, so it needs nothing here.
+                GameDataManager.RecordRemainingEquipmentAsLost(defender);
+
                 r.RemovedFromMap = true;
                 r.Destroyed = true;
                 r.Surrendered = true;

@@ -307,6 +307,22 @@ namespace HammerAndSickle.Models
     /// <summary>
     /// A RegimentProfile provides stat profiles for different deployment states in CombatUnits.
     /// </summary>
+    /// <summary>
+    /// The equipment buckets a <see cref="WeaponType"/> sorts into for reporting
+    /// (see <see cref="RegimentProfile.ClassifyWeaponType"/>).
+    ///
+    /// ⚠ NOT PERSISTED — this is a transient display classification, never written to a save or to
+    /// content, so it is exempt from the never-rename rule (CLAUDE.md §2.11) that governs WeaponType and
+    /// friends. Members may be renamed freely.
+    /// </summary>
+    public enum EquipmentBucket
+    {
+        None,
+        Personnel, TANK, IFV, APC, RCN,
+        ART, ROC, SAM, AAA, AT,
+        HEL, AWACS, TRN, FGT, ATT, BMB, RCNA
+    }
+
     public class RegimentProfile
     {
         #region Constants
@@ -430,6 +446,44 @@ namespace HammerAndSickle.Models
         #region Accessors
 
         /// <summary>
+        /// Sorts a <see cref="WeaponType"/> into its equipment bucket by NAME PREFIX.
+        ///
+        /// ⚠ THIS IS THE SINGLE CLASSIFIER, AND THAT IS THE POINT. Both the intel report (below) and the
+        /// §24.8 LOSS report roll up through it, so the two views cannot drift apart — the loss report can
+        /// never say "tanks" about something the intel report calls an AFV. Extracted 2026-07-28 when the
+        /// loss ledger needed the same rollup; the ratified P5 note required exactly this rather than a
+        /// second copy of the prefix list.
+        ///
+        /// ⚠ Prefix-matched, so a NEW `WeaponType` is bucketed automatically IF it follows the naming
+        /// convention, and falls to <see cref="EquipmentBucket.None"/> if it does not — silently missing
+        /// from both reports. Adding a member with a novel prefix means adding an arm here.
+        /// </summary>
+        public static EquipmentBucket ClassifyWeaponType(WeaponType type)
+        {
+            string name = type.ToString();
+
+            if (name == nameof(WeaponType.Personnel) || name.StartsWith("INF_")) return EquipmentBucket.Personnel;
+            if (name.StartsWith("TANK_")) return EquipmentBucket.TANK;
+            if (name.StartsWith("IFV_")) return EquipmentBucket.IFV;
+            if (name.StartsWith("APC_")) return EquipmentBucket.APC;
+            if (name.StartsWith("RCN_")) return EquipmentBucket.RCN;
+            if (name.StartsWith("ART_") || name.StartsWith("SPA_")) return EquipmentBucket.ART;
+            if (name.StartsWith("ROC_")) return EquipmentBucket.ROC;
+            if (name.StartsWith("SAM_") || name.StartsWith("SPSAM_") || name.StartsWith("MANPAD_")) return EquipmentBucket.SAM;
+            if (name.StartsWith("AAA_") || name.StartsWith("SPAAA_")) return EquipmentBucket.AAA;
+            if (name.StartsWith("AT_")) return EquipmentBucket.AT;
+            if (name.StartsWith("HEL_")) return EquipmentBucket.HEL;
+            if (name.StartsWith("AWACS_")) return EquipmentBucket.AWACS;
+            if (name.StartsWith("TRN_") || name.StartsWith("TRK_")) return EquipmentBucket.TRN;
+            if (name.StartsWith("FGT_")) return EquipmentBucket.FGT;
+            if (name.StartsWith("ATT_")) return EquipmentBucket.ATT;
+            if (name.StartsWith("BMB_")) return EquipmentBucket.BMB;
+            if (name.StartsWith("RCNA_")) return EquipmentBucket.RCNA;
+
+            return EquipmentBucket.None;
+        }
+
+        /// <summary>
         /// Creates an IntelReport by sorting TotalIntelStats into equipment buckets
         /// based on WeaponType name prefixes.
         /// </summary>
@@ -444,43 +498,28 @@ namespace HammerAndSickle.Models
 
                 foreach (var kvp in TotalIntelStats)
                 {
-                    string name = kvp.Key.ToString();
                     int value = kvp.Value;
 
-                    if (name == nameof(WeaponType.Personnel) || name.StartsWith("INF_"))
-                        report.Personnel += value;
-                    else if (name.StartsWith("TANK_"))
-                        report.TANK += value;
-                    else if (name.StartsWith("IFV_"))
-                        report.IFV += value;
-                    else if (name.StartsWith("APC_"))
-                        report.APC += value;
-                    else if (name.StartsWith("RCN_"))
-                        report.RCN += value;
-                    else if (name.StartsWith("ART_") || name.StartsWith("SPA_"))
-                        report.ART += value;
-                    else if (name.StartsWith("ROC_"))
-                        report.ROC += value;
-                    else if (name.StartsWith("SAM_") || name.StartsWith("SPSAM_") || name.StartsWith("MANPAD_"))
-                        report.SAM += value;
-                    else if (name.StartsWith("AAA_") || name.StartsWith("SPAAA_"))
-                        report.AAA += value;
-                    else if (name.StartsWith("AT_"))
-                        report.AT += value;
-                    else if (name.StartsWith("HEL_"))
-                        report.HEL += value;
-                    else if (name.StartsWith("AWACS_"))
-                        report.AWACS += value;
-                    else if (name.StartsWith("TRN_") || name.StartsWith("TRK_"))
-                        report.TRN += value;
-                    else if (name.StartsWith("FGT_"))
-                        report.FGT += value;
-                    else if (name.StartsWith("ATT_"))
-                        report.ATT += value;
-                    else if (name.StartsWith("BMB_"))
-                        report.BMB += value;
-                    else if (name.StartsWith("RCNA_"))
-                        report.RCNA += value;
+                    switch (ClassifyWeaponType(kvp.Key))
+                    {
+                        case EquipmentBucket.Personnel: report.Personnel += value; break;
+                        case EquipmentBucket.TANK:      report.TANK += value; break;
+                        case EquipmentBucket.IFV:       report.IFV += value; break;
+                        case EquipmentBucket.APC:       report.APC += value; break;
+                        case EquipmentBucket.RCN:       report.RCN += value; break;
+                        case EquipmentBucket.ART:       report.ART += value; break;
+                        case EquipmentBucket.ROC:       report.ROC += value; break;
+                        case EquipmentBucket.SAM:       report.SAM += value; break;
+                        case EquipmentBucket.AAA:       report.AAA += value; break;
+                        case EquipmentBucket.AT:        report.AT += value; break;
+                        case EquipmentBucket.HEL:       report.HEL += value; break;
+                        case EquipmentBucket.AWACS:     report.AWACS += value; break;
+                        case EquipmentBucket.TRN:       report.TRN += value; break;
+                        case EquipmentBucket.FGT:       report.FGT += value; break;
+                        case EquipmentBucket.ATT:       report.ATT += value; break;
+                        case EquipmentBucket.BMB:       report.BMB += value; break;
+                        case EquipmentBucket.RCNA:      report.RCNA += value; break;
+                    }
                 }
 
                 return report;

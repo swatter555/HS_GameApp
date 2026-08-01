@@ -4,6 +4,7 @@ using HammerAndSickle.Services;
 using System;
 using System.Collections.Generic;
 using System.Text;
+using UnityEngine;
 
 namespace HammerAndSickle.Core.UI
 {
@@ -185,7 +186,144 @@ namespace HammerAndSickle.Core.UI
             return new PrinterMessage(lines.ToArray(), source, PrinterCategory.Intel);
         }
 
+        /// <summary>
+        /// Builds the cumulative loss report (§24.8 / printer P6): two columns, OURS and ENEMY, over the
+        /// six ratified rows — Men · Tanks · AFVs · Guns · Aircraft · Helicopters.
+        ///
+        /// ⚠ ROUNDING HAPPENS HERE AND ONLY HERE. The ledgers accumulate FRACTIONAL equipment on purpose
+        /// (a unit holding 3 tanks that takes 1 HP of 40 contributes 0.075 of a tank); rounding earlier
+        /// destroys every small contribution and lets a regiment be ground to death reporting no losses.
+        /// This is the render step the ledger's float values were protecting.
+        ///
+        /// ⚠ THE ROLLUP GOES THROUGH <see cref="RegimentProfile.ClassifyWeaponType"/> — the same classifier
+        /// the intel report uses — so the loss report and the intel report cannot disagree about what
+        /// counts as a tank.
+        ///
+        /// ⚠ ENEMY FIGURES ARE EXACT, ratified and deliberate: this is a post-hoc HQ tally, not live intel,
+        /// so it carries none of the §12.5 estimate error and no "figures are estimates" disclaimer.
+        /// </summary>
+        /// <param name="ourLosses">Player-side ledger, fractional and un-rounded.</param>
+        /// <param name="enemyLosses">AI-side ledger, fractional and un-rounded.</param>
+        public static PrinterMessage CreateLossReport(
+            IReadOnlyDictionary<WeaponType, float> ourLosses,
+            IReadOnlyDictionary<WeaponType, float> enemyLosses,
+            bool dailyOnly = false)
+        {
+            try
+            {
+                string heading = dailyOnly ? "TURN LOSSES" : "ALL LOSSES";
+
+                // Build the rows first so the empty case can REPLACE them rather than trail below them.
+                var rows = new List<string>();
+                bool anyLosses = false;
+
+                foreach ((string label, EquipmentBucket[] buckets) in LossReportRows)
+                {
+                    int ours = RollUp(ourLosses, buckets);
+                    int theirs = RollUp(enemyLosses, buckets);
+
+                    if (ours > 0 || theirs > 0)
+                        anyLosses = true;
+
+                    rows.Add($"{label,-LOSS_ROW_LABEL_WIDTH}{ours,LOSS_ROW_VALUE_WIDTH}{theirs,LOSS_ROW_VALUE_WIDTH}");
+                }
+
+                var lines = new List<string>();
+
+                if (anyLosses)
+                {
+                    // ⚠ HEADING AND COLUMN HEADER SHARE ONE LINE — the heading sits in the row-label column
+                    // ("ALL LOSSES      OURS   ENEMY"). Two separate lines plus a blank spacer made the
+                    // report 10 lines tall against a panel that shows about that many, so it overran
+                    // vertically (Bob, in play 2026-07-28). This is the cheapest line to remove because the
+                    // label column is empty on that row anyway — pure dead space carrying no information.
+                    lines.Add($"{heading,-LOSS_ROW_LABEL_WIDTH}{"OURS",LOSS_ROW_VALUE_WIDTH}{"ENEMY",LOSS_ROW_VALUE_WIDTH}");
+                    lines.AddRange(rows);
+                }
+                else
+                {
+                    // ⚠ THE EMPTY REPORT REPLACES THE TABLE, it does not follow it. Appended below six zero
+                    // rows the notice landed past the bottom of the panel — so the one line that mattered
+                    // was the one clipped, and the message said nothing at all in the exact case it existed
+                    // to explain. Six zeroes also read as a bug on their own.
+                    lines.Add(heading);
+                    lines.Add(dailyOnly ? "No losses this turn." : "No losses reported.");
+                }
+
+                return new PrinterMessage(lines.ToArray(), SourceDivisionalHQ, PrinterCategory.Combat);
+            }
+            catch (Exception e)
+            {
+                AppService.HandleException(CLASS_NAME, nameof(CreateLossReport), e);
+                return new PrinterMessage(new[] { "Loss report unavailable." }, SourceDivisionalHQ, PrinterCategory.Combat);
+            }
+        }
+
+        /// <summary>
+        /// Sums a ledger's fractional entries across the buckets making up one display row, rounding ONCE
+        /// at the end.
+        /// ⚠ Sum first, THEN round — rounding each bucket before adding re-introduces exactly the loss of
+        /// small values the fractional ledger exists to prevent.
+        /// </summary>
+        private static int RollUp(IReadOnlyDictionary<WeaponType, float> ledger, EquipmentBucket[] buckets)
+        {
+            if (ledger == null || ledger.Count == 0) return 0;
+
+            float total = 0f;
+
+            foreach (KeyValuePair<WeaponType, float> entry in ledger)
+            {
+                EquipmentBucket bucket = RegimentProfile.ClassifyWeaponType(entry.Key);
+
+                foreach (EquipmentBucket wanted in buckets)
+                {
+                    if (bucket == wanted)
+                    {
+                        total += entry.Value;
+                        break;
+                    }
+                }
+            }
+
+            return Mathf.RoundToInt(total);
+        }
+
         #endregion // Static Factory Methods
+
+        #region Loss Report Layout
+
+        private const int LOSS_ROW_LABEL_WIDTH = 14;
+        private const int LOSS_ROW_VALUE_WIDTH = 8;
+
+        // The six RATIFIED rows, and which equipment buckets roll into each.
+        //
+        // ⚠ AFVs EXISTS BECAUSE A SOVIET MECH FORCE LOSES MOSTLY AFVs and a report without the row would
+        // look wrong (Bob's call). Recon vehicles file here rather than as tanks.
+        //
+        // ⚠ TRUCKS ARE NOT REPORTED, AND CORRECTLY SO (Bob, 2026-07-28): no truck profile declares any
+        // intel stats at all — TRK_GEN_SV and TRK_WEST add none — so trucks are absent from the intel model
+        // itself and there is nothing to report. Not a gap; there is no data.
+        //
+        // ⚠ BUT `EquipmentBucket.TRN` IS IN THE AIRCRAFT ROW, and that is not a typo. The TRN bucket
+        // catches both the TRN_ and TRK_ prefixes, and the ONLY profile in it that declares intel stats is
+        // the An-12 — a fixed-wing TRANSPORT PLANE carrying 48. Left out of every row, a destroyed An-12
+        // regiment would have printed "Aircraft 0" while 48 aircraft quietly vanished from the tally.
+        // Since trucks contribute nothing and TRN_NAVAL declares nothing either, folding TRN into Aircraft
+        // is exact today rather than approximate. ⚠ Revisit if a truck or naval transport ever GAINS intel
+        // stats — they would then wrongly land under Aircraft, and the bucket needs splitting.
+        private static readonly (string Label, EquipmentBucket[] Buckets)[] LossReportRows =
+        {
+            ("Men",         new[] { EquipmentBucket.Personnel }),
+            ("Tanks",       new[] { EquipmentBucket.TANK }),
+            ("AFVs",        new[] { EquipmentBucket.IFV, EquipmentBucket.APC, EquipmentBucket.RCN }),
+            ("Guns",        new[] { EquipmentBucket.ART, EquipmentBucket.ROC, EquipmentBucket.SAM,
+                                    EquipmentBucket.AAA, EquipmentBucket.AT }),
+            ("Aircraft",    new[] { EquipmentBucket.FGT, EquipmentBucket.ATT, EquipmentBucket.BMB,
+                                    EquipmentBucket.AWACS, EquipmentBucket.RCNA, EquipmentBucket.TRN }),
+            ("Helicopters", new[] { EquipmentBucket.HEL })
+        };
+
+        #endregion // Loss Report Layout
 
         #region Formatting Helpers
 

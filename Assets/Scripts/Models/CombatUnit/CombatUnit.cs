@@ -400,6 +400,13 @@ namespace HammerAndSickle.Models
 
         /// <summary>
         /// Applies damage to the unit, reducing hit points.
+        ///
+        /// ⚠ THIS IS THE LOSS-LEDGER CHOKE POINT (printer P5). Every damage source in the game already
+        /// funnels through here — direct combat, return fire, ambush, counter-battery, AD opportunity fire,
+        /// air strikes, base attacks, and shatter — so booking equipment losses at this one site captures
+        /// all of them and, more importantly, CANNOT BE FORGOTTEN when a new damage source is added later.
+        /// Hooking "after combat" instead would have silently missed return fire, ambush and AD fire, which
+        /// are resolved outside the main exchange.
         /// </summary>
         public void TakeDamage(float damage)
         {
@@ -410,8 +417,15 @@ namespace HammerAndSickle.Models
                 if (damage == 0f)
                     return;
 
-                float newHitPoints = Mathf.Max(0f, HitPoints.Current - damage);
+                float previousHitPoints = HitPoints.Current;
+                float newHitPoints = Mathf.Max(0f, previousHitPoints - damage);
                 HitPoints.SetCurrent(newHitPoints);
+
+                // ⚠ Book the HP ACTUALLY REMOVED, not the damage requested. Overkill must not book
+                // equipment the unit no longer had: a unit on 3 HP hit for 20 loses 3 HP of equipment,
+                // not 20. The two differ on exactly the blow that destroys a unit, so using `damage`
+                // here would over-report losses on every single kill.
+                GameDataManager.RecordEquipmentLosses(this, previousHitPoints - newHitPoints);
             }
             catch (Exception e)
             {
@@ -1432,6 +1446,17 @@ namespace HammerAndSickle.Models
                     errorMessage = $"Cannot change to Mobile state in Static Operations (current efficiency: {EfficiencyLevel})";
                     return false;
                 }
+            }
+
+            // ⚠ THE ACTION ITSELF, added 2026-07-28. This check was MISSING while
+            // ApplyDeploymentTransitionCosts decremented a DeploymentAction unconditionally — so nothing
+            // stopped a unit deploying up and down all turn, spending an action economy it did not have.
+            // The movement-point check below is NOT a substitute: MP is refunded to the new profile's max
+            // on every transition, so a unit can hold plenty of MP while having no action left.
+            if (DeploymentActions.Current < 1)
+            {
+                errorMessage = $"{UnitName} has no deployment actions remaining this turn";
+                return false;
             }
 
             if (MovementPoints.Current < GameData.DEPLOYMENT_ACTION_MOVEMENT_COST * MovementPoints.Max)

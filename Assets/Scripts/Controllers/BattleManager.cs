@@ -472,6 +472,11 @@ namespace HammerAndSickle.Controllers
             CurrentTurnNumber = newTurn;
             RefreshTurnText();
 
+            // A new turn is a new reporting day for the loss report (printer P6). This sits here precisely
+            // because SetTurn is the ONLY place the turn number changes — anywhere else and the daily
+            // figures would drift out of step with the turn they claim to cover.
+            GameDataManager.StartNewDailyLossPeriod();
+
             // See EventManager — broadcast so any subscriber (UI, audio, AI) can react.
             if (EventManager.Instance != null)
             {

@@ -148,6 +148,185 @@ namespace HammerAndSickle.Controllers
 
         #endregion // Properties
 
+        #region Loss Ledger (printer P5)
+
+        // ────────────────────────────────────────────────────────────────────────────────────────────
+        // EQUIPMENT LOSS LEDGER — the accounting behind the §24.8 loss report (printer P6).
+        //
+        // THE MODEL (Bob's, ratified 2026-07-25): HIT POINTS ALREADY ARE EQUIPMENT. A unit's
+        // RegimentProfile.TotalIntelStats is its FULL-STRENGTH roster of weapon systems — the intel stats
+        // of its deployed/mobile/embarked WeaponProfiles, summed — and §12.2.6 scales those linearly by
+        // currentHP/maxHP for display. So HP lost converts directly into weapon systems lost. There is no
+        // second model to keep in sync; this is a reading of the one that already exists.
+        //
+        // ⚠ KEYED BY WeaponType, NOT by display bucket. The report's rows (Men/Tanks/AFVs/Guns/Aircraft/
+        // Helicopters) are a rollup performed at RENDER time through the same name-prefix logic
+        // RegimentProfile.GetIntelReport() uses, so the loss report and the intel report cannot drift
+        // apart. Per-type granularity ("18 T-72A lost") then comes free later at no extra cost.
+        //
+        // ⚠ THE VALUES ARE float AND THAT IS LOAD-BEARING — do not "tidy" this to int. Rounding per damage
+        // event silently destroys everything small: a unit holding 3 tanks that takes 1 HP of 40
+        // contributes 3 × 0.025 = 0.075, which rounds to ZERO, and the unit can be ground to death having
+        // reported no tank losses at all. Accumulate in float; round ONCE when building the report.
+        //
+        // ⚠ STATIC, NOT INSTANCE, AND DELIBERATELY SO. CombatUnit.TakeDamage books into this, and
+        // GameDataManager.Instance LAZY-CREATES a GameObject — so an instance call from a plain model class
+        // would spawn a manager out of every headless EditorTest that damages a unit. This is the same trap
+        // PrinterMessage hit in the printer pass (solved there with an injected HeaderProvider); statics
+        // sidestep it entirely, and GDM already keeps its global state static.
+        // ────────────────────────────────────────────────────────────────────────────────────────────
+
+        private static readonly Dictionary<Side, Dictionary<WeaponType, float>> _lossLedger = new()
+        {
+            { Side.Player, new Dictionary<WeaponType, float>() },
+            { Side.AI,     new Dictionary<WeaponType, float>() }
+        };
+
+        // DAILY ledger — the same booking, reset at each turn boundary, for the per-turn loss report.
+        //
+        // ⚠ A SECOND ACCUMULATOR, not a diff against a snapshot of the cumulative one. A snapshot-and-
+        // subtract would look cheaper but goes wrong the moment the cumulative ledger is itself cleared or
+        // restored (new battle, save load), because the baseline and the total then disagree with no way to
+        // tell. Two independent accumulators fed from the same booking cannot drift apart.
+        private static readonly Dictionary<Side, Dictionary<WeaponType, float>> _dailyLossLedger = new()
+        {
+            { Side.Player, new Dictionary<WeaponType, float>() },
+            { Side.AI,     new Dictionary<WeaponType, float>() }
+        };
+
+        /// <summary>
+        /// Books the weapon systems represented by <paramref name="hitPointsLost"/> against the unit's own
+        /// side. Called from <see cref="CombatUnit.TakeDamage"/>, which is the single funnel every damage
+        /// source in the game already passes through.
+        ///
+        /// ⚠ FED FROM DAMAGE, NEVER FROM UNIT REMOVAL. Destruction then needs no special case — a unit
+        /// driven 40 → 0 books 100% of its equipment across however many events got it there. Conversely a
+        /// unit REMOVED without being destroyed is not a loss and must not be booked: shatter withdrawal
+        /// (§7.9.6.4), air units returning to base, and §11.7.2 aircraft evacuation are all removals.
+        /// Hooking damage rather than removal gets that distinction for free.
+        /// ⚠ SURRENDER IS THE ONE EXCEPTION (§7.9.6a) — a surrendering unit is lost without necessarily
+        /// being damaged to zero, so its REMAINING equipment must be booked explicitly at the surrender
+        /// site via <see cref="RecordRemainingEquipmentAsLost"/>.
+        /// </summary>
+        public static void RecordEquipmentLosses(CombatUnit unit, float hitPointsLost)
+        {
+            try
+            {
+                if (unit == null || hitPointsLost <= 0f)
+                    return;
+
+                float maxHitPoints = unit.HitPoints.Max;
+                if (maxHitPoints <= 0f)
+                    return;
+
+                // Clamped because a single blow can exceed the unit's remaining HP; a unit cannot lose
+                // more than all of its equipment.
+                float lostFraction = Mathf.Clamp01(hitPointsLost / maxHitPoints);
+
+                BookLosses(unit, lostFraction);
+            }
+            catch (Exception e)
+            {
+                AppService.HandleException(nameof(GameDataManager), nameof(RecordEquipmentLosses), e);
+            }
+        }
+
+        /// <summary>
+        /// Books ALL of a unit's currently-surviving equipment as lost, for the case where a unit is lost
+        /// without being damaged to zero — surrender (§7.9.6a).
+        /// ⚠ Call this INSTEAD of, not in addition to, letting the unit take lethal damage: the fraction
+        /// booked here is what the unit still has, so calling both would double-count.
+        /// </summary>
+        public static void RecordRemainingEquipmentAsLost(CombatUnit unit)
+        {
+            try
+            {
+                if (unit == null)
+                    return;
+
+                float maxHitPoints = unit.HitPoints.Max;
+                if (maxHitPoints <= 0f)
+                    return;
+
+                BookLosses(unit, Mathf.Clamp01(unit.HitPoints.Current / maxHitPoints));
+            }
+            catch (Exception e)
+            {
+                AppService.HandleException(nameof(GameDataManager), nameof(RecordRemainingEquipmentAsLost), e);
+            }
+        }
+
+        /// <summary>
+        /// Reads one side's running losses. Values are FRACTIONAL and deliberately un-rounded — the caller
+        /// rounds once, at render time (see the float warning above).
+        /// </summary>
+        public static IReadOnlyDictionary<WeaponType, float> GetLossLedger(Side side) => _lossLedger[side];
+
+        /// <summary>
+        /// Reads one side's losses SINCE THE CURRENT TURN BEGAN. Fractional and un-rounded, like the
+        /// cumulative ledger.
+        /// </summary>
+        public static IReadOnlyDictionary<WeaponType, float> GetDailyLossLedger(Side side) => _dailyLossLedger[side];
+
+        /// <summary>
+        /// Resets the DAILY ledger, beginning a new reporting day. Called from
+        /// <c>BattleManager.SetTurn</c> — the single place the turn number changes.
+        /// ⚠ Leaves the cumulative ledger untouched; that is the entire distinction between the two.
+        /// </summary>
+        public static void StartNewDailyLossPeriod()
+        {
+            foreach (var ledger in _dailyLossLedger.Values)
+                ledger.Clear();
+        }
+
+        /// <summary>Empties BOTH ledgers, both sides. Called on <see cref="ClearAll"/> — losses are per-battle.</summary>
+        public static void ClearLossLedger()
+        {
+            foreach (var ledger in _lossLedger.Values)
+                ledger.Clear();
+
+            StartNewDailyLossPeriod();
+        }
+
+        /// <summary>
+        /// Adds <paramref name="lostFraction"/> of the unit's full-strength roster to its side's ledger.
+        /// </summary>
+        private static void BookLosses(CombatUnit unit, float lostFraction)
+        {
+            if (lostFraction <= 0f)
+                return;
+
+            // The unit's FULL-STRENGTH weapon systems. TotalIntelStats is never HP-scaled at rest — the
+            // scaling happens in CombatUnit.ApplyEquipmentBuckets at display time — which is exactly what
+            // makes it the correct multiplicand here.
+            Dictionary<WeaponType, int> fullStrengthStats = unit.RegimentProfile?.TotalIntelStats;
+            if (fullStrengthStats == null || fullStrengthStats.Count == 0)
+                return;
+
+            // ⚠ Booked into BOTH accumulators from the one place, which is what keeps the daily figures a
+            // true subset of the cumulative ones. A second booking call site would eventually feed one and
+            // not the other.
+            Dictionary<WeaponType, float> cumulative = _lossLedger[unit.Side];
+            Dictionary<WeaponType, float> daily = _dailyLossLedger[unit.Side];
+
+            foreach (KeyValuePair<WeaponType, int> entry in fullStrengthStats)
+            {
+                float lost = entry.Value * lostFraction;
+                if (lost <= 0f)
+                    continue;
+
+                cumulative[entry.Key] = cumulative.TryGetValue(entry.Key, out float running)
+                    ? running + lost
+                    : lost;
+
+                daily[entry.Key] = daily.TryGetValue(entry.Key, out float runningDaily)
+                    ? runningDaily + lost
+                    : lost;
+            }
+        }
+
+        #endregion // Loss Ledger (printer P5)
+
         #region Unity Lifecycle
 
         private void Awake()
@@ -649,6 +828,10 @@ namespace HammerAndSickle.Controllers
 
                 _combatUnits.Clear();
                 _leaders.Clear();
+
+                // Losses are per-battle: a new scenario starts from zero, or the previous battle's
+                // casualties bleed into the next one's report.
+                ClearLossLedger();
 
                 CurrentCampaignData = null;
                 CurrentScenarioData = null;

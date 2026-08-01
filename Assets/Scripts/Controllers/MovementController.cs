@@ -134,6 +134,8 @@ namespace HammerAndSickle.Controllers
                 EventManager.Instance.OnPreviousUnitRequested += CyclePrevious;
                 EventManager.Instance.OnUnitMoveCompleted += HandleMoveCompleted;
                 EventManager.Instance.OnIntelActionRequested += HandleIntelActionRequested;
+                EventManager.Instance.OnDeployUpRequested += HandleDeployUpRequested;
+                EventManager.Instance.OnDeployDownRequested += HandleDeployDownRequested;
             }
         }
 
@@ -152,10 +154,125 @@ namespace HammerAndSickle.Controllers
                 EventManager.Instance.OnPreviousUnitRequested -= CyclePrevious;
                 EventManager.Instance.OnUnitMoveCompleted -= HandleMoveCompleted;
                 EventManager.Instance.OnIntelActionRequested -= HandleIntelActionRequested;
+                EventManager.Instance.OnDeployUpRequested -= HandleDeployUpRequested;
+                EventManager.Instance.OnDeployDownRequested -= HandleDeployDownRequested;
             }
         }
 
         #endregion // Event Subscriptions
+
+        #region Deployment Actions
+
+        // ────────────────────────────────────────────────────────────────────────────────────────────
+        // Deploy up / down (§8.2 action economy). The MODEL owns the rules — CombatUnit.TryDeployUP /
+        // TryDeployDOWN do all validation and cost application — so these handlers only supply the two
+        // pieces of MAP context the model cannot see (airbase adjacency, port hex), enforce turn/side
+        // ownership, and publish the result.
+        //
+        // ⚠ THE RAISE LIVES HERE, NOT IN CombatUnit. No class under Models/ raises events, and
+        // EventManager.Instance LAZY-CREATES a GameObject — a raise from the model would spawn an
+        // EventManager in every headless EditorTest that changes deployment. `?.` does NOT help: the
+        // getter creates the object and never returns null.
+        // ────────────────────────────────────────────────────────────────────────────────────────────
+
+        private void HandleDeployUpRequested(CombatUnit unit) => TryChangeDeployment(unit, deployUp: true);
+
+        private void HandleDeployDownRequested(CombatUnit unit) => TryChangeDeployment(unit, deployUp: false);
+
+        private void TryChangeDeployment(CombatUnit unit, bool deployUp)
+        {
+            try
+            {
+                if (unit == null) return;
+                if (_currentPhase != BattlePhase.PlayerTurn) return;
+                if (unit.Side != Side.Player) return;
+
+                string error;
+                bool changed = deployUp
+                    ? unit.TryDeployUP(out error, IsAdjacentToActiveFriendlyAirbase(unit), IsOnPortHex(unit))
+                    : unit.TryDeployDOWN(out error);
+
+                if (!changed)
+                {
+                    // ⚠ REFUSALS ARE NOT PRINTER DISPATCHES (§24.8.5) — a denial is feedback about the
+                    // player's own order, not a report of something they could not see. It belongs in the
+                    // UI message channel (and eventually a denial SFX), never in the HQ dispatch feed.
+                    AppService.CaptureUiMessage(string.IsNullOrWhiteSpace(error)
+                        ? $"{unit.UnitName} cannot change deployment right now."
+                        : error);
+                    return;
+                }
+
+                if (EventManager.Instance != null)
+                {
+                    EventManager.Instance.RaiseUnitActionsChanged(unit);
+                    EventManager.Instance.RaiseUnitMovementPointsChanged(unit);
+
+                    // ⚠ A FULL REDRAW, NOT RaiseUnitDeploymentChanged. That event only refreshes the deploy
+                    // BADGE (Prefab_CombatUnitIcon.RefreshDeployIcon), but a deployment change also swaps
+                    // the unit's MAIN ART — GameIconRenderer resolves it via
+                    // RegimentProfile.GetIcon(DeploymentPosition, facing), so Mobile and Deployed are
+                    // different sprites. Refreshing only the badge would leave a mounted unit drawn as
+                    // infantry. The redraw rebuilds icons from live unit state and covers both.
+                    EventManager.Instance.RaiseRedrawMapIcons();
+                }
+
+                // Deployment spends MP and changes the movement profile's max, so the range overlay for the
+                // selected unit is stale the moment the transition lands.
+                if (CurrentUnit == unit) RecomputeRangeAndRaise(GameDataManager.CurrentHexMap);
+            }
+            catch (Exception e)
+            {
+                AppService.HandleException(CLASS_NAME, nameof(TryChangeDeployment), e);
+            }
+        }
+
+        /// <summary>
+        /// True when the unit stands on a port hex (§5.4.2 sealift embarkation).
+        /// </summary>
+        private static bool IsOnPortHex(CombatUnit unit)
+        {
+            HexMap map = GameDataManager.CurrentHexMap;
+            if (map == null) return false;
+
+            return map.GetHexAt(unit.MapPos)?.IsPort ?? false;
+        }
+
+        /// <summary>
+        /// True when the unit is adjacent to an ACTIVE friendly airbase — the §21.3.1 condition that lets
+        /// AB/MAB (and SPECF with air transport) skip Mobile and embark directly.
+        ///
+        /// ⚠ "Active" is checked, not merely "present": an airbase that has been bombed
+        /// <see cref="OperationalCapacity.OutOfOperation"/> cannot mount an airborne operation, and a
+        /// destroyed one certainly cannot. Presence alone would let a wrecked airfield launch paratroopers.
+        /// </summary>
+        private static bool IsAdjacentToActiveFriendlyAirbase(CombatUnit unit)
+        {
+            HexMap map = GameDataManager.CurrentHexMap;
+            if (map == null) return false;
+
+            HexTile tile = map.GetHexAt(unit.MapPos);
+            if (tile == null) return false;
+
+            foreach (var neighbor in tile.GetAllNeighbors())
+            {
+                if (neighbor.Value == null) continue;
+
+                foreach (CombatUnit occupant in GameDataManager.Instance.GetUnitsAtHex(neighbor.Value.Position))
+                {
+                    if (occupant == null || occupant.Side != unit.Side) continue;
+                    if (!occupant.IsBase || occupant.FacilityType != FacilityType.Airbase) continue;
+                    if (occupant.IsDestroyed()) continue;
+                    if (occupant.OperationalCapacity == OperationalCapacity.OutOfOperation) continue;
+
+                    return true;
+                }
+            }
+
+            return false;
+        }
+
+        #endregion // Deployment Actions
 
         #region Intel Action
 

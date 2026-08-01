@@ -433,7 +433,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: UNDO
+  m_text: MENU
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: d9c2b7ba91e636645b0db1d47d42c5d4, type: 2}
   m_sharedMaterial: {fileID: -8619961392118247520, guid: d9c2b7ba91e636645b0db1d47d42c5d4, type: 2}
@@ -1607,7 +1607,20 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 313348638}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 963586261}
+        m_TargetAssemblyTypeName: HammerAndSickle.SceneManagement.DefaultDialog_Scene1,
+          Main
+        m_MethodName: OnDeployDownButton
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!114 &313348638
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2513,7 +2526,20 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 454642980}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 963586261}
+        m_TargetAssemblyTypeName: HammerAndSickle.SceneManagement.DefaultDialog_Scene1,
+          Main
+        m_MethodName: OnDeployUpButton
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!114 &454642980
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -3313,7 +3339,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: 'GATHER
+  m_text: 'OPTIONS
 
 '
   m_isRightToLeft: 0
@@ -3407,7 +3433,7 @@ GameObject:
   - component: {fileID: 689605521}
   - component: {fileID: 689605520}
   m_Layer: 7
-  m_Name: Unit Details Button
+  m_Name: Map Button
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -3497,7 +3523,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 21300000, guid: 49b28713a277b7e41ae0e02c2d106ef1, type: 3}
+  m_Sprite: {fileID: 21300000, guid: 9d3771b612531564782e19c796617508, type: 3}
   m_Type: 0
   m_PreserveAspect: 0
   m_FillCenter: 1
@@ -4401,7 +4427,7 @@ GameObject:
   - component: {fileID: 927839011}
   - component: {fileID: 927839010}
   m_Layer: 7
-  m_Name: Undo Button
+  m_Name: Menu Button
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -4491,7 +4517,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 21300000, guid: 937a365d8a4168c4aa189c11bd4d28a8, type: 3}
+  m_Sprite: {fileID: 21300000, guid: f3f105d934004a046b47b8ebce5f9b35, type: 3}
   m_Type: 0
   m_PreserveAspect: 0
   m_FillCenter: 1
@@ -5139,7 +5165,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: LEADER
+  m_text: UNIT DB
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: d9c2b7ba91e636645b0db1d47d42c5d4, type: 2}
   m_sharedMaterial: {fileID: -8619961392118247520, guid: d9c2b7ba91e636645b0db1d47d42c5d4, type: 2}
@@ -5414,6 +5440,8 @@ MonoBehaviour:
   _terrainPanel: {fileID: 729574983220951046}
   _unitPanel: {fileID: 729574983220951042}
   _printerPanel: {fileID: 715650377}
+  _unitOpsPanel: {fileID: 1838883206}
+  _battleOpsPanel: {fileID: 1319747210}
   _debug: 0
 --- !u!1 &1047100074
 GameObject:
@@ -6184,7 +6212,20 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 1172834599}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 963586261}
+        m_TargetAssemblyTypeName: HammerAndSickle.SceneManagement.DefaultDialog_Scene1,
+          Main
+        m_MethodName: OnDisplayLossesButton
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!114 &1172834599
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -6305,7 +6346,19 @@ MonoBehaviour:
   m_TargetGraphic: {fileID: 1192026454}
   m_OnClick:
     m_PersistentCalls:
-      m_Calls: []
+      m_Calls:
+      - m_Target: {fileID: 1266033642}
+        m_TargetAssemblyTypeName: HammerAndSickle.Controllers.BattleManager, Main
+        m_MethodName: OnEndTurnButton
+        m_Mode: 1
+        m_Arguments:
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
+          m_IntArgument: 0
+          m_FloatArgument: 0
+          m_StringArgument: 
+          m_BoolArgument: 0
+        m_CallState: 2
 --- !u!114 &1192026454
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -8011,7 +8064,7 @@ GameObject:
   - component: {fileID: 1663996561}
   - component: {fileID: 1663996560}
   m_Layer: 7
-  m_Name: Ldr Details Button
+  m_Name: UnitDB Button
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -8101,7 +8154,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 21300000, guid: ab547f07ab55cfa4f91369c03b01fbcf, type: 3}
+  m_Sprite: {fileID: 21300000, guid: 01bf781dfc0fbc94cbd1c034bb590e4c, type: 3}
   m_Type: 0
   m_PreserveAspect: 0
   m_FillCenter: 1
@@ -8385,7 +8438,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!4 &1706962203
 Transform:
   m_ObjectHideFlags: 0
@@ -9322,7 +9375,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: STATS
+  m_text: STRAT MAP
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: d9c2b7ba91e636645b0db1d47d42c5d4, type: 2}
   m_sharedMaterial: {fileID: -8619961392118247520, guid: d9c2b7ba91e636645b0db1d47d42c5d4, type: 2}
@@ -9349,7 +9402,7 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 17.05
+  m_fontSize: 15.1
   m_fontSizeBase: 24
   m_fontWeight: 400
   m_enableAutoSizing: 1
@@ -9910,7 +9963,7 @@ GameObject:
   - component: {fileID: 2124726780}
   - component: {fileID: 2124726779}
   m_Layer: 7
-  m_Name: Gather Button
+  m_Name: Options Button
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -10000,7 +10053,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_Sprite: {fileID: 21300000, guid: 0abc5e4ecf4996f4e89660824e2c4761, type: 3}
+  m_Sprite: {fileID: 21300000, guid: 9b1092b3a07b29f4d937d27c0c64dae7, type: 3}
   m_Type: 0
   m_PreserveAspect: 0
   m_FillCenter: 1
