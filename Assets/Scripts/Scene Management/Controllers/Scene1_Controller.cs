@@ -1,3 +1,4 @@
+using HammerAndSickle.Audio;
 using HammerAndSickle.Controllers;
 using HammerAndSickle.Core.UI;
 using HammerAndSickle.Core.Patterns;
@@ -122,7 +123,7 @@ namespace HammerAndSickle.SceneManagement.Controllers
             {
                 GameAudioManager.EnsureExists();
                 GameAudioManager.Instance.StopMusic();
-                GameAudioManager.Instance.PlaySFX(GameAudioManager.SoundEffect.MeduimSnareDrum);
+                GameAudio.Play(GameAudioManager.SoundEffect.MediumSnareDrum);
                 GameAudioManager.Instance.PlayAmbient(GameAudioManager.AmbientSound.AmbientCombat, fadeInTime: 1.0f);
             }
             catch (Exception e)

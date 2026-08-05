@@ -1,3 +1,4 @@
+using HammerAndSickle.Audio;
 using HammerAndSickle.Core.GameData;
 using HammerAndSickle.Services;
 using System;
@@ -44,6 +45,17 @@ namespace HammerAndSickle.Controllers
             }
         }
 
+        /// <summary>
+        /// The existing instance, or null. NEVER creates one.
+        /// </summary>
+        /// <remarks>
+        /// ⚠ This exists so <see cref="Audio.GameAudio"/> can be called from anywhere without the
+        /// side effect that makes <see cref="Instance"/> dangerous: its getter BUILDS a GameObject, so a
+        /// call from model code or a headless EditorTest would silently spawn an audio manager. Playing a
+        /// sound must never construct anything. Use this for every read-only or fire-and-forget access.
+        /// </remarks>
+        public static GameAudioManager Existing => _instance;
+
         #endregion // Singleton
 
         #region Audio Enums
@@ -71,17 +83,36 @@ namespace HammerAndSickle.Controllers
 
         /// <summary>
         /// Enumeration of all sound effects available in the game.
-        /// Maps to WAV files in StreamingAssets/Audio/SFX folder.
+        /// Clips are supplied by the AudioCatalog (Assets/Resources/Audio/AudioCatalog.asset).
         /// </summary>
+        /// <remarks>
+        /// ⚠ APPEND ONLY. NEVER INSERT OR REORDER A MEMBER. Unity serializes an enum field by its
+        /// INTEGER VALUE, not its name, and UIButtonAudio exposes two of them (clickSound, hoverSound)
+        /// as [SerializeField] — the scene YAML literally reads "clickSound: 1". Inserting a member
+        /// mid-enum therefore silently repoints EVERY Inspector-assigned button sound in every scene
+        /// and prefab, with no compile error and no warning. Same hazard as the persisted-enum rule in
+        /// CLAUDE.md item 11, but the payload here is scene YAML rather than save files.
+        /// RENAMING a member IS safe (the value is unchanged) — MeduimSnareDrum -> MediumSnareDrum was
+        /// fixed that way on 2026-08-03. Add new effects at the END of the list.
+        ///
+        /// ⚠ Most members below have NO CLIP YET, which is intentional and safe: a sound with no catalog
+        /// row is a SILENT NO-OP, never an error, so call sites may be wired before the audio is authored.
+        /// Tools/Audio/Audit Catalog reports which members are still unbacked.
+        /// </remarks>
         public enum SoundEffect
         {
             None,
             ButtonClick,
+            // ⚠ RETIRED 2026-08-03 — hover audio is deleted (§27.7, UIButtonAudio) and SFX_ButtonHover.wav
+            // is gone. THE MEMBER STAYS: this enum is append-only because Unity serializes enum fields as
+            // INTEGERS, so removing value 2 would shift MenuOpen 3→2, MenuClose 4→3 and so on, silently
+            // repointing every Inspector-assigned button sound in every scene. A retired member is cheap;
+            // a renumbered enum is a silent, project-wide defect. Maps to no file and preloads nothing.
             ButtonHover,
             MenuOpen,
             MenuClose,
             RadioButtonClick,
-            MeduimSnareDrum,
+            MediumSnareDrum,
             PrinterTick,
 
             // Movement SFX
@@ -101,7 +132,50 @@ namespace HammerAndSickle.Controllers
             AmbushDetected,
             FacingChange,
             NextUnit,
-            PrevUnit
+            PrevUnit,
+
+            // ─── Appended 2026-08-04 by the Phase 3 wiring pass. ⚠ APPEND ONLY, see the remarks above. ───
+
+            // §24.8.5 — a refused order is FEEDBACK, not a dispatch. One sound covers every refusal:
+            // illegal Ctrl+click, an attack the orchestrator rejects, a blocked deploy, a spent intel action.
+            ButtonDenied,
+
+            /* Long-form movement cuts (§27.7.7). ONE clip length cannot serve a 3-hex mountain crawl and a
+             * 24-hex helicopter transit: the long clip overhangs the short move, the short one ends halfway
+             * through the long one. The cut is chosen from the PREDICTED duration, which is known before the
+             * move starts. Foot needs no long cut — its longest possible move is 0.7 s. */
+            UnitMoveWheeledLong,
+            UnitMoveTrackedLong,
+            UnitMoveHeloLong,
+            UnitMoveJetLong,
+
+            /* Weapon fire — ONE PER WeaponSoundFamily (§27.7.5), never per profile: 177 profiles collapse
+             * to these 13. GameAudio.SoundEffectFor owns the mapping and is the only place it lives. */
+            FireSmallArms,
+            FireHeavyMachineGun,
+            FireAutocannon,
+            FireTankGun,
+            FireAntiTankMissile,
+            FireArtilleryGun,
+            FireRocketArtillery,
+            FireSurfaceToAirMissile,
+            FireAntiAircraftGun,
+            FireHelicopterAttack,
+            FireAircraftCannon,
+            FireAircraftGroundAttack,
+            FireAircraftBombs,
+
+            /* Impacts. ⚠ The impact is attributed to the TARGET, not the firer (§27.7.4.2) — that is what
+             * lets an unseen battery shell the player audibly without identifying itself. Armour/soft is
+             * decided by the SHARED classifier, so audio cannot disagree with the loss report. */
+            ImpactSoft,
+            ImpactArmour,
+            ImpactStructure,
+
+            // Outcomes and objectives.
+            UnitDestroyed,
+            ObjectiveCaptured,
+            ObjectiveLost
         }
 
         /// <summary>
@@ -138,40 +212,6 @@ namespace HammerAndSickle.Controllers
         };
 
         /// <summary>
-        /// Maps SoundEffect enum values to their corresponding WAV filenames.
-        /// Used for loading sound effect files from StreamingAssets.
-        /// </summary>
-        private static readonly Dictionary<SoundEffect, string> SoundEffectFiles = new()
-        {
-            { SoundEffect.ButtonClick, "SFX_ButtonClick.wav" },
-            { SoundEffect.MenuOpen, "SFX_MenuOpen.wav" },
-            { SoundEffect.MenuClose, "SFX_MenuClose.wav" },
-            { SoundEffect.RadioButtonClick, "SFX_RadioButtonClick.wav" },
-            { SoundEffect.ButtonHover, "SFX_ButtonHover.wav" },
-            { SoundEffect.MeduimSnareDrum, "SFX_MediumSnareDrum.wav"},
-            { SoundEffect.PrinterTick, "SFX_PrinterTick.wav"},
-
-            // Movement SFX
-            { SoundEffect.UnitSelect, "SFX_UnitSelect.wav" },
-            { SoundEffect.UnitDeselect, "SFX_UnitDeselect.wav" },
-            { SoundEffect.MoveOrderConfirm, "SFX_MoveOrderConfirm.wav" },
-            { SoundEffect.MoveOrderCancel, "SFX_MoveOrderCancel.wav" },
-            { SoundEffect.UnitMoveTracked, "SFX_UnitMoveTracked.wav" },
-            { SoundEffect.UnitMoveWheeled, "SFX_UnitMoveWheeled.wav" },
-            { SoundEffect.UnitMoveFoot, "SFX_UnitMoveFoot.wav" },
-            { SoundEffect.UnitMoveHelo, "SFX_UnitMoveHelo.wav" },
-            { SoundEffect.UnitMoveJet, "SFX_UnitMoveJet.wav" },
-            { SoundEffect.UnitMoveBlocked, "SFX_UnitMoveBlocked.wav" },
-            { SoundEffect.OutOfMP, "SFX_OutOfMP.wav" },
-            { SoundEffect.UnitSpotted, "SFX_UnitSpotted.wav" },
-            { SoundEffect.AmbushTriggered, "SFX_AmbushTriggered.wav" },
-            { SoundEffect.AmbushDetected, "SFX_AmbushDetected.wav" },
-            { SoundEffect.FacingChange, "SFX_FacingChange.wav" },
-            { SoundEffect.NextUnit, "SFX_NextUnit.wav" },
-            { SoundEffect.PrevUnit, "SFX_PrevUnit.wav" }
-        };
-
-        /// <summary>
         /// Maps BriefingNarration enum values to their corresponding OGG filenames.
         /// Used for loading briefing audio files from StreamingAssets.
         /// </summary>
@@ -196,6 +236,36 @@ namespace HammerAndSickle.Controllers
                 or UnitClassification.RECONA or UnitClassification.AWACS => SoundEffect.UnitMoveJet,
             _ => SoundEffect.UnitMoveWheeled
         };
+
+        /// <summary>
+        /// Roughly how long the STANDARD movement clip runs. A move predicted to outlast it gets the long
+        /// cut instead (§27.7.7).
+        /// </summary>
+        public const float MOVEMENT_STANDARD_CLIP_SECONDS = 1.0f;
+
+        /// <summary>
+        /// Movement SFX for a classification, choosing the LONG cut when the move will outrun the standard
+        /// clip. Movement is a fire-and-forget one-shot (§27.7.7 — R3 dissolved: no loops, no handles), so
+        /// the clip has to be picked up front; the duration is PREDICTED from the committed path before the
+        /// first step, which makes the choice deterministic rather than a mid-move correction.
+        /// </summary>
+        /// <remarks>
+        /// ⚠ Foot deliberately has no long cut: its maximum travel is 0.7 s, always inside the standard clip.
+        /// </remarks>
+        public static SoundEffect GetMovementSFX(UnitClassification classification, float predictedSeconds)
+        {
+            SoundEffect standard = GetMovementSFX(classification);
+            if (predictedSeconds <= MOVEMENT_STANDARD_CLIP_SECONDS) return standard;
+
+            return standard switch
+            {
+                SoundEffect.UnitMoveWheeled => SoundEffect.UnitMoveWheeledLong,
+                SoundEffect.UnitMoveTracked => SoundEffect.UnitMoveTrackedLong,
+                SoundEffect.UnitMoveHelo    => SoundEffect.UnitMoveHeloLong,
+                SoundEffect.UnitMoveJet     => SoundEffect.UnitMoveJetLong,
+                _ => standard
+            };
+        }
 
         #endregion // Static Mappings
 
@@ -229,8 +299,11 @@ namespace HammerAndSickle.Controllers
         private AudioSource _crossfadeSource;      // Secondary music channel for crossfading
         private AudioSource _ambientSource;        // Environmental ambient sounds channel
         private AudioSource _briefingSource;       // Dedicated channel for briefing narration
-        private AudioSource[] _sfxPool;            // Pool of audio sources for simultaneous sound effects
-        private int _nextSfxIndex = 0;             // Round-robin index for SFX pool allocation
+        /* SFX sources, split by whether the sound needs pitch variation. Pitch is a per-SOURCE property,
+         * so retuning a source warps any one-shot still ringing on it — UI sounds therefore get a source
+         * whose pitch is NEVER touched, and varied sounds round-robin the rest. See SfxPlayer. */
+        private AudioSource _sfxFlatSource;
+        private AudioSource[] _sfxPitchPool;
 
         // Current playback state tracking
         private MusicTrack _currentMusicTrack = MusicTrack.None;
@@ -245,18 +318,24 @@ namespace HammerAndSickle.Controllers
         private AudioSettings _settings;
         private string _settingsPath;
 
-        // Audio clip caching to avoid repeated loading
+        /* Clip caching for the STREAMED channels only. ⚠ There is no SFX cache any more, and its absence is
+         * the point: sound effects are imported project assets with Preload Audio Data on (§7.1a), so they
+         * are resident before anything asks for them. The cache, negative cache, in-flight guard, preload
+         * step, UI-vs-gameplay API split and drop-if-not-resident rule that used to live here ALL existed
+         * only to manage clips not being in memory, and all deleted together on 2026-08-03. */
         private readonly Dictionary<MusicTrack, AudioClip> _musicCache = new();
         private readonly Dictionary<AmbientSound, AudioClip> _ambientCache = new();
-        private readonly Dictionary<SoundEffect, AudioClip> _sfxCache = new();
         private readonly Dictionary<BriefingNarration, AudioClip> _briefingCache = new();
+
+        // SFX: the catalog is the data, SfxPlayer is the playback. Both resolved once at Awake.
+        private AudioCatalog _sfxCatalog;
+        private SfxPlayer _sfxPlayer;
 
         // Configuration constants
         private const float DEFAULT_CROSSFADE_DURATION = 1.5f; // Industry standard crossfade time in seconds
         private const int SFX_POOL_SIZE = 10;                  // Number of simultaneous sound effects supported
         private const string MUSIC_FOLDER = "Audio/Music";
         private const string AMBIENT_FOLDER = "Audio/Ambient";
-        private const string SFX_FOLDER = "Audio/SFX";
         private const string BRIEFING_FOLDER = "Audio/Briefings";
 
         #endregion // Private Fields
@@ -289,6 +368,8 @@ namespace HammerAndSickle.Controllers
                 InitializeAudioSources();
                 LoadSettings();
                 ApplyVolumeSettings();
+
+                InitializeSfx();
             }
             catch (Exception e)
             {
@@ -326,9 +407,9 @@ namespace HammerAndSickle.Controllers
                 if (_ambientSource != null) _ambientSource.Stop();
                 if (_briefingSource != null) _briefingSource.Stop();
 
-                if (_sfxPool != null)
+                if (_sfxPitchPool != null)
                 {
-                    foreach (var source in _sfxPool)
+                    foreach (var source in _sfxPitchPool)
                     {
                         if (source != null) source.Stop();
                     }
@@ -337,7 +418,6 @@ namespace HammerAndSickle.Controllers
                 // Clear cached audio clips to free memory
                 _musicCache?.Clear();
                 _ambientCache?.Clear();
-                _sfxCache?.Clear();
                 _briefingCache?.Clear();
 
                 // Clear callbacks
@@ -399,15 +479,26 @@ namespace HammerAndSickle.Controllers
                 _briefingSource.loop = false;
                 _briefingSource.playOnAwake = false;
 
-                // Create pool of SFX sources for simultaneous sound effects
-                _sfxPool = new AudioSource[SFX_POOL_SIZE];
+                // The FLAT source: one AudioSource whose pitch is never modified, carrying every sound with
+                // no pitch variation (all UI). ⚠ It needs no pool because PlayOneShot MIXES — one source
+                // hosts any number of overlapping one-shots. The pool below exists only because pitch is
+                // per-source, not because concurrency demands it.
+                GameObject flatObj = new("SFXSource_Flat");
+                flatObj.transform.parent = transform;
+                _sfxFlatSource = flatObj.AddComponent<AudioSource>();
+                _sfxFlatSource.loop = false;
+                _sfxFlatSource.playOnAwake = false;
+
+                // Pitch-varied sources, round-robined so a new pitch rarely lands on a source that is
+                // still ringing.
+                _sfxPitchPool = new AudioSource[SFX_POOL_SIZE];
                 for (int i = 0; i < SFX_POOL_SIZE; i++)
                 {
-                    GameObject sfxObj = new($"SFXSource_{i}");
+                    GameObject sfxObj = new($"SFXSource_Pitch_{i}");
                     sfxObj.transform.parent = transform;
-                    _sfxPool[i] = sfxObj.AddComponent<AudioSource>();
-                    _sfxPool[i].loop = false;
-                    _sfxPool[i].playOnAwake = false;
+                    _sfxPitchPool[i] = sfxObj.AddComponent<AudioSource>();
+                    _sfxPitchPool[i].loop = false;
+                    _sfxPitchPool[i].playOnAwake = false;
                 }
             }
             catch (Exception e)
@@ -841,86 +932,42 @@ namespace HammerAndSickle.Controllers
         #region SFX Control
 
         /// <summary>
-        /// Plays a sound effect at default volume and pitch.
-        /// Uses round-robin allocation from the SFX pool.
+        /// Resolves the catalog and builds the player. Called from Awake, after the AudioSources exist.
         /// </summary>
-        /// <param name="sfx">The sound effect to play</param>
-        public void PlaySFX(SoundEffect sfx)
+        private void InitializeSfx()
         {
-            try
+            _sfxCatalog = Resources.Load<AudioCatalog>(AudioCatalog.ResourcePath);
+            if (_sfxCatalog == null)
             {
-                if (sfx == SoundEffect.None)
-                    return;
+                // Loud, and it names the fix — with no catalog EVERY sound effect is silent, and silence
+                // is otherwise indistinguishable from "the audio just is not wired yet".
+                Debug.LogError($"[{nameof(GameAudioManager)}] No AudioCatalog at Resources/{AudioCatalog.ResourcePath}. " +
+                               "All sound effects will be silent. Create it via Tools/Audio/Create Or Update Audio Catalog.");
+            }
 
-                StartCoroutine(PlaySFXCoroutine(sfx, 1f, 0f));
-            }
-            catch (Exception e)
-            {
-                AppService.HandleException("GameAudioManager", "PlaySFX", e);
-            }
+            _sfxPlayer = new SfxPlayer(_sfxFlatSource, _sfxPitchPool);
         }
 
         /// <summary>
-        /// Plays a sound effect with volume scaling and pitch variation.
-        /// Useful for adding variety to repetitive sounds like gunfire.
+        /// Plays a sound effect. ⚠ INTERNAL PLUMBING — call <see cref="Audio.GameAudio"/> instead, which
+        /// carries the fog gate (§27.7.4). This method is deliberately NOT fog-aware: putting the gate here
+        /// would silently apply it to UI and turn sounds that have no source unit, and hide from call sites
+        /// the question of which unit a sound is attributed to.
         /// </summary>
-        /// <param name="sfx">The sound effect to play</param>
-        /// <param name="volumeScale">Volume multiplier (0-1)</param>
-        /// <param name="pitchVariation">Random pitch variation range (0 = no variation)</param>
-        public void PlaySFXWithVariation(SoundEffect sfx, float volumeScale = 1f, float pitchVariation = 0.1f)
+        public void PlaySfx(SoundEffect id, float volumeScale = 1f)
         {
             try
             {
-                if (sfx == SoundEffect.None)
-                    return;
+                if (id == SoundEffect.None || _sfxCatalog == null || _sfxPlayer == null) return;
+                if (!_sfxCatalog.TryGet(id, out AudioCatalog.Entry entry)) return;
 
-                StartCoroutine(PlaySFXCoroutine(sfx, volumeScale, pitchVariation));
+                // Unscaled so audio still behaves if the game is ever paused at timeScale 0.
+                _sfxPlayer.Play(entry, GetEffectiveSFXVolume(), volumeScale, Time.unscaledTime);
             }
             catch (Exception e)
             {
-                AppService.HandleException("GameAudioManager", "PlaySFXWithVariation", e);
+                AppService.HandleException("GameAudioManager", "PlaySfx", e);
             }
-        }
-
-        /// <summary>
-        /// Coroutine that handles SFX playback, including loading and pool allocation.
-        /// If all sources are busy, it steals the oldest playing source.
-        /// </summary>
-        private IEnumerator PlaySFXCoroutine(SoundEffect sfx, float volumeScale, float pitchVariation)
-        {
-            AudioClip clip = null;
-
-            // Check cache first
-            if (_sfxCache.ContainsKey(sfx))
-            {
-                clip = _sfxCache[sfx];
-            }
-            else
-            {
-                // Load SFX from disk
-                yield return LoadSFX(sfx);
-                if (_sfxCache.ContainsKey(sfx))
-                    clip = _sfxCache[sfx];
-            }
-
-            if (clip == null)
-            {
-                yield break;
-            }
-
-            // Get next source from pool (round-robin)
-            AudioSource source = _sfxPool[_nextSfxIndex];
-            _nextSfxIndex = (_nextSfxIndex + 1) % SFX_POOL_SIZE;
-
-            // Stop current sound if source is already playing (stealing)
-            if (source.isPlaying)
-                source.Stop();
-
-            // Configure and play the sound effect
-            source.clip = clip;
-            source.volume = GetEffectiveSFXVolume() * volumeScale;
-            source.pitch = 1f + UnityEngine.Random.Range(-pitchVariation, pitchVariation);
-            source.Play();
         }
 
         #endregion // SFX Control
@@ -1256,9 +1303,9 @@ namespace HammerAndSickle.Controllers
                 _briefingSource.volume = briefingVolume;
 
             // Apply SFX volume to inactive sources (active ones keep their current volume)
-            if (_sfxPool != null)
+            if (_sfxPitchPool != null)
             {
-                foreach (var source in _sfxPool)
+                foreach (var source in _sfxPitchPool)
                 {
                     if (source != null && !source.isPlaying)
                         source.volume = sfxVolume;
@@ -1323,13 +1370,19 @@ namespace HammerAndSickle.Controllers
 
         #region Audio Loading
 
+        /* NEGATIVE CACHING — the loaders below cache a NULL on failure so a missing file is reported
+         * ONCE rather than re-requested on every play attempt. ⚠ Scoped to the STREAMED channels now:
+         * sound effects left this path entirely on 2026-08-03 (§7.1a) and are imported assets. */
+
         /// <summary>
         /// Loads a music track from StreamingAssets and caches it for future use.
+        /// Caches null on failure so a missing file is reported once, not once per play attempt.
         /// </summary>
         private IEnumerator LoadMusicTrack(MusicTrack track)
         {
             if (!MusicTrackFiles.TryGetValue(track, out string filename))
             {
+                _musicCache[track] = null;
                 AppService.HandleException("GameAudioManager", "LoadMusicTrack",
                     new Exception($"No file mapping for music track: {track}"));
                 yield break;
@@ -1350,6 +1403,7 @@ namespace HammerAndSickle.Controllers
             }
             else
             {
+                _musicCache[track] = null;
                 AppService.HandleException("GameAudioManager", "LoadMusicTrack",
                     new Exception($"Failed to load {filename}: {www.error}"));
             }
@@ -1362,6 +1416,7 @@ namespace HammerAndSickle.Controllers
         {
             if (!AmbientSoundFiles.TryGetValue(ambient, out string filename))
             {
+                _ambientCache[ambient] = null;
                 AppService.HandleException("GameAudioManager", "LoadAmbientSound",
                     new Exception($"No file mapping for ambient sound: {ambient}"));
                 yield break;
@@ -1382,48 +1437,31 @@ namespace HammerAndSickle.Controllers
             }
             else
             {
+                _ambientCache[ambient] = null;
                 AppService.HandleException("GameAudioManager", "LoadAmbientSound",
                     new Exception($"Failed to load {filename}: {www.error}"));
             }
         }
 
         /// <summary>
-        /// Loads a sound effect from StreamingAssets and caches it for future use.
-        /// </summary>
-        private IEnumerator LoadSFX(SoundEffect sfx)
-        {
-            if (!SoundEffectFiles.TryGetValue(sfx, out string filename))
-            {
-                AppService.HandleException("GameAudioManager", "LoadSFX",
-                    new Exception($"No file mapping for SFX: {sfx}"));
-                yield break;
-            }
-
-            string path = Path.Combine(Application.streamingAssetsPath, SFX_FOLDER, filename);
-            string url = "file:///" + path.Replace("\\", "/");
-
-            using UnityWebRequest www = UnityWebRequestMultimedia.GetAudioClip(url, AudioType.WAV);
-            yield return www.SendWebRequest();
-
-            if (www.result == UnityWebRequest.Result.Success)
-            {
-                AudioClip clip = DownloadHandlerAudioClip.GetContent(www);
-                _sfxCache[sfx] = clip;
-            }
-            else
-            {
-                AppService.HandleException("GameAudioManager", "LoadSFX",
-                    new Exception($"Failed to load {filename}: {www.error}"));
-            }
-        }
-
-        /// <summary>
         /// Loads a briefing narration from StreamingAssets and caches it for future use.
+        /// Caches null on failure so a missing file is reported once, not once per play attempt.
         /// </summary>
+        /// <remarks>
+        /// ⚠ FLAGGED, NOT CHANGED (2026-08-03): these two failure branches still report through
+        /// HandleException, but DesignDoc 20.4.2 ratifies that briefing NARRATION is campaign-scenario
+        /// ONLY and that an ABSENT narration asset is the NORMAL case for a standalone scenario, never an
+        /// error. So the missing-file path here will eventually need to be a clean no-op rather than a
+        /// logged exception. It is not changed now because nothing calls PlayBriefing yet — narration is
+        /// dormant, with no manifest field — so the semantics are moot until it is wired, and the right
+        /// shape (silent-absent vs. warn-on-corrupt) is a decision for that pass, not this one.
+        /// Negative caching at least means the log cannot repeat per attempt in the meantime.
+        /// </remarks>
         private IEnumerator LoadBriefingNarration(BriefingNarration briefing)
         {
             if (!BriefingFiles.TryGetValue(briefing, out string filename))
             {
+                _briefingCache[briefing] = null;
                 AppService.HandleException("GameAudioManager", "LoadBriefingNarration",
                     new Exception($"No file mapping for briefing: {briefing}"));
                 yield break;
@@ -1444,6 +1482,7 @@ namespace HammerAndSickle.Controllers
             }
             else
             {
+                _briefingCache[briefing] = null;
                 AppService.HandleException("GameAudioManager", "LoadBriefingNarration",
                     new Exception($"Failed to load {filename}: {www.error}"));
             }
@@ -1491,27 +1530,6 @@ namespace HammerAndSickle.Controllers
         }
 
         /// <summary>
-        /// Preloads multiple sound effects into cache for instant playback.
-        /// Essential for frequently used sounds like UI clicks and combat effects.
-        /// </summary>
-        /// <param name="effects">Array of sound effects to preload</param>
-        public void PreloadSFX(params SoundEffect[] effects)
-        {
-            try
-            {
-                foreach (var sfx in effects)
-                {
-                    if (!_sfxCache.ContainsKey(sfx))
-                        StartCoroutine(LoadSFX(sfx));
-                }
-            }
-            catch (Exception e)
-            {
-                AppService.HandleException("GameAudioManager", "PreloadSFX", e);
-            }
-        }
-
-        /// <summary>
         /// Preloads briefing narration files into cache for instant playback.
         /// Useful for loading all briefings for a mission during loading screen.
         /// </summary>
@@ -1552,8 +1570,9 @@ namespace HammerAndSickle.Controllers
                 if (currentAmbientSound != AmbientSound.None)
                     StartCoroutine(LoadAmbientSound(currentAmbientSound));
 
-                // Clear SFX cache completely (they're small and quick to reload)
-                _sfxCache.Clear();
+                // ⚠ SFX are NOT unloaded: they are imported assets held resident by their import
+                // settings (§7.1a), not runtime-cached, so there is nothing here to free and nothing to
+                // re-warm. Only the streamed channels have a cache to clear.
 
                 // Clear briefing cache completely (briefings are scene-specific)
                 _briefingCache.Clear();
@@ -1665,7 +1684,6 @@ namespace HammerAndSickle.Controllers
                 // Clear all caches
                 _musicCache.Clear();
                 _ambientCache.Clear();
-                _sfxCache.Clear();
                 _briefingCache.Clear();
 
                 // Force garbage collection for large audio cleanup

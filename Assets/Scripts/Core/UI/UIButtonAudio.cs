@@ -1,16 +1,26 @@
 using UnityEngine;
 using UnityEngine.EventSystems;
 using UnityEngine.UI;
+using HammerAndSickle.Audio;
 using HammerAndSickle.Controllers;
 
 namespace HammerAndSickle.Core.UI
 {
     /// <summary>
-    /// Provides audio feedback for UI button interactions with customizable sounds
-    /// for hover and click events. Configurable per-button through Inspector.
+    /// Click audio for a UI button, configured per-button in the Inspector.
     /// </summary>
+    /// <remarks>
+    /// ⚠ HOVER AUDIO WAS DELETED 2026-08-03 (Bob's call, ratified HS_DesignDoc §27.7 / todo_audio D6) and
+    /// should not come back. It fires on pointer MOTION rather than on intent, so it machine-guns on any
+    /// sweep across a button row, and it says nothing the hover VISUAL (UIButtonHoverScale) has not already
+    /// said. It was also the project's clearest example of the "looks wired, does nothing" trap: the
+    /// handlers had been commented out at some point, leaving a fully populated "Hover Sound Settings"
+    /// block in the Inspector, an assigned clip on all seven menu buttons, and a shipped
+    /// SFX_ButtonHover.wav that never once played. Removed with the clip; deleting beat disabling, because
+    /// a switched-off option still reads as available.
+    /// </remarks>
     [RequireComponent(typeof(Button))]
-    public class UIButtonAudio : MonoBehaviour, IPointerEnterHandler, IPointerExitHandler, IPointerClickHandler, IPointerDownHandler
+    public class UIButtonAudio : MonoBehaviour, IPointerDownHandler
     {
         #region Inspector Fields
 
@@ -18,21 +28,15 @@ namespace HammerAndSickle.Core.UI
         [SerializeField] private bool enableClickSound = true;
         [SerializeField] private GameAudioManager.SoundEffect clickSound = GameAudioManager.SoundEffect.ButtonClick;
 
-        [Header("Hover Sound Settings")]
-        [SerializeField] private bool enableHoverSound = true;
-        [SerializeField] private GameAudioManager.SoundEffect hoverSound = GameAudioManager.SoundEffect.ButtonHover;
-
         [Header("Optional Settings")]
         [SerializeField] private bool playOnlyIfInteractable = true;
         [SerializeField] private float clickVolumeScale = 1.0f;
-        [SerializeField] private float hoverVolumeScale = 0.8f;
 
         #endregion // Inspector Fields
 
         #region Private Fields
 
         private Button _button;
-        //private bool _isHovering = false;
 
         #endregion // Private Fields
 
@@ -51,36 +55,14 @@ namespace HammerAndSickle.Core.UI
         #region Event Handlers
 
         /// <summary>
-        /// Handles pointer entering the button area.
-        /// </summary>
-        public void OnPointerEnter(PointerEventData eventData)
-        {
-            //if (!_isHovering && ShouldPlayHoverSound())
-            //{
-            //    _isHovering = true;
-            //    PlayHoverSound();
-            //}
-        }
-
-        /// <summary>
-        /// Handles pointer exiting the button area.
-        /// </summary>
-        public void OnPointerExit(PointerEventData eventData)
-        {
-            //_isHovering = false;
-        }
-
-        /// <summary>
-        /// Handles pointer click completion (mouse up over button).
-        /// </summary>
-        public void OnPointerClick(PointerEventData eventData)
-        {
-            // Click event for consistency, but sound plays on PointerDown for responsiveness
-        }
-
-        /// <summary>
         /// Handles pointer down for immediate audio feedback.
         /// </summary>
+        /// <remarks>
+        /// ⚠ PointerDown, NOT onClick, and NOT PointerUp. Sound fires on PRESS because that is when the
+        /// player commits, and any later is perceptibly late. It also means button audio is completely
+        /// independent of the Inspector-owns-onClick contract (Claude_Project §3.6b) — adding audio to a
+        /// button can never double-fire its callback.
+        /// </remarks>
         public void OnPointerDown(PointerEventData eventData)
         {
             if (ShouldPlayClickSound())
@@ -94,47 +76,13 @@ namespace HammerAndSickle.Core.UI
         #region Private Methods
 
         /// <summary>
-        /// Determines if hover sound should play based on settings and button state.
-        /// </summary>
-        private bool ShouldPlayHoverSound()
-        {
-            if (!enableHoverSound) return false;
-            if (playOnlyIfInteractable && _button != null && !_button.interactable) return false;
-            if (GameAudioManager.Instance == null) return false;
-            return true;
-        }
-
-        /// <summary>
         /// Determines if click sound should play based on settings and button state.
         /// </summary>
         private bool ShouldPlayClickSound()
         {
             if (!enableClickSound) return false;
             if (playOnlyIfInteractable && _button != null && !_button.interactable) return false;
-            if (GameAudioManager.Instance == null) return false;
             return true;
-        }
-
-        /// <summary>
-        /// Plays the configured hover sound effect.
-        /// </summary>
-        private void PlayHoverSound()
-        {
-            try
-            {
-                if (hoverSound != GameAudioManager.SoundEffect.None)
-                {
-                    GameAudioManager.Instance.PlaySFXWithVariation(
-                        hoverSound,
-                        hoverVolumeScale,
-                        0f // No pitch variation for UI sounds
-                    );
-                }
-            }
-            catch (System.Exception e)
-            {
-                Debug.LogError($"UIButtonAudio.PlayHoverSound failed: {e.Message}");
-            }
         }
 
         /// <summary>
@@ -146,11 +94,7 @@ namespace HammerAndSickle.Core.UI
             {
                 if (clickSound != GameAudioManager.SoundEffect.None)
                 {
-                    GameAudioManager.Instance.PlaySFXWithVariation(
-                        clickSound,
-                        clickVolumeScale,
-                        0f // No pitch variation for UI sounds
-                    );
+                    GameAudio.Play(clickSound, clickVolumeScale);
                 }
             }
             catch (System.Exception e)
@@ -175,32 +119,12 @@ namespace HammerAndSickle.Core.UI
         }
 
         /// <summary>
-        /// Manually trigger hover sound (useful for controller navigation).
-        /// </summary>
-        public void TriggerHoverSound()
-        {
-            if (ShouldPlayHoverSound())
-            {
-                PlayHoverSound();
-            }
-        }
-
-        /// <summary>
         /// Updates the click sound at runtime.
         /// </summary>
         public void SetClickSound(GameAudioManager.SoundEffect sound, bool enable = true)
         {
             clickSound = sound;
             enableClickSound = enable;
-        }
-
-        /// <summary>
-        /// Updates the hover sound at runtime.
-        /// </summary>
-        public void SetHoverSound(GameAudioManager.SoundEffect sound, bool enable = true)
-        {
-            hoverSound = sound;
-            enableHoverSound = enable;
         }
 
         #endregion // Public Methods

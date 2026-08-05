@@ -105,13 +105,9 @@ namespace HammerAndSickle.SceneManagement.Controllers
             {
                 GameAudioManager.EnsureExists();
 
-                GameAudioManager.Instance.PreloadSFX(
-                    GameAudioManager.SoundEffect.ButtonClick,
-                    GameAudioManager.SoundEffect.ButtonHover,
-                    GameAudioManager.SoundEffect.MenuOpen,
-                    GameAudioManager.SoundEffect.MenuClose,
-                    GameAudioManager.SoundEffect.RadioButtonClick
-                );
+                // ⚠ No SFX preload call any more. Sound effects are imported assets with Preload Audio
+                // Data ON (§7.1a), so Unity has them resident before this runs — a code-side warm-up would
+                // be pure ceremony. Music still loads on demand, below.
 
                 GameAudioManager.Instance.PlayMusic(
                     GameAudioManager.MusicTrack.MainMenu,

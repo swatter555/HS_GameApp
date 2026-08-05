@@ -1,3 +1,4 @@
+using HammerAndSickle.Audio;
 using HammerAndSickle.Core;
 using HammerAndSickle.Core.GameData;
 using HammerAndSickle.Core.Map;
@@ -14,6 +15,7 @@ using System.Collections.Generic;
 using System.Linq;
 using UnityEngine;
 using UnityEngine.InputSystem;
+using SFX = HammerAndSickle.Controllers.GameAudioManager.SoundEffect;
 
 namespace HammerAndSickle.Controllers
 {
@@ -200,6 +202,7 @@ namespace HammerAndSickle.Controllers
                     AppService.CaptureUiMessage(string.IsNullOrWhiteSpace(error)
                         ? $"{unit.UnitName} cannot change deployment right now."
                         : error);
+                    GameAudio.Play(SFX.ButtonDenied);
                     return;
                 }
 
@@ -295,6 +298,7 @@ namespace HammerAndSickle.Controllers
                 if (!unit.PerformIntelAction())
                 {
                     AppService.CaptureUiMessage($"{unit.UnitName} cannot gather intel right now.");
+                    GameAudio.Play(SFX.ButtonDenied);
                     return;
                 }
 
@@ -405,6 +409,11 @@ namespace HammerAndSickle.Controllers
                 var map = GameDataManager.CurrentHexMap;
 
                 State = MovementState.UnitSelected;
+
+                // Ungated: this path only ever selects the player's own units, and the sound is a response
+                // to the click rather than information about anything on the map.
+                GameAudio.Play(SFX.UnitSelect);
+
                 EventManager.Instance?.RaisePlayerUnitSelected(unit);
 
                 // Empty range for a unit with no move left (spent actions/MP, dug-in posture, base) — no
@@ -516,8 +525,9 @@ namespace HammerAndSickle.Controllers
         {
             if (State != MovementState.UnitSelected || CurrentUnit == null)
             {
-                // No attacker selected → nothing to engage with.
-                // TODO: Play denial SFX
+                // No attacker selected → nothing to engage with. ⚠ Ungated: a refusal concerns the
+                // player's own order and reveals nothing about a unit (§24.8.5 / §27.7.4).
+                GameAudio.Play(SFX.ButtonDenied);
                 return;
             }
 
@@ -526,7 +536,7 @@ namespace HammerAndSickle.Controllers
 
             if (target == null || target.Side == Side.Player)
             {
-                // TODO: Play denial SFX
+                GameAudio.Play(SFX.ButtonDenied);
                 return;
             }
 
@@ -535,6 +545,10 @@ namespace HammerAndSickle.Controllers
 
         private void DeselectUnit()
         {
+            // ⚠ Before the field is cleared — nothing here is unit-attributed, but the ordering keeps this
+            // readable as "the selection ends" rather than "something happened to no unit".
+            if (CurrentUnit != null) GameAudio.Play(SFX.UnitDeselect);
+
             CurrentUnit = null;
             _currentPath = null;
             State = MovementState.Idle;
@@ -646,6 +660,7 @@ namespace HammerAndSickle.Controllers
                 bool executed;
                 string message;
                 bool attackerDestroyed;
+                bool targetDestroyed;
 
                 // Where the engagement happens, captured BEFORE resolution: a defender that retreats or routs
                 // has already moved by the time the outcome returns, and the dispatch must name the hex the
@@ -662,6 +677,7 @@ namespace HammerAndSickle.Controllers
                     executed = o.Executed;
                     message = o.Executed ? BuildIndirectMessage(CurrentUnit, target, o) : o.Reason;
                     attackerDestroyed = o.FirerDestroyed;
+                    targetDestroyed = o.TargetDestroyed;
 
                     // §24.8.6 dispatch. Filed AFTER the whole action resolves so counter-battery losses are
                     // included — reporting mid-action would print "no losses" and then be contradicted.
@@ -675,6 +691,7 @@ namespace HammerAndSickle.Controllers
                     executed = o.Executed;
                     message = o.Executed ? BuildCombatMessage(CurrentUnit, target, o) : o.Reason;
                     attackerDestroyed = o.AttackerDestroyed;
+                    targetDestroyed = o.DefenderDestroyed;
 
                     // See EventManager / §24.8.6 — one call files whichever side's report the player owns.
                     if (o.Executed) PrinterDispatch.ReportGroundCombat(CurrentUnit, target, contactHex, o);
@@ -683,11 +700,30 @@ namespace HammerAndSickle.Controllers
                 if (!executed)
                 {
                     AppService.CaptureUiMessage(message);
-                    // TODO: Play denial SFX
+                    GameAudio.Play(SFX.ButtonDenied);
                     return;
                 }
 
                 AppService.CaptureUiMessage(message);
+
+                /* ═══ AUDIO (§27.7.4 fog gate, §27.7.5 family mapping) ═══
+                 *
+                 * ⚠ ORDERING IS LOAD-BEARING. PlayWeaponFire runs AFTER the orchestrator returns, so the
+                 * firing-reveal spotting change (§7.13.5.4 / §12.4.9) has already landed and the gate sees
+                 * the POST-reveal level. Called before Execute it would read the pre-reveal level and
+                 * suppress a shot the player is entitled to hear — invisible today because the firer is
+                 * always the player's own unit, and a real bug the moment the AI turn calls this path.
+                 *
+                 * ⚠ ATTRIBUTION: the FIRING sound is the firer's, the IMPACT is the target's. That split
+                 * is what lets an unseen battery shell the player audibly without identifying itself, and
+                 * it is why no "generic substitute sound" is needed anywhere. */
+                GameAudio.PlayWeaponFire(CurrentUnit);
+                GameAudio.PlayImpact(target);
+
+                // A kill is attributed to the unit that DIED — you hear your own regiment go, and an
+                // unspotted enemy dies silently, which is the same information the icon already gives.
+                if (targetDestroyed) GameAudio.PlayFrom(SFX.UnitDestroyed, target);
+                if (attackerDestroyed) GameAudio.PlayFrom(SFX.UnitDestroyed, CurrentUnit);
 
                 // §24.8.6 — announce a promotion earned in this engagement. Guarded on the attacker surviving:
                 // a destroyed regiment has already filed its own loss report and cannot also report good news.
@@ -752,7 +788,7 @@ namespace HammerAndSickle.Controllers
 
             if (!CurrentUnit.BeginMoveOrder())
             {
-                // TODO: Play OutOfMP SFX
+                GameAudio.Play(SFX.OutOfMP);
                 State = MovementState.UnitSelected;
                 yield break;
             }
@@ -773,6 +809,22 @@ namespace HammerAndSickle.Controllers
             // §6.13 tile-control flips after the move settles. May be shorter than the planned path
             // if an ambush / ZoC halt cuts the move short.
             var enteredHexes = new List<Position2D>();
+
+            /* ⚠ ONE SPELLING of the per-hex tween length, because the movement SOUND is chosen from it.
+             * It used to be re-declared inside the loop; two copies would let the audio pick a clip for a
+             * duration the animation no longer runs at. */
+            float stepSeconds = isFixedWing ? 0.08f : 0.18f;
+
+            /* §27.7.7 — ONE fire-and-forget shot for the WHOLE move. Not a per-hex blip (which would
+             * machine-gun at ~0.18 s/hex) and not a loop (R3 dissolved: nothing would own stopping it when
+             * an ambush halts the move or the unit dies mid-path). The long cut is selected from the
+             * PREDICTED duration, knowable here because the path is already committed — so the choice is
+             * deterministic rather than a mid-move correction.
+             * ⚠ PlayFrom, not Play: this is a UNIT's sound. Always audible today because the mover is the
+             * player's own, and correctly gated the moment the AI moves through this path. */
+            GameAudio.PlayFrom(
+                GameAudioManager.GetMovementSFX(CurrentUnit.Classification, _currentPath.Count * stepSeconds),
+                CurrentUnit);
 
             // TODO: Move undo — allowed only when no new spotting events fired during the move
 
@@ -808,7 +860,6 @@ namespace HammerAndSickle.Controllers
 
                 // Animate the icon a single hex step and WAIT for the tween before running the arrival
                 // checks below — the unit visibly enters the hex, then spotting/ambush/ZoC resolve there.
-                float stepDuration = isFixedWing ? 0.08f : 0.18f;
                 var iconRenderer = GameIconRenderer.Instance;
                 if (iconRenderer != null)
                 {
@@ -817,17 +868,24 @@ namespace HammerAndSickle.Controllers
                     iconRenderer.RefreshIconFacing(CurrentUnit.UnitID);
 
                     bool stepDone = false;
-                    iconRenderer.AnimateIconStep(CurrentUnit.UnitID, targetPos, stepDuration, () => stepDone = true);
+                    iconRenderer.AnimateIconStep(CurrentUnit.UnitID, targetPos, stepSeconds, () => stepDone = true);
                     yield return new WaitUntil(() => stepDone);
                 }
                 else
                 {
                     // Headless / no renderer (tests) — keep the cadence without animating.
-                    yield return new WaitForSeconds(stepDuration);
+                    yield return new WaitForSeconds(stepSeconds);
                 }
 
                 // Spotting pass
                 var newlySpotted = SpottingService.CheckSpottingForMover(CurrentUnit, targetPos);
+
+                /* First contact. ⚠ PlayFrom on the SPOTTED unit rather than an ungated Play, even though
+                 * everything in this list is by definition now spotted: if the meaning of "newly spotted"
+                 * ever drifts, the gate suppresses the sound instead of announcing a hidden unit. Fails
+                 * closed, like AudioFogPolicy itself. */
+                if (newlySpotted.Count > 0)
+                    GameAudio.PlayFrom(SFX.UnitSpotted, newlySpotted[0]);
 
                 // Ground ambush check
                 if (!isAir && newlySpotted.Count > 0)
@@ -842,6 +900,13 @@ namespace HammerAndSickle.Controllers
 
                         // §24.8.6 — the attribution case: fire came from a hex the player had no contact on.
                         PrinterDispatch.ReportAmbush(ambusher, CurrentUnit, targetPos);
+
+                        /* ⚠ ATTRIBUTED TO THE VICTIM, NOT THE AMBUSHER — the sharpest case §27.7.4.2
+                         * exists for. The ambusher is BY DEFINITION unspotted (§6.9.0), so attributing
+                         * the sound to it would gate the player's own regiment being hit into silence;
+                         * playing it ungated would announce a hidden unit. You always hear your own men
+                         * take fire, and you learn nothing about who fired. */
+                        GameAudio.PlayFrom(SFX.AmbushTriggered, CurrentUnit);
 
                         break;
                     }
@@ -869,6 +934,10 @@ namespace HammerAndSickle.Controllers
                 if (!isAir && _currentRange.ZocTerminals.Contains(targetPos))
                 {
                     ApplyAbnormalHalt(CurrentUnit, false);
+
+                    // Ungated: the halt is a fact about the player's own order, and the enemy ZoC that
+                    // caused it belongs to a unit they have already spotted.
+                    GameAudio.Play(SFX.UnitMoveBlocked);
                     break;
                 }
 
@@ -997,11 +1066,15 @@ namespace HammerAndSickle.Controllers
 
                     // §24.8.6 — see PrinterDispatch.
                     PrinterDispatch.ReportObjectiveCaptured(cap.Position, prestige);
+
+                    // Ungated (§27.7.4): an objective flip is a fact about the MAP, not about a unit.
+                    GameAudio.Play(SFX.ObjectiveCaptured);
                 }
                 else if (cap.PreviousControl == TileControl.Red)
                 {
                     bm.LoseObjective();
                     PrinterDispatch.ReportObjectiveLost(cap.Position);
+                    GameAudio.Play(SFX.ObjectiveLost);
                 }
             }
         }
@@ -1030,8 +1103,11 @@ namespace HammerAndSickle.Controllers
 
                     // Recompute range with updated MP (clears the overlay if rotation spent the last MP)
                     RecomputeRangeAndRaise(GameDataManager.CurrentHexMap);
+
+                    // ⚠ INSIDE the success branch. A rotation the unit could not pay for is a refusal, and
+                    // sounding it as a rotation would tell the player something happened when nothing did.
+                    GameAudio.PlayFrom(SFX.FacingChange, CurrentUnit);
                 }
-                // TODO: Play FacingChange SFX
             }
             catch (Exception e)
             {

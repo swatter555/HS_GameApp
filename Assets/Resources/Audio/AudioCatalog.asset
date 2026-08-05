@@ -1,0 +1,51 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: b951839f61909e24480d03d3f62399f4, type: 3}
+  m_Name: AudioCatalog
+  m_EditorClassIdentifier: Main::HammerAndSickle.Audio.AudioCatalog
+  entries:
+  - id: 1
+    clips:
+    - {fileID: 8300000, guid: e801d58b4a352ba408ed145e90b64257, type: 3}
+    volume: 1
+    pitchVariation: 0
+    minRetriggerSeconds: 0
+  - id: 3
+    clips:
+    - {fileID: 8300000, guid: 8fdb4c0aa97321146b40bfaeadb86367, type: 3}
+    volume: 1
+    pitchVariation: 0
+    minRetriggerSeconds: 0
+  - id: 4
+    clips:
+    - {fileID: 8300000, guid: 38191616fc601404c9b6111d96da4bc6, type: 3}
+    volume: 1
+    pitchVariation: 0
+    minRetriggerSeconds: 0
+  - id: 5
+    clips:
+    - {fileID: 8300000, guid: f844c8b8ef4cb824281b12eb98d5cce8, type: 3}
+    volume: 1
+    pitchVariation: 0
+    minRetriggerSeconds: 0
+  - id: 6
+    clips:
+    - {fileID: 8300000, guid: 8e96b94589b524d49a56a2faa42ac39f, type: 3}
+    volume: 1
+    pitchVariation: 0
+    minRetriggerSeconds: 0
+  - id: 7
+    clips:
+    - {fileID: 8300000, guid: f06cf9fce60ae5841b6714776ae59a9c, type: 3}
+    volume: 1
+    pitchVariation: 0
+    minRetriggerSeconds: 0

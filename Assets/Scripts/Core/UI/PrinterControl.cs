@@ -1,3 +1,4 @@
+using HammerAndSickle.Audio;
 using HammerAndSickle.Controllers;
 using HammerAndSickle.Core.GameData;
 using HammerAndSickle.Services;
@@ -578,9 +579,7 @@ namespace HammerAndSickle.Core.UI
         {
             try
             {
-                GameAudioManager.EnsureExists();
-                GameAudioManager.Instance.PlaySFXWithVariation(
-                    GameAudioManager.SoundEffect.PrinterTick, _printerVolume, 0f);
+                GameAudio.Play(GameAudioManager.SoundEffect.PrinterTick, _printerVolume);
             }
             catch (Exception e)
             {

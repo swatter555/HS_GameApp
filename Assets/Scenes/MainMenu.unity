@@ -204,7 +204,6 @@ GameObject:
   - component: {fileID: 138566843}
   - component: {fileID: 138566845}
   - component: {fileID: 138566846}
-  - component: {fileID: 138566842}
   m_Layer: 7
   m_Name: Settings Button
   m_TagString: Untagged
@@ -231,45 +230,6 @@ RectTransform:
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 336.7, y: 55}
   m_Pivot: {x: 0.5, y: 0.5}
---- !u!114 &138566842
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 138566840}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 75d5cf8529d94394683430ea0f016192, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Main::HammerAndSickle.Core.UI.UIButtonHoverScale
-  scaleIncrease: 10
-  animationDuration: 0.15
-  onlyIfInteractable: 1
-  scaleCurve:
-    serializedVersion: 2
-    m_Curve:
-    - serializedVersion: 3
-      time: 0
-      value: 0
-      inSlope: 0
-      outSlope: 0
-      tangentMode: 0
-      weightedMode: 0
-      inWeight: 0
-      outWeight: 0
-    - serializedVersion: 3
-      time: 1
-      value: 1
-      inSlope: 0
-      outSlope: 0
-      tangentMode: 0
-      weightedMode: 0
-      inWeight: 0
-      outWeight: 0
-    m_PreInfinity: 2
-    m_PostInfinity: 2
-    m_RotationOrder: 4
 --- !u!114 &138566843
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -366,7 +326,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Main::HammerAndSickle.Core.UI.UIButtonAudio
   enableClickSound: 1
   clickSound: 1
-  enableHoverSound: 1
+  enableHoverSound: 0
   hoverSound: 2
   playOnlyIfInteractable: 1
   clickVolumeScale: 1
@@ -384,7 +344,6 @@ GameObject:
   - component: {fileID: 163617995}
   - component: {fileID: 163617994}
   - component: {fileID: 163617999}
-  - component: {fileID: 163617996}
   m_Layer: 7
   m_Name: Exit Button
   m_TagString: Untagged
@@ -466,45 +425,6 @@ MonoBehaviour:
   m_FillOrigin: 0
   m_UseSpriteMesh: 0
   m_PixelsPerUnitMultiplier: 1
---- !u!114 &163617996
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 163617993}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 75d5cf8529d94394683430ea0f016192, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Main::HammerAndSickle.Core.UI.UIButtonHoverScale
-  scaleIncrease: 10
-  animationDuration: 0.15
-  onlyIfInteractable: 1
-  scaleCurve:
-    serializedVersion: 2
-    m_Curve:
-    - serializedVersion: 3
-      time: 0
-      value: 0
-      inSlope: 0
-      outSlope: 0
-      tangentMode: 0
-      weightedMode: 0
-      inWeight: 0
-      outWeight: 0
-    - serializedVersion: 3
-      time: 1
-      value: 1
-      inSlope: 0
-      outSlope: 0
-      tangentMode: 0
-      weightedMode: 0
-      inWeight: 0
-      outWeight: 0
-    m_PreInfinity: 2
-    m_PostInfinity: 2
-    m_RotationOrder: 4
 --- !u!222 &163617997
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -546,7 +466,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Main::HammerAndSickle.Core.UI.UIButtonAudio
   enableClickSound: 1
   clickSound: 1
-  enableHoverSound: 1
+  enableHoverSound: 0
   hoverSound: 2
   playOnlyIfInteractable: 1
   clickVolumeScale: 1
@@ -1618,7 +1538,6 @@ GameObject:
   - component: {fileID: 651719852}
   - component: {fileID: 651719854}
   - component: {fileID: 651719855}
-  - component: {fileID: 651719851}
   m_Layer: 7
   m_Name: Campaign Button
   m_TagString: Untagged
@@ -1645,45 +1564,6 @@ RectTransform:
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 333.06, y: 64}
   m_Pivot: {x: 0.5, y: 0.5}
---- !u!114 &651719851
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 651719849}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 75d5cf8529d94394683430ea0f016192, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Main::HammerAndSickle.Core.UI.UIButtonHoverScale
-  scaleIncrease: 10
-  animationDuration: 0.15
-  onlyIfInteractable: 1
-  scaleCurve:
-    serializedVersion: 2
-    m_Curve:
-    - serializedVersion: 3
-      time: 0
-      value: 0
-      inSlope: 0
-      outSlope: 0
-      tangentMode: 0
-      weightedMode: 0
-      inWeight: 0
-      outWeight: 0
-    - serializedVersion: 3
-      time: 1
-      value: 1
-      inSlope: 0
-      outSlope: 0
-      tangentMode: 0
-      weightedMode: 0
-      inWeight: 0
-      outWeight: 0
-    m_PreInfinity: 2
-    m_PostInfinity: 2
-    m_RotationOrder: 4
 --- !u!114 &651719852
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -1780,7 +1660,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Main::HammerAndSickle.Core.UI.UIButtonAudio
   enableClickSound: 1
   clickSound: 1
-  enableHoverSound: 1
+  enableHoverSound: 0
   hoverSound: 2
   playOnlyIfInteractable: 1
   clickVolumeScale: 1
@@ -2140,7 +2020,6 @@ GameObject:
   - component: {fileID: 728994419}
   - component: {fileID: 728994418}
   - component: {fileID: 728994420}
-  - component: {fileID: 728994417}
   - component: {fileID: 728994421}
   m_Layer: 7
   m_Name: Continue Button
@@ -2168,45 +2047,6 @@ RectTransform:
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 335.62, y: 64}
   m_Pivot: {x: 0.5, y: 0.5}
---- !u!114 &728994417
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 728994415}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 75d5cf8529d94394683430ea0f016192, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Main::HammerAndSickle.Core.UI.UIButtonHoverScale
-  scaleIncrease: 10
-  animationDuration: 0.15
-  onlyIfInteractable: 1
-  scaleCurve:
-    serializedVersion: 2
-    m_Curve:
-    - serializedVersion: 3
-      time: 0
-      value: 0
-      inSlope: 0
-      outSlope: 0
-      tangentMode: 0
-      weightedMode: 0
-      inWeight: 0
-      outWeight: 0
-    - serializedVersion: 3
-      time: 1
-      value: 1
-      inSlope: 0
-      outSlope: 0
-      tangentMode: 0
-      weightedMode: 0
-      inWeight: 0
-      outWeight: 0
-    m_PreInfinity: 2
-    m_PostInfinity: 2
-    m_RotationOrder: 4
 --- !u!114 &728994418
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -2303,7 +2143,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Main::HammerAndSickle.Core.UI.UIButtonAudio
   enableClickSound: 1
   clickSound: 1
-  enableHoverSound: 1
+  enableHoverSound: 0
   hoverSound: 2
   playOnlyIfInteractable: 1
   clickVolumeScale: 1
@@ -3098,7 +2938,6 @@ GameObject:
   - component: {fileID: 1012109795}
   - component: {fileID: 1012109794}
   - component: {fileID: 1012109793}
-  - component: {fileID: 1012109797}
   - component: {fileID: 1012109796}
   m_Layer: 7
   m_Name: Cancel Button
@@ -3236,50 +3075,11 @@ MonoBehaviour:
   m_EditorClassIdentifier: Main::HammerAndSickle.Core.UI.UIButtonAudio
   enableClickSound: 1
   clickSound: 1
-  enableHoverSound: 1
+  enableHoverSound: 0
   hoverSound: 2
   playOnlyIfInteractable: 1
   clickVolumeScale: 1
   hoverVolumeScale: 0.8
---- !u!114 &1012109797
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1012109791}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 75d5cf8529d94394683430ea0f016192, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Main::HammerAndSickle.Core.UI.UIButtonHoverScale
-  scaleIncrease: 10
-  animationDuration: 0.15
-  onlyIfInteractable: 1
-  scaleCurve:
-    serializedVersion: 2
-    m_Curve:
-    - serializedVersion: 3
-      time: 0
-      value: 0
-      inSlope: 0
-      outSlope: 0
-      tangentMode: 0
-      weightedMode: 0
-      inWeight: 0
-      outWeight: 0
-    - serializedVersion: 3
-      time: 1
-      value: 1
-      inSlope: 0
-      outSlope: 0
-      tangentMode: 0
-      weightedMode: 0
-      inWeight: 0
-      outWeight: 0
-    m_PreInfinity: 2
-    m_PostInfinity: 2
-    m_RotationOrder: 4
 --- !u!1 &1018833826
 GameObject:
   m_ObjectHideFlags: 0
@@ -4826,7 +4626,6 @@ GameObject:
   - component: {fileID: 1538382853}
   - component: {fileID: 1538382852}
   - component: {fileID: 1538382856}
-  - component: {fileID: 1538382855}
   m_Layer: 7
   m_Name: Load Button
   m_TagString: Untagged
@@ -4949,45 +4748,6 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 1538382850}
   m_CullTransparentMesh: 1
---- !u!114 &1538382855
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 1538382850}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 75d5cf8529d94394683430ea0f016192, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Main::HammerAndSickle.Core.UI.UIButtonHoverScale
-  scaleIncrease: 10
-  animationDuration: 0.15
-  onlyIfInteractable: 1
-  scaleCurve:
-    serializedVersion: 2
-    m_Curve:
-    - serializedVersion: 3
-      time: 0
-      value: 0
-      inSlope: 0
-      outSlope: 0
-      tangentMode: 0
-      weightedMode: 0
-      inWeight: 0
-      outWeight: 0
-    - serializedVersion: 3
-      time: 1
-      value: 1
-      inSlope: 0
-      outSlope: 0
-      tangentMode: 0
-      weightedMode: 0
-      inWeight: 0
-      outWeight: 0
-    m_PreInfinity: 2
-    m_PostInfinity: 2
-    m_RotationOrder: 4
 --- !u!114 &1538382856
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -5002,7 +4762,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Main::HammerAndSickle.Core.UI.UIButtonAudio
   enableClickSound: 1
   clickSound: 1
-  enableHoverSound: 1
+  enableHoverSound: 0
   hoverSound: 2
   playOnlyIfInteractable: 1
   clickVolumeScale: 1
@@ -5857,7 +5617,6 @@ GameObject:
   - component: {fileID: 2069267898}
   - component: {fileID: 2069267900}
   - component: {fileID: 2069267901}
-  - component: {fileID: 2069267897}
   m_Layer: 7
   m_Name: Scenario Button
   m_TagString: Untagged
@@ -5884,45 +5643,6 @@ RectTransform:
   m_AnchoredPosition: {x: 0, y: 0}
   m_SizeDelta: {x: 333.91, y: 64}
   m_Pivot: {x: 0.5, y: 0.5}
---- !u!114 &2069267897
-MonoBehaviour:
-  m_ObjectHideFlags: 0
-  m_CorrespondingSourceObject: {fileID: 0}
-  m_PrefabInstance: {fileID: 0}
-  m_PrefabAsset: {fileID: 0}
-  m_GameObject: {fileID: 2069267895}
-  m_Enabled: 1
-  m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 75d5cf8529d94394683430ea0f016192, type: 3}
-  m_Name: 
-  m_EditorClassIdentifier: Main::HammerAndSickle.Core.UI.UIButtonHoverScale
-  scaleIncrease: 10
-  animationDuration: 0.15
-  onlyIfInteractable: 1
-  scaleCurve:
-    serializedVersion: 2
-    m_Curve:
-    - serializedVersion: 3
-      time: 0
-      value: 0
-      inSlope: 0
-      outSlope: 0
-      tangentMode: 0
-      weightedMode: 0
-      inWeight: 0
-      outWeight: 0
-    - serializedVersion: 3
-      time: 1
-      value: 1
-      inSlope: 0
-      outSlope: 0
-      tangentMode: 0
-      weightedMode: 0
-      inWeight: 0
-      outWeight: 0
-    m_PreInfinity: 2
-    m_PostInfinity: 2
-    m_RotationOrder: 4
 --- !u!114 &2069267898
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -6032,7 +5752,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Main::HammerAndSickle.Core.UI.UIButtonAudio
   enableClickSound: 1
   clickSound: 1
-  enableHoverSound: 1
+  enableHoverSound: 0
   hoverSound: 2
   playOnlyIfInteractable: 1
   clickVolumeScale: 1
