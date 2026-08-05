@@ -1998,32 +1998,28 @@ namespace HammerAndSickle.Core.GameData
 
         #region HexMap Constants
 
-        // Hex grid orientation.
-        public const bool IsPointyTop = true;
+        // ⚠ HEX GEOMETRY LIVES IN HexGridSystem, NOT HERE. These two feed HexGridSystem.HEX_WIDTH
+        // (= HexSize / MapPPU = 2.56 world units) and are the only geometry inputs GameData owns.
+        // HexGridSystem then derives HALF_HEX_WIDTH, VERTICAL_SPACING (width * sqrt(3)/2) and
+        // HEX_HEIGHT (width * 2/sqrt(3)) from it, and every renderer reads them from there.
+        // DO NOT add a second, pixel-scaled spelling of a hex dimension to this file: one existed
+        // (GetVerticalSpacing(), returning 221.7 PIXELS against HexGridSystem's 2.217 WORLD UNITS),
+        // it was never called, it was still being "maintained" — its formula was corrected 0.75 ->
+        // sqrt(3)/2 in the chunk-renderer commit, fixing a number nothing read — and its original
+        // 0.75 form is what put the wrong VERTICAL_SPACING into DesignDoc 4.2.1, where it sat until
+        // 2026-08-03. Deleted that date along with IsPointyTop, PixelScaleX/Y and SpritePPU.
 
-        // Hex size constant.
+        // Hex art is 256 px wide; sprites import at 100 PPU project-wide (931 of 935 PNGs), so one
+        // hex spans exactly 2.56 world units. MapPPU is named for the background map but is in fact
+        // the project-wide sprite PPU — the two have never differed.
         public const int HexSize = 256;
-
-        // Rendering constants.
-        public const float PixelScaleX = 1;
-        public const float PixelScaleY = 1;
-        public const int SpritePPU = 256;
-        public const float MapPPU = 100f;  // Background map sprite pixels-per-unit
+        public const float MapPPU = 100f;
 
         // Hex grid size constants.
         public const int SmallHexWidth = 32;
         public const int SmallHexHeight = 21;
         public const int LargeHexWidth = 32;
         public const int LargeHexHeight = 42;
-
-        /// <summary>
-        /// Gets vertical spacing for the hex grid in pixels.
-        /// Regular pointy-top hex: row spacing = width * sqrt(3)/2.
-        /// </summary>
-        public static float GetVerticalSpacing()
-        {
-            return HexSize * 0.8660254038f;
-        }
 
         // Version of the .map file format. Bumped 1→2 for the HexTile model rework: added
         // isPort / isDeploymentZone / isBeachhead / hexControlLevel / reservedInt1-2 / reservedFlag1-2,
