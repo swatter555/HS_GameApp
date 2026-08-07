@@ -54,11 +54,13 @@ namespace HammerAndSickle.EditorTools.Audio
         private static readonly SoundEffect[] Sounds;
         private static readonly string[] SoundNames;
         private static readonly GUIContent[] FileNameLabels;
+        private static readonly string[] FileNames;
         private static readonly int HighestSoundValue;
 
         // Cached so GUILayout/GUIContent do not allocate on every control, every pass.
         private static readonly GUILayoutOption[] NameWidth = { GUILayout.Width(200f) };
         private static readonly GUILayoutOption[] FileNameWidth = { GUILayout.Width(240f) };
+        private static readonly GUILayoutOption[] CopyButtonWidth = { GUILayout.Width(46f) };
         private static readonly GUILayoutOption[] ButtonWidth = { GUILayout.Width(88f) };
         private static readonly GUILayoutOption[] TinyButtonWidth = { GUILayout.Width(22f) };
         private static readonly GUILayoutOption[] ExpandWidth = { GUILayout.ExpandWidth(true) };
@@ -75,6 +77,9 @@ namespace HammerAndSickle.EditorTools.Audio
         private static readonly GUIContent DropToAdd = new("Drop audio here to add a variant");
         private static readonly GUIContent RemoveRowLabel = new("Remove Row");
         private static readonly GUIContent RemoveClipLabel = new("X");
+        private static readonly GUIContent CopyLabel = new("Copy",
+            "Copy this filename to the clipboard, ready to paste into your audio editor's save dialog. " +
+            "Copies the name WITH the .wav extension, exactly as shown.");
 
         private static GUIContent[] _variantLabels = Array.Empty<GUIContent>();
 
@@ -91,6 +96,10 @@ namespace HammerAndSickle.EditorTools.Audio
              * needs no cross-referencing against AudioCatalogTools' parser. Built once — this is a fixed
              * string per sound, and formatting it per row per GUI pass is exactly the kind of allocation
              * the row cache exists to avoid. */
+            // The bare filename, which is what the Copy button puts on the clipboard — the label carries
+            // decorative parentheses and pasting those into a save dialog would be useless.
+            FileNames = Sounds.Select(id => $"{FilePrefix}{id}.wav").ToArray();
+
             FileNameLabels = Sounds.Select(id => new GUIContent(
                 $"({FilePrefix}{id}.wav)",
                 $"Expected filename. A wav dropped on this row is renamed to {FilePrefix}{id}.wav " +
@@ -145,9 +154,9 @@ namespace HammerAndSickle.EditorTools.Audio
         {
             var window = GetWindow<AudioCatalogWindow>("Audio Catalog");
 
-            // Wide enough for name + expected filename + status without the three colliding. The longest
+            // Wide enough for name + expected filename + Copy + status without them colliding. The longest
             // pair today is FireAircraftGroundAttack / (SFX_FireAircraftGroundAttack.wav).
-            window.minSize = new Vector2(760f, 320f);
+            window.minSize = new Vector2(820f, 320f);
         }
 
         private void OnEnable()
@@ -277,6 +286,17 @@ namespace HammerAndSickle.EditorTools.Audio
                 {
                     EditorGUILayout.LabelField(SoundNames[soundIndex], EditorStyles.boldLabel, NameWidth);
                     EditorGUILayout.LabelField(FileNameLabels[soundIndex], EditorStyles.miniLabel, FileNameWidth);
+
+                    /* ⚠ Safe to act on inline, unlike the row's other buttons: this mutates nothing the
+                     * GUI is laying out, so it cannot desync the Layout and Repaint passes. The
+                     * notification is not decoration — a copy with no visible feedback is
+                     * indistinguishable from a dead button. */
+                    if (GUILayout.Button(CopyLabel, EditorStyles.miniButton, CopyButtonWidth))
+                    {
+                        EditorGUIUtility.systemCopyBuffer = FileNames[soundIndex];
+                        ShowNotification(new GUIContent($"Copied  {FileNames[soundIndex]}"));
+                    }
+
                     EditorGUILayout.LabelField(StatusText(info),
                         info.Warn ? WarnStyle : EditorStyles.miniLabel);
                     GUILayout.FlexibleSpace();

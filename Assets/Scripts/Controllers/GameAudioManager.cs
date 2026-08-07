@@ -1,5 +1,6 @@
 using HammerAndSickle.Audio;
 using HammerAndSickle.Core.GameData;
+using HammerAndSickle.Models;
 using HammerAndSickle.Services;
 using System;
 using System.Collections;
@@ -244,12 +245,50 @@ namespace HammerAndSickle.Controllers
         public const float MOVEMENT_STANDARD_CLIP_SECONDS = 1.0f;
 
         /// <summary>
+        /// Movement SFX for a UNIT — the overload gameplay should call, because a regiment does not always
+        /// move the way its classification suggests.
+        /// </summary>
+        /// <remarks>
+        /// ⚠ CLASSIFICATION ALONE IS WRONG, AND THIS IS THE SAME MISTAKE THE WEAPON-FAMILY RULE ALREADY
+        /// AVOIDS (§9.10.4): posture decides. A mountable regiment below <c>Mobile</c> HAS DISMOUNTED — it
+        /// is not riding anything, so it moves on foot no matter what carries it when mounted. The model
+        /// already says which units those are, so nothing here hand-lists classifications:
+        ///
+        ///   • <c>IsMountable</c> + a distinct mobile profile = the transport is SEPARATE from the unit.
+        ///     A Motor Rifle regiment is INF_REG_SV deployed and APC_BTR80_SV mobile; a towed artillery
+        ///     regiment is ART_LIGHT_SV deployed and TRK_GEN_SV — literally a truck — mobile. Dismount
+        ///     either and the trucks and carriers are parked.
+        ///   • TANK, SPA, SPAAA and friends are <c>isMountable: false</c> with <c>mobileProfile: NONE</c>:
+        ///     the unit IS its vehicle. The rule below never fires for them, so a dug-in tank still
+        ///     sounds tracked — which is right, tanks do not dismount.
+        ///
+        /// ⚠ Deriving this from the model rather than a class list means a new mountable regiment gets the
+        /// correct sound the day it is added, with no second list to remember.
+        /// ⚠ <c>Embarked</c> is deliberately NOT treated as dismounted — an embarked unit is riding an
+        /// aircraft or ship, which is a transport-sound question for the M13/AOB pass, not a foot one.
+        /// </remarks>
+        public static SoundEffect GetMovementSFX(CombatUnit unit, float predictedSeconds)
+        {
+            if (unit == null) return SoundEffect.None;
+
+            bool hasSeparateTransport = unit.IsMountable && unit.GetMobileProfile() != null;
+            bool dismounted = hasSeparateTransport && unit.DeploymentPosition < DeploymentPosition.Mobile;
+
+            // Foot needs no long cut — its maximum travel is 0.7 s, always inside the standard clip.
+            if (dismounted) return SoundEffect.UnitMoveFoot;
+
+            return GetMovementSFX(unit.Classification, predictedSeconds);
+        }
+
+        /// <summary>
         /// Movement SFX for a classification, choosing the LONG cut when the move will outrun the standard
         /// clip. Movement is a fire-and-forget one-shot (§27.7.7 — R3 dissolved: no loops, no handles), so
         /// the clip has to be picked up front; the duration is PREDICTED from the committed path before the
         /// first step, which makes the choice deterministic rather than a mid-move correction.
         /// </summary>
         /// <remarks>
+        /// ⚠ Prefer the <see cref="GetMovementSFX(CombatUnit, float)"/> overload in gameplay: this one
+        /// cannot see posture, so it sounds a dismounted Motor Rifle regiment as wheeled.
         /// ⚠ Foot deliberately has no long cut: its maximum travel is 0.7 s, always inside the standard clip.
         /// </remarks>
         public static SoundEffect GetMovementSFX(UnitClassification classification, float predictedSeconds)

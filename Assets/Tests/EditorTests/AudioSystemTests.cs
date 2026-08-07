@@ -336,6 +336,150 @@ namespace HammerAndSickle.Tests
 
         #endregion // Retrigger window (D5)
 
+        #region Movement sound follows POSTURE, not classification
+
+        /* ⚠ THESE PIN A DEFECT FOUND BY EAR, NOT BY A FAILURE. GetMovementSFX originally mapped
+         * classification alone, so a dismounted Motor Rifle regiment walked to the sound of its parked
+         * BTRs and a towed artillery regiment to the sound of the trucks it had just unhitched from.
+         * Nothing throws, nothing logs — it just sounds wrong, which is why it survived to a play test.
+         * Same species as the weapon-family rule (§9.10.4): posture decides, never the class label. */
+
+        private static CombatUnit MakeMountable(string name, UnitClassification classification,
+            WeaponType deployed, WeaponType mobile)
+        {
+            var unit = new CombatUnit(name, classification, UnitRole.GroundCombat, Side.Player,
+                Nationality.USSR, RegimentProfileType.DEP_MOB, deployed,
+                isMountable: true, mobile, isEmbarkable: false, WeaponType.NONE);
+            return unit;
+        }
+
+        private static CombatUnit MakeSelfPropelled(string name, UnitClassification classification,
+            WeaponType deployed)
+        {
+            // isMountable: false + mobileProfile NONE — the unit IS its vehicle, exactly as CombatUnitDB
+            // declares TANK/SPA/SPAAA.
+            return new CombatUnit(name, classification, UnitRole.GroundCombat, Side.Player,
+                Nationality.USSR, RegimentProfileType.DEP, deployed,
+                isMountable: false, WeaponType.NONE, isEmbarkable: false, WeaponType.NONE);
+        }
+
+        [Test]
+        public void DismountedMotorRifle_MovesOnFoot_MountedMovesWheeled()
+        {
+            var mot = MakeMountable("Motor Rifle", UnitClassification.MOT,
+                WeaponType.INF_REG_SV, WeaponType.APC_BTR80_SV);
+
+            mot.SetDeploymentPosition(DeploymentPosition.Mobile);
+            Assert.That(GameAudioManager.GetMovementSFX(mot, 0.5f), Is.EqualTo(SoundEffect.UnitMoveWheeled),
+                "mounted in its BTRs");
+
+            mot.SetDeploymentPosition(DeploymentPosition.Deployed);
+            Assert.That(GameAudioManager.GetMovementSFX(mot, 0.5f), Is.EqualTo(SoundEffect.UnitMoveFoot),
+                "dismounted — the carriers are parked");
+        }
+
+        [Test]
+        public void DismountedMechanized_MovesOnFoot_MountedMovesTracked()
+        {
+            var mech = MakeMountable("Mech Rifle", UnitClassification.MECH,
+                WeaponType.INF_REG_SV, WeaponType.IFV_BMP1_SV);
+
+            mech.SetDeploymentPosition(DeploymentPosition.Mobile);
+            Assert.That(GameAudioManager.GetMovementSFX(mech, 0.5f), Is.EqualTo(SoundEffect.UnitMoveTracked));
+
+            mech.SetDeploymentPosition(DeploymentPosition.Deployed);
+            Assert.That(GameAudioManager.GetMovementSFX(mech, 0.5f), Is.EqualTo(SoundEffect.UnitMoveFoot));
+        }
+
+        [Test]
+        public void DismountedTowedArtillery_MovesOnFoot()
+        {
+            // The clearest case in the data: a towed regiment's MOBILE profile is literally TRK_GEN_SV,
+            // a truck. Unhitch and there is nothing left to make a vehicle noise.
+            var art = MakeMountable("Artillery", UnitClassification.ART,
+                WeaponType.ART_LIGHT_SV, WeaponType.TRK_GEN_SV);
+
+            art.SetDeploymentPosition(DeploymentPosition.Mobile);
+            Assert.That(GameAudioManager.GetMovementSFX(art, 0.5f), Is.Not.EqualTo(SoundEffect.UnitMoveFoot),
+                "limbered and under tow");
+
+            art.SetDeploymentPosition(DeploymentPosition.Deployed);
+            Assert.That(GameAudioManager.GetMovementSFX(art, 0.5f), Is.EqualTo(SoundEffect.UnitMoveFoot),
+                "emplaced — the guns are manhandled, not driven");
+        }
+
+        [Test]
+        public void EveryDugInPosture_CountsAsDismounted_NotJustDeployed()
+        {
+            // Fortified/Entrenched/HastyDefense all sit BELOW Mobile. A rule written as
+            // "== Deployed" would pass the obvious test and leave three postures wrong.
+            var mot = MakeMountable("Motor Rifle", UnitClassification.MOT,
+                WeaponType.INF_REG_SV, WeaponType.APC_BTR80_SV);
+
+            foreach (var posture in new[] { DeploymentPosition.Fortified, DeploymentPosition.Entrenched,
+                                            DeploymentPosition.HastyDefense, DeploymentPosition.Deployed })
+            {
+                mot.SetDeploymentPosition(posture);
+                Assert.That(GameAudioManager.GetMovementSFX(mot, 0.5f), Is.EqualTo(SoundEffect.UnitMoveFoot),
+                    $"{posture} is below Mobile, so the unit is off its carriers");
+            }
+        }
+
+        [Test]
+        public void SelfPropelledUnits_AreNeverOnFoot_InAnyPosture()
+        {
+            // The other half of the rule, and the reason it keys on the MODEL rather than a class list:
+            // tanks and SP guns do not dismount, so a dug-in tank must still sound tracked.
+            var tank = MakeSelfPropelled("Tank", UnitClassification.TANK, WeaponType.TANK_T55A_SV);
+            var spa = MakeSelfPropelled("SP Artillery", UnitClassification.SPA, WeaponType.SPA_2S1_SV);
+
+            foreach (DeploymentPosition posture in Enum.GetValues(typeof(DeploymentPosition)))
+            {
+                tank.SetDeploymentPosition(posture);
+                spa.SetDeploymentPosition(posture);
+
+                Assert.That(GameAudioManager.GetMovementSFX(tank, 0.5f), Is.EqualTo(SoundEffect.UnitMoveTracked),
+                    $"a tank at {posture} is still a tank");
+                Assert.That(GameAudioManager.GetMovementSFX(spa, 0.5f), Is.EqualTo(SoundEffect.UnitMoveTracked),
+                    $"an SP gun at {posture} carries its own gun");
+            }
+        }
+
+        [Test]
+        public void Embarked_IsNotTreatedAsDismounted()
+        {
+            // Embarked is ABOVE Mobile and means riding an aircraft or ship — a transport-sound question
+            // for the M13/AOB pass, and certainly not a man on foot.
+            var mot = MakeMountable("Motor Rifle", UnitClassification.MOT,
+                WeaponType.INF_REG_SV, WeaponType.APC_BTR80_SV);
+            mot.SetDeploymentPosition(DeploymentPosition.Embarked);
+
+            Assert.That(GameAudioManager.GetMovementSFX(mot, 0.5f), Is.Not.EqualTo(SoundEffect.UnitMoveFoot));
+        }
+
+        [Test]
+        public void LongCut_IsChosenOnlyForTypesThatCanOutrunTheStandardClip()
+        {
+            Assert.That(GameAudioManager.GetMovementSFX(UnitClassification.MOT, 0.5f),
+                Is.EqualTo(SoundEffect.UnitMoveWheeled), "inside the standard clip");
+            Assert.That(GameAudioManager.GetMovementSFX(UnitClassification.MOT, 2.0f),
+                Is.EqualTo(SoundEffect.UnitMoveWheeledLong), "past it");
+            Assert.That(GameAudioManager.GetMovementSFX(UnitClassification.HELO, 4.0f),
+                Is.EqualTo(SoundEffect.UnitMoveHeloLong));
+
+            // Foot has no long cut: its maximum travel is 0.7 s, always inside the standard clip.
+            Assert.That(GameAudioManager.GetMovementSFX(UnitClassification.INF, 99f),
+                Is.EqualTo(SoundEffect.UnitMoveFoot));
+        }
+
+        [Test]
+        public void NullUnit_IsSilent_RatherThanThrowing()
+        {
+            Assert.That(GameAudioManager.GetMovementSFX((CombatUnit)null, 1f), Is.EqualTo(SoundEffect.None));
+        }
+
+        #endregion // Movement sound follows POSTURE, not classification
+
         #region The facade constructs nothing
 
         [Test]
@@ -345,22 +489,52 @@ namespace HammerAndSickle.Tests
              * reaches the manager through `Existing` (a plain static field) and never `Instance` (whose
              * getter BUILDS a GameObject). If someone "simplifies" that back to Instance, every headless
              * test that makes a noise starts spawning an audio manager — the exact trap EventManager and
-             * GameDataManager still carry. */
-            Assert.That(GameAudioManager.Existing, Is.Null,
-                "precondition: nothing in a headless test should have constructed a GameAudioManager");
+             * GameDataManager still carry.
+             *
+             * ⚠ THE INSTANCE FIELD IS FORCED TO NULL FOR THE DURATION, and that is the only way to test
+             * this at all. "Constructs nothing" is observable ONLY when nothing exists — with a manager
+             * already present, every call legitimately finds it and the property is untestable. An
+             * earlier version simply asserted that none existed, which is not a fact about GameAudio: an
+             * EDIT-MODE test runs against whatever scene is open, and this project's scenes carry a
+             * GameAudioManager on their Controllers object, so the test failed on Bob's machine while the
+             * code was entirely correct. Restored in a finally, so the editor's real manager survives. */
+            FieldInfo instanceField = typeof(GameAudioManager)
+                .GetField("_instance", BindingFlags.NonPublic | BindingFlags.Static);
 
-            var friendly = new CombatUnit("AudioTestUnit", UnitClassification.INF, UnitRole.GroundCombat,
-                Side.Player, Nationality.USSR);
+            Assert.That(instanceField, Is.Not.Null,
+                "GameAudioManager._instance was renamed — this test can no longer isolate the singleton");
 
-            // A friendly source passes the fog gate, so these reach the manager lookup rather than
-            // stopping at CanHear — which is the path that would construct something.
-            Assert.DoesNotThrow(() => GameAudio.Play(SoundEffect.ButtonClick));
-            Assert.DoesNotThrow(() => GameAudio.PlayFrom(SoundEffect.UnitSelect, friendly));
-            Assert.DoesNotThrow(() => GameAudio.PlayWeaponFire(friendly));
-            Assert.DoesNotThrow(() => GameAudio.PlayFrom(SoundEffect.UnitSelect, null));
+            object saved = instanceField.GetValue(null);
+            try
+            {
+                instanceField.SetValue(null, null);
 
-            Assert.That(GameAudioManager.Existing, Is.Null,
-                "GameAudio must never lazy-create a GameAudioManager");
+                var friendly = new CombatUnit("AudioTestUnit", UnitClassification.INF, UnitRole.GroundCombat,
+                    Side.Player, Nationality.USSR);
+
+                // A friendly source passes the fog gate, so these reach the manager lookup rather than
+                // stopping at CanHear — which is the path that would construct something.
+                Assert.DoesNotThrow(() => GameAudio.Play(SoundEffect.ButtonClick));
+                Assert.DoesNotThrow(() => GameAudio.PlayFrom(SoundEffect.UnitSelect, friendly));
+                Assert.DoesNotThrow(() => GameAudio.PlayWeaponFire(friendly));
+                Assert.DoesNotThrow(() => GameAudio.PlayImpact(friendly));
+                Assert.DoesNotThrow(() => GameAudio.PlayFrom(SoundEffect.UnitSelect, null));
+
+                Assert.That(instanceField.GetValue(null), Is.Null,
+                    "GameAudio built a GameAudioManager — it must reach the manager through Existing, " +
+                    "never Instance, whose getter constructs one");
+            }
+            finally
+            {
+                // If the assert above FIRED, something was constructed and would otherwise be left behind
+                // as a DontDestroyOnLoad object — which every later test in the run would then see,
+                // turning one readable failure into a cascade.
+                var created = instanceField.GetValue(null) as GameAudioManager;
+                if (created != null && !ReferenceEquals(created, saved))
+                    UnityEngine.Object.DestroyImmediate(created.gameObject);
+
+                instanceField.SetValue(null, saved);
+            }
         }
 
         #endregion // The facade constructs nothing

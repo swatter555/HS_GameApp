@@ -49,3 +49,51 @@ MonoBehaviour:
     volume: 1
     pitchVariation: 0
     minRetriggerSeconds: 0
+  - id: 8
+    clips:
+    - {fileID: 8300000, guid: 4206259552235b94b8c6f5a373789514, type: 3}
+    volume: 1
+    pitchVariation: 0
+    minRetriggerSeconds: 0
+  - id: 12
+    clips:
+    - {fileID: 8300000, guid: f4cecdc48acbbe0469ed33437a38e882, type: 3}
+    volume: 0.7656
+    pitchVariation: 0
+    minRetriggerSeconds: 0
+  - id: 27
+    clips:
+    - {fileID: 8300000, guid: f4cecdc48acbbe0469ed33437a38e882, type: 3}
+    volume: 0.7585
+    pitchVariation: 0
+    minRetriggerSeconds: 0
+  - id: 26
+    clips:
+    - {fileID: 8300000, guid: c71dae8113750df418dc087b1fd6a075, type: 3}
+    volume: 1
+    pitchVariation: 0
+    minRetriggerSeconds: 0
+  - id: 13
+    clips:
+    - {fileID: 8300000, guid: c71dae8113750df418dc087b1fd6a075, type: 3}
+    volume: 1
+    pitchVariation: 0
+    minRetriggerSeconds: 0
+  - id: 14
+    clips:
+    - {fileID: 8300000, guid: f3539914f2d647640afdcb917a8fc281, type: 3}
+    volume: 0.7727
+    pitchVariation: 0
+    minRetriggerSeconds: 0
+  - id: 28
+    clips:
+    - {fileID: 8300000, guid: 175b2abb395f47240aa970fc5aa42043, type: 3}
+    volume: 1
+    pitchVariation: 0
+    minRetriggerSeconds: 0
+  - id: 15
+    clips:
+    - {fileID: 8300000, guid: 175b2abb395f47240aa970fc5aa42043, type: 3}
+    volume: 1
+    pitchVariation: 0
+    minRetriggerSeconds: 0

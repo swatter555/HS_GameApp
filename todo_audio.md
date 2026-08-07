@@ -233,11 +233,189 @@ Music / ambient / briefing equivalents all STAY.
 responsive". Re-run `Tools/Audio/Create Or Update Audio Catalog` after adding wavs; it never overwrites
 tuning you have set, and `Tools/Audio/Audit Catalog` reports what is still unbacked.
 
+### Phase 3b — MOVEMENT MEDIUM (PLAN + MILESTONES, ratified 2026-08-04)
+
+> **The one-line version:** the game has never known how a regiment is physically moving. It is
+> asked five times and answered from `UnitClassification` four of them. Teach the PROFILE how it
+> moves, build one resolver that owns the question, and have movement rules and audio both ask it.
+
+#### M0 — commit the pending tree (no new work)
+Copy button, the posture patch, the `GameAudio_NeverLazyCreatesAManager` correction. Start clean.
+
+#### M1 — the missing fact. Additive, ZERO behaviour change.
+- `MovementMedium` enum: `None · Static · Foot · Wheeled · Tracked · Helo · FixedWing · Naval`.
+  ⚠ NOT persisted — derived data, never in a save or `.map`/`.oob`, so it is free to reorder/rename,
+  unlike `WeaponType`. Keep it that way; do not let it leak into serialized data.
+- `Archetype.Medium` + defaults on the UNANIMOUS families only: Infantry→Foot, Ifv→Tracked,
+  Truck→Wheeled, Helicopter→Helo, tanks→Tracked, air→FixedWing, Artillery/Aaa/Sam→Foot (towed —
+  their MMP 4 already says so), Facility→Static.
+- ⚠ **Apc and Recon get NO family default.** They are genuinely mixed (APC 7 tracked / 3 wheeled,
+  recon 4 wheeled / 2 tracked), so every member is stated explicitly and an unclassified newcomer
+  falls to `None` = SILENT, not confidently wrong. Same failure direction as `WeaponSoundFamily`.
+- `WeaponProfile.MovementMedium` + `SetMovementMedium`, mirroring the existing `SetTransportCategory`
+  idiom.
+- **Test:** every profile reachable as a Deployed/Mobile/Embarked slot in `CombatUnitDB` has a medium.
+- **Bob:** run the suite. Nothing should change in play — that is the point of this milestone.
+
+**Ratified vehicle table (Bob, 2026-08-04).** Tracked: MT-LB (SV/IQ) · M113 (US/IR) · FV432 ·
+LVTP-7 · **VAB (FR)** · all 11 `IFV_*` · M3 Bradley CFV · FV105. Wheeled: BTR-70/80 · HMMWV ·
+BRDM-2 (both) · ERC-90 · Luchs · all 3 `TRK_*`.
+⚠ **VAB IS DELIBERATELY TRACKED AND THIS IS NOT AN ERROR.** The real VAB is a wheeled 6×6, and a code
+comment at the profile still says so. There is no VAB sprite — the profile draws `FR_M113_*`, and a
+French motor rifle regiment carries it as its mobile profile (CombatUnitDB ~3897), so the player SEES
+tracks. Sight and sound must agree; the art is the player-facing truth. Bob's call, "the French can
+sue me". Revisit only if VAB art is ever authored.
+
+#### M2 — the resolver, with audio as its first consumer. Still no gameplay change.
+- New `MovementModeService` (static, headless-safe, `Services/`): given a unit → current medium (from
+  the ACTIVE profile), `IsAirborneNow`, movement points for the situation, movement sound.
+- Audio calls it; the `UnitClassification` switch in `GetMovementSFX` is **DELETED, not patched**, and
+  the 08-04 "dismounted" special case goes with it — a dismounted unit's active profile IS its
+  deployed profile, so the rule falls out instead of being cased.
+- Long-cut threshold reads `AudioClip.length` of the standard row; the 1.0 s constant is deleted.
+  ⚠ Bob's clips run 1.5–2.5 s BY DESIGN (2026-08-04): the sound frames the move rather than tracking
+  it, so trailing audio is intended and the old ~1 s figure is superseded. Consequence: wheeled/tracked
+  long cuts are dead (max travel 1.8 s is inside the clip) and are not to be authored; helo (4.3 s) and
+  jet still need theirs, or a flight goes silent mid-air.
+- **Test:** AM/MAM across all three postures, SPECF, tank in every posture, towed artillery. ⚠ The 7
+  posture tests from earlier today survive UNCHANGED — they pin behaviour, not mechanism, which is how
+  we know they were testing the right thing.
+- **Bob:** the three sound bugs should be gone by ear.
+
+#### M3 — deployment state machine. First gameplay change.
+- `RegimentProfileType` += `DEP_EMB_HELO`, `DEP_EMB_AIR` (additive, persists by NAME, no `SAVE_VERSION`
+  implication). This is what makes "foot unit whose only transport is airborne" expressible at all.
+- Spetsnaz (GRU) → `DEP_EMB_HELO`, mobile `NONE`, embarked `HEL_MI8T_SV`, `isMountable: false`.
+- `TryDeployUP`: the hardcoded AB/MAB + literal-`TRN_AN8_SV` override is replaced by the general rule —
+  **at Deployed with no ground-mobile profile but an embarked one, target Embarked.** The three unit
+  shapes Bob named then all work: foot+helo, foot+helo (air mobile), foot+APC+helo.
+- **MP scale proportionally on every transition** (Bob's ruling). ⚠ Fixes a live defect BOTH ways:
+  today only `SetMax` is called, so a foot regiment with 2 of 4 points boards helicopters and flies
+  two hexes.
+- Guard: a `TransportCategory != None` profile may never sit in a Mobile slot — warn at init AND fail
+  an EditorTest over every template, since a console warning is invisible in a build.
+- **Bob:** `DeploymentActionTests` + play-test the Spetsnaz and both air-mobile shapes.
+
+#### M4 — movement rules read the resolver. The bug that started this.
+- `ExecuteMovement`: terrain cost, ZoC halt, ground-ambush branch and animation step all key on
+  `IsAirborneNow` instead of `isAir`. An embarked air-assault regiment finally flies — today it pays
+  mountain costs and is halted by ZoC it is flying over.
+- ✅ **AMBUSH-AGAINST-A-FLIGHT — RATIFIED (Bob, 2026-08-04). The ambush TRIGGERS; the COMBAT DOES NOT.**
+  The narrative is that the scouting helos detect the ambush and evade it, but the flight plan cannot
+  continue. Concretely:
+  1. **The full ground-ambush DETECTION still runs** — the ambush rules decide whether a flight is
+     stopped, exactly as for a ground unit. It *was* ambushed; only the combat is skipped. So the fix
+     is: same detection, call the halt, **do NOT raise `RaiseAmbushTriggered`** (that event is what
+     resolves the damage).
+  2. **Halt = movement points 0 + move actions 0, and NOTHING ELSE.** ⚠ Deliberately narrower than the
+     existing ambush branch, which also zeroes every other action. Bob is rebalancing action and
+     movement costs, so the rule must not depend on any particular cost — zeroing exactly the two
+     things that mean "this move is over" is the rebalance-proof form.
+  3. **The ambusher IS REVEALED**, and the flight halts on the hex it just entered — adjacent to the
+     ambusher by the trigger geometry. ⚠ REVERSES the agent's proposal to keep it hidden: the scouts
+     saw the threat, so the player learns what stopped them. Consequence worth holding onto — this
+     makes deliberate reconnaissance-by-overflight possible, priced at the scout's whole move plus
+     being stranded next to an enemy. That is a fair price, not an exploit.
+  4. **ZoC does NOT stop a flight.** The ambush rules are the single mechanism by which an enemy halts
+     an airborne move.
+  5. **Printer dispatch + the `UnitMoveBlocked` sound.** The player did not order this and cannot see
+     why it happened — the printer's exact purpose.
+  ⚠ **VOCABULARY (Bob's correction):** the movement is **STOPPED**, not "aborted". Code, comments and
+  identifiers say halted/stopped; "aborted" is narrative framing that belongs only in the player-facing
+  dispatch text.
+  ⚠ Related change Bob expects to make himself: **removing the movement cost for helos deploying down**,
+  so a halted flight can land rather than being stranded airborne with 0 MP. Nothing in M4 should assume
+  either way — the halt zeroes MP and lets the deployment rules decide what that permits.
+- **Bob:** play-test air assault over mountains, past enemy units, and into an ambush.
+
+#### M5 — remaining consumers (tracked follow-up, not this pass)
+`HexMapUtil` range generation, `GameDataManager` occupancy, `CombatResolver`, `GameIconRenderer` all
+read `IsAirUnit`/`IsHelicopter`. Each deserves reading on its own terms rather than a sweep.
+
+**Risk:** M1 touches the archetype layer (pinned by four weapon-profile suites), M3 the deployment
+state machine, M4 the movement path. Full suite per milestone, not just the audio tests.
+
+---
+
+### Phase 3b — original problem analysis (2026-08-04)
+
+**Three faults, found in play. The third explains the other two.**
+
+**F1 — audio picks on the wrong axis (agent's).** `GetMovementSFX` keys on `UnitClassification`, which
+says what a regiment IS, not what is CARRYING it. The 08-04 "dismounted" patch bolted posture onto that
+and fixed MOT/MECH/towed-ART by luck, but AM/MAM/SPECF sit in the FOOT arm, so they sound like infantry
+in every posture. `Air Assault Rgt (MT-LB)` is `INF_AM_SV` deployed / `APC_MTLB_SV` mobile /
+`HEL_MI8T_SV` embarked — three media, one sound.
+
+**F2 — a helicopter occupies a Mobile slot.** `Spetsnaz Regiment (GRU)` (CombatUnitDB ~1313) is
+`DEP_MOB` with `mobileProfile: HEL_MI8T_SV` and `embarkedProfile: NONE`. Deploy up and the Spetsnaz ride
+a helicopter as their GROUND profile.
+
+**F3 — `RegimentProfileType` cannot express "no ground transport, organic air lift".** It offers DEP,
+DEP_MOB, DEP_MOB_EMB_{HELO,AIR,NAVAL} and no `DEP_EMB_*`, so F2 is the only way to author that unit.
+⚠ The state machine already carries the scar: `TryDeployUP` hardcodes an override letting AB/MAB — and
+SPECF *only when its embarked profile is literally `TRN_AN8_SV`* — skip Mobile. The GRU Spetsnaz carries
+a Mi-8, misses the hardcoded weapon type, and falls through to Mobile. F2 and F3 are one defect.
+
+**Decisions (Bob, 2026-08-04):** explicit movement medium on the profile; full state-machine fix.
+
+**A — state machine + data.**
+1. `RegimentProfileType` += `DEP_EMB_HELO`, `DEP_EMB_AIR`. Additive, and it persists by NAME, so no
+   `SAVE_VERSION` implication.
+2. Spetsnaz (GRU) → `DEP_EMB_HELO`, `mobileProfile: NONE`, `embarkedProfile: HEL_MI8T_SV`,
+   `isMountable: false`.
+3. `TryDeployUP`: replace the classification + hardcoded-`TRN_AN8_SV` override with the general rule —
+   **at Deployed with no ground-mobile profile but an embarked one, target Embarked.** ⚠ Leave
+   `SpecialEmbarkmentChecks` alone: the airbase/port GATES are a separate ruling from the TARGET, and
+   changing them would be a gameplay change Bob did not ask for.
+4. Guard: a profile whose `TransportCategory != None` must never sit in a Mobile slot. Warn at
+   `InitializeRegimentProfile` AND assert over every `CombatUnitDB` template in an EditorTest — the test
+   is the real guard, since a console warning is invisible in a build.
+
+**B — `MovementMedium`, an explicit profile stat.**
+5. New enum (GameData): `None · Static · Foot · Wheeled · Tracked · Helo · FixedWing · Naval`.
+6. `Archetype` gains a `Medium`; the family archetypes set it once. ⚠ **MMP nearly encodes this already**
+   — Infantry 4, Apc 8, Ifv 10, Artillery/Aaa/Sam 4, Helicopter 24, Truck 8, Facility 0, air 100 — which
+   is why towed artillery already "knows" it moves at foot pace. It is NOT reliable enough to key on:
+   Recon is 10 but a BRDM is wheeled, and the Apc family holds both the wheeled BTR-80 and the TRACKED
+   MT-LB. Hence an explicit field rather than a threshold on a number that means something else.
+7. `WeaponProfile.MovementMedium` + `SetMovementMedium`, mirroring the existing `SetTransportCategory`
+   idiom (3 call sites today), for the per-profile deviants — MT-LB and the recon family being the known
+   ones. Audit needed; the count is bounded by profiles that can occupy a Mobile or self-propelled
+   Deployed slot, nothing like all 177.
+8. `TransportCategory` still decides Helo vs FixedWing for embarked slots, so those need no per-profile
+   medium at all.
+
+**C — audio, rebuilt.**
+9. `GetMovementSFX(CombatUnit, predictedSeconds)` resolves the ACTIVE profile → `MovementMedium` →
+   SoundEffect, and the classification switch is DELETED, not patched. The posture rule from earlier
+   today then falls out for free rather than being special-cased: a dismounted unit's active profile IS
+   its deployed profile.
+10. Tests: keep the 7 posture tests (they pin behaviour, not mechanism) and add AM/MAM across all three
+    profiles + the Spetsnaz embarked path.
+
+⚠ **Blast radius:** archetype layer (pinned by the four weapon-profile suites), the deployment state
+machine (`DeploymentActionTests`), unit data, audio. Full suite re-run required, not just the audio ones.
+
 ### Phase 3 — Wire the game's sounds — CODE COMPLETE 2026-08-04, awaiting a play test
 - [~] 3.1 `GetMovementSFX` finally gets a caller in `MovementController.ExecuteMovement`. ONE fire-and-
       forget shot for the whole move (§27.7.7), fired after `BeginMoveOrder` succeeds. New overload
       `GetMovementSFX(classification, predictedSeconds)` picks the LONG cut past
       `MOVEMENT_STANDARD_CLIP_SECONDS` (1.0 s); Foot has no long cut because its longest move is 0.7 s.
+
+      ⚠ **CLASSIFICATION ALONE WAS WRONG — POSTURE DECIDES (Bob, by ear, 2026-08-04).** A dismounted
+      Motor Rifle regiment walked to the sound of its parked BTRs, and a towed artillery regiment to the
+      sound of the trucks it had just unhitched from. Nothing threw and nothing logged; it just sounded
+      wrong, which is why it survived to a play test. Same species as the §9.10.4 weapon-family rule.
+      Fixed with a `GetMovementSFX(CombatUnit, predictedSeconds)` overload: **a mountable regiment below
+      `Mobile` has DISMOUNTED and moves on foot.** ⚠ The rule reads the MODEL, never a hand-listed class
+      set — `IsMountable` + a distinct mobile profile means the transport is SEPARATE from the unit
+      (MOT/MECH are `INF_REG_SV` deployed; towed ART's mobile profile is literally `TRK_GEN_SV`), while
+      TANK/SPA/SPAAA are `isMountable: false` with `mobileProfile: NONE` because the unit IS its vehicle,
+      so a dug-in tank still sounds tracked. A new mountable regiment therefore gets the right sound the
+      day it is added. ⚠ `Embarked` is NOT dismounted — that is a transport-sound question for M13/AOB.
+      Pinned by 7 tests in `AudioSystemTests`, including every dug-in posture (a rule written as
+      `== Deployed` passes the obvious test and leaves Fortified/Entrenched/HastyDefense wrong).
       ⚠ The per-hex tween length now has ONE spelling (`stepSeconds`) — it was re-declared inside the
       loop, and two copies would let the audio pick a clip for a duration the animation no longer runs at.
 - [~] 3.2 Combat / ambush / spotting / objective / deploy hooks, placed at the §24.8.6 printer-emitter

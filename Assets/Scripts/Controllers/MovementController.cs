@@ -823,7 +823,7 @@ namespace HammerAndSickle.Controllers
              * ⚠ PlayFrom, not Play: this is a UNIT's sound. Always audible today because the mover is the
              * player's own, and correctly gated the moment the AI moves through this path. */
             GameAudio.PlayFrom(
-                GameAudioManager.GetMovementSFX(CurrentUnit.Classification, _currentPath.Count * stepSeconds),
+                GameAudioManager.GetMovementSFX(CurrentUnit, _currentPath.Count * stepSeconds),
                 CurrentUnit);
 
             // TODO: Move undo — allowed only when no new spotting events fired during the move
