@@ -51,8 +51,8 @@ Assets/Scripts/
 │   ├── Controllers/     Scene0_Controller.cs, Scene1_Controller.cs
 │   └── Dialogs/         DefaultDialog_Scene0.cs, DefaultDialog_Scene1.cs, OrdersDialog_Scene1.cs, ScenarioDialog_Scene0.cs
 ├── Services/            AppService.cs, CameraService.cs, HexDetectionService.cs,
-│                        InputService_BattleMap.cs, NameGenService.cs, SpottingService.cs,
-│                        TerritoryService.cs
+│                        InputService_BattleMap.cs, MovementModeService.cs, NameGenService.cs,
+│                        SpottingService.cs, TerritoryService.cs
 └── Utils/               HexMapUtil.cs, NationalityUtils.cs
 ```
 
@@ -81,8 +81,9 @@ Assets/StreamingAssets/   STREAMED shipped content (§7.1): Audio/ (ambient, bri
                           Scenarios/<scenario>/, Campaigns/<campaign>/<mission>/
                           (`Assets/Generated Data/` DELETED 2026-07-28 — it was the old second content
                           root, unreachable in a build; do not recreate it, see P1 in todo.md)
-Assets/Tests/             EditorTests/ (46 NUnit files: combat/AI/spotting/movement/leader/weapon-profile/
-                          audio suites + TestFixture.cs base + CombatTestDice); RuntimeTests/ currently unused
+Assets/Tests/             EditorTests/ (48 NUnit files: combat/AI/spotting/movement/leader/weapon-profile/
+                          audio/movement-medium/deployment suites + TestFixture.cs base + CombatTestDice);
+                          RuntimeTests/ currently unused
 Assets/Tools/             (empty — BinaryToJsonConverter deleted 2026-06-15)
 ```
 
@@ -159,6 +160,24 @@ Battle-scene lifecycle owner. Scenario setup (`SetupBattleManagerData`: manifest
 **Weapons:** RegimentProfile → Deployed/Mobile/Embarked WeaponType configs → WeaponProfileDB lookup.
 **Facilities:** IsBase, FacilityType (HQ, Airbase, SupplyDepot, Fort), depot size, generation rate, projection range.
 **Air attachment:** Airbases maintain attached air unit lists. **Actions:** 5 types (Move, Combat, Deploy, Opportunity, Intel).
+
+### 3.2b THE PROFILE-SLOT RULE — three EQUIPMENT BAYS, not three loadouts (RATIFIED 2026-08-04)
+
+⚠ **The absence of this rule caused every defect in the 2026-08-04 movement/audio pass.** Write new code against it.
+
+A regiment has three bays: **Deployed** (how it fights dismounted or emplaced — always populated), **Mobile** (its GROUND transport), **Embarked** (its AIR or NAVAL lift).
+
+**1. AN EMPTY BAY IS NORMAL, NEVER A DEFECT.** Slots are Panzer-General-style **upgrade targets the player buys into**: a plain Spetsnaz regiment starts foot-only, the player later buys it an MT-LB for the Mobile bay, later still an Mi-8 for the Embarked bay. `mobileProfile: NONE` means *not purchased yet*.
+
+**2. THE FLAGS DECLARE CAPABILITY; THE SLOTS DECLARE CONTENTS.** `isMountable` / `isEmbarkable` / `profileType` say which bays the unit **has**. The `WeaponType` in each slot says what is **in** it right now. Different questions — never conflate them. ⚠ `isEmbarkable: true` on essentially every ground unit is CORRECT, because all ground units are naval-transportable (§5.4.2); it is not a claim that an embarked profile exists. An audit that flags "isEmbarkable true but embarkedProfile NONE" is measuring the wrong thing — 35 templates were nearly "fixed" on that mistake.
+
+**3. ⚠ RUNTIME BEHAVIOUR KEYS ON CONTENTS, NEVER ON FLAGS.** Ask `GetMobileProfile() != null`, not `IsMountable`. This is precisely what makes the upgrade model work with no special cases: a Spetsnaz with an empty Mobile bay skips Deployed→Embarked, and the day the player buys it an MT-LB the *same* code stops at Mobile instead. `TryDeployUP` was generalised to this rule on 2026-08-04, replacing a hardcoded list of classifications plus one literal `WeaponType`.
+
+**4. ⚠ THE ONE HARD INVARIANT: a profile whose `TransportCategory != None` may occupy ONLY the Embarked bay.** In the Mobile bay the unit rides it as its GROUND posture — paying terrain costs and halting for zones of control while airborne. That was the Spetsnaz (GRU) defect: `HEL_MI8T_SV` sat in Mobile with Embarked empty, because `RegimentProfileType` had no `DEP_EMB_*` shape to express "foot infantry whose only transport is airborne". Both `DEP_EMB_HELO`/`DEP_EMB_AIR` and a guard now exist — `RegimentProfile` warns at init, and `MovementMediumTests` fails over every template.
+
+**Units with NO Mobile bay** are the ones where the unit IS its vehicle — tanks, SP guns, SPAAA, SPSAM: `isMountable: false`, and a dug-in tank still moves and sounds tracked.
+
+⚠ **`CombatUnitDB` is the source of truth; a `.oob` is a SNAPSHOT of it.** The scenario editor builds OOBs from these templates, so a template defect gets frozen into shipped content and fixing the template alone does not fix a scenario already exported. Fix the template, then re-export. (The Spetsnaz bug survived a template fix for exactly this reason — `OOBFileLoader` reads every slot straight from the JSON and never consults the DB.)
 
 ### 3.3 Leader (~902 lines)
 
@@ -408,6 +427,10 @@ stubs; needs a `SAVE_VERSION` bump), P6 loss report, P8b tests.
 
 **SpottingService** (static, ~406 lines): All spotting, fog-of-war, and ambush detection logic for the battle scene. **Dual-domain (§12.3):** `SpottingRangeAgainst(spotter, target)` picks the spotter's AIR vs GROUND range by the TARGET's domain (`IsAirborneSpottingTarget`; attack helos = GROUND targets via NOE). Player side: `RecomputeAllSpotting()` full sweep at turn start + per-hex incremental checks from `MovementController`. AI side (ADDITIVE region, player paths untouched): `RecomputeAIPerception` / `StepAIPerceptionDecay` write the `AIPerceptionState` belief store instead of unit SpottedLevels. ⚠ Any §12 spotting change must update BOTH sides + the `AIPerceptionState.StepDecay` mirror. Defines `AirAmbushResult` enum (NoThreat / Detected / Ambushed).
 
+**MovementModeService** (static, pure, ~90 lines, `Services/MovementModeService.cs`) — **the single authority on HOW A REGIMENT IS PHYSICALLY MOVING RIGHT NOW.** `CurrentMedium(unit)` reads the ACTIVE profile's `MovementMedium`; `IsAirborneNow` / `IsGroundborneNow`; `MaxMovementPoints`; `ScaleMovementPoints(current, oldMax, newMax)` for posture changes. ⚠ **No Unity types, no singletons, no events, and NOTHING reads a balance constant** — safe from model code, audio and headless tests, and immune to Bob's movement/action cost rebalance. Keep it that way.
+
+⚠ **WHY IT EXISTS: the question used to be answered in five places and four were wrong.** `MaxMovementPoints` read the active profile and was right; `IsAirUnit`, `IsHelicopter`, the `isAir` terrain/ZoC/ambush branch and the movement sound all keyed on `UnitClassification`. An air-assault regiment riding Mi-8s is not `UnitClassification.HELO`, so it correctly received 24 movement points and then spent them paying **ground terrain costs while being halted by zones of control it was flying over**. Classification says what a regiment IS; only the active profile says what is CARRYING it. ⚠ `IsAirUnit`/`IsHelicopter` still answer a legitimate DIFFERENT question ("is this fundamentally an air unit" — stacking, icon layers); do not delete them, but never use them for movement. ⚠ **M4 is the outstanding half**: `MovementController.ExecuteMovement` still branches on `isAir`, so an embarked regiment does not yet actually fly. Audio consumes the service today; the movement rules do not.
+
 **TerritoryService** (static, ~146 lines): Movement-driven tile control (§6.13 + §17.5) — transit/occupation/ZoC-sweep ownership flips + end-on-objective captures, returned as `TerritoryChangeResult` (caller applies prestige/objective accounting + redraw). Fixed-wing transit never flips. HCL decay/recovery (§6.13.5, the Upkeep half) lands with the supply pass.
 
 ### 3.7b Audio System (`GameAudioManager` ~1,700 lines + `UIButtonAudio`)
@@ -452,7 +475,9 @@ Covered by `AudioPolicyTests`. ⚠ Both are POLICY only — enforcement arrives 
 
 **Test coverage split: `AudioPolicyTests` = the RULES, `AudioSystemTests` = the MACHINERY** (catalog lookup, variant selection, the retrigger window, and the facade's never-lazy-create guarantee — 18 tests, GREEN 2026-08-04). ⚠ **The suite exists because every failure mode in the SFX path is SILENCE.** A missing row, a duplicate row, an unassigned clip slot and a debounce swallowing a legitimate second sound all present identically in play — nothing happens — and none of them throw. Silence is also the CORRECT behaviour for an unmapped id, so "no sound" can never be treated as a bug report; pinning the intended silences is the only way to tell them from the accidental kind. ⚠ **No AudioSources are created**: `SfxPlayer` takes its sources by constructor injection and `ShouldPlay` is pure, so the whole debounce runs headlessly. ⚠ One reflection point — `AudioCatalog.entries` is a private `[SerializeField]`, reached by the same field name `AudioCatalogTools` uses through `SerializedObject`, so a rename breaks both together.
 
-**Wired (Phase 3, 2026-08-04).** Main-menu music (Scene0) · snare + ambient combat loop (Scene1) · printer tick · button click. Plus the battle-map layer, all from `MovementController` at the §24.8.6 printer-emitter sites: unit select/deselect · facing · movement (ONE fire-and-forget shot per move, long cut chosen from the PREDICTED duration — §27.7.7) · first contact · ZoC halt · out-of-MP · ambush · weapon fire (family-resolved) · impact · kills · objective captured/lost · `ButtonDenied` on all five refusal paths.
+**Wired (Phase 3, 2026-08-04).** Main-menu music (Scene0) · snare + ambient combat loop (Scene1) · printer tick · button click. Plus the battle-map layer, all from `MovementController` at the §24.8.6 printer-emitter sites: unit select/deselect · facing · movement · first contact · ZoC halt · out-of-MP · ambush · weapon fire (family-resolved) · impact · kills · objective captured/lost · `ButtonDenied` on all five refusal paths.
+
+⚠ **MOVEMENT SOUND KEYS ON `MovementMedium`, NOT CLASSIFICATION (rebuilt 2026-08-04).** `GameAudio.PlayMovement(unit, predictedSeconds)` asks `MovementModeService` for the ACTIVE profile's medium, so an air-assault regiment sounds like foot / tracked / helicopter across its three postures instead of infantry in all three. The old `GetMovementSFX(UnitClassification)` switch and the "is it dismounted?" patch that briefly sat on top of it are both DELETED — the dismount behaviour falls out of reading the active profile and needs no case. ⚠ **The long cut is chosen by MEASURING the real clip** (`AudioCatalog.Entry.ShortestClipSeconds`), never a constant: Bob's movement recordings run 1.5–2.5 s, so the original ~1 s assumption was wrong the day the first wav landed, and measuring means re-recording retunes it for free. Shortest, not longest, because any variant may be picked and a gap mid-move is the failure worth avoiding — **trailing audio past the end of a move is INTENDED** (Bob 2026-08-04: the sound frames the action rather than tracking it). Consequence: wheeled/tracked long cuts are dead (max travel 1.8 s is inside the clip) and should not be authored; helo and jet still need theirs.
 
 ⚠ **THE THREE ATTRIBUTION RULINGS, all of which fail SILENTLY if reversed.** (1) **Ambush is attributed to the VICTIM, never the ambusher** — the ambusher is by definition unspotted (§6.9.0), so attributing it there gates the player's own regiment being hit into silence, and playing it ungated announces a hidden unit. (2) **Fire is the firer's, impact is the target's**, which is why an unseen battery can shell the player audibly without identifying itself — and why no "generic substitute sound" concept is needed. (3) **`PlayWeaponFire` is called AFTER the orchestrator returns**, so the firing-reveal spotting change (§7.13.5.4 / §12.4.9) has landed and the gate reads the post-reveal level; called earlier it suppresses a shot the player is entitled to hear. That one is invisible today (the firer is always the player's own unit) and becomes a real defect the moment the AI turn uses the path. Ungated `Play` is used ONLY where nothing about a unit is revealed: refusals, the ZoC halt, objective flips, select/deselect.
 

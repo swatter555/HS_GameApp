@@ -697,6 +697,38 @@ namespace HammerAndSickle.Core.GameData
     }
 
     /// <summary>
+    /// How a weapon profile physically moves. The ONE fact the project has never recorded, and the
+    /// input every "how is this regiment moving right now" question resolves from.
+    /// </summary>
+    /// <remarks>
+    /// ⚠ WHY THIS HAD TO EXIST. Nothing else in the model distinguishes an MT-LB from a BTR-70: same
+    /// `APC_` prefix, same `FamilyArchetypes.Apc`, same `AMPHIBIOUS` trait, same `UpgradePath.APC`, same
+    /// MMP 8, same `EquipmentBucket.APC`. One is tracked and one is wheeled and the code could not tell.
+    /// ⚠ `RegimentProfile.ClassifyWeaponType` cannot answer this and must not be asked to: it is a ROLE
+    /// classifier (it deliberately folds `ART_`/`SPA_` together and puts trucks with transport planes),
+    /// so it answers a DIFFERENT question. Two axes, two answers — this is not a second opinion on the
+    /// same axis, which is the thing the project forbids.
+    /// ⚠ Do NOT infer this from `MaxMovementPoints`. Those are BALANCE DIALS: keying behaviour off them
+    /// means every rebalance silently re-sounds and re-classifies units. (They also cannot answer it —
+    /// MECH, CAVALRY and NAVAL are all 10, and Recon is 10 while a BRDM is wheeled.)
+    /// ⚠ NOT PERSISTED — derived data, never written to a save or to shipped content, so unlike
+    /// <see cref="WeaponType"/> this may be reordered and renamed freely. Keep it out of serialized data.
+    /// ⚠ <see cref="None"/> means UNDECLARED, and it is the safe failure: a profile nobody classified goes
+    /// SILENT rather than confidently sounding like the wrong vehicle.
+    /// </remarks>
+    public enum MovementMedium
+    {
+        None,
+        Static,
+        Foot,
+        Wheeled,
+        Tracked,
+        Helo,
+        FixedWing,
+        Naval
+    }
+
+    /// <summary>
     /// These WeaponTypes correspond to specific RegimentProfiles, help determine sprite usage.
     /// </summary>
     public enum WeaponType
@@ -1047,8 +1079,10 @@ namespace HammerAndSickle.Core.GameData
         /// DEP_MOB_EMB_HELO = Deployed, Mobile, and Embarked Helicopter
         /// DEP_MOB_EMB_AIR = Deployed, Mobile, and Embarked Air (Fixed-Wing)
         /// DEP_MOB_EMB_NAVAL = Deployed, Mobile, and Embarked Naval
+        /// DEP_EMB_HELO = Deployed and Embarked Helicopter, NO ground transport
+        /// DEP_EMB_AIR = Deployed and Embarked Air, NO ground transport
         /// </summary>
-        
+
         Default,
 
         DEP,
@@ -1056,6 +1090,21 @@ namespace HammerAndSickle.Core.GameData
         DEP_MOB_EMB_HELO,
         DEP_MOB_EMB_AIR,
         DEP_MOB_EMB_NAVAL,
+
+        /* ⚠ ADDED 2026-08-04 BECAUSE THEIR ABSENCE WAS CAUSING A REAL BUG. A regiment whose only
+         * transport is airborne — Spetsnaz with Mi-8s, air-mobile infantry with no carriers — could not
+         * be expressed: the shapes above all require a ground Mobile slot. So the helicopter was authored
+         * into the MOBILE slot instead, and the unit "mounted up" into helicopters as its ground posture.
+         *
+         * The state machine carried the same scar: TryDeployUP hardcoded an override letting AB/MAB, and
+         * SPECF only when its embarked profile was literally TRN_AN8_SV, skip Mobile. A Spetsnaz regiment
+         * carrying a Mi-8 missed that hardcoded weapon type and fell through to Mobile. Both the data
+         * workaround and the hardcoded override exist because these two members did not.
+         *
+         * ⚠ Persisted BY NAME, so adding members is safe and needs no SAVE_VERSION bump — but never
+         * RENAME one (CLAUDE.md item 11). */
+        DEP_EMB_HELO,
+        DEP_EMB_AIR,
     }
 
     #endregion // InitializeRegimentProfile Enums

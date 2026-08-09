@@ -1,6 +1,7 @@
 using HammerAndSickle.Controllers;
 using HammerAndSickle.Core.GameData;
 using HammerAndSickle.Models;
+using HammerAndSickle.Services;
 
 namespace HammerAndSickle.Audio
 {
@@ -74,6 +75,44 @@ namespace HammerAndSickle.Audio
             if (family == WeaponSoundFamily.None) return;
 
             GameAudioManager.Existing?.PlaySfx(SoundEffectFor(family), volumeScale);
+        }
+
+        /// <summary>
+        /// Plays a unit's movement sound: ONE fire-and-forget shot for the whole move (§27.7.7), with the
+        /// clip chosen from how the unit is ACTUALLY travelling and how long the move will take.
+        /// </summary>
+        /// <param name="unit">The mover. Fog-gated like <see cref="PlayFrom"/>.</param>
+        /// <param name="predictedSeconds">
+        /// Duration of the committed path. Known before the first step, which is what makes the choice
+        /// deterministic rather than a mid-move correction.
+        /// </param>
+        /// <remarks>
+        /// ⚠ THE MEDIUM COMES FROM THE ACTIVE PROFILE, never the classification — that is the whole fix.
+        /// An air-assault regiment is `MAM` walking, riding MT-LBs and flying; only the active profile
+        /// distinguishes foot from tracked from helo.
+        /// ⚠ THE LONG CUT IS DECIDED BY MEASURING THE ACTUAL CLIP, not by a constant. Bob's movement
+        /// recordings run 1.5–2.5 s by design, well past the ~1 s the original plan assumed, so a
+        /// hard-coded threshold was already wrong the day the first wav landed. Measuring means
+        /// re-recording retunes it for free — and if a standard clip already covers a medium's longest
+        /// possible move, its long row simply never gets picked and needs no clip at all.
+        /// </remarks>
+        public static void PlayMovement(CombatUnit unit, float predictedSeconds, float volumeScale = 1f)
+        {
+            if (!AudioFogPolicy.CanHear(unit)) return;
+
+            MovementMedium medium = MovementModeService.CurrentMedium(unit);
+            GameAudioManager.SoundEffect standard = GameAudioManager.GetMovementSFX(medium);
+            if (standard == GameAudioManager.SoundEffect.None) return;
+
+            GameAudioManager manager = GameAudioManager.Existing;
+            if (manager == null) return;
+
+            // Escalate only when the standard recording would leave a silent gap mid-move. A row with no
+            // clip reports 0 length and never escalates — there is nothing to fall short of yet.
+            float standardLength = manager.ClipSecondsFor(standard);
+            bool longCut = standardLength > 0f && predictedSeconds > standardLength;
+
+            manager.PlaySfx(GameAudioManager.GetMovementSFX(medium, longCut), volumeScale);
         }
 
         /// <summary>

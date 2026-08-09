@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using HammerAndSickle.Core.GameData;
 
 namespace HammerAndSickle.Models
 {
@@ -23,19 +24,40 @@ namespace HammerAndSickle.Models
     {
         #region Ground families
 
+        /* ⚠ MEDIUM IS SET ONLY WHERE THE FAMILY IS UNANIMOUS. FIVE families are mixed and carry NO
+         * default, with every member stating its own in WeaponProfileDB:
+         *   Apc       — tracked MT-LB/M113/FV432/LVTP-7 vs wheeled BTR/HMMWV
+         *   Recon     — tracked M3/FV105 vs wheeled BRDM/ERC-90/Luchs
+         *   Artillery — towed ART_ guns (emplaced, foot) vs SPA_ and ROC_ (tracked M109 and MLRS,
+         *               wheeled BM-21 and Scud)
+         *   Aaa       — towed AAA_* vs SPAAA_* (all tracked)
+         *   Sam       — emplaced SAM_* vs SPSAM_* (tracked Kub/Tunguska, wheeled Strela-1/Crotale)
+         *
+         * ⚠ A DEFAULT ON A MIXED FAMILY IS WORSE THAN NONE, and the artillery families proved it during
+         * M2: they briefly carried `Foot` (true of the towed baseline the archetype is named for), which
+         * silently made all 31 self-propelled guns sound like walking infantry. The coverage test could
+         * not catch it — those profiles HAD a medium, it was just wrong. `None` is the safe failure
+         * because it is SILENT and the coverage test fails on it; a wrong default is confident and
+         * invisible. */
+
         //                                              HA HD SA SD GAD MMP  (GAT)
         /// <summary>Foot infantry baseline; soaks airstrikes (GAD 10, R1), MANPADS adds GAT later.</summary>
-        public static readonly Archetype Infantry   = Ground(5, 7, 7, 8, 10, 4);
-        /// <summary>APC (MOT) — light-armour GAD 7 (R1).</summary>
+        public static readonly Archetype Infantry   = Ground(5, 7, 7, 8, 10, 4, medium: MovementMedium.Foot);
+        /// <summary>APC (MOT) — light-armour GAD 7 (R1). ⚠ MIXED FAMILY: medium is per profile.</summary>
         public static readonly Archetype Apc        = Ground(3, 4, 6, 7, 7, 8);
-        /// <summary>IFV (MECH) — soft attack 8 (R4), light-armour GAD 7 (R1).</summary>
-        public static readonly Archetype Ifv        = Ground(4, 4, 8, 7, 7, 10);
+        /// <summary>IFV (MECH) — soft attack 8 (R4), light-armour GAD 7 (R1). Every IFV in the DB is tracked.</summary>
+        public static readonly Archetype Ifv        = Ground(4, 4, 8, 7, 7, 10, medium: MovementMedium.Tracked);
         /// <summary>Light scout car (BRDM/M3-class) — weak gun but DELIBERATELY survivable (HD 5 / SD 9) so
         /// scouts soak the first blow and withdraw rather than getting one-shot out front (design call,
         /// 2026-06-15: "harden the hull"). Fast, SR 3. Add RECON_FRAGILE (R6) per scout profile to discourage
-        /// brawling (offense ICM ×0.6); AT-recon variants drop it and add an ATGM trait instead.</summary>
+        /// brawling (offense ICM ×0.6); AT-recon variants drop it and add an ATGM trait instead.
+        /// ⚠ MIXED FAMILY: medium is per profile.</summary>
         public static readonly Archetype Recon      = Ground(2, 5, 5, 9, 7, 10, sr: 3);
-        /// <summary>Towed artillery baseline; soft towed GAD 8. SP gun = +mobility in Phase 3.</summary>
+        /// <summary>Towed artillery baseline; soft towed GAD 8. SP gun = +mobility in Phase 3.
+        /// ⚠ MIXED FAMILY: medium is per profile. The towed guns are Foot (emplaced, crew-manhandled —
+        /// exactly what MMP 4 has always said, and their TRUCKS live in the unit's Mobile slot carrying
+        /// their own medium, so limbered and emplaced differ with no special case); the SPA_/ROC_ profiles
+        /// built on this same archetype are tracked or truck-mounted and say so individually.</summary>
         public static readonly Archetype Artillery  = Ground(5, 5, 9, 5, 8, 4);
         /// <summary>Towed AAA; resists air (GAD 12) and engages it (GAT 11), SR 3. SP = +mobility in Phase 3.
         /// GAT base 9→11 in the 2026-06-18 GAT rebalance (7/10 lethality target — backbone AD lands Favorable on
@@ -45,11 +67,14 @@ namespace HammerAndSickle.Models
         /// GAT base 10→12 in the 2026-06-18 GAT rebalance (see Aaa).</summary>
         public static readonly Archetype Sam        = Ground(1, 3, 1, 3, 8, 4, gat: 12, sr: 6);
         /// <summary>Attack-helicopter gunship; fast (MMP 24), glass-cannon (§7A.14); elevated observation SR 3.</summary>
-        public static readonly Archetype Helicopter = Ground(7, 6, 10, 7, 10, 24, sr: 3);
-        /// <summary>Soft transport; thin-topped air target (GAD 6).</summary>
-        public static readonly Archetype Truck      = Ground(3, 3, 3, 3, 6, 8);
-        /// <summary>Static base (HQ/DEPOT/AIRB); MANPADS-equippable (GAD 6), SR 4. HP 60 is a CombatUnit concern.</summary>
-        public static readonly Archetype Facility   = Ground(4, 6, 6, 7, 6, 0, sr: 4);
+        public static readonly Archetype Helicopter = Ground(7, 6, 10, 7, 10, 24, sr: 3,
+                                                             medium: MovementMedium.Helo);
+        /// <summary>Soft transport; thin-topped air target (GAD 6). Every TRK_ profile in the DB is wheeled.</summary>
+        public static readonly Archetype Truck      = Ground(3, 3, 3, 3, 6, 8, medium: MovementMedium.Wheeled);
+        /// <summary>Static base (HQ/DEPOT/AIRB); MANPADS-equippable (GAD 6), SR 4. HP 60 is a CombatUnit concern.
+        /// ⚠ Static, not None: a base does not move, which is a DECISION, not an undeclared medium.</summary>
+        public static readonly Archetype Facility   = Ground(4, 6, 6, 7, 6, 0, sr: 4,
+                                                            medium: MovementMedium.Static);
 
         #endregion // Ground families
 
@@ -76,7 +101,8 @@ namespace HammerAndSickle.Models
         /// air-attack baseline). GAT is omitted when 0 so it never gets clamped up off the W7 default.
         /// </summary>
         private static Archetype Ground(int ha, int hd, int sa, int sd, int gad, int mmp,
-                                        int gat = 0, int sr = 2, int pr = 1)
+                                        int gat = 0, int sr = 2, int pr = 1,
+                                        MovementMedium medium = MovementMedium.None)
         {
             var stats = new Dictionary<ProfileStat, int>
             {
@@ -93,7 +119,7 @@ namespace HammerAndSickle.Models
                 { ProfileStat.PR, pr }
             };
             if (gat > 0) stats[ProfileStat.GAT] = gat;
-            return new Archetype(stats);
+            return new Archetype(stats, medium);
         }
 
         /// <summary>Builds a fixed-wing archetype (DF/MAN/TS/SUR/MMP, plus base air SR, GA and OL). GA and OL are
@@ -111,7 +137,7 @@ namespace HammerAndSickle.Models
                 { ProfileStat.GA, ga },
                 { ProfileStat.OL, ol },
                 { ProfileStat.SR, sr }
-            });
+            }, MovementMedium.FixedWing);   // every Air() family flies; no fixed-wing exceptions exist
 
         #endregion // Factories
     }

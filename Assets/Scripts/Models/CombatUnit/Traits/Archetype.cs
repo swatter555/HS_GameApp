@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using HammerAndSickle.Core.GameData;
 
 namespace HammerAndSickle.Models
 {
@@ -11,9 +12,24 @@ namespace HammerAndSickle.Models
     {
         public IReadOnlyDictionary<ProfileStat, int> Stats { get; }
 
-        public Archetype(IReadOnlyDictionary<ProfileStat, int> stats)
+        /// <summary>
+        /// How this family physically moves. Declared once per family instead of once per profile.
+        /// </summary>
+        /// <remarks>
+        /// ⚠ NOT a <see cref="ProfileStat"/>, deliberately. Every member of that enum is a NUMBER the
+        /// resolver adds deltas to and traits scale; a medium is a category with no arithmetic, and
+        /// pushing it through the delta pipeline would invite "Tracked + 1".
+        /// ⚠ Families that are genuinely MIXED must leave this <see cref="MovementMedium.None"/> and
+        /// state it per profile — see FamilyArchetypes.Apc and .Recon. A default on a mixed family is
+        /// worse than no default: it makes the wrong answer the silent one.
+        /// </remarks>
+        public MovementMedium Medium { get; }
+
+        public Archetype(IReadOnlyDictionary<ProfileStat, int> stats,
+                         MovementMedium medium = MovementMedium.None)
         {
             Stats = stats;
+            Medium = medium;
         }
     }
 
@@ -30,8 +46,14 @@ namespace HammerAndSickle.Models
         public static readonly Archetype Gen3 = Make(13, 11, 9, 6, 7, 10); // T-64B/72B/80, M1, Leo2, Chally1
         public static readonly Archetype Gen4 = Make(16, 14, 10, 6, 7, 10);// T-80U/BV, M1A1HA
 
+        // ⚠ Every tank generation is Tracked, in every posture. A tank does not dismount, so a dug-in
+        // T-72 still sounds and moves as tracked — this is the half of the medium rule that keeps the
+        // dismount logic from over-reaching.
         private static Archetype Make(int ha, int hd, int sa, int sd, int gad, int mmp)
-            => new Archetype(new Dictionary<ProfileStat, int>
+            => new Archetype(MakeStats(ha, hd, sa, sd, gad, mmp), MovementMedium.Tracked);
+
+        private static Dictionary<ProfileStat, int> MakeStats(int ha, int hd, int sa, int sd, int gad, int mmp)
+            => new Dictionary<ProfileStat, int>
             {
                 { ProfileStat.HA, ha },
                 { ProfileStat.HD, hd },
@@ -44,7 +66,7 @@ namespace HammerAndSickle.Models
                 // PR+1 (standoff) adjust off this base.
                 { ProfileStat.SR, 2 },
                 { ProfileStat.PR, 1 }
-            });
+            };
     }
 
     /// <summary>

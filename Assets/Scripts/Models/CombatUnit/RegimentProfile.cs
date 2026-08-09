@@ -3,6 +3,7 @@ using System;
 using System.Text.Json.Serialization;
 using HammerAndSickle.Core.GameData;
 using System.Collections.Generic;
+using UnityEngine;
 
 namespace HammerAndSickle.Models
 {
@@ -398,12 +399,49 @@ namespace HammerAndSickle.Models
                 Embarked = embarked;
                 TotalIntelStats = new Dictionary<WeaponType, int>();
                 BuildIntelStats();
+
+                WarnIfTransportIsInTheMobileSlot();
             }
             catch (Exception e)
             {
                 AppService.HandleException(CLASS_NAME, nameof(InitializeRegimentProfile), e);
                 throw;
             }
+        }
+
+        /// <summary>
+        /// Flags a helicopter or transport aircraft authored into the MOBILE (ground transport) slot.
+        /// </summary>
+        /// <remarks>
+        /// ⚠ THIS EXACT MISTAKE SHIPPED AND SURVIVED UNTIL A PLAY TEST. The Spetsnaz (GRU) regiment
+        /// carried `HEL_MI8T_SV` as its mobile profile with an empty embarked slot, so deploying up put
+        /// the regiment aboard helicopters as its GROUND posture — it then paid ground terrain costs and
+        /// was halted by zones of control while flying. Nothing threw; the unit simply behaved as though
+        /// its helicopters drove.
+        ///
+        /// ⚠ The console warning is the SECOND line of defence, not the first. It is invisible in a build
+        /// and easy to scroll past, so `MovementMediumTests` asserts the same rule across every
+        /// `CombatUnitDB` template — that is what actually catches it. This exists so the failure is also
+        /// legible at runtime for content authored outside the DB.
+        /// </remarks>
+        private void WarnIfTransportIsInTheMobileSlot()
+        {
+            WeaponProfile mobileProfile = GetMobileProfile();
+            if (mobileProfile == null) return;
+            if (mobileProfile.TransportCategory == TransportCategory.None) return;
+
+            /* ⚠ Warning, not error, ON PURPOSE. The Unity Test Runner FAILS a test on an unexpected
+             * LogError, and this runs during CombatUnitDB static init — so one bad template would blow up
+             * every test that so much as touches the database, burying the real diagnosis under unrelated
+             * red. `MovementMediumTests.NoAirTransport_SitsInAGroundTransportSlot` is the hard failure and
+             * names every offender precisely; this line is the runtime breadcrumb for content authored
+             * outside the DB. */
+            Debug.LogWarning(
+                $"[{CLASS_NAME}] '{Name}' has {mobileProfile.WeaponType} " +
+                $"({mobileProfile.TransportCategory}) in its MOBILE slot. Air transports belong in the " +
+                "EMBARKED slot — in Mobile the unit rides them as its ground posture, paying terrain " +
+                "costs and stopping for zones of control while airborne. Use a DEP_EMB_HELO / " +
+                "DEP_EMB_AIR profile type when the regiment has no ground transport.");
         }
 
         /// <summary>

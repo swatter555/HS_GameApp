@@ -867,6 +867,9 @@ namespace HammerAndSickle.Models
                 SW = SpriteManager.SV_MTLB_SW
             };
 
+            // Mixed family (see FamilyArchetypes) - medium is stated per profile.
+            MTLB.SetMovementMedium(MovementMedium.Tracked);
+
             // Add the MT-LB profile to the database
             AddProfile(WeaponType.APC_MTLB_SV, MTLB);
             //----------------------------------------------
@@ -902,6 +905,9 @@ namespace HammerAndSickle.Models
                 SW = SpriteManager.SV_BTR70_SW
             };
 
+            // Mixed family (see FamilyArchetypes) - medium is stated per profile.
+            BTR70.SetMovementMedium(MovementMedium.Wheeled);
+
             // Add the BTR-70 profile to the database
             AddProfile(WeaponType.APC_BTR70_SV, BTR70);
             //----------------------------------------------
@@ -936,6 +942,9 @@ namespace HammerAndSickle.Models
                 NW = SpriteManager.SV_BTR80_NW,
                 SW = SpriteManager.SV_BTR80_SW
             };
+
+            // Mixed family (see FamilyArchetypes) - medium is stated per profile.
+            BTR80.SetMovementMedium(MovementMedium.Wheeled);
 
             // Add the BTR-80 profile to the database
             AddProfile(WeaponType.APC_BTR80_SV, BTR80);
@@ -982,6 +991,9 @@ namespace HammerAndSickle.Models
                 NW = SpriteManager.SV_BRDM2_NW,
                 SW = SpriteManager.SV_BRDM2_SW
             };
+
+            // Mixed family (see FamilyArchetypes) - medium is stated per profile.
+            BRDM2.SetMovementMedium(MovementMedium.Wheeled);
 
             // Add the BRDM-2 profile to the database
             AddProfile(WeaponType.RCN_BRDM2_SV, BRDM2);
@@ -1030,6 +1042,9 @@ namespace HammerAndSickle.Models
             // Add the BRDM-2 AT profile to the database
             // W1: armored-car recon fights as a Hard target (§7.4.1.2 override).
             BRDM2AT.SetTargetClass(TargetClass.Hard);
+            // Mixed family (see FamilyArchetypes) - medium is stated per profile.
+            BRDM2AT.SetMovementMedium(MovementMedium.Wheeled);
+
             AddProfile(WeaponType.RCN_BRDM2AT_SV, BRDM2AT);
             //----------------------------------------------
             // Soviet BRDM-2 AT-5 Recon Vehicle
@@ -1074,6 +1089,8 @@ namespace HammerAndSickle.Models
             };
 
             // Add the 2S1 profile to the database
+            // Towed vs self-propelled: the artillery/AAA/SAM families hold both, so medium is per profile.
+            SPA2S1.SetMovementMedium(MovementMedium.Tracked);
             AddProfile(WeaponType.SPA_2S1_SV, SPA2S1);
             //----------------------------------------------
             // Soviet 2S1 Gvozdika Self-Propelled Artillery
@@ -1113,6 +1130,8 @@ namespace HammerAndSickle.Models
             };
 
             // Add the 2S3 profile to the database
+            // Towed vs self-propelled: the artillery/AAA/SAM families hold both, so medium is per profile.
+            SPA2S3.SetMovementMedium(MovementMedium.Tracked);
             AddProfile(WeaponType.SPA_2S3_SV, SPA2S3);
             //----------------------------------------------
             // Soviet 2S3 Akatsiya Self-Propelled Artillery
@@ -1153,6 +1172,8 @@ namespace HammerAndSickle.Models
             };
 
             // Add the 2S5 profile to the database
+            // Towed vs self-propelled: the artillery/AAA/SAM families hold both, so medium is per profile.
+            SPA2S5.SetMovementMedium(MovementMedium.Tracked);
             AddProfile(WeaponType.SPA_2S5_SV, SPA2S5);
             //----------------------------------------------
             // Soviet 2S5 Giatsint-S Self-Propelled Artillery
@@ -1193,6 +1214,8 @@ namespace HammerAndSickle.Models
             };
 
             // Add the 2S19 profile to the database
+            // Towed vs self-propelled: the artillery/AAA/SAM families hold both, so medium is per profile.
+            SPA2S19.SetMovementMedium(MovementMedium.Tracked);
             AddProfile(WeaponType.SPA_2S19_SV, SPA2S19);
             //----------------------------------------------
             // Soviet 2S19 Msta-S Self-Propelled Artillery
@@ -1231,6 +1254,8 @@ namespace HammerAndSickle.Models
             };
 
             // Add the Light Artillery profile to the database
+            // Towed vs self-propelled: the artillery/AAA/SAM families hold both, so medium is per profile.
+            ArtLight.SetMovementMedium(MovementMedium.Foot);
             AddProfile(WeaponType.ART_LIGHT_SV, ArtLight);
             //----------------------------------------------
             // Soviet Light Towed Artillery
@@ -1265,6 +1290,8 @@ namespace HammerAndSickle.Models
             };
 
             // Add the Heavy Artillery profile to the database
+            // Towed vs self-propelled: the artillery/AAA/SAM families hold both, so medium is per profile.
+            ArtHeavy.SetMovementMedium(MovementMedium.Foot);
             AddProfile(WeaponType.ART_HEAVY_SV, ArtHeavy);
             //----------------------------------------------
             // Soviet Heavy Towed Artillery
@@ -1309,6 +1336,8 @@ namespace HammerAndSickle.Models
             };
 
             // Add the BM-21 profile to the database
+            // Towed vs self-propelled: the artillery/AAA/SAM families hold both, so medium is per profile.
+            BM21.SetMovementMedium(MovementMedium.Wheeled);
             AddProfile(WeaponType.ROC_BM21_SV, BM21);
             //----------------------------------------------
             // Soviet BM-21 Grad MLRS
@@ -1349,6 +1378,8 @@ namespace HammerAndSickle.Models
             };
 
             // Add the BM-27 profile to the database
+            // Towed vs self-propelled: the artillery/AAA/SAM families hold both, so medium is per profile.
+            BM27.SetMovementMedium(MovementMedium.Wheeled);
             AddProfile(WeaponType.ROC_BM27_SV, BM27);
             //----------------------------------------------
             // Soviet BM-27 Uragan MLRS
@@ -1389,6 +1420,8 @@ namespace HammerAndSickle.Models
             };
 
             // Add the BM-30 profile to the database
+            // Towed vs self-propelled: the artillery/AAA/SAM families hold both, so medium is per profile.
+            BM30.SetMovementMedium(MovementMedium.Wheeled);
             AddProfile(WeaponType.ROC_BM30_SV, BM30);
             //----------------------------------------------
             // Soviet BM-30 Smerch MLRS
@@ -1431,6 +1464,8 @@ namespace HammerAndSickle.Models
             };
 
             // Add the Scud-B profile to the database
+            // Towed vs self-propelled: the artillery/AAA/SAM families hold both, so medium is per profile.
+            SCUD.SetMovementMedium(MovementMedium.Wheeled);
             AddProfile(WeaponType.ROC_SCUD_SV, SCUD);
             //----------------------------------------------
             // Soviet 9K72 Scud-B Tactical Ballistic Missile
@@ -1474,6 +1509,8 @@ namespace HammerAndSickle.Models
             };
 
             // Add the ZSU-57-2 profile to the database
+            // Towed vs self-propelled: the artillery/AAA/SAM families hold both, so medium is per profile.
+            ZSU57.SetMovementMedium(MovementMedium.Tracked);
             AddProfile(WeaponType.SPAAA_ZSU57_SV, ZSU57);
             //----------------------------------------------
             // Soviet ZSU-57-2 Sparka SPAAA
@@ -1512,6 +1549,8 @@ namespace HammerAndSickle.Models
             };
 
             // Add the ZSU-23-4 profile to the database
+            // Towed vs self-propelled: the artillery/AAA/SAM families hold both, so medium is per profile.
+            ZSU23.SetMovementMedium(MovementMedium.Tracked);
             AddProfile(WeaponType.SPAAA_ZSU23_SV, ZSU23);
             //----------------------------------------------
             // Soviet ZSU-23-4 Shilka SPAAA
@@ -1551,6 +1590,8 @@ namespace HammerAndSickle.Models
             };
 
             // Add the 2K22 Tunguska profile to the database
+            // Towed vs self-propelled: the artillery/AAA/SAM families hold both, so medium is per profile.
+            Tunguska.SetMovementMedium(MovementMedium.Tracked);
             AddProfile(WeaponType.SPSAM_2K22_SV, Tunguska);
             //----------------------------------------------
             // Soviet 2K22 Tunguska SPAAA
@@ -1590,6 +1631,8 @@ namespace HammerAndSickle.Models
             };
 
             // Add the 2K12 Kub profile to the database
+            // Towed vs self-propelled: the artillery/AAA/SAM families hold both, so medium is per profile.
+            Kub.SetMovementMedium(MovementMedium.Tracked);
             AddProfile(WeaponType.SPSAM_2K12_SV, Kub);
             //----------------------------------------------
             // Soviet 2K12 Kub SPSAM
@@ -1629,6 +1672,8 @@ namespace HammerAndSickle.Models
             };
 
             // Add the 9K31 Strela-1 profile to the database
+            // Towed vs self-propelled: the artillery/AAA/SAM families hold both, so medium is per profile.
+            Strela1.SetMovementMedium(MovementMedium.Wheeled);
             AddProfile(WeaponType.SPSAM_9K31_SV, Strela1);
             //----------------------------------------------
             // Soviet 9K31 Strela-1 SPSAM
@@ -1663,6 +1708,8 @@ namespace HammerAndSickle.Models
             };
 
             // Add the S-75 Dvina profile to the database
+            // Towed vs self-propelled: the artillery/AAA/SAM families hold both, so medium is per profile.
+            S75.SetMovementMedium(MovementMedium.Foot);
             AddProfile(WeaponType.SAM_S75_SV, S75);
             //----------------------------------------------
             // Soviet S-75 Dvina SAM System
@@ -1697,6 +1744,8 @@ namespace HammerAndSickle.Models
             };
 
             // Add the S-125 Neva profile to the database
+            // Towed vs self-propelled: the artillery/AAA/SAM families hold both, so medium is per profile.
+            S125.SetMovementMedium(MovementMedium.Foot);
             AddProfile(WeaponType.SAM_S125_SV, S125);
             //----------------------------------------------
             // Soviet S-125 Neva SAM System
@@ -1737,6 +1786,8 @@ namespace HammerAndSickle.Models
             };
 
             // Add the S-300 profile to the database
+            // Towed vs self-propelled: the artillery/AAA/SAM families hold both, so medium is per profile.
+            S300.SetMovementMedium(MovementMedium.Foot);
             AddProfile(WeaponType.SAM_S300_SV, S300);
             //----------------------------------------------
             // Soviet S-300 SAM System
@@ -1771,6 +1822,8 @@ namespace HammerAndSickle.Models
             };
 
             // Add the Generic AAA profile to the database
+            // Towed vs self-propelled: the artillery/AAA/SAM families hold both, so medium is per profile.
+            AAA_GEN.SetMovementMedium(MovementMedium.Foot);
             AddProfile(WeaponType.AAA_GEN_SV, AAA_GEN);
             //----------------------------------------------
             // Soviet Generic AAA Platform
@@ -3293,6 +3346,9 @@ namespace HammerAndSickle.Models
                 SW = SpriteManager.US_M113_SW
             };
 
+            // Mixed family (see FamilyArchetypes) - medium is stated per profile.
+            M113_US.SetMovementMedium(MovementMedium.Tracked);
+
             // Add the M113 profile to the database
             AddProfile(WeaponType.APC_M113_US, M113_US);
             //----------------------------------------------
@@ -3328,6 +3384,9 @@ namespace HammerAndSickle.Models
                 SW = SpriteManager.US_Humvee_SW
             };
 
+            // Mixed family (see FamilyArchetypes) - medium is stated per profile.
+            HUMVEE_US.SetMovementMedium(MovementMedium.Wheeled);
+
             // Add the Humvee profile to the database
             AddProfile(WeaponType.APC_HUMVEE_US, HUMVEE_US);
             //----------------------------------------------
@@ -3362,6 +3421,9 @@ namespace HammerAndSickle.Models
                 SW = SpriteManager.US_LVTP_SW
             };
 
+            // Mixed family (see FamilyArchetypes) - medium is stated per profile.
+            LVTP7_US.SetMovementMedium(MovementMedium.Tracked);
+
             // Add the LVTP-7 profile to the database
             AddProfile(WeaponType.APC_LVTP7_US, LVTP7_US);
             //----------------------------------------------
@@ -3395,6 +3457,16 @@ namespace HammerAndSickle.Models
                 NW = SpriteManager.FR_M113_NW,
                 SW = SpriteManager.FR_M113_SW
             };
+
+            /* ⚠ TRACKED IS DELIBERATE AND NOT AN ERROR - DO NOT "CORRECT" IT (Bob, 2026-08-04).
+             * The real VAB is a wheeled 6x6, exactly as the comment above this profile still says.
+             * But there is no VAB sprite: this profile draws FR_M113_* (see the icon block above), and
+             * a French motor rifle regiment carries it as its mobile profile, so the player SEES tracks.
+             * Sight and sound must agree, and the art is the player-facing truth. Encoding "wheeled"
+             * here would ship a regiment that looks tracked and sounds wheeled.
+             * Revisit ONLY if VAB art is ever authored - at which point flip this to Wheeled and the
+             * rest of the system needs no other change. */
+            VAB_FR.SetMovementMedium(MovementMedium.Tracked);
 
             // Add the VAB profile to the database
             AddProfile(WeaponType.APC_VAB_FR, VAB_FR);
@@ -3440,6 +3512,8 @@ namespace HammerAndSickle.Models
             };
 
             // Add the M109 US profile to the database
+            // Towed vs self-propelled: the artillery/AAA/SAM families hold both, so medium is per profile.
+            M109_US.SetMovementMedium(MovementMedium.Tracked);
             AddProfile(WeaponType.SPA_M109_US, M109_US);
             //----------------------------------------------
             // US M109 Paladin Self-Propelled Artillery
@@ -3479,6 +3553,8 @@ namespace HammerAndSickle.Models
             };
 
             // Add the M109 GE profile to the database
+            // Towed vs self-propelled: the artillery/AAA/SAM families hold both, so medium is per profile.
+            M109_GE.SetMovementMedium(MovementMedium.Tracked);
             AddProfile(WeaponType.SPA_M109_GE, M109_GE);
             //----------------------------------------------
             // German M109 Self-Propelled Artillery
@@ -3517,6 +3593,8 @@ namespace HammerAndSickle.Models
                 SW_F = SpriteManager.US_M109_SW_F
             };
             // Add the M109 FR profile to the database
+            // Towed vs self-propelled: the artillery/AAA/SAM families hold both, so medium is per profile.
+            M109_FR.SetMovementMedium(MovementMedium.Tracked);
             AddProfile(WeaponType.SPA_M109_FR, M109_FR);
             //----------------------------------------------
             // French M109 Self-Propelled Artillery
@@ -3556,6 +3634,8 @@ namespace HammerAndSickle.Models
             };
 
             // Add the M109 UK profile to the database
+            // Towed vs self-propelled: the artillery/AAA/SAM families hold both, so medium is per profile.
+            M109_UK.SetMovementMedium(MovementMedium.Tracked);
             AddProfile(WeaponType.SPA_M109_UK, M109_UK);
             //----------------------------------------------
             // British M109 Self-Propelled Artillery
@@ -3593,6 +3673,8 @@ namespace HammerAndSickle.Models
             };
 
             // Add the Light Artillery profile to the database
+            // Towed vs self-propelled: the artillery/AAA/SAM families hold both, so medium is per profile.
+            ArtLightWest.SetMovementMedium(MovementMedium.Foot);
             AddProfile(WeaponType.ART_LIGHT_WEST, ArtLightWest);
             //----------------------------------------------
             // Western Light Towed Artillery
@@ -3626,6 +3708,8 @@ namespace HammerAndSickle.Models
             };
 
             // Add the Heavy Artillery profile to the database
+            // Towed vs self-propelled: the artillery/AAA/SAM families hold both, so medium is per profile.
+            ArtHeavyWest.SetMovementMedium(MovementMedium.Foot);
             AddProfile(WeaponType.ART_HEAVY_WEST, ArtHeavyWest);
             //----------------------------------------------
             // Western Heavy Towed Artillery
@@ -3670,6 +3754,8 @@ namespace HammerAndSickle.Models
             };
 
             // Add the MLRS US profile to the database
+            // Towed vs self-propelled: the artillery/AAA/SAM families hold both, so medium is per profile.
+            MLRS_US.SetMovementMedium(MovementMedium.Tracked);
             AddProfile(WeaponType.ROC_MLRS_US, MLRS_US);
             //----------------------------------------------
             // US M270 MLRS Multiple Launch Rocket System
@@ -3712,6 +3798,8 @@ namespace HammerAndSickle.Models
             };
 
             // Add the M163 US profile to the database
+            // Towed vs self-propelled: the artillery/AAA/SAM families hold both, so medium is per profile.
+            M163_US.SetMovementMedium(MovementMedium.Tracked);
             AddProfile(WeaponType.SPAAA_M163_US, M163_US);
             //----------------------------------------------
             // US M163 Vulcan Self-Propelled Anti-Aircraft Gun
@@ -3750,6 +3838,8 @@ namespace HammerAndSickle.Models
             };
 
             // Add the Chaparral profile to the database
+            // Towed vs self-propelled: the artillery/AAA/SAM families hold both, so medium is per profile.
+            Chaparral.SetMovementMedium(MovementMedium.Tracked);
             AddProfile(WeaponType.SPSAM_CHAP_US, Chaparral);
             //----------------------------------------------
             // US M48 Chaparral Self-Propelled SAM
@@ -3783,6 +3873,8 @@ namespace HammerAndSickle.Models
             };
 
             // Add the Hawk US profile to the database
+            // Towed vs self-propelled: the artillery/AAA/SAM families hold both, so medium is per profile.
+            Hawk_US.SetMovementMedium(MovementMedium.Foot);
             AddProfile(WeaponType.SAM_HAWK_US, Hawk_US);
             //----------------------------------------------
             // US MIM-23 Hawk Strategic SAM System
@@ -3822,6 +3914,8 @@ namespace HammerAndSickle.Models
             };
 
             // Add the Gepard GE profile to the database
+            // Towed vs self-propelled: the artillery/AAA/SAM families hold both, so medium is per profile.
+            Gepard_GE.SetMovementMedium(MovementMedium.Tracked);
             AddProfile(WeaponType.SPAAA_GEPARD_GE, Gepard_GE);
             //----------------------------------------------
             // German Flakpanzer Gepard SPAAA
@@ -3861,6 +3955,8 @@ namespace HammerAndSickle.Models
             };
 
             // Add the Roland FR profile to the database
+            // Towed vs self-propelled: the artillery/AAA/SAM families hold both, so medium is per profile.
+            Roland_FR.SetMovementMedium(MovementMedium.Tracked);
             AddProfile(WeaponType.SPSAM_ROLAND_FR, Roland_FR);
             //----------------------------------------------
             // French Roland Self-Propelled SAM
@@ -3900,6 +3996,8 @@ namespace HammerAndSickle.Models
             };
 
             // Add the Crotale profile to the database
+            // Towed vs self-propelled: the artillery/AAA/SAM families hold both, so medium is per profile.
+            Crotale.SetMovementMedium(MovementMedium.Wheeled);
             AddProfile(WeaponType.SPSAM_CROTALE_FR, Crotale);
             //----------------------------------------------
             // French Crotale Self-Propelled SAM
@@ -3939,6 +4037,8 @@ namespace HammerAndSickle.Models
             };
 
             // Add the Tracked Rapier profile to the database
+            // Towed vs self-propelled: the artillery/AAA/SAM families hold both, so medium is per profile.
+            Rapier_SP.SetMovementMedium(MovementMedium.Tracked);
             AddProfile(WeaponType.SPSAM_RAPIER_UK, Rapier_SP);
             //----------------------------------------------
             // British Tracked Rapier Self-Propelled SAM
@@ -3981,6 +4081,9 @@ namespace HammerAndSickle.Models
             // Add the M3 Bradley profile to the database
             // W1: armored-car recon fights as a Hard target (§7.4.1.2 override).
             M3_US.SetTargetClass(TargetClass.Hard);
+            // Mixed family (see FamilyArchetypes) - medium is stated per profile.
+            M3_US.SetMovementMedium(MovementMedium.Tracked);
+
             AddProfile(WeaponType.RCN_M3_US, M3_US);
             //----------------------------------------------
             // US M3 Bradley Cavalry Fighting Vehicle
@@ -4019,6 +4122,9 @@ namespace HammerAndSickle.Models
             // Add the Luchs profile to the database
             // W1: armored-car recon fights as a Hard target (§7.4.1.2 override).
             LUCHS_GE.SetTargetClass(TargetClass.Hard);
+            // Mixed family (see FamilyArchetypes) - medium is stated per profile.
+            LUCHS_GE.SetMovementMedium(MovementMedium.Wheeled);
+
             AddProfile(WeaponType.RCN_LUCHS_GE, LUCHS_GE);
             //----------------------------------------------
             // FRG Spähpanzer Luchs Reconnaissance Vehicle
@@ -4057,6 +4163,9 @@ namespace HammerAndSickle.Models
             // Add the FV105 Sultan profile to the database
             // W1: UK recon vehicle fights as a Hard target (§7.4.1.2 override).
             FV105_UK.SetTargetClass(TargetClass.Hard);
+            // Mixed family (see FamilyArchetypes) - medium is stated per profile.
+            FV105_UK.SetMovementMedium(MovementMedium.Tracked);
+
             AddProfile(WeaponType.RCN_FV105_UK, FV105_UK);
             //----------------------------------------------
             // UK FV105 Sultan
@@ -4095,6 +4204,9 @@ namespace HammerAndSickle.Models
             // Add the ERC 90 profile to the database
             // W1: armored-car recon fights as a Hard target (§7.4.1.2 override).
             ERC90_FR.SetTargetClass(TargetClass.Hard);
+            // Mixed family (see FamilyArchetypes) - medium is stated per profile.
+            ERC90_FR.SetMovementMedium(MovementMedium.Wheeled);
+
             AddProfile(WeaponType.RCN_ERC90_FR, ERC90_FR);
             //----------------------------------------------
             // French ERC 90 Sagaie Reconnaissance Vehicle
@@ -5290,6 +5402,9 @@ namespace HammerAndSickle.Models
                 SW = SpriteManager.AR_MTLB_SW
             };
 
+            // Mixed family (see FamilyArchetypes) - medium is stated per profile.
+            MTLB_IQ.SetMovementMedium(MovementMedium.Tracked);
+
             // Add the MT-LB profile to the database
             AddProfile(WeaponType.APC_MTLB_IQ, MTLB_IQ);
             //----------------------------------------------
@@ -5323,6 +5438,9 @@ namespace HammerAndSickle.Models
                 NW = SpriteManager.AR_M113_NW,
                 SW = SpriteManager.AR_M113_SW
             };
+
+            // Mixed family (see FamilyArchetypes) - medium is stated per profile.
+            M113_IR.SetMovementMedium(MovementMedium.Tracked);
 
             // Add the M113 profile to the database
             AddProfile(WeaponType.APC_M113_IR, M113_IR);
@@ -5368,6 +5486,8 @@ namespace HammerAndSickle.Models
             };
 
             // Add the 2S1 Gvozdika profile to the database
+            // Towed vs self-propelled: the artillery/AAA/SAM families hold both, so medium is per profile.
+            SPA_2S1_AR.SetMovementMedium(MovementMedium.Tracked);
             AddProfile(WeaponType.SPA_2S1_IQ, SPA_2S1_AR);
             //----------------------------------------------
             // Iraqi 2S1 Gvozdika Self-Propelled Artillery
@@ -5402,6 +5522,8 @@ namespace HammerAndSickle.Models
             };
 
             // Add the Arab Light Artillery profile to the database
+            // Towed vs self-propelled: the artillery/AAA/SAM families hold both, so medium is per profile.
+            ART_LT_AR.SetMovementMedium(MovementMedium.Foot);
             AddProfile(WeaponType.ART_LIGHT_ARAB, ART_LT_AR);
             //----------------------------------------------
             // Arab Light Towed Artillery
@@ -5436,6 +5558,8 @@ namespace HammerAndSickle.Models
             };
 
             // Add the Arab Heavy Artillery profile to the database
+            // Towed vs self-propelled: the artillery/AAA/SAM families hold both, so medium is per profile.
+            ART_HV_AR.SetMovementMedium(MovementMedium.Foot);
             AddProfile(WeaponType.ART_HEAVY_ARAB, ART_HV_AR);
             //----------------------------------------------
             // Arab Heavy Towed Artillery
@@ -5474,6 +5598,8 @@ namespace HammerAndSickle.Models
             };
 
             // Add the Mujahideen AAA profile to the database
+            // Towed vs self-propelled: the artillery/AAA/SAM families hold both, so medium is per profile.
+            AAA_MJ.SetMovementMedium(MovementMedium.Foot);
             AddProfile(WeaponType.AAA_GEN_MJ, AAA_MJ);
             //----------------------------------------------
             // Mujahideen Anti-Aircraft Artillery
@@ -5509,6 +5635,8 @@ namespace HammerAndSickle.Models
             };
 
             // Add the Mujahideen SAM profile to the database
+            // Towed vs self-propelled: the artillery/AAA/SAM families hold both, so medium is per profile.
+            SAM_MJ.SetMovementMedium(MovementMedium.Foot);
             AddProfile(WeaponType.SAM_GEN_MJ, SAM_MJ);
             //----------------------------------------------
             // Mujahideen Stinger SAM Team
@@ -5547,6 +5675,8 @@ namespace HammerAndSickle.Models
             };
 
             // Add the ZSU-57 IQ profile to the database
+            // Towed vs self-propelled: the artillery/AAA/SAM families hold both, so medium is per profile.
+            ZSU_57_IQ.SetMovementMedium(MovementMedium.Tracked);
             AddProfile(WeaponType.SPAAA_ZSU57_IQ, ZSU_57_IQ);
             //----------------------------------------------
             // IQ ZSU-57 Self-Propelled Anti-Aircraft Gun
@@ -5586,6 +5716,8 @@ namespace HammerAndSickle.Models
             };
 
             // Add the 2K12 IQ profile to the database
+            // Towed vs self-propelled: the artillery/AAA/SAM families hold both, so medium is per profile.
+            SPSAM_2k12.SetMovementMedium(MovementMedium.Tracked);
             AddProfile(WeaponType.SPSAM_2K12_IQ, SPSAM_2k12);
             //----------------------------------------------
             // IQ 2k12 Self-Propelled SAM
@@ -6005,6 +6137,8 @@ namespace HammerAndSickle.Models
             };
 
             // Add the Mujahideen Heavy Mortar profile to the database
+            // Towed vs self-propelled: the artillery/AAA/SAM families hold both, so medium is per profile.
+            ART_MJ_MORT.SetMovementMedium(MovementMedium.Foot);
             AddProfile(WeaponType.ART_MORTAR_MJ, ART_MJ_MORT);
             //----------------------------------------------
             // Mujahideen Heavy Mortar
@@ -6034,6 +6168,8 @@ namespace HammerAndSickle.Models
             };
 
             // Add the Mujahideen Light Artillery profile to the database
+            // Towed vs self-propelled: the artillery/AAA/SAM families hold both, so medium is per profile.
+            ART_MJ_LT.SetMovementMedium(MovementMedium.Foot);
             AddProfile(WeaponType.ART_LIGHT_MJ, ART_MJ_LT);
             //----------------------------------------------
             // Mujahideen Light Artillery
@@ -6244,6 +6380,8 @@ namespace HammerAndSickle.Models
             };
 
             // Add the Type 82 profile to the database
+            // Towed vs self-propelled: the artillery/AAA/SAM families hold both, so medium is per profile.
+            SPA_TYPE82.SetMovementMedium(MovementMedium.Tracked);
             AddProfile(WeaponType.SPA_TYPE82, SPA_TYPE82);
             //----------------------------------------------
             // Chinese Type 82 Self-Propelled Howitzer
@@ -6283,6 +6421,8 @@ namespace HammerAndSickle.Models
             };
 
             // Add the PHZ-89 profile to the database
+            // Towed vs self-propelled: the artillery/AAA/SAM families hold both, so medium is per profile.
+            PHZ89.SetMovementMedium(MovementMedium.Tracked);
             AddProfile(WeaponType.ROC_PHZ89, PHZ89);
             //----------------------------------------------
             // Chinese PHZ-89 Multiple Rocket Launcher
@@ -6316,6 +6456,8 @@ namespace HammerAndSickle.Models
             };
 
             // Add the Chinese Light Artillery profile to the database
+            // Towed vs self-propelled: the artillery/AAA/SAM families hold both, so medium is per profile.
+            ART_LT_CH.SetMovementMedium(MovementMedium.Foot);
             AddProfile(WeaponType.ART_LIGHT_CH, ART_LT_CH);
             //----------------------------------------------
             // Chinese Light Towed Artillery
@@ -6349,6 +6491,8 @@ namespace HammerAndSickle.Models
             };
 
             // Add the Chinese Heavy Artillery profile to the database
+            // Towed vs self-propelled: the artillery/AAA/SAM families hold both, so medium is per profile.
+            ART_HV_CH.SetMovementMedium(MovementMedium.Foot);
             AddProfile(WeaponType.ART_HEAVY_CH, ART_HV_CH);
             //----------------------------------------------
             // Chinese Heavy Towed Artillery
@@ -6391,6 +6535,8 @@ namespace HammerAndSickle.Models
             };
 
             // Add the Type 53 profile to the database
+            // Towed vs self-propelled: the artillery/AAA/SAM families hold both, so medium is per profile.
+            TYPE53.SetMovementMedium(MovementMedium.Tracked);
             AddProfile(WeaponType.SPAAA_TYPE53, TYPE53);
             //----------------------------------------------
             // Chinese Type 53 Self-Propelled AAA
@@ -6430,6 +6576,8 @@ namespace HammerAndSickle.Models
             };
 
             // Add the HQ-7 profile to the database
+            // Towed vs self-propelled: the artillery/AAA/SAM families hold both, so medium is per profile.
+            HQ7.SetMovementMedium(MovementMedium.Wheeled);
             AddProfile(WeaponType.SPSAM_HQ7, HQ7);
             //----------------------------------------------
             // Chinese HQ-7 Self-Propelled SAM

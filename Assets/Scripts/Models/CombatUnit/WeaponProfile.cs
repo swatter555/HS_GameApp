@@ -152,6 +152,17 @@ namespace HammerAndSickle.Models
         // organic/inorganic transport. Set via SetTransportCategory on the transport profiles.
         public TransportCategory TransportCategory { get; private set; } = TransportCategory.None;
 
+        /// <summary>
+        /// How this profile physically moves — the input every "how is this regiment moving right now"
+        /// question resolves from. Inherited from the archetype family, overridable per profile.
+        /// </summary>
+        /// <remarks>
+        /// ⚠ <see cref="MovementMedium.None"/> means UNDECLARED and is the safe failure: silent, never
+        /// mis-sounded. An `AudioSystemTests` case fails when a profile reachable as a unit's
+        /// Deployed/Mobile/Embarked slot has no medium, so undeclared cannot reach the player quietly.
+        /// </remarks>
+        public MovementMedium MovementMedium { get; private set; } = MovementMedium.None;
+
         // Capabilities resolved from this profile's traits (Appendix W §1). Populated by FromProfileDef.
         // Query via HasCapability (e.g. Amphibious, RocketArtillery, NonCombatant). The legacy
         // IsAmphibious / IsDoubleFire / IsAttackCapable mirror bools were removed in Phase 4 (R9).
@@ -280,6 +291,20 @@ namespace HammerAndSickle.Models
             TransportCategory = category;
         }
 
+        /// <summary>
+        /// Overrides the movement medium inherited from the archetype family.
+        /// </summary>
+        /// <remarks>
+        /// ⚠ Only for profiles that DISAGREE with their family — the tracked MT-LB inside an otherwise
+        /// mixed APC family, the wheeled BRDM inside recon. Families that are unanimous set it once on
+        /// the archetype; do not restate it per profile there, or the family default becomes decoration
+        /// that nobody trusts and everyone re-specifies.
+        /// </remarks>
+        public void SetMovementMedium(MovementMedium medium)
+        {
+            MovementMedium = medium;
+        }
+
         /// <summary>True if this profile carries the given capability (resolved from its traits).</summary>
         public bool HasCapability(WeaponCapability capability) => _capabilities.Contains(capability);
 
@@ -329,6 +354,11 @@ namespace HammerAndSickle.Models
 
             profile.SetICM(r.ICM);
             profile.SetCapabilities(caps);
+
+            // Medium comes straight off the archetype and does NOT pass through the resolver: it is a
+            // category, not a number, so there are no deltas or trait scaling to apply to it. Mixed
+            // families leave it None here and each profile calls SetMovementMedium.
+            profile.SetMovementMedium(def.Archetype.Medium);
             profile.SetStrikeRiders(
                 r.Stat(ProfileStat.GaVsHard), r.Stat(ProfileStat.GaVsSoft), r.Stat(ProfileStat.GaVsBase),
                 r.Stat(ProfileStat.OcSuppression), r.Stat(ProfileStat.ParkedHit));

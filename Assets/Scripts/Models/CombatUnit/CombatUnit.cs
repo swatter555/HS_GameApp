@@ -1254,28 +1254,30 @@ namespace HammerAndSickle.Models
             DeploymentPosition oldPosition = _deploymentPosition;
             DeploymentPosition targetPosition = _deploymentPosition + 1;
 
-            // Airborne deploy-up override: AB/MAB (and SPECF with AN-12 transport) in Deployed
-            // state, adjacent to an active friendly airbase, skip Mobile → target Embarked directly.
-            // These units have no ground-mobile profile; their organic transport is airborne.
-            if (oldPosition == DeploymentPosition.Deployed && onAirbase && IsEmbarkable)
+            /* AIRBORNE DEPLOY-UP: a regiment at Deployed with NO ground transport but an embarked
+             * profile skips Mobile entirely and targets Embarked — there is nothing on the ground for it
+             * to mount.
+             *
+             * ⚠ GENERALISED 2026-08-04, replacing a hardcoded list. The old rule named AB and MAB by
+             * CLASSIFICATION, plus SPECF only when its embarked profile was literally TRN_AN8_SV. A
+             * Spetsnaz regiment carrying a Mi-8 matched neither and fell through to Mobile — which
+             * "worked" solely because someone had put the helicopter in that unit's Mobile slot. Asking
+             * the PROFILES instead of the class label covers every shape Bob named (foot+helo,
+             * air-mobile foot+helo, air-mobile foot+APC+helo) and any future one, with no list to
+             * maintain.
+             *
+             * ⚠ The airbase/port GATES are deliberately untouched and still live in
+             * SpecialEmbarkmentChecks. What may embark WHERE is a separate ruling from where deploying
+             * up should aim; conflating them here would silently change a gameplay rule. */
+            bool hasGroundTransport = GetMobileProfile() != null;
+            if (oldPosition == DeploymentPosition.Deployed && IsEmbarkable && !hasGroundTransport
+                && GetEmbarkedProfile() != null)
             {
-                bool isAirborneType = Classification == UnitClassification.AB
-                                   || Classification == UnitClassification.MAB;
-                bool isSpecfWithAirTransport = Classification == UnitClassification.SPECF
-                    && GetEmbarkedProfile()?.WeaponType == WeaponType.TRN_AN8_SV;
-
-                if (isAirborneType || isSpecfWithAirTransport)
-                    targetPosition = DeploymentPosition.Embarked;
+                targetPosition = DeploymentPosition.Embarked;
             }
 
             if (!CanChangeToState(targetPosition, out errorMsg))
                 return false;
-
-            // Skip IsMountable gate when targeting Embarked via the airborne override path
-            if (targetPosition != DeploymentPosition.Embarked || targetPosition == oldPosition + 1)
-            {
-                // Normal path: check mountable for Mobile transition
-            }
 
             if (!SpecialEmbarkmentChecks(out errorMsg, targetPosition, onAirbase, onPort))
                 return false;
@@ -1322,13 +1324,23 @@ namespace HammerAndSickle.Models
             ConsumeSupplies(GameData.COMBAT_STATE_SUPPLY_TRANSITION_COST);
             DeploymentActions.DecrementCurrent();
 
-            // Subtract 50% of pre-transition max MP from current MP
-            float movementPenalty = GameData.DEPLOYMENT_ACTION_MOVEMENT_COST * MovementPoints.Max;
+            // Pay the transition out of the OLD profile's budget first.
+            float oldMax = MovementPoints.Max;
+            float movementPenalty = GameData.DEPLOYMENT_ACTION_MOVEMENT_COST * oldMax;
             float remainingMP = Mathf.Max(0f, MovementPoints.Current - movementPenalty);
 
-            // Set new max from the now-active profile, clamp leftover to new max
+            /* ⚠ THE LEFTOVER IS RESCALED, NOT CARRIED ACROSS (Bob's ruling, 2026-08-04). Movement points
+             * mean different things either side of a posture change: 2 points is half a foot regiment's
+             * day and one twelfth of a helicopter lift. The old code kept the ABSOLUTE figure and merely
+             * clamped it, so a full-strength foot regiment paid 2 of its 4 points to board and then flew
+             * TWO HEXES on a 24-point profile. Dismounting had the mirror defect. Preserving the FRACTION
+             * spent is the only reading that behaves in both directions.
+             *
+             * ⚠ Deliberately free of any particular cost constant — it needs only the two ceilings — so
+             * it survives the action/movement cost rebalance Bob has planned. */
             UpdateMovementPointsForProfile();
-            MovementPoints.SetCurrent(Mathf.Min(remainingMP, MovementPoints.Max));
+            MovementPoints.SetCurrent(
+                MovementModeService.ScaleMovementPoints(remainingMP, oldMax, MovementPoints.Max));
         }
 
         private bool SpecialEmbarkmentChecks(out string errorMsg, DeploymentPosition targetPos,

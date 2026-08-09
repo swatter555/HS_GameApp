@@ -1183,7 +1183,14 @@ namespace HammerAndSickle.Models
                 role: UnitRole.GroundCombat,
                 side: Side.Player,
                 nationality: Nationality.USSR,
-                profileType: RegimentProfileType.DEP_MOB_EMB_AIR,
+                /* ⚠ WAS DEP_MOB_EMB_AIR WITH NO MOBILE PROFILE (fixed 2026-08-04) — the same defect as the
+                 * Spetsnaz, found by the template audit rather than by ear. It has no ground transport,
+                 * so the _MOB_ in its profile type was a fiction forced by the enum having no DEP_EMB_*
+                 * shape. ⚠ It was ALSO unreachable: the old TryDeployUP override covered AB/MAB by
+                 * classification plus SPECF-with-AN-12, and this regiment is classified TANK, so it could
+                 * never actually board its aircraft. The generalised rule (no ground transport → aim at
+                 * Embarked) fixes that as a side effect. */
+                profileType: RegimentProfileType.DEP_EMB_AIR,
                 deployedProfile: WeaponType.RCN_BRDM2AT_SV,
                 isMountable: false,
                 mobileProfile: WeaponType.NONE,
@@ -1315,12 +1322,17 @@ namespace HammerAndSickle.Models
                 role: UnitRole.GroundCombatRecon,
                 side: Side.Player,
                 nationality: Nationality.USSR,
-                profileType: RegimentProfileType.DEP_MOB,
+                /* ⚠ FIXED 2026-08-04. The Mi-8 was in the MOBILE slot with the embarked slot empty, so
+                 * deploying up put the Spetsnaz on helicopters as their GROUND profile — they "mounted
+                 * up" into aircraft and then paid ground terrain costs while flying. It was authored
+                 * that way because RegimentProfileType had no DEP_EMB_* shape to express "foot infantry
+                 * whose only transport is airborne"; that member now exists. */
+                profileType: RegimentProfileType.DEP_EMB_HELO,
                 deployedProfile: WeaponType.INF_SPEC_SV,
-                isMountable: true,
-                mobileProfile: WeaponType.HEL_MI8T_SV,
+                isMountable: false,
+                mobileProfile: WeaponType.NONE,
                 isEmbarkable: true,
-                embarkedProfile: WeaponType.NONE,
+                embarkedProfile: WeaponType.HEL_MI8T_SV,
                 category: DepotCategory.Secondary,
                 size: DepotSize.Small
             );
@@ -1653,6 +1665,13 @@ namespace HammerAndSickle.Models
                 role: UnitRole.AirDefenseArea,
                 side: Side.Player,
                 nationality: Nationality.USSR,
+                /* An EMPTY Mobile bay is normal, not a defect: the slot is an UPGRADE TARGET the player
+                 * buys into (§ profile-slot rule), so DEP_MOB + isMountable:true + mobileProfile NONE
+                 * reads "may buy a ground transport, has not yet". Its sisters S-75 and S-125 already
+                 * carry TRK_GEN_SV.
+                 * ⚠ OPEN, Bob 2026-08-04: he leans toward treating the S-300 as self-contained ("consider
+                 * them tanks") since a real one rides its own TELs — that would mean DEP + isMountable
+                 * false. Left as authored until he rules; it is a gameplay change, not a cleanup. */
                 profileType: RegimentProfileType.DEP_MOB,
                 deployedProfile: WeaponType.SAM_S300_SV,
                 isMountable: true,
@@ -2590,7 +2609,11 @@ namespace HammerAndSickle.Models
                 role: UnitRole.AirDefenseArea,
                 side: Side.AI,
                 nationality: Nationality.MJ,
-                profileType: RegimentProfileType.DEP,
+                /* ⚠ profileType said DEP (no Mobile bay) while isMountable said true (may mount) — a real
+                 * contradiction, resolved 2026-08-04 in favour of the FLAG. Under the upgrade model a
+                 * unit that may buy a ground transport must declare the bay, and Mujahideen picking up a
+                 * truck is entirely in keeping. The empty slot is the un-purchased state, not an error. */
+                profileType: RegimentProfileType.DEP_MOB,
                 deployedProfile: WeaponType.SAM_GEN_MJ,
                 isMountable: true,
                 mobileProfile: WeaponType.NONE,

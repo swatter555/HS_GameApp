@@ -59,12 +59,40 @@ Per-item detail is in the change log — do NOT re-accumulate a confirmation lis
 **⚠ NOTHING IS BLOCKING.** The 2026-07-27 button-wiring gap is CLOSED — Bob wired the callbacks during the
 07-28 HUD pass and turn flow plays.
 
-**▶ NEXT — todo_audio PHASE 3, wiring the game's sounds.** The system is built and green; nothing is gated
-on anything, and the four items are listed in `todo_audio.md` §4 Phase 3. 3.4 (`UIButtonAudio` onto the
-battle HUD) is Bob's Inspector work; 3.1–3.3 are the agent's.
+**▶ NEXT — THE PROFILE-SLOT REBUILD, `todo_profiles.md` (RATIFIED 2026-08-07, all 8 decision
+boxes answered).** The 2026-08-07 pass reframed the three profile slots as Panzer-General-style
+purchasable bays with DERIVED capacity (from deployed-profile `MovementMedium` + identity), naval
+lift as a transient state, and a headless buy/sell/upgrade API. ⚠ **It ABSORBS todo_audio §3b
+M4 and part of M5** (the `isAir` fix now covers `HexMapUtil` range+path AND `ExecuteMovement`,
+as rebuild phase P3) — do NOT run M4 standalone from `todo_audio.md`.
+**HOLD STATE: waiting on P0 (Bob)** — M3 suite run + both khost `.oob` re-exports + commit.
+P1 (derive + delete `RegimentProfileType`/flags/`EmbarkmentState`) starts only on his green.
 
-⏸ **DEFERRED — ROUGH-EDGES PASS on the battle scene (Bob's call, 2026-07-28, superseded 2026-08-03 by the
-audio rebuild).** Consolidate before adding functionality: "straighten out some rough edges before too many
+**State at hand-off (2026-08-04, mid-pass — READ §3b BEFORE TOUCHING MOVEMENT OR AUDIO):**
+- **M0 ✅** committed (`d6abfcb`, `0558653`) and pushed. **M1 ✅ green. M2 ✅ green + confirmed by ear** —
+  sounds correct across deployment transitions. **M3 written, UNRUN.**
+- **M3 needs from Bob:** reload the unit DB in the scenario editor and **re-export both khost `.oob`
+  files**. The agent hand-patched them as a stopgap; the templates are now correct, so a re-export should
+  reproduce the same Spetsnaz data — if it does not, that discrepancy is itself worth chasing.
+- **M4 is the last one and it is the ORIGINAL bug**: `ExecuteMovement` still branches on `isAir`
+  (classification), so an embarked air-assault regiment does not actually fly — it pays mountain costs and
+  is halted by ZoC it is flying over. Route terrain cost, ZoC, the ambush branch and animation pacing
+  through `MovementModeService.IsAirborneNow`. **Every ruling M4 needs is already recorded in §3b** —
+  including the ambush-against-a-flight rule (the ambush TRIGGERS, the combat does NOT).
+- **M5** — `HexMapUtil`, `GameDataManager` occupancy, `CombatResolver`, `GameIconRenderer` still read
+  `IsAirUnit`/`IsHelicopter`. Tracked follow-up, each read on its own terms rather than swept.
+- ⚠ **Uncommitted:** everything after `d6abfcb`. Commit once M3 is green.
+
+**Open questions for Bob (neither blocking):**
+- **S-300 (and "a few other units"):** he leans toward treating them as self-contained — `DEP` +
+  `isMountable: false`, no ground-transport upgrade path — since a real one rides its own TELs. Left as
+  authored (`DEP_MOB`, empty bay) until he rules.
+- **Make the template audit permanent?** The one-off script that found the VDV and Mujahideen defects
+  could become a standing test. ⚠ If it does, it must check ONLY the §3.2b hard invariant and
+  profileType-vs-flag contradictions — NOT "empty slot", which is a normal un-purchased bay.
+
+⏸ **DEFERRED — ROUGH-EDGES PASS on the battle scene (Bob's call, 2026-07-28; superseded twice — first by
+the audio rebuild, then by the movement-medium pass — and never started).** Consolidate before adding functionality: "straighten out some rough edges before too many
 pile up", covering everything in the battle scene so far, not just the recent work. ⚠ Start by ASKING Bob
 which edges he has in mind — this note records the intent, not a diagnosis, and the agent should not assume
 its own list is his. Never started; still worth doing.
@@ -801,6 +829,9 @@ suppressed). Panel model settled at three always-open panels (§3.6c/§4.3) afte
 say *what* changed, not *why* (rationale lives in the design doc / gap analysis) · if it needs more
 than one line, it belongs elsewhere.
 
+- 2026-08-04 — RATIFY the profile-slot rule (Claude_Project §3.2b): a regiment has three EQUIPMENT BAYS, not three loadouts. An empty bay is NORMAL — slots are Panzer-General-style upgrade targets the player buys into, so `mobileProfile: NONE` means "not purchased yet". Flags (`isMountable`/`isEmbarkable`/`profileType`) declare CAPABILITY; the WeaponType in a slot declares CONTENTS; runtime behaviour keys on CONTENTS, never flags — which is exactly what makes the upgrade path work with no special cases. `isEmbarkable: true` on nearly every ground unit is CORRECT (all ground units are naval-transportable, §5.4.2) and 35 templates were nearly "fixed" on that misreading. One hard invariant: a `TransportCategory != None` profile may occupy ONLY the Embarked bay. Also recorded: `CombatUnitDB` is the source of truth and a `.oob` is a SNAPSHOT — fixing a template does not fix an already-exported scenario (Claude_Project §3.2b)
+- 2026-08-04 — Phase 3b M3: teach the deployment state machine about airborne-only regiments. Add `RegimentProfileType.DEP_EMB_HELO`/`DEP_EMB_AIR` — their absence was the root cause, since "foot infantry whose only transport is airborne" was unrepresentable and the Mi-8 got authored into the Spetsnaz MOBILE slot, where the unit rode helicopters as its GROUND posture. Replace TryDeployUP's hardcoded override (AB/MAB by classification plus SPECF only when its embarked profile was literally TRN_AN8_SV) with the general rule: at Deployed, no ground-mobile profile but an embarked one, aim at Embarked. That also repaired the VDV Support Regiment, classified TANK, which matched neither hardcoded arm and could never board its own aircraft. Movement points now RESCALE across a posture change instead of carrying the absolute figure — a foot regiment with 2 of 4 points used to board helicopters and fly two hexes. Guard added in two places: a RegimentProfile warning at init and a MovementMediumTests assertion over every template. Fixed both khost .oob files by hand as a stopgap pending re-export (todo_audio M3)
+- 2026-08-04 — Phase 3b M1+M2: add `MovementMedium` (the fact the project never recorded — nothing distinguished an MT-LB from a BTR-70: same prefix, archetype, trait, upgrade path, MMP and equipment bucket) and `MovementModeService`, the single authority on how a regiment is moving right now. Family archetypes carry the medium where unanimous; FIVE mixed families carry none and state it per profile across 63 profiles. ⚠ M2 caught M1 shipping a silent-wrong default: Artillery/Aaa/Sam had `Foot`, true of the towed baseline they are named for, which made all 31 self-propelled guns sound like walking infantry — and the coverage test could not catch it because those profiles HAD a medium, just the wrong one. That is the argument for `None` over a plausible default, demonstrated within a day. Movement sound rebuilt on the active profile; the classification switch and the day-old "dismounted" patch both deleted; long-cut threshold now measures the real clip instead of a constant (todo_audio M1/M2)
 - 2026-08-04 — Wire audio Phase 3.1–3.3: movement one-shot (long cut from PREDICTED duration, §27.7.7), weapon fire, impact, kills, ambush, first contact, ZoC halt, out-of-MP, objective flips, select/deselect/facing, and `ButtonDenied` on all five refusal paths — placed at the §24.8.6 printer-emitter sites. Append 24 `SoundEffect` members (13 `Fire*` one per `WeaponSoundFamily`, 3 `Impact*`, 4 `UnitMove*Long`, ButtonDenied, UnitDestroyed, Objective captured/lost); fill in `GameAudio.SoundEffectFor`, which had every arm returning `None`; add `GameAudio.PlayImpact` and `GetMovementSFX(classification, predictedSeconds)`. Collapse the duplicated per-hex tween length to one `stepSeconds` — the movement clip is chosen from it. Three attribution rulings recorded in Claude_Project §3.7b: ambush → victim not ambusher, fire → firer / impact → target, PlayWeaponFire AFTER the firing reveal (todo_audio §4 Phase 3)
 - 2026-08-04 — Fix Audio Catalog Editor sluggishness: walk the entries array ONCE per GUI pass into a `RowInfo[]` cache instead of querying `SerializedProperty` per row while drawing (the old path did ~4 full scans per row plus one per sound in the header — O(sounds × entries) twice a frame, against the slowest API in the editor). Also hoisted `Enum.GetValues`/LINQ/enum `ToString()`, the warning GUIStyle, all GUIContents and the GUILayout option arrays out of the per-pass path (todo_audio 2.7)
 - 2026-08-04 — Add `Tools/Audio/Audio Catalog Editor` (`Assets/Editor/Audio/AudioCatalogWindow.cs`), a drag-and-drop catalog window driven by the SoundEffect ENUM rather than the existing rows, so unbacked sounds are visible instead of needing an audit run and a drop creates the row. Stray files are moved into `Assets/Audio/SFX/`, renamed to the `SFX_<Name>[_n]` convention and FORCE-reimported, because import settings are path-gated and a move alone does not re-run the importer. Mutations deferred to end-of-frame with file work completed before the catalog is touched. Inline variants, tuning, search, unbacked-only filter, duplicate/empty warnings; Scan Folder and Audit call the existing tools (todo_audio 2.7, Claude_Project §3.7b)

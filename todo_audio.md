@@ -242,6 +242,34 @@ tuning you have set, and `Tools/Audio/Audit Catalog` reports what is still unbac
 #### M0 — commit the pending tree (no new work)
 Copy button, the posture patch, the `GameAudio_NeverLazyCreatesAManager` correction. Start clean.
 
+#### STATUS 2026-08-04 — M0 ✅ · M1 ✅ · M2 ✅ · M3 written/unrun · M4 next · M5 deferred
+M2 is **green AND confirmed by ear** — sounds correct across deployment transitions. M3 awaits a suite run
+plus Bob reloading the unit DB and re-exporting both khost `.oob` files.
+
+⚠ **THE ONE THING A FRESH CONTEXT MUST READ FIRST: Claude_Project §3.2b, the profile-slot rule.** Three
+equipment BAYS, not three loadouts; an empty bay is a normal un-purchased upgrade target; flags declare
+capability, slots declare contents, and runtime behaviour keys on CONTENTS. Not knowing that rule caused
+every defect in this pass — including the agent nearly "fixing" 35 correct templates.
+
+⚠ **`CombatUnitDB` IS THE SOURCE OF TRUTH; A `.oob` IS A SNAPSHOT.** `OOBFileLoader` reads every profile
+slot straight from the JSON and never consults the DB, so fixing a template does NOT fix an already-
+exported scenario. The Spetsnaz bug survived a correct template fix for exactly this reason.
+
+⚠ **M2 UNCOVERED A SILENT-WRONG DEFAULT THAT M1 HAD SHIPPED, and it is the most instructive thing in
+this pass.** M1 gave `Artillery`/`Aaa`/`Sam` a `Foot` default — correct for the towed baseline the
+archetype is named for. But **31 self-propelled profiles build on those same three archetypes**
+(`SPA_*`, `SPAAA_*`, `SPSAM_*`, `ROC_*` — the comment at the top of FamilyArchetypes says so outright:
+"SP gun = +mobility in Phase 3, there are no separate SP archetypes"). Every self-propelled gun in the
+game therefore inherited `Foot` and would have sounded like walking infantry.
+**The M1 coverage test could not catch it** — those profiles HAD a medium, it was simply wrong. That is
+the whole argument for `None` over a plausible default, restated by the code itself within a day: an
+undeclared medium is silent AND fails the coverage test; a wrong one is confident and invisible.
+Fixed by demoting all three families to mixed (no default) and stating all 48 members explicitly —
+17 Foot (towed guns), 7 Wheeled (BM-21/27/30, Scud, Strela-1, Crotale, HQ-7 — truck and BRDM chassis),
+24 Tracked (M109s, 2S-series, MLRS, PHZ-89, Shilka/ZSU/Gepard/Vulcan, Kub/Tunguska/Chaparral/Rapier/
+Roland). ⚠ **Bob should eyeball the wheeled/tracked split on the SP SAMs especially** — Strela-1 on a
+BRDM and Crotale/HQ-7 on wheels are the ones an outsider is most likely to get wrong.
+
 #### M1 — the missing fact. Additive, ZERO behaviour change.
 - `MovementMedium` enum: `None · Static · Foot · Wheeled · Tracked · Helo · FixedWing · Naval`.
   ⚠ NOT persisted — derived data, never in a save or `.map`/`.oob`, so it is free to reorder/rename,

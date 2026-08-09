@@ -4,6 +4,7 @@ using HammerAndSickle.Audio;
 using HammerAndSickle.Controllers;
 using HammerAndSickle.Core.GameData;
 using HammerAndSickle.Models;
+using HammerAndSickle.Services;
 using NUnit.Framework;
 using UnityEngine;
 using SoundEffect = HammerAndSickle.Controllers.GameAudioManager.SoundEffect;
@@ -344,6 +345,17 @@ namespace HammerAndSickle.Tests
          * Nothing throws, nothing logs — it just sounds wrong, which is why it survived to a play test.
          * Same species as the weapon-family rule (§9.10.4): posture decides, never the class label. */
 
+        /// <summary>How the unit is travelling right now — the ACTIVE profile's medium.</summary>
+        private static MovementMedium Medium(CombatUnit unit) => MovementModeService.CurrentMedium(unit);
+
+        /// <summary>
+        /// The movement sound for a unit's current posture, standard cut.
+        /// ⚠ Whether the LONG cut plays is decided at play time by measuring the real clip
+        /// (GameAudio.PlayMovement), so it is deliberately not part of this helper.
+        /// </summary>
+        private static SoundEffect Sound(CombatUnit unit) =>
+            GameAudioManager.GetMovementSFX(Medium(unit));
+
         private static CombatUnit MakeMountable(string name, UnitClassification classification,
             WeaponType deployed, WeaponType mobile)
         {
@@ -370,11 +382,11 @@ namespace HammerAndSickle.Tests
                 WeaponType.INF_REG_SV, WeaponType.APC_BTR80_SV);
 
             mot.SetDeploymentPosition(DeploymentPosition.Mobile);
-            Assert.That(GameAudioManager.GetMovementSFX(mot, 0.5f), Is.EqualTo(SoundEffect.UnitMoveWheeled),
+            Assert.That(Sound(mot), Is.EqualTo(SoundEffect.UnitMoveWheeled),
                 "mounted in its BTRs");
 
             mot.SetDeploymentPosition(DeploymentPosition.Deployed);
-            Assert.That(GameAudioManager.GetMovementSFX(mot, 0.5f), Is.EqualTo(SoundEffect.UnitMoveFoot),
+            Assert.That(Sound(mot), Is.EqualTo(SoundEffect.UnitMoveFoot),
                 "dismounted — the carriers are parked");
         }
 
@@ -385,10 +397,10 @@ namespace HammerAndSickle.Tests
                 WeaponType.INF_REG_SV, WeaponType.IFV_BMP1_SV);
 
             mech.SetDeploymentPosition(DeploymentPosition.Mobile);
-            Assert.That(GameAudioManager.GetMovementSFX(mech, 0.5f), Is.EqualTo(SoundEffect.UnitMoveTracked));
+            Assert.That(Sound(mech), Is.EqualTo(SoundEffect.UnitMoveTracked));
 
             mech.SetDeploymentPosition(DeploymentPosition.Deployed);
-            Assert.That(GameAudioManager.GetMovementSFX(mech, 0.5f), Is.EqualTo(SoundEffect.UnitMoveFoot));
+            Assert.That(Sound(mech), Is.EqualTo(SoundEffect.UnitMoveFoot));
         }
 
         [Test]
@@ -400,11 +412,11 @@ namespace HammerAndSickle.Tests
                 WeaponType.ART_LIGHT_SV, WeaponType.TRK_GEN_SV);
 
             art.SetDeploymentPosition(DeploymentPosition.Mobile);
-            Assert.That(GameAudioManager.GetMovementSFX(art, 0.5f), Is.Not.EqualTo(SoundEffect.UnitMoveFoot),
+            Assert.That(Sound(art), Is.Not.EqualTo(SoundEffect.UnitMoveFoot),
                 "limbered and under tow");
 
             art.SetDeploymentPosition(DeploymentPosition.Deployed);
-            Assert.That(GameAudioManager.GetMovementSFX(art, 0.5f), Is.EqualTo(SoundEffect.UnitMoveFoot),
+            Assert.That(Sound(art), Is.EqualTo(SoundEffect.UnitMoveFoot),
                 "emplaced — the guns are manhandled, not driven");
         }
 
@@ -420,7 +432,7 @@ namespace HammerAndSickle.Tests
                                             DeploymentPosition.HastyDefense, DeploymentPosition.Deployed })
             {
                 mot.SetDeploymentPosition(posture);
-                Assert.That(GameAudioManager.GetMovementSFX(mot, 0.5f), Is.EqualTo(SoundEffect.UnitMoveFoot),
+                Assert.That(Sound(mot), Is.EqualTo(SoundEffect.UnitMoveFoot),
                     $"{posture} is below Mobile, so the unit is off its carriers");
             }
         }
@@ -438,44 +450,83 @@ namespace HammerAndSickle.Tests
                 tank.SetDeploymentPosition(posture);
                 spa.SetDeploymentPosition(posture);
 
-                Assert.That(GameAudioManager.GetMovementSFX(tank, 0.5f), Is.EqualTo(SoundEffect.UnitMoveTracked),
+                Assert.That(Sound(tank), Is.EqualTo(SoundEffect.UnitMoveTracked),
                     $"a tank at {posture} is still a tank");
-                Assert.That(GameAudioManager.GetMovementSFX(spa, 0.5f), Is.EqualTo(SoundEffect.UnitMoveTracked),
+                Assert.That(Sound(spa), Is.EqualTo(SoundEffect.UnitMoveTracked),
                     $"an SP gun at {posture} carries its own gun");
             }
         }
 
         [Test]
-        public void Embarked_IsNotTreatedAsDismounted()
+        public void AirAssaultRegiment_SoundsDifferentInAllThreePostures()
         {
-            // Embarked is ABOVE Mobile and means riding an aircraft or ship — a transport-sound question
-            // for the M13/AOB pass, and certainly not a man on foot.
-            var mot = MakeMountable("Motor Rifle", UnitClassification.MOT,
-                WeaponType.INF_REG_SV, WeaponType.APC_BTR80_SV);
-            mot.SetDeploymentPosition(DeploymentPosition.Embarked);
+            /* ⚠ THE BUG BOB HEARD, PINNED. An air-assault regiment is `MAM` whether it is walking, riding
+             * its MT-LBs or flying — so the old classification switch sounded it as infantry in all three
+             * postures. Reading the ACTIVE PROFILE gives three different answers with no special case. */
+            var mam = new CombatUnit("Air Assault", UnitClassification.MAM, UnitRole.GroundCombat,
+                Side.Player, Nationality.USSR, RegimentProfileType.DEP_MOB_EMB_HELO,
+                WeaponType.INF_AM_SV, isMountable: true, WeaponType.APC_MTLB_SV,
+                isEmbarkable: true, WeaponType.HEL_MI8T_SV);
 
-            Assert.That(GameAudioManager.GetMovementSFX(mot, 0.5f), Is.Not.EqualTo(SoundEffect.UnitMoveFoot));
+            mam.SetDeploymentPosition(DeploymentPosition.Deployed);
+            Assert.That(Medium(mam), Is.EqualTo(MovementMedium.Foot), "dismounted infantry");
+
+            mam.SetDeploymentPosition(DeploymentPosition.Mobile);
+            Assert.That(Medium(mam), Is.EqualTo(MovementMedium.Tracked), "riding MT-LBs — TRACKED, not wheeled");
+
+            mam.SetDeploymentPosition(DeploymentPosition.Embarked);
+            Assert.That(Medium(mam), Is.EqualTo(MovementMedium.Helo), "flying");
         }
 
         [Test]
-        public void LongCut_IsChosenOnlyForTypesThatCanOutrunTheStandardClip()
+        public void EmbarkedInfantry_IsAirborneNow_EvenThoughItIsNotAnAirUnit()
         {
-            Assert.That(GameAudioManager.GetMovementSFX(UnitClassification.MOT, 0.5f),
-                Is.EqualTo(SoundEffect.UnitMoveWheeled), "inside the standard clip");
-            Assert.That(GameAudioManager.GetMovementSFX(UnitClassification.MOT, 2.0f),
-                Is.EqualTo(SoundEffect.UnitMoveWheeledLong), "past it");
-            Assert.That(GameAudioManager.GetMovementSFX(UnitClassification.HELO, 4.0f),
+            /* ⚠ THE GAMEPLAY HALF, AND THE MORE SERIOUS ONE. `IsAirUnit`/`IsHelicopter` are classification
+             * tests, so a regiment flying on Mi-8s reports FALSE and pays ground terrain costs, is halted
+             * by zones of control it is flying over, and is checked for ground ambush. M4 routes those
+             * decisions through IsAirborneNow; this pins the answer the moment the medium exists. */
+            var mam = new CombatUnit("Air Assault", UnitClassification.MAM, UnitRole.GroundCombat,
+                Side.Player, Nationality.USSR, RegimentProfileType.DEP_MOB_EMB_HELO,
+                WeaponType.INF_AM_SV, isMountable: true, WeaponType.APC_MTLB_SV,
+                isEmbarkable: true, WeaponType.HEL_MI8T_SV);
+
+            mam.SetDeploymentPosition(DeploymentPosition.Embarked);
+
+            Assert.That(MovementModeService.IsAirborneNow(mam), Is.True, "it is on helicopters");
+            Assert.That(mam.IsAirUnit || mam.IsHelicopter, Is.False,
+                "and classification still says otherwise — which is exactly why the two must not be conflated");
+
+            mam.SetDeploymentPosition(DeploymentPosition.Mobile);
+            Assert.That(MovementModeService.IsAirborneNow(mam), Is.False, "back on the ground in its carriers");
+        }
+
+        [Test]
+        public void LongCut_IsSelectedByMedium_NotByClassification()
+        {
+            // The clip CHOICE is now a pure medium→sound mapping; WHETHER to escalate is decided at play
+            // time by measuring the real clip (GameAudio.PlayMovement), not by a constant in here.
+            Assert.That(GameAudioManager.GetMovementSFX(MovementMedium.Wheeled),
+                Is.EqualTo(SoundEffect.UnitMoveWheeled));
+            Assert.That(GameAudioManager.GetMovementSFX(MovementMedium.Wheeled, longCut: true),
+                Is.EqualTo(SoundEffect.UnitMoveWheeledLong));
+            Assert.That(GameAudioManager.GetMovementSFX(MovementMedium.Helo, longCut: true),
                 Is.EqualTo(SoundEffect.UnitMoveHeloLong));
 
-            // Foot has no long cut: its maximum travel is 0.7 s, always inside the standard clip.
-            Assert.That(GameAudioManager.GetMovementSFX(UnitClassification.INF, 99f),
+            // Foot has no long cut — its longest possible move fits inside any recorded clip.
+            Assert.That(GameAudioManager.GetMovementSFX(MovementMedium.Foot, longCut: true),
                 Is.EqualTo(SoundEffect.UnitMoveFoot));
+
+            // A base does not move; naval movement (§5.4.2) is unbuilt. Silent, not mis-sounded.
+            Assert.That(GameAudioManager.GetMovementSFX(MovementMedium.Static), Is.EqualTo(SoundEffect.None));
+            Assert.That(GameAudioManager.GetMovementSFX(MovementMedium.None), Is.EqualTo(SoundEffect.None));
         }
 
         [Test]
         public void NullUnit_IsSilent_RatherThanThrowing()
         {
-            Assert.That(GameAudioManager.GetMovementSFX((CombatUnit)null, 1f), Is.EqualTo(SoundEffect.None));
+            Assert.That(MovementModeService.CurrentMedium(null), Is.EqualTo(MovementMedium.None));
+            Assert.That(MovementModeService.IsAirborneNow(null), Is.False);
+            Assert.That(GameAudioManager.GetMovementSFX(MovementMedium.None), Is.EqualTo(SoundEffect.None));
         }
 
         #endregion // Movement sound follows POSTURE, not classification

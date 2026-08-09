@@ -817,14 +817,11 @@ namespace HammerAndSickle.Controllers
 
             /* §27.7.7 — ONE fire-and-forget shot for the WHOLE move. Not a per-hex blip (which would
              * machine-gun at ~0.18 s/hex) and not a loop (R3 dissolved: nothing would own stopping it when
-             * an ambush halts the move or the unit dies mid-path). The long cut is selected from the
-             * PREDICTED duration, knowable here because the path is already committed — so the choice is
-             * deterministic rather than a mid-move correction.
-             * ⚠ PlayFrom, not Play: this is a UNIT's sound. Always audible today because the mover is the
-             * player's own, and correctly gated the moment the AI moves through this path. */
-            GameAudio.PlayFrom(
-                GameAudioManager.GetMovementSFX(CurrentUnit, _currentPath.Count * stepSeconds),
-                CurrentUnit);
+             * an ambush halts the move or the unit dies mid-path).
+             * ⚠ The medium and the clip choice both live in the audio layer now — this call site just
+             * supplies the mover and how long its committed path will take. Fog-gated inside, so it is
+             * already correct for the AI turn. */
+            GameAudio.PlayMovement(CurrentUnit, _currentPath.Count * stepSeconds);
 
             // TODO: Move undo — allowed only when no new spotting events fired during the move
 

@@ -64,6 +64,35 @@ namespace HammerAndSickle.Audio
                 }
             }
 
+            /// <summary>
+            /// Length of the SHORTEST usable variant, in seconds; 0 when the row has no clip.
+            /// </summary>
+            /// <remarks>
+            /// ⚠ SHORTEST, not longest or average, and the direction is a decision. This is used to ask
+            /// "will a standard clip cover this move, or should the long cut play?" — and since any
+            /// variant might be the one picked, escalating on the shortest means no variant can leave a
+            /// silent gap mid-move. Trailing audio past the end of a move is INTENDED (Bob, 2026-08-04:
+            /// the sound frames the action rather than tracking it); silence during a visible move is
+            /// the failure worth avoiding, so the tie breaks toward playing too much.
+            /// ⚠ Reading the real asset means re-recording a clip retunes this automatically. It replaces
+            /// a hard-coded seconds constant that described an asset the code could simply measure.
+            /// </remarks>
+            public float ShortestClipSeconds
+            {
+                get
+                {
+                    float shortest = 0f;
+                    if (clips == null) return 0f;
+
+                    foreach (var c in clips)
+                    {
+                        if (c == null) continue;
+                        if (shortest == 0f || c.length < shortest) shortest = c.length;
+                    }
+                    return shortest;
+                }
+            }
+
             /// <summary>A random non-null variant, or null when the row has no usable clip.</summary>
             public AudioClip PickClip()
             {
