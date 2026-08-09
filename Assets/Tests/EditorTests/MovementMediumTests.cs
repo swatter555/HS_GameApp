@@ -72,7 +72,8 @@ namespace HammerAndSickle.Tests
              *
              * The Mobile slot means "ground transport". A profile that declares itself a helo or
              * fixed-wing transport belongs in Embarked, and a regiment with no ground transport at all
-             * uses a DEP_EMB_* profile type rather than borrowing the Mobile slot. */
+             * simply leaves Mobile = NONE (P1 2026-08-08: there is no declared profile type anymore —
+             * the shape IS the slot contents). */
             var offenders = new List<string>();
 
             foreach (string templateId in CombatUnitDB.GetAllTemplateIds())

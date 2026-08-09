@@ -27,7 +27,7 @@ namespace HammerAndSickle.Tests
         /// `ApplyDeploymentTransitionCosts` → `UpdateMovementPointsForProfile`, which throws
         /// "No active weapon system profile available" if the unit has no weapon profiles — and the
         /// five-argument constructor does NOT install any (only the eleven-argument one calls
-        /// `InitializeRegimentProfile`). Without this the REFUSAL cases still pass, because they return
+        /// `InitializeEquipmentBays`). Without this the REFUSAL cases still pass, because they return
         /// before reaching the cost step, so a bare unit hides the problem in exactly half the suite.
         /// Matches the fixture idiom used by the combat suites.
         /// </summary>
@@ -36,8 +36,8 @@ namespace HammerAndSickle.Tests
             var unit = new CombatUnit("TestUnit", UnitClassification.INF, UnitRole.GroundCombat,
                 Side.Player, Nationality.USSR);
 
-            unit.RegimentProfile.InitializeRegimentProfile("TestUnit", RegimentProfileType.DEP,
-                WeaponType.NONE, WeaponType.INF_REG_SV, WeaponType.NONE);
+            unit.EquipmentBays.InitializeEquipmentBays("TestUnit",
+                WeaponType.INF_REG_SV, WeaponType.NONE, WeaponType.NONE);
 
             unit.HitPoints.SetCurrent(unit.HitPoints.Max);
             unit.DaysSupply.SetCurrent(unit.DaysSupply.Max);

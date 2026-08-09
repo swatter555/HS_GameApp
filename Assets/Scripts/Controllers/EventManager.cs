@@ -56,11 +56,10 @@ namespace HammerAndSickle.Controllers
         /// </summary>
         public event Action<string, int> OnUnitHitPointsChanged;
 
-        /// <summary>
-        /// Fired when a unit's deployment position changes. Carries the unit ID, the new deployment position,
-        /// and the embarkment state (relevant when position is Embarked).
-        /// </summary>
-        public event Action<string, DeploymentPosition, EmbarkmentState> OnUnitDeploymentChanged;
+        // (OnUnitDeploymentChanged DELETED 2026-08-08 — D10 ratified. Never raised in its lifetime;
+        // posture changes refresh through RaiseRedrawMapIcons, the coarse redraw that also covers the
+        // main-art swap a deployment change causes. Do not resurrect a fine-grained event without a
+        // raiser AND a reason the coarse redraw is insufficient.)
 
         /// <summary>
         /// Fired when the player toggles air/ground stacking dominance at a hex position.
@@ -279,24 +278,6 @@ namespace HammerAndSickle.Controllers
             catch (Exception e)
             {
                 AppService.HandleException(CLASS_NAME, nameof(RaiseUnitHitPointsChanged), e);
-            }
-        }
-
-        /// <summary>
-        /// Raises the unit deployment changed event.
-        /// </summary>
-        /// <param name="unitId">The ID of the unit whose deployment changed</param>
-        /// <param name="newPosition">The new deployment position</param>
-        /// <param name="embarkmentState">The embarkment state (relevant when position is Embarked)</param>
-        public void RaiseUnitDeploymentChanged(string unitId, DeploymentPosition newPosition, EmbarkmentState embarkmentState)
-        {
-            try
-            {
-                OnUnitDeploymentChanged?.Invoke(unitId, newPosition, embarkmentState);
-            }
-            catch (Exception e)
-            {
-                AppService.HandleException(CLASS_NAME, nameof(RaiseUnitDeploymentChanged), e);
             }
         }
 
@@ -716,7 +697,6 @@ namespace HammerAndSickle.Controllers
             // Battle scene events
             OnRedrawMapIcons = null;
             OnUnitHitPointsChanged = null;
-            OnUnitDeploymentChanged = null;
             OnStackingToggleRequested = null;
             OnPrinterMessage = null;
             OnBattlePhaseChanged = null;

@@ -360,19 +360,19 @@ namespace HammerAndSickle.Tests
             WeaponType deployed, WeaponType mobile)
         {
             var unit = new CombatUnit(name, classification, UnitRole.GroundCombat, Side.Player,
-                Nationality.USSR, RegimentProfileType.DEP_MOB, deployed,
-                isMountable: true, mobile, isEmbarkable: false, WeaponType.NONE);
+                Nationality.USSR, deployedProfile: deployed,
+                mobileProfile: mobile, embarkedProfile: WeaponType.NONE);
             return unit;
         }
 
         private static CombatUnit MakeSelfPropelled(string name, UnitClassification classification,
             WeaponType deployed)
         {
-            // isMountable: false + mobileProfile NONE — the unit IS its vehicle, exactly as CombatUnitDB
-            // declares TANK/SPA/SPAAA.
+            // Mobile bay empty AND closed by derivation — the unit IS its vehicle (deployed medium is
+            // Tracked/Wheeled), exactly as CombatUnitDB authors TANK/SPA/SPAAA.
             return new CombatUnit(name, classification, UnitRole.GroundCombat, Side.Player,
-                Nationality.USSR, RegimentProfileType.DEP, deployed,
-                isMountable: false, WeaponType.NONE, isEmbarkable: false, WeaponType.NONE);
+                Nationality.USSR, deployedProfile: deployed,
+                mobileProfile: WeaponType.NONE, embarkedProfile: WeaponType.NONE);
         }
 
         [Test]
@@ -464,9 +464,8 @@ namespace HammerAndSickle.Tests
              * its MT-LBs or flying — so the old classification switch sounded it as infantry in all three
              * postures. Reading the ACTIVE PROFILE gives three different answers with no special case. */
             var mam = new CombatUnit("Air Assault", UnitClassification.MAM, UnitRole.GroundCombat,
-                Side.Player, Nationality.USSR, RegimentProfileType.DEP_MOB_EMB_HELO,
-                WeaponType.INF_AM_SV, isMountable: true, WeaponType.APC_MTLB_SV,
-                isEmbarkable: true, WeaponType.HEL_MI8T_SV);
+                Side.Player, Nationality.USSR, deployedProfile: WeaponType.INF_AM_SV,
+                mobileProfile: WeaponType.APC_MTLB_SV, embarkedProfile: WeaponType.HEL_MI8T_SV);
 
             mam.SetDeploymentPosition(DeploymentPosition.Deployed);
             Assert.That(Medium(mam), Is.EqualTo(MovementMedium.Foot), "dismounted infantry");
@@ -486,9 +485,8 @@ namespace HammerAndSickle.Tests
              * by zones of control it is flying over, and is checked for ground ambush. M4 routes those
              * decisions through IsAirborneNow; this pins the answer the moment the medium exists. */
             var mam = new CombatUnit("Air Assault", UnitClassification.MAM, UnitRole.GroundCombat,
-                Side.Player, Nationality.USSR, RegimentProfileType.DEP_MOB_EMB_HELO,
-                WeaponType.INF_AM_SV, isMountable: true, WeaponType.APC_MTLB_SV,
-                isEmbarkable: true, WeaponType.HEL_MI8T_SV);
+                Side.Player, Nationality.USSR, deployedProfile: WeaponType.INF_AM_SV,
+                mobileProfile: WeaponType.APC_MTLB_SV, embarkedProfile: WeaponType.HEL_MI8T_SV);
 
             mam.SetDeploymentPosition(DeploymentPosition.Embarked);
 

@@ -28,8 +28,8 @@ namespace HammerAndSickle.Tests
         private CombatUnit Build(string name, UnitClassification cls, UnitRole role, WeaponType deployed)
         {
             var u = new CombatUnit(name, cls, role, Side.Player, Nationality.USSR);
-            u.RegimentProfile.InitializeRegimentProfile(name, RegimentProfileType.DEP,
-                WeaponType.NONE, deployed, WeaponType.NONE);
+            u.EquipmentBays.InitializeEquipmentBays(name,
+                deployed, WeaponType.NONE, WeaponType.NONE);
             u.SetDeploymentPosition(DeploymentPosition.Deployed);
             u.SetExperienceLevel(ExperienceLevel.Trained);
             return u;
@@ -80,16 +80,22 @@ namespace HammerAndSickle.Tests
         }
 
         [Test]
-        public void ResolveAirDefenseFire_EmbarkedHelo_UsesGadAxis()
+        public void ResolveAirDefenseFire_HeloLiftInTransit_UsesGadAxis()
         {
-            // An air-mobile unit caught mid-transit in EmbarkedHelo is engaged on the helo (GAD) axis (§11.8.9 / §5.13.2.4).
+            /* An air-mobile unit caught mid-transit riding its helo lift is engaged on the helo (GAD)
+             * axis (§11.8.9 / §5.13.2.4). ⚠ REWRITTEN 2026-08-08 (P1/D1): the old test forced the
+             * never-written EmbarkmentState, pinning a state gameplay could not produce — the lane never
+             * fired in play. The REAL fact is the active profile's medium: at Embarked with helos in the
+             * bay, the unit IS on helicopters. */
             var sam = Build("SAM", UnitClassification.SAM, UnitRole.AirDefenseArea, WeaponType.SAM_S75_SV);
             var am = Build("AM", UnitClassification.AM, UnitRole.GroundCombat, WeaponType.INF_AM_SV);
-            am.SetCurrentEmbarkmentState(EmbarkmentState.EmbarkedHelo);
+            am.EquipmentBays.InitializeEquipmentBays("AM",
+                WeaponType.INF_AM_SV, WeaponType.NONE, WeaponType.HEL_MI8T_SV);
+            am.SetDeploymentPosition(DeploymentPosition.Embarked);
 
-            Assert.IsTrue(CombatResolver.IsHeloAirDefenseTarget(am), "EmbarkedHelo transit → helo axis");
+            Assert.IsTrue(CombatResolver.IsHeloAirDefenseTarget(am), "helo-lift transit → helo axis");
             var lane = CombatResolver.BuildAirDefenseFireLane(sam, am);
-            Assert.AreEqual(am.ActiveGroundAirDefense, lane.TargetDefense, "embarked-helo target engaged GAT − GAD");
+            Assert.AreEqual(am.ActiveGroundAirDefense, lane.TargetDefense, "helo-lift target engaged GAT − GAD");
             Assert.AreNotEqual((am.ActiveManeuverability + am.ActiveSurvivability) / 2, lane.TargetDefense,
                 "the GAD axis is taken, NOT the fixed-wing (MAN+SUR)/2 axis");
         }

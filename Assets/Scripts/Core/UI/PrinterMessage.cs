@@ -195,7 +195,7 @@ namespace HammerAndSickle.Core.UI
         /// destroys every small contribution and lets a regiment be ground to death reporting no losses.
         /// This is the render step the ledger's float values were protecting.
         ///
-        /// ⚠ THE ROLLUP GOES THROUGH <see cref="RegimentProfile.ClassifyWeaponType"/> — the same classifier
+        /// ⚠ THE ROLLUP GOES THROUGH <see cref="EquipmentBays.ClassifyWeaponType"/> — the same classifier
         /// the intel report uses — so the loss report and the intel report cannot disagree about what
         /// counts as a tank.
         ///
@@ -273,7 +273,7 @@ namespace HammerAndSickle.Core.UI
 
             foreach (KeyValuePair<WeaponType, float> entry in ledger)
             {
-                EquipmentBucket bucket = RegimentProfile.ClassifyWeaponType(entry.Key);
+                EquipmentBucket bucket = EquipmentBays.ClassifyWeaponType(entry.Key);
 
                 foreach (EquipmentBucket wanted in buckets)
                 {

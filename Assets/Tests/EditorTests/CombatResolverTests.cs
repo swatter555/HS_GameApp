@@ -30,8 +30,8 @@ namespace HammerAndSickle.Tests
         private CombatUnit BuildUnit(UnitClassification cls, WeaponType deployed)
         {
             var u = new CombatUnit("U", cls, UnitRole.GroundCombat, Side.Player, Nationality.USSR);
-            u.RegimentProfile.InitializeRegimentProfile("U", RegimentProfileType.DEP,
-                WeaponType.NONE, deployed, WeaponType.NONE);
+            u.EquipmentBays.InitializeEquipmentBays("U",
+                deployed, WeaponType.NONE, WeaponType.NONE);
             u.SetDeploymentPosition(DeploymentPosition.Deployed);
             u.SetExperienceLevel(ExperienceLevel.Trained);
             return u;
@@ -107,8 +107,8 @@ namespace HammerAndSickle.Tests
         {
             var nat = side == Side.Player ? Nationality.USSR : Nationality.MJ;
             var u = new CombatUnit("U", cls, UnitRole.GroundCombat, side, nat);
-            u.RegimentProfile.InitializeRegimentProfile("U", RegimentProfileType.DEP,
-                WeaponType.NONE, deployed, WeaponType.NONE);
+            u.EquipmentBays.InitializeEquipmentBays("U",
+                deployed, WeaponType.NONE, WeaponType.NONE);
             u.SetDeploymentPosition(DeploymentPosition.Deployed);
             u.SetExperienceLevel(ExperienceLevel.Trained);
             u.SetPosition(pos);

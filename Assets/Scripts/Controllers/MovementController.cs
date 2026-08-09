@@ -214,7 +214,7 @@ namespace HammerAndSickle.Controllers
                     // ⚠ A FULL REDRAW, NOT RaiseUnitDeploymentChanged. That event only refreshes the deploy
                     // BADGE (Prefab_CombatUnitIcon.RefreshDeployIcon), but a deployment change also swaps
                     // the unit's MAIN ART — GameIconRenderer resolves it via
-                    // RegimentProfile.GetIcon(DeploymentPosition, facing), so Mobile and Deployed are
+                    // EquipmentBays.GetIcon(DeploymentPosition, facing), so Mobile and Deployed are
                     // different sprites. Refreshing only the badge would leave a mounted unit drawn as
                     // infantry. The redraw rebuilds icons from live unit state and covers both.
                     EventManager.Instance.RaiseRedrawMapIcons();

@@ -90,8 +90,8 @@ namespace HammerAndSickle.Models
         }
 
         [JsonInclude]
-        [JsonPropertyName("regimentProfile")]
-        public RegimentProfile RegimentProfile { get; private set; }
+        [JsonPropertyName("equipmentBays")]
+        public EquipmentBays EquipmentBays { get; private set; }
 
         [JsonInclude] [JsonPropertyName("efficiencyLevel")]
         public EfficiencyLevel EfficiencyLevel { get; internal set; }
@@ -118,10 +118,18 @@ namespace HammerAndSickle.Models
             IsLeaderAssigned ? GameDataManager.Instance.GetLeader(LeaderID) : null;
 
         // Deployment
-        [JsonIgnore]                                     public DeploymentPosition DeploymentPosition => _deploymentPosition;
-        [JsonInclude] [JsonPropertyName("isEmbarkable")] public bool IsEmbarkable { get; private set; }
-        [JsonInclude] [JsonPropertyName("isMountable")]  public bool IsMountable { get; private set; }
-        [JsonInclude] [JsonPropertyName("currentEmbarkmentState")] public EmbarkmentState CurrentEmbarkmentState { get; private set; } = EmbarkmentState.NotEmbarked;
+        [JsonIgnore] public DeploymentPosition DeploymentPosition => _deploymentPosition;
+        /* `isEmbarkable`/`isMountable`/`currentEmbarkmentState` DELETED 2026-08-08 (P1). The flags had
+         * 0 and 2 readers respectively, all redundant with slot-content null checks; the embarkment
+         * enum was never written by gameplay. Capacity is derived (EquipmentBays.CanAccept). */
+
+        /// <summary>
+        /// The naval transient state (§5.4.2/§9.10.6, todo_profiles §4.5): true while this ground unit
+        /// rides the universal sealift. NEVER a possession — the shared TRN_NAVAL profile is drawn at
+        /// <see cref="GetActiveWeaponProfile"/> while set. Written ONLY by the P2 naval embark/debark
+        /// path (always false until that lands) and by save restore.
+        /// </summary>
+        [JsonInclude] [JsonPropertyName("isNavalEmbarked")] public bool IsNavalEmbarked { get; private set; }
 
         // Experience
         [JsonInclude] [JsonPropertyName("experiencePoints")] public int ExperiencePoints { get; internal set; }
@@ -164,12 +172,14 @@ namespace HammerAndSickle.Models
         [JsonIgnore] public int ActiveAirSpottingRange => GameData.AirSpottingRange(Classification);
 
         /// <summary>True if THIS unit is an airborne spotting target (a spotter uses its AIR range against it): any
-        /// fixed-wing, or an AM/MAM riding a helo (EmbarkedHelo air-assault, §7A.14 — a lift that can't easily hide).
-        /// Attack helos (HELO) are NOT — they fly Nap-of-the-Earth and are spotted on the ground range. A dismounted
-        /// AM/MAM is also a ground target.</summary>
+        /// fixed-wing, or a regiment riding helo lift (§7A.14 — a lift that can't easily hide). Attack helos (HELO)
+        /// are NOT — they fly Nap-of-the-Earth and are spotted on the ground range. A dismounted rider is a ground
+        /// target. ⚠ The second arm read the never-written EmbarkmentState until 2026-08-08 (P1/D1) and was
+        /// permanently false; the ACTIVE PROFILE's medium is what actually says "riding helicopters right now".</summary>
         [JsonIgnore] public bool IsAirborneSpottingTarget =>
             GameData.IsAirborneClassification(Classification)
-            || CurrentEmbarkmentState == EmbarkmentState.EmbarkedHelo;
+            || (Classification != UnitClassification.HELO
+                && GetActiveWeaponProfile()?.MovementMedium == MovementMedium.Helo);
 
         #endregion // Properties
 
@@ -183,8 +193,6 @@ namespace HammerAndSickle.Models
             UnitRole role,
             Side side,
             Nationality nationality,
-            bool isMountable = false,
-            bool isEmbarkable = false,
             DepotCategory category = DepotCategory.Secondary,
             DepotSize size = DepotSize.Small)
         {
@@ -201,8 +209,8 @@ namespace HammerAndSickle.Models
                 Nationality = nationality;
                 Facing = side == Side.Player ? HexDirection.W : HexDirection.E;
 
-                InitializeDeploymentSystem(isEmbarkable, isMountable);
-                RegimentProfile = new RegimentProfile();
+                InitializeDeploymentSystem();
+                EquipmentBays = new EquipmentBays();
 
                 if (IsBase)
                     InitializeFacility(category, size);
@@ -240,12 +248,10 @@ namespace HammerAndSickle.Models
                 Side = Side.Player;
                 Nationality = Nationality.USSR;
                 Facing = HexDirection.W;
-                RegimentProfile = new RegimentProfile();
+                EquipmentBays = new EquipmentBays();
 
-                IsEmbarkable = false;
-                IsMountable = false;
                 _deploymentPosition = DeploymentPosition.Deployed;
-                CurrentEmbarkmentState = EmbarkmentState.NotEmbarked;
+                IsNavalEmbarked = false;
 
                 EfficiencyLevel = EfficiencyLevel.FullOperations;
 
@@ -287,25 +293,24 @@ namespace HammerAndSickle.Models
         }
 
         /// <summary>
-        /// Constructor with regiment profile parameters.
-        /// Used by OOB loading, template cloning, and snapshot creation.
+        /// Constructor with equipment-bay parameters. Used by OOB loading, template cloning, and
+        /// snapshot creation. ⚠ Slot order is DEP/MOB/EMB — the pre-P1 signature interleaved
+        /// profileType/isMountable/isEmbarkable between the slots AND took mobile before deployed;
+        /// those three are deleted (capacity is derived, see EquipmentBays).
         /// </summary>
         public CombatUnit(string unitName,
             UnitClassification classification,
             UnitRole role,
             Side side,
             Nationality nationality,
-            RegimentProfileType profileType,
             WeaponType deployedProfile,
-            bool isMountable,
             WeaponType mobileProfile,
-            bool isEmbarkable,
             WeaponType embarkedProfile,
             DepotCategory category = DepotCategory.Secondary,
             DepotSize size = DepotSize.Small)
-            : this(unitName, classification, role, side, nationality, isMountable, isEmbarkable, category, size)
+            : this(unitName, classification, role, side, nationality, category, size)
         {
-            RegimentProfile.InitializeRegimentProfile(unitName, profileType, mobileProfile, deployedProfile, embarkedProfile);
+            EquipmentBays.InitializeEquipmentBays(unitName, deployedProfile, mobileProfile, embarkedProfile);
             InitializeMovementPoints();
         }
 
@@ -313,15 +318,19 @@ namespace HammerAndSickle.Models
 
         #region Core
 
-        public WeaponProfile GetDeployedProfile() => RegimentProfile?.GetDeployedProfile();
-        public WeaponProfile GetMobileProfile() => RegimentProfile?.GetMobileProfile();
-        public WeaponProfile GetEmbarkedProfile() => RegimentProfile?.GetEmbarkedProfile();
+        public WeaponProfile GetDeployedProfile() => EquipmentBays?.GetDeployedProfile();
+        public WeaponProfile GetMobileProfile() => EquipmentBays?.GetMobileProfile();
+        public WeaponProfile GetEmbarkedProfile() => EquipmentBays?.GetEmbarkedProfile();
 
         /// <summary>
-        /// Returns the active weapon profile based on current deployment state.
+        /// Returns the active weapon profile based on current deployment state. While
+        /// <see cref="IsNavalEmbarked"/> (the §9.10.6 transient sealift state — P2 writes it), the
+        /// SHARED naval profile is drawn: never owned, never in a bay.
         /// </summary>
         public WeaponProfile GetActiveWeaponProfile() => DeploymentPosition switch
         {
+            DeploymentPosition.Embarked when IsNavalEmbarked =>
+                WeaponProfileDB.GetWeaponProfile(WeaponType.TRN_NAVAL) ?? GetDeployedProfile(),
             DeploymentPosition.Embarked => GetEmbarkedProfile() ?? GetDeployedProfile(),
             DeploymentPosition.Mobile => GetMobileProfile() ?? GetDeployedProfile(),
             _ => GetDeployedProfile()
@@ -574,12 +583,10 @@ namespace HammerAndSickle.Models
 
         #region Initialization
 
-        private void InitializeDeploymentSystem(bool embarkable, bool mountable)
+        private void InitializeDeploymentSystem()
         {
-            IsEmbarkable = embarkable;
-            IsMountable = mountable;
             _deploymentPosition = DeploymentPosition.Deployed;
-            CurrentEmbarkmentState = EmbarkmentState.NotEmbarked;
+            IsNavalEmbarked = false;
         }
 
         private void InitializeExperienceSystem()
@@ -1269,8 +1276,11 @@ namespace HammerAndSickle.Models
              * ⚠ The airbase/port GATES are deliberately untouched and still live in
              * SpecialEmbarkmentChecks. What may embark WHERE is a separate ruling from where deploying
              * up should aim; conflating them here would silently change a gameplay rule. */
+            /* (2026-08-08 P1: the `IsEmbarkable` term is gone from this condition — the flag is deleted.
+             * It was pure redundancy: `GetEmbarkedProfile() != null` IS the fact the flag claimed to
+             * declare, and no template ever had a populated Embarked bay with the flag false.) */
             bool hasGroundTransport = GetMobileProfile() != null;
-            if (oldPosition == DeploymentPosition.Deployed && IsEmbarkable && !hasGroundTransport
+            if (oldPosition == DeploymentPosition.Deployed && !hasGroundTransport
                 && GetEmbarkedProfile() != null)
             {
                 targetPosition = DeploymentPosition.Embarked;
@@ -1351,14 +1361,8 @@ namespace HammerAndSickle.Models
             if (targetPos != DeploymentPosition.Embarked)
                 return true;
 
-            if (!IsEmbarkable)
-            {
-                errorMsg = $"{UnitName} is not configured as embarkable.";
-                AppService.HandleException(CLASS_NAME, nameof(SpecialEmbarkmentChecks),
-                    new InvalidOperationException(errorMsg));
-                return false;
-            }
-
+            /* (2026-08-08 P1: the `!IsEmbarkable` guard is gone — the flag is deleted. The profile-null
+             * check below is the real fact; two guards for one fact was the declared-capability rot.) */
             var embarkedProfile = GetEmbarkedProfile();
             if (embarkedProfile == null)
             {
@@ -1503,7 +1507,11 @@ namespace HammerAndSickle.Models
                 : currentPosition - 1;
 
         public void SetDeploymentPosition(DeploymentPosition newPosition) => _deploymentPosition = newPosition;
-        public void SetCurrentEmbarkmentState(EmbarkmentState state) => CurrentEmbarkmentState = state;
+        /// <summary>
+        /// Writes the naval transient state. ⚠ Callers: the P2 naval embark/debark path and
+        /// SnapshotMapper restore ONLY — this is a state flag, not a capability toggle.
+        /// </summary>
+        public void SetNavalEmbarked(bool embarked) => IsNavalEmbarked = embarked;
 
         #endregion // Deployment
 
@@ -2340,15 +2348,11 @@ namespace HammerAndSickle.Models
                 Side = template.Side;
                 Nationality = template.Nationality;
 
-                RegimentProfile.InitializeRegimentProfile(
+                EquipmentBays.InitializeEquipmentBays(
                     template.UnitName,
-                    template.RegimentProfile.ProfileType,
-                    template.RegimentProfile.Mobile,
-                    template.RegimentProfile.Deployed,
-                    template.RegimentProfile.Embarked);
-
-                IsEmbarkable = template.IsEmbarkable;
-                IsMountable = template.IsMountable;
+                    template.EquipmentBays.Deployed,
+                    template.EquipmentBays.Mobile,
+                    template.EquipmentBays.Embarked);
 
                 if (template.IsBase)
                 {
@@ -2398,12 +2402,9 @@ namespace HammerAndSickle.Models
                     role: Role,
                     side: Side,
                     nationality: Nationality,
-                    profileType: RegimentProfile.ProfileType,
-                    deployedProfile: RegimentProfile.Deployed,
-                    isMountable: IsMountable,
-                    mobileProfile: RegimentProfile.Mobile,
-                    isEmbarkable: IsEmbarkable,
-                    embarkedProfile: RegimentProfile.Embarked,
+                    deployedProfile: EquipmentBays.Deployed,
+                    mobileProfile: EquipmentBays.Mobile,
+                    embarkedProfile: EquipmentBays.Embarked,
                     category: IsBase ? DepotCategory : DepotCategory.Secondary,
                     size: IsBase ? DepotSize : DepotSize.Small
                 );
@@ -2509,7 +2510,7 @@ namespace HammerAndSickle.Models
 
         private void ApplyEquipmentBuckets(IntelReport report, float errorRate)
         {
-            var baseReport = RegimentProfile?.GetIntelReport();
+            var baseReport = EquipmentBays?.GetIntelReport();
             if (baseReport == null)
                 return;
 

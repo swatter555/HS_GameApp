@@ -306,11 +306,8 @@ namespace HammerAndSickle.Models
     }
 
     /// <summary>
-    /// A RegimentProfile provides stat profiles for different deployment states in CombatUnits.
-    /// </summary>
-    /// <summary>
     /// The equipment buckets a <see cref="WeaponType"/> sorts into for reporting
-    /// (see <see cref="RegimentProfile.ClassifyWeaponType"/>).
+    /// (see <see cref="EquipmentBays.ClassifyWeaponType"/>).
     ///
     /// ⚠ NOT PERSISTED — this is a transient display classification, never written to a save or to
     /// content, so it is exempt from the never-rename rule (CLAUDE.md §2.11) that governs WeaponType and
@@ -324,11 +321,33 @@ namespace HammerAndSickle.Models
         HEL, AWACS, TRN, FGT, ATT, BMB, RCNA
     }
 
-    public class RegimentProfile
+    /// <summary>
+    /// The three equipment bays (transient — never persisted; slot CONTENTS persist as WeaponTypes).
+    /// </summary>
+    public enum EquipmentBay { Deployed, Mobile, Embarked }
+
+    /// <summary>
+    /// A regiment's three equipment bays — Panzer-General-style purchasable slots (todo_profiles,
+    /// ratified 2026-08-07/08). <b>Deployed</b> is the fighting kit, always populated, vertically
+    /// upgradeable only. <b>Mobile</b> (ground transport) and <b>Embarked</b> (air lift) are purchases;
+    /// an empty bay means "not bought yet", never a defect.
+    /// </summary>
+    /// <remarks>
+    /// ⚠ CAPACITY IS DERIVED, NEVER DECLARED (the rename from RegimentProfile, 2026-08-08, marks the
+    /// change). The deleted `RegimentProfileType`/`isMountable`/`isEmbarkable` declared which bays a
+    /// regiment had, had ZERO behavioural readers, and were wrong in 36 of 169 templates. Which bays
+    /// EXIST now derives from physics + doctrine (<see cref="CanAccept"/>: deployed medium, identity,
+    /// capability tags); which bays are FILLED is the slot contents.
+    ///
+    /// This class owns the DOCTRINE half only — statelessly, identity passed in. It never knows about
+    /// prestige, turns, postures or windows: that is RequisitionService (P4), which asks CanAccept and
+    /// mutates through TrySetSlot. Nothing here raises events or touches a singleton.
+    /// </remarks>
+    public class EquipmentBays
     {
         #region Constants
 
-        private const string CLASS_NAME = nameof(Models.RegimentProfile);
+        private const string CLASS_NAME = nameof(Models.EquipmentBays);
 
         #endregion // Constants
 
@@ -339,9 +358,7 @@ namespace HammerAndSickle.Models
         [JsonPropertyName("name")]
         public string Name { get; private set; } = "Default";
 
-        [JsonInclude]
-        [JsonPropertyName("profileType")]
-        public RegimentProfileType ProfileType { get; private set; } = RegimentProfileType.Default;
+        // (`profileType` DELETED 2026-08-08 — capacity is derived, see the class remarks. SAVE_VERSION 5.)
 
         // The stat profile associated with the embarked deployment state.
         [JsonInclude]
@@ -371,7 +388,7 @@ namespace HammerAndSickle.Models
         /// The deserializer will populate [JsonInclude] properties after construction.
         /// </summary>
         [JsonConstructor]
-        public RegimentProfile()
+        public EquipmentBays()
         {
             TotalIntelStats = new Dictionary<WeaponType, int>();
         }
@@ -381,21 +398,21 @@ namespace HammerAndSickle.Models
         #region Initialization
 
         /// <summary>
-        /// Initializes RegimentProfile with all required data.
+        /// Initializes the bays with all required data. ⚠ Parameter order is DEP/MOB/EMB — the old
+        /// InitializeRegimentProfile took mobile BEFORE deployed, a standing mis-bind trap (both are
+        /// WeaponTypes, so swapped arguments compiled clean). Fixed with the 2026-08-08 rename.
         /// </summary>
-        public void InitializeRegimentProfile(
+        public void InitializeEquipmentBays(
             string name,
-            RegimentProfileType profileType,
-            WeaponType mobile,
             WeaponType deployed,
+            WeaponType mobile,
             WeaponType embarked)
         {
             try
             {
                 Name = name;
-                ProfileType = profileType;
-                Mobile = mobile;
                 Deployed = deployed;
+                Mobile = mobile;
                 Embarked = embarked;
                 TotalIntelStats = new Dictionary<WeaponType, int>();
                 BuildIntelStats();
@@ -404,7 +421,7 @@ namespace HammerAndSickle.Models
             }
             catch (Exception e)
             {
-                AppService.HandleException(CLASS_NAME, nameof(InitializeRegimentProfile), e);
+                AppService.HandleException(CLASS_NAME, nameof(InitializeEquipmentBays), e);
                 throw;
             }
         }
@@ -438,10 +455,10 @@ namespace HammerAndSickle.Models
              * outside the DB. */
             Debug.LogWarning(
                 $"[{CLASS_NAME}] '{Name}' has {mobileProfile.WeaponType} " +
-                $"({mobileProfile.TransportCategory}) in its MOBILE slot. Air transports belong in the " +
-                "EMBARKED slot — in Mobile the unit rides them as its ground posture, paying terrain " +
-                "costs and stopping for zones of control while airborne. Use a DEP_EMB_HELO / " +
-                "DEP_EMB_AIR profile type when the regiment has no ground transport.");
+                $"({mobileProfile.TransportCategory}) in its MOBILE bay. Air transports belong in the " +
+                "EMBARKED bay — in Mobile the unit rides them as its ground posture, paying terrain " +
+                "costs and stopping for zones of control while airborne. A regiment with no ground " +
+                "transport simply leaves the Mobile bay empty (Mobile = NONE).");
         }
 
         /// <summary>
@@ -621,6 +638,149 @@ namespace HammerAndSickle.Models
         }
 
         #endregion // Accessors
+
+        #region Bay Capacity & Mutation (todo_profiles §4.1–§4.3, ratified 2026-08-07/08)
+
+        /// <summary>
+        /// The Mobile bay exists ⟺ the fighting kit moves on foot. Tanks, SP guns, recon vehicles and
+        /// the S-300 are their vehicles — their deployed medium is Wheeled/Tracked and the bay closes by
+        /// physics, with no per-class rule and no S-300 special case.
+        /// </summary>
+        public bool IsMobileBayOpen() =>
+            GetDeployedProfile()?.MovementMedium == MovementMedium.Foot;
+
+        /// <summary>
+        /// May this regiment carry HELO lift in the Embarked bay? Identity route: the infantry family
+        /// (AT joins iff its kit is foot). Equipment route: a deployed kit tagged
+        /// <see cref="WeaponCapability.HeloTransportable"/> (light towed tubes, MANPAD teams).
+        /// </summary>
+        public bool MayCarryHeloLift(UnitClassification identity) =>
+            GameData.IsInfantryFamily(identity)
+            || (identity == UnitClassification.AT && IsMobileBayOpen())
+            || (GetDeployedProfile()?.HasCapability(WeaponCapability.HeloTransportable) ?? false);
+
+        /// <summary>
+        /// May this regiment carry FIXED-WING lift? Identity route: paratroopers (AB/MAB/SPECF).
+        /// Equipment route: a deployed kit tagged <see cref="WeaponCapability.AirDroppable"/>
+        /// (BMDs, light towed tubes, the VDV support mount).
+        /// </summary>
+        public bool MayCarryFixedWingLift(UnitClassification identity) =>
+            identity is UnitClassification.AB or UnitClassification.MAB or UnitClassification.SPECF
+            || (GetDeployedProfile()?.HasCapability(WeaponCapability.AirDroppable) ?? false);
+
+        /// <summary>
+        /// The doctrine gate: may <paramref name="candidate"/> occupy <paramref name="bay"/> on a
+        /// regiment of <paramref name="identity"/>? Answers physical + doctrinal admissibility ONLY —
+        /// prestige, turn availability, nationality, the BMD-exclusivity purchase filter and the
+        /// transaction window are RequisitionService's questions (P4), layered on top of this one.
+        /// </summary>
+        /// <remarks>
+        /// ⚠ Naval lift can never be admitted here by construction: `TRN_NAVAL` carries
+        /// `TransportCategory.None`, and the Embarked arm admits only real transport categories.
+        /// Naval embarkation is a transient STATE (`CombatUnit.IsNavalEmbarked`), not a possession.
+        /// </remarks>
+        public bool CanAccept(UnitClassification identity, EquipmentBay bay, WeaponType candidate)
+        {
+            try
+            {
+                if (candidate == WeaponType.NONE) return false;
+                WeaponProfile profile = WeaponProfileDB.GetWeaponProfile(candidate);
+                if (profile == null) return false;
+
+                return bay switch
+                {
+                    // The fighting kit: anything that is not a transport. (Vertical-line legality —
+                    // "a tank is always a tank" — is the upgrade LIST's concern, §4.6/P4.)
+                    EquipmentBay.Deployed => profile.TransportCategory == TransportCategory.None,
+
+                    // Ground transport: bay must be open, content must be a ground vehicle.
+                    EquipmentBay.Mobile => IsMobileBayOpen()
+                        && profile.TransportCategory == TransportCategory.None
+                        && profile.MovementMedium is MovementMedium.Wheeled or MovementMedium.Tracked,
+
+                    // Air lift: content must be a real transport, of a kind this identity/kit may carry.
+                    EquipmentBay.Embarked => profile.TransportCategory switch
+                    {
+                        TransportCategory.HeloTransport => MayCarryHeloLift(identity),
+                        TransportCategory.FixedWingTransport => MayCarryFixedWingLift(identity),
+                        _ => false
+                    },
+
+                    _ => false
+                };
+            }
+            catch (Exception e)
+            {
+                AppService.HandleException(CLASS_NAME, nameof(CanAccept), e);
+                return false;
+            }
+        }
+
+        /// <summary>
+        /// Puts <paramref name="candidate"/> in <paramref name="bay"/> if <see cref="CanAccept"/> allows
+        /// it, rebuilding intel stats. The mutation funnel RequisitionService (P4) drives — validation
+        /// happens HERE so no caller, buggy or otherwise, can assemble an illegal loadout.
+        /// </summary>
+        public bool TrySetSlot(UnitClassification identity, EquipmentBay bay, WeaponType candidate, out string errorMsg)
+        {
+            errorMsg = string.Empty;
+            try
+            {
+                if (!CanAccept(identity, bay, candidate))
+                {
+                    errorMsg = $"{candidate} is not admissible in the {bay} bay of '{Name}' ({identity}).";
+                    return false;
+                }
+
+                switch (bay)
+                {
+                    case EquipmentBay.Deployed: Deployed = candidate; break;
+                    case EquipmentBay.Mobile: Mobile = candidate; break;
+                    case EquipmentBay.Embarked: Embarked = candidate; break;
+                }
+
+                BuildIntelStats();
+                WarnIfTransportIsInTheMobileSlot();
+                return true;
+            }
+            catch (Exception e)
+            {
+                AppService.HandleException(CLASS_NAME, nameof(TrySetSlot), e);
+                errorMsg = "Internal error changing equipment.";
+                return false;
+            }
+        }
+
+        /// <summary>
+        /// Empties a purchased bay (a sale, §4.6 — refund arithmetic is RequisitionService's).
+        /// The Deployed bay is never empty: a regiment always has its fighting kit.
+        /// </summary>
+        public bool TryClearSlot(EquipmentBay bay, out string errorMsg)
+        {
+            errorMsg = string.Empty;
+            try
+            {
+                if (bay == EquipmentBay.Deployed)
+                {
+                    errorMsg = $"The Deployed bay of '{Name}' cannot be emptied — a regiment always has its fighting kit.";
+                    return false;
+                }
+
+                if (bay == EquipmentBay.Mobile) Mobile = WeaponType.NONE;
+                else Embarked = WeaponType.NONE;
+
+                BuildIntelStats();
+                return true;
+            }
+            catch (Exception e)
+            {
+                AppService.HandleException(CLASS_NAME, nameof(TryClearSlot), e);
+                errorMsg = "Internal error changing equipment.";
+                return false;
+            }
+        }
+
+        #endregion // Bay Capacity & Mutation
 
         #region Icon Helpers
 

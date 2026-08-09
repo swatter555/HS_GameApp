@@ -12,7 +12,8 @@ namespace HammerAndSickle.Models
         Amphibious,        // T30 — swim open water, cross rivers
         RiverCrossing,     // generic river-edge crossing
         DeepWading,        // T29 — snorkel: cross one unbridged river edge
-        AirDroppable,      // T31 — airborne deploy slot
+        AirDroppable,      // T31 — airborne deploy slot; also fixed-wing-lift purchase eligibility (todo_profiles §4.1)
+        HeloTransportable, // sling-loadable cargo — helo-lift purchase eligibility beyond identity (todo_profiles §4.1)
         ExtendedRange,     // T32 — supply-economy bonus
         MountainMovement,  // T46 — reduced move cost in non-clear terrain
 

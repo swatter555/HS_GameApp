@@ -36,7 +36,7 @@ namespace HammerAndSickle.Audio
     /// </summary>
     /// <remarks>
     /// ⚠ THIS DELIBERATELY DOES NOT CLASSIFY ANYTHING ITSELF. It maps
-    /// <see cref="RegimentProfile.ClassifyWeaponType"/>'s output — the SINGLE prefix classifier that
+    /// <see cref="EquipmentBays.ClassifyWeaponType"/>'s output — the SINGLE prefix classifier that
     /// already backs both the intel report and the §24.8.7 loss report — onto sound families. A second
     /// prefix list would be a third opinion about what counts as a tank, and the loss-report pass (P6)
     /// specifically rejected that in favour of sharing this classifier. Do not "optimise" this into its
@@ -53,7 +53,7 @@ namespace HammerAndSickle.Audio
 
         /// <summary>Sound family for a weapon type.</summary>
         public static WeaponSoundFamily FamilyFor(WeaponType type) =>
-            FamilyFor(RegimentProfile.ClassifyWeaponType(type));
+            FamilyFor(EquipmentBays.ClassifyWeaponType(type));
 
         /// <summary>
         /// Sound family for a unit, resolved through its CURRENTLY ACTIVE weapon profile.

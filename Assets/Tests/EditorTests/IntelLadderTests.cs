@@ -64,7 +64,7 @@ namespace HammerAndSickle.Tests
         private CombatUnit StockedUnit(Side side, int x)
         {
             var unit = Unit(side, x);
-            unit.RegimentProfile.TotalIntelStats = new Dictionary<WeaponType, int>
+            unit.EquipmentBays.TotalIntelStats = new Dictionary<WeaponType, int>
             {
                 { WeaponType.Personnel, 1000 },
                 { WeaponType.TANK_T55A_SV, 100 },

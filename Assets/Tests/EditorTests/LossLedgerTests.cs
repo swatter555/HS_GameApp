@@ -10,7 +10,7 @@ namespace HammerAndSickle.Tests
     /// <summary>
     /// The equipment loss ledger (printer P5) — HP lost converted into weapon systems lost.
     ///
-    /// THE MODEL: a unit's `RegimentProfile.TotalIntelStats` is its FULL-STRENGTH roster of weapon systems,
+    /// THE MODEL: a unit's `EquipmentBays.TotalIntelStats` is its FULL-STRENGTH roster of weapon systems,
     /// and §12.2.6 scales that by currentHP/maxHP for display. So a unit that loses X% of its hit points has
     /// lost X% of its equipment, and `CombatUnit.TakeDamage` books it.
     ///
@@ -32,7 +32,7 @@ namespace HammerAndSickle.Tests
 
         /// <summary>
         /// A unit whose full-strength roster is exactly the supplied weapon systems, at full HP.
-        /// Built through the real CombatUnit/RegimentProfile path so the test exercises the same
+        /// Built through the real CombatUnit/EquipmentBays path so the test exercises the same
         /// TotalIntelStats the game reads, not a stand-in.
         /// </summary>
         private static CombatUnit MakeUnit(Side side, params (WeaponType type, int count)[] roster)
@@ -55,7 +55,7 @@ namespace HammerAndSickle.Tests
             foreach ((WeaponType type, int count) in roster)
                 stats[type] = count;
 
-            unit.RegimentProfile.TotalIntelStats = stats;
+            unit.EquipmentBays.TotalIntelStats = stats;
             return unit;
         }
 

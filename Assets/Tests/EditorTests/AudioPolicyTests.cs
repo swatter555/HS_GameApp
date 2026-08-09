@@ -133,7 +133,7 @@ namespace HammerAndSickle.Tests
             foreach (WeaponType type in Enum.GetValues(typeof(WeaponType)))
             {
                 var viaType = WeaponSoundClassifier.FamilyFor(type);
-                var viaBucket = WeaponSoundClassifier.FamilyFor(RegimentProfile.ClassifyWeaponType(type));
+                var viaBucket = WeaponSoundClassifier.FamilyFor(EquipmentBays.ClassifyWeaponType(type));
                 Assert.That(viaType, Is.EqualTo(viaBucket), $"{type} disagrees with the shared classifier");
             }
         }

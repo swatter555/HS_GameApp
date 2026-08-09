@@ -110,12 +110,9 @@ namespace HammerAndSickle.Persistence
                                 role: unit.Role,
                                 side: unit.Side,
                                 nationality: unit.Nationality,
-                                profileType: unit.RegimentProfile.ProfileType,
-                                deployedProfile: unit.RegimentProfile.Deployed,
-                                isMountable: unit.IsMountable,
-                                mobileProfile: unit.RegimentProfile.Mobile,
-                                isEmbarkable: unit.IsEmbarkable,
-                                embarkedProfile: unit.RegimentProfile.Embarked,
+                                deployedProfile: unit.EquipmentBays.Deployed,
+                                mobileProfile: unit.EquipmentBays.Mobile,
+                                embarkedProfile: unit.EquipmentBays.Embarked,
                                 category: unit.IsBase ? unit.DepotCategory : DepotCategory.Secondary,
                                 size: unit.IsBase ? unit.DepotSize : DepotSize.Small
                             );
@@ -145,9 +142,9 @@ namespace HammerAndSickle.Persistence
                             freshUnit.SetPosition(unit.MapPos);
                             freshUnit.SetSpottedLevel(unit.SpottedLevel);
 
-                            // Copy facing and embarkment state
+                            // Copy facing and the naval transient state
                             freshUnit.Facing = unit.Facing;
-                            freshUnit.SetCurrentEmbarkmentState(unit.CurrentEmbarkmentState);
+                            freshUnit.SetNavalEmbarked(unit.IsNavalEmbarked);
 
                             // Copy leader assignment (just the ID string, not the object)
                             freshUnit.LeaderID = unit.LeaderID;

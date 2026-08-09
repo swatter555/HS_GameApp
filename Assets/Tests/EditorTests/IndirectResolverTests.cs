@@ -28,8 +28,8 @@ namespace HammerAndSickle.Tests
         private CombatUnit BuildUnitAt(UnitClassification cls, WeaponType deployed, Position2D pos)
         {
             var u = new CombatUnit("U", cls, UnitRole.GroundCombat, Side.Player, Nationality.USSR);
-            u.RegimentProfile.InitializeRegimentProfile("U", RegimentProfileType.DEP,
-                WeaponType.NONE, deployed, WeaponType.NONE);
+            u.EquipmentBays.InitializeEquipmentBays("U",
+                deployed, WeaponType.NONE, WeaponType.NONE);
             u.SetDeploymentPosition(DeploymentPosition.Deployed);
             u.SetExperienceLevel(ExperienceLevel.Trained);
             u.SetPosition(pos);

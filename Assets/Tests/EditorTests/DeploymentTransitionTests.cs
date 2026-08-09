@@ -19,17 +19,18 @@ namespace HammerAndSickle.Tests
     {
         #region Helpers
 
-        /// <summary>Foot infantry whose ONLY transport is airborne — the Spetsnaz / air-mobile shape.</summary>
+        /// <summary>Foot infantry whose ONLY transport is airborne — the Spetsnaz / air-mobile shape.
+        /// (P1 2026-08-08: no declared shape, no flags — the shape IS Mobile=NONE + a populated Embarked bay.)</summary>
         private static CombatUnit MakeFootWithHelosOnly() =>
             new CombatUnit("Spetsnaz", UnitClassification.SPECF, UnitRole.GroundCombat, Side.Player,
-                Nationality.USSR, RegimentProfileType.DEP_EMB_HELO, WeaponType.INF_SPEC_SV,
-                isMountable: false, WeaponType.NONE, isEmbarkable: true, WeaponType.HEL_MI8T_SV);
+                Nationality.USSR, deployedProfile: WeaponType.INF_SPEC_SV,
+                mobileProfile: WeaponType.NONE, embarkedProfile: WeaponType.HEL_MI8T_SV);
 
         /// <summary>Foot infantry with BOTH a ground carrier and helicopters — the air-assault shape.</summary>
         private static CombatUnit MakeFootWithCarriersAndHelos() =>
             new CombatUnit("Air Assault", UnitClassification.MAM, UnitRole.GroundCombat, Side.Player,
-                Nationality.USSR, RegimentProfileType.DEP_MOB_EMB_HELO, WeaponType.INF_AM_SV,
-                isMountable: true, WeaponType.APC_MTLB_SV, isEmbarkable: true, WeaponType.HEL_MI8T_SV);
+                Nationality.USSR, deployedProfile: WeaponType.INF_AM_SV,
+                mobileProfile: WeaponType.APC_MTLB_SV, embarkedProfile: WeaponType.HEL_MI8T_SV);
 
         #endregion // Helpers
 

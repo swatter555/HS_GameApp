@@ -29,8 +29,8 @@ namespace HammerAndSickle.Tests
         private CombatUnit BuildStrike(UnitClassification cls, WeaponType jet)
         {
             var u = new CombatUnit("Strike", cls, UnitRole.AirGroundAttack, Side.Player, Nationality.USSR);
-            u.RegimentProfile.InitializeRegimentProfile("Strike", RegimentProfileType.DEP,
-                WeaponType.NONE, jet, WeaponType.NONE);
+            u.EquipmentBays.InitializeEquipmentBays("Strike",
+                jet, WeaponType.NONE, WeaponType.NONE);
             u.SetDeploymentPosition(DeploymentPosition.Deployed);
             u.SetExperienceLevel(ExperienceLevel.Trained);
             return u;
@@ -39,8 +39,8 @@ namespace HammerAndSickle.Tests
         private CombatUnit BuildIndirect(UnitClassification cls, WeaponType deployed)
         {
             var u = new CombatUnit("Arty", cls, UnitRole.GroundCombatIndirect, Side.Player, Nationality.USSR);
-            u.RegimentProfile.InitializeRegimentProfile("Arty", RegimentProfileType.DEP,
-                WeaponType.NONE, deployed, WeaponType.NONE);
+            u.EquipmentBays.InitializeEquipmentBays("Arty",
+                deployed, WeaponType.NONE, WeaponType.NONE);
             u.SetDeploymentPosition(DeploymentPosition.Deployed);
             u.SetExperienceLevel(ExperienceLevel.Trained);
             return u;
@@ -49,16 +49,16 @@ namespace HammerAndSickle.Tests
         private CombatUnit BuildBase(UnitClassification cls, WeaponType baseProfile)
         {
             var b = new CombatUnit("Base", cls, UnitRole.GroundCombatStatic, Side.AI, Nationality.USSR);
-            b.RegimentProfile.InitializeRegimentProfile("Base", RegimentProfileType.DEP,
-                WeaponType.NONE, baseProfile, WeaponType.NONE);
+            b.EquipmentBays.InitializeEquipmentBays("Base",
+                baseProfile, WeaponType.NONE, WeaponType.NONE);
             return b; // bases default to Deployed and cannot change posture (§9.3.4) — leave as-is
         }
 
         private CombatUnit BuildAttachedJet()
         {
             var j = new CombatUnit("Jet", UnitClassification.ATT, UnitRole.AirGroundAttack, Side.AI, Nationality.USSR);
-            j.RegimentProfile.InitializeRegimentProfile("Jet", RegimentProfileType.DEP,
-                WeaponType.NONE, WeaponType.ATT_SU25_SV, WeaponType.NONE);
+            j.EquipmentBays.InitializeEquipmentBays("Jet",
+                WeaponType.ATT_SU25_SV, WeaponType.NONE, WeaponType.NONE);
             j.SetExperienceLevel(ExperienceLevel.Trained);
             return j;
         }

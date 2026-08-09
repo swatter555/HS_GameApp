@@ -354,7 +354,7 @@ namespace HammerAndSickle.Core.Map
                 int hpPercent = Mathf.Clamp(Mathf.RoundToInt(unit.HitPoints.GetPercentage() * 100f), 1, 100);
 
                 // Initialize the prefab with unit ID, current state, and deploy sprite resolver
-                unitIcon.Initialize(unit.UnitID, hpPercent, unit.DeploymentPosition, unit.CurrentEmbarkmentState, GetDeploySpriteName);
+                unitIcon.Initialize(unit.UnitID, hpPercent, unit.DeploymentPosition, unit.IsNavalEmbarked, GetDeploySpriteName);
 
                 // Gate the icon's intel-bearing elements to the viewer's rung on this unit (§24.3.2).
                 ApplyIntelDisplay(unitIcon, unit);
@@ -565,8 +565,8 @@ namespace HammerAndSickle.Core.Map
                 // Normalize easterly directions to their western equivalents for sprite lookup
                 HexDirection normalizedDirection = NormalizeDirection(unit.Facing);
 
-                // Resolve sprite through the RegimentProfile icon system
-                string spriteName = unit.RegimentProfile.GetIcon(unit.DeploymentPosition, normalizedDirection);
+                // Resolve sprite through the EquipmentBays icon system
+                string spriteName = unit.EquipmentBays.GetIcon(unit.DeploymentPosition, normalizedDirection);
 
                 if (string.IsNullOrEmpty(spriteName))
                 {
@@ -737,15 +737,16 @@ namespace HammerAndSickle.Core.Map
             icon.SetIntelDisplay(hpMode, level >= SpottedLevel.Level3);
         }
 
-        private string GetDeploySpriteName(DeploymentPosition position, EmbarkmentState embarkmentState)
+        private string GetDeploySpriteName(DeploymentPosition position, bool isNavalEmbarked)
         {
             if (position == DeploymentPosition.Embarked)
             {
-                return embarkmentState switch
-                {
-                    EmbarkmentState.EmbarkedNaval => SpriteManager.EmbarkedNavalIcon,
-                    _ => SpriteManager.EmbarkedAirIcon // Fixed-wing and helo both use air icon
-                };
+                // ⚠ Naval keys on the transient-state bool (todo_profiles §4.5). The old EmbarkmentState
+                // parameter was never written by gameplay, so the naval branch was unreachable and an
+                // embarked marine drew the AIR icon (P1/D1). P2's naval path makes this branch real.
+                return isNavalEmbarked
+                    ? SpriteManager.EmbarkedNavalIcon
+                    : SpriteManager.EmbarkedAirIcon; // Fixed-wing and helo both use air icon
             }
 
             return position switch

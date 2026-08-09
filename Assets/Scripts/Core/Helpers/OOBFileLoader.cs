@@ -54,15 +54,16 @@ namespace HammerAndSickle.Helpers
         // Classification is confirmed in play; it is the only thing that would mask a failure.
         public string ClassificationName { get; set; }
         public UnitRole Role { get; set; }
-        public RegimentProfileType IntelProfileType { get; set; }
+        /* `IntelProfileType`/`IsMountable`/`IsEmbarkable` DELETED from the contract 2026-08-08 (P1) —
+         * capacity is derived from the slots below. Older `.oob` files still carrying the keys load
+         * fine: System.Text.Json skips unmapped members. The Scenario Editor already stopped emitting
+         * the first two (their Reply 4); the third goes on our P1-done signal. */
 
         // String-based weapon profile IDs from the Scenario Editor
         public string DeployedProfileID { get; set; }
         public string MobileProfileID { get; set; }
         public string EmbarkedProfileID { get; set; }
 
-        public bool IsMountable { get; set; }
-        public bool IsEmbarkable { get; set; }
         public ExperienceLevel Experience { get; set; }
         public EfficiencyLevel Efficiency { get; set; }
         public DeploymentPosition Deployment { get; set; }
@@ -381,25 +382,23 @@ namespace HammerAndSickle.Helpers
                     var nationality = data.Nationality;
                     var classification = ResolveClassification(data.ClassificationName, data.Classification);
                     var role = data.Role;
-                    var profileType = data.IntelProfileType;
                     var depotCategory = data.DepotCategory;
                     var depotSize = data.DepotSize;
 
-                    // Create unit with full constructor
+                    // Create unit with the bay constructor. ⚠ NAMED arguments on the slot trio, on
+                    // purpose: all three are WeaponTypes, and the pre-P1 positional call was one
+                    // signature edit away from silently re-binding them (todo_profiles §3).
                     var unit = new CombatUnit(
                         data.UnitName,
                         classification,
                         role,
                         side,
                         nationality,
-                        profileType,
-                        deployedProfile,
-                        data.IsMountable,
-                        mobileProfile,
-                        data.IsEmbarkable,
-                        embarkedProfile,
-                        depotCategory,
-                        depotSize
+                        deployedProfile: deployedProfile,
+                        mobileProfile: mobileProfile,
+                        embarkedProfile: embarkedProfile,
+                        category: depotCategory,
+                        size: depotSize
                     );
 
                     // Apply saved state

@@ -11,7 +11,7 @@
 //   - Constants (lines ~11-30): Combat rating modifier constants (MALUS/BONUS)
 //   - Private Fields (lines ~32-37): Dictionary storage and init flag
 //   - Public Properties (lines ~39-51): IsInitialized, ProfileCount
-//   - Public Methods (lines ~53-140): InitializeRegimentProfile(), GetWeaponProfile(), HasWeaponProfile()
+//   - Public Methods (lines ~53-140): Initialize(), GetWeaponProfile(), HasWeaponProfile()
 //   - Private Methods (lines ~142-192): CreateAllWeaponProfiles(), AddProfile()
 //   - Profile Definitions (lines ~197-10048): All 173 weapon profiles
 //
@@ -46,7 +46,7 @@
 //     - Optional combat rating modifiers (via AddCombatRatingModifier)
 //
 // USAGE:
-//   Call WeaponProfileDB.InitializeRegimentProfile() at startup.
+//   Call WeaponProfileDB.Initialize() at startup.
 //   Retrieve profiles via WeaponProfileDB.GetWeaponProfile(WeaponType.TANK_T55A_SV).
 //
 // SIZE: ~10,048 lines
@@ -1008,11 +1008,13 @@ namespace HammerAndSickle.Models
             // AMPHIBIOUS. NO RECON_FRAGILE — a survivable tank-destroyer scout that fights at range (Hard target,
             // set below) and withdraws. Konkurs gives the standoff AT punch.
             // → HA6 HD5 SA5 SD9 GAD7 · ICM 1.00 · MMP10 · SR3 · PR1 · amphibious · Hard target.
+            // AIR_DROPPABLE (ratified 2026-08-08, box 9 Option A): the VDV Support Regiment's mount —
+            // fixed-wing-lift purchase eligibility. Capability-only, zero statline effect.
             WeaponProfile BRDM2AT = WeaponProfile.FromProfileDef(
                 "BRDM-2 AT-5 Recon Vehicle", "BRDM-2 AT", WeaponType.RCN_BRDM2AT_SV,
                 new ProfileDef(FamilyArchetypes.Recon,
                     new Dictionary<ProfileStat, int>(),
-                    new[] { WeaponTrait.ATGM_RAIL, WeaponTrait.AMPHIBIOUS }),
+                    new[] { WeaponTrait.ATGM_RAIL, WeaponTrait.AMPHIBIOUS, WeaponTrait.AIR_DROPPABLE }),
                 UpgradePath.RCN, 336);
 
             // Set the prestige cost for the profile.
@@ -1230,11 +1232,14 @@ namespace HammerAndSickle.Models
             //----------------------------------------------
             // Phase 3 (derived): Artillery archetype bare (towed = foot, MMP 4) + IR SHORT.
             // → HA5 HD5 SA9 SD5 GAD8 · ICM 1.00 · MMP4 · IR4 · SR2.
+            // AIR_DROPPABLE + HELO_TRANSPORTABLE (ratified 2026-08-08, todo_profiles §4.1/§10 box 9):
+            // light towed tubes sling-load and air-drop — grants air-lift PURCHASE eligibility.
+            // Capability-only traits, zero statline effect.
             WeaponProfile ArtLight = WeaponProfile.FromProfileDef(
                 "Light Towed Artillery", "Lt Artillery", WeaponType.ART_LIGHT_SV,
                 new ProfileDef(FamilyArchetypes.Artillery,
                     new Dictionary<ProfileStat, int> { { ProfileStat.IR, GameData.INDIRECT_RANGE_SHORT } },
-                    System.Array.Empty<WeaponTrait>()),
+                    new[] { WeaponTrait.AIR_DROPPABLE, WeaponTrait.HELO_TRANSPORTABLE }),
                 UpgradePath.ART, 60);
 
             // Set the prestige cost for the profile.
@@ -1786,8 +1791,11 @@ namespace HammerAndSickle.Models
             };
 
             // Add the S-300 profile to the database
-            // Towed vs self-propelled: the artillery/AAA/SAM families hold both, so medium is per profile.
-            S300.SetMovementMedium(MovementMedium.Foot);
+            // ⚠ Wheeled, NOT Foot (fixed 2026-08-08, todo_profiles box 1): the S-300 rides its own
+            // TELs — self-contained like a tank, and its statline always said so ("truck MMP 8").
+            // Under derived bay capacity (§4.1) a Foot medium would have OPENED its Mobile bay,
+            // the exact inverse of Bob's ruling. The scenario editor flagged this one.
+            S300.SetMovementMedium(MovementMedium.Wheeled);
             AddProfile(WeaponType.SAM_S300_SV, S300);
             //----------------------------------------------
             // Soviet S-300 SAM System
@@ -2646,6 +2654,11 @@ namespace HammerAndSickle.Models
 
             // Add the Naval Transport profile to the database
             NAVAL.SetPrestigeCost(PrestigeTierCost.Gen1, PrestigeTypeCost.TRK);
+            // ⚠ Naval, overriding the Truck family default (P1 2026-08-08, todo_profiles §4.5): this is
+            // THE shared sealift profile drawn while CombatUnit.IsNavalEmbarked — the medium is what
+            // tells movement/audio/spotting "this unit is on water". Never authored into any bay
+            // (TransportCategory stays None, so EquipmentBays.CanAccept refuses it by construction).
+            NAVAL.SetMovementMedium(MovementMedium.Naval);
             AddProfile(WeaponType.TRN_NAVAL, NAVAL);
             //----------------------------------------------
             // Soviet Naval Transport Flotilla

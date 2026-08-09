@@ -218,16 +218,12 @@ namespace HammerAndSickle.Core.GameData
         Fortified    = 0
     }
 
-    /// <summary>
-    /// Represents the type of transport a unit is currently embarked on.
-    /// </summary>
-    public enum EmbarkmentState
-    {
-        NotEmbarked     = 0,
-        EmbarkedNaval   = 1,
-        EmbarkedFixedWing = 2,
-        EmbarkedHelo    = 3
-    }
+    /* ⚠ EmbarkmentState DELETED 2026-08-08 (P1, todo_profiles §3/D1). It was never written by any
+     * gameplay path — permanently NotEmbarked outside save restore — so its three readers (§12.3
+     * airborne spotting, the CombatResolver helo-AD lane, the naval embark icon) were silently dead.
+     * The questions it pretended to answer are DERIVED now: "helo-borne right now" =
+     * MovementModeService.CurrentMedium == Helo; "naval-embarked" = CombatUnit.IsNavalEmbarked,
+     * the transient-state bool the P2 naval path will write. */
 
     #endregion // DeploymentStateMachine
 
@@ -704,7 +700,7 @@ namespace HammerAndSickle.Core.GameData
     /// ⚠ WHY THIS HAD TO EXIST. Nothing else in the model distinguishes an MT-LB from a BTR-70: same
     /// `APC_` prefix, same `FamilyArchetypes.Apc`, same `AMPHIBIOUS` trait, same `UpgradePath.APC`, same
     /// MMP 8, same `EquipmentBucket.APC`. One is tracked and one is wheeled and the code could not tell.
-    /// ⚠ `RegimentProfile.ClassifyWeaponType` cannot answer this and must not be asked to: it is a ROLE
+    /// ⚠ `EquipmentBays.ClassifyWeaponType` cannot answer this and must not be asked to: it is a ROLE
     /// classifier (it deliberately folds `ART_`/`SPA_` together and puts trucks with transport planes),
     /// so it answers a DIFFERENT question. Two axes, two answers — this is not a second opinion on the
     /// same axis, which is the thing the project forbids.
@@ -1067,45 +1063,13 @@ namespace HammerAndSickle.Core.GameData
         #endregion // Non-Profile Units
     }
 
-    /// <summary>
-    /// The specific regiment profile, which determines the unit's visual representation and upgrade path.
-    /// </summary>
-    public enum RegimentProfileType
-    {
-        /// <summary>
-        /// Glossary:
-        /// DEP = Deployed
-        /// DEP_MOB = Deployed and Mobile
-        /// DEP_MOB_EMB_HELO = Deployed, Mobile, and Embarked Helicopter
-        /// DEP_MOB_EMB_AIR = Deployed, Mobile, and Embarked Air (Fixed-Wing)
-        /// DEP_MOB_EMB_NAVAL = Deployed, Mobile, and Embarked Naval
-        /// DEP_EMB_HELO = Deployed and Embarked Helicopter, NO ground transport
-        /// DEP_EMB_AIR = Deployed and Embarked Air, NO ground transport
-        /// </summary>
-
-        Default,
-
-        DEP,
-        DEP_MOB,
-        DEP_MOB_EMB_HELO,
-        DEP_MOB_EMB_AIR,
-        DEP_MOB_EMB_NAVAL,
-
-        /* ⚠ ADDED 2026-08-04 BECAUSE THEIR ABSENCE WAS CAUSING A REAL BUG. A regiment whose only
-         * transport is airborne — Spetsnaz with Mi-8s, air-mobile infantry with no carriers — could not
-         * be expressed: the shapes above all require a ground Mobile slot. So the helicopter was authored
-         * into the MOBILE slot instead, and the unit "mounted up" into helicopters as its ground posture.
-         *
-         * The state machine carried the same scar: TryDeployUP hardcoded an override letting AB/MAB, and
-         * SPECF only when its embarked profile was literally TRN_AN8_SV, skip Mobile. A Spetsnaz regiment
-         * carrying a Mi-8 missed that hardcoded weapon type and fell through to Mobile. Both the data
-         * workaround and the hardcoded override exist because these two members did not.
-         *
-         * ⚠ Persisted BY NAME, so adding members is safe and needs no SAVE_VERSION bump — but never
-         * RENAME one (CLAUDE.md item 11). */
-        DEP_EMB_HELO,
-        DEP_EMB_AIR,
-    }
+    /* ⚠ RegimentProfileType DELETED 2026-08-08 (P1, todo_profiles §3). The full-tree sweep found it
+     * had ZERO behavioural reads — authored 169 times, persisted, cloned, never branched on. Which
+     * bays a regiment HAS is now DERIVED (EquipmentBays.CanAccept: deployed medium + identity +
+     * capability tags); which bays are FILLED is the slot contents themselves. A declared shape was
+     * a second source of truth that could lie — and did, 36 templates out of 169. The `.oob` key
+     * `IntelProfileType` and save key `profileType` are gone with it (SAVE_VERSION 5); old files
+     * still load because unmapped JSON members are skipped. */
 
     #endregion // InitializeRegimentProfile Enums
 
@@ -1569,7 +1533,12 @@ namespace HammerAndSickle.Core.GameData
         // ⚠ THIS REASONING EXPIRES THE MOMENT SAVING IS WIRED UP. Once a save can exist in the wild, any
         // shape change needs its own version — amending a released version's shape in place is exactly the
         // silent-mismatch failure the ladder exists to prevent.
-        public const int SAVE_VERSION = 4;
+        //
+        // 4 → 5 (2026-08-08, the profile-slot rebuild P1): `profileType`, `isMountable`, `isEmbarkable`
+        // and `currentEmbarkmentState` dropped from the unit shape; `isNavalEmbarked` added (the naval
+        // transient-state bool, written by the P2 naval-embark path); `regimentProfile` renamed
+        // `equipmentBays`. No migration step — SaveLoad still has zero callers, pre-1.0 clean break.
+        public const int SAVE_VERSION = 5;
 
         #endregion
 
@@ -1782,6 +1751,21 @@ namespace HammerAndSickle.Core.GameData
             c == UnitClassification.FGT || c == UnitClassification.ATT || c == UnitClassification.BMB
             || c == UnitClassification.RECONA || c == UnitClassification.AWACS
             || c == UnitClassification.WW || c == UnitClassification.TRN;
+
+        /// <summary>
+        /// The leg-carried identities — the family whose members may buy helo lift by IDENTITY
+        /// (todo_profiles §4.1, ratified 2026-08-08). ⚠ CAV is deliberately ABSENT (Bob: "CAV is
+        /// tank-like" — a vehicle class, no bays) and AT is deliberately absent HERE: it joins iff its
+        /// deployed kit is foot, which EquipmentBays.MayCarryHeloLift checks at the call site because
+        /// only it can see the kit. Equipment-tag exceptions (HeloTransportable/AirDroppable) layer on
+        /// top — never duplicate this list onto profiles.
+        /// </summary>
+        public static bool IsInfantryFamily(UnitClassification c) =>
+            c is UnitClassification.INF or UnitClassification.MOT or UnitClassification.MECH
+            or UnitClassification.AB or UnitClassification.MAB
+            or UnitClassification.MAR or UnitClassification.MMAR
+            or UnitClassification.AM or UnitClassification.MAM
+            or UnitClassification.SPECF or UnitClassification.ENG;
 
         // High mach aircraft speeds
         public const int AC_HIGHSPEED_RUSSIAN = 17;

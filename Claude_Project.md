@@ -3,7 +3,7 @@
 Unity Version = 6000.2.6f2
 URP Version = 17.2.0
 
-_Last reconciled against the codebase: 2026-08-03._
+_Last reconciled against the codebase: 2026-08-08 (P1 of the profile-slot rebuild — see §3.2b)._
 
 **Large files (>1000 lines):** WeaponProfileDB.cs (6,677), CombatUnitDB.cs (5,224), CombatUnit.cs (2,469), GameData.cs (1,939), GameAudioManager.cs (1,627 — SFX path removed 2026-08-03), InputService_BattleMap.cs (1,431), SpriteManager.cs (1,420), BattleManager.cs (1,171), HexGridRenderer.cs (1,096), LeaderSkillCatalog.cs (1,096), GameIconRenderer.cs (1,084). Read these in chunks.
 
@@ -36,7 +36,8 @@ Assets/Scripts/
 │   │                    GroundCombatAction, IndirectCombatAction, AirCombatEngine, AirStandCheck,
 │   │                    AirAmbushCheck, HeloTransitStandCheck, ReconMissionEngine,
 │   │                    AOBMissionResolver, AOBStatus
-│   ├── CombatUnit/      CombatUnit.cs, RegimentProfile.cs, WeaponProfile.cs, CombatUnitDB.cs, WeaponProfileDB.cs
+│   ├── CombatUnit/      CombatUnit.cs, EquipmentBays.cs (was RegimentProfile.cs, renamed P1 2026-08-08),
+│   │                    WeaponProfile.cs, CombatUnitDB.cs, WeaponProfileDB.cs
 │   │   └── Traits/      ProfileStat, WeaponCapability, WeaponTrait, WeaponTraitCatalog, TraitDef,
 │   │                    TraitEffect, TraitTaxonomy, TraitResolver, Archetype (+TankArchetypes/ProfileDef),
 │   │                    FamilyArchetypes
@@ -162,6 +163,16 @@ Battle-scene lifecycle owner. Scenario setup (`SetupBattleManagerData`: manifest
 **Air attachment:** Airbases maintain attached air unit lists. **Actions:** 5 types (Move, Combat, Deploy, Opportunity, Intel).
 
 ### 3.2b THE PROFILE-SLOT RULE — three EQUIPMENT BAYS, not three loadouts (RATIFIED 2026-08-04)
+
+> **⚠ SUPERSEDED IN MECHANISM 2026-08-08 — P1 of the profile-slot rebuild (`todo_profiles.md`, the
+> current authority).** The RULE below stands; its MECHANISM changed: `RegimentProfile` is renamed
+> **`EquipmentBays`**, and `RegimentProfileType` + `isMountable`/`isEmbarkable` + `EmbarkmentState`
+> are **DELETED** (all had zero live readers — capacity was already fiction). Which bays a regiment
+> has is now **DERIVED**: Mobile bay open ⟺ deployed medium is `Foot`; Embarked kinds from identity
+> (`GameData.IsInfantryFamily`, AB/MAB/SPECF) + equipment tags (`AirDroppable`/`HeloTransportable`);
+> naval is a transient state (`IsNavalEmbarked` + shared `TRN_NAVAL`, never a bay). One address:
+> `EquipmentBays.CanAccept`/`TrySetSlot`/`TryClearSlot`; audited by `EquipmentBaysTests`.
+> Point 2 below ("flags declare capability") is RETIRED — nothing declares; physics + doctrine derive.
 
 ⚠ **The absence of this rule caused every defect in the 2026-08-04 movement/audio pass.** Write new code against it.
 

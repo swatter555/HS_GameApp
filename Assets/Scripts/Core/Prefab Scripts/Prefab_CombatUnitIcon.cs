@@ -51,9 +51,10 @@ namespace HammerAndSickle.Core
         private string _unitId;
 
         /// <summary>
-        /// Callback provided by the renderer to resolve a deployment position and embarkment state into a sprite name.
+        /// Callback provided by the renderer to resolve a deployment position (and the naval transient
+        /// state, todo_profiles §4.5) into a sprite name.
         /// </summary>
-        private Func<DeploymentPosition, EmbarkmentState, string> _resolveDeploySprite;
+        private Func<DeploymentPosition, bool, string> _resolveDeploySprite;
 
         // Motion flipbook (RegimentIconType.Helo_Animation): atlas ships 6 frames per helo named
         // "<unit>_Frame0".."_Frame5". While the icon is tween-moving the frames loop at animationFps;
@@ -75,7 +76,7 @@ namespace HammerAndSickle.Core
         private bool _deploymentKnown = true;
         private int _hpPercent;
         private DeploymentPosition _deploymentPosition;
-        private EmbarkmentState _embarkmentState;
+        private bool _isNavalEmbarked;
 
         private const string HP_HIDDEN_TEXT = "-";
         private const string HP_BAND_FULL = "FUL";
@@ -162,16 +163,16 @@ namespace HammerAndSickle.Core
         /// <param name="unitId">The unit ID this icon represents</param>
         /// <param name="hitPointPercent">Current hit points as a percentage (1-100)</param>
         /// <param name="deploymentPosition">Current deployment position for the deploy icon</param>
-        /// <param name="embarkmentState">Current embarkment state (relevant when position is Embarked)</param>
-        /// <param name="resolveDeploySprite">Callback to resolve a DeploymentPosition and EmbarkmentState to a sprite name</param>
+        /// <param name="isNavalEmbarked">The naval transient state (relevant when position is Embarked)</param>
+        /// <param name="resolveDeploySprite">Callback to resolve a DeploymentPosition + naval flag to a sprite name</param>
         public void Initialize(string unitId, int hitPointPercent, DeploymentPosition deploymentPosition,
-            EmbarkmentState embarkmentState, Func<DeploymentPosition, EmbarkmentState, string> resolveDeploySprite = null)
+            bool isNavalEmbarked, Func<DeploymentPosition, bool, string> resolveDeploySprite = null)
         {
             _unitId = unitId;
             _resolveDeploySprite = resolveDeploySprite;
             _hpPercent = hitPointPercent;
             _deploymentPosition = deploymentPosition;
-            _embarkmentState = embarkmentState;
+            _isNavalEmbarked = isNavalEmbarked;
 
             InitializeHitPointsText();
             RefreshHitPointText();
@@ -519,14 +520,16 @@ namespace HammerAndSickle.Core
         }
 
         /// <summary>
-        /// Subscribes to EventManager events for hit points and deployment changes.
+        /// Subscribes to EventManager events for hit-point changes.
+        /// (The OnUnitDeploymentChanged subscription was DELETED 2026-08-08 with the event itself,
+        /// D10 ratified — the event was never raised; posture changes refresh via the coarse
+        /// RaiseRedrawMapIcons redraw, which rebuilds every icon from live unit state.)
         /// </summary>
         private void SubscribeToEvents()
         {
             if (EventManager.Instance != null)
             {
                 EventManager.Instance.OnUnitHitPointsChanged += OnUnitHitPointsChanged;
-                EventManager.Instance.OnUnitDeploymentChanged += OnUnitDeploymentChanged;
             }
         }
 
@@ -538,7 +541,6 @@ namespace HammerAndSickle.Core
             if (EventManager.Instance != null)
             {
                 EventManager.Instance.OnUnitHitPointsChanged -= OnUnitHitPointsChanged;
-                EventManager.Instance.OnUnitDeploymentChanged -= OnUnitDeploymentChanged;
             }
         }
 
@@ -606,7 +608,7 @@ namespace HammerAndSickle.Core
             if (_resolveDeploySprite == null) return;
 
             string spriteName = _deploymentKnown
-                ? _resolveDeploySprite(_deploymentPosition, _embarkmentState)
+                ? _resolveDeploySprite(_deploymentPosition, _isNavalEmbarked)
                 : SpriteManager.UnknownDeploymentIcon;
 
             SetDeployIcon(spriteName);
@@ -628,19 +630,8 @@ namespace HammerAndSickle.Core
             RefreshHitPointText();
         }
 
-        /// <summary>
-        /// Handles deployment state changes for this unit. Caches the true posture and re-renders through the
-        /// current intel gate — while posture is unknown (§12.2.2) the icon keeps the unknown marker, so a
-        /// hidden enemy digging in does not announce itself.
-        /// </summary>
-        private void OnUnitDeploymentChanged(string unitId, DeploymentPosition newPosition, EmbarkmentState embarkmentState)
-        {
-            if (unitId != _unitId) return;
-
-            _deploymentPosition = newPosition;
-            _embarkmentState = embarkmentState;
-            RefreshDeployIcon();
-        }
+        // (OnUnitDeploymentChanged handler DELETED 2026-08-08 — D10. The event had no raiser; the
+        // coarse RaiseRedrawMapIcons redraw is the ratified refresh mechanism for posture changes.)
 
         #endregion // Event Handlers
     }

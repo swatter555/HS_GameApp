@@ -65,8 +65,11 @@ purchasable bays with DERIVED capacity (from deployed-profile `MovementMedium` +
 lift as a transient state, and a headless buy/sell/upgrade API. ⚠ **It ABSORBS todo_audio §3b
 M4 and part of M5** (the `isAir` fix now covers `HexMapUtil` range+path AND `ExecuteMovement`,
 as rebuild phase P3) — do NOT run M4 standalone from `todo_audio.md`.
-**HOLD STATE: waiting on P0 (Bob)** — M3 suite run + both khost `.oob` re-exports + commit.
-P1 (derive + delete `RegimentProfileType`/flags/`EmbarkmentState`) starts only on his green.
+**STATE 2026-08-08: P0 ✅ AND P1 ✅ — SUITE GREEN, COMMITTED.** The enum/flags/`EmbarkmentState`
+are deleted, `RegimentProfile` is `EquipmentBays` with the derived-capacity API, SAVE_VERSION is 5,
+`EquipmentBaysTests` guards the invariants, the editor's `IsEmbarkable` flip is authorized.
+**▶ NEXT: P2** (naval transient state + rewritten embark gates + defects D2–D7 — `todo_profiles.md`
+§4.4/§4.5/§5). Still open, non-blocking: Bob rules census A (towed-tube air-lift tags).
 
 **State at hand-off (2026-08-04, mid-pass — READ §3b BEFORE TOUCHING MOVEMENT OR AUDIO):**
 - **M0 ✅** committed (`d6abfcb`, `0558653`) and pushed. **M1 ✅ green. M2 ✅ green + confirmed by ear** —
@@ -98,6 +101,13 @@ which edges he has in mind — this note records the intent, not a diagnosis, an
 its own list is his. Never started; still worth doing.
 
 ### BOB'S QUEUE (nobody else can do these)
+
+- [ ] **BUILD VERSIONING (Bob, 2026-08-08): start versioning game builds, beginning with the
+      P1 build.** Bob-side: pick a scheme (proposal: `0.<pass>.<hotfix>` pre-1.0) and set it in
+      Project Settings → Player → Version. Agent-side once a number exists: surface
+      `Application.version` in the main menu + logs, and stamp it into the save header's
+      provenance block when saving gets wired (it declares content provenance today but not the
+      BUILD that wrote it).
 
 - [ ] **Run `Tools/UI/Audit Button Wiring`** now that ~20 buttons are wired — it should come back clean, and
       that is the tool's first real exercise. (The three-button blocker it was queued behind is resolved.)

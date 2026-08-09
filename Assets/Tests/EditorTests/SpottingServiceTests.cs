@@ -131,18 +131,26 @@ namespace HammerAndSickle.Tests
         }
 
         [Test]
-        public void Sweep_SamVsEmbarkedHeloLift_TreatedAsAirTarget()
+        public void Sweep_SamVsAirborneHeloLift_TreatedAsAirTarget()
         {
-            // An AM/MAM air-assault lift (EmbarkedHelo state) IS an air target — a lift cannot hide as easily as
-            // an NOE gunship — so the SAM's air range (6) catches it at distance 5.
+            /* An AM/MAM air-assault lift in flight IS an air target — a lift cannot hide as easily as an
+             * NOE gunship — so the SAM's air range (6) catches it at distance 5. ⚠ REWRITTEN 2026-08-08
+             * (P1/D1): the old test forced the never-written EmbarkmentState, so this §12.3 rule never
+             * actually fired in play. The real fact is the active profile's medium: Embarked + helos in
+             * the bay = riding helicopters. */
+            if (!WeaponProfileDB.IsInitialized)
+                WeaponProfileDB.Initialize();
+
             var sam = Spotter(UnitClassification.SAM);
             var lift = Target(UnitClassification.AM, SPOT_X + 5);
-            lift.SetCurrentEmbarkmentState(EmbarkmentState.EmbarkedHelo);
+            lift.EquipmentBays.InitializeEquipmentBays("Lift",
+                WeaponType.INF_AM_SV, WeaponType.NONE, WeaponType.HEL_MI8T_SV);
+            lift.SetDeploymentPosition(DeploymentPosition.Embarked);
 
             SpottingService.RecomputeAllSpotting();
 
             Assert.AreEqual(SpottedLevel.Level1, lift.SpottedLevel,
-                "An EmbarkedHelo air-assault lift is an air target, caught within the SAM air range (6)");
+                "An airborne air-assault lift is an air target, caught within the SAM air range (6)");
         }
 
         [Test]

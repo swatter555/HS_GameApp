@@ -794,11 +794,13 @@ namespace HammerAndSickle.Models.Combat
 
         /// <summary>
         /// True if the aircraft is engaged on the helo air-defense axis (GAT−GAD, §7A.14): an attack helicopter
-        /// (HELO) or an air-mobile unit caught mid-transit in EmbarkedHelo state (§11.8.9 / §5.13.2.4).
+        /// (HELO) or a regiment caught mid-transit riding helo lift (§11.8.9 / §5.13.2.4).
+        /// ⚠ The second arm read the never-written EmbarkmentState until 2026-08-08 (P1/D1) and was permanently
+        /// false — the §11.8.9 lane never fired for a lift in transit. The ACTIVE PROFILE's medium is the fact.
         /// </summary>
         public static bool IsHeloAirDefenseTarget(CombatUnit aircraft) =>
             aircraft.Classification == UnitClassification.HELO
-            || aircraft.CurrentEmbarkmentState == EmbarkmentState.EmbarkedHelo;
+            || aircraft.GetActiveWeaponProfile()?.MovementMedium == MovementMedium.Helo;
 
         #endregion // Ground-to-air opportunity fire
     }

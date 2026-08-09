@@ -124,7 +124,7 @@ namespace HammerAndSickle.Audio
         /// their regiment taking fire without learning what fired. It is also why no "generic substitute
         /// sound" concept is needed anywhere in the design.
         ///
-        /// ⚠ Armour vs soft comes from <see cref="RegimentProfile.ClassifyWeaponType"/> — the same single
+        /// ⚠ Armour vs soft comes from <see cref="EquipmentBays.ClassifyWeaponType"/> — the same single
         /// classifier behind the intel and §24.8.7 loss reports — so audio can never call something a tank
         /// that the loss report calls an AFV. Do not add a second list here.
         /// </remarks>
@@ -177,7 +177,7 @@ namespace HammerAndSickle.Audio
             WeaponProfile profile = target.GetActiveWeaponProfile();
             if (profile == null) return GameAudioManager.SoundEffect.ImpactSoft;
 
-            return RegimentProfile.ClassifyWeaponType(profile.WeaponType) switch
+            return EquipmentBays.ClassifyWeaponType(profile.WeaponType) switch
             {
                 EquipmentBucket.TANK or EquipmentBucket.IFV or EquipmentBucket.APC
                     => GameAudioManager.SoundEffect.ImpactArmour,

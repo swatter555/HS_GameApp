@@ -58,8 +58,8 @@ namespace HammerAndSickle.Tests
             var nat = side == Side.Player ? Nationality.USSR : Nationality.MJ;
             var role = cls == UnitClassification.SPA ? UnitRole.GroundCombatIndirect : UnitRole.GroundCombat;
             var u = new CombatUnit("U", cls, role, side, nat);
-            u.RegimentProfile.InitializeRegimentProfile("U", RegimentProfileType.DEP,
-                WeaponType.NONE, deployed, WeaponType.NONE);
+            u.EquipmentBays.InitializeEquipmentBays("U",
+                deployed, WeaponType.NONE, WeaponType.NONE);
             u.SetDeploymentPosition(DeploymentPosition.Deployed);
             u.SetExperienceLevel(ExperienceLevel.Trained);
             u.SetEfficiencyLevel(EfficiencyLevel.FullOperations);

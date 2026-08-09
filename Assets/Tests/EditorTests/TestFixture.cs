@@ -144,7 +144,7 @@ namespace HammerAndSickle.Tests
             {
                 TestLog.Add("Initializing test environment");
 
-                // InitializeRegimentProfile AppService for testing
+                // Initialize AppService for testing
                 TestHandler = new TestHandler();
                 AppService.SetTestHandler(TestHandler);
 

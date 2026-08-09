@@ -129,6 +129,10 @@ namespace HammerAndSickle.Models
                 "Full swim (BMP/BTR/BMD/AAV7).", Cap(WeaponCapability.Amphibious)));
             Add(new TraitDef(WeaponTrait.AIR_DROPPABLE, TraitCategory.GroundMobility,
                 "BMD/Sheridan airborne deploy.", Cap(WeaponCapability.AirDroppable)));
+            Add(new TraitDef(WeaponTrait.HELO_TRANSPORTABLE, TraitCategory.GroundMobility,
+                "Sling-loadable kit (D-30, MANPAD teams) — grants helo-lift purchase eligibility " +
+                "beyond the infantry-family identity rule. Doctrine grant, not physics: heavy towed " +
+                "pieces deliberately lack it.", Cap(WeaponCapability.HeloTransportable)));
             Add(new TraitDef(WeaponTrait.EXTENDED_RANGE_FUEL, TraitCategory.GroundMobility,
                 "Soviet long-range drums — supply ×0.9.", Cap(WeaponCapability.ExtendedRange)));
             Add(new TraitDef(WeaponTrait.HIGH_GROUND_PRESSURE, TraitCategory.GroundMobility,

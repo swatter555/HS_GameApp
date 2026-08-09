@@ -27,8 +27,8 @@ namespace HammerAndSickle.Tests
         private CombatUnit BuildUnit(UnitClassification cls, WeaponType deployed)
         {
             var u = new CombatUnit("U", cls, UnitRole.GroundCombat, Side.Player, Nationality.USSR);
-            u.RegimentProfile.InitializeRegimentProfile("U", RegimentProfileType.DEP,
-                WeaponType.NONE, deployed, WeaponType.NONE);
+            u.EquipmentBays.InitializeEquipmentBays("U",
+                deployed, WeaponType.NONE, WeaponType.NONE);
             u.SetDeploymentPosition(DeploymentPosition.Deployed);
             u.SetExperienceLevel(ExperienceLevel.Trained);
             return u;
@@ -37,8 +37,8 @@ namespace HammerAndSickle.Tests
         private CombatUnit BuildStrike(UnitClassification cls, WeaponType jet)
         {
             var u = new CombatUnit("Strike", cls, UnitRole.AirGroundAttack, Side.Player, Nationality.USSR);
-            u.RegimentProfile.InitializeRegimentProfile("Strike", RegimentProfileType.DEP,
-                WeaponType.NONE, jet, WeaponType.NONE);
+            u.EquipmentBays.InitializeEquipmentBays("Strike",
+                jet, WeaponType.NONE, WeaponType.NONE);
             u.SetDeploymentPosition(DeploymentPosition.Deployed);
             u.SetExperienceLevel(ExperienceLevel.Trained);
             return u;

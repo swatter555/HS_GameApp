@@ -154,14 +154,14 @@ namespace HammerAndSickle.Controllers
         // EQUIPMENT LOSS LEDGER — the accounting behind the §24.8 loss report (printer P6).
         //
         // THE MODEL (Bob's, ratified 2026-07-25): HIT POINTS ALREADY ARE EQUIPMENT. A unit's
-        // RegimentProfile.TotalIntelStats is its FULL-STRENGTH roster of weapon systems — the intel stats
+        // EquipmentBays.TotalIntelStats is its FULL-STRENGTH roster of weapon systems — the intel stats
         // of its deployed/mobile/embarked WeaponProfiles, summed — and §12.2.6 scales those linearly by
         // currentHP/maxHP for display. So HP lost converts directly into weapon systems lost. There is no
         // second model to keep in sync; this is a reading of the one that already exists.
         //
         // ⚠ KEYED BY WeaponType, NOT by display bucket. The report's rows (Men/Tanks/AFVs/Guns/Aircraft/
         // Helicopters) are a rollup performed at RENDER time through the same name-prefix logic
-        // RegimentProfile.GetIntelReport() uses, so the loss report and the intel report cannot drift
+        // EquipmentBays.GetIntelReport() uses, so the loss report and the intel report cannot drift
         // apart. Per-type granularity ("18 T-72A lost") then comes free later at no extra cost.
         //
         // ⚠ THE VALUES ARE float AND THAT IS LOAD-BEARING — do not "tidy" this to int. Rounding per damage
@@ -299,7 +299,7 @@ namespace HammerAndSickle.Controllers
             // The unit's FULL-STRENGTH weapon systems. TotalIntelStats is never HP-scaled at rest — the
             // scaling happens in CombatUnit.ApplyEquipmentBuckets at display time — which is exactly what
             // makes it the correct multiplicand here.
-            Dictionary<WeaponType, int> fullStrengthStats = unit.RegimentProfile?.TotalIntelStats;
+            Dictionary<WeaponType, int> fullStrengthStats = unit.EquipmentBays?.TotalIntelStats;
             if (fullStrengthStats == null || fullStrengthStats.Count == 0)
                 return;
 

@@ -414,7 +414,64 @@ fix the dangling Appendix W citation (§34.5) while in the file.
 - **NEW gate into P1: decision box 9** (VDV expressibility/load policy) — P1's capacity rules
   cannot land with two shipped templates in an undefined state.
 
-**P0 CLOSEOUT (2026-08-08):** (a) ✅ **suite GREEN — all 452 tests** (Bob ran the Test Runner);
-(b) ✅ OOB check done (fresh-placement test + in-game load of the new format); box 9 ✅ ruled
-(Option A). **(d) COMMIT is the LAST remaining gate — everything after `d6abfcb` is uncommitted.**
-**P1 starts on the commit.** No code from this doc has been written.
+**P0 CLOSED (2026-08-08):** suite green (452) · OOB check done · box 9 ruled · committed `36175e2`.
+
+## 12. P1 — ✅ CLOSED: SUITE GREEN 2026-08-08 (Bob ran the full Test Runner), committed
+
+**The editor's `IsEmbarkable` flip is AUTHORIZED** — green confirmation delivered to their
+Markdowns per the Reply-4 contract. Census A (towed-tube tags) remains Bob's to rule; the tags are
+two-line additions whenever ruled and gate nothing. **▶ NEXT: P2** — the naval transient state's
+embark/debark path (universal port rule, marines' beachhead debark), the rewritten embark gates
+(FW-needs-airbase by TransportCategory, no classification cases), and defects D2–D7.
+
+### What landed
+- **Deleted outright:** `RegimentProfileType` (169 authoring lines + enum + save/`.oob` fields),
+  `isMountable`/`isEmbarkable` (properties, ctor params, DTO fields, 338 authoring lines),
+  `EmbarkmentState` (enum, property, setter, event plumbing), `RaiseUnitDeploymentChanged` +
+  subscriber (D10). `SAVE_VERSION` 4 → **5**.
+- **`RegimentProfile` → `EquipmentBays`** (git-mv, meta preserved): + `EquipmentBay` enum,
+  `IsMobileBayOpen` / `MayCarryHeloLift` / `MayCarryFixedWingLift` / `CanAccept` /
+  `TrySetSlot` / `TryClearSlot` (the §4.1–§4.3 doctrine layer, stateless, identity passed in).
+  Init signature reordered DEP/MOB/EMB (the old mobile-before-deployed mis-bind trap is gone);
+  every caller rewritten with NAMED slot arguments.
+- **Capability tags:** new `WeaponTrait.HELO_TRANSPORTABLE` → `WeaponCapability.HeloTransportable`;
+  `ART_LIGHT_SV` tagged BOTH, `RCN_BRDM2AT_SV` tagged `AIR_DROPPABLE` (already existed as T31 on
+  the BMDs + five nations' airborne infantry). Capability-only traits — zero statline change.
+- **`SAM_S300_SV` medium Foot → Wheeled** (box 1; the editor's catch). Statline untouched
+  ("truck MMP 8" already said wheeled).
+- **Naval groundwork (P2-ready):** `CombatUnit.IsNavalEmbarked` (persisted, no writers yet) +
+  `GetActiveWeaponProfile` naval branch drawing the shared `TRN_NAVAL` (whose medium is now
+  `Naval`, overriding its Truck family default); `TRN_NAVAL` REMOVED from the two Naval Infantry
+  templates' Embarked bays (§9.10.6 finally enforced). ⚠ Interim consequence, deliberate: marines
+  cannot naval-embark until the P2 universal port path lands (nothing in khost uses it).
+- **D1 re-points, now LIVE rules:** §12.3 airborne-spotting (helo-riders are air targets; HELO
+  gunships excluded — NoE), `CombatResolver.IsHeloAirDefenseTarget` (§11.8.9 lane fires for lifts
+  in transit), the naval icon branch (keys on the bool). The two tests that pinned the dead state
+  were REWRITTEN to exercise the real mechanism.
+- **New suite `EquipmentBaysTests`** (12): the three §4.3 template audits over all 169 templates,
+  bay capacity by physics (tank/S-300 closed, infantry/S-75 open), both eligibility routes,
+  CanAccept/TrySetSlot/TryClearSlot, naval-never-a-slot + transient-state draw, D1 pins.
+- ⚠ Mid-pass incident, resolved: a PowerShell `Get-Content`/`Set-Content` pass double-encoded
+  `CombatUnitDB.cs`'s Unicode (UTF-8-no-BOM misread as ANSI); restored from git, redone with
+  explicit UTF-8. Bulk file edits in this repo must use BOM-aware IO.
+
+### ⬚ THE TWO CENSUSES — Bob's Y/N (code follows the rulings; agent proposals marked)
+**A. Towed-tube air-lift tags** (`ART_LIGHT_SV` already ratified BOTH):
+| Profile | Proposal |
+|---|---|
+| `ART_LIGHT_WEST`, `ART_LT_AR`, `ART_LT_CH`, `ART_MJ_LT`, `ART_MJ_MORT` | **BOTH** (light guns/mortars) |
+| `ART_HEAVY_SV`, `ART_HEAVY_WEST`, `ART_HV_AR`, `ART_HV_CH` | **NEITHER** (heavy pieces) |
+| `AAA_GEN_SV`, `AAA_MJ` (ZU-23-class — genuinely helo-portable) | **Bob's call** (agent leans HeloTransportable only) |
+| `SAM_S75_SV`, `SAM_S125_SV`, `HAWK_US`, `SAM_GEN_MJ` | **NEITHER** (big towed batteries) |
+
+**B. SAM/AAA self-contained check** — every non-Foot medium in those families verified sensible:
+all `SPA_*`/`SPAAA_*`/`SPSAM_*`/ZSU/Tunguska/Kub/Gepard/Roland/Rapier/Chaparral = Tracked;
+BM-21/27/30, Scud, Strela-1, Crotale, HQ-7, **S-300** = Wheeled. **No further Foot→self-propelled
+flips found** — the S-300 was the only mis-declared one. Census closed unless Bob objects.
+
+### Editor signal (their Reply 4 ask 1)
+The re-key is DONE — `CombatUnit.cs` no longer contains the `IsEmbarkable` symbol at all — but the
+signal note sent to their Markdowns says **flip only after Bob reports the suite green**, since
+their firewall exists precisely to not trust unverified claims.
+
+**P2 starts on suite green.**
