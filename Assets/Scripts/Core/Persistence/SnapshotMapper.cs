@@ -430,6 +430,12 @@ namespace HammerAndSickle.Persistence
                             continue; // Skip null units but continue processing
                         }
 
+                        /* D6 (P2 2026-08-08): deserialized units come through the [JsonConstructor],
+                         * which never runs InitializeEquipmentBays — so TotalIntelStats ([JsonIgnore])
+                         * arrives EMPTY, silently breaking intel reports and the loss-ledger multiplicand
+                         * on every loaded save. Rebuild from the restored slots before registration. */
+                        unit.EquipmentBays?.BuildIntelStats();
+
                         if (!mgr.RegisterCombatUnit(unit))
                         {
                             AppService.HandleException(CLASS_NAME, METHOD_NAME,

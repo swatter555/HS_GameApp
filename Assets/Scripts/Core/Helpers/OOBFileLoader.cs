@@ -407,6 +407,9 @@ namespace HammerAndSickle.Helpers
                     unit.SetExperienceLevel(data.Experience);
                     unit.SetEfficiencyLevel(data.Efficiency);
                     unit.SetDeploymentPosition(data.Deployment);
+                    // D5 (P2 2026-08-08): the ctor sized MP from the DEPLOYED profile; a unit authored
+                    // at Mobile/Embarked starts on its posture's real ceiling, not the foot one.
+                    unit.RefreshMovementPointsForPosture();
                     unit.SetSpottedLevel(data.Spotted);
                     unit.HitPoints.SetCurrent(unit.HitPoints.Max * data.HitPoints);
                     unit.DaysSupply.SetCurrent(unit.DaysSupply.Max * data.DaysSupply);

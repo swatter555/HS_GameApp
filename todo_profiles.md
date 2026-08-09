@@ -419,10 +419,76 @@ fix the dangling Appendix W citation (§34.5) while in the file.
 ## 12. P1 — ✅ CLOSED: SUITE GREEN 2026-08-08 (Bob ran the full Test Runner), committed
 
 **The editor's `IsEmbarkable` flip is AUTHORIZED** — green confirmation delivered to their
-Markdowns per the Reply-4 contract. Census A (towed-tube tags) remains Bob's to rule; the tags are
-two-line additions whenever ruled and gate nothing. **▶ NEXT: P2** — the naval transient state's
-embark/debark path (universal port rule, marines' beachhead debark), the rewritten embark gates
-(FW-needs-airbase by TransportCategory, no classification cases), and defects D2–D7.
+Markdowns per the Reply-4 contract.
+
+## 13. P2 — ✅ CLOSED: SUITE GREEN 2026-08-08 (Bob, full Test Runner), committed with census A
+
+**Census A implemented first** (§12 table): all towed SAM/AAA + light tubes tagged BOTH
+(11 profiles), heavies/SP untagged, pinned in `EquipmentBaysTests`.
+
+**Then the state machine:**
+- **Naval embark (§9.4.7, universal):** at Deployed with no ground transport, no owned lift, on a
+  friendly port → sealift (skips Mobile); from Mobile, +1 with no owned lift at a port → sealift.
+  **Organic lift always wins over naval.** `IsNavalEmbarked` is written BEFORE costs so the MP
+  rescale lands on `TRN_NAVAL`'s ceiling — after, and units would board ships on helicopter MP.
+- **Naval debark (§9.5.2/§9.10.6.1):** friendly port for everyone; beachhead for MAR/MMAR only
+  (deliberate identity doctrine, not the deleted rot — the privilege attaches to marines, not
+  equipment). State clears on debark; lands Deployed. Controller supplies the third map fact
+  (`IsOnBeachheadHex`).
+- **`SpecialEmbarkmentChecks` → `EmbarkmentChecks`, ZERO classification cases:** FW lift needs an
+  active friendly airbase (AB/MAB keep their rule as a consequence of the An-12 — and D8 closes:
+  FW-lifted SPECF is finally gated too); helo lift boards anywhere; naval needs the port. The
+  AB/MAB, SPECF+`TRN_AN8_SV`, MAR/MMAR, and AM/MAM+`UpgradePath.HELT` cases are all deleted.
+- **Defects:** D2 ceiling clamp (no more enum value 6) · D3 mounting-requires-transport ·
+  D4 one deploy-cost formula (raw fraction; the CeilToInt HUD/model split is gone) ·
+  D5 `RefreshMovementPointsForPosture` + loader call (units authored at Mobile/Embarked start on
+  the right ceiling; loader-only — the mapper restores saved MP and must not refill) ·
+  D6 `ApplySnapshot` rebuilds intel stats (loaded saves no longer have empty rosters) ·
+  D7 supply refuse (unreachable by the 0.5 critical gate; drift now logs).
+- **Tests:** 8 new cases in `DeploymentTransitionTests` (§P2 region): sealift on/off port, D3
+  refusal charges nothing, mounted-marines through Mobile, organic-beats-naval, FW airbase gate +
+  helo-anywhere, port-vs-beachhead debark by identity, D2 refusal, naval MP rescale.
+  `DeploymentActionTests` verified compatible (its up-tests only exercise the dug-in collapse).
+
+Deferred to P3 by design: naval TRAVERSAL (water-hex movement rules) rides the same medium-keyed
+pass as the airborne fix; the §21.8 instant port-to-port sealift mechanic needs a destination-pick
+input mode (M13-adjacent) and is not in P2/P3.
+
+## 14. ▶ NEXT: P3 — movement rules read the resolver (A FRESH CONTEXT STARTS HERE)
+
+**The original bug, still live:** an embarked air-assault regiment pays ground terrain costs and
+is halted by zones of control it is flying over. The classification test `IsAirUnit || IsHelicopter`
+sits in THREE places and all three must change together or the range overlay lies:
+- `MovementController.ExecuteMovement` (~:803) — step cost, road bonus, ambush branch, ZoC halt,
+  tween pacing (`isFixedWing` at :804 feeds `stepSeconds` + the movement-audio duration).
+- `HexMapUtil.GetValidMoveDestinations` (~:321) — range generation.
+- `HexMapUtil.FindPath` (~:453) — A* costs.
+All three re-key on `MovementModeService.IsAirborneNow` (and pacing on `CurrentMedium`).
+
+**Rulings already made — do NOT re-derive (full text: `todo_audio.md` §3b M4, ratified 2026-08-04):**
+- **Ambush-against-a-flight: the ambush TRIGGERS, the combat does NOT.** Detection runs exactly as
+  for ground; halt = movement points 0 + move actions 0 and NOTHING else; no `RaiseAmbushTriggered`;
+  the ambusher IS revealed; the flight halts on the entered hex. ZoC NEVER stops a flight — ambush
+  is the single mechanism. Printer dispatch + `UnitMoveBlocked` sound. Vocabulary: stopped/halted,
+  never "aborted" outside player-facing text.
+- Helo/jet long-cut audio still unauthored (todo_audio §3b M2 note) — a flight goes silent mid-air
+  until Bob authors them; not P3's problem, just don't "fix" it in code.
+- **Naval traversal (NEW in P3's scope):** while `IsNavalEmbarked`, the unit moves on WATER hexes.
+  ⚠ Decisions a fresh context must get from Bob before coding traversal: may ground units enter
+  Water hexes at all today (check `HexMapUtil` terrain rules — Water cost 1 suggests yes, which
+  would be its own latent bug for foot units), and does naval movement use the ambush-halt rule or
+  nothing. If Bob is not available, implement the AIRBORNE fix only and leave naval traversal
+  flagged — khost has no water, so nothing regresses.
+- **M5 residue (judge each on its own terms, not a sweep):** `GameDataManager` occupancy
+  (`GetGroundUnitAtHex`/`GetAirUnitAtHex` — legitimately classification for stacking),
+  `CombatResolver`, `GameIconRenderer` icon layers (legitimately classification). The consumer
+  sweep's verdict list is in this doc's history; most remaining reads are LEGIT class-(c) questions.
+
+**After P3:** P4 requisition API (§4.6/§4.7 — wallet arithmetic, cascade, transaction window;
+`RequisitionService` headless; the §4.1 `EquipmentBays.CanAccept` split is ratified and built).
+Then P5 content/docs/editor (design-doc amendments table in §7; `Transition.md` rewrite; the
+khost re-exports if the census tags should reach shipped content — they don't have to, templates
+only gate the SHOP).
 
 ### What landed
 - **Deleted outright:** `RegimentProfileType` (169 authoring lines + enum + save/`.oob` fields),
@@ -455,14 +521,16 @@ embark/debark path (universal port rule, marines' beachhead debark), the rewritt
   `CombatUnitDB.cs`'s Unicode (UTF-8-no-BOM misread as ANSI); restored from git, redone with
   explicit UTF-8. Bulk file edits in this repo must use BOM-aware IO.
 
-### ⬚ THE TWO CENSUSES — Bob's Y/N (code follows the rulings; agent proposals marked)
-**A. Towed-tube air-lift tags** (`ART_LIGHT_SV` already ratified BOTH):
-| Profile | Proposal |
-|---|---|
-| `ART_LIGHT_WEST`, `ART_LT_AR`, `ART_LT_CH`, `ART_MJ_LT`, `ART_MJ_MORT` | **BOTH** (light guns/mortars) |
-| `ART_HEAVY_SV`, `ART_HEAVY_WEST`, `ART_HV_AR`, `ART_HV_CH` | **NEITHER** (heavy pieces) |
-| `AAA_GEN_SV`, `AAA_MJ` (ZU-23-class — genuinely helo-portable) | **Bob's call** (agent leans HeloTransportable only) |
-| `SAM_S75_SV`, `SAM_S125_SV`, `HAWK_US`, `SAM_GEN_MJ` | **NEITHER** (big towed batteries) |
+### ✅ CENSUS A — RATIFIED (Bob, 2026-08-08) AND IMPLEMENTED
+**Bob's ruling: "SPSAM, SPAAA are base only. SAM and AAA should be helo and droppable"** (and
+Soviet generic AAA definitely both). Booked as:
+| Profile set | Ruling | Tagged |
+|---|---|---|
+| Light towed tubes: `ART_LIGHT_SV/WEST/ARAB/CH`, `ART_LIGHT_MJ`, `ART_MORTAR_MJ` | **BOTH** | ✅ |
+| ALL towed SAM/AAA: `SAM_S75_SV`, `SAM_S125_SV`, `SAM_HAWK_US`, `SAM_GEN_MJ`, `AAA_GEN_SV`, `AAA_GEN_MJ` | **BOTH** | ✅ |
+| Heavy towed: `ART_HEAVY_SV/WEST/ARAB/CH` | **NEITHER** (stood unchallenged) | — |
+| Every SP system (`SPA_*`/`SPAAA_*`/`SPSAM_*`/`ROC_*`) | **base only — no lift, ever** | — (no tags; bays close by medium) |
+Pinned in `EquipmentBaysTests.CapabilityTags_AreAuthoredWhereRatified` + the S-75 eligibility case.
 
 **B. SAM/AAA self-contained check** — every non-Foot medium in those families verified sensible:
 all `SPA_*`/`SPAAA_*`/`SPSAM_*`/ZSU/Tunguska/Kub/Gepard/Roland/Rapier/Chaparral = Tracked;

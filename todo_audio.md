@@ -235,6 +235,11 @@ tuning you have set, and `Tools/Audio/Audit Catalog` reports what is still unbac
 
 ### Phase 3b — MOVEMENT MEDIUM (PLAN + MILESTONES, ratified 2026-08-04)
 
+> **⚠ SUPERSEDED AS A PLAN 2026-08-08 — do not execute milestones from here.** M0–M3 shipped and
+> went green; **M4 and the `HexMapUtil` half of M5 are absorbed into the profile-slot rebuild as
+> P3 (`todo_profiles.md` §14, the live plan)**; the rest of M5 is judged there. The RULINGS below
+> (ambush-against-a-flight, long-cut clips, vocabulary) remain authoritative and P3 cites them.
+
 > **The one-line version:** the game has never known how a regiment is physically moving. It is
 > asked five times and answered from `UnitClassification` four of them. Teach the PROFILE how it
 > moves, build one resolver that owns the question, and have movement rules and audio both ask it.

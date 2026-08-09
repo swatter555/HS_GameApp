@@ -158,19 +158,23 @@ Battle-scene lifecycle owner. Scenario setup (`SetupBattleManagerData`: manifest
 **Identity:** UnitID, UnitName, Classification (45+ types), Role (11 types), Nationality (15), Side (Player/AI).
 **Position:** MapPos (Position2D), Facing (HexDirection), DeploymentPosition (Fortified→Embarked), EmbarkmentState.
 **Stats:** HitPoints (StatsMaxCurrent, max 40), DaysSupply, MovementPoints, Experience (6 levels, 0.8x–1.3x), Efficiency (5 levels).
-**Weapons:** RegimentProfile → Deployed/Mobile/Embarked WeaponType configs → WeaponProfileDB lookup.
+**Weapons:** EquipmentBays (three purchasable bays) → Deployed/Mobile/Embarked WeaponType slots → WeaponProfileDB lookup; naval sealift is a transient state (`IsNavalEmbarked` + shared TRN_NAVAL), never a bay.
 **Facilities:** IsBase, FacilityType (HQ, Airbase, SupplyDepot, Fort), depot size, generation rate, projection range.
 **Air attachment:** Airbases maintain attached air unit lists. **Actions:** 5 types (Move, Combat, Deploy, Opportunity, Intel).
 
 ### 3.2b THE PROFILE-SLOT RULE — three EQUIPMENT BAYS, not three loadouts (RATIFIED 2026-08-04)
 
-> **⚠ SUPERSEDED IN MECHANISM 2026-08-08 — P1 of the profile-slot rebuild (`todo_profiles.md`, the
-> current authority).** The RULE below stands; its MECHANISM changed: `RegimentProfile` is renamed
+> **⚠ SUPERSEDED IN MECHANISM 2026-08-08 — P1+P2 of the profile-slot rebuild (`todo_profiles.md`,
+> the current authority).** The RULE below stands; its MECHANISM changed: `RegimentProfile` is renamed
 > **`EquipmentBays`**, and `RegimentProfileType` + `isMountable`/`isEmbarkable` + `EmbarkmentState`
 > are **DELETED** (all had zero live readers — capacity was already fiction). Which bays a regiment
 > has is now **DERIVED**: Mobile bay open ⟺ deployed medium is `Foot`; Embarked kinds from identity
-> (`GameData.IsInfantryFamily`, AB/MAB/SPECF) + equipment tags (`AirDroppable`/`HeloTransportable`);
-> naval is a transient state (`IsNavalEmbarked` + shared `TRN_NAVAL`, never a bay). One address:
+> (`GameData.IsInfantryFamily`, AB/MAB/SPECF) + equipment tags (`AirDroppable`/`HeloTransportable` —
+> all towed SAM/AAA and light tubes carry both, census A). Naval is a transient state
+> (`IsNavalEmbarked` + shared `TRN_NAVAL`, never a bay) — P2 made it REAL: universal port embark
+> (§9.4.7, organic lift wins), port debark for all + beachhead for MAR/MMAR (§9.10.6.1 identity
+> doctrine), and `EmbarkmentChecks` gates by WHAT IS BOARDED (FW lift → active friendly airbase;
+> helo → anywhere; naval → port) with ZERO classification cases. One address:
 > `EquipmentBays.CanAccept`/`TrySetSlot`/`TryClearSlot`; audited by `EquipmentBaysTests`.
 > Point 2 below ("flags declare capability") is RETIRED — nothing declares; physics + doctrine derive.
 

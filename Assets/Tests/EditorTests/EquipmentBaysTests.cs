@@ -138,19 +138,22 @@ namespace HammerAndSickle.Tests
         #region Eligibility — identity route + equipment-tag route
 
         [Test]
-        public void HeloLift_InfantryByIdentity_TowedTubesByTag_TanksNever()
+        public void HeloLift_InfantryByIdentity_TowedByTag_HeaviesAndVehiclesNever()
         {
             var rifles = Make("Rifles", UnitClassification.MOT, WeaponType.INF_REG_SV);
             var lightGuns = Make("Lt Guns", UnitClassification.ART, WeaponType.ART_LIGHT_SV);
             var s75 = Make("S-75", UnitClassification.SAM, WeaponType.SAM_S75_SV);
+            var heavyGuns = Make("Hvy Guns", UnitClassification.ART, WeaponType.ART_HEAVY_SV);
             var tank = Make("Tanks", UnitClassification.TANK, WeaponType.TANK_T55A_SV);
 
             Assert.That(rifles.EquipmentBays.MayCarryHeloLift(rifles.Classification), Is.True,
                 "infantry family — identity route");
             Assert.That(lightGuns.EquipmentBays.MayCarryHeloLift(lightGuns.Classification), Is.True,
                 "light towed tubes sling-load — HeloTransportable tag route (ratified 2026-08-08)");
-            Assert.That(s75.EquipmentBays.MayCarryHeloLift(s75.Classification), Is.False,
-                "an untagged towed SAM battery has neither route");
+            Assert.That(s75.EquipmentBays.MayCarryHeloLift(s75.Classification), Is.True,
+                "census A (Bob, 2026-08-08): ALL towed SAM/AAA fly both ways");
+            Assert.That(heavyGuns.EquipmentBays.MayCarryHeloLift(heavyGuns.Classification), Is.False,
+                "heavy towed pieces stay untagged — deliberate doctrine, not an oversight");
             Assert.That(tank.EquipmentBays.MayCarryHeloLift(tank.Classification), Is.False,
                 "tanks never");
         }
@@ -186,6 +189,16 @@ namespace HammerAndSickle.Tests
             Assert.That(lightArt.HasCapability(WeaponCapability.HeloTransportable), Is.True);
             Assert.That(brdm2at.HasCapability(WeaponCapability.AirDroppable), Is.True);
             Assert.That(bmd2.HasCapability(WeaponCapability.AirDroppable), Is.True, "pre-existing T31 on the BMDs");
+
+            // Census A (Bob, 2026-08-08): all towed SAM/AAA both ways; heavies neither; SP = base only.
+            WeaponProfile aaa = WeaponProfileDB.GetWeaponProfile(WeaponType.AAA_GEN_SV);
+            WeaponProfile heavyArt = WeaponProfileDB.GetWeaponProfile(WeaponType.ART_HEAVY_SV);
+            WeaponProfile shilka = WeaponProfileDB.GetWeaponProfile(WeaponType.SPAAA_ZSU23_SV);
+            Assert.That(aaa.HasCapability(WeaponCapability.AirDroppable), Is.True);
+            Assert.That(aaa.HasCapability(WeaponCapability.HeloTransportable), Is.True);
+            Assert.That(heavyArt.HasCapability(WeaponCapability.AirDroppable), Is.False);
+            Assert.That(heavyArt.HasCapability(WeaponCapability.HeloTransportable), Is.False);
+            Assert.That(shilka.HasCapability(WeaponCapability.HeloTransportable), Is.False, "SP systems are base-only");
         }
 
         #endregion // Eligibility

@@ -65,34 +65,24 @@ purchasable bays with DERIVED capacity (from deployed-profile `MovementMedium` +
 lift as a transient state, and a headless buy/sell/upgrade API. ⚠ **It ABSORBS todo_audio §3b
 M4 and part of M5** (the `isAir` fix now covers `HexMapUtil` range+path AND `ExecuteMovement`,
 as rebuild phase P3) — do NOT run M4 standalone from `todo_audio.md`.
-**STATE 2026-08-08: P0 ✅ AND P1 ✅ — SUITE GREEN, COMMITTED.** The enum/flags/`EmbarkmentState`
-are deleted, `RegimentProfile` is `EquipmentBays` with the derived-capacity API, SAVE_VERSION is 5,
-`EquipmentBaysTests` guards the invariants, the editor's `IsEmbarkable` flip is authorized.
-**▶ NEXT: P2** (naval transient state + rewritten embark gates + defects D2–D7 — `todo_profiles.md`
-§4.4/§4.5/§5). Still open, non-blocking: Bob rules census A (towed-tube air-lift tags).
+**STATE 2026-08-08 (context-transition handoff): P0 ✅ · P1 ✅ · CENSUS A ✅ · P2 ✅ — ALL SUITE
+GREEN AND COMMITTED.** Delivered across the day: derived bay capacity (`EquipmentBays` +
+`CanAccept`/`TrySetSlot`), the enum/flags/`EmbarkmentState` deletions, SAVE_VERSION 5, the two
+capability tags on every ruled profile, naval sealift embark/debark (universal port rule, marine
+beachhead privilege), `EmbarkmentChecks` with zero classification cases, defects D1–D8 closed,
+`EquipmentBaysTests` + 8 naval deployment tests. The scenario editor's `IsEmbarkable` flip is
+authorized (signal in their Markdowns).
+**▶ A FRESH CONTEXT STARTS AT `todo_profiles.md` §14 — P3, movement rules read the resolver**
+(the three `isAir` sites, the ratified ambush-halts-the-flight rule, naval-traversal questions
+for Bob). Then P4 requisition, P5 content/docs/editor.
 
-**State at hand-off (2026-08-04, mid-pass — READ §3b BEFORE TOUCHING MOVEMENT OR AUDIO):**
-- **M0 ✅** committed (`d6abfcb`, `0558653`) and pushed. **M1 ✅ green. M2 ✅ green + confirmed by ear** —
-  sounds correct across deployment transitions. **M3 written, UNRUN.**
-- **M3 needs from Bob:** reload the unit DB in the scenario editor and **re-export both khost `.oob`
-  files**. The agent hand-patched them as a stopgap; the templates are now correct, so a re-export should
-  reproduce the same Spetsnaz data — if it does not, that discrepancy is itself worth chasing.
-- **M4 is the last one and it is the ORIGINAL bug**: `ExecuteMovement` still branches on `isAir`
-  (classification), so an embarked air-assault regiment does not actually fly — it pays mountain costs and
-  is halted by ZoC it is flying over. Route terrain cost, ZoC, the ambush branch and animation pacing
-  through `MovementModeService.IsAirborneNow`. **Every ruling M4 needs is already recorded in §3b** —
-  including the ambush-against-a-flight rule (the ambush TRIGGERS, the combat does NOT).
-- **M5** — `HexMapUtil`, `GameDataManager` occupancy, `CombatResolver`, `GameIconRenderer` still read
-  `IsAirUnit`/`IsHelicopter`. Tracked follow-up, each read on its own terms rather than swept.
-- ⚠ **Uncommitted:** everything after `d6abfcb`. Commit once M3 is green.
-
-**Open questions for Bob (neither blocking):**
-- **S-300 (and "a few other units"):** he leans toward treating them as self-contained — `DEP` +
-  `isMountable: false`, no ground-transport upgrade path — since a real one rides its own TELs. Left as
-  authored (`DEP_MOB`, empty bay) until he rules.
-- **Make the template audit permanent?** The one-off script that found the VDV and Mujahideen defects
-  could become a standing test. ⚠ If it does, it must check ONLY the §3.2b hard invariant and
-  profileType-vs-flag contradictions — NOT "empty slot", which is a normal un-purchased bay.
+**(The 2026-08-04 mid-pass hand-off that stood here is RESOLVED IN FULL, 2026-08-08:** M3 went
+green in the 452 run; the OOB question closed via the editor's fresh-placement test + the new-format
+standalone khost; M4 is `todo_profiles.md` §14/P3, absorbed with the `HexMapUtil` half of M5 — do
+NOT run M4 from `todo_audio.md` §3b, only its RULINGS still apply; the rest of M5 is judged in P3.
+The S-300 question was RULED self-contained (box 1 — its medium is Wheeled, bay closes by physics)
+and the template audit became the standing `EquipmentBaysTests` + `MovementMediumTests` pair,
+checking exactly the invariants and never "empty slot".)**
 
 ⏸ **DEFERRED — ROUGH-EDGES PASS on the battle scene (Bob's call, 2026-07-28; superseded twice — first by
 the audio rebuild, then by the movement-medium pass — and never started).** Consolidate before adding functionality: "straighten out some rough edges before too many

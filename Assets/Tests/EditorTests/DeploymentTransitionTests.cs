@@ -132,5 +132,158 @@ namespace HammerAndSickle.Tests
         }
 
         #endregion // Movement points scale across a posture change
+
+        #region P2 — naval transient state + the rewritten embark gates (2026-08-08)
+
+        /// <summary>Plain foot infantry: no transport of any kind — the universal-sealift base case.</summary>
+        private static CombatUnit MakePlainFoot() =>
+            new CombatUnit("Rifles", UnitClassification.MOT, UnitRole.GroundCombat, Side.Player,
+                Nationality.USSR, deployedProfile: WeaponType.INF_REG_SV,
+                mobileProfile: WeaponType.NONE, embarkedProfile: WeaponType.NONE);
+
+        /// <summary>Mounted marines — the shape whose sealift the P1 template change un-owned.</summary>
+        private static CombatUnit MakeMountedMarines() =>
+            new CombatUnit("Marines", UnitClassification.MMAR, UnitRole.GroundCombat, Side.Player,
+                Nationality.USSR, deployedProfile: WeaponType.INF_MAR_SV,
+                mobileProfile: WeaponType.APC_BTR70_SV, embarkedProfile: WeaponType.NONE);
+
+        /// <summary>Paratroopers with their An-12s — the fixed-wing gate case.</summary>
+        private static CombatUnit MakeParatroopersWithAn12() =>
+            new CombatUnit("VDV", UnitClassification.AB, UnitRole.GroundCombat, Side.Player,
+                Nationality.USSR, deployedProfile: WeaponType.INF_AB_SV,
+                mobileProfile: WeaponType.NONE, embarkedProfile: WeaponType.TRN_AN8_SV);
+
+        [Test]
+        public void FootUnit_AtAFriendlyPort_SealiftsToNavalEmbark()
+        {
+            // §9.4.7: ANY ground unit at a friendly port skips Mobile and embarks on the shared
+            // flotilla. Nothing is owned — the profile is drawn, the state is set.
+            var rifles = MakePlainFoot();
+
+            Assert.That(rifles.TryDeployUP(out string err, onPort: true), Is.True, err);
+            Assert.That(rifles.DeploymentPosition, Is.EqualTo(DeploymentPosition.Embarked));
+            Assert.That(rifles.IsNavalEmbarked, Is.True);
+            Assert.That(rifles.GetActiveWeaponProfile()?.WeaponType, Is.EqualTo(WeaponType.TRN_NAVAL));
+            Assert.That(MovementModeService.CurrentMedium(rifles), Is.EqualTo(MovementMedium.Naval));
+        }
+
+        [Test]
+        public void FootUnit_OffPort_WithNothingToMount_IsRefusedNotSilentlyMobile()
+        {
+            // D3: the pre-P2 code let this unit "mount" nothing — it paid full transition costs and
+            // silently kept its deployed profile at the Mobile position.
+            var rifles = MakePlainFoot();
+            float mpBefore = rifles.MovementPoints.Current;
+            float actionsBefore = rifles.DeploymentActions.Current;
+
+            Assert.That(rifles.TryDeployUP(out string err), Is.False);
+            Assert.That(err, Is.Not.Empty);
+            Assert.That(rifles.DeploymentPosition, Is.EqualTo(DeploymentPosition.Deployed));
+            Assert.That(rifles.MovementPoints.Current, Is.EqualTo(mpBefore), "a refusal charges nothing");
+            Assert.That(rifles.DeploymentActions.Current, Is.EqualTo(actionsBefore));
+        }
+
+        [Test]
+        public void MountedMarines_ReachSealift_ThroughMobile()
+        {
+            // A unit WITH ground transport still passes through Mobile; from there, +1 at a port is the
+            // naval route (no owned lift in the bay).
+            var marines = MakeMountedMarines();
+
+            Assert.That(marines.TryDeployUP(out string e1, onPort: true), Is.True, e1);
+            Assert.That(marines.DeploymentPosition, Is.EqualTo(DeploymentPosition.Mobile),
+                "owning carriers means mounting them first — the port does not skip a real Mobile bay");
+
+            marines.RefreshAllActions();                        // one deployment action per turn
+            marines.MovementPoints.ResetToMax();
+            Assert.That(marines.TryDeployUP(out string e2, onPort: true), Is.True, e2);
+            Assert.That(marines.DeploymentPosition, Is.EqualTo(DeploymentPosition.Embarked));
+            Assert.That(marines.IsNavalEmbarked, Is.True);
+        }
+
+        [Test]
+        public void OrganicLift_WinsOverNaval_AtAPort()
+        {
+            // Owned equipment beats the shared flotilla: a Spetsnaz at a port boards its OWN Mi-8s.
+            var spetsnaz = MakeFootWithHelosOnly();
+
+            Assert.That(spetsnaz.TryDeployUP(out string err, onPort: true), Is.True, err);
+            Assert.That(spetsnaz.IsNavalEmbarked, Is.False);
+            Assert.That(spetsnaz.GetActiveWeaponProfile()?.WeaponType, Is.EqualTo(WeaponType.HEL_MI8T_SV));
+        }
+
+        [Test]
+        public void FixedWingLift_NeedsTheAirbase_HeloLiftDoesNot()
+        {
+            /* The rewritten gate keys on WHAT is boarded, never who boards: the AB unit's airbase rule
+             * survives as a consequence of its An-12s — and now also covers the FW-lifted SPECF the old
+             * classification list missed (defect D8). */
+            var vdv = MakeParatroopersWithAn12();
+            Assert.That(vdv.TryDeployUP(out _, onAirbase: false), Is.False,
+                "fixed-wing lift operates from an airbase");
+            Assert.That(vdv.TryDeployUP(out string err, onAirbase: true), Is.True, err);
+            Assert.That(vdv.IsNavalEmbarked, Is.False);
+
+            var spetsnaz = MakeFootWithHelosOnly();
+            Assert.That(spetsnaz.TryDeployUP(out string err2), Is.True, err2);
+        }
+
+        [Test]
+        public void NavalDebark_PortForEveryone_BeachheadForMarinesOnly()
+        {
+            var marines = MakeMountedMarines();
+            marines.TryDeployUP(out _, onPort: true);           // Mobile
+            marines.RefreshAllActions();
+            marines.MovementPoints.ResetToMax();
+            marines.TryDeployUP(out _, onPort: true);           // Embarked (naval)
+            marines.RefreshAllActions();                        // fresh deployment actions for the debark
+            marines.MovementPoints.ResetToMax();
+
+            Assert.That(marines.TryDeployDOWN(out _), Is.False, "mid-ocean is not a debark site");
+            Assert.That(marines.TryDeployDOWN(out string err, onBeachhead: true), Is.True, err);
+            Assert.That(marines.DeploymentPosition, Is.EqualTo(DeploymentPosition.Deployed),
+                "naval debark lands Deployed (§9.5.2), bypassing Mobile");
+            Assert.That(marines.IsNavalEmbarked, Is.False, "the state clears on debark");
+
+            var rifles = MakePlainFoot();
+            rifles.TryDeployUP(out _, onPort: true);
+            rifles.RefreshAllActions();
+            rifles.MovementPoints.ResetToMax();
+            Assert.That(rifles.TryDeployDOWN(out _, onBeachhead: true), Is.False,
+                "the beachhead is the marines' ONE naval privilege (§9.10.6.1)");
+            Assert.That(rifles.TryDeployDOWN(out string err2, onPort: true), Is.True, err2);
+        }
+
+        [Test]
+        public void DeployUp_AtEmbarked_IsRefused_NotUndefined()
+        {
+            // D2: +1 from the top used to write the undefined enum value 6 and charge full costs.
+            var spetsnaz = MakeFootWithHelosOnly();
+            spetsnaz.TryDeployUP(out _);                        // Embarked
+            spetsnaz.RefreshAllActions();
+            spetsnaz.MovementPoints.ResetToMax();
+
+            Assert.That(spetsnaz.TryDeployUP(out string err), Is.False);
+            Assert.That(err, Is.Not.Empty);
+            Assert.That(spetsnaz.DeploymentPosition, Is.EqualTo(DeploymentPosition.Embarked));
+        }
+
+        [Test]
+        public void NavalEmbark_ScalesMovementPoints_OntoTheFlotillaCeiling()
+        {
+            // The naval flag is written BEFORE costs, so the rescale lands on TRN_NAVAL's ceiling —
+            // written after, the unit would board ships on its foot budget.
+            var rifles = MakePlainFoot();
+            float footMax = rifles.MovementPoints.Max;
+
+            rifles.TryDeployUP(out _, onPort: true);
+
+            float navalMax = rifles.MovementPoints.Max;
+            Assert.That(navalMax, Is.GreaterThan(footMax), "the flotilla is faster than boots");
+            Assert.That(rifles.MovementPoints.Current, Is.EqualTo(navalMax * 0.5f).Within(0.01f),
+                "half the foot budget spent means half the sea budget remains");
+        }
+
+        #endregion // P2 — naval transient state + the rewritten embark gates
     }
 }

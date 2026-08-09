@@ -1694,7 +1694,9 @@ namespace HammerAndSickle.Models
                 "S-75 Dvina Surface-to-Air Missile System", "S-75 Dvina", WeaponType.SAM_S75_SV,
                 new ProfileDef(FamilyArchetypes.Sam,
                     new Dictionary<ProfileStat, int> { { ProfileStat.IR, GameData.INDIRECT_RANGE_SAM }, { ProfileStat.MMP, -4 } },
-                    new[] { WeaponTrait.SARH_LONG_RANGE }),
+                    // Census A ruling (Bob, 2026-08-08): ALL towed SAM/AAA are HeloTransportable +
+                    // AirDroppable; SP systems are base-only (no lift, and their bays close by medium).
+                    new[] { WeaponTrait.SARH_LONG_RANGE, WeaponTrait.AIR_DROPPABLE, WeaponTrait.HELO_TRANSPORTABLE }),
                 UpgradePath.SAM, 228);
 
             // Set the prestige cost for the profile.
@@ -1730,7 +1732,7 @@ namespace HammerAndSickle.Models
                 "S-125 Neva Surface-to-Air Missile System", "S-125 Neva", WeaponType.SAM_S125_SV,
                 new ProfileDef(FamilyArchetypes.Sam,
                     new Dictionary<ProfileStat, int> { { ProfileStat.IR, 5 }, { ProfileStat.MMP, -4 } },
-                    new[] { WeaponTrait.COMMAND_GUIDANCE }),
+                    new[] { WeaponTrait.COMMAND_GUIDANCE, WeaponTrait.AIR_DROPPABLE, WeaponTrait.HELO_TRANSPORTABLE }),
                 UpgradePath.SAM, 276);
 
             // Set the prestige cost for the profile.
@@ -1811,7 +1813,8 @@ namespace HammerAndSickle.Models
                 "Generic Anti-Aircraft Artillery Emplacement", "Generic AAA", WeaponType.AAA_GEN_SV,
                 new ProfileDef(FamilyArchetypes.Aaa,
                     new Dictionary<ProfileStat, int> { { ProfileStat.HA, -1 }, { ProfileStat.SA, -1 }, { ProfileStat.GAT, -1 }, { ProfileStat.IR, GameData.INDIRECT_RANGE_AAA } },
-                    System.Array.Empty<WeaponTrait>()),
+                    // Census A (Bob, 2026-08-08): ZU-23-class towed AAA flies both ways.
+                    new[] { WeaponTrait.AIR_DROPPABLE, WeaponTrait.HELO_TRANSPORTABLE }),
                 UpgradePath.AAA, 144);
 
             // Set the prestige cost for the profile.
@@ -3667,7 +3670,7 @@ namespace HammerAndSickle.Models
                 "Light Towed Artillery", "Lt Artillery", WeaponType.ART_LIGHT_WEST,
                 new ProfileDef(FamilyArchetypes.Artillery,
                     new Dictionary<ProfileStat, int> { { ProfileStat.IR, GameData.INDIRECT_RANGE_SHORT } },
-                    System.Array.Empty<WeaponTrait>()),
+                    new[] { WeaponTrait.AIR_DROPPABLE, WeaponTrait.HELO_TRANSPORTABLE }),
                 UpgradePath.ART, 144);
 
             // Set the prestige cost for the profile.
@@ -3867,7 +3870,7 @@ namespace HammerAndSickle.Models
                 "MIM-23 Hawk Strategic SAM System", "MIM-23 Hawk", WeaponType.SAM_HAWK_US,
                 new ProfileDef(FamilyArchetypes.Sam,
                     new Dictionary<ProfileStat, int> { { ProfileStat.MMP, GameData.STATIC_UNIT - GameData.FOOT_UNIT }, { ProfileStat.IR, GameData.INDIRECT_RANGE_SAM } },
-                    new[] { WeaponTrait.SARH_LONG_RANGE }),
+                    new[] { WeaponTrait.SARH_LONG_RANGE, WeaponTrait.AIR_DROPPABLE, WeaponTrait.HELO_TRANSPORTABLE }),
                 UpgradePath.SAM, 264);
 
             // Set the prestige cost for the profile.
@@ -5516,7 +5519,7 @@ namespace HammerAndSickle.Models
                 "Light Towed Artillery", "Light Artillery", WeaponType.ART_LIGHT_ARAB,
                 new ProfileDef(FamilyArchetypes.Artillery,
                     new Dictionary<ProfileStat, int> { { ProfileStat.IR, GameData.INDIRECT_RANGE_SHORT } },
-                    System.Array.Empty<WeaponTrait>()),
+                    new[] { WeaponTrait.AIR_DROPPABLE, WeaponTrait.HELO_TRANSPORTABLE }),
                 UpgradePath.ART, 144);
 
             // Set the prestige cost for the profile.
@@ -5593,7 +5596,7 @@ namespace HammerAndSickle.Models
                 "Mujahideen Anti-Aircraft Artillery", "MJ AAA", WeaponType.AAA_GEN_MJ,
                 new ProfileDef(FamilyArchetypes.Aaa,
                     new Dictionary<ProfileStat, int> { { ProfileStat.HA, -1 }, { ProfileStat.SA, -1 }, { ProfileStat.GAT, -2 }, { ProfileStat.GAD, -2 }, { ProfileStat.IR, GameData.INDIRECT_RANGE_AAA } },
-                    System.Array.Empty<WeaponTrait>()),
+                    new[] { WeaponTrait.AIR_DROPPABLE, WeaponTrait.HELO_TRANSPORTABLE }),
                 UpgradePath.AAA, 144);
 
             // Set the prestige cost for the profile.
@@ -5630,7 +5633,7 @@ namespace HammerAndSickle.Models
                 "Mujahideen Stinger SAM Team", "MJ SAM", WeaponType.SAM_GEN_MJ,
                 new ProfileDef(FamilyArchetypes.Sam,
                     new Dictionary<ProfileStat, int> { { ProfileStat.GAT, -2 }, { ProfileStat.GAD, 2 }, { ProfileStat.SR, -4 }, { ProfileStat.IR, GameData.INDIRECT_RANGE_AAA } },
-                    System.Array.Empty<WeaponTrait>()),
+                    new[] { WeaponTrait.AIR_DROPPABLE, WeaponTrait.HELO_TRANSPORTABLE }),
                 UpgradePath.SAM, 264);
 
             // Set the prestige cost for the profile.
@@ -6135,7 +6138,7 @@ namespace HammerAndSickle.Models
                 "Mujahideen Heavy Mortar", "MJ Mortar", WeaponType.ART_MORTAR_MJ,
                 new ProfileDef(FamilyArchetypes.Artillery,
                     new Dictionary<ProfileStat, int> { { ProfileStat.SA, -2 }, { ProfileStat.GAD, 2 }, { ProfileStat.IR, GameData.INDIRECT_RANGE_MINIMUM } },
-                    System.Array.Empty<WeaponTrait>()));
+                    new[] { WeaponTrait.AIR_DROPPABLE, WeaponTrait.HELO_TRANSPORTABLE }));
 
             // Intel stats
             ART_MJ_MORT.AddIntelReportStat(WeaponType.Personnel,       700);
@@ -6167,7 +6170,7 @@ namespace HammerAndSickle.Models
                 "Mujahideen Light Artillery", "MJ Artillery", WeaponType.ART_LIGHT_MJ,
                 new ProfileDef(FamilyArchetypes.Artillery,
                     new Dictionary<ProfileStat, int> { { ProfileStat.SA, -3 }, { ProfileStat.GAD, 2 }, { ProfileStat.IR, GameData.INDIRECT_RANGE_MINIMUM } },
-                    System.Array.Empty<WeaponTrait>()));
+                    new[] { WeaponTrait.AIR_DROPPABLE, WeaponTrait.HELO_TRANSPORTABLE }));
 
             // Intel stats
             ART_MJ_LT.AddIntelReportStat(WeaponType.Personnel,       750);
@@ -6450,7 +6453,7 @@ namespace HammerAndSickle.Models
                 "Light Towed Artillery", "Light Artillery", WeaponType.ART_LIGHT_CH,
                 new ProfileDef(FamilyArchetypes.Artillery,
                     new Dictionary<ProfileStat, int> { { ProfileStat.IR, GameData.INDIRECT_RANGE_SHORT } },
-                    System.Array.Empty<WeaponTrait>()),
+                    new[] { WeaponTrait.AIR_DROPPABLE, WeaponTrait.HELO_TRANSPORTABLE }),
                 UpgradePath.ART, 144);
 
             // Set the prestige cost for the profile.

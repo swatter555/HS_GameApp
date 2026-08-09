@@ -1124,8 +1124,11 @@ namespace HammerAndSickle.Models
             return false;
         }
 
+        // D4 (P2 2026-08-08): the RAW fraction, no rounding — the single deploy-cost formula shared by
+        // the CanChangeToState gate and the HUD availability checks. CeilToInt here made the two
+        // disagree at odd maxima; display rounding is the UI's business, not the model's.
         private float GetDeployMovementCost() =>
-            Mathf.CeilToInt(MovementPoints.Max * GameData.DEPLOYMENT_ACTION_MOVEMENT_COST);
+            MovementPoints.Max * GameData.DEPLOYMENT_ACTION_MOVEMENT_COST;
 
         public float GetCombatMovementCost() =>
             Mathf.CeilToInt(MovementPoints.Max * GameData.COMBAT_ACTION_MOVEMENT_COST);
@@ -1258,38 +1261,61 @@ namespace HammerAndSickle.Models
                 return false;
             }
 
+            // D2 (P2 2026-08-08): the ladder has a top. Without this clamp, +1 from Embarked wrote the
+            // undefined enum value 6, charged full costs, and silently fell back to the deployed profile.
+            if (_deploymentPosition == DeploymentPosition.Embarked)
+            {
+                errorMsg = $"{UnitName} is already embarked — there is no higher deployment state.";
+                return false;
+            }
+
             DeploymentPosition oldPosition = _deploymentPosition;
             DeploymentPosition targetPosition = _deploymentPosition + 1;
+            bool navalRoute = false;
 
-            /* AIRBORNE DEPLOY-UP: a regiment at Deployed with NO ground transport but an embarked
-             * profile skips Mobile entirely and targets Embarked — there is nothing on the ground for it
-             * to mount.
-             *
-             * ⚠ GENERALISED 2026-08-04, replacing a hardcoded list. The old rule named AB and MAB by
-             * CLASSIFICATION, plus SPECF only when its embarked profile was literally TRN_AN8_SV. A
-             * Spetsnaz regiment carrying a Mi-8 matched neither and fell through to Mobile — which
-             * "worked" solely because someone had put the helicopter in that unit's Mobile slot. Asking
-             * the PROFILES instead of the class label covers every shape Bob named (foot+helo,
-             * air-mobile foot+helo, air-mobile foot+APC+helo) and any future one, with no list to
-             * maintain.
-             *
-             * ⚠ The airbase/port GATES are deliberately untouched and still live in
-             * SpecialEmbarkmentChecks. What may embark WHERE is a separate ruling from where deploying
-             * up should aim; conflating them here would silently change a gameplay rule. */
-            /* (2026-08-08 P1: the `IsEmbarkable` term is gone from this condition — the flag is deleted.
-             * It was pure redundancy: `GetEmbarkedProfile() != null` IS the fact the flag claimed to
-             * declare, and no template ever had a populated Embarked bay with the flag false.) */
+            /* TARGET SELECTION (generalised 2026-08-04; naval added P2 2026-08-08 — §9.4.5/§9.4.7).
+             * A regiment at Deployed with NO ground transport skips Mobile: to its OWN air lift if the
+             * Embarked bay is populated, else to the universal NAVAL sealift if it stands on a friendly
+             * port. Organic lift wins over naval — owned equipment beats the shared flotilla.
+             * Asking the SLOTS (never a class label) covers every shape with no list to maintain;
+             * the positional gates (airbase/port) stay in EmbarkmentChecks — what may embark WHERE is a
+             * separate ruling from where deploying up should AIM. */
             bool hasGroundTransport = GetMobileProfile() != null;
-            if (oldPosition == DeploymentPosition.Deployed && !hasGroundTransport
-                && GetEmbarkedProfile() != null)
+            if (oldPosition == DeploymentPosition.Deployed && !hasGroundTransport)
             {
-                targetPosition = DeploymentPosition.Embarked;
+                if (GetEmbarkedProfile() != null)
+                    targetPosition = DeploymentPosition.Embarked;
+                else if (onPort)
+                {
+                    targetPosition = DeploymentPosition.Embarked;
+                    navalRoute = true;
+                }
+            }
+
+            // D3 (P2 2026-08-08): mounting requires something to mount. Without this, a unit with an
+            // empty Mobile bay "mounted" nothing, paid full costs, and kept its deployed profile.
+            if (targetPosition == DeploymentPosition.Mobile && !hasGroundTransport)
+            {
+                errorMsg = $"{UnitName} has no ground transport to mount.";
+                return false;
+            }
+
+            // From Mobile, +1 is Embarked: organic lift if owned, else naval at a friendly port (§9.4.7).
+            if (targetPosition == DeploymentPosition.Embarked && !navalRoute && GetEmbarkedProfile() == null)
+            {
+                if (onPort)
+                    navalRoute = true;
+                else
+                {
+                    errorMsg = $"{UnitName} has no air lift, and naval embarkation needs a friendly port.";
+                    return false;
+                }
             }
 
             if (!CanChangeToState(targetPosition, out errorMsg))
                 return false;
 
-            if (!SpecialEmbarkmentChecks(out errorMsg, targetPosition, onAirbase, onPort))
+            if (!EmbarkmentChecks(out errorMsg, targetPosition, onAirbase, onPort, navalRoute))
                 return false;
 
             // Fortified/Entrenched skip directly to Deployed
@@ -1298,6 +1324,12 @@ namespace HammerAndSickle.Models
             else
                 _deploymentPosition = targetPosition;
 
+            /* ⚠ The naval flag is written BEFORE costs, deliberately: ApplyDeploymentTransitionCosts
+             * re-maxes movement points from the ACTIVE profile, and while naval-embarked that is the
+             * shared TRN_NAVAL — set the flag after and the unit would board ships on helicopter MP. */
+            if (_deploymentPosition == DeploymentPosition.Embarked)
+                SetNavalEmbarked(navalRoute);
+
             ApplyDeploymentTransitionCosts();
             return true;
         }
@@ -1305,7 +1337,9 @@ namespace HammerAndSickle.Models
         /// <summary>
         /// Attempt to change deployment state to a lower level (more defensive).
         /// </summary>
-        public bool TryDeployDOWN(out string errorMsg)
+        /// <param name="onPort">True if the unit is on a friendly port hex (naval debark site).</param>
+        /// <param name="onBeachhead">True if the unit is on a beachhead hex (§9.10.6.2).</param>
+        public bool TryDeployDOWN(out string errorMsg, bool onPort = false, bool onBeachhead = false)
         {
             if (MovementPoints.Max <= 0f)
             {
@@ -1319,19 +1353,48 @@ namespace HammerAndSickle.Models
                 return false;
             }
 
+            /* NAVAL DEBARK GATE (P2 2026-08-08, §9.5.2/§9.10.6.1): a sealifted unit lands at a friendly
+             * PORT — except marines (MAR/MMAR), whose ONE naval privilege is landing on a BEACHHEAD.
+             * ⚠ This identity check is deliberate doctrine, not the classification rot P1 deleted:
+             * §9.10.6.1 grants the privilege to the marine IDENTITY, not to any equipment. */
+            if (_deploymentPosition == DeploymentPosition.Embarked && IsNavalEmbarked)
+            {
+                bool marineBeachLanding = onBeachhead &&
+                    (Classification == UnitClassification.MAR || Classification == UnitClassification.MMAR);
+                if (!onPort && !marineBeachLanding)
+                {
+                    errorMsg = Classification is UnitClassification.MAR or UnitClassification.MMAR
+                        ? $"{UnitName} must debark at a friendly port or onto a beachhead."
+                        : $"{UnitName} must debark at a friendly port.";
+                    return false;
+                }
+            }
+
             DeploymentPosition targetPosition = GetDownwardTargetPosition(_deploymentPosition);
 
             if (!CanChangeToState(targetPosition, out errorMsg))
                 return false;
 
+            bool leavingEmbarked = _deploymentPosition == DeploymentPosition.Embarked;
             _deploymentPosition = targetPosition;
+
+            // Cleared BEFORE costs for the same active-profile reason as the deploy-up write.
+            if (leavingEmbarked)
+                SetNavalEmbarked(false);
+
             ApplyDeploymentTransitionCosts();
             return true;
         }
 
         private void ApplyDeploymentTransitionCosts()
         {
-            ConsumeSupplies(GameData.COMBAT_STATE_SUPPLY_TRANSITION_COST);
+            /* D7 (P2 2026-08-08, ruled REFUSE): a transition that cannot pay its supply does not happen.
+             * In practice this branch is unreachable — CanChangeToState refuses below the CRITICAL
+             * threshold (0.5), which exceeds the 0.25 cost — so a false return here means the gates and
+             * the costs have drifted apart, which is exactly worth a log. */
+            if (!ConsumeSupplies(GameData.COMBAT_STATE_SUPPLY_TRANSITION_COST))
+                Debug.LogWarning($"[{CLASS_NAME}] {UnitName} passed the deployment gates but could not " +
+                    "pay the supply cost — the CanChangeToState supply gate and the transition cost have drifted.");
             DeploymentActions.DecrementCurrent();
 
             // Pay the transition out of the OLD profile's budget first.
@@ -1353,54 +1416,53 @@ namespace HammerAndSickle.Models
                 MovementModeService.ScaleMovementPoints(remainingMP, oldMax, MovementPoints.Max));
         }
 
-        private bool SpecialEmbarkmentChecks(out string errorMsg, DeploymentPosition targetPos,
-            bool onAirbase, bool onPort)
+        /* ⚠ REWRITTEN P2 2026-08-08 (was SpecialEmbarkmentChecks) — ZERO classification cases. The gate
+         * keys on WHAT IS BEING BOARDED, never on who is boarding:
+         *   fixed-wing lift  -> needs an active friendly airbase (so AB/MAB keep their airbase rule as a
+         *                       CONSEQUENCE of their An-12s, and any future FW-lifted unit inherits it);
+         *   helo lift        -> boards anywhere;
+         *   naval sealift    -> needs a friendly port (the universal §9.4.7 rule — the old MAR/MMAR
+         *                       port case was this rule wearing a classification costume).
+         * The deleted cases: AB/MAB by class, the SPECF + literal TRN_AN8_SV check (which left FW-lifted
+         * SPECF with NO airbase gate at all — defect D8), the MAR/MMAR port case, and the AM/MAM
+         * UpgradePath.HELT check (the bay invariants make a non-transport in the Embarked bay
+         * impossible — EquipmentBaysTests enforces it over every template). */
+        private bool EmbarkmentChecks(out string errorMsg, DeploymentPosition targetPos,
+            bool onAirbase, bool onPort, bool navalRoute)
         {
             errorMsg = string.Empty;
 
             if (targetPos != DeploymentPosition.Embarked)
                 return true;
 
-            /* (2026-08-08 P1: the `!IsEmbarkable` guard is gone — the flag is deleted. The profile-null
-             * check below is the real fact; two guards for one fact was the declared-capability rot.) */
+            if (navalRoute)
+            {
+                if (!onPort)
+                {
+                    errorMsg = $"{UnitName} must be at a friendly port to embark on naval transport.";
+                    return false;
+                }
+                return true;
+            }
+
             var embarkedProfile = GetEmbarkedProfile();
             if (embarkedProfile == null)
             {
-                errorMsg = $"{UnitName} has no embarked profile and cannot deploy to Embarked position.";
+                errorMsg = $"{UnitName} has no air lift in its Embarked bay.";
                 return false;
             }
 
-            // Airborne units must be on an airbase
-            if ((Classification == UnitClassification.AB || Classification == UnitClassification.MAB) && !onAirbase)
+            return embarkedProfile.TransportCategory switch
             {
-                errorMsg = $"{UnitName} must be on an airbase to deploy to Embarked position.";
-                return false;
-            }
+                TransportCategory.HeloTransport => true,
+                TransportCategory.FixedWingTransport when onAirbase => true,
+                TransportCategory.FixedWingTransport => Fail(out errorMsg,
+                    $"{UnitName} must be adjacent to an active friendly airbase to board fixed-wing transport."),
+                _ => Fail(out errorMsg,
+                    $"{UnitName}'s Embarked bay holds {embarkedProfile.WeaponType}, which is not a transport — invalid content.")
+            };
 
-            // Special forces with aircraft transport must be on an airbase
-            if (Classification == UnitClassification.SPECF &&
-                embarkedProfile.WeaponType == WeaponType.TRN_AN8_SV && !onAirbase)
-            {
-                errorMsg = $"{UnitName} must be on an airbase to deploy to Embarked position with AN-12 transport.";
-                return false;
-            }
-
-            // Marines must be on a port
-            if ((Classification == UnitClassification.MAR || Classification == UnitClassification.MMAR) && !onPort)
-            {
-                errorMsg = $"{UnitName} must be on a port to deploy to Embarked position.";
-                return false;
-            }
-
-            // Airmobile units require helicopter transport profile
-            if ((Classification == UnitClassification.AM || Classification == UnitClassification.MAM) &&
-                embarkedProfile.UpgradePath != UpgradePath.HELT)
-            {
-                errorMsg = $"{UnitName} must have a valid helicopter transport profile (TRNHELO) to deploy to Embarked position.";
-                return false;
-            }
-
-            return true;
+            static bool Fail(out string msg, string text) { msg = text; return false; }
         }
 
         private void UpdateMovementPointsForProfile()
@@ -1417,6 +1479,20 @@ namespace HammerAndSickle.Models
             {
                 AppService.HandleException(CLASS_NAME, nameof(UpdateMovementPointsForProfile), e);
             }
+        }
+
+        /// <summary>
+        /// Re-derives the movement-point ceiling from the ACTIVE profile and refills to it. D5 (P2
+        /// 2026-08-08): for FRESH spawns positioned directly by a loader — a unit authored at
+        /// Mobile/Embarked otherwise started the battle on its foot ceiling, because the constructor
+        /// sizes MP from the deployed profile before the loader sets the posture.
+        /// ⚠ Loader-only. SnapshotMapper must NOT call this — it restores a SAVED current-MP value,
+        /// which a refill would clobber.
+        /// </summary>
+        public void RefreshMovementPointsForPosture()
+        {
+            UpdateMovementPointsForProfile();
+            MovementPoints.ResetToMax();
         }
 
         private bool CanChangeToState(DeploymentPosition targetState, out string errorMessage)
@@ -1475,9 +1551,12 @@ namespace HammerAndSickle.Models
                 return false;
             }
 
-            if (MovementPoints.Current < GameData.DEPLOYMENT_ACTION_MOVEMENT_COST * MovementPoints.Max)
+            // D4 (P2 2026-08-08): this gate and the HUD availability checks share ONE formula now
+            // (GetDeployMovementCost). The HUD used CeilToInt while this used the raw fraction, so at
+            // odd maxima the button greyed out for a transition the model would have allowed.
+            if (MovementPoints.Current < GetDeployMovementCost())
             {
-                errorMessage = $"{UnitName} does not have enough movement points to change states ({MovementPoints.Current:F1} available, {GameData.DEPLOYMENT_ACTION_MOVEMENT_COST} required)";
+                errorMessage = $"{UnitName} does not have enough movement points to change states ({MovementPoints.Current:F1} available, {GetDeployMovementCost():F1} required)";
                 return false;
             }
 

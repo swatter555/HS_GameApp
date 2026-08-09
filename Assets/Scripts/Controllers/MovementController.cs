@@ -167,9 +167,9 @@ namespace HammerAndSickle.Controllers
 
         // ────────────────────────────────────────────────────────────────────────────────────────────
         // Deploy up / down (§8.2 action economy). The MODEL owns the rules — CombatUnit.TryDeployUP /
-        // TryDeployDOWN do all validation and cost application — so these handlers only supply the two
-        // pieces of MAP context the model cannot see (airbase adjacency, port hex), enforce turn/side
-        // ownership, and publish the result.
+        // TryDeployDOWN do all validation and cost application — so these handlers only supply the
+        // pieces of MAP context the model cannot see (airbase adjacency, port hex, beachhead hex),
+        // enforce turn/side ownership, and publish the result.
         //
         // ⚠ THE RAISE LIVES HERE, NOT IN CombatUnit. No class under Models/ raises events, and
         // EventManager.Instance LAZY-CREATES a GameObject — a raise from the model would spawn an
@@ -192,7 +192,7 @@ namespace HammerAndSickle.Controllers
                 string error;
                 bool changed = deployUp
                     ? unit.TryDeployUP(out error, IsAdjacentToActiveFriendlyAirbase(unit), IsOnPortHex(unit))
-                    : unit.TryDeployDOWN(out error);
+                    : unit.TryDeployDOWN(out error, IsOnPortHex(unit), IsOnBeachheadHex(unit));
 
                 if (!changed)
                 {
@@ -239,6 +239,17 @@ namespace HammerAndSickle.Controllers
             if (map == null) return false;
 
             return map.GetHexAt(unit.MapPos)?.IsPort ?? false;
+        }
+
+        /// <summary>
+        /// True when the unit stands on a beachhead hex — the §9.10.6.1 marine debark site.
+        /// </summary>
+        private static bool IsOnBeachheadHex(CombatUnit unit)
+        {
+            HexMap map = GameDataManager.CurrentHexMap;
+            if (map == null) return false;
+
+            return map.GetHexAt(unit.MapPos)?.IsBeachhead ?? false;
         }
 
         /// <summary>
