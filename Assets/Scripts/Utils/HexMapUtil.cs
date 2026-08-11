@@ -30,6 +30,10 @@ namespace HammerAndSickle.Models.Map
 
         private const string CLASS_NAME = nameof(HexMapUtil);
 
+        /// <summary>How far <see cref="FindNearestLegalRestingHex"/> will search before giving up. Three
+        /// rings is 36 hexes — far beyond any realistic congestion at regimental density.</summary>
+        private const int MAX_DISPLACEMENT_RINGS = 3;
+
         // Direction vectors for pointy-top, odd-r with Y-up world coords (row+1 = higher world Y).
         // Odd rows stagger right by half a hex width. Rows are indexed by HexDirection enum:
         // NE=0, E=1, SE=2, SW=3, W=4, NW=5.
@@ -318,7 +322,16 @@ namespace HammerAndSickle.Models.Map
                 int maxMP = Mathf.RoundToInt(unit.MovementPoints.Current);
                 if (maxMP <= 0) return result;
 
-                bool isAir = unit.IsAirUnit || unit.IsHelicopter;
+                // Aboard sealift there is no per-hex movement to compute (§5.4.2.3 — instant port-to-port,
+                // sea passage abstracted). An empty range is the correct answer, not a missing feature.
+                if (MovementModeService.IsSealiftedNow(unit)) return result;
+
+                /* ⚠ THE ACTIVE PROFILE DECIDES, NOT THE CLASSIFICATION (§3.7 MovementModeService).
+                 * A classification test asks what the regiment IS; an air-assault regiment riding its
+                 * Mi-8s is neither, so it generated a GROUND range — terrain costs it does not pay and ZoC
+                 * it flies over. This must stay in lockstep with FindPath and ExecuteMovement or the overlay
+                 * promises hexes the move cannot deliver. */
+                bool isAir = MovementModeService.IsAirborneNow(unit);
                 var gdm = GameDataManager.Instance;
 
                 // Build enemy ZoC set from spotted enemies (air units ignore ZoC)
@@ -377,7 +390,13 @@ namespace HammerAndSickle.Models.Map
                         int totalCost = currentCost + stepCost;
                         if (totalCost > maxMP) continue;
 
-                        // Occupancy filtering
+                        /* ⚠ PASSING THROUGH KEYS ON THE MEDIUM — ANYTHING AIRBORNE OVERFLIES (ratified
+                         * 2026-08-10, after a play-test made the alternative untenable). A helicopter is a
+                         * ground-layer unit for where it may COME TO REST (the stop-test below), but it is
+                         * an AIRCRAFT in transit and flies over occupied hexes.
+                         * ⚠ THE PRICE OF OVERFLIGHT IS FIRE, NOT A WALL: §6.9 ambush and §11.8 air-defence
+                         * fire punish it, each followed by the §11.8.9 transit stand check. Blocking helos
+                         * here instead would make that whole risk model unreachable. */
                         if (!isAir)
                         {
                             // Enemy ground unit blocks entry — but only if the player has SPOTTED it.
@@ -408,20 +427,37 @@ namespace HammerAndSickle.Models.Map
                     }
                 }
 
-                // Build final result: exclude start position and hexes blocked by occupancy
+                /* Build final result: exclude the start position and hexes the unit may not COME TO REST on.
+                 *
+                 * ⚠ WHERE A UNIT MAY STOP IS AN OCCUPANCY QUESTION, SO IT KEYS ON CLASSIFICATION — not on the
+                 * medium that decided everything above. The two genuinely differ for a lift: a regiment riding
+                 * helicopters flies OVER an occupied hex (medium, handled in the expansion), but it comes to
+                 * rest in the GROUND stack, because `GetGroundUnitAtHex` and the icon layers both file
+                 * anything that is not fixed-wing there — helicopters included. Keying this on the medium
+                 * would let a flight land on top of an occupied hex and put two units in one ground stack,
+                 * which the stacking model cannot draw. */
                 foreach (var kvp in costs)
                 {
                     if (kvp.Key == unit.MapPos) continue;
 
-                    if (!isAir)
+                    if (unit.OccupiesDomain != Domain.Air)
                     {
-                        // Cannot stop on friendly ground unit
+                        // Comes to rest in the ground stack: no friendly and no enemy ground unit may be there.
                         if (gdm.IsHexOccupiedByFriendlyGround(kvp.Key, unit.Side))
+                            continue;
+
+                        /* The enemy half is a no-op for a walking unit — the expansion above already refused
+                         * to enter such a hex — and does the real work for a flight, which was allowed
+                         * through it. ⚠ The Level0 exclusion is the same fog rule as the expansion: an
+                         * unspotted enemy must not carve a hole in the overlay (§12). */
+                        var enemyGround = gdm.GetGroundUnitAtHex(kvp.Key);
+                        if (enemyGround != null && enemyGround.Side != unit.Side
+                            && enemyGround.SpottedLevel != SpottedLevel.Level0)
                             continue;
                     }
                     else
                     {
-                        // Air cannot stop on enemy air
+                        // Fixed-wing rests in the air stack, where only enemy aircraft are in the way.
                         var enemyAir = gdm.GetAirUnitAtHex(kvp.Key);
                         if (enemyAir != null && enemyAir.Side != unit.Side)
                             continue;
@@ -450,7 +486,12 @@ namespace HammerAndSickle.Models.Map
             {
                 if (map == null || unit == null) return new List<HexTile>();
 
-                bool isAir = unit.IsAirUnit || unit.IsHelicopter;
+                // Aboard sealift: no per-hex path exists to find (§5.4.2.3). Matches the empty range above.
+                if (MovementModeService.IsSealiftedNow(unit)) return new List<HexTile>();
+
+                // Same authority as GetValidMoveDestinations — the costs the overlay drew must be the costs
+                // the path charges.
+                bool isAir = MovementModeService.IsAirborneNow(unit);
 
                 var cameFrom = new Dictionary<Position2D, Position2D>();
                 var gScore = new Dictionary<Position2D, int> { [start] = 0 };
@@ -585,6 +626,83 @@ namespace HammerAndSickle.Models.Map
             }
         }
 
+        /// <summary>
+        /// The nearest hex <paramref name="unit"/> may legally COME TO REST on, searching outward from
+        /// <paramref name="from"/>. Returns <paramref name="from"/> unchanged when it is already legal.
+        /// </summary>
+        /// <remarks>
+        /// ⚠ WHY THIS EXISTS (Bob, play-tested 2026-08-10): the movement RANGE deliberately keeps hexes
+        /// holding UNSPOTTED enemies as legal destinations, because excluding them would carve a hole in
+        /// the overlay and leak their position through fog (§12). A ground unit is caught by the contact
+        /// halt before it arrives — but a HELICOPTER overflies that halt by design, so ordering one onto an
+        /// unspotted enemy's hex landed it on top of them. **Ruling: it is placed in the nearest legal
+        /// space, however ridiculous the result; unit density makes this rare enough not to matter.**
+        ///
+        /// ⚠ Deterministic by construction — rings outward, then the fixed neighbour order within a ring —
+        /// so a save replays identically and no player prompt is needed.
+        /// </remarks>
+        public static Position2D FindNearestLegalRestingHex(HexMap map, CombatUnit unit, Position2D from)
+        {
+            try
+            {
+                if (map == null || unit == null) return from;
+                if (CanRestAt(map, unit, from)) return from;
+
+                var visited = new HashSet<Position2D> { from };
+                var frontier = new List<Position2D> { from };
+
+                // Ring-by-ring outward. The map is small; a handful of rings always suffices in practice.
+                for (int ring = 0; ring < MAX_DISPLACEMENT_RINGS && frontier.Count > 0; ring++)
+                {
+                    var next = new List<Position2D>();
+                    foreach (var pos in frontier)
+                    {
+                        foreach (var neighbor in GetAllNeighborPositions(pos))
+                        {
+                            if (!visited.Add(neighbor)) continue;
+                            if (map.GetHexAt(neighbor) == null) continue;
+                            if (CanRestAt(map, unit, neighbor)) return neighbor;
+                            next.Add(neighbor);
+                        }
+                    }
+                    frontier = next;
+                }
+
+                // Nothing free anywhere near — leave it where it is rather than teleporting it across the
+                // map. Stacked is bad; arbitrarily relocated is worse.
+                return from;
+            }
+            catch (Exception ex)
+            {
+                AppService.HandleException(CLASS_NAME, nameof(FindNearestLegalRestingHex), ex);
+                return from;
+            }
+        }
+
+        /// <summary>True if <paramref name="unit"/> may come to rest on <paramref name="pos"/>.</summary>
+        private static bool CanRestAt(HexMap map, CombatUnit unit, Position2D pos)
+        {
+            var tile = map.GetHexAt(pos);
+            if (tile == null) return false;
+            if (tile.Terrain == TerrainType.Impassable) return false;
+
+            // Fixed-wing rests in the air stack and shares freely with the ground layer.
+            if (unit.OccupiesDomain == Domain.Air) return true;
+
+            // Everything else rests in the ground stack — which admits exactly one occupant.
+            if (tile.Terrain == TerrainType.Water) return false;
+
+            var gdm = GameDataManager.Instance;
+            if (gdm == null) return true;
+
+            foreach (var other in gdm.GetUnitsAtHex(pos))
+            {
+                if (other == null || other.UnitID == unit.UnitID) continue;
+                if (other.OccupiesDomain != Domain.Air) return false;
+            }
+            return true;
+        }
+
         #endregion // Unit Placement Methods
 
         #region Pathfinding Helpers
@@ -596,11 +714,16 @@ namespace HammerAndSickle.Models.Map
         private static int ComputeStepCost(CombatUnit unit, HexTile currentTile, HexTile neighborTile,
             HexDirection direction, bool isAir)
         {
-            // Air units: flat 1 MP per hex, ignore all terrain and rivers
-            if (isAir) return 1;
-
-            // Ground: impassable blocks entry
+            /* ⚠ IMPASSABLE IS CLOSED TO EVERY DOMAIN, INCLUDING AIR (ruled 2026-08-10) — and this check
+             * MUST stay above the airborne early-out below, which is where it used to sit.
+             * Impassable represents FOREIGN, NON-BELLIGERENT territory: overflying Pakistan or Iran is an
+             * act of war, not a shortcut. It is also what gives the map its shape — chokepoints,
+             * protected flanks, anchored air-defence placement — none of which mean anything if aircraft
+             * cross it freely. Supersedes §5.13.1's "ignores terrain costs and impassable". */
             if (neighborTile.Terrain == TerrainType.Impassable) return -1;
+
+            // Airborne: flat 1 MP per hex, ignoring terrain cost and rivers alike.
+            if (isAir) return 1;
 
             // Ground: water blocks entry (amphibious crossing handled separately by MovementController)
             if (neighborTile.Terrain == TerrainType.Water) return -1;

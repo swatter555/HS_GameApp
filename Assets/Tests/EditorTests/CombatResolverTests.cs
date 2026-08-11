@@ -200,6 +200,42 @@ namespace HammerAndSickle.Tests
         }
 
         [Test]
+        public void ResolveAmbush_HelicopterMover_IsAmbushedButNeverSurprised()
+        {
+            /* ⚠ RATIFIED 2026-08-10. A helicopter caught by a ground ambush IS halted and DOES take the
+             * attack — what it denies the ambusher is the §6.9.4 SURPRISE multiplier, because speed and
+             * altitude mean nobody gets the drop on it. A gunship is used rather than a lift precisely to
+             * isolate this from the §7.10.1 embarkment malus, which is a separate rule and still applies to
+             * anything riding in the back. */
+            var ambusher = BuildUnit(UnitClassification.INF, WeaponType.INF_REG_SV);
+            var gunship = BuildUnit(UnitClassification.HELO, WeaponType.HEL_MI24D_SV);
+            var ctx = new DirectAttackContext { DefenderTerrain = TerrainType.Clear };
+            const int v = 8;
+
+            TargetClass axis = gunship.ActiveTargetClass;
+            var expLane = new LaneInput
+            {
+                FirerAttack = ambusher.GetAttackStatVsClass(axis),
+                TargetDefense = gunship.GetDefenseStatVsClass(axis),
+                FirerQualityMult = ambusher.GetCombatQualityMultiplier(),
+                FirerDeploymentMod = ambusher.GetDeploymentCombatMod(),
+                FirerIsDefender = true,
+                AttackType = AttackType.Direct,
+                BypassTerrainBlock = true,
+                PostStackScalar = 1.0f,      // ← the whole ruling: no ×1.5
+            };
+            int exp = CombatEngine.ResolveLane(expLane, new FixedRollRandom(v));
+
+            float hp0 = gunship.HitPoints.Current;
+            var res = CombatResolver.ResolveAmbush(ambusher, gunship, ctx, new FixedRollRandom(v));
+
+            Assert.Greater(GameData.AMBUSH_BONUS_MULT, 1.0f,
+                "guard: this test proves nothing if the base ambush scalar is ever retuned to 1.0");
+            Assert.AreEqual(exp, res.DamageToMover, "ambushed, but not surprised — no ×1.5");
+            Assert.Less(gunship.HitPoints.Current, hp0, "and it definitely still takes damage");
+        }
+
+        [Test]
         public void ResolveAmbush_DugInAmbusher_HitsHarder()
         {
             var ctx = new DirectAttackContext { DefenderTerrain = TerrainType.Clear };

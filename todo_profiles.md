@@ -454,7 +454,149 @@ Deferred to P3 by design: naval TRAVERSAL (water-hex movement rules) rides the s
 pass as the airborne fix; the §21.8 instant port-to-port sealift mechanic needs a destination-pick
 input mode (M13-adjacent) and is not in P2/P3.
 
-## 14. ▶ NEXT: P3 — movement rules read the resolver (A FRESH CONTEXT STARTS HERE)
+## 14. P3 — ✅ CODE COMPLETE 2026-08-10, ⚑ SUITE RUN OWED (Bob)
+
+**All three sites re-keyed on `MovementModeService`, together:** `GetValidMoveDestinations`, `FindPath`,
+`ExecuteMovement` (step cost, road bonus, ZoC, ambush branch, and `isFixedWing` → medium for tween
+pacing, movement-audio duration, and the §6.13.2 transit flip). Ambush-against-a-flight built as
+ratified. New `MovementTests` §P3 region (8 cases) + `SpottingService.RevealAmbusherToContact` +
+`PrinterDispatch.ReportFlightHalted` + `ApplyMovementHalt` enum-keyed and `internal` for testing.
+
+### 🔴 THE NAVAL QUESTION DISSOLVED — the design doc already answers it, and the P3 note was wrong
+The note below asked Bob two things before coding naval traversal. **Neither needed him:**
+- *"May ground units enter Water hexes at all today (Water cost 1 suggests yes, a latent bug)?"* —
+  **NO, and there is no latent bug.** `HexMapUtil.ComputeStepCost` returns −1 for `TerrainType.Water`
+  on the ground branch, explicitly. The cost-1 table entry is never consulted for a walking unit.
+- *"Does naval movement use the ambush-halt rule or nothing?"* — **MOOT. THERE IS NO NAVAL TRAVERSAL
+  TO RULE ON.** §5.4.2.3: "Movement is instant (no per-hex traversal at this scale; naval intermediate
+  hexes abstracted)"; §5.4.2.6 defers everything finer than port-to-port; §24.7a.3 picks the
+  destination with a Naval Movement Marker. ⚠ **So "while `IsNavalEmbarked` the unit moves on WATER
+  hexes" (P3's own framing, below) CONTRADICTS the ratified §5.4.2 and would have built the wrong
+  mechanic** — hex-by-hex sea movement the doc explicitly abstracts away.
+
+**What P3 built instead — a PROHIBITION, which turned out to be a live hole.** `Naval` is neither
+airborne nor groundborne, so a sealifted unit fell through to the GROUND rules — which block water but
+allow LAND. A regiment that boarded ships at a port could WALK INLAND still aboard them. P2 made that
+reachable (universal port embark) on any map with a port; Khost has none, which is the only reason it
+was not already visible. `MovementModeService.IsSealiftedNow` + an early return in both HexMapUtil
+passes closes it. The §21.8 instant sealift stays where it was: needs the destination-pick input mode,
+M13-adjacent, not P3.
+
+### ⚑ FOR BOB
+1. **Please run Unity Test Runner** — `MovementTests` (rewritten helpers + 8 new cases),
+   `MovementMediumTests`, `DeploymentTransitionTests`, `AudioSystemTests`, `SpottingServiceTests`,
+   `IntelLadderTests`, `TerritoryServiceTests`. ⚠ `MovementTests`' `CreateGroundUnit`/`CreateAirUnit`
+   now build units WITH real weapon profiles — they had none, so under medium-keying the fixture
+   fighter would have been treated as infantry. That change is why the whole suite should run.
+2. **Play-test:** air assault over mountains, past enemy units, and into an ambush (the M4 ask).
+3. **Two judgement calls flagged, neither blocking** — see §14a below.
+
+## 14a. P3 — BOTH FLAGGED CALLS RULED BY BOB, 2026-08-10 (suite was green first)
+
+**THE GOVERNING DISTINCTION, in Bob's words:** helicopters "remain on the map, whereas fixed wing
+assets only ever traverse the map attempting to get to the air ops box." Everything below falls out
+of that one sentence, and new code should be written against it rather than against the symptoms.
+
+| | Helo / helo-borne | Fixed-wing |
+|---|---|---|
+| What it is | "a special type of GROUND unit" | a transient crossing the board |
+| Stopped by ground ambush? | **YES** — ambush triggers, combat does not | **NO** — nothing on the ground can touch it |
+| Spots ground units in transit? | **YES**, normally | **NO** — does not look down at all |
+| May share a ground unit's hex? | **NO** | **YES**, temporarily |
+| How the enemy engages it | ground ambush + air defence | **air defence only** — an unspotted AD unit fires and thereby reveals ITSELF |
+
+**(a) FIXED-WING AMBUSH — RULED OUT, now implemented.** P3 had applied the flight-evasion halt to
+ALL airborne movers because the ratified text said "exactly as for a ground unit"; the agent flagged
+the MiG-21-turned-back-by-infantry case as suspect. Bob: helo yes, fixed-wing no. The ambush block is
+now gated `!isFixedWing`, and the air-ambush path below it is the ONLY thing that touches a jet.
+
+**(b) "WHERE MAY IT STOP" STAYS ON CLASSIFICATION — RULED CORRECT.** Bob: "FW units CAN temporarily
+occupy a ground unit's hex, Helos cannot." That is exactly what the `IsAirUnit` stop-test delivers,
+since everything that is not fixed-wing files in the ground stack. Traversal keys on the medium, rest
+keys on the layer the unit occupies — the M5 "occupancy is legitimately classification" verdict,
+confirmed at the one place P3 forced the question.
+
+**(c) NEW — §12.3.7a, fixed-wing does not spot the ground.** Implemented in `SpottingRangeAgainst`
+(the single §12.3.10 chokepoint, so sweep + transit + decay + AI mirror inherit it together), keyed
+on the MEDIUM so a paratroop regiment inside an An-12 is covered too.
+⚠ **RECONA AND AWACS EXEMPTED — the agent's judgement call, flag it if wrong.** Both have a ratified
+8-hex ground reach that other systems are built on (§11.11.3 derives the recon mission's whole search
+area from RECONA's range; §12.3.9 calls exploiting the AWACS look-down near the front a deliberate
+player risk). Zeroing them would silently delete air reconnaissance, which the ruling plainly was not
+about. ⚠ **DESIGN-DOC AMENDMENT OWED: §12.3.7 "FGT / ATT / BMB / WW / TRN: 2 / 4" → "0 / 4"**, with a
+new §12.3.7a stating the transit rule and the two exemptions.
+
+## 14c. ⚓ THE NAVAL PROBLEM — full statement (written for Bob, 2026-08-10)
+
+### The one-sentence version
+**A unit can get onto the boat and off the boat, but there is no way to make the boat go anywhere** —
+so naval movement today is an elaborate no-op that charges a deployment action to end up exactly where
+it started.
+
+### What the design says should happen (§5.4.2, normative; §21.8 defers to it)
+1. Unit stands on a friendly **PORT** hex.
+2. It deploys up to Embarked, drawing the shared generic sealift profile (§9.4.7 / §9.10.6).
+3. The player places a **Naval Movement Marker** (§24.7a.3) on a destination — another friendly **port**
+   for any ground unit, or a coastal/**beachhead** hex for Marines only (§9.10.6.1).
+4. **Resolution is INSTANT** (§5.4.2.3): no sea hexes are crossed, the passage is abstracted away.
+5. It **consumes the entire turn** (§5.4.2.4): MoveAction and MP to zero, no combat or intel.
+6. The unit arrives **Deployed** on the destination hex (§5.4.2.5).
+
+### What is actually built
+| Step | State |
+|---|---|
+| 1–2 embark at a friendly port | ✅ **P2** — universal port rule, organic lift wins over naval, `IsNavalEmbarked` + shared `TRN_NAVAL` |
+| 6 debark → Deployed (port for all, beachhead for MAR/MMAR) | ✅ **P2** — identity doctrine, state clears on debark |
+| — the unit cannot walk while aboard | ✅ **P3** — `IsSealiftedNow` prohibition |
+| 3 destination picking | ❌ **nothing** |
+| 4 instant resolution | ❌ **nothing** |
+| 5 turn consumption | ❌ **nothing** |
+
+So the state machine is done at both ends and the middle is missing.
+
+### Why it is not simply "add movement"
+Because it is **not a movement** — it is a teleport with a target picker, and it needs three things the
+project does not have yet:
+
+1. **AN INPUT MODE.** Every battle-map input today is select / right-click-move / Ctrl-click-attack.
+   There is no "now click a destination" mode. §24 plans an input-mode state machine (Normal /
+   CtrlCombat / UnitPick / AOBPlacement / …) and **none of it exists** — this is why the todo kept
+   calling sealift "M13-adjacent". The Naval Movement Marker is one member of that family; building it
+   alone means building the first one.
+2. **A DESTINATION VALIDATOR.** Both map flags already exist (`HexTile.IsPort`, `HexTile.IsBeachhead`),
+   so this is the cheap part: friendly ports for anyone, friendly-controlled `IsBeachhead` additionally
+   for MAR/MMAR.
+3. **A RESOLUTION STEP.** Teleport, land Deployed, zero the turn, then the same post-move housekeeping a
+   normal move does — icon redraw, stacking refresh, §6.13 tile control, spotting sweep.
+
+### ⚠ It is also currently UNTESTABLE
+Khost has **no port and no beachhead hexes**, so none of this can be exercised in play until a map with
+a port is authored. That is a content gate, not a code gate, and it is the reason the P2/P3 naval work
+has never been seen running.
+
+### 🔴 DECISIONS NEEDED BEFORE CODING (this is the "solve it once and for all" list)
+1. **Is the passage risk-free?** §5.4.2.6 defers naval combat and interception, which reads as
+   *guaranteed arrival, no attrition, no interception*. Confirm — it is the difference between a
+   resolution step and a resolution *engine*.
+2. **Embark and sail in the same turn, or two turns?** Deploying up already costs a DeploymentAction and
+   50% MP, and §5.4.2.4 says the movement consumes the whole turn. Both in one turn, or board this turn
+   and sail next?
+3. **What blocks a destination?** Enemy-occupied port, friendly-occupied port, unspotted destination,
+   destination that is friendly-flagged but enemy-controlled. The paradrop equivalent (§5.4.1.6) blocks
+   on enemy occupancy and aborts — does sealift mirror that, and does a blocked attempt refund?
+4. **Is there any lift capacity?** Today `TRN_NAVAL` is a shared profile with no fleet behind it, so any
+   number of regiments can sail at once. Intended, or does a scenario cap it?
+5. **Is a beachhead landing opposed?** The marine arrives Deployed like everyone else per §5.4.2.5, which
+   makes an amphibious assault mechanically identical to walking off a dock. Intended for v1?
+6. **Does the AI ever sealift?** If yes it lands with M13; if no, say so and the resolution step can stay
+   player-only for now.
+
+### 📌 DOC DEBT found while writing this
+§9.10.6 still describes the mechanism as `EmbarkmentState EmbarkedNaval` and explains that ground
+templates "show Embarked=NONE yet IsEmbarkable=true" — **both of those symbols were DELETED in P1.**
+The RULE it states is current; only its mechanism paragraph is stale. Fold into the §7 amendments table.
+
+## 14b. ORIGINAL P3 BRIEF (kept for the rulings; the naval half is superseded by §14 above)
 
 **The original bug, still live:** an embarked air-assault regiment pays ground terrain costs and
 is halted by zones of control it is flying over. The classification test `IsAirUnit || IsHelicopter`

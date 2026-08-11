@@ -72,9 +72,96 @@ capability tags on every ruled profile, naval sealift embark/debark (universal p
 beachhead privilege), `EmbarkmentChecks` with zero classification cases, defects D1–D8 closed,
 `EquipmentBaysTests` + 8 naval deployment tests. The scenario editor's `IsEmbarkable` flip is
 authorized (signal in their Markdowns).
-**▶ A FRESH CONTEXT STARTS AT `todo_profiles.md` §14 — P3, movement rules read the resolver**
-(the three `isAir` sites, the ratified ambush-halts-the-flight rule, naval-traversal questions
-for Bob). Then P4 requisition, P5 content/docs/editor.
+**P3 — ✅ SUITE GREEN 2026-08-10 (Bob ran it), then EXTENDED the same day by Bob's air rulings
+(second suite run owed — see ⚑ below).** The governing distinction, in his words: helicopters
+"remain on the map, whereas fixed wing assets only ever traverse the map attempting to get to
+the air ops box." From that: a helo-borne unit is **a special kind of ground unit** — ambushable,
+sees the ground, may NOT share a ground unit's hex; a fixed-wing asset is **not touchable from
+the ground at all** — no ground ambush, **does not spot ground units in transit** (new §12.3.7a,
+RECONA/AWACS exempt), and MAY temporarily share a ground unit's hex. Air defence is the only
+thing that engages a jet, and it reveals itself by firing. Detail: `todo_profiles.md` §14a.
+
+All three `isAir` sites now read
+`MovementModeService` (range · A* · execution), so an embarked air-assault regiment finally
+flies; ambush-against-a-flight built as ratified (ambush triggers, combat does not, ambusher
+revealed at L1, printer + `UnitMoveBlocked`); halts enum-keyed so the narrow flight rule cannot
+be tidied into the ground one. 🔴 **The naval-traversal question DISSOLVED rather than being
+answered** — §5.4.2.3 makes naval movement INSTANT port-to-port with the sea passage abstracted,
+so P3's own "moves on WATER hexes" framing contradicted the doc. It shipped a PROHIBITION
+instead, which closed a live hole: a sealifted unit was falling through to the ground rules and
+could have walked inland aboard its ships on any map with a port. Detail + two flagged
+judgement calls: `todo_profiles.md` §14/§14a.
+**▶ A FRESH CONTEXT STARTS AT `todo_domains.md` § SESSION HANDOFF (top of file, 2026-08-10).**
+D0 and D1 are code-complete and SUITE GREEN. ✅ **The §6.9 trigger question is RESOLVED AND BUILT
+(2026-08-10, later session): POST-HOC SPOTTING** — a move is committed blind; the mover's passive
+spotting applies once at settlement over the path union (DesignDoc §12.4.4a/§6.9.10, the Panzer
+General commitment rule). Ships with the §6.9.9 eligibility filter (was enforced nowhere) and
+restores §11.11.4 air ambush against RECONA/AWACS transits (they were self-disarming it). ⚑ Suite
+run + ambush play-test owed. Everything else about the pass is designed, ratified and closed.
+
+**The full plan lives at `todo_domains.md` §H.**
+The air/ground/naval domain pass is DESIGNED AND CLOSED: helo vs fixed-wing layer model, the
+naming ruling, naval built from Bob's five precepts, and a new **`FacilityType.Port` base type**.
+Nine phases: **D0 vocabulary → D1 air rules → D2 helo air-defence → D3 over-water +
+SAVE_VERSION 6 → D4 fixed-wing staging → N0 naval foundations → N1 naval combat + sea clock →
+N2 the port (heavy lift) → N3 supply hooks (⛔ gated on §15)**. Then the ORIGINAL thread
+resumes: **P4 requisition + P5 content/docs**, with P5 merged into the domain doc pass since
+they are the same job. ⚠ Phases N0–N3 are suite-verifiable but NOT playable until Bob's coastal
+test map exists (Khost has no water). Editor relay list: `todo_domains.md` §I.
+
+### 📌 TWO DORMANT-ON-ARRIVAL NOTES (so their silence is never read as a bug)
+- **Weather is single-state Clear**, so §5.13.4 air grounding AND the new doubled sea-supply cost in
+  Storm **can never fire**. Both get built; neither can be validated in play until weather exists.
+- **§15 supply is designed but `BattleManager.ProcessUpkeep` is a stub** (depot generation, minor-depot,
+  airbase replenishment). Everything trace-dependent — the beachhead supply conduit and excluding water
+  from the trace/HCL — waits on that pass. The rest of naval does not.
+
+### ✈ AIR AUDIT 2026-08-10 → **now tracked in `todo_domains.md`** (the air/ground/naval domain pass)
+The audit below produced the layer model, the naming ruling, and a change list spanning the design
+doc, `Claude_Project.md` and code. **`todo_domains.md` is the live punch list; naval folds into its
+§F.** ✅ **The ambushed-helicopter ruling is RESOLVED AND BUILT (2026-08-10):** a helo takes an
+ORDINARY ambush attack but denies the ambusher the §6.9.4 surprise multiplier, then rolls the
+§11.8.9 transit stand check — see `todo_domains.md` §"THE AMBUSHED-HELICOPTER RULING". RULING 1
+below is kept as history of the contradiction; do not re-open it.
+
+### The audit itself — doc §5.13 / §11 vs code
+
+**Headline: the air RULES are built and tested; the air GAME is not wired.** Exactly ONE air model
+class is reachable from live gameplay (`AirAmbushCheck`, via `SpottingService.CheckAirAmbush` ←
+`MovementController`), and that path ends in a `UnityEngine.Random.Range(0,2)` coin flip under a
+`// TODO: Combat resolution for air ambush`. `AirCombatEngine`, `AirStandCheck`,
+`HeloTransitStandCheck`, `AOBMissionResolver`, `ReconMissionEngine` and `CombatResolver`'s
+airstrike / base-attack / AD-fire paths are ALL implemented, ALL EditorTest-covered, and ALL have
+ZERO live callers. There is no AOB entity, no placement input mode, no air phase in BattleManager,
+and no fixed-wing auto-return. This is the known M13 gap, now measured.
+
+**⚠ RULING 1 — does an ambushed HELICOPTER take damage?** Direct contradiction:
+- **DesignDoc §5.13.2.2:** "the ground ambush triggers and the helicopter's turn ends **after taking
+  the ambusher's attack**."
+- **Ratified 2026-08-04 (todo_audio §3b M4):** "the ambush TRIGGERS, the combat does NOT" — evade, no
+  damage, ambusher revealed. **This is what is CODED** (P3).
+- Bob 2026-08-10: "Helo-borne units are stopped by ambush by unspotted ground units, **as Helo-borne
+  units are a special type of ground unit**" — which leans back toward §5.13.2.2.
+If §5.13.2.2 wins, the fix is to raise `RaiseAmbushTriggered` on the helo branch too and keep only
+the "no ZoC halt" half of the flight rule. **Do not guess — the two readings differ by real damage.**
+
+**⚠ RULING 2 — helicopters must NOT get the fixed-wing detection roll.** §5.13.2.4: SAM/AAA op fire
+vs helos has "**no 1d6 detection roll; helicopters take the hit** if the air-defense unit has shots
+available," and a damaging hit then forces the §11.8.9 Helo Transit Stand Check. §5.13.3.2 gives the
+1d6-vs-experience roll to **fixed-wing only**. The code runs `CheckAirAmbush` (which rolls
+`AirAmbushCheck.RollDetection`) for every airborne mover. Pre-existing, widened slightly by P3.
+⚠ **`HeloTransitStandCheck` is fully built and tested with zero callers** — the correct helo path is
+mostly a wiring job, not new rules.
+
+**Smaller gaps found (no ruling needed, just unbuilt):** §5.13.5 / §3.5.7 fixed-wing auto-return
+(`UnitMoveAnimator.AnimateAutoReturn` + `OnAirUnitReturning` exist, zero callers) · sortie supply
+never deducted (`SORTIE_LAUNCH_COST` / `SORTIE_SHOT_COST` zero consumers; `CanLaunchSortie` never
+called) · §5.13.4 Storm grounding unenforced (weather is single-state Clear) · §5.13.3.3 "fixed-wing
+cannot change deployment state" is not a rule in code, only an accident of empty bays.
+
+**Confirmed CORRECT against the doc (P3 validated):** §5.13.1 flat 1 MP ignoring terrain ·
+§6.4 helos do not receive ground ZoC · §5.13.2.6 helos stack as ground units and may not share a hex
+· §5.13.2.3 a HELO can itself be the ambusher (`ProjectsZoC` true; an embarked lift correctly cannot).
 
 **(The 2026-08-04 mid-pass hand-off that stood here is RESOLVED IN FULL, 2026-08-08:** M3 went
 green in the 452 run; the OOB question closed via the editor's fresh-placement test + the new-format
@@ -203,6 +290,35 @@ to return early is that Phase 2 gets more expensive with each mission authored b
 > 5. A PASSED entry is deleted from this section the same session, after its result is recorded in the change
 >    log and, if it is a shipped behaviour, in Claude_Project. **This section is a queue, never an archive** —
 >    the moment it starts accumulating `[x]` lines it has turned back into the thing it replaced.
+
+- [!] **P3b SUITE RUN — the air rulings (2026-08-10, after the first green run).**
+      **DO:** run `SpottingServiceTests` (new §12.3.7a region, 6 cases), `MovementTests`,
+      `IntelLadderTests`, `AIPerceptionTests`, `AIPerceptionSweepTests`, `SpottingRangeTests`.
+      **PASS:** green. In particular a fighter adjacent to enemy infantry leaves it at Level0, while
+      RECONA and AWACS still spot ground out to 8 and a helo gunship still spots at 2.
+      **WHY:** the rule sits at `SpottingRangeAgainst`, the single §12.3.10 comparison — so it reaches
+      the turn-start sweep, per-hex transit checks, decay floors AND the AI mirror at once. That is
+      what makes it correct and also what makes it wide: if it is wrong it is wrong everywhere.
+      ⚠ **One judgement call to confirm: RECONA and AWACS are EXEMPT.** Their ratified 8-hex ground
+      reach is load-bearing (§11.11.3 builds the recon mission's search area from it), so zeroing them
+      would have deleted air recon. If you meant them zeroed too, say so — it is one line.
+
+- [ ] **P3 SUITE RUN — the movement rules now read the resolver (2026-08-10). ✅ GREEN, Bob ran it.**
+      Kept only until the P3b run above lands, then both go.
+      **DO:** run Unity Test Runner over `MovementTests`, `MovementMediumTests`,
+      `DeploymentTransitionTests`, `AudioSystemTests`, `SpottingServiceTests`, `IntelLadderTests`,
+      `TerritoryServiceTests`. Then play-test an air-assault regiment at Embarked: fly it over
+      mountains, past a spotted enemy, and into an unspotted one.
+      **PASS:** suites green. In play — the flight pays 1 MP per hex regardless of terrain, is NOT
+      stopped by zones of control, and when it enters a hex adjacent to an UNSPOTTED enemy it stops
+      there, takes NO damage, the enemy becomes visible as a plain contact, the printer files
+      "Ambush sighted … Flight aborted, holding position", and the unit still has its combat and
+      intel actions. Dismount it and the same regiment goes back to paying 5 MP for a mountain.
+      **WHY:** this is the bug the whole movement-medium pass exists for — an embarked regiment was
+      paying ground terrain costs and halting for ZoC it was flying over. ⚠ `MovementTests`'
+      fixtures changed shape: `CreateGroundUnit`/`CreateAirUnit` now build units WITH weapon
+      profiles, because a profile-less fixture reports `MovementMedium.None` and the fixture FIGHTER
+      would have been treated as infantry. A failure there is a fixture problem, not a rules one.
 
 - [ ] **Fog-of-war movement range (owed since 2026-07-21, never confirmed).**
       **DO:** move a unit along a path that passes near an enemy the player has NOT spotted (SpottedLevel 0) —

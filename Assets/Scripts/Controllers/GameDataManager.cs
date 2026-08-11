@@ -760,7 +760,8 @@ namespace HammerAndSickle.Controllers
                 var units = GetUnitsAtHex(pos);
                 foreach (var u in units)
                 {
-                    if (!u.IsAirUnit) return u;
+                    // Occupancy is a DOMAIN question (§`Domain`) — helicopters and lifts file here.
+                    if (u.OccupiesDomain != Domain.Air) return u;
                 }
                 return null;
             }
@@ -781,7 +782,8 @@ namespace HammerAndSickle.Controllers
                 var units = GetUnitsAtHex(pos);
                 foreach (var u in units)
                 {
-                    if (u.IsAirUnit) return u;
+                    // Only fixed-wing occupies the air layer.
+                    if (u.OccupiesDomain == Domain.Air) return u;
                 }
                 return null;
             }

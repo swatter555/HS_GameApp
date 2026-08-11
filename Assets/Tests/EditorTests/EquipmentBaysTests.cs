@@ -294,14 +294,14 @@ namespace HammerAndSickle.Tests
             var mam = Make("Air Assault", UnitClassification.MAM,
                 WeaponType.INF_AM_SV, WeaponType.NONE, WeaponType.HEL_MI8T_SV);
 
-            Assert.That(mam.IsAirborneSpottingTarget, Is.False, "dismounted rider = ground target");
+            Assert.That(mam.IsSeenAsAir, Is.False, "dismounted rider = ground target");
 
             mam.SetDeploymentPosition(DeploymentPosition.Embarked);
-            Assert.That(mam.IsAirborneSpottingTarget, Is.True,
+            Assert.That(mam.IsSeenAsAir, Is.True,
                 "riding helo lift = air target (§12.3 — dead until P1/D1 re-pointed it)");
 
             var gunship = Make("Gunship", UnitClassification.HELO, WeaponType.HEL_MI24V_SV);
-            Assert.That(gunship.IsAirborneSpottingTarget, Is.False,
+            Assert.That(gunship.IsSeenAsAir, Is.False,
                 "an attack helo flies NoE and is spotted on the GROUND range — the HELO exclusion holds");
         }
 

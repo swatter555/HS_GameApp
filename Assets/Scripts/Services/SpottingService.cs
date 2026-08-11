@@ -21,7 +21,9 @@ namespace HammerAndSickle.Services
 
     /// <summary>
     /// Handles all spotting, fog-of-war, and ambush detection logic for the battle scene.
-    /// Called by MovementController per hex step and by BattleManager at turn start/admin phase.
+    /// Called by BattleManager at turn start/admin phase and by MovementController per hex step for the
+    /// EVENT checks (ambush, air ambush) — the mover's own passive spotting applies once at move
+    /// settlement (§12.4.4a), not per hex.
     /// </summary>
     public static class SpottingService
     {
@@ -67,34 +69,66 @@ namespace HammerAndSickle.Services
         }
 
         /// <summary>
-        /// Incremental spotting: checks enemies within the mover's spotting range at newPos.
-        /// Returns list of enemies that transitioned from Level0 (newly visible).
-        /// Called per hex step during movement.
+        /// The MOVER's passive spotting for a whole move order, applied ONCE at settlement over every hex
+        /// the unit entered plus its resting hex (§12.4.4a, ratified 2026-08-10). Returns the enemies that
+        /// transitioned from Level0 (newly visible).
         /// </summary>
-        public static List<CombatUnit> CheckSpottingForMover(CombatUnit mover, Position2D newPos)
+        /// <remarks>
+        /// ⚠ THE MOVE IS COMMITTED BLIND — the Panzer General rule. This used to run per hex, and that is
+        /// precisely what made §6.9 ground ambush STRUCTURALLY UNREACHABLE: a mover must stand at distance
+        /// 2 before it can stand at distance 1, ground spotting is a deterministic 2, so the sweep raised
+        /// every ambusher to Level1 one hex before adjacency and the trigger's Level0 requirement could
+        /// never be met. Applied post-hoc, a hidden enemy is still hidden when you blunder past it. The
+        /// EVENT-DRIVEN reveals (contact halt, ambush §6.9.3, air-ambush detection §12.4.8, firing
+        /// §12.4.9) are the only mid-move reveals, and they stay where they are.
+        ///
+        /// ⚠ Each observed hex contributes its own distance ceiling, so a drive-past at adjacency earns
+        /// the §12.4.2 adjacency ceiling even when the move ends far away — the column reports what it
+        /// passed. Fleeting contacts then hold or decay by the ordinary §12.6 floor from the FINAL board
+        /// position, which is the model working as intended, not a leak.
+        ///
+        /// ⚠ DO NOT "OPTIMISE" WITH A FIXED-WING SKIP AT THE CALL SITE. <see cref="SpottingRangeAgainst"/>
+        /// already resolves a transiting jet to range 0 against ground targets (§12.3.7a) — but RECONA and
+        /// AWACS keep their ratified 8-hex look-down THROUGH THIS SAME PATH, and a helo-borne unit sees
+        /// the ground normally. The range function is the policy; the sweep must stay uniform.
+        /// </remarks>
+        public static List<CombatUnit> ApplyPostMoveSpotting(CombatUnit mover, IReadOnlyList<Position2D> observedFrom)
         {
             var newlySpotted = new List<CombatUnit>();
             try
             {
+                if (mover == null || observedFrom == null || observedFrom.Count == 0)
+                    return newlySpotted;
+
                 var enemies = GameDataManager.Instance.GetAIUnits();
                 foreach (var enemy in enemies)
                 {
                     if (enemy.IsDestroyed()) continue;
 
                     int range = SpottingRangeAgainst(mover, enemy);
-                    int dist = HexMapUtil.GetHexDistance(newPos, enemy.MapPos);
-                    if (dist <= range)
+
+                    // Best ceiling across every hex the column observed from. Duplicates in the list are
+                    // harmless — a hex contributes the same ceiling every time.
+                    var best = SpottedLevel.Level0;
+                    for (int i = 0; i < observedFrom.Count; i++)
                     {
-                        var oldLevel = enemy.SpottedLevel;
-                        RaiseToCeiling(enemy, PassiveContactCeiling(mover, dist));
-                        if (oldLevel == SpottedLevel.Level0)
-                            newlySpotted.Add(enemy);
+                        int dist = HexMapUtil.GetHexDistance(observedFrom[i], enemy.MapPos);
+                        if (dist > range) continue;
+
+                        var ceiling = PassiveContactCeiling(mover, dist);
+                        if (ceiling > best) best = ceiling;
                     }
+                    if (best == SpottedLevel.Level0) continue;
+
+                    var oldLevel = enemy.SpottedLevel;
+                    RaiseToCeiling(enemy, best);
+                    if (oldLevel == SpottedLevel.Level0)
+                        newlySpotted.Add(enemy);
                 }
             }
             catch (Exception e)
             {
-                AppService.HandleException(CLASS_NAME, nameof(CheckSpottingForMover), e);
+                AppService.HandleException(CLASS_NAME, nameof(ApplyPostMoveSpotting), e);
             }
             return newlySpotted;
         }
@@ -359,7 +393,16 @@ namespace HammerAndSickle.Services
         /// <summary>
         /// Checks for ground ambush: returns the unspotted enemy whose ZoC the mover entered, or null.
         /// </summary>
-        public static CombatUnit CheckGroundAmbush(CombatUnit mover, Position2D newPos)
+        /// <param name="alreadySprung">
+        /// ⚠ ANTI-DOGPILE (§11.8.6, extended to ambush 2026-08-10): unit IDs that have already ambushed
+        /// THIS mover during THIS move order. An ambusher gets ONE bite per aircraft — without it a
+        /// helicopter, which now flies ON through an ambush rather than halting, can be engaged repeatedly
+        /// by the same regiment as it crosses several hexes in that regiment's reach, and Shock compounds
+        /// until a defended line deletes a gunship in a single order. §11.8.6 already sets exactly this
+        /// limit for air-defence fire; this is the same rule for the same reason.
+        /// </param>
+        public static CombatUnit CheckGroundAmbush(CombatUnit mover, Position2D newPos,
+            ISet<string> alreadySprung = null)
         {
             try
             {
@@ -373,6 +416,15 @@ namespace HammerAndSickle.Services
                     if (ground.Side == mover.Side) continue;
                     if (ground.SpottedLevel != SpottedLevel.Level0) continue;
                     if (!ground.ProjectsZoC) continue;
+
+                    /* §6.9.9 — the classification half of the gate (ProjectsZoC above already rejects
+                     * bases and Embarked). A hidden tube battery is the ambush VICTIM, never the
+                     * ambusher: the mover passes it unmolested and learns of it at settlement
+                     * (§12.4.4a). Enforced here since 2026-08-10 — it was checked nowhere before,
+                     * invisible only because the trigger itself could never fire. */
+                    if (!GameData.IsAmbushEligible(ground.Classification)) continue;
+
+                    if (alreadySprung != null && alreadySprung.Contains(ground.UnitID)) continue;
 
                     return ground; // ambusher found
                 }
@@ -441,6 +493,34 @@ namespace HammerAndSickle.Services
             }
         }
 
+        /// <summary>
+        /// Reveals a unit at CONTACT (Level 1) — the reveal for a unit whose presence became known without
+        /// it firing from the open. Two callers: the §6.9.3 sprung ambusher (`AmbushAction`) and the
+        /// contact-halt blocker (`MovementController`).
+        /// </summary>
+        /// <remarks>
+        /// ⚠ LEVEL 1, NOT LEVEL 4, and the difference is which §12 rule applies. Opportunity and AD fire
+        /// reveal at Level4 (§12.4.9.1 — radars hot and shooting from the open exposes WHAT you are). An
+        /// ambusher fires FROM CONCEALMENT: §6.9.3 grants the victim a contact, not an identification —
+        /// you know where the fire came from, not what is dug in there.
+        ///
+        /// (History: built 2026-08-04 for the flight-evasion halt, whose rule was RETIRED 2026-08-10 when
+        /// helos started taking the ambush attack. The method outlived its first caller because §6.9.3 and
+        /// the contact halt need exactly this reveal.)
+        /// </remarks>
+        public static void RevealToContact(CombatUnit ambusher)
+        {
+            try
+            {
+                if (ambusher == null) return;
+                RaiseToCeiling(ambusher, SpottedLevel.Level1);
+            }
+            catch (Exception e)
+            {
+                AppService.HandleException(CLASS_NAME, nameof(RevealToContact), e);
+            }
+        }
+
         #endregion // Ambush Detection
 
         #region Private Helpers
@@ -456,11 +536,46 @@ namespace HammerAndSickle.Services
         /// </summary>
         private static int SpottingRangeAgainst(CombatUnit spotter, CombatUnit target)
         {
-            int range = target.IsAirborneSpottingTarget
+            // A fixed-wing aircraft in transit does not look at the ground (§12.3.7a, Bob 2026-08-10).
+            if (!target.IsSeenAsAir && FliesPastTheGround(spotter)) return 0;
+
+            int range = target.IsSeenAsAir
                 ? spotter.ActiveAirSpottingRange
                 : spotter.ActiveGroundSpottingRange;
 
             return Math.Max(0, range - target.EnemySpottingRangeReduction);
+        }
+
+        /// <summary>
+        /// True for a unit travelling FIXED-WING that is not a dedicated look-down sensor platform — i.e. one
+        /// that is merely crossing the map and sees nothing on the ground below it.
+        /// </summary>
+        /// <remarks>
+        /// ⚠ THE RULING (Bob, 2026-08-10): "FW air units do not even spot ground units during a transit
+        /// attempt." Fixed-wing assets only ever traverse the map on their way to the air ops box; they are
+        /// not loitering observers. What CAN happen to them on the way is the reverse — an unspotted air
+        /// defence unit fires on them and reveals ITSELF (`CheckAirAmbush`). Ground troops neither see them
+        /// nor are seen by them.
+        ///
+        /// ⚠ KEYED ON THE MEDIUM, NOT THE CLASSIFICATION, because a paratroop regiment riding an An-12 is
+        /// classification AB — it would otherwise keep its ground-combat spotting range of 2 and go on
+        /// spotting enemies from inside a transport aircraft.
+        ///
+        /// ⚠ RECONA AND AWACS ARE EXEMPT, AND THIS IS THE ONE JUDGEMENT CALL IN THE RULE. Both are ratified
+        /// look-down platforms whose ground reach is load-bearing elsewhere: §12.3.8 gives RECONA 8 hexes
+        /// and §11.11.3 builds the recon mission's whole search area out of it, while §12.3.9 gives AWACS 8
+        /// and calls exploiting it near the front a deliberate player risk. Zeroing those would silently
+        /// delete air reconnaissance, which is plainly not what the ruling was about. ⚠ DESIGN-DOC
+        /// AMENDMENT OWED: §12.3.7 becomes 0 / 4 for FGT / ATT / BMB / WW / TRN.
+        /// </remarks>
+        private static bool FliesPastTheGround(CombatUnit spotter)
+        {
+            if (MovementModeService.CurrentMedium(spotter) != MovementMedium.FixedWing) return false;
+
+            bool isLookDownPlatform =
+                spotter.Classification is UnitClassification.RECONA or UnitClassification.AWACS;
+
+            return !isLookDownPlatform;
         }
 
         /// <summary>

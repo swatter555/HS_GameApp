@@ -304,7 +304,7 @@ namespace HammerAndSickle.Core.Map
                 }
 
                 // Don't render air units that are attached to a friendly airbase
-                if (IsFixedWingAircraft(unit.Classification) && IsAtFriendlyAirbase(unit))
+                if (unit.OccupiesDomain == Domain.Air && IsAtFriendlyAirbase(unit))
                 {
                     if (_debug) Debug.Log($"[{CLASS_NAME}.CreateUnitIcon] Skipping '{unit.UnitName}' - attached to friendly airbase.");
                     return;
@@ -360,7 +360,7 @@ namespace HammerAndSickle.Core.Map
                 ApplyIntelDisplay(unitIcon, unit);
 
                 // Sorting from SortingConfig, overriding baked prefab sorting (matches the target layer).
-                unitIcon.ApplySorting(IsFixedWingAircraft(unit.Classification) ? SortSlot.AirUnit : SortSlot.GroundUnit);
+                unitIcon.ApplySorting(unit.OccupiesDomain == Domain.Air ? SortSlot.AirUnit : SortSlot.GroundUnit);
 
                 // Position the prefab
                 Vector3 position = GetRenderPosition(new Vector2Int(unit.MapPos.IntX, unit.MapPos.IntY));
@@ -639,7 +639,7 @@ namespace HammerAndSickle.Core.Map
         /// </summary>
         private Transform GetTargetLayerForUnit(CombatUnit unit)
         {
-            if (IsFixedWingAircraft(unit.Classification))
+            if (unit.OccupiesDomain == Domain.Air)
             {
                 return HexGridRenderer.Instance.AirUnitLayerTransform;
             }
@@ -668,17 +668,17 @@ namespace HammerAndSickle.Core.Map
             return false;
         }
 
-        /// <summary>
-        /// Checks if a unit classification is a fixed-wing aircraft (not helicopter).
-        /// </summary>
-        private bool IsFixedWingAircraft(UnitClassification classification)
-        {
-            return classification == UnitClassification.FGT ||
-                   classification == UnitClassification.ATT ||
-                   classification == UnitClassification.BMB ||
-                   classification == UnitClassification.RECONA ||
-                   classification == UnitClassification.AWACS;
-        }
+        /* ⚠ D9 (2026-08-10): a local "is fixed-wing" list lived here, missing WW and TRN — so a transport
+         * aircraft drew on the GROUND unit layer. DELETED rather than re-pointed: every caller had a
+         * CombatUnit in hand, and "which layer does this draw on" is exactly `OccupiesDomain`. Rule sites
+         * ask the question-named property; only the derivation asks the classification.
+         * ⚠ NAMESPACE TRAP WORTH KNOWING: it could not have simply called
+         * `GameData.IsAirborneClassification` either. This file sits in `HammerAndSickle.Core.Map`, so the
+         * identifier `GameData` binds to the NAMESPACE `HammerAndSickle.Core.GameData` and not to the
+         * class of the same name inside it. Any file under `HammerAndSickle.Core.*` hits this. The two
+         * existing workarounds are `PrinterDispatch` (`using GameDataConst = ...GameData.GameData;`) and
+         * `HexGridSystem` (`GameData.GameData.HexSize`) — but reaching for the unit's own property, as
+         * here, is better than either when a CombatUnit is in hand. */
 
         #endregion // Private Methods - Utilities
 
@@ -847,17 +847,8 @@ namespace HammerAndSickle.Core.Map
 
         #region Unit Stacking Methods
 
-        /// <summary>
-        /// Determines if a unit is an air unit based on its classification.
-        /// All fixed-wing aircraft are considered air units for stacking purposes.
-        /// Helicopters are ground units.
-        /// </summary>
-        /// <param name="unit">The unit to check</param>
-        /// <returns>True if the unit is an air unit</returns>
-        private bool IsAirUnit(CombatUnit unit)
-        {
-            return IsFixedWingAircraft(unit.Classification);
-        }
+        /* Stacking asks `OccupiesDomain` directly — helicopters stack as GROUND units, and since
+         * 2026-08-10 fixed-wing is the ONLY thing that may temporarily share a hex. */
 
         /// <summary>
         /// Checks for stacking at a hex position and updates stacking state.
@@ -882,7 +873,7 @@ namespace HammerAndSickle.Core.Map
                     if (unit == null || !unit.MapPos.Equals(position))
                         continue;
 
-                    if (IsAirUnit(unit))
+                    if (unit.OccupiesDomain == Domain.Air)
                     {
                         airUnitId = unitId;
                     }

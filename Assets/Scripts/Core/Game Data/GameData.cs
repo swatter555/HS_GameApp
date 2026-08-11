@@ -725,6 +725,40 @@ namespace HammerAndSickle.Core.GameData
     }
 
     /// <summary>
+    /// WHICH LAYER OF THE BATTLEFIELD A UNIT OCCUPIES — the answer to "what may share its hex, what may
+    /// engage it, does it hold ground".
+    /// </summary>
+    /// <remarks>
+    /// ⚠ THIS IS ONE OF THREE SEPARATE QUESTIONS, AND CONFLATING THEM IS THE DEFECT THIS ENUM EXISTS TO
+    /// END. The three are:
+    ///   1. HOW DOES IT MOVE?  → <see cref="MovementMedium"/> (terrain cost, zones of control, ambush
+    ///      exposure, impassable/water rules, pacing, audio).
+    ///   2. WHERE IS IT?       → this enum, via `CombatUnit.OccupiesDomain` (hex sharing, icon layer,
+    ///      tile-control flips, who may attack it).
+    ///   3. HOW IS IT SEEN?    → `CombatUnit.IsSeenAsAir` (which spotting range an observer uses).
+    ///
+    /// ⚠ The word "air" used to answer all three at once, and `IsAirUnit` returned FALSE for a
+    /// helicopter — the single most misleading thing in the codebase. **A helicopter OCCUPIES THE GROUND
+    /// LAYER**: it moves like an aircraft but stacks, holds ground, projects zones of control, flips
+    /// territory and is ambushed like a ground unit. Only FIXED-WING occupies the air layer.
+    ///
+    /// ⚠ RULE CODE ASKS THE QUESTION-NAMED PROPERTY; ONLY THE DERIVATION ASKS THE CLASSIFICATION.
+    /// `OccupiesDomain` happens to be derivable from `IsFixedWing` today, but a rule site that tests the
+    /// classification directly is how "air" got overloaded the first time.
+    /// </remarks>
+    public enum Domain
+    {
+        /// <summary>Walks or drives — and helicopters, which fly but live here.</summary>
+        Ground,
+
+        /// <summary>Fixed-wing only. Reachable solely by air defence and other aircraft.</summary>
+        Air,
+
+        /// <summary>Aboard sealift. Water hexes plus the one friendly port hex.</summary>
+        Naval
+    }
+
+    /// <summary>
     /// These WeaponTypes correspond to specific RegimentProfiles, help determine sprite usage.
     /// </summary>
     public enum WeaponType
@@ -1745,12 +1779,39 @@ namespace HammerAndSickle.Core.GameData
         /// fixed-wing classes only. Attack helos (HELO) are NOT airborne targets — they fly Nap-of-the-Earth (NOE),
         /// hugging terrain, so they are spotted on the GROUND range and are hard to catch on air-search. The AM/MAM
         /// air-assault transit case (EmbarkedHelo — a lift that cannot hide as easily) IS air, but it is runtime
-        /// state, added at the CombatUnit level (see CombatUnit.IsAirborneSpottingTarget).
+        /// state, added at the CombatUnit level (see CombatUnit.IsSeenAsAir).
         /// </summary>
         public static bool IsAirborneClassification(UnitClassification c) =>
             c == UnitClassification.FGT || c == UnitClassification.ATT || c == UnitClassification.BMB
             || c == UnitClassification.RECONA || c == UnitClassification.AWACS
             || c == UnitClassification.WW || c == UnitClassification.TRN;
+
+        /// <summary>
+        /// §6.9.9 ambush-eligibility (ratified 2026-06-11, ENFORCED 2026-08-10): may this classification
+        /// SPRING a ground ambush? Written as the doc's INCLUSION list so an unlisted class fails closed —
+        /// a new classification that should ambush is a visible playtest gap; a battery that ambushes when
+        /// it must not is a silent rules violation.
+        /// </summary>
+        /// <remarks>
+        /// ⚠ The exclusions are doctrine, not oversight: SAM/SPSAM cannot engage ground (§7A.13), BM is a
+        /// strategic single-shot (§7A.11), ROC has no point-blank reactive fire, ART/SPA surprised at close
+        /// range are the ambush VICTIM, ENG is a non-combatant (§7A.9), facilities cannot initiate attacks
+        /// (§7A.20). AAA/SPAAA are deliberately IN — flak leveled at infantry (§7A.12). Embarked state and
+        /// bases are additionally rejected by <c>ProjectsZoC</c> at the trigger; this list is the
+        /// classification half of the gate. Excluded classes still TRIGGER ambushes normally as the mover.
+        /// </remarks>
+        public static bool IsAmbushEligible(UnitClassification c) => c switch
+        {
+            UnitClassification.TANK or UnitClassification.MECH or UnitClassification.MOT
+                or UnitClassification.INF or UnitClassification.AB or UnitClassification.MAB
+                or UnitClassification.MAR or UnitClassification.MMAR
+                or UnitClassification.AM or UnitClassification.MAM
+                or UnitClassification.CAV or UnitClassification.SPECF
+                or UnitClassification.RECON or UnitClassification.AT
+                or UnitClassification.HELO
+                or UnitClassification.AAA or UnitClassification.SPAAA => true,
+            _ => false,
+        };
 
         /// <summary>
         /// The leg-carried identities — the family whose members may buy helo lift by IDENTITY

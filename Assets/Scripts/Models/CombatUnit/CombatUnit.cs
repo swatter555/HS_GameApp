@@ -67,14 +67,39 @@ namespace HammerAndSickle.Models
         [JsonInclude] [JsonPropertyName("nationality")]    public Nationality Nationality { get; private set; }
         [JsonIgnore]                                       public bool IsBase => IsBaseType(Classification);
 
-        // Unit classification helpers for movement, occupancy, and ZoC
-        [JsonIgnore] public bool IsAirUnit =>
-            Classification is UnitClassification.FGT or UnitClassification.ATT
-            or UnitClassification.BMB or UnitClassification.RECONA or UnitClassification.AWACS;
-
-        [JsonIgnore] public bool IsFixedWingAirUnit => IsAirUnit;
+        /// <summary>
+        /// True for a FIXED-WING aircraft. ⚠ Replaces the old `IsAirUnit` / `IsFixedWingAirUnit` pair
+        /// (identical expressions, both short by two members) — see the remarks.
+        /// </summary>
+        /// <remarks>
+        /// ⚠ THIS IS THE DERIVATION, NOT A RULE SITE. Ask <see cref="OccupiesDomain"/> or
+        /// <see cref="IsSeenAsAir"/> in rule code; this exists to feed them (§`Domain`).
+        ///
+        /// ⚠ D9 FIXED HERE (2026-08-10): FOUR disagreeing "is fixed-wing" lists existed —
+        /// `GameData.IsAirborneClassification` (7, correct), the old `IsAirUnit` (5, missing WW + TRN),
+        /// `IsFixedWingClassification` (4, missing AWACS as well), and one in `GameIconRenderer` (5).
+        /// All now defer to the GameData list, which §12.3.7 backs and `SpottingRangeTests` pins.
+        /// Two live bugs die with them: a TRANSPORT AIRCRAFT was filed in the GROUND layer (so it
+        /// projected zones of control and could be ground-ambushed), and an AWACS could not attach to an
+        /// airbase at all because `AddAirUnit` threw on it.
+        /// </remarks>
+        [JsonIgnore] public bool IsFixedWing => GameData.IsAirborneClassification(Classification);
 
         [JsonIgnore] public bool IsHelicopter => Classification == UnitClassification.HELO;
+
+        /// <summary>
+        /// Which layer of the battlefield this unit occupies right now — the authority for hex sharing,
+        /// icon layer, tile-control flips, and who may engage it.
+        /// </summary>
+        /// <remarks>
+        /// ⚠ A HELICOPTER IS `Ground`. It flies, but it stacks, holds ground, projects zones of control
+        /// and is ambushed like a ground unit. Only fixed-wing is `Air`, and fixed-wing is the ONLY thing
+        /// that may temporarily share a hex with another unit.
+        /// </remarks>
+        [JsonIgnore] public Domain OccupiesDomain =>
+            IsFixedWing ? Domain.Air
+            : IsNavalEmbarked ? Domain.Naval
+            : Domain.Ground;
 
         [JsonIgnore] public bool IsReconUnit =>
             Classification is UnitClassification.RECON or UnitClassification.RECONA;
@@ -83,7 +108,7 @@ namespace HammerAndSickle.Models
         {
             get
             {
-                if (IsAirUnit || IsBase) return false;
+                if (IsFixedWing || IsBase) return false;
                 if (_deploymentPosition == DeploymentPosition.Embarked) return false;
                 return true;
             }
@@ -171,13 +196,23 @@ namespace HammerAndSickle.Models
         [JsonIgnore] public int ActiveGroundSpottingRange => GameData.GroundSpottingRange(Classification);
         [JsonIgnore] public int ActiveAirSpottingRange => GameData.AirSpottingRange(Classification);
 
-        /// <summary>True if THIS unit is an airborne spotting target (a spotter uses its AIR range against it): any
-        /// fixed-wing, or a regiment riding helo lift (§7A.14 — a lift that can't easily hide). Attack helos (HELO)
-        /// are NOT — they fly Nap-of-the-Earth and are spotted on the ground range. A dismounted rider is a ground
-        /// target. ⚠ The second arm read the never-written EmbarkmentState until 2026-08-08 (P1/D1) and was
-        /// permanently false; the ACTIVE PROFILE's medium is what actually says "riding helicopters right now".</summary>
-        [JsonIgnore] public bool IsAirborneSpottingTarget =>
-            GameData.IsAirborneClassification(Classification)
+        /// <summary>True if a spotter uses its AIR range against THIS unit: any fixed-wing, or a regiment riding
+        /// helo lift (§7A.14 — a lift that can't easily hide). Attack helos (HELO) are NOT — they fly
+        /// Nap-of-the-Earth and are spotted on the ground range. A dismounted rider is a ground target.
+        /// ⚠ The second arm read the never-written EmbarkmentState until 2026-08-08 (P1/D1) and was
+        /// permanently false; the ACTIVE PROFILE's medium is what actually says "riding helicopters right now".
+        /// </summary>
+        /// <remarks>
+        /// ⚠ THIS IS DELIBERATELY A DIFFERENT QUESTION FROM <see cref="OccupiesDomain"/>, AND THE
+        /// HELO-BORNE LIFT IS THE CASE THAT PROVES IT: in flight it OCCUPIES the ground layer (it stacks
+        /// and lands there) but is SEEN as air (it cannot hide like a gunship). One property could never
+        /// express that, which is why the vocabulary names the question rather than the answer.
+        /// ⚠ Boolean rather than a `Domain`, because there are exactly TWO spotting ranges — tanks,
+        /// helicopters and ships all share the ground one, and no ship should have to be labelled
+        /// "Ground" to be ranged against.
+        /// </remarks>
+        [JsonIgnore] public bool IsSeenAsAir =>
+            IsFixedWing
             || (Classification != UnitClassification.HELO
                 && GetActiveWeaponProfile()?.MovementMedium == MovementMedium.Helo);
 
@@ -736,7 +771,7 @@ namespace HammerAndSickle.Models
                                  (GetActiveWeaponProfile()?.ICM ?? GameData.ICM_DEFAULT);
 
                 // Air units (not helos) skip deployment state modifier
-                if (!IsAirUnitClassification(Classification))
+                if (!IsFixedWingClassification(Classification))
                     modifier *= GetCombatStateModifier();
 
                 return modifier;
@@ -847,7 +882,7 @@ namespace HammerAndSickle.Models
         /// The engine applies this only on the return lane.
         /// </summary>
         public float GetDeploymentCombatMod() =>
-            IsFixedWingAirUnit ? 1.0f : GetCombatStateModifier();
+            IsFixedWing ? 1.0f : GetCombatStateModifier();
 
         /// <summary>The active profile's Hard/Soft target class (§7.4.1) — the axis an attacker uses against THIS unit.</summary>
         public TargetClass ActiveTargetClass => GetActiveWeaponProfile()?.TargetClass ?? TargetClass.Soft;
@@ -1902,7 +1937,7 @@ namespace HammerAndSickle.Models
                     return false;
                 }
 
-                if (!IsAirUnitClassification(unit.Classification))
+                if (!IsFixedWingClassification(unit.Classification))
                     throw new InvalidOperationException($"Only air units can be attached to an airbase. {unit.UnitName} is {unit.Classification}");
 
                 if (_airUnitsAttached.Contains(unit) || _attachedUnitIDs.Contains(unit.UnitID))
@@ -2103,11 +2138,12 @@ namespace HammerAndSickle.Models
             }
         }
 
-        private bool IsAirUnitClassification(UnitClassification classification) =>
-            classification == UnitClassification.FGT ||
-            classification == UnitClassification.ATT ||
-            classification == UnitClassification.BMB ||
-            classification == UnitClassification.RECONA;
+        /* ⚠ D9 (2026-08-10): this was a FOURTH spelling of "is fixed-wing" and the shortest of them —
+         * FGT / ATT / BMB / RECONA only. Because `AddAirUnit` throws on anything it rejects, an AWACS
+         * could not be attached to an airbase AT ALL, and neither could a transport (which the fixed-wing
+         * staging plan depends on). Now defers to the one canonical list. */
+        private bool IsFixedWingClassification(UnitClassification classification) =>
+            GameData.IsAirborneClassification(classification);
 
         #endregion // Airbase Management
 

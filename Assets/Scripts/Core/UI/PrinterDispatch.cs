@@ -236,6 +236,69 @@ namespace HammerAndSickle.Core.UI
             }
         }
 
+        /* ⚠ `ReportFlightHalted` was DELETED 2026-08-10 along with the evade-without-damage rule it
+         * narrated. A helicopter caught by a ground ambush now takes an ordinary attack and files the
+         * normal `ReportAmbush` dispatch like any other victim; fixed-wing is never ground-ambushed at
+         * all, so no flight-specific dispatch has a caller. */
+
+        /// <summary>
+        /// Files the §11.8.9 transit ABORT: the sortie took fire it could not press through and turned back
+        /// to where it launched.
+        /// </summary>
+        /// <remarks>
+        /// Never gated by verbosity — gate B, attribution. The unit is back where it started with nothing
+        /// to show for the turn, which without an explanation reads as the order never having been issued.
+        /// </remarks>
+        public static void ReportFlightAborted(CombatUnit flight, Position2D originHex)
+        {
+            try
+            {
+                if (flight == null || flight.Side != Side.Player) return;
+
+                File(
+                    new[]
+                    {
+                        "Heavy fire on the approach.",
+                        "Unable to press the sortie.",
+                        $"Returning to {Hex(originHex)}."
+                    },
+                    flight.UnitName, PrinterCategory.Combat);
+            }
+            catch (Exception e)
+            {
+                AppService.HandleException(CLASS_NAME, nameof(ReportFlightAborted), e);
+            }
+        }
+
+        /// <summary>
+        /// Files the §6.13-adjacent CONTACT halt: the advance ran into an enemy nobody knew was there and
+        /// stopped short of the hex the player picked.
+        /// </summary>
+        /// <remarks>
+        /// Never gated by verbosity — gate B, attribution. Without it, an order that visibly stops early
+        /// reads as the order having been ignored. This is the dispatch half of the 2026-08-10 overrun fix.
+        /// </remarks>
+        public static void ReportMoveBlockedByContact(CombatUnit mover, Position2D hex)
+        {
+            try
+            {
+                if (mover == null || mover.Side != Side.Player) return;
+
+                File(
+                    new[]
+                    {
+                        $"Enemy in strength at {Hex(hex)}.",
+                        "They were not there on the last report.",
+                        "Advance halted short of the objective."
+                    },
+                    mover.UnitName, PrinterCategory.Combat);
+            }
+            catch (Exception e)
+            {
+                AppService.HandleException(CLASS_NAME, nameof(ReportMoveBlockedByContact), e);
+            }
+        }
+
         #endregion // Combat Dispatches
 
         #region Objective Dispatches

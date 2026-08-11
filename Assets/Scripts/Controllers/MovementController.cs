@@ -811,8 +811,15 @@ namespace HammerAndSickle.Controllers
             }
 
             var map = GameDataManager.CurrentHexMap;
-            bool isAir = CurrentUnit.IsAirUnit || CurrentUnit.IsHelicopter;
-            bool isFixedWing = CurrentUnit.IsFixedWingAirUnit;
+
+            /* ⚠ HOW THE UNIT IS TRAVELLING RIGHT NOW, read from the profile carrying it — never from its
+             * classification (§3.7 MovementModeService). These two booleans must agree with the pair inside
+             * HexMapUtil's range and path passes; when they disagree the overlay draws hexes the move
+             * cannot reach. An air-assault regiment riding Mi-8s is not `UnitClassification.HELO`, so the
+             * old classification test walked it over the mountains it was flying above. */
+            var medium = MovementModeService.CurrentMedium(CurrentUnit);
+            bool isAir = MovementModeService.IsAirborneNow(CurrentUnit);
+            bool isFixedWing = medium == MovementMedium.FixedWing;
             Position2D previousPos = CurrentUnit.MapPos;
             Position2D originPos = CurrentUnit.MapPos;   // for the post-move stacking refresh
 
@@ -820,6 +827,16 @@ namespace HammerAndSickle.Controllers
             // §6.13 tile-control flips after the move settles. May be shorter than the planned path
             // if an ambush / ZoC halt cuts the move short.
             var enteredHexes = new List<Position2D>();
+
+            /* §11.8.9 Shock input — cumulative HP this helicopter has lost during THIS move order. Shock
+             * accumulates across events, so a second burst is far likelier to break the sortie than the
+             * first. Reset per move order, never per hex. */
+            int hpLostThisMove = 0;
+
+            /* §11.8.6 anti-dogpile, extended to ambush — one bite per ambusher per move order. Matters now
+             * that a helicopter flies ON through an ambush: without this the same regiment engages it again
+             * at every hex still in its reach, and accumulating Shock breaks the sortie on geometry alone. */
+            var ambushersSprung = new HashSet<string>();
 
             /* ⚠ ONE SPELLING of the per-hex tween length, because the movement SOUND is chosen from it.
              * It used to be re-declared inside the loop; two copies would let the audio pick a clip for a
@@ -840,6 +857,29 @@ namespace HammerAndSickle.Controllers
             {
                 var targetTile = _currentPath[i];
                 var targetPos = targetTile.Position;
+
+                /* ⚠ CONTACT HALT — THE OVERRUN FIX (2026-08-10). Before stepping in, is an enemy standing
+                 * there? The movement RANGE deliberately ignores unspotted enemies so the overlay cannot
+                 * leak their position through fog (§12) — `HexMapUtil` says as much and promises the
+                 * mid-move sweep "reveals and halts on contact instead". That halt was never written, so a
+                 * regiment walked straight over an unspotted enemy and kept going.
+                 * The unit stops BEFORE entering, the enemy is revealed to contact, and movement points
+                 * survive for a combat or intel action — you found them, now decide what to do about it. */
+                /* ⚠ GROUND ONLY. Anything AIRBORNE overflies an occupied hex (ratified 2026-08-10) — the
+                 * price of overflight is fire and a stand check, not a wall. */
+                if (!isAir)
+                {
+                    var blocker = GameDataManager.Instance?.GetGroundUnitAtHex(targetPos);
+                    if (blocker != null && blocker.Side != CurrentUnit.Side)
+                    {
+                        SpottingService.RevealToContact(blocker);
+                        ApplyMovementHalt(CurrentUnit, MovementHalt.Contact);
+
+                        PrinterDispatch.ReportMoveBlockedByContact(CurrentUnit, targetPos);
+                        GameAudio.Play(SFX.UnitMoveBlocked);
+                        break;
+                    }
+                }
 
                 // Compute step cost
                 var currentTile = map.GetHexAt(CurrentUnit.MapPos);
@@ -885,38 +925,110 @@ namespace HammerAndSickle.Controllers
                     yield return new WaitForSeconds(stepSeconds);
                 }
 
-                // Spotting pass
-                var newlySpotted = SpottingService.CheckSpottingForMover(CurrentUnit, targetPos);
-
-                /* First contact. ⚠ PlayFrom on the SPOTTED unit rather than an ungated Play, even though
-                 * everything in this list is by definition now spotted: if the meaning of "newly spotted"
-                 * ever drifts, the gate suppresses the sound instead of announcing a hidden unit. Fails
-                 * closed, like AudioFogPolicy itself. */
-                if (newlySpotted.Count > 0)
-                    GameAudio.PlayFrom(SFX.UnitSpotted, newlySpotted[0]);
-
-                // Ground ambush check
-                if (!isAir && newlySpotted.Count > 0)
+                /* ⚠ THE MOVE IS COMMITTED BLIND (§12.4.4a, ratified 2026-08-10 — the Panzer General
+                 * rule). The mover's own passive spotting does NOT run in this loop; it applies once at
+                 * settlement, below. That is what makes this check REACHABLE at all: a mover must stand at
+                 * distance 2 before it can stand at distance 1, and the per-hex sweep that used to run
+                 * here raised every ambusher to Level1 one hex before adjacency — the trigger's Level0
+                 * requirement could never be met, for any unit, ever (the earlier ambush-before-sweep
+                 * ordering fix only mattered within a single hex; the sweep from the PREVIOUS hex had
+                 * already disarmed the trap). Mid-move, the only reveals are event-driven: the contact
+                 * halt above, the ambush itself (§6.9.3), and air-ambush detection below.
+                 *
+                 * WHO IS SUBJECT TO IT, BY THE MEDIUM CARRYING THE UNIT (Bob, 2026-08-10):
+                 *   GROUND      → the full §6.9 ambush, combat and all.
+                 *   HELO        → the same, minus the §6.9.4 surprise multiplier (handled in the lane
+                 *                 builder). ⚠ A helo-borne regiment is A SPECIAL KIND OF GROUND UNIT — it
+                 *                 stays on the map, so ground troops can catch it.
+                 *   FIXED-WING  → NOTHING, and that is the rule rather than an omission. It is only ever
+                 *                 crossing the map to reach the air ops box; it does not look at the ground
+                 *                 on the way (see SpottingService §12.3) and ground troops cannot touch it.
+                 *                 Air defence engages it through the SEPARATE air-ambush path below, which
+                 *                 is how an unspotted SAM reveals itself by firing. */
+                if (!isFixedWing)
                 {
-                    var ambusher = SpottingService.CheckGroundAmbush(CurrentUnit, targetPos);
+                    var ambusher = SpottingService.CheckGroundAmbush(CurrentUnit, targetPos, ambushersSprung);
                     if (ambusher != null)
                     {
-                        ApplyAbnormalHalt(CurrentUnit, true);
+                        ambushersSprung.Add(ambusher.UnitID);
 
-                        if (EventManager.Instance != null)
-                            EventManager.Instance.RaiseAmbushTriggered(ambusher, CurrentUnit);
+                        /* ⚠ A GROUND UNIT STOPS DEAD; A HELICOPTER TAKES THE FIRE AND FLIES ON (ratified
+                         * 2026-08-10, superseding §5.13.2.2's "turn ends"). THE DIVERGENCE IS THE RULE, not
+                         * an inconsistency to tidy away: a helicopter is not stopped by troops on the
+                         * ground, it is SHOT AT by them, and whether the sortie survives that is decided by
+                         * the §11.8.9 transit stand check below — hold and continue, or abort home. */
+                        if (!isAir)
+                            ApplyMovementHalt(CurrentUnit, MovementHalt.GroundAmbush);
 
-                        // §24.8.6 — the attribution case: fire came from a hex the player had no contact on.
-                        PrinterDispatch.ReportAmbush(ambusher, CurrentUnit, targetPos);
+                        /* ⚠ THE ORCHESTRATOR, NOT THE EVENT. `RaiseAmbushTriggered` has never had a
+                         * subscriber, so until 2026-08-10 an ambush dealt NO DAMAGE — it halted the mover
+                         * and printed a dispatch about a fight that never happened. `AmbushAction` is the
+                         * caller `CombatResolver.ResolveAmbush` was written for. */
+                        var ambush = AmbushAction.Execute(ambusher, CurrentUnit, map, new CombatRandom());
+                        hpLostThisMove += ambush.DamageToMover;
 
-                        /* ⚠ ATTRIBUTED TO THE VICTIM, NOT THE AMBUSHER — the sharpest case §27.7.4.2
-                         * exists for. The ambusher is BY DEFINITION unspotted (§6.9.0), so attributing
-                         * the sound to it would gate the player's own regiment being hit into silence;
-                         * playing it ungated would announce a hidden unit. You always hear your own men
-                         * take fire, and you learn nothing about who fired. */
-                        GameAudio.PlayFrom(SFX.AmbushTriggered, CurrentUnit);
+                        if (AMBUSH_DEBUG)
+                            Debug.Log($"[AMBUSH DEBUG] {ambusher.UnitName} ({ambusher.Classification}) sprang " +
+                                      $"{CurrentUnit.UnitName} entering {targetPos}: executed={ambush.Executed}, " +
+                                      $"dmg={ambush.DamageToMover} (0 with no error above = a MISS band, legitimate §7.6), " +
+                                      $"stand={ambush.MoverOutcome}, displaced={ambush.MoverMoved} " +
+                                      $"back {ambush.MoverHexesRetreated} to {ambush.MoverFinalPosition}, " +
+                                      $"removed={ambush.MoverRemovedFromMap}" +
+                                      (ambush.Executed ? "" : $", REASON={ambush.Reason}"));
 
-                        break;
+                        /* ⚠ NARRATION ONLY IF THE RESOLUTION ACTUALLY RAN. If the orchestrator failed
+                         * internally (its own catch — already logged), the halt above stands (§6.9.2: the
+                         * move is over on the trigger hex) but no event, dispatch or sound fires — a fight
+                         * that never resolved must not be narrated as one. Without this gate a swallowed
+                         * failure is indistinguishable in play from a whiffed ambush. */
+                        if (ambush.Executed)
+                        {
+                            if (EventManager.Instance != null)
+                                EventManager.Instance.RaiseAmbushTriggered(ambusher, CurrentUnit);
+
+                            // §24.8.6 — the attribution case: fire came from a hex the player had no contact on.
+                            PrinterDispatch.ReportAmbush(ambusher, CurrentUnit, targetPos);
+
+                            /* ⚠ ATTRIBUTED TO THE VICTIM, NOT THE AMBUSHER — the sharpest case §27.7.4.2
+                             * exists for. The ambusher is BY DEFINITION unspotted (§6.9.0), so attributing
+                             * the sound to it would gate the player's own regiment being hit into silence;
+                             * playing it ungated would announce a hidden unit. You always hear your own men
+                             * take fire, and you learn nothing about who fired. */
+                            GameAudio.PlayFrom(SFX.AmbushTriggered, CurrentUnit);
+                        }
+
+                        /* ⚠ UNCONDITIONAL, mirroring the direct-combat path ("HP %, removals, defender
+                         * displacement"): the coarse redraw is the ONLY thing that refreshes the victim's
+                         * HP box — `RaiseUnitHitPointsChanged` is unused scaffolding (§3.6e). Gating this
+                         * on displacement/removal left a HOLD outcome showing pre-ambush HP: the model had
+                         * taken the damage and the ledger had booked it, but the icon never heard
+                         * (play-test 2026-08-11 — log said dmg=9, HP box said nothing). */
+                        EventManager.Instance?.RaiseRedrawMapIcons();
+
+                        if (ambush.MoverRemovedFromMap)
+                        {
+                            State = MovementState.Idle;
+                            yield break;
+                        }
+
+                        /* §11.8.9 — the transit stand check, per DAMAGING event, with Shock accumulating
+                         * across the whole move. A helicopter that holds carries on with what it has left;
+                         * one that breaks flies home free. Ground units never reach this: they already
+                         * halted above. */
+                        if (isAir && ambush.DamageToMover > 0
+                            && !HoldsTransitStand(CurrentUnit, hpLostThisMove))
+                        {
+                            AbortFlightToOrigin(CurrentUnit, originPos);
+                            break;
+                        }
+
+                        // A helicopter that held is still flying — do NOT break; the move continues.
+                        if (!isAir) break;
+                    }
+                    else if (AMBUSH_DEBUG)
+                    {
+                        // Diagnostic: name why any adjacent enemy did NOT spring on this hex (see the flag's note).
+                        DebugLogAmbushScan(CurrentUnit, targetPos, ambushersSprung);
                     }
                 }
 
@@ -938,10 +1050,12 @@ namespace HammerAndSickle.Controllers
                     }
                 }
 
-                // ZoC-to-ZoC check (ground only)
+                /* ZoC-to-ZoC check. ⚠ GROUND ONLY, AND THAT IS THE RULE, NOT AN OVERSIGHT: zones of control
+                 * never stop a flight (ratified 2026-08-04). Ambush is the single mechanism by which an
+                 * enemy halts an airborne move. */
                 if (!isAir && _currentRange.ZocTerminals.Contains(targetPos))
                 {
-                    ApplyAbnormalHalt(CurrentUnit, false);
+                    ApplyMovementHalt(CurrentUnit, MovementHalt.ZoneOfControl);
 
                     // Ungated: the halt is a fact about the player's own order, and the enemy ZoC that
                     // caused it belongs to a unit they have already spotted.
@@ -960,6 +1074,37 @@ namespace HammerAndSickle.Controllers
                 if (EventManager.Instance != null)
                     EventManager.Instance.RaiseUnitMovementPointsChanged(CurrentUnit);
             }
+
+            /* ⚠ LANDED ON SOMEONE? Displace to the nearest legal hex (Bob, play-tested 2026-08-10). The
+             * range overlay keeps UNSPOTTED enemy hexes selectable on purpose — hiding them would leak
+             * their position through fog (§12) — and a helicopter overflies the contact halt by design, so
+             * a move ordered onto a hidden enemy puts the two in one ground stack. The ruling is "nearest
+             * legal space, however ridiculous"; unit density makes it rare enough not to matter. */
+            var settled = HexMapUtil.FindNearestLegalRestingHex(map, CurrentUnit, CurrentUnit.MapPos);
+            if (settled != CurrentUnit.MapPos)
+            {
+                HexMapUtil.MoveUnitTo(map, CurrentUnit, settled);
+                GameDataManager.Instance?.BuildOccupancyCache();
+            }
+
+            /* §12.4.4a — THE COLUMN REPORTS IN. The move was committed blind (see the loop comment); now
+             * that it has settled — path done, or ended by ambush/contact/ZoC/exhausted MP, displacement
+             * included — one passive pass covers every hex entered plus the resting hex, each at its own
+             * distance ceiling. Dispatches, icons and the contact sound all land here, once per newly
+             * revealed unit — never per hex. A mover DESTROYED mid-move never reaches this line and files
+             * no report (the ambusher's own §6.9.3 reveal already fired inside AmbushAction).
+             * ⚠ No fixed-wing skip here, deliberately: SpottingRangeAgainst already resolves a transiting
+             * jet to 0 against ground targets (§12.3.7a), while RECONA/AWACS look-down and helo-borne
+             * ground vision flow through this same call. The range function is the policy. */
+            var observedFrom = new List<Position2D>(enteredHexes) { CurrentUnit.MapPos };
+            var newlySpotted = SpottingService.ApplyPostMoveSpotting(CurrentUnit, observedFrom);
+
+            /* First contact. ⚠ PlayFrom on the SPOTTED unit rather than an ungated Play, even though
+             * everything in this list is by definition now spotted: if the meaning of "newly spotted"
+             * ever drifts, the gate suppresses the sound instead of announcing a hidden unit. Fails
+             * closed, like AudioFogPolicy itself. */
+            if (newlySpotted.Count > 0)
+                GameAudio.PlayFrom(SFX.UnitSpotted, newlySpotted[0]);
 
             // Move complete. Snap the icon to its final hex (defends against tween rounding or a halted
             // last step) and refresh air/ground stacking at both ends (a departed origin may reveal a
@@ -1019,33 +1164,155 @@ namespace HammerAndSickle.Controllers
         }
 
         /// <summary>
-        /// Applies the abnormal movement halt rules (ZoC-to-ZoC, ground ambush).
+        /// The ways a move can end before its path does. Each kind spends a DIFFERENT set of resources,
+        /// which is why this is an enum rather than the bool it replaced.
         /// </summary>
-        private void ApplyAbnormalHalt(CombatUnit unit, bool isAmbush)
+        /// <remarks>
+        /// `internal` so EditorTests can pin the composition of each halt. The FlightEvasion rule is
+        /// "movement points and the move action, and nothing else" — a rule whose violation is invisible in
+        /// play (a flight that also lost its combat action just looks like a flight that was ambushed) and
+        /// which someone will eventually "tidy" into matching the ground branch.
+        /// </remarks>
+        internal enum MovementHalt
         {
+            /// <summary>ZoC-to-ZoC (§6.2): movement points survive for a combat or intel action.</summary>
+            ZoneOfControl,
+
+            /// <summary>
+            /// Walked into an enemy that was not there a moment ago — an unspotted unit standing in the
+            /// next hex. Same consequence as a ZoC halt (the move is over, but you may still fight), a
+            /// different cause, and worth naming separately so the reason is legible at the call site.
+            /// </summary>
+            Contact,
+
+            /// <summary>
+            /// Ground ambush (§6.9): the unit is in contact and everything is spent. ⚠ Applies to
+            /// HELICOPTERS TOO — §5.13.2.2, the helicopter's turn ends after taking the attack. The
+            /// narrower `FlightEvasion` kind was retired 2026-08-10 with the evade-without-damage rule.
+            /// </summary>
+            GroundAmbush
+        }
+
+        /// <summary>
+        /// Applies a movement halt. Every kind ends the move order; they differ in what else they cost.
+        /// </summary>
+        /// <summary>
+        /// §11.8.9 — the helicopter transit stand check. True if the sortie holds and the move continues.
+        /// </summary>
+        private static bool HoldsTransitStand(CombatUnit helo, int hpLostThisMove)
+        {
+            var input = new HeloTransitStandInput
+            {
+                Experience = helo.ExperienceLevel,
+                HpLostThisMove = hpLostThisMove,
+            };
+
+            int sv = HeloTransitStandCheck.ComputeStandValue(input);
+            return HeloTransitStandCheck.ResolveStand(sv, new CombatRandom()) == HeloTransitOutcome.Hold;
+        }
+
+        /// <summary>
+        /// §11.8.9 ABORT — the sortie breaks off and flies home. A FREE return to the hex the move order
+        /// began on (no opportunity fire on the return leg, mirroring §5.13.5), movement points and every
+        /// action to zero, and an embarked transport sets its passengers down at the origin.
+        /// </summary>
+        /// <remarks>
+        /// ⚠ THE ORIGIN HEX IS GUARANTEED FREE, and that is why there is no fallback here. A move order is
+        /// atomic with respect to input — nothing else can move between departure and abort — so the hex
+        /// the unit left cannot have been taken in the interim. ⚠ That guarantee holds only while input
+        /// stays gated during `MovementState.Executing`; if that ever changes, this needs a fallback hex.
+        /// </remarks>
+        private void AbortFlightToOrigin(CombatUnit helo, Position2D originPos)
+        {
+            var map = GameDataManager.CurrentHexMap;
+            HexMapUtil.MoveUnitTo(map, helo, originPos);
+
+            helo.ForceSetMovementPoints(0);
+            helo.ForceSetActions(0, 0, 0);
+            helo.MoveActions.SetCurrent(0);
+
+            // An air-assault lift that breaks off puts its troops down where they started (§11.8.9).
+            if (helo.DeploymentPosition == DeploymentPosition.Embarked
+                && MovementModeService.CurrentMedium(helo) == MovementMedium.Helo)
+            {
+                helo.TryDeployDOWN(out _);
+            }
+
+            GameIconRenderer.Instance?.SnapIcon(helo.UnitID, originPos);
+            PrinterDispatch.ReportFlightAborted(helo, originPos);
+            GameAudio.Play(SFX.UnitMoveBlocked);
+        }
+
+        internal static void ApplyMovementHalt(CombatUnit unit, MovementHalt kind)
+        {
+            // Common to every halt: the move order is over.
             unit.MoveActions.SetCurrent(0);
 
-            if (isAmbush)
+            switch (kind)
             {
-                // Full ambush: everything zeroed
-                unit.ForceSetMovementPoints(0);
-                unit.ForceSetActions(0, 0, 0);
-            }
-            else
-            {
-                // ZoC halt: preserve MP for combat/intel if actions remain
-                bool hasCombat = unit.CombatActions.Current >= 1;
-                bool hasIntel = unit.IntelActions.Current >= 1;
-
-                if (hasCombat || hasIntel)
-                {
-                    float preservedMP = Math.Max(unit.GetCombatMovementCost(), unit.GetIntelMovementCost());
-                    unit.ForceSetMovementPoints(preservedMP);
-                }
-                else
-                {
+                case MovementHalt.GroundAmbush:
+                    // Caught in contact — movement and every action gone.
                     unit.ForceSetMovementPoints(0);
-                }
+                    unit.ForceSetActions(0, 0, 0);
+                    break;
+
+                case MovementHalt.ZoneOfControl:
+                case MovementHalt.Contact:
+                    // Two causes, one consequence: the move is over, but preserve enough MP to still fight
+                    // or scout from where it stopped if an action remains.
+                    bool hasCombat = unit.CombatActions.Current >= 1;
+                    bool hasIntel = unit.IntelActions.Current >= 1;
+
+                    if (hasCombat || hasIntel)
+                    {
+                        float preservedMP = Math.Max(unit.GetCombatMovementCost(), unit.GetIntelMovementCost());
+                        unit.ForceSetMovementPoints(preservedMP);
+                    }
+                    else
+                    {
+                        unit.ForceSetMovementPoints(0);
+                    }
+                    break;
+            }
+        }
+
+        /* ─────────────────────────────────────────────────────────────────────────────────────────
+         * ⚠ DIAGNOSTIC PASS 2026-08-11 — flip false (or delete) once §6.9 ambush is CONFIRMED IN PLAY.
+         * A play-test cannot tell a WHIFFED ambush (natural 0 on the band roll = a miss, a legitimate
+         * §7.6 outcome — the halt still costs the whole turn) from a swallowed resolution failure, and
+         * cannot tell "no ambush" from "ambush skipped by a filter". These logs name the case exactly.
+         * Filter the Console on [AMBUSH DEBUG].
+         * ───────────────────────────────────────────────────────────────────────────────────────── */
+        private static readonly bool AMBUSH_DEBUG = true;
+
+        /// <summary>
+        /// Diagnostic (see the flag above): for the hex just entered, names WHY each adjacent enemy did
+        /// not spring an ambush — mirrors <see cref="SpottingService.CheckGroundAmbush"/>'s filters in
+        /// the same order. Silent when no enemy is adjacent.
+        /// </summary>
+        private static void DebugLogAmbushScan(CombatUnit mover, Position2D enteredHex, ISet<string> alreadySprung)
+        {
+            var gdm = GameDataManager.Instance;
+            if (gdm == null) return;
+
+            foreach (var neighborPos in HexMapUtil.GetAllNeighborPositions(enteredHex))
+            {
+                var ground = gdm.GetGroundUnitAtHex(neighborPos);
+                if (ground == null || ground.Side == mover.Side) continue;
+
+                string reason =
+                    ground.SpottedLevel != SpottedLevel.Level0
+                        ? $"already spotted ({ground.SpottedLevel}) — a Level0-at-adjacency miss here would be the old disarm bug"
+                    : !ground.ProjectsZoC
+                        ? "projects no ZoC (embarked or base)"
+                    : !GameData.IsAmbushEligible(ground.Classification)
+                        ? $"ineligible class per §6.9.9 ({ground.Classification})"
+                    : alreadySprung.Contains(ground.UnitID)
+                        ? "already sprang this move (anti-dogpile §11.8.6)"
+                        : "NO FILTER MATCHES — CheckGroundAmbush disagrees with this scan; investigate";
+
+                Debug.Log($"[AMBUSH DEBUG] {ground.UnitName} ({ground.Classification}) at {neighborPos}, " +
+                          $"adjacent to {mover.UnitName} entering {enteredHex}, did NOT spring: {reason}");
             }
         }
 

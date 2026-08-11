@@ -491,7 +491,7 @@ namespace HammerAndSickle.Tests
             mam.SetDeploymentPosition(DeploymentPosition.Embarked);
 
             Assert.That(MovementModeService.IsAirborneNow(mam), Is.True, "it is on helicopters");
-            Assert.That(mam.IsAirUnit || mam.IsHelicopter, Is.False,
+            Assert.That(mam.IsFixedWing || mam.IsHelicopter, Is.False,
                 "and classification still says otherwise — which is exactly why the two must not be conflated");
 
             mam.SetDeploymentPosition(DeploymentPosition.Mobile);

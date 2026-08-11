@@ -68,6 +68,70 @@ namespace HammerAndSickle.Tests
 
         #endregion // Helpers
 
+        #region Post-hoc settlement spotting (§12.4.4a)
+
+        [Test]
+        public void PostMoveSpotting_DrivePastEarnsTheAdjacencyCeiling()
+        {
+            /* §12.4.4a — the column reports what it PASSED, not merely what it can see from where it
+             * stopped. Adjacent at one mid-path hex, far away at settlement: the drive-past still earns
+             * the §12.4.2 adjacency ceiling. */
+            var mover = Spotter(UnitClassification.INF);
+            var enemy = Target(UnitClassification.INF, 6);
+
+            var observedFrom = new System.Collections.Generic.List<Position2D>
+            {
+                new Position2D(5, ROW_Y),   // adjacent to the enemy mid-path
+                new Position2D(9, ROW_Y),   // the resting hex, distance 3 — out of range on its own
+            };
+            var newlySpotted = SpottingService.ApplyPostMoveSpotting(mover, observedFrom);
+
+            Assert.AreEqual(SpottedLevel.Level2, enemy.SpottedLevel,
+                "adjacency somewhere along the path earns Level2, wherever the move ends");
+            Assert.That(newlySpotted, Does.Contain(enemy), "and it reports as a new contact");
+        }
+
+        [Test]
+        public void PostMoveSpotting_OutOfRangeFromEveryHex_StaysHidden()
+        {
+            var mover = Spotter(UnitClassification.INF);
+            var enemy = Target(UnitClassification.INF, 10);
+
+            var observedFrom = new System.Collections.Generic.List<Position2D>
+            {
+                new Position2D(3, ROW_Y),   // distance 7
+                new Position2D(4, ROW_Y),   // distance 6
+            };
+            var newlySpotted = SpottingService.ApplyPostMoveSpotting(mover, observedFrom);
+
+            Assert.AreEqual(SpottedLevel.Level0, enemy.SpottedLevel,
+                "nothing on the path came within ground range 2 — the enemy stays invisible");
+            Assert.That(newlySpotted, Is.Empty);
+        }
+
+        [Test]
+        public void PostMoveSpotting_ReportsOnlyLevel0Transitions()
+        {
+            /* The newly-spotted list drives the first-contact sound and dispatch — an enemy the player
+             * already had contact on must not re-announce itself every move that passes it. */
+            var mover = Spotter(UnitClassification.INF);
+            var fresh = Target(UnitClassification.INF, 5, SpottedLevel.Level0);
+            var known = Target(UnitClassification.TANK, 6, SpottedLevel.Level1);
+
+            var observedFrom = new System.Collections.Generic.List<Position2D>
+            {
+                new Position2D(4, ROW_Y),   // adjacent to fresh (d1), in range of known (d2)
+            };
+            var newlySpotted = SpottingService.ApplyPostMoveSpotting(mover, observedFrom);
+
+            Assert.AreEqual(SpottedLevel.Level2, fresh.SpottedLevel, "the new contact rises to the adjacency ceiling");
+            Assert.AreEqual(SpottedLevel.Level1, known.SpottedLevel, "the old contact holds — range only sustains Level1");
+            Assert.That(newlySpotted, Is.EquivalentTo(new[] { fresh }),
+                "only the Level0 transition is announced");
+        }
+
+        #endregion // Post-hoc settlement spotting (§12.4.4a)
+
         #region Air-defence dual-domain crux
 
         [Test]
@@ -253,5 +317,120 @@ namespace HammerAndSickle.Tests
         }
 
         #endregion // Baseline + decay
+
+        #region §12.3.7a — a fixed-wing aircraft in transit does not look at the ground
+
+        /* ⚠ THE RULING (Bob, 2026-08-10): fixed-wing assets only ever cross the map on their way to the air
+         * ops box, and they neither see ground units nor are seen by them. What CAN happen on the way is the
+         * reverse — an unspotted air-defence unit fires and reveals ITSELF. Helicopters are excluded from all
+         * of this: a helo-borne regiment is a special kind of GROUND unit that stays on the map.
+         *
+         * ⚠ THESE FIXTURES CARRY REAL PROFILES and the plain `Spotter` helper above does not. The rule keys
+         * on the MEDIUM, so a profile-less unit reports `MovementMedium.None` and the rule stays off — which
+         * is exactly why every case here uses `FlyingSpotter`. A test written with the bare helper would pass
+         * without exercising anything. */
+
+        /// <summary>A player spotter carrying a real profile, so it has an actual movement medium.</summary>
+        private CombatUnit FlyingSpotter(UnitClassification classification, WeaponType deployed, int x = SPOT_X)
+        {
+            var unit = new CombatUnit("AirSpotter", classification, UnitRole.AirSuperiority,
+                Side.Player, Nationality.USSR,
+                deployedProfile: deployed, mobileProfile: WeaponType.NONE, embarkedProfile: WeaponType.NONE);
+            unit.SetPosition(new Position2D(x, ROW_Y));
+            unit.SetDeploymentPosition(DeploymentPosition.Deployed);
+            GameManager.RegisterCombatUnit(unit);
+            return unit;
+        }
+
+        [Test]
+        public void FixedWingInTransit_SeesNothingOnTheGround()
+        {
+            // Standing right next to the enemy — the old 2-hex ground range would have caught it twice over.
+            var fighter = FlyingSpotter(UnitClassification.FGT, WeaponType.FGT_MIG21_SV);
+            var infantry = Target(UnitClassification.MOT, SPOT_X + 1);
+
+            SpottingService.RecomputeAllSpotting();
+
+            Assert.AreEqual(SpottedLevel.Level0, infantry.SpottedLevel,
+                "a fighter crossing the map does not spot the ground beneath it");
+            Assert.IsNotNull(fighter);
+        }
+
+        [Test]
+        public void FixedWingInTransit_StillSeesEnemyAircraft()
+        {
+            // Only the GROUND arm is zeroed. Air-to-air is the fighter's whole job and keeps its range of 4.
+            FlyingSpotter(UnitClassification.FGT, WeaponType.FGT_MIG21_SV);
+            var enemyJet = Target(UnitClassification.FGT, SPOT_X + 3);
+
+            SpottingService.RecomputeAllSpotting();
+
+            Assert.AreEqual(SpottedLevel.Level1, enemyJet.SpottedLevel,
+                "the air picture is unaffected — this rule is about looking DOWN");
+        }
+
+        [TestCase(UnitClassification.RECONA, WeaponType.RCNA_MIG25R_SV, Description = "§12.3.8 look-down recon, 8")]
+        [TestCase(UnitClassification.AWACS, WeaponType.AWACS_A50_SV, Description = "§12.3.9 AEW look-down, 8")]
+        public void LookDownPlatforms_KeepTheirRatifiedGroundReach(UnitClassification cls, WeaponType profile)
+        {
+            /* ⚠ THE EXEMPTION, AND THE REASON IT EXISTS. Both platforms have a ratified 8-hex ground reach
+             * that other systems are built on: §11.11.3 derives the recon mission's entire search area from
+             * RECONA's spotting range, and §12.3.9 calls exploiting the AWACS look-down near the front a
+             * deliberate player risk. Zeroing these along with the fighters would silently delete air
+             * reconnaissance — plainly not what the ruling was about. */
+            FlyingSpotter(cls, profile);
+            var infantry = Target(UnitClassification.MOT, SPOT_X + 6);
+
+            SpottingService.RecomputeAllSpotting();
+
+            Assert.AreEqual(SpottedLevel.Level1, infantry.SpottedLevel,
+                $"{cls} is a look-down sensor platform, not a transiting strike aircraft");
+        }
+
+        [Test]
+        public void ParatroopersInATransport_DoNotSpotGroundEither()
+        {
+            /* ⚠ WHY THE RULE KEYS ON THE MEDIUM RATHER THAN THE CLASSIFICATION. This regiment is
+             * `UnitClassification.AB` — a ground-combat class with a ground spotting range of 2 — but it is
+             * currently inside a transport aircraft. A classification-keyed rule would have it spotting
+             * enemies out of the cargo hold. */
+            var paras = new CombatUnit("Paras", UnitClassification.AB, UnitRole.GroundCombat,
+                Side.Player, Nationality.USSR,
+                deployedProfile: WeaponType.INF_AB_SV, mobileProfile: WeaponType.NONE,
+                embarkedProfile: WeaponType.TRN_AN8_SV);
+            paras.SetPosition(new Position2D(SPOT_X, ROW_Y));
+            paras.SetDeploymentPosition(DeploymentPosition.Embarked);
+            GameManager.RegisterCombatUnit(paras);
+
+            var infantry = Target(UnitClassification.MOT, SPOT_X + 1);
+
+            SpottingService.RecomputeAllSpotting();
+
+            Assert.AreEqual(SpottedLevel.Level0, infantry.SpottedLevel,
+                "in the air aboard a transport, it sees nothing on the ground");
+
+            // Back on its feet, the same regiment spots normally — the rule is about how it is travelling.
+            paras.SetDeploymentPosition(DeploymentPosition.Deployed);
+            SpottingService.RecomputeAllSpotting();
+
+            Assert.AreEqual(SpottedLevel.Level2, infantry.SpottedLevel,
+                "on the ground and adjacent, it earns the ordinary §12.4.2 ceiling");
+        }
+
+        [Test]
+        public void HelicoptersStillSpotTheGround()
+        {
+            // Helo-borne units are a special kind of GROUND unit — they stay on the map, see it, and can be
+            // ambushed off it. The transit rule must not leak across to them.
+            FlyingSpotter(UnitClassification.HELO, WeaponType.HEL_MI24D_SV);
+            var infantry = Target(UnitClassification.MOT, SPOT_X + 1);
+
+            SpottingService.RecomputeAllSpotting();
+
+            Assert.AreEqual(SpottedLevel.Level2, infantry.SpottedLevel,
+                "a gunship flying nap-of-the-earth is looking right at them");
+        }
+
+        #endregion // §12.3.7a — a fixed-wing aircraft in transit does not look at the ground
     }
 }

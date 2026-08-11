@@ -220,7 +220,7 @@ namespace HammerAndSickle.Models.Combat
                 FirerQualityMult = attacker.GetCombatQualityMultiplier(),
                 FirerIsDefender = false,
                 AttackType = AttackType.Direct,
-                FirerIsAir = attacker.IsFixedWingAirUnit,
+                FirerIsAir = attacker.IsFixedWing,
                 TargetTerrain = ctx.DefenderTerrain,
                 BypassTerrainBlock = attacker.Classification == UnitClassification.BM,
                 ContestedCrossing = ctx.ContestedCrossing,
@@ -246,7 +246,7 @@ namespace HammerAndSickle.Models.Combat
                 FirerDeploymentMod = defender.GetDeploymentCombatMod(),
                 FirerIsDefender = true,
                 AttackType = AttackType.Direct,
-                FirerIsAir = defender.IsFixedWingAirUnit,
+                FirerIsAir = defender.IsFixedWing,
                 BypassTerrainBlock = true,
                 FirerCommand = CommandValue(defender),           // §7.7.12 — defense's command payoff is the counterpunch
             };
@@ -302,9 +302,10 @@ namespace HammerAndSickle.Models.Combat
         /// <summary>
         /// Resolves a ground ambush (§6.9): the ambusher delivers one full attack against the moving unit at
         /// ×AMBUSH_BONUS_MULT (§6.9.4), the mover takes NO return fire (§6.9.5), and the mover rolls a stand
-        /// check. The mover is attacked as if on clear terrain (§7.5.6.7). The caller (MovementController)
-        /// displaces the mover via RetreatResolver using the ambusher as the bearing reference, reveals the
-        /// ambusher to Level 1 (§6.9.3), and ends the mover's turn (§6.9.6) — none of which is done here.
+        /// check. The mover is attacked as if on clear terrain (§7.5.6.7). The caller (`AmbushAction`)
+        /// displaces the mover via RetreatResolver using the ambusher as the bearing reference and reveals
+        /// the ambusher to Level 1 (§6.9.3); `MovementController` ends the mover's turn (§6.9.6) — none of
+        /// which is done here.
         /// Dice order: the ambush damage lane, then the mover's 1d10 stand roll.
         /// </summary>
         public static AmbushResult ResolveAmbush(CombatUnit ambusher, CombatUnit mover, in DirectAttackContext ctx, ICombatRandom rng)
@@ -363,12 +364,36 @@ namespace HammerAndSickle.Models.Combat
                 FirerDeploymentMod = ambusher.GetDeploymentCombatMod(),
                 FirerIsDefender = true,   // ambush hits from a defensive posture → deployment COMBAT_MOD applies
                 AttackType = AttackType.Direct,
-                FirerIsAir = ambusher.IsFixedWingAirUnit,
+                FirerIsAir = ambusher.IsFixedWing,
                 BypassTerrainBlock = true,
                 BandShift = moverEmbarked ? 1 : 0,
-                PostStackScalar = AmbushScalar(ambusher) * (moverEmbarked ? 2.0f : 1.0f),
+                PostStackScalar = SurpriseScalarAgainst(ambusher, mover) * (moverEmbarked ? 2.0f : 1.0f),
                 FirerCommand = CommandValue(ambusher),           // Command Mitigation §7.7.12
             };
+        }
+
+        /// <summary>
+        /// The §6.9.4 surprise multiplier as it applies to THIS victim — the ladder below, except that a
+        /// mover travelling by HELICOPTER denies it entirely (1.0).
+        /// </summary>
+        /// <remarks>
+        /// ⚠ RATIFIED 2026-08-10. A helicopter caught by a ground ambush is halted and takes an ORDINARY
+        /// attack, but its speed and altitude mean the ambusher never gets the drop on it. The ambush
+        /// happens; the SURPRISE does not.
+        ///
+        /// ⚠ THE §7.10.1 EMBARKMENT MALUS IS A DIFFERENT RULE AND SURVIVES THIS — see the caller, where
+        /// `moverEmbarked` still applies ×2.0 and +1 band. "Lift aviation is glass" is about how fragile
+        /// the platform is; the surprise multiplier is about whether the ambusher got a clean first shot.
+        /// The two compose exactly as intended: a GUNSHIP evades the surprise for a flat ×1.0, while a
+        /// LOADED LIFT evades it and is still hammered at ×2.0.
+        ///
+        /// ⚠ Keyed on the MEDIUM, not the classification — an air-assault regiment riding Mi-8s is
+        /// `UnitClassification.MAM`, and a classification test would hand the ambusher its bonus back.
+        /// </remarks>
+        private static float SurpriseScalarAgainst(CombatUnit ambusher, CombatUnit mover)
+        {
+            if (MovementModeService.CurrentMedium(mover) == MovementMedium.Helo) return 1.0f;
+            return AmbushScalar(ambusher);
         }
 
         /// <summary>
@@ -684,7 +709,7 @@ namespace HammerAndSickle.Models.Combat
         /// </summary>
         public static LaneInput BuildBaseForwardLane(CombatUnit attacker, CombatUnit baseUnit, in BaseAttackContext ctx)
         {
-            if (attacker.IsFixedWingAirUnit)
+            if (attacker.IsFixedWing)
                 return BuildAirStrikeLane(attacker, baseUnit,
                     new AirStrikeContext { TargetTerrain = ctx.BaseTerrain, WildWeaselAlive = ctx.WildWeaselAlive });
 

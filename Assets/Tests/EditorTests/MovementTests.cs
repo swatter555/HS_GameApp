@@ -1,6 +1,7 @@
 using HammerAndSickle.Controllers;
 using HammerAndSickle.Core.GameData;
 using HammerAndSickle.Models;
+using HammerAndSickle.Models.Combat;
 using HammerAndSickle.Models.Map;
 using HammerAndSickle.Services;
 using NUnit.Framework;
@@ -42,10 +43,20 @@ namespace HammerAndSickle.Tests
         /// <summary>
         /// Creates a player ground unit at the given position with specified MP.
         /// </summary>
+        /// <remarks>
+        /// ⚠ CARRIES A REAL FOOT PROFILE, and must keep carrying one. Since P3 the movement rules ask
+        /// <see cref="MovementModeService"/> how the unit is travelling, and that reads the ACTIVE PROFILE —
+        /// a unit with empty bays reports <see cref="MovementMedium.None"/>, which is neither airborne nor
+        /// ground. These fixtures would still pass (None falls through to the ground branch) while testing
+        /// a state no real unit is ever in.
+        /// </remarks>
         private CombatUnit CreateGroundUnit(Position2D pos, int mp, UnitClassification classification = UnitClassification.INF)
         {
             var unit = new CombatUnit("TestUnit", classification, UnitRole.GroundCombat,
-                Side.Player, Nationality.USSR);
+                Side.Player, Nationality.USSR,
+                deployedProfile: WeaponType.INF_REG_SV,
+                mobileProfile: WeaponType.NONE,
+                embarkedProfile: WeaponType.NONE);
             unit.SetPosition(pos);
             unit.SetDeploymentPosition(DeploymentPosition.Deployed);
             unit.MovementPoints.SetMax(mp);
@@ -72,11 +83,39 @@ namespace HammerAndSickle.Tests
         /// <summary>
         /// Creates a player air unit at the given position with specified MP.
         /// </summary>
+        /// <remarks>
+        /// ⚠ THE FIGHTER PROFILE IS LOAD-BEARING SINCE P3. Without it the unit's medium is `None` and the
+        /// movement rules treat this fighter as INFANTRY — it would be blocked by impassable terrain and
+        /// stopped by zones of control. The classification alone no longer decides.
+        /// </remarks>
         private CombatUnit CreateAirUnit(Position2D pos, int mp)
         {
             var unit = new CombatUnit("TestAirUnit", UnitClassification.FGT, UnitRole.AirSuperiority,
-                Side.Player, Nationality.USSR);
+                Side.Player, Nationality.USSR,
+                deployedProfile: WeaponType.FGT_MIG21_SV,
+                mobileProfile: WeaponType.NONE,
+                embarkedProfile: WeaponType.NONE);
             unit.SetPosition(pos);
+            unit.MovementPoints.SetMax(mp);
+            unit.MovementPoints.SetCurrent(mp);
+            GameManager.RegisterCombatUnit(unit);
+            return unit;
+        }
+
+        /// <summary>
+        /// Creates a player AIR-ASSAULT regiment — the unit the whole P3 pass exists for. Foot when Deployed,
+        /// tracked carriers when Mobile, Mi-8s when Embarked, and `UnitClassification.MAM` throughout, so
+        /// every classification test reports "not an air unit" no matter how it is actually travelling.
+        /// </summary>
+        private CombatUnit CreateAirAssaultUnit(Position2D pos, int mp, DeploymentPosition posture)
+        {
+            var unit = new CombatUnit("TestLift", UnitClassification.MAM, UnitRole.GroundCombat,
+                Side.Player, Nationality.USSR,
+                deployedProfile: WeaponType.INF_AM_SV,
+                mobileProfile: WeaponType.APC_MTLB_SV,
+                embarkedProfile: WeaponType.HEL_MI8T_SV);
+            unit.SetPosition(pos);
+            unit.SetDeploymentPosition(posture);
             unit.MovementPoints.SetMax(mp);
             unit.MovementPoints.SetCurrent(mp);
             GameManager.RegisterCombatUnit(unit);
@@ -140,10 +179,21 @@ namespace HammerAndSickle.Tests
             var groundResult = HexMapUtil.GetValidMoveDestinations(map, ground);
             Assert.IsFalse(groundResult.Reachable.ContainsKey(blockedPos), "Ground unit cannot enter impassable");
 
-            // Air unit can
+            /* ⚠ AND NEITHER CAN AIR, SINCE 2026-08-10 — this assertion was REVERSED, deliberately.
+             * Impassable is foreign, non-belligerent territory: overflying it is an act of war, not a
+             * shortcut, and letting aircraft cross it would erase the map's chokepoints and flanks for
+             * every air unit. Air still ignores terrain COST; it does not ignore impassable. */
             var air = CreateAirUnit(new Position2D(5, 5), 10);
             var airResult = HexMapUtil.GetValidMoveDestinations(map, air);
-            Assert.IsTrue(airResult.Reachable.ContainsKey(blockedPos), "Air unit ignores impassable");
+            Assert.IsFalse(airResult.Reachable.ContainsKey(blockedPos),
+                "impassable is closed to every domain, aircraft included");
+
+            // The cost rule is untouched: air still crosses expensive terrain for a flat 1.
+            var mountainPos = HexMapUtil.GetNeighborPosition(new Position2D(5, 5), HexDirection.W);
+            map.GetHexAt(mountainPos)?.SetTerrain(TerrainType.Mountains);
+            var airAgain = HexMapUtil.GetValidMoveDestinations(map, air);
+            Assert.AreEqual(1, airAgain.Reachable[mountainPos],
+                "ignoring terrain COST is a different rule from ignoring impassable");
         }
 
         [Test]
@@ -454,5 +504,305 @@ namespace HammerAndSickle.Tests
         }
 
         #endregion // Halt Rule Tests
+
+        #region P3 — the movement rules read the resolver, not the classification
+
+        /* ⚠ WHAT THIS REGION GUARDS. Until P3 the movement code asked `IsAirUnit || IsHelicopter` — a
+         * CLASSIFICATION test. An air-assault regiment riding its Mi-8s is `UnitClassification.MAM`, so it
+         * answered "no" and was walked over the mountains it was flying above, halted by zones of control it
+         * was flying through. The fix routes all three sites — range generation, A*, and execution — through
+         * MovementModeService, which reads the profile actually carrying the unit.
+         *
+         * ⚠ These cases all use MAM regiments precisely BECAUSE their classification lies. A test that flew a
+         * `FGT` would pass under either implementation and guard nothing. */
+
+        [Test]
+        public void Lift_InFlight_IgnoresTerrainAndPaysFlatOne()
+        {
+            var map = CreateClearMap();
+            GameDataManager.CurrentHexMap = map;
+
+            var mountainPos = HexMapUtil.GetNeighborPosition(new Position2D(5, 5), HexDirection.E);
+            map.GetHexAt(mountainPos)?.SetTerrain(TerrainType.Mountains);
+
+            var lift = CreateAirAssaultUnit(new Position2D(5, 5), 10, DeploymentPosition.Embarked);
+            var result = HexMapUtil.GetValidMoveDestinations(map, lift);
+
+            Assert.That(lift.IsFixedWing || lift.IsHelicopter, Is.False,
+                "the classification still says ground — which is the whole reason this test exists");
+            Assert.That(result.Reachable.ContainsKey(mountainPos), Is.True,
+                "a regiment on helicopters can cross a mountain hex");
+            Assert.That(result.Reachable[mountainPos], Is.EqualTo(1),
+                "and pays the flat airborne cost for it, not the mountain's 5");
+        }
+
+        [Test]
+        public void Lift_OnTheGround_StillPaysTerrain()
+        {
+            // The control case. The SAME regiment, one posture down, must go back to paying ground costs —
+            // otherwise the fix has simply made everything fly.
+            var map = CreateClearMap();
+            GameDataManager.CurrentHexMap = map;
+
+            var mountainPos = HexMapUtil.GetNeighborPosition(new Position2D(5, 5), HexDirection.E);
+            map.GetHexAt(mountainPos)?.SetTerrain(TerrainType.Mountains);
+
+            var lift = CreateAirAssaultUnit(new Position2D(5, 5), 10, DeploymentPosition.Deployed);
+            var result = HexMapUtil.GetValidMoveDestinations(map, lift);
+
+            Assert.That(result.Reachable[mountainPos], Is.EqualTo(5),
+                "dismounted, it walks up the mountain at full cost");
+        }
+
+        [Test]
+        public void Lift_InFlight_IsNotHeldByEnemyZoC()
+        {
+            /* Ratified 2026-08-04: zones of control NEVER stop a flight, and ambush is the single mechanism
+             * by which an enemy halts an airborne move. An empty terminal set is that rule. */
+            var map = CreateClearMap();
+            GameDataManager.CurrentHexMap = map;
+
+            CreateEnemyUnit(new Position2D(7, 5));
+
+            var walking = CreateAirAssaultUnit(new Position2D(5, 5), 10, DeploymentPosition.Deployed);
+            GameManager.BuildOccupancyCache();
+            var walkingResult = HexMapUtil.GetValidMoveDestinations(map, walking);
+
+            var flying = CreateAirAssaultUnit(new Position2D(5, 5), 10, DeploymentPosition.Embarked);
+            GameManager.BuildOccupancyCache();
+            var flyingResult = HexMapUtil.GetValidMoveDestinations(map, flying);
+
+            Assert.That(walkingResult.ZocTerminals, Is.Not.Empty,
+                "on foot the same regiment is caught by the same enemy's zone of control");
+            Assert.That(flyingResult.ZocTerminals, Is.Empty,
+                "in the air it is not — this is the rule, not an optimisation");
+        }
+
+        [Test]
+        public void Lift_InFlight_OverfliesAnOccupiedHex_ButMayNotLandOnIt()
+        {
+            /* ⚠ THE HALF THAT IS EASY TO GET WRONG. "May I pass over?" is a MEDIUM question; "may I stop
+             * here?" is an OCCUPANCY question, and a lift comes to rest in the GROUND stack because
+             * everything that is not fixed-wing files there. Keying the stop test on the medium too would
+             * put two units in one ground stack, which the stacking model cannot draw. */
+            var map = CreateClearMap();
+            GameDataManager.CurrentHexMap = map;
+
+            var occupiedPos = HexMapUtil.GetNeighborPosition(new Position2D(5, 5), HexDirection.E);
+            var beyondPos = HexMapUtil.GetNeighborPosition(occupiedPos, HexDirection.E);
+            CreateGroundUnit(occupiedPos, 5);
+
+            var lift = CreateAirAssaultUnit(new Position2D(5, 5), 10, DeploymentPosition.Embarked);
+            GameManager.BuildOccupancyCache();
+
+            var result = HexMapUtil.GetValidMoveDestinations(map, lift);
+
+            Assert.That(result.Reachable.ContainsKey(occupiedPos), Is.False,
+                "it cannot set down on top of a friendly regiment");
+            Assert.That(result.Reachable.ContainsKey(beyondPos), Is.True,
+                "but it flies straight over it to the hex beyond");
+        }
+
+        [Test]
+        public void Airborne_OverfliesAnOccupiedHex_ButOnlyFixedWingMayRestThere()
+        {
+            /* ⚠ RATIFIED 2026-08-10 AFTER A PLAY-TEST. Anything airborne OVERFLIES an occupied hex — the
+             * price of overflight is fire (§6.9 ambush, §11.8 air-defence) followed by the §11.8.9 transit
+             * stand check, never a movement wall. Blocking helicopters here would make that entire risk
+             * model unreachable, which is why the earlier "helos may not pass through" reading was
+             * withdrawn. What a helicopter still may NOT do is come to REST on the hex. */
+            var map = CreateClearMap();
+            GameDataManager.CurrentHexMap = map;
+
+            var start = new Position2D(5, 5);
+            var enemyPos = HexMapUtil.GetNeighborPosition(start, HexDirection.E);
+            var beyondPos = HexMapUtil.GetNeighborPosition(enemyPos, HexDirection.E);
+            CreateEnemyUnit(enemyPos);                    // spotted, so it legitimately shapes the range
+
+            var gunship = CreateAirAssaultUnit(start, 10, DeploymentPosition.Embarked);
+            GameManager.BuildOccupancyCache();
+            var heloRange = HexMapUtil.GetValidMoveDestinations(map, gunship);
+
+            Assert.That(heloRange.Reachable.ContainsKey(beyondPos), Is.True,
+                "it flies straight over and reaches the hex beyond");
+            Assert.That(heloRange.Reachable[beyondPos], Is.EqualTo(2),
+                "at the flat airborne cost — no detour, because nothing blocked it");
+            Assert.That(heloRange.Reachable.ContainsKey(enemyPos), Is.False,
+                "but it may not SET DOWN on an occupied hex — helicopters rest in the ground stack");
+
+            // Fixed-wing is the one exception, and it applies to resting, not to passage.
+            var jet = CreateAirUnit(start, 10);
+            GameManager.BuildOccupancyCache();
+            var jetRange = HexMapUtil.GetValidMoveDestinations(map, jet);
+
+            Assert.That(jetRange.Reachable.ContainsKey(enemyPos), Is.True,
+                "fixed-wing may temporarily occupy a ground unit's hex — the single stacking exception");
+        }
+
+        [Test]
+        public void RangeAndPath_AgreeOnTheAirborneCostModel()
+        {
+            /* ⚠ THE TWO MUST MOVE TOGETHER. Fixing execution but not pathfinding (or either but not range)
+             * makes the overlay promise hexes the move cannot deliver — the player sees a legal destination,
+             * right-clicks it, and the unit stops short with no explanation. */
+            var map = CreateClearMap();
+            GameDataManager.CurrentHexMap = map;
+
+            var start = new Position2D(5, 5);
+            var mountainPos = HexMapUtil.GetNeighborPosition(start, HexDirection.E);
+            map.GetHexAt(mountainPos)?.SetTerrain(TerrainType.Mountains);
+            var end = HexMapUtil.GetNeighborPosition(mountainPos, HexDirection.E);
+
+            var lift = CreateAirAssaultUnit(start, 10, DeploymentPosition.Embarked);
+
+            var range = HexMapUtil.GetValidMoveDestinations(map, lift);
+            var path = HexMapUtil.FindPath(map, lift, start, end);
+
+            Assert.That(range.Reachable.ContainsKey(end), Is.True, "the overlay offers the hex");
+            Assert.That(path, Is.Not.Empty, "and the pathfinder can actually get there");
+            Assert.That(path.Count, Is.EqualTo(2),
+                "straight across the mountain rather than around it — both passes agree it is flying");
+        }
+
+        [Test]
+        public void Sealifted_HasNoPerHexMovementAtAll()
+        {
+            /* §5.4.2.3 — naval movement is INSTANT port-to-port with the sea passage abstracted away, chosen
+             * with the §24.7a.3 Naval Movement Marker. There is no hex-by-hex sea traversal to implement.
+             *
+             * ⚠ WITHOUT THE GUARD THIS UNIT WALKS. `Naval` is neither airborne nor groundborne, so it falls
+             * through to the ground rules — which block water but happily allow LAND, i.e. a regiment that
+             * boarded ships at a port could stroll inland still aboard them. */
+            var map = CreateClearMap();
+            GameDataManager.CurrentHexMap = map;
+
+            var start = new Position2D(5, 5);
+            var unit = CreateGroundUnit(start, 10);
+            unit.SetDeploymentPosition(DeploymentPosition.Embarked);
+            unit.SetNavalEmbarked(true);
+            unit.MovementPoints.SetCurrent(10);   // plenty of MP — the guard, not exhaustion, must stop it
+
+            var range = HexMapUtil.GetValidMoveDestinations(map, unit);
+            var path = HexMapUtil.FindPath(map, unit, start,
+                HexMapUtil.GetNeighborPosition(start, HexDirection.E));
+
+            Assert.That(MovementModeService.IsSealiftedNow(unit), Is.True, "it is aboard the sealift profile");
+            Assert.That(unit.MovementPoints.Current, Is.GreaterThan(0),
+                "guard the guard — an exhausted unit would return an empty range for the wrong reason");
+            Assert.That(range.Reachable, Is.Empty, "so it has no walking range");
+            Assert.That(path, Is.Empty, "and no walking path");
+        }
+
+        [Test]
+        public void AmbushAction_ActuallyAppliesDamage_EndToEnd()
+        {
+            /* ⚠ THE POINT OF THIS TEST IS TO SPLIT "no combat" FROM "combat, no losses". Until 2026-08-10
+             * `CombatResolver.ResolveAmbush` had ZERO callers and `OnAmbushTriggered` ZERO subscribers, so
+             * an ambush halted the mover and printed a dispatch about a fight that never happened. If this
+             * passes and play still shows nothing, the fault is in the TRIGGER geometry, not the
+             * resolution — which is exactly the ambiguity a play-test cannot resolve on its own. */
+            var map = CreateClearMap();
+            GameDataManager.CurrentHexMap = map;
+
+            var moverPos = new Position2D(5, 5);
+            var ambusherPos = HexMapUtil.GetNeighborPosition(moverPos, HexDirection.E);
+
+            var mover = CreateGroundUnit(moverPos, 10);
+            var ambusher = CreateEnemyUnit(ambusherPos, spotted: SpottedLevel.Level0);
+            GameManager.BuildOccupancyCache();
+
+            float hp0 = mover.HitPoints.Current;
+
+            var outcome = AmbushAction.Execute(ambusher, mover, map, new FixedRollRandom(8));
+
+            Assert.That(outcome.Executed, Is.True, "the orchestrator ran");
+            Assert.That(outcome.DamageToMover, Is.GreaterThan(0), "an ambush deals real damage");
+            Assert.That(mover.HitPoints.Current, Is.LessThan(hp0), "and it lands on the victim's hit points");
+            Assert.That(ambusher.SpottedLevel, Is.GreaterThan(SpottedLevel.Level0),
+                "§6.9.3 — springing the trap reveals the ambusher");
+        }
+
+        [Test]
+        public void GroundAmbush_TriggersOnPassingADJACENT_NotOnWalkingInto()
+        {
+            /* ⚠ THE GEOMETRY THAT DECIDES WHETHER AN AMBUSH IS EVEN POSSIBLE, and the likeliest reason a
+             * play-test sees nothing. `CheckGroundAmbush` looks at the NEIGHBOURS of the hex just entered.
+             * Ordering a unit straight AT an unspotted enemy trips the CONTACT HALT instead — it stops
+             * before arriving and never becomes adjacent-and-moving. To be ambushed you must move PAST. */
+            var map = CreateClearMap();
+            GameDataManager.CurrentHexMap = map;
+
+            var ambusherPos = new Position2D(5, 5);
+            var passingHex = HexMapUtil.GetNeighborPosition(ambusherPos, HexDirection.E);
+
+            var mover = CreateGroundUnit(new Position2D(8, 5), 10);
+            CreateEnemyUnit(ambusherPos, spotted: SpottedLevel.Level0);
+            GameManager.BuildOccupancyCache();
+
+            Assert.That(SpottingService.CheckGroundAmbush(mover, passingHex), Is.Not.Null,
+                "entering a hex ADJACENT to the hidden enemy springs it");
+            Assert.That(SpottingService.CheckGroundAmbush(mover, new Position2D(8, 5)), Is.Null,
+                "standing three hexes away does not");
+        }
+
+        [Test]
+        public void GroundAmbush_IneligibleClassNeverSprings()
+        {
+            /* §6.9.9, enforced at the trigger 2026-08-10 — it was checked NOWHERE before, invisible only
+             * because the trigger itself could never fire. A hidden tube battery is the ambush VICTIM,
+             * never the ambusher: the mover passes it unmolested and learns of it at settlement. */
+            var map = CreateClearMap();
+            GameDataManager.CurrentHexMap = map;
+
+            var ambusherPos = new Position2D(5, 5);
+            var passingHex = HexMapUtil.GetNeighborPosition(ambusherPos, HexDirection.E);
+
+            var mover = CreateGroundUnit(new Position2D(8, 5), 10);
+            CreateEnemyUnit(ambusherPos, UnitClassification.ART, spotted: SpottedLevel.Level0);
+            GameManager.BuildOccupancyCache();
+
+            Assert.That(SpottingService.CheckGroundAmbush(mover, passingHex), Is.Null,
+                "§6.9.9 — ART may never spring the ambush, however hidden and adjacent it is");
+        }
+
+        [Test]
+        public void AmbushEligibility_PinsTheRatifiedList()
+        {
+            // §6.9.9 exclusions — each is doctrine, not oversight (see GameData.IsAmbushEligible remarks).
+            Assert.That(GameData.IsAmbushEligible(UnitClassification.ART), Is.False, "tubes are the victim");
+            Assert.That(GameData.IsAmbushEligible(UnitClassification.SPA), Is.False, "tubes are the victim");
+            Assert.That(GameData.IsAmbushEligible(UnitClassification.ROC), Is.False, "no point-blank reactive fire");
+            Assert.That(GameData.IsAmbushEligible(UnitClassification.BM), Is.False, "strategic single-shot");
+            Assert.That(GameData.IsAmbushEligible(UnitClassification.SAM), Is.False, "cannot engage ground");
+            Assert.That(GameData.IsAmbushEligible(UnitClassification.SPSAM), Is.False, "cannot engage ground");
+            Assert.That(GameData.IsAmbushEligible(UnitClassification.ENG), Is.False, "non-combatant");
+            Assert.That(GameData.IsAmbushEligible(UnitClassification.HQ), Is.False, "facilities cannot attack");
+
+            // And the deliberate inclusions the list exists to protect:
+            Assert.That(GameData.IsAmbushEligible(UnitClassification.AAA), Is.True, "flak leveled at infantry (§7A.12)");
+            Assert.That(GameData.IsAmbushEligible(UnitClassification.SPAAA), Is.True, "flak leveled at infantry (§7A.12)");
+            Assert.That(GameData.IsAmbushEligible(UnitClassification.HELO), Is.True, "a helo can be the ambusher (§5.13.2.3)");
+            Assert.That(GameData.IsAmbushEligible(UnitClassification.INF), Is.True);
+            Assert.That(GameData.IsAmbushEligible(UnitClassification.TANK), Is.True);
+        }
+
+        [Test]
+        public void GroundAmbushHalt_SpendsEverything()
+        {
+            /* ⚠ APPLIES TO HELICOPTERS TOO since 2026-08-10 (§5.13.2.2 — the helicopter's turn ends AFTER
+             * taking the ambusher's attack). The narrower FlightEvasion halt, and the test that pinned it,
+             * were retired with the evade-without-damage rule: a helo is now ambushed exactly like a ground
+             * unit and only the §6.9.4 surprise multiplier is denied the ambusher. */
+            var unit = CreateGroundUnit(new Position2D(5, 5), 10);
+
+            MovementController.ApplyMovementHalt(unit, MovementController.MovementHalt.GroundAmbush);
+
+            Assert.That(unit.MovementPoints.Current, Is.EqualTo(0));
+            Assert.That(unit.MoveActions.Current, Is.EqualTo(0));
+            Assert.That(unit.CombatActions.Current, Is.EqualTo(0));
+            Assert.That(unit.IntelActions.Current, Is.EqualTo(0));
+        }
+
+        #endregion // P3 — the movement rules read the resolver, not the classification
     }
 }
