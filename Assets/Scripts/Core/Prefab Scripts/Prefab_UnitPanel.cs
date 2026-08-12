@@ -128,6 +128,13 @@ namespace HammerAndSickle.Core
             lines.Add($"DEP: {unit.DeploymentPosition}  EXP: {unit.ExperienceLevel}  EFF: {FormatEfficiency(unit.EfficiencyLevel)}");
             lines.Add($"Supply: {unit.DaysSupply.Current:F1} days");
 
+            /* §5.13.2 — the PERSISTENT half of the over-water warning (ratified: "an info box when the unit
+             * is selected"). The printer dispatch that fires when the clock starts scrolls away with the
+             * next few messages; this line is here every time the player looks at the unit, right up until
+             * it makes land or is lost. ⚠ Last so it reads as an alert rather than a stat. */
+            if (unit.EndedTurnOverWater)
+                lines.Add("OVER WATER — REACH LAND THIS TURN OR BE LOST");
+
             return lines;
         }
 

@@ -833,10 +833,15 @@ namespace HammerAndSickle.Controllers
              * first. Reset per move order, never per hex. */
             int hpLostThisMove = 0;
 
-            /* §11.8.6 anti-dogpile, extended to ambush — one bite per ambusher per move order. Matters now
+            /* §11.8.6 anti-dogpile, extended to ambush — one bite per ENEMY per move order. Matters now
              * that a helicopter flies ON through an ambush: without this the same regiment engages it again
-             * at every hex still in its reach, and accumulating Shock breaks the sortie on geometry alone. */
-            var ambushersSprung = new HashSet<string>();
+             * at every hex still in its reach, and accumulating Shock breaks the sortie on geometry alone.
+             * ⚠ SHARED BY AMBUSH AND OVERHEAD FIRE (2026-08-11), because the ratified overhead-GAD rule is
+             * "one engagement per unit per move under the same anti-dogpile rule as ambush" — a regiment that
+             * has already sprung on a passing helo does not also shoot at it overhead, and vice versa.
+             * ⚠ NOT the §11.8.3 ranged air-defence budget, which is per TURN and lives on the firing unit
+             * (CombatUnit.MarkAircraftEngaged). Different scope, different owner, deliberately not merged. */
+            var enemiesEngagedThisMove = new HashSet<string>();
 
             /* ⚠ ONE SPELLING of the per-hex tween length, because the movement SOUND is chosen from it.
              * It used to be re-declared inside the loop; two copies would let the audio pick a clip for a
@@ -947,10 +952,10 @@ namespace HammerAndSickle.Controllers
                  *                 is how an unspotted SAM reveals itself by firing. */
                 if (!isFixedWing)
                 {
-                    var ambusher = SpottingService.CheckGroundAmbush(CurrentUnit, targetPos, ambushersSprung);
+                    var ambusher = SpottingService.CheckGroundAmbush(CurrentUnit, targetPos, enemiesEngagedThisMove);
                     if (ambusher != null)
                     {
-                        ambushersSprung.Add(ambusher.UnitID);
+                        enemiesEngagedThisMove.Add(ambusher.UnitID);
 
                         /* ⚠ A GROUND UNIT STOPS DEAD; A HELICOPTER TAKES THE FIRE AND FLIES ON (ratified
                          * 2026-08-10, superseding §5.13.2.2's "turn ends"). THE DIVERGENCE IS THE RULE, not
@@ -1028,25 +1033,32 @@ namespace HammerAndSickle.Controllers
                     else if (AMBUSH_DEBUG)
                     {
                         // Diagnostic: name why any adjacent enemy did NOT spring on this hex (see the flag's note).
-                        DebugLogAmbushScan(CurrentUnit, targetPos, ambushersSprung);
+                        DebugLogAmbushScan(CurrentUnit, targetPos, enemiesEngagedThisMove);
                     }
                 }
 
-                // Air ambush check
+                /* §11.8 TRANSIT FIRE — everything the ground throws at an aircraft crossing this hex:
+                 * ranged air-defence opportunity fire from every eligible battery whose envelope covers it,
+                 * and (helicopters only) OVERHEAD fire from whatever it just flew directly above. Both feed
+                 * the one §11.8.9 Shock accumulator, so a sortie is broken by its total punishment across
+                 * the move rather than by any single hit. */
                 if (isAir)
                 {
-                    var airResult = SpottingService.CheckAirAmbush(CurrentUnit, targetPos);
-                    if (airResult == AirAmbushResult.Ambushed)
+                    var transit = ResolveTransitFire(
+                        CurrentUnit, targetPos, isFixedWing, enemiesEngagedThisMove, hpLostThisMove);
+
+                    hpLostThisMove = transit.HpLostThisMove;
+
+                    if (transit.MoverRemovedFromMap)
                     {
-                        // TODO: Combat resolution for air ambush
-                        // 50% chance to continue
-                        bool continues = UnityEngine.Random.Range(0, 2) == 0;
-                        if (!continues)
-                        {
-                            CurrentUnit.ForceSetMovementPoints(0);
-                            CurrentUnit.ForceSetActions(0, 0, 0);
-                            break;
-                        }
+                        State = MovementState.Idle;
+                        yield break;
+                    }
+
+                    if (transit.Aborted)
+                    {
+                        AbortFlightToOrigin(CurrentUnit, originPos);
+                        break;
                     }
                 }
 
@@ -1194,8 +1206,163 @@ namespace HammerAndSickle.Controllers
         }
 
         /// <summary>
-        /// Applies a movement halt. Every kind ends the move order; they differ in what else they cost.
+        /// What one hex of ground fire did to a transiting aircraft.
         /// </summary>
+        /// <remarks>`internal` so EditorTests can drive <see cref="ResolveTransitFire"/> directly.</remarks>
+        internal struct TransitFireResult
+        {
+            /// <summary>The running §11.8.9 Shock total, updated with anything taken here.</summary>
+            public int HpLostThisMove;
+
+            /// <summary>The §11.8.9 stand check broke the sortie — the caller flies it home.</summary>
+            public bool Aborted;
+
+            /// <summary>Shot down: already unregistered, so the caller must stop the move coroutine.</summary>
+            public bool MoverRemovedFromMap;
+        }
+
+        /// <summary>
+        /// Everything the ground throws at an aircraft entering <paramref name="hex"/>: §11.8 ranged
+        /// air-defence opportunity fire from every eligible battery covering it, then — for a helicopter —
+        /// overhead fire from whatever it flew directly above.
+        /// </summary>
+        /// <remarks>
+        /// ⚠ REPLACED A `UnityEngine.Random.Range(0, 2)` COIN FLIP (2026-08-11). The old path found at most
+        /// one UNSPOTTED air-defence unit, rolled the fixed-wing detection check for EVERY mover including
+        /// helicopters, and then — under a `// TODO: Combat resolution for air ambush` — decided the sortie
+        /// on a 50/50 with no damage, no stand check and no reveal. `CombatResolver.ResolveAirDefenseFire`
+        /// and `HeloTransitStandCheck` were both already built and tested with zero callers; this is their
+        /// wiring, not new rules.
+        /// </remarks>
+        internal static TransitFireResult ResolveTransitFire(
+            CombatUnit mover, Position2D hex, bool isFixedWing,
+            ISet<string> enemiesEngagedThisMove, int hpLostThisMove)
+        {
+            var result = new TransitFireResult { HpLostThisMove = hpLostThisMove };
+
+            // ── §11.8 ranged air-defence opportunity fire ──────────────────────────────────────────────
+            foreach (var contact in SpottingService.FindTransitAirDefense(mover, hex))
+            {
+                var firer = contact.Firer;
+                if (firer == null || firer.IsDestroyed()) continue;
+
+                /* ⚠ THE SPLIT THIS PASS EXISTS FOR — §5.13.3.2 vs §5.13.2.4. A FIXED-WING mover gets one
+                 * 1d6-vs-experience look at a battery that was still unspotted, and a success averts the
+                 * shot outright. A HELICOPTER GETS NO ROLL: it takes the hit whenever the battery has shots
+                 * available, and its only escape is the stand check afterwards, on damage already taken. */
+                if (isFixedWing && contact.WasUnspotted
+                    && SpottingService.RollFixedWingAmbushDetection(firer, mover))
+                    continue;
+
+                /* §11.8.3 — spend the shot. A refusal (no opportunity action, or not the supply to pay for
+                 * one) fires nothing and leaves no trace, which is why the scan asked with the silent
+                 * predicate first: this call announces its refusals to the player's message log. */
+                if (!firer.PerformOpportunityAction()) continue;
+
+                // §11.8.6 — this aircraft is off this battery's list for the rest of the turn.
+                firer.MarkAircraftEngaged(mover.UnitID);
+
+                var fire = CombatResolver.ResolveAirDefenseFire(firer, mover, new CombatRandom());
+                if (!fire.Engaged) continue;
+
+                // §11.8.4 / §12.4.9.1 — radars hot, shooting from the open: identified, not merely located.
+                SpottingService.RevealByOpportunityFire(firer);
+
+                PrinterDispatch.ReportAirDefenseFire(mover, hex);
+                GameAudio.PlayFrom(SFX.AmbushTriggered, mover);
+
+                if (ApplyTransitDamage(mover, fire.DamageToAircraft, fire.AircraftDestroyed, isFixedWing, ref result))
+                    return result;
+            }
+
+            // ── Overhead fire (the GAD rule) — helicopters only ────────────────────────────────────────
+            if (!isFixedWing)
+                ApplyOverheadFire(mover, hex, enemiesEngagedThisMove, ref result);
+
+            return result;
+        }
+
+        /// <summary>
+        /// Books one transit damage event: accumulates §11.8.9 Shock, refreshes the HP box, and answers
+        /// whether the move is over — shot down, or the sortie broken by the stand check.
+        /// </summary>
+        private static bool ApplyTransitDamage(
+            CombatUnit mover, int damage, bool destroyed, bool isFixedWing, ref TransitFireResult result)
+        {
+            result.HpLostThisMove += damage;
+
+            /* ⚠ UNCONDITIONAL, for exactly the reason the ambush branch was fixed on 2026-08-11: the coarse
+             * redraw is the ONLY thing that refreshes a unit's HP box (§3.6e, `RaiseUnitHitPointsChanged` is
+             * unused scaffolding). Gating it on destruction leaves a damaged-but-still-flying aircraft
+             * showing its pre-hit strength while the model and the loss ledger both know better. */
+            EventManager.Instance?.RaiseRedrawMapIcons();
+
+            if (destroyed)
+            {
+                GameDataManager.Instance?.UnregisterCombatUnit(mover.UnitID);
+                result.MoverRemovedFromMap = true;
+                return true;
+            }
+
+            /* §11.8.9 — the transit stand check, per DAMAGING event, with Shock accumulating across the
+             * whole move. ⚠ HELICOPTERS ONLY, per the check's own scope line: a fixed-wing aircraft crossing
+             * to its ops box takes the damage and presses on, because its stand checks belong to the
+             * air-to-air venues (§7.9.8 in the AOB/AIB), not to transit. */
+            if (!isFixedWing && damage > 0 && !HoldsTransitStand(mover, result.HpLostThisMove))
+            {
+                result.Aborted = true;
+                return true;
+            }
+
+            return false;
+        }
+
+        /// <summary>
+        /// The overhead GAD rule (ratified 2026-08-10): a helicopter crossing directly OVER an enemy ground
+        /// unit's hex is fired on by that unit, Δ = its GAD − the helo's GAD, then rolls the §11.8.9 check.
+        /// </summary>
+        /// <remarks>
+        /// ⚠ THE SAME HEX, NEVER ADJACENCY AND NEVER A RADIUS — and that narrowness is what makes the rule
+        /// safe. Overflight is avoidable by ROUTING, so this makes the flight PATH a decision instead of
+        /// making flight suicidal, and it is what gives recon units real work: you need to know what is
+        /// UNDER the path, not merely where you intend to land. A radius version would break every sortie on
+        /// accumulated Shock alone.
+        /// ⚠ Bases are excluded (§7A.20 — facilities never initiate attacks), and so is an Embarked unit,
+        /// which is riding in someone else's vehicle and in no position to shoot at anything.
+        /// </remarks>
+        private static void ApplyOverheadFire(
+            CombatUnit helo, Position2D hex, ISet<string> enemiesEngagedThisMove, ref TransitFireResult result)
+        {
+            var gdm = GameDataManager.Instance;
+            if (gdm == null) return;
+
+            foreach (var below in gdm.GetUnitsAtHex(hex))
+            {
+                if (below == null || below.IsDestroyed()) continue;
+                if (below.UnitID == helo.UnitID) continue;      // the helo is itself in this ground stack
+                if (below.Side == helo.Side) continue;
+                if (below.OccupiesDomain != Domain.Ground) continue;
+                if (below.IsBase) continue;
+                if (below.DeploymentPosition == DeploymentPosition.Embarked) continue;
+
+                // One engagement per enemy per move order, shared with ambush (see the set's declaration).
+                if (enemiesEngagedThisMove.Contains(below.UnitID)) continue;
+                enemiesEngagedThisMove.Add(below.UnitID);
+
+                var over = CombatResolver.ResolveOverheadFire(below, helo, new CombatRandom());
+                if (!over.Engaged) continue;
+
+                // It shot upward from its own hex at something directly above — position and equipment both.
+                SpottingService.RevealByOpportunityFire(below);
+
+                PrinterDispatch.ReportOverheadFire(helo, hex);
+                GameAudio.PlayFrom(SFX.AmbushTriggered, helo);
+
+                if (ApplyTransitDamage(helo, over.DamageToHelo, over.HeloDestroyed, isFixedWing: false, ref result))
+                    return;
+            }
+        }
+
         /// <summary>
         /// §11.8.9 — the helicopter transit stand check. True if the sortie holds and the move continues.
         /// </summary>
@@ -1243,6 +1410,9 @@ namespace HammerAndSickle.Controllers
             GameAudio.Play(SFX.UnitMoveBlocked);
         }
 
+        /// <summary>
+        /// Applies a movement halt. Every kind ends the move order; they differ in what else they cost.
+        /// </summary>
         internal static void ApplyMovementHalt(CombatUnit unit, MovementHalt kind)
         {
             // Common to every halt: the move order is over.

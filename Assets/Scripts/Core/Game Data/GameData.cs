@@ -1572,7 +1572,14 @@ namespace HammerAndSickle.Core.GameData
         // and `currentEmbarkmentState` dropped from the unit shape; `isNavalEmbarked` added (the naval
         // transient-state bool, written by the P2 naval-embark path); `regimentProfile` renamed
         // `equipmentBays`. No migration step — SaveLoad still has zero callers, pre-1.0 clean break.
-        public const int SAVE_VERSION = 5;
+        //
+        // 5 → 6 (2026-08-11, domain pass D3): `endedTurnOverWater` added to the unit shape — the §5.13.2
+        // helicopter over-water grace flag. It MUST persist: without it, saving over open water and
+        // reloading would reset the grace clock, turning a one-turn deadline into "loiter at sea forever,
+        // as long as you save occasionally". No migration step — pre-1.0 clean break, and an absent member
+        // would default to false anyway, which is the safe value. ⚠ D3 was designated the plan's ONLY
+        // persistence bump; anything else needing one should have ridden along here.
+        public const int SAVE_VERSION = 6;
 
         #endregion
 
@@ -1658,8 +1665,12 @@ namespace HammerAndSickle.Core.GameData
         // (§11.7.2.2). = one OC tier; models interdiction suppressing FUNCTION out of proportion to HP loss.
         public const int STRATEGIC_OC_BONUS = 20;
 
-        // Ground-to-air interdiction gate (§11.8.2): a unit needs GAT ≥ this to fire on a transiting aircraft;
-        // below it, GAT is treated as 0 (no engagement). Infantry regain limited GAT only via the MANPADS trait.
+        /* Ground-to-air EFFECTIVENESS floor (§11.8.2): below this, GAT is treated as 0 and the shot does not
+         * resolve. ⚠ NOT the eligibility gate — WHO may fire on a transiting aircraft is the CLASSIFICATION
+         * (§11.8.2a, `IsAirDefenseClassification`: SAM/SPSAM/AAA/SPAAA). Keying eligibility here looks
+         * tempting and fails twice over: it would force GAT to be absent on non-AD units, breaking the
+         * stat-comparison paradigm that needs every stat present for a Δ, AND it would not even select the
+         * right units, since MANPADS_BASIC floors ordinary infantry GAT at exactly 6. */
         public const int GAT_INTERDICT_THRESHOLD = 6;
 
         // Combat action defaults
@@ -1812,6 +1823,55 @@ namespace HammerAndSickle.Core.GameData
                 or UnitClassification.AAA or UnitClassification.SPAAA => true,
             _ => false,
         };
+
+        /// <summary>
+        /// §11.8.2 — may this classification fire RANGED opportunity shots at a transiting aircraft? The
+        /// four dedicated air-defence types and nothing else: <see cref="UnitClassification.SAM"/>,
+        /// <see cref="UnitClassification.SPSAM"/>, <see cref="UnitClassification.AAA"/>,
+        /// <see cref="UnitClassification.SPAAA"/>.
+        /// </summary>
+        /// <remarks>
+        /// ⚠ THE GATE IS THE CLASSIFICATION, NOT GAT — RULED BY BOB 2026-08-11, and the reasoning is worth
+        /// keeping because the obvious alternative is a trap. Restricting GAT &gt; 0 to true air-defence units
+        /// would make the gate implicit in the stat, but it BREAKS THE STAT-COMPARISON PARADIGM the whole
+        /// combat model rests on: every unit carries every stat so that a Δ is always well defined. GAT is
+        /// therefore an ATTACK VALUE that everything has, and "is this an air-defence unit" is a separate
+        /// question that has to be asked separately.
+        ///
+        /// ⚠ AND A GAT THRESHOLD WOULD NOT HAVE WORKED ANYWAY. `MANPADS_BASIC` floors infantry GAT at
+        /// exactly 6 (`MANPADS_STINGER` / `MANPADS_IGLA` at 8), so a `GAT ≥ 6` test admits essentially every
+        /// line regiment on both sides — the opposite of the intent. MANPADS is a TRAIT ON INFANTRY
+        /// PROFILES, never a unit type: every profile carrying one is an `INF_*` weapon type, and no
+        /// SAM/AAA-classified template uses one (verified 2026-08-11).
+        ///
+        /// ⚠ Infantry organic anti-air is NOT unmodelled by this exclusion — it is the §11.8.11 overhead GAD
+        /// rule, where a helicopter crossing directly above ANY ground unit is fired on. Ranged interdiction
+        /// of transiting aircraft is what belongs to dedicated batteries alone.
+        /// </remarks>
+        public static bool IsAirDefenseClassification(UnitClassification c) =>
+            c == UnitClassification.SAM || c == UnitClassification.SPSAM
+            || c == UnitClassification.AAA || c == UnitClassification.SPAAA;
+
+        /// <summary>
+        /// §11.8.8 air-defence POSTURE gate: may a unit in this deployment position fire an opportunity
+        /// shot at a transiting aircraft? Deployed and the three dug-in sublevels yes; Mobile and Embarked
+        /// no — guns and radars travel packed.
+        /// </summary>
+        /// <remarks>
+        /// ⚠ THIS IS A POSTURE TEST, NOT THE DOC'S TOWED/SELF-PROPELLED CLASSIFICATION SPLIT, because the
+        /// split is already implied by the bay derivation and re-spelling it would be a second authority to
+        /// drift. §11.8.8 bars towed AAA/SAM while LIMBERED (Mobile) and lets SPAAA/SPSAM fire "from any
+        /// posture except Embarked" — but a self-propelled type IS its vehicle, so it has no Mobile bay
+        /// (§3.2b) and can never reach Mobile. Excluding Mobile therefore reproduces both halves with no
+        /// classification list to maintain.
+        /// ⚠ THE EQUIVALENCE BREAKS IF A SELF-PROPELLED AD UNIT EVER GAINS A MOBILE BAY — this gate would
+        /// then bar a shot the doc allows, and the explicit split has to come back.
+        /// ⚠ CONTENT CAVEAT, from §11.8.8's own note: towed AAA/SAM templates with no Mobile bay cannot
+        /// reach the limbered state at all, so the gate is VACUOUS for them until they are given DEP_MOB
+        /// profiles. That is content work, not a code gap.
+        /// </remarks>
+        public static bool PostureAllowsOpportunityFire(DeploymentPosition p) =>
+            p != DeploymentPosition.Mobile && p != DeploymentPosition.Embarked;
 
         /// <summary>
         /// The leg-carried identities — the family whose members may buy helo lift by IDENTITY

@@ -2,11 +2,44 @@
 
 ---
 
-## 🔖 SESSION HANDOFF — 2026-08-10, END OF SESSION. START HERE.
+## 🔖 SESSION HANDOFF — updated 2026-08-12, END OF SESSION. START HERE.
+
+**▶ NEXT SESSION: THE MAP-STANDARD PASS (interrupts the D-ladder; Bob's direction 2026-08-12).**
+D3's suite run came back GREEN 2026-08-12 (Bob: "all tests green"), so D0–D3 are fully closed
+(D3 play-blocked on a water map, as designed). The next work is NOT D4 — it is the map-standard
+change request from the Scenario Editor agent:
+- **Read first:** `MapStandard_Handoff_to_GameAgent_2026-08-12.md` (their ask) and
+  `MapStandard_Response_to_EditorAgent_2026-08-12.md` (our verified reply — the AMENDED plan is its §5).
+  ⚠ The editor agent ENDORSED the response and "adjusted where he needed to" — **check for a revised
+  editor doc before starting; their handoff may have been re-issued.**
+- **The pass, one commit's worth:** G1 at THREE sites (header props + `MapLoader` + `SnapshotMapper`
+  read AND the `ToSnapshot` WRITE site — the gap we found) → G3 (delete `MapConfig` geometry machinery
+  + eleven test-fixture constructor swaps) → G6 (the failCount throw, BOTH populate loops) → G5
+  (derive scroll bounds in `SetupBattleManagerData`) → G7 (docs incl. CLAUDE.md, with the
+  interaction-vs-file odd-row qualifier). G2 SKIPPED per the editor's own downgrade. G4 = Bob's scene
+  hands. Verify against existing Khost — behaviour must be byte-identical (its header says 32x21).
+- Bob is building an **AD-heavy test scenario**; if it gains a coastline it unblocks D3 play-testing
+  AND the N0–N3 naval phases in one artifact.
+
+The D-ladder resumes after the map pass: **D4 is deliberately deferred until the AOB/air-mission layer
+exists** (recommended 2026-08-11 — staging with no mission consumer is untestable, like D2's
+fixed-wing half). The block below is the 2026-08-10/11 history.
+
+---
+
+## 🔖 PRIOR HANDOFF — 2026-08-10 (history; superseded above)
 
 ### Where we are
-**D0 ✅ and D1 ✅ are code-complete and SUITE GREEN** (Bob ran the full Test Runner). Everything below
-D1 in §H is untouched. The design for the whole pass — air/ground/naval domains, the naming ruling,
+**D0 ✅, D1 ✅ and D2 ✅ are done — 514 tests green, D2 play-confirmed 2026-08-11.** Next on the ratified
+ladder is **D3** (helo over-water grace + the plan's only `SAVE_VERSION` bump). Everything below D2
+in §H is untouched.
+
+⚠ **THE STANDING SHAPE OF THE PROBLEM, restated because it now governs ordering:** the air RULES are
+built and tested; the air GAME is not wired. `AirCombatEngine`, `AOBMissionResolver`, `ReconMissionEngine`,
+`AirStandCheck` and `CombatResolver`'s airstrike / base-attack paths are all implemented, all
+EditorTest-covered, and all have ZERO live callers — there is no AOB entity, no placement input mode, no
+air phase, and no fixed-wing auto-return. D2 could only be play-tested against HELICOPTERS for exactly
+this reason. Every remaining air item (D4, and the untested half of D2) sits behind that same gap. The design for the whole pass — air/ground/naval domains, the naming ruling,
 naval from Bob's five precepts, and the `FacilityType.Port` base type — is **RATIFIED AND CLOSED**
 (§0, §D, §F). Nothing is waiting on a design decision except the ONE question in the next block.
 
@@ -84,11 +117,12 @@ Shock accumulating · `MovementHalt.FlightEvasion` and `ReportFlightHalted` dele
 ### Next milestones, in order
 1. ~~Resolve the §6.9 trigger question~~ ✅ RESOLVED, BUILT AND **PLAY-CONFIRMED 2026-08-11** (see
    the block above). Ambush is live end-to-end. Residue: flip `AMBUSH_DEBUG` off when tuning settles.
-2. **D2** (merged, now smaller): overhead **GAD** attack when a helo overflies a ground unit's hex
-   (§"OVERHEAD FIRE") · re-key `CheckAirAmbush` off the SAM/AAA classification list onto
-   `GAT_INTERDICT_THRESHOLD` ≥ 6 · §11.8.8 towed-posture gate · §11.8.3 shot budgets · **delete the
-   `UnityEngine.Random.Range(0,2)` coin flip**.
-3. **D3** helo over-water grace + `SAVE_VERSION` 5 → 6 (the only persistence bump in the plan).
+2. ~~**D2**~~ ✅ **CLOSED 2026-08-11 — 514 tests green, play-confirmed.** Overhead GAD fire, the
+   towed-posture gate, the shot meter, anti-dogpile, the coin flip deleted, and eligibility ruled to be
+   the **classification** gate (SAM/SPSAM/AAA/SPAAA). ⚠ Its FIXED-WING half is play-unverified and stays
+   that way until air missions exist. See § PHASE D2.
+3. ~~**D3**~~ ✅ **CODE-COMPLETE 2026-08-11** — over-water grace, `CanRestAt` fixed so a helo can stop on
+   water at all, both UI halves, `SAVE_VERSION` 6. ⚑ Suite run owed; not playable until a map has water.
 4. **D4** fixed-wing staging at airbases (unblocked by D0's list fix).
 5. **N0 → N2** naval foundations · naval combat + sea clock · the `FacilityType.Port` base type.
    **N3 supply hooks stay gated on §15.**
@@ -862,27 +896,95 @@ Bob (2026-08-10): *"if the helo flies over a non-air defense ground unit, it sho
 - Also owed in D2: the §11.8.8 towed-posture gate (towed AD cannot fire while limbered) and the §11.8.3
   per-turn shot budgets.
 
-### PHASE D2 — THE HELO AIR-DEFENCE PATH (wiring finished classes)
-⚠ **MERGED WITH THE ABOVE** — ambush and air-defence fire now share one call site and one stand check,
-so this is the same pass, not a second one. The ambush half is BUILT; the air-defence half (split the
-fixed-wing detection roll from the helo no-roll, call `ResolveAirDefenseFire`, feed the same
-`hpLostThisMove` accumulator, delete the `UnityEngine.Random.Range(0,2)` coin flip) remains.
-- [ ] Split the transit path: **fixed-wing → 1d6 detection roll; helo → NO roll, takes the hit**
-- [ ] Wire `CombatResolver.ResolveAirDefenseFire` then `HeloTransitStandCheck` (both built, tested,
-      **zero callers today**)
-- [ ] **DELETE the `UnityEngine.Random.Range(0,2)` coin flip** and its TODO
-- [ ] Abort outcome: free return to origin, MP/actions 0, transports force-disembark to Deployed there
-- [ ] Doc A5
-- **Test:** suite. **Play-test:** fly a helo past a SAM.
+### PHASE D2 — THE HELO AIR-DEFENCE PATH ✅ CLOSED 2026-08-11 — 514 TESTS GREEN + PLAY-CONFIRMED (Bob)
+**Bob played several turns as a real game: AAA and SAM fire on helos in transit works.** No tuning notes
+taken — deliberately deferred, the pass is accepted as-is.
 
-### PHASE D3 — HELO OVER WATER + `SAVE_VERSION` 6
-*The only persistence bump in the whole plan — bundle anything else that needs one into here.*
-- [ ] Persisted `EndedTurnOverWater`; checked at Refresh; still over water ⇒ lost
-- [ ] Impassable already closed (D1); water permitted with one turn of grace
-- [ ] **Turn-summary warning + selection info box** (Bob's ratified UI half of the rule)
-- [ ] `SAVE_VERSION` 5 → 6 with the pre-1.0 clean-break note
-- [ ] Doc A3
-- **Test:** suite + `SaveMigrationLadderTests`.
+⚠ **THE FIXED-WING HALF IS BUILT BUT HAS NEVER RUN IN PLAY, and cannot yet.** Bob, 2026-08-11: *"the
+mechanisms to run air missions are not in the game yet, so I can only subject helos to the opportunity
+fire."* So the §5.13.3.2 1d6 detection roll, the fixed-wing (MAN+SUR)/2 Δ axis and the "takes the damage
+and presses on, no transit stand check" branch are all suite-covered and **play-unverified**. They go
+live the day the AOB/air-mission layer does — re-test them then rather than assuming D2 covered them.
+
+⚠ **Bob is building an AD-heavy TEST SCENARIO** (2026-08-11) — Khost "simply doesn't have too much air
+defense". 🔵 If it can also be made COASTAL it retires the standing N0–N3 blocker in one artifact.
+⚠ **MERGED WITH THE ABOVE** — ambush and air-defence fire share one call site and one stand check,
+so this was the same pass, not a second one.
+- [x] Split the transit path: **fixed-wing → 1d6 detection roll; helo → NO roll, takes the hit**
+      (`SpottingService.RollFixedWingAmbushDetection`, named so the helo case cannot call it by accident)
+- [x] Wire `CombatResolver.ResolveAirDefenseFire` then `HeloTransitStandCheck` — both had zero callers
+- [x] **DELETED the `UnityEngine.Random.Range(0,2)` coin flip** and its TODO
+- [x] Abort outcome — reuses the existing `AbortFlightToOrigin` (free return, MP/actions 0, lift sets down)
+- [x] Eligibility = `GameData.IsAirDefenseClassification` (SAM/SPSAM/AAA/SPAAA). ⚠ **The punch list's
+      "re-key onto `GAT_INTERDICT_THRESHOLD` ≥ 6" was WRONG and is RETIRED** — see the ruling below.
+- [x] §11.8.8 towed-posture gate · §11.8.3 shot budget · §11.8.6 anti-dogpile
+- [x] **Overhead fire (the GAD rule)** — `CombatResolver.ResolveOverheadFire` + same-hex trigger
+- [x] `AirDefenseTransitTests` (17 tests) · doc §11.8.3a/b + §11.8.11 written
+- [-] **Doc A5 was ALREADY SATISFIED** — §5.13.2.4 and §5.13.3.2 both state the split plainly and
+      always did. The DOC was right and the CODE was wrong; nothing to amend.
+- [x] **Test:** full suite — 514 GREEN. **Play-test:** helo past a SAM — CONFIRMED WORKING.
+
+#### What D2 changed beyond the punch list, and why
+1. **⚠ SPOTTED AIR DEFENCE NOW FIRES.** The old scan required `SpottedLevel.Level0` and returned on the
+   FIRST match, so a SAM the player had already located was completely harmless and only one battery
+   could ever engage. §11.8.4 makes the opportunity automatic for any eligible unit in range; §6.10 air
+   ambush is the narrower *unspotted* case that buys a fixed-wing mover one detection roll. This is a
+   real difficulty increase and the biggest thing to watch in the play-test.
+2. ✅ **RESOLVED — THE GATE IS THE CLASSIFICATION (Bob, 2026-08-11).** Only **SAM / SPSAM / AAA / SPAAA**
+   may interdict a transiting aircraft at range. The agent's GAT re-key (which this file had asked for)
+   is REVERTED; `GameData.IsAirDefenseClassification` is the gate.
+   **Bob's reasoning, which is the part to keep:** making GAT > 0 exclusive to true air-defence units
+   would have expressed the gate through the stat, *but that breaks the stat-comparison paradigm* — every
+   unit must carry every stat for a Δ to be well defined. So GAT stays a universal ATTACK VALUE and
+   "is this an air-defence unit" is asked separately.
+   **The agent's supporting finding stands and reinforces it:** a `GAT ≥ 6` test would not have produced
+   the intended set anyway, because `MANPADS_BASIC` floors *infantry* GAT at exactly 6 (STINGER/IGLA: 8).
+   ⚠ **Correction to Bob's message: MANPADS units are NOT classified SAM.** MANPADS is a TRAIT on
+   `INF_*` profiles (regular / airborne / air-mobile / marine / Spetsnaz, every faction); no SAM- or
+   AAA-classified template carries one. That makes the classification gate exactly right with no
+   special case — and infantry organic anti-air is still modelled, as §11.8.11 overhead GAD fire.
+   Recorded as DesignDoc §11.8.2a/b/c; pinned by `ManpadsInfantry_HasRealGat_ButIsStillNotAnAirDefenceUnit`.
+   🔵 One consequence worth knowing: the MANPADS traits' GAT floor now has **no live consumer** — GAT is
+   read only in the §11.8.1 lane, which only dedicated batteries reach. The traits still cost prestige
+   and still read as flavour; whether they should confer something else is an open (small) question.
+3. **§11.8.3's per-system table is unbuildable as written** — "Tunguska 3" names a weapon profile, not a
+   classification, and no per-profile shot stat exists. The budget is §8.5.8's flat 2 via
+   `OpportunityActions`; recorded as §11.8.3a rather than faked.
+4. **§11.8.8 is coded as a POSTURE test, not the doc's towed/self-propelled class split**, because a
+   self-propelled type has no Mobile bay and can never be limbered — excluding Mobile reproduces both
+   halves with no list to drift. ⚠ Breaks if an SP air-defence unit ever gains a Mobile bay.
+5. **The ambush anti-dogpile set is now shared with overhead fire** (renamed `enemiesEngagedThisMove`),
+   per the ratified "one engagement per unit per move". The §11.8.6 *ranged* cap is separate and lives
+   on the firing unit (`CombatUnit.MarkAircraftEngaged`) because it is per TURN and spans aircraft.
+- 🔵 **Watch in the suite run:** `ResolveTransitFire` reaches `EventManager.Instance`, which lazy-creates
+  a GameObject and calls `DontDestroyOnLoad` — harmless in edit mode but it logs a warning. If the two
+  integration tests are noisy, the fix is a non-creating `EventManager.Existing` accessor.
+
+### PHASE D3 — HELO OVER WATER + `SAVE_VERSION` 6 ✅ CODE-COMPLETE 2026-08-11 (⚑ suite run owed)
+- [x] Persisted `EndedTurnOverWater` on `CombatUnit`; still over water on the SECOND Upkeep ⇒ lost,
+      full remaining equipment booked to the ledger, unit unregistered
+- [x] **`HexMapUtil.CanRestAt` now lets a helicopter stop over water** — this was the real blocker and it
+      was not on the punch list. `CanRestAt` rejected Water for anything in the GROUND domain, and a helo
+      occupies the ground domain for stacking, so a helo ordered onto water was silently displaced back to
+      land by the post-move settlement and the rule could never come up at all. Keyed on
+      `MovementModeService.IsAirborneNow` — "is it flying right now" — so nothing walking is affected
+- [x] **Turn warning + selection info box** — `PrinterDispatch.ReportStrandedOverWater` /
+      `ReportLostAtSea`, plus a persistent line in `Prefab_UnitPanel.BuildFriendlyLines`
+- [x] `SAVE_VERSION` 5 → 6 with the pre-1.0 clean-break note; `MigrateStep`'s NOTE updated to name all
+      three step-less bumps. ⚠ `CombatUnit` serialises DIRECTLY into `GameStateSnapshot.Units`, so the new
+      field needed no snapshot plumbing — but that is also exactly why it forces a version bump
+- [x] Doc A3 → DesignDoc **§5.13.2.7** (+ .1–.5)
+- **⚑ Test:** full suite. `OverWaterGraceTests` (10 tests) added; `SaveMigrationLadderTests` is
+  version-agnostic (it injects versions) so the bump needs nothing there.
+
+#### ⚠ ONE DEVIATION FROM THE PUNCH LIST, AND IT IS THE WHOLE RULE
+This file said "checked at Refresh". **Refresh is wrong and gives ZERO turns of grace** — it fires at the
+START of a turn, before the helicopter has had the very move the rule exists to give it. The check runs at
+**Upkeep** ("the end of your turn"), which is what "must reach land by the end of its next move" actually
+says. Recorded as DesignDoc §5.13.2.7.2 so the Refresh version is not restored later.
+
+🔵 **Not playable on Khost (no water).** Suite-verified only until Bob's test scenario has a coastline —
+the same artifact that unblocks N0–N3.
 
 ### PHASE D4 — FIXED-WING STAGING AT AIRBASES
 - [ ] Boarding while adjacent to a friendly airbase free-moves the loaded transport onto the base

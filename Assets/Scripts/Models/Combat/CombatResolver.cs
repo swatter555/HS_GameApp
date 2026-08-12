@@ -148,6 +148,24 @@ namespace HammerAndSickle.Models.Combat
     }
 
     /// <summary>
+    /// Outcome of OVERHEAD fire — the organic anti-air a ground unit throws at a helicopter crossing its own
+    /// hex (ratified 2026-08-10; Δ = firer's GAD − helo's GAD). One-way, damage-only. The same-hex trigger,
+    /// the one-engagement-per-unit-per-move cap and the §11.8.9 stand check are the caller's.
+    /// </summary>
+    /// <remarks>
+    /// ⚠ A SEPARATE RESULT TYPE FROM <see cref="AirDefenseFireResult"/> ON PURPOSE. The two look alike but
+    /// answer to different rules — §11.8 ranged fire is GAT-gated, budgeted and reaches fixed-wing; overhead
+    /// fire is GAD-driven, free, same-hex and helicopter-only. Sharing a struct would invite sharing a code
+    /// path, and the first "simplification" that merged them would silently give jets to the GAD rule.
+    /// </remarks>
+    public struct OverheadFireResult
+    {
+        public bool Engaged;
+        public int DamageToHelo;
+        public bool HeloDestroyed;
+    }
+
+    /// <summary>
     /// Adapter between <see cref="CombatUnit"/> and the pure damage engine. Builds the two damage lanes and the
     /// defender stand input from unit state + context, runs <see cref="CombatEngine.ResolveDirectEngagement"/>
     /// (universal return fire §6.12 / §7.7.3), and applies the resulting HP. It does NOT do the map-coupled
@@ -828,5 +846,81 @@ namespace HammerAndSickle.Models.Combat
             || aircraft.GetActiveWeaponProfile()?.MovementMedium == MovementMedium.Helo;
 
         #endregion // Ground-to-air opportunity fire
+
+        #region Overhead fire (the GAD rule — helicopter overflight)
+
+        /// <summary>
+        /// Resolves the organic anti-air a ground unit throws at a helicopter passing DIRECTLY OVER its hex
+        /// (ratified 2026-08-10). Δ = the ground unit's <b>GAD</b> − the helo's GAD. One-way (the helo does
+        /// not return fire), attacker pipeline, terrain bypassed aloft. HP is applied to the helicopter.
+        ///
+        /// SCOPE: the single damage shot. The same-hex trigger, the one-engagement-per-unit-per-move cap and
+        /// the §11.8.9 transit stand check are the caller's, exactly as for <see cref="ResolveAirDefenseFire"/>.
+        /// </summary>
+        /// <remarks>
+        /// ⚠ GAD IS A DEFENSIVE STAT USED HERE AS AN ATTACK VALUE, AND THAT IS DELIBERATE — do NOT "correct"
+        /// it to GAT. The game is REGIMENTAL scale, so nearly every formation carries organic air defence, and
+        /// GAD already encodes how much. GAT was scoped to DEDICATED air-defence systems because it was
+        /// written with jets in mind; §11.8 (ranged, GAT ≥ 6) remains that separate path. Using GAD costs no
+        /// new field to author and no new number to balance.
+        ///
+        /// ⚠ THE TRIGGER IS THE SAME HEX — NOT ADJACENCY, NOT A RANGE — and the narrowness is what makes the
+        /// rule safe. Letting ordinary ground units shoot at helicopters within a RADIUS would break every
+        /// sortie on geometry alone (accumulating Shock, §11.8.9). Overflight is avoidable by ROUTING, so this
+        /// makes the flight PATH a decision instead of making flight suicidal — and it is what gives recon
+        /// units real work, since you now need to know what is UNDER your path, not merely where you land.
+        ///
+        /// ⚠ FIXED-WING IS EXEMPT — too high for organic weapons; only the §11.8 dedicated path reaches it.
+        /// Enforced by the caller, which runs this for helicopter movers only.
+        ///
+        /// 🔵 CALIBRATION OWED: whether GAD-as-attack yields sensible deltas against real profiles has not
+        /// been checked. A truck archetype sits at GAD 6 and a helo's own GAD carries its evasion role
+        /// (§7A.14), so the band this produces against live templates wants a pass before balance testing.
+        /// </remarks>
+        public static OverheadFireResult ResolveOverheadFire(CombatUnit groundUnit, CombatUnit helo, ICombatRandom rng)
+        {
+            try
+            {
+                if (groundUnit == null) throw new ArgumentNullException(nameof(groundUnit));
+                if (helo == null) throw new ArgumentNullException(nameof(helo));
+                if (rng == null) throw new ArgumentNullException(nameof(rng));
+
+                LaneInput lane = BuildOverheadFireLane(groundUnit, helo);
+                int dmg = CombatEngine.ResolveLane(lane, rng);
+                helo.TakeDamage(dmg);
+
+                return new OverheadFireResult
+                {
+                    Engaged = true,
+                    DamageToHelo = dmg,
+                    HeloDestroyed = helo.HitPoints.Current <= 0f,
+                };
+            }
+            catch (Exception e)
+            {
+                AppService.HandleException(CLASS_NAME, nameof(ResolveOverheadFire), e);
+                return default;
+            }
+        }
+
+        /// <summary>
+        /// The overhead-fire lane: FirerAttack = the ground unit's GAD (see the ruling on
+        /// <see cref="ResolveOverheadFire"/>); TargetDefense = the helo's GAD (§7A.14 — helo air stats are
+        /// zero, GAD carries the evasion role). Attacker pipeline (no deployment mult, §7.12.2), firer is a
+        /// ground unit so GroundBalanceMod applies (§7.7.10), terrain bypassed (the target is aloft).
+        /// </summary>
+        public static LaneInput BuildOverheadFireLane(CombatUnit groundUnit, CombatUnit helo) =>
+            new LaneInput
+            {
+                FirerAttack = groundUnit.ActiveGroundAirDefense,
+                TargetDefense = helo.ActiveGroundAirDefense,
+                FirerQualityMult = groundUnit.GetCombatQualityMultiplier(),
+                FirerIsDefender = false,
+                AttackType = AttackType.Direct,
+                FirerIsAir = false,
+                BypassTerrainBlock = true,
+            };
+
+        #endregion // Overhead fire
     }
 }

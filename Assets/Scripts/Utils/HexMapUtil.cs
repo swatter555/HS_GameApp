@@ -689,8 +689,14 @@ namespace HammerAndSickle.Models.Map
             // Fixed-wing rests in the air stack and shares freely with the ground layer.
             if (unit.OccupiesDomain == Domain.Air) return true;
 
-            // Everything else rests in the ground stack — which admits exactly one occupant.
-            if (tile.Terrain == TerrainType.Water) return false;
+            /* §5.13.2 — A HELICOPTER MAY COME TO REST OVER WATER (D3, 2026-08-11). It has one turn of grace
+             * to reach land; failing that it is lost at BattleManager's Upkeep. ⚠ Keyed on "is it flying
+             * RIGHT NOW" (the medium) and not on the domain, because a helicopter occupies the GROUND domain
+             * for stacking and icon purposes — which is the very reason it used to be refused here. The
+             * refusal is what a walking unit needs; a helicopter is over the water, not in it.
+             * ⚠ The occupancy rule below still applies to it: a helo may not share a hex with a ground unit,
+             * so two units cannot end up in one ground stack out at sea either. */
+            if (tile.Terrain == TerrainType.Water && !MovementModeService.IsAirborneNow(unit)) return false;
 
             var gdm = GameDataManager.Instance;
             if (gdm == null) return true;

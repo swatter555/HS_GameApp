@@ -2,14 +2,17 @@ using HammerAndSickle.Core;
 using HammerAndSickle.Core.GameData;
 using HammerAndSickle.Core.Helpers;
 using HammerAndSickle.Core.Map;
+using HammerAndSickle.Core.UI;
 using HammerAndSickle.Helpers;
 using HammerAndSickle.Models;
 using HammerAndSickle.Models.Combat;
+using HammerAndSickle.Models.Map;
 using HammerAndSickle.Renderers;
 using HammerAndSickle.Renderers.Chunked;
 using HammerAndSickle.Services;
 using System;
 using System.Collections;
+using System.Collections.Generic;
 using System.Linq;
 using TMPro;
 using UnityEngine;
@@ -813,11 +816,30 @@ namespace HammerAndSickle.Controllers
                 // §3.5.4–.6 depot generation / minor-depot / airbase replenishment — STUB (supply pass).
 
                 // §3.5.8 efficiency recovery: +2 idle / +1 moved / 0 fought, cap Full.
-                foreach (var u in units)
+                // §5.13.2 over-water grace runs in the same pass — a helicopter still at sea on its second
+                // Upkeep is lost, so it must not then be given recovery it will not live to use.
+                // ⚠ Iterating a COPY: ApplyOverWaterGrace unregisters the unit it loses, which mutates the
+                // manager's collection underneath us.
+                var map = GameDataManager.CurrentHexMap;
+                bool anyLostAtSea = false;
+
+                foreach (var u in new List<CombatUnit>(units))
                 {
                     if (u == null || u.IsDestroyed()) continue;
+
+                    if (ApplyOverWaterGrace(u, map))
+                    {
+                        anyLostAtSea = true;
+                        continue;
+                    }
+
                     ApplyUpkeepRecovery(u);
                 }
+
+                // Only when something actually went into the sea (§3.6e — the coarse redraw is the sole
+                // icon refresh). Raising it every Upkeep would be a full repaint per turn for nothing.
+                if (anyLostAtSea)
+                    EventManager.Instance?.RaiseRedrawMapIcons();
 
                 // §3.5.9 HCL decay/recovery — STUB (needs depot supply tracing; supply pass).
             }
@@ -847,6 +869,58 @@ namespace HammerAndSickle.Controllers
             var recovered = DegradationCheck.ApplyUpkeepRecovery(
                 unit.EfficiencyLevel, unit.HasMovedThisTurn, unit.HasFoughtThisTurn);
             unit.SetEfficiencyLevel(recovered);
+        }
+
+        /// <summary>
+        /// §5.13.2 over-water grace — a helicopter may END a turn over Water, but must reach land by the end
+        /// of its NEXT turn or it is lost at sea. Returns true if <paramref name="unit"/> was lost.
+        /// </summary>
+        /// <remarks>
+        /// ⚠ RUNS AT UPKEEP, NOT REFRESH, and the difference is the whole grace period. The punch list said
+        /// "checked at Refresh", but Refresh fires at the START of a turn — before the unit has had the very
+        /// move the rule gives it to escape — so a literal Refresh check kills a helicopter that has not yet
+        /// been given its chance, i.e. zero turns of grace instead of one. Upkeep is "end of your turn",
+        /// which is exactly what "by the end of its next move" means.
+        ///
+        /// ⚠ ONE BOOL GIVES EXACTLY ONE TURN because the flag is read BEFORE it is written. End turn N over
+        /// water: flag was false → set it, survive. End turn N+1 still over water: flag was true → lost.
+        /// Reach land at any point: cleared, and the clock is fully reset for next time.
+        ///
+        /// ⚠ HELICOPTERS ONLY (`MovementMedium.Helo`), per §5.13.2. A fixed-wing aircraft parked over water
+        /// is not this rule's business — it is the §5.13.5 auto-return gap, which is unbuilt, and quietly
+        /// drowning jets here would disguise that as a working feature.
+        ///
+        /// ⚠ A LOADED LIFT TAKES ITS REGIMENT WITH IT, and that needs no special handling: the lift IS the
+        /// regiment (one UnitID, one HP pool, riding its Embarked profile), so removing the unit removes
+        /// both. The equipment is booked explicitly because NO DAMAGE EVENT FIRES — same reason
+        /// RetreatResolver books a surrender (§3.6d): `TakeDamage` is the only automatic booking hook, and a
+        /// unit lost at sea never passes through it.
+        /// </remarks>
+        public static bool ApplyOverWaterGrace(CombatUnit unit, HexMap map)
+        {
+            if (unit == null) return false;
+
+            bool overWater = MovementModeService.CurrentMedium(unit) == MovementMedium.Helo
+                          && map?.GetHexAt(unit.MapPos)?.Terrain == TerrainType.Water;
+
+            if (!overWater)
+            {
+                unit.SetEndedTurnOverWater(false);
+                return false;
+            }
+
+            if (!unit.EndedTurnOverWater)
+            {
+                // First turn out over the water: the clock starts, and the player is told.
+                unit.SetEndedTurnOverWater(true);
+                PrinterDispatch.ReportStrandedOverWater(unit);
+                return false;
+            }
+
+            GameDataManager.RecordRemainingEquipmentAsLost(unit);
+            PrinterDispatch.ReportLostAtSea(unit);
+            GameDataManager.Instance?.UnregisterCombatUnit(unit.UnitID);
+            return true;
         }
 
         /// <summary>

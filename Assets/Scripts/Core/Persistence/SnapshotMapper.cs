@@ -702,10 +702,11 @@ namespace HammerAndSickle.Persistence
             // e.g.  3 => MigrateV3ToV4,   // AI2: AIPerceptionState enters the snapshot
             //       4 => MigrateV4ToV5,   // P5: loss ledger enters the snapshot
             //
-            // NOTE there is deliberately NO 3 => arm for the 3→4 bump of 2026-07-28. While
-            // MINIMUM_SUPPORTED_SAVE_VERSION tracks SAVE_VERSION (pre-1.0), a v3 save is refused by the
-            // floor check before the ladder is ever entered, so a step would be unreachable code
-            // pretending to be a migration. See the SAVE_VERSION comment in GameData.
+            // NOTE there is deliberately NO 3 => arm for the 3→4 bump of 2026-07-28, NO 4 => arm for the
+            // 4→5 profile-slot bump of 2026-08-08, and NO 5 => arm for the 5→6 over-water bump of
+            // 2026-08-11. While MINIMUM_SUPPORTED_SAVE_VERSION tracks SAVE_VERSION (pre-1.0), any older
+            // save is refused by the floor check before the ladder is ever entered, so a step would be
+            // unreachable code pretending to be a migration. See the SAVE_VERSION comment in GameData.
             _ => null
         };
 

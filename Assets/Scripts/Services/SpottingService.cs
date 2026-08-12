@@ -10,13 +10,31 @@ using UnityEngine;
 namespace HammerAndSickle.Services
 {
     /// <summary>
-    /// Result of an air ambush detection check.
+    /// One air-defence unit eligible to fire on a transiting aircraft this step (§11.8), paired with whether
+    /// it was still UNSPOTTED when the aircraft arrived — the §6.10 air-ambush case.
     /// </summary>
-    public enum AirAmbushResult
+    /// <remarks>
+    /// (Replaced the old <c>AirAmbushResult</c> tri-state 2026-08-11. That enum could describe only ONE
+    /// air-defence unit per hex and only the unspotted-ambush half of §11.8, which is why the path it served
+    /// ended in a coin flip.)
+    /// </remarks>
+    public readonly struct TransitAirDefenseContact
     {
-        NoThreat,
-        Detected,
-        Ambushed
+        /// <summary>The air-defence unit that may fire.</summary>
+        public readonly CombatUnit Firer;
+
+        /// <summary>
+        /// True if <see cref="Firer"/> was at <see cref="SpottedLevel.Level0"/> when the aircraft entered.
+        /// ONLY this case is a §6.10 air ambush, and only a FIXED-WING mover gets the §5.13.3.2 detection
+        /// roll against it — §5.13.2.4 gives a helicopter no roll at all.
+        /// </summary>
+        public readonly bool WasUnspotted;
+
+        public TransitAirDefenseContact(CombatUnit firer, bool wasUnspotted)
+        {
+            Firer = firer;
+            WasUnspotted = wasUnspotted;
+        }
     }
 
     /// <summary>
@@ -439,57 +457,140 @@ namespace HammerAndSickle.Services
         }
 
         /// <summary>
-        /// Checks for air ambush: unspotted SAM/SPSAM/AAA/SPAAA within engagement range.
-        /// Rolls 1d6 vs detection table keyed by air unit's ExperienceLevel.
+        /// Every air-defence unit eligible to fire an opportunity shot at <paramref name="mover"/> as it
+        /// enters <paramref name="newPos"/> (§11.8). This owns only the question of WHO may shoot; the caller
+        /// resolves the shots, spends the budget and applies the consequences.
         /// </summary>
-        public static AirAmbushResult CheckAirAmbush(CombatUnit mover, Position2D newPos)
+        /// <remarks>
+        /// ⚠ ELIGIBILITY IS THE CLASSIFICATION — <see cref="GameData.IsAirDefenseClassification"/>, ruled by
+        /// Bob 2026-08-11. Only SAM / SPSAM / AAA / SPAAA interdict a transiting aircraft at range. NOT GAT:
+        /// restricting GAT to true air-defence units would break the stat-comparison paradigm (every unit
+        /// needs every stat for a Δ to exist), and a `GAT ≥ 6` test does not even produce the intended set —
+        /// `MANPADS_BASIC` floors infantry GAT at exactly 6, so it admits nearly every line regiment. GAT
+        /// remains the ATTACK VALUE in the lane; it was never the right question for "who may shoot".
+        /// ⚠ Infantry organic anti-air is not lost by this — it is the §11.8.11 overhead GAD rule, which
+        /// fires when a helicopter crosses directly above a ground unit. Ranged interdiction belongs to
+        /// dedicated batteries alone. (A brief 2026-08-11 GAT re-key is REVERTED; do not reinstate it.)
+        ///
+        /// ⚠ SPOTTED AIR DEFENCE FIRES TOO — THIS IS NOT AMBUSH-ONLY, and that is the second half of the
+        /// 2026-08-11 fix. §11.8.4 makes the firing opportunity automatic for any eligible unit in range;
+        /// §6.10 air ambush is the NARROWER case where the firer happened to be unspotted, which buys a
+        /// fixed-wing mover one detection roll and nothing else. The old code returned on the first UNSPOTTED
+        /// air-defence unit it found and never looked at the rest, so a SAM the player had already located was
+        /// completely harmless — exactly backwards, since flying past a known SAM should be the informed risk.
+        ///
+        /// ⚠ SIDE-AGNOSTIC (<c>enemy.Side != mover.Side</c>), like <see cref="CheckGroundAmbush"/> rather than
+        /// like the <c>GetAIUnits()</c> call it replaced: player air defence must engage AI aircraft the day
+        /// the AI starts flying (M13), without anyone having to remember this file.
+        /// </remarks>
+        public static List<TransitAirDefenseContact> FindTransitAirDefense(CombatUnit mover, Position2D newPos)
         {
+            var contacts = new List<TransitAirDefenseContact>();
+
             try
             {
                 var gdm = GameDataManager.Instance;
-                var enemies = gdm.GetAIUnits();
+                if (mover == null || gdm == null) return contacts;
 
-                foreach (var enemy in enemies)
+                foreach (var enemy in gdm.GetAllCombatUnits())
                 {
-                    if (enemy.IsDestroyed()) continue;
-                    if (enemy.SpottedLevel != SpottedLevel.Level0) continue;
+                    if (enemy == null || enemy.IsDestroyed()) continue;
+                    if (enemy.Side == mover.Side) continue;
 
-                    bool isAA = enemy.Classification == UnitClassification.SAM
-                             || enemy.Classification == UnitClassification.SPSAM
-                             || enemy.Classification == UnitClassification.AAA
-                             || enemy.Classification == UnitClassification.SPAAA;
-                    if (!isAA) continue;
+                    /* §11.8 is GROUND-to-air opportunity fire. Air-to-air belongs to the AOB/AIB venue
+                     * (§11.4.8 / §11.8.10), which has its own slots and its own action currency. Asking the
+                     * domain rather than the classification also lets an attack helo be excluded by its
+                     * (empty) opportunity budget below rather than by a special case here. */
+                    if (enemy.OccupiesDomain != Domain.Ground) continue;
+
+                    // §11.8.2 — THE GATE: only a dedicated air-defence type interdicts at range.
+                    if (!GameData.IsAirDefenseClassification(enemy.Classification)) continue;
+
+                    // §11.8.8 — packed guns and radars do not shoot.
+                    if (!GameData.PostureAllowsOpportunityFire(enemy.DeploymentPosition)) continue;
+
+                    /* §11.8.3 — the per-turn shot METER, denominated in OpportunityActions (§8.5.4 grants
+                     * exactly these four classes 2 apiece, for exactly this). ⚠ A METER, NOT A GATE: what
+                     * makes a unit an air-defence shooter is the line above; this only bounds how OFTEN a
+                     * genuine battery shoots, so a SAM cannot engage every aircraft on the map every turn.
+                     * ASKED here, never SPENT — a scan that spent would charge every battery whose envelope
+                     * an aircraft merely clipped. The non-announcing predicate is deliberate (see
+                     * CanPerformOpportunityAction): this runs over ENEMY units and the spender narrates its
+                     * refusals into the player's message log, which would leak an unspotted battery. */
+                    if (!enemy.CanPerformOpportunityAction()) continue;
+
+                    // §11.8.6 — one shot per aircraft per turn, however many hexes it crosses in reach.
+                    if (enemy.HasEngagedAircraftThisTurn(mover.UnitID)) continue;
 
                     int engagementRange = Mathf.FloorToInt(enemy.ActivePrimaryRange);
-                    if (engagementRange <= 0) engagementRange = 2; // fallback
+                    if (engagementRange <= 0) engagementRange = 2;   // fallback: profile states no reach
+                    if (HexMapUtil.GetHexDistance(newPos, enemy.MapPos) > engagementRange) continue;
 
-                    int dist = HexMapUtil.GetHexDistance(newPos, enemy.MapPos);
-                    if (dist > engagementRange) continue;
-
-                    // Detection roll (§6.10.3/.4) — delegated to the pure, seedable AirAmbushCheck.
-                    if (AirAmbushCheck.RollDetection(mover.ExperienceLevel, new CombatRandom()))
-                    {
-                        // Detection success, no shot fired: the AA unit is revealed at Level1 (§12.4.8).
-                        // (The FAILED branch — ambusher fires — reveals at Level4 per §12.4.9.1; that
-                        // belongs to the AD-fire wiring, which is M13 caller work.)
-                        RaiseToCeiling(enemy, SpottedLevel.Level1);
-
-                        if (EventManager.Instance != null)
-                            EventManager.Instance.RaiseAirAmbushDetected(enemy, mover);
-
-                        return AirAmbushResult.Detected;
-                    }
-
-                    // Ambush: detection failed
-                    return AirAmbushResult.Ambushed;
+                    contacts.Add(new TransitAirDefenseContact(enemy, enemy.SpottedLevel == SpottedLevel.Level0));
                 }
-
-                return AirAmbushResult.NoThreat;
             }
             catch (Exception e)
             {
-                AppService.HandleException(CLASS_NAME, nameof(CheckAirAmbush), e);
-                return AirAmbushResult.NoThreat;
+                AppService.HandleException(CLASS_NAME, nameof(FindTransitAirDefense), e);
+            }
+
+            return contacts;
+        }
+
+        /// <summary>
+        /// §6.10.3/.4 — the FIXED-WING air-ambush detection roll against an unspotted air-defence unit.
+        /// True if the aircraft spots the threat first: the shot is averted and <paramref name="firer"/> is
+        /// revealed at CONTACT (§12.4.8) without having fired.
+        /// </summary>
+        /// <remarks>
+        /// ⚠ FIXED-WING ONLY (§5.13.3.2), and the name says so because the split is the whole point of this
+        /// pass. A HELICOPTER GETS NO ROLL (§5.13.2.4): it takes the hit whenever the air-defence unit has
+        /// shots available, and its way out is the §11.8.9 transit stand check AFTER the damage, not a chance
+        /// to avoid it. Until 2026-08-11 every airborne mover rolled this, which handed helicopters an
+        /// evasion the design never gave them.
+        /// </remarks>
+        public static bool RollFixedWingAmbushDetection(CombatUnit firer, CombatUnit mover)
+        {
+            try
+            {
+                if (firer == null || mover == null) return false;
+
+                if (!AirAmbushCheck.RollDetection(mover.ExperienceLevel, new CombatRandom()))
+                    return false;
+
+                // Detected, no shot fired: revealed at Level1 (§12.4.8) — you found the radar, you did not
+                // get shot at by it. The FIRING case reveals at Level4 (RevealByOpportunityFire).
+                RaiseToCeiling(firer, SpottedLevel.Level1);
+                EventManager.Instance?.RaiseAirAmbushDetected(firer, mover);
+                return true;
+            }
+            catch (Exception e)
+            {
+                AppService.HandleException(CLASS_NAME, nameof(RollFixedWingAmbushDetection), e);
+                return false;   // safe default: undetected, the caller resolves the shot
+            }
+        }
+
+        /// <summary>
+        /// §12.4.9.1 / §11.8.4 — a unit that FIRES from the open is revealed at Level4 (position AND
+        /// equipment). The opportunity-fire counterpart to <see cref="RevealToContact"/>.
+        /// </summary>
+        /// <remarks>
+        /// ⚠ LEVEL 4, NOT LEVEL 1, and the contrast with the ambusher is the rule rather than an
+        /// inconsistency. §6.9.3 grants only a CONTACT because an ambusher fires from concealment; an
+        /// air-defence unit engaging an aircraft has its radars hot and its position obvious, so the player
+        /// learns what it is as well as where. This is the §11.8.4 "UI reveals the firing unit at Level 4".
+        /// </remarks>
+        public static void RevealByOpportunityFire(CombatUnit firer)
+        {
+            try
+            {
+                if (firer == null) return;
+                RaiseToCeiling(firer, SpottedLevel.Level4);
+            }
+            catch (Exception e)
+            {
+                AppService.HandleException(CLASS_NAME, nameof(RevealByOpportunityFire), e);
             }
         }
 
@@ -553,9 +654,9 @@ namespace HammerAndSickle.Services
         /// <remarks>
         /// ⚠ THE RULING (Bob, 2026-08-10): "FW air units do not even spot ground units during a transit
         /// attempt." Fixed-wing assets only ever traverse the map on their way to the air ops box; they are
-        /// not loitering observers. What CAN happen to them on the way is the reverse — an unspotted air
-        /// defence unit fires on them and reveals ITSELF (`CheckAirAmbush`). Ground troops neither see them
-        /// nor are seen by them.
+        /// not loitering observers. What CAN happen to them on the way is the reverse — an air defence unit
+        /// fires on them and reveals ITSELF (<see cref="FindTransitAirDefense"/>). Ground troops neither see
+        /// them nor are seen by them.
         ///
         /// ⚠ KEYED ON THE MEDIUM, NOT THE CLASSIFICATION, because a paratroop regiment riding an An-12 is
         /// classification AB — it would otherwise keep its ground-combat spotting range of 2 and go on

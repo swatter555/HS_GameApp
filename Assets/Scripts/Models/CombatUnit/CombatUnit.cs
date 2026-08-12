@@ -126,6 +126,24 @@ namespace HammerAndSickle.Models
         [JsonInclude] [JsonPropertyName("combatActions")]      public StatsMaxCurrent CombatActions { get; private set; }
         [JsonInclude] [JsonPropertyName("deploymentActions")]  public StatsMaxCurrent DeploymentActions { get; private set; }
         [JsonInclude] [JsonPropertyName("opportunityActions")] public StatsMaxCurrent OpportunityActions { get; private set; }
+
+        /// <summary>
+        /// §5.13.2 — this helicopter ended a previous turn over Water and is living on its one turn of
+        /// grace. Set at Upkeep when the resting hex is Water, cleared the moment it reaches land; still
+        /// true at the NEXT Upkeep while still over water means the unit is lost at sea.
+        /// </summary>
+        /// <remarks>
+        /// ⚠ PERSISTED, and it is the reason for the SAVE_VERSION 5 → 6 bump. It has to survive a save:
+        /// without it, saving over open water and reloading would silently reset the grace clock, turning
+        /// the rule into "a helicopter may loiter at sea forever, as long as you save occasionally."
+        /// ⚠ ONE BOOL IS ENOUGH because the rule is exactly one turn of grace — "was it already over water
+        /// at the last Upkeep" is the entire question. A stranded-since turn number would be needed only if
+        /// the grace period were ever longer than one turn.
+        /// </remarks>
+        [JsonInclude] [JsonPropertyName("endedTurnOverWater")] public bool EndedTurnOverWater { get; private set; }
+
+        /// <summary>Sets the §5.13.2 over-water grace flag. Driven by BattleManager's Upkeep pass.</summary>
+        public void SetEndedTurnOverWater(bool value) => EndedTurnOverWater = value;
         [JsonInclude] [JsonPropertyName("intelActions")]       public StatsMaxCurrent IntelActions { get; private set; }
 
         // State
@@ -381,6 +399,38 @@ namespace HammerAndSickle.Models
             DeploymentActions.ResetToMax();
             OpportunityActions.ResetToMax();
             IntelActions.ResetToMax();
+
+            // §11.8.6 — the per-turn anti-dogpile record clears with the budget it guards (see the field).
+            _aircraftEngagedThisTurn?.Clear();
+        }
+
+        // ----------------------------------------------------------------------------
+        // §11.8.6 anti-dogpile — the aircraft this unit has already fired an opportunity
+        // shot at THIS TURN.
+        //
+        // [JsonIgnore] and runtime-only: a move order is atomic with respect to input, so
+        // no save can be taken mid-transit and there is nothing here worth persisting.
+        // Cleared in RefreshAllActions, the one place per-turn state resets.
+        //
+        // ⚠ PER TURN, NOT PER MOVE ORDER, and the two scopes are doing different jobs. The
+        // §11.8.3 shot BUDGET is spent across every aircraft this unit engages in a turn;
+        // this SET stops it engaging the SAME aircraft twice however many hexes that
+        // aircraft flies through its envelope. The ground-ambush anti-dogpile is a separate
+        // per-move-order set owned by MovementController — same idea, different scope, and
+        // deliberately not shared.
+        // ----------------------------------------------------------------------------
+
+        [JsonIgnore] private HashSet<string> _aircraftEngagedThisTurn;
+
+        /// <summary>§11.8.6 — has this air-defence unit already engaged that aircraft this turn?</summary>
+        public bool HasEngagedAircraftThisTurn(string aircraftId) =>
+            aircraftId != null && _aircraftEngagedThisTurn != null && _aircraftEngagedThisTurn.Contains(aircraftId);
+
+        /// <summary>§11.8.6 — records an opportunity shot against that aircraft for the rest of this turn.</summary>
+        public void MarkAircraftEngaged(string aircraftId)
+        {
+            if (aircraftId == null) return;
+            (_aircraftEngagedThisTurn ??= new HashSet<string>()).Add(aircraftId);
         }
 
         /// <summary>
@@ -1082,15 +1132,32 @@ namespace HammerAndSickle.Models
         }
 
         /// <summary>
+        /// True if an opportunity action is affordable right now — an action left, the supply to pay for it,
+        /// and not a facility.
+        /// </summary>
+        /// <remarks>
+        /// ⚠ EXISTS SO A CALLER CAN ASK WITHOUT SPENDING, AND WITHOUT LEAKING. <see cref="PerformOpportunityAction"/>
+        /// announces its refusal through <c>AppService.CaptureUiMessage</c>, which is right for a player order
+        /// and wrong for a reactive scan: §11.8 air-defence fire tests ENEMY units every time an aircraft
+        /// crosses their envelope, and a supply-starved AI battery would print its own name into the player's
+        /// message log — a fog leak (§12) from a unit that may be unspotted. Scans ask this; only a shot that
+        /// is actually taken calls the spender.
+        /// ⚠ ONE SPELLING: <see cref="PerformOpportunityAction"/> gates on this method rather than repeating
+        /// the conditions, so the two can never disagree about what "affordable" means.
+        /// </remarks>
+        public bool CanPerformOpportunityAction() =>
+            OpportunityActions.Current >= 1 &&
+            DaysSupply.Current >= GameData.OPPORTUNITY_ACTION_SUPPLY_COST + GameData.OPPORTUNITY_ACTION_SUPPLY_THRESHOLD &&
+            !IsBase;
+
+        /// <summary>
         /// Consumes the required actions and supplies to perform an opportunity action.
         /// </summary>
         public bool PerformOpportunityAction()
         {
             try
             {
-                if (OpportunityActions.Current >= 1 &&
-                    DaysSupply.Current >= GameData.OPPORTUNITY_ACTION_SUPPLY_COST + GameData.OPPORTUNITY_ACTION_SUPPLY_THRESHOLD &&
-                    !IsBase)
+                if (CanPerformOpportunityAction())
                 {
                     OpportunityActions.DecrementCurrent();
                     ConsumeSupplies(GameData.OPPORTUNITY_ACTION_SUPPLY_COST);

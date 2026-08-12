@@ -91,13 +91,20 @@ so P3's own "moves on WATER hexes" framing contradicted the doc. It shipped a PR
 instead, which closed a live hole: a sealifted unit was falling through to the ground rules and
 could have walked inland aboard its ships on any map with a port. Detail + two flagged
 judgement calls: `todo_profiles.md` §14/§14a.
-**▶ A FRESH CONTEXT STARTS AT `todo_domains.md` § SESSION HANDOFF (top of file, 2026-08-10).**
-D0 and D1 are code-complete and SUITE GREEN. ✅ **The §6.9 trigger question is RESOLVED AND BUILT
-(2026-08-10, later session): POST-HOC SPOTTING** — a move is committed blind; the mover's passive
-spotting applies once at settlement over the path union (DesignDoc §12.4.4a/§6.9.10, the Panzer
-General commitment rule). Ships with the §6.9.9 eligibility filter (was enforced nowhere) and
-restores §11.11.4 air ambush against RECONA/AWACS transits (they were self-disarming it). ⚑ Suite
-run + ambush play-test owed. Everything else about the pass is designed, ratified and closed.
+**▶ A FRESH CONTEXT STARTS AT `todo_domains.md` § SESSION HANDOFF (top of file, updated 2026-08-11).**
+**D0 ✅ D1 ✅ D2 ✅ — 514 tests green; §6.9 ambush and D2 transit air defence both PLAY-CONFIRMED
+2026-08-11.** §6.9 shipped POST-HOC SPOTTING (a move is committed blind; the mover's passive spotting
+applies once at settlement over the path union — DesignDoc §12.4.4a/§6.9.10, the Panzer General
+commitment rule) plus the §6.9.9 eligibility filter. D2 wired transit air defence: AAA/SAM fire on
+helicopters in transit works in play, ranged eligibility is the CLASSIFICATION gate (§11.8.2a —
+SAM/SPSAM/AAA/SPAAA, never GAT), and §11.8.11 overhead GAD fire is built. **D3 ✅ code-complete
+2026-08-11** (⚑ suite run owed): helicopter over-water grace — a helo may now stop over water at all
+(`CanRestAt` refused it), the persisted `EndedTurnOverWater` clock runs at **Upkeep not Refresh**, and
+**`SAVE_VERSION` is 6**. ⚠ Not playable until a map has water. **Next on the ladder: D4 — but see below.**
+
+⚠ **D2's FIXED-WING half is play-unverified and stays that way until air missions exist** — Bob
+2026-08-11: *"the mechanisms to run air missions are not in the game yet, so I can only subject helos to
+the opportunity fire."* This is the M13/AOB gap, and D4 sits behind it too.
 
 **The full plan lives at `todo_domains.md` §H.**
 The air/ground/naval domain pass is DESIGNED AND CLOSED: helo vs fixed-wing layer model, the
@@ -178,6 +185,13 @@ which edges he has in mind — this note records the intent, not a diagnosis, an
 its own list is his. Never started; still worth doing.
 
 ### BOB'S QUEUE (nobody else can do these)
+
+- [ ] **Courier: `MapStandard_Response_to_EditorAgent_2026-08-12.md` to the Scenario Editor agent** —
+      the game-side reply to their map-standard handoff. Headline for them: G1 accepted but it has a
+      THIRD site (`SnapshotMapper.ToSnapshot` writes the embedded header — their spec missed the writer),
+      their caller audit missed `Assets/Tests` (both "zero callers" claims false), G6 needs both populate
+      loops, and G8 is answered (no AI turn exists yet; measure at M13). The map-standard pass itself is
+      QUEUED awaiting Bob's go — see the response doc §5 for the amended plan.
 
 - [ ] **BUILD VERSIONING (Bob, 2026-08-08): start versioning game builds, beginning with the
       P1 build.** Bob-side: pick a scheme (proposal: `0.<pass>.<hotfix>` pre-1.0) and set it in

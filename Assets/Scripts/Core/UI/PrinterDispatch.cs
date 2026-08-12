@@ -242,6 +242,133 @@ namespace HammerAndSickle.Core.UI
          * all, so no flight-specific dispatch has a caller. */
 
         /// <summary>
+        /// Files the §5.13.2 over-water WARNING: this helicopter ended its turn at sea and has one turn to
+        /// make land. Filed once, on the turn the clock starts.
+        /// </summary>
+        /// <remarks>
+        /// ⚠ Never gated by verbosity — this is the ratified UI half of the rule, and it is the only warning
+        /// the player gets before the unit is simply gone next turn. The design calls for it "in the turn
+        /// summary"; no turn-summary surface exists yet, and the HQ dispatch feed IS the per-turn narrative
+        /// channel (§24.8), so it lands here. ⚠ When a real turn summary is built this warning belongs there
+        /// too — a dispatch scrolls away, and the whole point is that it must still be visible next turn.
+        /// The selection info box (Prefab_UnitPanel) is the persistent half in the meantime.
+        /// </remarks>
+        public static void ReportStrandedOverWater(CombatUnit helo)
+        {
+            try
+            {
+                if (helo == null || helo.Side != Side.Player) return;
+
+                File(
+                    new[]
+                    {
+                        "Holding over open water.",
+                        "Fuel state critical — no place to set down.",
+                        "MUST REACH LAND NEXT TURN."
+                    },
+                    helo.UnitName, PrinterCategory.Combat);
+            }
+            catch (Exception e)
+            {
+                AppService.HandleException(CLASS_NAME, nameof(ReportStrandedOverWater), e);
+            }
+        }
+
+        /// <summary>
+        /// Files the §5.13.2 loss: a helicopter that could not make land in its turn of grace is gone, and
+        /// so is anything it was carrying.
+        /// </summary>
+        /// <remarks>
+        /// ⚠ Never gated by verbosity — a unit vanishing between turns with no combat anywhere near it is
+        /// the single most confusing thing that can happen on a map, and this is its only explanation.
+        /// </remarks>
+        public static void ReportLostAtSea(CombatUnit helo)
+        {
+            try
+            {
+                if (helo == null || helo.Side != Side.Player) return;
+
+                File(
+                    new[]
+                    {
+                        "Went down over open water.",
+                        "No landfall reached.",
+                        "No survivors recovered."
+                    },
+                    helo.UnitName, PrinterCategory.Combat);
+            }
+            catch (Exception e)
+            {
+                AppService.HandleException(CLASS_NAME, nameof(ReportLostAtSea), e);
+            }
+        }
+
+        /// <summary>
+        /// Files §11.8 air-defence opportunity fire taken in transit: something with a radar engaged the
+        /// aircraft on its way through.
+        /// </summary>
+        /// <remarks>
+        /// ⚠ Never gated by verbosity — gate B, attribution: HP came off a unit that was merely flying past,
+        /// with no order given and no combat joined, and without this the damage has no visible cause.
+        /// ⚠ THE FIRER IS NOT NAMED, matching <see cref="ReportAmbush"/>. It IS revealed at Level4 by firing
+        /// (§11.8.4), so naming it would leak nothing — but the dispatch is written from the cockpit, and
+        /// "we are taking fire from that ridge" is what the crew actually reports. The unit panel carries
+        /// the identification.
+        /// </remarks>
+        public static void ReportAirDefenseFire(CombatUnit aircraft, Position2D hex)
+        {
+            try
+            {
+                if (aircraft == null || aircraft.Side != Side.Player) return;
+
+                File(
+                    new[]
+                    {
+                        $"Air defense engaging at {Hex(hex)}.",
+                        "Radar-guided fire on the flight path.",
+                        // "Under fire", not "taking hits" — a 0-damage roll is a legitimate MISS band
+                        // (§7.6) and the engagement is still worth reporting.
+                        "Under fire."
+                    },
+                    aircraft.UnitName, PrinterCategory.Combat);
+            }
+            catch (Exception e)
+            {
+                AppService.HandleException(CLASS_NAME, nameof(ReportAirDefenseFire), e);
+            }
+        }
+
+        /// <summary>
+        /// Files OVERHEAD fire (the ratified GAD rule): the helicopter crossed directly above an enemy
+        /// ground unit and got shot at by everything that formation carries.
+        /// </summary>
+        /// <remarks>
+        /// ⚠ Never gated by verbosity — gate B, attribution, and here it is doing real teaching work. The
+        /// rule is avoidable by ROUTING, so the player needs to learn that the hex they overflew is what
+        /// cost them: a silent version reads as random attrition rather than as a routing mistake.
+        /// </remarks>
+        public static void ReportOverheadFire(CombatUnit helo, Position2D hex)
+        {
+            try
+            {
+                if (helo == null || helo.Side != Side.Player) return;
+
+                File(
+                    new[]
+                    {
+                        $"Ground fire from {Hex(hex)}.",
+                        "We overflew them at low level.",
+                        "Everything they had came up at us."
+                    },
+                    helo.UnitName, PrinterCategory.Combat);
+            }
+            catch (Exception e)
+            {
+                AppService.HandleException(CLASS_NAME, nameof(ReportOverheadFire), e);
+            }
+        }
+
+        /// <summary>
         /// Files the §11.8.9 transit ABORT: the sortie took fire it could not press through and turned back
         /// to where it launched.
         /// </summary>
