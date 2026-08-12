@@ -68,11 +68,20 @@ namespace HammerAndSickle.Persistence
                         // Generate checksum for map integrity (simple hash based on map state)
                         var checksum = $"{GameDataManager.CurrentHexMap.MapName}_{GameDataManager.CurrentHexMap.Configuration}_{GameDataManager.CurrentHexMap.HexCount}_{DateTime.UtcNow:yyyyMMddHHmmss}";
 
-                        // Create map header
+                        /* ⚠ THE SAVE MUST CARRY THE MAP'S DIMENSIONS (G1, 2026-08-12 — the site the change
+                         * request missed). This header is the ONLY geometry the restore path below has: it
+                         * has no manifest to consult. Before dimensions were written here, saving a map
+                         * loaded at explicit size produced a header with `Configuration = None` (which is
+                         * what the explicit HexMap constructor sets) and no columns/rows — so reloading it
+                         * resolved to nothing at all, resurrecting the exact silent-geometry failure G1
+                         * exists to kill, one save/load cycle later. */
+                        var mapSize = GameDataManager.CurrentHexMap.MapSize;
                         var mapHeader = new JsonMapHeader(
                             GameDataManager.CurrentHexMap.MapName,
                             GameDataManager.CurrentHexMap.Configuration,
-                            checksum
+                            checksum,
+                            mapSize.x,
+                            mapSize.y
                         );
 
                         // Extract all hexes from the map (HexMap implements IEnumerable<HexTile>)
@@ -354,8 +363,10 @@ namespace HammerAndSickle.Persistence
 
                         AppService.CaptureUiMessage($"Restoring map: {snap.MapData.Header.MapName}");
 
-                        // Create HexMap instance (following MapLoader pattern)
-                        var hexMap = new HexMap(snap.MapData.Header.MapName, snap.MapData.Header.MapConfiguration);
+                        // Create HexMap at the size the saved header declares (G1) — same single authority
+                        // MapLoader uses, so the two paths cannot drift.
+                        var restoredDims = snap.MapData.Header.ResolveMapDimensions();
+                        var hexMap = new HexMap(snap.MapData.Header.MapName, restoredDims.x, restoredDims.y);
 
                         // Populate the map with hex tiles
                         int successCount = 0;
@@ -385,7 +396,19 @@ namespace HammerAndSickle.Persistence
                             }
                         }
 
-                        AppService.CaptureUiMessage($"Restored {successCount} hexes, {failCount} failures");
+                        /* ⚠ Same hard failure as the load path (G6, 2026-08-12): a hex outside the saved
+                         * header's own declared geometry means the save is corrupt, and restoring a
+                         * silently truncated board is worse than refusing the file. This loop had the same
+                         * count-and-discard shape MapLoader's did. */
+                        if (failCount > 0)
+                        {
+                            throw new InvalidOperationException(
+                                $"Save file map '{hexMap.MapName}': {failCount} of {snap.MapData.Hexes.Length} " +
+                                $"hexes fell outside {hexMap.MapSize.x}x{hexMap.MapSize.y}. The save's map " +
+                                "geometry is inconsistent and it cannot be restored.");
+                        }
+
+                        AppService.CaptureUiMessage($"Restored {successCount} hexes");
 
                         // Build neighbor relationships (critical for hex connectivity)
                         hexMap.BuildNeighborRelationships();

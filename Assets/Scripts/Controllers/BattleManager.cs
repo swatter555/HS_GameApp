@@ -294,6 +294,9 @@ namespace HammerAndSickle.Controllers
                 Debug.LogWarning("BattleManager.SetupBattleManagerData: BattleBackgroundFitter not found in scene — background not fitted to map size.");
             }
 
+            // Camera scroll bounds, derived from the map that actually loaded (G5).
+            ApplyDerivedScrollBounds(mapSize);
+
             // Build the chunk-based terrain. Null-check so the scene still runs if the
             // HexChunkRenderer GameObject is not yet present in the scene hierarchy.
             if (HexChunkRenderer.Instance != null)
@@ -860,6 +863,59 @@ namespace HammerAndSickle.Controllers
             unit.RefreshAllActions();
             unit.RefreshMovementPoints();
             unit.ResetTurnFlags();
+        }
+
+        /// <summary>
+        /// How far outside the map's own footprint the camera may scroll, in world units (~4 hexes).
+        /// Enough to bring an edge hex comfortably in from the screen border without letting the view
+        /// wander off the board.
+        /// </summary>
+        private const float SCROLL_BOUNDS_MARGIN = 10f;
+
+        /// <summary>
+        /// Derives the camera's scroll limits from the loaded map's world footprint (G5, 2026-08-12).
+        /// </summary>
+        /// <remarks>
+        /// ⚠ WHY THIS EXISTS: `SetScrollBounds` had ZERO CALLERS. Scroll limits were whatever was serialized
+        /// on the Inspector (±100), hand-calibrated against 32x21 Khost — so they were wrong for every other
+        /// map size, in both directions: too tight on a larger map (edges unreachable) and far too loose on a
+        /// smaller one (the camera sails off the board). Deferred by Bob until the first non-32x21 map
+        /// existed; that map is being authored now.
+        ///
+        /// ⚠ THE EXTENT IS ASKED OF `HexGridSystem`, NEVER RE-DERIVED. §3.5 makes those four constants the
+        /// single geometry authority precisely because a second spelling of a hex dimension drifts — so this
+        /// converts corner HEXES to world space rather than multiplying a width by `HEX_WIDTH` itself. Both
+        /// row parities are sampled for the right edge because odd rows are staggered half a hex right, so
+        /// which row is widest depends on the map's height.
+        /// </remarks>
+        private static void ApplyDerivedScrollBounds(Position2D mapSize)
+        {
+            try
+            {
+                var input = InputService_BattleMap.Instance;
+                var grid = HexGridSystem.Instance;
+                if (input == null || grid == null || mapSize.IntX <= 0 || mapSize.IntY <= 0) return;
+
+                int lastCol = mapSize.IntX - 1;
+                int lastRow = mapSize.IntY - 1;
+
+                Vector3 origin = grid.HexToWorld(new Position2D(0, 0));
+
+                // Widest column centre: sample an even row and (if one exists) an odd row.
+                float maxX = grid.HexToWorld(new Position2D(lastCol, 0)).x;
+                if (mapSize.IntY > 1)
+                    maxX = Mathf.Max(maxX, grid.HexToWorld(new Position2D(lastCol, 1)).x);
+
+                float maxY = grid.HexToWorld(new Position2D(0, lastRow)).y;
+
+                input.SetScrollBounds(
+                    new Vector2(origin.x - SCROLL_BOUNDS_MARGIN, origin.y - SCROLL_BOUNDS_MARGIN),
+                    new Vector2(maxX + SCROLL_BOUNDS_MARGIN, maxY + SCROLL_BOUNDS_MARGIN));
+            }
+            catch (Exception ex)
+            {
+                AppService.HandleException(CLASS_NAME, nameof(ApplyDerivedScrollBounds), ex);
+            }
         }
 
         /// <summary>§3.5.8 — apply Efficiency recovery to a single unit from its moved/fought flags.

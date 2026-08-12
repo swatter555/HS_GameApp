@@ -48,7 +48,7 @@ namespace HammerAndSickle.Tests
         /// <summary>Clear everywhere except one full column of Water, so "reach land" is always one hex away.</summary>
         private HexMap CreateMapWithWaterColumn(int width = 16, int height = 12)
         {
-            var map = new HexMap("TestMap", MapConfig.Small);
+            var map = new HexMap("TestMap", width, height);
             for (int x = 0; x < width; x++)
                 for (int y = 0; y < height; y++)
                 {

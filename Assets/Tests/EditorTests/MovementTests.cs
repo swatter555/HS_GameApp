@@ -25,7 +25,7 @@ namespace HammerAndSickle.Tests
         /// </summary>
         private HexMap CreateClearMap(int width = 10, int height = 10)
         {
-            var map = new HexMap("TestMap", MapConfig.Small);
+            var map = new HexMap("TestMap", width, height);
             // Override internal size by adding hexes directly
             for (int x = 0; x < width; x++)
             {

@@ -2169,11 +2169,15 @@ namespace HammerAndSickle.Core.GameData
         public const int HexSize = 256;
         public const float MapPPU = 100f;
 
-        // Hex grid size constants.
-        public const int SmallHexWidth = 32;
-        public const int SmallHexHeight = 21;
-        public const int LargeHexWidth = 32;
-        public const int LargeHexHeight = 42;
+        /* ⚠ `SmallHexWidth/Height` AND `LargeHexWidth/Height` WERE DELETED 2026-08-12 (G3), AND ADDING A
+         * BLESSED MAP SIZE BACK HERE IS THE MISTAKE TO AVOID. The project once planned exactly two map
+         * sizes; that premise was dropped years of decisions ago but its skeleton survived here, and as
+         * PROJECT-LEVEL constants these four numbers read as two sanctioned sizes — which is precisely why
+         * `HexMap` kept deriving geometry from a MapConfig enum and every non-32x21 map loaded silently
+         * truncated. **MAP SIZE IS PER-SCENARIO AND ARBITRARY** (minimum 10x10); it comes from the `.map`
+         * header's `mapColumns`/`mapRows` via `JsonMapHeader.ResolveMapDimensions()`. The legacy 32x21 /
+         * 32x42 table survives ONLY inside that method, where it is what it actually is — a compatibility
+         * shim for files written before those keys existed. */
 
         // Version of the .map file format. Bumped 1→2 for the HexTile model rework: added
         // isPort / isDeploymentZone / isBeachhead / hexControlLevel / reservedInt1-2 / reservedFlag1-2,

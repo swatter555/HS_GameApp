@@ -4,7 +4,14 @@
 
 ## 🔖 SESSION HANDOFF — updated 2026-08-12, END OF SESSION. START HERE.
 
-**▶ NEXT SESSION: THE MAP-STANDARD PASS (interrupts the D-ladder; Bob's direction 2026-08-12).**
+**✅ THE MAP-STANDARD PASS IS BUILT — 2026-08-12 (⚑ suite run owed).** G1 (header dimensions at all
+THREE sites incl. the save writer) · G3 (`MapConfig`'s geometric role deleted outright, 11 test fixtures
+swapped) · G6 (truncation throws in both populate loops) · G5 (scroll bounds derived from the loaded
+map) · G7 (docs). G2 skipped per the editor's own downgrade; G4 remains Bob's scene work. Khost must
+behave identically — its header already says 32x21. **Next after the suite run: back to the D-ladder,
+where D4 is deliberately deferred behind the AOB/air-mission layer.**
+
+**▶ ORIGINAL DIRECTION (2026-08-12), kept for context:**
 D3's suite run came back GREEN 2026-08-12 (Bob: "all tests green"), so D0–D3 are fully closed
 (D3 play-blocked on a water map, as designed). The next work is NOT D4 — it is the map-standard
 change request from the Scenario Editor agent:

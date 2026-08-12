@@ -50,36 +50,16 @@ namespace HammerAndSickle.Models.Map
 
         #region Constructors
 
-        /// <summary>
-        /// Creates a new hex map with the specified configuration.
-        /// </summary>
-        /// <param name="mapName">Display name of the map</param>
-        /// <param name="configuration">Map size configuration</param>
-        /// <param name="enableLogging">Enable debug logging for this map</param>
-        public HexMap(string mapName, MapConfig configuration)
-        {
-            try
-            {
-                MapName = mapName ?? throw new ArgumentNullException(nameof(mapName));
-                Configuration = configuration;
-                coordinateComparer = new Coordinate2DEqualityComparer();
-
-                Initialize();
-
-                if (enableDebugLogging)
-                {
-                    Debug.Log($"{CLASS_NAME}: Created map '{MapName}' with configuration {Configuration}");
-                }
-            }
-            catch (Exception ex)
-            {
-                AppService.HandleException(CLASS_NAME, nameof(HexMap), ex);
-                throw;
-            }
-        }
+        /* ⚠ THE `HexMap(string, MapConfig)` CONSTRUCTOR WAS DELETED 2026-08-12 (G3). It derived geometry
+         * from the MapConfig enum — Small => 32x21, Large => 32x42 — which is why any map that was not one
+         * of two blessed sizes loaded SILENTLY TRUNCATED: every hex past column 31 was refused by SetHexAt
+         * and the failure count was discarded. Deleting it rather than fixing it is deliberate: a
+         * working-but-wrong constructor is how this survived so long, and any caller that still wants one
+         * should be a compile error rather than a quiet 32x21. Map dimensions now come from the `.map`
+         * header via JsonMapHeader.ResolveMapDimensions(). Do not reintroduce a size-by-enum constructor. */
 
         /// <summary>
-        /// Creates a new hex map with explicit dimensions (preferred for new code).
+        /// Creates a new hex map with explicit dimensions — the ONLY way to size a map.
         /// </summary>
         /// <param name="mapName">Display name of the map</param>
         /// <param name="width">Number of hex columns (>= 10)</param>
@@ -111,67 +91,33 @@ namespace HammerAndSickle.Models.Map
         }
 
         /// <summary>
-        /// Parameterless constructor for serialization.
+        /// Parameterless constructor for serialization. Produces an EMPTY, zero-sized map.
         /// </summary>
+        /// <remarks>
+        /// ⚠ Nothing deserializes a `HexMap` today — saves embed `JsonMapData` (header + hex array) and
+        /// rebuild the map through the explicit constructor. This exists for the serializer contract only.
+        /// ⚠ It deliberately does NOT touch `GameDataManager.CurrentMapSize`. The deleted `Initialize()`
+        /// did, which meant merely constructing an empty map published a (0,0) size globally.
+        /// </remarks>
         [JsonConstructor]
         public HexMap()
         {
             MapName = string.Empty;
             Configuration = MapConfig.None;
             coordinateComparer = new Coordinate2DEqualityComparer();
-            Initialize();
+
+            MapSize = Vector2Int.zero;
+            hexDictionary = new Dictionary<Position2D, HexTile>(coordinateComparer);
+            IsInitialized = true;
         }
 
         #endregion // Constructors
 
-        #region Initialization
-
-        /// <summary>
-        /// Initializes the hex map with proper dimensions and data structures.
-        /// </summary>
-        private void Initialize()
-        {
-            try
-            {
-                // Retrieve map dimensions based on configuration
-                MapSize = GetMapDimensions(Configuration);
-
-                // Tell the GameDataManager the map dimensions
-                GameDataManager.CurrentMapSize = MapSize;
-
-                // PrepareBattle the hex dictionary with coordinate comparer
-                hexDictionary = new Dictionary<Position2D, HexTile>(coordinateComparer);
-                IsInitialized = true;
-
-                if (enableDebugLogging)
-                {
-                    Debug.Log($"{CLASS_NAME}: Initialized map with size {MapSize.x}x{MapSize.y}");
-                }
-            }
-            catch (Exception ex)
-            {
-                AppService.HandleException(CLASS_NAME, nameof(Initialize), ex);
-                IsInitialized = false;
-                throw;
-            }
-        }
-
-        /// <summary>
-        /// Gets the map dimensions based on configuration.
-        /// </summary>
-        /// <param name="config">Map configuration</param>
-        /// <returns>Map dimensions as Vector2Int</returns>
-        private static Vector2Int GetMapDimensions(MapConfig config)
-        {
-            return config switch
-            {
-                MapConfig.Small => new Vector2Int(GameData.SmallHexWidth, GameData.SmallHexHeight),
-                MapConfig.Large => new Vector2Int(GameData.LargeHexWidth, GameData.LargeHexHeight),
-                _ => Vector2Int.zero
-            };
-        }
-
-        #endregion // Initialization
+        /* ⚠ `Initialize()` AND `GetMapDimensions(MapConfig)` WERE DELETED 2026-08-12 (G3). Together they
+         * were the mechanism that turned a MapConfig enum into a hex-grid size — the root of the silent
+         * truncation described on the deleted constructor above. There is no longer any path from a
+         * configuration ENUM to a map SIZE anywhere in the codebase, which is the property this pass was
+         * for. Geometry enters exactly one way: explicit dimensions read from the `.map` header. */
 
         #region Public Methods
 

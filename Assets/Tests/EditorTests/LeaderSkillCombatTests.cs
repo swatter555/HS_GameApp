@@ -39,7 +39,7 @@ namespace HammerAndSickle.Tests
 
         private HexMap CreateClearMap(int width = 16, int height = 12)
         {
-            var map = new HexMap("TestMap", MapConfig.Small);
+            var map = new HexMap("TestMap", width, height);
             for (int x = 0; x < width; x++)
                 for (int y = 0; y < height; y++)
                 {

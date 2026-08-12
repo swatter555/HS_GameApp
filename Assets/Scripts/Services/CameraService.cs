@@ -367,9 +367,12 @@ namespace HammerAndSickle.Services
         /// Belt and braces on purpose — an out-of-bounds camera used to be unreachable by scrolling and
         /// needed a <see cref="CenterOnPosition"/> to escape (2026-07-27).
         ///
-        /// NOT applied to CenterOnPosition: that is a deliberate teleport, and the bounds are still a
-        /// hand-set Inspector value rather than being derived from the loaded map (SetScrollBounds has no
-        /// callers), so clamping it could refuse to centre on a unit sitting near the map edge.
+        /// NOT applied to CenterOnPosition: that is a deliberate teleport, and refusing to centre on a unit
+        /// near the map edge would be worse than a briefly out-of-bounds camera (the next scroll step clamps
+        /// it back anyway).
+        /// ⚠ Bounds ARE now derived from the loaded map — `BattleManager.ApplyDerivedScrollBounds` calls
+        /// `SetScrollBounds` from `SetupBattleManagerData` (G5, 2026-08-12). They were hand-set Inspector
+        /// values calibrated for 32x21 until then, which is why this note used to say the opposite.
         /// </summary>
         private void ClampCameraToBounds()
         {

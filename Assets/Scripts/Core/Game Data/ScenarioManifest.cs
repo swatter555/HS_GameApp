@@ -147,7 +147,11 @@ namespace HammerAndSickle.Core.GameData
             if (PrestigePool < 0)
                 return false;
 
-            // Dimensions must resolve to valid values (explicit or via MapConfig fallback)
+            /* A manifest must state its map size explicitly (>= 10x10). ⚠ This became a real gate on
+             * 2026-08-12 (G3): GetMapDimensions used to assume 32x21 for a manifest with no dimensions, so
+             * this check could never fail. Both shipped manifests carry explicit values, so nothing in
+             * content breaks — but a legacy manifest without them is now REFUSED rather than silently
+             * assigned someone else's geometry. */
             var dims = GetMapDimensions();
             if (dims.x < 10 || dims.y < 10)
                 return false;
@@ -156,18 +160,25 @@ namespace HammerAndSickle.Core.GameData
         }
 
         /// <summary>
-        /// Resolves map dimensions. Uses explicit MapWidth/MapHeight when present,
-        /// otherwise falls back to MapConfig-derived defaults for legacy manifests.
+        /// The manifest's declared map dimensions, or <see cref="UnityEngine.Vector2Int.zero"/> when it does
+        /// not declare any. Used by consumers that need a size BEFORE the `.map` is parsed (menu display,
+        /// pre-flight validation) and as a cross-check against the header at load.
         /// </summary>
+        /// <remarks>
+        /// ⚠ THE `.map` HEADER IS AUTHORITATIVE, NOT THIS. This is a convenience copy; `MapLoader` warns
+        /// loudly if the two disagree and uses the header, because that is the file whose geometry is
+        /// actually being loaded.
+        /// ⚠ RETURNS ZERO RATHER THAN ASSUMING 32x21 (G3, 2026-08-12). It used to fall back to the "Small"
+        /// size, which is the same silent-wrong-answer pattern that made every non-32x21 map load truncated
+        /// — a manifest that does not state its size would have confidently reported someone else's.
+        /// Zero fails <see cref="IsValid"/>, so such a manifest is refused with a reason instead.
+        /// </remarks>
         public UnityEngine.Vector2Int GetMapDimensions()
         {
             if (MapWidth >= 10 && MapHeight >= 10)
                 return new UnityEngine.Vector2Int(MapWidth, MapHeight);
 
-            // Backward compat: derive from MapConfig header in the .map file.
-            // Callers that need dimensions before the map is loaded should ensure
-            // manifests include explicit width/height fields.
-            return new UnityEngine.Vector2Int(GameData.SmallHexWidth, GameData.SmallHexHeight);
+            return UnityEngine.Vector2Int.zero;
         }
 
         /// <summary>

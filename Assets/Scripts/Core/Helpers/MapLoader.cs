@@ -271,8 +271,32 @@ namespace HammerAndSickle.Core.Helpers
                 // Write to log.
                 if (log) Debug.Log($"{CLASS_NAME}: Creating HexMap instance...");
 
-                // Create HexMap instance
-                HexMap hexMap = new HexMap(mapData.Header.MapName, mapData.Header.MapConfiguration);
+                /* Create HexMap instance at the size THE FILE DECLARES (G1, 2026-08-12). This used to pass
+                 * `mapData.Header.MapConfiguration` into a constructor that mapped Small => 32x21, which is
+                 * why any map that was not one of two blessed sizes loaded silently truncated. Throws rather
+                 * than guessing when the header cannot answer — see ResolveMapDimensions. */
+                UnityEngine.Vector2Int dims = mapData.Header.ResolveMapDimensions();
+
+                /* Cross-check against the manifest, which carries its own copy for pre-parse consumers
+                 * (menu display, validation). They should never disagree; if they do, this scenario folder
+                 * has a `.map` and a manifest that were not built together — the mis-pairing failure that a
+                 * self-describing `.map` exists to make detectable. The HEADER wins: it is the file whose
+                 * geometry is actually being loaded. */
+                if (manifest != null)
+                {
+                    var manifestDims = manifest.GetMapDimensions();
+                    if (manifestDims.x >= 10 && manifestDims.y >= 10 && manifestDims != dims)
+                    {
+                        string mismatch =
+                            $"Map '{mapData.Header.MapName}' header says {dims.x}x{dims.y} but manifest " +
+                            $"'{manifest.ScenarioId}' says {manifestDims.x}x{manifestDims.y}. Using the header. " +
+                            "These files were not exported together — re-export the scenario.";
+                        Debug.LogWarning($"{CLASS_NAME}: {mismatch}");
+                        AppService.CaptureUiMessage(mismatch);
+                    }
+                }
+
+                HexMap hexMap = new HexMap(mapData.Header.MapName, dims.x, dims.y);
 
                 // Write to log.
                 if (log) Debug.Log($"{CLASS_NAME}: HexMap created - Expected size: {hexMap.MapSize}");
@@ -306,6 +330,21 @@ namespace HammerAndSickle.Core.Helpers
                 }
 
                 if (log) Debug.Log($"{CLASS_NAME}: Hex population complete - Success: {successCount}, Failed: {failCount}, Null: {nullCount}");
+
+                /* ⚠ TRUNCATION IS A HARD FAILURE (G6, 2026-08-12). With G1 in place the header's dimensions
+                 * ARE the map's dimensions, so a hex outside them can only mean a corrupt or hand-edited
+                 * file — there is no legitimate case left. This condition used to produce five log lines and
+                 * a playable, WRONG map, which is the single worst property this area had: the map loaded,
+                 * played, and silently lost every hex past the truncation. MapLoader's catch turns this into
+                 * a refused load with a visible reason rather than a crash. */
+                if (failCount > 0)
+                {
+                    throw new InvalidDataException(
+                        $"Map '{hexMap.MapName}': {failCount} of {mapData.Hexes.Length} hexes fell outside " +
+                        $"{hexMap.MapSize.x}x{hexMap.MapSize.y}. The file's geometry and the loaded map " +
+                        "disagree — regenerate it from the Scenario Editor.");
+                }
+
                 AppService.CaptureUiMessage($"Populated map with {hexMap.HexCount} hexes");
 
                 // Build neighbor relationships

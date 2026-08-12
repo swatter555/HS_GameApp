@@ -61,9 +61,19 @@ This file provides guidance to Claude Code (claude.ai/code) when working with co
 - Dynamic outcomes influence future missions and unlock alternate paths
 
 **Map Technical Details:**
-- Pointy-top, odd-r aligned hexagonal grid
-- Map sizes: 8192x4096 (32x21 hexes) or 8192x8192 (32x42 hexes)
-- Created from satellite imagery with color-coded terrain layers
+- Pointy-top, odd-r aligned hexagonal grid. ⚠ Interaction treats odd rows as one column short
+  (`HexGridSystem.IsInBounds`); the `.map` FILE carries the full rectangle with the odd-row overhang as
+  Impassable filler, so a 32x21 map is 672 hexes on disk, not 662. Both are correct — do not "fix" either
+  to match the other without checking which layer you are looking at.
+- **Map size is per-scenario and arbitrary** (minimum 10x10). Dimensions come from the `.map` header's
+  `mapColumns`/`mapRows` via `JsonMapHeader.ResolveMapDimensions()`. ⚠ There are NO blessed map sizes —
+  the old "two sizes" premise (32x21 / 32x42, selected by a `MapConfig` enum) was retired 2026-08-12
+  because it made every other size load silently truncated. `MapConfig` survives as a vestigial header tag
+  ONLY; nothing may derive geometry from it.
+- Scale: 1 hex = 5 km flat-to-flat · 1 unit = 1 regiment · 1 turn = 1 day (DesignDoc §1a)
+- Authored from colour-coded PNG data layers at 64 px/hex. ⚠ The PNGs are an authoring input to the
+  Scenario Editor only and are never loaded by the game; image pixel dimensions are a sampling parameter,
+  not a map property.
 ---
 
 ## Section 4: Important Notes

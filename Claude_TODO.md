@@ -186,12 +186,13 @@ its own list is his. Never started; still worth doing.
 
 ### BOB'S QUEUE (nobody else can do these)
 
-- [ ] **Courier: `MapStandard_Response_to_EditorAgent_2026-08-12.md` to the Scenario Editor agent** —
-      the game-side reply to their map-standard handoff. Headline for them: G1 accepted but it has a
-      THIRD site (`SnapshotMapper.ToSnapshot` writes the embedded header — their spec missed the writer),
-      their caller audit missed `Assets/Tests` (both "zero callers" claims false), G6 needs both populate
-      loops, and G8 is answered (no AI turn exists yet; measure at M13). The map-standard pass itself is
-      QUEUED awaiting Bob's go — see the response doc §5 for the amended plan.
+- [x] **Courier: the map-standard exchange — DONE.** Editor agent endorsed the response in full
+      (`Reply_MapStandard_2026-08-12.md`) and adjusted their side. **The pass itself is BUILT 2026-08-12**
+      (G1/G3/G5/G6/G7; G2 skipped by their own downgrade). ⚑ Suite run owed.
+- [ ] **Tell the Scenario Editor agent that G1 HAS LANDED** once Bob runs a build with it — that is their
+      stated trigger to start writing `mapConfiguration: None` (they explicitly keep writing Small/Large
+      until then so current builds keep loading fresh exports). Their E3 phase (manifest authoring with
+      `mapWidth`/`mapHeight` + cross-stamp) is gated on the same signal.
 
 - [ ] **BUILD VERSIONING (Bob, 2026-08-08): start versioning game builds, beginning with the
       P1 build.** Bob-side: pick a scheme (proposal: `0.<pass>.<hotfix>` pre-1.0) and set it in
@@ -553,11 +554,11 @@ sweeps (player + `RecomputeAIPerception`) AND the `AIPerceptionState.StepDecay` 
       in the original item is now false — `AppService.ManifestsPath` and `Assets/Generated Data` are deleted,
       the `isCampaignScenario` path split is gone, the divergent Documents copy was deleted after its newer
       files were taken as the source of truth, and Documents holds saves and logs only.
-- [ ] **`SetScrollBounds` HAS ZERO CALLERS** — scroll bounds are whatever is serialized on the Inspector
-      (`ScrollBounds` defaults ±100), never derived from the loaded map. Hand-calibrated for 32x21 Khost, so it
-      WILL be wrong at any other map size. Pairs with the `BattleBackgroundFitter` deferral: both are "breaks on
-      the first differently-sized map" items — do them in the same pass. `BattleManager.SetupBattleManagerData`
-      already calls `FitToMap(w,h)` and is the natural call site.
+- [x] **`SetScrollBounds` HAS ZERO CALLERS — CLOSED 2026-08-12 (G5).** `BattleManager.ApplyDerivedScrollBounds`
+      now calls it from `SetupBattleManagerData`, right after `FitToMap`, deriving limits from the loaded map's
+      world footprint (corner hexes through `HexGridSystem.HexToWorld` + a 10-unit margin; both row parities
+      sampled for the right edge, since odd rows are staggered half a hex). ⚑ Needs a non-32x21 map to
+      validate against — pairs with the `BattleBackgroundFitter` item above, which is still Bob's scene work.
 - [x] **DEPLOY UP / DOWN — ✅ DONE, SUITE GREEN AND CONFIRMED IN PLAY 2026-07-28.**
 
       ### What already exists (verified, not assumed)
