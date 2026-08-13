@@ -3530,7 +3530,9 @@ namespace HammerAndSickle.Models
             #region FR Armored Brigade
 
             var fr_armored_brigade = new CombatUnit(
-                unitName: "FR Armored Brigade (AMX-30)",
+                // Display name → Division (census pass 2026-08-13): France's brigade-sized
+                // "divisions" are its maneuver element; the 80-tank census stays. ID unchanged.
+                unitName: "FR Armoured Division (AMX-30)",
                 classification: UnitClassification.TANK,
                 role: UnitRole.GroundCombat,
                 side: Side.AI,

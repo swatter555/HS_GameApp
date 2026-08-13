@@ -1112,6 +1112,10 @@ namespace HammerAndSickle.Core.GameData
         MANPAD_STRELA,
         MANPAD_MISTRAL,
         MANPAD_RAPIER,
+        // UK census-only token (census pass 2026-08-13): the UK's MANPADS was Javelin/Blowpipe,
+        // never Stinger — and Rapier is a towed SAM, not a MANPAD, so UK infantry censuses were
+        // muddled between the two. MANPAD_ prefix → SAM bucket via ClassifyWeaponType.
+        MANPAD_JAVELIN,
 
         // Generic anti-tank and infantry weapons
         AT_RPG7,

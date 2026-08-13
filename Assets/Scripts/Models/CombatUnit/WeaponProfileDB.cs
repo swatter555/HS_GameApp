@@ -3074,16 +3074,19 @@ namespace HammerAndSickle.Models
             LEO1_GE.SetPrestigeCost(PrestigeTierCost.Gen1, PrestigeTypeCost.TANK);
 
             // Intel stats: FRG Panzer Brigade - Leopard 1
-            LEO1_GE.AddIntelReportStat(WeaponType.Personnel,          2200);
-            LEO1_GE.AddIntelReportStat(WeaponType.TANK_LEOPARD1_GE,    116);  // 2x Panzer BN (44 each) + Mixed BN (28)
-            LEO1_GE.AddIntelReportStat(WeaponType.IFV_MARDER_GE,       58);  // 1x PzGren BN (44) + Mixed BN mech company (14)
-            LEO1_GE.AddIntelReportStat(WeaponType.APC_M113_US,         24);  // Command posts, medical, maintenance
-            LEO1_GE.AddIntelReportStat(WeaponType.RCN_LUCHS_GE,        12);  // Brigade reconnaissance platoon
-            LEO1_GE.AddIntelReportStat(WeaponType.AT_ATGM,             32);  // Milan AT teams
-            LEO1_GE.AddIntelReportStat(WeaponType.MANPAD_STINGER,      24);  // Roland/Stinger air defense sections
-            LEO1_GE.AddIntelReportStat(WeaponType.SPA_M109_GE,         18);  // Organic artillery battalion (155mm SP)
-            LEO1_GE.AddIntelReportStat(WeaponType.SPAAA_GEPARD_GE,      8);  // Gepard air defense guns
-            LEO1_GE.AddIntelReportStat(WeaponType.ART_120MM_MORTAR,    12);  // 120mm mortars
+            // Census: German KAMPFGRUPPE (battle-group re-cut, census pass 2026-08-13). One GE
+            // counter = a Kampfgruppe (~55 tanks), per the scale table. Closed-bay base — carrier
+            // tokens are rule-7-legal.
+            LEO1_GE.AddIntelReportStat(WeaponType.Personnel,          1100);
+            LEO1_GE.AddIntelReportStat(WeaponType.TANK_LEOPARD1_GE,     55);  // Panzer battalion + mixed-bn company
+            LEO1_GE.AddIntelReportStat(WeaponType.IFV_MARDER_GE,       13);  // Cross-attached PzGren company
+            LEO1_GE.AddIntelReportStat(WeaponType.APC_M113_US,         12);  // Command posts, medical, maintenance
+            LEO1_GE.AddIntelReportStat(WeaponType.RCN_LUCHS_GE,         6);  // Reconnaissance platoon
+            LEO1_GE.AddIntelReportStat(WeaponType.AT_ATGM,             16);  // Milan AT teams
+            LEO1_GE.AddIntelReportStat(WeaponType.MANPAD_STINGER,      12);  // Roland/Stinger air defense sections
+            LEO1_GE.AddIntelReportStat(WeaponType.SPA_M109_GE,         18);  // Direct support artillery battalion (155mm SP)
+            LEO1_GE.AddIntelReportStat(WeaponType.SPAAA_GEPARD_GE,      4);  // Gepard air defense guns
+            LEO1_GE.AddIntelReportStat(WeaponType.ART_120MM_MORTAR,     6);  // 120mm mortars
 
             // Handle the icon profile.
             LEO1_GE.IconProfile = new RegimentIconProfile(RegimentIconType.Directional)
@@ -3117,16 +3120,17 @@ namespace HammerAndSickle.Models
             LEO2_GE.SetPrestigeCost(PrestigeTierCost.Gen3, PrestigeTypeCost.TANK);
 
             // Intel stats: FRG Panzer Brigade - Leopard 2
-            LEO2_GE.AddIntelReportStat(WeaponType.Personnel,          2200);
-            LEO2_GE.AddIntelReportStat(WeaponType.TANK_LEOPARD2_GE,    116);  // 2x Panzer BN (44 each) + Mixed BN (28)
-            LEO2_GE.AddIntelReportStat(WeaponType.IFV_MARDER_GE,       58);  // 1x PzGren BN (44) + Mixed BN mech company (14)
-            LEO2_GE.AddIntelReportStat(WeaponType.APC_M113_US,         24);  // Command posts, medical, maintenance
-            LEO2_GE.AddIntelReportStat(WeaponType.RCN_LUCHS_GE,        12);  // Brigade reconnaissance platoon
-            LEO2_GE.AddIntelReportStat(WeaponType.AT_ATGM,             32);  // Milan AT teams
-            LEO2_GE.AddIntelReportStat(WeaponType.MANPAD_STINGER,      24);  // Roland/Stinger air defense sections
-            LEO2_GE.AddIntelReportStat(WeaponType.SPA_M109_GE,         18);  // Organic artillery battalion (155mm SP)
-            LEO2_GE.AddIntelReportStat(WeaponType.SPAAA_GEPARD_GE,      8);  // Gepard air defense guns
-            LEO2_GE.AddIntelReportStat(WeaponType.ART_120MM_MORTAR,    12);  // 120mm mortars
+            // Census: German KAMPFGRUPPE (battle-group re-cut, census pass 2026-08-13).
+            LEO2_GE.AddIntelReportStat(WeaponType.Personnel,          1100);
+            LEO2_GE.AddIntelReportStat(WeaponType.TANK_LEOPARD2_GE,     55);  // Panzer battalion + mixed-bn company
+            LEO2_GE.AddIntelReportStat(WeaponType.IFV_MARDER_GE,       13);  // Cross-attached PzGren company
+            LEO2_GE.AddIntelReportStat(WeaponType.APC_M113_US,         12);  // Command posts, medical, maintenance
+            LEO2_GE.AddIntelReportStat(WeaponType.RCN_LUCHS_GE,         6);  // Reconnaissance platoon
+            LEO2_GE.AddIntelReportStat(WeaponType.AT_ATGM,             16);  // Milan AT teams
+            LEO2_GE.AddIntelReportStat(WeaponType.MANPAD_STINGER,      12);  // Roland/Stinger air defense sections
+            LEO2_GE.AddIntelReportStat(WeaponType.SPA_M109_GE,         18);  // Direct support artillery battalion (155mm SP)
+            LEO2_GE.AddIntelReportStat(WeaponType.SPAAA_GEPARD_GE,      4);  // Gepard air defense guns
+            LEO2_GE.AddIntelReportStat(WeaponType.ART_120MM_MORTAR,     6);  // 120mm mortars
 
             // Handle the icon profile.
             LEO2_GE.IconProfile = new RegimentIconProfile(RegimentIconType.Directional)
@@ -3160,16 +3164,19 @@ namespace HammerAndSickle.Models
             CHALL1_UK.SetPrestigeCost(PrestigeTierCost.Gen3, PrestigeTypeCost.TANK);
 
             // Intel stats: UK Armoured Brigade - Challenger 1 (Heavy Type)
-            CHALL1_UK.AddIntelReportStat(WeaponType.Personnel,          1880);
-            CHALL1_UK.AddIntelReportStat(WeaponType.TANK_CHALLENGER1_UK,116);  // 2x Armoured Regiments (58 each)
-            CHALL1_UK.AddIntelReportStat(WeaponType.IFV_WARRIOR_UK,      45);  // 1x Mechanised Infantry Battalion
-            CHALL1_UK.AddIntelReportStat(WeaponType.APC_FV432,           26);  // Command, medical, support vehicles
-            CHALL1_UK.AddIntelReportStat(WeaponType.SPSAM_RAPIER_UK,      8);  // Brigade reconnaissance troop (CVR(T))
-            CHALL1_UK.AddIntelReportStat(WeaponType.AT_ATGM,             30);  // Milan AT (Warrior-mounted + dismounted)
-            CHALL1_UK.AddIntelReportStat(WeaponType.MANPAD_STINGER,      16);  // Javelin SAM teams across battalions
+            // Census: UK BATTLE GROUP (re-cut, census pass 2026-08-13). Token fixes in the same
+            // pass: the recon troop was mis-tokened SPSAM_RAPIER_UK (a towed SAM standing in for
+            // CVR(T)s), and the SHORAD teams were mis-tokened Stinger/Rapier — UK MANPADS was
+            // Javelin/Blowpipe, now the census-only MANPAD_JAVELIN.
+            CHALL1_UK.AddIntelReportStat(WeaponType.Personnel,          1000);
+            CHALL1_UK.AddIntelReportStat(WeaponType.TANK_CHALLENGER1_UK, 58);  // Armoured regiment (58)
+            CHALL1_UK.AddIntelReportStat(WeaponType.IFV_WARRIOR_UK,      13);  // Cross-attached mech company
+            CHALL1_UK.AddIntelReportStat(WeaponType.APC_FV432,            8);  // Command, medical, support vehicles
+            CHALL1_UK.AddIntelReportStat(WeaponType.RCN_FV105_UK,         8);  // Reconnaissance troop (CVR(T))
+            CHALL1_UK.AddIntelReportStat(WeaponType.AT_ATGM,             15);  // Milan AT (Warrior-mounted + dismounted)
+            CHALL1_UK.AddIntelReportStat(WeaponType.MANPAD_JAVELIN,       8);  // Javelin SAM teams
             CHALL1_UK.AddIntelReportStat(WeaponType.SPA_M109_UK,         18);  // Organic Royal Artillery regiment (155mm SP)
-            CHALL1_UK.AddIntelReportStat(WeaponType.ART_81MM_MORTAR,     18);  // 81mm mortars distributed across battalions
-            CHALL1_UK.AddIntelReportStat(WeaponType.MANPAD_RAPIER,        6);  // Rapier air defense missiles
+            CHALL1_UK.AddIntelReportStat(WeaponType.ART_81MM_MORTAR,      9);  // 81mm mortars
 
             // Handle the icon profile.
             CHALL1_UK.IconProfile = new RegimentIconProfile(RegimentIconType.Directional)
@@ -3192,8 +3199,12 @@ namespace HammerAndSickle.Models
             // LOW_PROFILE. The no-frills fast French 105mm (base AMX-30B; no advanced FCS → ICM 1.00). A
             // glass-cannon scout-MBT identity vs the FCS-heavy Germans/Brits.
             // → HA10 HD7 SA8 SD7 GAD7 · ICM 1.00 · MMP12 · PR1 · SR2.
+            // Display name names the FORMATION a counter represents (census pass 2026-08-13, Bob's
+            // ruling): France abolished the brigade echelon in 1977 — its brigade-sized "divisions"
+            // ARE the French maneuver element, so the counter keeps its 80 tanks and is named a
+            // Division rather than being re-cut to the 40-tank battle group.
             WeaponProfile AMX30_FR = WeaponProfile.FromProfileDef(
-                "AMX-30 Main Battle Tank", "AMX-30", WeaponType.TANK_AMX30_FR,
+                "AMX-30 Armoured Division", "AMX-30", WeaponType.TANK_AMX30_FR,
                 new ProfileDef(TankArchetypes.Gen2,
                     new Dictionary<ProfileStat, int> { { ProfileStat.HD, -2 }, { ProfileStat.SA, 1 }, { ProfileStat.MMP, 2 } },
                     new[] { WeaponTrait.LOW_PROFILE }),
@@ -3202,7 +3213,8 @@ namespace HammerAndSickle.Models
             // Set the prestige cost for the profile.
             AMX30_FR.SetPrestigeCost(PrestigeTierCost.Gen2, PrestigeTypeCost.TANK);
 
-            // Intel stats: French Division Blindee - AMX-30B (Armored Division)
+            // Census: French Division Blindée — UNCHANGED by the census pass (division-as-counter,
+            // Bob's ruling 2026-08-13; the 80 tanks are the point).
             AMX30_FR.AddIntelReportStat(WeaponType.Personnel,        1750);
             AMX30_FR.AddIntelReportStat(WeaponType.TANK_AMX30_FR,      80);  // 2x Armored regiments (40 each)
             AMX30_FR.AddIntelReportStat(WeaponType.IFV_AMX10P,         36);  // 1x Mechanized infantry regiment
@@ -3280,10 +3292,8 @@ namespace HammerAndSickle.Models
             WARRIOR_UK.SetPrestigeCost(PrestigeTierCost.Gen3, PrestigeTypeCost.IFV);
 
             // Intel report stats
-            WARRIOR_UK.AddIntelReportStat(WeaponType.TANK_CHALLENGER1_UK,     58);
-            WARRIOR_UK.AddIntelReportStat(WeaponType.IFV_WARRIOR_UK,          58);
-            WARRIOR_UK.AddIntelReportStat(WeaponType.APC_FV432,               18);
-            WARRIOR_UK.AddIntelReportStat(WeaponType.RCN_FV105_UK,             8);
+            // Census — CARRIER: own platform count only (doctrine rule 2, census pass 2026-08-13).
+            WARRIOR_UK.AddIntelReportStat(WeaponType.IFV_WARRIOR_UK,          45);
 
             // Handle the icon profile.
             WARRIOR_UK.IconProfile = new RegimentIconProfile(RegimentIconType.Directional)
@@ -3315,10 +3325,8 @@ namespace HammerAndSickle.Models
             MARDER_GE.SetPrestigeCost(PrestigeTierCost.Gen2, PrestigeTypeCost.IFV);
 
             // Intel report stats
-            MARDER_GE.AddIntelReportStat(WeaponType.TANK_LEOPARD1_GE,  58);
-            MARDER_GE.AddIntelReportStat(WeaponType.IFV_MARDER_GE,    102);
-            MARDER_GE.AddIntelReportStat(WeaponType.APC_M113_US,       32);
-            MARDER_GE.AddIntelReportStat(WeaponType.RCN_LUCHS_GE,      12);
+            // Census — CARRIER: own platform count only (doctrine rule 2, census pass 2026-08-13).
+            MARDER_GE.AddIntelReportStat(WeaponType.IFV_MARDER_GE,     54);
 
             // Handle the icon profile.
             MARDER_GE.IconProfile = new RegimentIconProfile(RegimentIconType.Directional)
@@ -3474,9 +3482,8 @@ namespace HammerAndSickle.Models
             VAB_FR.SetPrestigeCost(PrestigeTierCost.Gen2, PrestigeTypeCost.APC);
 
             // Intel report stats
-            VAB_FR.AddIntelReportStat(WeaponType.TANK_AMX30_FR, 20);
+            // Census — CARRIER: own platform count only (doctrine rule 2, census pass 2026-08-13).
             VAB_FR.AddIntelReportStat(WeaponType.APC_VAB_FR,   135);
-            VAB_FR.AddIntelReportStat(WeaponType.RCN_ERC90_FR,     12);
 
             // Handle the icon profile.
             VAB_FR.IconProfile = new RegimentIconProfile(RegimentIconType.Directional)
@@ -3593,8 +3600,11 @@ namespace HammerAndSickle.Models
             //----------------------------------------------
             // Phase 3 (NATO): Artillery + SELF_PROPELLED + SA+1 (calibre), IR medium. Standard SP howitzer.
             // → HA5 HD7 SA10 SD7 GAD7 · ICM 1.00 · MMP10 · IR5.
+            // Display name → AUF1 (census pass 2026-08-13): the census correctly lists 48 AUF1 —
+            // France's SP 155 was the AUF1, not the M109 — so the profile NAME now agrees with it.
+            // WeaponType.SPA_M109_FR is unchanged: persisted-by-name, rename discouraged.
             WeaponProfile M109_FR = WeaponProfile.FromProfileDef(
-                "M109 Self-Propelled Artillery", "M109", WeaponType.SPA_M109_FR,
+                "AUF1 Self-Propelled Artillery", "AUF1", WeaponType.SPA_M109_FR,
                 new ProfileDef(FamilyArchetypes.Artillery,
                     new Dictionary<ProfileStat, int> { { ProfileStat.SA, 1 }, { ProfileStat.IR, GameData.INDIRECT_RANGE_MEDIUM } },
                     new[] { WeaponTrait.SELF_PROPELLED }),
@@ -3689,9 +3699,9 @@ namespace HammerAndSickle.Models
             ArtLightWest.SetPrestigeCost(PrestigeTierCost.Gen1, PrestigeTypeCost.ART);
 
             // Intel report stats
+            // 72 → 54 single-calibre (census pass 2026-08-13): mixed 105/155 was brigade mass.
             ArtLightWest.AddIntelReportStat(WeaponType.Personnel,   950);
             ArtLightWest.AddIntelReportStat(WeaponType.ART_105MM_FG, 54);
-            ArtLightWest.AddIntelReportStat(WeaponType.ART_155MM_FG, 18);
             ArtLightWest.AddIntelReportStat(WeaponType.APC_HUMVEE_US,12);
 
             // Handle the icon profile.
@@ -3724,8 +3734,8 @@ namespace HammerAndSickle.Models
             ArtHeavyWest.SetPrestigeCost(PrestigeTierCost.Gen1, PrestigeTypeCost.ART);
 
             // Intel report stats
+            // 72 → 54 single-calibre (census pass 2026-08-13): mixed 105/155 was brigade mass.
             ArtHeavyWest.AddIntelReportStat(WeaponType.Personnel,   950);
-            ArtHeavyWest.AddIntelReportStat(WeaponType.ART_105MM_FG, 18);
             ArtHeavyWest.AddIntelReportStat(WeaponType.ART_155MM_FG, 54);
             ArtHeavyWest.AddIntelReportStat(WeaponType.APC_HUMVEE_US,12);
 
@@ -3925,7 +3935,8 @@ namespace HammerAndSickle.Models
 
             // Intel report stats
             Gepard_GE.AddIntelReportStat(WeaponType.Personnel,      1100);
-            Gepard_GE.AddIntelReportStat(WeaponType.SAM_HAWK_US,       4);
+            // SAM_HAWK_US 4 deleted (census pass 2026-08-13): US Hawk batteries inside a German
+            // gun regiment — cross-national token, audit §2.5.
             Gepard_GE.AddIntelReportStat(WeaponType.SPAAA_GEPARD_GE,  18);
             Gepard_GE.AddIntelReportStat(WeaponType.IFV_MARDER_GE,    24);
             Gepard_GE.AddIntelReportStat(WeaponType.RCN_LUCHS_GE,        12);
@@ -4050,7 +4061,8 @@ namespace HammerAndSickle.Models
             Rapier_SP.AddIntelReportStat(WeaponType.Personnel,      1050);
             Rapier_SP.AddIntelReportStat(WeaponType.SPSAM_RAPIER_UK,     18);
             Rapier_SP.AddIntelReportStat(WeaponType.APC_FV432,        24);
-            Rapier_SP.AddIntelReportStat(WeaponType.SPAAA_M163_US,     4);
+            // SPAAA_M163_US 4 deleted (census pass 2026-08-13): US Vulcans inside a UK Rapier
+            // regiment — cross-national token, audit §2.5.
             Rapier_SP.AddIntelReportStat(WeaponType.RCN_FV105_UK,     12);
 
             // Handle the icon profile. (No dedicated UK Rapier sprites, using FR Roland)
@@ -4337,7 +4349,7 @@ namespace HammerAndSickle.Models
             BO105.SetPrestigeCost(PrestigeTierCost.Gen2, PrestigeTypeCost.HEL);
 
             // Intel stats
-            BO105.AddIntelReportStat(WeaponType.Personnel,       475);
+            // Census — air convention: aircraft only, no Personnel (census pass 2026-08-13).
             BO105.AddIntelReportStat(WeaponType.HEL_BO105_GE,     54);
 
             // Handle the icon profile.
@@ -4373,7 +4385,7 @@ namespace HammerAndSickle.Models
             AH1.SetPrestigeCost(PrestigeTierCost.Gen1, PrestigeTypeCost.HEL);
 
             // Intel stats
-            AH1.AddIntelReportStat(WeaponType.Personnel,   475);
+            // Census — air convention: aircraft only, no Personnel (census pass 2026-08-13).
             AH1.AddIntelReportStat(WeaponType.HEL_AH1,      54);
 
             // Handle the icon profile.
@@ -5058,11 +5070,16 @@ namespace HammerAndSickle.Models
                     new[] { WeaponTrait.RPG_LAW, WeaponTrait.ATGM_LIGHT, WeaponTrait.MANPADS_BASIC }));
 
             // Intel stats
-            INF_REG_UK_P.AddIntelReportStat(WeaponType.Personnel,           2040);
+            // Census: UK mech BATTLE GROUP base (re-cut, census pass 2026-08-13). Open-bay base:
+            // no carrier tokens (rule 7). MANPAD_RAPIER retired from infantry censuses — Rapier is
+            // a towed SAM; UK MANPADS was Javelin/Blowpipe (MANPAD_JAVELIN, census-only token).
+            INF_REG_UK_P.AddIntelReportStat(WeaponType.Personnel,           1100);
+            // Organic tank squadron (census pass 2026-08-13): cross-attached Challengers.
+            INF_REG_UK_P.AddIntelReportStat(WeaponType.TANK_CHALLENGER1_UK,   28);
             INF_REG_UK_P.AddIntelReportStat(WeaponType.SPA_M109_UK,           18);
             INF_REG_UK_P.AddIntelReportStat(WeaponType.ART_120MM_MORTAR,      18);
-            INF_REG_UK_P.AddIntelReportStat(WeaponType.AT_ATGM,               48);
-            INF_REG_UK_P.AddIntelReportStat(WeaponType.MANPAD_RAPIER,         24);
+            INF_REG_UK_P.AddIntelReportStat(WeaponType.AT_ATGM,               24);
+            INF_REG_UK_P.AddIntelReportStat(WeaponType.MANPAD_JAVELIN,        12);
 
             // Handle the icon profile.
             INF_REG_UK_P.IconProfile = new RegimentIconProfile(RegimentIconType.Single)
@@ -5093,7 +5110,9 @@ namespace HammerAndSickle.Models
             INF_AB_UK_P.AddIntelReportStat(WeaponType.ART_120MM_MORTAR,      18);
             INF_AB_UK_P.AddIntelReportStat(WeaponType.ART_82MM_MORTAR,       18);
             INF_AB_UK_P.AddIntelReportStat(WeaponType.AT_ATGM,               48);
-            INF_AB_UK_P.AddIntelReportStat(WeaponType.MANPAD_RAPIER,         24);
+            // MANPAD_RAPIER → MANPAD_JAVELIN (census pass 2026-08-13): Rapier is a towed SAM, not
+            // a MANPAD; UK airborne SHORAD was Javelin/Blowpipe teams.
+            INF_AB_UK_P.AddIntelReportStat(WeaponType.MANPAD_JAVELIN,        24);
 
             // Handle the icon profile.
             INF_AB_UK_P.IconProfile = new RegimentIconProfile(RegimentIconType.Single)
@@ -5120,11 +5139,16 @@ namespace HammerAndSickle.Models
                     new[] { WeaponTrait.RPG_LAW, WeaponTrait.ATGM_LIGHT, WeaponTrait.MANPADS_STINGER }));
 
             // Intel stats (Panzergrenadier Brigade composition)
-            INF_REG_GE_P.AddIntelReportStat(WeaponType.Personnel,           2600);
+            // Census: German PzGren KAMPFGRUPPE base (battle-group re-cut, census pass 2026-08-13).
+            // Open-bay base: no carrier tokens (rule 7).
+            INF_REG_GE_P.AddIntelReportStat(WeaponType.Personnel,           1300);
+            // Organic tank company (census pass 2026-08-13): Leopard 1 chosen as era-typical —
+            // the Leo 2 fleet concentrated in the Panzer brigades.
+            INF_REG_GE_P.AddIntelReportStat(WeaponType.TANK_LEOPARD1_GE,      28);
             INF_REG_GE_P.AddIntelReportStat(WeaponType.SPA_M109_GE,           18);
             INF_REG_GE_P.AddIntelReportStat(WeaponType.ART_120MM_MORTAR,      18);
-            INF_REG_GE_P.AddIntelReportStat(WeaponType.AT_ATGM,               40);
-            INF_REG_GE_P.AddIntelReportStat(WeaponType.MANPAD_STINGER,        28);
+            INF_REG_GE_P.AddIntelReportStat(WeaponType.AT_ATGM,               20);
+            INF_REG_GE_P.AddIntelReportStat(WeaponType.MANPAD_STINGER,        14);
 
             // Handle the icon profile.
             INF_REG_GE_P.IconProfile = new RegimentIconProfile(RegimentIconType.Single)
