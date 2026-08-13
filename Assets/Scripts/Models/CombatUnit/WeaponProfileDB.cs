@@ -3657,7 +3657,9 @@ namespace HammerAndSickle.Models
             M109_UK.AddIntelReportStat(WeaponType.Personnel, 1050);
             M109_UK.AddIntelReportStat(WeaponType.SPA_M109_UK, 54);
             M109_UK.AddIntelReportStat(WeaponType.APC_FV432,   48);
-            M109_UK.AddIntelReportStat(WeaponType.MANPAD_RAPIER, 12);
+            // MANPAD_RAPIER → MANPAD_JAVELIN (census pass 2026-08-13, folded in per Bob): Rapier is
+            // a towed SAM, not a MANPAD — token retired everywhere; count unchanged (no re-cut here).
+            M109_UK.AddIntelReportStat(WeaponType.MANPAD_JAVELIN, 12);
             M109_UK.AddIntelReportStat(WeaponType.RCN_FV105_UK, 6);
 
             // Handle the icon profile.
@@ -4190,7 +4192,9 @@ namespace HammerAndSickle.Models
             FV105_UK.AddIntelReportStat(WeaponType.RCN_FV105_UK,     36);
             FV105_UK.AddIntelReportStat(WeaponType.APC_FV432,        12);
             FV105_UK.AddIntelReportStat(WeaponType.AT_ATGM,           8);
-            FV105_UK.AddIntelReportStat(WeaponType.MANPAD_RAPIER,     6);
+            // MANPAD_RAPIER → MANPAD_JAVELIN (census pass 2026-08-13, folded in per Bob): token
+            // retired everywhere; count unchanged.
+            FV105_UK.AddIntelReportStat(WeaponType.MANPAD_JAVELIN,     6);
 
             // Handle the icon profile. (Using Warrior sprites as stand-in)
             FV105_UK.IconProfile = new RegimentIconProfile(RegimentIconType.Directional)
@@ -5423,9 +5427,8 @@ namespace HammerAndSickle.Models
             // Set the prestige cost for the profile.
             M113_NATO.SetPrestigeCost(PrestigeTierCost.Gen1, PrestigeTypeCost.APC);
 
-            // Intel report stats - the carrier's own vehicles and nothing else.
+            // Census — CARRIER: own platform count only (doctrine rule 2, census pass 2026-08-13).
             M113_NATO.AddIntelReportStat(WeaponType.APC_M113_NATO, 102);
-            M113_NATO.AddIntelReportStat(WeaponType.RCN_FV105_UK,    8);
 
             // Handle the icon profile.
             M113_NATO.IconProfile = new RegimentIconProfile(RegimentIconType.Directional)
@@ -5461,6 +5464,9 @@ namespace HammerAndSickle.Models
 
             // Intel stats (NL Armoured Infantry Brigade composition, dismounted)
             INF_REG_NL_P.AddIntelReportStat(WeaponType.Personnel,           2150);
+            // Organic tank battalion (census pass 2026-08-13, rule 1): the mech brigade's Leopards,
+            // previously missing — the census listed no armor at all for a mechanised brigade.
+            INF_REG_NL_P.AddIntelReportStat(WeaponType.TANK_LEOPARD1_NL,      32);
             INF_REG_NL_P.AddIntelReportStat(WeaponType.SPA_M109_US,           18);
             INF_REG_NL_P.AddIntelReportStat(WeaponType.ART_120MM_MORTAR,      18);
             INF_REG_NL_P.AddIntelReportStat(WeaponType.AT_ATGM,               36);
@@ -5493,6 +5499,8 @@ namespace HammerAndSickle.Models
 
             // Intel stats (BE Mechanised Infantry Brigade composition, dismounted)
             INF_REG_BE_P.AddIntelReportStat(WeaponType.Personnel,           2050);
+            // Organic tank battalion (census pass 2026-08-13, rule 1).
+            INF_REG_BE_P.AddIntelReportStat(WeaponType.TANK_LEOPARD1_BE,      28);
             INF_REG_BE_P.AddIntelReportStat(WeaponType.SPA_M109_US,           18);
             INF_REG_BE_P.AddIntelReportStat(WeaponType.ART_120MM_MORTAR,      18);
             INF_REG_BE_P.AddIntelReportStat(WeaponType.AT_ATGM,               30);
@@ -5524,6 +5532,8 @@ namespace HammerAndSickle.Models
 
             // Intel stats (DK Mechanised Infantry Brigade composition, dismounted)
             INF_REG_DK_P.AddIntelReportStat(WeaponType.Personnel,           1850);
+            // Organic tank battalion (census pass 2026-08-13, rule 1).
+            INF_REG_DK_P.AddIntelReportStat(WeaponType.TANK_LEOPARD1_DK,      24);
             INF_REG_DK_P.AddIntelReportStat(WeaponType.SPA_M109_US,           12);
             INF_REG_DK_P.AddIntelReportStat(WeaponType.ART_120MM_MORTAR,      18);
             INF_REG_DK_P.AddIntelReportStat(WeaponType.AT_ATGM,               30);
@@ -5613,7 +5623,8 @@ namespace HammerAndSickle.Models
             // Intel stats
             T62A.AddIntelReportStat(WeaponType.Personnel,       950);
             T62A.AddIntelReportStat(WeaponType.TANK_T62A_IQ,    104);
-            T62A.AddIntelReportStat(WeaponType.TANK_T55A_IQ,    105);
+            // TANK_T55A_IQ 105 deleted (census pass 2026-08-13): a stale copy-paste line that put
+            // 209 tanks on a 950-man brigade — the audit's worst find.
             T62A.AddIntelReportStat(WeaponType.IFV_BMP1_IQ,      40);
             T62A.AddIntelReportStat(WeaponType.RCN_BRDM2_SV,     12);
             T62A.AddIntelReportStat(WeaponType.SPA_2S1_IQ,       18);
@@ -5700,9 +5711,8 @@ namespace HammerAndSickle.Models
             BMP1_IQ.SetPrestigeCost(PrestigeTierCost.Gen1, PrestigeTypeCost.IFV);
 
             // Intel stats
+            // Census — CARRIER: own platform count only (doctrine rule 2, census pass 2026-08-13).
             BMP1_IQ.AddIntelReportStat(WeaponType.IFV_BMP1_IQ,       90);
-            BMP1_IQ.AddIntelReportStat(WeaponType.TANK_T55A_IQ,      31);
-            BMP1_IQ.AddIntelReportStat(WeaponType.APC_MTLB_IQ,        8);
 
             // Handle the icon profile.
             BMP1_IQ.IconProfile = new RegimentIconProfile(RegimentIconType.Directional)
@@ -5734,8 +5744,8 @@ namespace HammerAndSickle.Models
             MTLB_IQ.SetPrestigeCost(PrestigeTierCost.Gen1, PrestigeTypeCost.APC);
 
             // Intel stats
+            // Census — CARRIER: own platform count only (doctrine rule 2, census pass 2026-08-13).
             MTLB_IQ.AddIntelReportStat(WeaponType.APC_MTLB_IQ,       90);
-            MTLB_IQ.AddIntelReportStat(WeaponType.TANK_T55A_IQ,      31);
 
             // Handle the icon profile.
             MTLB_IQ.IconProfile = new RegimentIconProfile(RegimentIconType.Directional)
@@ -5771,8 +5781,8 @@ namespace HammerAndSickle.Models
             M113_IR.SetPrestigeCost(PrestigeTierCost.Gen1, PrestigeTypeCost.APC);
 
             // Intel stats
+            // Census — CARRIER: own platform count only (doctrine rule 2, census pass 2026-08-13).
             M113_IR.AddIntelReportStat(WeaponType.APC_M113_IR,       90);
-            M113_IR.AddIntelReportStat(WeaponType.TANK_M60A3_IR,     31);
 
             // Handle the icon profile.
             M113_IR.IconProfile = new RegimentIconProfile(RegimentIconType.Directional)
@@ -6272,6 +6282,11 @@ namespace HammerAndSickle.Models
 
             // Intel stats
             INF_REG_IQ_P.AddIntelReportStat(WeaponType.Personnel, 2040);
+            // Organic tank battalion (census pass 2026-08-13): moved off the stripped BMP-1/MT-LB
+            // carriers (rule 2). ⚠ This base is SHARED by a mech template (BMP-1 mobile) and a leg
+            // template (truck mobile), so the leg regiment reports 31 tanks too — the rule-6 base
+            // split is P4; period Iraqi infantry divisions did hold organic armor.
+            INF_REG_IQ_P.AddIntelReportStat(WeaponType.TANK_T55A_IQ, 31);
             INF_REG_IQ_P.AddIntelReportStat(WeaponType.ART_HEAVY_ARAB, 18);
             INF_REG_IQ_P.AddIntelReportStat(WeaponType.ART_120MM_MORTAR, 18);
             INF_REG_IQ_P.AddIntelReportStat(WeaponType.AT_ATGM, 12);
@@ -6304,6 +6319,9 @@ namespace HammerAndSickle.Models
 
             // Intel stats
             INF_REG_IR_P.AddIntelReportStat(WeaponType.Personnel, 2040);
+            // Organic tank battalion (census pass 2026-08-13): moved off the stripped M113 carrier
+            // (rule 2). ⚠ Shared by mech and leg templates — same P4 caveat as INF_REG_IQ.
+            INF_REG_IR_P.AddIntelReportStat(WeaponType.TANK_M60A3_IR, 31);
             INF_REG_IR_P.AddIntelReportStat(WeaponType.ART_HEAVY_ARAB, 18);
             INF_REG_IR_P.AddIntelReportStat(WeaponType.ART_120MM_MORTAR, 18);
             INF_REG_IR_P.AddIntelReportStat(WeaponType.AT_ATGM, 12);
