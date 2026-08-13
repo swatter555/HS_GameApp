@@ -462,9 +462,14 @@ namespace HammerAndSickle.Models
         }
 
         /// <summary>
-        /// Accumulates intel report stats from all assigned weapon profiles into TotalIntelStats.
-        /// Merges entries from deployed, mobile, and embarked profiles, summing duplicate keys.
+        /// Builds the unit's summed census: accumulates each bay profile's census (IntelReportStats)
+        /// into TotalIntelStats, summing duplicate keys across Deployed + Mobile + Embarked.
         /// </summary>
+        /// <remarks>
+        /// ⚠ Bay-summing is why a carrier profile's census must list only the carrier's own vehicles —
+        /// anything else it lists is silently added to whatever formation mounts it. Vocabulary and the
+        /// census/intel-report distinction: Claude_Project §9.
+        /// </remarks>
         public void BuildIntelStats()
         {
             try

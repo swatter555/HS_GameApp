@@ -672,11 +672,10 @@ namespace HammerAndSickle.Models
             // Set the prestige cost for the profile.
             BMP1.SetPrestigeCost(PrestigeTierCost.Gen1, PrestigeTypeCost.IFV);
 
-            // Fill out intel stats for the BMP-1P profile
-            BMP1.AddIntelReportStat(WeaponType.TANK_T55A_SV,     40);
+            // Census — CARRIER: own platform count only (doctrine rule 2, census pass 2026-08-13).
+            // The MRR's tanks/support APCs/recon live on the base profile that mounts this carrier;
+            // listing them here double-counted them in every bay-sum.
             BMP1.AddIntelReportStat(WeaponType.IFV_BMP1_SV,     129);
-            BMP1.AddIntelReportStat(WeaponType.APC_BTR70_SV,     26);
-            BMP1.AddIntelReportStat(WeaponType.RCN_BRDM2_SV,     12);
 
             // Handle the icon profile.
             BMP1.IconProfile = new RegimentIconProfile(RegimentIconType.Directional)
@@ -708,11 +707,8 @@ namespace HammerAndSickle.Models
             // Set the prestige cost for the profile.
             BMP2.SetPrestigeCost(PrestigeTierCost.Gen2, PrestigeTypeCost.IFV);
 
-            // Fill out intel stats for the BMP-2 profile
-            BMP2.AddIntelReportStat(WeaponType.TANK_T72A_SV,     40);
+            // Census — CARRIER: own platform count only (doctrine rule 2, census pass 2026-08-13).
             BMP2.AddIntelReportStat(WeaponType.IFV_BMP2_SV,     129);
-            BMP2.AddIntelReportStat(WeaponType.APC_BTR70_SV,     26);
-            BMP2.AddIntelReportStat(WeaponType.RCN_BRDM2_SV,     12);
 
             // Handle the icon profile.
             BMP2.IconProfile = new RegimentIconProfile(RegimentIconType.Directional)
@@ -747,11 +743,8 @@ namespace HammerAndSickle.Models
             // Set the prestige cost for the profile.
             BMP3.SetPrestigeCost(PrestigeTierCost.Gen3, PrestigeTypeCost.IFV);
 
-            // Fill out intel stats for the BMP-3 profile
-            BMP3.AddIntelReportStat(WeaponType.TANK_T80B_SV,     40);
+            // Census — CARRIER: own platform count only (doctrine rule 2, census pass 2026-08-13).
             BMP3.AddIntelReportStat(WeaponType.IFV_BMP3_SV,     129);
-            BMP3.AddIntelReportStat(WeaponType.APC_BTR80_SV,     26);
-            BMP3.AddIntelReportStat(WeaponType.RCN_BRDM2_SV,     12);
 
             // Handle the icon profile.
             BMP3.IconProfile = new RegimentIconProfile(RegimentIconType.Directional)
@@ -785,9 +778,8 @@ namespace HammerAndSickle.Models
             // Set the prestige cost for the profile.
             BMD2.SetPrestigeCost(PrestigeTierCost.Gen2, PrestigeTypeCost.IFV);
 
-            // Fill out intel stats for the BMD-2 profile
+            // Census — CARRIER: own platform count only (doctrine rule 2, census pass 2026-08-13).
             BMD2.AddIntelReportStat(WeaponType.IFV_BMD2_SV,      68);
-            BMD2.AddIntelReportStat(WeaponType.RCN_BRDM2_SV,     13);
 
             // Handle the icon profile.
             BMD2.IconProfile = new RegimentIconProfile(RegimentIconType.Directional)
@@ -821,9 +813,8 @@ namespace HammerAndSickle.Models
             // Set the prestige cost for the profile.
             BMD3.SetPrestigeCost(PrestigeTierCost.Gen3, PrestigeTypeCost.IFV);
 
-            // Fill out intel stats for the BMD-3 profile
+            // Census — CARRIER: own platform count only (doctrine rule 2, census pass 2026-08-13).
             BMD3.AddIntelReportStat(WeaponType.IFV_BMD3_SV,      68);
-            BMD3.AddIntelReportStat(WeaponType.RCN_BRDM2_SV,     13);
 
             // Handle the icon profile.
             BMD3.IconProfile = new RegimentIconProfile(RegimentIconType.Directional)
@@ -856,9 +847,8 @@ namespace HammerAndSickle.Models
             // Set the prestige cost for the profile.
             MTLB.SetPrestigeCost(PrestigeTierCost.Gen1, PrestigeTypeCost.APC);
 
-            // Fill out intel stats for the MT-LB profile
+            // Census — CARRIER: own platform count only (doctrine rule 2, census pass 2026-08-13).
             MTLB.AddIntelReportStat(WeaponType.APC_MTLB_SV,      68);
-            MTLB.AddIntelReportStat(WeaponType.RCN_BRDM2_SV,     13);
 
             // Handle the icon profile.
             MTLB.IconProfile = new RegimentIconProfile(RegimentIconType.Directional)
@@ -892,11 +882,8 @@ namespace HammerAndSickle.Models
             // Set the prestige cost for the profile.
             BTR70.SetPrestigeCost(PrestigeTierCost.Gen2, PrestigeTypeCost.APC);
 
-            // Fill out intel stats for the BTR-70 profile
-            BTR70.AddIntelReportStat(WeaponType.TANK_T55A_SV,     40);
+            // Census — CARRIER: own platform count only (doctrine rule 2, census pass 2026-08-13).
             BTR70.AddIntelReportStat(WeaponType.APC_BTR70_SV,    129);
-            BTR70.AddIntelReportStat(WeaponType.IFV_BMP1_SV,      26);
-            BTR70.AddIntelReportStat(WeaponType.RCN_BRDM2_SV,     12);
 
             // Handle the icon profile.
             BTR70.IconProfile = new RegimentIconProfile(RegimentIconType.Directional)
@@ -930,11 +917,8 @@ namespace HammerAndSickle.Models
             // Set the prestige cost for the profile.
             BTR80.SetPrestigeCost(PrestigeTierCost.Gen3, PrestigeTypeCost.APC);
 
-            // Fill out intel stats for the BTR-80 profile
-            BTR80.AddIntelReportStat(WeaponType.TANK_T72A_SV,     40);
+            // Census — CARRIER: own platform count only (doctrine rule 2, census pass 2026-08-13).
             BTR80.AddIntelReportStat(WeaponType.APC_BTR80_SV,    129);
-            BTR80.AddIntelReportStat(WeaponType.IFV_BMP2_SV,      26);
-            BTR80.AddIntelReportStat(WeaponType.RCN_BRDM2_SV,     12);
 
             // Handle the icon profile.
             BTR80.IconProfile = new RegimentIconProfile(RegimentIconType.Directional)
@@ -1248,7 +1232,8 @@ namespace HammerAndSickle.Models
 
             // Fill out intel stats for the Light Artillery profile
             ArtLight.AddIntelReportStat(WeaponType.Personnel,      1100);
-            ArtLight.AddIntelReportStat(WeaponType.ART_LIGHT_SV,     72);
+            // 72 → 48 tubes (census pass 2026-08-13): 72 was brigade mass wearing a Regiment name.
+            ArtLight.AddIntelReportStat(WeaponType.ART_LIGHT_SV,     48);
             ArtLight.AddIntelReportStat(WeaponType.RCN_BRDM2_SV,     12);
             ArtLight.AddIntelReportStat(WeaponType.APC_BTR70_SV,     24);
             ArtLight.AddIntelReportStat(WeaponType.MANPAD_STRELA,       21);
@@ -1284,7 +1269,8 @@ namespace HammerAndSickle.Models
 
             // Fill out intel stats for the Heavy Artillery profile
             ArtHeavy.AddIntelReportStat(WeaponType.Personnel,      1100);
-            ArtHeavy.AddIntelReportStat(WeaponType.ART_HEAVY_SV,     72);
+            // 72 → 48 tubes (census pass 2026-08-13): 72 was brigade mass wearing a Regiment name.
+            ArtHeavy.AddIntelReportStat(WeaponType.ART_HEAVY_SV,     48);
             ArtHeavy.AddIntelReportStat(WeaponType.RCN_BRDM2_SV,     12);
             ArtHeavy.AddIntelReportStat(WeaponType.APC_BTR70_SV,     24);
             ArtHeavy.AddIntelReportStat(WeaponType.MANPAD_STRELA,       21);
@@ -1861,8 +1847,9 @@ namespace HammerAndSickle.Models
             // Set the prestige cost for the profile.
             MI8T.SetPrestigeCost(PrestigeTierCost.Gen1, PrestigeTypeCost.HELT);
 
-            // Fill out intel stats for the Mi-8T profile
-            MI8T.AddIntelReportStat(WeaponType.HEL_MI8T_SV,       109);
+            // Census — LIFT (TransportCategory != None): EMPTY by doctrine rule 4 (census pass
+            // 2026-08-13). Lift losses are unreported by design — a debarked air-mobile regiment
+            // must not lose transport helicopters in ground combat. Exempted in CensusIntegrityTests.
 
             // Handle the icon profile.
             MI8T.IconProfile = new RegimentIconProfile(RegimentIconType.Helo_Animation)
@@ -1899,8 +1886,7 @@ namespace HammerAndSickle.Models
             // Set the prestige cost for the profile.
             MI8AT.SetPrestigeCost(PrestigeTierCost.Gen2, PrestigeTypeCost.HELT);
 
-            // Fill out intel stats for the Mi-8AT profile
-            MI8AT.AddIntelReportStat(WeaponType.Personnel, 475);
+            // Census — air convention: aircraft only, no Personnel (census pass 2026-08-13).
             MI8AT.AddIntelReportStat(WeaponType.HEL_MI8AT_SV,     54);
 
             // Handle the icon profile.
@@ -1938,7 +1924,6 @@ namespace HammerAndSickle.Models
             MI24D.SetPrestigeCost(PrestigeTierCost.Gen2, PrestigeTypeCost.HEL);
 
             // Fill out intel stats for the Mi-24D profile
-            MI24D.AddIntelReportStat(WeaponType.Personnel,       475);
             MI24D.AddIntelReportStat(WeaponType.HEL_MI24D_SV,     54);
 
             // Handle the icon profile.
@@ -1976,7 +1961,6 @@ namespace HammerAndSickle.Models
             MI24V.SetPrestigeCost(PrestigeTierCost.Gen3, PrestigeTypeCost.HEL);
 
             // Fill out intel stats for the Mi-24V profile
-            MI24V.AddIntelReportStat(WeaponType.Personnel,       475);
             MI24V.AddIntelReportStat(WeaponType.HEL_MI24V_SV,     54);
 
             // Handle the icon profile.
@@ -2014,7 +1998,6 @@ namespace HammerAndSickle.Models
             MI28.SetPrestigeCost(PrestigeTierCost.Gen4, PrestigeTypeCost.HEL);
 
             // Fill out intel stats for the Mi-28 profile
-            MI28.AddIntelReportStat(WeaponType.Personnel,        475);
             MI28.AddIntelReportStat(WeaponType.HEL_MI28_SV,       54);
 
             // Handle the icon profile.
@@ -2053,8 +2036,10 @@ namespace HammerAndSickle.Models
             // Set the prestige cost for the profile.
             AN12.SetPrestigeCost(PrestigeTierCost.Gen1, PrestigeTypeCost.TRN);
 
-            // Fill out intel stats for the An-12 profile
-            AN12.AddIntelReportStat(WeaponType.TRN_AN8_SV,        48);
+            // Census — LIFT (TransportCategory != None): EMPTY by doctrine rule 4 (census pass
+            // 2026-08-13). Lift losses are unreported by design — a debarked VDV regiment must not
+            // lose transport planes in ground combat. Exempted in CensusIntegrityTests.
+            // (§24.8.7.4.3's old TRN-row rationale cited this profile's 48 — doc amendment in Block 7.)
 
             // Handle the icon profile.
             AN12.IconProfile = new RegimentIconProfile(RegimentIconType.Single)
@@ -2684,8 +2669,16 @@ namespace HammerAndSickle.Models
                     new Dictionary<ProfileStat, int>(),
                     new[] { WeaponTrait.RPG_LAW, WeaponTrait.MANPADS_BASIC }));
 
-            // Fill out intel stats for the Regular Infantry profile (Soviet MRR BTR-70)
+            // Census — the de-facto INF_MECH_SV: this is the Soviet MRR base profile, used by MRR
+            // templates only (verified 2026-08-13). Rename blocked by shipped content — INF_REG_SV
+            // is in khost.oob, and WeaponType persists BY NAME (CLAUDE.md §2.11).
+            // Rule 7 (open bay): no BTR/BMP carrier tokens here — the carrier census supplies those;
+            // the 26 support APCs from the old carrier censuses are absorbed into the carriers' 129.
             INF_REG.AddIntelReportStat(WeaponType.Personnel,         2523);
+            // Organic tank battalion (census pass 2026-08-13): T-62A chosen as the era-typical MRR
+            // tank bn for the early-80s setting (tank tokens are rule-7-legal — tanks can't ride a
+            // Mobile bay). Moved here from the carrier censuses, where it double-counted.
+            INF_REG.AddIntelReportStat(WeaponType.TANK_T62A_SV,        40);
             INF_REG.AddIntelReportStat(WeaponType.SPAAA_ZSU57_SV,       4);
             INF_REG.AddIntelReportStat(WeaponType.SPSAM_9K31_SV,        4);
             INF_REG.AddIntelReportStat(WeaponType.SPA_2S1_SV,          18);
@@ -2760,7 +2753,8 @@ namespace HammerAndSickle.Models
             INF_AM.AddIntelReportStat(WeaponType.AT_ATGM,             14);
             INF_AM.AddIntelReportStat(WeaponType.MANPAD_STRELA,          45);
             INF_AM.AddIntelReportStat(WeaponType.AAA_GEN_SV,           2);
-            INF_AM.AddIntelReportStat(WeaponType.HEL_MI8T_SV,        166);
+            // HEL_MI8T_SV 166 deleted (rule 4, census pass 2026-08-13): lift is never censused —
+            // the AM regiment's helicopters belong to the Embarked bay's lift profile, itself empty.
 
             // Handle the icon profile.
             INF_AM.IconProfile = new RegimentIconProfile(RegimentIconType.Single)
@@ -2788,6 +2782,9 @@ namespace HammerAndSickle.Models
 
             // Fill out intel stats for the Marine Infantry profile (Soviet Naval BTR-70)
             INF_MAR.AddIntelReportStat(WeaponType.Personnel,         2750);
+            // Organic tank battalion (soft enrichment, census pass 2026-08-13): Soviet Naval
+            // Infantry regiments fielded a T-55 tank bn — era-typical for the naval role.
+            INF_MAR.AddIntelReportStat(WeaponType.TANK_T55A_SV,        31);
             INF_MAR.AddIntelReportStat(WeaponType.SPAAA_ZSU57_SV,       4);
             INF_MAR.AddIntelReportStat(WeaponType.SPSAM_9K31_SV,        4);
             INF_MAR.AddIntelReportStat(WeaponType.SPA_2S1_SV,          18);
@@ -2824,7 +2821,8 @@ namespace HammerAndSickle.Models
                     new[] { WeaponTrait.SPECIAL_FORCES, WeaponTrait.RPG_LAW, WeaponTrait.MANPADS_BASIC }));
 
             // Fill out intel stats for the Spetsnaz profile (Soviet AAR MT-LB)
-            INF_SPEC.AddIntelReportStat(WeaponType.Personnel,       2300);
+            // 2300 → 1200 (census pass 2026-08-13): Spetsnaz brigades ran ~1,000–1,300 men.
+            INF_SPEC.AddIntelReportStat(WeaponType.Personnel,       1200);
             INF_SPEC.AddIntelReportStat(WeaponType.ART_81MM_MORTAR,   12);
             INF_SPEC.AddIntelReportStat(WeaponType.ART_120MM_MORTAR,  12);
             INF_SPEC.AddIntelReportStat(WeaponType.AT_ATGM,           14);

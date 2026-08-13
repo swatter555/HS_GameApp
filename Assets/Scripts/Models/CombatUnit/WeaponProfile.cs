@@ -92,7 +92,11 @@ namespace HammerAndSickle.Models
         // The type of weapon, for sprite picking and upgrade logic.
         public WeaponType WeaponType { get; private set; } = WeaponType.NONE;
 
-        // Bucketted stats for intel report purposes.
+        // ⚠ THE PROFILE'S CENSUS (standard term, Bob 2026-08-13): the authored, full-strength equipment
+        // roster of the formation slice this profile represents. NOT the intel report — that is the
+        // COMPUTED output (bay-summed, HP-scaled, bucketed, enemy-merged, fuzzed). The census is also
+        // the §24.8 loss-ledger multiplicand, so a wrong census is a wrong casualty report.
+        // Guarded by CensusIntegrityTests; vocabulary anchored in Claude_Project §9.
         public Dictionary<WeaponType, int> IntelReportStats { get; private set; } = null;
 
         // Properties for ground units
@@ -209,8 +213,15 @@ namespace HammerAndSickle.Models
         #region Public Methods
 
         /// <summary>
-        /// Adds a stat value to the IntelReportStats dictionary for this weapon profile.
+        /// Adds one census line to this profile's IntelReportStats.
         /// </summary>
+        /// <remarks>
+        /// ⚠ ASSIGNS — LAST WRITE WINS, NEVER ACCUMULATES. Writing the same WeaponType twice keeps the
+        /// second value silently. Combined with the copy-paste shape of the DB (blocks of Add calls on a
+        /// local variable), a block aimed at the WRONG variable overwrites an unrelated profile's census
+        /// with no error — exactly the 2026-08-13 Humvee/M113 defect CensusIntegrityTests caught.
+        /// Check the receiver variable when copying a block.
+        /// </remarks>
         /// <param name="type"></param>
         /// <param name="value"></param>
         public void AddIntelReportStat(WeaponType type, int value)

@@ -48,6 +48,12 @@ namespace HammerAndSickle.Tests
             WeaponType.TRK_GEN_ARAB,
             WeaponType.TRK_WEST,
             WeaponType.TRN_NAVAL,
+
+            // Lift profiles (TransportCategory != None) — EMPTY by doctrine rule 4 (census pass
+            // 2026-08-13): lift losses are unreported by design. This name-based list is replaced
+            // by rule-based exemptions (lift-empty / truck-empty) in the doctrine-guard block.
+            WeaponType.HEL_MI8T_SV,
+            WeaponType.TRN_AN8_SV,
         };
 
         /// <summary>Every WeaponType that actually resolves to a registered profile.</summary>
