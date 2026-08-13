@@ -2495,8 +2495,10 @@ namespace HammerAndSickle.Models
         {
             #region US Armored Brigade
 
+            // Display name → battle group (census pass 2026-08-13): one US counter = a battalion
+            // task force, per the scale table. Template ID unchanged — the editor may reference it.
             var us_armored_brigade = new CombatUnit(
-                unitName: "US Armored Brigade",
+                unitName: "US Armor Battle Group",
                 classification: UnitClassification.TANK,
                 role: UnitRole.GroundCombat,
                 side: Side.AI,
@@ -2520,8 +2522,9 @@ namespace HammerAndSickle.Models
 
             #region US Mechanized Infantry Brigade
 
+            // Display name → battle group (census pass 2026-08-13): template ID unchanged.
             var us_mech_brigade = new CombatUnit(
-                unitName: "US Mechanized Infantry Brigade",
+                unitName: "US Mech Battle Group",
                 classification: UnitClassification.MECH,
                 role: UnitRole.GroundCombat,
                 side: Side.AI,

@@ -54,6 +54,7 @@ namespace HammerAndSickle.Tests
             // by rule-based exemptions (lift-empty / truck-empty) in the doctrine-guard block.
             WeaponType.HEL_MI8T_SV,
             WeaponType.TRN_AN8_SV,
+            WeaponType.HEL_UH60_US,
         };
 
         /// <summary>Every WeaponType that actually resolves to a registered profile.</summary>

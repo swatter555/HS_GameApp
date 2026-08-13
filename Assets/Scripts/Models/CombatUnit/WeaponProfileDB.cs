@@ -2985,17 +2985,19 @@ namespace HammerAndSickle.Models
             // Set the prestige cost for the profile.
             M1_US.SetPrestigeCost(PrestigeTierCost.Gen3, PrestigeTypeCost.TANK);
 
-            // Intel stats: US Armored Brigade - M1A1 Abrams (Division 86 structure)
-            M1_US.AddIntelReportStat(WeaponType.Personnel,       2200);
-            M1_US.AddIntelReportStat(WeaponType.TANK_M1_US,       116);  // 2 x Tank BN (58 each)
-            M1_US.AddIntelReportStat(WeaponType.IFV_M2_US,         54);  // 1 x Mech Inf BN (54 Bradleys)
-            M1_US.AddIntelReportStat(WeaponType.RCN_M3_US,         18);  // Scout vehicles across battalions + brigade recon
-            M1_US.AddIntelReportStat(WeaponType.APC_M113_US,       32);  // Command posts, medical, maintenance vehicles
-            M1_US.AddIntelReportStat(WeaponType.AT_ATGM,           32);  // TOW missiles (Bradley + dismounted teams)
-            M1_US.AddIntelReportStat(WeaponType.MANPAD_STINGER,    18);  // Stinger teams distributed across brigade
+            // Census: US Armor BATTALION TASK FORCE (battle-group re-cut, census pass 2026-08-13).
+            // One US counter = a bn TF (~5 km frontage), not a brigade — the scale table's answer to
+            // the Soviet regiment. Closed-bay base, so carrier tokens are rule-7-legal here.
+            M1_US.AddIntelReportStat(WeaponType.Personnel,       1000);
+            M1_US.AddIntelReportStat(WeaponType.TANK_M1_US,        58);  // Tank battalion (58)
+            M1_US.AddIntelReportStat(WeaponType.IFV_M2_US,         13);  // Cross-attached mech company
+            M1_US.AddIntelReportStat(WeaponType.RCN_M3_US,          6);  // Scout platoon
+            M1_US.AddIntelReportStat(WeaponType.APC_M113_US,       16);  // Command posts, medical, maintenance vehicles
+            M1_US.AddIntelReportStat(WeaponType.AT_ATGM,           16);  // TOW missiles (Bradley + dismounted teams)
+            M1_US.AddIntelReportStat(WeaponType.MANPAD_STINGER,     9);  // Stinger teams
             M1_US.AddIntelReportStat(WeaponType.SPA_M109_US,       18);  // Direct support artillery battalion
-            M1_US.AddIntelReportStat(WeaponType.ART_120MM_MORTAR,  18);
-            M1_US.AddIntelReportStat(WeaponType.SPAAA_M163_US,      4);  // Vulcan air defense guns
+            M1_US.AddIntelReportStat(WeaponType.ART_120MM_MORTAR,   9);
+            M1_US.AddIntelReportStat(WeaponType.SPAAA_M163_US,      2);  // Vulcan air defense guns
 
             // Handle the icon profile.
             M1_US.IconProfile = new RegimentIconProfile(RegimentIconType.Directional)
@@ -3034,8 +3036,10 @@ namespace HammerAndSickle.Models
             M60_US.AddIntelReportStat(WeaponType.APC_M113_US,       18);  // Command posts, mortars, support vehicles
             M60_US.AddIntelReportStat(WeaponType.AT_ATGM,           24);  // TOW missiles (M3 Bradley + ground teams)
             M60_US.AddIntelReportStat(WeaponType.MANPAD_STINGER,    12);  // Stinger teams for air defense
-            M60_US.AddIntelReportStat(WeaponType.HEL_AH64_US,       26);  // AH-64 Apache attack helicopters
-            M60_US.AddIntelReportStat(WeaponType.HEL_OH58,          12);  // OH-58 scout helicopters
+            // ACR helos 26/12 → 8/8 (census pass 2026-08-13): the squadron's own air troop — the
+            // Apache mass lived in the aviation squadron, not on a ground cav squadron.
+            M60_US.AddIntelReportStat(WeaponType.HEL_AH64_US,        8);  // Air troop AH-64s
+            M60_US.AddIntelReportStat(WeaponType.HEL_OH58,           8);  // Air troop OH-58 scouts
             M60_US.AddIntelReportStat(WeaponType.SPA_M109_US,        8);  // Organic 155mm artillery battery
             M60_US.AddIntelReportStat(WeaponType.SPAAA_M163_US,      4);  // Vulcan air defense guns
 
@@ -3243,10 +3247,8 @@ namespace HammerAndSickle.Models
             M2_US.SetPrestigeCost(PrestigeTierCost.Gen3, PrestigeTypeCost.IFV);
 
             // Add intel report stats
-            M2_US.AddIntelReportStat(WeaponType.TANK_M1_US,       58);
-            M2_US.AddIntelReportStat(WeaponType.IFV_M2_US,       108);
-            M2_US.AddIntelReportStat(WeaponType.RCN_M3_US,        18);
-            M2_US.AddIntelReportStat(WeaponType.APC_M113_US,      32);
+            // Census — CARRIER: own platform count only (doctrine rule 2, census pass 2026-08-13).
+            M2_US.AddIntelReportStat(WeaponType.IFV_M2_US,        54);
 
             // Handle the icon profile.
             M2_US.IconProfile = new RegimentIconProfile(RegimentIconType.Directional)
@@ -3348,10 +3350,8 @@ namespace HammerAndSickle.Models
             M113_US.SetPrestigeCost(PrestigeTierCost.Gen1, PrestigeTypeCost.APC);
 
             // Add intel report stats
-            M113_US.AddIntelReportStat(WeaponType.TANK_M1_US,   58);
+            // Census — CARRIER: own platform count only (doctrine rule 2, census pass 2026-08-13).
             M113_US.AddIntelReportStat(WeaponType.APC_M113_US, 108);
-            M113_US.AddIntelReportStat(WeaponType.RCN_M3_US,    18);
-            M113_US.AddIntelReportStat(WeaponType.IFV_M2_US,    32);
 
             // Handle the icon profile.
             M113_US.IconProfile = new RegimentIconProfile(RegimentIconType.Directional)
@@ -3436,9 +3436,10 @@ namespace HammerAndSickle.Models
             LVTP7_US.SetPrestigeCost(PrestigeTierCost.Gen2, PrestigeTypeCost.APC);
 
             // Intel report stats
-            LVTP7_US.AddIntelReportStat(WeaponType.APC_LVTP7_US, 18);
-            LVTP7_US.AddIntelReportStat(WeaponType.APC_HUMVEE_US, 120);
-            LVTP7_US.AddIntelReportStat(WeaponType.HEL_AH1, 12);
+            // Census — CARRIER: own platform count only (doctrine rule 2, census pass 2026-08-13).
+            // 18 → 45: amtracs to lift a Marine regiment; the Humvees and Cobras were a MEU roster
+            // that never belonged on a carrier profile.
+            LVTP7_US.AddIntelReportStat(WeaponType.APC_LVTP7_US, 45);
 
             // Handle the icon profile.
             LVTP7_US.IconProfile = new RegimentIconProfile(RegimentIconType.Directional)
@@ -3811,7 +3812,7 @@ namespace HammerAndSickle.Models
             M163_US.AddIntelReportStat(WeaponType.Personnel,      900); // Air defense personnel
             M163_US.AddIntelReportStat(WeaponType.SPAAA_M163_US,   18); // M163 Vulcan SPAAA units
             M163_US.AddIntelReportStat(WeaponType.APC_M113_US,     24); // Command and control vehicles
-            M163_US.AddIntelReportStat(WeaponType.MANPAD_STINGER,     12); // Chaparral mobile SAM systems
+            M163_US.AddIntelReportStat(WeaponType.MANPAD_STINGER,     12); // Stinger teams (comment fixed 2026-08-13 — said Chaparral)
 
             // Handle the icon profile.
             M163_US.IconProfile = new RegimentIconProfile(RegimentIconType.Directional_Fire)
@@ -3849,9 +3850,9 @@ namespace HammerAndSickle.Models
 
             // Intel report stats
             Chaparral.AddIntelReportStat(WeaponType.Personnel,    900); // Air defense personnel
-            Chaparral.AddIntelReportStat(WeaponType.SPSAM_CHAP_US, 18); // M163 Vulcan SPAAA units
+            Chaparral.AddIntelReportStat(WeaponType.SPSAM_CHAP_US, 18); // Chaparral mobile SAM systems (comments unswapped 2026-08-13)
             Chaparral.AddIntelReportStat(WeaponType.APC_M113_US,   24); // Command and control vehicles
-            Chaparral.AddIntelReportStat(WeaponType.SPAAA_M163_US,  4); // Chaparral mobile SAM systems
+            Chaparral.AddIntelReportStat(WeaponType.SPAAA_M163_US,  4); // Vulcan air defense guns
 
             // Handle the icon profile.
             Chaparral.IconProfile = new RegimentIconProfile(RegimentIconType.Directional_Fire)
@@ -3891,7 +3892,7 @@ namespace HammerAndSickle.Models
             Hawk_US.AddIntelReportStat(WeaponType.Personnel,    1100); // Air defense personnel
             Hawk_US.AddIntelReportStat(WeaponType.SAM_HAWK_US,    18); // Hawk SAM batteries
             Hawk_US.AddIntelReportStat(WeaponType.SPAAA_M163_US,   4); // Vulcan air defense guns
-            Hawk_US.AddIntelReportStat(WeaponType.APC_M113_US,    24); // Chaparral mobile SAM systems
+            Hawk_US.AddIntelReportStat(WeaponType.APC_M113_US,    24); // Command and control vehicles (comment fixed 2026-08-13 — said Chaparral)
 
             // Handle the icon profile.
             Hawk_US.IconProfile = new RegimentIconProfile(RegimentIconType.Single)
@@ -4260,7 +4261,7 @@ namespace HammerAndSickle.Models
             AH64.SetPrestigeCost(PrestigeTierCost.Gen4, PrestigeTypeCost.HEL);
 
             // Intel stats
-            AH64.AddIntelReportStat(WeaponType.Personnel,       475);
+            // Census — air convention: aircraft only, no Personnel (census pass 2026-08-13).
             AH64.AddIntelReportStat(WeaponType.HEL_AH64_US,      54);
             AH64.AddIntelReportStat(WeaponType.HEL_OH58,         24);
 
@@ -4297,9 +4298,9 @@ namespace HammerAndSickle.Models
             UH60.SetPrestigeCost(PrestigeTierCost.Gen2, PrestigeTypeCost.HELT);
 
             // Intel stats
-            UH60.AddIntelReportStat(WeaponType.HEL_UH60_US,  109);
-            UH60.AddIntelReportStat(WeaponType.HEL_AH64_US,   18);
-            UH60.AddIntelReportStat(WeaponType.HEL_OH58,      24);
+            // Census — LIFT (TransportCategory != None): EMPTY by doctrine rule 4 (census pass
+            // 2026-08-13). Embarked-bay-only lift; losses unreported by design. Exempted in
+            // CensusIntegrityTests.
 
             // Handle the icon profile.
             UH60.IconProfile = new RegimentIconProfile(RegimentIconType.Helo_Animation)
@@ -4924,12 +4925,17 @@ namespace HammerAndSickle.Models
                     new[] { WeaponTrait.RPG_LAW, WeaponTrait.ATGM_LIGHT, WeaponTrait.MANPADS_STINGER }));
 
             // Intel stats
-            INF_REG_US_P.AddIntelReportStat(WeaponType.Personnel,           2200);
+            // Census: US Mech BATTALION TASK FORCE base (battle-group re-cut, census pass 2026-08-13).
+            // Open-bay base: no carrier tokens (rule 7) — the mounted carrier census supplies those.
+            INF_REG_US_P.AddIntelReportStat(WeaponType.Personnel,           1100);
+            // Organic tank company/team (census pass 2026-08-13): cross-attached M1s — the mech TF's
+            // armor, moved off the carrier censuses where it double-counted.
+            INF_REG_US_P.AddIntelReportStat(WeaponType.TANK_M1_US,            28);
             INF_REG_US_P.AddIntelReportStat(WeaponType.SPA_M109_US,           18);
             INF_REG_US_P.AddIntelReportStat(WeaponType.ART_120MM_MORTAR,      18);
             INF_REG_US_P.AddIntelReportStat(WeaponType.SPAAA_M163_US,          4);
-            INF_REG_US_P.AddIntelReportStat(WeaponType.AT_ATGM,               40);
-            INF_REG_US_P.AddIntelReportStat(WeaponType.MANPAD_STINGER,        22);
+            INF_REG_US_P.AddIntelReportStat(WeaponType.AT_ATGM,               20);
+            INF_REG_US_P.AddIntelReportStat(WeaponType.MANPAD_STINGER,        11);
 
             // Handle the icon profile.
             INF_REG_US_P.IconProfile = new RegimentIconProfile(RegimentIconType.Single)
