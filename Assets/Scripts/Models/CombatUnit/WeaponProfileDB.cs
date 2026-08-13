@@ -5211,6 +5211,10 @@ namespace HammerAndSickle.Models
 
             // Intel stats (Brigade d'Infanterie Mecanisee composition)
             INF_REG_FR_P.AddIntelReportStat(WeaponType.Personnel,           1950);
+            // Organic armored regiment (census pass 2026-08-13, Bob-approved): +40 AMX-30, the
+            // division-as-counter arithmetic (the armoured division's 80 = two such regiments).
+            // Was missing entirely — a mechanised division-counter with zero tanks.
+            INF_REG_FR_P.AddIntelReportStat(WeaponType.TANK_AMX30_FR,         40);
             INF_REG_FR_P.AddIntelReportStat(WeaponType.SPA_AUF1,              18);
             INF_REG_FR_P.AddIntelReportStat(WeaponType.ART_120MM_MORTAR,      18);
             INF_REG_FR_P.AddIntelReportStat(WeaponType.AT_ATGM,               18);
@@ -6687,8 +6691,9 @@ namespace HammerAndSickle.Models
             TYPE86.SetPrestigeCost(PrestigeTierCost.Gen2, PrestigeTypeCost.IFV);
 
             // Intel stats
+            // Census — CARRIER: own platform count only (doctrine rule 2; caught by the Block 6
+            // guard simulation 2026-08-13, Bob-approved fix). The 40 Type 59s move to INF_REG_CH.
             TYPE86.AddIntelReportStat(WeaponType.IFV_TYPE86,        90);
-            TYPE86.AddIntelReportStat(WeaponType.TANK_TYPE59,       40);
 
             // Handle the icon profile.
             TYPE86.IconProfile = new RegimentIconProfile(RegimentIconType.Directional)
@@ -7128,6 +7133,10 @@ namespace HammerAndSickle.Models
 
             // Intel stats
             INF_REG_CH_P.AddIntelReportStat(WeaponType.Personnel,       2200);
+            // Organic tank battalion (census pass 2026-08-13, Bob-approved): moved off the stripped
+            // Type 86 carrier (rule 2). ⚠ Shared by mech and leg templates — same P4 caveat as
+            // INF_REG_IQ/IR.
+            INF_REG_CH_P.AddIntelReportStat(WeaponType.TANK_TYPE59,       40);
             INF_REG_CH_P.AddIntelReportStat(WeaponType.ART_155MM_FG,      18);
             INF_REG_CH_P.AddIntelReportStat(WeaponType.ART_120MM_MORTAR,  12);
             INF_REG_CH_P.AddIntelReportStat(WeaponType.ART_82MM_MORTAR,   12);
