@@ -66,7 +66,10 @@ accurate history.
 
 **✅ PLAY-CONFIRMED 2026-08-11 (Bob):** ambush fires — including through an unspotted unit's ZoC;
 devastating hits rout the victim 2 hexes (that is §6.8.1 working, not a bug); a Hold outcome deals
-real damage; helo abort-to-origin observed working. Two same-day fixes rode along: **the victim's
+real damage; helo abort-to-origin observed working. ✅ **`AMBUSH_DEBUG` and `DebugLogAmbushScan` were
+RETIRED 2026-08-12** now that the mechanic is confirmed across several sessions — restore from git
+(8a32a80) rather than re-writing if §6.9 ever needs re-diagnosing, since the value was that the scan
+mirrored `CheckGroundAmbush`'s filters in the same order. Two same-day fixes rode along: **the victim's
 HP box showed no damage on a Hold** — the ambush branch raised `RaiseRedrawMapIcons` only on
 displacement/removal, now unconditional like the direct-combat path (the coarse redraw is the ONLY
 HP-box refresh, §3.6e) — and narration (event/dispatch/sound) is now gated on `AmbushOutcome.Executed`

@@ -972,15 +972,6 @@ namespace HammerAndSickle.Controllers
                         var ambush = AmbushAction.Execute(ambusher, CurrentUnit, map, new CombatRandom());
                         hpLostThisMove += ambush.DamageToMover;
 
-                        if (AMBUSH_DEBUG)
-                            Debug.Log($"[AMBUSH DEBUG] {ambusher.UnitName} ({ambusher.Classification}) sprang " +
-                                      $"{CurrentUnit.UnitName} entering {targetPos}: executed={ambush.Executed}, " +
-                                      $"dmg={ambush.DamageToMover} (0 with no error above = a MISS band, legitimate §7.6), " +
-                                      $"stand={ambush.MoverOutcome}, displaced={ambush.MoverMoved} " +
-                                      $"back {ambush.MoverHexesRetreated} to {ambush.MoverFinalPosition}, " +
-                                      $"removed={ambush.MoverRemovedFromMap}" +
-                                      (ambush.Executed ? "" : $", REASON={ambush.Reason}"));
-
                         /* ⚠ NARRATION ONLY IF THE RESOLUTION ACTUALLY RAN. If the orchestrator failed
                          * internally (its own catch — already logged), the halt above stands (§6.9.2: the
                          * move is over on the trigger hex) but no event, dispatch or sound fires — a fight
@@ -1029,11 +1020,6 @@ namespace HammerAndSickle.Controllers
 
                         // A helicopter that held is still flying — do NOT break; the move continues.
                         if (!isAir) break;
-                    }
-                    else if (AMBUSH_DEBUG)
-                    {
-                        // Diagnostic: name why any adjacent enemy did NOT spring on this hex (see the flag's note).
-                        DebugLogAmbushScan(CurrentUnit, targetPos, enemiesEngagedThisMove);
                     }
                 }
 
@@ -1447,44 +1433,19 @@ namespace HammerAndSickle.Controllers
         }
 
         /* ─────────────────────────────────────────────────────────────────────────────────────────
-         * ⚠ DIAGNOSTIC PASS 2026-08-11 — flip false (or delete) once §6.9 ambush is CONFIRMED IN PLAY.
-         * A play-test cannot tell a WHIFFED ambush (natural 0 on the band roll = a miss, a legitimate
-         * §7.6 outcome — the halt still costs the whole turn) from a swallowed resolution failure, and
-         * cannot tell "no ambush" from "ambush skipped by a filter". These logs name the case exactly.
-         * Filter the Console on [AMBUSH DEBUG].
+         * ⚠ THE §6.9 AMBUSH DIAGNOSTIC WAS RETIRED 2026-08-12. `AMBUSH_DEBUG` and `DebugLogAmbushScan`
+         * existed for one job: a play-test cannot tell a WHIFFED ambush (a natural 0 on the band roll is a
+         * legitimate §7.6 miss, and the halt still costs the whole turn) from a swallowed resolution
+         * failure, nor "no ambush" from "ambush skipped by a filter". Ambush has now been confirmed in play
+         * twice — 2026-08-11 (fires, including through an unspotted unit's ZoC; Hold deals real damage;
+         * devastating hits rout 2 hexes per §6.8.1) and again across the 2026-08-12 sessions — so the
+         * question it answered is settled and the Console lines are pure noise.
+         *
+         * ⚠ IF §6.9 EVER NEEDS RE-DIAGNOSING, RESTORE IT FROM GIT rather than writing a new one: the value
+         * was that it mirrored `SpottingService.CheckGroundAmbush`'s filters IN THE SAME ORDER, and a
+         * freshly-written scan that drifts from those filters reports confident nonsense. It is in the
+         * history at 8a32a80.
          * ───────────────────────────────────────────────────────────────────────────────────────── */
-        private static readonly bool AMBUSH_DEBUG = true;
-
-        /// <summary>
-        /// Diagnostic (see the flag above): for the hex just entered, names WHY each adjacent enemy did
-        /// not spring an ambush — mirrors <see cref="SpottingService.CheckGroundAmbush"/>'s filters in
-        /// the same order. Silent when no enemy is adjacent.
-        /// </summary>
-        private static void DebugLogAmbushScan(CombatUnit mover, Position2D enteredHex, ISet<string> alreadySprung)
-        {
-            var gdm = GameDataManager.Instance;
-            if (gdm == null) return;
-
-            foreach (var neighborPos in HexMapUtil.GetAllNeighborPositions(enteredHex))
-            {
-                var ground = gdm.GetGroundUnitAtHex(neighborPos);
-                if (ground == null || ground.Side == mover.Side) continue;
-
-                string reason =
-                    ground.SpottedLevel != SpottedLevel.Level0
-                        ? $"already spotted ({ground.SpottedLevel}) — a Level0-at-adjacency miss here would be the old disarm bug"
-                    : !ground.ProjectsZoC
-                        ? "projects no ZoC (embarked or base)"
-                    : !GameData.IsAmbushEligible(ground.Classification)
-                        ? $"ineligible class per §6.9.9 ({ground.Classification})"
-                    : alreadySprung.Contains(ground.UnitID)
-                        ? "already sprang this move (anti-dogpile §11.8.6)"
-                        : "NO FILTER MATCHES — CheckGroundAmbush disagrees with this scan; investigate";
-
-                Debug.Log($"[AMBUSH DEBUG] {ground.UnitName} ({ground.Classification}) at {neighborPos}, " +
-                          $"adjacent to {mover.UnitName} entering {enteredHex}, did NOT spring: {reason}");
-            }
-        }
 
         /// <summary>
         /// Applies the objective-capture consequences of a move's territory changes (§17.5.3 / §18.2.1).
