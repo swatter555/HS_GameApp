@@ -960,6 +960,38 @@ namespace HammerAndSickle.Core.GameData
 
         #endregion // Western Units
 
+        #region Lowlands Units
+
+        // NATO's northern-sector contingents: Netherlands (NE), Belgium (BE), Denmark (DE).
+        // ⚠ Nationality.DE is DENMARK — West Germany is FRG. The _DK suffix here is deliberate:
+        // it names the COUNTRY the kit belongs to, so a Danish token can never be misread as German.
+        //
+        // ⚠ ONLY SEVEN TOKENS, AND THE RULE IS WHY (Bob, 2026-08-12). A census is a property of the
+        // WEAPON PROFILE, not of the unit template — so a nation gets its own profile exactly where
+        // that profile's census IS its brigade roster, and shares everything else. The armoured and
+        // mechanised brigades are those two places. Dutch/Belgian/Danish artillery, recon, air defence
+        // and air units deliberately reuse ART_HEAVY_WEST / RCN_FV105_UK / SAM_HAWK_US / FGT_F16_US:
+        // minting a token per nation per role would have added twelve more names the scenario editor
+        // must mirror forever, to differentiate rosters nobody reads apart.
+
+        // MBT — all Leopard 1 variants, all Gen2 archetype at Gen1 prestige (matches LEO1_GE).
+        TANK_LEOPARD1_NL,
+        TANK_LEOPARD1_BE,
+        TANK_LEOPARD1_DK,
+
+        // Personnel — the deployed half of each nation's mechanised brigade.
+        INF_REG_NL,
+        INF_REG_BE,
+        INF_REG_DK,
+
+        // Shared Lowlands carrier. ⚠ The SEVENTH token exists because APC_M113_US CANNOT be reused:
+        // its census carries 58 M1 Abrams, 32 Bradleys and 18 M3s (a US armoured brigade roster, the
+        // same bays-sum artefact as MARDER_GE/WARRIOR_UK), so mounting a Dutch brigade on it would
+        // report 58 Abrams in Dutch service. This one lists only the carrier's own vehicles.
+        APC_M113_NATO,
+
+        #endregion // Lowlands Units
+
         #region Arab Units
 
         // MBT

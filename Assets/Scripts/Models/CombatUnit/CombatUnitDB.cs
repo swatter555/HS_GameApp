@@ -260,6 +260,11 @@ namespace HammerAndSickle.Models
                 CreateBritishForces();
                 CreateFrenchForces();
 
+                // Create Lowlands Forces (NORTHAG's northern-sector contingents)
+                CreateDutchForces();
+                CreateBelgianForces();
+                CreateDanishForces();
+
                 // Create Arab Forces
                 CreateArabForces();
 
@@ -3771,6 +3776,436 @@ namespace HammerAndSickle.Models
         }
 
         #endregion // Western Units
+
+        //-------------------------------------------------------------------------------------------------
+
+        #region Lowlands Units
+
+        /// <summary>
+        /// Create Netherlands forces - 1 (NL) Corps, NORTHAG's northern sector.
+        /// </summary>
+        /// <remarks>
+        /// ⚠ NATIONALITY IS THE ONLY PLACE THE NATION LIVES ON A TEMPLATE. Every profile below is
+        /// either a Lowlands profile (Leopard 1, infantry, M113 carrier) or a shared Western one
+        /// (ART_HEAVY_WEST, RCN_FV105_UK, SAM_HAWK_US, FGT_F16_US) — see CreateLowlandsProfiles for
+        /// why only seven tokens were minted. The flag, national symbol and NATO-blue icon base all
+        /// resolve from Nationality.NE, so these read as Dutch on the map regardless.
+        /// </remarks>
+        public static void CreateDutchForces()
+        {
+            #region NL Armoured Brigade (Leopard 1)
+
+            var nl_armoured_brigade = new CombatUnit(
+                unitName: "NL Armoured Brigade (Leopard 1)",
+                classification: UnitClassification.TANK,
+                role: UnitRole.GroundCombat,
+                side: Side.AI,
+                nationality: Nationality.NE,
+                deployedProfile: WeaponType.TANK_LEOPARD1_NL,
+                mobileProfile: WeaponType.NONE,
+                embarkedProfile: WeaponType.NONE,
+                category: DepotCategory.Secondary,
+                size: DepotSize.Small
+            );
+
+            // Set experience level
+            nl_armoured_brigade.SetExperienceLevel(ExperienceLevel.Experienced);
+
+            // Add the template to the database
+            AddTemplate("NL_ARMOURED_BRIGADE", nl_armoured_brigade);
+
+            #endregion // NL Armoured Brigade
+
+            #region NL Armoured Infantry Brigade (YPR-765)
+
+            var nl_armoured_infantry_brigade = new CombatUnit(
+                unitName: "NL Armoured Infantry Brigade (YPR-765)",
+                classification: UnitClassification.MECH,
+                role: UnitRole.GroundCombat,
+                side: Side.AI,
+                nationality: Nationality.NE,
+                deployedProfile: WeaponType.INF_REG_NL,
+                mobileProfile: WeaponType.APC_M113_NATO,
+                embarkedProfile: WeaponType.NONE,
+                category: DepotCategory.Secondary,
+                size: DepotSize.Small
+            );
+
+            // Set experience level
+            nl_armoured_infantry_brigade.SetExperienceLevel(ExperienceLevel.Experienced);
+
+            // Add the template to the database
+            AddTemplate("NL_ARMOURED_INFANTRY_BRIGADE", nl_armoured_infantry_brigade);
+
+            #endregion // NL Armoured Infantry Brigade
+
+            #region NL Artillery Regiment
+
+            var nl_artillery_regiment = new CombatUnit(
+                unitName: "NL Artillery Regiment",
+                classification: UnitClassification.ART,
+                role: UnitRole.GroundCombatIndirect,
+                side: Side.AI,
+                nationality: Nationality.NE,
+                deployedProfile: WeaponType.ART_HEAVY_WEST,
+                mobileProfile: WeaponType.TRK_WEST,
+                embarkedProfile: WeaponType.NONE,
+                category: DepotCategory.Secondary,
+                size: DepotSize.Small
+            );
+
+            // Set experience level
+            nl_artillery_regiment.SetExperienceLevel(ExperienceLevel.Experienced);
+
+            // Add the template to the database
+            AddTemplate("NL_ARTILLERY_REGIMENT", nl_artillery_regiment);
+
+            #endregion // NL Artillery Regiment
+
+            #region NL Recon Unit
+
+            var nl_recon_unit = new CombatUnit(
+                unitName: "NL Recon Unit",
+                classification: UnitClassification.RECON,
+                role: UnitRole.GroundCombat,
+                side: Side.AI,
+                nationality: Nationality.NE,
+                deployedProfile: WeaponType.RCN_FV105_UK,
+                mobileProfile: WeaponType.NONE,
+                embarkedProfile: WeaponType.NONE,
+                category: DepotCategory.Secondary,
+                size: DepotSize.Small
+            );
+
+            // Set experience level
+            nl_recon_unit.SetExperienceLevel(ExperienceLevel.Experienced);
+
+            // Add the template to the database
+            AddTemplate("NL_RECON_UNIT", nl_recon_unit);
+
+            #endregion // NL Recon Unit
+
+            #region NL Air Defence Regiment (Cheetah)
+
+            // Reuses SPAAA_GEPARD_GE: the PRTL Cheetah is a Gepard turret on a Leopard 1 hull, so this
+            // is the same vehicle, and reusing it follows the SAM_HAWK_US precedent. Gepard's medium is
+            // Tracked, so the Mobile bay is closed by physics and mobileProfile is correctly NONE.
+            //
+            // ⚠ SPAAA IS LOAD-BEARING, NOT FLAVOUR. GameData.IsAirDefenseClassification admits
+            // SAM/SPSAM/AAA/SPAAA and nothing else, so this is what lets the Dutch sector put ranged
+            // §11.8 fire on a helicopter in transit. It also differs tactically from NL_HAWK_REGIMENT:
+            // Hawk is static (MMP → 0), a Gepard repositions.
+            var nl_air_defense_regiment = new CombatUnit(
+                unitName: "NL Air Defence Regiment (Cheetah)",
+                classification: UnitClassification.SPAAA,
+                role: UnitRole.AirDefenseArea,
+                side: Side.AI,
+                nationality: Nationality.NE,
+                deployedProfile: WeaponType.SPAAA_GEPARD_GE,
+                mobileProfile: WeaponType.NONE,
+                embarkedProfile: WeaponType.NONE,
+                category: DepotCategory.Secondary,
+                size: DepotSize.Small
+            );
+
+            // Set experience level
+            nl_air_defense_regiment.SetExperienceLevel(ExperienceLevel.Experienced);
+
+            // Add the template to the database
+            AddTemplate("NL_AIR_DEFENSE_REGIMENT", nl_air_defense_regiment);
+
+            #endregion // NL Air Defence Regiment
+
+            #region NL SAM Regiment (Hawk)
+
+            var nl_hawk_regiment = new CombatUnit(
+                unitName: "NL SAM Regiment (Hawk)",
+                classification: UnitClassification.SAM,
+                role: UnitRole.AirDefenseArea,
+                side: Side.AI,
+                nationality: Nationality.NE,
+                deployedProfile: WeaponType.SAM_HAWK_US,
+                mobileProfile: WeaponType.TRK_WEST,
+                embarkedProfile: WeaponType.NONE,
+                category: DepotCategory.Secondary,
+                size: DepotSize.Small
+            );
+
+            // Set experience level
+            nl_hawk_regiment.SetExperienceLevel(ExperienceLevel.Experienced);
+
+            // Add the template to the database
+            AddTemplate("NL_HAWK_REGIMENT", nl_hawk_regiment);
+
+            #endregion // NL SAM Regiment
+
+            #region NL F-16 Fighter Squadron
+
+            // ⚠ INERT UNTIL M13/AOB. There is no AOB entity, no air phase and no fixed-wing staging,
+            // so this template can be placed but not flown. Authored now because it costs nothing and
+            // the North German Plain map wants Dutch air on the OOB when air missions land.
+            var nl_f16_squadron = new CombatUnit(
+                unitName: "NL F-16 Fighter Squadron",
+                classification: UnitClassification.FGT,
+                role: UnitRole.AirSuperiority,
+                side: Side.AI,
+                nationality: Nationality.NE,
+                deployedProfile: WeaponType.FGT_F16_US,
+                mobileProfile: WeaponType.NONE,
+                embarkedProfile: WeaponType.NONE,
+                category: DepotCategory.Secondary,
+                size: DepotSize.Small
+            );
+
+            // Set experience level
+            nl_f16_squadron.SetExperienceLevel(ExperienceLevel.Experienced);
+
+            // Add the template to the database
+            AddTemplate("NL_F16_FIGHTER_SQUADRON", nl_f16_squadron);
+
+            #endregion // NL F-16 Fighter Squadron
+        }
+
+        /// <summary>
+        /// Create Belgium forces - I (BE) Corps, NORTHAG's southern sector.
+        /// </summary>
+        /// <remarks>
+        /// Templates are ExperienceLevel.Trained rather than Experienced (Bob's ruling, 2026-08-12):
+        /// I (BE) Corps had the lowest readiness in NORTHAG, with much of the force garrisoned in
+        /// Belgium rather than forward-deployed.
+        /// </remarks>
+        public static void CreateBelgianForces()
+        {
+            #region BE Armoured Brigade (Leopard 1)
+
+            var be_armoured_brigade = new CombatUnit(
+                unitName: "BE Armoured Brigade (Leopard 1)",
+                classification: UnitClassification.TANK,
+                role: UnitRole.GroundCombat,
+                side: Side.AI,
+                nationality: Nationality.BE,
+                deployedProfile: WeaponType.TANK_LEOPARD1_BE,
+                mobileProfile: WeaponType.NONE,
+                embarkedProfile: WeaponType.NONE,
+                category: DepotCategory.Secondary,
+                size: DepotSize.Small
+            );
+
+            // Set experience level
+            be_armoured_brigade.SetExperienceLevel(ExperienceLevel.Trained);
+
+            // Add the template to the database
+            AddTemplate("BE_ARMOURED_BRIGADE", be_armoured_brigade);
+
+            #endregion // BE Armoured Brigade
+
+            #region BE Mechanised Infantry Brigade (AIFV)
+
+            var be_mech_infantry_brigade = new CombatUnit(
+                unitName: "BE Mechanised Infantry Brigade (AIFV)",
+                classification: UnitClassification.MECH,
+                role: UnitRole.GroundCombat,
+                side: Side.AI,
+                nationality: Nationality.BE,
+                deployedProfile: WeaponType.INF_REG_BE,
+                mobileProfile: WeaponType.APC_M113_NATO,
+                embarkedProfile: WeaponType.NONE,
+                category: DepotCategory.Secondary,
+                size: DepotSize.Small
+            );
+
+            // Set experience level
+            be_mech_infantry_brigade.SetExperienceLevel(ExperienceLevel.Trained);
+
+            // Add the template to the database
+            AddTemplate("BE_MECH_INFANTRY_BRIGADE", be_mech_infantry_brigade);
+
+            #endregion // BE Mechanised Infantry Brigade
+
+            #region BE Artillery Regiment
+
+            var be_artillery_regiment = new CombatUnit(
+                unitName: "BE Artillery Regiment",
+                classification: UnitClassification.ART,
+                role: UnitRole.GroundCombatIndirect,
+                side: Side.AI,
+                nationality: Nationality.BE,
+                deployedProfile: WeaponType.ART_HEAVY_WEST,
+                mobileProfile: WeaponType.TRK_WEST,
+                embarkedProfile: WeaponType.NONE,
+                category: DepotCategory.Secondary,
+                size: DepotSize.Small
+            );
+
+            // Set experience level
+            be_artillery_regiment.SetExperienceLevel(ExperienceLevel.Trained);
+
+            // Add the template to the database
+            AddTemplate("BE_ARTILLERY_REGIMENT", be_artillery_regiment);
+
+            #endregion // BE Artillery Regiment
+
+            #region BE Recon Unit
+
+            var be_recon_unit = new CombatUnit(
+                unitName: "BE Recon Unit (Scimitar)",
+                classification: UnitClassification.RECON,
+                role: UnitRole.GroundCombat,
+                side: Side.AI,
+                nationality: Nationality.BE,
+                deployedProfile: WeaponType.RCN_FV105_UK,
+                mobileProfile: WeaponType.NONE,
+                embarkedProfile: WeaponType.NONE,
+                category: DepotCategory.Secondary,
+                size: DepotSize.Small
+            );
+
+            // Set experience level
+            be_recon_unit.SetExperienceLevel(ExperienceLevel.Trained);
+
+            // Add the template to the database
+            AddTemplate("BE_RECON_UNIT", be_recon_unit);
+
+            #endregion // BE Recon Unit
+
+            #region BE Air Defence Regiment (Gepard)
+
+            // Belgium operated the Gepard directly. This is the ONLY ranged air defence in the Belgian
+            // sector — see the note on NL_AIR_DEFENSE_REGIMENT for why the classification matters.
+            //
+            // ⚠ WITH BELGIUM COVERED, DENMARK IS THE ONLY UNCOVERED SECTOR, and that is the intent
+            // (Bob's no-organic-AD ruling for the Danes, 2026-08-12) — the asymmetry is sharper when
+            // it is the exception rather than two thirds of the front.
+            var be_air_defense_regiment = new CombatUnit(
+                unitName: "BE Air Defence Regiment (Gepard)",
+                classification: UnitClassification.SPAAA,
+                role: UnitRole.AirDefenseArea,
+                side: Side.AI,
+                nationality: Nationality.BE,
+                deployedProfile: WeaponType.SPAAA_GEPARD_GE,
+                mobileProfile: WeaponType.NONE,
+                embarkedProfile: WeaponType.NONE,
+                category: DepotCategory.Secondary,
+                size: DepotSize.Small
+            );
+
+            // Set experience level
+            be_air_defense_regiment.SetExperienceLevel(ExperienceLevel.Trained);
+
+            // Add the template to the database
+            AddTemplate("BE_AIR_DEFENSE_REGIMENT", be_air_defense_regiment);
+
+            #endregion // BE Air Defence Regiment
+        }
+
+        /// <summary>
+        /// Create Denmark forces - Jutland Division / LANDJUT, covering the Baltic approaches.
+        /// </summary>
+        /// <remarks>
+        /// ⚠ NATIONALITY.DE IS DENMARK. West Germany is Nationality.FRG. The collision with the ISO
+        /// code for Germany is the single most likely authoring mistake in this file — every
+        /// Nationality.DE below is deliberate and Danish.
+        ///
+        /// ⚠ NO ORGANIC AIR DEFENCE, BY DESIGN (Bob's ruling, 2026-08-12). Danish divisional AD was
+        /// towed Bofors and Hawk, and leaving it out makes the Danish sector the one that needs
+        /// covering — a gameplay asymmetry for the North German Plain map, not an omission.
+        /// </remarks>
+        public static void CreateDanishForces()
+        {
+            #region DK Armoured Brigade (Leopard 1)
+
+            var dk_armoured_brigade = new CombatUnit(
+                unitName: "DK Armoured Brigade (Leopard 1)",
+                classification: UnitClassification.TANK,
+                role: UnitRole.GroundCombat,
+                side: Side.AI,
+                nationality: Nationality.DE,
+                deployedProfile: WeaponType.TANK_LEOPARD1_DK,
+                mobileProfile: WeaponType.NONE,
+                embarkedProfile: WeaponType.NONE,
+                category: DepotCategory.Secondary,
+                size: DepotSize.Small
+            );
+
+            // Set experience level
+            dk_armoured_brigade.SetExperienceLevel(ExperienceLevel.Experienced);
+
+            // Add the template to the database
+            AddTemplate("DK_ARMOURED_BRIGADE", dk_armoured_brigade);
+
+            #endregion // DK Armoured Brigade
+
+            #region DK Mechanised Infantry Brigade (M113)
+
+            var dk_mech_infantry_brigade = new CombatUnit(
+                unitName: "DK Mechanised Infantry Brigade (M113)",
+                classification: UnitClassification.MECH,
+                role: UnitRole.GroundCombat,
+                side: Side.AI,
+                nationality: Nationality.DE,
+                deployedProfile: WeaponType.INF_REG_DK,
+                mobileProfile: WeaponType.APC_M113_NATO,
+                embarkedProfile: WeaponType.NONE,
+                category: DepotCategory.Secondary,
+                size: DepotSize.Small
+            );
+
+            // Set experience level
+            dk_mech_infantry_brigade.SetExperienceLevel(ExperienceLevel.Experienced);
+
+            // Add the template to the database
+            AddTemplate("DK_MECH_INFANTRY_BRIGADE", dk_mech_infantry_brigade);
+
+            #endregion // DK Mechanised Infantry Brigade
+
+            #region DK Artillery Regiment
+
+            var dk_artillery_regiment = new CombatUnit(
+                unitName: "DK Artillery Regiment",
+                classification: UnitClassification.ART,
+                role: UnitRole.GroundCombatIndirect,
+                side: Side.AI,
+                nationality: Nationality.DE,
+                deployedProfile: WeaponType.ART_HEAVY_WEST,
+                mobileProfile: WeaponType.TRK_WEST,
+                embarkedProfile: WeaponType.NONE,
+                category: DepotCategory.Secondary,
+                size: DepotSize.Small
+            );
+
+            // Set experience level
+            dk_artillery_regiment.SetExperienceLevel(ExperienceLevel.Experienced);
+
+            // Add the template to the database
+            AddTemplate("DK_ARTILLERY_REGIMENT", dk_artillery_regiment);
+
+            #endregion // DK Artillery Regiment
+
+            #region DK Recon Unit
+
+            var dk_recon_unit = new CombatUnit(
+                unitName: "DK Recon Unit",
+                classification: UnitClassification.RECON,
+                role: UnitRole.GroundCombat,
+                side: Side.AI,
+                nationality: Nationality.DE,
+                deployedProfile: WeaponType.RCN_FV105_UK,
+                mobileProfile: WeaponType.NONE,
+                embarkedProfile: WeaponType.NONE,
+                category: DepotCategory.Secondary,
+                size: DepotSize.Small
+            );
+
+            // Set experience level
+            dk_recon_unit.SetExperienceLevel(ExperienceLevel.Experienced);
+
+            // Add the template to the database
+            AddTemplate("DK_RECON_UNIT", dk_recon_unit);
+
+            #endregion // DK Recon Unit
+        }
+
+        #endregion // Lowlands Units
 
         //-------------------------------------------------------------------------------------------------
 

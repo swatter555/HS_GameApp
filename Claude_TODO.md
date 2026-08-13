@@ -186,6 +186,12 @@ its own list is his. Never started; still worth doing.
 
 ### BOB'S QUEUE (nobody else can do these)
 
+- [x] **Map-standard TESTS — added 2026-08-12** (`MapStandardTests`, 14 tests). Pins the branches that do
+      NOT run when Khost loads and so could not be caught by play: `ResolveMapDimensions`'s legacy fallback
+      and all four refusal cases (incl. `None`-with-no-dims, the save-writer gap), `IsValid`'s
+      mixed/undersized gate, `HexMap`'s bounds past the old 32-column ceiling, and
+      `ScenarioManifest.GetMapDimensions` returning zero instead of assuming 32x21.
+- [x] **`AMBUSH_DEBUG` retired 2026-08-12** — flag + `DebugLogAmbushScan` deleted; §6.9 confirmed in play.
 - [x] **Courier: the map-standard exchange — DONE.** Editor agent endorsed the response in full
       (`Reply_MapStandard_2026-08-12.md`) and adjusted their side. **The pass itself is BUILT 2026-08-12**
       (G1/G3/G5/G6/G7; G2 skipped by their own downgrade). ⚑ Suite run owed.
@@ -193,6 +199,30 @@ its own list is his. Never started; still worth doing.
       stated trigger to start writing `mapConfiguration: None` (they explicitly keep writing Small/Large
       until then so current builds keep loading fresh exports). Their E3 phase (manifest authoring with
       `mapWidth`/`mapHeight` + cross-stamp) is gated on the same signal.
+
+- [ ] **RELAY THE FINAL LOWLANDS WEAPONTYPE NAMES to the Scenario Editor agent (2026-08-12).** They
+      mirror `WeaponType` in their `ENUM_NAMES` tables and fail loudly on an unknown name at load.
+      **The list is SEVEN, not the eighteen their spec proposed:** `TANK_LEOPARD1_NL`,
+      `TANK_LEOPARD1_BE`, `TANK_LEOPARD1_DK`, `INF_REG_NL`, `INF_REG_BE`, `INF_REG_DK`,
+      `APC_M113_NATO`. Plus sixteen template IDs: `NL_ARMOURED_BRIGADE`,
+      `NL_ARMOURED_INFANTRY_BRIGADE`, `NL_ARTILLERY_REGIMENT`, `NL_RECON_UNIT`,
+      `NL_AIR_DEFENSE_REGIMENT`, `NL_HAWK_REGIMENT`, `NL_F16_FIGHTER_SQUADRON`,
+      `BE_ARMOURED_BRIGADE`, `BE_MECH_INFANTRY_BRIGADE`, `BE_ARTILLERY_REGIMENT`, `BE_RECON_UNIT`,
+      `BE_AIR_DEFENSE_REGIMENT`, `DK_ARMOURED_BRIGADE`, `DK_MECH_INFANTRY_BRIGADE`,
+      `DK_ARTILLERY_REGIMENT`, `DK_RECON_UNIT`.
+      ⚠ Worth telling them WHY the cut happened, since it changes how they should read their own
+      spec: **a census belongs to a PROFILE, not to a template**, so a nation earns its own profile
+      only where that census is its brigade roster. Artillery, recon, air defence and air units for
+      all three nations reuse existing Western profiles. Their §5 Gulf framework is unaffected.
+
+- [ ] **§7.2 CARRIER CENSUSES — RULED, and the ruling is LEAVE THEM (Bob, 2026-08-12).** `MARDER_GE`
+      carries 58 Leopard 1s and `WARRIOR_UK` 58 Challengers, which bays-summing folds into the German
+      and British MECH brigades. Kept deliberately: NATO is permanently AI, so no player ever
+      requisitions into those bays and the upgrade hazard that made it a defect cannot arise — and a
+      Panzergrenadier brigade with an organic tank battalion is good doctrine. ⚠ **Revisit ONLY if
+      NATO ever becomes player-controllable.** Recorded here so the next audit does not re-open it.
+      ⚠ **`APC_M113_US` is the same shape and was NOT fixed either** (58 M1, 32 M2, 18 M3) — it is
+      why the Lowlands got their own `APC_M113_NATO` carrier rather than reusing it.
 
 - [ ] **BUILD VERSIONING (Bob, 2026-08-08): start versioning game builds, beginning with the
       P1 build.** Bob-side: pick a scheme (proposal: `0.<pass>.<hotfix>` pre-1.0) and set it in
@@ -960,6 +990,10 @@ suppressed). Panel model settled at three always-open panels (§3.6c/§4.3) afte
 say *what* changed, not *why* (rationale lives in the design doc / gap analysis) · if it needs more
 than one line, it belongs elsewhere.
 
+- 2026-08-13 — Add `NL_AIR_DEFENSE_REGIMENT` + `BE_AIR_DEFENSE_REGIMENT` (SPAAA / AirDefenseArea), both reusing the existing `SPAAA_GEPARD_GE` — the PRTL Cheetah is a Gepard turret on a Leopard 1 hull, so this is the `SAM_HAWK_US` precedent applied again, and it costs ZERO new tokens. ⚠ NOT flavour: `GameData.IsAirDefenseClassification` admits SAM/SPSAM/AAA/SPAAA only, so before this exactly ONE of the 14 Lowlands templates could put ranged §11.8 fire on a helicopter and the Belgian sector had none at all — and D2 transit air defence is the one air mechanic play-confirmed to work. Also differs tactically from Hawk, which is static (MMP → 0). Denmark still has none, deliberately, and is now the ONLY uncovered sector. ⚠ Per-nation SPA/RCN/SPAAA profiles were considered and REFUSED: the enemy intel view merges `ART+ROC → "guns"` and `SAM+AAA+AT → "AA"` (`EquipmentBays.cs:80-81`) and the split view is friendly-only, so for permanently-AI units those profiles would differentiate rosters the player can never see apart (CombatUnitDB)
+- 2026-08-13 — ✅ LOWLANDS UNIT-DB EXPANSION GREEN (Bob ran the suite). Add NATO's northern-sector contingents: 7 `WeaponType`s, 7 profiles in a new `CreateLowlandsProfiles()`, 16 templates across `CreateDutchForces`/`CreateBelgianForces`/`CreateDanishForces`. ⚠ SEVEN tokens, not the 18 the scenario editor's spec proposed, on the rule that a CENSUS BELONGS TO A PROFILE, NOT A TEMPLATE — so a nation earns its own profile only where that census is its brigade roster (armoured + mechanised), and artillery/recon/AD/air reuse `ART_HEAVY_WEST`/`RCN_FV105_UK`/`SAM_HAWK_US`/`FGT_F16_US`. All three Leopard 1s resolve to a stat line identical to `LEO1_GE`; national character lives in the census, the template ExperienceLevel and the icon's nationality. Denmark has no organic AD (Bob's ruling — makes the Danish sector the one needing cover); NL/DK Experienced, BE Trained. `NL_F16_FIGHTER_SQUADRON` is inert until M13/AOB. `APC_M113_NATO` was minted rather than reusing `APC_M113_US`, whose census carries 58 M1s/32 M2s/18 M3s. Also fixed `Symbol_Kuwait` `"KQ_Symbol"` → `"KW_Symbol"` (asset is `KW_Symbol.png`) and added `Nationality.KW` to both Arabic name arms in `NameGenService` (Claude_TODO, GameData, WeaponProfileDB, CombatUnitDB, SpriteManager, NameGenService)
+- 2026-08-13 — Add `CensusIntegrityTests` (2 tests, the first thing under Assets/Tests ever to reference `IntelReportStats`): every registered profile declares a non-empty census (allow-list `TRK_GEN_SV`/`TRK_GEN_ARAB`/`TRK_WEST`/`TRN_NAVAL`, which are equipment-less by design), and every census token classifies to a non-`None` bucket. ⚠ IT FOUND A REAL BUG ON ITS FIRST RUN: the Humvee's four `AddIntelReportStat` calls were written against `M113_US`, the variable from the block above. Two victims — `APC_HUMVEE_US` had no census at all (and it is the MOBILE bay of `US_AIRBORNE_BRIGADE` and `US_AIRMOBILE_BRIGADE`, so both contributed nothing from that bay to intel or loss reports), and because `AddIntelReportStat` ASSIGNS rather than accumulates, the stray lines rewrote the M113's census — spurious 58 M60s and 108 Humvees, own M113 count knocked 108 → 32 (latent: no template uses `APC_M113_US`). Fixed by retargeting the variable AND trimming the census to carrier-only; restoring it verbatim would have given two AIRBORNE brigades a 58-tank Patton battalion (WeaponProfileDB, CensusIntegrityTests)
+- 2026-08-13 — RULE on §7.2 carrier censuses: LEAVE `MARDER_GE` (58 Leopard 1s) and `WARRIOR_UK` (58 Challengers) as they are (Bob). NATO is permanently AI, so no player ever requisitions into those bays and the upgrade hazard that made it a defect cannot arise; a Panzergrenadier brigade with an organic tank battalion is good doctrine. `APC_M113_US` is the same shape and also untouched. ⚠ Revisit ONLY if NATO becomes player-controllable — recorded so the next audit does not re-open it (Claude_TODO)
 - 2026-08-04 — RATIFY the profile-slot rule (Claude_Project §3.2b): a regiment has three EQUIPMENT BAYS, not three loadouts. An empty bay is NORMAL — slots are Panzer-General-style upgrade targets the player buys into, so `mobileProfile: NONE` means "not purchased yet". Flags (`isMountable`/`isEmbarkable`/`profileType`) declare CAPABILITY; the WeaponType in a slot declares CONTENTS; runtime behaviour keys on CONTENTS, never flags — which is exactly what makes the upgrade path work with no special cases. `isEmbarkable: true` on nearly every ground unit is CORRECT (all ground units are naval-transportable, §5.4.2) and 35 templates were nearly "fixed" on that misreading. One hard invariant: a `TransportCategory != None` profile may occupy ONLY the Embarked bay. Also recorded: `CombatUnitDB` is the source of truth and a `.oob` is a SNAPSHOT — fixing a template does not fix an already-exported scenario (Claude_Project §3.2b)
 - 2026-08-04 — Phase 3b M3: teach the deployment state machine about airborne-only regiments. Add `RegimentProfileType.DEP_EMB_HELO`/`DEP_EMB_AIR` — their absence was the root cause, since "foot infantry whose only transport is airborne" was unrepresentable and the Mi-8 got authored into the Spetsnaz MOBILE slot, where the unit rode helicopters as its GROUND posture. Replace TryDeployUP's hardcoded override (AB/MAB by classification plus SPECF only when its embarked profile was literally TRN_AN8_SV) with the general rule: at Deployed, no ground-mobile profile but an embarked one, aim at Embarked. That also repaired the VDV Support Regiment, classified TANK, which matched neither hardcoded arm and could never board its own aircraft. Movement points now RESCALE across a posture change instead of carrying the absolute figure — a foot regiment with 2 of 4 points used to board helicopters and fly two hexes. Guard added in two places: a RegimentProfile warning at init and a MovementMediumTests assertion over every template. Fixed both khost .oob files by hand as a stopgap pending re-export (todo_audio M3)
 - 2026-08-04 — Phase 3b M1+M2: add `MovementMedium` (the fact the project never recorded — nothing distinguished an MT-LB from a BTR-70: same prefix, archetype, trait, upgrade path, MMP and equipment bucket) and `MovementModeService`, the single authority on how a regiment is moving right now. Family archetypes carry the medium where unanimous; FIVE mixed families carry none and state it per profile across 63 profiles. ⚠ M2 caught M1 shipping a silent-wrong default: Artillery/Aaa/Sam had `Foot`, true of the towed baseline they are named for, which made all 31 self-propelled guns sound like walking infantry — and the coverage test could not catch it because those profiles HAD a medium, just the wrong one. That is the argument for `None` over a plausible default, demonstrated within a day. Movement sound rebuilt on the active profile; the classification switch and the day-old "dismounted" patch both deleted; long-cut threshold now measures the real clip instead of a constant (todo_audio M1/M2)

@@ -995,7 +995,7 @@ namespace HammerAndSickle.Controllers
         public const string Symbol_GE      = "GE_Symbol";
         public const string Symbol_Iran    = "IR_Symbol";
         public const string Symbol_Iraq    = "IQ_Symbol";
-        public const string Symbol_Kuwait  = "KQ_Symbol";
+        public const string Symbol_Kuwait  = "KW_Symbol";
         public const string Symbol_MJ      = "MJ_Symbol";
         public const string Symbol_NE      = "NE_Symbol";
         public const string Symbol_Saudi   = "SA_Symbol";

@@ -196,6 +196,7 @@ namespace HammerAndSickle.Models
                 CreateSovietProfiles();
                 CreateGenericProfiles();
                 CreateWesternProfiles();
+                CreateLowlandsProfiles();
                 CreateArabProfiles();
                 CreateChineseProfiles();
             }
@@ -3387,10 +3388,22 @@ namespace HammerAndSickle.Models
             HUMVEE_US.SetPrestigeCost(PrestigeTierCost.Gen2, PrestigeTypeCost.APC);
 
             // Add intel report stats
-            M113_US.AddIntelReportStat(WeaponType.TANK_M60_US, 58);
-            M113_US.AddIntelReportStat(WeaponType.APC_HUMVEE_US, 108);
-            M113_US.AddIntelReportStat(WeaponType.RCN_M3_US, 18);
-            M113_US.AddIntelReportStat(WeaponType.APC_M113_US, 32);
+            // ⚠ FIXED 2026-08-13: these four lines were written against M113_US, not HUMVEE_US — a
+            // copy-paste slip with TWO victims. The Humvee was left with no census at all (so a unit
+            // mounted on it died contributing nothing to the §24.8 loss report), AND because
+            // AddIntelReportStat ASSIGNS rather than accumulates, they leaked into the M113's census
+            // one block above: it gained a spurious 58 M60s and 108 Humvees, and its own M113 count
+            // was overwritten 108 → 32. Caught by CensusIntegrityTests on its first run.
+            //
+            // ⚠ AND THE CONTENT WAS TRIMMED, NOT JUST REDIRECTED. The original four lines were a
+            // standalone US brigade roster (58 M60s, 18 M3s, 32 M113s) of the same species as
+            // MARDER_GE/WARRIOR_UK — harmless while it sat on the wrong variable, but the Humvee is
+            // the MOBILE bay of US_AIRBORNE_BRIGADE and US_AIRMOBILE_BRIGADE, so restoring it
+            // verbatim would have handed two AIRBORNE brigades a Patton battalion. A carrier census
+            // lists the carrier's own vehicles and nothing else (Bob: author censuses for realism).
+            // ⚠ This is NOT a reversal of the "leave MARDER_GE/WARRIOR_UK alone" ruling — those are
+            // live shipped behaviour; this census has never once reached a report.
+            HUMVEE_US.AddIntelReportStat(WeaponType.APC_HUMVEE_US, 108);
 
             // Handle the icon profile.
             HUMVEE_US.IconProfile = new RegimentIconProfile(RegimentIconType.Directional)
@@ -5213,6 +5226,292 @@ namespace HammerAndSickle.Models
             AddProfile(WeaponType.INF_AB_FR, INF_AB_FR_P);
             //----------------------------------------------
             // French Airborne Infantry
+            //----------------------------------------------
+
+            #endregion // Infantry Units
+        }
+
+        /// <summary>
+        /// Add Lowlands WeaponProfiles (Netherlands, Belgium, Denmark).
+        /// </summary>
+        /// <remarks>
+        /// NORTHAG's northern-sector contingents. SEVEN profiles only, and the restraint is the design:
+        /// a census is a property of the PROFILE, never of the unit template, so a nation earns its own
+        /// profile exactly where that profile's census IS its brigade roster — the armoured brigade and
+        /// the mechanised brigade. Artillery, recon, air defence and air units for all three nations
+        /// reuse ART_HEAVY_WEST / RCN_FV105_UK / SAM_HAWK_US / FGT_F16_US rather than minting twelve
+        /// more names the scenario editor must mirror forever (Bob's call, 2026-08-12).
+        ///
+        /// All three Leopard 1s resolve to an IDENTICAL stat line — same archetype, deltas, traits and
+        /// price as LEO1_GE. That is deliberate: it is the same tank in four armies, and national
+        /// character lives in the census, the template ExperienceLevel and the map icon's nationality.
+        /// </remarks>
+        private static void CreateLowlandsProfiles()
+        {
+            #region MBTs
+
+            //----------------------------------------------
+            // NL Leopard 1 Main Battle Tank
+            //----------------------------------------------
+            // Gen2 + HA-1, HD-1, SA+1, MMP+2 + OPTICS_GEN2 + LASER_RANGEFINDER (matches LEO1_GE exactly).
+            // → HA9 HD7 SA8 SD6 GAD7 · ICM 1.10 · MMP12 · PR1 · SR3.
+            WeaponProfile LEO1_NL = WeaponProfile.FromProfileDef(
+                "Leopard 1 Main Battle Tank", "Leo 1", WeaponType.TANK_LEOPARD1_NL,
+                new ProfileDef(TankArchetypes.Gen2,
+                    new Dictionary<ProfileStat, int> { { ProfileStat.HA, -1 }, { ProfileStat.HD, -1 }, { ProfileStat.SA, 1 }, { ProfileStat.MMP, 2 } },
+                    new[] { WeaponTrait.OPTICS_GEN2, WeaponTrait.LASER_RANGEFINDER }),
+                UpgradePath.TANK, 372);
+
+            // Set the prestige cost for the profile.
+            // ⚠ Gen1 tier against a Gen2 archetype, matching LEO1_GE:3071 — so every Leopard 1 in the
+            // database costs the same. If that anomaly is ever corrected, correct all four together.
+            LEO1_NL.SetPrestigeCost(PrestigeTierCost.Gen1, PrestigeTypeCost.TANK);
+
+            // Intel stats: NL Armoured Brigade (1 (NL) Corps) - 2x tank bn + 1x armoured infantry bn
+            LEO1_NL.AddIntelReportStat(WeaponType.Personnel,          2000);
+            LEO1_NL.AddIntelReportStat(WeaponType.TANK_LEOPARD1_NL,     84);  // 2x tank BN (42 each)
+            LEO1_NL.AddIntelReportStat(WeaponType.APC_M113_NATO,        60);  // YPR-765 armoured infantry bn
+            LEO1_NL.AddIntelReportStat(WeaponType.RCN_FV105_UK,         12);  // Brigade recon squadron
+            LEO1_NL.AddIntelReportStat(WeaponType.AT_ATGM,              24);  // TOW/Dragon AT teams
+            LEO1_NL.AddIntelReportStat(WeaponType.MANPAD_STINGER,       18);  // Stinger sections
+            LEO1_NL.AddIntelReportStat(WeaponType.SPA_M109_US,          18);  // Organic 155mm SP battalion
+            LEO1_NL.AddIntelReportStat(WeaponType.ART_120MM_MORTAR,     12);  // 120mm mortars
+
+            // Handle the icon profile.
+            LEO1_NL.IconProfile = new RegimentIconProfile(RegimentIconType.Directional)
+            {
+                W = SpriteManager.GE_Leopard1_W,
+                NW = SpriteManager.GE_Leopard1_NW,
+                SW = SpriteManager.GE_Leopard1_SW
+            };
+
+            // Add the NL Leopard 1 profile to the database
+            AddProfile(WeaponType.TANK_LEOPARD1_NL, LEO1_NL);
+            //----------------------------------------------
+            // NL Leopard 1 Main Battle Tank
+            //----------------------------------------------
+
+            //----------------------------------------------
+            // BE Leopard 1A5 Main Battle Tank
+            //----------------------------------------------
+            // Identical line to LEO1_NL; Belgium fielded Leopard 1 from 1968.
+            WeaponProfile LEO1_BE = WeaponProfile.FromProfileDef(
+                "Leopard 1A5 Main Battle Tank", "Leo 1A5", WeaponType.TANK_LEOPARD1_BE,
+                new ProfileDef(TankArchetypes.Gen2,
+                    new Dictionary<ProfileStat, int> { { ProfileStat.HA, -1 }, { ProfileStat.HD, -1 }, { ProfileStat.SA, 1 }, { ProfileStat.MMP, 2 } },
+                    new[] { WeaponTrait.OPTICS_GEN2, WeaponTrait.LASER_RANGEFINDER }),
+                UpgradePath.TANK, 360);
+
+            // Set the prestige cost for the profile.
+            LEO1_BE.SetPrestigeCost(PrestigeTierCost.Gen1, PrestigeTypeCost.TANK);
+
+            // Intel stats: BE Armoured Brigade (I (BE) Corps, 16th Armoured Division)
+            LEO1_BE.AddIntelReportStat(WeaponType.Personnel,          1900);
+            LEO1_BE.AddIntelReportStat(WeaponType.TANK_LEOPARD1_BE,     72);  // 2x tank BN (36 each)
+            LEO1_BE.AddIntelReportStat(WeaponType.APC_M113_NATO,        55);  // AIFV armoured infantry bn
+            LEO1_BE.AddIntelReportStat(WeaponType.RCN_FV105_UK,         12);  // Scimitar recon squadron
+            LEO1_BE.AddIntelReportStat(WeaponType.AT_ATGM,              20);  // MILAN AT teams
+            LEO1_BE.AddIntelReportStat(WeaponType.MANPAD_MISTRAL,       16);  // Mistral/Blowpipe sections
+            LEO1_BE.AddIntelReportStat(WeaponType.SPA_M109_US,          18);  // Organic 155mm SP battalion
+            LEO1_BE.AddIntelReportStat(WeaponType.ART_120MM_MORTAR,     12);  // 120mm mortars
+
+            // Handle the icon profile.
+            LEO1_BE.IconProfile = new RegimentIconProfile(RegimentIconType.Directional)
+            {
+                W = SpriteManager.GE_Leopard1_W,
+                NW = SpriteManager.GE_Leopard1_NW,
+                SW = SpriteManager.GE_Leopard1_SW
+            };
+
+            // Add the BE Leopard 1 profile to the database
+            AddProfile(WeaponType.TANK_LEOPARD1_BE, LEO1_BE);
+            //----------------------------------------------
+            // BE Leopard 1A5 Main Battle Tank
+            //----------------------------------------------
+
+            //----------------------------------------------
+            // DK Leopard 1A3 Main Battle Tank
+            //----------------------------------------------
+            // Identical line again; Denmark took delivery from 1976. Lightest of the three brigades.
+            WeaponProfile LEO1_DK = WeaponProfile.FromProfileDef(
+                "Leopard 1A3 Main Battle Tank", "Leo 1A3", WeaponType.TANK_LEOPARD1_DK,
+                new ProfileDef(TankArchetypes.Gen2,
+                    new Dictionary<ProfileStat, int> { { ProfileStat.HA, -1 }, { ProfileStat.HD, -1 }, { ProfileStat.SA, 1 }, { ProfileStat.MMP, 2 } },
+                    new[] { WeaponTrait.OPTICS_GEN2, WeaponTrait.LASER_RANGEFINDER }),
+                UpgradePath.TANK, 456);
+
+            // Set the prestige cost for the profile.
+            LEO1_DK.SetPrestigeCost(PrestigeTierCost.Gen1, PrestigeTypeCost.TANK);
+
+            // Intel stats: DK Armoured Brigade (Jutland Division / LANDJUT) - materially lighter
+            LEO1_DK.AddIntelReportStat(WeaponType.Personnel,          1600);
+            LEO1_DK.AddIntelReportStat(WeaponType.TANK_LEOPARD1_DK,     60);  // 2x tank BN (30 each)
+            LEO1_DK.AddIntelReportStat(WeaponType.APC_M113_NATO,        48);  // M113 armoured infantry bn
+            LEO1_DK.AddIntelReportStat(WeaponType.RCN_FV105_UK,         10);  // Brigade recon troop
+            LEO1_DK.AddIntelReportStat(WeaponType.AT_ATGM,              24);  // TOW AT company
+            LEO1_DK.AddIntelReportStat(WeaponType.MANPAD_STINGER,       12);  // Stinger sections
+            LEO1_DK.AddIntelReportStat(WeaponType.SPA_M109_US,          12);  // Organic 155mm SP battery
+            LEO1_DK.AddIntelReportStat(WeaponType.ART_120MM_MORTAR,     12);  // 120mm mortars
+
+            // Handle the icon profile.
+            LEO1_DK.IconProfile = new RegimentIconProfile(RegimentIconType.Directional)
+            {
+                W = SpriteManager.GE_Leopard1_W,
+                NW = SpriteManager.GE_Leopard1_NW,
+                SW = SpriteManager.GE_Leopard1_SW
+            };
+
+            // Add the DK Leopard 1 profile to the database
+            AddProfile(WeaponType.TANK_LEOPARD1_DK, LEO1_DK);
+            //----------------------------------------------
+            // DK Leopard 1A3 Main Battle Tank
+            //----------------------------------------------
+
+            #endregion // MBTs
+
+            #region APCs
+
+            //----------------------------------------------
+            // Lowlands M113-family Armoured Personnel Carrier
+            //----------------------------------------------
+            // Bare Apc archetype (tracked, .50-cal only) — stands for the Dutch YPR-765, the Belgian
+            // AIFV and the Danish M113 alike, all M113 derivatives.
+            // → HA3 HD4 SA6 SD7 GAD7 · ICM 1.00 · MMP8 · SR2.
+            //
+            // ⚠ THIS EXISTS BECAUSE APC_M113_US COULD NOT BE REUSED. That profile's census carries 58
+            // M1 Abrams, 32 Bradleys and 18 M3s — a whole US armoured brigade riding on the carrier —
+            // so a Lowlands brigade mounted on it would report 58 Abrams in Dutch service. This census
+            // lists ONLY the carrier's own vehicles, which is what a carrier census should ever hold:
+            // EquipmentBays.BuildIntelStats SUMS Deployed + Mobile, so anything listed here is added to
+            // whatever infantry is riding in it. No Personnel (the deployed profile owns the men), and
+            // no tanks.
+            WeaponProfile M113_NATO = WeaponProfile.FromProfileDef(
+                "M113-family Armoured Personnel Carrier", "M113", WeaponType.APC_M113_NATO,
+                new ProfileDef(FamilyArchetypes.Apc,
+                    new Dictionary<ProfileStat, int>(),
+                    System.Array.Empty<WeaponTrait>()),
+                UpgradePath.APC, 264);
+
+            // Set the prestige cost for the profile.
+            M113_NATO.SetPrestigeCost(PrestigeTierCost.Gen1, PrestigeTypeCost.APC);
+
+            // Intel report stats - the carrier's own vehicles and nothing else.
+            M113_NATO.AddIntelReportStat(WeaponType.APC_M113_NATO, 102);
+            M113_NATO.AddIntelReportStat(WeaponType.RCN_FV105_UK,    8);
+
+            // Handle the icon profile.
+            M113_NATO.IconProfile = new RegimentIconProfile(RegimentIconType.Directional)
+            {
+                W = SpriteManager.US_M113_W,
+                NW = SpriteManager.US_M113_NW,
+                SW = SpriteManager.US_M113_SW
+            };
+
+            // Mixed family (see FamilyArchetypes) - medium is stated per profile.
+            M113_NATO.SetMovementMedium(MovementMedium.Tracked);
+
+            // Add the Lowlands M113 profile to the database
+            AddProfile(WeaponType.APC_M113_NATO, M113_NATO);
+            //----------------------------------------------
+            // Lowlands M113-family Armoured Personnel Carrier
+            //----------------------------------------------
+
+            #endregion // APCs
+
+            #region Infantry Units
+
+            //----------------------------------------------
+            // Dutch Infantry
+            //----------------------------------------------
+            // Infantry + RPG_LAW + ATGM_MEDIUM + MANPADS_STINGER (the Dutch bought Stinger).
+            // → HA9 HD7 SA7 SD8 GAD10 · GAT8 · ICM 1.05 · MMP4 · SR2.
+            WeaponProfile INF_REG_NL_P = WeaponProfile.FromProfileDef(
+                "Dutch Infantry Regiment", "NL Inf", WeaponType.INF_REG_NL,
+                new ProfileDef(FamilyArchetypes.Infantry,
+                    new Dictionary<ProfileStat, int>(),
+                    new[] { WeaponTrait.RPG_LAW, WeaponTrait.ATGM_MEDIUM, WeaponTrait.MANPADS_STINGER }));
+
+            // Intel stats (NL Armoured Infantry Brigade composition, dismounted)
+            INF_REG_NL_P.AddIntelReportStat(WeaponType.Personnel,           2150);
+            INF_REG_NL_P.AddIntelReportStat(WeaponType.SPA_M109_US,           18);
+            INF_REG_NL_P.AddIntelReportStat(WeaponType.ART_120MM_MORTAR,      18);
+            INF_REG_NL_P.AddIntelReportStat(WeaponType.AT_ATGM,               36);
+            INF_REG_NL_P.AddIntelReportStat(WeaponType.MANPAD_STINGER,        24);
+
+            // Handle the icon profile.
+            INF_REG_NL_P.IconProfile = new RegimentIconProfile(RegimentIconType.Single)
+            {
+                W = SpriteManager.NATO_Regulars
+            };
+
+            // Add the Dutch Infantry profile to the database
+            INF_REG_NL_P.SetPrestigeCost(PrestigeTierCost.Gen1, PrestigeTypeCost.INF);
+            AddProfile(WeaponType.INF_REG_NL, INF_REG_NL_P);
+            //----------------------------------------------
+            // Dutch Infantry
+            //----------------------------------------------
+
+            //----------------------------------------------
+            // Belgian Infantry
+            //----------------------------------------------
+            // ⚠ MANPADS_BASIC, not MANPADS_STINGER — Belgian infantry carried Blowpipe/Mistral.
+            // Free, honest differentiation, following the UK precedent at INF_REG_UK.
+            // → HA9 HD7 SA7 SD8 GAD10 · GAT6 · ICM 1.00 · MMP4 · SR2.
+            WeaponProfile INF_REG_BE_P = WeaponProfile.FromProfileDef(
+                "Belgian Infantry Regiment", "BE Inf", WeaponType.INF_REG_BE,
+                new ProfileDef(FamilyArchetypes.Infantry,
+                    new Dictionary<ProfileStat, int>(),
+                    new[] { WeaponTrait.RPG_LAW, WeaponTrait.ATGM_MEDIUM, WeaponTrait.MANPADS_BASIC }));
+
+            // Intel stats (BE Mechanised Infantry Brigade composition, dismounted)
+            INF_REG_BE_P.AddIntelReportStat(WeaponType.Personnel,           2050);
+            INF_REG_BE_P.AddIntelReportStat(WeaponType.SPA_M109_US,           18);
+            INF_REG_BE_P.AddIntelReportStat(WeaponType.ART_120MM_MORTAR,      18);
+            INF_REG_BE_P.AddIntelReportStat(WeaponType.AT_ATGM,               30);
+            INF_REG_BE_P.AddIntelReportStat(WeaponType.MANPAD_MISTRAL,        18);
+
+            // Handle the icon profile.
+            INF_REG_BE_P.IconProfile = new RegimentIconProfile(RegimentIconType.Single)
+            {
+                W = SpriteManager.NATO_Regulars
+            };
+
+            // Add the Belgian Infantry profile to the database
+            INF_REG_BE_P.SetPrestigeCost(PrestigeTierCost.Gen1, PrestigeTypeCost.INF);
+            AddProfile(WeaponType.INF_REG_BE, INF_REG_BE_P);
+            //----------------------------------------------
+            // Belgian Infantry
+            //----------------------------------------------
+
+            //----------------------------------------------
+            // Danish Infantry
+            //----------------------------------------------
+            // MANPADS_BASIC (Hamlet/Redeye-era). Smallest of the three.
+            // → HA9 HD7 SA7 SD8 GAD10 · GAT6 · ICM 1.00 · MMP4 · SR2.
+            WeaponProfile INF_REG_DK_P = WeaponProfile.FromProfileDef(
+                "Danish Infantry Regiment", "DK Inf", WeaponType.INF_REG_DK,
+                new ProfileDef(FamilyArchetypes.Infantry,
+                    new Dictionary<ProfileStat, int>(),
+                    new[] { WeaponTrait.RPG_LAW, WeaponTrait.ATGM_MEDIUM, WeaponTrait.MANPADS_BASIC }));
+
+            // Intel stats (DK Mechanised Infantry Brigade composition, dismounted)
+            INF_REG_DK_P.AddIntelReportStat(WeaponType.Personnel,           1850);
+            INF_REG_DK_P.AddIntelReportStat(WeaponType.SPA_M109_US,           12);
+            INF_REG_DK_P.AddIntelReportStat(WeaponType.ART_120MM_MORTAR,      18);
+            INF_REG_DK_P.AddIntelReportStat(WeaponType.AT_ATGM,               30);
+            INF_REG_DK_P.AddIntelReportStat(WeaponType.MANPAD_STINGER,        16);
+
+            // Handle the icon profile.
+            INF_REG_DK_P.IconProfile = new RegimentIconProfile(RegimentIconType.Single)
+            {
+                W = SpriteManager.NATO_Regulars
+            };
+
+            // Add the Danish Infantry profile to the database
+            INF_REG_DK_P.SetPrestigeCost(PrestigeTierCost.Gen1, PrestigeTypeCost.INF);
+            AddProfile(WeaponType.INF_REG_DK, INF_REG_DK_P);
+            //----------------------------------------------
+            // Danish Infantry
             //----------------------------------------------
 
             #endregion // Infantry Units

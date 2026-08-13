@@ -364,7 +364,7 @@ namespace HammerAndSickle.Services
                 Nationality.UK => ukMaleFirstNames,
                 Nationality.FRG => germanMaleFirstNames,
                 Nationality.FRA => frenchMaleFirstNames,
-                Nationality.IR or Nationality.IQ or Nationality.SAUD => arabicMaleFirstNames,
+                Nationality.IR or Nationality.IQ or Nationality.SAUD or Nationality.KW => arabicMaleFirstNames,
                 Nationality.MJ => russianMaleFirstNames,// Default to Russian for "MJ" (assuming this is mostly Russian)
                 _ => russianMaleFirstNames,// Default to Russian names
             };
@@ -384,7 +384,7 @@ namespace HammerAndSickle.Services
                 Nationality.UK => ukLastNames,
                 Nationality.FRG => germanLastNames,
                 Nationality.FRA => frenchLastNames,
-                Nationality.IR or Nationality.IQ or Nationality.SAUD => ArabicLastNames,
+                Nationality.IR or Nationality.IQ or Nationality.SAUD or Nationality.KW => ArabicLastNames,
                 Nationality.MJ => russianLastNames,// Default to Russian for "MJ" (assuming this is mostly Russian)
                 _ => russianLastNames,// Default to Russian names
             };
