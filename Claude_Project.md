@@ -738,6 +738,8 @@ It deliberately holds **three things it does not have**, each for the same under
 
 **EquipmentBays** (was `RegimentProfile`, renamed P1 2026-08-08 — §3.2b): links CombatUnit to weapons. Holds 3 WeaponType slots (Deployed/Mobile/Embarked) + TotalIntelStats (transient). Access: `unit.GetActiveWeaponProfile()`, `unit.GetDeployedProfile()`, etc.
 
+⚠ **VOCABULARY — "CENSUS" IS THE STANDARD TERM (Bob, 2026-08-13).** A profile's authored `IntelReportStats` is its **census**: the full-strength equipment roster of the formation slice that profile represents. The **intel report** is the COMPUTED output — bay-summed (`BuildIntelStats`, duplicate keys ADD), HP-scaled at display time, bucketed by `ClassifyWeaponType`, enemy-merged (ART+ROC → "guns", SAM+AAA+AT → "AA"), and fuzzed per §12.5. The two are one word apart in code (`IntelReportStats` vs `IntelReport`) and conflating them is the confusion behind both the §7.2 carrier double-counts and the 2026-08-13 Humvee defect. The census is ALSO the §24.8 loss-ledger multiplicand (§3.6d), so a wrong census is a wrong casualty report, not just a wrong panel. Guarded by `CensusIntegrityTests` (non-empty for every registered profile bar the equipment-less trucks/sealift; every token buckets non-`None`). ⚠ `AddIntelReportStat` ASSIGNS rather than accumulates — a copy-pasted block aimed at the wrong receiver variable silently overwrites an unrelated profile's census.
+
 ⚠ **`RegimentProfileType` IS DELETED and nothing declares a shape.** Which bays a regiment HAS is DERIVED — the Mobile bay is open iff the deployed medium is `Foot`; Embarked eligibility comes from identity plus the `AirDroppable`/`HeloTransportable` capability tags. The doctrine layer is `IsMobileBayOpen` / `MayCarryHeloLift` / `MayCarryFixedWingLift` / `CanAccept` / `TrySetSlot` / `TryClearSlot`, audited by `EquipmentBaysTests`. Naval is a transient STATE (`CombatUnit.IsNavalEmbarked` drawing the shared `TRN_NAVAL`), never a bay.
 
 **WeaponProfile (177 profiles, ALL built via `FromProfileDef` — the Archetype+Delta+Trait model, §2.6):** the resolver produces the 17-stat line (`ProfileStat`: HA/HD/SA/SD/GAT/GAD/DF/MAN/TS/SUR/GA/OL/STL/PR/IR/SR/MMP), a stored `ICM` (product of quality-trait multipliers, default 1.0, set only via `SetICM`), and a `WeaponCapability` set (replaces the old bool flags). Strike riders are STORED but mostly INERT until their combat-engine consumers land (M13): `GaVsHard/Soft/Base` (read via `EffectiveGroundAttack(targetClass, isBase)`), `ParkedHitBonus`, `OcSuppressionBonus`, `IgnoreAirDefense`, `LoiterReattack`. Plus Ranges (Primary/Indirect/Spotting — NOTE profile SR is UI-only; live spotting uses the GameData classification tables §12.3), Upgrades (PrestigeCost, TurnAvailable), Intel (IntelReportStats), Icons. The old AllWeather/NBC/NVG ratings and Silhouette fields are DELETED — do not reference them.
@@ -746,7 +748,7 @@ It deliberately holds **three things it does not have**, each for the same under
 
 ## 10. Intel System
 
-Generated on-the-fly: `WeaponProfile.IntelReportStats` → `RegimentProfile.BuildIntelStats()` → `RegimentProfile.GetIntelReport()` → `CombatUnit.GetIntelReport(SpottedLevel)` (filters by level, scales by HP, applies error).
+Generated on-the-fly: `WeaponProfile.IntelReportStats` (the CENSUS — §9) → `EquipmentBays.BuildIntelStats()` → `EquipmentBays.GetIntelReport()` → `CombatUnit.GetIntelReport(SpottedLevel)` (filters by level, scales by HP, applies error).
 
 17 buckets: Personnel, TANK, IFV, APC, RCN, ART, ROC, SAM, AAA, AT, HEL, AWACS, TRN, FGT, ATT, BMB, RCNA.
 
