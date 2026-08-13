@@ -980,9 +980,14 @@ namespace HammerAndSickle.Core.GameData
         TANK_LEOPARD1_DK,
 
         // Personnel — the deployed half of each nation's mechanised brigade.
-        INF_REG_NL,
-        INF_REG_BE,
-        INF_REG_DK,
+        // ⚠ NAMING SCHEME (census pass 2026-08-13): infantry bases encode the FORMATION TYPE —
+        // INF_LEG_* for foot infantry, INF_MECH_* for mounted (these three renamed from INF_REG_*
+        // while content-free; verified zero StreamingAssets hits before the rename). Existing
+        // shipped Soviet/US/etc. INF_REG_* names are GRANDFATHERED — they persist by name in
+        // khost.oob and rename is a breaking change (CLAUDE.md §2.11).
+        INF_MECH_NL,
+        INF_MECH_BE,
+        INF_MECH_DK,
 
         // Shared Lowlands carrier. ⚠ The SEVENTH token exists because APC_M113_US CANNOT be reused:
         // its census carries 58 M1 Abrams, 32 Bradleys and 18 M3s (a US armoured brigade roster, the

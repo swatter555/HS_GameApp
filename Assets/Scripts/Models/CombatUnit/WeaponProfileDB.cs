@@ -5456,31 +5456,31 @@ namespace HammerAndSickle.Models
             //----------------------------------------------
             // Infantry + RPG_LAW + ATGM_MEDIUM + MANPADS_STINGER (the Dutch bought Stinger).
             // → HA9 HD7 SA7 SD8 GAD10 · GAT8 · ICM 1.05 · MMP4 · SR2.
-            WeaponProfile INF_REG_NL_P = WeaponProfile.FromProfileDef(
-                "Dutch Infantry Regiment", "NL Inf", WeaponType.INF_REG_NL,
+            WeaponProfile INF_MECH_NL_P = WeaponProfile.FromProfileDef(
+                "Dutch Infantry Regiment", "NL Inf", WeaponType.INF_MECH_NL,
                 new ProfileDef(FamilyArchetypes.Infantry,
                     new Dictionary<ProfileStat, int>(),
                     new[] { WeaponTrait.RPG_LAW, WeaponTrait.ATGM_MEDIUM, WeaponTrait.MANPADS_STINGER }));
 
             // Intel stats (NL Armoured Infantry Brigade composition, dismounted)
-            INF_REG_NL_P.AddIntelReportStat(WeaponType.Personnel,           2150);
+            INF_MECH_NL_P.AddIntelReportStat(WeaponType.Personnel,           2150);
             // Organic tank battalion (census pass 2026-08-13, rule 1): the mech brigade's Leopards,
             // previously missing — the census listed no armor at all for a mechanised brigade.
-            INF_REG_NL_P.AddIntelReportStat(WeaponType.TANK_LEOPARD1_NL,      32);
-            INF_REG_NL_P.AddIntelReportStat(WeaponType.SPA_M109_US,           18);
-            INF_REG_NL_P.AddIntelReportStat(WeaponType.ART_120MM_MORTAR,      18);
-            INF_REG_NL_P.AddIntelReportStat(WeaponType.AT_ATGM,               36);
-            INF_REG_NL_P.AddIntelReportStat(WeaponType.MANPAD_STINGER,        24);
+            INF_MECH_NL_P.AddIntelReportStat(WeaponType.TANK_LEOPARD1_NL,      32);
+            INF_MECH_NL_P.AddIntelReportStat(WeaponType.SPA_M109_US,           18);
+            INF_MECH_NL_P.AddIntelReportStat(WeaponType.ART_120MM_MORTAR,      18);
+            INF_MECH_NL_P.AddIntelReportStat(WeaponType.AT_ATGM,               36);
+            INF_MECH_NL_P.AddIntelReportStat(WeaponType.MANPAD_STINGER,        24);
 
             // Handle the icon profile.
-            INF_REG_NL_P.IconProfile = new RegimentIconProfile(RegimentIconType.Single)
+            INF_MECH_NL_P.IconProfile = new RegimentIconProfile(RegimentIconType.Single)
             {
                 W = SpriteManager.NATO_Regulars
             };
 
             // Add the Dutch Infantry profile to the database
-            INF_REG_NL_P.SetPrestigeCost(PrestigeTierCost.Gen1, PrestigeTypeCost.INF);
-            AddProfile(WeaponType.INF_REG_NL, INF_REG_NL_P);
+            INF_MECH_NL_P.SetPrestigeCost(PrestigeTierCost.Gen1, PrestigeTypeCost.INF);
+            AddProfile(WeaponType.INF_MECH_NL, INF_MECH_NL_P);
             //----------------------------------------------
             // Dutch Infantry
             //----------------------------------------------
@@ -5491,30 +5491,30 @@ namespace HammerAndSickle.Models
             // ⚠ MANPADS_BASIC, not MANPADS_STINGER — Belgian infantry carried Blowpipe/Mistral.
             // Free, honest differentiation, following the UK precedent at INF_REG_UK.
             // → HA9 HD7 SA7 SD8 GAD10 · GAT6 · ICM 1.00 · MMP4 · SR2.
-            WeaponProfile INF_REG_BE_P = WeaponProfile.FromProfileDef(
-                "Belgian Infantry Regiment", "BE Inf", WeaponType.INF_REG_BE,
+            WeaponProfile INF_MECH_BE_P = WeaponProfile.FromProfileDef(
+                "Belgian Infantry Regiment", "BE Inf", WeaponType.INF_MECH_BE,
                 new ProfileDef(FamilyArchetypes.Infantry,
                     new Dictionary<ProfileStat, int>(),
                     new[] { WeaponTrait.RPG_LAW, WeaponTrait.ATGM_MEDIUM, WeaponTrait.MANPADS_BASIC }));
 
             // Intel stats (BE Mechanised Infantry Brigade composition, dismounted)
-            INF_REG_BE_P.AddIntelReportStat(WeaponType.Personnel,           2050);
+            INF_MECH_BE_P.AddIntelReportStat(WeaponType.Personnel,           2050);
             // Organic tank battalion (census pass 2026-08-13, rule 1).
-            INF_REG_BE_P.AddIntelReportStat(WeaponType.TANK_LEOPARD1_BE,      28);
-            INF_REG_BE_P.AddIntelReportStat(WeaponType.SPA_M109_US,           18);
-            INF_REG_BE_P.AddIntelReportStat(WeaponType.ART_120MM_MORTAR,      18);
-            INF_REG_BE_P.AddIntelReportStat(WeaponType.AT_ATGM,               30);
-            INF_REG_BE_P.AddIntelReportStat(WeaponType.MANPAD_MISTRAL,        18);
+            INF_MECH_BE_P.AddIntelReportStat(WeaponType.TANK_LEOPARD1_BE,      28);
+            INF_MECH_BE_P.AddIntelReportStat(WeaponType.SPA_M109_US,           18);
+            INF_MECH_BE_P.AddIntelReportStat(WeaponType.ART_120MM_MORTAR,      18);
+            INF_MECH_BE_P.AddIntelReportStat(WeaponType.AT_ATGM,               30);
+            INF_MECH_BE_P.AddIntelReportStat(WeaponType.MANPAD_MISTRAL,        18);
 
             // Handle the icon profile.
-            INF_REG_BE_P.IconProfile = new RegimentIconProfile(RegimentIconType.Single)
+            INF_MECH_BE_P.IconProfile = new RegimentIconProfile(RegimentIconType.Single)
             {
                 W = SpriteManager.NATO_Regulars
             };
 
             // Add the Belgian Infantry profile to the database
-            INF_REG_BE_P.SetPrestigeCost(PrestigeTierCost.Gen1, PrestigeTypeCost.INF);
-            AddProfile(WeaponType.INF_REG_BE, INF_REG_BE_P);
+            INF_MECH_BE_P.SetPrestigeCost(PrestigeTierCost.Gen1, PrestigeTypeCost.INF);
+            AddProfile(WeaponType.INF_MECH_BE, INF_MECH_BE_P);
             //----------------------------------------------
             // Belgian Infantry
             //----------------------------------------------
@@ -5524,30 +5524,30 @@ namespace HammerAndSickle.Models
             //----------------------------------------------
             // MANPADS_BASIC (Hamlet/Redeye-era). Smallest of the three.
             // → HA9 HD7 SA7 SD8 GAD10 · GAT6 · ICM 1.00 · MMP4 · SR2.
-            WeaponProfile INF_REG_DK_P = WeaponProfile.FromProfileDef(
-                "Danish Infantry Regiment", "DK Inf", WeaponType.INF_REG_DK,
+            WeaponProfile INF_MECH_DK_P = WeaponProfile.FromProfileDef(
+                "Danish Infantry Regiment", "DK Inf", WeaponType.INF_MECH_DK,
                 new ProfileDef(FamilyArchetypes.Infantry,
                     new Dictionary<ProfileStat, int>(),
                     new[] { WeaponTrait.RPG_LAW, WeaponTrait.ATGM_MEDIUM, WeaponTrait.MANPADS_BASIC }));
 
             // Intel stats (DK Mechanised Infantry Brigade composition, dismounted)
-            INF_REG_DK_P.AddIntelReportStat(WeaponType.Personnel,           1850);
+            INF_MECH_DK_P.AddIntelReportStat(WeaponType.Personnel,           1850);
             // Organic tank battalion (census pass 2026-08-13, rule 1).
-            INF_REG_DK_P.AddIntelReportStat(WeaponType.TANK_LEOPARD1_DK,      24);
-            INF_REG_DK_P.AddIntelReportStat(WeaponType.SPA_M109_US,           12);
-            INF_REG_DK_P.AddIntelReportStat(WeaponType.ART_120MM_MORTAR,      18);
-            INF_REG_DK_P.AddIntelReportStat(WeaponType.AT_ATGM,               30);
-            INF_REG_DK_P.AddIntelReportStat(WeaponType.MANPAD_STINGER,        16);
+            INF_MECH_DK_P.AddIntelReportStat(WeaponType.TANK_LEOPARD1_DK,      24);
+            INF_MECH_DK_P.AddIntelReportStat(WeaponType.SPA_M109_US,           12);
+            INF_MECH_DK_P.AddIntelReportStat(WeaponType.ART_120MM_MORTAR,      18);
+            INF_MECH_DK_P.AddIntelReportStat(WeaponType.AT_ATGM,               30);
+            INF_MECH_DK_P.AddIntelReportStat(WeaponType.MANPAD_STINGER,        16);
 
             // Handle the icon profile.
-            INF_REG_DK_P.IconProfile = new RegimentIconProfile(RegimentIconType.Single)
+            INF_MECH_DK_P.IconProfile = new RegimentIconProfile(RegimentIconType.Single)
             {
                 W = SpriteManager.NATO_Regulars
             };
 
             // Add the Danish Infantry profile to the database
-            INF_REG_DK_P.SetPrestigeCost(PrestigeTierCost.Gen1, PrestigeTypeCost.INF);
-            AddProfile(WeaponType.INF_REG_DK, INF_REG_DK_P);
+            INF_MECH_DK_P.SetPrestigeCost(PrestigeTierCost.Gen1, PrestigeTypeCost.INF);
+            AddProfile(WeaponType.INF_MECH_DK, INF_MECH_DK_P);
             //----------------------------------------------
             // Danish Infantry
             //----------------------------------------------
