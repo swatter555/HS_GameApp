@@ -200,29 +200,21 @@ its own list is his. Never started; still worth doing.
       until then so current builds keep loading fresh exports). Their E3 phase (manifest authoring with
       `mapWidth`/`mapHeight` + cross-stamp) is gated on the same signal.
 
-- [ ] **RELAY THE FINAL LOWLANDS WEAPONTYPE NAMES to the Scenario Editor agent (2026-08-12).** They
-      mirror `WeaponType` in their `ENUM_NAMES` tables and fail loudly on an unknown name at load.
-      **The list is SEVEN, not the eighteen their spec proposed:** `TANK_LEOPARD1_NL`,
-      `TANK_LEOPARD1_BE`, `TANK_LEOPARD1_DK`, `INF_REG_NL`, `INF_REG_BE`, `INF_REG_DK`,
-      `APC_M113_NATO`. Plus sixteen template IDs: `NL_ARMOURED_BRIGADE`,
-      `NL_ARMOURED_INFANTRY_BRIGADE`, `NL_ARTILLERY_REGIMENT`, `NL_RECON_UNIT`,
-      `NL_AIR_DEFENSE_REGIMENT`, `NL_HAWK_REGIMENT`, `NL_F16_FIGHTER_SQUADRON`,
-      `BE_ARMOURED_BRIGADE`, `BE_MECH_INFANTRY_BRIGADE`, `BE_ARTILLERY_REGIMENT`, `BE_RECON_UNIT`,
-      `BE_AIR_DEFENSE_REGIMENT`, `DK_ARMOURED_BRIGADE`, `DK_MECH_INFANTRY_BRIGADE`,
-      `DK_ARTILLERY_REGIMENT`, `DK_RECON_UNIT`.
-      ⚠ Worth telling them WHY the cut happened, since it changes how they should read their own
-      spec: **a census belongs to a PROFILE, not to a template**, so a nation earns its own profile
-      only where that census is its brigade roster. Artillery, recon, air defence and air units for
-      all three nations reuse existing Western profiles. Their §5 Gulf framework is unaffected.
+- [x] **RELAY TO THE SCENARIO EDITOR AGENT — folded into `Reply_CensusPass_2026-08-14.md`** (repo
+      root + their `Markdowns/`), which SUPERSEDES the 2026-08-12 Lowlands-names relay: the trio
+      shipped there as `INF_REG_NL/BE/DK` was renamed **`INF_MECH_NL/BE/DK`** in the census pass
+      (Block 5, while content-free), `MANPAD_JAVELIN` was added, and US/FR display names changed.
+      The courier file carries the full current token list, the doctrine, and the two required
+      editor actions (Import UnitDB + Import WeaponTypes). The sixteen Lowlands template IDs are
+      unchanged.
 
-- [ ] **§7.2 CARRIER CENSUSES — RULED, and the ruling is LEAVE THEM (Bob, 2026-08-12).** `MARDER_GE`
-      carries 58 Leopard 1s and `WARRIOR_UK` 58 Challengers, which bays-summing folds into the German
-      and British MECH brigades. Kept deliberately: NATO is permanently AI, so no player ever
-      requisitions into those bays and the upgrade hazard that made it a defect cannot arise — and a
-      Panzergrenadier brigade with an organic tank battalion is good doctrine. ⚠ **Revisit ONLY if
-      NATO ever becomes player-controllable.** Recorded here so the next audit does not re-open it.
-      ⚠ **`APC_M113_US` is the same shape and was NOT fixed either** (58 M1, 32 M2, 18 M3) — it is
-      why the Lowlands got their own `APC_M113_NATO` carrier rather than reusing it.
+- [-] **§7.2 CARRIER CENSUSES — the 2026-08-12 "LEAVE THEM" ruling is SUPERSEDED (census pass,
+      2026-08-13).** Doctrine v2 rule 2 reversed it: ALL carriers are now own-platform-count-only
+      (`MARDER_GE` 54, `WARRIOR_UK` 45, `APC_M113_US` 108, every faction's likewise), and the tank
+      battalions moved to the mech BASE profiles — so the bay-sum still shows the brigade its
+      organic armor, but the double-count is gone and the ruling's "NATO is permanently AI" hedge
+      is no longer load-bearing. Machine-enforced by `CensusIntegrityTests` carrier-clean; do not
+      re-open in either direction without touching that guard.
 
 - [ ] **BUILD VERSIONING (Bob, 2026-08-08): start versioning game builds, beginning with the
       P1 build.** Bob-side: pick a scheme (proposal: `0.<pass>.<hotfix>` pre-1.0) and set it in
@@ -990,6 +982,13 @@ suppressed). Panel model settled at three always-open panels (§3.6c/§4.3) afte
 say *what* changed, not *why* (rationale lives in the design doc / gap analysis) · if it needs more
 than one line, it belongs elsewhere.
 
+- 2026-08-14 — Census pass Block 7: design-doc amendments (§1a maneuver-formation scale, §10.7.1 EquipmentBays, §10.7.3 derived-bays table replacing ProfileType, §10.7.9 census doctrine ratified, §24.8.7.4.3 TRN-row-empty-by-rule) + `PrinterMessage` TRN comment + `Claude_Project` reconciliation + `Reply_CensusPass_2026-08-14.md` courier to the editor agent (docs)
+- 2026-08-13 — Census pass Block 6: `CensusIntegrityTests` 2→6 — carrier-clean / lift-empty / truck-empty / classification-coherence guards; name-based `CensusExempt` allow-list REPLACED by rules; pre-commit simulation caught + fixed Chinese Type 86 carrier (40 Type 59s → INF_REG_CH) and tankless FR mech base (+40 AMX-30, Bob-ruled) (tests + WeaponProfileDB)
+- 2026-08-13 — Census pass Block 5: rename `INF_REG_NL/BE/DK` → `INF_MECH_NL/BE/DK` while content-free (StreamingAssets grep zero); naming scheme recorded — INF_LEG_* foot / INF_MECH_* mounted, shipped names grandfathered (GameData + both DBs)
+- 2026-08-13 — Census pass Block 4: delete Iraqi 209-tank copy-paste line; Arab carriers → own-count (90), tanks to mech-paired bases IQ/IR +31; Lowlands bases +32/28/24 Leopard 1; `APC_M113_NATO` → 102 own; `MANPAD_RAPIER` fully retired (M109_UK/FV105 → `MANPAD_JAVELIN`, counts unchanged, enum member left census-unreferenced) (WeaponProfileDB)
+- 2026-08-13 — Census pass Block 3: GE/UK bases re-cut to Kampfgruppe/battle group (55–58 tanks, 1000–1100 men); UK token bugs fixed (recon `SPSAM_RAPIER_UK`→`RCN_FV105_UK`; UK SHORAD → new census-only `MANPAD_JAVELIN`, appended here not Block 5); carriers Marder 54 / Warrior 45 / VAB 135; cross-national deletes (GE Hawk, UK Vulcan); GE/UK mech bases +28 tanks; West towed art 72→54 single-calibre; FR division-as-counter — AMX30 census kept at 80, profile + template renamed Division, `SPA_M109_FR` profile renamed AUF1 (WeaponProfileDB + CombatUnitDB + GameData)
+- 2026-08-13 — Census pass Block 2: US bases re-cut to battalion task force (M1 base 58 tanks/1000 men; mech base 1100 + 28 M1); carriers M2 54 / M113 108 / LVTP7 45 own-only; UH-60 lift census emptied; ACR helos 26/12→8/8; AH-64 drops Personnel; AD comment muddle fixed; display names → US Armor/Mech Battle Group, template IDs unchanged (WeaponProfileDB + CombatUnitDB)
+- 2026-08-13 — Census pass Block 1: Soviet carriers → own-count-only (BMP/BTR 129, MT-LB/BMD 68); lift censuses emptied (Mi-8T, An-12, INF_AM's 166 Mi-8) per rule 4; MRR organic tank bn moved to base (`INF_REG_SV` +40 T-62A — de-facto INF_MECH_SV, rename blocked by shipped khost.oob); `INF_MAR_SV` +31 T-55A; Spetsnaz 2300→1200; towed art 72→48; helo regiments drop Personnel (WeaponProfileDB + CensusIntegrityTests exemptions)
 - 2026-08-13 — Add `NL_AIR_DEFENSE_REGIMENT` + `BE_AIR_DEFENSE_REGIMENT` (SPAAA / AirDefenseArea), both reusing the existing `SPAAA_GEPARD_GE` — the PRTL Cheetah is a Gepard turret on a Leopard 1 hull, so this is the `SAM_HAWK_US` precedent applied again, and it costs ZERO new tokens. ⚠ NOT flavour: `GameData.IsAirDefenseClassification` admits SAM/SPSAM/AAA/SPAAA only, so before this exactly ONE of the 14 Lowlands templates could put ranged §11.8 fire on a helicopter and the Belgian sector had none at all — and D2 transit air defence is the one air mechanic play-confirmed to work. Also differs tactically from Hawk, which is static (MMP → 0). Denmark still has none, deliberately, and is now the ONLY uncovered sector. ⚠ Per-nation SPA/RCN/SPAAA profiles were considered and REFUSED: the enemy intel view merges `ART+ROC → "guns"` and `SAM+AAA+AT → "AA"` (`EquipmentBays.cs:80-81`) and the split view is friendly-only, so for permanently-AI units those profiles would differentiate rosters the player can never see apart (CombatUnitDB)
 - 2026-08-13 — ✅ LOWLANDS UNIT-DB EXPANSION GREEN (Bob ran the suite). Add NATO's northern-sector contingents: 7 `WeaponType`s, 7 profiles in a new `CreateLowlandsProfiles()`, 16 templates across `CreateDutchForces`/`CreateBelgianForces`/`CreateDanishForces`. ⚠ SEVEN tokens, not the 18 the scenario editor's spec proposed, on the rule that a CENSUS BELONGS TO A PROFILE, NOT A TEMPLATE — so a nation earns its own profile only where that census is its brigade roster (armoured + mechanised), and artillery/recon/AD/air reuse `ART_HEAVY_WEST`/`RCN_FV105_UK`/`SAM_HAWK_US`/`FGT_F16_US`. All three Leopard 1s resolve to a stat line identical to `LEO1_GE`; national character lives in the census, the template ExperienceLevel and the icon's nationality. Denmark has no organic AD (Bob's ruling — makes the Danish sector the one needing cover); NL/DK Experienced, BE Trained. `NL_F16_FIGHTER_SQUADRON` is inert until M13/AOB. `APC_M113_NATO` was minted rather than reusing `APC_M113_US`, whose census carries 58 M1s/32 M2s/18 M3s. Also fixed `Symbol_Kuwait` `"KQ_Symbol"` → `"KW_Symbol"` (asset is `KW_Symbol.png`) and added `Nationality.KW` to both Arabic name arms in `NameGenService` (Claude_TODO, GameData, WeaponProfileDB, CombatUnitDB, SpriteManager, NameGenService)
 - 2026-08-13 — Add `CensusIntegrityTests` (2 tests, the first thing under Assets/Tests ever to reference `IntelReportStats`): every registered profile declares a non-empty census (allow-list `TRK_GEN_SV`/`TRK_GEN_ARAB`/`TRK_WEST`/`TRN_NAVAL`, which are equipment-less by design), and every census token classifies to a non-`None` bucket. ⚠ IT FOUND A REAL BUG ON ITS FIRST RUN: the Humvee's four `AddIntelReportStat` calls were written against `M113_US`, the variable from the block above. Two victims — `APC_HUMVEE_US` had no census at all (and it is the MOBILE bay of `US_AIRBORNE_BRIGADE` and `US_AIRMOBILE_BRIGADE`, so both contributed nothing from that bay to intel or loss reports), and because `AddIntelReportStat` ASSIGNS rather than accumulates, the stray lines rewrote the M113's census — spurious 58 M60s and 108 Humvees, own M113 count knocked 108 → 32 (latent: no template uses `APC_M113_US`). Fixed by retargeting the variable AND trimming the census to carrier-only; restoring it verbatim would have given two AIRBORNE brigades a 58-tank Patton battalion (WeaponProfileDB, CensusIntegrityTests)

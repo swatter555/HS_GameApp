@@ -300,17 +300,15 @@ namespace HammerAndSickle.Core.UI
         // ⚠ AFVs EXISTS BECAUSE A SOVIET MECH FORCE LOSES MOSTLY AFVs and a report without the row would
         // look wrong (Bob's call). Recon vehicles file here rather than as tanks.
         //
-        // ⚠ TRUCKS ARE NOT REPORTED, AND CORRECTLY SO (Bob, 2026-07-28): no truck profile declares any
-        // intel stats at all — TRK_GEN_SV and TRK_WEST add none — so trucks are absent from the intel model
-        // itself and there is nothing to report. Not a gap; there is no data.
-        //
-        // ⚠ BUT `EquipmentBucket.TRN` IS IN THE AIRCRAFT ROW, and that is not a typo. The TRN bucket
-        // catches both the TRN_ and TRK_ prefixes, and the ONLY profile in it that declares intel stats is
-        // the An-12 — a fixed-wing TRANSPORT PLANE carrying 48. Left out of every row, a destroyed An-12
-        // regiment would have printed "Aircraft 0" while 48 aircraft quietly vanished from the tally.
-        // Since trucks contribute nothing and TRN_NAVAL declares nothing either, folding TRN into Aircraft
-        // is exact today rather than approximate. ⚠ Revisit if a truck or naval transport ever GAINS intel
-        // stats — they would then wrongly land under Aircraft, and the bucket needs splitting.
+        // ⚠ NOTHING IN THE TRN BUCKET DECLARES A CENSUS, BY RULE (census doctrine v2, 2026-08-13 —
+        // HS_DesignDoc §10.7.9). Two rules cover the bucket's whole membership: trucks are never
+        // counted (rule 5, permanent law since 2026-07-28), and lift (TransportCategory != None)
+        // carries no census (rule 4 — lift losses are unreported by design, so the An-12's old
+        // 48-plane census, this row's original rationale, is deleted). `EquipmentBucket.TRN` stays
+        // folded into the Aircraft row as a harmless residue: the row arithmetic is exact BECAUSE
+        // the bucket is empty, and CensusIntegrityTests (lift-empty / truck-empty) fails the suite
+        // if anything ever declares TRN-bucket stats again — the "revisit" this comment used to owe
+        // is now machine-enforced.
         private static readonly (string Label, EquipmentBucket[] Buckets)[] LossReportRows =
         {
             ("Men",         new[] { EquipmentBucket.Personnel }),
