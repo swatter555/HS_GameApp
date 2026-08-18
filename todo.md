@@ -240,6 +240,16 @@ never scanned; all three are Phase 2's problem, recorded under Finding B below.
 
 # EXECUTION PLAN — Phase 2 + 3 (agent, 2026-07-28) — ⚠ DEFERRED BY BOB, kept for when campaign work starts
 
+> **⚠ ARMED BY PHASE 2 — the hold-to-the-limit farming residual (prestige pass V10.3, recorded
+> 2026-08-17).** Under the §18.2 income model a player who has met the scenario's requiredResult can
+> DECLINE the early-finish cash-out and sit to `maxTurns` collecting income. The early-finish bonus
+> (unusedTurns × steady income × `earlyFinishMultiplier` > 1) makes cashing out STRICTLY better, so
+> the behaviour is dominated, not prevented — harmless today because prestige is discarded at battle
+> end. **The moment Phase 2 carries prestige into a campaign wallet, sitting becomes real farming
+> against the campaign economy.** Revisit then: either the multiplier gets teeth (scale with rung?)
+> or campaign carryover caps banked income. Deliberately NOT solved in the prestige pass (Bob + both
+> agents agreed) — recorded here so Phase 2 does not ship without deciding it.
+
 ## FINDINGS FROM THE READ-THROUGH — settle these before Phase 2 code
 
 ### ✅ FINDING A — RESOLVED 2026-07-28. Bob ratified the SCORING/ROUTING split.

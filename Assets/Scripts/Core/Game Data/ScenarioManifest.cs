@@ -1,10 +1,33 @@
 using HammerAndSickle.Services;
 using System;
+using System.Collections.Generic;
 using System.IO;
 using System.Text.Json.Serialization;
 
 namespace HammerAndSickle.Core.GameData
 {
+    /// <summary>
+    /// One mission objective (C6): a hex the player must control before the scenario's requiredResult
+    /// is reachable. Authored PER-VARIANT in the manifest — the same .map legitimately carries
+    /// different sets in its standalone and campaign scenarios, which is why this is not map data.
+    /// MapLoader clear-then-stamps these onto hex.IsObjective at scenario load; gameplay, UI and
+    /// saves read the STAMPED flag, never this list (§7.3 — an in-battle save must load with its
+    /// scenario uninstalled).
+    /// </summary>
+    [Serializable]
+    public class MissionObjective
+    {
+        [JsonPropertyName("x")]
+        public int X { get; set; }
+
+        [JsonPropertyName("y")]
+        public int Y { get; set; }
+
+        /// <summary>Optional display name ("Khost airfield") for briefing/HUD/dispatch surfaces.</summary>
+        [JsonPropertyName("label")]
+        public string Label { get; set; } = string.Empty;
+    }
+
     /// <summary>
     /// Serializable data structure representing a scenario manifest file.
     /// Lists all files required to load a scenario and provides metadata for UI display.
@@ -123,6 +146,16 @@ namespace HammerAndSickle.Core.GameData
         [JsonPropertyName("requiredResult")]
         public BattleResult RequiredResult { get; set; } = BattleResult.MinorVictory;
 
+        /// <summary>
+        /// C6 mission objectives — the victory GATE: the player cannot reach <see cref="RequiredResult"/>
+        /// until ALL of these are Red-controlled (the grade is capped one rung below it otherwise).
+        /// Absent/empty = no gate declared, VALID (authoring convention says every scenario has at
+        /// least one; the schema does not enforce it — that is what keeps pre-C6 manifests loading).
+        /// Defensive scenarios put them on the player's side (hold); offensive on the AI side (take).
+        /// </summary>
+        [JsonPropertyName("missionObjectives")]
+        public List<MissionObjective> MissionObjectives { get; set; } = new List<MissionObjective>();
+
         #endregion // JSON Properties
 
         #region Constructors
@@ -217,6 +250,26 @@ namespace HammerAndSickle.Core.GameData
                 if (VictoryThresholdMinor >= VictoryThresholdMajor ||
                     VictoryThresholdMajor >= VictoryThresholdDecisive)
                     return false;
+            }
+
+            /* C6 mission objectives: absent/empty = no gate, valid. Entries must be unique and inside
+             * the declared rectangle. The AUTHORITATIVE checks live in the MapLoader stamp — it knows
+             * the real map (missing hex → refused load; non-stronghold → loud warning); this only
+             * knows the rectangle. */
+            if (MissionObjectives != null && MissionObjectives.Count > 0)
+            {
+                var seen = new HashSet<(int, int)>();
+                foreach (var obj in MissionObjectives)
+                {
+                    if (obj == null)
+                        return false;
+
+                    if (obj.X < 0 || obj.X >= dims.x || obj.Y < 0 || obj.Y >= dims.y)
+                        return false;
+
+                    if (!seen.Add((obj.X, obj.Y)))
+                        return false;   // duplicate objective is authoring garbage
+                }
             }
 
             return true;

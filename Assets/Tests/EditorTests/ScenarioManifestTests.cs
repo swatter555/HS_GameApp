@@ -230,5 +230,58 @@ namespace HammerAndSickle.Tests
         }
 
         #endregion // IsValid — threshold ladder
+
+        #region Mission objectives (C6a)
+
+        [Test]
+        public void IsValid_MissionObjectives_EmptyAndInRectangle_Valid()
+        {
+            var m = ValidManifest();
+            Assert.IsTrue(m.IsValid(), "Empty list = no gate declared — valid (keeps pre-C6 manifests loading).");
+
+            m.MissionObjectives.Add(new MissionObjective { X = 5, Y = 7, Label = "Test" });
+            Assert.IsTrue(m.IsValid(), "An in-rectangle objective is valid.");
+        }
+
+        [Test]
+        public void IsValid_MissionObjective_OutsideDeclaredRectangle_Refused()
+        {
+            var m = ValidManifest();   // declares 32x21
+            m.MissionObjectives.Add(new MissionObjective { X = 32, Y = 5 });
+            Assert.IsFalse(m.IsValid(), "X == mapWidth is off the rectangle.");
+
+            m = ValidManifest();
+            m.MissionObjectives.Add(new MissionObjective { X = 5, Y = -1 });
+            Assert.IsFalse(m.IsValid());
+        }
+
+        [Test]
+        public void IsValid_DuplicateMissionObjectives_Refused()
+        {
+            var m = ValidManifest();
+            m.MissionObjectives.Add(new MissionObjective { X = 5, Y = 7 });
+            m.MissionObjectives.Add(new MissionObjective { X = 5, Y = 7, Label = "Dup" });
+
+            Assert.IsFalse(m.IsValid(), "A duplicate objective is authoring garbage.");
+        }
+
+        [Test]
+        public void Roundtrip_MissionObjectives_SurviveWithLabels()
+        {
+            var m = ValidManifest();
+            m.MissionObjectives.Add(new MissionObjective { X = 19, Y = 6, Label = "Khost" });
+            m.MissionObjectives.Add(new MissionObjective { X = 2, Y = 8 });
+
+            string json = JsonSerializer.Serialize(m, JsonPolicy.Content);
+            var restored = JsonSerializer.Deserialize<ScenarioManifest>(json, JsonPolicy.Content);
+
+            Assert.AreEqual(2, restored.MissionObjectives.Count);
+            Assert.AreEqual(19, restored.MissionObjectives[0].X);
+            Assert.AreEqual(6, restored.MissionObjectives[0].Y);
+            Assert.AreEqual("Khost", restored.MissionObjectives[0].Label);
+            Assert.IsTrue(string.IsNullOrEmpty(restored.MissionObjectives[1].Label), "Absent label stays empty — never null-crashy.");
+        }
+
+        #endregion // Mission objectives
     }
 }

@@ -52,6 +52,18 @@ namespace HammerAndSickle.Models
         }
 
         /// <summary>
+        /// Save-restore path (Stage 5, SAVE_VERSION 7): reinstates a persisted wallet VERBATIM —
+        /// unlike <see cref="Seed"/>, the tallies are history, not a fresh start. Negative components
+        /// clamp to 0 so a hand-edited save cannot open a debt.
+        /// </summary>
+        public void Restore(int current, int earned, int spent)
+        {
+            Current = Math.Max(0, current);
+            Earned = Math.Max(0, earned);
+            Spent = Math.Max(0, spent);
+        }
+
+        /// <summary>
         /// Atomic check-and-debit (V8.2): false — mutating NOTHING — when the balance cannot cover
         /// <paramref name="amount"/> or the amount is non-positive. Callers must not pre-check-then-spend
         /// in two steps; this is the single gate the P4 purchase flow relies on.

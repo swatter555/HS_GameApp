@@ -1620,7 +1620,22 @@ namespace HammerAndSickle.Core.GameData
         // as long as you save occasionally". No migration step — pre-1.0 clean break, and an absent member
         // would default to false anyway, which is the safe value. ⚠ D3 was designated the plan's ONLY
         // persistence bump; anything else needing one should have ridden along here.
-        public const int SAVE_VERSION = 6;
+        //
+        // 6 → 7 (2026-08-17, prestige/victory pass Stage 5): the §18 economy + §17.3 scoring enter the
+        // save. ScenarioData gains the wallet WIRING (currentPrestige/earned/spent existed since v4 but
+        // were never mapped from live state), the two anchors that CANNOT be recomputed —
+        // `startingPlayerShare` (the §17.3 mirror anchor, unrecoverable after the first flip) and
+        // `highWaterVictoryValue` (the §18.2.2 anti-farm ratchet) — and the 8 manifest scoring/economy
+        // knob mirrors (an in-battle save restores WITHOUT its manifest, so income and grading must read
+        // the save). The three objective-counter fields are DROPPED (their counters retired with the
+        // recomputed VictoryLedger + stamped mission-objective flags — which ride the embedded map's
+        // existing hex shape, costing this bump nothing). The VictoryLedger is deliberately NOT
+        // persisted: derived state recomputes on load. No migration step — pre-1.0 clean break.
+        // ⚠ This bump deliberately did NOT wait to ride with AI2b-3's (AIPerceptionState, the other
+        // queued bump): that work sits behind M13-scale prerequisites with no date, and holding a READY
+        // bump hostage to an unscheduled one is exactly how the v4 amend-in-place shortcut happened
+        // (recorded at 3 → 4 above). AI2b-3 takes its own bump when it lands (Bob's ruling, 2026-08-17).
+        public const int SAVE_VERSION = 7;
 
         #endregion
 

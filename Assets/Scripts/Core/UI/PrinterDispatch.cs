@@ -431,10 +431,13 @@ namespace HammerAndSickle.Core.UI
         #region Objective Dispatches
 
         /// <summary>
-        /// "{place} is in our hands. Objective secured. {n} prestige credited to the front."
+        /// "{place} is in our hands. Objective secured."
         /// Never gated — an objective changing hands is the most consequential event in a scenario.
+        /// ⚠ The "{n} prestige credited to the front" line RETIRED with the §18.2 income model
+        /// (prestige pass Stage 3, 2026-08-17) — capture no longer credits a lump sum, so the
+        /// dispatch claiming one would lie; held value pays per-turn income at Upkeep instead.
         /// </summary>
-        public static void ReportObjectiveCaptured(Position2D hex, int prestige)
+        public static void ReportObjectiveCaptured(Position2D hex)
         {
             try
             {
@@ -443,9 +446,6 @@ namespace HammerAndSickle.Core.UI
                     $"{PlaceName(hex)} is in our hands.",
                     "Objective secured."
                 };
-
-                if (prestige > 0)
-                    lines.Add($"{prestige} prestige credited to the front.");
 
                 File(lines, PrinterMessage.SourceDivisionalHQ, PrinterCategory.Combat);
             }

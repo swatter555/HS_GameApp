@@ -1,5 +1,14 @@
 # todo_prestige.md — Victory Scoring, Prestige Economy & Objective Obsolescence (V-pass)
 
+> **✅ PASS CLOSED 2026-08-17 — all five stages GREEN (suites AND play), SAVE_VERSION 7 shipped.**
+> Final run: full suite green + the GATE 3 play checks (stamped flags identical, capture pays
+> nothing, income at Upkeep, grade log correct). Khost runs SAFELY in its placeholder state — the
+> shipped map carries 1550 victory value over 36 hexes, so scoring is LIVE with placeholder numbers
+> (not dormant as the editor's report assumed); every degenerate state has a tested guard.
+> **Downstream:** P4 requisition (`todo_profiles.md`, = V14 → GATE 4) now has a live currency ·
+> Bob wires the End Scenario button · the editor's rebalanced maps + authored missionObjectives
+> supersede the placeholders · design-doc amendments are IN (C4 done, §17.8/§17.9 new).
+
 > **Authority:** `PrestigeVictory_Handoff_to_GameAgent_2026-08-17_v2.md` (V1–V16, Bob-ratified) + the
 > editor side's answers doc (Q1–Q6 + V17, 2026-08-17 PM). The AM handoff is SUPERSEDED — move it to
 > `_to_delete/`. Every load-bearing claim in both docs was verified against the tree 2026-08-17 before
@@ -39,7 +48,52 @@
   OURS, not the editor's: their formulation (`share >= minor` alone) re-opens the C1 hole for a
   no-scoring-declared scenario paying a stipend — minor = 0 → `share >= 0` → turn-1 button again.
   `requiredResult` keeps briefing text + campaign branching ONLY; all rungs except `Ongoing` are
-  legal (`IsValid` refuses the sentinel — built with Stage 1b).
+  legal (`IsValid` refuses the sentinel — built with Stage 1b). (C6 adds a third term to the gate:
+  every mission objective held.)
+- **C6 — THE MISSION-OBJECTIVE GATE (Bob, ratified 2026-08-17 late; partially supersedes the
+  "isObjective is obsoleted" premise — REDEFINES it rather than reversing it).**
+  *Why:* share-based scoring alone lets the player avoid fortified strongpoints and farm weak
+  sectors. Every scenario authors ≥ 1 mission objective (defensive: on the player's side, to HOLD;
+  offensive: on the AI side, to TAKE; sparse — victory value keeps most of the weight; authoring
+  convention, not a schema requirement).
+  *The rule:* **the player cannot reach the scenario's `requiredResult` until ALL mission objectives
+  are Red-controlled.** Gate unmet → grade capped ONE RUNG BELOW `requiredResult` (generalizes
+  correctly: offensive/required-Minor caps at Draw = failed; defensive/required-Draw caps at
+  MinorDefeat = failed; withdrawal/required-MinorDefeat caps at MajorDefeat. Edge: required
+  DecisiveDefeat has no rung below — cap degenerates to itself; note in spec, IsValid does not
+  refuse). The gate joins BOTH the C5 early-finish availability and the V10.1 auto-end as one extra
+  term, and is evaluated FRESH from the map at each check — no stored gate state.
+  *Storage + runtime (ratified architecture):* authored in the MANIFEST —
+  `"missionObjectives": [{ "x": int, "y": int, "label": "optional" }]` (label feeds dispatches/UI;
+  absent or empty = no gate, valid — same philosophy as all-zero thresholds). At scenario load,
+  `MapLoader` (which already takes the manifest) **CLEARS every authored `IsObjective`, then STAMPS
+  the manifest list onto the map** — the authored flag value is DEAD AND IGNORED, so stale/legacy
+  maps and editor lag are harmless, and no re-export is urgent. Gameplay, UI (the existing city-flag
+  wiring works unchanged) and SAVES all read the STAMPED flag. ⚠ This is REQUIRED, not convenient:
+  §7.3 makes in-battle saves self-contained (the scenario may be uninstalled), so the gate cannot
+  read the live manifest — the embedded map carries the objectives, and the SnapshotMapper restore
+  path never re-stamps. Same snapshot doctrine as ".oob is a snapshot of CombatUnitDB": patching a
+  manifest's objectives does not change an in-battle save; between-battle saves reload fresh.
+  *Validation:* objective outside the map bounds → REFUSED load (G6 — manifest and map were not
+  exported together; silently skipping would make the gate quietly easier). Duplicate coordinates →
+  refused in `IsValid`. Objective on a NON-stronghold hex → loud WARNING only (stronghold placement
+  is an authoring convention, Bob's call — an open-ground objective flips by transit and flickers).
+  *Consequence:* **V15 is REDEFINED, not executed** — the flag is never ripped; it becomes a
+  load-time projection of manifest data. What dies is the AUTHORED value; the editor's map-side
+  objective-marking UI becomes obsolete. The Stage-2 tombstones get REWRITTEN when this builds
+  (authored = dead; runtime = stamped projection; gameplay reads the runtime value).
+  *Editor-status confirmations (their EOD report, 2026-08-17):* **the stamp writes THE FLAG ONLY** —
+  `victoryValue` is map data and is never stamped (their reading, confirmed; two sources of truth
+  for one number is the drift we keep killing). `missionObjectives` is **PER-VARIANT** — standalone
+  and campaign manifests over the same `.map` legitimately stamp different hexes; never assume a
+  canonical per-map set. `victoryValue` is genuinely FRACTIONAL now (their truncation bug fixed;
+  float end-to-end our side, ledger accumulates double, HUD messages format `0.#`). Their authoring
+  validation is deliberately STRICTER than ours (refuses multiplier == 1.0, partial ladders,
+  all-zero thresholds with a victory-rung requiredResult, filler-column objectives, negative value)
+  — leave our looser checks as they are; theirs run first. ⚠ **KHOST COORDINATION:** C6b's clear
+  wipes the 12 authored flags — C6a MUST seed both khost manifests IN THE SAME COMMIT as the stamp
+  (placeholder set = the 12 former hexes; the editor supplies authored sets with the rebalance) or
+  Khost shows no flags and runs no gate, which reads as a rendering bug.
 
 ## Q-refinements from the editor's answers doc (all verified)
 
@@ -147,56 +201,103 @@
       with dispatch + SFX, clean Console, no early end). One compile fix en route: a `*/` inside a
       block comment (`EU_*/CH_*`) terminated it early — the V17 comment is line-style now.
 
-## Stage 3 — Income switches over (no gate)
+## Stage 3 — Income switches over (no gate of its own)
+### ✅ CODE-COMPLETE 2026-08-17 — new `PrestigeIncomeTests` (6) ride ⚑ GATE 3
 
-- [ ] **V7** income in `ProcessUpkeep`, player-side only (matches the ratified scripted-only-AI-economy
-      ruling): stipend + `PlayerValue × rate` + high-water progress bonus (V7.2); `double` throughout,
-      `Math.Round` ONCE (V7.3); `CurrentLedger` refreshed here for UI/debug.
-- [ ] **V3.3** delete the capture award (`MovementController:1469-1470`); KEEP the printer dispatch +
-      `ObjectiveCaptured/Lost` SFX. `CaptureObjective()`/`LoseObjective()` calls replaced by the
-      ledger-content UI message (V6.3).
-- [ ] **V6** retire the counters: the three fields, `InitializeObjectivesFromMap` (call site :358 →
-      the Stage-1 `StartingPlayerShare` capture), `SetTotalObjectiveHexes` + `UpdateObjectiveStatus`
-      (zero callers), `ResetBattle`'s counter lines. ⚠ ALL THREE are persisted (`GameDataObjects`
-      :108-110, incl. `objectiveHexesUnoccupied` — v2 doc said two; verified three). Snapshot fields
-      drop in Stage 5's bump; until then the DTO keeps writing defaults, which is harmless.
+- [x] **V7** income in `ProcessUpkeep`, player-side only. ⚠ Arithmetic lives in
+      `BattleManager.ComputeIncome` — STATIC + PURE (the TurnStructureTests precedent, same reason as
+      the `PrestigeWallet` extraction): stipend + rate × held value + high-water progress bonus,
+      `double` accumulation, ONE `Math.Round` at the end. The three manifest knobs cached in
+      `GrabManifestData` beside `DeploymentPointCap` (⚠ Stage 5 must rule on their save mirror —
+      in-battle saves restore without a manifest, §7.3).
+- [x] **V3.3** capture award deleted; dispatch + SFX kept. `PrinterDispatch.ReportObjectiveCaptured`
+      DROPPED its prestige parameter and the "credited to the front" line — the dispatch must not
+      claim a lump sum that is no longer paid.
+- [x] **V6** counters retired in full: the three fields, `InitializeObjectivesFromMap`,
+      `SetTotalObjectiveHexes` + counter-`UpdateObjectiveStatus` (zero callers), the `ResetBattle`
+      lines. `CaptureObjective`/`LoseObjective` → `ReportStrongholdTaken`/`ReportStrongholdLost`
+      (V6.3): ledger-content HUD messages ("Stronghold taken — victory value 120/240 (50%)"), fresh
+      throwaway `Compute` per message — they do NOT write `CurrentLedger` (Upkeep owns it) and run NO
+      victory check. `TriggerImmediateVictory` keeps zero callers until Stage 4's End Scenario
+      button. DTO fields (`GameDataObjects` :108-110) drop with Stage 5's bump as planned.
+- [x] Tests: NEW `PrestigeIncomeTests` (6) — stipend floor, rate income, bonus-pays-once + ratchet,
+      lose-then-retake pays nothing, round-once (0.45 + 0.45 → 1), all-zero knobs.
 
 ## Stage 4 — Scoring + win condition + doc amendments → ⚑ GATE 3
+### ✅ CODE-COMPLETE 2026-08-17 — awaiting the GATE 3 run (queued in Claude_TODO ⚑)
+### ⚠ Deviation, deliberate: `OnEndScenarioButton` lives on **BattleManager**, not DefaultDialog_Scene1
+### — the OnEndTurnButton precedent (battle-flow callback, gate inside the callback, no HUD copy).
+### Bob wires the new button's onClick to BattleManager; name is a contract (§3.6b). Until wired,
+### early finish is unreachable — the auto-end and grading paths work without it.
+### ⚠ C6a label note: `MissionObjective.Label` is stored + round-tripped but has no game-side
+### consumer yet — dispatches already name places via the map's TileLabel; the label's consumers
+### arrive with the objectives HUD/briefing surfaces. Told the editor at pass close.
 
-- [ ] **V9** `CompleteBattle` grades: mirror around `StartingPlayerShare` (V9.1), switch-expression
-      ladder (V9.2), **C1 no-scoring guard first**, degenerate cases log never throw (V9.3), full
-      arithmetic logged for Bob's tuning (V9.4).
-- [ ] **V10.1** all-objectives rule deleted; nothing-further-to-gain early end via **C2 fresh
-      compute** + C1 guard. The boundary recompute ALSO writes `CurrentLedger` (editor's C2 addendum,
-      accepted) so the HUD and the verdict can never disagree about the same instant.
-- [ ] **V10.2** voluntary early finish per **C5** — gate is `VictoryThresholdMinor > 0f &&
-      PlayerShare >= VictoryThresholdMinor`, NEVER `requiredResult` (turn-1 defensive cash-out
-      exploit). Bonus per **C3** (live ledger, no stored field). `public void OnEndScenarioButton()`
-      on `DefaultDialog_Scene1` — Bob wires onClick (CLAUDE.md §2.13; name is a contract); the gate
-      lives INSIDE the callback per the `CanEndTurn` precedent (§3.6b).
-- [ ] **V10.3** farming note recorded in `todo.md` Phase 2 (goes live with campaign carryover; not
+- [x] **C6a — manifest schema:** `missionObjectives` list + `MissionObjective` type ({X, Y, Label} —
+      label optional, feeds dispatches/UI). `IsValid`: absent/empty valid; entries within the
+      declared `mapWidth`/`mapHeight` rectangle; duplicates refused. (The authoritative in-bounds +
+      terrain checks live in the MapLoader stamp — IsValid only knows the rectangle, not the
+      odd-row overhang or terrain.) Seed both shipped manifests — Khost's 12 formerly-authored
+      objective hexes are the candidate set; Bob authors the real one (map under revision).
+- [x] **C6b — the stamp:** `MapLoader` clears every authored `IsObjective` after populate, then
+      stamps `manifest.missionObjectives`. Out-of-bounds objective → refuse the load (G6 style);
+      non-stronghold objective → loud warning. Restore path (SnapshotMapper) untouched — stamped
+      flags ride the embedded save map.
+- [x] **C6c — tombstone rewrite:** `HexTile.IsObjective` + `SetIsObjective` + both reader-site notes
+      get the new doctrine (authored = dead/ignored; runtime = load-time projection of the manifest;
+      gameplay reads the RUNTIME value). The Stage-2 "do not add readers" wording is superseded.
+- [x] **V9** `CompleteBattle` grades: mirror around `StartingPlayerShare` (V9.1), switch-expression
+      ladder (V9.2), **C1 no-scoring guard first**, degenerate cases log never throw (V9.3), **C6
+      gate cap applied LAST** (unmet → min(shareGrade, one rung below `requiredResult`)), full
+      arithmetic + gate state logged for Bob's tuning (V9.4).
+- [x] **V10.1** all-objectives rule deleted (done early, Stage 2); nothing-further-to-gain early end
+      via **C2 fresh compute** + C1 guard **+ C6 gate term** (auto-end must not fire at a rung the
+      gate would then deny). The boundary recompute ALSO writes `CurrentLedger` (editor's C2
+      addendum, accepted) so the HUD and the verdict can never disagree about the same instant.
+- [x] **V10.2** voluntary early finish per **C5 + C6** — gate is `VictoryThresholdMinor > 0f &&
+      PlayerShare >= VictoryThresholdMinor && allObjectivesHeld`, NEVER `requiredResult` (turn-1
+      defensive cash-out exploit). Bonus per **C3** (live ledger, no stored field).
+      `public void OnEndScenarioButton()` on `DefaultDialog_Scene1` — Bob wires onClick (CLAUDE.md
+      §2.13; name is a contract); the gate lives INSIDE the callback per the `CanEndTurn` precedent
+      (§3.6b).
+- [x] **V10.3** farming note recorded in `todo.md` Phase 2 (goes live with campaign carryover; not
       solved here — by design).
-- [ ] **C4 — design-doc amendments** (`HS_DesignDoc.md`): §4.7.2 (flag → derived stronghold +
-      ungated value), §6.13.8 (exemption keys on `IsStronghold`), §17.5.2/.3 (capture no longer
-      credits prestige immediately), §18.2.1/.2 (REPLACED: per-turn income = stipend + rate × held
-      value + high-water bonus; early-finish rule), §17.7 cross-ref. §17.2/17.3 already anticipate
-      %-of-total thresholds — reconcile wording, no reversal. Each amendment dated + ratified per
-      house style.
-- [ ] New tests: `Grade()` all eight rungs, s0 at/off 0.5, boundary equality at each cut, C1 guard;
-      early-finish bonus arithmetic; high-water pays once (lose → retake → no double bonus).
+- [x] **C4 — design-doc amendments** (`HS_DesignDoc.md`): §4.7.2 (flag → derived stronghold +
+      ungated value + the C6 projection doctrine), §6.13.8 (exemption keys on `IsStronghold`),
+      §17.5.2/.3 (capture no longer credits prestige immediately), §18.2.1/.2 (REPLACED: per-turn
+      income = stipend + rate × held value + high-water bonus; early-finish rule), §17.7 cross-ref,
+      **NEW §17.x — THE MISSION-OBJECTIVE GATE** (C6 in full: manifest-authored, stamped at load,
+      one-rung-below-required cap, the gate term on early finish + auto-end, defensive/offensive
+      placement doctrine). §17.2/17.3 already anticipate %-of-total thresholds — reconcile wording,
+      no reversal. Each amendment dated + ratified per house style.
+- [x] New tests: `Grade()` all eight rungs, s0 at/off 0.5, boundary equality at each cut, C1 guard;
+      **C6 gate**: cap at each scenario shape (offensive → Draw, defensive → MinorDefeat,
+      withdrawal → MajorDefeat), gate term blocks early finish + auto-end, no-objectives manifest =
+      gate trivially met; **C6b stamp**: authored flags cleared, manifest stamped, out-of-bounds
+      refused, non-stronghold warns; early-finish bonus arithmetic; high-water pays once (lose →
+      retake → no double bonus). (Stage 5 adds: stamped flags survive the save round-trip.)
 - [ ] ⚑ **GATE 3** — suite run + play: battles stop always ending `Draw`.
 
-## Stage 5 — Persistence (no gate; suite piggybacks on GATE 3 if stages land together)
+## Stage 5 — Persistence
+### ✅ CLOSED 2026-08-17 — SAVE_VERSION 7; FINAL RUN GREEN (suite + play), COMMITTED.
 
-- [ ] **V12.1** persist: `CurrentPrestige`, `PrestigeEarned`, `PrestigeSpent` (DTO fields already
+- [x] **V12.1** persist: `CurrentPrestige`, `PrestigeEarned`, `PrestigeSpent` (DTO fields already
       exist on `ScenarioData` :98-100 — never mapped; wire them), `StartingPlayerShare`,
       `HighWaterVictoryValue` (both NEW fields — cannot be recomputed). **Not** the ledger (V12.2).
       Drop the three objective-counter fields (V6.4).
-- [ ] **V12.3** `SAVE_VERSION` 6 → 7, NO migration arm (pre-1.0 clean break, CLAUDE.md §2.12): dated
+- [x] **V12.3** `SAVE_VERSION` 6 → 7, NO migration arm (pre-1.0 clean break, CLAUDE.md §2.12): dated
       paragraph at `GameData.cs` incl. the Q5 why-it-didn't-ride-with-AI2b-3 record; extend the
       deliberately-no-arm list at `SnapshotMapper.cs:728-732`.
-- [ ] Round-trip test: save → load → recomputed ledger matches, anchors restored, `SpendPrestige`
-      state survives.
+- [x] Round-trip test: `PrestigePersistenceTests` — the full slice through `JsonPolicy.Save`,
+      dropped counters proven absent from the wire, `Wallet.Restore` verbatim + negative clamps,
+      stamped objective flag survives the hex round-trip (+ `IsStronghold` re-derives on restore).
+- [x] **RULED (the Stage-3 open question): the 8 manifest scoring/economy knobs ARE mirrored** into
+      `ScenarioData` (V11.6) — an in-battle save restores without its manifest and income/grading
+      read them every turn. Mission objectives need NO mirror: they ride the embedded map's stamped
+      flags (the C6 architecture paying off). Sync glue = `BattleManager.CaptureScenarioState` /
+      `RestoreScenarioState`, called null-tolerantly from ToSnapshot/ApplySnapshot — deliberately
+      ONLY the prestige-pass slice; full battle-state sync belongs to the unbuilt save-wiring
+      feature and these methods say so.
 
 ## Stage 6 — Spend sink = `todo_profiles.md` P4 (⚑ GATE 4 lives there)
 
@@ -213,9 +314,11 @@ everything shipped before then is a placeholder and is labeled as such.
   Hamburg: all three ports sit on city terrain).
 - **ART (Bob):** `EU_Airbase` / `EU_Fort` / `EU_Sprawl` sprites + `SpriteManager` registration —
   Hamburg blocker for icons, not for code (V17 warn-and-skip degrades it to a quiet gap).
-- **V15 rip:** delete `IsObjective` + `SetIsObjective`, repoint the two UI readers at a manifest
-  mission-objective list, `SAVE_VERSION` bump, tell the editor to stop writing the key. Trigger:
-  manifest gains the objective list (Phase 2 / briefing work).
+- **V15 — REDEFINED BY C6 (2026-08-17 late), no longer a rip.** `IsObjective` is never deleted: it
+  becomes a load-time PROJECTION of `manifest.missionObjectives` (C6b clear-then-stamp) that
+  gameplay, UI and saves all read. What dies is the AUTHORED value — the loader ignores whatever the
+  file says, and the editor's map-side objective-marking UI is obsolete (relayed in Response4). The
+  JSON key stays in the `.map` schema per V2.3 (removal costs a format bump for zero gain).
 - **V11.7 relay:** send the editor the final JSON field names + casing the moment Stage 1 lands
   (their E8 is gated on it; until then editor-authored manifests carry no scoring keys — harmless
   by V11.3, not a bug).

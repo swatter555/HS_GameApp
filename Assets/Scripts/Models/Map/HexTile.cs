@@ -64,15 +64,19 @@ namespace HammerAndSickle.Models.Map
         [JsonPropertyName("isPort")]
         public bool IsPort { get; set; }
 
-        // ⚠ GAMEPLAY-DEAD SINCE 2026-08-17 (prestige pass V2). This flag no longer drives tile control,
-        // scoring, or the win condition — capture stickiness is DERIVED (`IsStronghold`, below) and score
-        // comes from `victoryValue` summed over controlled hexes (VictoryLedger). It survives ONLY as a
-        // UI marker: the objective flag sprite (HexGridRenderer.DrawCityIconForHex) and the info-panel
-        // feature line (Prefab_TerrainPanel.GetSpecialFeatures). Scheduled for deletion once
-        // ScenarioManifest carries a mission-objective hex list — the mission's focus is SCENARIO data
-        // and does not belong in the .map, which must serve several scenarios (V15). The JSON key stays
-        // until then: the editor writes it and both shipped maps carry it on every hex (CLAUDE.md §2.11).
-        // ⚠ Do not add new readers.
+        // ⚠ A LOAD-TIME PROJECTION OF MANIFEST DATA — the AUTHORED value is DEAD (C6, 2026-08-17).
+        // MapLoader.ApplyMissionObjectiveStamp CLEARS every value read from the .map file, then stamps
+        // `manifest.missionObjectives` onto the listed hexes — so whatever the file says is ignored,
+        // and the same .map legitimately carries different objective sets in its standalone and
+        // campaign scenarios. The RUNTIME value is real gameplay state: the §17.x victory gate
+        // (HexMapUtil.AllMissionObjectivesHeld — the player cannot reach requiredResult until every
+        // stamped hex is Red), the objective flag sprite, and the info-panel feature line all read it,
+        // and it SERIALIZES INTO SAVES deliberately — an in-battle save must load with its scenario
+        // uninstalled (§7.3), so the embedded map, not the manifest, carries the objectives. The
+        // SnapshotMapper restore path never re-stamps. ⚠ It does NOT drive tile-control stickiness
+        // (that is the derived `IsStronghold` below) and does NOT gate scoring (value is ungated).
+        // The JSON key stays in the .map schema: the editor still writes it, removal costs a format
+        // bump for zero gain (CLAUDE.md §2.11).
         [JsonPropertyName("isObjective")]
         public bool IsObjective { get; set; }
 
@@ -550,8 +554,9 @@ namespace HammerAndSickle.Models.Map
 
         /// <summary>
         /// Sets the objective status of the hex.
-        /// ⚠ GAMEPLAY-DEAD (V2, 2026-08-17) — `IsObjective` is a UI-only marker now; see its tombstone.
-        /// Kept until the V15 rip (one test caller); do not add new callers.
+        /// ⚠ `IsObjective` is a load-time projection of `manifest.missionObjectives` (C6) — the ONLY
+        /// legitimate production writer is `MapLoader.ApplyMissionObjectiveStamp`. This setter survives
+        /// for tests; a gameplay call writes state the next scenario load will overwrite.
         /// </summary>
         /// <param name="value">True to make objective, false to remove</param>
         public void SetIsObjective(bool value)

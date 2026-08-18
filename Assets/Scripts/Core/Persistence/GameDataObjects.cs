@@ -94,20 +94,41 @@ namespace HammerAndSickle.Persistence
         // and leaving it here would have kept a dead concept alive in the save format.
         [JsonPropertyName("deploymentPointCap")] public int DeploymentPointCap { get; set; } = 0;
 
-        // Prestige
+        // Prestige (SAVE_VERSION 7: setters opened so BattleManager.CaptureScenarioState can write —
+        // these three were carried by the shape since v4 but never mapped from live state).
         [JsonPropertyName("currentPrestige")] public int CurrentPrestige { get; set; } = 0;
-        [JsonInclude] [JsonPropertyName("prestigeEarned")] public int PrestigeEarned { get; private set; } = 0;
-        [JsonInclude] [JsonPropertyName("prestigeSpent")] public int PrestigeSpent { get; private set; } = 0;
+        [JsonPropertyName("prestigeEarned")] public int PrestigeEarned { get; set; } = 0;
+        [JsonPropertyName("prestigeSpent")] public int PrestigeSpent { get; set; } = 0;
+
+        // Victory scoring anchors (SAVE_VERSION 7, prestige pass Stage 5). Both are REAL HISTORY and
+        // CANNOT be recomputed from the restored map: the starting share is unrecoverable after the
+        // first flip (it is the §17.3 mirror anchor), and the high-water mark is the §18.2.2
+        // anti-farm ratchet. ⚠ The VictoryLedger itself is deliberately NOT here — derived state
+        // recomputes on load (V12.2); serialising it re-creates the drift the recompute design kills.
+        [JsonPropertyName("startingPlayerShare")] public float StartingPlayerShare { get; set; } = 0f;
+        [JsonPropertyName("highWaterVictoryValue")] public float HighWaterVictoryValue { get; set; } = 0f;
+
+        // §18.2 income + §17.3 scoring knobs, mirrored from the manifest (V11.6): an in-battle save
+        // must restore WITHOUT its manifest (§7.3 self-containment), and income/grading read these
+        // every turn. The mission objectives need no mirror — they ride the embedded map's stamped
+        // hex flags (C6).
+        [JsonPropertyName("prestigeStipend")] public int PrestigeStipend { get; set; } = 0;
+        [JsonPropertyName("prestigeIncomeRate")] public float PrestigeIncomeRate { get; set; } = 0f;
+        [JsonPropertyName("prestigeProgressBonusRate")] public float PrestigeProgressBonusRate { get; set; } = 0f;
+        [JsonPropertyName("earlyFinishMultiplier")] public float EarlyFinishMultiplier { get; set; } = 1.25f;
+        [JsonPropertyName("victoryThresholdMinor")] public float VictoryThresholdMinor { get; set; } = 0f;
+        [JsonPropertyName("victoryThresholdMajor")] public float VictoryThresholdMajor { get; set; } = 0f;
+        [JsonPropertyName("victoryThresholdDecisive")] public float VictoryThresholdDecisive { get; set; } = 0f;
+        [JsonPropertyName("requiredResult")] public BattleResult RequiredResult { get; set; } = BattleResult.MinorVictory;
 
         // Conditions
         [JsonPropertyName("weatherCondition")] public WeatherCondition WeatherCondition { get; set; } = WeatherCondition.Clear;
         [JsonInclude] [JsonPropertyName("currentPhase")] public BattlePhase CurrentPhase { get; private set; } = BattlePhase.NotStarted;
         [JsonInclude] [JsonPropertyName("currentResult")] public BattleResult CurrentResult { get; private set; } = BattleResult.Ongoing;
 
-        // Objective data
-        [JsonInclude] [JsonPropertyName("objectiveHexesOccupied")] public int ObjectiveHexesOccupied { get; private set; } = 0;
-        [JsonInclude] [JsonPropertyName("objectiveHexesUnoccupied")] public int ObjectiveHexesUnoccupied { get; private set; } = 0;
-        [JsonInclude] [JsonPropertyName("totalObjectiveHexes")] public int TotalObjectiveHexes { get; private set; } = 0;
+        // (The three objective-counter fields — objectiveHexesOccupied/Unoccupied/totalObjectiveHexes —
+        // were DROPPED in SAVE_VERSION 7: the counters they mirrored retired with the recomputed
+        // VictoryLedger + stamped mission-objective flags, prestige pass Stages 3–4.)
 
         // TODO: Need to add loss tracking.
     }

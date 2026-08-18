@@ -7,6 +7,7 @@ using HammerAndSickle.Helpers;
 using HammerAndSickle.Models;
 using HammerAndSickle.Models.Combat;
 using HammerAndSickle.Models.Map;
+using HammerAndSickle.Persistence;
 using HammerAndSickle.Renderers;
 using HammerAndSickle.Renderers.Chunked;
 using HammerAndSickle.Services;
@@ -136,12 +137,26 @@ namespace HammerAndSickle.Controllers
         public int DeploymentPointCap { get; private set; } = 0;
 
         /// --------------------
-        /// Objective Tracking
+        /// Objective Tracking — RETIRED (prestige pass Stage 3, 2026-08-17)
         /// --------------------
+        // The three incremental counters (Occupied/Unoccupied/Total) are DELETED: the recomputed
+        // VictoryLedger is the territorial score, and the C6 mission-objective gate reads the stamped
+        // hex flags fresh. An incremental counter desyncs the moment a control change takes a path
+        // that forgot to update it — which is exactly what happened when flips widened to strongholds
+        // while the total still counted authored objectives. Their save-DTO fields drop with the
+        // Stage 5 SAVE_VERSION bump.
 
-        public int ObjectiveHexesOccupied { get; private set; } = 0;
-        public int ObjectiveHexesUnoccupied { get; private set; } = 0;
-        public int TotalObjectiveHexes { get; private set; } = 0;
+        // §18.2 income + §17.3 scoring knobs (V7/V9/V10), cached from the manifest like
+        // DeploymentPointCap. ⚠ Stage 5 must rule on their save mirror (V11.6) — an in-battle save
+        // restores WITHOUT a manifest (§7.3).
+        public int PrestigeStipend { get; private set; } = 0;
+        public float PrestigeIncomeRate { get; private set; } = 0f;
+        public float PrestigeProgressBonusRate { get; private set; } = 0f;
+        public float EarlyFinishMultiplier { get; private set; } = 1.25f;
+        public float VictoryThresholdMinor { get; private set; } = 0f;
+        public float VictoryThresholdMajor { get; private set; } = 0f;
+        public float VictoryThresholdDecisive { get; private set; } = 0f;
+        public BattleResult RequiredResult { get; private set; } = BattleResult.MinorVictory;
 
         /// --------------------
         /// Battle Statistics
@@ -377,12 +392,9 @@ namespace HammerAndSickle.Controllers
             SetTurn(0);
             SetPhase(BattlePhase.Deployment);
 
-            // Seed objective tracking from the loaded map so the §17 victory check has real
-            // totals to compare against as hexes flip during play.
-            InitializeObjectivesFromMap();
-
             // V5.3: capture the victory-value baseline the §17.3 scoring ladder mirrors around.
             // Once-only — the starting share CANNOT be recomputed after the first flip.
+            // (Replaced InitializeObjectivesFromMap + the counter trio, retired Stage 3.)
             CaptureStartingLedger();
 
             // Open the battle framed on the player's main supply depot (view only — no
@@ -390,39 +402,6 @@ namespace HammerAndSickle.Controllers
             CenterCameraOnStart();
 
             return true;
-        }
-
-        /// <summary>
-        /// Counts objective hexes on the loaded map and seeds the held/total counters (player = Red,
-        /// §4.7.1). Recomputed from the map rather than tracked incrementally at load so the totals are
-        /// always truthful; movement-driven captures then adjust the counters via CaptureObjective /
-        /// LoseObjective (§17.5). Safe no-op if no map is loaded.
-        /// </summary>
-        private void InitializeObjectivesFromMap()
-        {
-            try
-            {
-                var map = GameDataManager.CurrentHexMap;
-                int total = 0, occupied = 0;
-
-                if (map != null)
-                {
-                    foreach (var hex in map)
-                    {
-                        if (hex == null || !hex.IsObjective) continue;
-                        total++;
-                        if (hex.TileControl == TileControl.Red) occupied++;
-                    }
-                }
-
-                TotalObjectiveHexes = total;
-                ObjectiveHexesOccupied = occupied;
-                ObjectiveHexesUnoccupied = total - occupied;
-            }
-            catch (Exception ex)
-            {
-                AppService.HandleException(CLASS_NAME, nameof(InitializeObjectivesFromMap), ex);
-            }
         }
 
         /// <summary>
@@ -482,7 +461,14 @@ namespace HammerAndSickle.Controllers
             _prestige.Seed(GameDataManager.CurrentManifest.PrestigePool);
             DeploymentPointCap = GameDataManager.CurrentManifest.DeploymentPointCap;
             MaxTurnNumber = GameDataManager.CurrentManifest.MaxTurns;
-
+            PrestigeStipend = GameDataManager.CurrentManifest.PrestigeStipend;
+            PrestigeIncomeRate = GameDataManager.CurrentManifest.PrestigeIncomeRate;
+            PrestigeProgressBonusRate = GameDataManager.CurrentManifest.PrestigeProgressBonusRate;
+            EarlyFinishMultiplier = GameDataManager.CurrentManifest.EarlyFinishMultiplier;
+            VictoryThresholdMinor = GameDataManager.CurrentManifest.VictoryThresholdMinor;
+            VictoryThresholdMajor = GameDataManager.CurrentManifest.VictoryThresholdMajor;
+            VictoryThresholdDecisive = GameDataManager.CurrentManifest.VictoryThresholdDecisive;
+            RequiredResult = GameDataManager.CurrentManifest.RequiredResult;
         }
 
         /// <summary>
@@ -898,12 +884,21 @@ namespace HammerAndSickle.Controllers
                 if (anyLostAtSea)
                     EventManager.Instance?.RaiseRedrawMapIcons();
 
-                // V5.3: the once-per-turn victory-ledger recompute — derived, never accumulated, and
-                // deliberately NOT cached behind a dirty flag. Player side only, matching where the
-                // §18 income will draw from (V7, todo_prestige Stage 3): the AI has no economy
-                // (scripted-only ruling, AI design pass 1) — the symmetric branch is ABSENT, not forgotten.
+                // V5.3 + V7 (§18.2): the once-per-turn ledger recompute AND the prestige income it
+                // pays. Player side only — the AI has no economy (scripted-only ruling, AI design
+                // pass 1); the symmetric branch is ABSENT, not forgotten. The high-water mark is what
+                // defeats lose-and-retake farming (V7.2): the progress bonus pays only on value above
+                // the highest ever held.
                 if (isPlayerSide)
-                    CurrentLedger = VictoryLedger.Compute(GameDataManager.CurrentHexMap);
+                {
+                    VictoryLedger ledger = VictoryLedger.Compute(GameDataManager.CurrentHexMap);
+                    CurrentLedger = ledger;
+
+                    int paid = ComputeIncome(ledger, PrestigeStipend, PrestigeIncomeRate,
+                        PrestigeProgressBonusRate, HighWaterVictoryValue, out float newHighWater);
+                    HighWaterVictoryValue = newHighWater;
+                    if (paid != 0) AddPrestige(paid);
+                }
 
                 // §3.5.9 HCL decay/recovery — STUB (needs depot supply tracing; supply pass).
             }
@@ -1060,6 +1055,59 @@ namespace HammerAndSickle.Controllers
             }
         }
 
+        /// <summary>
+        /// End Scenario button (V10.2 — §17.x early finish). Inspector-wired by Bob, like
+        /// OnEndTurnButton — do NOT add a HUD copy, and ⚠ the name is a contract (§3.6b).
+        /// The availability gate lives HERE, not in button state (the CanEndTurn precedent):
+        /// player turn · scoring declared · an actual VICTORY achieved (share ≥ minor — never
+        /// requiredResult, the C5 turn-1 defensive cash-out exploit) · every mission objective held
+        /// (C6). Cashing out pays unusedTurns × steady income × earlyFinishMultiplier (C3: computed
+        /// LIVE — no stored field to go stale across a save), then ends the battle through the
+        /// normal grading path, which the gate terms guarantee will grade ≥ MinorVictory.
+        /// </summary>
+        public void OnEndScenarioButton()
+        {
+            try
+            {
+                if (_battleEnded || CurrentPhase != BattlePhase.PlayerTurn)
+                {
+                    AppService.CaptureUiMessage("The scenario can only be ended during your turn.");
+                    return;
+                }
+
+                var map = GameDataManager.CurrentHexMap;
+                VictoryLedger ledger = VictoryLedger.Compute(map);
+
+                if (VictoryThresholdMinor <= 0f || ledger.TotalValue <= 0f)
+                {
+                    AppService.CaptureUiMessage("This scenario is not scored — it runs to the turn limit.");
+                    return;
+                }
+
+                if (ledger.PlayerShare < VictoryThresholdMinor || !HexMapUtil.AllMissionObjectivesHeld(map))
+                {
+                    AppService.CaptureUiMessage("Cannot end the scenario — victory has not been achieved yet.");
+                    return;
+                }
+
+                int unusedTurns = Math.Max(0, MaxTurnNumber - CurrentTurnNumber);
+                int bonus = ComputeEarlyFinishBonus(ledger, PrestigeStipend, PrestigeIncomeRate,
+                    unusedTurns, EarlyFinishMultiplier);
+                if (bonus > 0)
+                {
+                    AddPrestige(bonus);
+                    AppService.CaptureUiMessage(
+                        $"Scenario ended early — {unusedTurns} unused day(s) pay a {bonus} prestige bonus.");
+                }
+
+                TriggerImmediateVictory();
+            }
+            catch (Exception ex)
+            {
+                AppService.HandleException(CLASS_NAME, nameof(OnEndScenarioButton), ex);
+            }
+        }
+
         #endregion // Turn Management
 
         #region Battle Status
@@ -1074,17 +1122,28 @@ namespace HammerAndSickle.Controllers
         {
             try
             {
-                /* ⚠ THE ALL-OBJECTIVES INSTANT WIN IS RETIRED (prestige pass Stage 2, 2026-08-17) —
-                 * and it had to go WITH the stronghold change, not after it: capture accounting now
-                 * bumps ObjectiveHexesOccupied on every STRONGHOLD taken (36 on Khost) while
-                 * TotalObjectiveHexes still counts the 12 AUTHORED objectives, so leaving the old
-                 * comparison live meant any 12 stronghold captures spuriously auto-won the battle.
-                 * It was also the rule that made defensive scenarios unwinnable (the reason for the
-                 * whole redesign). INTERIM: no early end exists — battles run to the turn limit.
-                 * Stage 4 (V10) replaces this with the share-based rule: a fresh
-                 * VictoryLedger.Compute against the manifest's decisive threshold, guarded by the
-                 * C1 no-scoring check. The counters themselves retire in Stage 3 (V6). */
-                return false;
+                /* V10.1 (Stage 4) — the nothing-further-to-gain end: the top rung is reached and the
+                 * C6 gate holds, so no better result exists and the battle ends without waiting for
+                 * the turn limit. (REPLACED the all-objectives instant win, retired Stage 2 — that
+                 * rule made defensive scenarios unwinnable and, under derived strongholds, would have
+                 * auto-won on any 12 stronghold captures.)
+                 * ⚠ C1 guard FIRST: with no scoring declared, decisiveCut is 0 and PlayerShare >= 0
+                 * would end every battle at its first turn boundary.
+                 * ⚠ Fresh compute (C2), and it WRITES CurrentLedger (editor addendum): this runs at
+                 * TurnBoundary, AFTER both Upkeeps, so the upkeep-cached copy is legitimately staler
+                 * than the map — and the moment an AI turn exists it would be a full enemy turn stale.
+                 * ⚠ The C6 gate term: the battle must never auto-end at a rung the gate would then
+                 * deny — a decisive SHARE with a lost objective is not a decisive victory. */
+                if (VictoryThresholdMinor <= 0f) return false;
+
+                var map = GameDataManager.CurrentHexMap;
+                VictoryLedger ledger = VictoryLedger.Compute(map);
+                CurrentLedger = ledger;
+
+                if (ledger.TotalValue <= 0f) return false;
+                if (!HexMapUtil.AllMissionObjectivesHeld(map)) return false;
+
+                return ledger.PlayerShare >= VictoryThresholdDecisive;
             }
             catch (Exception ex)
             {
@@ -1116,9 +1175,26 @@ namespace HammerAndSickle.Controllers
                     _turnSequenceCoroutine = null;
                 }
 
-                // TODO: Calculate final BattleResult based on objectives held, unit
-                // losses, and turn used. For now, draw is the placeholder.
-                CurrentResult = BattleResult.Draw;
+                // V9 (Stage 4): grade the battle — fresh ledger (C2), written to CurrentLedger so the
+                // HUD and this verdict describe the same instant (editor addendum), C6 gate applied
+                // inside GradeBattleResult. The full arithmetic is logged (V9.4) because Bob hand-tunes
+                // these numbers across maps and an opaque verdict is unusable to him.
+                var finalMap = GameDataManager.CurrentHexMap;
+                VictoryLedger finalLedger = VictoryLedger.Compute(finalMap);
+                CurrentLedger = finalLedger;
+                bool objectivesHeld = HexMapUtil.AllMissionObjectivesHeld(finalMap);
+
+                CurrentResult = GradeBattleResult(finalLedger, StartingPlayerShare,
+                    VictoryThresholdMinor, VictoryThresholdMajor, VictoryThresholdDecisive,
+                    objectivesHeld, RequiredResult);
+
+                Debug.Log($"[{CLASS_NAME}] Battle graded: share {finalLedger.PlayerShare:0.###} " +
+                          $"({finalLedger.PlayerValue:0.#}/{finalLedger.TotalValue:0.#}, start {StartingPlayerShare:0.###}) | " +
+                          $"cuts {VictoryThresholdMinor}/{VictoryThresholdMajor}/{VictoryThresholdDecisive} " +
+                          $"(mirrored defeat cuts {2f * StartingPlayerShare - VictoryThresholdMinor:0.###}/" +
+                          $"{2f * StartingPlayerShare - VictoryThresholdMajor:0.###}/" +
+                          $"{2f * StartingPlayerShare - VictoryThresholdDecisive:0.###}) | " +
+                          $"objectives held: {objectivesHeld} | required: {RequiredResult} | result: {CurrentResult}");
 
                 SetPhase(BattlePhase.BattleComplete);
                 AppService.CaptureUiMessage($"Battle complete: {CurrentResult}");
@@ -1158,86 +1234,199 @@ namespace HammerAndSickle.Controllers
 
         #endregion // Environmental Management
 
-        #region Objective Management
+        #region Victory Economy
 
         /// <summary>
-        /// Sets the total number of objective hexes for the scenario.
+        /// §18.2 per-turn income (V7): stipend floor + rate × held value + progress bonus on value
+        /// above the high-water mark. Static and pure so EditorTests can pin the arithmetic (the
+        /// TurnStructureTests precedent — instance methods on a MonoBehaviour are not headless-
+        /// testable). Accumulates in double and rounds ONCE — rounding the components separately
+        /// loses a point per turn to truncation, a real number over 21 turns (V7.3). The high-water
+        /// mark only ever ratchets UP (V7.2): losing 100 and retaking it pays nothing, which is the
+        /// entire anti-farm mechanism — no per-hex state, no capture events.
         /// </summary>
-        public void SetTotalObjectiveHexes(int total)
+        internal static int ComputeIncome(VictoryLedger ledger, int stipend, float incomeRate,
+            float progressBonusRate, float highWater, out float newHighWater)
+        {
+            double income = stipend + (double)ledger.PlayerValue * incomeRate;
+
+            if (progressBonusRate > 0f && ledger.PlayerValue > highWater)
+                income += ((double)ledger.PlayerValue - highWater) * progressBonusRate;
+
+            newHighWater = ledger.PlayerValue > highWater ? ledger.PlayerValue : highWater;
+            return (int)Math.Round(income);
+        }
+
+        /// <summary>
+        /// §17.3 grading (V9) + the §17.x mission-objective gate cap (C6). Static and pure for
+        /// EditorTests. Order matters: the C1 no-scoring guard FIRST (all-zero thresholds would
+        /// otherwise grade every share DecisiveVictory), the zero-value map second (V5.4 — every
+        /// pre-rebalance shipped map), the mirrored ladder third, the gate cap LAST.
+        /// ⚠ The defeat cuts MIRROR AROUND THE ACTUAL STARTING SHARE (V9.1), not 0.5 — the stalemate
+        /// premise stays a design convention Bob can deliberately break, never an assumption welded
+        /// into the scoring. Since decisive &gt; major &gt; minor &gt; s0, the mirrored cuts descend
+        /// correctly by construction.
+        /// ⚠ The C6 cap is ONE RUNG BELOW requiredResult, not a flat Draw: a flat Draw cap would let
+        /// a defensive scenario (required = Draw) LOSE its objectives and still pass. One rung below
+        /// fails the mission in every scenario shape while the share still grades how badly.
+        /// </summary>
+        internal static BattleResult GradeBattleResult(VictoryLedger ledger, float startingShare,
+            float minorCut, float majorCut, float decisiveCut, bool objectivesHeld, BattleResult requiredResult)
+        {
+            if (minorCut <= 0f) return BattleResult.Draw;          // C1: no scoring declared
+            if (ledger.TotalValue <= 0f) return BattleResult.Draw; // V5.4: unscored map
+
+            float share = ledger.PlayerShare;
+            float s0 = startingShare;
+
+            BattleResult byShare = share switch
+            {
+                _ when share >= decisiveCut => BattleResult.DecisiveVictory,
+                _ when share >= majorCut => BattleResult.MajorVictory,
+                _ when share >= minorCut => BattleResult.MinorVictory,
+                _ when share > 2f * s0 - minorCut => BattleResult.Draw,
+                _ when share > 2f * s0 - majorCut => BattleResult.MinorDefeat,
+                _ when share > 2f * s0 - decisiveCut => BattleResult.MajorDefeat,
+                _ => BattleResult.DecisiveDefeat
+            };
+
+            if (objectivesHeld) return byShare;
+
+            // Gate unmet: the worse of the share grade and the cap. BattleResult ordinals ascend
+            // toward defeat (Ongoing = 0 is the sentinel and can reach here from neither input).
+            BattleResult cap = OneRungBelow(requiredResult);
+            return (BattleResult)Math.Max((int)byShare, (int)cap);
+        }
+
+        /// <summary>
+        /// One rung toward defeat from <paramref name="result"/>. DecisiveDefeat has no rung below and
+        /// caps to itself (the degenerate authoring case noted in todo_prestige C6 — a scenario
+        /// requiring DecisiveDefeat cannot be failed further by its gate).
+        /// </summary>
+        internal static BattleResult OneRungBelow(BattleResult result)
+        {
+            return result >= BattleResult.DecisiveDefeat ? BattleResult.DecisiveDefeat : result + 1;
+        }
+
+        /// <summary>
+        /// §17.x early-finish bonus (V10.2/C3): unusedTurns × the STEADY income the player would earn
+        /// by sitting still (stipend + rate × held value — deliberately NOT the progress bonus, which
+        /// sitting still never pays) × the manifest multiplier. Computed LIVE from the ledger at
+        /// cash-out — no stored lastTurnIncome, so it cannot go stale across a save. One rounding.
+        /// Any multiplier above 1 makes cashing out strictly dominate sitting; the only way to raise
+        /// the bonus is to hold MORE value first, which is the behaviour the design wants.
+        /// </summary>
+        internal static int ComputeEarlyFinishBonus(VictoryLedger ledger, int stipend, float incomeRate,
+            int unusedTurns, float multiplier)
+        {
+            if (unusedTurns <= 0) return 0;
+
+            double steadyIncome = stipend + (double)ledger.PlayerValue * incomeRate;
+            return (int)Math.Round(unusedTurns * steadyIncome * multiplier);
+        }
+
+        /// <summary>
+        /// HUD roll-up for a player stronghold capture (V6.3) — replaces the retired counter pair
+        /// (CaptureObjective/LoseObjective), whose "(3/12)" arithmetic desynced by construction once
+        /// flips widened to strongholds. Computes a throwaway ledger for the message and deliberately
+        /// does NOT write CurrentLedger (Upkeep owns that — V5.3) and runs NO victory check (the
+        /// instant win retired in Stage 2; Stage 4's share-based rule runs at TurnBoundary).
+        /// </summary>
+        public void ReportStrongholdTaken()
         {
             try
             {
-                TotalObjectiveHexes = total;
-                ObjectiveHexesUnoccupied = total;
-                ObjectiveHexesOccupied = 0;
-                AppService.CaptureUiMessage($"Total objective hexes set to: {total}");
+                var ledger = VictoryLedger.Compute(GameDataManager.CurrentHexMap);
+                AppService.CaptureUiMessage(
+                    $"Stronghold taken — victory value {ledger.PlayerValue:0.#}/{ledger.TotalValue:0.#} ({ledger.PlayerShare * 100f:0}%).");
             }
             catch (Exception ex)
             {
-                AppService.HandleException(CLASS_NAME, nameof(SetTotalObjectiveHexes), ex);
+                AppService.HandleException(CLASS_NAME, nameof(ReportStrongholdTaken), ex);
+            }
+        }
+
+        /// <summary>HUD roll-up for a stronghold lost to the AI (V6.3).</summary>
+        public void ReportStrongholdLost()
+        {
+            try
+            {
+                var ledger = VictoryLedger.Compute(GameDataManager.CurrentHexMap);
+                AppService.CaptureUiMessage(
+                    $"Stronghold lost — victory value {ledger.PlayerValue:0.#}/{ledger.TotalValue:0.#} ({ledger.PlayerShare * 100f:0}%).");
+            }
+            catch (Exception ex)
+            {
+                AppService.HandleException(CLASS_NAME, nameof(ReportStrongholdLost), ex);
             }
         }
 
         /// <summary>
-        /// Updates objective hex occupation status.
+        /// Copies the battle's prestige + scoring state INTO the save DTO — SnapshotMapper.ToSnapshot
+        /// calls this when a battle is live (Stage 5, SAVE_VERSION 7). ⚠ Deliberately ONLY the
+        /// prestige-pass slice: the wallet, the two scoring anchors, and the manifest-knob mirror
+        /// (V11.6 — an in-battle save restores without its manifest, §7.3). The REST of battle state
+        /// (turn, phase, weather…) gets its sync when saving is wired to UI — a separate unbuilt
+        /// feature; do not read this pair as it.
         /// </summary>
-        public void UpdateObjectiveStatus(int occupied, int unoccupied)
+        public void CaptureScenarioState(ScenarioData data)
         {
             try
             {
-                ObjectiveHexesOccupied = occupied;
-                ObjectiveHexesUnoccupied = unoccupied;
+                if (data == null) return;
+
+                data.CurrentPrestige = _prestige.Current;
+                data.PrestigeEarned = _prestige.Earned;
+                data.PrestigeSpent = _prestige.Spent;
+                data.StartingPlayerShare = StartingPlayerShare;
+                data.HighWaterVictoryValue = HighWaterVictoryValue;
+                data.PrestigeStipend = PrestigeStipend;
+                data.PrestigeIncomeRate = PrestigeIncomeRate;
+                data.PrestigeProgressBonusRate = PrestigeProgressBonusRate;
+                data.EarlyFinishMultiplier = EarlyFinishMultiplier;
+                data.VictoryThresholdMinor = VictoryThresholdMinor;
+                data.VictoryThresholdMajor = VictoryThresholdMajor;
+                data.VictoryThresholdDecisive = VictoryThresholdDecisive;
+                data.RequiredResult = RequiredResult;
             }
             catch (Exception ex)
             {
-                AppService.HandleException(CLASS_NAME, nameof(UpdateObjectiveStatus), ex);
+                AppService.HandleException(CLASS_NAME, nameof(CaptureScenarioState), ex);
             }
         }
 
         /// <summary>
-        /// Increments occupied objective count (when player captures).
+        /// Restores the prestige/scoring slice FROM a loaded save DTO — SnapshotMapper.ApplySnapshot
+        /// calls this AFTER the map is restored, so the ledger recompute below sees restored control.
+        /// The ledger itself is never persisted (V12.2) — recomputed here, the derived-state rule.
         /// </summary>
-        public void CaptureObjective()
+        public void RestoreScenarioState(ScenarioData data)
         {
             try
             {
-                ObjectiveHexesOccupied++;
-                ObjectiveHexesUnoccupied--;
-                AppService.CaptureUiMessage($"Objective captured! ({ObjectiveHexesOccupied}/{TotalObjectiveHexes})");
+                if (data == null) return;
 
-                // Panzer-Corps-style immediate end: if that capture took the player
-                // to full objective control, end the battle now without waiting for
-                // the turn to complete. The turn coroutine (if running) will see
-                // _battleEnded at its next yield and bail.
-                if (CheckVictoryConditions())
-                {
-                    TriggerImmediateVictory();
-                }
+                _prestige.Restore(data.CurrentPrestige, data.PrestigeEarned, data.PrestigeSpent);
+                StartingPlayerShare = data.StartingPlayerShare;
+                HighWaterVictoryValue = data.HighWaterVictoryValue;
+                PrestigeStipend = data.PrestigeStipend;
+                PrestigeIncomeRate = data.PrestigeIncomeRate;
+                PrestigeProgressBonusRate = data.PrestigeProgressBonusRate;
+                EarlyFinishMultiplier = data.EarlyFinishMultiplier;
+                VictoryThresholdMinor = data.VictoryThresholdMinor;
+                VictoryThresholdMajor = data.VictoryThresholdMajor;
+                VictoryThresholdDecisive = data.VictoryThresholdDecisive;
+                RequiredResult = data.RequiredResult;
+
+                CurrentLedger = VictoryLedger.Compute(GameDataManager.CurrentHexMap);
             }
             catch (Exception ex)
             {
-                AppService.HandleException(CLASS_NAME, nameof(CaptureObjective), ex);
+                AppService.HandleException(CLASS_NAME, nameof(RestoreScenarioState), ex);
             }
         }
 
-        /// <summary>
-        /// Decrements occupied objective count (when player loses control).
-        /// </summary>
-        public void LoseObjective()
-        {
-            try
-            {
-                ObjectiveHexesOccupied--;
-                ObjectiveHexesUnoccupied++;
-                AppService.CaptureUiMessage($"Objective lost! ({ObjectiveHexesOccupied}/{TotalObjectiveHexes})");
-            }
-            catch (Exception ex)
-            {
-                AppService.HandleException(CLASS_NAME, nameof(LoseObjective), ex);
-            }
-        }
-
-        #endregion // Objective Management
+        #endregion // Victory Economy
 
         #region Statistics Management
 
@@ -1332,10 +1521,6 @@ namespace HammerAndSickle.Controllers
                 _battleEnded = false;
                 CurrentResult = BattleResult.Ongoing;
                 CurrentWeather = WeatherCondition.Clear;
-
-                ObjectiveHexesOccupied = 0;
-                ObjectiveHexesUnoccupied = 0;
-                TotalObjectiveHexes = 0;
 
                 // V8.3: the wallet resets WITH the battle — before this, CurrentPrestige survived a
                 // reset and a replayed scenario would inherit the previous run's pool.

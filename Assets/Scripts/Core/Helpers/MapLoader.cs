@@ -1,5 +1,6 @@
 using HammerAndSickle.Controllers;
 using HammerAndSickle.Core.GameData;
+using HammerAndSickle.Models;
 using HammerAndSickle.Models.Map;
 using HammerAndSickle.Persistence;
 using HammerAndSickle.Services;
@@ -359,6 +360,13 @@ namespace HammerAndSickle.Core.Helpers
 
                 AppService.CaptureUiMessage($"Populated map with {hexMap.HexCount} hexes");
 
+                // C6b (2026-08-17): mission objectives are MANIFEST data stamped onto the map here —
+                // the authored isObjective value in the file is DEAD and IGNORED. Scenario load is the
+                // ONLY stamping site: the SnapshotMapper restore path never re-stamps, because an
+                // in-battle save carries its own stamped map and must load with the scenario
+                // uninstalled (§7.3).
+                ApplyMissionObjectiveStamp(hexMap, manifest);
+
                 // Build neighbor relationships
                 if (log) Debug.Log($"{CLASS_NAME}: Building neighbor relationships...");
                 hexMap.BuildNeighborRelationships();
@@ -457,6 +465,52 @@ namespace HammerAndSickle.Core.Helpers
         /// <param name="aDir">Direction from A toward B</param>
         /// <param name="bDir">Direction from B toward A (opposite)</param>
         /// <param name="fixCount">Running count of fixes applied</param>
+        /// <summary>
+        /// C6b clear-then-stamp: zeroes EVERY authored isObjective on the loaded map (the file's value
+        /// is dead — stale flags in legacy maps and editor lag are harmless by construction), then
+        /// stamps the manifest's missionObjectives onto the hexes. Internal + static so EditorTests
+        /// can drive it against a fixture map without file I/O.
+        /// ⚠ An objective on a MISSING hex is a REFUSED LOAD (G6 doctrine: manifest and .map were not
+        /// exported together — silently skipping would make the C6 victory gate quietly easier, the
+        /// exact silent-wrong shape G6 exists to kill). An objective on a NON-STRONGHOLD hex warns
+        /// loudly and stamps anyway — stronghold placement is an authoring convention (Bob's call):
+        /// an open-ground objective flips by mere transit and the gate flickers.
+        /// </summary>
+        internal static void ApplyMissionObjectiveStamp(HexMap hexMap, ScenarioManifest manifest)
+        {
+            foreach (HexTile hex in hexMap)
+            {
+                if (hex != null) hex.IsObjective = false;
+            }
+
+            if (manifest?.MissionObjectives == null) return;
+
+            foreach (MissionObjective obj in manifest.MissionObjectives)
+            {
+                if (obj == null) continue;
+
+                string name = string.IsNullOrEmpty(obj.Label) ? $"({obj.X},{obj.Y})" : $"'{obj.Label}' ({obj.X},{obj.Y})";
+                HexTile tile = hexMap.GetHexAt(new Position2D(obj.X, obj.Y));
+
+                if (tile == null)
+                {
+                    throw new InvalidDataException(
+                        $"Mission objective {name} does not exist on map '{hexMap.MapName}' " +
+                        $"({hexMap.MapSize.x}x{hexMap.MapSize.y}) — the manifest and .map were not " +
+                        "exported together. Fix the manifest or re-export the map.");
+                }
+
+                tile.IsObjective = true;
+
+                if (!tile.IsStronghold)
+                {
+                    Debug.LogWarning($"{CLASS_NAME}: Mission objective {name} is not on a stronghold hex " +
+                                     "(city/fort/airbase/port) — it will flip by mere transit and the victory " +
+                                     "gate will flicker. Move it or fortify the hex.");
+                }
+            }
+        }
+
         private static void SymmetrizeBorder(
             JSONFeatureBorders aBorders,
             JSONFeatureBorders bBorders,

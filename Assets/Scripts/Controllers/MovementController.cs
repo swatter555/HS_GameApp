@@ -1448,13 +1448,12 @@ namespace HammerAndSickle.Controllers
          * ───────────────────────────────────────────────────────────────────────────────────────── */
 
         /// <summary>
-        /// Applies the stronghold-capture consequences of a move's territory changes (§17.5.3).
-        /// A PLAYER capture credits the hex's VictoryValue in prestige and bumps the held-objective count
-        /// (which runs the immediate-win check); an AI capture of a player-held (Red) stronghold
-        /// decrements it. Plain tile flips (non-stronghold) carry no prestige. Routed through
-        /// BattleManager so the HUD, victory checks, and prestige counters stay in sync.
-        /// ⚠ The immediate award + the counter calls retire in prestige-pass Stage 3 (income model,
-        /// §18.2 revised) — the dispatch and SFX stay.
+        /// Applies the FEEDBACK consequences of a move's stronghold captures (§17.5.3): the HUD
+        /// ledger roll-up (BattleManager.ReportStronghold*), the printer dispatch, and the SFX —
+        /// nothing here moves prestige or decides victory. §18.2 (Stage 3, 2026-08-17): capture pays
+        /// NO immediate award — held value earns per-turn income at Upkeep, where the high-water
+        /// bonus rewards new ground exactly once. The old counter arithmetic and its instant-win
+        /// check are retired with it.
         /// </summary>
         private void ApplyTerritoryAccounting(TerritoryChangeResult territory)
         {
@@ -1468,19 +1467,20 @@ namespace HammerAndSickle.Controllers
             {
                 if (CurrentUnit.Side == Side.Player)
                 {
-                    int prestige = Mathf.RoundToInt(cap.VictoryValue);
-                    bm.AddPrestige(prestige);
-                    bm.CaptureObjective();
+                    // §18.2 (V3.3, Stage 3): capture pays NO lump award — held value earns per-turn
+                    // income at Upkeep, and the high-water bonus already rewards NEW ground there.
+                    // Paying here too was the double-pay the income model replaces. Feedback stays.
+                    bm.ReportStrongholdTaken();
 
                     // §24.8.6 — see PrinterDispatch.
-                    PrinterDispatch.ReportObjectiveCaptured(cap.Position, prestige);
+                    PrinterDispatch.ReportObjectiveCaptured(cap.Position);
 
-                    // Ungated (§27.7.4): an objective flip is a fact about the MAP, not about a unit.
+                    // Ungated (§27.7.4): a stronghold flip is a fact about the MAP, not about a unit.
                     GameAudio.Play(SFX.ObjectiveCaptured);
                 }
                 else if (cap.PreviousControl == TileControl.Red)
                 {
-                    bm.LoseObjective();
+                    bm.ReportStrongholdLost();
                     PrinterDispatch.ReportObjectiveLost(cap.Position);
                     GameAudio.Play(SFX.ObjectiveLost);
                 }

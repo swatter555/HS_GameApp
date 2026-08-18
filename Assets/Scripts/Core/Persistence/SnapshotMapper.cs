@@ -48,6 +48,13 @@ namespace HammerAndSickle.Persistence
                 if (mgr == null)
                     throw new ArgumentNullException(nameof(mgr), "GameDataManager cannot be null");
 
+                // Stage 5 (SAVE_VERSION 7): sync the battle's prestige/scoring slice into the DTO
+                // before it is captured. Null-tolerant twice over — headless tests and between-battle
+                // saves have no BattleManager.Instance (plain static assigned in Awake, never
+                // lazy-creates), and campaign-only saves may carry no ScenarioData at all.
+                if (BattleManager.Instance != null && mgr.CurrentScenarioData != null)
+                    BattleManager.Instance.CaptureScenarioState(mgr.CurrentScenarioData);
+
                 // Create the snapshot with current game state
                 var snapshot = new GameStateSnapshot
                 {
@@ -439,6 +446,14 @@ namespace HammerAndSickle.Persistence
                     AppService.CaptureUiMessage("No map data in save - between-battle save detected");
                 }
 
+                // Stage 5 (SAVE_VERSION 7): restore the prestige/scoring slice into a live
+                // BattleManager — AFTER the map block above, so the ledger recompute inside sees
+                // restored tile control (and the stamped mission-objective flags, which ride the
+                // embedded map — the restore path never re-stamps, C6). Null-tolerant: headless
+                // tests and menu-context loads have no BattleManager.Instance.
+                if (BattleManager.Instance != null && snap.Scenario != null)
+                    BattleManager.Instance.RestoreScenarioState(snap.Scenario);
+
                 // Step 3: Re-populate entity dictionaries using manager's registration methods
                 // This ensures all internal invariants and validation logic is preserved
                 AppService.CaptureUiMessage($"Registering {snap.Units?.Count ?? 0} combat units...");
@@ -726,10 +741,11 @@ namespace HammerAndSickle.Persistence
             //       4 => MigrateV4ToV5,   // P5: loss ledger enters the snapshot
             //
             // NOTE there is deliberately NO 3 => arm for the 3→4 bump of 2026-07-28, NO 4 => arm for the
-            // 4→5 profile-slot bump of 2026-08-08, and NO 5 => arm for the 5→6 over-water bump of
-            // 2026-08-11. While MINIMUM_SUPPORTED_SAVE_VERSION tracks SAVE_VERSION (pre-1.0), any older
-            // save is refused by the floor check before the ladder is ever entered, so a step would be
-            // unreachable code pretending to be a migration. See the SAVE_VERSION comment in GameData.
+            // 4→5 profile-slot bump of 2026-08-08, NO 5 => arm for the 5→6 over-water bump of
+            // 2026-08-11, and NO 6 => arm for the 6→7 prestige/scoring bump of 2026-08-17. While
+            // MINIMUM_SUPPORTED_SAVE_VERSION tracks SAVE_VERSION (pre-1.0), any older save is refused by
+            // the floor check before the ladder is ever entered, so a step would be unreachable code
+            // pretending to be a migration. See the SAVE_VERSION comment in GameData.
             _ => null
         };
 

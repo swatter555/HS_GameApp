@@ -706,9 +706,9 @@ namespace HammerAndSickle.Renderers
             prefab.UpdateNameplate(GameDataManager.CurrentMapTheme);
             prefab.UpdateControlFlag(hex.TileControl, hex.DefaultTileControl);
             prefab.UpdateCityName(hex.TileLabel);
-            // ⚠ IsObjective is GAMEPLAY-DEAD (prestige pass V2, 2026-08-17) — this flag-sprite read and
-            // the Prefab_TerrainPanel feature line are its ONLY two legal readers, kept until the
-            // manifest carries a mission-objective list (V15). Do not add new readers.
+            // IsObjective here is the RUNTIME value — a load-time projection of the manifest's
+            // missionObjectives (C6 clear-then-stamp in MapLoader); the authored .map value is dead.
+            // This flag sprite is how the player sees the §17.x victory gate on the map.
             prefab.UpdateObjectiveStatus(hex.IsObjective);
 
             // Sorting comes from SortingConfig, overriding the prefab's baked (and previously stale) sorting.

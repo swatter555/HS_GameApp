@@ -200,6 +200,36 @@ namespace HammerAndSickle.Models.Map
         /// </summary>
         /// <param name="direction">Original direction</param>
         /// <returns>Opposite direction</returns>
+        /// <summary>
+        /// C6 victory gate (§17.x): true when EVERY stamped mission-objective hex is player-controlled
+        /// — vacuously true when the scenario stamped none ("no gate declared"). Reads the RUNTIME
+        /// IsObjective flags (MapLoader's clear-then-stamp), NEVER the manifest: an in-battle save
+        /// restores without one (§7.3). Evaluated fresh at every check — no cached gate state, the
+        /// same anti-drift rule as VictoryLedger. Fails OPEN (gate met) on a null/broken map: a
+        /// mysteriously unwinnable battle is worse than a logged easier one, and HandleException
+        /// screams either way.
+        /// </summary>
+        public static bool AllMissionObjectivesHeld(HexMap map)
+        {
+            try
+            {
+                if (map == null) return true;
+
+                foreach (HexTile t in map)
+                {
+                    if (t != null && t.IsObjective && t.TileControl != TileControl.Red)
+                        return false;
+                }
+
+                return true;
+            }
+            catch (Exception e)
+            {
+                AppService.HandleException("HexMapUtil", nameof(AllMissionObjectivesHeld), e);
+                return true;
+            }
+        }
+
         public static HexDirection GetOppositeDirection(HexDirection direction)
         {
             try
