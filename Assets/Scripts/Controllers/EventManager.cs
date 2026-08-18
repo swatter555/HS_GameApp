@@ -155,6 +155,7 @@ namespace HammerAndSickle.Controllers
         public event Action<bool> OnSupplyOverlayToggled;
         public event Action<bool> OnUnitIconsToggled;      // unit-icon layer visibility for a clear terrain read (§24.3.1)
         public event Action OnLeaderPoolRequested;         // Leader Pool dialog (§24.5.5; rest of the leader-UI family lands with L2/L3)
+        public event Action<int, int> OnPrestigeChanged;   // (newBalance, delta) — §18 wallet moved (V8.4); HUD readout + the P4 purchase UI subscribe here instead of polling
 
         #endregion // Battle Flow / HUD Events
 
@@ -509,6 +510,12 @@ namespace HammerAndSickle.Controllers
         {
             try { OnLeaderPoolRequested?.Invoke(); }
             catch (Exception e) { AppService.HandleException(CLASS_NAME, nameof(RaiseLeaderPoolRequested), e); }
+        }
+
+        public void RaisePrestigeChanged(int newBalance, int delta)
+        {
+            try { OnPrestigeChanged?.Invoke(newBalance, delta); }
+            catch (Exception e) { AppService.HandleException(CLASS_NAME, nameof(RaisePrestigeChanged), e); }
         }
 
         #endregion // Battle Flow / HUD Event Raising Methods

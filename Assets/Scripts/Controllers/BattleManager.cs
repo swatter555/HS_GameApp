@@ -148,9 +148,34 @@ namespace HammerAndSickle.Controllers
         /// --------------------
 
         public BattleResult CurrentResult { get; private set; } = BattleResult.Ongoing;
-        public int PrestigeEarned { get; private set; } = 0;
-        public int PrestigeSpent { get; private set; } = 0;
-        public int CurrentPrestige { get; private set; } = 0;
+
+        // §18 wallet (V8, 2026-08-17). One spendable balance + two tallies, arithmetic in the
+        // headless-testable PrestigeWallet — before this, AddPrestige credited PrestigeEarned while
+        // purchases were meant to draw on CurrentPrestige, and the two fields never met.
+        private readonly PrestigeWallet _prestige = new PrestigeWallet();
+        public int PrestigeEarned => _prestige.Earned;
+        public int PrestigeSpent => _prestige.Spent;
+        public int CurrentPrestige => _prestige.Current;
+
+        /// --------------------
+        /// Victory ledger (V5 — derived, recomputed once per turn + once at battle start, NEVER accumulated)
+        /// --------------------
+
+        /// <summary>Last computed victory-value distribution. Refreshed in ProcessUpkeep; UI/debug read it.</summary>
+        public VictoryLedger CurrentLedger { get; private set; }
+
+        /// <summary>
+        /// The player's share of map victory value at battle start — the anchor the §17.3 scoring ladder
+        /// mirrors around (V9.1). Captured ONCE after map+OOB load; cannot be recomputed after the first
+        /// flip, so it must persist (V12, Stage 5).
+        /// </summary>
+        public float StartingPlayerShare { get; private set; }
+
+        /// <summary>
+        /// Highest PlayerValue ever held this battle — the V7.2 anti-farm mark: the progress bonus pays
+        /// only on value above this, so losing ground and retaking it pays nothing twice. Persists (V12).
+        /// </summary>
+        public float HighWaterVictoryValue { get; private set; }
 
         // TODO: Loss tracking system
         // Track player unit losses (destroyed units)
@@ -347,8 +372,7 @@ namespace HammerAndSickle.Controllers
             // end-turn button is the player's signal that deployment is finished.
             _battleEnded = false;
             CurrentResult = BattleResult.Ongoing;
-            PrestigeEarned = 0;
-            PrestigeSpent = 0;
+            // (Prestige needs no reset here — GrabManifestData seeded the wallet, which zeroes both tallies.)
 
             SetTurn(0);
             SetPhase(BattlePhase.Deployment);
@@ -356,6 +380,10 @@ namespace HammerAndSickle.Controllers
             // Seed objective tracking from the loaded map so the §17 victory check has real
             // totals to compare against as hexes flip during play.
             InitializeObjectivesFromMap();
+
+            // V5.3: capture the victory-value baseline the §17.3 scoring ladder mirrors around.
+            // Once-only — the starting share CANNOT be recomputed after the first flip.
+            CaptureStartingLedger();
 
             // Open the battle framed on the player's main supply depot (view only — no
             // selection). Done after units load so the depot exists to center on.
@@ -451,10 +479,36 @@ namespace HammerAndSickle.Controllers
         {
             ScenarioID = GameDataManager.CurrentManifest.ScenarioId;
             IsCampaignBattle = GameDataManager.CurrentManifest.IsCampaignScenario;
-            CurrentPrestige = GameDataManager.CurrentManifest.PrestigePool;
+            _prestige.Seed(GameDataManager.CurrentManifest.PrestigePool);
             DeploymentPointCap = GameDataManager.CurrentManifest.DeploymentPointCap;
             MaxTurnNumber = GameDataManager.CurrentManifest.MaxTurns;
 
+        }
+
+        /// <summary>
+        /// Captures the battle-start victory ledger and the two persistent anchors derived from it:
+        /// <see cref="StartingPlayerShare"/> (the V9.1 mirror anchor) and the initial
+        /// <see cref="HighWaterVictoryValue"/> (the V7.2 anti-farm mark). Called exactly once per battle,
+        /// from SetupBattleManagerData after map + OOB load — everything else recomputes.
+        /// </summary>
+        private void CaptureStartingLedger()
+        {
+            try
+            {
+                var ledger = VictoryLedger.Compute(GameDataManager.CurrentHexMap);
+                CurrentLedger = ledger;
+                StartingPlayerShare = ledger.PlayerShare;
+                HighWaterVictoryValue = ledger.PlayerValue;
+
+                // V5.4: a zero-value map is legitimate (every currently shipped map) — the scenario
+                // simply declares no scoring, and V9 grades it Draw. Loud, not fatal.
+                if (ledger.TotalValue <= 0f)
+                    AppService.CaptureUiMessage("Map carries no victory value — scenario will not be scored.");
+            }
+            catch (Exception ex)
+            {
+                AppService.HandleException(CLASS_NAME, nameof(CaptureStartingLedger), ex);
+            }
         }
 
         #endregion // Initialization
@@ -844,6 +898,13 @@ namespace HammerAndSickle.Controllers
                 if (anyLostAtSea)
                     EventManager.Instance?.RaiseRedrawMapIcons();
 
+                // V5.3: the once-per-turn victory-ledger recompute — derived, never accumulated, and
+                // deliberately NOT cached behind a dirty flag. Player side only, matching where the
+                // §18 income will draw from (V7, todo_prestige Stage 3): the AI has no economy
+                // (scripted-only ruling, AI design pass 1) — the symmetric branch is ABSENT, not forgotten.
+                if (isPlayerSide)
+                    CurrentLedger = VictoryLedger.Compute(GameDataManager.CurrentHexMap);
+
                 // §3.5.9 HCL decay/recovery — STUB (needs depot supply tracing; supply pass).
             }
             catch (Exception ex)
@@ -1210,13 +1271,16 @@ namespace HammerAndSickle.Controllers
         }
 
         /// <summary>
-        /// Adds prestige earned during battle.
+        /// Credits prestige to the wallet — spendable balance AND earned tally together (V8.1).
+        /// No-op on non-positive amounts. See EventManager (OnPrestigeChanged).
         /// </summary>
         public void AddPrestige(int amount)
         {
             try
             {
-                PrestigeEarned += amount;
+                int credited = _prestige.Add(amount);
+                if (credited > 0 && EventManager.Instance != null)
+                    EventManager.Instance.RaisePrestigeChanged(_prestige.Current, credited);
             }
             catch (Exception ex)
             {
@@ -1225,17 +1289,24 @@ namespace HammerAndSickle.Controllers
         }
 
         /// <summary>
-        /// Subtracts prestige spent during battle.
+        /// Atomic check-and-debit (V8.2): false — and NOTHING mutates — when the balance cannot cover the
+        /// amount. The P4 purchase flow relies on this being one step; do not pre-check then spend.
+        /// See EventManager (OnPrestigeChanged).
         /// </summary>
-        public void SpendPrestige(int amount)
+        public bool SpendPrestige(int amount)
         {
             try
             {
-                PrestigeSpent += amount;
+                if (!_prestige.TrySpend(amount)) return false;
+
+                if (EventManager.Instance != null)
+                    EventManager.Instance.RaisePrestigeChanged(_prestige.Current, -amount);
+                return true;
             }
             catch (Exception ex)
             {
                 AppService.HandleException(CLASS_NAME, nameof(SpendPrestige), ex);
+                return false;
             }
         }
 
@@ -1265,8 +1336,12 @@ namespace HammerAndSickle.Controllers
                 ObjectiveHexesUnoccupied = 0;
                 TotalObjectiveHexes = 0;
 
-                PrestigeEarned = 0;
-                PrestigeSpent = 0;
+                // V8.3: the wallet resets WITH the battle — before this, CurrentPrestige survived a
+                // reset and a replayed scenario would inherit the previous run's pool.
+                _prestige.Seed(0);
+                CurrentLedger = default;
+                StartingPlayerShare = 0f;
+                HighWaterVictoryValue = 0f;
 
                 ScenarioID = string.Empty;
                 IsCampaignBattle = false;

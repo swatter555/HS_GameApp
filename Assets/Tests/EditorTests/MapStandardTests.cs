@@ -28,15 +28,31 @@ namespace HammerAndSickle.Tests
         private static JsonMapHeader Header(int cols, int rows, MapConfig config = MapConfig.None) =>
             new JsonMapHeader("TestMap", config, "checksum-not-validated", cols, rows);
 
-        /// <summary>A manifest with everything valid except the dimensions under test.</summary>
+        /// <summary>
+        /// A manifest with everything valid except the dimensions under test. Object initializer, not a
+        /// positional ctor — the 16-parameter [JsonConstructor] was deleted 2026-08-17 (V11.1), and an
+        /// initializer never has to change when the manifest gains a field.
+        /// </summary>
         private static ScenarioManifest Manifest(int w, int h) =>
-            new ScenarioManifest(
-                "test_scenario", "Test Scenario", "description",
-                "thumb.png", "test.map", "test.oob", "test.aii", "test.brf",
-                prestigePool: 100, isCampaignScenario: false,
-                MapTheme.MiddleEast, DifficultyLevel.Colonel,
-                maxTurns: 20, deploymentPointCap: 100,
-                mapWidth: w, mapHeight: h);
+            new ScenarioManifest
+            {
+                ScenarioId = "test_scenario",
+                DisplayName = "Test Scenario",
+                Description = "description",
+                ThumbnailFilename = "thumb.png",
+                MapFilename = "test.map",
+                OobFilename = "test.oob",
+                AiiFilename = "test.aii",
+                BriefingFilename = "test.brf",
+                PrestigePool = 100,
+                IsCampaignScenario = false,
+                MapTheme = MapTheme.MiddleEast,
+                DifficultyLevel = DifficultyLevel.Colonel,
+                MaxTurns = 20,
+                DeploymentPointCap = 100,
+                MapWidth = w,
+                MapHeight = h
+            };
 
         #endregion // Helpers
 

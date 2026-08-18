@@ -306,6 +306,7 @@ namespace HammerAndSickle.Core.Helpers
                 int successCount = 0;
                 int failCount = 0;
                 int nullCount = 0;
+                int negativeValueCount = 0;
 
                 foreach (HexTile hex in mapData.Hexes)
                 {
@@ -315,6 +316,17 @@ namespace HammerAndSickle.Core.Helpers
                         if (nullCount <= 5) // Only log first 5
                             if (log) Debug.LogWarning($"{CLASS_NAME}: Encountered null hex tile in map data");
                         continue;
+                    }
+
+                    // Negative victoryValue is authoring garbage, not geometry — warn, don't refuse
+                    // (ruled 2026-08-17, todo_prestige Stage 1). VictoryLedger.Compute's v <= 0 skip
+                    // treats it as 0 for scoring; the value is loaded as-is so the editor can see it.
+                    if (hex.VictoryValue < 0f)
+                    {
+                        negativeValueCount++;
+                        if (negativeValueCount <= 5) // Only log first 5
+                            Debug.LogWarning($"{CLASS_NAME}: Hex {hex.Position} has negative victoryValue " +
+                                             $"({hex.VictoryValue}) — scoring treats it as 0. Fix in the Scenario Editor.");
                     }
 
                     if (!hexMap.SetHexAt(hex))

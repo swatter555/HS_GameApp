@@ -14,5 +14,13 @@
   "maxTurns": 21,
   "deploymentPointCap": 1000,
   "mapWidth": 32,
-  "mapHeight": 21
+  "mapHeight": 21,
+  "prestigeStipend": 20,
+  "prestigeIncomeRate": 0.05,
+  "prestigeProgressBonusRate": 0.5,
+  "earlyFinishMultiplier": 1.25,
+  "victoryThresholdMinor": 0.55,
+  "victoryThresholdMajor": 0.65,
+  "victoryThresholdDecisive": 0.8,
+  "requiredResult": "MinorVictory"
 }

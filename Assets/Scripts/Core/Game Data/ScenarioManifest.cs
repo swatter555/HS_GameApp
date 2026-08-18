@@ -77,50 +77,67 @@ namespace HammerAndSickle.Core.GameData
         [JsonPropertyName("mapHeight")]
         public int MapHeight { get; set; } = 0;
 
+        // ────────────────────────────────────────────────────────────────────────────────────────────
+        // SCORING + ECONOMY (V11, 2026-08-17 prestige/victory pass — §17.3 / §18.2).
+        // A scenario declares the prestige income of held victory value and the share-of-total-value
+        // thresholds the BattleResult ladder grades against. ⚠ ALL THREE THRESHOLDS AT 0 IS VALID —
+        // "this scenario declares no scoring" — and is what an absent key deserializes to, which is what
+        // keeps pre-V11 manifests loading. The scoring path grades an unscored scenario Draw and never
+        // ends it early (C1). Values are placeholders until the P4 spend sink exists — nothing shipped
+        // before then is balanced (V14 calibration note).
+        // ────────────────────────────────────────────────────────────────────────────────────────────
+
+        /// <summary>Flat prestige per turn, independent of held value — the anti-death-spiral floor (V7.1).</summary>
+        [JsonPropertyName("prestigeStipend")]
+        public int PrestigeStipend { get; set; } = 0;
+
+        /// <summary>Prestige per turn per point of held victory value.</summary>
+        [JsonPropertyName("prestigeIncomeRate")]
+        public float PrestigeIncomeRate { get; set; } = 0f;
+
+        /// <summary>Bonus per point of NEW value above the battle's high-water mark (V7.2). 0 disables.</summary>
+        [JsonPropertyName("prestigeProgressBonusRate")]
+        public float PrestigeProgressBonusRate { get; set; } = 0f;
+
+        /// <summary>Multiplier on unusedTurns × current income when the player ends early (V10.2). ≥ 1.</summary>
+        [JsonPropertyName("earlyFinishMultiplier")]
+        public float EarlyFinishMultiplier { get; set; } = 1.25f;
+
+        /// <summary>Player share of total victory value required for MinorVictory (0 = no scoring declared).</summary>
+        [JsonPropertyName("victoryThresholdMinor")]
+        public float VictoryThresholdMinor { get; set; } = 0f;
+
+        /// <summary>... MajorVictory.</summary>
+        [JsonPropertyName("victoryThresholdMajor")]
+        public float VictoryThresholdMajor { get; set; } = 0f;
+
+        /// <summary>... DecisiveVictory.</summary>
+        [JsonPropertyName("victoryThresholdDecisive")]
+        public float VictoryThresholdDecisive { get; set; } = 0f;
+
+        /// <summary>
+        /// The rung this scenario demands — "achieve a Major Victory within 18 days" (briefing + campaign
+        /// branching + the V10.2 early-finish gate). Persisted BY NAME via JsonPolicy.Content, so
+        /// <see cref="BattleResult"/> members are rename-frozen from the moment this ships (CLAUDE.md §2.11).
+        /// </summary>
+        [JsonPropertyName("requiredResult")]
+        public BattleResult RequiredResult { get; set; } = BattleResult.MinorVictory;
+
         #endregion // JSON Properties
 
         #region Constructors
 
         /// <summary>
-        /// JSON deserialization constructor with explicit parameters for all serializable properties.
-        /// System.Text.Json uses this constructor to create objects with all data available at construction time.
-        /// Also used for creating manifest copies programmatically.
+        /// Parameterless — System.Text.Json populates via the property setters (the §15.2 "Large" pattern;
+        /// this class is 24 serializable properties). ⚠ REPLACED the 16-positional-parameter
+        /// [JsonConstructor] on 2026-08-17 (V11.1): under that shape, a property added WITHOUT a matching
+        /// constructor parameter was silently left at its default on every load — no exception, no log.
+        /// The positional ctor is DELETED rather than kept as a convenience (a second public ctor with no
+        /// [JsonConstructor] is exactly what §15.2 rule 3 warns about); programmatic construction uses an
+        /// object initializer, which never changes when a field is added.
         /// </summary>
-        [JsonConstructor]
-        public ScenarioManifest(
-            string scenarioId,
-            string displayName,
-            string description,
-            string thumbnailFilename,
-            string mapFilename,
-            string oobFilename,
-            string aiiFilename,
-            string briefingFilename,
-            int prestigePool,
-            bool isCampaignScenario,
-            MapTheme mapTheme,
-            DifficultyLevel difficultyLevel,
-            int maxTurns,
-            int deploymentPointCap,
-            int mapWidth = 0,
-            int mapHeight = 0)
+        public ScenarioManifest()
         {
-            ScenarioId = scenarioId;
-            DisplayName = displayName;
-            Description = description;
-            ThumbnailFilename = thumbnailFilename;
-            MapFilename = mapFilename;
-            OobFilename = oobFilename;
-            AiiFilename = aiiFilename;
-            BriefingFilename = briefingFilename;
-            PrestigePool = prestigePool;
-            IsCampaignScenario = isCampaignScenario;
-            MapTheme = mapTheme;
-            DifficultyLevel = difficultyLevel;
-            MaxTurns = maxTurns;
-            DeploymentPointCap = deploymentPointCap;
-            MapWidth = mapWidth;
-            MapHeight = mapHeight;
         }
 
         #endregion // Constructors
@@ -155,6 +172,31 @@ namespace HammerAndSickle.Core.GameData
             var dims = GetMapDimensions();
             if (dims.x < 10 || dims.y < 10)
                 return false;
+
+            // Scoring/economy gates (V11.3). None of these can be tripped by a pre-V11 manifest —
+            // every default passes, which is what keeps shipped content loading unchanged (Q6).
+            if (PrestigeStipend < 0 || PrestigeIncomeRate < 0f || PrestigeProgressBonusRate < 0f)
+                return false;
+
+            if (EarlyFinishMultiplier < 1f)
+                return false;
+
+            /* Thresholds: either ALL zero — "this scenario declares no scoring", the pre-V11 default and
+             * a VALID state (refusing it would stop both shipped manifests loading) — or a full strictly
+             * ascending ladder in (0, 1]. A PARTIAL declaration (some zero, some not) is refused: a zero
+             * minor cut would make any share a MinorVictory, the same degenerate shape the C1 guard
+             * exists to keep out of the scoring path. */
+            bool declaresScoring = VictoryThresholdMinor != 0f || VictoryThresholdMajor != 0f ||
+                                   VictoryThresholdDecisive != 0f;
+            if (declaresScoring)
+            {
+                if (VictoryThresholdMinor <= 0f || VictoryThresholdDecisive > 1f)
+                    return false;
+
+                if (VictoryThresholdMinor >= VictoryThresholdMajor ||
+                    VictoryThresholdMajor >= VictoryThresholdDecisive)
+                    return false;
+            }
 
             return true;
         }
