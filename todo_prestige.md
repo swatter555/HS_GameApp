@@ -29,6 +29,17 @@
   incentive, zero state.
 - **C4 — Design-doc amendments land in this pass** (house rule: ratified decisions amend the rules
   they change, same session). See Stage 4.
+- **C5 — Early finish gates on the THRESHOLD LADDER, never on `requiredResult` (editor's catch,
+  2026-08-17 PM reply; Bob-endorsed).** `requiredResult = Draw` IS the defensive scenario ("hold the
+  line for 21 days") — but a defensive scenario GRADES Draw at its starting share by construction, so
+  a requiredResult-met gate lights the cash-out button on TURN 1 and pays ~20 unused turns of bonus
+  for doing nothing. The gate is `VictoryThresholdMinor > 0f && PlayerShare >= VictoryThresholdMinor`
+  — the player has achieved an actual VICTORY. Offensive: lights at Minor, push-or-cash-out choice.
+  Defensive/withdrawal: never lights; playing to the limit IS the mission. ⚠ The `minor > 0` half is
+  OURS, not the editor's: their formulation (`share >= minor` alone) re-opens the C1 hole for a
+  no-scoring-declared scenario paying a stipend — minor = 0 → `share >= 0` → turn-1 button again.
+  `requiredResult` keeps briefing text + campaign branching ONLY; all rungs except `Ongoing` are
+  legal (`IsValid` refuses the sentinel — built with Stage 1b).
 
 ## Q-refinements from the editor's answers doc (all verified)
 
@@ -86,27 +97,55 @@
       their E8 dialog, Q1/Q2 confirmations, the negative-victoryValue ruling, and spec corrections
       C1–C3 so their docs don't describe the pseudocode.
 
-## Stage 2 — Stronghold derivation (the risky stage) → ⚑ GATE 2
+### Stage 1b — amendments from the editor's reply (2026-08-17 PM; ⚑ rides GATE 2, not its own run)
+- [x] `IsValid()` refuses `RequiredResult == Ongoing` (the sentinel); every other rung stays legal —
+      Draw = defensive, defeat rungs = fighting withdrawal (see C5).
+- [x] `earlyFinishMultiplier`: kept `>= 1` — exactly 1.0 LOADS with a named log warning rather than
+      refusing (our call, documented in the reply: refusal makes the scenario silently vanish from
+      the menu; the editor hard-blocks <= 1 at authoring so the warning only ever fires on
+      hand-edited content).
+- [x] `ScenarioManifestTests` +3 (Ongoing refused · Draw/MinorDefeat legal · 1.0 loads-but-inert).
+- [x] SoundEffect append-only tombstone (their §5 ask) — ALREADY EXISTS, `GameAudioManager.cs:88-102`;
+      confirmed back to them, nothing added.
 
-- [ ] **V1** `HexTile.IsStronghold` (`[JsonIgnore]`, derived): MajorCity ∥ MinorCity ∥ IsFort ∥
+## Stage 2 — Stronghold derivation (the risky stage) → ⚑ GATE 2
+### ✅ CLOSED 2026-08-17 — GATE 2 GREEN (suite + Bob PLAYED Khost, flips/captures/flags all correct),
+### COMMITTED. Stage 1b rode along and is green with it. ⚠ Khost map itself is under revision on the
+### editor side — the 36-stronghold count will change with their rebalance; the derivation is what
+### was validated, not the number.
+
+- [x] **V1** `HexTile.IsStronghold` (`[JsonIgnore]`, derived): MajorCity ∥ MinorCity ∥ IsFort ∥
       IsAirbase ∥ IsPort. Comment names the single source of truth (house precedent: `IsRiver`,
-      `ProjectsZoC`).
-- [ ] **V2** tombstone `IsObjective` (prose, not `[Obsolete]`) at `HexTile.cs` + the two reader sites
-      (`HexGridRenderer.cs:696`, `Prefab_TerrainPanel.cs:234`). JSON key untouched (V2.3). Leave
-      `SetIsObjective` for `BoardAnalysisTests` until the V15 rip.
-- [ ] **V3** `TerritoryService` :85/:94/:119 → `IsStronghold`. `FlipTo` and the neighbor enumeration
-      untouched (V3.2). Rename per Q2 incl. doc comments. ⚠ `MovementController:1469` prestige award
-      stays until Stage 3 — Stage 2 must not change prestige flow.
-- [ ] **V4** `RegionGraph:229` → `StrongholdCount` from `IsStronghold`; `VictoryValue` summed over
-      EVERY hex, no gate. Zero non-test readers of the old fields (verified). Sync note owed to
-      `Claude_AI_TODO.md` — Region metadata semantics changed under the AI's feet.
-- [ ] **V13** `Prefab_CityIcon`: add the `SV` arm (Stage 2 is what promotes the miss from latent to
-      routine — folded here, not "any time").
-- [ ] **V17** code side: sprite resolution before `Instantiate`; missing theme art → warn-and-skip.
-- [ ] Tests: `TerritoryServiceTests` :55/:83/:114 `IsObjective = true` → `SetTerrain(MinorCity)`
-      (movement cost identical, verified) + rename fallout + assertion nouns; `BoardAnalysisTests`
-      :177-190 rewritten against the V4 split. New: stronghold-derivation truth table.
-- [ ] ⚑ **GATE 2** — suite run. Khost goes 12 → 36 sticky hexes; Bob eyeballs feel in play.
+      `ProjectsZoC`) + the Hamburg airbases-on-Clear rationale.
+- [x] **V2** `IsObjective` tombstoned (prose) at `HexTile.cs` + both reader sites; `SetIsObjective`
+      tombstoned, kept (its one caller now asserts the DECOUPLING in `BoardAnalysisTests`). JSON key
+      untouched (V2.3).
+- [x] **V3** `TerritoryService` three flip conditionals → `IsStronghold`; `FlipTo` + neighbor
+      enumeration untouched (V3.2). Renamed `ObjectiveCapture`→`StrongholdCapture`,
+      `CapturedObjectives`→`CapturedStrongholds` + all doc comments (service + MovementController).
+      `MovementController` award + counter calls kept for Stage 3, marked.
+- [x] **V4** `RegionGraph`: `StrongholdCount` (derived) + `VictoryValue` (every hex, no gate).
+      Sync note WRITTEN into `Claude_AI_TODO.md` Status (includes the AI2b-3 bump coordination
+      outcome). Post-change sweep confirms zero stragglers of the old names.
+- [x] **V10.1 (first half) PULLED FORWARD — the all-objectives instant win is neutralized HERE, not
+      Stage 4.** Found during implementation: capture accounting bumps `ObjectiveHexesOccupied` per
+      STRONGHOLD (36 on Khost) while `TotalObjectiveHexes` still counts the 12 AUTHORED objectives,
+      so the old rule live + V3 = any 12 stronghold captures spuriously auto-win. `CheckVictoryConditions`
+      now returns false with the dated why; INTERIM: no early end, battles run to the turn limit.
+      Stage 4 builds the replacement; Stage 3 retires the counters.
+- [x] **V13** `Prefab_CityIcon` `SV` arm added, with the why-it-was-latent comment.
+- [x] **V17** `CreateMapIcon`: sprite resolves BEFORE `Instantiate`; missing theme art →
+      warn-and-skip, debounced to ONE warning per (theme, iconType) per session (nine Hamburg
+      airbases × every-repaint would otherwise be hundreds of log lines). UrbanSprawl no longer
+      falls through to Middle-East art on other themes — it skips like the rest.
+- [x] Tests: `TerritoryServiceTests` migrated to `MapFixtures` + strongholds-by-terrain (MinorCity —
+      movement cost identical to Clear) + renames; NEW `IsStronghold_TruthTable`,
+      `IsStronghold_IgnoresTheDeadFlagAndValue`, `Transit_ValuedNonStronghold_StillFlips`;
+      `BoardAnalysisTests` V4 rewrite (fort = stronghold, dead flag contributes nothing, value
+      sums ungated).
+- [x] ⚑ **GATE 2** — ✅ GREEN 2026-08-17 (suite + Bob played Khost: pass-by no-flip, end-on capture
+      with dispatch + SFX, clean Console, no early end). One compile fix en route: a `*/` inside a
+      block comment (`EU_*/CH_*`) terminated it early — the V17 comment is line-style now.
 
 ## Stage 3 — Income switches over (no gate)
 
@@ -128,11 +167,13 @@
       ladder (V9.2), **C1 no-scoring guard first**, degenerate cases log never throw (V9.3), full
       arithmetic logged for Bob's tuning (V9.4).
 - [ ] **V10.1** all-objectives rule deleted; nothing-further-to-gain early end via **C2 fresh
-      compute** + C1 guard.
-- [ ] **V10.2** voluntary early finish once `requiredResult` met; bonus per **C3** (live ledger, no
-      stored field). `public void OnEndScenarioButton()` on `DefaultDialog_Scene1` — Bob wires
-      onClick (CLAUDE.md §2.13; name is a contract); the `requiredResult`-met guard lives INSIDE the
-      callback per the `CanEndTurn` precedent (§3.6b).
+      compute** + C1 guard. The boundary recompute ALSO writes `CurrentLedger` (editor's C2 addendum,
+      accepted) so the HUD and the verdict can never disagree about the same instant.
+- [ ] **V10.2** voluntary early finish per **C5** — gate is `VictoryThresholdMinor > 0f &&
+      PlayerShare >= VictoryThresholdMinor`, NEVER `requiredResult` (turn-1 defensive cash-out
+      exploit). Bonus per **C3** (live ledger, no stored field). `public void OnEndScenarioButton()`
+      on `DefaultDialog_Scene1` — Bob wires onClick (CLAUDE.md §2.13; name is a contract); the gate
+      lives INSIDE the callback per the `CanEndTurn` precedent (§3.6b).
 - [ ] **V10.3** farming note recorded in `todo.md` Phase 2 (goes live with campaign carryover; not
       solved here — by design).
 - [ ] **C4 — design-doc amendments** (`HS_DesignDoc.md`): §4.7.2 (flag → derived stronghold +

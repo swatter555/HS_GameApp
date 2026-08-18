@@ -17,6 +17,17 @@
 
 ## Status
 
+> **⟳ 2026-08-17 sync — `Region` metadata changed under the AI's feet (prestige pass V4,
+> `todo_prestige.md`).** `Region.ObjectiveCount`/`ObjectiveValue` are RENAMED
+> **`StrongholdCount`** (hexes needing physical occupation to flip — the derived
+> `HexTile.IsStronghold`: cities/forts/airbases/ports) and **`VictoryValue`** (Σ over EVERY hex —
+> value is UNGATED; the authored `isObjective` flag is gameplay-dead). No AI decision consumed the
+> old fields (verified — only `BoardAnalysisTests` read them), so nothing behavioural changed; but
+> any FUTURE planner weighing regions by value must use `Region.VictoryValue` and must NOT
+> resurrect an objective-flag gate. Also relevant to AI2b-3 bump planning: `SAVE_VERSION` 6→7 is
+> being taken by the prestige pass Stage 5 (Bob's call — a ready bump does not wait for an
+> unscheduled one), so AI2b-3 takes its own bump when it lands.
+
 > **⟳ 2026-07-07 (session end / restart point).** AI0 ✅ AI1 ✅ AI2a ✅ AI2b-sweep ✅ GREEN; AI2b
 > WIRING LANDED (BattleManager.AIPerception property + ProcessRefresh AI-side branch — needs a
 > compile check + play sanity next session). ⏭ NEXT: **AI2b-3** — snapshot serialization of

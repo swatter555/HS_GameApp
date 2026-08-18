@@ -135,6 +135,36 @@ namespace HammerAndSickle.Tests
                 "Below 1.0, sitting to the turn limit dominates cashing out — the exact incentive V10.2 exists to invert.");
         }
 
+        [Test]
+        public void IsValid_EarlyFinishMultiplierExactlyOne_LoadsButIsInert()
+        {
+            // Ruled 2026-08-17 (editor note): 1.0 is coherent-but-inert — it LOADS (refusal would make
+            // the scenario silently vanish from the menu) and warns in the log instead.
+            var m = ValidManifest();
+            m.EarlyFinishMultiplier = 1.0f;
+
+            Assert.IsTrue(m.IsValid(), "Par payout is coherent; the named warning, not refusal, is the guard.");
+        }
+
+        [Test]
+        public void IsValid_RequiredResult_OngoingRefused_AllOutcomesLegal()
+        {
+            // Ongoing is the in-progress sentinel, never a demand.
+            var m = ValidManifest();
+            m.RequiredResult = BattleResult.Ongoing;
+            Assert.IsFalse(m.IsValid(), "Ongoing is not an outcome.");
+
+            // Draw IS the defensive scenario ("hold the line"), defeat rungs are fighting withdrawals —
+            // restricting requiredResult to victory rungs would re-create the unwinnable-defensive hole.
+            m = ValidManifest();
+            m.RequiredResult = BattleResult.Draw;
+            Assert.IsTrue(m.IsValid(), "A defensive scenario demands a Draw.");
+
+            m = ValidManifest();
+            m.RequiredResult = BattleResult.MinorDefeat;
+            Assert.IsTrue(m.IsValid(), "A fighting withdrawal demands only a MinorDefeat.");
+        }
+
         #endregion // IsValid — economy gates
 
         #region IsValid — threshold ladder (V11.3)

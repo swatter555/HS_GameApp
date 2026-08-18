@@ -64,9 +64,36 @@ namespace HammerAndSickle.Models.Map
         [JsonPropertyName("isPort")]
         public bool IsPort { get; set; }
 
-        // Game State
+        // ⚠ GAMEPLAY-DEAD SINCE 2026-08-17 (prestige pass V2). This flag no longer drives tile control,
+        // scoring, or the win condition — capture stickiness is DERIVED (`IsStronghold`, below) and score
+        // comes from `victoryValue` summed over controlled hexes (VictoryLedger). It survives ONLY as a
+        // UI marker: the objective flag sprite (HexGridRenderer.DrawCityIconForHex) and the info-panel
+        // feature line (Prefab_TerrainPanel.GetSpecialFeatures). Scheduled for deletion once
+        // ScenarioManifest carries a mission-objective hex list — the mission's focus is SCENARIO data
+        // and does not belong in the .map, which must serve several scenarios (V15). The JSON key stays
+        // until then: the editor writes it and both shipped maps carry it on every hex (CLAUDE.md §2.11).
+        // ⚠ Do not add new readers.
         [JsonPropertyName("isObjective")]
         public bool IsObjective { get; set; }
+
+        /// <summary>
+        /// True when this hex is an installation or built-up area that must be physically occupied to
+        /// change hands (§6.13.8): exempt from transit flip and from the end-of-move ZoC sweep, taken
+        /// only by a ground/helo unit that ENDS its move here.
+        ///
+        /// Derived from terrain and infrastructure so it cannot disagree with the map — the same reason
+        /// MovementCost is recomputed from Terrain rather than trusted from file. Airbases and ports are
+        /// included because an installation should not change hands because a recon element drove past —
+        /// and on the Hamburg map every airbase sits on Clear terrain, so a cities-only rule would leave
+        /// all of them bypassable. ⚠ REPLACES the authored `isObjective` flag as the gameplay source of
+        /// truth, 2026-08-17 (prestige pass V1); `isObjective` survives as a UI-only marker until the
+        /// manifest gains a mission-objective list (V15).
+        /// </summary>
+        [JsonIgnore]
+        public bool IsStronghold =>
+            Terrain == TerrainType.MajorCity ||
+            Terrain == TerrainType.MinorCity ||
+            IsFort || IsAirbase || IsPort;
 
         [JsonPropertyName("isVisible")]
         public bool IsVisible { get; set; }
@@ -523,6 +550,8 @@ namespace HammerAndSickle.Models.Map
 
         /// <summary>
         /// Sets the objective status of the hex.
+        /// ⚠ GAMEPLAY-DEAD (V2, 2026-08-17) — `IsObjective` is a UI-only marker now; see its tombstone.
+        /// Kept until the V15 rip (one test caller); do not add new callers.
         /// </summary>
         /// <param name="value">True to make objective, false to remove</param>
         public void SetIsObjective(bool value)

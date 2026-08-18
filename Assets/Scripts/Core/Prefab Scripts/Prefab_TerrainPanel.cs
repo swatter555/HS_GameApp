@@ -231,6 +231,9 @@ namespace HammerAndSickle.Core
             if (hexData.IsRail) features.Add("Rail");
             if (hexData.IsFort) features.Add("Fort");
             if (hexData.IsAirbase) features.Add("Airbase");
+            // ⚠ IsObjective is GAMEPLAY-DEAD (prestige pass V2, 2026-08-17) — this feature line and the
+            // HexGridRenderer flag sprite are its ONLY two legal readers, kept until the manifest carries
+            // a mission-objective list (V15). Do not add new readers.
             if (hexData.IsObjective) features.Add("Objective");
 
             return features.Count > 0 ? string.Join(", ", features) : "No special features";

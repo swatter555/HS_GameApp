@@ -1074,15 +1074,16 @@ namespace HammerAndSickle.Controllers
         {
             try
             {
-                // Immediate victory: every objective hex on the map is held by the
-                // player. Mirrors Panzer Corps — capture the last objective and the
-                // scenario ends right away rather than waiting for the turn limit.
-                if (TotalObjectiveHexes > 0 && ObjectiveHexesOccupied >= TotalObjectiveHexes)
-                {
-                    return true;
-                }
-
-                // TODO: additional conditions (unit-loss thresholds, special events).
+                /* ⚠ THE ALL-OBJECTIVES INSTANT WIN IS RETIRED (prestige pass Stage 2, 2026-08-17) —
+                 * and it had to go WITH the stronghold change, not after it: capture accounting now
+                 * bumps ObjectiveHexesOccupied on every STRONGHOLD taken (36 on Khost) while
+                 * TotalObjectiveHexes still counts the 12 AUTHORED objectives, so leaving the old
+                 * comparison live meant any 12 stronghold captures spuriously auto-won the battle.
+                 * It was also the rule that made defensive scenarios unwinnable (the reason for the
+                 * whole redesign). INTERIM: no early end exists — battles run to the turn limit.
+                 * Stage 4 (V10) replaces this with the share-based rule: a fresh
+                 * VictoryLedger.Compute against the manifest's decisive threshold, guarded by the
+                 * C1 no-scoring check. The counters themselves retire in Stage 3 (V6). */
                 return false;
             }
             catch (Exception ex)

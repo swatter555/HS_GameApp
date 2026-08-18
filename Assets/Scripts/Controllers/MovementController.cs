@@ -1448,21 +1448,23 @@ namespace HammerAndSickle.Controllers
          * ───────────────────────────────────────────────────────────────────────────────────────── */
 
         /// <summary>
-        /// Applies the objective-capture consequences of a move's territory changes (§17.5.3 / §18.2.1).
+        /// Applies the stronghold-capture consequences of a move's territory changes (§17.5.3).
         /// A PLAYER capture credits the hex's VictoryValue in prestige and bumps the held-objective count
-        /// (which runs the immediate-win check); an AI capture of a player-held (Red) objective decrements
-        /// it. Plain tile flips (non-objective) carry no prestige. Routed through BattleManager so the HUD,
-        /// victory checks, and prestige counters stay in sync.
+        /// (which runs the immediate-win check); an AI capture of a player-held (Red) stronghold
+        /// decrements it. Plain tile flips (non-stronghold) carry no prestige. Routed through
+        /// BattleManager so the HUD, victory checks, and prestige counters stay in sync.
+        /// ⚠ The immediate award + the counter calls retire in prestige-pass Stage 3 (income model,
+        /// §18.2 revised) — the dispatch and SFX stay.
         /// </summary>
         private void ApplyTerritoryAccounting(TerritoryChangeResult territory)
         {
-            if (territory.CapturedObjectives == null || territory.CapturedObjectives.Count == 0)
+            if (territory.CapturedStrongholds == null || territory.CapturedStrongholds.Count == 0)
                 return;
 
             var bm = BattleManager.Instance;
             if (bm == null) return;
 
-            foreach (var cap in territory.CapturedObjectives)
+            foreach (var cap in territory.CapturedStrongholds)
             {
                 if (CurrentUnit.Side == Side.Player)
                 {

@@ -615,8 +615,36 @@ namespace HammerAndSickle.Renderers
             catch (Exception e) { AppService.HandleException(CLASS_NAME, nameof(DrawMapIconsForHex), e); }
         }
 
+        // V17 (2026-08-17): one warning per (theme, iconType) per session. Without the debounce a
+        // missing themed sprite logs per affected hex per RefreshMap — and RefreshMap runs after every
+        // territorial change, so Hamburg's nine airbases would be hundreds of lines per session.
+        private static readonly HashSet<(MapTheme, MapIconType)> warnedMissingIconArt = new();
+
         private void CreateMapIcon(HexTile hex, MapIconType iconType)
         {
+            // ⚠ V17 (2026-08-17): the sprite resolves BEFORE anything is instantiated, and a theme with
+            // no art for this icon type WARNS-AND-SKIPS instead of throwing. The old shape threw for any
+            // non-MiddleEast theme AFTER Instantiate — caught upstream, so every affected hex left an
+            // orphaned iconless GameObject and an exception log per repaint, and UrbanSprawl silently fell
+            // through to Middle-East art on any map. Only MiddleEast has sprites today; the EU_ and CH_
+            // art is an authoring dependency (Bob); until it lands a themed map simply shows no such icons.
+            var theme = GameDataManager.CurrentMapTheme;
+            string spriteName = iconType switch
+            {
+                MapIconType.Airbase => theme == MapTheme.MiddleEast ? SpriteManager.ME_Airbase : null,
+                MapIconType.Fort => theme == MapTheme.MiddleEast ? SpriteManager.ME_Fort : null,
+                _ => theme == MapTheme.MiddleEast ? SpriteManager.ME_Sprawl : null
+            };
+
+            if (spriteName == null)
+            {
+                if (warnedMissingIconArt.Add((theme, iconType)))
+                    Debug.LogWarning($"{CLASS_NAME}.CreateMapIcon: no {iconType} icon art registered for map " +
+                                     $"theme '{theme}' — icons of this type will not render (first at {hex.Position}; " +
+                                     "further occurrences suppressed). Missing-asset gap, not an error.");
+                return;
+            }
+
             GameObject obj = UnityEngine.Object.Instantiate(SpriteManager.Instance.MapIconPrefab, mapIconLayer.transform);
             obj.name = $"{iconType}_{hex.Position.IntX}_{hex.Position.IntY}";
 
@@ -624,21 +652,6 @@ namespace HammerAndSickle.Renderers
             prefab.SetIconType(iconType);
             prefab.SetPosition(new Vector2Int(hex.Position.IntX, hex.Position.IntY));
 
-            var theme = GameDataManager.CurrentMapTheme;
-            string spriteName = iconType switch
-            {
-                MapIconType.Airbase => theme switch
-                {
-                    MapTheme.MiddleEast => SpriteManager.ME_Airbase,
-                    _ => throw new ArgumentException($"{CLASS_NAME}.CreateMapIcon: Airbase icon not defined for map theme '{theme}'.")
-                },
-                MapIconType.Fort => theme switch
-                {
-                    MapTheme.MiddleEast => SpriteManager.ME_Fort,
-                    _ => throw new ArgumentException($"{CLASS_NAME}.CreateMapIcon: Fort icon not defined for map theme '{theme}'.")
-                },
-                _ => SpriteManager.ME_Sprawl
-            };
             prefab.GetSpriteRenderer().sprite = SpriteManager.GetSprite(spriteName);
             prefab.ApplySorting(SortSlot.MapIcon);
 
@@ -693,6 +706,9 @@ namespace HammerAndSickle.Renderers
             prefab.UpdateNameplate(GameDataManager.CurrentMapTheme);
             prefab.UpdateControlFlag(hex.TileControl, hex.DefaultTileControl);
             prefab.UpdateCityName(hex.TileLabel);
+            // ⚠ IsObjective is GAMEPLAY-DEAD (prestige pass V2, 2026-08-17) — this flag-sprite read and
+            // the Prefab_TerrainPanel feature line are its ONLY two legal readers, kept until the
+            // manifest carries a mission-objective list (V15). Do not add new readers.
             prefab.UpdateObjectiveStatus(hex.IsObjective);
 
             // Sorting comes from SortingConfig, overriding the prefab's baked (and previously stale) sorting.

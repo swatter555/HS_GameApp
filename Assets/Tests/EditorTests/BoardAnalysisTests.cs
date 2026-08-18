@@ -175,18 +175,27 @@ namespace HammerAndSickle.Tests
         }
 
         [Test]
-        public void RegionGraph_ObjectiveMetadata_Accumulates()
+        public void RegionGraph_StrongholdAndValueMetadata_Accumulate()
         {
+            // V4 split (prestige pass, 2026-08-17): StrongholdCount from the derived HexTile.IsStronghold;
+            // VictoryValue summed over EVERY hex — value is ungated by any flag (Bob's ruling).
             HexMap map = Strip(TerrainType.Clear, TerrainType.Clear, TerrainType.Clear);
-            HexTile objective = map.GetHexAt(P(1, 0));
-            objective.SetIsObjective(true);
-            objective.VictoryValue = 20f;
+
+            HexTile fort = map.GetHexAt(P(1, 0));
+            fort.IsFort = true;                   // stronghold on uniform terrain — the region stays whole
+            fort.VictoryValue = 20f;
+
+            HexTile plain = map.GetHexAt(P(2, 0));
+            plain.SetIsObjective(true);           // gameplay-dead flag — must contribute NOTHING (V2)
+            plain.VictoryValue = 15f;             // ...but its value still counts: no gate
 
             RegionGraph graph = RegionGraph.Build(map);
             Region region = graph.Regions[graph.RegionOf[P(1, 0)]];
 
-            Assert.AreEqual(1, region.ObjectiveCount);
-            Assert.AreEqual(20f, region.ObjectiveValue, 1e-4f);
+            Assert.AreEqual(1, region.StrongholdCount,
+                "Only the fort is a stronghold — the dead isObjective flag adds nothing.");
+            Assert.AreEqual(35f, region.VictoryValue, 1e-4f,
+                "Region value sums over every hex, stronghold or not.");
         }
 
         #endregion // Region graph

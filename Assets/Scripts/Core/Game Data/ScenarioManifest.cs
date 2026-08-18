@@ -178,7 +178,28 @@ namespace HammerAndSickle.Core.GameData
             if (PrestigeStipend < 0 || PrestigeIncomeRate < 0f || PrestigeProgressBonusRate < 0f)
                 return false;
 
+            /* < 1 is refused (cashing out would pay WORSE than sitting still — backwards). Exactly 1.0
+             * LOADS BUT WARNS (editor note 2026-08-17 PM): at par the anti-farm dominance is no longer
+             * strict, so the mechanism is inert without saying so. It stays loadable because a par-payout
+             * manifest is coherent, refusal here makes the scenario silently vanish from the menu, and
+             * the editor hard-blocks <= 1 at authoring anyway — this warning can only fire on hand-edited
+             * content. */
             if (EarlyFinishMultiplier < 1f)
+                return false;
+
+            if (EarlyFinishMultiplier == 1f)
+                UnityEngine.Debug.LogWarning(
+                    $"ScenarioManifest '{ScenarioId}': earlyFinishMultiplier is exactly 1.0 — early finish " +
+                    "pays par with sitting still, so the V10.2 farming disincentive is inert.");
+
+            /* Ongoing is the in-progress sentinel, not an outcome — meaningless as a demand. Every OTHER
+             * rung is legal, and that breadth is load-bearing (editor note 2026-08-17 PM): Draw IS the
+             * defensive scenario ("hold the line for 21 days") and the defeat rungs are fighting
+             * withdrawals. Restricting to victory rungs would re-create the unwinnable-defensive-scenario
+             * hole this pass exists to close. ⚠ requiredResult does NOT gate early finish — that gate is
+             * the threshold ladder (todo_prestige Stage 4), or a defensive scenario would light the
+             * cash-out button on turn 1. */
+            if (RequiredResult == BattleResult.Ongoing)
                 return false;
 
             /* Thresholds: either ALL zero — "this scenario declares no scoring", the pre-V11 default and

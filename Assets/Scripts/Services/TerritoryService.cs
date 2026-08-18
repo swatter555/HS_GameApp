@@ -7,10 +7,13 @@ using System.Collections.Generic;
 namespace HammerAndSickle.Services
 {
     /// <summary>
-    /// One objective hex captured by a move that ended on it (§17.5), carrying the data the caller
-    /// needs to credit VictoryValue prestige (§18.2.1) and update objective accounting.
+    /// One stronghold hex captured by a move that ended on it (§17.5), carrying the data the caller
+    /// needs for capture accounting and feedback (dispatch + SFX; the immediate prestige award retires
+    /// with the §18.2 income model, prestige pass Stage 3).
+    /// (Renamed from ObjectiveCapture 2026-08-17, prestige pass V3.1 — capture stickiness now derives
+    /// from HexTile.IsStronghold, not the authored isObjective flag.)
     /// </summary>
-    public struct ObjectiveCapture
+    public struct StrongholdCapture
     {
         public Position2D Position;
         public float VictoryValue;
@@ -22,22 +25,24 @@ namespace HammerAndSickle.Services
     /// </summary>
     public struct TerritoryChangeResult
     {
-        /// <summary>Non-objective hexes whose ownership changed (transit / occupation / ZoC sweep).</summary>
+        /// <summary>Non-stronghold hexes whose ownership changed (transit / occupation / ZoC sweep).</summary>
         public List<Position2D> FlippedHexes;
 
-        /// <summary>Objective hexes captured by ending on them (§17.5) — prestige-bearing.</summary>
-        public List<ObjectiveCapture> CapturedObjectives;
+        /// <summary>Stronghold hexes captured by ending on them (§17.5).</summary>
+        public List<StrongholdCapture> CapturedStrongholds;
 
         public bool AnyChange =>
             (FlippedHexes != null && FlippedHexes.Count > 0) ||
-            (CapturedObjectives != null && CapturedObjectives.Count > 0);
+            (CapturedStrongholds != null && CapturedStrongholds.Count > 0);
     }
 
     /// <summary>
     /// Movement-driven territorial control (§6.13 + §17.5). Pure map mutation + reporting: the caller
-    /// (MovementController) applies prestige / objective accounting and triggers the redraw. Only the
+    /// (MovementController) applies capture accounting and triggers the redraw. Only the
     /// MOVEMENT-triggered flips live here — HCL decay/recovery (§6.13.5, the Upkeep half) lands with the
     /// supply pass. Fixed-wing transit does NOT flip ownership (§6.13.2) — the caller gates that out.
+    /// ⚠ Stickiness keys on <see cref="HexTile.IsStronghold"/> (derived: cities/forts/airbases/ports)
+    /// since 2026-08-17 (V3) — the authored isObjective flag is gameplay-dead.
     /// </summary>
     public static class TerritoryService
     {
@@ -52,12 +57,12 @@ namespace HammerAndSickle.Services
 
         /// <summary>
         /// Applies §6.13 control for a completed GROUND/HELO move:
-        ///   - Transit (§6.13.2): each NON-objective hex the mover passed THROUGH (path minus the final) flips.
-        ///   - Occupation: the final NON-objective hex flips.
-        ///   - End-of-move ZoC sweep (§6.13.3): each ENEMY-owned, non-objective neighbor of the final hex flips
+        ///   - Transit (§6.13.2): each NON-stronghold hex the mover passed THROUGH (path minus the final) flips.
+        ///   - Occupation: the final NON-stronghold hex flips.
+        ///   - End-of-move ZoC sweep (§6.13.3): each ENEMY-owned, non-stronghold neighbor of the final hex flips
         ///     (grey/none neighbors are NOT swept — the rule is "enemy-owned").
-        ///   - Objective capture (§6.13.8 / §17.5): objectives are EXEMPT from transit & ZoC sweep; an objective
-        ///     the mover ENDS on flips and is reported for prestige.
+        ///   - Stronghold capture (§6.13.8 / §17.5): strongholds are EXEMPT from transit & ZoC sweep; a stronghold
+        ///     the mover ENDS on flips and is reported.
         ///   - HCL resets to 1.0 on every flip (§6.13.10).
         /// <paramref name="pathEntered"/> = the hexes actually entered this move, in order; the LAST element is
         /// the hex the unit ended on. Null/empty → no change.
@@ -67,7 +72,7 @@ namespace HammerAndSickle.Services
             var result = new TerritoryChangeResult
             {
                 FlippedHexes = new List<Position2D>(),
-                CapturedObjectives = new List<ObjectiveCapture>()
+                CapturedStrongholds = new List<StrongholdCapture>()
             };
 
             try
@@ -78,27 +83,27 @@ namespace HammerAndSickle.Services
                 TileControl own = ControlForSide(mover.Side);
                 int lastIndex = pathEntered.Count - 1;
 
-                // Transit (§6.13.2): hexes passed through (everything but the final). Objectives exempt (§6.13.8).
+                // Transit (§6.13.2): hexes passed through (everything but the final). Strongholds exempt (§6.13.8).
                 for (int i = 0; i < lastIndex; i++)
                 {
                     var tile = map.GetHexAt(pathEntered[i]);
-                    if (tile == null || tile.IsObjective) continue;
+                    if (tile == null || tile.IsStronghold) continue;
                     if (FlipTo(tile, own)) result.FlippedHexes.Add(pathEntered[i]);
                 }
 
-                // Final hex — occupation (non-objective) or objective capture (§17.5).
+                // Final hex — occupation (non-stronghold) or stronghold capture (§17.5).
                 var destPos = pathEntered[lastIndex];
                 var destTile = map.GetHexAt(destPos);
                 if (destTile != null)
                 {
-                    if (destTile.IsObjective)
+                    if (destTile.IsStronghold)
                     {
-                        // §17.5: an objective flips ONLY when a ground unit ends on it. Prestige-bearing.
+                        // §17.5: a stronghold flips ONLY when a ground unit ends on it.
                         if (destTile.TileControl != own)
                         {
                             var prev = destTile.TileControl;
                             FlipTo(destTile, own);
-                            result.CapturedObjectives.Add(new ObjectiveCapture
+                            result.CapturedStrongholds.Add(new StrongholdCapture
                             {
                                 Position = destPos,
                                 VictoryValue = destTile.VictoryValue,
@@ -111,12 +116,12 @@ namespace HammerAndSickle.Services
                         result.FlippedHexes.Add(destPos);
                     }
 
-                    // End-of-move ZoC sweep (§6.13.3): enemy-owned, non-objective neighbors of the final hex.
+                    // End-of-move ZoC sweep (§6.13.3): enemy-owned, non-stronghold neighbors of the final hex.
                     TileControl enemy = EnemyControl(own);
                     foreach (var n in HexMapUtil.GetAllNeighborPositions(destPos))
                     {
                         var nt = map.GetHexAt(n);
-                        if (nt == null || nt.IsObjective) continue;     // objectives exempt (§6.13.8)
+                        if (nt == null || nt.IsStronghold) continue;    // strongholds exempt (§6.13.8)
                         if (nt.TileControl != enemy) continue;          // only enemy-owned swept (§6.13.3)
                         if (FlipTo(nt, own)) result.FlippedHexes.Add(n);
                     }

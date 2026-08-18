@@ -27,8 +27,10 @@ namespace HammerAndSickle.Models.AI
         /// <summary>Representative hex (nearest to the centroid) — stable anchor for .aii references and debug labels.</summary>
         public Position2D Seed;
 
-        public int ObjectiveCount;
-        public float ObjectiveValue;   // Σ VictoryValue over IsObjective hexes
+        // Split 2026-08-17 (prestige pass V4): the old ObjectiveCount/ObjectiveValue pair gated the value
+        // sum on the now-gameplay-dead isObjective flag, missing every valued non-stronghold hex.
+        public int StrongholdCount;    // hexes requiring physical occupation to flip (HexTile.IsStronghold)
+        public float VictoryValue;     // Σ VictoryValue over ALL hexes — value is ungated (Bob's ruling)
         public int RoadHexes;
         public bool HasFort;
         public bool HasAirbaseSite;    // isAirbase-flagged hexes persist as sites (§35.4.5)
@@ -226,7 +228,8 @@ namespace HammerAndSickle.Models.AI
                 classVotes[kv.Value].TryGetValue(cls, out int votes);
                 classVotes[kv.Value][cls] = votes + 1;
 
-                if (tile.IsObjective) { region.ObjectiveCount++; region.ObjectiveValue += tile.VictoryValue; }
+                if (tile.IsStronghold) region.StrongholdCount++;
+                region.VictoryValue += tile.VictoryValue;      // every hex, no gate (V4)
                 if (tile.IsRoad) region.RoadHexes++;
                 if (tile.IsFort) region.HasFort = true;
                 if (tile.IsAirbase) region.HasAirbaseSite = true;

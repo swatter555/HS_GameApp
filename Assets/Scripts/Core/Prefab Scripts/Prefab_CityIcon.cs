@@ -136,6 +136,12 @@ namespace HammerAndSickle.Core
                         DefaultTileControl.IQ => SpriteManager.GetSprite(SpriteManager.Control_Iraq),
                         DefaultTileControl.SA => SpriteManager.GetSprite(SpriteManager.Control_Saudi),
                         DefaultTileControl.KW => SpriteManager.GetSprite(SpriteManager.Control_Kuwait),
+                        // ⚠ SV arm added 2026-08-17 (prestige pass V13). Missing before, masked by the
+                        // Red short-circuit below + Khost's SV cities all starting Red. Under derived
+                        // strongholds (V3) a Red/SV city routinely flips to Blue, and the throw here was
+                        // CAUGHT — so the flag silently kept the previous owner's sprite while spamming
+                        // HandleException once per affected city per RefreshMap.
+                        DefaultTileControl.SV => SpriteManager.GetSprite(SpriteManager.Control_SV),
                         DefaultTileControl.None => SpriteManager.GetSprite(SpriteManager.Control_None),
                         _ => throw new ArgumentException($"{CLASS_NAME}.UpdateControlFlag: Invalid default control '{tileControl}.{defaultControl}'.")
                     };
