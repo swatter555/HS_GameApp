@@ -486,10 +486,18 @@ namespace HammerAndSickle.Controllers
                 StartingPlayerShare = ledger.PlayerShare;
                 HighWaterVictoryValue = ledger.PlayerValue;
 
-                // V5.4: a zero-value map is legitimate (every currently shipped map) — the scenario
-                // simply declares no scoring, and V9 grades it Draw. Loud, not fatal.
+                // V5.4: a zero-value map is legitimate — the scenario simply declares no scoring,
+                // and V9 grades it Draw. Loud, not fatal.
                 if (ledger.TotalValue <= 0f)
                     AppService.CaptureUiMessage("Map carries no victory value — scenario will not be scored.");
+
+                // Ladder audit (editor's pass-close catch): name every rung the mirror silently
+                // killed for THIS map + manifest pairing, at the one moment s0 is fresh.
+                foreach (string finding in AuditLadderReachability(StartingPlayerShare,
+                    VictoryThresholdMinor, VictoryThresholdMajor, VictoryThresholdDecisive))
+                {
+                    Debug.LogWarning($"[{CLASS_NAME}] Ladder audit: {finding}");
+                }
             }
             catch (Exception ex)
             {
@@ -1306,6 +1314,42 @@ namespace HammerAndSickle.Controllers
         internal static BattleResult OneRungBelow(BattleResult result)
         {
             return result >= BattleResult.DecisiveDefeat ? BattleResult.DecisiveDefeat : result + 1;
+        }
+
+        /// <summary>
+        /// §17.3 ladder-reachability audit (the editor's pass-close catch, 2026-08-17): the mirror
+        /// assumes comparable room ABOVE and BELOW the starting share, and nothing enforces that. At a
+        /// low s0 — every offensive scenario by definition — the derived defeat cuts fall below zero,
+        /// so every non-victory grades Draw and total collapse is indistinguishable from falling one
+        /// point short of Minor (shipped Khost: s0 0.226 vs cuts 0.55/0.65/0.8 → all three defeat
+        /// rungs dead). The inverse degenerate exists too: a victory cut at or below s0 is met before
+        /// the first order is given. Neither errors — the ladder silently has fewer rungs than it
+        /// appears to, the inert-earlyFinishMultiplier shape — so the battle-start log names every
+        /// dead rung. Static and returns the findings so tests pin them; the editor's authoring-side
+        /// Scoring Report is the PRIMARY catch point (they hold map and manifest together) — this is
+        /// the runtime backstop.
+        /// </summary>
+        internal static List<string> AuditLadderReachability(float s0, float minorCut, float majorCut,
+            float decisiveCut)
+        {
+            var findings = new List<string>();
+            if (minorCut <= 0f) return findings;   // no scoring declared — nothing to audit
+
+            if (minorCut <= s0)
+                findings.Add($"MinorVictory cut {minorCut:0.###} is at or below the starting share {s0:0.###} — met before the first order is given.");
+            if (majorCut <= s0)
+                findings.Add($"MajorVictory cut {majorCut:0.###} is at or below the starting share {s0:0.###} — met before the first order is given.");
+            if (decisiveCut <= s0)
+                findings.Add($"DecisiveVictory cut {decisiveCut:0.###} is at or below the starting share {s0:0.###} — met before the first order is given.");
+
+            if (2f * s0 - minorCut <= 0f)
+                findings.Add($"MinorDefeat is UNREACHABLE — its mirrored cut is {2f * s0 - minorCut:0.###} and a share cannot go below 0, so every non-victory grades Draw (total collapse included).");
+            if (2f * s0 - majorCut <= 0f)
+                findings.Add($"MajorDefeat is UNREACHABLE (mirrored cut {2f * s0 - majorCut:0.###}).");
+            if (2f * s0 - decisiveCut <= 0f)
+                findings.Add($"DecisiveDefeat is UNREACHABLE (mirrored cut {2f * s0 - decisiveCut:0.###}).");
+
+            return findings;
         }
 
         /// <summary>

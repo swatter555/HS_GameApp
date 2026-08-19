@@ -133,6 +133,50 @@ namespace HammerAndSickle.Tests
 
         #endregion // The C6 gate cap
 
+        #region Ladder reachability audit (editor's pass-close catch)
+
+        [Test]
+        public void Audit_BalancedStart_NoFindings()
+        {
+            var findings = BattleManager.AuditLadderReachability(0.5f, Minor, Major, Decisive);
+
+            Assert.IsEmpty(findings, "At the stalemate premise every rung is reachable — the mirror behaves.");
+        }
+
+        [Test]
+        public void Audit_OffensiveStart_NamesAllThreeDeadDefeatRungs()
+        {
+            // Shipped Khost: s0 = 0.226 against 0.55/0.65/0.8 — all three mirrored defeat cuts are
+            // negative, so every non-victory grades Draw and total collapse reads as a near-miss.
+            var findings = BattleManager.AuditLadderReachability(0.2258f, 0.55f, 0.65f, 0.8f);
+
+            Assert.AreEqual(3, findings.Count, "All three defeat rungs are dead and each must be NAMED.");
+            StringAssert.Contains("MinorDefeat", findings[0]);
+            StringAssert.Contains("MajorDefeat", findings[1]);
+            StringAssert.Contains("DecisiveDefeat", findings[2]);
+        }
+
+        [Test]
+        public void Audit_StartAboveMinorCut_FlagsMetAtStart()
+        {
+            // The inverse degenerate: a defensive-ish start ABOVE the minor cut is a victory before
+            // the first order. (Defeat side stays healthy here: 1.2 − 0.8 = 0.4 > 0.)
+            var findings = BattleManager.AuditLadderReachability(0.6f, 0.55f, 0.65f, 0.8f);
+
+            Assert.AreEqual(1, findings.Count);
+            StringAssert.Contains("MinorVictory", findings[0]);
+            StringAssert.Contains("met before the first order", findings[0]);
+        }
+
+        [Test]
+        public void Audit_NoScoringDeclared_IsSilent()
+        {
+            Assert.IsEmpty(BattleManager.AuditLadderReachability(0.5f, 0f, 0f, 0f),
+                "An unscored scenario has no ladder to audit.");
+        }
+
+        #endregion // Ladder reachability audit
+
         #region Early-finish bonus (V10.2 / C3)
 
         [Test]

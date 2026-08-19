@@ -1627,7 +1627,9 @@ namespace HammerAndSickle.Core.GameData
         // `startingPlayerShare` (the §17.3 mirror anchor, unrecoverable after the first flip) and
         // `highWaterVictoryValue` (the §18.2.2 anti-farm ratchet) — and the 8 manifest scoring/economy
         // knob mirrors (an in-battle save restores WITHOUT its manifest, so income and grading must read
-        // the save). The three objective-counter fields are DROPPED (their counters retired with the
+        // the save). ⚠ Stated plainly (editor's note): the mirror FREEZES the knobs at battle start —
+        // retuning a manifest does NOT reach saves in flight, only a fresh battle picks up new numbers.
+        // Same doctrine as the .oob snapshot; do not read it as tuning failing to apply. The three objective-counter fields are DROPPED (their counters retired with the
         // recomputed VictoryLedger + stamped mission-objective flags — which ride the embedded map's
         // existing hex shape, costing this bump nothing). The VictoryLedger is deliberately NOT
         // persisted: derived state recomputes on load. No migration step — pre-1.0 clean break.

@@ -8,6 +8,18 @@
 > **Downstream:** P4 requisition (`todo_profiles.md`, = V14 → GATE 4) now has a live currency ·
 > Bob wires the End Scenario button · the editor's rebalanced maps + authored missionObjectives
 > supersede the placeholders · design-doc amendments are IN (C4 done, §17.8/§17.9 new).
+>
+> **POST-CLOSE ADDENDUM (2026-08-17, the editor's final note — their catch, verified exactly):**
+> the mirror assumes room on BOTH sides of s0 and nothing enforced it. On shipped Khost
+> (s0 = 350/1550 = 0.226) all three derived defeat cuts are NEGATIVE — every non-victory grades
+> Draw, total collapse included. Not an implementation bug; recurs on every offensive scenario
+> until a map honours the stalemate premise. BUILT in response (their ask):
+> `BattleManager.AuditLadderReachability` — the battle-start log names every dead rung (defeat
+> cut ≤ 0 = unreachable; victory cut ≤ s0 = met before the first order), pinned by 4 new
+> `VictoryGradeTests` — ✅ GREEN 2026-08-17 incl. the three Khost warnings confirmed in play. Their authoring-side Scoring Report is the primary
+> catch; this is the runtime backstop. Also recorded at the SAVE_VERSION constant: the knob
+> mirror freezes at battle start — retuning a manifest does NOT reach saves in flight (.oob
+> doctrine); expect the three Khost warnings until the rebalance lands.
 
 > **Authority:** `PrestigeVictory_Handoff_to_GameAgent_2026-08-17_v2.md` (V1–V16, Bob-ratified) + the
 > editor side's answers doc (Q1–Q6 + V17, 2026-08-17 PM). The AM handoff is SUPERSEDED — move it to
