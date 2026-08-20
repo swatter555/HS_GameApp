@@ -235,11 +235,11 @@ namespace HammerAndSickle.Models.Combat
         private static TerrainType TerrainAt(HexMap map, Position2D pos) =>
             map.GetHexAt(pos)?.Terrain ?? TerrainType.Clear;
 
-        /// <summary>§18.2.3 — half purchase cost, reported only (see GroundCombatAction.PrestigeOnKill).</summary>
+        /// <summary>§18.2.3 — PRESTIGE_KILL_FRACTION of purchase cost (V19 dial), reported only (see GroundCombatAction.PrestigeOnKill).</summary>
         private static int PrestigeOnKill(CombatUnit killed)
         {
             int cost = killed.GetActiveWeaponProfile()?.PrestigeCost ?? 0;
-            return cost / 2;
+            return (int)Math.Round(cost * GameData.PRESTIGE_KILL_FRACTION, MidpointRounding.AwayFromZero);
         }
 
         private static void Unregister(CombatUnit unit)

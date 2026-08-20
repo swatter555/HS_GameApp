@@ -68,9 +68,11 @@ namespace HammerAndSickle.Models.Map
         // MapLoader.ApplyMissionObjectiveStamp CLEARS every value read from the .map file, then stamps
         // `manifest.missionObjectives` onto the listed hexes — so whatever the file says is ignored,
         // and the same .map legitimately carries different objective sets in its standalone and
-        // campaign scenarios. The RUNTIME value is real gameplay state: the §17.x victory gate
-        // (HexMapUtil.AllMissionObjectivesHeld — the player cannot reach requiredResult until every
-        // stamped hex is Red), the objective flag sprite, and the info-panel feature line all read it,
+        // campaign scenarios. The RUNTIME value is real gameplay state: the §17.8 victory gate
+        // (HexMapUtil.CountMissionObjectives → BattleManager.MissionObjectiveGateMet — the player
+        // cannot reach requiredResult until at least ceil(total × missionObjectiveFraction) stamped
+        // hexes are Red; C7 made the gate fractional, fraction 1.0 = the original all-of-them rule),
+        // the objective flag sprite, and the info-panel feature line all read it,
         // and it SERIALIZES INTO SAVES deliberately — an in-battle save must load with its scenario
         // uninstalled (§7.3), so the embedded map, not the manifest, carries the objectives. The
         // SnapshotMapper restore path never re-stamps. ⚠ It does NOT drive tile-control stickiness

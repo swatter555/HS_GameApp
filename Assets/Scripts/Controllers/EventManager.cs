@@ -85,7 +85,7 @@ namespace HammerAndSickle.Controllers
 
         /// <summary>
         /// Fired exactly once when the battle ends, either via reaching the final turn,
-        /// an immediate victory (all objectives held), or other terminal condition.
+        /// an immediate victory (the §17.9 auto-end or early finish), or other terminal condition.
         /// Carries the final BattleResult.
         /// </summary>
         public event Action<BattleResult> OnBattleEnded;

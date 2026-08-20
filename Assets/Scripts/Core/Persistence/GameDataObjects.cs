@@ -121,6 +121,12 @@ namespace HammerAndSickle.Persistence
         [JsonPropertyName("victoryThresholdDecisive")] public float VictoryThresholdDecisive { get; set; } = 0f;
         [JsonPropertyName("requiredResult")] public BattleResult RequiredResult { get; set; } = BattleResult.MinorVictory;
 
+        // C7 gate fraction (SAVE_VERSION 8), mirrored from the manifest for the same V11.6 reason as
+        // the knobs above — the stamped objective FLAGS ride the embedded map, but the required
+        // FRACTION has no other carrier, and the gate is evaluated every turn boundary. Default 1.0
+        // (the C6 all-of-them rule) is what a pre-C7 save deserializes to.
+        [JsonPropertyName("missionObjectiveFraction")] public float MissionObjectiveFraction { get; set; } = 1.0f;
+
         // Conditions
         [JsonPropertyName("weatherCondition")] public WeatherCondition WeatherCondition { get; set; } = WeatherCondition.Clear;
         [JsonInclude] [JsonPropertyName("currentPhase")] public BattlePhase CurrentPhase { get; private set; } = BattlePhase.NotStarted;

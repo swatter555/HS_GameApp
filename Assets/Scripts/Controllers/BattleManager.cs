@@ -157,6 +157,7 @@ namespace HammerAndSickle.Controllers
         public float VictoryThresholdMajor { get; private set; } = 0f;
         public float VictoryThresholdDecisive { get; private set; } = 0f;
         public BattleResult RequiredResult { get; private set; } = BattleResult.MinorVictory;
+        public float MissionObjectiveFraction { get; private set; } = 1.0f;   // C7 — gate floor, 1.0 = the C6 all-of-them rule
 
         /// --------------------
         /// Battle Statistics
@@ -469,6 +470,7 @@ namespace HammerAndSickle.Controllers
             VictoryThresholdMajor = GameDataManager.CurrentManifest.VictoryThresholdMajor;
             VictoryThresholdDecisive = GameDataManager.CurrentManifest.VictoryThresholdDecisive;
             RequiredResult = GameDataManager.CurrentManifest.RequiredResult;
+            MissionObjectiveFraction = GameDataManager.CurrentManifest.MissionObjectiveFraction;
         }
 
         /// <summary>
@@ -498,10 +500,60 @@ namespace HammerAndSickle.Controllers
                 {
                     Debug.LogWarning($"[{CLASS_NAME}] Ladder audit: {finding}");
                 }
+
+                // C7 diagnostic: the gate arithmetic nobody could see before, plus the gate-vs-ladder
+                // collision the ladder audit deliberately does NOT cover (it is exhaustive over the
+                // ladder alone and lumping the gate in would muddy that proof — editor C7 §2.6).
+                LogMissionObjectiveDiagnostic(GameDataManager.CurrentHexMap, ledger);
             }
             catch (Exception ex)
             {
                 AppService.HandleException(CLASS_NAME, nameof(CaptureStartingLedger), ex);
+            }
+        }
+
+        /// <summary>
+        /// C7 battle-start diagnostic. Logs "objectives held/total, gate requires N", then checks the
+        /// COLLISION that made re-priced Khost binary before the fractional gate existed: compute the
+        /// share the player would hold with the gate EXACTLY met and nothing else taken (current value
+        /// + the CHEAPEST still-unheld objectives up to the required count — cheapest-first gives the
+        /// MINIMUM gate-met share, so a warning here is never a false positive). If even that minimum
+        /// clears the decisive cut, every gate-met finish grades DecisiveVictory and the middle rungs
+        /// are decorative. The editor's Scoring Report (E15) is the PRIMARY catch point — authoring
+        /// holds map and manifest together; this is the runtime backstop, same division of labour as
+        /// the ladder audit.
+        /// </summary>
+        private void LogMissionObjectiveDiagnostic(HexMap map, VictoryLedger ledger)
+        {
+            (int held, int total) = HexMapUtil.CountMissionObjectives(map);
+            if (total <= 0) return;
+
+            int required = RequiredObjectiveCount(total, MissionObjectiveFraction);
+            Debug.Log($"[{CLASS_NAME}] Mission objectives: {held}/{total} held at start, " +
+                      $"gate requires {required} (fraction {MissionObjectiveFraction:0.###}).");
+
+            if (VictoryThresholdDecisive <= 0f || ledger.TotalValue <= 0f) return;
+
+            var unheldValues = new List<float>();
+            foreach (HexTile t in map)
+            {
+                if (t != null && t.IsObjective && t.TileControl != TileControl.Red)
+                    unheldValues.Add(t.VictoryValue);
+            }
+            unheldValues.Sort();
+
+            double valueAtGate = ledger.PlayerValue;
+            for (int i = 0; i < required - held && i < unheldValues.Count; i++)
+                valueAtGate += unheldValues[i];
+
+            float shareAtGate = (float)(valueAtGate / ledger.TotalValue);
+            if (shareAtGate >= VictoryThresholdDecisive)
+            {
+                Debug.LogWarning($"[{CLASS_NAME}] Gate/ladder collision: meeting the objective gate " +
+                    $"alone puts the player at share {shareAtGate:0.###}, at or above the decisive cut " +
+                    $"{VictoryThresholdDecisive:0.###} — MinorVictory and MajorVictory can never grade on " +
+                    $"a gate-met finish. Lower missionObjectiveFraction, re-price the objectives, or " +
+                    $"raise the cuts (the editor's Scoring Report is the authoring-side catch).");
             }
         }
 
@@ -1092,7 +1144,7 @@ namespace HammerAndSickle.Controllers
                     return;
                 }
 
-                if (ledger.PlayerShare < VictoryThresholdMinor || !HexMapUtil.AllMissionObjectivesHeld(map))
+                if (ledger.PlayerShare < VictoryThresholdMinor || !MissionObjectiveGateMet(map, MissionObjectiveFraction))
                 {
                     AppService.CaptureUiMessage("Cannot end the scenario — victory has not been achieved yet.");
                     return;
@@ -1121,9 +1173,9 @@ namespace HammerAndSickle.Controllers
         #region Battle Status
 
         /// <summary>
-        /// Checks scenario victory conditions. Currently only the "all objectives held"
-        /// condition is implemented, since the objective tracking fields already exist.
-        /// Turn-limit termination is handled directly by the turn coroutine.
+        /// Checks scenario victory conditions — the V10.1 nothing-further-to-gain auto-end: decisive
+        /// share AND the C7 fractional objective gate met. Turn-limit termination is handled directly
+        /// by the turn coroutine.
         /// </summary>
         /// <returns>True if a victory condition is met and the battle should end.</returns>
         private bool CheckVictoryConditions()
@@ -1149,7 +1201,7 @@ namespace HammerAndSickle.Controllers
                 CurrentLedger = ledger;
 
                 if (ledger.TotalValue <= 0f) return false;
-                if (!HexMapUtil.AllMissionObjectivesHeld(map)) return false;
+                if (!MissionObjectiveGateMet(map, MissionObjectiveFraction)) return false;
 
                 return ledger.PlayerShare >= VictoryThresholdDecisive;
             }
@@ -1190,7 +1242,8 @@ namespace HammerAndSickle.Controllers
                 var finalMap = GameDataManager.CurrentHexMap;
                 VictoryLedger finalLedger = VictoryLedger.Compute(finalMap);
                 CurrentLedger = finalLedger;
-                bool objectivesHeld = HexMapUtil.AllMissionObjectivesHeld(finalMap);
+                bool objectivesHeld = MissionObjectiveGateMet(finalMap, MissionObjectiveFraction);
+                (int objHeld, int objTotal) = HexMapUtil.CountMissionObjectives(finalMap);
 
                 CurrentResult = GradeBattleResult(finalLedger, StartingPlayerShare,
                     VictoryThresholdMinor, VictoryThresholdMajor, VictoryThresholdDecisive,
@@ -1202,7 +1255,8 @@ namespace HammerAndSickle.Controllers
                           $"(mirrored defeat cuts {2f * StartingPlayerShare - VictoryThresholdMinor:0.###}/" +
                           $"{2f * StartingPlayerShare - VictoryThresholdMajor:0.###}/" +
                           $"{2f * StartingPlayerShare - VictoryThresholdDecisive:0.###}) | " +
-                          $"objectives held: {objectivesHeld} | required: {RequiredResult} | result: {CurrentResult}");
+                          $"objectives {objHeld}/{objTotal} (gate needs {RequiredObjectiveCount(objTotal, MissionObjectiveFraction)}, met: {objectivesHeld}) | " +
+                          $"required: {RequiredResult} | result: {CurrentResult}");
 
                 SetPhase(BattlePhase.BattleComplete);
                 AppService.CaptureUiMessage($"Battle complete: {CurrentResult}");
@@ -1263,6 +1317,41 @@ namespace HammerAndSickle.Controllers
 
             newHighWater = ledger.PlayerValue > highWater ? ledger.PlayerValue : highWater;
             return (int)Math.Round(income);
+        }
+
+        /// <summary>
+        /// C7 gate (§17.8): held >= ceil(total × fraction). Vacuously met when the scenario stamped
+        /// none (or the map is null/broken — CountMissionObjectives fails open to (0, 0)).
+        /// ⚠ THE ONE PREDICATE FOR ALL THREE GATE SITES — grading (CompleteBattle), the voluntary
+        /// early end (OnEndScenarioButton) and the auto-end (CheckVictoryConditions). Any two of
+        /// them disagreeing produces a button that lies or a battle that auto-ends at a rung the
+        /// grade then denies; the shared helper makes disagreement unrepresentable. Do not inline
+        /// the arithmetic at a call site. Static and pure for EditorTests.
+        /// </summary>
+        internal static bool MissionObjectiveGateMet(HexMap map, float fraction)
+        {
+            (int held, int total) = HexMapUtil.CountMissionObjectives(map);
+            if (total <= 0) return true;
+            return held >= RequiredObjectiveCount(total, fraction);
+        }
+
+        /// <summary>
+        /// C7: how many of <paramref name="total"/> objectives a gate at <paramref name="fraction"/>
+        /// demands. ceil semantics, clamped to [1, total] — a declared gate always demands at least
+        /// one, and fraction >= 1 is exactly the C6 all-of-them rule.
+        /// ⚠ THE FLOAT TRAP (editor C7 §2.3): naive Math.Ceiling(total * fraction) over-counts on
+        /// pairs like (10, 0.3f) — the float 0.3f is 0.30000001…, so the product lands a hair ABOVE
+        /// 3 and ceils to 4. The product is rounded to 4 decimals first, which kills representation
+        /// noise at any plausible total with no magic epsilon (an epsilon subtraction breaks again
+        /// around ~85 objectives; authored fractions are two-decimal values, so 4 decimals is exact).
+        /// </summary>
+        internal static int RequiredObjectiveCount(int total, float fraction)
+        {
+            if (total <= 0) return 0;
+            if (fraction >= 1f) return total;   // exact, and the C6 default
+
+            int required = (int)Math.Ceiling(Math.Round(total * (double)fraction, 4));
+            return Math.Clamp(required, 1, total);
         }
 
         /// <summary>
@@ -1432,6 +1521,7 @@ namespace HammerAndSickle.Controllers
                 data.VictoryThresholdMajor = VictoryThresholdMajor;
                 data.VictoryThresholdDecisive = VictoryThresholdDecisive;
                 data.RequiredResult = RequiredResult;
+                data.MissionObjectiveFraction = MissionObjectiveFraction;
             }
             catch (Exception ex)
             {
@@ -1461,6 +1551,7 @@ namespace HammerAndSickle.Controllers
                 VictoryThresholdMajor = data.VictoryThresholdMajor;
                 VictoryThresholdDecisive = data.VictoryThresholdDecisive;
                 RequiredResult = data.RequiredResult;
+                MissionObjectiveFraction = data.MissionObjectiveFraction;
 
                 CurrentLedger = VictoryLedger.Compute(GameDataManager.CurrentHexMap);
             }

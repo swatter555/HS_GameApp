@@ -122,6 +122,44 @@ namespace HammerAndSickle.Tests
             Assert.AreEqual(BattleResult.DecisiveVictory, Grade(13, held: true, BattleResult.MinorVictory));
         }
 
+        /// <summary>Map with <paramref name="total"/> stamped objectives, first <paramref name="red"/> Red.</summary>
+        private static HexMap ObjectiveMap(int total, int red)
+        {
+            var map = MapFixtures.UniformMap();
+            for (int i = 0; i < total; i++)
+            {
+                var t = MapFixtures.At(map, i % 8 + 1, i / 8 + 1);
+                t.IsObjective = true;
+                t.TileControl = i < red ? TileControl.Red : TileControl.Blue;
+            }
+            return map;
+        }
+
+        [Test]
+        public void Grade_FractionalGateMet_LeavesTheShareGrade()
+        {
+            // C7 end-to-end: the REAL map-driven gate feeds the grade — 5 of 9 at fraction 0.5 is met,
+            // so a decisive share grades DecisiveVictory. This is the interaction the pass exists for:
+            // partial objective holds now earn the middle and upper rungs instead of collapsing to Draw.
+            bool gate = BattleManager.MissionObjectiveGateMet(ObjectiveMap(9, 5), 0.5f);
+
+            Assert.IsTrue(gate);
+            Assert.AreEqual(BattleResult.DecisiveVictory, Grade(13, held: gate, BattleResult.MinorVictory));
+        }
+
+        [Test]
+        public void Grade_FractionalGateUnmet_StillCapsOneRungBelow()
+        {
+            // §2.4 invariant, asserted at the pure layer: 4 of 9 at 0.5 leaves the gate unmet, so even
+            // a decisive share caps one rung below the required MinorVictory. Because ALL THREE gate
+            // call sites (grading, early end, auto-end) run this same MissionObjectiveGateMet, the
+            // auto-end can never fire at a rung the grade would then deny — the sites cannot disagree.
+            bool gate = BattleManager.MissionObjectiveGateMet(ObjectiveMap(9, 4), 0.5f);
+
+            Assert.IsFalse(gate);
+            Assert.AreEqual(BattleResult.Draw, Grade(13, held: gate, BattleResult.MinorVictory));
+        }
+
         [Test]
         public void OneRungBelow_StepsTowardDefeat_AndSaturates()
         {

@@ -1569,6 +1569,15 @@ namespace HammerAndSickle.Core.GameData
         // formula (~360) under-values an attack that bypasses air defence entirely.
         public const int PRESTIGE_CRUISE_BOMBER = 400;
 
+        // 2026-08-20 (V19) — §18.2.3: fraction of a destroyed unit's purchase cost paid to the killer.
+        // Bob's tuning dial — it was `cost / 2` hard-coded in three combat actions, which is three
+        // files to hunt per tuning step. Consumers round AWAY FROM ZERO ((int)Math.Round(cost * this,
+        // MidpointRounding.AwayFromZero)): bare Math.Round is banker's rounding, which at 0.5 sends
+        // 22.5 → 22 but 23.5 → 24 — exactly the inconsistency a tuning pass would trip over.
+        // ⚠ Still REPORTED, not credited (PrestigeOwedTo* fields) — crediting lands with the M13
+        // wallet wiring; Bob has ruled the kill reward STAYS (considered removing it, decided against).
+        public const float PRESTIGE_KILL_FRACTION = 0.5f;
+
         #endregion // Prestige Exceptions
 
         #region File Constants
@@ -1637,7 +1646,15 @@ namespace HammerAndSickle.Core.GameData
         // queued bump): that work sits behind M13-scale prerequisites with no date, and holding a READY
         // bump hostage to an unscheduled one is exactly how the v4 amend-in-place shortcut happened
         // (recorded at 3 → 4 above). AI2b-3 takes its own bump when it lands (Bob's ruling, 2026-08-17).
-        public const int SAVE_VERSION = 7;
+        //
+        // 7 → 8 (2026-08-20, C7 fractional objective gate): `missionObjectiveFraction` joins the
+        // ScenarioData knob mirror — the stamped objective flags ride the embedded map (C6), but the
+        // required FRACTION has no other carrier and the gate runs every turn boundary on a save that
+        // restores without its manifest (§7.3). Default 1.0 = the C6 all-of-them rule, so a pre-C7
+        // manifest or an absent save key keeps its exact behaviour. No migration step — pre-1.0 clean
+        // break, and the absent-member default is the correct value anyway. AI2b-3 still takes its own
+        // bump when it lands (9 or later).
+        public const int SAVE_VERSION = 8;
 
         #endregion
 

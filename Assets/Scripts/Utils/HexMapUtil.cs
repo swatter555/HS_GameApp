@@ -196,40 +196,44 @@ namespace HammerAndSickle.Models.Map
         }
 
         /// <summary>
-        /// Gets the opposite direction for a given hex direction.
+        /// C7 (§17.8): (held, total) over the stamped mission-objective hexes — held = Red-controlled.
+        /// COUNTS rather than a bool because the HUD ("objectives 5 / 9"), the debrief and the
+        /// battle-start diagnostic all want the numbers, and the gate threshold arithmetic lives in ONE
+        /// place (BattleManager.RequiredObjectiveCount) so the three gate call sites cannot disagree.
+        /// Reads the RUNTIME IsObjective flags (MapLoader's clear-then-stamp), NEVER the manifest: an
+        /// in-battle save restores without one (§7.3). Evaluated fresh at every call — no cached gate
+        /// state, the same anti-drift rule as VictoryLedger. Fails OPEN on a null/broken map — (0, 0)
+        /// reads as "no gate declared": a mysteriously unwinnable battle is worse than a logged easier
+        /// one, and HandleException screams either way. (Replaced the C6 bool AllMissionObjectivesHeld,
+        /// 2026-08-20 — it had no callers outside the gate and a kept wrapper would be dead code
+        /// reading authoritative.)
         /// </summary>
-        /// <param name="direction">Original direction</param>
-        /// <returns>Opposite direction</returns>
-        /// <summary>
-        /// C6 victory gate (§17.x): true when EVERY stamped mission-objective hex is player-controlled
-        /// — vacuously true when the scenario stamped none ("no gate declared"). Reads the RUNTIME
-        /// IsObjective flags (MapLoader's clear-then-stamp), NEVER the manifest: an in-battle save
-        /// restores without one (§7.3). Evaluated fresh at every check — no cached gate state, the
-        /// same anti-drift rule as VictoryLedger. Fails OPEN (gate met) on a null/broken map: a
-        /// mysteriously unwinnable battle is worse than a logged easier one, and HandleException
-        /// screams either way.
-        /// </summary>
-        public static bool AllMissionObjectivesHeld(HexMap map)
+        public static (int held, int total) CountMissionObjectives(HexMap map)
         {
             try
             {
-                if (map == null) return true;
+                if (map == null) return (0, 0);
 
+                int held = 0, total = 0;
                 foreach (HexTile t in map)
                 {
-                    if (t != null && t.IsObjective && t.TileControl != TileControl.Red)
-                        return false;
+                    if (t == null || !t.IsObjective) continue;
+                    total++;
+                    if (t.TileControl == TileControl.Red) held++;
                 }
 
-                return true;
+                return (held, total);
             }
             catch (Exception e)
             {
-                AppService.HandleException("HexMapUtil", nameof(AllMissionObjectivesHeld), e);
-                return true;
+                AppService.HandleException("HexMapUtil", nameof(CountMissionObjectives), e);
+                return (0, 0);
             }
         }
 
+        /// <summary>
+        /// Gets the opposite direction for a given hex direction.
+        /// </summary>
         public static HexDirection GetOppositeDirection(HexDirection direction)
         {
             try

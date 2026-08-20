@@ -147,8 +147,24 @@ namespace HammerAndSickle.Core.GameData
         public BattleResult RequiredResult { get; set; } = BattleResult.MinorVictory;
 
         /// <summary>
+        /// C7 — the FRACTION of <see cref="MissionObjectives"/> that must be Red-controlled for the
+        /// gate to be met: required = ceil(total × fraction), clamped to [1, total]. 1.0 (the default)
+        /// is C6's original all-or-nothing rule and is what an ABSENT key deserializes to, so every
+        /// pre-C7 manifest keeps its exact behaviour. Range (0, 1] — <see cref="IsValid"/> refuses the
+        /// rest. A COUNT gate, deliberately not value-weighted (editor C7 §5): cheap objectives are
+        /// cheap on purpose, so a poor corner of the map still costs the player a detachment.
+        /// ⚠ Mirrored into ScenarioData (V11.6 rationale): the stamped objective FLAGS ride the
+        /// embedded map, but the required fraction has no other carrier and the gate is evaluated
+        /// every turn boundary on a save that restores without its manifest (§7.3).
+        /// </summary>
+        [JsonPropertyName("missionObjectiveFraction")]
+        public float MissionObjectiveFraction { get; set; } = 1.0f;
+
+        /// <summary>
         /// C6 mission objectives — the victory GATE: the player cannot reach <see cref="RequiredResult"/>
-        /// until ALL of these are Red-controlled (the grade is capped one rung below it otherwise).
+        /// until at least ceil(count × <see cref="MissionObjectiveFraction"/>) of these are
+        /// Red-controlled (the grade is capped one rung below it otherwise; C7 made the gate
+        /// fractional — at the default fraction 1.0 this is the original ALL-of-them rule).
         /// Absent/empty = no gate declared, VALID (authoring convention says every scenario has at
         /// least one; the schema does not enforce it — that is what keeps pre-C6 manifests loading).
         /// Defensive scenarios put them on the player's side (hold); offensive on the AI side (take).
@@ -251,6 +267,16 @@ namespace HammerAndSickle.Core.GameData
                     VictoryThresholdMajor >= VictoryThresholdDecisive)
                     return false;
             }
+
+            /* C7 gate fraction: (0, 1] only. A zero fraction is a gate that is always met, which is
+             * indistinguishable from declaring no objectives and is better said that way; above 1 is
+             * unsatisfiable. Both are authoring errors, not content states. ⚠ Deliberately NOT refused:
+             * an empty objective list WITH a non-default fraction — meaningless but harmless
+             * (ceil(0 × f) == 0, gate vacuously met), and refusing it would make a manifest vanish
+             * from the menu over a field nobody set on purpose. The editor hard-blocks it at
+             * authoring instead (E15). */
+            if (MissionObjectiveFraction <= 0f || MissionObjectiveFraction > 1f)
+                return false;
 
             /* C6 mission objectives: absent/empty = no gate, valid. Entries must be unique and inside
              * the declared rectangle. The AUTHORITATIVE checks live in the MapLoader stamp — it knows

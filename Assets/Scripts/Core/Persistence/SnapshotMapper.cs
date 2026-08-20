@@ -742,10 +742,11 @@ namespace HammerAndSickle.Persistence
             //
             // NOTE there is deliberately NO 3 => arm for the 3→4 bump of 2026-07-28, NO 4 => arm for the
             // 4→5 profile-slot bump of 2026-08-08, NO 5 => arm for the 5→6 over-water bump of
-            // 2026-08-11, and NO 6 => arm for the 6→7 prestige/scoring bump of 2026-08-17. While
-            // MINIMUM_SUPPORTED_SAVE_VERSION tracks SAVE_VERSION (pre-1.0), any older save is refused by
-            // the floor check before the ladder is ever entered, so a step would be unreachable code
-            // pretending to be a migration. See the SAVE_VERSION comment in GameData.
+            // 2026-08-11, NO 6 => arm for the 6→7 prestige/scoring bump of 2026-08-17, and NO 7 => arm
+            // for the 7→8 C7 fractional-gate bump of 2026-08-20. While MINIMUM_SUPPORTED_SAVE_VERSION
+            // tracks SAVE_VERSION (pre-1.0), any older save is refused by the floor check before the
+            // ladder is ever entered, so a step would be unreachable code pretending to be a migration.
+            // See the SAVE_VERSION comment in GameData.
             _ => null
         };
 

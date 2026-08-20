@@ -85,7 +85,7 @@ a diagnosis.
 | **Printer / dispatch feed** | CRT + emitters LIVE for every existing host. Owed: P5 ledger persistence (SAVE_VERSION bump), P8b tests. Air/logistics/leader emitters host-blocked. | Agent: P5 persistence is small and self-contained. §11.7.2 evac revision awaits Bob's eyeball. |
 | **Supply (§15)** | Designed; `ProcessUpkeep` is a stub. Gates N3, HCL decay/recovery, logistics dispatches, depot REP award. | Agent: its own pass, unscheduled. No blockers besides size. |
 | **Weather** | Single-state Clear. Rich model deferred by design ("revisit before ship"). Several built rules dormant until it exists. | Design pass first (Bob + doc), then code. Nothing else gated on it except the dormant rules. |
-| **Content / editor coordination** | Editor writes full bundles; Hamburg (44×21 EU) in authoring — values/objectives/zones still zero. Khost scoring is placeholder (4/7 rungs reachable). | Editor-side: E10 Khost rebalance, E14 scoring report, Hamburg values. Game-side: nothing blocked; EU/CH ⏸ verify fires on their first export. |
+| **Content / editor coordination** | Khost re-priced editor-side (s0 0.302, ladder .38/.47/.56, 7/7 rungs). C7 fractional gate + V19 kill constant LANDED game-side 2026-08-20 (SAVE_VERSION 8) — E15 (fraction authoring + collision check) unblocked. Hamburg (44×21 EU) in authoring. | Editor-side: E15, Khost manifest re-export with the fraction, E14, Hamburg values. Game-side: ⚑ C7 suite run; EU/CH ⏸ verify fires on their first export. |
 | **Ship-blockers (small, must not be forgotten)** | Tilde (~) reveal cheat in `GameIconRenderer`; `AudioSettings` local `JsonSerializerOptions` (JsonPolicy rule violation). | Agent: both are quick deletes/redirects; do before any external build. Tracked in Cleanup. |
 
 ---
@@ -139,6 +139,18 @@ a diagnosis.
 >    under that, and it stays open until it passes.
 > 5. A PASSED entry is deleted from this section the same session, after its result is recorded in the change
 >    log and, if it is a shipped behaviour, in Claude_Project. **This section is a queue, never an archive.**
+
+- [!] **C7 SUITE RUN — the fractional objective gate + V19 (2026-08-20).**
+      **DO:** run the full EditorTest suite — in particular `MissionObjectiveGateTests` (grown 7 → 15:
+      counts API, `RequiredObjectiveCount` arithmetic, fractional gate), `VictoryGradeTests` (+2
+      fractional-gate compositions), `PrestigePersistenceTests` (fraction round-trip at a NON-default
+      value), `SaveMigrationLadderTests`, and `ScenarioManifestTests` if one exists (IsValid gained the
+      fraction range check).
+      **PASS:** green. The one to watch is `RequiredObjectiveCount_FloatEdge_DoesNotOverCount` —
+      `(10, 0.3f)` must be 3, not 4 (the float trap the editor hit in E14).
+      **WHY:** the gate runs at grading, the early-end button and the auto-end through ONE shared
+      predicate — wrong here is wrong at all three, and `SAVE_VERSION` is now 8 (v7 saves refuse —
+      correct pre-1.0 behaviour, but a surprise if you had a test save lying around).
 
 - [ ] **Fog-of-war movement range (owed since 2026-07-21; LOW priority, not blocking).**
       **DO:** move a unit along a path passing near an enemy at SpottedLevel 0 (tilde reveal OFF, known OOB
@@ -466,6 +478,18 @@ manager, for Khost). ⚠ AI2 snapshot serialization still owed its own `SAVE_VER
 > older than the last two passes migrate to `Claude_TODO_Archive.md` when this section is pruned.
 > **Entries 2026-07-21 → 2026-08-19 (incl. the theme-art pass and everything before it) are in the archive.**
 
+- 2026-08-20 — C7 FRACTIONAL OBJECTIVE GATE + V19 (editor's ask, Bob-ratified; **SAVE_VERSION 8**): the
+  §17.8 gate becomes held ≥ ceil(total × `missionObjectiveFraction`) — new manifest float (0,1], default
+  1.0 = the C6 all-of-them rule, mirrored into `ScenarioData` (no migration arm, pre-1.0 rule; SnapshotMapper
+  no-arm comment extended). `HexMapUtil.CountMissionObjectives` (counts, fail-open) REPLACES the deleted
+  `AllMissionObjectivesHeld`; ONE predicate (`BattleManager.MissionObjectiveGateMet` + `RequiredObjectiveCount`,
+  round-then-ceil float-trap defence, clamp [1,total]) serves grading + early end + auto-end so the three can
+  never disagree. Battle-start diagnostic: held/total/required log + gate/ladder collision warning (min
+  gate-met share ≥ decisive → middle rungs decorative — the re-priced-Khost defect). V19:
+  `GameData.PRESTIGE_KILL_FRACTION` (0.5, away-from-zero rounding) replaces three `cost / 2` copies.
+  Tests: gate suite 7→15, +2 grade compositions, non-default fraction round-trip. HS_DesignDoc §17.8
+  (NEW 17.8.0/17.8.5) + §18.2.3 amended in step. Editor Q&A: C7 takes 8 (AI2b-3 takes its own later);
+  wrapper DELETED; both diagnostics built. ⚑ suite run owed.
 - 2026-08-20 — DESIGN-DOC AMENDMENT PASS (`HS_DesignDoc.md`, outside the repo — not in this commit): 12.3.7
   amended 2/4 → **0/4** + NEW 12.3.7a (fixed-wing transit is ground-blind, medium-keyed, RECONA/AWACS exempt —
   clears the amendment owed since 2026-08-10); 4.8 infrastructure list gains `IsPort` (Fort/Airbase/Port

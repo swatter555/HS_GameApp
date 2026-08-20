@@ -35,7 +35,10 @@ namespace HammerAndSickle.Tests
                 VictoryThresholdMinor = 0.55f,
                 VictoryThresholdMajor = 0.65f,
                 VictoryThresholdDecisive = 0.8f,
-                RequiredResult = BattleResult.Draw
+                RequiredResult = BattleResult.Draw,
+                MissionObjectiveFraction = 0.5f   // ⚠ NON-default: a field that defaults correctly
+                                                  // would round-trip "successfully" while being
+                                                  // dropped on the wire (editor C7 §2.7)
             };
 
             string json = JsonSerializer.Serialize(data, JsonPolicy.Save);
@@ -51,6 +54,8 @@ namespace HammerAndSickle.Tests
             Assert.AreEqual(1.25f, restored.EarlyFinishMultiplier, 1e-6f);
             Assert.AreEqual(0.8f, restored.VictoryThresholdDecisive, 1e-6f);
             Assert.AreEqual(BattleResult.Draw, restored.RequiredResult, "A defensive scenario's demand survives the save.");
+            Assert.AreEqual(0.5f, restored.MissionObjectiveFraction, 1e-6f,
+                "C7 (SAVE_VERSION 8): the gate fraction has no other carrier — the stamped flags ride the map, the fraction rides here.");
             StringAssert.Contains("\"Draw\"", json, "requiredResult persists BY NAME in saves too (JsonPolicy.Save string-enum rule).");
         }
 

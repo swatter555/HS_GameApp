@@ -241,14 +241,15 @@ namespace HammerAndSickle.Models.Combat
             map.GetHexAt(pos)?.Terrain ?? TerrainType.Clear;
 
         /// <summary>
-        /// §18.2.3 — half the destroyed unit's purchase (prestige) cost. No prestige pool exists yet (§18), so this
-        /// is reported for the future requisition system, not credited. A shatter-WITHDRAWAL pays nothing (§7.9.6.5);
-        /// only callers that detect a permanent kill invoke this.
+        /// §18.2.3 — PRESTIGE_KILL_FRACTION of the destroyed unit's purchase (prestige) cost (V19: the
+        /// fraction is Bob's tuning dial in GameData; away-from-zero rounding so 0.5 of an odd cost is
+        /// consistent). Reported, not credited — crediting lands with the M13 wallet wiring. A
+        /// shatter-WITHDRAWAL pays nothing (§7.9.6.5); only callers that detect a permanent kill invoke this.
         /// </summary>
         private static int PrestigeOnKill(CombatUnit killed)
         {
             int cost = killed.GetActiveWeaponProfile()?.PrestigeCost ?? 0;
-            return cost / 2;
+            return (int)Math.Round(cost * GameData.PRESTIGE_KILL_FRACTION, MidpointRounding.AwayFromZero);
         }
 
         private static void Unregister(CombatUnit unit)

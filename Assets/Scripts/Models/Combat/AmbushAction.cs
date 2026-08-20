@@ -137,11 +137,11 @@ namespace HammerAndSickle.Models.Combat
 
         #region Helpers
 
-        /// <summary>§18.2.3 — half the destroyed unit's purchase cost. Reported, never credited (no §18 economy).</summary>
+        /// <summary>§18.2.3 — PRESTIGE_KILL_FRACTION of purchase cost (V19 dial), reported only (see GroundCombatAction.PrestigeOnKill).</summary>
         private static int PrestigeOnKill(CombatUnit killed)
         {
             int cost = killed.GetActiveWeaponProfile()?.PrestigeCost ?? 0;
-            return cost / 2;
+            return (int)Math.Round(cost * GameData.PRESTIGE_KILL_FRACTION, MidpointRounding.AwayFromZero);
         }
 
         /// <summary>§7.15.3 Efficiency + §7.15.5 Supply loss, mirroring <see cref="GroundCombatAction"/>.</summary>
