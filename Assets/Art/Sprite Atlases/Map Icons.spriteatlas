@@ -23,7 +23,7 @@ SpriteAtlas:
     platformSettings:
     - serializedVersion: 4
       m_BuildTarget: DefaultTexturePlatform
-      m_MaxTextureSize: 2048
+      m_MaxTextureSize: 4096
       m_ResizeAlgorithm: 0
       m_TextureFormat: -1
       m_TextureCompression: 2
@@ -45,6 +45,18 @@ SpriteAtlas:
     secondaryTextureSettings: {}
     variantMultiplier: 1
     packables:
+    - {fileID: 21300000, guid: c2dd4f992520a394f856af262a4a2bef, type: 3}
+    - {fileID: 21300000, guid: 275dc215402275245995f3567bf28931, type: 3}
+    - {fileID: 21300000, guid: e7c532cc2e5db174ea272f238e19ecae, type: 3}
+    - {fileID: 21300000, guid: a906285d446820547af837fc114be25f, type: 3}
+    - {fileID: 21300000, guid: 2c4f01077ce374f4fb617aa06423b624, type: 3}
+    - {fileID: 21300000, guid: 19e052cdc5636bc40affa19e9357f15c, type: 3}
+    - {fileID: 21300000, guid: 6ec93a251e24536468c1aa4c36c9a00b, type: 3}
+    - {fileID: 21300000, guid: 60ddb9e08159b0e48b60929b3bdab91e, type: 3}
+    - {fileID: 21300000, guid: 6f4be762aa24c8144bf3433d52b32e54, type: 3}
+    - {fileID: 21300000, guid: 169bf46148da2c041a49454468240e55, type: 3}
+    - {fileID: 21300000, guid: fbf8a7799a85fa348ae770855117fdda, type: 3}
+    - {fileID: 21300000, guid: 6cd73381ef35b6f4b869e82a411cc1ad, type: 3}
     - {fileID: 21300000, guid: 4c27aaa6f9f12d646a8419c3f024e4f7, type: 3}
     - {fileID: 21300000, guid: ab0a5f085f542ed4dbce9f756e0a4712, type: 3}
     - {fileID: 21300000, guid: fdc05e9e67ec13b4f9c4d2428e3b8538, type: 3}
@@ -57,32 +69,68 @@ SpriteAtlas:
     isAtlasV2: 0
     cachedData: {fileID: 0}
     packedSpriteRenderDataKeys:
+    - 60ddb9e08159b0e48b60929b3bdab91e: 21300000
     - 59a80ae07fb3a8a4993308c44e85eb7c: 21300000
     - 81046651793696b4faa5f315d8f00b26: 21300000
+    - 169bf46148da2c041a49454468240e55: 21300000
+    - 6cd73381ef35b6f4b869e82a411cc1ad: 21300000
+    - 6f4be762aa24c8144bf3433d52b32e54: 21300000
     - 656d7d7420f57de4e9999e1208042f9d: 21300000
+    - 275dc215402275245995f3567bf28931: 21300000
+    - 6ec93a251e24536468c1aa4c36c9a00b: 21300000
     - 4c27aaa6f9f12d646a8419c3f024e4f7: 21300000
+    - 2c4f01077ce374f4fb617aa06423b624: 21300000
     - ab0a5f085f542ed4dbce9f756e0a4712: 21300000
     - b62fc9780b19cf64bbd36158edf21ebc: 21300000
     - 69399449c4c7f8e4c85a86407d09a750: 21300000
+    - fbf8a7799a85fa348ae770855117fdda: 21300000
+    - c2dd4f992520a394f856af262a4a2bef: 21300000
+    - e7c532cc2e5db174ea272f238e19ecae: 21300000
+    - a906285d446820547af837fc114be25f: 21300000
+    - 19e052cdc5636bc40affa19e9357f15c: 21300000
     - fdc05e9e67ec13b4f9c4d2428e3b8538: 21300000
   m_MasterAtlas: {fileID: 0}
   m_PackedSprites:
+  - {fileID: 21300000, guid: 60ddb9e08159b0e48b60929b3bdab91e, type: 3}
   - {fileID: 21300000, guid: 59a80ae07fb3a8a4993308c44e85eb7c, type: 3}
   - {fileID: 21300000, guid: 81046651793696b4faa5f315d8f00b26, type: 3}
+  - {fileID: 21300000, guid: 169bf46148da2c041a49454468240e55, type: 3}
+  - {fileID: 21300000, guid: 6cd73381ef35b6f4b869e82a411cc1ad, type: 3}
+  - {fileID: 21300000, guid: 6f4be762aa24c8144bf3433d52b32e54, type: 3}
   - {fileID: 21300000, guid: 656d7d7420f57de4e9999e1208042f9d, type: 3}
+  - {fileID: 21300000, guid: 275dc215402275245995f3567bf28931, type: 3}
+  - {fileID: 21300000, guid: 6ec93a251e24536468c1aa4c36c9a00b, type: 3}
   - {fileID: 21300000, guid: 4c27aaa6f9f12d646a8419c3f024e4f7, type: 3}
+  - {fileID: 21300000, guid: 2c4f01077ce374f4fb617aa06423b624, type: 3}
   - {fileID: 21300000, guid: ab0a5f085f542ed4dbce9f756e0a4712, type: 3}
   - {fileID: 21300000, guid: b62fc9780b19cf64bbd36158edf21ebc, type: 3}
   - {fileID: 21300000, guid: 69399449c4c7f8e4c85a86407d09a750, type: 3}
+  - {fileID: 21300000, guid: fbf8a7799a85fa348ae770855117fdda, type: 3}
+  - {fileID: 21300000, guid: c2dd4f992520a394f856af262a4a2bef, type: 3}
+  - {fileID: 21300000, guid: e7c532cc2e5db174ea272f238e19ecae, type: 3}
+  - {fileID: 21300000, guid: a906285d446820547af837fc114be25f, type: 3}
+  - {fileID: 21300000, guid: 19e052cdc5636bc40affa19e9357f15c, type: 3}
   - {fileID: 21300000, guid: fdc05e9e67ec13b4f9c4d2428e3b8538, type: 3}
   m_PackedSpriteNamesToIndex:
+  - EU_Fort
   - ME_Nameplate
   - ME_Fort
+  - EU_MinorCity
+  - EU_Sprawl
+  - EU_MajorCity
   - ME_MajorCity
+  - CH_Fort
+  - EU_Airbase
   - GEN_Base
+  - CH_Nameplate
   - GEN_Depot
   - ME_Sprawl
   - ME_MinorCity
+  - EU_Nameplate
+  - CH_Airbase
+  - CH_MajorCity
+  - CH_MinorCity
+  - CH_Sprawl
   - ME_Airbase
   m_RenderDataMap: {}
   m_Tag: Map Icons

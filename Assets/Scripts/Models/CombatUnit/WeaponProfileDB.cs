@@ -2896,6 +2896,12 @@ namespace HammerAndSickle.Models
             BASE_AIRBASE.AddIntelReportStat(WeaponType.Personnel, 3000);
 
             // Handle the icon profile.
+            // ⚠ UNREAD AT RENDER TIME: GameIconRenderer.GetSpriteNameForUnit short-circuits
+            // Classification.AIRB to the theme-agnostic AirbaseStack_N utility badges before the
+            // EquipmentBays icon path is consulted, so this value never draws. Themed airbase art
+            // on the map is the MapIconType.Airbase path in HexGridRenderer (per-theme since
+            // 2026-08-19). Kept as a fallback so a null IconProfile can't surprise future callers;
+            // do not read it as "airbase units render ME art" — they don't.
             BASE_AIRBASE.IconProfile = new RegimentIconProfile(RegimentIconType.Single)
             {
                 W = SpriteManager.ME_Airbase

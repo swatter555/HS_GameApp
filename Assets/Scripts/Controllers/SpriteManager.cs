@@ -35,11 +35,17 @@ namespace HammerAndSickle.Controllers
         public const string EU_Nameplate = "EU_Nameplate";
         public const string EU_MajorCity = "EU_MajorCity";
         public const string EU_MinorCity = "EU_MinorCity";
+        public const string EU_Sprawl    = "EU_Sprawl";
+        public const string EU_Fort      = "EU_Fort";
+        public const string EU_Airbase   = "EU_Airbase";
 
         // China
         public const string CH_Nameplate = "CH_Nameplate";
         public const string CH_MajorCity = "CH_MajorCity";
         public const string CH_MinorCity = "CH_MinorCity";
+        public const string CH_Sprawl    = "CH_Sprawl";
+        public const string CH_Fort      = "CH_Fort";
+        public const string CH_Airbase   = "CH_Airbase";
 
         // Theme-agnostic
         public const string Impassable = "Impassable";

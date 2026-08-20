@@ -626,14 +626,21 @@ namespace HammerAndSickle.Renderers
             // no art for this icon type WARNS-AND-SKIPS instead of throwing. The old shape threw for any
             // non-MiddleEast theme AFTER Instantiate — caught upstream, so every affected hex left an
             // orphaned iconless GameObject and an exception log per repaint, and UrbanSprawl silently fell
-            // through to Middle-East art on any map. Only MiddleEast has sprites today; the EU_ and CH_
-            // art is an authoring dependency (Bob); until it lands a themed map simply shows no such icons.
+            // through to Middle-East art on any map. All three themes have art as of 2026-08-19; the null
+            // arm now covers only future MapTheme members and stays warn-and-skip.
             var theme = GameDataManager.CurrentMapTheme;
-            string spriteName = iconType switch
+            string spriteName = (theme, iconType) switch
             {
-                MapIconType.Airbase => theme == MapTheme.MiddleEast ? SpriteManager.ME_Airbase : null,
-                MapIconType.Fort => theme == MapTheme.MiddleEast ? SpriteManager.ME_Fort : null,
-                _ => theme == MapTheme.MiddleEast ? SpriteManager.ME_Sprawl : null
+                (MapTheme.MiddleEast, MapIconType.Airbase) => SpriteManager.ME_Airbase,
+                (MapTheme.MiddleEast, MapIconType.Fort)    => SpriteManager.ME_Fort,
+                (MapTheme.MiddleEast, _)                   => SpriteManager.ME_Sprawl,
+                (MapTheme.Europe,     MapIconType.Airbase) => SpriteManager.EU_Airbase,
+                (MapTheme.Europe,     MapIconType.Fort)    => SpriteManager.EU_Fort,
+                (MapTheme.Europe,     _)                   => SpriteManager.EU_Sprawl,
+                (MapTheme.China,      MapIconType.Airbase) => SpriteManager.CH_Airbase,
+                (MapTheme.China,      MapIconType.Fort)    => SpriteManager.CH_Fort,
+                (MapTheme.China,      _)                   => SpriteManager.CH_Sprawl,
+                _ => null
             };
 
             if (spriteName == null)
@@ -645,6 +652,19 @@ namespace HammerAndSickle.Renderers
                 return;
             }
 
+            // The sprite ALSO resolves before Instantiate: a registered name whose art is missing from
+            // the atlas (not repacked, misnamed file) must not leave an orphaned iconless GameObject per
+            // hex. GetSprite logs its own miss; this adds the actionable context once per (theme, type).
+            var sprite = SpriteManager.GetSprite(spriteName);
+            if (sprite == null)
+            {
+                if (warnedMissingIconArt.Add((theme, iconType)))
+                    Debug.LogWarning($"{CLASS_NAME}.CreateMapIcon: '{spriteName}' is registered for {iconType} on " +
+                                     $"theme '{theme}' but is not in any atlas — check the Map Icons atlas packing " +
+                                     $"(first at {hex.Position}; further occurrences suppressed).");
+                return;
+            }
+
             GameObject obj = UnityEngine.Object.Instantiate(SpriteManager.Instance.MapIconPrefab, mapIconLayer.transform);
             obj.name = $"{iconType}_{hex.Position.IntX}_{hex.Position.IntY}";
 
@@ -652,7 +672,7 @@ namespace HammerAndSickle.Renderers
             prefab.SetIconType(iconType);
             prefab.SetPosition(new Vector2Int(hex.Position.IntX, hex.Position.IntY));
 
-            prefab.GetSpriteRenderer().sprite = SpriteManager.GetSprite(spriteName);
+            prefab.GetSpriteRenderer().sprite = sprite;
             prefab.ApplySorting(SortSlot.MapIcon);
 
             obj.transform.position = GetRenderPosition(new Vector2Int(hex.Position.IntX, hex.Position.IntY));

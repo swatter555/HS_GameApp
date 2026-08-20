@@ -15,7 +15,7 @@ namespace HammerAndSickle.EditorTools.Chunked
     ///   - Overlay-only:       MinorCity, MajorCity, Impassable — placeholder magenta, no art
     ///
     /// Naming convention: {prefix}_{TerrainName}_{variant}.png
-    ///   - Themed prefixes: ME (MiddleEast), EU (Europe), CN (China)
+    ///   - Themed prefixes: ME (MiddleEast), EU (Europe), CH (China)
     ///   - Shared prefix:   AN (Any)
     ///
     /// POC tolerance: missing files log warnings and fill with magenta, they do not hard-fail.
@@ -52,8 +52,11 @@ namespace HammerAndSickle.EditorTools.Chunked
             "MinorCity", "MajorCity", "Impassable"
         };
 
+        // ⚠ China's prefix is CH, not CN — the codebase-wide China prefix (SpriteManager map icons,
+        // terrain portraits, unit icons) is CH_, and the authored tile PNGs follow it (CH_Clear_0.png).
+        // The original CN here predated any China art and never matched a real file.
         private static readonly string[] TerrainSetNames = { "MiddleEast", "Europe", "China" };
-        private static readonly string[] SetPrefixes     = { "ME",         "EU",     "CN"    };
+        private static readonly string[] SetPrefixes     = { "ME",         "EU",     "CH"    };
 
         #region Menu Items
 

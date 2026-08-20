@@ -326,11 +326,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: Main::HammerAndSickle.Core.UI.UIButtonAudio
   enableClickSound: 1
   clickSound: 1
-  enableHoverSound: 0
-  hoverSound: 2
   playOnlyIfInteractable: 1
   clickVolumeScale: 1
-  hoverVolumeScale: 0.8
 --- !u!1 &163617993
 GameObject:
   m_ObjectHideFlags: 0
@@ -466,11 +463,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: Main::HammerAndSickle.Core.UI.UIButtonAudio
   enableClickSound: 1
   clickSound: 1
-  enableHoverSound: 0
-  hoverSound: 2
   playOnlyIfInteractable: 1
   clickVolumeScale: 1
-  hoverVolumeScale: 0.8
 --- !u!1 &169507853
 GameObject:
   m_ObjectHideFlags: 0
@@ -1660,11 +1654,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: Main::HammerAndSickle.Core.UI.UIButtonAudio
   enableClickSound: 1
   clickSound: 1
-  enableHoverSound: 0
-  hoverSound: 2
   playOnlyIfInteractable: 1
   clickVolumeScale: 1
-  hoverVolumeScale: 0.8
 --- !u!1 &697127689
 GameObject:
   m_ObjectHideFlags: 0
@@ -2143,11 +2134,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: Main::HammerAndSickle.Core.UI.UIButtonAudio
   enableClickSound: 1
   clickSound: 1
-  enableHoverSound: 0
-  hoverSound: 2
   playOnlyIfInteractable: 1
   clickVolumeScale: 1
-  hoverVolumeScale: 0.8
 --- !u!1 &735061657
 GameObject:
   m_ObjectHideFlags: 0
@@ -3075,11 +3063,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: Main::HammerAndSickle.Core.UI.UIButtonAudio
   enableClickSound: 1
   clickSound: 1
-  enableHoverSound: 0
-  hoverSound: 2
   playOnlyIfInteractable: 1
   clickVolumeScale: 1
-  hoverVolumeScale: 0.8
 --- !u!1 &1018833826
 GameObject:
   m_ObjectHideFlags: 0
@@ -4762,11 +4747,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: Main::HammerAndSickle.Core.UI.UIButtonAudio
   enableClickSound: 1
   clickSound: 1
-  enableHoverSound: 0
-  hoverSound: 2
   playOnlyIfInteractable: 1
   clickVolumeScale: 1
-  hoverVolumeScale: 0.8
 --- !u!1 &1606348774
 GameObject:
   m_ObjectHideFlags: 0
@@ -5752,11 +5734,8 @@ MonoBehaviour:
   m_EditorClassIdentifier: Main::HammerAndSickle.Core.UI.UIButtonAudio
   enableClickSound: 1
   clickSound: 1
-  enableHoverSound: 0
-  hoverSound: 2
   playOnlyIfInteractable: 1
   clickVolumeScale: 1
-  hoverVolumeScale: 0.8
 --- !u!1 &2106158143
 GameObject:
   m_ObjectHideFlags: 0
