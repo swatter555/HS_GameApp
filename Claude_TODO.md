@@ -10,11 +10,9 @@
 > Bob's result before marking a milestone `[x]` or proceeding. Write code + tests, verify by inspection, then hand
 > off — never claim GREEN unrun.
 
-Living checklist for the design-doc → code migration (the "pull the band-aid" pass that intentionally breaks
-existing `.map` / `.oob` / `.cmp` files).
+The living work file. History lives in `Claude_TODO_Archive.md` (DONE records + pre-2026-08-20 change log) and git.
 
-- **Authoritative spec:** `HS_DesignDoc.md` · **Rating model:** `Coding Files/HS_DesignDoc_AppendixW_WeaponRatingSystem.md` + `WeaponTrait_Catalog_01.md`
-- **Engineering gap list:** `Coding Files/DocVsCode_GapAnalysis.md`
+- **Authoritative spec:** `HS_DesignDoc.md` · **Rating model:** Appendix W + `WeaponTrait_Supplement.md`
 - **AI design (authoritative):** `Design Docs/Supplements/AI-Design-Supplement.md` · planning detail: `Claude_AI_TODO.md` (this file gets only brief sync notes)
 - **Codebase context:** `Claude_Project.md` — keep reconciled; update it in the same session that lands structural changes
 
@@ -22,298 +20,104 @@ existing `.map` / `.oob` / `.cmp` files).
 
 ---
 
-## CURRENT STATUS (2026-08-04)
+## ⚡ CURRENT STATUS (2026-08-20 — full rewrite of this file; prior text verbatim at commit `55587d2`)
 
-> **⟳ 2026-08-17 — THE PRESTIGE/VICTORY PASS IS CLOSED** (`todo_prestige.md`: five stages, GATES 1–3
-> + final run ALL GREEN including play). Victory ledger + wallet economy + §17.3 share grading + the
-> §17.8 mission-objective gate + `SAVE_VERSION` 7. **P4 requisition (`todo_profiles.md`) is now
-> UNBLOCKED with a live currency and an atomic `SpendPrestige`** — the natural next frontier.
-> Owed around it: Bob wires the End Scenario button (Inspector, → `BattleManager.OnEndScenarioButton`);
-> the editor side delivers rebalanced maps + authored `missionObjectives` (safe placeholders shipped
-> meanwhile — Khost runs fully scored at 1550 value / 36 hexes).
+**▶ NEXT: P4 REQUISITION (`todo_profiles.md`).** The prestige/victory pass gave it a live currency
+(`PrestigeWallet`, atomic `SpendPrestige`) — the buy/sell/upgrade bay API is the natural next frontier.
+There is no other "start here" pointer; older ▶ arrows in `todo_profiles.md`/`todo_domains.md` headers are
+history, not directions.
 
-**Live & green:** weapon-rating migration (all 4 factions + bases, Archetype+Delta+Trait, zero legacy ctors);
-combat-engine pure resolvers M0–M9 + M11-RB (ground direct/indirect/CB/ambush/flank, air-to-air, air-to-ground,
-base combat, AD fire, recon chain — seedable, EditorTest-guarded); leader combat mechanics (M14 safe slice,
-rulings R-L1..R-L10); the ratified battle-map input model in code (left = select, right = move, Ctrl+left = combat,
-`IndirectCombatAction`, `CursorController`); hex-by-hex icon movement animation; AI track AI0–AI2b (board analysis,
-EV oracle, belief store wired into BattleManager at AI_Refresh — suites GREEN 2026-07-27); the §12 six-rung intel
-ladder (source-ceiling progression, graduated decay, icon gating, AI mirror); the HQ dispatch feed (CRT + six nav
-buttons + `PrinterDispatch` three-gate emitters) on the three-panel always-open HUD; the content pipeline —
-Phases 0, 1, 3 and 4 COMPLETE, so **adding a STANDALONE SCENARIO needs no code** (drop a folder under
-`Scenarios/` — discovered, listed, played) and the save declares the content it was made against.
-⚠ Only Phase 2 is left and it is PAUSED — **campaign scenarios are not reachable yet**, and saving/loading
-is not wired to anything. See frontier 1 below for the full resume note.
-Plus the 2026-07-28 HUD pass: **20 battle-scene button callbacks wired** (most deliberate stubs that announce
-themselves — see Claude_Project §3.6e), with next/prev unit, the printer nav, the loss reports and **deploy
-up/down** all LIVE and play-confirmed; the equipment loss ledger + loss report (§3.6d); six click-through
-panels.
-Plus the **AUDIO REBUILD (2026-08-03/04, `todo_audio.md`) — Phases 0, 1 and 2 CLOSED.** SFX are imported
-project assets with enforced import settings (§7.1a), the entire runtime SFX load path is deleted, and
-`AudioCatalog` + `SfxPlayer` + the `GameAudio` facade are in game and suite-green (`AudioPolicyTests`,
-`AudioSystemTests`). ⚠ **Phase 3 is the open half: the sounds are not WIRED.** `GetMovementSFX` still has
-zero callers, combat/ambush/objective/deploy have no hooks, an illegal Ctrl+click is still silently
-refused, and `UIButtonAudio` is on no battle-HUD button. ~45 of the ~85 inventoried sounds are wireable
-now; the rest are host-blocked on M13/AOB, supply, leader and §17.
+**Pass ledger (newest first; each closed pass's detail lives in its plan file + the archive change log):**
+- **2026-08-19 — THEME-ART** (committed `55587d2`): EU + CH map icons + hex tile sets, 9-arm `CreateMapIcon`,
+  CN→CH prefix fix, all three terrain arrays baked (gitignored). ⏸ In-play verify gated on first non-ME export.
+- **2026-08-17 — PRESTIGE/VICTORY, CLOSED** (`todo_prestige.md`, all gates green incl. play): `VictoryLedger` +
+  `PrestigeWallet` + §17.2/17.3 share grading + §17.8 mission-objective gate + §17.9 scenario end + §18.2
+  per-turn income (capture awards RETIRED) + **SAVE_VERSION 7**. Khost runs fully scored on placeholders
+  (editor-side E10 rebalance owed — see the ladder audit, `Reply_LadderAudit_2026-08-17.md`).
+- **2026-08-13 — CENSUS DOCTRINE v2, CLOSED** (`todo_census.md`): all censuses own-platform-count, organic
+  tanks on mech bases, lift censuses empty; machine-enforced by `CensusIntegrityTests` (6). ⚠ Do not re-open
+  the carrier question in either direction without touching that guard (supersedes the 08-12 "leave them" ruling).
+- **2026-08-12 — MAP-STANDARD**: map size per-scenario from the `.map` header, `MapConfig` geometry deleted,
+  truncation throws, derived scroll bounds. `MapStandardTests` (14). ⚑ Suite run owed.
+- **2026-08-10/11 — DOMAINS D0–D3** (`todo_domains.md`): domain vocabulary, post-hoc spotting (§12.4.4a),
+  transit air defence (D2, play-confirmed), helo over-water grace (D3) + **SAVE_VERSION 6**. ⚑ D3 + P3b runs owed.
+- **2026-08-08/10 — PROFILE REBUILD P0–P3** (`todo_profiles.md`): `EquipmentBays`, derived bay capacity, naval
+  sealift, movement-medium rules + **SAVE_VERSION 5**. P4 is the remainder.
+- **2026-08-03/04 — AUDIO REBUILD Phases 0–3** (`todo_audio.md`): SFX as imported assets, catalog + facade +
+  fog gate, battle-map sounds WIRED (movement/fire/impact/ambush/objectives/denied). Remaining audio work is
+  clips + Bob's Inspector items + host-blocked sounds — see the thread board below.
+- Earlier (weapon-rating migration, combat engine M0–M9, orchestrators, intel ladder, printer, AI0–AI2b,
+  content pipeline 0/1/3/4, HUD pass): `Claude_TODO_Archive.md` + `Claude_Project.md`.
 
-**Verification history — ALL CLEAR as of 2026-07-28.** Confirmed in play or by suite run: selection/movement ·
-movement overlays incl. over city hexes · ground combat · indirect fire + counter-battery · icon facing · helo
-rotor flipbook · the 07-22 tweak trio · overlay tint/opacity over white art · the printer dispatch feed + its
-emitters · the three-panel HUD · the two 07-27 input bugs (unit-panel click-through, camera edge stall) · the
-AI-track suites · the 07-28 scenario-load path (SceneID switch deleted, name-form manifest).
-Per-item detail is in the change log — do NOT re-accumulate a confirmation list here.
-**Anything still owed lives in ⚑ TESTING REQUESTS below, which is the ONLY place open test asks belong.**
-
-**⚠ NOTHING IS BLOCKING.** The 2026-07-27 button-wiring gap is CLOSED — Bob wired the callbacks during the
-07-28 HUD pass and turn flow plays.
-
-**▶ NEXT — THE PROFILE-SLOT REBUILD, `todo_profiles.md` (RATIFIED 2026-08-07, all 8 decision
-boxes answered).** The 2026-08-07 pass reframed the three profile slots as Panzer-General-style
-purchasable bays with DERIVED capacity (from deployed-profile `MovementMedium` + identity), naval
-lift as a transient state, and a headless buy/sell/upgrade API. ⚠ **It ABSORBS todo_audio §3b
-M4 and part of M5** (the `isAir` fix now covers `HexMapUtil` range+path AND `ExecuteMovement`,
-as rebuild phase P3) — do NOT run M4 standalone from `todo_audio.md`.
-**STATE 2026-08-08 (context-transition handoff): P0 ✅ · P1 ✅ · CENSUS A ✅ · P2 ✅ — ALL SUITE
-GREEN AND COMMITTED.** Delivered across the day: derived bay capacity (`EquipmentBays` +
-`CanAccept`/`TrySetSlot`), the enum/flags/`EmbarkmentState` deletions, SAVE_VERSION 5, the two
-capability tags on every ruled profile, naval sealift embark/debark (universal port rule, marine
-beachhead privilege), `EmbarkmentChecks` with zero classification cases, defects D1–D8 closed,
-`EquipmentBaysTests` + 8 naval deployment tests. The scenario editor's `IsEmbarkable` flip is
-authorized (signal in their Markdowns).
-**P3 — ✅ SUITE GREEN 2026-08-10 (Bob ran it), then EXTENDED the same day by Bob's air rulings
-(second suite run owed — see ⚑ below).** The governing distinction, in his words: helicopters
-"remain on the map, whereas fixed wing assets only ever traverse the map attempting to get to
-the air ops box." From that: a helo-borne unit is **a special kind of ground unit** — ambushable,
-sees the ground, may NOT share a ground unit's hex; a fixed-wing asset is **not touchable from
-the ground at all** — no ground ambush, **does not spot ground units in transit** (new §12.3.7a,
-RECONA/AWACS exempt), and MAY temporarily share a ground unit's hex. Air defence is the only
-thing that engages a jet, and it reveals itself by firing. Detail: `todo_profiles.md` §14a.
-
-All three `isAir` sites now read
-`MovementModeService` (range · A* · execution), so an embarked air-assault regiment finally
-flies; ambush-against-a-flight built as ratified (ambush triggers, combat does not, ambusher
-revealed at L1, printer + `UnitMoveBlocked`); halts enum-keyed so the narrow flight rule cannot
-be tidied into the ground one. 🔴 **The naval-traversal question DISSOLVED rather than being
-answered** — §5.4.2.3 makes naval movement INSTANT port-to-port with the sea passage abstracted,
-so P3's own "moves on WATER hexes" framing contradicted the doc. It shipped a PROHIBITION
-instead, which closed a live hole: a sealifted unit was falling through to the ground rules and
-could have walked inland aboard its ships on any map with a port. Detail + two flagged
-judgement calls: `todo_profiles.md` §14/§14a.
-**▶ A FRESH CONTEXT STARTS AT `todo_domains.md` § SESSION HANDOFF (top of file, updated 2026-08-11).**
-**D0 ✅ D1 ✅ D2 ✅ — 514 tests green; §6.9 ambush and D2 transit air defence both PLAY-CONFIRMED
-2026-08-11.** §6.9 shipped POST-HOC SPOTTING (a move is committed blind; the mover's passive spotting
-applies once at settlement over the path union — DesignDoc §12.4.4a/§6.9.10, the Panzer General
-commitment rule) plus the §6.9.9 eligibility filter. D2 wired transit air defence: AAA/SAM fire on
-helicopters in transit works in play, ranged eligibility is the CLASSIFICATION gate (§11.8.2a —
-SAM/SPSAM/AAA/SPAAA, never GAT), and §11.8.11 overhead GAD fire is built. **D3 ✅ code-complete
-2026-08-11** (⚑ suite run owed): helicopter over-water grace — a helo may now stop over water at all
-(`CanRestAt` refused it), the persisted `EndedTurnOverWater` clock runs at **Upkeep not Refresh**, and
-**`SAVE_VERSION` is 6**. ⚠ Not playable until a map has water. **Next on the ladder: D4 — but see below.**
-
-⚠ **D2's FIXED-WING half is play-unverified and stays that way until air missions exist** — Bob
-2026-08-11: *"the mechanisms to run air missions are not in the game yet, so I can only subject helos to
-the opportunity fire."* This is the M13/AOB gap, and D4 sits behind it too.
-
-**The full plan lives at `todo_domains.md` §H.**
-The air/ground/naval domain pass is DESIGNED AND CLOSED: helo vs fixed-wing layer model, the
-naming ruling, naval built from Bob's five precepts, and a new **`FacilityType.Port` base type**.
-Nine phases: **D0 vocabulary → D1 air rules → D2 helo air-defence → D3 over-water +
-SAVE_VERSION 6 → D4 fixed-wing staging → N0 naval foundations → N1 naval combat + sea clock →
-N2 the port (heavy lift) → N3 supply hooks (⛔ gated on §15)**. Then the ORIGINAL thread
-resumes: **P4 requisition + P5 content/docs**, with P5 merged into the domain doc pass since
-they are the same job. ⚠ Phases N0–N3 are suite-verifiable but NOT playable until Bob's coastal
-test map exists (Khost has no water). Editor relay list: `todo_domains.md` §I.
-
-### 📌 TWO DORMANT-ON-ARRIVAL NOTES (so their silence is never read as a bug)
-- **Weather is single-state Clear**, so §5.13.4 air grounding AND the new doubled sea-supply cost in
-  Storm **can never fire**. Both get built; neither can be validated in play until weather exists.
+**📌 Dormant-on-arrival (so their silence is never read as a bug):**
+- **Weather is single-state Clear** — §5.13.4 air grounding, storm sea costs and every weather ICM can never
+  fire until the weather pass exists. Built where cheap; none of it validatable in play.
 - **§15 supply is designed but `BattleManager.ProcessUpkeep` is a stub** (depot generation, minor-depot,
-  airbase replenishment). Everything trace-dependent — the beachhead supply conduit and excluding water
-  from the trace/HCL — waits on that pass. The rest of naval does not.
+  airbase replenishment). Everything trace-dependent — beachhead conduit, water exclusion, HCL decay — waits on it.
 
-### ✈ AIR AUDIT 2026-08-10 → **now tracked in `todo_domains.md`** (the air/ground/naval domain pass)
-The audit below produced the layer model, the naming ruling, and a change list spanning the design
-doc, `Claude_Project.md` and code. **`todo_domains.md` is the live punch list; naval folds into its
-§F.** ✅ **The ambushed-helicopter ruling is RESOLVED AND BUILT (2026-08-10):** a helo takes an
-ORDINARY ambush attack but denies the ambusher the §6.9.4 surprise multiplier, then rolls the
-§11.8.9 transit stand check — see `todo_domains.md` §"THE AMBUSHED-HELICOPTER RULING". RULING 1
-below is kept as history of the contradiction; do not re-open it.
+**⏸ Deferred: ROUGH-EDGES PASS** (Bob's call 2026-07-28; superseded twice, never started). Consolidate battle-scene
+rough edges before adding functionality. ⚠ Start by ASKING Bob which edges he means — the note records intent, not
+a diagnosis.
 
-### The audit itself — doc §5.13 / §11 vs code
+---
 
-**Headline: the air RULES are built and tested; the air GAME is not wired.** Exactly ONE air model
-class is reachable from live gameplay (`AirAmbushCheck`, via `SpottingService.CheckAirAmbush` ←
-`MovementController`), and that path ends in a `UnityEngine.Random.Range(0,2)` coin flip under a
-`// TODO: Combat resolution for air ambush`. `AirCombatEngine`, `AirStandCheck`,
-`HeloTransitStandCheck`, `AOBMissionResolver`, `ReconMissionEngine` and `CombatResolver`'s
-airstrike / base-attack / AD-fire paths are ALL implemented, ALL EditorTest-covered, and ALL have
-ZERO live callers. There is no AOB entity, no placement input mode, no air phase in BattleManager,
-and no fixed-wing auto-return. This is the known M13 gap, now measured.
+## 🧭 MAJOR OPEN THREADS — AT A GLANCE
 
-**⚠ RULING 1 — does an ambushed HELICOPTER take damage?** Direct contradiction:
-- **DesignDoc §5.13.2.2:** "the ground ambush triggers and the helicopter's turn ends **after taking
-  the ambusher's attack**."
-- **Ratified 2026-08-04 (todo_audio §3b M4):** "the ambush TRIGGERS, the combat does NOT" — evade, no
-  damage, ambusher revealed. **This is what is CODED** (P3).
-- Bob 2026-08-10: "Helo-borne units are stopped by ambush by unspotted ground units, **as Helo-borne
-  units are a special type of ground unit**" — which leans back toward §5.13.2.2.
-If §5.13.2.2 wins, the fix is to raise `RaiseAmbushTriggered` on the helo branch too and keep only
-the "no ZoC halt" half of the flight rule. **Do not guess — the two readings differ by real damage.**
+> **For Bob.** One entry per major thread: where it stands, what moves it. No implementation detail here —
+> that lives in OPEN WORK below and the plan files.
+>
+> **⚠ MAINTENANCE RULE — THIS SECTION MUST BE UPDATED WHENEVER IT IS TOUCHED (Bob's demand, 2026-08-20).**
+> Any session that lands work in one of these areas updates that thread's entry in the SAME session, before
+> the session ends — status line, gate, and "next move" all three. A stale glance-board is worse than none:
+> Bob reads THIS to decide what to do with an evening. Adding a new major thread = add a row here; closing
+> one = mark it CLOSED with the date and move it to the pass ledger next session.
 
-**⚠ RULING 2 — helicopters must NOT get the fixed-wing detection roll.** §5.13.2.4: SAM/AAA op fire
-vs helos has "**no 1d6 detection roll; helicopters take the hit** if the air-defense unit has shots
-available," and a damaging hit then forces the §11.8.9 Helo Transit Stand Check. §5.13.3.2 gives the
-1d6-vs-experience roll to **fixed-wing only**. The code runs `CheckAirAmbush` (which rolls
-`AirAmbushCheck.RollDetection`) for every airborne mover. Pre-existing, widened slightly by P3.
-⚠ **`HeloTransitStandCheck` is fully built and tested with zero callers** — the correct helo path is
-mostly a wiring job, not new rules.
+| Thread | Stands at | Next move / gate |
+|---|---|---|
+| **Requisition (P4)** | ▶ NEXT. Wallet + atomic spend LIVE (08-17); bay buy/sell/upgrade API + UI unbuilt. | Agent: build per `todo_profiles.md` P4. No gates. |
+| **Campaigns + Save/Load** | Pipeline Phase 2 paused CLEAN, all decisions settled. Campaign folders invisible to discovery; `SaveLoad` has ZERO callers — no Save button exists. | Agent: resume trio in OPEN WORK. Cost grows per mission authored (25–30 planned). Menu listing is Bob-gated (prefab). |
+| **M13 — turn loop / air missions / AOB** | The big frontier. Air RULES built + tested; air GAME unwired. Turn loop is straight-through; reaction yields are a day-one requirement (retrofit = rewrite). | Agent-led, large. Gates: D4, I8, most printer emitters, M14 remainder, D2 fixed-wing play-verify all sit behind it. |
+| **Audio** | System + policy + wiring DONE through Phase 3. Most wired sounds have NO CLIP yet; battle-HUD buttons silent. | Bob: author wavs (helo/jet long cuts too), put `UIButtonAudio` on HUD buttons. Host-blocked sounds arrive with M13/supply/leader/§17. |
+| **Leaders (L1–L4)** | Combat mechanics LIVE (M14 slice). Awards engine, pool/recruitment, details UI all unbuilt. Recruitment economy UNBLOCKED by the wallet (08-17). | Agent: L1+L4 approved + headless-safe, can start anytime. Art dependency: portraits + deco layers (Bob). |
+| **AI** | AI0–AI2b live (board analysis, EV oracle, honest-spotting belief store). AI takes no turn yet. | Agent: AI3+ per `Claude_AI_TODO.md` (irregular doctrine first, for Khost). AI2 state still owed a SAVE_VERSION ride. |
+| **Domains: naval + D4** | D0–D3 CLOSED. D4 fixed-wing staging gated on M13/AOB. N0–N3 designed (`todo_domains.md` §F/§H), suite-verifiable, unplayable without a coastal map. | Bob: coastal test map when convenient. N3 additionally gated on §15 supply. |
+| **Intel** | Six-rung ladder LIVE + play-confirmed. Open: I7 HQ SIGINT sweep (= M15, unblocked, slot-in-anywhere), I8 RB tiers (M13-gated). | Agent: I7 whenever convenient. Deferred skill re-homes need Bob ratification. |
+| **Printer / dispatch feed** | CRT + emitters LIVE for every existing host. Owed: P5 ledger persistence (SAVE_VERSION bump), P8b tests. Air/logistics/leader emitters host-blocked. | Agent: P5 persistence is small and self-contained. §11.7.2 evac revision awaits Bob's eyeball. |
+| **Supply (§15)** | Designed; `ProcessUpkeep` is a stub. Gates N3, HCL decay/recovery, logistics dispatches, depot REP award. | Agent: its own pass, unscheduled. No blockers besides size. |
+| **Weather** | Single-state Clear. Rich model deferred by design ("revisit before ship"). Several built rules dormant until it exists. | Design pass first (Bob + doc), then code. Nothing else gated on it except the dormant rules. |
+| **Content / editor coordination** | Editor writes full bundles; Hamburg (44×21 EU) in authoring — values/objectives/zones still zero. Khost scoring is placeholder (4/7 rungs reachable). | Editor-side: E10 Khost rebalance, E14 scoring report, Hamburg values. Game-side: nothing blocked; EU/CH ⏸ verify fires on their first export. |
+| **Ship-blockers (small, must not be forgotten)** | Tilde (~) reveal cheat in `GameIconRenderer`; `AudioSettings` local `JsonSerializerOptions` (JsonPolicy rule violation). | Agent: both are quick deletes/redirects; do before any external build. Tracked in Cleanup. |
 
-**Smaller gaps found (no ruling needed, just unbuilt):** §5.13.5 / §3.5.7 fixed-wing auto-return
-(`UnitMoveAnimator.AnimateAutoReturn` + `OnAirUnitReturning` exist, zero callers) · sortie supply
-never deducted (`SORTIE_LAUNCH_COST` / `SORTIE_SHOT_COST` zero consumers; `CanLaunchSortie` never
-called) · §5.13.4 Storm grounding unenforced (weather is single-state Clear) · §5.13.3.3 "fixed-wing
-cannot change deployment state" is not a rule in code, only an accident of empty bays.
+---
 
-**Confirmed CORRECT against the doc (P3 validated):** §5.13.1 flat 1 MP ignoring terrain ·
-§6.4 helos do not receive ground ZoC · §5.13.2.6 helos stack as ground units and may not share a hex
-· §5.13.2.3 a HELO can itself be the ambusher (`ProjectsZoC` true; an embarked lift correctly cannot).
+## BOB'S QUEUE (nobody else can do these)
 
-**(The 2026-08-04 mid-pass hand-off that stood here is RESOLVED IN FULL, 2026-08-08:** M3 went
-green in the 452 run; the OOB question closed via the editor's fresh-placement test + the new-format
-standalone khost; M4 is `todo_profiles.md` §14/P3, absorbed with the `HexMapUtil` half of M5 — do
-NOT run M4 from `todo_audio.md` §3b, only its RULINGS still apply; the rest of M5 is judged in P3.
-The S-300 question was RULED self-contained (box 1 — its medium is Wheeled, bay closes by physics)
-and the template audit became the standing `EquipmentBaysTests` + `MovementMediumTests` pair,
-checking exactly the invariants and never "empty slot".)**
-
-⏸ **DEFERRED — ROUGH-EDGES PASS on the battle scene (Bob's call, 2026-07-28; superseded twice — first by
-the audio rebuild, then by the movement-medium pass — and never started).** Consolidate before adding functionality: "straighten out some rough edges before too many
-pile up", covering everything in the battle scene so far, not just the recent work. ⚠ Start by ASKING Bob
-which edges he has in mind — this note records the intent, not a diagnosis, and the agent should not assume
-its own list is his. Never started; still worth doing.
-
-### BOB'S QUEUE (nobody else can do these)
-
-- [x] **Map-standard TESTS — added 2026-08-12** (`MapStandardTests`, 14 tests). Pins the branches that do
-      NOT run when Khost loads and so could not be caught by play: `ResolveMapDimensions`'s legacy fallback
-      and all four refusal cases (incl. `None`-with-no-dims, the save-writer gap), `IsValid`'s
-      mixed/undersized gate, `HexMap`'s bounds past the old 32-column ceiling, and
-      `ScenarioManifest.GetMapDimensions` returning zero instead of assuming 32x21.
-- [x] **`AMBUSH_DEBUG` retired 2026-08-12** — flag + `DebugLogAmbushScan` deleted; §6.9 confirmed in play.
-- [x] **Courier: the map-standard exchange — DONE.** Editor agent endorsed the response in full
-      (`Reply_MapStandard_2026-08-12.md`) and adjusted their side. **The pass itself is BUILT 2026-08-12**
-      (G1/G3/G5/G6/G7; G2 skipped by their own downgrade). ⚑ Suite run owed.
-- [ ] **Tell the Scenario Editor agent that G1 HAS LANDED** once Bob runs a build with it — that is their
-      stated trigger to start writing `mapConfiguration: None` (they explicitly keep writing Small/Large
-      until then so current builds keep loading fresh exports). Their E3 phase (manifest authoring with
-      `mapWidth`/`mapHeight` + cross-stamp) is gated on the same signal.
-
-- [x] **RELAY TO THE SCENARIO EDITOR AGENT — folded into `Reply_CensusPass_2026-08-14.md`** (repo
-      root + their `Markdowns/`), which SUPERSEDES the 2026-08-12 Lowlands-names relay: the trio
-      shipped there as `INF_REG_NL/BE/DK` was renamed **`INF_MECH_NL/BE/DK`** in the census pass
-      (Block 5, while content-free), `MANPAD_JAVELIN` was added, and US/FR display names changed.
-      The courier file carries the full current token list, the doctrine, and the two required
-      editor actions (Import UnitDB + Import WeaponTypes). The sixteen Lowlands template IDs are
-      unchanged.
-
-- [-] **§7.2 CARRIER CENSUSES — the 2026-08-12 "LEAVE THEM" ruling is SUPERSEDED (census pass,
-      2026-08-13).** Doctrine v2 rule 2 reversed it: ALL carriers are now own-platform-count-only
-      (`MARDER_GE` 54, `WARRIOR_UK` 45, `APC_M113_US` 108, every faction's likewise), and the tank
-      battalions moved to the mech BASE profiles — so the bay-sum still shows the brigade its
-      organic armor, but the double-count is gone and the ruling's "NATO is permanently AI" hedge
-      is no longer load-bearing. Machine-enforced by `CensusIntegrityTests` carrier-clean; do not
-      re-open in either direction without touching that guard.
-
-- [ ] **BUILD VERSIONING (Bob, 2026-08-08): start versioning game builds, beginning with the
-      P1 build.** Bob-side: pick a scheme (proposal: `0.<pass>.<hotfix>` pre-1.0) and set it in
-      Project Settings → Player → Version. Agent-side once a number exists: surface
-      `Application.version` in the main menu + logs, and stamp it into the save header's
-      provenance block when saving gets wired (it declares content provenance today but not the
-      BUILD that wrote it).
-
-- [ ] **Run `Tools/UI/Audit Button Wiring`** now that ~20 buttons are wired — it should come back clean, and
-      that is the tool's first real exercise. (The three-button blocker it was queued behind is resolved.)
-- [ ] **Relay to the SCENARIO EDITOR agent** (`ScenarioEditor_Status_2026-07-28.md` covers most of it):
-      (a) the **checksum decision is SETTLED, not pending** — `MapChecksumUtility` is deleted, the header
-      field stays as their fingerprint, they can stop treating their hash path as provisional;
-      (b) `classificationName` is **green-lit for removal** — name-form `Classification` is confirmed in play;
-      (c) `OobLeaderData` is enum-typed, so **leaders can go name-form** whenever they like;
-      (d) **NEW 2026-07-28 — briefing NARRATION is CAMPAIGN-SCENARIO ONLY** (DesignDoc §20.4.2, ratified).
-      Standalone scenarios get written `.brf` text and no audio, so a missing narration asset is the normal
-      case, not an error;
-      (e) **NEW 2026-07-28 — always say WHICH KIND of scenario** (§20.4.1, ratified): "standalone scenario"
-      vs "campaign scenario"/"mission". Bare "scenario" is not acceptable where the two differ — they differ
-      in briefing, OOB, progression and narration.
-- [ ] **Possibly still owed to them: `JsonPolicy.cs`** (`Assets/Scripts/Core/Persistence/JsonPolicy.cs`).
-      Flagged for sending twice; Bob is the courier and the agent cannot confirm receipt. Low urgency — they
-      correctly inferred the one property that matters (`PropertyNameCaseInsensitive`).
-
-**Next frontiers, in rough order:**
-1. **CONTENT PIPELINE Phase 2 — PAUSED 2026-07-28, ready to resume. Full detail: `todo.md`.**
-
-   ### ✅ WHAT IS DONE (all green, committed, pushed)
-   Phases 0, 1, 3, 4 are CLOSED. **Adding a STANDALONE SCENARIO is now a pure content operation** — drop a
-   folder under `StreamingAssets/Scenarios/` and it is discovered, listed and played with no code change,
-   no rebuild, no rewiring. Shipped content is read-only inside the build; every enum on disk is name-form,
-   so a future patch can insert a `WeaponType`/`TerrainType` without reinterpreting existing content; the
-   save declares its own provenance, addresses campaign progress by string id, and refuses by name when its
-   scenario is missing; the migration ladder is tested (`SaveMigrationLadderTests`, 9). `SAVE_VERSION` = 4.
-
-   ### ⛔ WHAT IS NOT DONE — two things, and they are different in kind
-   - **CAMPAIGN SCENARIOS ARE NOT REACHABLE.** Discovery scans `Scenarios/` ONLY, so
-     `Campaigns/grand_campaign/m01_khost/` is invisible to the game. This is Phase 2 and it is the actual
-     remaining work. (Its manifest is now CORRECT — fixed 2026-07-28 — so Phase 2 starts from content that
-     resolves rather than content that silently collides with the standalone Khost.)
-   - **SAVING/LOADING IS NOT WIRED TO ANYTHING** — `SaveLoad.SaveAsync`/`LoadAsync` have ZERO callers.
-     ⚠ Do not read "the save contract is finished" as "saving works": what is finished is the SHAPE
-     (what a save records, how it refuses one that is too old, how it survives patched-away content, and
-     the tested upgrade path). There is no Save button. This was never part of this pass — it is a separate
-     unbuilt feature — but it is the likeliest thing to be misread later.
-
-   ### ⚠ ONE TIME BOMB, and it is armed by wiring saves up
-   `SAVE_VERSION` stayed at **4** when v4's header shape was amended after the fact (`contentVersion`
-   removed). That is safe ONLY because no save file can exist yet. **The moment saving gets a caller, that
-   shortcut expires** and any further shape change needs its own version — amending a released version in
-   place is exactly the silent mismatch the ladder exists to prevent. The expiry is written at the
-   `SAVE_VERSION` constant in `GameData.cs`, where whoever wires saving will see it.
-
-   ### 🟢 DECISIONS ALREADY SETTLED — Phase 2 is unblocked, nothing is waiting on Bob
-   - **DesignDoc §19.1.6 AMENDED + RATIFIED:** campaign scenario owns victory THRESHOLDS, campaign owns
-     ROUTING, as outcome edges keyed on `BattleResult` (not a victory/defeat pair).
-   - **Manifests are the AGENT's to maintain**, not the external scenario editor's. No clobber risk.
-   - **`contentVersion` deleted** from `ScenarioManifest` + save header; **still OPEN for `CampaignManifest`**
-     and to be decided on ONE question (todo.md 2.1): *will a rebalanced campaign graph ever reach a player
-     WITHOUT a new build?* Bob expects to rebalance once remote testers have builds — if revisions go out as
-     bare files, the field is justified and must come back to the save header too.
-   - **Terminology (§20.4.1):** always say STANDALONE SCENARIO vs CAMPAIGN SCENARIO / MISSION.
-     **Narration (§20.4.2):** campaign scenarios only; a missing narration asset is normal, never an error.
-
-   ### ▶ RESUME HERE — three code items, in this order
-   1. **2.1 + 2.4 `CampaignManifest` + `CampaignNode`** — new file, includes the branch/edge shape.
-   2. **2.2 delete `ScenarioManifest.IsCampaignScenario`** — nearly free; `BattleManager.IsCampaignBattle`
-      is currently WRITE-ONLY (nothing reads it), re-source from campaign context.
-   3. **2.3 campaign discovery + menu** — new `.campaign` extension, `CampaignLoader`,
-      `GameDataManager.CurrentCampaign`. ⚠ **BOB-GATED:** `DefaultDialog_Scene0` already has an unwired
-      `_campaignDialog` slot; the agent writes `CampaignDialog_Scene0` as a structural twin of
-      `ScenarioDialog_Scene0` so Bob can duplicate that prefab. **Nothing lists campaigns until he wires it.**
-
-   **Cost of waiting:** grows with every mission authored (25–30 planned), since each one written before
-   Phase 2 is content that has to be retrofitted into the graph afterwards. Nothing else in the project is
-   gated on this, so it is safe to leave paused — just not free.
-2. **Printer P5 loss ledger** → P6 loss report. P5's `SAVE_VERSION` bump now has a real migration ladder to
-   land in (Phase 0.2), which it did not before.
-3. **§9 leader completion** (L1+L4 approved, headless-safe).
-4. **M13** turn loop + movement-dynamics/AOB package (consolidated below).
-5. **AI track AI3+** (`Claude_AI_TODO.md`).
-
-I7 (HQ SIGINT sweep = M15) is unblocked and can slot in anywhere; I8 waits on the M13/AOB caller.
-`SetScrollBounds`-from-map-size pairs with the gated `BattleBackgroundFitter` — both land on the first
-differently-sized map.
-
-**Agent's recommendation (2026-07-28, revised after Bob paused Phase 2):** wire the three buttons — that is
-still the only thing blocking play — then pick up whichever frontier is most useful next. The content
-pipeline is paused in a clean state with every decision settled, so nothing is gated on it; the only reason
-to return early is that Phase 2 gets more expensive with each mission authored before it lands.
+- [ ] **Wire the End Scenario button** → `BattleManager.OnEndScenarioButton` (Inspector, like End Turn — do NOT
+      add a HUD copy; the name is a contract). Owed since the prestige pass closed (2026-08-17); the editor's
+      status memo lists it too. Until wired, voluntary early finish (§17.9.2) is unreachable in play.
+- [ ] **Loss report: ONE button or TWO?** `OnDisplayLossesButton` (cumulative) and `OnDisplayDailyLossesButton`
+      (this turn) both exist and work; whether they get separate buttons is a design choice nobody has made.
+      Decide, then wire.
+- [ ] **Run `Tools/UI/Audit Button Wiring`** — ~20 buttons wired, tool never exercised. Should come back clean.
+- [ ] **Build versioning (Bob, 2026-08-08):** pick a scheme (proposal: `0.<pass>.<hotfix>` pre-1.0), set
+      Project Settings → Player → Version. Agent then surfaces `Application.version` in menu + logs and stamps
+      it into the save header when saving gets wired.
+- [ ] **Tell the Scenario Editor agent G1 HAS LANDED** once a build ships with it — their stated trigger to
+      start writing `mapConfiguration: None` and to open their E3 phase (manifest `mapWidth`/`mapHeight` +
+      cross-stamp).
+- [ ] **Relay to the Scenario Editor agent** (`ScenarioEditor_Status_2026-07-28.md` covers most of it):
+      (a) checksum decision SETTLED — header field stays as their fingerprint, game never validates;
+      (b) `classificationName` green-lit for removal; (c) leaders can go name-form;
+      (d) briefing narration is CAMPAIGN-SCENARIO ONLY (§20.4.2) — missing narration is normal, not an error;
+      (e) always say WHICH KIND of scenario (§20.4.1). ⚠ Check whether the 08-14 census courier already
+      carried any of this before re-sending.
+- [ ] **Possibly still owed to them: `JsonPolicy.cs`** — flagged for sending twice, receipt unconfirmed.
+      Low urgency; they inferred the one property that matters.
+- [ ] **ART owed (accumulating, no rush):** solid-white swaps for MoveRangeFill/ZocStop/MovePathStep/MovePathEnd ·
+      real cursor art (§24.11.3) · Leader Pool + Upgrade button art · leader base portraits (3) + deco layers (~14) ·
+      `UIButtonAudio` onto battle-HUD buttons · movement long-cut wavs for helo + jet.
+- [ ] **Scene work, gated on the first non-32x21 map:** add `BattleBackgroundFitter` to the Background Room
+      object (pre-calibrated) — pairs with the ⏸ auto-fit test below.
 
 ---
 
@@ -333,517 +137,289 @@ to return early is that Phase 2 gets more expensive with each mission authored b
 > 4. A FAILED test does NOT get deleted: Bob writes what he saw under the entry, the agent writes the diagnosis
 >    under that, and it stays open until it passes.
 > 5. A PASSED entry is deleted from this section the same session, after its result is recorded in the change
->    log and, if it is a shipped behaviour, in Claude_Project. **This section is a queue, never an archive** —
->    the moment it starts accumulating `[x]` lines it has turned back into the thing it replaced.
+>    log and, if it is a shipped behaviour, in Claude_Project. **This section is a queue, never an archive.**
 
-- [!] **P3b SUITE RUN — the air rulings (2026-08-10, after the first green run).**
-      **DO:** run `SpottingServiceTests` (new §12.3.7a region, 6 cases), `MovementTests`,
-      `IntelLadderTests`, `AIPerceptionTests`, `AIPerceptionSweepTests`, `SpottingRangeTests`.
-      **PASS:** green. In particular a fighter adjacent to enemy infantry leaves it at Level0, while
-      RECONA and AWACS still spot ground out to 8 and a helo gunship still spots at 2.
-      **WHY:** the rule sits at `SpottingRangeAgainst`, the single §12.3.10 comparison — so it reaches
-      the turn-start sweep, per-hex transit checks, decay floors AND the AI mirror at once. That is
-      what makes it correct and also what makes it wide: if it is wrong it is wrong everywhere.
-      ⚠ **One judgement call to confirm: RECONA and AWACS are EXEMPT.** Their ratified 8-hex ground
-      reach is load-bearing (§11.11.3 builds the recon mission's search area from it), so zeroing them
-      would have deleted air recon. If you meant them zeroed too, say so — it is one line.
+- [!] **P3b SUITE RUN — the air rulings (2026-08-10, after the first green run). Also covers the owed
+      map-standard and D3 suite runs — one Test Runner session closes all three.**
+      **DO:** run the full EditorTest suite set — in particular `SpottingServiceTests` (new §12.3.7a region,
+      6 cases), `MovementTests`, `MovementMediumTests`, `IntelLadderTests`, `AIPerceptionTests`,
+      `AIPerceptionSweepTests`, `SpottingRangeTests`, `MapStandardTests` (14, map-standard pass), and the D3
+      over-water additions.
+      **PASS:** green. In particular a fighter adjacent to enemy infantry leaves it at Level0, while RECONA and
+      AWACS still spot ground out to 8 and a helo gunship still spots at 2.
+      **WHY:** §12.3.7a sits at `SpottingRangeAgainst`, the single §12.3.10 comparison — it reaches the
+      turn-start sweep, transit checks, decay floors AND the AI mirror at once; wrong = wrong everywhere.
+      ⚠ **One judgement call to confirm: RECONA and AWACS are EXEMPT** (their ratified 8-hex ground reach is
+      load-bearing, §11.11.3). If you meant them zeroed too, say so — it is one line.
+      (The prior P3 run is GREEN, 2026-08-10 — its play-test scenario, an embarked air-assault regiment paying
+      1 MP over mountains and ignoring ZoC, is already confirmed; a `MovementTests` failure here is more likely
+      a fixture problem than a rules one, since fixtures now build units WITH weapon profiles.)
 
-- [ ] **P3 SUITE RUN — the movement rules now read the resolver (2026-08-10). ✅ GREEN, Bob ran it.**
-      Kept only until the P3b run above lands, then both go.
-      **DO:** run Unity Test Runner over `MovementTests`, `MovementMediumTests`,
-      `DeploymentTransitionTests`, `AudioSystemTests`, `SpottingServiceTests`, `IntelLadderTests`,
-      `TerritoryServiceTests`. Then play-test an air-assault regiment at Embarked: fly it over
-      mountains, past a spotted enemy, and into an unspotted one.
-      **PASS:** suites green. In play — the flight pays 1 MP per hex regardless of terrain, is NOT
-      stopped by zones of control, and when it enters a hex adjacent to an UNSPOTTED enemy it stops
-      there, takes NO damage, the enemy becomes visible as a plain contact, the printer files
-      "Ambush sighted … Flight aborted, holding position", and the unit still has its combat and
-      intel actions. Dismount it and the same regiment goes back to paying 5 MP for a mountain.
-      **WHY:** this is the bug the whole movement-medium pass exists for — an embarked regiment was
-      paying ground terrain costs and halting for ZoC it was flying over. ⚠ `MovementTests`'
-      fixtures changed shape: `CreateGroundUnit`/`CreateAirUnit` now build units WITH weapon
-      profiles, because a profile-less fixture reports `MovementMedium.None` and the fixture FIGHTER
-      would have been treated as infantry. A failure there is a fixture problem, not a rules one.
+- [ ] **Fog-of-war movement range (owed since 2026-07-21; LOW priority, not blocking).**
+      **DO:** move a unit along a path passing near an enemy at SpottedLevel 0 (tilde reveal OFF, known OOB
+      position). Watch the range overlay before and during the move.
+      **PASS:** the unspotted enemy neither blocks the displayed range nor carves a hole in it. A CONTACT halt
+      during traversal is correct and is not this test.
+      **WHY:** if `HexMapUtil` range generation consults unspotted units, the overlay leaks their position — a
+      fog breach invisible to EditorTests (they see all units). Bob 2026-07-28: "functional thus far, can't
+      claim it's perfect" — incidental non-observation is not this test; it needs the deliberate geometry.
 
-- [ ] **Fog-of-war movement range (owed since 2026-07-21, never confirmed).**
-      **DO:** move a unit along a path that passes near an enemy the player has NOT spotted (SpottedLevel 0) —
-      easiest with the tilde debug reveal OFF, using a known OOB position. Watch the range overlay before and
-      during the move.
-      **PASS:** the unspotted enemy neither blocks the displayed range nor carves a visible hole in it — the
-      overlay looks exactly as it would with no enemy there. The unit may still be stopped on CONTACT during
-      traversal; that is correct and is not this test.
-      **WHY:** the fix lives in `HexMapUtil`. If range generation consults unspotted units, the overlay leaks
-      the enemy's position — the player reads the hole and knows something is there. That is a fog-of-war
-      breach the §12 ladder cannot compensate for, and it is invisible in EditorTests because they see all units.
-      **BOB 2026-07-28:** "functional thus far in testing, can't claim it's perfect yet." So: no leak observed
-      in normal play, but NOT the deliberate unspotted-enemy path above. Stays open — this is the kind of
-      breach that shows up in one specific geometry and not in general play, so incidental non-observation
-      is not the same result as the test. Downgrade to low priority; it is not blocking anything.
+- [⏸] **Background auto-fit — GATED ON THE FIRST NON-32x21 MAP** (Bob's call, 2026-07-27).
+      **DO:** add `BattleBackgroundFitter` to `World Space/Hex Map/Background/Background Room` (defaults
+      pre-calibrated), then load Khost AND the new map.
+      **PASS:** Khost looks IDENTICAL to the hand-tuned state; the new map frames inside the table window with
+      the green tube padding intact.
+      **WHY:** the component exists but is not in the scene — nothing auto-fits today; Khost only looks right
+      because it was hand-tuned. Same pass validates the derived scroll bounds (G5, code landed 2026-08-12):
+      camera limits must hug the new map, not ±100.
 
-- [⏸] **Background auto-fit — GATED ON THE FIRST NON-32x21 MAP (Bob's call, 2026-07-27).**
-      **DO:** add `BattleBackgroundFitter` to `World Space/Hex Map/Background/Background Room` (defaults are
-      pre-calibrated, no other setup), then load Khost AND the new map.
-      **PASS:** 32x21 Khost looks IDENTICAL to the current hand-tuned state, and the new map frames inside the
-      table window with the green tube padding intact.
-      **WHY:** the component exists but is not in the scene, so today nothing auto-fits — Khost only looks right
-      because it was hand-tuned. Do this in the same pass as giving `SetScrollBounds` a caller (see Input/UI):
-      both are "silently wrong on the first differently-sized map" and share the `SetupBattleManagerData` site.
-
-- [⏸] **EU/CH THEME VERIFICATION — GATED ON THE FIRST EUROPE- OR CHINA-THEMED SCENARIO EXPORT (wired 2026-08-19).**
+- [⏸] **EU/CH THEME VERIFICATION — GATED ON THE FIRST EUROPE- OR CHINA-THEMED EXPORT (wired 2026-08-19).**
       **DO:** export any scenario with `"mapTheme": "Europe"` (or `"China"`) and load it. Likely pairs with the
-      two items above — the first non-ME map is probably also the first non-32x21 map.
-      **PASS:** chunk terrain draws the theme's tiles (not magenta, not ME art); airbase/fort/sprawl map icons,
-      city icons and nameplates all draw the theme's art; terrain-panel portraits match; the console shows NO
-      `CreateMapIcon` warn-and-skip lines and NO `GetSprite ... not found` lines. Then reload Khost — ME unchanged.
-      **WHY:** the wiring is switch-driven and suite-invisible (EditorTests don't render), so a wrong arm, a
-      misnamed sprite, or a stale atlas shows up ONLY in play. Khost-green (confirmed 2026-08-19) exercises just
-      the ME arms.
+      auto-fit item — the first non-ME map is probably also the first non-32x21 map (Hamburg is 44×21).
+      **PASS:** chunk terrain draws the theme's tiles (not magenta, not ME art); airbase/fort/sprawl icons, city
+      icons and nameplates all draw the theme's art; terrain portraits match; console shows NO `CreateMapIcon`
+      warn-and-skip and NO `GetSprite ... not found`. Then reload Khost — ME unchanged.
+      **WHY:** the wiring is switch-driven and suite-invisible (EditorTests don't render) — a wrong arm, a
+      misnamed sprite or a stale atlas shows up ONLY in play. Khost-green exercises just the ME arms.
 
 ---
 
 ## OPEN WORK
 
-### Bob's pass-again / eyeball flags
-### INTEL PASS — six-rung ladder (DESIGN RATIFIED 2026-07-24, CODE PENDING)
+### ▶ P4 — REQUISITION (`todo_profiles.md`, the live frontier)
+The bay purchase/upgrade economy on top of `EquipmentBays`: buy/sell/upgrade API (headless), prestige pricing
+(`PrestigeCost`/`TurnAvailable` fields exist on every profile), and the purchase UI surface. The wallet and
+atomic `SpendPrestige` are LIVE (2026-08-17) — this pass finally has a currency. Spec: `todo_profiles.md` P4
++ DesignDoc §18. ⚠ P5 (content/docs) was merged into the domain doc pass; do not resurrect it separately.
 
-**Design is DONE and lives in the DesignDoc** (§12 rewritten end-to-end: 12.2 ladder · 12.4 source-ceiling
-progression · 12.5 buckets + error stability · 12.6 graduated decay · 12.7 HQ SIGINT sweep · 12.8 fog of war;
-plus §24.3.2 icon gating, §24.5a printer content, §11.11.11 RB tiers, §8.2.4 intel-action effect, §6.9.0 ambush
-dependency, and the 7.12.4 / 11.8.4 / 24.8a.4 / 6.10.2 firing-reveal reconciliation). Summary in Claude_Project §10.1.
+### CONTENT PIPELINE Phase 2 — campaigns (PAUSED 2026-07-28, clean; full detail `todo.md`)
+Phases 0/1/3/4 CLOSED: a standalone scenario is a folder — discovered, listed, played, no code. What remains:
+- **Campaign scenarios are NOT REACHABLE** — discovery scans `Scenarios/` only; `Campaigns/...` is invisible.
+- **Saving/loading is NOT WIRED** — `SaveLoad.SaveAsync`/`LoadAsync` have ZERO callers, no Save button. The
+  save CONTRACT (shape, refusal, migration ladder, provenance) is finished and tested; the FEATURE is unbuilt.
+  ⚠ While zero callers exist, `SAVE_VERSION` bumps are free (three shipped since: 5, 6, 7, each with its
+  rationale at the constant in `GameData.cs`). **The moment saving gets a caller that discipline expires** —
+  every shape change then needs its own version + ladder step.
+- **Settled decisions:** §19.1.6 amended (scenario owns thresholds, campaign owns routing as `BattleResult`
+  edges); manifests are the agent's to maintain; `contentVersion` deleted from `ScenarioManifest` + save header,
+  **still OPEN for `CampaignManifest`** on one question: will a rebalanced campaign graph ever reach a player
+  WITHOUT a new build? (Bob expects remote-tester rebalancing — if revisions go out as bare files, the field
+  comes back, and to the save header too.)
+- **Resume order:** (1) 2.1+2.4 `CampaignManifest` + `CampaignNode` (branch/edge shape) → (2) 2.2 delete inert
+  `ScenarioManifest.IsCampaignScenario` (re-source `BattleManager.IsCampaignBattle`, currently write-only) →
+  (3) 2.3 discovery + menu (`.campaign`, `CampaignLoader`, `GameDataManager.CurrentCampaign`; ⚠ BOB-GATED:
+  agent writes `CampaignDialog_Scene0` as a structural twin of `ScenarioDialog_Scene0`, Bob duplicates the
+  prefab — nothing lists campaigns until he wires it).
+- **Cost of waiting:** grows with every mission authored (25–30 planned) — each pre-Phase-2 mission must be
+  retrofitted into the graph. Nothing else is gated on this; paused is safe, not free.
 
-**The shape:** breadth vs depth. Air recon + SIGINT sweep wide and shallow (ceiling L3); ground contact digs deep
-(ceiling L5 via adjacent IntelActions); combat is the fast route (sets L4); decay punishes breaking contact.
+### INTEL — remaining rungs (I1–I6, I9 + AI mirror CLOSED 2026-07-25; records in the archive)
+⚠ **Coupling (every item):** the AI plays by these rules — each change lands in BOTH SpottingService sweeps
+AND the `AIPerceptionState.StepDecay` mirror (floor MAP, not an in-range set).
+- [ ] **I7 — HQ SIGINT sweep (§12.7).** Map-wide roll per enemy on an HQ IntelAction, +1 rung ceiling L3,
+      gated on `SIGINT_Rating`, bounded by RADIO SILENCE (no move/fire/resupply last turn = untargetable).
+      This IS the M15 milestone — unblocked, can slot in anywhere.
+- [ ] **I8 — RB tier rewrite (§11.11.11).** `ReconMissionEngine` callers: 100/50/25 = coverage probability,
+      each success +1 rung ceiling L3; the old "floor of Level 2" is retired. Gated on the M13/AOB caller.
+- [-] **I10 — resolved NO (§24.3.2.5 ratified):** strength % lives in the icon HP box ONLY. Do not re-propose.
+**Deferred out of the pass (need Bob ratification, write-ups in §14.8.7 / Leader_Supplement §3.7/§3.7a):**
+Concealed Operations Base re-home (→ Radio Discipline; settle WITH Satellite Recon → sweep-ignores-silence) ·
+new skill candidates (Field Interrogation ⚠ collapses the safe/fast tradeoff — price late or drop; Trained
+Observers; Persistent Surveillance) · SigInt T4 Communications Decryption sharpening (sweep ceiling L3→L4).
 
-⚠ **COUPLING (applies to every item below):** the AI plays by these rules — each change lands in BOTH SpottingService
-sweeps (player + `RecomputeAIPerception`) AND the `AIPerceptionState.StepDecay` mirror.
+### PRINTER — remaining slices (P1–P4, P6, P7, P8a DONE + play-confirmed; records in the archive)
+- [~] **P5 — LOSS LEDGER: built, green, play-confirmed 2026-07-28; only PERSISTENCE remains.**
+      ⏳ Owed: snapshot field + its own `SAVE_VERSION` bump so the ledger survives save/load. While in there,
+      **DELETE the second-home stubs** `BattleManager.RecordPlayerUnitLoss`/`RecordAIUnitDestroyed` (empty,
+      zero callers, under a `// TODO` — the ledger lives in GameDataManager).
+      Constraints that shaped it (full detail Claude_Project §3.6d — keep them true): booked in
+      `CombatUnit.TakeDamage`, the single damage funnel (+ explicit surrender booking in `RetreatResolver`);
+      keyed by `WeaponType`, floats accumulated, rounded ONCE at render; HP actually removed, not requested;
+      removals (shatter/withdraw/evac) are not losses; daily ledger = second accumulator, never a diff.
+- [ ] **P8b — Tests.** History cursor bounds, dedup, filter, ledger arithmetic (proportional maths + save
+      round-trip once P5 persistence lands), and unearned-rung line omission.
+- [ ] **§11.7.2 air-displacement revision awaiting Bob's eyeball (flagged 2026-06-25):** adjacency = FORCED
+      evac, indirect/air bombardment = OPTIONAL owner evac (2-strike auto-evac safety net REMOVED —
+      Pearl-Harbor-under-bombardment is a player decision).
+> **Emitters still unwired, blocked on hosts that do not exist:** air operations (M13/AOB — the class Bob
+> expects to carry the feed) · logistics (§15.4a) · decorations/promotions/leader-killed (L1/L2) ·
+> opportunity + AD fire (the §11.8 transit walk) · turn-boundary divider (M13).
+> ⚠ §24.8.5 exclusions STAY — out-of-MP / terrain-blocked / deployment refusals are denial SFX, not dispatches.
 
-- [x] **I1 — Ladder + enum.** `SpottedLevel` 0–5 + `GetFullIntelReport()` (Full is NOT a stored rung, §12.2.7);
-      per-rung filter; stale 30%/10% comments gone. ✅ GREEN + play-confirmed (Bob, 2026-07-25).
-- [x] **I2 — Error constants + stability.** MAX 12→16, MODERATE 8, `MIN_INTEL_ERROR` deleted; `ApplyIntelError`
-      seeded by a stable FNV-1a over (UnitID, HP, bucket). SpottedLevel deliberately NOT in the seed so better
-      intel tightens rather than swings (§12.5.5.1). ✅ GREEN.
-- [x] **I3 — Coarse buckets.** `IntelReport.IsFullDetail` → 17 friendly / 6 coarse enemy. ✅ GREEN + confirmed in
-      play (friendly panel shows "guns" and "SAMs" separately; NBSP wrap breaks between entries, not inside them).
-- [x] **I4 — Icon gating (§24.3.2).** HP box dash <L4 / FUL-DEP-LOW band @L4 / exact @L5+friendly; `UnknownIcon`
-      at L1–L2. ✅ CONFIRMED in play 2026-07-25 — `?` deploy icon and FUL/DEP bands both rendering. Unit art +
-      nationality stay ungated from L1 (PG convention, deliberate).
-- [x] **I5 — Source-ceiling progression (§12.4).** Passive set-to-ceiling (range 1 / adjacent 2 / RECON adjacent 3),
-      direct combat sets 4 via `GroundCombatAction`, ground IntelAction +1 ceiling 5 on adjacent enemies wired
-      through the existing `OnIntelActionRequested`. ✅ GREEN.
-- [x] **I6 — Graduated decay (§12.6).** Sustained floor + −1 rung, held while adjacent, still reaches L0. ✅ GREEN.
-- [x] **AI mirror (§12.9).** `RecordSpot` takes a ceiling; `StepDecay` takes a SUSTAINED-FLOOR MAP (not an
-      in-range set — that bug shipped briefly and gave the AI a better memory than the player) + adjacency set.
-      ✅ GREEN.
-- [x] **I9 — EditorTests.** NEW `IntelLadderTests` (20); `AIPerceptionTests` / `AIPerceptionSweepTests` /
-      `SpottingServiceTests` updated to the new model. ✅ ALL GREEN (Bob ran the suites, 2026-07-25).
-- [ ] **I7 — HQ SIGINT sweep (§12.7).** Map-wide roll per enemy on an HQ IntelAction, +1 rung ceiling L3, gated on
-      `SIGINT_Rating`, bounded by RADIO SILENCE (no move/fire/resupply last turn = untargetable). This IS the M15
-      milestone content — see M15 below, which now points here.
-- [ ] **I8 — RB tier rewrite (§11.11.11).** `ReconMissionEngine` callers: 100/50/25 = coverage probability, each
-      success +1 rung ceiling L3; the old "floor of Level 2" is retired. Gated on the M13/AOB caller existing.
-- [-] **I10 — RESOLVED 2026-07-25, answer is NO (DesignDoc §24.3.2.5 ratified).** The strength percentage is a
-      CONCESSION for player ease and lives in exactly ONE place — the icon's hit-point box. It does NOT go on
-      the Unit Panel; a second readout would make it feel like a first-class stat and undo the restraint the
-      §12.2 rewrite was for. Do not re-propose this.
-
-**Deferred out of this pass (Bob's call):**
-- 📌 **Concealed Operations Base** (Intelligence T2 / `UndergroundBunker`, `CombatUnit.SetSpottedLevel:382`) capped
-  enemy intel at L3 — mid-ladder now, so the skill is gutted. Candidate re-home: **Radio Discipline** (never a valid
-  SIGINT sweep target). Settle TOGETHER with **Satellite Reconnaissance** (T3, its dependent) — proposed re-home:
-  the side's sweep IGNORES radio silence (imagery beats emission control). Both written up §14.8.7 + Leader_Supplement §3.7.
-- 📌 **New skill candidates** (need new tree slots, so NOT ratified): Field Interrogation (combat→L5),
-  Trained Observers (RECON ceiling for non-RECON), Persistent Surveillance (no decay within spotting range).
-  Leader_Supplement §3.7a. ⚠ Field Interrogation would collapse the safe/fast tradeoff — price it late/expensive or drop it.
-- 📌 **SigInt T4 Communications Decryption** — proposed sharpening: raises the sweep ceiling L3→L4. Pending ratification.
-
-### PRINTER PASS — remaining slices (P1–P4 · P7 · P8a DONE and play-confirmed 2026-07-27)
-
-> The finished slices are compressed into the DONE section below. Design lives in HS_DesignDoc §24.8; shipped
-> behaviour in Claude_Project §3.6c. Only unbuilt work is listed here — P5 ledger, P6 report, P8b tests.
-
-- [~] **P5 — LOSS LEDGER — ✅ BUILT, GREEN AND PLAY-CONFIRMED 2026-07-28. Only PERSISTENCE remains.**
-      ✅ **DONE:** `GameDataManager` now owns a static `Dictionary<Side, Dictionary<WeaponType, float>>`
-      ledger (Bob's placement call) + `RecordEquipmentLosses` / `RecordRemainingEquipmentAsLost` /
-      `GetLossLedger` / `ClearLossLedger`, cleared in `ClearAll` since losses are per-battle. Booking is
-      hooked in **`CombatUnit.TakeDamage`** — see the deviation note below — plus the surrender case in
-      `RetreatResolver`. NEW `LossLedgerTests` (12).
-      ⚠ **DEVIATION FROM THE BRIEF, deliberate:** Bob said "directly after combat". Hooking there would
-      have silently missed return fire, ambush, counter-battery and AD opportunity fire, which resolve
-      OUTSIDE the main exchange. `CombatUnit.TakeDamage(float)` is already the single funnel every damage
-      site passes through (12 call sites across `CombatResolver` + `RetreatResolver`), so booking there
-      catches every source AND cannot be forgotten when a new damage source is added.
-      ⚠ **STATIC, not instance:** `GameDataManager.Instance` lazy-creates a GameObject, so an instance call
-      from `CombatUnit` would spawn a manager in every headless EditorTest that damages a unit — the same
-      trap `PrinterMessage` hit. Statics sidestep it.
-      ⚠ **Books HP ACTUALLY REMOVED, not damage requested** — overkill on a nearly-dead unit must not book
-      equipment it no longer had, and the two differ on precisely the blow that kills.
-      ⏳ **STILL OWED for P5:** the ledger does NOT yet survive save/load — snapshot field +
-      `SAVE_VERSION` bump (⚠ and that bump ends the "amend v4 in place" allowance recorded at the constant).
-      Original findings kept below.
-
-      `BattleManager.RecordPlayerUnitLoss()` / `RecordAIUnitDestroyed()` are EMPTY STUBS with zero callers,
-      under a `// TODO: Loss tracking system` comment. ⚠ **They are now a SECOND HOME for this concept and
-      should be DELETED** — the ledger lives in GDM.
-
-      **ACCOUNTING MODEL — RATIFIED 2026-07-25 (Bob's, and it is better than the "proportional buckets" version
-      I proposed):** HP already ARE equipment. §12.2.6 scales a unit's equipment counts linearly by
-      `currentHP / maxHP`, so HP lost converts directly into real equipment lost — no new model, just a reading
-      of the one that exists. On every damage application: `fraction = hpLost / maxHP`, then for EACH
-      `WeaponType` in the unit's `RegimentProfile.TotalIntelStats`, add `count × fraction` to that side's ledger.
-      **Key the ledger by `WeaponType`, NOT by display bucket** — display rows are a rollup at render time
-      through the SAME name-prefix logic `RegimentProfile.GetIntelReport()` already uses, so the loss report and
-      the intel report cannot drift. Per-type granularity ("18 T-72A lost") then comes free later.
-
-      ⚠ **STORE FRACTIONAL, ROUND ONLY AT RENDER.** The ledger must be `Dictionary<WeaponType, float>`. Rounding
-      per damage event silently loses everything small: a unit with 3 tanks taking 1 HP of 40 contributes
-      `3 × 0.025 = 0.075` → rounds to 0, and can be destroyed outright having reported ZERO tank losses. Accumulate
-      the floats, round once when building the report.
-
-      ⚠ **FEED FROM DAMAGE, NOT FROM UNIT REMOVAL.** Destruction then needs no special case — a unit driven 40 → 0
-      contributes 100% of its equipment across however many events got it there. Conversely, units REMOVED without
-      being killed must not be counted: shatter / WITHDRAWN-RESERVE (§7.9.6.4), air units returning to base, and
-      §11.7.2 aircraft evacuation are all removals, not losses.
-      ⚠ **SURRENDER IS THE EXCEPTION** (§7.9.6a): a surrendering unit is lost without necessarily being damaged to
-      zero, so its REMAINING equipment must be booked explicitly at the surrender site.
-
-      Damage sites to hook: `GroundCombatAction`, `IndirectCombatAction`, `CombatResolver` return fire + ambush +
-      AD fire, and (when they land) air strike / base attack.
-
-      **ROW SET — RATIFIED:** Men · Tanks · **AFVs** · Guns · Aircraft · Helicopters (six; AFVs added at Bob's
-      confirmation — a Soviet mech force loses mostly AFVs and the report would look wrong without it).
-      **ENEMY FIGURES — RATIFIED EXACT.** It is a post-hoc HQ tally, not live intel. Bob's note: a player may be
-      able to deduce a little hidden intel from it after a couple of attacks, but that signal drowns out fast.
-
-      Ledger must survive save/load → snapshot field + `SAVE_VERSION` bump (one is already owed for AI2).
-- [x] **P6 — LOSS REPORT — ✅ DONE, GREEN AND CONFIRMED IN PLAY 2026-07-28.**
-      ✅ NEW `PrinterMessage.CreateLossReport(ourLedger, enemyLedger)` — two columns (OURS / ENEMY), the six
-      ratified rows, `Divisional HQ` letterhead, `PrinterCategory.Combat`. `OnDisplayLossesButton()` is now
-      LIVE: it reads both GDM ledgers and raises the message. Bob wires the button; no other setup.
-      ⚠ **THE ROLLUP SHARES THE INTEL REPORT'S CLASSIFIER.** Extracted NEW
-      `RegimentProfile.ClassifyWeaponType(WeaponType) → EquipmentBucket` (+ the enum, transient/not
-      persisted) and re-pointed `GetIntelReport()` at it, so the loss report and the intel report cannot
-      drift about what counts as a tank. The ratified P5 note required exactly this instead of a second copy
-      of the prefix list.
-      ⚠ **ROUNDS ONCE, AFTER SUMMING A ROW** — rounding each bucket before adding would re-introduce the
-      small-value loss the fractional ledger exists to prevent (0.4 + 0.4 must read 1, not 0).
-      ✅ **DAILY REPORT ADDED 2026-07-28 (Bob asked for it).** Second callback
-      `OnDisplayDailyLossesButton()` → **wire to its own button.** Backed by a SECOND accumulator
-      (`GetDailyLossLedger`) fed by the same booking and reset in `BattleManager.SetTurn` — the one place
-      the turn number changes. ⚠ A second accumulator rather than a snapshot-and-subtract: a baseline diff
-      breaks silently the moment the cumulative ledger is cleared or restored, with no way to detect it.
-      Headed "LOSSES THIS TURN" / empty-state "No losses this turn."
-      ✅ **TRUCKS RESOLVED — NOT A GAP (Bob, 2026-07-28).** Verified in `WeaponProfileDB`: NO truck profile
-      declares any intel stats (`TRK_GEN_SV`, `TRK_WEST` add none), so trucks are absent from the intel
-      model itself and there is nothing to report.
-      ⚠ **BUT THE CHECK FOUND A REAL HOLE, NOW FIXED:** the `TRN` bucket's ONE profile with intel stats is
-      the **An-12, a fixed-wing transport carrying 48** — so a destroyed transport regiment printed
-      "Aircraft 0" while 48 aircraft vanished. `TRN` is now in the **Aircraft** row, which is exact today
-      since trucks and `TRN_NAVAL` declare nothing. ⚠ Revisit if a truck or naval transport ever GAINS
-      intel stats — they would then land under Aircraft and the bucket needs splitting.
-      ✅ **HEIGHT FIXED 2026-07-28 after Bob's play-test: fits horizontally, OVERRAN VERTICALLY.** The CRT
-      shows ~10 lines including the frame's `turn: Message from …` header; the first layout spent 10 on
-      heading + blank spacer + column header + six rows, so anything past Helicopters was clipped.
-      Two lines recovered, now **8 with a line in hand**: (a) the heading MERGED INTO the column-header row
-      ("ALL LOSSES / TURN LOSSES" sits in the row-label column, which was dead space carrying nothing), and
-      (b) the blank spacer deleted.
-      ⚠ **AND IT FIXED A DEFECT THE OVERRUN WAS HIDING:** the empty-state notice was APPENDED BELOW the six
-      zero rows, i.e. past the bottom of the panel — so "No losses reported." was invisible in exactly the
-      case it existed to explain. The empty report now REPLACES the table (3 lines) instead of trailing it.
-      ✅ Horizontal alignment CONFIRMED in play — the CRT font is monospace, as the layout assumed.
-      NEW `Report_FitsTheCrtHeightBudget` pins ≤9 rendered lines, since an overrun clips SILENTLY.
-      ⚠ **CORRECTED 2026-07-28 — the old "serialized ref + `AddListener`" instruction is OBSOLETE and would
-      now violate CLAUDE.md §2.13.** This slice predates the 2026-07-27 wiring ruling: the Inspector owns
-      every `onClick`, and a code `AddListener` on top of it double-fires. ✅ The callback ALREADY EXISTS —
-      `DefaultDialog_Scene1.OnDisplayLossesButton()`, stubbed 2026-07-28 and ready for Bob to wire. P6 makes
-      it real by replacing its `Report(...)` line.
-      ⚠ **STILL UNDECIDED:** two events exist, `RaiseDailyLossesRequested()` and `RaiseTotalLossesRequested()`,
-      so whether this is ONE button or TWO is a design choice nobody has made.
-- [ ] **P8b — Tests.** History cursor
-      bounds, dedup, filter, ledger arithmetic (proportional maths + save round-trip), and that a message whose
-      rung was not earned omits its line rather than printing a default.
-
-> **STILL UNWIRED, blocked on hosts that do not exist** (the P7 deferred half): air operations (M13/AOB — the
-> class Bob expects to carry the feed) · logistics (§15.4a supply flow) · decorations/promotions/leader-killed
-> (leader L1/L2) · opportunity + AD fire (the §11.8 transit walk) · turn-boundary divider (M13 turn loop).
-> ⚠ §24.8.5 exclusions STAY — out of MP, terrain blocked, deployment refusals are denial SFX, not dispatches.
-- [ ] **§11.7.2 air-displacement revision awaiting Bob's eyeball (flagged 2026-06-25):** adjacency = FORCED evac,
-      indirect/air bombardment = OPTIONAL owner evac (the 2-strike auto-evac safety net was REMOVED —
-      Pearl-Harbor-under-bombardment is now a player decision).
-
-### Input / UI (battle map)
-
+### INPUT / UI (battle map)
 > **🔷 OVERLAY-SPRITE CONVENTION (ratified 2026-07-21):** the hex cell is a REGULAR pointy-top hex, 2.56 wide ×
-> 2.956 tall — square-canvas hex art renders ~13.5% short. ALL hex-shaped overlay sprites are stamped through
-> `HexGridRenderer.FitToCellScale` (done: MoveRangeFill/ZocStop + TargetPickOutline — live 2026-07-22 as the
-> Ctrl-combat legal-target stamp, L2 unit-pick reuses it; owed: ThreatFill_* in the M13 threat overlay). Point markers (MovePathStep/End, FacingChevrons) render authored-size.
-> Overlay art ships SOLID WHITE — HexGridRenderer applies serialized RGB tint × a per-overlay opacity slider
-> (live for the movement set 2026-07-21; supersedes the same-day as-authored/no-tint pass; new overlay
-> consumers follow the same pattern). **When planning any NEW overlay sprite, ASK Bob whether it's hex-shaped
-> (fit-scaled) or a marker (authored-size).**
-- [x] **Movement-overlay tint + opacity (Bob 2026-07-21) — CODE DONE same day:** serialized RGB tint × new
-      per-overlay `[Range 0–1]` opacity sliders now drive `ShowMovementRange`/`ShowPathPreview` (atlas art and
-      procedural fallback identically); convention block above updated. ART OWED (Bob): swap
-      MoveRangeFill/ZocStop/MovePathStep/MovePathEnd atlas entries to the solid-white texture(s) — until then
-      the tint MULTIPLIES over the existing colored art.
-- [x] **Unit-panel click-through + camera edge-stall — BOTH FIXED AND CONFIRMED (Bob, 2026-07-27).** Diagnosis and
-      fix detail in the change log; the two lessons worth keeping are recorded in Claude_Project §3.6/§3.7 —
-      a null click-through slot FAILS OPEN, and scroll damping must be per-axis and outward-only.
-- [x] **✅ CLOSED 2026-07-28 — standalone scenario content is versioned. (Was: "STILL UNVERSIONED", found
-      2026-07-27.)** Resolved by the CONTENT PIPELINE pass, which took option (b): all shipped content moved
-      into `Assets/StreamingAssets/`, so it is versioned by construction and reachable in a build. Every claim
-      in the original item is now false — `AppService.ManifestsPath` and `Assets/Generated Data` are deleted,
-      the `isCampaignScenario` path split is gone, the divergent Documents copy was deleted after its newer
-      files were taken as the source of truth, and Documents holds saves and logs only.
-- [x] **`SetScrollBounds` HAS ZERO CALLERS — CLOSED 2026-08-12 (G5).** `BattleManager.ApplyDerivedScrollBounds`
-      now calls it from `SetupBattleManagerData`, right after `FitToMap`, deriving limits from the loaded map's
-      world footprint (corner hexes through `HexGridSystem.HexToWorld` + a 10-unit margin; both row parities
-      sampled for the right edge, since odd rows are staggered half a hex). ⚑ Needs a non-32x21 map to
-      validate against — pairs with the `BattleBackgroundFitter` item above, which is still Bob's scene work.
-- [x] **DEPLOY UP / DOWN — ✅ DONE, SUITE GREEN AND CONFIRMED IN PLAY 2026-07-28.**
-
-      ### What already exists (verified, not assumed)
-      - `CombatUnit.TryDeployUP(out errorMsg, onAirbase, onPort)` / `TryDeployDOWN(out errorMsg)` are
-        COMPLETE: `CanChangeToState` + `SpecialEmbarkmentChecks` validation, the airborne override
-        (AB/MAB, and SPECF carrying an An-12, skipping Mobile straight to Embarked beside a friendly
-        airbase), the Fortified/Entrenched→Deployed collapse, and `ApplyDeploymentTransitionCosts`
-        (supply · `DeploymentAction` · 50% of max MP · re-max MP from the newly active profile).
-      - `Prefab_CombatUnitIcon` already subscribes to `OnUnitDeploymentChanged` → `RefreshDeployIcon()`,
-        which resolves through the intel gate (`UnknownDeploymentIcon` when the rung is unearned).
-      - **Zero callers.** Nothing invokes `TryDeploy*`; nothing raises `RaiseUnitDeploymentChanged`.
-
-      ### ⚠ CORRECTION TO AN EARLIER CLAIM IN THIS FILE'S CONVERSATION — THERE IS NO STALE-ICON BUG
-      I previously reported that combat-driven deployment changes leave the icon stale. **That is wrong.**
-      `MovementController:584` already raises `RaiseRedrawMapIcons()` after every combat (its comment
-      names "defender displacement"), `OnRedrawMapIcons` does `ClearAllUnitIcons()` + `DrawAllUnits()`,
-      and `DrawAllUnits` initialises each icon with the unit's LIVE `DeploymentPosition`. So the
-      RetreatResolver paths (§7.9.5.2 dug-in drop, §7.9.6a surrender→Deployed) render correctly today.
-      `RaiseUnitDeploymentChanged` is unused SCAFFOLDING, not a broken link — the coarse redraw covers
-      the same ground. Nothing to fix; the work below is a feature, not a repair.
-
-      ### ⚠ Two traps that shape the design
-      1. **The model layer must NOT raise events.** No class under `Models/` raises anything today, and
-         `EventManager.Instance` LAZY-CREATES a GameObject — so a raise inside `CombatUnit` would spawn an
-         EventManager in every headless EditorTest that changes deployment. ⚠ `?.` does NOT save you: the
-         getter creates the object and never returns null. The raise belongs in the CONTROLLER subscriber.
-      2. **`TryDeploy*` bypass `SetDeploymentPosition`** — they assign `_deploymentPosition` directly
-         (:1285/:1287/:1315), so that setter is NOT the single write funnel it appears to be. Either route
-         them through it or accept two write paths; do not assume one.
-
-      ### The steps
-      - [x] **D1 — Missing action-economy gate.** `CanChangeToState` checks same-state, destroyed,
-            unit-type, critical supply and StaticOperations — but **NOT that a `DeploymentAction` remains**,
-            while `ApplyDeploymentTransitionCosts` decrements one unconditionally. Add the check, or a unit
-            deploys freely all turn. Cheapest correct home is `CanChangeToState`, so both entry points get it.
-      - [x] **D2 — Controller subscriber.** `MovementController` (it already owns the unit-action input handlers and
-            calls the combat orchestrators) subscribes to `OnDeployUpRequested`/`OnDeployDownRequested` in
-            `Start()`, resolves `onAirbase`/`onPort`, calls `TryDeploy*`, and on success raises
-            `RaiseUnitDeploymentChanged(unit.UnitID, unit.DeploymentPosition, unit.CurrentEmbarkmentState)`
-            — finally giving that event its first caller — plus `RaiseUnitActionsChanged`/movement-point
-            refresh so the HUD reflects the spent action and MP.
-      - [x] **D3 — `onAirbase` / `onPort` resolution.** `onPort` is `HexTile.IsPort` on the unit's hex.
-            `onAirbase` is "adjacent to an ACTIVE friendly airbase unit" — needs a helper; `GameDataManager`
-            already filters `u.IsBase && u.FacilityType == FacilityType.Airbase` (:883). Must respect
-            side and operational state, not merely presence.
-      - [x] **D4 — Refusal feedback.** `TryDeploy*` return a human-readable `errorMsg`.
-            ⚠ **§24.8.5 says deployment refusals are DENIAL SFX, NOT printer dispatches** — do not route
-            these to the CRT. `AppService.CaptureUiMessage` + the (unbuilt) denial SFX hook.
-      - [x] **D5 — Point the two button stubs** `OnDeployUpButton`/`OnDeployDownButton` at the events,
-            replacing their `ReportForSelectedUnit` lines.
-      - [x] **D6 — Tests.** Costs applied exactly once; refusal leaves state AND action count untouched;
-            no `DeploymentAction` = refusal; Fortified→Deployed collapse; the airborne override;
-            critical-supply refusal.
-
-- [ ] **Move Undo (§5.11 — v1 CONFIRMED, HUD button art exists):** `MovementController` pre-move snapshot (MP,
-      actions, position, facing, deployment profile) + spotting-dirty flag during traversal (§5.11.1: undo only if
-      no enemy SpottedLevel rose); voided by ambush / ZoC-halt / extra supply (§5.11.4); single undo per move;
-      wire `OnMoveUndoRequested`.
-- [ ] **Cursor system completion (§24.11.3):** real cursor art (ART: Bob) replacing CursorController's procedural
-      placeholders; per-mode cursors as each input mode lands (unit-pick §24.5.5, AOB placement §24.7a.1).
-- [ ] **Denial SFX** on illegal Ctrl+click (currently a silent no-op; audio asset + hook).
+> 2.956 tall — square-canvas hex art renders ~13.5% short. ALL hex-shaped overlay sprites stamp through
+> `HexGridRenderer.FitToCellScale` (owed: ThreatFill_* in the M13 threat overlay). Point markers render
+> authored-size. Overlay art ships SOLID WHITE — HexGridRenderer applies serialized tint × per-overlay opacity.
+> **When planning any NEW overlay sprite, ASK Bob whether it is hex-shaped (fit-scaled) or a marker.**
+- [ ] **Move Undo (§5.11 — v1 CONFIRMED, HUD button art exists):** pre-move snapshot (MP, actions, position,
+      facing, deployment profile) + spotting-dirty flag (§5.11.1: undo only if no enemy SpottedLevel rose);
+      voided by ambush / ZoC-halt / extra supply (§5.11.4); single undo per move; wire `OnMoveUndoRequested`.
+- [ ] **Cursor system completion (§24.11.3):** real art (Bob) replacing procedural placeholders; per-mode
+      cursors as each input mode lands (unit-pick §24.5.5, AOB placement §24.7a.1).
+- [ ] **Denial SFX asset:** the `ButtonDenied` hook is WIRED on all five refusal paths (2026-08-04) — what is
+      missing is the wav (Bob's art queue) and confirming the illegal-Ctrl+click path plays it in play.
 - [ ] **Input-mode state machine** (Normal / CtrlCombat / CombatTargeting / UnitPick / AOBPlacement / AOBMode /
-      ReactionInterceptorPick) in the input layer — the cursor system keys off it; the AOB save-block and the
-      §24.11.1 universal-Esc stack live here.
-- [ ] **HUD button wiring** as Bob's layout lands — callbacks grow `DefaultDialog_Scene1`.
-      **RULE CHANGED 2026-07-27 (Bob, during the battle-HUD rework): the Inspector owns EVERY onClick, code
-      never calls `AddListener`.** The 07-20 nav/gameplay split is retired. A script keeps a serialized
-      `Button` only to drive that button's STATE, never to wire it. ⚠ `On*Button()` names are a contract —
-      UnityEvent binds by string, so a rename silently kills the wiring. See Claude_Project §3.6b.
-      Cross-singleton subscriptions still in `Start()` only. Button art still owed (Bob): Leader Pool,
-      Upgrade/second-replacements.
-- [x] **Editor audit tools BUILT 2026-07-27** — `Assets/Editor/UI/ButtonWiringAudit.cs`, the detection half of
-      the Inspector-owns-wiring trade. `Tools/UI/Audit Button Wiring` walks every Button in the OPEN scenes
-      (inactive included) and reports the four silent failures: nothing wired · a method that no longer
-      exists (the RENAME detector) · a listener set to Off · the same method wired twice. Findings log with
-      the Button as context, so clicking the console entry pings it in the hierarchy.
-      `Tools/UI/Find Unwired Button Callbacks` is the reverse — public `On*Button()` methods that no scene or
-      prefab references, i.e. the ones that look dead to a cleanup pass. It reads the scene/prefab YAML for
-      `m_MethodName:` rather than opening scenes (Asset Serialization is ForceText), so it covers the whole
-      project without disturbing what is open. ⚠ Matches by NAME only — two classes sharing a callback name
-      are indistinguishable, and a name wired to the WRONG object still counts as wired. The tool says so in
-      its own output. Editor assembly builds clean; ⚠ not yet RUN (needs Unity).
+      ReactionInterceptorPick) — cursors key off it; the AOB save-block and §24.11.1 universal-Esc stack live here.
+- [ ] **HUD button wiring** as Bob's layout lands — callbacks grow on `DefaultDialog_Scene1`. ⚠ The Inspector
+      owns EVERY onClick; code never `AddListener`s; `On*Button()` names are a contract (Claude_Project §3.6b).
+- `ButtonWiringAudit` + `Find Unwired Button Callbacks` are BUILT (2026-07-27), never run — queued for Bob.
 
-### Leader completion (§9: L1–L4) — L1+L4 approved, headless-safe
-**Context:** M14 safe slice made the leader MECHANICS live; this is the remaining product layer. **Spec:** §14.14
-(awards, RATIFIED) + §14.15 (recruitment) + §24.5.5/.6 (UIs, RATIFIED). **Intent (Bob):** campaign leaders are built
-FROM ZERO — first-scenario leaders and 50-prestige recruits both arrive CommandAbility.Average with 60 REP.
-
+### LEADERS — completion (§9: L1–L4; mechanics live via the M14 safe slice)
+**Spec:** §14.14 (awards, RATIFIED) + §14.15 (recruitment) + §24.5.5/.6 (UIs, RATIFIED). **Intent (Bob):**
+campaign leaders build FROM ZERO — first-scenario leaders and recruits both arrive Average with 60 REP.
 **L1 — Awards & decorations engine (§14.14, three channels):**
-- [ ] `LeaderAwardCatalog` (static, mirrors LeaderSkillCatalog): AwardId / channel / trigger predicate / layer asset
-      name / display name / chest slot + precedence. Channel A (badges) computed from the skill tree (replace-chains);
-      B (combat orders, deed counters, sticky); C (service awards, LifetimeRepSpent, sticky).
+- [ ] `LeaderAwardCatalog` (static, mirrors LeaderSkillCatalog): AwardId / channel / trigger predicate / layer
+      asset / display name / chest slot + precedence. A badges (computed from tree, replace-chains) · B combat
+      orders (deed counters, sticky) · C service awards (LifetimeRepSpent, sticky).
 - [ ] Leader counters (serialized, snapshot round-trip): `CombatActionsLed`, `EnemiesDestroyed`, `RetreatsForced`,
       `AttacksWithstood`, `ScenariosServed`, `LifetimeRepSpent` + append-only `EarnedAwards`. Increment sites:
-      `GroundCombatAction` (attacker deeds + defender Hold), `Leader.UnlockSkill` (lifetime spent), battle end (M13).
-- [ ] Award-check pass + `EventManager.OnLeaderDecorated(leader, awardId)` → printer citation + UI toast.
-- [ ] Portrait composition prefab: base-by-grade + stacked pre-positioned deco layers (display cap ~6 by precedence).
-      ART DEPENDENCY (Bob): 3 base portraits (Colonel/MjGen/LtGen rank boards) + ~14 curated deco layers.
+      `GroundCombatAction` (attacker deeds + defender Hold), `Leader.UnlockSkill`, battle end (M13).
+- [ ] Award-check pass + `OnLeaderDecorated(leader, awardId)` → printer citation + UI toast.
+- [ ] Portrait composition prefab: base-by-grade + stacked deco layers (display cap ~6 by precedence).
+      ART DEPENDENCY (Bob): 3 base portraits + ~14 curated deco layers.
 - [ ] EditorTests: per-channel thresholds, replace-chains, respec keeps B/C + strips-and-recomputes A,
       LifetimeRepSpent never decrements.
-
 **L2 — Leader Pool + recruitment (§14.15 + §24.5.5):**
-- [ ] Pool model: roster view over GameDataManager leaders (available + assigned) + seeding path for test leaders.
-- [ ] **Leader mortality (§14.15.4, RATIFIED — no rolls):** unit DESTROYED or SURRENDERS → leader DIES, permanent
-      (wire into GroundCombatAction/RetreatResolver removal paths); shatter → survives to WITHDRAWN-RESERVE (§7.9.6.4).
+- [ ] Pool model: roster view over GameDataManager leaders + seeding path for test leaders.
+- [ ] **Leader mortality (§14.15.4, RATIFIED — no rolls):** unit DESTROYED or SURRENDERS → leader DIES,
+      permanent (GroundCombatAction/RetreatResolver removal paths); shatter → survives to WITHDRAWN-RESERVE.
 - [ ] Recruitment + assignment economy: `LEADER_RECRUIT_COST 50` / `LEADER_ASSIGN_COST 30` (knobs); recruit =
-      Average CC + 60 REP; every placement (fresh or swap) pays 30; Remove (unassign) free; dismissal NOT in v1.
-      ⚠ DEPENDENCY: needs a live prestige WALLET — §18 economy is still report-only; minimal wallet lands here or M13.
-- [ ] Pool UI per §24.5.5: HUD button → UIListBox dialog (name+rank | assigned unit | Recruit/Assign/Remove/Details);
-      Assign → UNIT-PICK input mode (valid-target highlight per §14.15.3 = TargetPickOutline, HEX-SHAPED → stamp
-      via `FitToCellScale`; floating "Assigning: X — Esc cancels" chip, Esc/right-click abandons, blocked while
-      an AOB is open, swap-on-led-target).
-- [ ] OPEN (§14.15.5): how Good/Superior/Genius CC enters play (campaign rewards vs recruit rarity).
-
+      Average + 60 REP; every placement pays 30; Remove free; dismissal NOT in v1.
+      ✅ **The wallet dependency is RESOLVED (2026-08-17)** — `PrestigeWallet.SpendPrestige` is live and atomic.
+- [ ] Pool UI per §24.5.5: HUD button → UIListBox dialog; Assign → UNIT-PICK input mode (TargetPickOutline,
+      hex-shaped → `FitToCellScale`; Esc/right-click abandons; blocked while an AOB is open; swap-on-led-target).
+- [ ] OPEN (§14.15.5): how Good/Superior/Genius CC enters play (campaign rewards vs recruit rarity) — Bob.
 **L3 — Leader Details UI (§24.5.6):**
-- [ ] Layout: portrait pane (composited layers, per-decoration "what + why" tooltips) + identity block (rank string,
-      CC, EffectiveCommand talent-gap readout) + REP block (current = tree / spent = LifetimeRepSpent / earned =
-      derived) + service record (deed counters + next-award progress) + skill tree.
-- [ ] Skill tree per §24.5.6.1/.2: FOUR node states (grayed-with-reason / lit / highlighted / STRUCK for
-      exclusivity-dead branches); tier-aligned constellation — Foundation (2 cols) | Doctrine (7) | Specialization (4),
-      T1→T5 rows, connector lines, live striking of sibling branches on doctrine/spec start.
-- [ ] Purchase flow: LIT node click → confirm (cost + effect) → instant; anytime in player turn (§24.5.6.3);
-      promotions as emphasized gate-nodes; Respec button IN V1 (§24.5.6.4).
-- [ ] EventManager contract for both UIs (OnLeaderPoolRequested / OnLeaderRecruitRequested / OnLeaderAssignRequested /
-      OnLeaderUnassignRequested / OnLeaderDetailsRequested / OnLeaderSkillPurchaseRequested / OnLeaderRespecRequested /
-      OnLeaderDecorated — all centralized, see EventManager).
-- [ ] Test-leader seeding into the pool once L2 lands (OOB pass-3 leader loading still deserves its own exercise later).
-
-**L4 — Remaining safe wirings (2026-07-03 audit):**
+- [ ] Layout: composited portrait (per-decoration tooltips) + identity block (rank, CC, EffectiveCommand
+      talent-gap) + REP block + service record (counters + next-award progress) + skill tree.
+- [ ] Skill tree per §24.5.6.1/.2: FOUR node states (grayed-with-reason / lit / highlighted / STRUCK);
+      tier-aligned constellation — Foundation (2 cols) | Doctrine (7) | Specialization (4), T1→T5 rows,
+      connector lines, live striking of sibling branches.
+- [ ] Purchase flow: lit-node click → confirm → instant; anytime in player turn; promotions as gate-nodes;
+      Respec IN V1 (§24.5.6.4).
+- [ ] EventManager contract for both UIs (Pool/Recruit/Assign/Unassign/Details/SkillPurchase/Respec/Decorated).
+- [ ] Test-leader seeding once L2 lands (OOB pass-3 leader loading still deserves its own exercise later).
+**L4 — Remaining safe wirings:** 
 - [ ] `SpottingRangeBonus` → both dual-domain ranges (§12.3.11); `IndirectRangeBonus` → `ActiveIndirectRange`.
       Hosts locked & green; small slice, do with L1.
 
 ### M13 — TURN LOOP, MOVEMENT DYNAMICS & AOB (the combat-engine frontier)
-Consolidates the caller debt flagged across the done milestones (M2–M12), the ratified AOB input package, and the
-AI track's M13 asks.
-
+Consolidates the caller debt from M2–M12, the ratified AOB input package, and the AI track's asks. Headline
+(2026-08-10 audit, still true): **the air RULES are built and EditorTest-covered; the air GAME is not wired** —
+no AOB entity, no placement mode, no air phase, no fixed-wing auto-return. (The audit's two rulings are both
+RESOLVED AND BUILT: ambushed helo takes an ordinary attack minus the surprise multiplier + transit stand check,
+2026-08-10; helo gets no 1d6 detection roll — D2 gives it only to fixed-wing, 2026-08-11. Do not re-open.)
 **Turn loop core:**
-- [ ] BattlePhase loop (§3): Refresh (spotting decay §12.6 ✓ exists, efficiency recovery §7.15.8, action/MP reset,
-      supply), orders, Upkeep, AI turn (v1 stub), TurnBoundary. AI_Refresh perception hooks already wired (AI2b).
-- [ ] ⚠ DAY-ONE REQUIREMENT (§11.1.8.6): the loop must support REACTION YIELDS — an async/state machine that pauses
-      for player input at reaction points (hosted by `ReactionWindowController`), NOT a straight-through sequence.
-      Retrofit = rewrite. AI-turn AOBs prompt the HUMAN; ship the S2 reaction-policy INTERFACE with M13
-      (v1 = decline-all config, AI brain swaps in later).
+- [ ] BattlePhase loop (§3): Refresh (efficiency recovery §7.15.8, action/MP reset, supply), orders, Upkeep,
+      AI turn (v1 stub), TurnBoundary. Spotting decay + AI_Refresh hooks already exist.
+- [ ] ⚠ DAY-ONE REQUIREMENT (§11.1.8.6): the loop must support REACTION YIELDS — an async/state machine that
+      pauses for player input at reaction points (hosted by `ReactionWindowController`), NOT a straight-through
+      sequence. **Retrofit = rewrite.** AI-turn AOBs prompt the HUMAN; ship the S2 reaction-policy INTERFACE
+      with M13 (v1 = decline-all config, AI brain swaps in later).
 - [ ] Headless move-order path extracted from `MovementController` (AI + input both call it) — AI-track ask.
-- [ ] Automatic Advance (§7.9.9): attacker's free advance into the vacated hex (RetreatResolver reports
+- [ ] Automatic Advance (§7.9.9): attacker's free advance into the vacated hex (RetreatResolver already reports
       `AutomaticAdvanceAvailable`/`VacatedHex`; prompt + move are the loop's).
-- [ ] WITHDRAWN-RESERVE roster placement on shatter quit-field (§7.9.6.4/§35.2); kill/objective prestige crediting —
-      needs the §18 prestige WALLET (shared dependency with leader L2).
-- [ ] §7.15.7 move-path supply: replace the deterministic per-hex consume (`CombatUnit.cs:981`) with the §7.15.4
-      probabilistic roll (combat path already converted); §7.15.2.4 Degraded move gate (MovementController + UI).
+- [ ] WITHDRAWN-RESERVE roster placement on shatter quit-field (§7.9.6.4/§35.2). **Kill prestige crediting
+      (§18.2.3, half purchase cost)** — the wallet is LIVE; wire the credit at the kill sites. ⚠ The old
+      "objective prestige crediting" half of this item is RETIRED — capture awards were deleted 2026-08-17 in
+      favour of the §18.2 income model, which already runs in Upkeep.
+- [ ] §7.15.7 move-path supply: replace the deterministic per-hex consume (`CombatUnit.cs`) with the §7.15.4
+      probabilistic roll (combat path already converted); §7.15.2.4 Degraded move gate (controller + UI).
 - [ ] Reactive facing (§5.8.8, free once/enemy-turn): HasReactiveFaced flag + rotation + flank negation
-      (+ flank exemptions for bases/indirect/air enforced at call sites).
+      (+ exemptions for bases/indirect/air at call sites).
 - [ ] Contested-crossing caller geometry (§7.5.6.9.1) — also feeds the M14 RiverAssault ICM.
 - [ ] Confirm GroundFire opp-fire stays retired (§8.3.2) — ambush is the only ground-vs-ground reaction.
 - [ ] ROC two-CombatAction salvo (§7.14, different targets allowed); Scud single-shot, no bonus (§7A.11).
-- [ ] Battle result evaluation (§7.16); integration smoke scenario; UI hooks (opp-fire highlight + Level-4 reveal
-      §7.12.4 / §11.8.4).
-- [ ] Balance pass: GroundBalanceMod/AirBalanceMod vs the §7.9.5.1 distribution targets; AD GAT lethality; prestige/
-      DeploymentPointCost. ⚠ After ANY combat-const change, re-run `CombatOracleTests` — the AI EV oracle's drift
-      guards enumerate the real engine and fail loudly if the mirror is stale.
-
+- [ ] Battle result evaluation integration (§7.16 — grading itself is LIVE since 2026-08-17; this is the smoke
+      scenario + UI hooks: opp-fire highlight, Level-4 reveal §7.12.4/§11.8.4).
+- [ ] Balance pass: GroundBalanceMod/AirBalanceMod vs §7.9.5.1 distribution targets; AD GAT lethality;
+      prestige/DeploymentPointCost. ⚠ After ANY combat-const change re-run `CombatOracleTests` — the AI EV
+      oracle's drift guards enumerate the real engine and fail loudly if the mirror is stale.
 **Air transit & AD walk (movement-dynamics core):**
-- [ ] Air transit walk — per hex: MP §5.13.1, spotting, shot budget §11.8.3, anti-dogpile TargetedAircraftIds §11.8.6,
-      towed posture gate §11.8.8, `AirAmbushCheck`, `ResolveAirDefenseFire`, helo transit stand check §11.8.9
-      (abort → force-disembark at ORIGIN on the ground-AD path); fixed-wing auto-return §5.13.5; transit spotting +
-      §12.7.2 forward-spotting recency window for ASB targeting.
-- [ ] `AirThreatService` — shared eligibility/footprint (CanInterdict = AD-class + GAT ≥ 6 + posture gate; footprint =
-      spotting + IR per §11.4.4), consumed by BOTH the §24.7a.8 side-relative AD threat overlay (GAT bands 9–11 amber /
-      12–14 orange-red / 15+ deep red, overlap = darkened worst band; renderer = HexGridRenderer utility layers;
-      SpriteManager ThreatFill sprites ✓ exist — HEX-SHAPED → stamp via `FitToCellScale`) AND the §11.8 walk —
-      same helper, the overlay never lies.
+- [ ] Air transit walk — per hex: MP §5.13.1, spotting, shot budget §11.8.3, anti-dogpile §11.8.6, towed
+      posture gate §11.8.8, AD fire, helo transit stand check §11.8.9 (abort → force-disembark at ORIGIN);
+      fixed-wing auto-return §5.13.5 (`AnimateAutoReturn` + `OnAirUnitReturning` exist, zero callers); transit
+      spotting + §12.7.2 forward-spotting recency window for ASB targeting. Per-sortie supply deduction
+      (consts + `CanLaunchSortie` exist, zero consumers).
+- [ ] `AirThreatService` — shared eligibility/footprint (CanInterdict = AD-class + GAT ≥ 6 + posture gate;
+      footprint = spotting + IR per §11.4.4), consumed by BOTH the §24.7a.8 AD threat overlay (GAT bands,
+      overlap = darkened worst band; ThreatFill sprites exist — hex-shaped → `FitToCellScale`) AND the §11.8
+      walk — same helper, the overlay never lies.
 - [ ] In-hex ground fire (§11.4.8.5) + egress opp fire (§11.4.8.7); helo direct-attack path (GA vs GAD §7A.14,
       no OL §11.6.1.5).
-- [ ] Air-ambush reveal (ratified branch-dependent): detection SUCCESS → L1 (code ✓), ambusher FIRES → L4 (§11.8.4) —
-      wire the L4 branch when AD-fire lands.
-
+- [ ] Air-ambush reveal branches: detection SUCCESS → L1 (done); ambusher FIRES → L4 (§11.8.4) — wire when
+      AD-fire lands.
 **AOB framework (§11.1 + the ratified input package):**
-- [ ] `AirOperationsBox` model + populate pipeline: order-time validation (slot pre-check per lock state +
-      `CanLaunchSortie` ✓ + CombatAction; RB pays CombatAction per §8.5.2), arrival sequence §11.1.3 → off-map
-      (icon + spotting exclusion) + slot fill + type-flip via `AOBMissionResolver` ✓ + `OnAOBStateChanged` ✓ snapshot;
-      pay-at-launch BOTH sides (§11.1.8); cancel/end-of-turn = free auto-return, actions lost (§11.1.5/.7);
-      one-AOB-at-a-time (§11.1.6); WW pre-lock slot; AEWB 1/turn cap; per-sortie supply deduction (consts ✓).
-- [ ] Placement input (§24.7a.1): AOB button → box-on-cursor → Ctrl+left-click place (drag-drop retired); §11.1.9
-      AOB-Mode lockdown (air-only input, SAVE DISABLED while a box is open, Esc never cancels a box); §24.7a.7
-      Resolve/Cancel button row (Resolve = attacker-unilateral).
-- [ ] `ReactionWindowController` + §24.13 Phase Control Bar (`OnPhaseControlChanged` / `OnReactionWindowOpened/Closed` /
-      `OnInterceptorCommitted` ✓ events): per-arrival interception windows §11.1.8 — WW arrivals excluded (bait-proof),
-      1 interceptor per window, decline loses that window only, dead interceptor ≠ filled slot.
-- [ ] WW / SEAD orchestration (M10 — NO pure gap; damage primitive = `ResolveAirStrike(ww, sam)`): WW slot gate
-      (no air-to-air, no stand check), per-SAM-shot counter-fire trigger, 1 OppAction/shot §11.1.2.3, set
-      `WildWeaselAlive` on strike lanes when the WW survives, reveal firing SAM Level 4 (§24.8a.4).
-- [ ] Other AOB missions (M11): AAB airborne assault §11.12 (para-as-transport HP coupling, interception sequence,
-      drop on survival); AEWB §11.13 (+1 Δ to that side's offensive lanes rest-of-turn, symmetric, 1/turn); SB air
-      supply §11.9 (5-day `AIR_SUPPLY_LOAD` ✓, delivery + Replacements rider §15.4a.4a, ferry-neutral refund §11.9.6);
-      RB caller bits (per-tier spotting sweep §11.11.11: 100%-floor-L2 / 50% / 25%, HP application, CombatAction cost,
-      no-defender auto-100% §11.11.5, auto-return).
-- [ ] Helo AIB (M12, §11.8.10 — reworked 2026-06-23): 1 helo + 2 escort + 2 interceptor; helo defends on GAD (§7A.14);
-      dual-phase economy §8.5.1a (phasing side pays Combat, reacting side pays Opp — do NOT hard-code roles);
-      automatic + declinable, no safety roll; reuses M7 dogfight/breakthrough + §7.9.8 air stand. Triggers:
-      (a) reaction interception — transport helos (EmbarkedHelo), own turn, spotted, once/turn; (b) enemy-turn AIB —
-      all helos. Lose → transport disembarks Deployed at the INTERCEPT hex / attack helo damaged + efficiency hit,
-      stays. Reactive box (outside operative-flip); obeys one-AOB + everything-stops.
-- [ ] `LoiterReattack` rider (LOITER_PERSISTENCE) — CAS re-attack / extra-Opp hook in the action economy. Conditional
-      strike maluses (LOW_LEVEL_STRAFE / STANDOFF_PGM / HIGH_ALTITUDE_BOMBER) need the AD-interaction layer
-      (defender-GAT / altitude-vs-AD-type) — catalog Dormant until it exists.
-- [ ] Base-combat callers (M9 debt): ground-attack-on-base (forces OC 100 §11.7.2.5 + base return fire §7A.20);
-      air-displacement evac per the REVISED §11.7.2.4–.6 (see Bob's-eyeball flag above); destruction loses attached
-      aircraft §11.7.2.6; ZoC repair-lock; repurchase + 5-turn activation §11.7.2.7; bridge strike §11.7.3;
+- [ ] `AirOperationsBox` model + populate pipeline: order-time validation (slot pre-check, `CanLaunchSortie`,
+      CombatAction; RB pays CombatAction §8.5.2), arrival sequence §11.1.3 → off-map (icon + spotting
+      exclusion) + slot fill + type-flip via `AOBMissionResolver` + `OnAOBStateChanged` snapshot; pay-at-launch
+      BOTH sides (§11.1.8); cancel/end-of-turn = free auto-return, actions lost; one-AOB-at-a-time (§11.1.6);
+      WW pre-lock slot; AEWB 1/turn cap; per-sortie supply deduction.
+- [ ] Placement input (§24.7a.1): AOB button → box-on-cursor → Ctrl+left-click place; §11.1.9 AOB-Mode lockdown
+      (air-only input, SAVE DISABLED while a box is open, Esc never cancels a box); §24.7a.7 Resolve/Cancel row.
+- [ ] `ReactionWindowController` + §24.13 Phase Control Bar: per-arrival interception windows §11.1.8 — WW
+      arrivals excluded (bait-proof), 1 interceptor per window, decline loses that window only, dead
+      interceptor ≠ filled slot.
+- [ ] WW / SEAD orchestration (M10; damage primitive = `ResolveAirStrike(ww, sam)`): WW slot gate, per-SAM-shot
+      counter-fire, 1 OppAction/shot §11.1.2.3, `WildWeaselAlive` on strike lanes, firing SAM revealed Level 4.
+- [ ] Other AOB missions (M11): AAB airborne assault §11.12 · AEWB §11.13 (+1 Δ offensive lanes rest-of-turn,
+      symmetric, 1/turn) · SB air supply §11.9 (5-day load, Replacements rider §15.4a.4a, ferry-neutral refund)
+      · RB caller bits (per-tier sweep — see I8; HP application, CombatAction cost, no-defender auto-100%,
+      auto-return).
+- [ ] Helo AIB (M12, §11.8.10): 1 helo + 2 escort + 2 interceptor; helo defends on GAD; dual-phase economy
+      §8.5.1a (phasing pays Combat, reacting pays Opp — do NOT hard-code roles); automatic + declinable, no
+      safety roll; reuses M7 dogfight + §7.9.8 air stand. Triggers: (a) reaction interception vs transport
+      helos, own turn, spotted, once/turn; (b) enemy-turn AIB, all helos. Lose → transport disembarks Deployed
+      at the intercept hex / attack helo damaged + efficiency hit, stays. Reactive box; obeys one-AOB.
+- [ ] `LoiterReattack` rider (CAS re-attack / extra-Opp hook); conditional strike maluses (LOW_LEVEL_STRAFE /
+      STANDOFF_PGM / HIGH_ALTITUDE_BOMBER) need the AD-interaction layer — Dormant until it exists.
+- [ ] Base-combat callers (M9 debt): ground-attack-on-base (OC 100 §11.7.2.5 + base return fire §7A.20);
+      air-displacement evac per the REVISED §11.7.2 (Bob's-eyeball flag, Printer section); destruction loses
+      attached aircraft; ZoC repair-lock; repurchase + 5-turn activation; bridge strike §11.7.3;
       SAM-suppression SEAD §11.7.4; BM dual-targeting / un-interceptable routing §11.7.5.2/.3.
-- [ ] WW/TRN air-unit treatment in the ~7 hardcoded air/action checks (C1/C2 debt; WW opp-fire counts ✓ in §8.5.8).
+- [ ] WW/TRN air-unit treatment in the ~7 hardcoded air/action checks (C1/C2 debt).
+**Also gated here:** §5.13.4 Storm grounding + §5.13.3.3 fixed-wing no-deployment-change rule (currently an
+accident of empty bays, not a rule) — both land with the air walk; Storm additionally needs weather to exist.
 
 ### M14 — Leader-skill pass remainder (safe slice DONE 2026-07-03; rest gated on M13 hosts)
-**Gate & policy:** every leader effect is a MODIFIER on a combat/movement/supply primitive — wire only against locked
-hosts (this is the §7 neutralize-don't-rework policy's formal home). Prereq nodes are kept-and-neutralized, never
-deleted (`ValidateSkillTreeSystem` throws). Input register remainder: `ForeignTechnology_NVG` stays neutralize-keep
-(dormant until the night/weather pass); `Leader.HasNVG`/`NightCombatModifier` fields are harmless to leave.
-- [ ] Runtime `leader_skill_mod` ICM layer (§7.5.5.6, multiplier-effects only — stat bonuses moved to Δ-deltas):
-      RiverAssault ×1.4 (needs the contested-crossing geometry, M13), NVG asymmetry §21.5 (dormant), NBC zones §21.4
-      (not generated in v1), scenario mods. DEFERRED until a live consumer exists — no dead scaffolding (deliberate).
-- [ ] System-gating booleans into their (now-existing) hosts: Breakthrough (Armored T3 → M13 Automatic Advance),
-      ShootAndScoot + AdvancedTargetting (Artillery T2/T3 → indirect + economy; R-L2: +1 CombatAction gated ART/SPA,
-      2nd fire mission auto-consumes 1 supply), AirDefense T3 +1 OpportunityAction (→ AD opp fire), Airborne/AirMobile
-      post-jump/landing action retention (→ M11/M12), Engineering river/bridge/fort (§9.8.6/§14.9.3), SignalIntel
+**Gate & policy:** every leader effect is a MODIFIER on a combat/movement/supply primitive — wire only against
+locked hosts. Prereq nodes are kept-and-neutralized, never deleted (`ValidateSkillTreeSystem` throws).
+`ForeignTechnology_NVG` stays neutralize-keep (dormant until the night/weather pass).
+- [ ] Runtime `leader_skill_mod` ICM layer (§7.5.5.6, multiplier-effects only): RiverAssault ×1.4 (needs M13
+      contested-crossing geometry), NVG asymmetry §21.5 (dormant), NBC zones §21.4 (not generated v1), scenario
+      mods. DEFERRED until a live consumer exists — no dead scaffolding (deliberate).
+- [ ] System-gating booleans into their hosts as M13 lands: Breakthrough (→ Automatic Advance), ShootAndScoot +
+      AdvancedTargetting (→ indirect economy; R-L2 gated ART/SPA), AirDefense T3 +1 Opp (→ AD opp fire),
+      Airborne/AirMobile post-jump retention (→ M11/M12), Engineering river/bridge/fort, SignalIntel
       decryption/EW/pattern, SpecialForces infiltration/concealment/ambush.
-- [ ] EmergencyResupply UI (R-L3: once/scenario instant abstract 5-day delivery); DirectLineToHQ `ReplacementCost`
-      ×0.7 consumption (lands with the §18 economy); depot REP award wiring (R-L10 — `REP_PER_SUPPLY_DELIVERED` ✓,
-      lands with the §15.4a Resupply flow).
-- [ ] HQ/DEPOT-attached-leader facility skill map (§35.4.3 — R-L4 ratified: DEPOT gen +1 tier + SupplyPenetration via
-      PolCon, HQ natural intel skills, rest inert, SIGINT→M15). Wire when facility systems land.
+- [ ] EmergencyResupply UI (R-L3: once/scenario instant 5-day delivery); DirectLineToHQ `ReplacementCost` ×0.7
+      (host = the replacement/requisition flow — lands with P4/§15.4a; the wallet itself is live); depot REP
+      award wiring (R-L10, lands with §15.4a Resupply).
+- [ ] HQ/DEPOT-attached-leader facility skill map (§35.4.3, R-L4 ratified). Wire when facility systems land.
 - [ ] Per-skill EditorTest suite; `ValidateSkillTreeSystem` stays green through every re-home.
 
-### M15 — SIGINT reintroduction (REDEFINED 2026-07-24 — now the HQ sweep, see INTEL PASS I7)
-⚠ The old scope (a SpottedLevel bonus to friendlies within HQ projection range, §12.7.1) is **RETIRED** — that model
-made SIGINT a redundant long-range spotter, and the §12.3.6 "SIGINT-specialised 6/6" range entry died with it.
-- [ ] Reintroduce SIGINT as a property/mechanic on `CombatUnit` (NOT WeaponProfile). `SIGINT_Rating` enum is parked
-      in GameData, currently unreferenced.
-- [ ] The rating now gates the **map-wide HQ intelligence sweep** (§12.7): UnitLevel = no sweep, HQLevel = base
-      probability (prov. 15%), SpecializedLevel = higher (prov. 25%); +1 rung per success, ceiling L3, bounded by
-      RADIO SILENCE. Full item = INTEL PASS I7 above; this milestone is where it lands if not done sooner.
-- [ ] OPEN KNOB (§12.7.8): multiple HQs = multiple sweeps, or a 1-per-side-per-turn cap like AEWB. Prov. uncapped.
-- [ ] EditorTest the rating→sweep path incl. radio-silence exclusion; SpottingService regressions stay green.
+### M15 — SIGINT reintroduction (= INTEL I7; REDEFINED 2026-07-24 as the HQ sweep)
+⚠ The old scope (SpottedLevel bonus inside HQ projection) is RETIRED — with it died the §12.3.6 "6/6" range entry.
+- [ ] `SIGINT_Rating` onto `CombatUnit` (NOT WeaponProfile) — enum parked in GameData, unreferenced.
+- [ ] Rating gates the map-wide sweep (§12.7): UnitLevel none / HQLevel prov. 15% / SpecializedLevel prov. 25%;
+      +1 rung per success, ceiling L3, bounded by radio silence. Full item = I7 above.
+- [ ] OPEN KNOB (§12.7.8): multiple HQs = multiple sweeps, or 1-per-side cap like AEWB. Prov. uncapped.
+- [ ] EditorTests: rating→sweep path incl. radio-silence exclusion; SpottingService regressions green.
+
+### DOMAINS — D4 + naval N0–N3 (`todo_domains.md` §H is the plan; §I the editor relay list)
+D0–D3 CLOSED (see pass ledger). Remaining ladder:
+- [ ] **D4 — fixed-wing staging.** GATED ON M13/AOB — Bob 2026-08-11: "the mechanisms to run air missions are
+      not in the game yet." D2's fixed-wing half (1d6 detection, transit AD vs jets) stays play-unverified
+      until then; the code paths are suite-covered.
+- [ ] **N0–N3 — naval foundations → naval combat + sea clock → port heavy lift → supply hooks.** Designed from
+      Bob's five precepts; `FacilityType.Port` exists. Suite-verifiable but NOT playable until a coastal test
+      map exists (Khost has no water); N3 additionally ⛔ gated on §15 supply. ⚠ There is NO hex-by-hex sea
+      movement — §5.4.2.3 makes naval movement an instant port-to-port jump; do not add one.
 
 ### AI track → `Claude_AI_TODO.md`
-AI0–AI2b landed and wired (suites pending, see CURRENT STATUS). Next: AI3+ per the AI TODO (irregular doctrine ahead
-of the line manager for Khost). ⚠ AI2 snapshot serialization will bump `SAVE_VERSION`.
+AI0–AI2b landed, suites GREEN (2026-07-27). Next: AI3+ per the AI TODO (irregular doctrine ahead of the line
+manager, for Khost). ⚠ AI2 snapshot serialization still owed its own `SAVE_VERSION` ride.
 
 ---
 
@@ -878,308 +454,37 @@ of the line manager for Khost). ⚠ AI2 snapshot serialization will bump `SAVE_V
 
 ---
 
-## DONE — COMPRESSED RECORDS (full detail: change log, test suites, DesignDoc)
-
-**Weapon-rating migration (2026-06-15 → 06-18) — Phases 1–4 + W1–W8 + ICM relocation + GameData C1–C8, COMPLETE.**
-- Trait infrastructure `Models/CombatUnit/Traits/`: `ProfileStat` (17) · `WeaponTrait` (89) + `WeaponTraitCatalog` ·
-  `TraitEffect`/`TraitDef`/taxonomy · `TraitResolver` (band stats clamp [1,25], MMP/ranges/OL/STL floor 0; storedICM
-  clamp [MIN,MAX]) · `TankArchetypes` + `FamilyArchetypes` (14) + `ProfileDef`. All 177 profiles built via
-  `WeaponProfile.FromProfileDef`; ZERO legacy ctors. Source of truth for resolved statlines = the faction/factory
-  test suites (`WeaponProfileFactoryTests` + Soviet/NATO/Arab/Chinese/Class).
-- **Reusable reconciliation rules:** (1) archetype ≠ era label (T-72A/T-80B sit on Gen2); (2) NATO Gen3 publishes
-  SA 8 = archetype −1 per-unit Δ; (3) plain calibre traits add only OFF-NORM (standard gun is in the archetype);
-  (4) ICM is float-fuzzy — assert ±0.01.
-- Custom traits added: `ERA_RELIKT` · `ACTIVE_PROTECTION_HARDKILL` · `RECON_FRAGILE` · `SELF_PROPELLED` ·
-  `TRUCK_MOUNTED` · the §9b air-to-ground set (15) · `ACTIVE_RADAR_AAM` · `HIGH_OFF_BORESIGHT_IR`; new `Recon`
-  archetype; air-SR consts (Option A: base SR on air archetypes, recon/AWACS as deltas).
-- ICM relocated CombatUnit→WeaponProfile (was uniformly 1.0; combat reads `GetActiveWeaponProfile()?.ICM`).
-  NOTE: future *dynamic* per-unit ICM (suppression etc.) = a NEW transient layer on top, not a revival.
-- W-items: W1 `TargetClass` (+5 armored-car Hard overrides; lane axis reads it via `GetAttack/DefenseStatVsClass`) ·
-  W2 `TransportCategory` (embarked-slot validation deferred to a RegimentProfile touch) · W3 silhouette fully gone
-  (fields Phase 1 Step 0; the 3 leader consts + `Leader.SilhouetteReduction` deleted 2026-07-03) · W4/W6 verified
-  absent · W5 `ROCKET_ARTILLERY` salvo capability (Scud excluded, single-fire) · W7 GAT default 0 · W8 air-SR consts.
-- Phase 4: legacy capability bools removed (readers → `HasCapability`); ~95 dead GameData baseline consts removed
-  after a 123-const reader audit; `XLARGE_MALUS…XXXLARGE_BONUS` block deleted.
-- GameData C1–C8: `WW`/`TRN` classifications · `BattlePhase` → ratified §3.2 (10 values; the stale
-  `ProcessAdminPhaseDecay` name has since been renamed `ProcessSpottingDecay` ✓) · `BASE_MAX_HP 60` ·
-  `MaxDaysSupplyUnit 5` / `MaxDaysSupplyAirbase 30` / depot const retired / generation → %-of-cap ·
-  `SAVE_VERSION 3` · §8.5.8 action-economy rebalance (Opp no longer universal: AD 2 / FGT 1 / WW 3 / arty 1;
-  ROC 2×Combat; HELO no-entrench; HQ static; AWACS into the fixed-wing group).
-
-**Combat engine pure layers M0–M9 + M11-RB (2026-06-19 → 06-24) — ALL GREEN.** Seedable resolvers under
-`Models/Combat/` (details: Claude_Project §2.7): M0 dice/bands/consts · M1 `ResolveLane` (7-step §7.7.1) ·
-M2 stand/surrender/collapse + `RetreatResolver` displacement + `HexArc` · M3 `DegradationCheck` (§7.15 tables) ·
-M4 indirect + counter-battery + non-adjacent displacement · M5 ambush (ambusher keeps deployment mod — Bob's call)
-+ auto-flank · M6 pure slice (`HeloTransitStandCheck`, `AirAmbushCheck`, sortie consts + `CanLaunchSortie`,
-`ResolveAirDefenseFire` §7A.14 axes + GAT≥6 gate) · M7 `AirCombatEngine` (dogfight/breakthrough/stealth) +
-`AirStandCheck` · M8 `ResolveAirStrike` (DAMAGE-ONLY §11.6.1.6; cruise GAD-ignore; WW + embarkment band shifts) ·
-M9 `ResolveBaseAttack` (soft 60-HP, OC suppression + `STRATEGIC_OC_BONUS`, parked-aircraft roll) · M11-RB
-`ReconMissionEngine` (3-roll chain). M10 has NO pure gap (WW counter-fire = `ResolveAirStrike`). Rider consumers
-all live EXCEPT `LoiterReattack` + conditional maluses (→ M13). All remaining caller debt is consolidated in M13 above.
-
-**Orchestrators + input model (2026-06-26 → 07-06):** `GroundCombatAction.Execute` + `IndirectCombatAction.Execute`
-(validate → economy → resolve → degradation → displacement → outcome + REP); combat playable; ratified input model
-coded (AwaitingTarget deleted; ART/SPA/ROC/BM always fire indirect); `CursorController`; EventManager button
-contract final (5 added, 1 renamed, 2 retired); icon movement animation (`AnimateIconStep`/`SnapIcon`); deployment
-fog leak fixed + tilde debug cheat added (Cleanup).
-
-**M14 safe slice + leader arc (2026-07-03) — GREEN (LeaderSkillCombatTests 23 + all suites, Bob-run).**
-Rulings R-L1..R-L10 ratified & coded: EffectiveCommand (CC + training, cap 3) → command shock §7.9.4a + NEW Command
-Mitigation §7.7.12; §7.9.4b defender-command SV RETIRED (max stack 19→16); §14.13 Leader_mod (cap +3, derived
-internally by CombatResolver); doctrine +2 Δ-deltas class-gated (R-L9); ambush ladder 1.5/1.75/2.0 + NCO immunity;
-UndergroundBunker → Level-3 intel cap; SuperiorCamouflage → spotting −1; DirectLineToHQ → ReplacementCost ×0.7;
-depot REP const; REP earning wired (combat via GroundCombatAction ladder 3/5/8 + vet/elite mults, move at
-completion); `SyncFromSkillTree` desync fix (REP balance + CommandGrade track the tree); pre-existing
-branch-dead-end bug fixed (`IsBranchAvailable` blocked own deeper tiers). Design ratified same day: §14.14
-decorations, §14.15 pool/recruit/mortality, §24.5.5/.6 UIs (→ §9 above).
-
-**AI track AI0–AI2b (2026-07-07) — landed, suites pending.** `Models/AI/`: `Pmf` + `CombatOracle` (exact analytic
-mirror + drift guards) · `BoardAnalysis`/`MobilityMap`/`RegionGraph`/`ChokepointAnalysis` · `AvenueAnalysis` +
-`AmbushSiteCatalog` · `AIPerceptionState` (belief store, ghosts, decay, cheat-ladder dials) · SpottingService
-AI-side region · BattleManager ownership + AI_Refresh wiring. Design pass 1 done: 5 rulings ratified (Option-B
-honest spotting, scripted-only AI economy, hints-bias .aii, cheat-ladder mandate, IRREGULAR doctrine = v1 for Khost).
-
-**HexTile pass (2026-06-15):** parameterless-ctor serialization; + `HexControlLevel`/`IsDeploymentZone`/`IsBeachhead`/
-`IsPort` (Fort/Airbase/Port 3-way exclusive); manual-ctor border-set NRE fixed; reserve fields added.
-
-**Input control pass (2026-07-20):** input architecture documented (Claude_Project §3.6/§3.6b — dialog flow, focus
-gate, click chain, SEO table, division of labor); MovementController subscribe OnEnable→Start; right-click HUD
-block; stale Newtonsoft banner deleted; Claude_Project fully reconciled to the codebase.
-
-**Intel pass I1–I6 + I9 (2026-07-24 → 07-25) — GREEN + play-confirmed.** The §12 six-rung ladder in code:
-`SpottedLevel` 0–5 + `GetFullIntelReport()` (Full is not a rung); error constants MAX 16 / MODERATE 8 seeded by a
-stable FNV-1a over (UnitID, HP, bucket) with SpottedLevel deliberately excluded; 17 friendly / 6 coarse enemy
-buckets; §24.3.2 icon gating (dash <L4 / FUL-DEP-LOW @L4 / exact @L5, `UnknownIcon` at L1–L2); source-ceiling
-progression (passive 1/2/3, combat sets 4, ground IntelAction +1 to 5); graduated decay above a sustained floor;
-the `AIPerceptionState` mirror taking a floor MAP not an in-range set. NEW `IntelLadderTests` (20) + three suites
-updated. Remaining: I7 (HQ SIGINT sweep = M15) and I8 (RB tiers, blocked on the M13/AOB caller).
-
-**Printer pass P1–P4 + P7 + P8a (2026-07-25 → 07-27) — play-confirmed 2026-07-27.** The printer became the HQ
-dispatch feed (§24.8, MicroProse *Decision in the Desert* register): `PrinterControl` rewritten from the scrolling
-greenbar list to ONE message at a time on the CRT — history list + filtered-view cursor + one TMP, typewriter
-reveal at `Time.deltaTime * _charsPerSecond`, blinking cursor at rest, nav-press-during-reveal completes instead
-of navigating, `MSG n / N` readout, latest-indicator doubling as the unread flag, auto-size forced OFF in code.
-`PrinterMessage` rebuilt to the `12: Message from 3rd Tank Rgt` frame (the campaign date is GONE, which retired
-the day-level-date problem) + `Abbreviate` at render + `FlowIntoColumns` + `PrinterCategory`; turn injected via
-the static `TurnProvider` seam so no data class touches a lazy-creating singleton. Six Inspector-wired CRT buttons
-→ `DefaultDialog_Scene1.OnPrinter*Button` → EventManager (deliberately NO code `AddListener`). NEW static
-`PrinterDispatch` owns both the ratified §24.8.6 body text and the decision to print: three gates (A out of view /
-B attribution / C assessment) + a `Verbose` switch (OFF = report by exception, the design intent). Emitters live
-for every host that exists — ground + indirect combat both sides, ambush both directions, HQ unit-lost, objectives
-captured/lost, unit hardened, weather, first contact + intel rungs (L2–L5 verbose-only, turn-0 first contact
-suppressed). Panel model settled at three always-open panels (§3.6c/§4.3) after two rejected models.
-
----
-
 ## Cleanup / housekeeping
-- [x] **Dead hex-geometry constants in `GameData.cs` — ✅ DELETED 2026-08-03.** `GetVerticalSpacing()`,
-      `IsPointyTop`, `PixelScaleX`, `PixelScaleY`, `SpritePPU` — all five verified zero-caller repo-wide
-      (code, shaders, scene/prefab YAML) with no reflection anywhere in `Assets/Scripts`. `HexSize` and
-      `MapPPU` KEPT — `HexGridSystem.HEX_WIDTH` derives from both. Rationale recorded at the site and in
-      Claude_Project §3.5. ⏳ Needs a compile check (see ⚑ TESTING REQUESTS).
+
 - [ ] ⚠ **REMOVE BEFORE SHIPPING: the tilde (~) debug enemy-reveal cheat** (added 2026-07-06 at Bob's request).
-      `GameIconRenderer.DebugRevealAllEnemies` + its `Update()` poller + the two fog-filter bypasses — all marked
-      with "REMOVE BEFORE SHIPPING" comments. Rendering-only (SpottedLevel untouched).
-- **Repo tracks the WHOLE PROJECT as of 2026-07-27** (was code-only): `.gitignore` is now standard-Unity OPT-OUT,
-  3,745 files tracked (was 211), with 1,184 binaries in **Git LFS** (~236 MB). `.meta`, `ProjectSettings`,
-  `Assets/Scenes`, `Packages` and `Assets/Generated Data` are all in — so a clone can rebuild a working project,
-  and SEO / layers / Inspector wiring are backed up instead of living only on Bob's disk.
-  ⚠ **THE GENERATED CHUNK ARRAYS ARE DELIBERATELY EXCLUDED AND MUST BE REBUILT AFTER A FRESH CLONE:**
-  all three `Assets/Resources/Chunked/TerrainArray_<Theme>.asset` bakes (MiddleEast/Europe/China, ~289 MB
-  each — over GitHub's 100 MB hard limit; Europe + China first baked 2026-08-19) and `TestArray_RGB.asset`.
-  Rebuild via `Tools/Hex Chunk/Rebuild All Terrain Arrays`; a rebuilt asset gets a NEW GUID, so any
-  serialized reference to it needs re-pointing. ⚠ **LFS quota:** GitHub free tier is 1 GB storage + 1 GB/month
-  bandwidth — the current payload is ~24% of storage, and each revision of a changed binary adds more.
-  History rewritten 2026-06-15 via git-filter-repo (`python -m git_filter_repo`); any other local clone must be
-  re-cloned. `Assets/Tools/` is empty.
+      `GameIconRenderer.DebugRevealAllEnemies` + its `Update()` poller + the two fog-filter bypasses — all
+      marked "REMOVE BEFORE SHIPPING". Rendering-only (SpottedLevel untouched).
+- [ ] ⚠ **`AudioSettings.SaveSettings` builds a local `JsonSerializerOptions`** — violates CLAUDE.md item 10
+      now that the one sanctioned exception (`MapChecksumUtility`) is deleted. Route through `JsonPolicy`
+      (or add a third named policy if the settings format genuinely differs).
+- [ ] **`_to_delete/` review (Bob):** superseded courier/handoff files swept there 2026-08-20 (plus 13
+      zero-byte git-lock droppings from 08-13). Everything is in git history; delete the folder when ready.
+- **Repo tracks the WHOLE PROJECT as of 2026-07-27** (standard-Unity opt-out `.gitignore`; `.meta`,
+  `ProjectSettings`, scenes, `Packages` all in — a clone rebuilds a working project).
+  ⚠ **THE GENERATED CHUNK ARRAYS ARE DELIBERATELY EXCLUDED AND MUST BE REBUILT AFTER A FRESH CLONE:** all three
+  `Assets/Resources/Chunked/TerrainArray_<Theme>.asset` bakes (MiddleEast/Europe/China, ~289 MB each — over
+  GitHub's 100 MB hard limit; EU + CH first baked 2026-08-19) and `TestArray_RGB.asset`. Rebuild via
+  `Tools/Hex Chunk/Rebuild All Terrain Arrays`; a rebuilt asset gets a NEW GUID, so serialized references need
+  re-pointing. ⚠ **LFS quota:** free tier 1 GB storage + 1 GB/month bandwidth; payload ~24% of storage and each
+  binary revision adds more. History rewritten 2026-06-15 via git-filter-repo; older clones must be re-cloned.
 
 ---
 
 ## Change log
 
-**Rules:** one line per change · newest first · format `YYYY-MM-DD — imperative summary (area)` ·
-say *what* changed, not *why* (rationale lives in the design doc / gap analysis) · if it needs more
-than one line, it belongs elsewhere.
+> **Rules:** one line per change · newest first · format `YYYY-MM-DD — imperative summary (area)` · entries
+> older than the last two passes migrate to `Claude_TODO_Archive.md` when this section is pruned.
+> **Entries 2026-07-21 → 2026-08-19 (incl. the theme-art pass and everything before it) are in the archive.**
 
-- 2026-08-19 — THEME-ART PASS (Bob authored the full EU + CH sets; compile + all-suites + Khost regression GREEN): `CreateMapIcon` grew per-theme arms for all 9 (theme × icon type) pairs, and the SPRITE now also resolves before Instantiate with a second debounced warn-and-skip so an atlas-packing miss cannot orphan iconless GameObjects; SpriteManager +6 constants (EU_/CH_ × Sprawl/Fort/Airbase); `TextureArrayBuilder` China prefix `CN`→`CH` (the codebase-wide China prefix — a China bake would have found ZERO tiles and produced all-magenta); truth-restoring comment at `BASE_AIRBASE.IconProfile` — its `ME_Airbase` is UNREAD at render (AIRB short-circuits to the theme-agnostic `AirbaseStack_N` badges in `GetSpriteNameForUnit`), and it had already misled one audit into a wrong "airbase units render ME art on every theme" finding; fort facility units confirmed NONEXISTENT (zero `FacilityType` refs in CombatUnitDB — forts are tile infrastructure, themed via the map icon). Art landed: 18 themed map icons + all three nameplates packed in the Map Icons atlas; chunk tiles complete for all three sets (Europe Rough filled to 12, China 4×12); all three `TerrainArray_*.asset` baked (~289 MB each, gitignored by pattern). City icons, nameplates and terrain portraits needed zero code — already theme-wired. Import-compression audit: EU/CH tiles all uncompressed (an earlier compressed-EU warning was WRONG and is retracted); ME Forest + shared Any/Water+Marsh are CompressedHQ/BC7, which is the shipped ME look — left alone deliberately. EU/CH in-play verification is gated on the first non-ME scenario export (⚑) (HexGridRenderer, SpriteManager, TextureArrayBuilder, WeaponProfileDB comment, art + atlas + bakes)
-- 2026-08-17 — Prestige pass ADDENDUM (editor's post-close catch, verified + GREEN incl. the three Khost warnings showing in play): the §17.3 mirror loses its defeat rungs at a low starting share (shipped Khost s0 0.226 → all three mirrored cuts negative — every non-victory graded Draw, silently); NEW `BattleManager.AuditLadderReachability` names every dead rung at battle start, both directions (defeat cut ≤ 0 unreachable · victory cut ≤ s0 met-before-first-order), +4 `VictoryGradeTests`; knobs-freeze-in-flight consequence recorded at the SAVE_VERSION constant; courier Response5 (BattleManager, tests)
-- 2026-08-17 — Prestige pass Stages 3–5 CLOSE THE PASS (GATE 3 + final run GREEN, suites + play): §18.2 income live in player Upkeep (`BattleManager.ComputeIncome` — stipend + rate×held + high-water bonus; capture award + objective counters DELETED, `ReportStronghold*` ledger messages replace them, the dispatch drops its prestige line); V9 grading live in `CompleteBattle` (mirrored ladder + C1 no-scoring guard + C6 gate cap, full arithmetic logged) + V10 share-based auto-end + `OnEndScenarioButton` early finish (⚠ button unwired — Bob, Inspector); C6 BUILT — `MissionObjective` manifest list, `MapLoader.ApplyMissionObjectiveStamp` clear-then-stamp (out-of-bounds REFUSES, non-stronghold warns), `HexMapUtil.AllMissionObjectivesHeld`, both khost manifests seeded with the 12 legacy hexes (labels included); HS_DesignDoc amended (§4.7.2, §6.13.8, §17.1–17.5 rework, NEW §17.8 gate + §17.9 scenario end, §18.2 income model + tombstones); SAVE_VERSION 7 (wallet wiring + 2 anchors + 8 knob mirrors into ScenarioData, counter fields dropped, no arm, why-no-AI2b-3-ride recorded at the constant); 4 new suites — PrestigeIncome 6 / VictoryGrade 16 / MissionObjectiveGate 7 / PrestigePersistence 5 — + ScenarioManifest +4. Shipped Khost is SAFE and fully scored in placeholder state (1550 value / 36 hexes) (BattleManager, MapLoader, HexMapUtil, ScenarioManifest, GameDataObjects, SnapshotMapper, PrestigeWallet, MovementController, PrinterDispatch, manifests, tests, HS_DesignDoc)
-- 2026-08-17 — Prestige pass Stage 2 + 1b (`todo_prestige.md`, GATE 2 GREEN — suite + Bob PLAYED Khost): NEW derived `HexTile.IsStronghold` (cities/fort/airbase/port) keys all three `TerritoryService` flip exemptions; `isObjective` GAMEPLAY-DEAD (tombstoned, two UI readers, V15 rip trigger recorded); `ObjectiveCapture`→`StrongholdCapture` / `CapturedObjectives`→`CapturedStrongholds`; `RegionGraph` → `StrongholdCount` + ungated `VictoryValue` (AI-TODO sync note); all-objectives instant win RETIRED early (any 12 stronghold captures would have spuriously auto-won — interim: battles run to the turn limit until Stage 4); `Prefab_CityIcon` SV arm (V13); `CreateMapIcon` warn-and-skip w/ per-(theme,type) debounce, sprawl no longer falls through to ME art (V17); Stage 1b: `IsValid` refuses `requiredResult: Ongoing`, warns at `earlyFinishMultiplier` exactly 1.0 (Draw = defensive scenario ruling, C5); tests: TerritoryService+3 stronghold-truth suites, BoardAnalysis V4 rewrite, Manifest+3; courier `PrestigeVictory_Response2` + `Response3` (TerritoryService, HexTile, RegionGraph, MovementController, BattleManager, HexGridRenderer, prefabs, ScenarioManifest, tests)
-- 2026-08-17 — Prestige pass Stage 1 (`todo_prestige.md`, GATE 1 GREEN incl. Khost load-and-play): NEW `VictoryLedger` (recomputed, double-accumulated) + `PrestigeWallet` (V8 — AddPrestige finally credits the spendable balance; SpendPrestige → bool atomic) + `OnPrestigeChanged`; `ScenarioManifest` → parameterless ctor (16-param `[JsonConstructor]` DELETED, V11.1a) + 8 scoring/economy fields with two-state threshold validation; battle-start `CaptureStartingLedger` + upkeep recompute; MapLoader negative-victoryValue warn; NEW `MapFixtures` + 3 test suites (26); both shipped manifests gained placeholder scoring keys; courier `PrestigeVictory_Response_to_EditorAgent_2026-08-17.md` (V11.7 names + spec corrections C1–C3) (Models/Map, Models/General, BattleManager, EventManager, ScenarioManifest, MapLoader, tests, StreamingAssets)
-- 2026-08-14 — Census pass Block 7: design-doc amendments (§1a maneuver-formation scale, §10.7.1 EquipmentBays, §10.7.3 derived-bays table replacing ProfileType, §10.7.9 census doctrine ratified, §24.8.7.4.3 TRN-row-empty-by-rule) + `PrinterMessage` TRN comment + `Claude_Project` reconciliation + `Reply_CensusPass_2026-08-14.md` courier to the editor agent (docs)
-- 2026-08-13 — Census pass Block 6: `CensusIntegrityTests` 2→6 — carrier-clean / lift-empty / truck-empty / classification-coherence guards; name-based `CensusExempt` allow-list REPLACED by rules; pre-commit simulation caught + fixed Chinese Type 86 carrier (40 Type 59s → INF_REG_CH) and tankless FR mech base (+40 AMX-30, Bob-ruled) (tests + WeaponProfileDB)
-- 2026-08-13 — Census pass Block 5: rename `INF_REG_NL/BE/DK` → `INF_MECH_NL/BE/DK` while content-free (StreamingAssets grep zero); naming scheme recorded — INF_LEG_* foot / INF_MECH_* mounted, shipped names grandfathered (GameData + both DBs)
-- 2026-08-13 — Census pass Block 4: delete Iraqi 209-tank copy-paste line; Arab carriers → own-count (90), tanks to mech-paired bases IQ/IR +31; Lowlands bases +32/28/24 Leopard 1; `APC_M113_NATO` → 102 own; `MANPAD_RAPIER` fully retired (M109_UK/FV105 → `MANPAD_JAVELIN`, counts unchanged, enum member left census-unreferenced) (WeaponProfileDB)
-- 2026-08-13 — Census pass Block 3: GE/UK bases re-cut to Kampfgruppe/battle group (55–58 tanks, 1000–1100 men); UK token bugs fixed (recon `SPSAM_RAPIER_UK`→`RCN_FV105_UK`; UK SHORAD → new census-only `MANPAD_JAVELIN`, appended here not Block 5); carriers Marder 54 / Warrior 45 / VAB 135; cross-national deletes (GE Hawk, UK Vulcan); GE/UK mech bases +28 tanks; West towed art 72→54 single-calibre; FR division-as-counter — AMX30 census kept at 80, profile + template renamed Division, `SPA_M109_FR` profile renamed AUF1 (WeaponProfileDB + CombatUnitDB + GameData)
-- 2026-08-13 — Census pass Block 2: US bases re-cut to battalion task force (M1 base 58 tanks/1000 men; mech base 1100 + 28 M1); carriers M2 54 / M113 108 / LVTP7 45 own-only; UH-60 lift census emptied; ACR helos 26/12→8/8; AH-64 drops Personnel; AD comment muddle fixed; display names → US Armor/Mech Battle Group, template IDs unchanged (WeaponProfileDB + CombatUnitDB)
-- 2026-08-13 — Census pass Block 1: Soviet carriers → own-count-only (BMP/BTR 129, MT-LB/BMD 68); lift censuses emptied (Mi-8T, An-12, INF_AM's 166 Mi-8) per rule 4; MRR organic tank bn moved to base (`INF_REG_SV` +40 T-62A — de-facto INF_MECH_SV, rename blocked by shipped khost.oob); `INF_MAR_SV` +31 T-55A; Spetsnaz 2300→1200; towed art 72→48; helo regiments drop Personnel (WeaponProfileDB + CensusIntegrityTests exemptions)
-- 2026-08-13 — Add `NL_AIR_DEFENSE_REGIMENT` + `BE_AIR_DEFENSE_REGIMENT` (SPAAA / AirDefenseArea), both reusing the existing `SPAAA_GEPARD_GE` — the PRTL Cheetah is a Gepard turret on a Leopard 1 hull, so this is the `SAM_HAWK_US` precedent applied again, and it costs ZERO new tokens. ⚠ NOT flavour: `GameData.IsAirDefenseClassification` admits SAM/SPSAM/AAA/SPAAA only, so before this exactly ONE of the 14 Lowlands templates could put ranged §11.8 fire on a helicopter and the Belgian sector had none at all — and D2 transit air defence is the one air mechanic play-confirmed to work. Also differs tactically from Hawk, which is static (MMP → 0). Denmark still has none, deliberately, and is now the ONLY uncovered sector. ⚠ Per-nation SPA/RCN/SPAAA profiles were considered and REFUSED: the enemy intel view merges `ART+ROC → "guns"` and `SAM+AAA+AT → "AA"` (`EquipmentBays.cs:80-81`) and the split view is friendly-only, so for permanently-AI units those profiles would differentiate rosters the player can never see apart (CombatUnitDB)
-- 2026-08-13 — ✅ LOWLANDS UNIT-DB EXPANSION GREEN (Bob ran the suite). Add NATO's northern-sector contingents: 7 `WeaponType`s, 7 profiles in a new `CreateLowlandsProfiles()`, 16 templates across `CreateDutchForces`/`CreateBelgianForces`/`CreateDanishForces`. ⚠ SEVEN tokens, not the 18 the scenario editor's spec proposed, on the rule that a CENSUS BELONGS TO A PROFILE, NOT A TEMPLATE — so a nation earns its own profile only where that census is its brigade roster (armoured + mechanised), and artillery/recon/AD/air reuse `ART_HEAVY_WEST`/`RCN_FV105_UK`/`SAM_HAWK_US`/`FGT_F16_US`. All three Leopard 1s resolve to a stat line identical to `LEO1_GE`; national character lives in the census, the template ExperienceLevel and the icon's nationality. Denmark has no organic AD (Bob's ruling — makes the Danish sector the one needing cover); NL/DK Experienced, BE Trained. `NL_F16_FIGHTER_SQUADRON` is inert until M13/AOB. `APC_M113_NATO` was minted rather than reusing `APC_M113_US`, whose census carries 58 M1s/32 M2s/18 M3s. Also fixed `Symbol_Kuwait` `"KQ_Symbol"` → `"KW_Symbol"` (asset is `KW_Symbol.png`) and added `Nationality.KW` to both Arabic name arms in `NameGenService` (Claude_TODO, GameData, WeaponProfileDB, CombatUnitDB, SpriteManager, NameGenService)
-- 2026-08-13 — Add `CensusIntegrityTests` (2 tests, the first thing under Assets/Tests ever to reference `IntelReportStats`): every registered profile declares a non-empty census (allow-list `TRK_GEN_SV`/`TRK_GEN_ARAB`/`TRK_WEST`/`TRN_NAVAL`, which are equipment-less by design), and every census token classifies to a non-`None` bucket. ⚠ IT FOUND A REAL BUG ON ITS FIRST RUN: the Humvee's four `AddIntelReportStat` calls were written against `M113_US`, the variable from the block above. Two victims — `APC_HUMVEE_US` had no census at all (and it is the MOBILE bay of `US_AIRBORNE_BRIGADE` and `US_AIRMOBILE_BRIGADE`, so both contributed nothing from that bay to intel or loss reports), and because `AddIntelReportStat` ASSIGNS rather than accumulates, the stray lines rewrote the M113's census — spurious 58 M60s and 108 Humvees, own M113 count knocked 108 → 32 (latent: no template uses `APC_M113_US`). Fixed by retargeting the variable AND trimming the census to carrier-only; restoring it verbatim would have given two AIRBORNE brigades a 58-tank Patton battalion (WeaponProfileDB, CensusIntegrityTests)
-- 2026-08-13 — RULE on §7.2 carrier censuses: LEAVE `MARDER_GE` (58 Leopard 1s) and `WARRIOR_UK` (58 Challengers) as they are (Bob). NATO is permanently AI, so no player ever requisitions into those bays and the upgrade hazard that made it a defect cannot arise; a Panzergrenadier brigade with an organic tank battalion is good doctrine. `APC_M113_US` is the same shape and also untouched. ⚠ Revisit ONLY if NATO becomes player-controllable — recorded so the next audit does not re-open it (Claude_TODO)
-- 2026-08-04 — RATIFY the profile-slot rule (Claude_Project §3.2b): a regiment has three EQUIPMENT BAYS, not three loadouts. An empty bay is NORMAL — slots are Panzer-General-style upgrade targets the player buys into, so `mobileProfile: NONE` means "not purchased yet". Flags (`isMountable`/`isEmbarkable`/`profileType`) declare CAPABILITY; the WeaponType in a slot declares CONTENTS; runtime behaviour keys on CONTENTS, never flags — which is exactly what makes the upgrade path work with no special cases. `isEmbarkable: true` on nearly every ground unit is CORRECT (all ground units are naval-transportable, §5.4.2) and 35 templates were nearly "fixed" on that misreading. One hard invariant: a `TransportCategory != None` profile may occupy ONLY the Embarked bay. Also recorded: `CombatUnitDB` is the source of truth and a `.oob` is a SNAPSHOT — fixing a template does not fix an already-exported scenario (Claude_Project §3.2b)
-- 2026-08-04 — Phase 3b M3: teach the deployment state machine about airborne-only regiments. Add `RegimentProfileType.DEP_EMB_HELO`/`DEP_EMB_AIR` — their absence was the root cause, since "foot infantry whose only transport is airborne" was unrepresentable and the Mi-8 got authored into the Spetsnaz MOBILE slot, where the unit rode helicopters as its GROUND posture. Replace TryDeployUP's hardcoded override (AB/MAB by classification plus SPECF only when its embarked profile was literally TRN_AN8_SV) with the general rule: at Deployed, no ground-mobile profile but an embarked one, aim at Embarked. That also repaired the VDV Support Regiment, classified TANK, which matched neither hardcoded arm and could never board its own aircraft. Movement points now RESCALE across a posture change instead of carrying the absolute figure — a foot regiment with 2 of 4 points used to board helicopters and fly two hexes. Guard added in two places: a RegimentProfile warning at init and a MovementMediumTests assertion over every template. Fixed both khost .oob files by hand as a stopgap pending re-export (todo_audio M3)
-- 2026-08-04 — Phase 3b M1+M2: add `MovementMedium` (the fact the project never recorded — nothing distinguished an MT-LB from a BTR-70: same prefix, archetype, trait, upgrade path, MMP and equipment bucket) and `MovementModeService`, the single authority on how a regiment is moving right now. Family archetypes carry the medium where unanimous; FIVE mixed families carry none and state it per profile across 63 profiles. ⚠ M2 caught M1 shipping a silent-wrong default: Artillery/Aaa/Sam had `Foot`, true of the towed baseline they are named for, which made all 31 self-propelled guns sound like walking infantry — and the coverage test could not catch it because those profiles HAD a medium, just the wrong one. That is the argument for `None` over a plausible default, demonstrated within a day. Movement sound rebuilt on the active profile; the classification switch and the day-old "dismounted" patch both deleted; long-cut threshold now measures the real clip instead of a constant (todo_audio M1/M2)
-- 2026-08-04 — Wire audio Phase 3.1–3.3: movement one-shot (long cut from PREDICTED duration, §27.7.7), weapon fire, impact, kills, ambush, first contact, ZoC halt, out-of-MP, objective flips, select/deselect/facing, and `ButtonDenied` on all five refusal paths — placed at the §24.8.6 printer-emitter sites. Append 24 `SoundEffect` members (13 `Fire*` one per `WeaponSoundFamily`, 3 `Impact*`, 4 `UnitMove*Long`, ButtonDenied, UnitDestroyed, Objective captured/lost); fill in `GameAudio.SoundEffectFor`, which had every arm returning `None`; add `GameAudio.PlayImpact` and `GetMovementSFX(classification, predictedSeconds)`. Collapse the duplicated per-hex tween length to one `stepSeconds` — the movement clip is chosen from it. Three attribution rulings recorded in Claude_Project §3.7b: ambush → victim not ambusher, fire → firer / impact → target, PlayWeaponFire AFTER the firing reveal (todo_audio §4 Phase 3)
-- 2026-08-04 — Fix Audio Catalog Editor sluggishness: walk the entries array ONCE per GUI pass into a `RowInfo[]` cache instead of querying `SerializedProperty` per row while drawing (the old path did ~4 full scans per row plus one per sound in the header — O(sounds × entries) twice a frame, against the slowest API in the editor). Also hoisted `Enum.GetValues`/LINQ/enum `ToString()`, the warning GUIStyle, all GUIContents and the GUILayout option arrays out of the per-pass path (todo_audio 2.7)
-- 2026-08-04 — Add `Tools/Audio/Audio Catalog Editor` (`Assets/Editor/Audio/AudioCatalogWindow.cs`), a drag-and-drop catalog window driven by the SoundEffect ENUM rather than the existing rows, so unbacked sounds are visible instead of needing an audit run and a drop creates the row. Stray files are moved into `Assets/Audio/SFX/`, renamed to the `SFX_<Name>[_n]` convention and FORCE-reimported, because import settings are path-gated and a move alone does not re-run the importer. Mutations deferred to end-of-frame with file work completed before the catalog is touched. Inline variants, tuning, search, unbacked-only filter, duplicate/empty warnings; Scan Folder and Audit call the existing tools (todo_audio 2.7, Claude_Project §3.7b)
-- 2026-08-04 — ✅ AUDIO PHASE 2 CLOSED: `AudioSystemTests` (18 tests) GREEN, suite clean. Covers catalog lookup (tuning survives it, unmapped id false with a null out-param, every `SoundEffect` member silent against an empty catalog, all three no-usable-clip shapes, first-duplicate-wins, null row skipped, `Invalidate`), R4 variant selection (seeded, so deterministic), the D5 retrigger window (default off, boundary inclusive, PER SOUND not global, `Reset`, null/clipless entry) and the `GameAudio` never-lazy-creates guarantee. No AudioSources are created — `SfxPlayer` takes its sources by injection and the flat path books the timestamp regardless, which is the payoff of keeping `ShouldPlay` pure. One reflection point on the private `AudioCatalog.entries`, the same field name `AudioCatalogTools` finds via `SerializedObject`, asserted in `SetUp` so a rename reads as a rename. Testing request deleted per the queue-not-archive rule; todo_audio Phase 2 fully ticked and its stale ⏳ catalog-creation ask cleared (done 08-03). Phase 3 wiring is next and nothing gates it (todo_audio, Claude_Project §3.7b, Claude_TODO)
-- 2026-08-03 — ✅ AUDIO PHASES 1+2 CONFIRMED IN GAME (Bob): catalog created (6 rows), sounds play, "fast and responsive". Docs reconciled the same session — Claude_Project §3.7b REWRITTEN, because everything it said that morning (two play paths via `PlayUISFX`, negative caching, the `_sfxLoading` in-flight guard, the Awake preload) described machinery Phase 2 had since deleted; a section describing a system that no longer exists is worse than no section, and this one was ~10 hours old. Also corrected: the §1 directory tree, the large-files line (GameAudioManager 1,682 → 1,627), and todo_audio's decision D4, which had said "ONE play method" while the shipped facade has TWO — the ORIGINAL split (UI vs gameplay) did die with the load path exactly as D4 predicted, but a NEW split earned its place for a different reason (ungated `Play` vs fog-gated `PlayFrom`), and leaving the table asserting one method would have invited someone to "simplify" the gate away. Four PASSED testing requests deleted per the section's own queue-not-archive rule (AudioPolicyTests, Phase 0 latency, UI stacking re-test, GameData constant compile check). ⏳ STILL OWED: todo_audio 2.6 EditorTests for the catalog and retrigger window (Claude_Project/Claude_TODO/todo_audio)
-- 2026-08-03 — AUDIO PHASE 2: THE SFX RUNTIME LOAD PATH IS DELETED AND REPLACED BY A CATALOG. NEW `AudioCatalog` (ScriptableObject at `Assets/Resources/Audio/AudioCatalog.asset`) holding per-sound rows — id · **AudioClip[] variants** · volume · pitchVariation · minRetriggerSeconds — so adding a sound is drop-a-wav-add-a-row and TUNING NEEDS NO CODE CHANGE. NEW `SfxPlayer` (plain C# class, not a MonoBehaviour, owned by the manager so there is no extra scene object and no growth of an already-large file) and NEW `GameAudio` static facade. ⚠ **THE FACADE HAS TWO METHODS AND THAT IS WHAT ENFORCES R1**: `Play` for sounds no unit caused (UI, turn, weather) and `PlayFrom(id, source)` which runs the §27.7.4 fog gate, plus `PlayWeaponFire(unit)` which resolves the family through `WeaponSoundClassifier`. A single `Play` with an optional source would DEFAULT TO UNGATED, so forgetting the argument would leak an unspotted enemy through audio silently; two methods force the attribution question at every call site that has a unit. ⚠ `GameAudio` NEVER LAZY-CREATES — NEW `GameAudioManager.Existing` returns the instance or null, so playing a sound cannot construct a GameObject the way `Instance` does; audio is now safe to call from anywhere including headless tests. **DELETED**: `LoadSFX` · `SoundEffectFiles` · `_sfxCache` · `_sfxLoading` · SFX negative caching · `PreloadSFX` · `UiSoundEffects` · `PlaySFXCoroutine` · `TryPlayCached` · `EnsureSfxLoaded` · `PlayUISFX` · `PlaySFXWithVariation` · `SFX_UI_RETRIGGER_SECONDS` · `_lastSfxPlayTime` · `SFX_FOLDER` — every one of which existed ONLY to manage clips not being in memory, and all of which became unnecessary the moment Phase 1 made them imported assets with Preload Audio Data on. ⚠ **`PlayOneShot` REPLACES `clip=`/`Play()`**, which is a behavioural fix not a style change: one-shots MIX, so the old `source.Stop()` steal that truncated a sound mid-playback when the pool wrapped is gone, and overlap now layers as §27.7.7.2 requires. ⚠ **TWO SOURCE GROUPS**: pitch is a per-SOURCE property, so retuning a source warps any one-shot still ringing on it — UI sounds (pitchVariation 0) play on a dedicated FLAT source whose pitch is never touched and can never be detuned by a gameplay sound landing on top. ⚠ The retrigger debounce is now PER-SOUND DATA defaulting to 0 = OFF, reversing the global 50 ms added that morning: a blanket debounce suppresses legitimate audio (a double-click is two events). NEW `Tools/Audio/Create Or Update Audio Catalog` populates rows by filename convention `SFX_<SoundEffectName>[_n].wav` and NEVER overwrites existing tuning; NEW `Tools/Audio/Audit Catalog` reports unbacked members (INFO — the enum deliberately runs ahead of the audio), rows with no clip and duplicate rows (both WARNINGS — those look wired but are silent). Call sites repointed: `UIButtonAudio`, `PrinterControl`, `Scene1_Controller`; `Scene0_Controller`'s preload call deleted outright since import settings now do that job. ⏳ **BOB MUST RUN `Tools/Audio/Create Or Update Audio Catalog` ONCE** — until the asset exists every SFX is silent and `InitializeSfx` logs an error naming the fix (GameAudioManager/AudioCatalog/SfxPlayer/GameAudio/AudioCatalogTools/UIButtonAudio/PrinterControl/Scene0_Controller/Scene1_Controller)
-- 2026-08-03 — AUDIO PHASE 1: SFX ARE NOW IMPORTED PROJECT ASSETS, AND HOVER AUDIO IS GONE. Six wavs `git mv`'d from `StreamingAssets/Audio/SFX/` to **`Assets/Audio/SFX/`** (git recorded RENAMES, so history and LFS pointers survive). ⚠ THE OLD `.meta` FILES WERE DELETED RATHER THAN MOVED — a StreamingAssets meta is a `DefaultImporter`, and carrying it to a path where Unity must use `AudioImporter` would have brought the wrong importer type; nothing referenced these by GUID since StreamingAssets is path-based, so fresh GUIDs are harmless and the catalog that will reference them by GUID does not exist yet. Also removed the orphaned `StreamingAssets/Audio/SFX.meta` left by the emptied folder. ⚠ **THIS BREAKS THE "ALL SHIPPED CONTENT LIVES IN StreamingAssets" RULE DELIBERATELY**, recorded as NEW Claude_Project §7.1a with an explicit do-not-fix-it-back: the split is by ROLE, not folder — StreamingAssets keeps STREAMED content (music, ambience, and briefing narration, which is genuinely per-scenario per §20.4.2), while SFX are small, must be instant, are identical in every scenario and are triggered by code. A button click is not scenario content. What the move buys is the whole point: StreamingAssets files are NOT imported, so their format cannot be controlled and they can only be fetched at runtime, which is the sole reason the SFX path needed a cache, a negative cache, an in-flight guard, a preload step, a UI-vs-gameplay API split and a drop-if-not-resident rule — machinery that all DELETES in Phase 2 once clips are resident. ⚠ IMPORT SETTINGS ARE ENFORCED BY AN `AssetPostprocessor`, NOT A PRESET: NEW `Assets/Editor/Audio/SfxImportSettings.cs` stamps mono · PCM · Decompress On Load · Preload Audio Data ON · Load In Background OFF onto anything under `Assets/Audio/SFX/`, plus a `Tools/Audio/Reimport SFX With Ratified Settings` menu item for clips already in the project. A Preset has to be REMEMBERED and fails SILENTLY when it is not — the sound still plays, just late and at double memory — and with ~80 SFX still to author that is a defect waiting to happen 80 times. ⚠ **HOVER AUDIO DELETED (D6), not merely disabled**: handlers, fields, `PlayHoverSound`/`TriggerHoverSound`/`SetHoverSound`, the `_isHovering` latch, `OnDisable`, three now-unused `IPointer*Handler` interfaces, `SFX_ButtonHover.wav`, its filename mapping, its preload entry, and a `Scene0_Controller.PreloadSFX` call site that a grep caught and that would otherwise have been a compile error. `UIButtonAudio` is now a ~130-line click-only component implementing one interface. ⚠ **BUT THE ENUM MEMBER `SoundEffect.ButtonHover` STAYS AND THAT IS THE WHOLE POINT** — the enum is append-only because Unity serializes enum fields as INTEGERS, so deleting value 2 would shift MenuOpen 3→2 and MenuClose 4→3 and silently repoint every Inspector-assigned button sound in every scene; retired in place with a comment, and `ButtonClick` verified still 1 against the scene YAML. ⏳ **KNOWN WINDOW: SFX ARE SILENT UNTIL PHASE 2** — the loader still reads StreamingAssets, so every SFX now misses. Thanks to the morning's negative caching that degrades to SILENCE with one log line each, not per-call error spam (Claude_Project/todo_audio/GameAudioManager/UIButtonAudio/Scene0_Controller/SfxImportSettings)
-- 2026-08-03 — MOVEMENT + HIDDEN-SOUND DECISIONS RATIFIED (DesignDoc §27.7.6–§27.7.9), closing the audio design. ⚠ **MOVEMENT IS A ONE SHOT, NOT A LOOP** (Bob) — one sound fires per move and plays out; nothing stops it on arrival, interruption or death, and OVERLAP IS DESIRED rather than tolerated ("lots of tracks grinding with bangs and booms is an asset"). §27.7.2's "movement LOOP clip" is superseded. ⚠ CONSEQUENCE THAT SIMPLIFIES THE WHOLE BUILD: ambience and music already own their own channels, so with movement one-shot **no looping SFX exist anywhere**, R3's handle-API requirement DISSOLVES, and the Phase 2 facade stays a single fire-and-forget `Play` with no handles to leak. ⚠ BUT THE RISK ONLY MOVED, and the doc records it so nobody "simplifies" it back: one clip length cannot serve a 3-hex mountain crawl (0.5 s) and a 24-hex helicopter transit (4.3 s) — longer clips fix long moves and OVERHANG short ones (a 2 s tracked clip on a 0.5 s move leaves 1.5 s of engine running after the unit stopped). Resolved as a STANDARD clip (~1 s) per movement type plus a LONG clip for the four types that can outrun it, selected from the PREDICTED move duration, which is known before the move begins so the choice is deterministic and belongs in `GetMovementSFX`. ⚠ MEASURED RATHER THAN GUESSED, and it reframed the problem: it is not "long moves" generically but THE AIR LAYER, because ground units spend MP against terrain cost while air pays a flat 1 MP/hex and ignores it — Foot (MMP 4) 0.7 s · Wheeled 1.8 s · Tracked 1.8 s · **Helo (MMP 24) 4.3 s** · Jet bounded by MAP WIDTH not its 100 MP at ~2.6 s. On Khost's mountains a 10-MP tank actually moves THREE hexes, so ground was already fine. ⚠ **HIDDEN MOVEMENT IS SILENT AND UNPACED** — an unspotted enemy is invisible and silent, so its move resolves INSTANTLY; only SPOTTED moves are animated, sounded and paced, which bounds AI-turn length by how much of the enemy the player can SEE rather than by the AI's unit count, and degrades gracefully with reconnaissance quality. Spacing recorded as an M13 turn-loop concern (space from the END of the previous move, ~0.4 s provisional; a fixed 2 s cadence would add ~1.1 s of dead air after a typical 0.9 s move). ⚠ **AUDIO HAS TWO ROLES** (§27.7.6) — CONFIRMATION vs REPORT — and the §24.8.2.1 three-gate test governs REPORTS ONLY; demanding a click "earn its slot" against printer criteria is a category error, correcting my own earlier framing. ⚠ **HIDDEN FIRE NEEDED NO CHANGE — IT WAS ALREADY RATIFIED**: §7.13.5.4 reveals a firing battery +1 rung min Level 1 ("located, not identified"), §12.4.9.1 reveals opportunity/AD fire at Level 4, direct combat already sets both participants Level 4 in code, and BM is covered as indirect. Bob's instinct matched the existing design exactly; the only audio cost is an ORDERING requirement — apply the reveal BEFORE gating the gun sound, or the sound is suppressed by a level that is about to change. §6.10 air ambush SURVIVES (Bob clarified: reveal-on-firing, not no-ambush), so `AirAmbushCheck` is untouched. "Sound reports" as dispatches PARKED (§27.7.9) — nearly free since `PrinterDispatch` exists, but it reveals unspotted units and is therefore a FOURTH intel channel needing its own rung under §12.10 (Claude_TODO/todo_audio/HS_DesignDoc)
-- 2026-08-03 — AUDIO R1 + R2 RATIFIED AND BUILT. NEW `HammerAndSickle.Audio` namespace (`Assets/Scripts/Audio/`) holding pure, headless-safe POLICY with no Unity types: `AudioFogPolicy` + `WeaponSoundFamily`/`WeaponSoundClassifier`, covered by NEW `AudioPolicyTests`. ⚠ **R1 — SOUND IS THE THIRD INTEL CHANNEL AND WAS THE ONLY UNGATED ONE.** The icon is gated (§24.3.2) and dispatches are gated (§24.8.3); audio was not, so an unspotted enemy's tank-gun report would have told the player there is a tank there — a leak that BYPASSES the §12 ladder rather than bending it, same species as the movement-range-overlay leak still queued for testing. Ratified §27.7.4: a Player-side source is always audible, an AI-side source iff `SpottedLevel >= Level1`. ⚠ ATTRIBUTION IS THE MECHANISM AND IT REMOVES THE NEED FOR A "GENERIC SUBSTITUTE SOUND": the FIRING sound belongs to the firer and the IMPACT to the target, so an unseen battery shelling a player regiment produces NO gun report and a FULL impact — the player hears themselves being hit without learning what hit them, which is exactly §24.8.2.1's gate-B attribution case the printer already files a dispatch for. ⚠ THRESHOLD IS LEVEL1 *BECAUSE* §24.3.2.1 ALREADY SHOWS UNIT ART FROM LEVEL1 — the sound leaks nothing the icon has not, which is what keeps audio a SINGLE threshold instead of growing a six-rung ladder of its own. ⚠ NO AI MIRROR — deliberately the one §12-adjacent rule that is one-sided, since the AI does not listen; recorded so nobody "fixes" the asymmetry against §12.9. ⚠ FAILS CLOSED on a null source, deliberately the opposite of `IsScreenPointOverUI` which fails OPEN and shipped a live defect: a missing sound is cosmetic, a leaked one is exploitable. ⚠ PROXIMITY HEARING REFUSED IN ADVANCE (§27.7.4.4) — "you'd realistically hear tanks next door" reveals unspotted units BY POSITION, and §6.9.0 makes ambush load-bearing on unspotted ambushers with IRREGULAR ambush-web as the ratified v1 AI. ⚠ **R2 — FIRE SOUNDS MAP BY FAMILY, NEVER PER PROFILE** (§27.7.5): 177 profiles collapse to 14 families, unarmed classes (AWACS/TRN/RCNA) to None. ⚠ THE CLASSIFIER CLASSIFIES NOTHING ITSELF — it maps `RegimentProfile.ClassifyWeaponType`'s output, the single prefix classifier already shared by the intel report and the §24.8.7 loss report, so audio can never call something a tank that the loss report calls an AFV; that is the discipline P6 established rather than copying the prefix list, and a test asserts the agreement over EVERY `WeaponType`. The `FamilyFor(CombatUnit)` overload resolves through the ACTIVE profile since a regiment fires different weapons by posture (§9.10.4). NEW DesignDoc §12.10 names the three intel channels so any future revealing surface must declare its rung before shipping. ⚠ POLICY ONLY — NOTHING ENFORCES IT YET, because the Phase 2 facade that will call it does not exist; Phase 2 must ship an UNGATED `Play` for UI/turn/weather plus a SOURCE-TAKING overload for unit-caused sounds, or R1 is decorative. ⚠ Two weapon-type names in the first draft of the tests (`TANK_T72A`, `IFV_BMP2`) were GUESSES and did not exist — real members carry a nationality suffix (`TANK_T72A_SV`, `IFV_BMP2_SV`); caught by checking every identifier against `GameData.cs` before claiming done (Audio/AudioPolicyTests/HS_DesignDoc/Claude_Project/todo_audio)
-- 2026-08-03 — AUDIO REBUILD PLANNED + PHASE 0 (LATENCY) DONE. ⚠ THE DELAY WAS NEVER IN THE CODE: measured, a button click cost ~137–160 ms, of which ~114 ms was LEADING SILENCE BAKED INTO THE WAV and ~23–46 ms was the DSP buffer sitting at 1024 ("Best performance"). Two correct code fixes earlier the same day could not have touched either. Bob set DSP Buffer Size → Best latency; the agent trimmed the lead-in from 5 SFX. ⚠ THE FIRST MEASUREMENT WAS WRONG AND RE-MEASURING MATTERED: a −46 dBFS threshold read ButtonClick's onset as 114.5 ms, −60 dBFS read it as 56 ms, and only the ENVELOPE settled it — flat at −70…−55 dBFS for 110 ms then vertical to −1 dBFS in the final 15 ms, i.e. a NOISE FLOOR rather than a designed swell. Had it been a slow attack, trimming would have destroyed the sound. Cut at (first sample above −50 dBFS) − 5 ms pre-roll so no attack edge is clipped; verified afterwards that format is unchanged on every file and **the retained audio is byte-identical to the original tail**, so provably only leading samples were removed. ButtonClick 298.5→189.2 ms (−109.3), snare −55.3, RadioButtonClick −31.2, MenuOpen −17.4, MenuClose −13.4; PrinterTick had no lead-in; ButtonHover skipped because D6 deletes it and rewriting a doomed binary spends LFS quota for nothing. ⚠ HOVER AUDIO IS OUT (Bob): `enableHoverSound` now defaults FALSE and `hoverSound` to None, and the whole hover path is scheduled for DELETION rather than left disabled — a switched-off-but-present option is the same "looks wired, does nothing" trap as the commented-out handler found that morning, and `UIButtonHoverScale` already gives hover feedback visually. NEW `todo_audio.md` carries the rebuild design with the agent holding the decisions (Bob's call): SFX leave StreamingAssets to become imported project assets, which deletes the ENTIRE runtime load path (cache, negative cache, in-flight guard, preload, the UI-vs-gameplay API split, drop-if-not-resident) because all of it existed only to manage clips not being in memory; a `SoundEffect`-keyed ScriptableObject `AudioCatalog` becomes the authoring surface so tuning needs no code change; `SfxPlayer` uses `PlayOneShot` (mixes rather than replaces, killing the `Stop()` steal that truncates sounds) with a dedicated FLAT source for pitch-variation-0 sounds so a UI click can never be detuned by a gameplay sound landing on the same source; and a non-lazy-creating `GameAudio` static facade kills the `.Instance`-spawns-a-GameObject trap for good. ⚠ The 50 ms global debounce added that morning is REVERSED — it becomes per-sound data defaulting to OFF, since a global one suppresses legitimate audio (double-clicks, several units firing) and was a band-aid for stacking whose real causes were duplicate loads and the 114 ms head. Music/ambient/briefings stay in StreamingAssets untouched — the split is by ROLE, not folder (todo_audio/UIButtonAudio/StreamingAssets/Claude_TODO)
-- 2026-08-03 — UI AUDIO LATENCY/STACKING FIXED (Bob's play-test: sweeping the Scene 0 menu produced delayed clicks that then played the whole queue). ⚠ ROOT CAUSE WAS A MISSING IN-FLIGHT GUARD, not the pool and not the volume: `_sfxCache` only gains a key when a load COMPLETES, so during the multi-frame `UnityWebRequest` it still answered "not loaded" — and `PlaySFXCoroutine` responded by starting ANOTHER load. Sweeping seven buttons before the first fetch returned issued SEVEN concurrent requests for `SFX_ButtonHover.wav`; they completed together and each then called `Play()`, which is precisely "delayed, but still plays the whole queue". The negative-caching change earlier the same day did not cover this: it caches FAILURES, and these loads all eventually succeeded. THE REAL LESSON: load-on-demand is the wrong model for pointer-triggered audio, and no amount of pool tuning fixes it. FIVE CHANGES, all small and interlocking: (1) NEW `_sfxLoading` in-flight set, maintained by `LoadSFX` in a **try/finally** — legal around `yield return`, unlike try/catch — so every exit clears it including a scene-change coroutine stop; ⚠ a leaked flag would make that effect PERMANENTLY silent, since the waiter loops forever and `EnsureSfxLoaded` refuses to retry. (2) NEW `TryPlayCached`, now the ONLY place a SFX source is configured and started, so pool allocation/volume/pitch/debounce bookkeeping cannot diverge between paths; both public methods try it FIRST, so a resident clip now plays SYNCHRONOUSLY in the calling frame with no coroutine at all. (3) NEW `PlayUISFX(sfx, volumeScale)` — the fast-response path Bob asked for, and deliberately NOT PlaySFX with different defaults: it NEVER loads on demand (drops the sound instead, because a tick arriving 200ms late reports the WRONG button) and DEBOUNCES per effect at 50ms (two identical UI sounds in one instant are a stack, not two events). Gameplay callers keep the old semantics — if combat asks for a sound it should play even if that means loading, and twice means twice. (4) `UiSoundEffects` preloaded in `Awake` — this is what EARNS PlayUISFX the right to drop, and it finally gives the long-dead `PreloadSFX` a caller; `UnloadUnusedAudio` re-warms the same set, ⚠ without which it would silently break UI audio (first hover/click after any unload silent) — that also makes the method match its own summary, which always claimed it kept common UI sounds cached. (5) `PreloadSFX` routed through `EnsureSfxLoaded` so preloading something already mid-load cannot itself duplicate a request. `UIButtonAudio` click + hover both moved to `PlayUISFX`. ⚠ The printer tick was checked and deliberately LEFT on `PlaySFXWithVariation`: it fires once per MESSAGE, not per character (`_charsPerSecond` 120 would have made a 50ms debounce eat it), so it is not latency-critical and must not be debounced. Claude_Project §3.7b rewritten around the two-path model (GameAudioManager/UIButtonAudio/Claude_Project/Claude_TODO)
-- 2026-08-03 — AUDIO SYSTEM PREPPED FOR THE SFX PASS (three small fixes + first documentation). ⚠ THE ONE THAT MATTERED: every `Load*` in `GameAudioManager` now NEGATIVE-CACHES — it writes a null into its channel cache on failure. Before, a failure wrote nothing, so the caller's miss path re-ran IN FULL on EVERY call: a fresh `UnityWebRequest` against a file that is not there PLUS a fresh `AppService.HandleException`. With 17 of the 24 mapped `SoundEffect` members having no wav on disk, wiring (say) `UnitSelect` would have meant failed IO and a logged exception ON EVERY UNIT CLICK. Now the first attempt logs once and every attempt after is a silent no-op — which is what makes it safe to wire call sites AHEAD of the audio being authored, the whole point of the enum running ahead of the files. Zero consumer changes needed: all four `Play*Coroutine`s already read the cache and bail on a null clip, and `UnloadUnusedAudio`/`ReleaseAllResources` only `Clear()`, so nulls are never dereferenced and a clear gives a clean retry once the file lands. ⚠ BRIEFINGS FLAGGED NOT CHANGED: their two failure branches still report through `HandleException`, but DesignDoc §20.4.2 ratifies that narration is campaign-scenario-only and an ABSENT asset is the NORMAL standalone case, never an error — so that path eventually needs to be a clean no-op. Left alone deliberately because `PlayBriefing` has zero callers today, so the semantics are moot until narration is wired and the right shape (silent-absent vs warn-on-corrupt) belongs to that pass. ✅ HOVER SOUND RE-ENABLED — `UIButtonAudio.OnPointerEnter`/`OnPointerExit` had their bodies COMMENTED OUT, making the entire "Hover Sound Settings" Inspector block inert while all 7 menu buttons had `hoverSound` assigned and `SFX_ButtonHover.wav` shipped: silent but configurable, which reads as wired. Restored, plus a NEW `OnDisable` clearing the `_isHovering` latch — uGUI does not raise `PointerExit` on an object switched off under the cursor, so a button hidden mid-hover (overlay opening over the HUD) would have come back stuck and stayed silent. ✅ TYPO FIXED: `MeduimSnareDrum` → `MediumSnareDrum` (enum + mapping + `Scene1_Controller`). ⚠ SAFE ONLY BECAUSE RENAMING IS — Unity serializes enum fields by INTEGER VALUE (`clickSound: 1` in the scene YAML), so a rename is free but an INSERT OR REORDER would silently repoint every Inspector-assigned button sound in every scene and prefab with no compile error. `SoundEffect` is now marked APPEND-ONLY at the declaration; same species as the persisted-enum rule (CLAUDE.md item 11) with scene YAML as the payload instead of saves. NEW Claude_Project §3.7b documents the system end to end — the five channels, the 10-source stealing SFX pool, StreamingAssets + UnityWebRequest loading, wav-for-SFX/ogg-for-everything-else, negative caching, append-only, and that `UIButtonAudio` uses `IPointerDownHandler` NOT `onClick` so button audio is orthogonal to the §3.6b wiring contract. ⚠ RECORDED AS OPEN, NOT FIXED: all audio is 2D (`spatialBlend` never set, no AudioMixer — positional combat audio is a feature, not a setting); `GetMovementSFX(classification)` is complete with ZERO callers; `UIButtonAudio` is on 7 MainMenu buttons and NONE in BattleScene, so the whole battle HUD is silent (Bob's Inspector work); `SaveSettings` builds a local `JsonSerializerOptions`, violating CLAUDE.md item 10; and `audio_settings.json` lives in `Application.persistentDataPath`, a third write location outside the Documents saves+logs pair (GameAudioManager/UIButtonAudio/Scene1_Controller/Claude_Project/Claude_TODO)
-- 2026-08-03 — FIVE DEAD GEOMETRY CONSTANTS DELETED from `GameData.cs` after a research pass (Bob asked for a call, not a flag): `GetVerticalSpacing()`, `IsPointyTop`, `PixelScaleX`, `PixelScaleY`, `SpritePPU`. Verified zero-caller repo-wide across code, shaders and scene/prefab YAML, with no reflection anywhere in `Assets/Scripts`; `HexSize` and `MapPPU` KEPT, since `HexGridSystem.HEX_WIDTH = HexSize / MapPPU` derives from both. ⚠ THE CASE AGAINST `GetVerticalSpacing()` IS NOT "UNUSED", IT IS "ACTIVELY HARMFUL": it returned the row-spacing ratio in PIXELS (221.7) against `HexGridSystem.VERTICAL_SPACING`'s WORLD UNITS (2.217), so the two correct-looking spellings of one dimension differed by 100×; git blame shows it was still being MAINTAINED — commit 34ce669 (chunk renderer + HexTile rework) corrected its formula from `0.75` to `√3/2`, i.e. someone spent effort fixing a number nothing reads — and its ORIGINAL `0.75` form is provably the source of the wrong `VERTICAL_SPACING 1.92 (HexSize × 0.75)` in DesignDoc §4.2.1, which survived until it was corrected earlier today. That is the `MapChecksumUtility` failure mode exactly: dead code that reads authoritative, feeds a false claim into a doc, and the doc then shapes a plan. ⚠ `SpritePPU = 256` was additionally FALSE, not merely dead — a PPU survey of all 935 PNG `.meta` files under `Art/` + `Resources/` returned 931 at **100 PPU**, and the four at 256 are two ocean textures and two UI icons, no hex art whatsoever. ⚠ `IsPointyTop` was a `const bool` nothing branched on, advertising a flat-top mode that categorically cannot exist — both direction-offset tables, `HexChunkMeshBuilder`'s Voronoi corner derivation and every hex asset are hard-committed to pointy-top odd-r, so orientation is a rewrite, not a flag. `PixelScaleX`/`PixelScaleY` were the multiplicative identity with no semantics. The surviving block carries a DO-NOT-RE-ADD note naming the trap. Docs reconciled: Claude_Project §3.5, DesignDoc §4.2.1.4 + new §4.2.1.5. ⏳ Compile check queued in ⚑ TESTING REQUESTS — the agent cannot run Unity (GameData/Claude_Project/HS_DesignDoc/Claude_TODO)
-- 2026-08-03 — DOC-DRIFT PASS, no code changed: five contradictions found while priming on Claude_Project + Claude_TODO + HS_DesignDoc, all fixed at Bob's direction. (1) **TWO SCENES, RATIFIED** — `SceneID { MainMenu = 0, BattleScene = 1 }` and there will be NO scene per mission; both the stale `Scenario_Khost=1, Campaign_Khost=2` lines are corrected (Claude_Project §11, DesignDoc §24.1.1), each now stating why — a scene per scenario does not survive 25–30 missions and `Campaign_Khost=2` was a live `LoadSceneAsync(2)` crash against two-scene build settings. (2) **DesignDoc §24.8.7.4 said "the ledger does not exist"** when P5/P6 shipped and were play-confirmed 07-28; rewritten to the built state (TakeDamage hook + why not "after combat", HP-removed not damage-requested, the surrender exception, the shared `ClassifyWeaponType` rollup) with the two things still owed split out — save/load persistence + its SAVE_VERSION bump, and the `BattleManager.RecordPlayerUnitLoss`/`RecordAIUnitDestroyed` stubs that are now a second home for the concept. Its SAMPLE REPORT also showed five rows, omitting AFVs, contradicting the ratified six-row list directly beneath it. (3) Reactive-facing cost contradicts itself three ways (§5.8.8.1/§8.5.5 say FREE, §5.8.8.3/§8.2.5/§8.3.6 still charge an OpportunityAction) — **SHELVED by Bob**, folded into the coming movement/cost pass. (4) DesignDoc §5.15 still listed `AwaitingTarget`, deleted 2026-07-06 with the order-confirmation model. (5) **THE TERRAIN IS BUILT IN CHUNKS AND THE DOCS STILL CALLED IT A POC** — Claude_Project §3.5c rewritten from code: driven from `SetupBattleManagerData` (null-tolerant), `Dictionary<(cx,cy)>` not a flat list, `SetActiveTerrainSet`/`RebuildChunk`/`Rebuild`/`BindTerrainArray`, the shader-live vs builder-rebuild knob split, wymix variant hash with a seed, corner offsets DERIVED from `HexGridSystem` at static-init so the mesh cannot drift from `HexToWorld`, and the draw split (chunks = terrain surface, HexGridRenderer = everything above it, no terrain layer). (6) **GEOMETRY HAD THREE PUBLISHED SPELLINGS, TWO OF THEM BAD:** DesignDoc §4.2.1 said `VERTICAL_SPACING 1.92 (HexSize × 0.75)` — the FLAT-TOP quarter-height formula, wrong for a regular pointy-top hex — corrected to the real 2.56 / 2.217 / 2.956 set with the ~13.5% square-canvas art consequence; and `GameData.GetVerticalSpacing()` returns the same ratio in PIXELS (221.7) with ZERO callers, as do `PixelScaleX`/`PixelScaleY`/`SpritePPU` — all four logged as deletion candidates under Cleanup rather than deleted. ⚠ ALSO FIXED, found en route: DesignDoc §12 had NO `## 12.` heading at all — it ran on from 11.13.9, so the most cross-referenced section in the document was invisible to any heading scan; and §27.2.2 was an ART SPEC overstating the ask, since MinorCity/MajorCity/Impassable fall back to Clear and are overlay-only, so the real dependency is **72 tiles, not 108** (the array stays 108 slices because it is sized off the enum). §31.3 gained the two-renderer draw split and the layer-7 render-pass note (Claude_Project/Claude_TODO/HS_DesignDoc)
-- 2026-07-28 — ✅ DEPLOY UP/DOWN CONFIRMED IN PLAY (Bob) — buttons wired, deployment changes correctly in game with the unit's map art following the state, and the two new click-through panels stop the order panels leaking clicks to the map. Shipped behaviour recorded in Claude_Project §3.6e (button callback inventory, the controller-not-model raise rule, the redraw-not-badge rule, and the `CanChangeToState` action gate) and the six-slot click-through list in §3.6b. ⚠ NEXT SESSION IS A ROUGH-EDGES PASS on the battle scene (Bob's call, 2026-07-28) — consolidate before building more functionality.
-- 2026-07-28 — ✅ DEPLOY UP/DOWN SUITE GREEN (Bob) + two NEW click-through slots on `DefaultDialog_Scene1`: `_unitOpsPanel` and `_battleOpsPanel`, added to the `_panels` hit-test array AND to `WarnOnUnassignedPanels`. ⚠ Both are needed because an unlisted panel FAILS OPEN — clicks pass through it to the map, and a right-click reaching the map is a MOVE ORDER issued under the panel the player thought they were pressing (the same defect that went unnoticed for four days in July). Bob assigns both RectTransforms in the Inspector. ⚠ FOUR TEST FAILURES EN ROUTE WERE MINE, one cause: the five-argument `CombatUnit` ctor installs NO weapon profiles (only the eleven-argument one calls `InitializeRegimentProfile`), so a completing transition threw in `UpdateMovementPointsForProfile` — "No active weapon system profile available". The tell was WHICH tests failed: all four were the SUCCESS cases, while the five refusal cases passed because they return before reaching the cost step, so a profile-less fixture exercised half the suite perfectly and broke the other half. Fixed by installing `WeaponType.INF_REG_SV` the way the combat suites do. Also hardened `DeploymentAlsoCostsSupplyAndMovement`, which asserted `Current < Max` — but a transition RE-MAXES movement points from the newly active profile, so Max is a moving target and the assertion turned on profile MMP rather than on the cost; it now compares against the pre-transition current. LESSON: trace the SUCCESS path's full call chain when writing a fixture against unfamiliar model code, not just the validation gates being asserted on (DefaultDialog_Scene1/DeploymentActionTests/Claude_TODO)
-- 2026-07-28 — DEPLOY UP/DOWN WIRED END TO END (D1–D6), and D1 was a REAL DEFECT not just plumbing: `CanChangeToState` gated on same-state, destroyed, unit-type, critical supply, StaticOperations and movement points but NOT on having a `DeploymentAction` left, while `ApplyDeploymentTransitionCosts` decremented one unconditionally — so a unit could dig in and un-dig every turn for free. ⚠ The movement-point check was NOT covering for it: MP is re-maxed from the newly active profile on every transition, so a unit can hold plenty of MP with no action left. NEW handlers on `MovementController` (`OnDeployUpRequested`/`OnDeployDownRequested`), modelled exactly on `HandleIntelActionRequested`: phase + side gate, call `TryDeploy*`, publish on success. The controller supplies the two pieces of MAP context the model cannot see — `onPort` from `HexTile.IsPort`, and `onAirbase` from adjacency to a friendly airbase that is neither destroyed nor `OutOfOperation` (⚠ ACTIVE is checked, not merely present: a wrecked airfield must not launch paratroopers). ⚠ THE RAISE LIVES IN THE CONTROLLER, NOT THE MODEL — nothing under `Models/` raises events and `EventManager.Instance` LAZY-CREATES a GameObject, so a model-side raise would spawn an EventManager in every headless EditorTest that changes deployment; `?.` does not help because the getter creates the object and never returns null. ⚠ SUCCESS RAISES A FULL `RaiseRedrawMapIcons`, DELIBERATELY NOT `RaiseUnitDeploymentChanged`: that event only refreshes the deploy BADGE, but deployment also swaps the unit's MAIN ART (`GameIconRenderer` resolves it through `RegimentProfile.GetIcon(DeploymentPosition, facing)`), so a badge-only refresh would leave a mounted unit drawn as infantry. Refusals go to `AppService.CaptureUiMessage`, NEVER the printer (§24.8.5 — deployment refusals are denial feedback, not dispatches). Button stubs `OnDeployUpButton`/`OnDeployDownButton` now raise the events. NEW `DeploymentActionTests` (9): one action spent exactly, refusal when none remain, a refused change leaves state/supply/MP/actions untouched, supply+MP both charged, dig-in one step, Fortified refuses further, dug-in→Deployed collapses in one action, critical-supply refusal. Main + EditorTests build clean (CombatUnit/MovementController/DefaultDialog_Scene1/DeploymentActionTests/Claude_TODO)
-- 2026-07-28 — ✅ PRINTER P5 + P6 GREEN AND CONFIRMED IN PLAY (Bob): all 22 `LossLedgerTests` pass, every existing combat suite still green despite the booking call now running inside `CombatUnit.TakeDamage` in every test that damages a unit, and the loss report works end-to-end in game — both buttons, correct figures, fits the CRT. One test failure en route was MINE, not the code's: `Report_ShowsAllSixRatifiedRows` built its report from EMPTY ledgers, and the height fix had just made an empty report replace the table with a one-line notice, so it went looking for a "Men" row in a message that deliberately has none — the test's premise went stale when I changed the shape, and I should have swept the report tests in that same edit rather than after the run. Fixed by booking a loss first, which pins the contract that actually matters (when there ARE losses, all six rows appear including zeroed ones). Audited the other seven report tests for the same stale assumption — only that one had it; the two still using empty ledgers are the ones asserting empty-state behaviour. Shipped behaviour recorded in Claude_Project §3.6d (LossLedgerTests/Claude_Project/Claude_TODO)
-- 2026-07-28 — PRINTER P6 HEIGHT FIX after Bob's play-test: the report FITS HORIZONTALLY (monospace CRT confirmed, columns align) but OVERRAN VERTICALLY — the panel shows ~10 lines including the frame's `turn: Message from …` header, and the layout spent exactly 10 on heading + blank spacer + column header + six equipment rows, so anything past Helicopters was clipped. Recovered two lines, now 8 with one in hand: the heading MERGED INTO the column-header row (it now occupies the row-label column, which on that row was dead space carrying no information — the cheapest line in the message to delete), and the blank spacer removed. ⚠ THE OVERRUN WAS HIDING A DEFECT: the empty-state notice was APPENDED BELOW the six zero rows, i.e. onto the first clipped line, so "No losses reported." was invisible in precisely the case it existed to explain and the player saw six zeroes and nothing else. The empty report now REPLACES the table (3 lines) rather than trailing it. NEW `Report_FitsTheCrtHeightBudget` pins ≤9 rendered lines and a companion assert proves the empty report has no table — worth tests because an overrun CLIPS SILENTLY: it never throws, and it is invisible from outside the editor. Headings shortened to "ALL LOSSES" / "TURN LOSSES". `LossLedgerTests` 21 → 22 (PrinterMessage/LossLedgerTests/Claude_TODO)
-- 2026-07-28 — PRINTER P6 DAILY LOSS REPORT + A REAL HOLE FOUND BY CHECKING BOB'S TRUCK CLAIM. Bob asked for a daily-losses callback: NEW `OnDisplayDailyLossesButton()` (its own button) backed by a SECOND accumulator `_dailyLossLedger` fed from the same booking site and reset in `BattleManager.SetTurn`, the one place the turn number changes. ⚠ A SECOND ACCUMULATOR RATHER THAN SNAPSHOT-AND-SUBTRACT: a baseline diff looks cheaper but breaks silently whenever the cumulative ledger is cleared or restored (new battle, save load), because baseline and total then disagree with nothing to detect it; two accumulators fed from one call site cannot drift. Report heading switches to "LOSSES THIS TURN" with its own empty state. ⚠ BOB'S TRUCK RULING IS CORRECT AND IS NOW VERIFIED, NOT ASSUMED: no truck profile declares ANY intel stats (`TRK_GEN_SV`/`TRK_WEST` add none), so trucks are absent from the intel model and there is genuinely nothing to report — not a gap. ⚠ BUT THE SAME CHECK FOUND A REAL DEFECT: the only `TRN`-bucket profile that DOES declare intel stats is the **An-12, a fixed-wing transport plane carrying 48**, and with `TRN` in no display row a destroyed transport regiment would have printed "Aircraft 0" while 48 aircraft vanished from the tally. `TRN` folded into the **Aircraft** row, which is EXACT today rather than approximate because trucks and `TRN_NAVAL` declare nothing — flagged to revisit if either ever gains intel stats, since they would then wrongly file under Aircraft. `LossLedgerTests` grew 17 → 21 (daily tracks alongside cumulative, new period clears daily but NOT cumulative, daily accumulates only within its period, daily report labelling + empty state, transport aircraft appear under Aircraft). Main + EditorTests build clean (GameDataManager/BattleManager/PrinterMessage/DefaultDialog_Scene1/LossLedgerTests/Claude_TODO)
-- 2026-07-28 — PRINTER P6 LOSS REPORT BUILT AND PRINTABLE (P5 suites green, Bob). NEW `PrinterMessage.CreateLossReport(ourLedger, enemyLedger)` — two columns OURS/ENEMY over the six ratified rows (Men·Tanks·AFVs·Guns·Aircraft·Helicopters), `Divisional HQ` letterhead, `PrinterCategory.Combat`; `DefaultDialog_Scene1.OnDisplayLossesButton()` is LIVE, reading both GDM ledgers and raising the message, so wiring the button is the only step left. ⚠ THE ROLLUP NOW SHARES THE INTEL REPORT'S CLASSIFIER, which the ratified P5 note specifically required rather than a second copy of the prefix list: extracted NEW `RegimentProfile.ClassifyWeaponType(WeaponType) → EquipmentBucket` (new transient, non-persisted enum) and re-pointed `GetIntelReport()` through it, so the loss report can never call something a tank that the intel report calls an AFV. ⚠ ROUNDS ONCE PER ROW, AFTER SUMMING ITS BUCKETS — rounding each bucket first would re-introduce exactly the small-value destruction the fractional ledger prevents (0.4 IFV + 0.4 APC must read 1 AFV, not 0), and there is an end-to-end test for precisely that. ⚠ THE BUTTON REPORTS CUMULATIVE LOSSES AND FIRES NEITHER `RaiseDailyLossesRequested` NOR `RaiseTotalLossesRequested`: both still have zero subscribers, and cumulative is what the ledger actually holds — per-turn requires PARTITIONING the ledger by turn, so the one-button-or-two question is downstream of that decision rather than upstream of it. ⚠ GAP FLAGGED, NOT SILENTLY PATCHED: trucks/transport (`TRN_`/`TRK_`) fit none of the six ratified rows, so their losses are NOT reported — needs either a seventh row or an explicit ruling that soft transport is not worth reporting; deliberately NOT folded into AFVs, which they are not. Empty ledgers print "No losses reported." rather than six zeroes, which reads as a bug. `LossLedgerTests` grew to 17 (5 new: six-row presence, empty-state text, IFV+APC+RCN→AFVs rollup, sum-before-round, per-side column order). Main + EditorTests build clean (PrinterMessage/RegimentProfile/DefaultDialog_Scene1/LossLedgerTests/Claude_TODO)
-- 2026-07-28 — PRINTER P5 ACCOUNTING CORE BUILT: the equipment loss ledger. NEW static `Dictionary<Side, Dictionary<WeaponType, float>>` on `GameDataManager` (Bob's placement) + `RecordEquipmentLosses`/`RecordRemainingEquipmentAsLost`/`GetLossLedger`/`ClearLossLedger`, cleared in `ClearAll` (losses are per-battle). THE MODEL, confirmed against code before building: `WeaponProfile.IntelReportStats` are the intel stats on ONE weapon profile; `RegimentProfile.TotalIntelStats` sums them across deployed/mobile/embarked and is NEVER HP-scaled at rest — the strengthRatio scaling happens at DISPLAY time in `CombatUnit.ApplyEquipmentBuckets` — which is exactly what makes TotalIntelStats the correct full-strength multiplicand, so `lost[type] = TotalIntelStats[type] × (hpLost / HitPoints.Max)`. ⚠ THREE DELIBERATE DEVIATIONS FROM THE BRIEF, all recorded at their sites: (a) Bob said "directly after combat" — booking is instead hooked in `CombatUnit.TakeDamage(float)`, ALREADY the single funnel every damage source passes through (12 call sites across CombatResolver + RetreatResolver), because "after combat" would have silently missed return fire, ambush, counter-battery and AD opportunity fire, which resolve outside the main exchange, AND would need remembering for every future damage source; (b) the ledger is STATIC because `GameDataManager.Instance` LAZY-CREATES a GameObject, so an instance call from the `CombatUnit` model would spawn a manager in every headless EditorTest that damages a unit — the identical trap `PrinterMessage` hit in the printer pass; (c) it books HP ACTUALLY REMOVED (`previous - new`) rather than damage REQUESTED, since overkill on a nearly-dead unit would otherwise book equipment the unit no longer had, and the two diverge on precisely the blow that kills. Surrender (§7.9.6a) is the ONE case `TakeDamage` cannot see — a unit removed INTACT, no damage event — so `RetreatResolver.ResolveSurrender`'s destroyed branch books remaining equipment explicitly; shatter deliberately needs nothing, its extra damage is booked but the WITHDRAWAL is not a loss. Values are float and that is load-bearing: an int ledger silently drops 3 tanks × 1HP/40 = 0.075 to zero, so a unit can be ground to death reporting no tank losses. NEW `LossLedgerTests` (12) pinning proportional maths, cross-event accumulation, the two rounding traps, overkill, per-side booking, repair-does-not-unbook, and surrender. Main + EditorTests build clean, 0 errors. ⏳ NOT YET DONE for P5: ledger does not survive save/load (snapshot field + SAVE_VERSION bump owed); `BattleManager.RecordPlayerUnitLoss`/`RecordAIUnitDestroyed` are now a second home for the concept and should be deleted (GameDataManager/CombatUnit/RetreatResolver/LossLedgerTests/Claude_TODO)
-- 2026-07-28 — `contentVersion` DELETED from `ScenarioManifest` AND the save header (Bob's call, after a research pass). ✅ GREEN: all EditorTest suites pass after the removal (Bob, 2026-07-28). ⚠ THE FIELD CAME FROM MY OWN PLANNING DOC, was never in the design doc, and had NO DEFINED SEMANTICS anywhere — implemented in Phase 3 because the plan said to, not because anyone decided what it meant. It cannot earn its place while content ships INSIDE the build: StreamingAssets is replaced wholesale by a Steam patch, so content and exe move together and `gameVersion` (already in the header) identifies the content exactly; modding is designed out, so there is no foreign content to reconcile; and the `.map` header's editor-maintained checksum is a better content identity than a hand-kept string, being automatic and tamper-evident where a forgotten stamp asserts something false. It would have shipped ALWAYS-EMPTY AND LOOKING MEANINGFUL — the `MapChecksumUtility` mistake starting over, caught this time before it put a false claim into a doc. (Industry practice, checked: the standard concept is a SAVE FORMAT version with an upgrade chain — which is `SAVE_VERSION` + the ladder, already built — not a separate content version.) ⚠ `SAVE_VERSION` deliberately NOT re-bumped to 5: v4's header shape was amended in place, which is safe ONLY because `SaveLoad` still has zero callers so no v4 file exists, and because dropping a field is read-compatible anyway; the code comment records that this reasoning EXPIRES the moment saving is wired up. ⚠ KEPT OPEN FOR `CampaignManifest` (Phase 2.1) on Bob's note that he expects to REBALANCE THE CAMPAIGN GRAPH once remote testers have builds: if a revised `campaign.manifest` ever reaches a tester WITHOUT a rebuild, content genuinely moves independently of the exe and `gameVersion` stops identifying the graph — the one condition that justifies the field. Phase 2 decides it on that question, not by analogy (ScenarioManifest/GameDataObjects/SnapshotMapper/GameData/Claude_Project/todo)
-- 2026-07-28 — FOUR BOB RULINGS RECORDED, and a TERMINOLOGY rule that outranks the rest. (1) DESIGNDOC §19.1.6 AMENDED AND RATIFIED — the SCORING/ROUTING split: a campaign scenario owns its victory THRESHOLDS (intrinsic to its map and objectives), the CAMPAIGN owns the ROUTING between missions as outcome edges keyed on `BattleResult` (first match, best→worst, plus a default — a victory/defeat PAIR cannot express "Decisive opens the Iran branch, Major continues the main line", which is the branching the section asks for). The old "branching paths between branches are scenario-defined" clause is superseded: a scenario naming its own successors cannot be reused and turns a campaign reshuffle into an edit across every affected scenario file. Neither half exists in code — `CompleteBattle` still hardcodes `Draw`. (2) NEW DESIGNDOC §20.4.1 — **THERE ARE TWO KINDS OF SCENARIO AND BARE "SCENARIO" IS NO LONGER ACCEPTABLE** where they differ: STANDALONE SCENARIO (one-off, no carryover, `Scenarios/`) vs CAMPAIGN SCENARIO / MISSION (campaign node, carries core units + prestige, `Campaigns/`). The unqualified word already caused a real defect — the retired `IsCampaignScenario` split welded a GAMEPLAY distinction to a STORAGE one, so a campaign scenario could not be standalone-tested and the two copies diverged by eight months. Recorded as Claude_Project §7.0 with a comparison table, relayed to the scenario-editor agent, and saved to agent memory. (3) NEW DESIGNDOC §20.4.2 — briefing NARRATION is CAMPAIGN-SCENARIO ONLY; standalone scenarios get written `.brf` text and no audio, so an ABSENT narration asset is the normal case and must never be an error (this is now a constraint on whatever field eventually replaces the dormant `GameAudioManager.BriefingNarration` enum). (4) MANIFESTS ARE THE AGENT'S TO MAINTAIN (not the external editor), so the campaign mockup manifest is FIXED: `scenarioId` `Mission_Khost`→`Campaign_Khost` (it had duplicated the standalone's id, which is unresolvable since campaign nodes address scenarios BY ID), its own `displayName`, `briefingFilename` corrected to the `campaign_khost.brf` actually in the folder, name-form enums, and `isCampaignScenario` `false`→`true` — it had been false on a campaign scenario. Also: Bob DELETED `Documents/.../scenario data`, so Documents is saves + logs only and P1's one-source-of-truth end state is reached (HS_DesignDoc/Claude_Project/Claude_TODO/todo/campaign_khost.manifest/agent memory)
-- 2026-07-28 — CONTENT PIPELINE PHASES 0.5 + 3 LANDED; the pass is CLOSED except Phase 2 (deferred). ✅ GREEN: all EditorTest suites incl. the new `SaveMigrationLadderTests` (9) pass (Bob, 2026-07-28). ⚠ THE `GameDataHeader` PREMISE IN 3.1 WAS WRONG: todo.md said `saveVersion`+`gameVersion` "both exist on GameDataHeader", implying saves carried a header — the class was referenced by NOTHING, was not on `GameStateSnapshot`, and no save ever wrote one; only `saveVersion` persisted. So 3.1 was "put a header on the save at all". It now carries `saveTime · gameVersion · contentVersion · scenarioId · campaignId · combatUnitCount · leaderCount` via `SnapshotMapper.BuildHeader`, with NO `version` field (`GameStateSnapshot.SaveVersion` is the one authority the ladder keys off; a save reporting two versions that can disagree is worse than one reporting none) and the old never-computed `checksum` DELETED (the exact shape that produced the false "MapLoader checksum-validates" claim). NEW `ScenarioManifest.ContentVersion` feeds it, deliberately unset — no tool emits it and an absent version is honest where a defaulted "1.0.0" asserts one nobody set. P5 IS NOW LOAD-BEARING: `MapData != null` = in-battle/self-contained, `== null` = between-battle/content-dependent, documented on the field and branched on by NEW `VerifyContentAvailable` (3.3) — an in-battle save whose scenario was uninstalled STILL LOADS with a warning because it carries its own map, a between-battle one refuses with a message NAMING the missing scenario; it runs BEFORE `ClearAll()`, since throwing after the wipe would destroy the player's current game to report a different one failed. CAMPAIGN PROGRESS BY ID: `CurrentScenarioId`/`CompletedScenarioIds`/`CampaignId` strings replace `CampaignScenario` — a 23-MEMBER ENUM OF HARD-CODED MISSION NAMES that put campaign structure in the executable and progress at an ordinal, so inserting a mission silently repointed every save; enum DELETED, along with `ScenarioData.IsCampaignScenario` (superseded by header `campaignId`) and `MaxCoreUnits` (retired §20.1 → `DeploymentPointCap`). `SAVE_VERSION` 3→4 with NO migration step — `MINIMUM_SUPPORTED` tracks it pre-1.0 so v3 is refused by name, not misread; CLAUDE.md §2 item 12 amended to record that exception and that it EXPIRES at 1.0. ⚠ The bump was free because `SaveLoad.SaveAsync`/`LoadAsync` still have ZERO callers. 0.5: NEW `SaveMigrationLadderTests` (9) — required a test seam, and the reason is the point: with `MINIMUM == CURRENT` the ladder loop is UNREACHABLE from production, so its guards would first have been exercised by the real migration they protect; `UpgradeSnapshot` now delegates to `internal RunMigrationLadder(snap, min, current, stepLookup)` and the switch became `MigrateStep(from)`, with NEW `AssemblyInfo.cs` `[InternalsVisibleTo("EditorTests")]` existing solely for this. Main + EditorTests build clean, 0 errors (GameDataObjects/GameStateSnapshot/SnapshotMapper/ScenarioManifest/GameDataManager/GameData/AssemblyInfo/SaveMigrationLadderTests/CLAUDE/Claude_Project/todo)
-- 2026-07-28 — CONTENT PIPELINE PHASE 1 FINISHED — A SCENARIO IS NOW A FOLDER AND NOTHING ELSE. ✅ GREEN: EditorTest suites pass and Khost loads and plays from the menu (Bob, 2026-07-28), which also confirms the name-form `.manifest` and the `CurrentManifest` handoff. Main + EditorTests build clean (0 errors, no new warnings). Deleted the `scenarioId` → `SceneID` switch in `ScenarioDialog_Scene0.OnLoadButton`, the last place a scenario had to be KNOWN TO THE EXECUTABLE to be playable: shipping one previously meant adding a scenario-id constant, a `SceneID` member, a switch arm and a build-settings entry, or the player got "Unknown scenario ID" on a scenario the menu had just listed it. ⚠ IT WAS ALSO A LIVE CRASH — `SceneID.Campaign_Khost = 2` reached `LoadSceneAsync(2)` and build settings hold exactly two scenes; nobody had hit it only because campaign content is never discovered. `SceneID` is now `{ MainMenu = 0, BattleScene = 1 }` matching build settings; `SCENARIO_ID_MISSION_KHOST`/`SCENARIO_ID_CAMPAIGN_KHOST` DELETED (hard-coding a scenario's id in the exe is the same mistake as hard-coding its scene); `OnLoadButton` also now stamps `GameDataManager.CurrentManifest` explicitly at the point of no return, since Scene 1 reads that rather than the list. `Scene1_Controller` needed no change — it was already generic. Discovery hardened for the second scenario folder: sorted by display name then `scenarioId` (`Directory.GetFiles` order is filesystem-dependent and invisible while only one scenario exists) + NEW `WarnOnDuplicateScenarioIds` (a collision is otherwise silent and saves reference scenarios by id; a warning, not a refusal, since blanking the menu would be the worse failure). PHASE 0.4 CLOSED: `mission_khost.manifest` converted to name-form (`"mapTheme": "MiddleEast"`, `"difficultyLevel": "MjGeneral"`) — the `.map`/`.oob` came back name-form from the editor on 07-27 but the manifest was the third content type and still carried ordinals. Swept two stale `JsonPolicy` comments (a dangling `<see cref>` to the deleted `MapChecksumUtility`, and the "re-emitting changes the checksum" claim 0.4 disproved). Claude_Project reconciled: `Assets/Generated Data` removed from the directory tree (deleted in c8f015b), StreamingAssets tree corrected, runtime file system corrected to saves+logs only, §7.2 manifest fields corrected (`maxCoreUnits` → `deploymentPointCap` + mapWidth/mapHeight), new §7.1 scene-independence rule. ⚠ FLAGGED NOT FIXED: `GameAudioManager.BriefingNarration` is the same per-scenario-enum shape (`Khost` → `Briefing_Khost.ogg`) but is dormant — no callers, no manifest field. ⚠ Bob deferred Phase 2 (campaign-as-data): the `Campaigns/grand_campaign/m01_khost/` files are a LAYOUT MOCKUP, not real content, and its manifest's duplicate `scenarioId`/`displayName` + wrong briefing filename are left with it (GameData/ScenarioDialog_Scene0/JsonPolicy/mission_khost.manifest/Claude_Project/todo)
-- 2026-07-28 — MAP CHECKSUMS RETIRED (Bob's call) + name-form content CONFIRMED IN GAME + everything PUSHED (11 commits, local and origin/main both at b485aa2 — the repo's first push since whole-project tracking landed). CHECKSUMS: `MapChecksumUtility` DELETED. It had ZERO external callers and had never validated anything, but read convincingly enough that it put a false "MapLoader checksum-validates" claim into Claude_Project, which in turn shaped a planned Phase 4 that would have hard-failed every map the day it shipped. ⚠ THE `checksum` FIELD STAYS in the `.map` header and the scenario editor keeps computing it — removing it would cost a map-format version bump, an editor change and a re-export of every map for no gain, and it retains a real job as a CONTENT FINGERPRINT: it is how the name-form conversion was proved to have changed representation and not data. ⚠ DO NOT RESTORE VALIDATION — the editor hashes the hex array in ITS key order, which does not match C# property-declaration order, so the two can never agree without the game permanently mirroring the editor's field layout, a standing breakage risk for a guarantee Steam already provides on shipped read-only content. Rationale + warning recorded in Claude_Project §7.1. NAME-FORM CONTENT: the scenario editor re-exported Khost with enum NAMES instead of ordinals; verified before install by parsing every enum out of `GameData.cs` and checking every distinct value in both files (all 11 `.oob` fields across 56 units, all 6 `.map` hex fields + border types + `mapConfiguration` across 672 hexes; `hexControlLevel` correctly stayed numeric), map checksum byte-identical at `bced88f4…`. ⚠ THE FILE MIXED FORMS — units name-form, leaders still integers, because the export predated the `OobLeaderData` fix — so loading it proved name-form, integer-form AND mixed-format all parse in one shot. Bob confirmed in game. Both Khost copies (standalone + campaign) are now name-form (MapChecksumUtility/Claude_Project/todo/StreamingAssets)
-- 2026-07-27 — CONTENT PIPELINE PHASE 1 LANDED AND CONFIRMED IN GAME (Bob): shipped content now lives read-only inside the build under `StreamingAssets`, and `Documents/My Games` holds ONLY saves and logs. Nothing is copied between them, which is the whole point — a Steam patch becomes a file replacement instead of an install-and-merge problem. A scenario is a SELF-CONTAINED FOLDER: NEW transient `ScenarioManifest.ContentRoot` is stamped with the manifest's own directory at load and `GetMapFilePath`/`GetOobFilePath`/`GetAiiFilePath`/`GetBriefingFilePath` resolve against it, so patching one scenario touches one folder and the standalone Khost and the campaign's Khost coexist under the same filenames. ⚠ THIS RETIRED TWO PARALLEL PATH FAMILIES that had silently diverged by EIGHT MONTHS — `GetMapFilePath()` → Documents/My Games vs `GetMapFilePath_GDP()` → `Assets/Generated Data`, chosen between by `MapLoader` and `BattleManager` on `IsCampaignScenario`, welding a GAMEPLAY concept to a STORAGE one so a campaign could not be standalone-tested. The GDP family could never have run in a build at all: `Application.dataPath` is `<Game>_Data` in a player, where `Assets/Generated Data` does not exist. DELETED: `AppService.GDP_*` · `ScenarioDataPath` · `ManifestsPath`/`MapPath`/`OobPath`/`AiiPath`/`BrfPath` · the four `*_GDP()` methods · `LoadStandaloneOob`/`LoadCampaignOob` (now one `LoadOob(manifest)`) · the `IsCampaignScenario` branches. Manifest discovery is now a RECURSIVE scan of `Scenarios/`, since a scenario is a folder rather than a file in a shared `manifests/` dir. The three "consult settings to rebuild scenario data and manifests" error paths are GONE — they promised a feature that never existed and could not exist once content ships read-only; they say "verify the game files" now, which is the actual remedy. ⚠ `ContentRoot` has ONE point of entry (`ScenarioDialog_Scene0`, the only place a manifest is deserialized); `MapLoader` and `OOBFileLoader` both name it in their failure messages so a manifest built elsewhere fails loudly instead of resolving to nothing. Layout on disk (Bob): `Scenarios/khost/` + `Campaigns/grand_campaign/m01_khost/`, both on the newer map/oob. Claude_Project §7 rewritten as the content-pipeline section, including that a scenario's FOLDER NAME IS ITS IDENTITY and is permanent once shipped because saves reference it — mission ORDER lives in `campaign.manifest`, never in folder names, which is what keeps a post-release reshuffle a content patch. All three assemblies build clean (Main/EditorTests/Assembly-CSharp-Editor). ⚠ STILL DEAD ON DISK, safe to delete: `Assets/Generated Data` (tracked, so recoverable from git) and `Documents/.../scenario data` (NOT tracked — permanent once gone) (AppService/ScenarioManifest/MapLoader/OOBFileLoader/BattleManager/ScenarioDialog_Scene0/RiverSymmetryVerifier/Claude_Project/todo)
-- 2026-07-27 — BUTTON WIRING UNIFIED ON THE INSPECTOR (Bob's call, made while reworking the battle-scene GUI; RETIRES the 2026-07-20 nav/gameplay split). ONE RULE: the Inspector owns every onClick, code never calls `AddListener`. The split was the defect — it forced a per-button judgment call, and getting it wrong either double-fired or did nothing silently; one mechanism makes that hazard structurally impossible. My earlier preference for code wiring rested on three arguments and the strongest DIED EARLIER THE SAME DAY: "Inspector wiring isn't in git" stopped being true the moment scenes were tracked. The two survivors (rename breaks a string binding; a wired callback looks like dead code) do not justify making Bob round-trip through me for every button during a HUD rework. CONVERTED: the three code-wired holdouts — End Turn on BattleManager, next/prev unit on DefaultDialog_Scene1 — lost their `AddListener` calls AND their serialized `Button` fields per Bob's instruction that the callbacks not depend on the button object; `OnEndTurnButtonClicked` became public `OnEndTurnButton`, and NEW public `OnNextUnitButton`/`OnPreviousUnitButton` raise the existing events. ⚠ CONSEQUENCE HANDLED, NOT IGNORED: `_endTurnButton` was driving `.interactable` in two places, so removing it would have dropped both the phase gate and the frame-perfect-double-click guard. The gate moved INTO the callback as `CanEndTurn` — a guard on the LOGIC holds however the button is wired, or if it is not wired at all, which is strictly more robust than a UI-level disable; the double-click guard was always really the `_turnSequenceCoroutine != null` check, which is untouched. ⚠ WHAT IS ACTUALLY LOST: End Turn no longer greys out during non-player phases. `_turnProcessingPanel` still appears then, so the player is not without feedback — flagging it because it is a visible change, and re-adding it now needs a Button ref that only exists if a script must drive state (which is the rule's own exception). RULE RECORDED in CLAUDE.md §2.13 + Claude_Project §3.6b, including that `On*Button()` names are a CONTRACT because UnityEvent binds by method-name string and a rename kills the wiring with no compile error. Dead `using UnityEngine.UI` removed from both files. Main + EditorTests build clean. ⚠ BOB OWES three onClick assignments: End Turn → `BattleManager.OnEndTurnButton`, next/prev → `DefaultDialog_Scene1.OnNextUnitButton`/`OnPreviousUnitButton`. ⚠ AGENT OWES the `Tools/UI/Audit Button Wiring` Editor tool — the detection half of this trade (BattleManager/DefaultDialog_Scene1/CLAUDE.md/Claude_Project/Claude_TODO)
-- 2026-07-27 — REPO NOW TRACKS THE WHOLE PROJECT (was 210 `.cs` files and `.gitignore`, now 3,745 files with 1,184 binaries in Git LFS, ~236 MB). `.gitignore` flipped from opt-in (`*` then `!*.cs`) to standard-Unity OPT-OUT; NEW `.gitattributes` with LFS patterns for image/audio/font/native binaries. ⚠ WHAT THE OLD POLICY ACTUALLY COST: the repo could not rebuild a working project — no `.meta` means a clone regenerates every GUID and all scene/prefab → script references break, and `ProjectSettings` carried the Unity layer setup (layer 7 / NoVolumeRendering, the render-pass split §3.5 depends on), the sorting layers and the SEO list, none of it backed up. Scenes were untracked too, so every Inspector reference and onClick existed only on Bob's disk. It also failed the SAME WAY the unassigned click-through slot did that morning — silently, by omission: a new file type was simply never tracked and nothing said so. `Assets/Generated Data` was a candidate for DELETION at the start of the discussion — investigation killed that, and then CORRECTED ITSELF: my first pass claimed the folder was THE live scenario load path because I grepped for `GDP_*` and only the campaign callers came back — a selection effect. The truth is TWO parallel method families on `ScenarioManifest`: `GetMapFilePath_GDP()`/`GetOobFilePath_GDP()`/etc → `AppService.GDP_*` → the PROJECT folder for CAMPAIGN scenarios, and `GetMapFilePath()`/`GetOobFilePath()`/etc → `AppService.MapPath`/`OobPath` → `Documents/My Games/Hammer and Sickle/scenario data` for STANDALONE ones. `MapLoader` picks between them at :47/:60 and `BattleManager` does the same for the OOB (`LoadCampaignOob` vs `LoadStandaloneOob` at :334/:343). So the folder is real campaign content and is tracked — but see the open item below, because the standalone content is not. EXCLUDED and requiring a rebuild after a fresh clone: `TerrainArray_MiddleEast.asset` (288 MB — GitHub hard-rejects anything over 100 MB, and LFS would burn ~29% of the free 1 GB quota per revision) and `TestArray_RGB.asset`, both outputs of the `Assets/Editor/Chunked` tools. Two line-ending traps handled: `.gitattributes` pins Unity YAML to `eol=lf` because `core.autocrlf` is true here and Unity writes LF, and it deliberately WITHHOLDS the `text` attribute from `*.cs` so the 210 files already in history are not renormalized into one meaningless whole-repo diff (verified: only the 3 files edited today show as modified). ⚠ NOT PUSHED — the first push moves ~236 MB of LFS payload against a 1 GB free quota, Bob's call (.gitignore/.gitattributes/Claude_TODO/Claude_Project)
-- 2026-07-27 — NEW ⚑ TESTING REQUESTS SECTION (Bob's idea): a single queue for everything only a human at the keyboard can answer, replacing the "Pending Bob verification" list that had become a graveyard of twelve `[x]` confirmations with two live asks buried in it. Each entry must state DO / PASS / WHY — "check that it works" is not a test request — and carries a status of `[!]` blocking, `[ ]` normal, or `[⏸]` gated-on-something-that-does-not-exist-yet with the gate named. ⚠ THE RULE THAT KEEPS IT USEFUL: a passed entry is DELETED the same session once its result is in the change log, and the agent never ticks its own entries. It is a queue, not an archive — the moment `[x]` lines accumulate it has turned back into the thing it replaced. Seeded with the two genuinely open asks: the never-confirmed fog-of-war movement-range check (`HexMapUtil` — an unspotted enemy must not carve a hole in the range overlay, which EditorTests cannot catch because they see all units) and the gated background auto-fit. CURRENT STATUS loses the per-item confirmation list in favour of one all-clear line (Claude_TODO)
-- 2026-07-27 — TWO INPUT BUGS FOUND BY THE PLAY-TEST, FIXED: (1) RIGHT-CLICK OVER THE UNIT PANEL issued a move order to the hex underneath while terrain and printer blocked correctly — `DefaultDialog_Scene1` was still holding the pre-consolidation click-through slots `_unitGroundPanel`/`_unitAirPanel`/`_leaderPanel`, so nothing pointed at the single unit panel that replaced them, and `IsScreenPointOverUI` silently `continue`s past a null. ⚠ THE REAL DEFECT IS THAT A MISSING REFERENCE FAILS OPEN: the click reaches the map rather than being blocked, which is why this survived the panel consolidation on 2026-07-23 and only surfaced once the panels became permanently visible on 07-27. Collapsed to one `_unitPanel` with `[FormerlySerializedAs("_unitGroundPanel")]` so any live binding migrates instead of being dropped, and NEW `WarnOnUnassignedPanels()` names every empty slot at Start — plus a null `_uiCamera`, which mis-tests every panel at once rather than one. (2) CAMERA SCROLLING DIED AT THE MAP EDGE and only recovered when a unit was selected: the soft stop in `ApplyBoundaryConstraints` multiplied the WHOLE scroll vector by one isotropic factor read off `GetBoundaryProximity` (distance to the NEAREST edge, floored at 0), so at or past any boundary every direction scaled to zero — including the direction back onto the map — and the same nearest-edge reading throttled the perpendicular axis for free. `CameraService.HandleScroll` never clamped the transform and the hard stop predicted the landing position from a raw −1..1 axis value while the actual step is `axis × scrollSpeed × deltaTime`, so the camera overshot the boundary and then could not walk back; the only escape was `CenterOnPosition` teleporting it inside, which is exactly the "select another unit" recovery Bob observed. NEW `ConstrainScrollAxis` damps per axis and only the component heading OUT of bounds, comparing headroom against SoftStopDistance in world units so there is no prediction and no unit mismatch; NEW `CameraService.ClampCameraToBounds` on both scroll paths makes out-of-bounds unreachable rather than merely unrecoverable. ⚠ `CenterOnPosition` is deliberately NOT clamped — it is a deliberate teleport, and while `SetScrollBounds` still has ZERO CALLERS the bounds are a hand-set Inspector value rather than map-derived, so clamping it could refuse to centre on a unit near the map edge. That zero-caller finding is now its own TODO item, paired with `BattleBackgroundFitter` as a "breaks on the first differently-sized map" pass. Both assemblies build clean (Main + EditorTests, 0 errors). ⚠ PENDING Bob's play-test (DefaultDialog_Scene1/InputService_BattleMap/CameraService/Claude_TODO)
-- 2026-07-27 — BOB'S VERIFICATION QUEUE CLEARED, docs re-stamped (no code change): printer emitters + dispatch gating and the three-panel always-open HUD both CONFIRMED IN PLAY, and the AI-track suites (`BoardAnalysisTests`/`AvenueAndAmbushTests`/`CombatOracleTests`/`AIPerceptionTests`/`AIPerceptionSweepTests` + the `SpottingServiceTests` regression) run GREEN — clearing the test debt outstanding since the AI0–AI2b landing on 2026-07-07. `BattleBackgroundFitter` DEFERRED to the next new map rather than dropped: the component is written and pre-calibrated but stays off `Background Room` while 32x21 Khost renders correctly hand-tuned, so it goes in when a differently-sized map first needs framing. Printer plan block compressed per its own instruction — P1–P4/P7/P8a moved to a DONE record, only P5 ledger / P6 loss report / P8b tests remain live, with the unwired-for-lack-of-host list preserved. Intel pass I1–I6/I9 likewise compressed. Claude_Project: `SpottedLevel: 0–4` in §11 corrected to the six-rung 0–5 (stale since the 2026-07-24 ladder landed — §10.1 of the same file already described six rungs and `GameData.cs:187` has six members), §3.6c and §4.3 marked play-confirmed, reconcile stamp advanced to 2026-07-27. CURRENT STATUS re-stamped and the next-frontiers line rewritten around P5 → P6 → leader §9 → M13 (Claude_TODO/Claude_Project)
-- 2026-07-27 — LOSS BANDS SET + HS_DesignDoc RECONCILED to everything the printer pass changed. Bands are now ABSOLUTE HIT POINTS, not fractions of max (Bob): None 0 / Very Light ≤3 / Light ≤6 / Moderate ≤12 / Heavy ≤24 / Very Heavy >24 — `LOSS_BAND_*` become ints and `BandFor` drops its unit argument. ⚠ Absolute means a 60-HP facility reads one band gentler than a 40-HP regiment for the same proportional mauling; deliberate, the bands describe how much was lost rather than how much OF the unit. DESIGN-DOC AMENDMENTS (the debt accumulated across this whole pass, now cleared): §12.5.3 rewritten — unit panel shows BOTH sides, enemy filtered by rung, same layout, +12.5.3.1 the Level0 display gate and +12.5.3.2 the printer losing the enemy selection readout · §24.5a re-homed from a per-selection printout to the rung gates governing BOTH the panel and the intel dispatch · §24.8.2 SHARPENED from “report what the player did not order” to the subordinates/three-gates model (A out of view / B attribution / C assessment) with the hard exclusion, +24.8.2.3 the explicit COMBAT RECEIPTS CARVE-OUT, +24.8.2.4 report-by-exception as the volume rule, +24.8.2.5 verbose mode · NEW §24.8.4.3 panel visibility for the whole HUD (all three open from scene start, never close, deselect clears but the printer keeps its history) INCLUDING both rejected models so neither is re-proposed · §24.8.5a reframed to `12: Message from X` with +.1 recording that dropping the date RETIRES the unresolvable day-level-date conflict and +.2 the abbreviation list · §24.8.6 Battle rewritten from ten fixed strings to TWO PARAMETERISED TEMPLATES plus special cases, with the contact-hex and counter-battery-timing traps written into the doc, + NEW §24.8.6.1 loss bands / §24.8.6.2 intel L2–L5 verbose-only / §24.8.6.3 turn-0 first-contact suppression / §24.8.6.4 weather text held back until the mechanics exist. Compiles clean (Main + EditorTests, 0 errors) (GameData/PrinterDispatch/DesignDoc/Claude_Project/Claude_TODO)
-- 2026-07-27 — ALL THREE PANELS OPEN FROM SCENE START (Bob, after play-testing the emitters): the open-on-first-hex-click latch is REMOVED — `ReactivePanelManager._panelsOpened`/`OpenPanels` deleted, `Initialize` now brings terrain + unit up ACTIVE and immediately `Clear()`s them (without the clear they would show whatever placeholder text the prefab was authored with until the first click), and `PrinterControl.Initialize` opens `_panelRoot` showing “— NO MESSAGES —” with the cursor blinking, completed rather than typed since a resting placeholder is not a dispatch. The CRT’s SelectedHex poll in Update is gone with it; `ShowPanel` survives as a no-op guard for a root switched off by hand. Visibility is no longer a behaviour anywhere in the HUD — right-click CLEARS the terrain and unit panels, the printer keeps its history, and the layout is stable for the whole battle. Third and final model here: hide-on-right-click (mine, wrong) → open-on-first-click → open-always. Side benefit: the lazy-singleton hazard that came with starting closed is GONE, since `FindAnyObjectByType` not returning inactive objects only mattered while the panels began inactive. First-contact suppression at turn 0 is unaffected — it keys on turn number, not on panel state. Compiles clean, 0 errors. ⚠ PENDING Bob’s play-test (ReactivePanelManager/PrinterControl/Claude_Project)
-- 2026-07-26 — REMAINING EMITTERS WIRED (every §24.8.6 class whose host exists; font confirmed sized by Bob): ambush BOTH directions (never gated — the textbook attribution case: fire from a hex the player had no contact on, where the only other feedback is a halted move and an unexplained hit) · objective CAPTURED + LOST via `ApplyTerritoryAccounting`, with a NEW `PlaceName` helper reading the hex TileLabel and falling back to coordinates · UNIT HARDENED on an experience-level change · WEATHER · FIRST CONTACT and the deeper intel rungs. `PrinterDispatch` gains `Attach`/`Detach` for the two BROADCAST triggers (weather, spotting), lifetime owned by PrinterControl, so the whole dispatch domain — text, gating and triggers — stays in one file; everything a controller does to a unit it owns is still a direct call at that site. ⚠ UNIT HARDENED is detected by COMPARING ExperienceLevel across the attack in MovementController, not raised from the model: `CombatUnit` touches EventManager NOWHERE and must stay that way (it runs in headless EditorTests). ⚠ INTEL RUNGS L2–L5 FILE IN VERBOSE ONLY, deliberately: since enemy reports moved to the unit panel (2026-07-25) a dispatch reciting posture and equipment is telling the player what they can already click for, so it fails all three gates. First contact always files — a new enemy appearing is information no panel can volunteer. ⚠ FIRST CONTACT SUPPRESSED AT TURN 0: `SetupBattleManagerData` runs a full `RecomputeAllSpotting` before the first icon draw, so without the guard the feed opened with one “new contact” per already-visible enemy before the battle started. The starting picture is the situation, not news. ⚠ WEATHER TEXT DELIBERATELY TRUNCATED: §24.8.6 ends it “Air operations suspended. Visibility poor.” — both are claims about mechanics that DO NOT EXIST (weather is single-state Clear in v1 §3.3.6; nothing keys air ops or spotting off it), so only the condition change is printed until those effects land. Noted at the method. Verified player-side only: `ApplyLevel` mutates `unit.SpottedLevel` while the AI writes to `AIPerceptionState`, so the printer cannot narrate AI beliefs. Compiles clean (Main + EditorTests, 0 errors). STILL UNWIRED, no host: air operations (M13/AOB), logistics (§15.4a), decorations/promotions/leader-killed (leader L1/L2), opportunity + AD fire (the §11.8 transit walk). ⚠ PENDING Bob’s play-test + the text pass (PrinterDispatch/PrinterControl/MovementController/Claude_Project)
-- 2026-07-26 — COMBAT DISPATCHES + the VERBOSE switch (P7 combat slice; first-principles pass on what the printer is FOR): NEW static `PrinterDispatch` (Core/UI) owns both the ratified §24.8.6 body text AND the decision whether an event is worth printing, so call sites are one line and text/gating cannot drift. THE MODEL: a dispatch must pass one of three gates — (A) happened OUT OF VIEW, (B) ATTRIBUTION for a state change whose cause is off screen, (C) an ASSESSMENT the player would otherwise compute; anything that only restates a number readable off the icon or unit panel fails all three. `PrinterDispatch.Verbose` (serialized on PrinterControl) picks how strictly: ON files everything, OFF reports by exception — defensive reports ALWAYS file (gate A), the player’s own attacks file only on losses ≥ Moderate, a changed enemy state, or an attack that cannot continue. OFF is the design intent (a printer that narrates everything teaches the player to ignore it); ON is Bob’s A/B, and may become a player option. FRAME REVISED (§24.8.5a): the turn/date line folds into the source line as `12: Message from 3rd Tank Rgt` — long names were wrapping and burning a line of a fixed-height CRT — plus NEW `PrinterMessage.Abbreviate` (Regiment→Rgt, Motor Rifle→Mtr Rifle…) applied at RENDER only so `Source` keeps the real name. ⚠ The campaign date is GONE from the frame, which RETIRES the §24.8.5a day-level-date debt entirely — no date is rendered, so the missing scenario start date no longer matters. `HeaderProvider` → `TurnProvider`. NEW `LossBand` + `LOSS_BAND_*` thresholds (5/15/30/50%, provisional): damage taken in ONE exchange over MAX hp. ⚠ Explicitly NOT the Section 8 strength floors, which measure hit points REMAINING and feed combat multipliers — the enum and consts both carry a do-not-merge note, since the intel pass already hit that exact confusion once. Attacker text: “We are {attacking|bombarding} {enemy|strong enemy} forces at x,y. / Losses are {band}. / {enemy clause}”, with “strong” keyed off OUR OWN losses (sourcing it from real enemy strength would leak intel the §12 ladder never granted) and the “we are halting the attack” clause gated on `GetCombatActions() < 1` so the dispatch cannot claim the regiment is spent while the player can still order it to fire. ⚠ TWO CORRECTNESS FIXES made during the pass: the contact hex is captured BEFORE Execute (a retreating defender has already moved by the time the outcome returns, so the report would have named the hex it fled to), and indirect fire reports only after the WHOLE action including counter-battery (else the firer prints “no losses” and is contradicted by its own tubes dying in the same exchange). Both `Report*` methods handle BOTH sides in one call, so the defensive branch goes live for free when the M13 AI turn calls the same orchestrators. PrinterControl also gains a serialized `_fontSize` (0 = leave the TMP component alone) — ⚠ `ConfigureTextComponent` has been force-DISABLING TMP auto-sizing since 2026-07-25 and never set a size, which is why the seeds rendered too large; the warning now says where to set it. Debug seeds rebuilt in the real dispatch wording + a deliberately 9-line CALIBRATION message so the font is sized against the P6 loss report’s height budget. Compiles clean (0 errors). NOT wired, no host: air ops (M13/AOB — the class Bob expects to carry the feed), logistics (§15.4a), personnel decorations/promotions/leader-killed (leader L1/L2). Live hosts but not yet done: objectives, first contact/intel, unit hardened. ⚠ PENDING Bob’s play-test + text pass. ⚠ DesignDoc owes: the §24.8.2 receipts carve-out for combat, the revised frame, and the gate model (PrinterDispatch/PrinterMessage/PrinterControl/MovementController/GameData/Claude_Project)
-- 2026-07-25 — NO ENEMY LEADERS, made PERMANENT (Bob): DesignDoc §14.2.3 amended — the “Side — Player or AI (currently leaders are player-only)” hedge is replaced by a settled statement that leaders are player-only and AI-side leaders are not to be re-proposed. This RESTATES the already-ratified §14.1.1 rather than deciding anything new; §14.2.3 was the only line still implying the door was open. Consequences recorded in the doc + Claude_Project §3.3: `Leader.Side` is VESTIGIAL (every construction path passes Side.Player — noted at the field, kept because it serializes into saves, never to be used for side-gating), no display surface needs to gate leader info by side because an enemy unit never reports IsLeaderAssigned, the AI never receives Leader_mod / command shock §7.9.4a / Command Mitigation §7.7.12 / the §6.9 ambush ladder (AI resolves at ICM 1.0 per §14.1.1), and leader mortality §14.15.4 is player-side-only. Retracts the enemy-leader leak warning I added to `ResolveSelection` earlier the same day — the concern was already closed by §14.1.1 and the comment now says so (DesignDoc/Leader/ReactivePanelManager/Claude_Project)
-- 2026-07-25 — ENEMY UNIT REPORTS MOVED to the Unit Panel (Bob’s call — ⚠ REVERSES the 2026-07-24 §12.5.3 ratification that made the panel friendly-only and routed enemy intel to the printer; DesignDoc §12.5.3 + §24.5a OWE THE AMENDMENT): selecting a unit of EITHER side now populates `Prefab_UnitPanel`, and the printer keeps every other dispatch class. `UpdateUnitPanel` splits into `BuildFriendlyLines` (the Full ownership view, §12.2.7) and NEW `BuildEnemyLines` (the filtered report at the unit’s SpottedLevel) sharing ONE layout — per Bob, the enemy view differs from the friendly one only by the data hiding: L1 “UNIDENTIFIED CONTACT” · L2 + name · L3 + `DEP:` · L4 + coarse six-bucket equipment · L5 + `EXP:`/`EFF:` folded into the same status line, with unearned lines OMITTED rather than placeholdered (§24.5a). Supply + commanding officer stay friendly-only at every rung; HP appears on neither panel (§24.3.2.5 / the I10 ruling keeps strength in the icon HP box alone). ⚠ FOG GATE: RPM now requires `SpottedLevel >= Level1` for enemies — `GetUnitAtPosition` answers from the map regardless of spotting, so without it clicking an empty-looking hex would report the unspotted enemy standing on it. ⚠ LATENT LEAK FLAGGED (pre-existing, now likelier to bite): `ResolveSelection` resolves ENEMY leaders into `GameDataManager.SelectedLeader` — the old rule gated the panel, never the resolve — so the L3 leader modal must gate on Side or it hands out a free identification (§24.5a.6). Comment added at the site. `PrinterMessage.CreateUnitReport` KEPT but scope-narrowed to the §24.8.6 intel-dispatch body, no longer a selection readout. Compiles clean (0 errors). ⚠ PENDING Bob’s play-test; text formatting is a follow-up pass Bob will drive (Prefab_UnitPanel/ReactivePanelManager/PrinterMessage/Claude_Project)
-- 2026-07-25 — THREE-PANEL MODEL ratified and coded (Bob’s revision, supersedes both the interim RPM behaviour and my hide-on-right-click draft the same day): the terrain, unit and printer-CRT panels all start CLOSED, open TOGETHER on the battle’s first hex selection, and thereafter STAY OPEN — right-click deselect now CLEARS content instead of hiding panels, so the HUD keeps a stable layout instead of popping panels in and out. NEW `Prefab_TerrainPanel.Clear()` (blanks the text AND disables the portrait Image — a null sprite still draws as a solid white rectangle) and NEW `Prefab_UnitPanel.Clear()`; `UpdateTerrainPortrait` re-enables the Image after a Clear. RPM: `HideAllPanels`/`UpdateTerrainPanel(bool)`/`UpdateUnitPanel(bool)` REPLACED by a one-way `OpenPanels` latch + `ClearSelectionPanels`; a hex holding no FRIENDLY unit now leaves the unit panel open and BLANK rather than closed. PrinterControl gains the same latch off `GameDataManager.SelectedHex`, and is the ONE panel deselect does not clear — a dispatch log is not about the selected hex. ⚠ TRAP RECORDED: both panel singletons lazy-create through `FindAnyObjectByType`, which does NOT return inactive objects, so touching `Prefab_TerrainPanel.Instance`/`Prefab_UnitPanel.Instance` before the panels open would spawn a stray GameObject — RPM resolves them in `Initialize()` while still active and `ClearSelectionPanels` guards on the latch. Compiles clean (0 errors). ⚠ PENDING Bob’s play-test. ⚠ DesignDoc owes a line ratifying the panel model — §24.8 is silent on printer visibility (ReactivePanelManager/Prefab_TerrainPanel/Prefab_UnitPanel/PrinterControl/Claude_Project)
-- 2026-07-25 — PRINTER PASS P1–P4 CODED (the CRT and its navigation; P5 ledger / P6 loss report / P7 emitters / P8b tests are the next slices): `PrinterControl` REWRITTEN from the scrolling greenbar list to the one-message-at-a-time dispatch CRT — row pool, `CreateRow`, alternating row sprites, ScrollRect and `_printDelay` all DELETED; now `List<PrinterMessage>` + cursor + ONE TMP, typewriter at `Time.deltaTime * _charsPerSecond` (serialized, default 120), cursor blinking at rest, nav-press-during-reveal COMPLETES instead of navigating (§24.8.4.2), `MSG n / N` readout, latest-indicator that doubles as the unread flag, and a FILTER cycle over the view rather than the history. Auto-sizing is FORCED OFF in code (`ConfigureTextComponent`) — §24.8.4 warns it would jump between a 2-line dispatch and the 9-line loss report AND resize mid-type as the revealed substring grows, so it is not left to an Inspector checkbox. `PrinterMessage` rebuilt to the §24.8.5a frame: `Header` / `Source` / `Lines` / NEW `PrinterCategory`, `FullText` composing the frame, `FlowIntoColumns` so equipment lists pack to CRT width (the old control set NoWrap + Ellipsis and would have silently eaten the tail of the NBSP work); `CreateUnitReport` keeps its 2026-07-24 rung gating verbatim, re-fronted so identity moves into the frame and enemy reports file under Divisional HQ. The seven pre-rewrite ad-hoc factories (CreateBattleReport/NewContact/Ambush/Supply/Movement/AirThreat/HQDispatch) DELETED — zero callers, and all written in the status-log register §24.8 supersedes. NEW `PrinterCategory` + `PrinterFilter` in GameData; NEW six printer nav events + raisers + ClearAllSubscriptions entries in EventManager; NEW six public `OnPrinter*Button()` callbacks on `DefaultDialog_Scene1` (Inspector-wired per §3.6b — deliberately NO code AddListener, which would double-fire every press). P3 visibility now message-driven: PrinterControl owns `_panelRoot`, which starts CLOSED, opens on the first dispatch and STAYS OPEN for the scene (Bob, 2026-07-25 — an earlier draft hid it on right-click deselect, inherited from RPM’s interim selection-tracking; wrong for a non-contextual running log, since dismissing it stranded the history behind nav buttons inside the hidden root). CLEAR empties the log without closing the CRT. Subscribes in `Start()` via an idempotent `Initialize()` so a dispatch raised during BattleManager setup cannot be dropped; RPM’s `_messagePanelObject` handling REMOVED. ⚠ TWO TRAPS RECORDED: (a) `BattleManager.Instance` and `GameDataManager.Instance` both LAZY-CREATE a GameObject, so a plain data class reading them would spawn managers out of any headless test — the header is injected through `PrinterMessage.HeaderProvider`, installed by PrinterControl and cleared in OnDestroy; (b) the ratified frame’s DAY-level date is not derivable (CampaignDateCalendar resolves to a month and tracks the CAMPAIGN turn; ScenarioManifest has no start date) — v1 renders “TURN 4 — JUNE 1981” per Bob, isolated in one method, DesignDoc §24.8.5a owes the amendment. Compiles clean (dotnet build Main + EditorTests, 0 errors). ⚠ PENDING Bob: Inspector rewiring (always-active host + `_panelRoot` + `_messageText` + six onClicks) and play-test (PrinterControl/PrinterMessage/EventManager/DefaultDialog_Scene1/ReactivePanelManager/GameData)
-- 2026-07-25 — PRINTER re-scoped to the HQ DISPATCH FEED + detailed plan written (design only, no code): DesignDoc §24.8 REWRITTEN from "printer policy / 100-message scrolling ring buffer" to the *Decision in the Desert* dispatch model — guiding principle (report what the player did NOT order and could not otherwise see), SPOTTING GATE on enemy dispatches (bounds volume + makes the §12 ladder pay off again), ONE MESSAGE AT A TIME on the centre CRT with six nav buttons + typewriter reveal + blinking cursor, greenbar striping RETIRED, FIXED font size (auto-size would jump between messages and resize mid-type; the 9-line loss report sets the height budget), NEW §24.8.5a message frame (turn+date / "Message received from X:" / body — HQ files the report when a unit is destroyed), NEW §24.8.6 full ratified message catalogue (battle/objective/intel-by-rung/logistics/personnel/air/weather), NEW §24.8.7 loss report. Claude_TODO gains the P1–P8 implementation plan (marked DELETE-WHEN-DONE). ⚠ P5 is a NEW SYSTEM, not a printer feature: `BattleManager.RecordPlayerUnitLoss`/`RecordAIUnitDestroyed` are empty stubs with zero callers, so the loss ledger is built from nothing and needs a SAVE_VERSION bump. all 3 open questions RATIFIED same day (DesignDoc §24.8.7.1–.4): loss accounting = HP-ARE-EQUIPMENT (§12.2.6 already scales counts by currentHP/maxHP, so `hpLost/maxHP × TotalIntelStats` converts damage straight into real equipment — Bob's model, better than the proportional-buckets version proposed, and the ledger keys on WeaponType so display rows roll up through the existing prefix logic and can never drift from the intel report); rows = Men/Tanks/**AFVs**/Guns/Aircraft/Helicopters; enemy figures EXACT. Two traps recorded: store FRACTIONAL and round only at render (per-event rounding silently zeroes small losses), and book from DAMAGE not unit removal (so shatter/return-to-base/evac are excluded, with surrender as the explicit exception) (DesignDoc/Claude_TODO)
-- 2026-07-25 — INTEL PASS ✅ ALL SUITES GREEN + PLAY-CONFIRMED (Bob): `UnknownIcon` art in the atlas and live — enemy icons below L3 show the `?` deployment marker; L4 enemies show the FUL/DEP strength band instead of a number; friendly Unit Panel shows the FULL 17-bucket view with "guns" and "SAMs" kept separate and the NBSP wrap breaking between entries rather than inside them. Printer (centre console screen) still blank — expected, `CreateUnitReport` has no caller until the PRINTER PASS. NEW open question logged as I10: the friendly Unit Panel has no strength/HP line at all, which is more noticeable now that enemy HP is a gated rung (Bob's call)
-- 2026-07-24 — Intel-pass FIXUP after Bob's first test run (1 compile pair + 1 real fail): (a) `Prefab_CombatUnitIcon` sits in namespace `HammerAndSickle.Core`, where the bare name `GameData` binds to the CHILD NAMESPACE `HammerAndSickle.Core.GameData` and can never reach the same-named constants class — added a `GameDataConst` using-alias + comment (the same trap is latent for anything under Core/Core.UI; `SnapshotMapper` is unaffected, it lives in `HammerAndSickle.Persistence`); (b) the two `STRENGTH_BAND_*` consts I added were DUPLICATES of the existing `FULL_STRENGTH_FLOOR`/`DEPLETED_STRENGTH_FLOOR` — deleted mine and pointed the L4 band readout at the combat-side floors, so the band the player reads is the band the engine applies (GameData gains a don't-re-add note); (c) `AIPerceptionSweepTests.AISweep_ContactLost_DecaysToGhost` failed CORRECTLY — its target sat ADJACENT, which now earns L2 not L1 — but chasing it exposed a REAL symmetry bug I had shipped: `AIPerceptionState.StepDecay` treated "in sensor range" as holding a contact at ANY rung, while the player side only sustains the FLOOR and erodes everything above it. That silently gave the AI a better memory than the player (an Option-B cheat, §12.9). `StepDecay` now takes a **sustained-floor map** instead of an in-range set; `StepAIPerceptionDecay` builds it from the same `PassiveContactCeiling` (max across all spotters — cannot break early on first hit). Tests: sweep suite gains adjacency-ceiling + erode-while-watched + adjacency-hold cases; `AIPerceptionTests` regains the equivalent at store level (AIPerceptionState/SpottingService/GameData/Prefab_CombatUnitIcon/Tests)
-- 2026-07-24 — INTEL PASS I1–I6 + AI mirror CODED (the §12 rewrite below, made real): `SpottedLevel` → six rungs 0–5 + NEW `HitPointDisplayMode`; `CombatUnit.GetIntelReport` rewritten per-rung + NEW `GetFullIntelReport()` (the §12.2.7 Full view, unreachable via any level); error consts MAX 12→16 / MODERATE 8 / MIN_INTEL_ERROR DELETED; `ApplyIntelError` now seeded by a stable FNV-1a over (UnitID, HP, bucket) instead of `UnityEngine.Random` — SpottedLevel deliberately EXCLUDED from the seed so L4/L5 lean the same way and better intel TIGHTENS rather than swings (§12.5.5.1, doc amended to match code). `IntelReport.IsFullDetail` drives two-tier `GetEquipmentEntries` (17 friendly / 6 coarse enemy). ICON GATING: NEW `Prefab_CombatUnitIcon.SetIntelDisplay` — HP box dash <L4 / FUL-DEP-LOW band @L4 / exact @L5+friendly, deploy icon = NEW `SpriteManager.UnknownDeploymentIcon` ("UnknownIcon", ART OWED Bob) below L3; both event handlers now cache the true value and re-render THROUGH the gate (a fogged enemy taking damage or digging in no longer announces itself), `GameIconRenderer.ApplyIntelDisplay` re-gates on every rung change in BOTH directions. PROGRESSION: `SpottingService` swaps `IncrementSpottedLevel` for `PassiveContactCeiling`/`RaiseToCeiling`/`RaiseByOneRung`/`SustainedFloor` — all three sweeps now set-to-ceiling (range 1 / adjacent 2 / adjacent RECON 3), decay is graduated (−1 rung above a per-turn re-derived floor, HELD while adjacent, still reaches L0); NEW `ApplyGroundIntelAction` (+1 rung on every adjacent enemy, ceiling L5) wired to the existing `OnIntelActionRequested` via `MovementController` (spends the action first, then applies), NEW `ApplyDirectCombatContact` called from `GroundCombatAction` (both participants → L4). AI MIRROR per the §12.9 symmetry rule: `AIPerceptionState.RecordSpot` takes a ceiling, `StepDecay` graduated + adjacency-hold, `RecomputeAIPerception`/`StepAIPerceptionDecay` feed both. Displays: unit panel → `GetFullIntelReport`; `PrinterMessage.CreateUnitReport` rebuilt off the FILTERED report (was reading exp/eff/deployment/supply straight off the unit — supply + leader are now friendly-ONLY, and an enemy below L2 prints "UNIDENTIFIED CONTACT"). Tests: NEW `IntelLadderTests` (20); `AIPerceptionTests` + `SpottingServiceTests` updated to the new model. ⚠ NOTABLE BEHAVIOUR CHANGE: a contact held only by a DISTANT sensor now erodes to that sensor's floor instead of freezing. ⚠ Concealed Operations Base left UNCHANGED on purpose (deferred skills pass). NOT DONE: I7 sweep (needs SIGINT_Rating = M15), I8 RB tiers (caller is M13/AOB). ⚠ PENDING Bob: `UnknownIcon` art + Unity Test Runner (GameData/CombatUnit/RegimentProfile/SpriteManager/Prefab_CombatUnitIcon/Prefab_UnitPanel/GameIconRenderer/SpottingService/AIPerceptionState/GroundCombatAction/MovementController/PrinterMessage/Tests)
-- 2026-07-24 — INTEL SYSTEM REDESIGNED to a SIX-RUNG ladder (design only, no code — Bob: "too much intel on enemy units"): DesignDoc §12 rewritten end-to-end. NEW ladder L0 unspotted / L1 contact-icon-only (deploy icon "?", HP box "—") / L2 name / L3 deployment / L4 six coarse buckets @16% err + HP strength band / L5 +exp/eff @8% err + exact HP, plus **Full** = friendly ownership (17 buckets, 0 err) explicitly NOT a rung (never stored, never decayed) — resolves the pending §12.5.4 L3-cap question as MOOT. Progression switches from "+1 per spotting hit" to **SOURCE-CEILING** (§12.4.2: passive→L1, passive adjacent→L2, RECON adjacent→L3, ground IntelAction on adjacent enemies→+1 ceiling L5, combat both sides→L4, HQ SIGINT sweep→+1 ceiling L3, air recon→+1 ceiling L3). Decay rewritten graduated (−1 rung above a per-turn re-derived sustained floor, HELD while adjacent to a friendly) — the ≥L2→L1 collapse is retired. §12.7 SIGINT rewritten from a projection-range bonus into a **map-wide HQ IntelAction sweep** bounded by RADIO SILENCE (no move/fire/resupply last turn = untargetable) — the bound that keeps §6.9 ambush + Khost IRREGULAR doctrine alive (§6.9.0 dependency added). Reconciled the four "Level 4 = full intel" collisions (§7.12.4/§11.8.4/§24.8a.4/§6.10.2 → §12.4.9.1: L4 now means position+equipment, not perfect). §11.11.11 RB tiers rewritten as COVERAGE probability at +1 rung ceiling L3 (old "floor of Level 2" retired). NEW §24.3.2 icon-detail gating (⚠ the icon published exact enemy HP% from L1, making the whole error system cosmetic; generic-silhouette-at-L1 considered and REJECTED as PG drift). §24.5a printer content re-gated per rung (supply/leader friendly-ONLY — pre-rewrite `CreateUnitReport` read exp/eff/deployment/supply straight off the unit, harmless only because it has zero callers). §12.8 fog-of-war filled, §12.3.6 SIGINT range retired, §8.2.4 intel-action effect defined, §12.5.5 error made deterministic per (unit, level, HP). Skills: §14.8.7 T2 Concealed Operations Base + T3 Satellite Reconnaissance both flagged in-flight (Bob deferred), 3 new candidates parked in Leader_Supplement §3.7a. M15 redefined = the sweep. Implementation plan = INTEL PASS I1–I9 (Claude_TODO/DesignDoc/Leader_Supplement/Claude_Project)
-- 2026-07-24 — Unit-panel intel rework + friendly-only + stay-selected-after-move + message-panel right-click close (Bob's cluster): `Prefab_UnitPanel` now FRIENDLY-ONLY (RPM gates on `Side.Player`; enemy intel → printer, wired in the printer pass) — NATO symbol REMOVED (parked in ParkedCode) → single text field: name / commanding officer (rank+name, omit if none) / equipment flow (NEW shared `IntelReport.GetEquipmentEntries` — atomic non-zero buckets incl. air categories, NBSP-joined so wrap breaks only between entries, 2-space separators) / "DEP EXP EFF" / "Supply N days". RPM: drops the friendly→printer `CreateUnitReport` raise (+`_lastSelectedUnitID`); NEW interim `_messagePanelObject` shown-on-select/hidden-on-deselect so right-click closes the message panel like terrain/unit (proper message-driven visibility = printer pass). MovementController: unit STAYS selected after a move (PG-style — removed the spent-unit `DeselectUnit`) + NEW `HexDetectionService.SelectHex(pos)` makes the selection FOLLOW the unit to its new hex so panels+highlight track it. DesignDoc §12.5.3 display-home RATIFIED (+§12.5.4 L4-cap flagged pending). ⚠ Bob: assign unit-panel `_infoText`, RPM `_messagePanelObject`; play-test. ⚠ PENDING Bob's play-test (Prefab_UnitPanel/RegimentProfile/ReactivePanelManager/MovementController/HexDetectionService/ParkedCode/DesignDoc/Claude_Project)
-- 2026-07-23 — Reactive panels reworked to single-text format + leader panel DELETED (Bob's UI pass): `Prefab_TerrainPanel` slimmed to terrain image + ONE TextMeshProUGUI (4-line format: "x,y <terrain>" / location name [omitted when unnamed] / "Move Cost N, Defense Bonus N" / feature summary); `Prefab_UnitPanel` slimmed to NATO symbol + ONE text field (5-line: name / "Commanding Officer: <rank> <name>" [omitted when no leader] / actions / max+current MP / "EXP DEP EFF") — detailed combat-stat blocks + ranges REMOVED; `Prefab_LeaderPanel` DELETED (leader info → future modal dialog); ReactivePanelManager drops all leader-panel wiring but KEEPS resolving `GameDataManager.SelectedLeader` (cheap, for the modal). NEW `ParkedCode.cs` = all-purpose commented graveyard holding the unit panel's detailed-stat code + the whole leader panel for reinstatement. ⚠ Bob owes the Unity rewiring: assign each panel's new single text field + image, remove stale field refs, delete the Leader panel GameObject from BattleScene. ⚠ PENDING Bob's play-test (Prefab_TerrainPanel/Prefab_UnitPanel/ReactivePanelManager/ParkedCode/Claude_Project)
-- 2026-07-22 — Helo rotor ANIMATION during movement (Bob's ask, retires the CreateUnitIcon frame-cycling TODO stub): NEW motion flipbook in `Prefab_CombatUnitIcon` — `StartMotionAnimation`/`StopMotionAnimation` + Update-driven frame cycle at serialized `animationFps` (default 40, Bob play-tested); detection is sprite-name-based ("<unit>_Frame0" → resolve all 6 atlas frames once, loop what exists, no-op for non-animated icons — embarked air-mobile riding helos animate FREE); hooks: `GameIconRenderer.AnimateIconStep` starts / `SnapIcon` stops (fires at move end + every halt path = exactly the in-motion boundary; stationary rests on Frame0); `SetUnitIcon` tracks its sprite name (atlas clones mangle sprite.name) and kills a stale loop on a real sprite change while same-name facing refreshes leave it running. ✅ CONFIRMED in play (Bob, 2026-07-22) (Prefab_CombatUnitIcon/GameIconRenderer)
-- 2026-07-22 — Unit icons now TURN with facing (Bob's ask): NEW `GameIconRenderer.RefreshIconFacing(unitId)` re-resolves the unit sprite + easterly flipX from CURRENT Facing (both derive from it via GetSpriteNameForUnit; assigns flipX both ways so turning back west UN-flips); called per hex step in `ExecuteMovement` right before the step tween (`HexMapUtil.MoveUnitTo` had ALWAYS been rotating unit.Facing per step — the icon just never re-resolved after create) and after a successful Shift+click `TryRotateFacing` (same gap). ⚠ PENDING Bob's play-test (GameIconRenderer/MovementController)
-- 2026-07-22 — HexChunkRenderer console gated behind NEW `debugLog` flag (default OFF, Bob's tweak #3): build-timing + terrain-array-binding info logs silent by default; setup-FAILURE warnings/errors (missing material, failed Resources.Load, slice-count mismatch) still always log — deliberate deviation from "all messages" so a broken terrain setup never fails silently (HexChunkRenderer)
-- 2026-07-22 — Ctrl-combat legal-target graphic → TargetPickOutline hex stamp (Bob's tweak #2; DesignDoc §24.11.3 + §5.10.6 AMENDED): crosshair cursor RETIRED (enum state, serialized field, procedural texture + PlotOutlined all deleted); CursorController's Ctrl-hover legality poll now drives NEW `HexGridRenderer.ShowCombatTargetPick`/`ClearCombatTargetPick` — TargetPickOutline atlas sprite (hex-shaped → FitToCellScale, procedural-fill fallback) stamped on the LEGAL target's hex via utility1 with NEW serialized combatTargetColor × opacity per the overlay convention; re-stamps only on hex change; DENIED cursor unchanged for illegal Ctrl-hovers; battle-map guard keeps the lazy singleton find from running outside battle (CursorController/HexGridRenderer/DesignDoc/Claude_Project)
-- 2026-07-22 — HexSelect raised above terrain features (Bob's tweak #1): SortingConfig Map-layer renumber — selection ring drew UNDER rivers/roads/bridges/cities (order 10); now hexOutline 0 → mapIcon 10 → riverBank 20 → riverWater 30 → road 40 → bridgeIcon 50 → cityIcon 60 → impassable 70 → HexSelect 80 → mapText 90, so only map labels render over the ring; nothing serializes SortSlot, so the enum/table reorder is data-safe (SortingConfig/Claude_Project)
-- 2026-07-22 — Background room AUTO-FIT to map size (Bob's task): NEW `Renderers/BattleBackgroundFitter` — scales/moves the "Background Room" sprite so the image's baked-in table window (green tube border + glow = preserved padding) frames ANY map size; serialized normalized-window calibration (center offset + size as fractions of image size) reverse-engineered from Bob's hand-tuned 32x21 setup — feeding 32x21 back through reproduces that exact transform; `BattleManager.SetupBattleManagerData` calls `FitToMap(w,h)` right after `HexGridSystem.Initialize` (FindAnyObjectByType, null-tolerant warning). Per-axis scale = mild distortion only while maps stay ~16:9 (Bob's authoring convention, ratified in discussion). ⚠ PENDING Bob: add component to Background Room + play-test (BattleBackgroundFitter/BattleManager)
-- 2026-07-21 — Movement-overlay tint + opacity fields LIVE (Bob's request): overlay art now ships as a solid-white texture and `HexGridRenderer` drives the final look — serialized RGB tint × NEW per-overlay `[Range 0–1]` opacity sliders (movementRange/zocTerminal/pathPreview; color alpha IGNORED), applied via `OverlayTint` to atlas art AND the procedural fallback in `ShowMovementRange`/`ShowPathPreview`; supersedes the same-day as-authored/no-tint convention (TODO convention block + SpriteManager comment updated); white-art atlas swap owed by Bob (HexGridRenderer/SpriteManager/Claude_TODO)
-- 2026-07-21 — ROOT CAUSE of overlays-under-cities FOUND & FIXED (one line): Forward Renderer transparent mask 119 excludes Unity layer 7 ("No Volume Layer"), which the `NoVolumeRendering` RenderObjects feature redraws AFTER post-processing — `HexLayer.SetSprite`'s `new GameObject()` children were born on layer 0 (Default) and drew in the EARLY pass, under every layer-7 prefab regardless of sorting layer; stamps now inherit the host's layer (`go.layer = gameObject.layer`). Unity layer = which PASS, sorting layer = order WITHIN a pass; pass model documented in Claude_Project §3.5. Side effect: overlays now skip post-FX like all icons. Sorting/prefab/material theories were red herrings. ✅ CONFIRMED in play (Bob, 2026-07-21) (HexLayer/Claude_Project)
-- 2026-07-21 — Sprite sorting DECONFLICTED to a single authority (`Renderers/SortingConfig.cs`): new static `SortSlot` enum (16 concerns) + layer/base-order table + `Apply(renderer, slot, subOrder)`; `HexLayer` drops its serialized sortingLayer/sortingOrder → code `Configure(SortSlot)` (HexGridRenderer wires all 16 in Awake), SetSprite stamps via SortingConfig; every prefab is stamped at spawn overriding baked sorting — map prefabs (City/MapIcon/Bridge/MapText) via HexGridRenderer, unit icons via GameIconRenderer; each prefab's INTERNAL element order now lives as `const …SubOrder` in its own script (Bob's call). Kills the old dual prefab-baked-vs-HexLayer sorting system (NOTE: good hygiene but NOT the overlay bug — see the render-pass root-cause entry above). ✅ CONFIRMED 2026-07-21 — everything sorts correctly under the pass fix (SortingConfig/HexLayer/HexGridRenderer/GameIconRenderer/Prefab_CityIcon+MapIcon+BridgeIcon+MapText+CombatUnitIcon/Claude_Project)
-- 2026-07-21 — FIX fog-of-war movement leak: `HexMapUtil.GetValidMoveDestinations` no longer lets an UNSPOTTED (Level0) enemy ground unit block a hex — it was carving a visible hole in the range (move-around-but-not-onto) and leaking the enemy's position; now mirrors the Level0 exclusion already used for the ZoC set (spotted enemies still block; mid-move spotting reveals+halts on contact). ⚠ PENDING Bob's play-test (HexMapUtil)
-- 2026-07-21 — Overlay-sprite convention RATIFIED + FitToCellScale made public: ALL hex-shaped overlay sprites stamp through `HexGridRenderer.FitToCellScale` (MoveRangeFill/ZocStop live; TargetPickOutline + ThreatFill_* flagged at their L2/M13 consumer items); point markers authored-size; planning rule = ask Bob hex-shaped vs marker for every new overlay sprite; convention block added to TODO Input/UI + SpriteManager/FitToCellScale doc comments (HexGridRenderer/SpriteManager/Claude_TODO)
-- 2026-07-21 — Overlay hex-shape fix (fit-to-cell): the grid is REGULAR pointy-top (cell 2.56 wide × 2.956 tall — square-canvas hex art renders ~13.5% short vertically, Bob's "tops and bottoms too short"); add `HexGridSystem.HEX_HEIGHT` (width×2/√3) + optional `scale` param on `HexLayer.SetSprite` + `HexGridRenderer.FitToCellScale` applied to the range/ZoC stamps (self-normalizing: correctly-proportioned art → scale 1; fallback fill also lands exact); path markers stay authored-size; fix stale Claude_Project geometry claims (VERTICAL_SPACING 1.92→2.217, spacing formula ×0.75→×√3/2) (HexGridSystem/HexLayer/HexGridRenderer/Claude_Project)
-- 2026-07-21 — Overlay fixes per Bob's play notes: ALL overlay atlas art now stamped as-authored + fully opaque (Color.white — the code tint made range fills invisible; serialized HexGridRenderer colors now tint only the procedural fallback; SpriteManager comment updated to the no-tint convention); NEW `CombatUnit.CanBeginMoveOrder()` (read-only twin — BeginMoveOrder now calls it then spends) gates overlays/previews via `MovementController.RecomputeRangeAndRaise` (select/post-attack/post-move/facing paths; spent or dug-in unit → empty range, RangeCleared, no hover preview; mid-move per-hex recompute deliberately left raw — its ZocTerminals drive the halt rule) (CombatUnit/MovementController/HexGridRenderer/SpriteManager)
-- 2026-07-20 — MOVEMENT CONFIRMED LIVE + movement OVERLAYS hooked up (task 2): Bob added MovementController to BattleScene → selection/camera/movement/icon-glide all confirmed in play; MOVE-DIAG logging stripped; `RaiseMovementRangeComputed` gains the ZocTerminals param (renderer previously fabricated an empty set — ZoC-stop hexes now render distinctly via MoveRangeZocStop); `ShowMovementRange`/`ShowPathPreview` resolve the Movement Overlays atlas sprites (MoveRangeFill/MovePathStep/MovePathEnd, procedural-fill fallback if unpacked); NEW hover path preview — MovementController.Update polls the hovered hex (FindPath only on hex CHANGE; suppressed over HUD panels / outside UnitSelected) → new `OnMovementPathPreviewShown/Cleared` events → HexGridRenderer. ⚠ PENDING Bob's play-test; overlay tint colors may need Inspector retuning for the authored art (EventManager/MovementController/HexGridRenderer)
-- 2026-07-20 — DEAD MOVEMENT ROOT CAUSE FOUND (scene-file GUID scan, no code): `MovementController` exists in NO scene and NO prefab — it never ran; selection info only ever worked via ReactivePanelStack.prefab (ReactivePanelManager) + HexGridRenderer, both independently subscribed to HexDetectionService. Persistent managers (EventManager/GameDataManager/SpriteManager/Audio/SceneManager) confirmed MainMenu-resident via DontDestroyOnLoad; CursorController needs no scene object (bootstrap). FIX = Bob adds the component to BattleScene (+ the already-landed Start-subscribe change; the two bugs were stacked) (BattleScene/Claude_TODO)
-- 2026-07-20 — Claude_TODO.md RESTRUCTURED (942→~455 lines): six stacked status blocks → one CURRENT STATUS; all caller debt flagged inside done milestones M2–M12 consolidated into the M13 section; Phases 1–4 / W-items / M0–M9 compressed to done-records; stale claims resolved (ProcessAdminPhaseDecay rename, 4 of 6 strike riders now consumed, RB IntelAction→CombatAction, silhouette leftovers done); change log preserved (R-L6 mega-entry compressed — detail ratified in DesignDoc/Leader_Supplement); backup in session scratchpad (Claude_TODO)
-- 2026-07-20 — INPUT CONTROL pass: division of labor RATIFIED (nav buttons = Bob's Inspector onClick → public callbacks; gameplay buttons = serialized ref + code AddListener; new HUD callbacks grow DefaultDialog_Scene1; SEO Bob-owned; cross-singleton subscribe-in-Start rule) + full input architecture documented (Claude_Project §3.6/§3.6b); `MovementController` subscribe OnEnable→Start (SEO-proof — prime-suspect fix for the dead-selection bug; MOVE-DIAG logs kept for confirmation); right-clicks now blocked over HUD panels (IsScreenPointOverUI parity); stale Newtonsoft-JSON banner deleted from HexDetectionService. ⚠ PENDING Bob's play-test (MovementController/InputService_BattleMap/HexDetectionService/Claude_Project)
-- 2026-07-20 — Claude_Project.md RECONCILED to the codebase (was ~3 weeks stale with false claims): add Models/Combat (19 files) + Models/AI (9) + Traits/ + CursorController/TerritoryService to the tree + new §2.7 combat-engine/§2.8 AI architecture sections + §3.1b BattleManager; fix MovementController §3.5b to the ratified input model (AwaitingTarget deleted); purge deleted NVG/NBC/AllWeather/Silhouette enums + WeaponProfile ratings fields; refresh line counts, supply/HP/SAVE_VERSION consts, leader-mechanics-live note; add last-reconciled stamp (Claude_Project.md/Claude_TODO)
-- 2026-07-07 — AI2b sweep GREEN (after Level0-pin test fix) + WIRED LIVE: BattleManager owns `AIPerception` (belief store) + ProcessRefresh AI-side branch now runs StepAIPerceptionDecay/RecomputeAIPerception at AI_Refresh (§3.3.4 per-side; player paths untouched); Bob's pass-again flags added (spotting level, printer script). Compile check + suites pending. (BattleManager/Claude_TODO)
-- 2026-07-07 — AI2a GREEN + AI2b sweep landed (AI track): SpottingService gains an ADDITIVE AI-side perception region (RecomputeAIPerception/StepAIPerceptionDecay → belief store; player-side spotting paths untouched) + AIPerceptionSweepTests (3); AI2b-2 next = ownership + snapshot/SAVE_VERSION + AI_Refresh call-site. ⚠ PENDING Bob's Unity Test Runner incl. SpottingServiceTests regression (Services/Tests/Claude_AI_TODO)
-- 2026-07-07 — AI1 GREEN + AI2a landed (AI track): AIPerceptionState belief store (AI-side spotting mirror, ghosts, §12.6 decay, cheat-rung dials live) + tests (8); AI2b = SpottingService symmetric sweep + snapshot serialization (will touch SpottingService + SAVE_VERSION — flagged); detail in Claude_AI_TODO. ⚠ PENDING Bob's Unity Test Runner (Models/AI/Tests/Claude_AI_TODO)
-- 2026-07-07 — AI1a GREEN + AI1b landed (AI track): AvenueAnalysis (k-diverse corridors) + AmbushSiteCatalog (§6.9.1 trigger geometry, displace routes) + tests (6) — the L1 pieces the Khost irregular AI (AI4) consumes; trace ladder moved to AI5, overlays to AI2/AI3 integration. ⚠ PENDING Bob's Unity Test Runner (Models/AI/Tests/Claude_AI_TODO)
-- 2026-07-07 — AI0 GREEN + AI1a board analysis LANDED (AI track): `Models/AI/` MobilityMap/RegionGraph/ChokepointAnalysis/BoardAnalysis (region abstraction, chokepoints, mobility fields — pure, map-derived, never serialized) + `BoardAnalysisTests` (10); AI1b (avenues/traces/ambush catalog) next; detail in Claude_AI_TODO. ⚠ PENDING Bob's Unity Test Runner (Models/AI/Tests/Claude_AI_TODO)
-- 2026-07-07 — AI0 EV oracle LANDED (AI track): `Models/AI/` Pmf + CombatOracle (exact analytic mirror of ResolveLane + stand/fate/engagement forecasts + §7.15 odds; resolvers untouched, no UnityEngine dep) + `CombatOracleTests` (12, incl. 3 exhaustive engine-enumeration drift guards); M13 balance bullet gains the re-run-drift-guards note; detail in Claude_AI_TODO. ⚠ PENDING Bob's Unity Test Runner (Models/AI/Tests/Claude_AI_TODO)
-- 2026-07-07 — AI DESIGN PASS 1: supplement fleshed PROPOSED-DETAILED (belief layer, board analysis, EV oracle, postures, conventional line + NEW irregular ambush-web doctrine, HTN offense, reactions, .aii schema, cheat ladder R0–R4); 5 rulings RATIFIED (Option-B info model, scripted-only AI economy, hints-bias .aii, cheat-ladder mandate, irregular = v1 REQUIREMENT); Claude_AI_TODO renumbered AI0–AI10 (irregular ahead of line manager for Khost); M13 asks logged: headless move-order path, S2 interface ships with M13, AI2 SAVE_VERSION bump (planning only, no code) (AI-Design-Supplement/Claude_AI_TODO/Claude_TODO)
-- 2026-07-07 — AI track OPENED: create `Supplements/AI-Design-Supplement.md` (authoritative AI design home, architecture PROPOSED — 5 layers + EV oracle + reaction module, no RL, open questions Q1–Q8) + `Claude_AI_TODO.md` (design gates D1–D7, milestones AI0–AI9); DesignDoc §23 → pointer stub (planning only, no code) (AI-Design-Supplement/Claude_AI_TODO/DesignDoc/Claude_TODO)
-- 2026-07-06 — FIX deployment-phase fog leak + tilde debug reveal: `BattleManager.SetupBattleManagerData` now zeroes every AI unit's SpottedLevel after OOB load and runs the initial `RecomputeAllSpotting` sweep BEFORE the first icon draw (OOB Spotted values were rendering unspotted enemies from Deployment on — RecomputeAllSpotting only increments, nothing ever zeroed); GameIconRenderer gains the tilde (~) rendering-only enemy-reveal cheat (⚠ REMOVE BEFORE SHIPPING — tracked in Cleanup) (BattleManager/GameIconRenderer)
-- 2026-07-06 — GROUND MOVEMENT task 1 (icon animation): unit icons now visibly glide hex-by-hex during a move (was: data-only reposition, icon never moved — WaitForSeconds placeholder, UnitMoveAnimator uncalled). Add `GameIconRenderer.AnimateIconStep` (LeanTween via UnitMoveAnimator, onComplete-driven) + `SnapIcon` (cancel+hard-place); `MovementController.ExecuteMovement` now tweens each step and `WaitUntil` the tween before running arrival spotting/ambush/ZoC (WaitForSeconds fallback when no renderer); end-of-move SnapIcon + CheckForStacking at origin/destination. Plan in todo.md (movement 1→2→3 slice: 2=real overlay sprites, 3=move degradation + Degraded gate). Play-test only (Unity-coupled) (GameIconRenderer/MovementController)
-- 2026-07-06 — INPUT REWORK code (§5.10.4/.5/.6 + §24.11.3, replaces the pre-ratification two-click-confirm model): `HexDetectionService` +OnHexRightClicked (positioned right-clicks) + public ClearSelectionAndNotify (clear moved to the subscriber per §5.10.5); `MovementController` — AwaitingTarget state DELETED, plain left-click = universal select (enemy click = intel via SelectedHex, zero new code), right-click-in-radius = immediate move, `HandleCtrlClick` = the only combat trigger (no-op + denial on illegal), `TryAttack` routes by firer class (RATIFIED mid-pass: ART/SPA/ROC/BM ALWAYS fire §7.13 indirect, adjacent included — never direct), public `AttackLegality` for the cursor; NEW `IndirectCombatAction` orchestrator (economy spend, CB OppAction + flat-50% supply w/ SuppressCounterBattery resolver flag, AI-firer reveal, non-adjacent displacement, EL-both/supply-shooter-only degradation, rep awards, no AA) + `GroundCombatAction.Validate`→public CanExecute + `CombatResolver.IsIndirectFireClass` public; NEW `CursorController` (poll-based §24.11.3, procedural placeholder crosshair/denied, art slots). NEW `IndirectCombatActionTests` (9). ⚠ PENDING Bob: Unity Test Runner + input play-test (MovementController/HexDetectionService/CursorController/CombatResolver/GroundCombatAction/IndirectCombatAction/Tests)
-- 2026-07-06 — EventManager button-contract patch APPLIED: +5 events/raisers (OnAOBPlacementModeRequested, OnMoveUndoRequested, OnUnitDetailsRequested, OnUnitIconsToggled, OnLeaderPoolRequested), rename OnAOBRemoveRequested→OnAOBAbortRequested, retire OnAOBCommitDone + OnCombatActionRequested (0 external consumers), ClearAllSubscriptions synced, stale drag-drop/interim-model comments fixed. Compile-check pending in Unity (EventManager/MovementController)
-- 2026-07-06 — HUD button set FINAL (3rd pass, mapped vs Bob's button art): Combat button RETIRED (§5.10.6 revised — Ctrl+click is the only combat trigger; OnCombatActionRequested to retire); Move Undo §5.11 CONFIRMED v1 (button art exists; MovementController snapshot item added); NEW §24.5.2.4 on-demand Unit Details (always-on detail readout retired); NEW §24.3.1 unit-icon visibility toggle (TerrainShowHide); Abort terminology adopted (OnAOBRemoveRequested→OnAOBAbortRequested); §24.5.4 rewritten to final set; Requisition = core-force viewing + purchasing; Leader Pool button + Upgrade/second-replacements art still owed (Bob); EventManager patch item queued (DesignDoc/Claude_TODO planning only, no code)
-- 2026-07-06 — AOB input package RATIFIED (2nd pass): NEW DesignDoc §11.1.8 interception reaction windows (per qualifying operative/escort arrival — WW excluded as bait-proof, 1 interceptor per window, decline = that window only, dead interceptor ≠ slot, pay-at-launch both sides, package-size scaling ratified; supersedes §11.4.5/.6 batch handshake, Resolve now attacker-unilateral) + §11.1.9 AOB-Mode lockdown (air-only input, save disabled, Esc never cancels box) + §24.7a.8 side-relative threat overlay (spotted+AD-class+GAT-gate+posture-live; bands 9–11/12–14/15+ amber/orange-red/deep-red, overlap darkened; calibrated vs WeaponProfileDB floor GAT 9) + §24.13 Phase Control Bar + §24.7a.1 placement rewrite (AOB button + Ctrl+click place, drag-drop retired) + §24.7a.7 Resolve/Cancel button row + §24.11.1 universal Esc + §24.5.5 unit-pick commit → Ctrl+click. TODO: 5 implementation items (AirThreatService, transit walk, AOB model+populate, ReactionWindowController+control bar, input-mode state machine) + M13 reaction-yield day-one requirement (DesignDoc/Claude_TODO planning only, no code)
-- 2026-07-06 — Battle-map input model RATIFIED: NEW DesignDoc §5.10.6 (left-click = universal selection incl. enemy-intel print, never an attack; Ctrl+left-click = combat trigger direct+indirect, legality-gated, no-op + denial SFX on illegal; Combat button retained as targeting-mode alternative) + NEW §24.11.3 (cursor-feedback contract, cursor derives from resolver legality checks) + amend §5.10.4/§24.4 (left-click never moves/attacks) + §24.5.4 (Move button retired) + §24.11.1 (Ctrl+left-click core binding). TODO items added: MovementController Ctrl-gate rework + indirect-range TryAttack, cursor-feedback system. AOB placement/AOB-mode input UNDER DISCUSSION (DesignDoc/Claude_TODO planning only, no code)
-- 2026-07-03 — Leader UI design pass RATIFIED (Bob's 8 rulings): §14.15 pool/recruitment finalized (recruit 50 / assign 30 knobs, Remove = unassign free, swap-on-led-target, dismissal out of v1) + §14.15.4 leader MORTALITY (destroyed/surrendered unit → leader dies, NO rolls; shatter survives) + NEW §24.5.5 Pool UI (HUD button → UIListBox roster w/ assigned-unit column + Recruit/Assign/Remove/Details; Assign → unit-pick input mode w/ Esc abandon) + §24.5.6 Details UI (4 node states incl. STRUCK exclusivity; tier-aligned 2|7|4-column constellation layout; buy-anytime w/ confirm; respec in v1; portrait w/ per-decoration why-tooltips; REP triple readout; service record w/ next-award progress); TODO §9 L2/L3 updated to ratified specs (DesignDoc/Claude_TODO planning only, no code)
-- 2026-07-03 — Leader awards + recruitment DESIGN ratified: NEW DesignDoc §14.14 (three-channel decoration model — A badges-from-skills recomputed, B combat orders from deed counters sticky, C service awards from LifetimeRepSpent sticky; award catalog/data model/portrait-layer composition + v1 thresholds as knobs) + §14.15 (leader pool + recruit at 50 prestige → Average CC / 60 REP basics, PROVISIONAL pending UI design); NEW Claude_TODO §9 leader-completion plan (L1 awards engine, L2 pool+recruitment ⚠ needs a live prestige wallet, L3 Leader Details UI, L4 leftover safe wirings). UI design discussion next (DesignDoc/Claude_TODO planning only, no code)
-- 2026-07-03 — M14 rulings round 2 (R-L6..R-L10) RATIFIED + IMPLEMENTED: EffectiveCommand (cap 3) + NEW Command Mitigation §7.7.12; §7.9.4b defender-command SV term RETIRED (max stack 19→16); ambush ladder 1.5/1.75/2.0 + NCO T5 fully wired; DirectLineToHQ → ReplacementCost ×0.7; doctrine Δ-deltas CLASS-GATED; depot REP const; `Leader.SyncFromSkillTree()` desync fix; REP earn hooks wired (combat 3/5/8 ×vet/elite mults + move). Full ruling detail ratified into HS_DesignDoc + Leader_Supplement same day. Tests: LeaderSkillCombatTests → 23, StandCheckTests updated. ✅ GREEN 2026-07-03 (Bob ran all suites) (DesignDoc/Leader_Supplement/GameData/Leader/LeaderSkillTree/LeaderSkillCatalog/CombatEngine/StandCheck/CombatResolver/CombatUnit/GroundCombatAction/MovementController/Tests)
-- 2026-07-03 — FIX pre-existing skill-tree dead-end bug (surfaced by LeaderSkillCombatTests): `LeaderSkillTree.IsBranchAvailable` blocked a doctrine/specialization's OWN deeper tiers once the branch was started (missing `b != branch` exclusion in the exclusivity check) — no leader could ever progress past T1 of any Doctrine or T4 #1 of any Specialization; Foundations were unaffected, which is why the promotion spine masked it. Add regression test `Doctrine_OwnBranchProgresses_OtherDoctrineStillBlocked` (cross-branch exclusivity still enforced) → suite now 12 tests (LeaderSkillTree/Tests)
-- 2026-07-03 — M14 SAFE SLICE code (§14.13 + Δ-deltas + silhouette re-home): add `LeaderSkillTree.GetStandValueContribution` (distinct doctrine/CA tiers, clamp LEADER_STAND_MOD_CAP) + `Leader.StandValueContribution`; `CombatResolver` derives the §14.13 Leader_mod internally (`LeaderStandMod(unit)` beside `CommandValue`) in the direct/ambush/indirect stand builders — ctx fields `DefenderLeaderStandMod`/`TargetLeaderStandMod` REMOVED (GroundCombatAction updated); six `*_BONUS_VAL` 5→2 wired as Δ-side deltas via `CombatUnit.LeaderStatDelta` into `GetAttack/DefenseStatVsClass` + `ActiveGroundAirAttack/Defense` (IsBase-gated); UndergroundBunker → Level-3 intel cap in `CombatUnit.SetSpottedLevel` (+`Leader.HasUndergroundBunker`, catalog flag 1.0); SuperiorCamouflage → `ENEMY_SPOTTING_REDUCTION_VAL 1` subtracted in `SpottingService.SpottingRangeAgainst` (+`CombatUnit.EnemySpottingRangeReduction`; IncrementSpottedLevel reports post-cap level); DELETE 3 silhouette consts + `Leader.SilhouetteReduction`; fix BetterReplacements ×100 description. Tests: `LeaderSkillCombatTests` (11). ⚠ PENDING Bob's Unity Test Runner (Leader/LeaderSkillTree/LeaderSkillCatalog/CombatUnit/CombatResolver/GroundCombatAction/SpottingService/GameData/Tests)
-- 2026-07-03 — M14 rulings pass (design only, 5 rulings ratified): doctrine combat bonuses → Δ-side stat deltas at lane build, +5→+2 (§14.8/§14.10.4; §7.5.5.6 phantom ×1.10 example struck); AdvancedTargetting → +1 CombatAction gated ART/SPA, 2nd fire mission auto-1-supply (§14.8.3); EmergencyResupply → once/scenario instant abstract 5-day delivery (§14.7.2); facility-leader map ratified (§35.4.3, resolves 35.3.11d — DEPOT gen+1 tier & SupplyPenetration via PolCon, HQ natural intel skills, rest inert); ReplacementXP = 1-tier offset vs §18.4.3. Leader_Supplement fully resynced (CombatCommand live hook, §14.13 channels, repurposes, Urban Ops removal, M14 wiring map) (DesignDoc/Leader_Supplement/Claude_TODO)
-- 2026-06-26 — Combat input wiring (M13, makes combat playable): `MovementController` — add `using Models.Combat`, route a click on an adjacent SPOTTED enemy in `HandleUnitSelectedClick` → new `TryAttack(target)` → `GroundCombatAction.Execute(CurrentUnit, target, map, new CombatRandom())` → on success: HUD summary (`BuildCombatMessage`), `BuildOccupancyCache`, `RaiseRedrawMapIcons` + `RaiseUnitActionsChanged` + `RaiseUnitMovementPointsChanged`, recompute the movement overlay (or deselect if the attacker died to return fire); on rejection: surface `outcome.Reason`. INTERIM click-to-attack input model (Combat-button/`OnCombatActionRequested` = Bob's UI); Automatic Advance + contested-crossing geometry + denial SFX flagged TODO. Unity-coupled → not EditorTestable, verified by play (MovementController)
-- 2026-06-26 — M13 ground direct-attack orchestrator (wire BattleManager→engine, model layer): add `Models/Combat/GroundCombatAction.Execute` (+ `GroundCombatOutcome`) — the caller above the pure resolvers that runs a full §7 direct attack: eligibility validate (adjacent/enemy/spotted/not-base/not-embarked) → spend action economy (§8.2.1) → `CombatResolver.ResolveDirectAttack` (§7.7.3, universal return fire) → probabilistic combat Efficiency (§7.15.3) + Supply (§7.15.5) loss per side via `DegradationCheck` → `RetreatResolver.ResolveDisplacement` (§7.9) → `UnregisterCombatUnit` on removal/destruction → returns damage/outcome/displacement/AA/prestige-owed. Align `CombatUnit.PerformCombatAction` to §7.15.7.1 (drop deterministic `ConsumeSupplies` — combat supply now probabilistic; keep the supply GATE; zero prior callers). Prestige owed is REPORTED (no §18 economy); Automatic Advance REPORTED not executed; defender leader-stand-mod 0 until M14. Add `GroundCombatActionTests` (8: 3 validation rejections, action-economy spend, damage+degradation, hard-hit displacement+AA, lethal-hit destroy+unregister+prestige). PENDING Bob's Unity Test Runner (Models/Combat/CombatUnit/Tests)
-- 2026-06-26 — SpottingService dual-domain rewire (§12.3 stateful follow-up): route the spotting sweep + §12.6 decay through a new private `SpottingRangeAgainst(spotter, target)` that picks the spotter's AIR range vs an airborne target (`target.IsAirborneSpottingTarget`) else its GROUND range; rewired `RecomputeAllSpotting` / `CheckSpottingForMover` / `CheckSpottingByStationary` / `IsCurrentlySpotted` (drop the `Mathf.FloorToInt(spotter.ActiveSpottingRange)` profile-SR lookup — `ActiveSpottingRange` is UI-only now); decay inherits dual-domain via `IsCurrentlySpotted`. Add `SpottingServiceTests` (9 integration tests: SAM air-6/ground-2 crux, NOE attack-helo = ground target, EmbarkedHelo lift = air target, dismounted AM = ground, ground-spotter range-2 baseline, decay holds air / decays ground). PENDING Bob's Unity Test Runner (Services/Tests)
-- 2026-06-25 — DesignDoc lost-content pass (part 3 — COMPLETE): RECONSTRUCT §35.4 Deployment Point Cost — §35.4.1 deployment cost = round(prestige ÷ K), K=20 provisional (REPLACES the lost per-unit cost table; auto-varies by generation via PrestigeTierCost → satisfies "tank cost by gen"), §35.4.1.1 per-unit override, §35.4.2 facilities flat 2–3 (no prestige price), §35.4.4 coreForcePointCap (.cmp, a separate constant lever — no prestige snowball; distinct from per-scenario deploymentPointCap), §35.4.5/.5.2 airbases scenario-fixed + isAirbase-site persistence. ALL lost/dead doc items now resolved: §32 + §35.1 removed (orphans, omitted not renumbered); §35.2/§35.3/§35.4 reconstructed; every §35.x dangling ref resolves (DesignDoc)
-- 2026-06-25 — DesignDoc lost-content pass (part 2): RECONSTRUCT §35.3 Deployment Phase Rules — §35.3.1 overview, §35.3.2 deployment zones (friendly-controlled IsDeploymentZone, placeable anywhere; helo shared pool; §35.3.2.3 Marine IsBeachhead landing), §35.3.4 free placement + free initial posture + Khost pre-deployed-but-still-has-phase, §35.3.8 in-battle reinforcement to friendly-controlled zones + NO voluntary withdrawal (REVERSES the prior decision) — units leave only via shatter / destruction / air-displacement, freed points re-spendable; OMIT unreferenced §35.3.1/.3/.5/.6/.7/.9/.10. RATIFY the air-displacement model → REVISE §11.7.2.4/.5/.6: adjacency = FORCED evac, indirect/air bombardment = OPTIONAL owner evac (prior 2-strike auto-evac safety net REMOVED → Pearl-Harbor-under-bombardment is now a player decision), evac'd AC may return + points free. DEFINE IsBeachhead §9.10.6.2 (Marine landing hexes, initial + in-battle). §35.3.11d (HQ/DEPOT leader skills) deferred → M14 (DesignDoc)
-- 2026-06-25 — DesignDoc lost-content pass (part 1): remove the two UNREFERENCED lost orphans entirely — §32 Production + §35.1 Management Screen Inventory (OMITTED, not renumbered — renumbering §33–35 would cascade-break Appendix W §34.5 + all §35.x refs). Then RECONSTRUCT §35.2 (CFR) from cross-references (original lost 2026-06-18): §35.2.1 Core Management (persistent core force + coreForcePointCap point-budget + Reserve/WITHDRAWN-RESERVE + evac aircraft), §35.2.2 Deployment (deploymentPointCap + IsDeploymentZone + §35.3.8 in-battle reinforcement), §35.2.3 Tab Availability (RATIFIED — opens at scenario start, accessible anytime; inner actions obey their own phase rules), §35.2.4 design decisions. STILL LOAD-BEARING-LOST: §35.3 / §35.4 (deployment rules + point-cost tables; some numeric values genuinely gone) (DesignDoc)
-- 2026-06-25 — Attack-helo NOE spotting correction + DesignDoc consistency pass: HELO dropped from `GameData.IsAirborneClassification` (attack helos fly Nap-of-the-Earth → GROUND-spotted; only EmbarkedHelo AM/MAM air-assault is air; diverges from the air-defence-fire target test — DETECTION vs ENGAGEMENT, noted §12.3.10), test updated. Consistency fixes: air-ambush reveal conflict resolved branch-dependently (§6.10.2/§12.4.7 — detection SUCCESS→L1, ambusher FIRES→L4 per opp-fire reveal §11.8.4/§24.8a.4; code's L1-on-success already correct, L4-on-fire lands with AD-fire wiring); 4 stale RB-IntelAction refs → CombatAction (§11.1.5/§11.3.6/§11.10.5/§24.7a.5 per ratified §8.5.2); stale phase refs (§12.6 →Refresh §3.3.4 per-side; §24.8b.3 →Upkeep §3.5.1); strip retired-field refs (§10.7.1 WeaponProfile bools/ratings/Silhouette →trait model; §14.11 SilhouetteReduction; §24.5.2 ratings) (GameData/CombatUnit/Tests/DesignDoc)
-- 2026-06-25 — Dual-domain spotting ranges FOUNDATION (§12.3, RATIFIED): spotting is now TARGET-DOMAIN-AWARE — a spotter uses its GROUND range vs ground targets, AIR range vs airborne targets; AD platforms' long ranges are AIR-SEARCH ONLY (SAM ground reach = basic 2). Add `GameData.GroundSpottingRange`/`AirSpottingRange`/`IsAirborneClassification` (classification tables, decoupled from profile SR — RECONA 8/4 flips the old single-range mapping) + `CombatUnit.ActiveGroundSpottingRange`/`ActiveAirSpottingRange`/`IsAirborneSpottingTarget` (airborne target = fixed-wing or EmbarkedHelo AM/MAM air-assault; attack HELO = GROUND via NOE terrain-masking, diverges from the air-defence-fire target test §7A.14); rewrite DesignDoc §12.3 to the dual-domain table (resolves the prior proposed→ratified doc-lag); tests SpottingRangeTests (5). NEXT (stateful): rewire `SpottingService` sweep + §12.6 decay to select range by `target.IsAirborneSpottingTarget` (RecomputeAllSpotting / CheckSpottingForMover / CheckSpottingByStationary / ProcessSpottingDecay) (GameData/CombatUnit/Tests/DesignDoc)
-- 2026-06-25 — AOB Status Panel contract + EventManager callback layer (WP5 / UI wiring): add `Models/Combat/AOBStatus` snapshot (live CombatUnit refs per slot, §24.7a.7) + `EventManager.OnAOBStateChanged`; wire the settled EventManager events — HUD (EndTurn / Requisition / DailyLosses / TotalLosses / SupplyOverlay), unit actions (Combat / DeployUp / DeployDown / Intel / Resupply±Replacements / Upgrade / ReplaceLosses), weather (`OnWeatherChanged` + `BattleManager.SetWeather` now raises it), AOB lifecycle (PlacedOnHex / CommitDone / Resolve / Remove) — all with Raise methods + ClearAllSubscriptions nulling; ratify §24.7a.7 AOB Status Panel (fixed 7-slot template) into DesignDoc. NO Move event (right-click model §5.10.4); `OnCombatResolved`/`OnOpportunityFireResolved` deferred (payload shapes TBD, WP3) (EventManager/BattleManager/Models.Combat/DesignDoc)
-- 2026-06-25 — AOB type-flip + target pre-filter PURE resolver (§11.1.1a, WP5 prereq): add `Models/Combat/AOBMissionResolver` (+ `AOBType`/`AsbMissionType`/`AOBTargetCategory` enums) — operative→box type (§11.1.1; TRN disambiguated by para/supply payload §11.9.7), target→candidate-box pre-filter (§11.1.1a: RB legal everywhere, AAB/AEWB OpenHex-only), `IsOperativeLegalForTarget` composes the two, target→ASB mission sub-type (§11.7); RATIFY §11.1.1a target pre-filter into DesignDoc (drag-drop placement makes the target known first → narrows legal operatives, UI greys out the rest) + UI-spec edits for the no-Move-button right-click movement model (§5.10.4/.5, §24.4, §24.11.1) and AOB drag-drop+Remove (§24.7a.1, §11.4.1); tests AOBMissionResolverTests (11) (Models/Combat/Tests/DesignDoc)
-- 2026-06-24 — Combat engine M11 RB recon PURE chain (§11.11): add `Models/Combat/ReconMissionEngine.Resolve` (+ `ReconInput`/`InterceptorInput`/`ReconMissionResult`/`ReconMissionTier`) — stealth bypass (reuses `AirCombatEngine.RollStealthAvoidance`) → Roll 1 mission contest (tie→recon) → Roll 2 1d30 escape → Roll 3 combat round (Δ surrogate → §7.6 band via `CombatEngine.ResolveLane`, FirerIsAir/Direct/BypassTerrain, winner damages loser, tie→recon); pure stat-struct engine mirroring AirCombatEngine, returns tier + HP numbers (spotting sweep / HP application / CombatAction cost / auto-return = caller); tests ReconMissionEngineTests (7). Also recorded M10 has NO pure gap (WW counter-fire = `ResolveAirStrike(ww, sam)`) — all M10 is AOB/caller (Models/Combat/Tests/Claude_TODO)
-- 2026-06-24 — Combat engine M6 PURE slice (air foundations, stateful AOB/transit deferred to M13): add `HeloTransitStandCheck` (+ `HeloTransitOutcome`) — binary SV_helo = STAND_BASE + Exp_mod − Shock, no speed/terrain/posture terms, §11.8.9; extract the §6.10 air-ambush detection roll into seedable `AirAmbushCheck` (DetectionThreshold table + RollDetection) and repoint `SpottingService.CheckAirAmbush` (drops inline UnityEngine.Random + private threshold); add sortie-supply consts `SORTIE_LAUNCH_COST 1`/`SORTIE_SHOT_COST 0.5`/`AIRBASE_LAUNCH_FLOOR 5`/`AIR_SUPPLY_LOAD 5` + `CombatUnit.CanLaunchSortie()` launch gate (§11.2.3/.3a); tests HeloTransitStandCheckTests (8) + AirAmbushCheckTests (5). Caller/movement-dynamics bits (shot budget, anti-dogpile, towed gate, transit walk, sortie deduction) stay flagged. GREEN 2026-06-24 (223 tests) (Models/Combat/Services/GameData/CombatUnit/Tests)
-- 2026-06-23 — DESIGN (Aviation Intercept Box): rework DesignDoc §11.8.10 from the abstract Helo Transit Interception pounce → unified **AIB** (1 helo + 2 escort + 2 interceptor; helo defends on GAD; automatic + declinable, no safety-check roll; everyone traverses + eats SAM fire; reuses §11.4.8 + §7.9.8; reaction trigger for transport helos on own turn + enemy-turn AIB for all helos; loss → transport disembarks at intercept hex / attack helo damage+stays). Add the **dual-phase air maxim** §8.5.1a + USP §1.7.4 (phasing pays Combat, reacting pays Opp). Amend §5.13.2.5 / §11.3.5 (helos' sole air-to-air = AIB, reverses "outside all AOB air-to-air"), narrow §11.8.9 to the ground-fire path. Rewrite TODO M12. Reverses the 2026-06-11 helo-outside-AOB ratification (DesignDoc/Claude_TODO; no code yet — formalization only)
-- 2026-06-23 — Combat engine M6 CORE ground-to-air opportunity fire (§11.8.1): add `CombatResolver.ResolveAirDefenseFire` (+ `AirDefenseFireResult`, `BuildAirDefenseFireLane`, `IsHeloAirDefenseTarget`) — one-way attacker pipeline (§7.12.2), FirerIsAir=false → GroundBalanceMod, no terrain/OL/deployment; axis GAT−GAD for HELO/EmbarkedHelo (§7A.14) else GAT−(MAN+SUR)/2; GAT<6 gate → no engagement (§11.8.2); add `GameData.GAT_INTERDICT_THRESHOLD=6` + `CombatUnit.ActiveGroundAirAttack`/`ActiveManeuverability`/`ActiveSurvivability`; tests AirDefenseFireResolverTests (6). Shot-budget/anti-dogpile/towed-gate/detection-roll flagged caller. GREEN 2026-06-23 (CombatResolver/CombatUnit/GameData/Tests)
-- 2026-06-23 — Combat engine M9 base-combat CORE (standoff strategic attack, §11.7): add `CombatResolver.ResolveBaseAttack` (+ `BaseAttackContext`/`BaseAttackResult`/`ParkedAircraftDamage`, `BuildBaseForwardLane`/`RollParkedAircraft`) — base = soft 60-HP target through the air/indirect forward lane (one-way, no stand check §17.6), HP via TakeDamage, OC suppression = round(HP/60×100) + STRATEGIC_OC_BONUS + RUNWAY_CRATERING rider via AddFacilityDamage (§11.7.2.2/.2a), parked-aircraft flat band roll (§11.7.2.3); add `GameData.STRATEGIC_OC_BONUS=20` (§31.4a.20) + `CombatUnit.ActiveOcSuppressionBonus`/`ActiveParkedHitBonus`; tests BaseCombatResolverTests (8). Ground-attack-on-base + evac/repurchase/ZoC-lock flagged caller/M13. GREEN 2026-06-23 (CombatResolver/CombatUnit/GameData/Tests)
-- 2026-06-23 — Planning: schedule **SIGINT as §8 M15** (after M14) — promote the prior "adjacent, not in M14" note into a full milestone (CombatUnit `SIGINT_Rating` property + §12.7.1 HQ-projection SpottedLevel bonus via SpottingService); repoint the §5 SIGINT bullet + status-block NEXT FRONTIERS (e) + §8 sequencing note (Claude_TODO planning only, no code)
-- 2026-06-23 — Planning: formalize the leader-skill pass as combat-plan milestone **M14** (terminal, hard-gated on M1–M13); make §7 its named input register; add the M13-is-"fully-ironed-out" gate to the §8 sequencing note and the status-block NEXT FRONTIERS (d); scope M14 from the live stubs (`Leader.StandValueContribution` §14.13, `leader_skill_mod` ICM layer §7.5.5.6, system-gating booleans, Night-Combat-T5 ambush ×2.0 from M5, §7 inert-skill re-home + silhouette-const cleanup); note CommandAbility SV terms already live + SIGINT stays a separate intel pass (Claude_TODO planning only, no code)
-- 2026-06-22 — M8 embarkment malus: `BuildAirStrikeLane` adds the §7.10.1 +1-band ×2 malus when the target is Embarked (embarked air-mobile = a ground unit targetable by both AD §8.5.3 and fixed-wing airstrikes — Bob); WW (+1) and embarkment (+1) band shifts stack; tests ResolveAirStrike_EmbarkedTarget + BuildAirStrikeLane_EmbarkedAndWildWeasel (CombatResolver/Tests)
-- 2026-06-22 — M8 follow-up: airstrikes ruled DAMAGE-ONLY (DesignDoc §11.6.1.6 NEW) — strip the target stand check + `BuildAirStrikeTargetStand` + `TargetStandValue`/`TargetOutcome`/`TargetLeaderStandMod` from `ResolveAirStrike`/`AirStrikeResult`/`AirStrikeContext`; update the two stale dormant-cap assertions (WeaponProfileFactoryTests `RuleB_CapabilityHooks_*` + WeaponProfileSovietTests Tu-22) for the avoid-GAD Dormant→Live flip; swap the stand-check test for a no-forced-movement test (CombatResolver/DesignDoc/Tests)
-- 2026-06-22 — Combat engine M8 air-to-ground (§11.6): add `CombatResolver.ResolveAirStrike` (+ `AirStrikeContext`/`AirStrikeResult`, `BuildAirStrikeLane`/`BuildAirStrikeTargetStand`) — reuses `ResolveLane(Airstrike)` for effGA-vs-GAD/OL/terrain/air, WW band shift, target stand check (arc-agnostic); flip `IgnoreAirDefense` cap Dormant→Live (WeaponTraitCatalog) + cruise GAD-ignore branch; add `CombatUnit.ActiveGroundAirDefense`/`IgnoresAirDefense`/`GetEffectiveGroundAttack`; tests AirStrikeResolverTests (CombatResolver/CombatUnit/WeaponTraitCatalog/Tests)
-- 2026-06-22 — Combat engine M7 air-to-air (pure layer): add `Models/Combat/AirCombatEngine` (DogfightOffense/Defense/PairingMetric, ResolveDogfightPass reusing CombatEngine.ResolveLane via the air pipeline, ResolveBreakthrough §11.4.8.2.1, StealthAvoidanceChance/RollStealthAvoidance §11.5) + `AirStandCheck` (§7.9.8 binary SV_air, reuses StandCheck.Shock/ExperienceStandMod) + `AirStandOutcome` enum; tests AirCombatEngineTests + AirStandCheckTests. Best-vs-best pairing + AOB orchestration = caller (Models/Combat/Tests)
-- 2026-06-22 — M0 action-economy rebalance: rewrite `CombatUnit.InitializeActionCounts` to the new authoritative DesignDoc §8.5.8 table; `DEFAULT_OPPORTUNITY_ACTIONS` 1→0 (Opp no longer universal — only AD 2 / FGT 1 / WW 3 / ART·SPA·ROC 1 per §8.5.4); ROC +1 CombatAction; WW/TRN added to switch (fixed-wing M3/D0/I0, WW Opp 3); HELO Deploy 0 + Opp 0 (§8.5.6); HQ static except Intel 2 (§8.5.7); AWACS folded into fixed-wing group; add DesignDoc §8.5 (action-budget rules: AOB=CombatAction incl. RB override §8.5.2, AD anti-rotary restricted CombatAction §8.5.3, reactive-facing decoupled→free §8.5.5, helo-no-entrench §8.5.6) + amend §5.8.8.1/§10.3a/§11.11.6.1 (GameData/CombatUnit/DesignDoc)
-- 2026-06-22 — M0 C8 BattlePhase: replace enum with ratified §3.2 (10 values: NotStarted/Deployment/PlayerRefresh/PlayerTurn/PlayerUpkeep/AI_Refresh/AI_Turn/AI_Upkeep/TurnBoundary/BattleComplete; drops AdminPhase, renames AITurn→AI_Turn + EndTurnProcessing→TurnBoundary); update BattleManager display switch + RunTurnSequence (post-player EOT→PlayerUpkeep, post-AI EOT→AI_Upkeep, AdminPhase→TurnBoundary) behavior-preservingly; Refresh phases defined but not entered + loop contents = M13; SpottingService.ProcessAdminPhaseDecay name left stale (M13) (GameData/BattleManager)
-- 2026-06-22 — M0 GameData/enum batch (C1-C7): add `UnitClassification.WW` + `TRN` (after ATT / after RECONA); add `BASE_MAX_HP=60` + base HP init at CombatUnit.cs:200; `MaxDaysSupplyUnit` 7→5, add `MaxDaysSupplyAirbase=30` + airbase init, retire `MaxDaysSupplyDepot` (repoint SnapshotMapper.cs:151 to DaysSupply.Max); `GenerationRateValues` → fractions 0.05/0.10/0.15/0.25/0.40 (+ Industrial) with call-site `× GetMaxStockpile()` rewrite (CombatUnit.cs:1795); bump `SAVE_VERSION` 2→3. C8 (BattlePhase 7→9) deferred to M13 (GameData/CombatUnit/SnapshotMapper)
-- 2026-06-19 — Combat engine M4 indirect + counter-battery (§7.13): add `CombatResolver.ResolveIndirectAttack` (+ `IndirectAttackContext`/`IndirectAttackResult`, `BuildIndirectForwardLane`/`BuildCounterBatteryLane`/`BuildIndirectTargetStand`, `IsCounterBatteryEligible`/`IsInIndirectRange`/`IsArtillery`) — forward indirect (no deployment, terrain-blocks-target, BM-bypass, arc-agnostic) + simultaneous counter-battery from in-range artillery (deployment applies, blocks firer hex, full-effect, firer no stand check) + target stand check; add `HexMapUtil.GetGeneralDirection` and switch `RetreatResolver` to a general-bearing fallback (non-adjacent firer displacement); tests IndirectResolverTests + non-adjacent retreat in RetreatResolverTests (Models/Combat/Utils/Tests)
-- 2026-06-19 — Combat engine M5 ground ambush (§6.9): add `CombatResolver.ResolveAmbush` + `BuildAmbushLane`/`BuildAmbushStand` + `AmbushResult` — one-way ×AMBUSH_BONUS_MULT, terrain-bypassed, no return fire, mover stand check (no flank, ambusher command applies), embarked-mover +1-band ×2 malus; ambusher DOES get its deployment COMBAT_MOD (dug-in ambushers hit harder, §6.9.4); 3 tests in CombatResolverTests (caller wiring — detection/displacement/reveal/turn-end — is MovementController's, flagged) (Models/Combat/Tests)
-- 2026-06-19 — Combat engine M2 map-coupled (displacement + facing): add `HexArc` (front/flank arc + rear-arc geometry, §5.8.7/§6.8.1) and `RetreatResolver.ResolveDisplacement` (§6.8/§7.9 — rear-arc candidate search ranked control>defense>cost, retreat/rout displacement via HexMapUtil.MoveUnitTo, posture-drop floor, shatter quit-field, Surrender Check + Static-collapse application, reports AutomaticAdvanceAvailable/VacatedHex); wire auto-flank into `CombatResolver` (ComputeFlank from positions+facing → ×FLANK_DAMAGE_MULT forward + −FLANK_SV_PENALTY stand; drop ctx.FlankAttack); tests HexArcTests/RetreatResolverTests + flank case in CombatResolverTests (Models/Combat/Tests)
-- 2026-06-19 — Fix `WeaponProfile.HardAttack` float→int (lone non-int stat; every other stat + the ctor param `_hardAtt` are already int; integral values only, no save impact — surfaced by the integration accessors' int ternary) (WeaponProfile)
-- 2026-06-19 — Combat engine integration (CombatUnit↔engine): audit CombatUnit rating calc vs new model (GetCombatRatingTotal/GetFinalCombatRatingModifier are UI-only & not lane-aware — left intact; flagged AWACS omission in private IsAirUnitClassification + missing Leader.StandValueContribution §14.13); add lane-aware accessors `GetCombatQualityMultiplier` (Str×Eff×Exp×ICM, no deployment) / `GetDeploymentCombatMod` / `ActiveTargetClass` / `GetAttack/DefenseStatVsClass` / `ActiveOrdnanceLoad`; add `CombatResolver` (BuildForwardLane/BuildReturnLane/BuildDefenderStand + `ResolveDirectAttack` → runs `ResolveDirectEngagement`, applies HP, reports destruction; leader command terms wired, LeaderMod=0 pending §14.13); tests CombatUnitIntegrationTests/CombatResolverTests (CombatUnit/Models/Combat/Tests)
-- 2026-06-19 — Combat engine M3 (pure layer): add `DegradationCheck` (§7.15) — per-experience 1d100 threshold tables (move/combat EL §7.15.2/.3, move/combat supply §7.15.4/.5, CB flat 50% §7.15.6) + roll resolvers + `DropOneTier` (floor Degraded move / Static combat) + `Recover`/`RecoveryTiers` Upkeep recovery (§7.15.8, cap Full) + combined appliers; tests DegradationTests (Models/Combat/Tests)
-- 2026-06-19 — Combat engine M2 (pure layer): add `StandCheck` (Shock/SV mods/ComputeStandValue/ResolveStand, §7.9.1/.5), `SurrenderCheck` (1d20 surrender §7.9.6a + 1d100 static collapse §7.9.7), `CombatEngine.ResolveDirectEngagement` (universal return fire §7.7.3, two lanes + defender stand) + `StandOutcome`/`SurrenderOutcome` enums; GameData STAND/FLANK/SHATTER/SURRENDER/STATIC_COLLAPSE consts; tests StandCheckTests/SurrenderCheckTests/DirectEngagementTests (Models/Combat/GameData/Tests)
-- 2026-06-19 — Combat engine M0+M1 (greenfield): add `Models/Combat/` damage engine — `ICombatRandom`/`CombatRandom` (seedable dice), `CombatMath` (DeltaBand 11-band ladder + band/terrain dice + RoundHalfUp), `CombatEngine.ResolveLane` (§7.7.1 7-step pipeline: axis Δ→band→roll→mult stack→terrain/crossing block→balance mod→floor; embarkment band-shift+×2), `DamageBand`/`AttackType`/`TerrainBlockTier` enums; GameData `GROUND_BALANCE_MOD`/`AIR_BALANCE_MOD`; tests CombatMathTests/CombatEngineTests (Models/Combat/GameData/Tests)
-- 2026-06-18 — Phase 4 dead GameData consts: remove ~95 superseded baseline-stat consts (GROUND_DEFENSE_*, all BASE_*_HARD/SOFT_*, GEN1-4_TANK_*, *_FGT_*, AC_* loads/spotting/attack/bomber, GROUND_ATTACK_TIER_*, old PRESTIGE_TIER_*, *_SPOTTING_RANGE/RANGE_DEFAULT) after a 123-const reader audit; keep live delta consts (INDIRECT_RANGE_*, AIR_*_SPOTTING_RANGE, EARLY_FGT_TOPSPEED, AC_HIGHSPEED_*, *_UNIT); fix doc-comments in Archetype/FamilyArchetypes (GameData/Traits)
-- 2026-06-18 — Phase 4 dead-const removal: delete the `XLARGE_MALUS … XXXLARGE_BONUS` additive modifier block from WeaponProfileDB (0 live uses; superseded by archetype+delta+trait) (WeaponProfileDB)
-- 2026-06-18 — Phase 4 R9: remove legacy capability bools `IsAmphibious`/`IsDoubleFire`/`IsAttackCapable` (properties + ctor params + FromProfileDef derivation); migrate ~30 test assertions across 5 suites to `HasCapability(Amphibious/RocketArtillery/NonCombatant)`; rework the FactoryTests capability-bridge region into trait→capability resolution tests; update catalog descriptions (WeaponProfile/WeaponProfileDB/WeaponTraitCatalog/Tests)
-- 2026-06-18 — Phase 3 Generic bases COMPLETE: convert BASE_AIRBASE/DEPOT/HQ (`CreateGenericProfiles`) to `FromProfileDef` (Facility archetype + NON_COMBATANT) — WeaponProfileDB now has 0 legacy ctors, Phase 3 per-profile sweep DONE; add `WeaponProfileFactoryTests.GenericBase_ResolvesFacilityLine`. LARGE_MALUS/XLARGE_MALUS/XXXLARGE_BONUS/BASE_INF_* consts now dead (Phase 4 removal) (WeaponProfileDB/Tests)
-- 2026-06-18 — Classification fix (Gepard/Roland): rename WeaponType `SPSAM_GEPARD_GE`→`SPAAA_GEPARD_GE` (35mm gun) & `SPAAA_ROLAND_FR`→`SPSAM_ROLAND_FR` (missile) so the intel-bucket prefix routes correctly; Roland regiment UnitClassification SPAAA→SPSAM; move Roland onto the Sam missile line (= Crotale 1/5/1/5/7·GAT14, drops gun ground-attack); Gepard keeps gun line. Update NATO tests (GameData/WeaponProfileDB/CombatUnitDB/Tests)
-- 2026-06-18 — Verify AD inline GAT comments: confirmed all ~22 AAA/SAM resolved-line comments already post-rebalance (swept in commit 70b3ab4); the "~22 stale / 2 Chinese fixed" note was obsolete — no code change (no-op)
-- 2026-06-18 — PRESTIGE PASS (price-to-potential, PG-style): widen PrestigeTierCost (0/60/120/180); revise PrestigeTypeCost values + add INF 50 / TRK 20; pin apex 450 (Scud BMS + AWACS, both at Gen1). Price every infantry (regular/airborne/marine/eng 50, SF elites Spetsnaz/MJ 110) and truck/naval (20) — all were unpriced. Retier both 2S1s → Gen1 to hit the 130 marker. Markers land: INF 50 / T-55A 65 / 2S1 130 / MiG-21 150; ceiling 450 (T-80U 245, Su-27 330, Tu-22M3 360). Enum change auto-reprices all ~140 already-costed profiles; no prestige tests exist. PLUS new **Prestige Exceptions** region in GameData (a documented home for formula overrides) + `WeaponProfile.SetPrestigeCost(int)` overload; first exception `PRESTIGE_CRUISE_BOMBER = 400` applied to the Tu-22M3 (Gen3 BMB + GAD-ignoring STANDOFF_CRUISE_MISSILE; formula gave ~360). (GameData/WeaponProfile/WeaponProfileDB)
-- 2026-06-18 — GAT REBALANCE (7/10 lethality): bump AD archetype GAT bases — Aaa 9→11, Sam 10→12 (FamilyArchetypes) — lifting every AAA/SAM's resolved GAT +2 while preserving the guidance-quality trait spread (radar/SARH/TVM/command/IR deltas unchanged). Backbone SARH SAM now lands Favorable (~14% HP) on strike fighters, Advantaged/Strong on slow strikers; MANPADS floors (6/8) untouched. Axis Δ=GAT−(MAN+SUR)/2 vs the §7.6 band ladder. Updated FamilyArchetypeTests + all 4 faction AD test assertions (+2). ⚠ ~22 AD profile inline resolved-line comments still show pre-rebalance GAT — sweep pending (WeaponProfileDB only 2 Chinese fixed) (FamilyArchetypes/Tests)
-- 2026-06-18 — Air-stat enrichment (Arab + Chinese fighters) — ✅ ALL FACTIONS DONE. Arab exports: MiG-23_IQ/F-4_IR get BVR+RWR + downgrade residuals; Su-17_IQ = MULTIROLE+RWR; F-14_IR = RWR + degraded residuals (NO Phoenix/look-down — sits at bare FighterLate DF12 vs US 15); MiG-21_IQ stays bare. All resolved values preserved → Arab tests unchanged. Chinese J-8 → BVR+RWR (radar interceptor, DF10, no look-down ICM); J-7 bare, Q-5/H-6 untouched. `WeaponProfileChineseTests` J-8 updated. TARGETING_POD still unused/held (precision jets use LASER_GUIDED_MUNITIONS) (WeaponProfileDB/Tests)
-- 2026-06-18 — Air-stat enrichment (NATO fighters): re-trait F-15/F-14 (AMRAAM/Phoenix ACTIVE_RADAR_AAM + APG-63/AWG-9 look-down ICM, F-15→FighterLate), F-16/Mirage 2000 (AGILE+BVR+look-down ICM multirole), F-4/F-4F (Sparrow BVR), Mirage F1 (BVR no ICM), Jaguar defensive swap. Asymmetry baked: NATO leads BVR + radar ICM, Soviet leads close-in Archer (HOBS). Tornados/A-10/F-117/F-111 untouched. `WeaponProfileNatoTests` Jets_US/Euro updated (WeaponProfileDB/Tests)
-- 2026-06-18 — Air-stat enrichment (Soviet fighters): flatten the 9 air-superiority/fighter-bomber jets to their generation archetype + rebuild DF/MAN/SUR via traits (MiG-29/Su-27 re-homed FighterMid→FighterLate; residuals gone bar genuine singletons — TS on MiG-25/Su-27, super-maneuver MAN on Su-47). Add traits `ACTIVE_RADAR_AAM` (DF+3, AA-12/AMRAAM tier) + `HIGH_OFF_BORESIGHT_IR` (DF+1, R-73 Archer); wake `LOOKDOWN_SHOOTDOWN` live (radar-suite ICM ×1.10). Update `WeaponProfileSovietTests` jets. Attack/bombers untouched. NATO/Arab/Chinese fighters still pending (WeaponTrait/WeaponTraitCatalog/WeaponProfileDB/Tests)
-- 2026-06-18 — Rule B effGA read step: add `WeaponProfile.EffectiveGroundAttack(TargetClass, isBase)` (GA + target-class riders; engine-agnostic) + `RuleB_EffectiveGroundAttack_AddsTargetClassRiders` guard. Other 4 riders + avoid-GAD still blocked on the greenfield strike resolver (WeaponProfile/Tests)
-- 2026-06-18 — Phase 3 Chinese COMPLETE: convert 14 Chinese non-MBT profiles (Type 86 IFV; Type 82/PHZ-89/light/heavy arty; Type 53/HQ-7 AD; H-9 helo; J-7/J-8/Q-5/H-6 jets; REG/AB infantry) + the `TRK_W` straggler to `FromProfileDef`; extend `WeaponProfileChineseTests` (Ifv/Artillery/AirDefense/Helicopter/Jets/Infantry) — WeaponProfileDB now has only the 3 base ctors left (WeaponProfileDB/Tests)
-- 2026-06-17 — NATO Batch E: convert 4 NATO helos (AH-64/AH-1/Bo-105/UH-60) to `FromProfileDef` (Helicopter archetype + helo ATGM/cannon/rocket/armor/countermeasure traits; UH-60 non-combatant transport); add `Helicopters_ResolveConvertedLines` (WeaponProfileDB/Tests)
-- 2026-06-17 — NATO Batch D: convert 7 NATO air-defense (M163/Gepard/Roland guns, Chaparral/Crotale/Rapier SP-SAM, Hawk static) to `FromProfileDef` (Aaa/Sam + radar/IR/command/SARH traits; GAT provisional); flag Gepard/Roland classification↔role mismatch; add `AirDefense_ResolveConvertedLines` (WeaponProfileDB/Tests)
-- 2026-06-17 — NATO Batch C: convert 7 NATO artillery (M109 ×4, Lt/Hvy towed, MLRS) to `FromProfileDef` (SELF_PROPELLED/ROCKET_ARTILLERY/SMART_MUNITION; M109 no smart, MLRS smart); add `Artillery_ResolveConvertedLines` (WeaponProfileDB/Tests)
-- 2026-06-17 — NATO Batch B: convert 4 NATO recon (M3 CFV/Luchs/FV105/ERC-90) to `FromProfileDef` (Recon archetype, Hard, no fragile; ERC-90 90mm = residual HA+4); add `Recon_ResolveConvertedLines` (WeaponProfileDB/Tests)
-- 2026-06-17 — NATO Batch A: convert 7 NATO IFV/APC (M2/Warrior/Marder, M113/Humvee/LVTP-7/VAB) to `FromProfileDef`; add `WeaponProfileNatoTests` (WeaponProfileDB/Tests)
-- 2026-06-17 — Air pipeline Rule A code: add GA/OL baselines to `FamilyArchetypes.Air` (Attack 10/9, Bomber 8/12, fighters 2/6) + `Air_GA_OL_Baselines_PerRuleA` test; rebase 18 Soviet jets to value-preserving residuals (FamilyArchetypes/WeaponProfileDB/Tests)
-- 2026-06-16 — Air pipeline Rule A + Rule B spec: Appendix W §2 air-archetype GA/OL table + §3 R10 (target-class + base riders, cruise avoid-GAD); main doc §7.3.7/§7.4.1.4/§7.7.5/§7A.15-17/§7B.3-.4/§11.6.1.1; catalog §9b (15 air-to-ground traits); add standalone prestige-balance TODO (Coding Files/Claude_TODO)
-- 2026-06-15 — Phase 3 Batch 7 COMPLETE: convert all 18 Soviet jets to `FromProfileDef` (structural; W8 air-SR; NON_COMBATANT transport/AWACS/recon; HIGH_MACH_DASH markers) — SOVIET FACTION fully migrated; add `WeaponProfileSovietTests` regression suite (WeaponProfileDB/Tests)
-- 2026-06-15 — Phase 3 Batch 7 (partial): air infra (W8 air-SR consts + `FamilyArchetypes.Air` base SR 4, Option A) + convert 4/18 Soviet jets (An-12, A-50, MiG-21, MiG-23) to `FromProfileDef`; 14 jets remain (GameData/FamilyArchetypes/WeaponProfileDB)
-- 2026-06-15 — Phase 3 Batch 6: convert 13 Soviet helos/infantry/trucks-naval to `FromProfileDef` (Helicopter archetype SR3; infantry RPG+MANPADS, Spetsnaz SF R5 SD9, engineers fort/river; truck/naval NON_COMBATANT); S-300 → truck MMP (WeaponProfileDB/FamilyArchetypes)
-- 2026-06-15 — Phase 3 Batch 5: convert 9 Soviet air-defense (SPAAA/SPSAM/SAM) to `FromProfileDef` (first Aaa/Sam archetype use; radar/IR/command/TVM AD traits; SAM sites static via MMP-4; no new traits) (WeaponProfileDB)
-- 2026-06-15 — Phase 3 Batch 4: convert 10 Soviet artillery (SP/towed/rocket/Scud) to `FromProfileDef`; add SELF_PROPELLED + TRUCK_MOUNTED chassis traits; apply R3 Scud HA11/SA15 + W5 (Scud single-fire); SMART_MUNITION on 2S19/BM-27/30; doc sync (WeaponProfileDB/Traits/Coding Files)
-- 2026-06-15 — Phase 3 Batch 3: convert 10 Soviet IFVs/APCs/Recon to `FromProfileDef`; add SR/PR to FamilyArchetypes.Ground (sweep item a) + Recon archetype + RECON_FRAGILE trait (ICM ×0.6, R6); APC MMP 10→8; doc sync (WeaponProfileDB/FamilyArchetypes/Traits/Coding Files)
-- 2026-06-15 — Phase 3 Batch 2: convert all 6 NATO MBTs to `FromProfileDef` (M1=validated M1-105, Leo1/Leo2/Chall1 validated; M60A3 + AMX-30 derived) (WeaponProfileDB)
-- 2026-06-15 — Doc sync: add ERA_RELIKT/ACTIVE_PROTECTION_HARDKILL to WeaponTrait_Catalog_01.md §2+§14 + Appendix W §2 gen4+ tier note (Coding Files)
-- 2026-06-15 — Phase 3 Batch 1: convert all 9 Soviet tanks to `FromProfileDef`; T-64B=worked T-64BV; T-80U=Gen3 apex; T-80BVM=Gen4 super-tank (20/20·1.21); add traits ERA_RELIKT + ACTIVE_PROTECTION_HARDKILL (+WeaponCapability.ActiveProtection); restore T-72A/B amphibious via AMPHIBIOUS trait (WeaponProfileDB/Traits)
-- 2026-06-15 — §2 = Option A: `FromProfileDef` routes ALL 17 stats through the resolver (drop explicit GA/OL/PR/IR/SR args); `TankArchetypes` carry base SR 2/PR 1; pilot test asserts SR/PR (optics/thermal SR, GLATGM standoff PR) (WeaponProfile/Archetype/Tests)
-- 2026-06-15 — Phase 3 scaffolding: add `WeaponProfile.FromProfileDef` factory + `Capabilities`/`HasCapability` (legacy bools derived as Phase-4 bridge); pilot test `WeaponProfileFactoryTests` (9 §16 tanks via factory + 4 bridge tests); GA/OL/PR/IR/SR explicit pending §2 (WeaponProfile/Tests)
-- 2026-06-15 — §3 ICM relocation: move ICM CombatUnit→WeaponProfile; combat reads `GetActiveWeaponProfile()?.ICM`; remove `IndividualCombatModifier` + `CombatUnit.SetICM` + 169 DB calls + OOB/snapshot ICM; retire `ICM_SMALL_UNIT`/`ICM_LARGE_UNIT` (CombatUnit/CombatUnitDB/OOBFileLoader/SnapshotMapper/GameData)
-- 2026-06-15 — HexTile: init the four border sets in `SetDefaults()` (manual-ctor path) — fixes the BFS_RiverWithBridge NRE (HexTile.cs)
-- 2026-06-15 — W1 flag: RCN_FV105_UK → Hard (5th armored-car recon override) + test (WeaponProfileDB/Tests)
-- 2026-06-15 — W1/W2: add `TargetClass` + `TransportCategory` enums (GameData); `WeaponProfile.TargetClass` (auto-default by WeaponType prefix + `SetTargetClass`) and `.TransportCategory` (+`SetTransportCategory`); 4 RCN armored-car Hard overrides + 3 transport flags in WeaponProfileDB; add `WeaponProfileClassTests` (WeaponProfile/WeaponProfileDB/GameData/Tests)
-- 2026-06-15 — Phase 2: add `FamilyArchetypes.cs` (14 non-tank archetypes, ratified §7B/Appendix-W values); resolver clamp [1,25] restricted to band stats (MMP/ranges/OL/STL floored at 0); add `FamilyArchetypeTests` EditorTest (21) (Traits/Tests)
-- 2026-06-15 — Phase 1 trait system: add `Traits/` infra (ProfileStat, WeaponCapability, TraitEffect, TraitDef, WeaponTrait[89], WeaponTraitCatalog, Archetype/TankArchetypes/ProfileDef, TraitResolver) + `WeaponProfile.ICM`; §16 EditorTest passed 17/17 then removed (Traits)
-- 2026-06-15 — Step 0: strip 5 write-only WeaponProfile capability fields + 885 DB arg-lines across 177 sites; delete AllWeatherRating/NBC_Rating/NVG_Rating/UnitSilhouette enums, keep SIGINT_Rating (WeaponProfile/WeaponProfileDB/GameData)
-- 2026-06-15 — Purge all binaries from entire history: git-filter-repo kept only `*.cs`+`.gitignore` across all 285 commits; force-pushed; `.git` 474 MiB → 1.4 MiB (whole repo; tip = 34ce669)
-- 2026-06-15 — Squash 8 unpushed commits into the code-only baseline (origin was rejecting 100MB+ assets) (git history)
-- 2026-06-15 — Delete dead `BinaryToJsonConverter.cs` + `.meta` (Tools)
-- 2026-06-15 — Add `Claude_TODO.md` (root)
-- 2026-06-15 — HexTile: parameterless-ctor serialization; +HexControlLevel/IsDeploymentZone/IsBeachhead/IsPort, +4 reserves; Fort/Airbase/Port mutually exclusive; −AirbaseDamage (HexTile.cs)
-- 2026-06-15 — Repo → code-only: `.gitignore` tracks only `*.cs` (history later rewritten; current tip = 34ce669)
+- 2026-08-20 — FULL REWRITE of this file (docs): staleness audit vs code + design docs; single ▶ NEXT pointer
+  (P4 requisition); NEW 🧭 at-a-glance thread board with a same-session maintenance rule; corrected stale
+  claims (wallet-dependency on L2/M13 resolved, objective-crediting retired, audio Phase 3 wired, SAVE_VERSION
+  7 everywhere, air-audit rulings both resolved, `Generated Data` reference dropped); DONE records + old change
+  log moved to NEW `Claude_TODO_Archive.md`; superseded courier files swept to `_to_delete/`; theme-art pass
+  committed (`55587d2`); `OnEndScenarioButton` given a tracked home in Bob's queue; ⚑ P3b entry now bundles the
+  owed map-standard + D3 suite runs. Pre-rewrite text verbatim at `55587d2`.
