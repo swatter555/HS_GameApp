@@ -365,7 +365,7 @@ default 0 (everything else) → GameIconRenderer 100 → BattleManager 120 → I
 
 ⚠ **THE CRT SHOWS ABOUT TEN LINES INCLUDING THE FRAME HEADER, AND AN OVERRUN CLIPS SILENTLY** — it never throws and is invisible outside the editor. The report is 8 lines: heading and column header share one row (the heading occupies the otherwise-empty row-label column). An empty report REPLACES the table with a 3-line notice rather than trailing below it, which is where "No losses reported." was being clipped away in exactly the case it existed to explain. `LossLedgerTests.Report_FitsTheCrtHeightBudget` pins this. Font is monospace — column alignment depends on it.
 
-Buttons: `DefaultDialog_Scene1.OnDisplayLossesButton` (cumulative) / `.OnDisplayDailyLossesButton` (this turn). ⚠ Neither fires `RaiseDailyLossesRequested`/`RaiseTotalLossesRequested` — both still have zero subscribers.
+Buttons: `DefaultDialog_Scene1.OnDisplayLossesButton` (cumulative) / `.OnDisplayDailyLossesButton` (this turn) — **TWO separate Inspector-wired buttons, ratified 2026-08-20 (Bob)**; a cycle toggle was rejected as hiding the daily report behind an undiscoverable double-press. The orphan `RaiseDailyLossesRequested`/`RaiseTotalLossesRequested` events (zero subscribers ever) were DELETED with the decision — the callbacks read the ledgers directly.
 
 ### 3.6c HQ Dispatch Feed (the printer — §24.8; CRT + emitters CONFIRMED IN PLAY 2026-07-27)
 

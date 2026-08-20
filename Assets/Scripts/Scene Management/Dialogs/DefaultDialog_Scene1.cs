@@ -360,12 +360,11 @@ namespace HammerAndSickle.SceneManagement
         /// Prints the CUMULATIVE loss report to the HQ dispatch feed (§24.8 / printer P6) — live as of
         /// 2026-07-28, reading the P5 equipment ledger.
         ///
-        /// ⚠ Built here and raised as a message rather than routed through
-        /// `RaiseDailyLossesRequested`/`RaiseTotalLossesRequested`. Those two events still have no
-        /// subscribers, and which of them this button means is a design choice nobody has made — CUMULATIVE
-        /// is what the ledger actually holds, so that is what it reports. When per-turn losses are wanted,
-        /// the ledger needs a per-turn partition first; the event split is downstream of that decision, not
-        /// upstream of it.
+        /// TWO-BUTTON MODEL, ratified 2026-08-20 (Bob): this and <see cref="OnDisplayDailyLossesButton"/>
+        /// each get their OWN Inspector-wired button — cumulative and per-turn are different questions
+        /// asked at different moments, and a cycle toggle would hide the second behind an undiscoverable
+        /// double-press. The report is built here and raised directly as a printer message; the old
+        /// RaiseDailyLossesRequested/RaiseTotalLossesRequested events were deleted with the decision.
         /// </summary>
         public void OnDisplayLossesButton() => PrintLossReport(dailyOnly: false);
 

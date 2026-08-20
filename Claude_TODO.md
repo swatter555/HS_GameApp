@@ -38,9 +38,9 @@ history, not directions.
   tanks on mech bases, lift censuses empty; machine-enforced by `CensusIntegrityTests` (6). ⚠ Do not re-open
   the carrier question in either direction without touching that guard (supersedes the 08-12 "leave them" ruling).
 - **2026-08-12 — MAP-STANDARD**: map size per-scenario from the `.map` header, `MapConfig` geometry deleted,
-  truncation throws, derived scroll bounds. `MapStandardTests` (14). ⚑ Suite run owed.
+  truncation throws, derived scroll bounds. `MapStandardTests` (14, green 2026-08-20).
 - **2026-08-10/11 — DOMAINS D0–D3** (`todo_domains.md`): domain vocabulary, post-hoc spotting (§12.4.4a),
-  transit air defence (D2, play-confirmed), helo over-water grace (D3) + **SAVE_VERSION 6**. ⚑ D3 + P3b runs owed.
+  transit air defence (D2, play-confirmed), helo over-water grace (D3) + **SAVE_VERSION 6**. All suites green 2026-08-20.
 - **2026-08-08/10 — PROFILE REBUILD P0–P3** (`todo_profiles.md`): `EquipmentBays`, derived bay capacity, naval
   sealift, movement-medium rules + **SAVE_VERSION 5**. P4 is the remainder.
 - **2026-08-03/04 — AUDIO REBUILD Phases 0–3** (`todo_audio.md`): SFX as imported assets, catalog + facade +
@@ -95,9 +95,10 @@ a diagnosis.
 - [ ] **Wire the End Scenario button** → `BattleManager.OnEndScenarioButton` (Inspector, like End Turn — do NOT
       add a HUD copy; the name is a contract). Owed since the prestige pass closed (2026-08-17); the editor's
       status memo lists it too. Until wired, voluntary early finish (§17.9.2) is unreachable in play.
-- [ ] **Loss report: ONE button or TWO?** `OnDisplayLossesButton` (cumulative) and `OnDisplayDailyLossesButton`
-      (this turn) both exist and work; whether they get separate buttons is a design choice nobody has made.
-      Decide, then wire.
+- [ ] **Wire the TWO loss-report buttons (decided 2026-08-20: two buttons, not a toggle).**
+      `OnDisplayLossesButton` (cumulative) and `OnDisplayDailyLossesButton` (this turn) each get their own
+      Inspector-wired button. The orphan `RaiseDailyLossesRequested`/`RaiseTotalLossesRequested` events were
+      deleted with the decision; the callbacks read the ledgers directly.
 - [ ] **Run `Tools/UI/Audit Button Wiring`** — ~20 buttons wired, tool never exercised. Should come back clean.
 - [ ] **Build versioning (Bob, 2026-08-08):** pick a scheme (proposal: `0.<pass>.<hotfix>` pre-1.0), set
       Project Settings → Player → Version. Agent then surfaces `Application.version` in menu + logs and stamps
@@ -138,22 +139,6 @@ a diagnosis.
 >    under that, and it stays open until it passes.
 > 5. A PASSED entry is deleted from this section the same session, after its result is recorded in the change
 >    log and, if it is a shipped behaviour, in Claude_Project. **This section is a queue, never an archive.**
-
-- [!] **P3b SUITE RUN — the air rulings (2026-08-10, after the first green run). Also covers the owed
-      map-standard and D3 suite runs — one Test Runner session closes all three.**
-      **DO:** run the full EditorTest suite set — in particular `SpottingServiceTests` (new §12.3.7a region,
-      6 cases), `MovementTests`, `MovementMediumTests`, `IntelLadderTests`, `AIPerceptionTests`,
-      `AIPerceptionSweepTests`, `SpottingRangeTests`, `MapStandardTests` (14, map-standard pass), and the D3
-      over-water additions.
-      **PASS:** green. In particular a fighter adjacent to enemy infantry leaves it at Level0, while RECONA and
-      AWACS still spot ground out to 8 and a helo gunship still spots at 2.
-      **WHY:** §12.3.7a sits at `SpottingRangeAgainst`, the single §12.3.10 comparison — it reaches the
-      turn-start sweep, transit checks, decay floors AND the AI mirror at once; wrong = wrong everywhere.
-      ⚠ **One judgement call to confirm: RECONA and AWACS are EXEMPT** (their ratified 8-hex ground reach is
-      load-bearing, §11.11.3). If you meant them zeroed too, say so — it is one line.
-      (The prior P3 run is GREEN, 2026-08-10 — its play-test scenario, an embarked air-assault regiment paying
-      1 MP over mountains and ignoring ZoC, is already confirmed; a `MovementTests` failure here is more likely
-      a fixture problem than a rules one, since fixtures now build units WITH weapon profiles.)
 
 - [ ] **Fog-of-war movement range (owed since 2026-07-21; LOW priority, not blocking).**
       **DO:** move a unit along a path passing near an enemy at SpottedLevel 0 (tilde reveal OFF, known OOB
@@ -481,6 +466,22 @@ manager, for Khost). ⚠ AI2 snapshot serialization still owed its own `SAVE_VER
 > older than the last two passes migrate to `Claude_TODO_Archive.md` when this section is pruned.
 > **Entries 2026-07-21 → 2026-08-19 (incl. the theme-art pass and everything before it) are in the archive.**
 
+- 2026-08-20 — DESIGN-DOC AMENDMENT PASS (`HS_DesignDoc.md`, outside the repo — not in this commit): 12.3.7
+  amended 2/4 → **0/4** + NEW 12.3.7a (fixed-wing transit is ground-blind, medium-keyed, RECONA/AWACS exempt —
+  clears the amendment owed since 2026-08-10); 4.8 infrastructure list gains `IsPort` (Fort/Airbase/Port
+  three-way exclusive) + `IsBeachhead`, matching the built HexTile; 19.1.6.4 status corrected (scoring IS
+  BUILT since 08-17, routing data shape still the owed half); 27.2.1 records all-three-themes art
+  (theme-art pass); 6.13.11 perf example de-32×42'd. Master Log left as-is (dormant since June by
+  convention — recent ratifications live inline, dated).
+- 2026-08-20 — Loss report: TWO-BUTTON model RATIFIED (Bob) — cumulative and daily each get their own
+  Inspector-wired button (cycle toggle rejected). Orphan `RaiseDailyLossesRequested`/
+  `RaiseTotalLossesRequested` deleted from EventManager (declarations, raisers, ClearAllSubscriptions
+  nulls — zero subscribers ever); ruling recorded at the callbacks in `DefaultDialog_Scene1`. Bob's-queue
+  item flipped from "decide" to "wire the two buttons."
+- 2026-08-20 — ⚑ CLEARED (Bob ran it): full EditorTest suite GREEN — closes the `[!]` P3b air-rulings run
+  (§12.3.7a fixed-wing-blind spotting incl. the RECONA/AWACS exemption, now confirmed), the map-standard run
+  (`MapStandardTests` 14) and the D3 over-water run. The agent may build on all three again. Fog-of-war
+  overlay check stays open (play-test geometry, low priority).
 - 2026-08-20 — FULL REWRITE of this file (docs): staleness audit vs code + design docs; single ▶ NEXT pointer
   (P4 requisition); NEW 🧭 at-a-glance thread board with a same-session maintenance rule; corrected stale
   claims (wallet-dependency on L2/M13 resolved, objective-crediting retired, audio Phase 3 wired, SAVE_VERSION

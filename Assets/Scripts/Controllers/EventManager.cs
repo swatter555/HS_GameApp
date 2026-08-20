@@ -150,8 +150,6 @@ namespace HammerAndSickle.Controllers
         // See EventManager for all game events
         public event Action OnEndTurnRequested;
         public event Action OnRequisitionPanelRequested;
-        public event Action OnDailyLossesRequested;
-        public event Action OnTotalLossesRequested;
         public event Action<bool> OnSupplyOverlayToggled;
         public event Action<bool> OnUnitIconsToggled;      // unit-icon layer visibility for a clear terrain read (§24.3.1)
         public event Action OnLeaderPoolRequested;         // Leader Pool dialog (§24.5.5; rest of the leader-UI family lands with L2/L3)
@@ -482,18 +480,6 @@ namespace HammerAndSickle.Controllers
             catch (Exception e) { AppService.HandleException(CLASS_NAME, nameof(RaiseRequisitionPanelRequested), e); }
         }
 
-        public void RaiseDailyLossesRequested()
-        {
-            try { OnDailyLossesRequested?.Invoke(); }
-            catch (Exception e) { AppService.HandleException(CLASS_NAME, nameof(RaiseDailyLossesRequested), e); }
-        }
-
-        public void RaiseTotalLossesRequested()
-        {
-            try { OnTotalLossesRequested?.Invoke(); }
-            catch (Exception e) { AppService.HandleException(CLASS_NAME, nameof(RaiseTotalLossesRequested), e); }
-        }
-
         public void RaiseSupplyOverlayToggled(bool visible)
         {
             try { OnSupplyOverlayToggled?.Invoke(visible); }
@@ -742,8 +728,6 @@ namespace HammerAndSickle.Controllers
             // Battle flow / HUD events
             OnEndTurnRequested = null;
             OnRequisitionPanelRequested = null;
-            OnDailyLossesRequested = null;
-            OnTotalLossesRequested = null;
             OnSupplyOverlayToggled = null;
             OnUnitIconsToggled = null;
             OnLeaderPoolRequested = null;
