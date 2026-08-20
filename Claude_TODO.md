@@ -140,18 +140,6 @@ a diagnosis.
 > 5. A PASSED entry is deleted from this section the same session, after its result is recorded in the change
 >    log and, if it is a shipped behaviour, in Claude_Project. **This section is a queue, never an archive.**
 
-- [!] **C7 SUITE RUN — the fractional objective gate + V19 (2026-08-20).**
-      **DO:** run the full EditorTest suite — in particular `MissionObjectiveGateTests` (grown 7 → 15:
-      counts API, `RequiredObjectiveCount` arithmetic, fractional gate), `VictoryGradeTests` (+2
-      fractional-gate compositions), `PrestigePersistenceTests` (fraction round-trip at a NON-default
-      value), `SaveMigrationLadderTests`, and `ScenarioManifestTests` if one exists (IsValid gained the
-      fraction range check).
-      **PASS:** green. The one to watch is `RequiredObjectiveCount_FloatEdge_DoesNotOverCount` —
-      `(10, 0.3f)` must be 3, not 4 (the float trap the editor hit in E14).
-      **WHY:** the gate runs at grading, the early-end button and the auto-end through ONE shared
-      predicate — wrong here is wrong at all three, and `SAVE_VERSION` is now 8 (v7 saves refuse —
-      correct pre-1.0 behaviour, but a surprise if you had a test save lying around).
-
 - [ ] **Fog-of-war movement range (owed since 2026-07-21; LOW priority, not blocking).**
       **DO:** move a unit along a path passing near an enemy at SpottedLevel 0 (tilde reveal OFF, known OOB
       position). Watch the range overlay before and during the move.
@@ -478,6 +466,10 @@ manager, for Khost). ⚠ AI2 snapshot serialization still owed its own `SAVE_VER
 > older than the last two passes migrate to `Claude_TODO_Archive.md` when this section is pruned.
 > **Entries 2026-07-21 → 2026-08-19 (incl. the theme-art pass and everything before it) are in the archive.**
 
+- 2026-08-20 — ⚑ CLEARED (Bob ran it): C7/V19 suite GREEN — `MissionObjectiveGateTests` (15) incl. the
+  float-trap case, the two fractional grade compositions, the non-default fraction round-trip, and the
+  migration ladder all pass. The C7 pass is CLOSED game-side; editor's E15 + Khost manifest re-export
+  are go (Bob couriers `C7_Response_to_EditorAgent_2026-08-20.md` + the green signal).
 - 2026-08-20 — C7 FRACTIONAL OBJECTIVE GATE + V19 (editor's ask, Bob-ratified; **SAVE_VERSION 8**): the
   §17.8 gate becomes held ≥ ceil(total × `missionObjectiveFraction`) — new manifest float (0,1], default
   1.0 = the C6 all-of-them rule, mirrored into `ScenarioData` (no migration arm, pre-1.0 rule; SnapshotMapper
