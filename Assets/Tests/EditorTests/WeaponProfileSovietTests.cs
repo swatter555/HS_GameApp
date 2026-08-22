@@ -155,6 +155,14 @@ namespace HammerAndSickle.Tests
                 AssertGround(WeaponType.SAM_S300_SV, 1, 3, 1, 3, 8, 16);
                 Assert.AreEqual(8,  (int)P(WeaponType.SAM_S300_SV).MaxMovementPoints, "S-300 truck MMP 8");
                 Assert.AreEqual(10, (int)P(WeaponType.SAM_S300_SV).SpottingRange, "S-300 SR 10");
+
+                /* Engagement-envelope ladder (§11.8.2d — IR is the AD reach, live since 2026-08-22).
+                 * Tunguska = base 3 + GUN_MISSILE_COMBO trait +2 → 5: TRAIT-COMPOSED, ruled to STAY at 5
+                 * (Bob, 2026-08-22 — apex short-range AD sits above Strela-1's 4, below Kub/S-75's 6).
+                 * Pinned because a delta-only read of the DB misses the trait term and reports 3. */
+                Assert.AreEqual(3,  (int)P(WeaponType.SPAAA_ZSU23_SV).IndirectRange, "ZSU-23-4 IR 3 (gun band)");
+                Assert.AreEqual(5,  (int)P(WeaponType.SPSAM_2K22_SV).IndirectRange, "Tunguska IR 5 (3 + trait 2)");
+                Assert.AreEqual(10, (int)P(WeaponType.SAM_S300_SV).IndirectRange, "S-300 IR 10 (apex umbrella)");
             }
             catch (Exception ex) { AppService.HandleException(CLASS_NAME, nameof(AirDefense_ResolveConvertedLines), ex); throw; }
         }

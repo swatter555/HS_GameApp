@@ -97,10 +97,11 @@ namespace HammerAndSickle.Tests
 
         /// <summary>
         /// The firer's engagement reach, read the way the scan reads it so a profile change moves both.
+        /// §11.4.4 — the envelope is the profile's authored IR stat (PR kept in the max for hybrids).
         /// </summary>
         private static int Reach(CombatUnit firer)
         {
-            int r = Mathf.FloorToInt(firer.ActivePrimaryRange);
+            int r = Mathf.FloorToInt(Mathf.Max(firer.ActiveIndirectRange, firer.ActivePrimaryRange));
             return r <= 0 ? 2 : r;
         }
 
@@ -209,6 +210,79 @@ namespace HammerAndSickle.Tests
         }
 
         #endregion // §11.8.2
+
+        #region §11.4.4 — the authored IR envelope (defect fixed 2026-08-22)
+
+        /* ⚠ THE REGRESSION THIS REGION EXISTS TO PREVENT. Every AD profile authors its engagement
+         * envelope as an IR delta (the supplement T71 "IR high" idiom), but until 2026-08-22 the scan
+         * read ActivePrimaryRange — which no AD profile sets (archetype default 1) — so EVERY battery
+         * in the game interdicted at range 1 and an S-300 had a ZSU's umbrella. These tests pin both
+         * ends of the real ladder so the authored data can never go dead again. */
+
+        [Test]
+        public void FindTransitAirDefense_S300_EngagesAcrossItsAuthoredTenHexes()
+        {
+            var s300 = Unit("S300", UnitClassification.SAM, UnitRole.AirDefenseArea,
+                WeaponType.SAM_S300_SV, Side.AI, 15);
+            var helo = Helo(2);
+
+            Assert.AreEqual(10, Reach(s300), "precondition: the S-300 authors IR 10");
+
+            Assert.IsTrue(Finds(SpottingService.FindTransitAirDefense(helo, new Position2D(5, ROW_Y)), s300),
+                "the long-range SAM engages at the full authored 10 hexes");
+            Assert.IsFalse(Finds(SpottingService.FindTransitAirDefense(helo, new Position2D(4, ROW_Y)), s300),
+                "and not at 11");
+        }
+
+        [Test]
+        public void FindTransitAirDefense_Zsu23_RefusesBeyondItsAuthoredThreeHexes()
+        {
+            var zsu = Unit("ZSU", UnitClassification.SPAAA, UnitRole.AirDefenseArea,
+                WeaponType.SPAAA_ZSU23_SV, Side.AI, 10);
+            var helo = Helo(2);
+
+            Assert.AreEqual(3, Reach(zsu), "precondition: the ZSU-23 authors IR 3");
+
+            Assert.IsTrue(Finds(SpottingService.FindTransitAirDefense(helo, new Position2D(7, ROW_Y)), zsu),
+                "the point-defence gun engages at its authored 3 hexes");
+            Assert.IsFalse(Finds(SpottingService.FindTransitAirDefense(helo, new Position2D(6, ROW_Y)), zsu),
+                "and refuses at 4 — a gun system is not a SAM belt");
+        }
+
+        [Test]
+        public void EngagementLadder_IsDifferentiated_S300OutReachesZsu()
+        {
+            /* The defect by name: under the old PR read both of these resolved to 1. */
+            var s300 = Unit("S300", UnitClassification.SAM, UnitRole.AirDefenseArea,
+                WeaponType.SAM_S300_SV, Side.AI, 15);
+            var zsu = Unit("ZSU", UnitClassification.SPAAA, UnitRole.AirDefenseArea,
+                WeaponType.SPAAA_ZSU23_SV, Side.AI, 10);
+
+            Assert.Greater(Reach(s300), Reach(zsu),
+                "an S-300 does not have a ZSU's umbrella");
+        }
+
+        [Test]
+        public void ResolveTransitFire_WideEnvelope_StillOneShotPerAircraftPerTurn()
+        {
+            /* §11.8.6 held trivially when every envelope was 1 hex; a 10-hex envelope is the case it was
+             * written for — a transit crossing many hexes of one battery's reach is engaged ONCE, however
+             * long the exposure, or accumulated Shock (§11.8.9) breaks every sortie on geometry alone. */
+            var s300 = Unit("S300", UnitClassification.SAM, UnitRole.AirDefenseArea,
+                WeaponType.SAM_S300_SV, Side.AI, 15);
+            var helo = Helo(2);
+            float budget0 = s300.OpportunityActions.Current;
+            var engaged = new HashSet<string>();
+
+            // Two successive empty hexes of one move, both deep inside the 10-hex envelope.
+            MovementController.ResolveTransitFire(helo, new Position2D(6, ROW_Y), isFixedWing: false, engaged, 0);
+            MovementController.ResolveTransitFire(helo, new Position2D(7, ROW_Y), isFixedWing: false, engaged, 0);
+
+            Assert.AreEqual(budget0 - 1, s300.OpportunityActions.Current,
+                "one shot spent across the whole transit, however many hexes were in reach");
+        }
+
+        #endregion // §11.4.4
 
         #region §11.8.8 — the towed posture gate
 

@@ -3886,11 +3886,12 @@ namespace HammerAndSickle.Models
             // US M48 Chaparral Self-Propelled SAM
             //----------------------------------------------
             // Phase 3 (NATO): Sam + SELF_PROPELLED (M48 chassis) + IR_HOMING (fire-and-forget IR SAM → GAT 13, = Strela line).
-            // → HA1 HD5 SA1 SD5 GAD7 · GAT13 · MMP10 · IR6 · SR6.
+            // IR SAM→SHORT 2026-08-22 (Bob): point-defense band (real MIM-72 ~8 km) — the Strela-1 band, not Hawk's.
+            // → HA1 HD5 SA1 SD5 GAD7 · GAT13 · MMP10 · IR4 · SR6.
             WeaponProfile Chaparral = WeaponProfile.FromProfileDef(
                 "M48 Chaparral Self-Propelled SAM System", "M48 Chaparral", WeaponType.SPSAM_CHAP_US,
                 new ProfileDef(FamilyArchetypes.Sam,
-                    new Dictionary<ProfileStat, int> { { ProfileStat.IR, GameData.INDIRECT_RANGE_SAM } },
+                    new Dictionary<ProfileStat, int> { { ProfileStat.IR, GameData.INDIRECT_RANGE_SHORT } },
                     new[] { WeaponTrait.SELF_PROPELLED, WeaponTrait.IR_HOMING }),
                 UpgradePath.SAM, 372);
 
@@ -4004,11 +4005,12 @@ namespace HammerAndSickle.Models
             //----------------------------------------------
             // Phase 3 (NATO): Sam + SELF_PROPELLED + COMMAND_GUIDANCE (radar-command point SAM → GAT 14). Classification
             // corrected SPAAA→SPSAM (2026-06-18): Roland is an air-only missile system, now on the Sam line (= Crotale).
-            // → HA1 HD5 SA1 SD5 GAD7 · GAT14 · MMP10 · IR6 · SR6.
+            // IR SAM→SHORT 2026-08-22 (Bob): point-defense band (real Roland ~6 km) — not an area-defense umbrella.
+            // → HA1 HD5 SA1 SD5 GAD7 · GAT14 · MMP10 · IR4 · SR6.
             WeaponProfile Roland_FR = WeaponProfile.FromProfileDef(
                 "Roland Self-Propelled SAM System", "Roland", WeaponType.SPSAM_ROLAND_FR,
                 new ProfileDef(FamilyArchetypes.Sam,
-                    new Dictionary<ProfileStat, int> { { ProfileStat.IR, GameData.INDIRECT_RANGE_SAM } },
+                    new Dictionary<ProfileStat, int> { { ProfileStat.IR, GameData.INDIRECT_RANGE_SHORT } },
                     new[] { WeaponTrait.SELF_PROPELLED, WeaponTrait.COMMAND_GUIDANCE }),
                 UpgradePath.SAM, 468);
 
@@ -4044,11 +4046,12 @@ namespace HammerAndSickle.Models
             // French Crotale Self-Propelled SAM
             //----------------------------------------------
             // Phase 3 (NATO): Sam + SELF_PROPELLED + COMMAND_GUIDANCE (radar-command point SAM → GAT 14).
-            // → HA1 HD5 SA1 SD5 GAD7 · GAT14 · MMP10 · IR6 · SR6.
+            // IR SAM→SHORT 2026-08-22 (Bob): point-defense band (real Crotale ~10 km) — one NATO band, no fine split.
+            // → HA1 HD5 SA1 SD5 GAD7 · GAT14 · MMP10 · IR4 · SR6.
             WeaponProfile Crotale = WeaponProfile.FromProfileDef(
                 "Crotale Self-Propelled SAM System", "Crotale", WeaponType.SPSAM_CROTALE_FR,
                 new ProfileDef(FamilyArchetypes.Sam,
-                    new Dictionary<ProfileStat, int> { { ProfileStat.IR, GameData.INDIRECT_RANGE_SAM } },
+                    new Dictionary<ProfileStat, int> { { ProfileStat.IR, GameData.INDIRECT_RANGE_SHORT } },
                     new[] { WeaponTrait.SELF_PROPELLED, WeaponTrait.COMMAND_GUIDANCE }),
                 UpgradePath.SAM, 396);
 
@@ -4085,11 +4088,12 @@ namespace HammerAndSickle.Models
             // British Tracked Rapier Self-Propelled SAM
             //----------------------------------------------
             // Phase 3 (NATO): Sam + SELF_PROPELLED + COMMAND_GUIDANCE (SACLOS point SAM → GAT 14).
-            // → HA1 HD5 SA1 SD5 GAD7 · GAT14 · MMP10 · IR6 · SR6.
+            // IR SAM→SHORT 2026-08-22 (Bob): point-defense band (real Rapier ~7 km) — the Strela-1 band, not Hawk's.
+            // → HA1 HD5 SA1 SD5 GAD7 · GAT14 · MMP10 · IR4 · SR6.
             WeaponProfile Rapier_SP = WeaponProfile.FromProfileDef(
                 "Tracked Rapier Self-Propelled SAM System", "Tracked Rapier", WeaponType.SPSAM_RAPIER_UK,
                 new ProfileDef(FamilyArchetypes.Sam,
-                    new Dictionary<ProfileStat, int> { { ProfileStat.IR, GameData.INDIRECT_RANGE_SAM } },
+                    new Dictionary<ProfileStat, int> { { ProfileStat.IR, GameData.INDIRECT_RANGE_SHORT } },
                     new[] { WeaponTrait.SELF_PROPELLED, WeaponTrait.COMMAND_GUIDANCE }),
                 UpgradePath.SAM, 432);
 
@@ -6962,12 +6966,13 @@ namespace HammerAndSickle.Models
             // Chinese HQ-7 Self-Propelled SAM
             //----------------------------------------------
             // Phase 3 (derived): Sam archetype (air-only) + SELF_PROPELLED (tracked) + COMMAND_GUIDANCE (Crotale-class
-            // CLOS, GAT+2) + MOBILE_SHOOT_SCOOT (relocate after firing) + IR SAM. Tracked mobile point-defence SAM.
-            // → HA1 HD5 SA1 SD5 GAD7 GAT14 · MMP10 · SR6 · shoot-scoot.
+            // CLOS, GAT+2) + MOBILE_SHOOT_SCOOT (relocate after firing) + IR SHORT. Tracked mobile point-defence SAM.
+            // IR SAM→SHORT 2026-08-22 (Bob): rides with the NATO point-defense band — it IS a Crotale clone (~12 km).
+            // → HA1 HD5 SA1 SD5 GAD7 GAT14 · MMP10 · IR4 · SR6 · shoot-scoot.
             WeaponProfile HQ7 = WeaponProfile.FromProfileDef(
                 "HQ-7 Self-Propelled SAM System", "HQ-7", WeaponType.SPSAM_HQ7,
                 new ProfileDef(FamilyArchetypes.Sam,
-                    new Dictionary<ProfileStat, int> { { ProfileStat.IR, GameData.INDIRECT_RANGE_SAM } },
+                    new Dictionary<ProfileStat, int> { { ProfileStat.IR, GameData.INDIRECT_RANGE_SHORT } },
                     new[] { WeaponTrait.SELF_PROPELLED, WeaponTrait.COMMAND_GUIDANCE, WeaponTrait.MOBILE_SHOOT_SCOOT }),
                 UpgradePath.SAM, 564);
 

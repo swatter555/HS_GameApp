@@ -193,6 +193,16 @@ namespace HammerAndSickle.Tests
                 AssertGround(WeaponType.SAM_HAWK_US, 1, 3, 1, 3, 8, 15);
                 Assert.AreEqual(0, (int)P(WeaponType.SAM_HAWK_US).MaxMovementPoints, "Hawk static MMP 0");
                 Assert.AreEqual(10, (int)P(WeaponType.SPSAM_CHAP_US).MaxMovementPoints, "Chaparral SP MMP 10");
+
+                /* Engagement envelopes (§11.8.2d — IR is the AD reach, live since the 2026-08-22 range fix).
+                 * Bob's ruling same day: the four POINT-DEFENSE systems sit in the SHORT band (= Strela-1),
+                 * only the area-defense Hawk keeps the SAM 6. Pinned so the band split cannot silently
+                 * regress to the flat 6 it shipped with. */
+                Assert.AreEqual(4, (int)P(WeaponType.SPSAM_CHAP_US).IndirectRange, "Chaparral IR 4 (point defense)");
+                Assert.AreEqual(4, (int)P(WeaponType.SPSAM_ROLAND_FR).IndirectRange, "Roland IR 4 (point defense)");
+                Assert.AreEqual(4, (int)P(WeaponType.SPSAM_CROTALE_FR).IndirectRange, "Crotale IR 4 (point defense)");
+                Assert.AreEqual(4, (int)P(WeaponType.SPSAM_RAPIER_UK).IndirectRange, "Rapier IR 4 (point defense)");
+                Assert.AreEqual(6, (int)P(WeaponType.SAM_HAWK_US).IndirectRange, "Hawk IR 6 (area defense)");
             }
             catch (Exception ex) { AppService.HandleException(CLASS_NAME, nameof(AirDefense_ResolveConvertedLines), ex); throw; }
         }

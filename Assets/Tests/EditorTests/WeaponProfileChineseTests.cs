@@ -129,6 +129,8 @@ namespace HammerAndSickle.Tests
                 // HQ-7 mobile point SAM: Sam + SELF_PROPELLED + COMMAND_GUIDANCE (GAT+2) → GAT 14 (post-rebalance), SR 6.
                 AssertGround(WeaponType.SPSAM_HQ7, 1, 5, 1, 5, 7, 14);
                 Assert.AreEqual(6, (int)P(WeaponType.SPSAM_HQ7).SpottingRange, "HQ-7 SAM SR 6");
+                // §11.8.2d envelope — Crotale clone, rides the point-defense band (Bob, 2026-08-22).
+                Assert.AreEqual(4, (int)P(WeaponType.SPSAM_HQ7).IndirectRange, "HQ-7 IR 4 (point defense)");
             }
             catch (Exception ex) { AppService.HandleException(CLASS_NAME, nameof(AirDefense_ResolveConvertedLines), ex); throw; }
         }

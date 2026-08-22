@@ -522,8 +522,16 @@ namespace HammerAndSickle.Services
                     // §11.8.6 — one shot per aircraft per turn, however many hexes it crosses in reach.
                     if (enemy.HasEngagedAircraftThisTurn(mover.UnitID)) continue;
 
-                    int engagementRange = Mathf.FloorToInt(enemy.ActivePrimaryRange);
-                    if (engagementRange <= 0) engagementRange = 2;   // fallback: profile states no reach
+                    /* §11.4.4 — THE ENVELOPE IS THE PROFILE'S IR STAT. Every AD profile authors its
+                     * engagement reach as an IR delta (the supplement T71 "IR high" idiom: ZSU 3 …
+                     * S-300 10); AD classes are excluded from the artillery consumers of IR
+                     * (IsIndirectFireClass), so this is IR's ONLY meaning for them. Until 2026-08-22
+                     * this line read ActivePrimaryRange alone — which no AD profile sets (archetype
+                     * default 1) — so every battery in the game interdicted at range 1 and the whole
+                     * authored ladder was dead data. PR stays in the max for a future hybrid whose
+                     * gun out-reaches its authored envelope. */
+                    int engagementRange = Mathf.FloorToInt(Mathf.Max(enemy.ActiveIndirectRange, enemy.ActivePrimaryRange));
+                    if (engagementRange <= 0) engagementRange = 2;   // fallback: profile states no reach at all
                     if (HexMapUtil.GetHexDistance(newPos, enemy.MapPos) > engagementRange) continue;
 
                     contacts.Add(new TransitAirDefenseContact(enemy, enemy.SpottedLevel == SpottedLevel.Level0));
