@@ -1,7 +1,7 @@
 # AD Engagement-Range Pass (§11.8 defect) — plan + record, 2026-08-22
 
-> Spun off from the ICM pass ("THE BIG FIND", `todo_icm.md`). Status: **IMPLEMENTED (Option A),
-> awaiting Bob's Test Runner green.**
+> Spun off from the ICM pass ("THE BIG FIND", `todo_icm.md`). Status: **CLOSED 2026-08-22 —
+> suites green (Bob-run), committed `83d0f99` (fix + re-band + pins together).**
 >
 > **Why Option A proceeded without a fresh chat ratification:** §11.4.4 already ratifies the
 > envelope as the IR range ("every enemy SAM/SPSAM/AAA/SPAAA whose spotting + IR range covers the

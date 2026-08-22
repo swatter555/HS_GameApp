@@ -28,6 +28,22 @@ There is no other "start here" pointer; older ▶ arrows in `todo_profiles.md`/`
 history, not directions.
 
 **Pass ledger (newest first; each closed pass's detail lives in its plan file + the archive change log):**
+- **2026-08-22 — AIR-DEFENSE RANGE, CLOSED** (committed `83d0f99`, suites green Bob-run; record
+  `todo_adrange.md`): the §11.8 engagement envelope now reads the authored IR ladder (was `PrimaryRange`
+  = 1 on every AD unit — the whole ladder was dead data) + Bob's point-defense re-band (Chaparral/
+  Roland/Crotale/Rapier/HQ-7 6→4; Tunguska STAYS 5 — trait-composed 3+2; Hawk stays 6). Ratified ladder
+  in DesignDoc §11.8.2d; 9 envelope pins across the profile suites; 4 transit regressions. No re-pricing.
+- **2026-08-22 — PRESTIGE / UNIT ECONOMY, CLOSED** (committed `14fa5d5`, suites green Bob-run; record
+  §7 of `Prestige_SovietEconomy_Analysis_2026-08-22.md`): Soviet-menu re-tiers (BTR-70 40 / BTR-80 100 /
+  BRDM-2 AT 105 / Su-24 300 / T-80B 125; ACR explicit 250); NEW `CombatUnit.PurchaseCost` (Σ populated
+  bays) = the ratified §18.3.1 whole-unit price and the V19 kill-bounty basis; §18.5.1 upgrade formula +
+  §18.5.2 successor rule ratified; HS_DesignDoc §18 fully reconciled. Income side untouched (live).
+- **2026-08-22 — ICM / FORMATION QUALITY, CLOSED** (committed `d6734f3`, suites green Bob-run; record
+  `todo_icm.md` rulings 1–11): closed-bay ICM doctrine (sole profile prices the FORMATION); 4 new
+  formation-quality traits (M1 1.53 · Leo 2 1.47 · Challenger 1.33 · ACR 1.40 · M109/MLRS ×1.05); recon
+  ruling (all six scouts fight Soft, `RECON_FRAGILE` dormant); artillery fixes (M109 +SMART, PHZ-89/
+  Type 82 re-tiers, MJ arty prestige); 5 SP-gun templates ART→SPA. Open follow-ons: NATO late roster
+  (Q2/Q3, never ruled) + 2 ICM outliers (export idiom, LOOKDOWN live-vs-dormant) — see the handoff.
 - **2026-08-19 — THEME-ART** (committed `55587d2`): EU + CH map icons + hex tile sets, 9-arm `CreateMapIcon`,
   CN→CH prefix fix, all three terrain arrays baked (gitignored). ⏸ In-play verify gated on first non-ME export.
 - **2026-08-17 — PRESTIGE/VICTORY, CLOSED** (`todo_prestige.md`, all gates green incl. play): `VictoryLedger` +
@@ -74,7 +90,7 @@ a diagnosis.
 
 | Thread | Stands at | Next move / gate |
 |---|---|---|
-| **Requisition (P4)** | ▶ NEXT. Wallet + atomic spend LIVE (08-17); bay buy/sell/upgrade API + UI unbuilt. | Agent: build per `todo_profiles.md` P4. No gates. |
+| **Requisition (P4)** | ▶ NEXT. Wallet + atomic spend LIVE (08-17); pricing rules RATIFIED §18.3.1/§18.5.1 + `CombatUnit.PurchaseCost` LIVE (08-22, prestige pass); bay buy/sell/upgrade API + UI unbuilt. | Agent: build per `todo_profiles.md` P4 (§4.7 header carries the rules — do not re-derive prices). No gates. |
 | **Campaigns + Save/Load** | Pipeline Phase 2 paused CLEAN, all decisions settled. Campaign folders invisible to discovery; `SaveLoad` has ZERO callers — no Save button exists. | Agent: resume trio in OPEN WORK. Cost grows per mission authored (25–30 planned). Menu listing is Bob-gated (prefab). |
 | **M13 — turn loop / air missions / AOB** | The big frontier. Air RULES built + tested; air GAME unwired. Turn loop is straight-through; reaction yields are a day-one requirement (retrofit = rewrite). | Agent-led, large. Gates: D4, I8, most printer emitters, M14 remainder, D2 fixed-wing play-verify all sit behind it. |
 | **Audio** | System + policy + wiring DONE through Phase 3. Most wired sounds have NO CLIP yet; battle-HUD buttons silent. | Bob: author wavs (helo/jet long cuts too), put `UIButtonAudio` on HUD buttons. Host-blocked sounds arrive with M13/supply/leader/§17. |
@@ -85,7 +101,8 @@ a diagnosis.
 | **Printer / dispatch feed** | CRT + emitters LIVE for every existing host. Owed: P5 ledger persistence (SAVE_VERSION bump), P8b tests. Air/logistics/leader emitters host-blocked. | Agent: P5 persistence is small and self-contained. §11.7.2 evac revision awaits Bob's eyeball. |
 | **Supply (§15)** | Designed; `ProcessUpkeep` is a stub. Gates N3, HCL decay/recovery, logistics dispatches, depot REP award. | Agent: its own pass, unscheduled. No blockers besides size. |
 | **Weather** | Single-state Clear. Rich model deferred by design ("revisit before ship"). Several built rules dormant until it exists. | Design pass first (Bob + doc), then code. Nothing else gated on it except the dormant rules. |
-| **Content / editor coordination** | Khost re-priced editor-side (s0 0.302, ladder .38/.47/.56, 7/7 rungs). C7 fractional gate + V19 kill constant LANDED game-side 2026-08-20 (SAVE_VERSION 8) — E15 (fraction authoring + collision check) unblocked. Hamburg (44×21 EU) in authoring. | Editor-side: E15, Khost manifest re-export with the fraction, E14, Hamburg values. Game-side: ⚑ C7 suite run; EU/CH ⏸ verify fires on their first export. |
+| **Mission Pack (content reorg)** | NEW 2026-08-21. Plan DRAFTED (`todo_missionpack.md`, awaiting Bob's review): single `.mission` JSON pack (manifest+briefing+map+oob+aii sections), manifest in-pack, unified MapSection = a SAVE_VERSION ride, clean break, thumbnails/narration loose, `Mission`/`Scenario`/`Campaign Mission` semantics ratified. ⚠ NOT shared with the editor yet. | Bob: review plan; define the AII schema (the ⌛ gate for the editor spec + serious build). Agent: §7 update hook is bounded. |
+| **Content / editor coordination** | Khost re-priced editor-side (s0 0.302, ladder .38/.47/.56, 7/7 rungs). C7 landed game-side (SAVE_VERSION 8). ⚠ E15 + the Khost manifest re-export are SUPERSEDED by the Mission Pack plan (fraction ships inside the re-exported packs) — relay is Bob's, AFTER the AII schema lands. Hamburg (44×21 EU) in authoring. | Bob: hold the editor off E15/re-export dead work. Game-side: EU/CH ⏸ verify fires on their first export (will likely arrive as a pack). |
 | **Ship-blockers (small, must not be forgotten)** | Tilde (~) reveal cheat in `GameIconRenderer`; `AudioSettings` local `JsonSerializerOptions` (JsonPolicy rule violation). | Agent: both are quick deletes/redirects; do before any external build. Tracked in Cleanup. |
 
 ---
@@ -466,6 +483,34 @@ manager, for Khost). ⚠ AI2 snapshot serialization still owed its own `SAVE_VER
 > older than the last two passes migrate to `Claude_TODO_Archive.md` when this section is pruned.
 > **Entries 2026-07-21 → 2026-08-19 (incl. the theme-art pass and everything before it) are in the archive.**
 
+- 2026-08-22 — ⚑ CLEARED (Bob ran it): full EditorTest suite GREEN for the AD range pass — the 4 new
+  `AirDefenseTransitTests`, all 9 envelope pins, no movement elsewhere. Pass CLOSED and committed
+  (`83d0f99`); the day's three passes (ICM `d6734f3` · prestige `14fa5d5` · AD `83d0f99`) all in the
+  pass ledger. Optional play check still worth one sortie: Khost MJ AD envelopes are now 3 hexes.
+- 2026-08-22 — AD POINT-DEFENSE RE-BAND (Bob-ratified, same session as the range fix; record
+  `todo_adrange.md` addendum): Chaparral/Roland/Crotale/Rapier + HQ-7 IR 6→4 (`INDIRECT_RANGE_SHORT` —
+  they are ~6–12 km point-defense systems that had been authored with the Hawk's area umbrella);
+  Tunguska ruled to STAY 5 (⚠ it was never 3 — base 3 + GUN_MISSILE_COMBO trait +2; the "set it to 4"
+  instruction was withdrawn when the trait term surfaced); Hawk stays 6. Ratified ladder → NEW DesignDoc
+  §11.8.2d text: guns 3 · point-defense 4 · Tunguska/S-125 5 · area SAM 6 · S-300 10. Envelope pins
+  added to NATO (×5) / Soviet (×3) / Chinese (×1) profile suites. ⚑ rides the same suite run.
+- 2026-08-22 — AD ENGAGEMENT-RANGE FIX (the ICM pass's "BIG FIND", own session; record `todo_adrange.md`):
+  `FindTransitAirDefense` reads the envelope as `max(ActiveIndirectRange, ActivePrimaryRange)` (fallback
+  kept) — per §11.4.4 the AD envelope IS the authored IR stat (ZSU 3 … S-300 10; all ~22 AD profiles
+  verified, no gaps); the old PR read made every battery interdict at range 1 (authored ladder dead data).
+  Defect fix against ratified §11.4.4, not a new ruling; recorded as NEW DesignDoc §11.8.2d.
+  `AirDefenseTransitTests`: Reach() mirrors the read + 4 real-range regressions (S-300 10/11, ZSU 3/4,
+  ladder differentiation, §11.8.6 one-shot across a wide envelope). Khost: MJ AD envelopes 1→3 hexes
+  (intended). No re-pricing; §11.4.4 "spotting +" term deferred to M13 AirThreatService. ⚑ suite run owed.
+- 2026-08-21 — MISSION PACK plan drafted (`todo_missionpack.md`; docs only, no code): single-file
+  `.mission` content format — manifest/briefing/map/oob/aii as sections of one JSON doc read via
+  JsonPolicy.Content; manifest IN-pack (Bob), clean break (Bob), three text artifacts ruled (Bob);
+  agent-decided: unified `MapSection` for pack + save embed (SAVE_VERSION ride, kills MapConfig/
+  map-saveVersion/fake-checksum), `.mission` extension, `missionKind` self-describing, `missionId`
+  rename sweep, thumbnails out of Resources into the mission folder. Semantics RATIFIED:
+  Mission = either kind · Scenario = stand-alone · Campaign Mission = campaign scenario.
+  ⌛ Gated on Bob's AII schema; NOT shared with the editor (E15/Khost re-export supersession
+  relay waits with it). Thread-board row added.
 - 2026-08-20 — ⚑ CLEARED (Bob ran it): C7/V19 suite GREEN — `MissionObjectiveGateTests` (15) incl. the
   float-trap case, the two fractional grade compositions, the non-default fraction round-trip, and the
   migration ladder all pass. The C7 pass is CLOSED game-side; editor's E15 + Khost manifest re-export
