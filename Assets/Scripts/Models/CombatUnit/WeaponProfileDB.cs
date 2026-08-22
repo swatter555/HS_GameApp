@@ -527,7 +527,10 @@ namespace HammerAndSickle.Models
                 UpgradePath.TANK, 480);
 
             // Set the prestige cost for the profile.
-            T80B.SetPrestigeCost(PrestigeTierCost.Gen3, PrestigeTypeCost.TANK);
+            // Prestige pass 2026-08-22 (item 5): Gen3 -> Gen2. At 185 the T-80B (HD10) sat beside the
+            // T-64B/T-72B (HD14-15) as a trap purchase; at 125 its +2 MMP is a fair trade against the
+            // T-64A/T-72A twins.
+            T80B.SetPrestigeCost(PrestigeTierCost.Gen2, PrestigeTypeCost.TANK);
 
             // Fill out intel stats for the T-80B profile
             T80B.AddIntelReportStat(WeaponType.Personnel,      1143);
@@ -880,7 +883,9 @@ namespace HammerAndSickle.Models
                 UpgradePath.APC, 408);
 
             // Set the prestige cost for the profile.
-            BTR70.SetPrestigeCost(PrestigeTierCost.Gen2, PrestigeTypeCost.APC);
+            // Prestige pass 2026-08-22 (item 1): Gen2 -> Gen1. At 100 the BTR-70 cost double a BMP-1
+            // (55) for half the fight -- dead stock on the player menu. Wheels are the budget mount.
+            BTR70.SetPrestigeCost(PrestigeTierCost.Gen1, PrestigeTypeCost.APC);
 
             // Census — CARRIER: own platform count only (doctrine rule 2, census pass 2026-08-13).
             BTR70.AddIntelReportStat(WeaponType.APC_BTR70_SV,    129);
@@ -915,7 +920,9 @@ namespace HammerAndSickle.Models
                 UpgradePath.APC, 576);
 
             // Set the prestige cost for the profile.
-            BTR80.SetPrestigeCost(PrestigeTierCost.Gen3, PrestigeTypeCost.APC);
+            // Prestige pass 2026-08-22 (item 2): Gen3 -> Gen2. At 160 it out-priced the BMP-2 (115)
+            // while fighting like an MT-LB.
+            BTR80.SetPrestigeCost(PrestigeTierCost.Gen2, PrestigeTypeCost.APC);
 
             // Census — CARRIER: own platform count only (doctrine rule 2, census pass 2026-08-13).
             BTR80.AddIntelReportStat(WeaponType.APC_BTR80_SV,    129);
@@ -1005,7 +1012,9 @@ namespace HammerAndSickle.Models
                 UpgradePath.RCN, 336);
 
             // Set the prestige cost for the profile.
-            BRDM2AT.SetPrestigeCost(PrestigeTierCost.Gen1, PrestigeTypeCost.RCN);
+            // Prestige pass 2026-08-22 (item 3): Gen1 -> Gen2. Strictly better than the plain BRDM-2
+            // (HA6, air-droppable, same Soft class since the recon ruling) -- cannot share its 45 price.
+            BRDM2AT.SetPrestigeCost(PrestigeTierCost.Gen2, PrestigeTypeCost.RCN);
 
             // Fill out intel stats for the BRDM-2 AT profile
             BRDM2AT.AddIntelReportStat(WeaponType.Personnel, 800);
@@ -2453,7 +2462,10 @@ namespace HammerAndSickle.Models
                 UpgradePath.ATT, 432);
 
             // Set the prestige cost for the profile.
-            SU24.SetPrestigeCost(PrestigeTierCost.Gen2, PrestigeTypeCost.ATT);
+            // Prestige pass 2026-08-22 (item 4): ATT -> BMB type cost (195 -> 300). GA13/OL14 priced
+            // as a Fitter under-cut the Su-25 (255) and the Tu-16/22 (240); it is a bomber, price it as one.
+            // (UpgradePath deliberately untouched -- path membership is a gameplay chain, not a price.)
+            SU24.SetPrestigeCost(PrestigeTierCost.Gen2, PrestigeTypeCost.BMB);
 
             // Fill out intel stats for the Su-24 profile
             SU24.AddIntelReportStat(WeaponType.BMB_SU24_SV,       36);
@@ -3039,7 +3051,10 @@ namespace HammerAndSickle.Models
                 UpgradePath.TANK, 264);
 
             // Set the prestige cost for the profile.
-            M60_US.SetPrestigeCost(PrestigeTierCost.Gen1, PrestigeTypeCost.TANK);
+            // Prestige pass 2026-08-22 (item 6): explicit cost -- an ICM-1.40 Armored Cavalry squadron
+            // with an organic Apache troop (see census below) paid a T-55A bounty at Gen1+TANK=65.
+            // Bounty-only impact (AI-side); constant lives in GameData's Prestige Exceptions region.
+            M60_US.SetPrestigeCost(GameData.PRESTIGE_ACR_SQUADRON);
 
             // Intel stats: US Armored Cavalry Squadron (ACR) - Corps reconnaissance squadron
             M60_US.AddIntelReportStat(WeaponType.Personnel,       1500);

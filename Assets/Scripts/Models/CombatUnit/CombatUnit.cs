@@ -209,6 +209,18 @@ namespace HammerAndSickle.Models
         [JsonIgnore] public float ActiveIndirectRange => GetActiveWeaponProfile()?.IndirectRange ?? 0f;
         [JsonIgnore] public float ActiveSpottingRange => GetActiveWeaponProfile()?.SpottingRange ?? 0f;
 
+        /// <summary>
+        /// The unit's purchase value in prestige — the sum of every POPULATED bay's profile cost
+        /// (§18.3.1, ratified 2026-08-22: a unit is bought bay-by-bay and its value is their sum;
+        /// composable — an empty bay simply contributes nothing). Basis for the §18.2.3 kill bounty
+        /// and the §18.4.1 replacement formula; the transient naval state (TRN_NAVAL) is deliberately
+        /// NOT counted — it is never a bay (§3.2b).
+        /// </summary>
+        [JsonIgnore] public int PurchaseCost =>
+            (GetDeployedProfile()?.PrestigeCost ?? 0)
+            + (GetMobileProfile()?.PrestigeCost ?? 0)
+            + (GetEmbarkedProfile()?.PrestigeCost ?? 0);
+
         // Dual-domain spotting (§12.3) — classification-driven, decoupled from the profile SR. The spotting sweep
         // picks ground-vs-air by the TARGET's IsAirborneSpottingTarget. (Leader bonus §12.3.11 → M14; SIGINT → M15.)
         [JsonIgnore] public int ActiveGroundSpottingRange => GameData.GroundSpottingRange(Classification);

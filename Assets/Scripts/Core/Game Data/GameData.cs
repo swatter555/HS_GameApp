@@ -1578,6 +1578,18 @@ namespace HammerAndSickle.Core.GameData
         // wallet wiring; Bob has ruled the kill reward STAYS (considered removing it, decided against).
         public const float PRESTIGE_KILL_FRACTION = 0.5f;
 
+        // 2026-08-22 (prestige pass, item 6) — US Armored Cavalry squadron (TANK_M60_US): an ICM-1.40
+        // combined-arms squadron whose census carries an organic air troop (8 AH-64 + 8 OH-58) and the
+        // densest recon/AT content in the game. Gen1+TANK (65) paid a T-55A bounty for killing it; the
+        // formula has no arm for embedded aviation. Bounty-only impact (the profile is AI-side).
+        public const int PRESTIGE_ACR_SQUADRON = 250;
+
+        // 2026-08-22 (prestige pass, item 10 — §18.5.1, ratified): upgrade cost floor. The upgrade
+        // formula is max(targetProfileCost − currentProfileCost, THIS) [× PRESTIGE_COST_MULT with
+        // Connections At The Top]. The floor is what a same-price sidegrade costs (T-80U → T-80BVM,
+        // Su-27 → Su-47 — the turn-gated successor policy, item 11). Consumer: P4 RequisitionService.
+        public const int PRESTIGE_UPGRADE_MIN = 20;
+
         #endregion // Prestige Exceptions
 
         #region File Constants

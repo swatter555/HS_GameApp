@@ -223,6 +223,13 @@ check die; invariant 3 makes them unnecessary.
 
 ### 4.7 Requisition API (headless now, §18 shop UI later)
 
+> **⚠ PRICING RULES RATIFIED 2026-08-22 (prestige pass — `Prestige_SovietEconomy_Analysis_2026-08-22.md`,
+> all recorded in HS_DesignDoc §18):** whole-unit price = Σ populated bays, COMPOSABLE (§18.3.1 —
+> `CombatUnit.PurchaseCost` is already built and is the live V19 kill-bounty basis); replacement
+> cost basis = the same Σ (§18.4.1); upgrade price = `max(target − current, PRESTIGE_UPGRADE_MIN 20)`
+> × 0.7 with Connections At The Top (§18.5.1 — constant already in GameData); same-price turn-gated
+> successors pay the floor (§18.5.2). Build `RequisitionService` against these — do not re-derive.
+
 New static, headless `RequisitionService` (`Services/`, zero UnityEngine, zero singletons):
 
 ```

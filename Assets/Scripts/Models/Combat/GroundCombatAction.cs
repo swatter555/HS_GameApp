@@ -241,14 +241,16 @@ namespace HammerAndSickle.Models.Combat
             map.GetHexAt(pos)?.Terrain ?? TerrainType.Clear;
 
         /// <summary>
-        /// §18.2.3 — PRESTIGE_KILL_FRACTION of the destroyed unit's purchase (prestige) cost (V19: the
-        /// fraction is Bob's tuning dial in GameData; away-from-zero rounding so 0.5 of an odd cost is
-        /// consistent). Reported, not credited — crediting lands with the M13 wallet wiring. A
-        /// shatter-WITHDRAWAL pays nothing (§7.9.6.5); only callers that detect a permanent kill invoke this.
+        /// §18.2.3 — PRESTIGE_KILL_FRACTION of the destroyed unit's purchase value (V19: the fraction
+        /// is Bob's tuning dial in GameData; away-from-zero rounding so 0.5 of an odd cost is consistent).
+        /// Basis is CombatUnit.PurchaseCost — the Σ of populated bays (§18.3.1, prestige pass 2026-08-22,
+        /// item 9; REPLACES the active-profile read, whose bounty changed with the victim's posture).
+        /// Reported, not credited — crediting lands with the M13 wallet wiring. A shatter-WITHDRAWAL
+        /// pays nothing (§7.9.6.5); only callers that detect a permanent kill invoke this.
         /// </summary>
         private static int PrestigeOnKill(CombatUnit killed)
         {
-            int cost = killed.GetActiveWeaponProfile()?.PrestigeCost ?? 0;
+            int cost = killed.PurchaseCost;
             return (int)Math.Round(cost * GameData.PRESTIGE_KILL_FRACTION, MidpointRounding.AwayFromZero);
         }
 

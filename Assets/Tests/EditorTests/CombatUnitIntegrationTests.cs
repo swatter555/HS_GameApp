@@ -40,6 +40,31 @@ namespace HammerAndSickle.Tests
             Assert.AreEqual(TargetClass.Soft, BuildUnit(UnitClassification.INF, WeaponType.INF_REG_SV).ActiveTargetClass, "INF = Soft");
         }
 
+        /// <summary>
+        /// §18.3.1 (prestige pass 2026-08-22): PurchaseCost = Σ populated bays, independent of the
+        /// unit's current posture — the V19 kill-bounty and §18.4.1 replacement basis. A single-bay
+        /// unit's cost is its deployed profile; a mounted regiment adds its Mobile bay; an empty bay
+        /// contributes nothing.
+        /// </summary>
+        [Test]
+        public void PurchaseCost_SumsPopulatedBays_PostureIndependent()
+        {
+            var tank = BuildUnit(UnitClassification.TANK, WeaponType.TANK_T55A_SV);
+            int t55 = WeaponProfileDB.GetWeaponProfile(WeaponType.TANK_T55A_SV).PrestigeCost;
+            Assert.AreEqual(t55, tank.PurchaseCost, "single-bay unit = deployed profile cost");
+
+            var mrr = new CombatUnit("MRR", UnitClassification.MECH, UnitRole.GroundCombat, Side.Player, Nationality.USSR);
+            mrr.EquipmentBays.InitializeEquipmentBays("MRR",
+                WeaponType.INF_REG_SV, WeaponType.IFV_BMP2_SV, WeaponType.NONE);
+            int expected = WeaponProfileDB.GetWeaponProfile(WeaponType.INF_REG_SV).PrestigeCost
+                         + WeaponProfileDB.GetWeaponProfile(WeaponType.IFV_BMP2_SV).PrestigeCost;
+
+            mrr.SetDeploymentPosition(DeploymentPosition.Deployed);
+            Assert.AreEqual(expected, mrr.PurchaseCost, "two-bay unit sums deployed + mobile");
+            mrr.SetDeploymentPosition(DeploymentPosition.Mobile);
+            Assert.AreEqual(expected, mrr.PurchaseCost, "posture does not move the purchase value");
+        }
+
         [Test]
         public void AxisStats_ReadProfileStatsBySelectedClass()
         {

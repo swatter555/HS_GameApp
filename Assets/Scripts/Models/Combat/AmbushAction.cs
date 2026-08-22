@@ -137,10 +137,10 @@ namespace HammerAndSickle.Models.Combat
 
         #region Helpers
 
-        /// <summary>§18.2.3 — PRESTIGE_KILL_FRACTION of purchase cost (V19 dial), reported only (see GroundCombatAction.PrestigeOnKill).</summary>
+        /// <summary>§18.2.3 — PRESTIGE_KILL_FRACTION of PurchaseCost (Σ populated bays, §18.3.1 2026-08-22), reported only (see GroundCombatAction.PrestigeOnKill).</summary>
         private static int PrestigeOnKill(CombatUnit killed)
         {
-            int cost = killed.GetActiveWeaponProfile()?.PrestigeCost ?? 0;
+            int cost = killed.PurchaseCost;
             return (int)Math.Round(cost * GameData.PRESTIGE_KILL_FRACTION, MidpointRounding.AwayFromZero);
         }
 
