@@ -89,14 +89,17 @@ namespace HammerAndSickle.Tests
                 AssertGround(WeaponType.APC_BTR70_SV, 3, 4, 6, 8, 7, 0);  // APC archetype + SD
                 Assert.AreEqual(8, (int)P(WeaponType.APC_BTR70_SV).MaxMovementPoints, "BTR-70 MMP (APC baseline 8)");
 
-                // BRDM-2 scout: hardened hull (HD5/SD9) + RECON_FRAGILE ICM 0.60, SR 3.
+                // BRDM-2 scout: hardened hull (HD5/SD9), SR 3. Recon ruling 2026-08-22: RECON_FRAGILE
+                // retired (skirmisher doctrine — the weak statline is the offense governor), ICM back to 1.0.
                 AssertGround(WeaponType.RCN_BRDM2_SV, 2, 5, 5, 9, 7, 0);
-                Assert.AreEqual(0.60f, P(WeaponType.RCN_BRDM2_SV).ICM, ICM_TOL, "BRDM-2 RECON_FRAGILE ICM");
+                Assert.AreEqual(1.00f, P(WeaponType.RCN_BRDM2_SV).ICM, ICM_TOL, "BRDM-2 ICM (RECON_FRAGILE retired)");
+                Assert.AreEqual(TargetClass.Soft, P(WeaponType.RCN_BRDM2_SV).TargetClass, "BRDM-2 Soft");
                 Assert.AreEqual(3, (int)P(WeaponType.RCN_BRDM2_SV).SpottingRange, "BRDM-2 SR");
 
-                // BRDM-2 AT: ATGM (HA 6), Hard target, NOT fragile.
+                // BRDM-2 AT: ATGM (HA 6), NOT fragile. Soft target (recon ruling 2026-08-22 — the W1
+                // Hard override is deleted; same hull as the BRDM-2, same class).
                 AssertGround(WeaponType.RCN_BRDM2AT_SV, 6, 5, 5, 9, 7, 0);
-                Assert.AreEqual(TargetClass.Hard, P(WeaponType.RCN_BRDM2AT_SV).TargetClass, "BRDM-2 AT Hard");
+                Assert.AreEqual(TargetClass.Soft, P(WeaponType.RCN_BRDM2AT_SV).TargetClass, "BRDM-2 AT Soft");
                 Assert.AreEqual(1.00f, P(WeaponType.RCN_BRDM2AT_SV).ICM, ICM_TOL, "BRDM-2 AT no fragile penalty");
             }
             catch (Exception ex) { AppService.HandleException(CLASS_NAME, nameof(Mech_ResolveConvertedLines), ex); throw; }

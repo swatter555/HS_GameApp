@@ -60,6 +60,10 @@ namespace HammerAndSickle.Models
         ARV_RECOVERY,
 
         // §12 Universal / economy
-        NON_COMBATANT, ROCKET_ARTILLERY, EXPORT_DOWNGRADE, RECON_FRAGILE
+        NON_COMBATANT, ROCKET_ARTILLERY, EXPORT_DOWNGRADE, RECON_FRAGILE,
+
+        // §13 Formation quality (ICM pass 2026-08-22 — closed-bay doctrine: on a unit's SOLE
+        // profile the ICM prices the whole formation, not just the platform; see todo_icm.md)
+        COMBINED_ARMS_TF, NATO_FIRST_LINE, AIR_CAVALRY, FIRE_DIRECTION_NET
     }
 }

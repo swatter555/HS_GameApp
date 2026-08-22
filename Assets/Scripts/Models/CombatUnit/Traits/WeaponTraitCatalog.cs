@@ -362,9 +362,30 @@ namespace HammerAndSickle.Models
                 "Monkey-model export — thinner armour, simpler FCS.",
                 Delta(ProfileStat.HD, -2), Delta(ProfileStat.SD, -1), Icm(0.9f)));
             Add(new TraitDef(WeaponTrait.RECON_FRAGILE, TraitCategory.Economy,
-                "Scout 'don't brawl' discouragement (Appendix W R6) — preserves the old recon ICM penalty. " +
-                "Magnitude ×0.6 is the doc's proposed value (still open to confirm).",
-                Icm(0.6f)));
+                "RETIRED TO DORMANT (recon ruling 2026-08-22): scouts are skirmishers with staying power — " +
+                "all six recon profiles fight as Soft targets (SD9 defends) and their HA2-6/SA5-6 statlines " +
+                "already cap their punch, so the R6 offense penalty is withdrawn. Kept dormant, not deleted, " +
+                "in case play shows scouts brawling after all.",
+                Icm(0.6f, EffectStatus.Dormant)));
+            #endregion
+
+            #region §13 Formation quality (ICM pass 2026-08-22 — closed-bay doctrine)
+            // On a unit's SOLE profile (all other bays closed) the ICM represents the WHOLE formation.
+            // These traits carry the organizational/doctrine layer the platform statline cannot show
+            // (hardware quality = trait deltas + FCS ICM; crew quality = Experience; formation quality = here).
+            Add(new TraitDef(WeaponTrait.COMBINED_ARMS_TF, TraitCategory.Economy,
+                "US battalion task-force integration — habitual cross-attachment, Air-Land Battle C3.",
+                Icm(1.15f)));
+            Add(new TraitDef(WeaponTrait.NATO_FIRST_LINE, TraitCategory.Economy,
+                "NATO first-line formation quality — integrated C3, combined-arms brigade structure.",
+                Icm(1.10f)));
+            Add(new TraitDef(WeaponTrait.AIR_CAVALRY, TraitCategory.Economy,
+                "US Armored Cavalry — combined-arms squadron with organic attack-aviation troop " +
+                "(composite ≈ two QUALITY_M; lands the ACR at ~1.40 total, Bob's 2026-08-22 target).",
+                Icm(1.21f)));
+            Add(new TraitDef(WeaponTrait.FIRE_DIRECTION_NET, TraitCategory.FireControlOptics,
+                "TACFIRE-era automated fire direction — faster, tighter fire missions (NATO fires edge).",
+                Icm(1.05f)));
             #endregion
 
             return d;

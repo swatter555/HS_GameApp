@@ -102,23 +102,26 @@ namespace HammerAndSickle.Tests
 
         #endregion // W1 — Hard/Soft default by prefix
 
-        #region W1 — armored-car recon overrides
+        #region W1 — recon target class (ruling 2026-08-22)
 
         [Test]
-        public void W1_ArmoredCarRecon_OverridesToHard()
+        public void W1_AllRecon_IsSoft_SkirmisherRuling()
         {
+            // Recon ruling 2026-08-22: scouts are skirmishers with staying power — ALL recon fights
+            // as Soft (SD9 defends). The five W1 Hard overrides are DELETED; the prefix default rules.
             try
             {
-                Assert.AreEqual(TargetClass.Hard, ClassOf(WeaponType.RCN_BRDM2AT_SV), "BRDM-2 AT");
-                Assert.AreEqual(TargetClass.Hard, ClassOf(WeaponType.RCN_M3_US), "M3 Bradley");
-                Assert.AreEqual(TargetClass.Hard, ClassOf(WeaponType.RCN_LUCHS_GE), "Luchs");
-                Assert.AreEqual(TargetClass.Hard, ClassOf(WeaponType.RCN_ERC90_FR), "ERC-90");
-                Assert.AreEqual(TargetClass.Hard, ClassOf(WeaponType.RCN_FV105_UK), "FV105 (UK)");
+                Assert.AreEqual(TargetClass.Soft, ClassOf(WeaponType.RCN_BRDM2_SV), "BRDM-2");
+                Assert.AreEqual(TargetClass.Soft, ClassOf(WeaponType.RCN_BRDM2AT_SV), "BRDM-2 AT");
+                Assert.AreEqual(TargetClass.Soft, ClassOf(WeaponType.RCN_M3_US), "M3 Bradley");
+                Assert.AreEqual(TargetClass.Soft, ClassOf(WeaponType.RCN_LUCHS_GE), "Luchs");
+                Assert.AreEqual(TargetClass.Soft, ClassOf(WeaponType.RCN_ERC90_FR), "ERC-90");
+                Assert.AreEqual(TargetClass.Soft, ClassOf(WeaponType.RCN_FV105_UK), "FV105 (UK)");
             }
-            catch (Exception ex) { AppService.HandleException(CLASS_NAME, nameof(W1_ArmoredCarRecon_OverridesToHard), ex); throw; }
+            catch (Exception ex) { AppService.HandleException(CLASS_NAME, nameof(W1_AllRecon_IsSoft_SkirmisherRuling), ex); throw; }
         }
 
-        #endregion // W1 — armored-car recon overrides
+        #endregion // W1 — recon target class (ruling 2026-08-22)
 
         #region W2 — TransportCategory
 

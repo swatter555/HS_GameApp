@@ -1,4 +1,4 @@
-// =============================================================================
+﻿// =============================================================================
 // WeaponProfileDB.cs
 // =============================================================================
 //
@@ -944,14 +944,15 @@ namespace HammerAndSickle.Models
             //----------------------------------------------
             // Soviet BRDM-2 Recon Vehicle
             //----------------------------------------------
-            // Phase 3 (derived): Recon archetype (hardened HD5/SD9, SR 3) + AMPHIBIOUS + RECON_FRAGILE (ICM ×0.6
-            // — the R6 "don't brawl" offense penalty). A pure scout: survives the first hit, sees far, fights poorly.
-            // → HA2 HD5 SA5 SD9 GAD7 · ICM 0.60 · MMP10 · SR3 · PR1 · amphibious.
+            // Phase 3 (derived): Recon archetype (hardened HD5/SD9, SR 3) + AMPHIBIOUS. RECON_FRAGILE removed
+            // (recon ruling 2026-08-22): scouts are skirmishers with staying power — Soft target so SD9 defends,
+            // and the weak statline is the offense governor.
+            // → HA2 HD5 SA5 SD9 GAD7 · ICM 1.00 · MMP10 · SR3 · PR1 · amphibious · Soft target.
             WeaponProfile BRDM2 = WeaponProfile.FromProfileDef(
                 "BRDM-2 Recon Vehicle", "BRDM-2", WeaponType.RCN_BRDM2_SV,
                 new ProfileDef(FamilyArchetypes.Recon,
                     new Dictionary<ProfileStat, int>(),
-                    new[] { WeaponTrait.AMPHIBIOUS, WeaponTrait.RECON_FRAGILE }),
+                    new[] { WeaponTrait.AMPHIBIOUS }),
                 UpgradePath.RCN, 288);
 
             // Set the prestige cost for the profile.
@@ -990,9 +991,10 @@ namespace HammerAndSickle.Models
             // Soviet BRDM-2 AT-5 Recon Vehicle
             //----------------------------------------------
             // Phase 3 (derived): Recon archetype (hardened HD5/SD9, SR 3) + ATGM_RAIL (AT-5 Konkurs, HA+4) +
-            // AMPHIBIOUS. NO RECON_FRAGILE — a survivable tank-destroyer scout that fights at range (Hard target,
-            // set below) and withdraws. Konkurs gives the standoff AT punch.
-            // → HA6 HD5 SA5 SD9 GAD7 · ICM 1.00 · MMP10 · SR3 · PR1 · amphibious · Hard target.
+            // AMPHIBIOUS. A survivable tank-destroyer scout that fights at range and withdraws; Konkurs gives
+            // the standoff AT punch. Soft target (recon ruling 2026-08-22 — the Hard override is deleted so
+            // SD9 does its staying-power job; §7.4.1.2).
+            // → HA6 HD5 SA5 SD9 GAD7 · ICM 1.00 · MMP10 · SR3 · PR1 · amphibious · Soft target.
             // AIR_DROPPABLE (ratified 2026-08-08, box 9 Option A): the VDV Support Regiment's mount —
             // fixed-wing-lift purchase eligibility. Capability-only, zero statline effect.
             WeaponProfile BRDM2AT = WeaponProfile.FromProfileDef(
@@ -1027,8 +1029,8 @@ namespace HammerAndSickle.Models
             };
 
             // Add the BRDM-2 AT profile to the database
-            // W1: armored-car recon fights as a Hard target (§7.4.1.2 override).
-            BRDM2AT.SetTargetClass(TargetClass.Hard);
+            // Recon ruling 2026-08-22: the W1 Hard override is DELETED — all recon fights as Soft (prefix
+            // default) so the archetype's SD9 staying-power design actually functions.
             // Mixed family (see FamilyArchetypes) - medium is stated per profile.
             BRDM2AT.SetMovementMedium(MovementMedium.Wheeled);
 
@@ -2979,13 +2981,15 @@ namespace HammerAndSickle.Models
             // Phase 3 (Appendix W §16, validated worked line) — the M1 (105): Gen3 + HA-3 (105mm L7 is
             // under-gunned on a Gen3 chassis) + SA-1 + COMPOSITE_CERAMIC + LRF + BC + OPTICS_GEN3 + THERMAL +
             // GAS_TURBINE. The single in-game Abrams slot is the 105mm M1 (display "M1 Abrams").
-            // → HA10 HD13 SA8 SD6 GAD7 · ICM 1.33 · MMP12 · PR1 · SR4.
+            // → HA10 HD13 SA8 SD6 GAD7 · ICM 1.53 (FCS 1.33 × COMBINED_ARMS_TF 1.15, ICM pass 2026-08-22)
+            //   · MMP12 · PR1 · SR4.
             WeaponProfile M1_US = WeaponProfile.FromProfileDef(
                 "M1 Abrams Main Battle Tank", "M1 Abrams", WeaponType.TANK_M1_US,
                 new ProfileDef(TankArchetypes.Gen3,
                     new Dictionary<ProfileStat, int> { { ProfileStat.HA, -3 }, { ProfileStat.SA, -1 } },
                     new[] { WeaponTrait.COMPOSITE_CERAMIC, WeaponTrait.LASER_RANGEFINDER, WeaponTrait.BALLISTIC_COMPUTER,
-                            WeaponTrait.OPTICS_GEN3, WeaponTrait.THERMAL_IMAGER, WeaponTrait.GAS_TURBINE }),
+                            WeaponTrait.OPTICS_GEN3, WeaponTrait.THERMAL_IMAGER, WeaponTrait.GAS_TURBINE,
+                            WeaponTrait.COMBINED_ARMS_TF }),
                 UpgradePath.TANK, 504);
 
             // Set the prestige cost for the profile.
@@ -3024,12 +3028,14 @@ namespace HammerAndSickle.Models
             //----------------------------------------------
             // Phase 3 (derived): Gen2 (105mm M68 baked) + SA+1 (NATO SA8) + LASER_RANGEFINDER + THERMAL_IMAGER
             // (M60A3 TTS). A slower Gen2 with the NATO fire-control edge.
-            // → HA10 HD8 SA8 SD6 GAD7 · ICM 1.16 · MMP10 · PR1 · SR3.
+            // → HA10 HD8 SA8 SD6 GAD7 · ICM 1.40 (FCS 1.16 × AIR_CAVALRY 1.21 — the census carries the
+            //   squadron's own air troop (8 AH-64 + 8 OH-58) + 36 M3 scouts; ICM pass 2026-08-22, Bob's
+            //   1.4 target) · MMP10 · PR1 · SR3.
             WeaponProfile M60_US = WeaponProfile.FromProfileDef(
                 "M60A3 Patton Main Battle Tank", "M60A3", WeaponType.TANK_M60_US,
                 new ProfileDef(TankArchetypes.Gen2,
                     new Dictionary<ProfileStat, int> { { ProfileStat.SA, 1 } },
-                    new[] { WeaponTrait.LASER_RANGEFINDER, WeaponTrait.THERMAL_IMAGER }),
+                    new[] { WeaponTrait.LASER_RANGEFINDER, WeaponTrait.THERMAL_IMAGER, WeaponTrait.AIR_CAVALRY }),
                 UpgradePath.TANK, 264);
 
             // Set the prestige cost for the profile.
@@ -3068,12 +3074,13 @@ namespace HammerAndSickle.Models
             //----------------------------------------------
             // Phase 3 (Appendix W §16, validated worked line): Gen2 + HA-1, HD-1, SA+1, MMP+2 +
             // OPTICS_GEN2 + LASER_RANGEFINDER. Fast, well-sighted, lightly-gunned 105mm.
-            // → HA9 HD7 SA8 SD6 GAD7 · ICM 1.10 · MMP12 · PR1 · SR3.
+            // → HA9 HD7 SA8 SD6 GAD7 · ICM 1.21 (FCS 1.10 × NATO_FIRST_LINE 1.10, ICM pass 2026-08-22)
+            //   · MMP12 · PR1 · SR3.
             WeaponProfile LEO1_GE = WeaponProfile.FromProfileDef(
                 "Leopard 1 Main Battle Tank", "Leo 1", WeaponType.TANK_LEOPARD1_GE,
                 new ProfileDef(TankArchetypes.Gen2,
                     new Dictionary<ProfileStat, int> { { ProfileStat.HA, -1 }, { ProfileStat.HD, -1 }, { ProfileStat.SA, 1 }, { ProfileStat.MMP, 2 } },
-                    new[] { WeaponTrait.OPTICS_GEN2, WeaponTrait.LASER_RANGEFINDER }),
+                    new[] { WeaponTrait.OPTICS_GEN2, WeaponTrait.LASER_RANGEFINDER, WeaponTrait.NATO_FIRST_LINE }),
                 UpgradePath.TANK, 324);
 
             // Set the prestige cost for the profile.
@@ -3113,13 +3120,14 @@ namespace HammerAndSickle.Models
             //----------------------------------------------
             // Phase 3 (Appendix W §16, validated worked line): Gen3 + HA+1, SA-1, MMP+2 + SPACED_ARMOR +
             // OPTICS_GEN3 + LASER_RANGEFINDER + BALLISTIC_COMPUTER + THERMAL_IMAGER.
-            // → HA14 HD12 SA8 SD6 GAD7 · ICM 1.33 · MMP12 · PR1 · SR4.
+            // → HA14 HD12 SA8 SD6 GAD7 · ICM 1.47 (FCS 1.33 × NATO_FIRST_LINE 1.10, ICM pass 2026-08-22)
+            //   · MMP12 · PR1 · SR4.
             WeaponProfile LEO2_GE = WeaponProfile.FromProfileDef(
                 "Leopard 2 Main Battle Tank", "Leo 2", WeaponType.TANK_LEOPARD2_GE,
                 new ProfileDef(TankArchetypes.Gen3,
                     new Dictionary<ProfileStat, int> { { ProfileStat.HA, 1 }, { ProfileStat.SA, -1 }, { ProfileStat.MMP, 2 } },
                     new[] { WeaponTrait.SPACED_ARMOR, WeaponTrait.OPTICS_GEN3, WeaponTrait.LASER_RANGEFINDER,
-                            WeaponTrait.BALLISTIC_COMPUTER, WeaponTrait.THERMAL_IMAGER }),
+                            WeaponTrait.BALLISTIC_COMPUTER, WeaponTrait.THERMAL_IMAGER, WeaponTrait.NATO_FIRST_LINE }),
                 UpgradePath.TANK, 492);
 
             // Set the prestige cost for the profile.
@@ -3157,13 +3165,14 @@ namespace HammerAndSickle.Models
             //----------------------------------------------
             // Phase 3 (Appendix W §16, validated worked line): Gen3 + HD+1, SA-1 + COMPOSITE_CERAMIC +
             // LASER_RANGEFINDER + BALLISTIC_COMPUTER + THERMAL_IMAGER. Heavy-armour, slower (no turbine).
-            // → HA13 HD14 SA8 SD6 GAD7 · ICM 1.21 · MMP10 · PR1 · SR3.
+            // → HA13 HD14 SA8 SD6 GAD7 · ICM 1.33 (FCS 1.21 × NATO_FIRST_LINE 1.10, ICM pass 2026-08-22)
+            //   · MMP10 · PR1 · SR3.
             WeaponProfile CHALL1_UK = WeaponProfile.FromProfileDef(
                 "Challenger 1 Main Battle Tank", "Challenger 1", WeaponType.TANK_CHALLENGER1_UK,
                 new ProfileDef(TankArchetypes.Gen3,
                     new Dictionary<ProfileStat, int> { { ProfileStat.HD, 1 }, { ProfileStat.SA, -1 } },
                     new[] { WeaponTrait.COMPOSITE_CERAMIC, WeaponTrait.LASER_RANGEFINDER, WeaponTrait.BALLISTIC_COMPUTER,
-                            WeaponTrait.THERMAL_IMAGER }),
+                            WeaponTrait.THERMAL_IMAGER, WeaponTrait.NATO_FIRST_LINE }),
                 UpgradePath.TANK, 540);
 
             // Set the prestige cost for the profile.
@@ -3522,13 +3531,15 @@ namespace HammerAndSickle.Models
             //----------------------------------------------
             // US M109 Paladin Self-Propelled Artillery
             //----------------------------------------------
-            // Phase 3 (NATO): Artillery + SELF_PROPELLED (tracked 155mm SP) + SA+1 (calibre), IR medium. Standard SP howitzer (= 2S3 line).
-            // → HA5 HD7 SA10 SD7 GAD7 · ICM 1.00 · MMP10 · IR5.
+            // Phase 3 (NATO): Artillery + SELF_PROPELLED (tracked 155mm SP) + SA+1 (calibre), IR medium.
+            // Artillery rulings 2026-08-22: + SMART_MUNITION (Copperhead CLGP — supplement T18b carrier,
+            // US variant only per "add one") + FIRE_DIRECTION_NET (TACFIRE fires-quality ICM, ruling 9).
+            // → HA8 HD7 SA11 SD7 GAD7 · ICM 1.05 · MMP10 · IR5.
             WeaponProfile M109_US = WeaponProfile.FromProfileDef(
                 "M109 Paladin Self-Propelled Artillery", "M109 Paladin", WeaponType.SPA_M109_US,
                 new ProfileDef(FamilyArchetypes.Artillery,
                     new Dictionary<ProfileStat, int> { { ProfileStat.SA, 1 }, { ProfileStat.IR, GameData.INDIRECT_RANGE_MEDIUM } },
-                    new[] { WeaponTrait.SELF_PROPELLED }),
+                    new[] { WeaponTrait.SELF_PROPELLED, WeaponTrait.SMART_MUNITION, WeaponTrait.FIRE_DIRECTION_NET }),
                 UpgradePath.ART, 300);
 
             // Set the prestige cost for the profile.
@@ -3564,12 +3575,13 @@ namespace HammerAndSickle.Models
             // German M109 Self-Propelled Artillery
             //----------------------------------------------
             // Phase 3 (NATO): Artillery + SELF_PROPELLED + SA+1 (calibre), IR medium. Standard SP howitzer.
-            // → HA5 HD7 SA10 SD7 GAD7 · ICM 1.00 · MMP10 · IR5.
+            // + FIRE_DIRECTION_NET (artillery ruling 9, 2026-08-22 — NATO fires-quality ICM).
+            // → HA5 HD7 SA10 SD7 GAD7 · ICM 1.05 · MMP10 · IR5.
             WeaponProfile M109_GE = WeaponProfile.FromProfileDef(
                 "M109 Self-Propelled Artillery", "M109", WeaponType.SPA_M109_GE,
                 new ProfileDef(FamilyArchetypes.Artillery,
                     new Dictionary<ProfileStat, int> { { ProfileStat.SA, 1 }, { ProfileStat.IR, GameData.INDIRECT_RANGE_MEDIUM } },
-                    new[] { WeaponTrait.SELF_PROPELLED }),
+                    new[] { WeaponTrait.SELF_PROPELLED, WeaponTrait.FIRE_DIRECTION_NET }),
                 UpgradePath.ART, 300);
 
             // Set the prestige cost for the profile.
@@ -3609,11 +3621,12 @@ namespace HammerAndSickle.Models
             // Display name → AUF1 (census pass 2026-08-13): the census correctly lists 48 AUF1 —
             // France's SP 155 was the AUF1, not the M109 — so the profile NAME now agrees with it.
             // WeaponType.SPA_M109_FR is unchanged: persisted-by-name, rename discouraged.
+            // + FIRE_DIRECTION_NET (artillery ruling 9, 2026-08-22) → ICM 1.05.
             WeaponProfile M109_FR = WeaponProfile.FromProfileDef(
                 "AUF1 Self-Propelled Artillery", "AUF1", WeaponType.SPA_M109_FR,
                 new ProfileDef(FamilyArchetypes.Artillery,
                     new Dictionary<ProfileStat, int> { { ProfileStat.SA, 1 }, { ProfileStat.IR, GameData.INDIRECT_RANGE_MEDIUM } },
-                    new[] { WeaponTrait.SELF_PROPELLED }),
+                    new[] { WeaponTrait.SELF_PROPELLED, WeaponTrait.FIRE_DIRECTION_NET }),
                 UpgradePath.ART, 300);
 
             // Set the prestige cost for the profile.
@@ -3649,11 +3662,12 @@ namespace HammerAndSickle.Models
             //----------------------------------------------
             // Phase 3 (NATO): Artillery + SELF_PROPELLED + SA+1 (calibre), IR medium. Standard SP howitzer.
             // → HA5 HD7 SA10 SD7 GAD7 · ICM 1.00 · MMP10 · IR5.
+            // + FIRE_DIRECTION_NET (artillery ruling 9, 2026-08-22) → ICM 1.05.
             WeaponProfile M109_UK = WeaponProfile.FromProfileDef(
                 "M109 Self-Propelled Artillery", "M109", WeaponType.SPA_M109_UK,
                 new ProfileDef(FamilyArchetypes.Artillery,
                     new Dictionary<ProfileStat, int> { { ProfileStat.SA, 1 }, { ProfileStat.IR, GameData.INDIRECT_RANGE_MEDIUM } },
-                    new[] { WeaponTrait.SELF_PROPELLED }),
+                    new[] { WeaponTrait.SELF_PROPELLED, WeaponTrait.FIRE_DIRECTION_NET }),
                 UpgradePath.ART, 300);
 
             // Set the prestige cost for the profile.
@@ -3770,12 +3784,14 @@ namespace HammerAndSickle.Models
             //----------------------------------------------
             // Phase 3 (NATO): Artillery + SELF_PROPELLED (tracked M993 chassis) + ROCKET_ARTILLERY (double-fire)
             // + SMART_MUNITION (SADARM, HA+3/SA+1) + SA+1 (warhead), IR ROC_MR. Tracked analog of BM-27.
-            // → HA8 HD7 SA11 SD7 GAD7 · ICM 1.00 · MMP10 · IR6 · double-fire.
+            // + FIRE_DIRECTION_NET (artillery ruling 9, 2026-08-22 — NATO fires-quality ICM).
+            // → HA8 HD7 SA11 SD7 GAD7 · ICM 1.05 · MMP10 · IR6 · double-fire.
             WeaponProfile MLRS_US = WeaponProfile.FromProfileDef(
                 "M270 MLRS Multiple Launch Rocket System", "M270 MLRS", WeaponType.ROC_MLRS_US,
                 new ProfileDef(FamilyArchetypes.Artillery,
                     new Dictionary<ProfileStat, int> { { ProfileStat.SA, 1 }, { ProfileStat.IR, GameData.INDIRECT_RANGE_ROC_MR } },
-                    new[] { WeaponTrait.SELF_PROPELLED, WeaponTrait.ROCKET_ARTILLERY, WeaponTrait.SMART_MUNITION }),
+                    new[] { WeaponTrait.SELF_PROPELLED, WeaponTrait.ROCKET_ARTILLERY, WeaponTrait.SMART_MUNITION,
+                            WeaponTrait.FIRE_DIRECTION_NET }),
                 UpgradePath.ROC, 540);
 
             // Set the prestige cost for the profile.
@@ -4127,8 +4143,8 @@ namespace HammerAndSickle.Models
             };
 
             // Add the M3 Bradley profile to the database
-            // W1: armored-car recon fights as a Hard target (§7.4.1.2 override).
-            M3_US.SetTargetClass(TargetClass.Hard);
+            // Recon ruling 2026-08-22: Hard override DELETED (all recon = Soft; M3 explicitly included —
+            // "M3 scouts should be tough": SD9 defends).
             // Mixed family (see FamilyArchetypes) - medium is stated per profile.
             M3_US.SetMovementMedium(MovementMedium.Tracked);
 
@@ -4141,7 +4157,7 @@ namespace HammerAndSickle.Models
             // FRG Spähpanzer Luchs Reconnaissance Vehicle
             //----------------------------------------------
             // Phase 3 (NATO): Recon + AUTOCANNON_LIGHT (20mm) + AMPHIBIOUS; 8x8 wheeled scout, light gun.
-            // → HA2 HD5 SA6 SD9 GAD7 · ICM 1.00 · MMP10 · SR3 · amphibious · Hard (post-call).
+            // → HA2 HD5 SA6 SD9 GAD7 · ICM 1.00 · MMP10 · SR3 · amphibious · Soft (recon ruling 2026-08-22).
             WeaponProfile LUCHS_GE = WeaponProfile.FromProfileDef(
                 "Spähpanzer Luchs Reconnaissance Vehicle", "Luchs", WeaponType.RCN_LUCHS_GE,
                 new ProfileDef(FamilyArchetypes.Recon,
@@ -4168,8 +4184,7 @@ namespace HammerAndSickle.Models
             };
 
             // Add the Luchs profile to the database
-            // W1: armored-car recon fights as a Hard target (§7.4.1.2 override).
-            LUCHS_GE.SetTargetClass(TargetClass.Hard);
+            // Recon ruling 2026-08-22: Hard override DELETED (all recon = Soft).
             // Mixed family (see FamilyArchetypes) - medium is stated per profile.
             LUCHS_GE.SetMovementMedium(MovementMedium.Wheeled);
 
@@ -4182,7 +4197,7 @@ namespace HammerAndSickle.Models
             // UK FV105 Sultan
             //----------------------------------------------
             // Phase 3 (NATO): Recon + AUTOCANNON_HEAVY (30mm RARDEN, CVR(T)-class scout).
-            // → HA3 HD5 SA6 SD9 GAD7 · ICM 1.00 · MMP10 · SR3 · Hard (post-call).
+            // → HA3 HD5 SA6 SD9 GAD7 · ICM 1.00 · MMP10 · SR3 · Soft (recon ruling 2026-08-22).
             WeaponProfile FV105_UK = WeaponProfile.FromProfileDef(
                 "FV105 Sultan", "FV105", WeaponType.RCN_FV105_UK,
                 new ProfileDef(FamilyArchetypes.Recon,
@@ -4211,8 +4226,7 @@ namespace HammerAndSickle.Models
             };
 
             // Add the FV105 Sultan profile to the database
-            // W1: UK recon vehicle fights as a Hard target (§7.4.1.2 override).
-            FV105_UK.SetTargetClass(TargetClass.Hard);
+            // Recon ruling 2026-08-22: Hard override DELETED (all recon = Soft).
             // Mixed family (see FamilyArchetypes) - medium is stated per profile.
             FV105_UK.SetMovementMedium(MovementMedium.Tracked);
 
@@ -4225,7 +4239,7 @@ namespace HammerAndSickle.Models
             // French ERC 90 Sagaie Reconnaissance Vehicle
             //----------------------------------------------
             // Phase 3 (NATO): Recon + residual HA+4 (90mm low-pressure gun — one-off; calibre traits are tanks-only).
-            // → HA6 HD5 SA5 SD9 GAD7 · ICM 1.00 · MMP10 · SR3 · Hard (post-call). Fire-support scout, mirrors BRDM-2 AT.
+            // → HA6 HD5 SA5 SD9 GAD7 · ICM 1.00 · MMP10 · SR3 · Soft (recon ruling 2026-08-22). Fire-support scout, mirrors BRDM-2 AT.
             WeaponProfile ERC90_FR = WeaponProfile.FromProfileDef(
                 "ERC 90 Sagaie Reconnaissance Vehicle", "ERC 90", WeaponType.RCN_ERC90_FR,
                 new ProfileDef(FamilyArchetypes.Recon,
@@ -4252,8 +4266,7 @@ namespace HammerAndSickle.Models
             };
 
             // Add the ERC 90 profile to the database
-            // W1: armored-car recon fights as a Hard target (§7.4.1.2 override).
-            ERC90_FR.SetTargetClass(TargetClass.Hard);
+            // Recon ruling 2026-08-22: Hard override DELETED (all recon = Soft).
             // Mixed family (see FamilyArchetypes) - medium is stated per profile.
             ERC90_FR.SetMovementMedium(MovementMedium.Wheeled);
 
@@ -6495,6 +6508,12 @@ namespace HammerAndSickle.Models
                     new Dictionary<ProfileStat, int> { { ProfileStat.SA, -2 }, { ProfileStat.GAD, 2 }, { ProfileStat.IR, GameData.INDIRECT_RANGE_MINIMUM } },
                     new[] { WeaponTrait.AIR_DROPPABLE, WeaponTrait.HELO_TRANSPORTABLE }));
 
+            // Set the prestige cost for the profile.
+            // Artillery ruling 11 (2026-08-22): was MISSING entirely — the only combat profiles with no
+            // SetPrestigeCost, so V19 kill-prestige paid ZERO for MJ artillery kills. Gen1+ART like every
+            // other towed battery (the formula has no sub-Gen1 arm; bounty-only impact, MJ is AI-side).
+            ART_MJ_MORT.SetPrestigeCost(PrestigeTierCost.Gen1, PrestigeTypeCost.ART);
+
             // Intel stats
             ART_MJ_MORT.AddIntelReportStat(WeaponType.Personnel,       700);
             ART_MJ_MORT.AddIntelReportStat(WeaponType.ART_120MM_MORTAR, 12);
@@ -6526,6 +6545,10 @@ namespace HammerAndSickle.Models
                 new ProfileDef(FamilyArchetypes.Artillery,
                     new Dictionary<ProfileStat, int> { { ProfileStat.SA, -3 }, { ProfileStat.GAD, 2 }, { ProfileStat.IR, GameData.INDIRECT_RANGE_MINIMUM } },
                     new[] { WeaponTrait.AIR_DROPPABLE, WeaponTrait.HELO_TRANSPORTABLE }));
+
+            // Set the prestige cost for the profile.
+            // Artillery ruling 11 (2026-08-22): was MISSING — see ART_MJ_MORT note above.
+            ART_MJ_LT.SetPrestigeCost(PrestigeTierCost.Gen1, PrestigeTypeCost.ART);
 
             // Intel stats
             ART_MJ_LT.AddIntelReportStat(WeaponType.Personnel,       750);
@@ -6732,7 +6755,9 @@ namespace HammerAndSickle.Models
                 UpgradePath.ART, 552);
 
             // Set the prestige cost for the profile.
-            SPA_TYPE82.SetPrestigeCost(PrestigeTierCost.Gen3, PrestigeTypeCost.SPA);
+            // Artillery ruling 5 (2026-08-22): Gen3 → Gen2 — 2S3-class stats were carrying a 2S5-class
+            // price (pricing drift; China tank prices drifted the OTHER way, see survey §4).
+            SPA_TYPE82.SetPrestigeCost(PrestigeTierCost.Gen2, PrestigeTypeCost.SPA);
 
             // Intel stats
             SPA_TYPE82.AddIntelReportStat(WeaponType.Personnel,       700);
@@ -6773,7 +6798,9 @@ namespace HammerAndSickle.Models
                 UpgradePath.ROC, 500);
 
             // Set the prestige cost for the profile.
-            PHZ89.SetPrestigeCost(PrestigeTierCost.Gen3, PrestigeTypeCost.ROC);
+            // Artillery ruling 5 (2026-08-22): Gen3 → Gen1 — BM-21-class punch was carrying BM-30-class
+            // money (strictly worse than the BM-27 at +60; pricing drift).
+            PHZ89.SetPrestigeCost(PrestigeTierCost.Gen1, PrestigeTypeCost.ROC);
 
             // Intel stats
             PHZ89.AddIntelReportStat(WeaponType.Personnel,       650);
@@ -6838,12 +6865,14 @@ namespace HammerAndSickle.Models
             //----------------------------------------------
             // Chinese Heavy Towed Artillery
             //----------------------------------------------
-            // Phase 3 (derived): Artillery archetype (towed = foot, MMP 4) + IR LONG + SA+1 (heavier tube). Generic
-            // heavy towed piece, mirrors the Soviet heavy towed line (keeps its own LONG reach). → HA5 HD5 SA10 SD5 GAD8 · MMP4 · IR LONG.
+            // Phase 3 (derived): Artillery archetype (towed = foot, MMP 4) + IR MEDIUM + SA+1 (heavier tube). Generic
+            // heavy towed piece, mirrors the Soviet heavy towed line. Artillery ruling 8 (2026-08-22): IR
+            // LONG → MEDIUM — range drift; it outranged every other heavy towed AND China's own SPA.
+            // → HA5 HD5 SA10 SD5 GAD8 · MMP4 · IR MEDIUM.
             WeaponProfile ART_HV_CH = WeaponProfile.FromProfileDef(
                 "Heavy Towed Artillery", "Heavy Artillery", WeaponType.ART_HEAVY_CH,
                 new ProfileDef(FamilyArchetypes.Artillery,
-                    new Dictionary<ProfileStat, int> { { ProfileStat.IR, GameData.INDIRECT_RANGE_LONG }, { ProfileStat.SA, 1 } },
+                    new Dictionary<ProfileStat, int> { { ProfileStat.IR, GameData.INDIRECT_RANGE_MEDIUM }, { ProfileStat.SA, 1 } },
                     System.Array.Empty<WeaponTrait>()),
                 UpgradePath.ART, 144);
 

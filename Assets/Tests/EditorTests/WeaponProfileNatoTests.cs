@@ -108,25 +108,26 @@ namespace HammerAndSickle.Tests
         {
             try
             {
-                // All four are HARD armored-car/cavalry scouts (§7A.5 override), NOT RECON_FRAGILE.
+                // Recon ruling 2026-08-22: ALL recon fights as Soft (skirmisher doctrine — SD9 defends;
+                // the W1 Hard overrides are deleted). Statlines unchanged; no scout is RECON_FRAGILE.
                 // M3 Bradley CFV: Recon + ATGM_RAIL (TOW) + AUTOCANNON_LIGHT (25mm).
                 AssertGround(WeaponType.RCN_M3_US, 6, 5, 6, 9, 7, 0);
-                Assert.AreEqual(TargetClass.Hard, P(WeaponType.RCN_M3_US).TargetClass, "M3 Hard");
+                Assert.AreEqual(TargetClass.Soft, P(WeaponType.RCN_M3_US).TargetClass, "M3 Soft (skirmisher ruling)");
                 Assert.AreEqual(3, (int)P(WeaponType.RCN_M3_US).SpottingRange, "M3 SR 3");
                 Assert.AreEqual(1.00f, P(WeaponType.RCN_M3_US).ICM, 0.01f, "M3 not fragile");
 
                 // Luchs: Recon + AUTOCANNON_LIGHT (20mm) + AMPHIBIOUS.
                 AssertGround(WeaponType.RCN_LUCHS_GE, 2, 5, 6, 9, 7, 0);
-                Assert.AreEqual(TargetClass.Hard, P(WeaponType.RCN_LUCHS_GE).TargetClass, "Luchs Hard");
+                Assert.AreEqual(TargetClass.Soft, P(WeaponType.RCN_LUCHS_GE).TargetClass, "Luchs Soft");
                 Assert.IsTrue(P(WeaponType.RCN_LUCHS_GE).HasCapability(WeaponCapability.Amphibious), "Luchs amphibious");
 
                 // FV105: Recon + AUTOCANNON_HEAVY (30mm RARDEN).
                 AssertGround(WeaponType.RCN_FV105_UK, 3, 5, 6, 9, 7, 0);
-                Assert.AreEqual(TargetClass.Hard, P(WeaponType.RCN_FV105_UK).TargetClass, "FV105 Hard");
+                Assert.AreEqual(TargetClass.Soft, P(WeaponType.RCN_FV105_UK).TargetClass, "FV105 Soft");
 
                 // ERC-90: Recon + residual HA+4 (90mm gun).
                 AssertGround(WeaponType.RCN_ERC90_FR, 6, 5, 5, 9, 7, 0);
-                Assert.AreEqual(TargetClass.Hard, P(WeaponType.RCN_ERC90_FR).TargetClass, "ERC-90 Hard");
+                Assert.AreEqual(TargetClass.Soft, P(WeaponType.RCN_ERC90_FR).TargetClass, "ERC-90 Soft");
             }
             catch (Exception ex) { AppService.HandleException(CLASS_NAME, nameof(Recon_ResolveConvertedLines), ex); throw; }
         }
@@ -140,11 +141,17 @@ namespace HammerAndSickle.Tests
         {
             try
             {
-                // M109 (155mm SP): Artillery + SELF_PROPELLED + SA+1 (= the 2S3 line). All 4 nations identical.
-                AssertGround(WeaponType.SPA_M109_US, 5, 7, 10, 7, 7, 0);
+                // M109 (155mm SP): Artillery + SELF_PROPELLED + SA+1 (= the 2S3 line).
+                // Artillery rulings 2026-08-22: the US variant alone adds SMART_MUNITION (Copperhead,
+                // HA+3/SA+1 — "add one"); all four variants add FIRE_DIRECTION_NET (ICM 1.05, ruling 9).
+                AssertGround(WeaponType.SPA_M109_US, 8, 7, 11, 7, 7, 0);
                 Assert.AreEqual(10, (int)P(WeaponType.SPA_M109_US).MaxMovementPoints, "M109 MMP 10 (SELF_PROPELLED)");
                 Assert.AreEqual(5,  (int)P(WeaponType.SPA_M109_US).IndirectRange, "M109 IR 5");
-                AssertGround(WeaponType.SPA_M109_UK, 5, 7, 10, 7, 7, 0); // guard the export variants resolve the same
+                Assert.AreEqual(1.05f, P(WeaponType.SPA_M109_US).ICM, 0.01f, "M109 US FIRE_DIRECTION_NET");
+                AssertGround(WeaponType.SPA_M109_UK, 5, 7, 10, 7, 7, 0); // non-US variants keep the base line (no Copperhead)
+                Assert.AreEqual(1.05f, P(WeaponType.SPA_M109_UK).ICM, 0.01f, "M109 UK FIRE_DIRECTION_NET");
+                Assert.AreEqual(1.05f, P(WeaponType.SPA_M109_GE).ICM, 0.01f, "M109 GE FIRE_DIRECTION_NET");
+                Assert.AreEqual(1.05f, P(WeaponType.SPA_M109_FR).ICM, 0.01f, "AUF1 FIRE_DIRECTION_NET");
 
                 // Light towed (105mm): bare Artillery, foot MMP 4, GAD 8.
                 AssertGround(WeaponType.ART_LIGHT_WEST, 5, 5, 9, 5, 8, 0);
@@ -153,10 +160,12 @@ namespace HammerAndSickle.Tests
                 // Heavy towed (155mm): Artillery + SA+1.
                 AssertGround(WeaponType.ART_HEAVY_WEST, 5, 5, 10, 5, 8, 0);
 
-                // MLRS: tracked rocket artillery — SELF_PROPELLED + ROCKET_ARTILLERY + SMART_MUNITION (analog of BM-27).
+                // MLRS: tracked rocket artillery — SELF_PROPELLED + ROCKET_ARTILLERY + SMART_MUNITION (analog of BM-27)
+                // + FIRE_DIRECTION_NET (artillery ruling 9, 2026-08-22).
                 AssertGround(WeaponType.ROC_MLRS_US, 8, 7, 11, 7, 7, 0);
                 Assert.AreEqual(6, (int)P(WeaponType.ROC_MLRS_US).IndirectRange, "MLRS IR 6");
                 Assert.IsTrue(P(WeaponType.ROC_MLRS_US).HasCapability(WeaponCapability.RocketArtillery), "MLRS rocket-artillery double-fire");
+                Assert.AreEqual(1.05f, P(WeaponType.ROC_MLRS_US).ICM, 0.01f, "MLRS FIRE_DIRECTION_NET");
             }
             catch (Exception ex) { AppService.HandleException(CLASS_NAME, nameof(Artillery_ResolveConvertedLines), ex); throw; }
         }
@@ -359,5 +368,31 @@ namespace HammerAndSickle.Tests
         }
 
         #endregion // Batch G — Jets (Euro-NATO sub-batch)
+
+        #region Formation-quality ICM (ICM pass 2026-08-22)
+
+        [Test]
+        public void FormationQuality_TankIcmTotals()
+        {
+            // Closed-bay doctrine (Bob, 2026-08-22): on a unit's SOLE profile the ICM prices the WHOLE
+            // formation. NATO first-line tank formations carry the new §13 formation traits on top of
+            // their fire-control stacks; every other tank profile is unchanged. Pins todo_icm.md §2.
+            try
+            {
+                Assert.AreEqual(1.53f, P(WeaponType.TANK_M1_US).ICM, 0.01f, "M1 bn TF (1.33 × COMBINED_ARMS_TF 1.15)");
+                Assert.AreEqual(1.47f, P(WeaponType.TANK_LEOPARD2_GE).ICM, 0.01f, "Leo 2 (1.33 × NATO_FIRST_LINE 1.10)");
+                Assert.AreEqual(1.21f, P(WeaponType.TANK_LEOPARD1_GE).ICM, 0.01f, "Leo 1 GE (1.10 × NATO_FIRST_LINE 1.10)");
+                Assert.AreEqual(1.33f, P(WeaponType.TANK_CHALLENGER1_UK).ICM, 0.01f, "Challenger 1 (1.21 × NATO_FIRST_LINE 1.10)");
+                Assert.AreEqual(1.40f, P(WeaponType.TANK_M60_US).ICM, 0.01f, "ACR squadron (1.16 × AIR_CAVALRY 1.21 — Bob's 1.4 target)");
+
+                // The anchors do NOT move: Soviet formations are the ICM 1.0-baseline family
+                // (fire-control traits only), and the Low-Countries Leo 1 brigades carry no
+                // formation trait (mass normalized away — one counter = one maneuver formation).
+                Assert.AreEqual(1.10f, P(WeaponType.TANK_LEOPARD1_NL).ICM, 0.01f, "Leo 1 NL unchanged");
+            }
+            catch (Exception ex) { AppService.HandleException(CLASS_NAME, nameof(FormationQuality_TankIcmTotals), ex); throw; }
+        }
+
+        #endregion // Formation-quality ICM (ICM pass 2026-08-22)
     }
 }
