@@ -52,6 +52,25 @@ namespace HammerAndSickle.Persistence
             Converters = { new JsonStringEnumConverter() }
         };
 
+        /// <summary>
+        /// For PLAYER-WRITTEN SETTINGS files (today: audio_settings.json in persistentDataPath). A plain
+        /// flat tree — no reference graph, so never <see cref="Save"/>; not shipped content, so not
+        /// <see cref="Content"/> by meaning even though the option VALUES currently coincide with it.
+        /// Kept as its own named policy so a future shipped-content change can never silently ripple into
+        /// player settings, and vice versa. Lenient read matters here: these files get hand-edited, and
+        /// before 2026-08-24 a trailing comma made LoadSettings throw and silently reset to defaults.
+        /// (Added 2026-08-24, closing the last local JsonSerializerOptions — the CLAUDE.md item 10 cleanup
+        /// owed since MapChecksumUtility, the old sanctioned exception, was deleted.)
+        /// </summary>
+        public static readonly JsonSerializerOptions Settings = new()
+        {
+            WriteIndented = true,
+            PropertyNameCaseInsensitive = true,
+            AllowTrailingCommas = true,
+            ReadCommentHandling = JsonCommentHandling.Skip,
+            Converters = { new JsonStringEnumConverter() }
+        };
+
         #endregion // Options
 
         // ─────────────────────────────────────────────────────────────────────────────────────────────

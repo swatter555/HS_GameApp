@@ -1,6 +1,7 @@
 using HammerAndSickle.Audio;
 using HammerAndSickle.Core.GameData;
 using HammerAndSickle.Models;
+using HammerAndSickle.Persistence;
 using HammerAndSickle.Services;
 using System;
 using System.Collections;
@@ -1438,14 +1439,17 @@ namespace HammerAndSickle.Controllers
         /// Caches null on failure so a missing file is reported once, not once per play attempt.
         /// </summary>
         /// <remarks>
-        /// ⚠ FLAGGED, NOT CHANGED (2026-08-03): these two failure branches still report through
-        /// HandleException, but DesignDoc 20.4.2 ratifies that briefing NARRATION is campaign-scenario
-        /// ONLY and that an ABSENT narration asset is the NORMAL case for a standalone scenario, never an
-        /// error. So the missing-file path here will eventually need to be a clean no-op rather than a
-        /// logged exception. It is not changed now because nothing calls PlayBriefing yet — narration is
-        /// dormant, with no manifest field — so the semantics are moot until it is wired, and the right
-        /// shape (silent-absent vs. warn-on-corrupt) is a decision for that pass, not this one.
-        /// Negative caching at least means the log cannot repeat per attempt in the meantime.
+        /// §20.4.2 SEMANTICS (fixed 2026-08-24, closing the 2026-08-03 flag): briefing narration is
+        /// CAMPAIGN-SCENARIO ONLY, and an ABSENT narration asset is the NORMAL case for a standalone
+        /// scenario — never an error. The two failure kinds are therefore split:
+        ///   · file does not exist        → clean no-op, one info log (File.Exists checked BEFORE the
+        ///                                  request, because UnityWebRequest cannot reliably distinguish
+        ///                                  "missing" from "unreadable" in its result codes);
+        ///   · file exists but won't load → a REAL error (corrupt/unreadable content), HandleException.
+        /// An unmapped enum member also stays HandleException — that is a code gap (a member added without
+        /// its BriefingFiles entry), not a content state. This layer cannot know the scenario KIND; if a
+        /// campaign mission must treat absence as an error, that check belongs to the caller that knows
+        /// it is a campaign (none exists yet — narration is dormant, no manifest field).
         /// </remarks>
         private IEnumerator LoadBriefingNarration(BriefingNarration briefing)
         {
@@ -1458,6 +1462,15 @@ namespace HammerAndSickle.Controllers
             }
 
             string path = Path.Combine(Application.streamingAssetsPath, BRIEFING_FOLDER, filename);
+
+            // §20.4.2 — absent narration is the normal case, not a failure. Negative-cache and move on.
+            if (!File.Exists(path))
+            {
+                _briefingCache[briefing] = null;
+                Debug.Log($"[GameAudioManager] No narration asset for {briefing} ({filename}) — normal for a standalone scenario (§20.4.2).");
+                yield break;
+            }
+
             string url = "file:///" + path.Replace("\\", "/");
 
             using UnityWebRequest www = UnityWebRequestMultimedia.GetAudioClip(url, AudioType.OGGVORBIS);
@@ -1472,6 +1485,7 @@ namespace HammerAndSickle.Controllers
             }
             else
             {
+                // The file EXISTS but would not load — corrupt or unreadable content, a real error.
                 _briefingCache[briefing] = null;
                 AppService.HandleException("GameAudioManager", "LoadBriefingNarration",
                     new Exception($"Failed to load {filename}: {www.error}"));
@@ -1590,7 +1604,9 @@ namespace HammerAndSickle.Controllers
                 if (File.Exists(_settingsPath))
                 {
                     string json = File.ReadAllText(_settingsPath);
-                    _settings = JsonSerializer.Deserialize<AudioSettings>(json);
+                    // JsonPolicy.Settings (CLAUDE.md item 10) — the lenient read matters: this file gets
+                    // hand-edited, and default options made a trailing comma throw and reset to defaults.
+                    _settings = JsonSerializer.Deserialize<AudioSettings>(json, JsonPolicy.Settings);
                 }
                 else
                 {
@@ -1618,10 +1634,9 @@ namespace HammerAndSickle.Controllers
                 if (_settings == null || string.IsNullOrEmpty(_settingsPath))
                     return;
 
-                string json = JsonSerializer.Serialize(_settings, new JsonSerializerOptions
-                {
-                    WriteIndented = true
-                });
+                // See JsonPolicy — all JSON goes through a named policy (CLAUDE.md item 10). This was the
+                // last local JsonSerializerOptions in the project; closed 2026-08-24.
+                string json = JsonSerializer.Serialize(_settings, JsonPolicy.Settings);
                 File.WriteAllText(_settingsPath, json);
             }
             catch (Exception e)

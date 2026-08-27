@@ -175,7 +175,7 @@ namespace HammerAndSickle.Core.UI
 
             // Supply — friendly only (§24.5a.5).
             if (isFriendly)
-                lines.Add($"{unit.DaysSupply.Current:F1} days of supply");
+                lines.Add($"{unit.DaysSupply.Current:F1}/{unit.DaysSupply.Max:F0} days of supply");
 
             // Estimates disclaimer — enemy figures are error-bearing at every rung (§12.5).
             if (!isFriendly && entries.Count > 0)

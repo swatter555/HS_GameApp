@@ -191,7 +191,6 @@ namespace HammerAndSickle.Models
 
         // Facility - supply depot
         [JsonInclude] [JsonPropertyName("depotSize")]         public DepotSize DepotSize { get; private set; }
-        [JsonInclude] [JsonPropertyName("stockpileInDays")]   public float StockpileInDays { get; private set; }
         [JsonInclude] [JsonPropertyName("generationRate")]    public SupplyGenerationRate GenerationRate { get; private set; }
         [JsonInclude] [JsonPropertyName("supplyProjection")]  public SupplyProjection SupplyProjection { get; private set; }
         [JsonInclude] [JsonPropertyName("supplyPenetration")] public bool SupplyPenetration { get; private set; }
@@ -277,6 +276,18 @@ namespace HammerAndSickle.Models
                 InitializeDeploymentSystem();
                 EquipmentBays = new EquipmentBays();
 
+                /* ONE SUPPLY NUMBER PER UNIT (SUP-1, Bob's ruling 2026-08-24 — §15.1.2/§10.3.1): DaysSupply
+                 * is THE pool everything deducts from; only the caps differ. Fixed-wing get 0 — they carry
+                 * no supply of their own, the launching airbase pays (§11.2.3); a Max of 0 is also what
+                 * exempts them from every supply gate (the CanMove guard keys on Max > 0). Constructed
+                 * BEFORE InitializeFacility because SetDepotSize (called from there) raises a DEPOT's pool
+                 * to its size cap — SetDepotSize is the single authority for depot supply sizing, serving
+                 * construction and UpgradeDepotSize with the same code. */
+                DaysSupply = new StatsMaxCurrent(
+                    GameData.IsAirborneClassification(classification) ? 0f
+                    : classification == UnitClassification.AIRB ? GameData.MaxDaysSupplyAirbase
+                    : GameData.MaxDaysSupplyUnit);
+
                 if (IsBase)
                     InitializeFacility(category, size);
 
@@ -284,8 +295,6 @@ namespace HammerAndSickle.Models
                 SpottedLevel = SpottedLevel.Level1;
                 InitializeExperienceSystem();
                 HitPoints = new StatsMaxCurrent(IsBase ? GameData.BASE_MAX_HP : GameData.MAX_HP);
-                DaysSupply = new StatsMaxCurrent(IsBase && FacilityType == FacilityType.Airbase
-                    ? GameData.MaxDaysSupplyAirbase : GameData.MaxDaysSupplyUnit);
                 MovementPoints = new StatsMaxCurrent(GameData.FOOT_UNIT);
                 EfficiencyLevel = EfficiencyLevel.FullOperations;
                 MapPos = Position2D.Zero;
@@ -341,7 +350,6 @@ namespace HammerAndSickle.Models
                 FacilityType = FacilityType.HQ;
                 DepotSize = DepotSize.Small;
                 DepotCategory = DepotCategory.Secondary;
-                StockpileInDays = 0f;
                 GenerationRate = SupplyGenerationRate.Basic;
                 SupplyProjection = SupplyProjection.Local;
                 SupplyPenetration = false;
@@ -617,7 +625,10 @@ namespace HammerAndSickle.Models
         public bool CanMove()
         {
             if (IsDestroyed()) return false;
-            if (DaysSupply.Current < 1f) return false;
+            // A unit with NO supply store does not check supply (SUP-1 1.5): fixed-wing carry Max 0 --
+            // their supply lives on the launching airbase (10.3.1) -- and without this guard no aircraft
+            // could ever be ordered to move and unit-cycling would skip them all.
+            if (DaysSupply.Max > 0f && DaysSupply.Current < 1f) return false;
             if (EfficiencyLevel == EfficiencyLevel.StaticOperations) return false;
             return true;
         }
@@ -864,11 +875,11 @@ namespace HammerAndSickle.Models
 
         private float GetEfficiencyModifier() => EfficiencyLevel switch
         {
-            EfficiencyLevel.FullOperations => GameData.EFFICIENCY_MOD_PEAK,
-            EfficiencyLevel.CombatOperations => GameData.EFFICIENCY_MOD_FULL,
-            EfficiencyLevel.NormalOperations => GameData.EFFICIENCY_MOD_OPERATIONAL,
-            EfficiencyLevel.DegradedOperations => GameData.EFFICIENCY_MOD_DEGRADED,
-            _ => GameData.EFFICIENCY_MOD_STATIC,
+            EfficiencyLevel.FullOperations => GameData.EFFICIENCY_MOD_FULL_OPS,
+            EfficiencyLevel.CombatOperations => GameData.EFFICIENCY_MOD_COMBAT_OPS,
+            EfficiencyLevel.NormalOperations => GameData.EFFICIENCY_MOD_NORMAL_OPS,
+            EfficiencyLevel.DegradedOperations => GameData.EFFICIENCY_MOD_DEGRADED_OPS,
+            _ => GameData.EFFICIENCY_MOD_STATIC_OPS,
         };
 
         /// <summary>
@@ -2235,12 +2246,12 @@ namespace HammerAndSickle.Models
         private float GetCurrentGenerationRate()
         {
             if (!IsBase || FacilityType != FacilityType.SupplyDepot) return 0f;
-            // GenerationRateValues is a FRACTION of own capacity; scale by max stockpile to get days/turn.
-            return GameData.GenerationRateValues[GenerationRate] * GetMaxStockpile() * GetFacilityEfficiencyMultiplier();
+            // GenerationRateValues is a FRACTION of own capacity (10.8.4); the cap IS DaysSupply.Max (SUP-1).
+            return GameData.GenerationRateValues[GenerationRate] * DaysSupply.Max * GetFacilityEfficiencyMultiplier();
         }
 
         /// <summary>
-        /// Adds supplies directly to the depot stockpile.
+        /// Adds supply directly to the depot's pool (SUP-1: the pool IS DaysSupply — one number per unit).
         /// </summary>
         public bool AddSupplies(float amount)
         {
@@ -2250,16 +2261,15 @@ namespace HammerAndSickle.Models
                 if (amount <= 0)
                     throw new ArgumentException("Supply amount must be positive", nameof(amount));
 
-                if (StockpileInDays >= GetMaxStockpile())
+                if (DaysSupply.Current >= DaysSupply.Max)
                 {
-                    AppService.CaptureUiMessage($"{UnitName} stockpile is already full. Cannot add more supplies.");
+                    AppService.CaptureUiMessage($"{UnitName} supply is already full. Cannot add more supplies.");
                     return false;
                 }
 
-                float maxCapacity = GetMaxStockpile();
-                StockpileInDays = Math.Min(StockpileInDays + amount, maxCapacity);
+                DaysSupply.SetCurrent(Math.Min(DaysSupply.Current + amount, DaysSupply.Max));
 
-                AppService.CaptureUiMessage($"{UnitName} has added {amount} days of supply. Current stockpile: {StockpileInDays} days.");
+                AppService.CaptureUiMessage($"{UnitName} has added {amount} days of supply. Current supply: {DaysSupply.Current} days.");
                 return true;
             }
             catch (Exception e)
@@ -2270,7 +2280,7 @@ namespace HammerAndSickle.Models
         }
 
         /// <summary>
-        /// Removes supplies from the depot stockpile.
+        /// Removes supply from the depot's pool.
         /// </summary>
         public void RemoveSupplies(float amount)
         {
@@ -2280,10 +2290,10 @@ namespace HammerAndSickle.Models
                 if (amount <= 0)
                     throw new ArgumentException("Supply amount must be positive", nameof(amount));
 
-                float actualAmount = Math.Min(amount, StockpileInDays);
-                StockpileInDays -= actualAmount;
+                float actualAmount = Math.Min(amount, DaysSupply.Current);
+                DaysSupply.SetCurrent(DaysSupply.Current - actualAmount);
 
-                AppService.CaptureUiMessage($"{UnitName} has removed {actualAmount} days of supply. Current stockpile: {StockpileInDays} days.");
+                AppService.CaptureUiMessage($"{UnitName} has removed {actualAmount} days of supply. Current supply: {DaysSupply.Current} days.");
             }
             catch (Exception e)
             {
@@ -2306,11 +2316,10 @@ namespace HammerAndSickle.Models
                 }
 
                 float generatedAmount = GetCurrentGenerationRate();
-                float maxCapacity = GetMaxStockpile();
-                float amountToAdd = Math.Min(generatedAmount, maxCapacity - StockpileInDays);
-                StockpileInDays += amountToAdd;
+                float amountToAdd = Math.Min(generatedAmount, DaysSupply.Max - DaysSupply.Current);
+                DaysSupply.SetCurrent(DaysSupply.Current + amountToAdd);
 
-                AppService.CaptureUiMessage($"{UnitName} has generated {amountToAdd} days of supply. Current stockpile: {StockpileInDays} days.");
+                AppService.CaptureUiMessage($"{UnitName} has generated {amountToAdd} days of supply. Current supply: {DaysSupply.Current} days.");
                 return true;
             }
             catch (Exception e)
@@ -2354,15 +2363,18 @@ namespace HammerAndSickle.Models
             {
                 if (!IsBase || FacilityType != FacilityType.SupplyDepot) return 0f;
                 if (!CanSupplyUnitAt(distanceInHexes, enemyZOCsCrossed)) return 0f;
-                if (StockpileInDays <= GameData.MaxDaysSupplyUnit) return 0f;
+                if (DaysSupply.Current <= GameData.MaxDaysSupplyUnit) return 0f;
 
                 float distanceEfficiency = 1f - (distanceInHexes / (float)ProjectionRadius * GameData.DISTANCE_EFF_MULT);
                 float zocEfficiency = 1f - (enemyZOCsCrossed * GameData.ZOC_EFF_MULT);
                 float operationalEfficiency = GetFacilityEfficiencyMultiplier();
                 float totalEfficiency = Math.Max(distanceEfficiency * zocEfficiency * operationalEfficiency, 0.1f);
 
+                // NOTE deducts the FULL 5 but delivers 5 x efficiency; 15.4a.7 says deduct what is
+                // DELIVERED. Zero callers today; logged in Supply Unification.md 1.4 for the 15-pass
+                // to rule deliberately (the inefficiency may be intended as real transit loss).
                 float amountToDeliver = GameData.MaxDaysSupplyUnit * totalEfficiency;
-                StockpileInDays -= GameData.MaxDaysSupplyUnit;
+                DaysSupply.SetCurrent(DaysSupply.Current - GameData.MaxDaysSupplyUnit);
                 return amountToDeliver;
             }
             catch (Exception e)
@@ -2390,13 +2402,13 @@ namespace HammerAndSickle.Models
             {
                 if (!IsFacilityOperational() || !IsMainDepot || FacilityType != FacilityType.SupplyDepot)
                     return 0f;
-                if (distanceInHexes > maxRange || StockpileInDays <= GameData.MaxDaysSupplyUnit)
+                if (distanceInHexes > maxRange || DaysSupply.Current <= GameData.MaxDaysSupplyUnit)
                     return 0f;
 
                 float distanceEfficiency = 1f - (distanceInHexes / (float)maxRange * GameData.DISTANCE_EFF_MULT);
                 float totalEfficiency = Math.Max(distanceEfficiency * GetFacilityEfficiencyMultiplier(), 0.1f);
 
-                StockpileInDays -= GameData.MaxDaysSupplyUnit;
+                DaysSupply.SetCurrent(DaysSupply.Current - GameData.MaxDaysSupplyUnit);
                 return GameData.MaxDaysSupplyUnit * totalEfficiency;
             }
             catch (Exception e)
@@ -2409,16 +2421,15 @@ namespace HammerAndSickle.Models
         public float GetStockpilePercentage()
         {
             if (!IsBase || FacilityType != FacilityType.SupplyDepot) return 0f;
-            float maxCapacity = GetMaxStockpile();
-            return maxCapacity > 0 ? StockpileInDays / maxCapacity : 0f;
+            return DaysSupply.Max > 0 ? DaysSupply.Current / DaysSupply.Max : 0f;
         }
 
         public bool IsStockpileEmpty() =>
-            !IsBase || FacilityType != FacilityType.SupplyDepot || StockpileInDays <= 0f;
+            !IsBase || FacilityType != FacilityType.SupplyDepot || DaysSupply.Current <= 0f;
 
         public float GetRemainingSupplyCapacity() =>
             IsBase && FacilityType == FacilityType.SupplyDepot
-                ? GetMaxStockpile() - StockpileInDays : 0f;
+                ? DaysSupply.Max - DaysSupply.Current : 0f;
 
         /// <summary>
         /// Upgrades the depot to the next size tier.
@@ -2469,25 +2480,21 @@ namespace HammerAndSickle.Models
                 {
                     case DepotSize.Small:
                         DepotSize = DepotSize.Small;
-                        StockpileInDays = GetMaxStockpile();
                         GenerationRate = SupplyGenerationRate.Minimal;
                         SupplyProjection = SupplyProjection.Local;
                         break;
                     case DepotSize.Medium:
                         DepotSize = DepotSize.Medium;
-                        StockpileInDays = GetMaxStockpile();
                         GenerationRate = SupplyGenerationRate.Basic;
                         SupplyProjection = SupplyProjection.Extended;
                         break;
                     case DepotSize.Large:
                         DepotSize = DepotSize.Large;
-                        StockpileInDays = GetMaxStockpile();
                         GenerationRate = SupplyGenerationRate.Standard;
                         SupplyProjection = SupplyProjection.Regional;
                         break;
                     case DepotSize.Huge:
                         DepotSize = DepotSize.Huge;
-                        StockpileInDays = GetMaxStockpile();
                         GenerationRate = SupplyGenerationRate.Enhanced;
                         SupplyProjection = SupplyProjection.Strategic;
                         break;
@@ -2495,8 +2502,13 @@ namespace HammerAndSickle.Models
                         throw new ArgumentOutOfRangeException(nameof(depotSize), "Invalid depot size specified");
                 }
 
-                if (IsBase)
-                    AppService.CaptureUiMessage($"{UnitName} depot has been upgraded to {DepotSize} size. Stockpile: {StockpileInDays} days.");
+                // ONE supply number (SUP-1): a depot's pool IS DaysSupply, sized to its cap here — for
+                // BOTH the construction path (the ctor pre-sized 5, raised now) and UpgradeDepotSize
+                // (raise + refill, the pre-unification refill-on-upgrade behavior, preserved).
+                DaysSupply.SetMax(GetMaxStockpile());
+                DaysSupply.ResetToMax();
+
+                AppService.CaptureUiMessage($"{UnitName} depot is {DepotSize} size. Supply: {DaysSupply.Current} days.");
             }
             catch (Exception e)
             {
@@ -2571,8 +2583,11 @@ namespace HammerAndSickle.Models
                 {
                     BaseDamage = 0;
                     OperationalCapacity = OperationalCapacity.Full;
+                    // A template-instantiated depot starts EMPTY (pre-SUP-1 behavior, preserved --
+                    // deliberately overriding the ResetToMax above; P4/15 may re-rule what a newly
+                    // purchased depot arrives holding).
                     if (FacilityType == FacilityType.SupplyDepot)
-                        StockpileInDays = 0f;
+                        DaysSupply.SetCurrent(0f);
                     ClearAllAirUnits();
                 }
             }

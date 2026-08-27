@@ -17,6 +17,15 @@
 
 ## Status
 
+> **⟳ 2026-08-21 — COWORK HANDOFF DOC SET (5 files, repo root).** AI work is moving to a Cowork
+> project; Bob links the Design Docs folder into it. Created: `HS_Project_Info.md` (game/codebase/
+> standards/workflow primer) + `AI Design Philosophy.md` (full AI design breakdown) +
+> **`HS_Agent_Contract.md` (RATIFIED — Bob > Head Agent > delegate agents; ONE-WRITER RULE for
+> code: only the repo-side Head Agent lands code; shared design docs are append-only
+> DELEGATE-PROPOSED for delegates; snapshots never outrank sources)** + `AI_Code_Map.md` (verified
+> `Models/AI/` API map incl. post-rework sweep/ceiling APIs) + `HS_Glossary.md`. The primers are
+> SNAPSHOTS — supplement + this file stay authoritative; Head Agent refreshes them on drift.
+
 > **⟳ 2026-08-17 sync — `Region` metadata changed under the AI's feet (prestige pass V4,
 > `todo_prestige.md`).** `Region.ObjectiveCount`/`ObjectiveValue` are RENAMED
 > **`StrongholdCount`** (hexes needing physical occupation to flip — the derived

@@ -35,13 +35,12 @@ namespace HammerAndSickle.EditorTools.Rivers
             try
             {
                 string json = File.ReadAllText(path);
-                var options = new JsonSerializerOptions
-                {
-                    PropertyNamingPolicy = null,
-                    IncludeFields = false,
-                    ReferenceHandler = System.Text.Json.Serialization.ReferenceHandler.Preserve
-                };
-                var mapData = JsonSerializer.Deserialize<JsonMapData>(json, options);
+                // JsonPolicy.Content — the SAME options MapLoader reads a .map with (CLAUDE.md item 10).
+                // ⚠ The local options this replaced (2026-08-24) had NO string-enum converter, so this tool
+                // silently broke the day maps were re-exported name-form (2026-07-28): "terrain": "Rough"
+                // threw on deserialize. A diagnostic must read the file exactly as the game does, or its
+                // verdicts describe a file the game never sees — the MapChecksumUtility lesson again.
+                var mapData = JsonSerializer.Deserialize<JsonMapData>(json, HammerAndSickle.Persistence.JsonPolicy.Content);
                 if (mapData == null || mapData.Hexes == null)
                 {
                     Debug.LogError($"[RiverSymmetryVerifier] Failed to deserialize {path}");

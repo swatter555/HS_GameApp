@@ -10,60 +10,72 @@
 > Bob's result before marking a milestone `[x]` or proceeding. Write code + tests, verify by inspection, then hand
 > off — never claim GREEN unrun.
 
-The living work file. History lives in `Claude_TODO_Archive.md` (DONE records + pre-2026-08-20 change log) and git.
+The living work file. History lives in `Planning Docs/Claude_TODO_Archive.md` (DONE records + pre-2026-08-20 change log) and git.
 
 - **Authoritative spec:** `HS_DesignDoc.md` · **Rating model:** Appendix W + `WeaponTrait_Supplement.md`
-- **AI design (authoritative):** `Design Docs/Supplements/AI-Design-Supplement.md` · planning detail: `Claude_AI_TODO.md` (this file gets only brief sync notes)
+- **AI design (authoritative):** `Design Docs/Supplements/AI-Design-Supplement.md` · planning detail: `Planning Docs/Claude_AI_TODO.md` (this file gets only brief sync notes)
 - **Codebase context:** `Claude_Project.md` — keep reconciled; update it in the same session that lands structural changes
 
 **Legend:** `[ ]` todo · `[~]` in progress · `[x]` done · `[-]` deferred/dropped
 
 ---
 
-## ⚡ CURRENT STATUS (2026-08-20 — full rewrite of this file; prior text verbatim at commit `55587d2`)
+## ⚡ CURRENT STATUS (2026-08-24 — pointer moved to the combat pass; file last fully rewritten 2026-08-20, prior text verbatim at `55587d2`)
 
-**▶ NEXT: P4 REQUISITION (`todo_profiles.md`).** The prestige/victory pass gave it a live currency
-(`PrestigeWallet`, atomic `SpendPrestige`) — the buy/sell/upgrade bay API is the natural next frontier.
-There is no other "start here" pointer; older ▶ arrows in `todo_profiles.md`/`todo_domains.md` headers are
-history, not directions.
+**▶ NEXT: THE COMBAT PASS — `Planning Docs/Implementing Combat.md` (opened 2026-08-24, Bob's direction).**
+Four workstreams in one focus file: **audio tighten-up → combat animation → air operations → combat constants.**
+The detail lives entirely in that file; this one keeps the thread-board row and the change-log lines only.
+Start point is **AIR-0** for air (`AirThreatService` + the §24.7a.8 threat overlay — no gates, no new art) and
+**A-2** for audio (Bob runs `Tools/Audio/Audit Catalog`; that output is a prerequisite, not a verification).
+⚠ **Eight decisions are owed by Bob before parts of it can start** — §7 of that file, D3 in particular blocks AIR-0.
+
+**⏸ P4 REQUISITION (`Planning Docs/todo_profiles.md`) is still queued and still unblocked** — the wallet and
+atomic `SpendPrestige` are live and `CombatUnit.PurchaseCost` is the ratified basis. It was the ▶ pointer from
+2026-08-20 until the combat pass superseded it; nothing about it regressed. Older ▶ arrows inside
+`Planning Docs/todo_profiles.md` / `Planning Docs/todo_domains.md` headers are history, not directions.
+
+⚠ **DOCS MOVED 2026-08-24:** every plan/pass/courier document now lives in **`Planning Docs/`**; the repo root
+holds only `CLAUDE.md`, `Claude_Project.md`, `Claude_TODO.md` and `README.md`. See `Claude_Project.md` §1.1 for
+the rule. Paths in this file were re-pointed in the same commit; paths *inside* `Planning Docs/` are bare
+filenames and are correct as they stand.
 
 **Pass ledger (newest first; each closed pass's detail lives in its plan file + the archive change log):**
 - **2026-08-22 — AIR-DEFENSE RANGE, CLOSED** (committed `83d0f99`, suites green Bob-run; record
-  `todo_adrange.md`): the §11.8 engagement envelope now reads the authored IR ladder (was `PrimaryRange`
+  `Planning Docs/todo_adrange.md`): the §11.8 engagement envelope now reads the authored IR ladder (was `PrimaryRange`
   = 1 on every AD unit — the whole ladder was dead data) + Bob's point-defense re-band (Chaparral/
   Roland/Crotale/Rapier/HQ-7 6→4; Tunguska STAYS 5 — trait-composed 3+2; Hawk stays 6). Ratified ladder
   in DesignDoc §11.8.2d; 9 envelope pins across the profile suites; 4 transit regressions. No re-pricing.
 - **2026-08-22 — PRESTIGE / UNIT ECONOMY, CLOSED** (committed `14fa5d5`, suites green Bob-run; record
-  §7 of `Prestige_SovietEconomy_Analysis_2026-08-22.md`): Soviet-menu re-tiers (BTR-70 40 / BTR-80 100 /
+  §7 of `Planning Docs/Prestige_SovietEconomy_Analysis_2026-08-22.md`): Soviet-menu re-tiers (BTR-70 40 / BTR-80 100 /
   BRDM-2 AT 105 / Su-24 300 / T-80B 125; ACR explicit 250); NEW `CombatUnit.PurchaseCost` (Σ populated
   bays) = the ratified §18.3.1 whole-unit price and the V19 kill-bounty basis; §18.5.1 upgrade formula +
   §18.5.2 successor rule ratified; HS_DesignDoc §18 fully reconciled. Income side untouched (live).
 - **2026-08-22 — ICM / FORMATION QUALITY, CLOSED** (committed `d6734f3`, suites green Bob-run; record
-  `todo_icm.md` rulings 1–11): closed-bay ICM doctrine (sole profile prices the FORMATION); 4 new
+  `Planning Docs/todo_icm.md` rulings 1–11): closed-bay ICM doctrine (sole profile prices the FORMATION); 4 new
   formation-quality traits (M1 1.53 · Leo 2 1.47 · Challenger 1.33 · ACR 1.40 · M109/MLRS ×1.05); recon
   ruling (all six scouts fight Soft, `RECON_FRAGILE` dormant); artillery fixes (M109 +SMART, PHZ-89/
   Type 82 re-tiers, MJ arty prestige); 5 SP-gun templates ART→SPA. Open follow-ons: NATO late roster
   (Q2/Q3, never ruled) + 2 ICM outliers (export idiom, LOOKDOWN live-vs-dormant) — see the handoff.
 - **2026-08-19 — THEME-ART** (committed `55587d2`): EU + CH map icons + hex tile sets, 9-arm `CreateMapIcon`,
   CN→CH prefix fix, all three terrain arrays baked (gitignored). ⏸ In-play verify gated on first non-ME export.
-- **2026-08-17 — PRESTIGE/VICTORY, CLOSED** (`todo_prestige.md`, all gates green incl. play): `VictoryLedger` +
+- **2026-08-17 — PRESTIGE/VICTORY, CLOSED** (`Planning Docs/todo_prestige.md`, all gates green incl. play): `VictoryLedger` +
   `PrestigeWallet` + §17.2/17.3 share grading + §17.8 mission-objective gate + §17.9 scenario end + §18.2
   per-turn income (capture awards RETIRED) + **SAVE_VERSION 7**. Khost runs fully scored on placeholders
-  (editor-side E10 rebalance owed — see the ladder audit, `Reply_LadderAudit_2026-08-17.md`).
-- **2026-08-13 — CENSUS DOCTRINE v2, CLOSED** (`todo_census.md`): all censuses own-platform-count, organic
+  (editor-side E10 rebalance owed — see the ladder audit, `Planning Docs/Reply_LadderAudit_2026-08-17.md`).
+- **2026-08-13 — CENSUS DOCTRINE v2, CLOSED** (`Planning Docs/todo_census.md`): all censuses own-platform-count, organic
   tanks on mech bases, lift censuses empty; machine-enforced by `CensusIntegrityTests` (6). ⚠ Do not re-open
   the carrier question in either direction without touching that guard (supersedes the 08-12 "leave them" ruling).
 - **2026-08-12 — MAP-STANDARD**: map size per-scenario from the `.map` header, `MapConfig` geometry deleted,
   truncation throws, derived scroll bounds. `MapStandardTests` (14, green 2026-08-20).
-- **2026-08-10/11 — DOMAINS D0–D3** (`todo_domains.md`): domain vocabulary, post-hoc spotting (§12.4.4a),
+- **2026-08-10/11 — DOMAINS D0–D3** (`Planning Docs/todo_domains.md`): domain vocabulary, post-hoc spotting (§12.4.4a),
   transit air defence (D2, play-confirmed), helo over-water grace (D3) + **SAVE_VERSION 6**. All suites green 2026-08-20.
-- **2026-08-08/10 — PROFILE REBUILD P0–P3** (`todo_profiles.md`): `EquipmentBays`, derived bay capacity, naval
+- **2026-08-08/10 — PROFILE REBUILD P0–P3** (`Planning Docs/todo_profiles.md`): `EquipmentBays`, derived bay capacity, naval
   sealift, movement-medium rules + **SAVE_VERSION 5**. P4 is the remainder.
-- **2026-08-03/04 — AUDIO REBUILD Phases 0–3** (`todo_audio.md`): SFX as imported assets, catalog + facade +
+- **2026-08-03/04 — AUDIO REBUILD Phases 0–3** (`Planning Docs/todo_audio.md`): SFX as imported assets, catalog + facade +
   fog gate, battle-map sounds WIRED (movement/fire/impact/ambush/objectives/denied). Remaining audio work is
   clips + Bob's Inspector items + host-blocked sounds — see the thread board below.
 - Earlier (weapon-rating migration, combat engine M0–M9, orchestrators, intel ladder, printer, AI0–AI2b,
-  content pipeline 0/1/3/4, HUD pass): `Claude_TODO_Archive.md` + `Claude_Project.md`.
+  content pipeline 0/1/3/4, HUD pass): `Planning Docs/Claude_TODO_Archive.md` + `Claude_Project.md`.
 
 **📌 Dormant-on-arrival (so their silence is never read as a bug):**
 - **Weather is single-state Clear** — §5.13.4 air grounding, storm sea costs and every weather ICM can never
@@ -90,26 +102,41 @@ a diagnosis.
 
 | Thread | Stands at | Next move / gate |
 |---|---|---|
-| **Requisition (P4)** | ▶ NEXT. Wallet + atomic spend LIVE (08-17); pricing rules RATIFIED §18.3.1/§18.5.1 + `CombatUnit.PurchaseCost` LIVE (08-22, prestige pass); bay buy/sell/upgrade API + UI unbuilt. | Agent: build per `todo_profiles.md` P4 (§4.7 header carries the rules — do not re-derive prices). No gates. |
+| **▶ COMBAT PASS — audio · animation · air ops · constants** | ▶ NEXT, opened 2026-08-24 (Bob's direction). Plan DRAFTED in `Planning Docs/Implementing Combat.md`, no code yet. Air RULES built + tested and the transit half is live; the AOB/GAME half is unwired. Combat has NO visual at all. 49 sounds declared vs 14 catalog rows. Constants are solid per Bob — light touch only. | Bob: 8 decisions in §7 of that file (**D3 blocks AIR-0**), + run `Tools/Audio/Audit Catalog` (A-2) and the D-1 combat baseline play. Agent: AIR-0 and A-1 need nothing. |
+| **Requisition (P4)** | ⏸ QUEUED — was ▶ NEXT until the combat pass superseded it 2026-08-24; nothing regressed. Wallet + atomic spend LIVE (08-17); pricing rules RATIFIED §18.3.1/§18.5.1 + `CombatUnit.PurchaseCost` LIVE (08-22, prestige pass); bay buy/sell/upgrade API + UI unbuilt. | Agent: build per `Planning Docs/todo_profiles.md` P4 (§4.7 header carries the rules — do not re-derive prices). No gates. |
 | **Campaigns + Save/Load** | Pipeline Phase 2 paused CLEAN, all decisions settled. Campaign folders invisible to discovery; `SaveLoad` has ZERO callers — no Save button exists. | Agent: resume trio in OPEN WORK. Cost grows per mission authored (25–30 planned). Menu listing is Bob-gated (prefab). |
-| **M13 — turn loop / air missions / AOB** | The big frontier. Air RULES built + tested; air GAME unwired. Turn loop is straight-through; reaction yields are a day-one requirement (retrofit = rewrite). | Agent-led, large. Gates: D4, I8, most printer emitters, M14 remainder, D2 fixed-wing play-verify all sit behind it. |
-| **Audio** | System + policy + wiring DONE through Phase 3. Most wired sounds have NO CLIP yet; battle-HUD buttons silent. | Bob: author wavs (helo/jet long cuts too), put `UIButtonAudio` on HUD buttons. Host-blocked sounds arrive with M13/supply/leader/§17. |
+| **M13 — turn loop / air missions / AOB** | The big frontier. Air RULES built + tested; air GAME unwired. Turn loop is straight-through; reaction yields are a day-one requirement (retrofit = rewrite). ⚠ **The AIR half is now phased inside the combat pass** (`Planning Docs/Implementing Combat.md` §5, AIR-0→AIR-4) — the turn-loop half stays here. | Agent-led, large. Gates: D4, I8, most printer emitters, M14 remainder, D2 fixed-wing play-verify all sit behind it. ⚠ Finding 2026-08-24: **AIR-2 does NOT need the reaction-yielding loop** — in Khost the reaction windows belong to an AI with nothing to fly, so v1 never suspends. |
+| **Audio** | System + policy + wiring DONE through Phase 3. **49 `SoundEffect` members vs 14 catalog rows vs 11 wavs** — ~35 declared sounds have no row. Battle-HUD buttons silent. Two carried-forward defects open (JsonPolicy violation; briefing-absent logged as an exception). ⚠ **Now workstream A of the combat pass** — plan in `Planning Docs/Implementing Combat.md` §3; `Planning Docs/todo_audio.md` remains the system's design record. | Bob: run `Tools/Audio/Audit Catalog` (A-2, a prerequisite), rule D1/D2/D8, author wavs (helo/jet long cuts too), put `UIButtonAudio` on HUD buttons. Agent: A-1 + A-3 need nothing. |
 | **Leaders (L1–L4)** | Combat mechanics LIVE (M14 slice). Awards engine, pool/recruitment, details UI all unbuilt. Recruitment economy UNBLOCKED by the wallet (08-17). | Agent: L1+L4 approved + headless-safe, can start anytime. Art dependency: portraits + deco layers (Bob). |
-| **AI** | AI0–AI2b live (board analysis, EV oracle, honest-spotting belief store). AI takes no turn yet. | Agent: AI3+ per `Claude_AI_TODO.md` (irregular doctrine first, for Khost). AI2 state still owed a SAVE_VERSION ride. |
-| **Domains: naval + D4** | D0–D3 CLOSED. D4 fixed-wing staging gated on M13/AOB. N0–N3 designed (`todo_domains.md` §F/§H), suite-verifiable, unplayable without a coastal map. | Bob: coastal test map when convenient. N3 additionally gated on §15 supply. |
+| **AI** | AI0–AI2b live (board analysis, EV oracle, honest-spotting belief store). AI takes no turn yet. | Agent: AI3+ per `Planning Docs/Claude_AI_TODO.md` (irregular doctrine first, for Khost). AI2 state still owed a SAVE_VERSION ride. |
+| **Domains: naval + D4** | D0–D3 CLOSED. D4 fixed-wing staging gated on M13/AOB. N0–N3 designed (`Planning Docs/todo_domains.md` §F/§H), suite-verifiable, unplayable without a coastal map. | Bob: coastal test map when convenient. N3 additionally gated on §15 supply. |
 | **Intel** | Six-rung ladder LIVE + play-confirmed. Open: I7 HQ SIGINT sweep (= M15, unblocked, slot-in-anywhere), I8 RB tiers (M13-gated). | Agent: I7 whenever convenient. Deferred skill re-homes need Bob ratification. |
 | **Printer / dispatch feed** | CRT + emitters LIVE for every existing host. Owed: P5 ledger persistence (SAVE_VERSION bump), P8b tests. Air/logistics/leader emitters host-blocked. | Agent: P5 persistence is small and self-contained. §11.7.2 evac revision awaits Bob's eyeball. |
-| **Supply (§15)** | Designed; `ProcessUpkeep` is a stub. Gates N3, HCL decay/recovery, logistics dispatches, depot REP award. | Agent: its own pass, unscheduled. No blockers besides size. |
+| **Supply (§15)** | Designed; `ProcessUpkeep` is a stub. **NEW 2026-08-24: the SUPPLY UNIFICATION is this thread's groundwork** — Bob's one-number ruling (every unit ONE `DaysSupply`, caps 5/30/size; the `StockpileInDays` split was the code's invention, §15 never had it). Survey DONE, plan drafted (`Planning Docs/Supply Unification.md` — cheap: the depot API has zero callers; carries SAVE_VERSION 9 + a free fix for the latent depot-reloads-full snapshot bug). **SUP-1 CLOSED 2026-08-24 — suite GREEN + Khost play-confirmed (Bob-run): one `DaysSupply` pool per unit, SAVE_VERSION 9, fixed-wing Max 0.** The model is settled; §15 is now genuinely "deduct points." Gates N3, HCL decay/recovery, logistics dispatches, depot REP award. | Agent: §15 as its own pass when scheduled — `ProcessUpkeep` chain (§3.5.4-.6), §15.4a resupply (`OnResupplyRequested` has zero subscribers), §15.5.3 OOS incl. the airbase-keyed fixed-wing arm. No blockers besides size. |
 | **Weather** | Single-state Clear. Rich model deferred by design ("revisit before ship"). Several built rules dormant until it exists. | Design pass first (Bob + doc), then code. Nothing else gated on it except the dormant rules. |
-| **Mission Pack (content reorg)** | NEW 2026-08-21. Plan DRAFTED (`todo_missionpack.md`, awaiting Bob's review): single `.mission` JSON pack (manifest+briefing+map+oob+aii sections), manifest in-pack, unified MapSection = a SAVE_VERSION ride, clean break, thumbnails/narration loose, `Mission`/`Scenario`/`Campaign Mission` semantics ratified. ⚠ NOT shared with the editor yet. | Bob: review plan; define the AII schema (the ⌛ gate for the editor spec + serious build). Agent: §7 update hook is bounded. |
+| **Mission Pack (content reorg)** | NEW 2026-08-21. Plan DRAFTED (`Planning Docs/todo_missionpack.md`, awaiting Bob's review): single `.mission` JSON pack (manifest+briefing+map+oob+aii sections), manifest in-pack, unified MapSection = a SAVE_VERSION ride, clean break, thumbnails/narration loose, `Mission`/`Scenario`/`Campaign Mission` semantics ratified. ⚠ NOT shared with the editor yet. | Bob: review plan; define the AII schema (the ⌛ gate for the editor spec + serious build). Agent: §7 update hook is bounded. |
 | **Content / editor coordination** | Khost re-priced editor-side (s0 0.302, ladder .38/.47/.56, 7/7 rungs). C7 landed game-side (SAVE_VERSION 8). ⚠ E15 + the Khost manifest re-export are SUPERSEDED by the Mission Pack plan (fraction ships inside the re-exported packs) — relay is Bob's, AFTER the AII schema lands. Hamburg (44×21 EU) in authoring. | Bob: hold the editor off E15/re-export dead work. Game-side: EU/CH ⏸ verify fires on their first export (will likely arrive as a pack). |
-| **Ship-blockers (small, must not be forgotten)** | Tilde (~) reveal cheat in `GameIconRenderer`; `AudioSettings` local `JsonSerializerOptions` (JsonPolicy rule violation). | Agent: both are quick deletes/redirects; do before any external build. Tracked in Cleanup. |
+| **Ship-blockers (small, must not be forgotten)** | Tilde (~) reveal cheat in `GameIconRenderer`. ✅ The `AudioSettings` JsonPolicy violation is FIXED 2026-08-24 (new `JsonPolicy.Settings`; ⚑ rides the fix-batch suite run). | Agent: the tilde cheat is a quick delete before any external build. Tracked in Cleanup. |
 
 ---
 
 ## BOB'S QUEUE (nobody else can do these)
 
-- [ ] **Wire the End Scenario button** → `BattleManager.OnEndScenarioButton` (Inspector, like End Turn — do NOT
+- [ ] ⚠ **URGENT — relay to the Scenario Editor agent BEFORE the Hamburg OOB export (REWRITTEN 2026-08-24
+      LATE — supersedes the earlier version of this item; if that already went out, send this correction):**
+      (a) `.oob` `DaysSupply` is REAL DAYS, not a 0–1 ratio (unchanged from the earlier relay; loader clamps
+      to the unit's cap and warns; a ratio-form file trips a whole-file warning).
+      (b) **`StockpileInDays` is RESCINDED** — a field added and withdrawn game-side the same day, before
+      the editor implemented it. It must NOT appear in the editor's OOB inspector.
+      (c) Pending Bob's go on the supply unification (`Planning Docs/Supply Unification.md`): **depots
+      author their big supply number directly in `DaysSupply`** — full = 30/50/80/110 by DepotSize; airbase
+      30; everything else 5. Suggested editor validation: cap the field by classification/size.
+      (d) **Fixed-wing units author `DaysSupply` 0** (FGT/ATT/BMB/RECONA/AWACS/WW/TRN — no own supply;
+      the airbase pays per §11.2.3; ruled by Bob 2026-08-24, doc-confirmed §10.3.1/§15.1.2). Suggested
+      validation: force 0 for these classifications. Helicopters NOT included (cap 5).
+      (e) The `HitPoints` question stands: real HP (/40 mobile, /60 facility) or ratio? Editor authoring UX
+      should drive the call.
+- [ ] **Wire the End Scenario button**- [ ] **Wire the End Scenario button** → `BattleManager.OnEndScenarioButton` (Inspector, like End Turn — do NOT
       add a HUD copy; the name is a contract). Owed since the prestige pass closed (2026-08-17); the editor's
       status memo lists it too. Until wired, voluntary early finish (§17.9.2) is unreachable in play.
 - [ ] **Wire the TWO loss-report buttons (decided 2026-08-20: two buttons, not a toggle).**
@@ -123,7 +150,7 @@ a diagnosis.
 - [ ] **Tell the Scenario Editor agent G1 HAS LANDED** once a build ships with it — their stated trigger to
       start writing `mapConfiguration: None` and to open their E3 phase (manifest `mapWidth`/`mapHeight` +
       cross-stamp).
-- [ ] **Relay to the Scenario Editor agent** (`ScenarioEditor_Status_2026-07-28.md` covers most of it):
+- [ ] **Relay to the Scenario Editor agent** (`Planning Docs/ScenarioEditor_Status_2026-07-28.md` covers most of it):
       (a) checksum decision SETTLED — header field stays as their fingerprint, game never validates;
       (b) `classificationName` green-lit for removal; (c) leaders can go name-form;
       (d) briefing narration is CAMPAIGN-SCENARIO ONLY (§20.4.2) — missing narration is normal, not an error;
@@ -188,13 +215,26 @@ a diagnosis.
 
 ## OPEN WORK
 
-### ▶ P4 — REQUISITION (`todo_profiles.md`, the live frontier)
+### ▶ THE COMBAT PASS — audio · animation · air ops · constants (`Planning Docs/Implementing Combat.md`)
+**The live frontier, opened 2026-08-24.** Four workstreams, deliberately in one focus file so this one does not
+have to carry them: **A** audio tighten-up · **B** combat animation · **C** air operations (phased AIR-0→AIR-4;
+only AIR-0/AIR-1 and the start of AIR-2 are in scope this pass) · **D** combat constants. Recommended order is
+A → B → C with **D kept in its own session** — every combat-constant change forces a `CombatOracleTests` re-run,
+and bundling one into an animation commit means a red suite that could be either.
+⚠ **The one architectural point:** B and C need the same missing thing — a presentation step gameplay can hand
+control to and get back. §11.1.8.6 makes reaction yields a day-one requirement and warns *retrofit = rewrite*, so
+**B ships the suspendable sequencer that C's reaction windows reuse.** Do not build a fire-and-forget FX layer.
+⚠ **Eight decisions are owed by Bob** (§7 of that file). **D3 — the §11.4.4 "spotting +" term — blocks AIR-0**,
+and it is the term the AD range pass deliberately deferred to `AirThreatService` so the overlay and the walk
+could not disagree. Everything else in this section is unchanged and unblocked.
+
+### P4 — REQUISITION (`Planning Docs/todo_profiles.md`) — ⏸ queued, still unblocked
 The bay purchase/upgrade economy on top of `EquipmentBays`: buy/sell/upgrade API (headless), prestige pricing
 (`PrestigeCost`/`TurnAvailable` fields exist on every profile), and the purchase UI surface. The wallet and
-atomic `SpendPrestige` are LIVE (2026-08-17) — this pass finally has a currency. Spec: `todo_profiles.md` P4
+atomic `SpendPrestige` are LIVE (2026-08-17) — this pass finally has a currency. Spec: `Planning Docs/todo_profiles.md` P4
 + DesignDoc §18. ⚠ P5 (content/docs) was merged into the domain doc pass; do not resurrect it separately.
 
-### CONTENT PIPELINE Phase 2 — campaigns (PAUSED 2026-07-28, clean; full detail `todo.md`)
+### CONTENT PIPELINE Phase 2 — campaigns (PAUSED 2026-07-28, clean; full detail `Planning Docs/todo.md`)
 Phases 0/1/3/4 CLOSED: a standalone scenario is a folder — discovered, listed, played, no code. What remains:
 - **Campaign scenarios are NOT REACHABLE** — discovery scans `Scenarios/` only; `Campaigns/...` is invisible.
 - **Saving/loading is NOT WIRED** — `SaveLoad.SaveAsync`/`LoadAsync` have ZERO callers, no Save button. The
@@ -328,6 +368,34 @@ RESOLVED AND BUILT: ambushed helo takes an ordinary attack minus the surprise mu
       favour of the §18.2 income model, which already runs in Upkeep.
 - [ ] §7.15.7 move-path supply: replace the deterministic per-hex consume (`CombatUnit.cs`) with the §7.15.4
       probabilistic roll (combat path already converted); §7.15.2.4 Degraded move gate (controller + UI).
+- [ ] **⭐ AI/OPFOR REINFORCEMENT ARRIVALS (`.oob`-scheduled) — requested by Bob via the editor agent,
+      2026-08-24.** §20.2 already specifies this — *"AI reinforcement schedules (scripted arrivals) remain
+      manifest/.oob-driven"* — but **nothing implements it**: `OobUnitData` (`OOBFileLoader.cs:36`) has no
+      arrival field, so **every unit in an `.oob` is on the map at turn 1**. ⚠ Do not mistake
+      `WeaponProfile.TurnAvailable` for this — that is equipment availability by campaign date
+      (`CampaignDateCalendar.cs:238`), a different concept entirely.
+      **Why now:** Hamburg is being authored as a player assault against LANDJUT. The historical NATO
+      shape is a lone German division delaying while the UK Mobile Force and the US 9th Infantry Division
+      come up — which cannot be expressed. Put them in the `.oob` and they are a fully-reinforced defence
+      from turn 1, a materially different (and much harder) scenario. Every future defensive or
+      delaying scenario has the same problem.
+      **Suggested minimal shape** (the editor agent's proposal — yours to accept, amend or reject):
+      - One new `OobUnitData` field, `arrivalTurn`, **default 0 = present at start**, so every existing
+        `.oob` keeps its exact behaviour and no content needs touching.
+      - A unit with `arrivalTurn > 0` is held out of the map until that turn, then placed at the
+        `MapPosX/MapPosY` it already carries. **No new position field** — the OOB already says where.
+      - ⚠ **Arrival must be idempotent across save/load, and this is the part with teeth.** "Has this
+        arrival already fired?" is NOT derivable from the roster: a unit that arrived and was then
+        destroyed would re-arrive on reload. That needs either a persisted fired-set in `ScenarioData`
+        (⇒ `SAVE_VERSION` bump, no ladder step while `MINIMUM` tracks it per CLAUDE.md §2.12) or an
+        arrival check that also consults the loss ledger. **Your call which — flagging that a naive
+        turn >= N test is wrong.**
+      - Occupied-arrival-hex rule needed: delay one turn and log, with a cap, seems safest. Refusing at
+        load is wrong — the hex is free at authoring time and occupied only by play.
+      - ⚠ Scope: this is the **AI/OPFOR** side only. Player reinforcement is already specified as the
+        Reserve pool brought on in-battle (§20.2 / §35.3.8), not a schedule — do not conflate them.
+      **Editor side:** authoring `arrivalTurn` is a small addition to the OOB inspector; nothing is
+      blocked on us. Say the word on the field name and casing and it ships with the next editor pass.
 - [ ] Reactive facing (§5.8.8, free once/enemy-turn): HasReactiveFaced flag + rotation + flank negation
       (+ exemptions for bases/indirect/air at call sites).
 - [ ] Contested-crossing caller geometry (§7.5.6.9.1) — also feeds the M14 RiverAssault ICM.
@@ -409,7 +477,7 @@ locked hosts. Prereq nodes are kept-and-neutralized, never deleted (`ValidateSki
 - [ ] OPEN KNOB (§12.7.8): multiple HQs = multiple sweeps, or 1-per-side cap like AEWB. Prov. uncapped.
 - [ ] EditorTests: rating→sweep path incl. radio-silence exclusion; SpottingService regressions green.
 
-### DOMAINS — D4 + naval N0–N3 (`todo_domains.md` §H is the plan; §I the editor relay list)
+### DOMAINS — D4 + naval N0–N3 (`Planning Docs/todo_domains.md` §H is the plan; §I the editor relay list)
 D0–D3 CLOSED (see pass ledger). Remaining ladder:
 - [ ] **D4 — fixed-wing staging.** GATED ON M13/AOB — Bob 2026-08-11: "the mechanisms to run air missions are
       not in the game yet." D2's fixed-wing half (1d6 detection, transit AD vs jets) stays play-unverified
@@ -419,7 +487,7 @@ D0–D3 CLOSED (see pass ledger). Remaining ladder:
       map exists (Khost has no water); N3 additionally ⛔ gated on §15 supply. ⚠ There is NO hex-by-hex sea
       movement — §5.4.2.3 makes naval movement an instant port-to-port jump; do not add one.
 
-### AI track → `Claude_AI_TODO.md`
+### AI track → `Planning Docs/Claude_AI_TODO.md`
 AI0–AI2b landed, suites GREEN (2026-07-27). Next: AI3+ per the AI TODO (irregular doctrine ahead of the line
 manager, for Khost). ⚠ AI2 snapshot serialization still owed its own `SAVE_VERSION` ride.
 
@@ -461,9 +529,10 @@ manager, for Khost). ⚠ AI2 snapshot serialization still owed its own `SAVE_VER
 - [ ] ⚠ **REMOVE BEFORE SHIPPING: the tilde (~) debug enemy-reveal cheat** (added 2026-07-06 at Bob's request).
       `GameIconRenderer.DebugRevealAllEnemies` + its `Update()` poller + the two fog-filter bypasses — all
       marked "REMOVE BEFORE SHIPPING". Rendering-only (SpottedLevel untouched).
-- [ ] ⚠ **`AudioSettings.SaveSettings` builds a local `JsonSerializerOptions`** — violates CLAUDE.md item 10
-      now that the one sanctioned exception (`MapChecksumUtility`) is deleted. Route through `JsonPolicy`
-      (or add a third named policy if the settings format genuinely differs).
+- [x] ✅ **`AudioSettings` JsonPolicy violation FIXED 2026-08-24, suite green (Bob-run same day)** — NEW third named policy
+      `JsonPolicy.Settings` (player-written flat tree, lenient read); AudioSettings reads AND writes through
+      it, and the same sweep repaired `RiverSymmetryVerifier` (its local options had no string-enum converter
+      — broken against every name-form map since 2026-07-28; now reads via `JsonPolicy.Content`).
 - [ ] **`_to_delete/` review (Bob):** superseded courier/handoff files swept there 2026-08-20 (plus 13
       zero-byte git-lock droppings from 08-13). Everything is in git history; delete the folder when ready.
 - **Repo tracks the WHOLE PROJECT as of 2026-07-27** (standard-Unity opt-out `.gitignore`; `.meta`,
@@ -480,21 +549,111 @@ manager, for Khost). ⚠ AI2 snapshot serialization still owed its own `SAVE_VER
 ## Change log
 
 > **Rules:** one line per change · newest first · format `YYYY-MM-DD — imperative summary (area)` · entries
-> older than the last two passes migrate to `Claude_TODO_Archive.md` when this section is pruned.
+> older than the last two passes migrate to `Planning Docs/Claude_TODO_Archive.md` when this section is pruned.
 > **Entries 2026-07-21 → 2026-08-19 (incl. the theme-art pass and everything before it) are in the archive.**
 
+- 2026-08-24 — ⚑ CLEARED (Bob ran it): SUP-1 suite GREEN + Khost panel play-confirmed across the board
+  (regiment 5/5 · airbase 30/30 · cache 30/30 · depot 80/80 · Su-17 0/0, units moving normally — the
+  fixed-wing `CanMove` guard verified in play, which was the silent-failure risk). **SUPPLY UNIFICATION
+  PASS CLOSED**; the one-number model is the settled foundation §15 builds on.
+- 2026-08-24 — SUP-1 SUPPLY UNIFICATION LANDED (Bob's go; **SAVE_VERSION 9**; record `Planning
+  Docs/Supply Unification.md` §3): one `DaysSupply` pool per unit — depot Max = size cap via `SetDepotSize`
+  (single sizing authority; upgrade refill preserved), airbase 30, **fixed-wing 0** + the `CanMove`
+  `Max > 0` guard; `StockpileInDays` + both band-aids DELETED; ten depot methods re-pointed; SnapshotMapper
+  depot force-reset deleted (half-spent-depot-reloads-full bug dead); loader field/block deleted +
+  warnings re-worded; khost.oob depots 30/80 + Su-17s 0 + rescinded keys removed; panel/printer uniform
+  `cur/max`; `DepotSupplyTests` (9) replaces `DepotStockpileTests`; HS_DesignDoc gains §15.1.2a (ratified
+  in step). Template depots still arrive empty (preserved, P4/§15 note). ⚑ suite + Khost look, blocking.
+- 2026-08-24 — FIXED-WING SUPPLY ruled (Bob) + doc-confirmed (§10.3.1, §15.1.2 verbatim): fixed-wing carry
+  NO own supply — `DaysSupply` Max 0, the airbase pays (§11.2.3). Recorded as `Supply Unification.md` §1.5
+  + SUP-1 step 6a — docs only, rides the awaited SUP-1 go. ⚠ Found the bite in advance: `CanMove` refuses
+  any unit under 1 supply, so the zeroing ships WITH a `Max > 0` guard or no aircraft can ever be ordered
+  to move and unit-cycling skips them. §15.5.3.1's "every unit ≤ 0" OOS wording flagged for the §15 pass
+  (fixed-wing OOS is airbase-keyed, §15.7.6). Khost's 4 Su-17s re-author to 0.0 with SUP-1; editor relay
+  item gains the author-0 line. Airbase-unit CYCLING itself is unbuilt (AIR-1/AIR-2 UI) — §1.5 is the
+  record of intent so nobody "fixes" a 0 back to 5.
+- 2026-08-24 — ⚑ CLEARED (Bob ran it): depot round-2 GREEN, panel shows stockpiles correctly in play.
+  Immediately superseded in MODEL terms by the ruling below — the display fix was correct and is the first
+  thing the unification deletes.
+- 2026-08-24 — SUPPLY UNIFICATION ruled + surveyed (Bob: ONE supply number per unit — the game just deducts;
+  caps regiment 5 / airbase 30 / depot 30/50/80/110; the "stockpile" distinction is not helping. Docs only,
+  no code; plan `Planning Docs/Supply Unification.md`, ⏳ awaiting go): survey verified §15 already means
+  one-number-per-unit (the doc's "stockpile" names a facility's single store) — the code's dual field was
+  the deviation, and the whole depot distribution API has ZERO external callers, so SUP-1 is an internal
+  refactor + three local touchpoints. Carries SAVE_VERSION 9 (stockpileInDays leaves the save shape) and
+  kills a latent bug free (SnapshotMapper never restored stockpile + force-reset depot supply to Max — a
+  half-spent depot reloaded FULL). Editor-relay item REWRITTEN: StockpileInDays RESCINDED same-day, before
+  the editor built it. NEW memory: no band-aids — root-cause the model; sweep own diffs for band-aids;
+  flag editor impact unprompted (Bob's process ruling, this session).
+- 2026-08-24 — DEPOT STOCKPILE round 2 (Bob's catch: the Soviet depot read "5 days supply" in play): the
+  suite was green because the MODEL held 80 — but the stockpile had NO display surface; `Prefab_UnitPanel`
+  printed every unit's 5-day operating `DaysSupply`, depots included. Panel now branches: depots show
+  "Stockpile: N/Max days (Size)" and deliberately NOT the operating supply (two supply numbers was the
+  confusion); NEW `CombatUnit.MaxStockpileInDays` (display reads the same table the clamp uses — no second
+  spelling; the panel's `HammerAndSickle.Core` namespace cannot reach the GameData class cleanly anyway).
+  `DepotStockpileTests` 5→6. Round-1 ⚑ superseded by round 2 (its play half was uncheckable as written —
+  recorded as the lesson: a PASS criterion must name a surface that exists).
+- 2026-08-24 — ⚑ CLEARED (Bob ran it): fix-batch suite GREEN + Khost play confirmed (units 5/5, airbases
+  30/30, no tripwire, settings survive). A-1 and D-3 are `[x]`; the AudioSettings ship-blocker is closed
+  for good. Entry deleted from the testing queue per its rules; record in `Planning Docs/Implementing
+  Combat.md` §9.
+- 2026-08-24 — DEPOT STOCKPILE follow-on (Bob's ask on the green report — "list the large supply totals"):
+  `.oob` depots now carry explicit `StockpileInDays` in REAL DAYS — new optional field (−1/absent = the
+  ctor's full-for-size default, exactly the old behavior; authored 0 = deliberately empty depot, which is
+  why the sentinel is −1) + new `CombatUnit.SetStockpile` (clamps [0, size max] INSIDE the model so
+  `GetMaxStockpile` stays the single capacity authority; loader detects a clamp by comparison and warns;
+  non-depot authoring warns and is ignored — an airbase's stockpile is its DaysSupply). `khost.oob`
+  re-authored: 7 caches list 30.0, the Soviet Large depot 80.0 — behavior-identical. NEW
+  `DepotStockpileTests` (5). Editor relay item extended. ⚑ suite + Khost look queued.
+- 2026-08-24 — `.oob` `DaysSupply` → REAL DAYS (Bob's ruling; content format): the ratio form made Khost's
+  full airbases author "1" and read as grounded under the §11.2.3a 5-day floor. Loader reads days, clamps
+  [0, Max] with warning (`StatsMaxCurrent.SetCurrent` does not clamp to Max), per-file tripwire when every
+  value ≤ 1 (un-migrated ratio signature); `khost.oob` re-authored in step (units 5.0, airbases 30.0 —
+  behavior-identical). `HitPoints` STAYS a ratio — question carried in the relay, not drift. ⚠ URGENT editor
+  relay queued in Bob's queue (Hamburg OOB in authoring). ⚑ rides the fix-batch run.
+- 2026-08-24 — Combat-pass day-one fixes (Bob's blanket permission; record `Planning Docs/Implementing
+  Combat.md` §9): NEW `JsonPolicy.Settings` closes the last local `JsonSerializerOptions` (AudioSettings
+  read+write; the ship-blocker); briefing absent-vs-corrupt split per §20.4.2 (`File.Exists` first — absent =
+  info no-op, unloadable = real exception); `RiverSymmetryVerifier` repaired (was silently broken vs
+  name-form maps since 2026-07-28 — no string-enum converter — now `JsonPolicy.Content`, same read as
+  MapLoader); efficiency constants renamed to spell their `EfficiencyLevel` member (D-3 —
+  `EFFICIENCY_MOD_FULL` had been the CombatOperations value; single consumer, values untouched). Plan
+  RATIFIED by Bob with riders (ground animations first in B; AIR-2 no-AI case test-pinned; §7 decisions stand
+  as notes, defaults proceed). ⚑ one suite run + Khost load queued, blocking.
+- 2026-08-24 — COMBAT PASS opened (docs only, no code; plan `Planning Docs/Implementing Combat.md`): Bob's
+  direction — tighten audio, add combat animations, begin air ops, touch up the global combat constants. Four
+  workstreams A/B/C/D scoped against verified ground truth; order argued (A→B→C, D in its own session because
+  of the `CombatOracleTests` re-run); AIR-0 (`AirThreatService` + §24.7a.8 overlay) named as the air start
+  point; 8 decisions raised for Bob. ▶ NEXT moved here from P4 (which is ⏸ queued, not regressed).
+  Findings recorded in that file's §9: **(a)** `.oob` `DaysSupply` is a RATIO not days
+  (`OOBFileLoader.cs:415`), so Khost's airbases load 30/30 and are NOT under the §11.2.3a launch floor — the
+  literal `1` reads as "grounded" and is not; **(b)** the efficiency constants are named one rung off the enum
+  they serve (`EFFICIENCY_MOD_FULL` serves `CombatOperations`, `_PEAK` serves `FullOperations`) — free rename
+  proposed as D-3, do it BEFORE any tuning; **(c)** Khost has **no enemy aircraft**, so ASB ground-strike is
+  fully playable there and interception is structurally untestable until Hamburg; **(d)** AIR-2 does NOT
+  require the reaction-yielding turn loop — in Khost the reaction windows belong to an AI with nothing to fly,
+  so v1 never suspends (the interface and the resumable SHAPE still ship, per §11.1.8.6).
+- 2026-08-24 — DOCS REORG (Bob's ask): NEW **`Planning Docs/`** holds all 21 plan/pass/courier documents plus
+  the new focus file; the repo root keeps exactly `CLAUDE.md`, `Claude_Project.md`, `Claude_TODO.md`,
+  `README.md`. `Claude_AI_TODO.md` and `Claude_TODO_Archive.md` moved with the rest despite the `Claude_`
+  prefix — they are working documents. Every path reference in `Claude_Project.md` (12) and this file (31) was
+  re-pointed in the same commit; references *inside* `Planning Docs/` stay bare filenames and are correct.
+  Rule + rationale recorded as NEW `Claude_Project.md` §1.1, and its reconcile stamp updated.
+  ✅ **`CLAUDE.md`'s Standard Workflow amended same day** (Bob's "eliminate confusion" permission): items
+  1/7 now name the pass's plan file under `Planning Docs/` — a root `todo.md` can no longer be re-created by
+  the letter of the rules.
 - 2026-08-22 — ⚑ CLEARED (Bob ran it): full EditorTest suite GREEN for the AD range pass — the 4 new
   `AirDefenseTransitTests`, all 9 envelope pins, no movement elsewhere. Pass CLOSED and committed
   (`83d0f99`); the day's three passes (ICM `d6734f3` · prestige `14fa5d5` · AD `83d0f99`) all in the
   pass ledger. Optional play check still worth one sortie: Khost MJ AD envelopes are now 3 hexes.
 - 2026-08-22 — AD POINT-DEFENSE RE-BAND (Bob-ratified, same session as the range fix; record
-  `todo_adrange.md` addendum): Chaparral/Roland/Crotale/Rapier + HQ-7 IR 6→4 (`INDIRECT_RANGE_SHORT` —
+  `Planning Docs/todo_adrange.md` addendum): Chaparral/Roland/Crotale/Rapier + HQ-7 IR 6→4 (`INDIRECT_RANGE_SHORT` —
   they are ~6–12 km point-defense systems that had been authored with the Hawk's area umbrella);
   Tunguska ruled to STAY 5 (⚠ it was never 3 — base 3 + GUN_MISSILE_COMBO trait +2; the "set it to 4"
   instruction was withdrawn when the trait term surfaced); Hawk stays 6. Ratified ladder → NEW DesignDoc
   §11.8.2d text: guns 3 · point-defense 4 · Tunguska/S-125 5 · area SAM 6 · S-300 10. Envelope pins
   added to NATO (×5) / Soviet (×3) / Chinese (×1) profile suites. ⚑ rides the same suite run.
-- 2026-08-22 — AD ENGAGEMENT-RANGE FIX (the ICM pass's "BIG FIND", own session; record `todo_adrange.md`):
+- 2026-08-22 — AD ENGAGEMENT-RANGE FIX (the ICM pass's "BIG FIND", own session; record `Planning Docs/todo_adrange.md`):
   `FindTransitAirDefense` reads the envelope as `max(ActiveIndirectRange, ActivePrimaryRange)` (fallback
   kept) — per §11.4.4 the AD envelope IS the authored IR stat (ZSU 3 … S-300 10; all ~22 AD profiles
   verified, no gaps); the old PR read made every battery interdict at range 1 (authored ladder dead data).
@@ -502,7 +661,7 @@ manager, for Khost). ⚠ AI2 snapshot serialization still owed its own `SAVE_VER
   `AirDefenseTransitTests`: Reach() mirrors the read + 4 real-range regressions (S-300 10/11, ZSU 3/4,
   ladder differentiation, §11.8.6 one-shot across a wide envelope). Khost: MJ AD envelopes 1→3 hexes
   (intended). No re-pricing; §11.4.4 "spotting +" term deferred to M13 AirThreatService. ⚑ suite run owed.
-- 2026-08-21 — MISSION PACK plan drafted (`todo_missionpack.md`; docs only, no code): single-file
+- 2026-08-21 — MISSION PACK plan drafted (`Planning Docs/todo_missionpack.md`; docs only, no code): single-file
   `.mission` content format — manifest/briefing/map/oob/aii as sections of one JSON doc read via
   JsonPolicy.Content; manifest IN-pack (Bob), clean break (Bob), three text artifacts ruled (Bob);
   agent-decided: unified `MapSection` for pack + save embed (SAVE_VERSION ride, kills MapConfig/
@@ -514,7 +673,7 @@ manager, for Khost). ⚠ AI2 snapshot serialization still owed its own `SAVE_VER
 - 2026-08-20 — ⚑ CLEARED (Bob ran it): C7/V19 suite GREEN — `MissionObjectiveGateTests` (15) incl. the
   float-trap case, the two fractional grade compositions, the non-default fraction round-trip, and the
   migration ladder all pass. The C7 pass is CLOSED game-side; editor's E15 + Khost manifest re-export
-  are go (Bob couriers `C7_Response_to_EditorAgent_2026-08-20.md` + the green signal).
+  are go (Bob couriers `Planning Docs/C7_Response_to_EditorAgent_2026-08-20.md` + the green signal).
 - 2026-08-20 — C7 FRACTIONAL OBJECTIVE GATE + V19 (editor's ask, Bob-ratified; **SAVE_VERSION 8**): the
   §17.8 gate becomes held ≥ ceil(total × `missionObjectiveFraction`) — new manifest float (0,1], default
   1.0 = the C6 all-of-them rule, mirrored into `ScenarioData` (no migration arm, pre-1.0 rule; SnapshotMapper
@@ -547,6 +706,6 @@ manager, for Khost). ⚠ AI2 snapshot serialization still owed its own `SAVE_VER
   (P4 requisition); NEW 🧭 at-a-glance thread board with a same-session maintenance rule; corrected stale
   claims (wallet-dependency on L2/M13 resolved, objective-crediting retired, audio Phase 3 wired, SAVE_VERSION
   7 everywhere, air-audit rulings both resolved, `Generated Data` reference dropped); DONE records + old change
-  log moved to NEW `Claude_TODO_Archive.md`; superseded courier files swept to `_to_delete/`; theme-art pass
+  log moved to NEW `Planning Docs/Claude_TODO_Archive.md`; superseded courier files swept to `_to_delete/`; theme-art pass
   committed (`55587d2`); `OnEndScenarioButton` given a tracked home in Bob's queue; ⚑ P3b entry now bundles the
   owed map-standard + D3 suite runs. Pre-rewrite text verbatim at `55587d2`.

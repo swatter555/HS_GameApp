@@ -1,11 +1,11 @@
 {
   "scenarioId": "Mission_Khost",
   "displayName": "Operation Molot",
-  "description": "Soviet forces launch a major offensive against Mujahideen positions near Khost, Afghanistan.",
+  "description": "Soviet forces break out of the Khost pocket and drive to take the province.",
   "thumbnailFilename": "khost.png",
   "mapFilename": "khost.map",
   "oobFilename": "khost.oob",
-  "aiiFilename": "khost.aii",
+  "aiiFilename": "",
   "briefingFilename": "mission_khost.brf",
   "prestigePool": 500,
   "isCampaignScenario": false,
@@ -13,28 +13,62 @@
   "difficultyLevel": "MjGeneral",
   "maxTurns": 21,
   "deploymentPointCap": 1000,
-  "mapWidth": 32,
-  "mapHeight": 21,
   "prestigeStipend": 20,
-  "prestigeIncomeRate": 0.05,
+  "prestigeIncomeRate": 0.02,
   "prestigeProgressBonusRate": 0.5,
   "earlyFinishMultiplier": 1.25,
-  "victoryThresholdMinor": 0.55,
-  "victoryThresholdMajor": 0.65,
-  "victoryThresholdDecisive": 0.8,
+  "victoryThresholdMinor": 0.38,
+  "victoryThresholdMajor": 0.47,
+  "victoryThresholdDecisive": 0.56,
   "requiredResult": "MinorVictory",
   "missionObjectives": [
-    { "x": 0, "y": 16, "label": "Gardez" },
-    { "x": 1, "y": 20, "label": "Sari Qal" },
-    { "x": 2, "y": 8, "label": "Barak Kalay" },
-    { "x": 6, "y": 5, "label": "Dey Khul" },
-    { "x": 11, "y": 19, "label": "Ayubkhel" },
-    { "x": 13, "y": 13, "label": "Kumbaray" },
-    { "x": 19, "y": 6, "label": "Khost" },
-    { "x": 20, "y": 19, "label": "Pelon Kheyl" },
-    { "x": 21, "y": 8, "label": "Kunday" },
-    { "x": 23, "y": 14, "label": "Zazi Maidan" },
-    { "x": 26, "y": 14, "label": "Khan Kala" },
-    { "x": 27, "y": 6, "label": "Dabgay" }
-  ]
+    {
+      "x": 0,
+      "y": 16,
+      "label": "Gardez"
+    },
+    {
+      "x": 2,
+      "y": 8,
+      "label": "Barak Kalay"
+    },
+    {
+      "x": 6,
+      "y": 5,
+      "label": "Dey Khul"
+    },
+    {
+      "x": 11,
+      "y": 13,
+      "label": "Caperi"
+    },
+    {
+      "x": 11,
+      "y": 19,
+      "label": "Ayubkhel"
+    },
+    {
+      "x": 13,
+      "y": 9,
+      "label": "Arghu"
+    },
+    {
+      "x": 20,
+      "y": 19,
+      "label": "Pelon Kheyl"
+    },
+    {
+      "x": 26,
+      "y": 14,
+      "label": "Khan Kala"
+    },
+    {
+      "x": 27,
+      "y": 6,
+      "label": "Dabgay"
+    }
+  ],
+  "missionObjectiveFraction": 0.5,
+  "mapWidth": 32,
+  "mapHeight": 21
 }

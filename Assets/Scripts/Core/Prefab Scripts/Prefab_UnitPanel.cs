@@ -103,7 +103,8 @@ namespace HammerAndSickle.Core
         /// Line 2: commanding officer (omitted when no leader is assigned).
         /// Line 3: equipment flow — non-zero buckets, 2 spaces apart, wrapping at entry gaps.
         /// Line 4: "DEP: ...  EXP: ...  EFF: ...".
-        /// Line 5: "Supply: N days".
+        /// Line 5: "Supply: N/Max days" — ONE line for every unit (SUP-1: one supply number per unit;
+        ///         a fixed-wing reads 0.0/0, its supply lives on the airbase).
         /// </summary>
         private static List<string> BuildFriendlyLines(CombatUnit unit)
         {
@@ -126,7 +127,14 @@ namespace HammerAndSickle.Core
                 lines.Add(string.Join("  ", entries));
 
             lines.Add($"DEP: {unit.DeploymentPosition}  EXP: {unit.ExperienceLevel}  EFF: {FormatEfficiency(unit.EfficiencyLevel)}");
-            lines.Add($"Supply: {unit.DaysSupply.Current:F1} days");
+
+            /* ONE SUPPLY NUMBER PER UNIT (SUP-1, Bob's ruling 2026-08-24) — so ONE supply line, no
+             * facility branch: DaysSupply IS the pool for everyone, only the caps differ (regiment 5 ·
+             * airbase 30 · depot 30/50/80/110 by size · fixed-wing 0, whose supply lives on its airbase).
+             * Current/max because the cap ladder is the rule the player reads off the panel. The short-lived
+             * depot "Stockpile:" branch that stood here for a few hours was the band-aid over the old
+             * dual-number model — do not reintroduce a per-facility supply readout. */
+            lines.Add($"Supply: {unit.DaysSupply.Current:F1}/{unit.DaysSupply.Max:F0} days");
 
             /* §5.13.2 — the PERSISTENT half of the over-water warning (ratified: "an info box when the unit
              * is selected"). The printer dispatch that fires when the clock starts scrolls away with the

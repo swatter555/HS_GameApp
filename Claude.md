@@ -9,13 +9,15 @@ We are working on a game called "Hammer and Sickle" (HS_GameApp), which is a Uni
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
 ### Standard Workflow
-1. Think through the problem, read relevant files, and write a plan to todo.md
+1. Think through the problem, read relevant files, and write a plan to the pass's plan file in
+   `Planning Docs/` (one file per pass, e.g. `Planning Docs/Implementing Combat.md` — see
+   Claude_Project.md §1.1; never create a new .md at the repo root)
 2. Create a list of todo items to check off as you complete them
 3. Check in with me to verify the plan before beginning work
 4. Work through todo items, marking them complete as you go
 5. Provide high-level explanations of changes at each step
 6. Keep every change as simple as possible - minimize code impact
-7. Add a review section to todo.md summarizing changes
+7. Add a review section to the pass's plan file summarizing changes
 ---
 
 ## SECTION 2: Coding Guidelines

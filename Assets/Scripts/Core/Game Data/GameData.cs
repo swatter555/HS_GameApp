@@ -1666,7 +1666,16 @@ namespace HammerAndSickle.Core.GameData
         // manifest or an absent save key keeps its exact behaviour. No migration step — pre-1.0 clean
         // break, and the absent-member default is the correct value anyway. AI2b-3 still takes its own
         // bump when it lands (9 or later).
-        public const int SAVE_VERSION = 8;
+        //
+        // 8 → 9 (2026-08-24, SUP-1 supply unification — Bob's one-number ruling, plan
+        // `Planning Docs/Supply Unification.md`): `stockpileInDays` LEAVES the CombatUnit save shape —
+        // a depot's pool is now its DaysSupply (Max = the size cap 30/50/80/110; airbase 30; fixed-wing
+        // 0 per §10.3.1 — no own supply, the airbase pays; everything else 5). The old dual-number shape
+        // also carried a live restore bug: SnapshotMapper never copied the stockpile and force-reset a
+        // depot's DaysSupply to Max, so a half-spent depot reloaded FULL — the generic DaysSupply copy
+        // is now simply correct. No migration step — pre-1.0 clean break (the floor refuses v8 saves,
+        // and none exist: SaveLoad still has zero callers). AI2b-3 still takes its own bump (10+).
+        public const int SAVE_VERSION = 9;
 
         #endregion
 
@@ -1708,11 +1717,14 @@ namespace HammerAndSickle.Core.GameData
         public const float STRENGTH_MOD_DEPLETED = 0.75f; // Depleted strength units get -25% combat malus
         public const float STRENGTH_MOD_LOW = 0.4f;  // Low strength units get -60% combat malus
 
-        public const float EFFICIENCY_MOD_STATIC = 0.5f; // Static units get 50% combat malus
-        public const float EFFICIENCY_MOD_DEGRADED = 0.7f; // Degraded units get 30% combat malus
-        public const float EFFICIENCY_MOD_OPERATIONAL = 0.8f; // NormalOperations units get 20% combat malus
-        public const float EFFICIENCY_MOD_FULL = 0.9f; // Full efficiency units get 10% combat malus
-        public const float EFFICIENCY_MOD_PEAK = 1.0f; // Peak efficiency units have no combat modifier
+        // ⚠ RENAMED 2026-08-24 — each constant now spells the EfficiencyLevel member it serves. The old names
+        // were shifted one rung (EFFICIENCY_MOD_FULL was the CombatOperations value, _PEAK was FullOperations),
+        // which misled exactly the person tuning them. Values unchanged; const floats, so nothing persisted moves.
+        public const float EFFICIENCY_MOD_STATIC_OPS = 0.5f;   // StaticOperations: 50% combat malus
+        public const float EFFICIENCY_MOD_DEGRADED_OPS = 0.7f; // DegradedOperations: 30% combat malus
+        public const float EFFICIENCY_MOD_NORMAL_OPS = 0.8f;   // NormalOperations: 20% combat malus
+        public const float EFFICIENCY_MOD_COMBAT_OPS = 0.9f;   // CombatOperations: 10% combat malus
+        public const float EFFICIENCY_MOD_FULL_OPS = 1.0f;     // FullOperations: no combat modifier
 
         public const float FULL_STRENGTH_FLOOR = 0.8f; // Minimum strength for full effectiveness
         public const float DEPLETED_STRENGTH_FLOOR = 0.5f; // Minimum strength for depleted effectiveness

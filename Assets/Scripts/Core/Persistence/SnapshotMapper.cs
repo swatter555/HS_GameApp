@@ -169,10 +169,11 @@ namespace HammerAndSickle.Persistence
                             if (unit.IsBase)
                             {
                                 freshUnit.SetFacilityDamage(unit.BaseDamage);
-                                if (unit.FacilityType == FacilityType.SupplyDepot)
-                                {
-                                    freshUnit.DaysSupply.SetCurrent(freshUnit.DaysSupply.Max);
-                                }
+                                /* The depot DaysSupply force-reset that lived here was DELETED with SUP-1
+                                 * (2026-08-24). Under one-number-per-unit the generic DaysSupply.Current
+                                 * copy above restores a depot's pool correctly — the reset was also a live
+                                 * bug: a half-spent depot reloaded FULL (its real stockpile was never in
+                                 * the copy list at all). Do not reintroduce a facility special case. */
 
                                 // Copy attached air unit IDs for airbases
                                 if (unit.FacilityType == FacilityType.Airbase)

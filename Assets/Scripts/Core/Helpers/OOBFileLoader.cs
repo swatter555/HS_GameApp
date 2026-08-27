@@ -69,9 +69,22 @@ namespace HammerAndSickle.Helpers
         public DeploymentPosition Deployment { get; set; }
         public SpottedLevel Spotted { get; set; }
         public float HitPoints { get; set; }
+
+        /// <summary>
+        /// REAL DAYS since 2026-08-24 (Bob's ruling), NOT a 0.0-1.0 ratio -- and since SUP-1 (same day)
+        /// this is THE one supply number for every unit: full line regiment 5 - airbase 30 - DEPOT its
+        /// size cap (Small 30 / Medium 50 / Large 80 / Huge 110) - FIXED-WING 0 (FGT/ATT/BMB/RECONA/
+        /// AWACS/WW/TRN carry no own supply; the launching airbase pays, doc 10.3.1/15.1.2; helicopters
+        /// are NOT included and cap at 5). The loader clamps to [0, the unit's cap] with a warning, and
+        /// warns once per file when every value is <= 1 (the signature of an un-migrated ratio file).
+        /// The short-lived StockpileInDays field (added and RESCINDED 2026-08-24, never implemented by
+        /// the editor) is DELETED -- depots author their big number HERE.
+        /// HitPoints above deliberately STAYS a ratio pending Bob's call -- flagged in the editor relay.
+        /// </summary>
         public float DaysSupply { get; set; }
         public DepotCategory DepotCategory { get; set; }
         public DepotSize DepotSize { get; set; }
+
         public List<string> AttachedAirUnitIDs { get; set; } = new List<string>();
     }
 
@@ -120,7 +133,7 @@ namespace HammerAndSickle.Helpers
     ///   - Enum fields (Side, Nationality, Classification, etc.) are serialized as integers
     ///   - WeaponType profile fields are serialized as strings matching the WeaponType enum name
     ///   - AttachedAirUnitIDs contains string unit IDs for fixed-wing aircraft assigned to airbases
-    ///   - HitPoints and DaysSupply are stored as 0.0-1.0 ratios
+    ///   - HitPoints is stored as a 0.0-1.0 ratio; DaysSupply is REAL DAYS since 2026-08-24 (see the field doc)
     ///
     /// Leader data:
     ///   - Only present for Player (Soviet) units
@@ -358,6 +371,7 @@ namespace HammerAndSickle.Helpers
                 var unitMap = new Dictionary<string, CombatUnit>();
                 int playerCount = 0;
                 int aiCount = 0;
+                float maxAuthoredDays = 0f;   // ratio-form tripwire — see the check after the loop
                 int resolveWarnings = 0;
 
                 foreach (var data in oobDataList)
@@ -412,7 +426,20 @@ namespace HammerAndSickle.Helpers
                     unit.RefreshMovementPointsForPosture();
                     unit.SetSpottedLevel(data.Spotted);
                     unit.HitPoints.SetCurrent(unit.HitPoints.Max * data.HitPoints);
-                    unit.DaysSupply.SetCurrent(unit.DaysSupply.Max * data.DaysSupply);
+
+                    // DaysSupply is REAL DAYS (2026-08-24 — see the OobUnitData field doc). Clamped here
+                    // because StatsMaxCurrent.SetCurrent does NOT clamp to Max (only to ±1000), so an
+                    // over-authored value would silently set Current above Max.
+                    float authoredDays = data.DaysSupply;
+                    if (authoredDays < 0f || authoredDays > unit.DaysSupply.Max)
+                    {
+                        Debug.LogWarning($"{CLASS_NAME}.{nameof(LoadOobFile)}: {data.UnitName}: authored " +
+                            $"DaysSupply {authoredDays} outside [0, {unit.DaysSupply.Max}] — clamped. " +
+                            "(REAL DAYS; caps: regiment 5 / airbase 30 / depot by size / fixed-wing 0.)");
+                        authoredDays = Mathf.Clamp(authoredDays, 0f, unit.DaysSupply.Max);
+                    }
+                    unit.DaysSupply.SetCurrent(authoredDays);
+                    if (authoredDays > maxAuthoredDays) maxAuthoredDays = authoredDays;
 
                     // Track for second pass
                     unitMap[unit.UnitID] = unit;
@@ -433,6 +460,16 @@ namespace HammerAndSickle.Helpers
                         Debug.LogWarning($"{CLASS_NAME}.{nameof(LoadOobFile)}: Failed to register unit: {unit.UnitName}");
                     }
                 }
+
+                // ⚠ Ratio-form tripwire: every DaysSupply ≤ 1 across the WHOLE file is the signature of an
+                // un-migrated pre-2026-08-24 file (ratio 1.0 = full), now silently reading as ≤ 1 day of
+                // supply on every unit. A genuinely supply-starved scenario can author that on purpose —
+                // hence a warning to be judged, not a refusal.
+                if (unitMap.Count > 0 && maxAuthoredDays <= 1f)
+                    Debug.LogWarning($"{CLASS_NAME}.{nameof(LoadOobFile)}: every unit's DaysSupply is ≤ 1 DAY. " +
+                        "If this file predates 2026-08-24 it is ratio-form and needs re-export in real days " +
+                        "(full regiment 5 / airbase 30 / depot 30-110 by size / fixed-wing 0). " +
+                        "If the starvation is intended, ignore this.");
 
                 if (_debug)
                     Debug.Log($"{CLASS_NAME}.{nameof(LoadOobFile)}: First pass complete. Created {unitMap.Count} units ({resolveWarnings} profile resolve warnings)");
