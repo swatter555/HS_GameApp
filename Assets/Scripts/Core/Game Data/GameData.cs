@@ -2187,7 +2187,21 @@ namespace HammerAndSickle.Core.GameData
             { SupplyProjection.Strategic, 16 }
         };
 
-        // Amount any unit can stockpile
+        /* THE SUPPLY CAP LADDER — the complete set lives in TWO places, so read both (SUP-1, §15.1.2a).
+         * Every unit has exactly ONE supply pool, `CombatUnit.DaysSupply`; only the cap differs:
+         *
+         *     ground unit (incl. helicopters)  5   MaxDaysSupplyUnit          (below)
+         *     airbase                          30  MaxDaysSupplyAirbase       (below)
+         *     depot                        30/50/80/110  MaxStockpileBySize   (^ up this region, by DepotSize)
+         *     fixed-wing                       0   no constant — see IsAirborneClassification
+         *
+         * ⚠ Fixed-wing carry NO supply of their own (§10.3.1): the launching airbase pays. A cap of 0 is
+         *   also what exempts them from every supply gate — rule sites test `DaysSupply.Max > 0`, never a
+         *   classification list (see CombatUnit.CanMove).
+         * ⚠ THESE ARE CONTRACT CONSTANTS, NOT BALANCE DIALS. They are ratified in DesignDoc §15.6/§15.7 and
+         *   `.oob` files author absolute days against them, so changing one is a CONTENT-MIGRATION event
+         *   (re-export every scenario) and a courier event to the Scenario Editor — whose validator mirrors
+         *   this table and re-derives it from this file. Not a number to tune quietly. */
         public const float MaxDaysSupplyUnit = 5f;          // Max operating supply a mobile unit can carry
         public const float MaxDaysSupplyAirbase = 30f;      // Max operating supply an airbase can carry (sortie-hungry)
 

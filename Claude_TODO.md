@@ -105,7 +105,7 @@ a diagnosis.
 | **▶ COMBAT PASS — audio · animation · air ops · constants** | ▶ NEXT, opened 2026-08-24 (Bob's direction). Plan DRAFTED in `Planning Docs/Implementing Combat.md`, no code yet. Air RULES built + tested and the transit half is live; the AOB/GAME half is unwired. Combat has NO visual at all. 49 sounds declared vs 14 catalog rows. Constants are solid per Bob — light touch only. | Bob: 8 decisions in §7 of that file (**D3 blocks AIR-0**), + run `Tools/Audio/Audit Catalog` (A-2) and the D-1 combat baseline play. Agent: AIR-0 and A-1 need nothing. |
 | **Requisition (P4)** | ⏸ QUEUED — was ▶ NEXT until the combat pass superseded it 2026-08-24; nothing regressed. Wallet + atomic spend LIVE (08-17); pricing rules RATIFIED §18.3.1/§18.5.1 + `CombatUnit.PurchaseCost` LIVE (08-22, prestige pass); bay buy/sell/upgrade API + UI unbuilt. | Agent: build per `Planning Docs/todo_profiles.md` P4 (§4.7 header carries the rules — do not re-derive prices). No gates. |
 | **Campaigns + Save/Load** | Pipeline Phase 2 paused CLEAN, all decisions settled. Campaign folders invisible to discovery; `SaveLoad` has ZERO callers — no Save button exists. | Agent: resume trio in OPEN WORK. Cost grows per mission authored (25–30 planned). Menu listing is Bob-gated (prefab). |
-| **M13 — turn loop / air missions / AOB** | The big frontier. Air RULES built + tested; air GAME unwired. Turn loop is straight-through; reaction yields are a day-one requirement (retrofit = rewrite). ⚠ **The AIR half is now phased inside the combat pass** (`Planning Docs/Implementing Combat.md` §5, AIR-0→AIR-4) — the turn-loop half stays here. | Agent-led, large. Gates: D4, I8, most printer emitters, M14 remainder, D2 fixed-wing play-verify all sit behind it. ⚠ Finding 2026-08-24: **AIR-2 does NOT need the reaction-yielding loop** — in Khost the reaction windows belong to an AI with nothing to fly, so v1 never suspends. |
+| **M13 — turn loop / air missions / AOB** | The big frontier. **NEW 2026-08-27: the AI RESERVE ruling (§20.2.1) is ratified and unblocks the reinforcement-arrivals item** — arrival = enters the AI's Reserve (no timer, retry cap moot); staged build does not wait on the AI brain. Air RULES built + tested; air GAME unwired. Turn loop is straight-through; reaction yields are a day-one requirement (retrofit = rewrite). ⚠ **The AIR half is now phased inside the combat pass** (`Planning Docs/Implementing Combat.md` §5, AIR-0→AIR-4) — the turn-loop half stays here. | Agent-led, large. Gates: D4, I8, most printer emitters, M14 remainder, D2 fixed-wing play-verify all sit behind it. ⚠ Finding 2026-08-24: **AIR-2 does NOT need the reaction-yielding loop** — in Khost the reaction windows belong to an AI with nothing to fly, so v1 never suspends. |
 | **Audio** | System + policy + wiring DONE through Phase 3. **49 `SoundEffect` members vs 14 catalog rows vs 11 wavs** — ~35 declared sounds have no row. Battle-HUD buttons silent. Two carried-forward defects open (JsonPolicy violation; briefing-absent logged as an exception). ⚠ **Now workstream A of the combat pass** — plan in `Planning Docs/Implementing Combat.md` §3; `Planning Docs/todo_audio.md` remains the system's design record. | Bob: run `Tools/Audio/Audit Catalog` (A-2, a prerequisite), rule D1/D2/D8, author wavs (helo/jet long cuts too), put `UIButtonAudio` on HUD buttons. Agent: A-1 + A-3 need nothing. |
 | **Leaders (L1–L4)** | Combat mechanics LIVE (M14 slice). Awards engine, pool/recruitment, details UI all unbuilt. Recruitment economy UNBLOCKED by the wallet (08-17). | Agent: L1+L4 approved + headless-safe, can start anytime. Art dependency: portraits + deco layers (Bob). |
 | **AI** | AI0–AI2b live (board analysis, EV oracle, honest-spotting belief store). AI takes no turn yet. | Agent: AI3+ per `Planning Docs/Claude_AI_TODO.md` (irregular doctrine first, for Khost). AI2 state still owed a SAVE_VERSION ride. |
@@ -122,21 +122,20 @@ a diagnosis.
 
 ## BOB'S QUEUE (nobody else can do these)
 
-- [ ] ⚠ **URGENT — relay to the Scenario Editor agent BEFORE the Hamburg OOB export (REWRITTEN 2026-08-24
-      LATE — supersedes the earlier version of this item; if that already went out, send this correction):**
-      (a) `.oob` `DaysSupply` is REAL DAYS, not a 0–1 ratio (unchanged from the earlier relay; loader clamps
-      to the unit's cap and warns; a ratio-form file trips a whole-file warning).
-      (b) **`StockpileInDays` is RESCINDED** — a field added and withdrawn game-side the same day, before
-      the editor implemented it. It must NOT appear in the editor's OOB inspector.
-      (c) Pending Bob's go on the supply unification (`Planning Docs/Supply Unification.md`): **depots
-      author their big supply number directly in `DaysSupply`** — full = 30/50/80/110 by DepotSize; airbase
-      30; everything else 5. Suggested editor validation: cap the field by classification/size.
-      (d) **Fixed-wing units author `DaysSupply` 0** (FGT/ATT/BMB/RECONA/AWACS/WW/TRN — no own supply;
-      the airbase pays per §11.2.3; ruled by Bob 2026-08-24, doc-confirmed §10.3.1/§15.1.2). Suggested
-      validation: force 0 for these classifications. Helicopters NOT included (cap 5).
-      (e) The `HitPoints` question stands: real HP (/40 mobile, /60 facility) or ratio? Editor authoring UX
-      should drive the call.
-- [ ] **Wire the End Scenario button**- [ ] **Wire the End Scenario button** → `BattleManager.OnEndScenarioButton` (Inspector, like End Turn — do NOT
+- [ ] **COURIER READY TO SEND: `Planning Docs/Reply_AIReserve_to_EditorAgent_2026-08-27.md`**
+      → the Scenario Editor agent. Tells them the blocked-arrival **retry cap is MOOT** (you ruled the
+      model instead of the number — §20.2.1), banks their two yeses, and suggests they DROP the
+      arrival-overlap validator cases they'd planned (the collision those guard cannot occur once arrival
+      means "enters the Reserve"). Their `maxTurns` warn survives. Nothing in it needs an answer unless
+      they disagree. ⚠ The earlier `SupplyContract_Reply2_…` courier is ANSWERED — no need to send it
+      again; this one supersedes its open items.
+- [ ] **⚠ ONE DECISION STILL YOURS — where may the AI deploy FROM its Reserve? (design doc §20.2.1.4)**
+      Not blocking anything; the staged build works under any answer. But it decides content work:
+      **Khost authors 14 deployment zones and all 14 are player-controlled**, so the player's rule
+      (§35.3.8.1) gives the AI ZERO legal hexes. (a) author AI-side zones on every scenario — real editor
+      work; (b) the unit's authored `.oob` hex is its entry point — no new content, expresses
+      reinforcement axis (agent leans here); (c) free choice in friendly territory. Answer whenever.
+- [ ] **Wire the End Scenario button** → `BattleManager.OnEndScenarioButton` (Inspector, like End Turn — do NOT
       add a HUD copy; the name is a contract). Owed since the prestige pass closed (2026-08-17); the editor's
       status memo lists it too. Until wired, voluntary early finish (§17.9.2) is unreachable in play.
 - [ ] **Wire the TWO loss-report buttons (decided 2026-08-20: two buttons, not a toggle).**
@@ -147,17 +146,19 @@ a diagnosis.
 - [ ] **Build versioning (Bob, 2026-08-08):** pick a scheme (proposal: `0.<pass>.<hotfix>` pre-1.0), set
       Project Settings → Player → Version. Agent then surfaces `Application.version` in menu + logs and stamps
       it into the save header when saving gets wired.
-- [ ] **Tell the Scenario Editor agent G1 HAS LANDED** once a build ships with it — their stated trigger to
-      start writing `mapConfiguration: None` and to open their E3 phase (manifest `mapWidth`/`mapHeight` +
-      cross-stamp).
-- [ ] **Relay to the Scenario Editor agent** (`Planning Docs/ScenarioEditor_Status_2026-07-28.md` covers most of it):
+- [~] **Tell the Scenario Editor agent G1 HAS LANDED** — FOLDED INTO the drafted supply courier (§6, last
+      bullet), flagged there as YOUR call whether the "once a build ships with it" trigger has fired. Do not
+      send separately; close this when the courier goes.
+- [~] **Relay to the Scenario Editor agent — FOLDED INTO the drafted supply courier (§6); do not send
+      separately, close this when the courier goes.** (`Planning Docs/ScenarioEditor_Status_2026-07-28.md`
+      covers most of it):
       (a) checksum decision SETTLED — header field stays as their fingerprint, game never validates;
       (b) `classificationName` green-lit for removal; (c) leaders can go name-form;
       (d) briefing narration is CAMPAIGN-SCENARIO ONLY (§20.4.2) — missing narration is normal, not an error;
       (e) always say WHICH KIND of scenario (§20.4.1). ⚠ Check whether the 08-14 census courier already
       carried any of this before re-sending.
-- [ ] **Possibly still owed to them: `JsonPolicy.cs`** — flagged for sending twice, receipt unconfirmed.
-      Low urgency; they inferred the one property that matters.
+- [~] **Possibly still owed to them: `JsonPolicy.cs`** — FOLDED INTO the courier (§6) as an offer rather
+      than an attachment; send the file if they ask. Low urgency; they inferred the one property that matters.
 - [ ] **ART owed (accumulating, no rush):** solid-white swaps for MoveRangeFill/ZocStop/MovePathStep/MovePathEnd ·
       real cursor art (§24.11.3) · Leader Pool + Upgrade button art · leader base portraits (3) + deco layers (~14) ·
       `UIButtonAudio` onto battle-HUD buttons · movement long-cut wavs for helo + jet.
@@ -368,34 +369,37 @@ RESOLVED AND BUILT: ambushed helo takes an ordinary attack minus the surprise mu
       favour of the §18.2 income model, which already runs in Upkeep.
 - [ ] §7.15.7 move-path supply: replace the deterministic per-hex consume (`CombatUnit.cs`) with the §7.15.4
       probabilistic roll (combat path already converted); §7.15.2.4 Degraded move gate (controller + UI).
-- [ ] **⭐ AI/OPFOR REINFORCEMENT ARRIVALS (`.oob`-scheduled) — requested by Bob via the editor agent,
-      2026-08-24.** §20.2 already specifies this — *"AI reinforcement schedules (scripted arrivals) remain
-      manifest/.oob-driven"* — but **nothing implements it**: `OobUnitData` (`OOBFileLoader.cs:36`) has no
-      arrival field, so **every unit in an `.oob` is on the map at turn 1**. ⚠ Do not mistake
-      `WeaponProfile.TurnAvailable` for this — that is equipment availability by campaign date
-      (`CampaignDateCalendar.cs:238`), a different concept entirely.
-      **Why now:** Hamburg is being authored as a player assault against LANDJUT. The historical NATO
-      shape is a lone German division delaying while the UK Mobile Force and the US 9th Infantry Division
-      come up — which cannot be expressed. Put them in the `.oob` and they are a fully-reinforced defence
-      from turn 1, a materially different (and much harder) scenario. Every future defensive or
-      delaying scenario has the same problem.
-      **Suggested minimal shape** (the editor agent's proposal — yours to accept, amend or reject):
-      - One new `OobUnitData` field, `arrivalTurn`, **default 0 = present at start**, so every existing
-        `.oob` keeps its exact behaviour and no content needs touching.
-      - A unit with `arrivalTurn > 0` is held out of the map until that turn, then placed at the
-        `MapPosX/MapPosY` it already carries. **No new position field** — the OOB already says where.
-      - ⚠ **Arrival must be idempotent across save/load, and this is the part with teeth.** "Has this
-        arrival already fired?" is NOT derivable from the roster: a unit that arrived and was then
-        destroyed would re-arrive on reload. That needs either a persisted fired-set in `ScenarioData`
-        (⇒ `SAVE_VERSION` bump, no ladder step while `MINIMUM` tracks it per CLAUDE.md §2.12) or an
-        arrival check that also consults the loss ledger. **Your call which — flagging that a naive
-        turn >= N test is wrong.**
-      - Occupied-arrival-hex rule needed: delay one turn and log, with a cap, seems safest. Refusing at
-        load is wrong — the hex is free at authoring time and occupied only by play.
-      - ⚠ Scope: this is the **AI/OPFOR** side only. Player reinforcement is already specified as the
-        Reserve pool brought on in-battle (§20.2 / §35.3.8), not a schedule — do not conflate them.
-      **Editor side:** authoring `arrivalTurn` is a small addition to the OOB inspector; nothing is
-      blocked on us. Say the word on the field name and casing and it ships with the next editor pass.
+- [ ] **⭐ AI RESERVE + REINFORCEMENT ARRIVALS — RULING RATIFIED 2026-08-27 (Bob); design doc §20.2.1
+      NEW. Ready to build; no gates.** Supersedes the 2026-08-24 scripted-arrival framing entirely.
+      **The model:** AI reinforcements arrive **into the AI's Reserve**, not onto a hex; the AI chooses
+      when and where to commit them. Both sides now hold undeployed forces in a **Reserve** — that is the
+      vocabulary on both sides (Bob 2026-08-27: "deployment box" is the UI surface, NOT a second concept;
+      do not let a parallel name grow). Not a new container either: §11.7.2.4 already evacuates aircraft
+      to "the owner's Reserve" for player AND AI.
+      ⚠ **The blocked-arrival RETRY CAP is MOOT and must not be reintroduced** (§20.2.1.1) — a Reserve has
+      no timer, so a unit whose hex is busy simply waits. That question is closed, not deferred.
+      **Build list:**
+      - `.oob` gains **`ArrivalTurn`** (PascalCase, matching every other field; default 0 = present at
+        start, so no existing content is touched). Editor has accepted the casing and is ready to author.
+      - A **Reserve container** per side, holding units off-map with no timer. Undeployed Reserve units
+        are NOT lost at scenario end — they return to the roster (§20.2.1.6; carryover is campaign-gated).
+      - **Arrival idempotency = a persisted fired-set of unit IDs** in scenario state ⇒ **its own
+        `SAVE_VERSION`**. ⚠ Do NOT use the loss ledger to answer "did this already fire?" — that ledger is
+        itself unpersisted (P5), so it would be one unpersisted structure vouching for another. ⚠ Take the
+        bump while save/load still has zero UI callers and bumps are free.
+      - **Staged build (§20.2.1.3), so this does NOT wait on the AI brain:** v1 places an arriving unit at
+        its authored `MapPosX/Y` when free and HOLDS it in Reserve when not — behaviour-identical to the
+        old model in the normal case, no retry cap, upgrades to real AI judgement with no format or
+        content change.
+      ⚠ **ONE OPEN SUB-QUESTION, Bob's (§20.2.1.4): where may the AI deploy FROM Reserve?** The player's
+      rule (§35.3.8.1, friendly-controlled `IsDeploymentZone`) does NOT transfer — **verified 2026-08-27:
+      Khost authors 14 deployment-zone hexes and ALL 14 are player-controlled**, so applying it to the AI
+      yields ZERO legal hexes. Candidates: (a) mirror §35.3.8.1 + author AI-side zones (content work on
+      every scenario); (b) the unit's authored `.oob` hex is its entry point — no new content, and it
+      expresses reinforcement AXIS (agent leans here); (c) free choice in friendly territory. Not blocking
+      — the staged build is compatible with all three.
+      ⚠ Scope: **AI/OPFOR only.** Player reinforcement is the Reserve purchased per §35.4 and brought on
+      via §35.3.8 — a player never receives a scheduled arrival.
 - [ ] Reactive facing (§5.8.8, free once/enemy-turn): HasReactiveFaced flag + rotation + flank negation
       (+ exemptions for bases/indirect/air at call sites).
 - [ ] Contested-crossing caller geometry (§7.5.6.9.1) — also feeds the M14 RiverAssault ICM.
@@ -552,6 +556,44 @@ manager, for Khost). ⚠ AI2 snapshot serialization still owed its own `SAVE_VER
 > older than the last two passes migrate to `Planning Docs/Claude_TODO_Archive.md` when this section is pruned.
 > **Entries 2026-07-21 → 2026-08-19 (incl. the theme-art pass and everything before it) are in the archive.**
 
+- 2026-08-27 — **AI RESERVE RATIFIED (Bob) — NEW DesignDoc §20.2.1 + §35.3.8 cross-ref; docs only.**
+  AI reinforcements arrive INTO the AI's Reserve, not onto a hex; the AI chooses when and where ("the AI
+  will choose the best place"). §20.2's scripted-arrival reading is SUPERSEDED. Consequences recorded:
+  the blocked-arrival **retry cap is MOOT** (§20.2.1.1 — a Reserve has no timer; must not be
+  reintroduced), the container is not new (§11.7.2.4 already gives player AND AI an "owner's Reserve"),
+  **vocabulary is RESERVE on both sides** (Bob's own call — "deployment box" is the UI surface, not a
+  second name), and a **staged build** (§20.2.1.3) lets the machinery land without the AI brain: place at
+  the authored hex when free, hold in Reserve when not. Undeployed Reserve survives scenario end
+  (§20.2.1.6). ⚠ NEW OPEN sub-question §20.2.1.4 — where the AI may deploy FROM Reserve — with the
+  finding that forced it: **Khost's 14 deployment zones are ALL player-controlled**, so the player's
+  §35.3.8.1 rule gives the AI zero legal hexes. M13 arrivals item rewritten to the ratified model
+  (fired-set + own SAVE_VERSION; loss-ledger route rejected as circular). Both editor concerns came back
+  YES — ownership ratified (Bob bundles, moves, one SHA end-to-end) and the drift trigger accepted, with
+  the editor adding a read-side parity check that re-derives our cap table from `GameData.cs` — so those
+  four symbols are now a contract with their harness and a rename is a courier event.
+- 2026-08-27 — EDITOR REPLY RECEIVED + REPLY-2 DRAFTED (`Planning Docs/SupplyContract_Reply2_to_
+  EditorAgent_2026-08-27.md`; docs only). **Supply contract CLOSED both sides** — editor adopted real-days
+  end-to-end (36/36 harness + live pass), mirrored the caps/fixed-wing set/clamp/tripwire, re-authored
+  Khost through its own writer (SHA 3be5eaf6… across their 3 copies, values matching our §4 table), and
+  confirmed Hamburg was never exported on the old contract. **§5 RATIFIED BY BOB: `HitPoints` stays a
+  ratio** ("I do not want the player counting hit points") — their decoupling argument (HP maxes are
+  balance knobs; a real-HP file couples every .oob to a tunable) is stronger than the "wart" framing we
+  sent, accepted as such. Backlog closed: `classificationName` already removed write-side (verified our
+  end — khost.oob carries none and loads clean), `JsonPolicy.cs` receipt CONFIRMED, **G1/E3 shipped
+  2026-08-12** so our "Bob's call" flag was stale. Cross-checked their AIRB-carries-DepotSize-Large trap
+  against our data: we carry it too (both Khost airbases) and are guarded twice (ctor tests AIRB before
+  any depot fallthrough; SetDepotSize early-returns on non-depot FacilityType) — both load at 30.
+  Reply-2 raises the three items Bob delegated to the agents: content ownership, rule-table drift, and a
+  substantive `arrivalTurn` proposal. Residual for Bob: the blocked-arrival retry cap.
+- 2026-08-24 — EDITOR COURIER DRAFTED (`Planning Docs/SupplyContract_to_EditorAgent_2026-08-24.md`,
+  docs only): the `.oob` supply contract change, written for the editor agent — §1 real-days ladder
+  (blocking Hamburg; an old-contract export loads SILENTLY with every unit at ≤1 day), §2 `StockpileInDays`
+  rescission + why the split was wrong, §3 fixed-wing 0 incl. the helo and TRN-profile-vs-classification
+  traps, §4 the re-authored khost.oob values (verified: 54 = 8 depot + 2 airbase + 4 fixed-wing + 40),
+  §5 the open `HitPoints` ratio-or-real question back to them, §6 the older backlog bundled so it stops
+  accumulating, §7 an explicit do-not-build-yet list (Mission Pack pending the AII schema; `arrivalTurn`
+  pending its own SAVE_VERSION decision). Three older Bob's-queue relay items marked `[~]` folded-in so
+  nothing is sent twice.
 - 2026-08-24 — ⚑ CLEARED (Bob ran it): SUP-1 suite GREEN + Khost panel play-confirmed across the board
   (regiment 5/5 · airbase 30/30 · cache 30/30 · depot 80/80 · Su-17 0/0, units moving normally — the
   fixed-wing `CanMove` guard verified in play, which was the silent-failure risk). **SUPPLY UNIFICATION

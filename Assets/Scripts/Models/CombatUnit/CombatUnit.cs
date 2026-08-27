@@ -2160,10 +2160,12 @@ namespace HammerAndSickle.Models
             _airUnitsAttached.Count > 0;
 
         /// <summary>
-        /// Airbase launch gate (§11.2.3a): true only if the airbase can run air operations AND its stockpile is at
+        /// Airbase launch gate (§11.2.3a): true only if the airbase can run air operations AND its supply is at
         /// or above the AIRBASE_LAUNCH_FLOOR hard reserve (5 days). Below the floor no aircraft may launch this turn
         /// — the reserve prevents partial-supply launches that would strand a sortie mid-mission. The per-sortie
-        /// stockpile deduction (SORTIE_LAUNCH_COST + SORTIE_SHOT_COST, §11.2.3) is applied by the air-mission caller.
+        /// deduction (SORTIE_LAUNCH_COST + SORTIE_SHOT_COST, §11.2.3) is applied by the air-mission caller.
+        /// ⚠ An airbase's "stockpile" IS its <see cref="DaysSupply"/> (cap 30) — one supply pool per unit since
+        /// SUP-1 (§15.1.2a). This gate has always read the right number; only the word has been tightened.
         /// </summary>
         public bool CanLaunchSortie() =>
             CanLaunchAirOperations() && DaysSupply.Current >= GameData.AIRBASE_LAUNCH_FLOOR;
