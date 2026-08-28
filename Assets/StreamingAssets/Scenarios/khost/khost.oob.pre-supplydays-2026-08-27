@@ -18,7 +18,7 @@
       "Deployment": "HastyDefense",
       "Spotted": "Level1",
       "HitPoints": 1,
-      "DaysSupply": 5,
+      "DaysSupply": 1,
       "DepotCategory": "Secondary",
       "DepotSize": "Small",
       "AttachedAirUnitIDs": []
@@ -41,7 +41,7 @@
       "Deployment": "HastyDefense",
       "Spotted": "Level1",
       "HitPoints": 1,
-      "DaysSupply": 5,
+      "DaysSupply": 1,
       "DepotCategory": "Secondary",
       "DepotSize": "Small",
       "AttachedAirUnitIDs": []
@@ -64,7 +64,7 @@
       "Deployment": "Entrenched",
       "Spotted": "Level1",
       "HitPoints": 1,
-      "DaysSupply": 30,
+      "DaysSupply": 1,
       "DepotCategory": "Secondary",
       "DepotSize": "Small",
       "AttachedAirUnitIDs": []
@@ -87,7 +87,7 @@
       "Deployment": "HastyDefense",
       "Spotted": "Level1",
       "HitPoints": 1,
-      "DaysSupply": 5,
+      "DaysSupply": 1,
       "DepotCategory": "Secondary",
       "DepotSize": "Small",
       "AttachedAirUnitIDs": []
@@ -110,7 +110,7 @@
       "Deployment": "HastyDefense",
       "Spotted": "Level1",
       "HitPoints": 1,
-      "DaysSupply": 5,
+      "DaysSupply": 1,
       "DepotCategory": "Secondary",
       "DepotSize": "Small",
       "AttachedAirUnitIDs": []
@@ -133,7 +133,7 @@
       "Deployment": "HastyDefense",
       "Spotted": "Level1",
       "HitPoints": 1,
-      "DaysSupply": 5,
+      "DaysSupply": 1,
       "DepotCategory": "Secondary",
       "DepotSize": "Small",
       "AttachedAirUnitIDs": []
@@ -156,7 +156,7 @@
       "Deployment": "Entrenched",
       "Spotted": "Level1",
       "HitPoints": 1,
-      "DaysSupply": 30,
+      "DaysSupply": 1,
       "DepotCategory": "Secondary",
       "DepotSize": "Small",
       "AttachedAirUnitIDs": []
@@ -179,7 +179,7 @@
       "Deployment": "Deployed",
       "Spotted": "Level1",
       "HitPoints": 1,
-      "DaysSupply": 30,
+      "DaysSupply": 1,
       "DepotCategory": "Secondary",
       "DepotSize": "Small",
       "AttachedAirUnitIDs": []
@@ -202,7 +202,7 @@
       "Deployment": "HastyDefense",
       "Spotted": "Level1",
       "HitPoints": 1,
-      "DaysSupply": 5,
+      "DaysSupply": 1,
       "DepotCategory": "Secondary",
       "DepotSize": "Small",
       "AttachedAirUnitIDs": []
@@ -225,7 +225,7 @@
       "Deployment": "HastyDefense",
       "Spotted": "Level1",
       "HitPoints": 1,
-      "DaysSupply": 5,
+      "DaysSupply": 1,
       "DepotCategory": "Secondary",
       "DepotSize": "Small",
       "AttachedAirUnitIDs": []
@@ -248,7 +248,7 @@
       "Deployment": "HastyDefense",
       "Spotted": "Level1",
       "HitPoints": 1,
-      "DaysSupply": 5,
+      "DaysSupply": 1,
       "DepotCategory": "Secondary",
       "DepotSize": "Small",
       "AttachedAirUnitIDs": []
@@ -271,7 +271,7 @@
       "Deployment": "HastyDefense",
       "Spotted": "Level1",
       "HitPoints": 1,
-      "DaysSupply": 5,
+      "DaysSupply": 1,
       "DepotCategory": "Secondary",
       "DepotSize": "Small",
       "AttachedAirUnitIDs": []
@@ -294,7 +294,7 @@
       "Deployment": "HastyDefense",
       "Spotted": "Level1",
       "HitPoints": 1,
-      "DaysSupply": 5,
+      "DaysSupply": 1,
       "DepotCategory": "Secondary",
       "DepotSize": "Small",
       "AttachedAirUnitIDs": []
@@ -317,7 +317,7 @@
       "Deployment": "HastyDefense",
       "Spotted": "Level1",
       "HitPoints": 1,
-      "DaysSupply": 5,
+      "DaysSupply": 1,
       "DepotCategory": "Secondary",
       "DepotSize": "Small",
       "AttachedAirUnitIDs": []
@@ -340,7 +340,7 @@
       "Deployment": "Deployed",
       "Spotted": "Level1",
       "HitPoints": 1,
-      "DaysSupply": 5,
+      "DaysSupply": 1,
       "DepotCategory": "Secondary",
       "DepotSize": "Small",
       "AttachedAirUnitIDs": []
@@ -363,7 +363,7 @@
       "Deployment": "Entrenched",
       "Spotted": "Level1",
       "HitPoints": 1,
-      "DaysSupply": 30,
+      "DaysSupply": 1,
       "DepotCategory": "Secondary",
       "DepotSize": "Small",
       "AttachedAirUnitIDs": []
@@ -386,7 +386,7 @@
       "Deployment": "Entrenched",
       "Spotted": "Level1",
       "HitPoints": 1,
-      "DaysSupply": 30,
+      "DaysSupply": 1,
       "DepotCategory": "Secondary",
       "DepotSize": "Small",
       "AttachedAirUnitIDs": []
@@ -409,7 +409,7 @@
       "Deployment": "Entrenched",
       "Spotted": "Level1",
       "HitPoints": 1,
-      "DaysSupply": 5,
+      "DaysSupply": 1,
       "DepotCategory": "Secondary",
       "DepotSize": "Small",
       "AttachedAirUnitIDs": []
@@ -432,7 +432,7 @@
       "Deployment": "HastyDefense",
       "Spotted": "Level1",
       "HitPoints": 1,
-      "DaysSupply": 5,
+      "DaysSupply": 1,
       "DepotCategory": "Secondary",
       "DepotSize": "Small",
       "AttachedAirUnitIDs": []
@@ -455,7 +455,7 @@
       "Deployment": "HastyDefense",
       "Spotted": "Level1",
       "HitPoints": 1,
-      "DaysSupply": 5,
+      "DaysSupply": 1,
       "DepotCategory": "Secondary",
       "DepotSize": "Small",
       "AttachedAirUnitIDs": []
@@ -478,7 +478,7 @@
       "Deployment": "HastyDefense",
       "Spotted": "Level1",
       "HitPoints": 1,
-      "DaysSupply": 5,
+      "DaysSupply": 1,
       "DepotCategory": "Secondary",
       "DepotSize": "Small",
       "AttachedAirUnitIDs": []
@@ -501,7 +501,7 @@
       "Deployment": "HastyDefense",
       "Spotted": "Level1",
       "HitPoints": 1,
-      "DaysSupply": 5,
+      "DaysSupply": 1,
       "DepotCategory": "Secondary",
       "DepotSize": "Small",
       "AttachedAirUnitIDs": []
@@ -524,7 +524,7 @@
       "Deployment": "HastyDefense",
       "Spotted": "Level1",
       "HitPoints": 1,
-      "DaysSupply": 5,
+      "DaysSupply": 1,
       "DepotCategory": "Secondary",
       "DepotSize": "Small",
       "AttachedAirUnitIDs": []
@@ -547,7 +547,7 @@
       "Deployment": "Entrenched",
       "Spotted": "Level1",
       "HitPoints": 1,
-      "DaysSupply": 30,
+      "DaysSupply": 1,
       "DepotCategory": "Secondary",
       "DepotSize": "Small",
       "AttachedAirUnitIDs": []
@@ -570,7 +570,7 @@
       "Deployment": "Entrenched",
       "Spotted": "Level1",
       "HitPoints": 1,
-      "DaysSupply": 5,
+      "DaysSupply": 1,
       "DepotCategory": "Secondary",
       "DepotSize": "Small",
       "AttachedAirUnitIDs": []
@@ -593,7 +593,7 @@
       "Deployment": "HastyDefense",
       "Spotted": "Level1",
       "HitPoints": 1,
-      "DaysSupply": 5,
+      "DaysSupply": 1,
       "DepotCategory": "Secondary",
       "DepotSize": "Small",
       "AttachedAirUnitIDs": []
@@ -616,7 +616,7 @@
       "Deployment": "HastyDefense",
       "Spotted": "Level1",
       "HitPoints": 1,
-      "DaysSupply": 5,
+      "DaysSupply": 1,
       "DepotCategory": "Secondary",
       "DepotSize": "Small",
       "AttachedAirUnitIDs": []
@@ -639,7 +639,7 @@
       "Deployment": "HastyDefense",
       "Spotted": "Level1",
       "HitPoints": 1,
-      "DaysSupply": 5,
+      "DaysSupply": 1,
       "DepotCategory": "Secondary",
       "DepotSize": "Small",
       "AttachedAirUnitIDs": []
@@ -662,7 +662,7 @@
       "Deployment": "Entrenched",
       "Spotted": "Level1",
       "HitPoints": 1,
-      "DaysSupply": 30,
+      "DaysSupply": 1,
       "DepotCategory": "Secondary",
       "DepotSize": "Small",
       "AttachedAirUnitIDs": []
@@ -685,7 +685,7 @@
       "Deployment": "HastyDefense",
       "Spotted": "Level1",
       "HitPoints": 1,
-      "DaysSupply": 5,
+      "DaysSupply": 1,
       "DepotCategory": "Secondary",
       "DepotSize": "Small",
       "AttachedAirUnitIDs": []
@@ -708,7 +708,7 @@
       "Deployment": "HastyDefense",
       "Spotted": "Level1",
       "HitPoints": 1,
-      "DaysSupply": 5,
+      "DaysSupply": 1,
       "DepotCategory": "Secondary",
       "DepotSize": "Small",
       "AttachedAirUnitIDs": []
@@ -731,7 +731,7 @@
       "Deployment": "HastyDefense",
       "Spotted": "Level1",
       "HitPoints": 1,
-      "DaysSupply": 5,
+      "DaysSupply": 1,
       "DepotCategory": "Secondary",
       "DepotSize": "Small",
       "AttachedAirUnitIDs": []
@@ -754,7 +754,7 @@
       "Deployment": "Deployed",
       "Spotted": "Level1",
       "HitPoints": 1,
-      "DaysSupply": 5,
+      "DaysSupply": 1,
       "DepotCategory": "Secondary",
       "DepotSize": "Small",
       "AttachedAirUnitIDs": []
@@ -777,7 +777,7 @@
       "Deployment": "Deployed",
       "Spotted": "Level1",
       "HitPoints": 1,
-      "DaysSupply": 5,
+      "DaysSupply": 1,
       "DepotCategory": "Secondary",
       "DepotSize": "Small",
       "AttachedAirUnitIDs": []
@@ -800,7 +800,7 @@
       "Deployment": "Deployed",
       "Spotted": "Level1",
       "HitPoints": 1,
-      "DaysSupply": 5,
+      "DaysSupply": 1,
       "DepotCategory": "Secondary",
       "DepotSize": "Small",
       "AttachedAirUnitIDs": []
@@ -823,7 +823,7 @@
       "Deployment": "Deployed",
       "Spotted": "Level1",
       "HitPoints": 1,
-      "DaysSupply": 5,
+      "DaysSupply": 1,
       "DepotCategory": "Secondary",
       "DepotSize": "Small",
       "AttachedAirUnitIDs": []
@@ -846,7 +846,7 @@
       "Deployment": "Deployed",
       "Spotted": "Level1",
       "HitPoints": 1,
-      "DaysSupply": 5,
+      "DaysSupply": 1,
       "DepotCategory": "Secondary",
       "DepotSize": "Small",
       "AttachedAirUnitIDs": []
@@ -869,7 +869,7 @@
       "Deployment": "Deployed",
       "Spotted": "Level1",
       "HitPoints": 1,
-      "DaysSupply": 5,
+      "DaysSupply": 1,
       "DepotCategory": "Secondary",
       "DepotSize": "Small",
       "AttachedAirUnitIDs": []
@@ -892,7 +892,7 @@
       "Deployment": "Deployed",
       "Spotted": "Level1",
       "HitPoints": 1,
-      "DaysSupply": 5,
+      "DaysSupply": 1,
       "DepotCategory": "Secondary",
       "DepotSize": "Small",
       "AttachedAirUnitIDs": []
@@ -915,7 +915,7 @@
       "Deployment": "Deployed",
       "Spotted": "Level1",
       "HitPoints": 1,
-      "DaysSupply": 5,
+      "DaysSupply": 1,
       "DepotCategory": "Secondary",
       "DepotSize": "Small",
       "AttachedAirUnitIDs": []
@@ -938,7 +938,7 @@
       "Deployment": "Deployed",
       "Spotted": "Level1",
       "HitPoints": 1,
-      "DaysSupply": 5,
+      "DaysSupply": 1,
       "DepotCategory": "Secondary",
       "DepotSize": "Small",
       "AttachedAirUnitIDs": []
@@ -961,7 +961,7 @@
       "Deployment": "Deployed",
       "Spotted": "Level1",
       "HitPoints": 1,
-      "DaysSupply": 5,
+      "DaysSupply": 1,
       "DepotCategory": "Secondary",
       "DepotSize": "Small",
       "AttachedAirUnitIDs": []
@@ -984,7 +984,7 @@
       "Deployment": "Deployed",
       "Spotted": "Level1",
       "HitPoints": 1,
-      "DaysSupply": 5,
+      "DaysSupply": 1,
       "DepotCategory": "Secondary",
       "DepotSize": "Small",
       "AttachedAirUnitIDs": []
@@ -1007,7 +1007,7 @@
       "Deployment": "Deployed",
       "Spotted": "Level1",
       "HitPoints": 1,
-      "DaysSupply": 5,
+      "DaysSupply": 1,
       "DepotCategory": "Secondary",
       "DepotSize": "Small",
       "AttachedAirUnitIDs": []
@@ -1030,7 +1030,7 @@
       "Deployment": "Deployed",
       "Spotted": "Level1",
       "HitPoints": 1,
-      "DaysSupply": 5,
+      "DaysSupply": 1,
       "DepotCategory": "Secondary",
       "DepotSize": "Small",
       "AttachedAirUnitIDs": []
@@ -1053,7 +1053,7 @@
       "Deployment": "Deployed",
       "Spotted": "Level1",
       "HitPoints": 1,
-      "DaysSupply": 5,
+      "DaysSupply": 1,
       "DepotCategory": "Secondary",
       "DepotSize": "Small",
       "AttachedAirUnitIDs": []
@@ -1076,7 +1076,7 @@
       "Deployment": "Deployed",
       "Spotted": "Level1",
       "HitPoints": 1,
-      "DaysSupply": 30,
+      "DaysSupply": 1,
       "DepotCategory": "Main",
       "DepotSize": "Large",
       "AttachedAirUnitIDs": [
@@ -1102,7 +1102,7 @@
       "Deployment": "Deployed",
       "Spotted": "Level1",
       "HitPoints": 1,
-      "DaysSupply": 30,
+      "DaysSupply": 1,
       "DepotCategory": "Main",
       "DepotSize": "Large",
       "AttachedAirUnitIDs": [
@@ -1128,7 +1128,7 @@
       "Deployment": "Deployed",
       "Spotted": "Level1",
       "HitPoints": 1,
-      "DaysSupply": 80,
+      "DaysSupply": 1,
       "DepotCategory": "Main",
       "DepotSize": "Large",
       "AttachedAirUnitIDs": []
@@ -1151,7 +1151,7 @@
       "Deployment": "Deployed",
       "Spotted": "Level1",
       "HitPoints": 1,
-      "DaysSupply": 5,
+      "DaysSupply": 1,
       "DepotCategory": "Main",
       "DepotSize": "Small",
       "AttachedAirUnitIDs": []
@@ -1174,7 +1174,7 @@
       "Deployment": "Deployed",
       "Spotted": "Level1",
       "HitPoints": 1,
-      "DaysSupply": 0,
+      "DaysSupply": 1,
       "DepotCategory": "Secondary",
       "DepotSize": "Small",
       "AttachedAirUnitIDs": []
@@ -1197,7 +1197,7 @@
       "Deployment": "Deployed",
       "Spotted": "Level1",
       "HitPoints": 1,
-      "DaysSupply": 0,
+      "DaysSupply": 1,
       "DepotCategory": "Secondary",
       "DepotSize": "Small",
       "AttachedAirUnitIDs": []
@@ -1220,7 +1220,7 @@
       "Deployment": "Deployed",
       "Spotted": "Level1",
       "HitPoints": 1,
-      "DaysSupply": 0,
+      "DaysSupply": 1,
       "DepotCategory": "Secondary",
       "DepotSize": "Small",
       "AttachedAirUnitIDs": []
@@ -1243,7 +1243,7 @@
       "Deployment": "Deployed",
       "Spotted": "Level1",
       "HitPoints": 1,
-      "DaysSupply": 0,
+      "DaysSupply": 1,
       "DepotCategory": "Secondary",
       "DepotSize": "Small",
       "AttachedAirUnitIDs": []

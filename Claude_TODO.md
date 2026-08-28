@@ -22,7 +22,14 @@ The living work file. History lives in `Planning Docs/Claude_TODO_Archive.md` (D
 
 ## ⚡ CURRENT STATUS (2026-08-24 — pointer moved to the combat pass; file last fully rewritten 2026-08-20, prior text verbatim at `55587d2`)
 
-**▶ NEXT: THE COMBAT PASS — `Planning Docs/Implementing Combat.md` (opened 2026-08-24, Bob's direction).**
+**▶ NEXT: TOP-DOWN ICONS — `Planning Docs/Top-Down Icons.md` (ruled 2026-08-27, Bob's command decision).**
+One sprite per profile, rotated to facing; old directional/firing path RIPPED OUT, no switch. Plan is
+FINAL (post-scan, all rulings R1–R6 in, counts verified 184 = 89 Single · 53 Directional · 32
+Directional_Fire · 10 Helo). **Implementation T-1…T-4 + the two §6 guard tests, as ONE commit, is the
+next session's first task** — Soviet + MJ art is ready on Bob's side. ⚠ Read that plan's §1 trap and §2.1
+correction BEFORE touching a field.
+
+**⏸ THE COMBAT PASS — `Planning Docs/Implementing Combat.md` (opened 2026-08-24) resumes after icons.**
 Four workstreams in one focus file: **audio tighten-up → combat animation → air operations → combat constants.**
 The detail lives entirely in that file; this one keeps the thread-board row and the change-log lines only.
 Start point is **AIR-0** for air (`AirThreatService` + the §24.7a.8 threat overlay — no gates, no new art) and
@@ -102,7 +109,8 @@ a diagnosis.
 
 | Thread | Stands at | Next move / gate |
 |---|---|---|
-| **▶ COMBAT PASS — audio · animation · air ops · constants** | ▶ NEXT, opened 2026-08-24 (Bob's direction). Plan DRAFTED in `Planning Docs/Implementing Combat.md`, no code yet. Air RULES built + tested and the transit half is live; the AOB/GAME half is unwired. Combat has NO visual at all. 49 sounds declared vs 14 catalog rows. Constants are solid per Bob — light touch only. | Bob: 8 decisions in §7 of that file (**D3 blocks AIR-0**), + run `Tools/Audio/Audit Catalog` (A-2) and the D-1 combat baseline play. Agent: AIR-0 and A-1 need nothing. |
+| **▶ TOP-DOWN ICONS** | Ruled 2026-08-27 (Bob, command decision): ONE sprite per profile rotated to facing; bases don't rotate; helos keep names+flipbook (files are `_Frame0..5`, no directional suffix); ALL directional/firing variants + `flipX` path DELETED, no switch; suffix-strip scoped to `Unit Icons/` ONLY (86 bridge/river/chevron sprites KEEP suffixes); `GER_`→`GE_` fold. Plan FINAL in `Planning Docs/Top-Down Icons.md` — read its §1 trap (helo frames ride the firing fields) + §2.1 correction (firing art DOES render when dug in) first. | Agent: implement T-1…T-4 + 2 guard tests as one commit, NEXT SESSION. Bob: art renames (R6), play-verify per plan §6; AH-1-shares-AH-64-art call (§2.8b). |
+| **COMBAT PASS — audio · animation · air ops · constants** | ▶ NEXT, opened 2026-08-24 (Bob's direction). Plan DRAFTED in `Planning Docs/Implementing Combat.md`, no code yet. Air RULES built + tested and the transit half is live; the AOB/GAME half is unwired. Combat has NO visual at all. 49 sounds declared vs 14 catalog rows. Constants are solid per Bob — light touch only. | Bob: 8 decisions in §7 of that file (**D3 blocks AIR-0**), + run `Tools/Audio/Audit Catalog` (A-2) and the D-1 combat baseline play. Agent: AIR-0 and A-1 need nothing. |
 | **Requisition (P4)** | ⏸ QUEUED — was ▶ NEXT until the combat pass superseded it 2026-08-24; nothing regressed. Wallet + atomic spend LIVE (08-17); pricing rules RATIFIED §18.3.1/§18.5.1 + `CombatUnit.PurchaseCost` LIVE (08-22, prestige pass); bay buy/sell/upgrade API + UI unbuilt. | Agent: build per `Planning Docs/todo_profiles.md` P4 (§4.7 header carries the rules — do not re-derive prices). No gates. |
 | **Campaigns + Save/Load** | Pipeline Phase 2 paused CLEAN, all decisions settled. Campaign folders invisible to discovery; `SaveLoad` has ZERO callers — no Save button exists. | Agent: resume trio in OPEN WORK. Cost grows per mission authored (25–30 planned). Menu listing is Bob-gated (prefab). |
 | **M13 — turn loop / air missions / AOB** | The big frontier. **NEW 2026-08-27: the AI RESERVE ruling (§20.2.1) is ratified and unblocks the reinforcement-arrivals item** — arrival = enters the AI's Reserve (no timer, retry cap moot); staged build does not wait on the AI brain. Air RULES built + tested; air GAME unwired. Turn loop is straight-through; reaction yields are a day-one requirement (retrofit = rewrite). ⚠ **The AIR half is now phased inside the combat pass** (`Planning Docs/Implementing Combat.md` §5, AIR-0→AIR-4) — the turn-loop half stays here. | Agent-led, large. Gates: D4, I8, most printer emitters, M14 remainder, D2 fixed-wing play-verify all sit behind it. ⚠ Finding 2026-08-24: **AIR-2 does NOT need the reaction-yielding loop** — in Khost the reaction windows belong to an AI with nothing to fly, so v1 never suspends. |
@@ -556,6 +564,21 @@ manager, for Khost). ⚠ AI2 snapshot serialization still owed its own `SAVE_VER
 > older than the last two passes migrate to `Planning Docs/Claude_TODO_Archive.md` when this section is pruned.
 > **Entries 2026-07-21 → 2026-08-19 (incl. the theme-art pass and everything before it) are in the archive.**
 
+- 2026-08-27 — **TOP-DOWN ICONS ruled + planned (Bob, command decision; plan `Planning Docs/Top-Down
+  Icons.md`, FINAL; docs only, no code):** unit art moves to AI-generated top-down sprites — one per
+  profile, rotated to facing (bases excepted), directional + firing variants deleted outright, no
+  fallback switch. Scan findings worth the ledger: helo frames are stored in the DIRECTIONAL+FIRING
+  fields (naive `_F` deletion kills the flipbook — the trap the plan's T-2 ordering exists for);
+  `GetAnimationFrame` has zero callers (flipbook is sprite-name-based, so `RegimentIconProfile` collapses
+  to ONE `Icon` field); §2.1 self-correction — firing art DOES render (dug-in postures), the cost of
+  dropping it is a variant covered by the deployIcon chevron; suffix-strip is scoped to `Unit Icons/`
+  (bridge/river/chevron sprites are hex-EDGE features and keep suffixes); no test touches icons at all,
+  so two guard tests ship with the work. Counts verified against the 184 registered profiles. Soviet + MJ
+  art converted Bob-side; implementation is next session's first task.
+- 2026-08-27 — Khost `.oob` ownership loop CLOSED: Bob hand-moved the editor's bundle; our copy now
+  carries the editor writer's bytes (`30` not `30.0`, exactly the 54 DaysSupply lines). One SHA end to
+  end from here. The `khost.oob.pre-supplydays-2026-08-27` backup rode along into StreamingAssets — kept
+  (Bob's file); delete when he confirms, it ships in builds otherwise.
 - 2026-08-27 — **AI RESERVE RATIFIED (Bob) — NEW DesignDoc §20.2.1 + §35.3.8 cross-ref; docs only.**
   AI reinforcements arrive INTO the AI's Reserve, not onto a hex; the AI chooses when and where ("the AI
   will choose the best place"). §20.2's scripted-arrival reading is SUPERSEDED. Consequences recorded:
