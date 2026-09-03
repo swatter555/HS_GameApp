@@ -440,6 +440,18 @@ same scratchpad file path from this conversation, or pass that URL as `url` from
 
 ## 8. PROGRESS LOG
 
+- **2026-09-03, later** — **THE MASTER LIST IS NOW VERIFIED, not just asserted.** Bob: *"This is my master
+  list to follow."* So it was audited against the code rather than added to: 172 sprite-bearing profiles
+  walked, every `SpriteManager` constant resolved, cross-checked against both the manifest rows and the
+  PNGs on disk. Zero dangling constants, zero genuine gaps, zero false On-disk rows. The 22 code names
+  with no row are all pre-rename spellings whose replacements are already listed — which is itself the
+  proof that §2's rename batch is completely captured here.
+  Two findings kept: **`SV_2S5` is ticked but has no file anywhere** (row annotated; the tick left alone),
+  and **`ME_Airbase` is the only unit profile drawing from `Map Icons/` instead of `Unit Icons/`** — a
+  standing trap for T-4/T-5, whose suffix sweep is scoped to `Unit Icons/` alone.
+  ⚠ The audit ran as a throwaway script, NOT committed. Its durable home is an Editor test using
+  `AssetDatabase.FindAssets` — the one check `IconIntegrityTests` cannot make. Offered, not built.
+
 - **2026-09-03** — **FIRST RE-5/RE-6 SLICE: the German air-mobile brigade.** Three profiles
   (`INF_AM_GE`, `APC_M113_GE`, `HEL_UH1D_GE`), three WeaponType members, eight `SpriteManager` constants
   and one template. Now **186 profiles / 183 templates / 215 WeaponType members**.

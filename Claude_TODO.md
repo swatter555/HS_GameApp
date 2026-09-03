@@ -207,18 +207,6 @@ a diagnosis.
 > 5. A PASSED entry is deleted from this section the same session, after its result is recorded in the change
 >    log and, if it is a shipped behaviour, in Claude_Project. **This section is a queue, never an archive.**
 
-- [!] **GE AIR-MOBILE BRIGADE — BLOCKING, landed 2026-09-03.**
-      **DO:** compile, then run the full EditorTest suite — especially `WeaponProfileNatoTests` (3 new
-      pin blocks), `EquipmentBaysTests` (its three template audits walk the real DB and now sweep the new
-      three-bay unit) and `CensusIntegrityTests`.
-      **PASS:** suite green. `EquipmentBaysTests` is the one that matters — it proves the new Mobile bay
-      holds a ground vehicle and the Embarked bay a real air transport, which is the whole legality
-      question for a three-bay unit.
-      ⚠ **DO NOT eyeball the unit in game yet** — all three of its sprites are still to-draw, so it will
-      correctly render the mismatch placeholder. That is expected, not a bug.
-      **WHY:** first RE-5/RE-6 slice. It is also the first template added since the icon pass, so it is
-      the first real test of whether a new three-bay unit still assembles cleanly under derived capacity.
-
 - [⏸] **RE-2 FREE RE-POINTS — four sprites, PLAY-CHECK ONLY, ride the T-5 art verification.**
       Landed 2026-08-29. No suite value: `IconIntegrityTests` proves an icon is present and valid, not that
       it is the RIGHT one, so this is eyes-only.
@@ -612,6 +600,29 @@ manager, for Khost). ⚠ AI2 snapshot serialization still owed its own `SAVE_VER
 > **Rules:** one line per change · newest first · format `YYYY-MM-DD — imperative summary (area)` · entries
 > older than the last two passes migrate to `Planning Docs/Claude_TODO_Archive.md` when this section is pruned.
 > **Entries 2026-07-21 → 2026-08-19 (incl. the theme-art pass and everything before it) are in the archive.**
+
+- 2026-09-03 — **MANIFEST AUDITED AGAINST THE CODE (no code change).** Bob asked for the German air-mobile
+  sprite to be added to the master list; it was already on it (GE section, row 4, tagged `new`) — a
+  duplicate row in the list he follows would be worse than the confusion, so instead the list was VERIFIED.
+  Walked all **172 sprite-bearing profiles**, resolved each `SpriteManager` constant, and cross-checked
+  three ways. Results:
+  • **Zero dangling constants** — every `Icon = SpriteManager.X` resolves to a declared constant.
+  • **Zero genuine manifest gaps.** 22 names the code uses have no row, and all 22 are *pre-rename*
+  spellings the pending batch retires (`AR_*` ×14, `GER_Airborne/Regulars`, `CH_H9_Frame0`, `CH_Type82`,
+  `MJ_AA`, `SV_AA`, `SV_AN8`, `UK_TornadoGR1`). The manifest already carries every replacement.
+  • **Zero false "On disk" rows** — every row tagged `have` really is on disk.
+  • **4 profiles point at a PNG that does not exist:** the three new German air-mobile sprites (expected,
+  art-gated) and **`SV_2S5_W`, which Bob has TICKED but which exists nowhere under `Assets/Art/Sprites`.**
+  The manifest row now says so. The tick was left alone — his ticks are his.
+  ⚠ **FALSE ALARM CAUGHT AND CORRECTED MID-AUDIT:** the first pass flagged `ME_Airbase` as missing. It is
+  not — it lives in `Art/Sprites/Map Icons/`, and the audit was only walking `Unit Icons/`. Worth keeping
+  though: **the airbase profile is the ONLY unit profile whose art lives outside `Unit Icons/`**, which
+  matters because the T-4/T-5 suffix sweep is explicitly scoped to that one directory.
+  ⚠ This partly discharges the "directory cross-check owed" item, but the check was a THROWAWAY script and
+  was NOT kept in the repo (it hardcoded a scratchpad path and would rot). **The durable home for it is an
+  Editor test** — `AssetDatabase.FindAssets` can prove a declared icon has a real PNG, which is exactly the
+  gap `IconIntegrityTests` cannot close and exactly the defect class `SV_2S5` and the three German sprites
+  sit in. Not built: Bob asked for a manifest check, not a new test. Offered, awaiting his call.
 
 - 2026-09-03 — **GE AIR-MOBILE BRIGADE — the first RE-5/RE-6 slice. ⚑ Suite run owed.** Bob asked for a
   German air-mobile unit after confirming the UH-1D is a transport. Built: `INF_AM_GE` · `APC_M113_GE` ·
