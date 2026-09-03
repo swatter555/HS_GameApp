@@ -207,17 +207,6 @@ a diagnosis.
 > 5. A PASSED entry is deleted from this section the same session, after its result is recorded in the change
 >    log and, if it is a shipped behaviour, in Claude_Project. **This section is a queue, never an archive.**
 
-- [!] **CONSOLE HYGIENE — the three `LogAssert.Expect` calls, landed 2026-09-02.**
-      **DO:** re-run the EditorTest suite and look at the console afterwards.
-      **PASS:** `MapStandardTests`, `MissionObjectiveGateTests` and `ScenarioManifestTests` all still green,
-      and the console shows ONLY the two `IPrebuildSetup`/`IPostBuildCleanup` lines from Unity's perf-test
-      package. All four of our own messages should be gone.
-      ⚠ **A NEW FAILURE HERE IS INFORMATIVE, NOT A REGRESSION.** `LogAssert.Expect` fails a test when the
-      expected warning does NOT arrive, so a red test means the warning stopped firing — which is exactly
-      the thing these three tests previously could not see. Read the failure before "fixing" it.
-      **WHY:** three tests were named for a warning they never asserted. Deleting the `LogWarning` out of
-      `ScenarioManifest.IsValid()` would have left all three green with the guard silently gone.
-
 - [⏸] **RE-2 FREE RE-POINTS — four sprites, PLAY-CHECK ONLY, ride the T-5 art verification.**
       Landed 2026-08-29. No suite value: `IconIntegrityTests` proves an icon is present and valid, not that
       it is the RIGHT one, so this is eyes-only.
@@ -629,7 +618,20 @@ manager, for Khost). ⚠ AI2 snapshot serialization still owed its own `SAVE_VER
   of them green with the guard gone. Now asserted with `LogAssert.Expect` (first use in the suite —
   `UnityEngine.TestRunner` was already referenced by the asmdef), matching a stable fragment by `Regex`
   rather than the full prose so the messages can still be re-worded.
-  Net: the console drops to Unity's two plumbing lines, and three warnings stop being unguarded.
+  ⚠ **CORRECTION, same day, from Bob's TestResults.xml (651/651 passed):** the console did NOT get
+  quieter, and the agent should not have said it would. **`LogAssert.Expect` CANNOT SUPPRESS CONSOLE
+  OUTPUT.** `LogScope` subscribes to `Application.logMessageReceivedThreaded`
+  (`com.unity.test-framework/UnityEngine.TestRunner/Assertions/LogScope/LogScope.cs:53`) — an OBSERVER
+  that fires AFTER Unity has already written the line. It can only (a) stop an expected error from failing
+  a test and (b) fail the test if the expected log never arrives. (b) is the half that mattered and it
+  works: all three warnings are still emitted, still recorded in the run's `<output>`, and now ASSERTED.
+  ⚠ **The two are mutually exclusive, so do not go looking for a way to have both.** The only lever that
+  silences a log — `Debug.unityLogger.logEnabled = false` — stops the message reaching
+  `logMessageReceived` at all, so the expectation goes unmet and the test fails. Either the warning is
+  asserted or it is hidden. Asserted is the right side of that trade.
+  **RULED: the four lines stay.** 651 tests emitting three warnings from the three branches designed to
+  warn is CORRECT output, not noise — and the fourth ("Saving results to:") is the harness writing its own
+  results file, attributed to whichever test happened to be current.
 
 - 2026-09-02 — **RE-4 `SECOND_LINE_FORMATION` LANDED (roster expansion). ⚑ CLEARED same day (Bob ran it): suite GREEN.** The
   formation-quality layer (§13) gains its first sub-1.0 member at `Icm(0.9f)` and **China leaves the
