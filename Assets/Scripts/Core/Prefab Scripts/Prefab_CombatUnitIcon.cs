@@ -60,7 +60,10 @@ namespace HammerAndSickle.Core
         // "<unit>_Frame0".."_Frame5". While the icon is tween-moving the frames loop at animationFps;
         // at rest the icon sits on Frame0 (motion-only by design, Bob 2026-07-22).
         private const int MOTION_FRAME_COUNT = 6;
-        private const string MOTION_FRAME0_SUFFIX = "_Frame0";
+        // ⚠ Aliased from GameData, never re-spelled: RegimentIconProfile.Validate refuses a Helo_Animation
+        // profile whose icon does not end in this, so the validator and this resolver must agree by
+        // construction. A const-from-const makes the compiler enforce that.
+        private const string MOTION_FRAME0_SUFFIX = GameDataConst.ICON_MOTION_FRAME0_SUFFIX;
 
         private string _unitSpriteName;    // last name passed to SetUnitIcon (atlas clones mangle sprite.name)
         private Sprite[] _motionFrames;    // resolved frames while the loop runs; null otherwise

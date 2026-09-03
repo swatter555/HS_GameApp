@@ -29,6 +29,19 @@ Directional_Fire · 10 Helo). **Implementation T-1…T-4 + the two §6 guard tes
 next session's first task** — Soviet + MJ art is ready on Bob's side. ⚠ Read that plan's §1 trap and §2.1
 correction BEFORE touching a field.
 
+**⏸ ROSTER EXPANSION — `Planning Docs/Roster Expansion.md`. ALL ELEVEN NATIONS SETTLED 2026-08-29; no code
+written yet.** Per-nation art + WeaponProfiles: generic artillery/AAA art abolished, the `AR_` regional
+convention killed, Saudi Arabia added as a real nation, Kuwait deliberately empty. **Architecture SETTLED —
+profiles for everything, no icon picker** (that plan's §1.1 records why; do not re-propose one). Carries a
+Bob-approved **rename batch** (7 types, one `SAVE_VERSION` bump, one `khost.oob` re-export), **four content
+errors** found in the audit, and a NEW `SECOND_LINE_FORMATION` ICM trait (0.9) for China.
+⚠ **Sequenced AFTER the icon pass** so ~40 new profiles are authored in the new shape once, not converted
+twice. **The work order is that plan's §5.**
+✅ **THE ART-FREE STEPS ARE DONE: RE-1a, RE-2, RE-3a and RE-4 have all landed** (RE-4 on 2026-09-02, suite
+run owed). What remains is gated on something outside the code: **RE-1b** on the next `khost.oob`
+re-export, **RE-3b / RE-5 / RE-6** on Bob's art, per nation.
+Art checklist (self-saving, checkboxes persist): https://claude.ai/code/artifact/a9d4cc37-a7c9-4a68-865c-2428d8f2969c
+
 **⏸ THE COMBAT PASS — `Planning Docs/Implementing Combat.md` (opened 2026-08-24) resumes after icons.**
 Four workstreams in one focus file: **audio tighten-up → combat animation → air operations → combat constants.**
 The detail lives entirely in that file; this one keeps the thread-board row and the change-log lines only.
@@ -109,7 +122,8 @@ a diagnosis.
 
 | Thread | Stands at | Next move / gate |
 |---|---|---|
-| **▶ TOP-DOWN ICONS** | Ruled 2026-08-27 (Bob, command decision): ONE sprite per profile rotated to facing; bases don't rotate; helos keep names+flipbook (files are `_Frame0..5`, no directional suffix); ALL directional/firing variants + `flipX` path DELETED, no switch; suffix-strip scoped to `Unit Icons/` ONLY (86 bridge/river/chevron sprites KEEP suffixes); `GER_`→`GE_` fold. Plan FINAL in `Planning Docs/Top-Down Icons.md` — read its §1 trap (helo frames ride the firing fields) + §2.1 correction (firing art DOES render when dug in) first. | Agent: implement T-1…T-4 + 2 guard tests as one commit, NEXT SESSION. Bob: art renames (R6), play-verify per plan §6; AH-1-shares-AH-64-art call (§2.8b). |
+| **▶ TOP-DOWN ICONS** | Ruled 2026-08-27 (Bob, command decision): ONE sprite per profile rotated to facing; bases don't rotate; helos keep names+flipbook (files are `_Frame0..5`, no directional suffix); ALL directional/firing variants + `flipX` path DELETED, no switch; suffix-strip scoped to `Unit Icons/` ONLY (86 bridge/river/chevron sprites KEEP suffixes); `GER_`→`GE_` fold. Plan FINAL in `Planning Docs/Top-Down Icons.md` — read its §1 trap (helo frames ride the firing fields) + §2.1 correction (firing art DOES render when dug in) first. | Agent: implement T-1…T-4 + 2 guard tests as one commit, NEXT SESSION. Bob: art renames (R6), play-verify per plan §6. ✅ §2.8b CLOSED 2026-08-28 — Bob is drawing a Cobra, so the AH-1 stops sharing Apache frames. |
+| **⏸ ROSTER EXPANSION** | Opened 2026-08-28, **ALL ELEVEN NATIONS SETTLED 2026-08-29** (`Planning Docs/Roster Expansion.md`) — decisions complete, NO code yet. Per-nation art + profiles; generic artillery/AAA art abolished; `AR_` convention killed; Saudi added as a real nation; Kuwait deliberately gets nothing. **Architecture settled: one profile per picture, NO icon picker** (§1.1 — do not re-propose). Carries a 7-type rename batch (one `SAVE_VERSION` bump + one `khost.oob` re-export), 4 content errors, and a NEW `SECOND_LINE_FORMATION` ICM trait for China. Art checklist published as a self-saving Artifact. | ✅ **RE-1a / RE-2 / RE-3a / RE-4 all landed** — the art-free half of §5 is complete (RE-4 2026-09-02: `SECOND_LINE_FORMATION` on 15 Chinese profiles, Type 86 IFV excluded by closed-bay doctrine; suite run owed). Remaining agent work is art-gated per nation (RE-3b/RE-5/RE-6) or content-gated (RE-1b, next `khost.oob` re-export). All §6 open questions are now CLOSED. Bob: draw per the checklist. |
 | **COMBAT PASS — audio · animation · air ops · constants** | ▶ NEXT, opened 2026-08-24 (Bob's direction). Plan DRAFTED in `Planning Docs/Implementing Combat.md`, no code yet. Air RULES built + tested and the transit half is live; the AOB/GAME half is unwired. Combat has NO visual at all. 49 sounds declared vs 14 catalog rows. Constants are solid per Bob — light touch only. | Bob: 8 decisions in §7 of that file (**D3 blocks AIR-0**), + run `Tools/Audio/Audit Catalog` (A-2) and the D-1 combat baseline play. Agent: AIR-0 and A-1 need nothing. |
 | **Requisition (P4)** | ⏸ QUEUED — was ▶ NEXT until the combat pass superseded it 2026-08-24; nothing regressed. Wallet + atomic spend LIVE (08-17); pricing rules RATIFIED §18.3.1/§18.5.1 + `CombatUnit.PurchaseCost` LIVE (08-22, prestige pass); bay buy/sell/upgrade API + UI unbuilt. | Agent: build per `Planning Docs/todo_profiles.md` P4 (§4.7 header carries the rules — do not re-derive prices). No gates. |
 | **Campaigns + Save/Load** | Pipeline Phase 2 paused CLEAN, all decisions settled. Campaign folders invisible to discovery; `SaveLoad` has ZERO callers — no Save button exists. | Agent: resume trio in OPEN WORK. Cost grows per mission authored (25–30 planned). Menu listing is Bob-gated (prefab). |
@@ -192,6 +206,40 @@ a diagnosis.
 >    under that, and it stays open until it passes.
 > 5. A PASSED entry is deleted from this section the same session, after its result is recorded in the change
 >    log and, if it is a shipped behaviour, in Claude_Project. **This section is a queue, never an archive.**
+
+- [!] **RE-4 SECOND_LINE_FORMATION — BLOCKING, landed 2026-09-02.**
+      **DO:** compile, then run the full EditorTest suite — especially `WeaponProfileChineseTests` (now 8,
+      two of them new) and `CommodityProfileTests` (now 7).
+      **PASS:** suite green. The Chinese ICM pins MOVED on purpose — 0.90 everywhere, 0.945 for the Type 80,
+      **1.00 for the Type 86 IFV**. If the Type 86 comes back 0.90 the trait has leaked onto a Mobile-bay
+      profile and the formation is being priced twice; fix the profile, not the test.
+      ⚠ If a NON-Chinese suite reports a moved number, the trait has leaked through a shared commodity
+      blueprint — `FormationQuality_SecondLineIsChinaOnly` is the tripwire for exactly that.
+      **WHY:** the four blueprints now take `params WeaponTrait[]`, so for the first time a national trait
+      rides a shared stat line. This is the run that proves it rides ON it rather than forking it.
+
+- [⏸] **RE-2 FREE RE-POINTS — four sprites, PLAY-CHECK ONLY, ride the T-5 art verification.**
+      Landed 2026-08-29. No suite value: `IconIntegrityTests` proves an icon is present and valid, not that
+      it is the RIGHT one, so this is eyes-only.
+      **DO:** look at a US air-mobile brigade, a Chinese towed artillery regiment (light and heavy), and the
+      Soviet generic AAA regiment.
+      **PASS:** the US air-mobile unit no longer wears the AIRBORNE sprite · the two Chinese artillery units
+      draw Chinese art, not the generic · Soviet AAA draws `SV_AA`.
+      **WHY:** all four sprites were sitting on disk unused while the profiles drew something else. Nothing
+      new was authored — this is purely pointing at art that already shipped.
+
+- [⏸] **ICON PASS — final art verification, GATED ON BOB'S T-5 ASSET DROP.**
+      ✅ Suite green, Khost loads clean, and **rotation confirmed working on the pre-pass art** (Bob,
+      2026-08-29) — so the mechanism is proven and `ICON_HEADING_OFFSET_DEGREES = 0f` is correct for
+      west-facing art. What is left fires when the new sprites land.
+      **DO:** after dropping the converted art, load Khost and turn units to EASTERLY facings.
+      **PASS:** no magenta and no mismatch placeholder anywhere · vehicles point the right way at all six
+      facings · **HQs/depots/airbases upright** · and on an easterly facing the HP box, nationality flag,
+      deploy chevron and stacking badge are still upright and readable.
+      **WHY:** easterly is 180° of rotation — the only facing that exposes a root-rotation bug, which a
+      north-facing unit hides completely. And if the NEW art has a different canonical heading than the
+      old `_W` sprites, this is where it shows: fix `ICON_HEADING_OFFSET_DEGREES`, not the geometry.
+      ⚠ Agent owes a directory cross-check against the manifest at the same time (Bob's ask, 2026-08-29).
 
 - [ ] **Fog-of-war movement range (owed since 2026-07-21; LOW priority, not blocking).**
       **DO:** move a unit along a path passing near an enemy at SpottedLevel 0 (tilde reveal OFF, known OOB
@@ -564,6 +612,37 @@ manager, for Khost). ⚠ AI2 snapshot serialization still owed its own `SAVE_VER
 > older than the last two passes migrate to `Planning Docs/Claude_TODO_Archive.md` when this section is pruned.
 > **Entries 2026-07-21 → 2026-08-19 (incl. the theme-art pass and everything before it) are in the archive.**
 
+- 2026-09-02 — **RE-4 `SECOND_LINE_FORMATION` LANDED (roster expansion). ⚑ Suite run owed.** The
+  formation-quality layer (§13) gains its first sub-1.0 member at `Icm(0.9f)` and **China leaves the
+  ICM-1.0 baseline** it had shared with the Soviets and the Arabs. Applied to **15 of the 16 Chinese
+  profiles** — every one a template names in its DEPLOYED bay. ⚠ **`IFV_TYPE86_CH` is deliberately
+  excluded:** it exists only as the Mobile-bay ride of the mechanised regiment, and closed-bay doctrine
+  prices the formation ONCE, on the sole/deployed profile. Result: China 0.90, Type 80 0.945 (LRF
+  1.05 × 0.9), Type 86 unchanged at 1.00.
+  ⚠ **The RE-3a blueprints had to learn an optional trait argument.** `ART_LIGHT_CH` and `ART_HEAVY_CH`
+  resolve from methods shared with the Soviet, NATO and Arab guns, so a new `Plus()` helper lets a national
+  trait ride ON the shared stat line instead of forking it — all four blueprints now take
+  `params WeaponTrait[]`. A new test pins that the Chinese gun keeps the Soviet stat line while carrying a
+  different ICM; another is the tripwire for the trait leaking into a blueprint's base list.
+  Docs amended in the same commit: `HS_DesignDoc` §7.5.5 and `WeaponTrait_Supplement` §13b (new T91 row).
+  The supplement's "Soviet/**Chinese**/Arab formations stay the ICM-1.0 baseline" anchor was a direct
+  contradiction of this ruling and is retired in place, not left standing.
+  ⚠ **FOUND IN PASSING: `SPA_TYPE83_CH` has a profile but NO template** — the only Chinese profile
+  nothing fields. It took the trait on deployed-intent; the missing SPH regiment is booked as RE-6 work.
+  **Bob-side follow-ups unchanged:** RE-1b still rides the next `khost.oob` re-export; RE-5+ stays
+  art-gated per nation.
+- 2026-09-02 — **HUEY OWNERSHIP SETTLED at FOUR sprite sets (docs + manifest only, no code).** Bob:
+  the US and Saudi each own a transport + gunship pair; **NATO generic borrows the US art** (its profiles
+  stay its own — R1 permits sharing in that direction); **Iran owns `IR_UH1`** because its Hueys are a
+  desert reskin; Germany keeps `GE_UH1D` and is now its only rider. 24 new frames, down from the 36 the
+  first cut implied. ⚠ Transport and gunship are the long-body UH-1H and the **short-body UH-1C** — two
+  different airframes, not a repaint. Recorded without objection: no NATO-generic nation (NL/BE/DK) ever
+  flew a Huey, and the 1980s US gunship was the Cobra, so the pair is an older/cheaper tier rather than a
+  historical fielding. Iran's gunship slot stays empty on purpose — its attack helo is the AH-1J.
+  **Naming question closed:** the `XX_XXXX` (NATION_PLATFORM) rule governs SPRITE names and `SpriteManager`
+  constants ONLY; WeaponType names keep the existing `ROLE_PLATFORM_NATION` form. The two conventions run in
+  opposite directions on purpose — do not "fix" either to match the other.
+
 - 2026-08-27 — **TOP-DOWN ICONS ruled + planned (Bob, command decision; plan `Planning Docs/Top-Down
   Icons.md`, FINAL; docs only, no code):** unit art moves to AI-generated top-down sprites — one per
   profile, rotated to facing (bases excepted), directional + firing variants deleted outright, no
@@ -575,6 +654,81 @@ manager, for Khost). ⚠ AI2 snapshot serialization still owed its own `SAVE_VER
   (bridge/river/chevron sprites are hex-EDGE features and keep suffixes); no test touches icons at all,
   so two guard tests ship with the work. Counts verified against the 184 registered profiles. Soviet + MJ
   art converted Bob-side; implementation is next session's first task.
+- 2026-08-29 — **RE-3a COMMODITY BLUEPRINTS (refactor, zero behaviour change). ⚑ CLEARED 2026-09-02 (Bob ran it): suite GREEN.** Four
+  blueprint methods in `WeaponProfileDB` — `LightTowedArtilleryDef` / `HeavyTowedArtilleryDef` /
+  `TowedAaaDef` / `TransportTruckDef` — and **12 profiles re-expressed through them** (4 light, 4 heavy,
+  1 AAA, 3 truck). The three byte-identical light-artillery copies whose own comments admitted it ("the
+  same gun for anyone") are now one authored line. NEW `CommodityProfileTests` (6): every national member
+  of a family must resolve to ONE stat line · only the light gun keeps `AirDroppable`/`HeloTransportable`
+  (the tags `EquipmentBays.CanAccept` routes airborne artillery by) · and the two **Mujahideen irregular
+  variants must stay DIFFERENT** — folding them onto the blueprint would erase what makes them Mujahideen.
+  Turn stays a per-nation parameter (Soviet artillery is authored at 60, everyone else 144).
+  ⚠ **RE-3b RE-ORDERED — minting the ~28 national commodity profiles is NOT art-free after all.** Two
+  findings: each needs a `SpriteManager` constant, and **a census is genuinely NATIONAL and cannot come
+  from a blueprint** — `ART_LIGHT_NATO` is 950 men + `ART_105MM_FG` + `APC_HUMVEE_US`, `ART_LIGHT_ARAB` is
+  700 + `APC_MTLB_IQ` + `MANPAD_STRELA`. A Saudi census names `APC_M113_SA`, which RE-5 mints. So RE-3b
+  goes per-nation alongside RE-5, not as one batch ahead of it.
+- 2026-08-29 — **RE-2 free re-points (4 sprites, no new art).** `INF_AM_US` off `US_Airborne` onto
+  `US_AirMobile` · `ART_LIGHT_CH`/`ART_HEAVY_CH` off the generics onto `CH_LightArt`/`CH_HeavyArt` ·
+  `AAA_GEN_SV` off `GEN_AA` onto `SV_AA`. All four sprites had been shipping unused while the profiles drew
+  something else. ⚠ The `SV_AA`→`SV_AAA` and `GEN_*` retirements are ART renames and belong to T-4/T-5 —
+  this step only re-points at files that exist TODAY, so it is safe ahead of Bob's asset drop. The Iranian
+  AAA re-point is NOT here: it needs `AAA_GEN_IR`, which RE-3 mints. Play-check only, no suite value.
+  ⚠ Post-conversion orphan sweep run: ~250 surplus `_NW`/`_SW`/`_F` constants now reference nothing, which
+  is exactly T-4's deletion list and confirms its scope. `FR_Gepard` and `CH_Type95` are gone from it.
+- 2026-08-29 — **RE-1a RENAME BATCH LANDED (roster expansion; `SAVE_VERSION` 9 → 10). ⚑ CLEARED (Bob ran
+  it): suite GREEN, Khost loads fine.**
+  20 WeaponType renames, 169 replacements across 6 files. The two Tornado types now name the nation each
+  already served (GR.1 is the RAF designation for the IDS — the profiles were authored as two BRITISH
+  variants and the German squadron borrowed the spare), with designations and art pointers swapped and
+  **no stat line moved**. `SPA_M109_FR`→`SPA_AUF1_FR`; `APC_FV432`/`HEL_AH1` gain nation suffixes; the
+  three `WEST` types become `_NATO`; thirteen Chinese types gain `_CH`, two with a model correction —
+  `SPA_TYPE82`→`SPA_TYPE83_CH` (the Type 82 is a 130mm MRL, the SPH is the PLZ-83) and `HEL_H9`→`HEL_Z9_CH`
+  ("H" is Hongzhaji, bomber; the real aircraft is the Harbin Z-9). **Deleted:** `TANK_TYPE95` outright
+  (fictional — the enum comment already admitted it), plus two content-error templates —
+  `UK_AIR_DEFENSE_REGIMENT` (Britain never operated the M163) and `IR_SAM_REGIMENT` (Iran never operated
+  the SA-2) — and six `FR_Gepard` constants. `HEL_AH1_US` moved out of the enum's Non-Profile region,
+  where it had been misfiled despite having a real profile. Ends at 183 profiles / 183 templates /
+  212 WeaponType members, no duplicates, no dangling references.
+  ⚠ **`TRN_AN8_SV` deliberately excluded** — verified as the ONLY renamed type present in shipped content
+  (`khost.oob`), so it becomes RE-1b and rides the next editor re-export. That check is what let the rest
+  proceed without touching content, the editor, or Bob's art.
+- 2026-08-29 — **TOP-DOWN ICONS T-1…T-3 + guard suite LANDED; ⚑ CLEARED (Bob ran it): full EditorTest
+  suite GREEN and Khost loads clean.** Unit art is now ONE sprite per profile, rotated to facing.
+  `RegimentIconProfile` six fields → one `Icon`; `GetDirectionalIcon`/`GetFiringIcon`/`GetAnimationFrame`
+  deleted (all three had ZERO callers outside the class, as the plan predicted); `RegimentIconType` down to
+  two members. All **184** declarations converted mechanically, counts matching the plan exactly
+  (89 Single + 53 Directional + 32 Directional_Fire + 10 Helo → 174 Single + 10 Helo). ✅ **The §1 trap did
+  not bite** — all ten helos verified still on their `_Frame0` sprite. Renderer: `NormalizeDirection`,
+  `ShouldFlipSprite`, the `out bool shouldFlip` and both `flipX = true` writes deleted; NEW
+  `ApplyIconFacing` rotates **`unitIcon` only, never the prefab root** (six renderers) and gates on
+  `unit.IsBase`. NEW `GameData.ICON_MOTION_FRAME0_SUFFIX` — the prefab's suffix was `private` so the
+  headless validator could not reach it; rather than spell it twice it moved to GameData and the prefab
+  aliases it const-from-const, so the compiler enforces agreement. NEW `IconIntegrityTests` (8) closes the
+  §2.5 finding that NOTHING in the suite referenced icons; a pure `internal static IconRotationDegrees`
+  seam was extracted so the rotation rule tests with no MonoBehaviour. Net −806/+485 lines.
+  ⚠ **T-4/T-5 deliberately NOT done and they land TOGETHER** — renaming the ~250 `SpriteManager` constants
+  breaks every lookup until the PNGs are renamed, so profiles still point at the pre-pass `_W` constants,
+  which resolve fine and are now rotated. ⚠ `ICON_HEADING_OFFSET_DEGREES` assumes a WEST heading; rotation
+  play-check still queued.
+- 2026-08-28 — **ROSTER EXPANSION opened (docs only, no code; plan `Planning Docs/Roster Expansion.md`).**
+  Bob authoring new unit art surfaced three things: 11 shared sprite sets (17 profiles on borrowed art),
+  real roster holes per nation, and **four content errors** — a UK M163 Vulcan regiment (Britain never
+  operated it; template DELETED), an Iranian S-75 SAM regiment (Iran was Hawk/Rapier-equipped), Iranian AAA
+  drawing Soviet art, and a Chinese S-125 regiment (China's SAM was the HQ-2). **Architecture settled after
+  Bob raised an icon picker: profiles for everything, no picker** — art resolves through the profile alone
+  (`GetSpriteNameForUnit` → `EquipmentBays.GetIcon` → `IconProfile`, AIRB the only special case), the
+  per-nation split ALREADY exists everywhere else (4 Leopard 1 profiles on 1 sprite), a picker would give
+  art a second home right as the icon pass collapses `RegimentIconProfile` to one field, and only separate
+  profiles can carry per-nation export stats. Commodity stat lines get authored ONCE in a shared
+  `ProfileDef` helper — the three light-artillery profiles are already byte-identical copies today.
+  Naming ratified (sprites `NATION_WEAPON`, types `CATEGORY_MODEL_NATION`, towed AAA sprite `XX_AAA`,
+  `AR_` killed, Saudi = `SA_`); casing deliberately NOT normalised. Rename batch approved (7 types incl.
+  `TRN_AN8_SV`→`TRN_AN12_SV` and the two Tornados) — ⚠ **An-8 is a RENAME not a delete**, it is the only
+  fixed-wing lift for all four VDV templates. **Tornado fix: the art pointers were always right, the two
+  TEMPLATES were crossed** (GR.1 is the RAF name for the IDS; Bob self-corrected twice) — swap the profile
+  assignment, move no stat lines. Verified `.oob` references WeaponTypes not template IDs, so template
+  renames are content-free. Sequenced AFTER the icon pass. Six nations still to specify with Bob.
 - 2026-08-27 — Khost `.oob` ownership loop CLOSED: Bob hand-moved the editor's bundle; our copy now
   carries the editor writer's bytes (`30` not `30.0`, exactly the 54 DaysSupply lines). One SHA end to
   end from here. The `khost.oob.pre-supplydays-2026-08-27` backup rode along into StreamingAssets — kept

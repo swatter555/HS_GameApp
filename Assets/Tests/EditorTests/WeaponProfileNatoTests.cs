@@ -151,14 +151,14 @@ namespace HammerAndSickle.Tests
                 AssertGround(WeaponType.SPA_M109_UK, 5, 7, 10, 7, 7, 0); // non-US variants keep the base line (no Copperhead)
                 Assert.AreEqual(1.05f, P(WeaponType.SPA_M109_UK).ICM, 0.01f, "M109 UK FIRE_DIRECTION_NET");
                 Assert.AreEqual(1.05f, P(WeaponType.SPA_M109_GE).ICM, 0.01f, "M109 GE FIRE_DIRECTION_NET");
-                Assert.AreEqual(1.05f, P(WeaponType.SPA_M109_FR).ICM, 0.01f, "AUF1 FIRE_DIRECTION_NET");
+                Assert.AreEqual(1.05f, P(WeaponType.SPA_AUF1_FR).ICM, 0.01f, "AUF1 FIRE_DIRECTION_NET");
 
                 // Light towed (105mm): bare Artillery, foot MMP 4, GAD 8.
-                AssertGround(WeaponType.ART_LIGHT_WEST, 5, 5, 9, 5, 8, 0);
-                Assert.AreEqual(4, (int)P(WeaponType.ART_LIGHT_WEST).MaxMovementPoints, "Lt towed MMP 4");
+                AssertGround(WeaponType.ART_LIGHT_NATO, 5, 5, 9, 5, 8, 0);
+                Assert.AreEqual(4, (int)P(WeaponType.ART_LIGHT_NATO).MaxMovementPoints, "Lt towed MMP 4");
 
                 // Heavy towed (155mm): Artillery + SA+1.
-                AssertGround(WeaponType.ART_HEAVY_WEST, 5, 5, 10, 5, 8, 0);
+                AssertGround(WeaponType.ART_HEAVY_NATO, 5, 5, 10, 5, 8, 0);
 
                 // MLRS: tracked rocket artillery — SELF_PROPELLED + ROCKET_ARTILLERY + SMART_MUNITION (analog of BM-27)
                 // + FIRE_DIRECTION_NET (artillery ruling 9, 2026-08-22).
@@ -222,7 +222,7 @@ namespace HammerAndSickle.Tests
                 Assert.AreEqual(3, (int)P(WeaponType.HEL_AH64_US).SpottingRange, "AH-64 SR 3");
 
                 // AH-1 Cobra: SACLOS TOW + cannon + rockets, = Mi-24D minus armor.
-                AssertGround(WeaponType.HEL_AH1, 11, 6, 13, 7, 10, 0);
+                AssertGround(WeaponType.HEL_AH1_US, 11, 6, 13, 7, 10, 0);
 
                 // Bo-105: light AT helo (HOT only).
                 AssertGround(WeaponType.HEL_BO105_GE, 11, 6, 10, 7, 10, 0);
@@ -350,14 +350,14 @@ namespace HammerAndSickle.Tests
             try
             {
                 // Tornado IDS: heavy interdictor — MULTIROLE_STRIKE + LASER_GUIDED + HEAVY_PAYLOAD + RUNWAY_CRATERING.
-                AssertAir(WeaponType.FGT_TORNADO_IDS_UK, 12, 11, 10, 7, 8);
-                Assert.AreEqual(9, (int)P(WeaponType.FGT_TORNADO_IDS_UK).OrdinanceLoad, "Tornado IDS OL 9");
-                Assert.AreEqual(20, P(WeaponType.FGT_TORNADO_IDS_UK).OcSuppressionBonus, "Tornado IDS runway cratering");
+                AssertAir(WeaponType.FGT_TORNADO_UK, 12, 11, 10, 7, 8);
+                Assert.AreEqual(9, (int)P(WeaponType.FGT_TORNADO_UK).OrdinanceLoad, "Tornado IDS OL 9");
+                Assert.AreEqual(20, P(WeaponType.FGT_TORNADO_UK).OcSuppressionBonus, "Tornado IDS runway cratering");
 
                 // Tornado GR.1: lighter UK strike variant (no HEAVY_PAYLOAD → OL6).
-                AssertAir(WeaponType.FGT_TORNADO_GR1_US, 13, 11, 10, 7, 8);
-                Assert.AreEqual(6, (int)P(WeaponType.FGT_TORNADO_GR1_US).OrdinanceLoad, "Tornado GR.1 OL 6");
-                Assert.AreEqual(20, P(WeaponType.FGT_TORNADO_GR1_US).OcSuppressionBonus, "Tornado GR.1 runway cratering");
+                AssertAir(WeaponType.FGT_TORNADO_GE, 13, 11, 10, 7, 8);
+                Assert.AreEqual(6, (int)P(WeaponType.FGT_TORNADO_GE).OrdinanceLoad, "Tornado GR.1 OL 6");
+                Assert.AreEqual(20, P(WeaponType.FGT_TORNADO_GE).OcSuppressionBonus, "Tornado GR.1 runway cratering");
 
                 // F-4F: pure interceptor, GA floor 2 (= US F-4).
                 AssertAir(WeaponType.FGT_F4_GE, 10, 9, 12, 8, 2);

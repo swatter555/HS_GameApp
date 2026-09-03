@@ -63,7 +63,8 @@ namespace HammerAndSickle.Models
         NON_COMBATANT, ROCKET_ARTILLERY, EXPORT_DOWNGRADE, RECON_FRAGILE,
 
         // §13 Formation quality (ICM pass 2026-08-22 — closed-bay doctrine: on a unit's SOLE
-        // profile the ICM prices the whole formation, not just the platform; see todo_icm.md)
-        COMBINED_ARMS_TF, NATO_FIRST_LINE, AIR_CAVALRY, FIRE_DIRECTION_NET
+        // profile the ICM prices the whole formation, not just the platform; see todo_icm.md).
+        // SECOND_LINE_FORMATION is the layer's only sub-1.0 member (roster expansion RE-4, 2026-09-02).
+        COMBINED_ARMS_TF, NATO_FIRST_LINE, AIR_CAVALRY, FIRE_DIRECTION_NET, SECOND_LINE_FORMATION
     }
 }

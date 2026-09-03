@@ -221,6 +221,41 @@ with the guard tests in it.
 
 ## 7. PROGRESS LOG
 
+- **2026-08-29 — T-1, T-2, T-3 + the §6 guard tests LANDED. ✅ SUITE GREEN + Khost loads clean (Bob-run).**
+  T-4/T-5/T-6 remain; the rotation PLAY-check (easterly facings especially) is still queued.
+  - **T-2** — `RegimentIconProfile` collapsed to ONE `Icon` field. `GetDirectionalIcon`, `GetFiringIcon`
+    and `GetAnimationFrame` deleted; `Validate` reduced to two rules; `EquipmentBays.GetIcon` no longer
+    selects a variant. ✅ Verified the §1 trap did NOT bite: all ten `Helo_Animation` profiles carry their
+    `_Frame0` sprite. Confirmed the plan's finding — the three deleted readers had ZERO callers outside
+    the class.
+  - **NEW `GameData.ICON_MOTION_FRAME0_SUFFIX`.** `Prefab_CombatUnitIcon`'s frame-0 suffix was `private`,
+    so the headless validator could not reach it. Rather than spell "_Frame0" twice, the constant moved to
+    GameData and the prefab now aliases it const-from-const — the compiler enforces they agree.
+  - **T-3** — all **184** declarations rewritten mechanically. Counts matched the plan exactly:
+    89 Single · 53 Directional · 32 Directional_Fire · 10 Helo → **174 Single + 10 Helo_Animation**.
+  - **T-1** — `NormalizeDirection` and `ShouldFlipSprite` deleted; the `out bool shouldFlip` parameter and
+    both `flipX = true` writes are gone; the redundant backwards-compat overload deleted. NEW
+    `ApplyIconFacing` rotates **`unitIcon` only, never the root** (§3), sets `flipX = false` explicitly
+    (§2.6), and gates on `unit.IsBase` (R5). `RefreshIconFacing` still re-resolves the SPRITE — deployment
+    position still changes which bay is active — then rotates.
+  - `RegimentIconType` is down to **two members**; `Directional` and `Directional_Fire` deleted.
+  - **NEW `Assets/Tests/EditorTests/IconIntegrityTests.cs` (8 tests)** — closes §2.5, which found that no
+    test touched icons at all. Covers: every profile has an IconProfile · every one passes `Validate` ·
+    none has an empty icon · every helo names its `_Frame0` sprite · the enum holds exactly two members ·
+    the six facings map to their 60° steps · all six rotations are distinct · a base never rotates.
+    A pure `internal static GameIconRenderer.IconRotationDegrees(facing, isBase)` seam was extracted so
+    the rotation rule tests headlessly with no MonoBehaviour (`InternalsVisibleTo("EditorTests")` already
+    existed).
+  - ⚠ **CALIBRATION OWED — `ICON_HEADING_OFFSET_DEGREES` is 0f, meaning the art is assumed to point WEST.**
+    That matches the pre-pass `_W` sprites the declarations now use, but §3 says take the real heading from
+    Bob's first converted sprite rather than guessing. If the new art points elsewhere, change that ONE
+    constant; `RotationForFacing` is pure hex geometry and stays correct.
+  - ⚠ **T-4 IS DELIBERATELY NOT DONE, and the ordering matters.** Renaming the ~250 `SpriteManager`
+    constants to suffix-free names would break every sprite lookup until Bob's PNGs are renamed (T-5).
+    The current state is coherent and playable: each profile points at its old `_W` constant, which still
+    resolves to a real file, and the renderer now ROTATES it — which is the intended behaviour, just with
+    pre-pass art. T-4 and T-5 land together.
+
 - 2026-08-27 (final check, pre-restart) — **Two corrections from the last verification pass.** (a) §2.1
   was WRONG: firing art DOES render — `GetIcon` routes `Directional_Fire` to the `_F` sprite for dug-in
   postures; the grep that "proved" it dead excluded the file the caller lives in. R1 stands, but the cost

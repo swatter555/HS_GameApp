@@ -661,12 +661,18 @@ namespace HammerAndSickle.Core.GameData
     /// <summary>
     /// The number of icon sprites needed by the Regiment
     /// </summary>
+    /// <summary>
+    /// How a profile's art is resolved. TWO members since the top-down icon pass (2026-08-29):
+    /// every unit has ONE sprite, rotated to facing by the renderer.
+    ///
+    /// ⚠ The old <c>Directional</c> and <c>Directional_Fire</c> members are DELETED, along with the
+    /// per-facing and firing variant art. Do not reintroduce them: facing is a transform rotation now,
+    /// and a dug-in unit's posture reads off the deployment chevron rather than a separate sprite.
+    /// </summary>
     public enum RegimentIconType
     {
-        Single,           // Typically weapons systems that are unloaded off a transport.
-        Directional,      // Vehicles that can face multiple directions (W, NW, SW).
-        Directional_Fire, // Same as above, by with separate firing icon.
-        Helo_Animation    // Helo animations have 6 frames.
+        Single,           // One sprite, rotated to facing. The default and the overwhelming majority.
+        Helo_Animation    // One sprite too — but its name ends in _Frame0 and the flipbook derives 1-5.
     }
 
     /// <summary>
@@ -902,12 +908,12 @@ namespace HammerAndSickle.Core.GameData
         // SPA
         SPA_M109_US,
         SPA_M109_GE,
-        SPA_M109_FR,
+        SPA_AUF1_FR,
         SPA_M109_UK,
 
         // Artillery
-        ART_LIGHT_WEST,
-        ART_HEAVY_WEST,
+        ART_LIGHT_NATO,
+        ART_HEAVY_NATO,
 
         // Rocket
         ROC_MLRS_US,
@@ -922,12 +928,13 @@ namespace HammerAndSickle.Core.GameData
         SPSAM_CROTALE_FR,
 
         // Trucks
-        TRK_WEST,
+        TRK_GEN_NATO,
 
         // Helicopters
         HEL_AH64_US,
         HEL_UH60_US,
         HEL_BO105_GE,
+        HEL_AH1_US,
 
         // Jets
         AWACS_E3_US,
@@ -935,8 +942,8 @@ namespace HammerAndSickle.Core.GameData
         FGT_F4_US,
         FGT_F16_US,
         FGT_F14_US,
-        FGT_TORNADO_IDS_UK,
-        FGT_TORNADO_GR1_US,
+        FGT_TORNADO_UK,
+        FGT_TORNADO_GE,
         FGT_F4_GE,
         FGT_MIRAGE2000_FR,
         FGT_MIRAGEF1_FR,
@@ -970,7 +977,7 @@ namespace HammerAndSickle.Core.GameData
         // WEAPON PROFILE, not of the unit template — so a nation gets its own profile exactly where
         // that profile's census IS its brigade roster, and shares everything else. The armoured and
         // mechanised brigades are those two places. Dutch/Belgian/Danish artillery, recon, air defence
-        // and air units deliberately reuse ART_HEAVY_WEST / RCN_FV105_UK / SAM_HAWK_US / FGT_F16_US:
+        // and air units deliberately reuse ART_HEAVY_NATO / RCN_FV105_UK / SAM_HAWK_US / FGT_F16_US:
         // minting a token per nation per role would have added twelve more names the scenario editor
         // must mirror forever, to differentiate rosters nobody reads apart.
 
@@ -1048,33 +1055,32 @@ namespace HammerAndSickle.Core.GameData
         #region Chinese Units
 
         // MBT
-        TANK_TYPE59, // Chinese T-54 variant
-        TANK_TYPE80, // Chinese T-62 variant
-        TANK_TYPE95, // Fictional Chinese T-80 variant
+        TANK_TYPE59_CH, // Chinese T-54 variant
+        TANK_TYPE80_CH, // Chinese T-62 variant
 
         // IFV
-        IFV_TYPE86,   // Chinese BMP variant
+        IFV_TYPE86_CH,   // Chinese BMP variant
 
         // SPA
         ART_LIGHT_CH,
         ART_HEAVY_CH,
-        SPA_TYPE82,   // Chinese SPA similar to 2S1
+        SPA_TYPE83_CH,   // Chinese SPA similar to 2S1
 
         // Rocket
-        ROC_PHZ89,     // Chinese MLRS similar to BM-21
+        ROC_PHZ89_CH,     // Chinese MLRS similar to BM-21
 
         // AAA and Air Defense
-        SPSAM_HQ7,        // Chinese SAM similar to SA-2
-        SPAAA_TYPE53,     // Chinese AAA similar to ZSU-57
+        SPSAM_HQ7_CH,        // Chinese SAM similar to SA-2
+        SPAAA_TYPE53_CH,     // Chinese AAA similar to ZSU-57
 
         // Helicopters
-        HEL_H9,
+        HEL_Z9_CH,
 
         // Jets
-        FGT_J7,        // Chinese MiG-21 variant
-        FGT_J8,        // Chinese MiG-23 variant
-        ATT_Q5,        // Chinese Su-17 variant
-        BMB_H6,        // Chinese Tu-16 variant
+        FGT_J7_CH,        // Chinese MiG-21 variant
+        FGT_J8_CH,        // Chinese MiG-23 variant
+        ATT_Q5_CH,        // Chinese Su-17 variant
+        BMB_H6_CH,        // Chinese Tu-16 variant
 
         // Personnel
         INF_REG_CH,
@@ -1091,7 +1097,7 @@ namespace HammerAndSickle.Core.GameData
 
         // IFVs and APCs
         IFV_AMX10P,
-        APC_FV432,
+        APC_FV432_UK,
 
         // Self-Propelled Artillery
         SPA_AUF1,
@@ -1128,7 +1134,6 @@ namespace HammerAndSickle.Core.GameData
         AT_RecoilessRifle,
 
         // Helicopters
-        HEL_AH1,
         HEL_LYNX,
         HEL_OH58,
 
@@ -1592,6 +1597,21 @@ namespace HammerAndSickle.Core.GameData
 
         #endregion // Prestige Exceptions
 
+        #region Icon Constants
+
+        /// <summary>
+        /// The suffix that marks a helicopter's first flipbook frame, e.g. "SV_MI8_Frame0".
+        /// ⚠ SINGLE AUTHORITY, and it is public for exactly that reason. Two consumers read it and they
+        /// must never drift: <c>Prefab_CombatUnitIcon</c> derives frames 1-5 by swapping this suffix at
+        /// runtime, and <c>RegimentIconProfile.Validate</c> refuses a Helo_Animation profile whose icon
+        /// does not end in it. That naming convention IS the flipbook contract — there is no frame array
+        /// on the profile (top-down icon pass, 2026-08-29), so the name is the only thing carrying frames
+        /// 1-5. Do not re-spell it anywhere.
+        /// </summary>
+        public const string ICON_MOTION_FRAME0_SUFFIX = "_Frame0";
+
+        #endregion // Icon Constants
+
         #region File Constants
 
         public const string MANIFEST_EXTENSION = ".manifest";
@@ -1675,7 +1695,39 @@ namespace HammerAndSickle.Core.GameData
         // depot's DaysSupply to Max, so a half-spent depot reloaded FULL — the generic DaysSupply copy
         // is now simply correct. No migration step — pre-1.0 clean break (the floor refuses v8 saves,
         // and none exist: SaveLoad still has zero callers). AI2b-3 still takes its own bump (10+).
-        public const int SAVE_VERSION = 9;
+        //
+        // 9 → 10 (2026-08-29, RE-1a of the roster expansion — plan `Planning Docs/Roster Expansion.md`
+        // §2): a batch of WeaponType RENAMES. Persisted enums serialize BY NAME (CLAUDE.md §2.11), so a
+        // rename silently breaks every save and content file that carries the old spelling — which is
+        // exactly why it is a version event rather than a free edit.
+        //   · FGT_TORNADO_IDS_UK → FGT_TORNADO_UK and FGT_TORNADO_GR1_US → FGT_TORNADO_GE. The two
+        //     Tornado profiles were authored as BRITISH variants and the German squadron later borrowed
+        //     the spare, so the type names disagreed with the templates they served. GR.1 is the RAF
+        //     designation for the IDS; each profile now names its nation, carries that nation's
+        //     designation and draws that nation's art. ⚠ NO STAT LINE MOVED — Germany keeps DF13/OL6 on
+        //     UpgradePath.ATT, the UK keeps DF12/OL9 with HEAVY_PAYLOAD on UpgradePath.FGT.
+        //   · SPA_M109_FR → SPA_AUF1_FR (the profile is an AUF1 on an AMX-30 hull, not an M109).
+        //   · APC_FV432 → APC_FV432_UK and HEL_AH1 → HEL_AH1_US (both lacked a nation suffix).
+        //   · ART_LIGHT_WEST / ART_HEAVY_WEST / TRK_WEST → *_NATO. `WEST` was the only non-nation
+        //     suffix in the enum, and these three now serve the Lowlands as an explicit NATO set.
+        //   · Thirteen Chinese types gain `_CH` (TANK_TYPE59/80, IFV_TYPE86, SPAAA_TYPE53, SPSAM_HQ7,
+        //     ROC_PHZ89, FGT_J7/J8, ATT_Q5, BMB_H6) — INF_REG_CH and ART_LIGHT_CH already had one, so
+        //     China disagreed with itself. Two carry a model correction with the suffix:
+        //     SPA_TYPE82 → SPA_TYPE83_CH (the Type 82 is a 130mm MRL; the mid-80s SPH is the PLZ-83)
+        //     and HEL_H9 → HEL_Z9_CH ("H" is Hongzhaji, bomber — there is no H-9 helicopter; the real
+        //     aircraft is the Harbin Z-9).
+        //   · TANK_TYPE95 DELETED outright, profile and template with it. No such tank exists — the
+        //     enum comment called it "Fictional Chinese T-80 variant" and China's next MBTs after the
+        //     Type 80 were the Type 96 (1997) and Type 99 (2001).
+        // Two templates were deleted as content errors in the same pass: `UK_AIR_DEFENSE_REGIMENT`
+        // (Britain never operated the M163 Vulcan — its SHORAD was Rapier plus Blowpipe/Javelin; the
+        // SPAAA_M163_US profile stays, America keeps it) and `IR_SAM_REGIMENT` (Iran never operated the
+        // SA-2; it was Hawk- and Rapier-equipped, the S-75 was Iraq's).
+        // No migration step — pre-1.0 clean break, and the floor refuses v9 saves before the ladder is
+        // entered. ⚠ TRN_AN8_SV → TRN_AN12_SV is deliberately NOT in this batch: it is the ONE renamed
+        // type present in shipped content (`khost.oob`), so it rides the next editor re-export as its
+        // own bump. AI2b-3 still takes its own (11+).
+        public const int SAVE_VERSION = 10;
 
         #endregion
 

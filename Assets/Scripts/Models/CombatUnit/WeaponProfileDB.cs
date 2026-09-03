@@ -1,4 +1,4 @@
-﻿// =============================================================================
+// =============================================================================
 // WeaponProfileDB.cs
 // =============================================================================
 //
@@ -183,6 +183,102 @@ namespace HammerAndSickle.Models
 
         #endregion // Public Methods
 
+        #region Commodity Profile Blueprints
+
+        /* ═══════════════════════════════════════════════════════════════════════════════════════════
+         * COMMODITY EQUIPMENT — one authored stat line, many national profiles.
+         *
+         * ⚠ WHY THESE EXIST (roster expansion RE-3, 2026-08-29). Bob's rule is that every nation gets
+         * its own ARTWORK for towed artillery, towed AAA and trucks — and in this codebase art lives on
+         * the profile, so unique art means a profile per nation. That is fine; the per-nation profile
+         * split already exists everywhere else (four Leopard 1 profiles share one sprite). What is NOT
+         * fine is copying the STAT LINE eleven times.
+         *
+         * And this is not a hypothetical: before this refactor, ART_LIGHT_NATO, ART_LIGHT_ARAB and
+         * ART_LIGHT_CH were three byte-identical copies — same archetype, same delta, same traits, same
+         * UpgradePath, same turn — and their own comments admitted it ("the same gun for anyone",
+         * "identical to the Soviet light towed line"). Going per-nation without a blueprint would have
+         * taken one gun to ten hand-maintained copies, which is the exact shape of defect this project
+         * has already eaten twice (four disagreeing is-fixed-wing lists; two spellings of the hex
+         * geometry).
+         *
+         * ⚠ A towed howitzer is the same gun for anyone. Nationality changes the PICTURE, the CENSUS
+         * and the availability TURN — never the ballistics. So the turn is a parameter (Soviet artillery
+         * is authored at 60, everyone else at 144) and the census stays hand-authored per nation,
+         * because a census genuinely IS national: it names that nation's own equipment.
+         *
+         * ⚠ NOT EVERY TOWED PIECE IS A COMMODITY. The Mujahideen light artillery and AAA are deliberate
+         * IRREGULAR variants (SA-3/GAD+2/IR MINIMUM, and GAT-2/GAD-2 respectively) — captured, worn,
+         * badly served kit. They stay hand-authored and must NOT be folded in here.
+         * ═══════════════════════════════════════════════════════════════════════════════════════════ */
+
+        /// <summary>
+        /// Light towed artillery — 105mm-class, foot-mobile, short indirect reach, air-droppable and
+        /// helo-liftable. The line every nation's light gun resolves from.
+        /// </summary>
+        private static ProfileDef LightTowedArtilleryDef(params WeaponTrait[] extraTraits) => new(
+            FamilyArchetypes.Artillery,
+            new Dictionary<ProfileStat, int> { { ProfileStat.IR, GameData.INDIRECT_RANGE_SHORT } },
+            Plus(new[] { WeaponTrait.AIR_DROPPABLE, WeaponTrait.HELO_TRANSPORTABLE }, extraTraits));
+
+        /// <summary>
+        /// Heavy towed artillery — 152/155mm-class: harder-hitting (SA+1) and longer-reaching than the
+        /// light line, and too heavy to air-drop or sling, hence no lift traits.
+        /// </summary>
+        private static ProfileDef HeavyTowedArtilleryDef(params WeaponTrait[] extraTraits) => new(
+            FamilyArchetypes.Artillery,
+            new Dictionary<ProfileStat, int>
+            {
+                { ProfileStat.SA, 1 },
+                { ProfileStat.IR, GameData.INDIRECT_RANGE_MEDIUM }
+            },
+            Plus(System.Array.Empty<WeaponTrait>(), extraTraits));
+
+        /// <summary>
+        /// Towed anti-aircraft artillery — ZU-23-class emplacement. Weaker than its self-propelled
+        /// cousins across the board and reaching only the §11.8.2d gun band, but light enough to fly
+        /// both ways (census A, Bob 2026-08-08).
+        /// </summary>
+        private static ProfileDef TowedAaaDef(params WeaponTrait[] extraTraits) => new(
+            FamilyArchetypes.Aaa,
+            new Dictionary<ProfileStat, int>
+            {
+                { ProfileStat.HA, -1 },
+                { ProfileStat.SA, -1 },
+                { ProfileStat.GAT, -1 },
+                { ProfileStat.IR, GameData.INDIRECT_RANGE_AAA }
+            },
+            Plus(new[] { WeaponTrait.AIR_DROPPABLE, WeaponTrait.HELO_TRANSPORTABLE }, extraTraits));
+
+        /// <summary>
+        /// Generic transport truck — the bare Truck archetype, non-combatant. Identical for everyone;
+        /// only the paint differs.
+        /// </summary>
+        private static ProfileDef TransportTruckDef(params WeaponTrait[] extraTraits) => new(
+            FamilyArchetypes.Truck,
+            new Dictionary<ProfileStat, int>(),
+            Plus(new[] { WeaponTrait.NON_COMBATANT }, extraTraits));
+
+        /// <summary>
+        /// Appends a nation's own traits to a blueprint's base list. Exists so a commodity profile can
+        /// still carry something national (RE-4's SECOND_LINE_FORMATION is the first case) without
+        /// forking the shared stat line — which is the whole point of the blueprints.
+        /// ⚠ A truck or APC ridden in a Mobile/Embarked bay must NOT be handed a formation-quality
+        /// trait: the ICM prices the formation on the SOLE profile only (closed-bay doctrine).
+        /// Array-based rather than Linq so the blueprints stay allocation-cheap.
+        /// </summary>
+        private static WeaponTrait[] Plus(WeaponTrait[] baseTraits, WeaponTrait[] extraTraits)
+        {
+            if (extraTraits == null || extraTraits.Length == 0) return baseTraits;
+
+            var combined = new WeaponTrait[baseTraits.Length + extraTraits.Length];
+            System.Array.Copy(baseTraits, combined, baseTraits.Length);
+            System.Array.Copy(extraTraits, 0, combined, baseTraits.Length, extraTraits.Length);
+            return combined;
+        }
+
+        #endregion // Commodity Profile Blueprints
+
         #region Private Methods
 
         /// <summary>
@@ -273,11 +369,9 @@ namespace HammerAndSickle.Models
             T55A.AddIntelReportStat(WeaponType.MANPAD_STRELA,    12);
 
             // Handle the icon profile.
-            T55A.IconProfile = new RegimentIconProfile(RegimentIconType.Directional)
+            T55A.IconProfile = new RegimentIconProfile(RegimentIconType.Single)
             {
-                W = SpriteManager.SV_T55A_W,
-                NW = SpriteManager.SV_T55A_NW,
-                SW = SpriteManager.SV_T55A_SW
+                Icon = SpriteManager.SV_T55A_W
             };
 
 
@@ -317,11 +411,9 @@ namespace HammerAndSickle.Models
             T62A.AddIntelReportStat(WeaponType.MANPAD_STRELA,       12);
 
             // Handle the icon profile.
-            T62A.IconProfile = new RegimentIconProfile(RegimentIconType.Directional)
+            T62A.IconProfile = new RegimentIconProfile(RegimentIconType.Single)
             {
-                W = SpriteManager.SV_T62_W,
-                NW = SpriteManager.SV_T62_NW,
-                SW = SpriteManager.SV_T62_SW
+                Icon = SpriteManager.SV_T62_W
             };
 
             // Add the T-62A profile to the database
@@ -361,11 +453,9 @@ namespace HammerAndSickle.Models
             T64A.AddIntelReportStat(WeaponType.MANPAD_STRELA,       12);
 
             // Handle the icon profile.
-            T64A.IconProfile = new RegimentIconProfile(RegimentIconType.Directional)
+            T64A.IconProfile = new RegimentIconProfile(RegimentIconType.Single)
             {
-                W = SpriteManager.SV_T64A_W,
-                NW = SpriteManager.SV_T64A_NW,
-                SW = SpriteManager.SV_T64A_SW
+                Icon = SpriteManager.SV_T64A_W
             };
 
             // Add the T-64A profile to the database
@@ -407,11 +497,9 @@ namespace HammerAndSickle.Models
             T64B.AddIntelReportStat(WeaponType.MANPAD_STRELA,       12);
 
             // Handle the icon profile.
-            T64B.IconProfile = new RegimentIconProfile(RegimentIconType.Directional)
+            T64B.IconProfile = new RegimentIconProfile(RegimentIconType.Single)
             {
-                W = SpriteManager.SV_T64B_W,
-                NW = SpriteManager.SV_T64B_NW,
-                SW = SpriteManager.SV_T64B_SW
+                Icon = SpriteManager.SV_T64B_W
             };
 
             // Add the T-64B profile to the database
@@ -453,11 +541,9 @@ namespace HammerAndSickle.Models
             T72A.AddIntelReportStat(WeaponType.MANPAD_STRELA,       12);
 
             // Handle the icon profile.
-            T72A.IconProfile = new RegimentIconProfile(RegimentIconType.Directional)
+            T72A.IconProfile = new RegimentIconProfile(RegimentIconType.Single)
             {
-                W = SpriteManager.SV_T72A_W,
-                NW = SpriteManager.SV_T72A_NW,
-                SW = SpriteManager.SV_T72A_SW
+                Icon = SpriteManager.SV_T72A_W
             };
 
             // Add the T-72A profile to the database
@@ -499,11 +585,9 @@ namespace HammerAndSickle.Models
             T72B.AddIntelReportStat(WeaponType.MANPAD_STRELA,       12);
 
             // Handle the icon profile.
-            T72B.IconProfile = new RegimentIconProfile(RegimentIconType.Directional)
+            T72B.IconProfile = new RegimentIconProfile(RegimentIconType.Single)
             {
-                W = SpriteManager.SV_T72B_W,
-                NW = SpriteManager.SV_T72B_NW,
-                SW = SpriteManager.SV_T72B_SW
+                Icon = SpriteManager.SV_T72B_W
             };
 
             // Add the T-72B profile to the database
@@ -547,11 +631,9 @@ namespace HammerAndSickle.Models
             T80B.AddIntelReportStat(WeaponType.MANPAD_STRELA,       12);
 
             // Handle the icon profile.
-            T80B.IconProfile = new RegimentIconProfile(RegimentIconType.Directional)
+            T80B.IconProfile = new RegimentIconProfile(RegimentIconType.Single)
             {
-                W = SpriteManager.SV_T80B_W,
-                NW = SpriteManager.SV_T80B_NW,
-                SW = SpriteManager.SV_T80B_SW
+                Icon = SpriteManager.SV_T80B_W
             };
 
             // Add the T-80B profile to the database
@@ -594,11 +676,9 @@ namespace HammerAndSickle.Models
             T80U.AddIntelReportStat(WeaponType.MANPAD_STRELA,       12);
 
             // Handle the icon profile.
-            T80U.IconProfile = new RegimentIconProfile(RegimentIconType.Directional)
+            T80U.IconProfile = new RegimentIconProfile(RegimentIconType.Single)
             {
-                W = SpriteManager.SV_T80U_W,
-                NW = SpriteManager.SV_T80U_NW,
-                SW = SpriteManager.SV_T80U_SW
+                Icon = SpriteManager.SV_T80U_W
             };
 
             // Add the T-80U profile to the database
@@ -643,11 +723,9 @@ namespace HammerAndSickle.Models
             T80BV.AddIntelReportStat(WeaponType.MANPAD_STRELA,       12);
 
             // Handle the icon profile.
-            T80BV.IconProfile = new RegimentIconProfile(RegimentIconType.Directional)
+            T80BV.IconProfile = new RegimentIconProfile(RegimentIconType.Single)
             {
-                W = SpriteManager.SV_T80BVM_W,
-                NW = SpriteManager.SV_T80BVM_NW,
-                SW = SpriteManager.SV_T80BVM_SW
+                Icon = SpriteManager.SV_T80BVM_W
             };
 
             // Add the T-80BV profile to the database
@@ -681,11 +759,9 @@ namespace HammerAndSickle.Models
             BMP1.AddIntelReportStat(WeaponType.IFV_BMP1_SV,     129);
 
             // Handle the icon profile.
-            BMP1.IconProfile = new RegimentIconProfile(RegimentIconType.Directional)
+            BMP1.IconProfile = new RegimentIconProfile(RegimentIconType.Single)
             {
-                W = SpriteManager.SV_BMP1_W,
-                NW = SpriteManager.SV_BMP1_NW,
-                SW = SpriteManager.SV_BMP1_SW
+                Icon = SpriteManager.SV_BMP1_W
             };
 
             // Add the BMP-1P profile to the database
@@ -714,11 +790,9 @@ namespace HammerAndSickle.Models
             BMP2.AddIntelReportStat(WeaponType.IFV_BMP2_SV,     129);
 
             // Handle the icon profile.
-            BMP2.IconProfile = new RegimentIconProfile(RegimentIconType.Directional)
+            BMP2.IconProfile = new RegimentIconProfile(RegimentIconType.Single)
             {
-                W = SpriteManager.SV_BMP2_W,
-                NW = SpriteManager.SV_BMP2_NW,
-                SW = SpriteManager.SV_BMP2_SW
+                Icon = SpriteManager.SV_BMP2_W
             };
 
             // Add the BMP-2 profile to the database
@@ -750,11 +824,9 @@ namespace HammerAndSickle.Models
             BMP3.AddIntelReportStat(WeaponType.IFV_BMP3_SV,     129);
 
             // Handle the icon profile.
-            BMP3.IconProfile = new RegimentIconProfile(RegimentIconType.Directional)
+            BMP3.IconProfile = new RegimentIconProfile(RegimentIconType.Single)
             {
-                W = SpriteManager.SV_BMP3_W,
-                NW = SpriteManager.SV_BMP3_NW,
-                SW = SpriteManager.SV_BMP3_SW
+                Icon = SpriteManager.SV_BMP3_W
             };
 
             // Add the BMP-3 profile to the database
@@ -785,11 +857,9 @@ namespace HammerAndSickle.Models
             BMD2.AddIntelReportStat(WeaponType.IFV_BMD2_SV,      68);
 
             // Handle the icon profile.
-            BMD2.IconProfile = new RegimentIconProfile(RegimentIconType.Directional)
+            BMD2.IconProfile = new RegimentIconProfile(RegimentIconType.Single)
             {
-                W = SpriteManager.SV_BMD2_W,
-                NW = SpriteManager.SV_BMD2_NW,
-                SW = SpriteManager.SV_BMD2_SW
+                Icon = SpriteManager.SV_BMD2_W
             };
 
             // Add the BMD-2 profile to the database
@@ -820,11 +890,9 @@ namespace HammerAndSickle.Models
             BMD3.AddIntelReportStat(WeaponType.IFV_BMD3_SV,      68);
 
             // Handle the icon profile.
-            BMD3.IconProfile = new RegimentIconProfile(RegimentIconType.Directional)
+            BMD3.IconProfile = new RegimentIconProfile(RegimentIconType.Single)
             {
-                W = SpriteManager.SV_BMD3_W,
-                NW = SpriteManager.SV_BMD3_NW,
-                SW = SpriteManager.SV_BMD3_SW
+                Icon = SpriteManager.SV_BMD3_W
             };
 
             // Add the BMD-3 profile to the database
@@ -854,11 +922,9 @@ namespace HammerAndSickle.Models
             MTLB.AddIntelReportStat(WeaponType.APC_MTLB_SV,      68);
 
             // Handle the icon profile.
-            MTLB.IconProfile = new RegimentIconProfile(RegimentIconType.Directional)
+            MTLB.IconProfile = new RegimentIconProfile(RegimentIconType.Single)
             {
-                W = SpriteManager.SV_MTLB_W,
-                NW = SpriteManager.SV_MTLB_NW,
-                SW = SpriteManager.SV_MTLB_SW
+                Icon = SpriteManager.SV_MTLB_W
             };
 
             // Mixed family (see FamilyArchetypes) - medium is stated per profile.
@@ -891,11 +957,9 @@ namespace HammerAndSickle.Models
             BTR70.AddIntelReportStat(WeaponType.APC_BTR70_SV,    129);
 
             // Handle the icon profile.
-            BTR70.IconProfile = new RegimentIconProfile(RegimentIconType.Directional)
+            BTR70.IconProfile = new RegimentIconProfile(RegimentIconType.Single)
             {
-                W = SpriteManager.SV_BTR70_W,
-                NW = SpriteManager.SV_BTR70_NW,
-                SW = SpriteManager.SV_BTR70_SW
+                Icon = SpriteManager.SV_BTR70_W
             };
 
             // Mixed family (see FamilyArchetypes) - medium is stated per profile.
@@ -928,11 +992,9 @@ namespace HammerAndSickle.Models
             BTR80.AddIntelReportStat(WeaponType.APC_BTR80_SV,    129);
 
             // Handle the icon profile.
-            BTR80.IconProfile = new RegimentIconProfile(RegimentIconType.Directional)
+            BTR80.IconProfile = new RegimentIconProfile(RegimentIconType.Single)
             {
-                W = SpriteManager.SV_BTR80_W,
-                NW = SpriteManager.SV_BTR80_NW,
-                SW = SpriteManager.SV_BTR80_SW
+                Icon = SpriteManager.SV_BTR80_W
             };
 
             // Mixed family (see FamilyArchetypes) - medium is stated per profile.
@@ -978,11 +1040,9 @@ namespace HammerAndSickle.Models
             BRDM2.AddIntelReportStat(WeaponType.AT_ATGM,          24);
             BRDM2.AddIntelReportStat(WeaponType.MANPAD_STRELA,       12);
             // Handle the icon profile.
-            BRDM2.IconProfile = new RegimentIconProfile(RegimentIconType.Directional)
+            BRDM2.IconProfile = new RegimentIconProfile(RegimentIconType.Single)
             {
-                W = SpriteManager.SV_BRDM2_W,
-                NW = SpriteManager.SV_BRDM2_NW,
-                SW = SpriteManager.SV_BRDM2_SW
+                Icon = SpriteManager.SV_BRDM2_W
             };
 
             // Mixed family (see FamilyArchetypes) - medium is stated per profile.
@@ -1030,11 +1090,9 @@ namespace HammerAndSickle.Models
             BRDM2AT.AddIntelReportStat(WeaponType.MANPAD_STRELA, 12);
 
             // Handle the icon profile.
-            BRDM2AT.IconProfile = new RegimentIconProfile(RegimentIconType.Directional)
+            BRDM2AT.IconProfile = new RegimentIconProfile(RegimentIconType.Single)
             {
-                W = SpriteManager.SV_BRDM2AT_W,
-                NW = SpriteManager.SV_BRDM2AT_NW,
-                SW = SpriteManager.SV_BRDM2AT_SW
+                Icon = SpriteManager.SV_BRDM2AT_W
             };
 
             // Add the BRDM-2 AT profile to the database
@@ -1076,14 +1134,9 @@ namespace HammerAndSickle.Models
             SPA2S1.AddIntelReportStat(WeaponType.MANPAD_STRELA,       21);
 
             // Handle the icon profile.
-            SPA2S1.IconProfile = new RegimentIconProfile(RegimentIconType.Directional_Fire)
+            SPA2S1.IconProfile = new RegimentIconProfile(RegimentIconType.Single)
             {
-                W = SpriteManager.SV_2S1_W,
-                NW = SpriteManager.SV_2S1_NW,
-                SW = SpriteManager.SV_2S1_SW,
-                W_F = SpriteManager.SV_2S1_W_F,
-                NW_F = SpriteManager.SV_2S1_NW_F,
-                SW_F = SpriteManager.SV_2S1_SW_F
+                Icon = SpriteManager.SV_2S1_W
             };
 
             // Add the 2S1 profile to the database
@@ -1117,14 +1170,9 @@ namespace HammerAndSickle.Models
             SPA2S3.AddIntelReportStat(WeaponType.MANPAD_STRELA,       21);
 
             // Handle the icon profile.
-            SPA2S3.IconProfile = new RegimentIconProfile(RegimentIconType.Directional_Fire)
+            SPA2S3.IconProfile = new RegimentIconProfile(RegimentIconType.Single)
             {
-                W = SpriteManager.SV_2S3_W,
-                NW = SpriteManager.SV_2S3_NW,
-                SW = SpriteManager.SV_2S3_SW,
-                W_F = SpriteManager.SV_2S3_W_F,
-                NW_F = SpriteManager.SV_2S3_NW_F,
-                SW_F = SpriteManager.SV_2S3_SW_F
+                Icon = SpriteManager.SV_2S3_W
             };
 
             // Add the 2S3 profile to the database
@@ -1159,14 +1207,9 @@ namespace HammerAndSickle.Models
             SPA2S5.AddIntelReportStat(WeaponType.MANPAD_STRELA,       21);
 
             // Handle the icon profile.
-            SPA2S5.IconProfile = new RegimentIconProfile(RegimentIconType.Directional_Fire)
+            SPA2S5.IconProfile = new RegimentIconProfile(RegimentIconType.Single)
             {
-                W = SpriteManager.SV_2S5_W,
-                NW = SpriteManager.SV_2S5_NW,
-                SW = SpriteManager.SV_2S5_SW,
-                W_F = SpriteManager.SV_2S5_W_F,
-                NW_F = SpriteManager.SV_2S5_NW_F,
-                SW_F = SpriteManager.SV_2S5_SW_F
+                Icon = SpriteManager.SV_2S5_W
             };
 
             // Add the 2S5 profile to the database
@@ -1201,14 +1244,9 @@ namespace HammerAndSickle.Models
             SPA2S19.AddIntelReportStat(WeaponType.MANPAD_STRELA,      21);
 
             // Handle the icon profile.
-            SPA2S19.IconProfile = new RegimentIconProfile(RegimentIconType.Directional_Fire)
+            SPA2S19.IconProfile = new RegimentIconProfile(RegimentIconType.Single)
             {
-                W = SpriteManager.SV_2S19_W,
-                NW = SpriteManager.SV_2S19_NW,
-                SW = SpriteManager.SV_2S19_SW,
-                W_F = SpriteManager.SV_2S19_W_F,
-                NW_F = SpriteManager.SV_2S19_NW_F,
-                SW_F = SpriteManager.SV_2S19_SW_F
+                Icon = SpriteManager.SV_2S19_W
             };
 
             // Add the 2S19 profile to the database
@@ -1233,9 +1271,7 @@ namespace HammerAndSickle.Models
             // Capability-only traits, zero statline effect.
             WeaponProfile ArtLight = WeaponProfile.FromProfileDef(
                 "Light Towed Artillery", "Lt Artillery", WeaponType.ART_LIGHT_SV,
-                new ProfileDef(FamilyArchetypes.Artillery,
-                    new Dictionary<ProfileStat, int> { { ProfileStat.IR, GameData.INDIRECT_RANGE_SHORT } },
-                    new[] { WeaponTrait.AIR_DROPPABLE, WeaponTrait.HELO_TRANSPORTABLE }),
+                LightTowedArtilleryDef(),
                 UpgradePath.ART, 60);
 
             // Set the prestige cost for the profile.
@@ -1252,7 +1288,7 @@ namespace HammerAndSickle.Models
             // Handle the icon profile.
             ArtLight.IconProfile = new RegimentIconProfile(RegimentIconType.Single)
             {
-                W = SpriteManager.SV_LightArt
+                Icon = SpriteManager.SV_LightArt
             };
 
             // Add the Light Artillery profile to the database
@@ -1270,9 +1306,7 @@ namespace HammerAndSickle.Models
             // → HA5 HD5 SA10 SD5 GAD8 · ICM 1.00 · MMP4 · IR5 · SR2.
             WeaponProfile ArtHeavy = WeaponProfile.FromProfileDef(
                 "Heavy Towed Artillery", "Hvy Artillery", WeaponType.ART_HEAVY_SV,
-                new ProfileDef(FamilyArchetypes.Artillery,
-                    new Dictionary<ProfileStat, int> { { ProfileStat.IR, GameData.INDIRECT_RANGE_MEDIUM }, { ProfileStat.SA, 1 } },
-                    System.Array.Empty<WeaponTrait>()),
+                HeavyTowedArtilleryDef(),
                 UpgradePath.ART, 60);
 
             // Set the prestige cost for the profile.
@@ -1289,7 +1323,7 @@ namespace HammerAndSickle.Models
             // Handle the icon profile.
             ArtHeavy.IconProfile = new RegimentIconProfile(RegimentIconType.Single)
             {
-                W = SpriteManager.SV_HeavyArt
+                Icon = SpriteManager.SV_HeavyArt
             };
 
             // Add the Heavy Artillery profile to the database
@@ -1328,14 +1362,9 @@ namespace HammerAndSickle.Models
             BM21.AddIntelReportStat(WeaponType.MANPAD_STRELA,       21);
 
             // Handle the icon profile.
-            BM21.IconProfile = new RegimentIconProfile(RegimentIconType.Directional_Fire)
+            BM21.IconProfile = new RegimentIconProfile(RegimentIconType.Single)
             {
-                W = SpriteManager.SV_BM21_W,
-                NW = SpriteManager.SV_BM21_NW,
-                SW = SpriteManager.SV_BM21_SW,
-                W_F = SpriteManager.SV_BM21_W_F,
-                NW_F = SpriteManager.SV_BM21_NW_F,
-                SW_F = SpriteManager.SV_BM21_SW_F
+                Icon = SpriteManager.SV_BM21_W
             };
 
             // Add the BM-21 profile to the database
@@ -1370,14 +1399,9 @@ namespace HammerAndSickle.Models
             BM27.AddIntelReportStat(WeaponType.MANPAD_STRELA,       21);
 
             // Handle the icon profile.
-            BM27.IconProfile = new RegimentIconProfile(RegimentIconType.Directional_Fire)
+            BM27.IconProfile = new RegimentIconProfile(RegimentIconType.Single)
             {
-                W = SpriteManager.SV_BM27_W,
-                NW = SpriteManager.SV_BM27_NW,
-                SW = SpriteManager.SV_BM27_SW,
-                W_F = SpriteManager.SV_BM27_W_F,
-                NW_F = SpriteManager.SV_BM27_NW_F,
-                SW_F = SpriteManager.SV_BM27_SW_F
+                Icon = SpriteManager.SV_BM27_W
             };
 
             // Add the BM-27 profile to the database
@@ -1412,14 +1436,9 @@ namespace HammerAndSickle.Models
             BM30.AddIntelReportStat(WeaponType.MANPAD_STRELA,       21);
 
             // Handle the icon profile.
-            BM30.IconProfile = new RegimentIconProfile(RegimentIconType.Directional_Fire)
+            BM30.IconProfile = new RegimentIconProfile(RegimentIconType.Single)
             {
-                W = SpriteManager.SV_BM30_W,
-                NW = SpriteManager.SV_BM30_NW,
-                SW = SpriteManager.SV_BM30_SW,
-                W_F = SpriteManager.SV_BM30_W_F,
-                NW_F = SpriteManager.SV_BM30_NW_F,
-                SW_F = SpriteManager.SV_BM30_SW_F
+                Icon = SpriteManager.SV_BM30_W
             };
 
             // Add the BM-30 profile to the database
@@ -1456,14 +1475,9 @@ namespace HammerAndSickle.Models
             SCUD.AddIntelReportStat(WeaponType.MANPAD_STRELA,      21);
 
             // Handle the icon profile.
-            SCUD.IconProfile = new RegimentIconProfile(RegimentIconType.Directional_Fire)
+            SCUD.IconProfile = new RegimentIconProfile(RegimentIconType.Single)
             {
-                W = SpriteManager.SV_ScudB_W,
-                NW = SpriteManager.SV_ScudB_NW,
-                SW = SpriteManager.SV_ScudB_SW,
-                W_F = SpriteManager.SV_ScudB_W_F,
-                NW_F = SpriteManager.SV_ScudB_NW_F,
-                SW_F = SpriteManager.SV_ScudB_SW_F
+                Icon = SpriteManager.SV_ScudB_W
             };
 
             // Add the Scud-B profile to the database
@@ -1501,14 +1515,9 @@ namespace HammerAndSickle.Models
             ZSU57.AddIntelReportStat(WeaponType.APC_BTR70_SV,      22);
 
             // Handle the icon profile.
-            ZSU57.IconProfile = new RegimentIconProfile(RegimentIconType.Directional_Fire)
+            ZSU57.IconProfile = new RegimentIconProfile(RegimentIconType.Single)
             {
-                W = SpriteManager.SV_ZSU57_W,
-                NW = SpriteManager.SV_ZSU57_NW,
-                SW = SpriteManager.SV_ZSU57_SW,
-                W_F = SpriteManager.SV_ZSU57_W_F,
-                NW_F = SpriteManager.SV_ZSU57_NW_F,
-                SW_F = SpriteManager.SV_ZSU57_SW_F
+                Icon = SpriteManager.SV_ZSU57_W
             };
 
             // Add the ZSU-57-2 profile to the database
@@ -1541,14 +1550,9 @@ namespace HammerAndSickle.Models
             ZSU23.AddIntelReportStat(WeaponType.APC_BTR70_SV,      22);
 
             // Handle the icon profile.
-            ZSU23.IconProfile = new RegimentIconProfile(RegimentIconType.Directional_Fire)
+            ZSU23.IconProfile = new RegimentIconProfile(RegimentIconType.Single)
             {
-                W = SpriteManager.SV_ZSU23_W,
-                NW = SpriteManager.SV_ZSU23_NW,
-                SW = SpriteManager.SV_ZSU23_SW,
-                W_F = SpriteManager.SV_ZSU23_W_F,
-                NW_F = SpriteManager.SV_ZSU23_NW_F,
-                SW_F = SpriteManager.SV_ZSU23_SW_F
+                Icon = SpriteManager.SV_ZSU23_W
             };
 
             // Add the ZSU-23-4 profile to the database
@@ -1582,14 +1586,9 @@ namespace HammerAndSickle.Models
             Tunguska.AddIntelReportStat(WeaponType.APC_BTR70_SV,     22);
 
             // Handle the icon profile.
-            Tunguska.IconProfile = new RegimentIconProfile(RegimentIconType.Directional_Fire)
+            Tunguska.IconProfile = new RegimentIconProfile(RegimentIconType.Single)
             {
-                W = SpriteManager.SV_2K22_W,
-                NW = SpriteManager.SV_2K22_NW,
-                SW = SpriteManager.SV_2K22_SW,
-                W_F = SpriteManager.SV_2K22_W_F,
-                NW_F = SpriteManager.SV_2K22_NW_F,
-                SW_F = SpriteManager.SV_2K22_SW_F
+                Icon = SpriteManager.SV_2K22_W
             };
 
             // Add the 2K22 Tunguska profile to the database
@@ -1623,14 +1622,9 @@ namespace HammerAndSickle.Models
             Kub.AddIntelReportStat(WeaponType.APC_BTR70_SV,      22);
 
             // Handle the icon profile.
-            Kub.IconProfile = new RegimentIconProfile(RegimentIconType.Directional_Fire)
+            Kub.IconProfile = new RegimentIconProfile(RegimentIconType.Single)
             {
-                W = SpriteManager.SV_2K12_W,
-                NW = SpriteManager.SV_2K12_NW,
-                SW = SpriteManager.SV_2K12_SW,
-                W_F = SpriteManager.SV_2K12_W_F,
-                NW_F = SpriteManager.SV_2K12_NW_F,
-                SW_F = SpriteManager.SV_2K12_SW_F
+                Icon = SpriteManager.SV_2K12_W
             };
 
             // Add the 2K12 Kub profile to the database
@@ -1664,14 +1658,9 @@ namespace HammerAndSickle.Models
             Strela1.AddIntelReportStat(WeaponType.APC_BTR70_SV,     22);
 
             // Handle the icon profile.
-            Strela1.IconProfile = new RegimentIconProfile(RegimentIconType.Directional_Fire)
+            Strela1.IconProfile = new RegimentIconProfile(RegimentIconType.Single)
             {
-                W = SpriteManager.SV_9K31_W,
-                NW = SpriteManager.SV_9K31_NW,
-                SW = SpriteManager.SV_9K31_SW,
-                W_F = SpriteManager.SV_9K31_W_F,
-                NW_F = SpriteManager.SV_9K31_NW_F,
-                SW_F = SpriteManager.SV_9K31_SW_F
+                Icon = SpriteManager.SV_9K31_W
             };
 
             // Add the 9K31 Strela-1 profile to the database
@@ -1709,7 +1698,7 @@ namespace HammerAndSickle.Models
             // Handle the icon profile.
             S75.IconProfile = new RegimentIconProfile(RegimentIconType.Single)
             {
-                W = SpriteManager.SV_S75
+                Icon = SpriteManager.SV_S75
             };
 
             // Add the S-75 Dvina profile to the database
@@ -1745,7 +1734,7 @@ namespace HammerAndSickle.Models
             // Handle the icon profile.
             S125.IconProfile = new RegimentIconProfile(RegimentIconType.Single)
             {
-                W = SpriteManager.SV_S125
+                Icon = SpriteManager.SV_S125
             };
 
             // Add the S-125 Neva profile to the database
@@ -1780,14 +1769,9 @@ namespace HammerAndSickle.Models
             S300.AddIntelReportStat(WeaponType.APC_BTR70_SV,    48);
 
             // Handle the icon profile.
-            S300.IconProfile = new RegimentIconProfile(RegimentIconType.Directional_Fire)
+            S300.IconProfile = new RegimentIconProfile(RegimentIconType.Single)
             {
-                W = SpriteManager.SV_S300_W,
-                NW = SpriteManager.SV_S300_NW,
-                SW = SpriteManager.SV_S300_SW,
-                W_F = SpriteManager.SV_S300_W_F,
-                NW_F = SpriteManager.SV_S300_NW_F,
-                SW_F = SpriteManager.SV_S300_SW_F
+                Icon = SpriteManager.SV_S300_W
             };
 
             // Add the S-300 profile to the database
@@ -1809,10 +1793,7 @@ namespace HammerAndSickle.Models
             // → HA3 HD4 SA8 SD6 GAD12 · GAT10 · MMP4 · IR3 · SR3.
             WeaponProfile AAA_GEN = WeaponProfile.FromProfileDef(
                 "Generic Anti-Aircraft Artillery Emplacement", "Generic AAA", WeaponType.AAA_GEN_SV,
-                new ProfileDef(FamilyArchetypes.Aaa,
-                    new Dictionary<ProfileStat, int> { { ProfileStat.HA, -1 }, { ProfileStat.SA, -1 }, { ProfileStat.GAT, -1 }, { ProfileStat.IR, GameData.INDIRECT_RANGE_AAA } },
-                    // Census A (Bob, 2026-08-08): ZU-23-class towed AAA flies both ways.
-                    new[] { WeaponTrait.AIR_DROPPABLE, WeaponTrait.HELO_TRANSPORTABLE }),
+                TowedAaaDef(),
                 UpgradePath.AAA, 144);
 
             // Set the prestige cost for the profile.
@@ -1827,7 +1808,7 @@ namespace HammerAndSickle.Models
             // Handle the icon profile.
             AAA_GEN.IconProfile = new RegimentIconProfile(RegimentIconType.Single)
             {
-                W = SpriteManager.GEN_AA
+                Icon = SpriteManager.SV_AA
             };
 
             // Add the Generic AAA profile to the database
@@ -1865,12 +1846,7 @@ namespace HammerAndSickle.Models
             // Handle the icon profile.
             MI8T.IconProfile = new RegimentIconProfile(RegimentIconType.Helo_Animation)
             {
-                W = SpriteManager.SV_MI8_Frame0,
-                NW = SpriteManager.SV_MI8_Frame1,
-                SW = SpriteManager.SV_MI8_Frame2,
-                W_F = SpriteManager.SV_MI8_Frame3,
-                NW_F = SpriteManager.SV_MI8_Frame4,
-                SW_F = SpriteManager.SV_MI8_Frame5
+                Icon = SpriteManager.SV_MI8_Frame0
             };
 
             // Add the Mi-8T profile to the database
@@ -1903,12 +1879,7 @@ namespace HammerAndSickle.Models
             // Handle the icon profile.
             MI8AT.IconProfile = new RegimentIconProfile(RegimentIconType.Helo_Animation)
             {
-                W = SpriteManager.SV_MI8AT_Frame0,
-                NW = SpriteManager.SV_MI8AT_Frame1,
-                SW = SpriteManager.SV_MI8AT_Frame2,
-                W_F = SpriteManager.SV_MI8AT_Frame3,
-                NW_F = SpriteManager.SV_MI8AT_Frame4,
-                SW_F = SpriteManager.SV_MI8AT_Frame5
+                Icon = SpriteManager.SV_MI8AT_Frame0
             };
 
             // Add the Mi-8AT profile to the database
@@ -1940,12 +1911,7 @@ namespace HammerAndSickle.Models
             // Handle the icon profile.
             MI24D.IconProfile = new RegimentIconProfile(RegimentIconType.Helo_Animation)
             {
-                W = SpriteManager.SV_MI24D_Frame0,
-                NW = SpriteManager.SV_MI24D_Frame1,
-                SW = SpriteManager.SV_MI24D_Frame2,
-                W_F = SpriteManager.SV_MI24D_Frame3,
-                NW_F = SpriteManager.SV_MI24D_Frame4,
-                SW_F = SpriteManager.SV_MI24D_Frame5
+                Icon = SpriteManager.SV_MI24D_Frame0
             };
 
             // Add the Mi-24D profile to the database
@@ -1977,12 +1943,7 @@ namespace HammerAndSickle.Models
             // Handle the icon profile.
             MI24V.IconProfile = new RegimentIconProfile(RegimentIconType.Helo_Animation)
             {
-                W = SpriteManager.SV_MI24V_Frame0,
-                NW = SpriteManager.SV_MI24V_Frame1,
-                SW = SpriteManager.SV_MI24V_Frame2,
-                W_F = SpriteManager.SV_MI24V_Frame3,
-                NW_F = SpriteManager.SV_MI24V_Frame4,
-                SW_F = SpriteManager.SV_MI24V_Frame5
+                Icon = SpriteManager.SV_MI24V_Frame0
             };
 
             // Add the Mi-24V profile to the database
@@ -2014,12 +1975,7 @@ namespace HammerAndSickle.Models
             // Handle the icon profile.
             MI28.IconProfile = new RegimentIconProfile(RegimentIconType.Helo_Animation)
             {
-                W = SpriteManager.SV_MI28_Frame0,
-                NW = SpriteManager.SV_MI28_Frame1,
-                SW = SpriteManager.SV_MI28_Frame2,
-                W_F = SpriteManager.SV_MI28_Frame3,
-                NW_F = SpriteManager.SV_MI28_Frame4,
-                SW_F = SpriteManager.SV_MI28_Frame5
+                Icon = SpriteManager.SV_MI28_Frame0
             };
 
             // Add the Mi-28 profile to the database
@@ -2055,7 +2011,7 @@ namespace HammerAndSickle.Models
             // Handle the icon profile.
             AN12.IconProfile = new RegimentIconProfile(RegimentIconType.Single)
             {
-                W = SpriteManager.SV_AN8
+                Icon = SpriteManager.SV_AN8
             };
 
             // Add the An-12 profile to the database
@@ -2088,7 +2044,7 @@ namespace HammerAndSickle.Models
             // Handle the icon profile.
             A50.IconProfile = new RegimentIconProfile(RegimentIconType.Single)
             {
-                W = SpriteManager.SV_A50
+                Icon = SpriteManager.SV_A50
             };
 
             // Add the A-50 profile to the database
@@ -2118,7 +2074,7 @@ namespace HammerAndSickle.Models
             // Handle the icon profile.
             MIG21.IconProfile = new RegimentIconProfile(RegimentIconType.Single)
             {
-                W = SpriteManager.SV_Mig21
+                Icon = SpriteManager.SV_Mig21
             };
 
             // Add the MiG-21 profile to the database
@@ -2149,7 +2105,7 @@ namespace HammerAndSickle.Models
             // Handle the icon profile.
             MIG23.IconProfile = new RegimentIconProfile(RegimentIconType.Single)
             {
-                W = SpriteManager.SV_Mig23
+                Icon = SpriteManager.SV_Mig23
             };
 
             // Add the MiG-23 profile to the database
@@ -2180,7 +2136,7 @@ namespace HammerAndSickle.Models
             // Handle the icon profile.
             MIG25.IconProfile = new RegimentIconProfile(RegimentIconType.Single)
             {
-                W = SpriteManager.SV_Mig25
+                Icon = SpriteManager.SV_Mig25
             };
 
             // Add the MiG-25 profile to the database
@@ -2213,7 +2169,7 @@ namespace HammerAndSickle.Models
             // Handle the icon profile.
             MIG29.IconProfile = new RegimentIconProfile(RegimentIconType.Single)
             {
-                W = SpriteManager.SV_Mig29
+                Icon = SpriteManager.SV_Mig29
             };
 
             // Add the MiG-29 profile to the database
@@ -2246,7 +2202,7 @@ namespace HammerAndSickle.Models
             // Handle the icon profile.
             MIG31.IconProfile = new RegimentIconProfile(RegimentIconType.Single)
             {
-                W = SpriteManager.SV_Mig31
+                Icon = SpriteManager.SV_Mig31
             };
 
             // Add the MiG-31 profile to the database
@@ -2280,7 +2236,7 @@ namespace HammerAndSickle.Models
             // Handle the icon profile.
             SU27.IconProfile = new RegimentIconProfile(RegimentIconType.Single)
             {
-                W = SpriteManager.SV_SU27
+                Icon = SpriteManager.SV_SU27
             };
 
             // Add the Su-27 profile to the database
@@ -2315,7 +2271,7 @@ namespace HammerAndSickle.Models
             // Handle the icon profile.
             SU47.IconProfile = new RegimentIconProfile(RegimentIconType.Single)
             {
-                W = SpriteManager.SV_SU47
+                Icon = SpriteManager.SV_SU47
             };
 
             // Add the Su-47 profile to the database
@@ -2346,7 +2302,7 @@ namespace HammerAndSickle.Models
             // Handle the icon profile.
             MIG27.IconProfile = new RegimentIconProfile(RegimentIconType.Single)
             {
-                W = SpriteManager.SV_Mig27
+                Icon = SpriteManager.SV_Mig27
             };
 
             // Add the MiG-27 profile to the database
@@ -2377,7 +2333,7 @@ namespace HammerAndSickle.Models
             // Handle the icon profile.
             SU17.IconProfile = new RegimentIconProfile(RegimentIconType.Single)
             {
-                W = SpriteManager.SV_SU17
+                Icon = SpriteManager.SV_SU17
             };
 
             // Add the Su-17 profile to the database
@@ -2408,7 +2364,7 @@ namespace HammerAndSickle.Models
             // Handle the icon profile.
             SU25.IconProfile = new RegimentIconProfile(RegimentIconType.Single)
             {
-                W = SpriteManager.SV_SU25
+                Icon = SpriteManager.SV_SU25
             };
 
             // Add the Su-25 profile to the database
@@ -2439,7 +2395,7 @@ namespace HammerAndSickle.Models
             // Handle the icon profile.
             SU25B.IconProfile = new RegimentIconProfile(RegimentIconType.Single)
             {
-                W = SpriteManager.SV_SU25B
+                Icon = SpriteManager.SV_SU25B
             };
 
             // Add the Su-25B profile to the database
@@ -2473,7 +2429,7 @@ namespace HammerAndSickle.Models
             // Handle the icon profile.
             SU24.IconProfile = new RegimentIconProfile(RegimentIconType.Single)
             {
-                W = SpriteManager.SV_SU24
+                Icon = SpriteManager.SV_SU24
             };
 
             // Add the Su-24 profile to the database
@@ -2504,7 +2460,7 @@ namespace HammerAndSickle.Models
             // Handle the icon profile.
             TU16.IconProfile = new RegimentIconProfile(RegimentIconType.Single)
             {
-                W = SpriteManager.SV_TU16
+                Icon = SpriteManager.SV_TU16
             };
 
             // Add the Tu-16 profile to the database
@@ -2535,7 +2491,7 @@ namespace HammerAndSickle.Models
             // Handle the icon profile.
             TU22.IconProfile = new RegimentIconProfile(RegimentIconType.Single)
             {
-                W = SpriteManager.SV_TU22
+                Icon = SpriteManager.SV_TU22
             };
 
             // Add the Tu-22 profile to the database
@@ -2567,7 +2523,7 @@ namespace HammerAndSickle.Models
             // Handle the icon profile.
             TU22M3.IconProfile = new RegimentIconProfile(RegimentIconType.Single)
             {
-                W = SpriteManager.SV_TU22M3
+                Icon = SpriteManager.SV_TU22M3
             };
 
             // Add the Tu-22M3 profile to the database
@@ -2598,7 +2554,7 @@ namespace HammerAndSickle.Models
             // Handle the icon profile.
             MIG25R.IconProfile = new RegimentIconProfile(RegimentIconType.Single)
             {
-                W = SpriteManager.SV_Mig25R
+                Icon = SpriteManager.SV_Mig25R
             };
 
             // Add the MiG-25R profile to the database
@@ -2618,16 +2574,12 @@ namespace HammerAndSickle.Models
             // → HA3 HD3 SA3 SD3 GAD6 · MMP8 · SR2 · non-combatant.
             WeaponProfile TRK_GEN = WeaponProfile.FromProfileDef(
                 "Generic Transport Truck", "Transport Truck", WeaponType.TRK_GEN_SV,
-                new ProfileDef(FamilyArchetypes.Truck,
-                    new Dictionary<ProfileStat, int>(),
-                    new[] { WeaponTrait.NON_COMBATANT }));
+                TransportTruckDef());
 
             // Handle the icon profile.
-            TRK_GEN.IconProfile = new RegimentIconProfile(RegimentIconType.Directional)
+            TRK_GEN.IconProfile = new RegimentIconProfile(RegimentIconType.Single)
             {
-                W = SpriteManager.SV_Truck_W,
-                NW = SpriteManager.SV_Truck_NW,
-                SW = SpriteManager.SV_Truck_SW
+                Icon = SpriteManager.SV_Truck_W
             };
 
             // Add the Truck profile to the database
@@ -2652,7 +2604,7 @@ namespace HammerAndSickle.Models
             // Handle the icon profile.
             NAVAL.IconProfile = new RegimentIconProfile(RegimentIconType.Single)
             {
-                W = SpriteManager.GEN_NavalTransport
+                Icon = SpriteManager.GEN_NavalTransport
             };
 
             // Add the Naval Transport profile to the database
@@ -2705,7 +2657,7 @@ namespace HammerAndSickle.Models
             // Handle the icon profile.
             INF_REG.IconProfile = new RegimentIconProfile(RegimentIconType.Single)
             {
-                W = SpriteManager.SV_Regulars
+                Icon = SpriteManager.SV_Regulars
             };
 
             // Add the Regular Infantry profile to the database
@@ -2737,7 +2689,7 @@ namespace HammerAndSickle.Models
             // Handle the icon profile.
             INF_AB.IconProfile = new RegimentIconProfile(RegimentIconType.Single)
             {
-                W = SpriteManager.SV_Airborne
+                Icon = SpriteManager.SV_Airborne
             };
 
             // Add the Airborne Infantry profile to the database
@@ -2773,7 +2725,7 @@ namespace HammerAndSickle.Models
             // Handle the icon profile.
             INF_AM.IconProfile = new RegimentIconProfile(RegimentIconType.Single)
             {
-                W = SpriteManager.SV_AirMobile
+                Icon = SpriteManager.SV_AirMobile
             };
 
             // Add the Air-Mobile Infantry profile to the database
@@ -2812,7 +2764,7 @@ namespace HammerAndSickle.Models
             // Note- No Marines-specific sprite exists yet.
             INF_MAR.IconProfile = new RegimentIconProfile(RegimentIconType.Single)
             {
-                W = SpriteManager.SV_Marines
+                Icon = SpriteManager.SV_Marines
             };
 
             // Add the Marine Infantry profile to the database
@@ -2846,7 +2798,7 @@ namespace HammerAndSickle.Models
             // Handle the icon profile.
             INF_SPEC.IconProfile = new RegimentIconProfile(RegimentIconType.Single)
             {
-                W = SpriteManager.SV_Spetsnaz
+                Icon = SpriteManager.SV_Spetsnaz
             };
 
             // Add the Spetsnaz profile to the database
@@ -2875,7 +2827,7 @@ namespace HammerAndSickle.Models
             // Handle the icon profile.
             INF_ENG.IconProfile = new RegimentIconProfile(RegimentIconType.Single)
             {
-                W = SpriteManager.SV_Engineers
+                Icon = SpriteManager.SV_Engineers
             };
 
             // Add the Combat Engineers profile to the database
@@ -2918,7 +2870,7 @@ namespace HammerAndSickle.Models
             // do not read it as "airbase units render ME art" — they don't.
             BASE_AIRBASE.IconProfile = new RegimentIconProfile(RegimentIconType.Single)
             {
-                W = SpriteManager.ME_Airbase
+                Icon = SpriteManager.ME_Airbase
             };
 
             // Add the Large Base profile to the database
@@ -2943,7 +2895,7 @@ namespace HammerAndSickle.Models
             // Handle the icon profile.
             BASE_DEPOT.IconProfile = new RegimentIconProfile(RegimentIconType.Single)
             {
-                W = SpriteManager.GEN_Depot
+                Icon = SpriteManager.GEN_Depot
             };
 
             // Add the Medium Base profile to the database
@@ -2968,7 +2920,7 @@ namespace HammerAndSickle.Models
             // Handle the icon profile.
             BASE_HQ.IconProfile = new RegimentIconProfile(RegimentIconType.Single)
             {
-                W = SpriteManager.GEN_Base
+                Icon = SpriteManager.GEN_Base
             };
 
             // Add the Small Base profile to the database
@@ -3022,11 +2974,9 @@ namespace HammerAndSickle.Models
             M1_US.AddIntelReportStat(WeaponType.SPAAA_M163_US,      2);  // Vulcan air defense guns
 
             // Handle the icon profile.
-            M1_US.IconProfile = new RegimentIconProfile(RegimentIconType.Directional)
+            M1_US.IconProfile = new RegimentIconProfile(RegimentIconType.Single)
             {
-                W = SpriteManager.US_M1_W,
-                NW = SpriteManager.US_M1_NW,
-                SW = SpriteManager.US_M1_SW
+                Icon = SpriteManager.US_M1_W
             };
 
             // Add the M1 Abrams profile to the database
@@ -3071,11 +3021,9 @@ namespace HammerAndSickle.Models
             M60_US.AddIntelReportStat(WeaponType.SPAAA_M163_US,      4);  // Vulcan air defense guns
 
             // Handle the icon profile.
-            M60_US.IconProfile = new RegimentIconProfile(RegimentIconType.Directional)
+            M60_US.IconProfile = new RegimentIconProfile(RegimentIconType.Single)
             {
-                W = SpriteManager.US_M60_W,
-                NW = SpriteManager.US_M60_NW,
-                SW = SpriteManager.US_M60_SW
+                Icon = SpriteManager.US_M60_W
             };
 
             // Add the M60A3 profile to the database
@@ -3117,11 +3065,9 @@ namespace HammerAndSickle.Models
             LEO1_GE.AddIntelReportStat(WeaponType.ART_120MM_MORTAR,     6);  // 120mm mortars
 
             // Handle the icon profile.
-            LEO1_GE.IconProfile = new RegimentIconProfile(RegimentIconType.Directional)
+            LEO1_GE.IconProfile = new RegimentIconProfile(RegimentIconType.Single)
             {
-                W = SpriteManager.GE_Leopard1_W,
-                NW = SpriteManager.GE_Leopard1_NW,
-                SW = SpriteManager.GE_Leopard1_SW
+                Icon = SpriteManager.GE_Leopard1_W
             };
 
             // Add the Leopard 1 profile to the database
@@ -3162,11 +3108,9 @@ namespace HammerAndSickle.Models
             LEO2_GE.AddIntelReportStat(WeaponType.ART_120MM_MORTAR,     6);  // 120mm mortars
 
             // Handle the icon profile.
-            LEO2_GE.IconProfile = new RegimentIconProfile(RegimentIconType.Directional)
+            LEO2_GE.IconProfile = new RegimentIconProfile(RegimentIconType.Single)
             {
-                W = SpriteManager.GE_Leopard2_W,
-                NW = SpriteManager.GE_Leopard2_NW,
-                SW = SpriteManager.GE_Leopard2_SW
+                Icon = SpriteManager.GE_Leopard2_W
             };
 
             // Add the Leopard 2 profile to the database
@@ -3201,7 +3145,7 @@ namespace HammerAndSickle.Models
             CHALL1_UK.AddIntelReportStat(WeaponType.Personnel,          1000);
             CHALL1_UK.AddIntelReportStat(WeaponType.TANK_CHALLENGER1_UK, 58);  // Armoured regiment (58)
             CHALL1_UK.AddIntelReportStat(WeaponType.IFV_WARRIOR_UK,      13);  // Cross-attached mech company
-            CHALL1_UK.AddIntelReportStat(WeaponType.APC_FV432,            8);  // Command, medical, support vehicles
+            CHALL1_UK.AddIntelReportStat(WeaponType.APC_FV432_UK,            8);  // Command, medical, support vehicles
             CHALL1_UK.AddIntelReportStat(WeaponType.RCN_FV105_UK,         8);  // Reconnaissance troop (CVR(T))
             CHALL1_UK.AddIntelReportStat(WeaponType.AT_ATGM,             15);  // Milan AT (Warrior-mounted + dismounted)
             CHALL1_UK.AddIntelReportStat(WeaponType.MANPAD_JAVELIN,       8);  // Javelin SAM teams
@@ -3209,11 +3153,9 @@ namespace HammerAndSickle.Models
             CHALL1_UK.AddIntelReportStat(WeaponType.ART_81MM_MORTAR,      9);  // 81mm mortars
 
             // Handle the icon profile.
-            CHALL1_UK.IconProfile = new RegimentIconProfile(RegimentIconType.Directional)
+            CHALL1_UK.IconProfile = new RegimentIconProfile(RegimentIconType.Single)
             {
-                W = SpriteManager.UK_Challenger1_W,
-                NW = SpriteManager.UK_Challenger1_NW,
-                SW = SpriteManager.UK_Challenger1_SW
+                Icon = SpriteManager.UK_Challenger1_W
             };
 
             // Add the Challenger 1 profile to the database
@@ -3256,11 +3198,9 @@ namespace HammerAndSickle.Models
             AMX30_FR.AddIntelReportStat(WeaponType.ART_120MM_MORTAR,   18);  // 120mm mortars
 
             // Handle the icon profile.
-            AMX30_FR.IconProfile = new RegimentIconProfile(RegimentIconType.Directional)
+            AMX30_FR.IconProfile = new RegimentIconProfile(RegimentIconType.Single)
             {
-                W = SpriteManager.FR_AMX30_W,
-                NW = SpriteManager.FR_AMX30_NW,
-                SW = SpriteManager.FR_AMX30_SW
+                Icon = SpriteManager.FR_AMX30_W
             };
 
             // Add the AMX-30 profile to the database
@@ -3293,11 +3233,9 @@ namespace HammerAndSickle.Models
             M2_US.AddIntelReportStat(WeaponType.IFV_M2_US,        54);
 
             // Handle the icon profile.
-            M2_US.IconProfile = new RegimentIconProfile(RegimentIconType.Directional)
+            M2_US.IconProfile = new RegimentIconProfile(RegimentIconType.Single)
             {
-                W = SpriteManager.US_M2_W,
-                NW = SpriteManager.US_M2_NW,
-                SW = SpriteManager.US_M2_SW
+                Icon = SpriteManager.US_M2_W
             };
 
             // Add the M2 Bradley profile to the database
@@ -3326,11 +3264,9 @@ namespace HammerAndSickle.Models
             WARRIOR_UK.AddIntelReportStat(WeaponType.IFV_WARRIOR_UK,          45);
 
             // Handle the icon profile.
-            WARRIOR_UK.IconProfile = new RegimentIconProfile(RegimentIconType.Directional)
+            WARRIOR_UK.IconProfile = new RegimentIconProfile(RegimentIconType.Single)
             {
-                W = SpriteManager.UK_Warrior_W,
-                NW = SpriteManager.UK_Warrior_NW,
-                SW = SpriteManager.UK_Warrior_SW
+                Icon = SpriteManager.UK_Warrior_W
             };
 
             // Add the Warrior profile to the database
@@ -3359,11 +3295,9 @@ namespace HammerAndSickle.Models
             MARDER_GE.AddIntelReportStat(WeaponType.IFV_MARDER_GE,     54);
 
             // Handle the icon profile.
-            MARDER_GE.IconProfile = new RegimentIconProfile(RegimentIconType.Directional)
+            MARDER_GE.IconProfile = new RegimentIconProfile(RegimentIconType.Single)
             {
-                W = SpriteManager.GE_Marder_W,
-                NW = SpriteManager.GE_Marder_NW,
-                SW = SpriteManager.GE_Marder_SW
+                Icon = SpriteManager.GE_Marder_W
             };
 
             // Add the Marder profile to the database
@@ -3392,11 +3326,9 @@ namespace HammerAndSickle.Models
             M113_US.AddIntelReportStat(WeaponType.APC_M113_US, 108);
 
             // Handle the icon profile.
-            M113_US.IconProfile = new RegimentIconProfile(RegimentIconType.Directional)
+            M113_US.IconProfile = new RegimentIconProfile(RegimentIconType.Single)
             {
-                W = SpriteManager.US_M113_W,
-                NW = SpriteManager.US_M113_NW,
-                SW = SpriteManager.US_M113_SW
+                Icon = SpriteManager.US_M113_W
             };
 
             // Mixed family (see FamilyArchetypes) - medium is stated per profile.
@@ -3442,11 +3374,9 @@ namespace HammerAndSickle.Models
             HUMVEE_US.AddIntelReportStat(WeaponType.APC_HUMVEE_US, 108);
 
             // Handle the icon profile.
-            HUMVEE_US.IconProfile = new RegimentIconProfile(RegimentIconType.Directional)
+            HUMVEE_US.IconProfile = new RegimentIconProfile(RegimentIconType.Single)
             {
-                W = SpriteManager.US_Humvee_W,
-                NW = SpriteManager.US_Humvee_NW,
-                SW = SpriteManager.US_Humvee_SW
+                Icon = SpriteManager.US_Humvee_W
             };
 
             // Mixed family (see FamilyArchetypes) - medium is stated per profile.
@@ -3480,11 +3410,9 @@ namespace HammerAndSickle.Models
             LVTP7_US.AddIntelReportStat(WeaponType.APC_LVTP7_US, 45);
 
             // Handle the icon profile.
-            LVTP7_US.IconProfile = new RegimentIconProfile(RegimentIconType.Directional)
+            LVTP7_US.IconProfile = new RegimentIconProfile(RegimentIconType.Single)
             {
-                W = SpriteManager.US_LVTP_W,
-                NW = SpriteManager.US_LVTP_NW,
-                SW = SpriteManager.US_LVTP_SW
+                Icon = SpriteManager.US_LVTP_W
             };
 
             // Mixed family (see FamilyArchetypes) - medium is stated per profile.
@@ -3516,11 +3444,9 @@ namespace HammerAndSickle.Models
             VAB_FR.AddIntelReportStat(WeaponType.APC_VAB_FR,   135);
 
             // Handle the icon profile.
-            VAB_FR.IconProfile = new RegimentIconProfile(RegimentIconType.Directional)
+            VAB_FR.IconProfile = new RegimentIconProfile(RegimentIconType.Single)
             {
-                W = SpriteManager.FR_M113_W,
-                NW = SpriteManager.FR_M113_NW,
-                SW = SpriteManager.FR_M113_SW
+                Icon = SpriteManager.FR_M113_W
             };
 
             /* ⚠ TRACKED IS DELIBERATE AND NOT AN ERROR - DO NOT "CORRECT" IT (Bob, 2026-08-04).
@@ -3568,14 +3494,9 @@ namespace HammerAndSickle.Models
             M109_US.AddIntelReportStat(WeaponType.RCN_M3_US,        6);
 
             // Handle the icon profile.
-            M109_US.IconProfile = new RegimentIconProfile(RegimentIconType.Directional_Fire)
+            M109_US.IconProfile = new RegimentIconProfile(RegimentIconType.Single)
             {
-                W = SpriteManager.US_M109_W,
-                NW = SpriteManager.US_M109_NW,
-                SW = SpriteManager.US_M109_SW,
-                W_F = SpriteManager.US_M109_W_F,
-                NW_F = SpriteManager.US_M109_NW_F,
-                SW_F = SpriteManager.US_M109_SW_F
+                Icon = SpriteManager.US_M109_W
             };
 
             // Add the M109 US profile to the database
@@ -3610,14 +3531,9 @@ namespace HammerAndSickle.Models
             M109_GE.AddIntelReportStat(WeaponType.RCN_LUCHS_GE,      6);
 
             // Handle the icon profile.
-            M109_GE.IconProfile = new RegimentIconProfile(RegimentIconType.Directional_Fire)
+            M109_GE.IconProfile = new RegimentIconProfile(RegimentIconType.Single)
             {
-                W = SpriteManager.GE_M109_W,
-                NW = SpriteManager.GE_M109_NW,
-                SW = SpriteManager.GE_M109_SW,
-                W_F = SpriteManager.GE_M109_W_F,
-                NW_F = SpriteManager.GE_M109_NW_F,
-                SW_F = SpriteManager.GE_M109_SW_F
+                Icon = SpriteManager.GE_M109_W
             };
 
             // Add the M109 GE profile to the database
@@ -3635,10 +3551,10 @@ namespace HammerAndSickle.Models
             // → HA5 HD7 SA10 SD7 GAD7 · ICM 1.00 · MMP10 · IR5.
             // Display name → AUF1 (census pass 2026-08-13): the census correctly lists 48 AUF1 —
             // France's SP 155 was the AUF1, not the M109 — so the profile NAME now agrees with it.
-            // WeaponType.SPA_M109_FR is unchanged: persisted-by-name, rename discouraged.
+            // WeaponType.SPA_AUF1_FR is unchanged: persisted-by-name, rename discouraged.
             // + FIRE_DIRECTION_NET (artillery ruling 9, 2026-08-22) → ICM 1.05.
             WeaponProfile M109_FR = WeaponProfile.FromProfileDef(
-                "AUF1 Self-Propelled Artillery", "AUF1", WeaponType.SPA_M109_FR,
+                "AUF1 Self-Propelled Artillery", "AUF1", WeaponType.SPA_AUF1_FR,
                 new ProfileDef(FamilyArchetypes.Artillery,
                     new Dictionary<ProfileStat, int> { { ProfileStat.SA, 1 }, { ProfileStat.IR, GameData.INDIRECT_RANGE_MEDIUM } },
                     new[] { WeaponTrait.SELF_PROPELLED, WeaponTrait.FIRE_DIRECTION_NET }),
@@ -3655,19 +3571,14 @@ namespace HammerAndSickle.Models
             M109_FR.AddIntelReportStat(WeaponType.RCN_ERC90_FR,    6);
 
             // Handle the icon profile. (No dedicated French M109 sprites, using US M109)
-            M109_FR.IconProfile = new RegimentIconProfile(RegimentIconType.Directional_Fire)
+            M109_FR.IconProfile = new RegimentIconProfile(RegimentIconType.Single)
             {
-                W = SpriteManager.US_M109_W,
-                NW = SpriteManager.US_M109_NW,
-                SW = SpriteManager.US_M109_SW,
-                W_F = SpriteManager.US_M109_W_F,
-                NW_F = SpriteManager.US_M109_NW_F,
-                SW_F = SpriteManager.US_M109_SW_F
+                Icon = SpriteManager.US_M109_W
             };
             // Add the M109 FR profile to the database
             // Towed vs self-propelled: the artillery/AAA/SAM families hold both, so medium is per profile.
             M109_FR.SetMovementMedium(MovementMedium.Tracked);
-            AddProfile(WeaponType.SPA_M109_FR, M109_FR);
+            AddProfile(WeaponType.SPA_AUF1_FR, M109_FR);
             //----------------------------------------------
             // French M109 Self-Propelled Artillery
             //----------------------------------------------
@@ -3691,21 +3602,16 @@ namespace HammerAndSickle.Models
             // Intel report stats
             M109_UK.AddIntelReportStat(WeaponType.Personnel, 1050);
             M109_UK.AddIntelReportStat(WeaponType.SPA_M109_UK, 54);
-            M109_UK.AddIntelReportStat(WeaponType.APC_FV432,   48);
+            M109_UK.AddIntelReportStat(WeaponType.APC_FV432_UK,   48);
             // MANPAD_RAPIER → MANPAD_JAVELIN (census pass 2026-08-13, folded in per Bob): Rapier is
             // a towed SAM, not a MANPAD — token retired everywhere; count unchanged (no re-cut here).
             M109_UK.AddIntelReportStat(WeaponType.MANPAD_JAVELIN, 12);
             M109_UK.AddIntelReportStat(WeaponType.RCN_FV105_UK, 6);
 
             // Handle the icon profile.
-            M109_UK.IconProfile = new RegimentIconProfile(RegimentIconType.Directional_Fire)
+            M109_UK.IconProfile = new RegimentIconProfile(RegimentIconType.Single)
             {
-                W = SpriteManager.UK_M109_W,
-                NW = SpriteManager.UK_M109_NW,
-                SW = SpriteManager.UK_M109_SW,
-                W_F = SpriteManager.UK_M109_W_F,
-                NW_F = SpriteManager.UK_M109_NW_F,
-                SW_F = SpriteManager.UK_M109_SW_F
+                Icon = SpriteManager.UK_M109_W
             };
 
             // Add the M109 UK profile to the database
@@ -3726,10 +3632,8 @@ namespace HammerAndSickle.Models
             // Phase 3 (NATO): bare Artillery archetype (105mm towed, foot MMP4), IR short.
             // → HA5 HD5 SA9 SD5 GAD8 · ICM 1.00 · MMP4 · IR4.
             WeaponProfile ArtLightWest = WeaponProfile.FromProfileDef(
-                "Light Towed Artillery", "Lt Artillery", WeaponType.ART_LIGHT_WEST,
-                new ProfileDef(FamilyArchetypes.Artillery,
-                    new Dictionary<ProfileStat, int> { { ProfileStat.IR, GameData.INDIRECT_RANGE_SHORT } },
-                    new[] { WeaponTrait.AIR_DROPPABLE, WeaponTrait.HELO_TRANSPORTABLE }),
+                "Light Towed Artillery", "Lt Artillery", WeaponType.ART_LIGHT_NATO,
+                LightTowedArtilleryDef(),
                 UpgradePath.ART, 144);
 
             // Set the prestige cost for the profile.
@@ -3744,13 +3648,13 @@ namespace HammerAndSickle.Models
             // Handle the icon profile.
             ArtLightWest.IconProfile = new RegimentIconProfile(RegimentIconType.Single)
             {
-                W = SpriteManager.GEN_LightArt
+                Icon = SpriteManager.GEN_LightArt
             };
 
             // Add the Light Artillery profile to the database
             // Towed vs self-propelled: the artillery/AAA/SAM families hold both, so medium is per profile.
             ArtLightWest.SetMovementMedium(MovementMedium.Foot);
-            AddProfile(WeaponType.ART_LIGHT_WEST, ArtLightWest);
+            AddProfile(WeaponType.ART_LIGHT_NATO, ArtLightWest);
             //----------------------------------------------
             // Western Light Towed Artillery
             //----------------------------------------------
@@ -3761,10 +3665,8 @@ namespace HammerAndSickle.Models
             // Phase 3 (NATO): Artillery + SA+1 (155mm calibre), IR medium. Heavy towed (foot MMP4).
             // → HA5 HD5 SA10 SD5 GAD8 · ICM 1.00 · MMP4 · IR5.
             WeaponProfile ArtHeavyWest = WeaponProfile.FromProfileDef(
-                "Heavy Towed Artillery", "Hvy Artillery", WeaponType.ART_HEAVY_WEST,
-                new ProfileDef(FamilyArchetypes.Artillery,
-                    new Dictionary<ProfileStat, int> { { ProfileStat.SA, 1 }, { ProfileStat.IR, GameData.INDIRECT_RANGE_MEDIUM } },
-                    System.Array.Empty<WeaponTrait>()),
+                "Heavy Towed Artillery", "Hvy Artillery", WeaponType.ART_HEAVY_NATO,
+                HeavyTowedArtilleryDef(),
                 UpgradePath.ART, 144);
 
             // Set the prestige cost for the profile.
@@ -3779,13 +3681,13 @@ namespace HammerAndSickle.Models
             // Handle the icon profile.
             ArtHeavyWest.IconProfile = new RegimentIconProfile(RegimentIconType.Single)
             {
-                W = SpriteManager.GEN_HeavyArt
+                Icon = SpriteManager.GEN_HeavyArt
             };
 
             // Add the Heavy Artillery profile to the database
             // Towed vs self-propelled: the artillery/AAA/SAM families hold both, so medium is per profile.
             ArtHeavyWest.SetMovementMedium(MovementMedium.Foot);
-            AddProfile(WeaponType.ART_HEAVY_WEST, ArtHeavyWest);
+            AddProfile(WeaponType.ART_HEAVY_NATO, ArtHeavyWest);
             //----------------------------------------------
             // Western Heavy Towed Artillery
             //----------------------------------------------
@@ -3820,14 +3722,9 @@ namespace HammerAndSickle.Models
             MLRS_US.AddIntelReportStat(WeaponType.RCN_M3_US,        6);
 
             // Handle the icon profile.
-            MLRS_US.IconProfile = new RegimentIconProfile(RegimentIconType.Directional_Fire)
+            MLRS_US.IconProfile = new RegimentIconProfile(RegimentIconType.Single)
             {
-                W = SpriteManager.US_MLRS_W,
-                NW = SpriteManager.US_MLRS_NW,
-                SW = SpriteManager.US_MLRS_SW,
-                W_F = SpriteManager.US_MLRS_W_F,
-                NW_F = SpriteManager.US_MLRS_NW_F,
-                SW_F = SpriteManager.US_MLRS_SW_F
+                Icon = SpriteManager.US_MLRS_W
             };
 
             // Add the MLRS US profile to the database
@@ -3864,14 +3761,9 @@ namespace HammerAndSickle.Models
             M163_US.AddIntelReportStat(WeaponType.MANPAD_STINGER,     12); // Stinger teams (comment fixed 2026-08-13 — said Chaparral)
 
             // Handle the icon profile.
-            M163_US.IconProfile = new RegimentIconProfile(RegimentIconType.Directional_Fire)
+            M163_US.IconProfile = new RegimentIconProfile(RegimentIconType.Single)
             {
-                W = SpriteManager.US_M163_W,
-                NW = SpriteManager.US_M163_NW,
-                SW = SpriteManager.US_M163_SW,
-                W_F = SpriteManager.US_M163_W_F,
-                NW_F = SpriteManager.US_M163_NW_F,
-                SW_F = SpriteManager.US_M163_SW_F
+                Icon = SpriteManager.US_M163_W
             };
 
             // Add the M163 US profile to the database
@@ -3905,14 +3797,9 @@ namespace HammerAndSickle.Models
             Chaparral.AddIntelReportStat(WeaponType.SPAAA_M163_US,  4); // Vulcan air defense guns
 
             // Handle the icon profile.
-            Chaparral.IconProfile = new RegimentIconProfile(RegimentIconType.Directional_Fire)
+            Chaparral.IconProfile = new RegimentIconProfile(RegimentIconType.Single)
             {
-                W = SpriteManager.US_Chaparral_W,
-                NW = SpriteManager.US_Chaparral_NW,
-                SW = SpriteManager.US_Chaparral_SW,
-                W_F = SpriteManager.US_Chaparral_W_F,
-                NW_F = SpriteManager.US_Chaparral_NW_F,
-                SW_F = SpriteManager.US_Chaparral_SW_F
+                Icon = SpriteManager.US_Chaparral_W
             };
 
             // Add the Chaparral profile to the database
@@ -3947,7 +3834,7 @@ namespace HammerAndSickle.Models
             // Handle the icon profile.
             Hawk_US.IconProfile = new RegimentIconProfile(RegimentIconType.Single)
             {
-                W = SpriteManager.US_Hawk
+                Icon = SpriteManager.US_Hawk
             };
 
             // Add the Hawk US profile to the database
@@ -3982,14 +3869,9 @@ namespace HammerAndSickle.Models
             Gepard_GE.AddIntelReportStat(WeaponType.RCN_LUCHS_GE,        12);
 
             // Handle the icon profile.
-            Gepard_GE.IconProfile = new RegimentIconProfile(RegimentIconType.Directional_Fire)
+            Gepard_GE.IconProfile = new RegimentIconProfile(RegimentIconType.Single)
             {
-                W = SpriteManager.GE_Gepard_W,
-                NW = SpriteManager.GE_Gepard_NW,
-                SW = SpriteManager.GE_Gepard_SW,
-                W_F = SpriteManager.GE_Gepard_W_F,
-                NW_F = SpriteManager.GE_Gepard_NW_F,
-                SW_F = SpriteManager.GE_Gepard_SW_F
+                Icon = SpriteManager.GE_Gepard_W
             };
 
             // Add the Gepard GE profile to the database
@@ -4024,14 +3906,9 @@ namespace HammerAndSickle.Models
             Roland_FR.AddIntelReportStat(WeaponType.RCN_ERC90_FR,       12);
 
             // Handle the icon profile.
-            Roland_FR.IconProfile = new RegimentIconProfile(RegimentIconType.Directional_Fire)
+            Roland_FR.IconProfile = new RegimentIconProfile(RegimentIconType.Single)
             {
-                W = SpriteManager.FR_Roland_W,
-                NW = SpriteManager.FR_Roland_NW,
-                SW = SpriteManager.FR_Roland_SW,
-                W_F = SpriteManager.FR_Roland_W_F,
-                NW_F = SpriteManager.FR_Roland_NW_F,
-                SW_F = SpriteManager.FR_Roland_SW_F
+                Icon = SpriteManager.FR_Roland_W
             };
 
             // Add the Roland FR profile to the database
@@ -4066,14 +3943,9 @@ namespace HammerAndSickle.Models
             Crotale.AddIntelReportStat(WeaponType.RCN_ERC90_FR,      12);
 
             // Handle the icon profile. (Using FR Roland sprites)
-            Crotale.IconProfile = new RegimentIconProfile(RegimentIconType.Directional_Fire)
+            Crotale.IconProfile = new RegimentIconProfile(RegimentIconType.Single)
             {
-                W = SpriteManager.US_Chaparral_W,
-                NW = SpriteManager.US_Chaparral_NW,
-                SW = SpriteManager.US_Chaparral_SW,
-                W_F = SpriteManager.US_Chaparral_W_F,
-                NW_F = SpriteManager.US_Chaparral_NW_F,
-                SW_F = SpriteManager.US_Chaparral_SW_F
+                Icon = SpriteManager.US_Chaparral_W
             };
 
             // Add the Crotale profile to the database
@@ -4103,20 +3975,15 @@ namespace HammerAndSickle.Models
             // Intel report stats
             Rapier_SP.AddIntelReportStat(WeaponType.Personnel,      1050);
             Rapier_SP.AddIntelReportStat(WeaponType.SPSAM_RAPIER_UK,     18);
-            Rapier_SP.AddIntelReportStat(WeaponType.APC_FV432,        24);
+            Rapier_SP.AddIntelReportStat(WeaponType.APC_FV432_UK,        24);
             // SPAAA_M163_US 4 deleted (census pass 2026-08-13): US Vulcans inside a UK Rapier
             // regiment — cross-national token, audit §2.5.
             Rapier_SP.AddIntelReportStat(WeaponType.RCN_FV105_UK,     12);
 
             // Handle the icon profile. (No dedicated UK Rapier sprites, using FR Roland)
-            Rapier_SP.IconProfile = new RegimentIconProfile(RegimentIconType.Directional_Fire)
+            Rapier_SP.IconProfile = new RegimentIconProfile(RegimentIconType.Single)
             {
-                W = SpriteManager.US_Chaparral_W,
-                NW = SpriteManager.US_Chaparral_NW,
-                SW = SpriteManager.US_Chaparral_SW,
-                W_F = SpriteManager.US_Chaparral_W_F,
-                NW_F = SpriteManager.US_Chaparral_NW_F,
-                SW_F = SpriteManager.US_Chaparral_SW_F
+                Icon = SpriteManager.US_Chaparral_W
             };
 
             // Add the Tracked Rapier profile to the database
@@ -4154,11 +4021,9 @@ namespace HammerAndSickle.Models
             M3_US.AddIntelReportStat(WeaponType.MANPAD_STINGER,    6);
 
             // Handle the icon profile. (Using M2 Bradley sprites)
-            M3_US.IconProfile = new RegimentIconProfile(RegimentIconType.Directional)
+            M3_US.IconProfile = new RegimentIconProfile(RegimentIconType.Single)
             {
-                W = SpriteManager.US_M2_W,
-                NW = SpriteManager.US_M2_NW,
-                SW = SpriteManager.US_M2_SW
+                Icon = SpriteManager.US_M2_W
             };
 
             // Add the M3 Bradley profile to the database
@@ -4195,11 +4060,9 @@ namespace HammerAndSickle.Models
             LUCHS_GE.AddIntelReportStat(WeaponType.MANPAD_STINGER,    6);
 
             // Handle the icon profile. (Using Marder sprites as stand-in)
-            LUCHS_GE.IconProfile = new RegimentIconProfile(RegimentIconType.Directional)
+            LUCHS_GE.IconProfile = new RegimentIconProfile(RegimentIconType.Single)
             {
-                W = SpriteManager.GE_Luchs_W,
-                NW = SpriteManager.GE_Luchs_NW,
-                SW = SpriteManager.GE_Luchs_SW
+                Icon = SpriteManager.GE_Luchs_W
             };
 
             // Add the Luchs profile to the database
@@ -4230,18 +4093,16 @@ namespace HammerAndSickle.Models
             // Intel stats
             FV105_UK.AddIntelReportStat(WeaponType.Personnel,       600);
             FV105_UK.AddIntelReportStat(WeaponType.RCN_FV105_UK,     36);
-            FV105_UK.AddIntelReportStat(WeaponType.APC_FV432,        12);
+            FV105_UK.AddIntelReportStat(WeaponType.APC_FV432_UK,        12);
             FV105_UK.AddIntelReportStat(WeaponType.AT_ATGM,           8);
             // MANPAD_RAPIER → MANPAD_JAVELIN (census pass 2026-08-13, folded in per Bob): token
             // retired everywhere; count unchanged.
             FV105_UK.AddIntelReportStat(WeaponType.MANPAD_JAVELIN,     6);
 
             // Handle the icon profile. (Using Warrior sprites as stand-in)
-            FV105_UK.IconProfile = new RegimentIconProfile(RegimentIconType.Directional)
+            FV105_UK.IconProfile = new RegimentIconProfile(RegimentIconType.Single)
             {
-                W = SpriteManager.UK_FV105_W,
-                NW = SpriteManager.UK_FV105_NW,
-                SW = SpriteManager.UK_FV105_SW
+                Icon = SpriteManager.UK_FV105_W
             };
 
             // Add the FV105 Sultan profile to the database
@@ -4277,11 +4138,9 @@ namespace HammerAndSickle.Models
             ERC90_FR.AddIntelReportStat(WeaponType.MANPAD_MISTRAL,      6);
 
             // Handle the icon profile. (Using French M113 sprites as stand-in)
-            ERC90_FR.IconProfile = new RegimentIconProfile(RegimentIconType.Directional)
+            ERC90_FR.IconProfile = new RegimentIconProfile(RegimentIconType.Single)
             {
-                W = SpriteManager.FR_ERC90_W,
-                NW = SpriteManager.FR_ERC90_NW,
-                SW = SpriteManager.FR_ERC90_SW
+                Icon = SpriteManager.FR_ERC90_W
             };
 
             // Add the ERC 90 profile to the database
@@ -4322,12 +4181,7 @@ namespace HammerAndSickle.Models
             // Handle the icon profile.
             AH64.IconProfile = new RegimentIconProfile(RegimentIconType.Helo_Animation)
             {
-                W = SpriteManager.US_AH64_Frame0,
-                NW = SpriteManager.US_AH64_Frame1,
-                SW = SpriteManager.US_AH64_Frame2,
-                W_F = SpriteManager.US_AH64_Frame3,
-                NW_F = SpriteManager.US_AH64_Frame4,
-                SW_F = SpriteManager.US_AH64_Frame5
+                Icon = SpriteManager.US_AH64_Frame0
             };
 
             // Add the AH-64 Apache profile to the database
@@ -4359,12 +4213,7 @@ namespace HammerAndSickle.Models
             // Handle the icon profile.
             UH60.IconProfile = new RegimentIconProfile(RegimentIconType.Helo_Animation)
             {
-                W = SpriteManager.US_UH60_Frame0,
-                NW = SpriteManager.US_UH60_Frame1,
-                SW = SpriteManager.US_UH60_Frame2,
-                W_F = SpriteManager.US_UH60_Frame3,
-                NW_F = SpriteManager.US_UH60_Frame4,
-                SW_F = SpriteManager.US_UH60_Frame5
+                Icon = SpriteManager.US_UH60_Frame0
             };
 
             // Add the UH-60 Black Hawk profile to the database
@@ -4397,12 +4246,7 @@ namespace HammerAndSickle.Models
             // Handle the icon profile.
             BO105.IconProfile = new RegimentIconProfile(RegimentIconType.Helo_Animation)
             {
-                W = SpriteManager.GE_BO105_Frame0,
-                NW = SpriteManager.GE_BO105_Frame1,
-                SW = SpriteManager.GE_BO105_Frame2,
-                W_F = SpriteManager.GE_BO105_Frame3,
-                NW_F = SpriteManager.GE_BO105_Frame4,
-                SW_F = SpriteManager.GE_BO105_Frame5
+                Icon = SpriteManager.GE_BO105_Frame0
             };
 
             // Add the Bo 105 profile to the database
@@ -4417,7 +4261,7 @@ namespace HammerAndSickle.Models
             // Phase 3 (NATO): Helicopter + ATGM_HELO_SACLOS (TOW) + CANNON_HELO (20mm) + ROCKET_PODS. = Mi-24D line minus the armor.
             // → HA11 HD6 SA13 SD7 GAD10 · ICM 1.00 · MMP24 · SR3.
             WeaponProfile AH1 = WeaponProfile.FromProfileDef(
-                "AH-1 Cobra Attack Helicopter", "AH-1 Cobra", WeaponType.HEL_AH1,
+                "AH-1 Cobra Attack Helicopter", "AH-1 Cobra", WeaponType.HEL_AH1_US,
                 new ProfileDef(FamilyArchetypes.Helicopter,
                     new Dictionary<ProfileStat, int>(),
                     new[] { WeaponTrait.ATGM_HELO_SACLOS, WeaponTrait.CANNON_HELO, WeaponTrait.ROCKET_PODS }),
@@ -4428,22 +4272,17 @@ namespace HammerAndSickle.Models
 
             // Intel stats
             // Census — air convention: aircraft only, no Personnel (census pass 2026-08-13).
-            AH1.AddIntelReportStat(WeaponType.HEL_AH1,      54);
+            AH1.AddIntelReportStat(WeaponType.HEL_AH1_US,      54);
 
             // Handle the icon profile.
             // Note- No dedicated AH-1 sprites exist yet.
             AH1.IconProfile = new RegimentIconProfile(RegimentIconType.Helo_Animation)
             {
-                W = SpriteManager.US_AH64_Frame0,
-                NW = SpriteManager.US_AH64_Frame1,
-                SW = SpriteManager.US_AH64_Frame2,
-                W_F = SpriteManager.US_AH64_Frame3,
-                NW_F = SpriteManager.US_AH64_Frame4,
-                SW_F = SpriteManager.US_AH64_Frame5
+                Icon = SpriteManager.US_AH64_Frame0
             };
 
             // Add the AH-1 Cobra profile to the database
-            AddProfile(WeaponType.HEL_AH1, AH1);
+            AddProfile(WeaponType.HEL_AH1_US, AH1);
             //----------------------------------------------
             // US AH-1 Cobra Attack Helicopter
             //----------------------------------------------
@@ -4476,7 +4315,7 @@ namespace HammerAndSickle.Models
             // Handle the icon profile.
             F15.IconProfile = new RegimentIconProfile(RegimentIconType.Single)
             {
-                W = SpriteManager.US_F15
+                Icon = SpriteManager.US_F15
             };
 
             // Add the F-15 Eagle profile to the database
@@ -4509,7 +4348,7 @@ namespace HammerAndSickle.Models
             // Handle the icon profile.
             F16.IconProfile = new RegimentIconProfile(RegimentIconType.Single)
             {
-                W = SpriteManager.US_F16
+                Icon = SpriteManager.US_F16
             };
 
             // Add the F-16 Fighting Falcon profile to the database
@@ -4540,7 +4379,7 @@ namespace HammerAndSickle.Models
             // Handle the icon profile.
             F4_US.IconProfile = new RegimentIconProfile(RegimentIconType.Single)
             {
-                W = SpriteManager.US_F4
+                Icon = SpriteManager.US_F4
             };
 
             // Add the F-4 Phantom profile to the database
@@ -4573,7 +4412,7 @@ namespace HammerAndSickle.Models
             // Handle the icon profile.
             F14_US.IconProfile = new RegimentIconProfile(RegimentIconType.Single)
             {
-                W = SpriteManager.US_F14
+                Icon = SpriteManager.US_F14
             };
 
             // Add the F-14 Tomcat profile to the database
@@ -4583,66 +4422,66 @@ namespace HammerAndSickle.Models
             //----------------------------------------------
 
             //----------------------------------------------
-            // UK Tornado IDS Interdictor/Strike Fighter
+            // UK Tornado GR.1 Strike Fighter
             //----------------------------------------------
             // Phase 3 (final-intent): FighterMid + DF+2 (decent self-defense) + MULTIROLE_STRIKE (GA+4) +
             // LASER_GUIDED_MUNITIONS (GA+2) + HEAVY_PAYLOAD (OL+3) + RUNWAY_CRATERING (JP233: OcSuppression+20
             // stored) + TERRAIN_FOLLOW_RADAR (low-level penetration, dormant SUR). Heavy all-weather interdictor:
             // GA8 (down from old 12) but big OL9 payload. → DF12 MAN11 TS10 SUR7 · GA8 OL9 · SR4 · OcSuppression 20.
-            WeaponProfile TORNADO_IDS = WeaponProfile.FromProfileDef(
-                "Tornado IDS Interdictor/Strike Fighter", "Tornado IDS", WeaponType.FGT_TORNADO_IDS_UK,
+            WeaponProfile TORNADO_UK = WeaponProfile.FromProfileDef(
+                "Tornado GR.1 Strike Fighter", "Tornado GR.1", WeaponType.FGT_TORNADO_UK,
                 new ProfileDef(FamilyArchetypes.FighterMid,
                     new Dictionary<ProfileStat, int> { { ProfileStat.DF, 2 } },
                     new[] { WeaponTrait.MULTIROLE_STRIKE, WeaponTrait.LASER_GUIDED_MUNITIONS, WeaponTrait.HEAVY_PAYLOAD, WeaponTrait.RUNWAY_CRATERING, WeaponTrait.TERRAIN_FOLLOW_RADAR }),
                 UpgradePath.FGT, 492);
 
             // Set the prestige cost for the profile.
-            TORNADO_IDS.SetPrestigeCost(PrestigeTierCost.Gen3, PrestigeTypeCost.FGT);
+            TORNADO_UK.SetPrestigeCost(PrestigeTierCost.Gen3, PrestigeTypeCost.FGT);
 
             // Intel stats
-            TORNADO_IDS.AddIntelReportStat(WeaponType.FGT_TORNADO_IDS_UK,     36);
+            TORNADO_UK.AddIntelReportStat(WeaponType.FGT_TORNADO_UK,     36);
 
             // Handle the icon profile.
-            TORNADO_IDS.IconProfile = new RegimentIconProfile(RegimentIconType.Single)
+            TORNADO_UK.IconProfile = new RegimentIconProfile(RegimentIconType.Single)
             {
-                W = SpriteManager.GE_Tornado
+                Icon = SpriteManager.UK_TornadoGR1
             };
 
-            // Add the Tornado IDS profile to the database
-            AddProfile(WeaponType.FGT_TORNADO_IDS_UK, TORNADO_IDS);
+            // Add the RAF Tornado profile to the database
+            AddProfile(WeaponType.FGT_TORNADO_UK, TORNADO_UK);
             //----------------------------------------------
-            // UK Tornado IDS Interdictor/Strike Fighter
+            // UK Tornado GR.1 Strike Fighter
             //----------------------------------------------
 
             //----------------------------------------------
-            // UK Tornado GR.1 Strike Fighter
+            // FRG Tornado IDS Strike Fighter
             //----------------------------------------------
             // Phase 3 (final-intent): FighterMid + DF+3 + MULTIROLE_STRIKE (GA+4) + LASER_GUIDED_MUNITIONS (GA+2)
             // + RUNWAY_CRATERING (OcSuppression+20 stored) + TERRAIN_FOLLOW_RADAR (dormant). The lighter UK strike
             // variant (no HEAVY_PAYLOAD → OL6, vs IDS's OL9). → DF13 MAN11 TS10 SUR7 · GA8 OL6 · SR4 · OcSuppression 20.
-            WeaponProfile TORNADO_GR1 = WeaponProfile.FromProfileDef(
-                "Tornado GR.1 Strike Fighter", "Tornado GR.1", WeaponType.FGT_TORNADO_GR1_US,
+            WeaponProfile TORNADO_GE = WeaponProfile.FromProfileDef(
+                "Tornado IDS Strike Fighter", "Tornado IDS", WeaponType.FGT_TORNADO_GE,
                 new ProfileDef(FamilyArchetypes.FighterMid,
                     new Dictionary<ProfileStat, int> { { ProfileStat.DF, 3 } },
                     new[] { WeaponTrait.MULTIROLE_STRIKE, WeaponTrait.LASER_GUIDED_MUNITIONS, WeaponTrait.RUNWAY_CRATERING, WeaponTrait.TERRAIN_FOLLOW_RADAR }),
                 UpgradePath.ATT, 528);
 
             // Set the prestige cost for the profile.
-            TORNADO_GR1.SetPrestigeCost(PrestigeTierCost.Gen3, PrestigeTypeCost.ATT);
+            TORNADO_GE.SetPrestigeCost(PrestigeTierCost.Gen3, PrestigeTypeCost.ATT);
 
             // Intel stats
-            TORNADO_GR1.AddIntelReportStat(WeaponType.FGT_TORNADO_GR1_US,     36);
+            TORNADO_GE.AddIntelReportStat(WeaponType.FGT_TORNADO_GE,     36);
 
             // Handle the icon profile.
-            TORNADO_GR1.IconProfile = new RegimentIconProfile(RegimentIconType.Single)
+            TORNADO_GE.IconProfile = new RegimentIconProfile(RegimentIconType.Single)
             {
-                W = SpriteManager.UK_TornadoGR1
+                Icon = SpriteManager.GE_Tornado
             };
 
-            // Add the Tornado GR.1 profile to the database
-            AddProfile(WeaponType.FGT_TORNADO_GR1_US, TORNADO_GR1);
+            // Add the Luftwaffe Tornado profile to the database
+            AddProfile(WeaponType.FGT_TORNADO_GE, TORNADO_GE);
             //----------------------------------------------
-            // UK Tornado GR.1 Strike Fighter
+            // FRG Tornado IDS Strike Fighter
             //----------------------------------------------
 
             //----------------------------------------------
@@ -4666,7 +4505,7 @@ namespace HammerAndSickle.Models
             // Handle the icon profile.
             F4_GE.IconProfile = new RegimentIconProfile(RegimentIconType.Single)
             {
-                W = SpriteManager.GE_F4
+                Icon = SpriteManager.GE_F4
             };
 
             // Add the F-4F Phantom profile to the database
@@ -4699,7 +4538,7 @@ namespace HammerAndSickle.Models
             // Handle the icon profile.
             MIRAGE2000.IconProfile = new RegimentIconProfile(RegimentIconType.Single)
             {
-                W = SpriteManager.FR_Mirage2000
+                Icon = SpriteManager.FR_Mirage2000
             };
 
             // Add the Mirage 2000 profile to the database
@@ -4730,7 +4569,7 @@ namespace HammerAndSickle.Models
             // Handle the icon profile.
             MIRAGEF1.IconProfile = new RegimentIconProfile(RegimentIconType.Single)
             {
-                W = SpriteManager.FR_MirageF1
+                Icon = SpriteManager.FR_MirageF1
             };
 
             // Add the Mirage F1 profile to the database
@@ -4763,7 +4602,7 @@ namespace HammerAndSickle.Models
             // Handle the icon profile.
             A10.IconProfile = new RegimentIconProfile(RegimentIconType.Single)
             {
-                W = SpriteManager.US_A10
+                Icon = SpriteManager.US_A10
             };
 
             // Add the A-10 Thunderbolt profile to the database
@@ -4796,7 +4635,7 @@ namespace HammerAndSickle.Models
             // Handle the icon profile.
             F117.IconProfile = new RegimentIconProfile(RegimentIconType.Single)
             {
-                W = SpriteManager.US_F117
+                Icon = SpriteManager.US_F117
             };
 
             // Add the F-117 Nighthawk profile to the database
@@ -4829,7 +4668,7 @@ namespace HammerAndSickle.Models
             // Handle the icon profile.
             JAGUAR.IconProfile = new RegimentIconProfile(RegimentIconType.Single)
             {
-                W = SpriteManager.FR_Jaguar
+                Icon = SpriteManager.FR_Jaguar
             };
 
             // Add the Jaguar profile to the database
@@ -4861,7 +4700,7 @@ namespace HammerAndSickle.Models
             // Handle the icon profile.
             F111.IconProfile = new RegimentIconProfile(RegimentIconType.Single)
             {
-                W = SpriteManager.US_F111
+                Icon = SpriteManager.US_F111
             };
 
             // Add the F-111 Aardvark profile to the database
@@ -4892,7 +4731,7 @@ namespace HammerAndSickle.Models
             // Handle the icon profile.
             E3.IconProfile = new RegimentIconProfile(RegimentIconType.Single)
             {
-                W = SpriteManager.US_E3
+                Icon = SpriteManager.US_E3
             };
 
             // Add the E-3 Sentry profile to the database
@@ -4923,7 +4762,7 @@ namespace HammerAndSickle.Models
             // Handle the icon profile.
             SR71.IconProfile = new RegimentIconProfile(RegimentIconType.Single)
             {
-                W = SpriteManager.US_SR71
+                Icon = SpriteManager.US_SR71
             };
 
             // Add the SR-71 Blackbird profile to the database
@@ -4942,22 +4781,18 @@ namespace HammerAndSickle.Models
             // Phase 3 (derived): Truck archetype (soft, GAD 6, MOT 8) + NON_COMBATANT (unarmed transport). Mirrors the
             // Soviet/Arab generic-truck conversion. → HA3 HD3 SA3 SD3 GAD6 · MMP8 · SR2 · non-combatant.
             WeaponProfile TRK_W = WeaponProfile.FromProfileDef(
-                "Generic Transport Truck", "Transport Truck", WeaponType.TRK_WEST,
-                new ProfileDef(FamilyArchetypes.Truck,
-                    new Dictionary<ProfileStat, int>(),
-                    new[] { WeaponTrait.NON_COMBATANT }));
+                "Generic Transport Truck", "Transport Truck", WeaponType.TRK_GEN_NATO,
+                TransportTruckDef());
 
             // Handle the icon profile.
-            TRK_W.IconProfile = new RegimentIconProfile(RegimentIconType.Directional)
+            TRK_W.IconProfile = new RegimentIconProfile(RegimentIconType.Single)
             {
-                W = SpriteManager.GEN_Truck_W,
-                NW = SpriteManager.GEN_Truck_NW,
-                SW = SpriteManager.GEN_Truck_SW
+                Icon = SpriteManager.GEN_Truck_W
             };
 
             // Add the Western Truck profile to the database
             TRK_W.SetPrestigeCost(PrestigeTierCost.Gen1, PrestigeTypeCost.TRK);
-            AddProfile(WeaponType.TRK_WEST, TRK_W);
+            AddProfile(WeaponType.TRK_GEN_NATO, TRK_W);
             //----------------------------------------------
             // Western Generic Truck
             //----------------------------------------------
@@ -4994,7 +4829,7 @@ namespace HammerAndSickle.Models
             // Handle the icon profile.
             INF_REG_US_P.IconProfile = new RegimentIconProfile(RegimentIconType.Single)
             {
-                W = SpriteManager.US_Regulars
+                Icon = SpriteManager.US_Regulars
             };
 
             // Add the US Regular Infantry profile to the database
@@ -5025,7 +4860,7 @@ namespace HammerAndSickle.Models
             // Handle the icon profile.
             INF_MAR_US_P.IconProfile = new RegimentIconProfile(RegimentIconType.Single)
             {
-                W = SpriteManager.US_Marines
+                Icon = SpriteManager.US_Marines
             };
 
             // Add the US Marine Infantry profile to the database
@@ -5057,7 +4892,7 @@ namespace HammerAndSickle.Models
             // Handle the icon profile.
             INF_AB_US_P.IconProfile = new RegimentIconProfile(RegimentIconType.Single)
             {
-                W = SpriteManager.US_Airborne
+                Icon = SpriteManager.US_Airborne
             };
 
             // Add the US Airborne Infantry profile to the database
@@ -5089,7 +4924,7 @@ namespace HammerAndSickle.Models
             // Handle the icon profile.
             INF_AM_US_P.IconProfile = new RegimentIconProfile(RegimentIconType.Single)
             {
-                W = SpriteManager.US_Airborne
+                Icon = SpriteManager.US_AirMobile
             };
 
             // Add the US Air-Mobile Infantry profile to the database
@@ -5126,7 +4961,7 @@ namespace HammerAndSickle.Models
             // Handle the icon profile.
             INF_REG_UK_P.IconProfile = new RegimentIconProfile(RegimentIconType.Single)
             {
-                W = SpriteManager.UK_Regulars
+                Icon = SpriteManager.UK_Regulars
             };
 
             // Add the UK Regular Infantry profile to the database
@@ -5159,7 +4994,7 @@ namespace HammerAndSickle.Models
             // Handle the icon profile.
             INF_AB_UK_P.IconProfile = new RegimentIconProfile(RegimentIconType.Single)
             {
-                W = SpriteManager.UK_Airborne
+                Icon = SpriteManager.UK_Airborne
             };
 
             // Add the UK Airborne Infantry profile to the database
@@ -5195,7 +5030,7 @@ namespace HammerAndSickle.Models
             // Handle the icon profile.
             INF_REG_GE_P.IconProfile = new RegimentIconProfile(RegimentIconType.Single)
             {
-                W = SpriteManager.GER_Regulars
+                Icon = SpriteManager.GER_Regulars
             };
 
             // Add the FRG Regular Infantry profile to the database
@@ -5225,7 +5060,7 @@ namespace HammerAndSickle.Models
             // Handle the icon profile.
             INF_AB_GE_P.IconProfile = new RegimentIconProfile(RegimentIconType.Single)
             {
-                W = SpriteManager.GER_Airborne
+                Icon = SpriteManager.GER_Airborne
             };
 
             // Add the FRG Airborne Infantry profile to the database
@@ -5261,7 +5096,7 @@ namespace HammerAndSickle.Models
             // Handle the icon profile.
             INF_REG_FR_P.IconProfile = new RegimentIconProfile(RegimentIconType.Single)
             {
-                W = SpriteManager.FR_Regulars
+                Icon = SpriteManager.FR_Regulars
             };
 
             // Add the French Regular Infantry profile to the database
@@ -5292,7 +5127,7 @@ namespace HammerAndSickle.Models
             // Handle the icon profile.
             INF_AB_FR_P.IconProfile = new RegimentIconProfile(RegimentIconType.Single)
             {
-                W = SpriteManager.FR_Airborne
+                Icon = SpriteManager.FR_Airborne
             };
 
             // Add the French Airborne Infantry profile to the database
@@ -5313,7 +5148,7 @@ namespace HammerAndSickle.Models
         /// a census is a property of the PROFILE, never of the unit template, so a nation earns its own
         /// profile exactly where that profile's census IS its brigade roster — the armoured brigade and
         /// the mechanised brigade. Artillery, recon, air defence and air units for all three nations
-        /// reuse ART_HEAVY_WEST / RCN_FV105_UK / SAM_HAWK_US / FGT_F16_US rather than minting twelve
+        /// reuse ART_HEAVY_NATO / RCN_FV105_UK / SAM_HAWK_US / FGT_F16_US rather than minting twelve
         /// more names the scenario editor must mirror forever (Bob's call, 2026-08-12).
         ///
         /// All three Leopard 1s resolve to an IDENTICAL stat line — same archetype, deltas, traits and
@@ -5352,11 +5187,9 @@ namespace HammerAndSickle.Models
             LEO1_NL.AddIntelReportStat(WeaponType.ART_120MM_MORTAR,     12);  // 120mm mortars
 
             // Handle the icon profile.
-            LEO1_NL.IconProfile = new RegimentIconProfile(RegimentIconType.Directional)
+            LEO1_NL.IconProfile = new RegimentIconProfile(RegimentIconType.Single)
             {
-                W = SpriteManager.GE_Leopard1_W,
-                NW = SpriteManager.GE_Leopard1_NW,
-                SW = SpriteManager.GE_Leopard1_SW
+                Icon = SpriteManager.GE_Leopard1_W
             };
 
             // Add the NL Leopard 1 profile to the database
@@ -5390,11 +5223,9 @@ namespace HammerAndSickle.Models
             LEO1_BE.AddIntelReportStat(WeaponType.ART_120MM_MORTAR,     12);  // 120mm mortars
 
             // Handle the icon profile.
-            LEO1_BE.IconProfile = new RegimentIconProfile(RegimentIconType.Directional)
+            LEO1_BE.IconProfile = new RegimentIconProfile(RegimentIconType.Single)
             {
-                W = SpriteManager.GE_Leopard1_W,
-                NW = SpriteManager.GE_Leopard1_NW,
-                SW = SpriteManager.GE_Leopard1_SW
+                Icon = SpriteManager.GE_Leopard1_W
             };
 
             // Add the BE Leopard 1 profile to the database
@@ -5428,11 +5259,9 @@ namespace HammerAndSickle.Models
             LEO1_DK.AddIntelReportStat(WeaponType.ART_120MM_MORTAR,     12);  // 120mm mortars
 
             // Handle the icon profile.
-            LEO1_DK.IconProfile = new RegimentIconProfile(RegimentIconType.Directional)
+            LEO1_DK.IconProfile = new RegimentIconProfile(RegimentIconType.Single)
             {
-                W = SpriteManager.GE_Leopard1_W,
-                NW = SpriteManager.GE_Leopard1_NW,
-                SW = SpriteManager.GE_Leopard1_SW
+                Icon = SpriteManager.GE_Leopard1_W
             };
 
             // Add the DK Leopard 1 profile to the database
@@ -5473,11 +5302,9 @@ namespace HammerAndSickle.Models
             M113_NATO.AddIntelReportStat(WeaponType.APC_M113_NATO, 102);
 
             // Handle the icon profile.
-            M113_NATO.IconProfile = new RegimentIconProfile(RegimentIconType.Directional)
+            M113_NATO.IconProfile = new RegimentIconProfile(RegimentIconType.Single)
             {
-                W = SpriteManager.US_M113_W,
-                NW = SpriteManager.US_M113_NW,
-                SW = SpriteManager.US_M113_SW
+                Icon = SpriteManager.US_M113_W
             };
 
             // Mixed family (see FamilyArchetypes) - medium is stated per profile.
@@ -5517,7 +5344,7 @@ namespace HammerAndSickle.Models
             // Handle the icon profile.
             INF_MECH_NL_P.IconProfile = new RegimentIconProfile(RegimentIconType.Single)
             {
-                W = SpriteManager.NATO_Regulars
+                Icon = SpriteManager.NATO_Regulars
             };
 
             // Add the Dutch Infantry profile to the database
@@ -5551,7 +5378,7 @@ namespace HammerAndSickle.Models
             // Handle the icon profile.
             INF_MECH_BE_P.IconProfile = new RegimentIconProfile(RegimentIconType.Single)
             {
-                W = SpriteManager.NATO_Regulars
+                Icon = SpriteManager.NATO_Regulars
             };
 
             // Add the Belgian Infantry profile to the database
@@ -5584,7 +5411,7 @@ namespace HammerAndSickle.Models
             // Handle the icon profile.
             INF_MECH_DK_P.IconProfile = new RegimentIconProfile(RegimentIconType.Single)
             {
-                W = SpriteManager.NATO_Regulars
+                Icon = SpriteManager.NATO_Regulars
             };
 
             // Add the Danish Infantry profile to the database
@@ -5633,11 +5460,9 @@ namespace HammerAndSickle.Models
             T55A.AddIntelReportStat(WeaponType.SPSAM_2K12_IQ,      4);
 
             // Handle the icon profile.
-            T55A.IconProfile = new RegimentIconProfile(RegimentIconType.Directional)
+            T55A.IconProfile = new RegimentIconProfile(RegimentIconType.Single)
             {
-                W = SpriteManager.AR_T55_W,
-                NW = SpriteManager.AR_T55_NW,
-                SW = SpriteManager.AR_T55_SW
+                Icon = SpriteManager.AR_T55_W
             };
 
             // Add the T-55A profile to the database
@@ -5677,11 +5502,9 @@ namespace HammerAndSickle.Models
             T62A.AddIntelReportStat(WeaponType.SPSAM_2K12_IQ,     4);
 
             // Handle the icon profile. (Using T-55 sprites as stand-in)
-            T62A.IconProfile = new RegimentIconProfile(RegimentIconType.Directional)
+            T62A.IconProfile = new RegimentIconProfile(RegimentIconType.Single)
             {
-                W = SpriteManager.AR_T55_W,
-                NW = SpriteManager.AR_T55_NW,
-                SW = SpriteManager.AR_T55_SW
+                Icon = SpriteManager.AR_T55_W
             };
 
             // Add the T-62A profile to the database
@@ -5719,11 +5542,9 @@ namespace HammerAndSickle.Models
             M60A3.AddIntelReportStat(WeaponType.SPAAA_ZSU23_SV,     4);
 
             // Handle the icon profile.
-            M60A3.IconProfile = new RegimentIconProfile(RegimentIconType.Directional)
+            M60A3.IconProfile = new RegimentIconProfile(RegimentIconType.Single)
             {
-                W = SpriteManager.AR_M60_W,
-                NW = SpriteManager.AR_M60_NW,
-                SW = SpriteManager.AR_M60_SW
+                Icon = SpriteManager.AR_M60_W
             };
 
             // Add the M60A3 profile to the database
@@ -5757,11 +5578,9 @@ namespace HammerAndSickle.Models
             BMP1_IQ.AddIntelReportStat(WeaponType.IFV_BMP1_IQ,       90);
 
             // Handle the icon profile.
-            BMP1_IQ.IconProfile = new RegimentIconProfile(RegimentIconType.Directional)
+            BMP1_IQ.IconProfile = new RegimentIconProfile(RegimentIconType.Single)
             {
-                W = SpriteManager.AR_BMP1_W,
-                NW = SpriteManager.AR_BMP1_NW,
-                SW = SpriteManager.AR_BMP1_SW
+                Icon = SpriteManager.AR_BMP1_W
             };
 
             // Add the BMP-1 profile to the database
@@ -5790,11 +5609,9 @@ namespace HammerAndSickle.Models
             MTLB_IQ.AddIntelReportStat(WeaponType.APC_MTLB_IQ,       90);
 
             // Handle the icon profile.
-            MTLB_IQ.IconProfile = new RegimentIconProfile(RegimentIconType.Directional)
+            MTLB_IQ.IconProfile = new RegimentIconProfile(RegimentIconType.Single)
             {
-                W = SpriteManager.AR_MTLB_W,
-                NW = SpriteManager.AR_MTLB_NW,
-                SW = SpriteManager.AR_MTLB_SW
+                Icon = SpriteManager.AR_MTLB_W
             };
 
             // Mixed family (see FamilyArchetypes) - medium is stated per profile.
@@ -5827,11 +5644,9 @@ namespace HammerAndSickle.Models
             M113_IR.AddIntelReportStat(WeaponType.APC_M113_IR,       90);
 
             // Handle the icon profile.
-            M113_IR.IconProfile = new RegimentIconProfile(RegimentIconType.Directional)
+            M113_IR.IconProfile = new RegimentIconProfile(RegimentIconType.Single)
             {
-                W = SpriteManager.AR_M113_W,
-                NW = SpriteManager.AR_M113_NW,
-                SW = SpriteManager.AR_M113_SW
+                Icon = SpriteManager.AR_M113_W
             };
 
             // Mixed family (see FamilyArchetypes) - medium is stated per profile.
@@ -5870,14 +5685,9 @@ namespace HammerAndSickle.Models
             SPA_2S1_AR.AddIntelReportStat(WeaponType.MANPAD_STRELA,      8);
 
             // Handle the icon profile.
-            SPA_2S1_AR.IconProfile = new RegimentIconProfile(RegimentIconType.Directional_Fire)
+            SPA_2S1_AR.IconProfile = new RegimentIconProfile(RegimentIconType.Single)
             {
-                W = SpriteManager.AR_2S1_W,
-                NW = SpriteManager.AR_2S1_NW,
-                SW = SpriteManager.AR_2S1_SW,
-                W_F = SpriteManager.AR_2S1_W_F,
-                NW_F = SpriteManager.AR_2S1_NW_F,
-                SW_F = SpriteManager.AR_2S1_SW_F
+                Icon = SpriteManager.AR_2S1_W
             };
 
             // Add the 2S1 Gvozdika profile to the database
@@ -5896,9 +5706,7 @@ namespace HammerAndSickle.Models
             // → HA5 HD5 SA9 SD5 GAD8 · ICM 1.00 · MMP4 · IR4 · SR2.
             WeaponProfile ART_LT_AR = WeaponProfile.FromProfileDef(
                 "Light Towed Artillery", "Light Artillery", WeaponType.ART_LIGHT_ARAB,
-                new ProfileDef(FamilyArchetypes.Artillery,
-                    new Dictionary<ProfileStat, int> { { ProfileStat.IR, GameData.INDIRECT_RANGE_SHORT } },
-                    new[] { WeaponTrait.AIR_DROPPABLE, WeaponTrait.HELO_TRANSPORTABLE }),
+                LightTowedArtilleryDef(),
                 UpgradePath.ART, 144);
 
             // Set the prestige cost for the profile.
@@ -5913,7 +5721,7 @@ namespace HammerAndSickle.Models
             // Handle the icon profile.
             ART_LT_AR.IconProfile = new RegimentIconProfile(RegimentIconType.Single)
             {
-                W = SpriteManager.GEN_LightArt
+                Icon = SpriteManager.GEN_LightArt
             };
 
             // Add the Arab Light Artillery profile to the database
@@ -5932,9 +5740,7 @@ namespace HammerAndSickle.Models
             // → HA5 HD5 SA10 SD5 GAD8 · ICM 1.00 · MMP4 · IR5 · SR2.
             WeaponProfile ART_HV_AR = WeaponProfile.FromProfileDef(
                 "Heavy Towed Artillery", "Heavy Artillery", WeaponType.ART_HEAVY_ARAB,
-                new ProfileDef(FamilyArchetypes.Artillery,
-                    new Dictionary<ProfileStat, int> { { ProfileStat.IR, GameData.INDIRECT_RANGE_MEDIUM }, { ProfileStat.SA, 1 } },
-                    System.Array.Empty<WeaponTrait>()),
+                HeavyTowedArtilleryDef(),
                 UpgradePath.ART, 144);
 
             // Set the prestige cost for the profile.
@@ -5949,7 +5755,7 @@ namespace HammerAndSickle.Models
             // Handle the icon profile.
             ART_HV_AR.IconProfile = new RegimentIconProfile(RegimentIconType.Single)
             {
-                W = SpriteManager.GEN_HeavyArt
+                Icon = SpriteManager.GEN_HeavyArt
             };
 
             // Add the Arab Heavy Artillery profile to the database
@@ -5989,7 +5795,7 @@ namespace HammerAndSickle.Models
             // Handle the icon profile.
             AAA_MJ.IconProfile = new RegimentIconProfile(RegimentIconType.Single)
             {
-                W = SpriteManager.MJ_AA
+                Icon = SpriteManager.MJ_AA
             };
 
             // Add the Mujahideen AAA profile to the database
@@ -6026,7 +5832,7 @@ namespace HammerAndSickle.Models
             // Handle the icon profile.
             SAM_MJ.IconProfile = new RegimentIconProfile(RegimentIconType.Single)
             {
-                W = SpriteManager.MJ_Stinger
+                Icon = SpriteManager.MJ_Stinger
             };
 
             // Add the Mujahideen SAM profile to the database
@@ -6059,14 +5865,9 @@ namespace HammerAndSickle.Models
             ZSU_57_IQ.AddIntelReportStat(WeaponType.MANPAD_STRELA, 12); // Strela mobile SAM systems
 
             // Handle the icon profile.
-            ZSU_57_IQ.IconProfile = new RegimentIconProfile(RegimentIconType.Directional_Fire)
+            ZSU_57_IQ.IconProfile = new RegimentIconProfile(RegimentIconType.Single)
             {
-                W = SpriteManager.AR_ZSU57_W,
-                NW = SpriteManager.AR_ZSU57_NW,
-                SW = SpriteManager.AR_ZSU57_SW,
-                W_F = SpriteManager.AR_ZSU57_W_F,
-                NW_F = SpriteManager.AR_ZSU57_NW_F,
-                SW_F = SpriteManager.AR_ZSU57_SW_F
+                Icon = SpriteManager.AR_ZSU57_W
             };
 
             // Add the ZSU-57 IQ profile to the database
@@ -6100,14 +5901,9 @@ namespace HammerAndSickle.Models
             SPSAM_2k12.AddIntelReportStat(WeaponType.MANPAD_STRELA, 12); // Strela mobile SAM systems
 
             // Handle the icon profile.
-            SPSAM_2k12.IconProfile = new RegimentIconProfile(RegimentIconType.Directional_Fire)
+            SPSAM_2k12.IconProfile = new RegimentIconProfile(RegimentIconType.Single)
             {
-                W = SpriteManager.AR_2K12_W,
-                NW = SpriteManager.AR_2K12_NW,
-                SW = SpriteManager.AR_2K12_SW,
-                W_F = SpriteManager.AR_2K12_W_F,
-                NW_F = SpriteManager.AR_2K12_NW_F,
-                SW_F = SpriteManager.AR_2K12_SW_F
+                Icon = SpriteManager.AR_2K12_W
             };
 
             // Add the 2K12 IQ profile to the database
@@ -6144,7 +5940,7 @@ namespace HammerAndSickle.Models
             // Handle the icon profile.
             MIG21_IQ.IconProfile = new RegimentIconProfile(RegimentIconType.Single)
             {
-                W = SpriteManager.AR_Mig21
+                Icon = SpriteManager.AR_Mig21
             };
 
             // Add the MiG-21 profile to the database
@@ -6175,7 +5971,7 @@ namespace HammerAndSickle.Models
             // Handle the icon profile.
             MIG23_IQ.IconProfile = new RegimentIconProfile(RegimentIconType.Single)
             {
-                W = SpriteManager.AR_Mig23
+                Icon = SpriteManager.AR_Mig23
             };
 
             // Add the MiG-23 profile to the database
@@ -6205,7 +6001,7 @@ namespace HammerAndSickle.Models
             // Handle the icon profile.
             SU17_IQ.IconProfile = new RegimentIconProfile(RegimentIconType.Single)
             {
-                W = SpriteManager.AR_SU17
+                Icon = SpriteManager.AR_SU17
             };
 
             // Add the Su-17 profile to the database
@@ -6236,7 +6032,7 @@ namespace HammerAndSickle.Models
             // Handle the icon profile.
             F4_IR.IconProfile = new RegimentIconProfile(RegimentIconType.Single)
             {
-                W = SpriteManager.AR_F4
+                Icon = SpriteManager.AR_F4
             };
 
             // Add the Iranian F-4 profile to the database
@@ -6268,7 +6064,7 @@ namespace HammerAndSickle.Models
             // Handle the icon profile.
             F14_IR.IconProfile = new RegimentIconProfile(RegimentIconType.Single)
             {
-                W = SpriteManager.AR_F14
+                Icon = SpriteManager.AR_F14
             };
 
             // Add the Iranian F-14 profile to the database
@@ -6288,16 +6084,12 @@ namespace HammerAndSickle.Models
             // → HA3 HD3 SA3 SD3 GAD6 · MMP8 · SR2 · non-combatant.
             WeaponProfile TRK_AR = WeaponProfile.FromProfileDef(
                 "Generic Transport Truck", "Transport Truck", WeaponType.TRK_GEN_ARAB,
-                new ProfileDef(FamilyArchetypes.Truck,
-                    new Dictionary<ProfileStat, int>(),
-                    new[] { WeaponTrait.NON_COMBATANT }));
+                TransportTruckDef());
 
             // Handle the icon profile.
-            TRK_AR.IconProfile = new RegimentIconProfile(RegimentIconType.Directional)
+            TRK_AR.IconProfile = new RegimentIconProfile(RegimentIconType.Single)
             {
-                W = SpriteManager.AR_Truck_W,
-                NW = SpriteManager.AR_Truck_NW,
-                SW = SpriteManager.AR_Truck_SW
+                Icon = SpriteManager.AR_Truck_W
             };
 
             // Add the Arab Truck profile to the database
@@ -6337,7 +6129,7 @@ namespace HammerAndSickle.Models
             // Handle the icon profile.
             INF_REG_IQ_P.IconProfile = new RegimentIconProfile(RegimentIconType.Single)
             {
-                W = SpriteManager.IQ_Regulars
+                Icon = SpriteManager.IQ_Regulars
             };
 
             // Add the IQ Regular Infantry profile to the database
@@ -6372,7 +6164,7 @@ namespace HammerAndSickle.Models
             // Handle the icon profile.
             INF_REG_IR_P.IconProfile = new RegimentIconProfile(RegimentIconType.Single)
             {
-                W = SpriteManager.IR_Regulars
+                Icon = SpriteManager.IR_Regulars
             };
 
             // Add the IR Regular Infantry profile to the database
@@ -6410,7 +6202,7 @@ namespace HammerAndSickle.Models
             // Handle the icon profile.
             INF_MJ_REG.IconProfile = new RegimentIconProfile(RegimentIconType.Single)
             {
-                W = SpriteManager.MJ_Regulars
+                Icon = SpriteManager.MJ_Regulars
             };
 
             // Add the Mujahideen Regular Infantry profile to the database
@@ -6442,7 +6234,7 @@ namespace HammerAndSickle.Models
             // Handle the icon profile.
             INF_MJ_SPEC.IconProfile = new RegimentIconProfile(RegimentIconType.Single)
             {
-                W = SpriteManager.MJ_Elite
+                Icon = SpriteManager.MJ_Elite
             };
 
             // Add the Mujahideen Special Forces profile to the database
@@ -6473,7 +6265,7 @@ namespace HammerAndSickle.Models
             // Handle the icon profile.
             INF_MJ_CAV.IconProfile = new RegimentIconProfile(RegimentIconType.Single)
             {
-                W = SpriteManager.MJ_Mounted
+                Icon = SpriteManager.MJ_Mounted
             };
 
             // Add the Mujahideen Horse Cavalry profile to the database
@@ -6505,7 +6297,7 @@ namespace HammerAndSickle.Models
             // Handle the icon profile.
             INF_MJ_RPG.IconProfile = new RegimentIconProfile(RegimentIconType.Single)
             {
-                W = SpriteManager.MJ_RPG
+                Icon = SpriteManager.MJ_RPG
             };
 
             // Add the Mujahideen RPG Teams profile to the database
@@ -6542,7 +6334,7 @@ namespace HammerAndSickle.Models
             // Handle the icon profile.
             ART_MJ_MORT.IconProfile = new RegimentIconProfile(RegimentIconType.Single)
             {
-                W = SpriteManager.MJ_Mortar
+                Icon = SpriteManager.MJ_Mortar
             };
 
             // Add the Mujahideen Heavy Mortar profile to the database
@@ -6577,7 +6369,7 @@ namespace HammerAndSickle.Models
             // Handle the icon profile.
             ART_MJ_LT.IconProfile = new RegimentIconProfile(RegimentIconType.Single)
             {
-                W = SpriteManager.MJ_Artillery
+                Icon = SpriteManager.MJ_Artillery
             };
 
             // Add the Mujahideen Light Artillery profile to the database
@@ -6592,8 +6384,17 @@ namespace HammerAndSickle.Models
         }
 
         /// <summary>
-        /// Add Chinese WeaponProfiles
+        /// Add Chinese WeaponProfiles.
         /// </summary>
+        /// <remarks>
+        /// ⚠ RE-4 (2026-09-02): every profile here carries <see cref="WeaponTrait.SECOND_LINE_FORMATION"/>
+        /// (ICM ×0.9) EXCEPT the Type 86 IFV. That is not an oversight — the Type 86 exists only as the
+        /// Mobile-bay profile of the Chinese mechanised regiment, and closed-bay doctrine puts the
+        /// formation-quality ICM on the SOLE/deployed profile alone. Giving it to the ride as well would
+        /// price the same formation twice, once per stance.
+        /// The trait is China-only for now; its NAME is deliberately nation-agnostic because Iraq and Iran
+        /// are the next candidates. See Planning Docs/Roster Expansion.md §4.10 and WeaponTrait_Supplement §13b.
+        /// </remarks>
         private static void CreateChineseProfiles()
         {
             #region MBTs
@@ -6602,12 +6403,12 @@ namespace HammerAndSickle.Models
             // Chinese Type 59 Medium Tank
             //----------------------------------------------
             // Phase 3 (final-intent): Type 59 (T-54 copy, 100mm) = Gen1 + LOW_PROFILE. Domestic Chinese design (not a
-            // monkey-model), no NBC. = the T-55A line minus the dormant NBC. → HA7 HD6 SA5 SD7 GAD7 · ICM 1.00 · MMP10 · SR2.
+            // monkey-model), no NBC. = the T-55A line minus the dormant NBC. → HA7 HD6 SA5 SD7 GAD7 · ICM 0.90 (second line) · MMP10 · SR2.
             WeaponProfile TYPE59 = WeaponProfile.FromProfileDef(
-                "Type 59 Medium Tank", "Type 59", WeaponType.TANK_TYPE59,
+                "Type 59 Medium Tank", "Type 59", WeaponType.TANK_TYPE59_CH,
                 new ProfileDef(TankArchetypes.Gen1,
                     new Dictionary<ProfileStat, int>(),
-                    new[] { WeaponTrait.LOW_PROFILE }),
+                    new[] { WeaponTrait.LOW_PROFILE, WeaponTrait.SECOND_LINE_FORMATION }),
                 UpgradePath.TANK, 252);
 
             // Set the prestige cost for the profile.
@@ -6615,25 +6416,23 @@ namespace HammerAndSickle.Models
 
             // Intel stats
             TYPE59.AddIntelReportStat(WeaponType.Personnel,      1050);
-            TYPE59.AddIntelReportStat(WeaponType.TANK_TYPE59,      80);
-            TYPE59.AddIntelReportStat(WeaponType.IFV_TYPE86,       40);
-            TYPE59.AddIntelReportStat(WeaponType.SPA_TYPE82,       18);
+            TYPE59.AddIntelReportStat(WeaponType.TANK_TYPE59_CH,      80);
+            TYPE59.AddIntelReportStat(WeaponType.IFV_TYPE86_CH,       40);
+            TYPE59.AddIntelReportStat(WeaponType.SPA_TYPE83_CH,       18);
             TYPE59.AddIntelReportStat(WeaponType.ART_122MM_FG,     18);
             TYPE59.AddIntelReportStat(WeaponType.AT_ATGM,          12);
-            TYPE59.AddIntelReportStat(WeaponType.SPAAA_TYPE53,      6);
+            TYPE59.AddIntelReportStat(WeaponType.SPAAA_TYPE53_CH,      6);
             TYPE59.AddIntelReportStat(WeaponType.AAA_20MM,          6);
             TYPE59.AddIntelReportStat(WeaponType.MANPAD_STRELA,     18);
 
             // Handle the icon profile.
-            TYPE59.IconProfile = new RegimentIconProfile(RegimentIconType.Directional)
+            TYPE59.IconProfile = new RegimentIconProfile(RegimentIconType.Single)
             {
-                W = SpriteManager.CH_Type59_W,
-                NW = SpriteManager.CH_Type59_NW,
-                SW = SpriteManager.CH_Type59_SW
+                Icon = SpriteManager.CH_Type59_W
             };
 
             // Add the Type 59 profile to the database
-            AddProfile(WeaponType.TANK_TYPE59, TYPE59);
+            AddProfile(WeaponType.TANK_TYPE59_CH, TYPE59);
             //----------------------------------------------
             // Chinese Type 59 Medium Tank
             //----------------------------------------------
@@ -6642,12 +6441,12 @@ namespace HammerAndSickle.Models
             // Chinese Type 80 Main Battle Tank
             //----------------------------------------------
             // Phase 3 (final-intent): Type 80 (105mm rifled, China's first modern MBT) = Gen2 + LASER_RANGEFINDER
-            // (basic FCS, no thermal). → HA10 HD8 SA7 SD6 GAD7 · ICM 1.05 · MMP10 · SR2.
+            // (basic FCS, no thermal). → HA10 HD8 SA7 SD6 GAD7 · ICM 0.945 (LRF 1.05 × second line 0.9) · MMP10 · SR2.
             WeaponProfile TYPE80 = WeaponProfile.FromProfileDef(
-                "Type 80 Main Battle Tank", "Type 80", WeaponType.TANK_TYPE80,
+                "Type 80 Main Battle Tank", "Type 80", WeaponType.TANK_TYPE80_CH,
                 new ProfileDef(TankArchetypes.Gen2,
                     new Dictionary<ProfileStat, int>(),
-                    new[] { WeaponTrait.LASER_RANGEFINDER }),
+                    new[] { WeaponTrait.LASER_RANGEFINDER, WeaponTrait.SECOND_LINE_FORMATION }),
                 UpgradePath.TANK, 564);
 
             // Set the prestige cost for the profile.
@@ -6655,68 +6454,25 @@ namespace HammerAndSickle.Models
 
             // Intel stats
             TYPE80.AddIntelReportStat(WeaponType.Personnel, 1050);
-            TYPE80.AddIntelReportStat(WeaponType.TANK_TYPE80, 80);
-            TYPE80.AddIntelReportStat(WeaponType.IFV_TYPE86,  40);
-            TYPE80.AddIntelReportStat(WeaponType.SPA_TYPE82,  18);
+            TYPE80.AddIntelReportStat(WeaponType.TANK_TYPE80_CH, 80);
+            TYPE80.AddIntelReportStat(WeaponType.IFV_TYPE86_CH,  40);
+            TYPE80.AddIntelReportStat(WeaponType.SPA_TYPE83_CH,  18);
             TYPE80.AddIntelReportStat(WeaponType.ART_122MM_FG,18);
             TYPE80.AddIntelReportStat(WeaponType.AT_ATGM,     12);
-            TYPE80.AddIntelReportStat(WeaponType.SPAAA_TYPE53, 6);
+            TYPE80.AddIntelReportStat(WeaponType.SPAAA_TYPE53_CH, 6);
             TYPE80.AddIntelReportStat(WeaponType.AAA_20MM,     6);
             TYPE80.AddIntelReportStat(WeaponType.MANPAD_STRELA, 18);
 
             // Handle the icon profile.
-            TYPE80.IconProfile = new RegimentIconProfile(RegimentIconType.Directional)
+            TYPE80.IconProfile = new RegimentIconProfile(RegimentIconType.Single)
             {
-                W = SpriteManager.CH_Type80_W,
-                NW = SpriteManager.CH_Type80_NW,
-                SW = SpriteManager.CH_Type80_SW
+                Icon = SpriteManager.CH_Type80_W
             };
 
             // Add the Type 80 profile to the database
-            AddProfile(WeaponType.TANK_TYPE80, TYPE80);
+            AddProfile(WeaponType.TANK_TYPE80_CH, TYPE80);
             //----------------------------------------------
             // Chinese Type 80 Main Battle Tank
-            //----------------------------------------------
-
-            //----------------------------------------------
-            // Chinese Type 95 Main Battle Tank
-            //----------------------------------------------
-            // Phase 3 (final-intent): Type 95 (modern 125mm Chinese MBT) = Gen3 + LASER_RANGEFINDER + BALLISTIC_COMPUTER.
-            // Capable Gen3 hull/gun but NO Western thermal → ICM 1.10 / SR 2, deliberately below the M1/Leo2 (ICM 1.33,
-            // SR 3) — Chinese thermal/optics lag of the era. → HA13 HD11 SA9 SD6 GAD7 · ICM 1.10 · MMP10 · SR2.
-            WeaponProfile TYPE95 = WeaponProfile.FromProfileDef(
-                "Type 95 Main Battle Tank", "Type 95", WeaponType.TANK_TYPE95,
-                new ProfileDef(TankArchetypes.Gen3,
-                    new Dictionary<ProfileStat, int>(),
-                    new[] { WeaponTrait.LASER_RANGEFINDER, WeaponTrait.BALLISTIC_COMPUTER }),
-                UpgradePath.TANK, 588);
-
-            // Set the prestige cost for the profile.
-            TYPE95.SetPrestigeCost(PrestigeTierCost.Gen2, PrestigeTypeCost.TANK);
-
-            // Intel stats
-            TYPE95.AddIntelReportStat(WeaponType.Personnel, 1050);
-            TYPE95.AddIntelReportStat(WeaponType.TANK_TYPE95, 80);
-            TYPE95.AddIntelReportStat(WeaponType.IFV_TYPE86, 40);
-            TYPE95.AddIntelReportStat(WeaponType.SPA_TYPE82, 18);
-            TYPE95.AddIntelReportStat(WeaponType.ART_122MM_FG, 18);
-            TYPE95.AddIntelReportStat(WeaponType.AT_ATGM, 12);
-            TYPE95.AddIntelReportStat(WeaponType.SPAAA_TYPE53, 6);
-            TYPE95.AddIntelReportStat(WeaponType.AAA_20MM, 6);
-            TYPE95.AddIntelReportStat(WeaponType.MANPAD_STRELA, 18);
-
-            // Handle the icon profile.
-            TYPE95.IconProfile = new RegimentIconProfile(RegimentIconType.Directional)
-            {
-                W = SpriteManager.CH_Type95_W,
-                NW = SpriteManager.CH_Type95_NW,
-                SW = SpriteManager.CH_Type95_SW
-            };
-
-            // Add the Type 95 profile to the database
-            AddProfile(WeaponType.TANK_TYPE95, TYPE95);
-            //----------------------------------------------
-            // Chinese Type 95 Main Battle Tank
             //----------------------------------------------
 
             #endregion // MBTs
@@ -6727,9 +6483,9 @@ namespace HammerAndSickle.Models
             // Chinese Type 86 Infantry Fighting Vehicle
             //----------------------------------------------
             // Phase 3 (derived): Ifv + ATGM_RAIL (HJ-73 rail on the BMP-1-copy hull, HA+4) + AMPHIBIOUS.
-            // Mirrors the Soviet BMP-1P line. → HA8 HD4 SA8 SD7 GAD7 · ICM 1.00 · MMP10 · SR2 · amphibious.
+            // Mirrors the Soviet BMP-1P line. → HA8 HD4 SA8 SD7 GAD7 · ICM 1.00 (Mobile-bay ride — NO formation trait) · MMP10 · SR2 · amphibious.
             WeaponProfile TYPE86 = WeaponProfile.FromProfileDef(
-                "Type 86 Infantry Fighting Vehicle", "Type 86", WeaponType.IFV_TYPE86,
+                "Type 86 Infantry Fighting Vehicle", "Type 86", WeaponType.IFV_TYPE86_CH,
                 new ProfileDef(FamilyArchetypes.Ifv,
                     new Dictionary<ProfileStat, int>(),
                     new[] { WeaponTrait.ATGM_RAIL, WeaponTrait.AMPHIBIOUS }),
@@ -6741,18 +6497,16 @@ namespace HammerAndSickle.Models
             // Intel stats
             // Census — CARRIER: own platform count only (doctrine rule 2; caught by the Block 6
             // guard simulation 2026-08-13, Bob-approved fix). The 40 Type 59s move to INF_REG_CH.
-            TYPE86.AddIntelReportStat(WeaponType.IFV_TYPE86,        90);
+            TYPE86.AddIntelReportStat(WeaponType.IFV_TYPE86_CH,        90);
 
             // Handle the icon profile.
-            TYPE86.IconProfile = new RegimentIconProfile(RegimentIconType.Directional)
+            TYPE86.IconProfile = new RegimentIconProfile(RegimentIconType.Single)
             {
-                W = SpriteManager.CH_Type86_W,
-                NW = SpriteManager.CH_Type86_NW,
-                SW = SpriteManager.CH_Type86_SW
+                Icon = SpriteManager.CH_Type86_W
             };
 
             // Add the Type 86 profile to the database
-            AddProfile(WeaponType.IFV_TYPE86, TYPE86);
+            AddProfile(WeaponType.IFV_TYPE86_CH, TYPE86);
             //----------------------------------------------
             // Chinese Type 86 Infantry Fighting Vehicle
             //----------------------------------------------
@@ -6766,39 +6520,34 @@ namespace HammerAndSickle.Models
             //----------------------------------------------
             // Phase 3 (derived): Artillery + SELF_PROPELLED (tracked chassis: MMP+6→10, HD/SD+2, GAD-1) + IR MEDIUM.
             // 122mm tracked SP howitzer, the Soviet 2S1 analogue. → HA5 HD7 SA9 SD7 GAD7 · MMP10 · IR MEDIUM.
-            WeaponProfile SPA_TYPE82 = WeaponProfile.FromProfileDef(
-                "Type 82 Self-Propelled Howitzer", "Type 82", WeaponType.SPA_TYPE82,
+            WeaponProfile SPA_TYPE83_CH = WeaponProfile.FromProfileDef(
+                "Type 82 Self-Propelled Howitzer", "Type 82", WeaponType.SPA_TYPE83_CH,
                 new ProfileDef(FamilyArchetypes.Artillery,
                     new Dictionary<ProfileStat, int> { { ProfileStat.IR, GameData.INDIRECT_RANGE_MEDIUM } },
-                    new[] { WeaponTrait.SELF_PROPELLED }),
+                    new[] { WeaponTrait.SELF_PROPELLED, WeaponTrait.SECOND_LINE_FORMATION }),
                 UpgradePath.ART, 552);
 
             // Set the prestige cost for the profile.
             // Artillery ruling 5 (2026-08-22): Gen3 → Gen2 — 2S3-class stats were carrying a 2S5-class
             // price (pricing drift; China tank prices drifted the OTHER way, see survey §4).
-            SPA_TYPE82.SetPrestigeCost(PrestigeTierCost.Gen2, PrestigeTypeCost.SPA);
+            SPA_TYPE83_CH.SetPrestigeCost(PrestigeTierCost.Gen2, PrestigeTypeCost.SPA);
 
             // Intel stats
-            SPA_TYPE82.AddIntelReportStat(WeaponType.Personnel,       700);
-            SPA_TYPE82.AddIntelReportStat(WeaponType.SPA_TYPE82,       36);
-            SPA_TYPE82.AddIntelReportStat(WeaponType.IFV_TYPE86,       12);
-            SPA_TYPE82.AddIntelReportStat(WeaponType.MANPAD_STRELA,      8);
+            SPA_TYPE83_CH.AddIntelReportStat(WeaponType.Personnel,       700);
+            SPA_TYPE83_CH.AddIntelReportStat(WeaponType.SPA_TYPE83_CH,       36);
+            SPA_TYPE83_CH.AddIntelReportStat(WeaponType.IFV_TYPE86_CH,       12);
+            SPA_TYPE83_CH.AddIntelReportStat(WeaponType.MANPAD_STRELA,      8);
 
             // Handle the icon profile.
-            SPA_TYPE82.IconProfile = new RegimentIconProfile(RegimentIconType.Directional_Fire)
+            SPA_TYPE83_CH.IconProfile = new RegimentIconProfile(RegimentIconType.Single)
             {
-                W = SpriteManager.CH_Type82_W,
-                NW = SpriteManager.CH_Type82_NW,
-                SW = SpriteManager.CH_Type82_SW,
-                W_F = SpriteManager.CH_Type82_W_F,
-                NW_F = SpriteManager.CH_Type82_NW_F,
-                SW_F = SpriteManager.CH_Type82_SW_F
+                Icon = SpriteManager.CH_Type82_W
             };
 
             // Add the Type 82 profile to the database
             // Towed vs self-propelled: the artillery/AAA/SAM families hold both, so medium is per profile.
-            SPA_TYPE82.SetMovementMedium(MovementMedium.Tracked);
-            AddProfile(WeaponType.SPA_TYPE82, SPA_TYPE82);
+            SPA_TYPE83_CH.SetMovementMedium(MovementMedium.Tracked);
+            AddProfile(WeaponType.SPA_TYPE83_CH, SPA_TYPE83_CH);
             //----------------------------------------------
             // Chinese Type 82 Self-Propelled Howitzer
             //----------------------------------------------
@@ -6810,10 +6559,10 @@ namespace HammerAndSickle.Models
             // +1 CombatAction, derives IsDoubleFire) + IR ROC_MR. Tracked Grad-class — drops the old flat SA bonus and
             // carries its punch via the extra action, as the Soviet BM-21 does. → HA5 HD7 SA9 SD7 GAD7 · MMP10 · double-fire.
             WeaponProfile PHZ89 = WeaponProfile.FromProfileDef(
-                "PHZ-89 Multiple Rocket Launcher", "PHZ-89", WeaponType.ROC_PHZ89,
+                "PHZ-89 Multiple Rocket Launcher", "PHZ-89", WeaponType.ROC_PHZ89_CH,
                 new ProfileDef(FamilyArchetypes.Artillery,
                     new Dictionary<ProfileStat, int> { { ProfileStat.IR, GameData.INDIRECT_RANGE_ROC_MR } },
-                    new[] { WeaponTrait.SELF_PROPELLED, WeaponTrait.ROCKET_ARTILLERY }),
+                    new[] { WeaponTrait.SELF_PROPELLED, WeaponTrait.ROCKET_ARTILLERY, WeaponTrait.SECOND_LINE_FORMATION }),
                 UpgradePath.ROC, 500);
 
             // Set the prestige cost for the profile.
@@ -6823,25 +6572,20 @@ namespace HammerAndSickle.Models
 
             // Intel stats
             PHZ89.AddIntelReportStat(WeaponType.Personnel,       650);
-            PHZ89.AddIntelReportStat(WeaponType.ROC_PHZ89,        24);
-            PHZ89.AddIntelReportStat(WeaponType.IFV_TYPE86,       12);
+            PHZ89.AddIntelReportStat(WeaponType.ROC_PHZ89_CH,        24);
+            PHZ89.AddIntelReportStat(WeaponType.IFV_TYPE86_CH,       12);
             PHZ89.AddIntelReportStat(WeaponType.MANPAD_STRELA,      8);
 
             // Handle the icon profile.
-            PHZ89.IconProfile = new RegimentIconProfile(RegimentIconType.Directional_Fire)
+            PHZ89.IconProfile = new RegimentIconProfile(RegimentIconType.Single)
             {
-                W = SpriteManager.CH_PHZ89_W,
-                NW = SpriteManager.CH_PHZ89_NW,
-                SW = SpriteManager.CH_PHZ89_SW,
-                W_F = SpriteManager.CH_PHZ89_W_F,
-                NW_F = SpriteManager.CH_PHZ89_NW_F,
-                SW_F = SpriteManager.CH_PHZ89_SW_F
+                Icon = SpriteManager.CH_PHZ89_W
             };
 
             // Add the PHZ-89 profile to the database
             // Towed vs self-propelled: the artillery/AAA/SAM families hold both, so medium is per profile.
             PHZ89.SetMovementMedium(MovementMedium.Tracked);
-            AddProfile(WeaponType.ROC_PHZ89, PHZ89);
+            AddProfile(WeaponType.ROC_PHZ89_CH, PHZ89);
             //----------------------------------------------
             // Chinese PHZ-89 Multiple Rocket Launcher
             //----------------------------------------------
@@ -6853,9 +6597,7 @@ namespace HammerAndSickle.Models
             // identical to the Soviet light towed line. → HA5 HD5 SA9 SD5 GAD8 · MMP4 · IR SHORT.
             WeaponProfile ART_LT_CH = WeaponProfile.FromProfileDef(
                 "Light Towed Artillery", "Light Artillery", WeaponType.ART_LIGHT_CH,
-                new ProfileDef(FamilyArchetypes.Artillery,
-                    new Dictionary<ProfileStat, int> { { ProfileStat.IR, GameData.INDIRECT_RANGE_SHORT } },
-                    new[] { WeaponTrait.AIR_DROPPABLE, WeaponTrait.HELO_TRANSPORTABLE }),
+                LightTowedArtilleryDef(WeaponTrait.SECOND_LINE_FORMATION),
                 UpgradePath.ART, 144);
 
             // Set the prestige cost for the profile.
@@ -6864,13 +6606,13 @@ namespace HammerAndSickle.Models
             // Intel stats
             ART_LT_CH.AddIntelReportStat(WeaponType.Personnel,       1050);
             ART_LT_CH.AddIntelReportStat(WeaponType.ART_LIGHT_CH,     72);
-            ART_LT_CH.AddIntelReportStat(WeaponType.IFV_TYPE86,       12);
+            ART_LT_CH.AddIntelReportStat(WeaponType.IFV_TYPE86_CH,       12);
             ART_LT_CH.AddIntelReportStat(WeaponType.MANPAD_STRELA,      6);
 
             // Handle the icon profile.
             ART_LT_CH.IconProfile = new RegimentIconProfile(RegimentIconType.Single)
             {
-                W = SpriteManager.GEN_LightArt
+                Icon = SpriteManager.CH_LightArt
             };
 
             // Add the Chinese Light Artillery profile to the database
@@ -6890,9 +6632,7 @@ namespace HammerAndSickle.Models
             // → HA5 HD5 SA10 SD5 GAD8 · MMP4 · IR MEDIUM.
             WeaponProfile ART_HV_CH = WeaponProfile.FromProfileDef(
                 "Heavy Towed Artillery", "Heavy Artillery", WeaponType.ART_HEAVY_CH,
-                new ProfileDef(FamilyArchetypes.Artillery,
-                    new Dictionary<ProfileStat, int> { { ProfileStat.IR, GameData.INDIRECT_RANGE_MEDIUM }, { ProfileStat.SA, 1 } },
-                    System.Array.Empty<WeaponTrait>()),
+                HeavyTowedArtilleryDef(WeaponTrait.SECOND_LINE_FORMATION),
                 UpgradePath.ART, 144);
 
             // Set the prestige cost for the profile.
@@ -6901,13 +6641,13 @@ namespace HammerAndSickle.Models
             // Intel stats
             ART_HV_CH.AddIntelReportStat(WeaponType.Personnel,       1100);
             ART_HV_CH.AddIntelReportStat(WeaponType.ART_HEAVY_CH,     72);
-            ART_HV_CH.AddIntelReportStat(WeaponType.IFV_TYPE86,       18);
+            ART_HV_CH.AddIntelReportStat(WeaponType.IFV_TYPE86_CH,       18);
             ART_HV_CH.AddIntelReportStat(WeaponType.MANPAD_STRELA,      8);
 
             // Handle the icon profile.
             ART_HV_CH.IconProfile = new RegimentIconProfile(RegimentIconType.Single)
             {
-                W = SpriteManager.GEN_HeavyArt
+                Icon = SpriteManager.CH_HeavyArt
             };
 
             // Add the Chinese Heavy Artillery profile to the database
@@ -6928,10 +6668,10 @@ namespace HammerAndSickle.Models
             // Phase 3 (derived): Aaa archetype + SELF_PROPELLED (tracked) + IR AAA. Optically-aimed twin 57mm with no
             // radar (the Chinese ZSU-57-2 analogue), so it stays at base AAA gunnery. → HA4 HD6 SA9 SD8 GAD11 GAT11 · MMP10 · SR3.
             WeaponProfile TYPE53 = WeaponProfile.FromProfileDef(
-                "Type 53 Self-Propelled Anti-Aircraft Gun", "Type 53", WeaponType.SPAAA_TYPE53,
+                "Type 53 Self-Propelled Anti-Aircraft Gun", "Type 53", WeaponType.SPAAA_TYPE53_CH,
                 new ProfileDef(FamilyArchetypes.Aaa,
                     new Dictionary<ProfileStat, int> { { ProfileStat.IR, GameData.INDIRECT_RANGE_AAA } },
-                    new[] { WeaponTrait.SELF_PROPELLED }),
+                    new[] { WeaponTrait.SELF_PROPELLED, WeaponTrait.SECOND_LINE_FORMATION }),
                 UpgradePath.AAA, 204);
 
             // Set the prestige cost for the profile.
@@ -6939,25 +6679,20 @@ namespace HammerAndSickle.Models
 
             // Intel stats
             TYPE53.AddIntelReportStat(WeaponType.Personnel,         700);
-            TYPE53.AddIntelReportStat(WeaponType.SPAAA_TYPE53,       36);
-            TYPE53.AddIntelReportStat(WeaponType.IFV_TYPE86,         12);
+            TYPE53.AddIntelReportStat(WeaponType.SPAAA_TYPE53_CH,       36);
+            TYPE53.AddIntelReportStat(WeaponType.IFV_TYPE86_CH,         12);
             TYPE53.AddIntelReportStat(WeaponType.MANPAD_STRELA,       24);
 
             // Handle the icon profile.
-            TYPE53.IconProfile = new RegimentIconProfile(RegimentIconType.Directional_Fire)
+            TYPE53.IconProfile = new RegimentIconProfile(RegimentIconType.Single)
             {
-                W = SpriteManager.CH_Type53_W,
-                NW = SpriteManager.CH_Type53_NW,
-                SW = SpriteManager.CH_Type53_SW,
-                W_F = SpriteManager.CH_Type53_W_F,
-                NW_F = SpriteManager.CH_Type53_NW_F,
-                SW_F = SpriteManager.CH_Type53_SW_F
+                Icon = SpriteManager.CH_Type53_W
             };
 
             // Add the Type 53 profile to the database
             // Towed vs self-propelled: the artillery/AAA/SAM families hold both, so medium is per profile.
             TYPE53.SetMovementMedium(MovementMedium.Tracked);
-            AddProfile(WeaponType.SPAAA_TYPE53, TYPE53);
+            AddProfile(WeaponType.SPAAA_TYPE53_CH, TYPE53);
             //----------------------------------------------
             // Chinese Type 53 Self-Propelled AAA
             //----------------------------------------------
@@ -6970,10 +6705,11 @@ namespace HammerAndSickle.Models
             // IR SAM→SHORT 2026-08-22 (Bob): rides with the NATO point-defense band — it IS a Crotale clone (~12 km).
             // → HA1 HD5 SA1 SD5 GAD7 GAT14 · MMP10 · IR4 · SR6 · shoot-scoot.
             WeaponProfile HQ7 = WeaponProfile.FromProfileDef(
-                "HQ-7 Self-Propelled SAM System", "HQ-7", WeaponType.SPSAM_HQ7,
+                "HQ-7 Self-Propelled SAM System", "HQ-7", WeaponType.SPSAM_HQ7_CH,
                 new ProfileDef(FamilyArchetypes.Sam,
                     new Dictionary<ProfileStat, int> { { ProfileStat.IR, GameData.INDIRECT_RANGE_SHORT } },
-                    new[] { WeaponTrait.SELF_PROPELLED, WeaponTrait.COMMAND_GUIDANCE, WeaponTrait.MOBILE_SHOOT_SCOOT }),
+                    new[] { WeaponTrait.SELF_PROPELLED, WeaponTrait.COMMAND_GUIDANCE, WeaponTrait.MOBILE_SHOOT_SCOOT,
+                            WeaponTrait.SECOND_LINE_FORMATION }),
                 UpgradePath.SAM, 564);
 
             // Set the prestige cost for the profile.
@@ -6981,25 +6717,20 @@ namespace HammerAndSickle.Models
 
             // Intel stats
             HQ7.AddIntelReportStat(WeaponType.Personnel,       750);
-            HQ7.AddIntelReportStat(WeaponType.SPSAM_HQ7,        18);
-            HQ7.AddIntelReportStat(WeaponType.IFV_TYPE86,        24);
-            HQ7.AddIntelReportStat(WeaponType.SPAAA_TYPE53,       4);
+            HQ7.AddIntelReportStat(WeaponType.SPSAM_HQ7_CH,        18);
+            HQ7.AddIntelReportStat(WeaponType.IFV_TYPE86_CH,        24);
+            HQ7.AddIntelReportStat(WeaponType.SPAAA_TYPE53_CH,       4);
 
             // Handle the icon profile.
-            HQ7.IconProfile = new RegimentIconProfile(RegimentIconType.Directional_Fire)
+            HQ7.IconProfile = new RegimentIconProfile(RegimentIconType.Single)
             {
-                W = SpriteManager.CH_HQ7_W,
-                NW = SpriteManager.CH_HQ7_NW,
-                SW = SpriteManager.CH_HQ7_SW,
-                W_F = SpriteManager.CH_HQ7_W_F,
-                NW_F = SpriteManager.CH_HQ7_NW_F,
-                SW_F = SpriteManager.CH_HQ7_SW_F
+                Icon = SpriteManager.CH_HQ7_W
             };
 
             // Add the HQ-7 profile to the database
             // Towed vs self-propelled: the artillery/AAA/SAM families hold both, so medium is per profile.
             HQ7.SetMovementMedium(MovementMedium.Wheeled);
-            AddProfile(WeaponType.SPSAM_HQ7, HQ7);
+            AddProfile(WeaponType.SPSAM_HQ7_CH, HQ7);
             //----------------------------------------------
             // Chinese HQ-7 Self-Propelled SAM
             //----------------------------------------------
@@ -7012,12 +6743,12 @@ namespace HammerAndSickle.Models
             // Chinese H-9 Attack Helicopter
             //----------------------------------------------
             // Phase 3 (derived): Helicopter + ATGM_HELO_SACLOS (HJ-8 SACLOS missiles, HA+4). Light Z-9-class AT helo —
-            // unarmoured, no heavy cannon, so it sits below the armoured Hind. → HA11 HD6 SA10 SD7 GAD10 · ICM 1.00 · MMP24 · SR3.
+            // unarmoured, no heavy cannon, so it sits below the armoured Hind. → HA11 HD6 SA10 SD7 GAD10 · ICM 0.90 (second line) · MMP24 · SR3.
             WeaponProfile H9 = WeaponProfile.FromProfileDef(
-                "H-9 Attack Helicopter", "H-9", WeaponType.HEL_H9,
+                "H-9 Attack Helicopter", "H-9", WeaponType.HEL_Z9_CH,
                 new ProfileDef(FamilyArchetypes.Helicopter,
                     new Dictionary<ProfileStat, int>(),
-                    new[] { WeaponTrait.ATGM_HELO_SACLOS }),
+                    new[] { WeaponTrait.ATGM_HELO_SACLOS, WeaponTrait.SECOND_LINE_FORMATION }),
                 UpgradePath.HEL, 528);
 
             // Set the prestige cost for the profile.
@@ -7025,21 +6756,16 @@ namespace HammerAndSickle.Models
 
             // Intel stats
             H9.AddIntelReportStat(WeaponType.Personnel,       475);
-            H9.AddIntelReportStat(WeaponType.HEL_H9,           54);
+            H9.AddIntelReportStat(WeaponType.HEL_Z9_CH,           54);
 
             // Handle the icon profile.
             H9.IconProfile = new RegimentIconProfile(RegimentIconType.Helo_Animation)
             {
-                W = SpriteManager.CH_H9_Frame0,
-                NW = SpriteManager.CH_H9_Frame1,
-                SW = SpriteManager.CH_H9_Frame2,
-                W_F = SpriteManager.CH_H9_Frame3,
-                NW_F = SpriteManager.CH_H9_Frame4,
-                SW_F = SpriteManager.CH_H9_Frame5
+                Icon = SpriteManager.CH_H9_Frame0
             };
 
             // Add the H-9 profile to the database
-            AddProfile(WeaponType.HEL_H9, H9);
+            AddProfile(WeaponType.HEL_Z9_CH, H9);
             //----------------------------------------------
             // Chinese H-9 Attack Helicopter
             //----------------------------------------------
@@ -7054,26 +6780,26 @@ namespace HammerAndSickle.Models
             // Phase 3 (derived): FighterEarly archetype bare (MiG-21 copy). Basic early air-superiority jet, GA Rule-A
             // floor 2. → DF8 MAN9 TS10 SUR6 GA2 OL6 · MMP100 · SR4.
             WeaponProfile J7 = WeaponProfile.FromProfileDef(
-                "J-7 Fighter", "J-7", WeaponType.FGT_J7,
+                "J-7 Fighter", "J-7", WeaponType.FGT_J7_CH,
                 new ProfileDef(FamilyArchetypes.FighterEarly,
                     new Dictionary<ProfileStat, int>(),
-                    System.Array.Empty<WeaponTrait>()),
+                    new[] { WeaponTrait.SECOND_LINE_FORMATION }),
                 UpgradePath.FGT, 324);
 
             // Set the prestige cost for the profile.
             J7.SetPrestigeCost(PrestigeTierCost.Gen1, PrestigeTypeCost.FGT);
 
             // Intel stats
-            J7.AddIntelReportStat(WeaponType.FGT_J7,     36);
+            J7.AddIntelReportStat(WeaponType.FGT_J7_CH,     36);
 
             // Handle the icon profile.
             J7.IconProfile = new RegimentIconProfile(RegimentIconType.Single)
             {
-                W = SpriteManager.CH_J7
+                Icon = SpriteManager.CH_J7
             };
 
             // Add the J-7 profile to the database
-            AddProfile(WeaponType.FGT_J7, J7);
+            AddProfile(WeaponType.FGT_J7_CH, J7);
             //----------------------------------------------
             // Chinese J-7 Fighter
             //----------------------------------------------
@@ -7086,26 +6812,26 @@ namespace HammerAndSickle.Models
             // look-down ICM (Chinese radar lag), so a notch under the radar-ICM Western jets. JUDGMENT CALL (flagged):
             // agility stays early-gen. → DF10 MAN9 TS13 SUR7 · GA2 OL6 · MMP100 · SR4.
             WeaponProfile J8 = WeaponProfile.FromProfileDef(
-                "J-8 Interceptor", "J-8", WeaponType.FGT_J8,
+                "J-8 Interceptor", "J-8", WeaponType.FGT_J8_CH,
                 new ProfileDef(FamilyArchetypes.FighterEarly,
                     new Dictionary<ProfileStat, int> { { ProfileStat.TS, 3 } },
-                    new[] { WeaponTrait.BVR_RADAR_MISSILE, WeaponTrait.RWR, WeaponTrait.HIGH_MACH_DASH }),
+                    new[] { WeaponTrait.BVR_RADAR_MISSILE, WeaponTrait.RWR, WeaponTrait.HIGH_MACH_DASH, WeaponTrait.SECOND_LINE_FORMATION }),
                 UpgradePath.FGT, 504);
 
             // Set the prestige cost for the profile.
             J8.SetPrestigeCost(PrestigeTierCost.Gen2, PrestigeTypeCost.FGT);
 
             // Intel stats
-            J8.AddIntelReportStat(WeaponType.FGT_J8,     36);
+            J8.AddIntelReportStat(WeaponType.FGT_J8_CH,     36);
 
             // Handle the icon profile.
             J8.IconProfile = new RegimentIconProfile(RegimentIconType.Single)
             {
-                W = SpriteManager.CH_J8
+                Icon = SpriteManager.CH_J8
             };
 
             // Add the J-8 profile to the database
-            AddProfile(WeaponType.FGT_J8, J8);
+            AddProfile(WeaponType.FGT_J8_CH, J8);
             //----------------------------------------------
             // Chinese J-8 Interceptor
             //----------------------------------------------
@@ -7117,26 +6843,26 @@ namespace HammerAndSickle.Models
             // light attacker — no precision AG traits, so GA stays at the archetype floor 10, clearly below the A-10/Su-25
             // trait stack (15). JUDGMENT CALL (flagged). → DF2 MAN4 TS9 SUR10 GA10 OL9.
             WeaponProfile Q5 = WeaponProfile.FromProfileDef(
-                "Q-5 Fantan Attack Aircraft", "Q-5 Fantan", WeaponType.ATT_Q5,
+                "Q-5 Fantan Attack Aircraft", "Q-5 Fantan", WeaponType.ATT_Q5_CH,
                 new ProfileDef(FamilyArchetypes.Attack,
                     new Dictionary<ProfileStat, int> { { ProfileStat.DF, -2 }, { ProfileStat.TS, 2 } },
-                    System.Array.Empty<WeaponTrait>()),
+                    new[] { WeaponTrait.SECOND_LINE_FORMATION }),
                 UpgradePath.ATT, 384);
 
             // Set the prestige cost for the profile.
             Q5.SetPrestigeCost(PrestigeTierCost.Gen2, PrestigeTypeCost.ATT);
 
             // Intel stats
-            Q5.AddIntelReportStat(WeaponType.ATT_Q5,     36);
+            Q5.AddIntelReportStat(WeaponType.ATT_Q5_CH,     36);
 
             // Handle the icon profile.
             Q5.IconProfile = new RegimentIconProfile(RegimentIconType.Single)
             {
-                W = SpriteManager.CH_Q5
+                Icon = SpriteManager.CH_Q5
             };
 
             // Add the Q-5 profile to the database
-            AddProfile(WeaponType.ATT_Q5, Q5);
+            AddProfile(WeaponType.ATT_Q5_CH, Q5);
             //----------------------------------------------
             // Chinese Q-5 Fantan Attack Aircraft
             //----------------------------------------------
@@ -7147,26 +6873,26 @@ namespace HammerAndSickle.Models
             // Phase 3 (final-intent): Bomber + SUR+2 + CARPET_BOMBING (area anti-soft: GA+1→9, GaVsSoft+3 stored) +
             // STRATEGIC_PAYLOAD (OL+4→16). The H-6 IS the Tu-16 (licence copy) — same area level-bomber line. → DF1 MAN3 TS10 SUR10 GA9 OL16.
             WeaponProfile H6 = WeaponProfile.FromProfileDef(
-                "H-6 Bomber", "H-6", WeaponType.BMB_H6,
+                "H-6 Bomber", "H-6", WeaponType.BMB_H6_CH,
                 new ProfileDef(FamilyArchetypes.Bomber,
                     new Dictionary<ProfileStat, int> { { ProfileStat.SUR, 2 } },
-                    new[] { WeaponTrait.CARPET_BOMBING, WeaponTrait.STRATEGIC_PAYLOAD }),
+                    new[] { WeaponTrait.CARPET_BOMBING, WeaponTrait.STRATEGIC_PAYLOAD, WeaponTrait.SECOND_LINE_FORMATION }),
                 UpgradePath.BMB, 372);
 
             // Set the prestige cost for the profile.
             H6.SetPrestigeCost(PrestigeTierCost.Gen1, PrestigeTypeCost.BMB);
 
             // Intel stats
-            H6.AddIntelReportStat(WeaponType.BMB_H6,     24);
+            H6.AddIntelReportStat(WeaponType.BMB_H6_CH,     24);
 
             // Handle the icon profile.
             H6.IconProfile = new RegimentIconProfile(RegimentIconType.Single)
             {
-                W = SpriteManager.CH_H6
+                Icon = SpriteManager.CH_H6
             };
 
             // Add the H-6 profile to the database
-            AddProfile(WeaponType.BMB_H6, H6);
+            AddProfile(WeaponType.BMB_H6_CH, H6);
             //----------------------------------------------
             // Chinese H-6 Bomber
             //----------------------------------------------
@@ -7184,25 +6910,25 @@ namespace HammerAndSickle.Models
                 "Chinese Regular Infantry", "PLA Regulars", WeaponType.INF_REG_CH,
                 new ProfileDef(FamilyArchetypes.Infantry,
                     new Dictionary<ProfileStat, int>(),
-                    new[] { WeaponTrait.RPG_LAW, WeaponTrait.MANPADS_BASIC }));
+                    new[] { WeaponTrait.RPG_LAW, WeaponTrait.MANPADS_BASIC, WeaponTrait.SECOND_LINE_FORMATION }));
 
             // Intel stats
             INF_REG_CH_P.AddIntelReportStat(WeaponType.Personnel,       2200);
             // Organic tank battalion (census pass 2026-08-13, Bob-approved): moved off the stripped
             // Type 86 carrier (rule 2). ⚠ Shared by mech and leg templates — same P4 caveat as
             // INF_REG_IQ/IR.
-            INF_REG_CH_P.AddIntelReportStat(WeaponType.TANK_TYPE59,       40);
+            INF_REG_CH_P.AddIntelReportStat(WeaponType.TANK_TYPE59_CH,       40);
             INF_REG_CH_P.AddIntelReportStat(WeaponType.ART_155MM_FG,      18);
             INF_REG_CH_P.AddIntelReportStat(WeaponType.ART_120MM_MORTAR,  12);
             INF_REG_CH_P.AddIntelReportStat(WeaponType.ART_82MM_MORTAR,   12);
             INF_REG_CH_P.AddIntelReportStat(WeaponType.AT_ATGM,           18);
             INF_REG_CH_P.AddIntelReportStat(WeaponType.MANPAD_STRELA,     24);
-            INF_REG_CH_P.AddIntelReportStat(WeaponType.SPAAA_TYPE53,       6);
+            INF_REG_CH_P.AddIntelReportStat(WeaponType.SPAAA_TYPE53_CH,       6);
 
             // Handle the icon profile.
             INF_REG_CH_P.IconProfile = new RegimentIconProfile(RegimentIconType.Single)
             {
-                W = SpriteManager.CH_Infantry
+                Icon = SpriteManager.CH_Infantry
             };
 
             // Add the Chinese Regular Infantry profile to the database
@@ -7221,7 +6947,8 @@ namespace HammerAndSickle.Models
                 "Chinese Airborne Infantry", "PLA Airborne", WeaponType.INF_AB_CH,
                 new ProfileDef(FamilyArchetypes.Infantry,
                     new Dictionary<ProfileStat, int>(),
-                    new[] { WeaponTrait.RPG_LAW, WeaponTrait.MANPADS_BASIC, WeaponTrait.AIR_DROPPABLE }));
+                    new[] { WeaponTrait.RPG_LAW, WeaponTrait.MANPADS_BASIC, WeaponTrait.AIR_DROPPABLE,
+                            WeaponTrait.SECOND_LINE_FORMATION }));
 
             // Intel stats
             INF_AB_CH_P.AddIntelReportStat(WeaponType.Personnel,       1800);
@@ -7234,7 +6961,7 @@ namespace HammerAndSickle.Models
             // Handle the icon profile.
             INF_AB_CH_P.IconProfile = new RegimentIconProfile(RegimentIconType.Single)
             {
-                W = SpriteManager.CH_Airborne
+                Icon = SpriteManager.CH_Airborne
             };
 
             // Add the Chinese Airborne Infantry profile to the database

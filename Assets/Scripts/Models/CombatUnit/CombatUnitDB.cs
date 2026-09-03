@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using HammerAndSickle.Services;
 using HammerAndSickle.Core.GameData;
@@ -2512,7 +2512,7 @@ namespace HammerAndSickle.Models
                 side: Side.AI,
                 nationality: Nationality.USA,
                 deployedProfile: WeaponType.SAM_HAWK_US,
-                mobileProfile: WeaponType.TRK_WEST,
+                mobileProfile: WeaponType.TRK_GEN_NATO,
                 embarkedProfile: WeaponType.NONE,
                 category: DepotCategory.Secondary,
                 size: DepotSize.Small
@@ -3042,7 +3042,7 @@ namespace HammerAndSickle.Models
                 side: Side.AI,
                 nationality: Nationality.FRG,
                 deployedProfile: WeaponType.SAM_HAWK_US,
-                mobileProfile: WeaponType.TRK_WEST,
+                mobileProfile: WeaponType.TRK_GEN_NATO,
                 embarkedProfile: WeaponType.NONE,
                 category: DepotCategory.Secondary,
                 size: DepotSize.Small
@@ -3110,7 +3110,7 @@ namespace HammerAndSickle.Models
                 role: UnitRole.AirSuperiority,
                 side: Side.AI,
                 nationality: Nationality.FRG,
-                deployedProfile: WeaponType.FGT_TORNADO_GR1_US,
+                deployedProfile: WeaponType.FGT_TORNADO_GE,
                 mobileProfile: WeaponType.NONE,
                 embarkedProfile: WeaponType.NONE,
                 category: DepotCategory.Secondary,
@@ -3183,7 +3183,7 @@ namespace HammerAndSickle.Models
                 side: Side.AI,
                 nationality: Nationality.UK,
                 deployedProfile: WeaponType.INF_AB_UK,
-                mobileProfile: WeaponType.TRK_WEST,
+                mobileProfile: WeaponType.TRK_GEN_NATO,
                 embarkedProfile: WeaponType.NONE,
                 category: DepotCategory.Secondary,
                 size: DepotSize.Small
@@ -3244,29 +3244,6 @@ namespace HammerAndSickle.Models
 
             #endregion // UK Self-Propelled Artillery Regiment
 
-            #region UK Air Defense Regiment (US M163)
-
-            var uk_air_defense_regiment = new CombatUnit(
-                unitName: "UK Air Defense Regiment (M163)",
-                classification: UnitClassification.SPAAA,
-                role: UnitRole.AirDefenseArea,
-                side: Side.AI,
-                nationality: Nationality.UK,
-                deployedProfile: WeaponType.SPAAA_M163_US,
-                mobileProfile: WeaponType.NONE,
-                embarkedProfile: WeaponType.NONE,
-                category: DepotCategory.Secondary,
-                size: DepotSize.Small
-            );
-
-            // Set experience level
-            uk_air_defense_regiment.SetExperienceLevel(ExperienceLevel.Experienced);
-
-            // Add the template to the database
-            AddTemplate("UK_AIR_DEFENSE_REGIMENT", uk_air_defense_regiment);
-
-            #endregion // UK Air Defense Regiment (US M163)
-
             #region UK SAM Regiment (Rapier)
 
             var uk_rapier_regiment = new CombatUnit(
@@ -3298,7 +3275,7 @@ namespace HammerAndSickle.Models
                 role: UnitRole.AirSuperiority,
                 side: Side.AI,
                 nationality: Nationality.UK,
-                deployedProfile: WeaponType.FGT_TORNADO_IDS_UK,
+                deployedProfile: WeaponType.FGT_TORNADO_UK,
                 mobileProfile: WeaponType.NONE,
                 embarkedProfile: WeaponType.NONE,
                 category: DepotCategory.Secondary,
@@ -3373,7 +3350,7 @@ namespace HammerAndSickle.Models
                 side: Side.AI,
                 nationality: Nationality.FRA,
                 deployedProfile: WeaponType.INF_AB_FR,
-                mobileProfile: WeaponType.TRK_WEST,
+                mobileProfile: WeaponType.TRK_GEN_NATO,
                 embarkedProfile: WeaponType.NONE,
                 category: DepotCategory.Secondary,
                 size: DepotSize.Small
@@ -3419,7 +3396,7 @@ namespace HammerAndSickle.Models
                 role: UnitRole.GroundCombat,
                 side: Side.AI,
                 nationality: Nationality.FRA,
-                deployedProfile: WeaponType.SPA_M109_FR,
+                deployedProfile: WeaponType.SPA_AUF1_FR,
                 mobileProfile: WeaponType.NONE,
                 embarkedProfile: WeaponType.NONE,
                 category: DepotCategory.Secondary,
@@ -3562,7 +3539,7 @@ namespace HammerAndSickle.Models
         /// <remarks>
         /// ⚠ NATIONALITY IS THE ONLY PLACE THE NATION LIVES ON A TEMPLATE. Every profile below is
         /// either a Lowlands profile (Leopard 1, infantry, M113 carrier) or a shared Western one
-        /// (ART_HEAVY_WEST, RCN_FV105_UK, SAM_HAWK_US, FGT_F16_US) — see CreateLowlandsProfiles for
+        /// (ART_HEAVY_NATO, RCN_FV105_UK, SAM_HAWK_US, FGT_F16_US) — see CreateLowlandsProfiles for
         /// why only seven tokens were minted. The flag, national symbol and NATO-blue icon base all
         /// resolve from Nationality.NE, so these read as Dutch on the map regardless.
         /// </remarks>
@@ -3622,8 +3599,8 @@ namespace HammerAndSickle.Models
                 role: UnitRole.GroundCombatIndirect,
                 side: Side.AI,
                 nationality: Nationality.NE,
-                deployedProfile: WeaponType.ART_HEAVY_WEST,
-                mobileProfile: WeaponType.TRK_WEST,
+                deployedProfile: WeaponType.ART_HEAVY_NATO,
+                mobileProfile: WeaponType.TRK_GEN_NATO,
                 embarkedProfile: WeaponType.NONE,
                 category: DepotCategory.Secondary,
                 size: DepotSize.Small
@@ -3700,7 +3677,7 @@ namespace HammerAndSickle.Models
                 side: Side.AI,
                 nationality: Nationality.NE,
                 deployedProfile: WeaponType.SAM_HAWK_US,
-                mobileProfile: WeaponType.TRK_WEST,
+                mobileProfile: WeaponType.TRK_GEN_NATO,
                 embarkedProfile: WeaponType.NONE,
                 category: DepotCategory.Secondary,
                 size: DepotSize.Small
@@ -3805,8 +3782,8 @@ namespace HammerAndSickle.Models
                 role: UnitRole.GroundCombatIndirect,
                 side: Side.AI,
                 nationality: Nationality.BE,
-                deployedProfile: WeaponType.ART_HEAVY_WEST,
-                mobileProfile: WeaponType.TRK_WEST,
+                deployedProfile: WeaponType.ART_HEAVY_NATO,
+                mobileProfile: WeaponType.TRK_GEN_NATO,
                 embarkedProfile: WeaponType.NONE,
                 category: DepotCategory.Secondary,
                 size: DepotSize.Small
@@ -3941,8 +3918,8 @@ namespace HammerAndSickle.Models
                 role: UnitRole.GroundCombatIndirect,
                 side: Side.AI,
                 nationality: Nationality.DE,
-                deployedProfile: WeaponType.ART_HEAVY_WEST,
-                mobileProfile: WeaponType.TRK_WEST,
+                deployedProfile: WeaponType.ART_HEAVY_NATO,
+                mobileProfile: WeaponType.TRK_GEN_NATO,
                 embarkedProfile: WeaponType.NONE,
                 category: DepotCategory.Secondary,
                 size: DepotSize.Small
@@ -4404,29 +4381,6 @@ namespace HammerAndSickle.Models
 
             #endregion // Iranian Towed Air Defense Regiment (AAA_GEN_SV)
 
-            #region Iranian Towed SAM Regiment (SAM_S75_SV)
-
-            var ir_sam_regiment = new CombatUnit(
-                unitName: "Iranian SAM Regiment (S-75)",
-                classification: UnitClassification.SAM,
-                role: UnitRole.AirDefenseArea,
-                side: Side.AI,
-                nationality: Nationality.IR,
-                deployedProfile: WeaponType.SAM_S75_SV,
-                mobileProfile: WeaponType.TRK_GEN_ARAB,
-                embarkedProfile: WeaponType.NONE,
-                category: DepotCategory.Secondary,
-                size: DepotSize.Small
-            );
-
-            // Set experience level
-            ir_sam_regiment.SetExperienceLevel(ExperienceLevel.Green);
-
-            // Add the template to the database
-            AddTemplate("IR_SAM_REGIMENT", ir_sam_regiment);
-
-            #endregion // Iranian Towed SAM Regiment (SAM_S75_SV)
-
             #region Iranian Fighter Squadron (F-14)
 
             var ir_f14_squadron = new CombatUnit(
@@ -4490,7 +4444,7 @@ namespace HammerAndSickle.Models
                 role: UnitRole.GroundCombat,
                 side: Side.AI,
                 nationality: Nationality.China,
-                deployedProfile: WeaponType.TANK_TYPE59,
+                deployedProfile: WeaponType.TANK_TYPE59_CH,
                 mobileProfile: WeaponType.NONE,
                 embarkedProfile: WeaponType.NONE,
                 category: DepotCategory.Secondary,
@@ -4513,7 +4467,7 @@ namespace HammerAndSickle.Models
                 role: UnitRole.GroundCombat,
                 side: Side.AI,
                 nationality: Nationality.China,
-                deployedProfile: WeaponType.TANK_TYPE80,
+                deployedProfile: WeaponType.TANK_TYPE80_CH,
                 mobileProfile: WeaponType.NONE,
                 embarkedProfile: WeaponType.NONE,
                 category: DepotCategory.Secondary,
@@ -4528,29 +4482,6 @@ namespace HammerAndSickle.Models
 
             #endregion // Chinese Tank Regiment (Type80)
 
-            #region Chinese Tank Regiment (Type95)
-
-            var ch_tank_regiment_type95 = new CombatUnit(
-                unitName: "Chinese Tank Regiment (Type 95)",
-                classification: UnitClassification.TANK,
-                role: UnitRole.GroundCombat,
-                side: Side.AI,
-                nationality: Nationality.China,
-                deployedProfile: WeaponType.TANK_TYPE95,
-                mobileProfile: WeaponType.NONE,
-                embarkedProfile: WeaponType.NONE,
-                category: DepotCategory.Secondary,
-                size: DepotSize.Small
-            );
-
-            // Set experience level
-            ch_tank_regiment_type95.SetExperienceLevel(ExperienceLevel.Trained);
-
-            // Add the template to the database
-            AddTemplate("CH_TANK_REGIMENT_TYPE95", ch_tank_regiment_type95);
-
-            #endregion // Chinese Tank Regiment (Type95)
-
             #region Chinese Mechanized Infantry Regiment (Type86)
 
             var ch_mech_infantry_regiment = new CombatUnit(
@@ -4560,7 +4491,7 @@ namespace HammerAndSickle.Models
                 side: Side.AI,
                 nationality: Nationality.China,
                 deployedProfile: WeaponType.INF_REG_CH,
-                mobileProfile: WeaponType.IFV_TYPE86,
+                mobileProfile: WeaponType.IFV_TYPE86_CH,
                 embarkedProfile: WeaponType.NONE,
                 category: DepotCategory.Secondary,
                 size: DepotSize.Small
@@ -4674,7 +4605,7 @@ namespace HammerAndSickle.Models
                 role: UnitRole.GroundCombat,
                 side: Side.AI,
                 nationality: Nationality.China,
-                deployedProfile: WeaponType.ROC_PHZ89,
+                deployedProfile: WeaponType.ROC_PHZ89_CH,
                 mobileProfile: WeaponType.NONE,
                 embarkedProfile: WeaponType.NONE,
                 category: DepotCategory.Secondary,
@@ -4697,7 +4628,7 @@ namespace HammerAndSickle.Models
                 role: UnitRole.AirDefenseArea,
                 side: Side.AI,
                 nationality: Nationality.China,
-                deployedProfile: WeaponType.SPAAA_TYPE53,
+                deployedProfile: WeaponType.SPAAA_TYPE53_CH,
                 mobileProfile: WeaponType.NONE,
                 embarkedProfile: WeaponType.NONE,
                 category: DepotCategory.Secondary,
@@ -4720,7 +4651,7 @@ namespace HammerAndSickle.Models
                 role: UnitRole.AirDefenseArea,
                 side: Side.AI,
                 nationality: Nationality.China,
-                deployedProfile: WeaponType.SPSAM_HQ7,
+                deployedProfile: WeaponType.SPSAM_HQ7_CH,
                 mobileProfile: WeaponType.NONE,
                 embarkedProfile: WeaponType.NONE,
                 category: DepotCategory.Secondary,
@@ -4766,7 +4697,7 @@ namespace HammerAndSickle.Models
                 role: UnitRole.AirSuperiority,
                 side: Side.AI,
                 nationality: Nationality.China,
-                deployedProfile: WeaponType.FGT_J7,
+                deployedProfile: WeaponType.FGT_J7_CH,
                 mobileProfile: WeaponType.NONE,
                 embarkedProfile: WeaponType.NONE,
                 category: DepotCategory.Secondary,
@@ -4789,7 +4720,7 @@ namespace HammerAndSickle.Models
                 role: UnitRole.AirSuperiority,
                 side: Side.AI,
                 nationality: Nationality.China,
-                deployedProfile: WeaponType.FGT_J8,
+                deployedProfile: WeaponType.FGT_J8_CH,
                 mobileProfile: WeaponType.NONE,
                 embarkedProfile: WeaponType.NONE,
                 category: DepotCategory.Secondary,
@@ -4812,7 +4743,7 @@ namespace HammerAndSickle.Models
                 role: UnitRole.AirGroundAttack,
                 side: Side.AI,
                 nationality: Nationality.China,
-                deployedProfile: WeaponType.ATT_Q5,
+                deployedProfile: WeaponType.ATT_Q5_CH,
                 mobileProfile: WeaponType.NONE,
                 embarkedProfile: WeaponType.NONE,
                 category: DepotCategory.Secondary,
@@ -4835,7 +4766,7 @@ namespace HammerAndSickle.Models
                 role: UnitRole.AirStrategicAttack,
                 side: Side.AI,
                 nationality: Nationality.China,
-                deployedProfile: WeaponType.BMB_H6,
+                deployedProfile: WeaponType.BMB_H6_CH,
                 mobileProfile: WeaponType.NONE,
                 embarkedProfile: WeaponType.NONE,
                 category: DepotCategory.Secondary,
@@ -4858,7 +4789,7 @@ namespace HammerAndSickle.Models
                 role: UnitRole.GroundCombat,
                 side: Side.AI,
                 nationality: Nationality.China,
-                deployedProfile: WeaponType.HEL_H9,
+                deployedProfile: WeaponType.HEL_Z9_CH,
                 mobileProfile: WeaponType.NONE,
                 embarkedProfile: WeaponType.NONE,
                 category: DepotCategory.Secondary,

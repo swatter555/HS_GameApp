@@ -386,6 +386,17 @@ namespace HammerAndSickle.Models
             Add(new TraitDef(WeaponTrait.FIRE_DIRECTION_NET, TraitCategory.FireControlOptics,
                 "TACFIRE-era automated fire direction — faster, tighter fire missions (NATO fires edge).",
                 Icm(1.05f)));
+            // The layer's only sub-1.0 member — the mirror of NATO_FIRST_LINE (roster expansion RE-4).
+            // ⚠ It prices the FORMATION, so it belongs on a nation's deployed/sole profiles only; a profile
+            // that exists to ride a Mobile or Embarked bay (APC under infantry, truck under a towed gun)
+            // stays 1.0 by the same closed-bay rule that governs the four traits above.
+            // ⚠ Deliberately nation-agnostic in NAME: Iraq and Iran are future candidates. Applied to
+            // CHINA ONLY as of 2026-09-02.
+            Add(new TraitDef(WeaponTrait.SECOND_LINE_FORMATION, TraitCategory.Economy,
+                "Second-line formation quality — shallow C3, thin logistics, little combined-arms practice. " +
+                "The PLA's late-1980s Group Army reform was real but incomplete; this is the organizational " +
+                "gap the platform statline cannot show. Crew quality is NOT this trait — that is Experience.",
+                Icm(0.9f)));
             #endregion
 
             return d;

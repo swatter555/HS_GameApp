@@ -125,8 +125,8 @@ namespace HammerAndSickle.Tests
         [Test]
         public void ResolveBaseAttack_RunwayCratering_AddsOcSuppressionRider()
         {
-            // FGT_TORNADO_IDS_UK carries RUNWAY_CRATERING → OcSuppressionBonus 20 on top of the strategic premium.
-            var strike = BuildStrike(UnitClassification.ATT, WeaponType.FGT_TORNADO_IDS_UK);
+            // FGT_TORNADO_UK carries RUNWAY_CRATERING → OcSuppressionBonus 20 on top of the strategic premium.
+            var strike = BuildStrike(UnitClassification.ATT, WeaponType.FGT_TORNADO_UK);
             var ab = BuildBase(UnitClassification.AIRB, WeaponType.BASE_AIRBASE);
             var ctx = new BaseAttackContext { BaseTerrain = TerrainType.Clear };
             const int v = 5;

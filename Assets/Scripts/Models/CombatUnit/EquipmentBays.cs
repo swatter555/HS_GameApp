@@ -113,46 +113,32 @@ namespace HammerAndSickle.Models
     /// </summary>
     public class RegimentIconProfile
     {
-        #region Constants
-
-        private const string CLASS_NAME = nameof(RegimentIconProfile);
-
-        #endregion // Constants
-
         #region Properties
 
         public RegimentIconType IconType { get; set; }
-        public string W { get; set; }
-        public string NW { get; set; }
-        public string SW { get; set; }
-        public string W_F { get; set; }
-        public string NW_F { get; set; }
-        public string SW_F { get; set; }
+
+        /// <summary>
+        /// The ONE sprite for this profile. Facing is applied by rotating the icon transform
+        /// (<c>GameIconRenderer</c>), never by picking a per-direction variant — that path was deleted
+        /// outright in the top-down icon pass, 2026-08-29.
+        ///
+        /// ⚠ For <see cref="RegimentIconType.Helo_Animation"/> this is the FRAME 0 sprite, and its name
+        /// carries the other five: <c>Prefab_CombatUnitIcon</c> resolves frames 1-5 by swapping
+        /// <see cref="GameData.ICON_MOTION_FRAME0_SUFFIX"/>. That is why no frame array lives here —
+        /// the flipbook never read one (its only caller was a method with zero callers).
+        /// </summary>
+        public string Icon { get; set; }
 
         #endregion // Properties
 
         #region Constructor
 
-        public RegimentIconProfile()
-        {
-            IconType = RegimentIconType.Single;
-            W = string.Empty;
-            NW = string.Empty;
-            SW = string.Empty;
-            W_F = string.Empty;
-            NW_F = string.Empty;
-            SW_F = string.Empty;
-        }
+        public RegimentIconProfile() : this(RegimentIconType.Single) { }
 
         public RegimentIconProfile(RegimentIconType _iconType)
         {
             IconType = _iconType;
-            W = string.Empty;
-            NW = string.Empty;
-            SW = string.Empty;
-            W_F = string.Empty;
-            NW_F = string.Empty;
-            SW_F = string.Empty;
+            Icon = string.Empty;
         }
 
         #endregion // Constructor
@@ -160,99 +146,10 @@ namespace HammerAndSickle.Models
         #region Access Methods
 
         /// <summary>
-        /// Returns the single icon sprite. Valid for all icon types.
+        /// Returns this profile's sprite. Valid for both icon types — for Helo_Animation it is Frame 0,
+        /// which is exactly what the renderer wants at rest and what the flipbook starts from.
         /// </summary>
-        public string GetIcon()
-        {
-            return W;
-        }
-
-        /// <summary>
-        /// Returns the sprite for a given facing direction (W, NW, SW).
-        /// Valid for Directional and Directional_Fire icon types.
-        /// </summary>
-        public string GetDirectionalIcon(HexDirection direction)
-        {
-            try
-            {
-                if (IconType != RegimentIconType.Directional && IconType != RegimentIconType.Directional_Fire)
-                    throw new InvalidOperationException(
-                        $"Directional icons not available for icon type {IconType}");
-
-                return direction switch
-                {
-                    HexDirection.W => W,
-                    HexDirection.NW => NW,
-                    HexDirection.SW => SW,
-                    _ => throw new ArgumentException(
-                        $"Invalid direction {direction}. Only W, NW, SW are valid.", nameof(direction))
-                };
-            }
-            catch (Exception e)
-            {
-                AppService.HandleException(CLASS_NAME, "GetDirectionalIcon", e);
-                throw;
-            }
-        }
-
-        /// <summary>
-        /// Returns the firing sprite for a given facing direction (W, NW, SW).
-        /// Valid only for Directional_Fire icon type.
-        /// </summary>
-        public string GetFiringIcon(HexDirection direction)
-        {
-            try
-            {
-                if (IconType != RegimentIconType.Directional_Fire)
-                    throw new InvalidOperationException(
-                        $"Firing icons not available for icon type {IconType}");
-
-                return direction switch
-                {
-                    HexDirection.W => W_F,
-                    HexDirection.NW => NW_F,
-                    HexDirection.SW => SW_F,
-                    _ => throw new ArgumentException(
-                        $"Invalid direction {direction}. Only W, NW, SW are valid.", nameof(direction))
-                };
-            }
-            catch (Exception e)
-            {
-                AppService.HandleException(CLASS_NAME, "GetFiringIcon", e);
-                throw;
-            }
-        }
-
-        /// <summary>
-        /// Returns the sprite for a given animation frame (0-5).
-        /// Valid only for Helo_Animation icon type.
-        /// </summary>
-        public string GetAnimationFrame(int frame)
-        {
-            try
-            {
-                if (IconType != RegimentIconType.Helo_Animation)
-                    throw new InvalidOperationException(
-                        $"Animation frames not available for icon type {IconType}");
-
-                return frame switch
-                {
-                    0 => W,
-                    1 => NW,
-                    2 => SW,
-                    3 => W_F,
-                    4 => NW_F,
-                    5 => SW_F,
-                    _ => throw new ArgumentOutOfRangeException(
-                        nameof(frame), $"Frame must be 0-5, got {frame}")
-                };
-            }
-            catch (Exception e)
-            {
-                AppService.HandleException(CLASS_NAME, "GetAnimationFrame", e);
-                throw;
-            }
-        }
+        public string GetIcon() => Icon;
 
         #endregion // Access Methods
 
@@ -265,38 +162,20 @@ namespace HammerAndSickle.Models
         {
             error = null;
 
-            if (string.IsNullOrEmpty(W))
+            if (string.IsNullOrEmpty(Icon))
             {
-                error = "Primary icon (W) is required for all icon types.";
+                error = "Icon is required for all icon types.";
                 return false;
             }
 
-            if (IconType == RegimentIconType.Directional || IconType == RegimentIconType.Directional_Fire)
+            // The frame-0 suffix IS the flipbook contract (GameData.ICON_MOTION_FRAME0_SUFFIX): with no
+            // frame array on the profile, a helo whose icon does not end in it silently animates nothing.
+            if (IconType == RegimentIconType.Helo_Animation &&
+                !Icon.EndsWith(GameData.ICON_MOTION_FRAME0_SUFFIX, StringComparison.Ordinal))
             {
-                if (string.IsNullOrEmpty(NW) || string.IsNullOrEmpty(SW))
-                {
-                    error = $"Directional icons (NW, SW) are required for {IconType}.";
-                    return false;
-                }
-            }
-
-            if (IconType == RegimentIconType.Directional_Fire)
-            {
-                if (string.IsNullOrEmpty(W_F) || string.IsNullOrEmpty(NW_F) || string.IsNullOrEmpty(SW_F))
-                {
-                    error = "Firing icons (W_F, NW_F, SW_F) are required for Directional_Fire.";
-                    return false;
-                }
-            }
-
-            if (IconType == RegimentIconType.Helo_Animation)
-            {
-                if (string.IsNullOrEmpty(NW) || string.IsNullOrEmpty(SW) ||
-                    string.IsNullOrEmpty(W_F) || string.IsNullOrEmpty(NW_F) || string.IsNullOrEmpty(SW_F))
-                {
-                    error = "All six animation frames are required for Helo_Animation.";
-                    return false;
-                }
+                error = $"Helo_Animation icon must end in \"{GameData.ICON_MOTION_FRAME0_SUFFIX}\" — " +
+                        $"the flipbook resolves frames 1-5 from that name. Got \"{Icon}\".";
+                return false;
             }
 
             return true;
@@ -807,22 +686,10 @@ namespace HammerAndSickle.Models
                 if (profile?.IconProfile == null)
                     throw new InvalidOperationException($"No icon profile available for position {position}");
 
-                var iconProfile = profile.IconProfile;
-                bool useFiringIcon = iconProfile.IconType == RegimentIconType.Directional_Fire &&
-                    (position == DeploymentPosition.HastyDefense ||
-                     position == DeploymentPosition.Entrenched ||
-                     position == DeploymentPosition.Fortified);
-
-                return iconProfile.IconType switch
-                {
-                    RegimentIconType.Single => iconProfile.GetIcon(),
-                    RegimentIconType.Directional => iconProfile.GetDirectionalIcon(direction),
-                    RegimentIconType.Directional_Fire => useFiringIcon
-                        ? iconProfile.GetFiringIcon(direction)
-                        : iconProfile.GetDirectionalIcon(direction),
-                    RegimentIconType.Helo_Animation => iconProfile.GetIcon(),
-                    _ => throw new ArgumentException($"Unknown icon type: {iconProfile.IconType}")
-                };
+                // One sprite per profile since the top-down pass. `direction` is retained in the signature
+                // because the deployment position still selects the BAY, and callers pass facing anyway —
+                // but facing is now applied as a transform rotation by GameIconRenderer, not by choosing art.
+                return profile.IconProfile.GetIcon();
             }
             catch (Exception e)
             {

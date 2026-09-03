@@ -328,19 +328,16 @@ namespace HammerAndSickle.Core.Map
                 }
 
                 // Get sprite name and flip info for this unit
-                string spriteName = GetSpriteNameForUnit(unit, out bool shouldFlip);
+                string spriteName = GetSpriteNameForUnit(unit);
 
                 // Frame-based icons (Helo_Animation) rest on Frame0 here; the motion flipbook cycles
                 // them while the icon tween-moves (Prefab_CombatUnitIcon.StartMotionAnimation, driven
                 // by AnimateIconStep/SnapIcon — implemented 2026-07-22).
                 unitIcon.SetUnitIcon(spriteName);
 
-                // Apply horizontal flip if unit is facing east (E, NE, SE)
-                if (shouldFlip)
-                {
-                    unitIcon.UnitIconRenderer.flipX = true;
-                    if (_debug) Debug.Log($"[{CLASS_NAME}.CreateUnitIcon] Flipping sprite for unit '{unit.UnitName}' facing {unit.Facing}");
-                }
+                // Facing is a rotation of the art renderer only (bases excepted) — never the root.
+                ApplyIconFacing(unitIcon, unit);
+
                 
                 // Set nationality symbol
                 string symbolSprite = GetNationalSymbol(unit.Nationality);
@@ -384,8 +381,9 @@ namespace HammerAndSickle.Core.Map
         }
         
         /// <summary>
-        /// Re-resolves an existing icon's unit sprite + horizontal flip from the unit's CURRENT Facing
-        /// (both the sprite variant and the easterly mirror derive from it — see GetSpriteNameForUnit).
+        /// Re-applies an existing icon's sprite and facing ROTATION from the unit's current state.
+        /// Since the top-down pass the sprite itself no longer varies with facing — but it still varies
+        /// with the active bay, so both are refreshed here and this stays the single facing entry point.
         /// Called per hex step during movement and after a manual Shift+click rotation. Cheaper than a
         /// full redraw: leaves position, tweens, nation/box/HP elements and stacking state alone.
         /// </summary>
@@ -399,12 +397,12 @@ namespace HammerAndSickle.Core.Map
                 CombatUnit unit = GameDataManager.Instance.GetCombatUnit(unitId);
                 if (unit == null) return;
 
-                string spriteName = GetSpriteNameForUnit(unit, out bool shouldFlip);
-                unitIcon.SetUnitIcon(spriteName);
-                // Assign both ways — a unit turning back west must UN-flip.
-                unitIcon.UnitIconRenderer.flipX = shouldFlip;
+                // The SPRITE no longer varies with facing, but it still varies with DEPLOYMENT POSITION
+                // (which bay is active), and a move can change both — so re-resolve, then rotate.
+                unitIcon.SetUnitIcon(GetSpriteNameForUnit(unit));
+                ApplyIconFacing(unitIcon, unit);
 
-                if (_debug) Debug.Log($"[{CLASS_NAME}.RefreshIconFacing] '{unit.UnitName}' now facing {unit.Facing} (flip={shouldFlip}).");
+                if (_debug) Debug.Log($"[{CLASS_NAME}.RefreshIconFacing] '{unit.UnitName}' now facing {unit.Facing}.");
             }
             catch (Exception e)
             {
@@ -543,10 +541,8 @@ namespace HammerAndSickle.Core.Map
         /// Airbases are handled separately with stacking icons.
         /// All icons can be flipped horizontally for easterly directions (E, NE, SE).
         /// </summary>
-        public string GetSpriteNameForUnit(CombatUnit unit, out bool shouldFlip)
+        public string GetSpriteNameForUnit(CombatUnit unit)
         {
-            shouldFlip = false;
-
             try
             {
                 // Airbases use stacking icons based on attached air unit count
@@ -559,14 +555,9 @@ namespace HammerAndSickle.Core.Map
                     return airbaseSprite;
                 }
 
-                // All icons flip for easterly directions
-                shouldFlip = ShouldFlipSprite(unit.Facing);
-
-                // Normalize easterly directions to their western equivalents for sprite lookup
-                HexDirection normalizedDirection = NormalizeDirection(unit.Facing);
-
-                // Resolve sprite through the EquipmentBays icon system
-                string spriteName = unit.EquipmentBays.GetIcon(unit.DeploymentPosition, normalizedDirection);
+                // One sprite per profile since the top-down pass — facing is a rotation, applied by
+                // ApplyIconFacing, so nothing here varies with direction any more.
+                string spriteName = unit.EquipmentBays.GetIcon(unit.DeploymentPosition, unit.Facing);
 
                 if (string.IsNullOrEmpty(spriteName))
                 {
@@ -574,7 +565,7 @@ namespace HammerAndSickle.Core.Map
                     return SpriteManager.Utility_MismatchIcon;
                 }
 
-                if (_debug) Debug.Log($"[{CLASS_NAME}.GetSpriteNameForUnit] Unit '{unit.UnitName}': sprite={spriteName}, Flip={shouldFlip}");
+                if (_debug) Debug.Log($"[{CLASS_NAME}.GetSpriteNameForUnit] Unit '{unit.UnitName}': sprite={spriteName}");
                 return spriteName;
             }
             catch (Exception e)
@@ -582,14 +573,6 @@ namespace HammerAndSickle.Core.Map
                 AppService.HandleException(CLASS_NAME, "GetSpriteNameForUnit", e);
                 return SpriteManager.Utility_MismatchIcon;
             }
-        }
-
-        /// <summary>
-        /// Overload for backwards compatibility - ignores flip information.
-        /// </summary>
-        public string GetSpriteNameForUnit(CombatUnit unit)
-        {
-            return GetSpriteNameForUnit(unit, out _);
         }
 
         #endregion // Public Methods
@@ -765,29 +748,68 @@ namespace HammerAndSickle.Core.Map
         #region Direction and Flip Methods
 
         /// <summary>
-        /// Normalizes easterly directions to their western equivalents for sprite lookup.
-        /// E maps to W, NE maps to NW, SE maps to SW. Western directions pass through unchanged.
+        /// ⚠ CALIBRATION — the ONE number to change if the art's canonical heading is not west.
+        ///
+        /// Degrees added to every facing rotation. Zero means the sprite is drawn pointing WEST, which is
+        /// the heading the pre-pass "_W" art used and therefore the assumption the top-down replacements
+        /// inherit. If Bob's converted sprites point north (or any other way), set this to the offset that
+        /// brings them back to west — do NOT touch <see cref="RotationForFacing"/>, which is pure hex
+        /// geometry and stays correct at any heading.
         /// </summary>
-        private HexDirection NormalizeDirection(HexDirection direction)
-        {
-            return direction switch
-            {
-                HexDirection.E => HexDirection.W,
-                HexDirection.NE => HexDirection.NW,
-                HexDirection.SE => HexDirection.SW,
-                _ => direction
-            };
-        }
+        private const float ICON_HEADING_OFFSET_DEGREES = 0f;
 
         /// <summary>
-        /// Determines if sprite should be flipped horizontally based on facing.
-        /// All icon types (vehicles, infantry, aircraft, etc.) flip for easterly directions.
+        /// Z rotation for each of the six facings, 60° apart on a pointy-top grid, measured from the
+        /// canonical west heading and turning counter-clockwise (Unity's positive Z).
+        ///
+        /// ⚠ Replaces the deleted variant-plus-mirror model entirely. There is no longer a "normalize
+        /// easterly to western" step and no horizontal flip: an east-facing unit is the same sprite turned
+        /// 180°, which is why easterly units no longer render mirror-imaged.
         /// </summary>
-        private bool ShouldFlipSprite(HexDirection facing)
+        private static float RotationForFacing(HexDirection facing) => facing switch
         {
-            return facing == HexDirection.E ||
-                   facing == HexDirection.NE ||
-                   facing == HexDirection.SE;
+            HexDirection.W => 0f,
+            HexDirection.SW => 60f,
+            HexDirection.SE => 120f,
+            HexDirection.E => 180f,
+            HexDirection.NE => 240f,
+            HexDirection.NW => 300f,
+            _ => 0f
+        };
+
+        /// <summary>
+        /// The whole facing decision as a PURE function — no Unity types, no instance, no scene. This is
+        /// the seam <c>IconRotationTests</c> drives: the rule (bases do not rotate; everything else turns
+        /// 60° per facing off the canonical heading) is testable headlessly, while
+        /// <see cref="ApplyIconFacing"/> keeps only the transform write that needs a live renderer.
+        /// </summary>
+        internal static float IconRotationDegrees(HexDirection facing, bool isBase) =>
+            isBase ? 0f : ICON_HEADING_OFFSET_DEGREES + RotationForFacing(facing);
+
+        /// <summary>
+        /// Applies the facing rotation to a unit's icon.
+        ///
+        /// ⚠ ROTATES <c>unitIcon</c> ONLY, NEVER THE PREFAB ROOT. The prefab carries six renderers — the
+        /// vehicle art plus the nationality flag, box, HP readout, deployment chevron and stacking badge.
+        /// Turning the root would spin the HP number and the flag with the tank. Invisible until wrong,
+        /// and a later "simplification" will reach for the root: don't.
+        ///
+        /// ⚠ BASES DO NOT ROTATE (§R5). HQs, depots and airbases are structures, and the constructor hands
+        /// them a side-derived Facing that means nothing — honouring it would tilt every airbase on the map.
+        /// </summary>
+        private void ApplyIconFacing(Prefab_CombatUnitIcon icon, CombatUnit unit)
+        {
+            if (icon == null || unit == null) return;
+
+            var art = icon.UnitIconRenderer;
+            if (art == null) return;
+
+            // Ceasing to SET flipX is not enough — a recycled or prefab-baked renderer can arrive with a
+            // stale true, which would mirror the art under the new rotation model. Assign it every time.
+            art.flipX = false;
+
+            art.transform.localRotation =
+                Quaternion.Euler(0f, 0f, IconRotationDegrees(unit.Facing, unit.IsBase));
         }
 
         #endregion // Direction and Flip Methods

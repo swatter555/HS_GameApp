@@ -737,12 +737,6 @@ namespace HammerAndSickle.Controllers
         public const string FR_M113_SW = "FR_M113_SW";
 
         // French Anti-Aircraft
-        public const string FR_Gepard_W    = "FR_Gepard_W";
-        public const string FR_Gepard_NW   = "FR_Gepard_NW";
-        public const string FR_Gepard_SW   = "FR_Gepard_SW";
-        public const string FR_Gepard_W_F  = "FR_Gepard_W_F";
-        public const string FR_Gepard_NW_F = "FR_Gepard_NW_F";
-        public const string FR_Gepard_SW_F = "FR_Gepard_SW_F";
 
         // French SAM Systems
         public const string FR_Roland_W    = "FR_Roland_W";
