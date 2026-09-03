@@ -2,6 +2,9 @@ using HammerAndSickle.Core.GameData;
 using HammerAndSickle.Persistence;
 using NUnit.Framework;
 using System.Text.Json;
+using System.Text.RegularExpressions;
+using UnityEngine;
+using UnityEngine.TestTools;
 
 namespace HammerAndSickle.Tests
 {
@@ -142,6 +145,11 @@ namespace HammerAndSickle.Tests
             // the scenario silently vanish from the menu) and warns in the log instead.
             var m = ValidManifest();
             m.EarlyFinishMultiplier = 1.0f;
+
+            /* ⚠ THE WARNING *IS* THE RULED BEHAVIOUR. This branch deliberately does not refuse, so
+             * IsValid() returning true proves nothing on its own — delete the LogWarning and the guard
+             * vanishes with this test still green. Assert the log, not just the verdict. */
+            LogAssert.Expect(LogType.Warning, new Regex("earlyFinishMultiplier is exactly 1.0"));
 
             Assert.IsTrue(m.IsValid(), "Par payout is coherent; the named warning, not refusal, is the guard.");
         }

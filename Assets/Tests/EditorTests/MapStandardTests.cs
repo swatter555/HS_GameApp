@@ -4,7 +4,9 @@ using HammerAndSickle.Models.Map;
 using NUnit.Framework;
 using System;
 using System.IO;
+using System.Text.RegularExpressions;
 using UnityEngine;
+using UnityEngine.TestTools;
 
 namespace HammerAndSickle.Tests
 {
@@ -90,8 +92,16 @@ namespace HammerAndSickle.Tests
             /* A `.map` written before mapColumns/mapRows existed. This branch has never run in play — every
              * shipped file already carries explicit dimensions — so it is exactly the code most likely to
              * be wrong and least likely to be noticed. */
+
+            /* ⚠ The WARNING IS PART OF THE CONTRACT, not incidental noise. A silent fallback would let a
+             * stale `.map` load at the wrong size with nothing in the log to explain the mismatch, so the
+             * re-export nag is asserted here rather than merely tolerated. Matching a stable fragment, not
+             * the full prose, so re-wording the message does not fail the test. */
+            LogAssert.Expect(LogType.Warning, new Regex(@"falling back to MapConfig\.Small"));
             Assert.AreEqual(new Vector2Int(32, 21), Header(0, 0, MapConfig.Small).ResolveMapDimensions(),
                 "legacy Small");
+
+            LogAssert.Expect(LogType.Warning, new Regex(@"falling back to MapConfig\.Large"));
             Assert.AreEqual(new Vector2Int(32, 42), Header(0, 0, MapConfig.Large).ResolveMapDimensions(),
                 "legacy Large");
         }

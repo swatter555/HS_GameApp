@@ -207,16 +207,16 @@ a diagnosis.
 > 5. A PASSED entry is deleted from this section the same session, after its result is recorded in the change
 >    log and, if it is a shipped behaviour, in Claude_Project. **This section is a queue, never an archive.**
 
-- [!] **RE-4 SECOND_LINE_FORMATION — BLOCKING, landed 2026-09-02.**
-      **DO:** compile, then run the full EditorTest suite — especially `WeaponProfileChineseTests` (now 8,
-      two of them new) and `CommodityProfileTests` (now 7).
-      **PASS:** suite green. The Chinese ICM pins MOVED on purpose — 0.90 everywhere, 0.945 for the Type 80,
-      **1.00 for the Type 86 IFV**. If the Type 86 comes back 0.90 the trait has leaked onto a Mobile-bay
-      profile and the formation is being priced twice; fix the profile, not the test.
-      ⚠ If a NON-Chinese suite reports a moved number, the trait has leaked through a shared commodity
-      blueprint — `FormationQuality_SecondLineIsChinaOnly` is the tripwire for exactly that.
-      **WHY:** the four blueprints now take `params WeaponTrait[]`, so for the first time a national trait
-      rides a shared stat line. This is the run that proves it rides ON it rather than forking it.
+- [!] **CONSOLE HYGIENE — the three `LogAssert.Expect` calls, landed 2026-09-02.**
+      **DO:** re-run the EditorTest suite and look at the console afterwards.
+      **PASS:** `MapStandardTests`, `MissionObjectiveGateTests` and `ScenarioManifestTests` all still green,
+      and the console shows ONLY the two `IPrebuildSetup`/`IPostBuildCleanup` lines from Unity's perf-test
+      package. All four of our own messages should be gone.
+      ⚠ **A NEW FAILURE HERE IS INFORMATIVE, NOT A REGRESSION.** `LogAssert.Expect` fails a test when the
+      expected warning does NOT arrive, so a red test means the warning stopped firing — which is exactly
+      the thing these three tests previously could not see. Read the failure before "fixing" it.
+      **WHY:** three tests were named for a warning they never asserted. Deleting the `LogWarning` out of
+      `ScenarioManifest.IsValid()` would have left all three green with the guard silently gone.
 
 - [⏸] **RE-2 FREE RE-POINTS — four sprites, PLAY-CHECK ONLY, ride the T-5 art verification.**
       Landed 2026-08-29. No suite value: `IconIntegrityTests` proves an icon is present and valid, not that
@@ -612,7 +612,26 @@ manager, for Khost). ⚠ AI2 snapshot serialization still owed its own `SAVE_VER
 > older than the last two passes migrate to `Planning Docs/Claude_TODO_Archive.md` when this section is pruned.
 > **Entries 2026-07-21 → 2026-08-19 (incl. the theme-art pass and everything before it) are in the archive.**
 
-- 2026-09-02 — **RE-4 `SECOND_LINE_FORMATION` LANDED (roster expansion). ⚑ Suite run owed.** The
+- 2026-09-02 — **CONSOLE HYGIENE — and a real test-quality hole behind it. ⚑ Suite run owed.** Bob asked
+  what the accumulated test-run console messages were. Five messages for the WHOLE suite, and the audit
+  found the noise was mostly the tests doing their job badly rather than the code misbehaving:
+  • **Two are Unity's, not ours** — the `IPrebuildSetup`/`IPostBuildCleanup` pair comes from
+  `com.unity.test-framework.performance`, which `packages-lock.json` shows at **depth 3** (a transitive
+  dependency nobody added; nothing in `Assets/` references it). Cannot be removed, ignore them.
+  • **One was gratuitous** — `SkillBranchExtensions` logged "Initialized cache with 14 branches" to
+  announce success. Deleted: the two failure paths above it already report themselves, so a silent cache
+  IS the good outcome. The file's other `Debug.Log`s are `[Conditional]` opt-in tools and were left alone.
+  • ⚠ **THE ACTUAL FINDING — three tests were named for a warning they never asserted.**
+  `Stamp_NonStrongholdObjective_WARNSButStamps` checked only that it stamps; the legacy map-dimension
+  fallback checked only the returned size; and `IsValid_EarlyFinishMultiplierExactlyOne_LoadsButIsInert`
+  checked only the bool — while its own comment said *"the named warning, not refusal, is the guard."*
+  In all three the WARNING IS THE RULED BEHAVIOUR, so deleting the `LogWarning` would have left every one
+  of them green with the guard gone. Now asserted with `LogAssert.Expect` (first use in the suite —
+  `UnityEngine.TestRunner` was already referenced by the asmdef), matching a stable fragment by `Regex`
+  rather than the full prose so the messages can still be re-worded.
+  Net: the console drops to Unity's two plumbing lines, and three warnings stop being unguarded.
+
+- 2026-09-02 — **RE-4 `SECOND_LINE_FORMATION` LANDED (roster expansion). ⚑ CLEARED same day (Bob ran it): suite GREEN.** The
   formation-quality layer (§13) gains its first sub-1.0 member at `Icm(0.9f)` and **China leaves the
   ICM-1.0 baseline** it had shared with the Soviets and the Arabs. Applied to **15 of the 16 Chinese
   profiles** — every one a template names in its DEPLOYED bay. ⚠ **`IFV_TYPE86_CH` is deliberately

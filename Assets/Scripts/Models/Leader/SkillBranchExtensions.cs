@@ -64,10 +64,9 @@ namespace HammerAndSickle.Models
 
                     _cacheInitialized = true;
 
-                    // Log cache initialization in debug builds
-                    #if UNITY_EDITOR || DEBUG
-                    Debug.Log($"SkillBranchExtensions: Initialized cache with {_branchTypeCache.Count} branches");
-                    #endif
+                    // No success log on purpose: a silent cache IS the good outcome. The two failure paths
+                    // above already report themselves (a warning per missing attribute, an error + rethrow
+                    // on exception), so an "it worked" line is pure console noise on every editor run.
                 }
                 catch (Exception ex)
                 {

@@ -5,6 +5,9 @@ using HammerAndSickle.Models.Map;
 using NUnit.Framework;
 using System.Collections.Generic;
 using System.IO;
+using System.Text.RegularExpressions;
+using UnityEngine;
+using UnityEngine.TestTools;
 
 namespace HammerAndSickle.Tests
 {
@@ -82,6 +85,12 @@ namespace HammerAndSickle.Tests
             // Stronghold placement is an authoring CONVENTION (Bob's call) — the stamp warns loudly
             // but does not refuse, and the flag still lands.
             var map = MapFixtures.UniformMap();
+
+            /* ⚠ THE WARNING IS THE WHOLE GUARD. Nothing refuses this placement, so the log line is the
+             * only thing standing between an author and a victory gate that flickers on transit — assert
+             * it, or deleting the LogWarning leaves this test green with the guard gone. Stable fragment
+             * only, so the prose can be re-worded freely. */
+            LogAssert.Expect(LogType.Warning, new Regex("is not on a stronghold hex"));
 
             MapLoader.ApplyMissionObjectiveStamp(map, ManifestWith((6, 6)));   // plain Clear
 
