@@ -13,7 +13,8 @@
 //   - Public Properties (lines ~39-51): IsInitialized, ProfileCount
 //   - Public Methods (lines ~53-140): Initialize(), GetWeaponProfile(), HasWeaponProfile()
 //   - Private Methods (lines ~142-192): CreateAllWeaponProfiles(), AddProfile()
-//   - Profile Definitions (lines ~197-10048): All 173 weapon profiles
+//   - Profile Definitions: All 186 weapon profiles (count verified 2026-09-03; line numbers above are
+//     indicative only - they have drifted repeatedly and are not maintained)
 //
 // PROFILE SECTIONS:
 //   CreateSovietProfiles()  (line ~197)  - Soviet equipment
@@ -3341,6 +3342,42 @@ namespace HammerAndSickle.Models
             //----------------------------------------------
 
             //----------------------------------------------
+            // FRG M113 Armored Personnel Carrier
+            //----------------------------------------------
+            // Phase 3 (NATO): same bare Apc archetype as the US M113 — it IS the same vehicle. Germany
+            // gets its own profile only because ART lives on the profile (§1.1) and Bob is drawing a
+            // German M113. ⚠ The stat line is deliberately identical; if it ever diverges, that is a bug.
+            // It carries the second Panzergrenadier option and the air-mobile brigade's Mobile bay.
+            // → HA3 HD4 SA6 SD7 GAD7 · ICM 1.00 · MMP8 · SR2.
+            WeaponProfile M113_GE = WeaponProfile.FromProfileDef(
+                "M113 Armored Personnel Carrier", "M113", WeaponType.APC_M113_GE,
+                new ProfileDef(FamilyArchetypes.Apc,
+                    new Dictionary<ProfileStat, int>(),
+                    System.Array.Empty<WeaponTrait>()),
+                UpgradePath.APC, 264);
+
+            // Set the prestige cost for the profile.
+            M113_GE.SetPrestigeCost(PrestigeTierCost.Gen1, PrestigeTypeCost.APC);
+
+            // Census — CARRIER: own platform count only (doctrine rule 2). Matches the US M113: the same
+            // vehicle in the same carrier role, so an invented German figure would be false precision.
+            M113_GE.AddIntelReportStat(WeaponType.APC_M113_GE, 108);
+
+            // Handle the icon profile.
+            M113_GE.IconProfile = new RegimentIconProfile(RegimentIconType.Single)
+            {
+                Icon = SpriteManager.GE_M113
+            };
+
+            // Mixed family (see FamilyArchetypes) - medium is stated per profile.
+            M113_GE.SetMovementMedium(MovementMedium.Tracked);
+
+            AddProfile(WeaponType.APC_M113_GE, M113_GE);
+            //----------------------------------------------
+            // FRG M113 Armored Personnel Carrier
+            //----------------------------------------------
+
+            //----------------------------------------------
             // US HMMWV (Humvee)
             //----------------------------------------------
             // Phase 3 (NATO): Apc + THIN_TOP (open-mount soft-skin, GAD−1). Wheeled utility carrier.
@@ -4225,6 +4262,40 @@ namespace HammerAndSickle.Models
             //----------------------------------------------
 
             //----------------------------------------------
+            // FRG UH-1D Transport Helicopter
+            //----------------------------------------------
+            // Phase 3 (NATO): Helicopter + NON_COMBATANT — the Heeresflieger lift helo, NATO's exact
+            // counterpart to the Mi-8T and pinned to the same Gen1/348 anchor. ⚠ TRANSPORT ONLY: Germany
+            // never armed its Hueys (the Bundeswehr gunship is the Bo 105 PAH-1), so unlike the US and
+            // Saudi there is no UH-1C variant. A generation older than the UH-60, hence Gen1 not Gen2.
+            // → bare 7/6/10/7 GAD10 · MMP24 · SR3 · non-combatant · helo-transport.
+            WeaponProfile UH1D_GE = WeaponProfile.FromProfileDef(
+                "UH-1D Transport Helicopter", "UH-1D", WeaponType.HEL_UH1D_GE,
+                new ProfileDef(FamilyArchetypes.Helicopter,
+                    new Dictionary<ProfileStat, int>(),
+                    new[] { WeaponTrait.NON_COMBATANT }),
+                UpgradePath.HELT, 348);
+
+            // Set the prestige cost for the profile.
+            UH1D_GE.SetPrestigeCost(PrestigeTierCost.Gen1, PrestigeTypeCost.HELT);
+
+            // Census — LIFT (TransportCategory != None): EMPTY by doctrine rule 4. Embarked-bay-only lift;
+            // losses unreported by design. Exempted in CensusIntegrityTests.
+
+            // Handle the icon profile.
+            UH1D_GE.IconProfile = new RegimentIconProfile(RegimentIconType.Helo_Animation)
+            {
+                Icon = SpriteManager.GE_UH1D_Frame0
+            };
+
+            // W2: the UH-1D is the FRG AM organic helo transport.
+            UH1D_GE.SetTransportCategory(TransportCategory.HeloTransport);
+            AddProfile(WeaponType.HEL_UH1D_GE, UH1D_GE);
+            //----------------------------------------------
+            // FRG UH-1D Transport Helicopter
+            //----------------------------------------------
+
+            //----------------------------------------------
             // FRG Bo 105 Light Attack Helicopter
             //----------------------------------------------
             // Phase 3 (NATO): Helicopter + ATGM_HELO_SACLOS (HOT, HA+4). Light AT helo — potent missiles, no cannon/armor (glass cannon).
@@ -5068,6 +5139,46 @@ namespace HammerAndSickle.Models
             AddProfile(WeaponType.INF_AB_GE, INF_AB_GE_P);
             //----------------------------------------------
             // FRG Airborne Infantry
+            //----------------------------------------------
+
+            //----------------------------------------------
+            // FRG Air-Mobile Infantry
+            //----------------------------------------------
+            // Phase 3 (derived): Infantry + RPG_LAW + ATGM_MEDIUM + MANPADS_STINGER + MOUNTAIN_TRAINED —
+            // the same line as INF_AM_US, which is the point: the AM/AB split is ONE trait in both
+            // armies. Against the FRG airborne directly above, MOUNTAIN_TRAINED replaces AIR_DROPPABLE,
+            // so the two units are genuinely different rather than a re-skin.
+            // ⚠ HISTORICAL NOTE — the Bundeswehr had no separate air-mobile brigade. The Luftlandebrigaden
+            // WERE both the parachute and the helicopter-borne force, lifted by Heeresflieger UH-1Ds. This
+            // is a gameplay slot Bob asked for (2026-08-29), not a formation that stood on its own.
+            // → HA9 HD7 SA7 SD8 GAD10 · GAT8 · ICM 1.05 · MMP4 · SR2 · mountain movement.
+            WeaponProfile INF_AM_GE_P = WeaponProfile.FromProfileDef(
+                "FRG Air-Mobile Infantry", "FRG Air-Mobile", WeaponType.INF_AM_GE,
+                new ProfileDef(FamilyArchetypes.Infantry,
+                    new Dictionary<ProfileStat, int>(),
+                    new[] { WeaponTrait.RPG_LAW, WeaponTrait.ATGM_MEDIUM, WeaponTrait.MANPADS_STINGER,
+                            WeaponTrait.MOUNTAIN_TRAINED }));
+
+            // Intel stats. German brigades ran lighter than their US counterparts, so this sits at the
+            // Luftlandebrigade's 1,900 rather than the US air-mobile 2,040. Open-bay base: NO carrier
+            // tokens (rule 7) — the M113 and the UH-1D are this unit's own bays, not its census.
+            INF_AM_GE_P.AddIntelReportStat(WeaponType.Personnel,           1900);
+            INF_AM_GE_P.AddIntelReportStat(WeaponType.AT_ATGM,               48);
+            INF_AM_GE_P.AddIntelReportStat(WeaponType.MANPAD_STINGER,        30);
+            INF_AM_GE_P.AddIntelReportStat(WeaponType.ART_120MM_MORTAR,      18);
+            INF_AM_GE_P.AddIntelReportStat(WeaponType.ART_82MM_MORTAR,       18);
+
+            // Handle the icon profile.
+            INF_AM_GE_P.IconProfile = new RegimentIconProfile(RegimentIconType.Single)
+            {
+                Icon = SpriteManager.GE_AirMobile
+            };
+
+            // Add the FRG Air-Mobile Infantry profile to the database
+            INF_AM_GE_P.SetPrestigeCost(PrestigeTierCost.Gen1, PrestigeTypeCost.INF);
+            AddProfile(WeaponType.INF_AM_GE, INF_AM_GE_P);
+            //----------------------------------------------
+            // FRG Air-Mobile Infantry
             //----------------------------------------------
 
             //----------------------------------------------

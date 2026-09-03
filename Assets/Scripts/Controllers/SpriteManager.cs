@@ -676,8 +676,14 @@ namespace HammerAndSickle.Controllers
         // German Personnel & Support
         public const string GER_Airborne = "GER_Airborne";
         public const string GER_Regulars = "GER_Regulars";
+        // ⚠ ART NOT DRAWN YET (roster expansion §4.2, added 2026-09-03). The three constants below name
+        // files that do not exist on disk, so their units render the mismatch placeholder until Bob's
+        // German drop lands — the same deliberate state SV_2S5 sat in. IconIntegrityTests CANNOT catch
+        // this: it proves an icon is declared and well-formed, never that the PNG exists.
+        public const string GE_AirMobile = "GE_AirMobile";
 
         // German Vehicles
+        public const string GE_M113 = "GE_M113";
         public const string GE_Luchs_W = "GE_Luchs_W";
         public const string GE_Luchs_NW = "GE_Luchs_NW";
         public const string GE_Luchs_SW = "GE_Luchs_SW";
@@ -710,6 +716,13 @@ namespace HammerAndSickle.Controllers
         public const string GE_Gepard_SW_F = "GE_Gepard_SW_F";
 
         // German Helicopters - Animated
+        // UH-1D: the Heeresflieger TRANSPORT Huey. No gunship counterpart — see WeaponType.HEL_UH1D_GE.
+        public const string GE_UH1D_Frame0 = "GE_UH1D_Frame0";
+        public const string GE_UH1D_Frame1 = "GE_UH1D_Frame1";
+        public const string GE_UH1D_Frame2 = "GE_UH1D_Frame2";
+        public const string GE_UH1D_Frame3 = "GE_UH1D_Frame3";
+        public const string GE_UH1D_Frame4 = "GE_UH1D_Frame4";
+        public const string GE_UH1D_Frame5 = "GE_UH1D_Frame5";
         public const string GE_BO105_Frame0 = "GE_BO105_Frame0";
         public const string GE_BO105_Frame1 = "GE_BO105_Frame1";
         public const string GE_BO105_Frame2 = "GE_BO105_Frame2";

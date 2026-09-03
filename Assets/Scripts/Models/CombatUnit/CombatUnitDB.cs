@@ -2963,6 +2963,34 @@ namespace HammerAndSickle.Models
 
             #endregion // GE Airborne Regiment
 
+            #region GE Airmobile Brigade
+
+            // Mirrors US_AIRMOBILE_BRIGADE (roster expansion §4.2): a three-bay unit that walks, rides
+            // and flies. ⚠ The Embarked bay is what makes it air-mobile rather than just light infantry.
+            // Classification AM, not INF — that is the difference from GE_AIRBORNE_REGIMENT above.
+            // ⚠ ART PENDING: all three profiles name sprites Bob has not drawn yet, so this unit renders
+            // the mismatch placeholder until the German art drop lands.
+            var ge_airmobile_brigade = new CombatUnit(
+                unitName: "GE Airmobile Brigade",
+                classification: UnitClassification.AM,
+                role: UnitRole.GroundCombat,
+                side: Side.AI,
+                nationality: Nationality.FRG,
+                deployedProfile: WeaponType.INF_AM_GE,
+                mobileProfile: WeaponType.APC_M113_GE,
+                embarkedProfile: WeaponType.HEL_UH1D_GE,
+                category: DepotCategory.Secondary,
+                size: DepotSize.Small
+            );
+
+            // Set experience level
+            ge_airmobile_brigade.SetExperienceLevel(ExperienceLevel.Veteran);
+
+            // Add the template to the database
+            AddTemplate("GE_AIRMOBILE_BRIGADE", ge_airmobile_brigade);
+
+            #endregion // GE Airmobile Brigade
+
             #region GE Recon Unit
 
             var ge_recon_unit = new CombatUnit(

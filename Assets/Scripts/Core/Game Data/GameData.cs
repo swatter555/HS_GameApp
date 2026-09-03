@@ -895,6 +895,10 @@ namespace HammerAndSickle.Core.GameData
 
         // APC
         APC_M113_US,
+        // ⚠ Germany gets its OWN M113 token rather than sharing the American one: art lives on the
+        // profile, and Bob is drawing a German M113 (roster expansion §4.2). Same vehicle, same stat
+        // line — different picture and a different census. Same reasoning as the Lowlands token below.
+        APC_M113_GE,
         APC_HUMVEE_US,
         APC_LVTP7_US,
         APC_VAB_FR,
@@ -935,6 +939,9 @@ namespace HammerAndSickle.Core.GameData
         HEL_UH60_US,
         HEL_BO105_GE,
         HEL_AH1_US,
+        // Heeresflieger UH-1D (Dornier-built Bell 205) — TRANSPORT only. Germany never armed its Hueys;
+        // the Bundeswehr gunship is the Bo 105 PAH-1 above, which is why there is no HEL_UH1C_GE.
+        HEL_UH1D_GE,
 
         // Jets
         AWACS_E3_US,
@@ -962,6 +969,7 @@ namespace HammerAndSickle.Core.GameData
         INF_AB_UK,
         INF_REG_GE,
         INF_AB_GE,
+        INF_AM_GE,
         INF_REG_FR,
         INF_AB_FR,
 

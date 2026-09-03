@@ -207,6 +207,18 @@ a diagnosis.
 > 5. A PASSED entry is deleted from this section the same session, after its result is recorded in the change
 >    log and, if it is a shipped behaviour, in Claude_Project. **This section is a queue, never an archive.**
 
+- [!] **GE AIR-MOBILE BRIGADE — BLOCKING, landed 2026-09-03.**
+      **DO:** compile, then run the full EditorTest suite — especially `WeaponProfileNatoTests` (3 new
+      pin blocks), `EquipmentBaysTests` (its three template audits walk the real DB and now sweep the new
+      three-bay unit) and `CensusIntegrityTests`.
+      **PASS:** suite green. `EquipmentBaysTests` is the one that matters — it proves the new Mobile bay
+      holds a ground vehicle and the Embarked bay a real air transport, which is the whole legality
+      question for a three-bay unit.
+      ⚠ **DO NOT eyeball the unit in game yet** — all three of its sprites are still to-draw, so it will
+      correctly render the mismatch placeholder. That is expected, not a bug.
+      **WHY:** first RE-5/RE-6 slice. It is also the first template added since the icon pass, so it is
+      the first real test of whether a new three-bay unit still assembles cleanly under derived capacity.
+
 - [⏸] **RE-2 FREE RE-POINTS — four sprites, PLAY-CHECK ONLY, ride the T-5 art verification.**
       Landed 2026-08-29. No suite value: `IconIntegrityTests` proves an icon is present and valid, not that
       it is the RIGHT one, so this is eyes-only.
@@ -600,6 +612,30 @@ manager, for Khost). ⚠ AI2 snapshot serialization still owed its own `SAVE_VER
 > **Rules:** one line per change · newest first · format `YYYY-MM-DD — imperative summary (area)` · entries
 > older than the last two passes migrate to `Planning Docs/Claude_TODO_Archive.md` when this section is pruned.
 > **Entries 2026-07-21 → 2026-08-19 (incl. the theme-art pass and everything before it) are in the archive.**
+
+- 2026-09-03 — **GE AIR-MOBILE BRIGADE — the first RE-5/RE-6 slice. ⚑ Suite run owed.** Bob asked for a
+  German air-mobile unit after confirming the UH-1D is a transport. Built: `INF_AM_GE` · `APC_M113_GE` ·
+  `HEL_UH1D_GE` + the `GE_AIRMOBILE_BRIGADE` template (Deployed/Mobile/Embarked, mirroring
+  `US_AIRMOBILE_BRIGADE`). 3 WeaponType members, 8 `SpriteManager` constants.
+  **Now 186 profiles / 183 templates / 215 WeaponType members.**
+  ⚠ **COUNT CORRECTION — the RE-1a entry's "183 templates" was wrong; it was 182.** Profiles were right.
+  Verified by counting call sites with and without this change stashed.
+  ⚠ **ART-GATED and shipping that way deliberately:** all three sprites (`GE_AirMobile`, `GE_M113`,
+  `GE_UH1D_Frame0..5`) are still to-draw, so the unit renders the mismatch placeholder until Bob's German
+  drop lands — the same state `SV_2S5` sat in. `IconIntegrityTests` CANNOT catch this by design: it proves
+  an icon is declared and well-formed, never that the PNG exists.
+  Design notes worth keeping:
+  • `INF_AM_GE` differs from `INF_AB_GE` by exactly ONE trait (`MOUNTAIN_TRAINED` for `AIR_DROPPABLE`) —
+  the same single-trait split the US AM/AB pair uses. BOTH halves are pinned, because a one-trait
+  difference is exactly the kind that silently collapses into a re-skin.
+  • `APC_M113_GE` is the SAME VEHICLE as `APC_M113_US` and is pinned to resolve identically. It exists
+  only because art lives on the profile; any future divergence is a bug, not a national variant.
+  • **No new bay test was written, on purpose.** The three `EquipmentBaysTests` template audits walk the
+  REAL database, so a new template is swept the moment it is authored — which is the entire point of a
+  database-walking audit over a fixture list.
+  • The UH-1D is TRANSPORT ONLY: Germany never armed its Hueys, so there is no `HEL_UH1C_GE` to match the
+  US and Saudi gunships. The Bundeswehr's gunship is the Bo 105 PAH-1, already in the game.
+  • Fixed in passing: `WeaponProfileDB`'s header comment still claimed "All 173 weapon profiles".
 
 - 2026-09-02 — **CONSOLE HYGIENE — and a real test-quality hole behind it. ⚑ Suite run owed.** Bob asked
   what the accumulated test-run console messages were. Five messages for the WHOLE suite, and the audit

@@ -86,6 +86,14 @@ namespace HammerAndSickle.Tests
                 AssertGround(WeaponType.APC_M113_US, 3, 4, 6, 7, 7, 0);
                 Assert.AreEqual(8, (int)P(WeaponType.APC_M113_US).MaxMovementPoints, "M113 MMP 8 (APC baseline)");
 
+                // The German M113 is the SAME VEHICLE and must resolve to the same numbers. It exists as
+                // a separate profile only because art lives on the profile; any divergence here is a bug,
+                // not a national variant.
+                AssertGround(WeaponType.APC_M113_GE, 3, 4, 6, 7, 7, 0);
+                Assert.AreEqual(8, (int)P(WeaponType.APC_M113_GE).MaxMovementPoints, "GE M113 MMP 8");
+                Assert.AreEqual(P(WeaponType.APC_M113_US).ICM, P(WeaponType.APC_M113_GE).ICM, 0.001f,
+                    "GE M113 ICM must track the US M113 - same vehicle, no formation trait on a carrier");
+
                 // Humvee: Apc + THIN_TOP (soft-skin GAD 6).
                 AssertGround(WeaponType.APC_HUMVEE_US, 3, 4, 6, 7, 6, 0);
 
@@ -230,6 +238,12 @@ namespace HammerAndSickle.Tests
                 // UH-60 Black Hawk: non-combatant lift + helo-transport category.
                 Assert.IsTrue(P(WeaponType.HEL_UH60_US).HasCapability(WeaponCapability.NonCombatant), "UH-60 non-combatant");
                 Assert.AreEqual(TransportCategory.HeloTransport, P(WeaponType.HEL_UH60_US).TransportCategory, "UH-60 helo transport");
+
+                // FRG UH-1D: the Heeresflieger lift helo. TRANSPORT ONLY - Germany never armed its
+                // Hueys, so NonCombatant here is a historical fact, not a balance dial. If this ever
+                // resolves as attack-capable, someone has given the Bundeswehr a gunship it never had.
+                Assert.IsTrue(P(WeaponType.HEL_UH1D_GE).HasCapability(WeaponCapability.NonCombatant), "UH-1D non-combatant");
+                Assert.AreEqual(TransportCategory.HeloTransport, P(WeaponType.HEL_UH1D_GE).TransportCategory, "UH-1D helo transport");
             }
             catch (Exception ex) { AppService.HandleException(CLASS_NAME, nameof(Helicopters_ResolveConvertedLines), ex); throw; }
         }
@@ -272,6 +286,15 @@ namespace HammerAndSickle.Tests
                 AssertGround(WeaponType.INF_REG_GE, 8, 7, 7, 8, 10, 8);
                 AssertGround(WeaponType.INF_AB_GE, 9, 7, 7, 8, 10, 8);
                 Assert.IsTrue(P(WeaponType.INF_AB_GE).HasCapability(WeaponCapability.AirDroppable), "FRG Airborne air-droppable");
+
+                // FRG Air-Mobile: same statline as the airborne above, ONE trait apart. That single
+                // swap is the whole difference between the two units, so both halves are pinned -
+                // without them the two profiles could silently converge into a re-skin.
+                AssertGround(WeaponType.INF_AM_GE, 9, 7, 7, 8, 10, 8);
+                Assert.IsTrue(P(WeaponType.INF_AM_GE).HasCapability(WeaponCapability.MountainMovement),
+                    "FRG Air-Mobile mountain movement");
+                Assert.IsFalse(P(WeaponType.INF_AM_GE).HasCapability(WeaponCapability.AirDroppable),
+                    "FRG Air-Mobile is helo-lifted, NOT a parachute formation - that is the airborne above");
 
                 // --- FR (Mistral = Stinger-class) ---
                 AssertGround(WeaponType.INF_REG_FR, 8, 7, 7, 8, 10, 8);

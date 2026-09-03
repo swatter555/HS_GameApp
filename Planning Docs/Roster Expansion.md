@@ -142,9 +142,21 @@ as plain IDS. Bob twice stated it the other way round and corrected himself; the
 **New art:** `GE_M113` · `GE_Roland` · `GE_AlphaJet` · `GE_AirMobile` · `GE_LightArt` · `GE_HeavyArt` ·
 `GE_AAA` · `GE_MLRS` · `GE_UH1D_Frame0..5`
 **Replace in place:** `GE_F4`. **Rename:** `GER_Regulars`→`GE_Regulars`, `GER_Airborne`→`GE_Airborne`.
-**New templates:** second Panzergrenadier on the M113 · air-mobile brigade (Deployed `INF_AM_GE` /
-Mobile `APC_M113_GE` / Embarked `HEL_UH1D_GE`, mirroring `US Airmobile Brigade`) · Alpha Jet squadron ·
-Roland regiment · towed light + heavy artillery · towed AAA · MLRS regiment.
+**New templates:** second Panzergrenadier on the M113 · ~~air-mobile brigade~~ ✅ **BUILT 2026-09-03** ·
+Alpha Jet squadron · Roland regiment · towed light + heavy artillery · towed AAA · MLRS regiment.
+
+✅ **AIR-MOBILE SLICE LANDED 2026-09-03 (the first RE-5/RE-6 work).** `GE_AIRMOBILE_BRIGADE` —
+Deployed `INF_AM_GE` / Mobile `APC_M113_GE` / Embarked `HEL_UH1D_GE`, mirroring `US_AIRMOBILE_BRIGADE`.
+⚠ **ART-GATED: all three sprites are still to-draw** (`GE_AirMobile`, `GE_M113`, `GE_UH1D_Frame0..5`), so
+the unit renders the mismatch placeholder until Bob's German drop lands — the deliberate `SV_2S5` state.
+⚠ **`INF_AM_GE` differs from `INF_AB_GE` by exactly ONE trait** — `MOUNTAIN_TRAINED` in place of
+`AIR_DROPPABLE`, the same single-trait split the US pair uses. Both halves are pinned in
+`WeaponProfileNatoTests`, because without them the two profiles could silently converge into a re-skin.
+⚠ **HISTORICAL NOTE, recorded not objected:** the Bundeswehr had no separate air-mobile brigade. The
+Luftlandebrigaden WERE both the parachute and the helicopter-borne force, lifted by Heeresflieger UH-1Ds.
+This is a gameplay slot Bob asked for on 2026-08-29, not a formation that stood on its own.
+⚠ **The UH-1D is TRANSPORT ONLY** — Germany never armed its Hueys, so there is no `HEL_UH1C_GE` to match
+the US and Saudi gunships. The Bundeswehr's gunship is the Bo 105 PAH-1, which is already in the game.
 **Hawk stays shared** on `SAM_HAWK_US` — "not enough differentiation to matter" (Bob).
 ⚠ **OPEN: `GE_Truck`** — see §6.
 
@@ -427,6 +439,19 @@ same scratchpad file path from this conversation, or pass that URL as `url` from
 ---
 
 ## 8. PROGRESS LOG
+
+- **2026-09-03** — **FIRST RE-5/RE-6 SLICE: the German air-mobile brigade.** Three profiles
+  (`INF_AM_GE`, `APC_M113_GE`, `HEL_UH1D_GE`), three WeaponType members, eight `SpriteManager` constants
+  and one template. Now **186 profiles / 183 templates / 215 WeaponType members**.
+  ⚠ **COUNT CORRECTION:** the RE-1a summary recorded "183 profiles / 183 templates". Profiles were right;
+  templates were **182**, not 183. Verified by counting call sites before and after this change. The
+  corrected figures are above.
+  Two things worth keeping: (1) the three existing `EquipmentBaysTests` template audits walk the REAL
+  database, so the new three-bay unit is swept automatically — no new bay test was needed, which is what
+  a database-walking audit is FOR; (2) `APC_M113_GE` is the same vehicle as `APC_M113_US` and is pinned
+  to resolve identically — it exists only because art lives on the profile, so divergence is a bug, not a
+  national variant.
+  ⚠ Art-gated: all three sprites are still to-draw, so the unit renders the placeholder until they land.
 
 - **2026-09-02, later** — **RE-4 suite GREEN (Bob-run).** RE-1a and RE-3a cleared in the same run. The
   console audit that followed found nothing wrong with the roster work, but did surface a test-quality
