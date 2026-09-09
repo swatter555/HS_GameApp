@@ -1,5 +1,7 @@
 # Roster Expansion — per-nation art + WeaponProfiles
 
+> **Historical record — execution plan superseded 2026-09-09.** Use the [current completion-plan and checklist pointers](<../Docs/Roster and Art Completion.md>). The original decisions and notes below are preserved; their status headlines and work order are not the current implementation queue.
+
 > **Status: ALL ELEVEN NATIONS SETTLED 2026-08-29. NO CODE WRITTEN YET — see §5 for the work order.**
 > Art checklist (self-saving, checkboxes persist): https://claude.ai/code/artifact/a9d4cc37-a7c9-4a68-865c-2428d8f2969c
 > Opened out of the top-down icon work: Bob is authoring new unit art, which surfaced shared sprites,
