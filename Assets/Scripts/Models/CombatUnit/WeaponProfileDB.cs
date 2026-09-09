@@ -3920,40 +3920,39 @@ namespace HammerAndSickle.Models
             //----------------------------------------------
 
             //----------------------------------------------
-            // French Roland Self-Propelled SAM
+            // French AMX-30 DCA Self-Propelled Anti-Aircraft Gun
             //----------------------------------------------
-            // Phase 3 (NATO): Sam + SELF_PROPELLED + COMMAND_GUIDANCE (radar-command point SAM → GAT 14). Classification
-            // corrected SPAAA→SPSAM (2026-06-18): Roland is an air-only missile system, now on the Sam line (= Crotale).
-            // IR SAM→SHORT 2026-08-22 (Bob): point-defense band (real Roland ~6 km) — not an area-defense umbrella.
-            // → HA1 HD5 SA1 SD5 GAD7 · GAT14 · MMP10 · IR4 · SR6.
-            WeaponProfile Roland_FR = WeaponProfile.FromProfileDef(
-                "Roland Self-Propelled SAM System", "Roland", WeaponType.SPSAM_ROLAND_FR,
-                new ProfileDef(FamilyArchetypes.Sam,
-                    new Dictionary<ProfileStat, int> { { ProfileStat.IR, GameData.INDIRECT_RANGE_SHORT } },
-                    new[] { WeaponTrait.SELF_PROPELLED, WeaponTrait.COMMAND_GUIDANCE }),
-                UpgradePath.SAM, 468);
+            // Radar-directed twin 30mm guns on a tracked chassis (Robert's correction, 2026-09-09).
+            // Aaa + SELF_PROPELLED + RADAR_GUIDED_GUN, with the short-range gun envelope.
+            // → HA4 HD6 SA9 SD8 GAD11 · GAT13 · MMP10 · IR3 · SR3.
+            WeaponProfile AMX30DCA_FR = WeaponProfile.FromProfileDef(
+                "AMX-30 DCA Self-Propelled Anti-Aircraft Gun", "AMX-30 DCA", WeaponType.SPAAA_AMX30DCA_FR,
+                new ProfileDef(FamilyArchetypes.Aaa,
+                    new Dictionary<ProfileStat, int> { { ProfileStat.IR, GameData.INDIRECT_RANGE_AAA } },
+                    new[] { WeaponTrait.SELF_PROPELLED, WeaponTrait.RADAR_GUIDED_GUN }),
+                UpgradePath.AAA, 468);
 
             // Set the prestige cost for the profile.
-            Roland_FR.SetPrestigeCost(PrestigeTierCost.Gen3, PrestigeTypeCost.SPSAM);
+            AMX30DCA_FR.SetPrestigeCost(PrestigeTierCost.Gen3, PrestigeTypeCost.SPAAA);
 
             // Intel report stats
-            Roland_FR.AddIntelReportStat(WeaponType.Personnel,      950);
-            Roland_FR.AddIntelReportStat(WeaponType.SPSAM_ROLAND_FR, 18);
-            Roland_FR.AddIntelReportStat(WeaponType.APC_VAB_FR,      24);
-            Roland_FR.AddIntelReportStat(WeaponType.RCN_ERC90_FR,       12);
+            AMX30DCA_FR.AddIntelReportStat(WeaponType.Personnel,         950);
+            AMX30DCA_FR.AddIntelReportStat(WeaponType.SPAAA_AMX30DCA_FR,  18);
+            AMX30DCA_FR.AddIntelReportStat(WeaponType.APC_VAB_FR,         24);
+            AMX30DCA_FR.AddIntelReportStat(WeaponType.RCN_ERC90_FR,       12);
 
             // Handle the icon profile.
-            Roland_FR.IconProfile = new RegimentIconProfile(RegimentIconType.Single)
+            AMX30DCA_FR.IconProfile = new RegimentIconProfile(RegimentIconType.Single)
             {
-                Icon = SpriteManager.FR_Roland_W
+                Icon = SpriteManager.FR_AMX30DCA_W
             };
 
-            // Add the Roland FR profile to the database
+            // Add the AMX-30 DCA profile to the database
             // Towed vs self-propelled: the artillery/AAA/SAM families hold both, so medium is per profile.
-            Roland_FR.SetMovementMedium(MovementMedium.Tracked);
-            AddProfile(WeaponType.SPSAM_ROLAND_FR, Roland_FR);
+            AMX30DCA_FR.SetMovementMedium(MovementMedium.Tracked);
+            AddProfile(WeaponType.SPAAA_AMX30DCA_FR, AMX30DCA_FR);
             //----------------------------------------------
-            // French Roland Self-Propelled SAM
+            // French AMX-30 DCA Self-Propelled Anti-Aircraft Gun
             //----------------------------------------------
 
             //----------------------------------------------
@@ -3976,10 +3975,10 @@ namespace HammerAndSickle.Models
             Crotale.AddIntelReportStat(WeaponType.Personnel,    1050);
             Crotale.AddIntelReportStat(WeaponType.SPSAM_CROTALE_FR,  18);
             Crotale.AddIntelReportStat(WeaponType.APC_VAB_FR,     24);
-            Crotale.AddIntelReportStat(WeaponType.SPSAM_ROLAND_FR, 4);
+            Crotale.AddIntelReportStat(WeaponType.SPAAA_AMX30DCA_FR, 4);
             Crotale.AddIntelReportStat(WeaponType.RCN_ERC90_FR,      12);
 
-            // Handle the icon profile. (Using FR Roland sprites)
+            // Handle the icon profile. (Using US Chaparral sprites)
             Crotale.IconProfile = new RegimentIconProfile(RegimentIconType.Single)
             {
                 Icon = SpriteManager.US_Chaparral_W
@@ -4017,7 +4016,7 @@ namespace HammerAndSickle.Models
             // regiment — cross-national token, audit §2.5.
             Rapier_SP.AddIntelReportStat(WeaponType.RCN_FV105_UK,     12);
 
-            // Handle the icon profile. (No dedicated UK Rapier sprites, using FR Roland)
+            // Handle the icon profile. (No dedicated UK Rapier sprites, using US Chaparral)
             Rapier_SP.IconProfile = new RegimentIconProfile(RegimentIconType.Single)
             {
                 Icon = SpriteManager.US_Chaparral_W

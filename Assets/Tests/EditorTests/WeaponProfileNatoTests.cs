@@ -1,4 +1,7 @@
 using HammerAndSickle.Core.GameData;
+using HammerAndSickle.Core.Map;
+using HammerAndSickle.Audio;
+using HammerAndSickle.Controllers;
 using HammerAndSickle.Models;
 using HammerAndSickle.Services;
 using NUnit.Framework;
@@ -190,11 +193,11 @@ namespace HammerAndSickle.Tests
                 // Guns (Aaa archetype + SELF_PROPELLED). GAT +2 in the 2026-06-18 rebalance (7/10 lethality).
                 AssertGround(WeaponType.SPAAA_M163_US, 4, 6, 9, 8, 11, 11);   // optical Vulcan (= ZSU-57-2)
                 AssertGround(WeaponType.SPAAA_GEPARD_GE, 4, 6, 9, 8, 11, 13); // radar 35mm gun (= ZSU-23-4)
+                AssertGround(WeaponType.SPAAA_AMX30DCA_FR, 4, 6, 9, 8, 11, 13); // radar twin 30mm gun
 
                 // SP SAMs (Sam archetype + SELF_PROPELLED), air-only HA/SA 1.
                 AssertGround(WeaponType.SPSAM_CHAP_US, 1, 5, 1, 5, 7, 13);    // IR fire-and-forget
                 AssertGround(WeaponType.SPSAM_CROTALE_FR, 1, 5, 1, 5, 7, 14); // command
-                AssertGround(WeaponType.SPSAM_ROLAND_FR, 1, 5, 1, 5, 7, 14);  // command (= Crotale, reclassified missile)
                 AssertGround(WeaponType.SPSAM_RAPIER_UK, 1, 5, 1, 5, 7, 14);  // SACLOS
 
                 // Hawk: static medium SARH SAM (= NATO S-75), MMP 0.
@@ -203,16 +206,56 @@ namespace HammerAndSickle.Tests
                 Assert.AreEqual(10, (int)P(WeaponType.SPSAM_CHAP_US).MaxMovementPoints, "Chaparral SP MMP 10");
 
                 /* Engagement envelopes (§11.8.2d — IR is the AD reach, live since the 2026-08-22 range fix).
-                 * Bob's ruling same day: the four POINT-DEFENSE systems sit in the SHORT band (= Strela-1),
+                 * Bob's ruling same day: POINT-DEFENSE missiles sit in the SHORT band (= Strela-1),
                  * only the area-defense Hawk keeps the SAM 6. Pinned so the band split cannot silently
                  * regress to the flat 6 it shipped with. */
                 Assert.AreEqual(4, (int)P(WeaponType.SPSAM_CHAP_US).IndirectRange, "Chaparral IR 4 (point defense)");
-                Assert.AreEqual(4, (int)P(WeaponType.SPSAM_ROLAND_FR).IndirectRange, "Roland IR 4 (point defense)");
+                Assert.AreEqual(3, (int)P(WeaponType.SPAAA_AMX30DCA_FR).IndirectRange, "AMX-30 DCA IR 3 (short-range guns)");
                 Assert.AreEqual(4, (int)P(WeaponType.SPSAM_CROTALE_FR).IndirectRange, "Crotale IR 4 (point defense)");
                 Assert.AreEqual(4, (int)P(WeaponType.SPSAM_RAPIER_UK).IndirectRange, "Rapier IR 4 (point defense)");
                 Assert.AreEqual(6, (int)P(WeaponType.SAM_HAWK_US).IndirectRange, "Hawk IR 6 (area defense)");
             }
             catch (Exception ex) { AppService.HandleException(CLASS_NAME, nameof(AirDefense_ResolveConvertedLines), ex); throw; }
+        }
+
+        [Test]
+        public void Amx30Dca_IsTrackedGunEquipment_InTheFrenchDeployedBay()
+        {
+            if (!CombatUnitDB.IsInitialized) CombatUnitDB.Initialize();
+            var profile = P(WeaponType.SPAAA_AMX30DCA_FR);
+            Assert.That(profile.ShortName, Is.EqualTo("AMX-30 DCA"));
+            Assert.That(profile.MovementMedium, Is.EqualTo(MovementMedium.Tracked));
+            Assert.That(profile.MaxMovementPoints, Is.EqualTo(10));
+            Assert.That(profile.SpottingRange, Is.EqualTo(3));
+            Assert.That(profile.UpgradePath, Is.EqualTo(UpgradePath.AAA));
+            Assert.That(profile.PrestigeCost, Is.EqualTo(255));
+
+            var unit = CombatUnitDB.GetUnitTemplate("FR_AIR_DEFENSE_REGIMENT");
+            Assert.That(unit.UnitName, Is.EqualTo("FR Air Defense Regiment (AMX-30 DCA)"));
+            Assert.That(unit.Classification, Is.EqualTo(UnitClassification.SPAAA));
+            Assert.That(unit.EquipmentBays.Deployed, Is.EqualTo(WeaponType.SPAAA_AMX30DCA_FR));
+            Assert.That(unit.EquipmentBays.Mobile, Is.EqualTo(WeaponType.NONE));
+            Assert.That(unit.EquipmentBays.Embarked, Is.EqualTo(WeaponType.NONE));
+            Assert.That(unit.EquipmentBays.IsMobileBayOpen(), Is.False, "The fighting kit is already tracked.");
+            Assert.That(unit.EquipmentBays.GetIcon(DeploymentPosition.Deployed, HexDirection.W),
+                Is.EqualTo(SpriteManager.FR_AMX30DCA_W));
+            Assert.That(unit.EquipmentBays.GetIcon(DeploymentPosition.Fortified, HexDirection.E),
+                Is.EqualTo(SpriteManager.FR_AMX30DCA_W), "Posture/facing must retain the deployed gun artwork.");
+
+            var sprite = UnityEditor.AssetDatabase.LoadAssetAtPath<UnityEngine.Sprite>(
+                "Assets/Art/Sprites/Unit Icons/NATO Icons/FR_AMX30DCA_W.png");
+            Assert.That(sprite, Is.Not.Null, "The renamed profile artwork must still import.");
+            Assert.That(sprite.name, Is.EqualTo(profile.IconProfile.Icon));
+        }
+
+        [Test]
+        public void Amx30Dca_IsReportedAndHeardAsAaa_IncludingCrotaleSupportGuns()
+        {
+            var type = WeaponType.SPAAA_AMX30DCA_FR;
+            Assert.That(EquipmentBays.ClassifyWeaponType(type), Is.EqualTo(EquipmentBucket.AAA));
+            Assert.That(WeaponSoundClassifier.FamilyFor(type), Is.EqualTo(WeaponSoundFamily.AntiAircraftGun));
+            Assert.That(P(type).IntelReportStats[type], Is.EqualTo(18));
+            Assert.That(P(WeaponType.SPSAM_CROTALE_FR).IntelReportStats[type], Is.EqualTo(4));
         }
 
         #endregion // Batch D — Air Defense

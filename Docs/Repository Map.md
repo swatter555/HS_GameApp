@@ -18,7 +18,7 @@ This map describes the implementation that exists. The [design document][design]
 | First-party source | 127 C# files under `Assets/Scripts`, 7 under `Assets/Editor`; 66 test/helper C# files, including 63 `*Tests.cs` files |
 | Assemblies | Runtime `Main`; `EditorTests`; `RuntimeTests` is Editor-only and currently contains no C# tests; LeanTween has its own vendor assembly |
 | Playable content | One standalone Khost folder; campaign Khost is a separate, undiscovered mockup folder |
-| Persistent versions | `GameData.SAVE_VERSION = 10`; minimum supported save tracks it. Map data version = 2, exact-version read gate |
+| Persistent versions | `GameData.SAVE_VERSION = 11`; minimum supported save tracks it. Map data version = 2, exact-version read gate |
 | Known frontier | Remaining icon/roster art, combat presentation, air mission integration, logistics, requisition, AI order execution, campaign/save UI |
 
 ## Repository layout
@@ -112,9 +112,17 @@ Static authored UI is Inspector-wired to stable public `On…Button()` callbacks
 | Scenario metadata | [ScenarioManifest.cs](../Assets/Scripts/Core/Game%20Data/ScenarioManifest.cs): parameterless DTO/setters, paths resolved against transient `ContentRoot`; validates economy/grade ladder/objective fraction. Current format has no independent format identifier/version gate |
 | Maps | [JsonMapHeader.cs](../Assets/Scripts/Models/Map/JsonMapHeader.cs), [JsonMapData.cs](../Assets/Scripts/Models/Map/JsonMapData.cs), [MapLoader.cs](../Assets/Scripts/Core/Helpers/MapLoader.cs): map header version 2; explicit geometry; validation and refusal of out-of-range tiles |
 | OOB | [OOBFileLoader.cs](../Assets/Scripts/Core/Helpers/OOBFileLoader.cs): accepts object wrapper with units/leaders and legacy flat unit list; creates/registers units, restores aircraft attachments, then creates/registers/assigns leaders. Some invalid items warn/continue. No current `ArrivalTurn` field |
-| Saves | [GameStateSnapshot.cs](../Assets/Scripts/Core/Persistence/GameStateSnapshot.cs), [GameDataObjects.cs](../Assets/Scripts/Core/Persistence/GameDataObjects.cs), [SnapshotMapper.cs](../Assets/Scripts/Core/Persistence/SnapshotMapper.cs), [SaveLoad.cs](../Assets/Scripts/Core/Persistence/SaveLoad.cs): version 10, provenance header, campaign/scenario, embedded map, units/leaders; save/load entry points currently have no callers |
+| Saves | [GameStateSnapshot.cs](../Assets/Scripts/Core/Persistence/GameStateSnapshot.cs), [GameDataObjects.cs](../Assets/Scripts/Core/Persistence/GameDataObjects.cs), [SnapshotMapper.cs](../Assets/Scripts/Core/Persistence/SnapshotMapper.cs), [SaveLoad.cs](../Assets/Scripts/Core/Persistence/SaveLoad.cs): version 11, provenance header, campaign/scenario, embedded map, units/leaders; save/load entry points currently have no callers |
 | Player settings | `GameAudioManager` reads/writes `audio_settings.json` under `Application.persistentDataPath` using `JsonPolicy.Settings`; this is separate from shipped content and the AppService Documents paths |
 | Future mission/AI files | `.mission` pack and `.aii` schema are planning work. No `.aii` content exists in the current StreamingAssets inventory; do not require one for today's Khost load |
+
+### French AMX-30 DCA correction (2026-09-09)
+
+Robert replaced the French Roland entry with **AMX-30 DCA**, a tracked radar-guided twin-gun SPAAA profile. `SPSAM_ROLAND_FR` is now `SPAAA_AMX30DCA_FR`; the stable template key `FR_AIR_DEFENSE_REGIMENT` remains, with classification SPAAA and the new profile in its Deployed bay. Crotale's four supporting vehicles use the new AAA census key. The AAA archetype, SELF_PROPELLED and RADAR_GUIDED_GUN traits resolve HA4/HD6/SA9/SD8/GAD11/GAT13, movement 10, spotting 3 and the AAA engagement envelope of 3 hexes. Gen3 + SPAAA costs 255 prestige; availability remains turn 468.
+
+Save version 11 uses Robert's explicitly approved development clean break: older saves are rejected, with no migration or old-enum alias. Editor/AI catalogs and any external OOB using the old identifier must be updated together before interchange; no tracked StreamingAssets file contains it. See the [coordination record](<C:/Users/coder/Desktop/Codex Projects/Agent Correspondence/2026-09-09 HS Game AMX-30 DCA profile correction.md>). Existing save-load error-reporting limitations remain as documented below.
+
+All six `FR_Roland_*` PNGs and their matching constants became `FR_AMX30DCA_*`, preserving asset bytes, `.meta` GUIDs and existing atlas references. The live profile selects `FR_AMX30DCA_W`; facing still rotates this sprite. This focused rename does not complete the broader directional-suffix retirement. `WeaponProfileNatoTests` now covers the corrected profile, template/bay artwork, imported sprite, census and gun sound family. Agent-run Unity 6000.2.6f2 EditMode on 2026-09-09 passed the 12-test NATO suite and 203-test relevant regression selection (including CombatOracle and SaveMigrationLadder); no tests skipped. Static checks verified all six asset hashes/meta files/atlas GUID references. Build and visual play verification remain unrun.
 
 ### Geometry, identity and content boundaries
 

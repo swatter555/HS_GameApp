@@ -927,7 +927,7 @@ namespace HammerAndSickle.Core.GameData
         SPSAM_CHAP_US,
         SAM_HAWK_US,
         SPAAA_GEPARD_GE,   // 35mm radar gun (SPAAA, dual-role)
-        SPSAM_ROLAND_FR,   // command-guided point SAM (SPSAM, air-only)
+        SPAAA_AMX30DCA_FR, // tracked radar-guided twin 30mm AAA
         SPSAM_RAPIER_UK,
         SPSAM_CROTALE_FR,
 
@@ -1735,7 +1735,10 @@ namespace HammerAndSickle.Core.GameData
         // entered. ⚠ TRN_AN8_SV → TRN_AN12_SV is deliberately NOT in this batch: it is the ONE renamed
         // type present in shipped content (`khost.oob`), so it rides the next editor re-export as its
         // own bump. AI2b-3 still takes its own (11+).
-        public const int SAVE_VERSION = 10;
+        // 10 → 11 (2026-09-09, Robert-approved clean break): SPSAM_ROLAND_FR becomes
+        // SPAAA_AMX30DCA_FR. French air defense is tracked gun AAA, including its template and
+        // census references. Older development saves are rejected; Editor/AI catalogs must update.
+        public const int SAVE_VERSION = 11;
 
         #endregion
 

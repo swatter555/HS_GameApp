@@ -3439,15 +3439,15 @@ namespace HammerAndSickle.Models
 
             #endregion // FR Self-Propelled Artillery Regiment
 
-            #region FR Air Defense Regiment (Roland)
+            #region FR Air Defense Regiment (AMX-30 DCA)
 
             var fr_air_defense_regiment = new CombatUnit(
-                unitName: "FR Air Defense Regiment (Roland)",
-                classification: UnitClassification.SPSAM,
+                unitName: "FR Air Defense Regiment (AMX-30 DCA)",
+                classification: UnitClassification.SPAAA,
                 role: UnitRole.AirDefenseArea,
                 side: Side.AI,
                 nationality: Nationality.FRA,
-                deployedProfile: WeaponType.SPSAM_ROLAND_FR,
+                deployedProfile: WeaponType.SPAAA_AMX30DCA_FR,
                 mobileProfile: WeaponType.NONE,
                 embarkedProfile: WeaponType.NONE,
                 category: DepotCategory.Secondary,
@@ -3460,7 +3460,7 @@ namespace HammerAndSickle.Models
             // Add the template to the database
             AddTemplate("FR_AIR_DEFENSE_REGIMENT", fr_air_defense_regiment);
 
-            #endregion // FR Air Defense Regiment (Roland)
+            #endregion // FR Air Defense Regiment (AMX-30 DCA)
 
             #region FR SAM Regiment (Crotale)
 

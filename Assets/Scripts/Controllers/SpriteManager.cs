@@ -752,12 +752,12 @@ namespace HammerAndSickle.Controllers
         // French Anti-Aircraft
 
         // French SAM Systems
-        public const string FR_Roland_W    = "FR_Roland_W";
-        public const string FR_Roland_NW   = "FR_Roland_NW";
-        public const string FR_Roland_SW   = "FR_Roland_SW";
-        public const string FR_Roland_W_F  = "FR_Roland_W_F";
-        public const string FR_Roland_NW_F = "FR_Roland_NW_F";
-        public const string FR_Roland_SW_F = "FR_Roland_SW_F";
+        public const string FR_AMX30DCA_W    = "FR_AMX30DCA_W";
+        public const string FR_AMX30DCA_NW   = "FR_AMX30DCA_NW";
+        public const string FR_AMX30DCA_SW   = "FR_AMX30DCA_SW";
+        public const string FR_AMX30DCA_W_F  = "FR_AMX30DCA_W_F";
+        public const string FR_AMX30DCA_NW_F = "FR_AMX30DCA_NW_F";
+        public const string FR_AMX30DCA_SW_F = "FR_AMX30DCA_SW_F";
 
         // French Aircraft
         public const string FR_Jaguar     = "FR_Jaguar";
