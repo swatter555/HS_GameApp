@@ -6,4 +6,10 @@ The [active TODO](<C:/Users/coder/Desktop/Codex Projects/HS Game/HS Game TODO.md
 
 Robert's local [sprite checklist](<C:/Users/coder/Desktop/Codex Projects/helpers/hs-sprite-checklist/README.md>) lists required final PNG names by nation, weapon names, and existing/planned WeaponType constants. [Launch it](<C:/Users/coder/Desktop/Codex Projects/helpers/Open Sprite Checklist.cmd>). Its catalog and saved status are under `helpers/hs-sprite-checklist/data` in the vault; they are not runtime game data or included in this repository's commits. Read those files when reviewing current artwork readiness. A checked PNG means artwork created, not imported or verified in Unity.
 
+## Current authoring restrictions and rendering contract
+
+Robert withdrew Iranian and Saudi air-mobile forces on 2026-09-23. Do not add the previously proposed `HEL_UH1_IR`, `HEL_UH1_SA`, or `HEL_UH1C_SA`, their templates, or equivalent formations using shared foreign lift. Their `IR_UH1_Frame0..5`, `SA_UH1_Frame0..5`, and `SA_UH1C_Frame0..5` drawings are no longer requirements. The planned Iranian AH-1 Cobra remains approved. None of these withdrawn identifiers exists in the checked game or editor source; no save-version change is required. See the [coordination record](<C:/Users/coder/Desktop/Codex Projects/Agent Correspondence/2026-09-23 HS Game roster withdrawals and map airfield art.md>).
+
+`ME_Airbase` is map art for a potential airfield, selected from `HexTile.IsAirbase` by [HexGridRenderer](<../Assets/Scripts/Renderers/HexGridRenderer.cs>). It must remain available even without an airbase unit. `BASE_AIRBASE` remains valid: [GameIconRenderer](<../Assets/Scripts/Renderers/GameIconRenderer.cs>) handles AIRB units before bay-based icon selection, using the existing generic `AirbaseStack_0..4` hex badges. Its profile fallback to `ME_Airbase` must not cause a unit-art checklist requirement. Broader asset organization is deferred.
+
 This pointer deliberately does not duplicate the plan or progress ledger. Game source/assets/tests remain the authority for actual profile registration, bay selection, sprite resolution, and compatibility behavior.

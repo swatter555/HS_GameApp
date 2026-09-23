@@ -74,6 +74,8 @@ Paths below are relative to `Assets/Scripts`.
 | Prefab behavior | [Core/Prefab Scripts](../Assets/Scripts/Core/Prefab%20Scripts/): unit/terrain panels, unit/city/map/bridge/text visuals. `ParkedCode.cs` contains inactive historical code, not a separate system |
 | Audio | [Audio](../Assets/Scripts/Audio/): `GameAudio` facade, shared `AudioFogPolicy`, weapon-family classification, catalog and SFX player; [GameAudioManager.cs](../Assets/Scripts/Controllers/GameAudioManager.cs) audio lifecycle/streaming/settings |
 
+Airfield map art and airbase unit art have separate paths: `HexGridRenderer` uses themed map icons (including `ME_Airbase`) for `IsAirbase` sites, while `GameIconRenderer` handles AIRB units with generic stack badges before equipment-bay art selection. See the [roster/art contract](<Roster and Art Completion.md>) for checklist exclusions and current editor authoring restrictions.
+
 ### Assembly and lifecycle constraints
 
 [Main.asmdef](../Assets/Scripts/Main.asmdef) references TextMeshPro and Input System by GUID, LeanTween by name, and explicit `System.Text.Json.dll`/`System.IO.Pipelines.dll` precompiled references. Its `noEngineReferences` is false. [AssemblyInfo.cs](../Assets/Scripts/AssemblyInfo.cs) exposes internals to `EditorTests` for actual test seams. Do not infer package availability from a generated IDE project file.

@@ -4,6 +4,8 @@
 
 > **Scope amendment, Robert, 2026-09-10:** Remove the PLA Type 69 tank entirely to avoid redundant gameplay choices. The old `TANK_TYPE69_CH` / `CH_Type69` additions below are withdrawn. The active plan and local checklist omit them; no game profile, template, enum member, scenario entry or asset had been implemented for this addition.
 
+> **Scope amendment, Robert, 2026-09-23:** Iran and Saudi Arabia will not field air-mobile formations at this scale. Withdraw `HEL_UH1_IR`, `HEL_UH1_SA`, `HEL_UH1C_SA` and their national frame sets below; do not author these units or recreate them with shared foreign lift. These were planned additions, absent from the current game and checked editor source. `ME_Airbase` is map airfield/potential-base art, not unit art; AIRB units retain generic stack badges. See the [current scope and rendering contract](<../Docs/Roster and Art Completion.md>).
+
 > **Status: ALL ELEVEN NATIONS SETTLED 2026-08-29. NO CODE WRITTEN YET — see §5 for the work order.**
 > Art checklist (self-saving, checkboxes persist): https://claude.ai/code/artifact/a9d4cc37-a7c9-4a68-865c-2428d8f2969c
 > Opened out of the top-down icon work: Bob is authoring new unit art, which surfaced shared sprites,
