@@ -6,6 +6,12 @@ The [active TODO](<C:/Users/coder/Desktop/Codex Projects/HS Game/HS Game TODO.md
 
 Robert's local [sprite checklist](<C:/Users/coder/Desktop/Codex Projects/helpers/hs-sprite-checklist/README.md>) lists required final PNG names by nation, weapon names, and existing/planned WeaponType constants. [Launch it](<C:/Users/coder/Desktop/Codex Projects/helpers/Open Sprite Checklist.cmd>). Its catalog and saved status are under `helpers/hs-sprite-checklist/data` in the vault; they are not runtime game data or included in this repository's commits. Read those files when reviewing current artwork readiness. A checked PNG means artwork created, not imported or verified in Unity.
 
+## Approved NATO expansion — 2026-09-23
+
+Robert approved dedicated NATO Leopard 1 and M113 art plus M109, M113 C&V reconnaissance, PRTL radar AAA and Centurion; the YPR-765/AIFV was already approved. Existing Leopard profile IDs (`TANK_LEOPARD1_NL`, `_BE`, `_DK`) and `APC_M113_NATO` stay stable. Proposed additions are `SPA_M109_NATO`, `RCN_M113CV_NATO`, `SPAAA_PRTL_NATO` and `TANK_CENTURION_NATO`; these are planning names, not registered game keys.
+
+The shared art set does not imply universal national availability. Use the current plan and [NATO coordination packet](<C:/Users/coder/Desktop/Codex Projects/Agent Correspondence/2026-09-23 HS Game NATO roster and art expansion.md>) for filenames, assignments and pending Centurion variant decisions. Profile-owned icon selection remains the contract. Runtime profiles, imports and verification are still owed; do not export proposed keys until the game supports them.
+
 ## Current authoring restrictions and rendering contract
 
 Robert withdrew Iranian and Saudi air-mobile forces on 2026-09-23. Do not add the previously proposed `HEL_UH1_IR`, `HEL_UH1_SA`, or `HEL_UH1C_SA`, their templates, or equivalent formations using shared foreign lift. Their `IR_UH1_Frame0..5`, `SA_UH1_Frame0..5`, and `SA_UH1C_Frame0..5` drawings are no longer requirements. The planned Iranian AH-1 Cobra remains approved. None of these withdrawn identifiers exists in the checked game or editor source; no save-version change is required. See the [coordination record](<C:/Users/coder/Desktop/Codex Projects/Agent Correspondence/2026-09-23 HS Game roster withdrawals and map airfield art.md>).

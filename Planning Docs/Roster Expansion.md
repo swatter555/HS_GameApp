@@ -6,6 +6,8 @@
 
 > **Scope amendment, Robert, 2026-09-23:** Iran and Saudi Arabia will not field air-mobile formations at this scale. Withdraw `HEL_UH1_IR`, `HEL_UH1_SA`, `HEL_UH1C_SA` and their national frame sets below; do not author these units or recreate them with shared foreign lift. These were planned additions, absent from the current game and checked editor source. `ME_Airbase` is map airfield/potential-base art, not unit art; AIRB units retain generic stack badges. See the [current scope and rendering contract](<../Docs/Roster and Art Completion.md>).
 
+> **Scope amendment, Robert, 2026-09-23 — NATO:** Approved dedicated NATO Leopard 1/M113 art and M109, M113 C&V, PRTL and Centurion additions, retaining the approved YPR-765/AIFV. This supersedes earlier borrowed-art limits and the uncommitted YPR reconnaissance example; follow the [current packet](<../Docs/Roster and Art Completion.md>). National availability and profile-owned art selection remain explicit.
+
 > **Status: ALL ELEVEN NATIONS SETTLED 2026-08-29. NO CODE WRITTEN YET — see §5 for the work order.**
 > Art checklist (self-saving, checkboxes persist): https://claude.ai/code/artifact/a9d4cc37-a7c9-4a68-865c-2428d8f2969c
 > Opened out of the top-down icon work: Bob is authoring new unit art, which surfaced shared sprites,
