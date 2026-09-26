@@ -1178,6 +1178,21 @@ namespace HammerAndSickle.Core.GameData
         SAM_S75_IQ,
 
         #endregion // Iraqi Roster Additions
+
+        #region Iranian Roster Additions
+
+        // Append only; shared Hawk and existing Iranian equipment retain their persisted IDs.
+        TANK_CHIEFTAIN_IR,
+        HEL_AH1_IR,
+        FGT_F5_IR,
+        SPA_M109_IR,
+        RCN_M113_IR,
+        ART_LIGHT_IR,
+        ART_HEAVY_IR,
+        AAA_GEN_IR,
+        TRK_GEN_IR,
+
+        #endregion // Iranian Roster Additions
     }
 
     /* ⚠ RegimentProfileType DELETED 2026-08-08 (P1, todo_profiles §3). The full-tree sweep found it

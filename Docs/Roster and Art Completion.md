@@ -14,6 +14,10 @@ The [French integration contract](<French Roster Integration.md>) defines the ne
 
 The [Iraqi integration contract](<Iraqi Roster Integration.md>) defines nine national profiles, six new formations, three existing formation reassignments and national census references. Armed Mi-8AT replaces the planned Mi-24 and has no transport role. Legacy shared regional identifiers remain supported; existing saved/OOB bay selections are not migrated by template changes.
 
+## Iranian roster contract — 2026-09-26
+
+The [Iranian integration contract](<Iranian Roster Integration.md>) defines nine national profiles, six new formations and four existing formation reassignments. Iran has national Chieftain, Cobra, F-5E, M109, M113 recon and support art; Hawk deliberately shares the existing US profile and census. Cobra is a combat helicopter, with no Iranian air-mobile addition. Existing persisted identifiers and saved/OOB selections remain supported.
+
 ## Approved NATO expansion — 2026-09-23
 
 Robert approved dedicated NATO Leopard 1 and M113 art plus M109, M113 C&V reconnaissance, PRTL radar AAA and Centurion; the YPR-765/AIFV was already approved. Existing Leopard profile IDs (`TANK_LEOPARD1_NL`, `_BE`, `_DK`) and `APC_M113_NATO` stay stable. Proposed additions are `SPA_M109_NATO`, `RCN_M113CV_NATO`, `SPAAA_PRTL_NATO` and `TANK_CENTURION_NATO`; these are planning names, not registered game keys.
@@ -22,7 +26,7 @@ The shared art set does not imply universal national availability. Use the curre
 
 ## Current authoring restrictions and rendering contract
 
-Robert withdrew Iranian and Saudi air-mobile forces on 2026-09-23. Do not add the previously proposed `HEL_UH1_IR`, `HEL_UH1_SA`, or `HEL_UH1C_SA`, their templates, or equivalent formations using shared foreign lift. Their `IR_UH1_Frame0..5`, `SA_UH1_Frame0..5`, and `SA_UH1C_Frame0..5` drawings are no longer requirements. The planned Iranian AH-1 Cobra remains approved. None of these withdrawn identifiers exists in the checked game or editor source; no save-version change is required. See the [coordination record](<C:/Users/coder/Desktop/Codex Projects/Agent Correspondence/2026-09-23 HS Game roster withdrawals and map airfield art.md>).
+Robert withdrew Iranian and Saudi air-mobile forces on 2026-09-23. Do not add the previously proposed `HEL_UH1_IR`, `HEL_UH1_SA`, or `HEL_UH1C_SA`, their templates, or equivalent formations using shared foreign lift. Their `IR_UH1_Frame0..5`, `SA_UH1_Frame0..5`, and `SA_UH1C_Frame0..5` drawings are no longer requirements. The Iranian AH-1 Cobra is registered under the Iranian contract above. None of these withdrawn identifiers exists in the checked game or editor source; no save-version change is required. See the [coordination record](<C:/Users/coder/Desktop/Codex Projects/Agent Correspondence/2026-09-23 HS Game roster withdrawals and map airfield art.md>).
 
 `ME_Airbase` is map art for a potential airfield, selected from `HexTile.IsAirbase` by [HexGridRenderer](<../Assets/Scripts/Renderers/HexGridRenderer.cs>). It must remain available even without an airbase unit. `BASE_AIRBASE` remains valid: [GameIconRenderer](<../Assets/Scripts/Renderers/GameIconRenderer.cs>) handles AIRB units before bay-based icon selection, using the existing generic `AirbaseStack_0..4` hex badges. Its profile fallback to `ME_Airbase` must not cause a unit-art checklist requirement. Broader asset organization is deferred.
 

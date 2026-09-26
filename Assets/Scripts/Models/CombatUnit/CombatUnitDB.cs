@@ -4509,7 +4509,7 @@ namespace HammerAndSickle.Models
                 side: Side.AI,
                 nationality: Nationality.IR,
                 deployedProfile: WeaponType.INF_REG_IR,
-                mobileProfile: WeaponType.TRK_GEN_ARAB,
+                mobileProfile: WeaponType.TRK_GEN_IR,
                 embarkedProfile: WeaponType.NONE,
                 category: DepotCategory.Secondary,
                 size: DepotSize.Small
@@ -4523,7 +4523,7 @@ namespace HammerAndSickle.Models
 
             #endregion // Iranian Infantry Regiment
 
-            #region Iranian Towed Heavy Artillery Regiment (ART_HEAVY_ARAB)
+            #region Iranian Towed Heavy Artillery Regiment (ART_HEAVY_IR)
 
             var ir_heavy_artillery_regiment = new CombatUnit(
                 unitName: "Iranian Towed Heavy Artillery Regiment",
@@ -4531,8 +4531,8 @@ namespace HammerAndSickle.Models
                 role: UnitRole.GroundCombat,
                 side: Side.AI,
                 nationality: Nationality.IR,
-                deployedProfile: WeaponType.ART_HEAVY_ARAB,
-                mobileProfile: WeaponType.TRK_GEN_ARAB,
+                deployedProfile: WeaponType.ART_HEAVY_IR,
+                mobileProfile: WeaponType.TRK_GEN_IR,
                 embarkedProfile: WeaponType.NONE,
                 category: DepotCategory.Secondary,
                 size: DepotSize.Small
@@ -4546,7 +4546,7 @@ namespace HammerAndSickle.Models
 
             #endregion // Iranian Heavy Artillery Regiment
 
-            #region Iranian Towed Light Artillery Regiment (ART_LIGHT_ARAB)
+            #region Iranian Towed Light Artillery Regiment (ART_LIGHT_IR)
 
             var ir_light_artillery_regiment = new CombatUnit(
                 unitName: "Iranian Towed Light Artillery Regiment",
@@ -4554,8 +4554,8 @@ namespace HammerAndSickle.Models
                 role: UnitRole.GroundCombat,
                 side: Side.AI,
                 nationality: Nationality.IR,
-                deployedProfile: WeaponType.ART_LIGHT_ARAB,
-                mobileProfile: WeaponType.TRK_GEN_ARAB,
+                deployedProfile: WeaponType.ART_LIGHT_IR,
+                mobileProfile: WeaponType.TRK_GEN_IR,
                 embarkedProfile: WeaponType.NONE,
                 category: DepotCategory.Secondary,
                 size: DepotSize.Small
@@ -4569,7 +4569,7 @@ namespace HammerAndSickle.Models
 
             #endregion // Iranian Light Artillery Regiment
 
-            #region Iranian Towed Air Defense Regiment (AAA_GEN_SV)
+            #region Iranian Towed Air Defense Regiment (AAA_GEN_IR)
 
             var ir_air_defense_regiment = new CombatUnit(
                 unitName: "Iranian Air Defense Regiment",
@@ -4577,8 +4577,8 @@ namespace HammerAndSickle.Models
                 role: UnitRole.AirDefenseArea,
                 side: Side.AI,
                 nationality: Nationality.IR,
-                deployedProfile: WeaponType.AAA_GEN_SV,
-                mobileProfile: WeaponType.TRK_GEN_ARAB,
+                deployedProfile: WeaponType.AAA_GEN_IR,
+                mobileProfile: WeaponType.TRK_GEN_IR,
                 embarkedProfile: WeaponType.NONE,
                 category: DepotCategory.Secondary,
                 size: DepotSize.Small
@@ -4590,7 +4590,7 @@ namespace HammerAndSickle.Models
             // Add the template to the database
             AddTemplate("IR_AIR_DEFENSE_REGIMENT", ir_air_defense_regiment);
 
-            #endregion // Iranian Towed Air Defense Regiment (AAA_GEN_SV)
+            #endregion // Iranian Towed Air Defense Regiment (AAA_GEN_IR)
 
             #region Iranian Fighter Squadron (F-14)
 
@@ -4637,6 +4637,96 @@ namespace HammerAndSickle.Models
             AddTemplate("IR_F4_FIGHTER_SQUADRON", ir_f4_squadron);
 
             #endregion // Iranian Fighter Squadron (F4)
+
+            var ir_tank_regiment_chieftain = new CombatUnit(
+                unitName: "Iranian Tank Regiment (Chieftain)",
+                classification: UnitClassification.TANK,
+                role: UnitRole.GroundCombat,
+                side: Side.AI,
+                nationality: Nationality.IR,
+                deployedProfile: WeaponType.TANK_CHIEFTAIN_IR,
+                mobileProfile: WeaponType.NONE,
+                embarkedProfile: WeaponType.NONE,
+                category: DepotCategory.Secondary,
+                size: DepotSize.Small
+            );
+            ir_tank_regiment_chieftain.SetExperienceLevel(ExperienceLevel.Green);
+            AddTemplate("IR_TANK_REGIMENT_CHIEFTAIN", ir_tank_regiment_chieftain);
+
+            var ir_ah1_attack_squadron = new CombatUnit(
+                unitName: "Iranian Attack Helicopter Squadron (AH-1J)",
+                classification: UnitClassification.HELO,
+                role: UnitRole.GroundCombat,
+                side: Side.AI,
+                nationality: Nationality.IR,
+                deployedProfile: WeaponType.HEL_AH1_IR,
+                mobileProfile: WeaponType.NONE,
+                embarkedProfile: WeaponType.NONE,
+                category: DepotCategory.Secondary,
+                size: DepotSize.Small
+            );
+            ir_ah1_attack_squadron.SetExperienceLevel(ExperienceLevel.Experienced);
+            AddTemplate("IR_AH1_ATTACK_SQUADRON", ir_ah1_attack_squadron);
+
+            var ir_f5_fighter_squadron = new CombatUnit(
+                unitName: "Iranian Fighter Squadron (F-5E)",
+                classification: UnitClassification.FGT,
+                role: UnitRole.AirSuperiority,
+                side: Side.AI,
+                nationality: Nationality.IR,
+                deployedProfile: WeaponType.FGT_F5_IR,
+                mobileProfile: WeaponType.NONE,
+                embarkedProfile: WeaponType.NONE,
+                category: DepotCategory.Secondary,
+                size: DepotSize.Small
+            );
+            ir_f5_fighter_squadron.SetExperienceLevel(ExperienceLevel.Experienced);
+            AddTemplate("IR_F5_FIGHTER_SQUADRON", ir_f5_fighter_squadron);
+
+            var ir_sp_artillery_regiment_m109 = new CombatUnit(
+                unitName: "Iranian Self-Propelled Artillery Regiment (M109)",
+                classification: UnitClassification.SPA,
+                role: UnitRole.GroundCombat,
+                side: Side.AI,
+                nationality: Nationality.IR,
+                deployedProfile: WeaponType.SPA_M109_IR,
+                mobileProfile: WeaponType.NONE,
+                embarkedProfile: WeaponType.NONE,
+                category: DepotCategory.Secondary,
+                size: DepotSize.Small
+            );
+            ir_sp_artillery_regiment_m109.SetExperienceLevel(ExperienceLevel.Green);
+            AddTemplate("IR_SP_ARTILLERY_REGIMENT_M109", ir_sp_artillery_regiment_m109);
+
+            var ir_recon_regiment_m113 = new CombatUnit(
+                unitName: "Iranian Recon Regiment (M113)",
+                classification: UnitClassification.RECON,
+                role: UnitRole.GroundCombat,
+                side: Side.AI,
+                nationality: Nationality.IR,
+                deployedProfile: WeaponType.RCN_M113_IR,
+                mobileProfile: WeaponType.NONE,
+                embarkedProfile: WeaponType.NONE,
+                category: DepotCategory.Secondary,
+                size: DepotSize.Small
+            );
+            ir_recon_regiment_m113.SetExperienceLevel(ExperienceLevel.Green);
+            AddTemplate("IR_RECON_REGIMENT_M113", ir_recon_regiment_m113);
+
+            var ir_hawk_sam_regiment = new CombatUnit(
+                unitName: "Iranian Hawk SAM Regiment",
+                classification: UnitClassification.SAM,
+                role: UnitRole.AirDefenseArea,
+                side: Side.AI,
+                nationality: Nationality.IR,
+                deployedProfile: WeaponType.SAM_HAWK_US,
+                mobileProfile: WeaponType.TRK_GEN_IR,
+                embarkedProfile: WeaponType.NONE,
+                category: DepotCategory.Secondary,
+                size: DepotSize.Small
+            );
+            ir_hawk_sam_regiment.SetExperienceLevel(ExperienceLevel.Green);
+            AddTemplate("IR_HAWK_SAM_REGIMENT", ir_hawk_sam_regiment);
         }
 
         #endregion // Arab Units

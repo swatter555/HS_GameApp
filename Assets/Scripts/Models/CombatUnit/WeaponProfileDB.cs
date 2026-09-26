@@ -307,6 +307,7 @@ namespace HammerAndSickle.Models
                 CreateLowlandsProfiles();
                 CreateArabProfiles();
                 CreateIraqiRosterAdditions();
+                CreateIranianRosterAdditions();
                 CreateChineseProfiles();
             }
             catch (Exception e)
@@ -5784,6 +5785,130 @@ namespace HammerAndSickle.Models
         }
 
         /// <summary>
+        /// Adds Iran's approved national equipment; Hawk remains the shared US profile.
+        /// </summary>
+        private static void CreateIranianRosterAdditions()
+        {
+            // Mk3/Mk5-era 120mm gun on the Gen2 line; no Challenger armour/thermal package.
+            // Availability anchors and formation-scale censuses are documented in the Iranian contract.
+            WeaponProfile CHIEFTAIN_IR = WeaponProfile.FromProfileDef(
+                "Chieftain Mk3/Mk5 Main Battle Tank", "Chieftain", WeaponType.TANK_CHIEFTAIN_IR,
+                new ProfileDef(TankArchetypes.Gen2, new Dictionary<ProfileStat, int>(),
+                    new[] { WeaponTrait.GUN_120_RIFLED, WeaponTrait.GUN_STABILIZER_2PLANE }), UpgradePath.TANK, 396);
+            CHIEFTAIN_IR.SetPrestigeCost(PrestigeTierCost.Gen2, PrestigeTypeCost.TANK);
+            CHIEFTAIN_IR.AddIntelReportStat(WeaponType.Personnel, 1100);
+            CHIEFTAIN_IR.AddIntelReportStat(WeaponType.TANK_CHIEFTAIN_IR, 100);
+            CHIEFTAIN_IR.AddIntelReportStat(WeaponType.APC_M113_IR, 52);
+            CHIEFTAIN_IR.AddIntelReportStat(WeaponType.RCN_M113_IR, 12);
+            CHIEFTAIN_IR.AddIntelReportStat(WeaponType.ART_155MM_FG, 18);
+            CHIEFTAIN_IR.AddIntelReportStat(WeaponType.ART_120MM_MORTAR, 18);
+            CHIEFTAIN_IR.AddIntelReportStat(WeaponType.AT_ATGM, 8);
+            CHIEFTAIN_IR.AddIntelReportStat(WeaponType.MANPAD_STINGER, 6);
+            // Retain the existing Iranian tank-counter support mix; no new SPAAA is approved here.
+            CHIEFTAIN_IR.AddIntelReportStat(WeaponType.SPAAA_ZSU23_SV, 4);
+            CHIEFTAIN_IR.IconProfile = new RegimentIconProfile(RegimentIconType.Single) { Icon = SpriteManager.IR_Chieftain };
+            AddProfile(WeaponType.TANK_CHIEFTAIN_IR, CHIEFTAIN_IR);
+
+            // TOW-capable AH-1J representation: the established Cobra gun/rocket/ATGM line.
+            // Aircraft-only loss census; this is a combat helicopter, never organic lift.
+            WeaponProfile AH1_IR = WeaponProfile.FromProfileDef(
+                "AH-1J Cobra Attack Helicopter", "AH-1J Cobra", WeaponType.HEL_AH1_IR,
+                new ProfileDef(FamilyArchetypes.Helicopter, new Dictionary<ProfileStat, int>(),
+                    new[] { WeaponTrait.ATGM_HELO_SACLOS, WeaponTrait.CANNON_HELO, WeaponTrait.ROCKET_PODS }),
+                UpgradePath.HEL, 432);
+            AH1_IR.SetPrestigeCost(PrestigeTierCost.Gen1, PrestigeTypeCost.HEL);
+            AH1_IR.AddIntelReportStat(WeaponType.HEL_AH1_IR, 54);
+            AH1_IR.IconProfile = new RegimentIconProfile(RegimentIconType.Helo_Animation) { Icon = SpriteManager.IR_AH1_Frame0 };
+            AddProfile(WeaponType.HEL_AH1_IR, AH1_IR);
+
+            // Early lightweight fighter: agile, shorter dash and unguided strike capability.
+            // No BVR missile, precision-strike or later radar/defensive suite is inferred.
+            WeaponProfile F5_IR = WeaponProfile.FromProfileDef(
+                "F-5E Tiger II Fighter", "F-5E Tiger II", WeaponType.FGT_F5_IR,
+                new ProfileDef(FamilyArchetypes.FighterEarly,
+                    new Dictionary<ProfileStat, int> { { ProfileStat.TS, -1 } },
+                    new[] { WeaponTrait.AGILE_AIRFRAME, WeaponTrait.MULTIROLE_STRIKE }), UpgradePath.FGT, 432);
+            F5_IR.SetPrestigeCost(PrestigeTierCost.Gen1, PrestigeTypeCost.FGT);
+            // Keep the ratified Iranian fighter-wing scale used by the existing F-4/F-14.
+            F5_IR.AddIntelReportStat(WeaponType.FGT_F5_IR, 48);
+            F5_IR.IconProfile = new RegimentIconProfile(RegimentIconType.Single) { Icon = SpriteManager.IR_F5 };
+            AddProfile(WeaponType.FGT_F5_IR, F5_IR);
+
+            // Conventional 155mm M109: same gun/chassis as the NATO line, without its fires network
+            // or the US-only Copperhead package. Turn 300 is the established M109 family anchor.
+            WeaponProfile M109_IR = WeaponProfile.FromProfileDef(
+                "Iranian M109 Self-Propelled Artillery", "IR M109", WeaponType.SPA_M109_IR,
+                new ProfileDef(FamilyArchetypes.Artillery,
+                    new Dictionary<ProfileStat, int> { { ProfileStat.SA, 1 }, { ProfileStat.IR, GameData.INDIRECT_RANGE_MEDIUM } },
+                    new[] { WeaponTrait.SELF_PROPELLED }), UpgradePath.ART, 300);
+            M109_IR.SetPrestigeCost(PrestigeTierCost.Gen2, PrestigeTypeCost.SPA);
+            M109_IR.SetMovementMedium(MovementMedium.Tracked);
+            M109_IR.AddIntelReportStat(WeaponType.Personnel, 750);
+            M109_IR.AddIntelReportStat(WeaponType.SPA_M109_IR, 36);
+            M109_IR.AddIntelReportStat(WeaponType.APC_M113_IR, 12);
+            M109_IR.AddIntelReportStat(WeaponType.MANPAD_STRELA, 8);
+            M109_IR.IconProfile = new RegimentIconProfile(RegimentIconType.Single) { Icon = SpriteManager.IR_M109 };
+            AddProfile(WeaponType.SPA_M109_IR, M109_IR);
+
+            // Recon-role M113, not the Dutch C&V vehicle. Preserve the parent's tracked movement,
+            // speed and lack of a live amphibious capability; the Recon family supplies observation.
+            WeaponProfile RECON_IR = WeaponProfile.FromProfileDef(
+                "Iranian M113 Recon Vehicle", "IR M113 Recon", WeaponType.RCN_M113_IR,
+                new ProfileDef(FamilyArchetypes.Recon,
+                    new Dictionary<ProfileStat, int> { { ProfileStat.MMP, -2 } }, System.Array.Empty<WeaponTrait>()),
+                UpgradePath.RCN, 264);
+            RECON_IR.SetPrestigeCost(PrestigeTierCost.Gen1, PrestigeTypeCost.RCN);
+            RECON_IR.SetMovementMedium(MovementMedium.Tracked);
+            RECON_IR.AddIntelReportStat(WeaponType.Personnel, 600);
+            RECON_IR.AddIntelReportStat(WeaponType.RCN_M113_IR, 36);
+            RECON_IR.AddIntelReportStat(WeaponType.APC_M113_IR, 12);
+            RECON_IR.AddIntelReportStat(WeaponType.AT_ATGM, 8);
+            RECON_IR.AddIntelReportStat(WeaponType.MANPAD_STRELA, 6);
+            RECON_IR.IconProfile = new RegimentIconProfile(RegimentIconType.Single) { Icon = SpriteManager.IR_M113Recon };
+            AddProfile(WeaponType.RCN_M113_IR, RECON_IR);
+
+            // Shared ballistics, national art/census. Open-bay towed bases contain no carrier census.
+            WeaponProfile LIGHT_IR = WeaponProfile.FromProfileDef(
+                "Iranian Light Towed Artillery", "IR Light Artillery", WeaponType.ART_LIGHT_IR,
+                LightTowedArtilleryDef(), UpgradePath.ART, 144);
+            LIGHT_IR.SetPrestigeCost(PrestigeTierCost.Gen1, PrestigeTypeCost.ART);
+            LIGHT_IR.SetMovementMedium(MovementMedium.Foot);
+            LIGHT_IR.AddIntelReportStat(WeaponType.Personnel, 700);
+            LIGHT_IR.AddIntelReportStat(WeaponType.ART_LIGHT_IR, 48);
+            LIGHT_IR.AddIntelReportStat(WeaponType.MANPAD_STRELA, 6);
+            LIGHT_IR.IconProfile = new RegimentIconProfile(RegimentIconType.Single) { Icon = SpriteManager.IR_LightArt };
+            AddProfile(WeaponType.ART_LIGHT_IR, LIGHT_IR);
+
+            WeaponProfile HEAVY_IR = WeaponProfile.FromProfileDef(
+                "Iranian Heavy Towed Artillery", "IR Heavy Artillery", WeaponType.ART_HEAVY_IR,
+                HeavyTowedArtilleryDef(), UpgradePath.ART, 144);
+            HEAVY_IR.SetPrestigeCost(PrestigeTierCost.Gen1, PrestigeTypeCost.ART);
+            HEAVY_IR.SetMovementMedium(MovementMedium.Foot);
+            HEAVY_IR.AddIntelReportStat(WeaponType.Personnel, 750);
+            HEAVY_IR.AddIntelReportStat(WeaponType.ART_HEAVY_IR, 36);
+            HEAVY_IR.AddIntelReportStat(WeaponType.MANPAD_STRELA, 8);
+            HEAVY_IR.IconProfile = new RegimentIconProfile(RegimentIconType.Single) { Icon = SpriteManager.IR_HeavyArt };
+            AddProfile(WeaponType.ART_HEAVY_IR, HEAVY_IR);
+
+            WeaponProfile AAA_IR = WeaponProfile.FromProfileDef(
+                "Iranian Towed Anti-Aircraft Artillery", "IR Towed AAA", WeaponType.AAA_GEN_IR,
+                TowedAaaDef(), UpgradePath.AAA, 144);
+            AAA_IR.SetPrestigeCost(PrestigeTierCost.Gen1, PrestigeTypeCost.AAA);
+            AAA_IR.SetMovementMedium(MovementMedium.Foot);
+            AAA_IR.AddIntelReportStat(WeaponType.Personnel, 500);
+            AAA_IR.AddIntelReportStat(WeaponType.AAA_GEN_IR, 18);
+            AAA_IR.AddIntelReportStat(WeaponType.MANPAD_STRELA, 12);
+            AAA_IR.IconProfile = new RegimentIconProfile(RegimentIconType.Single) { Icon = SpriteManager.IR_AAA };
+            AddProfile(WeaponType.AAA_GEN_IR, AAA_IR);
+
+            WeaponProfile TRUCK_IR = WeaponProfile.FromProfileDef(
+                "Iranian Transport Truck", "IR Truck", WeaponType.TRK_GEN_IR, TransportTruckDef());
+            TRUCK_IR.SetPrestigeCost(PrestigeTierCost.Gen1, PrestigeTypeCost.TRK);
+            TRUCK_IR.IconProfile = new RegimentIconProfile(RegimentIconType.Single) { Icon = SpriteManager.IR_Truck };
+            AddProfile(WeaponType.TRK_GEN_IR, TRUCK_IR);
+        }
+
+        /// <summary>
         /// Add Arab WeaponProfiles
         /// </summary>
         private static void CreateArabProfiles()
@@ -6515,7 +6640,7 @@ namespace HammerAndSickle.Models
             // Organic tank battalion (census pass 2026-08-13): moved off the stripped M113 carrier
             // (rule 2). ⚠ Shared by mech and leg templates — same P4 caveat as INF_REG_IQ.
             INF_REG_IR_P.AddIntelReportStat(WeaponType.TANK_M60A3_IR, 31);
-            INF_REG_IR_P.AddIntelReportStat(WeaponType.ART_HEAVY_ARAB, 18);
+            INF_REG_IR_P.AddIntelReportStat(WeaponType.ART_HEAVY_IR, 18);
             INF_REG_IR_P.AddIntelReportStat(WeaponType.ART_120MM_MORTAR, 18);
             INF_REG_IR_P.AddIntelReportStat(WeaponType.AT_ATGM, 12);
             INF_REG_IR_P.AddIntelReportStat(WeaponType.MANPAD_STRELA, 24);
