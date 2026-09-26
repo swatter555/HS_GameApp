@@ -208,7 +208,10 @@ namespace HammerAndSickle.Tests
                 {
                     usedSprites.Add(frame);
                     var resolving = ResolvingAtlases(frame);
-                    string state = "Connected; visual acceptance pending";
+                    string state = frame.StartsWith("FR_Puma", StringComparison.Ordinal) ||
+                        frame.StartsWith("FR_Gazelle", StringComparison.Ordinal)
+                        ? "Connected; approved provisional French frames; replacements owed"
+                        : "Connected; visual acceptance pending";
                     if (Pending.TryGetValue(type, out string pendingIcon))
                     {
                         seenPending.Add(type);

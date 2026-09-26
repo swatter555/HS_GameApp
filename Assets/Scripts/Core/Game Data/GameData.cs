@@ -1149,6 +1149,20 @@ namespace HammerAndSickle.Core.GameData
         Personnel,
 
         #endregion // Non-Profile Units
+
+        #region French Roster Additions
+
+        // Append new IDs: preserve every existing enum value as well as persisted names.
+        // IFV_AMX10P above remains the existing census-only token.
+        ART_LIGHT_FR,
+        ART_HEAVY_FR,
+        AAA_GEN_FR,
+        IFV_AMX10P_FR,
+        INF_AM_FR,
+        HEL_PUMA_FR,
+        HEL_GAZELLE_FR,
+
+        #endregion // French Roster Additions
     }
 
     /* ⚠ RegimentProfileType DELETED 2026-08-08 (P1, todo_profiles §3). The full-tree sweep found it

@@ -3553,6 +3553,99 @@ namespace HammerAndSickle.Models
             AddTemplate("FR_JAGUAR_ATTACK_SQUADRON", fr_jaguar_squadron);
 
             #endregion // FR Jaguar Attack Squadron
+
+            // French roster additions. Puma is organic Embarked lift, never a separate fighting unit.
+
+            var fr_mech_infantry_brigade_amx10p = new CombatUnit(
+                unitName: "FR Mechanized Infantry Brigade (AMX-10P)",
+                classification: UnitClassification.MECH,
+                role: UnitRole.GroundCombat,
+                side: Side.AI,
+                nationality: Nationality.FRA,
+                deployedProfile: WeaponType.INF_REG_FR,
+                mobileProfile: WeaponType.IFV_AMX10P_FR,
+                embarkedProfile: WeaponType.NONE,
+                category: DepotCategory.Secondary,
+                size: DepotSize.Small
+            );
+            fr_mech_infantry_brigade_amx10p.SetExperienceLevel(ExperienceLevel.Trained);
+            AddTemplate("FR_MECH_INFANTRY_BRIGADE_AMX10P", fr_mech_infantry_brigade_amx10p);
+
+            var fr_airmobile_brigade = new CombatUnit(
+                unitName: "FR Airmobile Brigade",
+                classification: UnitClassification.AM,
+                role: UnitRole.GroundCombat,
+                side: Side.AI,
+                nationality: Nationality.FRA,
+                deployedProfile: WeaponType.INF_AM_FR,
+                mobileProfile: WeaponType.APC_VAB_FR,
+                embarkedProfile: WeaponType.HEL_PUMA_FR,
+                category: DepotCategory.Secondary,
+                size: DepotSize.Small
+            );
+            fr_airmobile_brigade.SetExperienceLevel(ExperienceLevel.Trained);
+            AddTemplate("FR_AIRMOBILE_BRIGADE", fr_airmobile_brigade);
+
+            var fr_gazelle_attack_squadron = new CombatUnit(
+                unitName: "FR Gazelle Attack Squadron",
+                classification: UnitClassification.HELO,
+                role: UnitRole.GroundCombat,
+                side: Side.AI,
+                nationality: Nationality.FRA,
+                deployedProfile: WeaponType.HEL_GAZELLE_FR,
+                mobileProfile: WeaponType.NONE,
+                embarkedProfile: WeaponType.NONE,
+                category: DepotCategory.Secondary,
+                size: DepotSize.Small
+            );
+            fr_gazelle_attack_squadron.SetExperienceLevel(ExperienceLevel.Experienced);
+            AddTemplate("FR_GAZELLE_ATTACK_SQUADRON", fr_gazelle_attack_squadron);
+
+            var fr_light_artillery_regiment = new CombatUnit(
+                unitName: "FR Light Towed Artillery Regiment",
+                classification: UnitClassification.ART,
+                role: UnitRole.GroundCombat,
+                side: Side.AI,
+                nationality: Nationality.FRA,
+                deployedProfile: WeaponType.ART_LIGHT_FR,
+                mobileProfile: WeaponType.TRK_GEN_NATO,
+                embarkedProfile: WeaponType.NONE,
+                category: DepotCategory.Secondary,
+                size: DepotSize.Small
+            );
+            fr_light_artillery_regiment.SetExperienceLevel(ExperienceLevel.Trained);
+            AddTemplate("FR_LIGHT_ARTILLERY_REGIMENT", fr_light_artillery_regiment);
+
+            var fr_heavy_artillery_regiment = new CombatUnit(
+                unitName: "FR Heavy Towed Artillery Regiment",
+                classification: UnitClassification.ART,
+                role: UnitRole.GroundCombat,
+                side: Side.AI,
+                nationality: Nationality.FRA,
+                deployedProfile: WeaponType.ART_HEAVY_FR,
+                mobileProfile: WeaponType.TRK_GEN_NATO,
+                embarkedProfile: WeaponType.NONE,
+                category: DepotCategory.Secondary,
+                size: DepotSize.Small
+            );
+            fr_heavy_artillery_regiment.SetExperienceLevel(ExperienceLevel.Trained);
+            AddTemplate("FR_HEAVY_ARTILLERY_REGIMENT", fr_heavy_artillery_regiment);
+
+            var fr_towed_aaa_regiment = new CombatUnit(
+                unitName: "FR Towed Anti-Aircraft Regiment",
+                classification: UnitClassification.AAA,
+                role: UnitRole.AirDefenseArea,
+                side: Side.AI,
+                nationality: Nationality.FRA,
+                deployedProfile: WeaponType.AAA_GEN_FR,
+                mobileProfile: WeaponType.TRK_GEN_NATO,
+                embarkedProfile: WeaponType.NONE,
+                category: DepotCategory.Secondary,
+                size: DepotSize.Small
+            );
+            fr_towed_aaa_regiment.SetExperienceLevel(ExperienceLevel.Trained);
+            AddTemplate("FR_TOWED_AAA_REGIMENT", fr_towed_aaa_regiment);
+
         }
 
         #endregion // Western Units

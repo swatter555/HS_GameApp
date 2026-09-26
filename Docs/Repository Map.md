@@ -76,6 +76,8 @@ Paths below are relative to `Assets/Scripts`.
 
 Airfield map art and airbase unit art have separate paths: `HexGridRenderer` uses themed map icons (including `ME_Airbase`) for `IsAirbase` sites, while `GameIconRenderer` handles AIRB units with generic stack badges before equipment-bay art selection. See the [roster/art contract](<Roster and Art Completion.md>) for checklist exclusions and current editor authoring restrictions.
 
+The [French roster contract](<French Roster Integration.md>) records the seven profiles added by `WeaponProfileDB.CreateFrenchRosterAdditions` and six templates added to `CombatUnitDB.CreateFrenchForces` (193 profiles / 189 templates overall). Puma is non-combatant organic transport in an air-mobile unit's Embarked bay; Gazelle has a separate attack template. The AMX-10P carrier option retains the existing VAB infantry template. New `WeaponType` members are appended; the old census-only `IFV_AMX10P` token remains valid. Consumer catalog adoption is tracked in the vault rather than inferred from game registration.
+
 ### Assembly and lifecycle constraints
 
 [Main.asmdef](../Assets/Scripts/Main.asmdef) references TextMeshPro and Input System by GUID, LeanTween by name, and explicit `System.Text.Json.dll`/`System.IO.Pipelines.dll` precompiled references. Its `noEngineReferences` is false. [AssemblyInfo.cs](../Assets/Scripts/AssemblyInfo.cs) exposes internals to `EditorTests` for actual test seams. Do not infer package availability from a generated IDE project file.
@@ -185,7 +187,7 @@ All named suites below live in [Assets/Tests/EditorTests](../Assets/Tests/Editor
 | Change | Relevant suite families |
 |---|---|
 | Save/content/geometry | `SaveMigrationLadderTests`, `MapStandardTests`, `ScenarioManifestTests`, `PrestigePersistenceTests`, `MissionObjectiveGateTests` |
-| Unit/profile/trait/census | `EquipmentBaysTests`, `CensusIntegrityTests`, `CommodityProfileTests`, `FamilyArchetypeTests`, `WeaponProfile*Tests`, `IconIntegrityTests`, `CombatUnitIntegrationTests`, `DepotSupplyTests` |
+| Unit/profile/trait/census | `EquipmentBaysTests`, `CensusIntegrityTests`, `CommodityProfileTests`, `FamilyArchetypeTests`, `WeaponProfile*Tests`, `FrenchRosterTests`, `IconIntegrityTests`, `UnitIconAssetTests`, `CombatUnitIntegrationTests`, `DepotSupplyTests` |
 | Movement/deployment/intel | `MovementTests`, `MovementMediumTests`, `DeploymentActionTests`, `DeploymentTransitionTests`, `OverWaterGraceTests`, `SpottingServiceTests`, `SpottingRangeTests`, `IntelLadderTests`, `TerritoryServiceTests` |
 | Combat/math/retreat | `CombatMathTests`, `CombatEngineTests`, `CombatResolverTests`, `DirectEngagementTests`, `GroundCombatActionTests`, `IndirectCombatActionTests`, `IndirectResolverTests`, stand/surrender/degradation/retreat/hex-arc and leader-skill suites |
 | Air | `AirCombatEngineTests`, `AirStrikeResolverTests`, `AirDefenseFireResolverTests`, `AirDefenseTransitTests`, `AirStandCheckTests`, `AirAmbushCheckTests`, `HeloTransitStandCheckTests`, `AOBMissionResolverTests`, `ReconMissionEngineTests`, `BaseCombatResolverTests` |

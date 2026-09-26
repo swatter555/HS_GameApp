@@ -293,6 +293,7 @@ namespace HammerAndSickle.Models
                 CreateSovietProfiles();
                 CreateGenericProfiles();
                 CreateWesternProfiles();
+                CreateFrenchRosterAdditions();
                 CreateLowlandsProfiles();
                 CreateArabProfiles();
                 CreateChineseProfiles();
@@ -3600,7 +3601,7 @@ namespace HammerAndSickle.Models
             M109_FR.AddIntelReportStat(WeaponType.MANPAD_MISTRAL, 12);
             M109_FR.AddIntelReportStat(WeaponType.RCN_ERC90_FR,    6);
 
-            // Handle the icon profile. (No dedicated French M109 sprites, using US M109)
+            // National AUF1 artwork; this profile does not share the US M109 sprite.
             M109_FR.IconProfile = new RegimentIconProfile(RegimentIconType.Single)
             {
                 Icon = SpriteManager.FR_AUF1
@@ -5241,6 +5242,121 @@ namespace HammerAndSickle.Models
             //----------------------------------------------
 
             #endregion // Infantry Units
+        }
+
+        /// <summary>
+        /// Adds the French packet's national equipment, infantry and organic helicopter lift.
+        /// </summary>
+        private static void CreateFrenchRosterAdditions()
+        {
+            // National commodities use the same ballistics as the other regular armies.
+            // Census scale follows the existing French support counter: 1,050 personnel / 48 tubes.
+            // Open-bay guns have no carrier census; the NATO truck is selected by the template.
+            WeaponProfile LIGHT_FR = WeaponProfile.FromProfileDef(
+                "French Light Towed Artillery", "FR Light Artillery", WeaponType.ART_LIGHT_FR,
+                LightTowedArtilleryDef(), UpgradePath.ART, 144);
+            LIGHT_FR.SetPrestigeCost(PrestigeTierCost.Gen1, PrestigeTypeCost.ART);
+            LIGHT_FR.SetMovementMedium(MovementMedium.Foot);
+            LIGHT_FR.AddIntelReportStat(WeaponType.Personnel, 1050);
+            LIGHT_FR.AddIntelReportStat(WeaponType.ART_105MM_FG, 48);
+            LIGHT_FR.AddIntelReportStat(WeaponType.MANPAD_MISTRAL, 12);
+            LIGHT_FR.IconProfile = new RegimentIconProfile(RegimentIconType.Single)
+            {
+                Icon = SpriteManager.FR_LightArt
+            };
+            AddProfile(WeaponType.ART_LIGHT_FR, LIGHT_FR);
+
+            WeaponProfile HEAVY_FR = WeaponProfile.FromProfileDef(
+                "French Heavy Towed Artillery", "FR Heavy Artillery", WeaponType.ART_HEAVY_FR,
+                HeavyTowedArtilleryDef(), UpgradePath.ART, 144);
+            HEAVY_FR.SetPrestigeCost(PrestigeTierCost.Gen1, PrestigeTypeCost.ART);
+            HEAVY_FR.SetMovementMedium(MovementMedium.Foot);
+            HEAVY_FR.AddIntelReportStat(WeaponType.Personnel, 1050);
+            HEAVY_FR.AddIntelReportStat(WeaponType.ART_155MM_FG, 48);
+            HEAVY_FR.AddIntelReportStat(WeaponType.MANPAD_MISTRAL, 12);
+            HEAVY_FR.IconProfile = new RegimentIconProfile(RegimentIconType.Single)
+            {
+                Icon = SpriteManager.FR_HeavyArt
+            };
+            AddProfile(WeaponType.ART_HEAVY_FR, HEAVY_FR);
+
+            // Generic towed AAA scale, with French rather than Soviet MANPADS in the census.
+            WeaponProfile AAA_FR = WeaponProfile.FromProfileDef(
+                "French Towed Anti-Aircraft Artillery", "FR Towed AAA", WeaponType.AAA_GEN_FR,
+                TowedAaaDef(), UpgradePath.AAA, 144);
+            AAA_FR.SetPrestigeCost(PrestigeTierCost.Gen1, PrestigeTypeCost.AAA);
+            AAA_FR.SetMovementMedium(MovementMedium.Foot);
+            AAA_FR.AddIntelReportStat(WeaponType.Personnel, 500);
+            AAA_FR.AddIntelReportStat(WeaponType.AAA_GEN_FR, 18);
+            AAA_FR.AddIntelReportStat(WeaponType.MANPAD_MISTRAL, 12);
+            AAA_FR.IconProfile = new RegimentIconProfile(RegimentIconType.Single)
+            {
+                Icon = SpriteManager.FR_AAA
+            };
+            AddProfile(WeaponType.AAA_GEN_FR, AAA_FR);
+
+            // 20mm tracked amphibious carrier. Dismounted MILAN teams belong to the infantry
+            // base's census/traits, so this hull does not inherit the Marder's ATGM_RAIL.
+            WeaponProfile AMX10P_FR = WeaponProfile.FromProfileDef(
+                "AMX-10P Infantry Fighting Vehicle", "AMX-10P", WeaponType.IFV_AMX10P_FR,
+                new ProfileDef(FamilyArchetypes.Ifv, new Dictionary<ProfileStat, int>(),
+                    new[] { WeaponTrait.AUTOCANNON_LIGHT, WeaponTrait.AMPHIBIOUS }),
+                UpgradePath.IFV, 420);
+            AMX10P_FR.SetPrestigeCost(PrestigeTierCost.Gen2, PrestigeTypeCost.IFV);
+            // Alternative carrier for the same French infantry counter as the 135-VAB option.
+            AMX10P_FR.AddIntelReportStat(WeaponType.IFV_AMX10P_FR, 135);
+            AMX10P_FR.IconProfile = new RegimentIconProfile(RegimentIconType.Single)
+            {
+                Icon = SpriteManager.FR_AMX10P
+            };
+            AddProfile(WeaponType.IFV_AMX10P_FR, AMX10P_FR);
+
+            // The established AM/AB distinction: terrain training replaces parachute capability.
+            // Retain the French light-infantry census; ground carriers and air lift occupy bays.
+            WeaponProfile INF_AM_FR_P = WeaponProfile.FromProfileDef(
+                "French Air-Mobile Infantry", "FR Air-Mobile", WeaponType.INF_AM_FR,
+                new ProfileDef(FamilyArchetypes.Infantry, new Dictionary<ProfileStat, int>(),
+                    new[] { WeaponTrait.RPG_LAW, WeaponTrait.ATGM_MEDIUM, WeaponTrait.MANPADS_STINGER,
+                            WeaponTrait.MOUNTAIN_TRAINED }));
+            INF_AM_FR_P.SetPrestigeCost(PrestigeTierCost.Gen1, PrestigeTypeCost.INF);
+            INF_AM_FR_P.AddIntelReportStat(WeaponType.Personnel, 2200);
+            INF_AM_FR_P.AddIntelReportStat(WeaponType.ART_120MM_MORTAR, 36);
+            INF_AM_FR_P.AddIntelReportStat(WeaponType.AT_ATGM, 36);
+            INF_AM_FR_P.AddIntelReportStat(WeaponType.MANPAD_MISTRAL, 24);
+            INF_AM_FR_P.IconProfile = new RegimentIconProfile(RegimentIconType.Single)
+            {
+                Icon = SpriteManager.FR_AirMobile
+            };
+            AddProfile(WeaponType.INF_AM_FR, INF_AM_FR_P);
+
+            // Organic, non-combatant lift follows the UH-1D/Mi-8T contract; no aircraft census.
+            // Service-year anchor: Army Puma 1969 = turn 372 from January 1938.
+            WeaponProfile PUMA_FR = WeaponProfile.FromProfileDef(
+                "SA 330 Puma Transport Helicopter", "Puma", WeaponType.HEL_PUMA_FR,
+                new ProfileDef(FamilyArchetypes.Helicopter, new Dictionary<ProfileStat, int>(),
+                    new[] { WeaponTrait.NON_COMBATANT }), UpgradePath.HELT, 372);
+            PUMA_FR.SetPrestigeCost(PrestigeTierCost.Gen1, PrestigeTypeCost.HELT);
+            PUMA_FR.SetTransportCategory(TransportCategory.HeloTransport);
+            PUMA_FR.IconProfile = new RegimentIconProfile(RegimentIconType.Helo_Animation)
+            {
+                Icon = SpriteManager.FR_Puma_Frame0
+            };
+            AddProfile(WeaponType.HEL_PUMA_FR, PUMA_FR);
+
+            // SA 342M HOT (1979): use the existing Bo 105 light SACLOS helicopter line.
+            // No cannon/armour trait and no transport role; 54 aircraft follows the current NATO
+            // helicopter counter convention, not a claim about a single historical squadron.
+            WeaponProfile GAZELLE_FR = WeaponProfile.FromProfileDef(
+                "SA 342M Gazelle HOT Attack Helicopter", "Gazelle HOT", WeaponType.HEL_GAZELLE_FR,
+                new ProfileDef(FamilyArchetypes.Helicopter, new Dictionary<ProfileStat, int>(),
+                    new[] { WeaponTrait.ATGM_HELO_SACLOS }), UpgradePath.HEL, 492);
+            GAZELLE_FR.SetPrestigeCost(PrestigeTierCost.Gen2, PrestigeTypeCost.HEL);
+            GAZELLE_FR.AddIntelReportStat(WeaponType.HEL_GAZELLE_FR, 54);
+            GAZELLE_FR.IconProfile = new RegimentIconProfile(RegimentIconType.Helo_Animation)
+            {
+                Icon = SpriteManager.FR_Gazelle_Frame0
+            };
+            AddProfile(WeaponType.HEL_GAZELLE_FR, GAZELLE_FR);
         }
 
         /// <summary>

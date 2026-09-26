@@ -98,7 +98,7 @@ namespace HammerAndSickle.Tests
         {
             AssertOneStatLine("Light towed artillery",
                 WeaponType.ART_LIGHT_SV, WeaponType.ART_LIGHT_NATO,
-                WeaponType.ART_LIGHT_ARAB, WeaponType.ART_LIGHT_CH);
+                WeaponType.ART_LIGHT_ARAB, WeaponType.ART_LIGHT_CH, WeaponType.ART_LIGHT_FR);
         }
 
         [Test]
@@ -106,7 +106,13 @@ namespace HammerAndSickle.Tests
         {
             AssertOneStatLine("Heavy towed artillery",
                 WeaponType.ART_HEAVY_SV, WeaponType.ART_HEAVY_NATO,
-                WeaponType.ART_HEAVY_ARAB, WeaponType.ART_HEAVY_CH);
+                WeaponType.ART_HEAVY_ARAB, WeaponType.ART_HEAVY_CH, WeaponType.ART_HEAVY_FR);
+        }
+
+        [Test]
+        public void FrenchTowedAaa_UsesTheRegularCommodityLine()
+        {
+            AssertOneStatLine("Towed AAA", WeaponType.AAA_GEN_SV, WeaponType.AAA_GEN_FR);
         }
 
         [Test]
@@ -128,7 +134,7 @@ namespace HammerAndSickle.Tests
             var wrong = new List<string>();
 
             foreach (var t in new[] { WeaponType.ART_LIGHT_SV, WeaponType.ART_LIGHT_NATO,
-                                      WeaponType.ART_LIGHT_ARAB, WeaponType.ART_LIGHT_CH })
+                                      WeaponType.ART_LIGHT_ARAB, WeaponType.ART_LIGHT_CH, WeaponType.ART_LIGHT_FR })
             {
                 if (!WeaponProfileDB.HasWeaponProfile(t)) continue;
                 var p = P(t);
@@ -137,7 +143,7 @@ namespace HammerAndSickle.Tests
             }
 
             foreach (var t in new[] { WeaponType.ART_HEAVY_SV, WeaponType.ART_HEAVY_NATO,
-                                      WeaponType.ART_HEAVY_ARAB, WeaponType.ART_HEAVY_CH })
+                                      WeaponType.ART_HEAVY_ARAB, WeaponType.ART_HEAVY_CH, WeaponType.ART_HEAVY_FR })
             {
                 if (!WeaponProfileDB.HasWeaponProfile(t)) continue;
                 var p = P(t);

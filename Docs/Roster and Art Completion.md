@@ -6,6 +6,10 @@ The [active TODO](<C:/Users/coder/Desktop/Codex Projects/HS Game/HS Game TODO.md
 
 Robert's local [sprite checklist](<C:/Users/coder/Desktop/Codex Projects/helpers/hs-sprite-checklist/README.md>) lists required final PNG names by nation, weapon names, and existing/planned WeaponType constants. [Launch it](<C:/Users/coder/Desktop/Codex Projects/helpers/Open Sprite Checklist.cmd>). Its catalog and saved status are under `helpers/hs-sprite-checklist/data` in the vault; they are not runtime game data or included in this repository's commits. Read those files when reviewing current artwork readiness. A checked PNG means artwork created, not imported or verified in Unity. The executable integration guard is [UnitIconAssetTests](../Assets/Tests/EditorTests/UnitIconAssetTests.cs); its EditMode inventory test writes `Temp/unit-icon-reachability.tsv` from the current profiles, formations, assets and saved atlas references. See the [repository rendering contract](<Repository Map.md#rendering-and-asset-contracts>) for pending exceptions.
 
+## French roster contract — 2026-09-26
+
+The [French integration contract](<French Roster Integration.md>) defines the new profiles, formation bays, census choices and compatibility rules. Puma supplies organic Embarked lift; Gazelle has a separate attack formation. The AMX-10P adds a carrier option, and national guns/AAA use the shared definitions. French helicopter frames remain provisional. Use the vault TODO for verification and the linked consumer packet for Editor/AI adoption.
+
 ## Approved NATO expansion — 2026-09-23
 
 Robert approved dedicated NATO Leopard 1 and M113 art plus M109, M113 C&V reconnaissance, PRTL radar AAA and Centurion; the YPR-765/AIFV was already approved. Existing Leopard profile IDs (`TANK_LEOPARD1_NL`, `_BE`, `_DK`) and `APC_M113_NATO` stay stable. Proposed additions are `SPA_M109_NATO`, `RCN_M113CV_NATO`, `SPAAA_PRTL_NATO` and `TANK_CENTURION_NATO`; these are planning names, not registered game keys.
