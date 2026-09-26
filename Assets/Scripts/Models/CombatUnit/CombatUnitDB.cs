@@ -3317,6 +3317,141 @@ namespace HammerAndSickle.Models
             AddTemplate("UK_TORNADO_FIGHTER_SQUADRON", uk_tornado_squadron);
 
             #endregion // UK Tornado Fighter Squadron
+
+            var uk_mech_infantry_regiment_fv432 = new CombatUnit(
+                unitName: "UK Mechanized Infantry Regiment (FV432)",
+                classification: UnitClassification.MECH,
+                role: UnitRole.GroundCombat,
+                side: Side.AI,
+                nationality: Nationality.UK,
+                deployedProfile: WeaponType.INF_REG_UK,
+                mobileProfile: WeaponType.APC_FV432_UK,
+                embarkedProfile: WeaponType.NONE,
+                category: DepotCategory.Secondary,
+                size: DepotSize.Small
+            );
+            uk_mech_infantry_regiment_fv432.SetExperienceLevel(ExperienceLevel.Experienced);
+            AddTemplate("UK_MECH_INFANTRY_REGIMENT_FV432", uk_mech_infantry_regiment_fv432);
+
+            var uk_airmobile_regiment = new CombatUnit(
+                unitName: "UK Air-Mobile Regiment",
+                classification: UnitClassification.AM,
+                role: UnitRole.GroundCombat,
+                side: Side.AI,
+                nationality: Nationality.UK,
+                deployedProfile: WeaponType.INF_AM_UK,
+                mobileProfile: WeaponType.TRK_GEN_NATO,
+                embarkedProfile: WeaponType.HEL_PUMA_UK,
+                category: DepotCategory.Secondary,
+                size: DepotSize.Small
+            );
+            uk_airmobile_regiment.SetExperienceLevel(ExperienceLevel.Experienced);
+            AddTemplate("UK_AIRMOBILE_REGIMENT", uk_airmobile_regiment);
+
+            var uk_lynx_attack_squadron = new CombatUnit(
+                unitName: "UK Lynx TOW Attack Squadron",
+                classification: UnitClassification.HELO,
+                role: UnitRole.GroundCombat,
+                side: Side.AI,
+                nationality: Nationality.UK,
+                deployedProfile: WeaponType.HEL_LYNX_UK,
+                mobileProfile: WeaponType.NONE,
+                embarkedProfile: WeaponType.NONE,
+                category: DepotCategory.Secondary,
+                size: DepotSize.Small
+            );
+            uk_lynx_attack_squadron.SetExperienceLevel(ExperienceLevel.Experienced);
+            AddTemplate("UK_LYNX_ATTACK_SQUADRON", uk_lynx_attack_squadron);
+
+            var uk_jaguar_attack_squadron = new CombatUnit(
+                unitName: "UK Jaguar Attack Squadron",
+                classification: UnitClassification.ATT,
+                role: UnitRole.AirGroundAttack,
+                side: Side.AI,
+                nationality: Nationality.UK,
+                deployedProfile: WeaponType.ATT_JAGUAR_UK,
+                mobileProfile: WeaponType.NONE,
+                embarkedProfile: WeaponType.NONE,
+                category: DepotCategory.Secondary,
+                size: DepotSize.Small
+            );
+            uk_jaguar_attack_squadron.SetExperienceLevel(ExperienceLevel.Experienced);
+            AddTemplate("UK_JAGUAR_ATTACK_SQUADRON", uk_jaguar_attack_squadron);
+
+            var uk_light_artillery_regiment = new CombatUnit(
+                unitName: "UK Light Towed Artillery Regiment",
+                classification: UnitClassification.ART,
+                role: UnitRole.GroundCombat,
+                side: Side.AI,
+                nationality: Nationality.UK,
+                deployedProfile: WeaponType.ART_LIGHT_UK,
+                mobileProfile: WeaponType.TRK_GEN_NATO,
+                embarkedProfile: WeaponType.NONE,
+                category: DepotCategory.Secondary,
+                size: DepotSize.Small
+            );
+            uk_light_artillery_regiment.SetExperienceLevel(ExperienceLevel.Experienced);
+            AddTemplate("UK_LIGHT_ARTILLERY_REGIMENT", uk_light_artillery_regiment);
+
+            var uk_heavy_artillery_regiment = new CombatUnit(
+                unitName: "UK Heavy Towed Artillery Regiment",
+                classification: UnitClassification.ART,
+                role: UnitRole.GroundCombat,
+                side: Side.AI,
+                nationality: Nationality.UK,
+                deployedProfile: WeaponType.ART_HEAVY_UK,
+                mobileProfile: WeaponType.TRK_GEN_NATO,
+                embarkedProfile: WeaponType.NONE,
+                category: DepotCategory.Secondary,
+                size: DepotSize.Small
+            );
+            uk_heavy_artillery_regiment.SetExperienceLevel(ExperienceLevel.Experienced);
+            AddTemplate("UK_HEAVY_ARTILLERY_REGIMENT", uk_heavy_artillery_regiment);
+
+            var uk_towed_aaa_regiment = new CombatUnit(
+                unitName: "UK Towed Anti-Aircraft Regiment",
+                classification: UnitClassification.AAA,
+                role: UnitRole.AirDefenseArea,
+                side: Side.AI,
+                nationality: Nationality.UK,
+                deployedProfile: WeaponType.AAA_GEN_UK,
+                mobileProfile: WeaponType.TRK_GEN_NATO,
+                embarkedProfile: WeaponType.NONE,
+                category: DepotCategory.Secondary,
+                size: DepotSize.Small
+            );
+            uk_towed_aaa_regiment.SetExperienceLevel(ExperienceLevel.Experienced);
+            AddTemplate("UK_TOWED_AAA_REGIMENT", uk_towed_aaa_regiment);
+
+            var uk_armoured_regiment_chieftain = new CombatUnit(
+                unitName: "UK Armoured Regiment (Chieftain)",
+                classification: UnitClassification.TANK,
+                role: UnitRole.GroundCombat,
+                side: Side.AI,
+                nationality: Nationality.UK,
+                deployedProfile: WeaponType.TANK_CHIEFTAIN_UK,
+                mobileProfile: WeaponType.NONE,
+                embarkedProfile: WeaponType.NONE,
+                category: DepotCategory.Secondary,
+                size: DepotSize.Small
+            );
+            uk_armoured_regiment_chieftain.SetExperienceLevel(ExperienceLevel.Experienced);
+            AddTemplate("UK_ARMOURED_REGIMENT_CHIEFTAIN", uk_armoured_regiment_chieftain);
+
+            var uk_f4_fighter_squadron = new CombatUnit(
+                unitName: "UK Phantom FG.1 Fighter Squadron",
+                classification: UnitClassification.FGT,
+                role: UnitRole.AirSuperiority,
+                side: Side.AI,
+                nationality: Nationality.UK,
+                deployedProfile: WeaponType.FGT_F4_UK,
+                mobileProfile: WeaponType.NONE,
+                embarkedProfile: WeaponType.NONE,
+                category: DepotCategory.Secondary,
+                size: DepotSize.Small
+            );
+            uk_f4_fighter_squadron.SetExperienceLevel(ExperienceLevel.Experienced);
+            AddTemplate("UK_F4_FIGHTER_SQUADRON", uk_f4_fighter_squadron);
         }
 
         public static void CreateFrenchForces()

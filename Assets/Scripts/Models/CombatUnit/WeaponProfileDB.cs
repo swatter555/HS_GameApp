@@ -270,6 +270,13 @@ namespace HammerAndSickle.Models
             // Retain the ratified towed-SAM lift capabilities; this packet changes no transport rules.
             new[] { WeaponTrait.SARH_LONG_RANGE, WeaponTrait.AIR_DROPPABLE, WeaponTrait.HELO_TRANSPORTABLE });
 
+        /// <summary>Established Jaguar strike line shared by the French and British national profiles.</summary>
+        private static ProfileDef JaguarStrikeDef() => new(
+            FamilyArchetypes.FighterEarly,
+            new Dictionary<ProfileStat, int> { { ProfileStat.TS, -1 } },
+            new[] { WeaponTrait.MULTIROLE_STRIKE, WeaponTrait.LASER_GUIDED_MUNITIONS, WeaponTrait.HEAVY_PAYLOAD,
+                    WeaponTrait.RUNWAY_CRATERING, WeaponTrait.RWR, WeaponTrait.ECM_JAMMER, WeaponTrait.CHAFF_FLARE });
+
         /// <summary>
         /// Appends a nation's own traits to a blueprint's base list. Exists so a commodity profile can
         /// still carry something national (RE-4's SECOND_LINE_FORMATION is the first case) without
@@ -304,6 +311,7 @@ namespace HammerAndSickle.Models
                 CreateGenericProfiles();
                 CreateWesternProfiles();
                 CreateFrenchRosterAdditions();
+                CreateBritishRosterAdditions();
                 CreateLowlandsProfiles();
                 CreateArabProfiles();
                 CreateIraqiRosterAdditions();
@@ -4018,7 +4026,7 @@ namespace HammerAndSickle.Models
             // regiment — cross-national token, audit §2.5.
             Rapier_SP.AddIntelReportStat(WeaponType.RCN_FV105_UK,     12);
 
-            // Handle the icon profile. (No dedicated UK Rapier sprites, using US Chaparral)
+            // Dedicated tracked Rapier art was connected in the shared sprite integration.
             Rapier_SP.IconProfile = new RegimentIconProfile(RegimentIconType.Single)
             {
                 Icon = SpriteManager.UK_Rapier
@@ -4725,10 +4733,7 @@ namespace HammerAndSickle.Models
             // low-level attack jet. → DF8 MAN9 TS9 SUR9 · GA8 OL9 · SR4 · OcSuppression 20.
             WeaponProfile JAGUAR = WeaponProfile.FromProfileDef(
                 "SEPECAT Jaguar Attack Aircraft", "Jaguar", WeaponType.ATT_JAGUAR_FR,
-                new ProfileDef(FamilyArchetypes.FighterEarly,
-                    new Dictionary<ProfileStat, int> { { ProfileStat.TS, -1 } },
-                    new[] { WeaponTrait.MULTIROLE_STRIKE, WeaponTrait.LASER_GUIDED_MUNITIONS, WeaponTrait.HEAVY_PAYLOAD,
-                            WeaponTrait.RUNWAY_CRATERING, WeaponTrait.RWR, WeaponTrait.ECM_JAMMER, WeaponTrait.CHAFF_FLARE }),
+                JaguarStrikeDef(),
                 UpgradePath.ATT, 420);
 
             // Set the prestige cost for the profile.
@@ -5365,6 +5370,139 @@ namespace HammerAndSickle.Models
                 Icon = SpriteManager.FR_Gazelle_Frame0
             };
             AddProfile(WeaponType.HEL_GAZELLE_FR, GAZELLE_FR);
+        }
+
+        /// <summary>
+        /// Adds the approved British national support, armour, carrier and aircraft options.
+        /// </summary>
+        private static void CreateBritishRosterAdditions()
+        {
+            // Shared gun ballistics; UK support-counter scale and Javelin census. Open-bay bases
+            // omit carrier tokens because the Mobile bay owns the shared NATO truck.
+            WeaponProfile LIGHT_UK = WeaponProfile.FromProfileDef(
+                "British Light Towed Artillery", "UK Light Artillery", WeaponType.ART_LIGHT_UK,
+                LightTowedArtilleryDef(), UpgradePath.ART, 144);
+            LIGHT_UK.SetPrestigeCost(PrestigeTierCost.Gen1, PrestigeTypeCost.ART);
+            LIGHT_UK.SetMovementMedium(MovementMedium.Foot);
+            LIGHT_UK.AddIntelReportStat(WeaponType.Personnel, 1050);
+            LIGHT_UK.AddIntelReportStat(WeaponType.ART_105MM_FG, 54);
+            LIGHT_UK.AddIntelReportStat(WeaponType.MANPAD_JAVELIN, 12);
+            LIGHT_UK.IconProfile = new RegimentIconProfile(RegimentIconType.Single) { Icon = SpriteManager.UK_LightArt };
+            AddProfile(WeaponType.ART_LIGHT_UK, LIGHT_UK);
+
+            WeaponProfile HEAVY_UK = WeaponProfile.FromProfileDef(
+                "British Heavy Towed Artillery", "UK Heavy Artillery", WeaponType.ART_HEAVY_UK,
+                HeavyTowedArtilleryDef(), UpgradePath.ART, 144);
+            HEAVY_UK.SetPrestigeCost(PrestigeTierCost.Gen1, PrestigeTypeCost.ART);
+            HEAVY_UK.SetMovementMedium(MovementMedium.Foot);
+            HEAVY_UK.AddIntelReportStat(WeaponType.Personnel, 1050);
+            HEAVY_UK.AddIntelReportStat(WeaponType.ART_155MM_FG, 54);
+            HEAVY_UK.AddIntelReportStat(WeaponType.MANPAD_JAVELIN, 12);
+            HEAVY_UK.IconProfile = new RegimentIconProfile(RegimentIconType.Single) { Icon = SpriteManager.UK_HeavyArt };
+            AddProfile(WeaponType.ART_HEAVY_UK, HEAVY_UK);
+
+            WeaponProfile AAA_UK = WeaponProfile.FromProfileDef(
+                "British Towed Anti-Aircraft Artillery", "UK Towed AAA", WeaponType.AAA_GEN_UK,
+                TowedAaaDef(), UpgradePath.AAA, 144);
+            AAA_UK.SetPrestigeCost(PrestigeTierCost.Gen1, PrestigeTypeCost.AAA);
+            AAA_UK.SetMovementMedium(MovementMedium.Foot);
+            AAA_UK.AddIntelReportStat(WeaponType.Personnel, 500);
+            AAA_UK.AddIntelReportStat(WeaponType.AAA_GEN_UK, 18);
+            AAA_UK.AddIntelReportStat(WeaponType.MANPAD_JAVELIN, 12);
+            AAA_UK.IconProfile = new RegimentIconProfile(RegimentIconType.Single) { Icon = SpriteManager.UK_AAA };
+            AddProfile(WeaponType.AAA_GEN_UK, AAA_UK);
+
+            // Same consolidated Jaguar game line as France; this is not a year-by-year fit model.
+            WeaponProfile JAGUAR_UK = WeaponProfile.FromProfileDef(
+                "Jaguar GR.1 Attack Aircraft", "Jaguar GR.1", WeaponType.ATT_JAGUAR_UK,
+                JaguarStrikeDef(), UpgradePath.ATT, 420);
+            JAGUAR_UK.SetPrestigeCost(PrestigeTierCost.Gen2, PrestigeTypeCost.ATT);
+            JAGUAR_UK.AddIntelReportStat(WeaponType.ATT_JAGUAR_UK, 36);
+            JAGUAR_UK.IconProfile = new RegimentIconProfile(RegimentIconType.Single) { Icon = SpriteManager.UK_Jaguar };
+            AddProfile(WeaponType.ATT_JAGUAR_UK, JAGUAR_UK);
+
+            // UK light-infantry base: keep its mortar/AT/Javelin mix, with mountain training
+            // instead of parachute capability. Truck and Puma are selected by the formation bays.
+            WeaponProfile INF_AM_UK_P = WeaponProfile.FromProfileDef(
+                "UK Air-Mobile Infantry", "UK Air-Mobile", WeaponType.INF_AM_UK,
+                new ProfileDef(FamilyArchetypes.Infantry, new Dictionary<ProfileStat, int>(),
+                    new[] { WeaponTrait.RPG_LAW, WeaponTrait.ATGM_MEDIUM, WeaponTrait.MANPADS_BASIC,
+                            WeaponTrait.MOUNTAIN_TRAINED }));
+            INF_AM_UK_P.SetPrestigeCost(PrestigeTierCost.Gen1, PrestigeTypeCost.INF);
+            INF_AM_UK_P.AddIntelReportStat(WeaponType.Personnel, 1860);
+            INF_AM_UK_P.AddIntelReportStat(WeaponType.ART_120MM_MORTAR, 18);
+            INF_AM_UK_P.AddIntelReportStat(WeaponType.ART_82MM_MORTAR, 18);
+            INF_AM_UK_P.AddIntelReportStat(WeaponType.AT_ATGM, 48);
+            INF_AM_UK_P.AddIntelReportStat(WeaponType.MANPAD_JAVELIN, 24);
+            INF_AM_UK_P.IconProfile = new RegimentIconProfile(RegimentIconType.Single) { Icon = SpriteManager.UK_AirMobile };
+            AddProfile(WeaponType.INF_AM_UK, INF_AM_UK_P);
+
+            // Organic transport only, as with the French Puma. RAF service anchor: 1971 (turn 396).
+            WeaponProfile PUMA_UK = WeaponProfile.FromProfileDef(
+                "Puma HC.1 Transport Helicopter", "Puma HC.1", WeaponType.HEL_PUMA_UK,
+                new ProfileDef(FamilyArchetypes.Helicopter, new Dictionary<ProfileStat, int>(),
+                    new[] { WeaponTrait.NON_COMBATANT }), UpgradePath.HELT, 396);
+            PUMA_UK.SetPrestigeCost(PrestigeTierCost.Gen1, PrestigeTypeCost.HELT);
+            PUMA_UK.SetTransportCategory(TransportCategory.HeloTransport);
+            PUMA_UK.IconProfile = new RegimentIconProfile(RegimentIconType.Helo_Animation) { Icon = SpriteManager.UK_Puma_Frame0 };
+            AddProfile(WeaponType.HEL_PUMA_UK, PUMA_UK);
+
+            // TOW-armed Lynx AH.1 uses the established light SACLOS attack-helicopter line.
+            // TOW adoption was reported in March 1981; use the 1981 anchor, not first Lynx flight.
+            WeaponProfile LYNX_UK = WeaponProfile.FromProfileDef(
+                "Lynx AH.1 TOW Attack Helicopter", "Lynx AH.1 TOW", WeaponType.HEL_LYNX_UK,
+                new ProfileDef(FamilyArchetypes.Helicopter, new Dictionary<ProfileStat, int>(),
+                    new[] { WeaponTrait.ATGM_HELO_SACLOS }), UpgradePath.HEL, 516);
+            LYNX_UK.SetPrestigeCost(PrestigeTierCost.Gen2, PrestigeTypeCost.HEL);
+            LYNX_UK.AddIntelReportStat(WeaponType.HEL_LYNX_UK, 54);
+            LYNX_UK.IconProfile = new RegimentIconProfile(RegimentIconType.Helo_Animation) { Icon = SpriteManager.UK_Lynx_Frame0 };
+            AddProfile(WeaponType.HEL_LYNX_UK, LYNX_UK);
+
+            // Activate the existing census token; retain its enum position and support references.
+            // Standard tracked machine-gun carrier, not the later RARDEN or Bulldog variants.
+            WeaponProfile FV432_UK = WeaponProfile.FromProfileDef(
+                "FV432 Armoured Personnel Carrier", "FV432", WeaponType.APC_FV432_UK,
+                new ProfileDef(FamilyArchetypes.Apc, new Dictionary<ProfileStat, int>(), System.Array.Empty<WeaponTrait>()),
+                UpgradePath.APC, 300);
+            FV432_UK.SetPrestigeCost(PrestigeTierCost.Gen1, PrestigeTypeCost.APC);
+            FV432_UK.SetMovementMedium(MovementMedium.Tracked);
+            // Alternative to 45 Warriors for the same British battle-group infantry base.
+            FV432_UK.AddIntelReportStat(WeaponType.APC_FV432_UK, 45);
+            FV432_UK.IconProfile = new RegimentIconProfile(RegimentIconType.Single) { Icon = SpriteManager.UK_FV432 };
+            AddProfile(WeaponType.APC_FV432_UK, FV432_UK);
+
+            // Earlier Chieftain option: 120mm rifled gun and laser ranging, with the established
+            // British closed-bay formation quality. No later Stillbrew/TOGS or Challenger armour.
+            WeaponProfile CHIEFTAIN_UK = WeaponProfile.FromProfileDef(
+                "Chieftain Main Battle Tank", "Chieftain", WeaponType.TANK_CHIEFTAIN_UK,
+                new ProfileDef(TankArchetypes.Gen2, new Dictionary<ProfileStat, int>(),
+                    new[] { WeaponTrait.GUN_120_RIFLED, WeaponTrait.LASER_RANGEFINDER,
+                            WeaponTrait.GUN_STABILIZER_2PLANE, WeaponTrait.NATO_FIRST_LINE }), UpgradePath.TANK, 336);
+            CHIEFTAIN_UK.SetPrestigeCost(PrestigeTierCost.Gen2, PrestigeTypeCost.TANK);
+            // Existing 58-tank UK counter scale; older carrier support replaces the Warrior slice.
+            CHIEFTAIN_UK.AddIntelReportStat(WeaponType.Personnel, 1000);
+            CHIEFTAIN_UK.AddIntelReportStat(WeaponType.TANK_CHIEFTAIN_UK, 58);
+            CHIEFTAIN_UK.AddIntelReportStat(WeaponType.APC_FV432_UK, 21);
+            CHIEFTAIN_UK.AddIntelReportStat(WeaponType.RCN_FV105_UK, 8);
+            CHIEFTAIN_UK.AddIntelReportStat(WeaponType.AT_ATGM, 15);
+            CHIEFTAIN_UK.AddIntelReportStat(WeaponType.MANPAD_JAVELIN, 8);
+            CHIEFTAIN_UK.AddIntelReportStat(WeaponType.SPA_M109_UK, 18);
+            CHIEFTAIN_UK.AddIntelReportStat(WeaponType.ART_81MM_MORTAR, 9);
+            CHIEFTAIN_UK.IconProfile = new RegimentIconProfile(RegimentIconType.Single) { Icon = SpriteManager.UK_Chieftain };
+            AddProfile(WeaponType.TANK_CHIEFTAIN_UK, CHIEFTAIN_UK);
+
+            // FG.1 interceptor on the established Phantom game line. National air census and art;
+            // no Tornado reassignment and no added strike/SEAD capability.
+            WeaponProfile F4_UK = WeaponProfile.FromProfileDef(
+                "Phantom FG.1 Fighter", "Phantom FG.1", WeaponType.FGT_F4_UK,
+                new ProfileDef(FamilyArchetypes.FighterEarly,
+                    new Dictionary<ProfileStat, int> { { ProfileStat.TS, 2 } },
+                    new[] { WeaponTrait.BVR_RADAR_MISSILE, WeaponTrait.RWR, WeaponTrait.CHAFF_FLARE }),
+                UpgradePath.FGT, 372);
+            F4_UK.SetPrestigeCost(PrestigeTierCost.Gen1, PrestigeTypeCost.FGT);
+            F4_UK.AddIntelReportStat(WeaponType.FGT_F4_UK, 36);
+            F4_UK.IconProfile = new RegimentIconProfile(RegimentIconType.Single) { Icon = SpriteManager.UK_F4 };
+            AddProfile(WeaponType.FGT_F4_UK, F4_UK);
         }
 
         /// <summary>

@@ -18,6 +18,10 @@ The [Iraqi integration contract](<Iraqi Roster Integration.md>) defines nine nat
 
 The [Iranian integration contract](<Iranian Roster Integration.md>) defines nine national profiles, six new formations and four existing formation reassignments. Iran has national Chieftain, Cobra, F-5E, M109, M113 recon and support art; Hawk deliberately shares the existing US profile and census. Cobra is a combat helicopter, with no Iranian air-mobile addition. Existing persisted identifiers and saved/OOB selections remain supported.
 
+## British roster contract — 2026-09-26
+
+The [British integration contract](<British Roster Integration.md>) records ten profiles and nine new formations, including playable FV432 at its original enum value. Puma supplies organic lift; Lynx is TOW-armed combat aviation. National Chieftain, Phantom, Jaguar, guns and AAA are connected, while Challenger, Warrior, Rapier and Tornado remain available. The UK shares the NATO truck.
+
 ## Approved NATO expansion — 2026-09-23
 
 Robert approved dedicated NATO Leopard 1 and M113 art plus M109, M113 C&V reconnaissance, PRTL radar AAA and Centurion; the YPR-765/AIFV was already approved. Existing Leopard profile IDs (`TANK_LEOPARD1_NL`, `_BE`, `_DK`) and `APC_M113_NATO` stay stable. Proposed additions are `SPA_M109_NATO`, `RCN_M113CV_NATO`, `SPAAA_PRTL_NATO` and `TANK_CENTURION_NATO`; these are planning names, not registered game keys.

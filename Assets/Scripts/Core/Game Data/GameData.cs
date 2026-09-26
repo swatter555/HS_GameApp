@@ -1096,16 +1096,16 @@ namespace HammerAndSickle.Core.GameData
 
         #endregion // Chinese Units
 
-        #region Non-Profile Units
+        #region Census Tokens and Retained Enum Positions
 
-        /* These units do not have ratings associated with them */
+        // Legacy census-token block. FV432 now has a playable profile; all positions remain stable.
 
         // Tanks
         TANK_M551,
 
         // IFVs and APCs
         IFV_AMX10P,
-        APC_FV432_UK,
+        APC_FV432_UK, // Playable UK carrier; retain its original census-token position/value.
 
         // Self-Propelled Artillery
         SPA_AUF1,
@@ -1148,7 +1148,7 @@ namespace HammerAndSickle.Core.GameData
         // Generic for all personnel in a unit.
         Personnel,
 
-        #endregion // Non-Profile Units
+        #endregion // Census Tokens and Retained Enum Positions
 
         #region French Roster Additions
 
@@ -1193,6 +1193,21 @@ namespace HammerAndSickle.Core.GameData
         TRK_GEN_IR,
 
         #endregion // Iranian Roster Additions
+
+        #region British Roster Additions
+
+        // APC_FV432_UK already exists above; append the other additions without moving old IDs.
+        ART_LIGHT_UK,
+        ART_HEAVY_UK,
+        AAA_GEN_UK,
+        ATT_JAGUAR_UK,
+        INF_AM_UK,
+        HEL_PUMA_UK,
+        HEL_LYNX_UK,
+        TANK_CHIEFTAIN_UK,
+        FGT_F4_UK,
+
+        #endregion // British Roster Additions
     }
 
     /* ⚠ RegimentProfileType DELETED 2026-08-08 (P1, todo_profiles §3). The full-tree sweep found it
