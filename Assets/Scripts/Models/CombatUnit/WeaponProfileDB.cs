@@ -277,6 +277,13 @@ namespace HammerAndSickle.Models
             new[] { WeaponTrait.MULTIROLE_STRIKE, WeaponTrait.LASER_GUIDED_MUNITIONS, WeaponTrait.HEAVY_PAYLOAD,
                     WeaponTrait.RUNWAY_CRATERING, WeaponTrait.RWR, WeaponTrait.ECM_JAMMER, WeaponTrait.CHAFF_FLARE });
 
+        /// <summary>Established M270 combat definition; national availability, census and art are separate.</summary>
+        private static ProfileDef MlrsDef() => new(
+            FamilyArchetypes.Artillery,
+            new Dictionary<ProfileStat, int> { { ProfileStat.SA, 1 }, { ProfileStat.IR, GameData.INDIRECT_RANGE_ROC_MR } },
+            new[] { WeaponTrait.SELF_PROPELLED, WeaponTrait.ROCKET_ARTILLERY, WeaponTrait.SMART_MUNITION,
+                    WeaponTrait.FIRE_DIRECTION_NET });
+
         /// <summary>
         /// Appends a nation's own traits to a blueprint's base list. Exists so a commodity profile can
         /// still carry something national (RE-4's SECOND_LINE_FORMATION is the first case) without
@@ -312,6 +319,7 @@ namespace HammerAndSickle.Models
                 CreateWesternProfiles();
                 CreateFrenchRosterAdditions();
                 CreateBritishRosterAdditions();
+                CreateGermanRosterAdditions();
                 CreateLowlandsProfiles();
                 CreateArabProfiles();
                 CreateIraqiRosterAdditions();
@@ -3752,10 +3760,7 @@ namespace HammerAndSickle.Models
             // → HA8 HD7 SA11 SD7 GAD7 · ICM 1.05 · MMP10 · IR6 · double-fire.
             WeaponProfile MLRS_US = WeaponProfile.FromProfileDef(
                 "M270 MLRS Multiple Launch Rocket System", "M270 MLRS", WeaponType.ROC_MLRS_US,
-                new ProfileDef(FamilyArchetypes.Artillery,
-                    new Dictionary<ProfileStat, int> { { ProfileStat.SA, 1 }, { ProfileStat.IR, GameData.INDIRECT_RANGE_ROC_MR } },
-                    new[] { WeaponTrait.SELF_PROPELLED, WeaponTrait.ROCKET_ARTILLERY, WeaponTrait.SMART_MUNITION,
-                            WeaponTrait.FIRE_DIRECTION_NET }),
+                MlrsDef(),
                 UpgradePath.ROC, 540);
 
             // Set the prestige cost for the profile.
@@ -5503,6 +5508,90 @@ namespace HammerAndSickle.Models
             F4_UK.AddIntelReportStat(WeaponType.FGT_F4_UK, 36);
             F4_UK.IconProfile = new RegimentIconProfile(RegimentIconType.Single) { Icon = SpriteManager.UK_F4 };
             AddProfile(WeaponType.FGT_F4_UK, F4_UK);
+        }
+
+        /// <summary>Adds the remaining German support, point-SAM, rocket and light-attack options.</summary>
+        private static void CreateGermanRosterAdditions()
+        {
+            // Same point-defense band as Rapier: command-guided missiles on a tracked Marder chassis.
+            // The 1981 German service anchor differs from the earlier French Roland introduction.
+            WeaponProfile ROLAND_GE = WeaponProfile.FromProfileDef(
+                "Roland Tracked SAM System", "Roland", WeaponType.SPSAM_ROLAND_GE,
+                new ProfileDef(FamilyArchetypes.Sam,
+                    new Dictionary<ProfileStat, int> { { ProfileStat.IR, GameData.INDIRECT_RANGE_SHORT } },
+                    new[] { WeaponTrait.SELF_PROPELLED, WeaponTrait.COMMAND_GUIDANCE }), UpgradePath.SAM, 516);
+            ROLAND_GE.SetPrestigeCost(PrestigeTierCost.Gen2, PrestigeTypeCost.SPSAM);
+            ROLAND_GE.SetMovementMedium(MovementMedium.Tracked);
+            // Existing German air-defense counter scale, with national support equipment.
+            ROLAND_GE.AddIntelReportStat(WeaponType.Personnel, 1100);
+            ROLAND_GE.AddIntelReportStat(WeaponType.SPSAM_ROLAND_GE, 18);
+            ROLAND_GE.AddIntelReportStat(WeaponType.IFV_MARDER_GE, 24);
+            ROLAND_GE.AddIntelReportStat(WeaponType.RCN_LUCHS_GE, 12);
+            ROLAND_GE.IconProfile = new RegimentIconProfile(RegimentIconType.Single) { Icon = SpriteManager.GE_Roland };
+            AddProfile(WeaponType.SPSAM_ROLAND_GE, ROLAND_GE);
+
+            // Light subsonic strike aircraft: modest payload, no inferred precision weapons or armour.
+            // The early-jet strike line gives GA6/OL6, below Jaguar's GA8/OL9 and the heavy attack types.
+            WeaponProfile ALPHAJET_GE = WeaponProfile.FromProfileDef(
+                "Alpha Jet A Light Attack Aircraft", "Alpha Jet A", WeaponType.ATT_ALPHAJET_GE,
+                new ProfileDef(FamilyArchetypes.FighterEarly,
+                    new Dictionary<ProfileStat, int> { { ProfileStat.TS, -3 } },
+                    new[] { WeaponTrait.MULTIROLE_STRIKE }), UpgradePath.ATT, 492);
+            ALPHAJET_GE.SetPrestigeCost(PrestigeTierCost.Gen1, PrestigeTypeCost.ATT);
+            ALPHAJET_GE.AddIntelReportStat(WeaponType.ATT_ALPHAJET_GE, 36);
+            ALPHAJET_GE.IconProfile = new RegimentIconProfile(RegimentIconType.Single) { Icon = SpriteManager.GE_AlphaJet };
+            AddProfile(WeaponType.ATT_ALPHAJET_GE, ALPHAJET_GE);
+
+            // MARS I uses the established M270 line, not a new MARS II/GMLRS capability tier.
+            // Availability follows the German 1990 service anchor rather than the US 1983 anchor.
+            WeaponProfile MLRS_GE = WeaponProfile.FromProfileDef(
+                "MARS I Multiple Launch Rocket System", "MARS I (MLRS)", WeaponType.ROC_MLRS_GE,
+                MlrsDef(), UpgradePath.ROC, 624);
+            MLRS_GE.SetPrestigeCost(PrestigeTierCost.Gen3, PrestigeTypeCost.ROC);
+            MLRS_GE.SetMovementMedium(MovementMedium.Tracked);
+            // German M109 support-counter scale, with the established 18-launcher rocket slice.
+            MLRS_GE.AddIntelReportStat(WeaponType.Personnel, 950);
+            MLRS_GE.AddIntelReportStat(WeaponType.ROC_MLRS_GE, 18);
+            MLRS_GE.AddIntelReportStat(WeaponType.IFV_MARDER_GE, 24);
+            MLRS_GE.AddIntelReportStat(WeaponType.MANPAD_STINGER, 12);
+            MLRS_GE.AddIntelReportStat(WeaponType.RCN_LUCHS_GE, 6);
+            MLRS_GE.IconProfile = new RegimentIconProfile(RegimentIconType.Single) { Icon = SpriteManager.GE_MLRS };
+            AddProfile(WeaponType.ROC_MLRS_GE, MLRS_GE);
+
+            // Commodity ballistics with the German 950-person / 48-gun support-counter scale.
+            // Open-bay bases omit carriers; the Mobile bay owns the shared NATO truck.
+            WeaponProfile LIGHT_GE = WeaponProfile.FromProfileDef(
+                "German Light Towed Artillery", "GE Light Artillery", WeaponType.ART_LIGHT_GE,
+                LightTowedArtilleryDef(), UpgradePath.ART, 144);
+            LIGHT_GE.SetPrestigeCost(PrestigeTierCost.Gen1, PrestigeTypeCost.ART);
+            LIGHT_GE.SetMovementMedium(MovementMedium.Foot);
+            LIGHT_GE.AddIntelReportStat(WeaponType.Personnel, 950);
+            LIGHT_GE.AddIntelReportStat(WeaponType.ART_105MM_FG, 48);
+            LIGHT_GE.AddIntelReportStat(WeaponType.MANPAD_STINGER, 12);
+            LIGHT_GE.IconProfile = new RegimentIconProfile(RegimentIconType.Single) { Icon = SpriteManager.GE_LightArt };
+            AddProfile(WeaponType.ART_LIGHT_GE, LIGHT_GE);
+
+            WeaponProfile HEAVY_GE = WeaponProfile.FromProfileDef(
+                "German Heavy Towed Artillery", "GE Heavy Artillery", WeaponType.ART_HEAVY_GE,
+                HeavyTowedArtilleryDef(), UpgradePath.ART, 144);
+            HEAVY_GE.SetPrestigeCost(PrestigeTierCost.Gen1, PrestigeTypeCost.ART);
+            HEAVY_GE.SetMovementMedium(MovementMedium.Foot);
+            HEAVY_GE.AddIntelReportStat(WeaponType.Personnel, 950);
+            HEAVY_GE.AddIntelReportStat(WeaponType.ART_155MM_FG, 48);
+            HEAVY_GE.AddIntelReportStat(WeaponType.MANPAD_STINGER, 12);
+            HEAVY_GE.IconProfile = new RegimentIconProfile(RegimentIconType.Single) { Icon = SpriteManager.GE_HeavyArt };
+            AddProfile(WeaponType.ART_HEAVY_GE, HEAVY_GE);
+
+            WeaponProfile AAA_GE = WeaponProfile.FromProfileDef(
+                "German Towed Anti-Aircraft Artillery", "GE Towed AAA", WeaponType.AAA_GEN_GE,
+                TowedAaaDef(), UpgradePath.AAA, 144);
+            AAA_GE.SetPrestigeCost(PrestigeTierCost.Gen1, PrestigeTypeCost.AAA);
+            AAA_GE.SetMovementMedium(MovementMedium.Foot);
+            AAA_GE.AddIntelReportStat(WeaponType.Personnel, 500);
+            AAA_GE.AddIntelReportStat(WeaponType.AAA_GEN_GE, 18);
+            AAA_GE.AddIntelReportStat(WeaponType.MANPAD_STINGER, 12);
+            AAA_GE.IconProfile = new RegimentIconProfile(RegimentIconType.Single) { Icon = SpriteManager.GE_AAA };
+            AddProfile(WeaponType.AAA_GEN_GE, AAA_GE);
         }
 
         /// <summary>

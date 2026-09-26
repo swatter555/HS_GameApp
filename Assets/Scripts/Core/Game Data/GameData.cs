@@ -1208,6 +1208,18 @@ namespace HammerAndSickle.Core.GameData
         FGT_F4_UK,
 
         #endregion // British Roster Additions
+
+        #region German Roster Additions
+
+        // Append national additions; existing profile and census-token positions remain stable.
+        SPSAM_ROLAND_GE,
+        ATT_ALPHAJET_GE,
+        ROC_MLRS_GE,
+        ART_LIGHT_GE,
+        ART_HEAVY_GE,
+        AAA_GEN_GE,
+
+        #endregion // German Roster Additions
     }
 
     /* ⚠ RegimentProfileType DELETED 2026-08-08 (P1, todo_profiles §3). The full-tree sweep found it

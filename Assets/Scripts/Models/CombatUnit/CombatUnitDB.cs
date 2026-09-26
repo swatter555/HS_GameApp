@@ -2968,8 +2968,7 @@ namespace HammerAndSickle.Models
             // Mirrors US_AIRMOBILE_BRIGADE (roster expansion §4.2): a three-bay unit that walks, rides
             // and flies. ⚠ The Embarked bay is what makes it air-mobile rather than just light infantry.
             // Classification AM, not INF — that is the difference from GE_AIRBORNE_REGIMENT above.
-            // ⚠ ART PENDING: all three profiles name sprites Bob has not drawn yet, so this unit renders
-            // the mismatch placeholder until the German art drop lands.
+            // National infantry, M113 and six UH-1D frames were connected in the shared art integration.
             var ge_airmobile_brigade = new CombatUnit(
                 unitName: "GE Airmobile Brigade",
                 classification: UnitClassification.AM,
@@ -3152,6 +3151,111 @@ namespace HammerAndSickle.Models
             AddTemplate("GE_TORNADO_FIGHTER_SQUADRON", ge_tornado_squadron);
 
             #endregion // GE Tornado Fighter Squadron
+
+            var ge_panzergrenadier_regiment_m113 = new CombatUnit(
+                unitName: "GE Panzergrenadier Regiment (M113)",
+                classification: UnitClassification.MECH,
+                role: UnitRole.GroundCombat,
+                side: Side.AI,
+                nationality: Nationality.FRG,
+                deployedProfile: WeaponType.INF_REG_GE,
+                mobileProfile: WeaponType.APC_M113_GE,
+                embarkedProfile: WeaponType.NONE,
+                category: DepotCategory.Secondary,
+                size: DepotSize.Small
+            );
+            ge_panzergrenadier_regiment_m113.SetExperienceLevel(ExperienceLevel.Experienced);
+            AddTemplate("GE_PANZERGRENADIER_REGIMENT_M113", ge_panzergrenadier_regiment_m113);
+
+            var ge_roland_regiment = new CombatUnit(
+                unitName: "GE Roland Air Defense Regiment",
+                classification: UnitClassification.SPSAM,
+                role: UnitRole.AirDefenseArea,
+                side: Side.AI,
+                nationality: Nationality.FRG,
+                deployedProfile: WeaponType.SPSAM_ROLAND_GE,
+                mobileProfile: WeaponType.NONE,
+                embarkedProfile: WeaponType.NONE,
+                category: DepotCategory.Secondary,
+                size: DepotSize.Small
+            );
+            ge_roland_regiment.SetExperienceLevel(ExperienceLevel.Experienced);
+            AddTemplate("GE_ROLAND_REGIMENT", ge_roland_regiment);
+
+            var ge_alphajet_attack_squadron = new CombatUnit(
+                unitName: "GE Alpha Jet Attack Squadron",
+                classification: UnitClassification.ATT,
+                role: UnitRole.AirGroundAttack,
+                side: Side.AI,
+                nationality: Nationality.FRG,
+                deployedProfile: WeaponType.ATT_ALPHAJET_GE,
+                mobileProfile: WeaponType.NONE,
+                embarkedProfile: WeaponType.NONE,
+                category: DepotCategory.Secondary,
+                size: DepotSize.Small
+            );
+            ge_alphajet_attack_squadron.SetExperienceLevel(ExperienceLevel.Experienced);
+            AddTemplate("GE_ALPHAJET_ATTACK_SQUADRON", ge_alphajet_attack_squadron);
+
+            var ge_mlrs_regiment = new CombatUnit(
+                unitName: "GE MARS Rocket Artillery Regiment",
+                classification: UnitClassification.ROC,
+                role: UnitRole.GroundCombat,
+                side: Side.AI,
+                nationality: Nationality.FRG,
+                deployedProfile: WeaponType.ROC_MLRS_GE,
+                mobileProfile: WeaponType.NONE,
+                embarkedProfile: WeaponType.NONE,
+                category: DepotCategory.Secondary,
+                size: DepotSize.Small
+            );
+            ge_mlrs_regiment.SetExperienceLevel(ExperienceLevel.Experienced);
+            AddTemplate("GE_MLRS_REGIMENT", ge_mlrs_regiment);
+
+            var ge_light_artillery_regiment = new CombatUnit(
+                unitName: "GE Light Towed Artillery Regiment",
+                classification: UnitClassification.ART,
+                role: UnitRole.GroundCombat,
+                side: Side.AI,
+                nationality: Nationality.FRG,
+                deployedProfile: WeaponType.ART_LIGHT_GE,
+                mobileProfile: WeaponType.TRK_GEN_NATO,
+                embarkedProfile: WeaponType.NONE,
+                category: DepotCategory.Secondary,
+                size: DepotSize.Small
+            );
+            ge_light_artillery_regiment.SetExperienceLevel(ExperienceLevel.Experienced);
+            AddTemplate("GE_LIGHT_ARTILLERY_REGIMENT", ge_light_artillery_regiment);
+
+            var ge_heavy_artillery_regiment = new CombatUnit(
+                unitName: "GE Heavy Towed Artillery Regiment",
+                classification: UnitClassification.ART,
+                role: UnitRole.GroundCombat,
+                side: Side.AI,
+                nationality: Nationality.FRG,
+                deployedProfile: WeaponType.ART_HEAVY_GE,
+                mobileProfile: WeaponType.TRK_GEN_NATO,
+                embarkedProfile: WeaponType.NONE,
+                category: DepotCategory.Secondary,
+                size: DepotSize.Small
+            );
+            ge_heavy_artillery_regiment.SetExperienceLevel(ExperienceLevel.Experienced);
+            AddTemplate("GE_HEAVY_ARTILLERY_REGIMENT", ge_heavy_artillery_regiment);
+
+            var ge_towed_aaa_regiment = new CombatUnit(
+                unitName: "GE Towed Anti-Aircraft Regiment",
+                classification: UnitClassification.AAA,
+                role: UnitRole.AirDefenseArea,
+                side: Side.AI,
+                nationality: Nationality.FRG,
+                deployedProfile: WeaponType.AAA_GEN_GE,
+                mobileProfile: WeaponType.TRK_GEN_NATO,
+                embarkedProfile: WeaponType.NONE,
+                category: DepotCategory.Secondary,
+                size: DepotSize.Small
+            );
+            ge_towed_aaa_regiment.SetExperienceLevel(ExperienceLevel.Experienced);
+            AddTemplate("GE_TOWED_AAA_REGIMENT", ge_towed_aaa_regiment);
         }
 
         public static void CreateBritishForces()

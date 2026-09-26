@@ -84,6 +84,8 @@ The [Iranian roster contract](<Iranian Roster Integration.md>) adds nine profile
 
 The [British roster contract](<British Roster Integration.md>) adds ten profiles through `CreateBritishRosterAdditions` and nine templates to `CreateBritishForces` (221 profiles / 210 templates overall). `APC_FV432_UK` gains a playable profile at its existing enum value; nine other IDs are appended. Puma is organic lift, Lynx is the independent TOW gunship, and Jaguar uses a shared definition preserving French statistics. Chieftain, FV432 and FG.1 add options without replacing Challenger, Warrior or Tornado. All 28 British PNGs belong to national profiles in the NATO atlas; trucks remain shared.
 
+The [German roster contract](<German Roster Integration.md>) adds six profiles through `CreateGermanRosterAdditions` and seven templates to `CreateGermanForces` (227 profiles / 217 templates overall). Tracked Roland adds point air defense, Alpha Jet adds light strike, and MARS I shares the unchanged US MLRS combat definition with national census/art and German availability. The M113 infantry option reuses the existing carrier profile; all twelve previous German templates stay intact. Air-mobile/M113/UH-1D art is connected, Hawk and the NATO truck remain shared, and all 30 German PNGs have profile owners.
+
 ### Assembly and lifecycle constraints
 
 [Main.asmdef](../Assets/Scripts/Main.asmdef) references TextMeshPro and Input System by GUID, LeanTween by name, and explicit `System.Text.Json.dll`/`System.IO.Pipelines.dll` precompiled references. Its `noEngineReferences` is false. [AssemblyInfo.cs](../Assets/Scripts/AssemblyInfo.cs) exposes internals to `EditorTests` for actual test seams. Do not infer package availability from a generated IDE project file.
@@ -193,7 +195,7 @@ All named suites below live in [Assets/Tests/EditorTests](../Assets/Tests/Editor
 | Change | Relevant suite families |
 |---|---|
 | Save/content/geometry | `SaveMigrationLadderTests`, `MapStandardTests`, `ScenarioManifestTests`, `PrestigePersistenceTests`, `MissionObjectiveGateTests` |
-| Unit/profile/trait/census | `EquipmentBaysTests`, `CensusIntegrityTests`, `CommodityProfileTests`, `FamilyArchetypeTests`, `WeaponProfile*Tests`, `FrenchRosterTests`, `IraqiRosterTests`, `IranianRosterTests`, `BritishRosterTests`, `IconIntegrityTests`, `UnitIconAssetTests`, `CombatUnitIntegrationTests`, `DepotSupplyTests` |
+| Unit/profile/trait/census | `EquipmentBaysTests`, `CensusIntegrityTests`, `CommodityProfileTests`, `FamilyArchetypeTests`, `WeaponProfile*Tests`, `FrenchRosterTests`, `IraqiRosterTests`, `IranianRosterTests`, `BritishRosterTests`, `GermanRosterTests`, `IconIntegrityTests`, `UnitIconAssetTests`, `CombatUnitIntegrationTests`, `DepotSupplyTests` |
 | Movement/deployment/intel | `MovementTests`, `MovementMediumTests`, `DeploymentActionTests`, `DeploymentTransitionTests`, `OverWaterGraceTests`, `SpottingServiceTests`, `SpottingRangeTests`, `IntelLadderTests`, `TerritoryServiceTests` |
 | Combat/math/retreat | `CombatMathTests`, `CombatEngineTests`, `CombatResolverTests`, `DirectEngagementTests`, `GroundCombatActionTests`, `IndirectCombatActionTests`, `IndirectResolverTests`, stand/surrender/degradation/retreat/hex-arc and leader-skill suites |
 | Air | `AirCombatEngineTests`, `AirStrikeResolverTests`, `AirDefenseFireResolverTests`, `AirDefenseTransitTests`, `AirStandCheckTests`, `AirAmbushCheckTests`, `HeloTransitStandCheckTests`, `AOBMissionResolverTests`, `ReconMissionEngineTests`, `BaseCombatResolverTests` |
