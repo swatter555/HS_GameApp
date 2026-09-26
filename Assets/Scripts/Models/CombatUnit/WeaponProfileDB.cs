@@ -372,7 +372,7 @@ namespace HammerAndSickle.Models
             // Handle the icon profile.
             T55A.IconProfile = new RegimentIconProfile(RegimentIconType.Single)
             {
-                Icon = SpriteManager.SV_T55A_W
+                Icon = SpriteManager.SV_T55A
             };
 
 
@@ -414,7 +414,7 @@ namespace HammerAndSickle.Models
             // Handle the icon profile.
             T62A.IconProfile = new RegimentIconProfile(RegimentIconType.Single)
             {
-                Icon = SpriteManager.SV_T62_W
+                Icon = SpriteManager.SV_T62
             };
 
             // Add the T-62A profile to the database
@@ -456,7 +456,7 @@ namespace HammerAndSickle.Models
             // Handle the icon profile.
             T64A.IconProfile = new RegimentIconProfile(RegimentIconType.Single)
             {
-                Icon = SpriteManager.SV_T64A_W
+                Icon = SpriteManager.SV_T64A
             };
 
             // Add the T-64A profile to the database
@@ -500,7 +500,7 @@ namespace HammerAndSickle.Models
             // Handle the icon profile.
             T64B.IconProfile = new RegimentIconProfile(RegimentIconType.Single)
             {
-                Icon = SpriteManager.SV_T64B_W
+                Icon = SpriteManager.SV_T64B
             };
 
             // Add the T-64B profile to the database
@@ -544,7 +544,7 @@ namespace HammerAndSickle.Models
             // Handle the icon profile.
             T72A.IconProfile = new RegimentIconProfile(RegimentIconType.Single)
             {
-                Icon = SpriteManager.SV_T72A_W
+                Icon = SpriteManager.SV_T72A
             };
 
             // Add the T-72A profile to the database
@@ -588,7 +588,7 @@ namespace HammerAndSickle.Models
             // Handle the icon profile.
             T72B.IconProfile = new RegimentIconProfile(RegimentIconType.Single)
             {
-                Icon = SpriteManager.SV_T72B_W
+                Icon = SpriteManager.SV_T72B
             };
 
             // Add the T-72B profile to the database
@@ -634,7 +634,7 @@ namespace HammerAndSickle.Models
             // Handle the icon profile.
             T80B.IconProfile = new RegimentIconProfile(RegimentIconType.Single)
             {
-                Icon = SpriteManager.SV_T80B_W
+                Icon = SpriteManager.SV_T80B
             };
 
             // Add the T-80B profile to the database
@@ -679,7 +679,7 @@ namespace HammerAndSickle.Models
             // Handle the icon profile.
             T80U.IconProfile = new RegimentIconProfile(RegimentIconType.Single)
             {
-                Icon = SpriteManager.SV_T80U_W
+                Icon = SpriteManager.SV_T80U
             };
 
             // Add the T-80U profile to the database
@@ -726,7 +726,7 @@ namespace HammerAndSickle.Models
             // Handle the icon profile.
             T80BV.IconProfile = new RegimentIconProfile(RegimentIconType.Single)
             {
-                Icon = SpriteManager.SV_T80BVM_W
+                Icon = SpriteManager.SV_T80BVM
             };
 
             // Add the T-80BV profile to the database
@@ -762,7 +762,7 @@ namespace HammerAndSickle.Models
             // Handle the icon profile.
             BMP1.IconProfile = new RegimentIconProfile(RegimentIconType.Single)
             {
-                Icon = SpriteManager.SV_BMP1_W
+                Icon = SpriteManager.SV_BMP1
             };
 
             // Add the BMP-1P profile to the database
@@ -793,7 +793,7 @@ namespace HammerAndSickle.Models
             // Handle the icon profile.
             BMP2.IconProfile = new RegimentIconProfile(RegimentIconType.Single)
             {
-                Icon = SpriteManager.SV_BMP2_W
+                Icon = SpriteManager.SV_BMP2
             };
 
             // Add the BMP-2 profile to the database
@@ -827,7 +827,7 @@ namespace HammerAndSickle.Models
             // Handle the icon profile.
             BMP3.IconProfile = new RegimentIconProfile(RegimentIconType.Single)
             {
-                Icon = SpriteManager.SV_BMP3_W
+                Icon = SpriteManager.SV_BMP3
             };
 
             // Add the BMP-3 profile to the database
@@ -860,7 +860,7 @@ namespace HammerAndSickle.Models
             // Handle the icon profile.
             BMD2.IconProfile = new RegimentIconProfile(RegimentIconType.Single)
             {
-                Icon = SpriteManager.SV_BMD2_W
+                Icon = SpriteManager.SV_BMD2
             };
 
             // Add the BMD-2 profile to the database
@@ -893,7 +893,7 @@ namespace HammerAndSickle.Models
             // Handle the icon profile.
             BMD3.IconProfile = new RegimentIconProfile(RegimentIconType.Single)
             {
-                Icon = SpriteManager.SV_BMD3_W
+                Icon = SpriteManager.SV_BMD3
             };
 
             // Add the BMD-3 profile to the database
@@ -925,7 +925,7 @@ namespace HammerAndSickle.Models
             // Handle the icon profile.
             MTLB.IconProfile = new RegimentIconProfile(RegimentIconType.Single)
             {
-                Icon = SpriteManager.SV_MTLB_W
+                Icon = SpriteManager.SV_MTLB
             };
 
             // Mixed family (see FamilyArchetypes) - medium is stated per profile.
@@ -960,7 +960,7 @@ namespace HammerAndSickle.Models
             // Handle the icon profile.
             BTR70.IconProfile = new RegimentIconProfile(RegimentIconType.Single)
             {
-                Icon = SpriteManager.SV_BTR70_W
+                Icon = SpriteManager.SV_BTR70
             };
 
             // Mixed family (see FamilyArchetypes) - medium is stated per profile.
@@ -995,7 +995,7 @@ namespace HammerAndSickle.Models
             // Handle the icon profile.
             BTR80.IconProfile = new RegimentIconProfile(RegimentIconType.Single)
             {
-                Icon = SpriteManager.SV_BTR80_W
+                Icon = SpriteManager.SV_BTR80
             };
 
             // Mixed family (see FamilyArchetypes) - medium is stated per profile.
@@ -1043,7 +1043,7 @@ namespace HammerAndSickle.Models
             // Handle the icon profile.
             BRDM2.IconProfile = new RegimentIconProfile(RegimentIconType.Single)
             {
-                Icon = SpriteManager.SV_BRDM2_W
+                Icon = SpriteManager.SV_BRDM2
             };
 
             // Mixed family (see FamilyArchetypes) - medium is stated per profile.
@@ -1093,7 +1093,7 @@ namespace HammerAndSickle.Models
             // Handle the icon profile.
             BRDM2AT.IconProfile = new RegimentIconProfile(RegimentIconType.Single)
             {
-                Icon = SpriteManager.SV_BRDM2AT_W
+                Icon = SpriteManager.SV_BRDM2AT
             };
 
             // Add the BRDM-2 AT profile to the database
@@ -1137,7 +1137,7 @@ namespace HammerAndSickle.Models
             // Handle the icon profile.
             SPA2S1.IconProfile = new RegimentIconProfile(RegimentIconType.Single)
             {
-                Icon = SpriteManager.SV_2S1_W
+                Icon = SpriteManager.SV_2S1
             };
 
             // Add the 2S1 profile to the database
@@ -1173,7 +1173,7 @@ namespace HammerAndSickle.Models
             // Handle the icon profile.
             SPA2S3.IconProfile = new RegimentIconProfile(RegimentIconType.Single)
             {
-                Icon = SpriteManager.SV_2S3_W
+                Icon = SpriteManager.SV_2S3
             };
 
             // Add the 2S3 profile to the database
@@ -1210,7 +1210,7 @@ namespace HammerAndSickle.Models
             // Handle the icon profile.
             SPA2S5.IconProfile = new RegimentIconProfile(RegimentIconType.Single)
             {
-                Icon = SpriteManager.SV_2S5_W
+                Icon = SpriteManager.SV_2S5
             };
 
             // Add the 2S5 profile to the database
@@ -1247,7 +1247,7 @@ namespace HammerAndSickle.Models
             // Handle the icon profile.
             SPA2S19.IconProfile = new RegimentIconProfile(RegimentIconType.Single)
             {
-                Icon = SpriteManager.SV_2S19_W
+                Icon = SpriteManager.SV_2S19
             };
 
             // Add the 2S19 profile to the database
@@ -1365,7 +1365,7 @@ namespace HammerAndSickle.Models
             // Handle the icon profile.
             BM21.IconProfile = new RegimentIconProfile(RegimentIconType.Single)
             {
-                Icon = SpriteManager.SV_BM21_W
+                Icon = SpriteManager.SV_BM21
             };
 
             // Add the BM-21 profile to the database
@@ -1402,7 +1402,7 @@ namespace HammerAndSickle.Models
             // Handle the icon profile.
             BM27.IconProfile = new RegimentIconProfile(RegimentIconType.Single)
             {
-                Icon = SpriteManager.SV_BM27_W
+                Icon = SpriteManager.SV_BM27
             };
 
             // Add the BM-27 profile to the database
@@ -1439,7 +1439,7 @@ namespace HammerAndSickle.Models
             // Handle the icon profile.
             BM30.IconProfile = new RegimentIconProfile(RegimentIconType.Single)
             {
-                Icon = SpriteManager.SV_BM30_W
+                Icon = SpriteManager.SV_BM30
             };
 
             // Add the BM-30 profile to the database
@@ -1478,7 +1478,7 @@ namespace HammerAndSickle.Models
             // Handle the icon profile.
             SCUD.IconProfile = new RegimentIconProfile(RegimentIconType.Single)
             {
-                Icon = SpriteManager.SV_ScudB_W
+                Icon = SpriteManager.SV_ScudB
             };
 
             // Add the Scud-B profile to the database
@@ -1518,7 +1518,7 @@ namespace HammerAndSickle.Models
             // Handle the icon profile.
             ZSU57.IconProfile = new RegimentIconProfile(RegimentIconType.Single)
             {
-                Icon = SpriteManager.SV_ZSU57_W
+                Icon = SpriteManager.SV_ZSU57
             };
 
             // Add the ZSU-57-2 profile to the database
@@ -1553,7 +1553,7 @@ namespace HammerAndSickle.Models
             // Handle the icon profile.
             ZSU23.IconProfile = new RegimentIconProfile(RegimentIconType.Single)
             {
-                Icon = SpriteManager.SV_ZSU23_W
+                Icon = SpriteManager.SV_ZSU23
             };
 
             // Add the ZSU-23-4 profile to the database
@@ -1589,7 +1589,7 @@ namespace HammerAndSickle.Models
             // Handle the icon profile.
             Tunguska.IconProfile = new RegimentIconProfile(RegimentIconType.Single)
             {
-                Icon = SpriteManager.SV_2K22_W
+                Icon = SpriteManager.SV_2K22
             };
 
             // Add the 2K22 Tunguska profile to the database
@@ -1625,7 +1625,7 @@ namespace HammerAndSickle.Models
             // Handle the icon profile.
             Kub.IconProfile = new RegimentIconProfile(RegimentIconType.Single)
             {
-                Icon = SpriteManager.SV_2K12_W
+                Icon = SpriteManager.SV_2K12
             };
 
             // Add the 2K12 Kub profile to the database
@@ -1661,7 +1661,7 @@ namespace HammerAndSickle.Models
             // Handle the icon profile.
             Strela1.IconProfile = new RegimentIconProfile(RegimentIconType.Single)
             {
-                Icon = SpriteManager.SV_9K31_W
+                Icon = SpriteManager.SV_9K31
             };
 
             // Add the 9K31 Strela-1 profile to the database
@@ -1772,7 +1772,7 @@ namespace HammerAndSickle.Models
             // Handle the icon profile.
             S300.IconProfile = new RegimentIconProfile(RegimentIconType.Single)
             {
-                Icon = SpriteManager.SV_S300_W
+                Icon = SpriteManager.SV_S300
             };
 
             // Add the S-300 profile to the database
@@ -1809,7 +1809,7 @@ namespace HammerAndSickle.Models
             // Handle the icon profile.
             AAA_GEN.IconProfile = new RegimentIconProfile(RegimentIconType.Single)
             {
-                Icon = SpriteManager.SV_AA
+                Icon = SpriteManager.SV_AAA
             };
 
             // Add the Generic AAA profile to the database
@@ -2012,7 +2012,7 @@ namespace HammerAndSickle.Models
             // Handle the icon profile.
             AN12.IconProfile = new RegimentIconProfile(RegimentIconType.Single)
             {
-                Icon = SpriteManager.SV_AN8
+                Icon = SpriteManager.SV_AN12
             };
 
             // Add the An-12 profile to the database
@@ -2580,7 +2580,7 @@ namespace HammerAndSickle.Models
             // Handle the icon profile.
             TRK_GEN.IconProfile = new RegimentIconProfile(RegimentIconType.Single)
             {
-                Icon = SpriteManager.SV_Truck_W
+                Icon = SpriteManager.SV_Truck
             };
 
             // Add the Truck profile to the database
@@ -2977,7 +2977,7 @@ namespace HammerAndSickle.Models
             // Handle the icon profile.
             M1_US.IconProfile = new RegimentIconProfile(RegimentIconType.Single)
             {
-                Icon = SpriteManager.US_M1_W
+                Icon = SpriteManager.US_M1
             };
 
             // Add the M1 Abrams profile to the database
@@ -3024,7 +3024,7 @@ namespace HammerAndSickle.Models
             // Handle the icon profile.
             M60_US.IconProfile = new RegimentIconProfile(RegimentIconType.Single)
             {
-                Icon = SpriteManager.US_M60_W
+                Icon = SpriteManager.US_M60
             };
 
             // Add the M60A3 profile to the database
@@ -3068,7 +3068,7 @@ namespace HammerAndSickle.Models
             // Handle the icon profile.
             LEO1_GE.IconProfile = new RegimentIconProfile(RegimentIconType.Single)
             {
-                Icon = SpriteManager.GE_Leopard1_W
+                Icon = SpriteManager.GE_Leopard1
             };
 
             // Add the Leopard 1 profile to the database
@@ -3111,7 +3111,7 @@ namespace HammerAndSickle.Models
             // Handle the icon profile.
             LEO2_GE.IconProfile = new RegimentIconProfile(RegimentIconType.Single)
             {
-                Icon = SpriteManager.GE_Leopard2_W
+                Icon = SpriteManager.GE_Leopard2
             };
 
             // Add the Leopard 2 profile to the database
@@ -3156,7 +3156,7 @@ namespace HammerAndSickle.Models
             // Handle the icon profile.
             CHALL1_UK.IconProfile = new RegimentIconProfile(RegimentIconType.Single)
             {
-                Icon = SpriteManager.UK_Challenger1_W
+                Icon = SpriteManager.UK_Challenger1
             };
 
             // Add the Challenger 1 profile to the database
@@ -3201,7 +3201,7 @@ namespace HammerAndSickle.Models
             // Handle the icon profile.
             AMX30_FR.IconProfile = new RegimentIconProfile(RegimentIconType.Single)
             {
-                Icon = SpriteManager.FR_AMX30_W
+                Icon = SpriteManager.FR_AMX30
             };
 
             // Add the AMX-30 profile to the database
@@ -3236,7 +3236,7 @@ namespace HammerAndSickle.Models
             // Handle the icon profile.
             M2_US.IconProfile = new RegimentIconProfile(RegimentIconType.Single)
             {
-                Icon = SpriteManager.US_M2_W
+                Icon = SpriteManager.US_M2
             };
 
             // Add the M2 Bradley profile to the database
@@ -3267,7 +3267,7 @@ namespace HammerAndSickle.Models
             // Handle the icon profile.
             WARRIOR_UK.IconProfile = new RegimentIconProfile(RegimentIconType.Single)
             {
-                Icon = SpriteManager.UK_Warrior_W
+                Icon = SpriteManager.UK_Warrior
             };
 
             // Add the Warrior profile to the database
@@ -3298,7 +3298,7 @@ namespace HammerAndSickle.Models
             // Handle the icon profile.
             MARDER_GE.IconProfile = new RegimentIconProfile(RegimentIconType.Single)
             {
-                Icon = SpriteManager.GE_Marder_W
+                Icon = SpriteManager.GE_Marder
             };
 
             // Add the Marder profile to the database
@@ -3329,7 +3329,7 @@ namespace HammerAndSickle.Models
             // Handle the icon profile.
             M113_US.IconProfile = new RegimentIconProfile(RegimentIconType.Single)
             {
-                Icon = SpriteManager.US_M113_W
+                Icon = SpriteManager.US_M113
             };
 
             // Mixed family (see FamilyArchetypes) - medium is stated per profile.
@@ -3413,7 +3413,7 @@ namespace HammerAndSickle.Models
             // Handle the icon profile.
             HUMVEE_US.IconProfile = new RegimentIconProfile(RegimentIconType.Single)
             {
-                Icon = SpriteManager.US_Humvee_W
+                Icon = SpriteManager.US_Humvee
             };
 
             // Mixed family (see FamilyArchetypes) - medium is stated per profile.
@@ -3449,7 +3449,7 @@ namespace HammerAndSickle.Models
             // Handle the icon profile.
             LVTP7_US.IconProfile = new RegimentIconProfile(RegimentIconType.Single)
             {
-                Icon = SpriteManager.US_LVTP_W
+                Icon = SpriteManager.US_LVTP
             };
 
             // Mixed family (see FamilyArchetypes) - medium is stated per profile.
@@ -3483,18 +3483,11 @@ namespace HammerAndSickle.Models
             // Handle the icon profile.
             VAB_FR.IconProfile = new RegimentIconProfile(RegimentIconType.Single)
             {
-                Icon = SpriteManager.FR_M113_W
+                Icon = SpriteManager.FR_VAB
             };
 
-            /* ⚠ TRACKED IS DELIBERATE AND NOT AN ERROR - DO NOT "CORRECT" IT (Bob, 2026-08-04).
-             * The real VAB is a wheeled 6x6, exactly as the comment above this profile still says.
-             * But there is no VAB sprite: this profile draws FR_M113_* (see the icon block above), and
-             * a French motor rifle regiment carries it as its mobile profile, so the player SEES tracks.
-             * Sight and sound must agree, and the art is the player-facing truth. Encoding "wheeled"
-             * here would ship a regiment that looks tracked and sounds wheeled.
-             * Revisit ONLY if VAB art is ever authored - at which point flip this to Wheeled and the
-             * rest of the system needs no other change. */
-            VAB_FR.SetMovementMedium(MovementMedium.Tracked);
+            // The national VAB artwork now depicts the wheeled carrier.
+            VAB_FR.SetMovementMedium(MovementMedium.Wheeled);
 
             // Add the VAB profile to the database
             AddProfile(WeaponType.APC_VAB_FR, VAB_FR);
@@ -3533,7 +3526,7 @@ namespace HammerAndSickle.Models
             // Handle the icon profile.
             M109_US.IconProfile = new RegimentIconProfile(RegimentIconType.Single)
             {
-                Icon = SpriteManager.US_M109_W
+                Icon = SpriteManager.US_M109
             };
 
             // Add the M109 US profile to the database
@@ -3570,7 +3563,7 @@ namespace HammerAndSickle.Models
             // Handle the icon profile.
             M109_GE.IconProfile = new RegimentIconProfile(RegimentIconType.Single)
             {
-                Icon = SpriteManager.GE_M109_W
+                Icon = SpriteManager.GE_M109
             };
 
             // Add the M109 GE profile to the database
@@ -3610,7 +3603,7 @@ namespace HammerAndSickle.Models
             // Handle the icon profile. (No dedicated French M109 sprites, using US M109)
             M109_FR.IconProfile = new RegimentIconProfile(RegimentIconType.Single)
             {
-                Icon = SpriteManager.US_M109_W
+                Icon = SpriteManager.FR_AUF1
             };
             // Add the M109 FR profile to the database
             // Towed vs self-propelled: the artillery/AAA/SAM families hold both, so medium is per profile.
@@ -3648,7 +3641,7 @@ namespace HammerAndSickle.Models
             // Handle the icon profile.
             M109_UK.IconProfile = new RegimentIconProfile(RegimentIconType.Single)
             {
-                Icon = SpriteManager.UK_M109_W
+                Icon = SpriteManager.UK_M109
             };
 
             // Add the M109 UK profile to the database
@@ -3685,7 +3678,7 @@ namespace HammerAndSickle.Models
             // Handle the icon profile.
             ArtLightWest.IconProfile = new RegimentIconProfile(RegimentIconType.Single)
             {
-                Icon = SpriteManager.GEN_LightArt
+                Icon = SpriteManager.NATO_LightArt
             };
 
             // Add the Light Artillery profile to the database
@@ -3718,7 +3711,7 @@ namespace HammerAndSickle.Models
             // Handle the icon profile.
             ArtHeavyWest.IconProfile = new RegimentIconProfile(RegimentIconType.Single)
             {
-                Icon = SpriteManager.GEN_HeavyArt
+                Icon = SpriteManager.NATO_HeavyArt
             };
 
             // Add the Heavy Artillery profile to the database
@@ -3761,7 +3754,7 @@ namespace HammerAndSickle.Models
             // Handle the icon profile.
             MLRS_US.IconProfile = new RegimentIconProfile(RegimentIconType.Single)
             {
-                Icon = SpriteManager.US_MLRS_W
+                Icon = SpriteManager.US_MLRS
             };
 
             // Add the MLRS US profile to the database
@@ -3800,7 +3793,7 @@ namespace HammerAndSickle.Models
             // Handle the icon profile.
             M163_US.IconProfile = new RegimentIconProfile(RegimentIconType.Single)
             {
-                Icon = SpriteManager.US_M163_W
+                Icon = SpriteManager.US_M163
             };
 
             // Add the M163 US profile to the database
@@ -3836,7 +3829,7 @@ namespace HammerAndSickle.Models
             // Handle the icon profile.
             Chaparral.IconProfile = new RegimentIconProfile(RegimentIconType.Single)
             {
-                Icon = SpriteManager.US_Chaparral_W
+                Icon = SpriteManager.US_Chaparral
             };
 
             // Add the Chaparral profile to the database
@@ -3908,7 +3901,7 @@ namespace HammerAndSickle.Models
             // Handle the icon profile.
             Gepard_GE.IconProfile = new RegimentIconProfile(RegimentIconType.Single)
             {
-                Icon = SpriteManager.GE_Gepard_W
+                Icon = SpriteManager.GE_Gepard
             };
 
             // Add the Gepard GE profile to the database
@@ -3944,7 +3937,7 @@ namespace HammerAndSickle.Models
             // Handle the icon profile.
             AMX30DCA_FR.IconProfile = new RegimentIconProfile(RegimentIconType.Single)
             {
-                Icon = SpriteManager.FR_AMX30DCA_W
+                Icon = SpriteManager.FR_AMX30DCA
             };
 
             // Add the AMX-30 DCA profile to the database
@@ -3981,7 +3974,7 @@ namespace HammerAndSickle.Models
             // Handle the icon profile. (Using US Chaparral sprites)
             Crotale.IconProfile = new RegimentIconProfile(RegimentIconType.Single)
             {
-                Icon = SpriteManager.US_Chaparral_W
+                Icon = SpriteManager.FR_Crotale
             };
 
             // Add the Crotale profile to the database
@@ -4019,7 +4012,7 @@ namespace HammerAndSickle.Models
             // Handle the icon profile. (No dedicated UK Rapier sprites, using US Chaparral)
             Rapier_SP.IconProfile = new RegimentIconProfile(RegimentIconType.Single)
             {
-                Icon = SpriteManager.US_Chaparral_W
+                Icon = SpriteManager.UK_Rapier
             };
 
             // Add the Tracked Rapier profile to the database
@@ -4059,7 +4052,7 @@ namespace HammerAndSickle.Models
             // Handle the icon profile. (Using M2 Bradley sprites)
             M3_US.IconProfile = new RegimentIconProfile(RegimentIconType.Single)
             {
-                Icon = SpriteManager.US_M2_W
+                Icon = SpriteManager.US_M2
             };
 
             // Add the M3 Bradley profile to the database
@@ -4098,7 +4091,7 @@ namespace HammerAndSickle.Models
             // Handle the icon profile. (Using Marder sprites as stand-in)
             LUCHS_GE.IconProfile = new RegimentIconProfile(RegimentIconType.Single)
             {
-                Icon = SpriteManager.GE_Luchs_W
+                Icon = SpriteManager.GE_Luchs
             };
 
             // Add the Luchs profile to the database
@@ -4138,7 +4131,7 @@ namespace HammerAndSickle.Models
             // Handle the icon profile. (Using Warrior sprites as stand-in)
             FV105_UK.IconProfile = new RegimentIconProfile(RegimentIconType.Single)
             {
-                Icon = SpriteManager.UK_FV105_W
+                Icon = SpriteManager.UK_FV105
             };
 
             // Add the FV105 Sultan profile to the database
@@ -4176,7 +4169,7 @@ namespace HammerAndSickle.Models
             // Handle the icon profile. (Using French M113 sprites as stand-in)
             ERC90_FR.IconProfile = new RegimentIconProfile(RegimentIconType.Single)
             {
-                Icon = SpriteManager.FR_ERC90_W
+                Icon = SpriteManager.FR_ERC90
             };
 
             // Add the ERC 90 profile to the database
@@ -4348,7 +4341,7 @@ namespace HammerAndSickle.Models
             // Note- No dedicated AH-1 sprites exist yet.
             AH1.IconProfile = new RegimentIconProfile(RegimentIconType.Helo_Animation)
             {
-                Icon = SpriteManager.US_AH64_Frame0
+                Icon = SpriteManager.US_AH1_Frame0
             };
 
             // Add the AH-1 Cobra profile to the database
@@ -4514,7 +4507,7 @@ namespace HammerAndSickle.Models
             // Handle the icon profile.
             TORNADO_UK.IconProfile = new RegimentIconProfile(RegimentIconType.Single)
             {
-                Icon = SpriteManager.UK_TornadoGR1
+                Icon = SpriteManager.UK_Tornado
             };
 
             // Add the RAF Tornado profile to the database
@@ -4857,7 +4850,7 @@ namespace HammerAndSickle.Models
             // Handle the icon profile.
             TRK_W.IconProfile = new RegimentIconProfile(RegimentIconType.Single)
             {
-                Icon = SpriteManager.GEN_Truck_W
+                Icon = SpriteManager.NATO_Truck
             };
 
             // Add the Western Truck profile to the database
@@ -5100,7 +5093,7 @@ namespace HammerAndSickle.Models
             // Handle the icon profile.
             INF_REG_GE_P.IconProfile = new RegimentIconProfile(RegimentIconType.Single)
             {
-                Icon = SpriteManager.GER_Regulars
+                Icon = SpriteManager.GE_Regulars
             };
 
             // Add the FRG Regular Infantry profile to the database
@@ -5130,7 +5123,7 @@ namespace HammerAndSickle.Models
             // Handle the icon profile.
             INF_AB_GE_P.IconProfile = new RegimentIconProfile(RegimentIconType.Single)
             {
-                Icon = SpriteManager.GER_Airborne
+                Icon = SpriteManager.GE_Airborne
             };
 
             // Add the FRG Airborne Infantry profile to the database
@@ -5299,7 +5292,7 @@ namespace HammerAndSickle.Models
             // Handle the icon profile.
             LEO1_NL.IconProfile = new RegimentIconProfile(RegimentIconType.Single)
             {
-                Icon = SpriteManager.GE_Leopard1_W
+                Icon = SpriteManager.NATO_Leopard1
             };
 
             // Add the NL Leopard 1 profile to the database
@@ -5335,7 +5328,7 @@ namespace HammerAndSickle.Models
             // Handle the icon profile.
             LEO1_BE.IconProfile = new RegimentIconProfile(RegimentIconType.Single)
             {
-                Icon = SpriteManager.GE_Leopard1_W
+                Icon = SpriteManager.NATO_Leopard1
             };
 
             // Add the BE Leopard 1 profile to the database
@@ -5371,7 +5364,7 @@ namespace HammerAndSickle.Models
             // Handle the icon profile.
             LEO1_DK.IconProfile = new RegimentIconProfile(RegimentIconType.Single)
             {
-                Icon = SpriteManager.GE_Leopard1_W
+                Icon = SpriteManager.NATO_Leopard1
             };
 
             // Add the DK Leopard 1 profile to the database
@@ -5414,7 +5407,7 @@ namespace HammerAndSickle.Models
             // Handle the icon profile.
             M113_NATO.IconProfile = new RegimentIconProfile(RegimentIconType.Single)
             {
-                Icon = SpriteManager.US_M113_W
+                Icon = SpriteManager.NATO_M113
             };
 
             // Mixed family (see FamilyArchetypes) - medium is stated per profile.
@@ -5572,7 +5565,7 @@ namespace HammerAndSickle.Models
             // Handle the icon profile.
             T55A.IconProfile = new RegimentIconProfile(RegimentIconType.Single)
             {
-                Icon = SpriteManager.AR_T55_W
+                Icon = SpriteManager.IQ_T55
             };
 
             // Add the T-55A profile to the database
@@ -5614,7 +5607,7 @@ namespace HammerAndSickle.Models
             // Handle the icon profile. (Using T-55 sprites as stand-in)
             T62A.IconProfile = new RegimentIconProfile(RegimentIconType.Single)
             {
-                Icon = SpriteManager.AR_T55_W
+                Icon = SpriteManager.IQ_T62
             };
 
             // Add the T-62A profile to the database
@@ -5654,7 +5647,7 @@ namespace HammerAndSickle.Models
             // Handle the icon profile.
             M60A3.IconProfile = new RegimentIconProfile(RegimentIconType.Single)
             {
-                Icon = SpriteManager.AR_M60_W
+                Icon = SpriteManager.IR_M60
             };
 
             // Add the M60A3 profile to the database
@@ -5690,7 +5683,7 @@ namespace HammerAndSickle.Models
             // Handle the icon profile.
             BMP1_IQ.IconProfile = new RegimentIconProfile(RegimentIconType.Single)
             {
-                Icon = SpriteManager.AR_BMP1_W
+                Icon = SpriteManager.IQ_BMP1
             };
 
             // Add the BMP-1 profile to the database
@@ -5721,7 +5714,7 @@ namespace HammerAndSickle.Models
             // Handle the icon profile.
             MTLB_IQ.IconProfile = new RegimentIconProfile(RegimentIconType.Single)
             {
-                Icon = SpriteManager.AR_MTLB_W
+                Icon = SpriteManager.IQ_MTLB
             };
 
             // Mixed family (see FamilyArchetypes) - medium is stated per profile.
@@ -5756,7 +5749,7 @@ namespace HammerAndSickle.Models
             // Handle the icon profile.
             M113_IR.IconProfile = new RegimentIconProfile(RegimentIconType.Single)
             {
-                Icon = SpriteManager.AR_M113_W
+                Icon = SpriteManager.IR_M113
             };
 
             // Mixed family (see FamilyArchetypes) - medium is stated per profile.
@@ -5797,7 +5790,7 @@ namespace HammerAndSickle.Models
             // Handle the icon profile.
             SPA_2S1_AR.IconProfile = new RegimentIconProfile(RegimentIconType.Single)
             {
-                Icon = SpriteManager.AR_2S1_W
+                Icon = SpriteManager.IQ_2S1
             };
 
             // Add the 2S1 Gvozdika profile to the database
@@ -5905,7 +5898,7 @@ namespace HammerAndSickle.Models
             // Handle the icon profile.
             AAA_MJ.IconProfile = new RegimentIconProfile(RegimentIconType.Single)
             {
-                Icon = SpriteManager.MJ_AA
+                Icon = SpriteManager.MJ_AAA
             };
 
             // Add the Mujahideen AAA profile to the database
@@ -5977,7 +5970,7 @@ namespace HammerAndSickle.Models
             // Handle the icon profile.
             ZSU_57_IQ.IconProfile = new RegimentIconProfile(RegimentIconType.Single)
             {
-                Icon = SpriteManager.AR_ZSU57_W
+                Icon = SpriteManager.IQ_ZSU57
             };
 
             // Add the ZSU-57 IQ profile to the database
@@ -6013,7 +6006,7 @@ namespace HammerAndSickle.Models
             // Handle the icon profile.
             SPSAM_2k12.IconProfile = new RegimentIconProfile(RegimentIconType.Single)
             {
-                Icon = SpriteManager.AR_2K12_W
+                Icon = SpriteManager.IQ_2K12
             };
 
             // Add the 2K12 IQ profile to the database
@@ -6050,7 +6043,7 @@ namespace HammerAndSickle.Models
             // Handle the icon profile.
             MIG21_IQ.IconProfile = new RegimentIconProfile(RegimentIconType.Single)
             {
-                Icon = SpriteManager.AR_Mig21
+                Icon = SpriteManager.IQ_Mig21
             };
 
             // Add the MiG-21 profile to the database
@@ -6081,7 +6074,7 @@ namespace HammerAndSickle.Models
             // Handle the icon profile.
             MIG23_IQ.IconProfile = new RegimentIconProfile(RegimentIconType.Single)
             {
-                Icon = SpriteManager.AR_Mig23
+                Icon = SpriteManager.IQ_Mig23
             };
 
             // Add the MiG-23 profile to the database
@@ -6111,7 +6104,7 @@ namespace HammerAndSickle.Models
             // Handle the icon profile.
             SU17_IQ.IconProfile = new RegimentIconProfile(RegimentIconType.Single)
             {
-                Icon = SpriteManager.AR_SU17
+                Icon = SpriteManager.IQ_SU17
             };
 
             // Add the Su-17 profile to the database
@@ -6142,7 +6135,7 @@ namespace HammerAndSickle.Models
             // Handle the icon profile.
             F4_IR.IconProfile = new RegimentIconProfile(RegimentIconType.Single)
             {
-                Icon = SpriteManager.AR_F4
+                Icon = SpriteManager.IR_F4
             };
 
             // Add the Iranian F-4 profile to the database
@@ -6174,7 +6167,7 @@ namespace HammerAndSickle.Models
             // Handle the icon profile.
             F14_IR.IconProfile = new RegimentIconProfile(RegimentIconType.Single)
             {
-                Icon = SpriteManager.AR_F14
+                Icon = SpriteManager.IR_F14
             };
 
             // Add the Iranian F-14 profile to the database
@@ -6538,7 +6531,7 @@ namespace HammerAndSickle.Models
             // Handle the icon profile.
             TYPE59.IconProfile = new RegimentIconProfile(RegimentIconType.Single)
             {
-                Icon = SpriteManager.CH_Type59_W
+                Icon = SpriteManager.CH_Type59
             };
 
             // Add the Type 59 profile to the database
@@ -6576,7 +6569,7 @@ namespace HammerAndSickle.Models
             // Handle the icon profile.
             TYPE80.IconProfile = new RegimentIconProfile(RegimentIconType.Single)
             {
-                Icon = SpriteManager.CH_Type80_W
+                Icon = SpriteManager.CH_Type80
             };
 
             // Add the Type 80 profile to the database
@@ -6612,7 +6605,7 @@ namespace HammerAndSickle.Models
             // Handle the icon profile.
             TYPE86.IconProfile = new RegimentIconProfile(RegimentIconType.Single)
             {
-                Icon = SpriteManager.CH_Type86_W
+                Icon = SpriteManager.CH_Type86
             };
 
             // Add the Type 86 profile to the database
@@ -6651,7 +6644,7 @@ namespace HammerAndSickle.Models
             // Handle the icon profile.
             SPA_TYPE83_CH.IconProfile = new RegimentIconProfile(RegimentIconType.Single)
             {
-                Icon = SpriteManager.CH_Type82_W
+                Icon = SpriteManager.CH_Type83
             };
 
             // Add the Type 82 profile to the database
@@ -6689,7 +6682,7 @@ namespace HammerAndSickle.Models
             // Handle the icon profile.
             PHZ89.IconProfile = new RegimentIconProfile(RegimentIconType.Single)
             {
-                Icon = SpriteManager.CH_PHZ89_W
+                Icon = SpriteManager.CH_PHZ89
             };
 
             // Add the PHZ-89 profile to the database
@@ -6796,7 +6789,7 @@ namespace HammerAndSickle.Models
             // Handle the icon profile.
             TYPE53.IconProfile = new RegimentIconProfile(RegimentIconType.Single)
             {
-                Icon = SpriteManager.CH_Type53_W
+                Icon = SpriteManager.CH_Type53
             };
 
             // Add the Type 53 profile to the database
@@ -6834,7 +6827,7 @@ namespace HammerAndSickle.Models
             // Handle the icon profile.
             HQ7.IconProfile = new RegimentIconProfile(RegimentIconType.Single)
             {
-                Icon = SpriteManager.CH_HQ7_W
+                Icon = SpriteManager.CH_HQ7
             };
 
             // Add the HQ-7 profile to the database
@@ -6871,7 +6864,7 @@ namespace HammerAndSickle.Models
             // Handle the icon profile.
             H9.IconProfile = new RegimentIconProfile(RegimentIconType.Helo_Animation)
             {
-                Icon = SpriteManager.CH_H9_Frame0
+                Icon = SpriteManager.CH_Z9_Frame0
             };
 
             // Add the H-9 profile to the database

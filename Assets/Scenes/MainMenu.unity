@@ -2663,11 +2663,11 @@ MonoBehaviour:
   _nationalSymbolAtlas: {fileID: 4343727234628468602, guid: 43e3faccee7cdbb44a029fc21e881785, type: 2}
   _utilityIconAtlas: {fileID: 4343727234628468602, guid: 3fe5ea4e07a7cfe47853b4870e48730d, type: 2}
   _unitPrefabIconAtlas: {fileID: 4343727234628468602, guid: 2943a0266f300294d94147b5c731c4b2, type: 2}
-  _sovietIconAtlas: {fileID: 4343727234628468602, guid: 6c0b2fd47d655164bac4b8812a1c9365, type: 2}
-  _natoIconAtlas: {fileID: 4343727234628468602, guid: 5f2278d3e08aed54c9b9d1def487b453, type: 2}
-  _genericIconAtlas: {fileID: 4343727234628468602, guid: 2dd4bc4d154ac5545bfc2d59a397aa04, type: 2}
-  _arabIconAtlas: {fileID: 4343727234628468602, guid: 9cf7530c863cb1f448b292a192cd8a1d, type: 2}
-  _chineseIconAtlas: {fileID: 4343727234628468602, guid: e51e4198296b6b545877b15e0ccd9449, type: 2}
+  _sovietIconAtlas: {fileID: 4343727234628468602, guid: e8e4fdb8531b1f84986ed10591073da5, type: 2}
+  _natoIconAtlas: {fileID: 4343727234628468602, guid: 3c6bb6ef9b54c9242abd836ea2909391, type: 2}
+  _genericIconAtlas: {fileID: 4343727234628468602, guid: b295b0f2e53eab9448aef4bc931c78c9, type: 2}
+  _regionalIconAtlas: {fileID: 4343727234628468602, guid: 9600fd2f735fb6c418a17c4d9994e87c, type: 2}
+  _chineseIconAtlas: {fileID: 4343727234628468602, guid: e46f3ffb0bedba84d9f05bc8aa75ff1e, type: 2}
   _officerPortraitAtlas: {fileID: 4343727234628468602, guid: 7e3e4700d7bd653409c10a32005a11ea, type: 2}
   _riverIconAtlas: {fileID: 4343727234628468602, guid: 30af36f6783f6a8478bf84b56b40e34a, type: 2}
   _roadIconAtlas: {fileID: 4343727234628468602, guid: 15d4f42131582fa4c8938085e41b1b66, type: 2}

@@ -177,17 +177,12 @@ namespace HammerAndSickle.Tests
         }
 
         [Test]
-        public void FrenchVab_IsTracked_DeliberatelyAndNotByMistake()
+        public void FrenchVab_IsWheeled_WithItsNationalArtwork()
         {
-            /* ⚠ The real VAB is a wheeled 6x6. This is ratified as Tracked (Bob, 2026-08-04) because no
-             * VAB sprite exists — the profile draws FR_M113_*, a French motor rifle regiment carries it
-             * as its mobile profile, and the player therefore SEES tracks. Sight and sound must agree.
-             * This test exists so that a later reader who "corrects" it to Wheeled gets a failure that
-             * points at the reasoning instead of a silent mismatch nobody notices for months. */
-            Assert.That(WeaponProfileDB.GetWeaponProfile(WeaponType.APC_VAB_FR).MovementMedium,
-                Is.EqualTo(MovementMedium.Tracked),
-                "VAB is deliberately Tracked to match its M113 art — see the ruling at the profile. " +
-                "Flip it to Wheeled only when real VAB art is authored.");
+            var profile = WeaponProfileDB.GetWeaponProfile(WeaponType.APC_VAB_FR);
+            Assert.That(profile.IconProfile.Icon, Is.EqualTo(HammerAndSickle.Controllers.SpriteManager.FR_VAB));
+            Assert.That(profile.MovementMedium, Is.EqualTo(MovementMedium.Wheeled),
+                "The real VAB artwork replaces the tracked M113 placeholder; movement and sound must follow.");
         }
 
         #endregion // The pair that started this

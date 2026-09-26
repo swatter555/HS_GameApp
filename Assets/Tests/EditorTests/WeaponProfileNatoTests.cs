@@ -238,12 +238,12 @@ namespace HammerAndSickle.Tests
             Assert.That(unit.EquipmentBays.Embarked, Is.EqualTo(WeaponType.NONE));
             Assert.That(unit.EquipmentBays.IsMobileBayOpen(), Is.False, "The fighting kit is already tracked.");
             Assert.That(unit.EquipmentBays.GetIcon(DeploymentPosition.Deployed, HexDirection.W),
-                Is.EqualTo(SpriteManager.FR_AMX30DCA_W));
+                Is.EqualTo(SpriteManager.FR_AMX30DCA));
             Assert.That(unit.EquipmentBays.GetIcon(DeploymentPosition.Fortified, HexDirection.E),
-                Is.EqualTo(SpriteManager.FR_AMX30DCA_W), "Posture/facing must retain the deployed gun artwork.");
+                Is.EqualTo(SpriteManager.FR_AMX30DCA), "Posture/facing must retain the deployed gun artwork.");
 
             var sprite = UnityEditor.AssetDatabase.LoadAssetAtPath<UnityEngine.Sprite>(
-                "Assets/Art/Sprites/Unit Icons/NATO Icons/FR_AMX30DCA_W.png");
+                "Assets/Art/Sprites/Unit Icons/NATO/FR_AMX30DCA.png");
             Assert.That(sprite, Is.Not.Null, "The renamed profile artwork must still import.");
             Assert.That(sprite.name, Is.EqualTo(profile.IconProfile.Icon));
         }

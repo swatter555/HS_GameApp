@@ -1,0 +1,69 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!687078895 &4343727234628468602
+SpriteAtlas:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_Name: Generic
+  m_EditorData:
+    serializedVersion: 2
+    textureSettings:
+      serializedVersion: 2
+      anisoLevel: 0
+      compressionQuality: 0
+      maxTextureSize: 0
+      textureCompression: 0
+      filterMode: 1
+      generateMipMaps: 1
+      readable: 1
+      crunchedCompression: 0
+      sRGB: 1
+    platformSettings:
+    - serializedVersion: 4
+      m_BuildTarget: DefaultTexturePlatform
+      m_MaxTextureSize: 8192
+      m_ResizeAlgorithm: 0
+      m_TextureFormat: -1
+      m_TextureCompression: 2
+      m_CompressionQuality: 50
+      m_CrunchedCompression: 0
+      m_AllowsAlphaSplitting: 0
+      m_Overridden: 0
+      m_IgnorePlatformSupport: 0
+      m_AndroidETC2FallbackOverride: 0
+      m_ForceMaximumCompressionQuality_BC6H_BC7: 0
+    packingSettings:
+      serializedVersion: 2
+      padding: 2
+      blockOffset: 0
+      allowAlphaSplitting: 0
+      enableRotation: 1
+      enableTightPacking: 0
+      enableAlphaDilation: 0
+    secondaryTextureSettings: {}
+    variantMultiplier: 1
+    packables:
+    - {fileID: 21300000, guid: 68bd8176fa1e8c644874351dd47aa291, type: 3}
+    - {fileID: 21300000, guid: 686b3c10335d8b748a69adb6457befcb, type: 3}
+    - {fileID: 21300000, guid: 1c1c87736b69a124ab56d37f13d3dcb2, type: 3}
+    bindAsDefault: 1
+    isAtlasV2: 0
+    cachedData: {fileID: 0}
+    packedSpriteRenderDataKeys:
+    - 686b3c10335d8b748a69adb6457befcb: 21300000
+    - 1c1c87736b69a124ab56d37f13d3dcb2: 21300000
+    - 68bd8176fa1e8c644874351dd47aa291: 21300000
+  m_MasterAtlas: {fileID: 0}
+  m_PackedSprites:
+  - {fileID: 21300000, guid: 686b3c10335d8b748a69adb6457befcb, type: 3}
+  - {fileID: 21300000, guid: 1c1c87736b69a124ab56d37f13d3dcb2, type: 3}
+  - {fileID: 21300000, guid: 68bd8176fa1e8c644874351dd47aa291, type: 3}
+  m_PackedSpriteNamesToIndex:
+  - GEN_Depot
+  - GEN_NavalTransport
+  - GEN_Base
+  m_RenderDataMap: {}
+  m_Tag: Generic
+  m_IsVariant: 0

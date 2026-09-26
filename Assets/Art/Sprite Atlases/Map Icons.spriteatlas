@@ -57,8 +57,6 @@ SpriteAtlas:
     - {fileID: 21300000, guid: 169bf46148da2c041a49454468240e55, type: 3}
     - {fileID: 21300000, guid: fbf8a7799a85fa348ae770855117fdda, type: 3}
     - {fileID: 21300000, guid: 6cd73381ef35b6f4b869e82a411cc1ad, type: 3}
-    - {fileID: 21300000, guid: 4c27aaa6f9f12d646a8419c3f024e4f7, type: 3}
-    - {fileID: 21300000, guid: ab0a5f085f542ed4dbce9f756e0a4712, type: 3}
     - {fileID: 21300000, guid: fdc05e9e67ec13b4f9c4d2428e3b8538, type: 3}
     - {fileID: 21300000, guid: 81046651793696b4faa5f315d8f00b26, type: 3}
     - {fileID: 21300000, guid: 656d7d7420f57de4e9999e1208042f9d, type: 3}
@@ -78,9 +76,7 @@ SpriteAtlas:
     - 656d7d7420f57de4e9999e1208042f9d: 21300000
     - 275dc215402275245995f3567bf28931: 21300000
     - 6ec93a251e24536468c1aa4c36c9a00b: 21300000
-    - 4c27aaa6f9f12d646a8419c3f024e4f7: 21300000
     - 2c4f01077ce374f4fb617aa06423b624: 21300000
-    - ab0a5f085f542ed4dbce9f756e0a4712: 21300000
     - b62fc9780b19cf64bbd36158edf21ebc: 21300000
     - 69399449c4c7f8e4c85a86407d09a750: 21300000
     - fbf8a7799a85fa348ae770855117fdda: 21300000
@@ -100,9 +96,7 @@ SpriteAtlas:
   - {fileID: 21300000, guid: 656d7d7420f57de4e9999e1208042f9d, type: 3}
   - {fileID: 21300000, guid: 275dc215402275245995f3567bf28931, type: 3}
   - {fileID: 21300000, guid: 6ec93a251e24536468c1aa4c36c9a00b, type: 3}
-  - {fileID: 21300000, guid: 4c27aaa6f9f12d646a8419c3f024e4f7, type: 3}
   - {fileID: 21300000, guid: 2c4f01077ce374f4fb617aa06423b624, type: 3}
-  - {fileID: 21300000, guid: ab0a5f085f542ed4dbce9f756e0a4712, type: 3}
   - {fileID: 21300000, guid: b62fc9780b19cf64bbd36158edf21ebc, type: 3}
   - {fileID: 21300000, guid: 69399449c4c7f8e4c85a86407d09a750, type: 3}
   - {fileID: 21300000, guid: fbf8a7799a85fa348ae770855117fdda, type: 3}
@@ -121,9 +115,7 @@ SpriteAtlas:
   - ME_MajorCity
   - CH_Fort
   - EU_Airbase
-  - GEN_Base
   - CH_Nameplate
-  - GEN_Depot
   - ME_Sprawl
   - ME_MinorCity
   - EU_Nameplate
