@@ -98,7 +98,7 @@ namespace HammerAndSickle.Tests
         {
             AssertOneStatLine("Light towed artillery",
                 WeaponType.ART_LIGHT_SV, WeaponType.ART_LIGHT_NATO,
-                WeaponType.ART_LIGHT_ARAB, WeaponType.ART_LIGHT_CH, WeaponType.ART_LIGHT_FR);
+                WeaponType.ART_LIGHT_ARAB, WeaponType.ART_LIGHT_CH, WeaponType.ART_LIGHT_FR, WeaponType.ART_LIGHT_IQ);
         }
 
         [Test]
@@ -106,20 +106,20 @@ namespace HammerAndSickle.Tests
         {
             AssertOneStatLine("Heavy towed artillery",
                 WeaponType.ART_HEAVY_SV, WeaponType.ART_HEAVY_NATO,
-                WeaponType.ART_HEAVY_ARAB, WeaponType.ART_HEAVY_CH, WeaponType.ART_HEAVY_FR);
+                WeaponType.ART_HEAVY_ARAB, WeaponType.ART_HEAVY_CH, WeaponType.ART_HEAVY_FR, WeaponType.ART_HEAVY_IQ);
         }
 
         [Test]
-        public void FrenchTowedAaa_UsesTheRegularCommodityLine()
+        public void FrenchAndIraqiTowedAaa_UseTheRegularCommodityLine()
         {
-            AssertOneStatLine("Towed AAA", WeaponType.AAA_GEN_SV, WeaponType.AAA_GEN_FR);
+            AssertOneStatLine("Towed AAA", WeaponType.AAA_GEN_SV, WeaponType.AAA_GEN_FR, WeaponType.AAA_GEN_IQ);
         }
 
         [Test]
         public void TransportTrucks_AreOneVehicleForEveryNation()
         {
             AssertOneStatLine("Transport truck",
-                WeaponType.TRK_GEN_SV, WeaponType.TRK_GEN_NATO, WeaponType.TRK_GEN_ARAB);
+                WeaponType.TRK_GEN_SV, WeaponType.TRK_GEN_NATO, WeaponType.TRK_GEN_ARAB, WeaponType.TRK_GEN_IQ);
         }
 
         /// <summary>
@@ -134,7 +134,7 @@ namespace HammerAndSickle.Tests
             var wrong = new List<string>();
 
             foreach (var t in new[] { WeaponType.ART_LIGHT_SV, WeaponType.ART_LIGHT_NATO,
-                                      WeaponType.ART_LIGHT_ARAB, WeaponType.ART_LIGHT_CH, WeaponType.ART_LIGHT_FR })
+                                      WeaponType.ART_LIGHT_ARAB, WeaponType.ART_LIGHT_CH, WeaponType.ART_LIGHT_FR, WeaponType.ART_LIGHT_IQ })
             {
                 if (!WeaponProfileDB.HasWeaponProfile(t)) continue;
                 var p = P(t);
@@ -143,7 +143,7 @@ namespace HammerAndSickle.Tests
             }
 
             foreach (var t in new[] { WeaponType.ART_HEAVY_SV, WeaponType.ART_HEAVY_NATO,
-                                      WeaponType.ART_HEAVY_ARAB, WeaponType.ART_HEAVY_CH, WeaponType.ART_HEAVY_FR })
+                                      WeaponType.ART_HEAVY_ARAB, WeaponType.ART_HEAVY_CH, WeaponType.ART_HEAVY_FR, WeaponType.ART_HEAVY_IQ })
             {
                 if (!WeaponProfileDB.HasWeaponProfile(t)) continue;
                 var p = P(t);

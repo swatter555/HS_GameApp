@@ -1163,6 +1163,21 @@ namespace HammerAndSickle.Core.GameData
         HEL_GAZELLE_FR,
 
         #endregion // French Roster Additions
+
+        #region Iraqi Roster Additions
+
+        // Append only: retain the shared ARAB keys for existing content and other nations.
+        TANK_T72M_IQ,
+        HEL_MI8AT_IQ,
+        RCN_BRDM2_IQ,
+        FGT_MIRAGEF1_IQ,
+        ART_LIGHT_IQ,
+        ART_HEAVY_IQ,
+        AAA_GEN_IQ,
+        TRK_GEN_IQ,
+        SAM_S75_IQ,
+
+        #endregion // Iraqi Roster Additions
     }
 
     /* ⚠ RegimentProfileType DELETED 2026-08-08 (P1, todo_profiles §3). The full-tree sweep found it

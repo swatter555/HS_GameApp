@@ -260,6 +260,16 @@ namespace HammerAndSickle.Models
             new Dictionary<ProfileStat, int>(),
             Plus(new[] { WeaponTrait.NON_COMBATANT }, extraTraits));
 
+        /// <summary>Same S-75 site system for Soviet and Iraqi profiles; national art/census stay separate.</summary>
+        private static ProfileDef S75SiteDef() => new(
+            FamilyArchetypes.Sam,
+            new Dictionary<ProfileStat, int>
+            {
+                { ProfileStat.IR, GameData.INDIRECT_RANGE_SAM }, { ProfileStat.MMP, -4 }
+            },
+            // Retain the ratified towed-SAM lift capabilities; this packet changes no transport rules.
+            new[] { WeaponTrait.SARH_LONG_RANGE, WeaponTrait.AIR_DROPPABLE, WeaponTrait.HELO_TRANSPORTABLE });
+
         /// <summary>
         /// Appends a nation's own traits to a blueprint's base list. Exists so a commodity profile can
         /// still carry something national (RE-4's SECOND_LINE_FORMATION is the first case) without
@@ -296,6 +306,7 @@ namespace HammerAndSickle.Models
                 CreateFrenchRosterAdditions();
                 CreateLowlandsProfiles();
                 CreateArabProfiles();
+                CreateIraqiRosterAdditions();
                 CreateChineseProfiles();
             }
             catch (Exception e)
@@ -1681,11 +1692,7 @@ namespace HammerAndSickle.Models
             // → HA1 HD3 SA1 SD3 GAD8 · GAT15 · MMP0 · IR6 · SR6.
             WeaponProfile S75 = WeaponProfile.FromProfileDef(
                 "S-75 Dvina Surface-to-Air Missile System", "S-75 Dvina", WeaponType.SAM_S75_SV,
-                new ProfileDef(FamilyArchetypes.Sam,
-                    new Dictionary<ProfileStat, int> { { ProfileStat.IR, GameData.INDIRECT_RANGE_SAM }, { ProfileStat.MMP, -4 } },
-                    // Census A ruling (Bob, 2026-08-08): ALL towed SAM/AAA are HeloTransportable +
-                    // AirDroppable; SP systems are base-only (no lift, and their bays close by medium).
-                    new[] { WeaponTrait.SARH_LONG_RANGE, WeaponTrait.AIR_DROPPABLE, WeaponTrait.HELO_TRANSPORTABLE }),
+                S75SiteDef(),
                 UpgradePath.SAM, 228);
 
             // Set the prestige cost for the profile.
@@ -5644,6 +5651,139 @@ namespace HammerAndSickle.Models
         }
 
         /// <summary>
+        /// Adds Iraq's national support equipment and approved tank, scout and aircraft options.
+        /// </summary>
+        private static void CreateIraqiRosterAdditions()
+        {
+            // Established T-72A game line plus the approved export downgrade. No ERA/MV addition.
+            // Availability follows the roster plan's 1982 Iraqi T-72M anchor (January 1938 epoch).
+            WeaponProfile T72M_IQ = WeaponProfile.FromProfileDef(
+                "T-72M Main Battle Tank", "T-72M", WeaponType.TANK_T72M_IQ,
+                new ProfileDef(TankArchetypes.Gen2, new Dictionary<ProfileStat, int>(),
+                    new[] { WeaponTrait.GUN_125_SMOOTH, WeaponTrait.SPACED_ARMOR, WeaponTrait.LASER_RANGEFINDER,
+                            WeaponTrait.AMPHIBIOUS, WeaponTrait.EXPORT_DOWNGRADE }), UpgradePath.TANK, 528);
+            T72M_IQ.SetPrestigeCost(PrestigeTierCost.Gen2, PrestigeTypeCost.TANK);
+            // Same authored Iraqi tank-counter scale as the existing T-55; not a new Guard doctrine.
+            T72M_IQ.AddIntelReportStat(WeaponType.Personnel, 950);
+            T72M_IQ.AddIntelReportStat(WeaponType.TANK_T72M_IQ, 105);
+            T72M_IQ.AddIntelReportStat(WeaponType.IFV_BMP1_IQ, 40);
+            T72M_IQ.AddIntelReportStat(WeaponType.SPA_2S1_IQ, 18);
+            T72M_IQ.AddIntelReportStat(WeaponType.RCN_BRDM2_IQ, 12);
+            T72M_IQ.AddIntelReportStat(WeaponType.ART_120MM_MORTAR, 18);
+            T72M_IQ.AddIntelReportStat(WeaponType.AT_ATGM, 6);
+            T72M_IQ.AddIntelReportStat(WeaponType.MANPAD_STRELA, 8);
+            T72M_IQ.AddIntelReportStat(WeaponType.SPAAA_ZSU57_IQ, 4);
+            T72M_IQ.AddIntelReportStat(WeaponType.SPSAM_2K12_IQ, 4);
+            T72M_IQ.IconProfile = new RegimentIconProfile(RegimentIconType.Single) { Icon = SpriteManager.IQ_T72 };
+            AddProfile(WeaponType.TANK_T72M_IQ, T72M_IQ);
+
+            // Robert's armed Mi-8AT is a rocket-armed attack counter, not organic lift or a Mi-24.
+            // No ATGM, cannon, armoured cockpit or countermeasure traits are inferred from the old plan.
+            // The 1967 availability anchor follows the existing Mi-8 family, not an asserted Iraqi receipt date.
+            WeaponProfile MI8AT_IQ = WeaponProfile.FromProfileDef(
+                "Mi-8AT Hip Armed Helicopter", "Mi-8AT Hip", WeaponType.HEL_MI8AT_IQ,
+                new ProfileDef(FamilyArchetypes.Helicopter, new Dictionary<ProfileStat, int>(),
+                    new[] { WeaponTrait.ROCKET_PODS }), UpgradePath.HEL, 348);
+            MI8AT_IQ.SetPrestigeCost(PrestigeTierCost.Gen1, PrestigeTypeCost.HEL);
+            MI8AT_IQ.AddIntelReportStat(WeaponType.HEL_MI8AT_IQ, 36);
+            MI8AT_IQ.IconProfile = new RegimentIconProfile(RegimentIconType.Helo_Animation)
+            {
+                Icon = SpriteManager.IQ_MI8AT_Frame0
+            };
+            AddProfile(WeaponType.HEL_MI8AT_IQ, MI8AT_IQ);
+
+            // Standard BRDM-2 scout mechanics; export armour/FCS penalties remain tank-only.
+            WeaponProfile BRDM2_IQ = WeaponProfile.FromProfileDef(
+                "Iraqi BRDM-2 Recon Vehicle", "IQ BRDM-2", WeaponType.RCN_BRDM2_IQ,
+                new ProfileDef(FamilyArchetypes.Recon, new Dictionary<ProfileStat, int>(),
+                    new[] { WeaponTrait.AMPHIBIOUS }), UpgradePath.RCN, 288);
+            BRDM2_IQ.SetPrestigeCost(PrestigeTierCost.Gen1, PrestigeTypeCost.RCN);
+            BRDM2_IQ.SetMovementMedium(MovementMedium.Wheeled);
+            // Existing recon-counter scale, with Iraqi support platforms instead of Soviet-only kit.
+            BRDM2_IQ.AddIntelReportStat(WeaponType.Personnel, 800);
+            BRDM2_IQ.AddIntelReportStat(WeaponType.RCN_BRDM2_IQ, 36);
+            BRDM2_IQ.AddIntelReportStat(WeaponType.TANK_T62A_IQ, 12);
+            BRDM2_IQ.AddIntelReportStat(WeaponType.APC_MTLB_IQ, 21);
+            BRDM2_IQ.AddIntelReportStat(WeaponType.SPAAA_ZSU57_IQ, 2);
+            BRDM2_IQ.AddIntelReportStat(WeaponType.SPSAM_2K12_IQ, 2);
+            BRDM2_IQ.AddIntelReportStat(WeaponType.SPA_2S1_IQ, 6);
+            BRDM2_IQ.AddIntelReportStat(WeaponType.ART_81MM_MORTAR, 4);
+            BRDM2_IQ.AddIntelReportStat(WeaponType.ART_120MM_MORTAR, 4);
+            BRDM2_IQ.AddIntelReportStat(WeaponType.AT_ATGM, 24);
+            BRDM2_IQ.AddIntelReportStat(WeaponType.MANPAD_STRELA, 12);
+            BRDM2_IQ.IconProfile = new RegimentIconProfile(RegimentIconType.Single) { Icon = SpriteManager.IQ_BRDM2 };
+            AddProfile(WeaponType.RCN_BRDM2_IQ, BRDM2_IQ);
+
+            // French multirole line with the approved export DF/SUR residuals, not the tank trait.
+            // One game profile represents the Iraqi F1; this does not add an Exocet/precision-strike system.
+            WeaponProfile MIRAGEF1_IQ = WeaponProfile.FromProfileDef(
+                "Iraqi Mirage F1 Fighter", "IQ Mirage F1", WeaponType.FGT_MIRAGEF1_IQ,
+                new ProfileDef(FamilyArchetypes.FighterEarly,
+                    new Dictionary<ProfileStat, int>
+                    {
+                        { ProfileStat.DF, -1 }, { ProfileStat.SUR, -1 },
+                        { ProfileStat.MAN, 1 }, { ProfileStat.TS, 1 }
+                    },
+                    new[] { WeaponTrait.BVR_RADAR_MISSILE, WeaponTrait.RWR, WeaponTrait.CHAFF_FLARE,
+                            WeaponTrait.MULTIROLE_STRIKE }), UpgradePath.FGT, 516);
+            MIRAGEF1_IQ.SetPrestigeCost(PrestigeTierCost.Gen2, PrestigeTypeCost.FGT);
+            MIRAGEF1_IQ.AddIntelReportStat(WeaponType.FGT_MIRAGEF1_IQ, 36);
+            MIRAGEF1_IQ.IconProfile = new RegimentIconProfile(RegimentIconType.Single) { Icon = SpriteManager.IQ_MirageF1 };
+            AddProfile(WeaponType.FGT_MIRAGEF1_IQ, MIRAGEF1_IQ);
+
+            // Preserve regional personnel/gun scales but omit embedded carriers from these open-bay bases.
+            WeaponProfile LIGHT_IQ = WeaponProfile.FromProfileDef(
+                "Iraqi Light Towed Artillery", "IQ Light Artillery", WeaponType.ART_LIGHT_IQ,
+                LightTowedArtilleryDef(), UpgradePath.ART, 144);
+            LIGHT_IQ.SetPrestigeCost(PrestigeTierCost.Gen1, PrestigeTypeCost.ART);
+            LIGHT_IQ.SetMovementMedium(MovementMedium.Foot);
+            LIGHT_IQ.AddIntelReportStat(WeaponType.Personnel, 700);
+            LIGHT_IQ.AddIntelReportStat(WeaponType.ART_LIGHT_IQ, 48);
+            LIGHT_IQ.AddIntelReportStat(WeaponType.MANPAD_STRELA, 6);
+            LIGHT_IQ.IconProfile = new RegimentIconProfile(RegimentIconType.Single) { Icon = SpriteManager.IQ_LightArt };
+            AddProfile(WeaponType.ART_LIGHT_IQ, LIGHT_IQ);
+
+            WeaponProfile HEAVY_IQ = WeaponProfile.FromProfileDef(
+                "Iraqi Heavy Towed Artillery", "IQ Heavy Artillery", WeaponType.ART_HEAVY_IQ,
+                HeavyTowedArtilleryDef(), UpgradePath.ART, 144);
+            HEAVY_IQ.SetPrestigeCost(PrestigeTierCost.Gen1, PrestigeTypeCost.ART);
+            HEAVY_IQ.SetMovementMedium(MovementMedium.Foot);
+            HEAVY_IQ.AddIntelReportStat(WeaponType.Personnel, 750);
+            HEAVY_IQ.AddIntelReportStat(WeaponType.ART_HEAVY_IQ, 36);
+            HEAVY_IQ.AddIntelReportStat(WeaponType.MANPAD_STRELA, 8);
+            HEAVY_IQ.IconProfile = new RegimentIconProfile(RegimentIconType.Single) { Icon = SpriteManager.IQ_HeavyArt };
+            AddProfile(WeaponType.ART_HEAVY_IQ, HEAVY_IQ);
+
+            WeaponProfile AAA_IQ = WeaponProfile.FromProfileDef(
+                "Iraqi Towed Anti-Aircraft Artillery", "IQ Towed AAA", WeaponType.AAA_GEN_IQ,
+                TowedAaaDef(), UpgradePath.AAA, 144);
+            AAA_IQ.SetPrestigeCost(PrestigeTierCost.Gen1, PrestigeTypeCost.AAA);
+            AAA_IQ.SetMovementMedium(MovementMedium.Foot);
+            AAA_IQ.AddIntelReportStat(WeaponType.Personnel, 500);
+            AAA_IQ.AddIntelReportStat(WeaponType.AAA_GEN_IQ, 18);
+            AAA_IQ.AddIntelReportStat(WeaponType.MANPAD_STRELA, 12);
+            AAA_IQ.IconProfile = new RegimentIconProfile(RegimentIconType.Single) { Icon = SpriteManager.IQ_AAA };
+            AddProfile(WeaponType.AAA_GEN_IQ, AAA_IQ);
+
+            WeaponProfile TRUCK_IQ = WeaponProfile.FromProfileDef(
+                "Iraqi Transport Truck", "IQ Truck", WeaponType.TRK_GEN_IQ, TransportTruckDef());
+            TRUCK_IQ.SetPrestigeCost(PrestigeTierCost.Gen1, PrestigeTypeCost.TRK);
+            TRUCK_IQ.IconProfile = new RegimentIconProfile(RegimentIconType.Single) { Icon = SpriteManager.IQ_Truck };
+            AddProfile(WeaponType.TRK_GEN_IQ, TRUCK_IQ);
+
+            WeaponProfile S75_IQ = WeaponProfile.FromProfileDef(
+                "Iraqi S-75 Dvina Surface-to-Air Missile System", "IQ S-75 Dvina", WeaponType.SAM_S75_IQ,
+                S75SiteDef(), UpgradePath.SAM, 228);
+            S75_IQ.SetPrestigeCost(PrestigeTierCost.Gen1, PrestigeTypeCost.SAM);
+            S75_IQ.SetMovementMedium(MovementMedium.Foot);
+            S75_IQ.AddIntelReportStat(WeaponType.Personnel, 750);
+            S75_IQ.AddIntelReportStat(WeaponType.SAM_S75_IQ, 18);
+            S75_IQ.AddIntelReportStat(WeaponType.MANPAD_STRELA, 21);
+            S75_IQ.IconProfile = new RegimentIconProfile(RegimentIconType.Single) { Icon = SpriteManager.IQ_S75 };
+            AddProfile(WeaponType.SAM_S75_IQ, S75_IQ);
+        }
+
+        /// <summary>
         /// Add Arab WeaponProfiles
         /// </summary>
         private static void CreateArabProfiles()
@@ -5671,7 +5811,7 @@ namespace HammerAndSickle.Models
             T55A.AddIntelReportStat(WeaponType.TANK_T55A_IQ,     105);
             T55A.AddIntelReportStat(WeaponType.IFV_BMP1_IQ,       40);
             T55A.AddIntelReportStat(WeaponType.SPA_2S1_IQ,        18);
-            T55A.AddIntelReportStat(WeaponType.RCN_BRDM2_SV,      12);
+            T55A.AddIntelReportStat(WeaponType.RCN_BRDM2_IQ,      12);
             T55A.AddIntelReportStat(WeaponType.ART_120MM_MORTAR,  18);
             T55A.AddIntelReportStat(WeaponType.AT_ATGM,            6);
             T55A.AddIntelReportStat(WeaponType.MANPAD_STRELA,      8);
@@ -5712,7 +5852,7 @@ namespace HammerAndSickle.Models
             // TANK_T55A_IQ 105 deleted (census pass 2026-08-13): a stale copy-paste line that put
             // 209 tanks on a 950-man brigade — the audit's worst find.
             T62A.AddIntelReportStat(WeaponType.IFV_BMP1_IQ,      40);
-            T62A.AddIntelReportStat(WeaponType.RCN_BRDM2_SV,     12);
+            T62A.AddIntelReportStat(WeaponType.RCN_BRDM2_IQ,     12);
             T62A.AddIntelReportStat(WeaponType.SPA_2S1_IQ,       18);
             T62A.AddIntelReportStat(WeaponType.ART_120MM_MORTAR, 18);
             T62A.AddIntelReportStat(WeaponType.AT_ATGM,           6);
@@ -5720,7 +5860,7 @@ namespace HammerAndSickle.Models
             T62A.AddIntelReportStat(WeaponType.SPAAA_ZSU57_IQ,    4);
             T62A.AddIntelReportStat(WeaponType.SPSAM_2K12_IQ,     4);
 
-            // Handle the icon profile. (Using T-55 sprites as stand-in)
+            // Handle the national T-62 icon profile.
             T62A.IconProfile = new RegimentIconProfile(RegimentIconType.Single)
             {
                 Icon = SpriteManager.IQ_T62
@@ -6340,7 +6480,7 @@ namespace HammerAndSickle.Models
             // template (truck mobile), so the leg regiment reports 31 tanks too — the rule-6 base
             // split is P4; period Iraqi infantry divisions did hold organic armor.
             INF_REG_IQ_P.AddIntelReportStat(WeaponType.TANK_T55A_IQ, 31);
-            INF_REG_IQ_P.AddIntelReportStat(WeaponType.ART_HEAVY_ARAB, 18);
+            INF_REG_IQ_P.AddIntelReportStat(WeaponType.ART_HEAVY_IQ, 18);
             INF_REG_IQ_P.AddIntelReportStat(WeaponType.ART_120MM_MORTAR, 18);
             INF_REG_IQ_P.AddIntelReportStat(WeaponType.AT_ATGM, 12);
             INF_REG_IQ_P.AddIntelReportStat(WeaponType.MANPAD_STRELA, 24);

@@ -4164,7 +4164,7 @@ namespace HammerAndSickle.Models
                 side: Side.AI,
                 nationality: Nationality.IQ,
                 deployedProfile: WeaponType.INF_REG_IQ,
-                mobileProfile: WeaponType.TRK_GEN_ARAB,
+                mobileProfile: WeaponType.TRK_GEN_IQ,
                 embarkedProfile: WeaponType.NONE,
                 category: DepotCategory.Secondary,
                 size: DepotSize.Small
@@ -4202,7 +4202,7 @@ namespace HammerAndSickle.Models
 
             #endregion // Iraqi Self-Propelled Artillery Regiment
 
-            #region Iraqi Towed Artillery Regiment (ART_HEAVY_ARAB)
+            #region Iraqi Towed Artillery Regiment (ART_HEAVY_IQ)
 
             var iq_towed_artillery_regiment = new CombatUnit(
                 unitName: "Iraqi Towed Artillery Regiment",
@@ -4210,8 +4210,8 @@ namespace HammerAndSickle.Models
                 role: UnitRole.GroundCombat,
                 side: Side.AI,
                 nationality: Nationality.IQ,
-                deployedProfile: WeaponType.ART_HEAVY_ARAB,
-                mobileProfile: WeaponType.TRK_GEN_ARAB,
+                deployedProfile: WeaponType.ART_HEAVY_IQ,
+                mobileProfile: WeaponType.TRK_GEN_IQ,
                 embarkedProfile: WeaponType.NONE,
                 category: DepotCategory.Secondary,
                 size: DepotSize.Small
@@ -4271,7 +4271,7 @@ namespace HammerAndSickle.Models
 
             #endregion // Iraqi Self Propelled SAM Regiment (2K12)
 
-            #region Iraqi SAM Regiment (SAM_S75_SV)
+            #region Iraqi SAM Regiment (SAM_S75_IQ)
 
             var iq_sam_regiment = new CombatUnit(
                 unitName: "Iraqi SAM Regiment (S-75)",
@@ -4279,8 +4279,8 @@ namespace HammerAndSickle.Models
                 role: UnitRole.AirDefenseArea,
                 side: Side.AI,
                 nationality: Nationality.IQ,
-                deployedProfile: WeaponType.SAM_S75_SV,
-                mobileProfile: WeaponType.TRK_GEN_ARAB,
+                deployedProfile: WeaponType.SAM_S75_IQ,
+                mobileProfile: WeaponType.TRK_GEN_IQ,
                 embarkedProfile: WeaponType.NONE,
                 category: DepotCategory.Secondary,
                 size: DepotSize.Small
@@ -4292,7 +4292,7 @@ namespace HammerAndSickle.Models
             // Add the template to the database
             AddTemplate("IQ_SAM_REGIMENT", iq_sam_regiment);
 
-            #endregion // Iraqi SAM Regiment (SAM_S75_SV)
+            #endregion // Iraqi SAM Regiment (SAM_S75_IQ)
 
             #region Iraqi Fighter Squadron (MiG-21)
 
@@ -4363,6 +4363,96 @@ namespace HammerAndSickle.Models
 
             #endregion // Iraqi Attack Squadron (Su-17)
 
+
+            var iq_tank_regiment_t72m = new CombatUnit(
+                unitName: "Iraqi Tank Regiment (T-72M)",
+                classification: UnitClassification.TANK,
+                role: UnitRole.GroundCombat,
+                side: Side.AI,
+                nationality: Nationality.IQ,
+                deployedProfile: WeaponType.TANK_T72M_IQ,
+                mobileProfile: WeaponType.NONE,
+                embarkedProfile: WeaponType.NONE,
+                category: DepotCategory.Secondary,
+                size: DepotSize.Small
+            );
+            iq_tank_regiment_t72m.SetExperienceLevel(ExperienceLevel.Green);
+            AddTemplate("IQ_TANK_REGIMENT_T72M", iq_tank_regiment_t72m);
+
+            var iq_mi8at_attack_squadron = new CombatUnit(
+                unitName: "Iraqi Armed Helicopter Squadron (Mi-8AT)",
+                classification: UnitClassification.HELO,
+                role: UnitRole.GroundCombat,
+                side: Side.AI,
+                nationality: Nationality.IQ,
+                deployedProfile: WeaponType.HEL_MI8AT_IQ,
+                mobileProfile: WeaponType.NONE,
+                embarkedProfile: WeaponType.NONE,
+                category: DepotCategory.Secondary,
+                size: DepotSize.Small
+            );
+            iq_mi8at_attack_squadron.SetExperienceLevel(ExperienceLevel.Green);
+            AddTemplate("IQ_MI8AT_ATTACK_SQUADRON", iq_mi8at_attack_squadron);
+
+            var iq_recon_regiment_brdm2 = new CombatUnit(
+                unitName: "Iraqi Recon Regiment (BRDM-2)",
+                classification: UnitClassification.RECON,
+                role: UnitRole.GroundCombat,
+                side: Side.AI,
+                nationality: Nationality.IQ,
+                deployedProfile: WeaponType.RCN_BRDM2_IQ,
+                mobileProfile: WeaponType.NONE,
+                embarkedProfile: WeaponType.NONE,
+                category: DepotCategory.Secondary,
+                size: DepotSize.Small
+            );
+            iq_recon_regiment_brdm2.SetExperienceLevel(ExperienceLevel.Green);
+            AddTemplate("IQ_RECON_REGIMENT_BRDM2", iq_recon_regiment_brdm2);
+
+            var iq_miragef1_fighter_squadron = new CombatUnit(
+                unitName: "Iraqi Fighter Squadron (Mirage F1)",
+                classification: UnitClassification.FGT,
+                role: UnitRole.AirSuperiority,
+                side: Side.AI,
+                nationality: Nationality.IQ,
+                deployedProfile: WeaponType.FGT_MIRAGEF1_IQ,
+                mobileProfile: WeaponType.NONE,
+                embarkedProfile: WeaponType.NONE,
+                category: DepotCategory.Secondary,
+                size: DepotSize.Small
+            );
+            iq_miragef1_fighter_squadron.SetExperienceLevel(ExperienceLevel.Green);
+            AddTemplate("IQ_MIRAGEF1_FIGHTER_SQUADRON", iq_miragef1_fighter_squadron);
+
+            var iq_light_artillery_regiment = new CombatUnit(
+                unitName: "Iraqi Light Towed Artillery Regiment",
+                classification: UnitClassification.ART,
+                role: UnitRole.GroundCombat,
+                side: Side.AI,
+                nationality: Nationality.IQ,
+                deployedProfile: WeaponType.ART_LIGHT_IQ,
+                mobileProfile: WeaponType.TRK_GEN_IQ,
+                embarkedProfile: WeaponType.NONE,
+                category: DepotCategory.Secondary,
+                size: DepotSize.Small
+            );
+            iq_light_artillery_regiment.SetExperienceLevel(ExperienceLevel.Green);
+            AddTemplate("IQ_LIGHT_ARTILLERY_REGIMENT", iq_light_artillery_regiment);
+
+            var iq_towed_aaa_regiment = new CombatUnit(
+                unitName: "Iraqi Towed Anti-Aircraft Regiment",
+                classification: UnitClassification.AAA,
+                role: UnitRole.AirDefenseArea,
+                side: Side.AI,
+                nationality: Nationality.IQ,
+                deployedProfile: WeaponType.AAA_GEN_IQ,
+                mobileProfile: WeaponType.TRK_GEN_IQ,
+                embarkedProfile: WeaponType.NONE,
+                category: DepotCategory.Secondary,
+                size: DepotSize.Small
+            );
+            iq_towed_aaa_regiment.SetExperienceLevel(ExperienceLevel.Green);
+            AddTemplate("IQ_TOWED_AAA_REGIMENT", iq_towed_aaa_regiment);
 
             #region Iranian Tank Regiment (M-60)
 

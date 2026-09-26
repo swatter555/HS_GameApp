@@ -10,6 +10,10 @@ Robert's local [sprite checklist](<C:/Users/coder/Desktop/Codex Projects/helpers
 
 The [French integration contract](<French Roster Integration.md>) defines the new profiles, formation bays, census choices and compatibility rules. Puma supplies organic Embarked lift; Gazelle has a separate attack formation. The AMX-10P adds a carrier option, and national guns/AAA use the shared definitions. French helicopter frames remain provisional. Use the vault TODO for verification and the linked consumer packet for Editor/AI adoption.
 
+## Iraqi roster contract — 2026-09-26
+
+The [Iraqi integration contract](<Iraqi Roster Integration.md>) defines nine national profiles, six new formations, three existing formation reassignments and national census references. Armed Mi-8AT replaces the planned Mi-24 and has no transport role. Legacy shared regional identifiers remain supported; existing saved/OOB bay selections are not migrated by template changes.
+
 ## Approved NATO expansion — 2026-09-23
 
 Robert approved dedicated NATO Leopard 1 and M113 art plus M109, M113 C&V reconnaissance, PRTL radar AAA and Centurion; the YPR-765/AIFV was already approved. Existing Leopard profile IDs (`TANK_LEOPARD1_NL`, `_BE`, `_DK`) and `APC_M113_NATO` stay stable. Proposed additions are `SPA_M109_NATO`, `RCN_M113CV_NATO`, `SPAAA_PRTL_NATO` and `TANK_CENTURION_NATO`; these are planning names, not registered game keys.
