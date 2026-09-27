@@ -112,14 +112,14 @@ namespace HammerAndSickle.Tests
         [Test]
         public void NationalTowedAaa_UsesTheRegularCommodityLine()
         {
-            AssertOneStatLine("Towed AAA", WeaponType.AAA_GEN_SV, WeaponType.AAA_GEN_FR, WeaponType.AAA_GEN_IQ, WeaponType.AAA_GEN_IR, WeaponType.AAA_GEN_UK, WeaponType.AAA_GEN_GE, WeaponType.AAA_GEN_NATO, WeaponType.AAA_GEN_US);
+            AssertOneStatLine("Towed AAA", WeaponType.AAA_GEN_SV, WeaponType.AAA_GEN_FR, WeaponType.AAA_GEN_IQ, WeaponType.AAA_GEN_IR, WeaponType.AAA_GEN_UK, WeaponType.AAA_GEN_GE, WeaponType.AAA_GEN_NATO, WeaponType.AAA_GEN_US, WeaponType.AAA_GEN_CH);
         }
 
         [Test]
         public void TransportTrucks_AreOneVehicleForEveryNation()
         {
             AssertOneStatLine("Transport truck",
-                WeaponType.TRK_GEN_SV, WeaponType.TRK_GEN_NATO, WeaponType.TRK_GEN_ARAB, WeaponType.TRK_GEN_IQ, WeaponType.TRK_GEN_IR, WeaponType.TRK_GEN_US);
+                WeaponType.TRK_GEN_SV, WeaponType.TRK_GEN_NATO, WeaponType.TRK_GEN_ARAB, WeaponType.TRK_GEN_IQ, WeaponType.TRK_GEN_IR, WeaponType.TRK_GEN_US, WeaponType.TRK_GEN_CH);
         }
 
         /// <summary>

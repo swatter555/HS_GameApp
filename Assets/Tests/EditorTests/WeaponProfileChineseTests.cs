@@ -13,9 +13,9 @@ namespace HammerAndSickle.Tests
     /// NATO / Arab guards. Chinese kit is domestic (no EXPORT_DOWNGRADE) but its fire-control lags the West.
     ///
     /// ⚠ SINCE RE-4 (2026-09-02) EVERY ICM PIN HERE CARRIES THE ×0.9 SECOND_LINE_FORMATION FACTOR.
-    /// A Chinese profile's ICM is therefore 0.90 unless it also has a fire-control trait (only the Type 80's
-    /// laser rangefinder does: 1.05 × 0.9 = 0.945). The lone exception is the Type 86 IFV at 1.00 — it is a
-    /// Mobile-bay ride, and closed-bay doctrine prices the formation on the deployed profile only.
+    /// A Chinese profile's ICM is therefore 0.90 unless it also has a fire-control trait (only the Type 88's
+    /// laser rangefinder does: 1.05 × 0.9 = 0.945). Carrier/truck exceptions stay at 1.00:
+    /// closed-bay doctrine prices the formation on the deployed profile only. ChineseRosterTests covers additions.
     /// </summary>
     [TestFixture]
     public class WeaponProfileChineseTests : BaseTestFixture
@@ -62,10 +62,10 @@ namespace HammerAndSickle.Tests
                 AssertGround(WeaponType.TANK_TYPE59_CH, 7, 6, 5, 7, 7, 0);
                 Assert.AreEqual(0.90f, P(WeaponType.TANK_TYPE59_CH).ICM, 0.01f, "Type 59 ICM 0.90 (second line)");
 
-                // Type 80 (105mm): Gen2 + LASER_RANGEFINDER (basic FCS, no thermal).
+                // Type 88 (105mm): Gen2 + LASER_RANGEFINDER (basic FCS, no thermal).
                 AssertGround(WeaponType.TANK_TYPE80_CH, 10, 8, 7, 6, 7, 0);
                 Assert.AreEqual(0.945f, P(WeaponType.TANK_TYPE80_CH).ICM, 0.01f,
-                    "Type 80 LRF 1.05 × second-line 0.9");
+                    "Type 88 LRF 1.05 × second-line 0.9");
             }
             catch (Exception ex) { AppService.HandleException(CLASS_NAME, nameof(Mbts_ResolveConvertedLines), ex); throw; }
         }
@@ -82,7 +82,7 @@ namespace HammerAndSickle.Tests
                 // Type 86 (BMP-1 copy + HJ-73 rail): Ifv + ATGM_RAIL (HA+4) + AMPHIBIOUS. Mirrors BMP-1P.
                 AssertGround(WeaponType.IFV_TYPE86_CH, 8, 4, 8, 7, 7, 0);
                 Assert.IsTrue(P(WeaponType.IFV_TYPE86_CH).HasCapability(WeaponCapability.Amphibious), "Type 86 amphibious");
-                // ⚠ THE ONE CHINESE PROFILE WITHOUT SECOND_LINE_FORMATION. The Type 86 is the Mobile-bay
+                // ⚠ CARRIERS EXCLUDE SECOND_LINE_FORMATION. The Type 86 is the Mobile-bay
                 // ride of the mechanised regiment, never a unit's sole profile, so the formation ICM would
                 // be charged twice if it were here. This pin is the guard against that regression.
                 Assert.AreEqual(1.00f, P(WeaponType.IFV_TYPE86_CH).ICM, 0.01f,
@@ -100,9 +100,9 @@ namespace HammerAndSickle.Tests
         {
             try
             {
-                // Type 82 122mm SP howitzer: Artillery + SELF_PROPELLED (tracked) → MMP 10.
+                // Type 83 152mm SP howitzer: Artillery + SELF_PROPELLED (tracked) → MMP 10.
                 AssertGround(WeaponType.SPA_TYPE83_CH, 5, 7, 9, 7, 7, 0);
-                Assert.AreEqual(10, (int)P(WeaponType.SPA_TYPE83_CH).MaxMovementPoints, "Type 82 MMP (SELF_PROPELLED)");
+                Assert.AreEqual(10, (int)P(WeaponType.SPA_TYPE83_CH).MaxMovementPoints, "Type 83 MMP (SELF_PROPELLED)");
 
                 // PHZ-89 tracked MRL: SELF_PROPELLED + ROCKET_ARTILLERY → double-fire.
                 AssertGround(WeaponType.ROC_PHZ89_CH, 5, 7, 9, 7, 7, 0);
@@ -145,16 +145,16 @@ namespace HammerAndSickle.Tests
         #region Helicopters
 
         [Test]
-        public void Helicopter_ResolvesH9()
+        public void Helicopter_ResolvesZ9()
         {
             try
             {
-                // H-9 light AT helo: Helicopter + ATGM_HELO_SACLOS (HA+4); unarmoured, no cannon.
+                // Z-9 light AT helo: Helicopter + ATGM_HELO_SACLOS (HA+4); unarmoured, no cannon.
                 AssertGround(WeaponType.HEL_Z9_CH, 11, 6, 10, 7, 10, 0);
                 Assert.AreEqual(0.90f, P(WeaponType.HEL_Z9_CH).ICM, 0.01f, "Z-9 ICM 0.90 (second line)");
-                Assert.AreEqual(3, (int)P(WeaponType.HEL_Z9_CH).SpottingRange, "H-9 SR 3");
+                Assert.AreEqual(3, (int)P(WeaponType.HEL_Z9_CH).SpottingRange, "Z-9 SR 3");
             }
-            catch (Exception ex) { AppService.HandleException(CLASS_NAME, nameof(Helicopter_ResolvesH9), ex); throw; }
+            catch (Exception ex) { AppService.HandleException(CLASS_NAME, nameof(Helicopter_ResolvesZ9), ex); throw; }
         }
 
         #endregion // Helicopters
@@ -223,8 +223,8 @@ namespace HammerAndSickle.Tests
 
         /// <summary>
         /// The SECOND_LINE_FORMATION sweep: every Chinese profile that a template names in its DEPLOYED
-        /// bay must carry the x0.9 formation factor, and the one Mobile-bay ride must not. Enumerated
-        /// rather than looped (house rule: no loops in Editor tests) so a failure names the offender.
+        /// bay must carry the x0.9 formation factor, and Mobile-bay rides must not. This guards the
+        /// earlier catalog; ChineseRosterTests covers the added profiles and their transport exceptions.
         /// </summary>
         [Test]
         public void FormationQuality_SecondLineAppliesToDeployedProfilesOnly()
@@ -250,7 +250,7 @@ namespace HammerAndSickle.Tests
 
                 // The fourteenth stacks its rangefinder on top: 1.05 x 0.9. Pinned separately because it
                 // proves the factor MULTIPLIES the fire-control stack rather than replacing it.
-                Assert.AreEqual(0.945f, P(WeaponType.TANK_TYPE80_CH).ICM, 0.01f, "Type 80 = 1.05 x 0.9");
+                Assert.AreEqual(0.945f, P(WeaponType.TANK_TYPE80_CH).ICM, 0.01f, "Type 88 = 1.05 x 0.9");
 
                 // And the exception, restated here so this test alone documents the doctrine.
                 Assert.AreEqual(1.00f, P(WeaponType.IFV_TYPE86_CH).ICM, 0.01f,

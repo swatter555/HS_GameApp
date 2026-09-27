@@ -1243,6 +1243,18 @@ namespace HammerAndSickle.Core.GameData
         HEL_UH1C_NATO,
 
         #endregion // US Roster Additions
+
+        #region Chinese Roster Additions
+
+        // Append only; preserve earlier persisted names and numeric positions.
+        TANK_TYPE62_CH,
+        FGT_J6_CH,
+        AAA_GEN_CH,
+        SAM_HQ2_CH,
+        APC_TYPE63_CH,
+        TRK_GEN_CH,
+
+        #endregion // Chinese Roster Additions
     }
 
     /* ⚠ RegimentProfileType DELETED 2026-08-08 (P1, todo_profiles §3). The full-tree sweep found it

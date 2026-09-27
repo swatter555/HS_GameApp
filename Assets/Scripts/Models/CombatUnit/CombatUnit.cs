@@ -2602,12 +2602,13 @@ namespace HammerAndSickle.Models
 
         /// <summary>
         /// Creates a new CombatUnit that is a template copy of this unit with fresh state.
+        /// Retains the template's crew level, starting XP at that level's minimum.
         /// </summary>
         public CombatUnit CreateTemplateClone()
         {
             try
             {
-                return new CombatUnit(
+                var clone = new CombatUnit(
                     unitName: UnitName,
                     classification: Classification,
                     role: Role,
@@ -2619,6 +2620,8 @@ namespace HammerAndSickle.Models
                     category: IsBase ? DepotCategory : DepotCategory.Secondary,
                     size: IsBase ? DepotSize : DepotSize.Small
                 );
+                clone.SetExperienceLevel(ExperienceLevel);
+                return clone;
             }
             catch (Exception e)
             {

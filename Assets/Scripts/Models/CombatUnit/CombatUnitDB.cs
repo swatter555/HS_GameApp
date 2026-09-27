@@ -5254,7 +5254,7 @@ namespace HammerAndSickle.Models
             #region Chinese Tank Regiment (Type80)
 
             var ch_tank_regiment_type80 = new CombatUnit(
-                unitName: "Chinese Tank Regiment (Type 80)",
+                unitName: "Chinese Tank Regiment (Type 88)",
                 classification: UnitClassification.TANK,
                 role: UnitRole.GroundCombat,
                 side: Side.AI,
@@ -5306,7 +5306,7 @@ namespace HammerAndSickle.Models
                 side: Side.AI,
                 nationality: Nationality.China,
                 deployedProfile: WeaponType.INF_REG_CH,
-                mobileProfile: WeaponType.TRK_GEN_SV,
+                mobileProfile: WeaponType.TRK_GEN_CH,
                 embarkedProfile: WeaponType.NONE,
                 category: DepotCategory.Secondary,
                 size: DepotSize.Small
@@ -5329,7 +5329,7 @@ namespace HammerAndSickle.Models
                 side: Side.AI,
                 nationality: Nationality.China,
                 deployedProfile: WeaponType.INF_AB_CH,
-                mobileProfile: WeaponType.TRK_GEN_SV,
+                mobileProfile: WeaponType.TRK_GEN_CH,
                 embarkedProfile: WeaponType.NONE,
                 category: DepotCategory.Secondary,
                 size: DepotSize.Small
@@ -5352,7 +5352,7 @@ namespace HammerAndSickle.Models
                 side: Side.AI,
                 nationality: Nationality.China,
                 deployedProfile: WeaponType.ART_HEAVY_CH,
-                mobileProfile: WeaponType.TRK_GEN_SV,
+                mobileProfile: WeaponType.TRK_GEN_CH,
                 embarkedProfile: WeaponType.NONE,
                 category: DepotCategory.Secondary,
                 size: DepotSize.Small
@@ -5375,7 +5375,7 @@ namespace HammerAndSickle.Models
                 side: Side.AI,
                 nationality: Nationality.China,
                 deployedProfile: WeaponType.ART_LIGHT_CH,
-                mobileProfile: WeaponType.TRK_GEN_SV,
+                mobileProfile: WeaponType.TRK_GEN_CH,
                 embarkedProfile: WeaponType.NONE,
                 category: DepotCategory.Secondary,
                 size: DepotSize.Small
@@ -5458,16 +5458,16 @@ namespace HammerAndSickle.Models
 
             #endregion // Chinese SAM Regiment (HQ-7)
 
-            #region Chinese SAM Regiment (SAM_S125_SV)
+            #region Chinese SAM Regiment (HQ2)
 
             var ch_sam_regiment = new CombatUnit(
-                unitName: "Chinese SAM Regiment (S-125)",
+                unitName: "Chinese SAM Regiment (HQ-2)",
                 classification: UnitClassification.SAM,
                 role: UnitRole.AirDefenseArea,
                 side: Side.AI,
                 nationality: Nationality.China,
-                deployedProfile: WeaponType.SAM_S125_SV,
-                mobileProfile: WeaponType.TRK_GEN_SV,
+                deployedProfile: WeaponType.SAM_HQ2_CH,
+                mobileProfile: WeaponType.TRK_GEN_CH,
                 embarkedProfile: WeaponType.NONE,
                 category: DepotCategory.Secondary,
                 size: DepotSize.Small
@@ -5479,7 +5479,7 @@ namespace HammerAndSickle.Models
             // Add the template to the database
             AddTemplate("CH_SAM_REGIMENT", ch_sam_regiment);
 
-            #endregion // Chinese SAM Regiment (SAM_S125_SV)
+            #endregion // Chinese SAM Regiment (HQ2)
 
             #region Chinese Fighter Squadron (J-7)
 
@@ -5573,10 +5573,10 @@ namespace HammerAndSickle.Models
 
             #endregion // Chinese Bomber Squadron (H-6)
 
-            #region Chinese Aviation Regiment (H9)
+            #region Chinese Aviation Regiment (Z9)
 
             var ch_aviation_regiment = new CombatUnit(
-                unitName: "Chinese Aviation Regiment (H-9)",
+                unitName: "Chinese Aviation Regiment (Z-9)",
                 classification: UnitClassification.HELO,
                 role: UnitRole.GroundCombat,
                 side: Side.AI,
@@ -5595,6 +5595,127 @@ namespace HammerAndSickle.Models
             AddTemplate("CH_AVIATION_REGIMENT", ch_aviation_regiment);
 
             #endregion // Chinese Aviation Regiment
+
+            var ch_tank_regiment_type62 = new CombatUnit(
+                unitName: "Chinese Light Tank Regiment (Type 62)",
+                classification: UnitClassification.TANK,
+                role: UnitRole.GroundCombat,
+                side: Side.AI,
+                nationality: Nationality.China,
+                deployedProfile: WeaponType.TANK_TYPE62_CH,
+                mobileProfile: WeaponType.NONE,
+                embarkedProfile: WeaponType.NONE,
+                category: DepotCategory.Secondary,
+                size: DepotSize.Small
+            );
+            ch_tank_regiment_type62.SetExperienceLevel(ExperienceLevel.Trained);
+            AddTemplate("CH_TANK_REGIMENT_TYPE62", ch_tank_regiment_type62);
+
+            var ch_mot_infantry_regiment_type63 = new CombatUnit(
+                unitName: "Chinese Motorised Infantry Regiment (Type 63)",
+                classification: UnitClassification.MOT,
+                role: UnitRole.GroundCombat,
+                side: Side.AI,
+                nationality: Nationality.China,
+                deployedProfile: WeaponType.INF_REG_CH,
+                mobileProfile: WeaponType.APC_TYPE63_CH,
+                embarkedProfile: WeaponType.NONE,
+                category: DepotCategory.Secondary,
+                size: DepotSize.Small
+            );
+            ch_mot_infantry_regiment_type63.SetExperienceLevel(ExperienceLevel.Trained);
+            AddTemplate("CH_MOT_INFANTRY_REGIMENT_TYPE63", ch_mot_infantry_regiment_type63);
+
+            var ch_j6_fighter_squadron = new CombatUnit(
+                unitName: "Chinese Fighter Squadron (J-6)",
+                classification: UnitClassification.FGT,
+                role: UnitRole.AirSuperiority,
+                side: Side.AI,
+                nationality: Nationality.China,
+                deployedProfile: WeaponType.FGT_J6_CH,
+                mobileProfile: WeaponType.NONE,
+                embarkedProfile: WeaponType.NONE,
+                category: DepotCategory.Secondary,
+                size: DepotSize.Small
+            );
+            ch_j6_fighter_squadron.SetExperienceLevel(ExperienceLevel.Trained);
+            AddTemplate("CH_J6_FIGHTER_SQUADRON", ch_j6_fighter_squadron);
+
+            var ch_towed_aaa_regiment = new CombatUnit(
+                unitName: "Chinese Towed Anti-Aircraft Regiment",
+                classification: UnitClassification.AAA,
+                role: UnitRole.AirDefenseArea,
+                side: Side.AI,
+                nationality: Nationality.China,
+                deployedProfile: WeaponType.AAA_GEN_CH,
+                mobileProfile: WeaponType.TRK_GEN_CH,
+                embarkedProfile: WeaponType.NONE,
+                category: DepotCategory.Secondary,
+                size: DepotSize.Small
+            );
+            ch_towed_aaa_regiment.SetExperienceLevel(ExperienceLevel.Trained);
+            AddTemplate("CH_TOWED_AAA_REGIMENT", ch_towed_aaa_regiment);
+
+            var ch_type83_artillery_regiment = new CombatUnit(
+                unitName: "Chinese Self-Propelled Artillery Regiment (Type 83)",
+                classification: UnitClassification.ART,
+                role: UnitRole.GroundCombat,
+                side: Side.AI,
+                nationality: Nationality.China,
+                deployedProfile: WeaponType.SPA_TYPE83_CH,
+                mobileProfile: WeaponType.NONE,
+                embarkedProfile: WeaponType.NONE,
+                category: DepotCategory.Secondary,
+                size: DepotSize.Small
+            );
+            ch_type83_artillery_regiment.SetExperienceLevel(ExperienceLevel.Trained);
+            AddTemplate("CH_TYPE83_ARTILLERY_REGIMENT", ch_type83_artillery_regiment);
+
+            // Robert, 2026-09-26: crew quality varies by template; all three reuse national profiles.
+            var ch_tank_regiment_type59_second_line = new CombatUnit(
+                unitName: "Chinese Tank Regiment (Type 59, Second Line)",
+                classification: UnitClassification.TANK,
+                role: UnitRole.GroundCombat,
+                side: Side.AI,
+                nationality: Nationality.China,
+                deployedProfile: WeaponType.TANK_TYPE59_CH,
+                mobileProfile: WeaponType.NONE,
+                embarkedProfile: WeaponType.NONE,
+                category: DepotCategory.Secondary,
+                size: DepotSize.Small
+            );
+            ch_tank_regiment_type59_second_line.SetExperienceLevel(ExperienceLevel.Green);
+            AddTemplate("CH_TANK_REGIMENT_TYPE59_SECOND_LINE", ch_tank_regiment_type59_second_line);
+
+            var ch_mot_infantry_regiment_type63_second_line = new CombatUnit(
+                unitName: "Chinese Motorised Infantry Regiment (Type 63, Second Line)",
+                classification: UnitClassification.MOT,
+                role: UnitRole.GroundCombat,
+                side: Side.AI,
+                nationality: Nationality.China,
+                deployedProfile: WeaponType.INF_REG_CH,
+                mobileProfile: WeaponType.APC_TYPE63_CH,
+                embarkedProfile: WeaponType.NONE,
+                category: DepotCategory.Secondary,
+                size: DepotSize.Small
+            );
+            ch_mot_infantry_regiment_type63_second_line.SetExperienceLevel(ExperienceLevel.Raw);
+            AddTemplate("CH_MOT_INFANTRY_REGIMENT_TYPE63_SECOND_LINE", ch_mot_infantry_regiment_type63_second_line);
+
+            var ch_j6_fighter_squadron_second_line = new CombatUnit(
+                unitName: "Chinese Fighter Squadron (J-6, Second Line)",
+                classification: UnitClassification.FGT,
+                role: UnitRole.AirSuperiority,
+                side: Side.AI,
+                nationality: Nationality.China,
+                deployedProfile: WeaponType.FGT_J6_CH,
+                mobileProfile: WeaponType.NONE,
+                embarkedProfile: WeaponType.NONE,
+                category: DepotCategory.Secondary,
+                size: DepotSize.Small
+            );
+            ch_j6_fighter_squadron_second_line.SetExperienceLevel(ExperienceLevel.Green);
+            AddTemplate("CH_J6_FIGHTER_SQUADRON_SECOND_LINE", ch_j6_fighter_squadron_second_line);
         }
 
         #endregion // Chinese Units

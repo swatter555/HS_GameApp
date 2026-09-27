@@ -260,15 +260,15 @@ namespace HammerAndSickle.Models
             new Dictionary<ProfileStat, int>(),
             Plus(new[] { WeaponTrait.NON_COMBATANT }, extraTraits));
 
-        /// <summary>Same S-75 site system for Soviet and Iraqi profiles; national art/census stay separate.</summary>
-        private static ProfileDef S75SiteDef() => new(
+        /// <summary>S-75/HQ-2 site family; national art/census and optional formation traits stay separate.</summary>
+        private static ProfileDef S75SiteDef(params WeaponTrait[] extraTraits) => new(
             FamilyArchetypes.Sam,
             new Dictionary<ProfileStat, int>
             {
                 { ProfileStat.IR, GameData.INDIRECT_RANGE_SAM }, { ProfileStat.MMP, -4 }
             },
             // Retain the ratified towed-SAM lift capabilities; this packet changes no transport rules.
-            new[] { WeaponTrait.SARH_LONG_RANGE, WeaponTrait.AIR_DROPPABLE, WeaponTrait.HELO_TRANSPORTABLE });
+            Plus(new[] { WeaponTrait.SARH_LONG_RANGE, WeaponTrait.AIR_DROPPABLE, WeaponTrait.HELO_TRANSPORTABLE }, extraTraits));
 
         /// <summary>Established Jaguar strike line shared by the French and British national profiles.</summary>
         private static ProfileDef JaguarStrikeDef() => new(
@@ -358,6 +358,7 @@ namespace HammerAndSickle.Models
                 CreateIraqiRosterAdditions();
                 CreateIranianRosterAdditions();
                 CreateChineseProfiles();
+                CreateChineseRosterAdditions();
             }
             catch (Exception e)
             {
@@ -7280,6 +7281,86 @@ namespace HammerAndSickle.Models
             #endregion // Mujahideen Infantry
         }
 
+        /// <summary>Approved Chinese additions; formation quality belongs on deployed equipment only.</summary>
+        private static void CreateChineseRosterAdditions()
+        {
+            // Type 62: smaller 85mm light tank, not an amphibious Type 63 tank or an MBT upgrade.
+            // Authored deltas from Gen1: less penetration/protection, more road mobility. No modern FCS.
+            WeaponProfile TYPE62 = WeaponProfile.FromProfileDef(
+                "Type 62 Light Tank", "Type 62", WeaponType.TANK_TYPE62_CH,
+                new ProfileDef(TankArchetypes.Gen1,
+                    new Dictionary<ProfileStat, int> { { ProfileStat.HA, -1 }, { ProfileStat.HD, -2 },
+                        { ProfileStat.SA, -1 }, { ProfileStat.MMP, 2 } },
+                    new[] { WeaponTrait.LOW_PROFILE, WeaponTrait.SECOND_LINE_FORMATION }),
+                UpgradePath.TANK, 300);
+            TYPE62.SetPrestigeCost(PrestigeTierCost.Gen1, PrestigeTypeCost.TANK);
+            // Existing Chinese tank-regiment scale; lighter carrier support owns no extra infantry.
+            TYPE62.AddIntelReportStat(WeaponType.Personnel, 1050);
+            TYPE62.AddIntelReportStat(WeaponType.TANK_TYPE62_CH, 80);
+            TYPE62.AddIntelReportStat(WeaponType.APC_TYPE63_CH, 40);
+            TYPE62.AddIntelReportStat(WeaponType.SPA_TYPE83_CH, 18);
+            TYPE62.AddIntelReportStat(WeaponType.ART_122MM_FG, 18);
+            TYPE62.AddIntelReportStat(WeaponType.AT_ATGM, 12);
+            TYPE62.AddIntelReportStat(WeaponType.SPAAA_TYPE53_CH, 6);
+            TYPE62.AddIntelReportStat(WeaponType.AAA_20MM, 6);
+            TYPE62.AddIntelReportStat(WeaponType.MANPAD_STRELA, 18);
+            TYPE62.IconProfile = new RegimentIconProfile(RegimentIconType.Single) { Icon = SpriteManager.CH_Type62 };
+            AddProfile(WeaponType.TANK_TYPE62_CH, TYPE62);
+
+            // Early gun-fighter J-6 (MiG-19 lineage), below J-7 speed/engagement quality; no radar-missile trait.
+            WeaponProfile J6 = WeaponProfile.FromProfileDef(
+                "J-6 Fighter", "J-6", WeaponType.FGT_J6_CH,
+                new ProfileDef(FamilyArchetypes.FighterEarly,
+                    new Dictionary<ProfileStat, int> { { ProfileStat.DF, -1 }, { ProfileStat.TS, -2 } },
+                    new[] { WeaponTrait.SECOND_LINE_FORMATION }),
+                UpgradePath.FGT, 312);
+            J6.SetPrestigeCost(PrestigeTierCost.Gen1, PrestigeTypeCost.FGT);
+            J6.AddIntelReportStat(WeaponType.FGT_J6_CH, 36);
+            J6.IconProfile = new RegimentIconProfile(RegimentIconType.Single) { Icon = SpriteManager.CH_J6 };
+            AddProfile(WeaponType.FGT_J6_CH, J6);
+
+            WeaponProfile AAA_CH = WeaponProfile.FromProfileDef(
+                "Chinese Towed Anti-Aircraft Artillery", "PLA Towed AAA", WeaponType.AAA_GEN_CH,
+                TowedAaaDef(WeaponTrait.SECOND_LINE_FORMATION), UpgradePath.AAA, 144);
+            AAA_CH.SetPrestigeCost(PrestigeTierCost.Gen1, PrestigeTypeCost.AAA);
+            AAA_CH.SetMovementMedium(MovementMedium.Foot);
+            AAA_CH.AddIntelReportStat(WeaponType.Personnel, 700);
+            AAA_CH.AddIntelReportStat(WeaponType.AAA_GEN_CH, 36);
+            AAA_CH.AddIntelReportStat(WeaponType.MANPAD_STRELA, 24);
+            AAA_CH.IconProfile = new RegimentIconProfile(RegimentIconType.Single) { Icon = SpriteManager.CH_AAA };
+            AddProfile(WeaponType.AAA_GEN_CH, AAA_CH);
+
+            // HQ-2 is in the S-75 site-SAM family, not the old borrowed S-125. National formation factor only.
+            WeaponProfile HQ2 = WeaponProfile.FromProfileDef(
+                "HQ-2 Surface-to-Air Missile System", "HQ-2", WeaponType.SAM_HQ2_CH,
+                S75SiteDef(WeaponTrait.SECOND_LINE_FORMATION), UpgradePath.SAM, 348);
+            HQ2.SetPrestigeCost(PrestigeTierCost.Gen1, PrestigeTypeCost.SAM);
+            HQ2.SetMovementMedium(MovementMedium.Foot);
+            HQ2.AddIntelReportStat(WeaponType.Personnel, 750);
+            HQ2.AddIntelReportStat(WeaponType.SAM_HQ2_CH, 18);
+            HQ2.AddIntelReportStat(WeaponType.MANPAD_STRELA, 21);
+            HQ2.IconProfile = new RegimentIconProfile(RegimentIconType.Single) { Icon = SpriteManager.CH_HQ2 };
+            AddProfile(WeaponType.SAM_HQ2_CH, HQ2);
+
+            // YW531 tracked/amphibious APC, not the Type 63 light tank. Carrier census stays own-platform only.
+            WeaponProfile TYPE63 = WeaponProfile.FromProfileDef(
+                "Type 63 Armored Personnel Carrier", "Type 63 APC", WeaponType.APC_TYPE63_CH,
+                new ProfileDef(FamilyArchetypes.Apc, new Dictionary<ProfileStat, int>(),
+                    new[] { WeaponTrait.AMPHIBIOUS }), UpgradePath.APC, 348);
+            TYPE63.SetPrestigeCost(PrestigeTierCost.Gen1, PrestigeTypeCost.APC);
+            TYPE63.SetMovementMedium(MovementMedium.Tracked);
+            TYPE63.AddIntelReportStat(WeaponType.APC_TYPE63_CH, 90);
+            TYPE63.IconProfile = new RegimentIconProfile(RegimentIconType.Single) { Icon = SpriteManager.CH_Type63 };
+            AddProfile(WeaponType.APC_TYPE63_CH, TYPE63);
+
+            WeaponProfile TRUCK_CH = WeaponProfile.FromProfileDef(
+                "Chinese Transport Truck", "PLA Truck", WeaponType.TRK_GEN_CH, TransportTruckDef());
+            TRUCK_CH.SetPrestigeCost(PrestigeTierCost.Gen1, PrestigeTypeCost.TRK);
+            TRUCK_CH.IconProfile = new RegimentIconProfile(RegimentIconType.Single) { Icon = SpriteManager.CH_Truck };
+            AddProfile(WeaponType.TRK_GEN_CH, TRUCK_CH);
+        }
+
+
         /// <summary>
         /// Add Chinese WeaponProfiles.
         /// </summary>
@@ -7335,12 +7416,13 @@ namespace HammerAndSickle.Models
             //----------------------------------------------
 
             //----------------------------------------------
-            // Chinese Type 80 Main Battle Tank
+            // Chinese Type 88 Main Battle Tank (stable TANK_TYPE80_CH key)
             //----------------------------------------------
-            // Phase 3 (final-intent): Type 80 (105mm rifled, China's first modern MBT) = Gen2 + LASER_RANGEFINDER
-            // (basic FCS, no thermal). → HA10 HD8 SA7 SD6 GAD7 · ICM 0.945 (LRF 1.05 × second line 0.9) · MMP10 · SR2.
+            // Type 88 (105mm rifled) = Gen2 + LASER_RANGEFINDER. Robert approved display-only correction;
+            // keep the existing Type80 key/art and availability. Basic FCS, no thermal.
+            // → HA10 HD8 SA7 SD6 GAD7 · ICM 0.945 (LRF 1.05 × second line 0.9) · MMP10 · SR2.
             WeaponProfile TYPE80 = WeaponProfile.FromProfileDef(
-                "Type 80 Main Battle Tank", "Type 80", WeaponType.TANK_TYPE80_CH,
+                "Type 88 Main Battle Tank", "Type 88", WeaponType.TANK_TYPE80_CH,
                 new ProfileDef(TankArchetypes.Gen2,
                     new Dictionary<ProfileStat, int>(),
                     new[] { WeaponTrait.LASER_RANGEFINDER, WeaponTrait.SECOND_LINE_FORMATION }),
@@ -7366,10 +7448,10 @@ namespace HammerAndSickle.Models
                 Icon = SpriteManager.CH_Type80
             };
 
-            // Add the Type 80 profile to the database
+            // Retain the historical key for Type 88 so existing persisted selections keep resolving.
             AddProfile(WeaponType.TANK_TYPE80_CH, TYPE80);
             //----------------------------------------------
-            // Chinese Type 80 Main Battle Tank
+            // Chinese Type 88 Main Battle Tank (stable TANK_TYPE80_CH key)
             //----------------------------------------------
 
             #endregion // MBTs
@@ -7413,12 +7495,12 @@ namespace HammerAndSickle.Models
             #region Artillery
 
             //----------------------------------------------
-            // Chinese Type 82 Self-Propelled Howitzer
+            // Chinese Type 83 Self-Propelled Howitzer
             //----------------------------------------------
             // Phase 3 (derived): Artillery + SELF_PROPELLED (tracked chassis: MMP+6→10, HD/SD+2, GAD-1) + IR MEDIUM.
-            // 122mm tracked SP howitzer, the Soviet 2S1 analogue. → HA5 HD7 SA9 SD7 GAD7 · MMP10 · IR MEDIUM.
+            // 152mm tracked SP howitzer with a 2S3-like layout; retain the existing authored ratings. → HA5 HD7 SA9 SD7 GAD7 · MMP10 · IR MEDIUM.
             WeaponProfile SPA_TYPE83_CH = WeaponProfile.FromProfileDef(
-                "Type 82 Self-Propelled Howitzer", "Type 82", WeaponType.SPA_TYPE83_CH,
+                "Type 83 Self-Propelled Howitzer", "Type 83", WeaponType.SPA_TYPE83_CH,
                 new ProfileDef(FamilyArchetypes.Artillery,
                     new Dictionary<ProfileStat, int> { { ProfileStat.IR, GameData.INDIRECT_RANGE_MEDIUM } },
                     new[] { WeaponTrait.SELF_PROPELLED, WeaponTrait.SECOND_LINE_FORMATION }),
@@ -7441,12 +7523,12 @@ namespace HammerAndSickle.Models
                 Icon = SpriteManager.CH_Type83
             };
 
-            // Add the Type 82 profile to the database
+            // Add the Type 83 profile to the database
             // Towed vs self-propelled: the artillery/AAA/SAM families hold both, so medium is per profile.
             SPA_TYPE83_CH.SetMovementMedium(MovementMedium.Tracked);
             AddProfile(WeaponType.SPA_TYPE83_CH, SPA_TYPE83_CH);
             //----------------------------------------------
-            // Chinese Type 82 Self-Propelled Howitzer
+            // Chinese Type 83 Self-Propelled Howitzer
             //----------------------------------------------
 
             //----------------------------------------------
@@ -7597,8 +7679,8 @@ namespace HammerAndSickle.Models
             //----------------------------------------------
             // Chinese HQ-7 Self-Propelled SAM
             //----------------------------------------------
-            // Phase 3 (derived): Sam archetype (air-only) + SELF_PROPELLED (tracked) + COMMAND_GUIDANCE (Crotale-class
-            // CLOS, GAT+2) + MOBILE_SHOOT_SCOOT (relocate after firing) + IR SHORT. Tracked mobile point-defence SAM.
+            // Phase 3 (derived): Sam archetype (air-only) + SELF_PROPELLED (wheeled) + COMMAND_GUIDANCE (Crotale-class
+            // CLOS, GAT+2) + MOBILE_SHOOT_SCOOT (relocate after firing) + IR SHORT. Wheeled mobile point-defence SAM.
             // IR SAM→SHORT 2026-08-22 (Bob): rides with the NATO point-defense band — it IS a Crotale clone (~12 km).
             // → HA1 HD5 SA1 SD5 GAD7 GAT14 · MMP10 · IR4 · SR6 · shoot-scoot.
             WeaponProfile HQ7 = WeaponProfile.FromProfileDef(
@@ -7637,34 +7719,34 @@ namespace HammerAndSickle.Models
             #region Helicopters
 
             //----------------------------------------------
-            // Chinese H-9 Attack Helicopter
+            // Chinese Z-9 Attack Helicopter
             //----------------------------------------------
             // Phase 3 (derived): Helicopter + ATGM_HELO_SACLOS (HJ-8 SACLOS missiles, HA+4). Light Z-9-class AT helo —
             // unarmoured, no heavy cannon, so it sits below the armoured Hind. → HA11 HD6 SA10 SD7 GAD10 · ICM 0.90 (second line) · MMP24 · SR3.
-            WeaponProfile H9 = WeaponProfile.FromProfileDef(
-                "H-9 Attack Helicopter", "H-9", WeaponType.HEL_Z9_CH,
+            WeaponProfile Z9 = WeaponProfile.FromProfileDef(
+                "Z-9 Attack Helicopter", "Z-9", WeaponType.HEL_Z9_CH,
                 new ProfileDef(FamilyArchetypes.Helicopter,
                     new Dictionary<ProfileStat, int>(),
                     new[] { WeaponTrait.ATGM_HELO_SACLOS, WeaponTrait.SECOND_LINE_FORMATION }),
                 UpgradePath.HEL, 528);
 
             // Set the prestige cost for the profile.
-            H9.SetPrestigeCost(PrestigeTierCost.Gen2, PrestigeTypeCost.HEL);
+            Z9.SetPrestigeCost(PrestigeTierCost.Gen2, PrestigeTypeCost.HEL);
 
             // Intel stats
-            H9.AddIntelReportStat(WeaponType.Personnel,       475);
-            H9.AddIntelReportStat(WeaponType.HEL_Z9_CH,           54);
+            Z9.AddIntelReportStat(WeaponType.Personnel,       475);
+            Z9.AddIntelReportStat(WeaponType.HEL_Z9_CH,           54);
 
             // Handle the icon profile.
-            H9.IconProfile = new RegimentIconProfile(RegimentIconType.Helo_Animation)
+            Z9.IconProfile = new RegimentIconProfile(RegimentIconType.Helo_Animation)
             {
                 Icon = SpriteManager.CH_Z9_Frame0
             };
 
-            // Add the H-9 profile to the database
-            AddProfile(WeaponType.HEL_Z9_CH, H9);
+            // Add the Z-9 profile to the database
+            AddProfile(WeaponType.HEL_Z9_CH, Z9);
             //----------------------------------------------
-            // Chinese H-9 Attack Helicopter
+            // Chinese Z-9 Attack Helicopter
             //----------------------------------------------
 
             #endregion // Helicopters
@@ -7810,7 +7892,7 @@ namespace HammerAndSickle.Models
                     new[] { WeaponTrait.RPG_LAW, WeaponTrait.MANPADS_BASIC, WeaponTrait.SECOND_LINE_FORMATION }));
 
             // Intel stats
-            INF_REG_CH_P.AddIntelReportStat(WeaponType.Personnel,       2200);
+            INF_REG_CH_P.AddIntelReportStat(WeaponType.Personnel,       2900);
             // Organic tank battalion (census pass 2026-08-13, Bob-approved): moved off the stripped
             // Type 86 carrier (rule 2). ⚠ Shared by mech and leg templates — same P4 caveat as
             // INF_REG_IQ/IR.

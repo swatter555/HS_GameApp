@@ -40,6 +40,40 @@ namespace HammerAndSickle.Tests
             Assert.AreEqual(TargetClass.Soft, BuildUnit(UnitClassification.INF, WeaponType.INF_REG_SV).ActiveTargetClass, "INF = Soft");
         }
 
+        [Test]
+        public void CreateUnitFromTemplate_PreservesEveryCatalogCrewLevelAndStartingXp()
+        {
+            if (!CombatUnitDB.IsInitialized) CombatUnitDB.Initialize();
+            foreach (var id in CombatUnitDB.GetAllTemplateIds())
+            {
+                var template = CombatUnitDB.GetUnitTemplate(id);
+                var unit = CombatUnitDB.CreateUnitFromTemplate(id, "Template crew test");
+                Assert.That(unit, Is.Not.Null, id);
+                Assert.That(unit.UnitID, Is.Not.EqualTo(template.UnitID), id);
+                Assert.That(unit.ExperienceLevel, Is.EqualTo(template.ExperienceLevel), id);
+                Assert.That(unit.ExperiencePoints, Is.EqualTo(template.ExperiencePoints), id);
+                unit.AddExperience(1);
+                Assert.That(unit.ExperienceLevel, Is.EqualTo(template.ExperienceLevel),
+                    id + ": the first XP award must not downgrade an authored crew.");
+            }
+        }
+
+        [Test]
+        public void TemplateClone_RetainsCrewLevel_WithoutCopyingEarnedXpOrDamage()
+        {
+            var source = BuildUnit(UnitClassification.TANK, WeaponType.TANK_T55A_SV);
+            source.SetExperienceLevel(ExperienceLevel.Green);
+            source.AddExperience(10);
+            source.HitPoints.SetCurrent(10);
+
+            var clone = source.CreateTemplateClone();
+            Assert.That(clone.ExperienceLevel, Is.EqualTo(ExperienceLevel.Green));
+            Assert.That(clone.ExperiencePoints, Is.EqualTo((int)ExperiencePointLevels.Green));
+            Assert.That(clone.HitPoints.Current, Is.EqualTo(GameData.MAX_HP));
+            Assert.That(source.ExperiencePoints, Is.EqualTo((int)ExperiencePointLevels.Green + 10));
+            Assert.That(source.HitPoints.Current, Is.EqualTo(10));
+        }
+
         /// <summary>
         /// §18.3.1 (prestige pass 2026-08-22): PurchaseCost = Σ populated bays, independent of the
         /// unit's current posture — the V19 kill-bounty and §18.4.1 replacement basis. A single-bay
