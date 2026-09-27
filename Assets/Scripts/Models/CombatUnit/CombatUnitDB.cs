@@ -3897,11 +3897,9 @@ namespace HammerAndSickle.Models
         /// Create Netherlands forces - 1 (NL) Corps, NORTHAG's northern sector.
         /// </summary>
         /// <remarks>
-        /// ⚠ NATIONALITY IS THE ONLY PLACE THE NATION LIVES ON A TEMPLATE. Every profile below is
-        /// either a Lowlands profile (Leopard 1, infantry, M113 carrier) or a shared Western one
-        /// (ART_HEAVY_NATO, RCN_FV105_UK, SAM_HAWK_US, FGT_F16_US) — see CreateLowlandsProfiles for
-        /// why only seven tokens were minted. The flag, national symbol and NATO-blue icon base all
-        /// resolve from Nationality.NE, so these read as Dutch on the map regardless.
+        /// Nationality owns the flag/base; each equipment profile owns its vehicle art and census.
+        /// The 2026-09-26 expansion assigns YPR-765, M113 C&V, PRTL and the shared NATO F-16
+        /// explicitly to Dutch templates. Shared art does not imply universal national availability.
         /// </remarks>
         public static void CreateDutchForces()
         {
@@ -3937,7 +3935,7 @@ namespace HammerAndSickle.Models
                 side: Side.AI,
                 nationality: Nationality.NE,
                 deployedProfile: WeaponType.INF_MECH_NL,
-                mobileProfile: WeaponType.APC_M113_NATO,
+                mobileProfile: WeaponType.IFV_YPR765_NATO,
                 embarkedProfile: WeaponType.NONE,
                 category: DepotCategory.Secondary,
                 size: DepotSize.Small
@@ -3977,12 +3975,12 @@ namespace HammerAndSickle.Models
             #region NL Recon Unit
 
             var nl_recon_unit = new CombatUnit(
-                unitName: "NL Recon Unit",
+                unitName: "NL Recon Unit (M113 C&V)",
                 classification: UnitClassification.RECON,
                 role: UnitRole.GroundCombat,
                 side: Side.AI,
                 nationality: Nationality.NE,
-                deployedProfile: WeaponType.RCN_FV105_UK,
+                deployedProfile: WeaponType.RCN_M113CV_NATO,
                 mobileProfile: WeaponType.NONE,
                 embarkedProfile: WeaponType.NONE,
                 category: DepotCategory.Secondary,
@@ -3999,9 +3997,8 @@ namespace HammerAndSickle.Models
 
             #region NL Air Defence Regiment (Cheetah)
 
-            // Reuses SPAAA_GEPARD_GE: the PRTL Cheetah is a Gepard turret on a Leopard 1 hull, so this
-            // is the same vehicle, and reusing it follows the SAM_HAWK_US precedent. Gepard's medium is
-            // Tracked, so the Mobile bay is closed by physics and mobileProfile is correctly NONE.
+            // PRTL now owns its Dutch radar artwork and national support census. The tracked
+            // self-propelled platform closes Mobile; the separate Hawk keeps its truck and site role.
             //
             // ⚠ SPAAA IS LOAD-BEARING, NOT FLAVOUR. GameData.IsAirDefenseClassification admits
             // SAM/SPSAM/AAA/SPAAA and nothing else, so this is what lets the Dutch sector put ranged
@@ -4013,7 +4010,7 @@ namespace HammerAndSickle.Models
                 role: UnitRole.AirDefenseArea,
                 side: Side.AI,
                 nationality: Nationality.NE,
-                deployedProfile: WeaponType.SPAAA_GEPARD_GE,
+                deployedProfile: WeaponType.SPAAA_PRTL_NATO,
                 mobileProfile: WeaponType.NONE,
                 embarkedProfile: WeaponType.NONE,
                 category: DepotCategory.Secondary,
@@ -4062,7 +4059,7 @@ namespace HammerAndSickle.Models
                 role: UnitRole.AirSuperiority,
                 side: Side.AI,
                 nationality: Nationality.NE,
-                deployedProfile: WeaponType.FGT_F16_US,
+                deployedProfile: WeaponType.FGT_F16_NATO,
                 mobileProfile: WeaponType.NONE,
                 embarkedProfile: WeaponType.NONE,
                 category: DepotCategory.Secondary,
@@ -4076,6 +4073,66 @@ namespace HammerAndSickle.Models
             AddTemplate("NL_F16_FIGHTER_SQUADRON", nl_f16_squadron);
 
             #endregion // NL F-16 Fighter Squadron
+
+            var nl_armoured_infantry_brigade_m113 = new CombatUnit(
+                unitName: "NL Armoured Infantry Brigade (M113)",
+                classification: UnitClassification.MECH,
+                role: UnitRole.GroundCombat,
+                side: Side.AI,
+                nationality: Nationality.NE,
+                deployedProfile: WeaponType.INF_MECH_NL,
+                mobileProfile: WeaponType.APC_M113_NATO,
+                embarkedProfile: WeaponType.NONE,
+                category: DepotCategory.Secondary,
+                size: DepotSize.Small
+            );
+            nl_armoured_infantry_brigade_m113.SetExperienceLevel(ExperienceLevel.Experienced);
+            AddTemplate("NL_ARMOURED_INFANTRY_BRIGADE_M113", nl_armoured_infantry_brigade_m113);
+
+            var nl_m109_artillery_regiment = new CombatUnit(
+                unitName: "NL M109 Artillery Regiment",
+                classification: UnitClassification.SPA,
+                role: UnitRole.GroundCombatIndirect,
+                side: Side.AI,
+                nationality: Nationality.NE,
+                deployedProfile: WeaponType.SPA_M109_NATO,
+                mobileProfile: WeaponType.NONE,
+                embarkedProfile: WeaponType.NONE,
+                category: DepotCategory.Secondary,
+                size: DepotSize.Small
+            );
+            nl_m109_artillery_regiment.SetExperienceLevel(ExperienceLevel.Experienced);
+            AddTemplate("NL_M109_ARTILLERY_REGIMENT", nl_m109_artillery_regiment);
+
+            var nl_light_artillery_regiment = new CombatUnit(
+                unitName: "NL Light Towed Artillery Regiment",
+                classification: UnitClassification.ART,
+                role: UnitRole.GroundCombatIndirect,
+                side: Side.AI,
+                nationality: Nationality.NE,
+                deployedProfile: WeaponType.ART_LIGHT_NATO,
+                mobileProfile: WeaponType.TRK_GEN_NATO,
+                embarkedProfile: WeaponType.NONE,
+                category: DepotCategory.Secondary,
+                size: DepotSize.Small
+            );
+            nl_light_artillery_regiment.SetExperienceLevel(ExperienceLevel.Experienced);
+            AddTemplate("NL_LIGHT_ARTILLERY_REGIMENT", nl_light_artillery_regiment);
+
+            var nl_towed_aaa_regiment = new CombatUnit(
+                unitName: "NL Towed Anti-Aircraft Regiment",
+                classification: UnitClassification.AAA,
+                role: UnitRole.AirDefenseArea,
+                side: Side.AI,
+                nationality: Nationality.NE,
+                deployedProfile: WeaponType.AAA_GEN_NATO,
+                mobileProfile: WeaponType.TRK_GEN_NATO,
+                embarkedProfile: WeaponType.NONE,
+                category: DepotCategory.Secondary,
+                size: DepotSize.Small
+            );
+            nl_towed_aaa_regiment.SetExperienceLevel(ExperienceLevel.Experienced);
+            AddTemplate("NL_TOWED_AAA_REGIMENT", nl_towed_aaa_regiment);
         }
 
         /// <summary>
@@ -4120,7 +4177,7 @@ namespace HammerAndSickle.Models
                 side: Side.AI,
                 nationality: Nationality.BE,
                 deployedProfile: WeaponType.INF_MECH_BE,
-                mobileProfile: WeaponType.APC_M113_NATO,
+                mobileProfile: WeaponType.IFV_YPR765_NATO,
                 embarkedProfile: WeaponType.NONE,
                 category: DepotCategory.Secondary,
                 size: DepotSize.Small
@@ -4208,6 +4265,66 @@ namespace HammerAndSickle.Models
             AddTemplate("BE_AIR_DEFENSE_REGIMENT", be_air_defense_regiment);
 
             #endregion // BE Air Defence Regiment
+
+            var be_mech_infantry_brigade_m113 = new CombatUnit(
+                unitName: "BE Mechanised Infantry Brigade (M113)",
+                classification: UnitClassification.MECH,
+                role: UnitRole.GroundCombat,
+                side: Side.AI,
+                nationality: Nationality.BE,
+                deployedProfile: WeaponType.INF_MECH_BE,
+                mobileProfile: WeaponType.APC_M113_NATO,
+                embarkedProfile: WeaponType.NONE,
+                category: DepotCategory.Secondary,
+                size: DepotSize.Small
+            );
+            be_mech_infantry_brigade_m113.SetExperienceLevel(ExperienceLevel.Trained);
+            AddTemplate("BE_MECH_INFANTRY_BRIGADE_M113", be_mech_infantry_brigade_m113);
+
+            var be_m109_artillery_regiment = new CombatUnit(
+                unitName: "BE M109 Artillery Regiment",
+                classification: UnitClassification.SPA,
+                role: UnitRole.GroundCombatIndirect,
+                side: Side.AI,
+                nationality: Nationality.BE,
+                deployedProfile: WeaponType.SPA_M109_NATO,
+                mobileProfile: WeaponType.NONE,
+                embarkedProfile: WeaponType.NONE,
+                category: DepotCategory.Secondary,
+                size: DepotSize.Small
+            );
+            be_m109_artillery_regiment.SetExperienceLevel(ExperienceLevel.Trained);
+            AddTemplate("BE_M109_ARTILLERY_REGIMENT", be_m109_artillery_regiment);
+
+            var be_light_artillery_regiment = new CombatUnit(
+                unitName: "BE Light Towed Artillery Regiment",
+                classification: UnitClassification.ART,
+                role: UnitRole.GroundCombatIndirect,
+                side: Side.AI,
+                nationality: Nationality.BE,
+                deployedProfile: WeaponType.ART_LIGHT_NATO,
+                mobileProfile: WeaponType.TRK_GEN_NATO,
+                embarkedProfile: WeaponType.NONE,
+                category: DepotCategory.Secondary,
+                size: DepotSize.Small
+            );
+            be_light_artillery_regiment.SetExperienceLevel(ExperienceLevel.Trained);
+            AddTemplate("BE_LIGHT_ARTILLERY_REGIMENT", be_light_artillery_regiment);
+
+            var be_towed_aaa_regiment = new CombatUnit(
+                unitName: "BE Towed Anti-Aircraft Regiment",
+                classification: UnitClassification.AAA,
+                role: UnitRole.AirDefenseArea,
+                side: Side.AI,
+                nationality: Nationality.BE,
+                deployedProfile: WeaponType.AAA_GEN_NATO,
+                mobileProfile: WeaponType.TRK_GEN_NATO,
+                embarkedProfile: WeaponType.NONE,
+                category: DepotCategory.Secondary,
+                size: DepotSize.Small
+            );
+            be_towed_aaa_regiment.SetExperienceLevel(ExperienceLevel.Trained);
+            AddTemplate("BE_TOWED_AAA_REGIMENT", be_towed_aaa_regiment);
         }
 
         /// <summary>
@@ -4315,6 +4432,51 @@ namespace HammerAndSickle.Models
             AddTemplate("DK_RECON_UNIT", dk_recon_unit);
 
             #endregion // DK Recon Unit
+
+            var dk_centurion_brigade = new CombatUnit(
+                unitName: "DK Armoured Brigade (Centurion Mk 5/2)",
+                classification: UnitClassification.TANK,
+                role: UnitRole.GroundCombat,
+                side: Side.AI,
+                nationality: Nationality.DE,
+                deployedProfile: WeaponType.TANK_CENTURION_NATO,
+                mobileProfile: WeaponType.NONE,
+                embarkedProfile: WeaponType.NONE,
+                category: DepotCategory.Secondary,
+                size: DepotSize.Small
+            );
+            dk_centurion_brigade.SetExperienceLevel(ExperienceLevel.Experienced);
+            AddTemplate("DK_CENTURION_BRIGADE", dk_centurion_brigade);
+
+            var dk_m109_artillery_regiment = new CombatUnit(
+                unitName: "DK M109 Artillery Regiment",
+                classification: UnitClassification.SPA,
+                role: UnitRole.GroundCombatIndirect,
+                side: Side.AI,
+                nationality: Nationality.DE,
+                deployedProfile: WeaponType.SPA_M109_NATO,
+                mobileProfile: WeaponType.NONE,
+                embarkedProfile: WeaponType.NONE,
+                category: DepotCategory.Secondary,
+                size: DepotSize.Small
+            );
+            dk_m109_artillery_regiment.SetExperienceLevel(ExperienceLevel.Experienced);
+            AddTemplate("DK_M109_ARTILLERY_REGIMENT", dk_m109_artillery_regiment);
+
+            var dk_light_artillery_regiment = new CombatUnit(
+                unitName: "DK Light Towed Artillery Regiment",
+                classification: UnitClassification.ART,
+                role: UnitRole.GroundCombatIndirect,
+                side: Side.AI,
+                nationality: Nationality.DE,
+                deployedProfile: WeaponType.ART_LIGHT_NATO,
+                mobileProfile: WeaponType.TRK_GEN_NATO,
+                embarkedProfile: WeaponType.NONE,
+                category: DepotCategory.Secondary,
+                size: DepotSize.Small
+            );
+            dk_light_artillery_regiment.SetExperienceLevel(ExperienceLevel.Experienced);
+            AddTemplate("DK_LIGHT_ARTILLERY_REGIMENT", dk_light_artillery_regiment);
         }
 
         #endregion // Lowlands Units

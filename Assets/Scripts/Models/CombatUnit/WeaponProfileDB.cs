@@ -302,6 +302,25 @@ namespace HammerAndSickle.Models
             return combined;
         }
 
+        /// <summary>Established conventional NATO M109 combat line; art, census and dates remain profile-owned.</summary>
+        private static ProfileDef NatoM109Def() => new(
+            FamilyArchetypes.Artillery,
+            new Dictionary<ProfileStat, int> { { ProfileStat.SA, 1 }, { ProfileStat.IR, GameData.INDIRECT_RANGE_MEDIUM } },
+            new[] { WeaponTrait.SELF_PROPELLED, WeaponTrait.FIRE_DIRECTION_NET });
+
+        /// <summary>Established F-16 multirole combat line; art, census and dates remain profile-owned.</summary>
+        private static ProfileDef F16MultiroleDef() => new(
+            FamilyArchetypes.FighterMid,
+            new Dictionary<ProfileStat, int> { { ProfileStat.TS, 1 } },
+            new[] { WeaponTrait.AGILE_AIRFRAME, WeaponTrait.BVR_RADAR_MISSILE, WeaponTrait.LOOKDOWN_SHOOTDOWN,
+                    WeaponTrait.RWR, WeaponTrait.CHAFF_FLARE, WeaponTrait.MULTIROLE_STRIKE, WeaponTrait.AT_GUIDED_AIR });
+
+        /// <summary>Established radar-directed self-propelled AAA combat line; art, census and dates remain profile-owned.</summary>
+        private static ProfileDef RadarSpAaaDef() => new(
+            FamilyArchetypes.Aaa,
+            new Dictionary<ProfileStat, int> { { ProfileStat.IR, GameData.INDIRECT_RANGE_SHORT } },
+            new[] { WeaponTrait.SELF_PROPELLED, WeaponTrait.RADAR_GUIDED_GUN });
+
         #endregion // Commodity Profile Blueprints
 
         #region Private Methods
@@ -321,6 +340,7 @@ namespace HammerAndSickle.Models
                 CreateBritishRosterAdditions();
                 CreateGermanRosterAdditions();
                 CreateLowlandsProfiles();
+                CreateGenericNatoRosterAdditions();
                 CreateArabProfiles();
                 CreateIraqiRosterAdditions();
                 CreateIranianRosterAdditions();
@@ -3570,9 +3590,7 @@ namespace HammerAndSickle.Models
             // → HA5 HD7 SA10 SD7 GAD7 · ICM 1.05 · MMP10 · IR5.
             WeaponProfile M109_GE = WeaponProfile.FromProfileDef(
                 "M109 Self-Propelled Artillery", "M109", WeaponType.SPA_M109_GE,
-                new ProfileDef(FamilyArchetypes.Artillery,
-                    new Dictionary<ProfileStat, int> { { ProfileStat.SA, 1 }, { ProfileStat.IR, GameData.INDIRECT_RANGE_MEDIUM } },
-                    new[] { WeaponTrait.SELF_PROPELLED, WeaponTrait.FIRE_DIRECTION_NET }),
+                NatoM109Def(),
                 UpgradePath.ART, 300);
 
             // Set the prestige cost for the profile.
@@ -3646,9 +3664,7 @@ namespace HammerAndSickle.Models
             // + FIRE_DIRECTION_NET (artillery ruling 9, 2026-08-22) → ICM 1.05.
             WeaponProfile M109_UK = WeaponProfile.FromProfileDef(
                 "M109 Self-Propelled Artillery", "M109", WeaponType.SPA_M109_UK,
-                new ProfileDef(FamilyArchetypes.Artillery,
-                    new Dictionary<ProfileStat, int> { { ProfileStat.SA, 1 }, { ProfileStat.IR, GameData.INDIRECT_RANGE_MEDIUM } },
-                    new[] { WeaponTrait.SELF_PROPELLED, WeaponTrait.FIRE_DIRECTION_NET }),
+                NatoM109Def(),
                 UpgradePath.ART, 300);
 
             // Set the prestige cost for the profile.
@@ -3904,9 +3920,7 @@ namespace HammerAndSickle.Models
             // → HA4 HD6 SA9 SD8 GAD11 · GAT13 · MMP10 · IR4 · SR3. SPAAA gun (dual-role) — classification corrected 2026-06-18.
             WeaponProfile Gepard_GE = WeaponProfile.FromProfileDef(
                 "Flakpanzer Gepard Self-Propelled Anti-Aircraft Gun", "Gepard", WeaponType.SPAAA_GEPARD_GE,
-                new ProfileDef(FamilyArchetypes.Aaa,
-                    new Dictionary<ProfileStat, int> { { ProfileStat.IR, GameData.INDIRECT_RANGE_SHORT } },
-                    new[] { WeaponTrait.SELF_PROPELLED, WeaponTrait.RADAR_GUIDED_GUN }),
+                RadarSpAaaDef(),
                 UpgradePath.AAA, 456);
 
             // Set the prestige cost for the profile.
@@ -4418,10 +4432,7 @@ namespace HammerAndSickle.Models
             // Agile multirole; NATO avionics edge shows as ICM, not raw DF. → DF12 MAN13 TS11 SUR9 · ICM 1.10 · GA9 OL6 · SR4.
             WeaponProfile F16 = WeaponProfile.FromProfileDef(
                 "F-16 Fighting Falcon Multi-Role Fighter", "F-16 Falcon", WeaponType.FGT_F16_US,
-                new ProfileDef(FamilyArchetypes.FighterMid,
-                    new Dictionary<ProfileStat, int> { { ProfileStat.TS, 1 } },
-                    new[] { WeaponTrait.AGILE_AIRFRAME, WeaponTrait.BVR_RADAR_MISSILE, WeaponTrait.LOOKDOWN_SHOOTDOWN,
-                            WeaponTrait.RWR, WeaponTrait.CHAFF_FLARE, WeaponTrait.MULTIROLE_STRIKE, WeaponTrait.AT_GUIDED_AIR }),
+                F16MultiroleDef(),
                 UpgradePath.FGT, 480);
 
             // Set the prestige cost for the profile.
@@ -5595,19 +5606,12 @@ namespace HammerAndSickle.Models
         }
 
         /// <summary>
-        /// Add Lowlands WeaponProfiles (Netherlands, Belgium, Denmark).
+        /// Add national Lowlands tank/infantry profiles and the shared M113 carrier.
         /// </summary>
         /// <remarks>
-        /// NORTHAG's northern-sector contingents. SEVEN profiles only, and the restraint is the design:
-        /// a census is a property of the PROFILE, never of the unit template, so a nation earns its own
-        /// profile exactly where that profile's census IS its brigade roster — the armoured brigade and
-        /// the mechanised brigade. Artillery, recon, air defence and air units for all three nations
-        /// reuse ART_HEAVY_NATO / RCN_FV105_UK / SAM_HAWK_US / FGT_F16_US rather than minting twelve
-        /// more names the scenario editor must mirror forever (Bob's call, 2026-08-12).
-        ///
-        /// All three Leopard 1s resolve to an IDENTICAL stat line — same archetype, deltas, traits and
-        /// price as LEO1_GE. That is deliberate: it is the same tank in four armies, and national
-        /// character lives in the census, the template ExperienceLevel and the map icon's nationality.
+        /// National tank/infantry censuses and experience remain distinct. The approved 2026-09-23
+        /// expansion supplies shared NATO equipment where art is shared; it does not grant every
+        /// nation every platform. Existing Leopard combat definitions and prices are preserved.
         /// </remarks>
         private static void CreateLowlandsProfiles()
         {
@@ -5633,11 +5637,11 @@ namespace HammerAndSickle.Models
             // Intel stats: NL Armoured Brigade (1 (NL) Corps) - 2x tank bn + 1x armoured infantry bn
             LEO1_NL.AddIntelReportStat(WeaponType.Personnel,          2000);
             LEO1_NL.AddIntelReportStat(WeaponType.TANK_LEOPARD1_NL,     84);  // 2x tank BN (42 each)
-            LEO1_NL.AddIntelReportStat(WeaponType.APC_M113_NATO,        60);  // YPR-765 armoured infantry bn
-            LEO1_NL.AddIntelReportStat(WeaponType.RCN_FV105_UK,         12);  // Brigade recon squadron
+            LEO1_NL.AddIntelReportStat(WeaponType.IFV_YPR765_NATO,        60);  // YPR-765 armoured infantry bn
+            LEO1_NL.AddIntelReportStat(WeaponType.RCN_M113CV_NATO,         12);  // Brigade recon squadron
             LEO1_NL.AddIntelReportStat(WeaponType.AT_ATGM,              24);  // TOW/Dragon AT teams
             LEO1_NL.AddIntelReportStat(WeaponType.MANPAD_STINGER,       18);  // Stinger sections
-            LEO1_NL.AddIntelReportStat(WeaponType.SPA_M109_US,          18);  // Organic 155mm SP battalion
+            LEO1_NL.AddIntelReportStat(WeaponType.SPA_M109_NATO,          18);  // Organic 155mm SP battalion
             LEO1_NL.AddIntelReportStat(WeaponType.ART_120MM_MORTAR,     12);  // 120mm mortars
 
             // Handle the icon profile.
@@ -5669,11 +5673,11 @@ namespace HammerAndSickle.Models
             // Intel stats: BE Armoured Brigade (I (BE) Corps, 16th Armoured Division)
             LEO1_BE.AddIntelReportStat(WeaponType.Personnel,          1900);
             LEO1_BE.AddIntelReportStat(WeaponType.TANK_LEOPARD1_BE,     72);  // 2x tank BN (36 each)
-            LEO1_BE.AddIntelReportStat(WeaponType.APC_M113_NATO,        55);  // AIFV armoured infantry bn
+            LEO1_BE.AddIntelReportStat(WeaponType.IFV_YPR765_NATO,        55);  // AIFV armoured infantry bn
             LEO1_BE.AddIntelReportStat(WeaponType.RCN_FV105_UK,         12);  // Scimitar recon squadron
             LEO1_BE.AddIntelReportStat(WeaponType.AT_ATGM,              20);  // MILAN AT teams
             LEO1_BE.AddIntelReportStat(WeaponType.MANPAD_MISTRAL,       16);  // Mistral/Blowpipe sections
-            LEO1_BE.AddIntelReportStat(WeaponType.SPA_M109_US,          18);  // Organic 155mm SP battalion
+            LEO1_BE.AddIntelReportStat(WeaponType.SPA_M109_NATO,          18);  // Organic 155mm SP battalion
             LEO1_BE.AddIntelReportStat(WeaponType.ART_120MM_MORTAR,     12);  // 120mm mortars
 
             // Handle the icon profile.
@@ -5709,7 +5713,7 @@ namespace HammerAndSickle.Models
             LEO1_DK.AddIntelReportStat(WeaponType.RCN_FV105_UK,         10);  // Brigade recon troop
             LEO1_DK.AddIntelReportStat(WeaponType.AT_ATGM,              24);  // TOW AT company
             LEO1_DK.AddIntelReportStat(WeaponType.MANPAD_STINGER,       12);  // Stinger sections
-            LEO1_DK.AddIntelReportStat(WeaponType.SPA_M109_US,          12);  // Organic 155mm SP battery
+            LEO1_DK.AddIntelReportStat(WeaponType.SPA_M109_NATO,          12);  // Organic 155mm SP battery
             LEO1_DK.AddIntelReportStat(WeaponType.ART_120MM_MORTAR,     12);  // 120mm mortars
 
             // Handle the icon profile.
@@ -5731,17 +5735,9 @@ namespace HammerAndSickle.Models
             //----------------------------------------------
             // Lowlands M113-family Armoured Personnel Carrier
             //----------------------------------------------
-            // Bare Apc archetype (tracked, .50-cal only) — stands for the Dutch YPR-765, the Belgian
-            // AIFV and the Danish M113 alike, all M113 derivatives.
-            // → HA3 HD4 SA6 SD7 GAD7 · ICM 1.00 · MMP8 · SR2.
-            //
-            // ⚠ THIS EXISTS BECAUSE APC_M113_US COULD NOT BE REUSED. That profile's census carries 58
-            // M1 Abrams, 32 Bradleys and 18 M3s — a whole US armoured brigade riding on the carrier —
-            // so a Lowlands brigade mounted on it would report 58 Abrams in Dutch service. This census
-            // lists ONLY the carrier's own vehicles, which is what a carrier census should ever hold:
-            // EquipmentBays.BuildIntelStats SUMS Deployed + Mobile, so anything listed here is added to
-            // whatever infantry is riding in it. No Personnel (the deployed profile owns the men), and
-            // no tanks.
+            // Plain tracked M113 remains alongside the separately registered YPR-765/AIFV.
+            // Carrier census owns only its 102 vehicles; the deployed infantry owns personnel,
+            // organic tanks and support. EquipmentBays sums those independent censuses.
             WeaponProfile M113_NATO = WeaponProfile.FromProfileDef(
                 "M113-family Armoured Personnel Carrier", "M113", WeaponType.APC_M113_NATO,
                 new ProfileDef(FamilyArchetypes.Apc,
@@ -5790,7 +5786,7 @@ namespace HammerAndSickle.Models
             // Organic tank battalion (census pass 2026-08-13, rule 1): the mech brigade's Leopards,
             // previously missing — the census listed no armor at all for a mechanised brigade.
             INF_MECH_NL_P.AddIntelReportStat(WeaponType.TANK_LEOPARD1_NL,      32);
-            INF_MECH_NL_P.AddIntelReportStat(WeaponType.SPA_M109_US,           18);
+            INF_MECH_NL_P.AddIntelReportStat(WeaponType.SPA_M109_NATO,           18);
             INF_MECH_NL_P.AddIntelReportStat(WeaponType.ART_120MM_MORTAR,      18);
             INF_MECH_NL_P.AddIntelReportStat(WeaponType.AT_ATGM,               36);
             INF_MECH_NL_P.AddIntelReportStat(WeaponType.MANPAD_STINGER,        24);
@@ -5824,7 +5820,7 @@ namespace HammerAndSickle.Models
             INF_MECH_BE_P.AddIntelReportStat(WeaponType.Personnel,           2050);
             // Organic tank battalion (census pass 2026-08-13, rule 1).
             INF_MECH_BE_P.AddIntelReportStat(WeaponType.TANK_LEOPARD1_BE,      28);
-            INF_MECH_BE_P.AddIntelReportStat(WeaponType.SPA_M109_US,           18);
+            INF_MECH_BE_P.AddIntelReportStat(WeaponType.SPA_M109_NATO,           18);
             INF_MECH_BE_P.AddIntelReportStat(WeaponType.ART_120MM_MORTAR,      18);
             INF_MECH_BE_P.AddIntelReportStat(WeaponType.AT_ATGM,               30);
             INF_MECH_BE_P.AddIntelReportStat(WeaponType.MANPAD_MISTRAL,        18);
@@ -5857,7 +5853,7 @@ namespace HammerAndSickle.Models
             INF_MECH_DK_P.AddIntelReportStat(WeaponType.Personnel,           1850);
             // Organic tank battalion (census pass 2026-08-13, rule 1).
             INF_MECH_DK_P.AddIntelReportStat(WeaponType.TANK_LEOPARD1_DK,      24);
-            INF_MECH_DK_P.AddIntelReportStat(WeaponType.SPA_M109_US,           12);
+            INF_MECH_DK_P.AddIntelReportStat(WeaponType.SPA_M109_NATO,           12);
             INF_MECH_DK_P.AddIntelReportStat(WeaponType.ART_120MM_MORTAR,      18);
             INF_MECH_DK_P.AddIntelReportStat(WeaponType.AT_ATGM,               30);
             INF_MECH_DK_P.AddIntelReportStat(WeaponType.MANPAD_STINGER,        16);
@@ -5876,6 +5872,105 @@ namespace HammerAndSickle.Models
             //----------------------------------------------
 
             #endregion // Infantry Units
+        }
+
+        /// <summary>Adds the approved shared NATO art profiles with explicit national template assignments.</summary>
+        private static void CreateGenericNatoRosterAdditions()
+        {
+            // Standard 25mm infantry carrier: no TOW rail, ERA, or formation-quality multiplier.
+            // The 1977 game anchor follows Dutch entry; Belgian availability remains scenario-authored.
+            WeaponProfile YPR_NATO = WeaponProfile.FromProfileDef(
+                "YPR-765 / AIFV Infantry Fighting Vehicle", "YPR-765 / AIFV", WeaponType.IFV_YPR765_NATO,
+                new ProfileDef(FamilyArchetypes.Ifv, new Dictionary<ProfileStat, int>(),
+                    new[] { WeaponTrait.AUTOCANNON_LIGHT }), UpgradePath.IFV, 468);
+            YPR_NATO.SetPrestigeCost(PrestigeTierCost.Gen1, PrestigeTypeCost.IFV);
+            YPR_NATO.AddIntelReportStat(WeaponType.IFV_YPR765_NATO, 102);
+            YPR_NATO.IconProfile = new RegimentIconProfile(RegimentIconType.Single) { Icon = SpriteManager.NATO_YPR765 };
+            AddProfile(WeaponType.IFV_YPR765_NATO, YPR_NATO);
+
+            // Conventional NATO M109, without the US-only Copperhead trait. The shared support
+            // counter uses the established generic gun scale (950 men / 54 guns), not a national TOE.
+            WeaponProfile M109_NATO = WeaponProfile.FromProfileDef(
+                "NATO M109 Self-Propelled Artillery", "NATO M109", WeaponType.SPA_M109_NATO,
+                NatoM109Def(), UpgradePath.ART, 300);
+            M109_NATO.SetPrestigeCost(PrestigeTierCost.Gen2, PrestigeTypeCost.SPA);
+            M109_NATO.SetMovementMedium(MovementMedium.Tracked);
+            M109_NATO.AddIntelReportStat(WeaponType.Personnel, 950);
+            M109_NATO.AddIntelReportStat(WeaponType.SPA_M109_NATO, 54);
+            M109_NATO.AddIntelReportStat(WeaponType.APC_M113_NATO, 12);
+            M109_NATO.IconProfile = new RegimentIconProfile(RegimentIconType.Single) { Icon = SpriteManager.NATO_M109 };
+            AddProfile(WeaponType.SPA_M109_NATO, M109_NATO);
+
+            // Dutch C&V, 25mm modernization (1974 game anchor), not an armed standard M113 APC.
+            // Recon stays Soft under the skirmisher contract; the scout does not carry infantry.
+            WeaponProfile M113CV_NATO = WeaponProfile.FromProfileDef(
+                "M113 C&V Reconnaissance Vehicle", "M113 C&V", WeaponType.RCN_M113CV_NATO,
+                new ProfileDef(FamilyArchetypes.Recon, new Dictionary<ProfileStat, int>(),
+                    new[] { WeaponTrait.AUTOCANNON_LIGHT, WeaponTrait.AMPHIBIOUS }), UpgradePath.RCN, 432);
+            M113CV_NATO.SetPrestigeCost(PrestigeTierCost.Gen2, PrestigeTypeCost.RCN);
+            M113CV_NATO.SetMovementMedium(MovementMedium.Tracked);
+            M113CV_NATO.AddIntelReportStat(WeaponType.Personnel, 600);
+            M113CV_NATO.AddIntelReportStat(WeaponType.RCN_M113CV_NATO, 36);
+            M113CV_NATO.AddIntelReportStat(WeaponType.APC_M113_NATO, 12);
+            M113CV_NATO.AddIntelReportStat(WeaponType.AT_ATGM, 8);
+            M113CV_NATO.AddIntelReportStat(WeaponType.MANPAD_STINGER, 6);
+            M113CV_NATO.IconProfile = new RegimentIconProfile(RegimentIconType.Single) { Icon = SpriteManager.NATO_M113CV };
+            AddProfile(WeaponType.RCN_M113CV_NATO, M113CV_NATO);
+
+            // Dutch PRTL retains its radar-specific picture and the established twin-35mm game line.
+            WeaponProfile PRTL_NATO = WeaponProfile.FromProfileDef(
+                "PRTL Self-Propelled Anti-Aircraft Gun", "PRTL", WeaponType.SPAAA_PRTL_NATO,
+                RadarSpAaaDef(), UpgradePath.AAA, 468);
+            PRTL_NATO.SetPrestigeCost(PrestigeTierCost.Gen3, PrestigeTypeCost.SPAAA);
+            PRTL_NATO.SetMovementMedium(MovementMedium.Tracked);
+            PRTL_NATO.AddIntelReportStat(WeaponType.Personnel, 1100);
+            PRTL_NATO.AddIntelReportStat(WeaponType.SPAAA_PRTL_NATO, 18);
+            PRTL_NATO.AddIntelReportStat(WeaponType.IFV_YPR765_NATO, 24);
+            PRTL_NATO.AddIntelReportStat(WeaponType.RCN_M113CV_NATO, 12);
+            PRTL_NATO.IconProfile = new RegimentIconProfile(RegimentIconType.Single) { Icon = SpriteManager.NATO_PRTL };
+            AddProfile(WeaponType.SPAAA_PRTL_NATO, PRTL_NATO);
+
+            // Robert, 2026-09-26: 105mm Mk 5/2 before thermal/laser modernization, 60-tank Danish
+            // brigade and 55 prestige. Turn 312 (1964) is an authored mid-1960s availability anchor.
+            // Older gun/armor, slower than Leopard; no modern optics or NATO_FIRST_LINE package.
+            WeaponProfile CENTURION_NATO = WeaponProfile.FromProfileDef(
+                "Centurion Mk 5/2 Main Battle Tank", "Centurion Mk 5/2", WeaponType.TANK_CENTURION_NATO,
+                new ProfileDef(TankArchetypes.Gen1,
+                    new Dictionary<ProfileStat, int> { { ProfileStat.HA, 1 }, { ProfileStat.HD, 1 },
+                        { ProfileStat.SA, 1 }, { ProfileStat.MMP, -2 } }, System.Array.Empty<WeaponTrait>()),
+                UpgradePath.TANK, 312);
+            CENTURION_NATO.SetPrestigeCost(GameData.PRESTIGE_CENTURION_NATO);
+            CENTURION_NATO.AddIntelReportStat(WeaponType.Personnel, 1600);
+            CENTURION_NATO.AddIntelReportStat(WeaponType.TANK_CENTURION_NATO, 60);
+            CENTURION_NATO.AddIntelReportStat(WeaponType.APC_M113_NATO, 48);
+            CENTURION_NATO.AddIntelReportStat(WeaponType.RCN_FV105_UK, 10);
+            CENTURION_NATO.AddIntelReportStat(WeaponType.AT_ATGM, 24);
+            CENTURION_NATO.AddIntelReportStat(WeaponType.MANPAD_STINGER, 12);
+            CENTURION_NATO.AddIntelReportStat(WeaponType.SPA_M109_NATO, 12);
+            CENTURION_NATO.AddIntelReportStat(WeaponType.ART_120MM_MORTAR, 12);
+            CENTURION_NATO.IconProfile = new RegimentIconProfile(RegimentIconType.Single) { Icon = SpriteManager.NATO_Centurion };
+            AddProfile(WeaponType.TANK_CENTURION_NATO, CENTURION_NATO);
+
+            // Shared towed battery group; no embedded carriers or nation-specific MANPADS.
+            WeaponProfile AAA_NATO = WeaponProfile.FromProfileDef(
+                "NATO Towed Anti-Aircraft Artillery", "NATO Towed AAA", WeaponType.AAA_GEN_NATO,
+                TowedAaaDef(), UpgradePath.AAA, 144);
+            AAA_NATO.SetPrestigeCost(PrestigeTierCost.Gen1, PrestigeTypeCost.AAA);
+            AAA_NATO.SetMovementMedium(MovementMedium.Foot);
+            AAA_NATO.AddIntelReportStat(WeaponType.Personnel, 500);
+            AAA_NATO.AddIntelReportStat(WeaponType.AAA_GEN_NATO, 18);
+            AAA_NATO.IconProfile = new RegimentIconProfile(RegimentIconType.Single) { Icon = SpriteManager.NATO_AAA };
+            AddProfile(WeaponType.AAA_GEN_NATO, AAA_NATO);
+
+            // Retain the existing F-16 gameplay capability package and 36-aircraft counter scale.
+            // The 1979 Dutch entry anchor is not a claim every modeled missile existed that year.
+            WeaponProfile F16_NATO = WeaponProfile.FromProfileDef(
+                "NATO F-16 Fighting Falcon Multi-Role Fighter", "NATO F-16", WeaponType.FGT_F16_NATO,
+                F16MultiroleDef(), UpgradePath.FGT, 492);
+            F16_NATO.SetPrestigeCost(PrestigeTierCost.Gen3, PrestigeTypeCost.FGT);
+            F16_NATO.AddIntelReportStat(WeaponType.FGT_F16_NATO, 36);
+            F16_NATO.IconProfile = new RegimentIconProfile(RegimentIconType.Single) { Icon = SpriteManager.NATO_F16 };
+            AddProfile(WeaponType.FGT_F16_NATO, F16_NATO);
         }
 
         /// <summary>

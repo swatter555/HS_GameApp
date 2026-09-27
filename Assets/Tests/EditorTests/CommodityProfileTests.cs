@@ -112,7 +112,7 @@ namespace HammerAndSickle.Tests
         [Test]
         public void NationalTowedAaa_UsesTheRegularCommodityLine()
         {
-            AssertOneStatLine("Towed AAA", WeaponType.AAA_GEN_SV, WeaponType.AAA_GEN_FR, WeaponType.AAA_GEN_IQ, WeaponType.AAA_GEN_IR, WeaponType.AAA_GEN_UK, WeaponType.AAA_GEN_GE);
+            AssertOneStatLine("Towed AAA", WeaponType.AAA_GEN_SV, WeaponType.AAA_GEN_FR, WeaponType.AAA_GEN_IQ, WeaponType.AAA_GEN_IR, WeaponType.AAA_GEN_UK, WeaponType.AAA_GEN_GE, WeaponType.AAA_GEN_NATO);
         }
 
         [Test]

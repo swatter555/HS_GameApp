@@ -981,13 +981,9 @@ namespace HammerAndSickle.Core.GameData
         // ⚠ Nationality.DE is DENMARK — West Germany is FRG. The _DK suffix here is deliberate:
         // it names the COUNTRY the kit belongs to, so a Danish token can never be misread as German.
         //
-        // ⚠ ONLY SEVEN TOKENS, AND THE RULE IS WHY (Bob, 2026-08-12). A census is a property of the
-        // WEAPON PROFILE, not of the unit template — so a nation gets its own profile exactly where
-        // that profile's census IS its brigade roster, and shares everything else. The armoured and
-        // mechanised brigades are those two places. Dutch/Belgian/Danish artillery, recon, air defence
-        // and air units deliberately reuse ART_HEAVY_NATO / RCN_FV105_UK / SAM_HAWK_US / FGT_F16_US:
-        // minting a token per nation per role would have added twelve more names the scenario editor
-        // must mirror forever, to differentiate rosters nobody reads apart.
+        // Original seven-profile slice (Bob, 2026-08-12): the national tank/infantry census belongs
+        // to its profile, not its template. The 2026-09-23 expansion adds shared NATO equipment
+        // at the END of this enum; these original numeric positions remain unchanged.
 
         // MBT — all Leopard 1 variants, all Gen2 archetype at Gen1 prestige (matches LEO1_GE).
         TANK_LEOPARD1_NL,
@@ -1220,6 +1216,19 @@ namespace HammerAndSickle.Core.GameData
         AAA_GEN_GE,
 
         #endregion // German Roster Additions
+
+        #region Generic NATO Roster Additions
+
+        // Append only: profile keys and prior numeric positions are persisted contracts.
+        IFV_YPR765_NATO,
+        SPA_M109_NATO,
+        RCN_M113CV_NATO,
+        SPAAA_PRTL_NATO,
+        TANK_CENTURION_NATO,
+        AAA_GEN_NATO,
+        FGT_F16_NATO,
+
+        #endregion // Generic NATO Roster Additions
     }
 
     /* ⚠ RegimentProfileType DELETED 2026-08-08 (P1, todo_profiles §3). The full-tree sweep found it
@@ -1667,6 +1676,10 @@ namespace HammerAndSickle.Core.GameData
         // densest recon/AT content in the game. Gen1+TANK (65) paid a T-55A bounty for killing it; the
         // formula has no arm for embedded aviation. Bounty-only impact (the profile is AI-side).
         public const int PRESTIGE_ACR_SQUADRON = 250;
+
+        // Robert, 2026-09-26: pre-thermal 105mm Danish Centurion is the cheaper armor option.
+        // The existing Leopard 1s already cost Gen1+TANK (65); preserve them and price this at 55.
+        public const int PRESTIGE_CENTURION_NATO = 55;
 
         // 2026-08-22 (prestige pass, item 10 — §18.5.1, ratified): upgrade cost floor. The upgrade
         // formula is max(targetProfileCost − currentProfileCost, THIS) [× PRESTIGE_COST_MULT with

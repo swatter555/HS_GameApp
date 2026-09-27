@@ -26,11 +26,11 @@ The [British integration contract](<British Roster Integration.md>) records ten 
 
 The [German integration contract](<German Roster Integration.md>) records six profiles and seven new formations: tracked Roland, Alpha Jet, MARS I, national guns/AAA and a second Panzergrenadier option using the existing M113. Existing German templates, organic UH-1D lift, shared Hawk and the NATO truck remain intact. MARS uses the shared M270 combat definition with national availability and census.
 
-## Approved NATO expansion — 2026-09-23
+## Generic NATO roster contract — 2026-09-26
 
-Robert approved dedicated NATO Leopard 1 and M113 art plus M109, M113 C&V reconnaissance, PRTL radar AAA and Centurion; the YPR-765/AIFV was already approved. Existing Leopard profile IDs (`TANK_LEOPARD1_NL`, `_BE`, `_DK`) and `APC_M113_NATO` stay stable. Proposed additions are `SPA_M109_NATO`, `RCN_M113CV_NATO`, `SPAAA_PRTL_NATO` and `TANK_CENTURION_NATO`; these are planning names, not registered game keys.
+The [generic NATO integration contract](<Generic NATO Roster Integration.md>) records seven profiles, eleven new templates and five corrected Dutch/Belgian assignments. YPR/AIFV joins retained M113 options; M109 supplies mobile artillery; Dutch M113 C&V, PRTL and F-16 receive their approved art. Robert selected the older 105mm Centurion Mk 5/2 for Denmark, with 60 tanks and cost55. National quantities, experience and older identifiers remain intact; six existing national censuses update equipment keys without changing counts.
 
-The shared art set does not imply universal national availability. Use the current plan and [NATO coordination packet](<C:/Users/coder/Desktop/Codex Projects/Agent Correspondence/2026-09-23 HS Game NATO roster and art expansion.md>) for filenames, assignments and pending Centurion variant decisions. Profile-owned icon selection remains the contract. Runtime profiles, imports and verification are still owed; do not export proposed keys until the game supports them.
+All thirteen NATO drawings have profile/formation owners. Shared art does not grant every nation every platform: Belgian/Danish recon proxies remain for separate review, and Denmark's existing air-defense restriction remains. The approved NATO Hueys sharing US art remain a follow-up with the US Huey packet. Use the vault TODO and [current consumer packet](<C:/Users/coder/Desktop/Codex Projects/Agent Correspondence/2026-09-26 HS Game generic NATO roster integration.md>) for verification/adoption status; template changes do not migrate stored OOB/save selections.
 
 ## Current authoring restrictions and rendering contract
 
