@@ -270,6 +270,7 @@ namespace HammerAndSickle.Models
 
                 // Create Chinese Forces
                 CreateChineseForces();
+                CreateSaudiForces();
             }
             catch (Exception e)
             {
@@ -5223,6 +5224,225 @@ namespace HammerAndSickle.Models
         #endregion // Arab Units
 
         //-------------------------------------------------------------------------------------------------
+
+        #region Saudi Units
+
+        /// <summary>Approved Saudi army and air-defense roster; no helicopter/air-mobile force.</summary>
+        public static void CreateSaudiForces()
+        {
+            var sa_tank_brigade_amx30 = new CombatUnit(
+                unitName: "Saudi Armored Brigade (AMX-30)",
+                classification: UnitClassification.TANK,
+                role: UnitRole.GroundCombat,
+                side: Side.AI,
+                nationality: Nationality.SAUD,
+                deployedProfile: WeaponType.TANK_AMX30_SA,
+                mobileProfile: WeaponType.NONE,
+                embarkedProfile: WeaponType.NONE,
+                category: DepotCategory.Secondary,
+                size: DepotSize.Small
+            );
+            sa_tank_brigade_amx30.SetExperienceLevel(ExperienceLevel.Green);
+            AddTemplate("SA_TANK_BRIGADE_AMX30", sa_tank_brigade_amx30);
+
+            var sa_shahine_sam_regiment = new CombatUnit(
+                unitName: "Saudi Shahine SAM Regiment",
+                classification: UnitClassification.SPSAM,
+                role: UnitRole.AirDefenseArea,
+                side: Side.AI,
+                nationality: Nationality.SAUD,
+                deployedProfile: WeaponType.SPSAM_SHAHINE_SA,
+                mobileProfile: WeaponType.NONE,
+                embarkedProfile: WeaponType.NONE,
+                category: DepotCategory.Secondary,
+                size: DepotSize.Small
+            );
+            sa_shahine_sam_regiment.SetExperienceLevel(ExperienceLevel.Green);
+            AddTemplate("SA_SHAHINE_SAM_REGIMENT", sa_shahine_sam_regiment);
+
+            var sa_f15_fighter_squadron = new CombatUnit(
+                unitName: "Saudi F-15C Fighter Squadron",
+                classification: UnitClassification.FGT,
+                role: UnitRole.AirSuperiority,
+                side: Side.AI,
+                nationality: Nationality.SAUD,
+                deployedProfile: WeaponType.FGT_F15_SA,
+                mobileProfile: WeaponType.NONE,
+                embarkedProfile: WeaponType.NONE,
+                category: DepotCategory.Secondary,
+                size: DepotSize.Small
+            );
+            sa_f15_fighter_squadron.SetExperienceLevel(ExperienceLevel.Trained);
+            AddTemplate("SA_F15_FIGHTER_SQUADRON", sa_f15_fighter_squadron);
+
+            var sa_f5_fighter_squadron = new CombatUnit(
+                unitName: "Saudi F-5E Fighter Squadron",
+                classification: UnitClassification.FGT,
+                role: UnitRole.AirSuperiority,
+                side: Side.AI,
+                nationality: Nationality.SAUD,
+                deployedProfile: WeaponType.FGT_F5_SA,
+                mobileProfile: WeaponType.NONE,
+                embarkedProfile: WeaponType.NONE,
+                category: DepotCategory.Secondary,
+                size: DepotSize.Small
+            );
+            sa_f5_fighter_squadron.SetExperienceLevel(ExperienceLevel.Trained);
+            AddTemplate("SA_F5_FIGHTER_SQUADRON", sa_f5_fighter_squadron);
+
+            var sa_infantry_brigade = new CombatUnit(
+                unitName: "Saudi Infantry Brigade",
+                classification: UnitClassification.INF,
+                role: UnitRole.GroundCombat,
+                side: Side.AI,
+                nationality: Nationality.SAUD,
+                deployedProfile: WeaponType.INF_REG_SA,
+                mobileProfile: WeaponType.TRK_GEN_SA,
+                embarkedProfile: WeaponType.NONE,
+                category: DepotCategory.Secondary,
+                size: DepotSize.Small
+            );
+            sa_infantry_brigade.SetExperienceLevel(ExperienceLevel.Green);
+            AddTemplate("SA_INFANTRY_BRIGADE", sa_infantry_brigade);
+
+            // Infantry with truck transport, not an armored combined-arms formation.
+            var sa_national_guard_brigade = new CombatUnit(
+                unitName: "Saudi National Guard Brigade",
+                classification: UnitClassification.INF,
+                role: UnitRole.GroundCombat,
+                side: Side.AI,
+                nationality: Nationality.SAUD,
+                deployedProfile: WeaponType.INF_GUARD_SA,
+                mobileProfile: WeaponType.TRK_GEN_SA,
+                embarkedProfile: WeaponType.NONE,
+                category: DepotCategory.Secondary,
+                size: DepotSize.Small
+            );
+            sa_national_guard_brigade.SetExperienceLevel(ExperienceLevel.Green);
+            AddTemplate("SA_NATIONAL_GUARD_BRIGADE", sa_national_guard_brigade);
+
+            var sa_mot_infantry_brigade_m113 = new CombatUnit(
+                unitName: "Saudi Motorized Infantry Brigade (M113)",
+                classification: UnitClassification.MOT,
+                role: UnitRole.GroundCombat,
+                side: Side.AI,
+                nationality: Nationality.SAUD,
+                deployedProfile: WeaponType.INF_MECH_SA,
+                mobileProfile: WeaponType.APC_M113_SA,
+                embarkedProfile: WeaponType.NONE,
+                category: DepotCategory.Secondary,
+                size: DepotSize.Small
+            );
+            sa_mot_infantry_brigade_m113.SetExperienceLevel(ExperienceLevel.Green);
+            AddTemplate("SA_MOT_INFANTRY_BRIGADE_M113", sa_mot_infantry_brigade_m113);
+
+            var sa_mech_infantry_brigade_amx10p = new CombatUnit(
+                unitName: "Saudi Mechanized Infantry Brigade (AMX-10P)",
+                classification: UnitClassification.MECH,
+                role: UnitRole.GroundCombat,
+                side: Side.AI,
+                nationality: Nationality.SAUD,
+                deployedProfile: WeaponType.INF_MECH_SA,
+                mobileProfile: WeaponType.IFV_AMX10P_SA,
+                embarkedProfile: WeaponType.NONE,
+                category: DepotCategory.Secondary,
+                size: DepotSize.Small
+            );
+            sa_mech_infantry_brigade_amx10p.SetExperienceLevel(ExperienceLevel.Green);
+            AddTemplate("SA_MECH_INFANTRY_BRIGADE_AMX10P", sa_mech_infantry_brigade_amx10p);
+
+            var sa_light_artillery_regiment = new CombatUnit(
+                unitName: "Saudi Light Artillery Regiment",
+                classification: UnitClassification.ART,
+                role: UnitRole.GroundCombat,
+                side: Side.AI,
+                nationality: Nationality.SAUD,
+                deployedProfile: WeaponType.ART_LIGHT_SA,
+                mobileProfile: WeaponType.TRK_GEN_SA,
+                embarkedProfile: WeaponType.NONE,
+                category: DepotCategory.Secondary,
+                size: DepotSize.Small
+            );
+            sa_light_artillery_regiment.SetExperienceLevel(ExperienceLevel.Green);
+            AddTemplate("SA_LIGHT_ARTILLERY_REGIMENT", sa_light_artillery_regiment);
+
+            var sa_heavy_artillery_regiment = new CombatUnit(
+                unitName: "Saudi Heavy Artillery Regiment",
+                classification: UnitClassification.ART,
+                role: UnitRole.GroundCombat,
+                side: Side.AI,
+                nationality: Nationality.SAUD,
+                deployedProfile: WeaponType.ART_HEAVY_SA,
+                mobileProfile: WeaponType.TRK_GEN_SA,
+                embarkedProfile: WeaponType.NONE,
+                category: DepotCategory.Secondary,
+                size: DepotSize.Small
+            );
+            sa_heavy_artillery_regiment.SetExperienceLevel(ExperienceLevel.Green);
+            AddTemplate("SA_HEAVY_ARTILLERY_REGIMENT", sa_heavy_artillery_regiment);
+
+            var sa_towed_aaa_regiment = new CombatUnit(
+                unitName: "Saudi Towed Anti-Aircraft Regiment",
+                classification: UnitClassification.AAA,
+                role: UnitRole.AirDefenseArea,
+                side: Side.AI,
+                nationality: Nationality.SAUD,
+                deployedProfile: WeaponType.AAA_GEN_SA,
+                mobileProfile: WeaponType.TRK_GEN_SA,
+                embarkedProfile: WeaponType.NONE,
+                category: DepotCategory.Secondary,
+                size: DepotSize.Small
+            );
+            sa_towed_aaa_regiment.SetExperienceLevel(ExperienceLevel.Green);
+            AddTemplate("SA_TOWED_AAA_REGIMENT", sa_towed_aaa_regiment);
+
+            var sa_auf1_artillery_regiment = new CombatUnit(
+                unitName: "Saudi AUF1 Artillery Regiment",
+                classification: UnitClassification.ART,
+                role: UnitRole.GroundCombat,
+                side: Side.AI,
+                nationality: Nationality.SAUD,
+                deployedProfile: WeaponType.SPA_AUF1_SA,
+                mobileProfile: WeaponType.NONE,
+                embarkedProfile: WeaponType.NONE,
+                category: DepotCategory.Secondary,
+                size: DepotSize.Small
+            );
+            sa_auf1_artillery_regiment.SetExperienceLevel(ExperienceLevel.Green);
+            AddTemplate("SA_AUF1_ARTILLERY_REGIMENT", sa_auf1_artillery_regiment);
+
+            var sa_hawk_sam_regiment = new CombatUnit(
+                unitName: "Saudi Hawk SAM Regiment",
+                classification: UnitClassification.SAM,
+                role: UnitRole.AirDefenseArea,
+                side: Side.AI,
+                nationality: Nationality.SAUD,
+                deployedProfile: WeaponType.SAM_HAWK_US,
+                mobileProfile: WeaponType.TRK_GEN_SA,
+                embarkedProfile: WeaponType.NONE,
+                category: DepotCategory.Secondary,
+                size: DepotSize.Small
+            );
+            sa_hawk_sam_regiment.SetExperienceLevel(ExperienceLevel.Green);
+            AddTemplate("SA_HAWK_SAM_REGIMENT", sa_hawk_sam_regiment);
+
+            var sa_m163_air_defense_regiment = new CombatUnit(
+                unitName: "Saudi M163 Air Defense Regiment",
+                classification: UnitClassification.SPAAA,
+                role: UnitRole.AirDefenseArea,
+                side: Side.AI,
+                nationality: Nationality.SAUD,
+                deployedProfile: WeaponType.SPAAA_M163_US,
+                mobileProfile: WeaponType.NONE,
+                embarkedProfile: WeaponType.NONE,
+                category: DepotCategory.Secondary,
+                size: DepotSize.Small
+            );
+            sa_m163_air_defense_regiment.SetExperienceLevel(ExperienceLevel.Green);
+            AddTemplate("SA_M163_AIR_DEFENSE_REGIMENT", sa_m163_air_defense_regiment);
+        }
+
+        #endregion // Saudi Units
 
         #region Chines Units
 

@@ -40,6 +40,10 @@ The [US integration contract](<US Roster Integration.md>) records national suppo
 
 The [Chinese integration contract](<Chinese Roster Integration.md>) records Type 62, J-6, Type 63 APC, HQ-2, national AAA/truck and eight formations, plus the approved 2,900-person infantry census. Existing PHZ-89 stays intact while Type 83 gains its missing formation. Type 83/Z-9/Type 88 display names are corrected, with Type80 keys/art retained by Robert’s decision. Second-line Type 59/J-6 crews are Green and infantry/Type 63 crews Raw, reusing regular profiles. Template creation now preserves authored crew experience. Unity verification passes 26/26 Chinese and 870/870 full EditorTests; consult the vault TODO for visual/build and consumer acceptance.
 
+## Saudi roster contract — 2026-09-26
+
+The [Saudi integration contract](<Saudi Roster Integration.md>) records the new national equipment, regular formations and shared Hawk/M163. National Guard uses its own infantry profile/art with the Saudi truck in Mobile; Robert withdrew V-150. No Saudi helicopter force is registered. Unity verification passed 38/38 Saudi and 908/908 full EditorTests, including all six asset checks. Use the vault TODO for remaining visual/build acceptance and the consumer packet for adoption.
+
 ## Current authoring restrictions and rendering contract
 
 Robert withdrew Iranian and Saudi air-mobile forces on 2026-09-23. Do not add the previously proposed `HEL_UH1_IR`, `HEL_UH1_SA`, or `HEL_UH1C_SA`, their templates, or equivalent formations using shared foreign lift. Their `IR_UH1_Frame0..5`, `SA_UH1_Frame0..5`, and `SA_UH1C_Frame0..5` drawings are no longer requirements. The Iranian AH-1 Cobra is registered under the Iranian contract above. None of these withdrawn identifiers exists in the checked game or editor source; no save-version change is required. See the [coordination record](<C:/Users/coder/Desktop/Codex Projects/Agent Correspondence/2026-09-23 HS Game roster withdrawals and map airfield art.md>).

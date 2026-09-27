@@ -337,6 +337,35 @@ namespace HammerAndSickle.Models
 
         #region Private Methods
 
+        /// <summary>AMX-30 hardware shared by French and Saudi formations.</summary>
+        private static ProfileDef Amx30Def() => new ProfileDef(TankArchetypes.Gen2,
+                new Dictionary<ProfileStat, int> { { ProfileStat.HD, -2 }, { ProfileStat.SA, 1 }, { ProfileStat.MMP, 2 } },
+                new[] { WeaponTrait.LOW_PROFILE });
+
+        /// <summary>Crotale/Shahine point-defense weapon; each profile specifies its chassis medium.</summary>
+        private static ProfileDef CrotaleFamilyDef() => new ProfileDef(FamilyArchetypes.Sam,
+                new Dictionary<ProfileStat, int> { { ProfileStat.IR, GameData.INDIRECT_RANGE_SHORT } },
+                new[] { WeaponTrait.SELF_PROPELLED, WeaponTrait.COMMAND_GUIDANCE });
+
+        /// <summary>AMX-10P carrier hardware; national census and artwork remain separate.</summary>
+        private static ProfileDef Amx10pDef() => new ProfileDef(FamilyArchetypes.Ifv, new Dictionary<ProfileStat, int>(),
+                new[] { WeaponTrait.AUTOCANNON_LIGHT, WeaponTrait.AMPHIBIOUS });
+
+        /// <summary>Early F-5E weapon line shared by Iranian and Saudi profiles.</summary>
+        private static ProfileDef F5TigerDef() => new ProfileDef(FamilyArchetypes.FighterEarly,
+                new Dictionary<ProfileStat, int> { { ProfileStat.TS, -1 } },
+                new[] { WeaponTrait.AGILE_AIRFRAME, WeaponTrait.MULTIROLE_STRIKE });
+
+        /// <summary>AUF1 gun/chassis with optional national fires-network quality.</summary>
+        private static ProfileDef Auf1Def(params WeaponTrait[] extraTraits) => new ProfileDef(FamilyArchetypes.Artillery,
+                new Dictionary<ProfileStat, int> { { ProfileStat.SA, 1 }, { ProfileStat.IR, GameData.INDIRECT_RANGE_MEDIUM } },
+                Plus(new[] { WeaponTrait.SELF_PROPELLED }, extraTraits));
+
+        /// <summary>Saudi infantry baseline; crew experience belongs to templates, carriers to Mobile.</summary>
+        private static ProfileDef SaudiInfantryDef() => new(
+            FamilyArchetypes.Infantry, new Dictionary<ProfileStat, int>(),
+            new[] { WeaponTrait.RPG_LAW, WeaponTrait.ATGM_MEDIUM });
+
         /// <summary>
         /// Creates all weapon profiles used in the game.
         /// This method contains the complete database of weapon configurations.
@@ -359,6 +388,7 @@ namespace HammerAndSickle.Models
                 CreateIranianRosterAdditions();
                 CreateChineseProfiles();
                 CreateChineseRosterAdditions();
+                CreateSaudiProfiles();
             }
             catch (Exception e)
             {
@@ -3237,9 +3267,7 @@ namespace HammerAndSickle.Models
             // Division rather than being re-cut to the 40-tank battle group.
             WeaponProfile AMX30_FR = WeaponProfile.FromProfileDef(
                 "AMX-30 Armoured Division", "AMX-30", WeaponType.TANK_AMX30_FR,
-                new ProfileDef(TankArchetypes.Gen2,
-                    new Dictionary<ProfileStat, int> { { ProfileStat.HD, -2 }, { ProfileStat.SA, 1 }, { ProfileStat.MMP, 2 } },
-                    new[] { WeaponTrait.LOW_PROFILE }),
+                Amx30Def(),
                 UpgradePath.TANK, 336);
 
             // Set the prestige cost for the profile.
@@ -3642,9 +3670,7 @@ namespace HammerAndSickle.Models
             // + FIRE_DIRECTION_NET (artillery ruling 9, 2026-08-22) → ICM 1.05.
             WeaponProfile M109_FR = WeaponProfile.FromProfileDef(
                 "AUF1 Self-Propelled Artillery", "AUF1", WeaponType.SPA_AUF1_FR,
-                new ProfileDef(FamilyArchetypes.Artillery,
-                    new Dictionary<ProfileStat, int> { { ProfileStat.SA, 1 }, { ProfileStat.IR, GameData.INDIRECT_RANGE_MEDIUM } },
-                    new[] { WeaponTrait.SELF_PROPELLED, WeaponTrait.FIRE_DIRECTION_NET }),
+                Auf1Def(WeaponTrait.FIRE_DIRECTION_NET),
                 UpgradePath.ART, 300);
 
             // Set the prestige cost for the profile.
@@ -4006,9 +4032,7 @@ namespace HammerAndSickle.Models
             // → HA1 HD5 SA1 SD5 GAD7 · GAT14 · MMP10 · IR4 · SR6.
             WeaponProfile Crotale = WeaponProfile.FromProfileDef(
                 "Crotale Self-Propelled SAM System", "Crotale", WeaponType.SPSAM_CROTALE_FR,
-                new ProfileDef(FamilyArchetypes.Sam,
-                    new Dictionary<ProfileStat, int> { { ProfileStat.IR, GameData.INDIRECT_RANGE_SHORT } },
-                    new[] { WeaponTrait.SELF_PROPELLED, WeaponTrait.COMMAND_GUIDANCE }),
+                CrotaleFamilyDef(),
                 UpgradePath.SAM, 396);
 
             // Set the prestige cost for the profile.
@@ -5420,8 +5444,7 @@ namespace HammerAndSickle.Models
             // base's census/traits, so this hull does not inherit the Marder's ATGM_RAIL.
             WeaponProfile AMX10P_FR = WeaponProfile.FromProfileDef(
                 "AMX-10P Infantry Fighting Vehicle", "AMX-10P", WeaponType.IFV_AMX10P_FR,
-                new ProfileDef(FamilyArchetypes.Ifv, new Dictionary<ProfileStat, int>(),
-                    new[] { WeaponTrait.AUTOCANNON_LIGHT, WeaponTrait.AMPHIBIOUS }),
+                Amx10pDef(),
                 UpgradePath.IFV, 420);
             AMX10P_FR.SetPrestigeCost(PrestigeTierCost.Gen2, PrestigeTypeCost.IFV);
             // Alternative carrier for the same French infantry counter as the 135-VAB option.
@@ -6239,9 +6262,7 @@ namespace HammerAndSickle.Models
             // No BVR missile, precision-strike or later radar/defensive suite is inferred.
             WeaponProfile F5_IR = WeaponProfile.FromProfileDef(
                 "F-5E Tiger II Fighter", "F-5E Tiger II", WeaponType.FGT_F5_IR,
-                new ProfileDef(FamilyArchetypes.FighterEarly,
-                    new Dictionary<ProfileStat, int> { { ProfileStat.TS, -1 } },
-                    new[] { WeaponTrait.AGILE_AIRFRAME, WeaponTrait.MULTIROLE_STRIKE }), UpgradePath.FGT, 432);
+                F5TigerDef(), UpgradePath.FGT, 432);
             F5_IR.SetPrestigeCost(PrestigeTierCost.Gen1, PrestigeTypeCost.FGT);
             // Keep the ratified Iranian fighter-wing scale used by the existing F-4/F-14.
             F5_IR.AddIntelReportStat(WeaponType.FGT_F5_IR, 48);
@@ -7279,6 +7300,166 @@ namespace HammerAndSickle.Models
             //----------------------------------------------
 
             #endregion // Mujahideen Infantry
+        }
+
+        /// <summary>Saudi national equipment; shared Hawk/M163 remain US-owned profiles.</summary>
+        private static void CreateSaudiProfiles()
+        {
+            // Censuses are authored brigade/regiment counters, not national inventory totals.
+            // F-15C uses early Sparrow BVR; no AMRAAM/strike upgrade or blanket export penalty.
+            // AUF1 retains hardware stats but does not inherit the French fires-network factor.
+            WeaponProfile TANK_AMX30_SA = WeaponProfile.FromProfileDef(
+                "Saudi AMX-30 Armored Brigade", "AMX-30", WeaponType.TANK_AMX30_SA,
+                Amx30Def(), UpgradePath.TANK, 420);
+            TANK_AMX30_SA.SetPrestigeCost(PrestigeTierCost.Gen2, PrestigeTypeCost.TANK);
+            TANK_AMX30_SA.AddIntelReportStat(WeaponType.Personnel, 1500);
+            TANK_AMX30_SA.AddIntelReportStat(WeaponType.TANK_AMX30_SA, 60);
+            TANK_AMX30_SA.AddIntelReportStat(WeaponType.IFV_AMX10P_SA, 36);
+            TANK_AMX30_SA.AddIntelReportStat(WeaponType.APC_M113_SA, 18);
+            TANK_AMX30_SA.AddIntelReportStat(WeaponType.SPA_AUF1_SA, 18);
+            TANK_AMX30_SA.AddIntelReportStat(WeaponType.ART_120MM_MORTAR, 18);
+            TANK_AMX30_SA.AddIntelReportStat(WeaponType.AT_ATGM, 12);
+            TANK_AMX30_SA.AddIntelReportStat(WeaponType.SPAAA_M163_US, 6);
+            TANK_AMX30_SA.IconProfile = new RegimentIconProfile(RegimentIconType.Single) { Icon = SpriteManager.SA_AMX30 };
+            AddProfile(WeaponType.TANK_AMX30_SA, TANK_AMX30_SA);
+
+            WeaponProfile SPSAM_SHAHINE_SA = WeaponProfile.FromProfileDef(
+                "Shahine Tracked Surface-to-Air Missile System", "Shahine", WeaponType.SPSAM_SHAHINE_SA,
+                CrotaleFamilyDef(), UpgradePath.SAM, 504);
+            SPSAM_SHAHINE_SA.SetPrestigeCost(PrestigeTierCost.Gen2, PrestigeTypeCost.SPSAM);
+            SPSAM_SHAHINE_SA.SetMovementMedium(MovementMedium.Tracked);
+            SPSAM_SHAHINE_SA.AddIntelReportStat(WeaponType.Personnel, 500);
+            SPSAM_SHAHINE_SA.AddIntelReportStat(WeaponType.SPSAM_SHAHINE_SA, 18);
+            SPSAM_SHAHINE_SA.AddIntelReportStat(WeaponType.APC_M113_SA, 12);
+            SPSAM_SHAHINE_SA.AddIntelReportStat(WeaponType.AAA_GEN_SA, 6);
+            SPSAM_SHAHINE_SA.IconProfile = new RegimentIconProfile(RegimentIconType.Single) { Icon = SpriteManager.SA_Shahine };
+            AddProfile(WeaponType.SPSAM_SHAHINE_SA, SPSAM_SHAHINE_SA);
+
+            WeaponProfile FGT_F15_SA = WeaponProfile.FromProfileDef(
+                "Saudi F-15C Eagle Air Superiority Fighter", "F-15C Eagle", WeaponType.FGT_F15_SA,
+                new ProfileDef(FamilyArchetypes.FighterLate,
+                    new Dictionary<ProfileStat, int> { { ProfileStat.TS, 2 } },
+                    new[] { WeaponTrait.BVR_RADAR_MISSILE, WeaponTrait.AGILE_AIRFRAME, WeaponTrait.LOOKDOWN_SHOOTDOWN,
+                            WeaponTrait.RWR, WeaponTrait.ECM_JAMMER, WeaponTrait.CHAFF_FLARE }), UpgradePath.FGT, 528);
+            FGT_F15_SA.SetPrestigeCost(PrestigeTierCost.Gen3, PrestigeTypeCost.FGT);
+            FGT_F15_SA.AddIntelReportStat(WeaponType.FGT_F15_SA, 24);
+            FGT_F15_SA.IconProfile = new RegimentIconProfile(RegimentIconType.Single) { Icon = SpriteManager.SA_F15 };
+            AddProfile(WeaponType.FGT_F15_SA, FGT_F15_SA);
+
+            WeaponProfile FGT_F5_SA = WeaponProfile.FromProfileDef(
+                "Saudi F-5E Tiger II Fighter", "F-5E Tiger II", WeaponType.FGT_F5_SA,
+                F5TigerDef(), UpgradePath.FGT, 432);
+            FGT_F5_SA.SetPrestigeCost(PrestigeTierCost.Gen1, PrestigeTypeCost.FGT);
+            FGT_F5_SA.AddIntelReportStat(WeaponType.FGT_F5_SA, 24);
+            FGT_F5_SA.IconProfile = new RegimentIconProfile(RegimentIconType.Single) { Icon = SpriteManager.SA_F5 };
+            AddProfile(WeaponType.FGT_F5_SA, FGT_F5_SA);
+
+            WeaponProfile INF_REG_SA = WeaponProfile.FromProfileDef(
+                "Saudi Regular Infantry", "Saudi Regulars", WeaponType.INF_REG_SA,
+                SaudiInfantryDef());
+            INF_REG_SA.SetPrestigeCost(PrestigeTierCost.Gen1, PrestigeTypeCost.INF);
+            INF_REG_SA.AddIntelReportStat(WeaponType.Personnel, 2400);
+            INF_REG_SA.AddIntelReportStat(WeaponType.ART_81MM_MORTAR, 36);
+            INF_REG_SA.AddIntelReportStat(WeaponType.ART_LIGHT_SA, 18);
+            INF_REG_SA.AddIntelReportStat(WeaponType.AT_ATGM, 24);
+            INF_REG_SA.IconProfile = new RegimentIconProfile(RegimentIconType.Single) { Icon = SpriteManager.SA_Regulars };
+            AddProfile(WeaponType.INF_REG_SA, INF_REG_SA);
+
+            // Robert, 2026-09-26: Guard infantry rides national trucks; V-150 is withdrawn.
+            WeaponProfile INF_GUARD_SA = WeaponProfile.FromProfileDef(
+                "Saudi National Guard Infantry", "Saudi National Guard", WeaponType.INF_GUARD_SA,
+                SaudiInfantryDef());
+            INF_GUARD_SA.SetPrestigeCost(PrestigeTierCost.Gen1, PrestigeTypeCost.INF);
+            INF_GUARD_SA.AddIntelReportStat(WeaponType.Personnel, 2400);
+            INF_GUARD_SA.AddIntelReportStat(WeaponType.ART_81MM_MORTAR, 36);
+            INF_GUARD_SA.AddIntelReportStat(WeaponType.ART_LIGHT_SA, 18);
+            INF_GUARD_SA.AddIntelReportStat(WeaponType.AT_ATGM, 24);
+            INF_GUARD_SA.IconProfile = new RegimentIconProfile(RegimentIconType.Single) { Icon = SpriteManager.SA_Guard };
+            AddProfile(WeaponType.INF_GUARD_SA, INF_GUARD_SA);
+
+            // Census doctrine 10.7.9: a distinct combined-arms base owns its tank battalion;
+            // carrier bays count only vehicles. Foot infantry keeps its own tank-free shape.
+            WeaponProfile INF_MECH_SA = WeaponProfile.FromProfileDef(
+                "Saudi Combined-Arms Infantry", "Saudi Mech Infantry", WeaponType.INF_MECH_SA,
+                SaudiInfantryDef());
+            INF_MECH_SA.SetPrestigeCost(PrestigeTierCost.Gen1, PrestigeTypeCost.INF);
+            INF_MECH_SA.AddIntelReportStat(WeaponType.Personnel, 2400);
+            INF_MECH_SA.AddIntelReportStat(WeaponType.TANK_AMX30_SA, 30);
+            INF_MECH_SA.AddIntelReportStat(WeaponType.ART_81MM_MORTAR, 36);
+            INF_MECH_SA.AddIntelReportStat(WeaponType.ART_LIGHT_SA, 18);
+            INF_MECH_SA.AddIntelReportStat(WeaponType.AT_ATGM, 24);
+            INF_MECH_SA.IconProfile = new RegimentIconProfile(RegimentIconType.Single) { Icon = SpriteManager.SA_Regulars };
+            AddProfile(WeaponType.INF_MECH_SA, INF_MECH_SA);
+
+            WeaponProfile ART_LIGHT_SA = WeaponProfile.FromProfileDef(
+                "Saudi Light Towed Artillery", "SA Light Artillery", WeaponType.ART_LIGHT_SA,
+                LightTowedArtilleryDef(), UpgradePath.ART, 144);
+            ART_LIGHT_SA.SetPrestigeCost(PrestigeTierCost.Gen1, PrestigeTypeCost.ART);
+            ART_LIGHT_SA.SetMovementMedium(MovementMedium.Foot);
+            ART_LIGHT_SA.AddIntelReportStat(WeaponType.Personnel, 600);
+            ART_LIGHT_SA.AddIntelReportStat(WeaponType.ART_105MM_FG, 24);
+            ART_LIGHT_SA.AddIntelReportStat(WeaponType.AT_ATGM, 6);
+            ART_LIGHT_SA.IconProfile = new RegimentIconProfile(RegimentIconType.Single) { Icon = SpriteManager.SA_LightArt };
+            AddProfile(WeaponType.ART_LIGHT_SA, ART_LIGHT_SA);
+
+            WeaponProfile ART_HEAVY_SA = WeaponProfile.FromProfileDef(
+                "Saudi Heavy Towed Artillery", "SA Heavy Artillery", WeaponType.ART_HEAVY_SA,
+                HeavyTowedArtilleryDef(), UpgradePath.ART, 144);
+            ART_HEAVY_SA.SetPrestigeCost(PrestigeTierCost.Gen1, PrestigeTypeCost.ART);
+            ART_HEAVY_SA.SetMovementMedium(MovementMedium.Foot);
+            ART_HEAVY_SA.AddIntelReportStat(WeaponType.Personnel, 700);
+            ART_HEAVY_SA.AddIntelReportStat(WeaponType.ART_155MM_FG, 24);
+            ART_HEAVY_SA.AddIntelReportStat(WeaponType.AT_ATGM, 6);
+            ART_HEAVY_SA.IconProfile = new RegimentIconProfile(RegimentIconType.Single) { Icon = SpriteManager.SA_HeavyArt };
+            AddProfile(WeaponType.ART_HEAVY_SA, ART_HEAVY_SA);
+
+            WeaponProfile AAA_GEN_SA = WeaponProfile.FromProfileDef(
+                "Saudi Towed Anti-Aircraft Artillery", "SA Towed AAA", WeaponType.AAA_GEN_SA,
+                TowedAaaDef(), UpgradePath.AAA, 144);
+            AAA_GEN_SA.SetPrestigeCost(PrestigeTierCost.Gen1, PrestigeTypeCost.AAA);
+            AAA_GEN_SA.SetMovementMedium(MovementMedium.Foot);
+            AAA_GEN_SA.AddIntelReportStat(WeaponType.Personnel, 500);
+            AAA_GEN_SA.AddIntelReportStat(WeaponType.AAA_GEN_SA, 24);
+            AAA_GEN_SA.IconProfile = new RegimentIconProfile(RegimentIconType.Single) { Icon = SpriteManager.SA_AAA };
+            AddProfile(WeaponType.AAA_GEN_SA, AAA_GEN_SA);
+
+            WeaponProfile SPA_AUF1_SA = WeaponProfile.FromProfileDef(
+                "Saudi AUF1 Self-Propelled Artillery", "AUF1", WeaponType.SPA_AUF1_SA,
+                Auf1Def(), UpgradePath.ART, 516);
+            SPA_AUF1_SA.SetPrestigeCost(PrestigeTierCost.Gen2, PrestigeTypeCost.SPA);
+            SPA_AUF1_SA.SetMovementMedium(MovementMedium.Tracked);
+            SPA_AUF1_SA.AddIntelReportStat(WeaponType.Personnel, 650);
+            SPA_AUF1_SA.AddIntelReportStat(WeaponType.SPA_AUF1_SA, 24);
+            SPA_AUF1_SA.AddIntelReportStat(WeaponType.APC_M113_SA, 12);
+            SPA_AUF1_SA.AddIntelReportStat(WeaponType.AT_ATGM, 6);
+            SPA_AUF1_SA.IconProfile = new RegimentIconProfile(RegimentIconType.Single) { Icon = SpriteManager.SA_AUF1 };
+            AddProfile(WeaponType.SPA_AUF1_SA, SPA_AUF1_SA);
+
+            WeaponProfile APC_M113_SA = WeaponProfile.FromProfileDef(
+                "Saudi M113 Armored Personnel Carrier", "M113", WeaponType.APC_M113_SA,
+                new ProfileDef(FamilyArchetypes.Apc, new Dictionary<ProfileStat, int>(),
+                    System.Array.Empty<WeaponTrait>()), UpgradePath.APC, 264);
+            APC_M113_SA.SetPrestigeCost(PrestigeTierCost.Gen1, PrestigeTypeCost.APC);
+            APC_M113_SA.SetMovementMedium(MovementMedium.Tracked);
+            APC_M113_SA.AddIntelReportStat(WeaponType.APC_M113_SA, 90);
+            APC_M113_SA.IconProfile = new RegimentIconProfile(RegimentIconType.Single) { Icon = SpriteManager.SA_M113 };
+            AddProfile(WeaponType.APC_M113_SA, APC_M113_SA);
+
+            WeaponProfile IFV_AMX10P_SA = WeaponProfile.FromProfileDef(
+                "Saudi AMX-10P Infantry Fighting Vehicle", "AMX-10P", WeaponType.IFV_AMX10P_SA,
+                Amx10pDef(), UpgradePath.IFV, 444);
+            IFV_AMX10P_SA.SetPrestigeCost(PrestigeTierCost.Gen2, PrestigeTypeCost.IFV);
+            IFV_AMX10P_SA.AddIntelReportStat(WeaponType.IFV_AMX10P_SA, 90);
+            IFV_AMX10P_SA.IconProfile = new RegimentIconProfile(RegimentIconType.Single) { Icon = SpriteManager.SA_AMX10P };
+            AddProfile(WeaponType.IFV_AMX10P_SA, IFV_AMX10P_SA);
+
+            WeaponProfile TRK_GEN_SA = WeaponProfile.FromProfileDef(
+                "Saudi Transport Truck", "SA Truck", WeaponType.TRK_GEN_SA,
+                TransportTruckDef());
+            TRK_GEN_SA.SetPrestigeCost(PrestigeTierCost.Gen1, PrestigeTypeCost.TRK);
+
+            TRK_GEN_SA.IconProfile = new RegimentIconProfile(RegimentIconType.Single) { Icon = SpriteManager.SA_Truck };
+            AddProfile(WeaponType.TRK_GEN_SA, TRK_GEN_SA);
         }
 
         /// <summary>Approved Chinese additions; formation quality belongs on deployed equipment only.</summary>

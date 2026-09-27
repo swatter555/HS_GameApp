@@ -124,6 +124,8 @@ Losses accumulate in `GameDataManager` by weapon type, fed by actual damage and 
 
 Static authored UI is Inspector-wired to stable public `On…Button()` callbacks. Scene scans find `OnEndTurnButton` and cumulative `OnDisplayLossesButton`; no `OnEndScenarioButton` or `OnDisplayDailyLossesButton` binding was found. These are serialized-reference observations, not proof that every action behaves correctly in play. `BattleBackgroundFitter` is already attached in BattleScene, contrary to older TODO instructions.
 
+The [Saudi roster contract](<Saudi Roster Integration.md>) adds CreateSaudiProfiles/CreateSaudiForces: fourteen national profiles and fourteen templates, plus approved shared Hawk/M163. Existing Nationality.SAUD and earlier identifiers remain. Shared AMX-30/Crotale/AMX-10P/F-5/AUF1 helpers retain prior definitions. Shahine is tracked; Saudi AUF1 omits French fires-network quality; early F-15C uses Sparrow BVR. Separate foot and combined-arms infantry bases keep tanks out of ordinary foot/Guard censuses. Robert directed the National Guard to use the Saudi truck and withdrew V-150. All 13 Saudi pictures have profile/formation owners. After Robert refreshed, agent-run Unity tests passed 38/38 Saudi and 908/908 full EditorTests, with no failures, skips or inconclusive results, including all six asset checks. Visual/build and consumer acceptance remain open.
+
 ## Data and compatibility contracts
 
 | Format | Authority and current behavior |

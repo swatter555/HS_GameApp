@@ -1255,6 +1255,26 @@ namespace HammerAndSickle.Core.GameData
         TRK_GEN_CH,
 
         #endregion // Chinese Roster Additions
+
+        #region Saudi Roster Additions
+
+        // Append only; preserve earlier persisted names and numeric positions.
+        TANK_AMX30_SA,
+        SPSAM_SHAHINE_SA,
+        FGT_F15_SA,
+        FGT_F5_SA,
+        INF_REG_SA,
+        INF_GUARD_SA,
+        ART_LIGHT_SA,
+        ART_HEAVY_SA,
+        AAA_GEN_SA,
+        SPA_AUF1_SA,
+        APC_M113_SA,
+        IFV_AMX10P_SA,
+        TRK_GEN_SA,
+        INF_MECH_SA,
+
+        #endregion // Saudi Roster Additions
     }
 
     /* ⚠ RegimentProfileType DELETED 2026-08-08 (P1, todo_profiles §3). The full-tree sweep found it
