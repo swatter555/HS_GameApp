@@ -98,7 +98,7 @@ namespace HammerAndSickle.Tests
         {
             AssertOneStatLine("Light towed artillery",
                 WeaponType.ART_LIGHT_SV, WeaponType.ART_LIGHT_NATO,
-                WeaponType.ART_LIGHT_ARAB, WeaponType.ART_LIGHT_CH, WeaponType.ART_LIGHT_FR, WeaponType.ART_LIGHT_IQ, WeaponType.ART_LIGHT_IR, WeaponType.ART_LIGHT_UK, WeaponType.ART_LIGHT_GE);
+                WeaponType.ART_LIGHT_ARAB, WeaponType.ART_LIGHT_CH, WeaponType.ART_LIGHT_FR, WeaponType.ART_LIGHT_IQ, WeaponType.ART_LIGHT_IR, WeaponType.ART_LIGHT_UK, WeaponType.ART_LIGHT_GE, WeaponType.ART_LIGHT_US);
         }
 
         [Test]
@@ -106,20 +106,20 @@ namespace HammerAndSickle.Tests
         {
             AssertOneStatLine("Heavy towed artillery",
                 WeaponType.ART_HEAVY_SV, WeaponType.ART_HEAVY_NATO,
-                WeaponType.ART_HEAVY_ARAB, WeaponType.ART_HEAVY_CH, WeaponType.ART_HEAVY_FR, WeaponType.ART_HEAVY_IQ, WeaponType.ART_HEAVY_IR, WeaponType.ART_HEAVY_UK, WeaponType.ART_HEAVY_GE);
+                WeaponType.ART_HEAVY_ARAB, WeaponType.ART_HEAVY_CH, WeaponType.ART_HEAVY_FR, WeaponType.ART_HEAVY_IQ, WeaponType.ART_HEAVY_IR, WeaponType.ART_HEAVY_UK, WeaponType.ART_HEAVY_GE, WeaponType.ART_HEAVY_US);
         }
 
         [Test]
         public void NationalTowedAaa_UsesTheRegularCommodityLine()
         {
-            AssertOneStatLine("Towed AAA", WeaponType.AAA_GEN_SV, WeaponType.AAA_GEN_FR, WeaponType.AAA_GEN_IQ, WeaponType.AAA_GEN_IR, WeaponType.AAA_GEN_UK, WeaponType.AAA_GEN_GE, WeaponType.AAA_GEN_NATO);
+            AssertOneStatLine("Towed AAA", WeaponType.AAA_GEN_SV, WeaponType.AAA_GEN_FR, WeaponType.AAA_GEN_IQ, WeaponType.AAA_GEN_IR, WeaponType.AAA_GEN_UK, WeaponType.AAA_GEN_GE, WeaponType.AAA_GEN_NATO, WeaponType.AAA_GEN_US);
         }
 
         [Test]
         public void TransportTrucks_AreOneVehicleForEveryNation()
         {
             AssertOneStatLine("Transport truck",
-                WeaponType.TRK_GEN_SV, WeaponType.TRK_GEN_NATO, WeaponType.TRK_GEN_ARAB, WeaponType.TRK_GEN_IQ, WeaponType.TRK_GEN_IR);
+                WeaponType.TRK_GEN_SV, WeaponType.TRK_GEN_NATO, WeaponType.TRK_GEN_ARAB, WeaponType.TRK_GEN_IQ, WeaponType.TRK_GEN_IR, WeaponType.TRK_GEN_US);
         }
 
         /// <summary>

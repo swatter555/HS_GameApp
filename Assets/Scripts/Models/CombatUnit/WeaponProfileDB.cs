@@ -321,6 +321,18 @@ namespace HammerAndSickle.Models
             new Dictionary<ProfileStat, int> { { ProfileStat.IR, GameData.INDIRECT_RANGE_SHORT } },
             new[] { WeaponTrait.SELF_PROPELLED, WeaponTrait.RADAR_GUIDED_GUN });
 
+        /// <summary>Established organic helicopter lift; national art, cost and dates stay separate.</summary>
+        private static ProfileDef OrganicHeloLiftDef() => new(
+            FamilyArchetypes.Helicopter,
+            new Dictionary<ProfileStat, int>(),
+            new[] { WeaponTrait.NON_COMBATANT });
+
+        /// <summary>Short-body UH-1C rocket/minigun gunship; no cannon, guided AT missiles or lift role.</summary>
+        private static ProfileDef Uh1cGunshipDef() => new(
+            FamilyArchetypes.Helicopter,
+            new Dictionary<ProfileStat, int>(),
+            new[] { WeaponTrait.ROCKET_PODS });
+
         #endregion // Commodity Profile Blueprints
 
         #region Private Methods
@@ -336,6 +348,7 @@ namespace HammerAndSickle.Models
                 CreateSovietProfiles();
                 CreateGenericProfiles();
                 CreateWesternProfiles();
+                CreateUsRosterAdditions();
                 CreateFrenchRosterAdditions();
                 CreateBritishRosterAdditions();
                 CreateGermanRosterAdditions();
@@ -4262,9 +4275,7 @@ namespace HammerAndSickle.Models
             // → bare 7/6/10/7 GAD10 · MMP24 · SR3 · non-combatant.
             WeaponProfile UH60 = WeaponProfile.FromProfileDef(
                 "UH-60 Black Hawk Transport Helicopter", "UH-60 Black Hawk", WeaponType.HEL_UH60_US,
-                new ProfileDef(FamilyArchetypes.Helicopter,
-                    new Dictionary<ProfileStat, int>(),
-                    new[] { WeaponTrait.NON_COMBATANT }),
+                OrganicHeloLiftDef(),
                 UpgradePath.HELT, 492);
 
             // Set the prestige cost for the profile.
@@ -4295,13 +4306,11 @@ namespace HammerAndSickle.Models
             // Phase 3 (NATO): Helicopter + NON_COMBATANT — the Heeresflieger lift helo, NATO's exact
             // counterpart to the Mi-8T and pinned to the same Gen1/348 anchor. ⚠ TRANSPORT ONLY: Germany
             // never armed its Hueys (the Bundeswehr gunship is the Bo 105 PAH-1), so unlike the US and
-            // Saudi there is no UH-1C variant. A generation older than the UH-60, hence Gen1 not Gen2.
+            // NATO gameplay gunship there is no German UH-1C variant. Older than UH-60: Gen1, not Gen2.
             // → bare 7/6/10/7 GAD10 · MMP24 · SR3 · non-combatant · helo-transport.
             WeaponProfile UH1D_GE = WeaponProfile.FromProfileDef(
                 "UH-1D Transport Helicopter", "UH-1D", WeaponType.HEL_UH1D_GE,
-                new ProfileDef(FamilyArchetypes.Helicopter,
-                    new Dictionary<ProfileStat, int>(),
-                    new[] { WeaponTrait.NON_COMBATANT }),
+                OrganicHeloLiftDef(),
                 UpgradePath.HELT, 348);
 
             // Set the prestige cost for the profile.
@@ -4374,7 +4383,7 @@ namespace HammerAndSickle.Models
             AH1.AddIntelReportStat(WeaponType.HEL_AH1_US,      54);
 
             // Handle the icon profile.
-            // Note- No dedicated AH-1 sprites exist yet.
+            // National Cobra frames were connected during the shared sprite integration.
             AH1.IconProfile = new RegimentIconProfile(RegimentIconType.Helo_Animation)
             {
                 Icon = SpriteManager.US_AH1_Frame0
@@ -5272,6 +5281,88 @@ namespace HammerAndSickle.Models
 
             #endregion // Infantry Units
         }
+
+        /// <summary>National US support equipment and the older organic Huey option.</summary>
+        private static void CreateUsRosterAdditions()
+        {
+            // Shared gun ballistics; personnel/gun scale follows the existing US M109 counter.
+            // Open-bay towed bases exclude carriers: ground transport belongs in Mobile.
+            WeaponProfile LIGHT_US = WeaponProfile.FromProfileDef(
+                "US Light Towed Artillery", "US Light Artillery", WeaponType.ART_LIGHT_US,
+                LightTowedArtilleryDef(), UpgradePath.ART, 144);
+            LIGHT_US.SetPrestigeCost(PrestigeTierCost.Gen1, PrestigeTypeCost.ART);
+            LIGHT_US.SetMovementMedium(MovementMedium.Foot);
+            LIGHT_US.AddIntelReportStat(WeaponType.Personnel, 1050);
+            LIGHT_US.AddIntelReportStat(WeaponType.ART_105MM_FG, 54);
+            LIGHT_US.AddIntelReportStat(WeaponType.MANPAD_STINGER, 12);
+            LIGHT_US.IconProfile = new RegimentIconProfile(RegimentIconType.Single) { Icon = SpriteManager.US_LightArt };
+            AddProfile(WeaponType.ART_LIGHT_US, LIGHT_US);
+
+            WeaponProfile HEAVY_US = WeaponProfile.FromProfileDef(
+                "US Heavy Towed Artillery", "US Heavy Artillery", WeaponType.ART_HEAVY_US,
+                HeavyTowedArtilleryDef(), UpgradePath.ART, 144);
+            HEAVY_US.SetPrestigeCost(PrestigeTierCost.Gen1, PrestigeTypeCost.ART);
+            HEAVY_US.SetMovementMedium(MovementMedium.Foot);
+            HEAVY_US.AddIntelReportStat(WeaponType.Personnel, 1050);
+            HEAVY_US.AddIntelReportStat(WeaponType.ART_155MM_FG, 54);
+            HEAVY_US.AddIntelReportStat(WeaponType.MANPAD_STINGER, 12);
+            HEAVY_US.IconProfile = new RegimentIconProfile(RegimentIconType.Single) { Icon = SpriteManager.US_HeavyArt };
+            AddProfile(WeaponType.ART_HEAVY_US, HEAVY_US);
+
+            WeaponProfile AAA_US = WeaponProfile.FromProfileDef(
+                "US Towed Anti-Aircraft Artillery", "US Towed AAA", WeaponType.AAA_GEN_US,
+                TowedAaaDef(), UpgradePath.AAA, 144);
+            AAA_US.SetPrestigeCost(PrestigeTierCost.Gen1, PrestigeTypeCost.AAA);
+            AAA_US.SetMovementMedium(MovementMedium.Foot);
+            AAA_US.AddIntelReportStat(WeaponType.Personnel, 500);
+            AAA_US.AddIntelReportStat(WeaponType.AAA_GEN_US, 18);
+            AAA_US.AddIntelReportStat(WeaponType.MANPAD_STINGER, 12);
+            AAA_US.IconProfile = new RegimentIconProfile(RegimentIconType.Single) { Icon = SpriteManager.US_AAA };
+            AddProfile(WeaponType.AAA_GEN_US, AAA_US);
+
+            WeaponProfile TRUCK_US = WeaponProfile.FromProfileDef(
+                "US Transport Truck", "US Truck", WeaponType.TRK_GEN_US, TransportTruckDef());
+            TRUCK_US.SetPrestigeCost(PrestigeTierCost.Gen1, PrestigeTypeCost.TRK);
+            TRUCK_US.IconProfile = new RegimentIconProfile(RegimentIconType.Single) { Icon = SpriteManager.US_Truck };
+            AddProfile(WeaponType.TRK_GEN_US, TRUCK_US);
+
+            // Long-body UH-1D/H: same organic-only lift rules as the German UH-1D and Black Hawk.
+            // Turn300 uses 1963 UH-1D delivery; no aircraft census and no independent transport unit.
+            WeaponProfile UH1_US = WeaponProfile.FromProfileDef(
+                "UH-1D/H Huey Transport Helicopter", "UH-1 Huey", WeaponType.HEL_UH1_US,
+                OrganicHeloLiftDef(), UpgradePath.HELT, 300);
+            UH1_US.SetPrestigeCost(PrestigeTierCost.Gen1, PrestigeTypeCost.HELT);
+            UH1_US.SetTransportCategory(TransportCategory.HeloTransport);
+            UH1_US.IconProfile = new RegimentIconProfile(RegimentIconType.Helo_Animation) { Icon = SpriteManager.US_UH1_Frame0 };
+            AddProfile(WeaponType.HEL_UH1_US, UH1_US);
+
+            // Dedicated 1965 gunship; the minigun is represented by the family baseline, not CANNON_HELO.
+            WeaponProfile UH1C_US = WeaponProfile.FromProfileDef(
+                "UH-1C Huey Gunship", "UH-1C", WeaponType.HEL_UH1C_US,
+                Uh1cGunshipDef(), UpgradePath.HEL, 324);
+            UH1C_US.SetPrestigeCost(GameData.PRESTIGE_UH1C_GUNSHIP);
+            UH1C_US.AddIntelReportStat(WeaponType.HEL_UH1C_US, 54);
+            UH1C_US.IconProfile = new RegimentIconProfile(RegimentIconType.Helo_Animation) { Icon = SpriteManager.US_UH1C_Frame0 };
+            AddProfile(WeaponType.HEL_UH1C_US, UH1C_US);
+
+            // Approved NATO gameplay equipment shares the US pictures, but owns its profile/census.
+            WeaponProfile UH1_NATO = WeaponProfile.FromProfileDef(
+                "NATO UH-1D/H Huey Transport Helicopter", "NATO UH-1", WeaponType.HEL_UH1_NATO,
+                OrganicHeloLiftDef(), UpgradePath.HELT, 300);
+            UH1_NATO.SetPrestigeCost(PrestigeTierCost.Gen1, PrestigeTypeCost.HELT);
+            UH1_NATO.SetTransportCategory(TransportCategory.HeloTransport);
+            UH1_NATO.IconProfile = new RegimentIconProfile(RegimentIconType.Helo_Animation) { Icon = SpriteManager.US_UH1_Frame0 };
+            AddProfile(WeaponType.HEL_UH1_NATO, UH1_NATO);
+
+            WeaponProfile UH1C_NATO = WeaponProfile.FromProfileDef(
+                "NATO UH-1C Huey Gunship", "NATO UH-1C", WeaponType.HEL_UH1C_NATO,
+                Uh1cGunshipDef(), UpgradePath.HEL, 324);
+            UH1C_NATO.SetPrestigeCost(GameData.PRESTIGE_UH1C_GUNSHIP);
+            UH1C_NATO.AddIntelReportStat(WeaponType.HEL_UH1C_NATO, 54);
+            UH1C_NATO.IconProfile = new RegimentIconProfile(RegimentIconType.Helo_Animation) { Icon = SpriteManager.US_UH1C_Frame0 };
+            AddProfile(WeaponType.HEL_UH1C_NATO, UH1C_NATO);
+        }
+
 
         /// <summary>
         /// Adds the French packet's national equipment, infantry and organic helicopter lift.

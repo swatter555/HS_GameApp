@@ -1229,6 +1229,20 @@ namespace HammerAndSickle.Core.GameData
         FGT_F16_NATO,
 
         #endregion // Generic NATO Roster Additions
+
+        #region US Roster Additions
+
+        // Append additions; preserve all prior persisted keys and numeric positions.
+        ART_LIGHT_US,
+        ART_HEAVY_US,
+        AAA_GEN_US,
+        TRK_GEN_US,
+        HEL_UH1_US,
+        HEL_UH1C_US,
+        HEL_UH1_NATO,
+        HEL_UH1C_NATO,
+
+        #endregion // US Roster Additions
     }
 
     /* ⚠ RegimentProfileType DELETED 2026-08-08 (P1, todo_profiles §3). The full-tree sweep found it
@@ -1680,6 +1694,10 @@ namespace HammerAndSickle.Core.GameData
         // Robert, 2026-09-26: pre-thermal 105mm Danish Centurion is the cheaper armor option.
         // The existing Leopard 1s already cost Gen1+TANK (65); preserve them and price this at 55.
         public const int PRESTIGE_CENTURION_NATO = 55;
+
+        // Robert, 2026-09-26: older rocket-armed UH-1C costs less than the existing 130-prestige Cobra.
+        // US and NATO share the gunship definition and this 100-prestige exception.
+        public const int PRESTIGE_UH1C_GUNSHIP = 100;
 
         // 2026-08-22 (prestige pass, item 10 — §18.5.1, ratified): upgrade cost floor. The upgrade
         // formula is max(targetProfileCost − currentProfileCost, THIS) [× PRESTIGE_COST_MULT with

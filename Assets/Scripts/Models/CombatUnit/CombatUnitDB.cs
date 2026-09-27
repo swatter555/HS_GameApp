@@ -2512,7 +2512,7 @@ namespace HammerAndSickle.Models
                 side: Side.AI,
                 nationality: Nationality.USA,
                 deployedProfile: WeaponType.SAM_HAWK_US,
-                mobileProfile: WeaponType.TRK_GEN_NATO,
+                mobileProfile: WeaponType.TRK_GEN_US,
                 embarkedProfile: WeaponType.NONE,
                 category: DepotCategory.Secondary,
                 size: DepotSize.Small
@@ -2867,6 +2867,96 @@ namespace HammerAndSickle.Models
             AddTemplate("US_SR71_RECON_SQUADRON", us_SR71_squadron);
 
             #endregion // US Recon Squadron
+
+            var us_light_artillery_regiment = new CombatUnit(
+                unitName: "US Light Towed Artillery Regiment",
+                classification: UnitClassification.ART,
+                role: UnitRole.GroundCombat,
+                side: Side.AI,
+                nationality: Nationality.USA,
+                deployedProfile: WeaponType.ART_LIGHT_US,
+                mobileProfile: WeaponType.TRK_GEN_US,
+                embarkedProfile: WeaponType.NONE,
+                category: DepotCategory.Secondary,
+                size: DepotSize.Small
+            );
+            us_light_artillery_regiment.SetExperienceLevel(ExperienceLevel.Experienced);
+            AddTemplate("US_LIGHT_ARTILLERY_REGIMENT", us_light_artillery_regiment);
+
+            var us_heavy_artillery_regiment = new CombatUnit(
+                unitName: "US Heavy Towed Artillery Regiment",
+                classification: UnitClassification.ART,
+                role: UnitRole.GroundCombat,
+                side: Side.AI,
+                nationality: Nationality.USA,
+                deployedProfile: WeaponType.ART_HEAVY_US,
+                mobileProfile: WeaponType.TRK_GEN_US,
+                embarkedProfile: WeaponType.NONE,
+                category: DepotCategory.Secondary,
+                size: DepotSize.Small
+            );
+            us_heavy_artillery_regiment.SetExperienceLevel(ExperienceLevel.Experienced);
+            AddTemplate("US_HEAVY_ARTILLERY_REGIMENT", us_heavy_artillery_regiment);
+
+            var us_towed_aaa_regiment = new CombatUnit(
+                unitName: "US Towed Anti-Aircraft Regiment",
+                classification: UnitClassification.AAA,
+                role: UnitRole.AirDefenseArea,
+                side: Side.AI,
+                nationality: Nationality.USA,
+                deployedProfile: WeaponType.AAA_GEN_US,
+                mobileProfile: WeaponType.TRK_GEN_US,
+                embarkedProfile: WeaponType.NONE,
+                category: DepotCategory.Secondary,
+                size: DepotSize.Small
+            );
+            us_towed_aaa_regiment.SetExperienceLevel(ExperienceLevel.Trained);
+            AddTemplate("US_TOWED_AAA_REGIMENT", us_towed_aaa_regiment);
+
+            var us_cobra_aviation_brigade = new CombatUnit(
+                unitName: "US Cobra Aviation Brigade",
+                classification: UnitClassification.HELO,
+                role: UnitRole.GroundCombat,
+                side: Side.AI,
+                nationality: Nationality.USA,
+                deployedProfile: WeaponType.HEL_AH1_US,
+                mobileProfile: WeaponType.NONE,
+                embarkedProfile: WeaponType.NONE,
+                category: DepotCategory.Secondary,
+                size: DepotSize.Small
+            );
+            us_cobra_aviation_brigade.SetExperienceLevel(ExperienceLevel.Experienced);
+            AddTemplate("US_COBRA_AVIATION_BRIGADE", us_cobra_aviation_brigade);
+
+            var us_uh1c_aviation_brigade = new CombatUnit(
+                unitName: "US UH-1C Aviation Brigade",
+                classification: UnitClassification.HELO,
+                role: UnitRole.GroundCombat,
+                side: Side.AI,
+                nationality: Nationality.USA,
+                deployedProfile: WeaponType.HEL_UH1C_US,
+                mobileProfile: WeaponType.NONE,
+                embarkedProfile: WeaponType.NONE,
+                category: DepotCategory.Secondary,
+                size: DepotSize.Small
+            );
+            us_uh1c_aviation_brigade.SetExperienceLevel(ExperienceLevel.Experienced);
+            AddTemplate("US_UH1C_AVIATION_BRIGADE", us_uh1c_aviation_brigade);
+
+            var us_airmobile_brigade_uh1 = new CombatUnit(
+                unitName: "US Airmobile Brigade (UH-1)",
+                classification: UnitClassification.AM,
+                role: UnitRole.GroundCombat,
+                side: Side.AI,
+                nationality: Nationality.USA,
+                deployedProfile: WeaponType.INF_AM_US,
+                mobileProfile: WeaponType.APC_HUMVEE_US,
+                embarkedProfile: WeaponType.HEL_UH1_US,
+                category: DepotCategory.Secondary,
+                size: DepotSize.Small
+            );
+            us_airmobile_brigade_uh1.SetExperienceLevel(ExperienceLevel.Veteran);
+            AddTemplate("US_AIRMOBILE_BRIGADE_UH1", us_airmobile_brigade_uh1);
         }
 
         public static void CreateGermanForces()
