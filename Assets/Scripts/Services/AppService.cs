@@ -232,6 +232,7 @@ namespace HammerAndSickle.Services
                 sb.AppendLine($"=== Hammer & Sickle Session Log ===");
                 sb.AppendLine($"Session Start: {_exceptions[0].Timestamp:yyyy-MM-dd HH:mm:ss}");
                 sb.AppendLine($"Total Exceptions: {_exceptions.Count}");
+                sb.AppendLine($"Game Version: {Application.version}");
                 sb.AppendLine($"Unity Version: {Application.unityVersion}");
                 sb.AppendLine($"Platform: {Application.platform}");
                 sb.AppendLine();

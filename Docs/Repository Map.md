@@ -8,6 +8,8 @@
 
 **Current roster/art work:** [Completion-plan and local checklist navigation](<Roster and Art Completion.md>) links the reconciled vault plan and Robert's file-backed sprite creation checklist. Its progress is separate from Unity import and gameplay verification.
 
+**Windows testing builds:** [Build and Versioning](<Build and Versioning.md>) owns the product/build-counter policy, desktop defaults, exact Editor upgrade workflow and packaging gates. The first testing version is `0.1.0-alpha.1` / build `1`; product and engine versions remain independent of save/content versions.
+
 This map describes the implementation that exists. The [design document][design] and its supplements describe intended behavior, which is not all implemented. The scan covered the tracked/nonignored file inventory, all first-party C# files for types/imports and unfinished-work markers, runtime call sites, assemblies, project settings, scene callback/script references, content headers and assets. Key load, turn, combat, persistence and rendering paths were inspected in detail. This was not a line-by-line correctness audit of every asset/vendor file, a Unity import, a build, or a test run.
 
 ## Project at a glance
