@@ -4308,12 +4308,12 @@ namespace HammerAndSickle.Models
             #region BE Recon Unit
 
             var be_recon_unit = new CombatUnit(
-                unitName: "BE Recon Unit (Scimitar)",
+                unitName: "BE Recon Unit (M113 C&V)",
                 classification: UnitClassification.RECON,
                 role: UnitRole.GroundCombat,
                 side: Side.AI,
                 nationality: Nationality.BE,
-                deployedProfile: WeaponType.RCN_FV105_UK,
+                deployedProfile: WeaponType.RCN_M113CV_NATO,
                 mobileProfile: WeaponType.NONE,
                 embarkedProfile: WeaponType.NONE,
                 category: DepotCategory.Secondary,
@@ -4504,12 +4504,12 @@ namespace HammerAndSickle.Models
             #region DK Recon Unit
 
             var dk_recon_unit = new CombatUnit(
-                unitName: "DK Recon Unit",
+                unitName: "DK Recon Unit (M113 C&V)",
                 classification: UnitClassification.RECON,
                 role: UnitRole.GroundCombat,
                 side: Side.AI,
                 nationality: Nationality.DE,
-                deployedProfile: WeaponType.RCN_FV105_UK,
+                deployedProfile: WeaponType.RCN_M113CV_NATO,
                 mobileProfile: WeaponType.NONE,
                 embarkedProfile: WeaponType.NONE,
                 category: DepotCategory.Secondary,
@@ -5878,8 +5878,8 @@ namespace HammerAndSickle.Models
 
             var ch_type83_artillery_regiment = new CombatUnit(
                 unitName: "Chinese Self-Propelled Artillery Regiment (Type 83)",
-                classification: UnitClassification.ART,
-                role: UnitRole.GroundCombat,
+                classification: UnitClassification.SPA,
+                role: UnitRole.GroundCombatIndirect,
                 side: Side.AI,
                 nationality: Nationality.China,
                 deployedProfile: WeaponType.SPA_TYPE83_CH,

@@ -40,6 +40,8 @@ namespace HammerAndSickle.Tests
         [TestCase("NL_ARMOURED_INFANTRY_BRIGADE", Nationality.NE, UnitClassification.MECH, WeaponType.INF_MECH_NL, WeaponType.IFV_YPR765_NATO)]
         [TestCase("BE_MECH_INFANTRY_BRIGADE", Nationality.BE, UnitClassification.MECH, WeaponType.INF_MECH_BE, WeaponType.IFV_YPR765_NATO)]
         [TestCase("NL_RECON_UNIT", Nationality.NE, UnitClassification.RECON, WeaponType.RCN_M113CV_NATO, WeaponType.NONE)]
+        [TestCase("BE_RECON_UNIT", Nationality.BE, UnitClassification.RECON, WeaponType.RCN_M113CV_NATO, WeaponType.NONE)]
+        [TestCase("DK_RECON_UNIT", Nationality.DE, UnitClassification.RECON, WeaponType.RCN_M113CV_NATO, WeaponType.NONE)]
         [TestCase("NL_AIR_DEFENSE_REGIMENT", Nationality.NE, UnitClassification.SPAAA, WeaponType.SPAAA_PRTL_NATO, WeaponType.NONE)]
         [TestCase("NL_F16_FIGHTER_SQUADRON", Nationality.NE, UnitClassification.FGT, WeaponType.FGT_F16_NATO, WeaponType.NONE)]
         [TestCase("NL_ARMOURED_INFANTRY_BRIGADE_M113", Nationality.NE, UnitClassification.MECH, WeaponType.INF_MECH_NL, WeaponType.APC_M113_NATO)]
@@ -119,6 +121,9 @@ namespace HammerAndSickle.Tests
             Assert.That(P(tank).IconProfile.Icon, Is.EqualTo(SpriteManager.NATO_Leopard1));
             Assert.That(P(tank).PrestigeCost, Is.EqualTo(65));
             Assert.That(P(tank).ICM, Is.EqualTo(1.05f * 1.05f).Within(0.0001f), "Existing optics and laser multipliers combine multiplicatively.");
+            Assert.That(P(tank).IntelReportStats[WeaponType.RCN_M113CV_NATO],
+                Is.EqualTo(tank == WeaponType.TANK_LEOPARD1_DK ? 10 : 12));
+            Assert.That(P(tank).IntelReportStats.ContainsKey(WeaponType.RCN_FV105_UK), Is.False);
         }
 
         [Test]
@@ -140,7 +145,7 @@ namespace HammerAndSickle.Tests
         }
 
         [Test]
-        public void DutchRecon_IsDistinctFromIranianM113AndDoesNotBecomeAnInfantryCarrier()
+        public void SharedNatoRecon_IsDistinctFromIranianM113AndDoesNotBecomeAnInfantryCarrier()
         {
             var p = P(WeaponType.RCN_M113CV_NATO);
             Assert.That(p.TargetClass, Is.EqualTo(TargetClass.Soft));
@@ -219,13 +224,13 @@ namespace HammerAndSickle.Tests
             Assert.That(units.Count(u => u.Nationality == Nationality.NE), Is.EqualTo(11));
             Assert.That(units.Count(u => u.Nationality == Nationality.BE), Is.EqualTo(9));
             Assert.That(units.Count(u => u.Nationality == Nationality.DE), Is.EqualTo(7));
-            foreach (var type in new[] { WeaponType.SPAAA_PRTL_NATO, WeaponType.RCN_M113CV_NATO })
-                Assert.That(units.Where(u => u.EquipmentBays.Deployed == type).All(u => u.Nationality == Nationality.NE), Is.True);
+            Assert.That(units.Where(u => u.EquipmentBays.Deployed == WeaponType.SPAAA_PRTL_NATO)
+                .All(u => u.Nationality == Nationality.NE), Is.True);
+            Assert.That(units.Where(u => u.EquipmentBays.Deployed == WeaponType.RCN_M113CV_NATO)
+                .Select(u => u.Nationality), Is.EquivalentTo(new[] { Nationality.NE, Nationality.BE, Nationality.DE }));
             Assert.That(units.Where(u => u.EquipmentBays.Deployed == WeaponType.TANK_CENTURION_NATO).All(u => u.Nationality == Nationality.DE), Is.True);
             Assert.That(units.Where(u => u.Nationality == Nationality.DE).Any(u => GameData.IsAirDefenseClassification(u.Classification)), Is.False);
             Assert.That(CombatUnitDB.GetUnitTemplate("BE_AIR_DEFENSE_REGIMENT").EquipmentBays.Deployed, Is.EqualTo(WeaponType.SPAAA_GEPARD_GE));
-            Assert.That(CombatUnitDB.GetUnitTemplate("BE_RECON_UNIT").EquipmentBays.Deployed, Is.EqualTo(WeaponType.RCN_FV105_UK));
-            Assert.That(CombatUnitDB.GetUnitTemplate("DK_RECON_UNIT").EquipmentBays.Deployed, Is.EqualTo(WeaponType.RCN_FV105_UK));
             var pictures = units.SelectMany(u => new[] { u.EquipmentBays.Deployed, u.EquipmentBays.Mobile, u.EquipmentBays.Embarked })
                 .Where(t => t != WeaponType.NONE).Select(t => P(t).IconProfile.Icon)
                 .Where(icon => icon.StartsWith("NATO_", StringComparison.Ordinal)).Distinct().ToList();

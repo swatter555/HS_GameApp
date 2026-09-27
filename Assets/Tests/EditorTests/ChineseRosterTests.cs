@@ -2,6 +2,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using HammerAndSickle.Controllers;
+using HammerAndSickle.Core.Campaign;
 using HammerAndSickle.Core.GameData;
 using HammerAndSickle.Core.Map;
 using HammerAndSickle.Models;
@@ -42,7 +43,7 @@ namespace HammerAndSickle.Tests
         [TestCase("CH_MOT_INFANTRY_REGIMENT_TYPE63", UnitClassification.MOT, UnitRole.GroundCombat, WeaponType.INF_REG_CH, WeaponType.APC_TYPE63_CH)]
         [TestCase("CH_J6_FIGHTER_SQUADRON", UnitClassification.FGT, UnitRole.AirSuperiority, WeaponType.FGT_J6_CH, WeaponType.NONE)]
         [TestCase("CH_TOWED_AAA_REGIMENT", UnitClassification.AAA, UnitRole.AirDefenseArea, WeaponType.AAA_GEN_CH, WeaponType.TRK_GEN_CH)]
-        [TestCase("CH_TYPE83_ARTILLERY_REGIMENT", UnitClassification.ART, UnitRole.GroundCombat, WeaponType.SPA_TYPE83_CH, WeaponType.NONE)]
+        [TestCase("CH_TYPE83_ARTILLERY_REGIMENT", UnitClassification.SPA, UnitRole.GroundCombatIndirect, WeaponType.SPA_TYPE83_CH, WeaponType.NONE)]
         public void NewRegularFormations_UseLegalBaysAndExistingNationalExperience(string id,
             UnitClassification classification, UnitRole role, WeaponType deployed, WeaponType mobile)
         {
@@ -145,7 +146,7 @@ namespace HammerAndSickle.Tests
         }
 
         [Test]
-        public void Type83AndZ9_DisplayCorrections_PreserveTheirIdentifiersArtAndCombatBehavior()
+        public void ChineseDisplayNames_KeepApprovedIdentifiersArtAndUnitTypes()
         {
             Assert.That(P(WeaponType.SPA_TYPE83_CH).ShortName, Is.EqualTo("Type 83"));
             Assert.That(P(WeaponType.SPA_TYPE83_CH).IconProfile.Icon, Is.EqualTo(SpriteManager.CH_Type83));
@@ -157,7 +158,33 @@ namespace HammerAndSickle.Tests
             Assert.That(CombatUnitDB.GetUnitTemplate("CH_SP_ARTILLERY_REGIMENT").EquipmentBays.Deployed, Is.EqualTo(WeaponType.ROC_PHZ89_CH));
             Assert.That(P(WeaponType.ROC_PHZ89_CH).HasCapability(WeaponCapability.RocketArtillery), Is.True);
             Assert.That(P(WeaponType.SPAAA_TYPE53_CH).ShortName, Is.EqualTo("Type 53"));
+            Assert.That(CombatUnitDB.GetUnitTemplate("CH_AIR_DEFENSE_REGIMENT").Classification, Is.EqualTo(UnitClassification.SPAAA));
             Assert.That(Enum.GetNames(typeof(WeaponType)), Does.Not.Contain("TANK_TYPE69_CH"));
+        }
+
+        [Test]
+        public void Type83_Matches2S1WeaponsAndPrice_WhileKeepingChineseCensusAndQuality()
+        {
+            var p = P(WeaponType.SPA_TYPE83_CH);
+            var soviet = P(WeaponType.SPA_2S1_SV);
+            Assert.That(p.HardAttack, Is.EqualTo(soviet.HardAttack));
+            Assert.That(p.HardDefense, Is.EqualTo(soviet.HardDefense));
+            Assert.That(p.SoftAttack, Is.EqualTo(soviet.SoftAttack));
+            Assert.That(p.SoftDefense, Is.EqualTo(soviet.SoftDefense));
+            Assert.That(p.GroundAirAttack, Is.EqualTo(soviet.GroundAirAttack));
+            Assert.That(p.GroundAirDefense, Is.EqualTo(soviet.GroundAirDefense));
+            Assert.That(p.MaxMovementPoints, Is.EqualTo(soviet.MaxMovementPoints));
+            Assert.That(p.MovementMedium, Is.EqualTo(soviet.MovementMedium));
+            Assert.That(p.SpottingRange, Is.EqualTo(soviet.SpottingRange));
+            Assert.That(p.IndirectRange, Is.EqualTo(soviet.IndirectRange));
+            Assert.That(p.PrestigeCost, Is.EqualTo(soviet.PrestigeCost));
+            Assert.That(p.ICM, Is.EqualTo(0.9f).Within(0.0001f));
+            Assert.That(p.IconProfile.Icon, Is.EqualTo(SpriteManager.CH_Type83));
+            Assert.That(p.IntelReportStats, Is.EquivalentTo(new Dictionary<WeaponType, int>
+            {
+                { WeaponType.Personnel, 700 }, { WeaponType.SPA_TYPE83_CH, 36 },
+                { WeaponType.IFV_TYPE86_CH, 12 }, { WeaponType.MANPAD_STRELA, 8 }
+            }));
         }
 
         [TestCase("CH_TANK_REGIMENT_TYPE59_SECOND_LINE", "CH_TANK_REGIMENT_TYPE59", ExperienceLevel.Green)]
@@ -195,7 +222,9 @@ namespace HammerAndSickle.Tests
             Assert.That(p.IntelReportStats[WeaponType.TANK_TYPE80_CH], Is.EqualTo(80));
             Assert.That(p.HardAttack, Is.EqualTo(10));
             Assert.That(p.ICM, Is.EqualTo(1.05f * 0.9f).Within(0.0001f));
-            Assert.That(p.TurnAvailable, Is.EqualTo(564), "Display-only correction preserves the existing availability.");
+            Assert.That(p.TurnAvailable, Is.EqualTo(CampaignDateCalendar.DateToTurn(011986)));
+            Assert.That(new CampaignDateCalendar(121985, 011986).IsWeaponSystemAvailable(p), Is.False);
+            Assert.That(new CampaignDateCalendar(011986, 011986).IsWeaponSystemAvailable(p), Is.True);
             Assert.That(p.PrestigeCost, Is.EqualTo(65));
             var u = CombatUnitDB.GetUnitTemplate("CH_TANK_REGIMENT_TYPE80");
             Assert.That(u.UnitName, Is.EqualTo("Chinese Tank Regiment (Type 88)"));

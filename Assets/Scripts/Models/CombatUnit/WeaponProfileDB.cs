@@ -5789,7 +5789,7 @@ namespace HammerAndSickle.Models
             LEO1_BE.AddIntelReportStat(WeaponType.Personnel,          1900);
             LEO1_BE.AddIntelReportStat(WeaponType.TANK_LEOPARD1_BE,     72);  // 2x tank BN (36 each)
             LEO1_BE.AddIntelReportStat(WeaponType.IFV_YPR765_NATO,        55);  // AIFV armoured infantry bn
-            LEO1_BE.AddIntelReportStat(WeaponType.RCN_FV105_UK,         12);  // Scimitar recon squadron
+            LEO1_BE.AddIntelReportStat(WeaponType.RCN_M113CV_NATO,      12);  // Shared NATO recon squadron
             LEO1_BE.AddIntelReportStat(WeaponType.AT_ATGM,              20);  // MILAN AT teams
             LEO1_BE.AddIntelReportStat(WeaponType.MANPAD_MISTRAL,       16);  // Mistral/Blowpipe sections
             LEO1_BE.AddIntelReportStat(WeaponType.SPA_M109_NATO,          18);  // Organic 155mm SP battalion
@@ -5825,7 +5825,7 @@ namespace HammerAndSickle.Models
             LEO1_DK.AddIntelReportStat(WeaponType.Personnel,          1600);
             LEO1_DK.AddIntelReportStat(WeaponType.TANK_LEOPARD1_DK,     60);  // 2x tank BN (30 each)
             LEO1_DK.AddIntelReportStat(WeaponType.APC_M113_NATO,        48);  // M113 armoured infantry bn
-            LEO1_DK.AddIntelReportStat(WeaponType.RCN_FV105_UK,         10);  // Brigade recon troop
+            LEO1_DK.AddIntelReportStat(WeaponType.RCN_M113CV_NATO,      10);  // Brigade recon troop
             LEO1_DK.AddIntelReportStat(WeaponType.AT_ATGM,              24);  // TOW AT company
             LEO1_DK.AddIntelReportStat(WeaponType.MANPAD_STINGER,       12);  // Stinger sections
             LEO1_DK.AddIntelReportStat(WeaponType.SPA_M109_NATO,          12);  // Organic 155mm SP battery
@@ -6058,7 +6058,7 @@ namespace HammerAndSickle.Models
             CENTURION_NATO.AddIntelReportStat(WeaponType.Personnel, 1600);
             CENTURION_NATO.AddIntelReportStat(WeaponType.TANK_CENTURION_NATO, 60);
             CENTURION_NATO.AddIntelReportStat(WeaponType.APC_M113_NATO, 48);
-            CENTURION_NATO.AddIntelReportStat(WeaponType.RCN_FV105_UK, 10);
+            CENTURION_NATO.AddIntelReportStat(WeaponType.RCN_M113CV_NATO, 10);
             CENTURION_NATO.AddIntelReportStat(WeaponType.AT_ATGM, 24);
             CENTURION_NATO.AddIntelReportStat(WeaponType.MANPAD_STINGER, 12);
             CENTURION_NATO.AddIntelReportStat(WeaponType.SPA_M109_NATO, 12);
@@ -7600,14 +7600,15 @@ namespace HammerAndSickle.Models
             // Chinese Type 88 Main Battle Tank (stable TANK_TYPE80_CH key)
             //----------------------------------------------
             // Type 88 (105mm rifled) = Gen2 + LASER_RANGEFINDER. Robert approved display-only correction;
-            // keep the existing Type80 key/art and availability. Basic FCS, no thermal.
+            // keep the existing Type80 key/art. January 1986 availability approved 2026-09-27.
+            // Basic FCS, no thermal.
             // → HA10 HD8 SA7 SD6 GAD7 · ICM 0.945 (LRF 1.05 × second line 0.9) · MMP10 · SR2.
             WeaponProfile TYPE80 = WeaponProfile.FromProfileDef(
                 "Type 88 Main Battle Tank", "Type 88", WeaponType.TANK_TYPE80_CH,
                 new ProfileDef(TankArchetypes.Gen2,
                     new Dictionary<ProfileStat, int>(),
                     new[] { WeaponTrait.LASER_RANGEFINDER, WeaponTrait.SECOND_LINE_FORMATION }),
-                UpgradePath.TANK, 564);
+                UpgradePath.TANK, 576);
 
             // Set the prestige cost for the profile.
             TYPE80.SetPrestigeCost(PrestigeTierCost.Gen1, PrestigeTypeCost.TANK);
@@ -7678,19 +7679,18 @@ namespace HammerAndSickle.Models
             //----------------------------------------------
             // Chinese Type 83 Self-Propelled Howitzer
             //----------------------------------------------
-            // Phase 3 (derived): Artillery + SELF_PROPELLED (tracked chassis: MMP+6→10, HD/SD+2, GAD-1) + IR MEDIUM.
-            // 152mm tracked SP howitzer with a 2S3-like layout; retain the existing authored ratings. → HA5 HD7 SA9 SD7 GAD7 · MMP10 · IR MEDIUM.
+            // Robert, 2026-09-27: use 2S1-equivalent weapon statistics and price as a game abstraction.
+            // Chinese census/art and SECOND_LINE_FORMATION remain national: HA5 HD7 SA9 SD7 GAD7,
+            // MMP10, IR4, ICM0.9. Equipment equivalence does not import the Soviet formation census.
             WeaponProfile SPA_TYPE83_CH = WeaponProfile.FromProfileDef(
                 "Type 83 Self-Propelled Howitzer", "Type 83", WeaponType.SPA_TYPE83_CH,
                 new ProfileDef(FamilyArchetypes.Artillery,
-                    new Dictionary<ProfileStat, int> { { ProfileStat.IR, GameData.INDIRECT_RANGE_MEDIUM } },
+                    new Dictionary<ProfileStat, int> { { ProfileStat.IR, GameData.INDIRECT_RANGE_SHORT } },
                     new[] { WeaponTrait.SELF_PROPELLED, WeaponTrait.SECOND_LINE_FORMATION }),
                 UpgradePath.ART, 552);
 
             // Set the prestige cost for the profile.
-            // Artillery ruling 5 (2026-08-22): Gen3 → Gen2 — 2S3-class stats were carrying a 2S5-class
-            // price (pricing drift; China tank prices drifted the OTHER way, see survey §4).
-            SPA_TYPE83_CH.SetPrestigeCost(PrestigeTierCost.Gen2, PrestigeTypeCost.SPA);
+            SPA_TYPE83_CH.SetPrestigeCost(PrestigeTierCost.Gen1, PrestigeTypeCost.SPA);
 
             // Intel stats
             SPA_TYPE83_CH.AddIntelReportStat(WeaponType.Personnel,       700);
