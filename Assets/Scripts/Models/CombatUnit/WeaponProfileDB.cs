@@ -375,6 +375,7 @@ namespace HammerAndSickle.Models
             try
             {
                 CreateSovietProfiles();
+                CreateSovietRosterAdditions();
                 CreateGenericProfiles();
                 CreateWesternProfiles();
                 CreateUsRosterAdditions();
@@ -2928,6 +2929,66 @@ namespace HammerAndSickle.Models
             //----------------------------------------------
 
             #endregion // Infantry Units
+        }
+
+        /// <summary>Approved Soviet-only Gen1 tanks with light reactive armor.</summary>
+        private static void CreateSovietRosterAdditions()
+        {
+            // Keep each original tank line and add ERA_LIGHT only (+2 HD). January 1985
+            // is the authored availability anchor; no extra FCS, missile or engine package.
+            WeaponProfile T55MV = WeaponProfile.FromProfileDef(
+                "T-55MV Main Battle Tank", "T-55MV", WeaponType.TANK_T55MV_SV,
+                new ProfileDef(TankArchetypes.Gen1,
+                    new Dictionary<ProfileStat, int>(),
+                    new[] { WeaponTrait.LOW_PROFILE, WeaponTrait.NBC_PROTECTED, WeaponTrait.ERA_LIGHT }),
+                UpgradePath.TANK, 564);
+            T55MV.SetPrestigeCost(PrestigeTierCost.Gen1, PrestigeTypeCost.TANK);
+
+            // Same regiment support as the original; only its 94 own tanks change type.
+            T55MV.AddIntelReportStat(WeaponType.Personnel, 1143);
+            T55MV.AddIntelReportStat(WeaponType.TANK_T55MV_SV, 94);
+            T55MV.AddIntelReportStat(WeaponType.IFV_BMP1_SV, 45);
+            T55MV.AddIntelReportStat(WeaponType.APC_BTR70_SV, 21);
+            T55MV.AddIntelReportStat(WeaponType.RCN_BRDM2_SV, 12);
+            T55MV.AddIntelReportStat(WeaponType.SPAAA_ZSU57_SV, 4);
+            T55MV.AddIntelReportStat(WeaponType.SPSAM_2K12_SV, 4);
+            T55MV.AddIntelReportStat(WeaponType.SPA_2S1_SV, 18);
+            T55MV.AddIntelReportStat(WeaponType.ART_81MM_MORTAR, 12);
+            T55MV.AddIntelReportStat(WeaponType.ART_120MM_MORTAR, 12);
+            T55MV.AddIntelReportStat(WeaponType.AT_ATGM, 12);
+            T55MV.AddIntelReportStat(WeaponType.MANPAD_STRELA, 12);
+            T55MV.IconProfile = new RegimentIconProfile(RegimentIconType.Single)
+            {
+                Icon = SpriteManager.SV_T55MV
+            };
+            AddProfile(WeaponType.TANK_T55MV_SV, T55MV);
+
+            WeaponProfile T62MV = WeaponProfile.FromProfileDef(
+                "T-62MV Main Battle Tank", "T-62MV", WeaponType.TANK_T62MV_SV,
+                new ProfileDef(TankArchetypes.Gen1,
+                    new Dictionary<ProfileStat, int> { { ProfileStat.HA, 1 } },
+                    new[] { WeaponTrait.LOW_PROFILE, WeaponTrait.NBC_PROTECTED, WeaponTrait.ERA_LIGHT }),
+                UpgradePath.TANK, 564);
+            T62MV.SetPrestigeCost(PrestigeTierCost.Gen1, PrestigeTypeCost.TANK);
+
+            // Same regiment support as the original; only its 94 own tanks change type.
+            T62MV.AddIntelReportStat(WeaponType.Personnel, 1143);
+            T62MV.AddIntelReportStat(WeaponType.TANK_T62MV_SV, 94);
+            T62MV.AddIntelReportStat(WeaponType.IFV_BMP1_SV, 45);
+            T62MV.AddIntelReportStat(WeaponType.APC_BTR70_SV, 21);
+            T62MV.AddIntelReportStat(WeaponType.RCN_BRDM2_SV, 12);
+            T62MV.AddIntelReportStat(WeaponType.SPAAA_ZSU57_SV, 4);
+            T62MV.AddIntelReportStat(WeaponType.SPSAM_2K12_SV, 4);
+            T62MV.AddIntelReportStat(WeaponType.SPA_2S1_SV, 18);
+            T62MV.AddIntelReportStat(WeaponType.ART_81MM_MORTAR, 12);
+            T62MV.AddIntelReportStat(WeaponType.ART_120MM_MORTAR, 12);
+            T62MV.AddIntelReportStat(WeaponType.AT_ATGM, 12);
+            T62MV.AddIntelReportStat(WeaponType.MANPAD_STRELA, 12);
+            T62MV.IconProfile = new RegimentIconProfile(RegimentIconType.Single)
+            {
+                Icon = SpriteManager.SV_T62MV
+            };
+            AddProfile(WeaponType.TANK_T62MV_SV, T62MV);
         }
 
         /// <summary>

@@ -462,6 +462,44 @@ namespace HammerAndSickle.Models
 
             #endregion //T62A Tank Regiment
 
+            #region T55MV Tank Regiment
+
+            var t55mvRegiment = new CombatUnit(
+                unitName: "Tank Regiment (T-55MV)",
+                classification: UnitClassification.TANK,
+                role: UnitRole.GroundCombat,
+                side: Side.Player,
+                nationality: Nationality.USSR,
+                deployedProfile: WeaponType.TANK_T55MV_SV,
+                mobileProfile: WeaponType.NONE,
+                embarkedProfile: WeaponType.NONE,
+                category: DepotCategory.Secondary,
+                size: DepotSize.Small
+            );
+            t55mvRegiment.SetExperienceLevel(ExperienceLevel.Trained);
+            AddTemplate("USSR_TR_T55MV", t55mvRegiment);
+
+            #endregion // T55MV Tank Regiment
+
+            #region T62MV Tank Regiment
+
+            var t62mvRegiment = new CombatUnit(
+                unitName: "Tank Regiment (T-62MV)",
+                classification: UnitClassification.TANK,
+                role: UnitRole.GroundCombat,
+                side: Side.Player,
+                nationality: Nationality.USSR,
+                deployedProfile: WeaponType.TANK_T62MV_SV,
+                mobileProfile: WeaponType.NONE,
+                embarkedProfile: WeaponType.NONE,
+                category: DepotCategory.Secondary,
+                size: DepotSize.Small
+            );
+            t62mvRegiment.SetExperienceLevel(ExperienceLevel.Trained);
+            AddTemplate("USSR_TR_T62MV", t62mvRegiment);
+
+            #endregion // T62MV Tank Regiment
+
             #region T64A Tank Regiment
 
             var t64aRegiment = new CombatUnit(

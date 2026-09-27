@@ -90,6 +90,25 @@ namespace HammerAndSickle.Tests
                 "Declared unit art and imported PNGs must match, including art for upcoming profiles.");
         }
 
+        [Test]
+        public void EveryImportedUnitIcon_HasARegisteredProfileOwner()
+        {
+            // The Soviet MV additions close the last planned-only artwork entries.
+            var owned = new HashSet<string>(StringComparer.Ordinal);
+            foreach (WeaponType type in Enum.GetValues(typeof(WeaponType)))
+            {
+                if (!WeaponProfileDB.HasWeaponProfile(type)) continue;
+                var icon = WeaponProfileDB.GetWeaponProfile(type).IconProfile;
+                if (icon.IconType == RegimentIconType.Helo_Animation)
+                    for (int frame = 0; frame < 6; frame++)
+                        owned.Add(Regex.Replace(icon.Icon, @"_Frame0$", $"_Frame{frame}"));
+                else
+                    owned.Add(icon.Icon);
+            }
+            Assert.That(_assets.Keys.Except(owned).OrderBy(name => name).ToArray(), Is.Empty,
+                "Every imported unit PNG must belong to a registered profile, including helicopter frames.");
+        }
+
         private static bool IsUnitConstant(string name)
         {
             // CH is also used by the existing Chinese map theme and terrain portraits.

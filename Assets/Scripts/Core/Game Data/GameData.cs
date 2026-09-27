@@ -1275,6 +1275,14 @@ namespace HammerAndSickle.Core.GameData
         INF_MECH_SA,
 
         #endregion // Saudi Roster Additions
+
+        #region Soviet MV Roster Additions
+
+        // Append only; the original T-55A/T-62A and all earlier values remain valid.
+        TANK_T55MV_SV,
+        TANK_T62MV_SV,
+
+        #endregion // Soviet MV Roster Additions
     }
 
     /* ⚠ RegimentProfileType DELETED 2026-08-08 (P1, todo_profiles §3). The full-tree sweep found it
