@@ -43,6 +43,9 @@ namespace HammerAndSickle.Models
 
         #region Skill System
 
+        // Snapshot handoff only; saves persist Leader.SkillTreeData through System.Text.Json.
+        // Unity's field serializer cannot serialize this property-based DTO.
+        [NonSerialized]
         public LeaderSkillTreeData SkillTreeData;
 
         #endregion // Skill System

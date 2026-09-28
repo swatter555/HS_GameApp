@@ -245,7 +245,12 @@ namespace HammerAndSickle.EditorTools.UI
         {
             var results = new List<MethodInfo>();
 
-            foreach (Assembly assembly in AppDomain.CurrentDomain.GetAssemblies())
+#if UNITY_6000_6_OR_NEWER
+            var assemblies = UnityEngine.Assemblies.CurrentAssemblies.GetLoadedAssemblies();
+#else
+            var assemblies = AppDomain.CurrentDomain.GetAssemblies();
+#endif
+            foreach (Assembly assembly in assemblies)
             {
                 foreach (Type type in SafeGetTypes(assembly))
                 {

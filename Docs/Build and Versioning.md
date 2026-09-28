@@ -53,7 +53,11 @@ Use a short Editor installation root such as `C:/Unity/Editors/<exact-version>`.
 
 If this recurs, compare the affected cache with the exact Editor's bundled package, preserve the existing project, and reinstall the same signed release under the short root. Verify its release checksum/signature, original source and metadata, then regenerate or restore the affected caches from the complete matching package. Do not patch vendor code, invent replacement GUIDs, or treat the CLI's structural Editor check as a full package-file audit. Register the repaired installation and keep the preceding working Editor available. Recompile and rerun tests before claiming recovery.
 
-The Editor-only button-wiring audit compares `(target object, method name)` directly when detecting duplicate listeners. It does not use Unity's retired `GetInstanceID()` API or persist Editor object identities.
+After changing installations, verify the running process path (or `EditorApplication.applicationPath`), not just the CLI's installation list. An already-running Unity Hub can retain the old installation choice, including when the CLI is given an explicit Editor path. Restart Hub to reload its installation settings. If it still selects the old installation, launch the repaired `Unity.exe` directly with `-projectPath` and verify the live path before continuing.
+
+The Editor-only button-wiring audit compares `(target object, method name)` directly when detecting duplicate listeners. It does not use Unity's retired `GetInstanceID()` API or persist Editor object identities. On Unity 6.6 it enumerates `CurrentAssemblies.GetLoadedAssemblies()` to avoid assemblies Unity has already unloaded; the earlier Editor keeps its existing enumeration fallback. The LeanTween example's unsorted object count likewise uses the supported 6.6 overload with an earlier-version fallback.
+
+`LeaderData.SkillTreeData` is a snapshot handoff field explicitly excluded from Unity field serialization. Saved leaders still carry `Leader.SkillTreeData` through System.Text.Json and `JsonPolicy.Save`; the property-based skill DTO and the persisted JSON names are unchanged. A snapshot/save round-trip test protects skills, grade, reputation and leader identity.
 
 Atlas verification must also respect Unity object ownership: `SpriteAtlas.GetSprite` can return a persistent imported asset in the newer Editor. Test cleanup destroys only nonpersistent temporary sprites; it must never enable asset destruction to silence a cleanup error.
 

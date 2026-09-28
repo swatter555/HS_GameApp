@@ -523,7 +523,11 @@ namespace DentedPixel.LTExamples
             Time.timeScale = 1f;
 
             int ltCount = 0;
+#if UNITY_6000_6_OR_NEWER
+            GameObject[] allGos = UnityEngine.Object.FindObjectsByType<GameObject>();
+#else
             GameObject[] allGos = UnityEngine.Object.FindObjectsByType<GameObject>(FindObjectsSortMode.None);
+#endif
             foreach (var go in allGos)
             {
                 if (go.name == "~LeanTween")

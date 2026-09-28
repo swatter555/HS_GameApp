@@ -544,5 +544,40 @@ namespace HammerAndSickle.Tests
         }
 
         #endregion // REP earn hooks
+
+        #region Snapshot persistence
+
+        [Test]
+        public void SnapshotAndSaveRoundTrip_PreservesLeaderSkills()
+        {
+            var leader = MakeLeader();
+            PromoteToSenior(leader);
+            var expected = leader.GetSkillTree().ToSnapshot();
+
+            // Follow SnapshotMapper's handoff, then the actual save serializer.
+            var copy = LeaderSnapshotExtensions.FromSnapshot(leader.ToSnapshot());
+            copy.PrepareForSerialization();
+            string json = System.Text.Json.JsonSerializer.Serialize(copy, Persistence.JsonPolicy.Save);
+            StringAssert.Contains("\"skillTreeData\"", json);
+            StringAssert.Contains("\"unlockedSkills\"", json);
+            var restored = System.Text.Json.JsonSerializer.Deserialize<Leader>(json, Persistence.JsonPolicy.Save);
+            restored.RestoreFromDeserialization();
+            var actual = restored.GetSkillTree().ToSnapshot();
+
+            Assert.AreEqual(leader.LeaderID, restored.LeaderID);
+            Assert.AreEqual(expected.ReputationPoints, actual.ReputationPoints);
+            Assert.AreEqual(expected.CurrentGrade, actual.CurrentGrade);
+            CollectionAssert.AreEquivalent(expected.StartedBranches, actual.StartedBranches);
+            Assert.AreEqual(expected.UnlockedSkills.Count, actual.UnlockedSkills.Count);
+            foreach (var skill in expected.UnlockedSkills)
+            {
+                Assert.IsTrue(actual.UnlockedSkills.Exists(candidate =>
+                    candidate.EnumTypeName == skill.EnumTypeName &&
+                    candidate.EnumValueName == skill.EnumValueName &&
+                    candidate.EnumValueInt == skill.EnumValueInt), skill.EnumValueName);
+            }
+        }
+
+        #endregion // Snapshot persistence
     }
 }
