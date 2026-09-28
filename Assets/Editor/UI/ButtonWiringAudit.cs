@@ -111,7 +111,7 @@ namespace HammerAndSickle.EditorTools.UI
             }
 
             int findings = 0;
-            var seen = new HashSet<string>(StringComparer.Ordinal);
+            var seen = new HashSet<(UnityEngine.Object target, string method)>();
 
             for (int i = 0; i < listenerCount; i++)
             {
@@ -153,7 +153,7 @@ namespace HammerAndSickle.EditorTools.UI
 
                 // (4) Same target+method twice — fires twice per press. This project has eaten a double-fire
                 // before, which is exactly why one wiring mechanism replaced the old split.
-                if (!seen.Add($"{target.GetInstanceID()}.{method}"))
+                if (!seen.Add((target, method)))
                 {
                     Debug.LogWarning($"{CLASS_NAME}: '{path}' wires {method}() MORE THAN ONCE — it will fire once " +
                                      "per duplicate on every press.", button);

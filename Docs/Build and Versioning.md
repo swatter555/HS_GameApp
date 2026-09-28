@@ -47,6 +47,16 @@ Robert delegated HS Game Unity-version management to the Lead Agent on 2026-09-2
 5. Adopt the candidate by committing the exact Editor pin and necessary dependency/migration changes with their verification record. If the trial fails, keep the previous approved baseline and record the blocker. Do not claim installing the Editor completed the project migration.
 6. Coordinate the exact game pin and any shared-contract consequences with HS Editor/HS_AI through the established correspondence workflow. Their Editor versions are not silently changed by an HS Game decision.
 
+### Windows installation paths
+
+Use a short Editor installation root such as `C:/Unity/Editors/<exact-version>`. On September 27, 2026, installing `6000.6.3f1` below the longer Documents/Game Development path omitted bundled files whose full names exceeded the legacy Windows path limit, despite Windows long-path support being enabled. The missing rendering-bridge assembly definition and material helpers caused package compiler errors; the project cache inherited the incomplete files.
+
+If this recurs, compare the affected cache with the exact Editor's bundled package, preserve the existing project, and reinstall the same signed release under the short root. Verify its release checksum/signature, original source and metadata, then regenerate or restore the affected caches from the complete matching package. Do not patch vendor code, invent replacement GUIDs, or treat the CLI's structural Editor check as a full package-file audit. Register the repaired installation and keep the preceding working Editor available. Recompile and rerun tests before claiming recovery.
+
+The Editor-only button-wiring audit compares `(target object, method name)` directly when detecting duplicate listeners. It does not use Unity's retired `GetInstanceID()` API or persist Editor object identities.
+
+Atlas verification must also respect Unity object ownership: `SpriteAtlas.GetSprite` can return a persistent imported asset in the newer Editor. Test cleanup destroys only nonpersistent temporary sprites; it must never enable asset destruction to silence a cleanup error.
+
 ## Packaging gates
 
 Read the active vault TODO before any external distribution. Existing open gates include the enemy-reveal cheat, legacy asset/identifier cleanup, provisional French frames, the StreamingAssets OOB backup, generated terrain arrays and unfinished player-save guarantees. Unity test success alone does not close those gates.

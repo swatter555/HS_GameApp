@@ -272,7 +272,9 @@ namespace HammerAndSickle.Tests
                 var sprite = atlas.GetSprite(name);
                 if (sprite == null) continue;
                 matches.Add(atlas);
-                UnityEngine.Object.DestroyImmediate(sprite); // GetSprite returns a temporary clone.
+                // Unity 6.6 can return the imported asset; only older temporary clones are ours to destroy.
+                if (!EditorUtility.IsPersistent(sprite))
+                    UnityEngine.Object.DestroyImmediate(sprite);
             }
             return matches.ToArray();
         }
