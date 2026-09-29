@@ -339,13 +339,13 @@ namespace HammerAndSickle.Core.Map
                 ApplyIconFacing(unitIcon, unit);
 
                 
-                // Set nationality symbol
-                string symbolSprite = GetNationalSymbol(unit.Nationality);
-                unitIcon.SetNationIcon(symbolSprite);
+                // Set the nationality flag sized for the information overlay.
+                string flagSprite = GetNationalFlagIcon(unit.Nationality);
+                unitIcon.SetNationIcon(flagSprite);
 
-                // Set box icon base (color based on faction)
-                string boxSprite = GetBoxIconBase(unit.Nationality);
-                unitIcon.SetBoxIcon(boxSprite);
+                // Set the information overlay color by faction.
+                string overlaySprite = GetInfoOverlay(unit.Nationality);
+                unitIcon.SetInfoOverlay(overlaySprite);
 
                 // Calculate HP percentage (1-100)
                 int hpPercent = Mathf.Clamp(Mathf.RoundToInt(unit.HitPoints.GetPercentage() * 100f), 1, 100);
@@ -814,58 +814,57 @@ namespace HammerAndSickle.Core.Map
 
         #endregion // Direction and Flip Methods
 
-        #region Nationality Symbol Methods
+        #region Nationality Display Methods
 
         /// <summary>
-        /// Gets the national symbol sprite name for a given nationality.
-        /// Symbols are small icons designed for unit icon display.
+        /// Gets the national flag sprite name sized for the unit information overlay.
         /// </summary>
-        /// <param name="nationality">The nationality to get the symbol for</param>
-        /// <returns>Sprite name for the nationality symbol</returns>
-        private string GetNationalSymbol(Nationality nationality)
+        /// <param name="nationality">The nationality to get the flag for</param>
+        /// <returns>Sprite name for the nationality flag</returns>
+        private string GetNationalFlagIcon(Nationality nationality)
         {
             return nationality switch
             {
-                Nationality.USSR => SpriteManager.Symbol_SV,
-                Nationality.USA => SpriteManager.Symbol_US,
-                Nationality.UK => SpriteManager.Symbol_UK,
-                Nationality.FRG => SpriteManager.Symbol_GE,
-                Nationality.FRA => SpriteManager.Symbol_FR,
-                Nationality.BE => SpriteManager.Symbol_BE,
-                Nationality.DE => SpriteManager.Symbol_DE,
-                Nationality.NE => SpriteManager.Symbol_NE,
-                Nationality.MJ => SpriteManager.Symbol_MJ,
-                Nationality.IR => SpriteManager.Symbol_Iran,
-                Nationality.IQ => SpriteManager.Symbol_Iraq,
-                Nationality.SAUD => SpriteManager.Symbol_Saudi,
-                Nationality.KW => SpriteManager.Symbol_Kuwait,
-                Nationality.China => SpriteManager.Symbol_China,
+                Nationality.USSR => SpriteManager.FlagIcon_SV,
+                Nationality.USA => SpriteManager.FlagIcon_US,
+                Nationality.UK => SpriteManager.FlagIcon_UK,
+                Nationality.FRG => SpriteManager.FlagIcon_GE,
+                Nationality.FRA => SpriteManager.FlagIcon_FR,
+                Nationality.BE => SpriteManager.FlagIcon_BE,
+                Nationality.DE => SpriteManager.FlagIcon_DE,
+                Nationality.NE => SpriteManager.FlagIcon_NE,
+                Nationality.MJ => SpriteManager.FlagIcon_MJ,
+                Nationality.IR => SpriteManager.FlagIcon_IR,
+                Nationality.IQ => SpriteManager.FlagIcon_IQ,
+                Nationality.SAUD => SpriteManager.FlagIcon_SA,
+                Nationality.KW => SpriteManager.FlagIcon_KW,
+                Nationality.China => SpriteManager.FlagIcon_CH,
                 _ => SpriteManager.Symbol_Default
             };
         }
 
         /// <summary>
-        /// Gets the box icon base sprite name for a given nationality.
-        /// Soviet = Red, NATO = Blue, Mujahideen/Arab = Green, Chinese = Grey.
+        /// Gets the information overlay for a nationality.
+        /// Soviet = Red, NATO = Blue, Regional (including China) = Green.
         /// </summary>
-        /// <param name="nationality">The nationality to get the box icon for</param>
-        /// <returns>Sprite name for the icon base</returns>
-        private string GetBoxIconBase(Nationality nationality)
+        /// <param name="nationality">The nationality to get the overlay for</param>
+        /// <returns>Sprite name for the information overlay</returns>
+        private string GetInfoOverlay(Nationality nationality)
         {
             return nationality switch
             {
-                Nationality.USSR => SpriteManager.RedIconBase,
-                Nationality.MJ => SpriteManager.GreenIconBase,
-                Nationality.IR => SpriteManager.GreenIconBase,
-                Nationality.IQ => SpriteManager.GreenIconBase,
-                Nationality.SAUD => SpriteManager.GreenIconBase,
-                Nationality.KW => SpriteManager.GreenIconBase,
-                Nationality.China => SpriteManager.GreyIconBase,
-                _ => SpriteManager.BlueIconBase // NATO nations (USA, UK, FRG, FRA, BE, DE, NE)
+                Nationality.USSR => SpriteManager.UnitIcon_Red,
+                Nationality.MJ => SpriteManager.UnitIcon_Green,
+                Nationality.IR => SpriteManager.UnitIcon_Green,
+                Nationality.IQ => SpriteManager.UnitIcon_Green,
+                Nationality.SAUD => SpriteManager.UnitIcon_Green,
+                Nationality.KW => SpriteManager.UnitIcon_Green,
+                Nationality.China => SpriteManager.UnitIcon_Green,
+                _ => SpriteManager.UnitIcon_Blue // NATO nations (USA, UK, FRG, FRA, BE, DE, NE)
             };
         }
 
-        #endregion // Nationality Symbol Methods
+        #endregion // Nationality Display Methods
 
         #region Unit Stacking Methods
 

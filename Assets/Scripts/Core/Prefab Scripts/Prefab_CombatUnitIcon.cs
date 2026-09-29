@@ -5,6 +5,7 @@ using HammerAndSickle.Services;
 using System;
 using TMPro;
 using UnityEngine;
+using UnityEngine.Serialization;
 
 // This file sits in namespace HammerAndSickle.Core, where the bare name "GameData" binds to the CHILD
 // NAMESPACE HammerAndSickle.Core.GameData rather than to the constants class of the same name inside it.
@@ -28,7 +29,8 @@ namespace HammerAndSickle.Core
         [Header("Component References")]
         [SerializeField] private SpriteRenderer unitIcon;
         [SerializeField] private SpriteRenderer nationIcon;
-        [SerializeField] private SpriteRenderer boxIcon;
+        [FormerlySerializedAs("boxIcon")]
+        [SerializeField] private SpriteRenderer infoOverlay;
         [SerializeField] private TextMeshPro boxText;
         [SerializeField] private SpriteRenderer deployIcon;
         [SerializeField] private SpriteRenderer stackingIcon;
@@ -318,39 +320,39 @@ namespace HammerAndSickle.Core
         }
 
         /// <summary>
-        /// Sets the box icon sprite (background behind hit points text).
+        /// Sets the faction-colored information overlay sprite.
         /// </summary>
-        public void SetBoxIcon(string spriteName)
+        public void SetInfoOverlay(string spriteName)
         {
             try
             {
-                if (boxIcon == null)
+                if (infoOverlay == null)
                 {
                     return;
                 }
 
                 if (string.IsNullOrEmpty(spriteName))
                 {
-                    AppService.CaptureUiMessage($"{CLASS_NAME}.SetBoxIcon: Sprite name is null or empty.");
+                    AppService.CaptureUiMessage($"{CLASS_NAME}.SetInfoOverlay: Sprite name is null or empty.");
                     return;
                 }
 
-                boxIcon.sprite = SpriteManager.GetSprite(spriteName);
+                infoOverlay.sprite = SpriteManager.GetSprite(spriteName);
             }
             catch (Exception e)
             {
-                AppService.HandleException(CLASS_NAME, nameof(SetBoxIcon), e);
+                AppService.HandleException(CLASS_NAME, nameof(SetInfoOverlay), e);
             }
         }
 
         /// <summary>
-        /// Shows or hides the box icon.
+        /// Shows or hides the information overlay.
         /// </summary>
-        public void ShowBoxIcon(bool show)
+        public void ShowInfoOverlay(bool show)
         {
-            if (boxIcon != null)
+            if (infoOverlay != null)
             {
-                boxIcon.enabled = show;
+                infoOverlay.enabled = show;
             }
         }
 
@@ -433,7 +435,7 @@ namespace HammerAndSickle.Core
         private const int UnitIconSubOrder = 0;
         private const int NationIconSubOrder = 1;
         private const int DeployIconSubOrder = 2;
-        private const int BoxIconSubOrder = 3;
+        private const int InfoOverlaySubOrder = 3;
         private const int BoxTextSubOrder = 4;
         private const int StackingIconSubOrder = 5;
 
@@ -449,7 +451,7 @@ namespace HammerAndSickle.Core
                 SortingConfig.Apply(unitIcon, slot, UnitIconSubOrder);
                 SortingConfig.Apply(nationIcon, slot, NationIconSubOrder);
                 SortingConfig.Apply(deployIcon, slot, DeployIconSubOrder);
-                SortingConfig.Apply(boxIcon, slot, BoxIconSubOrder);
+                SortingConfig.Apply(infoOverlay, slot, InfoOverlaySubOrder);
                 SortingConfig.Apply(boxText != null ? boxText.GetComponent<Renderer>() : null, slot, BoxTextSubOrder);
                 SortingConfig.Apply(stackingIcon, slot, StackingIconSubOrder);
             }
@@ -481,11 +483,11 @@ namespace HammerAndSickle.Core
                 nationIcon.color = color;
             }
 
-            if (boxIcon != null)
+            if (infoOverlay != null)
             {
-                Color color = boxIcon.color;
+                Color color = infoOverlay.color;
                 color.a = opacity;
-                boxIcon.color = color;
+                infoOverlay.color = color;
             }
 
             if (boxText != null)
@@ -558,8 +560,8 @@ namespace HammerAndSickle.Core
             if (nationIcon == null)
                 Debug.LogWarning($"{CLASS_NAME}.ValidateReferences: nationIcon is not assigned");
 
-            if (boxIcon == null)
-                Debug.LogWarning($"{CLASS_NAME}.ValidateReferences: boxIcon is not assigned");
+            if (infoOverlay == null)
+                Debug.LogWarning($"{CLASS_NAME}.ValidateReferences: infoOverlay is not assigned");
 
             if (boxText == null)
                 Debug.LogWarning($"{CLASS_NAME}.ValidateReferences: boxText is not assigned");

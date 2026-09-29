@@ -2,6 +2,7 @@
 %TAG !u! tag:unity3d.com,2011:
 --- !u!687078895 &4343727234628468602
 SpriteAtlas:
+  serializedVersion: 3
   m_ObjectHideFlags: 0
   m_CorrespondingSourceObject: {fileID: 0}
   m_PrefabInstance: {fileID: 0}
@@ -45,61 +46,62 @@ SpriteAtlas:
     secondaryTextureSettings: {}
     variantMultiplier: 1
     packables:
-    - {fileID: 21300000, guid: 365a55a3d659d134d92f8e42eeb93827, type: 3}
-    - {fileID: 21300000, guid: 5047717550940834e968234750f9c5e1, type: 3}
-    - {fileID: 21300000, guid: f432776f021df8145988490b5f5b04c1, type: 3}
-    - {fileID: 21300000, guid: 657986de00710534781367e573f528ff, type: 3}
-    - {fileID: 21300000, guid: 880dd1d6225741246a45278039a6a741, type: 3}
-    - {fileID: 21300000, guid: 1c62f7e8564b6764cba1390ce01e136e, type: 3}
-    - {fileID: 21300000, guid: e981b44643d258b4c9202866cc2cc7e6, type: 3}
-    - {fileID: 21300000, guid: 84c781ded1906c64ea3a8f244a64414c, type: 3}
-    - {fileID: 21300000, guid: b28dd8ec23b9763408599f5a919c8298, type: 3}
-    - {fileID: 21300000, guid: 415f8dd7bff620d4680b8d574b1c9650, type: 3}
-    - {fileID: 21300000, guid: b7a8cdb5ad9d80c4eb148b27c41d6907, type: 3}
-    - {fileID: 21300000, guid: 1f9a0b13cadbdbe4d9969c5193cd02c6, type: 3}
+    - {fileID: 21300000, guid: 02cfd65953540634d923f7c78868dddc, type: 3}
+    - {fileID: 21300000, guid: 3eee49471ac89134c9f796a1dba79334, type: 3}
+    - {fileID: 21300000, guid: 1840ca6bc63af5944a721c08865cb2fd, type: 3}
+    - {fileID: 21300000, guid: 96f909b9bc8886345a943289e617ca26, type: 3}
+    - {fileID: 21300000, guid: 841f32a1ca845534fafa67696335b192, type: 3}
+    - {fileID: 21300000, guid: 9cd008577d9a2ac47ad49d6a40605dd3, type: 3}
+    - {fileID: 21300000, guid: c0a9adf38a7739e4b8a7726f8387133d, type: 3}
+    - {fileID: 21300000, guid: b32f9d5f3d663204cb9dff55f71334e0, type: 3}
+    - {fileID: 21300000, guid: 86099af90f1a2af419cb04fd10382258, type: 3}
+    - {fileID: 21300000, guid: 7d1c86ba7eb22eb40ad03aecaa37e13c, type: 3}
+    - {fileID: 21300000, guid: cc4a0d68d70c42b498d1f00319c2d148, type: 3}
+    - {fileID: 21300000, guid: d5b17dc52fccc4845bd65f4e4e32496f, type: 3}
+    - {fileID: 21300000, guid: 3a79865318d56894fa0e8158caf00194, type: 3}
+    - {fileID: 21300000, guid: 9308935021fb0e54d812ee112eef8b11, type: 3}
+    - {fileID: 21300000, guid: 48e236661362ea64fabe20438fde7aa3, type: 3}
+    - {fileID: 21300000, guid: 34cd26a9394434f47834f4776e8ea57b, type: 3}
+    - {fileID: 21300000, guid: c9244189c4dd9f34b8872a3e8572cb88, type: 3}
+    - {fileID: 21300000, guid: 44bc4baabd8b64e41a2691005c64aafd, type: 3}
+    - {fileID: 21300000, guid: abd7dfebc4dd02141bf627f081d7815c, type: 3}
+    - {fileID: 21300000, guid: 5ae97d1191ce6ce4bb8874e203d042f2, type: 3}
+    - {fileID: 21300000, guid: 8606242bac3d73545b920a2bfee956c3, type: 3}
+    - {fileID: 21300000, guid: c6fd949644126374f96290faf75c362a, type: 3}
+    - {fileID: 21300000, guid: 9e0794d50ef28e24abf6bdd816d0475c, type: 3}
+    - {fileID: 21300000, guid: 44016ee44bf70ee418832269459877be, type: 3}
+    - {fileID: 21300000, guid: 5ed5319ef4945c94eb1647c8c05416fd, type: 3}
     bindAsDefault: 1
     isAtlasV2: 0
     cachedData: {fileID: 0}
     packedSpriteRenderDataKeys:
-    - 1f9a0b13cadbdbe4d9969c5193cd02c6: 21300000
-    - 365a55a3d659d134d92f8e42eeb93827: 21300000
-    - 5047717550940834e968234750f9c5e1: 21300000
-    - b7a8cdb5ad9d80c4eb148b27c41d6907: 21300000
-    - e981b44643d258b4c9202866cc2cc7e6: 21300000
-    - 880dd1d6225741246a45278039a6a741: 21300000
-    - 415f8dd7bff620d4680b8d574b1c9650: 21300000
-    - 1c62f7e8564b6764cba1390ce01e136e: 21300000
-    - b28dd8ec23b9763408599f5a919c8298: 21300000
-    - 84c781ded1906c64ea3a8f244a64414c: 21300000
-    - 657986de00710534781367e573f528ff: 21300000
-    - f432776f021df8145988490b5f5b04c1: 21300000
+    - 9308935021fb0e54d812ee112eef8b11: 21300000
+    - 5ae97d1191ce6ce4bb8874e203d042f2: 21300000
+    - 841f32a1ca845534fafa67696335b192: 21300000
+    - 3a79865318d56894fa0e8158caf00194: 21300000
+    - c0a9adf38a7739e4b8a7726f8387133d: 21300000
+    - 44016ee44bf70ee418832269459877be: 21300000
+    - d5b17dc52fccc4845bd65f4e4e32496f: 21300000
+    - 9e0794d50ef28e24abf6bdd816d0475c: 21300000
+    - 48e236661362ea64fabe20438fde7aa3: 21300000
+    - c6fd949644126374f96290faf75c362a: 21300000
+    - 3eee49471ac89134c9f796a1dba79334: 21300000
+    - 9cd008577d9a2ac47ad49d6a40605dd3: 21300000
+    - cc4a0d68d70c42b498d1f00319c2d148: 21300000
+    - 02cfd65953540634d923f7c78868dddc: 21300000
+    - c9244189c4dd9f34b8872a3e8572cb88: 21300000
+    - 34cd26a9394434f47834f4776e8ea57b: 21300000
+    - 96f909b9bc8886345a943289e617ca26: 21300000
+    - 86099af90f1a2af419cb04fd10382258: 21300000
+    - 44bc4baabd8b64e41a2691005c64aafd: 21300000
+    - 7d1c86ba7eb22eb40ad03aecaa37e13c: 21300000
+    - 8606242bac3d73545b920a2bfee956c3: 21300000
+    - 1840ca6bc63af5944a721c08865cb2fd: 21300000
+    - abd7dfebc4dd02141bf627f081d7815c: 21300000
+    - 5ed5319ef4945c94eb1647c8c05416fd: 21300000
+    - b32f9d5f3d663204cb9dff55f71334e0: 21300000
   m_MasterAtlas: {fileID: 0}
-  m_PackedSprites:
-  - {fileID: 21300000, guid: 1f9a0b13cadbdbe4d9969c5193cd02c6, type: 3}
-  - {fileID: 21300000, guid: 365a55a3d659d134d92f8e42eeb93827, type: 3}
-  - {fileID: 21300000, guid: 5047717550940834e968234750f9c5e1, type: 3}
-  - {fileID: 21300000, guid: b7a8cdb5ad9d80c4eb148b27c41d6907, type: 3}
-  - {fileID: 21300000, guid: e981b44643d258b4c9202866cc2cc7e6, type: 3}
-  - {fileID: 21300000, guid: 880dd1d6225741246a45278039a6a741, type: 3}
-  - {fileID: 21300000, guid: 415f8dd7bff620d4680b8d574b1c9650, type: 3}
-  - {fileID: 21300000, guid: 1c62f7e8564b6764cba1390ce01e136e, type: 3}
-  - {fileID: 21300000, guid: b28dd8ec23b9763408599f5a919c8298, type: 3}
-  - {fileID: 21300000, guid: 84c781ded1906c64ea3a8f244a64414c, type: 3}
-  - {fileID: 21300000, guid: 657986de00710534781367e573f528ff, type: 3}
-  - {fileID: 21300000, guid: f432776f021df8145988490b5f5b04c1, type: 3}
-  m_PackedSpriteNamesToIndex:
-  - UnknownIcon
-  - BlueUnitBase
-  - DefensiveIcon
-  - RedUnitBase
-  - FortifiedIcon
-  - EmbarkedNavalIcon
-  - MountedIcon
-  - EntrenchedIcon
-  - GreyUnitBase
-  - GreenUnitBase
-  - EmbarkedAirIcon
-  - DeployedIcon
   m_RenderDataMap: {}
   m_Tag: UnitPrefab Icons
   m_IsVariant: 0
+  m_Guid: 2943a0266f300294d94147b5c731c4b2

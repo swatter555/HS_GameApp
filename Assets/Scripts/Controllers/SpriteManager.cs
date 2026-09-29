@@ -794,24 +794,39 @@ namespace HammerAndSickle.Controllers
         public const string Symbol_UK      = "UK_Symbol";
         public const string Symbol_US      = "US_Symbol";
         public const string Symbol_Default = "DF_Symbol";
-        // Icon Bases
-        public const string BlueIconBase  = "BlueUnitBase";
-        public const string GreenIconBase = "GreenUnitBase";
-        public const string RedIconBase   = "RedUnitBase";
-        public const string GreyIconBase  = "GreyUnitBase";
+        // Nationality flags sized for the unit information overlay.
+        public const string FlagIcon_BE = "BE_Flag_Icon";
+        public const string FlagIcon_CH = "CH_Flag_Icon";
+        public const string FlagIcon_DE = "DE_Flag_Icon";
+        public const string FlagIcon_FR = "FR_Flag_Icon";
+        public const string FlagIcon_GE = "GE_Flag_Icon";
+        public const string FlagIcon_IR = "IR_Flag_Icon";
+        public const string FlagIcon_IQ = "IQ_Flag_Icon";
+        public const string FlagIcon_KW = "KW_Flag_Icon";
+        public const string FlagIcon_MJ = "MJ_Flag_Icon";
+        public const string FlagIcon_NE = "NE_Flag_Icon";
+        public const string FlagIcon_SA = "SA_Flag_Icon";
+        public const string FlagIcon_SV = "SV_Flag_Icon";
+        public const string FlagIcon_UK = "UK_Flag_Icon";
+        public const string FlagIcon_US = "US_Flag_Icon";
+
+        // Information overlays (NATO, Soviet, Regional including China)
+        public const string UnitIcon_Blue  = "UnitIcon_Blue";
+        public const string UnitIcon_Red   = "UnitIcon_Red";
+        public const string UnitIcon_Green = "UnitIcon_Green";
 
         // Deployment Status
-        public const string DeployedIcon      = "DeployedIcon";
-        public const string DefensiveIcon     = "DefensiveIcon";
-        public const string EntrenchedIcon    = "EntrenchedIcon";
-        public const string FortifiedIcon     = "FortifiedIcon";
-        public const string MountedIcon       = "MountedIcon";
-        public const string EmbarkedAirIcon   = "EmbarkedAirIcon";
-        public const string EmbarkedNavalIcon = "EmbarkedNavalIcon";
+        public const string DeployedIcon      = "Deployed_Icon";
+        public const string DefensiveIcon     = "Defensive_Icon";
+        public const string EntrenchedIcon    = "Entrenched_Icon";
+        public const string FortifiedIcon     = "Fortified_Icon";
+        public const string MountedIcon       = "Mounted_Icon";
+        public const string EmbarkedAirIcon   = "Embarked_Air_Icon";
+        public const string EmbarkedNavalIcon = "Embarked_Naval_Icon";
 
         // Deployment posture UNKNOWN (§12.2.2 / §24.3.2.2): shown on an enemy icon below SpottedLevel3,
         // where the ladder has not yet revealed the real posture. Same slot and size as the icons above.
-        public const string UnknownDeploymentIcon = "UnknownIcon";
+        public const string UnknownDeploymentIcon = "Unknown_Icon";
 
         #endregion
 

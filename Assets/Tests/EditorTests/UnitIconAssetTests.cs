@@ -131,6 +131,56 @@ namespace HammerAndSickle.Tests
         }
 
         [Test]
+        public void UnitInfoOverlay_PreservesTheAuthoredPrefabRendererReference()
+        {
+            var prefab = AssetDatabase.LoadAssetAtPath<GameObject>("Assets/Art/Prefabs/Units/Prefab_UnitIcons.prefab");
+            Assert.That(prefab, Is.Not.Null);
+            var component = prefab.GetComponent<HammerAndSickle.Core.Prefab_CombatUnitIcon>();
+            Assert.That(component, Is.Not.Null);
+            var overlay = prefab.GetComponentsInChildren<SpriteRenderer>(true)
+                .Single(r => r.name == "SpriteRenderer_Overlay");
+            // The authored prefab still stores boxIcon until Unity next saves it. The rename must
+            // deserialize that existing reference, not silently leave the new Inspector field empty.
+            var property = new SerializedObject(component).FindProperty("infoOverlay");
+            Assert.That(property, Is.Not.Null);
+            Assert.That(property.objectReferenceValue, Is.EqualTo(overlay));
+            Assert.That(overlay.sprite, Is.Not.Null);
+        }
+
+        [Test]
+        public void UnitPrefabGraphics_ResolveThroughTheWiredAtlas()
+        {
+            const string atlasPath = AtlasRoot + "/UnitPrefab Icons.spriteatlas";
+            var atlas = AssetDatabase.LoadAssetAtPath<SpriteAtlas>(atlasPath);
+            Assert.That(atlas, Is.Not.Null);
+            Assert.That(_sceneAtlases, Does.Contain(atlas), "MainMenu must wire the prefab icon atlas.");
+            Assert.That(SpriteAtlasExtensions.IsIncludeInBuild(atlas), Is.True);
+            var packables = atlas.GetPackables();
+            Assert.That(packables.Any(p => p == null), Is.False, "Missing prefab icon packable.");
+
+            var names = new[]
+            {
+                SpriteManager.UnitIcon_Blue, SpriteManager.UnitIcon_Red, SpriteManager.UnitIcon_Green,
+                SpriteManager.DeployedIcon, SpriteManager.DefensiveIcon, SpriteManager.EntrenchedIcon,
+                SpriteManager.FortifiedIcon, SpriteManager.MountedIcon, SpriteManager.EmbarkedAirIcon,
+                SpriteManager.EmbarkedNavalIcon, SpriteManager.UnknownDeploymentIcon
+            }.Concat(typeof(SpriteManager).GetFields(BindingFlags.Public | BindingFlags.Static)
+                .Where(f => f.IsLiteral && f.FieldType == typeof(string) && f.Name.StartsWith("FlagIcon_", StringComparison.Ordinal))
+                .Select(f => (string)f.GetRawConstantValue()));
+
+            foreach (string name in names)
+            {
+                string path = $"Assets/Art/Sprites/UnitPrefab Icons/{name}.png";
+                var sprite = AssetDatabase.LoadAssetAtPath<Sprite>(path);
+                Assert.That(sprite, Is.Not.Null, path);
+                Assert.That(sprite.name, Is.EqualTo(name), path);
+                Assert.That(packables.Count(p => AssetDatabase.GetAssetPath(p) == path), Is.EqualTo(1), path);
+                Assert.That(ResolvingAtlases(name), Is.EquivalentTo(new[] { atlas }),
+                    $"{name}: missing or ambiguous runtime lookup.");
+            }
+        }
+
+        [Test]
         public void ImportedIcons_PreserveTheFullCanvasAndImportContract()
         {
             foreach (var pair in _assets)
