@@ -131,7 +131,7 @@ namespace HammerAndSickle.Tests
         {
             var p = P(WeaponType.SPA_M109_NATO);
             Assert.That(p.HardAttack, Is.EqualTo(5));
-            Assert.That(p.SoftAttack, Is.EqualTo(10));
+            Assert.That(p.SoftAttack, Is.EqualTo(11), "Approved artillery-family SA 10 plus the preserved NATO profile adjustment +1.");
             Assert.That(p.IndirectRange, Is.EqualTo(GameData.INDIRECT_RANGE_MEDIUM));
             Assert.That(p.MaxMovementPoints, Is.EqualTo(10));
             Assert.That(p.ICM, Is.EqualTo(1.05f).Within(0.001f));

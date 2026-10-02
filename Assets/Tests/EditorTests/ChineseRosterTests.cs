@@ -150,7 +150,7 @@ namespace HammerAndSickle.Tests
         {
             Assert.That(P(WeaponType.SPA_TYPE83_CH).ShortName, Is.EqualTo("Type 83"));
             Assert.That(P(WeaponType.SPA_TYPE83_CH).IconProfile.Icon, Is.EqualTo(SpriteManager.CH_Type83));
-            Assert.That(P(WeaponType.SPA_TYPE83_CH).SoftAttack, Is.EqualTo(9));
+            Assert.That(P(WeaponType.SPA_TYPE83_CH).SoftAttack, Is.EqualTo(10), "Approved artillery-family SA +1; Type 83 retains its 2S1-equivalent ratings.");
             Assert.That(P(WeaponType.HEL_Z9_CH).ShortName, Is.EqualTo("Z-9"));
             Assert.That(P(WeaponType.HEL_Z9_CH).IconProfile.Icon, Is.EqualTo(SpriteManager.CH_Z9_Frame0));
             Assert.That(P(WeaponType.HEL_Z9_CH).IconProfile.IconType, Is.EqualTo(RegimentIconType.Helo_Animation));
