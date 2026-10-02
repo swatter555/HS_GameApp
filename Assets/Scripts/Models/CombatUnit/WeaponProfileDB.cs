@@ -265,8 +265,7 @@ namespace HammerAndSickle.Models
             FamilyArchetypes.Sam,
             new Dictionary<ProfileStat, int>
             {
-                { ProfileStat.IR, GameData.INDIRECT_RANGE_SAM }, { ProfileStat.MMP, -4 }
-            },
+                { ProfileStat.IR, GameData.INDIRECT_RANGE_SAM },},
             // Retain the ratified towed-SAM lift capabilities; this packet changes no transport rules.
             Plus(new[] { WeaponTrait.SARH_LONG_RANGE, WeaponTrait.AIR_DROPPABLE, WeaponTrait.HELO_TRANSPORTABLE }, extraTraits));
 
@@ -339,7 +338,7 @@ namespace HammerAndSickle.Models
 
         /// <summary>AMX-30 hardware shared by French and Saudi formations.</summary>
         private static ProfileDef Amx30Def() => new ProfileDef(TankArchetypes.Gen2,
-                new Dictionary<ProfileStat, int> { { ProfileStat.HD, -2 }, { ProfileStat.SA, 1 }, { ProfileStat.MMP, 2 } },
+                new Dictionary<ProfileStat, int> { { ProfileStat.HD, -2 }, { ProfileStat.SA, 1 },},
                 new[] { WeaponTrait.LOW_PROFILE });
 
         /// <summary>Crotale/Shahine point-defense weapon; each profile specifies its chassis medium.</summary>
@@ -440,7 +439,7 @@ namespace HammerAndSickle.Models
             // Phase 3 (Appendix W §16, validated worked line): Gen1 + LOW_PROFILE + NBC_PROTECTED
             // → HA7 HD6 SA5 SD7 GAD7 · ICM 1.00 · MMP10 · PR1.
             WeaponProfile T55A = WeaponProfile.FromProfileDef(
-                "T-55A Main Battle Tank", "T-55A", WeaponType.TANK_T55A_SV,
+                "T-55A Main Battle Tank", "T-55A", WeaponType.TANK_T55A_SV, GameData.MMP_VEHICLE_STANDARD,
                 new ProfileDef(TankArchetypes.Gen1,
                     new Dictionary<ProfileStat, int>(),
                     new[] { WeaponTrait.LOW_PROFILE, WeaponTrait.NBC_PROTECTED }),
@@ -482,7 +481,7 @@ namespace HammerAndSickle.Models
             // Phase 3 (derived): Gen1 + HA+1 (115mm U-5TS up-gun, off-norm) + LOW_PROFILE + NBC_PROTECTED
             // → HA8 HD6 SA5 SD7 GAD7 · ICM 1.00 · MMP10 · PR1.
             WeaponProfile T62A = WeaponProfile.FromProfileDef(
-                "T-62A Main Battle Tank", "T-62A", WeaponType.TANK_T62A_SV,
+                "T-62A Main Battle Tank", "T-62A", WeaponType.TANK_T62A_SV, GameData.MMP_VEHICLE_STANDARD,
                 new ProfileDef(TankArchetypes.Gen1,
                     new Dictionary<ProfileStat, int> { { ProfileStat.HA, 1 } },
                     new[] { WeaponTrait.LOW_PROFILE, WeaponTrait.NBC_PROTECTED }),
@@ -524,7 +523,7 @@ namespace HammerAndSickle.Models
             // optical rangefinder, no laser FCS → ICM 1.00.
             // → HA12 HD9 SA7 SD7 GAD7 · ICM 1.00 · MMP10 · PR1.
             WeaponProfile T64A = WeaponProfile.FromProfileDef(
-                "T-64A Main Battle Tank", "T-64A", WeaponType.TANK_T64A_SV,
+                "T-64A Main Battle Tank", "T-64A", WeaponType.TANK_T64A_SV, GameData.MMP_VEHICLE_STANDARD,
                 new ProfileDef(TankArchetypes.Gen2,
                     new Dictionary<ProfileStat, int>(),
                     new[] { WeaponTrait.GUN_125_SMOOTH, WeaponTrait.LOW_PROFILE }),
@@ -567,7 +566,7 @@ namespace HammerAndSickle.Models
             // + LASER_RANGEFINDER + BALLISTIC_COMPUTER.
             // → HA15 HD14 SA9 SD7 GAD7 · ICM 1.10 · MMP10 · PR2.
             WeaponProfile T64B = WeaponProfile.FromProfileDef(
-                "T-64B Main Battle Tank", "T-64B", WeaponType.TANK_T64B_SV,
+                "T-64B Main Battle Tank", "T-64B", WeaponType.TANK_T64B_SV, GameData.MMP_VEHICLE_STANDARD,
                 new ProfileDef(TankArchetypes.Gen3,
                     new Dictionary<ProfileStat, int>(),
                     new[] { WeaponTrait.ERA_LIGHT, WeaponTrait.GUN_LAUNCHED_ATGM, WeaponTrait.LOW_PROFILE,
@@ -611,7 +610,7 @@ namespace HammerAndSickle.Models
             // amphibious effect in-game) — IsAmphibious now derived from the trait, the flag is retired (R9).
             // → HA12 HD9 SA7 SD6 GAD7 · ICM 1.05 · MMP10 · PR1 · amphibious.
             WeaponProfile T72A = WeaponProfile.FromProfileDef(
-                "T-72A Main Battle Tank", "T-72A", WeaponType.TANK_T72A_SV,
+                "T-72A Main Battle Tank", "T-72A", WeaponType.TANK_T72A_SV, GameData.MMP_VEHICLE_STANDARD,
                 new ProfileDef(TankArchetypes.Gen2,
                     new Dictionary<ProfileStat, int>(),
                     new[] { WeaponTrait.GUN_125_SMOOTH, WeaponTrait.SPACED_ARMOR, WeaponTrait.LASER_RANGEFINDER,
@@ -655,7 +654,7 @@ namespace HammerAndSickle.Models
             // LRF+BC → ICM 1.05) + AMPHIBIOUS (restores old _isAmph via trait; flag retired, R9).
             // → HA15 HD15 SA9 SD7 GAD7 · ICM 1.05 · MMP10 · PR2 · amphibious.
             WeaponProfile T72B = WeaponProfile.FromProfileDef(
-                "T-72B Main Battle Tank", "T-72B", WeaponType.TANK_T72B_SV,
+                "T-72B Main Battle Tank", "T-72B", WeaponType.TANK_T72B_SV, GameData.MMP_VEHICLE_STANDARD,
                 new ProfileDef(TankArchetypes.Gen3,
                     new Dictionary<ProfileStat, int>(),
                     new[] { WeaponTrait.GUN_LAUNCHED_ATGM, WeaponTrait.ERA_HEAVY, WeaponTrait.LOW_PROFILE,
@@ -698,7 +697,7 @@ namespace HammerAndSickle.Models
             // standoff PR+1) + COMPOSITE_CERAMIC + LRF + BC + GAS_TURBINE (MMP+2).
             // → HA13 HD10 SA7 SD6 GAD7 · ICM 1.10 · MMP12 · PR2.
             WeaponProfile T80B = WeaponProfile.FromProfileDef(
-                "T-80B Main Battle Tank", "T-80B", WeaponType.TANK_T80B_SV,
+                "T-80B Main Battle Tank", "T-80B", WeaponType.TANK_T80B_SV, GameData.MMP_VEHICLE_FAST,
                 new ProfileDef(TankArchetypes.Gen2,
                     new Dictionary<ProfileStat, int> { { ProfileStat.HA, 1 } },
                     new[] { WeaponTrait.GUN_LAUNCHED_ATGM, WeaponTrait.COMPOSITE_CERAMIC,
@@ -745,7 +744,7 @@ namespace HammerAndSickle.Models
             // + GAS_TURBINE (MMP+2) + LRF + BC. Out-guns the T-72B; NATO Gen4 still edges it on ICM.
             // → HA17 HD15 SA9 SD7 GAD7 · ICM 1.10 · MMP12 · PR2.
             WeaponProfile T80U = WeaponProfile.FromProfileDef(
-                "T-80U Main Battle Tank", "T-80U", WeaponType.TANK_T80U_SV,
+                "T-80U Main Battle Tank", "T-80U", WeaponType.TANK_T80U_SV, GameData.MMP_VEHICLE_FAST,
                 new ProfileDef(TankArchetypes.Gen3,
                     new Dictionary<ProfileStat, int>(),
                     new[] { WeaponTrait.GUN_LAUNCHED_ATGM, WeaponTrait.APFSDS_ADVANCED, WeaponTrait.ERA_HEAVY,
@@ -792,7 +791,7 @@ namespace HammerAndSickle.Models
             // modern FCS edge Soviet tanks otherwise lacked). Display renamed T-80BV → T-80BVM (sprites match).
             // → HA20 HD20 SA10 SD7 GAD7 · ICM 1.21 · MMP12 · PR2 · SR3.
             WeaponProfile T80BV = WeaponProfile.FromProfileDef(
-                "T-80BVM Main Battle Tank", "T-80BVM", WeaponType.TANK_T80BV_SV,
+                "T-80BVM Main Battle Tank", "T-80BVM", WeaponType.TANK_T80BV_SV, GameData.MMP_VEHICLE_FAST,
                 new ProfileDef(TankArchetypes.Gen4,
                     new Dictionary<ProfileStat, int>(),
                     new[] { WeaponTrait.GUN_LAUNCHED_ATGM, WeaponTrait.APFSDS_ADVANCED, WeaponTrait.ERA_RELIKT,
@@ -839,7 +838,7 @@ namespace HammerAndSickle.Models
             // Phase 3 (derived): Ifv + ATGM_RAIL (Konkurs on the BMP-1P, HA+4) + AMPHIBIOUS.
             // → HA8 HD4 SA8 SD7 GAD7 · ICM 1.00 · MMP10 · SR2 · PR1 · amphibious.
             WeaponProfile BMP1 = WeaponProfile.FromProfileDef(
-                "BMP-1P Infantry Fighting Vehicle", "BMP-1P", WeaponType.IFV_BMP1_SV,
+                "BMP-1P Infantry Fighting Vehicle", "BMP-1P", WeaponType.IFV_BMP1_SV, GameData.MMP_VEHICLE_STANDARD,
                 new ProfileDef(FamilyArchetypes.Ifv,
                     new Dictionary<ProfileStat, int>(),
                     new[] { WeaponTrait.ATGM_RAIL, WeaponTrait.AMPHIBIOUS }),
@@ -872,7 +871,7 @@ namespace HammerAndSickle.Models
             // + AMPHIBIOUS. The premier Soviet tank-killing IFV.
             // → HA9 HD4 SA9 SD7 GAD7 · ICM 1.00 · MMP10 · SR2 · PR1 · amphibious.
             WeaponProfile BMP2 = WeaponProfile.FromProfileDef(
-                "BMP-2 Infantry Fighting Vehicle", "BMP-2", WeaponType.IFV_BMP2_SV,
+                "BMP-2 Infantry Fighting Vehicle", "BMP-2", WeaponType.IFV_BMP2_SV, GameData.MMP_VEHICLE_STANDARD,
                 new ProfileDef(FamilyArchetypes.Ifv,
                     new Dictionary<ProfileStat, int>(),
                     new[] { WeaponTrait.AUTOCANNON_HEAVY, WeaponTrait.ATGM_RAIL, WeaponTrait.AMPHIBIOUS }),
@@ -905,7 +904,7 @@ namespace HammerAndSickle.Models
             // the simpler rail+HE build for now.)
             // → HA9 HD5 SA10 SD8 GAD7 · ICM 1.00 · MMP10 · SR2 · PR1 · amphibious.
             WeaponProfile BMP3 = WeaponProfile.FromProfileDef(
-                "BMP-3 Infantry Fighting Vehicle", "BMP-3", WeaponType.IFV_BMP3_SV,
+                "BMP-3 Infantry Fighting Vehicle", "BMP-3", WeaponType.IFV_BMP3_SV, GameData.MMP_VEHICLE_STANDARD,
                 new ProfileDef(FamilyArchetypes.Ifv,
                     new Dictionary<ProfileStat, int> { { ProfileStat.HD, 1 }, { ProfileStat.SD, 1 } },
                     new[] { WeaponTrait.AUTOCANNON_HEAVY, WeaponTrait.ATGM_RAIL, WeaponTrait.CANISTER_HE,
@@ -938,7 +937,7 @@ namespace HammerAndSickle.Models
             // + AIR_DROPPABLE + AMPHIBIOUS. BMP-2 firepower on an air-droppable, lightly-armoured chassis.
             // → HA9 HD3 SA9 SD7 GAD7 · ICM 1.00 · MMP10 · SR2 · PR1 · amphibious · air-droppable.
             WeaponProfile BMD2 = WeaponProfile.FromProfileDef(
-                "BMD-2 Airborne IFV", "BMD-2", WeaponType.IFV_BMD2_SV,
+                "BMD-2 Airborne IFV", "BMD-2", WeaponType.IFV_BMD2_SV, GameData.MMP_VEHICLE_STANDARD,
                 new ProfileDef(FamilyArchetypes.Ifv,
                     new Dictionary<ProfileStat, int> { { ProfileStat.HD, -1 } },
                     new[] { WeaponTrait.AUTOCANNON_HEAVY, WeaponTrait.ATGM_RAIL, WeaponTrait.AIR_DROPPABLE,
@@ -971,7 +970,7 @@ namespace HammerAndSickle.Models
             // AUTOCANNON_HEAVY (30mm) + ATGM_RAIL (Konkurs) + AIR_DROPPABLE + AMPHIBIOUS. Upgraded BMD.
             // → HA9 HD3 SA10 SD7 GAD7 · ICM 1.00 · MMP10 · SR2 · PR1 · amphibious · air-droppable.
             WeaponProfile BMD3 = WeaponProfile.FromProfileDef(
-                "BMD-3 Airborne IFV", "BMD-3", WeaponType.IFV_BMD3_SV,
+                "BMD-3 Airborne IFV", "BMD-3", WeaponType.IFV_BMD3_SV, GameData.MMP_VEHICLE_STANDARD,
                 new ProfileDef(FamilyArchetypes.Ifv,
                     new Dictionary<ProfileStat, int> { { ProfileStat.HD, -1 }, { ProfileStat.SA, 1 } },
                     new[] { WeaponTrait.AUTOCANNON_HEAVY, WeaponTrait.ATGM_RAIL, WeaponTrait.AIR_DROPPABLE,
@@ -1004,7 +1003,7 @@ namespace HammerAndSickle.Models
             // (was 10 — the ratified APC baseline is 8).
             // → HA3 HD4 SA6 SD7 GAD7 · ICM 1.00 · MMP8 · SR2 · PR1 · amphibious.
             WeaponProfile MTLB = WeaponProfile.FromProfileDef(
-                "MT-LB Armored Personnel Carrier", "MT-LB", WeaponType.APC_MTLB_SV,
+                "MT-LB Armored Personnel Carrier", "MT-LB", WeaponType.APC_MTLB_SV, GameData.MMP_VEHICLE_SLOW,
                 new ProfileDef(FamilyArchetypes.Apc,
                     new Dictionary<ProfileStat, int>(),
                     new[] { WeaponTrait.AMPHIBIOUS }),
@@ -1037,7 +1036,7 @@ namespace HammerAndSickle.Models
             // Phase 3 (derived): Apc + SD+1 + AMPHIBIOUS. Wheeled carrier, 14.5mm KPVT HMG.
             // → HA3 HD4 SA6 SD8 GAD7 · ICM 1.00 · MMP8 · SR2 · PR1 · amphibious.
             WeaponProfile BTR70 = WeaponProfile.FromProfileDef(
-                "BTR-70 Armored Personnel Carrier", "BTR-70", WeaponType.APC_BTR70_SV,
+                "BTR-70 Armored Personnel Carrier", "BTR-70", WeaponType.APC_BTR70_SV, GameData.MMP_VEHICLE_SLOW,
                 new ProfileDef(FamilyArchetypes.Apc,
                     new Dictionary<ProfileStat, int> { { ProfileStat.SD, 1 } },
                     new[] { WeaponTrait.AMPHIBIOUS }),
@@ -1072,7 +1071,7 @@ namespace HammerAndSickle.Models
             // Phase 3 (derived): Apc + SA+1/SD+1 + AMPHIBIOUS. Improved wheeled carrier (14.5mm + better hull).
             // → HA3 HD4 SA7 SD8 GAD7 · ICM 1.00 · MMP8 · SR2 · PR1 · amphibious.
             WeaponProfile BTR80 = WeaponProfile.FromProfileDef(
-                "BTR-80 Armored Personnel Carrier", "BTR-80", WeaponType.APC_BTR80_SV,
+                "BTR-80 Armored Personnel Carrier", "BTR-80", WeaponType.APC_BTR80_SV, GameData.MMP_VEHICLE_SLOW,
                 new ProfileDef(FamilyArchetypes.Apc,
                     new Dictionary<ProfileStat, int> { { ProfileStat.SA, 1 }, { ProfileStat.SD, 1 } },
                     new[] { WeaponTrait.AMPHIBIOUS }),
@@ -1113,7 +1112,7 @@ namespace HammerAndSickle.Models
             // and the weak statline is the offense governor.
             // → HA2 HD5 SA5 SD9 GAD7 · ICM 1.00 · MMP10 · SR3 · PR1 · amphibious · Soft target.
             WeaponProfile BRDM2 = WeaponProfile.FromProfileDef(
-                "BRDM-2 Recon Vehicle", "BRDM-2", WeaponType.RCN_BRDM2_SV,
+                "BRDM-2 Recon Vehicle", "BRDM-2", WeaponType.RCN_BRDM2_SV, GameData.MMP_VEHICLE_STANDARD,
                 new ProfileDef(FamilyArchetypes.Recon,
                     new Dictionary<ProfileStat, int>(),
                     new[] { WeaponTrait.AMPHIBIOUS }),
@@ -1160,7 +1159,7 @@ namespace HammerAndSickle.Models
             // AIR_DROPPABLE (ratified 2026-08-08, box 9 Option A): the VDV Support Regiment's mount —
             // fixed-wing-lift purchase eligibility. Capability-only, zero statline effect.
             WeaponProfile BRDM2AT = WeaponProfile.FromProfileDef(
-                "BRDM-2 AT-5 Recon Vehicle", "BRDM-2 AT", WeaponType.RCN_BRDM2AT_SV,
+                "BRDM-2 AT-5 Recon Vehicle", "BRDM-2 AT", WeaponType.RCN_BRDM2AT_SV, GameData.MMP_VEHICLE_STANDARD,
                 new ProfileDef(FamilyArchetypes.Recon,
                     new Dictionary<ProfileStat, int>(),
                     new[] { WeaponTrait.ATGM_RAIL, WeaponTrait.AMPHIBIOUS, WeaponTrait.AIR_DROPPABLE }),
@@ -1212,7 +1211,7 @@ namespace HammerAndSickle.Models
             // + IR SHORT. 122mm light SP howitzer.
             // → HA5 HD7 SA9 SD7 GAD7 · ICM 1.00 · MMP10 · IR4 · SR2.
             WeaponProfile SPA2S1 = WeaponProfile.FromProfileDef(
-                "2S1 Gvozdika Self-Propelled Artillery", "2S1 Gvozdika", WeaponType.SPA_2S1_SV,
+                "2S1 Gvozdika Self-Propelled Artillery", "2S1 Gvozdika", WeaponType.SPA_2S1_SV, GameData.MMP_VEHICLE_STANDARD,
                 new ProfileDef(FamilyArchetypes.Artillery,
                     new Dictionary<ProfileStat, int> { { ProfileStat.IR, GameData.INDIRECT_RANGE_SHORT } },
                     new[] { WeaponTrait.SELF_PROPELLED }),
@@ -1248,7 +1247,7 @@ namespace HammerAndSickle.Models
             // Phase 3 (derived): Artillery + SELF_PROPELLED + IR MEDIUM + SA+1 (152mm heavier shell).
             // → HA5 HD7 SA10 SD7 GAD7 · ICM 1.00 · MMP10 · IR5 · SR2.
             WeaponProfile SPA2S3 = WeaponProfile.FromProfileDef(
-                "2S3 Akatsiya Self-Propelled Artillery", "2S3 Akatsiya", WeaponType.SPA_2S3_SV,
+                "2S3 Akatsiya Self-Propelled Artillery", "2S3 Akatsiya", WeaponType.SPA_2S3_SV, GameData.MMP_VEHICLE_STANDARD,
                 new ProfileDef(FamilyArchetypes.Artillery,
                     new Dictionary<ProfileStat, int> { { ProfileStat.IR, GameData.INDIRECT_RANGE_MEDIUM }, { ProfileStat.SA, 1 } },
                     new[] { WeaponTrait.SELF_PROPELLED }),
@@ -1285,7 +1284,7 @@ namespace HammerAndSickle.Models
             // high-velocity gun — best reach, some counter-battery/direct punch).
             // → HA6 HD7 SA10 SD7 GAD7 · ICM 1.00 · MMP10 · IR6 · SR2.
             WeaponProfile SPA2S5 = WeaponProfile.FromProfileDef(
-                "2S5 Giatsint-S Self-Propelled Artillery", "2S5 Giatsint-S", WeaponType.SPA_2S5_SV,
+                "2S5 Giatsint-S Self-Propelled Artillery", "2S5 Giatsint-S", WeaponType.SPA_2S5_SV, GameData.MMP_VEHICLE_STANDARD,
                 new ProfileDef(FamilyArchetypes.Artillery,
                     new Dictionary<ProfileStat, int> { { ProfileStat.IR, GameData.INDIRECT_RANGE_LONG }, { ProfileStat.SA, 1 }, { ProfileStat.HA, 1 } },
                     new[] { WeaponTrait.SELF_PROPELLED }),
@@ -1322,7 +1321,7 @@ namespace HammerAndSickle.Models
             // HA+3/SA+1 — anti-armour bite). Modern apex SP howitzer; precision over raw range (2S5 reaches further).
             // → HA8 HD7 SA10 SD7 GAD7 · ICM 1.00 · MMP10 · IR5 · SR2.
             WeaponProfile SPA2S19 = WeaponProfile.FromProfileDef(
-                "2S19 Msta-S Self-Propelled Artillery", "2S19 Msta-S", WeaponType.SPA_2S19_SV,
+                "2S19 Msta-S Self-Propelled Artillery", "2S19 Msta-S", WeaponType.SPA_2S19_SV, GameData.MMP_VEHICLE_STANDARD,
                 new ProfileDef(FamilyArchetypes.Artillery,
                     new Dictionary<ProfileStat, int> { { ProfileStat.IR, GameData.INDIRECT_RANGE_MEDIUM } },
                     new[] { WeaponTrait.SELF_PROPELLED, WeaponTrait.SMART_MUNITION }),
@@ -1365,7 +1364,7 @@ namespace HammerAndSickle.Models
             // light towed tubes sling-load and air-drop — grants air-lift PURCHASE eligibility.
             // Capability-only traits, zero statline effect.
             WeaponProfile ArtLight = WeaponProfile.FromProfileDef(
-                "Light Towed Artillery", "Lt Artillery", WeaponType.ART_LIGHT_SV,
+                "Light Towed Artillery", "Lt Artillery", WeaponType.ART_LIGHT_SV, GameData.MMP_MANHANDLED_GUN,
                 LightTowedArtilleryDef(),
                 UpgradePath.ART, 60);
 
@@ -1400,7 +1399,7 @@ namespace HammerAndSickle.Models
             // Phase 3 (derived): Artillery archetype (towed = foot, MMP 4) + IR MEDIUM + SA+1 (heavier tube).
             // → HA5 HD5 SA10 SD5 GAD8 · ICM 1.00 · MMP4 · IR5 · SR2.
             WeaponProfile ArtHeavy = WeaponProfile.FromProfileDef(
-                "Heavy Towed Artillery", "Hvy Artillery", WeaponType.ART_HEAVY_SV,
+                "Heavy Towed Artillery", "Hvy Artillery", WeaponType.ART_HEAVY_SV, GameData.MMP_MANHANDLED_GUN,
                 HeavyTowedArtilleryDef(),
                 UpgradePath.ART, 60);
 
@@ -1440,7 +1439,7 @@ namespace HammerAndSickle.Models
             // ROCKET_ARTILLERY (salvo → +1 CombatAction, derives IsDoubleFire) + IR ROC_SR. Dumb 122mm area rockets.
             // → HA5 HD5 SA9 SD5 GAD6 · ICM 1.00 · MMP8 · IR4 · SR2 · double-fire.
             WeaponProfile BM21 = WeaponProfile.FromProfileDef(
-                "BM-21 Grad Multiple Launch Rocket System", "BM-21 Grad", WeaponType.ROC_BM21_SV,
+                "BM-21 Grad Multiple Launch Rocket System", "BM-21 Grad", WeaponType.ROC_BM21_SV, GameData.MMP_VEHICLE_SLOW,
                 new ProfileDef(FamilyArchetypes.Artillery,
                     new Dictionary<ProfileStat, int> { { ProfileStat.IR, GameData.INDIRECT_RANGE_ROC_SR } },
                     new[] { WeaponTrait.TRUCK_MOUNTED, WeaponTrait.ROCKET_ARTILLERY }),
@@ -1477,7 +1476,7 @@ namespace HammerAndSickle.Models
             // bomblets → anti-armour bite, HA+3/SA+1) + SA+1 + IR ROC_MR.
             // → HA8 HD5 SA11 SD5 GAD6 · ICM 1.00 · MMP8 · IR6 · SR2 · double-fire.
             WeaponProfile BM27 = WeaponProfile.FromProfileDef(
-                "BM-27 Uragan Multiple Launch Rocket System", "BM-27 Uragan", WeaponType.ROC_BM27_SV,
+                "BM-27 Uragan Multiple Launch Rocket System", "BM-27 Uragan", WeaponType.ROC_BM27_SV, GameData.MMP_VEHICLE_SLOW,
                 new ProfileDef(FamilyArchetypes.Artillery,
                     new Dictionary<ProfileStat, int> { { ProfileStat.IR, GameData.INDIRECT_RANGE_ROC_MR }, { ProfileStat.SA, 1 } },
                     new[] { WeaponTrait.TRUCK_MOUNTED, WeaponTrait.ROCKET_ARTILLERY, WeaponTrait.SMART_MUNITION }),
@@ -1514,7 +1513,7 @@ namespace HammerAndSickle.Models
             // SA+2 (massive 300mm warheads) + IR ROC_LR (longest reach). Apex Soviet MRL.
             // → HA8 HD5 SA12 SD5 GAD6 · ICM 1.00 · MMP8 · IR10 · SR2 · double-fire.
             WeaponProfile BM30 = WeaponProfile.FromProfileDef(
-                "BM-30 Smerch Multiple Launch Rocket System", "BM-30 Smerch", WeaponType.ROC_BM30_SV,
+                "BM-30 Smerch Multiple Launch Rocket System", "BM-30 Smerch", WeaponType.ROC_BM30_SV, GameData.MMP_VEHICLE_SLOW,
                 new ProfileDef(FamilyArchetypes.Artillery,
                     new Dictionary<ProfileStat, int> { { ProfileStat.IR, GameData.INDIRECT_RANGE_ROC_LR }, { ProfileStat.SA, 2 } },
                     new[] { WeaponTrait.TRUCK_MOUNTED, WeaponTrait.ROCKET_ARTILLERY, WeaponTrait.SMART_MUNITION }),
@@ -1553,7 +1552,7 @@ namespace HammerAndSickle.Models
             // (Large one-off deltas are fine for a unique profile; promote to a BALLISTIC_MISSILE trait if a 2nd Scud appears.)
             // → HA11 HD5 SA15 SD5 GAD6 · ICM 1.00 · MMP8 · IR10 · SR2 (single-fire).
             WeaponProfile SCUD = WeaponProfile.FromProfileDef(
-                "9K72 Scud-B Tactical Ballistic Missile Launcher", "9K72 Scud-B", WeaponType.ROC_SCUD_SV,
+                "9K72 Scud-B Tactical Ballistic Missile Launcher", "9K72 Scud-B", WeaponType.ROC_SCUD_SV, GameData.MMP_VEHICLE_SLOW,
                 new ProfileDef(FamilyArchetypes.Artillery,
                     new Dictionary<ProfileStat, int> { { ProfileStat.IR, GameData.INDIRECT_RANGE_ROC_LR }, { ProfileStat.HA, 6 }, { ProfileStat.SA, 6 } },
                     new[] { WeaponTrait.TRUCK_MOUNTED }),
@@ -1594,7 +1593,7 @@ namespace HammerAndSickle.Models
             // no radar, so it stays at the base AAA gunnery (RADAR_GUIDED_GUN is what elevates the Shilka).
             // → HA4 HD6 SA9 SD8 GAD11 · GAT11 · MMP10 · IR3 · SR3.
             WeaponProfile ZSU57 = WeaponProfile.FromProfileDef(
-                "ZSU-57-2 Sparka Self-Propelled Anti-Aircraft Gun", "ZSU-57-2 Sparka", WeaponType.SPAAA_ZSU57_SV,
+                "ZSU-57-2 Sparka Self-Propelled Anti-Aircraft Gun", "ZSU-57-2 Sparka", WeaponType.SPAAA_ZSU57_SV, GameData.MMP_VEHICLE_STANDARD,
                 new ProfileDef(FamilyArchetypes.Aaa,
                     new Dictionary<ProfileStat, int> { { ProfileStat.IR, GameData.INDIRECT_RANGE_AAA } },
                     new[] { WeaponTrait.SELF_PROPELLED }),
@@ -1629,7 +1628,7 @@ namespace HammerAndSickle.Models
             // Phase 3 (derived): Aaa + SELF_PROPELLED + RADAR_GUIDED_GUN (Gun-Dish radar, GAT+2) + IR AAA.
             // → HA4 HD6 SA9 SD8 GAD11 · GAT13 · MMP10 · IR3 · SR3.
             WeaponProfile ZSU23 = WeaponProfile.FromProfileDef(
-                "ZSU-23-4 Shilka Self-Propelled Anti-Aircraft Gun", "ZSU-23-4 Shilka", WeaponType.SPAAA_ZSU23_SV,
+                "ZSU-23-4 Shilka Self-Propelled Anti-Aircraft Gun", "ZSU-23-4 Shilka", WeaponType.SPAAA_ZSU23_SV, GameData.MMP_VEHICLE_STANDARD,
                 new ProfileDef(FamilyArchetypes.Aaa,
                     new Dictionary<ProfileStat, int> { { ProfileStat.IR, GameData.INDIRECT_RANGE_AAA } },
                     new[] { WeaponTrait.SELF_PROPELLED, WeaponTrait.RADAR_GUIDED_GUN }),
@@ -1665,7 +1664,7 @@ namespace HammerAndSickle.Models
             // SAM, GAT+2/IR+2) + IR AAA base. Apex Soviet short-range AD (gun & missile).
             // → HA4 HD6 SA9 SD8 GAD11 · GAT15 · MMP10 · IR5 · SR3.
             WeaponProfile Tunguska = WeaponProfile.FromProfileDef(
-                "2K22 Tunguska Self-Propelled Anti-Aircraft System", "2K22 Tunguska", WeaponType.SPSAM_2K22_SV,
+                "2K22 Tunguska Self-Propelled Anti-Aircraft System", "2K22 Tunguska", WeaponType.SPSAM_2K22_SV, GameData.MMP_VEHICLE_STANDARD,
                 new ProfileDef(FamilyArchetypes.Aaa,
                     new Dictionary<ProfileStat, int> { { ProfileStat.IR, GameData.INDIRECT_RANGE_AAA } },
                     new[] { WeaponTrait.SELF_PROPELLED, WeaponTrait.RADAR_GUIDED_GUN, WeaponTrait.GUN_MISSILE_COMBO }),
@@ -1701,7 +1700,7 @@ namespace HammerAndSickle.Models
             // illuminated medium reach, GAT+3) + MOBILE_SHOOT_SCOOT (relocate after firing) + IR SAM.
             // → HA1 HD5 SA1 SD5 GAD7 · GAT15 · MMP10 · IR6 · SR6 · shoot-scoot.
             WeaponProfile Kub = WeaponProfile.FromProfileDef(
-                "2K12 Kub Self-Propelled SAM System", "2K12 Kub", WeaponType.SPSAM_2K12_SV,
+                "2K12 Kub Self-Propelled SAM System", "2K12 Kub", WeaponType.SPSAM_2K12_SV, GameData.MMP_VEHICLE_STANDARD,
                 new ProfileDef(FamilyArchetypes.Sam,
                     new Dictionary<ProfileStat, int> { { ProfileStat.IR, GameData.INDIRECT_RANGE_SAM } },
                     new[] { WeaponTrait.SELF_PROPELLED, WeaponTrait.SARH_LONG_RANGE, WeaponTrait.MOBILE_SHOOT_SCOOT }),
@@ -1737,7 +1736,7 @@ namespace HammerAndSickle.Models
             // (passive IR, fire-and-forget, GAT+1) + AMPHIBIOUS (BRDM hull) + short IR. Cheap mobile point SAM.
             // → HA1 HD3 SA1 SD3 GAD6 · GAT13 · MMP8 · IR4 · SR6 · fire-and-forget · amphibious.
             WeaponProfile Strela1 = WeaponProfile.FromProfileDef(
-                "9K31 Strela-1 Self-Propelled SAM System", "9K31 Strela-1", WeaponType.SPSAM_9K31_SV,
+                "9K31 Strela-1 Self-Propelled SAM System", "9K31 Strela-1", WeaponType.SPSAM_9K31_SV, GameData.MMP_VEHICLE_SLOW,
                 new ProfileDef(FamilyArchetypes.Sam,
                     new Dictionary<ProfileStat, int> { { ProfileStat.IR, 4 } },
                     new[] { WeaponTrait.TRUCK_MOUNTED, WeaponTrait.IR_HOMING, WeaponTrait.AMPHIBIOUS }),
@@ -1773,7 +1772,7 @@ namespace HammerAndSickle.Models
             // GAT+3) + IR SAM. Classic high-altitude site SAM.
             // → HA1 HD3 SA1 SD3 GAD8 · GAT15 · MMP0 · IR6 · SR6.
             WeaponProfile S75 = WeaponProfile.FromProfileDef(
-                "S-75 Dvina Surface-to-Air Missile System", "S-75 Dvina", WeaponType.SAM_S75_SV,
+                "S-75 Dvina Surface-to-Air Missile System", "S-75 Dvina", WeaponType.SAM_S75_SV, GameData.MMP_IMMOBILE,
                 S75SiteDef(),
                 UpgradePath.SAM, 228);
 
@@ -1807,9 +1806,9 @@ namespace HammerAndSickle.Models
             // site SAM — shorter reach than the S-75.
             // → HA1 HD3 SA1 SD3 GAD8 · GAT14 · MMP0 · IR5 · SR6.
             WeaponProfile S125 = WeaponProfile.FromProfileDef(
-                "S-125 Neva Surface-to-Air Missile System", "S-125 Neva", WeaponType.SAM_S125_SV,
+                "S-125 Neva Surface-to-Air Missile System", "S-125 Neva", WeaponType.SAM_S125_SV, GameData.MMP_IMMOBILE,
                 new ProfileDef(FamilyArchetypes.Sam,
-                    new Dictionary<ProfileStat, int> { { ProfileStat.IR, 5 }, { ProfileStat.MMP, -4 } },
+                    new Dictionary<ProfileStat, int> { { ProfileStat.IR, 5 },},
                     new[] { WeaponTrait.COMMAND_GUIDANCE, WeaponTrait.AIR_DROPPABLE, WeaponTrait.HELO_TRANSPORTABLE }),
                 UpgradePath.SAM, 276);
 
@@ -1844,9 +1843,9 @@ namespace HammerAndSickle.Models
             // (Bob: transported as part of the system, NOT towed/static), keeping the hardened GAD 8.
             // → HA1 HD3 SA1 SD3 GAD8 · GAT16 · MMP8 · IR10 · SR10.
             WeaponProfile S300 = WeaponProfile.FromProfileDef(
-                "S-300 Surface-to-Air Missile System", "S-300", WeaponType.SAM_S300_SV,
+                "S-300 Surface-to-Air Missile System", "S-300", WeaponType.SAM_S300_SV, GameData.MMP_VEHICLE_SLOW,
                 new ProfileDef(FamilyArchetypes.Sam,
-                    new Dictionary<ProfileStat, int> { { ProfileStat.IR, 10 }, { ProfileStat.SR, 4 }, { ProfileStat.MMP, GameData.MOT_UNIT - GameData.FOOT_UNIT } },
+                    new Dictionary<ProfileStat, int> { { ProfileStat.IR, 10 }, { ProfileStat.SR, 4 },},
                     new[] { WeaponTrait.TVM_GUIDANCE }),
                 UpgradePath.SAM, 480);
 
@@ -1883,7 +1882,7 @@ namespace HammerAndSickle.Models
             // cheap generic emplacement + IR AAA. No chassis trait; keeps the AAA GAD 12 (digs in, resists air).
             // → HA3 HD4 SA8 SD6 GAD12 · GAT10 · MMP4 · IR3 · SR3.
             WeaponProfile AAA_GEN = WeaponProfile.FromProfileDef(
-                "Generic Anti-Aircraft Artillery Emplacement", "Generic AAA", WeaponType.AAA_GEN_SV,
+                "Generic Anti-Aircraft Artillery Emplacement", "Generic AAA", WeaponType.AAA_GEN_SV, GameData.MMP_MANHANDLED_GUN,
                 TowedAaaDef(),
                 UpgradePath.AAA, 144);
 
@@ -1921,7 +1920,7 @@ namespace HammerAndSickle.Models
             // it carries troops, it doesn't initiate attacks (IsAttackCapable false via the trait).
             // → HA7 HD6 SA10 SD7 GAD10 · MMP24 · SR3 · non-combatant · helo-transport.
             WeaponProfile MI8T = WeaponProfile.FromProfileDef(
-                "Mi-8T Hip Transport Helicopter", "Mi-8T Hip", WeaponType.HEL_MI8T_SV,
+                "Mi-8T Hip Transport Helicopter", "Mi-8T Hip", WeaponType.HEL_MI8T_SV, GameData.MMP_HELO,
                 new ProfileDef(FamilyArchetypes.Helicopter,
                     new Dictionary<ProfileStat, int>(),
                     new[] { WeaponTrait.NON_COMBATANT }),
@@ -1955,7 +1954,7 @@ namespace HammerAndSickle.Models
             // strong anti-soft (rockets/guns), but no ATGM (HA stays base) — the Hinds are the tank-killers.
             // → HA7 HD6 SA13 SD7 GAD10 · MMP24 · SR3.
             WeaponProfile MI8AT = WeaponProfile.FromProfileDef(
-                "Mi-8AT Hip-C Attack Helicopter", "Mi-8AT Hip-C", WeaponType.HEL_MI8AT_SV,
+                "Mi-8AT Hip-C Attack Helicopter", "Mi-8AT Hip-C", WeaponType.HEL_MI8AT_SV, GameData.MMP_HELO,
                 new ProfileDef(FamilyArchetypes.Helicopter,
                     new Dictionary<ProfileStat, int>(),
                     new[] { WeaponTrait.ROCKET_PODS, WeaponTrait.CANNON_HELO }),
@@ -1986,7 +1985,7 @@ namespace HammerAndSickle.Models
             // ARMORED_COCKPIT (HD/SD+1). The classic Hind gunship — anti-armour + anti-soft, armoured.
             // → HA11 HD7 SA13 SD8 GAD10 · MMP24 · SR3.
             WeaponProfile MI24D = WeaponProfile.FromProfileDef(
-                "Mi-24D Hind-D Attack Helicopter", "Mi-24D Hind-D", WeaponType.HEL_MI24D_SV,
+                "Mi-24D Hind-D Attack Helicopter", "Mi-24D Hind-D", WeaponType.HEL_MI24D_SV, GameData.MMP_HELO,
                 new ProfileDef(FamilyArchetypes.Helicopter,
                     new Dictionary<ProfileStat, int>(),
                     new[] { WeaponTrait.CANNON_HELO, WeaponTrait.ROCKET_PODS, WeaponTrait.ATGM_HELO_SACLOS,
@@ -2018,7 +2017,7 @@ namespace HammerAndSickle.Models
             // Shturm ATGM). The Hind-E — survivable, harder-hitting.
             // → HA12 HD7 SA13 SD8 GAD12 · MMP24 · SR3.
             WeaponProfile MI24V = WeaponProfile.FromProfileDef(
-                "Mi-24V Hind-E Attack Helicopter", "Mi-24V Hind-E", WeaponType.HEL_MI24V_SV,
+                "Mi-24V Hind-E Attack Helicopter", "Mi-24V Hind-E", WeaponType.HEL_MI24V_SV, GameData.MMP_HELO,
                 new ProfileDef(FamilyArchetypes.Helicopter,
                     new Dictionary<ProfileStat, int> { { ProfileStat.HA, 1 } },
                     new[] { WeaponTrait.CANNON_HELO, WeaponTrait.ROCKET_PODS, WeaponTrait.ATGM_HELO_SACLOS,
@@ -2050,7 +2049,7 @@ namespace HammerAndSickle.Models
             // + ROCKET_PODS + ARMORED_COCKPIT + HELO_COUNTERMEASURES. Apex Soviet gunship — shoot-and-hide AT.
             // → HA12 HD7 SA13 SD8 GAD12 · ICM 1.05 · MMP24 · SR3.
             WeaponProfile MI28 = WeaponProfile.FromProfileDef(
-                "Mi-28 Havoc Attack Helicopter", "Mi-28 Havoc", WeaponType.HEL_MI28_SV,
+                "Mi-28 Havoc Attack Helicopter", "Mi-28 Havoc", WeaponType.HEL_MI28_SV, GameData.MMP_HELO,
                 new ProfileDef(FamilyArchetypes.Helicopter,
                     new Dictionary<ProfileStat, int>(),
                     new[] { WeaponTrait.ATGM_HELO_FNF, WeaponTrait.CANNON_HELO, WeaponTrait.ROCKET_PODS,
@@ -2085,7 +2084,7 @@ namespace HammerAndSickle.Models
             // Phase 3 (derived): Bomber archetype + NON_COMBATANT (fixed-wing transport). TS-3 (slow lifter), OL big.
             // → DF1 MAN3 TS7 SUR8 · OL12 · MMP100 · SR4 · non-combatant · fixed-wing transport.
             WeaponProfile AN12 = WeaponProfile.FromProfileDef(
-                "An-12 Antonov Transport Plane", "An-12 Antonov", WeaponType.TRN_AN8_SV,
+                "An-12 Antonov Transport Plane", "An-12 Antonov", WeaponType.TRN_AN8_SV, GameData.MMP_FIXED_WING,
                 new ProfileDef(FamilyArchetypes.Bomber,
                     new Dictionary<ProfileStat, int> { { ProfileStat.TS, -3 } },
                     new[] { WeaponTrait.NON_COMBATANT }),
@@ -2120,7 +2119,7 @@ namespace HammerAndSickle.Models
             // the air picture; W8). Carries no real strike load itself.
             // → DF1 MAN3 TS10 SUR8 · MMP100 · SR12 · non-combatant.
             WeaponProfile A50 = WeaponProfile.FromProfileDef(
-                "A-50 Mainstay AWACS", "A-50 Mainstay", WeaponType.AWACS_A50_SV,
+                "A-50 Mainstay AWACS", "A-50 Mainstay", WeaponType.AWACS_A50_SV, GameData.MMP_FIXED_WING,
                 new ProfileDef(FamilyArchetypes.Bomber,
                     new Dictionary<ProfileStat, int> { { ProfileStat.SR, GameData.AWACS_SPOTTING_RANGE - GameData.AIR_UNIT_SPOTTING_RANGE } },
                     new[] { WeaponTrait.NON_COMBATANT }),
@@ -2150,7 +2149,7 @@ namespace HammerAndSickle.Models
             // Phase 3 (derived): FighterEarly archetype + small ground load. Basic early air-superiority jet.
             // → DF8 MAN9 TS10 SUR6 · OL6 · MMP100 · SR4.
             WeaponProfile MIG21 = WeaponProfile.FromProfileDef(
-                "MiG-21 Fishbed Air Superiority Fighter", "MiG-21 Fishbed", WeaponType.FGT_MIG21_SV,
+                "MiG-21 Fishbed Air Superiority Fighter", "MiG-21 Fishbed", WeaponType.FGT_MIG21_SV, GameData.MMP_FIXED_WING,
                 new ProfileDef(FamilyArchetypes.FighterEarly,
                     new Dictionary<ProfileStat, int>(),
                     System.Array.Empty<WeaponTrait>()),
@@ -2181,7 +2180,7 @@ namespace HammerAndSickle.Models
             // CHAFF_FLARE (defensive suite, SUR+2) + TS+1 (fast swing-wing singleton). Radar-armed pure air-superiority
             // → GA floor 2. → DF10 MAN9 TS11 SUR8 · GA2 OL6 · MMP100 · SR4.
             WeaponProfile MIG23 = WeaponProfile.FromProfileDef(
-                "MiG-23 Flogger Air Superiority Fighter", "MiG-23 Flogger", WeaponType.FGT_MIG23_SV,
+                "MiG-23 Flogger Air Superiority Fighter", "MiG-23 Flogger", WeaponType.FGT_MIG23_SV, GameData.MMP_FIXED_WING,
                 new ProfileDef(FamilyArchetypes.FighterEarly,
                     new Dictionary<ProfileStat, int> { { ProfileStat.TS, 1 } },
                     new[] { WeaponTrait.BVR_RADAR_MISSILE, WeaponTrait.RWR, WeaponTrait.CHAFF_FLARE }),
@@ -2212,7 +2211,7 @@ namespace HammerAndSickle.Models
             // HIGH_MACH_DASH + TS+7 (Mach-3 Foxbat — the record-holder singleton). Crude but fast/heavily-armed
             // interceptor → GA floor 2. → DF10 MAN9 TS17 SUR6 · GA2 OL6 · MMP100 · SR4.
             WeaponProfile MIG25 = WeaponProfile.FromProfileDef(
-                "MiG-25 Foxbat Interceptor", "MiG-25 Foxbat", WeaponType.FGT_MIG25_SV,
+                "MiG-25 Foxbat Interceptor", "MiG-25 Foxbat", WeaponType.FGT_MIG25_SV, GameData.MMP_FIXED_WING,
                 new ProfileDef(FamilyArchetypes.FighterEarly,
                     new Dictionary<ProfileStat, int> { { ProfileStat.TS, 7 } },
                     new[] { WeaponTrait.BVR_RADAR_MISSILE, WeaponTrait.HIGH_MACH_DASH }),
@@ -2244,7 +2243,7 @@ namespace HammerAndSickle.Models
             // CHAFF_FLARE (SUR+2) + MULTIROLE_STRIKE (Fulcrum-A/S dual-role, GA+4→6). Agile, well-armed, no radar-suite
             // ICM edge (N019 lagged Western sets). → DF15 MAN14 TS10 SUR11 · ICM 1.00 · GA6 OL6 · MMP100 · SR4.
             WeaponProfile MIG29 = WeaponProfile.FromProfileDef(
-                "MiG-29 Fulcrum Air Superiority Fighter", "MiG-29 Fulcrum", WeaponType.FGT_MIG29_SV,
+                "MiG-29 Fulcrum Air Superiority Fighter", "MiG-29 Fulcrum", WeaponType.FGT_MIG29_SV, GameData.MMP_FIXED_WING,
                 new ProfileDef(FamilyArchetypes.FighterLate,
                     new Dictionary<ProfileStat, int>(),
                     new[] { WeaponTrait.AGILE_AIRFRAME, WeaponTrait.HIGH_OFF_BORESIGHT_IR, WeaponTrait.BVR_RADAR_MISSILE,
@@ -2277,7 +2276,7 @@ namespace HammerAndSickle.Models
             // (Mach-2.8 Foxhound singleton). Pure long-range interceptor → GA floor 2.
             // → DF15 MAN12 TS17 SUR10 · ICM 1.10 · GA2 OL6 · MMP100 · SR4.
             WeaponProfile MIG31 = WeaponProfile.FromProfileDef(
-                "MiG-31 Foxhound Interceptor", "MiG-31 Foxhound", WeaponType.FGT_MIG31_SV,
+                "MiG-31 Foxhound Interceptor", "MiG-31 Foxhound", WeaponType.FGT_MIG31_SV, GameData.MMP_FIXED_WING,
                 new ProfileDef(FamilyArchetypes.FighterLate,
                     new Dictionary<ProfileStat, int> { { ProfileStat.TS, 7 } },
                     new[] { WeaponTrait.ACTIVE_RADAR_AAM, WeaponTrait.LOOKDOWN_SHOOTDOWN, WeaponTrait.HIGH_MACH_DASH,
@@ -2310,7 +2309,7 @@ namespace HammerAndSickle.Models
             // RWR + CHAFF_FLARE (SUR+2) + MULTIROLE_STRIKE (GA+4→6) + TS+1 (fast Flanker singleton). Apex Soviet
             // air-superiority fighter. → DF16 MAN14 TS11 SUR11 · ICM 1.10 · GA6 OL6 · MMP100 · SR4.
             WeaponProfile SU27 = WeaponProfile.FromProfileDef(
-                "Su-27 Flanker Air Superiority Fighter", "Su-27 Flanker", WeaponType.FGT_SU27_SV,
+                "Su-27 Flanker Air Superiority Fighter", "Su-27 Flanker", WeaponType.FGT_SU27_SV, GameData.MMP_FIXED_WING,
                 new ProfileDef(FamilyArchetypes.FighterLate,
                     new Dictionary<ProfileStat, int> { { ProfileStat.TS, 1 } },
                     new[] { WeaponTrait.AGILE_AIRFRAME, WeaponTrait.ACTIVE_RADAR_AAM, WeaponTrait.HIGH_OFF_BORESIGHT_IR,
@@ -2345,7 +2344,7 @@ namespace HammerAndSickle.Models
             // The what-if apex super-fighter — tops the roster on agility/survivability.
             // → DF16 MAN17 TS10 SUR12 · ICM 1.10 · GA6 OL6 · MMP100 · SR4.
             WeaponProfile SU47 = WeaponProfile.FromProfileDef(
-                "Su-47 Berkut Experimental Fighter", "Su-47 Berkut", WeaponType.FGT_SU47_SV,
+                "Su-47 Berkut Experimental Fighter", "Su-47 Berkut", WeaponType.FGT_SU47_SV, GameData.MMP_FIXED_WING,
                 new ProfileDef(FamilyArchetypes.FighterLate,
                     new Dictionary<ProfileStat, int> { { ProfileStat.MAN, 3 } },
                     new[] { WeaponTrait.AGILE_AIRFRAME, WeaponTrait.ACTIVE_RADAR_AAM, WeaponTrait.HIGH_OFF_BORESIGHT_IR,
@@ -2378,7 +2377,7 @@ namespace HammerAndSickle.Models
             // GA+4→6) + RWR + CHAFF_FLARE (defensive suite, SUR+2). Dumb-bomb fighter-bomber, deliberately below the
             // precision-PGM F-16 (GA9). → DF8 MAN9 TS10 SUR8 · GA6 OL6 · MMP100 · SR4.
             WeaponProfile MIG27 = WeaponProfile.FromProfileDef(
-                "MiG-27 Flogger-D Multi-Role Fighter", "MiG-27 Flogger-D", WeaponType.FGT_MIG27_SV,
+                "MiG-27 Flogger-D Multi-Role Fighter", "MiG-27 Flogger-D", WeaponType.FGT_MIG27_SV, GameData.MMP_FIXED_WING,
                 new ProfileDef(FamilyArchetypes.FighterEarly,
                     new Dictionary<ProfileStat, int>(),
                     new[] { WeaponTrait.MULTIROLE_STRIKE, WeaponTrait.RWR, WeaponTrait.CHAFF_FLARE }),
@@ -2409,7 +2408,7 @@ namespace HammerAndSickle.Models
             // GA+4→6) + RWR (basic warning suite, SUR+1). Swing-wing fighter-bomber, dumb-bomb striker.
             // → DF8 MAN9 TS10 SUR7 · GA6 OL6 · MMP100 · SR4.
             WeaponProfile SU17 = WeaponProfile.FromProfileDef(
-                "Su-17 Fitter Attack Aircraft", "Su-17 Fitter", WeaponType.ATT_SU17_SV,
+                "Su-17 Fitter Attack Aircraft", "Su-17 Fitter", WeaponType.ATT_SU17_SV, GameData.MMP_FIXED_WING,
                 new ProfileDef(FamilyArchetypes.FighterEarly,
                     new Dictionary<ProfileStat, int>(),
                     new[] { WeaponTrait.MULTIROLE_STRIKE, WeaponTrait.RWR }),
@@ -2440,7 +2439,7 @@ namespace HammerAndSickle.Models
             // AT_GUIDED_AIR (Vikhr/Kh-25: GA+3, GaVsHard+1) + CAS_ARMORED (SUR+2) + LOITER_PERSISTENCE. The Soviet
             // A-10 — GA15, GaVsHard 3 stored. → DF2 MAN4 TS7 SUR12 · GA15 OL9 · MMP100 · SR4 · GaVsHard 3.
             WeaponProfile SU25 = WeaponProfile.FromProfileDef(
-                "Su-25 Frogfoot Attack Aircraft", "Su-25 Frogfoot", WeaponType.ATT_SU25_SV,
+                "Su-25 Frogfoot Attack Aircraft", "Su-25 Frogfoot", WeaponType.ATT_SU25_SV, GameData.MMP_FIXED_WING,
                 new ProfileDef(FamilyArchetypes.Attack,
                     new Dictionary<ProfileStat, int> { { ProfileStat.DF, -2 } },
                     new[] { WeaponTrait.HEAVY_AG_CANNON, WeaponTrait.AT_GUIDED_AIR, WeaponTrait.CAS_ARMORED, WeaponTrait.LOITER_PERSISTENCE }),
@@ -2471,7 +2470,7 @@ namespace HammerAndSickle.Models
             // + CAS_ARMORED (SUR+2) + LOITER_PERSISTENCE. Apex Soviet CAS — GA15, max armour SUR15, GaVsHard 3.
             // → DF4 MAN4 TS7 SUR15 · GA15 OL10 · MMP100 · SR4 · GaVsHard 3.
             WeaponProfile SU25B = WeaponProfile.FromProfileDef(
-                "Su-25B Frogfoot-B Attack Aircraft", "Su-25B Frogfoot-B", WeaponType.ATT_SU25B_SV,
+                "Su-25B Frogfoot-B Attack Aircraft", "Su-25B Frogfoot-B", WeaponType.ATT_SU25B_SV, GameData.MMP_FIXED_WING,
                 new ProfileDef(FamilyArchetypes.Attack,
                     new Dictionary<ProfileStat, int> { { ProfileStat.SUR, 3 }, { ProfileStat.OL, 1 } },
                     new[] { WeaponTrait.HEAVY_AG_CANNON, WeaponTrait.AT_GUIDED_AIR, WeaponTrait.CAS_ARMORED, WeaponTrait.LOITER_PERSISTENCE }),
@@ -2502,7 +2501,7 @@ namespace HammerAndSickle.Models
             // + LASER_GUIDED_MUNITIONS (Kh-29L: GA+2) + BUNKER_PENETRATOR (GaVsBase+4 stored) + TERRAIN_FOLLOW_RADAR.
             // The Soviet F-111 — GA13. → DF6 MAN6 TS14 SUR8 · GA13 OL14 · MMP100 · SR4 · GaVsBase 4.
             WeaponProfile SU24 = WeaponProfile.FromProfileDef(
-                "Su-24 Fencer Bomber", "Su-24 Fencer", WeaponType.BMB_SU24_SV,
+                "Su-24 Fencer Bomber", "Su-24 Fencer", WeaponType.BMB_SU24_SV, GameData.MMP_FIXED_WING,
                 new ProfileDef(FamilyArchetypes.Bomber,
                     new Dictionary<ProfileStat, int> { { ProfileStat.DF, 5 }, { ProfileStat.MAN, 3 }, { ProfileStat.TS, 4 } },
                     new[] { WeaponTrait.HARDENED_STRIKE, WeaponTrait.LASER_GUIDED_MUNITIONS, WeaponTrait.BUNKER_PENETRATOR, WeaponTrait.TERRAIN_FOLLOW_RADAR }),
@@ -2536,7 +2535,7 @@ namespace HammerAndSickle.Models
             // + STRATEGIC_PAYLOAD (OL+4 → 16). Old heavy-lift level bomber — area saturation, not precision.
             // → DF1 MAN3 TS10 SUR10 · GA9 OL16 · MMP100 · SR4 · GaVsSoft 3.
             WeaponProfile TU16 = WeaponProfile.FromProfileDef(
-                "Tu-16 Badger Bomber", "Tu-16 Badger", WeaponType.BMB_TU16_SV,
+                "Tu-16 Badger Bomber", "Tu-16 Badger", WeaponType.BMB_TU16_SV, GameData.MMP_FIXED_WING,
                 new ProfileDef(FamilyArchetypes.Bomber,
                     new Dictionary<ProfileStat, int> { { ProfileStat.SUR, 2 } },
                     new[] { WeaponTrait.CARPET_BOMBING, WeaponTrait.STRATEGIC_PAYLOAD }),
@@ -2567,7 +2566,7 @@ namespace HammerAndSickle.Models
             // GaVsSoft+3 stored) + STANDOFF_CRUISE_MISSILE (Kh-22 — GA+3 heavy warhead, strike ignores GAD; avoid-GAD
             // hook dormant). Area/standoff bomber. → DF1 MAN3 TS14 SUR8 · GA12 OL12 · MMP100 · SR4 · GaVsSoft 3 · avoid-GAD.
             WeaponProfile TU22 = WeaponProfile.FromProfileDef(
-                "Tu-22 Blinder Bomber", "Tu-22 Blinder", WeaponType.BMB_TU22_SV,
+                "Tu-22 Blinder Bomber", "Tu-22 Blinder", WeaponType.BMB_TU22_SV, GameData.MMP_FIXED_WING,
                 new ProfileDef(FamilyArchetypes.Bomber,
                     new Dictionary<ProfileStat, int> { { ProfileStat.TS, 4 } },
                     new[] { WeaponTrait.HIGH_MACH_DASH, WeaponTrait.CARPET_BOMBING, WeaponTrait.STANDOFF_CRUISE_MISSILE }),
@@ -2599,7 +2598,7 @@ namespace HammerAndSickle.Models
             // avoid-GAD dormant) + BUNKER_PENETRATOR (GaVsBase+4). Apex strategic bomber — heavy GA plus riders + payload.
             // → DF1 MAN3 TS16 SUR8 · GA12 OL16 · MMP100 · SR4 · GaVsSoft 3 · GaVsBase 4 · avoid-GAD.
             WeaponProfile TU22M3 = WeaponProfile.FromProfileDef(
-                "Tu-22M3 Backfire-C Strategic Bomber", "Tu-22M3 Backfire", WeaponType.BMB_TU22M3_SV,
+                "Tu-22M3 Backfire-C Strategic Bomber", "Tu-22M3 Backfire", WeaponType.BMB_TU22M3_SV, GameData.MMP_FIXED_WING,
                 new ProfileDef(FamilyArchetypes.Bomber,
                     new Dictionary<ProfileStat, int> { { ProfileStat.TS, 6 } },
                     new[] { WeaponTrait.HIGH_MACH_DASH, WeaponTrait.CARPET_BOMBING, WeaponTrait.STRATEGIC_PAYLOAD, WeaponTrait.STANDOFF_CRUISE_MISSILE, WeaponTrait.BUNKER_PENETRATOR }),
@@ -2630,7 +2629,7 @@ namespace HammerAndSickle.Models
             // + NON_COMBATANT (unarmed photo-recon Foxbat-B). The faction's deep-look fixed-wing recon.
             // → DF8 MAN9 TS19 SUR6 · MMP100 · SR8 · non-combatant.
             WeaponProfile MIG25R = WeaponProfile.FromProfileDef(
-                "MiG-25R Foxbat-B Reconnaissance Aircraft", "MiG-25R Foxbat-B", WeaponType.RCNA_MIG25R_SV,
+                "MiG-25R Foxbat-B Reconnaissance Aircraft", "MiG-25R Foxbat-B", WeaponType.RCNA_MIG25R_SV, GameData.MMP_FIXED_WING,
                 new ProfileDef(FamilyArchetypes.FighterEarly,
                     new Dictionary<ProfileStat, int> { { ProfileStat.TS, 9 }, { ProfileStat.SR, GameData.AIR_RECON_SPOTTING_RANGE - GameData.AIR_UNIT_SPOTTING_RANGE } },
                     new[] { WeaponTrait.HIGH_MACH_DASH, WeaponTrait.NON_COMBATANT }),
@@ -2664,7 +2663,7 @@ namespace HammerAndSickle.Models
             // Phase 3 (derived): Truck archetype (soft, GAD 6, MOT 8) + NON_COMBATANT (unarmed transport).
             // → HA3 HD3 SA3 SD3 GAD6 · MMP8 · SR2 · non-combatant.
             WeaponProfile TRK_GEN = WeaponProfile.FromProfileDef(
-                "Generic Transport Truck", "Transport Truck", WeaponType.TRK_GEN_SV,
+                "Generic Transport Truck", "Transport Truck", WeaponType.TRK_GEN_SV, GameData.MMP_TRUCK,
                 TransportTruckDef());
 
             // Handle the icon profile.
@@ -2687,9 +2686,9 @@ namespace HammerAndSickle.Models
             // Sea-lift flotilla for amphibious moves.
             // → HA3 HD3 SA3 SD3 GAD6 · MMP10 · SR2 · non-combatant · amphibious.
             WeaponProfile NAVAL = WeaponProfile.FromProfileDef(
-                "Transport Flotilla", "Transports", WeaponType.TRN_NAVAL,
+                "Transport Flotilla", "Transports", WeaponType.TRN_NAVAL, GameData.MMP_NAVAL_TRANSPORT,
                 new ProfileDef(FamilyArchetypes.Truck,
-                    new Dictionary<ProfileStat, int> { { ProfileStat.MMP, GameData.NAVAL_UNIT - GameData.MOT_UNIT } },
+                    new Dictionary<ProfileStat, int> {},
                     new[] { WeaponTrait.NON_COMBATANT, WeaponTrait.AMPHIBIOUS }));
 
             // Handle the icon profile.
@@ -2721,7 +2720,7 @@ namespace HammerAndSickle.Models
             // floor 6 + EngageAir). Line infantry with organic AT + short-range air defense.
             // → HA6 HD7 SA7 SD8 GAD10 · GAT6 · MMP4 · SR2.
             WeaponProfile INF_REG = WeaponProfile.FromProfileDef(
-                "Regular Infantry", "Regulars", WeaponType.INF_REG_SV,
+                "Regular Infantry", "Regulars", WeaponType.INF_REG_SV, GameData.MMP_WALKING,
                 new ProfileDef(FamilyArchetypes.Infantry,
                     new Dictionary<ProfileStat, int>(),
                     new[] { WeaponTrait.RPG_LAW, WeaponTrait.MANPADS_BASIC }));
@@ -2764,7 +2763,7 @@ namespace HammerAndSickle.Models
             // Phase 3 (derived): Infantry + RPG_LAW + MANPADS_BASIC + AIR_DROPPABLE (VDV — airborne deploy).
             // → HA6 HD7 SA7 SD8 GAD10 · GAT6 · MMP4 · SR2 · air-droppable.
             WeaponProfile INF_AB = WeaponProfile.FromProfileDef(
-                "Airborne Infantry", "Airborne", WeaponType.INF_AB_SV,
+                "Airborne Infantry", "Airborne", WeaponType.INF_AB_SV, GameData.MMP_WALKING,
                 new ProfileDef(FamilyArchetypes.Infantry,
                     new Dictionary<ProfileStat, int>(),
                     new[] { WeaponTrait.RPG_LAW, WeaponTrait.MANPADS_BASIC, WeaponTrait.AIR_DROPPABLE }));
@@ -2797,7 +2796,7 @@ namespace HammerAndSickle.Models
             // infantry — reduced move cost in non-clear terrain; fits the Afghan air-assault role).
             // → HA6 HD7 SA7 SD8 GAD10 · GAT6 · MMP4 · SR2 · mountain movement.
             WeaponProfile INF_AM = WeaponProfile.FromProfileDef(
-                "Air-Mobile Infantry", "Air-Mobile", WeaponType.INF_AM_SV,
+                "Air-Mobile Infantry", "Air-Mobile", WeaponType.INF_AM_SV, GameData.MMP_WALKING,
                 new ProfileDef(FamilyArchetypes.Infantry,
                     new Dictionary<ProfileStat, int>(),
                     new[] { WeaponTrait.RPG_LAW, WeaponTrait.MANPADS_BASIC, WeaponTrait.MOUNTAIN_TRAINED }));
@@ -2832,7 +2831,7 @@ namespace HammerAndSickle.Models
             // Phase 3 (derived): Infantry + RPG_LAW + MANPADS_BASIC + AMPHIBIOUS (naval infantry — assault swim).
             // → HA6 HD7 SA7 SD8 GAD10 · GAT6 · MMP4 · SR2 · amphibious.
             WeaponProfile INF_MAR = WeaponProfile.FromProfileDef(
-                "Marine Infantry", "Marines", WeaponType.INF_MAR_SV,
+                "Marine Infantry", "Marines", WeaponType.INF_MAR_SV, GameData.MMP_WALKING,
                 new ProfileDef(FamilyArchetypes.Infantry,
                     new Dictionary<ProfileStat, int>(),
                     new[] { WeaponTrait.RPG_LAW, WeaponTrait.MANPADS_BASIC, WeaponTrait.AMPHIBIOUS }));
@@ -2872,7 +2871,7 @@ namespace HammerAndSickle.Models
             // RPG_LAW + MANPADS_BASIC + SR+1 (recon SR 3). Elite Spetsnaz.
             // → HA8 HD7 SA9 SD9 GAD10 · GAT6 · ICM 1.10 · MMP4 · SR3.
             WeaponProfile INF_SPEC = WeaponProfile.FromProfileDef(
-                "Special Forces Infantry", "Spetsnaz", WeaponType.INF_SPEC_SV,
+                "Special Forces Infantry", "Spetsnaz", WeaponType.INF_SPEC_SV, GameData.MMP_WALKING,
                 new ProfileDef(FamilyArchetypes.Infantry,
                     new Dictionary<ProfileStat, int> { { ProfileStat.SR, 1 } },
                     new[] { WeaponTrait.SPECIAL_FORCES, WeaponTrait.RPG_LAW, WeaponTrait.MANPADS_BASIC }));
@@ -2906,7 +2905,7 @@ namespace HammerAndSickle.Models
             // + RIVER_ASSAULT (×1.4 across-river attack) + RPG_LAW. Engineering utility over firepower.
             // → HA6 HD7 SA4 SD5 GAD10 · GAT0 · MMP4 · SR2 · field-fortification · river-assault.
             WeaponProfile INF_ENG = WeaponProfile.FromProfileDef(
-                "Combat Engineers", "Engineers", WeaponType.INF_ENG_SV,
+                "Combat Engineers", "Engineers", WeaponType.INF_ENG_SV, GameData.MMP_WALKING,
                 new ProfileDef(FamilyArchetypes.Infantry,
                     new Dictionary<ProfileStat, int> { { ProfileStat.SA, -3 }, { ProfileStat.SD, -3 } },
                     new[] { WeaponTrait.FIELD_FORTIFICATION, WeaponTrait.RIVER_ASSAULT, WeaponTrait.RPG_LAW }));
@@ -2937,7 +2936,7 @@ namespace HammerAndSickle.Models
             // Keep each original tank line and add ERA_LIGHT only (+2 HD). January 1985
             // is the authored availability anchor; no extra FCS, missile or engine package.
             WeaponProfile T55MV = WeaponProfile.FromProfileDef(
-                "T-55MV Main Battle Tank", "T-55MV", WeaponType.TANK_T55MV_SV,
+                "T-55MV Main Battle Tank", "T-55MV", WeaponType.TANK_T55MV_SV, GameData.MMP_VEHICLE_STANDARD,
                 new ProfileDef(TankArchetypes.Gen1,
                     new Dictionary<ProfileStat, int>(),
                     new[] { WeaponTrait.LOW_PROFILE, WeaponTrait.NBC_PROTECTED, WeaponTrait.ERA_LIGHT }),
@@ -2964,7 +2963,7 @@ namespace HammerAndSickle.Models
             AddProfile(WeaponType.TANK_T55MV_SV, T55MV);
 
             WeaponProfile T62MV = WeaponProfile.FromProfileDef(
-                "T-62MV Main Battle Tank", "T-62MV", WeaponType.TANK_T62MV_SV,
+                "T-62MV Main Battle Tank", "T-62MV", WeaponType.TANK_T62MV_SV, GameData.MMP_VEHICLE_STANDARD,
                 new ProfileDef(TankArchetypes.Gen1,
                     new Dictionary<ProfileStat, int> { { ProfileStat.HA, 1 } },
                     new[] { WeaponTrait.LOW_PROFILE, WeaponTrait.NBC_PROTECTED, WeaponTrait.ERA_LIGHT }),
@@ -3004,7 +3003,7 @@ namespace HammerAndSickle.Models
             // Phase 3 (Generic): Facility archetype (ratified §7B base line) + NON_COMBATANT (static, can't initiate attack).
             // → HA4 HD6 SA6 SD7 GAD6 · GAT0 · MMP0 · PR1 · IR0 · SR4 · non-combatant.
             WeaponProfile BASE_AIRBASE = WeaponProfile.FromProfileDef(
-                "Miltary Airbase", "Airbase", WeaponType.BASE_AIRBASE,
+                "Miltary Airbase", "Airbase", WeaponType.BASE_AIRBASE, GameData.MMP_IMMOBILE,
                 new ProfileDef(FamilyArchetypes.Facility,
                     new Dictionary<ProfileStat, int>(),
                     new[] { WeaponTrait.NON_COMBATANT }));
@@ -3035,7 +3034,7 @@ namespace HammerAndSickle.Models
             //----------------------------------------------
             // Phase 3 (Generic): Facility archetype + NON_COMBATANT. → HA4 HD6 SA6 SD7 GAD6 · GAT0 · MMP0 · PR1 · IR0 · SR4 · non-combatant.
             WeaponProfile BASE_DEPOT = WeaponProfile.FromProfileDef(
-                "Supply Depot", "Depot", WeaponType.BASE_DEPOT,
+                "Supply Depot", "Depot", WeaponType.BASE_DEPOT, GameData.MMP_IMMOBILE,
                 new ProfileDef(FamilyArchetypes.Facility,
                     new Dictionary<ProfileStat, int>(),
                     new[] { WeaponTrait.NON_COMBATANT }));
@@ -3060,7 +3059,7 @@ namespace HammerAndSickle.Models
             //----------------------------------------------
             // Phase 3 (Generic): Facility archetype + NON_COMBATANT. → HA4 HD6 SA6 SD7 GAD6 · GAT0 · MMP0 · PR1 · IR0 · SR4 · non-combatant.
             WeaponProfile BASE_HQ = WeaponProfile.FromProfileDef(
-                "Intel Base", "Intel", WeaponType.BASE_HQ,
+                "Intel Base", "Intel", WeaponType.BASE_HQ, GameData.MMP_IMMOBILE,
                 new ProfileDef(FamilyArchetypes.Facility,
                     new Dictionary<ProfileStat, int>(),
                     new[] { WeaponTrait.NON_COMBATANT }));
@@ -3099,7 +3098,7 @@ namespace HammerAndSickle.Models
             // → HA10 HD13 SA8 SD6 GAD7 · ICM 1.53 (FCS 1.33 × COMBINED_ARMS_TF 1.15, ICM pass 2026-08-22)
             //   · MMP12 · PR1 · SR4.
             WeaponProfile M1_US = WeaponProfile.FromProfileDef(
-                "M1 Abrams Main Battle Tank", "M1 Abrams", WeaponType.TANK_M1_US,
+                "M1 Abrams Main Battle Tank", "M1 Abrams", WeaponType.TANK_M1_US, GameData.MMP_VEHICLE_FAST,
                 new ProfileDef(TankArchetypes.Gen3,
                     new Dictionary<ProfileStat, int> { { ProfileStat.HA, -3 }, { ProfileStat.SA, -1 } },
                     new[] { WeaponTrait.COMPOSITE_CERAMIC, WeaponTrait.LASER_RANGEFINDER, WeaponTrait.BALLISTIC_COMPUTER,
@@ -3145,7 +3144,7 @@ namespace HammerAndSickle.Models
             //   squadron's own air troop (8 AH-64 + 8 OH-58) + 36 M3 scouts; ICM pass 2026-08-22, Bob's
             //   1.4 target) · MMP10 · PR1 · SR3.
             WeaponProfile M60_US = WeaponProfile.FromProfileDef(
-                "M60A3 Patton Main Battle Tank", "M60A3", WeaponType.TANK_M60_US,
+                "M60A3 Patton Main Battle Tank", "M60A3", WeaponType.TANK_M60_US, GameData.MMP_VEHICLE_STANDARD,
                 new ProfileDef(TankArchetypes.Gen2,
                     new Dictionary<ProfileStat, int> { { ProfileStat.SA, 1 } },
                     new[] { WeaponTrait.LASER_RANGEFINDER, WeaponTrait.THERMAL_IMAGER, WeaponTrait.AIR_CAVALRY }),
@@ -3191,9 +3190,9 @@ namespace HammerAndSickle.Models
             // → HA9 HD7 SA8 SD6 GAD7 · ICM 1.21 (FCS 1.10 × NATO_FIRST_LINE 1.10, ICM pass 2026-08-22)
             //   · MMP12 · PR1 · SR3.
             WeaponProfile LEO1_GE = WeaponProfile.FromProfileDef(
-                "Leopard 1 Main Battle Tank", "Leo 1", WeaponType.TANK_LEOPARD1_GE,
+                "Leopard 1 Main Battle Tank", "Leo 1", WeaponType.TANK_LEOPARD1_GE, GameData.MMP_VEHICLE_FAST,
                 new ProfileDef(TankArchetypes.Gen2,
-                    new Dictionary<ProfileStat, int> { { ProfileStat.HA, -1 }, { ProfileStat.HD, -1 }, { ProfileStat.SA, 1 }, { ProfileStat.MMP, 2 } },
+                    new Dictionary<ProfileStat, int> { { ProfileStat.HA, -1 }, { ProfileStat.HD, -1 }, { ProfileStat.SA, 1 },},
                     new[] { WeaponTrait.OPTICS_GEN2, WeaponTrait.LASER_RANGEFINDER, WeaponTrait.NATO_FIRST_LINE }),
                 UpgradePath.TANK, 324);
 
@@ -3235,9 +3234,9 @@ namespace HammerAndSickle.Models
             // → HA14 HD12 SA8 SD6 GAD7 · ICM 1.47 (FCS 1.33 × NATO_FIRST_LINE 1.10, ICM pass 2026-08-22)
             //   · MMP12 · PR1 · SR4.
             WeaponProfile LEO2_GE = WeaponProfile.FromProfileDef(
-                "Leopard 2 Main Battle Tank", "Leo 2", WeaponType.TANK_LEOPARD2_GE,
+                "Leopard 2 Main Battle Tank", "Leo 2", WeaponType.TANK_LEOPARD2_GE, GameData.MMP_VEHICLE_FAST,
                 new ProfileDef(TankArchetypes.Gen3,
-                    new Dictionary<ProfileStat, int> { { ProfileStat.HA, 1 }, { ProfileStat.SA, -1 }, { ProfileStat.MMP, 2 } },
+                    new Dictionary<ProfileStat, int> { { ProfileStat.HA, 1 }, { ProfileStat.SA, -1 },},
                     new[] { WeaponTrait.SPACED_ARMOR, WeaponTrait.OPTICS_GEN3, WeaponTrait.LASER_RANGEFINDER,
                             WeaponTrait.BALLISTIC_COMPUTER, WeaponTrait.THERMAL_IMAGER, WeaponTrait.NATO_FIRST_LINE }),
                 UpgradePath.TANK, 492);
@@ -3278,7 +3277,7 @@ namespace HammerAndSickle.Models
             // → HA13 HD14 SA8 SD6 GAD7 · ICM 1.33 (FCS 1.21 × NATO_FIRST_LINE 1.10, ICM pass 2026-08-22)
             //   · MMP10 · PR1 · SR3.
             WeaponProfile CHALL1_UK = WeaponProfile.FromProfileDef(
-                "Challenger 1 Main Battle Tank", "Challenger 1", WeaponType.TANK_CHALLENGER1_UK,
+                "Challenger 1 Main Battle Tank", "Challenger 1", WeaponType.TANK_CHALLENGER1_UK, GameData.MMP_VEHICLE_STANDARD,
                 new ProfileDef(TankArchetypes.Gen3,
                     new Dictionary<ProfileStat, int> { { ProfileStat.HD, 1 }, { ProfileStat.SA, -1 } },
                     new[] { WeaponTrait.COMPOSITE_CERAMIC, WeaponTrait.LASER_RANGEFINDER, WeaponTrait.BALLISTIC_COMPUTER,
@@ -3327,7 +3326,7 @@ namespace HammerAndSickle.Models
             // ARE the French maneuver element, so the counter keeps its 80 tanks and is named a
             // Division rather than being re-cut to the 40-tank battle group.
             WeaponProfile AMX30_FR = WeaponProfile.FromProfileDef(
-                "AMX-30 Armoured Division", "AMX-30", WeaponType.TANK_AMX30_FR,
+                "AMX-30 Armoured Division", "AMX-30", WeaponType.TANK_AMX30_FR, GameData.MMP_VEHICLE_FAST,
                 Amx30Def(),
                 UpgradePath.TANK, 336);
 
@@ -3368,7 +3367,7 @@ namespace HammerAndSickle.Models
             // Phase 3 (NATO): Ifv + ATGM_RAIL (TOW, HA+4) + AUTOCANNON_LIGHT (25mm Bushmaster, SA+1).
             // → HA8 HD4 SA9 SD7 GAD7 · ICM 1.00 · MMP10 · SR2 · PR1.
             WeaponProfile M2_US = WeaponProfile.FromProfileDef(
-                "M2 Bradley Infantry Fighting Vehicle", "M2 Bradley", WeaponType.IFV_M2_US,
+                "M2 Bradley Infantry Fighting Vehicle", "M2 Bradley", WeaponType.IFV_M2_US, GameData.MMP_VEHICLE_STANDARD,
                 new ProfileDef(FamilyArchetypes.Ifv,
                     new Dictionary<ProfileStat, int>(),
                     new[] { WeaponTrait.ATGM_RAIL, WeaponTrait.AUTOCANNON_LIGHT }),
@@ -3399,7 +3398,7 @@ namespace HammerAndSickle.Models
             // Phase 3 (NATO): Ifv + AUTOCANNON_HEAVY (30mm RARDEN, HA+1/SA+1); MILAN is dismounted (no vehicle ATGM).
             // → HA5 HD4 SA9 SD7 GAD7 · ICM 1.00 · MMP10 · SR2.
             WeaponProfile WARRIOR_UK = WeaponProfile.FromProfileDef(
-                "Warrior Infantry Fighting Vehicle", "Warrior", WeaponType.IFV_WARRIOR_UK,
+                "Warrior Infantry Fighting Vehicle", "Warrior", WeaponType.IFV_WARRIOR_UK, GameData.MMP_VEHICLE_STANDARD,
                 new ProfileDef(FamilyArchetypes.Ifv,
                     new Dictionary<ProfileStat, int>(),
                     new[] { WeaponTrait.AUTOCANNON_HEAVY }),
@@ -3430,7 +3429,7 @@ namespace HammerAndSickle.Models
             // Phase 3 (NATO): Ifv + ATGM_RAIL (MILAN, HA+4) + AUTOCANNON_LIGHT (20mm, SA+1).
             // → HA8 HD4 SA9 SD7 GAD7 · ICM 1.00 · MMP10 · SR2.
             WeaponProfile MARDER_GE = WeaponProfile.FromProfileDef(
-                "Marder Infantry Fighting Vehicle", "Marder", WeaponType.IFV_MARDER_GE,
+                "Marder Infantry Fighting Vehicle", "Marder", WeaponType.IFV_MARDER_GE, GameData.MMP_VEHICLE_STANDARD,
                 new ProfileDef(FamilyArchetypes.Ifv,
                     new Dictionary<ProfileStat, int>(),
                     new[] { WeaponTrait.ATGM_RAIL, WeaponTrait.AUTOCANNON_LIGHT }),
@@ -3461,7 +3460,7 @@ namespace HammerAndSickle.Models
             // Phase 3 (NATO): bare Apc archetype (tracked, .50-cal only).
             // → HA3 HD4 SA6 SD7 GAD7 · ICM 1.00 · MMP8 · SR2.
             WeaponProfile M113_US = WeaponProfile.FromProfileDef(
-                "M113 Armored Personnel Carrier", "M113", WeaponType.APC_M113_US,
+                "M113 Armored Personnel Carrier", "M113", WeaponType.APC_M113_US, GameData.MMP_VEHICLE_SLOW,
                 new ProfileDef(FamilyArchetypes.Apc,
                     new Dictionary<ProfileStat, int>(),
                     System.Array.Empty<WeaponTrait>()),
@@ -3498,7 +3497,7 @@ namespace HammerAndSickle.Models
             // It carries the second Panzergrenadier option and the air-mobile brigade's Mobile bay.
             // → HA3 HD4 SA6 SD7 GAD7 · ICM 1.00 · MMP8 · SR2.
             WeaponProfile M113_GE = WeaponProfile.FromProfileDef(
-                "M113 Armored Personnel Carrier", "M113", WeaponType.APC_M113_GE,
+                "M113 Armored Personnel Carrier", "M113", WeaponType.APC_M113_GE, GameData.MMP_VEHICLE_SLOW,
                 new ProfileDef(FamilyArchetypes.Apc,
                     new Dictionary<ProfileStat, int>(),
                     System.Array.Empty<WeaponTrait>()),
@@ -3531,7 +3530,7 @@ namespace HammerAndSickle.Models
             // Phase 3 (NATO): Apc + THIN_TOP (open-mount soft-skin, GAD−1). Wheeled utility carrier.
             // → HA3 HD4 SA6 SD7 GAD6 · ICM 1.00 · MMP8 · SR2.
             WeaponProfile HUMVEE_US = WeaponProfile.FromProfileDef(
-                "HMMWV Utility Vehicle", "Humvee", WeaponType.APC_HUMVEE_US,
+                "HMMWV Utility Vehicle", "Humvee", WeaponType.APC_HUMVEE_US, GameData.MMP_VEHICLE_SLOW,
                 new ProfileDef(FamilyArchetypes.Apc,
                     new Dictionary<ProfileStat, int>(),
                     new[] { WeaponTrait.THIN_TOP }),
@@ -3579,7 +3578,7 @@ namespace HammerAndSickle.Models
             // Phase 3 (NATO): Apc + AMPHIBIOUS (Marine assault swimmer).
             // → HA3 HD4 SA6 SD7 GAD7 · ICM 1.00 · MMP8 · SR2 · amphibious.
             WeaponProfile LVTP7_US = WeaponProfile.FromProfileDef(
-                "LVTP-7 Amphibious Assault Vehicle", "LVTP-7", WeaponType.APC_LVTP7_US,
+                "LVTP-7 Amphibious Assault Vehicle", "LVTP-7", WeaponType.APC_LVTP7_US, GameData.MMP_VEHICLE_SLOW,
                 new ProfileDef(FamilyArchetypes.Apc,
                     new Dictionary<ProfileStat, int>(),
                     new[] { WeaponTrait.AMPHIBIOUS }),
@@ -3615,7 +3614,7 @@ namespace HammerAndSickle.Models
             // Phase 3 (NATO): bare Apc archetype (wheeled 6x6 carrier).
             // → HA3 HD4 SA6 SD7 GAD7 · ICM 1.00 · MMP8 · SR2.
             WeaponProfile VAB_FR = WeaponProfile.FromProfileDef(
-                "VAB Armored Personnel Carrier", "VAB", WeaponType.APC_VAB_FR,
+                "VAB Armored Personnel Carrier", "VAB", WeaponType.APC_VAB_FR, GameData.MMP_VEHICLE_SLOW,
                 new ProfileDef(FamilyArchetypes.Apc,
                     new Dictionary<ProfileStat, int>(),
                     System.Array.Empty<WeaponTrait>()),
@@ -3655,7 +3654,7 @@ namespace HammerAndSickle.Models
             // US variant only per "add one") + FIRE_DIRECTION_NET (TACFIRE fires-quality ICM, ruling 9).
             // → HA8 HD7 SA11 SD7 GAD7 · ICM 1.05 · MMP10 · IR5.
             WeaponProfile M109_US = WeaponProfile.FromProfileDef(
-                "M109 Paladin Self-Propelled Artillery", "M109 Paladin", WeaponType.SPA_M109_US,
+                "M109 Paladin Self-Propelled Artillery", "M109 Paladin", WeaponType.SPA_M109_US, GameData.MMP_VEHICLE_STANDARD,
                 new ProfileDef(FamilyArchetypes.Artillery,
                     new Dictionary<ProfileStat, int> { { ProfileStat.SA, 1 }, { ProfileStat.IR, GameData.INDIRECT_RANGE_MEDIUM } },
                     new[] { WeaponTrait.SELF_PROPELLED, WeaponTrait.SMART_MUNITION, WeaponTrait.FIRE_DIRECTION_NET }),
@@ -3692,7 +3691,7 @@ namespace HammerAndSickle.Models
             // + FIRE_DIRECTION_NET (artillery ruling 9, 2026-08-22 — NATO fires-quality ICM).
             // → HA5 HD7 SA10 SD7 GAD7 · ICM 1.05 · MMP10 · IR5.
             WeaponProfile M109_GE = WeaponProfile.FromProfileDef(
-                "M109 Self-Propelled Artillery", "M109", WeaponType.SPA_M109_GE,
+                "M109 Self-Propelled Artillery", "M109", WeaponType.SPA_M109_GE, GameData.MMP_VEHICLE_STANDARD,
                 NatoM109Def(),
                 UpgradePath.ART, 300);
 
@@ -3730,7 +3729,7 @@ namespace HammerAndSickle.Models
             // WeaponType.SPA_AUF1_FR is unchanged: persisted-by-name, rename discouraged.
             // + FIRE_DIRECTION_NET (artillery ruling 9, 2026-08-22) → ICM 1.05.
             WeaponProfile M109_FR = WeaponProfile.FromProfileDef(
-                "AUF1 Self-Propelled Artillery", "AUF1", WeaponType.SPA_AUF1_FR,
+                "AUF1 Self-Propelled Artillery", "AUF1", WeaponType.SPA_AUF1_FR, GameData.MMP_VEHICLE_STANDARD,
                 Auf1Def(WeaponTrait.FIRE_DIRECTION_NET),
                 UpgradePath.ART, 300);
 
@@ -3764,7 +3763,7 @@ namespace HammerAndSickle.Models
             // → HA5 HD7 SA10 SD7 GAD7 · ICM 1.00 · MMP10 · IR5.
             // + FIRE_DIRECTION_NET (artillery ruling 9, 2026-08-22) → ICM 1.05.
             WeaponProfile M109_UK = WeaponProfile.FromProfileDef(
-                "M109 Self-Propelled Artillery", "M109", WeaponType.SPA_M109_UK,
+                "M109 Self-Propelled Artillery", "M109", WeaponType.SPA_M109_UK, GameData.MMP_VEHICLE_STANDARD,
                 NatoM109Def(),
                 UpgradePath.ART, 300);
 
@@ -3804,7 +3803,7 @@ namespace HammerAndSickle.Models
             // Phase 3 (NATO): bare Artillery archetype (105mm towed, foot MMP4), IR short.
             // → HA5 HD5 SA9 SD5 GAD8 · ICM 1.00 · MMP4 · IR4.
             WeaponProfile ArtLightWest = WeaponProfile.FromProfileDef(
-                "Light Towed Artillery", "Lt Artillery", WeaponType.ART_LIGHT_NATO,
+                "Light Towed Artillery", "Lt Artillery", WeaponType.ART_LIGHT_NATO, GameData.MMP_MANHANDLED_GUN,
                 LightTowedArtilleryDef(),
                 UpgradePath.ART, 144);
 
@@ -3837,7 +3836,7 @@ namespace HammerAndSickle.Models
             // Phase 3 (NATO): Artillery + SA+1 (155mm calibre), IR medium. Heavy towed (foot MMP4).
             // → HA5 HD5 SA10 SD5 GAD8 · ICM 1.00 · MMP4 · IR5.
             WeaponProfile ArtHeavyWest = WeaponProfile.FromProfileDef(
-                "Heavy Towed Artillery", "Hvy Artillery", WeaponType.ART_HEAVY_NATO,
+                "Heavy Towed Artillery", "Hvy Artillery", WeaponType.ART_HEAVY_NATO, GameData.MMP_MANHANDLED_GUN,
                 HeavyTowedArtilleryDef(),
                 UpgradePath.ART, 144);
 
@@ -3876,7 +3875,7 @@ namespace HammerAndSickle.Models
             // + FIRE_DIRECTION_NET (artillery ruling 9, 2026-08-22 — NATO fires-quality ICM).
             // → HA8 HD7 SA11 SD7 GAD7 · ICM 1.05 · MMP10 · IR6 · double-fire.
             WeaponProfile MLRS_US = WeaponProfile.FromProfileDef(
-                "M270 MLRS Multiple Launch Rocket System", "M270 MLRS", WeaponType.ROC_MLRS_US,
+                "M270 MLRS Multiple Launch Rocket System", "M270 MLRS", WeaponType.ROC_MLRS_US, GameData.MMP_VEHICLE_STANDARD,
                 MlrsDef(),
                 UpgradePath.ROC, 540);
 
@@ -3914,7 +3913,7 @@ namespace HammerAndSickle.Models
             // Phase 3 (NATO): Aaa + SELF_PROPELLED (M113 chassis); optical/ranging 20mm gun, no radar-direction trait (GAT 11, = ZSU-57-2).
             // → HA4 HD6 SA9 SD8 GAD11 · GAT11 · MMP10 · IR3 · SR3.
             WeaponProfile M163_US = WeaponProfile.FromProfileDef(
-                "M163 Vulcan Self-Propelled Anti-Aircraft Gun", "M163 Vulcan", WeaponType.SPAAA_M163_US,
+                "M163 Vulcan Self-Propelled Anti-Aircraft Gun", "M163 Vulcan", WeaponType.SPAAA_M163_US, GameData.MMP_VEHICLE_STANDARD,
                 new ProfileDef(FamilyArchetypes.Aaa,
                     new Dictionary<ProfileStat, int> { { ProfileStat.IR, GameData.INDIRECT_RANGE_AAA } },
                     new[] { WeaponTrait.SELF_PROPELLED }),
@@ -3950,7 +3949,7 @@ namespace HammerAndSickle.Models
             // IR SAM→SHORT 2026-08-22 (Bob): point-defense band (real MIM-72 ~8 km) — the Strela-1 band, not Hawk's.
             // → HA1 HD5 SA1 SD5 GAD7 · GAT13 · MMP10 · IR4 · SR6.
             WeaponProfile Chaparral = WeaponProfile.FromProfileDef(
-                "M48 Chaparral Self-Propelled SAM System", "M48 Chaparral", WeaponType.SPSAM_CHAP_US,
+                "M48 Chaparral Self-Propelled SAM System", "M48 Chaparral", WeaponType.SPSAM_CHAP_US, GameData.MMP_VEHICLE_STANDARD,
                 new ProfileDef(FamilyArchetypes.Sam,
                     new Dictionary<ProfileStat, int> { { ProfileStat.IR, GameData.INDIRECT_RANGE_SHORT } },
                     new[] { WeaponTrait.SELF_PROPELLED, WeaponTrait.IR_HOMING }),
@@ -3985,9 +3984,9 @@ namespace HammerAndSickle.Models
             // Phase 3 (NATO): Sam + SARH_LONG_RANGE (radar-illuminated medium SAM → GAT 15) + static (MMP→0). = NATO's S-75.
             // → HA1 HD3 SA1 SD3 GAD8 · GAT15 · MMP0 · IR6 · SR6.
             WeaponProfile Hawk_US = WeaponProfile.FromProfileDef(
-                "MIM-23 Hawk Strategic SAM System", "MIM-23 Hawk", WeaponType.SAM_HAWK_US,
+                "MIM-23 Hawk Strategic SAM System", "MIM-23 Hawk", WeaponType.SAM_HAWK_US, GameData.MMP_IMMOBILE,
                 new ProfileDef(FamilyArchetypes.Sam,
-                    new Dictionary<ProfileStat, int> { { ProfileStat.MMP, GameData.STATIC_UNIT - GameData.FOOT_UNIT }, { ProfileStat.IR, GameData.INDIRECT_RANGE_SAM } },
+                    new Dictionary<ProfileStat, int> { { ProfileStat.IR, GameData.INDIRECT_RANGE_SAM } },
                     new[] { WeaponTrait.SARH_LONG_RANGE, WeaponTrait.AIR_DROPPABLE, WeaponTrait.HELO_TRANSPORTABLE }),
                 UpgradePath.SAM, 264);
 
@@ -4020,7 +4019,7 @@ namespace HammerAndSickle.Models
             // Phase 3 (NATO): Aaa + SELF_PROPELLED + RADAR_GUIDED_GUN (35mm radar-directed = NATO's ZSU-23-4 → GAT 13).
             // → HA4 HD6 SA9 SD8 GAD11 · GAT13 · MMP10 · IR4 · SR3. SPAAA gun (dual-role) — classification corrected 2026-06-18.
             WeaponProfile Gepard_GE = WeaponProfile.FromProfileDef(
-                "Flakpanzer Gepard Self-Propelled Anti-Aircraft Gun", "Gepard", WeaponType.SPAAA_GEPARD_GE,
+                "Flakpanzer Gepard Self-Propelled Anti-Aircraft Gun", "Gepard", WeaponType.SPAAA_GEPARD_GE, GameData.MMP_VEHICLE_STANDARD,
                 RadarSpAaaDef(),
                 UpgradePath.AAA, 456);
 
@@ -4056,7 +4055,7 @@ namespace HammerAndSickle.Models
             // Aaa + SELF_PROPELLED + RADAR_GUIDED_GUN, with the short-range gun envelope.
             // → HA4 HD6 SA9 SD8 GAD11 · GAT13 · MMP10 · IR3 · SR3.
             WeaponProfile AMX30DCA_FR = WeaponProfile.FromProfileDef(
-                "AMX-30 DCA Self-Propelled Anti-Aircraft Gun", "AMX-30 DCA", WeaponType.SPAAA_AMX30DCA_FR,
+                "AMX-30 DCA Self-Propelled Anti-Aircraft Gun", "AMX-30 DCA", WeaponType.SPAAA_AMX30DCA_FR, GameData.MMP_VEHICLE_STANDARD,
                 new ProfileDef(FamilyArchetypes.Aaa,
                     new Dictionary<ProfileStat, int> { { ProfileStat.IR, GameData.INDIRECT_RANGE_AAA } },
                     new[] { WeaponTrait.SELF_PROPELLED, WeaponTrait.RADAR_GUIDED_GUN }),
@@ -4092,7 +4091,7 @@ namespace HammerAndSickle.Models
             // IR SAM→SHORT 2026-08-22 (Bob): point-defense band (real Crotale ~10 km) — one NATO band, no fine split.
             // → HA1 HD5 SA1 SD5 GAD7 · GAT14 · MMP10 · IR4 · SR6.
             WeaponProfile Crotale = WeaponProfile.FromProfileDef(
-                "Crotale Self-Propelled SAM System", "Crotale", WeaponType.SPSAM_CROTALE_FR,
+                "Crotale Self-Propelled SAM System", "Crotale", WeaponType.SPSAM_CROTALE_FR, GameData.MMP_VEHICLE_STANDARD,
                 CrotaleFamilyDef(),
                 UpgradePath.SAM, 396);
 
@@ -4127,7 +4126,7 @@ namespace HammerAndSickle.Models
             // IR SAM→SHORT 2026-08-22 (Bob): point-defense band (real Rapier ~7 km) — the Strela-1 band, not Hawk's.
             // → HA1 HD5 SA1 SD5 GAD7 · GAT14 · MMP10 · IR4 · SR6.
             WeaponProfile Rapier_SP = WeaponProfile.FromProfileDef(
-                "Tracked Rapier Self-Propelled SAM System", "Tracked Rapier", WeaponType.SPSAM_RAPIER_UK,
+                "Tracked Rapier Self-Propelled SAM System", "Tracked Rapier", WeaponType.SPSAM_RAPIER_UK, GameData.MMP_VEHICLE_STANDARD,
                 new ProfileDef(FamilyArchetypes.Sam,
                     new Dictionary<ProfileStat, int> { { ProfileStat.IR, GameData.INDIRECT_RANGE_SHORT } },
                     new[] { WeaponTrait.SELF_PROPELLED, WeaponTrait.COMMAND_GUIDANCE }),
@@ -4168,7 +4167,7 @@ namespace HammerAndSickle.Models
             // Phase 3 (NATO): Recon + ATGM_RAIL (TOW, HA+4) + AUTOCANNON_LIGHT (25mm); Bradley-chassis combat scout.
             // → HA6 HD5 SA6 SD9 GAD7 · ICM 1.00 · MMP10 · SR3 · Hard (post-call). Not RECON_FRAGILE (armored cavalry).
             WeaponProfile M3_US = WeaponProfile.FromProfileDef(
-                "M3 Bradley Cavalry Fighting Vehicle", "M3 Bradley", WeaponType.RCN_M3_US,
+                "M3 Bradley Cavalry Fighting Vehicle", "M3 Bradley", WeaponType.RCN_M3_US, GameData.MMP_VEHICLE_STANDARD,
                 new ProfileDef(FamilyArchetypes.Recon,
                     new Dictionary<ProfileStat, int>(),
                     new[] { WeaponTrait.ATGM_RAIL, WeaponTrait.AUTOCANNON_LIGHT }),
@@ -4207,7 +4206,7 @@ namespace HammerAndSickle.Models
             // Phase 3 (NATO): Recon + AUTOCANNON_LIGHT (20mm) + AMPHIBIOUS; 8x8 wheeled scout, light gun.
             // → HA2 HD5 SA6 SD9 GAD7 · ICM 1.00 · MMP10 · SR3 · amphibious · Soft (recon ruling 2026-08-22).
             WeaponProfile LUCHS_GE = WeaponProfile.FromProfileDef(
-                "Spähpanzer Luchs Reconnaissance Vehicle", "Luchs", WeaponType.RCN_LUCHS_GE,
+                "Spähpanzer Luchs Reconnaissance Vehicle", "Luchs", WeaponType.RCN_LUCHS_GE, GameData.MMP_VEHICLE_STANDARD,
                 new ProfileDef(FamilyArchetypes.Recon,
                     new Dictionary<ProfileStat, int>(),
                     new[] { WeaponTrait.AUTOCANNON_LIGHT, WeaponTrait.AMPHIBIOUS }),
@@ -4245,7 +4244,7 @@ namespace HammerAndSickle.Models
             // Phase 3 (NATO): Recon + AUTOCANNON_HEAVY (30mm RARDEN, CVR(T)-class scout).
             // → HA3 HD5 SA6 SD9 GAD7 · ICM 1.00 · MMP10 · SR3 · Soft (recon ruling 2026-08-22).
             WeaponProfile FV105_UK = WeaponProfile.FromProfileDef(
-                "FV105 Sultan", "FV105", WeaponType.RCN_FV105_UK,
+                "FV105 Sultan", "FV105", WeaponType.RCN_FV105_UK, GameData.MMP_VEHICLE_STANDARD,
                 new ProfileDef(FamilyArchetypes.Recon,
                     new Dictionary<ProfileStat, int>(),
                     new[] { WeaponTrait.AUTOCANNON_HEAVY }),
@@ -4285,7 +4284,7 @@ namespace HammerAndSickle.Models
             // Phase 3 (NATO): Recon + residual HA+4 (90mm low-pressure gun — one-off; calibre traits are tanks-only).
             // → HA6 HD5 SA5 SD9 GAD7 · ICM 1.00 · MMP10 · SR3 · Soft (recon ruling 2026-08-22). Fire-support scout, mirrors BRDM-2 AT.
             WeaponProfile ERC90_FR = WeaponProfile.FromProfileDef(
-                "ERC 90 Sagaie Reconnaissance Vehicle", "ERC 90", WeaponType.RCN_ERC90_FR,
+                "ERC 90 Sagaie Reconnaissance Vehicle", "ERC 90", WeaponType.RCN_ERC90_FR, GameData.MMP_VEHICLE_STANDARD,
                 new ProfileDef(FamilyArchetypes.Recon,
                     new Dictionary<ProfileStat, int> { { ProfileStat.HA, 4 } },
                     System.Array.Empty<WeaponTrait>()),
@@ -4328,7 +4327,7 @@ namespace HammerAndSickle.Models
             // (Hydra-70) + ARMORED_COCKPIT + HELO_COUNTERMEASURES. Apex NATO gunship (= Mi-28 line).
             // → HA12 HD7 SA13 SD8 GAD12 · ICM 1.05 · MMP24 · SR3.
             WeaponProfile AH64 = WeaponProfile.FromProfileDef(
-                "AH-64 Apache Attack Helicopter", "AH-64 Apache", WeaponType.HEL_AH64_US,
+                "AH-64 Apache Attack Helicopter", "AH-64 Apache", WeaponType.HEL_AH64_US, GameData.MMP_HELO,
                 new ProfileDef(FamilyArchetypes.Helicopter,
                     new Dictionary<ProfileStat, int>(),
                     new[] { WeaponTrait.ATGM_HELO_FNF, WeaponTrait.CANNON_HELO, WeaponTrait.ROCKET_PODS, WeaponTrait.ARMORED_COCKPIT, WeaponTrait.HELO_COUNTERMEASURES }),
@@ -4360,7 +4359,7 @@ namespace HammerAndSickle.Models
             // Phase 3 (NATO): Helicopter + NON_COMBATANT; organic AM/MAM lift (= Mi-8T). HeloTransport category (post-call).
             // → bare 7/6/10/7 GAD10 · MMP24 · SR3 · non-combatant.
             WeaponProfile UH60 = WeaponProfile.FromProfileDef(
-                "UH-60 Black Hawk Transport Helicopter", "UH-60 Black Hawk", WeaponType.HEL_UH60_US,
+                "UH-60 Black Hawk Transport Helicopter", "UH-60 Black Hawk", WeaponType.HEL_UH60_US, GameData.MMP_HELO,
                 OrganicHeloLiftDef(),
                 UpgradePath.HELT, 492);
 
@@ -4395,7 +4394,7 @@ namespace HammerAndSickle.Models
             // NATO gameplay gunship there is no German UH-1C variant. Older than UH-60: Gen1, not Gen2.
             // → bare 7/6/10/7 GAD10 · MMP24 · SR3 · non-combatant · helo-transport.
             WeaponProfile UH1D_GE = WeaponProfile.FromProfileDef(
-                "UH-1D Transport Helicopter", "UH-1D", WeaponType.HEL_UH1D_GE,
+                "UH-1D Transport Helicopter", "UH-1D", WeaponType.HEL_UH1D_GE, GameData.MMP_HELO,
                 OrganicHeloLiftDef(),
                 UpgradePath.HELT, 348);
 
@@ -4424,7 +4423,7 @@ namespace HammerAndSickle.Models
             // Phase 3 (NATO): Helicopter + ATGM_HELO_SACLOS (HOT, HA+4). Light AT helo — potent missiles, no cannon/armor (glass cannon).
             // → HA11 HD6 SA10 SD7 GAD10 · ICM 1.00 · MMP24 · SR3. (SA10 is archetype-inherited; Bo-105 PAH-1 is AT-only.)
             WeaponProfile BO105 = WeaponProfile.FromProfileDef(
-                "Bo 105 Light Attack Helicopter", "Bo 105", WeaponType.HEL_BO105_GE,
+                "Bo 105 Light Attack Helicopter", "Bo 105", WeaponType.HEL_BO105_GE, GameData.MMP_HELO,
                 new ProfileDef(FamilyArchetypes.Helicopter,
                     new Dictionary<ProfileStat, int>(),
                     new[] { WeaponTrait.ATGM_HELO_SACLOS }),
@@ -4455,7 +4454,7 @@ namespace HammerAndSickle.Models
             // Phase 3 (NATO): Helicopter + ATGM_HELO_SACLOS (TOW) + CANNON_HELO (20mm) + ROCKET_PODS. = Mi-24D line minus the armor.
             // → HA11 HD6 SA13 SD7 GAD10 · ICM 1.00 · MMP24 · SR3.
             WeaponProfile AH1 = WeaponProfile.FromProfileDef(
-                "AH-1 Cobra Attack Helicopter", "AH-1 Cobra", WeaponType.HEL_AH1_US,
+                "AH-1 Cobra Attack Helicopter", "AH-1 Cobra", WeaponType.HEL_AH1_US, GameData.MMP_HELO,
                 new ProfileDef(FamilyArchetypes.Helicopter,
                     new Dictionary<ProfileStat, int>(),
                     new[] { WeaponTrait.ATGM_HELO_SACLOS, WeaponTrait.CANNON_HELO, WeaponTrait.ROCKET_PODS }),
@@ -4493,7 +4492,7 @@ namespace HammerAndSickle.Models
             // radar, ICM ×1.10) + RWR + ECM_JAMMER + CHAFF_FLARE (full suite, SUR+3) + TS+2 (fast singleton). Apex US
             // air-superiority fighter → GA floor 2. → DF15 MAN14 TS12 SUR12 · ICM 1.10 · GA2 OL6 · MMP100 · SR4.
             WeaponProfile F15 = WeaponProfile.FromProfileDef(
-                "F-15 Eagle Air Superiority Fighter", "F-15 Eagle", WeaponType.FGT_F15_US,
+                "F-15 Eagle Air Superiority Fighter", "F-15 Eagle", WeaponType.FGT_F15_US, GameData.MMP_FIXED_WING,
                 new ProfileDef(FamilyArchetypes.FighterLate,
                     new Dictionary<ProfileStat, int> { { ProfileStat.TS, 2 } },
                     new[] { WeaponTrait.ACTIVE_RADAR_AAM, WeaponTrait.AGILE_AIRFRAME, WeaponTrait.LOOKDOWN_SHOOTDOWN,
@@ -4526,7 +4525,7 @@ namespace HammerAndSickle.Models
             // CHAFF_FLARE (SUR+2) + MULTIROLE_STRIKE (GA+4) + AT_GUIDED_AIR (Maverick: GA+3, GaVsHard+1) + TS+1.
             // Agile multirole; NATO avionics edge shows as ICM, not raw DF. → DF12 MAN13 TS11 SUR9 · ICM 1.10 · GA9 OL6 · SR4.
             WeaponProfile F16 = WeaponProfile.FromProfileDef(
-                "F-16 Fighting Falcon Multi-Role Fighter", "F-16 Falcon", WeaponType.FGT_F16_US,
+                "F-16 Fighting Falcon Multi-Role Fighter", "F-16 Falcon", WeaponType.FGT_F16_US, GameData.MMP_FIXED_WING,
                 F16MultiroleDef(),
                 UpgradePath.FGT, 480);
 
@@ -4555,7 +4554,7 @@ namespace HammerAndSickle.Models
             // (SUR+2) + TS+2 (fast singleton). Radar-armed workhorse interceptor → GA floor 2.
             // → DF10 MAN9 TS12 SUR8 · GA2 OL6 · MMP100 · SR4.
             WeaponProfile F4_US = WeaponProfile.FromProfileDef(
-                "F-4 Phantom II Fighter", "F-4 Phantom", WeaponType.FGT_F4_US,
+                "F-4 Phantom II Fighter", "F-4 Phantom", WeaponType.FGT_F4_US, GameData.MMP_FIXED_WING,
                 new ProfileDef(FamilyArchetypes.FighterEarly,
                     new Dictionary<ProfileStat, int> { { ProfileStat.TS, 2 } },
                     new[] { WeaponTrait.BVR_RADAR_MISSILE, WeaponTrait.RWR, WeaponTrait.CHAFF_FLARE }),
@@ -4587,7 +4586,7 @@ namespace HammerAndSickle.Models
             // TS+2 (fast singleton). The BVR sniper — pure fleet air-defense, no AGILE (big heavy interceptor) → GA
             // floor 2. → DF15 MAN12 TS12 SUR12 · ICM 1.10 · GA2 OL6 · MMP100 · SR4.
             WeaponProfile F14_US = WeaponProfile.FromProfileDef(
-                "F-14 Tomcat Fleet Defense Fighter", "F-14 Tomcat", WeaponType.FGT_F14_US,
+                "F-14 Tomcat Fleet Defense Fighter", "F-14 Tomcat", WeaponType.FGT_F14_US, GameData.MMP_FIXED_WING,
                 new ProfileDef(FamilyArchetypes.FighterLate,
                     new Dictionary<ProfileStat, int> { { ProfileStat.TS, 2 } },
                     new[] { WeaponTrait.ACTIVE_RADAR_AAM, WeaponTrait.LOOKDOWN_SHOOTDOWN,
@@ -4620,7 +4619,7 @@ namespace HammerAndSickle.Models
             // stored) + TERRAIN_FOLLOW_RADAR (low-level penetration, dormant SUR). Heavy all-weather interdictor:
             // GA8 (down from old 12) but big OL9 payload. → DF12 MAN11 TS10 SUR7 · GA8 OL9 · SR4 · OcSuppression 20.
             WeaponProfile TORNADO_UK = WeaponProfile.FromProfileDef(
-                "Tornado GR.1 Strike Fighter", "Tornado GR.1", WeaponType.FGT_TORNADO_UK,
+                "Tornado GR.1 Strike Fighter", "Tornado GR.1", WeaponType.FGT_TORNADO_UK, GameData.MMP_FIXED_WING,
                 new ProfileDef(FamilyArchetypes.FighterMid,
                     new Dictionary<ProfileStat, int> { { ProfileStat.DF, 2 } },
                     new[] { WeaponTrait.MULTIROLE_STRIKE, WeaponTrait.LASER_GUIDED_MUNITIONS, WeaponTrait.HEAVY_PAYLOAD, WeaponTrait.RUNWAY_CRATERING, WeaponTrait.TERRAIN_FOLLOW_RADAR }),
@@ -4651,7 +4650,7 @@ namespace HammerAndSickle.Models
             // + RUNWAY_CRATERING (OcSuppression+20 stored) + TERRAIN_FOLLOW_RADAR (dormant). The lighter UK strike
             // variant (no HEAVY_PAYLOAD → OL6, vs IDS's OL9). → DF13 MAN11 TS10 SUR7 · GA8 OL6 · SR4 · OcSuppression 20.
             WeaponProfile TORNADO_GE = WeaponProfile.FromProfileDef(
-                "Tornado IDS Strike Fighter", "Tornado IDS", WeaponType.FGT_TORNADO_GE,
+                "Tornado IDS Strike Fighter", "Tornado IDS", WeaponType.FGT_TORNADO_GE, GameData.MMP_FIXED_WING,
                 new ProfileDef(FamilyArchetypes.FighterMid,
                     new Dictionary<ProfileStat, int> { { ProfileStat.DF, 3 } },
                     new[] { WeaponTrait.MULTIROLE_STRIKE, WeaponTrait.LASER_GUIDED_MUNITIONS, WeaponTrait.RUNWAY_CRATERING, WeaponTrait.TERRAIN_FOLLOW_RADAR }),
@@ -4681,7 +4680,7 @@ namespace HammerAndSickle.Models
             // Phase 3 (air-stat enrichment): FighterEarly + BVR_RADAR_MISSILE (Sparrow, DF+2) + RWR + CHAFF_FLARE
             // (SUR+2) + TS+2. FRG air-defense Phantom — mirrors the US F-4 line. → DF10 MAN9 TS12 SUR8 · GA2 OL6 · SR4.
             WeaponProfile F4_GE = WeaponProfile.FromProfileDef(
-                "F-4F Phantom Fighter", "F-4F Phantom", WeaponType.FGT_F4_GE,
+                "F-4F Phantom Fighter", "F-4F Phantom", WeaponType.FGT_F4_GE, GameData.MMP_FIXED_WING,
                 new ProfileDef(FamilyArchetypes.FighterEarly,
                     new Dictionary<ProfileStat, int> { { ProfileStat.TS, 2 } },
                     new[] { WeaponTrait.BVR_RADAR_MISSILE, WeaponTrait.RWR, WeaponTrait.CHAFF_FLARE }),
@@ -4713,7 +4712,7 @@ namespace HammerAndSickle.Models
             // MULTIROLE_STRIKE (GA+4) + LASER_GUIDED_MUNITIONS (GA+2) + TS+2. Agile multirole delta.
             // → DF12 MAN13 TS12 SUR9 · ICM 1.10 · GA8 OL6 · SR4.
             WeaponProfile MIRAGE2000 = WeaponProfile.FromProfileDef(
-                "Mirage 2000 Multi-Role Fighter", "Mirage 2000", WeaponType.FGT_MIRAGE2000_FR,
+                "Mirage 2000 Multi-Role Fighter", "Mirage 2000", WeaponType.FGT_MIRAGE2000_FR, GameData.MMP_FIXED_WING,
                 new ProfileDef(FamilyArchetypes.FighterMid,
                     new Dictionary<ProfileStat, int> { { ProfileStat.TS, 2 } },
                     new[] { WeaponTrait.AGILE_AIRFRAME, WeaponTrait.BVR_RADAR_MISSILE, WeaponTrait.LOOKDOWN_SHOOTDOWN,
@@ -4745,7 +4744,7 @@ namespace HammerAndSickle.Models
             // (SUR+2) + MULTIROLE_STRIKE (GA+4) + MAN+1/TS+1. Older multirole — no radar ICM (Cyrano set); lighter
             // striker than the Mirage 2000 (GA6 vs 8). → DF10 MAN10 TS11 SUR8 · GA6 OL6 · SR4.
             WeaponProfile MIRAGEF1 = WeaponProfile.FromProfileDef(
-                "Mirage F1 Fighter", "Mirage F1", WeaponType.FGT_MIRAGEF1_FR,
+                "Mirage F1 Fighter", "Mirage F1", WeaponType.FGT_MIRAGEF1_FR, GameData.MMP_FIXED_WING,
                 new ProfileDef(FamilyArchetypes.FighterEarly,
                     new Dictionary<ProfileStat, int> { { ProfileStat.MAN, 1 }, { ProfileStat.TS, 1 } },
                     new[] { WeaponTrait.BVR_RADAR_MISSILE, WeaponTrait.RWR, WeaponTrait.CHAFF_FLARE, WeaponTrait.MULTIROLE_STRIKE }),
@@ -4778,7 +4777,7 @@ namespace HammerAndSickle.Models
             // "flying tank" line. GA15 final (down from old 17), with GaVsHard 3 stored for the anti-armour bite.
             // → DF4 MAN4 TS7 SUR15 · GA15 OL11 · MMP100 · SR4 · GaVsHard 3.
             WeaponProfile A10 = WeaponProfile.FromProfileDef(
-                "A-10 Thunderbolt II Attack Aircraft", "A-10 Warthog", WeaponType.ATT_A10_US,
+                "A-10 Thunderbolt II Attack Aircraft", "A-10 Warthog", WeaponType.ATT_A10_US, GameData.MMP_FIXED_WING,
                 new ProfileDef(FamilyArchetypes.Attack,
                     new Dictionary<ProfileStat, int> { { ProfileStat.SUR, 3 }, { ProfileStat.OL, 2 } },
                     new[] { WeaponTrait.HEAVY_AG_CANNON, WeaponTrait.AT_GUIDED_AIR, WeaponTrait.CAS_ARMORED, WeaponTrait.LOITER_PERSISTENCE }),
@@ -4811,7 +4810,7 @@ namespace HammerAndSickle.Models
             // the tiny internal bay (2 LGBs). GA13 precision strike (down from old 18). → DF1 MAN3 TS10 SUR8 ·
             // GA13 OL6 · STL15 · MMP100 · SR4 · GaVsBase 4 · stealth.
             WeaponProfile F117 = WeaponProfile.FromProfileDef(
-                "F-117 Nighthawk Stealth Attack Aircraft", "F-117 Nighthawk", WeaponType.ATT_F117_US,
+                "F-117 Nighthawk Stealth Attack Aircraft", "F-117 Nighthawk", WeaponType.ATT_F117_US, GameData.MMP_FIXED_WING,
                 new ProfileDef(FamilyArchetypes.Bomber,
                     new Dictionary<ProfileStat, int> { { ProfileStat.OL, -8 }, { ProfileStat.STL, 15 } },
                     new[] { WeaponTrait.HARDENED_STRIKE, WeaponTrait.LASER_GUIDED_MUNITIONS, WeaponTrait.BUNKER_PENETRATOR, WeaponTrait.STEALTH_RAM }),
@@ -4843,7 +4842,7 @@ namespace HammerAndSickle.Models
             // CHAFF_FLARE (rugged twin's defensive suite, SUR+3) + TS−1 (low-level, not a fast climber). Dedicated
             // low-level attack jet. → DF8 MAN9 TS9 SUR9 · GA8 OL9 · SR4 · OcSuppression 20.
             WeaponProfile JAGUAR = WeaponProfile.FromProfileDef(
-                "SEPECAT Jaguar Attack Aircraft", "Jaguar", WeaponType.ATT_JAGUAR_FR,
+                "SEPECAT Jaguar Attack Aircraft", "Jaguar", WeaponType.ATT_JAGUAR_FR, GameData.MMP_FIXED_WING,
                 JaguarStrikeDef(),
                 UpgradePath.ATT, 420);
 
@@ -4873,7 +4872,7 @@ namespace HammerAndSickle.Models
             // (GaVsBase+4 stored) + TERRAIN_FOLLOW_RADAR (SUR vs ground-AD, dormant). GA13 heavy interdiction
             // (down from old 15); OL14 preserved. → DF6 MAN6 TS14 SUR8 · GA13 OL14 · MMP100 · SR4 · GaVsBase 4.
             WeaponProfile F111 = WeaponProfile.FromProfileDef(
-                "F-111 Aardvark Bomber", "F-111 Aardvark", WeaponType.BMB_F111_US,
+                "F-111 Aardvark Bomber", "F-111 Aardvark", WeaponType.BMB_F111_US, GameData.MMP_FIXED_WING,
                 new ProfileDef(FamilyArchetypes.Bomber,
                     new Dictionary<ProfileStat, int> { { ProfileStat.DF, 5 }, { ProfileStat.MAN, 3 }, { ProfileStat.TS, 4 } },
                     new[] { WeaponTrait.HARDENED_STRIKE, WeaponTrait.LASER_GUIDED_MUNITIONS, WeaponTrait.BUNKER_PENETRATOR, WeaponTrait.TERRAIN_FOLLOW_RADAR }),
@@ -4904,7 +4903,7 @@ namespace HammerAndSickle.Models
             // picture; W8). Mirrors the Soviet A-50. Carries no strike (GA inert). → DF1 MAN3 TS10 SUR8 · OL12 ·
             // MMP100 · SR12 · non-combatant.
             WeaponProfile E3 = WeaponProfile.FromProfileDef(
-                "E-3 Sentry AWACS", "E-3 Sentry", WeaponType.AWACS_E3_US,
+                "E-3 Sentry AWACS", "E-3 Sentry", WeaponType.AWACS_E3_US, GameData.MMP_FIXED_WING,
                 new ProfileDef(FamilyArchetypes.Bomber,
                     new Dictionary<ProfileStat, int> { { ProfileStat.SR, GameData.AWACS_SPOTTING_RANGE - GameData.AIR_UNIT_SPOTTING_RANGE } },
                     new[] { WeaponTrait.NON_COMBATANT }),
@@ -4935,7 +4934,7 @@ namespace HammerAndSickle.Models
             // HIGH_MACH_DASH + TS+11 → AC_HIGHSPEED_WESTERN 21 (Mach-3 dash) + SR+4 → AIR_RECON_SPOTTING_RANGE 8.
             // Mirrors the Soviet MiG-25R. → DF8 MAN9 TS21 SUR6 · MMP100 · SR8 · non-combatant.
             WeaponProfile SR71 = WeaponProfile.FromProfileDef(
-                "SR-71 Blackbird Reconnaissance Aircraft", "SR-71 Blackbird", WeaponType.RCNA_SR71_US,
+                "SR-71 Blackbird Reconnaissance Aircraft", "SR-71 Blackbird", WeaponType.RCNA_SR71_US, GameData.MMP_FIXED_WING,
                 new ProfileDef(FamilyArchetypes.FighterEarly,
                     new Dictionary<ProfileStat, int> { { ProfileStat.TS, GameData.AC_HIGHSPEED_WESTERN - GameData.EARLY_FGT_TOPSPEED }, { ProfileStat.SR, GameData.AIR_RECON_SPOTTING_RANGE - GameData.AIR_UNIT_SPOTTING_RANGE } },
                     new[] { WeaponTrait.NON_COMBATANT, WeaponTrait.HIGH_MACH_DASH }),
@@ -4969,7 +4968,7 @@ namespace HammerAndSickle.Models
             // Phase 3 (derived): Truck archetype (soft, GAD 6, MOT 8) + NON_COMBATANT (unarmed transport). Mirrors the
             // Soviet/Arab generic-truck conversion. → HA3 HD3 SA3 SD3 GAD6 · MMP8 · SR2 · non-combatant.
             WeaponProfile TRK_W = WeaponProfile.FromProfileDef(
-                "Generic Transport Truck", "Transport Truck", WeaponType.TRK_GEN_NATO,
+                "Generic Transport Truck", "Transport Truck", WeaponType.TRK_GEN_NATO, GameData.MMP_TRUCK,
                 TransportTruckDef());
 
             // Handle the icon profile.
@@ -4996,7 +4995,7 @@ namespace HammerAndSickle.Models
             // MANPADS_STINGER (FIM-92 — GAT floor 8 + ICM ×1.05 + fire-and-forget). NATO line infantry.
             // → HA8 HD7 SA7 SD8 GAD10 · GAT8 · ICM 1.05 · MMP4 · SR2.
             WeaponProfile INF_REG_US_P = WeaponProfile.FromProfileDef(
-                "US Regular Infantry", "US Regulars", WeaponType.INF_REG_US,
+                "US Regular Infantry", "US Regulars", WeaponType.INF_REG_US, GameData.MMP_WALKING,
                 new ProfileDef(FamilyArchetypes.Infantry,
                     new Dictionary<ProfileStat, int>(),
                     new[] { WeaponTrait.RPG_LAW, WeaponTrait.ATGM_LIGHT, WeaponTrait.MANPADS_STINGER }));
@@ -5033,7 +5032,7 @@ namespace HammerAndSickle.Models
             // Phase 3 (derived): Infantry + RPG_LAW + ATGM_LIGHT + MANPADS_STINGER + AMPHIBIOUS (USMC assault swim).
             // → HA8 HD7 SA7 SD8 GAD10 · GAT8 · ICM 1.05 · MMP4 · SR2 · amphibious.
             WeaponProfile INF_MAR_US_P = WeaponProfile.FromProfileDef(
-                "US Marine Infantry", "US Marines", WeaponType.INF_MAR_US,
+                "US Marine Infantry", "US Marines", WeaponType.INF_MAR_US, GameData.MMP_WALKING,
                 new ProfileDef(FamilyArchetypes.Infantry,
                     new Dictionary<ProfileStat, int>(),
                     new[] { WeaponTrait.RPG_LAW, WeaponTrait.ATGM_LIGHT, WeaponTrait.MANPADS_STINGER, WeaponTrait.AMPHIBIOUS }));
@@ -5065,7 +5064,7 @@ namespace HammerAndSickle.Models
             // MANPADS_STINGER + AIR_DROPPABLE (82nd Airborne parachute deploy).
             // → HA9 HD7 SA7 SD8 GAD10 · GAT8 · ICM 1.05 · MMP4 · SR2 · air-droppable.
             WeaponProfile INF_AB_US_P = WeaponProfile.FromProfileDef(
-                "US Airborne Infantry", "US Airborne", WeaponType.INF_AB_US,
+                "US Airborne Infantry", "US Airborne", WeaponType.INF_AB_US, GameData.MMP_WALKING,
                 new ProfileDef(FamilyArchetypes.Infantry,
                     new Dictionary<ProfileStat, int>(),
                     new[] { WeaponTrait.RPG_LAW, WeaponTrait.ATGM_MEDIUM, WeaponTrait.MANPADS_STINGER, WeaponTrait.AIR_DROPPABLE }));
@@ -5097,7 +5096,7 @@ namespace HammerAndSickle.Models
             // (101st Airborne — helo-inserted light infantry, reduced move cost in non-clear terrain).
             // → HA9 HD7 SA7 SD8 GAD10 · GAT8 · ICM 1.05 · MMP4 · SR2 · mountain movement.
             WeaponProfile INF_AM_US_P = WeaponProfile.FromProfileDef(
-                "US Air-Mobile Infantry", "US Air-Mobile", WeaponType.INF_AM_US,
+                "US Air-Mobile Infantry", "US Air-Mobile", WeaponType.INF_AM_US, GameData.MMP_WALKING,
                 new ProfileDef(FamilyArchetypes.Infantry,
                     new Dictionary<ProfileStat, int>(),
                     new[] { WeaponTrait.RPG_LAW, WeaponTrait.ATGM_MEDIUM, WeaponTrait.MANPADS_STINGER, WeaponTrait.MOUNTAIN_TRAINED }));
@@ -5129,7 +5128,7 @@ namespace HammerAndSickle.Models
             // GAT floor 6; deliberately weaker organic AD than the US/FRG Stinger). Rapier is the brigade's separate AD.
             // → HA8 HD7 SA7 SD8 GAD10 · GAT6 · ICM 1.00 · MMP4 · SR2.
             WeaponProfile INF_REG_UK_P = WeaponProfile.FromProfileDef(
-                "UK Regular Infantry", "UK Regulars", WeaponType.INF_REG_UK,
+                "UK Regular Infantry", "UK Regulars", WeaponType.INF_REG_UK, GameData.MMP_WALKING,
                 new ProfileDef(FamilyArchetypes.Infantry,
                     new Dictionary<ProfileStat, int>(),
                     new[] { WeaponTrait.RPG_LAW, WeaponTrait.ATGM_LIGHT, WeaponTrait.MANPADS_BASIC }));
@@ -5165,7 +5164,7 @@ namespace HammerAndSickle.Models
             // Phase 3 (derived): Infantry + RPG_LAW + ATGM_MEDIUM + MANPADS_BASIC + AIR_DROPPABLE (Parachute Regiment).
             // → HA9 HD7 SA7 SD8 GAD10 · GAT6 · ICM 1.00 · MMP4 · SR2 · air-droppable.
             WeaponProfile INF_AB_UK_P = WeaponProfile.FromProfileDef(
-                "UK Airborne Infantry", "UK Airborne", WeaponType.INF_AB_UK,
+                "UK Airborne Infantry", "UK Airborne", WeaponType.INF_AB_UK, GameData.MMP_WALKING,
                 new ProfileDef(FamilyArchetypes.Infantry,
                     new Dictionary<ProfileStat, int>(),
                     new[] { WeaponTrait.RPG_LAW, WeaponTrait.ATGM_MEDIUM, WeaponTrait.MANPADS_BASIC, WeaponTrait.AIR_DROPPABLE }));
@@ -5198,7 +5197,7 @@ namespace HammerAndSickle.Models
             // Phase 3 (derived): Infantry + RPG_LAW + ATGM_LIGHT + MANPADS_STINGER (Bundeswehr Fliegerfaust/Stinger).
             // → HA8 HD7 SA7 SD8 GAD10 · GAT8 · ICM 1.05 · MMP4 · SR2.
             WeaponProfile INF_REG_GE_P = WeaponProfile.FromProfileDef(
-                "FRG Regular Infantry", "FRG Regulars", WeaponType.INF_REG_GE,
+                "FRG Regular Infantry", "FRG Regulars", WeaponType.INF_REG_GE, GameData.MMP_WALKING,
                 new ProfileDef(FamilyArchetypes.Infantry,
                     new Dictionary<ProfileStat, int>(),
                     new[] { WeaponTrait.RPG_LAW, WeaponTrait.ATGM_LIGHT, WeaponTrait.MANPADS_STINGER }));
@@ -5234,7 +5233,7 @@ namespace HammerAndSickle.Models
             // Phase 3 (derived): Infantry + RPG_LAW + ATGM_MEDIUM + MANPADS_STINGER + AIR_DROPPABLE (Luftlandebrigade).
             // → HA9 HD7 SA7 SD8 GAD10 · GAT8 · ICM 1.05 · MMP4 · SR2 · air-droppable.
             WeaponProfile INF_AB_GE_P = WeaponProfile.FromProfileDef(
-                "FRG Airborne Infantry", "FRG Airborne", WeaponType.INF_AB_GE,
+                "FRG Airborne Infantry", "FRG Airborne", WeaponType.INF_AB_GE, GameData.MMP_WALKING,
                 new ProfileDef(FamilyArchetypes.Infantry,
                     new Dictionary<ProfileStat, int>(),
                     new[] { WeaponTrait.RPG_LAW, WeaponTrait.ATGM_MEDIUM, WeaponTrait.MANPADS_STINGER, WeaponTrait.AIR_DROPPABLE }));
@@ -5270,7 +5269,7 @@ namespace HammerAndSickle.Models
             // is a gameplay slot Bob asked for (2026-08-29), not a formation that stood on its own.
             // → HA9 HD7 SA7 SD8 GAD10 · GAT8 · ICM 1.05 · MMP4 · SR2 · mountain movement.
             WeaponProfile INF_AM_GE_P = WeaponProfile.FromProfileDef(
-                "FRG Air-Mobile Infantry", "FRG Air-Mobile", WeaponType.INF_AM_GE,
+                "FRG Air-Mobile Infantry", "FRG Air-Mobile", WeaponType.INF_AM_GE, GameData.MMP_WALKING,
                 new ProfileDef(FamilyArchetypes.Infantry,
                     new Dictionary<ProfileStat, int>(),
                     new[] { WeaponTrait.RPG_LAW, WeaponTrait.ATGM_MEDIUM, WeaponTrait.MANPADS_STINGER,
@@ -5305,7 +5304,7 @@ namespace HammerAndSickle.Models
             // Stinger-class: GAT floor 8 + ICM ×1.05 + fire-and-forget).
             // → HA8 HD7 SA7 SD8 GAD10 · GAT8 · ICM 1.05 · MMP4 · SR2.
             WeaponProfile INF_REG_FR_P = WeaponProfile.FromProfileDef(
-                "French Regular Infantry", "FR Regulars", WeaponType.INF_REG_FR,
+                "French Regular Infantry", "FR Regulars", WeaponType.INF_REG_FR, GameData.MMP_WALKING,
                 new ProfileDef(FamilyArchetypes.Infantry,
                     new Dictionary<ProfileStat, int>(),
                     new[] { WeaponTrait.RPG_LAW, WeaponTrait.ATGM_LIGHT, WeaponTrait.MANPADS_STINGER }));
@@ -5341,7 +5340,7 @@ namespace HammerAndSickle.Models
             // (11e Brigade Parachutiste).
             // → HA9 HD7 SA7 SD8 GAD10 · GAT8 · ICM 1.05 · MMP4 · SR2 · air-droppable.
             WeaponProfile INF_AB_FR_P = WeaponProfile.FromProfileDef(
-                "French Airborne Infantry", "FR Airborne", WeaponType.INF_AB_FR,
+                "French Airborne Infantry", "FR Airborne", WeaponType.INF_AB_FR, GameData.MMP_WALKING,
                 new ProfileDef(FamilyArchetypes.Infantry,
                     new Dictionary<ProfileStat, int>(),
                     new[] { WeaponTrait.RPG_LAW, WeaponTrait.ATGM_MEDIUM, WeaponTrait.MANPADS_STINGER, WeaponTrait.AIR_DROPPABLE }));
@@ -5374,7 +5373,7 @@ namespace HammerAndSickle.Models
             // Shared gun ballistics; personnel/gun scale follows the existing US M109 counter.
             // Open-bay towed bases exclude carriers: ground transport belongs in Mobile.
             WeaponProfile LIGHT_US = WeaponProfile.FromProfileDef(
-                "US Light Towed Artillery", "US Light Artillery", WeaponType.ART_LIGHT_US,
+                "US Light Towed Artillery", "US Light Artillery", WeaponType.ART_LIGHT_US, GameData.MMP_MANHANDLED_GUN,
                 LightTowedArtilleryDef(), UpgradePath.ART, 144);
             LIGHT_US.SetPrestigeCost(PrestigeTierCost.Gen1, PrestigeTypeCost.ART);
             LIGHT_US.SetMovementMedium(MovementMedium.Foot);
@@ -5385,7 +5384,7 @@ namespace HammerAndSickle.Models
             AddProfile(WeaponType.ART_LIGHT_US, LIGHT_US);
 
             WeaponProfile HEAVY_US = WeaponProfile.FromProfileDef(
-                "US Heavy Towed Artillery", "US Heavy Artillery", WeaponType.ART_HEAVY_US,
+                "US Heavy Towed Artillery", "US Heavy Artillery", WeaponType.ART_HEAVY_US, GameData.MMP_MANHANDLED_GUN,
                 HeavyTowedArtilleryDef(), UpgradePath.ART, 144);
             HEAVY_US.SetPrestigeCost(PrestigeTierCost.Gen1, PrestigeTypeCost.ART);
             HEAVY_US.SetMovementMedium(MovementMedium.Foot);
@@ -5396,7 +5395,7 @@ namespace HammerAndSickle.Models
             AddProfile(WeaponType.ART_HEAVY_US, HEAVY_US);
 
             WeaponProfile AAA_US = WeaponProfile.FromProfileDef(
-                "US Towed Anti-Aircraft Artillery", "US Towed AAA", WeaponType.AAA_GEN_US,
+                "US Towed Anti-Aircraft Artillery", "US Towed AAA", WeaponType.AAA_GEN_US, GameData.MMP_MANHANDLED_GUN,
                 TowedAaaDef(), UpgradePath.AAA, 144);
             AAA_US.SetPrestigeCost(PrestigeTierCost.Gen1, PrestigeTypeCost.AAA);
             AAA_US.SetMovementMedium(MovementMedium.Foot);
@@ -5407,7 +5406,7 @@ namespace HammerAndSickle.Models
             AddProfile(WeaponType.AAA_GEN_US, AAA_US);
 
             WeaponProfile TRUCK_US = WeaponProfile.FromProfileDef(
-                "US Transport Truck", "US Truck", WeaponType.TRK_GEN_US, TransportTruckDef());
+                "US Transport Truck", "US Truck", WeaponType.TRK_GEN_US, GameData.MMP_TRUCK, TransportTruckDef());
             TRUCK_US.SetPrestigeCost(PrestigeTierCost.Gen1, PrestigeTypeCost.TRK);
             TRUCK_US.IconProfile = new RegimentIconProfile(RegimentIconType.Single) { Icon = SpriteManager.US_Truck };
             AddProfile(WeaponType.TRK_GEN_US, TRUCK_US);
@@ -5415,7 +5414,7 @@ namespace HammerAndSickle.Models
             // Long-body UH-1D/H: same organic-only lift rules as the German UH-1D and Black Hawk.
             // Turn300 uses 1963 UH-1D delivery; no aircraft census and no independent transport unit.
             WeaponProfile UH1_US = WeaponProfile.FromProfileDef(
-                "UH-1D/H Huey Transport Helicopter", "UH-1 Huey", WeaponType.HEL_UH1_US,
+                "UH-1D/H Huey Transport Helicopter", "UH-1 Huey", WeaponType.HEL_UH1_US, GameData.MMP_HELO,
                 OrganicHeloLiftDef(), UpgradePath.HELT, 300);
             UH1_US.SetPrestigeCost(PrestigeTierCost.Gen1, PrestigeTypeCost.HELT);
             UH1_US.SetTransportCategory(TransportCategory.HeloTransport);
@@ -5424,7 +5423,7 @@ namespace HammerAndSickle.Models
 
             // Dedicated 1965 gunship; the minigun is represented by the family baseline, not CANNON_HELO.
             WeaponProfile UH1C_US = WeaponProfile.FromProfileDef(
-                "UH-1C Huey Gunship", "UH-1C", WeaponType.HEL_UH1C_US,
+                "UH-1C Huey Gunship", "UH-1C", WeaponType.HEL_UH1C_US, GameData.MMP_HELO,
                 Uh1cGunshipDef(), UpgradePath.HEL, 324);
             UH1C_US.SetPrestigeCost(GameData.PRESTIGE_UH1C_GUNSHIP);
             UH1C_US.AddIntelReportStat(WeaponType.HEL_UH1C_US, 54);
@@ -5433,7 +5432,7 @@ namespace HammerAndSickle.Models
 
             // Approved NATO gameplay equipment shares the US pictures, but owns its profile/census.
             WeaponProfile UH1_NATO = WeaponProfile.FromProfileDef(
-                "NATO UH-1D/H Huey Transport Helicopter", "NATO UH-1", WeaponType.HEL_UH1_NATO,
+                "NATO UH-1D/H Huey Transport Helicopter", "NATO UH-1", WeaponType.HEL_UH1_NATO, GameData.MMP_HELO,
                 OrganicHeloLiftDef(), UpgradePath.HELT, 300);
             UH1_NATO.SetPrestigeCost(PrestigeTierCost.Gen1, PrestigeTypeCost.HELT);
             UH1_NATO.SetTransportCategory(TransportCategory.HeloTransport);
@@ -5441,7 +5440,7 @@ namespace HammerAndSickle.Models
             AddProfile(WeaponType.HEL_UH1_NATO, UH1_NATO);
 
             WeaponProfile UH1C_NATO = WeaponProfile.FromProfileDef(
-                "NATO UH-1C Huey Gunship", "NATO UH-1C", WeaponType.HEL_UH1C_NATO,
+                "NATO UH-1C Huey Gunship", "NATO UH-1C", WeaponType.HEL_UH1C_NATO, GameData.MMP_HELO,
                 Uh1cGunshipDef(), UpgradePath.HEL, 324);
             UH1C_NATO.SetPrestigeCost(GameData.PRESTIGE_UH1C_GUNSHIP);
             UH1C_NATO.AddIntelReportStat(WeaponType.HEL_UH1C_NATO, 54);
@@ -5459,7 +5458,7 @@ namespace HammerAndSickle.Models
             // Census scale follows the existing French support counter: 1,050 personnel / 48 tubes.
             // Open-bay guns have no carrier census; the NATO truck is selected by the template.
             WeaponProfile LIGHT_FR = WeaponProfile.FromProfileDef(
-                "French Light Towed Artillery", "FR Light Artillery", WeaponType.ART_LIGHT_FR,
+                "French Light Towed Artillery", "FR Light Artillery", WeaponType.ART_LIGHT_FR, GameData.MMP_MANHANDLED_GUN,
                 LightTowedArtilleryDef(), UpgradePath.ART, 144);
             LIGHT_FR.SetPrestigeCost(PrestigeTierCost.Gen1, PrestigeTypeCost.ART);
             LIGHT_FR.SetMovementMedium(MovementMedium.Foot);
@@ -5473,7 +5472,7 @@ namespace HammerAndSickle.Models
             AddProfile(WeaponType.ART_LIGHT_FR, LIGHT_FR);
 
             WeaponProfile HEAVY_FR = WeaponProfile.FromProfileDef(
-                "French Heavy Towed Artillery", "FR Heavy Artillery", WeaponType.ART_HEAVY_FR,
+                "French Heavy Towed Artillery", "FR Heavy Artillery", WeaponType.ART_HEAVY_FR, GameData.MMP_MANHANDLED_GUN,
                 HeavyTowedArtilleryDef(), UpgradePath.ART, 144);
             HEAVY_FR.SetPrestigeCost(PrestigeTierCost.Gen1, PrestigeTypeCost.ART);
             HEAVY_FR.SetMovementMedium(MovementMedium.Foot);
@@ -5488,7 +5487,7 @@ namespace HammerAndSickle.Models
 
             // Generic towed AAA scale, with French rather than Soviet MANPADS in the census.
             WeaponProfile AAA_FR = WeaponProfile.FromProfileDef(
-                "French Towed Anti-Aircraft Artillery", "FR Towed AAA", WeaponType.AAA_GEN_FR,
+                "French Towed Anti-Aircraft Artillery", "FR Towed AAA", WeaponType.AAA_GEN_FR, GameData.MMP_MANHANDLED_GUN,
                 TowedAaaDef(), UpgradePath.AAA, 144);
             AAA_FR.SetPrestigeCost(PrestigeTierCost.Gen1, PrestigeTypeCost.AAA);
             AAA_FR.SetMovementMedium(MovementMedium.Foot);
@@ -5504,7 +5503,7 @@ namespace HammerAndSickle.Models
             // 20mm tracked amphibious carrier. Dismounted MILAN teams belong to the infantry
             // base's census/traits, so this hull does not inherit the Marder's ATGM_RAIL.
             WeaponProfile AMX10P_FR = WeaponProfile.FromProfileDef(
-                "AMX-10P Infantry Fighting Vehicle", "AMX-10P", WeaponType.IFV_AMX10P_FR,
+                "AMX-10P Infantry Fighting Vehicle", "AMX-10P", WeaponType.IFV_AMX10P_FR, GameData.MMP_VEHICLE_STANDARD,
                 Amx10pDef(),
                 UpgradePath.IFV, 420);
             AMX10P_FR.SetPrestigeCost(PrestigeTierCost.Gen2, PrestigeTypeCost.IFV);
@@ -5519,7 +5518,7 @@ namespace HammerAndSickle.Models
             // The established AM/AB distinction: terrain training replaces parachute capability.
             // Retain the French light-infantry census; ground carriers and air lift occupy bays.
             WeaponProfile INF_AM_FR_P = WeaponProfile.FromProfileDef(
-                "French Air-Mobile Infantry", "FR Air-Mobile", WeaponType.INF_AM_FR,
+                "French Air-Mobile Infantry", "FR Air-Mobile", WeaponType.INF_AM_FR, GameData.MMP_WALKING,
                 new ProfileDef(FamilyArchetypes.Infantry, new Dictionary<ProfileStat, int>(),
                     new[] { WeaponTrait.RPG_LAW, WeaponTrait.ATGM_MEDIUM, WeaponTrait.MANPADS_STINGER,
                             WeaponTrait.MOUNTAIN_TRAINED }));
@@ -5537,7 +5536,7 @@ namespace HammerAndSickle.Models
             // Organic, non-combatant lift follows the UH-1D/Mi-8T contract; no aircraft census.
             // Service-year anchor: Army Puma 1969 = turn 372 from January 1938.
             WeaponProfile PUMA_FR = WeaponProfile.FromProfileDef(
-                "SA 330 Puma Transport Helicopter", "Puma", WeaponType.HEL_PUMA_FR,
+                "SA 330 Puma Transport Helicopter", "Puma", WeaponType.HEL_PUMA_FR, GameData.MMP_HELO,
                 new ProfileDef(FamilyArchetypes.Helicopter, new Dictionary<ProfileStat, int>(),
                     new[] { WeaponTrait.NON_COMBATANT }), UpgradePath.HELT, 372);
             PUMA_FR.SetPrestigeCost(PrestigeTierCost.Gen1, PrestigeTypeCost.HELT);
@@ -5552,7 +5551,7 @@ namespace HammerAndSickle.Models
             // No cannon/armour trait and no transport role; 54 aircraft follows the current NATO
             // helicopter counter convention, not a claim about a single historical squadron.
             WeaponProfile GAZELLE_FR = WeaponProfile.FromProfileDef(
-                "SA 342M Gazelle HOT Attack Helicopter", "Gazelle HOT", WeaponType.HEL_GAZELLE_FR,
+                "SA 342M Gazelle HOT Attack Helicopter", "Gazelle HOT", WeaponType.HEL_GAZELLE_FR, GameData.MMP_HELO,
                 new ProfileDef(FamilyArchetypes.Helicopter, new Dictionary<ProfileStat, int>(),
                     new[] { WeaponTrait.ATGM_HELO_SACLOS }), UpgradePath.HEL, 492);
             GAZELLE_FR.SetPrestigeCost(PrestigeTierCost.Gen2, PrestigeTypeCost.HEL);
@@ -5572,7 +5571,7 @@ namespace HammerAndSickle.Models
             // Shared gun ballistics; UK support-counter scale and Javelin census. Open-bay bases
             // omit carrier tokens because the Mobile bay owns the shared NATO truck.
             WeaponProfile LIGHT_UK = WeaponProfile.FromProfileDef(
-                "British Light Towed Artillery", "UK Light Artillery", WeaponType.ART_LIGHT_UK,
+                "British Light Towed Artillery", "UK Light Artillery", WeaponType.ART_LIGHT_UK, GameData.MMP_MANHANDLED_GUN,
                 LightTowedArtilleryDef(), UpgradePath.ART, 144);
             LIGHT_UK.SetPrestigeCost(PrestigeTierCost.Gen1, PrestigeTypeCost.ART);
             LIGHT_UK.SetMovementMedium(MovementMedium.Foot);
@@ -5583,7 +5582,7 @@ namespace HammerAndSickle.Models
             AddProfile(WeaponType.ART_LIGHT_UK, LIGHT_UK);
 
             WeaponProfile HEAVY_UK = WeaponProfile.FromProfileDef(
-                "British Heavy Towed Artillery", "UK Heavy Artillery", WeaponType.ART_HEAVY_UK,
+                "British Heavy Towed Artillery", "UK Heavy Artillery", WeaponType.ART_HEAVY_UK, GameData.MMP_MANHANDLED_GUN,
                 HeavyTowedArtilleryDef(), UpgradePath.ART, 144);
             HEAVY_UK.SetPrestigeCost(PrestigeTierCost.Gen1, PrestigeTypeCost.ART);
             HEAVY_UK.SetMovementMedium(MovementMedium.Foot);
@@ -5594,7 +5593,7 @@ namespace HammerAndSickle.Models
             AddProfile(WeaponType.ART_HEAVY_UK, HEAVY_UK);
 
             WeaponProfile AAA_UK = WeaponProfile.FromProfileDef(
-                "British Towed Anti-Aircraft Artillery", "UK Towed AAA", WeaponType.AAA_GEN_UK,
+                "British Towed Anti-Aircraft Artillery", "UK Towed AAA", WeaponType.AAA_GEN_UK, GameData.MMP_MANHANDLED_GUN,
                 TowedAaaDef(), UpgradePath.AAA, 144);
             AAA_UK.SetPrestigeCost(PrestigeTierCost.Gen1, PrestigeTypeCost.AAA);
             AAA_UK.SetMovementMedium(MovementMedium.Foot);
@@ -5606,7 +5605,7 @@ namespace HammerAndSickle.Models
 
             // Same consolidated Jaguar game line as France; this is not a year-by-year fit model.
             WeaponProfile JAGUAR_UK = WeaponProfile.FromProfileDef(
-                "Jaguar GR.1 Attack Aircraft", "Jaguar GR.1", WeaponType.ATT_JAGUAR_UK,
+                "Jaguar GR.1 Attack Aircraft", "Jaguar GR.1", WeaponType.ATT_JAGUAR_UK, GameData.MMP_FIXED_WING,
                 JaguarStrikeDef(), UpgradePath.ATT, 420);
             JAGUAR_UK.SetPrestigeCost(PrestigeTierCost.Gen2, PrestigeTypeCost.ATT);
             JAGUAR_UK.AddIntelReportStat(WeaponType.ATT_JAGUAR_UK, 36);
@@ -5616,7 +5615,7 @@ namespace HammerAndSickle.Models
             // UK light-infantry base: keep its mortar/AT/Javelin mix, with mountain training
             // instead of parachute capability. Truck and Puma are selected by the formation bays.
             WeaponProfile INF_AM_UK_P = WeaponProfile.FromProfileDef(
-                "UK Air-Mobile Infantry", "UK Air-Mobile", WeaponType.INF_AM_UK,
+                "UK Air-Mobile Infantry", "UK Air-Mobile", WeaponType.INF_AM_UK, GameData.MMP_WALKING,
                 new ProfileDef(FamilyArchetypes.Infantry, new Dictionary<ProfileStat, int>(),
                     new[] { WeaponTrait.RPG_LAW, WeaponTrait.ATGM_MEDIUM, WeaponTrait.MANPADS_BASIC,
                             WeaponTrait.MOUNTAIN_TRAINED }));
@@ -5631,7 +5630,7 @@ namespace HammerAndSickle.Models
 
             // Organic transport only, as with the French Puma. RAF service anchor: 1971 (turn 396).
             WeaponProfile PUMA_UK = WeaponProfile.FromProfileDef(
-                "Puma HC.1 Transport Helicopter", "Puma HC.1", WeaponType.HEL_PUMA_UK,
+                "Puma HC.1 Transport Helicopter", "Puma HC.1", WeaponType.HEL_PUMA_UK, GameData.MMP_HELO,
                 new ProfileDef(FamilyArchetypes.Helicopter, new Dictionary<ProfileStat, int>(),
                     new[] { WeaponTrait.NON_COMBATANT }), UpgradePath.HELT, 396);
             PUMA_UK.SetPrestigeCost(PrestigeTierCost.Gen1, PrestigeTypeCost.HELT);
@@ -5642,7 +5641,7 @@ namespace HammerAndSickle.Models
             // TOW-armed Lynx AH.1 uses the established light SACLOS attack-helicopter line.
             // TOW adoption was reported in March 1981; use the 1981 anchor, not first Lynx flight.
             WeaponProfile LYNX_UK = WeaponProfile.FromProfileDef(
-                "Lynx AH.1 TOW Attack Helicopter", "Lynx AH.1 TOW", WeaponType.HEL_LYNX_UK,
+                "Lynx AH.1 TOW Attack Helicopter", "Lynx AH.1 TOW", WeaponType.HEL_LYNX_UK, GameData.MMP_HELO,
                 new ProfileDef(FamilyArchetypes.Helicopter, new Dictionary<ProfileStat, int>(),
                     new[] { WeaponTrait.ATGM_HELO_SACLOS }), UpgradePath.HEL, 516);
             LYNX_UK.SetPrestigeCost(PrestigeTierCost.Gen2, PrestigeTypeCost.HEL);
@@ -5653,7 +5652,7 @@ namespace HammerAndSickle.Models
             // Activate the existing census token; retain its enum position and support references.
             // Standard tracked machine-gun carrier, not the later RARDEN or Bulldog variants.
             WeaponProfile FV432_UK = WeaponProfile.FromProfileDef(
-                "FV432 Armoured Personnel Carrier", "FV432", WeaponType.APC_FV432_UK,
+                "FV432 Armoured Personnel Carrier", "FV432", WeaponType.APC_FV432_UK, GameData.MMP_VEHICLE_SLOW,
                 new ProfileDef(FamilyArchetypes.Apc, new Dictionary<ProfileStat, int>(), System.Array.Empty<WeaponTrait>()),
                 UpgradePath.APC, 300);
             FV432_UK.SetPrestigeCost(PrestigeTierCost.Gen1, PrestigeTypeCost.APC);
@@ -5666,7 +5665,7 @@ namespace HammerAndSickle.Models
             // Earlier Chieftain option: 120mm rifled gun and laser ranging, with the established
             // British closed-bay formation quality. No later Stillbrew/TOGS or Challenger armour.
             WeaponProfile CHIEFTAIN_UK = WeaponProfile.FromProfileDef(
-                "Chieftain Main Battle Tank", "Chieftain", WeaponType.TANK_CHIEFTAIN_UK,
+                "Chieftain Main Battle Tank", "Chieftain", WeaponType.TANK_CHIEFTAIN_UK, GameData.MMP_VEHICLE_STANDARD,
                 new ProfileDef(TankArchetypes.Gen2, new Dictionary<ProfileStat, int>(),
                     new[] { WeaponTrait.GUN_120_RIFLED, WeaponTrait.LASER_RANGEFINDER,
                             WeaponTrait.GUN_STABILIZER_2PLANE, WeaponTrait.NATO_FIRST_LINE }), UpgradePath.TANK, 336);
@@ -5686,7 +5685,7 @@ namespace HammerAndSickle.Models
             // FG.1 interceptor on the established Phantom game line. National air census and art;
             // no Tornado reassignment and no added strike/SEAD capability.
             WeaponProfile F4_UK = WeaponProfile.FromProfileDef(
-                "Phantom FG.1 Fighter", "Phantom FG.1", WeaponType.FGT_F4_UK,
+                "Phantom FG.1 Fighter", "Phantom FG.1", WeaponType.FGT_F4_UK, GameData.MMP_FIXED_WING,
                 new ProfileDef(FamilyArchetypes.FighterEarly,
                     new Dictionary<ProfileStat, int> { { ProfileStat.TS, 2 } },
                     new[] { WeaponTrait.BVR_RADAR_MISSILE, WeaponTrait.RWR, WeaponTrait.CHAFF_FLARE }),
@@ -5703,7 +5702,7 @@ namespace HammerAndSickle.Models
             // Same point-defense band as Rapier: command-guided missiles on a tracked Marder chassis.
             // The 1981 German service anchor differs from the earlier French Roland introduction.
             WeaponProfile ROLAND_GE = WeaponProfile.FromProfileDef(
-                "Roland Tracked SAM System", "Roland", WeaponType.SPSAM_ROLAND_GE,
+                "Roland Tracked SAM System", "Roland", WeaponType.SPSAM_ROLAND_GE, GameData.MMP_VEHICLE_STANDARD,
                 new ProfileDef(FamilyArchetypes.Sam,
                     new Dictionary<ProfileStat, int> { { ProfileStat.IR, GameData.INDIRECT_RANGE_SHORT } },
                     new[] { WeaponTrait.SELF_PROPELLED, WeaponTrait.COMMAND_GUIDANCE }), UpgradePath.SAM, 516);
@@ -5720,7 +5719,7 @@ namespace HammerAndSickle.Models
             // Light subsonic strike aircraft: modest payload, no inferred precision weapons or armour.
             // The early-jet strike line gives GA6/OL6, below Jaguar's GA8/OL9 and the heavy attack types.
             WeaponProfile ALPHAJET_GE = WeaponProfile.FromProfileDef(
-                "Alpha Jet A Light Attack Aircraft", "Alpha Jet A", WeaponType.ATT_ALPHAJET_GE,
+                "Alpha Jet A Light Attack Aircraft", "Alpha Jet A", WeaponType.ATT_ALPHAJET_GE, GameData.MMP_FIXED_WING,
                 new ProfileDef(FamilyArchetypes.FighterEarly,
                     new Dictionary<ProfileStat, int> { { ProfileStat.TS, -3 } },
                     new[] { WeaponTrait.MULTIROLE_STRIKE }), UpgradePath.ATT, 492);
@@ -5732,7 +5731,7 @@ namespace HammerAndSickle.Models
             // MARS I uses the established M270 line, not a new MARS II/GMLRS capability tier.
             // Availability follows the German 1990 service anchor rather than the US 1983 anchor.
             WeaponProfile MLRS_GE = WeaponProfile.FromProfileDef(
-                "MARS I Multiple Launch Rocket System", "MARS I (MLRS)", WeaponType.ROC_MLRS_GE,
+                "MARS I Multiple Launch Rocket System", "MARS I (MLRS)", WeaponType.ROC_MLRS_GE, GameData.MMP_VEHICLE_STANDARD,
                 MlrsDef(), UpgradePath.ROC, 624);
             MLRS_GE.SetPrestigeCost(PrestigeTierCost.Gen3, PrestigeTypeCost.ROC);
             MLRS_GE.SetMovementMedium(MovementMedium.Tracked);
@@ -5748,7 +5747,7 @@ namespace HammerAndSickle.Models
             // Commodity ballistics with the German 950-person / 48-gun support-counter scale.
             // Open-bay bases omit carriers; the Mobile bay owns the shared NATO truck.
             WeaponProfile LIGHT_GE = WeaponProfile.FromProfileDef(
-                "German Light Towed Artillery", "GE Light Artillery", WeaponType.ART_LIGHT_GE,
+                "German Light Towed Artillery", "GE Light Artillery", WeaponType.ART_LIGHT_GE, GameData.MMP_MANHANDLED_GUN,
                 LightTowedArtilleryDef(), UpgradePath.ART, 144);
             LIGHT_GE.SetPrestigeCost(PrestigeTierCost.Gen1, PrestigeTypeCost.ART);
             LIGHT_GE.SetMovementMedium(MovementMedium.Foot);
@@ -5759,7 +5758,7 @@ namespace HammerAndSickle.Models
             AddProfile(WeaponType.ART_LIGHT_GE, LIGHT_GE);
 
             WeaponProfile HEAVY_GE = WeaponProfile.FromProfileDef(
-                "German Heavy Towed Artillery", "GE Heavy Artillery", WeaponType.ART_HEAVY_GE,
+                "German Heavy Towed Artillery", "GE Heavy Artillery", WeaponType.ART_HEAVY_GE, GameData.MMP_MANHANDLED_GUN,
                 HeavyTowedArtilleryDef(), UpgradePath.ART, 144);
             HEAVY_GE.SetPrestigeCost(PrestigeTierCost.Gen1, PrestigeTypeCost.ART);
             HEAVY_GE.SetMovementMedium(MovementMedium.Foot);
@@ -5770,7 +5769,7 @@ namespace HammerAndSickle.Models
             AddProfile(WeaponType.ART_HEAVY_GE, HEAVY_GE);
 
             WeaponProfile AAA_GE = WeaponProfile.FromProfileDef(
-                "German Towed Anti-Aircraft Artillery", "GE Towed AAA", WeaponType.AAA_GEN_GE,
+                "German Towed Anti-Aircraft Artillery", "GE Towed AAA", WeaponType.AAA_GEN_GE, GameData.MMP_MANHANDLED_GUN,
                 TowedAaaDef(), UpgradePath.AAA, 144);
             AAA_GE.SetPrestigeCost(PrestigeTierCost.Gen1, PrestigeTypeCost.AAA);
             AAA_GE.SetMovementMedium(MovementMedium.Foot);
@@ -5799,9 +5798,9 @@ namespace HammerAndSickle.Models
             // Gen2 + HA-1, HD-1, SA+1, MMP+2 + OPTICS_GEN2 + LASER_RANGEFINDER (matches LEO1_GE exactly).
             // → HA9 HD7 SA8 SD6 GAD7 · ICM 1.10 · MMP12 · PR1 · SR3.
             WeaponProfile LEO1_NL = WeaponProfile.FromProfileDef(
-                "Leopard 1 Main Battle Tank", "Leo 1", WeaponType.TANK_LEOPARD1_NL,
+                "Leopard 1 Main Battle Tank", "Leo 1", WeaponType.TANK_LEOPARD1_NL, GameData.MMP_VEHICLE_FAST,
                 new ProfileDef(TankArchetypes.Gen2,
-                    new Dictionary<ProfileStat, int> { { ProfileStat.HA, -1 }, { ProfileStat.HD, -1 }, { ProfileStat.SA, 1 }, { ProfileStat.MMP, 2 } },
+                    new Dictionary<ProfileStat, int> { { ProfileStat.HA, -1 }, { ProfileStat.HD, -1 }, { ProfileStat.SA, 1 },},
                     new[] { WeaponTrait.OPTICS_GEN2, WeaponTrait.LASER_RANGEFINDER }),
                 UpgradePath.TANK, 372);
 
@@ -5837,9 +5836,9 @@ namespace HammerAndSickle.Models
             //----------------------------------------------
             // Identical line to LEO1_NL; Belgium fielded Leopard 1 from 1968.
             WeaponProfile LEO1_BE = WeaponProfile.FromProfileDef(
-                "Leopard 1A5 Main Battle Tank", "Leo 1A5", WeaponType.TANK_LEOPARD1_BE,
+                "Leopard 1A5 Main Battle Tank", "Leo 1A5", WeaponType.TANK_LEOPARD1_BE, GameData.MMP_VEHICLE_FAST,
                 new ProfileDef(TankArchetypes.Gen2,
-                    new Dictionary<ProfileStat, int> { { ProfileStat.HA, -1 }, { ProfileStat.HD, -1 }, { ProfileStat.SA, 1 }, { ProfileStat.MMP, 2 } },
+                    new Dictionary<ProfileStat, int> { { ProfileStat.HA, -1 }, { ProfileStat.HD, -1 }, { ProfileStat.SA, 1 },},
                     new[] { WeaponTrait.OPTICS_GEN2, WeaponTrait.LASER_RANGEFINDER }),
                 UpgradePath.TANK, 360);
 
@@ -5873,9 +5872,9 @@ namespace HammerAndSickle.Models
             //----------------------------------------------
             // Identical line again; Denmark took delivery from 1976. Lightest of the three brigades.
             WeaponProfile LEO1_DK = WeaponProfile.FromProfileDef(
-                "Leopard 1A3 Main Battle Tank", "Leo 1A3", WeaponType.TANK_LEOPARD1_DK,
+                "Leopard 1A3 Main Battle Tank", "Leo 1A3", WeaponType.TANK_LEOPARD1_DK, GameData.MMP_VEHICLE_FAST,
                 new ProfileDef(TankArchetypes.Gen2,
-                    new Dictionary<ProfileStat, int> { { ProfileStat.HA, -1 }, { ProfileStat.HD, -1 }, { ProfileStat.SA, 1 }, { ProfileStat.MMP, 2 } },
+                    new Dictionary<ProfileStat, int> { { ProfileStat.HA, -1 }, { ProfileStat.HD, -1 }, { ProfileStat.SA, 1 },},
                     new[] { WeaponTrait.OPTICS_GEN2, WeaponTrait.LASER_RANGEFINDER }),
                 UpgradePath.TANK, 456);
 
@@ -5915,7 +5914,7 @@ namespace HammerAndSickle.Models
             // Carrier census owns only its 102 vehicles; the deployed infantry owns personnel,
             // organic tanks and support. EquipmentBays sums those independent censuses.
             WeaponProfile M113_NATO = WeaponProfile.FromProfileDef(
-                "M113-family Armoured Personnel Carrier", "M113", WeaponType.APC_M113_NATO,
+                "M113-family Armoured Personnel Carrier", "M113", WeaponType.APC_M113_NATO, GameData.MMP_VEHICLE_SLOW,
                 new ProfileDef(FamilyArchetypes.Apc,
                     new Dictionary<ProfileStat, int>(),
                     System.Array.Empty<WeaponTrait>()),
@@ -5952,7 +5951,7 @@ namespace HammerAndSickle.Models
             // Infantry + RPG_LAW + ATGM_MEDIUM + MANPADS_STINGER (the Dutch bought Stinger).
             // → HA9 HD7 SA7 SD8 GAD10 · GAT8 · ICM 1.05 · MMP4 · SR2.
             WeaponProfile INF_MECH_NL_P = WeaponProfile.FromProfileDef(
-                "Dutch Infantry Regiment", "NL Inf", WeaponType.INF_MECH_NL,
+                "Dutch Infantry Regiment", "NL Inf", WeaponType.INF_MECH_NL, GameData.MMP_WALKING,
                 new ProfileDef(FamilyArchetypes.Infantry,
                     new Dictionary<ProfileStat, int>(),
                     new[] { WeaponTrait.RPG_LAW, WeaponTrait.ATGM_MEDIUM, WeaponTrait.MANPADS_STINGER }));
@@ -5987,7 +5986,7 @@ namespace HammerAndSickle.Models
             // Free, honest differentiation, following the UK precedent at INF_REG_UK.
             // → HA9 HD7 SA7 SD8 GAD10 · GAT6 · ICM 1.00 · MMP4 · SR2.
             WeaponProfile INF_MECH_BE_P = WeaponProfile.FromProfileDef(
-                "Belgian Infantry Regiment", "BE Inf", WeaponType.INF_MECH_BE,
+                "Belgian Infantry Regiment", "BE Inf", WeaponType.INF_MECH_BE, GameData.MMP_WALKING,
                 new ProfileDef(FamilyArchetypes.Infantry,
                     new Dictionary<ProfileStat, int>(),
                     new[] { WeaponTrait.RPG_LAW, WeaponTrait.ATGM_MEDIUM, WeaponTrait.MANPADS_BASIC }));
@@ -6020,7 +6019,7 @@ namespace HammerAndSickle.Models
             // MANPADS_BASIC (Hamlet/Redeye-era). Smallest of the three.
             // → HA9 HD7 SA7 SD8 GAD10 · GAT6 · ICM 1.00 · MMP4 · SR2.
             WeaponProfile INF_MECH_DK_P = WeaponProfile.FromProfileDef(
-                "Danish Infantry Regiment", "DK Inf", WeaponType.INF_MECH_DK,
+                "Danish Infantry Regiment", "DK Inf", WeaponType.INF_MECH_DK, GameData.MMP_WALKING,
                 new ProfileDef(FamilyArchetypes.Infantry,
                     new Dictionary<ProfileStat, int>(),
                     new[] { WeaponTrait.RPG_LAW, WeaponTrait.ATGM_MEDIUM, WeaponTrait.MANPADS_BASIC }));
@@ -6056,7 +6055,7 @@ namespace HammerAndSickle.Models
             // Standard 25mm infantry carrier: no TOW rail, ERA, or formation-quality multiplier.
             // The 1977 game anchor follows Dutch entry; Belgian availability remains scenario-authored.
             WeaponProfile YPR_NATO = WeaponProfile.FromProfileDef(
-                "YPR-765 / AIFV Infantry Fighting Vehicle", "YPR-765 / AIFV", WeaponType.IFV_YPR765_NATO,
+                "YPR-765 / AIFV Infantry Fighting Vehicle", "YPR-765 / AIFV", WeaponType.IFV_YPR765_NATO, GameData.MMP_VEHICLE_STANDARD,
                 new ProfileDef(FamilyArchetypes.Ifv, new Dictionary<ProfileStat, int>(),
                     new[] { WeaponTrait.AUTOCANNON_LIGHT }), UpgradePath.IFV, 468);
             YPR_NATO.SetPrestigeCost(PrestigeTierCost.Gen1, PrestigeTypeCost.IFV);
@@ -6067,7 +6066,7 @@ namespace HammerAndSickle.Models
             // Conventional NATO M109, without the US-only Copperhead trait. The shared support
             // counter uses the established generic gun scale (950 men / 54 guns), not a national TOE.
             WeaponProfile M109_NATO = WeaponProfile.FromProfileDef(
-                "NATO M109 Self-Propelled Artillery", "NATO M109", WeaponType.SPA_M109_NATO,
+                "NATO M109 Self-Propelled Artillery", "NATO M109", WeaponType.SPA_M109_NATO, GameData.MMP_VEHICLE_STANDARD,
                 NatoM109Def(), UpgradePath.ART, 300);
             M109_NATO.SetPrestigeCost(PrestigeTierCost.Gen2, PrestigeTypeCost.SPA);
             M109_NATO.SetMovementMedium(MovementMedium.Tracked);
@@ -6080,7 +6079,7 @@ namespace HammerAndSickle.Models
             // Dutch C&V, 25mm modernization (1974 game anchor), not an armed standard M113 APC.
             // Recon stays Soft under the skirmisher contract; the scout does not carry infantry.
             WeaponProfile M113CV_NATO = WeaponProfile.FromProfileDef(
-                "M113 C&V Reconnaissance Vehicle", "M113 C&V", WeaponType.RCN_M113CV_NATO,
+                "M113 C&V Reconnaissance Vehicle", "M113 C&V", WeaponType.RCN_M113CV_NATO, GameData.MMP_VEHICLE_STANDARD,
                 new ProfileDef(FamilyArchetypes.Recon, new Dictionary<ProfileStat, int>(),
                     new[] { WeaponTrait.AUTOCANNON_LIGHT, WeaponTrait.AMPHIBIOUS }), UpgradePath.RCN, 432);
             M113CV_NATO.SetPrestigeCost(PrestigeTierCost.Gen2, PrestigeTypeCost.RCN);
@@ -6095,7 +6094,7 @@ namespace HammerAndSickle.Models
 
             // Dutch PRTL retains its radar-specific picture and the established twin-35mm game line.
             WeaponProfile PRTL_NATO = WeaponProfile.FromProfileDef(
-                "PRTL Self-Propelled Anti-Aircraft Gun", "PRTL", WeaponType.SPAAA_PRTL_NATO,
+                "PRTL Self-Propelled Anti-Aircraft Gun", "PRTL", WeaponType.SPAAA_PRTL_NATO, GameData.MMP_VEHICLE_STANDARD,
                 RadarSpAaaDef(), UpgradePath.AAA, 468);
             PRTL_NATO.SetPrestigeCost(PrestigeTierCost.Gen3, PrestigeTypeCost.SPAAA);
             PRTL_NATO.SetMovementMedium(MovementMedium.Tracked);
@@ -6110,10 +6109,10 @@ namespace HammerAndSickle.Models
             // brigade and 55 prestige. Turn 312 (1964) is an authored mid-1960s availability anchor.
             // Older gun/armor, slower than Leopard; no modern optics or NATO_FIRST_LINE package.
             WeaponProfile CENTURION_NATO = WeaponProfile.FromProfileDef(
-                "Centurion Mk 5/2 Main Battle Tank", "Centurion Mk 5/2", WeaponType.TANK_CENTURION_NATO,
+                "Centurion Mk 5/2 Main Battle Tank", "Centurion Mk 5/2", WeaponType.TANK_CENTURION_NATO, GameData.MMP_VEHICLE_SLOW,
                 new ProfileDef(TankArchetypes.Gen1,
                     new Dictionary<ProfileStat, int> { { ProfileStat.HA, 1 }, { ProfileStat.HD, 1 },
-                        { ProfileStat.SA, 1 }, { ProfileStat.MMP, -2 } }, System.Array.Empty<WeaponTrait>()),
+                        { ProfileStat.SA, 1 },}, System.Array.Empty<WeaponTrait>()),
                 UpgradePath.TANK, 312);
             CENTURION_NATO.SetPrestigeCost(GameData.PRESTIGE_CENTURION_NATO);
             CENTURION_NATO.AddIntelReportStat(WeaponType.Personnel, 1600);
@@ -6129,7 +6128,7 @@ namespace HammerAndSickle.Models
 
             // Shared towed battery group; no embedded carriers or nation-specific MANPADS.
             WeaponProfile AAA_NATO = WeaponProfile.FromProfileDef(
-                "NATO Towed Anti-Aircraft Artillery", "NATO Towed AAA", WeaponType.AAA_GEN_NATO,
+                "NATO Towed Anti-Aircraft Artillery", "NATO Towed AAA", WeaponType.AAA_GEN_NATO, GameData.MMP_MANHANDLED_GUN,
                 TowedAaaDef(), UpgradePath.AAA, 144);
             AAA_NATO.SetPrestigeCost(PrestigeTierCost.Gen1, PrestigeTypeCost.AAA);
             AAA_NATO.SetMovementMedium(MovementMedium.Foot);
@@ -6141,7 +6140,7 @@ namespace HammerAndSickle.Models
             // Retain the existing F-16 gameplay capability package and 36-aircraft counter scale.
             // The 1979 Dutch entry anchor is not a claim every modeled missile existed that year.
             WeaponProfile F16_NATO = WeaponProfile.FromProfileDef(
-                "NATO F-16 Fighting Falcon Multi-Role Fighter", "NATO F-16", WeaponType.FGT_F16_NATO,
+                "NATO F-16 Fighting Falcon Multi-Role Fighter", "NATO F-16", WeaponType.FGT_F16_NATO, GameData.MMP_FIXED_WING,
                 F16MultiroleDef(), UpgradePath.FGT, 492);
             F16_NATO.SetPrestigeCost(PrestigeTierCost.Gen3, PrestigeTypeCost.FGT);
             F16_NATO.AddIntelReportStat(WeaponType.FGT_F16_NATO, 36);
@@ -6157,7 +6156,7 @@ namespace HammerAndSickle.Models
             // Established T-72A game line plus the approved export downgrade. No ERA/MV addition.
             // Availability follows the roster plan's 1982 Iraqi T-72M anchor (January 1938 epoch).
             WeaponProfile T72M_IQ = WeaponProfile.FromProfileDef(
-                "T-72M Main Battle Tank", "T-72M", WeaponType.TANK_T72M_IQ,
+                "T-72M Main Battle Tank", "T-72M", WeaponType.TANK_T72M_IQ, GameData.MMP_VEHICLE_STANDARD,
                 new ProfileDef(TankArchetypes.Gen2, new Dictionary<ProfileStat, int>(),
                     new[] { WeaponTrait.GUN_125_SMOOTH, WeaponTrait.SPACED_ARMOR, WeaponTrait.LASER_RANGEFINDER,
                             WeaponTrait.AMPHIBIOUS, WeaponTrait.EXPORT_DOWNGRADE }), UpgradePath.TANK, 528);
@@ -6180,7 +6179,7 @@ namespace HammerAndSickle.Models
             // No ATGM, cannon, armoured cockpit or countermeasure traits are inferred from the old plan.
             // The 1967 availability anchor follows the existing Mi-8 family, not an asserted Iraqi receipt date.
             WeaponProfile MI8AT_IQ = WeaponProfile.FromProfileDef(
-                "Mi-8AT Hip Armed Helicopter", "Mi-8AT Hip", WeaponType.HEL_MI8AT_IQ,
+                "Mi-8AT Hip Armed Helicopter", "Mi-8AT Hip", WeaponType.HEL_MI8AT_IQ, GameData.MMP_HELO,
                 new ProfileDef(FamilyArchetypes.Helicopter, new Dictionary<ProfileStat, int>(),
                     new[] { WeaponTrait.ROCKET_PODS }), UpgradePath.HEL, 348);
             MI8AT_IQ.SetPrestigeCost(PrestigeTierCost.Gen1, PrestigeTypeCost.HEL);
@@ -6193,7 +6192,7 @@ namespace HammerAndSickle.Models
 
             // Standard BRDM-2 scout mechanics; export armour/FCS penalties remain tank-only.
             WeaponProfile BRDM2_IQ = WeaponProfile.FromProfileDef(
-                "Iraqi BRDM-2 Recon Vehicle", "IQ BRDM-2", WeaponType.RCN_BRDM2_IQ,
+                "Iraqi BRDM-2 Recon Vehicle", "IQ BRDM-2", WeaponType.RCN_BRDM2_IQ, GameData.MMP_VEHICLE_STANDARD,
                 new ProfileDef(FamilyArchetypes.Recon, new Dictionary<ProfileStat, int>(),
                     new[] { WeaponTrait.AMPHIBIOUS }), UpgradePath.RCN, 288);
             BRDM2_IQ.SetPrestigeCost(PrestigeTierCost.Gen1, PrestigeTypeCost.RCN);
@@ -6216,7 +6215,7 @@ namespace HammerAndSickle.Models
             // French multirole line with the approved export DF/SUR residuals, not the tank trait.
             // One game profile represents the Iraqi F1; this does not add an Exocet/precision-strike system.
             WeaponProfile MIRAGEF1_IQ = WeaponProfile.FromProfileDef(
-                "Iraqi Mirage F1 Fighter", "IQ Mirage F1", WeaponType.FGT_MIRAGEF1_IQ,
+                "Iraqi Mirage F1 Fighter", "IQ Mirage F1", WeaponType.FGT_MIRAGEF1_IQ, GameData.MMP_FIXED_WING,
                 new ProfileDef(FamilyArchetypes.FighterEarly,
                     new Dictionary<ProfileStat, int>
                     {
@@ -6232,7 +6231,7 @@ namespace HammerAndSickle.Models
 
             // Preserve regional personnel/gun scales but omit embedded carriers from these open-bay bases.
             WeaponProfile LIGHT_IQ = WeaponProfile.FromProfileDef(
-                "Iraqi Light Towed Artillery", "IQ Light Artillery", WeaponType.ART_LIGHT_IQ,
+                "Iraqi Light Towed Artillery", "IQ Light Artillery", WeaponType.ART_LIGHT_IQ, GameData.MMP_MANHANDLED_GUN,
                 LightTowedArtilleryDef(), UpgradePath.ART, 144);
             LIGHT_IQ.SetPrestigeCost(PrestigeTierCost.Gen1, PrestigeTypeCost.ART);
             LIGHT_IQ.SetMovementMedium(MovementMedium.Foot);
@@ -6243,7 +6242,7 @@ namespace HammerAndSickle.Models
             AddProfile(WeaponType.ART_LIGHT_IQ, LIGHT_IQ);
 
             WeaponProfile HEAVY_IQ = WeaponProfile.FromProfileDef(
-                "Iraqi Heavy Towed Artillery", "IQ Heavy Artillery", WeaponType.ART_HEAVY_IQ,
+                "Iraqi Heavy Towed Artillery", "IQ Heavy Artillery", WeaponType.ART_HEAVY_IQ, GameData.MMP_MANHANDLED_GUN,
                 HeavyTowedArtilleryDef(), UpgradePath.ART, 144);
             HEAVY_IQ.SetPrestigeCost(PrestigeTierCost.Gen1, PrestigeTypeCost.ART);
             HEAVY_IQ.SetMovementMedium(MovementMedium.Foot);
@@ -6254,7 +6253,7 @@ namespace HammerAndSickle.Models
             AddProfile(WeaponType.ART_HEAVY_IQ, HEAVY_IQ);
 
             WeaponProfile AAA_IQ = WeaponProfile.FromProfileDef(
-                "Iraqi Towed Anti-Aircraft Artillery", "IQ Towed AAA", WeaponType.AAA_GEN_IQ,
+                "Iraqi Towed Anti-Aircraft Artillery", "IQ Towed AAA", WeaponType.AAA_GEN_IQ, GameData.MMP_MANHANDLED_GUN,
                 TowedAaaDef(), UpgradePath.AAA, 144);
             AAA_IQ.SetPrestigeCost(PrestigeTierCost.Gen1, PrestigeTypeCost.AAA);
             AAA_IQ.SetMovementMedium(MovementMedium.Foot);
@@ -6265,13 +6264,13 @@ namespace HammerAndSickle.Models
             AddProfile(WeaponType.AAA_GEN_IQ, AAA_IQ);
 
             WeaponProfile TRUCK_IQ = WeaponProfile.FromProfileDef(
-                "Iraqi Transport Truck", "IQ Truck", WeaponType.TRK_GEN_IQ, TransportTruckDef());
+                "Iraqi Transport Truck", "IQ Truck", WeaponType.TRK_GEN_IQ, GameData.MMP_TRUCK, TransportTruckDef());
             TRUCK_IQ.SetPrestigeCost(PrestigeTierCost.Gen1, PrestigeTypeCost.TRK);
             TRUCK_IQ.IconProfile = new RegimentIconProfile(RegimentIconType.Single) { Icon = SpriteManager.IQ_Truck };
             AddProfile(WeaponType.TRK_GEN_IQ, TRUCK_IQ);
 
             WeaponProfile S75_IQ = WeaponProfile.FromProfileDef(
-                "Iraqi S-75 Dvina Surface-to-Air Missile System", "IQ S-75 Dvina", WeaponType.SAM_S75_IQ,
+                "Iraqi S-75 Dvina Surface-to-Air Missile System", "IQ S-75 Dvina", WeaponType.SAM_S75_IQ, GameData.MMP_IMMOBILE,
                 S75SiteDef(), UpgradePath.SAM, 228);
             S75_IQ.SetPrestigeCost(PrestigeTierCost.Gen1, PrestigeTypeCost.SAM);
             S75_IQ.SetMovementMedium(MovementMedium.Foot);
@@ -6290,7 +6289,7 @@ namespace HammerAndSickle.Models
             // Mk3/Mk5-era 120mm gun on the Gen2 line; no Challenger armour/thermal package.
             // Availability anchors and formation-scale censuses are documented in the Iranian contract.
             WeaponProfile CHIEFTAIN_IR = WeaponProfile.FromProfileDef(
-                "Chieftain Mk3/Mk5 Main Battle Tank", "Chieftain", WeaponType.TANK_CHIEFTAIN_IR,
+                "Chieftain Mk3/Mk5 Main Battle Tank", "Chieftain", WeaponType.TANK_CHIEFTAIN_IR, GameData.MMP_VEHICLE_STANDARD,
                 new ProfileDef(TankArchetypes.Gen2, new Dictionary<ProfileStat, int>(),
                     new[] { WeaponTrait.GUN_120_RIFLED, WeaponTrait.GUN_STABILIZER_2PLANE }), UpgradePath.TANK, 396);
             CHIEFTAIN_IR.SetPrestigeCost(PrestigeTierCost.Gen2, PrestigeTypeCost.TANK);
@@ -6310,7 +6309,7 @@ namespace HammerAndSickle.Models
             // TOW-capable AH-1J representation: the established Cobra gun/rocket/ATGM line.
             // Aircraft-only loss census; this is a combat helicopter, never organic lift.
             WeaponProfile AH1_IR = WeaponProfile.FromProfileDef(
-                "AH-1J Cobra Attack Helicopter", "AH-1J Cobra", WeaponType.HEL_AH1_IR,
+                "AH-1J Cobra Attack Helicopter", "AH-1J Cobra", WeaponType.HEL_AH1_IR, GameData.MMP_HELO,
                 new ProfileDef(FamilyArchetypes.Helicopter, new Dictionary<ProfileStat, int>(),
                     new[] { WeaponTrait.ATGM_HELO_SACLOS, WeaponTrait.CANNON_HELO, WeaponTrait.ROCKET_PODS }),
                 UpgradePath.HEL, 432);
@@ -6322,7 +6321,7 @@ namespace HammerAndSickle.Models
             // Early lightweight fighter: agile, shorter dash and unguided strike capability.
             // No BVR missile, precision-strike or later radar/defensive suite is inferred.
             WeaponProfile F5_IR = WeaponProfile.FromProfileDef(
-                "F-5E Tiger II Fighter", "F-5E Tiger II", WeaponType.FGT_F5_IR,
+                "F-5E Tiger II Fighter", "F-5E Tiger II", WeaponType.FGT_F5_IR, GameData.MMP_FIXED_WING,
                 F5TigerDef(), UpgradePath.FGT, 432);
             F5_IR.SetPrestigeCost(PrestigeTierCost.Gen1, PrestigeTypeCost.FGT);
             // Keep the ratified Iranian fighter-wing scale used by the existing F-4/F-14.
@@ -6333,7 +6332,7 @@ namespace HammerAndSickle.Models
             // Conventional 155mm M109: same gun/chassis as the NATO line, without its fires network
             // or the US-only Copperhead package. Turn 300 is the established M109 family anchor.
             WeaponProfile M109_IR = WeaponProfile.FromProfileDef(
-                "Iranian M109 Self-Propelled Artillery", "IR M109", WeaponType.SPA_M109_IR,
+                "Iranian M109 Self-Propelled Artillery", "IR M109", WeaponType.SPA_M109_IR, GameData.MMP_VEHICLE_STANDARD,
                 new ProfileDef(FamilyArchetypes.Artillery,
                     new Dictionary<ProfileStat, int> { { ProfileStat.SA, 1 }, { ProfileStat.IR, GameData.INDIRECT_RANGE_MEDIUM } },
                     new[] { WeaponTrait.SELF_PROPELLED }), UpgradePath.ART, 300);
@@ -6349,9 +6348,9 @@ namespace HammerAndSickle.Models
             // Recon-role M113, not the Dutch C&V vehicle. Preserve the parent's tracked movement,
             // speed and lack of a live amphibious capability; the Recon family supplies observation.
             WeaponProfile RECON_IR = WeaponProfile.FromProfileDef(
-                "Iranian M113 Recon Vehicle", "IR M113 Recon", WeaponType.RCN_M113_IR,
+                "Iranian M113 Recon Vehicle", "IR M113 Recon", WeaponType.RCN_M113_IR, GameData.MMP_VEHICLE_SLOW,
                 new ProfileDef(FamilyArchetypes.Recon,
-                    new Dictionary<ProfileStat, int> { { ProfileStat.MMP, -2 } }, System.Array.Empty<WeaponTrait>()),
+                    new Dictionary<ProfileStat, int> {}, System.Array.Empty<WeaponTrait>()),
                 UpgradePath.RCN, 264);
             RECON_IR.SetPrestigeCost(PrestigeTierCost.Gen1, PrestigeTypeCost.RCN);
             RECON_IR.SetMovementMedium(MovementMedium.Tracked);
@@ -6365,7 +6364,7 @@ namespace HammerAndSickle.Models
 
             // Shared ballistics, national art/census. Open-bay towed bases contain no carrier census.
             WeaponProfile LIGHT_IR = WeaponProfile.FromProfileDef(
-                "Iranian Light Towed Artillery", "IR Light Artillery", WeaponType.ART_LIGHT_IR,
+                "Iranian Light Towed Artillery", "IR Light Artillery", WeaponType.ART_LIGHT_IR, GameData.MMP_MANHANDLED_GUN,
                 LightTowedArtilleryDef(), UpgradePath.ART, 144);
             LIGHT_IR.SetPrestigeCost(PrestigeTierCost.Gen1, PrestigeTypeCost.ART);
             LIGHT_IR.SetMovementMedium(MovementMedium.Foot);
@@ -6376,7 +6375,7 @@ namespace HammerAndSickle.Models
             AddProfile(WeaponType.ART_LIGHT_IR, LIGHT_IR);
 
             WeaponProfile HEAVY_IR = WeaponProfile.FromProfileDef(
-                "Iranian Heavy Towed Artillery", "IR Heavy Artillery", WeaponType.ART_HEAVY_IR,
+                "Iranian Heavy Towed Artillery", "IR Heavy Artillery", WeaponType.ART_HEAVY_IR, GameData.MMP_MANHANDLED_GUN,
                 HeavyTowedArtilleryDef(), UpgradePath.ART, 144);
             HEAVY_IR.SetPrestigeCost(PrestigeTierCost.Gen1, PrestigeTypeCost.ART);
             HEAVY_IR.SetMovementMedium(MovementMedium.Foot);
@@ -6387,7 +6386,7 @@ namespace HammerAndSickle.Models
             AddProfile(WeaponType.ART_HEAVY_IR, HEAVY_IR);
 
             WeaponProfile AAA_IR = WeaponProfile.FromProfileDef(
-                "Iranian Towed Anti-Aircraft Artillery", "IR Towed AAA", WeaponType.AAA_GEN_IR,
+                "Iranian Towed Anti-Aircraft Artillery", "IR Towed AAA", WeaponType.AAA_GEN_IR, GameData.MMP_MANHANDLED_GUN,
                 TowedAaaDef(), UpgradePath.AAA, 144);
             AAA_IR.SetPrestigeCost(PrestigeTierCost.Gen1, PrestigeTypeCost.AAA);
             AAA_IR.SetMovementMedium(MovementMedium.Foot);
@@ -6398,7 +6397,7 @@ namespace HammerAndSickle.Models
             AddProfile(WeaponType.AAA_GEN_IR, AAA_IR);
 
             WeaponProfile TRUCK_IR = WeaponProfile.FromProfileDef(
-                "Iranian Transport Truck", "IR Truck", WeaponType.TRK_GEN_IR, TransportTruckDef());
+                "Iranian Transport Truck", "IR Truck", WeaponType.TRK_GEN_IR, GameData.MMP_TRUCK, TransportTruckDef());
             TRUCK_IR.SetPrestigeCost(PrestigeTierCost.Gen1, PrestigeTypeCost.TRK);
             TRUCK_IR.IconProfile = new RegimentIconProfile(RegimentIconType.Single) { Icon = SpriteManager.IR_Truck };
             AddProfile(WeaponType.TRK_GEN_IR, TRUCK_IR);
@@ -6418,7 +6417,7 @@ namespace HammerAndSickle.Models
             // LOW_PROFILE + NBC_PROTECTED) + EXPORT_DOWNGRADE (thinner armour HD-2/SD-1 + simpler FCS ICM×0.9).
             // → HA7 HD4 SA5 SD6 GAD7 · ICM 0.90 · MMP10 · SR2.
             WeaponProfile T55A = WeaponProfile.FromProfileDef(
-                "T-55A Medium Tank", "T-55A", WeaponType.TANK_T55A_IQ,
+                "T-55A Medium Tank", "T-55A", WeaponType.TANK_T55A_IQ, GameData.MMP_VEHICLE_STANDARD,
                 new ProfileDef(TankArchetypes.Gen1,
                     new Dictionary<ProfileStat, int>(),
                     new[] { WeaponTrait.LOW_PROFILE, WeaponTrait.NBC_PROTECTED, WeaponTrait.EXPORT_DOWNGRADE }),
@@ -6458,7 +6457,7 @@ namespace HammerAndSickle.Models
             // 115mm up-gun + LOW_PROFILE + NBC_PROTECTED) + EXPORT_DOWNGRADE (HD-2/SD-1, ICM×0.9).
             // → HA8 HD4 SA5 SD6 GAD7 · ICM 0.90 · MMP10 · SR2.
             WeaponProfile T62A = WeaponProfile.FromProfileDef(
-                "T-62A Medium Tank", "T-62A", WeaponType.TANK_T62A_IQ,
+                "T-62A Medium Tank", "T-62A", WeaponType.TANK_T62A_IQ, GameData.MMP_VEHICLE_STANDARD,
                 new ProfileDef(TankArchetypes.Gen1,
                     new Dictionary<ProfileStat, int> { { ProfileStat.HA, 1 } },
                     new[] { WeaponTrait.LOW_PROFILE, WeaponTrait.NBC_PROTECTED, WeaponTrait.EXPORT_DOWNGRADE }),
@@ -6501,7 +6500,7 @@ namespace HammerAndSickle.Models
             // ICM 1.16 / SR 3). Real US tank, NOT a monkey-model (no EXPORT_DOWNGRADE). DESIGN CALL — flag for Bob.
             // → HA10 HD8 SA8 SD6 GAD7 · ICM 1.05 · MMP10 · SR2.
             WeaponProfile M60A3 = WeaponProfile.FromProfileDef(
-                "M60A3 Main Battle Tank", "M60A3", WeaponType.TANK_M60A3_IR,
+                "M60A3 Main Battle Tank", "M60A3", WeaponType.TANK_M60A3_IR, GameData.MMP_VEHICLE_STANDARD,
                 new ProfileDef(TankArchetypes.Gen2,
                     new Dictionary<ProfileStat, int> { { ProfileStat.SA, 1 } },
                     new[] { WeaponTrait.LASER_RANGEFINDER }),
@@ -6544,7 +6543,7 @@ namespace HammerAndSickle.Models
             // No EXPORT_DOWNGRADE — that armour/FCS downgrade is reserved for the export tanks; standard BMP-1s.
             // → HA8 HD4 SA8 SD7 GAD7 · ICM 1.00 · MMP10 · SR2 · amphibious.
             WeaponProfile BMP1_IQ = WeaponProfile.FromProfileDef(
-                "BMP-1 Infantry Fighting Vehicle", "BMP-1", WeaponType.IFV_BMP1_IQ,
+                "BMP-1 Infantry Fighting Vehicle", "BMP-1", WeaponType.IFV_BMP1_IQ, GameData.MMP_VEHICLE_STANDARD,
                 new ProfileDef(FamilyArchetypes.Ifv,
                     new Dictionary<ProfileStat, int>(),
                     new[] { WeaponTrait.ATGM_RAIL, WeaponTrait.AMPHIBIOUS }),
@@ -6575,7 +6574,7 @@ namespace HammerAndSickle.Models
             // Phase 3 (final-intent): Iraqi MT-LB = the Soviet MT-LB line (Apc + AMPHIBIOUS). Standard export tractor.
             // → HA3 HD4 SA6 SD7 GAD7 · ICM 1.00 · MMP8 · SR2 · amphibious.
             WeaponProfile MTLB_IQ = WeaponProfile.FromProfileDef(
-                "MT-LB Armored Personnel Carrier", "MT-LB", WeaponType.APC_MTLB_IQ,
+                "MT-LB Armored Personnel Carrier", "MT-LB", WeaponType.APC_MTLB_IQ, GameData.MMP_VEHICLE_SLOW,
                 new ProfileDef(FamilyArchetypes.Apc,
                     new Dictionary<ProfileStat, int>(),
                     new[] { WeaponTrait.AMPHIBIOUS }),
@@ -6610,7 +6609,7 @@ namespace HammerAndSickle.Models
             // downgrade. Amphibious DROPPED to match the ratified NATO M113 (marginal swim, NATO Batch A).
             // → HA3 HD4 SA6 SD7 GAD7 · ICM 1.00 · MMP8 · SR2.
             WeaponProfile M113_IR = WeaponProfile.FromProfileDef(
-                "M113 Armored Personnel Carrier", "M113", WeaponType.APC_M113_IR,
+                "M113 Armored Personnel Carrier", "M113", WeaponType.APC_M113_IR, GameData.MMP_VEHICLE_SLOW,
                 new ProfileDef(FamilyArchetypes.Apc,
                     new Dictionary<ProfileStat, int>(),
                     System.Array.Empty<WeaponTrait>()),
@@ -6649,7 +6648,7 @@ namespace HammerAndSickle.Models
             // light SP howitzer; no EXPORT_DOWNGRADE (artillery fires the same shell). IR 5→4 to match the Soviet 2S1.
             // → HA5 HD7 SA9 SD7 GAD7 · ICM 1.00 · MMP10 · IR4 · SR2.
             WeaponProfile SPA_2S1_AR = WeaponProfile.FromProfileDef(
-                "2S1 Gvozdika Self-Propelled Howitzer", "2S1 Gvozdika", WeaponType.SPA_2S1_IQ,
+                "2S1 Gvozdika Self-Propelled Howitzer", "2S1 Gvozdika", WeaponType.SPA_2S1_IQ, GameData.MMP_VEHICLE_STANDARD,
                 new ProfileDef(FamilyArchetypes.Artillery,
                     new Dictionary<ProfileStat, int> { { ProfileStat.IR, GameData.INDIRECT_RANGE_SHORT } },
                     new[] { WeaponTrait.SELF_PROPELLED }),
@@ -6685,7 +6684,7 @@ namespace HammerAndSickle.Models
             // old Arab-specific stat maluses + MOT mobility are dropped — a towed howitzer is the same gun for anyone.
             // → HA5 HD5 SA9 SD5 GAD8 · ICM 1.00 · MMP4 · IR4 · SR2.
             WeaponProfile ART_LT_AR = WeaponProfile.FromProfileDef(
-                "Light Towed Artillery", "Light Artillery", WeaponType.ART_LIGHT_ARAB,
+                "Light Towed Artillery", "Light Artillery", WeaponType.ART_LIGHT_ARAB, GameData.MMP_MANHANDLED_GUN,
                 LightTowedArtilleryDef(),
                 UpgradePath.ART, 144);
 
@@ -6719,7 +6718,7 @@ namespace HammerAndSickle.Models
             // Old Arab-specific maluses + MOT mobility dropped; IR LONG→MEDIUM to match the standard heavy towed.
             // → HA5 HD5 SA10 SD5 GAD8 · ICM 1.00 · MMP4 · IR5 · SR2.
             WeaponProfile ART_HV_AR = WeaponProfile.FromProfileDef(
-                "Heavy Towed Artillery", "Heavy Artillery", WeaponType.ART_HEAVY_ARAB,
+                "Heavy Towed Artillery", "Heavy Artillery", WeaponType.ART_HEAVY_ARAB, GameData.MMP_MANHANDLED_GUN,
                 HeavyTowedArtilleryDef(),
                 UpgradePath.ART, 144);
 
@@ -6758,7 +6757,7 @@ namespace HammerAndSickle.Models
             // DESIGN CALL — no ratified MJ AD line; invented as a weaker generic AAA. Flag/tunable (GAT rebalance pass).
             // → HA3 HD4 SA8 SD6 GAD10 · GAT9 · MMP4 · IR3 · SR3.
             WeaponProfile AAA_MJ = WeaponProfile.FromProfileDef(
-                "Mujahideen Anti-Aircraft Artillery", "MJ AAA", WeaponType.AAA_GEN_MJ,
+                "Mujahideen Anti-Aircraft Artillery", "MJ AAA", WeaponType.AAA_GEN_MJ, GameData.MMP_MANHANDLED_GUN,
                 new ProfileDef(FamilyArchetypes.Aaa,
                     new Dictionary<ProfileStat, int> { { ProfileStat.HA, -1 }, { ProfileStat.SA, -1 }, { ProfileStat.GAT, -2 }, { ProfileStat.GAD, -2 }, { ProfileStat.IR, GameData.INDIRECT_RANGE_AAA } },
                     new[] { WeaponTrait.AIR_DROPPABLE, WeaponTrait.HELO_TRANSPORTABLE }),
@@ -6795,7 +6794,7 @@ namespace HammerAndSickle.Models
             // MJ AD line; Sam base is a loose fit for a shoulder team. Flag/tunable (GAT rebalance pass).
             // → HA1 HD3 SA1 SD3 GAD10 · GAT10 · MMP4 · IR3 · SR2.
             WeaponProfile SAM_MJ = WeaponProfile.FromProfileDef(
-                "Mujahideen Stinger SAM Team", "MJ SAM", WeaponType.SAM_GEN_MJ,
+                "Mujahideen Stinger SAM Team", "MJ SAM", WeaponType.SAM_GEN_MJ, GameData.MMP_WALKING,
                 new ProfileDef(FamilyArchetypes.Sam,
                     new Dictionary<ProfileStat, int> { { ProfileStat.GAT, -2 }, { ProfileStat.GAD, 2 }, { ProfileStat.SR, -4 }, { ProfileStat.IR, GameData.INDIRECT_RANGE_AAA } },
                     new[] { WeaponTrait.AIR_DROPPABLE, WeaponTrait.HELO_TRANSPORTABLE }),
@@ -6829,7 +6828,7 @@ namespace HammerAndSickle.Models
             // Phase 3 (final-intent): Iraqi ZSU-57-2 = the Soviet ZSU-57-2 line (Aaa + IR AAA + SELF_PROPELLED).
             // Optical twin-57mm SP gun; no EXPORT_DOWNGRADE (gun system). → HA4 HD6 SA9 SD8 GAD11 · GAT11 · MMP10 · IR3 · SR3.
             WeaponProfile ZSU_57_IQ = WeaponProfile.FromProfileDef(
-                "ZSU-57 Self-Propelled Anti-Aircraft Gun", "ZSU-57", WeaponType.SPAAA_ZSU57_IQ,
+                "ZSU-57 Self-Propelled Anti-Aircraft Gun", "ZSU-57", WeaponType.SPAAA_ZSU57_IQ, GameData.MMP_VEHICLE_STANDARD,
                 new ProfileDef(FamilyArchetypes.Aaa,
                     new Dictionary<ProfileStat, int> { { ProfileStat.IR, GameData.INDIRECT_RANGE_AAA } },
                     new[] { WeaponTrait.SELF_PROPELLED }),
@@ -6865,7 +6864,7 @@ namespace HammerAndSickle.Models
             // SARH_LONG_RANGE + MOBILE_SHOOT_SCOOT). Radar-illuminated medium SAM; no EXPORT_DOWNGRADE.
             // → HA1 HD5 SA1 SD5 GAD7 · GAT15 · MMP10 · IR6 · SR6 · shoot-scoot.
             WeaponProfile SPSAM_2k12 = WeaponProfile.FromProfileDef(
-                "2K12 Self-Propelled SAM", "2K12", WeaponType.SPSAM_2K12_IQ,
+                "2K12 Self-Propelled SAM", "2K12", WeaponType.SPSAM_2K12_IQ, GameData.MMP_VEHICLE_STANDARD,
                 new ProfileDef(FamilyArchetypes.Sam,
                     new Dictionary<ProfileStat, int> { { ProfileStat.IR, GameData.INDIRECT_RANGE_SAM } },
                     new[] { WeaponTrait.SELF_PROPELLED, WeaponTrait.SARH_LONG_RANGE, WeaponTrait.MOBILE_SHOOT_SCOOT }),
@@ -6905,7 +6904,7 @@ namespace HammerAndSickle.Models
             // below the Soviet MiG-21). Pure interceptor → GA floor 2. No EXPORT_DOWNGRADE (tank-shaped; the air
             // downgrade is the DF/MAN residual). → DF7 MAN8 TS10 SUR6 · GA2 OL6 · MMP100 · SR4.
             WeaponProfile MIG21_IQ = WeaponProfile.FromProfileDef(
-                "MiG-21 Fishbed Interceptor", "MiG-21 Fishbed", WeaponType.FGT_MIG21_IQ,
+                "MiG-21 Fishbed Interceptor", "MiG-21 Fishbed", WeaponType.FGT_MIG21_IQ, GameData.MMP_FIXED_WING,
                 new ProfileDef(FamilyArchetypes.FighterEarly,
                     new Dictionary<ProfileStat, int> { { ProfileStat.DF, -1 }, { ProfileStat.MAN, -1 } },
                     System.Array.Empty<WeaponTrait>()),
@@ -6936,7 +6935,7 @@ namespace HammerAndSickle.Models
             // RWR (SUR+1) + TS+1. A notch below the Soviet MiG-23 (no chaff — one less countermeasure). Pure fighter
             // → GA floor 2. → DF10 MAN9 TS11 SUR7 · GA2 OL6 · MMP100 · SR4.
             WeaponProfile MIG23_IQ = WeaponProfile.FromProfileDef(
-                "MiG-23 Flogger Fighter", "MiG-23 Flogger", WeaponType.FGT_MIG23_IQ,
+                "MiG-23 Flogger Fighter", "MiG-23 Flogger", WeaponType.FGT_MIG23_IQ, GameData.MMP_FIXED_WING,
                 new ProfileDef(FamilyArchetypes.FighterEarly,
                     new Dictionary<ProfileStat, int> { { ProfileStat.TS, 1 } },
                     new[] { WeaponTrait.BVR_RADAR_MISSILE, WeaponTrait.RWR }),
@@ -6966,7 +6965,7 @@ namespace HammerAndSickle.Models
             // Phase 3 (air-stat enrichment): Iraqi Su-17 = the Soviet Su-17 line (FighterEarly + MULTIROLE_STRIKE +
             // RWR, GA6). Same airframe; dumb-bomb fighter-bomber. → DF8 MAN9 TS10 SUR7 · GA6 OL6 · MMP100 · SR4.
             WeaponProfile SU17_IQ = WeaponProfile.FromProfileDef(
-                "Su-17 Fitter Attack Aircraft", "Su-17 Fitter", WeaponType.ATT_SU17_IQ,
+                "Su-17 Fitter Attack Aircraft", "Su-17 Fitter", WeaponType.ATT_SU17_IQ, GameData.MMP_FIXED_WING,
                 new ProfileDef(FamilyArchetypes.FighterEarly,
                     new Dictionary<ProfileStat, int>(),
                     new[] { WeaponTrait.MULTIROLE_STRIKE, WeaponTrait.RWR }),
@@ -6997,7 +6996,7 @@ namespace HammerAndSickle.Models
             // (SUR+1) + DF-1/MAN-1/TS+1 (real US Phantom, degraded by post-1979 isolation — a notch below the US F-4).
             // Pure fighter → GA floor 2. → DF9 MAN8 TS11 SUR7 · GA2 OL6 · MMP100 · SR4.
             WeaponProfile F4_IR = WeaponProfile.FromProfileDef(
-                "F-4 Phantom Fighter", "F-4 Phantom", WeaponType.FGT_F4_IR,
+                "F-4 Phantom Fighter", "F-4 Phantom", WeaponType.FGT_F4_IR, GameData.MMP_FIXED_WING,
                 new ProfileDef(FamilyArchetypes.FighterEarly,
                     new Dictionary<ProfileStat, int> { { ProfileStat.DF, -1 }, { ProfileStat.MAN, -1 }, { ProfileStat.TS, 1 } },
                     new[] { WeaponTrait.BVR_RADAR_MISSILE, WeaponTrait.RWR }),
@@ -7029,7 +7028,7 @@ namespace HammerAndSickle.Models
             // ICM premium (vs the US F-14's DF15/ICM 1.10), so it sits at the bare FighterLate DF12. Pure fleet
             // interceptor → GA floor 2. → DF12 MAN11 TS11 SUR8 · ICM 1.00 · GA2 OL6 · MMP100 · SR4.
             WeaponProfile F14_IR = WeaponProfile.FromProfileDef(
-                "F-14 Tomcat Fleet Defense Fighter", "F-14 Tomcat", WeaponType.FGT_F14_IR,
+                "F-14 Tomcat Fleet Defense Fighter", "F-14 Tomcat", WeaponType.FGT_F14_IR, GameData.MMP_FIXED_WING,
                 new ProfileDef(FamilyArchetypes.FighterLate,
                     new Dictionary<ProfileStat, int> { { ProfileStat.MAN, -1 }, { ProfileStat.TS, 1 }, { ProfileStat.SUR, -2 } },
                     new[] { WeaponTrait.RWR }),
@@ -7063,7 +7062,7 @@ namespace HammerAndSickle.Models
             // Phase 3 (final-intent): Arab truck = the Soviet/NATO generic truck line (Truck archetype + NON_COMBATANT).
             // → HA3 HD3 SA3 SD3 GAD6 · MMP8 · SR2 · non-combatant.
             WeaponProfile TRK_AR = WeaponProfile.FromProfileDef(
-                "Generic Transport Truck", "Transport Truck", WeaponType.TRK_GEN_ARAB,
+                "Generic Transport Truck", "Transport Truck", WeaponType.TRK_GEN_ARAB, GameData.MMP_TRUCK,
                 TransportTruckDef());
 
             // Handle the icon profile.
@@ -7089,7 +7088,7 @@ namespace HammerAndSickle.Models
             // Phase 3 (final-intent): Iraqi regulars = the Soviet regular-infantry line (Infantry + RPG_LAW +
             // MANPADS_BASIC Strela). Conventional army troops. → HA6 HD7 SA7 SD8 GAD10 · GAT6 · MMP4 · SR2.
             WeaponProfile INF_REG_IQ_P = WeaponProfile.FromProfileDef(
-                "Iraqi Regular Infantry", "IQ Regulars", WeaponType.INF_REG_IQ,
+                "Iraqi Regular Infantry", "IQ Regulars", WeaponType.INF_REG_IQ, GameData.MMP_WALKING,
                 new ProfileDef(FamilyArchetypes.Infantry,
                     new Dictionary<ProfileStat, int>(),
                     new[] { WeaponTrait.RPG_LAW, WeaponTrait.MANPADS_BASIC }));
@@ -7126,7 +7125,7 @@ namespace HammerAndSickle.Models
             // Phase 3 (final-intent): Iranian regulars = the same conventional line as the Iraqi regulars
             // (Infantry + RPG_LAW + MANPADS_BASIC). → HA6 HD7 SA7 SD8 GAD10 · GAT6 · MMP4 · SR2.
             WeaponProfile INF_REG_IR_P = WeaponProfile.FromProfileDef(
-                "Iranian Regular Infantry", "IR Regulars", WeaponType.INF_REG_IR,
+                "Iranian Regular Infantry", "IR Regulars", WeaponType.INF_REG_IR, GameData.MMP_WALKING,
                 new ProfileDef(FamilyArchetypes.Infantry,
                     new Dictionary<ProfileStat, int>(),
                     new[] { WeaponTrait.RPG_LAW, WeaponTrait.MANPADS_BASIC }));
@@ -7167,7 +7166,7 @@ namespace HammerAndSickle.Models
             // DESIGN CALL — MOUNTAIN_TRAINED added to all MJ infantry as final intent; flag/easy to remove.
             // → HA6 HD7 SA7 SD8 GAD10 · GAT0 · MMP4 · SR2 · mountain movement.
             WeaponProfile INF_MJ_REG = WeaponProfile.FromProfileDef(
-                "Mujahideen Regular Infantry", "MJ Regulars", WeaponType.INF_REG_MJ,
+                "Mujahideen Regular Infantry", "MJ Regulars", WeaponType.INF_REG_MJ, GameData.MMP_WALKING,
                 new ProfileDef(FamilyArchetypes.Infantry,
                     new Dictionary<ProfileStat, int>(),
                     new[] { WeaponTrait.RPG_LAW, WeaponTrait.MOUNTAIN_TRAINED }));
@@ -7199,7 +7198,7 @@ namespace HammerAndSickle.Models
             // ICM×1.10) + RPG_LAW + MOUNTAIN_TRAINED. No MANPADS here (the Stinger is the dedicated MJ SAM team —
             // avoids stacking the SF and Stinger ICMs). → HA8 HD7 SA9 SD9 GAD10 · GAT0 · ICM 1.10 · MMP4 · SR3 · mountain.
             WeaponProfile INF_MJ_SPEC = WeaponProfile.FromProfileDef(
-                "Mujahideen Special Forces", "MJ Elite", WeaponType.INF_SPEC_MJ,
+                "Mujahideen Special Forces", "MJ Elite", WeaponType.INF_SPEC_MJ, GameData.MMP_WALKING,
                 new ProfileDef(FamilyArchetypes.Infantry,
                     new Dictionary<ProfileStat, int> { { ProfileStat.SR, 1 } },
                     new[] { WeaponTrait.SPECIAL_FORCES, WeaponTrait.RPG_LAW, WeaponTrait.MOUNTAIN_TRAINED }));
@@ -7230,9 +7229,9 @@ namespace HammerAndSickle.Models
             // Phase 3 (final-intent): MJ horse cavalry = Infantry + MMP+6 (→ CAVALRY_UNIT 10, mounted) + RPG_LAW +
             // MOUNTAIN_TRAINED. Fast raiders. → HA6 HD7 SA7 SD8 GAD10 · GAT0 · MMP10 · SR2 · mountain movement.
             WeaponProfile INF_MJ_CAV = WeaponProfile.FromProfileDef(
-                "Mujahideen Horse Cavalry", "MJ Cavalry", WeaponType.INF_CAV_MJ,
+                "Mujahideen Horse Cavalry", "MJ Cavalry", WeaponType.INF_CAV_MJ, GameData.MMP_CAVALRY,
                 new ProfileDef(FamilyArchetypes.Infantry,
-                    new Dictionary<ProfileStat, int> { { ProfileStat.MMP, GameData.CAVALRY_UNIT - GameData.FOOT_UNIT } },
+                    new Dictionary<ProfileStat, int> {},
                     new[] { WeaponTrait.RPG_LAW, WeaponTrait.MOUNTAIN_TRAINED }));
 
             // Intel stats
@@ -7262,7 +7261,7 @@ namespace HammerAndSickle.Models
             // specialists; HA+2 is a residual, no clean trait for recoilless) + RPG_LAW (+1 → HA8) + MOUNTAIN_TRAINED.
             // → HA8 HD7 SA6 SD8 GAD10 · GAT0 · MMP4 · SR2 · mountain movement.
             WeaponProfile INF_MJ_RPG = WeaponProfile.FromProfileDef(
-                "Mujahideen RPG Teams", "MJ RPG", WeaponType.INF_RPG_MJ,
+                "Mujahideen RPG Teams", "MJ RPG", WeaponType.INF_RPG_MJ, GameData.MMP_WALKING,
                 new ProfileDef(FamilyArchetypes.Infantry,
                     new Dictionary<ProfileStat, int> { { ProfileStat.HA, 2 }, { ProfileStat.SA, -1 } },
                     new[] { WeaponTrait.RPG_LAW, WeaponTrait.MOUNTAIN_TRAINED }));
@@ -7294,7 +7293,7 @@ namespace HammerAndSickle.Models
             // teams, not a battery) + IR MINIMUM (short mortar reach). DESIGN CALL — invented MJ line; flag/tunable.
             // → HA5 HD5 SA7 SD5 GAD10 · MMP4 · IR3 · SR2.
             WeaponProfile ART_MJ_MORT = WeaponProfile.FromProfileDef(
-                "Mujahideen Heavy Mortar", "MJ Mortar", WeaponType.ART_MORTAR_MJ,
+                "Mujahideen Heavy Mortar", "MJ Mortar", WeaponType.ART_MORTAR_MJ, GameData.MMP_MANHANDLED_GUN,
                 new ProfileDef(FamilyArchetypes.Artillery,
                     new Dictionary<ProfileStat, int> { { ProfileStat.SA, -2 }, { ProfileStat.GAD, 2 }, { ProfileStat.IR, GameData.INDIRECT_RANGE_MINIMUM } },
                     new[] { WeaponTrait.AIR_DROPPABLE, WeaponTrait.HELO_TRANSPORTABLE }));
@@ -7332,7 +7331,7 @@ namespace HammerAndSickle.Models
             // indirect) + GAD+2 (→10, dispersed) + IR MINIMUM. DESIGN CALL — invented MJ line; flag/tunable.
             // → HA5 HD5 SA6 SD5 GAD10 · MMP4 · IR3 · SR2.
             WeaponProfile ART_MJ_LT = WeaponProfile.FromProfileDef(
-                "Mujahideen Light Artillery", "MJ Artillery", WeaponType.ART_LIGHT_MJ,
+                "Mujahideen Light Artillery", "MJ Artillery", WeaponType.ART_LIGHT_MJ, GameData.MMP_MANHANDLED_GUN,
                 new ProfileDef(FamilyArchetypes.Artillery,
                     new Dictionary<ProfileStat, int> { { ProfileStat.SA, -3 }, { ProfileStat.GAD, 2 }, { ProfileStat.IR, GameData.INDIRECT_RANGE_MINIMUM } },
                     new[] { WeaponTrait.AIR_DROPPABLE, WeaponTrait.HELO_TRANSPORTABLE }));
@@ -7370,7 +7369,7 @@ namespace HammerAndSickle.Models
             // F-15C uses early Sparrow BVR; no AMRAAM/strike upgrade or blanket export penalty.
             // AUF1 retains hardware stats but does not inherit the French fires-network factor.
             WeaponProfile TANK_AMX30_SA = WeaponProfile.FromProfileDef(
-                "Saudi AMX-30 Armored Brigade", "AMX-30", WeaponType.TANK_AMX30_SA,
+                "Saudi AMX-30 Armored Brigade", "AMX-30", WeaponType.TANK_AMX30_SA, GameData.MMP_VEHICLE_FAST,
                 Amx30Def(), UpgradePath.TANK, 420);
             TANK_AMX30_SA.SetPrestigeCost(PrestigeTierCost.Gen2, PrestigeTypeCost.TANK);
             TANK_AMX30_SA.AddIntelReportStat(WeaponType.Personnel, 1500);
@@ -7385,7 +7384,7 @@ namespace HammerAndSickle.Models
             AddProfile(WeaponType.TANK_AMX30_SA, TANK_AMX30_SA);
 
             WeaponProfile SPSAM_SHAHINE_SA = WeaponProfile.FromProfileDef(
-                "Shahine Tracked Surface-to-Air Missile System", "Shahine", WeaponType.SPSAM_SHAHINE_SA,
+                "Shahine Tracked Surface-to-Air Missile System", "Shahine", WeaponType.SPSAM_SHAHINE_SA, GameData.MMP_VEHICLE_STANDARD,
                 CrotaleFamilyDef(), UpgradePath.SAM, 504);
             SPSAM_SHAHINE_SA.SetPrestigeCost(PrestigeTierCost.Gen2, PrestigeTypeCost.SPSAM);
             SPSAM_SHAHINE_SA.SetMovementMedium(MovementMedium.Tracked);
@@ -7397,7 +7396,7 @@ namespace HammerAndSickle.Models
             AddProfile(WeaponType.SPSAM_SHAHINE_SA, SPSAM_SHAHINE_SA);
 
             WeaponProfile FGT_F15_SA = WeaponProfile.FromProfileDef(
-                "Saudi F-15C Eagle Air Superiority Fighter", "F-15C Eagle", WeaponType.FGT_F15_SA,
+                "Saudi F-15C Eagle Air Superiority Fighter", "F-15C Eagle", WeaponType.FGT_F15_SA, GameData.MMP_FIXED_WING,
                 new ProfileDef(FamilyArchetypes.FighterLate,
                     new Dictionary<ProfileStat, int> { { ProfileStat.TS, 2 } },
                     new[] { WeaponTrait.BVR_RADAR_MISSILE, WeaponTrait.AGILE_AIRFRAME, WeaponTrait.LOOKDOWN_SHOOTDOWN,
@@ -7408,7 +7407,7 @@ namespace HammerAndSickle.Models
             AddProfile(WeaponType.FGT_F15_SA, FGT_F15_SA);
 
             WeaponProfile FGT_F5_SA = WeaponProfile.FromProfileDef(
-                "Saudi F-5E Tiger II Fighter", "F-5E Tiger II", WeaponType.FGT_F5_SA,
+                "Saudi F-5E Tiger II Fighter", "F-5E Tiger II", WeaponType.FGT_F5_SA, GameData.MMP_FIXED_WING,
                 F5TigerDef(), UpgradePath.FGT, 432);
             FGT_F5_SA.SetPrestigeCost(PrestigeTierCost.Gen1, PrestigeTypeCost.FGT);
             FGT_F5_SA.AddIntelReportStat(WeaponType.FGT_F5_SA, 24);
@@ -7416,7 +7415,7 @@ namespace HammerAndSickle.Models
             AddProfile(WeaponType.FGT_F5_SA, FGT_F5_SA);
 
             WeaponProfile INF_REG_SA = WeaponProfile.FromProfileDef(
-                "Saudi Regular Infantry", "Saudi Regulars", WeaponType.INF_REG_SA,
+                "Saudi Regular Infantry", "Saudi Regulars", WeaponType.INF_REG_SA, GameData.MMP_WALKING,
                 SaudiInfantryDef());
             INF_REG_SA.SetPrestigeCost(PrestigeTierCost.Gen1, PrestigeTypeCost.INF);
             INF_REG_SA.AddIntelReportStat(WeaponType.Personnel, 2400);
@@ -7428,7 +7427,7 @@ namespace HammerAndSickle.Models
 
             // Robert, 2026-09-26: Guard infantry rides national trucks; V-150 is withdrawn.
             WeaponProfile INF_GUARD_SA = WeaponProfile.FromProfileDef(
-                "Saudi National Guard Infantry", "Saudi National Guard", WeaponType.INF_GUARD_SA,
+                "Saudi National Guard Infantry", "Saudi National Guard", WeaponType.INF_GUARD_SA, GameData.MMP_WALKING,
                 SaudiInfantryDef());
             INF_GUARD_SA.SetPrestigeCost(PrestigeTierCost.Gen1, PrestigeTypeCost.INF);
             INF_GUARD_SA.AddIntelReportStat(WeaponType.Personnel, 2400);
@@ -7441,7 +7440,7 @@ namespace HammerAndSickle.Models
             // Census doctrine 10.7.9: a distinct combined-arms base owns its tank battalion;
             // carrier bays count only vehicles. Foot infantry keeps its own tank-free shape.
             WeaponProfile INF_MECH_SA = WeaponProfile.FromProfileDef(
-                "Saudi Combined-Arms Infantry", "Saudi Mech Infantry", WeaponType.INF_MECH_SA,
+                "Saudi Combined-Arms Infantry", "Saudi Mech Infantry", WeaponType.INF_MECH_SA, GameData.MMP_WALKING,
                 SaudiInfantryDef());
             INF_MECH_SA.SetPrestigeCost(PrestigeTierCost.Gen1, PrestigeTypeCost.INF);
             INF_MECH_SA.AddIntelReportStat(WeaponType.Personnel, 2400);
@@ -7453,7 +7452,7 @@ namespace HammerAndSickle.Models
             AddProfile(WeaponType.INF_MECH_SA, INF_MECH_SA);
 
             WeaponProfile ART_LIGHT_SA = WeaponProfile.FromProfileDef(
-                "Saudi Light Towed Artillery", "SA Light Artillery", WeaponType.ART_LIGHT_SA,
+                "Saudi Light Towed Artillery", "SA Light Artillery", WeaponType.ART_LIGHT_SA, GameData.MMP_MANHANDLED_GUN,
                 LightTowedArtilleryDef(), UpgradePath.ART, 144);
             ART_LIGHT_SA.SetPrestigeCost(PrestigeTierCost.Gen1, PrestigeTypeCost.ART);
             ART_LIGHT_SA.SetMovementMedium(MovementMedium.Foot);
@@ -7464,7 +7463,7 @@ namespace HammerAndSickle.Models
             AddProfile(WeaponType.ART_LIGHT_SA, ART_LIGHT_SA);
 
             WeaponProfile ART_HEAVY_SA = WeaponProfile.FromProfileDef(
-                "Saudi Heavy Towed Artillery", "SA Heavy Artillery", WeaponType.ART_HEAVY_SA,
+                "Saudi Heavy Towed Artillery", "SA Heavy Artillery", WeaponType.ART_HEAVY_SA, GameData.MMP_MANHANDLED_GUN,
                 HeavyTowedArtilleryDef(), UpgradePath.ART, 144);
             ART_HEAVY_SA.SetPrestigeCost(PrestigeTierCost.Gen1, PrestigeTypeCost.ART);
             ART_HEAVY_SA.SetMovementMedium(MovementMedium.Foot);
@@ -7475,7 +7474,7 @@ namespace HammerAndSickle.Models
             AddProfile(WeaponType.ART_HEAVY_SA, ART_HEAVY_SA);
 
             WeaponProfile AAA_GEN_SA = WeaponProfile.FromProfileDef(
-                "Saudi Towed Anti-Aircraft Artillery", "SA Towed AAA", WeaponType.AAA_GEN_SA,
+                "Saudi Towed Anti-Aircraft Artillery", "SA Towed AAA", WeaponType.AAA_GEN_SA, GameData.MMP_MANHANDLED_GUN,
                 TowedAaaDef(), UpgradePath.AAA, 144);
             AAA_GEN_SA.SetPrestigeCost(PrestigeTierCost.Gen1, PrestigeTypeCost.AAA);
             AAA_GEN_SA.SetMovementMedium(MovementMedium.Foot);
@@ -7485,7 +7484,7 @@ namespace HammerAndSickle.Models
             AddProfile(WeaponType.AAA_GEN_SA, AAA_GEN_SA);
 
             WeaponProfile SPA_AUF1_SA = WeaponProfile.FromProfileDef(
-                "Saudi AUF1 Self-Propelled Artillery", "AUF1", WeaponType.SPA_AUF1_SA,
+                "Saudi AUF1 Self-Propelled Artillery", "AUF1", WeaponType.SPA_AUF1_SA, GameData.MMP_VEHICLE_STANDARD,
                 Auf1Def(), UpgradePath.ART, 516);
             SPA_AUF1_SA.SetPrestigeCost(PrestigeTierCost.Gen2, PrestigeTypeCost.SPA);
             SPA_AUF1_SA.SetMovementMedium(MovementMedium.Tracked);
@@ -7497,7 +7496,7 @@ namespace HammerAndSickle.Models
             AddProfile(WeaponType.SPA_AUF1_SA, SPA_AUF1_SA);
 
             WeaponProfile APC_M113_SA = WeaponProfile.FromProfileDef(
-                "Saudi M113 Armored Personnel Carrier", "M113", WeaponType.APC_M113_SA,
+                "Saudi M113 Armored Personnel Carrier", "M113", WeaponType.APC_M113_SA, GameData.MMP_VEHICLE_SLOW,
                 new ProfileDef(FamilyArchetypes.Apc, new Dictionary<ProfileStat, int>(),
                     System.Array.Empty<WeaponTrait>()), UpgradePath.APC, 264);
             APC_M113_SA.SetPrestigeCost(PrestigeTierCost.Gen1, PrestigeTypeCost.APC);
@@ -7507,7 +7506,7 @@ namespace HammerAndSickle.Models
             AddProfile(WeaponType.APC_M113_SA, APC_M113_SA);
 
             WeaponProfile IFV_AMX10P_SA = WeaponProfile.FromProfileDef(
-                "Saudi AMX-10P Infantry Fighting Vehicle", "AMX-10P", WeaponType.IFV_AMX10P_SA,
+                "Saudi AMX-10P Infantry Fighting Vehicle", "AMX-10P", WeaponType.IFV_AMX10P_SA, GameData.MMP_VEHICLE_STANDARD,
                 Amx10pDef(), UpgradePath.IFV, 444);
             IFV_AMX10P_SA.SetPrestigeCost(PrestigeTierCost.Gen2, PrestigeTypeCost.IFV);
             IFV_AMX10P_SA.AddIntelReportStat(WeaponType.IFV_AMX10P_SA, 90);
@@ -7515,7 +7514,7 @@ namespace HammerAndSickle.Models
             AddProfile(WeaponType.IFV_AMX10P_SA, IFV_AMX10P_SA);
 
             WeaponProfile TRK_GEN_SA = WeaponProfile.FromProfileDef(
-                "Saudi Transport Truck", "SA Truck", WeaponType.TRK_GEN_SA,
+                "Saudi Transport Truck", "SA Truck", WeaponType.TRK_GEN_SA, GameData.MMP_TRUCK,
                 TransportTruckDef());
             TRK_GEN_SA.SetPrestigeCost(PrestigeTierCost.Gen1, PrestigeTypeCost.TRK);
 
@@ -7529,10 +7528,10 @@ namespace HammerAndSickle.Models
             // Type 62: smaller 85mm light tank, not an amphibious Type 63 tank or an MBT upgrade.
             // Authored deltas from Gen1: less penetration/protection, more road mobility. No modern FCS.
             WeaponProfile TYPE62 = WeaponProfile.FromProfileDef(
-                "Type 62 Light Tank", "Type 62", WeaponType.TANK_TYPE62_CH,
+                "Type 62 Light Tank", "Type 62", WeaponType.TANK_TYPE62_CH, GameData.MMP_VEHICLE_FAST,
                 new ProfileDef(TankArchetypes.Gen1,
                     new Dictionary<ProfileStat, int> { { ProfileStat.HA, -1 }, { ProfileStat.HD, -2 },
-                        { ProfileStat.SA, -1 }, { ProfileStat.MMP, 2 } },
+                        { ProfileStat.SA, -1 },},
                     new[] { WeaponTrait.LOW_PROFILE, WeaponTrait.SECOND_LINE_FORMATION }),
                 UpgradePath.TANK, 300);
             TYPE62.SetPrestigeCost(PrestigeTierCost.Gen1, PrestigeTypeCost.TANK);
@@ -7551,7 +7550,7 @@ namespace HammerAndSickle.Models
 
             // Early gun-fighter J-6 (MiG-19 lineage), below J-7 speed/engagement quality; no radar-missile trait.
             WeaponProfile J6 = WeaponProfile.FromProfileDef(
-                "J-6 Fighter", "J-6", WeaponType.FGT_J6_CH,
+                "J-6 Fighter", "J-6", WeaponType.FGT_J6_CH, GameData.MMP_FIXED_WING,
                 new ProfileDef(FamilyArchetypes.FighterEarly,
                     new Dictionary<ProfileStat, int> { { ProfileStat.DF, -1 }, { ProfileStat.TS, -2 } },
                     new[] { WeaponTrait.SECOND_LINE_FORMATION }),
@@ -7562,7 +7561,7 @@ namespace HammerAndSickle.Models
             AddProfile(WeaponType.FGT_J6_CH, J6);
 
             WeaponProfile AAA_CH = WeaponProfile.FromProfileDef(
-                "Chinese Towed Anti-Aircraft Artillery", "PLA Towed AAA", WeaponType.AAA_GEN_CH,
+                "Chinese Towed Anti-Aircraft Artillery", "PLA Towed AAA", WeaponType.AAA_GEN_CH, GameData.MMP_MANHANDLED_GUN,
                 TowedAaaDef(WeaponTrait.SECOND_LINE_FORMATION), UpgradePath.AAA, 144);
             AAA_CH.SetPrestigeCost(PrestigeTierCost.Gen1, PrestigeTypeCost.AAA);
             AAA_CH.SetMovementMedium(MovementMedium.Foot);
@@ -7574,7 +7573,7 @@ namespace HammerAndSickle.Models
 
             // HQ-2 is in the S-75 site-SAM family, not the old borrowed S-125. National formation factor only.
             WeaponProfile HQ2 = WeaponProfile.FromProfileDef(
-                "HQ-2 Surface-to-Air Missile System", "HQ-2", WeaponType.SAM_HQ2_CH,
+                "HQ-2 Surface-to-Air Missile System", "HQ-2", WeaponType.SAM_HQ2_CH, GameData.MMP_IMMOBILE,
                 S75SiteDef(WeaponTrait.SECOND_LINE_FORMATION), UpgradePath.SAM, 348);
             HQ2.SetPrestigeCost(PrestigeTierCost.Gen1, PrestigeTypeCost.SAM);
             HQ2.SetMovementMedium(MovementMedium.Foot);
@@ -7586,7 +7585,7 @@ namespace HammerAndSickle.Models
 
             // YW531 tracked/amphibious APC, not the Type 63 light tank. Carrier census stays own-platform only.
             WeaponProfile TYPE63 = WeaponProfile.FromProfileDef(
-                "Type 63 Armored Personnel Carrier", "Type 63 APC", WeaponType.APC_TYPE63_CH,
+                "Type 63 Armored Personnel Carrier", "Type 63 APC", WeaponType.APC_TYPE63_CH, GameData.MMP_VEHICLE_SLOW,
                 new ProfileDef(FamilyArchetypes.Apc, new Dictionary<ProfileStat, int>(),
                     new[] { WeaponTrait.AMPHIBIOUS }), UpgradePath.APC, 348);
             TYPE63.SetPrestigeCost(PrestigeTierCost.Gen1, PrestigeTypeCost.APC);
@@ -7596,7 +7595,7 @@ namespace HammerAndSickle.Models
             AddProfile(WeaponType.APC_TYPE63_CH, TYPE63);
 
             WeaponProfile TRUCK_CH = WeaponProfile.FromProfileDef(
-                "Chinese Transport Truck", "PLA Truck", WeaponType.TRK_GEN_CH, TransportTruckDef());
+                "Chinese Transport Truck", "PLA Truck", WeaponType.TRK_GEN_CH, GameData.MMP_TRUCK, TransportTruckDef());
             TRUCK_CH.SetPrestigeCost(PrestigeTierCost.Gen1, PrestigeTypeCost.TRK);
             TRUCK_CH.IconProfile = new RegimentIconProfile(RegimentIconType.Single) { Icon = SpriteManager.CH_Truck };
             AddProfile(WeaponType.TRK_GEN_CH, TRUCK_CH);
@@ -7625,7 +7624,7 @@ namespace HammerAndSickle.Models
             // Phase 3 (final-intent): Type 59 (T-54 copy, 100mm) = Gen1 + LOW_PROFILE. Domestic Chinese design (not a
             // monkey-model), no NBC. = the T-55A line minus the dormant NBC. → HA7 HD6 SA5 SD7 GAD7 · ICM 0.90 (second line) · MMP10 · SR2.
             WeaponProfile TYPE59 = WeaponProfile.FromProfileDef(
-                "Type 59 Medium Tank", "Type 59", WeaponType.TANK_TYPE59_CH,
+                "Type 59 Medium Tank", "Type 59", WeaponType.TANK_TYPE59_CH, GameData.MMP_VEHICLE_STANDARD,
                 new ProfileDef(TankArchetypes.Gen1,
                     new Dictionary<ProfileStat, int>(),
                     new[] { WeaponTrait.LOW_PROFILE, WeaponTrait.SECOND_LINE_FORMATION }),
@@ -7665,7 +7664,7 @@ namespace HammerAndSickle.Models
             // Basic FCS, no thermal.
             // → HA10 HD8 SA7 SD6 GAD7 · ICM 0.945 (LRF 1.05 × second line 0.9) · MMP10 · SR2.
             WeaponProfile TYPE80 = WeaponProfile.FromProfileDef(
-                "Type 88 Main Battle Tank", "Type 88", WeaponType.TANK_TYPE80_CH,
+                "Type 88 Main Battle Tank", "Type 88", WeaponType.TANK_TYPE80_CH, GameData.MMP_VEHICLE_STANDARD,
                 new ProfileDef(TankArchetypes.Gen2,
                     new Dictionary<ProfileStat, int>(),
                     new[] { WeaponTrait.LASER_RANGEFINDER, WeaponTrait.SECOND_LINE_FORMATION }),
@@ -7707,7 +7706,7 @@ namespace HammerAndSickle.Models
             // Phase 3 (derived): Ifv + ATGM_RAIL (HJ-73 rail on the BMP-1-copy hull, HA+4) + AMPHIBIOUS.
             // Mirrors the Soviet BMP-1P line. → HA8 HD4 SA8 SD7 GAD7 · ICM 1.00 (Mobile-bay ride — NO formation trait) · MMP10 · SR2 · amphibious.
             WeaponProfile TYPE86 = WeaponProfile.FromProfileDef(
-                "Type 86 Infantry Fighting Vehicle", "Type 86", WeaponType.IFV_TYPE86_CH,
+                "Type 86 Infantry Fighting Vehicle", "Type 86", WeaponType.IFV_TYPE86_CH, GameData.MMP_VEHICLE_STANDARD,
                 new ProfileDef(FamilyArchetypes.Ifv,
                     new Dictionary<ProfileStat, int>(),
                     new[] { WeaponTrait.ATGM_RAIL, WeaponTrait.AMPHIBIOUS }),
@@ -7744,7 +7743,7 @@ namespace HammerAndSickle.Models
             // Chinese census/art and SECOND_LINE_FORMATION remain national: HA5 HD7 SA9 SD7 GAD7,
             // MMP10, IR4, ICM0.9. Equipment equivalence does not import the Soviet formation census.
             WeaponProfile SPA_TYPE83_CH = WeaponProfile.FromProfileDef(
-                "Type 83 Self-Propelled Howitzer", "Type 83", WeaponType.SPA_TYPE83_CH,
+                "Type 83 Self-Propelled Howitzer", "Type 83", WeaponType.SPA_TYPE83_CH, GameData.MMP_VEHICLE_STANDARD,
                 new ProfileDef(FamilyArchetypes.Artillery,
                     new Dictionary<ProfileStat, int> { { ProfileStat.IR, GameData.INDIRECT_RANGE_SHORT } },
                     new[] { WeaponTrait.SELF_PROPELLED, WeaponTrait.SECOND_LINE_FORMATION }),
@@ -7780,7 +7779,7 @@ namespace HammerAndSickle.Models
             // +1 CombatAction, derives IsDoubleFire) + IR ROC_MR. Tracked Grad-class — drops the old flat SA bonus and
             // carries its punch via the extra action, as the Soviet BM-21 does. → HA5 HD7 SA9 SD7 GAD7 · MMP10 · double-fire.
             WeaponProfile PHZ89 = WeaponProfile.FromProfileDef(
-                "PHZ-89 Multiple Rocket Launcher", "PHZ-89", WeaponType.ROC_PHZ89_CH,
+                "PHZ-89 Multiple Rocket Launcher", "PHZ-89", WeaponType.ROC_PHZ89_CH, GameData.MMP_VEHICLE_STANDARD,
                 new ProfileDef(FamilyArchetypes.Artillery,
                     new Dictionary<ProfileStat, int> { { ProfileStat.IR, GameData.INDIRECT_RANGE_ROC_MR } },
                     new[] { WeaponTrait.SELF_PROPELLED, WeaponTrait.ROCKET_ARTILLERY, WeaponTrait.SECOND_LINE_FORMATION }),
@@ -7817,7 +7816,7 @@ namespace HammerAndSickle.Models
             // Phase 3 (derived): Artillery archetype bare (towed = foot, MMP 4) + IR SHORT. Generic light towed piece,
             // identical to the Soviet light towed line. → HA5 HD5 SA9 SD5 GAD8 · MMP4 · IR SHORT.
             WeaponProfile ART_LT_CH = WeaponProfile.FromProfileDef(
-                "Light Towed Artillery", "Light Artillery", WeaponType.ART_LIGHT_CH,
+                "Light Towed Artillery", "Light Artillery", WeaponType.ART_LIGHT_CH, GameData.MMP_MANHANDLED_GUN,
                 LightTowedArtilleryDef(WeaponTrait.SECOND_LINE_FORMATION),
                 UpgradePath.ART, 144);
 
@@ -7852,7 +7851,7 @@ namespace HammerAndSickle.Models
             // LONG → MEDIUM — range drift; it outranged every other heavy towed AND China's own SPA.
             // → HA5 HD5 SA10 SD5 GAD8 · MMP4 · IR MEDIUM.
             WeaponProfile ART_HV_CH = WeaponProfile.FromProfileDef(
-                "Heavy Towed Artillery", "Heavy Artillery", WeaponType.ART_HEAVY_CH,
+                "Heavy Towed Artillery", "Heavy Artillery", WeaponType.ART_HEAVY_CH, GameData.MMP_MANHANDLED_GUN,
                 HeavyTowedArtilleryDef(WeaponTrait.SECOND_LINE_FORMATION),
                 UpgradePath.ART, 144);
 
@@ -7889,7 +7888,7 @@ namespace HammerAndSickle.Models
             // Phase 3 (derived): Aaa archetype + SELF_PROPELLED (tracked) + IR AAA. Optically-aimed twin 57mm with no
             // radar (the Chinese ZSU-57-2 analogue), so it stays at base AAA gunnery. → HA4 HD6 SA9 SD8 GAD11 GAT11 · MMP10 · SR3.
             WeaponProfile TYPE53 = WeaponProfile.FromProfileDef(
-                "Type 53 Self-Propelled Anti-Aircraft Gun", "Type 53", WeaponType.SPAAA_TYPE53_CH,
+                "Type 53 Self-Propelled Anti-Aircraft Gun", "Type 53", WeaponType.SPAAA_TYPE53_CH, GameData.MMP_VEHICLE_STANDARD,
                 new ProfileDef(FamilyArchetypes.Aaa,
                     new Dictionary<ProfileStat, int> { { ProfileStat.IR, GameData.INDIRECT_RANGE_AAA } },
                     new[] { WeaponTrait.SELF_PROPELLED, WeaponTrait.SECOND_LINE_FORMATION }),
@@ -7926,7 +7925,7 @@ namespace HammerAndSickle.Models
             // IR SAM→SHORT 2026-08-22 (Bob): rides with the NATO point-defense band — it IS a Crotale clone (~12 km).
             // → HA1 HD5 SA1 SD5 GAD7 GAT14 · MMP10 · IR4 · SR6 · shoot-scoot.
             WeaponProfile HQ7 = WeaponProfile.FromProfileDef(
-                "HQ-7 Self-Propelled SAM System", "HQ-7", WeaponType.SPSAM_HQ7_CH,
+                "HQ-7 Self-Propelled SAM System", "HQ-7", WeaponType.SPSAM_HQ7_CH, GameData.MMP_VEHICLE_STANDARD,
                 new ProfileDef(FamilyArchetypes.Sam,
                     new Dictionary<ProfileStat, int> { { ProfileStat.IR, GameData.INDIRECT_RANGE_SHORT } },
                     new[] { WeaponTrait.SELF_PROPELLED, WeaponTrait.COMMAND_GUIDANCE, WeaponTrait.MOBILE_SHOOT_SCOOT,
@@ -7966,7 +7965,7 @@ namespace HammerAndSickle.Models
             // Phase 3 (derived): Helicopter + ATGM_HELO_SACLOS (HJ-8 SACLOS missiles, HA+4). Light Z-9-class AT helo —
             // unarmoured, no heavy cannon, so it sits below the armoured Hind. → HA11 HD6 SA10 SD7 GAD10 · ICM 0.90 (second line) · MMP24 · SR3.
             WeaponProfile Z9 = WeaponProfile.FromProfileDef(
-                "Z-9 Attack Helicopter", "Z-9", WeaponType.HEL_Z9_CH,
+                "Z-9 Attack Helicopter", "Z-9", WeaponType.HEL_Z9_CH, GameData.MMP_HELO,
                 new ProfileDef(FamilyArchetypes.Helicopter,
                     new Dictionary<ProfileStat, int>(),
                     new[] { WeaponTrait.ATGM_HELO_SACLOS, WeaponTrait.SECOND_LINE_FORMATION }),
@@ -8001,7 +8000,7 @@ namespace HammerAndSickle.Models
             // Phase 3 (derived): FighterEarly archetype bare (MiG-21 copy). Basic early air-superiority jet, GA Rule-A
             // floor 2. → DF8 MAN9 TS10 SUR6 GA2 OL6 · MMP100 · SR4.
             WeaponProfile J7 = WeaponProfile.FromProfileDef(
-                "J-7 Fighter", "J-7", WeaponType.FGT_J7_CH,
+                "J-7 Fighter", "J-7", WeaponType.FGT_J7_CH, GameData.MMP_FIXED_WING,
                 new ProfileDef(FamilyArchetypes.FighterEarly,
                     new Dictionary<ProfileStat, int>(),
                     new[] { WeaponTrait.SECOND_LINE_FORMATION }),
@@ -8033,7 +8032,7 @@ namespace HammerAndSickle.Models
             // look-down ICM (Chinese radar lag), so a notch under the radar-ICM Western jets. JUDGMENT CALL (flagged):
             // agility stays early-gen. → DF10 MAN9 TS13 SUR7 · GA2 OL6 · MMP100 · SR4.
             WeaponProfile J8 = WeaponProfile.FromProfileDef(
-                "J-8 Interceptor", "J-8", WeaponType.FGT_J8_CH,
+                "J-8 Interceptor", "J-8", WeaponType.FGT_J8_CH, GameData.MMP_FIXED_WING,
                 new ProfileDef(FamilyArchetypes.FighterEarly,
                     new Dictionary<ProfileStat, int> { { ProfileStat.TS, 3 } },
                     new[] { WeaponTrait.BVR_RADAR_MISSILE, WeaponTrait.RWR, WeaponTrait.HIGH_MACH_DASH, WeaponTrait.SECOND_LINE_FORMATION }),
@@ -8064,7 +8063,7 @@ namespace HammerAndSickle.Models
             // light attacker — no precision AG traits, so GA stays at the archetype floor 10, clearly below the A-10/Su-25
             // trait stack (15). JUDGMENT CALL (flagged). → DF2 MAN4 TS9 SUR10 GA10 OL9.
             WeaponProfile Q5 = WeaponProfile.FromProfileDef(
-                "Q-5 Fantan Attack Aircraft", "Q-5 Fantan", WeaponType.ATT_Q5_CH,
+                "Q-5 Fantan Attack Aircraft", "Q-5 Fantan", WeaponType.ATT_Q5_CH, GameData.MMP_FIXED_WING,
                 new ProfileDef(FamilyArchetypes.Attack,
                     new Dictionary<ProfileStat, int> { { ProfileStat.DF, -2 }, { ProfileStat.TS, 2 } },
                     new[] { WeaponTrait.SECOND_LINE_FORMATION }),
@@ -8094,7 +8093,7 @@ namespace HammerAndSickle.Models
             // Phase 3 (final-intent): Bomber + SUR+2 + CARPET_BOMBING (area anti-soft: GA+1→9, GaVsSoft+3 stored) +
             // STRATEGIC_PAYLOAD (OL+4→16). The H-6 IS the Tu-16 (licence copy) — same area level-bomber line. → DF1 MAN3 TS10 SUR10 GA9 OL16.
             WeaponProfile H6 = WeaponProfile.FromProfileDef(
-                "H-6 Bomber", "H-6", WeaponType.BMB_H6_CH,
+                "H-6 Bomber", "H-6", WeaponType.BMB_H6_CH, GameData.MMP_FIXED_WING,
                 new ProfileDef(FamilyArchetypes.Bomber,
                     new Dictionary<ProfileStat, int> { { ProfileStat.SUR, 2 } },
                     new[] { WeaponTrait.CARPET_BOMBING, WeaponTrait.STRATEGIC_PAYLOAD, WeaponTrait.SECOND_LINE_FORMATION }),
@@ -8128,7 +8127,7 @@ namespace HammerAndSickle.Models
             // Phase 3 (derived): Infantry archetype (GAD 10, R1) + RPG_LAW (HA+1) + MANPADS_BASIC (Strela, GAT floor 6
             // + EngageAir). PLA line infantry with organic AT + short-range air defence. → HA6 HD7 SA7 SD8 GAD10 · GAT6 · MMP4 · SR2.
             WeaponProfile INF_REG_CH_P = WeaponProfile.FromProfileDef(
-                "Chinese Regular Infantry", "PLA Regulars", WeaponType.INF_REG_CH,
+                "Chinese Regular Infantry", "PLA Regulars", WeaponType.INF_REG_CH, GameData.MMP_WALKING,
                 new ProfileDef(FamilyArchetypes.Infantry,
                     new Dictionary<ProfileStat, int>(),
                     new[] { WeaponTrait.RPG_LAW, WeaponTrait.MANPADS_BASIC, WeaponTrait.SECOND_LINE_FORMATION }));
@@ -8165,7 +8164,7 @@ namespace HammerAndSickle.Models
             // Phase 3 (derived): Infantry + RPG_LAW + MANPADS_BASIC + AIR_DROPPABLE (PLA airborne — parachute deploy).
             // → HA6 HD7 SA7 SD8 GAD10 · GAT6 · MMP4 · SR2 · air-droppable.
             WeaponProfile INF_AB_CH_P = WeaponProfile.FromProfileDef(
-                "Chinese Airborne Infantry", "PLA Airborne", WeaponType.INF_AB_CH,
+                "Chinese Airborne Infantry", "PLA Airborne", WeaponType.INF_AB_CH, GameData.MMP_WALKING,
                 new ProfileDef(FamilyArchetypes.Infantry,
                     new Dictionary<ProfileStat, int>(),
                     new[] { WeaponTrait.RPG_LAW, WeaponTrait.MANPADS_BASIC, WeaponTrait.AIR_DROPPABLE,

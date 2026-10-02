@@ -1,3 +1,4 @@
+using System;
 using System.Collections.Generic;
 using HammerAndSickle.Core.GameData;
 
@@ -334,7 +335,7 @@ namespace HammerAndSickle.Models
         /// <summary>
         /// Builds a WeaponProfile from the Archetype + Delta + Trait model (Appendix W §1). The ProfileDef
         /// is resolved by <see cref="TraitResolver"/> into the FULL statline — all 17 ProfileStats
-        /// (HA/HD/SA/SD/GAT/GAD, the air block DF/MAN/TS/SUR, plus GA/OL/STL/PR/IR/SR and MMP) — the stored
+        /// (HA/HD/SA/SD/GAT/GAD, the air block DF/MAN/TS/SUR, plus GA/OL/STL/PR/IR/SR; movement is supplied explicitly) — the stored
         /// ICM, and a capability set. This is the Phase 3 entry point that replaces the additive per-profile
         /// constructor calls in WeaponProfileDB.
         ///
@@ -348,10 +349,17 @@ namespace HammerAndSickle.Models
         /// prefix by the constructor; override afterward if needed.
         /// </summary>
         public static WeaponProfile FromProfileDef(
-            string longName, string shortName, WeaponType type, ProfileDef def,
+            string longName, string shortName, WeaponType type, int maxMovementPoints, ProfileDef def,
             UpgradePath upgradePath = UpgradePath.None, int turnAvailable = 0)
         {
+            if (maxMovementPoints < 0)
+                throw new ArgumentOutOfRangeException(nameof(maxMovementPoints));
+            if ((def.Archetype.Stats?.ContainsKey(ProfileStat.MMP) ?? false) ||
+                (def.Deltas?.ContainsKey(ProfileStat.MMP) ?? false))
+                throw new ArgumentException("Movement must be selected explicitly, not supplied by archetype/delta arithmetic.", nameof(def));
             TraitResolver.Result r = TraitResolver.Resolve(def);
+            if (r.Stats.ContainsKey(ProfileStat.MMP))
+                throw new ArgumentException("Traits cannot modify the explicit movement allowance.", nameof(def));
             var caps = new HashSet<WeaponCapability>(r.Capabilities);
 
             var profile = new WeaponProfile(
@@ -360,7 +368,7 @@ namespace HammerAndSickle.Models
                 r.Stat(ProfileStat.GAT), r.Stat(ProfileStat.GAD),
                 r.Stat(ProfileStat.DF), r.Stat(ProfileStat.MAN), r.Stat(ProfileStat.TS), r.Stat(ProfileStat.SUR),
                 r.Stat(ProfileStat.GA), r.Stat(ProfileStat.OL), r.Stat(ProfileStat.STL),
-                r.Stat(ProfileStat.PR), r.Stat(ProfileStat.IR), r.Stat(ProfileStat.SR), r.Stat(ProfileStat.MMP),
+                r.Stat(ProfileStat.PR), r.Stat(ProfileStat.IR), r.Stat(ProfileStat.SR), maxMovementPoints,
                 upgradePath, turnAvailable);
 
             profile.SetICM(r.ICM);

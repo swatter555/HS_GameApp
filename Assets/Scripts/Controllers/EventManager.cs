@@ -177,6 +177,8 @@ namespace HammerAndSickle.Controllers
         // (OnCombatActionRequested retired 2026-07-06 — no Combat button; Ctrl+left-click is the only combat trigger, §5.10.6)
         public event Action<CombatUnit> OnDeployUpRequested;
         public event Action<CombatUnit> OnDeployDownRequested;
+        public event Action<CombatUnit> OnAirEmbarkRequested;
+        public event Action<CombatUnit> OnAirDisembarkRequested;
         public event Action<CombatUnit> OnIntelActionRequested;
         public event Action<CombatUnit, bool> OnResupplyRequested;   // (unit, includeReplacements §15.4a.4a)
         public event Action<CombatUnit> OnUpgradeEquipmentRequested;
@@ -520,6 +522,18 @@ namespace HammerAndSickle.Controllers
             catch (Exception e) { AppService.HandleException(CLASS_NAME, nameof(RaiseDeployDownRequested), e); }
         }
 
+        public void RaiseAirEmbarkRequested(CombatUnit unit)
+        {
+            try { OnAirEmbarkRequested?.Invoke(unit); }
+            catch (Exception e) { AppService.HandleException(CLASS_NAME, nameof(RaiseAirEmbarkRequested), e); }
+        }
+
+        public void RaiseAirDisembarkRequested(CombatUnit unit)
+        {
+            try { OnAirDisembarkRequested?.Invoke(unit); }
+            catch (Exception e) { AppService.HandleException(CLASS_NAME, nameof(RaiseAirDisembarkRequested), e); }
+        }
+
         public void RaiseIntelActionRequested(CombatUnit unit)
         {
             try { OnIntelActionRequested?.Invoke(unit); }
@@ -735,6 +749,8 @@ namespace HammerAndSickle.Controllers
             // Unit action events
             OnDeployUpRequested = null;
             OnDeployDownRequested = null;
+            OnAirEmbarkRequested = null;
+            OnAirDisembarkRequested = null;
             OnIntelActionRequested = null;
             OnResupplyRequested = null;
             OnUpgradeEquipmentRequested = null;

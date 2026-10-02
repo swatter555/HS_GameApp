@@ -94,9 +94,11 @@ namespace HammerAndSickle.Models.Combat
                 if (reason != null)
                     return new IndirectCombatOutcome { Executed = false, Reason = reason };
 
-                // §8.2.1 — 1 CombatAction + 25% max MP; supply GATED here, rolled probabilistically below (§7.15.7.1).
+                // §8.2.1 — 1 CombatAction + no MP fee; supply GATED here, rolled probabilistically below (§7.15.7.1).
                 if (!firer.PerformCombatAction())
                     return new IndirectCombatOutcome { Executed = false, Reason = "Firer cannot afford the combat action." };
+
+                firer.Facing = HexMapUtil.GetGeneralDirection(firer.MapPos, target.MapPos);
 
                 firer.MarkFoughtThisTurn();
                 target.MarkFoughtThisTurn();

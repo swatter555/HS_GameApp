@@ -579,5 +579,34 @@ namespace HammerAndSickle.Tests
         }
 
         #endregion // Snapshot persistence
+        [Test]
+        public void SnapshotAndSaveRoundTrip_PreservesActiveLiftCeiling_Budgets_AndOffensiveLocks()
+        {
+            var unit = new CombatUnit("Lift", UnitClassification.MAM, UnitRole.GroundCombat, Side.Player,
+                Nationality.USSR, deployedProfile: WeaponType.INF_AM_SV,
+                mobileProfile: WeaponType.APC_MTLB_SV, embarkedProfile: WeaponType.HEL_MI8T_SV);
+            unit.SetDeploymentPosition(DeploymentPosition.Embarked);
+            unit.RefreshMovementPointsForPosture();
+            unit.RefreshAllActions();
+            unit.MovementPoints.SetCurrent(13.5f);
+            unit.CombatActions.SetMax(3);
+            unit.CombatActions.SetCurrent(3);
+            Assert.That(unit.PerformCombatAction(), Is.True);
+            GameManager.RegisterCombatUnit(unit);
+            var snapshot = Persistence.SnapshotMapper.ToSnapshot(GameManager);
+            var copy = snapshot.Units[unit.UnitID];
+            Assert.That(copy.MovementPoints.Max, Is.EqualTo(24));
+            Assert.That(copy.MovementPoints.Current, Is.EqualTo(13.5f));
+            Assert.That(copy.MoveActions.Max, Is.EqualTo(2));
+            Assert.That(copy.CombatActions.Max, Is.EqualTo(3));
+            Assert.That(copy.CombatActions.Current, Is.EqualTo(2));
+            Assert.That(copy.HasInitiatedCombatThisTurn, Is.True);
+            string json = System.Text.Json.JsonSerializer.Serialize(copy, Persistence.JsonPolicy.Save);
+            var restored = System.Text.Json.JsonSerializer.Deserialize<CombatUnit>(json, Persistence.JsonPolicy.Save);
+            restored.DeploymentActions.SetCurrent(1);
+            Assert.That(restored.TryAirDisembark(out _), Is.False);
+            Assert.That(restored.MovementPoints.Max, Is.EqualTo(24));
+        }
+
     }
 }

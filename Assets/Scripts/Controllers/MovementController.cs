@@ -138,6 +138,8 @@ namespace HammerAndSickle.Controllers
                 EventManager.Instance.OnIntelActionRequested += HandleIntelActionRequested;
                 EventManager.Instance.OnDeployUpRequested += HandleDeployUpRequested;
                 EventManager.Instance.OnDeployDownRequested += HandleDeployDownRequested;
+                EventManager.Instance.OnAirEmbarkRequested += HandleAirEmbarkRequested;
+                EventManager.Instance.OnAirDisembarkRequested += HandleAirDisembarkRequested;
             }
         }
 
@@ -158,6 +160,8 @@ namespace HammerAndSickle.Controllers
                 EventManager.Instance.OnIntelActionRequested -= HandleIntelActionRequested;
                 EventManager.Instance.OnDeployUpRequested -= HandleDeployUpRequested;
                 EventManager.Instance.OnDeployDownRequested -= HandleDeployDownRequested;
+                EventManager.Instance.OnAirEmbarkRequested -= HandleAirEmbarkRequested;
+                EventManager.Instance.OnAirDisembarkRequested -= HandleAirDisembarkRequested;
             }
         }
 
@@ -181,7 +185,11 @@ namespace HammerAndSickle.Controllers
 
         private void HandleDeployDownRequested(CombatUnit unit) => TryChangeDeployment(unit, deployUp: false);
 
-        private void TryChangeDeployment(CombatUnit unit, bool deployUp)
+        private void HandleAirEmbarkRequested(CombatUnit unit) => TryChangeDeployment(unit, true, airTransition: true);
+
+        private void HandleAirDisembarkRequested(CombatUnit unit) => TryChangeDeployment(unit, false, airTransition: true);
+
+        private void TryChangeDeployment(CombatUnit unit, bool deployUp, bool airTransition = false)
         {
             try
             {
@@ -190,9 +198,13 @@ namespace HammerAndSickle.Controllers
                 if (unit.Side != Side.Player) return;
 
                 string error;
-                bool changed = deployUp
-                    ? unit.TryDeployUP(out error, IsAdjacentToActiveFriendlyAirbase(unit), IsOnPortHex(unit))
-                    : unit.TryDeployDOWN(out error, IsOnPortHex(unit), IsOnBeachheadHex(unit));
+                bool changed = airTransition
+                    ? (deployUp
+                        ? unit.TryAirEmbark(out error, IsAdjacentToActiveFriendlyAirbase(unit), IsInKnownEnemyZoc(unit))
+                        : unit.TryAirDisembark(out error))
+                    : (deployUp
+                        ? unit.TryDeployUP(out error, onPort: IsOnPortHex(unit))
+                        : unit.TryDeployDOWN(out error, IsOnPortHex(unit), IsOnBeachheadHex(unit)));
 
                 if (!changed)
                 {
@@ -286,49 +298,31 @@ namespace HammerAndSickle.Controllers
             return false;
         }
 
+        // Uses the same spotted-contact boundary as movement previews; unseen contacts are not exposed
+        // by a boarding refusal. Actual movement halts are independently latched on CombatUnit.
+        private static bool IsInKnownEnemyZoc(CombatUnit unit)
+        {
+            foreach (var enemy in GameDataManager.Instance.GetAIUnits())
+            {
+                if (enemy.IsDestroyed() || enemy.SpottedLevel == SpottedLevel.Level0 || !enemy.ProjectsZoC) continue;
+                foreach (var pos in HexMapUtil.GetAllNeighborPositions(enemy.MapPos))
+                    if (pos.Equals(unit.MapPos)) return true;
+            }
+            return false;
+        }
+
         #endregion // Deployment Actions
 
         #region Intel Action
 
-        /// <summary>
-        /// Handles a GatherIntel request (§12.4.5): spends the unit's IntelAction, then raises every ADJACENT
-        /// enemy one rung (ceiling Level 5). This is the only route to Level 5 and the deliberate alternative
-        /// to attacking — three IntelActions walk a contact to a full picture without firing a shot.
-        ///
-        /// Player turn only, and the action is spent BEFORE the intel is applied so a unit that cannot pay
-        /// (no IntelAction, or below the §8.2.4 MP/supply floor) learns nothing.
-        /// </summary>
+        /// <summary>HQ intel must not invoke the separate ground-recon action.</summary>
         private void HandleIntelActionRequested(CombatUnit unit)
         {
-            try
-            {
-                if (unit == null) return;
-                if (_currentPhase != BattlePhase.PlayerTurn) return;
-                if (unit.Side != Side.Player) return;
-
-                if (!unit.PerformIntelAction())
-                {
-                    AppService.CaptureUiMessage($"{unit.UnitName} cannot gather intel right now.");
-                    GameAudio.Play(SFX.ButtonDenied);
-                    return;
-                }
-
-                SpottingService.ApplyGroundIntelAction(unit);
-
-                if (EventManager.Instance != null)
-                {
-                    EventManager.Instance.RaiseUnitActionsChanged(unit);
-                    EventManager.Instance.RaiseUnitMovementPointsChanged(unit);
-                    EventManager.Instance.RaiseRedrawMapIcons();
-                }
-
-                // Intel spends MP, so the movement overlay must be re-derived for the selected unit.
-                if (CurrentUnit == unit) RecomputeRangeAndRaise(GameDataManager.CurrentHexMap);
-            }
-            catch (Exception e)
-            {
-                AppService.HandleException(CLASS_NAME, nameof(HandleIntelActionRequested), e);
-            }
+            if (unit == null || _currentPhase != BattlePhase.PlayerTurn || unit.Side != Side.Player) return;
+            AppService.CaptureUiMessage(unit.GetIntelActions() < 1
+                ? $"{unit.UnitName} cannot gather base intel right now."
+                : "HQ intelligence gathering is unavailable while SIGINT rules are pending implementation.");
+            GameAudio.Play(SFX.ButtonDenied);
         }
 
         #endregion // Intel Action
@@ -860,6 +854,7 @@ namespace HammerAndSickle.Controllers
 
             for (int i = 0; i < _currentPath.Count; i++)
             {
+                if (!CurrentUnit.CanContinueMoveOrder()) break;
                 var targetTile = _currentPath[i];
                 var targetPos = targetTile.Position;
 
@@ -1388,7 +1383,7 @@ namespace HammerAndSickle.Controllers
             if (helo.DeploymentPosition == DeploymentPosition.Embarked
                 && MovementModeService.CurrentMedium(helo) == MovementMedium.Helo)
             {
-                helo.TryDeployDOWN(out _);
+                helo.ForceAirLandingAfterBreakOff();
             }
 
             GameIconRenderer.Instance?.SnapIcon(helo.UnitID, originPos);
@@ -1402,7 +1397,7 @@ namespace HammerAndSickle.Controllers
         internal static void ApplyMovementHalt(CombatUnit unit, MovementHalt kind)
         {
             // Common to every halt: the move order is over.
-            unit.MoveActions.SetCurrent(0);
+            unit.MarkMovementHalted();
 
             switch (kind)
             {

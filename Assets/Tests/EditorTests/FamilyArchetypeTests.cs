@@ -57,14 +57,14 @@ namespace HammerAndSickle.Tests
         [Test]
         public void Infantry_ResolvesRatifiedLine()
         {
-            try { AssertGround(Resolve(FamilyArchetypes.Infantry), 5, 7, 7, 8, 10, 4); }
+            try { AssertGround(Resolve(FamilyArchetypes.Infantry), 5, 7, 7, 8, 10, 0); }
             catch (Exception ex) { AppService.HandleException(CLASS_NAME, nameof(Infantry_ResolvesRatifiedLine), ex); throw; }
         }
 
         [Test]
         public void Apc_ResolvesRatifiedLine()
         {
-            try { AssertGround(Resolve(FamilyArchetypes.Apc), 3, 4, 6, 7, 7, 8); }
+            try { AssertGround(Resolve(FamilyArchetypes.Apc), 3, 4, 6, 7, 7, 0); }
             catch (Exception ex) { AppService.HandleException(CLASS_NAME, nameof(Apc_ResolvesRatifiedLine), ex); throw; }
         }
 
@@ -72,7 +72,7 @@ namespace HammerAndSickle.Tests
         public void Ifv_ResolvesRatifiedLine()
         {
             // SA 8 (R4), GAD 7 (R1).
-            try { AssertGround(Resolve(FamilyArchetypes.Ifv), 4, 4, 8, 7, 7, 10); }
+            try { AssertGround(Resolve(FamilyArchetypes.Ifv), 4, 4, 8, 7, 7, 0); }
             catch (Exception ex) { AppService.HandleException(CLASS_NAME, nameof(Ifv_ResolvesRatifiedLine), ex); throw; }
         }
 
@@ -80,7 +80,7 @@ namespace HammerAndSickle.Tests
         public void Artillery_ResolvesRatifiedLine()
         {
             // Towed = foot (MMP 4).
-            try { AssertGround(Resolve(FamilyArchetypes.Artillery), 5, 5, 9, 5, 8, 4); }
+            try { AssertGround(Resolve(FamilyArchetypes.Artillery), 5, 5, 10, 5, 8, 0); }
             catch (Exception ex) { AppService.HandleException(CLASS_NAME, nameof(Artillery_ResolvesRatifiedLine), ex); throw; }
         }
 
@@ -88,7 +88,7 @@ namespace HammerAndSickle.Tests
         public void Aaa_ResolvesRatifiedLine()
         {
             // GAT 11 (2026-06-18 GAT rebalance, 7/10 lethality), GAD 12, towed = foot (MMP 4).
-            try { AssertGround(Resolve(FamilyArchetypes.Aaa), 4, 4, 9, 6, 12, 4, gat: 11); }
+            try { AssertGround(Resolve(FamilyArchetypes.Aaa), 4, 4, 9, 6, 12, 0, gat: 11); }
             catch (Exception ex) { AppService.HandleException(CLASS_NAME, nameof(Aaa_ResolvesRatifiedLine), ex); throw; }
         }
 
@@ -96,21 +96,21 @@ namespace HammerAndSickle.Tests
         public void Sam_ResolvesRatifiedLine()
         {
             // Air-only (HA/SA 1, §7A.13), GAT 12 (2026-06-18 GAT rebalance), towed = foot (MMP 4).
-            try { AssertGround(Resolve(FamilyArchetypes.Sam), 1, 3, 1, 3, 8, 4, gat: 12); }
+            try { AssertGround(Resolve(FamilyArchetypes.Sam), 1, 3, 1, 3, 8, 0, gat: 12); }
             catch (Exception ex) { AppService.HandleException(CLASS_NAME, nameof(Sam_ResolvesRatifiedLine), ex); throw; }
         }
 
         [Test]
         public void Helicopter_ResolvesRatifiedLine()
         {
-            try { AssertGround(Resolve(FamilyArchetypes.Helicopter), 7, 6, 10, 7, 10, 24); }
+            try { AssertGround(Resolve(FamilyArchetypes.Helicopter), 7, 6, 10, 7, 10, 0); }
             catch (Exception ex) { AppService.HandleException(CLASS_NAME, nameof(Helicopter_ResolvesRatifiedLine), ex); throw; }
         }
 
         [Test]
         public void Truck_ResolvesRatifiedLine()
         {
-            try { AssertGround(Resolve(FamilyArchetypes.Truck), 3, 3, 3, 3, 6, 8); }
+            try { AssertGround(Resolve(FamilyArchetypes.Truck), 3, 3, 3, 3, 6, 0); }
             catch (Exception ex) { AppService.HandleException(CLASS_NAME, nameof(Truck_ResolvesRatifiedLine), ex); throw; }
         }
 
@@ -129,35 +129,35 @@ namespace HammerAndSickle.Tests
         [Test]
         public void FighterEarly_ResolvesRatifiedLine()
         {
-            try { AssertAir(Resolve(FamilyArchetypes.FighterEarly), 8, 9, 10, 6, 100); }
+            try { AssertAir(Resolve(FamilyArchetypes.FighterEarly), 8, 9, 10, 6, 0); }
             catch (Exception ex) { AppService.HandleException(CLASS_NAME, nameof(FighterEarly_ResolvesRatifiedLine), ex); throw; }
         }
 
         [Test]
         public void FighterMid_ResolvesRatifiedLine()
         {
-            try { AssertAir(Resolve(FamilyArchetypes.FighterMid), 10, 11, 10, 7, 100); }
+            try { AssertAir(Resolve(FamilyArchetypes.FighterMid), 10, 11, 10, 7, 0); }
             catch (Exception ex) { AppService.HandleException(CLASS_NAME, nameof(FighterMid_ResolvesRatifiedLine), ex); throw; }
         }
 
         [Test]
         public void FighterLate_ResolvesRatifiedLine()
         {
-            try { AssertAir(Resolve(FamilyArchetypes.FighterLate), 12, 12, 10, 9, 100); }
+            try { AssertAir(Resolve(FamilyArchetypes.FighterLate), 12, 12, 10, 9, 0); }
             catch (Exception ex) { AppService.HandleException(CLASS_NAME, nameof(FighterLate_ResolvesRatifiedLine), ex); throw; }
         }
 
         [Test]
         public void Attack_ResolvesRatifiedLine()
         {
-            try { AssertAir(Resolve(FamilyArchetypes.Attack), 4, 4, 7, 10, 100); }
+            try { AssertAir(Resolve(FamilyArchetypes.Attack), 4, 4, 7, 10, 0); }
             catch (Exception ex) { AppService.HandleException(CLASS_NAME, nameof(Attack_ResolvesRatifiedLine), ex); throw; }
         }
 
         [Test]
         public void Bomber_ResolvesRatifiedLine()
         {
-            try { AssertAir(Resolve(FamilyArchetypes.Bomber), 1, 3, 10, 8, 100); }
+            try { AssertAir(Resolve(FamilyArchetypes.Bomber), 1, 3, 10, 8, 0); }
             catch (Exception ex) { AppService.HandleException(CLASS_NAME, nameof(Bomber_ResolvesRatifiedLine), ex); throw; }
         }
 
@@ -192,11 +192,11 @@ namespace HammerAndSickle.Tests
         #region Mechanics guards
 
         [Test]
-        public void FixedWing_MMP_NotClampedTo25()
+        public void FixedWing_DoesNotSupplyMovement()
         {
             // The §1 [1,25] clamp is band-stats only; FIXEDWING MMP 100 must pass through intact.
-            try { Assert.AreEqual(100, Resolve(FamilyArchetypes.Bomber).Stat(ProfileStat.MMP)); }
-            catch (Exception ex) { AppService.HandleException(CLASS_NAME, nameof(FixedWing_MMP_NotClampedTo25), ex); throw; }
+            try { Assert.AreEqual(0, Resolve(FamilyArchetypes.Bomber).Stat(ProfileStat.MMP)); }
+            catch (Exception ex) { AppService.HandleException(CLASS_NAME, nameof(FixedWing_DoesNotSupplyMovement), ex); throw; }
         }
 
         [Test]

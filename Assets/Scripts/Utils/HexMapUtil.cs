@@ -353,7 +353,7 @@ namespace HammerAndSickle.Models.Map
             {
                 if (map == null || unit == null) return result;
 
-                int maxMP = Mathf.RoundToInt(unit.MovementPoints.Current);
+                int maxMP = Mathf.FloorToInt(unit.MovementPoints.Current);
                 if (maxMP <= 0) return result;
 
                 // Aboard sealift there is no per-hex movement to compute (§5.4.2.3 — instant port-to-port,

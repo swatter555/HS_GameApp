@@ -266,7 +266,7 @@ namespace HammerAndSickle.SceneManagement
 
         /// <summary>
         /// Moves the selected unit one step toward Embarked (Fortified → Entrenched → Hasty → Deployed →
-        /// Mobile → Embarked). LIVE as of 2026-07-28 — `MovementController` services the event.
+        /// Mobile; naval boarding at ports). LIVE as of 2026-07-28 — `MovementController` services the event.
         /// </summary>
         public void OnDeployUpButton() => RequestDeploymentChange(deployUp: true);
 
@@ -301,7 +301,24 @@ namespace HammerAndSickle.SceneManagement
         /// <summary>Spends the unit's IntelAction (§8.2.4). Will raise EventManager.RaiseIntelActionRequested(unit)
         /// — ⚠ this is the ONE unit-order event that already has a subscriber, so wire it last and expect
         /// real behaviour the moment the stub is replaced.</summary>
-        public void OnGatherIntelButton() => ReportForSelectedUnit("Gather intel");
+        public void OnGatherIntelButton()
+        {
+            var unit = GameDataManager.SelectedUnit;
+            if (unit == null) { AppService.CaptureUiMessage("No unit selected."); return; }
+            EventManager.Instance?.RaiseIntelActionRequested(unit);
+        }
+
+        public void OnAirEmbarkButton() => RequestAirTransition(true);
+
+        public void OnAirDisembarkButton() => RequestAirTransition(false);
+
+        private void RequestAirTransition(bool embark)
+        {
+            var unit = GameDataManager.SelectedUnit;
+            if (unit == null) { AppService.CaptureUiMessage("No unit selected."); return; }
+            if (embark) EventManager.Instance?.RaiseAirEmbarkRequested(unit);
+            else EventManager.Instance?.RaiseAirDisembarkRequested(unit);
+        }
 
         /// <summary>Reverts the selected unit's last move. Will raise EventManager.RaiseMoveUndoRequested(unit).</summary>
         public void OnUndoButton() => ReportForSelectedUnit("Undo move");

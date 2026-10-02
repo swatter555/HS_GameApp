@@ -51,6 +51,8 @@ This map describes the implementation that exists. The [design document][design]
 
 The vault is `C:/Users/coder/Desktop/Codex Projects`. Company standards, job descriptions, the active TODO, design and cross-project correspondence live there. Versioned setup, implementation architecture and data-contract details live here. The vault is outside this Git repository; repository commits do not back it up.
 
+Action economy and movement (2026-10-02): [implemented contract and verification](<Action Economy Implementation.md>) records explicit MMP assignments for all 264 profiles, artillery +1 SA, offensive order locks, HQ-only intel allocation (SIGINT execution deferred), distinct air commands, fractional MP and AB/entrenchment overrides, active-helicopter refresh and snapshot ceilings. [Complete catalog comparison](<Weapon Profile Movement Audit.tsv>) preserves every ID and old/new value. Existing scene/prefab authoring remains separate; Air Embark / Air Disembark callbacks need manual Unity wiring. Native acceptance is pending.
+
 ## Runtime ownership and navigation
 
 Paths below are relative to `Assets/Scripts`.

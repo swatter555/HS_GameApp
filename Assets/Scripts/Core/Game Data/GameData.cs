@@ -1908,8 +1908,8 @@ namespace HammerAndSickle.Core.GameData
 
         //public const float MOBILE_MOVEMENT_BONUS = 2.0f;  // Movement point bonus for Mobile units without MountedProfile
         public const float DEPLOYMENT_ACTION_MOVEMENT_COST = 0.5f;  // Deployment actions cost 50% of max movement
-        public const float COMBAT_ACTION_MOVEMENT_COST = 0.25f; // Combat actions cost 25% of max movement
-        public const float INTEL_ACTION_MOVEMENT_COST = 0.15f; // Intel actions cost 15% of max movement
+        public const float COMBAT_ACTION_MOVEMENT_COST = 0f; // Combat spends actions, not MP
+        public const float INTEL_ACTION_MOVEMENT_COST = 0f; // Intel spends actions, not MP
 
 
         // Defender firepower modifications for deployment states.
@@ -1980,7 +1980,7 @@ namespace HammerAndSickle.Core.GameData
         // Combat action defaults
         public const int DEFAULT_MOVE_ACTIONS = 1;
         public const int DEFAULT_COMBAT_ACTIONS = 1;
-        public const int DEFAULT_INTEL_ACTIONS = 1;
+        public const int DEFAULT_INTEL_ACTIONS = 0;
         public const int DEFAULT_DEPLOYMENT_ACTIONS = 1;
         public const int DEFAULT_OPPORTUNITY_ACTIONS = 0;  // §8.5.4 — Opp is NOT universal; granted only to reactive-fire roles
 
@@ -2023,7 +2023,18 @@ namespace HammerAndSickle.Core.GameData
 
         // Movement constants for WeaponSystems,in movement points.
         public const int STATIC_UNIT = 0;
-        public const int FOOT_UNIT = 4;
+        public const int MMP_IMMOBILE = 0;
+        public const int MMP_WALKING = 3;
+        public const int MMP_MANHANDLED_GUN = 2;
+        public const int MMP_TRUCK = 8;
+        public const int MMP_VEHICLE_SLOW = 8;
+        public const int MMP_VEHICLE_STANDARD = 10;
+        public const int MMP_VEHICLE_FAST = 12;
+        public const int MMP_CAVALRY = 10;
+        public const int MMP_NAVAL_TRANSPORT = 10;
+        public const int MMP_HELO = 24;
+        public const int MMP_FIXED_WING = 100;
+        public const int FOOT_UNIT = MMP_WALKING;
         public const int MOT_UNIT = 8;
         public const int MECH_UNIT = 10;
         public const int CAVALRY_UNIT = 10;

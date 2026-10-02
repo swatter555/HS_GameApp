@@ -115,21 +115,21 @@ namespace HammerAndSickle.Tests
             try
             {
                 // 2S19 SP howitzer: Krasnopol SMART_MUNITION (HA 8) on the tracked chassis.
-                AssertGround(WeaponType.SPA_2S19_SV, 8, 7, 10, 7, 7, 0);
+                AssertGround(WeaponType.SPA_2S19_SV, 8, 7, 11, 7, 7, 0);
                 Assert.AreEqual(10, (int)P(WeaponType.SPA_2S19_SV).MaxMovementPoints, "2S19 MMP (SELF_PROPELLED)");
                 Assert.AreEqual(5,  (int)P(WeaponType.SPA_2S19_SV).IndirectRange, "2S19 IR");
 
                 // Towed light: bare Artillery archetype (foot, MMP 4), GAD 8.
-                AssertGround(WeaponType.ART_LIGHT_SV, 5, 5, 9, 5, 8, 0);
-                Assert.AreEqual(4, (int)P(WeaponType.ART_LIGHT_SV).MaxMovementPoints, "Lt towed MMP 4");
+                AssertGround(WeaponType.ART_LIGHT_SV, 5, 5, 10, 5, 8, 0);
+                Assert.AreEqual(2, (int)P(WeaponType.ART_LIGHT_SV).MaxMovementPoints, "Lt towed MMP 4");
 
                 // BM-21: rocket artillery → RocketArtillery capability; truck chassis GAD 6, MMP 8.
-                AssertGround(WeaponType.ROC_BM21_SV, 5, 5, 9, 5, 6, 0);
+                AssertGround(WeaponType.ROC_BM21_SV, 5, 5, 10, 5, 6, 0);
                 Assert.IsTrue(P(WeaponType.ROC_BM21_SV).HasCapability(WeaponCapability.RocketArtillery), "BM-21 rocket-artillery double-fire");
                 Assert.AreEqual(8, (int)P(WeaponType.ROC_BM21_SV).MaxMovementPoints, "BM-21 MMP (TRUCK_MOUNTED)");
 
                 // Scud (R3): HA 11 / SA 15, single-fire (W5 excludes it from ROCKET_ARTILLERY).
-                AssertGround(WeaponType.ROC_SCUD_SV, 11, 5, 15, 5, 6, 0);
+                AssertGround(WeaponType.ROC_SCUD_SV, 11, 5, 16, 5, 6, 0);
                 Assert.IsFalse(P(WeaponType.ROC_SCUD_SV).HasCapability(WeaponCapability.RocketArtillery), "Scud is single-fire (W5)");
             }
             catch (Exception ex) { AppService.HandleException(CLASS_NAME, nameof(Artillery_ResolveConvertedLines), ex); throw; }

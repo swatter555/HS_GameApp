@@ -1,0 +1,48 @@
+# Action economy implementation — 2026-10-02
+
+Robert authorized implementation, scoped commits and normal pushes. Latest assignment supersedes provisional alternatives in the [working notes](<C:/Users/coder/Desktop/Codex Projects/HS Game/Action Economy Working Notes.md>) and [movement register](<C:/Users/coder/Desktop/Codex Projects/HS Game/Weapon Profile Movement Designations.md>).
+
+## Stages and acceptance
+
+1. **Catalog authority.** Require explicit maximum MP at profile construction; assign all 264 profiles to named constants; remove permanent MMP arithmetic from archetypes, profile deltas and traits. Walking Stinger = 3, heavy mortar and foot-served Mujahideen AAA = 2. Preserve powered speeds, identifiers, media, other stats and profile adjustments; artillery-family SA increases by exactly 1. Compare actual initialized catalogs before/after, retaining every row.
+2. **Action and transition rules.** Remove combat/intel MP fees and gates; HQ alone retains base IntelActions. Successful voluntary combat clears move/deploy/intel, stops active travel, preserves combat extras and OpportunityActions. Direct/indirect attacks face their target only after validation/payment. Defensive reactions retain their existing rules. Separate ground deployment and direct air boarding commands. AM/MAM and AB/MAB have one shared deployment action; helo boarding assigns exactly one move action, no MP fee, no disembark refill and no forced-halt escape. Turn-start active helicopter modes receive two moves. AB full-MP boarding beside an active friendly airbase and landing explicitly zero MP. Defensive dig-in requires half MP and consumes all MP; bare landing/dismount is separate. Preserve fractional MP without cycling gains. Repair snapshot active-profile ceilings where implicated.
+3. **Verification and publication.** Compile Main and EditorTests with the pinned local Unity references into isolated temporary outputs. Run focused managed assertions and catalog audits, then broader applicable managed regressions. Native Unity tests, fresh MainMenu-to-Khost load, UI playtest and Windows build require an available permitted runner. Review task-relative diff, protect every unrelated baseline file, update canonical vault decisions/checklist and repository contracts, commit only owned changes and verify normal push against origin/main. No scenario regeneration, asset authoring, dependency installation, merge or deployment.
+
+## Retained behavior and remaining decision
+
+- Ordinary ground transitions retain the existing 50% MP fee.
+- AM/MAM landing retains current Deployed posture, permitting one-action fly-land-attack; the old canonical Mobile alternative is superseded for this implementation.
+- HQ alone retains two base IntelActions; Gather Intel reports SIGINT unavailable without spending an action/supply. Full execution needs a separate decision for HQ rating, radio-silence history and one-sweep-versus-two-actions semantics. Ground recon remains separate.
+
+## Protected baseline
+
+Branch main, HEAD `92a5e3bbaf4c5275c6dd4202a8767eefd1905969`; origin `https://github.com/swatter555/HS_GameApp.git`. Existing NATO/icon/prefab centralization source/tests, Repository Map edits, authored scenes/prefabs, migration metadata, packages/settings and historical moves are unrelated and preserved. Task-start hashes, exact status, source copies, compiler responses and actual old catalog are in `C:/Users/coder/AppData/Local/Temp/hs-gameplay-20261002`.
+
+There are no callable Unity/Pipeline tools in this execution environment. The earlier STATUS_DESCRIPTOR_UNREADABLE denial is respected; no descriptor or direct-connection bypass will be used. Managed assertions are not Unity Test Runner results.
+
+## Implemented ownership
+
+- `GameData`, `WeaponProfile`, `WeaponProfileDB`, `TankArchetypes`, `FamilyArchetypes`, `WeaponTraitCatalog`: 11 named movement constants; factory requires explicit max including zero and rejects permanent MMP arithmetic. All 264 registrations select constants. Artillery base SA 9 -> 10; existing deltas remain.
+- `CombatUnit`: no combat/intel MP fee; offensive/forced-halt guards; one shared deployment action; explicit air transitions, fractional ordinary air MP, helo boarding one move, turn-start helos two, AB zero overrides, half-MP dig-in gate/all-MP cost. Ground mount/dismount still costs half MP. Defensive fire does not close orders.
+- `GroundCombatAction` / `IndirectCombatAction`: after validation/payment and before resolution, set only the firer's facing to the general target bearing. Existing defensive-facing behavior is preserved; implementing optional defender reactions is separate future work.
+- `MovementController`, `EventManager`, `DefaultDialog_Scene1`: separate air request callbacks/events; boarding checks known enemy ZoC using the movement-preview visibility boundary; forced halts independently prevent boarding escape. Forced helo transit break-off landing bypasses voluntary costs without refilling actions. HQ command never invokes adjacent-ground intel.
+- `OOBFileLoader`: fresh posture assignment followed by active MP ceiling/refill and action refresh. `SnapshotMapper`: active-profile ceiling, current fractional MP, all action capacities/current counts and voluntary-order locks preserved. Additive lock JSON fields preserve existing names and JsonPolicy; no legacy-save migration or scenario regeneration.
+- `HexMapUtil`: movement previews floor fractional MP rather than promising an unaffordable integer-cost hex.
+
+## Verification - 2026-10-02
+
+Main and EditorTests compile with the local Unity 6000.6.3f1 references using its bundled Roslyn compiler, with zero compiler diagnostics. Outputs are isolated in Local Temp, not Unity's assemblies.
+
+**176 managed assertion cases pass, zero failures:** 20 new action-economy cases, 22 deployment cases, 21 family cases, 52 national/factory/class profile cases, eight commodity cases, seven movement-medium cases, 31 combat/math/air-engine cases and 15 CombatOracle cases. These invoke assertion methods outside Unity and omit BaseTestFixture lifecycle; they are not Unity Test Runner results. The one native NATO asset assertion is excluded explicitly. Four added native integration cases (two direct facing, one indirect facing, one snapshot/JSON) compile but remain unrun.
+
+The complete actual initialized catalog comparison checks **264/264 IDs**. Movement counts: zero 8, manhandled 2 MP 35, walking 3 MP 33, 8 MP 30, 10 MP 74, 12 MP 12, helo 24 MP 21, fixed-wing 100 MP 51. Every ART/SPA/ROC profile, including Scud and irregular guns, gains exactly one SA. Other published scalar stats, media, capabilities, equipment census and icon bindings match the task-start catalog. The old catalog was compiled from task-start source copies; the new catalog from current source. No native Unity API is involved.
+
+All unrelated tracked files match task-start hashes, including existing icon/prefab source changes, tests, authored scenes/prefabs, packages/settings and metadata. Repository Map receives only the new contract paragraph in this commit; its earlier dirty edits remain unstaged. All existing asset GUIDs and Khost scenario files are preserved. `git diff --check` passes for owned paths. No repository CI workflow exists.
+
+## Native acceptance and manual UI wiring owed
+
+Robert offered to recompile Unity. Return to Unity and let it import/recompile; capture Console warning/error counts and the first error if any. Run the full EditorTests EditMode assembly and retain result XML/totals. Start from MainMenu and load Khost **fresh after catalog initialization**; refresh alone does not recompute profile ceilings. Verify movement previews/per-hex travel, ROC/leader extra attacks, defensive reactions, attack facing/refused clicks, fractional ground/helo changes, forced halts, AB board-next-turn-land-attack, entrenchment, and snapshot restoration. Check fog/stack/art presentation and Windows build.
+
+Existing authored scenes/prefabs were not edited. Add distinct Air Embark and Air Disembark controls in Unity and bind their Button.onClick to `DefaultDialog_Scene1.OnAirEmbarkButton` and `OnAirDisembarkButton`. Existing Deploy Up/Down callbacks now handle ground mounting/dismounting/dig-in and existing naval transitions. Gather Intel retains its existing `OnGatherIntelButton` name and reports the unresolved SIGINT implementation without charging. Do not reinterpret ground Deploy Up as air boarding.
+
+Native full EditorTests, Console, Play, fresh Khost and build remain **unrun by the agent** because no permitted native runner is available. The earlier STATUS_DESCRIPTOR_UNREADABLE restriction was respected. Shared OOB/profile IDs and enums did not change; no helper-application edits were necessary.

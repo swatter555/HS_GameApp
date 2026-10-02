@@ -11,9 +11,8 @@ namespace HammerAndSickle.Models
     /// consts were removed in Phase 4. The resolver/tests read these values directly.
     ///
     /// Conventions:
-    ///  - "Towed = foot": ART / AAA / SAM carry MMP 4 (the emplaced weapon). Self-propelled and
-    ///    truck-mobile variants get their mobility from a transport (Mobile-slot) profile or a
-    ///    chassis trait/delta in Phase 3 — there are no separate SP archetypes.
+    ///  - Maximum movement is explicitly selected at WeaponProfile construction; archetypes and traits
+    ///    do not supply movement arithmetic.
     ///  - GAT is carried ONLY where the family has a real baseline (AAA 11, SAM 12 after the 2026-06-18 rebalance). Everything else
     ///    is GAT 0 (W7) and gains air-attack via the MANPADS trait (GAT floor) in Phase 3.
     ///  - GA / OL on aircraft ARE archetype baselines (Appendix W §2 air table / Rule A, 2026-06-16):
@@ -40,67 +39,67 @@ namespace HammerAndSickle.Models
          * because it is SILENT and the coverage test fails on it; a wrong default is confident and
          * invisible. */
 
-        //                                              HA HD SA SD GAD MMP  (GAT)
+        //                                              HA HD SA SD GAD (GAT)
         /// <summary>Foot infantry baseline; soaks airstrikes (GAD 10, R1), MANPADS adds GAT later.</summary>
-        public static readonly Archetype Infantry   = Ground(5, 7, 7, 8, 10, 4, medium: MovementMedium.Foot);
+        public static readonly Archetype Infantry   = Ground(5, 7, 7, 8, 10, medium: MovementMedium.Foot);
         /// <summary>APC (MOT) — light-armour GAD 7 (R1). ⚠ MIXED FAMILY: medium is per profile.</summary>
-        public static readonly Archetype Apc        = Ground(3, 4, 6, 7, 7, 8);
+        public static readonly Archetype Apc        = Ground(3, 4, 6, 7, 7);
         /// <summary>IFV (MECH) — soft attack 8 (R4), light-armour GAD 7 (R1). Every IFV in the DB is tracked.</summary>
-        public static readonly Archetype Ifv        = Ground(4, 4, 8, 7, 7, 10, medium: MovementMedium.Tracked);
+        public static readonly Archetype Ifv        = Ground(4, 4, 8, 7, 7, medium: MovementMedium.Tracked);
         /// <summary>Light scout car (BRDM/M3-class) — weak gun but DELIBERATELY survivable (HD 5 / SD 9) so
         /// scouts soak the first blow and withdraw rather than getting one-shot out front (design call,
         /// 2026-06-15: "harden the hull"). Fast, SR 3. Add RECON_FRAGILE (R6) per scout profile to discourage
         /// brawling (offense ICM ×0.6); AT-recon variants drop it and add an ATGM trait instead.
         /// ⚠ MIXED FAMILY: medium is per profile.</summary>
-        public static readonly Archetype Recon      = Ground(2, 5, 5, 9, 7, 10, sr: 3);
-        /// <summary>Towed artillery baseline; soft towed GAD 8. SP gun = +mobility in Phase 3.
+        public static readonly Archetype Recon      = Ground(2, 5, 5, 9, 7, sr: 3);
+        /// <summary>Towed artillery baseline; soft towed GAD 8. Mobility is selected per profile.
         /// ⚠ MIXED FAMILY: medium is per profile. The towed guns are Foot (emplaced, crew-manhandled —
-        /// exactly what MMP 4 has always said, and their TRUCKS live in the unit's Mobile slot carrying
+        /// crew movement is selected per profile, and their TRUCKS live in the unit's Mobile slot carrying
         /// their own medium, so limbered and emplaced differ with no special case); the SPA_/ROC_ profiles
         /// built on this same archetype are tracked or truck-mounted and say so individually.</summary>
-        public static readonly Archetype Artillery  = Ground(5, 5, 9, 5, 8, 4);
-        /// <summary>Towed AAA; resists air (GAD 12) and engages it (GAT 11), SR 3. SP = +mobility in Phase 3.
+        public static readonly Archetype Artillery  = Ground(5, 5, 10, 5, 8);
+        /// <summary>Towed AAA; resists air (GAD 12) and engages it (GAT 11), SR 3. Mobility is selected per profile.
         /// GAT base 9→11 in the 2026-06-18 GAT rebalance (7/10 lethality target — backbone AD lands Favorable on
         /// fighters / Advantaged-Strong on slow strikers; the guidance-quality trait spread is unchanged).</summary>
-        public static readonly Archetype Aaa        = Ground(4, 4, 9, 6, 12, 4, gat: 11, sr: 3);
-        /// <summary>Towed/site SAM; air-only (HA/SA 1, §7A.13), GAT 12, SR 6. SP = +mobility in Phase 3.
+        public static readonly Archetype Aaa        = Ground(4, 4, 9, 6, 12, gat: 11, sr: 3);
+        /// <summary>Towed/site SAM; air-only (HA/SA 1, §7A.13), GAT 12, SR 6. Mobility is selected per profile.
         /// GAT base 10→12 in the 2026-06-18 GAT rebalance (see Aaa).</summary>
-        public static readonly Archetype Sam        = Ground(1, 3, 1, 3, 8, 4, gat: 12, sr: 6);
+        public static readonly Archetype Sam        = Ground(1, 3, 1, 3, 8, gat: 12, sr: 6);
         /// <summary>Attack-helicopter gunship; fast (MMP 24), glass-cannon (§7A.14); elevated observation SR 3.</summary>
-        public static readonly Archetype Helicopter = Ground(7, 6, 10, 7, 10, 24, sr: 3,
+        public static readonly Archetype Helicopter = Ground(7, 6, 10, 7, 10, sr: 3,
                                                              medium: MovementMedium.Helo);
         /// <summary>Soft transport; thin-topped air target (GAD 6). Every TRK_ profile in the DB is wheeled.</summary>
-        public static readonly Archetype Truck      = Ground(3, 3, 3, 3, 6, 8, medium: MovementMedium.Wheeled);
+        public static readonly Archetype Truck      = Ground(3, 3, 3, 3, 6, medium: MovementMedium.Wheeled);
         /// <summary>Static base (HQ/DEPOT/AIRB); MANPADS-equippable (GAD 6), SR 4. HP 60 is a CombatUnit concern.
         /// ⚠ Static, not None: a base does not move, which is a DECISION, not an undeclared medium.</summary>
-        public static readonly Archetype Facility   = Ground(4, 6, 6, 7, 6, 0, sr: 4,
+        public static readonly Archetype Facility   = Ground(4, 6, 6, 7, 6, sr: 4,
                                                             medium: MovementMedium.Static);
 
         #endregion // Ground families
 
         #region Air families
 
-        //                                             DF MAN TS SUR  MMP  GA  OL
+        //                                             DF MAN TS SUR GA  OL
         /// <summary>Early jet (MiG-21, F-4); dual-role GA floor 2 (Rule A).</summary>
-        public static readonly Archetype FighterEarly = Air(8, 9, 10, 6, 100, ga: 2, ol: 6);
+        public static readonly Archetype FighterEarly = Air(8, 9, 10, 6, ga: 2, ol: 6);
         /// <summary>Mid jet (MiG-23/27, F-16); dual-role GA floor 2 (Rule A).</summary>
-        public static readonly Archetype FighterMid   = Air(10, 11, 10, 7, 100, ga: 2, ol: 6);
+        public static readonly Archetype FighterMid   = Air(10, 11, 10, 7, ga: 2, ol: 6);
         /// <summary>Late jet (MiG-29, Su-27, F-15); dual-role GA floor 2 (Rule A).</summary>
-        public static readonly Archetype FighterLate  = Air(12, 12, 10, 9, 100, ga: 2, ol: 6);
+        public static readonly Archetype FighterLate  = Air(12, 12, 10, 9, ga: 2, ol: 6);
         /// <summary>Attack aircraft (Su-25, A-10) — low agility, high survivability, GA specialist (10/OL 9).</summary>
-        public static readonly Archetype Attack       = Air(4, 4, 7, 10, 100, ga: 10, ol: 9);
+        public static readonly Archetype Attack       = Air(4, 4, 7, 10, ga: 10, ol: 9);
         /// <summary>Bomber (Su-24, Tu-22, F-111) — no dogfight, fast, durable; strike GA 8 / heavy OL 12.</summary>
-        public static readonly Archetype Bomber       = Air(1, 3, 10, 8, 100, ga: 8, ol: 12);
+        public static readonly Archetype Bomber       = Air(1, 3, 10, 8, ga: 8, ol: 12);
 
         #endregion // Air families
 
         #region Factories
 
         /// <summary>
-        /// Builds a ground archetype (HA/HD/SA/SD/GAD/MMP, plus GAT when the family has a real
+        /// Builds a ground archetype (HA/HD/SA/SD/GAD, plus GAT when the family has a real
         /// air-attack baseline). GAT is omitted when 0 so it never gets clamped up off the W7 default.
         /// </summary>
-        private static Archetype Ground(int ha, int hd, int sa, int sd, int gad, int mmp,
+        private static Archetype Ground(int ha, int hd, int sa, int sd, int gad,
                                         int gat = 0, int sr = 2, int pr = 1,
                                         MovementMedium medium = MovementMedium.None)
         {
@@ -111,7 +110,7 @@ namespace HammerAndSickle.Models
                 { ProfileStat.SA, sa },
                 { ProfileStat.SD, sd },
                 { ProfileStat.GAD, gad },
-                { ProfileStat.MMP, mmp },
+
                 // Family base spotting / primary-fire range (§12.3.1). Defaults SR 2 / PR 1; families with a
                 // different baseline (recon SR 3, AAA SR 3, SAM SR 6, facility SR 4) override sr. Per design §2
                 // (Option A) these flow through the resolver so optics/sensor traits adjust off the base.
@@ -122,18 +121,18 @@ namespace HammerAndSickle.Models
             return new Archetype(stats, medium);
         }
 
-        /// <summary>Builds a fixed-wing archetype (DF/MAN/TS/SUR/MMP, plus base air SR, GA and OL). GA and OL are
+        /// <summary>Builds a fixed-wing archetype (DF/MAN/TS/SUR, plus base air SR, GA and OL). GA and OL are
         /// now archetype baselines (Rule A): GA is a band stat (1..25), OL the air payload (OL/9 multiplier). Base
         /// SR 4 = W8 AIR_UNIT_SPOTTING_RANGE (Option A — routed through the resolver); recon (8) and AWACS (12) add
         /// the difference as a per-profile delta.</summary>
-        private static Archetype Air(int df, int man, int ts, int sur, int mmp, int ga, int ol, int sr = 4)
+        private static Archetype Air(int df, int man, int ts, int sur, int ga, int ol, int sr = 4)
             => new Archetype(new Dictionary<ProfileStat, int>
             {
                 { ProfileStat.DF, df },
                 { ProfileStat.MAN, man },
                 { ProfileStat.TS, ts },
                 { ProfileStat.SUR, sur },
-                { ProfileStat.MMP, mmp },
+
                 { ProfileStat.GA, ga },
                 { ProfileStat.OL, ol },
                 { ProfileStat.SR, sr }

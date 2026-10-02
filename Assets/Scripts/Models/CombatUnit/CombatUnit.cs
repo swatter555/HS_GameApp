@@ -414,7 +414,13 @@ namespace HammerAndSickle.Models
         /// </summary>
         public void RefreshAllActions()
         {
+            // Active lift, not infantry classification, determines the turn-start movement budget.
+            int baselineMoves = IsBase ? 0 : IsFixedWing ? 3 : Classification == UnitClassification.RECON ? 2 : 1;
+            if (IsHelicopter || MovementModeService.CurrentMedium(this) == MovementMedium.Helo) baselineMoves = 2;
+            MoveActions.SetMax(baselineMoves);
             MoveActions.ResetToMax();
+            HasInitiatedCombatThisTurn = false;
+            HasMovementHaltedThisTurn = false;
             CombatActions.ResetToMax();
             DeploymentActions.ResetToMax();
             OpportunityActions.ResetToMax();
@@ -468,6 +474,27 @@ namespace HammerAndSickle.Models
 
         /// <summary>True if this unit moved at least one hex this turn (§7.15.8.2).</summary>
         [JsonIgnore] public bool HasMovedThisTurn { get; private set; }
+
+        // Separate from HasFoughtThisTurn: defensive fire does not close voluntary orders.
+        [JsonInclude] [JsonPropertyName("hasInitiatedCombatThisTurn")]
+        public bool HasInitiatedCombatThisTurn { get; private set; }
+        [JsonInclude] [JsonPropertyName("hasMovementHaltedThisTurn")]
+        public bool HasMovementHaltedThisTurn { get; private set; }
+
+        public bool CanContinueMoveOrder() => !HasInitiatedCombatThisTurn && !HasMovementHaltedThisTurn;
+
+        public void MarkMovementHalted()
+        {
+            HasMovementHaltedThisTurn = true;
+            MoveActions.SetCurrent(0);
+        }
+
+        internal void RestoreVoluntaryOrderLocks(bool combat, bool movementHalt)
+        {
+            HasInitiatedCombatThisTurn = combat;
+            HasMovementHaltedThisTurn = movementHalt;
+        }
+
 
         /// <summary>True if this unit fought this turn — attacker, defender, ambusher,
         /// opportunity firer, or counter-battery (§7.15.8.3).</summary>
@@ -711,7 +738,7 @@ namespace HammerAndSickle.Models
             int opportunityActions = GameData.DEFAULT_OPPORTUNITY_ACTIONS;
             int intelActions = GameData.DEFAULT_INTEL_ACTIONS;
 
-            // Action-count overrides per §8.5.8 (authoritative table). Baseline = 1/1/1/0/1
+            // Action-count overrides per §8.5.8 (authoritative table). Baseline = 1/1/1/0/0
             // (Move/Combat/Deploy/Opportunity/Intel); Opportunity defaults to 0 — granted only
             // to reactive-fire roles (§8.5.4).
             switch (Classification)
@@ -735,10 +762,9 @@ namespace HammerAndSickle.Models
                     break;
                 case UnitClassification.AM:                     // §10.3a.2
                 case UnitClassification.MAM:
-                    deploymentActions += 1;
                     break;
                 case UnitClassification.SPECF:                  // §10.3a.3
-                    intelActions += 1;
+
                     break;
                 // Tube artillery — Opp for counter-battery (§8.5.4 / §7.13.5.7)
                 case UnitClassification.ART:
@@ -760,6 +786,7 @@ namespace HammerAndSickle.Models
                     break;
                 // Attack helicopter — cannot entrench/embark (§8.5.6): 0 Deploy, 0 Opp (no op-fire)
                 case UnitClassification.HELO:
+                    moveActions = 2;
                     deploymentActions = 0;
                     break;
                 // Interceptor fighter — fixed-wing economy + 1 Opp for interception (§8.5.4 / §11.4.7.2)
@@ -791,7 +818,7 @@ namespace HammerAndSickle.Models
                     moveActions = 0;
                     combatActions = 0;
                     deploymentActions = 0;
-                    intelActions += 1;
+                    intelActions = 2;
                     break;
                 // Passive facilities — all actions 0 (§8.5.7)
                 case UnitClassification.DEPOT:
@@ -806,6 +833,7 @@ namespace HammerAndSickle.Models
                     break;
             }
 
+            if (IsHelicopter || MovementModeService.CurrentMedium(this) == MovementMedium.Helo) moveActions = 2;
             MoveActions = new StatsMaxCurrent(moveActions);
             CombatActions = new StatsMaxCurrent(combatActions);
             DeploymentActions = new StatsMaxCurrent(deploymentActions);
@@ -1069,7 +1097,7 @@ namespace HammerAndSickle.Models
         #region Actions
 
         /// <summary>
-        /// Spends the action economy for a combat action: 1 CombatAction + 25% max MP (§8.2.1). Supply is a GATE
+        /// Spends the action economy for a combat action: 1 CombatAction, with no MP fee (§8.2.1). Supply is a GATE
         /// (must stay above COMBAT_ACTION_SUPPLY_THRESHOLD) but is NOT deterministically consumed here — the old
         /// flat per-attack supply cost is rescinded (§7.15.7.1). Combat supply loss is now probabilistic (§7.15.5)
         /// and is rolled per side by the combat orchestrator (<see cref="HammerAndSickle.Models.Combat.GroundCombatAction"/>).
@@ -1079,16 +1107,18 @@ namespace HammerAndSickle.Models
             try
             {
                 if (CombatActions.Current >= 1 &&
-                    MovementPoints.Current >= GetCombatMovementCost() &&
                     DaysSupply.Current >= GameData.COMBAT_ACTION_SUPPLY_THRESHOLD &&
                     !IsBase)
                 {
                     CombatActions.DecrementCurrent();
-                    ConsumeMovementPoints(GetCombatMovementCost());
+                    HasInitiatedCombatThisTurn = true;
+                    MoveActions.SetCurrent(0);
+                    DeploymentActions.SetCurrent(0);
+                    IntelActions.SetCurrent(0);
                     return true;
                 }
 
-                AppService.CaptureUiMessage($"{UnitName} does not have enough combat actions, movement points, or supplies to perform a combat action.");
+                AppService.CaptureUiMessage($"{UnitName} does not have enough combat actions or supplies to perform a combat action.");
                 return false;
             }
             catch (Exception e)
@@ -1106,7 +1136,7 @@ namespace HammerAndSickle.Models
         {
             try
             {
-                if (MoveActions.Current >= 1 &&
+                if (CanContinueMoveOrder() && MoveActions.Current >= 1 &&
                     MovementPoints.Current >= movtCost &&
                     DaysSupply.Current >= (movtCost * GameData.MOVE_ACTION_SUPPLY_COST) + GameData.MOVE_ACTION_SUPPLY_THRESHOLD &&
                     !IsBase)
@@ -1135,16 +1165,15 @@ namespace HammerAndSickle.Models
             try
             {
                 if (IntelActions.Current >= 1 &&
-                    MovementPoints.Current >= GetIntelMovementCost() &&
+                    IsBase && Classification == UnitClassification.HQ && !HasInitiatedCombatThisTurn &&
                     DaysSupply.Current >= GameData.INTEL_ACTION_SUPPLY_COST)
                 {
                     IntelActions.DecrementCurrent();
-                    ConsumeMovementPoints(GetIntelMovementCost());
                     ConsumeSupplies(GameData.INTEL_ACTION_SUPPLY_COST);
                     return true;
                 }
 
-                AppService.CaptureUiMessage($"{UnitName} does not have enough intel actions, movement points, or supplies to perform an intel action.");
+                AppService.CaptureUiMessage($"{UnitName} does not have an eligible base intel action or enough supplies to perform an intel action.");
                 return false;
             }
             catch (Exception e)
@@ -1202,14 +1231,12 @@ namespace HammerAndSickle.Models
         /// </summary>
         public Dictionary<ActionTypes, float> GetAvailableActions()
         {
-            float moveAvailable = (MoveActions.Current >= 1 && MovementPoints.Current > 0f)
+            float moveAvailable = (CanBeginMoveOrder())
                 ? MoveActions.Current : 0f;
             float combatAvailable = CombatActions.Current >= 1 ? CombatActions.Current : 0f;
             float opportunityAvailable = OpportunityActions.Current;
-            float intelAvailable = IntelActions.Current >= 1 ? IntelActions.Current : 0f;
-            float deploymentAvailable = IsBase ? 0f :
-                (MovementPoints.Current >= GetDeployMovementCost() && DeploymentActions.Current >= 1)
-                    ? DeploymentActions.Current : 0f;
+            float intelAvailable = GetIntelActions();
+            float deploymentAvailable = GetDeployActions();
 
             return new Dictionary<ActionTypes, float>
             {
@@ -1222,21 +1249,21 @@ namespace HammerAndSickle.Models
         }
 
         public float GetDeployActions() =>
-            !CanUnitTypeChangeStates() ? 0 :
+            !CanUnitTypeChangeStates() || HasInitiatedCombatThisTurn ? 0 :
+            (_deploymentPosition == DeploymentPosition.Embarked && !IsNavalEmbarked) ||
             MovementPoints.Current >= GetDeployMovementCost() ? DeploymentActions.Current : 0f;
 
         public float GetCombatActions() =>
             IsBase ? 0 :
-            MovementPoints.Current >= GetCombatMovementCost() ? CombatActions.Current : 0;
+            CombatActions.Current;
 
         public float GetMoveActions() =>
-            IsBase ? 0 :
-            MovementPoints.Current > 0 ? MoveActions.Current : 0;
+            CanBeginMoveOrder() ? MoveActions.Current : 0;
 
         public float GetOpportunityActions() => IsBase ? 0 : OpportunityActions.Current;
 
         public float GetIntelActions() =>
-            MovementPoints.Current >= GetIntelMovementCost() ? IntelActions.Current : 0;
+            IsBase && Classification == UnitClassification.HQ && !HasInitiatedCombatThisTurn ? IntelActions.Current : 0;
 
         private bool ConsumeMovementPoints(float points)
         {
@@ -1256,10 +1283,10 @@ namespace HammerAndSickle.Models
             MovementPoints.Max * GameData.DEPLOYMENT_ACTION_MOVEMENT_COST;
 
         public float GetCombatMovementCost() =>
-            Mathf.CeilToInt(MovementPoints.Max * GameData.COMBAT_ACTION_MOVEMENT_COST);
+            0f;
 
         public float GetIntelMovementCost() =>
-            Mathf.CeilToInt(MovementPoints.Max * GameData.INTEL_ACTION_MOVEMENT_COST);
+            0f;
 
         #endregion // Actions
 
@@ -1276,6 +1303,7 @@ namespace HammerAndSickle.Models
         /// </summary>
         public bool CanBeginMoveOrder()
         {
+            if (!CanContinueMoveOrder()) return false;
             if (!CanMove()) return false;
             if (MoveActions.Current < 1) return false;
             if (MovementPoints.Current <= 0) return false;
@@ -1311,7 +1339,7 @@ namespace HammerAndSickle.Models
         {
             try
             {
-                return ConsumeMovementPoints(cost);
+                return CanContinueMoveOrder() && ConsumeMovementPoints(cost);
             }
             catch (Exception e)
             {
@@ -1333,6 +1361,7 @@ namespace HammerAndSickle.Models
         /// </summary>
         public void ForceSetActions(float moveActions, float combatActions, float intelActions)
         {
+            if (moveActions <= 0) MarkMovementHalted();
             MoveActions.SetCurrent(Mathf.Max(0f, moveActions));
             CombatActions.SetCurrent(Mathf.Max(0f, combatActions));
             IntelActions.SetCurrent(Mathf.Max(0f, intelActions));
@@ -1398,43 +1427,38 @@ namespace HammerAndSickle.Models
             DeploymentPosition targetPosition = _deploymentPosition + 1;
             bool navalRoute = false;
 
-            /* TARGET SELECTION (generalised 2026-08-04; naval added P2 2026-08-08 — §9.4.5/§9.4.7).
-             * A regiment at Deployed with NO ground transport skips Mobile: to its OWN air lift if the
-             * Embarked bay is populated, else to the universal NAVAL sealift if it stands on a friendly
-             * port. Organic lift wins over naval — owned equipment beats the shared flotilla.
-             * Asking the SLOTS (never a class label) covers every shape with no list to maintain;
-             * the positional gates (airbase/port) stay in EmbarkmentChecks — what may embark WHERE is a
-             * separate ruling from where deploying up should AIM. */
             bool hasGroundTransport = GetMobileProfile() != null;
             if (oldPosition == DeploymentPosition.Deployed && !hasGroundTransport)
             {
-                if (GetEmbarkedProfile() != null)
-                    targetPosition = DeploymentPosition.Embarked;
-                else if (onPort)
+                if (onPort && GetEmbarkedProfile() == null)
                 {
                     targetPosition = DeploymentPosition.Embarked;
                     navalRoute = true;
                 }
-            }
-
-            // D3 (P2 2026-08-08): mounting requires something to mount. Without this, a unit with an
-            // empty Mobile bay "mounted" nothing, paid full costs, and kept its deployed profile.
-            if (targetPosition == DeploymentPosition.Mobile && !hasGroundTransport)
-            {
-                errorMsg = $"{UnitName} has no ground transport to mount.";
-                return false;
-            }
-
-            // From Mobile, +1 is Embarked: organic lift if owned, else naval at a friendly port (§9.4.7).
-            if (targetPosition == DeploymentPosition.Embarked && !navalRoute && GetEmbarkedProfile() == null)
-            {
-                if (onPort)
-                    navalRoute = true;
                 else
                 {
-                    errorMsg = $"{UnitName} has no air lift, and naval embarkation needs a friendly port.";
+                    errorMsg = $"{UnitName} has no ground transport to mount; use Air Embark for owned air lift.";
                     return false;
                 }
+            }
+            if (targetPosition == DeploymentPosition.Embarked)
+            {
+                if (GetEmbarkedProfile() != null)
+                {
+                    errorMsg = "Use Air Embark to board owned air lift.";
+                    return false;
+                }
+                navalRoute = true;
+                if (!onPort)
+                {
+                    errorMsg = "Naval embarkation needs a friendly port.";
+                    return false;
+                }
+            }
+            if (targetPosition == DeploymentPosition.Embarked && HasMovementHaltedThisTurn)
+            {
+                errorMsg = "Boarding is unavailable after a forced movement halt.";
+                return false;
             }
 
             if (!CanChangeToState(targetPosition, out errorMsg))
@@ -1466,6 +1490,11 @@ namespace HammerAndSickle.Models
         /// <param name="onBeachhead">True if the unit is on a beachhead hex (§9.10.6.2).</param>
         public bool TryDeployDOWN(out string errorMsg, bool onPort = false, bool onBeachhead = false)
         {
+            if (_deploymentPosition == DeploymentPosition.Embarked && !IsNavalEmbarked)
+            {
+                errorMsg = "Use Air Disembark to land from owned air lift.";
+                return false;
+            }
             if (MovementPoints.Max <= 0f)
             {
                 errorMsg = "Unit has invalid movement profile; cannot deploy.";
@@ -1507,11 +1536,76 @@ namespace HammerAndSickle.Models
             if (leavingEmbarked)
                 SetNavalEmbarked(false);
 
-            ApplyDeploymentTransitionCosts();
+            ApplyDeploymentTransitionCosts(exhaustMovement: targetPosition <= DeploymentPosition.HastyDefense);
             return true;
         }
 
-        private void ApplyDeploymentTransitionCosts()
+        /// <summary>Direct air boarding shares the deployment budget with ground transitions.</summary>
+        public bool TryAirEmbark(out string errorMsg, bool onAirbase = false, bool inEnemyZoc = false)
+        {
+            errorMsg = string.Empty;
+            if (_deploymentPosition != DeploymentPosition.Deployed && _deploymentPosition != DeploymentPosition.Mobile)
+            {
+                errorMsg = "Air boarding requires Deployed or Mobile posture.";
+                return false;
+            }
+            if (HasMovementHaltedThisTurn)
+            {
+                errorMsg = "Boarding is unavailable after a forced movement halt.";
+                return false;
+            }
+            if (!CanChangeToState(DeploymentPosition.Embarked, out errorMsg, requireMovementFee: false) ||
+                !EmbarkmentChecks(out errorMsg, DeploymentPosition.Embarked, onAirbase, false, false))
+                return false;
+            var transport = GetEmbarkedProfile();
+            bool helo = transport.TransportCategory == TransportCategory.HeloTransport;
+            if (helo && inEnemyZoc)
+            {
+                errorMsg = "Helicopter boarding is unavailable in an enemy zone of control.";
+                return false;
+            }
+            bool airborne = Classification == UnitClassification.AB || Classification == UnitClassification.MAB;
+            if (airborne && (MovementPoints.Max <= 0 || MovementPoints.Current < MovementPoints.Max))
+            {
+                errorMsg = "Airborne boarding requires full movement points.";
+                return false;
+            }
+            _deploymentPosition = DeploymentPosition.Embarked;
+            SetNavalEmbarked(false);
+            ApplyDeploymentTransitionCosts(requireMovementFee: false, exhaustMovement: airborne);
+            if (helo)
+            {
+                MoveActions.SetMax(2);
+                MoveActions.SetCurrent(1);
+            }
+            return true;
+        }
+
+        public bool TryAirDisembark(out string errorMsg)
+        {
+            errorMsg = string.Empty;
+            if (_deploymentPosition != DeploymentPosition.Embarked || IsNavalEmbarked)
+            {
+                errorMsg = "Unit is not aboard owned air lift.";
+                return false;
+            }
+            if (!CanChangeToState(DeploymentPosition.Deployed, out errorMsg, requireMovementFee: false))
+                return false;
+            bool airborne = Classification == UnitClassification.AB || Classification == UnitClassification.MAB;
+            _deploymentPosition = DeploymentPosition.Deployed;
+            ApplyDeploymentTransitionCosts(requireMovementFee: false, exhaustMovement: airborne);
+            return true;
+        }
+
+        internal void ForceAirLandingAfterBreakOff()
+        {
+            _deploymentPosition = DeploymentPosition.Deployed;
+            SetNavalEmbarked(false);
+            UpdateMovementPointsForProfile();
+            MovementPoints.SetCurrent(0);
+        }
+
+        private void ApplyDeploymentTransitionCosts(bool requireMovementFee = true, bool exhaustMovement = false)
         {
             /* D7 (P2 2026-08-08, ruled REFUSE): a transition that cannot pay its supply does not happen.
              * In practice this branch is unreachable — CanChangeToState refuses below the CRITICAL
@@ -1524,7 +1618,7 @@ namespace HammerAndSickle.Models
 
             // Pay the transition out of the OLD profile's budget first.
             float oldMax = MovementPoints.Max;
-            float movementPenalty = GameData.DEPLOYMENT_ACTION_MOVEMENT_COST * oldMax;
+            float movementPenalty = requireMovementFee ? GameData.DEPLOYMENT_ACTION_MOVEMENT_COST * oldMax : 0f;
             float remainingMP = Mathf.Max(0f, MovementPoints.Current - movementPenalty);
 
             /* ⚠ THE LEFTOVER IS RESCALED, NOT CARRIED ACROSS (Bob's ruling, 2026-08-04). Movement points
@@ -1538,7 +1632,7 @@ namespace HammerAndSickle.Models
              * it survives the action/movement cost rebalance Bob has planned. */
             UpdateMovementPointsForProfile();
             MovementPoints.SetCurrent(
-                MovementModeService.ScaleMovementPoints(remainingMP, oldMax, MovementPoints.Max));
+                exhaustMovement ? 0f : MovementModeService.ScaleMovementPoints(remainingMP, oldMax, MovementPoints.Max));
         }
 
         /* ⚠ REWRITTEN P2 2026-08-08 (was SpecialEmbarkmentChecks) — ZERO classification cases. The gate
@@ -1620,9 +1714,15 @@ namespace HammerAndSickle.Models
             MovementPoints.ResetToMax();
         }
 
-        private bool CanChangeToState(DeploymentPosition targetState, out string errorMessage)
+        private bool CanChangeToState(DeploymentPosition targetState, out string errorMessage, bool requireMovementFee = true)
         {
             errorMessage = string.Empty;
+
+            if (HasInitiatedCombatThisTurn)
+            {
+                errorMessage = "Deployment is unavailable after initiating combat this turn.";
+                return false;
+            }
 
             if (DeploymentPosition == targetState)
             {
@@ -1679,7 +1779,7 @@ namespace HammerAndSickle.Models
             // D4 (P2 2026-08-08): this gate and the HUD availability checks share ONE formula now
             // (GetDeployMovementCost). The HUD used CeilToInt while this used the raw fraction, so at
             // odd maxima the button greyed out for a transition the model would have allowed.
-            if (MovementPoints.Current < GetDeployMovementCost())
+            if (requireMovementFee && MovementPoints.Current < GetDeployMovementCost())
             {
                 errorMessage = $"{UnitName} does not have enough movement points to change states ({MovementPoints.Current:F1} available, {GetDeployMovementCost():F1} required)";
                 return false;
@@ -2814,7 +2914,7 @@ namespace HammerAndSickle.Models
         #region Debugging
 
         public float DebugGetCombatMovementCost() =>
-            Mathf.CeilToInt(MovementPoints.Max * GameData.COMBAT_ACTION_MOVEMENT_COST);
+            0f;
 
         #endregion // Debugging
     }

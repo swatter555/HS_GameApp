@@ -424,6 +424,7 @@ namespace HammerAndSickle.Helpers
                     // D5 (P2 2026-08-08): the ctor sized MP from the DEPLOYED profile; a unit authored
                     // at Mobile/Embarked starts on its posture's real ceiling, not the foot one.
                     unit.RefreshMovementPointsForPosture();
+                    unit.RefreshAllActions();
                     unit.SetSpottedLevel(data.Spotted);
                     unit.HitPoints.SetCurrent(unit.HitPoints.Max * data.HitPoints);
 

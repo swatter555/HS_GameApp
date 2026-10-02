@@ -118,17 +118,17 @@ namespace HammerAndSickle.Tests
             try
             {
                 // Iraqi 2S1 (122mm SP): Artillery + IR SHORT + SELF_PROPELLED (= Soviet 2S1 line).
-                AssertGround(WeaponType.SPA_2S1_IQ, 5, 7, 9, 7, 7, 0);
+                AssertGround(WeaponType.SPA_2S1_IQ, 5, 7, 10, 7, 7, 0);
                 Assert.AreEqual(10, (int)P(WeaponType.SPA_2S1_IQ).MaxMovementPoints, "2S1_IQ MMP 10 (SELF_PROPELLED)");
                 Assert.AreEqual(4,  (int)P(WeaponType.SPA_2S1_IQ).IndirectRange, "2S1_IQ IR 4");
 
                 // Light towed: bare Artillery, foot MMP 4, GAD 8 (= standard light towed).
-                AssertGround(WeaponType.ART_LIGHT_ARAB, 5, 5, 9, 5, 8, 0);
-                Assert.AreEqual(4, (int)P(WeaponType.ART_LIGHT_ARAB).MaxMovementPoints, "Arab Lt towed MMP 4");
+                AssertGround(WeaponType.ART_LIGHT_ARAB, 5, 5, 10, 5, 8, 0);
+                Assert.AreEqual(2, (int)P(WeaponType.ART_LIGHT_ARAB).MaxMovementPoints, "Arab Lt towed MMP 4");
                 Assert.AreEqual(4, (int)P(WeaponType.ART_LIGHT_ARAB).IndirectRange, "Arab Lt towed IR 4");
 
                 // Heavy towed: Artillery + SA+1, IR MEDIUM (= standard heavy towed).
-                AssertGround(WeaponType.ART_HEAVY_ARAB, 5, 5, 10, 5, 8, 0);
+                AssertGround(WeaponType.ART_HEAVY_ARAB, 5, 5, 11, 5, 8, 0);
                 Assert.AreEqual(5, (int)P(WeaponType.ART_HEAVY_ARAB).IndirectRange, "Arab Hvy towed IR 5");
             }
             catch (Exception ex) { AppService.HandleException(CLASS_NAME, nameof(Artillery_ResolveConvertedLines), ex); throw; }
@@ -153,7 +153,7 @@ namespace HammerAndSickle.Tests
 
                 // Mujahideen AAA: improvised (Aaa + GAT−2), still −2 below standard → GAT 9 post-rebalance.
                 AssertGround(WeaponType.AAA_GEN_MJ, 3, 4, 8, 6, 10, 9);
-                Assert.AreEqual(4, (int)P(WeaponType.AAA_GEN_MJ).MaxMovementPoints, "MJ AAA foot MMP 4");
+                Assert.AreEqual(2, (int)P(WeaponType.AAA_GEN_MJ).MaxMovementPoints, "MJ AAA foot MMP 4");
 
                 // Mujahideen Stinger team: air-only (Sam + GAT−2), GAT 10 post-rebalance, no radar (SR 2).
                 AssertGround(WeaponType.SAM_GEN_MJ, 1, 3, 1, 3, 10, 10);
@@ -224,9 +224,9 @@ namespace HammerAndSickle.Tests
                 AssertGround(WeaponType.INF_RPG_MJ, 8, 7, 6, 8, 10, 0);
 
                 // MJ artillery (invented improvised lines): short-range, dispersed (GAD 10).
-                AssertGround(WeaponType.ART_MORTAR_MJ, 5, 5, 7, 5, 10, 0);
+                AssertGround(WeaponType.ART_MORTAR_MJ, 5, 5, 8, 5, 10, 0);
                 Assert.AreEqual(3, (int)P(WeaponType.ART_MORTAR_MJ).IndirectRange, "MJ mortar IR 3");
-                AssertGround(WeaponType.ART_LIGHT_MJ, 5, 5, 6, 5, 10, 0);
+                AssertGround(WeaponType.ART_LIGHT_MJ, 5, 5, 7, 5, 10, 0);
                 Assert.AreEqual(3, (int)P(WeaponType.ART_LIGHT_MJ).IndirectRange, "MJ light arty IR 3");
             }
             catch (Exception ex) { AppService.HandleException(CLASS_NAME, nameof(TrucksAndInfantry_ResolveConvertedLines), ex); throw; }

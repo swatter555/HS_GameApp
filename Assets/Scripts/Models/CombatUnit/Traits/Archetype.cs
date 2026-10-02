@@ -40,19 +40,19 @@ namespace HammerAndSickle.Models
     /// </summary>
     public static class TankArchetypes
     {
-        //                                  HA  HD  SA  SD  GAD  MMP
-        public static readonly Archetype Gen1 = Make(7, 5, 5, 6, 7, 10);   // T-55, T-62
-        public static readonly Archetype Gen2 = Make(10, 8, 7, 6, 7, 10);  // T-64A, M60, Leo1-late
-        public static readonly Archetype Gen3 = Make(13, 11, 9, 6, 7, 10); // T-64B/72B/80, M1, Leo2, Chally1
-        public static readonly Archetype Gen4 = Make(16, 14, 10, 6, 7, 10);// T-80U/BV, M1A1HA
+        //                                  HA  HD  SA  SD  GAD
+        public static readonly Archetype Gen1 = Make(7, 5, 5, 6, 7);   // T-55, T-62
+        public static readonly Archetype Gen2 = Make(10, 8, 7, 6, 7);  // T-64A, M60, Leo1-late
+        public static readonly Archetype Gen3 = Make(13, 11, 9, 6, 7); // T-64B/72B/80, M1, Leo2, Chally1
+        public static readonly Archetype Gen4 = Make(16, 14, 10, 6, 7);// T-80U/BV, M1A1HA
 
         // ⚠ Every tank generation is Tracked, in every posture. A tank does not dismount, so a dug-in
         // T-72 still sounds and moves as tracked — this is the half of the medium rule that keeps the
         // dismount logic from over-reaching.
-        private static Archetype Make(int ha, int hd, int sa, int sd, int gad, int mmp)
-            => new Archetype(MakeStats(ha, hd, sa, sd, gad, mmp), MovementMedium.Tracked);
+        private static Archetype Make(int ha, int hd, int sa, int sd, int gad)
+            => new Archetype(MakeStats(ha, hd, sa, sd, gad), MovementMedium.Tracked);
 
-        private static Dictionary<ProfileStat, int> MakeStats(int ha, int hd, int sa, int sd, int gad, int mmp)
+        private static Dictionary<ProfileStat, int> MakeStats(int ha, int hd, int sa, int sd, int gad)
             => new Dictionary<ProfileStat, int>
             {
                 { ProfileStat.HA, ha },
@@ -60,7 +60,7 @@ namespace HammerAndSickle.Models
                 { ProfileStat.SA, sa },
                 { ProfileStat.SD, sd },
                 { ProfileStat.GAD, gad },
-                { ProfileStat.MMP, mmp },
+
                 // Family base spotting/primary range (§12.3.1 — SR 2 / PR 1 defaults). Per design §2
                 // (Option A) these flow through the resolver, so OPTICS/THERMAL SR+1 and GUN_LAUNCHED_ATGM
                 // PR+1 (standoff) adjust off this base.

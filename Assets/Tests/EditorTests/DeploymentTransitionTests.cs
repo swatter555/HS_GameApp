@@ -45,7 +45,7 @@ namespace HammerAndSickle.Tests
             var spetsnaz = MakeFootWithHelosOnly();
             spetsnaz.SetDeploymentPosition(DeploymentPosition.Deployed);
 
-            bool moved = spetsnaz.TryDeployUP(out string error, onAirbase: true, onPort: false);
+            bool moved = spetsnaz.TryAirEmbark(out string error, onAirbase: true);
 
             Assert.That(moved, Is.True, error);
             Assert.That(spetsnaz.DeploymentPosition, Is.EqualTo(DeploymentPosition.Embarked),
@@ -62,7 +62,7 @@ namespace HammerAndSickle.Tests
             var airAssault = MakeFootWithCarriersAndHelos();
             airAssault.SetDeploymentPosition(DeploymentPosition.Deployed);
 
-            Assert.That(airAssault.TryDeployUP(out string error, onAirbase: true, onPort: false), Is.True, error);
+            Assert.That(airAssault.TryDeployUP(out string error), Is.True, error);
             Assert.That(airAssault.DeploymentPosition, Is.EqualTo(DeploymentPosition.Mobile),
                 "it has MT-LBs, so Mobile is a real posture for it");
             Assert.That(MovementModeService.CurrentMedium(airAssault), Is.EqualTo(MovementMedium.Tracked));
@@ -76,7 +76,7 @@ namespace HammerAndSickle.Tests
             var spetsnaz = MakeFootWithHelosOnly();
             spetsnaz.SetDeploymentPosition(DeploymentPosition.Embarked);
 
-            Assert.That(spetsnaz.TryDeployDOWN(out string error), Is.True, error);
+            Assert.That(spetsnaz.TryAirDisembark(out string error), Is.True, error);
             Assert.That(spetsnaz.DeploymentPosition, Is.EqualTo(DeploymentPosition.Deployed));
             Assert.That(MovementModeService.CurrentMedium(spetsnaz), Is.EqualTo(MovementMedium.Foot));
         }
@@ -96,14 +96,14 @@ namespace HammerAndSickle.Tests
             spetsnaz.SetDeploymentPosition(DeploymentPosition.Deployed);
 
             float footMax = spetsnaz.MovementPoints.Max;
-            Assert.That(spetsnaz.TryDeployUP(out string error, onAirbase: true, onPort: false), Is.True, error);
+            Assert.That(spetsnaz.TryAirEmbark(out string error, onAirbase: true), Is.True, error);
 
             float heloMax = spetsnaz.MovementPoints.Max;
             Assert.That(heloMax, Is.GreaterThan(footMax), "helicopters must raise the ceiling");
 
             // The transition costs half the pre-move budget, so half the new ceiling should remain.
-            Assert.That(spetsnaz.MovementPoints.Current, Is.EqualTo(heloMax * 0.5f).Within(0.01f),
-                "half the foot budget spent must mean half the air budget remains");
+            Assert.That(spetsnaz.MovementPoints.Current, Is.EqualTo(heloMax).Within(0.01f),
+                "ordinary air boarding preserves the complete remaining fraction");
             Assert.That(spetsnaz.MovementPoints.Current, Is.GreaterThan(footMax),
                 "the old bug: a regiment that boarded helicopters could still only travel on foot legs");
         }
@@ -207,7 +207,7 @@ namespace HammerAndSickle.Tests
             // Owned equipment beats the shared flotilla: a Spetsnaz at a port boards its OWN Mi-8s.
             var spetsnaz = MakeFootWithHelosOnly();
 
-            Assert.That(spetsnaz.TryDeployUP(out string err, onPort: true), Is.True, err);
+            Assert.That(spetsnaz.TryAirEmbark(out string err), Is.True, err);
             Assert.That(spetsnaz.IsNavalEmbarked, Is.False);
             Assert.That(spetsnaz.GetActiveWeaponProfile()?.WeaponType, Is.EqualTo(WeaponType.HEL_MI8T_SV));
         }
@@ -219,13 +219,13 @@ namespace HammerAndSickle.Tests
              * survives as a consequence of its An-12s — and now also covers the FW-lifted SPECF the old
              * classification list missed (defect D8). */
             var vdv = MakeParatroopersWithAn12();
-            Assert.That(vdv.TryDeployUP(out _, onAirbase: false), Is.False,
+            Assert.That(vdv.TryAirEmbark(out _, onAirbase: false), Is.False,
                 "fixed-wing lift operates from an airbase");
-            Assert.That(vdv.TryDeployUP(out string err, onAirbase: true), Is.True, err);
+            Assert.That(vdv.TryAirEmbark(out string err, onAirbase: true), Is.True, err);
             Assert.That(vdv.IsNavalEmbarked, Is.False);
 
             var spetsnaz = MakeFootWithHelosOnly();
-            Assert.That(spetsnaz.TryDeployUP(out string err2), Is.True, err2);
+            Assert.That(spetsnaz.TryAirEmbark(out string err2), Is.True, err2);
         }
 
         [Test]
@@ -259,7 +259,7 @@ namespace HammerAndSickle.Tests
         {
             // D2: +1 from the top used to write the undefined enum value 6 and charge full costs.
             var spetsnaz = MakeFootWithHelosOnly();
-            spetsnaz.TryDeployUP(out _);                        // Embarked
+            spetsnaz.TryAirEmbark(out _);                        // Embarked
             spetsnaz.RefreshAllActions();
             spetsnaz.MovementPoints.ResetToMax();
 

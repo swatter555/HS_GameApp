@@ -133,7 +133,7 @@ namespace HammerAndSickle.Tests
 
             Assert.IsTrue(r.Executed, "Adjacent spotted enemy → attack executes");
             Assert.AreEqual(0f, attacker.CombatActions.Current, "1 CombatAction spent (§8.2.1)");
-            Assert.AreEqual(12f - combatCost, attacker.MovementPoints.Current, TOL, "25% max MP spent (§8.2.1)");
+            Assert.AreEqual(12f - combatCost, attacker.MovementPoints.Current, TOL, "combat leaves MP unchanged (§8.2.1)");
             Assert.IsTrue(attacker.HasFoughtThisTurn, "attacker flagged fought (§7.15.8.3)");
             Assert.IsTrue(defender.HasFoughtThisTurn, "defender flagged fought");
         }
@@ -207,5 +207,36 @@ namespace HammerAndSickle.Tests
         }
 
         #endregion // Displacement + destruction
+        [Test]
+        public void LaunchedDirectAttack_FacesTarget_Free_WithoutRotatingDefender()
+        {
+            var attacker = Tank(Side.Player, new Position2D(5, 5));
+            var defender = Infantry(Side.AI, new Position2D(6, 5), SpottedLevel.Level2);
+            attacker.Facing = HexDirection.W;
+            defender.Facing = HexDirection.W;
+            var result = GroundCombatAction.Execute(attacker, defender, GameDataManager.CurrentHexMap, new FixedRollRandom(1));
+            Assert.That(result.Executed, Is.True);
+            Assert.That(attacker.Facing, Is.EqualTo(HammerAndSickle.Models.Map.HexMapUtil.GetGeneralDirection(attacker.MapPos, defender.MapPos)));
+            Assert.That(defender.Facing, Is.EqualTo(HexDirection.W));
+            Assert.That(attacker.MovementPoints.Current, Is.EqualTo(12));
+            Assert.That(defender.HasInitiatedCombatThisTurn, Is.False);
+        }
+
+        [Test]
+        public void FailedDirectAttack_DoesNotFaceOrCauseDefensiveReaction()
+        {
+            var attacker = Tank(Side.Player, new Position2D(5, 5));
+            var defender = Infantry(Side.AI, new Position2D(6, 5), SpottedLevel.Level2);
+            attacker.DaysSupply.SetCurrent(0);
+            attacker.Facing = HexDirection.W;
+            float opponentActions = defender.OpportunityActions.Current;
+            var result = GroundCombatAction.Execute(attacker, defender, GameDataManager.CurrentHexMap, new FixedRollRandom(1));
+            Assert.That(result.Executed, Is.False);
+            Assert.That(attacker.Facing, Is.EqualTo(HexDirection.W));
+            Assert.That(attacker.HasInitiatedCombatThisTurn, Is.False);
+            Assert.That(defender.HasFoughtThisTurn, Is.False);
+            Assert.That(defender.OpportunityActions.Current, Is.EqualTo(opponentActions));
+        }
+
     }
 }

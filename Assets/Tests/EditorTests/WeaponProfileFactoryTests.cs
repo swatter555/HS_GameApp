@@ -28,7 +28,7 @@ namespace HammerAndSickle.Tests
         private static void AssertTank(string name, Archetype arch, Dictionary<ProfileStat, int> deltas,
             WeaponTrait[] traits, int ha, int hd, int sa, int sd, int gad, float icm, int mmp, int sr, int pr)
         {
-            WeaponProfile p = WeaponProfile.FromProfileDef(name, name, WeaponType.TANK_T55A_SV,
+            WeaponProfile p = WeaponProfile.FromProfileDef(name, name, WeaponType.TANK_T55A_SV, mmp,
                 new ProfileDef(arch, deltas, traits));
             Assert.AreEqual(ha,  (int)p.HardAttack,    $"{name} HA");
             Assert.AreEqual(hd,  p.HardDefense,        $"{name} HD");
@@ -42,7 +42,7 @@ namespace HammerAndSickle.Tests
         }
 
         private static WeaponProfile WithTraits(params WeaponTrait[] traits)
-            => WeaponProfile.FromProfileDef("x", "x", WeaponType.TANK_T55A_SV,
+            => WeaponProfile.FromProfileDef("x", "x", WeaponType.TANK_T55A_SV, GameData.MMP_VEHICLE_STANDARD,
                 new ProfileDef(TankArchetypes.Gen1, new Dictionary<ProfileStat, int>(), traits));
 
         #endregion // Helpers
@@ -85,12 +85,12 @@ namespace HammerAndSickle.Tests
                 Archetype g2 = TankArchetypes.Gen2, g3 = TankArchetypes.Gen3;
 
                 AssertTank("Leopard 1", g2,
-                    new Dictionary<ProfileStat, int> { { ProfileStat.HA, -1 }, { ProfileStat.HD, -1 }, { ProfileStat.SA, 1 }, { ProfileStat.MMP, 2 } },
+                    new Dictionary<ProfileStat, int> { { ProfileStat.HA, -1 }, { ProfileStat.HD, -1 }, { ProfileStat.SA, 1 },},
                     new[] { WeaponTrait.OPTICS_GEN2, WeaponTrait.LASER_RANGEFINDER },
                     9, 7, 8, 6, 7, 1.10f, 12, 3, 1);   // SR 3 — OPTICS_GEN2 +1
 
                 AssertTank("Leopard 2", g3,
-                    new Dictionary<ProfileStat, int> { { ProfileStat.HA, 1 }, { ProfileStat.SA, -1 }, { ProfileStat.MMP, 2 } },
+                    new Dictionary<ProfileStat, int> { { ProfileStat.HA, 1 }, { ProfileStat.SA, -1 },},
                     new[] { WeaponTrait.SPACED_ARMOR, WeaponTrait.OPTICS_GEN3, WeaponTrait.LASER_RANGEFINDER,
                             WeaponTrait.BALLISTIC_COMPUTER, WeaponTrait.THERMAL_IMAGER },
                     14, 12, 8, 6, 7, 1.33f, 12, 4, 1);   // SR 4 — OPTICS_GEN3 +1, THERMAL +1
@@ -172,7 +172,7 @@ namespace HammerAndSickle.Tests
 
         // Builds on the Attack air archetype (GA 10 / OL 9) so the flat GA deltas land alongside the riders.
         private static WeaponProfile Strike(params WeaponTrait[] traits)
-            => WeaponProfile.FromProfileDef("x", "x", WeaponType.ATT_SU25_SV,
+            => WeaponProfile.FromProfileDef("x", "x", WeaponType.ATT_SU25_SV, GameData.MMP_FIXED_WING,
                 new ProfileDef(FamilyArchetypes.Attack, new Dictionary<ProfileStat, int>(), traits));
 
         [Test]
@@ -259,7 +259,7 @@ namespace HammerAndSickle.Tests
             try
             {
                 // All three bases (Airbase/Depot/HQ) share one ProfileDef: Facility archetype + NON_COMBATANT.
-                WeaponProfile p = WeaponProfile.FromProfileDef("Base", "Base", WeaponType.BASE_AIRBASE,
+                WeaponProfile p = WeaponProfile.FromProfileDef("Base", "Base", WeaponType.BASE_AIRBASE, GameData.MMP_IMMOBILE,
                     new ProfileDef(FamilyArchetypes.Facility, new Dictionary<ProfileStat, int>(),
                         new[] { WeaponTrait.NON_COMBATANT }));
 

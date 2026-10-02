@@ -68,10 +68,12 @@ namespace HammerAndSickle.Models.Combat
                 if (reason != null)
                     return new GroundCombatOutcome { Executed = false, Reason = reason };
 
-                // §8.2.1 — spend 1 CombatAction + 25% max MP. Supply is GATED here, not consumed (§7.15.7.1);
+                // §8.2.1 — spend 1 CombatAction + no MP fee. Supply is GATED here, not consumed (§7.15.7.1);
                 // the probabilistic combat-supply loss is rolled below (§7.15.5).
                 if (!attacker.PerformCombatAction())
                     return new GroundCombatOutcome { Executed = false, Reason = "Attacker cannot afford the combat action." };
+
+                attacker.Facing = HexMapUtil.GetGeneralDirection(attacker.MapPos, defender.MapPos);
 
                 attacker.MarkFoughtThisTurn();
                 defender.MarkFoughtThisTurn();

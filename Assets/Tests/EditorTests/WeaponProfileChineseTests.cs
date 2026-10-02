@@ -101,19 +101,19 @@ namespace HammerAndSickle.Tests
             try
             {
                 // Type 83 152mm SP howitzer: Artillery + SELF_PROPELLED (tracked) → MMP 10.
-                AssertGround(WeaponType.SPA_TYPE83_CH, 5, 7, 9, 7, 7, 0);
+                AssertGround(WeaponType.SPA_TYPE83_CH, 5, 7, 10, 7, 7, 0);
                 Assert.AreEqual(10, (int)P(WeaponType.SPA_TYPE83_CH).MaxMovementPoints, "Type 83 MMP (SELF_PROPELLED)");
 
                 // PHZ-89 tracked MRL: SELF_PROPELLED + ROCKET_ARTILLERY → double-fire.
-                AssertGround(WeaponType.ROC_PHZ89_CH, 5, 7, 9, 7, 7, 0);
+                AssertGround(WeaponType.ROC_PHZ89_CH, 5, 7, 10, 7, 7, 0);
                 Assert.IsTrue(P(WeaponType.ROC_PHZ89_CH).HasCapability(WeaponCapability.RocketArtillery), "PHZ-89 rocket-artillery double-fire");
 
                 // Light towed: bare Artillery archetype (foot, MMP 4), GAD 8.
-                AssertGround(WeaponType.ART_LIGHT_CH, 5, 5, 9, 5, 8, 0);
-                Assert.AreEqual(4, (int)P(WeaponType.ART_LIGHT_CH).MaxMovementPoints, "Lt towed MMP 4");
+                AssertGround(WeaponType.ART_LIGHT_CH, 5, 5, 10, 5, 8, 0);
+                Assert.AreEqual(2, (int)P(WeaponType.ART_LIGHT_CH).MaxMovementPoints, "Lt towed MMP 4");
 
                 // Heavy towed: Artillery + SA+1 (heavier tube), foot MMP 4.
-                AssertGround(WeaponType.ART_HEAVY_CH, 5, 5, 10, 5, 8, 0);
+                AssertGround(WeaponType.ART_HEAVY_CH, 5, 5, 11, 5, 8, 0);
             }
             catch (Exception ex) { AppService.HandleException(CLASS_NAME, nameof(Artillery_ResolveConvertedLines), ex); throw; }
         }

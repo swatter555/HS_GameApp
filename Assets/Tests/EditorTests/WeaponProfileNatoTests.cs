@@ -155,25 +155,25 @@ namespace HammerAndSickle.Tests
                 // M109 (155mm SP): Artillery + SELF_PROPELLED + SA+1 (= the 2S3 line).
                 // Artillery rulings 2026-08-22: the US variant alone adds SMART_MUNITION (Copperhead,
                 // HA+3/SA+1 — "add one"); all four variants add FIRE_DIRECTION_NET (ICM 1.05, ruling 9).
-                AssertGround(WeaponType.SPA_M109_US, 8, 7, 11, 7, 7, 0);
+                AssertGround(WeaponType.SPA_M109_US, 8, 7, 12, 7, 7, 0);
                 Assert.AreEqual(10, (int)P(WeaponType.SPA_M109_US).MaxMovementPoints, "M109 MMP 10 (SELF_PROPELLED)");
                 Assert.AreEqual(5,  (int)P(WeaponType.SPA_M109_US).IndirectRange, "M109 IR 5");
                 Assert.AreEqual(1.05f, P(WeaponType.SPA_M109_US).ICM, 0.01f, "M109 US FIRE_DIRECTION_NET");
-                AssertGround(WeaponType.SPA_M109_UK, 5, 7, 10, 7, 7, 0); // non-US variants keep the base line (no Copperhead)
+                AssertGround(WeaponType.SPA_M109_UK, 5, 7, 11, 7, 7, 0); // non-US variants keep the base line (no Copperhead)
                 Assert.AreEqual(1.05f, P(WeaponType.SPA_M109_UK).ICM, 0.01f, "M109 UK FIRE_DIRECTION_NET");
                 Assert.AreEqual(1.05f, P(WeaponType.SPA_M109_GE).ICM, 0.01f, "M109 GE FIRE_DIRECTION_NET");
                 Assert.AreEqual(1.05f, P(WeaponType.SPA_AUF1_FR).ICM, 0.01f, "AUF1 FIRE_DIRECTION_NET");
 
                 // Light towed (105mm): bare Artillery, foot MMP 4, GAD 8.
-                AssertGround(WeaponType.ART_LIGHT_NATO, 5, 5, 9, 5, 8, 0);
-                Assert.AreEqual(4, (int)P(WeaponType.ART_LIGHT_NATO).MaxMovementPoints, "Lt towed MMP 4");
+                AssertGround(WeaponType.ART_LIGHT_NATO, 5, 5, 10, 5, 8, 0);
+                Assert.AreEqual(2, (int)P(WeaponType.ART_LIGHT_NATO).MaxMovementPoints, "Lt towed MMP 4");
 
                 // Heavy towed (155mm): Artillery + SA+1.
-                AssertGround(WeaponType.ART_HEAVY_NATO, 5, 5, 10, 5, 8, 0);
+                AssertGround(WeaponType.ART_HEAVY_NATO, 5, 5, 11, 5, 8, 0);
 
                 // MLRS: tracked rocket artillery — SELF_PROPELLED + ROCKET_ARTILLERY + SMART_MUNITION (analog of BM-27)
                 // + FIRE_DIRECTION_NET (artillery ruling 9, 2026-08-22).
-                AssertGround(WeaponType.ROC_MLRS_US, 8, 7, 11, 7, 7, 0);
+                AssertGround(WeaponType.ROC_MLRS_US, 8, 7, 12, 7, 7, 0);
                 Assert.AreEqual(6, (int)P(WeaponType.ROC_MLRS_US).IndirectRange, "MLRS IR 6");
                 Assert.IsTrue(P(WeaponType.ROC_MLRS_US).HasCapability(WeaponCapability.RocketArtillery), "MLRS rocket-artillery double-fire");
                 Assert.AreEqual(1.05f, P(WeaponType.ROC_MLRS_US).ICM, 0.01f, "MLRS FIRE_DIRECTION_NET");

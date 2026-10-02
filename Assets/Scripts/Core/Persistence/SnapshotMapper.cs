@@ -139,13 +139,18 @@ namespace HammerAndSickle.Persistence
                             // Copy essential current state
                             freshUnit.HitPoints.SetCurrent(unit.HitPoints.Current);
                             freshUnit.DaysSupply.SetCurrent(unit.DaysSupply.Current);
-                            freshUnit.MovementPoints.SetCurrent(unit.MovementPoints.Current);
+                            // Movement state is copied after posture and naval state below.
 
                             // Copy action states
+                            freshUnit.MoveActions.SetMax(unit.MoveActions.Max);
                             freshUnit.MoveActions.SetCurrent(unit.MoveActions.Current);
+                            freshUnit.CombatActions.SetMax(unit.CombatActions.Max);
                             freshUnit.CombatActions.SetCurrent(unit.CombatActions.Current);
+                            freshUnit.DeploymentActions.SetMax(unit.DeploymentActions.Max);
                             freshUnit.DeploymentActions.SetCurrent(unit.DeploymentActions.Current);
+                            freshUnit.OpportunityActions.SetMax(unit.OpportunityActions.Max);
                             freshUnit.OpportunityActions.SetCurrent(unit.OpportunityActions.Current);
+                            freshUnit.IntelActions.SetMax(unit.IntelActions.Max);
                             freshUnit.IntelActions.SetCurrent(unit.IntelActions.Current);
 
                             // Copy deployment and experience state
@@ -161,6 +166,9 @@ namespace HammerAndSickle.Persistence
                             // Copy facing and the naval transient state
                             freshUnit.Facing = unit.Facing;
                             freshUnit.SetNavalEmbarked(unit.IsNavalEmbarked);
+                            freshUnit.MovementPoints.SetMax(unit.GetActiveWeaponProfile()?.MaxMovementPoints ?? 0);
+                            freshUnit.MovementPoints.SetCurrent(unit.MovementPoints.Current);
+                            freshUnit.RestoreVoluntaryOrderLocks(unit.HasInitiatedCombatThisTurn, unit.HasMovementHaltedThisTurn);
 
                             // Copy leader assignment (just the ID string, not the object)
                             freshUnit.LeaderID = unit.LeaderID;

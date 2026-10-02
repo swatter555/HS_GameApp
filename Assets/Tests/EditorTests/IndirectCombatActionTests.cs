@@ -144,7 +144,7 @@ namespace HammerAndSickle.Tests
 
             Assert.IsTrue(r.Executed);
             Assert.AreEqual(0f, firer.CombatActions.Current, "1 CombatAction spent (§8.2.1)");
-            Assert.AreEqual(12f - combatCost, firer.MovementPoints.Current, TOL, "25% max MP spent (§8.2.1)");
+            Assert.AreEqual(12f - combatCost, firer.MovementPoints.Current, TOL, "combat leaves MP unchanged (§8.2.1)");
             Assert.IsTrue(firer.HasFoughtThisTurn, "firer flagged fought");
             Assert.IsTrue(target.HasFoughtThisTurn, "target flagged fought");
 
@@ -241,5 +241,19 @@ namespace HammerAndSickle.Tests
         }
 
         #endregion // Reveal, displacement, destruction
+        [Test]
+        public void LaunchedIndirectAttack_FacesGeneralBearing_WithoutRotatingTarget()
+        {
+            var firer = Build(UnitClassification.ART, WeaponType.ART_LIGHT_SV, Side.Player, new Position2D(5, 5));
+            var target = Build(UnitClassification.INF, WeaponType.INF_REG_SV, Side.AI, new Position2D(6, 7), SpottedLevel.Level2);
+            firer.Facing = HexDirection.W;
+            target.Facing = HexDirection.W;
+            var result = IndirectCombatAction.Execute(firer, target, GameDataManager.CurrentHexMap, new FixedRollRandom(1));
+            Assert.That(result.Executed, Is.True);
+            Assert.That(firer.Facing, Is.EqualTo(HammerAndSickle.Models.Map.HexMapUtil.GetGeneralDirection(firer.MapPos, target.MapPos)));
+            Assert.That(target.Facing, Is.EqualTo(HexDirection.W));
+            Assert.That(firer.MovementPoints.Current, Is.EqualTo(12));
+        }
+
     }
 }

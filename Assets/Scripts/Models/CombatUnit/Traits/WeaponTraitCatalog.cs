@@ -122,7 +122,7 @@ namespace HammerAndSickle.Models
 
             #region §5 Mobility & Survivability — ground
             Add(new TraitDef(WeaponTrait.GAS_TURBINE, TraitCategory.GroundMobility,
-                "M1 AGT1500 / T-80 GTD — high power/accel.", Delta(ProfileStat.MMP, 2)));
+                "M1 AGT1500 / T-80 GTD — high power/accel."));
             Add(new TraitDef(WeaponTrait.DEEP_WADING_SNORKEL, TraitCategory.GroundMobility,
                 "OPVT MBT river-fording kit.", Cap(WeaponCapability.DeepWading)));
             Add(new TraitDef(WeaponTrait.AMPHIBIOUS, TraitCategory.GroundMobility,
@@ -138,13 +138,12 @@ namespace HammerAndSickle.Models
             Add(new TraitDef(WeaponTrait.HIGH_GROUND_PRESSURE, TraitCategory.GroundMobility,
                 "DORMANT → per-class terrain move: heavy MBTs bog in soft terrain."));
             Add(new TraitDef(WeaponTrait.SELF_PROPELLED, TraitCategory.GroundMobility,
-                "Tracked self-propelled chassis (SP guns, tracked SP-AAA/SAM) — mobility off the MMP-4 towed " +
-                "baseline + an armoured hull; a vehicle is a slightly bigger air target than a dispersed towed battery.",
-                Delta(ProfileStat.MMP, 6), Delta(ProfileStat.HD, 2), Delta(ProfileStat.SD, 2), Delta(ProfileStat.GAD, -1)));
+                "Tracked self-propelled chassis (SP guns, tracked SP-AAA/SAM) — an armoured hull; a vehicle is a slightly bigger air target than a dispersed towed battery.",
+                Delta(ProfileStat.HD, 2), Delta(ProfileStat.SD, 2), Delta(ProfileStat.GAD, -1)));
             Add(new TraitDef(WeaponTrait.TRUCK_MOUNTED, TraitCategory.GroundMobility,
                 "Wheeled launch/transport chassis (MRLs, Scud TEL, wheeled SP-SAM) — mobility on a soft-skinned " +
                 "truck that is markedly air-vulnerable.",
-                Delta(ProfileStat.MMP, 4), Delta(ProfileStat.GAD, -2)));
+                Delta(ProfileStat.GAD, -2)));
             #endregion
 
             #region §6 IFV / APC
