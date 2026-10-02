@@ -198,6 +198,8 @@ namespace HammerAndSickle.Models.Combat
                 DirectEngagementResult eng =
                     CombatEngine.ResolveDirectEngagement(forward, returnLane, defenderStand, rng);
 
+                attacker.MarkFiredThisTurn();
+                defender.MarkFiredThisTurn();
                 defender.TakeDamage(eng.DamageToDefender);
                 attacker.TakeDamage(eng.DamageToAttacker);
 
@@ -341,6 +343,7 @@ namespace HammerAndSickle.Models.Combat
                 // DAMAGE (the attack resolves, deals 0); the caller still ends the mover's turn per §6.9.6.
                 if (HasNightCombatOps(mover)) dmg = 0;
 
+                ambusher.MarkFiredThisTurn();
                 mover.TakeDamage(dmg);
 
                 StandValueInput stand = BuildAmbushStand(ambusher, mover, ctx, dmg);
@@ -476,6 +479,8 @@ namespace HammerAndSickle.Models.Combat
                 int toFirer = cb ? CombatEngine.ResolveLane(BuildCounterBatteryLane(firer, target, ctx), rng) : 0;
 
                 // Simultaneous (§7.13.5.5) — apply after both lanes computed on pre-damage stats.
+                firer.MarkFiredThisTurn();
+                if (cb) target.MarkFiredThisTurn();
                 target.TakeDamage(toTarget);
                 if (cb) firer.TakeDamage(toFirer);
 
@@ -619,6 +624,7 @@ namespace HammerAndSickle.Models.Combat
 
                 LaneInput lane = BuildAirStrikeLane(strike, target, ctx);
                 int dmg = CombatEngine.ResolveLane(lane, rng);
+                strike.MarkFiredThisTurn();
                 target.TakeDamage(dmg);
 
                 return new AirStrikeResult
@@ -693,6 +699,7 @@ namespace HammerAndSickle.Models.Combat
 
                 LaneInput lane = BuildBaseForwardLane(attacker, baseUnit, ctx);
                 int dmg = CombatEngine.ResolveLane(lane, rng);
+                attacker.MarkFiredThisTurn();
                 baseUnit.TakeDamage(dmg);
                 bool destroyed = baseUnit.HitPoints.Current <= 0f;
 
@@ -794,6 +801,7 @@ namespace HammerAndSickle.Models.Combat
 
                 LaneInput lane = BuildAirDefenseFireLane(defender, aircraft);
                 int dmg = CombatEngine.ResolveLane(lane, rng);
+                defender.MarkFiredThisTurn();
                 aircraft.TakeDamage(dmg);
 
                 return new AirDefenseFireResult
@@ -887,6 +895,7 @@ namespace HammerAndSickle.Models.Combat
 
                 LaneInput lane = BuildOverheadFireLane(groundUnit, helo);
                 int dmg = CombatEngine.ResolveLane(lane, rng);
+                groundUnit.MarkFiredThisTurn();
                 helo.TakeDamage(dmg);
 
                 return new OverheadFireResult

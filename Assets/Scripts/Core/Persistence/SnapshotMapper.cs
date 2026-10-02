@@ -169,6 +169,7 @@ namespace HammerAndSickle.Persistence
                             freshUnit.MovementPoints.SetMax(unit.GetActiveWeaponProfile()?.MaxMovementPoints ?? 0);
                             freshUnit.MovementPoints.SetCurrent(unit.MovementPoints.Current);
                             freshUnit.RestoreVoluntaryOrderLocks(unit.HasInitiatedCombatThisTurn, unit.HasMovementHaltedThisTurn);
+                            freshUnit.RestoreSigintHistory(unit.HasEmittedThisTurn, unit.EmittedDuringLastOwnTurn, unit.SigintSweepsThisTurn, unit.SigintSweepAllowance);
 
                             // Copy leader assignment (just the ID string, not the object)
                             freshUnit.LeaderID = unit.LeaderID;

@@ -166,8 +166,7 @@ namespace HammerAndSickle.Core.GameData
     // weather ramp).
 
     /// <summary>
-    /// Signals IntelligenceDoctrine (SIGINT) rating. Parked (currently unreferenced) pending
-    /// reintroduction on CombatUnit — see Claude_TODO.md §5.
+    /// Signals intelligence rating. Ordinary HQs use HQLevel; SpecializedLevel qualification is pending.
     /// </summary>
     public enum SIGINT_Rating
     {
@@ -1993,6 +1992,9 @@ namespace HammerAndSickle.Core.GameData
         public const float MOVE_ACTION_SUPPLY_THRESHOLD = 1.5f;  // Threshold for move action supply cost.
         public const float MOVE_ACTION_SUPPLY_COST = 0.2f;  // Supply cost for move actions.
         public const float INTEL_ACTION_SUPPLY_COST = 0.25f; // Supply cost for intel actions.
+        public const int HQ_SIGINT_SUCCESS_PERCENT = 15;
+        // Ordinary HQ allowance. Each existing leader IntelAction bonus adds one extra sweep.
+        public const int HQ_SIGINT_SWEEPS_PER_TURN = 1;
         public const float OPPORTUNITY_ACTION_SUPPLY_THRESHOLD = 1.5f;  // Threshold for opportunity action supply cost.
         public const float OPPORTUNITY_ACTION_SUPPLY_COST = 0.5f;  // Supply cost for opportunity actions.
 

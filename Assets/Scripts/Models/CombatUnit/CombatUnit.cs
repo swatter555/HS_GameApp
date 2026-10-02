@@ -424,7 +424,7 @@ namespace HammerAndSickle.Models
             CombatActions.ResetToMax();
             DeploymentActions.ResetToMax();
             OpportunityActions.ResetToMax();
-            IntelActions.ResetToMax();
+            RefreshIntelActions(GetAssignedLeader());
 
             // §11.8.6 — the per-turn anti-dogpile record clears with the budget it guards (see the field).
             _aircraftEngagedThisTurn?.Clear();
@@ -481,6 +481,44 @@ namespace HammerAndSickle.Models
         [JsonInclude] [JsonPropertyName("hasMovementHaltedThisTurn")]
         public bool HasMovementHaltedThisTurn { get; private set; }
 
+        // SIGINT observes the last completed OWN turn, not activity during the enemy turn.
+        // Persist current history too: a mid-turn save must not erase an emission already made.
+        [JsonInclude] [JsonPropertyName("hasEmittedThisTurn")]
+        public bool HasEmittedThisTurn { get; private set; }
+        [JsonInclude] [JsonPropertyName("emittedDuringLastOwnTurn")]
+        public bool EmittedDuringLastOwnTurn { get; private set; }
+        [JsonInclude] [JsonPropertyName("sigintSweepsThisTurn")]
+        public int SigintSweepsThisTurn { get; private set; }
+
+        [JsonInclude] [JsonPropertyName("sigintSweepAllowance")]
+        public int SigintSweepAllowance { get; private set; } = GameData.HQ_SIGINT_SWEEPS_PER_TURN;
+
+        // A real leader's existing ImprovedGathering bonus grants both one action and one sweep.
+        // Kept separate from the baseline two-action pool; damage still restricts spendable actions.
+        internal void RefreshIntelActions(Leader assignedLeader)
+        {
+            int bonus = SigintRating == SIGINT_Rating.HQLevel ? Math.Max(0, (int)(assignedLeader?.IntelActionBonus ?? 0f)) : 0;
+            SigintSweepAllowance = SigintRating == SIGINT_Rating.HQLevel ? GameData.HQ_SIGINT_SWEEPS_PER_TURN + bonus : 0;
+            SigintSweepsThisTurn = 0;
+            IntelActions.SetMax(SigintRating == SIGINT_Rating.HQLevel ? 2 + bonus : 0);
+            IntelActions.SetCurrent(GetIntelOperationalCapacity());
+        }
+
+        [JsonIgnore] public SIGINT_Rating SigintRating =>
+            IsBase && Classification == UnitClassification.HQ ? SIGINT_Rating.HQLevel : SIGINT_Rating.UnitLevel;
+
+        public void MarkFiredThisTurn() => HasEmittedThisTurn = true;
+        public void MarkResuppliedThisTurn() => HasEmittedThisTurn = true;
+        public void CompleteOwnTurnActivity() => EmittedDuringLastOwnTurn = HasEmittedThisTurn;
+
+        internal void RestoreSigintHistory(bool currentEmission, bool lastOwnTurnEmission, int sweeps, int allowance)
+        {
+            HasEmittedThisTurn = currentEmission;
+            EmittedDuringLastOwnTurn = lastOwnTurnEmission;
+            SigintSweepsThisTurn = sweeps;
+            SigintSweepAllowance = allowance;
+        }
+
         public bool CanContinueMoveOrder() => !HasInitiatedCombatThisTurn && !HasMovementHaltedThisTurn;
 
         public void MarkMovementHalted()
@@ -501,7 +539,11 @@ namespace HammerAndSickle.Models
         [JsonIgnore] public bool HasFoughtThisTurn { get; private set; }
 
         /// <summary>Flags the unit as having moved this turn (called by MovementController per step).</summary>
-        public void MarkMovedThisTurn() => HasMovedThisTurn = true;
+        public void MarkMovedThisTurn()
+        {
+            HasMovedThisTurn = true;
+            HasEmittedThisTurn = true;
+        }
 
         /// <summary>Flags the unit as having fought this turn (called by the combat resolver path).</summary>
         public void MarkFoughtThisTurn() => HasFoughtThisTurn = true;
@@ -511,6 +553,7 @@ namespace HammerAndSickle.Models
         {
             HasMovedThisTurn = false;
             HasFoughtThisTurn = false;
+            HasEmittedThisTurn = false;
         }
 
         /// <summary>
@@ -635,6 +678,7 @@ namespace HammerAndSickle.Models
                 float availableCapacity = DaysSupply.Max - DaysSupply.Current;
                 float actualAmount = Mathf.Min(amount, availableCapacity);
                 DaysSupply.SetCurrent(DaysSupply.Current + actualAmount);
+                if (actualAmount > 0f) MarkResuppliedThisTurn();
                 return actualAmount;
             }
             catch (Exception e)
@@ -1164,11 +1208,10 @@ namespace HammerAndSickle.Models
         {
             try
             {
-                if (IntelActions.Current >= 1 &&
-                    IsBase && Classification == UnitClassification.HQ && !HasInitiatedCombatThisTurn &&
-                    DaysSupply.Current >= GameData.INTEL_ACTION_SUPPLY_COST)
+                if (GetIntelActions() >= 1)
                 {
                     IntelActions.DecrementCurrent();
+                    SigintSweepsThisTurn++;
                     ConsumeSupplies(GameData.INTEL_ACTION_SUPPLY_COST);
                     return true;
                 }
@@ -1248,10 +1291,21 @@ namespace HammerAndSickle.Models
             };
         }
 
-        public float GetDeployActions() =>
-            !CanUnitTypeChangeStates() || HasInitiatedCombatThisTurn ? 0 :
-            (_deploymentPosition == DeploymentPosition.Embarked && !IsNavalEmbarked) ||
-            MovementPoints.Current >= GetDeployMovementCost() ? DeploymentActions.Current : 0f;
+        public float GetDeployActions()
+        {
+            if (!CanUnitTypeChangeStates() || HasInitiatedCombatThisTurn) return 0f;
+            // Availability covers both ground transitions and the distinct, fee-free air commands.
+            // Map-dependent airbase/ZoC gates remain on the actual command.
+            if (_deploymentPosition == DeploymentPosition.Embarked && !IsNavalEmbarked)
+                return CanChangeToState(DeploymentPosition.Deployed, out _, requireMovementFee: false)
+                    ? DeploymentActions.Current : 0f;
+            bool groundStart = _deploymentPosition == DeploymentPosition.Deployed || _deploymentPosition == DeploymentPosition.Mobile;
+            bool airborne = Classification == UnitClassification.AB || Classification == UnitClassification.MAB;
+            bool airBoarding = groundStart && !HasMovementHaltedThisTurn && GetEmbarkedProfile() != null &&
+                (!airborne || (MovementPoints.Max > 0f && MovementPoints.Current >= MovementPoints.Max)) &&
+                CanChangeToState(DeploymentPosition.Embarked, out _, requireMovementFee: false);
+            return airBoarding || MovementPoints.Current >= GetDeployMovementCost() ? DeploymentActions.Current : 0f;
+        }
 
         public float GetCombatActions() =>
             IsBase ? 0 :
@@ -1262,8 +1316,18 @@ namespace HammerAndSickle.Models
 
         public float GetOpportunityActions() => IsBase ? 0 : OpportunityActions.Current;
 
+        public float GetIntelOperationalCapacity() =>
+            SigintRating != SIGINT_Rating.HQLevel || IsDestroyed() ? 0f : OperationalCapacity switch
+            {
+                OperationalCapacity.Full or OperationalCapacity.SlightlyDegraded => IntelActions.Max,
+                OperationalCapacity.ModeratelyDegraded or OperationalCapacity.HeavilyDegraded => Math.Min(1f, IntelActions.Max),
+                _ => 0f
+            };
+
         public float GetIntelActions() =>
-            IsBase && Classification == UnitClassification.HQ && !HasInitiatedCombatThisTurn ? IntelActions.Current : 0;
+            HasInitiatedCombatThisTurn || DaysSupply.Current < GameData.INTEL_ACTION_SUPPLY_COST ? 0f :
+            Math.Max(0f, Math.Min(Math.Min(IntelActions.Current, Math.Max(0f, GetIntelOperationalCapacity() - SigintSweepsThisTurn)),
+                SigintSweepAllowance - SigintSweepsThisTurn));
 
         private bool ConsumeMovementPoints(float points)
         {
@@ -2370,6 +2434,7 @@ namespace HammerAndSickle.Models
                 }
 
                 DaysSupply.SetCurrent(Math.Min(DaysSupply.Current + amount, DaysSupply.Max));
+                MarkResuppliedThisTurn();
 
                 AppService.CaptureUiMessage($"{UnitName} has added {amount} days of supply. Current supply: {DaysSupply.Current} days.");
                 return true;

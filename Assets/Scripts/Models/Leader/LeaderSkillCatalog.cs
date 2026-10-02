@@ -596,7 +596,7 @@ namespace HammerAndSickle.Models
                 GameData.TIER3_REP_COST,
                 SkillBranch.AirborneDoctrine,
                 SkillTier.Tier3,
-                "Elite airborne units can still conduct combat operations immediately after a jump.",
+                "Combat after a jump is available with any remaining attack. This doctrine's additional benefit awaits definition.",
                 SkillBonusType.AirborneElite, // Boolean capability
                 CommandGrade.SeniorGrade,
                 new List<Enum> { AirborneDoctrine.CombatDropDoctrine_AirborneAssault }
@@ -615,7 +615,7 @@ namespace HammerAndSickle.Models
                 GameData.TIER1_REP_COST,
                 SkillBranch.AirMobileDoctrine,
                 SkillTier.Tier1,
-                "Improved helicopter operations allow units to move after air landing.",
+                "Air landing preserves remaining movement without replenishing actions. This doctrine's additional benefit awaits definition.",
                 SkillBonusType.AirMobile, // Boolean capability
                 CommandGrade.JuniorGrade
             ));
@@ -627,7 +627,7 @@ namespace HammerAndSickle.Models
                 GameData.TIER2_REP_COST,
                 SkillBranch.AirMobileDoctrine,
                 SkillTier.Tier2,
-                "Combat-focused air mobile operations allow units to still have a combat action after landing.",
+                "Combat after air landing is available with any remaining attack. This doctrine's additional benefit awaits definition.",
                 SkillBonusType.AirMobileAssault, // Boolean capability
                 CommandGrade.SeniorGrade,
                 new List<Enum> { AirMobileDoctrine.RapidRedeployment_AirMobile }
@@ -659,7 +659,7 @@ namespace HammerAndSickle.Models
                 GameData.TIER1_REP_COST,
                 SkillBranch.IntelligenceDoctrine,
                 SkillTier.Tier1,
-                "Improved intelligence gathering techniques provide additional intel actions each turn.",
+                "Improved intelligence gathering grants one additional HQ intel action and one additional sweep each turn.",
                 SkillBonusType.ImprovedGathering,
                 GameData.DEPLOYMENT_ACTION_BONUS_VAL,
                 CommandGrade.JuniorGrade

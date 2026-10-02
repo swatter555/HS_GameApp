@@ -773,9 +773,9 @@ namespace HammerAndSickle.Controllers
             if (_battleEnded) { _turnSequenceCoroutine = null; yield break; }
 
             // -------- AI Turn --------
-            // Placeholder until real AI exists. The phase enters, sits for the
-            // configured dwell, and exits. When AI logic lands it slots in here.
+            // HQ SIGINT uses the same rules as player commands; other AI orders remain pending.
             SetPhase(BattlePhase.AI_Turn);
+            ProcessAiSigint();
             AppService.CaptureUiMessage("Enemy turn underway...");
             yield return new WaitForSeconds(_aiTurnPlaceholderDelay);
             if (_battleEnded) { _turnSequenceCoroutine = null; yield break; }
@@ -849,14 +849,29 @@ namespace HammerAndSickle.Controllers
         /// </summary>
         public Models.AI.AIPerceptionState AIPerception { get; private set; } = new Models.AI.AIPerceptionState();
 
+        private void ProcessAiSigint()
+        {
+            try
+            {
+                var rng = new Models.Combat.CombatRandom();
+                var targets = GameDataManager.Instance.GetPlayerUnits();
+                foreach (var hq in GameDataManager.Instance.GetAIUnits())
+                    while (hq != null && hq.GetIntelActions() >= 1f)
+                        if (!SigintAction.Execute(hq, targets, rng, AIPerception, CurrentTurnNumber).Executed) break;
+            }
+            catch (Exception e)
+            {
+                AppService.HandleException(CLASS_NAME, nameof(ProcessAiSigint), e);
+            }
+        }
+
         /// <summary>
         /// Refresh phase (§3.3) for one side. Order per §3.3: action/MP refresh and per-turn
         /// flag reset for every living unit on that side; (out-of-supply consequences §3.3.3 —
         /// HOOK reserved, inert until the supply system lands); spotting decay + recompute
         /// (§3.3.4); weather check (§3.3.6).
         ///
-        /// Spotting (§3.3.4) runs only for the player side: SpottedLevel lives on AI units and
-        /// is set by player spotters; AI-side fog of war is unmodelled in v1.
+        /// Player spotting updates AI units' SpottedLevel; AI spotting updates its separate belief store.
         /// </summary>
         private void ProcessRefresh(bool isPlayerSide)
         {
@@ -936,6 +951,7 @@ namespace HammerAndSickle.Controllers
                         continue;
                     }
 
+                    u.CompleteOwnTurnActivity();
                     ApplyUpkeepRecovery(u);
                 }
 

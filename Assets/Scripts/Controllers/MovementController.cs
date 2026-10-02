@@ -319,10 +319,18 @@ namespace HammerAndSickle.Controllers
         private void HandleIntelActionRequested(CombatUnit unit)
         {
             if (unit == null || _currentPhase != BattlePhase.PlayerTurn || unit.Side != Side.Player) return;
-            AppService.CaptureUiMessage(unit.GetIntelActions() < 1
-                ? $"{unit.UnitName} cannot gather base intel right now."
-                : "HQ intelligence gathering is unavailable while SIGINT rules are pending implementation.");
-            GameAudio.Play(SFX.ButtonDenied);
+            var result = SigintAction.Execute(unit, GameDataManager.Instance.GetAIUnits(), new CombatRandom());
+            if (!result.Executed)
+            {
+                AppService.CaptureUiMessage($"{unit.UnitName}: {result.RefusalReason}");
+                GameAudio.Play(SFX.ButtonDenied);
+                return;
+            }
+            EventManager.Instance.RaiseUnitActionsChanged(unit);
+            foreach (var change in result.Changes)
+                EventManager.Instance.RaiseUnitSpottedLevelChanged(change.Unit, change.OldLevel, change.NewLevel);
+            if (result.Changes.Count > 0) EventManager.Instance.RaiseRedrawMapIcons();
+            AppService.CaptureUiMessage($"{unit.UnitName} completed an intelligence sweep.");
         }
 
         #endregion // Intel Action
