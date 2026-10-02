@@ -7,6 +7,7 @@ using HammerAndSickle.Models;
 using HammerAndSickle.Models.AI;
 using HammerAndSickle.Models.Combat;
 using HammerAndSickle.Persistence;
+using HammerAndSickle.Services;
 using NUnit.Framework;
 
 namespace HammerAndSickle.Tests
@@ -14,6 +15,51 @@ namespace HammerAndSickle.Tests
     [TestFixture]
     public class SigintActionTests
     {
+        private TestHandler _previousHandler;
+        private TestHandler _handler;
+
+        [SetUp]
+        public void SetUp()
+        {
+            _previousHandler = AppService.GetTestHandler();
+            _handler = new TestHandler();
+            AppService.SetTestHandler(_handler);
+            try
+            {
+                // Target and air-mobile units resolve their equipment from the real catalog.
+                // Own this dependency even when no earlier fixture has initialized it.
+                if (!WeaponProfileDB.IsInitialized) WeaponProfileDB.Initialize();
+                Assert.That(WeaponProfileDB.IsInitialized, Is.True);
+                Assert.That(_handler.ExceptionCount, Is.Zero, "Catalog initialization must not recover from errors.");
+            }
+            catch
+            {
+                // NUnit does not run this level's TearDown when SetUp fails.
+                RestoreHandler();
+                throw;
+            }
+        }
+
+        [TearDown]
+        public void TearDown()
+        {
+            try
+            {
+                Assert.That(_handler.Exceptions, Is.Empty, "Unexpected application errors must fail the test.");
+            }
+            finally
+            {
+                RestoreHandler();
+            }
+        }
+
+        private void RestoreHandler()
+        {
+            AppService.SetTestHandler(_previousHandler);
+            _handler = null;
+            _previousHandler = null;
+        }
+
         private sealed class Rolls : ICombatRandom
         {
             private readonly Queue<int> _values;

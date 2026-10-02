@@ -19,7 +19,7 @@ Each selection line is a complete fixture name (for example `ActionEconomyRegres
     -TimeoutSeconds 15
 ```
 
-The script compiles only the harness, using the installed Unity compiler/framework references and the referenced NUnit assembly. It verifies pure NUnit lifecycle/output handling first, then checks the actual action-economy fixture's error guard and restoration in a separate process. It never installs a runtime or invokes standalone Mono. Use a new output directory for every run; preserve old results and crash logs.
+The script compiles only the harness, using the installed Unity compiler/framework references and the referenced NUnit assembly. It verifies pure NUnit lifecycle/output handling first, then checks the actual action-economy and SIGINT fixtures' error guards and restoration, each in its own fresh process. It never installs a runtime or invokes standalone Mono. Use a new output directory for every run; preserve old results and crash logs.
 
 The runner rejects an initialized catalog at process entry or after first-selection discovery, zero-case/empty selections, handler leaks, test failures, skips/inconclusive results, and truncated reporting. NUnit owns inherited one-time and per-case callbacks and parameterized cases. The fixture itself owns its required initialization. Native services/assets remain unsupported outside Unity; failures are recorded, never skipped or converted to success.
 
@@ -47,16 +47,32 @@ Verified on installed **.NET 8.0.31**, using local **Unity 6000.6.3f1** compiler
 | CombatMath, CombatEngine, AirCombatEngine, CombatOracle, AIPerception, each cold | 8 + 12 + 11 + 15 + 11 = 57 passed / 0 failed |
 | Action fixture before and after those five broader suites | 97 passed / 0 failed, including the repeated 20 cases |
 
-These repetitions establish different isolation/order checks, not additional unique tests. There are **77 unique passing game cases** in the successful managed selection.
+These repetitions establish different isolation/order checks, not additional unique tests. The first repair milestone verified **77 unique passing game cases**, published as `e89ea48f3983d21e8656d04a9ba28f0b45da14be` with a normal push to `origin/main`. All 208 C# compiler inputs were extracted from that exact commit, compiled with no diagnostics, and its committed harness repeated the isolated, reversed and combined checks successfully.
 
-### Separately exposed dependency
+## SIGINT fixture follow-up, 2026-10-02
 
-A cold-process `SigintActionTests` run produced **11 passed / 16 failed**. Its weapon-dependent unit factories also rely on an already initialized catalog. The missing profile path reached Unity's native error logger, unavailable under .NET (`ECall methods must be packaged into a system module`). The saved full native run had passed all 27 SIGINT cases after other fixtures initialized the catalog. This is an open fixture-isolation finding, not a new gameplay failure or a passing cold-start check. No SIGINT assertions or source have been changed in this repair. The Chinese/NATO roster fixtures inherit native manager setup and were not rerun by bypassing it; their saved native results are 27/27 and 35/35.
+The stricter runner exposed another missing catalog dependency in `SigintActionTests`. The same assemblies extracted from `e89ea48`, running on the same .NET 8.0.31 runtime, produced **11 passed / 16 failed** when SIGINT ran first and **27/27 passed** when the action-economy fixture ran before it. The runner reported the catalog uninitialized before the cold selection and initialized before the warm SIGINT selection. This controlled comparison distinguishes fixture order dependence from a required Unity runtime behavior.
+
+All 16 cold failures pass through `CombatUnit.InitializeMovementPoints`: the target/air-mobile constructors resolve equipment identifiers through an uninitialized `WeaponProfileDB`, receive no deployed profile and report `Unit must have a valid deployed profile`. With no test handler, that error reaches Unity's native logger, unavailable under .NET (`ECall methods must be packaged into a system module`). That runtime exception is secondary error reporting, not the root cause. The 11 passing cases do not require those weapon-backed factories. The saved native full run's 27/27 SIGINT result did not demonstrate independence from earlier catalog initialization.
+
+Robert authorized closing this fixture dependency as a separate follow-up. `SigintActionTests` now owns the same explicit catalog initialization, unexpected-error assertions and previous-handler restoration as the action-economy fixture, including cleanup when setup fails. Its existing helpers, test bodies and assertions are byte-identical. No SIGINT/gameplay implementation changed. The harness's actual-fixture lifecycle check now verifies each fixture in a separate process, including a deliberately captured error that must fail teardown while restoring the previous handler.
+
+| Follow-up check | Actual result |
+|---|---|
+| Main and EditorTests compilation | Passed, no compiler diagnostics |
+| SIGINT alone with cold catalog through discovery | 27 passed / 0 failed |
+| Each SIGINT case in its own cold process | 27 passed / 0 failed |
+| Reverse SIGINT case order | 27 passed / 0 failed |
+| SIGINT, ActionEconomy, SIGINT, ActionEconomy in one cold-start process | 94 passed / 0 failed |
+| SIGINT + ActionEconomy + CombatMath + CombatEngine + AirCombatEngine + CombatOracle + AIPerception, each in a fresh process | 104 unique cases passed / 0 failed |
+| Pure output/lifecycle checks and both actual-fixture error/restore checks | Passed |
+
+The original XML and before/after evidence are preserved in `C:/Users/coder/AppData/Local/Temp/hs-sigint-fixture-repair-20261002`. Native `SigintActionTests` and the separate seven-case `SigintIntegrationTests` had passed in the saved full native run; neither result is presented as a new post-repair native run. Chinese/NATO roster fixtures inherit native manager setup and were not rerun by bypassing it; their saved native results remain 27/27 and 35/35.
 
 ### Scope and remaining acceptance
 
-Only the action-economy fixture, supplemental harness and documentation belong to this repair. Existing icon/prefab-source changes, user scenes/prefabs, metadata, upgrade settings/packages and historical files remain outside it. Before documentation edits, all **4,064 unrelated baseline files** matched their saved hashes.
+The first repair changed the action-economy fixture, supplemental harness and documentation. The SIGINT follow-up changes only its fixture, the two harness lifecycle-check callers and this verification record. Existing icon/prefab-source changes, user scenes/prefabs, metadata, upgrade settings/packages and historical files remain outside both repairs. The first milestone preserved all **4,063 unrelated files** plus every unrelated Repository Map byte.
 
-Committed pins remain **Unity 6000.2.6f2 / URP 17.2.0**; the local reference environment is **6000.6.3f1 / URP 17.6.0**. Compiling exact committed C# sources with local references does not establish a native clean build at committed pins. Native fixture/full EditorTests reruns after recompilation remain pending, as do fresh Khost, Console/Play/UI and build acceptance. Robert owns air-button wiring; no prefab or scene authoring was performed.
+Committed pins remain **Unity 6000.2.6f2 / URP 17.2.0**; the local reference environment is **6000.6.3f1 / URP 17.6.0**. Compiling exact committed C# sources with local references does not establish a native clean build at committed pins. Stable native checkpoint: let Unity recompile, run `ActionEconomyRegressionTests` (20 cases) and `SigintActionTests` (27 cases) individually, then full EditorTests when available, preserving XML and Console observations. These post-repair native checks remain pending, as do fresh Khost, Play/UI and build acceptance. Robert owns air-button wiring; no prefab or scene authoring was performed.
 
 Evidence: `C:/Users/coder/AppData/Local/Temp/hs-fixture-repair-20261002`. Original XML and earlier probes are retained at its root; `astra-resume` contains the .NET crash, corrected runs, compiler responses, per-case XML, order runs, native XML capture and baseline hash comparison.

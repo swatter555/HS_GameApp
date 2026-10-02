@@ -85,8 +85,10 @@ foreach ($taskTool in @('RunnerLifecycleChecks', 'ManagedNUnitRunner', 'FixtureL
     $taskRuntimeConfig | Set-Content -LiteralPath (Join-Path $OutputDirectory ($taskTool + '.runtimeconfig.json'))
 }
 Invoke-BoundedDotNet @((Join-Path $OutputDirectory 'RunnerLifecycleChecks.dll')) 'self-check'
-Invoke-BoundedDotNet @((Join-Path $OutputDirectory 'FixtureLifecycleChecks.dll'), $ReferencePathsFile,
-    $MainAssembly, $TestAssembly) 'fixture-lifecycle-check'
+foreach ($taskFixture in @('ActionEconomyRegressionTests', 'SigintActionTests')) {
+    Invoke-BoundedDotNet @((Join-Path $OutputDirectory 'FixtureLifecycleChecks.dll'), $ReferencePathsFile,
+        $MainAssembly, $TestAssembly, $taskFixture) ($taskFixture + '-lifecycle-check')
+}
 $taskGroups = if ($SharedProcess) { 1 } else { $taskSelections.Count }
 for ($taskIndex = 0; $taskIndex -lt $taskGroups; $taskIndex++) {
     $taskLabel = 'selection-{0:D3}' -f ($taskIndex + 1)

@@ -10,7 +10,9 @@ internal static class FixtureLifecycleChecks
     {
         try
         {
-            if (args.Length != 3) throw new ArgumentException("Usage: fixture-check refs.txt Main.dll EditorTests.dll");
+            if (args.Length < 3 || args.Length > 4)
+                throw new ArgumentException("Usage: fixture-check refs.txt Main.dll EditorTests.dll [fixture-name]");
+            string fixtureName = args.Length == 4 ? args[3] : "ActionEconomyRegressionTests";
             Program.ResolveAssemblies(args[0], args[1], args[2]);
             var main = Assembly.LoadFrom(args[1]);
             var tests = Assembly.LoadFrom(args[2]);
@@ -26,7 +28,7 @@ internal static class FixtureLifecycleChecks
             try
             {
                 setHandler.Invoke(null, new[] { sentinel });
-                var type = tests.GetType("HammerAndSickle.Tests.ActionEconomyRegressionTests", true);
+                var type = tests.GetType("HammerAndSickle.Tests." + fixtureName, true);
                 var fixture = Activator.CreateInstance(type);
                 type.GetMethod("SetUp").Invoke(fixture, null);
                 var ownedHandler = getHandler.Invoke(null, null);
@@ -45,7 +47,7 @@ internal static class FixtureLifecycleChecks
                     throw new Exception("Clean repeated setup/teardown leaked the handler.");
             }
             finally { setHandler.Invoke(null, new[] { previous }); }
-            Console.WriteLine("Fixture lifecycle checks passed: cold catalog, captured-error failure, previous-handler restoration, clean repeat.");
+            Console.WriteLine(fixtureName + " lifecycle checks passed: cold catalog, captured-error failure, previous-handler restoration, clean repeat.");
             return 0;
         }
         catch (Exception error) { Console.Error.WriteLine(error); return 1; }
