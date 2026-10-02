@@ -10,6 +10,51 @@ namespace HammerAndSickle.Tests
     [TestFixture]
     public class ActionEconomyRegressionTests
     {
+        private TestHandler _previousHandler;
+        private TestHandler _handler;
+
+        [SetUp]
+        public void SetUp()
+        {
+            _previousHandler = AppService.GetTestHandler();
+            _handler = new TestHandler();
+            AppService.SetTestHandler(_handler);
+            try
+            {
+                // These model tests need the real catalog, even when run first or in isolation.
+                // Catalog initialization is idempotent; no scene/global manager is required.
+                if (!WeaponProfileDB.IsInitialized) WeaponProfileDB.Initialize();
+                Assert.That(WeaponProfileDB.IsInitialized, Is.True);
+                Assert.That(_handler.ExceptionCount, Is.Zero, "Catalog initialization must not recover from errors.");
+            }
+            catch
+            {
+                // NUnit does not run this level's TearDown when SetUp fails.
+                RestoreHandler();
+                throw;
+            }
+        }
+
+        [TearDown]
+        public void TearDown()
+        {
+            try
+            {
+                Assert.That(_handler.Exceptions, Is.Empty, "Unexpected application errors must fail the test.");
+            }
+            finally
+            {
+                RestoreHandler();
+            }
+        }
+
+        private void RestoreHandler()
+        {
+            AppService.SetTestHandler(_previousHandler);
+            _handler = null;
+            _previousHandler = null;
+        }
+
         private static CombatUnit AirMobile() => new CombatUnit("AM", UnitClassification.MAM,
             UnitRole.GroundCombat, Side.Player, Nationality.USSR, deployedProfile: WeaponType.INF_AM_SV,
             mobileProfile: WeaponType.APC_MTLB_SV, embarkedProfile: WeaponType.HEL_MI8T_SV);

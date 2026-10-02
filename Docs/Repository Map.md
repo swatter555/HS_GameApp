@@ -204,7 +204,7 @@ Audio uses `GameAudio`/`AudioFogPolicy` to prevent hidden-unit information leaks
 2. Ensure Git LFS assets are present for a fresh clone; [.gitattributes](../.gitattributes) defines binary LFS tracking. Preserve existing source line endings; [.editorconfig](../.editorconfig) and attributes intentionally avoid a wholesale C# renormalization.
 3. Generated terrain arrays and their `.meta` files are excluded by [.gitignore](../.gitignore). In Unity run `Tools/Hex Chunk/Rebuild All Terrain Arrays` (MiddleEast/Europe/China). Verify Resources loads and any serialized references; recreated assets may have new GUIDs. Original terrain PNGs are tracked.
 4. Open MainMenu to exercise normal startup into Khost; directly opening BattleScene without a selected manifest is not the normal setup path.
-5. Use Unity Test Runner's EditMode tests for the `EditorTests` assembly. The repository has no CI workflow or dedicated standalone domain-test runner. No Unity executable was found in the default Unity Hub directory during this scan; that is a local discovery result, not a permanent restriction on agent testing. If a runner is unavailable, request the actual run from Robert and keep the result pending.
+5. Use Unity Test Runner's EditMode tests for the `EditorTests` assembly. The repository has no CI workflow. [Managed fixture verification](<Managed Test Verification.md>) documents the supplemental [Tools/ManagedTests](../Tools/ManagedTests/) runner: installed .NET 8, real NUnit lifecycle, fresh processes, no catalog bootstrap, bounded file reporting and explicit native limitations. It does not replace Unity Test Runner. If a native runner is unavailable, request the actual run from Robert and keep the result pending.
 
 ### Tests by affected behavior
 
