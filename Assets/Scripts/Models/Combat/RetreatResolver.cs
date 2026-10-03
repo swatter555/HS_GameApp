@@ -45,7 +45,8 @@ namespace HammerAndSickle.Models.Combat
         /// retreat/rout on an open map consumes none.
         /// </summary>
         public static DisplacementResult ResolveDisplacement(
-            CombatUnit attacker, CombatUnit defender, StandOutcome outcome, HexMap map, ICombatRandom rng)
+            CombatUnit attacker, CombatUnit defender, StandOutcome outcome, HexMap map, ICombatRandom rng,
+            bool failOnError = false, GroundCombatContext combatContext = null)
         {
             var result = new DisplacementResult
             {
@@ -60,6 +61,7 @@ namespace HammerAndSickle.Models.Combat
                 if (defender == null) throw new ArgumentNullException(nameof(defender));
                 if (map == null) throw new ArgumentNullException(nameof(map));
                 if (rng == null) throw new ArgumentNullException(nameof(rng));
+                if (failOnError && !(rng is CombatActionRandom)) rng = new CombatActionRandom(rng);
 
                 if (outcome == StandOutcome.Hold) return result;
 
@@ -77,7 +79,7 @@ namespace HammerAndSickle.Models.Combat
                     if (defender.HitPoints.Current <= 0f)
                         return MarkRemoved(ref result, destroyed: true, aa: true);
 
-                    bool hasPath = BestCandidate(defender.MapPos, rearDirs, side, map).HasValue;
+                    bool hasPath = BestCandidate(defender.MapPos, rearDirs, side, map, combatContext).HasValue;
                     if (!hasPath)
                         return ResolveSurrender(defender, rng, ref result);      // §7.9.6.3 no-path → Surrender
 
@@ -88,7 +90,7 @@ namespace HammerAndSickle.Models.Combat
                 }
 
                 // Retreat or Rout: find the first step.
-                Position2D? first = BestCandidate(defender.MapPos, rearDirs, side, map);
+                Position2D? first = BestCandidate(defender.MapPos, rearDirs, side, map, combatContext);
                 if (!first.HasValue)
                     return ResolveSurrender(defender, rng, ref result);          // §6.8.3 / §7.9.6a
 
@@ -110,7 +112,7 @@ namespace HammerAndSickle.Models.Combat
                         result.PostureDropped = true;
                     }
 
-                    Position2D? second = BestCandidate(defender.MapPos, rearDirs, side, map);
+                    Position2D? second = BestCandidate(defender.MapPos, rearDirs, side, map, combatContext);
                     if (second.HasValue)
                     {
                         HexMapUtil.MoveUnitTo(map, defender, second.Value);
@@ -124,6 +126,7 @@ namespace HammerAndSickle.Models.Combat
             }
             catch (Exception e)
             {
+                if (failOnError) throw;
                 AppService.HandleException(CLASS_NAME, nameof(ResolveDisplacement), e);
                 return result;
             }
@@ -143,7 +146,13 @@ namespace HammerAndSickle.Models.Combat
         private static bool StaticCollapses(CombatUnit defender, ICombatRandom rng, ref DisplacementResult r)
         {
             if (defender.EfficiencyLevel != EfficiencyLevel.StaticOperations) return false;
-            if (!SurrenderCheck.ResolveStaticCollapse(defender.ExperienceLevel, rng)) return false;
+            bool collapsed = SurrenderCheck.ResolveStaticCollapse(defender.ExperienceLevel, rng);
+            // Legacy pure helpers catch dice errors. Reject their fallback BEFORE movement, damage or removal.
+            CombatActionRandom.ThrowIfFailed(rng);
+            if (!collapsed) return false;
+            // Collapse removes surviving equipment just like surrender. Without this, a support-induced
+            // collapse would disappear from the roster without entering the casualty ledger.
+            GameDataManager.RecordRemainingEquipmentAsLost(defender);
             r.RemovedFromMap = true;
             r.Destroyed = true;
             r.StaticCollapsed = true;
@@ -154,7 +163,9 @@ namespace HammerAndSickle.Models.Combat
         /// <summary>§7.9.6a: must-retreat-but-cannot — hold in place at a cost, or be destroyed.</summary>
         private static DisplacementResult ResolveSurrender(CombatUnit defender, ICombatRandom rng, ref DisplacementResult r)
         {
-            if (SurrenderCheck.ResolveSurrender(defender.ExperienceLevel, rng) == SurrenderOutcome.Destroyed)
+            SurrenderOutcome surrender = SurrenderCheck.ResolveSurrender(defender.ExperienceLevel, rng);
+            CombatActionRandom.ThrowIfFailed(rng);
+            if (surrender == SurrenderOutcome.Destroyed)
             {
                 // ⚠ THE ONE LOSS-LEDGER CASE TakeDamage CANNOT SEE (printer P5). This unit is lost WITHOUT
                 // being damaged to zero — it is removed intact — so no damage event ever fires and its
@@ -197,13 +208,14 @@ namespace HammerAndSickle.Models.Combat
         /// (§6.8.2): friendly tile control, then higher terrain defense bonus, then lowest movement cost, then
         /// stable rear-arc order as the hex-index tiebreak. Null if none are valid.
         /// </summary>
-        private static Position2D? BestCandidate(Position2D from, HexDirection[] rearDirs, Side side, HexMap map)
+        private static Position2D? BestCandidate(Position2D from, HexDirection[] rearDirs, Side side, HexMap map,
+            GroundCombatContext combatContext)
         {
             var valid = new List<Position2D>(3);
             foreach (HexDirection dir in rearDirs)
             {
                 Position2D pos = HexMapUtil.GetNeighborPosition(from, dir);
-                if (IsValidCandidate(pos, side, map)) valid.Add(pos);
+                if (IsValidCandidate(pos, side, map, combatContext)) valid.Add(pos);
             }
             if (valid.Count == 0) return null;
 
@@ -215,24 +227,25 @@ namespace HammerAndSickle.Models.Combat
         }
 
         /// <summary>§6.8.2a: a candidate is invalid if off-map, impassable/water, occupied, or in enemy ZoC.</summary>
-        private static bool IsValidCandidate(Position2D pos, Side side, HexMap map)
+        private static bool IsValidCandidate(Position2D pos, Side side, HexMap map, GroundCombatContext combatContext)
         {
             HexTile tile = map.GetHexAt(pos);
             if (tile == null) return false;                                               // off-map (§6.8.6)
             if (tile.Terrain == TerrainType.Impassable || tile.Terrain == TerrainType.Water) return false; // §4.3.6
             if (GameDataManager.Instance.GetUnitAtPosition(pos) != null) return false;    // occupied by any unit
-            if (InEnemyZoC(pos, side, map)) return false;                                 // ZoC blocks retreat
+            if (InEnemyZoC(pos, side, map, combatContext)) return false;                  // ZoC blocks retreat
             return true;
         }
 
         /// <summary>True if any spotted, ZoC-projecting enemy of <paramref name="side"/> is adjacent to <paramref name="pos"/> (§6.5).</summary>
-        private static bool InEnemyZoC(Position2D pos, Side side, HexMap map)
+        private static bool InEnemyZoC(Position2D pos, Side side, HexMap map, GroundCombatContext combatContext)
         {
             GameDataManager gdm = GameDataManager.Instance;
             IEnumerable<CombatUnit> enemies = side == Side.Player ? gdm.GetAIUnits() : gdm.GetPlayerUnits();
             foreach (CombatUnit e in enemies)
             {
-                if (e.SpottedLevel == SpottedLevel.Level0) continue;
+                if (combatContext != null ? !combatContext.CanObserve(side, e, map)
+                    : e.SpottedLevel == SpottedLevel.Level0) continue;
                 if (!e.ProjectsZoC) continue;
                 if (HexMapUtil.GetHexDistance(e.MapPos, pos) == GameData.ZOC_RANGE) return true;
             }

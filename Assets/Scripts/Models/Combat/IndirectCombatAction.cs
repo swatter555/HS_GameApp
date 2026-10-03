@@ -14,7 +14,10 @@ namespace HammerAndSickle.Models.Combat
     /// </summary>
     public struct IndirectCombatOutcome
     {
-        public bool Executed;                   // false → rejected before any dice/costs (see Reason)
+        public bool Committed;                 // payment succeeded, including an interrupted/failed resolution
+        public bool ShotResolved;              // HP/stand resolution completed
+        public bool ResolutionFailed;
+        public bool Executed;                   // the whole mission completed; Committed records costs on failure
         public string Reason;                   // rejection reason (null/empty on success)
 
         public int DamageToTarget;
@@ -23,6 +26,7 @@ namespace HammerAndSickle.Models.Combat
         public StandOutcome TargetOutcome;
 
         public bool TargetMoved;                // retreated/routed to a new hex
+        public bool TargetHeldInPlace;          // failed stand, blocked retreat, passed surrender check
         public Position2D TargetFinalPosition;
         public int TargetHexesRetreated;        // 0 / 1 / 2
         public bool TargetRemovedFromMap;       // shatter-quit OR destruction → unregistered
@@ -85,18 +89,34 @@ namespace HammerAndSickle.Models.Combat
         /// target has no OpportunityAction to pay for it (§7.13.5.7).
         /// </summary>
         public static IndirectCombatOutcome Execute(CombatUnit firer, CombatUnit target, HexMap map, ICombatRandom rng)
+            => ExecuteCore(firer, target, map, rng, null);
+
+        // Only GroundCombatAction calls this after selecting a fully eligible separate battery. This is a
+        // terminal reaction: it cannot enter ground combat, select another supporter, or return counter-battery.
+        internal static IndirectCombatOutcome ExecuteSupport(CombatUnit firer, CombatUnit target, HexMap map,
+            ICombatRandom rng, GroundCombatContext context) => ExecuteCore(firer, target, map, rng, context);
+
+        private static IndirectCombatOutcome ExecuteCore(CombatUnit firer, CombatUnit target, HexMap map,
+            ICombatRandom rng, GroundCombatContext supportContext)
         {
+            Position2D targetStart = target?.MapPos ?? Position2D.Zero;
+            var outcome = new IndirectCombatOutcome { TargetFinalPosition = targetStart };
+            bool support = supportContext != null;
             try
             {
                 if (rng == null)
                     return new IndirectCombatOutcome { Executed = false, Reason = "No RNG." };
-                string reason = CanExecute(firer, target, map);
+                string reason = support ? null : CanExecute(firer, target, map);
                 if (reason != null)
                     return new IndirectCombatOutcome { Executed = false, Reason = reason };
 
-                // §8.2.1 — 1 CombatAction + no MP fee; supply GATED here, rolled probabilistically below (§7.15.7.1).
-                if (!firer.PerformCombatAction())
+                // Initiated mission: CombatAction, supply gate only. Support: OpportunityAction + .5 supply,
+                // with the existing 2-supply gate; no CombatAction, MP, or voluntary offensive lock.
+                if (!(support ? firer.CanPerformOpportunityAction() && firer.PerformOpportunityAction() : firer.PerformCombatAction()))
                     return new IndirectCombatOutcome { Executed = false, Reason = "Firer cannot afford the combat action." };
+
+                outcome.Committed = true;
+                rng = rng is CombatActionRandom ? rng : new CombatActionRandom(rng);
 
                 firer.Facing = HexMapUtil.GetGeneralDirection(firer.MapPos, target.MapPos);
 
@@ -107,21 +127,19 @@ namespace HammerAndSickle.Models.Combat
                 {
                     TargetTerrain = TerrainAt(map, target.MapPos),
                     FirerTerrain = TerrainAt(map, firer.MapPos),
-                    SuppressCounterBattery = target.GetOpportunityActions() < 1,
+                    SuppressCounterBattery = support || target.GetOpportunityActions() < 1,
                 };
 
                 // (1) The shot: forward lane + simultaneous CB + target stand check. HP applied inside.
                 IndirectAttackResult atk = CombatResolver.ResolveIndirectAttack(firer, target, ctx, rng);
-
-                var outcome = new IndirectCombatOutcome
-                {
-                    Executed = true,
-                    DamageToTarget = atk.DamageToTarget,
-                    DamageToFirer = atk.DamageToFirer,
-                    CounterBatteryFired = atk.CounterBatteryFired,
-                    TargetOutcome = atk.TargetOutcome,
-                    TargetFinalPosition = target.MapPos,
-                };
+                CombatActionRandom.ThrowIfFailed(rng);
+                if (!atk.Resolved) throw new InvalidOperationException("Indirect combat did not resolve.");
+                outcome.ShotResolved = true;
+                outcome.DamageToTarget = atk.DamageToTarget;
+                outcome.DamageToFirer = atk.DamageToFirer;
+                outcome.CounterBatteryFired = atk.CounterBatteryFired;
+                outcome.TargetOutcome = atk.TargetOutcome;
+                outcome.TargetFinalPosition = target.MapPos;
 
                 // (2) The CB shot's economy on the target: 1 OpportunityAction + flat-50% supply (§7.13.5.7 / §7.15.6).
                 // Deliberately NOT PerformOpportunityAction() — that path charges the generic deterministic
@@ -136,64 +154,84 @@ namespace HammerAndSickle.Models.Combat
 
                 // (3) Firing always exposes the battery (§7.13.5.4). Only an AI firer actually gains a level —
                 // fog is one-directional in v1. SetSpottedLevel clamps (Level4 / Bunker cap §14.8.7).
-                if (firer.Side == Side.AI)
+                if (support) supportContext.RevealSupportBattery(firer);
+                else if (firer.Side == Side.AI)
                     firer.SetSpottedLevel(firer.SpottedLevel + 1);
 
                 // (4) Firer killed by counter-battery — no stand check ever (§7.13.5.8), just removal.
                 if (atk.FirerDestroyed)
                 {
                     outcome.FirerDestroyed = true;
-                    Unregister(firer);
+                    Remove(firer, supportContext);
                 }
 
                 // (5) Target board consequences (mirrors the direct path).
-                if (atk.TargetDestroyed)
+                if (atk.TargetDestroyed || target.IsDestroyed())
                 {
                     outcome.TargetDestroyed = true;
-                    outcome.TargetRemovedFromMap = true;
                     outcome.PrestigeOwedToFirer = PrestigeOnKill(target);
-                    Unregister(target);
+                    Remove(target, supportContext);
+                    outcome.TargetRemovedFromMap = true;
                 }
                 else if (atk.TargetOutcome != StandOutcome.Hold)
                 {
                     DisplacementResult disp =
-                        RetreatResolver.ResolveDisplacement(firer, target, atk.TargetOutcome, map, rng);
+                        RetreatResolver.ResolveDisplacement(firer, target, atk.TargetOutcome, map, rng,
+                            failOnError: true, combatContext: supportContext);
+                    CombatActionRandom.ThrowIfFailed(rng);
 
                     outcome.TargetMoved = disp.Moved;
+                    outcome.TargetHeldInPlace = disp.SurrenderHeldInPlace;
                     outcome.TargetFinalPosition = disp.FinalPosition;
                     outcome.TargetHexesRetreated = disp.HexesRetreated;
 
                     bool permanent = disp.Destroyed || disp.Surrendered || disp.StaticCollapsed;
                     if (disp.RemovedFromMap || permanent)
                     {
-                        outcome.TargetRemovedFromMap = true;
                         outcome.TargetDestroyed = permanent;            // a shatter-quit survives (§7.9.6.5)
                         if (permanent)
                             outcome.PrestigeOwedToFirer = PrestigeOnKill(target);
-                        Unregister(target);
+                        Remove(target, supportContext);
+                        outcome.TargetRemovedFromMap = true;
                     }
                 }
 
                 // (6) Degradation. EL loss both sides (§7.15.3). Supply models SHOOTING: the firer rolls §7.15.5;
                 // the target's shot cost was the CB flat-50% in (2) — a shelled unit that fired nothing loses none.
                 ApplyEfficiencyLoss(firer, alive: !outcome.FirerDestroyed, rng);
-                if (!outcome.FirerDestroyed && DegradationCheck.RollCombatSupplyLoss(firer.ExperienceLevel, rng))
+                if (!support && !outcome.FirerDestroyed && DegradationCheck.RollCombatSupplyLoss(firer.ExperienceLevel, rng))
                     firer.ConsumeSupplies(1f);
                 ApplyEfficiencyLoss(target, alive: !outcome.TargetRemovedFromMap, rng);
+                CombatActionRandom.ThrowIfFailed(rng);
 
                 // (7) Leader reputation (§14.5) — same triggers as the direct path.
                 AwardFirerReputation(firer, target, outcome);
 
+                outcome.Executed = true;
                 return outcome;
             }
             catch (Exception e)
             {
                 AppService.HandleException(CLASS_NAME, nameof(Execute), e);
-                return new IndirectCombatOutcome { Executed = false, Reason = "Internal error resolving the fire mission." };
+                outcome.ResolutionFailed = true;
+                outcome.Reason = "Internal error resolving the fire mission.";
+                outcome.TargetFinalPosition = target?.MapPos ?? Position2D.Zero;
+                outcome.TargetMoved |= target != null && target.MapPos != targetStart;
+                if (outcome.TargetMoved)
+                    outcome.TargetHexesRetreated = Math.Max(outcome.TargetHexesRetreated,
+                        HexMapUtil.GetHexDistance(targetStart, outcome.TargetFinalPosition));
+                outcome.TargetDestroyed |= target != null && target.IsDestroyed();
+                return outcome;
             }
         }
 
         #region Helpers
+
+        private static void Remove(CombatUnit unit, GroundCombatContext context)
+        {
+            if (context != null) context.Remove(unit);
+            else Unregister(unit);
+        }
 
         private static void ApplyEfficiencyLoss(CombatUnit unit, bool alive, ICombatRandom rng)
         {

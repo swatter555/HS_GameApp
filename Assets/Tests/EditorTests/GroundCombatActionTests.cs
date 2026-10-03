@@ -34,6 +34,13 @@ namespace HammerAndSickle.Tests
             GameDataManager.CurrentHexMap = CreateClearMap();
         }
 
+        private GroundCombatContext CombatContext() => new GroundCombatContext(Side.Player,
+            GameManager.GetAllCombatUnits(), new HammerAndSickle.Models.AI.AIPerceptionState(), 1, unit =>
+            {
+                GameManager.UnregisterCombatUnit(unit.UnitID);
+                GameManager.InvalidateOccupancy();
+            });
+
         #region Helpers
 
         private HexMap CreateClearMap(int width = 16, int height = 16)
@@ -86,7 +93,7 @@ namespace HammerAndSickle.Tests
             var attacker = Tank(Side.Player, new Position2D(5, 5));
             var defender = Infantry(Side.AI, new Position2D(5, 9), SpottedLevel.Level2); // distance 4
 
-            var r = GroundCombatAction.Execute(attacker, defender, GameDataManager.CurrentHexMap, new FixedRollRandom(1));
+            var r = GroundCombatAction.Execute(attacker, defender, GameDataManager.CurrentHexMap, new FixedRollRandom(1), CombatContext());
 
             Assert.IsFalse(r.Executed, "Non-adjacent target is rejected");
             StringAssert.Contains("adjacent", r.Reason);
@@ -100,7 +107,7 @@ namespace HammerAndSickle.Tests
             var attacker = Tank(Side.Player, new Position2D(5, 5));
             var friend = Infantry(Side.Player, new Position2D(6, 5));
 
-            var r = GroundCombatAction.Execute(attacker, friend, GameDataManager.CurrentHexMap, new FixedRollRandom(1));
+            var r = GroundCombatAction.Execute(attacker, friend, GameDataManager.CurrentHexMap, new FixedRollRandom(1), CombatContext());
 
             Assert.IsFalse(r.Executed);
             StringAssert.Contains("friendly", r.Reason);
@@ -112,7 +119,7 @@ namespace HammerAndSickle.Tests
             var attacker = Tank(Side.Player, new Position2D(5, 5));
             var defender = Infantry(Side.AI, new Position2D(6, 5)); // SpottedLevel0 by default
 
-            var r = GroundCombatAction.Execute(attacker, defender, GameDataManager.CurrentHexMap, new FixedRollRandom(1));
+            var r = GroundCombatAction.Execute(attacker, defender, GameDataManager.CurrentHexMap, new FixedRollRandom(1), CombatContext());
 
             Assert.IsFalse(r.Executed, "Cannot strike what you cannot see");
             StringAssert.Contains("spotted", r.Reason);
@@ -129,7 +136,7 @@ namespace HammerAndSickle.Tests
             var defender = Infantry(Side.AI, new Position2D(6, 5), SpottedLevel.Level2);
             float combatCost = attacker.GetCombatMovementCost();
 
-            var r = GroundCombatAction.Execute(attacker, defender, GameDataManager.CurrentHexMap, new FixedRollRandom(1));
+            var r = GroundCombatAction.Execute(attacker, defender, GameDataManager.CurrentHexMap, new FixedRollRandom(1), CombatContext());
 
             Assert.IsTrue(r.Executed, "Adjacent spotted enemy → attack executes");
             Assert.AreEqual(0f, attacker.CombatActions.Current, "1 CombatAction spent (§8.2.1)");
@@ -147,7 +154,7 @@ namespace HammerAndSickle.Tests
             var defender = Infantry(Side.AI, new Position2D(6, 5), SpottedLevel.Level2);
             float defHp0 = defender.HitPoints.Current;
 
-            var r = GroundCombatAction.Execute(attacker, defender, GameDataManager.CurrentHexMap, new FixedRollRandom(1));
+            var r = GroundCombatAction.Execute(attacker, defender, GameDataManager.CurrentHexMap, new FixedRollRandom(1), CombatContext());
 
             Assert.IsTrue(r.Executed);
             Assert.AreEqual(StandOutcome.Hold, r.DefenderOutcome, "small hit + low stand roll → holds");
@@ -174,7 +181,7 @@ namespace HammerAndSickle.Tests
 
             // FixedRollRandom(8): a heavy hit → high Shock → low SV; stand roll 8 vacates the hex (retreat/rout, or a
             // shatter-quit). Not lethal to a full-HP infantry, so this exercises the displacement + AA wiring, not a kill.
-            var r = GroundCombatAction.Execute(attacker, defender, GameDataManager.CurrentHexMap, new FixedRollRandom(8));
+            var r = GroundCombatAction.Execute(attacker, defender, GameDataManager.CurrentHexMap, new FixedRollRandom(8), CombatContext());
 
             Assert.IsTrue(r.Executed);
             Assert.AreNotEqual(StandOutcome.Hold, r.DefenderOutcome, "heavy hit dislodges the defender");
@@ -194,7 +201,7 @@ namespace HammerAndSickle.Tests
             var attacker = Tank(Side.Player, new Position2D(5, 5));
             string defId = defender.UnitID;
 
-            var r = GroundCombatAction.Execute(attacker, defender, GameDataManager.CurrentHexMap, new FixedRollRandom(8));
+            var r = GroundCombatAction.Execute(attacker, defender, GameDataManager.CurrentHexMap, new FixedRollRandom(8), CombatContext());
 
             Assert.IsTrue(r.Executed);
             Assert.IsTrue(r.DefenderDestroyed, "1 HP − connecting hit → destroyed");
@@ -214,7 +221,7 @@ namespace HammerAndSickle.Tests
             var defender = Infantry(Side.AI, new Position2D(6, 5), SpottedLevel.Level2);
             attacker.Facing = HexDirection.W;
             defender.Facing = HexDirection.W;
-            var result = GroundCombatAction.Execute(attacker, defender, GameDataManager.CurrentHexMap, new FixedRollRandom(1));
+            var result = GroundCombatAction.Execute(attacker, defender, GameDataManager.CurrentHexMap, new FixedRollRandom(1), CombatContext());
             Assert.That(result.Executed, Is.True);
             Assert.That(attacker.Facing, Is.EqualTo(HammerAndSickle.Models.Map.HexMapUtil.GetGeneralDirection(attacker.MapPos, defender.MapPos)));
             Assert.That(defender.Facing, Is.EqualTo(HexDirection.W));
@@ -230,7 +237,7 @@ namespace HammerAndSickle.Tests
             attacker.DaysSupply.SetCurrent(0);
             attacker.Facing = HexDirection.W;
             float opponentActions = defender.OpportunityActions.Current;
-            var result = GroundCombatAction.Execute(attacker, defender, GameDataManager.CurrentHexMap, new FixedRollRandom(1));
+            var result = GroundCombatAction.Execute(attacker, defender, GameDataManager.CurrentHexMap, new FixedRollRandom(1), CombatContext());
             Assert.That(result.Executed, Is.False);
             Assert.That(attacker.Facing, Is.EqualTo(HexDirection.W));
             Assert.That(attacker.HasInitiatedCombatThisTurn, Is.False);

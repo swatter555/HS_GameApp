@@ -119,6 +119,34 @@ namespace HammerAndSickle.Core.UI
             {
                 if (!o.Executed || attacker == null || defender == null) return;
 
+                // One history item keeps both phases readable in the current single-message TMP window,
+                // including scenes with no navigation controls. Never emit a separate duplicate support item.
+                if (o.Support.Combat.Committed)
+                {
+                    FileSupportedCombatReport(attacker, defender, contactHex, o);
+                    return;
+                }
+                if (o.ResolutionFailed)
+                {
+                    File(new[] { $"Ground attack at {Hex(contactHex)}: internal error.",
+                        o.MainAttackResolved ? "The direct engagement resolved; follow-up stopped." : "The direct engagement did not resolve.",
+                        "Paid costs and resolved effects are retained." }, PrinterMessage.SourceDivisionalHQ, PrinterCategory.Combat);
+                    return;
+                }
+                if (!o.MainAttackResolved)
+                {
+                    CombatUnit reportingUnit = attacker.Side == Side.Player ? attacker : defender;
+                    string text = o.ResolutionFailed
+                        ? "Combat resolution stopped because of an internal error. Committed costs are retained."
+                        : attacker.Side == Side.Player
+                            ? "Our attack was cancelled by defensive artillery fire. The attack action remains spent."
+                            : "The enemy attack was stopped by our defensive artillery fire.";
+                    File(new[] { text, $"Ordered attack at {Hex(contactHex)}." },
+                        reportingUnit.IsDestroyed() || (attacker.Side == Side.Player && o.AttackerRemovedFromMap)
+                            ? PrinterMessage.SourceDivisionalHQ : reportingUnit.UnitName, PrinterCategory.Combat);
+                    return;
+                }
+
                 if (attacker.Side == Side.Player)
                 {
                     FileAttackerReport(
@@ -147,6 +175,51 @@ namespace HammerAndSickle.Core.UI
             }
         }
 
+        private static void FileSupportedCombatReport(CombatUnit attacker, CombatUnit defender,
+            Position2D contactHex, GroundCombatOutcome outcome)
+        {
+            DefensiveSupportOutcome support = outcome.Support;
+            bool ourBattery = support.Battery.Side == Side.Player;
+            var lines = new List<string>();
+            if (!support.Fired)
+                lines.Add("Artillery support did not resolve.");
+            else
+            {
+                lines.Add(ourBattery
+                    ? $"Our artillery support at {Hex(support.TargetHex)}."
+                    : $"Enemy artillery support at {Hex(support.TargetHex)}.");
+                if (!ourBattery)
+                    lines.Add($"Support losses: {BandText(BandFor(support.Combat.DamageToTarget))}" +
+                        (support.Combat.TargetDestroyed ? "; destroyed."
+                        : support.Combat.TargetHeldInPlace ? "; holding in place."
+                        : support.Combat.TargetRemovedFromMap ? "; left field."
+                        : support.Combat.TargetMoved ? "; withdrew." : "."));
+            }
+
+            if (outcome.MainAttackResolved)
+            {
+                int ownLoss = ourBattery ? outcome.DamageToDefender : outcome.DamageToAttacker;
+                lines.Add($"{(ourBattery ? "Enemy" : "Main")} attack at {Hex(contactHex)}: losses {BandText(BandFor(ownLoss))}.");
+                lines.Add(outcome.ResolutionFailed ? "Follow-up error; paid costs retained."
+                    : ourBattery ? outcome.DefenderDestroyed ? "Our defending unit was destroyed."
+                        : OwnStandClause(outcome.DefenderOutcome, outcome.DefenderRemovedFromMap)
+                    : outcome.AttackerDestroyed ? "Our attacking unit was destroyed."
+                        : EnemyClause(outcome.DefenderOutcome, outcome.DefenderDestroyed, outcome.DefenderRemovedFromMap));
+            }
+            else
+            {
+                lines.Add(outcome.ResolutionFailed ? "Main attack stopped: internal error."
+                    : ourBattery ? "Enemy attack stopped before contact."
+                    : "Main attack cancelled; action spent.");
+                if (outcome.ResolutionFailed) lines.Add("Paid costs and effects retained.");
+            }
+            // Enemy battery name, position, equipment and remaining reactions are deliberately absent.
+            CombatUnit own = ourBattery ? defender : attacker;
+            string source = own.IsDestroyed() || (!ourBattery && outcome.AttackerRemovedFromMap)
+                ? PrinterMessage.SourceDivisionalHQ : own.UnitName;
+            File(lines, source, PrinterCategory.Combat);
+        }
+
         /// <summary>
         /// Files the dispatches for one resolved INDIRECT fire mission (§7.13).
         ///
@@ -160,7 +233,20 @@ namespace HammerAndSickle.Core.UI
         {
             try
             {
-                if (!o.Executed || firer == null || target == null) return;
+                if (!o.Committed || firer == null || target == null) return;
+                if (o.ResolutionFailed)
+                {
+                    CombatUnit own = firer.Side == Side.Player ? firer : target;
+                    int losses = firer.Side == Side.Player ? o.DamageToFirer : o.DamageToTarget;
+                    bool destroyed = firer.Side == Side.Player ? o.FirerDestroyed : o.TargetDestroyed;
+                    File(new[] { $"Fire mission at {Hex(contactHex)} stopped: internal error.",
+                        o.ShotResolved ? destroyed ? "Shot resolved. Our unit was destroyed."
+                            : $"Shot resolved. Our losses: {BandText(BandFor(losses))}."
+                            : "The shot did not resolve.",
+                        "Paid costs and resolved effects are retained." },
+                        destroyed ? PrinterMessage.SourceDivisionalHQ : own.UnitName, PrinterCategory.Combat);
+                    return;
+                }
 
                 if (firer.Side == Side.Player)
                 {

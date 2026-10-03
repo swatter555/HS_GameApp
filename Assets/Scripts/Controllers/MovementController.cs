@@ -663,17 +663,26 @@ namespace HammerAndSickle.Controllers
         /// Automatic Advance (§7.9.9, direct only) is reported but not yet executed here (TODO — player prompt).
         /// </summary>
         private void TryAttack(CombatUnit target)
+            => TryAttack(target, new CombatRandom());
+
+        // Same production orchestration with caller-owned dice, allowing deterministic native integration checks.
+        internal void TryAttack(CombatUnit target, ICombatRandom rng)
         {
+            if (State == MovementState.Executing || _currentPhase != BattlePhase.PlayerTurn) return;
             try
             {
                 if (CurrentUnit == null || target == null) return;
                 var map = GameDataManager.CurrentHexMap;
                 if (map == null) return;
+                State = MovementState.Executing;
 
                 bool executed;
                 string message;
                 bool attackerDestroyed;
                 bool targetDestroyed;
+                bool attackerRemoved = false;
+                bool mainShotResolved;
+                DefensiveSupportOutcome support = default;
 
                 // Where the engagement happens, captured BEFORE resolution: a defender that retreats or routs
                 // has already moved by the time the outcome returns, and the dispatch must name the hex the
@@ -686,8 +695,9 @@ namespace HammerAndSickle.Controllers
 
                 if (CombatResolver.IsIndirectFireClass(CurrentUnit.Classification))
                 {
-                    IndirectCombatOutcome o = IndirectCombatAction.Execute(CurrentUnit, target, map, new CombatRandom());
-                    executed = o.Executed;
+                    IndirectCombatOutcome o = IndirectCombatAction.Execute(CurrentUnit, target, map, rng);
+                    executed = o.Committed;
+                    mainShotResolved = o.ShotResolved;
                     message = o.Executed ? BuildIndirectMessage(CurrentUnit, target, o) : o.Reason;
                     attackerDestroyed = o.FirerDestroyed;
                     targetDestroyed = o.TargetDestroyed;
@@ -695,15 +705,26 @@ namespace HammerAndSickle.Controllers
                     // §24.8.6 dispatch. Filed AFTER the whole action resolves so counter-battery losses are
                     // included — reporting mid-action would print "no losses" and then be contradicted.
                     // PrinterDispatch decides whether it is worth printing and handles both sides.
-                    if (o.Executed) PrinterDispatch.ReportIndirectCombat(CurrentUnit, target, contactHex, o);
+                    if (o.Committed) PrinterDispatch.ReportIndirectCombat(CurrentUnit, target, contactHex, o);
                 }
                 else
                 {
                     // TODO §7.5.6.9.1 — compute contestedCrossing from river/bridge geometry between the two hexes.
-                    GroundCombatOutcome o = GroundCombatAction.Execute(CurrentUnit, target, map, new CombatRandom());
+                    var gdm = GameDataManager.Instance;
+                    var battle = BattleManager.Instance;
+                    var context = new GroundCombatContext(Side.Player, gdm.GetAllCombatUnits(),
+                        battle.AIPerception, battle.CurrentTurnNumber, unit =>
+                        {
+                            gdm.UnregisterCombatUnit(unit.UnitID);
+                            gdm.InvalidateOccupancy();
+                        });
+                    GroundCombatOutcome o = GroundCombatAction.Execute(CurrentUnit, target, map, rng, context);
                     executed = o.Executed;
-                    message = o.Executed ? BuildCombatMessage(CurrentUnit, target, o) : o.Reason;
+                    mainShotResolved = o.MainAttackResolved;
+                    support = o.Support;
+                    message = o.MainAttackResolved && !o.ResolutionFailed ? BuildCombatMessage(CurrentUnit, target, o) : o.Reason;
                     attackerDestroyed = o.AttackerDestroyed;
+                    attackerRemoved = o.AttackerRemovedFromMap;
                     targetDestroyed = o.DefenderDestroyed;
 
                     // See EventManager / §24.8.6 — one call files whichever side's report the player owns.
@@ -730,8 +751,16 @@ namespace HammerAndSickle.Controllers
                  * ⚠ ATTRIBUTION: the FIRING sound is the firer's, the IMPACT is the target's. That split
                  * is what lets an unseen battery shell the player audibly without identifying itself, and
                  * it is why no "generic substitute sound" is needed anywhere. */
-                GameAudio.PlayWeaponFire(CurrentUnit);
-                GameAudio.PlayImpact(target);
+                if (support.Fired)
+                {
+                    GameAudio.PlayWeaponFire(support.Battery);
+                    GameAudio.PlayImpact(CurrentUnit);
+                }
+                if (mainShotResolved)
+                {
+                    GameAudio.PlayWeaponFire(CurrentUnit);
+                    GameAudio.PlayImpact(target);
+                }
 
                 // A kill is attributed to the unit that DIED — you hear your own regiment go, and an
                 // unspotted enemy dies silently, which is the same information the icon already gives.
@@ -753,19 +782,30 @@ namespace HammerAndSickle.Controllers
                 }
 
                 // Attacker killed (return fire §7.4.2.3 / counter-battery §7.13.5) → nothing left to keep selected.
-                if (attackerDestroyed)
+                if (attackerDestroyed || attackerRemoved)
                 {
                     DeselectUnit();
+                    HexDetectionService.Instance?.ClearSelectionAndNotify();
                     return;
                 }
 
-                // Keep the unit selected and refresh its movement overlay (combat spent 25% MP).
+                // Support can force the selected attacker to retreat. Update inspection/highlight while
+                // input is still guarded: a held Ctrl key must not turn this programmatic selection into an order.
+                if (support.Combat.TargetMoved)
+                    HexDetectionService.Instance?.SelectHex(CurrentUnit.MapPos);
+
+                // Keep the survivor selected; the committed combat order has closed further movement.
                 State = MovementState.UnitSelected;
                 RecomputeRangeAndRaise(map);
             }
             catch (Exception e)
             {
                 AppService.HandleException(CLASS_NAME, nameof(TryAttack), e);
+            }
+            finally
+            {
+                if (State == MovementState.Executing)
+                    State = CurrentUnit == null ? MovementState.Idle : MovementState.UnitSelected;
             }
         }
 

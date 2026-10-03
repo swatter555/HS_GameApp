@@ -1,5 +1,4 @@
 using System;
-using HammerAndSickle.Controllers;
 using HammerAndSickle.Core.GameData;
 using HammerAndSickle.Models.Map;
 using HammerAndSickle.Services;
@@ -16,8 +15,13 @@ namespace HammerAndSickle.Models.Combat
     /// </summary>
     public struct GroundCombatOutcome
     {
-        public bool Executed;                   // false → rejected before any dice/costs (see Reason)
-        public string Reason;                   // rejection reason (null/empty on success)
+        public bool MainAttackResolved;         // distinguishes a fired engagement from a committed, cancelled order
+        public bool ResolutionFailed;
+        public DefensiveSupportOutcome Support;
+        public bool AttackerRemovedFromMap;
+        public Position2D AttackerFinalPosition;
+        public bool Executed;                   // initiating CombatAction paid; may be interrupted by Support
+        public string Reason;                   // rejection, cancellation or failure explanation
 
         public int DamageToDefender;
         public int DamageToAttacker;            // universal return fire (§6.12)
@@ -52,14 +56,22 @@ namespace HammerAndSickle.Models.Combat
 
         /// <summary>
         /// Executes a direct attack by <paramref name="attacker"/> against an adjacent enemy <paramref name="defender"/>.
-        /// Dice come from <paramref name="rng"/> in a fixed order — engagement (§7.7.3) → displacement (§7.9) →
+        /// Dice come from <paramref name="rng"/> in a fixed order: optional support selection/fire/displacement/
+        /// degradation, then engagement (§7.7.3) → displacement (§7.9) →
         /// degradation (attacker then defender, §7.15) — so seeded tests are stable. <paramref name="contestedCrossing"/>
         /// is supplied by the map-layer caller per §7.5.6.9.1 (river/bridge geometry); the defender's hex terrain is
         /// read from the map.
         /// </summary>
         public static GroundCombatOutcome Execute(
-            CombatUnit attacker, CombatUnit defender, HexMap map, ICombatRandom rng, bool contestedCrossing = false)
+            CombatUnit attacker, CombatUnit defender, HexMap map, ICombatRandom rng,
+            GroundCombatContext context, bool contestedCrossing = false)
         {
+            var outcome = new GroundCombatOutcome
+            {
+                AttackerFinalPosition = attacker?.MapPos ?? Position2D.Zero,
+                DefenderFinalPosition = defender?.MapPos ?? Position2D.Zero,
+                VacatedHex = defender?.MapPos ?? Position2D.Zero,
+            };
             try
             {
                 if (rng == null)
@@ -67,13 +79,47 @@ namespace HammerAndSickle.Models.Combat
                 string reason = CanExecute(attacker, defender, map);
                 if (reason != null)
                     return new GroundCombatOutcome { Executed = false, Reason = reason };
+                if (context == null || attacker.Side != context.PhasingSide ||
+                    !context.IsOnMap(attacker, map) || !context.IsOnMap(defender, map))
+                    return new GroundCombatOutcome { Reason = "Invalid turn or on-map combat context." };
+                if (CombatResolver.IsIndirectFireClass(attacker.Classification))
+                    return new GroundCombatOutcome { Reason = "Artillery initiates attacks through indirect combat." };
+                if (!context.CanObserve(attacker.Side, defender, map))
+                    return new GroundCombatOutcome { Reason = "Target is not spotted." };
 
                 // §8.2.1 — spend 1 CombatAction + no MP fee. Supply is GATED here, not consumed (§7.15.7.1);
                 // the probabilistic combat-supply loss is rolled below (§7.15.5).
                 if (!attacker.PerformCombatAction())
                     return new GroundCombatOutcome { Executed = false, Reason = "Attacker cannot afford the combat action." };
 
+                // Executed means the initiating order committed. A later interruption never refunds its
+                // CombatAction or offensive lock, and must not be presented as a pre-payment rejection.
+                outcome.Executed = true;
+                rng = new CombatActionRandom(rng);
+
                 attacker.Facing = HexMapUtil.GetGeneralDirection(attacker.MapPos, defender.MapPos);
+
+                // The only support trigger. Neither the indirect kernel nor return fire can re-enter it.
+                CombatUnit battery = DefensiveArtillerySupport.Select(attacker, defender, map, context, rng);
+                if (battery != null)
+                {
+                    outcome.Support = new DefensiveSupportOutcome { Battery = battery, TargetHex = attacker.MapPos };
+                    if (!DefensiveArtillerySupport.IsEligible(battery, attacker, defender, map, context))
+                        throw new InvalidOperationException("Selected support battery is no longer eligible.");
+                    outcome.Support.Combat = IndirectCombatAction.ExecuteSupport(battery, attacker, map, rng, context);
+                    outcome.AttackerFinalPosition = attacker.MapPos;
+                    outcome.AttackerDestroyed = outcome.Support.Combat.TargetDestroyed;
+                    outcome.AttackerRemovedFromMap = outcome.Support.Combat.TargetRemovedFromMap;
+                    if (!outcome.Support.Combat.Executed)
+                        throw new InvalidOperationException("The support mission did not complete; the main attack was stopped.");
+                    if (outcome.AttackerDestroyed || outcome.AttackerRemovedFromMap ||
+                        outcome.Support.Combat.TargetOutcome != StandOutcome.Hold || !context.IsOnMap(attacker, map) ||
+                        !context.IsOnMap(defender, map) || !HexMapUtil.GetDirectionBetween(attacker.MapPos, defender.MapPos).HasValue)
+                    {
+                        outcome.Reason = "Defensive artillery support stopped the attack.";
+                        return outcome;
+                    }
+                }
 
                 attacker.MarkFoughtThisTurn();
                 defender.MarkFoughtThisTurn();
@@ -87,6 +133,9 @@ namespace HammerAndSickle.Models.Combat
 
                 // (1) Engagement — applies HP to both units, returns the defender's stand outcome (§7.7.3).
                 DirectAttackResult atk = CombatResolver.ResolveDirectAttack(attacker, defender, ctx, rng);
+                CombatActionRandom.ThrowIfFailed(rng);
+                if (!atk.Resolved) throw new InvalidOperationException("Direct combat did not resolve.");
+                outcome.MainAttackResolved = true;
 
                 // (1a) Direct-combat intel (§12.4.6): closing to contact reveals what the other side is
                 // fighting with — both participants are set to Level 4. Applied AFTER the engagement so a
@@ -94,37 +143,36 @@ namespace HammerAndSickle.Models.Combat
                 // removal path below unregisters it either way.
                 SpottingService.ApplyDirectCombatContact(attacker, defender);
 
-                var outcome = new GroundCombatOutcome
-                {
-                    Executed = true,
-                    DamageToDefender = atk.DamageToDefender,
-                    DamageToAttacker = atk.DamageToAttacker,
-                    DefenderOutcome = atk.DefenderOutcome,
-                    DefenderFinalPosition = defender.MapPos,
-                    VacatedHex = defender.MapPos,
-                };
+                outcome.DamageToDefender = atk.DamageToDefender;
+                outcome.DamageToAttacker = atk.DamageToAttacker;
+                outcome.DefenderOutcome = atk.DefenderOutcome;
+                outcome.DefenderFinalPosition = defender.MapPos;
+                outcome.VacatedHex = defender.MapPos;
 
                 // (2) Attacker killed by return fire (§7.4.2.3) — no stand check, just removal.
-                if (atk.AttackerDestroyed)
+                if (atk.AttackerDestroyed || attacker.IsDestroyed())
                 {
                     outcome.AttackerDestroyed = true;
-                    Unregister(attacker);
+                    context.Remove(attacker);
+                    outcome.AttackerRemovedFromMap = true;
                 }
 
                 // (3) Defender board consequences.
-                if (atk.DefenderDestroyed)
+                if (atk.DefenderDestroyed || defender.IsDestroyed())
                 {
                     // HP hit 0 in the engagement — no displacement, but the hex is vacated so AA opens (§7.9.9.2).
                     outcome.DefenderDestroyed = true;
-                    outcome.DefenderRemovedFromMap = true;
                     outcome.AutomaticAdvanceAvailable = true;
                     outcome.PrestigeOwedToAttacker = PrestigeOnKill(defender);
-                    Unregister(defender);
+                    context.Remove(defender);
+                    outcome.DefenderRemovedFromMap = true;
                 }
                 else if (atk.DefenderOutcome != StandOutcome.Hold)
                 {
                     DisplacementResult disp =
-                        RetreatResolver.ResolveDisplacement(attacker, defender, atk.DefenderOutcome, map, rng);
+                        RetreatResolver.ResolveDisplacement(attacker, defender, atk.DefenderOutcome, map, rng,
+                            failOnError: true, combatContext: context);
+                    CombatActionRandom.ThrowIfFailed(rng);
 
                     outcome.DefenderMoved = disp.Moved;
                     outcome.DefenderFinalPosition = disp.FinalPosition;
@@ -135,17 +183,18 @@ namespace HammerAndSickle.Models.Combat
                     bool permanent = disp.Destroyed || disp.Surrendered || disp.StaticCollapsed;
                     if (disp.RemovedFromMap || permanent)
                     {
-                        outcome.DefenderRemovedFromMap = true;
                         outcome.DefenderDestroyed = permanent;          // a shatter-quit survives (§7.9.6.5)
                         if (permanent)
                             outcome.PrestigeOwedToAttacker = PrestigeOnKill(defender);
-                        Unregister(defender);
+                        context.Remove(defender);
+                        outcome.DefenderRemovedFromMap = true;
                     }
                 }
 
                 // (4) Combat degradation (§7.15.3 Efficiency + §7.15.5 Supply) — both sides, only while still in play.
                 ApplyCombatDegradation(attacker, alive: !outcome.AttackerDestroyed, rng);
                 ApplyCombatDegradation(defender, alive: !outcome.DefenderRemovedFromMap, rng);
+                CombatActionRandom.ThrowIfFailed(rng);
 
                 // (5) Leader reputation (§14.5) — attacker's leader earns for the action and its results.
                 AwardAttackerReputation(attacker, defender, outcome);
@@ -155,7 +204,20 @@ namespace HammerAndSickle.Models.Combat
             catch (Exception e)
             {
                 AppService.HandleException(CLASS_NAME, nameof(Execute), e);
-                return new GroundCombatOutcome { Executed = false, Reason = "Internal error resolving the attack." };
+                outcome.ResolutionFailed = true;
+                outcome.Reason = "Combat resolution failed; the attack has stopped. Committed costs are retained.";
+                outcome.AttackerFinalPosition = attacker?.MapPos ?? Position2D.Zero;
+                outcome.AttackerDestroyed |= attacker != null && attacker.IsDestroyed();
+                if (defender != null)
+                {
+                    outcome.DefenderFinalPosition = defender.MapPos;
+                    outcome.DefenderMoved |= defender.MapPos != outcome.VacatedHex;
+                    outcome.DefenderDestroyed |= defender.IsDestroyed();
+                    if (outcome.DefenderMoved)
+                        outcome.DefenderHexesRetreated = Math.Max(outcome.DefenderHexesRetreated,
+                            HexMapUtil.GetHexDistance(outcome.VacatedHex, defender.MapPos));
+                }
+                return outcome;
             }
         }
 
@@ -254,12 +316,6 @@ namespace HammerAndSickle.Models.Combat
         {
             int cost = killed.PurchaseCost;
             return (int)Math.Round(cost * GameData.PRESTIGE_KILL_FRACTION, MidpointRounding.AwayFromZero);
-        }
-
-        private static void Unregister(CombatUnit unit)
-        {
-            if (unit == null) return;
-            GameDataManager.Instance?.UnregisterCombatUnit(unit.UnitID);
         }
 
         #endregion // Helpers

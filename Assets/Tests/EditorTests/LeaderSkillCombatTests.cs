@@ -524,6 +524,13 @@ namespace HammerAndSickle.Tests
 
         #endregion // State-desync fixes
 
+        private GroundCombatContext CombatContext() => new GroundCombatContext(Side.Player,
+            GameManager.GetAllCombatUnits(), new HammerAndSickle.Models.AI.AIPerceptionState(), 1, unit =>
+            {
+                GameManager.UnregisterCombatUnit(unit.UnitID);
+                GameManager.InvalidateOccupancy();
+            });
+
         #region REP earn hooks (§14.5)
 
         [Test]
@@ -536,7 +543,7 @@ namespace HammerAndSickle.Tests
             var leader = MakeLeader(reputation: 0);
             Assign(leader, attacker);
 
-            var r = GroundCombatAction.Execute(attacker, defender, GameDataManager.CurrentHexMap, new FixedRollRandom(1));
+            var r = GroundCombatAction.Execute(attacker, defender, GameDataManager.CurrentHexMap, new FixedRollRandom(1), CombatContext());
 
             Assert.IsTrue(r.Executed, "Attack executed");
             Assert.GreaterOrEqual(leader.ReputationPoints, GameData.REP_PER_COMBAT_ACTION,

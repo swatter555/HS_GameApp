@@ -27,6 +27,7 @@ namespace HammerAndSickle.Models.Combat
     /// </summary>
     public struct DirectAttackResult
     {
+        public bool Resolved;                 // false when resolution failed; never interpret a default as a miss
         public int DamageToDefender;
         public int DamageToAttacker;
         public int DefenderStandValue;
@@ -67,6 +68,7 @@ namespace HammerAndSickle.Models.Combat
     /// </summary>
     public struct IndirectAttackResult
     {
+        public bool Resolved;
         public int DamageToTarget;
         public int DamageToFirer;          // counter-battery (0 if none)
         public bool CounterBatteryFired;
@@ -198,6 +200,8 @@ namespace HammerAndSickle.Models.Combat
                 DirectEngagementResult eng =
                     CombatEngine.ResolveDirectEngagement(forward, returnLane, defenderStand, rng);
 
+                CombatActionRandom.ThrowIfFailed(rng);
+
                 attacker.MarkFiredThisTurn();
                 defender.MarkFiredThisTurn();
                 defender.TakeDamage(eng.DamageToDefender);
@@ -205,6 +209,7 @@ namespace HammerAndSickle.Models.Combat
 
                 return new DirectAttackResult
                 {
+                    Resolved = true,
                     DamageToDefender = eng.DamageToDefender,
                     DamageToAttacker = eng.DamageToAttacker,
                     DefenderStandValue = eng.DefenderStandValue,
@@ -478,18 +483,24 @@ namespace HammerAndSickle.Models.Combat
                 bool cb = !ctx.SuppressCounterBattery && IsCounterBatteryEligible(firer, target);
                 int toFirer = cb ? CombatEngine.ResolveLane(BuildCounterBatteryLane(firer, target, ctx), rng) : 0;
 
+                CombatActionRandom.ThrowIfFailed(rng);
+
                 // Simultaneous (§7.13.5.5) — apply after both lanes computed on pre-damage stats.
+                StandValueInput stand = BuildIndirectTargetStand(firer, target, ctx, toTarget);
+                int sv = StandCheck.ComputeStandValue(stand);
+                StandOutcome outcome = StandCheck.ResolveStand(sv, rng);
+
+                CombatActionRandom.ThrowIfFailed(rng);
+
+                // Stage all dice before applying HP. A failed stand roll must not leave a half-fired shot.
                 firer.MarkFiredThisTurn();
                 if (cb) target.MarkFiredThisTurn();
                 target.TakeDamage(toTarget);
                 if (cb) firer.TakeDamage(toFirer);
 
-                StandValueInput stand = BuildIndirectTargetStand(firer, target, ctx, toTarget);
-                int sv = StandCheck.ComputeStandValue(stand);
-                StandOutcome outcome = StandCheck.ResolveStand(sv, rng);
-
                 return new IndirectAttackResult
                 {
+                    Resolved = true,
                     DamageToTarget = toTarget,
                     DamageToFirer = toFirer,
                     CounterBatteryFired = cb,

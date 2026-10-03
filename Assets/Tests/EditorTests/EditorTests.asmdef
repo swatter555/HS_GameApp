@@ -5,6 +5,8 @@
         "UnityEngine.TestRunner",
         "UnityEditor.TestRunner",
         "Main",
+        "Unity.TextMeshPro",
+        "UnityEngine.UI",
         "System.Text.Json"
     ],
     "includePlatforms": [

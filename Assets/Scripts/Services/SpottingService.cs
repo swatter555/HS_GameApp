@@ -643,7 +643,7 @@ namespace HammerAndSickle.Services
         /// Superior Camouflage (§14.9.4) shortens the range against a led target — applied here, at the
         /// §12.3.10 comparison, so it affects the sweep, per-hex checks, and decay uniformly.
         /// </summary>
-        private static int SpottingRangeAgainst(CombatUnit spotter, CombatUnit target)
+        internal static int SpottingRangeAgainst(CombatUnit spotter, CombatUnit target)
         {
             // A fixed-wing aircraft in transit does not look at the ground (§12.3.7a, Bob 2026-08-10).
             if (!target.IsSeenAsAir && FliesPastTheGround(spotter)) return 0;
