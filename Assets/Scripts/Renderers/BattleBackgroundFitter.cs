@@ -24,15 +24,14 @@ namespace HammerAndSickle.Renderers
         #region Inspector Fields
 
         // Calibration: where the hex map's drawn footprint sits inside the background image, in
-        // normalized image coordinates (fractions of image size). Derived 2026-07-22 by
-        // reverse-engineering Bob's hand-tuned 32x21 Khost setup (Background Room at world
-        // (40.1971, 18.4457), scale (2.5294, 2.9052), sprite 76.8 x 43.2 world units):
-        //   windowSize   = map drawn extent / background world footprint
-        //   windowOffset = (map center - background center) / background world footprint
-        // Feeding 32x21 through FitToMap reproduces that transform exactly; every other map size
-        // generalizes from the same window. Nudge these only to reposition the map within the
-        // table art for ALL map sizes at once. The green tube border + glow padding live in the
-        // image OUTSIDE this window, so they are preserved automatically.
+        // normalized image coordinates (fractions of image size). Recalibrated 2026-10-05 from
+        // Bob's polished image and aligned 32x21 Khost scale (2.264488, 2.549951), with the
+        // sprite still 76.8 x 43.2 world units:
+        //   windowSize = map drawn extent / background world footprint
+        // FitToMap reproduces that reference scale and generalizes by the drawn hex footprint.
+        // The existing window-center offset is retained. Nudge it only to reposition the map
+        // within the table art for ALL map sizes at once. Border and glow outside the window
+        // remain part of the scaled image.
         [Header("Image Calibration (fractions of image size)")]
 
         [SerializeField]
@@ -41,7 +40,7 @@ namespace HammerAndSickle.Renderers
 
         [SerializeField]
         [Tooltip("Map-window size as a fraction of image size.")]
-        private Vector2 windowSize = new Vector2(0.4217073f, 0.3768509f);
+        private Vector2 windowSize = new Vector2(0.47104099f, 0.42935224f);
 
         #endregion // Inspector Fields
 

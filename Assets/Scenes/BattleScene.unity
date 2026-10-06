@@ -8525,7 +8525,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Main::HammerAndSickle.Renderers.BattleBackgroundFitter
   windowCenterOffset: {x: -0.0026619, y: 0.0296766}
-  windowSize: {x: 0.4217073, y: 0.3768509}
+  windowSize: {x: 0.47104099, y: 0.42935224}
 --- !u!1 &1716844630
 GameObject:
   m_ObjectHideFlags: 0
