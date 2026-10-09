@@ -2,7 +2,7 @@
   "scenarioId": "Mission_Khost",
   "displayName": "Operation Molot",
   "description": "Soviet forces break out of the Khost pocket and drive to take the province.",
-  "thumbnailFilename": "khost.png",
+  "thumbnailFilename": "scenario_1",
   "mapFilename": "khost.map",
   "oobFilename": "khost.oob",
   "aiiFilename": "",

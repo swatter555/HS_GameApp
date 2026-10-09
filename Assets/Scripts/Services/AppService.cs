@@ -118,9 +118,6 @@ namespace HammerAndSickle.Services
         // Path to sprite atlas resources within the Unity project.
         public const string SpriteAtlasPath = "Assets/Art/Sprite Atlases/";
 
-        // Path to the scenario thumbnail folder, relative to any Resources/ folder (for Resources.Load).
-        public const string ScenarioThumbnailPath = "Scenario Thumbs/";
-
         // ────────────────────────────────────────────────────────────────────────────────────────────
         // SHIPPED CONTENT — read-only, inside the build (content pipeline Phase 1, 2026-07-27).
         //

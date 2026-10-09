@@ -47,6 +47,10 @@ namespace HammerAndSickle.Core.GameData
         [JsonPropertyName("description")]
         public string Description { get; set; } = string.Empty;
 
+        /// <summary>
+        /// Thumbnail key (for example scenario_1), resolved by MainMenu's serialized Sprite mappings.
+        /// The JSON field name is retained; this value is not an image filename or resource path.
+        /// </summary>
         [JsonPropertyName("thumbnailFilename")]
         public string ThumbnailFilename { get; set; } = string.Empty;
 
@@ -321,17 +325,6 @@ namespace HammerAndSickle.Core.GameData
                 return new UnityEngine.Vector2Int(MapWidth, MapHeight);
 
             return UnityEngine.Vector2Int.zero;
-        }
-
-        /// <summary>
-        /// Gets the path in the assets/resources folder to the thumbnail image. Must use resource load.
-        /// </summary>
-        public string GetThumbnailPath()
-        {
-            if (string.IsNullOrWhiteSpace(ThumbnailFilename))
-                return string.Empty;
-            
-            return Path.Combine(AppService.ScenarioThumbnailPath, ThumbnailFilename);
         }
 
         // ────────────────────────────────────────────────────────────────────────────────────────────

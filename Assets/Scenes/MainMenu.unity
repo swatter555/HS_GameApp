@@ -185,6 +185,15 @@ MonoBehaviour:
   _briefingText: {fileID: 1018833828}
   _thumbnailImage: {fileID: 1436220859}
   _placeholderThumbnail: {fileID: 21300000, guid: e838a04bd59897349abf2f32eb6bed79, type: 3}
+  _scenarioThumbnails:
+  - ScenarioName: scenario_1
+    Sprite: {fileID: 21300000, guid: 9026ca04274cb9a4da4b1953a6fe1d25, type: 3}
+  - ScenarioName: scenario_2
+    Sprite: {fileID: 21300000, guid: c9e7e6e44766ac44e9a63f86ccb6bff8, type: 3}
+  - ScenarioName: scenario_3
+    Sprite: {fileID: 21300000, guid: e5f5ee807bcd7f145ac49980f5e9923a, type: 3}
+  - ScenarioName: scenario_4
+    Sprite: {fileID: 21300000, guid: 1c8111af3289c524daa56b7c37013265, type: 3}
   _difficultyText: {fileID: 415884814}
   _colonelButton: {fileID: 1074815379}
   _mjGenButton: {fileID: 2106158146}

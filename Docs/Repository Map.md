@@ -34,7 +34,7 @@ This map describes the implementation that exists. The [design document][design]
 | [Assets/Editor](../Assets/Editor/) | Content/audio/UI validation and terrain generation tools |
 | [Assets/Scenes](../Assets/Scenes/) | Main menu and shared battle scene; preserve serialized references |
 | [Assets/Art](../Assets/Art/) | Source sprites, terrain tiles, atlases and prefabs; source art and `.meta` files belong together |
-| [Assets/Resources](../Assets/Resources/) | Runtime Resources loads: audio catalog, fonts, scenario thumbnails, chunk material/noise and locally generated terrain arrays |
+| [Assets/Resources](../Assets/Resources/) | Runtime Resources loads: audio catalog, fonts, chunk material/noise and locally generated terrain arrays |
 | [Assets/Audio/SFX](../Assets/Audio/SFX/) | Imported, preloaded short effects; deliberately not streamed |
 | [Assets/StreamingAssets](../Assets/StreamingAssets/) | Read-only scenario/campaign files and streamed music/ambience/narration |
 | [Assets/Input](../Assets/Input/), [Assets/Settings](../Assets/Settings/) | Input assets and URP/volume configuration; battle input also has inline serialized actions |
@@ -187,6 +187,8 @@ The required “reject incomplete data without damage” policy is not fully imp
 These observations are tracked in the [TODO][todo]; no fixes are part of the documentation foundation.
 
 ## Rendering and asset contracts
+
+Scenario thumbnails (2026-10-09): MainMenu's `ScenarioDialog_Scene0` owns explicit `ScenarioName`/`Sprite` mappings for `scenario_1` through `scenario_4`, referencing imported images under `Assets/Art/UI Graphics/Elements/Scenario Thumbs`. The existing JSON field `thumbnailFilename` now carries a key such as `scenario_1`, without an extension; it is read directly, trimmed and matched without regard to case. Both Khost manifests use `scenario_1`. Blank/unknown keys, missing mappings, missing Sprites and a missing manifest use the authored `ui-element-thumb-default` fallback. Direct saved scene references retain all five images in player-build dependencies; runtime does not load thumbnails through Resources or an Assets filesystem path. The obsolete `GetThumbnailPath` helper and `ScenarioThumbnailPath` constant are removed. New scenario art requires adding a Sprite mapping to the menu, while an existing mapped image can be selected from a new manifest. Keep the JSON field name and stable scenario IDs intact; editor/content authors should export the thumbnail key in that existing field.
 
 Battle background calibration (2026-10-05): `BattleBackgroundFitter` fits the painted table opening to the loaded hex grid footprint. The polished image uses Robert's 32x21 Khost reference scale (2.264488, 2.549951) and sprite size 76.8x43.2 world units, giving `windowSize` (0.47104099, 0.42935224) in both code defaults and the saved BattleScene component. X scales by columns/32; Y scales by the full drawn height, `((rows-1)*VERTICAL_SPACING+HEX_HEIGHT)/(20*VERTICAL_SPACING+HEX_HEIGHT)`. Existing window-center calibration, map coordinates, Z depth and parent-scale conversion are retained. Runtime setup applies the fit after loading map dimensions; other authored scene values and the polished image remain independent work. Robert tested the current Khost setup on 2026-10-05 and reported it functioning, accepting and closing the task. Implementation commit `6752060` is published; revisit visual alignment on future maps if needed.
 

@@ -2,7 +2,7 @@
   "scenarioId": "Campaign_Khost",
   "displayName": "Operation Molot (Campaign)",
   "description": "Opening mission of the grand campaign. Soviet forces launch a major offensive against Mujahideen positions near Khost, Afghanistan.",
-  "thumbnailFilename": "khost.png",
+  "thumbnailFilename": "scenario_1",
   "mapFilename": "khost.map",
   "oobFilename": "khost.oob",
   "aiiFilename": "khost.aii",

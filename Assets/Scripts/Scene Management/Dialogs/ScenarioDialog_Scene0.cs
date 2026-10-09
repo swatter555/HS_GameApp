@@ -22,6 +22,13 @@ namespace HammerAndSickle.SceneManagement
     {
         private const string CLASS_NAME = nameof(ScenarioDialog_Scene0);
 
+        [Serializable]
+        private class ScenarioThumbnailMapping
+        {
+            public string ScenarioName = string.Empty;
+            public Sprite Sprite;
+        }
+
         #region Serialized Fields
 
         [Header("Navigation")]
@@ -35,6 +42,8 @@ namespace HammerAndSickle.SceneManagement
         [SerializeField] private TMP_Text _briefingText;
         [SerializeField] private Image _thumbnailImage;
         [SerializeField] private Sprite _placeholderThumbnail;
+        [Tooltip("Map manifest thumbnailFilename keys, such as scenario_1, to imported Sprites.")]
+        [SerializeField] private ScenarioThumbnailMapping[] _scenarioThumbnails = Array.Empty<ScenarioThumbnailMapping>();
         [SerializeField] private TMP_Text _difficultyText;
 
         [Header("Difficulty Buttons")]
@@ -330,23 +339,17 @@ namespace HammerAndSickle.SceneManagement
         {
             try
             {
-                string thumbnailPath = manifest.GetThumbnailPath();
-
-                if (string.IsNullOrEmpty(thumbnailPath))
+                string scenarioName = manifest?.ThumbnailFilename?.Trim();
+                if (string.IsNullOrWhiteSpace(scenarioName))
                 {
                     SetPlaceholderThumbnail();
                     return;
                 }
 
-                // Resources.Load requires the path without the file extension
-                if (thumbnailPath.EndsWith(".png"))
-                    thumbnailPath = thumbnailPath[..^4];
-
-                Sprite thumbnail = Resources.Load<Sprite>(thumbnailPath);
-
+                Sprite thumbnail = FindThumbnail(scenarioName);
                 if (thumbnail == null)
                 {
-                    AppService.CaptureUiMessage($"Thumbnail not found: {manifest.ThumbnailFilename}");
+                    AppService.CaptureUiMessage($"Thumbnail not found: {scenarioName}");
                     SetPlaceholderThumbnail();
                     return;
                 }
@@ -358,6 +361,21 @@ namespace HammerAndSickle.SceneManagement
                 AppService.HandleException(CLASS_NAME, nameof(LoadThumbnail), e);
                 SetPlaceholderThumbnail();
             }
+        }
+
+        private Sprite FindThumbnail(string scenarioName)
+        {
+            if (_scenarioThumbnails == null)
+                return null;
+
+            foreach (ScenarioThumbnailMapping mapping in _scenarioThumbnails)
+            {
+                if (mapping != null && mapping.Sprite != null &&
+                    string.Equals(mapping.ScenarioName, scenarioName, StringComparison.OrdinalIgnoreCase))
+                    return mapping.Sprite;
+            }
+
+            return null;
         }
 
         private void LoadBriefing(ScenarioManifest manifest)
@@ -426,7 +444,7 @@ namespace HammerAndSickle.SceneManagement
 
         private void SetPlaceholderThumbnail()
         {
-            if (_thumbnailImage != null && _placeholderThumbnail != null)
+            if (_thumbnailImage != null)
                 _thumbnailImage.sprite = _placeholderThumbnail;
         }
 
