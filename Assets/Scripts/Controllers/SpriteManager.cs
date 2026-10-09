@@ -904,6 +904,37 @@ namespace HammerAndSickle.Controllers
 
         #region Officer Portraits
 
+        // Head layers (zero-based names match the imported Sprites).
+        public const string OfficerPortraitHead0 = "ui-element-head-0";
+        public const string OfficerPortraitHead1 = "ui-element-head-1";
+        public const string OfficerPortraitHead2 = "ui-element-head-2";
+        public const string OfficerPortraitHead3 = "ui-element-head-3";
+        public const string OfficerPortraitHead4 = "ui-element-head-4";
+        public const string OfficerPortraitHead5 = "ui-element-head-5";
+        public const string OfficerPortraitHead6 = "ui-element-head-6";
+        public const string OfficerPortraitHead7 = "ui-element-head-7";
+        public const string OfficerPortraitHead8 = "ui-element-head-8";
+        public const string OfficerPortraitHead9 = "ui-element-head-9";
+        public const string OfficerPortraitHead10 = "ui-element-head-10";
+        public const string OfficerPortraitHead11 = "ui-element-head-11";
+        public const string OfficerPortraitHead12 = "ui-element-head-12";
+        public const string OfficerPortraitHead13 = "ui-element-head-13";
+        public const string OfficerPortraitHead14 = "ui-element-head-14";
+        public const string OfficerPortraitHead15 = "ui-element-head-15";
+        public const string OfficerPortraitHead16 = "ui-element-head-16";
+        public const string OfficerPortraitHead17 = "ui-element-head-17";
+        public const string OfficerPortraitHead18 = "ui-element-head-18";
+        public const string OfficerPortraitHead19 = "ui-element-head-19";
+
+        // Uniform layers for composing officer portraits.
+        public const string OfficerUniformColonel = "ui-element-col-uni";
+        public const string OfficerUniformMajorGeneral = "ui-element-mj-gen-uni";
+        public const string OfficerUniformLieutenantGeneral = "ui-element-lt-gen-uni";
+        public const string OfficerUniformColonelGeneral = "ui-element-col-gen-uni";
+        public const string OfficerUniformArmyGeneral = "ui-element-army-gen-uni";
+        public const string OfficerUniformMarshal = "ui-element-marshall-uni";
+
+        // Retained portrait identifiers used by existing leader content and persistence.
         public const string RussianPortrait01 = "Russian01";
         public const string RussianPortrait02 = "Russian02";
         public const string RussianPortrait03 = "Russian03";
