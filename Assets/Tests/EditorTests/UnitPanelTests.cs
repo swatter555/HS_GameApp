@@ -188,8 +188,47 @@ namespace HammerAndSickle.Tests
         {
             Assert.That(_panel.Initialize(), Is.True);
             typeof(Prefab_UnitPanel).GetField("_flagImage", PrivateInstance).SetValue(_panel, null);
-            LogAssert.Expect(LogType.Error, "[Prefab_UnitPanel] Initialization errors found: Flag Image is not assigned. ");
-            Assert.That(_panel.Initialize(), Is.False);
+            var logger = Debug.unityLogger;
+            var previousHandler = logger.logHandler;
+            var capture = new ExpectedErrorCapture(previousHandler,
+                "[Prefab_UnitPanel] Initialization errors found: Flag Image is not assigned. ");
+            bool initialized;
+            try
+            {
+                logger.logHandler = capture;
+                initialized = _panel.Initialize();
+            }
+            finally { logger.logHandler = previousHandler; }
+            Assert.That(initialized, Is.False);
+            Assert.That(capture.Count, Is.EqualTo(1), "Missing references must still produce an actionable runtime error.");
+            LogAssert.NoUnexpectedReceived();
+        }
+
+        /// <summary>Keep the intentional validation error out of the Console; forward all other logs.</summary>
+        private sealed class ExpectedErrorCapture : ILogHandler
+        {
+            private readonly ILogHandler _previous;
+            private readonly string _message;
+            public int Count { get; private set; }
+
+            public ExpectedErrorCapture(ILogHandler previous, string message)
+            {
+                _previous = previous;
+                _message = message;
+            }
+
+            public void LogFormat(LogType logType, UnityEngine.Object context, string format, params object[] args)
+            {
+                if (logType == LogType.Error && string.Format(format, args) == _message)
+                {
+                    Count++;
+                    return;
+                }
+                _previous.LogFormat(logType, context, format, args);
+            }
+
+            public void LogException(System.Exception exception, UnityEngine.Object context)
+                => _previous.LogException(exception, context);
         }
     }
 }
