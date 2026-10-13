@@ -1,4 +1,5 @@
 using System.Collections.Generic;
+using System.Globalization;
 using HammerAndSickle.Controllers;
 using HammerAndSickle.Core.GameData;
 using HammerAndSickle.Models;
@@ -8,7 +9,7 @@ using UnityEngine;
 namespace HammerAndSickle.Core
 {
     /// <summary>
-    /// Reactive unit panel: a single formatted text block for the selected unit, friendly OR enemy.
+    /// Reactive unit panel: a formatted monitor and action bar for the selected unit, friendly OR enemy.
     ///
     /// Enemy units display here too as of 2026-07-25 (Bob's call — this REVERSES the 2026-07-24 §12.5.3
     /// ratification that made the panel friendly-only and routed enemy intel to the printer; the printer keeps
@@ -16,8 +17,8 @@ namespace HammerAndSickle.Core
     /// rung ladder has not revealed yet, so lines are omitted rather than filled with placeholders.
     ///
     /// Friendly = the Full ownership view (§12.2.7 — all seventeen buckets, no error). Enemy = the filtered
-    /// report at the unit's current SpottedLevel. Detailed combat stats + the NATO symbol were parked
-    /// 2026-07-23/24. Hit points deliberately appear NOWHERE here — §24.3.2.5 keeps the strength readout in the
+    /// report at the unit's current SpottedLevel. Flag and classification are visible from Level1; action
+    /// counts are available actions for friendly units and zero placeholders for enemies. Hit points deliberately appear NOWHERE here — §24.3.2.5 keeps the strength readout in the
     /// icon's hit-point box alone.
     /// </summary>
     public class Prefab_UnitPanel : MonoBehaviour
@@ -54,6 +55,18 @@ namespace HammerAndSickle.Core
         [Header("Unit Panel Fields")]
         [SerializeField] private TextMeshProUGUI _infoText;
 
+        [Header("Action Panel Fields")]
+        [SerializeField] private UnityEngine.UI.Image _flagImage;
+        [SerializeField, InspectorName("NATO Image")] private UnityEngine.UI.Image _natoImage;
+        [SerializeField] private TextMeshProUGUI _moveActionsText;
+        [SerializeField] private TextMeshProUGUI _combatActionsText;
+        [SerializeField] private TextMeshProUGUI _deployActionsText;
+        [SerializeField] private TextMeshProUGUI _intelActionsText;
+        [SerializeField] private TextMeshProUGUI _oppActionsText;
+
+        private Nationality? _displayedNationality;
+        private UnitClassification? _displayedClassification;
+
         #endregion // Inspector Fields
 
         #region Initialization
@@ -66,6 +79,13 @@ namespace HammerAndSickle.Core
             string errorString = "";
 
             if (_infoText == null) errorString += "Info Text is not assigned. ";
+            if (_flagImage == null) errorString += "Flag Image is not assigned. ";
+            if (_natoImage == null) errorString += "NATO Image is not assigned. ";
+            if (_moveActionsText == null) errorString += "Move Actions Text is not assigned. ";
+            if (_combatActionsText == null) errorString += "Combat Actions Text is not assigned. ";
+            if (_deployActionsText == null) errorString += "Deploy Actions Text is not assigned. ";
+            if (_intelActionsText == null) errorString += "Intel Actions Text is not assigned. ";
+            if (_oppActionsText == null) errorString += "Opp Actions Text is not assigned. ";
 
             if (!string.IsNullOrEmpty(errorString))
             {
@@ -88,8 +108,14 @@ namespace HammerAndSickle.Core
         public void UpdateUnitPanel()
         {
             var unit = GameDataManager.SelectedUnit;
-            if (unit == null)
+            if (unit == null || (unit.Side != Side.Player && unit.SpottedLevel < SpottedLevel.Level1))
+            {
+                Clear();
                 return;
+            }
+
+            UpdateIdentityImages(unit);
+            UpdateActionCounts(unit);
 
             var lines = unit.Side == Side.Player ? BuildFriendlyLines(unit) : BuildEnemyLines(unit);
 
@@ -195,22 +221,109 @@ namespace HammerAndSickle.Core
         }
 
         /// <summary>
-        /// Blanks the panel's contents without closing it. The reactive panels open on the first hex selection
-        /// of the battle and stay open (2026-07-25) — right-click deselect empties them instead of hiding them,
-        /// so the HUD keeps a stable layout rather than popping panels in and out.
+        /// Clears contents; The Battle HUD hides this root until a visible unit is selected.
         ///
-        /// Also the state for a hex holding no FRIENDLY unit: the panel is friendly-only (§12.5.3), so an empty
-        /// hex and an enemy-occupied hex both leave it blank rather than closed.
+        /// Also used for an empty hex or an enemy contact below Level1; no previous identity or actions remain.
         /// </summary>
         public void Clear()
         {
             if (_infoText != null)
                 _infoText.text = string.Empty;
+
+            SetIdentityImage(_flagImage, null);
+            SetIdentityImage(_natoImage, null);
+            _displayedNationality = null;
+            _displayedClassification = null;
+            ClearActionCounts();
         }
 
         #endregion // Unit Panel Update
 
         #region Helper Methods
+
+        private void UpdateIdentityImages(CombatUnit unit)
+        {
+            // The panel refreshes each frame; resolve atlas sprites only when the identity changes.
+            if (_flagImage != null && _displayedNationality != unit.Nationality)
+            {
+                string flagName = FlagSpriteName(unit.Nationality);
+                SetIdentityImage(_flagImage, flagName == null ? null : SpriteManager.GetSprite(flagName));
+                _displayedNationality = unit.Nationality;
+            }
+
+            if (_natoImage != null && _displayedClassification != unit.Classification)
+            {
+                string spriteName = Prefab_CombatUnitIcon.NatoSpriteName(unit.Classification);
+                Sprite sprite = SpriteManager.GetUnitPrefabSprite(spriteName);
+                if (sprite == null && spriteName != SpriteManager.UnknownDeploymentIcon)
+                    sprite = SpriteManager.GetUnitPrefabSprite(SpriteManager.UnknownDeploymentIcon);
+
+                SetIdentityImage(_natoImage, sprite);
+                _displayedClassification = unit.Classification;
+            }
+        }
+
+        private static void SetIdentityImage(UnityEngine.UI.Image image, Sprite sprite)
+        {
+            if (image == null) return;
+            image.sprite = sprite;
+            image.enabled = sprite != null;
+        }
+
+        private void UpdateActionCounts(CombatUnit unit)
+        {
+            // Remaining enemy actions are not part of the intel report at any spotting level.
+            if (unit.Side != Side.Player)
+            {
+                SetActionCount(_moveActionsText, 0);
+                SetActionCount(_combatActionsText, 0);
+                SetActionCount(_deployActionsText, 0);
+                SetActionCount(_intelActionsText, 0);
+                SetActionCount(_oppActionsText, 0);
+                return;
+            }
+
+            SetActionCount(_moveActionsText, unit.GetMoveActions());
+            SetActionCount(_combatActionsText, unit.GetCombatActions());
+            SetActionCount(_deployActionsText, unit.GetDeployActions());
+            SetActionCount(_intelActionsText, unit.GetIntelActions());
+            SetActionCount(_oppActionsText, unit.GetOpportunityActions());
+        }
+
+        private static void SetActionCount(TextMeshProUGUI text, float count)
+        {
+            if (text != null)
+                text.text = Mathf.Max(0, Mathf.FloorToInt(count)).ToString(CultureInfo.InvariantCulture);
+        }
+
+        private void ClearActionCounts()
+        {
+            if (_moveActionsText != null) _moveActionsText.text = string.Empty;
+            if (_combatActionsText != null) _combatActionsText.text = string.Empty;
+            if (_deployActionsText != null) _deployActionsText.text = string.Empty;
+            if (_intelActionsText != null) _intelActionsText.text = string.Empty;
+            if (_oppActionsText != null) _oppActionsText.text = string.Empty;
+        }
+
+        /// <summary>Generic or unrecognized nationalities have no authored national flag.</summary>
+        internal static string FlagSpriteName(Nationality nationality) => nationality switch
+        {
+            Nationality.USSR => SpriteManager.Flag_SV,
+            Nationality.USA => SpriteManager.Flag_US,
+            Nationality.FRG => SpriteManager.Flag_GE,
+            Nationality.UK => SpriteManager.Flag_UK,
+            Nationality.FRA => SpriteManager.Flag_FR,
+            Nationality.BE => SpriteManager.Flag_BE,
+            Nationality.DE => SpriteManager.Flag_DE,
+            Nationality.NE => SpriteManager.Flag_NE,
+            Nationality.MJ => SpriteManager.Flag_MJ,
+            Nationality.IR => SpriteManager.Flag_Iran,
+            Nationality.IQ => SpriteManager.Flag_Iraq,
+            Nationality.SAUD => SpriteManager.Flag_Saudi,
+            Nationality.KW => SpriteManager.Flag_Kuwait,
+            Nationality.China => SpriteManager.Flag_China,
+            _ => null
+        };
 
         /// <summary>Efficiency level as a short display string (matches the printer's wording).</summary>
         private static string FormatEfficiency(EfficiencyLevel level) => level switch

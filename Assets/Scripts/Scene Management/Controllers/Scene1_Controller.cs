@@ -38,6 +38,10 @@ namespace HammerAndSickle.SceneManagement.Controllers
         {
             ValidateGameSystems();
 
+            if (!InitializeSelectionPanels())
+                AppService.HandleException(CLASS_NAME, nameof(Start),
+                    new Exception("Failed to initialize battle selection panels. Check their Inspector references."));
+
             // See EventManager: subscribe to Scene 1 dialog switch requests
             EventManager.Instance.OnScene1DialogRequested += OnDialogRequested;
 
@@ -116,6 +120,15 @@ namespace HammerAndSickle.SceneManagement.Controllers
         #endregion // Dialog Flow
 
         #region Private Methods
+
+        /// <summary>Initializes selection-driven information panels through the authored Battle HUD.</summary>
+        internal bool InitializeSelectionPanels()
+        {
+            if (_defaultDialog is DefaultDialog_Scene1 hud)
+                return hud.InitializeSelectionPanels();
+            Debug.LogError($"{CLASS_NAME}: Default Dialog must reference the Battle HUD.");
+            return false;
+        }
 
         private void InitializeAudio()
         {

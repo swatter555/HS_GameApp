@@ -1,4 +1,6 @@
 using HammerAndSickle.Core.GameData;
+using HammerAndSickle.Core;
+using HammerAndSickle.Controllers;
 using HammerAndSickle.Core.Map;
 using HammerAndSickle.Models;
 using NUnit.Framework;
@@ -138,6 +140,66 @@ namespace HammerAndSickle.Tests
         }
 
         #endregion // Icon Profile Integrity
+
+        #region Small NATO Classification Symbols
+
+        [TestCase(UnitClassification.TANK, "Icon_Tank")]
+        [TestCase(UnitClassification.MECH, "Icon_Mech")]
+        [TestCase(UnitClassification.MOT, "Icon_Mot")]
+        [TestCase(UnitClassification.AB, "Icon_Airborne")]
+        [TestCase(UnitClassification.MAB, "Icon_MechAirborne")]
+        [TestCase(UnitClassification.MAR, "Icon_Marine")]
+        [TestCase(UnitClassification.MMAR, "Icon_ArmoredMarine")]
+        [TestCase(UnitClassification.RECON, "Icon_Recon")]
+        [TestCase(UnitClassification.CAV, "Icon_ArmoredCav")]
+        [TestCase(UnitClassification.AT, "Icon_Antitank")]
+        [TestCase(UnitClassification.AM, "Icon_AirAssault")]
+        [TestCase(UnitClassification.MAM, "Icon_MechAM")]
+        [TestCase(UnitClassification.INF, "Icon_Infantry")]
+        [TestCase(UnitClassification.SPECF, "Icon_SpecialForces")]
+        [TestCase(UnitClassification.ART, "Icon_Artillery")]
+        [TestCase(UnitClassification.SPA, "Icon_SPArtillery")]
+        [TestCase(UnitClassification.ROC, "Icon_Rocket")]
+        [TestCase(UnitClassification.BM, "Icon_BallisticMissile")]
+        [TestCase(UnitClassification.SAM, "Icon_SAM")]
+        [TestCase(UnitClassification.SPSAM, "Icon_SPSAM")]
+        [TestCase(UnitClassification.AAA, "Icon_AAA")]
+        [TestCase(UnitClassification.SPAAA, "Icon_SPAAA")]
+        [TestCase(UnitClassification.ENG, "Icon_Engineer")]
+        [TestCase(UnitClassification.HELO, "Icon_Helo")]
+        [TestCase(UnitClassification.FGT, "Icon_FW_Fighters")]
+        [TestCase(UnitClassification.ATT, "Icon_FW_Attack")]
+        [TestCase(UnitClassification.WW, "Icon_FW_Attack")]
+        [TestCase(UnitClassification.AWACS, "Icon_FW_AWACS")]
+        [TestCase(UnitClassification.BMB, "Icon_FW_Bombers")]
+        [TestCase(UnitClassification.RECONA, "Icon_FW_Recon")]
+        [TestCase(UnitClassification.TRN, "Icon_FixedWing")]
+        [TestCase(UnitClassification.HQ, "Icon_Depot")]
+        [TestCase(UnitClassification.DEPOT, "Icon_Depot")]
+        [TestCase(UnitClassification.AIRB, "Icon_Airbase")]
+        public void Classification_UsesTheApprovedSmallNatoSymbol(UnitClassification classification, string expected)
+        {
+            Assert.That(Prefab_CombatUnitIcon.NatoSpriteName(classification), Is.EqualTo(expected));
+        }
+
+        [TestCase(-1)]
+        [TestCase(int.MaxValue)]
+        public void UnrecognizedClassification_UsesTheDeploymentQuestionMark(int value)
+        {
+            Assert.That(Prefab_CombatUnitIcon.NatoSpriteName((UnitClassification)value),
+                Is.EqualTo(SpriteManager.UnknownDeploymentIcon));
+        }
+
+        [Test]
+        public void EveryClassification_HasAnExplicitSmallSymbolMapping()
+        {
+            foreach (UnitClassification classification in Enum.GetValues(typeof(UnitClassification)))
+                Assert.That(Prefab_CombatUnitIcon.NatoSpriteName(classification),
+                    Is.Not.EqualTo(SpriteManager.UnknownDeploymentIcon),
+                    $"{classification}: approve a mapping when adding a classification.");
+        }
+
+        #endregion // Small NATO Classification Symbols
 
         #region Facing Rotation
 

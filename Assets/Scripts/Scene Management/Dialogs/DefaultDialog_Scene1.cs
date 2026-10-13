@@ -78,6 +78,9 @@ namespace HammerAndSickle.SceneManagement
         // Cached array of all HUD panels that should block map clicks.
         // Built once in Start() from the serialized references.
         private RectTransform[] _panels;
+        private HammerAndSickle.Core.Prefab_TerrainPanel _terrainInfoPanel;
+        private HammerAndSickle.Core.Prefab_UnitPanel _unitInfoPanel;
+        private bool _selectionPanelsInitialized;
 
         #endregion // Fields
 
@@ -97,6 +100,7 @@ namespace HammerAndSickle.SceneManagement
             };
 
             WarnOnUnassignedPanels();
+            if (!_selectionPanelsInitialized) InitializeSelectionPanels();
         }
 
         /// <summary>
@@ -135,6 +139,95 @@ namespace HammerAndSickle.SceneManagement
         }
 
         #endregion // Unity Lifecycle
+
+        #region Selection Panels
+
+        private void LateUpdate()
+        {
+            // Selection subscribers finish first; counters also stay live while the same unit is selected.
+            RefreshSelectionPanels();
+        }
+
+        /// <summary>Caches the authored components before hiding them; no replacement panels are created.</summary>
+        public bool InitializeSelectionPanels()
+        {
+            _selectionPanelsInitialized = false;
+            _terrainInfoPanel = _terrainPanel != null ? _terrainPanel.GetComponent<HammerAndSickle.Core.Prefab_TerrainPanel>() : null;
+            _unitInfoPanel = _unitPanel != null ? _unitPanel.GetComponent<HammerAndSickle.Core.Prefab_UnitPanel>() : null;
+            if (_terrainInfoPanel == null || _unitInfoPanel == null)
+            {
+                Debug.LogError($"{CLASS_NAME}: Terrain Panel and Unit Panel must reference the authored information panels.");
+                return false;
+            }
+
+            bool terrainReady = _terrainInfoPanel.Initialize();
+            bool unitReady = _unitInfoPanel.Initialize();
+            GameDataManager.ClearSelection();
+            ClearSelectionPanels();
+            _selectionPanelsInitialized = terrainReady && unitReady;
+            return _selectionPanelsInitialized;
+        }
+
+        internal void RefreshSelectionPanels()
+        {
+            if (!_selectionPanelsInitialized) return;
+            try
+            {
+                var position = GameDataManager.SelectedHex;
+                var hex = position == GameDataManager.NoHexSelected
+                    ? null : GameDataManager.CurrentHexMap?.GetHexAt(position);
+                if (hex == null)
+                {
+                    ClearSelectionPanels();
+                    return;
+                }
+
+                GameDataManager.SelectedHexData = hex;
+                ResolveSelection();
+                _terrainPanel.gameObject.SetActive(true);
+                _terrainInfoPanel.UpdateTerrainPanel();
+                if (GameDataManager.SelectedUnit != null)
+                {
+                    _unitPanel.gameObject.SetActive(true);
+                    _unitInfoPanel.UpdateUnitPanel();
+                }
+                else
+                {
+                    _unitInfoPanel.Clear();
+                    _unitPanel.gameObject.SetActive(false);
+                }
+            }
+            catch (Exception e)
+            {
+                AppService.HandleException(CLASS_NAME, nameof(RefreshSelectionPanels), e);
+                ClearSelectionPanels();
+            }
+        }
+
+        private void ResolveSelection()
+        {
+            var data = GameDataManager.Instance;
+            var unit = data.GetUnitAtPosition(GameDataManager.SelectedHex);
+            if (unit != null && unit.Side != Side.Player && unit.SpottedLevel < SpottedLevel.Level1)
+                unit = null;
+            GameDataManager.SelectedUnit = unit;
+            GameDataManager.SelectedLeader = unit != null && unit.IsLeaderAssigned
+                ? data.GetLeader(unit.LeaderID) : null;
+        }
+
+        private void ClearSelectionPanels()
+        {
+            GameDataManager.SelectedHexData = null;
+            GameDataManager.SelectedUnit = null;
+            GameDataManager.SelectedLeader = null;
+            _terrainInfoPanel?.Clear();
+            _unitInfoPanel?.Clear();
+            if (_terrainPanel != null) _terrainPanel.gameObject.SetActive(false);
+            if (_unitPanel != null) _unitPanel.gameObject.SetActive(false);
+            // The printer owns dispatch history independently of selection.
+        }
+
+        #endregion // Selection Panels
 
         #region UIPanel Overrides
 

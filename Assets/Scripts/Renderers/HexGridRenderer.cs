@@ -715,7 +715,7 @@ namespace HammerAndSickle.Renderers
 
         private void CreateCityIcon(HexTile hex, TerrainType terrain)
         {
-            GameObject obj = UnityEngine.Object.Instantiate(SpriteManager.Instance.CityPrefab, cityIconLayer.transform);
+            GameObject obj = UnityEngine.Object.Instantiate(SpriteManager.GetCityPrefab(), cityIconLayer.transform);
             obj.name = $"City_{hex.Position.IntX}_{hex.Position.IntY}";
 
             var prefab = obj.GetComponent<Prefab_CityIcon>();
@@ -723,7 +723,6 @@ namespace HammerAndSickle.Renderers
             obj.transform.position = GetRenderPosition(new Vector2Int(hex.Position.IntX, hex.Position.IntY));
 
             prefab.UpdateCityIcon(terrain, GameDataManager.CurrentMapTheme);
-            prefab.UpdateNameplate(GameDataManager.CurrentMapTheme);
             prefab.UpdateControlFlag(hex.TileControl, hex.DefaultTileControl);
             prefab.UpdateCityName(hex.TileLabel);
             // IsObjective here is the RUNTIME value — a load-time projection of the manifest's

@@ -6,6 +6,7 @@ using System.Reflection;
 using System.Text;
 using System.Text.RegularExpressions;
 using HammerAndSickle.Controllers;
+using HammerAndSickle.Core;
 using HammerAndSickle.Core.GameData;
 using HammerAndSickle.Core.Map;
 using HammerAndSickle.Models;
@@ -15,6 +16,8 @@ using UnityEditor.SceneManagement;
 using UnityEditor.U2D;
 using UnityEngine;
 using UnityEngine.U2D;
+using UnityEngine.TestTools;
+using UnityEngine.Serialization;
 
 namespace HammerAndSickle.Tests
 {
@@ -76,6 +79,92 @@ namespace HammerAndSickle.Tests
                     .Select(f => (SpriteAtlas)f.GetValue(managers[0])).Where(a => a != null).Distinct().ToArray();
             }
             finally { EditorSceneManager.ClosePreviewScene(preview); }
+        }
+
+        [Test]
+        public void BattleIconRenderer_HasNoSerializedPrefabOverride()
+        {
+            var prefabFields = typeof(GameIconRenderer).GetFields(BindingFlags.NonPublic | BindingFlags.Instance)
+                .Where(f => f.FieldType == typeof(GameObject) && f.IsDefined(typeof(SerializeField), false));
+            Assert.That(prefabFields, Is.Empty, "Battle icons must use SpriteManager's prefab assignments.");
+        }
+
+        [TestCase(true)]
+        [TestCase(false)]
+        public void BattleIconPrefabLookup_RejectsMissingBootstrapWithoutCreatingAManager(bool unitIcon)
+        {
+            var instanceField = typeof(SpriteManager).GetField("_instance", BindingFlags.NonPublic | BindingFlags.Static);
+            var previous = instanceField.GetValue(null);
+            try
+            {
+                instanceField.SetValue(null, null);
+                var error = Assert.Throws<InvalidOperationException>(() => ResolveBattleIconPrefab(unitIcon));
+                Assert.That(error.Message, Does.Contain("Start the game from MainMenu"));
+                Assert.That(instanceField.GetValue(null), Is.Null, "Lookup must not create an unwired singleton.");
+            }
+            finally { instanceField.SetValue(null, previous); }
+        }
+
+        [TestCase(true)]
+        [TestCase(false)]
+        public void BattleIconPrefabLookup_UsesSavedAssignmentAndFollowsItsReplacement(bool unitIcon)
+        {
+            CheckBattleIconPrefabSource(unitIcon, (manager, field, replacement) =>
+            {
+                var saved = (GameObject)field.GetValue(manager);
+                Assert.That(saved, Is.Not.Null, "MainMenu must supply the icon prefab.");
+                Assert.That(ResolveBattleIconPrefab(unitIcon), Is.SameAs(saved));
+
+                // Inactive temporary objects avoid running the authored prefab's visual lifecycle.
+                replacement.AddComponent(unitIcon ? typeof(Prefab_CombatUnitIcon) : typeof(Prefab_CityIcon));
+                field.SetValue(manager, replacement);
+                Assert.That(ResolveBattleIconPrefab(unitIcon), Is.SameAs(replacement),
+                    "A changed SpriteManager assignment must be used by the next icon creation.");
+            });
+        }
+
+        [TestCase(true)]
+        [TestCase(false)]
+        public void BattleIconPrefabLookup_RejectsMissingOrWrongRootWithActionableDiagnostics(bool unitIcon)
+        {
+            CheckBattleIconPrefabSource(unitIcon, (manager, field, replacement) =>
+            {
+                field.SetValue(manager, null);
+                var missing = Assert.Throws<InvalidOperationException>(() => ResolveBattleIconPrefab(unitIcon));
+                Assert.That(missing.Message, Does.Contain(field.Name).And.Contain("Assign the icon prefab"));
+
+                field.SetValue(manager, replacement);
+                var wrongRoot = Assert.Throws<InvalidOperationException>(() => ResolveBattleIconPrefab(unitIcon));
+                Assert.That(wrongRoot.Message, Does.Contain(unitIcon ? nameof(Prefab_CombatUnitIcon) : nameof(Prefab_CityIcon))
+                    .And.Contain("on its root").And.Contain("MainMenu"));
+            });
+        }
+
+        private static GameObject ResolveBattleIconPrefab(bool unitIcon) =>
+            unitIcon ? SpriteManager.GetUnitIconPrefab() : SpriteManager.GetCityPrefab();
+
+        private static void CheckBattleIconPrefabSource(bool unitIcon, Action<SpriteManager, FieldInfo, GameObject> check)
+        {
+            var instanceField = typeof(SpriteManager).GetField("_instance", BindingFlags.NonPublic | BindingFlags.Static);
+            var previous = instanceField.GetValue(null);
+            var preview = EditorSceneManager.OpenPreviewScene("Assets/Scenes/MainMenu.unity");
+            var replacement = new GameObject("Temporary icon prefab source");
+            replacement.SetActive(false);
+            try
+            {
+                var manager = preview.GetRootGameObjects()
+                    .SelectMany(go => go.GetComponentsInChildren<SpriteManager>(true)).Single();
+                var field = typeof(SpriteManager).GetField(unitIcon ? "_unitIconPrefab" : "_cityPrefab",
+                    BindingFlags.NonPublic | BindingFlags.Instance);
+                instanceField.SetValue(null, manager);
+                check(manager, field, replacement);
+            }
+            finally
+            {
+                instanceField.SetValue(null, previous);
+                UnityEngine.Object.DestroyImmediate(replacement);
+                EditorSceneManager.ClosePreviewScene(preview);
+            }
         }
 
         [Test]
@@ -164,9 +253,7 @@ namespace HammerAndSickle.Tests
                 SpriteManager.DeployedIcon, SpriteManager.DefensiveIcon, SpriteManager.EntrenchedIcon,
                 SpriteManager.FortifiedIcon, SpriteManager.MountedIcon, SpriteManager.EmbarkedAirIcon,
                 SpriteManager.EmbarkedNavalIcon, SpriteManager.UnknownDeploymentIcon
-            }.Concat(typeof(SpriteManager).GetFields(BindingFlags.Public | BindingFlags.Static)
-                .Where(f => f.IsLiteral && f.FieldType == typeof(string) && f.Name.StartsWith("FlagIcon_", StringComparison.Ordinal))
-                .Select(f => (string)f.GetRawConstantValue()));
+            };
 
             foreach (string name in names)
             {
@@ -178,6 +265,92 @@ namespace HammerAndSickle.Tests
                 Assert.That(ResolvingAtlases(name), Is.EquivalentTo(new[] { atlas }),
                     $"{name}: missing or ambiguous runtime lookup.");
             }
+        }
+
+        [Test]
+        public void SmallNatoCatalog_MatchesImportedAssets_AndResolvesOnlyInThePrefabAtlas()
+        {
+            const string root = "Assets/Art/Sprites/UnitPrefab Icons";
+            var atlas = AssetDatabase.LoadAssetAtPath<SpriteAtlas>($"{AtlasRoot}/UnitPrefab Icons.spriteatlas");
+            Assert.That(atlas, Is.Not.Null);
+            Assert.That(_sceneAtlases, Does.Contain(atlas));
+            Assert.That(SpriteAtlasExtensions.IsIncludeInBuild(atlas), Is.True);
+            var names = typeof(SpriteManager).GetFields(BindingFlags.Public | BindingFlags.Static)
+                .Where(f => f.IsLiteral && f.FieldType == typeof(string) && f.Name.StartsWith("UnitNato_", StringComparison.Ordinal))
+                .Select(f => (string)f.GetRawConstantValue()).ToArray();
+            var imported = Directory.GetFiles(root, "Icon_*.png").Select(Path.GetFileNameWithoutExtension);
+            Assert.That(names.Distinct().Count(), Is.EqualTo(names.Length));
+            Assert.That(names, Is.EquivalentTo(imported), "Small symbols must have their own catalog.");
+            foreach (string name in names.Append(SpriteManager.UnknownDeploymentIcon))
+            {
+                string path = $"{root}/{name}.png";
+                Assert.That(atlas.GetPackables().Count(p => AssetDatabase.GetAssetPath(p) == path), Is.EqualTo(1), path);
+                var sprite = SpriteManager.GetUnitPrefabSprite(atlas, name);
+                try
+                {
+                    Assert.That(sprite, Is.Not.Null, name);
+                    Assert.That(sprite.rect.size, Is.EqualTo(new Vector2(43, 32)), name);
+                }
+                finally { DestroyTemporarySprite(sprite); }
+            }
+            foreach (UnitClassification classification in Enum.GetValues(typeof(UnitClassification)))
+                Assert.That(names, Does.Contain(Prefab_CombatUnitIcon.NatoSpriteName(classification)), classification.ToString());
+        }
+
+        [TestCase("Icon_AAA")]
+        [TestCase("Icon_Helo")]
+        [TestCase("Icon_Infantry")]
+        [TestCase("Icon_SAM")]
+        [TestCase("Icon_SPAAA")]
+        [TestCase("Icon_SPSAM")]
+        public void SmallNatoLookup_IgnoresSameNamedLargeSymbols(string name)
+        {
+            var large = AssetDatabase.LoadAssetAtPath<Sprite>($"Assets/Art/Sprites/Nato Symbols/{name}.png");
+            Assert.That(large, Is.Not.Null);
+            Assert.That(large.rect.width, Is.GreaterThan(43));
+            var atlas = AssetDatabase.LoadAssetAtPath<SpriteAtlas>($"{AtlasRoot}/UnitPrefab Icons.spriteatlas");
+            var small = SpriteManager.GetUnitPrefabSprite(atlas, name);
+            try
+            {
+                Assert.That(small, Is.Not.Null);
+                Assert.That(small.rect.size, Is.EqualTo(new Vector2(43, 32)));
+            }
+            finally { DestroyTemporarySprite(small); }
+        }
+
+        [Test]
+        public void SmallNatoLookup_DoesNotFallBackToALargeOnlySymbol()
+        {
+            Assert.That(AssetDatabase.LoadAssetAtPath<Sprite>("Assets/Art/Sprites/Nato Symbols/Icon_HQ.png"), Is.Not.Null);
+            var atlas = AssetDatabase.LoadAssetAtPath<SpriteAtlas>($"{AtlasRoot}/UnitPrefab Icons.spriteatlas");
+            LogAssert.Expect(LogType.Warning,
+                "SpriteManager.GetUnitPrefabSprite: Sprite 'Icon_HQ' not found in UnitPrefab Icons atlas.");
+            var sprite = SpriteManager.GetUnitPrefabSprite(atlas, "Icon_HQ");
+            try { Assert.That(sprite, Is.Null); }
+            finally { DestroyTemporarySprite(sprite); }
+        }
+
+        [Test]
+        public void NatoRenderer_RetainsTheFormerFlagBindingUntilTheUserRewiresIt()
+        {
+            var field = typeof(Prefab_CombatUnitIcon).GetField("natoIcon", BindingFlags.NonPublic | BindingFlags.Instance);
+            Assert.That(field, Is.Not.Null);
+            Assert.That(field.GetCustomAttributes<FormerlySerializedAsAttribute>().Select(a => a.oldName),
+                Does.Contain("nationIcon"));
+            var prefab = AssetDatabase.LoadAssetAtPath<GameObject>("Assets/Art/Prefabs/Units/Prefab_UnitIcons.prefab");
+            Assert.That(prefab, Is.Not.Null);
+            var component = prefab.GetComponent<Prefab_CombatUnitIcon>();
+            Assert.That(component, Is.Not.Null);
+            var property = new SerializedObject(component).FindProperty("natoIcon");
+            Assert.That(property, Is.Not.Null);
+            Assert.That(property.objectReferenceValue, Is.Not.Null, "Preserve the authored binding across the rename.");
+            Assert.That(property.objectReferenceValue, Is.EqualTo(component.NatoIconRenderer));
+        }
+
+        private static void DestroyTemporarySprite(Sprite sprite)
+        {
+            // Unity 6.6 can return persistent imported sprites, which the audit must never destroy.
+            if (sprite != null && !EditorUtility.IsPersistent(sprite)) UnityEngine.Object.DestroyImmediate(sprite);
         }
 
         [Test]

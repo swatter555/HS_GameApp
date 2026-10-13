@@ -49,6 +49,7 @@ namespace HammerAndSickle.Core
         [Header("Terrain Panel Fields")]
         [SerializeField] private Image _terrainImage;
         [SerializeField] private TextMeshProUGUI _infoText;
+        private string _displayedPortraitName;
 
         #endregion // Inspector Fields
 
@@ -119,9 +120,7 @@ namespace HammerAndSickle.Core
         }
 
         /// <summary>
-        /// Blanks the panel's contents without closing it. The reactive panels open on the first hex selection
-        /// of the battle and stay open (2026-07-25) — right-click deselect empties them instead of hiding them,
-        /// so the HUD keeps a stable layout rather than popping panels in and out.
+        /// Clears contents; The Battle HUD hides this root until a valid hex is selected.
         ///
         /// The portrait Image is DISABLED rather than just having its sprite nulled: an Image with a null
         /// sprite still draws as a solid white rectangle.
@@ -136,6 +135,8 @@ namespace HammerAndSickle.Core
                 _terrainImage.sprite = null;
                 _terrainImage.enabled = false;
             }
+
+            _displayedPortraitName = null;
         }
 
         /// <summary>
@@ -143,18 +144,14 @@ namespace HammerAndSickle.Core
         /// </summary>
         private void UpdateTerrainPortrait(TerrainType terrain, MapTheme theme)
         {
+            if (_terrainImage == null) return;
             var spriteName = GetTerrainPortraitSpriteName(terrain, theme);
-            if (string.IsNullOrEmpty(spriteName))
-                return;
+            if (_displayedPortraitName == spriteName) return;
 
-            var sprite = SpriteManager.GetSprite(spriteName);
-            if (sprite != null && _terrainImage != null)
-            {
-                _terrainImage.sprite = sprite;
-
-                // Re-enable after a Clear() — the Image is switched off, not just emptied.
-                _terrainImage.enabled = true;
-            }
+            _displayedPortraitName = spriteName;
+            var sprite = string.IsNullOrEmpty(spriteName) ? null : SpriteManager.GetSprite(spriteName);
+            _terrainImage.sprite = sprite;
+            _terrainImage.enabled = sprite != null;
         }
 
         #endregion

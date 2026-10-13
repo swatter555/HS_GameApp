@@ -16,7 +16,7 @@ using GameDataConst = HammerAndSickle.Core.GameData.GameData;
 namespace HammerAndSickle.Core
 {
     /// <summary>
-    /// Manages a combat unit icon prefab instance including unit sprite, nationality symbol,
+    /// Manages a combat unit icon prefab instance including unit sprite, NATO classification symbol,
     /// hit points display, deployment state icon, and stacking icon.
     /// Subscribes to EventManager for hit point and deployment state changes.
     /// </summary>
@@ -28,7 +28,8 @@ namespace HammerAndSickle.Core
 
         [Header("Component References")]
         [SerializeField] private SpriteRenderer unitIcon;
-        [SerializeField] private SpriteRenderer nationIcon;
+        [FormerlySerializedAs("nationIcon")]
+        [SerializeField] private SpriteRenderer natoIcon;
         [FormerlySerializedAs("boxIcon")]
         [SerializeField] private SpriteRenderer infoOverlay;
         [SerializeField] private TextMeshPro boxText;
@@ -103,9 +104,9 @@ namespace HammerAndSickle.Core
         public SpriteRenderer UnitIconRenderer => unitIcon;
 
         /// <summary>
-        /// Gets the nationality icon sprite renderer.
+        /// Gets the NATO classification icon sprite renderer.
         /// </summary>
-        public SpriteRenderer NationIconRenderer => nationIcon;
+        public SpriteRenderer NatoIconRenderer => natoIcon;
 
         /// <summary>
         /// Gets the stacking icon sprite renderer.
@@ -294,30 +295,76 @@ namespace HammerAndSickle.Core
         }
 
         /// <summary>
-        /// Sets the nationality symbol sprite.
+        /// Sets the classification symbol from the small unit-prefab atlas. Classification is visible
+        /// with unit art from Level1; GameIconRenderer owns whether the entire enemy icon is visible.
         /// </summary>
-        public void SetNationIcon(string spriteName)
+        public void SetNatoIcon(UnitClassification classification)
         {
             try
             {
-                if (nationIcon == null)
+                if (natoIcon == null)
                 {
                     return;
                 }
 
-                if (string.IsNullOrEmpty(spriteName))
-                {
-                    AppService.CaptureUiMessage($"{CLASS_NAME}.SetNationIcon: Sprite name is null or empty.");
-                    return;
-                }
+                string spriteName = NatoSpriteName(classification);
+                Sprite sprite = SpriteManager.GetUnitPrefabSprite(spriteName);
+                if (sprite == null && spriteName != SpriteManager.UnknownDeploymentIcon)
+                    sprite = SpriteManager.GetUnitPrefabSprite(SpriteManager.UnknownDeploymentIcon);
 
-                nationIcon.sprite = SpriteManager.GetSprite(spriteName);
+                // Clear a missing symbol rather than retaining another unit's or the prefab's old flag.
+                natoIcon.sprite = sprite;
+                natoIcon.enabled = sprite != null;
             }
             catch (Exception e)
             {
-                AppService.HandleException(CLASS_NAME, nameof(SetNationIcon), e);
+                AppService.HandleException(CLASS_NAME, nameof(SetNatoIcon), e);
             }
         }
+
+        /// <summary>
+        /// Formation classification stays stable when equipment bays change. Robert approved armored
+        /// cavalry for CAV, depot for HQ, attack aircraft for WW and generic fixed-wing for TRN.
+        /// Unrecognized classifications reuse the deployment question mark without inventing a type.
+        /// </summary>
+        internal static string NatoSpriteName(UnitClassification classification) => classification switch
+        {
+            UnitClassification.TANK => SpriteManager.UnitNato_Tank,
+            UnitClassification.MECH => SpriteManager.UnitNato_Mech,
+            UnitClassification.MOT => SpriteManager.UnitNato_Mot,
+            UnitClassification.AB => SpriteManager.UnitNato_Airborne,
+            UnitClassification.MAB => SpriteManager.UnitNato_MechAirborne,
+            UnitClassification.MAR => SpriteManager.UnitNato_Marine,
+            UnitClassification.MMAR => SpriteManager.UnitNato_ArmoredMarine,
+            UnitClassification.RECON => SpriteManager.UnitNato_Recon,
+            UnitClassification.CAV => SpriteManager.UnitNato_ArmoredCav,
+            UnitClassification.AT => SpriteManager.UnitNato_Antitank,
+            UnitClassification.AM => SpriteManager.UnitNato_AirAssault,
+            UnitClassification.MAM => SpriteManager.UnitNato_MechAM,
+            UnitClassification.INF => SpriteManager.UnitNato_Infantry,
+            UnitClassification.SPECF => SpriteManager.UnitNato_SpecialForces,
+            UnitClassification.ART => SpriteManager.UnitNato_Artillery,
+            UnitClassification.SPA => SpriteManager.UnitNato_SPArtillery,
+            UnitClassification.ROC => SpriteManager.UnitNato_Rocket,
+            UnitClassification.BM => SpriteManager.UnitNato_BallisticMissile,
+            UnitClassification.SAM => SpriteManager.UnitNato_SAM,
+            UnitClassification.SPSAM => SpriteManager.UnitNato_SPSAM,
+            UnitClassification.AAA => SpriteManager.UnitNato_AAA,
+            UnitClassification.SPAAA => SpriteManager.UnitNato_SPAAA,
+            UnitClassification.ENG => SpriteManager.UnitNato_Engineer,
+            UnitClassification.HELO => SpriteManager.UnitNato_Helo,
+            UnitClassification.FGT => SpriteManager.UnitNato_FW_Fighters,
+            UnitClassification.ATT => SpriteManager.UnitNato_FW_Attack,
+            UnitClassification.WW => SpriteManager.UnitNato_FW_Attack,
+            UnitClassification.AWACS => SpriteManager.UnitNato_FW_AWACS,
+            UnitClassification.BMB => SpriteManager.UnitNato_FW_Bombers,
+            UnitClassification.RECONA => SpriteManager.UnitNato_FW_Recon,
+            UnitClassification.TRN => SpriteManager.UnitNato_FixedWing,
+            UnitClassification.HQ => SpriteManager.UnitNato_Depot,
+            UnitClassification.DEPOT => SpriteManager.UnitNato_Depot,
+            UnitClassification.AIRB => SpriteManager.UnitNato_Airbase,
+            _ => SpriteManager.UnknownDeploymentIcon
+        };
 
         /// <summary>
         /// Sets the faction-colored information overlay sprite.
@@ -432,11 +479,12 @@ namespace HammerAndSickle.Core
 
         // Render order of the elements WITHIN this prefab (offset added to the slot's base order by
         // SortingConfig). Lives here in the script — the single place the internal stack is defined.
-        private const int UnitIconSubOrder = 0;
-        private const int NationIconSubOrder = 1;
-        private const int DeployIconSubOrder = 2;
-        private const int InfoOverlaySubOrder = 3;
-        private const int BoxTextSubOrder = 4;
+
+        private const int NatoIconSubOrder     = 0;
+        private const int DeployIconSubOrder   = 1;
+        private const int InfoOverlaySubOrder  = 2;
+        private const int BoxTextSubOrder      = 3;
+        private const int UnitIconSubOrder     = 4;
         private const int StackingIconSubOrder = 5;
 
         /// <summary>
@@ -449,7 +497,7 @@ namespace HammerAndSickle.Core
             try
             {
                 SortingConfig.Apply(unitIcon, slot, UnitIconSubOrder);
-                SortingConfig.Apply(nationIcon, slot, NationIconSubOrder);
+                SortingConfig.Apply(natoIcon, slot, NatoIconSubOrder);
                 SortingConfig.Apply(deployIcon, slot, DeployIconSubOrder);
                 SortingConfig.Apply(infoOverlay, slot, InfoOverlaySubOrder);
                 SortingConfig.Apply(boxText != null ? boxText.GetComponent<Renderer>() : null, slot, BoxTextSubOrder);
@@ -462,7 +510,7 @@ namespace HammerAndSickle.Core
         }
 
         /// <summary>
-        /// Sets the opacity of the unit icon, nationality icon, and hit points text.
+        /// Sets the opacity of the unit art and information elements, including the NATO symbol.
         /// Used for stacking to show non-dominant units at reduced opacity.
         /// </summary>
         public void SetOpacity(float opacity)
@@ -476,11 +524,11 @@ namespace HammerAndSickle.Core
                 unitIcon.color = color;
             }
 
-            if (nationIcon != null)
+            if (natoIcon != null)
             {
-                Color color = nationIcon.color;
+                Color color = natoIcon.color;
                 color.a = opacity;
-                nationIcon.color = color;
+                natoIcon.color = color;
             }
 
             if (infoOverlay != null)
@@ -557,8 +605,8 @@ namespace HammerAndSickle.Core
             if (unitIcon == null)
                 throw new NullReferenceException($"{CLASS_NAME}.ValidateReferences: unitIcon is null");
 
-            if (nationIcon == null)
-                Debug.LogWarning($"{CLASS_NAME}.ValidateReferences: nationIcon is not assigned");
+            if (natoIcon == null)
+                Debug.LogWarning($"{CLASS_NAME}.ValidateReferences: natoIcon is not assigned");
 
             if (infoOverlay == null)
                 Debug.LogWarning($"{CLASS_NAME}.ValidateReferences: infoOverlay is not assigned");

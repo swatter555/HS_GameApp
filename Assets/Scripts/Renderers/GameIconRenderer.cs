@@ -64,13 +64,6 @@ namespace HammerAndSickle.Core.Map
 
         #endregion // Nested Types
 
-        #region Inspector Fields
-
-        [Header("Prefabs")]
-        [SerializeField] private GameObject combatUnitIconPrefab;
-
-        #endregion // Inspector Fields
-
         #region Properties
 
         /// <summary>
@@ -193,8 +186,8 @@ namespace HammerAndSickle.Core.Map
         {
             if (_debug) Debug.Log($"[{CLASS_NAME}.ValidateComponents] Validating required components...");
 
-            if (combatUnitIconPrefab == null)
-                throw new NullReferenceException($"{CLASS_NAME}.ValidateComponents: {nameof(combatUnitIconPrefab)} is missing.");
+            // SpriteManager owns the authored prefab; never keep a second Inspector assignment here.
+            SpriteManager.GetUnitIconPrefab();
 
             if (HexGridRenderer.Instance == null)
                 throw new NullReferenceException($"{CLASS_NAME}.ValidateComponents: HexGridRenderer singleton not found.");
@@ -290,7 +283,7 @@ namespace HammerAndSickle.Core.Map
         /// <summary>
         /// Creates a unit icon prefab at the unit's map position.
         /// Handles all unit types: ground units, air units, airbases, and facilities.
-        /// Sets sprite, nationality flag, hit points display, and applies facing-based flipping.
+        /// Sets unit art, NATO classification symbol, hit points display, and facing rotation.
         /// Automatically checks for air/ground unit stacking at the position.
         /// </summary>
         public void CreateUnitIcon(CombatUnit unit)
@@ -316,7 +309,7 @@ namespace HammerAndSickle.Core.Map
                 Transform targetLayer = GetTargetLayerForUnit(unit);
 
                 // Create prefab instance
-                GameObject unitIconObject = Instantiate(combatUnitIconPrefab, targetLayer);
+                GameObject unitIconObject = Instantiate(SpriteManager.GetUnitIconPrefab(), targetLayer);
                 unitIconObject.name = $"Unit_{unit.UnitID}_{unit.UnitName}";
 
                 // Get prefab component
@@ -339,9 +332,8 @@ namespace HammerAndSickle.Core.Map
                 ApplyIconFacing(unitIcon, unit);
 
                 
-                // Set the nationality flag sized for the information overlay.
-                string flagSprite = GetNationalFlagIcon(unit.Nationality);
-                unitIcon.SetNationIcon(flagSprite);
+                // The small NATO symbol describes the formation; the overlay carries faction color.
+                unitIcon.SetNatoIcon(unit.Classification);
 
                 // Set the information overlay color by faction.
                 string overlaySprite = GetInfoOverlay(unit.Nationality);
@@ -385,7 +377,7 @@ namespace HammerAndSickle.Core.Map
         /// Since the top-down pass the sprite itself no longer varies with facing — but it still varies
         /// with the active bay, so both are refreshed here and this stays the single facing entry point.
         /// Called per hex step during movement and after a manual Shift+click rotation. Cheaper than a
-        /// full redraw: leaves position, tweens, nation/box/HP elements and stacking state alone.
+        /// full redraw: leaves position, tweens, NATO/overlay/HP elements and stacking state alone.
         /// </summary>
         public void RefreshIconFacing(string unitId)
         {
@@ -790,8 +782,8 @@ namespace HammerAndSickle.Core.Map
         /// Applies the facing rotation to a unit's icon.
         ///
         /// ⚠ ROTATES <c>unitIcon</c> ONLY, NEVER THE PREFAB ROOT. The prefab carries six renderers — the
-        /// vehicle art plus the nationality flag, box, HP readout, deployment chevron and stacking badge.
-        /// Turning the root would spin the HP number and the flag with the tank. Invisible until wrong,
+        /// vehicle art plus the NATO symbol, overlay, HP readout, deployment chevron and stacking badge.
+        /// Turning the root would spin the HP number and the symbol with the tank. Invisible until wrong,
         /// and a later "simplification" will reach for the root: don't.
         ///
         /// ⚠ BASES DO NOT ROTATE (§R5). HQs, depots and airbases are structures, and the constructor hands
@@ -815,33 +807,6 @@ namespace HammerAndSickle.Core.Map
         #endregion // Direction and Flip Methods
 
         #region Nationality Display Methods
-
-        /// <summary>
-        /// Gets the national flag sprite name sized for the unit information overlay.
-        /// </summary>
-        /// <param name="nationality">The nationality to get the flag for</param>
-        /// <returns>Sprite name for the nationality flag</returns>
-        private string GetNationalFlagIcon(Nationality nationality)
-        {
-            return nationality switch
-            {
-                Nationality.USSR => SpriteManager.FlagIcon_SV,
-                Nationality.USA => SpriteManager.FlagIcon_US,
-                Nationality.UK => SpriteManager.FlagIcon_UK,
-                Nationality.FRG => SpriteManager.FlagIcon_GE,
-                Nationality.FRA => SpriteManager.FlagIcon_FR,
-                Nationality.BE => SpriteManager.FlagIcon_BE,
-                Nationality.DE => SpriteManager.FlagIcon_DE,
-                Nationality.NE => SpriteManager.FlagIcon_NE,
-                Nationality.MJ => SpriteManager.FlagIcon_MJ,
-                Nationality.IR => SpriteManager.FlagIcon_IR,
-                Nationality.IQ => SpriteManager.FlagIcon_IQ,
-                Nationality.SAUD => SpriteManager.FlagIcon_SA,
-                Nationality.KW => SpriteManager.FlagIcon_KW,
-                Nationality.China => SpriteManager.FlagIcon_CH,
-                _ => SpriteManager.Symbol_Default
-            };
-        }
 
         /// <summary>
         /// Gets the information overlay for a nationality.

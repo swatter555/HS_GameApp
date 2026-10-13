@@ -1,4 +1,5 @@
 using HammerAndSickle.Core.GameData;
+using HammerAndSickle.Core;
 using HammerAndSickle.Services;
 using System;
 using UnityEngine;
@@ -296,34 +297,34 @@ namespace HammerAndSickle.Controllers
         #region Terrain Portraits
 
         // Water
-        public const string TP_Water = "Ocean";
+        public const string TP_Water = "ui-element-ocean";
 
         // Middle East
-        public const string ME_TP_Clear     = "ME_Clear";
-        public const string ME_TP_Forest    = "ME_Forest";
-        public const string ME_TP_Marsh     = "ME_Marsh";
-        public const string ME_TP_Mountains = "ME_Mountain";
-        public const string ME_TP_Rough     = "ME_Rough";
-        public const string ME_TP_City      = "ME_City";
-        public const string ME_TP_Town      = "ME_Town";
+        public const string ME_TP_Clear     = "ui-element-me-clear";
+        public const string ME_TP_Forest    = "ui-element-me-forest";
+        public const string ME_TP_Marsh     = "ui-element-me-marsh";
+        public const string ME_TP_Mountains = "ui-element-me-mountain";
+        public const string ME_TP_Rough     = "ui-element-me-rough";
+        public const string ME_TP_City      = "ui-element-me-city";
+        public const string ME_TP_Town      = "ui-element-me-village";
 
         // Europe
-        public const string EU_TP_Clear     = "EU_Clear";
-        public const string EU_TP_Forest    = "EU_Forest";
-        public const string EU_TP_Marsh     = "EU_Marsh";
-        public const string EU_TP_Mountains = "EU_Mountain";
-        public const string EU_TP_Rough     = "EU_Rough";
-        public const string EU_TP_City      = "EU_City";
-        public const string EU_TP_Town      = "EU_Town";
+        public const string EU_TP_Clear     = "ui-element-eu-clear";
+        public const string EU_TP_Forest    = "ui-element-eu-forest";
+        public const string EU_TP_Marsh     = "ui-element-eu-marsh";
+        public const string EU_TP_Mountains = "ui-element-eu-mountain";
+        public const string EU_TP_Rough     = "ui-element-eu-rough";
+        public const string EU_TP_City      = "ui-element-eu-city";
+        public const string EU_TP_Town      = "ui-element-eu-village";
 
         // China
-        public const string CH_TP_Clear     = "CH_Clear";
-        public const string CH_TP_Forest    = "CH_Forest";
-        public const string CH_TP_Marsh     = "CH_Marsh";
-        public const string CH_TP_Mountains = "CH_Mountain";
-        public const string CH_TP_Rough     = "CH_Rough";
-        public const string CH_TP_City      = "CH_City";
-        public const string CH_TP_Town      = "CH_Town";
+        public const string CH_TP_Clear     = "ui-element-ch-clear";
+        public const string CH_TP_Forest    = "ui-element-ch-forest";
+        public const string CH_TP_Marsh     = "ui-element-ch-marsh";
+        public const string CH_TP_Mountains = "ui-element-ch-mountain";
+        public const string CH_TP_Rough     = "ui-element-ch-rough";
+        public const string CH_TP_City      = "ui-element-ch-city";
+        public const string CH_TP_Town      = "ui-element-ch-village";
 
         #endregion // Terrain Portraits
 
@@ -794,21 +795,43 @@ namespace HammerAndSickle.Controllers
         public const string Symbol_UK      = "UK_Symbol";
         public const string Symbol_US      = "US_Symbol";
         public const string Symbol_Default = "DF_Symbol";
-        // Nationality flags sized for the unit information overlay.
-        public const string FlagIcon_BE = "BE_Flag_Icon";
-        public const string FlagIcon_CH = "CH_Flag_Icon";
-        public const string FlagIcon_DE = "DE_Flag_Icon";
-        public const string FlagIcon_FR = "FR_Flag_Icon";
-        public const string FlagIcon_GE = "GE_Flag_Icon";
-        public const string FlagIcon_IR = "IR_Flag_Icon";
-        public const string FlagIcon_IQ = "IQ_Flag_Icon";
-        public const string FlagIcon_KW = "KW_Flag_Icon";
-        public const string FlagIcon_MJ = "MJ_Flag_Icon";
-        public const string FlagIcon_NE = "NE_Flag_Icon";
-        public const string FlagIcon_SA = "SA_Flag_Icon";
-        public const string FlagIcon_SV = "SV_Flag_Icon";
-        public const string FlagIcon_UK = "UK_Flag_Icon";
-        public const string FlagIcon_US = "US_Flag_Icon";
+
+        // Small classification symbols. Several names also exist in the large NATO symbol atlas;
+        // resolve these through GetUnitPrefabSprite, never the global GetSprite search.
+        public const string UnitNato_AAA = "Icon_AAA";
+        public const string UnitNato_AirAssault = "Icon_AirAssault";
+        public const string UnitNato_Airbase = "Icon_Airbase";
+        public const string UnitNato_Airborne = "Icon_Airborne";
+        public const string UnitNato_Antitank = "Icon_Antitank";
+        public const string UnitNato_ArmoredCav = "Icon_ArmoredCav";
+        public const string UnitNato_ArmoredMarine = "Icon_ArmoredMarine";
+        public const string UnitNato_Artillery = "Icon_Artillery";
+        public const string UnitNato_BallisticMissile = "Icon_BallisticMissile";
+        public const string UnitNato_Depot = "Icon_Depot";
+        public const string UnitNato_Engineer = "Icon_Engineer";
+        public const string UnitNato_FixedWing = "Icon_FixedWing";
+        public const string UnitNato_FixedWingRecon = "Icon_FixedWingRecon";
+        public const string UnitNato_FW_Attack = "Icon_FW_Attack";
+        public const string UnitNato_FW_AWACS = "Icon_FW_AWACS";
+        public const string UnitNato_FW_Bombers = "Icon_FW_Bombers";
+        public const string UnitNato_FW_Fighters = "Icon_FW_Fighters";
+        public const string UnitNato_FW_Recon = "Icon_FW_Recon";
+        public const string UnitNato_Helo = "Icon_Helo";
+        public const string UnitNato_Infantry = "Icon_Infantry";
+        public const string UnitNato_Marine = "Icon_Marine";
+        public const string UnitNato_Mech = "Icon_Mech";
+        public const string UnitNato_MechAirborne = "Icon_MechAirborne";
+        public const string UnitNato_MechAM = "Icon_MechAM";
+        public const string UnitNato_Mot = "Icon_Mot";
+        public const string UnitNato_Recon = "Icon_Recon";
+        public const string UnitNato_Rocket = "Icon_Rocket";
+        public const string UnitNato_SAM = "Icon_SAM";
+        public const string UnitNato_Signal = "Icon_Signal";
+        public const string UnitNato_SPAAA = "Icon_SPAAA";
+        public const string UnitNato_SPArtillery = "Icon_SPArtillery";
+        public const string UnitNato_SpecialForces = "Icon_SpecialForces";
+        public const string UnitNato_SPSAM = "Icon_SPSAM";
+        public const string UnitNato_Tank = "Icon_Tank";
 
         // Information overlays (NATO, Soviet, Regional including China)
         public const string UnitIcon_Blue  = "UnitIcon_Blue";
@@ -1077,6 +1100,80 @@ namespace HammerAndSickle.Controllers
         #endregion // Unity Lifecycle
 
         #region Static Methods
+
+        /// <summary>
+        /// Resolves the battle unit prefab from the persistent MainMenu manager, without creating
+        /// an unwired manager. The authored reference is checked again whenever an icon is created.
+        /// </summary>
+        public static GameObject GetUnitIconPrefab() =>
+            RequireIconPrefab<Prefab_CombatUnitIcon>(RequireInitializedManager().UnitIconPrefab, nameof(_unitIconPrefab));
+
+        /// <summary>Resolves the city prefab from the same authoritative bootstrap assignments.</summary>
+        public static GameObject GetCityPrefab() =>
+            RequireIconPrefab<Prefab_CityIcon>(RequireInitializedManager().CityPrefab, nameof(_cityPrefab));
+
+        private static SpriteManager RequireInitializedManager()
+        {
+            if (_instance == null)
+                throw new InvalidOperationException($"{CLASS_NAME}: SpriteManager is not initialized. Start the game from MainMenu so its authored prefab references are loaded.");
+
+            return _instance;
+        }
+
+        private static GameObject RequireIconPrefab<T>(GameObject prefab, string fieldName) where T : Component
+        {
+            if (prefab == null)
+                throw new InvalidOperationException($"{CLASS_NAME}: {fieldName} is not assigned. Assign the icon prefab on SpriteManager in MainMenu.");
+
+            if (!prefab.TryGetComponent<T>(out _))
+                throw new InvalidOperationException($"{CLASS_NAME}: {fieldName} must reference a prefab with {typeof(T).Name} on its root. Correct the SpriteManager assignment in MainMenu.");
+
+            return prefab;
+        }
+
+        /// <summary>
+        /// Resolves small unit information graphics exclusively from their authored atlas. The bootstrap
+        /// scene owns this manager; a lookup must not create missing infrastructure or use large symbols.
+        /// </summary>
+        public static Sprite GetUnitPrefabSprite(string spriteName)
+        {
+            if (_instance == null)
+            {
+                UnityEngine.Debug.LogError($"{CLASS_NAME}.GetUnitPrefabSprite: SpriteManager is not initialized.");
+                return null;
+            }
+
+            return GetUnitPrefabSprite(_instance._unitPrefabIconAtlas, spriteName);
+        }
+
+        // Explicit atlas input lets the asset audit exercise the runtime lookup without replacing the
+        // live manager or opening the saved bootstrap scene as the active scene.
+        internal static Sprite GetUnitPrefabSprite(SpriteAtlas atlas, string spriteName)
+        {
+            try
+            {
+                if (atlas == null)
+                {
+                    UnityEngine.Debug.LogWarning($"{CLASS_NAME}.GetUnitPrefabSprite: UnitPrefab Icons atlas is not assigned.");
+                    return null;
+                }
+
+                if (string.IsNullOrEmpty(spriteName)) return null;
+
+                Sprite sprite = atlas.GetSprite(spriteName);
+                if (sprite != null) return sprite;
+
+                string warningMessage = $"{CLASS_NAME}.GetUnitPrefabSprite: Sprite '{spriteName}' not found in UnitPrefab Icons atlas.";
+                UnityEngine.Debug.LogWarning(warningMessage);
+                AppService.CaptureUiMessage(warningMessage);
+                return null;
+            }
+            catch (Exception e)
+            {
+                AppService.HandleException(CLASS_NAME, nameof(GetUnitPrefabSprite), e);
+                return null;
+            }
+        }
 
         /// <summary>
         /// Resolves the pre-rotated facing chevron sprite for a HexDirection (§5.8). One sprite per
