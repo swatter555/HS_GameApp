@@ -46,6 +46,10 @@ namespace HammerAndSickle.Tests
         private string[] Counts() => new[] { "_moveActionsText", "_combatActionsText", "_deployActionsText", "_intelActionsText", "_oppActionsText" }
             .Select(field => UnitText(field).text).ToArray();
 
+        private static readonly string[] TerrainFields = { "_terrainTypeText", "_cityNameText", "_hexLocationText", "_movementCostText", "_defenseModifierText" };
+        private TextMeshProUGUI TerrainText(string field) => (TextMeshProUGUI)typeof(Prefab_TerrainPanel).GetField(field, PrivateInstance).GetValue(_terrainPanel);
+        private string[] TerrainValues() => TerrainFields.Select(field => TerrainText(field).text).ToArray();
+
         [SetUp]
         public void SetUp()
         {
@@ -189,6 +193,7 @@ namespace HammerAndSickle.Tests
             Assert.That(GameDataManager.SelectedUnit, Is.Null);
             Assert.That(GameDataManager.SelectedLeader, Is.Null);
             Assert.That(GameDataManager.SelectedHexData, Is.Null);
+            Assert.That(TerrainValues(), Is.All.EqualTo(string.Empty));
             Assert.That(UnitText("_infoText").text, Is.Empty);
         }
 
@@ -218,6 +223,38 @@ namespace HammerAndSickle.Tests
         }
 
         [Test]
+        public void SwitchingFromNamedCityToUnnamedMountains_ReplacesEveryTerrainField()
+        {
+            var city = _map.GetHexAt(new Position2D(2, 2));
+            city.SetTerrain(TerrainType.MajorCity);
+            city.TileLabel = "Khost";
+            Select();
+            Assert.That(TerrainValues(), Is.EqualTo(new[] { "Major City", "Khost", "2,2", "1", "3" }));
+
+            var mountains = _map.GetHexAt(new Position2D(4, 4));
+            mountains.SetTerrain(TerrainType.Mountains);
+            mountains.TileLabel = " ";
+            Select(4, 4);
+            Assert.That(TerrainValues(), Is.EqualTo(new[] { "Mountains", "", "4,4", "5", "4" }));
+
+            mountains.TileLabel = "Mountain Pass";
+            _updater.RefreshSelectionPanels();
+            Assert.That(TerrainText("_cityNameText").text, Is.EqualTo("Mountain Pass"));
+        }
+
+        [Test]
+        public void SwitchingToImpassableTerrain_ClearsThePreviousPortrait()
+        {
+            Select();
+            var hex = _map.GetHexAt(new Position2D(4, 4));
+            hex.SetTerrain(TerrainType.Impassable);
+            Select(4, 4);
+            Assert.That(TerrainValues(), Is.EqualTo(new[] { "Impassable", "", "4,4", "0", "0" }));
+            var image = (UnityEngine.UI.Image)typeof(Prefab_TerrainPanel).GetField("_terrainImage", PrivateInstance).GetValue(_terrainPanel);
+            Assert.That(image.sprite, Is.Null);
+            Assert.That(image.enabled, Is.False);
+        }
+        [Test]
         public void TerrainPortraitCatalog_KeysMatchTheImportedSpriteNames()
         {
             var names = typeof(SpriteManager).GetFields(BindingFlags.Public | BindingFlags.Static)
@@ -231,6 +268,13 @@ namespace HammerAndSickle.Tests
                 var sprite = UnityEditor.AssetDatabase.LoadAssetAtPath<UnityEngine.Sprite>("Assets/Art/UI Graphics/Elements/Terrain Portraits/" + name + ".png");
                 Assert.That(sprite, Is.Not.Null, name);
                 Assert.That(sprite.name.Replace("(Clone)", ""), Is.EqualTo(name));
+                var packed = SpriteManager.GetSprite(name);
+                try { Assert.That(packed, Is.Not.Null, "Terrain atlas must resolve " + name); }
+                finally
+                {
+                    if (packed != null && !UnityEditor.EditorUtility.IsPersistent(packed))
+                        UnityEngine.Object.DestroyImmediate(packed);
+                }
 
             }
         }

@@ -1,17 +1,16 @@
-using System.Collections.Generic;
+using System.Globalization;
 using HammerAndSickle.Controllers;
 using HammerAndSickle.Core.GameData;
 using HammerAndSickle.Models;
 using HammerAndSickle.Models.Map;
 using TMPro;
 using UnityEngine;
-using UnityEngine.UI;
+using UnityEngine.Serialization;
 
 namespace HammerAndSickle.Core
 {
     /// <summary>
-    /// Reactive terrain panel: a terrain portrait image + a single formatted text block
-    /// (slimmed from per-field labels 2026-07-23).
+    /// Displays the selected hex through separate Inspector-owned text fields and a terrain portrait.
     /// </summary>
     public class Prefab_TerrainPanel : MonoBehaviour
     {
@@ -47,8 +46,13 @@ namespace HammerAndSickle.Core
         #region Inspector Fields
 
         [Header("Terrain Panel Fields")]
-        [SerializeField] private Image _terrainImage;
-        [SerializeField] private TextMeshProUGUI _infoText;
+        [FormerlySerializedAs("_infoText")]
+        [SerializeField, InspectorName("Terrain Type")] private TextMeshProUGUI _terrainTypeText;
+        [SerializeField, InspectorName("City Name")] private TextMeshProUGUI _cityNameText;
+        [SerializeField, InspectorName("Hex Location")] private TextMeshProUGUI _hexLocationText;
+        [SerializeField, InspectorName("Movement Cost")] private TextMeshProUGUI _movementCostText;
+        [SerializeField, InspectorName("Defense Modifier")] private TextMeshProUGUI _defenseModifierText;
+        [SerializeField, InspectorName("Terrain Portrait")] private UnityEngine.UI.Image _terrainImage;
         private string _displayedPortraitName;
 
         #endregion // Inspector Fields
@@ -61,8 +65,12 @@ namespace HammerAndSickle.Core
         public bool Initialize()
         {
             string errorString = "";
-            if (_terrainImage == null) errorString += "Terrain Image is not assigned. ";
-            if (_infoText == null) errorString += "Info Text is not assigned. ";
+            if (_terrainTypeText == null) errorString += "Terrain Type is not assigned. ";
+            if (_cityNameText == null) errorString += "City Name is not assigned. ";
+            if (_hexLocationText == null) errorString += "Hex Location is not assigned. ";
+            if (_movementCostText == null) errorString += "Movement Cost is not assigned. ";
+            if (_defenseModifierText == null) errorString += "Defense Modifier is not assigned. ";
+            if (_terrainImage == null) errorString += "Terrain Portrait is not assigned. ";
 
             if (!string.IsNullOrEmpty(errorString))
             {
@@ -77,58 +85,36 @@ namespace HammerAndSickle.Core
 
         #region Terrain Panel Update
 
-        /// <summary>
-        /// Updates the terrain panel with data from the currently selected hex.
-        /// Line 1: "x, y  &lt;terrain type&gt;".
-        /// Line 2: location name (omitted when the hex has no label).
-        /// Line 3: "Move Cost N, Defense Bonus N".
-        /// Line 4: feature summary.
-        /// </summary>
+        /// <summary>Updates each field from the selected hex; authored captions supply the labels.</summary>
         public void UpdateTerrainPanel()
         {
-            if (GameDataManager.SelectedHex == GameDataManager.NoHexSelected)
-                return;
-
             var hexData = GameDataManager.SelectedHexData;
-            if (hexData == null)
+            if (GameDataManager.SelectedHex == GameDataManager.NoHexSelected || hexData == null)
+            {
+                Clear();
                 return;
+            }
 
             UpdateTerrainPortrait(hexData.Terrain, GameDataManager.CurrentMapTheme);
-
-            var pos = GameDataManager.SelectedHex;
-            var lines = new List<string>();
-
-            // This line only when the hex is named.
-            if (!string.IsNullOrWhiteSpace(hexData.TileLabel))
-                lines.Add(hexData.TileLabel);
-
-            // Add hex type.
-            lines.Add(FormatTerrainType(hexData.Terrain));
-
-            // Add move cost and defense bonus.
-            lines.Add($"MOV:{GetMoveCost(hexData.Terrain)}");
-            lines.Add($"DEF:{GetDefenseBonus(hexData.Terrain)}");
-
-            // Add the location text.
-            lines.Add($"{pos.IntX},{pos.IntY}");
-
-            // Add summary text.
-            lines.Add(GenerateSummary(hexData));
-
-            if (_infoText != null)
-                _infoText.text = string.Join("\n", lines);
+            if (_terrainTypeText != null) _terrainTypeText.text = FormatTerrainType(hexData.Terrain);
+            if (_cityNameText != null) _cityNameText.text = string.IsNullOrWhiteSpace(hexData.TileLabel) ? string.Empty : hexData.TileLabel;
+            if (_hexLocationText != null) _hexLocationText.text = $"{GameDataManager.SelectedHex.IntX},{GameDataManager.SelectedHex.IntY}";
+            if (_movementCostText != null) _movementCostText.text = hexData.MovementCost.ToString(CultureInfo.InvariantCulture);
+            if (_defenseModifierText != null) _defenseModifierText.text = GetDefenseBonus(hexData.Terrain).ToString(CultureInfo.InvariantCulture);
         }
-
         /// <summary>
-        /// Clears contents; The Battle HUD hides this root until a valid hex is selected.
+        /// Clears all fields; the Battle HUD hides this root until a valid hex is selected.
         ///
         /// The portrait Image is DISABLED rather than just having its sprite nulled: an Image with a null
         /// sprite still draws as a solid white rectangle.
         /// </summary>
         public void Clear()
         {
-            if (_infoText != null)
-                _infoText.text = string.Empty;
+            if (_terrainTypeText != null) _terrainTypeText.text = string.Empty;
+            if (_cityNameText != null) _cityNameText.text = string.Empty;
+            if (_hexLocationText != null) _hexLocationText.text = string.Empty;
+            if (_movementCostText != null) _movementCostText.text = string.Empty;
+            if (_defenseModifierText != null) _defenseModifierText.text = string.Empty;
 
             if (_terrainImage != null)
             {
@@ -185,54 +171,16 @@ namespace HammerAndSickle.Core
         {
             return terrain switch
             {
-                TerrainType.Water => 0,
-                TerrainType.Clear => 0,
-                TerrainType.Forest => 1,
-                TerrainType.Rough => 2,
-                TerrainType.Marsh => 3,
-                TerrainType.Mountains => 4,
-                TerrainType.MinorCity => 1,
-                TerrainType.MajorCity => 3,
+                TerrainType.Water => (int)HexDefenseBonus.Water,
+                TerrainType.Clear => (int)HexDefenseBonus.Plains,
+                TerrainType.Forest => (int)HexDefenseBonus.Forest,
+                TerrainType.Rough => (int)HexDefenseBonus.Rough,
+                TerrainType.Marsh => (int)HexDefenseBonus.Marsh,
+                TerrainType.Mountains => (int)HexDefenseBonus.Mountains,
+                TerrainType.MinorCity => (int)HexDefenseBonus.MinorCity,
+                TerrainType.MajorCity => (int)HexDefenseBonus.MajorCity,
                 _ => 0
             };
-        }
-
-        /// <summary>
-        /// Gets the movement cost for a terrain type.
-        /// </summary>
-        private int GetMoveCost(TerrainType terrain)
-        {
-            return terrain switch
-            {
-                TerrainType.Water => (int)HexMovementCost.Water,
-                TerrainType.Clear => (int)HexMovementCost.Clear,
-                TerrainType.Forest => (int)HexMovementCost.Forest,
-                TerrainType.Rough => (int)HexMovementCost.Rough,
-                TerrainType.Marsh => (int)HexMovementCost.Marsh,
-                TerrainType.Mountains => (int)HexMovementCost.Mountains,
-                TerrainType.MinorCity => (int)HexMovementCost.MinorCity,
-                TerrainType.MajorCity => (int)HexMovementCost.MajorCity,
-                _ => 0
-            };
-        }
-
-        /// <summary>
-        /// Generates a summary text for the hex.
-        /// </summary>
-        private string GenerateSummary(HexTile hexData)
-        {
-            var features = new List<string>();
-
-            if (hexData.UrbanDamage > 0) features.Add("Urban Sprawl");
-            if (hexData.IsRoad) features.Add("Road");
-            if (hexData.IsRail) features.Add("Rail");
-            if (hexData.IsFort) features.Add("Fort");
-            if (hexData.IsAirbase) features.Add("Airbase");
-            // IsObjective here is the RUNTIME value — a load-time projection of the manifest's
-            // missionObjectives (C6 clear-then-stamp in MapLoader); the authored .map value is dead.
-            if (hexData.IsObjective) features.Add("Objective");
-
-            return features.Count > 0 ? string.Join(", ", features) : "No special features";
         }
 
         /// <summary>
